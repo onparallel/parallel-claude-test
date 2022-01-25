@@ -23,6 +23,7 @@ export const PetitionAttachmentFragment = gql`
 export const UserFragment = gql`
   fragment User on User {
     id
+    email
     fullName
     firstName
     lastName

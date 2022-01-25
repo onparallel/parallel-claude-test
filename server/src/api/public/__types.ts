@@ -3196,6 +3196,7 @@ export type PetitionAttachmentFragment = {
 
 export type UserFragment = {
   id: string;
+  email: string;
   fullName: string | null;
   firstName: string | null;
   lastName: string | null;
@@ -3232,6 +3233,7 @@ export type PetitionAccessFragment = {
   } | null;
   granter: {
     id: string;
+    email: string;
     fullName: string | null;
     firstName: string | null;
     lastName: string | null;
@@ -3303,6 +3305,7 @@ export type PetitionFragment = {
     } | null;
     granter: {
       id: string;
+      email: string;
       fullName: string | null;
       firstName: string | null;
       lastName: string | null;
@@ -3355,7 +3358,13 @@ export type Permission_PetitionUserGroupPermission_Fragment = {
 export type Permission_PetitionUserPermission_Fragment = {
   permissionType: PetitionPermissionType;
   createdAt: string;
-  user: { id: string; fullName: string | null; firstName: string | null; lastName: string | null };
+  user: {
+    id: string;
+    email: string;
+    fullName: string | null;
+    firstName: string | null;
+    lastName: string | null;
+  };
 };
 
 export type PermissionFragment =
@@ -3394,6 +3403,18 @@ export type getTaskResultFileUrl_getTaskResultFileUrlMutationVariables = Exact<{
 
 export type getTaskResultFileUrl_getTaskResultFileUrlMutation = {
   getTaskResultFileUrl: { result: Result; url: string | null };
+};
+
+export type GetMe_userQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetMe_userQuery = {
+  me: {
+    id: string;
+    email: string;
+    fullName: string | null;
+    firstName: string | null;
+    lastName: string | null;
+  };
 };
 
 export type GetTags_tagsQueryVariables = Exact<{
@@ -3449,6 +3470,7 @@ export type GetPetitions_petitionsQuery = {
             } | null;
             granter: {
               id: string;
+              email: string;
               fullName: string | null;
               firstName: string | null;
               lastName: string | null;
@@ -3515,6 +3537,7 @@ export type CreatePetition_petitionMutation = {
           } | null;
           granter: {
             id: string;
+            email: string;
             fullName: string | null;
             firstName: string | null;
             lastName: string | null;
@@ -3578,6 +3601,7 @@ export type GetPetition_petitionQuery = {
           } | null;
           granter: {
             id: string;
+            email: string;
             fullName: string | null;
             firstName: string | null;
             lastName: string | null;
@@ -3643,6 +3667,7 @@ export type UpdatePetition_updatePetitionMutation = {
           } | null;
           granter: {
             id: string;
+            email: string;
             fullName: string | null;
             firstName: string | null;
             lastName: string | null;
@@ -3735,6 +3760,7 @@ export type GetPetitionRecipients_petitionAccessesQuery = {
           } | null;
           granter: {
             id: string;
+            email: string;
             fullName: string | null;
             firstName: string | null;
             lastName: string | null;
@@ -3796,6 +3822,7 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
       } | null;
       granter: {
         id: string;
+        email: string;
         fullName: string | null;
         firstName: string | null;
         lastName: string | null;
@@ -3900,6 +3927,7 @@ export type GetPermissions_permissionsQuery = {
               createdAt: string;
               user: {
                 id: string;
+                email: string;
                 fullName: string | null;
                 firstName: string | null;
                 lastName: string | null;
@@ -3919,6 +3947,7 @@ export type GetPermissions_permissionsQuery = {
               createdAt: string;
               user: {
                 id: string;
+                email: string;
                 fullName: string | null;
                 firstName: string | null;
                 lastName: string | null;
@@ -3949,6 +3978,7 @@ export type SharePetition_addPetitionPermissionMutation = {
               createdAt: string;
               user: {
                 id: string;
+                email: string;
                 fullName: string | null;
                 firstName: string | null;
                 lastName: string | null;
@@ -3968,6 +3998,7 @@ export type SharePetition_addPetitionPermissionMutation = {
               createdAt: string;
               user: {
                 id: string;
+                email: string;
                 fullName: string | null;
                 firstName: string | null;
                 lastName: string | null;
@@ -4023,6 +4054,7 @@ export type TransferPetition_transferPetitionOwnershipMutation = {
               createdAt: string;
               user: {
                 id: string;
+                email: string;
                 fullName: string | null;
                 firstName: string | null;
                 lastName: string | null;
@@ -4042,6 +4074,7 @@ export type TransferPetition_transferPetitionOwnershipMutation = {
               createdAt: string;
               user: {
                 id: string;
+                email: string;
                 fullName: string | null;
                 firstName: string | null;
                 lastName: string | null;
@@ -4227,6 +4260,7 @@ export type GetOrganizationUsers_usersQuery = {
         totalCount: number;
         items: Array<{
           id: string;
+          email: string;
           fullName: string | null;
           firstName: string | null;
           lastName: string | null;
@@ -4598,6 +4632,7 @@ export const ContactFragmentDoc = gql`
 export const UserFragmentDoc = gql`
   fragment User on User {
     id
+    email
     fullName
     firstName
     lastName
@@ -4769,6 +4804,14 @@ export const getTaskResultFileUrl_getTaskResultFileUrlDocument = gql`
   getTaskResultFileUrl_getTaskResultFileUrlMutation,
   getTaskResultFileUrl_getTaskResultFileUrlMutationVariables
 >;
+export const GetMe_userDocument = gql`
+  query GetMe_user {
+    me {
+      ...User
+    }
+  }
+  ${UserFragmentDoc}
+` as unknown as DocumentNode<GetMe_userQuery, GetMe_userQueryVariables>;
 export const GetTags_tagsDocument = gql`
   query GetTags_tags($offset: Int!, $limit: Int!, $search: String) {
     tags(offset: $offset, limit: $limit, search: $search) {

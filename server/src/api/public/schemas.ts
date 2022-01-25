@@ -30,10 +30,14 @@ const _User = {
   title: "User",
   type: "object",
   additionalProperties: false,
-  required: ["id", "firstName", "lastName", "fullName"],
+  required: ["id", "email", "firstName", "lastName", "fullName"],
   properties: {
     id: {
       description: "The ID of the user",
+      type: "string",
+    },
+    email: {
+      description: "The email of the user",
       type: "string",
     },
     firstName: {
@@ -629,6 +633,7 @@ export const ListOfPetitionAccesses = ListOf(_PetitionAccess);
 export const Template = schema(_Template);
 export const PaginatedTemplates = PaginatedListOf(_Template);
 export const Contact = schema(_Contact);
+export const User = schema(_User);
 export const CreateContact = schema({
   title: "CreateContact",
   type: "object",

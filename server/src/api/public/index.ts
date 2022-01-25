@@ -46,7 +46,6 @@ import {
   waitForTask,
 } from "./helpers";
 import {
-  _PetitionEvent,
   Contact,
   CreateContact,
   CreateOrUpdatePetitionCustomProperty,
@@ -75,6 +74,8 @@ import {
   Template,
   UpdatePetition,
   UpdateReply,
+  User,
+  _PetitionEvent,
 } from "./schemas";
 import {
   CreateContact_contactDocument,
@@ -102,6 +103,7 @@ import {
   ExportPetitionReplies_createPrintPdfTaskDocument,
   GetContacts_contactsDocument,
   GetContact_contactDocument,
+  GetMe_userDocument,
   GetOrganizationUsers_usersDocument,
   GetPermissions_permissionsDocument,
   GetPetitionAttachments_petitionDocument,
@@ -137,6 +139,7 @@ import {
   UpdateReply_updateFileUploadReplyCompleteDocument,
   UpdateReply_updateFileUploadReplyDocument,
   UpdateReply_updateSimpleReplyDocument,
+  UserFragmentDoc,
 } from "./__types";
 
 const uploadFileMiddleware = multer({
@@ -334,6 +337,32 @@ const signatureId = idParam({
   type: "PetitionSignatureRequest",
   description: "The ID of the signature request",
 });
+
+api.path("/me").get(
+  {
+    operationId: "GetMe",
+    summary: "Get user info",
+    description: outdent`
+    Get the information for the user who owns the token.
+  `,
+    responses: {
+      200: SuccessResponse(User),
+    },
+    tags: ["Users"],
+  },
+  async ({ client }) => {
+    const _query = gql`
+      query GetMe_user {
+        me {
+          ...User
+        }
+      }
+      ${UserFragmentDoc}
+    `;
+    const result = await client.request(GetMe_userDocument);
+    return Ok(result.me);
+  }
+);
 
 api.path("/tags").get(
   {
