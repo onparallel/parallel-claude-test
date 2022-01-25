@@ -1675,21 +1675,6 @@
     "context": "There are no replies to this field yet"
   },
   {
-    "term": "component.petition-replies-field.review-button",
-    "definition": "Revisado",
-    "context": "Reviewed"
-  },
-  {
-    "term": "component.petition-replies-field.review-button-not-validated-label",
-    "definition": "No revisado",
-    "context": "Not reviewed"
-  },
-  {
-    "term": "component.petition-replies-field.review-button-validated-label",
-    "definition": "Revisado",
-    "context": "Reviewed"
-  },
-  {
     "term": "component.petition-replies-filter-button.show-not-reviewed",
     "definition": "Pendiente de revisar",
     "context": "Not reviewed"
@@ -4585,14 +4570,14 @@
     "context": "Error loading image. Please upload again."
   },
   {
-    "term": "organization.branding.logo-attach-help",
-    "definition": "Adjunta una imagen que quieras que mostremos en tus correos.",
-    "context": "Attach an image that you would like us to display in your emails."
-  },
-  {
     "term": "organization.branding.logo-atach-requirements-dropbox",
     "definition": "(Imagen PNG, máx. {size})",
     "context": "(PNG image, max. {size})"
+  },
+  {
+    "term": "organization.branding.logo-attach-help",
+    "definition": "Adjunta una imagen que quieras que mostremos en tus correos.",
+    "context": "Attach an image that you would like us to display in your emails."
   },
   {
     "term": "organization.branding.logo-attach-requirements-help",
@@ -4630,11 +4615,6 @@
     "context": "Are you sure you want to <b>activate</b> the selected {count, plural, =1{user} other {users}}?"
   },
   {
-    "term": "organization.confirm-deactivate-user-dialog.assign-to-other",
-    "definition": "Asignar peticiones a otro usuario de la organización",
-    "context": "Assign petitions to another user in the organization"
-  },
-  {
     "term": "organization.confirm-deactivate-user-dialog.body",
     "definition": "Estás seguro que quieres <b>desactivar</b> {count, plural, =1{el usuario seleccionado} other{los usuarios seleccionados}}?",
     "context": "Are you sure you want to <b>deactivate</b> the selected {count, plural, =1{user} other {users}}?"
@@ -4643,11 +4623,6 @@
     "term": "organization.confirm-deactivate-user-dialog.body-2",
     "definition": "Los usuarios inactivos no podrán acceder ni utilizar Parallel de ninguna manera.",
     "context": "Inactive users won't be able to login or use Parallel in any way."
-  },
-  {
-    "term": "organization.confirm-deactivate-user-dialog.delete-all-petitions",
-    "definition": "Eliminar todas sus peticiones",
-    "context": "Delete all petitions"
   },
   {
     "term": "organization.confirm-deactivate-user-dialog.transfer-to-user",
