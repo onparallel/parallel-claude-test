@@ -85,6 +85,7 @@ const config = {
   },
   redirects() {
     return [
+      { source: "/invite", destination: "/signup", permanent: true },
       { source: "/app/settings/tokens", destination: "/app/settings/developers", permanent: true },
     ];
   },
