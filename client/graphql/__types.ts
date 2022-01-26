@@ -460,6 +460,8 @@ export interface Mutation {
   fileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
   /** Generates a new API token for the context user */
   generateUserAuthToken: GenerateUserAuthTokenResponse;
+  /** Get the user who owns an API Token */
+  getApiTokenOwner: SupportMethodResponse;
   /** Returns a signed download url for tasks with file output */
   getTaskResultFileUrl: FileUploadDownloadLinkResult;
   /** marks a Signature integration as default */
@@ -930,6 +932,10 @@ export interface MutationfileUploadReplyDownloadLinkArgs {
 
 export interface MutationgenerateUserAuthTokenArgs {
   tokenName: Scalars["String"];
+}
+
+export interface MutationgetApiTokenOwnerArgs {
+  token: Scalars["String"];
 }
 
 export interface MutationgetTaskResultFileUrlArgs {

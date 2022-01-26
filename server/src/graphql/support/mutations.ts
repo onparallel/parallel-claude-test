@@ -2,7 +2,7 @@ import { arg, idArg, intArg, mutationField, nonNull, nullable, stringArg } from 
 import { isDefined, uniq } from "remeda";
 import { fullName } from "../../util/fullName";
 import { fromGlobalId } from "../../util/globalId";
-import { random } from "../../util/token";
+import { hash, random } from "../../util/token";
 import { ArgValidationError } from "../helpers/errors";
 import { RESULT } from "../helpers/result";
 import { uploadArg } from "../helpers/upload";
@@ -219,6 +219,37 @@ export const resetUserPassword = mutationField("resetUserPassword", {
           message: `User with email ${email} not found.`,
         };
       }
+    } catch (error: any) {
+      return {
+        result: RESULT.FAILURE,
+        message: error.message,
+      };
+    }
+  },
+});
+
+export const getApiTokenOwner = mutationField("getApiTokenOwner", {
+  description: "Get the user who owns an API Token",
+  type: "SupportMethodResponse",
+  args: {
+    token: nonNull(stringArg()),
+  },
+  authorize: supportMethodAccess(),
+  resolve: async (_, { token }, ctx) => {
+    try {
+      const tokenHash = await hash(token, "");
+      const userToken = await ctx.userAuthentication.loadUserAuthenticationByTokenHash(tokenHash);
+      if (!isDefined(userToken)) {
+        throw new Error("Token not found");
+      }
+      const user = await ctx.users.loadUser(userToken.user_id);
+      if (!isDefined(user)) {
+        throw new Error("Token found but user is deleted");
+      }
+      return {
+        result: RESULT.SUCCESS,
+        message: `User:${user.id} with email ${user.email}.`,
+      };
     } catch (error: any) {
       return {
         result: RESULT.FAILURE,

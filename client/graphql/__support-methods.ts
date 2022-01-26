@@ -210,6 +210,34 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "getApiTokenOwner",
+      description: "Get the user who owns an API Token",
+      args: [
+        {
+          name: "token",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "String", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "globalIdDecode",
       description: "Decodes the given Global ID into an entity in the database.",
       args: [

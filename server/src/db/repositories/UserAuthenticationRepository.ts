@@ -60,6 +60,12 @@ export class UserAuthenticationRepository extends BaseRepository {
     return count === new Set(ids).size;
   }
 
+  readonly loadUserAuthenticationByTokenHash = this.buildLoadBy(
+    "user_authentication_token",
+    "token_hash",
+    (q) => q.whereNull("deleted_at")
+  );
+
   readonly loadUserAuthenticationTokens = this.buildLoadMultipleBy(
     "user_authentication_token",
     "user_id",

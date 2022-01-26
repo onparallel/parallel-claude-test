@@ -834,6 +834,11 @@ type Mutation {
   generateUserAuthToken(tokenName: String!): GenerateUserAuthTokenResponse!
 
   """
+  Get the user who owns an API Token
+  """
+  getApiTokenOwner(token: String!): SupportMethodResponse!
+
+  """
   Returns a signed download url for tasks with file output
   """
   getTaskResultFileUrl(preview: Boolean, taskId: GID!): FileUploadDownloadLinkResult!

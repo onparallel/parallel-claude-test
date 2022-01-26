@@ -886,6 +886,7 @@ export interface NexusGenFieldTypes {
     editPetitionPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
+    getApiTokenOwner: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     getTaskResultFileUrl: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     markSignatureIntegrationAsDefault: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
     modifyPetitionCustomProperty: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
@@ -2173,6 +2174,7 @@ export interface NexusGenFieldTypeNames {
     editPetitionPermission: "Petition";
     fileUploadReplyDownloadLink: "FileUploadDownloadLinkResult";
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
+    getApiTokenOwner: "SupportMethodResponse";
     getTaskResultFileUrl: "FileUploadDownloadLinkResult";
     markSignatureIntegrationAsDefault: "OrgIntegration";
     modifyPetitionCustomProperty: "PetitionBase";
@@ -3510,6 +3512,10 @@ export interface NexusGenArgTypes {
     generateUserAuthToken: {
       // args
       tokenName: string; // String!
+    };
+    getApiTokenOwner: {
+      // args
+      token: string; // String!
     };
     getTaskResultFileUrl: {
       // args
