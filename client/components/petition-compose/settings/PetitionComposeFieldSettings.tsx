@@ -110,7 +110,7 @@ export function PetitionComposeFieldSettings({
         </SettingsRow>
 
         <SettingsRow
-          isDisabled={isReadOnly}
+          isDisabled={isReadOnly || field.isFixed}
           label={
             <FormattedMessage
               id="component.petition-settings.petition-internal-field"

@@ -11,9 +11,10 @@ export function HeadingSettings({
   isReadOnly,
 }: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">) {
   const options = field.options as FieldOptions["HEADING"];
+  const isDisabled = field.visibility !== null || isReadOnly || field.isFixed;
   return (
     <SettingsRow
-      isDisabled={isReadOnly}
+      isDisabled={isDisabled}
       label={
         <FormattedMessage
           id="field-settings.heading-page-break-label"
@@ -43,7 +44,7 @@ export function HeadingSettings({
       >
         <Box>
           <Switch
-            isDisabled={field.visibility !== null || isReadOnly || field.isFixed}
+            isDisabled={isDisabled}
             height="20px"
             display="block"
             id="heading-page-break"
