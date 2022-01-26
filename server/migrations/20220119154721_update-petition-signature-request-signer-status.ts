@@ -66,7 +66,7 @@ export async function up(knex: Knex): Promise<void> {
         .where("id", row.id)
         .update("signer_status", newSignerStatus);
     },
-    { concurrency: 1 }
+    { concurrency: 10 }
   );
 }
 
@@ -93,6 +93,6 @@ export async function down(knex: Knex): Promise<void> {
         .where("id", row.id)
         .update("signer_status", newStatus);
     },
-    { concurrency: 1 }
+    { concurrency: 10 }
   );
 }
