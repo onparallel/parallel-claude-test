@@ -526,15 +526,28 @@ export const closePetition = mutationField("closePetition", {
     petitionId: nonNull(globalIdArg("Petition")),
   },
   resolve: async (_, args, ctx) => {
-    const [petition] = await ctx.petitions.updatePetition(
-      args.petitionId,
-      { status: "CLOSED" },
-      `User:${ctx.user!.id}`
-    );
+    return await ctx.petitions.withTransaction(async (t) => {
+      const [petition] = await ctx.petitions.updatePetition(
+        args.petitionId,
+        { status: "CLOSED" },
+        `User:${ctx.user!.id}`,
+        t
+      );
 
-    await ctx.petitions.updateRemindersForPetition(args.petitionId, null);
+      await ctx.petitions.updateRemindersForPetition(args.petitionId, null, t);
+      await ctx.petitions.createEvent(
+        {
+          petition_id: args.petitionId,
+          type: "PETITION_CLOSED",
+          data: {
+            user_id: ctx.user!.id,
+          },
+        },
+        t
+      );
 
-    return petition;
+      return petition;
+    });
   },
 });
 
