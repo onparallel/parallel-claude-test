@@ -99,6 +99,7 @@ export function PublicHero({
               <Box as="a">
                 <Image
                   htmlWidth={150}
+                  htmlHeight={49}
                   src="https://assets.capterra.com/badge/5b8a84543b954403684b7b8ba854282d.svg?v=2198650&p=236724"
                 />
               </Box>
