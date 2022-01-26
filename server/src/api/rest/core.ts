@@ -241,6 +241,9 @@ const _PathResolver: any = (function () {
             }
           }
         })();
+        if (operationOptions.deprecated) {
+          res.header("Warning", "Deprecated API");
+        }
         response.apply(res);
       });
       return this;

@@ -92,6 +92,7 @@ import {
   DeletePetition_deletePetitionsDocument,
   DeleteReply_deletePetitionReplyDocument,
   DeleteTemplate_deletePetitionsDocument,
+  DEPRECATED_CreatePetitionRecipients_sendPetitionDocument,
   DownloadFileReply_fileUploadReplyDownloadLinkDocument,
   DownloadPetitionAttachment_petitionAttachmentDownloadLinkDocument,
   DownloadSignedDocument_downloadAuditTrailDocument,
@@ -892,6 +893,182 @@ api
     }
   );
 
+api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
+  {
+    operationId: "SendPetition",
+    summary: "Send petition",
+    description: outdent`
+      Send a petition to a contact. You can send a petition to multiple
+      people at once so they can fill the petition collaboratively.
+
+      There are two ways of specifying the recipients of the petition.
+
+      One way is to pass a list of contact IDs if you know them beforehand:
+      ~~~json
+      {
+        ...
+        "contacts": [
+          "${toGlobalId("Contact", 12)}",
+          "${toGlobalId("Contact", 13)}"
+        ]
+        ...
+      }
+      ~~~ 
+      The other way is passing an object with the information needed to
+      create a contact. If the contact already exists it will also be updated
+      with the information provided.
+      ~~~json
+      {
+        ...
+        "contacts": [
+          {
+            "email": "tyrion@casterlyrock.wes",
+            "firstName": "Tyrion",
+            "lastName": "Lannister"
+          }
+        ]
+        ...
+      }
+      ~~~
+      The two options can also be mixed if necessary.
+    `,
+    body: JsonBody(SendPetition),
+    query: {
+      ...petitionIncludeParam,
+    },
+    responses: {
+      200: SuccessResponse(Petition),
+      400: ErrorResponse({
+        description: "Invalid parameter",
+      }),
+      409: ErrorResponse({
+        description: "The petition was already sent to some of the provided contacts",
+      }),
+    },
+    tags: ["Petitions"],
+  },
+  async ({ client, params, body, query }) => {
+    const contactIds = await pMap(
+      body.contacts,
+      async (item) => {
+        if (typeof item === "string") {
+          return item;
+        } else {
+          const { email, ...data } = item;
+          const _query = gql`
+            query CreatePetitionRecipients_contact($email: String!) {
+              contacts: contactsByEmail(emails: [$email]) {
+                id
+                firstName
+                lastName
+              }
+            }
+          `;
+          const result = await client.request(CreatePetitionRecipients_contactDocument, {
+            email,
+          });
+          const contact = result.contacts[0];
+          if (contact) {
+            if (
+              (contact.firstName !== data.firstName && isDefined(data.firstName)) ||
+              (contact.lastName !== data.lastName && isDefined(data.lastName))
+            ) {
+              const _mutation = gql`
+                mutation CreatePetitionRecipients_updateContact(
+                  $contactId: GID!
+                  $data: UpdateContactInput!
+                ) {
+                  updateContact(id: $contactId, data: $data) {
+                    id
+                  }
+                }
+              `;
+              await client.request(CreatePetitionRecipients_updateContactDocument, {
+                contactId: contact.id,
+                data,
+              });
+            }
+            return contact.id;
+          } else {
+            const _mutation = gql`
+              mutation CreatePetitionRecipients_createContact($data: CreateContactInput!) {
+                createContact(data: $data) {
+                  id
+                }
+              }
+            `;
+            const result = await client.request(CreatePetitionRecipients_createContactDocument, {
+              data: item,
+            });
+            return result.createContact.id;
+          }
+        }
+      },
+      { concurrency: 3 }
+    );
+    const message = isDefined(body.message)
+      ? body.message.format === "PLAIN_TEXT"
+        ? body.message.content.split("\n").map((line) => ({ children: [{ text: line }] }))
+        : [{ children: [{ text: "" }] }]
+      : null;
+    try {
+      const _mutation = gql`
+        mutation CreatePetitionRecipients_sendPetition(
+          $petitionId: GID!
+          $contactIds: [GID!]!
+          $subject: String
+          $body: JSON
+          $scheduledAt: DateTime
+          $remindersConfig: RemindersConfigInput
+          $includeRecipients: Boolean!
+          $includeFields: Boolean!
+          $includeTags: Boolean!
+        ) {
+          sendPetition(
+            petitionId: $petitionId
+            contactIds: $contactIds
+            subject: $subject
+            body: $body
+            scheduledAt: $scheduledAt
+            remindersConfig: $remindersConfig
+          ) {
+            petition {
+              ...Petition
+            }
+          }
+        }
+        ${PetitionFragment}
+      `;
+      const result = await client.request(CreatePetitionRecipients_sendPetitionDocument, {
+        petitionId: params.petitionId,
+        contactIds,
+        body: message,
+        ...pick(body, ["subject", "remindersConfig", "scheduledAt"]),
+        includeFields: query.include?.includes("fields") ?? false,
+        includeRecipients: query.include?.includes("recipients") ?? false,
+        includeTags: query.include?.includes("tags") ?? false,
+      });
+      assert("id" in result.sendPetition.petition!);
+      return Ok(mapPetition(result.sendPetition.petition));
+    } catch (error: any) {
+      if (
+        error instanceof ClientError &&
+        containsGraphQLError(error, "PETITION_ALREADY_SENT_ERROR")
+      ) {
+        throw new ConflictError("The petition was already sent to some of the provided contacts");
+      } else if (
+        error instanceof ClientError &&
+        containsGraphQLError(error, "MISSING_SUBJECT_OR_BODY")
+      ) {
+        throw new BadRequestError(
+          "The subject or the message are missing and not defined on the petition"
+        );
+      }
+      throw error;
+    }
+  }
+);
+
 api
   .path("/petitions/:petitionId/recipients", { params: { petitionId } })
   .get(
@@ -926,42 +1103,12 @@ api
   )
   .post(
     {
+      deprecated: true,
       operationId: "CreatePetitionRecipients",
       summary: "Send petition",
       description: outdent`
-        Send a petition to a contact. You can send a petition to multiple
-        people at once so they can fill the petition collaboratively.
-  
-        There are two ways of specifying the recipients of the petition.
-  
-        One way is to pass a list of contact IDs if you know them beforehand:
-        ~~~json
-        {
-          ...
-          "contacts": [
-            "${toGlobalId("Contact", 12)}",
-            "${toGlobalId("Contact", 13)}"
-          ]
-          ...
-        }
-        ~~~ 
-        The other way is passing an object with the information needed to
-        create a contact. If the contact already exists it will also be updated
-        with the information provided.
-        ~~~json
-        {
-          ...
-          "contacts": [
-            {
-              "email": "tyrion@casterlyrock.wes",
-              "firstName": "Tyrion",
-              "lastName": "Lannister"
-            }
-          ]
-          ...
-        }
-        ~~~
-        The two options can also be mixed if necessary.
+        This method is deprecated and will stop working soon. Please, use
+        [SendPetition](#operation/SendPetition) instead.
       `,
       body: JsonBody(SendPetition),
       responses: {
@@ -1041,7 +1188,7 @@ api
         : null;
       try {
         const _mutation = gql`
-          mutation CreatePetitionRecipients_sendPetition(
+          mutation DEPRECATED_CreatePetitionRecipients_sendPetition(
             $petitionId: GID!
             $contactIds: [GID!]!
             $subject: String
@@ -1064,12 +1211,15 @@ api
           }
           ${PetitionAccessFragment}
         `;
-        const result = await client.request(CreatePetitionRecipients_sendPetitionDocument, {
-          petitionId: params.petitionId,
-          contactIds,
-          body: message,
-          ...pick(body, ["subject", "remindersConfig", "scheduledAt"]),
-        });
+        const result = await client.request(
+          DEPRECATED_CreatePetitionRecipients_sendPetitionDocument,
+          {
+            petitionId: params.petitionId,
+            contactIds,
+            body: message,
+            ...pick(body, ["subject", "remindersConfig", "scheduledAt"]),
+          }
+        );
         return Ok(result.sendPetition.accesses!);
       } catch (error: any) {
         if (

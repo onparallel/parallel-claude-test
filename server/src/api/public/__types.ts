@@ -430,6 +430,8 @@ export type Mutation = {
   fileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
   /** Generates a new API token for the context user */
   generateUserAuthToken: GenerateUserAuthTokenResponse;
+  /** Get the user who owns an API Token */
+  getApiTokenOwner: SupportMethodResponse;
   /** Returns a signed download url for tasks with file output */
   getTaskResultFileUrl: FileUploadDownloadLinkResult;
   /** marks a Signature integration as default */
@@ -900,6 +902,10 @@ export type MutationfileUploadReplyDownloadLinkArgs = {
 
 export type MutationgenerateUserAuthTokenArgs = {
   tokenName: Scalars["String"];
+};
+
+export type MutationgetApiTokenOwnerArgs = {
+  token: Scalars["String"];
 };
 
 export type MutationgetTaskResultFileUrlArgs = {
@@ -3734,6 +3740,96 @@ export type DeletePetitionCustomProperty_modifyPetitionCustomPropertyMutation = 
   modifyPetitionCustomProperty: { id: string } | { id: string };
 };
 
+export type CreatePetitionRecipients_contactQueryVariables = Exact<{
+  email: Scalars["String"];
+}>;
+
+export type CreatePetitionRecipients_contactQuery = {
+  contacts: Array<{ id: string; firstName: string | null; lastName: string | null } | null>;
+};
+
+export type CreatePetitionRecipients_updateContactMutationVariables = Exact<{
+  contactId: Scalars["GID"];
+  data: UpdateContactInput;
+}>;
+
+export type CreatePetitionRecipients_updateContactMutation = { updateContact: { id: string } };
+
+export type CreatePetitionRecipients_createContactMutationVariables = Exact<{
+  data: CreateContactInput;
+}>;
+
+export type CreatePetitionRecipients_createContactMutation = { createContact: { id: string } };
+
+export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  contactIds: Array<Scalars["GID"]> | Scalars["GID"];
+  subject?: InputMaybe<Scalars["String"]>;
+  body?: InputMaybe<Scalars["JSON"]>;
+  scheduledAt?: InputMaybe<Scalars["DateTime"]>;
+  remindersConfig?: InputMaybe<RemindersConfigInput>;
+  includeRecipients: Scalars["Boolean"];
+  includeFields: Scalars["Boolean"];
+  includeTags: Scalars["Boolean"];
+}>;
+
+export type CreatePetitionRecipients_sendPetitionMutation = {
+  sendPetition: {
+    petition: {
+      id: string;
+      name: string | null;
+      status: PetitionStatus;
+      deadline: string | null;
+      locale: PetitionLocale;
+      createdAt: string;
+      fromTemplateId: string | null;
+      customProperties: { [key: string]: any };
+      recipients: Array<{
+        id: string;
+        status: PetitionAccessStatus;
+        reminderCount: number;
+        remindersLeft: number;
+        remindersActive: boolean;
+        nextReminderAt: string | null;
+        createdAt: string;
+        contact: {
+          id: string;
+          email: string;
+          fullName: string | null;
+          firstName: string | null;
+          lastName: string | null;
+          createdAt: string;
+          updatedAt: string;
+        } | null;
+        granter: {
+          id: string;
+          email: string;
+          fullName: string | null;
+          firstName: string | null;
+          lastName: string | null;
+        } | null;
+      }>;
+      fields?: Array<{
+        id: string;
+        title: string | null;
+        type: PetitionFieldType;
+        fromPetitionFieldId: string | null;
+        alias: string | null;
+        options: { [key: string]: any };
+        multiple: boolean;
+        replies: Array<{
+          id: string;
+          content: { [key: string]: any };
+          status: PetitionFieldReplyStatus;
+          createdAt: string;
+          updatedAt: string;
+        }>;
+      }>;
+      tags?: Array<{ id: string; name: string }>;
+    } | null;
+  };
+};
+
 export type GetPetitionRecipients_petitionAccessesQueryVariables = Exact<{
   petitionId: Scalars["GID"];
 }>;
@@ -3771,28 +3867,7 @@ export type GetPetitionRecipients_petitionAccessesQuery = {
     | null;
 };
 
-export type CreatePetitionRecipients_contactQueryVariables = Exact<{
-  email: Scalars["String"];
-}>;
-
-export type CreatePetitionRecipients_contactQuery = {
-  contacts: Array<{ id: string; firstName: string | null; lastName: string | null } | null>;
-};
-
-export type CreatePetitionRecipients_updateContactMutationVariables = Exact<{
-  contactId: Scalars["GID"];
-  data: UpdateContactInput;
-}>;
-
-export type CreatePetitionRecipients_updateContactMutation = { updateContact: { id: string } };
-
-export type CreatePetitionRecipients_createContactMutationVariables = Exact<{
-  data: CreateContactInput;
-}>;
-
-export type CreatePetitionRecipients_createContactMutation = { createContact: { id: string } };
-
-export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
+export type DEPRECATED_CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   contactIds: Array<Scalars["GID"]> | Scalars["GID"];
   subject?: InputMaybe<Scalars["String"]>;
@@ -3801,7 +3876,7 @@ export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
   remindersConfig?: InputMaybe<RemindersConfigInput>;
 }>;
 
-export type CreatePetitionRecipients_sendPetitionMutation = {
+export type DEPRECATED_CreatePetitionRecipients_sendPetitionMutation = {
   sendPetition: {
     accesses: Array<{
       id: string;
@@ -4941,21 +5016,6 @@ export const DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument =
   DeletePetitionCustomProperty_modifyPetitionCustomPropertyMutation,
   DeletePetitionCustomProperty_modifyPetitionCustomPropertyMutationVariables
 >;
-export const GetPetitionRecipients_petitionAccessesDocument = gql`
-  query GetPetitionRecipients_petitionAccesses($petitionId: GID!) {
-    petition(id: $petitionId) {
-      ... on Petition {
-        accesses {
-          ...PetitionAccess
-        }
-      }
-    }
-  }
-  ${PetitionAccessFragmentDoc}
-` as unknown as DocumentNode<
-  GetPetitionRecipients_petitionAccessesQuery,
-  GetPetitionRecipients_petitionAccessesQueryVariables
->;
 export const CreatePetitionRecipients_contactDocument = gql`
   query CreatePetitionRecipients_contact($email: String!) {
     contacts: contactsByEmail(emails: [$email]) {
@@ -4996,6 +5056,51 @@ export const CreatePetitionRecipients_sendPetitionDocument = gql`
     $body: JSON
     $scheduledAt: DateTime
     $remindersConfig: RemindersConfigInput
+    $includeRecipients: Boolean!
+    $includeFields: Boolean!
+    $includeTags: Boolean!
+  ) {
+    sendPetition(
+      petitionId: $petitionId
+      contactIds: $contactIds
+      subject: $subject
+      body: $body
+      scheduledAt: $scheduledAt
+      remindersConfig: $remindersConfig
+    ) {
+      petition {
+        ...Petition
+      }
+    }
+  }
+  ${PetitionFragmentDoc}
+` as unknown as DocumentNode<
+  CreatePetitionRecipients_sendPetitionMutation,
+  CreatePetitionRecipients_sendPetitionMutationVariables
+>;
+export const GetPetitionRecipients_petitionAccessesDocument = gql`
+  query GetPetitionRecipients_petitionAccesses($petitionId: GID!) {
+    petition(id: $petitionId) {
+      ... on Petition {
+        accesses {
+          ...PetitionAccess
+        }
+      }
+    }
+  }
+  ${PetitionAccessFragmentDoc}
+` as unknown as DocumentNode<
+  GetPetitionRecipients_petitionAccessesQuery,
+  GetPetitionRecipients_petitionAccessesQueryVariables
+>;
+export const DEPRECATED_CreatePetitionRecipients_sendPetitionDocument = gql`
+  mutation DEPRECATED_CreatePetitionRecipients_sendPetition(
+    $petitionId: GID!
+    $contactIds: [GID!]!
+    $subject: String
+    $body: JSON
+    $scheduledAt: DateTime
+    $remindersConfig: RemindersConfigInput
   ) {
     sendPetition(
       petitionId: $petitionId
@@ -5012,8 +5117,8 @@ export const CreatePetitionRecipients_sendPetitionDocument = gql`
   }
   ${PetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<
-  CreatePetitionRecipients_sendPetitionMutation,
-  CreatePetitionRecipients_sendPetitionMutationVariables
+  DEPRECATED_CreatePetitionRecipients_sendPetitionMutation,
+  DEPRECATED_CreatePetitionRecipients_sendPetitionMutationVariables
 >;
 export const PetitionReplies_repliesDocument = gql`
   query PetitionReplies_replies($petitionId: GID!) {
