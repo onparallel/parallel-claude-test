@@ -508,7 +508,22 @@ export const resendVerificationCode = mutationField("resendVerificationCode", {
   resolve: async (_, { email, locale }, ctx) => {
     try {
       const user = await ctx.users.loadUserByEmail(email);
-      if (user && !user.is_sso_user) {
+      if (
+        user &&
+        !user.is_sso_user &&
+        (!user.details.verificationCodeSentAt ||
+          differenceInMinutes(new Date(), new Date(user.details.verificationCodeSentAt)) >= 60)
+      ) {
+        await ctx.users.updateUserById(
+          user.id,
+          {
+            details: {
+              ...(user.details ?? {}),
+              verificationCodeSentAt: new Date(),
+            },
+          },
+          `User:${user.id}`
+        );
         await ctx.aws.resendVerificationCode(email, { locale: locale ?? "en" });
       }
     } catch {}
