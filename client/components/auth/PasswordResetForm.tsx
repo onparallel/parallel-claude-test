@@ -86,8 +86,14 @@ export function PasswordResetForm({
             <Controller
               name="verificationCode"
               control={control}
-              render={({ field: { onChange, value } }) => (
-                <PinInput onChange={onChange} value={value} autoFocus>
+              rules={{ required: true, minLength: 6 }}
+              render={({ field: { onChange, value }, fieldState }) => (
+                <PinInput
+                  onChange={onChange}
+                  value={value}
+                  autoFocus
+                  isInvalid={fieldState.invalid}
+                >
                   <PinInputField />
                   <PinInputField />
                   <PinInputField />
@@ -105,7 +111,8 @@ export function PasswordResetForm({
                 defaultMessage="The verification code is invalid"
               />
             )}
-            {errors.verificationCode?.type === "required" && (
+            {(errors.verificationCode?.type === "required" ||
+              errors.verificationCode?.type === "minLength") && (
               <FormattedMessage
                 id="generic.forms.required-verification-code"
                 defaultMessage="The verification code is required"
