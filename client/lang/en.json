@@ -1640,6 +1640,26 @@
     "context": "This petition is completed."
   },
   {
+    "term": "component.petition-progress-bar.internal-not-replied",
+    "definition": "{count} internal {count, plural, =1{field} other {fields}} without replies.",
+    "context": "{count} internal {count, plural, =1{field} other {fields}} without replies."
+  },
+  {
+    "term": "component.petition-progress-bar.internal-optional",
+    "definition": "{count} optional internal {count, plural, =1{field} other {fields}} without replies.",
+    "context": "{count} optional internal {count, plural, =1{field} other {fields}} without replies."
+  },
+  {
+    "term": "component.petition-progress-bar.internal-replied",
+    "definition": "{count} replied internal {count, plural, =1{field} other {fields}}.",
+    "context": "{count} replied internal {count, plural, =1{field} other {fields}}."
+  },
+  {
+    "term": "component.petition-progress-bar.internal-validated",
+    "definition": "{count} reviewed internal {count, plural, =1{field} other {fields}}.",
+    "context": "{count} reviewed internal {count, plural, =1{field} other {fields}}."
+  },
+  {
     "term": "component.petition-progress-bar.no-fields",
     "definition": "This petition has no fields.",
     "context": "This petition has no fields."
@@ -1648,6 +1668,11 @@
     "term": "component.petition-progress-bar.not-replied",
     "definition": "{count} {count, plural, =1{field} other {fields}} without replies.",
     "context": "{count} {count, plural, =1{field} other {fields}} without replies."
+  },
+  {
+    "term": "component.petition-progress-bar.not-replied-with-internal",
+    "definition": "{count} {count, plural, =1{field} other {fields}} without replies ({internalCount} internal).",
+    "context": "{count} {count, plural, =1{field} other {fields}} without replies ({internalCount} internal)."
   },
   {
     "term": "component.petition-progress-bar.not-replies",
@@ -1660,14 +1685,29 @@
     "context": "{count} optional {count, plural, =1{field} other {fields}} without replies."
   },
   {
+    "term": "component.petition-progress-bar.optional-with-internal",
+    "definition": "{count} optional {count, plural, =1{field} other {fields}} without replies ({internalCount} internal).",
+    "context": "{count} optional {count, plural, =1{field} other {fields}} without replies ({internalCount} internal)."
+  },
+  {
     "term": "component.petition-progress-bar.replied",
     "definition": "{count} replied {count, plural, =1{field} other {fields}}.",
     "context": "{count} replied {count, plural, =1{field} other {fields}}."
   },
   {
+    "term": "component.petition-progress-bar.replied-with-internal",
+    "definition": "{count} replied {count, plural, =1{field} other {fields}} ({internalCount} internal).",
+    "context": "{count} replied {count, plural, =1{field} other {fields}} ({internalCount} internal)."
+  },
+  {
     "term": "component.petition-progress-bar.validated",
     "definition": "{count} reviewed {count, plural, =1{field} other {fields}}.",
     "context": "{count} reviewed {count, plural, =1{field} other {fields}}."
+  },
+  {
+    "term": "component.petition-progress-bar.validated-with-internal",
+    "definition": "{count} reviewed {count, plural, =1{field} other {fields}} ({internalCount} internal).",
+    "context": "{count} reviewed {count, plural, =1{field} other {fields}} ({internalCount} internal)."
   },
   {
     "term": "component.petition-reminder-settings.next-reminder",

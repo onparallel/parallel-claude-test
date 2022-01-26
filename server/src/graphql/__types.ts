@@ -315,6 +315,13 @@ export interface NexusGenObjects {
     db.PetitionPermission,
     "petition_id" | "user_id" | "type" | "is_subscribed"
   >;
+  ExternalFieldsProgress: {
+    // root type
+    optional: number; // Int!
+    replied: number; // Int!
+    total: number; // Int!
+    validated: number; // Int!
+  };
   FileUpload: db.FileUpload;
   FileUploadDownloadLinkResult: {
     // root type
@@ -335,6 +342,13 @@ export interface NexusGenObjects {
   GroupPermissionAddedEvent: events.GroupPermissionAddedEvent;
   GroupPermissionEditedEvent: events.GroupPermissionEditedEvent;
   GroupPermissionRemovedEvent: events.GroupPermissionRemovedEvent;
+  InternalFieldsProgress: {
+    // root type
+    optional: number; // Int!
+    replied: number; // Int!
+    total: number; // Int!
+    validated: number; // Int!
+  };
   LandingTemplate: db.Petition;
   LandingTemplateCategorySample: string;
   LandingTemplateField: db.PetitionField;
@@ -422,10 +436,8 @@ export interface NexusGenObjects {
   PetitionMessageBouncedEvent: events.PetitionMessageBouncedEvent;
   PetitionProgress: {
     // root type
-    optional: number; // Int!
-    replied: number; // Int!
-    total: number; // Int!
-    validated: number; // Int!
+    external: NexusGenRootTypes["ExternalFieldsProgress"]; // ExternalFieldsProgress!
+    internal: NexusGenRootTypes["InternalFieldsProgress"]; // InternalFieldsProgress!
   };
   PetitionReminder: db.PetitionReminder;
   PetitionReminderBouncedEvent: events.PetitionReminderBouncedEvent;
@@ -715,6 +727,13 @@ export interface NexusGenFieldTypes {
     isSubscribed: boolean; // Boolean!
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
   };
+  ExternalFieldsProgress: {
+    // field return type
+    optional: number; // Int!
+    replied: number; // Int!
+    total: number; // Int!
+    validated: number; // Int!
+  };
   FileUpload: {
     // field return type
     contentType: string; // String!
@@ -763,6 +782,13 @@ export interface NexusGenFieldTypes {
     permissionGroup: NexusGenRootTypes["UserGroup"] | null; // UserGroup
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
+  };
+  InternalFieldsProgress: {
+    // field return type
+    optional: number; // Int!
+    replied: number; // Int!
+    total: number; // Int!
+    validated: number; // Int!
   };
   LandingTemplate: {
     // field return type
@@ -1235,10 +1261,8 @@ export interface NexusGenFieldTypes {
   };
   PetitionProgress: {
     // field return type
-    optional: number; // Int!
-    replied: number; // Int!
-    total: number; // Int!
-    validated: number; // Int!
+    external: NexusGenRootTypes["ExternalFieldsProgress"]; // ExternalFieldsProgress!
+    internal: NexusGenRootTypes["InternalFieldsProgress"]; // InternalFieldsProgress!
   };
   PetitionReminder: {
     // field return type
@@ -2006,6 +2030,13 @@ export interface NexusGenFieldTypeNames {
     isSubscribed: "Boolean";
     permissionType: "PetitionPermissionType";
   };
+  ExternalFieldsProgress: {
+    // field return type name
+    optional: "Int";
+    replied: "Int";
+    total: "Int";
+    validated: "Int";
+  };
   FileUpload: {
     // field return type name
     contentType: "String";
@@ -2054,6 +2085,13 @@ export interface NexusGenFieldTypeNames {
     permissionGroup: "UserGroup";
     type: "PetitionEventType";
     user: "User";
+  };
+  InternalFieldsProgress: {
+    // field return type name
+    optional: "Int";
+    replied: "Int";
+    total: "Int";
+    validated: "Int";
   };
   LandingTemplate: {
     // field return type name
@@ -2526,10 +2564,8 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionProgress: {
     // field return type name
-    optional: "Int";
-    replied: "Int";
-    total: "Int";
-    validated: "Int";
+    external: "ExternalFieldsProgress";
+    internal: "InternalFieldsProgress";
   };
   PetitionReminder: {
     // field return type name

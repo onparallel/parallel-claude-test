@@ -179,6 +179,19 @@ export interface EffectivePetitionUserPermission {
 
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
+/** The progress of the petition exlude internal fields */
+export interface ExternalFieldsProgress {
+  __typename?: "ExternalFieldsProgress";
+  /** Number of optional fields not replied or validated */
+  optional: Scalars["Int"];
+  /** Number of fields with a reply and not validated */
+  replied: Scalars["Int"];
+  /** Total number of fields in the petition */
+  total: Scalars["Int"];
+  /** Number of fields validated */
+  validated: Scalars["Int"];
+}
+
 export type FeatureFlag =
   | "DEVELOPER_ACCESS"
   | "EXPORT_CUATRECASAS"
@@ -260,6 +273,19 @@ export interface GroupPermissionRemovedEvent extends PetitionEvent {
 
 /** The types of integrations available. */
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
+
+/** The progress of the petition include internal fields */
+export interface InternalFieldsProgress {
+  __typename?: "InternalFieldsProgress";
+  /** Number of optional fields not replied or validated */
+  optional: Scalars["Int"];
+  /** Number of fields with a reply and not validated */
+  replied: Scalars["Int"];
+  /** Total number of fields in the petition */
+  total: Scalars["Int"];
+  /** Number of fields validated */
+  validated: Scalars["Int"];
+}
 
 /** A public template on landing page */
 export interface LandingTemplate {
@@ -2073,14 +2099,10 @@ export type PetitionPermissionTypeRW = "READ" | "WRITE";
 /** The progress of a petition. */
 export interface PetitionProgress {
   __typename?: "PetitionProgress";
-  /** Number of optional fields not replied or validated */
-  optional: Scalars["Int"];
-  /** Number of fields with a reply and not validated */
-  replied: Scalars["Int"];
-  /** Total number of fields in the petition */
-  total: Scalars["Int"];
-  /** Number of fields validated */
-  validated: Scalars["Int"];
+  /** The progress of the petition exlude internal fields. */
+  external: ExternalFieldsProgress;
+  /** The progress of the petition include internal fields. */
+  internal: InternalFieldsProgress;
 }
 
 export interface PetitionReminder extends CreatedAt {
@@ -3440,10 +3462,20 @@ export type PetitionStatusCellContent_PetitionFragment = {
   status: PetitionStatus;
   progress: {
     __typename?: "PetitionProgress";
-    validated: number;
-    replied: number;
-    optional: number;
-    total: number;
+    external: {
+      __typename?: "ExternalFieldsProgress";
+      validated: number;
+      replied: number;
+      optional: number;
+      total: number;
+    };
+    internal: {
+      __typename?: "InternalFieldsProgress";
+      validated: number;
+      replied: number;
+      optional: number;
+      total: number;
+    };
   };
 };
 
@@ -9709,10 +9741,20 @@ export type Contact_ContactFragment = {
         >;
         progress: {
           __typename?: "PetitionProgress";
-          validated: number;
-          replied: number;
-          optional: number;
-          total: number;
+          external: {
+            __typename?: "ExternalFieldsProgress";
+            validated: number;
+            replied: number;
+            optional: number;
+            total: number;
+          };
+          internal: {
+            __typename?: "InternalFieldsProgress";
+            validated: number;
+            replied: number;
+            optional: number;
+            total: number;
+          };
         };
         currentSignatureRequest?: {
           __typename?: "PetitionSignatureRequest";
@@ -9770,10 +9812,20 @@ export type Contact_PetitionAccessFragment = {
     >;
     progress: {
       __typename?: "PetitionProgress";
-      validated: number;
-      replied: number;
-      optional: number;
-      total: number;
+      external: {
+        __typename?: "ExternalFieldsProgress";
+        validated: number;
+        replied: number;
+        optional: number;
+        total: number;
+      };
+      internal: {
+        __typename?: "InternalFieldsProgress";
+        validated: number;
+        replied: number;
+        optional: number;
+        total: number;
+      };
     };
     currentSignatureRequest?: {
       __typename?: "PetitionSignatureRequest";
@@ -9817,10 +9869,20 @@ export type Contact_PetitionFragment = {
   >;
   progress: {
     __typename?: "PetitionProgress";
-    validated: number;
-    replied: number;
-    optional: number;
-    total: number;
+    external: {
+      __typename?: "ExternalFieldsProgress";
+      validated: number;
+      replied: number;
+      optional: number;
+      total: number;
+    };
+    internal: {
+      __typename?: "InternalFieldsProgress";
+      validated: number;
+      replied: number;
+      optional: number;
+      total: number;
+    };
   };
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
@@ -9946,10 +10008,20 @@ export type Contact_contactQuery = {
           >;
           progress: {
             __typename?: "PetitionProgress";
-            validated: number;
-            replied: number;
-            optional: number;
-            total: number;
+            external: {
+              __typename?: "ExternalFieldsProgress";
+              validated: number;
+              replied: number;
+              optional: number;
+              total: number;
+            };
+            internal: {
+              __typename?: "InternalFieldsProgress";
+              validated: number;
+              replied: number;
+              optional: number;
+              total: number;
+            };
           };
           currentSignatureRequest?: {
             __typename?: "PetitionSignatureRequest";
@@ -15610,10 +15682,20 @@ export type Petitions_PetitionBasePaginationFragment = {
         >;
         progress: {
           __typename?: "PetitionProgress";
-          validated: number;
-          replied: number;
-          optional: number;
-          total: number;
+          external: {
+            __typename?: "ExternalFieldsProgress";
+            validated: number;
+            replied: number;
+            optional: number;
+            total: number;
+          };
+          internal: {
+            __typename?: "InternalFieldsProgress";
+            validated: number;
+            replied: number;
+            optional: number;
+            total: number;
+          };
         };
         tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         currentSignatureRequest?: {
@@ -15696,10 +15778,20 @@ export type Petitions_PetitionBase_Petition_Fragment = {
   >;
   progress: {
     __typename?: "PetitionProgress";
-    validated: number;
-    replied: number;
-    optional: number;
-    total: number;
+    external: {
+      __typename?: "ExternalFieldsProgress";
+      validated: number;
+      replied: number;
+      optional: number;
+      total: number;
+    };
+    internal: {
+      __typename?: "InternalFieldsProgress";
+      validated: number;
+      replied: number;
+      optional: number;
+      total: number;
+    };
   };
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   currentSignatureRequest?: {
@@ -15830,10 +15922,20 @@ export type Petitions_petitionsQuery = {
           >;
           progress: {
             __typename?: "PetitionProgress";
-            validated: number;
-            replied: number;
-            optional: number;
-            total: number;
+            external: {
+              __typename?: "ExternalFieldsProgress";
+              validated: number;
+              replied: number;
+              optional: number;
+              total: number;
+            };
+            internal: {
+              __typename?: "InternalFieldsProgress";
+              validated: number;
+              replied: number;
+              optional: number;
+              total: number;
+            };
           };
           tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
           currentSignatureRequest?: {
@@ -17464,10 +17566,20 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
   >;
   progress: {
     __typename?: "PetitionProgress";
-    validated: number;
-    replied: number;
-    optional: number;
-    total: number;
+    external: {
+      __typename?: "ExternalFieldsProgress";
+      validated: number;
+      replied: number;
+      optional: number;
+      total: number;
+    };
+    internal: {
+      __typename?: "InternalFieldsProgress";
+      validated: number;
+      replied: number;
+      optional: number;
+      total: number;
+    };
   };
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   currentSignatureRequest?: {
@@ -18382,10 +18494,18 @@ export const PetitionStatusCellContent_PetitionFragmentDoc = gql`
   fragment PetitionStatusCellContent_Petition on Petition {
     status
     progress {
-      validated
-      replied
-      optional
-      total
+      external {
+        validated
+        replied
+        optional
+        total
+      }
+      internal {
+        validated
+        replied
+        optional
+        total
+      }
     }
   }
 ` as unknown as DocumentNode<PetitionStatusCellContent_PetitionFragment, unknown>;

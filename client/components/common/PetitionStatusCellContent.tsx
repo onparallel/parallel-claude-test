@@ -30,10 +30,18 @@ PetitionStatusCellContent.fragments = {
     fragment PetitionStatusCellContent_Petition on Petition {
       status
       progress {
-        validated
-        replied
-        optional
-        total
+        external {
+          validated
+          replied
+          optional
+          total
+        }
+        internal {
+          validated
+          replied
+          optional
+          total
+        }
       }
     }
   `,

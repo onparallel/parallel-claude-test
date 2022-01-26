@@ -165,6 +165,18 @@ export type EffectivePetitionUserPermission = {
 
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
+/** The progress of the petition exlude internal fields */
+export type ExternalFieldsProgress = {
+  /** Number of optional fields not replied or validated */
+  optional: Scalars["Int"];
+  /** Number of fields with a reply and not validated */
+  replied: Scalars["Int"];
+  /** Total number of fields in the petition */
+  total: Scalars["Int"];
+  /** Number of fields validated */
+  validated: Scalars["Int"];
+};
+
 export type FeatureFlag =
   | "DEVELOPER_ACCESS"
   | "EXPORT_CUATRECASAS"
@@ -239,6 +251,18 @@ export type GroupPermissionRemovedEvent = PetitionEvent & {
 
 /** The types of integrations available. */
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
+
+/** The progress of the petition include internal fields */
+export type InternalFieldsProgress = {
+  /** Number of optional fields not replied or validated */
+  optional: Scalars["Int"];
+  /** Number of fields with a reply and not validated */
+  replied: Scalars["Int"];
+  /** Total number of fields in the petition */
+  total: Scalars["Int"];
+  /** Number of fields validated */
+  validated: Scalars["Int"];
+};
 
 /** A public template on landing page */
 export type LandingTemplate = {
@@ -2012,14 +2036,10 @@ export type PetitionPermissionTypeRW = "READ" | "WRITE";
 
 /** The progress of a petition. */
 export type PetitionProgress = {
-  /** Number of optional fields not replied or validated */
-  optional: Scalars["Int"];
-  /** Number of fields with a reply and not validated */
-  replied: Scalars["Int"];
-  /** Total number of fields in the petition */
-  total: Scalars["Int"];
-  /** Number of fields validated */
-  validated: Scalars["Int"];
+  /** The progress of the petition exlude internal fields. */
+  external: ExternalFieldsProgress;
+  /** The progress of the petition include internal fields. */
+  internal: InternalFieldsProgress;
 };
 
 export type PetitionReminder = CreatedAt & {

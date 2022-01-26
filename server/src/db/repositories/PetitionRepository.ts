@@ -479,10 +479,18 @@ export class PetitionRepository extends BaseRepository {
     new DataLoader<
       number,
       {
-        validated: number;
-        replied: number;
-        optional: number;
-        total: number;
+        external: {
+          validated: number;
+          replied: number;
+          optional: number;
+          total: number;
+        };
+        internal: {
+          validated: number;
+          replied: number;
+          optional: number;
+          total: number;
+        };
       }
     >(async (ids) => {
       const [fields, fieldReplies] = await Promise.all([
@@ -539,25 +547,51 @@ export class PetitionRepository extends BaseRepository {
         }));
 
         const visibleFields = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies))
-          .filter(([, isVisible]) => isVisible)
+          .filter(([field, isVisible]) => isVisible && !field.is_internal)
+          .map(([field]) => field);
+
+        const visibleInternalFields = zip(
+          fieldsWithReplies,
+          evaluateFieldVisibility(fieldsWithReplies)
+        )
+          .filter(([field, isVisible]) => isVisible && field.is_internal)
           .map(([field]) => field);
 
         return {
-          validated: countBy(
-            visibleFields,
-            (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED")
-          ),
-          replied: countBy(
-            visibleFields,
-            (f) =>
-              completedFieldReplies(f).length > 0 &&
-              f.replies.some((r) => r.status === "PENDING" || r.status === "REJECTED")
-          ),
-          optional: countBy(
-            visibleFields,
-            (f) => f.optional && completedFieldReplies(f).length === 0
-          ),
-          total: visibleFields.length,
+          external: {
+            validated: countBy(
+              visibleFields,
+              (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED")
+            ),
+            replied: countBy(
+              visibleFields,
+              (f) =>
+                completedFieldReplies(f).length > 0 &&
+                f.replies.some((r) => r.status === "PENDING" || r.status === "REJECTED")
+            ),
+            optional: countBy(
+              visibleFields,
+              (f) => f.optional && completedFieldReplies(f).length === 0
+            ),
+            total: visibleFields.length,
+          },
+          internal: {
+            validated: countBy(
+              visibleInternalFields,
+              (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED")
+            ),
+            replied: countBy(
+              visibleInternalFields,
+              (f) =>
+                completedFieldReplies(f).length > 0 &&
+                f.replies.some((r) => r.status === "PENDING" || r.status === "REJECTED")
+            ),
+            optional: countBy(
+              visibleInternalFields,
+              (f) => f.optional && completedFieldReplies(f).length === 0
+            ),
+            total: visibleInternalFields.length,
+          },
         };
       });
     })
