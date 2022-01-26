@@ -1529,7 +1529,11 @@ export class PetitionRepository extends BaseRepository {
 
     const canComplete = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies)).every(
       ([field, isVisible]) =>
-        field.type === "HEADING" || field.optional || field.replies.length > 0 || !isVisible
+        (isAccess ? field.is_internal : false) ||
+        field.type === "HEADING" ||
+        field.optional ||
+        field.replies.length > 0 ||
+        !isVisible
     );
 
     if (canComplete) {

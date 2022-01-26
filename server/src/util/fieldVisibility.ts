@@ -98,6 +98,8 @@ function conditionIsMet(
         : reply.content.choices;
     return evaluatePredicate(_value, operator, value);
   }
+
+  const { type, options } = field;
   switch (modifier) {
     case "ANY":
       return replies.some(evaluator);
@@ -106,7 +108,12 @@ function conditionIsMet(
     case "NONE":
       return !replies.some(evaluator);
     case "NUMBER_OF_REPLIES":
-      const completed = completedFieldReplies(field);
+      const completed = completedFieldReplies({
+        type,
+        options,
+        replies,
+      });
+
       return evaluatePredicate(completed.length, operator, value);
     default:
       return false;
