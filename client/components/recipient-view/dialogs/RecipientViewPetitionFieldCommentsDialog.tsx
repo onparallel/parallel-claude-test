@@ -179,13 +179,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
           )}
         </ModalHeader>
         <Divider />
-        <ModalBody
-          padding={0}
-          overflow="auto"
-          display="flex"
-          flexDirection="column-reverse"
-          minHeight="0"
-        >
+        <ModalBody padding={0} display="flex" flexDirection="column-reverse" minHeight="0">
           {loading ? (
             <Center minHeight={64}>
               <Spinner
@@ -221,8 +215,8 @@ export function RecipientViewPetitionFieldCommentsDialog({
               </Text>
             </Flex>
           ) : (
-            <Stack spacing={0} divider={<Divider />}>
-              {comments.map((comment, i) => (
+            <Stack spacing={0} divider={<Divider />} overflow="auto">
+              {comments.map((comment) => (
                 <FieldComment
                   key={comment.id}
                   comment={comment}
@@ -242,6 +236,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
             borderRadius="md"
             paddingX={2}
             minHeight={0}
+            maxHeight={20}
             rows={1}
             placeholder={intl.formatMessage({
               id: "recipient-view.field-comments.placeholder",
