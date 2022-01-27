@@ -211,31 +211,6 @@ enum EntityType {
   User
 }
 
-"""
-The progress of the petition exlude internal fields
-"""
-type ExternalFieldsProgress {
-  """
-  Number of optional fields not replied or validated
-  """
-  optional: Int!
-
-  """
-  Number of fields with a reply and not validated
-  """
-  replied: Int!
-
-  """
-  Total number of fields in the petition
-  """
-  total: Int!
-
-  """
-  Number of fields validated
-  """
-  validated: Int!
-}
-
 enum FeatureFlag {
   DEVELOPER_ACCESS
   EXPORT_CUATRECASAS
@@ -322,31 +297,6 @@ enum IntegrationType {
   SIGNATURE
   SSO
   USER_PROVISIONING
-}
-
-"""
-The progress of the petition include internal fields
-"""
-type InternalFieldsProgress {
-  """
-  Number of optional fields not replied or validated
-  """
-  optional: Int!
-
-  """
-  Number of fields with a reply and not validated
-  """
-  replied: Int!
-
-  """
-  Total number of fields in the petition
-  """
-  total: Int!
-
-  """
-  Number of fields validated
-  """
-  validated: Int!
 }
 
 """
@@ -2430,6 +2380,31 @@ type PetitionFieldComment {
 }
 
 """
+The progress of the petition exlude internal fields
+"""
+type PetitionFieldProgress {
+  """
+  Number of optional fields not replied or validated
+  """
+  optional: Int!
+
+  """
+  Number of fields with a reply and not validated
+  """
+  replied: Int!
+
+  """
+  Total number of fields in the petition
+  """
+  total: Int!
+
+  """
+  Number of fields validated
+  """
+  validated: Int!
+}
+
+"""
 A reply to a petition field
 """
 type PetitionFieldReply implements Timestamps {
@@ -2698,12 +2673,12 @@ type PetitionProgress {
   """
   The progress of the petition exlude internal fields.
   """
-  external: ExternalFieldsProgress!
+  external: PetitionFieldProgress!
 
   """
   The progress of the petition include internal fields.
   """
-  internal: InternalFieldsProgress!
+  internal: PetitionFieldProgress!
 }
 
 type PetitionReminder implements CreatedAt {

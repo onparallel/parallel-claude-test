@@ -34,28 +34,9 @@ export const PetitionBaseType = enumType({
   members: ["PETITION", "TEMPLATE"],
 });
 
-export const ExternalFieldsProgress = objectType({
-  name: "ExternalFieldsProgress",
+export const PetitionFieldProgress = objectType({
+  name: "PetitionFieldProgress",
   description: "The progress of the petition exlude internal fields",
-  definition(t) {
-    t.int("validated", {
-      description: "Number of fields validated",
-    });
-    t.int("replied", {
-      description: "Number of fields with a reply and not validated",
-    });
-    t.int("optional", {
-      description: "Number of optional fields not replied or validated",
-    });
-    t.int("total", {
-      description: "Total number of fields in the petition",
-    });
-  },
-});
-
-export const InternalFieldsProgress = objectType({
-  name: "InternalFieldsProgress",
-  description: "The progress of the petition include internal fields",
   definition(t) {
     t.int("validated", {
       description: "Number of fields validated",
@@ -77,11 +58,11 @@ export const PetitionProgress = objectType({
   description: "The progress of a petition.",
   definition(t) {
     t.field("external", {
-      type: "ExternalFieldsProgress",
+      type: "PetitionFieldProgress",
       description: "The progress of the petition exlude internal fields.",
     });
     t.field("internal", {
-      type: "InternalFieldsProgress",
+      type: "PetitionFieldProgress",
       description: "The progress of the petition include internal fields.",
     });
   },
