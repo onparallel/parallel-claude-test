@@ -2273,7 +2273,7 @@ type PetitionField {
   isFixed: Boolean!
 
   """
-  Determines if the field is only visible inside the app.
+  Determines if the field is visible by the recipients.
   """
   isInternal: Boolean!
 
@@ -2380,7 +2380,7 @@ type PetitionFieldComment {
 }
 
 """
-The progress of the petition exlude internal fields
+The progress of the petition
 """
 type PetitionFieldProgress {
   """
@@ -3252,7 +3252,7 @@ type PublicPetitionField {
   id: GID!
 
   """
-  Determines if the field is only visible inside the app.
+  Determines if the field is visible by the recipients.
   """
   isInternal: Boolean!
 

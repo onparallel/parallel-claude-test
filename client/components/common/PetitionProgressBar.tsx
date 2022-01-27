@@ -133,34 +133,14 @@ function EmptyProgressText({ external, internal }: PetitionProgress) {
 
   return (
     <ProgressText as="li" type="EMPTY">
-      {emptyFields && !internalEmptyFields ? (
-        <FormattedMessage
-          id="component.petition-progress-bar.not-replied"
-          defaultMessage="{count} {count, plural, =1{field} other {fields}} without replies."
-          values={{
-            count: emptyFields,
-          }}
-        />
-      ) : null}
-      {emptyFields === internalEmptyFields ? (
-        <FormattedMessage
-          id="component.petition-progress-bar.internal-not-replied"
-          defaultMessage="{count} internal {count, plural, =1{field} other {fields}} without replies."
-          values={{
-            count: internalEmptyFields,
-          }}
-        />
-      ) : null}
-      {emptyFields && internalEmptyFields && emptyFields !== internalEmptyFields ? (
-        <FormattedMessage
-          id="component.petition-progress-bar.not-replied-with-internal"
-          defaultMessage="{count} {count, plural, =1{field} other {fields}} without replies ({internalCount} internal)."
-          values={{
-            count: emptyFields,
-            internalCount: internalEmptyFields,
-          }}
-        />
-      ) : null}
+      <FormattedMessage
+        id="component.petition-progress-bar.not-replied-with-internal"
+        defaultMessage="{count} {count, plural, =1{field} other {fields}} without replies{internalCount, plural,=0{} other { ({internalCount} internal)}}."
+        values={{
+          count: emptyFields,
+          internalCount: internalEmptyFields,
+        }}
+      />
     </ProgressText>
   );
 }
@@ -170,30 +150,14 @@ function ValidatedProgressText({ external, internal }: PetitionProgress) {
 
   return (
     <ProgressText as="li" type="VALIDATED">
-      {external.validated && !internal.validated ? (
-        <FormattedMessage
-          id="component.petition-progress-bar.validated"
-          defaultMessage="{count} reviewed {count, plural, =1{field} other {fields}}."
-          values={{ count: external.validated }}
-        />
-      ) : null}
-      {!external.validated && internal.validated ? (
-        <FormattedMessage
-          id="component.petition-progress-bar.internal-validated"
-          defaultMessage="{count} reviewed internal {count, plural, =1{field} other {fields}}."
-          values={{ count: internal.validated }}
-        />
-      ) : null}
-      {external.validated && internal.validated ? (
-        <FormattedMessage
-          id="component.petition-progress-bar.validated-with-internal"
-          defaultMessage="{count} reviewed {count, plural, =1{field} other {fields}} ({internalCount} internal)."
-          values={{
-            count: external.replied + internal.replied,
-            internalCount: internal.replied,
-          }}
-        />
-      ) : null}
+      <FormattedMessage
+        id="component.petition-progress-bar.validated-with-internal"
+        defaultMessage="{count} reviewed {count, plural, =1{field} other {fields}}{internalCount, plural,=0{} other { ({internalCount} internal)}}."
+        values={{
+          count: external.replied + internal.replied,
+          internalCount: internal.replied,
+        }}
+      />
     </ProgressText>
   );
 }
@@ -203,30 +167,14 @@ function RepliedProgressText({ external, internal }: PetitionProgress) {
 
   return (
     <ProgressText as="li" type="REPLIED">
-      {external.replied && !internal.replied ? (
-        <FormattedMessage
-          id="component.petition-progress-bar.replied"
-          defaultMessage="{count} replied {count, plural, =1{field} other {fields}}."
-          values={{ count: external.replied }}
-        />
-      ) : null}
-      {!external.replied && internal.replied ? (
-        <FormattedMessage
-          id="component.petition-progress-bar.internal-replied"
-          defaultMessage="{count} replied internal {count, plural, =1{field} other {fields}}."
-          values={{ count: internal.replied }}
-        />
-      ) : null}
-      {external.replied && internal.replied ? (
-        <FormattedMessage
-          id="component.petition-progress-bar.replied-with-internal"
-          defaultMessage="{count} replied {count, plural, =1{field} other {fields}} ({internalCount} internal)."
-          values={{
-            count: external.replied + internal.replied,
-            internalCount: internal.replied,
-          }}
-        />
-      ) : null}
+      <FormattedMessage
+        id="component.petition-progress-bar.replied-with-internal"
+        defaultMessage="{count} replied {count, plural, =1{field} other {fields}}{internalCount, plural,=0{} other { ({internalCount} internal)}}."
+        values={{
+          count: external.replied + internal.replied,
+          internalCount: internal.replied,
+        }}
+      />
     </ProgressText>
   );
 }
@@ -236,30 +184,14 @@ function OptionalProgressText({ external, internal }: PetitionProgress) {
 
   return (
     <ProgressText as="li" type="OPTIONAL">
-      {external.optional && !internal.optional ? (
-        <FormattedMessage
-          id="component.petition-progress-bar.optional"
-          defaultMessage="{count} optional {count, plural, =1{field} other {fields}} without replies."
-          values={{ count: external.optional }}
-        />
-      ) : null}
-      {!external.optional && internal.optional ? (
-        <FormattedMessage
-          id="component.petition-progress-bar.internal-optional"
-          defaultMessage="{count} optional internal {count, plural, =1{field} other {fields}} without replies."
-          values={{ count: internal.optional }}
-        />
-      ) : null}
-      {external.optional && internal.optional ? (
-        <FormattedMessage
-          id="component.petition-progress-bar.optional-with-internal"
-          defaultMessage="{count} optional {count, plural, =1{field} other {fields}} without replies ({internalCount} internal)."
-          values={{
-            count: external.optional + internal.optional,
-            internalCount: internal.optional,
-          }}
-        />
-      ) : null}
+      <FormattedMessage
+        id="component.petition-progress-bar.optional-with-internal"
+        defaultMessage="{count} optional {count, plural, =1{field} other {fields}} without replies{internalCount, plural,=0{} other { ({internalCount} internal)}}."
+        values={{
+          count: external.optional + internal.optional,
+          internalCount: internal.optional,
+        }}
+      />
     </ProgressText>
   );
 }

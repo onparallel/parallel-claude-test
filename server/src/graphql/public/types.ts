@@ -201,7 +201,7 @@ export const PublicPetitionField = objectType({
       description: "Determines if this field allows multiple replies.",
     });
     t.boolean("isInternal", {
-      description: "Determines if the field is only visible inside the app.",
+      description: "Determines if the field is visible by the recipients.",
       resolve: (o) => o.is_internal,
     });
     t.boolean("isReadOnly", {

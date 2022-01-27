@@ -886,8 +886,8 @@
   },
   {
     "term": "component.internal-field-badge.text",
-    "definition": "INT",
-    "context": "INT"
+    "definition": "Int",
+    "context": "Int"
   },
   {
     "term": "component.message-email-editor.body-placeholder",
@@ -1640,39 +1640,14 @@
     "context": "This petition is completed."
   },
   {
-    "term": "component.petition-progress-bar.internal-not-replied",
-    "definition": "{count} {count, plural, =1{campo interno} other {campos internos}} sin rellenar.",
-    "context": "{count} internal {count, plural, =1{field} other {fields}} without replies."
-  },
-  {
-    "term": "component.petition-progress-bar.internal-optional",
-    "definition": "{count} {count, plural, =1{campo interno opcional} other {campos internos opcionales}} sin rellenar.",
-    "context": "{count} optional internal {count, plural, =1{field} other {fields}} without replies."
-  },
-  {
-    "term": "component.petition-progress-bar.internal-replied",
-    "definition": "{count} {count, plural, =1{campo interno rellenado} other {campos internos rellenados}}.",
-    "context": "{count} replied internal {count, plural, =1{field} other {fields}}."
-  },
-  {
-    "term": "component.petition-progress-bar.internal-validated",
-    "definition": "{count} {count, plural, =1{campo interno aprobado} other {campos internos aprobados}}.",
-    "context": "{count} reviewed internal {count, plural, =1{field} other {fields}}."
-  },
-  {
     "term": "component.petition-progress-bar.no-fields",
     "definition": "Esta petición no tiene campos.",
     "context": "This petition has no fields."
   },
   {
-    "term": "component.petition-progress-bar.not-replied",
-    "definition": "{count} {count, plural, =1{campo} other {campos}} sin rellenar.",
-    "context": "{count} {count, plural, =1{field} other {fields}} without replies."
-  },
-  {
     "term": "component.petition-progress-bar.not-replied-with-internal",
-    "definition": "{count} {count, plural, =1{campo} other {campos}} sin rellenar ({internalCount} {internalCount, plural, =1{interno} other {internos}}).",
-    "context": "{count} {count, plural, =1{field} other {fields}} without replies ({internalCount} internal)."
+    "definition": "{count} {count, plural, =1{campo} other {campos}} sin rellenar{internalCount, plural,=0{} =1{ ({internalCount} interno)} other { ({internalCount} internos)}}.",
+    "context": "{count} {count, plural, =1{field} other {fields}} without replies{internalCount, plural,=0{} other { ({internalCount} internal)}}."
   },
   {
     "term": "component.petition-progress-bar.not-replies",
@@ -1680,34 +1655,19 @@
     "context": "No replies have been added yet"
   },
   {
-    "term": "component.petition-progress-bar.optional",
-    "definition": "{count} {count, plural, =1{campo opcional} other {campos opcionales}} sin rellenar.",
-    "context": "{count} optional {count, plural, =1{field} other {fields}} without replies."
-  },
-  {
     "term": "component.petition-progress-bar.optional-with-internal",
-    "definition": "{count} {count, plural, =1{campo opcional} other {campos opcionales}} sin rellenar ({internalCount} {internalCount, plural, =1{interno} other {internos}}).",
-    "context": "{count} optional {count, plural, =1{field} other {fields}} without replies ({internalCount} internal)."
-  },
-  {
-    "term": "component.petition-progress-bar.replied",
-    "definition": "{count} {count, plural, =1{campo rellenado} other {campos rellenados}}.",
-    "context": "{count} replied {count, plural, =1{field} other {fields}}."
+    "definition": "{count} {count, plural, =1{campo opcional} other {campos opcionales}} sin rellenar{internalCount, plural,=0{}  =1{ ({internalCount} interno)} other { ({internalCount} internos)}}.",
+    "context": "{count} optional {count, plural, =1{field} other {fields}} without replies{internalCount, plural,=0{} other { ({internalCount} internal)}}."
   },
   {
     "term": "component.petition-progress-bar.replied-with-internal",
-    "definition": "{count} {count, plural, =1{campo rellenado} other {campos rellenados}} ({internalCount} {internalCount, plural, =1{interno} other {internos}}).",
-    "context": "{count} replied {count, plural, =1{field} other {fields}} ({internalCount} internal)."
-  },
-  {
-    "term": "component.petition-progress-bar.validated",
-    "definition": "{count} {count, plural, =1{campo aprobado} other {campos aprobados}}.",
-    "context": "{count} reviewed {count, plural, =1{field} other {fields}}."
+    "definition": "{count} {count, plural, =1{campo rellenado} other {campos rellenados}}{internalCount, plural,=0{}  =1{ ({internalCount} interno)} other { ({internalCount} internos)}}.",
+    "context": "{count} replied {count, plural, =1{field} other {fields}}{internalCount, plural,=0{} other { ({internalCount} internal)}}."
   },
   {
     "term": "component.petition-progress-bar.validated-with-internal",
-    "definition": "{count} {count, plural, =1{campo aprobado} other {campos aprobados}} ({internalCount} {internalCount, plural, =1{interno} other {internos}}).",
-    "context": "{count} reviewed {count, plural, =1{field} other {fields}} ({internalCount} internal)."
+    "definition": "{count} {count, plural, =1{campo aprobado} other {campos aprobados}}{internalCount, plural,=0{}  =1{ ({internalCount} interno)} other { ({internalCount} internos)}}.",
+    "context": "{count} reviewed {count, plural, =1{field} other {fields}}{internalCount, plural,=0{} other { ({internalCount} internal)}}."
   },
   {
     "term": "component.petition-reminder-settings.next-reminder",

@@ -185,11 +185,7 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
             )}
           </Text>
           {fieldIndicators ? createElement(fieldIndicators, { field }) : null}
-          {field.isInternal ? (
-            <Center>
-              <InternalFieldBadge />
-            </Center>
-          ) : null}
+          {field.isInternal ? <InternalFieldBadge /> : null}
         </Stack>
       </Box>
     </>

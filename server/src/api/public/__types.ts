@@ -165,18 +165,6 @@ export type EffectivePetitionUserPermission = {
 
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
-/** The progress of the petition exlude internal fields */
-export type ExternalFieldsProgress = {
-  /** Number of optional fields not replied or validated */
-  optional: Scalars["Int"];
-  /** Number of fields with a reply and not validated */
-  replied: Scalars["Int"];
-  /** Total number of fields in the petition */
-  total: Scalars["Int"];
-  /** Number of fields validated */
-  validated: Scalars["Int"];
-};
-
 export type FeatureFlag =
   | "DEVELOPER_ACCESS"
   | "EXPORT_CUATRECASAS"
@@ -251,18 +239,6 @@ export type GroupPermissionRemovedEvent = PetitionEvent & {
 
 /** The types of integrations available. */
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
-
-/** The progress of the petition include internal fields */
-export type InternalFieldsProgress = {
-  /** Number of optional fields not replied or validated */
-  optional: Scalars["Int"];
-  /** Number of fields with a reply and not validated */
-  replied: Scalars["Int"];
-  /** Total number of fields in the petition */
-  total: Scalars["Int"];
-  /** Number of fields validated */
-  validated: Scalars["Int"];
-};
 
 /** A public template on landing page */
 export type LandingTemplate = {
@@ -1857,7 +1833,7 @@ export type PetitionField = {
   id: Scalars["GID"];
   /** Determines if the field can be moved or deleted. */
   isFixed: Scalars["Boolean"];
-  /** Determines if the field is only visible inside the app. */
+  /** Determines if the field is visible by the recipients. */
   isInternal: Scalars["Boolean"];
   /** Determines if the field accepts replies */
   isReadOnly: Scalars["Boolean"];
@@ -1910,6 +1886,18 @@ export type PetitionFieldComment = {
   isInternal: Scalars["Boolean"];
   /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
+};
+
+/** The progress of the petition */
+export type PetitionFieldProgress = {
+  /** Number of optional fields not replied or validated */
+  optional: Scalars["Int"];
+  /** Number of fields with a reply and not validated */
+  replied: Scalars["Int"];
+  /** Total number of fields in the petition */
+  total: Scalars["Int"];
+  /** Number of fields validated */
+  validated: Scalars["Int"];
 };
 
 /** A reply to a petition field */
@@ -2037,9 +2025,9 @@ export type PetitionPermissionTypeRW = "READ" | "WRITE";
 /** The progress of a petition. */
 export type PetitionProgress = {
   /** The progress of the petition exlude internal fields. */
-  external: ExternalFieldsProgress;
+  external: PetitionFieldProgress;
   /** The progress of the petition include internal fields. */
-  internal: InternalFieldsProgress;
+  internal: PetitionFieldProgress;
 };
 
 export type PetitionReminder = CreatedAt & {
@@ -2360,7 +2348,7 @@ export type PublicPetitionField = {
   description: Maybe<Scalars["String"]>;
   /** The ID of the petition field. */
   id: Scalars["GID"];
-  /** Determines if the field is only visible inside the app. */
+  /** Determines if the field is visible by the recipients. */
   isInternal: Scalars["Boolean"];
   /** Determines if the field accepts replies */
   isReadOnly: Scalars["Boolean"];

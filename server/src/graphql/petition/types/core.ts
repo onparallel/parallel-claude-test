@@ -36,7 +36,7 @@ export const PetitionBaseType = enumType({
 
 export const PetitionFieldProgress = objectType({
   name: "PetitionFieldProgress",
-  description: "The progress of the petition exlude internal fields",
+  description: "The progress of the petition",
   definition(t) {
     t.int("validated", {
       description: "Number of fields validated",
@@ -364,7 +364,7 @@ export const PetitionField = objectType({
       resolve: (o) => o.is_fixed,
     });
     t.boolean("isInternal", {
-      description: "Determines if the field is only visible inside the app.",
+      description: "Determines if the field is visible by the recipients.",
       resolve: (o) => o.is_internal,
     });
     t.boolean("isReadOnly", {

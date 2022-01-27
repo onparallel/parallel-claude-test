@@ -179,19 +179,6 @@ export interface EffectivePetitionUserPermission {
 
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
-/** The progress of the petition exlude internal fields */
-export interface ExternalFieldsProgress {
-  __typename?: "ExternalFieldsProgress";
-  /** Number of optional fields not replied or validated */
-  optional: Scalars["Int"];
-  /** Number of fields with a reply and not validated */
-  replied: Scalars["Int"];
-  /** Total number of fields in the petition */
-  total: Scalars["Int"];
-  /** Number of fields validated */
-  validated: Scalars["Int"];
-}
-
 export type FeatureFlag =
   | "DEVELOPER_ACCESS"
   | "EXPORT_CUATRECASAS"
@@ -273,19 +260,6 @@ export interface GroupPermissionRemovedEvent extends PetitionEvent {
 
 /** The types of integrations available. */
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
-
-/** The progress of the petition include internal fields */
-export interface InternalFieldsProgress {
-  __typename?: "InternalFieldsProgress";
-  /** Number of optional fields not replied or validated */
-  optional: Scalars["Int"];
-  /** Number of fields with a reply and not validated */
-  replied: Scalars["Int"];
-  /** Total number of fields in the petition */
-  total: Scalars["Int"];
-  /** Number of fields validated */
-  validated: Scalars["Int"];
-}
 
 /** A public template on landing page */
 export interface LandingTemplate {
@@ -1912,7 +1886,7 @@ export interface PetitionField {
   id: Scalars["GID"];
   /** Determines if the field can be moved or deleted. */
   isFixed: Scalars["Boolean"];
-  /** Determines if the field is only visible inside the app. */
+  /** Determines if the field is visible by the recipients. */
   isInternal: Scalars["Boolean"];
   /** Determines if the field accepts replies */
   isReadOnly: Scalars["Boolean"];
@@ -1969,6 +1943,19 @@ export interface PetitionFieldComment {
   isInternal: Scalars["Boolean"];
   /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
+}
+
+/** The progress of the petition */
+export interface PetitionFieldProgress {
+  __typename?: "PetitionFieldProgress";
+  /** Number of optional fields not replied or validated */
+  optional: Scalars["Int"];
+  /** Number of fields with a reply and not validated */
+  replied: Scalars["Int"];
+  /** Total number of fields in the petition */
+  total: Scalars["Int"];
+  /** Number of fields validated */
+  validated: Scalars["Int"];
 }
 
 /** A reply to a petition field */
@@ -2100,9 +2087,9 @@ export type PetitionPermissionTypeRW = "READ" | "WRITE";
 export interface PetitionProgress {
   __typename?: "PetitionProgress";
   /** The progress of the petition exlude internal fields. */
-  external: ExternalFieldsProgress;
+  external: PetitionFieldProgress;
   /** The progress of the petition include internal fields. */
-  internal: InternalFieldsProgress;
+  internal: PetitionFieldProgress;
 }
 
 export interface PetitionReminder extends CreatedAt {
@@ -2439,7 +2426,7 @@ export interface PublicPetitionField {
   description?: Maybe<Scalars["String"]>;
   /** The ID of the petition field. */
   id: Scalars["GID"];
-  /** Determines if the field is only visible inside the app. */
+  /** Determines if the field is visible by the recipients. */
   isInternal: Scalars["Boolean"];
   /** Determines if the field accepts replies */
   isReadOnly: Scalars["Boolean"];
@@ -3463,14 +3450,14 @@ export type PetitionStatusCellContent_PetitionFragment = {
   progress: {
     __typename?: "PetitionProgress";
     external: {
-      __typename?: "ExternalFieldsProgress";
+      __typename?: "PetitionFieldProgress";
       validated: number;
       replied: number;
       optional: number;
       total: number;
     };
     internal: {
-      __typename?: "InternalFieldsProgress";
+      __typename?: "PetitionFieldProgress";
       validated: number;
       replied: number;
       optional: number;
@@ -9742,14 +9729,14 @@ export type Contact_ContactFragment = {
         progress: {
           __typename?: "PetitionProgress";
           external: {
-            __typename?: "ExternalFieldsProgress";
+            __typename?: "PetitionFieldProgress";
             validated: number;
             replied: number;
             optional: number;
             total: number;
           };
           internal: {
-            __typename?: "InternalFieldsProgress";
+            __typename?: "PetitionFieldProgress";
             validated: number;
             replied: number;
             optional: number;
@@ -9813,14 +9800,14 @@ export type Contact_PetitionAccessFragment = {
     progress: {
       __typename?: "PetitionProgress";
       external: {
-        __typename?: "ExternalFieldsProgress";
+        __typename?: "PetitionFieldProgress";
         validated: number;
         replied: number;
         optional: number;
         total: number;
       };
       internal: {
-        __typename?: "InternalFieldsProgress";
+        __typename?: "PetitionFieldProgress";
         validated: number;
         replied: number;
         optional: number;
@@ -9870,14 +9857,14 @@ export type Contact_PetitionFragment = {
   progress: {
     __typename?: "PetitionProgress";
     external: {
-      __typename?: "ExternalFieldsProgress";
+      __typename?: "PetitionFieldProgress";
       validated: number;
       replied: number;
       optional: number;
       total: number;
     };
     internal: {
-      __typename?: "InternalFieldsProgress";
+      __typename?: "PetitionFieldProgress";
       validated: number;
       replied: number;
       optional: number;
@@ -10009,14 +9996,14 @@ export type Contact_contactQuery = {
           progress: {
             __typename?: "PetitionProgress";
             external: {
-              __typename?: "ExternalFieldsProgress";
+              __typename?: "PetitionFieldProgress";
               validated: number;
               replied: number;
               optional: number;
               total: number;
             };
             internal: {
-              __typename?: "InternalFieldsProgress";
+              __typename?: "PetitionFieldProgress";
               validated: number;
               replied: number;
               optional: number;
@@ -15683,14 +15670,14 @@ export type Petitions_PetitionBasePaginationFragment = {
         progress: {
           __typename?: "PetitionProgress";
           external: {
-            __typename?: "ExternalFieldsProgress";
+            __typename?: "PetitionFieldProgress";
             validated: number;
             replied: number;
             optional: number;
             total: number;
           };
           internal: {
-            __typename?: "InternalFieldsProgress";
+            __typename?: "PetitionFieldProgress";
             validated: number;
             replied: number;
             optional: number;
@@ -15779,14 +15766,14 @@ export type Petitions_PetitionBase_Petition_Fragment = {
   progress: {
     __typename?: "PetitionProgress";
     external: {
-      __typename?: "ExternalFieldsProgress";
+      __typename?: "PetitionFieldProgress";
       validated: number;
       replied: number;
       optional: number;
       total: number;
     };
     internal: {
-      __typename?: "InternalFieldsProgress";
+      __typename?: "PetitionFieldProgress";
       validated: number;
       replied: number;
       optional: number;
@@ -15923,14 +15910,14 @@ export type Petitions_petitionsQuery = {
           progress: {
             __typename?: "PetitionProgress";
             external: {
-              __typename?: "ExternalFieldsProgress";
+              __typename?: "PetitionFieldProgress";
               validated: number;
               replied: number;
               optional: number;
               total: number;
             };
             internal: {
-              __typename?: "InternalFieldsProgress";
+              __typename?: "PetitionFieldProgress";
               validated: number;
               replied: number;
               optional: number;
@@ -17567,14 +17554,14 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
   progress: {
     __typename?: "PetitionProgress";
     external: {
-      __typename?: "ExternalFieldsProgress";
+      __typename?: "PetitionFieldProgress";
       validated: number;
       replied: number;
       optional: number;
       total: number;
     };
     internal: {
-      __typename?: "InternalFieldsProgress";
+      __typename?: "PetitionFieldProgress";
       validated: number;
       replied: number;
       optional: number;

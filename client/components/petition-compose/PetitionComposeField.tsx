@@ -499,12 +499,8 @@ const _PetitionComposeFieldInner = chakraForwardRef<
 
   return (
     <Stack spacing={1} {...props}>
-      <Stack direction="row" spacing={2}>
-        {field.isInternal ? (
-          <Center>
-            <InternalFieldBadge />
-          </Center>
-        ) : null}
+      <Stack direction="row" spacing={2} alignItems="center">
+        {field.isInternal ? <InternalFieldBadge /> : null}
         <Box flex={1}>
           <Input
             id={`field-title-${field.id}`}
