@@ -1,5 +1,4 @@
 import faker from "@faker-js/faker";
-import { addMinutes } from "date-fns";
 import { Knex } from "knex";
 import { range } from "remeda";
 import { USER_COGNITO_ID } from "../../../../test/mocks";
@@ -662,10 +661,17 @@ export class Mocks {
     ownerId: number,
     builder?: () => Partial<PublicPetitionLink>
   ) {
+    await this.knex<TemplateDefaultPermission>("template_default_permission").insert({
+      is_subscribed: false,
+      position: 0,
+      template_id: templateId,
+      user_id: ownerId,
+      type: "OWNER",
+    });
     const [data] = await this.knex<PublicPetitionLink>("public_petition_link")
       .insert({
         template_id: templateId,
-        owner_id: ownerId,
+        owner_id: ownerId, // TODO remove, deprecated
         description: faker.lorem.paragraph(),
         title: faker.lorem.words(),
         is_active: true,

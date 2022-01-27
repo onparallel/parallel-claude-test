@@ -804,7 +804,7 @@ export const PublicPetitionLink = objectType({
     t.nonNull.field("owner", {
       type: "User",
       resolve: async (root, _, ctx) => {
-        return (await ctx.users.loadUser(root.owner_id))!;
+        return (await ctx.petitions.getPublicPetitionLinkOwner(root.id))!;
       },
     });
     t.nonNull.field("template", {

@@ -114,6 +114,11 @@ export type PetitionSignatureConfig = {
   additionalSignersInfo?: PetitionSignatureConfigSigner[];
 };
 
+type TemplateDefaultPermissionInput = {
+  permissionType: PetitionPermissionType;
+  isSubscribed: boolean;
+} & ({ userId: number } | { userGroupId: number });
+
 export type PetitionSignatureRequestCancelData<CancelReason extends PetitionSignatureCancelReason> =
   {
     CANCELLED_BY_USER: { user_id: number };
@@ -3272,12 +3277,19 @@ export class PetitionRepository extends BaseRepository {
     updatedBy: User,
     t?: Knex.Transaction
   ) {
-    await this.from("public_petition_link", t)
-      .whereIn("owner_id", ownersIds)
+    await this.from("template_default_permission", t)
+      .whereIn("user_id", ownersIds)
+      .where("type", "OWNER")
+      .whereRaw(
+        /* sql */ `
+        exists(select * from public_petition_link ppl where ppl.template_id = template_default_permission.template_id)
+        `
+      )
+      .whereNull("deleted_at")
       .update({
         updated_by: `User:${updatedBy.id}`,
         updated_at: this.now(),
-        owner_id: toUserId,
+        user_id: toUserId,
       })
       .returning("*");
   }
@@ -3374,15 +3386,38 @@ export class PetitionRepository extends BaseRepository {
   readonly loadTemplateDefaultPermissions = this.buildLoadMultipleBy(
     "template_default_permission",
     "template_id",
-    (q) => q.whereNull("deleted_at").orderBy("position", "asc")
+    (q) => q.whereNull("deleted_at").whereNot("type", "OWNER").orderBy("position", "asc")
   );
+
+  readonly loadTemplateDefaultPermissionOwner = this.buildLoadBy(
+    "template_default_permission",
+    "template_id",
+    (q) => q.whereNull("deleted_at").where("type", "OWNER")
+  );
+
+  async createTemplateDefaultPermissions(
+    templateId: number,
+    permissions: TemplateDefaultPermissionInput[],
+    createdBy: string,
+    t?: Knex.Transaction
+  ) {
+    await this.insert(
+      "template_default_permission",
+      permissions.map((p, i) => ({
+        template_id: templateId,
+        position: i,
+        type: p.permissionType,
+        is_subscribed: p.isSubscribed,
+        created_by: createdBy,
+        ...("userId" in p ? { user_id: p.userId } : { user_group_id: p.userGroupId }),
+      })),
+      t
+    );
+  }
 
   async updateTemplateDefaultPermissions(
     templateId: number,
-    permissions: ({
-      permissionType: PetitionPermissionType;
-      isSubscribed: boolean;
-    } & ({ userId: number } | { userGroupId: number }))[],
+    permissions: TemplateDefaultPermissionInput[],
     updatedBy: string,
     t?: Knex.Transaction
   ) {
@@ -3420,6 +3455,7 @@ export class PetitionRepository extends BaseRepository {
       await this.from("template_default_permission", t)
         .where("template_id", templateId)
         .whereNull("deleted_at")
+        .whereNot("type", "OWNER")
         .whereNotIn(
           "id",
           rows.map((p) => p.id)
@@ -3894,6 +3930,22 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.orderBy("created_at", "asc")
   );
 
+  async getPublicPetitionLinkOwner(publicPetitionLinkId: number) {
+    const [user] = await this.raw<User | null>(
+      /* sql */ `
+    select u.* from public_petition_link ppl 
+    left join template_default_permission tdp on ppl.template_id = tdp.template_id
+    left join "user" u on tdp.user_id = u.id
+    where tdp."type" = 'OWNER'
+    and tdp.deleted_at is null
+    and ppl.id = ?;
+  `,
+      [publicPetitionLinkId]
+    );
+
+    return user;
+  }
+
   async createPublicPetitionLink(
     data: CreatePublicPetitionLink,
     createdBy: string,
@@ -3929,6 +3981,36 @@ export class PetitionRepository extends BaseRepository {
       );
 
     return row;
+  }
+
+  async updatePublicPetitionLinkOwner(
+    templateId: number,
+    newOwnerId: number,
+    updatedBy: string,
+    t?: Knex.Transaction
+  ) {
+    await this.raw(
+      /* sql */ `
+          ?
+          on conflict (template_id) where type = 'OWNER' and deleted_at is null
+            do update set
+              user_id = EXCLUDED.user_id, is_subscribed = EXCLUDED.is_subscribed, updated_by = ?, updated_at = NOW()
+          returning *;
+        `,
+      [
+        this.knex.from({ tdp: "template_default_permission" }).insert({
+          template_id: templateId,
+          type: "OWNER",
+          user_id: newOwnerId,
+          is_subscribed: true,
+          created_by: updatedBy,
+          updated_by: updatedBy,
+          position: 0,
+        }),
+        updatedBy,
+      ],
+      t
+    );
   }
 
   async contactHasAccessFromPublicPetitionLink(contactEmail: string, publicPetitionLinkId: number) {

@@ -616,9 +616,9 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
         );
       }
 
-      const owner = await ctx.users.loadUser(link.owner_id);
+      const owner = await ctx.petitions.getPublicPetitionLinkOwner(link.id);
       if (!isDefined(owner)) {
-        throw new Error(`User not found for public_petition_link.owner_id ${link.owner_id}`);
+        throw new Error(`Can't find owner of PublicPetitionLink:${link.id}`);
       }
 
       const { messages, result, petition } = await ctx.petitions.withTransaction(async (t) => {
@@ -711,7 +711,7 @@ export const publicSendReminder = mutationField("publicSendReminder", {
     const link = (await ctx.petitions.loadPublicPetitionLinkBySlug(args.slug))!;
     const [access, owner] = await Promise.all([
       ctx.petitions.getLatestPetitionAccessFromPublicPetitionLink(link.id, args.contactEmail),
-      ctx.users.loadUser(link.owner_id),
+      ctx.petitions.getPublicPetitionLinkOwner(link.id),
     ]);
 
     if (!access || access.status === "INACTIVE" || access.reminders_left === 0 || !owner) {

@@ -10,6 +10,8 @@ import {
   useSearchUsers,
 } from "@parallel/components/common/UserSelect";
 import {
+  Maybe,
+  TemplateDefaultPermissionsDialog_PublicPetitionLinkFragment,
   TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragment,
   UserOrUserGroupPermissionInput,
 } from "@parallel/graphql/__types";
@@ -23,10 +25,12 @@ interface TemplateDefaultPermissionsDialogData {
 
 export interface TemplateDefaultPermissionsDialogProps {
   permissions: TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragment[];
+  publicLink?: Maybe<TemplateDefaultPermissionsDialog_PublicPetitionLinkFragment>;
 }
 
 export function TemplateDefaultPermissionsDialog({
   permissions,
+  publicLink,
   ...props
 }: DialogProps<TemplateDefaultPermissionsDialogProps, TemplateDefaultPermissionsDialogData>) {
   const intl = useIntl();
@@ -53,7 +57,10 @@ export function TemplateDefaultPermissionsDialog({
   const handleSearchUsers = useCallback(
     async (search: string, excludeUsers: string[], excludeUserGroups: string[]) => {
       return await _handleSearchUsers(search, {
-        excludeUsers,
+        // if there is an active public link, exclude the owner of that link from the search
+        excludeUsers: publicLink?.isActive
+          ? excludeUsers.concat(publicLink.owner.id)
+          : excludeUsers,
         excludeUserGroups,
         includeGroups: true,
       });
@@ -153,6 +160,14 @@ export function TemplateDefaultPermissionsDialog({
 
 TemplateDefaultPermissionsDialog.fragments = {
   PublicPetitionLink: gql`
+    fragment TemplateDefaultPermissionsDialog_PublicPetitionLink on PublicPetitionLink {
+      isActive
+      owner {
+        id
+      }
+    }
+  `,
+  TemplateDefaultPermission: gql`
     fragment TemplateDefaultPermissionsDialog_TemplateDefaultPermission on TemplateDefaultPermission {
       ... on TemplateDefaultUserPermission {
         user {

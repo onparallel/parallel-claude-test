@@ -1595,9 +1595,16 @@ export const updateTemplateDefaultPermissions = mutationField("updateTemplateDef
     permissions: nonNull(list(nonNull("UserOrUserGroupPermissionInput"))),
   },
   resolve: async (_, args, ctx) => {
+    const defaultOwner = await ctx.petitions.loadTemplateDefaultPermissionOwner(args.templateId);
+
+    // avoid modifying OWNERs
+    const permissions = defaultOwner
+      ? args.permissions.filter((p) => p.userId !== defaultOwner.user_id)
+      : args.permissions;
+
     await ctx.petitions.updateTemplateDefaultPermissions(
       args.templateId,
-      args.permissions as any,
+      permissions as any,
       `User:${ctx.user!.id}`
     );
     return (await ctx.petitions.loadPetition(args.templateId))!;
@@ -1625,17 +1632,26 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
     validatePublicPetitionLinkSlug((args) => args.slug!, "slug")
   ),
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.createPublicPetitionLink(
-      {
-        template_id: args.templateId,
-        title: args.title,
-        description: args.description,
-        slug: args.slug ?? random(10),
-        owner_id: args.ownerId,
-        is_active: true,
-      },
-      `User:${ctx.user!.id}`
-    );
+    return await ctx.petitions.withTransaction(async (t) => {
+      await ctx.petitions.createTemplateDefaultPermissions(
+        args.templateId,
+        [{ isSubscribed: true, permissionType: "OWNER", userId: args.ownerId }],
+        `User:${ctx.user!.id}`,
+        t
+      );
+      return await ctx.petitions.createPublicPetitionLink(
+        {
+          template_id: args.templateId,
+          title: args.title,
+          description: args.description,
+          slug: args.slug ?? random(10),
+          owner_id: args.ownerId, // TODO remove, deprecated
+          is_active: true,
+        },
+        `User:${ctx.user!.id}`,
+        t
+      );
+    });
   },
 });
 
@@ -1676,8 +1692,23 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
     if (isDefined(args.slug)) {
       publicPetitionLinkData.slug = args.slug;
     }
+
+    const publicLink = (await ctx.petitions.loadPublicPetitionLink(args.publicPetitionLinkId))!;
     if (isDefined(args.ownerId)) {
-      publicPetitionLinkData.owner_id = args.ownerId;
+      try {
+        await ctx.petitions.updatePublicPetitionLinkOwner(
+          publicLink.template_id,
+          args.ownerId,
+          `User:${ctx.user!.id}`
+        );
+      } catch (error: any) {
+        if (error.constraint === "template_default_permission__template_id__user_id") {
+          // trying to set as OWNER a user that already has READ/WRITE default permissions on this template
+          // ignore this error and continue
+        } else {
+          throw error;
+        }
+      }
     }
     return await ctx.petitions.updatePublicPetitionLink(
       args.publicPetitionLinkId,

@@ -261,6 +261,7 @@ function _PetitionSettings({
       try {
         const { permissions } = await showTemplateDefaultPermissionsDialog({
           permissions: petition.defaultPermissions,
+          publicLink: petition.publicLink,
         });
         await updateTemplateDefaultPermissions({
           variables: { templateId: petition.id, permissions },
@@ -665,6 +666,7 @@ const fragments = {
           url
           isActive
           ...PublicLinkSettingsDialog_PublicPetitionLink
+          ...TemplateDefaultPermissionsDialog_PublicPetitionLink
         }
         defaultPermissions {
           ...TemplateDefaultPermissionsDialog_TemplateDefaultPermission
@@ -675,6 +677,7 @@ const fragments = {
     ${PublicLinkSettingsDialog.fragments.PetitionTemplate}
     ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
     ${TemplateDefaultPermissionsDialog.fragments.PublicPetitionLink}
+    ${TemplateDefaultPermissionsDialog.fragments.TemplateDefaultPermission}
   `,
 };
 const mutations = [
@@ -777,7 +780,7 @@ const mutations = [
         }
       }
     }
-    ${TemplateDefaultPermissionsDialog.fragments.PublicPetitionLink}
+    ${TemplateDefaultPermissionsDialog.fragments.TemplateDefaultPermission}
   `,
 ];
 

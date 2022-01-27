@@ -58,7 +58,11 @@ function PublicPetitionLink({
 
   const [submittedData, setSubmittedData] = useState<PublicPetitionInitialFormInputs>();
 
-  const { description, title, organization } = publicPetitionLink;
+  const {
+    description,
+    title,
+    owner: { organization },
+  } = publicPetitionLink;
 
   const [createPublicPetition, { loading }] = useMutation(
     PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkDocument
@@ -287,10 +291,10 @@ PublicPetitionLink.fragments = {
       owner {
         fullName
         email
-      }
-      organization {
-        name
-        logoUrl
+        organization {
+          name
+          logoUrl
+        }
       }
     }
   `,

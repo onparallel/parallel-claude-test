@@ -477,29 +477,14 @@ export const PublicPublicPetitionLink = objectType({
     t.nonNull.field("owner", {
       type: "PublicUser",
       resolve: async (root, _, ctx) => {
-        return (await ctx.users.loadUser(root.owner_id))!;
-      },
-    });
-
-    t.nonNull.field("organization", {
-      type: "PublicOrganization",
-      resolve: async (root, _, ctx) => {
-        const owner = await ctx.users.loadUser(root.owner_id);
-        if (!owner) {
-          throw new Error(`Can't find owner of PublicPetitionLink:${root.id}`);
-        }
-        const organization = await ctx.organizations.loadOrg(owner.org_id);
-        if (!organization) {
-          throw new Error(`Can't find organization of User:${owner.id}`);
-        }
-        return organization;
+        return (await ctx.petitions.getPublicPetitionLinkOwner(root.id))!;
       },
     });
     t.nonNull.boolean("isAvailable", {
       description:
         "If the organization has enough credits to send a petition with this public link or not",
       resolve: async (o, _, ctx) => {
-        const owner = await ctx.users.loadUser(o.owner_id);
+        const owner = await ctx.petitions.getPublicPetitionLinkOwner(o.id);
         const orgLimits = await ctx.organizations.getOrganizationCurrentUsageLimit(
           owner!.org_id,
           "PETITION_SEND"

@@ -2620,7 +2620,6 @@ export type PublicPublicPetitionLink = {
   isActive: Scalars["Boolean"];
   /** If the organization has enough credits to send a petition with this public link or not */
   isAvailable: Scalars["Boolean"];
-  organization: PublicOrganization;
   owner: PublicUser;
   slug: Scalars["String"];
   title: Scalars["String"];
