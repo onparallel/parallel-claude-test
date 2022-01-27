@@ -82,9 +82,11 @@ describe("GraphQL/PublicPetitionLink", () => {
             publicPetitionLinkBySlug(slug: $slug) {
               title
               description
-              organization {
-                logoUrl
-                name
+              owner {
+                organization {
+                  logoUrl
+                  name
+                }
               }
             }
           }
@@ -98,9 +100,11 @@ describe("GraphQL/PublicPetitionLink", () => {
       expect(data?.publicPetitionLinkBySlug).toEqual({
         title: publicPetitionLink.title,
         description: publicPetitionLink.description,
-        organization: {
-          logoUrl: null,
-          name: "Parallel",
+        owner: {
+          organization: {
+            logoUrl: null,
+            name: "Parallel",
+          },
         },
       });
     });
@@ -112,10 +116,6 @@ describe("GraphQL/PublicPetitionLink", () => {
             publicPetitionLinkBySlug(slug: $slug) {
               title
               description
-              organization {
-                logoUrl
-                name
-              }
             }
           }
         `,
@@ -842,6 +842,7 @@ describe("GraphQL/PublicPetitionLink", () => {
         .whereNotNull("from_public_petition_link_id")
         .update("from_public_petition_link_id", null);
       await mocks.knex.from("public_petition_link").delete();
+      await mocks.knex.from("template_default_permission").delete();
 
       otherUsers = await mocks.createRandomUsers(organization.id, 2);
       [privateTemplate] = await mocks.createRandomPetitions(
