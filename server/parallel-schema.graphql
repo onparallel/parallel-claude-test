@@ -520,7 +520,7 @@ type Mutation {
   If the petition has a signature configured and does not require a review, starts the signing process.
   """
   completePetition(
-    additionalSignersContactIds: [GID!]
+    additionalSigners: [PublicPetitionSignerDataInput!]
     message: String
     petitionId: GID!
   ): Petition!

@@ -141,7 +141,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
           await completePetition({
             variables: {
               petitionId,
-              additionalSignersContactIds: completeSignerInfoData?.additionalSignersContactIds,
+              additionalSigners: completeSignerInfoData?.additionalSigners,
               message: completeSignerInfoData?.message,
             },
           });
@@ -392,12 +392,12 @@ PetitionPreview.mutations = [
   gql`
     mutation PetitionPreview_completePetition(
       $petitionId: GID!
-      $additionalSignersContactIds: [GID!]
+      $additionalSigners: [PublicPetitionSignerDataInput!]
       $message: String
     ) {
       completePetition(
         petitionId: $petitionId
-        additionalSignersContactIds: $additionalSignersContactIds
+        additionalSigners: $additionalSigners
         message: $message
       ) {
         ...PetitionPreview_PetitionBase

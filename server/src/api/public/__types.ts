@@ -683,7 +683,7 @@ export type MutationclosePetitionArgs = {
 };
 
 export type MutationcompletePetitionArgs = {
-  additionalSignersContactIds?: InputMaybe<Array<Scalars["GID"]>>;
+  additionalSigners?: InputMaybe<Array<PublicPetitionSignerDataInput>>;
   message?: InputMaybe<Scalars["String"]>;
   petitionId: Scalars["GID"];
 };

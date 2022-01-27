@@ -713,7 +713,7 @@ export interface MutationclosePetitionArgs {
 }
 
 export interface MutationcompletePetitionArgs {
-  additionalSignersContactIds?: InputMaybe<Array<Scalars["GID"]>>;
+  additionalSigners?: InputMaybe<Array<PublicPetitionSignerDataInput>>;
   message?: InputMaybe<Scalars["String"]>;
   petitionId: Scalars["GID"];
 }
@@ -7980,7 +7980,8 @@ export type PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyF
 
 export type usePetitionPreviewSignerInfoDialog_PetitionSignerFragment = {
   __typename?: "PetitionSigner";
-  fullName: string;
+  firstName: string;
+  lastName?: string | null;
   email: string;
 };
 
@@ -14099,7 +14100,13 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
     __typename?: "SignatureConfig";
     letRecipientsChooseSigners: boolean;
     review: boolean;
-    signers: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      firstName: string;
+      lastName?: string | null;
+      email: string;
+      fullName: string;
+    }>;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -14186,7 +14193,12 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
     __typename?: "SignatureConfig";
     letRecipientsChooseSigners: boolean;
     review: boolean;
-    signers: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      firstName: string;
+      lastName?: string | null;
+      email: string;
+    }>;
   } | null;
 };
 
@@ -14293,7 +14305,13 @@ export type PetitionPreview_updatePetitionMutation = {
           __typename?: "SignatureConfig";
           letRecipientsChooseSigners: boolean;
           review: boolean;
-          signers: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
+          signers: Array<{
+            __typename?: "PetitionSigner";
+            firstName: string;
+            lastName?: string | null;
+            email: string;
+            fullName: string;
+          }>;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -14383,14 +14401,21 @@ export type PetitionPreview_updatePetitionMutation = {
           __typename?: "SignatureConfig";
           letRecipientsChooseSigners: boolean;
           review: boolean;
-          signers: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
+          signers: Array<{
+            __typename?: "PetitionSigner";
+            firstName: string;
+            lastName?: string | null;
+            email: string;
+          }>;
         } | null;
       };
 };
 
 export type PetitionPreview_completePetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
-  additionalSignersContactIds?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  additionalSigners?: InputMaybe<
+    Array<PublicPetitionSignerDataInput> | PublicPetitionSignerDataInput
+  >;
   message?: InputMaybe<Scalars["String"]>;
 }>;
 
@@ -14462,7 +14487,13 @@ export type PetitionPreview_completePetitionMutation = {
       __typename?: "SignatureConfig";
       letRecipientsChooseSigners: boolean;
       review: boolean;
-      signers: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
+      signers: Array<{
+        __typename?: "PetitionSigner";
+        firstName: string;
+        lastName?: string | null;
+        email: string;
+        fullName: string;
+      }>;
       integration?: {
         __typename?: "SignatureOrgIntegration";
         id: string;
@@ -14565,7 +14596,13 @@ export type PetitionPreview_petitionQuery = {
           __typename?: "SignatureConfig";
           letRecipientsChooseSigners: boolean;
           review: boolean;
-          signers: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
+          signers: Array<{
+            __typename?: "PetitionSigner";
+            firstName: string;
+            lastName?: string | null;
+            email: string;
+            fullName: string;
+          }>;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -14655,7 +14692,12 @@ export type PetitionPreview_petitionQuery = {
           __typename?: "SignatureConfig";
           letRecipientsChooseSigners: boolean;
           review: boolean;
-          signers: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
+          signers: Array<{
+            __typename?: "PetitionSigner";
+            firstName: string;
+            lastName?: string | null;
+            email: string;
+          }>;
         } | null;
       }
     | null;
@@ -19839,7 +19881,8 @@ export const PreviewPetitionField_PetitionFieldFragmentDoc = gql`
 ` as unknown as DocumentNode<PreviewPetitionField_PetitionFieldFragment, unknown>;
 export const usePetitionPreviewSignerInfoDialog_PetitionSignerFragmentDoc = gql`
   fragment usePetitionPreviewSignerInfoDialog_PetitionSigner on PetitionSigner {
-    fullName
+    firstName
+    lastName
     email
   }
 ` as unknown as DocumentNode<usePetitionPreviewSignerInfoDialog_PetitionSignerFragment, unknown>;
@@ -23079,12 +23122,12 @@ export const PetitionPreview_updatePetitionDocument = gql`
 export const PetitionPreview_completePetitionDocument = gql`
   mutation PetitionPreview_completePetition(
     $petitionId: GID!
-    $additionalSignersContactIds: [GID!]
+    $additionalSigners: [PublicPetitionSignerDataInput!]
     $message: String
   ) {
     completePetition(
       petitionId: $petitionId
-      additionalSignersContactIds: $additionalSignersContactIds
+      additionalSigners: $additionalSigners
       message: $message
     ) {
       ...PetitionPreview_PetitionBase

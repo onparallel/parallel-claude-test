@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { datatype, internet, lorem } from "@faker-js/faker";
+import { datatype, internet, lorem, name } from "@faker-js/faker";
 import knex, { Knex } from "knex";
 import { sortBy } from "remeda";
 import { PetitionEvent } from "../../db/events";
@@ -3402,6 +3402,7 @@ describe("GraphQL/Petitions", () => {
     let limit: OrganizationUsageLimit;
     let signatureLimit: OrganizationUsageLimit;
     let sharedSignaturitIntegration: OrgIntegration;
+    let signers: { email: string; firstName: string; lastName: string }[];
 
     beforeAll(async () => {
       limit = await mocks.createOrganizationUsageLimit(organization.id, "PETITION_SEND", 10);
@@ -3410,6 +3411,24 @@ describe("GraphQL/Petitions", () => {
         "SIGNATURIT_SHARED_APIKEY",
         10
       );
+
+      signers = [
+        {
+          email: internet.email(undefined, undefined, "onparallel.com"),
+          firstName: name.firstName(),
+          lastName: name.lastName(),
+        },
+        {
+          email: internet.email(undefined, undefined, "onparallel.com"),
+          firstName: name.firstName(),
+          lastName: name.lastName(),
+        },
+        {
+          email: internet.email(undefined, undefined, "onparallel.com"),
+          firstName: name.firstName(),
+          lastName: name.lastName(),
+        },
+      ];
 
       contacts = await mocks.createRandomContacts(organization.id, 2, () => ({
         email: internet.email(undefined, undefined, "onparallel.com"),
@@ -3558,31 +3577,12 @@ describe("GraphQL/Petitions", () => {
       expect(data).toBeNull();
     });
 
-    it("sends error if some of the contacts passed as signers are invalid", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($petitionId: GID!, $contactIds: [GID!]) {
-            completePetition(petitionId: $petitionId, additionalSignersContactIds: $contactIds) {
-              id
-              status
-            }
-          }
-        `,
-        variables: {
-          petitionId: toGlobalId("Petition", petitions[1].id),
-          contactIds: contacts.concat(otherOrgContact).map((c) => toGlobalId("Contact", c.id)),
-        },
-      });
-
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
-    });
 
     it("completes the petition as a user and starts a signature request", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($petitionId: GID!, $contactIds: [GID!]) {
-            completePetition(petitionId: $petitionId, additionalSignersContactIds: $contactIds) {
+          mutation ($petitionId: GID!, $additionalSigners: [PublicPetitionSignerDataInput!]) {
+            completePetition(petitionId: $petitionId, additionalSigners: $additionalSigners) {
               id
               status
               currentSignatureRequest {
@@ -3601,7 +3601,7 @@ describe("GraphQL/Petitions", () => {
         `,
         variables: {
           petitionId: toGlobalId("Petition", petitions[1].id),
-          contactIds: contacts.map((c) => toGlobalId("Contact", c.id)),
+          additionalSigners: signers,
         },
       });
 
@@ -3635,10 +3635,14 @@ describe("GraphQL/Petitions", () => {
     it("cancels the pending signature process when completing a second time", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($petitionId: GID!, $contactIds: [GID!], $message: String) {
+          mutation (
+            $petitionId: GID!
+            $additionalSigners: [PublicPetitionSignerDataInput!]
+            $message: String
+          ) {
             completePetition(
               petitionId: $petitionId
-              additionalSignersContactIds: $contactIds
+              additionalSigners: $additionalSigners
               message: $message
             ) {
               id
@@ -3660,7 +3664,7 @@ describe("GraphQL/Petitions", () => {
         `,
         variables: {
           petitionId: toGlobalId("Petition", petitions[1].id),
-          contactIds: [toGlobalId("Contact", contacts[0].id)],
+          additionalSigners: signers,
           message: "email body",
         },
       });
@@ -3695,8 +3699,8 @@ describe("GraphQL/Petitions", () => {
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($petitionId: GID!, $contactId: GID!) {
-            completePetition(petitionId: $petitionId, additionalSignersContactIds: [$contactId]) {
+          mutation ($petitionId: GID!, $additionalSigners: [PublicPetitionSignerDataInput!]) {
+            completePetition(petitionId: $petitionId, additionalSigners: $additionalSigners) {
               id
               status
             }
@@ -3704,7 +3708,7 @@ describe("GraphQL/Petitions", () => {
         `,
         variables: {
           petitionId: toGlobalId("Petition", petition.id),
-          contactId: toGlobalId("Contact", contacts[0].id),
+          additionalSigners: signers,
         },
       });
 

@@ -3294,7 +3294,7 @@ export interface NexusGenArgTypes {
     };
     completePetition: {
       // args
-      additionalSignersContactIds?: NexusGenScalars["GID"][] | null; // [GID!]
+      additionalSigners?: NexusGenInputs["PublicPetitionSignerDataInput"][] | null; // [PublicPetitionSignerDataInput!]
       message?: string | null; // String
       petitionId: NexusGenScalars["GID"]; // GID!
     };
