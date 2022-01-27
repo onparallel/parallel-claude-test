@@ -228,10 +228,7 @@ function _PetitionSettings({
         });
 
         if (data) {
-          const publicLink = data.createPublicPetitionLink;
-          onCopyPublicLink({
-            value: `${process.env.NEXT_PUBLIC_PARALLEL_URL}/${petition.locale}/pp/${publicLink?.slug}`,
-          });
+          onCopyPublicLink({ value: data.createPublicPetitionLink.url });
         }
       }
     } catch {}
