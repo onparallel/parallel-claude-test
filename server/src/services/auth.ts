@@ -225,7 +225,8 @@ export class Auth implements IAuth {
           res.status(401).send({ error: "InvalidUsernameOrPassword" });
           return;
       }
-      next(error);
+      req.context.logger.error(error?.message, { stack: error?.stack, body: req.body });
+      res.status(401).send({ error: "InvalidUsernameOrPassword" });
     }
   }
 
