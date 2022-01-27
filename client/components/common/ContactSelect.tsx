@@ -79,7 +79,7 @@ export const ContactSelect = Object.assign(
         const contact = await onCreateContact({ defaultEmail: email });
         onChange([
           ...(value ?? []).filter((v) => v.id !== email),
-          pick(contact, ["id", "email", "fullName", "hasBouncedEmail"]),
+          pick(contact, ["id", "email", "firstName", "fullName", "hasBouncedEmail"]),
         ]);
         setIsCreating(false);
         return true;
@@ -283,13 +283,7 @@ const MultiValueLabel: typeof components.MultiValueLabel = function MultiValueLa
   return (
     <components.MultiValueLabel {...props}>
       <Text as="span" marginLeft={1}>
-        {isDeleted ? (
-          <DeletedContact color="red.600" />
-        ) : fullName ? (
-          `${fullName} <${email}>`
-        ) : (
-          email
-        )}
+        {isDeleted ? <DeletedContact color="red.600" /> : `${fullName} <${email}>`}
       </Text>
       {hasBouncedEmail ? (
         <Tooltip
@@ -316,17 +310,14 @@ const Option: typeof components.Option = function Option({ children, ...props })
     const contact = props.data as ContactSelectSelection;
     return (
       <components.Option {...props}>
-        {contact.fullName ? (
-          <Text as="span" verticalAlign="baseline">
-            <Text as="span">{contact.fullName}</Text>
-            <Text as="span" display="inline-block" width={2} />
-            <Text as="span" fontSize="sm" color="gray.500">
-              {contact.email}
-            </Text>
+        <Text as="span" verticalAlign="baseline">
+          <Text as="span">{contact.fullName}</Text>
+          <Text as="span" display="inline-block" width={2} />
+          <Text as="span" fontSize="sm" color="gray.500">
+            {contact.email}
           </Text>
-        ) : (
-          <Text as="span">{contact.email}</Text>
-        )}
+        </Text>
+
         {contact.hasBouncedEmail ? (
           <AlertCircleFilledIcon boxSize={4} color="yellow.500" marginLeft={2} />
         ) : null}

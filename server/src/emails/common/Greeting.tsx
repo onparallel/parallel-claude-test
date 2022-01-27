@@ -31,8 +31,8 @@ export function GreetingContact({
   fullName,
   tone,
 }: {
-  name: string | null;
-  fullName: string | null;
+  name: string;
+  fullName: string;
   tone: Tone;
 }) {
   return (
@@ -40,41 +40,13 @@ export function GreetingContact({
       {tone === "INFORMAL" ? (
         <FormattedMessage
           id="greeting-contact.informal"
-          defaultMessage="{name, select, null {Hello,} other {Hello {name},}}"
+          defaultMessage="Hello {name},"
           values={{ name }}
         />
       ) : (
         <FormattedMessage
           id="greeting-contact.formal"
-          defaultMessage="{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}"
-          values={{ fullName }}
-        />
-      )}
-    </MjmlText>
-  );
-}
-
-export function GreetingReminder({
-  name,
-  fullName,
-  tone,
-}: {
-  name: string | null;
-  fullName: string | null;
-  tone: Tone;
-}) {
-  return (
-    <MjmlText>
-      {tone === "INFORMAL" ? (
-        <FormattedMessage
-          id="greeting-reminder.informal"
-          defaultMessage="{name, select, null {Hello!} other {Hello {name}!}}"
-          values={{ name }}
-        />
-      ) : (
-        <FormattedMessage
-          id="greeting-contact.formal"
-          defaultMessage="{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}"
+          defaultMessage="Dear {fullName},"
           values={{ fullName }}
         />
       )}

@@ -86,7 +86,7 @@ export interface NexusGenInputs {
   CreateContactInput: {
     // input type
     email: string; // String!
-    firstName?: string | null; // String
+    firstName: string; // String!
     lastName?: string | null; // String
   };
   FileUploadInput: {
@@ -697,8 +697,8 @@ export interface NexusGenFieldTypes {
     accesses: NexusGenRootTypes["PetitionAccessPagination"]; // PetitionAccessPagination!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     email: string; // String!
-    firstName: string | null; // String
-    fullName: string | null; // String
+    firstName: string; // String!
+    fullName: string; // String!
     hasBouncedEmail: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     lastName: string | null; // String
@@ -1370,8 +1370,8 @@ export interface NexusGenFieldTypes {
   PublicContact: {
     // field return type
     email: string; // String!
-    firstName: string | null; // String
-    fullName: string | null; // String
+    firstName: string; // String!
+    fullName: string; // String!
     id: NexusGenScalars["GID"]; // GID!
     lastName: string | null; // String
   };
@@ -1481,7 +1481,7 @@ export interface NexusGenFieldTypes {
     // field return type
     email: string; // String!
     firstName: string | null; // String
-    fullName: string | null; // String
+    fullName: string; // String!
     id: NexusGenScalars["GID"]; // GID!
     lastName: string | null; // String
     organization: NexusGenRootTypes["PublicOrganization"]; // PublicOrganization!

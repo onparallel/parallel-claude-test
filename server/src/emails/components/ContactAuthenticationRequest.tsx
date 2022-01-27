@@ -9,8 +9,8 @@ import { closing, greetingContact } from "../common/texts";
 import { Tone } from "../utils/types";
 
 export type ContactAuthenticationRequest = {
-  name: string | null;
-  fullName: string | null;
+  name: string;
+  fullName: string;
   browserName: string;
   osName: string;
   code: string;

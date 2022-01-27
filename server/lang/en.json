@@ -211,18 +211,13 @@
   },
   {
     "term": "greeting-contact.formal",
-    "definition": "{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}",
-    "context": "{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}"
+    "definition": "Dear {fullName},",
+    "context": "Dear {fullName},"
   },
   {
     "term": "greeting-contact.informal",
-    "definition": "{name, select, null {Hello,} other {Hello {name},}}",
-    "context": "{name, select, null {Hello,} other {Hello {name},}}"
-  },
-  {
-    "term": "greeting-reminder.informal",
-    "definition": "{name, select, null {Hello!} other {Hello {name}!}}",
-    "context": "{name, select, null {Hello!} other {Hello {name}!}}"
+    "definition": "Hello {name},",
+    "context": "Hello {name},"
   },
   {
     "term": "greeting-user",

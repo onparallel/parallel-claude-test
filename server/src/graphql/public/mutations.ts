@@ -809,9 +809,9 @@ export const publicDelegateAccessToContact = mutationField("publicDelegateAccess
     const [contactToDelegate] = await ctx.contacts.loadOrCreate(
       {
         email: args.email,
-        orgId: recipient.org_id,
-        firstName: args.firstName,
-        lastName: args.lastName,
+        org_id: recipient.org_id,
+        first_name: args.firstName,
+        last_name: args.lastName,
       },
       `Contact:${recipient.id}`
     );
@@ -1016,9 +1016,9 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
           ctx.contacts.loadOrCreate(
             {
               email: args.contactEmail,
-              firstName: args.contactFirstName,
-              lastName: args.contactLastName,
-              orgId: owner!.org_id,
+              first_name: args.contactFirstName,
+              last_name: args.contactLastName,
+              org_id: owner!.org_id,
             },
             `PublicPetitionLink:${link.id}`,
             t

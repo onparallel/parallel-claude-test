@@ -9,7 +9,7 @@ import { closing, gdprDisclaimer, greetingContact } from "../common/texts";
 import { Tone } from "../utils/types";
 
 type SignatureCancelledProps = {
-  signerName: string | null;
+  signerName: string;
   signatureProvider: string;
   tone: Tone;
 } & LayoutProps;

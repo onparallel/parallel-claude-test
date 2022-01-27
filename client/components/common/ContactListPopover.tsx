@@ -16,7 +16,6 @@ import {
   ContactListPopover_PublicContactFragment,
 } from "@parallel/graphql/__types";
 import { ReactNode } from "react";
-import { FormattedMessage } from "react-intl";
 
 type ContactSelection =
   | ContactListPopover_ContactFragment
@@ -64,15 +63,9 @@ export function ContactListPopover<T extends ContactSelection>({
                   _hover={isClickable ? { backgroundColor: "gray.75" } : {}}
                   cursor={isClickable ? "pointer" : "unset"}
                 >
-                  {c.fullName ? (
-                    <Box whiteSpace="nowrap" color={isClickable ? "purple.600" : "gray.800"}>
-                      {c.fullName}
-                    </Box>
-                  ) : (
-                    <Box textStyle="hint">
-                      <FormattedMessage id="generic.no-name" defaultMessage="No name" />
-                    </Box>
-                  )}
+                  <Box whiteSpace="nowrap" color={isClickable ? "purple.600" : "gray.800"}>
+                    {c.fullName}
+                  </Box>
                   <Box whiteSpace="nowrap" color="gray.600" fontSize="xs">
                     {c.email}
                   </Box>

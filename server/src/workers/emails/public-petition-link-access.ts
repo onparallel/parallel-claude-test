@@ -49,8 +49,8 @@ export async function publicPetitionLinkAccess(
   const { html, text, subject, from } = await buildEmail(
     PublicPetitionLinkAccess,
     {
-      name: contact.first_name!,
-      fullName: fullName(contact.first_name, contact.last_name)!,
+      name: contact.first_name,
+      fullName: fullName(contact.first_name, contact.last_name),
       senderName: fullName(sender.first_name, sender.last_name)!,
       emailSubject: petition.email_subject,
       petitionTitle: publicPetitionLink.title,

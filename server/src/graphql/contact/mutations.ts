@@ -1,7 +1,7 @@
 import { nameCase } from "@foundernest/namecase";
 import { inputObjectType, list, mutationField, nonNull } from "nexus";
 import pMap from "p-map";
-import { chunk, uniqBy } from "remeda";
+import { chunk, isDefined, uniqBy } from "remeda";
 import { CreateContact } from "../../db/__types";
 import { withError } from "../../util/promises/withError";
 import { authenticate, chain } from "../helpers/authorize";
@@ -25,7 +25,7 @@ export const createContact = mutationField("createContact", {
         name: "CreateContactInput",
         definition(t) {
           t.nonNull.string("email");
-          t.string("firstName");
+          t.nonNull.string("firstName");
           t.string("lastName");
         },
       }).asArg()
@@ -39,7 +39,7 @@ export const createContact = mutationField("createContact", {
         {
           org_id: ctx.user!.org_id,
           email: email.toLowerCase(),
-          first_name: firstName || null,
+          first_name: firstName,
           last_name: lastName || null,
         },
         `User:${ctx.user!.id}`
@@ -74,7 +74,7 @@ export const updateContact = mutationField("updateContact", {
   resolve: async (_, args, ctx) => {
     const { firstName, lastName } = args.data;
     const data: Partial<CreateContact> = {};
-    if (firstName !== undefined) {
+    if (isDefined(firstName)) {
       data.first_name = firstName;
     }
     if (lastName !== undefined) {

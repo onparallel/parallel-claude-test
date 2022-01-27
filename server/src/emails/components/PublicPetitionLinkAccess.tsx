@@ -12,8 +12,8 @@ import { Tone } from "../utils/types";
 
 export type PublicPetitionLinkAccessProps = {
   emailSubject: Maybe<string>;
-  name: string | null;
-  fullName: string | null;
+  name: string;
+  fullName: string;
   senderName: string;
   petitionTitle: string;
   keycode: string;

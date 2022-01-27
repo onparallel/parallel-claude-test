@@ -197,7 +197,7 @@ describe("GraphQL/Contacts", () => {
   it("creates a new contact with email and full name", async () => {
     const { data, errors } = await testClient.mutate({
       mutation: gql`
-        mutation ($email: String!, $firstName: String, $lastName: String) {
+        mutation ($email: String!, $firstName: String!, $lastName: String) {
           createContact(data: { email: $email, firstName: $firstName, lastName: $lastName }) {
             email
             firstName
@@ -225,8 +225,8 @@ describe("GraphQL/Contacts", () => {
   it("sends error when trying to create a contact with an existing email", async () => {
     const { data, errors } = await testClient.mutate({
       mutation: gql`
-        mutation ($email: String!) {
-          createContact(data: { email: $email }) {
+        mutation ($email: String!, $firstName: String!) {
+          createContact(data: { email: $email, firstName: $firstName }) {
             id
             email
           }
@@ -234,6 +234,7 @@ describe("GraphQL/Contacts", () => {
       `,
       variables: {
         email: userContacts[3].email,
+        firstName: "Mark",
       },
     });
 

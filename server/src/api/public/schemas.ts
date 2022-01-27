@@ -98,7 +98,7 @@ const _Contact = {
       description: "The email of the contact",
     },
     firstName: {
-      type: ["string", "null"],
+      type: "string",
       description: "The first name of the contact",
     },
     lastName: {
@@ -106,7 +106,7 @@ const _Contact = {
       description: "The last name of the contact",
     },
     fullName: {
-      type: ["string", "null"],
+      type: "string",
       description: "The full name of the contact",
     },
     createdAt: {
@@ -638,7 +638,7 @@ export const CreateContact = schema({
   title: "CreateContact",
   type: "object",
   additionalProperties: false,
-  required: ["email"],
+  required: ["email", "firstName"],
   properties: {
     email: {
       type: "string",
@@ -646,7 +646,7 @@ export const CreateContact = schema({
       description: "The email of the contact",
     },
     firstName: {
-      type: ["string", "null"],
+      type: "string",
       maxLength: 255,
       description: "The first name of the contact",
     },
@@ -683,7 +683,7 @@ export const SendPetition = schema({
             title: "CreateOrUpdateContact",
             type: "object",
             additionalProperties: false,
-            required: ["email"],
+            required: ["email", "firstName"],
             properties: {
               email: {
                 type: "string",
@@ -691,7 +691,7 @@ export const SendPetition = schema({
                 description: "The email of the contact to send this petition to",
               },
               firstName: {
-                type: ["string", "null"],
+                type: "string",
                 description: "The first name of the contact",
                 maxLength: 255,
               },

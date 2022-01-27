@@ -9,7 +9,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 
 export type ContactDetailsFormData = {
   email: string;
-  firstName: string | null;
+  firstName: string;
   lastName: string | null;
 };
 
@@ -32,7 +32,7 @@ export function AskContactDetailsDialog({
   function onCreateContact(data: ContactDetailsFormData) {
     props.onResolve({
       email: data.email,
-      firstName: data.firstName || null,
+      firstName: data.firstName,
       lastName: data.lastName || null,
     });
   }
@@ -44,7 +44,9 @@ export function AskContactDetailsDialog({
   });
 
   const firstNameRef = useRef<HTMLInputElement>(null);
-  const firstNameRegisterProps = useRegisterWithRef(firstNameRef, register, "firstName");
+  const firstNameRegisterProps = useRegisterWithRef(firstNameRef, register, "firstName", {
+    required: true,
+  });
   return (
     <ConfirmDialog
       id="pw-add-contact"

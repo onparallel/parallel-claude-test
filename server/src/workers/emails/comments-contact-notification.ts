@@ -48,7 +48,7 @@ export async function commentsContactNotification(
     PetitionCommentsContactNotification,
     {
       emailSubject: originalMessage?.email_subject ?? null,
-      contactName: contact.first_name!,
+      contactName: contact.first_name,
       contactFullName: fullName(contact.first_name, contact.last_name),
       keycode: access.keycode,
       tone: organization!.preferred_tone,

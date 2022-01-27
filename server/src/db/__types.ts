@@ -408,7 +408,7 @@ export interface TablePrimaryKeys {
 export interface Contact {
   id: number; // int4
   email: string; // varchar
-  first_name: Maybe<string>; // varchar
+  first_name: string; // varchar
   last_name: Maybe<string>; // varchar
   org_id: number; // int4
   created_at: Date; // timestamptz
@@ -422,7 +422,6 @@ export interface Contact {
 
 export type CreateContact = PartialProps<
   Omit<Contact, "id">,
-  | "first_name"
   | "last_name"
   | "created_at"
   | "created_by"

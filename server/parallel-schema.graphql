@@ -135,12 +135,12 @@ type Contact implements Timestamps {
   """
   The first name of the contact.
   """
-  firstName: String
+  firstName: String!
 
   """
   The full name of the contact.
   """
-  fullName: String
+  fullName: String!
   hasBouncedEmail: Boolean!
 
   """
@@ -173,7 +173,7 @@ type ContactPagination {
 
 input CreateContactInput {
   email: String!
-  firstName: String
+  firstName: String!
   lastName: String
 }
 
@@ -3092,12 +3092,12 @@ type PublicContact {
   """
   The first name of the user.
   """
-  firstName: String
+  firstName: String!
 
   """
   The full name of the user.
   """
-  fullName: String
+  fullName: String!
 
   """
   The ID of the contact.
@@ -3429,7 +3429,7 @@ type PublicUser {
   """
   The full name of the user.
   """
-  fullName: String
+  fullName: String!
 
   """
   The ID of the user.

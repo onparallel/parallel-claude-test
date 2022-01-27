@@ -131,9 +131,9 @@ export interface Contact extends Timestamps {
   /** The email of the contact. */
   email: Scalars["String"];
   /** The first name of the contact. */
-  firstName?: Maybe<Scalars["String"]>;
+  firstName: Scalars["String"];
   /** The full name of the contact. */
-  fullName?: Maybe<Scalars["String"]>;
+  fullName: Scalars["String"];
   hasBouncedEmail: Scalars["Boolean"];
   /** The ID of the contact. */
   id: Scalars["GID"];
@@ -159,7 +159,7 @@ export interface ContactPagination {
 
 export interface CreateContactInput {
   email: Scalars["String"];
-  firstName?: InputMaybe<Scalars["String"]>;
+  firstName: Scalars["String"];
   lastName?: InputMaybe<Scalars["String"]>;
 }
 
@@ -2337,9 +2337,9 @@ export interface PublicContact {
   /** The email of the user. */
   email: Scalars["String"];
   /** The first name of the user. */
-  firstName?: Maybe<Scalars["String"]>;
+  firstName: Scalars["String"];
   /** The full name of the user. */
-  fullName?: Maybe<Scalars["String"]>;
+  fullName: Scalars["String"];
   /** The ID of the contact. */
   id: Scalars["GID"];
   /** The last name of the user. */
@@ -2529,7 +2529,7 @@ export interface PublicUser {
   /** The first name of the user. */
   firstName?: Maybe<Scalars["String"]>;
   /** The full name of the user. */
-  fullName?: Maybe<Scalars["String"]>;
+  fullName: Scalars["String"];
   /** The ID of the user. */
   id: Scalars["GID"];
   /** The last name of the user. */
@@ -3333,14 +3333,14 @@ export type ContactListPopover_ContactFragment = {
   __typename?: "Contact";
   id: string;
   email: string;
-  fullName?: string | null;
+  fullName: string;
 };
 
 export type ContactListPopover_PublicContactFragment = {
   __typename?: "PublicContact";
   id: string;
   email: string;
-  fullName?: string | null;
+  fullName: string;
 };
 
 export type ContactListPopover_PetitionSignerFragment = {
@@ -3352,16 +3352,16 @@ export type ContactListPopover_PetitionSignerFragment = {
 export type ContactReference_ContactFragment = {
   __typename?: "Contact";
   id: string;
-  fullName?: string | null;
+  fullName: string;
   email: string;
 };
 
 export type ContactSelect_ContactFragment = {
   __typename?: "Contact";
   id: string;
-  firstName?: string | null;
+  firstName: string;
   lastName?: string | null;
-  fullName?: string | null;
+  fullName: string;
   email: string;
   hasBouncedEmail: boolean;
 };
@@ -3373,8 +3373,8 @@ export type FieldComment_PublicPetitionFieldCommentFragment = {
   createdAt: string;
   isUnread: boolean;
   author?:
-    | { __typename?: "PublicContact"; id: string; fullName?: string | null }
-    | { __typename?: "PublicUser"; id: string; fullName?: string | null }
+    | { __typename?: "PublicContact"; id: string; fullName: string }
+    | { __typename?: "PublicUser"; id: string; fullName: string }
     | null;
 };
 
@@ -3390,12 +3390,7 @@ export type FieldComment_PetitionFieldCommentFragment = {
     | {
         __typename?: "PetitionAccess";
         id: string;
-        contact?: {
-          __typename?: "Contact";
-          id: string;
-          fullName?: string | null;
-          email: string;
-        } | null;
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
       }
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
@@ -3978,12 +3973,7 @@ export type NotificationsDrawer_PetitionUserNotification_AccessActivatedFromPubl
     isRead: boolean;
     access: {
       __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
     petition:
       | { __typename?: "Petition"; id: string; name?: string | null }
@@ -4003,12 +3993,7 @@ export type NotificationsDrawer_PetitionUserNotification_CommentCreatedUserNotif
     author?:
       | {
           __typename?: "PetitionAccess";
-          contact?: {
-            __typename?: "Contact";
-            id: string;
-            fullName?: string | null;
-            email: string;
-          } | null;
+          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
         }
       | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
       | null;
@@ -4026,12 +4011,7 @@ export type NotificationsDrawer_PetitionUserNotification_MessageEmailBouncedUser
     isRead: boolean;
     access: {
       __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
     petition:
       | { __typename?: "Petition"; id: string; name?: string | null }
@@ -4047,12 +4027,7 @@ export type NotificationsDrawer_PetitionUserNotification_PetitionCompletedUserNo
     completedBy?:
       | {
           __typename?: "PetitionAccess";
-          contact?: {
-            __typename?: "Contact";
-            id: string;
-            fullName?: string | null;
-            email: string;
-          } | null;
+          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
         }
       | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
       | null;
@@ -4084,12 +4059,7 @@ export type NotificationsDrawer_PetitionUserNotification_ReminderEmailBouncedUse
     isRead: boolean;
     access: {
       __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
     petition:
       | { __typename?: "Petition"; id: string; name?: string | null }
@@ -4105,12 +4075,7 @@ export type NotificationsDrawer_PetitionUserNotification_RemindersOptOutNotifica
   isRead: boolean;
   access: {
     __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
   petition:
     | { __typename?: "Petition"; id: string; name?: string | null }
@@ -4176,7 +4141,7 @@ export type NotificationsDrawer_notificationsQuery = {
               contact?: {
                 __typename?: "Contact";
                 id: string;
-                fullName?: string | null;
+                fullName: string;
                 email: string;
               } | null;
             };
@@ -4200,7 +4165,7 @@ export type NotificationsDrawer_notificationsQuery = {
                     contact?: {
                       __typename?: "Contact";
                       id: string;
-                      fullName?: string | null;
+                      fullName: string;
                       email: string;
                     } | null;
                   }
@@ -4221,7 +4186,7 @@ export type NotificationsDrawer_notificationsQuery = {
               contact?: {
                 __typename?: "Contact";
                 id: string;
-                fullName?: string | null;
+                fullName: string;
                 email: string;
               } | null;
             };
@@ -4240,7 +4205,7 @@ export type NotificationsDrawer_notificationsQuery = {
                   contact?: {
                     __typename?: "Contact";
                     id: string;
-                    fullName?: string | null;
+                    fullName: string;
                     email: string;
                   } | null;
                 }
@@ -4279,7 +4244,7 @@ export type NotificationsDrawer_notificationsQuery = {
               contact?: {
                 __typename?: "Contact";
                 id: string;
-                fullName?: string | null;
+                fullName: string;
                 email: string;
               } | null;
             };
@@ -4299,7 +4264,7 @@ export type NotificationsDrawer_notificationsQuery = {
               contact?: {
                 __typename?: "Contact";
                 id: string;
-                fullName?: string | null;
+                fullName: string;
                 email: string;
               } | null;
             };
@@ -4339,12 +4304,7 @@ export type NotificationsList_PetitionUserNotification_AccessActivatedFromPublic
     isRead: boolean;
     access: {
       __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
     petition:
       | { __typename?: "Petition"; id: string; name?: string | null }
@@ -4364,12 +4324,7 @@ export type NotificationsList_PetitionUserNotification_CommentCreatedUserNotific
     author?:
       | {
           __typename?: "PetitionAccess";
-          contact?: {
-            __typename?: "Contact";
-            id: string;
-            fullName?: string | null;
-            email: string;
-          } | null;
+          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
         }
       | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
       | null;
@@ -4387,12 +4342,7 @@ export type NotificationsList_PetitionUserNotification_MessageEmailBouncedUserNo
     isRead: boolean;
     access: {
       __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
     petition:
       | { __typename?: "Petition"; id: string; name?: string | null }
@@ -4408,12 +4358,7 @@ export type NotificationsList_PetitionUserNotification_PetitionCompletedUserNoti
     completedBy?:
       | {
           __typename?: "PetitionAccess";
-          contact?: {
-            __typename?: "Contact";
-            id: string;
-            fullName?: string | null;
-            email: string;
-          } | null;
+          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
         }
       | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
       | null;
@@ -4445,12 +4390,7 @@ export type NotificationsList_PetitionUserNotification_ReminderEmailBouncedUserN
     isRead: boolean;
     access: {
       __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
     petition:
       | { __typename?: "Petition"; id: string; name?: string | null }
@@ -4466,12 +4406,7 @@ export type NotificationsList_PetitionUserNotification_RemindersOptOutNotificati
   isRead: boolean;
   access: {
     __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
   petition:
     | { __typename?: "Petition"; id: string; name?: string | null }
@@ -4520,12 +4455,7 @@ export type AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitio
     isRead: boolean;
     access: {
       __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
     petition:
       | { __typename?: "Petition"; id: string; name?: string | null }
@@ -4545,12 +4475,7 @@ export type CommentCreatedUserNotification_CommentCreatedUserNotificationFragmen
     author?:
       | {
           __typename?: "PetitionAccess";
-          contact?: {
-            __typename?: "Contact";
-            id: string;
-            fullName?: string | null;
-            email: string;
-          } | null;
+          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
         }
       | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
       | null;
@@ -4567,12 +4492,7 @@ export type MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotificat
   isRead: boolean;
   access: {
     __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
   petition:
     | { __typename?: "Petition"; id: string; name?: string | null }
@@ -4587,12 +4507,7 @@ export type PetitionCompletedUserNotification_PetitionCompletedUserNotificationF
   completedBy?:
     | {
         __typename?: "PetitionAccess";
-        contact?: {
-          __typename?: "Contact";
-          id: string;
-          fullName?: string | null;
-          email: string;
-        } | null;
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
       }
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
@@ -4733,12 +4648,7 @@ export type ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotific
   isRead: boolean;
   access: {
     __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
   petition:
     | { __typename?: "Petition"; id: string; name?: string | null }
@@ -4754,12 +4664,7 @@ export type RemindersOptOutNotification_RemindersOptOutNotificationFragment = {
   isRead: boolean;
   access: {
     __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
   petition:
     | { __typename?: "Petition"; id: string; name?: string | null }
@@ -4838,12 +4743,7 @@ export type PetitionAccessTable_PetitionFragment = {
     remindersActive: boolean;
     remindersOptOut: boolean;
     createdAt: string;
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     remindersConfig?: {
       __typename?: "RemindersConfig";
       offset: number;
@@ -4872,7 +4772,7 @@ export type PetitionAccessTable_PetitionAccessFragment = {
   remindersActive: boolean;
   remindersOptOut: boolean;
   createdAt: string;
-  contact?: { __typename?: "Contact"; id: string; fullName?: string | null; email: string } | null;
+  contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   remindersConfig?: {
     __typename?: "RemindersConfig";
     offset: number;
@@ -4902,7 +4802,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
             contact?: {
               __typename?: "Contact";
               id: string;
-              fullName?: string | null;
+              fullName: string;
               email: string;
             } | null;
           };
@@ -4916,7 +4816,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
             contact?: {
               __typename?: "Contact";
               id: string;
-              fullName?: string | null;
+              fullName: string;
               email: string;
             } | null;
           };
@@ -4936,7 +4836,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
             contact?: {
               __typename?: "Contact";
               id: string;
-              fullName?: string | null;
+              fullName: string;
               email: string;
             } | null;
           };
@@ -4950,7 +4850,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
             contact?: {
               __typename?: "Contact";
               id: string;
-              fullName?: string | null;
+              fullName: string;
               email: string;
             } | null;
           };
@@ -4959,7 +4859,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
             contact?: {
               __typename?: "Contact";
               id: string;
-              fullName?: string | null;
+              fullName: string;
               email: string;
             } | null;
           };
@@ -4973,7 +4873,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
             contact?: {
               __typename?: "Contact";
               id: string;
-              fullName?: string | null;
+              fullName: string;
               email: string;
             } | null;
           };
@@ -4989,7 +4889,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
                 contact?: {
                   __typename?: "Contact";
                   id: string;
-                  fullName?: string | null;
+                  fullName: string;
                   email: string;
                 } | null;
               }
@@ -5011,7 +4911,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
                   contact?: {
                     __typename?: "Contact";
                     id: string;
-                    fullName?: string | null;
+                    fullName: string;
                     email: string;
                   } | null;
                 }
@@ -5071,7 +4971,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
               contact?: {
                 __typename?: "Contact";
                 id: string;
-                fullName?: string | null;
+                fullName: string;
                 email: string;
               } | null;
             };
@@ -5106,7 +5006,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
               contact?: {
                 __typename?: "Contact";
                 id: string;
-                fullName?: string | null;
+                fullName: string;
                 email: string;
               } | null;
             };
@@ -5136,7 +5036,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
               contact?: {
                 __typename?: "Contact";
                 id: string;
-                fullName?: string | null;
+                fullName: string;
                 email: string;
               } | null;
             };
@@ -5202,7 +5102,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
             contact?: {
               __typename?: "Contact";
               id: string;
-              fullName?: string | null;
+              fullName: string;
               email: string;
             } | null;
           };
@@ -5217,7 +5117,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
                 contact?: {
                   __typename?: "Contact";
                   id: string;
-                  fullName?: string | null;
+                  fullName: string;
                   email: string;
                 } | null;
               }
@@ -5247,7 +5147,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
               contact?: {
                 __typename?: "Contact";
                 id: string;
-                fullName?: string | null;
+                fullName: string;
                 email: string;
               } | null;
             };
@@ -5264,7 +5164,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
               contact?: {
                 __typename?: "Contact";
                 id: string;
-                fullName?: string | null;
+                fullName: string;
                 email: string;
               } | null;
             };
@@ -5307,7 +5207,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
               contact?: {
                 __typename?: "Contact";
                 id: string;
-                fullName?: string | null;
+                fullName: string;
                 email: string;
               } | null;
             };
@@ -5324,7 +5224,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
             contact?: {
               __typename?: "Contact";
               id: string;
-              fullName?: string | null;
+              fullName: string;
               email: string;
             } | null;
           };
@@ -5340,7 +5240,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
                 contact?: {
                   __typename?: "Contact";
                   id: string;
-                  fullName?: string | null;
+                  fullName: string;
                   email: string;
                 } | null;
               }
@@ -5358,7 +5258,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
                 contact?: {
                   __typename?: "Contact";
                   id: string;
-                  fullName?: string | null;
+                  fullName: string;
                   email: string;
                 } | null;
               }
@@ -5376,7 +5276,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
                 contact?: {
                   __typename?: "Contact";
                   id: string;
-                  fullName?: string | null;
+                  fullName: string;
                   email: string;
                 } | null;
               }
@@ -5396,7 +5296,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
                 contact?: {
                   __typename?: "Contact";
                   id: string;
-                  fullName?: string | null;
+                  fullName: string;
                   email: string;
                 } | null;
               }
@@ -5495,12 +5395,7 @@ export type PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
   access: {
     __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
 };
 
@@ -5511,12 +5406,7 @@ export type PetitionActivityTimeline_PetitionEvent_AccessActivatedFromPublicPeti
     createdAt: string;
     access: {
       __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
   };
 
@@ -5527,12 +5417,7 @@ export type PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragme
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
   access: {
     __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
 };
 
@@ -5542,21 +5427,11 @@ export type PetitionActivityTimeline_PetitionEvent_AccessDelegatedEvent_Fragment
   createdAt: string;
   originalAccess: {
     __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
   newAccess: {
     __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
 };
 
@@ -5566,12 +5441,7 @@ export type PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment = 
   createdAt: string;
   access: {
     __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
 };
 
@@ -5583,12 +5453,7 @@ export type PetitionActivityTimeline_PetitionEvent_CommentDeletedEvent_Fragment 
   deletedBy?:
     | {
         __typename?: "PetitionAccess";
-        contact?: {
-          __typename?: "Contact";
-          id: string;
-          fullName?: string | null;
-          email: string;
-        } | null;
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
       }
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
@@ -5606,12 +5471,7 @@ export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragmen
     author?:
       | {
           __typename?: "PetitionAccess";
-          contact?: {
-            __typename?: "Contact";
-            id: string;
-            fullName?: string | null;
-            email: string;
-          } | null;
+          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
         }
       | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
       | null;
@@ -5655,12 +5515,7 @@ export type PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragmen
     emailSubject?: any | null;
     access: {
       __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
   };
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
@@ -5681,12 +5536,7 @@ export type PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragmen
     sender: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
     access: {
       __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
   };
 };
@@ -5707,12 +5557,7 @@ export type PetitionActivityTimeline_PetitionEvent_MessageSentEvent_Fragment = {
     sender: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
     access: {
       __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
   };
 };
@@ -5752,12 +5597,7 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionClosedNotifiedEvent_F
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
   access: {
     __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
 };
 
@@ -5768,12 +5608,7 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragme
   completedBy?:
     | {
         __typename?: "PetitionAccess";
-        contact?: {
-          __typename?: "Contact";
-          id: string;
-          fullName?: string | null;
-          email: string;
-        } | null;
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
       }
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
@@ -5799,12 +5634,7 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionMessageBouncedEvent_F
     __typename?: "PetitionMessage";
     access: {
       __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
   };
 };
@@ -5817,12 +5647,7 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionReminderBouncedEvent_
     __typename?: "PetitionReminder";
     access: {
       __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
   };
 };
@@ -5858,12 +5683,7 @@ export type PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment = 
     } | null;
     access: {
       __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
   };
 };
@@ -5876,12 +5696,7 @@ export type PetitionActivityTimeline_PetitionEvent_RemindersOptOutEvent_Fragment
   other?: string | null;
   access: {
     __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
 };
 
@@ -5893,12 +5708,7 @@ export type PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment = 
   createdBy?:
     | {
         __typename?: "PetitionAccess";
-        contact?: {
-          __typename?: "Contact";
-          id: string;
-          fullName?: string | null;
-          email: string;
-        } | null;
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
       }
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
@@ -5912,12 +5722,7 @@ export type PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment = 
   deletedBy?:
     | {
         __typename?: "PetitionAccess";
-        contact?: {
-          __typename?: "Contact";
-          id: string;
-          fullName?: string | null;
-          email: string;
-        } | null;
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
       }
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
@@ -5931,12 +5736,7 @@ export type PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment = 
   updatedBy?:
     | {
         __typename?: "PetitionAccess";
-        contact?: {
-          __typename?: "Contact";
-          id: string;
-          fullName?: string | null;
-          email: string;
-        } | null;
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
       }
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
@@ -5952,12 +5752,7 @@ export type PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragm
   cancelledBy?:
     | {
         __typename?: "PetitionAccess";
-        contact?: {
-          __typename?: "Contact";
-          id: string;
-          fullName?: string | null;
-          email: string;
-        } | null;
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
       }
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
@@ -6088,7 +5883,7 @@ export type UserGroupReference_UserGroupFragment = { __typename?: "UserGroup"; n
 
 export type UserOrContactReference_UserOrPetitionAccess_PetitionAccess_Fragment = {
   __typename?: "PetitionAccess";
-  contact?: { __typename?: "Contact"; id: string; fullName?: string | null; email: string } | null;
+  contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
 };
 
 export type UserOrContactReference_UserOrPetitionAccess_User_Fragment = {
@@ -6142,12 +5937,7 @@ export type SentPetitionMessageDialog_PetitionMessageFragment = {
   scheduledAt?: string | null;
   access: {
     __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
 };
 
@@ -6157,12 +5947,7 @@ export type SentReminderMessageDialog_PetitionReminderFragment = {
   emailBody?: string | null;
   access: {
     __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
 };
 
@@ -6172,12 +5957,7 @@ export type TimelineAccessActivatedEvent_AccessActivatedEventFragment = {
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
   access: {
     __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
 };
 
@@ -6187,12 +5967,7 @@ export type TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetiti
     createdAt: string;
     access: {
       __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
   };
 
@@ -6202,12 +5977,7 @@ export type TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment = {
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
   access: {
     __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
 };
 
@@ -6216,21 +5986,11 @@ export type TimelineAccessDelegatedEvent_AccessDelegatedEventFragment = {
   createdAt: string;
   originalAccess: {
     __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
   newAccess: {
     __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
 };
 
@@ -6239,12 +5999,7 @@ export type TimelineAccessOpenedEvent_AccessOpenedEventFragment = {
   createdAt: string;
   access: {
     __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
 };
 
@@ -6255,12 +6010,7 @@ export type TimelineCommentDeletedEvent_CommentDeletedEventFragment = {
   deletedBy?:
     | {
         __typename?: "PetitionAccess";
-        contact?: {
-          __typename?: "Contact";
-          id: string;
-          fullName?: string | null;
-          email: string;
-        } | null;
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
       }
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
@@ -6277,12 +6027,7 @@ export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
     author?:
       | {
           __typename?: "PetitionAccess";
-          contact?: {
-            __typename?: "Contact";
-            id: string;
-            fullName?: string | null;
-            email: string;
-          } | null;
+          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
         }
       | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
       | null;
@@ -6322,12 +6067,7 @@ export type TimelineMessageCancelledEvent_MessageCancelledEventFragment = {
     emailSubject?: any | null;
     access: {
       __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
   };
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
@@ -6346,12 +6086,7 @@ export type TimelineMessageScheduledEvent_MessageScheduledEventFragment = {
     sender: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
     access: {
       __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
   };
 };
@@ -6371,12 +6106,7 @@ export type TimelineMessageSentEvent_MessageSentEventFragment = {
     sender: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
     access: {
       __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
   };
 };
@@ -6412,12 +6142,7 @@ export type TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragm
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
   access: {
     __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
 };
 
@@ -6427,12 +6152,7 @@ export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
   completedBy?:
     | {
         __typename?: "PetitionAccess";
-        contact?: {
-          __typename?: "Contact";
-          id: string;
-          fullName?: string | null;
-          email: string;
-        } | null;
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
       }
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
@@ -6451,12 +6171,7 @@ export type TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEventFragm
     __typename?: "PetitionMessage";
     access: {
       __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
   };
 };
@@ -6468,12 +6183,7 @@ export type TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEventFra
     __typename?: "PetitionReminder";
     access: {
       __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
   };
 };
@@ -6506,12 +6216,7 @@ export type TimelineReminderSentEvent_ReminderSentEventFragment = {
     } | null;
     access: {
       __typename?: "PetitionAccess";
-      contact?: {
-        __typename?: "Contact";
-        id: string;
-        fullName?: string | null;
-        email: string;
-      } | null;
+      contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
   };
 };
@@ -6523,12 +6228,7 @@ export type TimelineRemindersOptOutEvent_RemindersOptOutEventFragment = {
   other?: string | null;
   access: {
     __typename?: "PetitionAccess";
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
 };
 
@@ -6539,12 +6239,7 @@ export type TimelineReplyCreatedEvent_ReplyCreatedEventFragment = {
   createdBy?:
     | {
         __typename?: "PetitionAccess";
-        contact?: {
-          __typename?: "Contact";
-          id: string;
-          fullName?: string | null;
-          email: string;
-        } | null;
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
       }
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
@@ -6557,12 +6252,7 @@ export type TimelineReplyDeletedEvent_ReplyDeletedEventFragment = {
   deletedBy?:
     | {
         __typename?: "PetitionAccess";
-        contact?: {
-          __typename?: "Contact";
-          id: string;
-          fullName?: string | null;
-          email: string;
-        } | null;
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
       }
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
@@ -6575,12 +6265,7 @@ export type TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment = {
   updatedBy?:
     | {
         __typename?: "PetitionAccess";
-        contact?: {
-          __typename?: "Contact";
-          id: string;
-          fullName?: string | null;
-          email: string;
-        } | null;
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
       }
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
@@ -6595,12 +6280,7 @@ export type TimelineSignatureCancelledEvent_SignatureCancelledEventFragment = {
   cancelledBy?:
     | {
         __typename?: "PetitionAccess";
-        contact?: {
-          __typename?: "Contact";
-          id: string;
-          fullName?: string | null;
-          email: string;
-        } | null;
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
       }
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
@@ -8334,12 +8014,7 @@ export type PreviewPetitionFieldCommentsDialog_PetitionFieldFragment = {
       | {
           __typename?: "PetitionAccess";
           id: string;
-          contact?: {
-            __typename?: "Contact";
-            id: string;
-            fullName?: string | null;
-            email: string;
-          } | null;
+          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
         }
       | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
       | null;
@@ -8377,7 +8052,7 @@ export type PreviewPetitionFieldCommentsDialog_petitionFieldQueryQuery = {
             contact?: {
               __typename?: "Contact";
               id: string;
-              fullName?: string | null;
+              fullName: string;
               email: string;
             } | null;
           }
@@ -8412,12 +8087,7 @@ export type PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentMutatio
       | {
           __typename?: "PetitionAccess";
           id: string;
-          contact?: {
-            __typename?: "Contact";
-            id: string;
-            fullName?: string | null;
-            email: string;
-          } | null;
+          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
         }
       | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
       | null;
@@ -8449,12 +8119,7 @@ export type PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutatio
       | {
           __typename?: "PetitionAccess";
           id: string;
-          contact?: {
-            __typename?: "Contact";
-            id: string;
-            fullName?: string | null;
-            email: string;
-          } | null;
+          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
         }
       | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
       | null;
@@ -8487,7 +8152,7 @@ export type PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutatio
             contact?: {
               __typename?: "Contact";
               id: string;
-              fullName?: string | null;
+              fullName: string;
               email: string;
             } | null;
           }
@@ -8588,7 +8253,7 @@ export type PetitionRepliesField_PetitionFieldFragment = {
       | {
           __typename?: "PetitionAccess";
           id: string;
-          contact?: { __typename?: "Contact"; id: string; fullName?: string | null } | null;
+          contact?: { __typename?: "Contact"; id: string; fullName: string } | null;
         }
       | { __typename?: "User"; id: string; fullName?: string | null }
       | null;
@@ -8624,7 +8289,7 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
     | {
         __typename?: "PetitionAccess";
         id: string;
-        contact?: { __typename?: "Contact"; id: string; fullName?: string | null } | null;
+        contact?: { __typename?: "Contact"; id: string; fullName: string } | null;
       }
     | { __typename?: "User"; id: string; fullName?: string | null }
     | null;
@@ -8679,7 +8344,7 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
     | {
         __typename?: "PetitionAccess";
         id: string;
-        contact?: { __typename?: "Contact"; id: string; fullName?: string | null } | null;
+        contact?: { __typename?: "Contact"; id: string; fullName: string } | null;
       }
     | { __typename?: "User"; id: string; fullName?: string | null }
     | null;
@@ -9153,8 +8818,8 @@ export type RecipientViewContentsCard_PetitionFieldFragment = {
 export type RecipientViewHeader_PublicContactFragment = {
   __typename?: "PublicContact";
   id: string;
-  fullName?: string | null;
-  firstName?: string | null;
+  fullName: string;
+  firstName: string;
   email: string;
 };
 
@@ -9162,7 +8827,7 @@ export type RecipientViewHeader_PublicUserFragment = {
   __typename?: "PublicUser";
   id: string;
   firstName?: string | null;
-  fullName?: string | null;
+  fullName: string;
   email: string;
   organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
 };
@@ -9184,7 +8849,7 @@ export type RecipientViewHeader_publicDelegateAccessToContactMutation = {
       recipients: Array<{
         __typename?: "PublicContact";
         id: string;
-        fullName?: string | null;
+        fullName: string;
         email: string;
       }>;
     } | null;
@@ -9281,14 +8946,14 @@ export type useCompleteSignerInfoDialog_PetitionSignerFragment = {
 
 export type useCompleteSignerInfoDialog_PublicContactFragment = {
   __typename?: "PublicContact";
-  firstName?: string | null;
+  firstName: string;
   lastName?: string | null;
   email: string;
 };
 
 export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment = {
   __typename?: "PublicPetitionAccess";
-  granter?: { __typename?: "PublicUser"; fullName?: string | null } | null;
+  granter?: { __typename?: "PublicUser"; fullName: string } | null;
   contact?: { __typename?: "PublicContact"; id: string } | null;
 };
 
@@ -9321,8 +8986,8 @@ export type RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldQuery = 
       createdAt: string;
       isUnread: boolean;
       author?:
-        | { __typename?: "PublicContact"; id: string; fullName?: string | null }
-        | { __typename?: "PublicUser"; id: string; fullName?: string | null }
+        | { __typename?: "PublicContact"; id: string; fullName: string }
+        | { __typename?: "PublicUser"; id: string; fullName: string }
         | null;
     }>;
   };
@@ -9362,8 +9027,8 @@ export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentM
       comments: Array<{ __typename?: "PublicPetitionFieldComment"; id: string }>;
     };
     author?:
-      | { __typename?: "PublicContact"; id: string; fullName?: string | null }
-      | { __typename?: "PublicUser"; id: string; fullName?: string | null }
+      | { __typename?: "PublicContact"; id: string; fullName: string }
+      | { __typename?: "PublicUser"; id: string; fullName: string }
       | null;
   };
 };
@@ -9384,8 +9049,8 @@ export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentM
     createdAt: string;
     isUnread: boolean;
     author?:
-      | { __typename?: "PublicContact"; id: string; fullName?: string | null }
-      | { __typename?: "PublicUser"; id: string; fullName?: string | null }
+      | { __typename?: "PublicContact"; id: string; fullName: string }
+      | { __typename?: "PublicUser"; id: string; fullName: string }
       | null;
   };
 };
@@ -9407,7 +9072,7 @@ export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentM
 
 export type RecipientViewPetitionField_PublicPetitionAccessFragment = {
   __typename?: "PublicPetitionAccess";
-  granter?: { __typename?: "PublicUser"; fullName?: string | null } | null;
+  granter?: { __typename?: "PublicUser"; fullName: string } | null;
   contact?: { __typename?: "PublicContact"; id: string } | null;
 };
 
@@ -9981,8 +9646,8 @@ export type Contact_ContactFragment = {
   __typename?: "Contact";
   id: string;
   email: string;
-  fullName?: string | null;
-  firstName?: string | null;
+  fullName: string;
+  firstName: string;
   lastName?: string | null;
   accesses: {
     __typename?: "PetitionAccessPagination";
@@ -10042,8 +9707,8 @@ export type Contact_Contact_ProfileFragment = {
   __typename?: "Contact";
   id: string;
   email: string;
-  fullName?: string | null;
-  firstName?: string | null;
+  fullName: string;
+  firstName: string;
   lastName?: string | null;
 };
 
@@ -10176,8 +9841,8 @@ export type Contact_updateContactMutation = {
     __typename?: "Contact";
     id: string;
     email: string;
-    fullName?: string | null;
-    firstName?: string | null;
+    fullName: string;
+    firstName: string;
     lastName?: string | null;
   };
 };
@@ -10218,8 +9883,8 @@ export type Contact_contactQuery = {
     __typename?: "Contact";
     id: string;
     email: string;
-    fullName?: string | null;
-    firstName?: string | null;
+    fullName: string;
+    firstName: string;
     lastName?: string | null;
     accesses: {
       __typename?: "PetitionAccessPagination";
@@ -10282,8 +9947,8 @@ export type Contacts_ContactsListFragment = {
   items: Array<{
     __typename?: "Contact";
     id: string;
-    fullName?: string | null;
-    firstName?: string | null;
+    fullName: string;
+    firstName: string;
     lastName?: string | null;
     email: string;
     createdAt: string;
@@ -10333,8 +9998,8 @@ export type Contacts_contactsQuery = {
     items: Array<{
       __typename?: "Contact";
       id: string;
-      fullName?: string | null;
-      firstName?: string | null;
+      fullName: string;
+      firstName: string;
       lastName?: string | null;
       email: string;
       createdAt: string;
@@ -11104,12 +10769,7 @@ export type PetitionActivity_PetitionFragment = {
     remindersActive: boolean;
     remindersOptOut: boolean;
     createdAt: string;
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     remindersConfig?: {
       __typename?: "RemindersConfig";
       offset: number;
@@ -11143,7 +10803,7 @@ export type PetitionActivity_PetitionFragment = {
             contact?: {
               __typename?: "Contact";
               id: string;
-              fullName?: string | null;
+              fullName: string;
               email: string;
             } | null;
           };
@@ -11157,7 +10817,7 @@ export type PetitionActivity_PetitionFragment = {
             contact?: {
               __typename?: "Contact";
               id: string;
-              fullName?: string | null;
+              fullName: string;
               email: string;
             } | null;
           };
@@ -11177,7 +10837,7 @@ export type PetitionActivity_PetitionFragment = {
             contact?: {
               __typename?: "Contact";
               id: string;
-              fullName?: string | null;
+              fullName: string;
               email: string;
             } | null;
           };
@@ -11191,7 +10851,7 @@ export type PetitionActivity_PetitionFragment = {
             contact?: {
               __typename?: "Contact";
               id: string;
-              fullName?: string | null;
+              fullName: string;
               email: string;
             } | null;
           };
@@ -11200,7 +10860,7 @@ export type PetitionActivity_PetitionFragment = {
             contact?: {
               __typename?: "Contact";
               id: string;
-              fullName?: string | null;
+              fullName: string;
               email: string;
             } | null;
           };
@@ -11214,7 +10874,7 @@ export type PetitionActivity_PetitionFragment = {
             contact?: {
               __typename?: "Contact";
               id: string;
-              fullName?: string | null;
+              fullName: string;
               email: string;
             } | null;
           };
@@ -11230,7 +10890,7 @@ export type PetitionActivity_PetitionFragment = {
                 contact?: {
                   __typename?: "Contact";
                   id: string;
-                  fullName?: string | null;
+                  fullName: string;
                   email: string;
                 } | null;
               }
@@ -11252,7 +10912,7 @@ export type PetitionActivity_PetitionFragment = {
                   contact?: {
                     __typename?: "Contact";
                     id: string;
-                    fullName?: string | null;
+                    fullName: string;
                     email: string;
                   } | null;
                 }
@@ -11312,7 +10972,7 @@ export type PetitionActivity_PetitionFragment = {
               contact?: {
                 __typename?: "Contact";
                 id: string;
-                fullName?: string | null;
+                fullName: string;
                 email: string;
               } | null;
             };
@@ -11347,7 +11007,7 @@ export type PetitionActivity_PetitionFragment = {
               contact?: {
                 __typename?: "Contact";
                 id: string;
-                fullName?: string | null;
+                fullName: string;
                 email: string;
               } | null;
             };
@@ -11377,7 +11037,7 @@ export type PetitionActivity_PetitionFragment = {
               contact?: {
                 __typename?: "Contact";
                 id: string;
-                fullName?: string | null;
+                fullName: string;
                 email: string;
               } | null;
             };
@@ -11443,7 +11103,7 @@ export type PetitionActivity_PetitionFragment = {
             contact?: {
               __typename?: "Contact";
               id: string;
-              fullName?: string | null;
+              fullName: string;
               email: string;
             } | null;
           };
@@ -11458,7 +11118,7 @@ export type PetitionActivity_PetitionFragment = {
                 contact?: {
                   __typename?: "Contact";
                   id: string;
-                  fullName?: string | null;
+                  fullName: string;
                   email: string;
                 } | null;
               }
@@ -11488,7 +11148,7 @@ export type PetitionActivity_PetitionFragment = {
               contact?: {
                 __typename?: "Contact";
                 id: string;
-                fullName?: string | null;
+                fullName: string;
                 email: string;
               } | null;
             };
@@ -11505,7 +11165,7 @@ export type PetitionActivity_PetitionFragment = {
               contact?: {
                 __typename?: "Contact";
                 id: string;
-                fullName?: string | null;
+                fullName: string;
                 email: string;
               } | null;
             };
@@ -11548,7 +11208,7 @@ export type PetitionActivity_PetitionFragment = {
               contact?: {
                 __typename?: "Contact";
                 id: string;
-                fullName?: string | null;
+                fullName: string;
                 email: string;
               } | null;
             };
@@ -11565,7 +11225,7 @@ export type PetitionActivity_PetitionFragment = {
             contact?: {
               __typename?: "Contact";
               id: string;
-              fullName?: string | null;
+              fullName: string;
               email: string;
             } | null;
           };
@@ -11581,7 +11241,7 @@ export type PetitionActivity_PetitionFragment = {
                 contact?: {
                   __typename?: "Contact";
                   id: string;
-                  fullName?: string | null;
+                  fullName: string;
                   email: string;
                 } | null;
               }
@@ -11599,7 +11259,7 @@ export type PetitionActivity_PetitionFragment = {
                 contact?: {
                   __typename?: "Contact";
                   id: string;
-                  fullName?: string | null;
+                  fullName: string;
                   email: string;
                 } | null;
               }
@@ -11617,7 +11277,7 @@ export type PetitionActivity_PetitionFragment = {
                 contact?: {
                   __typename?: "Contact";
                   id: string;
-                  fullName?: string | null;
+                  fullName: string;
                   email: string;
                 } | null;
               }
@@ -11637,7 +11297,7 @@ export type PetitionActivity_PetitionFragment = {
                 contact?: {
                   __typename?: "Contact";
                   id: string;
-                  fullName?: string | null;
+                  fullName: string;
                   email: string;
                 } | null;
               }
@@ -11824,12 +11484,7 @@ export type PetitionActivity_updatePetitionMutation = {
           remindersActive: boolean;
           remindersOptOut: boolean;
           createdAt: string;
-          contact?: {
-            __typename?: "Contact";
-            id: string;
-            fullName?: string | null;
-            email: string;
-          } | null;
+          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
           remindersConfig?: {
             __typename?: "RemindersConfig";
             offset: number;
@@ -11863,7 +11518,7 @@ export type PetitionActivity_updatePetitionMutation = {
                   contact?: {
                     __typename?: "Contact";
                     id: string;
-                    fullName?: string | null;
+                    fullName: string;
                     email: string;
                   } | null;
                 };
@@ -11877,7 +11532,7 @@ export type PetitionActivity_updatePetitionMutation = {
                   contact?: {
                     __typename?: "Contact";
                     id: string;
-                    fullName?: string | null;
+                    fullName: string;
                     email: string;
                   } | null;
                 };
@@ -11897,7 +11552,7 @@ export type PetitionActivity_updatePetitionMutation = {
                   contact?: {
                     __typename?: "Contact";
                     id: string;
-                    fullName?: string | null;
+                    fullName: string;
                     email: string;
                   } | null;
                 };
@@ -11911,7 +11566,7 @@ export type PetitionActivity_updatePetitionMutation = {
                   contact?: {
                     __typename?: "Contact";
                     id: string;
-                    fullName?: string | null;
+                    fullName: string;
                     email: string;
                   } | null;
                 };
@@ -11920,7 +11575,7 @@ export type PetitionActivity_updatePetitionMutation = {
                   contact?: {
                     __typename?: "Contact";
                     id: string;
-                    fullName?: string | null;
+                    fullName: string;
                     email: string;
                   } | null;
                 };
@@ -11934,7 +11589,7 @@ export type PetitionActivity_updatePetitionMutation = {
                   contact?: {
                     __typename?: "Contact";
                     id: string;
-                    fullName?: string | null;
+                    fullName: string;
                     email: string;
                   } | null;
                 };
@@ -11950,7 +11605,7 @@ export type PetitionActivity_updatePetitionMutation = {
                       contact?: {
                         __typename?: "Contact";
                         id: string;
-                        fullName?: string | null;
+                        fullName: string;
                         email: string;
                       } | null;
                     }
@@ -11977,7 +11632,7 @@ export type PetitionActivity_updatePetitionMutation = {
                         contact?: {
                           __typename?: "Contact";
                           id: string;
-                          fullName?: string | null;
+                          fullName: string;
                           email: string;
                         } | null;
                       }
@@ -12042,7 +11697,7 @@ export type PetitionActivity_updatePetitionMutation = {
                     contact?: {
                       __typename?: "Contact";
                       id: string;
-                      fullName?: string | null;
+                      fullName: string;
                       email: string;
                     } | null;
                   };
@@ -12077,7 +11732,7 @@ export type PetitionActivity_updatePetitionMutation = {
                     contact?: {
                       __typename?: "Contact";
                       id: string;
-                      fullName?: string | null;
+                      fullName: string;
                       email: string;
                     } | null;
                   };
@@ -12107,7 +11762,7 @@ export type PetitionActivity_updatePetitionMutation = {
                     contact?: {
                       __typename?: "Contact";
                       id: string;
-                      fullName?: string | null;
+                      fullName: string;
                       email: string;
                     } | null;
                   };
@@ -12173,7 +11828,7 @@ export type PetitionActivity_updatePetitionMutation = {
                   contact?: {
                     __typename?: "Contact";
                     id: string;
-                    fullName?: string | null;
+                    fullName: string;
                     email: string;
                   } | null;
                 };
@@ -12188,7 +11843,7 @@ export type PetitionActivity_updatePetitionMutation = {
                       contact?: {
                         __typename?: "Contact";
                         id: string;
-                        fullName?: string | null;
+                        fullName: string;
                         email: string;
                       } | null;
                     }
@@ -12223,7 +11878,7 @@ export type PetitionActivity_updatePetitionMutation = {
                     contact?: {
                       __typename?: "Contact";
                       id: string;
-                      fullName?: string | null;
+                      fullName: string;
                       email: string;
                     } | null;
                   };
@@ -12240,7 +11895,7 @@ export type PetitionActivity_updatePetitionMutation = {
                     contact?: {
                       __typename?: "Contact";
                       id: string;
-                      fullName?: string | null;
+                      fullName: string;
                       email: string;
                     } | null;
                   };
@@ -12283,7 +11938,7 @@ export type PetitionActivity_updatePetitionMutation = {
                     contact?: {
                       __typename?: "Contact";
                       id: string;
-                      fullName?: string | null;
+                      fullName: string;
                       email: string;
                     } | null;
                   };
@@ -12300,7 +11955,7 @@ export type PetitionActivity_updatePetitionMutation = {
                   contact?: {
                     __typename?: "Contact";
                     id: string;
-                    fullName?: string | null;
+                    fullName: string;
                     email: string;
                   } | null;
                 };
@@ -12316,7 +11971,7 @@ export type PetitionActivity_updatePetitionMutation = {
                       contact?: {
                         __typename?: "Contact";
                         id: string;
-                        fullName?: string | null;
+                        fullName: string;
                         email: string;
                       } | null;
                     }
@@ -12339,7 +11994,7 @@ export type PetitionActivity_updatePetitionMutation = {
                       contact?: {
                         __typename?: "Contact";
                         id: string;
-                        fullName?: string | null;
+                        fullName: string;
                         email: string;
                       } | null;
                     }
@@ -12362,7 +12017,7 @@ export type PetitionActivity_updatePetitionMutation = {
                       contact?: {
                         __typename?: "Contact";
                         id: string;
-                        fullName?: string | null;
+                        fullName: string;
                         email: string;
                       } | null;
                     }
@@ -12387,7 +12042,7 @@ export type PetitionActivity_updatePetitionMutation = {
                       contact?: {
                         __typename?: "Contact";
                         id: string;
-                        fullName?: string | null;
+                        fullName: string;
                         email: string;
                       } | null;
                     }
@@ -12620,12 +12275,7 @@ export type PetitionActivity_petitionQuery = {
           remindersActive: boolean;
           remindersOptOut: boolean;
           createdAt: string;
-          contact?: {
-            __typename?: "Contact";
-            id: string;
-            fullName?: string | null;
-            email: string;
-          } | null;
+          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
           remindersConfig?: {
             __typename?: "RemindersConfig";
             offset: number;
@@ -12659,7 +12309,7 @@ export type PetitionActivity_petitionQuery = {
                   contact?: {
                     __typename?: "Contact";
                     id: string;
-                    fullName?: string | null;
+                    fullName: string;
                     email: string;
                   } | null;
                 };
@@ -12673,7 +12323,7 @@ export type PetitionActivity_petitionQuery = {
                   contact?: {
                     __typename?: "Contact";
                     id: string;
-                    fullName?: string | null;
+                    fullName: string;
                     email: string;
                   } | null;
                 };
@@ -12693,7 +12343,7 @@ export type PetitionActivity_petitionQuery = {
                   contact?: {
                     __typename?: "Contact";
                     id: string;
-                    fullName?: string | null;
+                    fullName: string;
                     email: string;
                   } | null;
                 };
@@ -12707,7 +12357,7 @@ export type PetitionActivity_petitionQuery = {
                   contact?: {
                     __typename?: "Contact";
                     id: string;
-                    fullName?: string | null;
+                    fullName: string;
                     email: string;
                   } | null;
                 };
@@ -12716,7 +12366,7 @@ export type PetitionActivity_petitionQuery = {
                   contact?: {
                     __typename?: "Contact";
                     id: string;
-                    fullName?: string | null;
+                    fullName: string;
                     email: string;
                   } | null;
                 };
@@ -12730,7 +12380,7 @@ export type PetitionActivity_petitionQuery = {
                   contact?: {
                     __typename?: "Contact";
                     id: string;
-                    fullName?: string | null;
+                    fullName: string;
                     email: string;
                   } | null;
                 };
@@ -12746,7 +12396,7 @@ export type PetitionActivity_petitionQuery = {
                       contact?: {
                         __typename?: "Contact";
                         id: string;
-                        fullName?: string | null;
+                        fullName: string;
                         email: string;
                       } | null;
                     }
@@ -12773,7 +12423,7 @@ export type PetitionActivity_petitionQuery = {
                         contact?: {
                           __typename?: "Contact";
                           id: string;
-                          fullName?: string | null;
+                          fullName: string;
                           email: string;
                         } | null;
                       }
@@ -12838,7 +12488,7 @@ export type PetitionActivity_petitionQuery = {
                     contact?: {
                       __typename?: "Contact";
                       id: string;
-                      fullName?: string | null;
+                      fullName: string;
                       email: string;
                     } | null;
                   };
@@ -12873,7 +12523,7 @@ export type PetitionActivity_petitionQuery = {
                     contact?: {
                       __typename?: "Contact";
                       id: string;
-                      fullName?: string | null;
+                      fullName: string;
                       email: string;
                     } | null;
                   };
@@ -12903,7 +12553,7 @@ export type PetitionActivity_petitionQuery = {
                     contact?: {
                       __typename?: "Contact";
                       id: string;
-                      fullName?: string | null;
+                      fullName: string;
                       email: string;
                     } | null;
                   };
@@ -12969,7 +12619,7 @@ export type PetitionActivity_petitionQuery = {
                   contact?: {
                     __typename?: "Contact";
                     id: string;
-                    fullName?: string | null;
+                    fullName: string;
                     email: string;
                   } | null;
                 };
@@ -12984,7 +12634,7 @@ export type PetitionActivity_petitionQuery = {
                       contact?: {
                         __typename?: "Contact";
                         id: string;
-                        fullName?: string | null;
+                        fullName: string;
                         email: string;
                       } | null;
                     }
@@ -13019,7 +12669,7 @@ export type PetitionActivity_petitionQuery = {
                     contact?: {
                       __typename?: "Contact";
                       id: string;
-                      fullName?: string | null;
+                      fullName: string;
                       email: string;
                     } | null;
                   };
@@ -13036,7 +12686,7 @@ export type PetitionActivity_petitionQuery = {
                     contact?: {
                       __typename?: "Contact";
                       id: string;
-                      fullName?: string | null;
+                      fullName: string;
                       email: string;
                     } | null;
                   };
@@ -13079,7 +12729,7 @@ export type PetitionActivity_petitionQuery = {
                     contact?: {
                       __typename?: "Contact";
                       id: string;
-                      fullName?: string | null;
+                      fullName: string;
                       email: string;
                     } | null;
                   };
@@ -13096,7 +12746,7 @@ export type PetitionActivity_petitionQuery = {
                   contact?: {
                     __typename?: "Contact";
                     id: string;
-                    fullName?: string | null;
+                    fullName: string;
                     email: string;
                   } | null;
                 };
@@ -13112,7 +12762,7 @@ export type PetitionActivity_petitionQuery = {
                       contact?: {
                         __typename?: "Contact";
                         id: string;
-                        fullName?: string | null;
+                        fullName: string;
                         email: string;
                       } | null;
                     }
@@ -13135,7 +12785,7 @@ export type PetitionActivity_petitionQuery = {
                       contact?: {
                         __typename?: "Contact";
                         id: string;
-                        fullName?: string | null;
+                        fullName: string;
                         email: string;
                       } | null;
                     }
@@ -13158,7 +12808,7 @@ export type PetitionActivity_petitionQuery = {
                       contact?: {
                         __typename?: "Contact";
                         id: string;
-                        fullName?: string | null;
+                        fullName: string;
                         email: string;
                       } | null;
                     }
@@ -13183,7 +12833,7 @@ export type PetitionActivity_petitionQuery = {
                       contact?: {
                         __typename?: "Contact";
                         id: string;
-                        fullName?: string | null;
+                        fullName: string;
                         email: string;
                       } | null;
                     }
@@ -15071,7 +14721,7 @@ export type PetitionReplies_PetitionFragment = {
         | {
             __typename?: "PetitionAccess";
             id: string;
-            contact?: { __typename?: "Contact"; id: string; fullName?: string | null } | null;
+            contact?: { __typename?: "Contact"; id: string; fullName: string } | null;
           }
         | { __typename?: "User"; id: string; fullName?: string | null }
         | null;
@@ -15197,7 +14847,7 @@ export type PetitionReplies_PetitionFieldFragment = {
       | {
           __typename?: "PetitionAccess";
           id: string;
-          contact?: { __typename?: "Contact"; id: string; fullName?: string | null } | null;
+          contact?: { __typename?: "Contact"; id: string; fullName: string } | null;
         }
       | { __typename?: "User"; id: string; fullName?: string | null }
       | null;
@@ -15338,7 +14988,7 @@ export type PetitionReplies_closePetitionMutation = {
           | {
               __typename?: "PetitionAccess";
               id: string;
-              contact?: { __typename?: "Contact"; id: string; fullName?: string | null } | null;
+              contact?: { __typename?: "Contact"; id: string; fullName: string } | null;
             }
           | { __typename?: "User"; id: string; fullName?: string | null }
           | null;
@@ -15481,7 +15131,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
           | {
               __typename?: "PetitionAccess";
               id: string;
-              contact?: { __typename?: "Contact"; id: string; fullName?: string | null } | null;
+              contact?: { __typename?: "Contact"; id: string; fullName: string } | null;
             }
           | { __typename?: "User"; id: string; fullName?: string | null }
           | null;
@@ -15723,7 +15373,7 @@ export type PetitionReplies_petitionQuery = {
               | {
                   __typename?: "PetitionAccess";
                   id: string;
-                  contact?: { __typename?: "Contact"; id: string; fullName?: string | null } | null;
+                  contact?: { __typename?: "Contact"; id: string; fullName: string } | null;
                 }
               | { __typename?: "User"; id: string; fullName?: string | null }
               | null;
@@ -15846,12 +15496,7 @@ export type Petitions_PetitionBasePaginationFragment = {
           __typename?: "PetitionAccess";
           status: PetitionAccessStatus;
           nextReminderAt?: string | null;
-          contact?: {
-            __typename?: "Contact";
-            id: string;
-            fullName?: string | null;
-            email: string;
-          } | null;
+          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
           reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
         }>;
         permissions: Array<
@@ -15937,12 +15582,7 @@ export type Petitions_PetitionBase_Petition_Fragment = {
     __typename?: "PetitionAccess";
     status: PetitionAccessStatus;
     nextReminderAt?: string | null;
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
   }>;
   permissions: Array<
@@ -16074,7 +15714,7 @@ export type Petitions_petitionsQuery = {
             contact?: {
               __typename?: "Contact";
               id: string;
-              fullName?: string | null;
+              fullName: string;
               email: string;
             } | null;
             reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
@@ -16674,14 +16314,14 @@ export type RecipientView_PublicPetitionAccessFragment = {
     recipients: Array<{
       __typename?: "PublicContact";
       id: string;
-      fullName?: string | null;
-      firstName?: string | null;
+      fullName: string;
+      firstName: string;
       email: string;
     }>;
   } | null;
   granter?: {
     __typename?: "PublicUser";
-    fullName?: string | null;
+    fullName: string;
     id: string;
     firstName?: string | null;
     email: string;
@@ -16690,8 +16330,8 @@ export type RecipientView_PublicPetitionAccessFragment = {
   contact?: {
     __typename?: "PublicContact";
     id: string;
-    fullName?: string | null;
-    firstName?: string | null;
+    fullName: string;
+    firstName: string;
     email: string;
     lastName?: string | null;
   } | null;
@@ -16767,8 +16407,8 @@ export type RecipientView_PublicPetitionFragment = {
   recipients: Array<{
     __typename?: "PublicContact";
     id: string;
-    fullName?: string | null;
-    firstName?: string | null;
+    fullName: string;
+    firstName: string;
     email: string;
   }>;
 };
@@ -16811,7 +16451,7 @@ export type RecipientView_PublicUserFragment = {
   __typename?: "PublicUser";
   id: string;
   firstName?: string | null;
-  fullName?: string | null;
+  fullName: string;
   email: string;
   organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
 };
@@ -16888,8 +16528,8 @@ export type RecipientView_publicCompletePetitionMutation = {
     recipients: Array<{
       __typename?: "PublicContact";
       id: string;
-      fullName?: string | null;
-      firstName?: string | null;
+      fullName: string;
+      firstName: string;
       email: string;
     }>;
   };
@@ -16965,14 +16605,14 @@ export type RecipientView_accessQuery = {
       recipients: Array<{
         __typename?: "PublicContact";
         id: string;
-        fullName?: string | null;
-        firstName?: string | null;
+        fullName: string;
+        firstName: string;
         email: string;
       }>;
     } | null;
     granter?: {
       __typename?: "PublicUser";
-      fullName?: string | null;
+      fullName: string;
       id: string;
       firstName?: string | null;
       email: string;
@@ -16981,8 +16621,8 @@ export type RecipientView_accessQuery = {
     contact?: {
       __typename?: "PublicContact";
       id: string;
-      fullName?: string | null;
-      firstName?: string | null;
+      fullName: string;
+      firstName: string;
       email: string;
       lastName?: string | null;
     } | null;
@@ -17086,7 +16726,7 @@ export type PublicPetitionLink_PublicPublicPetitionLinkFragment = {
   title: string;
   isAvailable: boolean;
   description: string;
-  owner: { __typename?: "PublicUser"; fullName?: string | null; email: string };
+  owner: { __typename?: "PublicUser"; fullName: string; email: string };
   organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
 };
 
@@ -17119,7 +16759,7 @@ export type PublicPetitionLink_publicPetitionLinkBySlugQuery = {
     title: string;
     isAvailable: boolean;
     description: string;
-    owner: { __typename?: "PublicUser"; fullName?: string | null; email: string };
+    owner: { __typename?: "PublicUser"; fullName: string; email: string };
     organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
   } | null;
 };
@@ -17506,9 +17146,9 @@ export type useCreateContact_createContactMutation = {
     __typename?: "Contact";
     id: string;
     email: string;
-    firstName?: string | null;
+    firstName: string;
     lastName?: string | null;
-    fullName?: string | null;
+    fullName: string;
     hasBouncedEmail: boolean;
   };
 };
@@ -17681,12 +17321,7 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
     __typename?: "PetitionAccess";
     status: PetitionAccessStatus;
     nextReminderAt?: string | null;
-    contact?: {
-      __typename?: "Contact";
-      id: string;
-      fullName?: string | null;
-      email: string;
-    } | null;
+    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
   }>;
   permissions: Array<
@@ -17798,9 +17433,9 @@ export type useSearchContacts_contactsQuery = {
     items: Array<{
       __typename?: "Contact";
       id: string;
-      firstName?: string | null;
+      firstName: string;
       lastName?: string | null;
-      fullName?: string | null;
+      fullName: string;
       email: string;
       hasBouncedEmail: boolean;
     }>;
@@ -17815,9 +17450,9 @@ export type useSearchContactsByEmail_contactsByEmailQuery = {
   contactsByEmail: Array<{
     __typename?: "Contact";
     id: string;
-    firstName?: string | null;
+    firstName: string;
     lastName?: string | null;
-    fullName?: string | null;
+    fullName: string;
     email: string;
     hasBouncedEmail: boolean;
   } | null>;

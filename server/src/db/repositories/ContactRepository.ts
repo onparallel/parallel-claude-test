@@ -69,12 +69,7 @@ export class ContactRepository extends BaseRepository {
   );
 
   async loadOrCreate(
-    contacts: MaybeArray<{
-      email: string;
-      orgId: number;
-      firstName: Maybe<string>;
-      lastName: Maybe<string>;
-    }>,
+    contacts: MaybeArray<Pick<CreateContact, "first_name" | "last_name" | "email" | "org_id">>,
     createdBy: string,
     t?: Knex.Transaction
   ) {
@@ -92,12 +87,11 @@ export class ContactRepository extends BaseRepository {
       RETURNING *;`,
       [
         this.from("contact").insert(
-          contactsArr.map((c) => ({
-            email: c.email.toLowerCase().trim(),
-            org_id: c.orgId,
-            first_name: c.firstName,
-            last_name: c.lastName,
+          contactsArr.map((contact) => ({
+            ...contact,
+            email: contact.email.toLowerCase().trim(),
             created_by: createdBy,
+            updated_by: createdBy,
           }))
         ),
       ],

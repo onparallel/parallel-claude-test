@@ -12,7 +12,7 @@ export const Contact = objectType({
     t.string("email", {
       description: "The email of the contact.",
     });
-    t.nullable.string("firstName", {
+    t.string("firstName", {
       description: "The first name of the contact.",
       resolve: (o) => o.first_name,
     });
@@ -20,7 +20,7 @@ export const Contact = objectType({
       description: "The last name of the contact.",
       resolve: (o) => o.last_name,
     });
-    t.nullable.string("fullName", {
+    t.string("fullName", {
       description: "The full name of the contact.",
       resolve: (o) => fullName(o.first_name, o.last_name),
     });

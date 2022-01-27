@@ -119,9 +119,9 @@ export type Contact = Timestamps & {
   /** The email of the contact. */
   email: Scalars["String"];
   /** The first name of the contact. */
-  firstName: Maybe<Scalars["String"]>;
+  firstName: Scalars["String"];
   /** The full name of the contact. */
-  fullName: Maybe<Scalars["String"]>;
+  fullName: Scalars["String"];
   hasBouncedEmail: Scalars["Boolean"];
   /** The ID of the contact. */
   id: Scalars["GID"];
@@ -146,7 +146,7 @@ export type ContactPagination = {
 
 export type CreateContactInput = {
   email: Scalars["String"];
-  firstName?: InputMaybe<Scalars["String"]>;
+  firstName: Scalars["String"];
   lastName?: InputMaybe<Scalars["String"]>;
 };
 
@@ -497,10 +497,12 @@ export type Mutation = {
   removeUsersFromGroup: UserGroup;
   /** Reopens the petition */
   reopenPetition: Petition;
-  /** Sends an email with confirmation code to unconfirmed user emails */
+  /** Sends the AccountVerification email with confirmation code to unconfirmed user emails */
   resendVerificationCode: Result;
   /** Removes the Signaturit Branding Ids of selected organization. */
   resetSignaturitOrganizationBranding: SupportMethodResponse;
+  /** Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD */
+  resetTemporaryPassword: Result;
   /** Resets the given user password on AWS Cognito and sends an email with new temporary. */
   resetUserPassword: SupportMethodResponse;
   /** Soft-deletes a given auth token, making it permanently unusable. */
@@ -1105,6 +1107,11 @@ export type MutationresendVerificationCodeArgs = {
 
 export type MutationresetSignaturitOrganizationBrandingArgs = {
   orgId: Scalars["Int"];
+};
+
+export type MutationresetTemporaryPasswordArgs = {
+  email: Scalars["String"];
+  locale?: InputMaybe<Scalars["String"]>;
 };
 
 export type MutationresetUserPasswordArgs = {
@@ -2258,9 +2265,9 @@ export type PublicContact = {
   /** The email of the user. */
   email: Scalars["String"];
   /** The first name of the user. */
-  firstName: Maybe<Scalars["String"]>;
+  firstName: Scalars["String"];
   /** The full name of the user. */
-  fullName: Maybe<Scalars["String"]>;
+  fullName: Scalars["String"];
   /** The ID of the contact. */
   id: Scalars["GID"];
   /** The last name of the user. */
@@ -2438,7 +2445,7 @@ export type PublicUser = {
   /** The first name of the user. */
   firstName: Maybe<Scalars["String"]>;
   /** The full name of the user. */
-  fullName: Maybe<Scalars["String"]>;
+  fullName: Scalars["String"];
   /** The ID of the user. */
   id: Scalars["GID"];
   /** The last name of the user. */
@@ -3212,8 +3219,8 @@ export type UserGroupFragment = { id: string; name: string };
 export type ContactFragment = {
   id: string;
   email: string;
-  fullName: string | null;
-  firstName: string | null;
+  fullName: string;
+  firstName: string;
   lastName: string | null;
   createdAt: string;
   updatedAt: string;
@@ -3230,8 +3237,8 @@ export type PetitionAccessFragment = {
   contact: {
     id: string;
     email: string;
-    fullName: string | null;
-    firstName: string | null;
+    fullName: string;
+    firstName: string;
     lastName: string | null;
     createdAt: string;
     updatedAt: string;
@@ -3302,8 +3309,8 @@ export type PetitionFragment = {
     contact: {
       id: string;
       email: string;
-      fullName: string | null;
-      firstName: string | null;
+      fullName: string;
+      firstName: string;
       lastName: string | null;
       createdAt: string;
       updatedAt: string;
@@ -3467,8 +3474,8 @@ export type GetPetitions_petitionsQuery = {
             contact: {
               id: string;
               email: string;
-              fullName: string | null;
-              firstName: string | null;
+              fullName: string;
+              firstName: string;
               lastName: string | null;
               createdAt: string;
               updatedAt: string;
@@ -3534,8 +3541,8 @@ export type CreatePetition_petitionMutation = {
           contact: {
             id: string;
             email: string;
-            fullName: string | null;
-            firstName: string | null;
+            fullName: string;
+            firstName: string;
             lastName: string | null;
             createdAt: string;
             updatedAt: string;
@@ -3598,8 +3605,8 @@ export type GetPetition_petitionQuery = {
           contact: {
             id: string;
             email: string;
-            fullName: string | null;
-            firstName: string | null;
+            fullName: string;
+            firstName: string;
             lastName: string | null;
             createdAt: string;
             updatedAt: string;
@@ -3664,8 +3671,8 @@ export type UpdatePetition_updatePetitionMutation = {
           contact: {
             id: string;
             email: string;
-            fullName: string | null;
-            firstName: string | null;
+            fullName: string;
+            firstName: string;
             lastName: string | null;
             createdAt: string;
             updatedAt: string;
@@ -3744,7 +3751,7 @@ export type CreatePetitionRecipients_contactQueryVariables = Exact<{
 }>;
 
 export type CreatePetitionRecipients_contactQuery = {
-  contacts: Array<{ id: string; firstName: string | null; lastName: string | null } | null>;
+  contacts: Array<{ id: string; firstName: string; lastName: string | null } | null>;
 };
 
 export type CreatePetitionRecipients_updateContactMutationVariables = Exact<{
@@ -3794,8 +3801,8 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
         contact: {
           id: string;
           email: string;
-          fullName: string | null;
-          firstName: string | null;
+          fullName: string;
+          firstName: string;
           lastName: string | null;
           createdAt: string;
           updatedAt: string;
@@ -3847,8 +3854,8 @@ export type GetPetitionRecipients_petitionAccessesQuery = {
           contact: {
             id: string;
             email: string;
-            fullName: string | null;
-            firstName: string | null;
+            fullName: string;
+            firstName: string;
             lastName: string | null;
             createdAt: string;
             updatedAt: string;
@@ -3888,8 +3895,8 @@ export type DEPRECATED_CreatePetitionRecipients_sendPetitionMutation = {
       contact: {
         id: string;
         email: string;
-        fullName: string | null;
-        firstName: string | null;
+        fullName: string;
+        firstName: string;
         lastName: string | null;
         createdAt: string;
         updatedAt: string;
@@ -4280,8 +4287,8 @@ export type GetContacts_contactsQuery = {
     items: Array<{
       id: string;
       email: string;
-      fullName: string | null;
-      firstName: string | null;
+      fullName: string;
+      firstName: string;
       lastName: string | null;
       createdAt: string;
       updatedAt: string;
@@ -4297,8 +4304,8 @@ export type CreateContact_contactMutation = {
   createContact: {
     id: string;
     email: string;
-    fullName: string | null;
-    firstName: string | null;
+    fullName: string;
+    firstName: string;
     lastName: string | null;
     createdAt: string;
     updatedAt: string;
@@ -4313,8 +4320,8 @@ export type GetContact_contactQuery = {
   contact: {
     id: string;
     email: string;
-    fullName: string | null;
-    firstName: string | null;
+    fullName: string;
+    firstName: string;
     lastName: string | null;
     createdAt: string;
     updatedAt: string;

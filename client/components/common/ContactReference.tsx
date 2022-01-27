@@ -15,17 +15,17 @@ export function ContactReference({
   isLink?: boolean;
 } & TextProps) {
   return contact ? (
-    <Tooltip isDisabled={!contact.fullName && !isFull} label={contact.email}>
+    <Tooltip isDisabled={isFull} label={contact.email}>
       <Text as="span" {...props}>
         {isLink ? (
           <Link href={`/app/contacts/${contact.id}`}>
-            {contact.fullName || contact.email}
-            {isFull && contact.fullName ? `<${contact.email}>` : null}
+            {contact.fullName}
+            {isFull ? `<${contact.email}>` : null}
           </Link>
         ) : (
           <>
-            {contact.fullName || contact.email}
-            {isFull && contact.fullName ? `<${contact.email}>` : null}
+            {contact.fullName}
+            {isFull ? `<${contact.email}>` : null}
           </>
         )}
       </Text>

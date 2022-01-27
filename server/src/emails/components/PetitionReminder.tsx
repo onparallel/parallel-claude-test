@@ -6,7 +6,7 @@ import { Email } from "../buildEmail";
 import { CompleteInfoButton } from "../common/CompleteInfoButton";
 import { DateTime } from "../common/DateTime";
 import { Disclaimer } from "../common/Disclaimer";
-import { GreetingReminder } from "../common/Greeting";
+import { GreetingContact } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import { disclaimer, greetingContact } from "../common/texts";
 import { UserMessageBox } from "../common/UserMessageBox";
@@ -172,7 +172,7 @@ const email: Email<PetitionReminderProps> = {
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingReminder name={name} fullName={fullName} tone={tone} />
+            <GreetingContact name={name} fullName={fullName} tone={tone} />
 
             <MjmlText lineHeight="24px">
               <FormattedMessage

@@ -28,21 +28,21 @@ export function greetingUser({ name }: { name: string | null }, intl: IntlShape)
 }
 
 export function greetingContact(
-  { name, fullName, tone }: { name: string | null; fullName: string | null; tone: Tone },
+  { name, fullName, tone }: { name: string; fullName: string; tone: Tone },
   intl: IntlShape
 ) {
   return tone === "INFORMAL"
     ? intl.formatMessage(
         {
           id: "greeting-contact.informal",
-          defaultMessage: "{name, select, null {Hello,} other {Hello {name},}}",
+          defaultMessage: "Hello {name},",
         },
         { name }
       )
     : intl.formatMessage(
         {
           id: "greeting-contact.formal",
-          defaultMessage: "{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}",
+          defaultMessage: "Dear {fullName},",
         },
         { fullName }
       );

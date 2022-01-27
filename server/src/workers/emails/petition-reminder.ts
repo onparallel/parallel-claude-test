@@ -76,8 +76,8 @@ export async function petitionReminder(
       PetitionReminder,
       {
         emailSubject: originalMessage?.email_subject ?? null,
-        contactName: contact.first_name!,
-        contactFullName: fullName(contact.first_name, contact.last_name)!,
+        contactName: contact.first_name,
+        contactFullName: fullName(contact.first_name, contact.last_name),
         senderName: fullName(granter.first_name, granter.last_name)!,
         senderEmail: granter.email,
         missingFieldCount,

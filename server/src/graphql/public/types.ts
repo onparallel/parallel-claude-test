@@ -284,7 +284,7 @@ export const PublicUser = objectType({
       description: "The last name of the user.",
       resolve: (o) => o.last_name,
     });
-    t.nullable.string("fullName", {
+    t.string("fullName", {
       description: "The full name of the user.",
       resolve: (o) => fullName(o.first_name, o.last_name),
     });
@@ -382,7 +382,7 @@ export const PublicContact = objectType({
     t.string("email", {
       description: "The email of the user.",
     });
-    t.nullable.string("firstName", {
+    t.string("firstName", {
       description: "The first name of the user.",
       resolve: (o) => o.first_name,
     });
@@ -390,7 +390,7 @@ export const PublicContact = objectType({
       description: "The last name of the user.",
       resolve: (o) => o.last_name,
     });
-    t.nullable.string("fullName", {
+    t.string("fullName", {
       description: "The full name of the user.",
       resolve: (o) => fullName(o.first_name, o.last_name),
     });

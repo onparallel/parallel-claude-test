@@ -10,7 +10,7 @@ import { Tone } from "../utils/types";
 
 type SignatureCompletedProps = {
   documentName: string | null;
-  signerName: string | null;
+  signerName: string;
   signatureProvider: string;
   tone: Tone;
 } & LayoutProps;
