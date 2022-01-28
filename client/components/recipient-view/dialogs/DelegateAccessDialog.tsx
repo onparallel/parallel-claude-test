@@ -161,8 +161,8 @@ function DelegateAccessDialog({
             {errors.firstName && (
               <FormErrorMessage>
                 <FormattedMessage
-                  id="generic.forms.invalid-contact-first-name-error"
-                  defaultMessage="Please, enter the contact first name"
+                  id="generic.forms.invalid-first-name-error"
+                  defaultMessage="Please, enter the first name"
                 />
               </FormErrorMessage>
             )}
@@ -175,8 +175,8 @@ function DelegateAccessDialog({
             {errors.lastName && (
               <FormErrorMessage>
                 <FormattedMessage
-                  id="generic.forms.invalid-contact-last-name-error"
-                  defaultMessage="Please, enter the contact last name"
+                  id="generic.forms.invalid-last-name-error"
+                  defaultMessage="Please, enter the last name"
                 />
               </FormErrorMessage>
             )}

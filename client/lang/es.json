@@ -3870,24 +3870,24 @@
     "context": "First name"
   },
   {
-    "term": "generic.forms.invalid-contact-first-name-error",
-    "definition": "Por favor, introduzca el nombre del contacto",
-    "context": "Please, enter the contact first name"
-  },
-  {
-    "term": "generic.forms.invalid-contact-last-name-error",
-    "definition": "Por favor, introduzca el apellido del contacto",
-    "context": "Please, enter the contact last name"
-  },
-  {
     "term": "generic.forms.invalid-email-error",
     "definition": "Por favor, introduzca un correo electrónico válido",
     "context": "Please, enter a valid email"
   },
   {
+    "term": "generic.forms.invalid-first-name-error",
+    "definition": "Por favor, introduzca el nombre",
+    "context": "Please, enter the first name"
+  },
+  {
     "term": "generic.forms.invalid-group-name-error",
     "definition": "Por favor, introduzca el nombre del equipo",
     "context": "Please, enter the team name"
+  },
+  {
+    "term": "generic.forms.invalid-last-name-error",
+    "definition": "Por favor, introduzca el apellido",
+    "context": "Please, enter the last name"
   },
   {
     "term": "generic.forms.invalid-old-password-error",
@@ -3898,16 +3898,6 @@
     "term": "generic.forms.invalid-password-policy-error",
     "definition": "Por favor, escoge una contraseña más robusta",
     "context": "Please choose a stronger password"
-  },
-  {
-    "term": "generic.forms.invalid-user-first-name-error",
-    "definition": "Por favor, introduzca el nombre del usuario",
-    "context": "Please, enter the user first name"
-  },
-  {
-    "term": "generic.forms.invalid-user-last-name-error",
-    "definition": "Por favor, introduzca el apellido del usuario",
-    "context": "Please, enter the user last name"
   },
   {
     "term": "generic.forms.invalid-verification-code",

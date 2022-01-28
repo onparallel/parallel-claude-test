@@ -164,8 +164,8 @@ function CreateOrUpdateUserDialog({
             <Input {...register("firstName", { required: true })} />
             <FormErrorMessage>
               <FormattedMessage
-                id="generic.forms.invalid-user-first-name-error"
-                defaultMessage="Please, enter the user first name"
+                id="generic.forms.invalid-first-name-error"
+                defaultMessage="Please, enter the first name"
               />
             </FormErrorMessage>
           </FormControl>
@@ -180,8 +180,8 @@ function CreateOrUpdateUserDialog({
             <Input {...register("lastName", { required: true })} />
             <FormErrorMessage>
               <FormattedMessage
-                id="generic.forms.invalid-user-last-name-error"
-                defaultMessage="Please, enter the user last name"
+                id="generic.forms.invalid-last-name-error"
+                defaultMessage="Please, enter the last name"
               />
             </FormErrorMessage>
           </FormControl>

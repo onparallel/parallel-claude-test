@@ -3870,24 +3870,24 @@
     "context": "First name"
   },
   {
-    "term": "generic.forms.invalid-contact-first-name-error",
-    "definition": "Please, enter the contact first name",
-    "context": "Please, enter the contact first name"
-  },
-  {
-    "term": "generic.forms.invalid-contact-last-name-error",
-    "definition": "Please, enter the contact last name",
-    "context": "Please, enter the contact last name"
-  },
-  {
     "term": "generic.forms.invalid-email-error",
     "definition": "Please, enter a valid email",
     "context": "Please, enter a valid email"
   },
   {
+    "term": "generic.forms.invalid-first-name-error",
+    "definition": "Please, enter the first name",
+    "context": "Please, enter the first name"
+  },
+  {
     "term": "generic.forms.invalid-group-name-error",
     "definition": "Please, enter the team name",
     "context": "Please, enter the team name"
+  },
+  {
+    "term": "generic.forms.invalid-last-name-error",
+    "definition": "Please, enter the last name",
+    "context": "Please, enter the last name"
   },
   {
     "term": "generic.forms.invalid-old-password-error",
@@ -3898,16 +3898,6 @@
     "term": "generic.forms.invalid-password-policy-error",
     "definition": "Please choose a stronger password",
     "context": "Please choose a stronger password"
-  },
-  {
-    "term": "generic.forms.invalid-user-first-name-error",
-    "definition": "Please, enter the user first name",
-    "context": "Please, enter the user first name"
-  },
-  {
-    "term": "generic.forms.invalid-user-last-name-error",
-    "definition": "Please, enter the user last name",
-    "context": "Please, enter the user last name"
   },
   {
     "term": "generic.forms.invalid-verification-code",

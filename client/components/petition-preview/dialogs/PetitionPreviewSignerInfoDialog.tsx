@@ -254,7 +254,11 @@ function PetitionPreviewSignerInfoDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="purple" type="submit">
+        <Button
+          colorScheme="purple"
+          type="submit"
+          isDisabled={signers.length === 0 && additionalSigners.length === 0 && !userWillSign}
+        >
           <FormattedMessage
             id="component.signature-config-dialog.confirm-start"
             defaultMessage="Start signature"
