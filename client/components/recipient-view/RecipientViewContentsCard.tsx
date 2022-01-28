@@ -219,11 +219,7 @@ export function RecipientViewContentsCard({
                                     commentCount={commentCount}
                                   />
                                 ) : null}
-                                {field.isInternal ? (
-                                  <Center>
-                                    <InternalFieldBadge marginLeft={2} />
-                                  </Center>
-                                ) : null}
+                                {field.isInternal ? <InternalFieldBadge marginLeft={2} /> : null}
                               </Button>
                             </NakedLink>
                           </Text>

@@ -42,8 +42,10 @@ function PetitionPdf({ token }: { token: string }) {
   const timezone = currentSignatureRequest?.signatureConfig.timezone;
 
   const fieldVisibility = useFieldVisibility(petition.fields);
+
   const pages = useMemo(
-    () => groupFieldsByPages<PetitionPdf_PetitionFieldFragment>(petition.fields, fieldVisibility),
+    () =>
+      groupFieldsByPages<PetitionPdf_PetitionFieldFragment>(petition.fields, fieldVisibility, true),
     [petition.fields, fieldVisibility]
   );
 

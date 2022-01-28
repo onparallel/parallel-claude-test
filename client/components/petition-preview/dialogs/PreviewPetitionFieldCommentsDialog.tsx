@@ -75,9 +75,9 @@ export function PreviewPetitionFieldCommentsDialog({
     onBlurDelay: 300,
   });
 
-  const [isInternalComment, setInternalComment] = useState(
-    field.options.hasCommentsEnabled && !field.isInternal ? false : true
-  );
+  const hasCommentsEnabled = field.isInternal ? false : field.options.hasCommentsEnabled;
+
+  const [isInternalComment, setInternalComment] = useState(hasCommentsEnabled ? false : true);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -211,7 +211,7 @@ export function PreviewPetitionFieldCommentsDialog({
               justifyContent="center"
               alignItems="center"
             >
-              {field.options.hasCommentsEnabled ? (
+              {hasCommentsEnabled ? (
                 <>
                   <CommentIcon color="gray.300" boxSize="64px" />
                   <Text color="gray.500">
@@ -291,7 +291,7 @@ export function PreviewPetitionFieldCommentsDialog({
             value={draft}
             onKeyDown={handleKeyDown as any}
             onChange={handleDraftChange as any}
-            isDisabled={!field.options.hasCommentsEnabled && !hasInternalComments}
+            isDisabled={!hasCommentsEnabled && !hasInternalComments}
             {...inputFocusBind}
           />
           <PaddedCollapse in={isExpanded}>
@@ -306,7 +306,7 @@ export function PreviewPetitionFieldCommentsDialog({
                     marginLeft={1}
                     colorScheme="purple"
                     isChecked={isInternalComment}
-                    isDisabled={!field.options.hasCommentsEnabled || field.isInternal}
+                    isDisabled={!hasCommentsEnabled || field.isInternal}
                     onChange={() => setInternalComment(!isInternalComment)}
                   >
                     <FormattedMessage

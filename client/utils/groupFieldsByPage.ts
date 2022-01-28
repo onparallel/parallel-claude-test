@@ -11,12 +11,13 @@ type PetitionFieldSelection =
 
 export function groupFieldsByPages<T extends PetitionFieldSelection>(
   fields: T[],
-  visibility: boolean[]
+  visibility: boolean[],
+  hideInternalFields: boolean
 ): T[][] {
   const pages: T[][] = [];
   let page: T[] = [];
   for (const [field, isVisible] of zip(fields, visibility)) {
-    const isHiddenToPublic = field.__typename === "PublicPetitionField" && field.isInternal;
+    const isHiddenToPublic = hideInternalFields && field.isInternal;
     if (field.type === "HEADING" && field.options!.hasPageBreak && !isHiddenToPublic) {
       if (page.length > 0) {
         pages.push(page);

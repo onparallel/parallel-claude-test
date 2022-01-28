@@ -1,6 +1,7 @@
 import { Box, Flex, Heading, HStack, Stack, Text } from "@chakra-ui/react";
 import { BreakLines } from "@parallel/components/common/BreakLines";
 import { FileAttachmentButton } from "@parallel/components/common/FileAttachmentButton";
+import { InternalFieldBadge } from "@parallel/components/common/InternalFieldBadge";
 import { Linkify } from "@parallel/components/common/Linkify";
 import { countBy } from "remeda";
 import { CommentsButton } from "../CommentsButton";
@@ -29,7 +30,16 @@ export function RecipientViewPetitionFieldHeading({
   return (
     <Stack as="header" id={`field-${field.id}`} spacing={1} paddingX={2} paddingY={2}>
       <HStack alignItems="flex-start">
-        <Box flex="1">{field.title ? <Heading size="md">{field.title}</Heading> : null}</Box>
+        <Box flex="1">
+          {field.title ? (
+            <Heading size="md">
+              {field.isInternal ? (
+                <InternalFieldBadge marginRight={2.5} marginBottom={0.5} />
+              ) : null}
+              {field.title}
+            </Heading>
+          ) : null}
+        </Box>
         {field.options.hasCommentsEnabled || field.__typename === "PetitionField" ? (
           <Box paddingRight={2}>
             <CommentsButton

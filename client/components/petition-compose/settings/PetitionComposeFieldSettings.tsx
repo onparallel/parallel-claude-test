@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Heading, Stack, Switch, Text } from "@chakra-ui/react";
+import { Box, Heading, Stack, Switch } from "@chakra-ui/react";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import {
   PetitionComposeFieldSettings_PetitionFieldFragment,
@@ -85,7 +85,7 @@ export function PetitionComposeFieldSettings({
           />
         </Box>
         <SettingsRow
-          isDisabled={isReadOnly}
+          isDisabled={isReadOnly || field.isInternal}
           label={
             <FormattedMessage
               id="component.petition-settings.petition-comments-enable"
@@ -99,13 +99,13 @@ export function PetitionComposeFieldSettings({
             display="block"
             id="enable-comments"
             color="green"
-            isChecked={field.options.hasCommentsEnabled}
+            isChecked={field.isInternal ? false : field.options.hasCommentsEnabled}
             onChange={(event) =>
               onFieldEdit(field.id, {
                 options: { ...field.options, hasCommentsEnabled: event.target.checked },
               })
             }
-            isDisabled={isReadOnly}
+            isDisabled={isReadOnly || field.isInternal}
           />
         </SettingsRow>
 
@@ -115,6 +115,12 @@ export function PetitionComposeFieldSettings({
             <FormattedMessage
               id="component.petition-settings.petition-internal-field"
               defaultMessage="Internal field"
+            />
+          }
+          description={
+            <FormattedMessage
+              id="field-settings.internal-field-description"
+              defaultMessage="Enabling this will make the field invisible to the recipient."
             />
           }
           controlId="internal-field"
@@ -151,19 +157,17 @@ export function PetitionComposeFieldSettings({
               )
             }
             description={
-              <Text fontSize="sm">
-                {field.type === "FILE_UPLOAD" ? (
-                  <FormattedMessage
-                    id="field-settings.file-multiple-description"
-                    defaultMessage="Enabling this allows the recipient to upload multiple files to this field."
-                  />
-                ) : (
-                  <FormattedMessage
-                    id="field-settings.multiple-description"
-                    defaultMessage="Enabling this allows the recipient to submit multiple answers to this field."
-                  />
-                )}
-              </Text>
+              field.type === "FILE_UPLOAD" ? (
+                <FormattedMessage
+                  id="field-settings.file-multiple-description"
+                  defaultMessage="Enabling this allows the recipient to upload multiple files to this field."
+                />
+              ) : (
+                <FormattedMessage
+                  id="field-settings.multiple-description"
+                  defaultMessage="Enabling this allows the recipient to submit multiple answers to this field."
+                />
+              )
             }
             controlId="field-multiple"
           >

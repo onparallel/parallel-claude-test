@@ -46,9 +46,8 @@ export function PetitionRepliesFieldComments({
   const intl = useIntl();
 
   const [draft, setDraft] = useState("");
-  const [isInternalComment, setInternalComment] = useState(
-    hasCommentsEnabled && !field.isInternal ? false : true
-  );
+
+  const [isInternalComment, setInternalComment] = useState(hasCommentsEnabled ? false : true);
   const [inputFocused, inputFocusBind] = useFocus({ onBlurDelay: 300 });
 
   const commentsRef = useRef<HTMLDivElement>(null);

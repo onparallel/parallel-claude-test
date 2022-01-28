@@ -18,8 +18,13 @@ export function useGetPageFields<T extends UnionToArrayUnion<PetitionFieldSelect
   isCacheOnly: boolean
 ) {
   const visibility = useFieldVisibility(fields, isCacheOnly);
+  const hideInternalFields = fields[0]?.__typename === "PublicPetitionField";
   return useMemo(() => {
-    const pages = groupFieldsByPages<PetitionFieldSelection>(fields, visibility);
+    const pages = groupFieldsByPages<PetitionFieldSelection>(
+      fields,
+      visibility,
+      hideInternalFields
+    );
     return { fields: pages[page - 1] as T, pages: pages.length, visibility };
   }, [fields, page, visibility]);
 }

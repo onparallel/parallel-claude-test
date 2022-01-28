@@ -3540,6 +3540,11 @@
     "context": "Can't add page breaks on headings with visibility conditions"
   },
   {
+    "term": "field-settings.internal-field-description",
+    "definition": "Enabling this will make the field invisible to the recipient.",
+    "context": "Enabling this will make the field invisible to the recipient."
+  },
+  {
     "term": "field-settings.multiple-description",
     "definition": "Enabling this allows the recipient to submit multiple answers to this field.",
     "context": "Enabling this allows the recipient to submit multiple answers to this field."

@@ -11,6 +11,7 @@ import {
   ButtonProps,
   Flex,
   Heading,
+  HStack,
   IconButton,
   Stack,
   Text,
@@ -101,7 +102,8 @@ export const PetitionRepliesField = Object.assign(
             fieldIndex={fieldIndex}
             hideIcon={true}
           />
-          <Box flex="1" minWidth="0">
+          <HStack flex="1" minWidth="0" alignItems="center">
+            {field.isInternal ? <InternalFieldBadge marginLeft={2} /> : null}
             {field.title ? (
               <Heading marginLeft={4} size="md" fontWeight={600} isTruncated>
                 {field.title}
@@ -118,7 +120,7 @@ export const PetitionRepliesField = Object.assign(
                 <FormattedMessage id="generic.empty-heading" defaultMessage="Untitled heading" />
               </Heading>
             )}
-          </Box>
+          </HStack>
           {/* This Flex element makes the reviewed buttons to be aligned */}
           <Flex width="66px">
             <Spacer />
