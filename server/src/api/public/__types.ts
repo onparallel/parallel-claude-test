@@ -2594,7 +2594,7 @@ export type PublicPetitionLink = {
   description: Scalars["String"];
   id: Scalars["GID"];
   isActive: Scalars["Boolean"];
-  owner: User;
+  owner: Maybe<User>;
   slug: Scalars["String"];
   template: PetitionTemplate;
   title: Scalars["String"];

@@ -110,7 +110,7 @@ export function PublicLinkSettingsDialog({
   );
 
   const isValidSlug = async (value: string) => {
-    if (publicLink?.isActive && publicLink.slug === value) {
+    if (publicLink?.slug === value) {
       return true;
     }
     try {
@@ -141,7 +141,7 @@ export function PublicLinkSettingsDialog({
         onSubmit: handleSubmit((data) => {
           props.onResolve({
             ...pick(data, ["title", "description", "slug"]),
-            ownerId: data.owner.id,
+            ownerId: data.owner!.id,
           });
         }),
       }}
@@ -242,10 +242,10 @@ export function PublicLinkSettingsDialog({
             <Controller
               name="owner"
               control={control}
-              rules={{ validate: { isDefined } }}
+              rules={{ validate: { isDefined }, required: true }}
               render={({ field: { onChange, onBlur, value } }) => (
                 <UserSelect
-                  value={value}
+                  value={value!}
                   onKeyDown={(e: KeyboardEvent) => {
                     if (e.key === "Enter" && !(e.target as HTMLInputElement).value) {
                       e.preventDefault();

@@ -1810,6 +1810,11 @@
     "context": "Without tags"
   },
   {
+    "term": "component.petition-permission-row.default-owner",
+    "definition": "Usuario que inicia la petición",
+    "context": "User starting the petition"
+  },
+  {
     "term": "component.petition-preview-signature-review-alert.signature-required",
     "definition": "<b>Firma pendiente</b>, puedes iniciarla desde la pestaña de {tabName}.",
     "context": "<b>Pending eSignature</b>, you can start it from the {tabName} tab."

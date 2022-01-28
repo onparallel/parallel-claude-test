@@ -201,7 +201,11 @@ function _PetitionSettings({
 
   const hasActivePublicLink = publicLink?.isActive ?? false;
   const [createPublicPetitionLink] = useMutation(PetitionSettings_createPublicPetitionLinkDocument);
-  const [updatePublicPetitionLink] = useMutation(PetitionSettings_updatePublicPetitionLinkDocument);
+  const [updatePublicPetitionLink] = useMutation(
+    PetitionSettings_updatePublicPetitionLinkDocument,
+    // refetch on updates of public link so the new link owner is correctly passed to the TemplateDefaultPermissionsDialog
+    { update: () => onRefetch() }
+  );
   const showPublicLinkSettingDialog = usePublicLinkSettingsDialog();
   const handleToggleShareByLink = async () => {
     assertTypename(petition, "PetitionTemplate");
@@ -212,8 +216,22 @@ function _PetitionSettings({
         }
       }
       if (publicLink) {
+        // if the public link owner is not found, it means its permissions have been modified on the TemplateDefaultPermissionsDialog
+        // so, before reactivating the link we need to ask for a new owner
+        let ownerId = publicLink.owner?.id;
+        if (!ownerId) {
+          const { ownerId: newOwnerId } = await showPublicLinkSettingDialog({
+            template: petition,
+            publicLink,
+          });
+          ownerId = newOwnerId;
+        }
         await updatePublicPetitionLink({
-          variables: { publicPetitionLinkId: publicLink.id, isActive: !publicLink.isActive },
+          variables: {
+            publicPetitionLinkId: publicLink.id,
+            isActive: !publicLink.isActive,
+            ownerId: publicLink.owner?.id ?? ownerId,
+          },
         });
       } else {
         const publicLinkSettings = await showPublicLinkSettingDialog({ template: petition });
@@ -255,13 +273,13 @@ function _PetitionSettings({
 
   const showTemplateDefaultPermissionsDialog = useTemplateDefaultPermissionsDialog();
   const [updateTemplateDefaultPermissions] = useMutation(
-    PetitionSettings_updateTemplateDefaultPermissionsDocument
+    PetitionSettings_updateTemplateDefaultPermissionsDocument,
+    { update: () => onRefetch() }
   );
   const handleUpdateTemplateDefaultPermissions = async (enable: boolean) => {
     assertTypename(petition, "PetitionTemplate");
     if (enable) {
       try {
-        await onRefetch(); // refetch to bring possible owner changes through the public link settings
         const { permissions } = await showTemplateDefaultPermissionsDialog({
           permissions: petition.defaultPermissions,
           publicLink: petition.publicLink,

@@ -2677,7 +2677,7 @@ export interface PublicPetitionLink {
   description: Scalars["String"];
   id: Scalars["GID"];
   isActive: Scalars["Boolean"];
-  owner: User;
+  owner?: Maybe<User>;
   slug: Scalars["String"];
   template: PetitionTemplate;
   title: Scalars["String"];
@@ -7204,7 +7204,7 @@ export type PublicLinkSettingsDialog_PublicPetitionLinkFragment = {
   description: string;
   slug: string;
   url: string;
-  owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+  owner?: { __typename?: "User"; id: string; fullName?: string | null; email: string } | null;
 };
 
 export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
@@ -7291,14 +7291,14 @@ export type SignatureConfigDialog_UserFragment = {
 export type TemplateDefaultPermissionsDialog_PublicPetitionLinkFragment = {
   __typename?: "PublicPetitionLink";
   isActive: boolean;
-  owner: {
+  owner?: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     email: string;
     avatarUrl?: string | null;
     initials?: string | null;
-  };
+  } | null;
 };
 
 export type TemplateDefaultPermissionsDialog_TemplateDefaultPermission_TemplateDefaultUserGroupPermission_Fragment =
@@ -7704,14 +7704,14 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
     title: string;
     description: string;
     slug: string;
-    owner: {
+    owner?: {
       __typename?: "User";
       id: string;
       fullName?: string | null;
       email: string;
       avatarUrl?: string | null;
       initials?: string | null;
-    };
+    } | null;
   } | null;
   defaultPermissions: Array<
     | {
@@ -7831,7 +7831,7 @@ export type PetitionSettings_createPublicPetitionLinkMutation = {
       id: string;
       publicLink?: { __typename?: "PublicPetitionLink"; id: string } | null;
     };
-    owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+    owner?: { __typename?: "User"; id: string; fullName?: string | null; email: string } | null;
   };
 };
 
@@ -7858,7 +7858,7 @@ export type PetitionSettings_updatePublicPetitionLinkMutation = {
       id: string;
       publicLink?: { __typename?: "PublicPetitionLink"; id: string } | null;
     };
-    owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+    owner?: { __typename?: "User"; id: string; fullName?: string | null; email: string } | null;
   };
 };
 
@@ -13461,14 +13461,14 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     title: string;
     description: string;
     slug: string;
-    owner: {
+    owner?: {
       __typename?: "User";
       id: string;
       fullName?: string | null;
       email: string;
       avatarUrl?: string | null;
       initials?: string | null;
-    };
+    } | null;
   } | null;
   defaultPermissions: Array<
     | {
@@ -13709,14 +13709,14 @@ export type PetitionCompose_updatePetitionMutation = {
           title: string;
           description: string;
           slug: string;
-          owner: {
+          owner?: {
             __typename?: "User";
             id: string;
             fullName?: string | null;
             email: string;
             avatarUrl?: string | null;
             initials?: string | null;
-          };
+          } | null;
         } | null;
         defaultPermissions: Array<
           | {
@@ -14297,14 +14297,14 @@ export type PetitionCompose_petitionQuery = {
           title: string;
           description: string;
           slug: string;
-          owner: {
+          owner?: {
             __typename?: "User";
             id: string;
             fullName?: string | null;
             email: string;
             avatarUrl?: string | null;
             initials?: string | null;
-          };
+          } | null;
         } | null;
         defaultPermissions: Array<
           | {

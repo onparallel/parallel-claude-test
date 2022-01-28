@@ -1515,7 +1515,7 @@ export interface NexusGenFieldTypes {
     description: string; // String!
     id: NexusGenScalars["GID"]; // GID!
     isActive: boolean; // Boolean!
-    owner: NexusGenRootTypes["User"]; // User!
+    owner: NexusGenRootTypes["User"] | null; // User
     slug: string; // String!
     template: NexusGenRootTypes["PetitionTemplate"]; // PetitionTemplate!
     title: string; // String!

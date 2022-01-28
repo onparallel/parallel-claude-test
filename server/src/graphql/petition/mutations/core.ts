@@ -1595,16 +1595,9 @@ export const updateTemplateDefaultPermissions = mutationField("updateTemplateDef
     permissions: nonNull(list(nonNull("UserOrUserGroupPermissionInput"))),
   },
   resolve: async (_, args, ctx) => {
-    const defaultOwner = await ctx.petitions.loadTemplateDefaultPermissionOwner(args.templateId);
-
-    // avoid modifying OWNERs
-    const permissions = defaultOwner
-      ? args.permissions.filter((p) => p.userId !== defaultOwner.user_id)
-      : args.permissions;
-
     await ctx.petitions.updateTemplateDefaultPermissions(
       args.templateId,
-      permissions as any,
+      args.permissions as any,
       `User:${ctx.user!.id}`
     );
     return (await ctx.petitions.loadPetition(args.templateId))!;

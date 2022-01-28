@@ -59,9 +59,10 @@ export function TemplateDefaultPermissionsDialog({
     async (search: string, excludeUsers: string[], excludeUserGroups: string[]) => {
       return await _handleSearchUsers(search, {
         // if there is an active public link, exclude the owner of that link from the search
-        excludeUsers: publicLink?.isActive
-          ? excludeUsers.concat(publicLink.owner.id)
-          : excludeUsers,
+        excludeUsers:
+          publicLink?.isActive && !!publicLink.owner
+            ? excludeUsers.concat(publicLink.owner.id)
+            : excludeUsers,
         excludeUserGroups,
         includeGroups: true,
       });

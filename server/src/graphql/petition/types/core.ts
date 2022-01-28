@@ -801,10 +801,10 @@ export const PublicPetitionLink = objectType({
         return `${prefix}/${template.locale}/pp/${root.slug}`;
       },
     });
-    t.nonNull.field("owner", {
+    t.nullable.field("owner", {
       type: "User",
       resolve: async (root, _, ctx) => {
-        return (await ctx.petitions.getPublicPetitionLinkOwner(root.id))!;
+        return await ctx.petitions.getPublicPetitionLinkOwner(root.id);
       },
     });
     t.nonNull.field("template", {

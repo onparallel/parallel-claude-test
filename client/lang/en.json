@@ -1810,6 +1810,11 @@
     "context": "Without tags"
   },
   {
+    "term": "component.petition-permission-row.default-owner",
+    "definition": "User starting the petition",
+    "context": "User starting the petition"
+  },
+  {
     "term": "component.petition-preview-signature-review-alert.signature-required",
     "definition": "<b>Pending eSignature</b>, you can start it from the {tabName} tab.",
     "context": "<b>Pending eSignature</b>, you can start it from the {tabName} tab."
