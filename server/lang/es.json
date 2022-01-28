@@ -215,6 +215,11 @@
     "context": "{tone, select, INFORMAL{Hello {name},} other{Dear {fullName},}}"
   },
   {
+    "term": "greeting-reminder",
+    "definition": "{tone, select, INFORMAL{¡Hola, {name}!} other{Estimado/a {fullName},}}",
+    "context": "{tone, select, INFORMAL{Hello {name}!} other{Dear {fullName},}}"
+  },
+  {
     "term": "greeting-user",
     "definition": "{name, select, null {Hola,} other {Hola {name},}}",
     "context": "{name, select, null {Hi,} other {Hi {name},}}"

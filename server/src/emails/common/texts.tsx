@@ -40,6 +40,19 @@ export function greetingContact(
   );
 }
 
+export function greetingReminder(
+  { name, fullName, tone }: { name: string; fullName: string; tone: Tone },
+  intl: IntlShape
+) {
+  return intl.formatMessage(
+    {
+      id: "greeting-reminder",
+      defaultMessage: "{tone, select, INFORMAL{Hello {name}!} other{Dear {fullName},}}",
+    },
+    { name, fullName, tone }
+  );
+}
+
 export function petitionFieldList(
   {
     fields,

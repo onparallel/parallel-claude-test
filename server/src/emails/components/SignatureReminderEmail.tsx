@@ -3,9 +3,9 @@ import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { ClosingThanks } from "../common/ClosingThanks";
-import { GreetingContact } from "../common/Greeting";
+import { GreetingReminder } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { closing, gdprDisclaimer, greetingContact } from "../common/texts";
+import { closing, gdprDisclaimer, greetingReminder } from "../common/texts";
 import { Tone } from "../utils/types";
 
 type SignatureReminderProps = {
@@ -34,7 +34,7 @@ const email: Email<SignatureReminderProps> = {
     intl: IntlShape
   ) {
     return outdent`
-      ${greetingContact({ fullName, name: fullName, tone }, intl)}
+      ${greetingReminder({ fullName, name: fullName, tone }, intl)}
 
       ${intl.formatMessage(
         {
@@ -84,7 +84,7 @@ const email: Email<SignatureReminderProps> = {
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingContact name={fullName} fullName={fullName} tone={tone} />
+            <GreetingReminder name={fullName} fullName={fullName} tone={tone} />
             <MjmlText>
               <FormattedMessage
                 id="signature-reminder.text"

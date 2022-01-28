@@ -6,9 +6,9 @@ import { Email } from "../buildEmail";
 import { CompleteInfoButton } from "../common/CompleteInfoButton";
 import { DateTime } from "../common/DateTime";
 import { Disclaimer } from "../common/Disclaimer";
-import { GreetingContact } from "../common/Greeting";
+import { GreetingReminder } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { disclaimer, greetingContact } from "../common/texts";
+import { disclaimer, greetingReminder } from "../common/texts";
 import { UserMessageBox } from "../common/UserMessageBox";
 import { WhyWeUseParallel } from "../common/WhyWeUseParallel";
 import { FORMATS } from "../utils/dates";
@@ -74,7 +74,7 @@ const email: Email<PetitionReminderProps> = {
     intl: IntlShape
   ) {
     return outdent`
-      ${greetingContact({ name, fullName, tone }, intl)}
+      ${greetingReminder({ name, fullName, tone }, intl)}
       
       ${intl.formatMessage(
         {
@@ -172,7 +172,7 @@ const email: Email<PetitionReminderProps> = {
       >
         <MjmlSection padding="0">
           <MjmlColumn>
-            <GreetingContact name={name} fullName={fullName} tone={tone} />
+            <GreetingReminder name={name} fullName={fullName} tone={tone} />
 
             <MjmlText lineHeight="24px">
               <FormattedMessage

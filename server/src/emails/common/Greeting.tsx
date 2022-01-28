@@ -45,3 +45,23 @@ export function GreetingContact({
     </MjmlText>
   );
 }
+
+export function GreetingReminder({
+  name,
+  fullName,
+  tone,
+}: {
+  name: string;
+  fullName: string;
+  tone: Tone;
+}) {
+  return (
+    <MjmlText>
+      <FormattedMessage
+        id="greeting-reminder"
+        defaultMessage="{tone, select, INFORMAL{Hello {name}!} other{Dear {fullName},}}"
+        values={{ name, fullName, tone }}
+      />
+    </MjmlText>
+  );
+}
