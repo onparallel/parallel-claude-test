@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
-import { datatype, internet, lorem, name } from "@faker-js/faker";
-import knex, { Knex } from "knex";
+import faker from "@faker-js/faker";
+import { Knex } from "knex";
 import { sortBy } from "remeda";
 import { PetitionEvent } from "../../db/events";
 import { KNEX } from "../../db/knex";
@@ -38,7 +38,7 @@ function petitionsBuilder(orgId: number, signatureIntegrationId: number) {
     public_metadata:
       index > 7
         ? {
-            slug: lorem.slug(5),
+            slug: faker.lorem.slug(5),
             categories: ["legal"],
             description: null,
             background_color: "#81E6D9",
@@ -389,7 +389,7 @@ describe("GraphQL/Petitions", () => {
       const { items } = templates!.templates;
 
       // pick a random templateId that is not on first position of items array
-      const index = datatype.number({ min: 1, max: items.length - 1 });
+      const index = faker.datatype.number({ min: 1, max: items.length - 1 });
       const templateId = items[index].id;
 
       // use this random template to create a petition
@@ -510,7 +510,7 @@ describe("GraphQL/Petitions", () => {
       const { items } = data!.templates;
 
       // pick a random templateId that is not on first position of items array
-      const index = datatype.number({ min: 1, max: items.length - 1 });
+      const index = faker.datatype.number({ min: 1, max: items.length - 1 });
       const templateId = items[index].id;
 
       // use this random template to create a petition
@@ -2712,7 +2712,7 @@ describe("GraphQL/Petitions", () => {
     let contacts: Contact[];
     beforeAll(async () => {
       contacts = await mocks.createRandomContacts(organization.id, 3, (i) => ({
-        email: i === 0 ? sessionUser.email : internet.email(),
+        email: i === 0 ? sessionUser.email : faker.internet.email(),
       }));
       usageLimit = await mocks.createOrganizationUsageLimit(organization.id, "PETITION_SEND", 0);
     });
@@ -3414,24 +3414,24 @@ describe("GraphQL/Petitions", () => {
 
       signers = [
         {
-          email: internet.email(undefined, undefined, "onparallel.com"),
-          firstName: name.firstName(),
-          lastName: name.lastName(),
+          email: faker.internet.email(undefined, undefined, "onparallel.com"),
+          firstName: faker.name.firstName(),
+          lastName: faker.name.lastName(),
         },
         {
-          email: internet.email(undefined, undefined, "onparallel.com"),
-          firstName: name.firstName(),
-          lastName: name.lastName(),
+          email: faker.internet.email(undefined, undefined, "onparallel.com"),
+          firstName: faker.name.firstName(),
+          lastName: faker.name.lastName(),
         },
         {
-          email: internet.email(undefined, undefined, "onparallel.com"),
-          firstName: name.firstName(),
-          lastName: name.lastName(),
+          email: faker.internet.email(undefined, undefined, "onparallel.com"),
+          firstName: faker.name.firstName(),
+          lastName: faker.name.lastName(),
         },
       ];
 
       contacts = await mocks.createRandomContacts(organization.id, 2, () => ({
-        email: internet.email(undefined, undefined, "onparallel.com"),
+        email: faker.internet.email(undefined, undefined, "onparallel.com"),
       }));
 
       [otherOrgContact] = await mocks.createRandomContacts(otherOrg.id, 1);
@@ -3576,7 +3576,6 @@ describe("GraphQL/Petitions", () => {
       expect(errors).toContainGraphQLError("REQUIRED_SIGNER_INFO_ERROR");
       expect(data).toBeNull();
     });
-
 
     it("completes the petition as a user and starts a signature request", async () => {
       const { errors, data } = await testClient.mutate({
