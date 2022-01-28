@@ -23,7 +23,7 @@ export function groupFieldsByPages<T extends PetitionFieldSelection>(
         page = [];
       }
     }
-    if (isVisible) {
+    if (isVisible && !isHiddenToPublic) {
       page.push(field);
     }
   }

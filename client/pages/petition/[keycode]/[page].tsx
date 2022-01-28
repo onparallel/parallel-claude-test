@@ -339,8 +339,6 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
               <Stack spacing={4} key={currentPage}>
                 <AnimatePresence initial={false}>
                   {fields.map((field) => {
-                    // Hidde internal field to Public
-                    if (field.__typename === "PublicPetitionField" && field.isInternal) return null;
                     return (
                       <motion.div key={field.id} layout="position">
                         <RecipientViewPetitionField
