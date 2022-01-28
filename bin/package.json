@@ -14,9 +14,9 @@
     "full-release": "node dist/full-release.js"
   },
   "dependencies": {
-    "@formatjs/cli": "^4.7.1",
-    "@formatjs/icu-messageformat-parser": "^2.0.16",
-    "aws-sdk": "^2.1058.0",
+    "@formatjs/cli": "^4.8.1",
+    "@formatjs/icu-messageformat-parser": "^2.0.17",
+    "aws-sdk": "^2.1065.0",
     "chalk": "^4.1.2",
     "cli-table3": "^0.6.1",
     "outdent": "^0.8.0",
@@ -25,10 +25,10 @@
     "yargs": "^17.3.1"
   },
   "devDependencies": {
-    "@types/node": "^17.0.9",
+    "@types/node": "^17.0.13",
     "@types/rimraf": "^3.0.2",
     "@types/yargs": "^17.0.8",
     "rimraf": "^3.0.2",
-    "typescript": "^4.5.4"
+    "typescript": "^4.5.5"
   }
 }
