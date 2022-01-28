@@ -76,20 +76,24 @@ export function AskContactDetailsDialog({
                 defaultMessage: "name@example.com",
               })}
             />
-            {errors.email && (
-              <FormErrorMessage>
-                <FormattedMessage
-                  id="generic.forms.invalid-email-error"
-                  defaultMessage="Please, enter a valid email"
-                />
-              </FormErrorMessage>
-            )}
+            <FormErrorMessage>
+              <FormattedMessage
+                id="generic.forms.invalid-email-error"
+                defaultMessage="Please, enter a valid email"
+              />
+            </FormErrorMessage>
           </FormControl>
-          <FormControl id="contact-first-name">
+          <FormControl id="contact-first-name" isInvalid={!!errors.firstName}>
             <FormLabel>
               <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
             </FormLabel>
             <Input {...firstNameRegisterProps} />
+            <FormErrorMessage>
+              <FormattedMessage
+                id="generic.forms.invalid-contact-first-name-error"
+                defaultMessage="Please, enter the contact first name"
+              />
+            </FormErrorMessage>
           </FormControl>
           <FormControl id="contact-last-name">
             <FormLabel>
