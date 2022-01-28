@@ -2179,6 +2179,43 @@ export class PetitionRepository extends BaseRepository {
     )
   );
 
+  readonly loadPetitionFieldUnreadCommentCountForFieldAndUser = fromDataLoader(
+    new DataLoader<{ userId: number; petitionId: number; petitionFieldId: number }, number, string>(
+      async (ids) => {
+        const rows = await this.from("petition_user_notification")
+          .whereIn("petition_id", uniq(ids.map((x) => x.petitionId)))
+          .whereIn("user_id", uniq(ids.map((x) => x.userId)))
+          .whereIn(
+            this.knex.raw("(data ->> 'petition_field_id')::int") as any,
+            uniq(ids.map((x) => x.petitionFieldId))
+          )
+          .where("type", "COMMENT_CREATED")
+          .where("is_read", false)
+          .groupBy("petition_id", "user_id", this.knex.raw("(data ->> 'petition_field_id')::int"))
+          .select<
+            (Pick<PetitionUserNotification, "petition_id" | "user_id"> & {
+              petition_field_id: number;
+              unread_count: number;
+            })[]
+          >(
+            "petition_id",
+            "petition_access_id",
+            this.knex.raw("(data ->> 'petition_field_id')::int as petition_field_id"),
+            this.count("unread_count")
+          );
+
+        const rowsById = indexBy(rows, keyBuilder(["petition_id", "petition_field_id", "user_id"]));
+
+        return ids.map(keyBuilder(["petitionId", "petitionFieldId", "userId"])).map((key) => {
+          return rowsById[key]?.unread_count ?? 0;
+        });
+      },
+      {
+        cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "userId"]),
+      }
+    )
+  );
+
   private sortComments(comments: PetitionFieldComment[]) {
     return comments.sort((a, b) => a.created_at.valueOf() - b.created_at.valueOf());
   }

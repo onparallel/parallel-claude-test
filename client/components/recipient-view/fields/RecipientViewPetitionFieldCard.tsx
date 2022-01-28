@@ -15,7 +15,6 @@ import {
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { countBy } from "remeda";
 import { BreakLines } from "../../common/BreakLines";
 import { CommentsButton } from "../CommentsButton";
 import { RecipientViewPetitionFieldCommentsDialog } from "../dialogs/RecipientViewPetitionFieldCommentsDialog";
@@ -52,19 +51,8 @@ export function RecipientViewPetitionFieldCard({
   onCommentsButtonClick,
 }: RecipientViewPetitionFieldCardProps) {
   const intl = useIntl();
-
-  const isPublicPetitionField = field.__typename === "PublicPetitionField";
   const isPetitionField = field.__typename === "PetitionField";
-
   const fieldReplies = completedFieldReplies(field);
-  const { commentCount, unreadCommentCount } = isPublicPetitionField
-    ? field
-    : isPetitionField
-    ? {
-        commentCount: field.comments.length,
-        unreadCommentCount: countBy(field.comments, (c) => c.isUnread),
-      }
-    : (null as never);
 
   return (
     <Card
@@ -104,8 +92,8 @@ export function RecipientViewPetitionFieldCard({
         </Box>
         {hasCommentsEnabled || isPetitionField ? (
           <CommentsButton
-            commentCount={commentCount}
-            hasUnreadComments={unreadCommentCount > 0}
+            commentCount={field.commentCount}
+            hasUnreadComments={field.unreadCommentCount > 0}
             onClick={onCommentsButtonClick}
           />
         ) : null}
@@ -189,11 +177,8 @@ RecipientViewPetitionFieldCard.fragments = {
             ...FileAttachmentButton_FileUpload
           }
         }
-        comments {
-          id
-          isUnread
-          isInternal
-        }
+        commentCount
+        unreadCommentCount
         ...RecipientViewPetitionFieldCommentsDialog_PetitionField
       }
       ${this.PetitionFieldReply}

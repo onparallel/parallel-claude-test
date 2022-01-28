@@ -12,8 +12,8 @@ import {
 } from "@chakra-ui/react";
 import { ChevronFilledIcon, CommentIcon } from "@parallel/chakra/icons";
 import {
-  RecipientViewContentsCard_PetitionFieldFragment,
   RecipientViewContentsCard_PetitionBaseFragment,
+  RecipientViewContentsCard_PetitionFieldFragment,
   RecipientViewContentsCard_PublicPetitionFieldFragment,
   RecipientViewContentsCard_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
@@ -22,7 +22,7 @@ import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisi
 import { Maybe, UnionToArrayUnion } from "@parallel/utils/types";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
-import { countBy, zip } from "remeda";
+import { zip } from "remeda";
 import { Card, CardHeader, CardProps } from "../common/Card";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { NakedLink } from "../common/Link";
@@ -156,17 +156,6 @@ export function RecipientViewContentsCard({
                 {index + 1 === currentPage ? (
                   <Stack as={List} spacing={1}>
                     {filteredFields.map((field) => {
-                      const isPublicPetitionField = field.__typename === "PublicPetitionField";
-                      const isPetitionField = field.__typename === "PetitionField";
-
-                      const { commentCount, unreadCommentCount } = isPublicPetitionField
-                        ? field
-                        : isPetitionField
-                        ? {
-                            commentCount: field.comments.length,
-                            unreadCommentCount: countBy(field.comments, (c) => c.isUnread),
-                          }
-                        : (null as never);
                       return (
                         <ListItem key={field.id} position="relative">
                           <Text
@@ -215,8 +204,8 @@ export function RecipientViewContentsCard({
                                 </Box>
                                 {commentCount && showCommentsCount(field) ? (
                                   <RecipientViewContentsIndicators
-                                    hasUnreadComments={!!unreadCommentCount}
-                                    commentCount={commentCount}
+                                    hasUnreadComments={field.unreadCommentCount > 0}
+                                    commentCount={field.commentCount}
                                   />
                                 ) : null}
                                 {field.isInternal ? <InternalFieldBadge marginLeft={2} /> : null}
@@ -288,19 +277,6 @@ function useGetPagesAndFields<T extends UnionToArrayUnion<PetitionFieldSelection
   for (const [field, isVisible] of zip<PetitionFieldSelection, boolean>(fields, visibility)) {
     const isHiddenToPublic = field.__typename === "PublicPetitionField" && field.isInternal;
 
-    const currentFieldCommentCount =
-      field.__typename === "PublicPetitionField"
-        ? field.commentCount
-        : field.__typename === "PetitionField"
-        ? field.comments.length
-        : 0;
-
-    const currentFieldHasUnreadComments =
-      field.__typename === "PublicPetitionField"
-        ? field.unreadCommentCount > 0
-        : field.__typename === "PetitionField"
-        ? field.comments.some((c) => c.isUnread)
-        : false;
     if (
       field.type === "HEADING" &&
       (pages.length === 0 || (field.options.hasPageBreak && !isHiddenToPublic))
@@ -309,8 +285,8 @@ function useGetPagesAndFields<T extends UnionToArrayUnion<PetitionFieldSelection
         title: field.title ?? null,
         commentCount: 0,
         isInternal: field.isInternal,
-        currentFieldCommentCount,
-        currentFieldHasUnreadComments,
+        currentFieldCommentCount: field.commentCount,
+        currentFieldHasUnreadComments: field.unreadCommentCount > 0,
       });
       page -= 1;
     }
@@ -319,9 +295,8 @@ function useGetPagesAndFields<T extends UnionToArrayUnion<PetitionFieldSelection
       currentPage.hasUnreadComments = currentPage.hasUnreadComments || field.unreadCommentCount > 0;
       currentPage.commentCount += field.commentCount;
     } else if (field.__typename === "PetitionField") {
-      currentPage.hasUnreadComments =
-        currentPage.hasUnreadComments || field.comments.some((c) => c.isUnread);
-      currentPage.commentCount += field.comments.length;
+      currentPage.hasUnreadComments = currentPage.hasUnreadComments || field.unreadCommentCount > 0;
+      currentPage.commentCount += field.commentCount;
     }
     if (page === 0 && isVisible) {
       _fields.push(field as any);
@@ -395,10 +370,8 @@ RecipientViewContentsCard.fragments = {
           id
           status
         }
-        comments {
-          id
-          isUnread
-        }
+        commentCount
+        unreadCommentCount
         ...useFieldVisibility_PetitionField
       }
       ${useFieldVisibility.fragments.PetitionField}

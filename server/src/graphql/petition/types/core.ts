@@ -393,6 +393,30 @@ export const PetitionField = objectType({
         });
       },
     });
+    t.nonNull.int("commentCount", {
+      resolve: async (root, _, ctx) => {
+        const loadInternalComments = await ctx.featureFlags.userHasFeatureFlag(
+          ctx.user!.id,
+          "INTERNAL_COMMENTS"
+        );
+        return (
+          await ctx.petitions.loadPetitionFieldCommentsForField({
+            loadInternalComments,
+            petitionId: root.petition_id,
+            petitionFieldId: root.id,
+          })
+        ).length;
+      },
+    });
+    t.nonNull.int("unreadCommentCount", {
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadPetitionFieldUnreadCommentCountForFieldAndUser({
+          userId: ctx.user!.id,
+          petitionId: root.petition_id,
+          petitionFieldId: root.id,
+        });
+      },
+    });
     t.int("position");
     t.nullable.jsonObject("visibility", {
       description: "A JSON object representing the conditions for the field to be visible",

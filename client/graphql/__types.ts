@@ -1876,6 +1876,7 @@ export interface PetitionField {
   alias?: Maybe<Scalars["String"]>;
   /** A list of files attached to this field. */
   attachments: Array<PetitionFieldAttachment>;
+  commentCount: Scalars["Int"];
   /** The comments for this field. */
   comments: Array<PetitionFieldComment>;
   /** The description of the petition field. */
@@ -1905,6 +1906,7 @@ export interface PetitionField {
   title?: Maybe<Scalars["String"]>;
   /** The type of the petition field. */
   type: PetitionFieldType;
+  unreadCommentCount: Scalars["Int"];
   /** A JSON object representing the conditions for the field to be visible */
   visibility?: Maybe<Scalars["JSONObject"]>;
 }
@@ -7708,6 +7710,8 @@ export type PreviewPetitionField_PetitionFieldFragment = {
   optional: boolean;
   multiple: boolean;
   isInternal: boolean;
+  commentCount: number;
+  unreadCommentCount: number;
   previewReplies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
@@ -7734,12 +7738,6 @@ export type PreviewPetitionField_PetitionFieldFragment = {
       size: number;
       isComplete: boolean;
     };
-  }>;
-  comments: Array<{
-    __typename?: "PetitionFieldComment";
-    id: string;
-    isUnread: boolean;
-    isInternal: boolean;
   }>;
 };
 
@@ -8785,6 +8783,8 @@ export type RecipientViewContentsCard_PetitionBase_Petition_Fragment = {
     optional: boolean;
     isInternal: boolean;
     isReadOnly: boolean;
+    commentCount: number;
+    unreadCommentCount: number;
     visibility?: { [key: string]: any } | null;
     replies: Array<{
       __typename?: "PetitionFieldReply";
@@ -8792,7 +8792,6 @@ export type RecipientViewContentsCard_PetitionBase_Petition_Fragment = {
       status: PetitionFieldReplyStatus;
       content: { [key: string]: any };
     }>;
-    comments: Array<{ __typename?: "PetitionFieldComment"; id: string; isUnread: boolean }>;
     previewReplies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -8812,6 +8811,8 @@ export type RecipientViewContentsCard_PetitionBase_PetitionTemplate_Fragment = {
     optional: boolean;
     isInternal: boolean;
     isReadOnly: boolean;
+    commentCount: number;
+    unreadCommentCount: number;
     visibility?: { [key: string]: any } | null;
     replies: Array<{
       __typename?: "PetitionFieldReply";
@@ -8819,7 +8820,6 @@ export type RecipientViewContentsCard_PetitionBase_PetitionTemplate_Fragment = {
       status: PetitionFieldReplyStatus;
       content: { [key: string]: any };
     }>;
-    comments: Array<{ __typename?: "PetitionFieldComment"; id: string; isUnread: boolean }>;
     previewReplies: Array<{
       __typename?: "PetitionFieldReply";
       id: string;
@@ -8841,6 +8841,8 @@ export type RecipientViewContentsCard_PetitionFieldFragment = {
   optional: boolean;
   isInternal: boolean;
   isReadOnly: boolean;
+  commentCount: number;
+  unreadCommentCount: number;
   visibility?: { [key: string]: any } | null;
   replies: Array<{
     __typename?: "PetitionFieldReply";
@@ -8848,7 +8850,6 @@ export type RecipientViewContentsCard_PetitionFieldFragment = {
     status: PetitionFieldReplyStatus;
     content: { [key: string]: any };
   }>;
-  comments: Array<{ __typename?: "PetitionFieldComment"; id: string; isUnread: boolean }>;
   previewReplies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
@@ -9338,6 +9339,8 @@ export type RecipientViewPetitionFieldCard_PetitionFieldFragment = {
   optional: boolean;
   multiple: boolean;
   isInternal: boolean;
+  commentCount: number;
+  unreadCommentCount: number;
   replies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
@@ -9356,12 +9359,6 @@ export type RecipientViewPetitionFieldCard_PetitionFieldFragment = {
       size: number;
       isComplete: boolean;
     };
-  }>;
-  comments: Array<{
-    __typename?: "PetitionFieldComment";
-    id: string;
-    isUnread: boolean;
-    isInternal: boolean;
   }>;
 };
 
@@ -14155,6 +14152,8 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
     isReadOnly: boolean;
     title?: string | null;
     options: { [key: string]: any };
+    commentCount: number;
+    unreadCommentCount: number;
     description?: string | null;
     multiple: boolean;
     visibility?: { [key: string]: any } | null;
@@ -14173,12 +14172,6 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
       content: { [key: string]: any };
       createdAt: string;
       updatedAt: string;
-    }>;
-    comments: Array<{
-      __typename?: "PetitionFieldComment";
-      id: string;
-      isUnread: boolean;
-      isInternal: boolean;
     }>;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -14249,6 +14242,8 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
     optional: boolean;
     isInternal: boolean;
     isReadOnly: boolean;
+    commentCount: number;
+    unreadCommentCount: number;
     description?: string | null;
     multiple: boolean;
     visibility?: { [key: string]: any } | null;
@@ -14267,12 +14262,6 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
       content: { [key: string]: any };
       createdAt: string;
       updatedAt: string;
-    }>;
-    comments: Array<{
-      __typename?: "PetitionFieldComment";
-      id: string;
-      isUnread: boolean;
-      isInternal: boolean;
     }>;
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -14362,6 +14351,8 @@ export type PetitionPreview_updatePetitionMutation = {
           isReadOnly: boolean;
           title?: string | null;
           options: { [key: string]: any };
+          commentCount: number;
+          unreadCommentCount: number;
           description?: string | null;
           multiple: boolean;
           visibility?: { [key: string]: any } | null;
@@ -14380,12 +14371,6 @@ export type PetitionPreview_updatePetitionMutation = {
             content: { [key: string]: any };
             createdAt: string;
             updatedAt: string;
-          }>;
-          comments: Array<{
-            __typename?: "PetitionFieldComment";
-            id: string;
-            isUnread: boolean;
-            isInternal: boolean;
           }>;
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
@@ -14459,6 +14444,8 @@ export type PetitionPreview_updatePetitionMutation = {
           optional: boolean;
           isInternal: boolean;
           isReadOnly: boolean;
+          commentCount: number;
+          unreadCommentCount: number;
           description?: string | null;
           multiple: boolean;
           visibility?: { [key: string]: any } | null;
@@ -14477,12 +14464,6 @@ export type PetitionPreview_updatePetitionMutation = {
             content: { [key: string]: any };
             createdAt: string;
             updatedAt: string;
-          }>;
-          comments: Array<{
-            __typename?: "PetitionFieldComment";
-            id: string;
-            isUnread: boolean;
-            isInternal: boolean;
           }>;
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
@@ -14546,6 +14527,8 @@ export type PetitionPreview_completePetitionMutation = {
       isReadOnly: boolean;
       title?: string | null;
       options: { [key: string]: any };
+      commentCount: number;
+      unreadCommentCount: number;
       description?: string | null;
       multiple: boolean;
       visibility?: { [key: string]: any } | null;
@@ -14564,12 +14547,6 @@ export type PetitionPreview_completePetitionMutation = {
         content: { [key: string]: any };
         createdAt: string;
         updatedAt: string;
-      }>;
-      comments: Array<{
-        __typename?: "PetitionFieldComment";
-        id: string;
-        isUnread: boolean;
-        isInternal: boolean;
       }>;
       attachments: Array<{
         __typename?: "PetitionFieldAttachment";
@@ -14656,6 +14633,8 @@ export type PetitionPreview_petitionQuery = {
           isReadOnly: boolean;
           title?: string | null;
           options: { [key: string]: any };
+          commentCount: number;
+          unreadCommentCount: number;
           description?: string | null;
           multiple: boolean;
           visibility?: { [key: string]: any } | null;
@@ -14674,12 +14653,6 @@ export type PetitionPreview_petitionQuery = {
             content: { [key: string]: any };
             createdAt: string;
             updatedAt: string;
-          }>;
-          comments: Array<{
-            __typename?: "PetitionFieldComment";
-            id: string;
-            isUnread: boolean;
-            isInternal: boolean;
           }>;
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
@@ -14753,6 +14726,8 @@ export type PetitionPreview_petitionQuery = {
           optional: boolean;
           isInternal: boolean;
           isReadOnly: boolean;
+          commentCount: number;
+          unreadCommentCount: number;
           description?: string | null;
           multiple: boolean;
           visibility?: { [key: string]: any } | null;
@@ -14771,12 +14746,6 @@ export type PetitionPreview_petitionQuery = {
             content: { [key: string]: any };
             createdAt: string;
             updatedAt: string;
-          }>;
-          comments: Array<{
-            __typename?: "PetitionFieldComment";
-            id: string;
-            isUnread: boolean;
-            isInternal: boolean;
           }>;
           attachments: Array<{
             __typename?: "PetitionFieldAttachment";
@@ -20048,11 +20017,8 @@ export const RecipientViewPetitionFieldCard_PetitionFieldFragmentDoc = gql`
         ...FileAttachmentButton_FileUpload
       }
     }
-    comments {
-      id
-      isUnread
-      isInternal
-    }
+    commentCount
+    unreadCommentCount
     ...RecipientViewPetitionFieldCommentsDialog_PetitionField
   }
   ${RecipientViewPetitionFieldCard_PetitionFieldReplyFragmentDoc}
@@ -20089,10 +20055,8 @@ export const RecipientViewContentsCard_PetitionFieldFragmentDoc = gql`
       id
       status
     }
-    comments {
-      id
-      isUnread
-    }
+    commentCount
+    unreadCommentCount
     ...useFieldVisibility_PetitionField
   }
   ${useFieldVisibility_PetitionFieldFragmentDoc}

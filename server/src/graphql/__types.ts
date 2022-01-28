@@ -1165,6 +1165,7 @@ export interface NexusGenFieldTypes {
     // field return type
     alias: string | null; // String
     attachments: NexusGenRootTypes["PetitionFieldAttachment"][]; // [PetitionFieldAttachment!]!
+    commentCount: number; // Int!
     comments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     description: string | null; // String
     fromPetitionFieldId: NexusGenScalars["GID"] | null; // GID
@@ -1180,6 +1181,7 @@ export interface NexusGenFieldTypes {
     replies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
     title: string | null; // String
     type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
+    unreadCommentCount: number; // Int!
     visibility: NexusGenScalars["JSONObject"] | null; // JSONObject
   };
   PetitionFieldAttachment: {
@@ -2461,6 +2463,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     alias: "String";
     attachments: "PetitionFieldAttachment";
+    commentCount: "Int";
     comments: "PetitionFieldComment";
     description: "String";
     fromPetitionFieldId: "GID";
@@ -2476,6 +2479,7 @@ export interface NexusGenFieldTypeNames {
     replies: "PetitionFieldReply";
     title: "String";
     type: "PetitionFieldType";
+    unreadCommentCount: "Int";
     visibility: "JSONObject";
   };
   PetitionFieldAttachment: {

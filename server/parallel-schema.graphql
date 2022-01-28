@@ -2246,6 +2246,7 @@ type PetitionField {
   A list of files attached to this field.
   """
   attachments: [PetitionFieldAttachment!]!
+  commentCount: Int!
 
   """
   The comments for this field.
@@ -2313,6 +2314,7 @@ type PetitionField {
   The type of the petition field.
   """
   type: PetitionFieldType!
+  unreadCommentCount: Int!
 
   """
   A JSON object representing the conditions for the field to be visible
