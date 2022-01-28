@@ -8,6 +8,7 @@ import {
   OrganizationUsageLimit,
   Petition,
   PublicPetitionLink,
+  TemplateDefaultPermission,
   User,
   UserGroup,
 } from "../../db/__types";
@@ -1065,6 +1066,66 @@ describe("GraphQL/PublicPetitionLink", () => {
       });
       expect(data).toBeNull();
     });
+
+    it("overwrites permission if creating a link and the link owner already has read or write permissions on the template", async () => {
+      await mocks.knex
+        .from("petition")
+        .whereNotNull("from_public_petition_link_id")
+        .update("from_public_petition_link_id", null);
+      await mocks.knex.from("public_petition_link").delete();
+      await mocks.knex.from("template_default_permission").delete();
+
+      await mocks.knex<TemplateDefaultPermission>("template_default_permission").insert({
+        position: 0,
+        template_id: templates[0].id,
+        user_id: user.id,
+        type: "READ",
+      });
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($templateId: GID!, $title: String!, $description: String!, $ownerId: GID!) {
+            createPublicPetitionLink(
+              templateId: $templateId
+              title: $title
+              description: $description
+              ownerId: $ownerId
+            ) {
+              owner {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          templateId: toGlobalId("Petition", templates[0].id),
+          title: "public link title",
+          description: "this is the description",
+          ownerId: toGlobalId("User", user.id),
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPublicPetitionLink).toEqual({
+        owner: {
+          id: toGlobalId("User", user.id),
+        },
+      });
+
+      const templateDefaultPermissions = await mocks
+        .knex<TemplateDefaultPermission>("template_default_permission")
+        .where("template_id", templates[0].id)
+        .whereNull("deleted_at")
+        .select("template_id", "type", "user_id");
+
+      expect(templateDefaultPermissions).toEqual([
+        {
+          template_id: templates[0].id,
+          type: "OWNER",
+          user_id: user.id,
+        },
+      ]);
+    });
   });
 
   describe("updatePublicPetitionLink", () => {
@@ -1212,5 +1273,7 @@ describe("GraphQL/PublicPetitionLink", () => {
       });
       expect(data).toBeNull();
     });
+
+    it("overwrites permission if updating a link owner and the link owner already has read or write permissions on the template", async () => {});
   });
 });

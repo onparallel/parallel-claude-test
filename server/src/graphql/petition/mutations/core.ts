@@ -1595,7 +1595,21 @@ export const updateTemplateDefaultPermissions = mutationField("updateTemplateDef
     permissions: nonNull(list(nonNull("UserOrUserGroupPermissionInput"))),
   },
   resolve: async (_, args, ctx) => {
-    await ctx.petitions.updateTemplateDefaultPermissions(
+    const [templateDefaultPermissionOwner, [publicLink]] = await Promise.all([
+      ctx.petitions.loadTemplateDefaultPermissionOwner(args.templateId),
+      ctx.petitions.loadPublicPetitionLinksByTemplateId(args.templateId),
+    ]);
+    if (
+      publicLink?.is_active &&
+      templateDefaultPermissionOwner &&
+      args.permissions.some((p) => p.userId === templateDefaultPermissionOwner.user_id)
+    ) {
+      throw new ApolloError(
+        "Can't update template default permissions on the owner of a public link",
+        "UPDATE_TEMPLATE_DEFAULT_PERMISSIONS_ERROR"
+      );
+    }
+    await ctx.petitions.upsertTemplateDefaultPermissions(
       args.templateId,
       args.permissions as any,
       `User:${ctx.user!.id}`
@@ -1626,7 +1640,7 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
   ),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.withTransaction(async (t) => {
-      await ctx.petitions.createTemplateDefaultPermissions(
+      await ctx.petitions.upsertTemplateDefaultPermissions(
         args.templateId,
         [{ isSubscribed: true, permissionType: "OWNER", userId: args.ownerId }],
         `User:${ctx.user!.id}`,

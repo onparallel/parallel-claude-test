@@ -3395,27 +3395,7 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.whereNull("deleted_at").where("type", "OWNER")
   );
 
-  async createTemplateDefaultPermissions(
-    templateId: number,
-    permissions: TemplateDefaultPermissionInput[],
-    createdBy: string,
-    t?: Knex.Transaction
-  ) {
-    await this.insert(
-      "template_default_permission",
-      permissions.map((p, i) => ({
-        template_id: templateId,
-        position: i,
-        type: p.permissionType,
-        is_subscribed: p.isSubscribed,
-        created_by: createdBy,
-        ...("userId" in p ? { user_id: p.userId } : { user_group_id: p.userGroupId }),
-      })),
-      t
-    );
-  }
-
-  async updateTemplateDefaultPermissions(
+  async upsertTemplateDefaultPermissions(
     templateId: number,
     permissions: TemplateDefaultPermissionInput[],
     updatedBy: string,

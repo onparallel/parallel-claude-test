@@ -7,7 +7,7 @@ import { Organization, Petition, PublicPetitionLink, User, UserGroup } from "../
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
 
-describe("GraphQL/PublicPetitionLink", () => {
+describe("GraphQL/TemplateDefaultPermissions", () => {
   let testClient: TestClient;
   let mocks: Mocks;
   let knex: Knex;
@@ -53,8 +53,6 @@ describe("GraphQL/PublicPetitionLink", () => {
   });
 
   describe("updateTemplateDefaultPermissions", () => {
-    beforeAll(async () => {});
-
     it("sends error if user does not have access to the template", async () => {
       const [privateTemplate] = await mocks.createRandomPetitions(
         organization.id,
@@ -410,6 +408,102 @@ describe("GraphQL/PublicPetitionLink", () => {
             },
             isSubscribed: false,
             permissionType: "READ",
+          },
+        ],
+      });
+    });
+
+    it("sends error if trying to give read/write permissions to a user that is the owner of an active public link", async () => {
+      await mocks.knex.from("public_petition_link").where("template_id", templates[0].id).delete();
+      await mocks.knex
+        .from("template_default_permission")
+        .where("template_id", templates[0].id)
+        .delete();
+
+      await mocks.createRandomPublicPetitionLink(templates[0].id, users[0].id);
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]!) {
+            updateTemplateDefaultPermissions(templateId: $templateId, permissions: $permissions) {
+              id
+            }
+          }
+        `,
+        variables: {
+          templateId: toGlobalId("Petition", templates[0].id),
+          permissions: [
+            {
+              isSubscribed: true,
+              permissionType: "WRITE",
+              userId: toGlobalId("User", users[0].id),
+            },
+          ],
+        },
+      });
+
+      expect(errors).toContainGraphQLError("UPDATE_TEMPLATE_DEFAULT_PERMISSIONS_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("overwrites the permission if giving read/write access to a user that is the owner of an inactive public link, and nulls the link owner", async () => {
+      await mocks.knex.from("public_petition_link").where("template_id", templates[0].id).delete();
+      await mocks.knex
+        .from("template_default_permission")
+        .where("template_id", templates[0].id)
+        .delete();
+
+      await mocks.createRandomPublicPetitionLink(templates[0].id, users[0].id, () => ({
+        is_active: false,
+      }));
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]!) {
+            updateTemplateDefaultPermissions(templateId: $templateId, permissions: $permissions) {
+              id
+              publicLink {
+                isActive
+                owner {
+                  id
+                }
+              }
+              defaultPermissions {
+                ... on TemplateDefaultUserPermission {
+                  user {
+                    id
+                  }
+                }
+                permissionType
+              }
+            }
+          }
+        `,
+        variables: {
+          templateId: toGlobalId("Petition", templates[0].id),
+          permissions: [
+            {
+              isSubscribed: true,
+              permissionType: "WRITE",
+              userId: toGlobalId("User", users[0].id),
+            },
+          ],
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateTemplateDefaultPermissions).toEqual({
+        id: toGlobalId("Petition", templates[0].id),
+        publicLink: {
+          isActive: false,
+          owner: null,
+        },
+        defaultPermissions: [
+          {
+            permissionType: "WRITE",
+            user: {
+              id: toGlobalId("User", users[0].id),
+            },
           },
         ],
       });
