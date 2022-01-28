@@ -90,8 +90,8 @@ export function AskContactDetailsDialog({
             <Input {...firstNameRegisterProps} />
             <FormErrorMessage>
               <FormattedMessage
-                id="generic.forms.invalid-contact-first-name-error"
-                defaultMessage="Please, enter the contact first name"
+                id="generic.forms.invalid-first-name-error"
+                defaultMessage="Please, enter the first name"
               />
             </FormErrorMessage>
           </FormControl>
