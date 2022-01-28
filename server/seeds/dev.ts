@@ -127,6 +127,7 @@ export async function seed(knex: Knex): Promise<any> {
     },
     {
       org_id: orgIds[0],
+      first_name: "Alex",
       email: "alex@onparallel.com",
       created_by: `User:${userIds[2]}`,
       updated_by: `User:${userIds[2]}`,
@@ -140,6 +141,7 @@ export async function seed(knex: Knex): Promise<any> {
     },
     {
       org_id: orgIds[0],
+      first_name: "Derek",
       last_name: "Lou",
       email: "dereklou00@gmail.com",
       created_by: `User:${userIds[2]}`,
@@ -147,6 +149,7 @@ export async function seed(knex: Knex): Promise<any> {
     },
     {
       org_id: orgIds[0],
+      first_name: "Santi",
       email: "santialbo@gmail.com",
       created_by: `User:${userIds[2]}`,
       updated_by: `User:${userIds[2]}`,
