@@ -37,19 +37,11 @@ export function GreetingContact({
 }) {
   return (
     <MjmlText>
-      {tone === "INFORMAL" ? (
-        <FormattedMessage
-          id="greeting-contact.informal"
-          defaultMessage="Hello {name},"
-          values={{ name }}
-        />
-      ) : (
-        <FormattedMessage
-          id="greeting-contact.formal"
-          defaultMessage="Dear {fullName},"
-          values={{ fullName }}
-        />
-      )}
+      <FormattedMessage
+        id="greeting-contact"
+        defaultMessage="{tone, select, INFORMAL{Hello {name},} other{Dear {fullName},}}"
+        values={{ name, fullName, tone }}
+      />
     </MjmlText>
   );
 }

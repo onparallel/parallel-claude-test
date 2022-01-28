@@ -210,14 +210,9 @@
     "context": "Untitled petition"
   },
   {
-    "term": "greeting-contact.formal",
-    "definition": "Dear {fullName},",
-    "context": "Dear {fullName},"
-  },
-  {
-    "term": "greeting-contact.informal",
-    "definition": "Hello {name},",
-    "context": "Hello {name},"
+    "term": "greeting-contact",
+    "definition": "{tone, select, INFORMAL{Hello {name},} other{Dear {fullName},}}",
+    "context": "{tone, select, INFORMAL{Hello {name},} other{Dear {fullName},}}"
   },
   {
     "term": "greeting-user",

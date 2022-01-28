@@ -31,21 +31,13 @@ export function greetingContact(
   { name, fullName, tone }: { name: string; fullName: string; tone: Tone },
   intl: IntlShape
 ) {
-  return tone === "INFORMAL"
-    ? intl.formatMessage(
-        {
-          id: "greeting-contact.informal",
-          defaultMessage: "Hello {name},",
-        },
-        { name }
-      )
-    : intl.formatMessage(
-        {
-          id: "greeting-contact.formal",
-          defaultMessage: "Dear {fullName},",
-        },
-        { fullName }
-      );
+  return intl.formatMessage(
+    {
+      id: "greeting-contact",
+      defaultMessage: "{tone, select, INFORMAL{Hello {name},} other{Dear {fullName},}}",
+    },
+    { name, fullName, tone }
+  );
 }
 
 export function petitionFieldList(
