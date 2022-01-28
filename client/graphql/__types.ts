@@ -2705,7 +2705,6 @@ export interface PublicPublicPetitionLink {
   isActive: Scalars["Boolean"];
   /** If the organization has enough credits to send a petition with this public link or not */
   isAvailable: Scalars["Boolean"];
-  organization: PublicOrganization;
   owner: PublicUser;
   slug: Scalars["String"];
   title: Scalars["String"];
@@ -6655,6 +6654,14 @@ export type ConfirmPetitionSignersDialog_PetitionSignerFragment = {
   lastName?: string | null;
 };
 
+export type PetitionPermissionRow_UserFragment = {
+  __typename?: "User";
+  fullName?: string | null;
+  email: string;
+  avatarUrl?: string | null;
+  initials?: string | null;
+};
+
 export type PetitionSharingModal_Petition_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
@@ -7281,6 +7288,19 @@ export type SignatureConfigDialog_UserFragment = {
   email: string;
 };
 
+export type TemplateDefaultPermissionsDialog_PublicPetitionLinkFragment = {
+  __typename?: "PublicPetitionLink";
+  isActive: boolean;
+  owner: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    email: string;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  };
+};
+
 export type TemplateDefaultPermissionsDialog_TemplateDefaultPermission_TemplateDefaultUserGroupPermission_Fragment =
   {
     __typename?: "TemplateDefaultUserGroupPermission";
@@ -7684,7 +7704,14 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
     title: string;
     description: string;
     slug: string;
-    owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+    owner: {
+      __typename?: "User";
+      id: string;
+      fullName?: string | null;
+      email: string;
+      avatarUrl?: string | null;
+      initials?: string | null;
+    };
   } | null;
   defaultPermissions: Array<
     | {
@@ -13434,7 +13461,14 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     title: string;
     description: string;
     slug: string;
-    owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+    owner: {
+      __typename?: "User";
+      id: string;
+      fullName?: string | null;
+      email: string;
+      avatarUrl?: string | null;
+      initials?: string | null;
+    };
   } | null;
   defaultPermissions: Array<
     | {
@@ -13675,7 +13709,14 @@ export type PetitionCompose_updatePetitionMutation = {
           title: string;
           description: string;
           slug: string;
-          owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+          owner: {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null;
+            email: string;
+            avatarUrl?: string | null;
+            initials?: string | null;
+          };
         } | null;
         defaultPermissions: Array<
           | {
@@ -14256,7 +14297,14 @@ export type PetitionCompose_petitionQuery = {
           title: string;
           description: string;
           slug: string;
-          owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+          owner: {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null;
+            email: string;
+            avatarUrl?: string | null;
+            initials?: string | null;
+          };
         } | null;
         defaultPermissions: Array<
           | {
@@ -17235,8 +17283,12 @@ export type PublicPetitionLink_PublicPublicPetitionLinkFragment = {
   title: string;
   isAvailable: boolean;
   description: string;
-  owner: { __typename?: "PublicUser"; fullName: string; email: string };
-  organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
+  owner: {
+    __typename?: "PublicUser";
+    fullName: string;
+    email: string;
+    organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
+  };
 };
 
 export type PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutationVariables = Exact<{
@@ -17268,8 +17320,12 @@ export type PublicPetitionLink_publicPetitionLinkBySlugQuery = {
     title: string;
     isAvailable: boolean;
     description: string;
-    owner: { __typename?: "PublicUser"; fullName: string; email: string };
-    organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
+    owner: {
+      __typename?: "PublicUser";
+      fullName: string;
+      email: string;
+      organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
+    };
   } | null;
 };
 
@@ -20275,6 +20331,24 @@ export const PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc = gql`
   }
   ${UserSelect_UserFragmentDoc}
 ` as unknown as DocumentNode<PublicLinkSettingsDialog_PublicPetitionLinkFragment, unknown>;
+export const PetitionPermissionRow_UserFragmentDoc = gql`
+  fragment PetitionPermissionRow_User on User {
+    fullName
+    email
+    ...UserAvatar_User
+  }
+  ${UserAvatar_UserFragmentDoc}
+` as unknown as DocumentNode<PetitionPermissionRow_UserFragment, unknown>;
+export const TemplateDefaultPermissionsDialog_PublicPetitionLinkFragmentDoc = gql`
+  fragment TemplateDefaultPermissionsDialog_PublicPetitionLink on PublicPetitionLink {
+    isActive
+    owner {
+      id
+      ...PetitionPermissionRow_User
+    }
+  }
+  ${PetitionPermissionRow_UserFragmentDoc}
+` as unknown as DocumentNode<TemplateDefaultPermissionsDialog_PublicPetitionLinkFragment, unknown>;
 export const UserSelect_UserGroupFragmentDoc = gql`
   fragment UserSelect_UserGroup on UserGroup {
     id
@@ -20339,6 +20413,7 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
         url
         isActive
         ...PublicLinkSettingsDialog_PublicPetitionLink
+        ...TemplateDefaultPermissionsDialog_PublicPetitionLink
       }
       defaultPermissions {
         ...TemplateDefaultPermissionsDialog_TemplateDefaultPermission
@@ -20348,6 +20423,7 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
   ${SignatureConfigDialog_PetitionBaseFragmentDoc}
   ${PublicLinkSettingsDialog_PetitionTemplateFragmentDoc}
   ${PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc}
+  ${TemplateDefaultPermissionsDialog_PublicPetitionLinkFragmentDoc}
   ${TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragmentDoc}
 ` as unknown as DocumentNode<PetitionSettings_PetitionBaseFragment, unknown>;
 export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
@@ -21549,10 +21625,10 @@ export const PublicPetitionLink_PublicPublicPetitionLinkFragmentDoc = gql`
     owner {
       fullName
       email
-    }
-    organization {
-      name
-      logoUrl
+      organization {
+        name
+        logoUrl
+      }
     }
   }
 ` as unknown as DocumentNode<PublicPetitionLink_PublicPublicPetitionLinkFragment, unknown>;

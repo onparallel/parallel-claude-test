@@ -73,7 +73,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const {
     data: { me },
   } = useAssertQuery(PetitionCompose_userDocument);
-  const { data } = useAssertQuery(PetitionCompose_petitionDocument, {
+  const { data, refetch } = useAssertQuery(PetitionCompose_petitionDocument, {
     variables: { id: petitionId },
   });
   const petition = data.petition!;
@@ -464,6 +464,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                           petition={petition}
                           onUpdatePetition={handleUpdatePetition}
                           validPetitionFields={validPetitionFields}
+                          onRefetch={() => refetch({ id: petitionId })}
                         />
                       </TabPanel>
                     </TabPanels>

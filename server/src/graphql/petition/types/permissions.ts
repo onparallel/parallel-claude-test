@@ -110,7 +110,6 @@ export const TemplateDefaultPermission = interfaceType({
     );
   },
   definition(t) {
-    t.globalId("id");
     t.implements("Timestamps");
     t.field("permissionType", {
       type: "PetitionPermissionType",

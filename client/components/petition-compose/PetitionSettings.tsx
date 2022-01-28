@@ -79,11 +79,13 @@ export interface PetitionSettingsProps {
   petition: PetitionSettings_PetitionBaseFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
   validPetitionFields: () => Promise<boolean>;
+  onRefetch: () => Promise<any>;
 }
 
 function _PetitionSettings({
   user,
   petition,
+  onRefetch,
   onUpdatePetition,
   validPetitionFields,
 }: PetitionSettingsProps) {
@@ -259,6 +261,7 @@ function _PetitionSettings({
     assertTypename(petition, "PetitionTemplate");
     if (enable) {
       try {
+        await onRefetch(); // refetch to bring possible owner changes through the public link settings
         const { permissions } = await showTemplateDefaultPermissionsDialog({
           permissions: petition.defaultPermissions,
           publicLink: petition.publicLink,

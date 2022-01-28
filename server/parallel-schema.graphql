@@ -4336,7 +4336,6 @@ interface TemplateDefaultPermission implements Timestamps {
   Time when the resource was created.
   """
   createdAt: DateTime!
-  id: GID!
 
   """
   wether user is will be subscribed or not to emails and alerts of the generated petition
@@ -4367,7 +4366,6 @@ type TemplateDefaultUserGroupPermission implements TemplateDefaultPermission & T
   The group linked to the permission
   """
   group: UserGroup!
-  id: GID!
 
   """
   wether user is will be subscribed or not to emails and alerts of the generated petition
@@ -4393,7 +4391,6 @@ type TemplateDefaultUserPermission implements TemplateDefaultPermission & Timest
   Time when the resource was created.
   """
   createdAt: DateTime!
-  id: GID!
 
   """
   wether user is will be subscribed or not to emails and alerts of the generated petition

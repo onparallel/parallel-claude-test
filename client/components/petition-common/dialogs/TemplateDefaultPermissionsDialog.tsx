@@ -18,6 +18,7 @@ import {
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { PetitionPermissionRow } from "./PetitionPermissionRow";
 
 interface TemplateDefaultPermissionsDialogData {
   permissions: UserOrUserGroupPermissionInput[];
@@ -67,6 +68,8 @@ export function TemplateDefaultPermissionsDialog({
     },
     [_handleSearchUsers]
   );
+
+  const publicLinkOwner = publicLink?.isActive ? publicLink.owner : undefined;
 
   return (
     <ConfirmDialog
@@ -146,6 +149,11 @@ export function TemplateDefaultPermissionsDialog({
               </Checkbox>
             </FormControl>
           </Collapse>
+          <Stack>
+            <PetitionPermissionRow
+              {...(publicLinkOwner && { user: publicLinkOwner, permissionType: "OWNER" })}
+            />
+          </Stack>
         </Stack>
       }
       confirm={
@@ -164,8 +172,10 @@ TemplateDefaultPermissionsDialog.fragments = {
       isActive
       owner {
         id
+        ...PetitionPermissionRow_User
       }
     }
+    ${PetitionPermissionRow.fragments.User}
   `,
   TemplateDefaultPermission: gql`
     fragment TemplateDefaultPermissionsDialog_TemplateDefaultPermission on TemplateDefaultPermission {

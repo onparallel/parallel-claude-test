@@ -3989,6 +3989,25 @@ export class PetitionRepository extends BaseRepository {
     updatedBy: string,
     t?: Knex.Transaction
   ) {
+    const templatePermissions = await this.from("template_default_permission", t)
+      .whereNull("deleted_at")
+      .where("template_id", templateId)
+      .select("*");
+
+    // if the new owner of the public link already has read/write permissions on the template,
+    // we need to delete this first before doing the upsert below so the query doesn't throw a constraint error
+    const newOwnerCurrentRWPermissions = templatePermissions.filter(
+      (p) => p.user_id === newOwnerId && ["READ", "WRITE"].includes(p.type)
+    );
+    if (newOwnerCurrentRWPermissions.length > 0) {
+      await this.from("template_default_permission", t)
+        .whereIn(
+          "id",
+          newOwnerCurrentRWPermissions.map((p) => p.id)
+        )
+        .update({ deleted_at: this.now(), deleted_by: updatedBy });
+    }
+
     await this.raw(
       /* sql */ `
           ?

@@ -119,6 +119,11 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
             },
           },
         },
+        PetitionTemplate: {
+          fields: {
+            defaultPermissions: { merge: false },
+          },
+        },
         Petition: {
           fields: {
             permissions: {
