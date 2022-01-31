@@ -13,7 +13,6 @@ import {
   Flex,
   Grid,
   Heading,
-  HStack,
   IconButton,
   Stack,
   Text,
@@ -36,7 +35,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../common/BreakLines";
 import { FileAttachmentButton } from "../common/FileAttachmentButton";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
-import { Spacer } from "../common/Spacer";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
 import { PetitionRepliesFieldAction, PetitionRepliesFieldReply } from "./PetitionRepliesFieldReply";
 
