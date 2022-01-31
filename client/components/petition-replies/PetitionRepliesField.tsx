@@ -9,7 +9,9 @@ import {
   BoxProps,
   Button,
   ButtonProps,
+  Center,
   Flex,
+  Grid,
   Heading,
   HStack,
   IconButton,
@@ -81,72 +83,55 @@ export const PetitionRepliesField = Object.assign(
       });
     };
 
-    const InternalFieldBadgeComp = field.isInternal ? (
-      <InternalFieldBadge marginRight={2.5} marginBottom={0.5} />
-    ) : null;
-
     return field.type === "HEADING" ? (
-      <Stack
+      <Grid
         ref={ref as any}
-        spacing={1}
         paddingLeft={{ base: 4, md: 6 }}
         paddingRight={4}
         paddingY={2}
         as="section"
+        templateColumns="32px 10px 1fr 8px auto"
+        gridTemplateAreas={`"index . heading . comments" ". . desc desc desc"`}
         {...props}
       >
-        <Flex alignItems="center">
-          <PetitionFieldTypeIndicator
-            marginLeft="1px"
-            type={field.type}
-            fieldIndex={fieldIndex}
-            hideIcon={true}
-          />
-          <HStack flex="1" minWidth="0" alignItems="center">
-            {field.isInternal ? <InternalFieldBadge marginLeft={2} /> : null}
-            {field.title ? (
-              <Heading marginLeft={4} size="md" fontWeight={600} isTruncated>
-                {field.title}
-              </Heading>
-            ) : (
-              <Heading
-                marginLeft={4}
-                size="md"
-                color="gray.500"
-                fontWeight="normal"
-                fontStyle="italic"
-                isTruncated
-              >
-                <FormattedMessage id="generic.empty-heading" defaultMessage="Untitled heading" />
-              </Heading>
+        <Center gridArea="index">
+          <PetitionFieldTypeIndicator type={field.type} fieldIndex={fieldIndex} hideIcon />
+        </Center>
+        <Flex gridArea="heading" alignItems="center" minWidth={0}>
+          <Heading size="md" flex="1" isTruncated {...(field.title ? {} : { textStyle: "hint" })}>
+            {field.isInternal ? (
+              <InternalFieldBadge marginRight={1.5} position="relative" top="-2px" />
+            ) : null}
+            {field.title || (
+              <FormattedMessage id="generic.empty-heading" defaultMessage="Untitled heading" />
             )}
-          </HStack>
-          {/* This Flex element makes the reviewed buttons to be aligned */}
-          <Flex width="66px">
-            <Spacer />
-            <CommentsButton
-              data-action="see-field-comments"
-              isActive={isShowingComments}
-              commentCount={field.comments.length}
-              hasUnreadComments={field.comments.some((c) => c.isUnread)}
-              onClick={onToggleComments}
-            />
-          </Flex>
+          </Heading>
         </Flex>
-        {field.description ? (
-          <Text color="gray.600" fontSize="sm" overflowWrap="anywhere">
-            <BreakLines>{field.description}</BreakLines>
-          </Text>
-        ) : null}
-        {field.attachments.length ? (
-          <Box paddingY={1}>
-            <PetitionRepliesFieldAttachments
-              attachments={field.attachments}
-              onAttachmentClick={handleAttachmentClick}
-            />
-          </Box>
-        ) : null}
-      </Stack>
+        <Box gridArea="comments">
+          <CommentsButton
+            data-action="see-field-comments"
+            isActive={isShowingComments}
+            commentCount={field.comments.length}
+            hasUnreadComments={field.comments.some((c) => c.isUnread)}
+            onClick={onToggleComments}
+          />
+        </Box>
+        <Box gridArea="desc">
+          {field.description ? (
+            <Text color="gray.600" fontSize="sm" overflowWrap="anywhere" marginTop={1.5}>
+              <BreakLines>{field.description}</BreakLines>
+            </Text>
+          ) : null}
+          {field.attachments.length ? (
+            <Box paddingY={1}>
+              <PetitionRepliesFieldAttachments
+                attachments={field.attachments}
+                onAttachmentClick={handleAttachmentClick}
+              />
+            </Box>
+          ) : null}
+        </Box>
+      </Grid>
     ) : (
       <Card
         ref={ref}
@@ -160,13 +145,11 @@ export const PetitionRepliesField = Object.assign(
         paddingRight={4}
         {...props}
       >
-        <Flex flexWrap="wrap" justifyContent="space-between">
-          <Flex
-            width={{ base: "100%", lg: "auto" }}
-            flex="1"
-            position="relative"
-            paddingLeft={{ base: 2, md: 0 }}
-          >
+        <Grid
+          templateColumns="32px 10px 1fr 8px auto"
+          gridTemplateAreas={`"index . heading . comments" ". . desc desc desc"`}
+        >
+          <Box position="relative" gridArea="index">
             {!field.optional ? (
               <Tooltip
                 placement="bottom"
@@ -198,59 +181,52 @@ export const PetitionRepliesField = Object.assign(
               marginTop="2px"
               type={field.type}
               fieldIndex={fieldIndex}
-              hideIcon={true}
-            />
-            <Box marginLeft={2} flex="1">
-              {field.title ? (
-                <Text as="h4" overflowWrap="anywhere" fontWeight={600}>
-                  {InternalFieldBadgeComp}
-                  {field.title}
-                </Text>
-              ) : (
-                <Text as="h4" textStyle="hint" whiteSpace="nowrap">
-                  {InternalFieldBadgeComp}
-                  <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
-                </Text>
-              )}
-            </Box>
-          </Flex>
-          <Flex width={{ base: "100%", lg: "auto" }}>
-            <Spacer />
-
-            {/* This Flex element makes the reviewed buttons to be aligned */}
-            <Flex width="66px">
-              <Spacer />
-              <CommentsButton
-                data-action="see-field-comments"
-                isActive={isShowingComments}
-                commentCount={field.comments.length}
-                hasUnreadComments={field.comments.some((c) => c.isUnread)}
-                onClick={onToggleComments}
-              />
-            </Flex>
-          </Flex>
-        </Flex>
-        <Box marginBottom={2}>
-          {field.description ? (
-            <Text color="gray.600" fontSize="sm" overflowWrap="anywhere">
-              <BreakLines>{field.description}</BreakLines>
-            </Text>
-          ) : (
-            <Text fontSize="sm" textStyle="hint">
-              <FormattedMessage id="generic.no-description" defaultMessage="No description" />
-            </Text>
-          )}
-        </Box>
-        {field.attachments.length ? (
-          <Box marginBottom={2} paddingY={1}>
-            <PetitionRepliesFieldAttachments
-              attachments={field.attachments}
-              onAttachmentClick={handleAttachmentClick}
+              hideIcon
             />
           </Box>
-        ) : null}
+          <Flex gridArea="heading" alignItems="center">
+            <Heading
+              fontSize="md"
+              as="h4"
+              {...(field.title
+                ? { overflowWrap: "anywhere", fontWeight: 600 }
+                : { textStyle: "hint", whiteSpace: "nowrap" })}
+            >
+              {field.isInternal ? (
+                <InternalFieldBadge marginRight={1.5} position="relative" top="-2px" />
+              ) : null}
+              {field.title || (
+                <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
+              )}
+            </Heading>
+          </Flex>
+          <Box gridArea="comments">
+            <CommentsButton
+              data-action="see-field-comments"
+              isActive={isShowingComments}
+              commentCount={field.comments.length}
+              hasUnreadComments={field.comments.some((c) => c.isUnread)}
+              onClick={onToggleComments}
+            />
+          </Box>
+          <Box gridArea="desc">
+            {field.description ? (
+              <Text marginTop={1} color="gray.600" fontSize="sm" overflowWrap="anywhere">
+                <BreakLines>{field.description}</BreakLines>
+              </Text>
+            ) : null}
+            {field.attachments.length ? (
+              <Box marginTop={2} paddingY={1}>
+                <PetitionRepliesFieldAttachments
+                  attachments={field.attachments}
+                  onAttachmentClick={handleAttachmentClick}
+                />
+              </Box>
+            ) : null}
+          </Box>
+        </Grid>
         {field.replies.length ? (
-          <>
+          <Box marginTop={3}>
             {field.type === "DYNAMIC_SELECT" ? (
               <Stack
                 as="ol"
@@ -278,7 +254,7 @@ export const PetitionRepliesField = Object.assign(
                 />
               ))}
             </Stack>
-          </>
+          </Box>
         ) : isVisible ? (
           <Box paddingY={4}>
             <Text textStyle="hint" textAlign="center">

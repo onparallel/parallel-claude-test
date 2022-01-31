@@ -263,7 +263,7 @@ function RecipientViewContentsIndicators({
           values={{ commentCount: commentCount }}
         />
       </VisuallyHidden>
-      <Text as="span" fontSize="sm" aria-hidden>
+      <Text as="span" fontSize="sm" aria-hidden height="12px" lineHeight="12px">
         {intl.formatNumber(commentCount)}
       </Text>
       <CommentIcon marginLeft={1} role="presentation" fontSize="sm" />
