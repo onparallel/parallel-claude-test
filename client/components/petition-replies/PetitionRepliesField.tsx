@@ -93,7 +93,12 @@ export const PetitionRepliesField = Object.assign(
         {...props}
       >
         <Center gridArea="index">
-          <PetitionFieldTypeIndicator type={field.type} fieldIndex={fieldIndex} hideIcon />
+          <PetitionFieldTypeIndicator
+            as="span"
+            type={field.type}
+            fieldIndex={fieldIndex}
+            hideIcon
+          />
         </Center>
         <Flex gridArea="heading" alignItems="center" minWidth={0}>
           <Heading size="md" flex="1" isTruncated {...(field.title ? {} : { textStyle: "hint" })}>
@@ -176,6 +181,7 @@ export const PetitionRepliesField = Object.assign(
               </Tooltip>
             ) : null}
             <PetitionFieldTypeIndicator
+              as="span"
               marginTop="2px"
               type={field.type}
               fieldIndex={fieldIndex}

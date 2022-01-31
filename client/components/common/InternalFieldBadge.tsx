@@ -27,7 +27,14 @@ export const InternalFieldBadge = chakraForwardRef<"span", InternalFieldBadgePro
         placement={placement}
         width={popoverWidth}
       >
-        <Badge ref={ref} fontStyle="normal" variant="outline" colorScheme="blue" {...props}>
+        <Badge
+          ref={ref}
+          fontStyle="normal"
+          variant="outline"
+          colorScheme="blue"
+          cursor="default"
+          {...props}
+        >
           <FormattedMessage id="component.internal-field-badge.text" defaultMessage="Int" />
         </Badge>
       </SmallPopover>
