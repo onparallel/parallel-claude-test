@@ -2199,7 +2199,7 @@ export class PetitionRepository extends BaseRepository {
             })[]
           >(
             "petition_id",
-            "petition_access_id",
+            "user_id",
             this.knex.raw("(data ->> 'petition_field_id')::int as petition_field_id"),
             this.count("unread_count")
           );
