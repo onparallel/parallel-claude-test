@@ -41,7 +41,7 @@ export function PetitionSignatureStatusIcon({
           color={environment === "DEMO" ? "yellow.700" : "gray.700"}
           opacity={status === "COMPLETED" ? 1 : 0.4}
         />
-        {status === "PROCESSING" ? (
+        {status && ["ENQUEUED", "PROCESSING", "PROCESSED"].includes(status) ? (
           <TimeIcon color="yellow.600" fontSize="13px" position="absolute" top={-2} right={0} />
         ) : status === "CANCELLED" ? (
           <AlertCircleIcon color="red.500" fontSize="14px" position="absolute" top={-2} right={0} />

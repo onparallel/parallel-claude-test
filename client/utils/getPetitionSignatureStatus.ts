@@ -1,12 +1,7 @@
 import { gql } from "@apollo/client";
-import {
-  getPetitionSignatureStatus_PetitionFragment,
-  PetitionSignatureRequestStatus,
-} from "@parallel/graphql/__types";
+import { getPetitionSignatureStatus_PetitionFragment } from "@parallel/graphql/__types";
 
-export function getPetitionSignatureStatus(
-  petition: getPetitionSignatureStatus_PetitionFragment
-): PetitionSignatureRequestStatus | "START" | null {
+export function getPetitionSignatureStatus(petition: getPetitionSignatureStatus_PetitionFragment) {
   return petition.signatureConfig?.review &&
     ["COMPLETED", "CLOSED"].includes(petition.status) &&
     (!petition.currentSignatureRequest ||

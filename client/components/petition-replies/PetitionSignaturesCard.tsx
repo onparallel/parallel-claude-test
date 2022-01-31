@@ -18,6 +18,7 @@ import { getPetitionSignatureEnvironment } from "@parallel/utils/getPetitionSign
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapArray } from "@parallel/utils/types";
+import { usePetitionSignaturesCardPolling } from "@parallel/utils/usePetitionSignaturesCardPolling";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Card, GenericCardHeader } from "../common/Card";
@@ -134,6 +135,8 @@ export const PetitionSignaturesCard = Object.assign(
     { petition, user, onRefetchPetition, ...props },
     ref
   ) {
+    usePetitionSignaturesCardPolling(petition);
+
     let current: Maybe<UnwrapArray<PetitionSignaturesCard_PetitionFragment["signatureRequests"]>> =
       petition.signatureRequests![0];
     const older = petition.signatureRequests!.slice(1);

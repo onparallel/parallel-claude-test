@@ -17,6 +17,10 @@ export function usePetitionSignatureStatusLabels() {
         id: "petition-signature-status-label.e-signature-processing",
         defaultMessage: "eSignature pending",
       }),
+      PROCESSED: intl.formatMessage({
+        id: "petition-signature-status-label.e-signature-processing",
+        defaultMessage: "eSignature pending",
+      }),
       CANCELLED: intl.formatMessage({
         id: "petition-signature-status-label.e-signature-cancelled",
         defaultMessage: "eSignature cancelled",

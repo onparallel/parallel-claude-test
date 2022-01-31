@@ -1890,9 +1890,9 @@
     "context": "Not started"
   },
   {
-    "term": "component.petition-sigatures-card.sending",
-    "definition": "Enviando",
-    "context": "Sending"
+    "term": "component.petition-sigatures-card.starting",
+    "definition": "Iniciando",
+    "context": "Starting"
   },
   {
     "term": "component.petition-signature-request.signer-status.dates.declined-at",

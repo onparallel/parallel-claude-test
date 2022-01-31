@@ -2201,7 +2201,12 @@ export interface PetitionSignatureRequestSignerStatus {
   status: Scalars["String"];
 }
 
-export type PetitionSignatureRequestStatus = "CANCELLED" | "COMPLETED" | "ENQUEUED" | "PROCESSING";
+export type PetitionSignatureRequestStatus =
+  | "CANCELLED"
+  | "COMPLETED"
+  | "ENQUEUED"
+  | "PROCESSED"
+  | "PROCESSING";
 
 /** Information about a signer of the petition */
 export interface PetitionSigner {
@@ -17538,6 +17543,67 @@ export type useGetPageFields_PetitionFieldFragment = {
   }>;
 };
 
+export type PetitionSignaturesCardPolling_petitionQueryVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type PetitionSignaturesCardPolling_petitionQuery = {
+  petition?:
+    | {
+        __typename?: "Petition";
+        id: string;
+        status: PetitionStatus;
+        name?: string | null;
+        signatureRequests?: Array<{
+          __typename?: "PetitionSignatureRequest";
+          id: string;
+          status: PetitionSignatureRequestStatus;
+          signerStatus: Array<{
+            __typename?: "PetitionSignatureRequestSignerStatus";
+            status: string;
+            sentAt?: string | null;
+            openedAt?: string | null;
+            signedAt?: string | null;
+            declinedAt?: string | null;
+            signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
+          }>;
+          signatureConfig: {
+            __typename?: "SignatureConfig";
+            signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+          };
+        }> | null;
+        signatureConfig?: {
+          __typename?: "SignatureConfig";
+          title: string;
+          review: boolean;
+          letRecipientsChooseSigners: boolean;
+          timezone: string;
+          integration?: {
+            __typename?: "SignatureOrgIntegration";
+            id: string;
+            name: string;
+            provider: SignatureOrgIntegrationProvider;
+            environment: SignatureOrgIntegrationEnvironment;
+            isDefault: boolean;
+          } | null;
+          signers: Array<{
+            __typename?: "PetitionSigner";
+            contactId?: string | null;
+            firstName: string;
+            lastName?: string | null;
+            email: string;
+            fullName: string;
+          }>;
+        } | null;
+        currentSignatureRequest?: {
+          __typename?: "PetitionSignatureRequest";
+          environment: SignatureOrgIntegrationEnvironment;
+        } | null;
+      }
+    | { __typename?: "PetitionTemplate" }
+    | null;
+};
+
 export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   sentAt?: string | null;
@@ -24131,6 +24197,17 @@ export const useExportRepliesTask_getTaskResultFileUrlDocument = gql`
 ` as unknown as DocumentNode<
   useExportRepliesTask_getTaskResultFileUrlMutation,
   useExportRepliesTask_getTaskResultFileUrlMutationVariables
+>;
+export const PetitionSignaturesCardPolling_petitionDocument = gql`
+  query PetitionSignaturesCardPolling_petition($petitionId: GID!) {
+    petition(id: $petitionId) {
+      ...PetitionSignaturesCard_Petition
+    }
+  }
+  ${PetitionSignaturesCard_PetitionFragmentDoc}
+` as unknown as DocumentNode<
+  PetitionSignaturesCardPolling_petitionQuery,
+  PetitionSignaturesCardPolling_petitionQueryVariables
 >;
 export const usePrintPdfTask_createPrintPdfTaskDocument = gql`
   mutation usePrintPdfTask_createPrintPdfTask($petitionId: GID!) {

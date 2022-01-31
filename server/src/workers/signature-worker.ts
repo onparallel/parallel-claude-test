@@ -145,24 +145,30 @@ async function cancelSignatureProcess(
   payload: { petitionSignatureRequestId: number },
   ctx: WorkerContext
 ) {
-  const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
-  if (!signature.external_id) {
-    throw new Error(
-      `Can't find external_id on petition signature request ${payload.petitionSignatureRequestId}`
+  try {
+    const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
+    if (!signature.external_id) {
+      throw new Error(
+        `Can't find external_id on petition signature request ${payload.petitionSignatureRequestId}`
+      );
+    }
+
+    const { orgIntegrationId } = signature.signature_config;
+
+    // here we need to lookup all signature integrations, also disabled and deleted ones
+    // this is because the user could have deleted their signature integration, triggering a cancel of all pending signature requests
+    const signatureIntegration = await ctx.integrations.loadAnySignatureIntegration(
+      orgIntegrationId
     );
-  }
 
-  const { orgIntegrationId } = signature.signature_config;
-
-  // here we need to lookup all signature integrations, also disabled and deleted ones
-  // this is because the user could have deleted their signature integration, triggering a cancel of all pending signature requests
-  const signatureIntegration = await ctx.integrations.loadAnySignatureIntegration(orgIntegrationId);
-
-  if (!signatureIntegration) {
-    throw new Error(`Couldn't find a signature integration for OrgIntegration:${orgIntegrationId}`);
-  }
-  const signatureClient = ctx.signature.getClient(signatureIntegration);
-  await signatureClient.cancelSignatureRequest(signature.external_id.replace(/^.*?\//, ""));
+    if (!signatureIntegration) {
+      throw new Error(
+        `Couldn't find a signature integration for OrgIntegration:${orgIntegrationId}`
+      );
+    }
+    const signatureClient = ctx.signature.getClient(signatureIntegration);
+    await signatureClient.cancelSignatureRequest(signature.external_id.replace(/^.*?\//, ""));
+  } catch {}
 }
 
 /** sends a reminder email to every pending signer of the signature request */

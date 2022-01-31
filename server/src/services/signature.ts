@@ -2,7 +2,7 @@ import { EventEmitter } from "events";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import "reflect-metadata";
-import { countBy, omit } from "remeda";
+import { countBy, isDefined, omit } from "remeda";
 import SignaturitSDK, { BrandingParams, BrandingResponse, Document } from "signaturit-sdk";
 import { URLSearchParams } from "url";
 import { Tone } from "../api/public/__types";
@@ -197,36 +197,34 @@ export class SignatureService implements ISignatureService {
     const enqueuedSignatureRequest = previousSignatureRequests.find(
       (r) => r.status === "ENQUEUED" || r.status === "PROCESSING"
     );
-    // ENQUEUED and PROCESSING signature requests cannot be cancelled because those still don't have an external_id
-    if (enqueuedSignatureRequest) {
-      throw new Error(
-        `Can't cancel ${enqueuedSignatureRequest.status} PetitionSignatureRequest:${enqueuedSignatureRequest.id}`
-      );
-    }
+
     const pendingSignatureRequest = previousSignatureRequests.find((r) => r.status === "PROCESSED");
 
     // cancel pending signature request before starting a new one
-    if (pendingSignatureRequest) {
+    if (enqueuedSignatureRequest || pendingSignatureRequest) {
       await Promise.all([
         this.petitionsRepository.cancelPetitionSignatureRequest(
-          pendingSignatureRequest,
+          [enqueuedSignatureRequest, pendingSignatureRequest].filter(isDefined),
           "REQUEST_RESTARTED",
           isAccess ? { petition_access_id: starter.id } : { user_id: starter.id },
           undefined,
           t
         ),
         this.petitionsRepository.loadPetitionSignaturesByPetitionId.dataloader.clear(petitionId),
-        this.aws.enqueueMessages(
-          "signature-worker",
-          {
-            groupId: `signature-${toGlobalId("Petition", pendingSignatureRequest.petition_id)}`,
-            body: {
-              type: "cancel-signature-process",
-              payload: { petitionSignatureRequestId: pendingSignatureRequest.id },
-            },
-          },
-          t
-        ),
+        pendingSignatureRequest
+          ? // only send a cancel request if the signature request has been already processed
+            this.aws.enqueueMessages(
+              "signature-worker",
+              {
+                groupId: `signature-${toGlobalId("Petition", pendingSignatureRequest.petition_id)}`,
+                body: {
+                  type: "cancel-signature-process",
+                  payload: { petitionSignatureRequestId: pendingSignatureRequest.id },
+                },
+              },
+              t
+            )
+          : null,
       ]);
     }
 

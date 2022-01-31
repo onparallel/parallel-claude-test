@@ -10,18 +10,19 @@ export function PetitionSignatureRequestStatusText({
 }) {
   switch (status) {
     case "ENQUEUED":
+    case "PROCESSING":
       return (
         <Stack direction="row" display="inline-flex" alignItems="center" color="gray.600">
           <PaperPlaneIcon />
           <Text>
             <FormattedMessage
-              id="component.petition-sigatures-card.sending"
-              defaultMessage="Sending"
+              id="component.petition-sigatures-card.starting"
+              defaultMessage="Starting"
             />
           </Text>
         </Stack>
       );
-    case "PROCESSING":
+    case "PROCESSED":
       return (
         <Stack direction="row" display="inline-flex" alignItems="center" color="yellow.600">
           <TimeIcon />

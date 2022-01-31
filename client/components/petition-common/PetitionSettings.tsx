@@ -98,9 +98,7 @@ function _PetitionSettings({
     signatureIntegrations[0].environment === "DEMO";
 
   const ongoingSignatureRequest =
-    petition.__typename === "Petition" &&
-    petition.currentSignatureRequest &&
-    petition.currentSignatureRequest.status === "PROCESSING"
+    petition.__typename === "Petition" && petition.currentSignatureRequest?.status === "PROCESSED"
       ? petition.currentSignatureRequest
       : null;
 

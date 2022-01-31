@@ -3639,7 +3639,7 @@ export class PetitionRepository extends BaseRepository {
         "id",
         signatures.map((s) => s.id)
       )
-      .where({ status: "PROCESSED" })
+      .whereNotIn("status", ["COMPLETED", "CANCELLED"])
       .update({
         ...extraData,
         status: "CANCELLED",

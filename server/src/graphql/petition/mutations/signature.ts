@@ -79,10 +79,6 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
       return signature;
     }
 
-    if (signature.status !== "PROCESSED") {
-      throw new Error(`Can't cancel a ${signature.status} signature process.`);
-    }
-
     const petition = await ctx.petitions.loadPetition(signature.petition_id);
     if (!petition) {
       throw new Error(
@@ -94,13 +90,15 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
       ctx.petitions.cancelPetitionSignatureRequest(signature, "CANCELLED_BY_USER", {
         user_id: ctx.user!.id,
       }),
-      ctx.aws.enqueueMessages("signature-worker", {
-        groupId: `signature-${toGlobalId("Petition", petition.id)}`,
-        body: {
-          type: "cancel-signature-process",
-          payload: { petitionSignatureRequestId: signature.id },
-        },
-      }),
+      signature.status === "PROCESSED"
+        ? ctx.aws.enqueueMessages("signature-worker", {
+            groupId: `signature-${toGlobalId("Petition", petition.id)}`,
+            body: {
+              type: "cancel-signature-process",
+              payload: { petitionSignatureRequestId: signature.id },
+            },
+          })
+        : null,
     ]);
 
     return signatureRequest;

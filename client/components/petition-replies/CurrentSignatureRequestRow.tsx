@@ -27,8 +27,7 @@ export function CurrentSignatureRequestRow({
   const intl = useIntl();
   const status = signatureRequest.status;
   const signerStatus = signatureRequest.signerStatus;
-  const isAwaitingSignature = ["ENQUEUED", "PROCESSING"].includes(status);
-  const isSigned = status === "COMPLETED";
+  const isAwaitingSignature = ["ENQUEUED", "PROCESSING", "PROCESSED"].includes(status);
 
   // when everyone signed (or declined) the document, there is a time window where the request is still in "processing" status
   // because the signed documents are being generated. In this window it makes no sense to cancel the request or send reminders,
@@ -87,7 +86,7 @@ export function CurrentSignatureRequestRow({
         </Box>
       </Box>
       <Box padding={2} paddingRight={4}>
-        {status === "PROCESSING" && someSignerIsPending ? (
+        {status === "PROCESSED" && someSignerIsPending ? (
           <>
             <IconButtonWithTooltip
               marginRight={2}
@@ -102,7 +101,7 @@ export function CurrentSignatureRequestRow({
               <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
             </Button>
           </>
-        ) : isSigned ? (
+        ) : status === "COMPLETED" ? (
           <Button width="24" colorScheme="purple" onClick={() => onDownload(signatureRequest.id)}>
             <FormattedMessage id="generic.download" defaultMessage="Download" />
           </Button>
