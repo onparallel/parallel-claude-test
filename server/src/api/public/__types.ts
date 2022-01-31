@@ -2133,7 +2133,12 @@ export type PetitionSignatureRequestSignerStatus = {
   status: Scalars["String"];
 };
 
-export type PetitionSignatureRequestStatus = "CANCELLED" | "COMPLETED" | "ENQUEUED" | "PROCESSING";
+export type PetitionSignatureRequestStatus =
+  | "CANCELLED"
+  | "COMPLETED"
+  | "ENQUEUED"
+  | "PROCESSED"
+  | "PROCESSING";
 
 /** Information about a signer of the petition */
 export type PetitionSigner = {

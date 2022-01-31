@@ -3618,7 +3618,7 @@ describe("GraphQL/Petitions", () => {
         },
       });
 
-      // update enqueued signature request to have status "PROCESSING" (skip ENQUEUED cancel check error)
+      // update enqueued signature request to have status "PROCESSED" (skip ENQUEUED, PROCESSING cancel check error)
       await mocks.knex
         .from<PetitionSignatureRequest>("petition_signature_request")
         .where(
@@ -3628,7 +3628,7 @@ describe("GraphQL/Petitions", () => {
             "PetitionSignatureRequest"
           ).id
         )
-        .update("status", "PROCESSING");
+        .update("status", "PROCESSED");
     });
 
     it("cancels the pending signature process when completing a second time", async () => {

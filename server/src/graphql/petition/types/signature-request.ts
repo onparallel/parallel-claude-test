@@ -2,7 +2,7 @@ import { enumType, objectType } from "nexus";
 
 export const PetitionSignatureRequestStatus = enumType({
   name: "PetitionSignatureRequestStatus",
-  members: ["ENQUEUED", "PROCESSING", "COMPLETED", "CANCELLED"],
+  members: ["ENQUEUED", "PROCESSING", "PROCESSED", "COMPLETED", "CANCELLED"],
 });
 
 export const PetitionSignatureCancelReason = enumType({

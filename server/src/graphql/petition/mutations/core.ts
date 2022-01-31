@@ -341,29 +341,16 @@ export const deletePetitions = mutationField("deletePetitions", {
       if (pendingSignatureRequests.length > 0) {
         await Promise.all([
           ctx.petitions.cancelPetitionSignatureRequest(
-            pendingSignatureRequests.map((s) => s.id),
+            pendingSignatureRequests,
             "CANCELLED_BY_USER",
             { user_id: ctx.user!.id },
-            t
-          ),
-          ctx.petitions.createEvent(
-            pendingSignatureRequests.map((s) => ({
-              type: "SIGNATURE_CANCELLED",
-              petition_id: s.petition_id,
-              data: {
-                petition_signature_request_id: s.id,
-                cancel_reason: "CANCELLED_BY_USER",
-                cancel_data: {
-                  user_id: ctx.user!.id,
-                },
-              },
-            })),
+            undefined,
             t
           ),
           ctx.aws.enqueueMessages(
             "signature-worker",
             pendingSignatureRequests
-              .filter((s) => s.status === "PROCESSING")
+              .filter((s) => s.status === "PROCESSED")
               .map((s) => ({
                 id: `signature-${toGlobalId("Petition", s.petition_id)}`,
                 groupId: `signature-${toGlobalId("Petition", s.petition_id)}`,
@@ -1809,9 +1796,7 @@ export const completePetition = mutationField("completePetition", {
             ctx.petitions.completePetition(
               args.petitionId,
               ctx.user!,
-              {
-                credits_used: 1,
-              },
+              { credits_used: requiredCredits },
               t
             ),
             ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
@@ -1821,11 +1806,14 @@ export const completePetition = mutationField("completePetition", {
               t
             ),
           ]);
-          await ctx.petitions.createEvent({
-            type: "PETITION_COMPLETED",
-            petition_id: petition.id,
-            data: { user_id: ctx.user!.id },
-          });
+          await ctx.petitions.createEvent(
+            {
+              type: "PETITION_COMPLETED",
+              petition_id: petition.id,
+              data: { user_id: ctx.user!.id },
+            },
+            t
+          );
           return petition;
         });
 

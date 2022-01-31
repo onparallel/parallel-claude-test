@@ -132,28 +132,13 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
       }
       if (pendingSignatures.length > 0) {
         await Promise.all([
-          ctx.petitions.cancelPetitionSignatureRequest(
-            pendingSignatures.map((s) => s.id),
-            "CANCELLED_BY_USER",
-            { user_id: ctx.user!.id }
-          ),
-          ctx.petitions.createEvent(
-            pendingSignatures.map((s) => ({
-              type: "SIGNATURE_CANCELLED",
-              petition_id: s.petition_id,
-              data: {
-                petition_signature_request_id: s.id,
-                cancel_reason: "CANCELLED_BY_USER",
-                cancel_data: {
-                  user_id: ctx.user!.id,
-                },
-              },
-            }))
-          ),
+          ctx.petitions.cancelPetitionSignatureRequest(pendingSignatures, "CANCELLED_BY_USER", {
+            user_id: ctx.user!.id,
+          }),
           ctx.aws.enqueueMessages(
             "signature-worker",
             pendingSignatures
-              .filter((s) => s.status === "PROCESSING")
+              .filter((s) => s.status === "PROCESSED")
               .map((s) => ({
                 id: `signature-${toGlobalId("Petition", s.petition_id)}`,
                 groupId: `signature-${toGlobalId("Petition", s.petition_id)}`,

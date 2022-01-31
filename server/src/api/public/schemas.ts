@@ -1786,7 +1786,7 @@ const _SignatureRequest = {
     },
     status: {
       type: "string",
-      enum: ["ENQUEUED", "PROCESSING", "CANCELLED", "COMPLETED"],
+      enum: ["ENQUEUED", "PROCESSING", "PROCESSED", "CANCELLED", "COMPLETED"],
       description: "Current status of the signature request",
       example: "COMPLETED",
     },

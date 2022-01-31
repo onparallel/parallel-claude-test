@@ -33,7 +33,9 @@ export class IntegrationRepository extends BaseRepository {
     q.whereNull("deleted_at").where("is_enabled", true)
   );
 
-  readonly loadAnyIntegration = this.buildLoadBy("org_integration", "id");
+  readonly loadAnySignatureIntegration = this.buildLoadBy("org_integration", "id", (q) =>
+    q.where({ type: "SIGNATURE" })
+  );
 
   async loadPaginatedIntegrations(
     orgId: number,

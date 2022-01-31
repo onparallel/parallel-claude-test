@@ -203,11 +203,17 @@ export const PetitionSignatureCancelReasonValues = [
   "REQUEST_RESTARTED",
 ] as PetitionSignatureCancelReason[];
 
-export type PetitionSignatureStatus = "ENQUEUED" | "PROCESSING" | "CANCELLED" | "COMPLETED";
+export type PetitionSignatureStatus =
+  | "ENQUEUED"
+  | "PROCESSING"
+  | "PROCESSED"
+  | "CANCELLED"
+  | "COMPLETED";
 
 export const PetitionSignatureStatusValues = [
   "ENQUEUED",
   "PROCESSING",
+  "PROCESSED",
   "CANCELLED",
   "COMPLETED",
 ] as PetitionSignatureStatus[];

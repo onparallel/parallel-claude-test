@@ -244,7 +244,12 @@ export interface NexusGenEnums {
   PetitionPermissionTypeRW: "READ" | "WRITE";
   PetitionReminderType: db.PetitionReminderType;
   PetitionSignatureCancelReason: db.PetitionSignatureCancelReason;
-  PetitionSignatureRequestStatus: "CANCELLED" | "COMPLETED" | "ENQUEUED" | "PROCESSING";
+  PetitionSignatureRequestStatus:
+    | "CANCELLED"
+    | "COMPLETED"
+    | "ENQUEUED"
+    | "PROCESSED"
+    | "PROCESSING";
   PetitionStatus: db.PetitionStatus;
   PetitionUserNotificationFilter: "ALL" | "COMMENTS" | "COMPLETED" | "OTHER" | "SHARED" | "UNREAD";
   PublicSignatureStatus: "COMPLETED" | "STARTED";

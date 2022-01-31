@@ -136,8 +136,8 @@ async function documentDeclined(ctx: ApiContext, data: SignaturItEventBody, peti
   );
 
   await Promise.all([
-    ctx.petitions.cancelPetitionSignatureRequestByExternalId(
-      `SIGNATURIT/${data.document.signature.id}`,
+    ctx.petitions.cancelPetitionSignatureRequest(
+      signature,
       "DECLINED_BY_SIGNER",
       {
         canceller,
@@ -153,15 +153,6 @@ async function documentDeclined(ctx: ApiContext, data: SignaturItEventBody, peti
         },
       }
     ),
-    ctx.petitions.createEvent({
-      type: "SIGNATURE_CANCELLED",
-      petition_id: petitionId,
-      data: {
-        petition_signature_request_id: signature.id,
-        cancel_reason: "DECLINED_BY_SIGNER",
-        cancel_data: { canceller, decline_reason: data.document.decline_reason },
-      },
-    }),
     appendEventLogs(ctx, data),
   ]);
 }
@@ -257,21 +248,8 @@ async function emailBounced(ctx: ApiContext, data: SignaturItEventBody, petition
   };
 
   await Promise.all([
-    ctx.petitions.cancelPetitionSignatureRequestByExternalId(
-      `SIGNATURIT/${data.document.signature.id}`,
-      "REQUEST_ERROR",
-      cancelData
-    ),
+    ctx.petitions.cancelPetitionSignatureRequest(signature, "REQUEST_ERROR", cancelData),
     updateSignatureStartedEvent(petitionId, { email_bounced_at: new Date(data.created_at) }, ctx),
-    ctx.petitions.createEvent({
-      type: "SIGNATURE_CANCELLED",
-      petition_id: petitionId,
-      data: {
-        petition_signature_request_id: signature.id,
-        cancel_reason: "REQUEST_ERROR",
-        cancel_data: cancelData,
-      },
-    }),
     appendEventLogs(ctx, data),
   ]);
 }

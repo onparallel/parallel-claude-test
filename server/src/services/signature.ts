@@ -194,39 +194,28 @@ export class SignatureService implements ISignatureService {
       throw new Error(`Signature request on Petition:${petitionId} was restarted too many times`);
     }
 
-    const enqueuedSignatureRequest = previousSignatureRequests.find((r) => r.status === "ENQUEUED");
-    // ENQUEUED signature requests cannot be cancelled because those still don't have an external_id
+    const enqueuedSignatureRequest = previousSignatureRequests.find(
+      (r) => r.status === "ENQUEUED" || r.status === "PROCESSING"
+    );
+    // ENQUEUED and PROCESSING signature requests cannot be cancelled because those still don't have an external_id
     if (enqueuedSignatureRequest) {
       throw new Error(
-        `Can't cancel enqueued PetitionSignatureRequest:${enqueuedSignatureRequest.id}`
+        `Can't cancel ${enqueuedSignatureRequest.status} PetitionSignatureRequest:${enqueuedSignatureRequest.id}`
       );
     }
-    const pendingSignatureRequest = previousSignatureRequests.find(
-      (r) => r.status === "PROCESSING"
-    );
+    const pendingSignatureRequest = previousSignatureRequests.find((r) => r.status === "PROCESSED");
 
     // cancel pending signature request before starting a new one
     if (pendingSignatureRequest) {
       await Promise.all([
         this.petitionsRepository.cancelPetitionSignatureRequest(
-          pendingSignatureRequest.id,
+          pendingSignatureRequest,
           "REQUEST_RESTARTED",
           isAccess ? { petition_access_id: starter.id } : { user_id: starter.id },
+          undefined,
           t
         ),
         this.petitionsRepository.loadPetitionSignaturesByPetitionId.dataloader.clear(petitionId),
-        this.petitionsRepository.createEvent(
-          {
-            type: "SIGNATURE_CANCELLED",
-            petition_id: petitionId,
-            data: {
-              petition_signature_request_id: pendingSignatureRequest.id,
-              cancel_reason: "REQUEST_RESTARTED",
-              cancel_data: isAccess ? { petition_access_id: starter.id } : { user_id: starter.id },
-            },
-          },
-          t
-        ),
         this.aws.enqueueMessages(
           "signature-worker",
           {

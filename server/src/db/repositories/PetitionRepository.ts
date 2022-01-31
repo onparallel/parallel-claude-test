@@ -3566,7 +3566,7 @@ export class PetitionRepository extends BaseRepository {
   async loadPendingSignatureRequestsByIntegrationId(orgIntegrationId: number) {
     return await this.from("petition_signature_request")
       .whereRaw("signature_config ->> 'orgIntegrationId' = ?", orgIntegrationId)
-      .whereIn("status", ["PROCESSING", "ENQUEUED"]);
+      .whereIn("status", ["ENQUEUED", "PROCESSING", "PROCESSED"]);
   }
 
   async loadPetitionsByOrgIntegrationId(orgIntegrationId: number) {
@@ -3594,10 +3594,11 @@ export class PetitionRepository extends BaseRepository {
 
   async updatePetitionSignature(
     petitionSignatureId: number,
-    data: Partial<PetitionSignatureRequest>
-  ) {
+    data: Partial<PetitionSignatureRequest>,
+    where?: Partial<PetitionSignatureRequest>
+  ): Promise<TableTypes["petition_signature_request"] | undefined> {
     const [row] = await this.from("petition_signature_request")
-      .where("id", petitionSignatureId)
+      .where({ id: petitionSignatureId, ...where })
       .update({
         ...data,
         updated_at: this.now(),
@@ -3623,34 +3624,22 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async cancelPetitionSignatureRequest<CancelReason extends PetitionSignatureCancelReason>(
-    petitionSignatureIds: MaybeArray<number>,
+    petitionSignatures: MaybeArray<Pick<PetitionSignatureRequest, "id" | "petition_id">>,
     reason: CancelReason,
     cancelData: PetitionSignatureRequestCancelData<CancelReason>,
+    extraData?: Partial<PetitionSignatureRequest>,
     t?: Knex.Transaction
   ) {
-    const [row] = await this.from("petition_signature_request", t)
-      .whereIn("id", unMaybeArray(petitionSignatureIds))
-      .update({
-        status: "CANCELLED",
-        cancel_reason: reason,
-        cancel_data: cancelData,
-        updated_at: this.now(),
-      })
-      .returning("*");
-
-    return row;
-  }
-
-  async cancelPetitionSignatureRequestByExternalId<
-    CancelReason extends PetitionSignatureCancelReason
-  >(
-    prefixedExternalId: string,
-    reason: CancelReason,
-    cancelData: PetitionSignatureRequestCancelData<CancelReason>,
-    extraData?: Partial<PetitionSignatureRequest>
-  ) {
-    const [row] = await this.from("petition_signature_request")
-      .where("external_id", prefixedExternalId)
+    const signatures = unMaybeArray(petitionSignatures);
+    if (signatures.length === 0) {
+      return [];
+    }
+    const rows = await this.from("petition_signature_request", t)
+      .whereIn(
+        "id",
+        signatures.map((s) => s.id)
+      )
+      .where({ status: "PROCESSED" })
       .update({
         ...extraData,
         status: "CANCELLED",
@@ -3660,7 +3649,20 @@ export class PetitionRepository extends BaseRepository {
       })
       .returning("*");
 
-    return row;
+    await this.createEvent(
+      rows.map((signature) => ({
+        type: "SIGNATURE_CANCELLED",
+        petition_id: signature.petition_id,
+        data: {
+          petition_signature_request_id: signature.id,
+          cancel_reason: reason,
+          cancel_data: cancelData,
+        },
+      })),
+      t
+    );
+
+    return rows;
   }
 
   async appendPetitionSignatureEventLogs(prefixedExternalId: string, logs: any[]) {

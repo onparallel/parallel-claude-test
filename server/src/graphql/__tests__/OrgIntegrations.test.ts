@@ -83,7 +83,7 @@ describe("GraphQL/OrgIntegrations", () => {
       .insert(
         {
           petition_id: petition.id,
-          status: "PROCESSING",
+          status: "PROCESSED",
           signature_config: {
             orgIntegrationId: integrations[1].id,
             signersInfo: [],

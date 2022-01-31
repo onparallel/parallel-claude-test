@@ -22,19 +22,23 @@ async function startSignatureProcess(
   payload: { petitionSignatureRequestId: number },
   ctx: WorkerContext
 ) {
-  const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
+  const signature = await ctx.petitions.updatePetitionSignature(
+    payload.petitionSignatureRequestId,
+    { status: "PROCESSING" },
+    { status: "ENQUEUED" }
+  );
 
-  if (signature.status !== "ENQUEUED") {
-    throw new Error(
-      `ENQUEUED petition signature request with id ${payload.petitionSignatureRequestId} not found`
-    );
+  // the signature wasn't found or with status !== ENQUEUED, ignore and finish
+  if (!signature) {
+    return;
   }
+
   const petition = await fetchPetition(signature.petition_id, ctx);
   if (!petition.signature_config) {
     throw new Error(`Signature is not enabled on petition with id ${signature.petition_id}`);
   }
-  const org = await ctx.organizations.loadOrg(petition.org_id);
-  const tone = org!.preferred_tone;
+
+  const org = await fetchOrganization(petition.org_id, ctx);
 
   const { title, orgIntegrationId, signersInfo, message } = signature.signature_config;
 
@@ -77,7 +81,7 @@ async function startSignatureProcess(
         locale: petition.locale,
         templateData: {
           ...(await getLayoutProps(petition.org_id, ctx)),
-          tone,
+          tone: org.preferred_tone,
         },
         signingMode: "parallel",
         initialMessage: message,
@@ -94,16 +98,6 @@ async function startSignatureProcess(
         externalId: findSignerExternalId(data.documents, signer, signerIndex),
       })
     );
-
-    await ctx.petitions.updatePetitionSignature(signature.id, {
-      external_id: `${signatureIntegration.provider.toUpperCase()}/${data.id}`,
-      data,
-      signature_config: {
-        ...signature.signature_config,
-        signersInfo: updatedSignersInfo,
-      },
-      status: "PROCESSING",
-    });
 
     // when reaching this part, we can be sure the org has at least 1 signature credit available
     if (settings.API_KEY === ctx.config.signature.signaturitSharedProductionApiKey) {
@@ -122,23 +116,22 @@ async function startSignatureProcess(
         await ctx.emails.sendLastSignatureCreditUsedEmail(petition.org_id);
       }
     }
+
+    await ctx.petitions.updatePetitionSignature(signature.id, {
+      external_id: `${signatureIntegration.provider.toUpperCase()}/${data.id}`,
+      data,
+      signature_config: {
+        ...signature.signature_config,
+        signersInfo: updatedSignersInfo,
+      },
+      status: "PROCESSED",
+    });
   } catch (error: any) {
     const cancelData = {
       error: error.stack ?? JSON.stringify(error),
     } as PetitionSignatureRequestCancelData<"REQUEST_ERROR">;
 
-    await Promise.all([
-      ctx.petitions.cancelPetitionSignatureRequest(signature.id, "REQUEST_ERROR", cancelData),
-      ctx.petitions.createEvent({
-        type: "SIGNATURE_CANCELLED",
-        petition_id: petition.id,
-        data: {
-          petition_signature_request_id: signature.id,
-          cancel_reason: "REQUEST_ERROR",
-          cancel_data: cancelData,
-        },
-      }),
-    ]);
+    await ctx.petitions.cancelPetitionSignatureRequest(signature, "REQUEST_ERROR", cancelData);
     throw error;
   } finally {
     try {
@@ -163,9 +156,9 @@ async function cancelSignatureProcess(
 
   // here we need to lookup all signature integrations, also disabled and deleted ones
   // this is because the user could have deleted their signature integration, triggering a cancel of all pending signature requests
-  const signatureIntegration = await ctx.integrations.loadAnyIntegration(orgIntegrationId);
+  const signatureIntegration = await ctx.integrations.loadAnySignatureIntegration(orgIntegrationId);
 
-  if (!signatureIntegration || signatureIntegration.type !== "SIGNATURE") {
+  if (!signatureIntegration) {
     throw new Error(`Couldn't find a signature integration for OrgIntegration:${orgIntegrationId}`);
   }
   const signatureClient = ctx.signature.getClient(signatureIntegration);
@@ -178,13 +171,13 @@ async function sendSignatureReminder(
   ctx: WorkerContext
 ) {
   const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
-  if (signature.status !== "PROCESSING") {
+  if (signature.status !== "PROCESSED") {
     return;
   }
 
   if (!signature.external_id) {
     throw new Error(
-      `Can't find external_id on petition signature request ${payload.petitionSignatureRequestId}`
+      `Can't find external_id on PetitionSignatureRequest:${payload.petitionSignatureRequestId}`
     );
   }
   const { orgIntegrationId } = signature.signature_config;
@@ -307,6 +300,14 @@ async function fetchPetition(id: number, ctx: WorkerContext) {
     throw new Error(`Couldn't find petition with id ${id}`);
   }
   return petition;
+}
+
+async function fetchOrganization(id: number, ctx: WorkerContext) {
+  const org = await ctx.organizations.loadOrg(id);
+  if (!org) {
+    throw new Error(`Organization:${id} not found`);
+  }
+  return org;
 }
 
 async function fetchPetitionSignature(petitionSignatureRequestId: number, ctx: WorkerContext) {
