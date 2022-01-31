@@ -319,6 +319,8 @@ export type MessageSentEvent = PetitionEvent & {
 export type Mutation = {
   /** set user status to ACTIVE. */
   activateUser: Array<User>;
+  /** Add new entry or update existing in feature_flag_override by orgId */
+  addFeatureFlagOverride: SupportMethodResponse;
   /** Adds permissions on given petitions and users */
   addPetitionPermission: Array<PetitionBase>;
   /** Add users to a user group */
@@ -602,6 +604,12 @@ export type Mutation = {
 
 export type MutationactivateUserArgs = {
   userIds: Array<Scalars["GID"]>;
+};
+
+export type MutationaddFeatureFlagOverrideArgs = {
+  featureFlag: FeatureFlag;
+  orgId: Scalars["Int"];
+  value: Scalars["Boolean"];
 };
 
 export type MutationaddPetitionPermissionArgs = {
@@ -1823,6 +1831,7 @@ export type PetitionField = {
   alias: Maybe<Scalars["String"]>;
   /** A list of files attached to this field. */
   attachments: Array<PetitionFieldAttachment>;
+  commentCount: Scalars["Int"];
   /** The comments for this field. */
   comments: Array<PetitionFieldComment>;
   /** The description of the petition field. */
@@ -1851,6 +1860,7 @@ export type PetitionField = {
   title: Maybe<Scalars["String"]>;
   /** The type of the petition field. */
   type: PetitionFieldType;
+  unreadCommentCount: Scalars["Int"];
   /** A JSON object representing the conditions for the field to be visible */
   visibility: Maybe<Scalars["JSONObject"]>;
 };

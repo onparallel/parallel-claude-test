@@ -1254,6 +1254,23 @@ type Mutation {
   updateEventSubscription(data: UpdateEventSubscriptionInput!, id: GID!): PetitionEventSubscription!
 
   """
+  Activate or deactivate an organization feature flag
+  """
+  updateFeatureFlag(
+    featureFlag: FeatureFlag!
+
+    """
+    Numeric ID of the organization
+    """
+    orgId: Int!
+
+    """
+    Feature flag value
+    """
+    value: Boolean!
+  ): SupportMethodResponse!
+
+  """
   Updates the positions of the petition fields
   """
   updateFieldPositions(fieldIds: [GID!]!, petitionId: GID!): PetitionBase!

@@ -1,4 +1,13 @@
-import { Grid, Input, NumberInput, NumberInputField, Select, Text } from "@chakra-ui/react";
+import {
+  Flex,
+  Grid,
+  Input,
+  NumberInput,
+  NumberInputField,
+  Select,
+  Switch,
+  Text,
+} from "@chakra-ui/react";
 import { unCamelCase } from "@parallel/utils/strings";
 import {
   IntrospectionEnumType,
@@ -26,7 +35,7 @@ export function SupportMethodArgumentInput(props: SupportMethodArgumentInputProp
           <Text as="label" lineHeight={10}>
             {unCamelCase(props.arg.name)}
           </Text>
-          {type.name === "Upload" ? <FileUploadInput {...props} /> : <ScalarInput {...props} />}
+          <ScalarInput {...props} />
         </>
       );
     case "ENUM":
@@ -53,41 +62,56 @@ export function SupportMethodArgumentInput(props: SupportMethodArgumentInputProp
   }
 }
 
-function FileUploadInput({ arg, value, isInvalid, onValue }: SupportMethodArgumentInputProps) {
-  return (
-    <Input
-      width="100%"
-      type="file"
-      isInvalid={isInvalid}
-      onChange={(e) => e.target.files && onValue(e.target.files[0])}
-    />
-  );
-}
-
 function ScalarInput({ arg, value, isInvalid, onValue }: SupportMethodArgumentInputProps) {
   const type =
     arg.type.kind === "NON_NULL"
       ? (arg.type.ofType as IntrospectionNamedTypeRef)
       : (arg.type as IntrospectionNamedTypeRef);
 
-  return type.name === "String" || type.name === "ID" ? (
-    <Input
-      placeholder={arg.description ?? ""}
-      width="100%"
-      isInvalid={isInvalid}
-      value={value}
-      onChange={(e) => onValue(e.target.value || null)}
-    />
-  ) : (
-    <NumberInput
-      width="100%"
-      isInvalid={isInvalid}
-      value={value}
-      onChange={(_, value) => (Number.isNaN(value) ? null : onValue(value))}
-    >
-      <NumberInputField placeholder={arg.description ?? ""} />
-    </NumberInput>
-  );
+  switch (type.name) {
+    case "Upload":
+      return (
+        <Input
+          width="100%"
+          type="file"
+          isInvalid={isInvalid}
+          onChange={(e) => e.target.files && onValue(e.target.files[0])}
+        />
+      );
+    case "Boolean":
+      return (
+        <Flex alignItems="center">
+          <Switch
+            isInvalid={isInvalid}
+            isChecked={value}
+            onChange={(event) => onValue(event.target.checked)}
+          />
+          <Text marginLeft={2}>{String(value)}</Text>
+        </Flex>
+      );
+    case "Int":
+    case "Float":
+      return (
+        <NumberInput
+          width="100%"
+          isInvalid={isInvalid}
+          value={value}
+          onChange={(_, value) => (Number.isNaN(value) ? null : onValue(value))}
+        >
+          <NumberInputField placeholder={arg.description ?? ""} />
+        </NumberInput>
+      );
+    default:
+      return (
+        <Input
+          placeholder={arg.description ?? ""}
+          width="100%"
+          isInvalid={isInvalid}
+          value={value}
+          onChange={(e) => onValue(e.target.value || null)}
+        />
+      );
+  }
 }
 
 function EnumInput({

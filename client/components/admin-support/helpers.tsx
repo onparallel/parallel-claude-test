@@ -6,6 +6,7 @@ import {
   IntrospectionNamedTypeRef,
   IntrospectionType,
 } from "graphql";
+import { isDefined } from "remeda";
 
 export function findNamedTypeRef<T extends IntrospectionType>(
   type: IntrospectionNamedTypeRef<T>,
@@ -27,11 +28,12 @@ function getDefaultInputObjectTypeValue(
 
 export function getDefaultInputTypeValue(
   type: IntrospectionInputTypeRef,
-  schemaTypes: readonly IntrospectionType[]
+  schemaTypes: readonly IntrospectionType[],
+  defaultValue?: any
 ): any {
   switch (type.kind) {
     case "NON_NULL":
-      return getDefaultInputTypeValue(type.ofType, schemaTypes);
+      return getDefaultInputTypeValue(type.ofType, schemaTypes, defaultValue);
     case "ENUM":
       return (
         schemaTypes.find(
@@ -44,7 +46,11 @@ export function getDefaultInputTypeValue(
         schemaTypes
       );
     case "SCALAR":
-      if (type.name === "Upload") return null;
+      if (type.name === "Upload") {
+        return null;
+      } else if (type.name === "Boolean") {
+        return isDefined(defaultValue) ? defaultValue === "true" : false;
+      }
       return "";
     default:
       return "";

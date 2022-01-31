@@ -948,6 +948,7 @@ export interface NexusGenFieldTypes {
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
     updateDynamicSelectReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updateEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
+    updateFeatureFlag: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateFieldPositions: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateFileUploadReply: NexusGenRootTypes["FileUploadReplyResponse"]; // FileUploadReplyResponse!
     updateFileUploadReplyComplete: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
@@ -2246,6 +2247,7 @@ export interface NexusGenFieldTypeNames {
     updateContact: "Contact";
     updateDynamicSelectReply: "PetitionFieldReply";
     updateEventSubscription: "PetitionEventSubscription";
+    updateFeatureFlag: "SupportMethodResponse";
     updateFieldPositions: "PetitionBase";
     updateFileUploadReply: "FileUploadReplyResponse";
     updateFileUploadReplyComplete: "PetitionFieldReply";
@@ -3852,6 +3854,12 @@ export interface NexusGenArgTypes {
       // args
       data: NexusGenInputs["UpdateEventSubscriptionInput"]; // UpdateEventSubscriptionInput!
       id: NexusGenScalars["GID"]; // GID!
+    };
+    updateFeatureFlag: {
+      // args
+      featureFlag: NexusGenEnums["FeatureFlag"]; // FeatureFlag!
+      orgId: number; // Int!
+      value: boolean; // Boolean!
     };
     updateFieldPositions: {
       // args

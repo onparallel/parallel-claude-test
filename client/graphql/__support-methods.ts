@@ -469,6 +469,58 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "updateFeatureFlag",
+      description: "Activate or deactivate an organization feature flag",
+      args: [
+        {
+          name: "featureFlag",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "ENUM", name: "FeatureFlag", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "orgId",
+          description: "Numeric ID of the organization",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "Int", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "value",
+          description: "Feature flag value",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "Boolean", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "updateLandingTemplateMetadata",
       description: "Updates the metadata of a public landing template.",
       args: [
@@ -704,6 +756,55 @@ export const schemaTypes: IntrospectionType[] = [
     enumValues: [
       { name: "en", description: null, isDeprecated: false, deprecationReason: null },
       { name: "es", description: null, isDeprecated: false, deprecationReason: null },
+    ],
+    possibleTypes: null,
+  },
+  {
+    kind: "ENUM",
+    name: "FeatureFlag",
+    description: null,
+    specifiedByUrl: null,
+    fields: null,
+    inputFields: null,
+    interfaces: null,
+    enumValues: [
+      { name: "DEVELOPER_ACCESS", description: null, isDeprecated: false, deprecationReason: null },
+      {
+        name: "EXPORT_CUATRECASAS",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
+      {
+        name: "HIDE_RECIPIENT_VIEW_CONTENTS",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
+      {
+        name: "INTERNAL_COMMENTS",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
+      {
+        name: "PETITION_PDF_EXPORT",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
+      {
+        name: "PETITION_SIGNATURE",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
+      {
+        name: "SKIP_FORWARD_SECURITY",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
     ],
     possibleTypes: null,
   },

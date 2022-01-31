@@ -2,6 +2,7 @@ import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { indexBy, uniq } from "remeda";
+import { FeatureFlag } from "../../api/public/__types";
 import { fromDataLoader, FromDataLoaderOptions } from "../../util/fromDataLoader";
 import { keyBuilder } from "../../util/keyBuilder";
 import { MaybeArray } from "../../util/types";
@@ -75,4 +76,17 @@ export class FeatureFlagRepository extends BaseRepository {
       }
     )
   );
+
+  async addOrUpdateFeatureFlagOverride(featureFlag: FeatureFlag, orgId: number, value: boolean) {
+    return await this.raw(
+      /* sql */ `
+        insert into feature_flag_override (feature_flag_name, org_id, "value") values (?, ?, ?) 
+          on conflict (org_id, feature_flag_name) where user_id is null do update
+        set
+          value = EXCLUDED.value
+        returning *;
+      `,
+      [featureFlag, orgId, value]
+    );
+  }
 }

@@ -31,7 +31,7 @@ function reset(field: IntrospectionField, schemaTypes: readonly IntrospectionTyp
       field.args.map((arg) => [
         arg.name,
         {
-          value: arg.defaultValue ?? getDefaultInputTypeValue(arg.type, schemaTypes),
+          value: getDefaultInputTypeValue(arg.type, schemaTypes, arg.defaultValue),
           isInvalid: false,
         },
       ])

@@ -570,6 +570,8 @@ export interface Mutation {
   updateDynamicSelectReply: PetitionFieldReply;
   /** Updates an existing event subscription for the user's petitions */
   updateEventSubscription: PetitionEventSubscription;
+  /** Activate or deactivate an organization feature flag */
+  updateFeatureFlag: SupportMethodResponse;
   /** Updates the positions of the petition fields */
   updateFieldPositions: PetitionBase;
   /** Updates the file of a FILE_UPLOAD reply. The previous file will be deleted from AWS S3 when client notifies of upload completed via updateFileUploadReplyComplete mutation. */
@@ -1247,6 +1249,12 @@ export interface MutationupdateDynamicSelectReplyArgs {
 export interface MutationupdateEventSubscriptionArgs {
   data: UpdateEventSubscriptionInput;
   id: Scalars["GID"];
+}
+
+export interface MutationupdateFeatureFlagArgs {
+  featureFlag: FeatureFlag;
+  orgId: Scalars["Int"];
+  value: Scalars["Boolean"];
 }
 
 export interface MutationupdateFieldPositionsArgs {
