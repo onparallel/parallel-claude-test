@@ -83,7 +83,9 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     if (layoutBody) layoutBody.scrollTop = 0;
   }, [currentPage]);
 
-  const { fields, pages, visibility } = useGetPageFields(petition.fields, currentPage, !isPetition);
+  const { fields, pages, visibility } = useGetPageFields(petition.fields, currentPage, {
+    usePreviewReplies: !isPetition,
+  });
 
   const breakpoint = "md";
 

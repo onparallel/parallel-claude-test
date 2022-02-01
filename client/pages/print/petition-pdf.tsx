@@ -45,7 +45,9 @@ function PetitionPdf({ token }: { token: string }) {
 
   const pages = useMemo(
     () =>
-      groupFieldsByPages<PetitionPdf_PetitionFieldFragment>(petition.fields, fieldVisibility, true),
+      groupFieldsByPages<PetitionPdf_PetitionFieldFragment>(petition.fields, fieldVisibility, {
+        isPdf: true,
+      }),
     [petition.fields, fieldVisibility]
   );
 

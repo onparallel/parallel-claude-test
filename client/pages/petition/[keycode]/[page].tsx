@@ -72,7 +72,9 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
 
   const tone = petition.tone;
 
-  const { fields, pages, visibility } = useGetPageFields(petition.fields, currentPage, false);
+  const { fields, pages, visibility } = useGetPageFields(petition.fields, currentPage, {
+    hideInternalFields: true,
+  });
 
   const [finalized, setFinalized] = useState(false);
   const [publicCompletePetition] = useMutation(RecipientView_publicCompletePetitionDocument);

@@ -110,33 +110,18 @@ function conditionIsMet(
  */
 export function useFieldVisibility(
   fields: UnionToArrayUnion<PetitionFieldSelection>,
-  isCacheOnly?: boolean
+  usePreviewReplies = false
 ) {
   return useMemo(() => {
     const fieldsById = indexBy<PetitionFieldSelection>(fields, (f) => f.id);
     const visibilitiesById: { [fieldId: string]: boolean } = {};
     for (const field of fields) {
       if (field.visibility) {
-        const v = field.visibility as PetitionFieldVisibility;
-        const result =
-          v.operator === "OR"
-            ? v.conditions.some((c) =>
-                conditionIsMet(
-                  c,
-                  fieldsById[c.fieldId],
-                  visibilitiesById[c.fieldId],
-                  Boolean(isCacheOnly)
-                )
-              )
-            : v.conditions.every((c) =>
-                conditionIsMet(
-                  c,
-                  fieldsById[c.fieldId],
-                  visibilitiesById[c.fieldId],
-                  Boolean(isCacheOnly)
-                )
-              );
-        visibilitiesById[field.id] = v.type === "SHOW" ? result : !result;
+        const { conditions, operator, type } = field.visibility as PetitionFieldVisibility;
+        const result = conditions[operator === "OR" ? "some" : "every"]((c) =>
+          conditionIsMet(c, fieldsById[c.fieldId], visibilitiesById[c.fieldId], usePreviewReplies)
+        );
+        visibilitiesById[field.id] = type === "SHOW" ? result : !result;
       } else {
         visibilitiesById[field.id] = true;
       }

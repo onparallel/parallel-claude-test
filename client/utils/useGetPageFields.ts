@@ -5,23 +5,27 @@ import {
 } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { useFieldVisibility } from "./fieldVisibility/useFieldVisibility";
-import { groupFieldsByPages } from "./groupFieldsByPage";
+import { groupFieldsByPages, GroupFieldsByPagesOptions } from "./groupFieldsByPage";
 import { UnionToArrayUnion } from "./types";
 
 type PetitionFieldSelection =
   | useGetPageFields_PublicPetitionFieldFragment
   | useGetPageFields_PetitionFieldFragment;
 
+interface UseGetPageFieldsOptions extends GroupFieldsByPagesOptions {
+  usePreviewReplies?: boolean;
+}
+
 export function useGetPageFields<T extends UnionToArrayUnion<PetitionFieldSelection>>(
   fields: T,
   page: number,
-  isCacheOnly: boolean
+  { usePreviewReplies, ...options }: UseGetPageFieldsOptions
 ) {
-  const visibility = useFieldVisibility(fields, isCacheOnly);
+  const visibility = useFieldVisibility(fields, usePreviewReplies);
   return useMemo(() => {
-    const pages = groupFieldsByPages<PetitionFieldSelection>(fields, visibility);
+    const pages = groupFieldsByPages<PetitionFieldSelection>(fields, visibility, options);
     return { fields: pages[page - 1] as T, pages: pages.length, visibility };
-  }, [fields, page, visibility]);
+  }, [fields, page, visibility, usePreviewReplies, options.hideInternalFields, options.isPdf]);
 }
 
 useGetPageFields.fragments = {
