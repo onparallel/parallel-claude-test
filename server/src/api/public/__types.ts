@@ -319,8 +319,6 @@ export type MessageSentEvent = PetitionEvent & {
 export type Mutation = {
   /** set user status to ACTIVE. */
   activateUser: Array<User>;
-  /** Add new entry or update existing in feature_flag_override by orgId */
-  addFeatureFlagOverride: SupportMethodResponse;
   /** Adds permissions on given petitions and users */
   addPetitionPermission: Array<PetitionBase>;
   /** Add users to a user group */
@@ -542,6 +540,8 @@ export type Mutation = {
   updateDynamicSelectReply: PetitionFieldReply;
   /** Updates an existing event subscription for the user's petitions */
   updateEventSubscription: PetitionEventSubscription;
+  /** Activate or deactivate an organization feature flag */
+  updateFeatureFlag: SupportMethodResponse;
   /** Updates the positions of the petition fields */
   updateFieldPositions: PetitionBase;
   /** Updates the file of a FILE_UPLOAD reply. The previous file will be deleted from AWS S3 when client notifies of upload completed via updateFileUploadReplyComplete mutation. */
@@ -604,12 +604,6 @@ export type Mutation = {
 
 export type MutationactivateUserArgs = {
   userIds: Array<Scalars["GID"]>;
-};
-
-export type MutationaddFeatureFlagOverrideArgs = {
-  featureFlag: FeatureFlag;
-  orgId: Scalars["Int"];
-  value: Scalars["Boolean"];
 };
 
 export type MutationaddPetitionPermissionArgs = {
@@ -1225,6 +1219,12 @@ export type MutationupdateDynamicSelectReplyArgs = {
 export type MutationupdateEventSubscriptionArgs = {
   data: UpdateEventSubscriptionInput;
   id: Scalars["GID"];
+};
+
+export type MutationupdateFeatureFlagArgs = {
+  featureFlag: FeatureFlag;
+  orgId: Scalars["Int"];
+  value: Scalars["Boolean"];
 };
 
 export type MutationupdateFieldPositionsArgs = {
