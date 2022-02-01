@@ -179,6 +179,17 @@ export class PetitionRepository extends BaseRepository {
     return count === new Set(petitionIds).size;
   }
 
+  async recipientHasAccessToPetition(petitionAccessId: number, petitionId: number) {
+    const rows = await this.from("petition_access")
+      .where({
+        id: petitionAccessId,
+        petition_id: petitionId,
+        status: "ACTIVE",
+      })
+      .select("id");
+    return rows.length === 1;
+  }
+
   async userHasAccessToPetitionFieldComments(userId: number, petitionFieldCommentIds: number[]) {
     const comments = await this.loadPetitionFieldComment(petitionFieldCommentIds);
     return (

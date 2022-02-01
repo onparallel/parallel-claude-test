@@ -1,7 +1,7 @@
 import { idArg, nonNull, nullable, queryField } from "nexus";
 import { chain } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { authenticatePublicAccess, fieldBelongsToAccess } from "./authorizers";
+import { authenticatePublicAccess, fieldBelongsToAccess, taskBelongsToAccess } from "./authorizers";
 
 export const accessQuery = queryField("access", {
   type: nullable("PublicPetitionAccess"),
@@ -49,5 +49,17 @@ export const publicPetitionLinkBySlug = queryField("publicPetitionLinkBySlug", {
       : undefined;
 
     return publicLink?.is_active && petition ? publicLink : null;
+  },
+});
+
+export const publicTask = queryField("publicTask", {
+  type: "Task",
+  args: {
+    keycode: nonNull(idArg()),
+    taskId: nonNull(globalIdArg("Task")),
+  },
+  authorize: chain(authenticatePublicAccess("keycode"), taskBelongsToAccess("taskId")),
+  resolve: async (_, { taskId }, ctx) => {
+    return (await ctx.tasks.loadTask(taskId))!;
   },
 });

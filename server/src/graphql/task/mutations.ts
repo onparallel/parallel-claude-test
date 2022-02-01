@@ -1,9 +1,8 @@
+import { ApolloError } from "apollo-server-core";
 import { booleanArg, mutationField, nonNull, nullable } from "nexus";
 import { Task } from "../../db/repositories/TaskRepository";
 import { authenticateAnd } from "../helpers/authorize";
-import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { RESULT } from "../helpers/result";
 import { userHasAccessToPetitions } from "../petition/authorizers";
 import { tasksAreOfType, userHasAccessToTasks } from "./authorizers";
 
@@ -18,11 +17,12 @@ export const createPrintPdfTask = mutationField("createPrintPdfTask", {
     await ctx.tasks.createTask(
       {
         name: "PRINT_PDF",
+        user_id: ctx.user!.id,
         input: {
           petition_id: args.petitionId,
         },
       },
-      ctx.user!.id
+      `User:${ctx.user!.id}`
     ),
 });
 
@@ -39,19 +39,20 @@ export const createExportRepliesTask = mutationField("createExportRepliesTask", 
     return await ctx.tasks.createTask(
       {
         name: "EXPORT_REPLIES",
+        user_id: ctx.user!.id,
         input: {
           petition_id: args.petitionId,
           pattern: args.pattern,
         },
       },
-      ctx.user!.id
+      `User:${ctx.user!.id}`
     );
   },
 });
 
 export const getTaskResultFileUrl = mutationField("getTaskResultFileUrl", {
   description: "Returns a signed download url for tasks with file output",
-  type: "FileUploadDownloadLinkResult",
+  type: "String",
   authorize: authenticateAnd(
     userHasAccessToTasks("taskId"),
     tasksAreOfType("taskId", ["EXPORT_REPLIES", "PRINT_PDF"])
@@ -61,30 +62,21 @@ export const getTaskResultFileUrl = mutationField("getTaskResultFileUrl", {
     preview: nullable(booleanArg()),
   },
   resolve: async (_, args, ctx) => {
-    try {
-      const task = (await ctx.tasks.loadTask(args.taskId)) as
-        | Task<"EXPORT_REPLIES">
-        | Task<"PRINT_PDF">;
+    const task = (await ctx.tasks.loadTask(args.taskId)) as
+      | Task<"EXPORT_REPLIES">
+      | Task<"PRINT_PDF">;
 
-      const file = await ctx.files.loadTemporaryFile(task.output.temporary_file_id);
-      if (!file) {
-        // TODO: no tiene mucho sentido tirar un WhitelistedError aqui
-        throw new WhitelistedError(
-          `Temporary file not found for Task:${task.id} output`,
-          "FILE_NOT_FOUND_ERROR"
-        );
-      }
-      const url = await ctx.aws.temporaryFiles.getSignedDownloadEndpoint(
-        file?.path,
-        file?.filename,
-        args.preview ? "inline" : "attachment"
+    const file = await ctx.files.loadTemporaryFile(task.output.temporary_file_id);
+    if (!file) {
+      throw new ApolloError(
+        `Temporary file not found for Task:${task.id} output`,
+        "FILE_NOT_FOUND_ERROR"
       );
-
-      return {
-        result: RESULT.SUCCESS,
-        url,
-      };
-    } catch {}
-    return { result: RESULT.FAILURE };
+    }
+    return await ctx.aws.temporaryFiles.getSignedDownloadEndpoint(
+      file.path,
+      file.filename,
+      args.preview ? "inline" : "attachment"
+    );
   },
 });

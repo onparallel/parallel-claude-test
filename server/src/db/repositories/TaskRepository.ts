@@ -34,12 +34,11 @@ export class TaskRepository extends BaseRepository {
 
   readonly loadTask: Loader<number, Task<any> | null> = this.buildLoadBy("task", "id");
 
-  async createTask<TName extends TaskName>(data: Partial<Task<TName>>, userId: number) {
+  async createTask<TName extends TaskName>(data: Partial<Task<TName>>, createdBy: string) {
     const [task] = await this.from("task").insert(
       {
         ...data,
-        user_id: userId,
-        created_by: `User:${userId}`,
+        created_by: createdBy,
       },
       "*"
     );
@@ -75,5 +74,15 @@ export class TaskRepository extends BaseRepository {
       .select(this.count());
 
     return count === new Set(taskIds).size;
+  }
+
+  async taskBelongsToAccess(taskId: number, petitionAccessId: number) {
+    const rows = await this.from("task")
+      .where({
+        id: taskId,
+        petition_access_id: petitionAccessId,
+      })
+      .select("id");
+    return rows.length === 1;
   }
 }

@@ -4125,6 +4125,11 @@
     "context": "Omit"
   },
   {
+    "term": "generic.options",
+    "definition": "Opciones...",
+    "context": "Options..."
+  },
+  {
     "term": "generic.page-break",
     "definition": "Salto de página",
     "context": "Page break"
@@ -8150,6 +8155,11 @@
     "context": "Expired code"
   },
   {
+    "term": "recipient-view.export-to-pdf",
+    "definition": "Exportar a PDF",
+    "context": "Export to PDF"
+  },
+  {
     "term": "recipient-view.field-comments.cta",
     "definition": "¿Alguna duda? Pregunte por aquí",
     "context": "Have any questions? Ask here"
@@ -8200,6 +8210,11 @@
     "context": "Send your doubts"
   },
   {
+    "term": "recipient-view.guide-me",
+    "definition": "Guíame",
+    "context": "Guide me"
+  },
+  {
     "term": "recipient-view.in-order-to",
     "definition": "Para",
     "context": "To"
@@ -8248,11 +8263,6 @@
     "term": "recipient-view.last-saved-time-short",
     "definition": "Guardado {time}",
     "context": "Saved {time}"
-  },
-  {
-    "term": "recipient-view.need-help",
-    "definition": "Ayuda",
-    "context": "Help"
   },
   {
     "term": "recipient-view.petition-closed-alert",

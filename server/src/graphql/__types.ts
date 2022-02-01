@@ -899,7 +899,7 @@ export interface NexusGenFieldTypes {
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
     getApiTokenOwner: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
-    getTaskResultFileUrl: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
+    getTaskResultFileUrl: string; // String!
     markSignatureIntegrationAsDefault: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
     modifyPetitionCustomProperty: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     petitionAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
@@ -913,12 +913,14 @@ export interface NexusGenFieldTypes {
     publicCreateDynamicSelectReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicCreateFileUploadReply: NexusGenRootTypes["PublicCreateFileUploadReply"]; // PublicCreateFileUploadReply!
     publicCreatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
+    publicCreatePrintPdfTask: NexusGenRootTypes["Task"]; // Task!
     publicCreateSimpleReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicDelegateAccessToContact: NexusGenRootTypes["PublicPetitionAccess"]; // PublicPetitionAccess!
     publicDeletePetitionFieldComment: NexusGenRootTypes["PublicPetitionField"]; // PublicPetitionField!
     publicDeletePetitionReply: NexusGenRootTypes["PublicPetitionField"]; // PublicPetitionField!
     publicFileUploadReplyComplete: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicFileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
+    publicGetTaskResultFileUrl: string; // String!
     publicMarkPetitionFieldCommentsAsRead: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     publicOptOutReminders: NexusGenRootTypes["PublicPetitionAccess"]; // PublicPetitionAccess!
     publicPetitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
@@ -1535,6 +1537,7 @@ export interface NexusGenFieldTypes {
     publicOrgLogoUrl: string | null; // String
     publicPetitionField: NexusGenRootTypes["PublicPetitionField"]; // PublicPetitionField!
     publicPetitionLinkBySlug: NexusGenRootTypes["PublicPublicPetitionLink"] | null; // PublicPublicPetitionLink
+    publicTask: NexusGenRootTypes["Task"]; // Task!
     publicTemplateCategories: string[]; // [String!]!
     searchUsers: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
     subscriptions: NexusGenRootTypes["PetitionEventSubscription"][]; // [PetitionEventSubscription!]!
@@ -2199,7 +2202,7 @@ export interface NexusGenFieldTypeNames {
     fileUploadReplyDownloadLink: "FileUploadDownloadLinkResult";
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
     getApiTokenOwner: "SupportMethodResponse";
-    getTaskResultFileUrl: "FileUploadDownloadLinkResult";
+    getTaskResultFileUrl: "String";
     markSignatureIntegrationAsDefault: "OrgIntegration";
     modifyPetitionCustomProperty: "PetitionBase";
     petitionAttachmentDownloadLink: "FileUploadDownloadLinkResult";
@@ -2213,12 +2216,14 @@ export interface NexusGenFieldTypeNames {
     publicCreateDynamicSelectReply: "PublicPetitionFieldReply";
     publicCreateFileUploadReply: "PublicCreateFileUploadReply";
     publicCreatePetitionFieldComment: "PublicPetitionFieldComment";
+    publicCreatePrintPdfTask: "Task";
     publicCreateSimpleReply: "PublicPetitionFieldReply";
     publicDelegateAccessToContact: "PublicPetitionAccess";
     publicDeletePetitionFieldComment: "PublicPetitionField";
     publicDeletePetitionReply: "PublicPetitionField";
     publicFileUploadReplyComplete: "PublicPetitionFieldReply";
     publicFileUploadReplyDownloadLink: "FileUploadDownloadLinkResult";
+    publicGetTaskResultFileUrl: "String";
     publicMarkPetitionFieldCommentsAsRead: "PublicPetitionFieldComment";
     publicOptOutReminders: "PublicPetitionAccess";
     publicPetitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
@@ -2835,6 +2840,7 @@ export interface NexusGenFieldTypeNames {
     publicOrgLogoUrl: "String";
     publicPetitionField: "PublicPetitionField";
     publicPetitionLinkBySlug: "PublicPublicPetitionLink";
+    publicTask: "Task";
     publicTemplateCategories: "String";
     searchUsers: "UserOrUserGroup";
     subscriptions: "PetitionEventSubscription";
@@ -3634,6 +3640,10 @@ export interface NexusGenArgTypes {
       keycode: string; // ID!
       petitionFieldId: NexusGenScalars["GID"]; // GID!
     };
+    publicCreatePrintPdfTask: {
+      // args
+      keycode: string; // ID!
+    };
     publicCreateSimpleReply: {
       // args
       fieldId: NexusGenScalars["GID"]; // GID!
@@ -3669,6 +3679,11 @@ export interface NexusGenArgTypes {
       keycode: string; // ID!
       preview?: boolean | null; // Boolean
       replyId: NexusGenScalars["GID"]; // GID!
+    };
+    publicGetTaskResultFileUrl: {
+      // args
+      keycode: string; // ID!
+      taskId: NexusGenScalars["GID"]; // GID!
     };
     publicMarkPetitionFieldCommentsAsRead: {
       // args
@@ -4165,6 +4180,11 @@ export interface NexusGenArgTypes {
     publicPetitionLinkBySlug: {
       // args
       slug: string; // ID!
+    };
+    publicTask: {
+      // args
+      keycode: string; // ID!
+      taskId: NexusGenScalars["GID"]; // GID!
     };
     searchUsers: {
       // args

@@ -1,3 +1,4 @@
+import { isDefined } from "remeda";
 import { URLSearchParams } from "url";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
 import { random } from "../../util/token";
@@ -6,11 +7,20 @@ import { TaskRunner } from "../helpers/TaskRunner";
 export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
   async run() {
     const { petition_id: petitionId } = this.task.input;
-    const hasAccess = await this.ctx.petitions.userHasAccessToPetitions(this.task.user_id, [
-      petitionId,
-    ]);
+
+    const hasAccess = isDefined(this.task.user_id)
+      ? await this.ctx.petitions.userHasAccessToPetitions(this.task.user_id, [petitionId])
+      : isDefined(this.task.petition_access_id)
+      ? this.ctx.petitions.recipientHasAccessToPetition(this.task.petition_access_id, petitionId)
+      : false;
     if (!hasAccess) {
-      throw new Error(`User ${this.task.user_id} has no access to petition ${petitionId}`);
+      throw new Error(
+        `${
+          isDefined(this.task.user_id)
+            ? `User:${this.task.user_id}`
+            : `PetitionAccess:${this.task.petition_access_id}`
+        } has no access to petition ${petitionId}`
+      );
     }
     const petition = (await this.ctx.petitions.loadPetition(petitionId))!;
     const token = this.ctx.security.generateAuthToken({

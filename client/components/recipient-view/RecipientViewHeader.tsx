@@ -12,14 +12,20 @@ import {
   Flex,
   Heading,
   HStack,
+  IconButton,
   Img,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Portal,
   Stack,
   Text,
   Tooltip,
   useBreakpointValue,
   useToast,
 } from "@chakra-ui/react";
-import { CloudOkIcon, HelpOutlineIcon } from "@parallel/chakra/icons";
+import { CloudOkIcon, FilePdfIcon, MapIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
 import { CardProps } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
 import {
@@ -31,12 +37,12 @@ import {
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
+import { usePublicPrintPdfTask } from "@parallel/utils/usePublicPrintPdfTask";
 import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { useEffect } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ContactListPopover } from "../common/ContactListPopover";
 import { HelpPopover } from "../common/HelpPopover";
-import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SmallPopover } from "../common/SmallPopover";
 import { useTone } from "../common/ToneProvider";
 import { useDelegateAccessDialog } from "./dialogs/DelegateAccessDialog";
@@ -135,6 +141,8 @@ export function RecipientViewHeader({
     } catch {}
   };
 
+  const publicPrintPdfTask = usePublicPrintPdfTask();
+
   return (
     <Box position="relative" width="100%" zIndex={3} backgroundColor="white" {...props}>
       <Flex flexDirection="column" alignItems="center">
@@ -206,19 +214,42 @@ export function RecipientViewHeader({
               </SmallPopover>
             ) : null}
 
-            <IconButtonWithTooltip
-              label={intl.formatMessage({
-                id: "recipient-view.need-help",
-                defaultMessage: "Help",
-              })}
-              placement="bottom"
-              size="md"
-              variant="ghost"
-              backgroundColor="white"
-              isRound
-              onClick={handleHelpClick}
-              icon={<HelpOutlineIcon fontSize="22px" />}
-            />
+            <Menu placement="bottom-end">
+              <Tooltip
+                placement="bottom-end"
+                label={intl.formatMessage({
+                  id: "generic.options",
+                  defaultMessage: "Options...",
+                })}
+                whiteSpace="nowrap"
+              >
+                <MenuButton
+                  as={IconButton}
+                  variant="outline"
+                  icon={<MoreVerticalIcon />}
+                  aria-label={intl.formatMessage({
+                    id: "generic.options",
+                    defaultMessage: "Options...",
+                  })}
+                />
+              </Tooltip>
+              <Portal>
+                <MenuList minW="min-content">
+                  <MenuItem
+                    onClick={() => publicPrintPdfTask(keycode)}
+                    icon={<FilePdfIcon fontSize="md" />}
+                  >
+                    <FormattedMessage
+                      id="recipient-view.export-to-pdf"
+                      defaultMessage="Export to PDF"
+                    />
+                  </MenuItem>
+                  <MenuItem onClick={handleHelpClick} icon={<MapIcon fontSize="md" />}>
+                    <FormattedMessage id="recipient-view.guide-me" defaultMessage="Guide me" />
+                  </MenuItem>
+                </MenuList>
+              </Portal>
+            </Menu>
           </HStack>
         </Flex>
 

@@ -173,3 +173,19 @@ export function validPublicPetitionLink<
     return true;
   };
 }
+
+export function taskBelongsToAccess<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number>
+>(taskIdArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      return await ctx.tasks.taskBelongsToAccess(
+        args[taskIdArg] as unknown as number,
+        ctx.access!.id
+      );
+    } catch {}
+    return false;
+  };
+}

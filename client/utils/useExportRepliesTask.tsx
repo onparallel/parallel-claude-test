@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {
   TaskProgressDialog,
@@ -7,6 +7,7 @@ import {
 import {
   useExportRepliesTask_createExportRepliesTaskDocument,
   useExportRepliesTask_getTaskResultFileUrlDocument,
+  useExportRepliesTask_taskDocument,
 } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { openNewWindow } from "./openNewWindow";
@@ -20,11 +21,17 @@ export function useExportRepliesTask() {
   const showTaskProgressDialog = useTaskProgressDialog();
   const intl = useIntl();
 
+  const { refetch } = useQuery(useExportRepliesTask_taskDocument, { skip: true });
+
   return async (petitionId: string, pattern?: Maybe<string>) => {
     const [error, finishedTask] = await withError(async () => {
       const { data } = await createTask({ variables: { petitionId, pattern } });
       return await showTaskProgressDialog({
         task: data!.createExportRepliesTask,
+        refetch: async () => {
+          const { data: refetchData } = await refetch({ id: data!.createExportRepliesTask.id });
+          return refetchData.task;
+        },
         dialogHeader: intl.formatMessage({
           id: "component.export-replies-task.header",
           defaultMessage: "Exporting replies...",
@@ -47,14 +54,25 @@ export function useExportRepliesTask() {
     } else {
       openNewWindow(async () => {
         const { data } = await generateDownloadURL({ variables: { taskId: finishedTask!.id } });
-        if (data?.getTaskResultFileUrl.result !== "SUCCESS") {
+        if (!data?.getTaskResultFileUrl) {
           throw new Error();
         }
-        return data.getTaskResultFileUrl.url!;
+        return data.getTaskResultFileUrl;
       });
     }
   };
 }
+
+useExportRepliesTask.queries = [
+  gql`
+    query useExportRepliesTask_task($id: GID!) {
+      task(id: $id) {
+        ...TaskProgressDialog_Task
+      }
+    }
+    ${TaskProgressDialog.fragments.Task}
+  `,
+];
 
 useExportRepliesTask.mutations = [
   gql`
@@ -67,10 +85,7 @@ useExportRepliesTask.mutations = [
   `,
   gql`
     mutation useExportRepliesTask_getTaskResultFileUrl($taskId: GID!) {
-      getTaskResultFileUrl(taskId: $taskId, preview: false) {
-        result
-        url
-      }
+      getTaskResultFileUrl(taskId: $taskId, preview: false)
     }
   `,
 ];

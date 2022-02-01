@@ -1,12 +1,9 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { Button, Progress } from "@chakra-ui/react";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import {
-  TaskProgressDialog_TaskDocument,
-  TaskProgressDialog_TaskFragment,
-} from "@parallel/graphql/__types";
+import { TaskProgressDialog_TaskFragment } from "@parallel/graphql/__types";
 import { useInterval } from "@parallel/utils/useInterval";
-import { ReactNode, useRef } from "react";
+import { ReactNode, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { ConfirmDialog } from "./ConfirmDialog";
 
@@ -15,26 +12,25 @@ interface TaskProgressDialogProps {
   dialogHeader?: ReactNode;
   pollInterval?: number;
   task: TaskProgressDialog_TaskFragment;
+  refetch: () => Promise<TaskProgressDialog_TaskFragment>;
 }
 export function TaskProgressDialog({
   confirmText,
   dialogHeader,
   pollInterval,
   task,
+  refetch,
   ...props
 }: DialogProps<TaskProgressDialogProps, TaskProgressDialog_TaskFragment>) {
-  const { data, refetch } = useQuery(TaskProgressDialog_TaskDocument, {
-    variables: { id: task.id },
-  });
-  const processingTask = data?.task ?? task;
-
+  const [processingTask, setProcessingTask] = useState(task);
   useInterval(
     async (done) => {
       try {
-        const { data: updatedData } = await refetch();
-        if (updatedData.task.status === "COMPLETED") {
+        const task = await refetch();
+        setProcessingTask(task);
+        if (task.status === "COMPLETED") {
           done();
-        } else if (updatedData.task.status === "FAILED") {
+        } else if (task.status === "FAILED") {
           done();
           props.onReject("SERVER_ERROR");
         }
@@ -99,17 +95,6 @@ TaskProgressDialog.fragments = {
     }
   `,
 };
-
-TaskProgressDialog.queries = [
-  gql`
-    query TaskProgressDialog_Task($id: GID!) {
-      task(id: $id) {
-        ...TaskProgressDialog_Task
-      }
-    }
-    ${TaskProgressDialog.fragments.Task}
-  `,
-];
 
 export function useTaskProgressDialog() {
   return useDialog(TaskProgressDialog);

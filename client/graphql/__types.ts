@@ -462,7 +462,7 @@ export interface Mutation {
   /** Get the user who owns an API Token */
   getApiTokenOwner: SupportMethodResponse;
   /** Returns a signed download url for tasks with file output */
-  getTaskResultFileUrl: FileUploadDownloadLinkResult;
+  getTaskResultFileUrl: Scalars["String"];
   /** marks a Signature integration as default */
   markSignatureIntegrationAsDefault: OrgIntegration;
   /** Adds, edits or deletes a custom property on the petition */
@@ -491,6 +491,8 @@ export interface Mutation {
   publicCreateFileUploadReply: PublicCreateFileUploadReply;
   /** Create a petition field comment. */
   publicCreatePetitionFieldComment: PublicPetitionFieldComment;
+  /** Starts an export pdf task in a recipient context */
+  publicCreatePrintPdfTask: Task;
   /** Creates a reply to a text or select field. */
   publicCreateSimpleReply: PublicPetitionFieldReply;
   /** Lets a recipient delegate access to the petition to another contact in the same organization */
@@ -503,6 +505,8 @@ export interface Mutation {
   publicFileUploadReplyComplete: PublicPetitionFieldReply;
   /** Generates a download link for a file reply on a public context. */
   publicFileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
+  /** Returns a signed download url for tasks with file output */
+  publicGetTaskResultFileUrl: Scalars["String"];
   /** Marks the specified comments as read. */
   publicMarkPetitionFieldCommentsAsRead: Array<PublicPetitionFieldComment>;
   /** Cancel a reminder for a contact. */
@@ -1022,6 +1026,10 @@ export interface MutationpublicCreatePetitionFieldCommentArgs {
   petitionFieldId: Scalars["GID"];
 }
 
+export interface MutationpublicCreatePrintPdfTaskArgs {
+  keycode: Scalars["ID"];
+}
+
 export interface MutationpublicCreateSimpleReplyArgs {
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
@@ -1056,6 +1064,11 @@ export interface MutationpublicFileUploadReplyDownloadLinkArgs {
   keycode: Scalars["ID"];
   preview?: InputMaybe<Scalars["Boolean"]>;
   replyId: Scalars["GID"];
+}
+
+export interface MutationpublicGetTaskResultFileUrlArgs {
+  keycode: Scalars["ID"];
+  taskId: Scalars["GID"];
 }
 
 export interface MutationpublicMarkPetitionFieldCommentsAsReadArgs {
@@ -2606,6 +2619,7 @@ export interface Query {
   /** The comments for this field. */
   publicPetitionField: PublicPetitionField;
   publicPetitionLinkBySlug?: Maybe<PublicPublicPetitionLink>;
+  publicTask: Task;
   publicTemplateCategories: Array<Scalars["String"]>;
   /** Search users and user groups */
   searchUsers: Array<UserOrUserGroup>;
@@ -2724,6 +2738,11 @@ export interface QuerypublicPetitionFieldArgs {
 
 export interface QuerypublicPetitionLinkBySlugArgs {
   slug: Scalars["ID"];
+}
+
+export interface QuerypublicTaskArgs {
+  keycode: Scalars["ID"];
+  taskId: Scalars["GID"];
 }
 
 export interface QuerysearchUsersArgs {
@@ -3750,14 +3769,6 @@ export type TaskProgressDialog_TaskFragment = {
   id: string;
   status: TaskStatus;
   progress?: number | null;
-};
-
-export type TaskProgressDialog_TaskQueryVariables = Exact<{
-  id: Scalars["GID"];
-}>;
-
-export type TaskProgressDialog_TaskQuery = {
-  task: { __typename?: "Task"; id: string; status: TaskStatus; progress?: number | null };
 };
 
 export type WithAdminOrganizationRoleQueryVariables = Exact<{ [key: string]: never }>;
@@ -17471,6 +17482,14 @@ export type uploadFile_AWSPresignedPostDataFragment = {
   fields: { [key: string]: any };
 };
 
+export type useExportRepliesTask_taskQueryVariables = Exact<{
+  id: Scalars["GID"];
+}>;
+
+export type useExportRepliesTask_taskQuery = {
+  task: { __typename?: "Task"; id: string; status: TaskStatus; progress?: number | null };
+};
+
 export type useExportRepliesTask_createExportRepliesTaskMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   pattern?: InputMaybe<Scalars["String"]>;
@@ -17489,13 +17508,7 @@ export type useExportRepliesTask_getTaskResultFileUrlMutationVariables = Exact<{
   taskId: Scalars["GID"];
 }>;
 
-export type useExportRepliesTask_getTaskResultFileUrlMutation = {
-  getTaskResultFileUrl: {
-    __typename?: "FileUploadDownloadLinkResult";
-    result: Result;
-    url?: string | null;
-  };
-};
+export type useExportRepliesTask_getTaskResultFileUrlMutation = { getTaskResultFileUrl: string };
 
 export type useFilenamePlaceholdersRename_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -17719,12 +17732,45 @@ export type usePrintPdfTask_getTaskResultFileUrlMutationVariables = Exact<{
   taskId: Scalars["GID"];
 }>;
 
-export type usePrintPdfTask_getTaskResultFileUrlMutation = {
-  getTaskResultFileUrl: {
-    __typename?: "FileUploadDownloadLinkResult";
-    result: Result;
-    url?: string | null;
+export type usePrintPdfTask_getTaskResultFileUrlMutation = { getTaskResultFileUrl: string };
+
+export type usePrintPdfTask_taskQueryVariables = Exact<{
+  id: Scalars["GID"];
+}>;
+
+export type usePrintPdfTask_taskQuery = {
+  task: { __typename?: "Task"; id: string; status: TaskStatus; progress?: number | null };
+};
+
+export type usePublicPrintPdfTask_publicCreatePrintPdfTaskMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+}>;
+
+export type usePublicPrintPdfTask_publicCreatePrintPdfTaskMutation = {
+  publicCreatePrintPdfTask: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    progress?: number | null;
   };
+};
+
+export type usePublicPrintPdfTask_publicGetTaskResultFileUrlMutationVariables = Exact<{
+  taskId: Scalars["GID"];
+  keycode: Scalars["ID"];
+}>;
+
+export type usePublicPrintPdfTask_publicGetTaskResultFileUrlMutation = {
+  publicGetTaskResultFileUrl: string;
+};
+
+export type usePublicPrintPdfTask_publicTaskQueryVariables = Exact<{
+  taskId: Scalars["GID"];
+  keycode: Scalars["ID"];
+}>;
+
+export type usePublicPrintPdfTask_publicTaskQuery = {
+  task: { __typename?: "Task"; id: string; status: TaskStatus; progress?: number | null };
 };
 
 export type useSearchContacts_contactsQueryVariables = Exact<{
@@ -21263,14 +21309,6 @@ export const TagEditDialog_updateTagDocument = gql`
   TagEditDialog_updateTagMutation,
   TagEditDialog_updateTagMutationVariables
 >;
-export const TaskProgressDialog_TaskDocument = gql`
-  query TaskProgressDialog_Task($id: GID!) {
-    task(id: $id) {
-      ...TaskProgressDialog_Task
-    }
-  }
-  ${TaskProgressDialog_TaskFragmentDoc}
-` as unknown as DocumentNode<TaskProgressDialog_TaskQuery, TaskProgressDialog_TaskQueryVariables>;
 export const WithAdminOrganizationRoleDocument = gql`
   query WithAdminOrganizationRole {
     me {
@@ -24176,6 +24214,17 @@ export const useUpdateIsReadNotification_updatePetitionUserNotificationReadStatu
   useUpdateIsReadNotification_updatePetitionUserNotificationReadStatusMutation,
   useUpdateIsReadNotification_updatePetitionUserNotificationReadStatusMutationVariables
 >;
+export const useExportRepliesTask_taskDocument = gql`
+  query useExportRepliesTask_task($id: GID!) {
+    task(id: $id) {
+      ...TaskProgressDialog_Task
+    }
+  }
+  ${TaskProgressDialog_TaskFragmentDoc}
+` as unknown as DocumentNode<
+  useExportRepliesTask_taskQuery,
+  useExportRepliesTask_taskQueryVariables
+>;
 export const useExportRepliesTask_createExportRepliesTaskDocument = gql`
   mutation useExportRepliesTask_createExportRepliesTask($petitionId: GID!, $pattern: String) {
     createExportRepliesTask(petitionId: $petitionId, pattern: $pattern) {
@@ -24189,10 +24238,7 @@ export const useExportRepliesTask_createExportRepliesTaskDocument = gql`
 >;
 export const useExportRepliesTask_getTaskResultFileUrlDocument = gql`
   mutation useExportRepliesTask_getTaskResultFileUrl($taskId: GID!) {
-    getTaskResultFileUrl(taskId: $taskId, preview: false) {
-      result
-      url
-    }
+    getTaskResultFileUrl(taskId: $taskId, preview: false)
   }
 ` as unknown as DocumentNode<
   useExportRepliesTask_getTaskResultFileUrlMutation,
@@ -24222,14 +24268,49 @@ export const usePrintPdfTask_createPrintPdfTaskDocument = gql`
 >;
 export const usePrintPdfTask_getTaskResultFileUrlDocument = gql`
   mutation usePrintPdfTask_getTaskResultFileUrl($taskId: GID!) {
-    getTaskResultFileUrl(taskId: $taskId, preview: true) {
-      result
-      url
-    }
+    getTaskResultFileUrl(taskId: $taskId, preview: true)
   }
 ` as unknown as DocumentNode<
   usePrintPdfTask_getTaskResultFileUrlMutation,
   usePrintPdfTask_getTaskResultFileUrlMutationVariables
+>;
+export const usePrintPdfTask_taskDocument = gql`
+  query usePrintPdfTask_task($id: GID!) {
+    task(id: $id) {
+      ...TaskProgressDialog_Task
+    }
+  }
+  ${TaskProgressDialog_TaskFragmentDoc}
+` as unknown as DocumentNode<usePrintPdfTask_taskQuery, usePrintPdfTask_taskQueryVariables>;
+export const usePublicPrintPdfTask_publicCreatePrintPdfTaskDocument = gql`
+  mutation usePublicPrintPdfTask_publicCreatePrintPdfTask($keycode: ID!) {
+    publicCreatePrintPdfTask(keycode: $keycode) {
+      ...TaskProgressDialog_Task
+    }
+  }
+  ${TaskProgressDialog_TaskFragmentDoc}
+` as unknown as DocumentNode<
+  usePublicPrintPdfTask_publicCreatePrintPdfTaskMutation,
+  usePublicPrintPdfTask_publicCreatePrintPdfTaskMutationVariables
+>;
+export const usePublicPrintPdfTask_publicGetTaskResultFileUrlDocument = gql`
+  mutation usePublicPrintPdfTask_publicGetTaskResultFileUrl($taskId: GID!, $keycode: ID!) {
+    publicGetTaskResultFileUrl(taskId: $taskId, keycode: $keycode)
+  }
+` as unknown as DocumentNode<
+  usePublicPrintPdfTask_publicGetTaskResultFileUrlMutation,
+  usePublicPrintPdfTask_publicGetTaskResultFileUrlMutationVariables
+>;
+export const usePublicPrintPdfTask_publicTaskDocument = gql`
+  query usePublicPrintPdfTask_publicTask($taskId: GID!, $keycode: ID!) {
+    task: publicTask(taskId: $taskId, keycode: $keycode) {
+      ...TaskProgressDialog_Task
+    }
+  }
+  ${TaskProgressDialog_TaskFragmentDoc}
+` as unknown as DocumentNode<
+  usePublicPrintPdfTask_publicTaskQuery,
+  usePublicPrintPdfTask_publicTaskQueryVariables
 >;
 export const useSearchContacts_contactsDocument = gql`
   query useSearchContacts_contacts($search: String, $exclude: [GID!]) {

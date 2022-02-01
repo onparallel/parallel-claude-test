@@ -840,7 +840,7 @@ type Mutation {
   """
   Returns a signed download url for tasks with file output
   """
-  getTaskResultFileUrl(preview: Boolean, taskId: GID!): FileUploadDownloadLinkResult!
+  getTaskResultFileUrl(preview: Boolean, taskId: GID!): String!
 
   """
   marks a Signature integration as default
@@ -946,6 +946,11 @@ type Mutation {
   ): PublicPetitionFieldComment!
 
   """
+  Starts an export pdf task in a recipient context
+  """
+  publicCreatePrintPdfTask(keycode: ID!): Task!
+
+  """
   Creates a reply to a text or select field.
   """
   publicCreateSimpleReply(fieldId: GID!, keycode: ID!, value: String!): PublicPetitionFieldReply!
@@ -992,6 +997,11 @@ type Mutation {
     preview: Boolean
     replyId: GID!
   ): FileUploadDownloadLinkResult!
+
+  """
+  Returns a signed download url for tasks with file output on a recipient context
+  """
+  publicGetTaskResultFileUrl(keycode: ID!, taskId: GID!): String!
 
   """
   Marks the specified comments as read.
@@ -3657,6 +3667,7 @@ type Query {
   """
   publicPetitionField(keycode: ID!, petitionFieldId: GID!): PublicPetitionField!
   publicPetitionLinkBySlug(slug: ID!): PublicPublicPetitionLink
+  publicTask(keycode: ID!, taskId: GID!): Task!
   publicTemplateCategories: [String!]!
 
   """

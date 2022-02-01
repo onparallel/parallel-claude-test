@@ -1115,7 +1115,7 @@ export type CreateTag = PartialProps<
 
 export interface Task {
   id: number; // int4
-  user_id: number; // int4
+  user_id: Maybe<number>; // int4
   name: TaskName; // task_name
   status: TaskStatus; // task_status
   progress: Maybe<number>; // int4
@@ -1126,10 +1126,12 @@ export interface Task {
   created_by: Maybe<string>; // varchar
   updated_at: Date; // timestamptz
   updated_by: Maybe<string>; // varchar
+  petition_access_id: Maybe<number>; // int4
 }
 
 export type CreateTask = PartialProps<
   Omit<Task, "id">,
+  | "user_id"
   | "status"
   | "progress"
   | "input"
@@ -1139,6 +1141,7 @@ export type CreateTask = PartialProps<
   | "created_by"
   | "updated_at"
   | "updated_by"
+  | "petition_access_id"
 >;
 
 export interface TemplateDefaultPermission {

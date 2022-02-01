@@ -12,6 +12,7 @@ import {
 } from "nexus";
 import { isDefined } from "remeda";
 import { getClientIp } from "request-ip";
+import { Task } from "../../db/repositories/TaskRepository";
 import { toGlobalId } from "../../util/globalId";
 import { stallFor } from "../../util/promises/stallFor";
 import { random } from "../../util/token";
@@ -34,6 +35,7 @@ import {
   replyCanBeUpdated,
   replyIsForFieldOfType,
 } from "../petition/authorizers";
+import { tasksAreOfType } from "../task/authorizers";
 import { validateCheckboxReplyValues, validateDynamicSelectReplyValues } from "../utils";
 import {
   authenticatePublicAccess,
@@ -42,6 +44,7 @@ import {
   fieldBelongsToAccess,
   getContactAuthCookieValue,
   replyBelongsToAccess,
+  taskBelongsToAccess,
   validPublicPetitionLinkSlug,
 } from "./authorizers";
 function anonymizePart(part: string) {
@@ -1135,5 +1138,52 @@ export const publicSendReminder = mutationField("publicSendReminder", {
     } catch (error: any) {
       return RESULT.FAILURE;
     }
+  },
+});
+
+export const publicCreatePrintPdfTask = mutationField("publicCreatePrintPdfTask", {
+  description: "Starts an export pdf task in a recipient context",
+  type: "Task",
+  authorize: authenticatePublicAccess("keycode"),
+  args: { keycode: nonNull(idArg()) },
+  resolve: async (_, args, ctx) =>
+    await ctx.tasks.createTask(
+      {
+        name: "PRINT_PDF",
+        petition_access_id: ctx.access!.id,
+        input: {
+          petition_id: ctx.access!.petition_id,
+        },
+      },
+      `PetitionAccess:${ctx.access!.id}`
+    ),
+});
+
+export const publicGetTaskResultFileUrl = mutationField("publicGetTaskResultFileUrl", {
+  description: "Returns a signed download url for tasks with file output on a recipient context",
+  type: "String",
+  authorize: chain(
+    authenticatePublicAccess("keycode"),
+    taskBelongsToAccess("taskId"),
+    tasksAreOfType("taskId", ["PRINT_PDF"])
+  ),
+  args: {
+    taskId: nonNull(globalIdArg("Task")),
+    keycode: nonNull(idArg()),
+  },
+  resolve: async (_, args, ctx) => {
+    const task = (await ctx.tasks.loadTask(args.taskId)) as Task<"PRINT_PDF">;
+    const file = await ctx.files.loadTemporaryFile(task.output.temporary_file_id);
+    if (!file) {
+      throw new ApolloError(
+        `Temporary file not found for Task:${task.id} output`,
+        "FILE_NOT_FOUND_ERROR"
+      );
+    }
+    return await ctx.aws.temporaryFiles.getSignedDownloadEndpoint(
+      file.path,
+      file.filename,
+      "inline"
+    );
   },
 });

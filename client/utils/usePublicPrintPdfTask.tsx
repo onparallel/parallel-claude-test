@@ -5,32 +5,38 @@ import {
   useTaskProgressDialog,
 } from "@parallel/components/common/dialogs/TaskProgressDialog";
 import {
-  usePrintPdfTask_createPrintPdfTaskDocument,
-  usePrintPdfTask_getTaskResultFileUrlDocument,
-  usePrintPdfTask_taskDocument,
+  usePublicPrintPdfTask_publicCreatePrintPdfTaskDocument,
+  usePublicPrintPdfTask_publicGetTaskResultFileUrlDocument,
+  usePublicPrintPdfTask_publicTaskDocument,
 } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { openNewWindow } from "./openNewWindow";
 import { withError } from "./promises/withError";
 
-export function usePrintPdfTask() {
-  const showError = useErrorDialog();
-  const [createTask] = useMutation(usePrintPdfTask_createPrintPdfTaskDocument);
-  const [generateDownloadUrl] = useMutation(usePrintPdfTask_getTaskResultFileUrlDocument);
-
-  const showTaskProgressDialog = useTaskProgressDialog();
+export function usePublicPrintPdfTask() {
   const intl = useIntl();
+  const showError = useErrorDialog();
+  const showTaskProgressDialog = useTaskProgressDialog();
 
-  const { refetch } = useQuery(usePrintPdfTask_taskDocument, { skip: true });
+  const [publicCreatePrintPdfTask] = useMutation(
+    usePublicPrintPdfTask_publicCreatePrintPdfTaskDocument
+  );
+  const [publicGetTaskResultFileUrl] = useMutation(
+    usePublicPrintPdfTask_publicGetTaskResultFileUrlDocument
+  );
+  const { refetch } = useQuery(usePublicPrintPdfTask_publicTaskDocument, { skip: true });
 
-  return async (petitionId: string) => {
+  return async (keycode: string) => {
     const [error, finishedTask] = await withError(async () => {
-      const { data } = await createTask({ variables: { petitionId } });
+      const { data } = await publicCreatePrintPdfTask({
+        variables: { keycode },
+      });
       return await showTaskProgressDialog({
-        task: data!.createPrintPdfTask,
+        task: data!.publicCreatePrintPdfTask,
         refetch: async () => {
           const { data: refetchData } = await refetch({
-            id: data!.createPrintPdfTask.id,
+            keycode,
+            taskId: data!.publicCreatePrintPdfTask.id,
           });
           return refetchData.task;
         },
@@ -55,36 +61,38 @@ export function usePrintPdfTask() {
       });
     } else {
       openNewWindow(async () => {
-        const { data } = await generateDownloadUrl({ variables: { taskId: finishedTask!.id } });
-        if (!data?.getTaskResultFileUrl) {
+        const { data } = await publicGetTaskResultFileUrl({
+          variables: { taskId: finishedTask!.id, keycode },
+        });
+        if (!data?.publicGetTaskResultFileUrl) {
           throw new Error();
         }
-        return data.getTaskResultFileUrl;
+        return data.publicGetTaskResultFileUrl;
       });
     }
   };
 }
 
-usePrintPdfTask.mutations = [
+usePublicPrintPdfTask.mutations = [
   gql`
-    mutation usePrintPdfTask_createPrintPdfTask($petitionId: GID!) {
-      createPrintPdfTask(petitionId: $petitionId) {
+    mutation usePublicPrintPdfTask_publicCreatePrintPdfTask($keycode: ID!) {
+      publicCreatePrintPdfTask(keycode: $keycode) {
         ...TaskProgressDialog_Task
       }
     }
     ${TaskProgressDialog.fragments.Task}
   `,
   gql`
-    mutation usePrintPdfTask_getTaskResultFileUrl($taskId: GID!) {
-      getTaskResultFileUrl(taskId: $taskId, preview: true)
+    mutation usePublicPrintPdfTask_publicGetTaskResultFileUrl($taskId: GID!, $keycode: ID!) {
+      publicGetTaskResultFileUrl(taskId: $taskId, keycode: $keycode)
     }
   `,
 ];
 
-usePrintPdfTask.queries = [
+usePublicPrintPdfTask.queries = [
   gql`
-    query usePrintPdfTask_task($id: GID!) {
-      task(id: $id) {
+    query usePublicPrintPdfTask_publicTask($taskId: GID!, $keycode: ID!) {
+      task: publicTask(taskId: $taskId, keycode: $keycode) {
         ...TaskProgressDialog_Task
       }
     }
