@@ -23,7 +23,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { Card, GenericCardHeader } from "../common/Card";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { Link, NormalLink } from "../common/Link";
+import { NormalLink } from "../common/Link";
 import {
   SignatureConfigDialog,
   useSignatureConfigDialog,
@@ -339,17 +339,6 @@ export const PetitionSignaturesCard = Object.assign(
               <FormattedMessage
                 id="component.petition-signatures-card.no-signature-configured"
                 defaultMessage="No signature has been configured for this petition."
-              />
-            </Text>
-            <Text>
-              <FormattedMessage
-                id="component.petition-signatures-card.no-signature-configured-2"
-                defaultMessage="If you need it, you can configure it from the petition settings in the <a>Compose</a> tab."
-                values={{
-                  a: (chunks: any) => (
-                    <Link href={`/app/petitions/${petition.id}/compose`}>{chunks}</Link>
-                  ),
-                }}
               />
             </Text>
           </Center>

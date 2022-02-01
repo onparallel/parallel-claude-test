@@ -1935,11 +1935,6 @@
     "context": "No signature has been configured for this petition."
   },
   {
-    "term": "component.petition-signatures-card.no-signature-configured-2",
-    "definition": "If you need it, you can configure it from the petition settings in the <a>Compose</a> tab.",
-    "context": "If you need it, you can configure it from the petition settings in the <a>Compose</a> tab."
-  },
-  {
     "term": "component.petition-signatures-card.previous-signatures",
     "definition": "Previous signatures",
     "context": "Previous signatures"

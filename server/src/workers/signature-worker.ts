@@ -14,7 +14,6 @@ import { toGlobalId } from "../util/globalId";
 import { removeKeys } from "../util/remedaExtensions";
 import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
 import { random } from "../util/token";
-import { calculateSignatureBoxPositions } from "./helpers/calculateSignatureBoxPositions";
 import { createQueueWorker } from "./helpers/createQueueWorker";
 import { getLayoutProps } from "./helpers/getLayoutProps";
 
@@ -39,7 +38,6 @@ async function startSignatureProcess(
 
   const { title, orgIntegrationId, signersInfo, message } = signature.signature_config;
 
-  let removeGeneratedPdf = true;
   const tmpPdfPath = resolve(
     tmpdir(),
     "print",
@@ -61,14 +59,12 @@ async function startSignatureProcess(
       documentTitle: title,
     });
 
-    const buffer = await ctx.printer.pdf(
+    await ctx.printer.pdf(
       `http://localhost:3000/${petition.locale}/print/petition-pdf?${new URLSearchParams({
         token,
       })}`,
       tmpPdfPath
     );
-
-    const signatureBoxPositions = await calculateSignatureBoxPositions(buffer, recipients);
 
     const signatureClient = ctx.signature.getClient(signatureIntegration);
 
@@ -84,7 +80,6 @@ async function startSignatureProcess(
           tone,
         },
         signingMode: "parallel",
-        signatureBoxPositions,
         initialMessage: message,
       }
     );
@@ -131,11 +126,7 @@ async function startSignatureProcess(
     const cancelData = {
       error: error.stack ?? JSON.stringify(error),
     } as PetitionSignatureRequestCancelData<"REQUEST_ERROR">;
-    if (error.message === "MALFORMED_PDF_ERROR") {
-      cancelData.file = tmpPdfPath;
-      cancelData.error_code = "MALFORMED_PDF_ERROR";
-      removeGeneratedPdf = false;
-    }
+
     await Promise.all([
       ctx.petitions.cancelPetitionSignatureRequest(signature.id, "REQUEST_ERROR", cancelData),
       ctx.petitions.createEvent({
@@ -151,9 +142,7 @@ async function startSignatureProcess(
     throw error;
   } finally {
     try {
-      if (removeGeneratedPdf) {
-        await fs.unlink(tmpPdfPath);
-      }
+      await fs.unlink(tmpPdfPath);
     } catch {}
   }
 }

@@ -3,12 +3,7 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import "reflect-metadata";
 import { countBy, omit } from "remeda";
-import SignaturitSDK, {
-  BrandingParams,
-  BrandingResponse,
-  Document,
-  SignatureParams,
-} from "signaturit-sdk";
+import SignaturitSDK, { BrandingParams, BrandingResponse, Document } from "signaturit-sdk";
 import { URLSearchParams } from "url";
 import { Tone } from "../api/public/__types";
 import {
@@ -25,8 +20,6 @@ import SignatureReminderEmail from "../emails/components/SignatureReminderEmail"
 import SignatureRequestedEmail from "../emails/components/SignatureRequestedEmail";
 import { toGlobalId } from "../util/globalId";
 import { downloadImageBase64 } from "../util/images";
-import { removeNotDefined } from "../util/remedaExtensions";
-import { PageSignatureMetadata } from "../workers/helpers/calculateSignatureBoxPositions";
 import { getBaseWebhookUrl } from "../workers/helpers/getBaseWebhookUrl";
 import { CONFIG, Config } from "./../config";
 import { AWS_SERVICE, IAws } from "./aws";
@@ -43,11 +36,6 @@ type SignatureOptions = {
   };
   events_url?: string;
   signingMode?: "parallel" | "sequential";
-  /**
-   *  Each element on the array represents a page in the document.
-   *  Inside each page, there's an array with the signers information.
-   */
-  signatureBoxPositions?: PageSignatureMetadata[][];
   /**
    * Optional plain-text custom message to include in the "signature requested" emails
    */
@@ -358,29 +346,30 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
 
     const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.parallelUrl);
 
-    return await this.sdk.createSignature(
-      files,
-      recipients,
-      removeNotDefined<SignatureParams>({
-        body: opts.initialMessage,
-        delivery_type: "email",
-        signing_mode: opts.signingMode ?? "parallel",
-        branding_id: brandingId,
-        events_url: `${baseEventsUrl}/api/webhooks/signaturit/${petitionId}/events`,
-        callback_url: `${this.config.misc.parallelUrl}/${locale}/thanks?${new URLSearchParams({
-          o: toGlobalId("Organization", this.orgId),
-        })}`,
-        recipients: recipients.map((r, recipientIndex) => ({
-          email: r.email,
-          name: r.name,
-          require_signature_in_coordinates: opts.signatureBoxPositions?.map(
-            (pageBoxes) => pageBoxes.find((pb) => pb.signerIndex === recipientIndex)?.box ?? {}
-          ),
-        })),
-        expire_time: 0, // disable signaturit automatic reminder emails
-        reminders: 0,
-      }) as any
-    );
+    return await this.sdk.createSignature(files, recipients, {
+      body: opts.initialMessage,
+      delivery_type: "email",
+      signing_mode: opts.signingMode ?? "parallel",
+      branding_id: brandingId,
+      events_url: `${baseEventsUrl}/api/webhooks/signaturit/${petitionId}/events`,
+      callback_url: `${this.config.misc.parallelUrl}/${locale}/thanks?${new URLSearchParams({
+        o: toGlobalId("Organization", this.orgId),
+      })}`,
+      recipients: recipients.map((r, recipientIndex) => ({
+        email: r.email,
+        name: r.name,
+        widgets: [
+          {
+            type: "signature",
+            word_anchor: `SIGNER${recipientIndex}`,
+            height: 7, // 7% of page height
+            width: 26, // 26% of page width
+          },
+        ],
+      })),
+      expire_time: 0, // disable signaturit automatic reminder emails
+      reminders: 0,
+    });
   }
 
   public async cancelSignatureRequest(externalId: string) {

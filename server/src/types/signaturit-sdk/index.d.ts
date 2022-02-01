@@ -112,12 +112,6 @@ declare module "signaturit-sdk" {
     created_at: Date;
   } & BrandingParams;
 
-  type PageCoordinates = {
-    top: string | number;
-    left: string | number;
-    height: string | number;
-    width: string | number;
-  };
   type Recipient = {
     email: string;
     name: string;
@@ -145,7 +139,6 @@ declare module "signaturit-sdk" {
     /** List with signature recipients containing name, email and extra requirements for the signature process if needed. */
     recipients?: Array<
       Recipient & {
-        require_signature_in_coordinates?: Array<PageCoordinates | number | {}>;
         widgets?: SignaturItWidget[];
       }
     >;
@@ -167,6 +160,9 @@ declare module "signaturit-sdk" {
     left?: number;
     type: "date" | "image" | "check" | "radio" | "select" | "text" | "signature";
     default?: any;
+    /**
+     * Set this value to find a single world in the document and anchor the widget to that position. If the word is found multiple times, there will be a widget for each one. This parameter doesn't support spaces or symbols like _ or @.
+     */
     word_anchor?: string;
     options?: any;
   };

@@ -28,7 +28,7 @@ export function SignatureBox({ signer, timezone }: SignatureBoxProps) {
         }}
       >
         <Text color="#ffffff" position="absolute" top="0" left="0">
-          {`SIGNER_${signer.key}`}
+          {`SIGNER${signer.key}`}
         </Text>
         {signer.fullName}
         <br />
