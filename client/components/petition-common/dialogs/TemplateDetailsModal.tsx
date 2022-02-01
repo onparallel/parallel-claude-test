@@ -64,12 +64,8 @@ export function TemplateDetailsModal({ me, template, ...props }: TemplateDetails
 
   const indices = useFieldIndices(filteredFields);
 
-  const publicLinkURL = template.publicLink?.isActive
-    ? `${process.env.NEXT_PUBLIC_PARALLEL_URL}/${template.locale}/pp/${template.publicLink.slug}`
-    : undefined;
-
   const onCopyPublicLink = useClipboardWithToast({
-    value: publicLinkURL!,
+    value: template.publicLink!.url,
     text: intl.formatMessage({
       id: "component.petition-settings.link-copied-toast",
       defaultMessage: "Link copied to clipboard",
@@ -333,6 +329,7 @@ TemplateDetailsModal.fragments = {
         id
         isActive
         slug
+        url
       }
       updatedAt
     }

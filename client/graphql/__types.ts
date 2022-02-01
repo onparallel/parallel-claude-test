@@ -7342,6 +7342,7 @@ export type TemplateDetailsModal_PetitionTemplateFragment = {
     id: string;
     isActive: boolean;
     slug: string;
+    url: string;
   } | null;
 };
 
@@ -16076,6 +16077,7 @@ export type NewPetition_templateQuery = {
           id: string;
           isActive: boolean;
           slug: string;
+          url: string;
         } | null;
       }
     | null;
@@ -18101,6 +18103,7 @@ export const TemplateDetailsModal_PetitionTemplateFragmentDoc = gql`
       id
       isActive
       slug
+      url
     }
     updatedAt
   }
