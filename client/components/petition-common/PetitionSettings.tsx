@@ -195,7 +195,6 @@ function _PetitionSettings({
   }
 
   const onCopyPublicLink = useClipboardWithToast({
-    value: petition.__typename === "PetitionTemplate" ? petition.publicLink?.url : "",
     text: intl.formatMessage({
       id: "component.petition-settings.link-copied-toast",
       defaultMessage: "Link copied to clipboard",

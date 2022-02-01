@@ -65,7 +65,6 @@ export function TemplateDetailsModal({ me, template, ...props }: TemplateDetails
   const indices = useFieldIndices(filteredFields);
 
   const onCopyPublicLink = useClipboardWithToast({
-    value: template.publicLink!.url,
     text: intl.formatMessage({
       id: "component.petition-settings.link-copied-toast",
       defaultMessage: "Link copied to clipboard",
@@ -189,7 +188,7 @@ export function TemplateDetailsModal({ me, template, ...props }: TemplateDetails
                         <MenuItem
                           justifyContent="left"
                           icon={<LinkIcon display="block" boxSize={4} />}
-                          onClick={() => onCopyPublicLink()}
+                          onClick={() => onCopyPublicLink({ value: template.publicLink!.url })}
                         >
                           <FormattedMessage id="generic.copy-link" defaultMessage="Copy link" />
                         </MenuItem>
