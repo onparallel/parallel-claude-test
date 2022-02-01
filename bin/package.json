@@ -1,7 +1,8 @@
 {
   "name": "@parallel/bin",
   "version": "1.0.0",
-  "license": "MIT",
+  "license": "UNLICENSED",
+  "private": true,
   "scripts": {
     "build": "rimraf dist && tsc --project tsconfig.json",
     "extract-i18n-terms": "node dist/extract-i18n-terms.js",

@@ -1,7 +1,8 @@
 {
   "name": "@parallel/server",
   "version": "1.0.0",
-  "license": "MIT",
+  "license": "UNLICENSED",
+  "private": true,
   "scripts": {
     "dev": "cross-env NODE_ENV=development ts-node-dev --ignore-watch graphql/__types.ts --no-notify --transpile-only --respawn ./src",
     "debug": "cross-env NODE_ENV=development ts-node-dev --inspect --ignore-watch graphql/__types.ts --no-notify --transpile-only --respawn ./src",

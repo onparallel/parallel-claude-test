@@ -1,6 +1,7 @@
 {
   "version": "1.0.0",
   "name": "@parallel/e2e",
+  "license": "UNLICENSED",
   "private": true,
   "scripts": {
     "test": "jest"
