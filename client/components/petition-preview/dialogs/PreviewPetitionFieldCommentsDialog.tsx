@@ -354,6 +354,8 @@ PreviewPetitionFieldCommentsDialog.fragments = {
         id
         title
         isInternal
+        commentCount
+        unreadCommentCount
         comments {
           ...FieldComment_PetitionFieldComment
         }
@@ -402,6 +404,8 @@ PreviewPetitionFieldCommentsDialog.mutations = [
         ...FieldComment_PetitionFieldComment
         field {
           id
+          commentCount
+          unreadCommentCount
           comments {
             id
           }
@@ -446,6 +450,8 @@ PreviewPetitionFieldCommentsDialog.mutations = [
         petitionFieldCommentId: $petitionFieldCommentId
       ) {
         ...PreviewPetitionFieldCommentsDialog_PetitionField
+        commentCount
+        unreadCommentCount
         comments {
           id
         }

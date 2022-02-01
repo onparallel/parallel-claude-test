@@ -298,6 +298,8 @@ RecipientViewPetitionFieldCommentsDialog.fragments = {
       fragment RecipientViewPetitionFieldCommentsDialog_PublicPetitionField on PublicPetitionField {
         id
         title
+        commentCount
+        unreadCommentCount
       }
     `;
   },
@@ -310,14 +312,14 @@ RecipientViewPetitionFieldCommentsDialog.queries = [
       $petitionFieldId: GID!
     ) {
       publicPetitionField(keycode: $keycode, petitionFieldId: $petitionFieldId) {
-        id
-        title
+        ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
         comments {
           id
           ...FieldComment_PublicPetitionFieldComment
         }
       }
     }
+    ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionField}
     ${FieldComment.fragments.PublicPetitionFieldComment}
   `,
 ];
@@ -351,6 +353,8 @@ RecipientViewPetitionFieldCommentsDialog.mutations = [
         ...FieldComment_PublicPetitionFieldComment
         field {
           id
+          commentCount
+          unreadCommentCount
           comments {
             id
           }
@@ -389,6 +393,8 @@ RecipientViewPetitionFieldCommentsDialog.mutations = [
         petitionFieldCommentId: $petitionFieldCommentId
       ) {
         id
+        commentCount
+        unreadCommentCount
         comments {
           id
         }

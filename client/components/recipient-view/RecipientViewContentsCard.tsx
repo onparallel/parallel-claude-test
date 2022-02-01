@@ -69,7 +69,10 @@ export function RecipientViewContentsCard({
     .slice(fields[0].title ? 1 : 0) as typeof fields;
 
   const showCommentsCount = (field: PetitionFieldSelection) => {
-    return field.__typename === "PetitionField" ? true : field.options.hasCommentsEnabled;
+    return (
+      field.commentCount > 0 &&
+      (field.__typename === "PetitionField" || field.options.hasCommentsEnabled)
+    );
   };
 
   return (
@@ -202,7 +205,7 @@ export function RecipientViewContentsCard({
                                     />
                                   )}
                                 </Box>
-                                {commentCount && showCommentsCount(field) ? (
+                                {showCommentsCount(field) ? (
                                   <RecipientViewContentsIndicators
                                     hasUnreadComments={field.unreadCommentCount > 0}
                                     commentCount={field.commentCount}

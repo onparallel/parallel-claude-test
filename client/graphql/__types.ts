@@ -8045,6 +8045,8 @@ export type PreviewPetitionFieldCommentsDialog_PetitionFieldFragment = {
   id: string;
   title?: string | null;
   isInternal: boolean;
+  commentCount: number;
+  unreadCommentCount: number;
   comments: Array<{
     __typename?: "PetitionFieldComment";
     id: string;
@@ -8081,6 +8083,8 @@ export type PreviewPetitionFieldCommentsDialog_petitionFieldQueryQuery = {
     id: string;
     title?: string | null;
     isInternal: boolean;
+    commentCount: number;
+    unreadCommentCount: number;
     comments: Array<{
       __typename?: "PetitionFieldComment";
       id: string;
@@ -8125,6 +8129,8 @@ export type PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentMutatio
     field: {
       __typename?: "PetitionField";
       id: string;
+      commentCount: number;
+      unreadCommentCount: number;
       comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
     };
     author?:
@@ -8179,6 +8185,8 @@ export type PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutatio
 export type PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation = {
   deletePetitionFieldComment: {
     __typename?: "PetitionField";
+    commentCount: number;
+    unreadCommentCount: number;
     id: string;
     title?: string | null;
     isInternal: boolean;
@@ -9026,6 +9034,8 @@ export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment
   __typename?: "PublicPetitionField";
   id: string;
   title?: string | null;
+  commentCount: number;
+  unreadCommentCount: number;
 };
 
 export type RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldQueryVariables = Exact<{
@@ -9038,6 +9048,8 @@ export type RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldQuery = 
     __typename?: "PublicPetitionField";
     id: string;
     title?: string | null;
+    commentCount: number;
+    unreadCommentCount: number;
     comments: Array<{
       __typename?: "PublicPetitionFieldComment";
       id: string;
@@ -9083,6 +9095,8 @@ export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentM
     field: {
       __typename?: "PublicPetitionField";
       id: string;
+      commentCount: number;
+      unreadCommentCount: number;
       comments: Array<{ __typename?: "PublicPetitionFieldComment"; id: string }>;
     };
     author?:
@@ -9125,6 +9139,8 @@ export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentM
   publicDeletePetitionFieldComment: {
     __typename?: "PublicPetitionField";
     id: string;
+    commentCount: number;
+    unreadCommentCount: number;
     comments: Array<{ __typename?: "PublicPetitionFieldComment"; id: string }>;
   };
 };
@@ -18310,6 +18326,8 @@ export const PreviewPetitionFieldCommentsDialog_PetitionFieldFragmentDoc = gql`
     id
     title
     isInternal
+    commentCount
+    unreadCommentCount
     comments {
       ...FieldComment_PetitionFieldComment
     }
@@ -20648,6 +20666,8 @@ export const RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragmen
   fragment RecipientViewPetitionFieldCommentsDialog_PublicPetitionField on PublicPetitionField {
     id
     title
+    commentCount
+    unreadCommentCount
   }
 ` as unknown as DocumentNode<
   RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment,
@@ -21937,6 +21957,8 @@ export const PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentDocume
       ...FieldComment_PetitionFieldComment
       field {
         id
+        commentCount
+        unreadCommentCount
         comments {
           id
         }
@@ -21987,6 +22009,8 @@ export const PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocume
       petitionFieldCommentId: $petitionFieldCommentId
     ) {
       ...PreviewPetitionFieldCommentsDialog_PetitionField
+      commentCount
+      unreadCommentCount
       comments {
         id
       }
@@ -22213,14 +22237,14 @@ export const RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldDocumen
     $petitionFieldId: GID!
   ) {
     publicPetitionField(keycode: $keycode, petitionFieldId: $petitionFieldId) {
-      id
-      title
+      ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
       comments {
         id
         ...FieldComment_PublicPetitionFieldComment
       }
     }
   }
+  ${RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragmentDoc}
   ${FieldComment_PublicPetitionFieldCommentFragmentDoc}
 ` as unknown as DocumentNode<
   RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldQuery,
@@ -22257,6 +22281,8 @@ export const RecipientViewPetitionFieldCommentsDialog_createPetitionFieldComment
       ...FieldComment_PublicPetitionFieldComment
       field {
         id
+        commentCount
+        unreadCommentCount
         comments {
           id
         }
@@ -22301,6 +22327,8 @@ export const RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldComment
       petitionFieldCommentId: $petitionFieldCommentId
     ) {
       id
+      commentCount
+      unreadCommentCount
       comments {
         id
       }
