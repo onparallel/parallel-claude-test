@@ -131,6 +131,7 @@ PetitionPdf.fragments = {
         title
         options
         description
+        showInPdf
         replies {
           id
           status

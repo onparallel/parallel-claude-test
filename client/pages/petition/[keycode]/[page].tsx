@@ -470,6 +470,7 @@ RecipientView.fragments = {
         tone
         fields {
           ...RecipientView_PublicPetitionField
+          ...useGetPageFields_PublicPetitionField
         }
         signatureConfig {
           review
@@ -495,6 +496,7 @@ RecipientView.fragments = {
       ${RecipientViewContentsCard.fragments.PublicPetition}
       ${RecipientViewProgressFooter.fragments.PublicPetition}
       ${RecipientViewHeader.fragments.PublicContact}
+      ${useGetPageFields.fragments.PublicPetitionField}
     `;
   },
   get PublicPetitionField() {

@@ -1795,6 +1795,11 @@
     "context": "Internal field"
   },
   {
+    "term": "component.petition-settings.petition-shown-in-pdf",
+    "definition": "Mostrar en PDF",
+    "context": "Show in PDF"
+  },
+  {
     "term": "component.petition-settings.petition-signature-configure",
     "definition": "Ajustes de firma digital",
     "context": "Configure eSignature"
@@ -3555,6 +3560,11 @@
     "context": "Allow more than one reply"
   },
   {
+    "term": "field-settings.show-in-pdf-description",
+    "definition": "Al activar esta opción, se mostrará el contenido en la exportación de PDF y en el documento a firmar.",
+    "context": "Enabling this option will make the content appear in the exported PDF and the document to be signed."
+  },
+  {
     "term": "field-settings.text-placeholder-description",
     "definition": "El placeholder es un sutil texto descriptivo que aparece cuando el campo de texto está vacío.",
     "context": "The placeholder is the subtle descriptive text that shows when the input field is empty."
@@ -4098,11 +4108,6 @@
     "term": "generic.no-deadline",
     "definition": "Sin vencimiento",
     "context": "No deadline"
-  },
-  {
-    "term": "generic.no-description",
-    "definition": "Sin descripción",
-    "context": "No description"
   },
   {
     "term": "generic.not-sent",

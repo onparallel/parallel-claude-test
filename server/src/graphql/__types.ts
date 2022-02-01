@@ -161,6 +161,7 @@ export interface NexusGenInputs {
     multiple?: boolean | null; // Boolean
     optional?: boolean | null; // Boolean
     options?: NexusGenScalars["JSONObject"] | null; // JSONObject
+    showInPdf?: boolean | null; // Boolean
     title?: string | null; // String
     visibility?: NexusGenScalars["JSONObject"] | null; // JSONObject
   };
@@ -1180,6 +1181,7 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     position: number; // Int!
     replies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
+    showInPdf: boolean; // Boolean!
     title: string | null; // String
     type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
     unreadCommentCount: number; // Int!
@@ -2479,6 +2481,7 @@ export interface NexusGenFieldTypeNames {
     petition: "PetitionBase";
     position: "Int";
     replies: "PetitionFieldReply";
+    showInPdf: "Boolean";
     title: "String";
     type: "PetitionFieldType";
     unreadCommentCount: "Int";

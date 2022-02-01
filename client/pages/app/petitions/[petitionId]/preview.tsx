@@ -345,6 +345,7 @@ PetitionPreview.fragments = {
       }
       fields {
         ...PreviewPetitionField_PetitionField
+        ...useGetPageFields_PetitionField
       }
       signatureConfig {
         letRecipientsChooseSigners
@@ -362,6 +363,7 @@ PetitionPreview.fragments = {
     ${RecipientViewContentsCard.fragments.PetitionBase}
     ${PetitionLayout.fragments.PetitionBase}
     ${PreviewPetitionField.fragments.PetitionField}
+    ${useGetPageFields.fragments.PetitionField}
   `,
   User: gql`
     fragment PetitionPreview_User on User {

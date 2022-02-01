@@ -201,6 +201,7 @@ export function defaultFieldOptions(
         optional: true,
         multiple: false,
         is_internal: false,
+        show_in_pdf: true,
         options: {
           hasCommentsEnabled: false,
           hasPageBreak: false,
@@ -212,6 +213,7 @@ export function defaultFieldOptions(
         optional: optional ?? false,
         multiple: multiple ?? false,
         is_internal: field?.is_internal ?? false,
+        show_in_pdf: field?.show_in_pdf ?? true,
         alias: field?.alias ?? null,
         options: {
           hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
@@ -223,6 +225,7 @@ export function defaultFieldOptions(
         optional: optional ?? false,
         multiple: multiple ?? false,
         is_internal: field?.is_internal ?? false,
+        show_in_pdf: field?.show_in_pdf ?? true,
         alias: field?.alias ?? null,
         options: {
           hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
@@ -234,6 +237,7 @@ export function defaultFieldOptions(
         optional: false,
         multiple: true,
         is_internal: field?.is_internal ?? false,
+        show_in_pdf: field?.show_in_pdf ?? true,
         alias: field?.alias ?? null,
         options: {
           hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
@@ -245,6 +249,7 @@ export function defaultFieldOptions(
         optional: optional ?? false,
         multiple: multiple ?? false,
         is_internal: field?.is_internal ?? false,
+        show_in_pdf: field?.show_in_pdf ?? true,
         alias: field?.alias ?? null,
         options: {
           hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
@@ -258,6 +263,7 @@ export function defaultFieldOptions(
         optional: optional ?? false,
         multiple: multiple ?? false,
         is_internal: field?.is_internal ?? false,
+        show_in_pdf: field?.show_in_pdf ?? true,
         alias: field?.alias ?? null,
         options: {
           hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
@@ -272,6 +278,7 @@ export function defaultFieldOptions(
         optional: optional ?? false,
         multiple: false,
         is_internal: field?.is_internal ?? false,
+        show_in_pdf: field?.show_in_pdf ?? true,
         alias: field?.alias ?? null,
         options: {
           hasCommentsEnabled: options?.hasCommentsEnabled ?? true,

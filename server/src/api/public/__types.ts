@@ -1856,6 +1856,8 @@ export type PetitionField = {
   position: Scalars["Int"];
   /** The replies to the petition field */
   replies: Array<PetitionFieldReply>;
+  /** Determines if the field is visible in PDF export. */
+  showInPdf: Scalars["Boolean"];
   /** The title of the petition field. */
   title: Maybe<Scalars["String"]>;
   /** The type of the petition field. */
@@ -3032,6 +3034,7 @@ export type UpdatePetitionFieldInput = {
   multiple?: InputMaybe<Scalars["Boolean"]>;
   optional?: InputMaybe<Scalars["Boolean"]>;
   options?: InputMaybe<Scalars["JSONObject"]>;
+  showInPdf?: InputMaybe<Scalars["Boolean"]>;
   title?: InputMaybe<Scalars["String"]>;
   visibility?: InputMaybe<Scalars["JSONObject"]>;
 };

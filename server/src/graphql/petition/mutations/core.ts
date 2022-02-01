@@ -780,6 +780,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           t.nullable.boolean("optional");
           t.nullable.boolean("multiple");
           t.nullable.boolean("isInternal");
+          t.nullable.boolean("showInPdf");
           t.nullable.field("visibility", { type: "JSONObject" });
           t.nullable.string("alias");
         },
@@ -801,8 +802,17 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     )
   ),
   resolve: async (_, args, ctx, info) => {
-    const { title, description, optional, multiple, options, visibility, alias, isInternal } =
-      args.data;
+    const {
+      title,
+      description,
+      optional,
+      multiple,
+      options,
+      visibility,
+      alias,
+      isInternal,
+      showInPdf,
+    } = args.data;
     const data: Partial<CreatePetitionField> = {};
     if (title !== undefined) {
       data.title = title?.trim() || null;
@@ -819,6 +829,11 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     if (isDefined(isInternal)) {
       data.is_internal = isInternal;
     }
+
+    if (isDefined(showInPdf)) {
+      data.show_in_pdf = showInPdf;
+    }
+
     if (alias !== undefined) {
       data.alias = alias?.trim() || null;
     }

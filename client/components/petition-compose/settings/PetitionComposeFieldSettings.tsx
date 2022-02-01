@@ -139,6 +139,36 @@ export function PetitionComposeFieldSettings({
             isDisabled={isReadOnly || field.isFixed}
           />
         </SettingsRow>
+        <SettingsRow
+          isDisabled={isReadOnly}
+          label={
+            <FormattedMessage
+              id="component.petition-settings.petition-shown-in-pdf"
+              defaultMessage="Show in PDF"
+            />
+          }
+          description={
+            <FormattedMessage
+              id="field-settings.show-in-pdf-description"
+              defaultMessage="Enabling this option will make the content appear in the exported PDF and the document to be signed."
+            />
+          }
+          controlId="show-in-pdf"
+        >
+          <Switch
+            height="20px"
+            display="block"
+            id="show-in-pdf"
+            color="green"
+            isChecked={field.showInPdf}
+            onChange={(event) =>
+              onFieldEdit(field.id, {
+                showInPdf: event.target.checked,
+              })
+            }
+            isDisabled={isReadOnly}
+          />
+        </SettingsRow>
 
         {!field.isReadOnly && field.type !== "CHECKBOX" && (
           <SettingsRow
@@ -228,6 +258,7 @@ PetitionComposeFieldSettings.fragments = {
       options
       isInternal
       isReadOnly
+      showInPdf
       isFixed
       position
       visibility

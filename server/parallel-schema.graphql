@@ -2323,6 +2323,11 @@ type PetitionField {
   replies: [PetitionFieldReply!]!
 
   """
+  Determines if the field is visible in PDF export.
+  """
+  showInPdf: Boolean!
+
+  """
   The title of the petition field.
   """
   title: String
@@ -4275,6 +4280,7 @@ input UpdatePetitionFieldInput {
   multiple: Boolean
   optional: Boolean
   options: JSONObject
+  showInPdf: Boolean
   title: String
   visibility: JSONObject
 }
