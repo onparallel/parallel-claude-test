@@ -34,6 +34,10 @@ export const initServer = async () => {
   const knex = container.get<Knex>(KNEX);
 
   return {
+    async execute(query: string | DocumentNode, variables?: VariableValues) {
+      return await server.executeOperation({ query, variables });
+    },
+    /** @deprecated use execute instead */
     async query({
       query,
       variables,
@@ -43,6 +47,7 @@ export const initServer = async () => {
     }) {
       return await server.executeOperation({ query, variables });
     },
+    /** @deprecated use execute instead */
     async mutate({
       mutation,
       variables,

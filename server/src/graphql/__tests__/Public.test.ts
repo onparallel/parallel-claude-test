@@ -10,6 +10,7 @@ import {
   PetitionAccess,
   PetitionField,
   PetitionFieldReply,
+  Task,
 } from "../../db/__types";
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
@@ -1406,6 +1407,151 @@ describe("GraphQL/Public", () => {
           },
           petition_id: access.petition_id,
         });
+      });
+    });
+
+    describe("publicTask", () => {
+      let task: Task;
+      beforeAll(async () => {
+        task = await mocks.createTask({
+          petition_access_id: access.id,
+          name: "PRINT_PDF",
+          input: { petition_id: access.petition_id },
+          status: "PROCESSING",
+          progress: 50,
+        });
+      });
+
+      it("queries a task as a recipient", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            query ($id: GID!, $keycode: ID!) {
+              publicTask(taskId: $id, keycode: $keycode) {
+                id
+                progress
+                status
+              }
+            }
+          `,
+          {
+            id: toGlobalId("Task", task.id),
+            keycode: access.keycode,
+          }
+        );
+        expect(errors).toBeUndefined();
+        expect(data?.publicTask).toEqual({
+          id: toGlobalId("Task", task.id),
+          progress: 50,
+          status: "PROCESSING",
+        });
+      });
+    });
+
+    describe("publicCreatePrintPdfTask", () => {
+      it("creates a 'print pdf' task on a petition as a recipient", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($keycode: ID!) {
+              publicCreatePrintPdfTask(keycode: $keycode) {
+                progress
+                status
+              }
+            }
+          `,
+          { keycode: access.keycode }
+        );
+
+        expect(errors).toBeUndefined();
+        expect(data?.publicCreatePrintPdfTask).toEqual({
+          progress: null,
+          status: "ENQUEUED",
+        });
+      });
+    });
+    describe("publicGetTaskResultFileUrl", () => {
+      let completedTask: Task;
+      let incompleteTask: Task;
+      beforeAll(async () => {
+        const [file] = await mocks.createRandomTemporaryFile(1);
+        completedTask = await mocks.createTask({
+          petition_access_id: access.id,
+          name: "PRINT_PDF",
+          progress: 100,
+          status: "COMPLETED",
+          input: { petition_id: access.petition_id },
+          output: { temporary_file_id: file.id },
+        });
+
+        incompleteTask = await mocks.createTask({
+          petition_access_id: access.id,
+          name: "PRINT_PDF",
+          progress: 0,
+          status: "PROCESSING",
+          input: { petition_id: access.petition_id },
+          output: {},
+        });
+      });
+
+      it("gets the result url of a print pdf task as a recipient", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($taskId: GID!, $keycode: ID!) {
+              publicGetTaskResultFileUrl(taskId: $taskId, keycode: $keycode)
+            }
+          `,
+          {
+            taskId: toGlobalId("Task", completedTask.id),
+            keycode: access.keycode,
+          }
+        );
+
+        expect(errors).toBeUndefined();
+        expect(data?.publicGetTaskResultFileUrl).toEqual("");
+      });
+
+      it("sends error if trying to get the result url on a private task of another recipient", async () => {
+        const [file] = await mocks.createRandomTemporaryFile(1);
+        const [otherContact] = await mocks.createRandomContacts(org.id, 1);
+        const [privateAccess] = await mocks.createPetitionAccess(
+          access.petition_id,
+          access.granter_id,
+          [otherContact.id],
+          access.granter_id
+        );
+        const privateTask = await mocks.createTask({
+          petition_access_id: privateAccess.id,
+          name: "PRINT_PDF",
+          input: { petition_id: privateAccess.petition_id },
+          output: { temporary_file_id: file.id },
+          progress: 100,
+          status: "COMPLETED",
+        });
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($taskId: GID!, $keycode: ID!) {
+              publicGetTaskResultFileUrl(taskId: $taskId, keycode: $keycode)
+            }
+          `,
+          { taskId: toGlobalId("Task", privateTask.id), keycode: privateAccess.keycode }
+        );
+
+        expect(errors).toContainGraphQLError("CONTACT_NOT_VERIFIED");
+        expect(data).toBeNull();
+      });
+
+      it("sends error if the task is not yet completed", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($taskId: GID!, $keycode: ID!) {
+              publicGetTaskResultFileUrl(taskId: $taskId, keycode: $keycode)
+            }
+          `,
+          { taskId: toGlobalId("Task", incompleteTask.id), keycode: access.keycode }
+        );
+
+        expect(errors).toContainGraphQLError("FILE_NOT_FOUND_ERROR");
+        expect(data).toBeNull();
       });
     });
   });

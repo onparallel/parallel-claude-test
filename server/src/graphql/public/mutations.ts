@@ -1173,7 +1173,10 @@ export const publicGetTaskResultFileUrl = mutationField("publicGetTaskResultFile
   },
   resolve: async (_, args, ctx) => {
     const task = (await ctx.tasks.loadTask(args.taskId)) as Task<"PRINT_PDF">;
-    const file = await ctx.files.loadTemporaryFile(task.output.temporary_file_id);
+
+    const file = isDefined(task.output.temporary_file_id)
+      ? await ctx.files.loadTemporaryFile(task.output.temporary_file_id)
+      : null;
     if (!file) {
       throw new ApolloError(
         `Temporary file not found for Task:${task.id} output`,

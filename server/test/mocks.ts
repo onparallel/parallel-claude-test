@@ -96,6 +96,9 @@ export class MockAwsService implements IAws {
   public get publicFiles() {
     return new MockStorage();
   }
+  public get temporaryFiles() {
+    return new MockStorage();
+  }
 }
 
 @injectable()

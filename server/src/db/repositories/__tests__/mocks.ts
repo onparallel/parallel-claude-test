@@ -20,6 +20,7 @@ import {
   CreatePetitionField,
   CreatePetitionFieldReply,
   CreateTag,
+  CreateTemporaryFile,
   CreateUser,
   CreateUserGroup,
   EmailLog,
@@ -44,12 +45,15 @@ import {
   PetitionUserNotification,
   PublicPetitionLink,
   Tag,
+  TaskName,
   TemplateDefaultPermission,
+  TemporaryFile,
   User,
   UserAuthenticationToken,
   UserGroup,
   UserGroupMember,
 } from "../../__types";
+import { Task } from "../TaskRepository";
 
 export class Mocks {
   constructor(public knex: Knex) {}
@@ -246,6 +250,23 @@ export class Mocks {
           path: random(16),
           size: "100",
           upload_complete: true,
+          ...builder?.(index),
+        }))
+      )
+      .returning("*");
+  }
+
+  async createRandomTemporaryFile(
+    amount?: number,
+    builder?: (index: number) => Partial<TemporaryFile>
+  ) {
+    return await this.knex<TemporaryFile>("temporary_file")
+      .insert(
+        range(0, amount || 1).map<CreateTemporaryFile>((index) => ({
+          content_type: "application/pdf",
+          filename: "file.pdf",
+          path: random(16),
+          size: "100",
           ...builder?.(index),
         }))
       )
@@ -603,6 +624,11 @@ export class Mocks {
       dataArr,
       "*"
     );
+  }
+
+  async createTask<TName extends TaskName>(data: Partial<Task<TName>>) {
+    const [task] = await this.knex<Task<TName>>("task").insert(data, "*");
+    return task;
   }
 }
 

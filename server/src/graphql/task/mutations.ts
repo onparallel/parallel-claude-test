@@ -1,5 +1,6 @@
 import { ApolloError } from "apollo-server-core";
 import { booleanArg, mutationField, nonNull, nullable } from "nexus";
+import { isDefined } from "remeda";
 import { Task } from "../../db/repositories/TaskRepository";
 import { authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -66,7 +67,9 @@ export const getTaskResultFileUrl = mutationField("getTaskResultFileUrl", {
       | Task<"EXPORT_REPLIES">
       | Task<"PRINT_PDF">;
 
-    const file = await ctx.files.loadTemporaryFile(task.output.temporary_file_id);
+    const file = isDefined(task.output.temporary_file_id)
+      ? await ctx.files.loadTemporaryFile(task.output.temporary_file_id)
+      : null;
     if (!file) {
       throw new ApolloError(
         `Temporary file not found for Task:${task.id} output`,
