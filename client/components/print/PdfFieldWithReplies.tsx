@@ -9,18 +9,24 @@ export function PdfFieldWithReplies({ field }: { field: PetitionPdf_PetitionFiel
     <Box sx={{ pageBreakInside: field.type === "HEADING" ? "auto" : "avoid" }} marginY="4mm">
       {field.type === "HEADING" ? (
         <Stack>
-          {field.title ? <Heading size="lg">{field.title ?? "-"}</Heading> : null}
+          {field.title ? (
+            <Heading textAlign="justify" size="lg">
+              {field.title ?? "-"}
+            </Heading>
+          ) : null}
           {field.description ? (
-            <Text paddingLeft="2mm">
+            <Text textAlign="justify" paddingLeft="2mm">
               <BreakLines>{field.description}</BreakLines>
             </Text>
           ) : null}
         </Stack>
       ) : (
         <Stack borderRadius="md" border="1px solid" borderColor="gray.400" padding="4mm">
-          <Text fontWeight="bold">{field.title ?? "-"}</Text>
+          <Text textAlign="justify" fontWeight="bold">
+            {field.title ?? "-"}
+          </Text>
           {field.description ? (
-            <Text paddingLeft="2mm">
+            <Text textAlign="justify" paddingLeft="2mm">
               <BreakLines>{field.description}</BreakLines>
             </Text>
           ) : null}
@@ -45,7 +51,7 @@ export function PdfFieldWithReplies({ field }: { field: PetitionPdf_PetitionFiel
             ) : field.type === "DYNAMIC_SELECT" ? (
               <Stack spacing={0} key={reply.id}>
                 {(reply.content.columns as [string, string | null][]).map(([label, value], i) => (
-                  <Text key={i}>
+                  <Text textAlign="justify" key={i}>
                     {label}:{" "}
                     {value ?? (
                       <Text fontStyle="italic">
@@ -61,11 +67,13 @@ export function PdfFieldWithReplies({ field }: { field: PetitionPdf_PetitionFiel
             ) : field.type === "CHECKBOX" ? (
               <Stack spacing={0} key={reply.id}>
                 {(reply.content.choices as [string]).map((value, i) => (
-                  <Text key={i}>{value}</Text>
+                  <Text textAlign="justify" key={i}>
+                    {value}
+                  </Text>
                 ))}
               </Stack>
             ) : (
-              <Text key={reply.id}>
+              <Text textAlign="justify" key={reply.id}>
                 <BreakLines>{reply.content.text}</BreakLines>
               </Text>
             )
