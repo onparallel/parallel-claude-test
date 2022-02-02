@@ -73,6 +73,7 @@ export const PetitionFieldFragment = gql`
   fragment PetitionField on PetitionField {
     id
     title
+    description
     type
     fromPetitionFieldId
     alias

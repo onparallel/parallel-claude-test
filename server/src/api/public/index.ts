@@ -25,6 +25,7 @@ import {
   ContactFragment,
   PermissionFragment,
   PetitionAccessFragment,
+  PetitionFieldFragment,
   PetitionFieldWithRepliesFragment,
   PetitionFragment,
   SubscriptionFragment,
@@ -38,6 +39,7 @@ import {
   getTaskResultFileUrl,
   idParam,
   mapPetition,
+  mapPetitionField,
   mapReplyResponse,
   mapTemplate,
   paginationParams,
@@ -66,6 +68,7 @@ import {
   Petition,
   PetitionAttachment,
   PetitionCustomProperties,
+  PetitionField,
   PetitionFieldReply,
   SendPetition,
   SharePetition,
@@ -73,6 +76,7 @@ import {
   Subscription,
   Template,
   UpdatePetition,
+  UpdatePetitionField,
   UpdateReply,
   User,
   _PetitionEvent,
@@ -132,6 +136,7 @@ import {
   TagFragmentDoc,
   TemplateFragment as TemplateFragmentType,
   TransferPetition_transferPetitionOwnershipDocument,
+  UpdatePetitionField_updatePetitionFieldDocument,
   UpdatePetition_updatePetitionDocument,
   UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
   UpdateReply_petitionDocument,
@@ -1270,6 +1275,50 @@ api.path("/petitions/:petitionId/fields", { params: { petitionId } }).get(
     return Ok(mapPetition(result.petition!).fields);
   }
 );
+
+api
+  .path("/petitions/:petitionId/fields/:fieldId", {
+    params: { petitionId, fieldId },
+  })
+  .put(
+    {
+      operationId: "UpdatePetitionField",
+      summary: "Update petition field",
+      description: outdent`
+      Update the title and/or description of the specified field on a petition.
+    `,
+      body: JsonBody(UpdatePetitionField),
+      responses: { 200: SuccessResponse(PetitionField) },
+      tags: ["Petitions"],
+    },
+    async ({ client, params, body }) => {
+      gql`
+        mutation UpdatePetitionField_updatePetitionField(
+          $petitionId: GID!
+          $fieldId: GID!
+          $title: String
+          $description: String
+        ) {
+          updatePetitionField(
+            petitionId: $petitionId
+            fieldId: $fieldId
+            data: { title: $title, description: $description }
+          ) {
+            ...PetitionField
+          }
+        }
+        ${PetitionFieldFragment}
+      `;
+      const result = await client.request(UpdatePetitionField_updatePetitionFieldDocument, {
+        petitionId: params.petitionId,
+        fieldId: params.fieldId,
+        description: body.description,
+        title: body.title,
+      });
+      assert("id" in result.updatePetitionField!);
+      return Ok(mapPetitionField(result.updatePetitionField));
+    }
+  );
 
 api
   .path("/petitions/:petitionId/fields/:fieldId/replies", {

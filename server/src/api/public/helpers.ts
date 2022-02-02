@@ -23,6 +23,7 @@ import {
   AWSPresignedPostDataFragment,
   getTags_tagsDocument,
   getTaskResultFileUrl_getTaskResultFileUrlDocument,
+  PetitionFieldFragment,
   PetitionFieldReplyFragment,
   PetitionFieldType,
   PetitionFragment,
@@ -134,6 +135,13 @@ function mapTemplateFields<T extends Pick<TemplateFragment, "fields">>(template:
       ...omit(field, ["options"]),
       options: field.options.values ?? undefined,
     })),
+  };
+}
+
+export function mapPetitionField<T extends PetitionFieldFragment>(field: T) {
+  return {
+    ...omit(field, ["options"]),
+    options: field.options.values ?? undefined,
   };
 }
 

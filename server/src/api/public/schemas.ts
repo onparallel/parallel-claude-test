@@ -211,6 +211,11 @@ const _PetitionField = {
     title: {
       type: ["string", "null"],
       description: "Title of the field",
+      example: "First name",
+    },
+    description: {
+      type: ["string", "null"],
+      description: "Description of the field",
       example: "Please, tell us your name",
     },
     type: {
@@ -625,6 +630,25 @@ export const CreatePetition = schema({
     },
   },
 } as const);
+export const UpdatePetitionField = schema({
+  title: "UpdatePetitionField",
+  type: "object",
+  additionalProperties: false,
+  minProperties: 1,
+  properties: {
+    title: {
+      description: "The title of the petition field",
+      type: ["string", "null"],
+      example: "ID",
+    },
+    description: {
+      description: "The description of the petition field",
+      type: ["string", "null"],
+      example: "Please, write your ID number",
+    },
+  },
+} as const);
+export const PetitionField = schema(_PetitionField);
 export const PaginatedTags = PaginatedListOf({ type: "string", example: ["kyc", "priority"] });
 export const PaginatedPetitions = PaginatedListOf(_Petition);
 export const PaginatedUsers = PaginatedListOf(_User);

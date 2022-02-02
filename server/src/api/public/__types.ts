@@ -3281,6 +3281,7 @@ export type PetitionAccessFragment = {
 export type PetitionFieldFragment = {
   id: string;
   title: string | null;
+  description: string | null;
   type: PetitionFieldType;
   fromPetitionFieldId: string | null;
   alias: string | null;
@@ -3299,6 +3300,7 @@ export type PetitionFieldReplyFragment = {
 export type PetitionFieldWithRepliesFragment = {
   id: string;
   title: string | null;
+  description: string | null;
   type: PetitionFieldType;
   fromPetitionFieldId: string | null;
   alias: string | null;
@@ -3352,6 +3354,7 @@ export type PetitionFragment = {
   fields?: Array<{
     id: string;
     title: string | null;
+    description: string | null;
     type: PetitionFieldType;
     fromPetitionFieldId: string | null;
     alias: string | null;
@@ -3378,6 +3381,7 @@ export type TemplateFragment = {
   fields?: Array<{
     id: string;
     title: string | null;
+    description: string | null;
     type: PetitionFieldType;
     fromPetitionFieldId: string | null;
     alias: string | null;
@@ -3517,6 +3521,7 @@ export type GetPetitions_petitionsQuery = {
           fields?: Array<{
             id: string;
             title: string | null;
+            description: string | null;
             type: PetitionFieldType;
             fromPetitionFieldId: string | null;
             alias: string | null;
@@ -3584,6 +3589,7 @@ export type CreatePetition_petitionMutation = {
         fields?: Array<{
           id: string;
           title: string | null;
+          description: string | null;
           type: PetitionFieldType;
           fromPetitionFieldId: string | null;
           alias: string | null;
@@ -3648,6 +3654,7 @@ export type GetPetition_petitionQuery = {
         fields?: Array<{
           id: string;
           title: string | null;
+          description: string | null;
           type: PetitionFieldType;
           fromPetitionFieldId: string | null;
           alias: string | null;
@@ -3714,6 +3721,7 @@ export type UpdatePetition_updatePetitionMutation = {
         fields?: Array<{
           id: string;
           title: string | null;
+          description: string | null;
           type: PetitionFieldType;
           fromPetitionFieldId: string | null;
           alias: string | null;
@@ -3844,6 +3852,7 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
       fields?: Array<{
         id: string;
         title: string | null;
+        description: string | null;
         type: PetitionFieldType;
         fromPetitionFieldId: string | null;
         alias: string | null;
@@ -3948,6 +3957,7 @@ export type PetitionReplies_repliesQuery = {
         fields: Array<{
           id: string;
           title: string | null;
+          description: string | null;
           type: PetitionFieldType;
           fromPetitionFieldId: string | null;
           alias: string | null;
@@ -3966,6 +3976,7 @@ export type PetitionReplies_repliesQuery = {
         fields: Array<{
           id: string;
           title: string | null;
+          description: string | null;
           type: PetitionFieldType;
           fromPetitionFieldId: string | null;
           alias: string | null;
@@ -3981,6 +3992,26 @@ export type PetitionReplies_repliesQuery = {
         }>;
       }
     | null;
+};
+
+export type UpdatePetitionField_updatePetitionFieldMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  title?: InputMaybe<Scalars["String"]>;
+  description?: InputMaybe<Scalars["String"]>;
+}>;
+
+export type UpdatePetitionField_updatePetitionFieldMutation = {
+  updatePetitionField: {
+    id: string;
+    title: string | null;
+    description: string | null;
+    type: PetitionFieldType;
+    fromPetitionFieldId: string | null;
+    alias: string | null;
+    options: { [key: string]: any };
+    multiple: boolean;
+  };
 };
 
 export type DeleteReply_deletePetitionReplyMutationVariables = Exact<{
@@ -4251,6 +4282,7 @@ export type GetTemplates_templatesQuery = {
           fields?: Array<{
             id: string;
             title: string | null;
+            description: string | null;
             type: PetitionFieldType;
             fromPetitionFieldId: string | null;
             alias: string | null;
@@ -4282,6 +4314,7 @@ export type GetTemplate_templateQuery = {
         fields?: Array<{
           id: string;
           title: string | null;
+          description: string | null;
           type: PetitionFieldType;
           fromPetitionFieldId: string | null;
           alias: string | null;
@@ -4768,6 +4801,7 @@ export const PetitionFieldFragmentDoc = gql`
   fragment PetitionField on PetitionField {
     id
     title
+    description
     type
     fromPetitionFieldId
     alias
@@ -5162,6 +5196,26 @@ export const PetitionReplies_repliesDocument = gql`
   }
   ${PetitionFieldWithRepliesFragmentDoc}
 ` as unknown as DocumentNode<PetitionReplies_repliesQuery, PetitionReplies_repliesQueryVariables>;
+export const UpdatePetitionField_updatePetitionFieldDocument = gql`
+  mutation UpdatePetitionField_updatePetitionField(
+    $petitionId: GID!
+    $fieldId: GID!
+    $title: String
+    $description: String
+  ) {
+    updatePetitionField(
+      petitionId: $petitionId
+      fieldId: $fieldId
+      data: { title: $title, description: $description }
+    ) {
+      ...PetitionField
+    }
+  }
+  ${PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<
+  UpdatePetitionField_updatePetitionFieldMutation,
+  UpdatePetitionField_updatePetitionFieldMutationVariables
+>;
 export const DeleteReply_deletePetitionReplyDocument = gql`
   mutation DeleteReply_deletePetitionReply($petitionId: GID!, $replyId: GID!) {
     deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
