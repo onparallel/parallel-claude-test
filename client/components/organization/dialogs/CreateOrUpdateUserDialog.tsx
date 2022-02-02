@@ -103,7 +103,7 @@ function CreateOrUpdateUserDialog({
         props.type === "update" ? (
           <FormattedMessage id="organization-users.update-user" defaultMessage="Update user" />
         ) : (
-          <FormattedMessage id="organization-users.create-user" defaultMessage="Create user" />
+          <FormattedMessage id="organization-users.invite-user" defaultMessage="Invite user" />
         )
       }
       body={
@@ -209,7 +209,7 @@ function CreateOrUpdateUserDialog({
           {props.type === "update" ? (
             <FormattedMessage id="organization-users.update-user" defaultMessage="Update user" />
           ) : (
-            <FormattedMessage id="organization-users.create-user" defaultMessage="Create user" />
+            <FormattedMessage id="organization-users.invite-user" defaultMessage="Invite user" />
           )}
         </Button>
       }

@@ -4536,8 +4536,8 @@
   },
   {
     "term": "organization-role.normal",
-    "definition": "Normal",
-    "context": "Normal"
+    "definition": "Member",
+    "context": "Member"
   },
   {
     "term": "organization-role.owner",
@@ -4553,11 +4553,6 @@
     "term": "organization-users.activate",
     "definition": "Activate {count, plural, =1{user} other {users}}",
     "context": "Activate {count, plural, =1{user} other {users}}"
-  },
-  {
-    "term": "organization-users.create-user",
-    "definition": "Create user",
-    "context": "Create user"
   },
   {
     "term": "organization-users.deactivate",
@@ -4578,6 +4573,11 @@
     "term": "organization-users.header.user-email",
     "definition": "Email",
     "context": "Email"
+  },
+  {
+    "term": "organization-users.invite-user",
+    "definition": "Invite user",
+    "context": "Invite user"
   },
   {
     "term": "organization-users.max-limit-reached",

@@ -18,7 +18,7 @@ export function useOrganizationRoles() {
         role: "NORMAL",
         label: intl.formatMessage({
           id: "organization-role.normal",
-          defaultMessage: "Normal",
+          defaultMessage: "Member",
         }),
       },
       {

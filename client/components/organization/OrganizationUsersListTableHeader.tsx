@@ -143,7 +143,7 @@ export function OrganizationUsersListTableHeader({
               leftIcon={<UserPlusIcon fontSize="18px" />}
               onClick={onCreateUser}
             >
-              <FormattedMessage id="organization-users.create-user" defaultMessage="Create user" />
+              <FormattedMessage id="organization-users.invite-user" defaultMessage="Invite user" />
             </Button>
           )}
         </>
