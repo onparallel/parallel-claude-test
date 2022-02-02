@@ -432,7 +432,7 @@ export type Mutation = {
   /** Get the user who owns an API Token */
   getApiTokenOwner: SupportMethodResponse;
   /** Returns a signed download url for tasks with file output */
-  getTaskResultFileUrl: FileUploadDownloadLinkResult;
+  getTaskResultFileUrl: Scalars["String"];
   /** marks a Signature integration as default */
   markSignatureIntegrationAsDefault: OrgIntegration;
   /** Adds, edits or deletes a custom property on the petition */
@@ -461,6 +461,8 @@ export type Mutation = {
   publicCreateFileUploadReply: PublicCreateFileUploadReply;
   /** Create a petition field comment. */
   publicCreatePetitionFieldComment: PublicPetitionFieldComment;
+  /** Starts an export pdf task in a recipient context */
+  publicCreatePrintPdfTask: Task;
   /** Creates a reply to a text or select field. */
   publicCreateSimpleReply: PublicPetitionFieldReply;
   /** Lets a recipient delegate access to the petition to another contact in the same organization */
@@ -473,6 +475,8 @@ export type Mutation = {
   publicFileUploadReplyComplete: PublicPetitionFieldReply;
   /** Generates a download link for a file reply on a public context. */
   publicFileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
+  /** Returns a signed download url for tasks with file output on a recipient context */
+  publicGetTaskResultFileUrl: Scalars["String"];
   /** Marks the specified comments as read. */
   publicMarkPetitionFieldCommentsAsRead: Array<PublicPetitionFieldComment>;
   /** Cancel a reminder for a contact. */
@@ -992,6 +996,10 @@ export type MutationpublicCreatePetitionFieldCommentArgs = {
   petitionFieldId: Scalars["GID"];
 };
 
+export type MutationpublicCreatePrintPdfTaskArgs = {
+  keycode: Scalars["ID"];
+};
+
 export type MutationpublicCreateSimpleReplyArgs = {
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
@@ -1026,6 +1034,11 @@ export type MutationpublicFileUploadReplyDownloadLinkArgs = {
   keycode: Scalars["ID"];
   preview?: InputMaybe<Scalars["Boolean"]>;
   replyId: Scalars["GID"];
+};
+
+export type MutationpublicGetTaskResultFileUrlArgs = {
+  keycode: Scalars["ID"];
+  taskId: Scalars["GID"];
 };
 
 export type MutationpublicMarkPetitionFieldCommentsAsReadArgs = {
@@ -2520,6 +2533,7 @@ export type Query = {
   /** The comments for this field. */
   publicPetitionField: PublicPetitionField;
   publicPetitionLinkBySlug: Maybe<PublicPublicPetitionLink>;
+  publicTask: Task;
   publicTemplateCategories: Array<Scalars["String"]>;
   /** Search users and user groups */
   searchUsers: Array<UserOrUserGroup>;
@@ -2638,6 +2652,11 @@ export type QuerypublicPetitionFieldArgs = {
 
 export type QuerypublicPetitionLinkBySlugArgs = {
   slug: Scalars["ID"];
+};
+
+export type QuerypublicTaskArgs = {
+  keycode: Scalars["ID"];
+  taskId: Scalars["GID"];
 };
 
 export type QuerysearchUsersArgs = {
@@ -3448,9 +3467,7 @@ export type getTaskResultFileUrl_getTaskResultFileUrlMutationVariables = Exact<{
   taskId: Scalars["GID"];
 }>;
 
-export type getTaskResultFileUrl_getTaskResultFileUrlMutation = {
-  getTaskResultFileUrl: { result: Result; url: string | null };
-};
+export type getTaskResultFileUrl_getTaskResultFileUrlMutation = { getTaskResultFileUrl: string };
 
 export type GetMe_userQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -4941,10 +4958,7 @@ export const waitForTask_TaskDocument = gql`
 ` as unknown as DocumentNode<waitForTask_TaskQuery, waitForTask_TaskQueryVariables>;
 export const getTaskResultFileUrl_getTaskResultFileUrlDocument = gql`
   mutation getTaskResultFileUrl_getTaskResultFileUrl($taskId: GID!) {
-    getTaskResultFileUrl(taskId: $taskId) {
-      result
-      url
-    }
+    getTaskResultFileUrl(taskId: $taskId)
   }
 ` as unknown as DocumentNode<
   getTaskResultFileUrl_getTaskResultFileUrlMutation,

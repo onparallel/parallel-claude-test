@@ -208,19 +208,16 @@ export async function waitForTask(client: GraphQLClient, task: TaskType) {
 export async function getTaskResultFileUrl(client: GraphQLClient, task: TaskType) {
   const _mutation = gql`
     mutation getTaskResultFileUrl_getTaskResultFileUrl($taskId: GID!) {
-      getTaskResultFileUrl(taskId: $taskId) {
-        result
-        url
-      }
+      getTaskResultFileUrl(taskId: $taskId)
     }
   `;
   const result = await client.request(getTaskResultFileUrl_getTaskResultFileUrlDocument, {
     taskId: task.id,
   });
-  if (result.getTaskResultFileUrl.result === "FAILURE") {
+  if (!result?.getTaskResultFileUrl) {
     throw new Error();
   } else {
-    return result.getTaskResultFileUrl.url!;
+    return result.getTaskResultFileUrl;
   }
 }
 

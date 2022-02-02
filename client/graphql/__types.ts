@@ -505,7 +505,7 @@ export interface Mutation {
   publicFileUploadReplyComplete: PublicPetitionFieldReply;
   /** Generates a download link for a file reply on a public context. */
   publicFileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
-  /** Returns a signed download url for tasks with file output */
+  /** Returns a signed download url for tasks with file output on a recipient context */
   publicGetTaskResultFileUrl: Scalars["String"];
   /** Marks the specified comments as read. */
   publicMarkPetitionFieldCommentsAsRead: Array<PublicPetitionFieldComment>;
