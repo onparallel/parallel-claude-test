@@ -3,6 +3,7 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { indexBy } from "remeda";
 import { Config, CONFIG } from "../../config";
+import { EMAILS, EmailsService } from "../../services/emails";
 import { unMaybeArray } from "../../util/arrays";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { Maybe, MaybeArray } from "../../util/types";
@@ -34,7 +35,11 @@ export type OrganizationUsageDetails = {
 
 @injectable()
 export class OrganizationRepository extends BaseRepository {
-  constructor(@inject(CONFIG) private config: Config, @inject(KNEX) knex: Knex) {
+  constructor(
+    @inject(CONFIG) private config: Config,
+    @inject(KNEX) knex: Knex,
+    @inject(EMAILS) private readonly emails: EmailsService
+  ) {
     super(knex);
   }
 
@@ -272,14 +277,19 @@ export class OrganizationRepository extends BaseRepository {
     creditsSpent: number,
     t?: Knex.Transaction
   ) {
-    const [limit] = await this.from("organization_usage_limit", t)
+    const [usage] = await this.from("organization_usage_limit", t)
       .where({
         period_end_date: null,
         limit_name: limitName,
         org_id: orgId,
       })
       .update({ used: this.knex.raw(`used + ?`, [creditsSpent]) }, "*");
-    return limit;
+
+    // if usage reached 80% or 100% of total credits in the period, send warning email to owner and admins
+    if (usage.used === Math.round(usage.limit * 0.8) || usage.limit === usage.used) {
+      await this.emails.sendOrganizationLimitsReachedEmail(orgId, limitName);
+    }
+    return usage;
   }
 
   async createSandboxSignatureIntegration(orgId: number, createdBy?: string, t?: Knex.Transaction) {

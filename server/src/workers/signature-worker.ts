@@ -102,21 +102,11 @@ async function startSignatureProcess(
     // when reaching this part, we can be sure the org has at least 1 signature credit available
     if (settings.API_KEY === ctx.config.signature.signaturitSharedProductionApiKey) {
       // sets used signature credits += 1
-      const signatureLimit = await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
+      await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
         signatureIntegration.org_id,
         "SIGNATURIT_SHARED_APIKEY",
         1
       );
-      // if usage reached 80% or 100% of total credits in the period, send warning email to owner and admins
-      if (
-        signatureLimit.used === Math.round(signatureLimit.limit * 0.8) ||
-        signatureLimit.limit === signatureLimit.used
-      ) {
-        await ctx.emails.sendOrganizationLimitsReachedEmail(
-          petition.org_id,
-          "SIGNATURIT_SHARED_APIKEY"
-        );
-      }
     }
 
     await ctx.petitions.updatePetitionSignature(signature.id, {
