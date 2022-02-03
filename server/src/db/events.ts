@@ -13,14 +13,14 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   PETITION_CREATED: { user_id: number };
   PETITION_COMPLETED: { petition_access_id?: number; user_id?: number }; //id of the User or PetitionAccess that completed the petition. Only one will be defined
   ACCESS_ACTIVATED: { petition_access_id: number; user_id: number };
-  ACCESS_DEACTIVATED: { petition_access_id: number; user_id: number };
+  ACCESS_DEACTIVATED: { petition_access_id: number; user_id?: number }; // if user_id is undefined, the access was deactivated automatically because an email bounce ocurred
   ACCESS_OPENED: { petition_access_id: number };
   ACCESS_DELEGATED: {
     new_petition_access_id: number; // new petition access created by the contact
     petition_access_id: number; // original access from where the delegation ocurred
   };
   MESSAGE_SCHEDULED: { petition_message_id: number };
-  MESSAGE_CANCELLED: { petition_message_id: number; user_id: number };
+  MESSAGE_CANCELLED: { petition_message_id: number; user_id?: number }; // if user_id is undefined, the message was cancelled automatically because an email bounce ocurred
   MESSAGE_SENT: { petition_message_id: number };
   REMINDER_SENT: { petition_reminder_id: number };
   REPLY_CREATED: {

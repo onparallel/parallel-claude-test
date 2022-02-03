@@ -981,7 +981,7 @@ export const _PetitionEvent = {
       },
     },
     ACCESS_DEACTIVATED: {
-      description: "The user deactivated an access on the petition",
+      description: "An access on the petition has been deactivated.",
       properties: {
         petitionAccessId: {
           description: "The ID of the petition access",
@@ -989,8 +989,9 @@ export const _PetitionEvent = {
           example: toGlobalId("PetitionAccess", 2),
         },
         userId: {
-          description: "The ID of the user",
-          type: "string",
+          description:
+            "The ID of the user that deactivated the access. If `null`, the access was automatically deactivated because a bounce ocurred when trying to delivery an email.",
+          type: ["string", "null"],
           example: toGlobalId("User", 1),
         },
       },
@@ -1071,8 +1072,9 @@ export const _PetitionEvent = {
           example: toGlobalId("PetitionMessage", 10),
         },
         userId: {
-          description: "The ID of the user that cancelled the send of the message",
-          type: "string",
+          description:
+            "The ID of the user that cancelled the send of the message. If `null`, the message was automatically cancelled because a bounce ocurred when trying to delivery an email.",
+          type: ["string", "null"],
           example: toGlobalId("User", 10),
         },
       },

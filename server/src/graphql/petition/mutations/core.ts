@@ -1406,7 +1406,12 @@ export const deactivateAccesses = mutationField("deactivateAccesses", {
     accessIds: nonNull(list(nonNull(globalIdArg("PetitionAccess")))),
   },
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.deactivateAccesses(args.petitionId, args.accessIds, ctx.user!);
+    return await ctx.petitions.deactivateAccesses(
+      args.petitionId,
+      args.accessIds,
+      `User:${ctx.user!.id}`,
+      ctx.user!.id
+    );
   },
 });
 

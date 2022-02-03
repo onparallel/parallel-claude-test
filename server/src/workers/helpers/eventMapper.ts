@@ -13,7 +13,7 @@ function mapEventPayload(event: PetitionEvent) {
     case "ACCESS_DEACTIVATED": {
       return {
         petitionAccessId: toGlobalId("PetitionAccess", event.data.petition_access_id),
-        userId: toGlobalId("User", event.data.user_id),
+        userId: isDefined(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
       };
     }
     case "ACCESS_DELEGATED": {
@@ -51,7 +51,7 @@ function mapEventPayload(event: PetitionEvent) {
     }
     case "MESSAGE_CANCELLED": {
       return {
-        userId: toGlobalId("User", event.data.user_id),
+        userId: isDefined(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
         petitionMessageId: toGlobalId("PetitionMessage", event.data.petition_message_id),
       };
     }

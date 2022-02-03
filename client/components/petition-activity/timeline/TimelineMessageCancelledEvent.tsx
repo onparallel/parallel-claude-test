@@ -14,24 +14,36 @@ export type TimelineMessageCancelledEventProps = {
 };
 
 export function TimelineMessageCancelledEvent({
-  event: { message, user, createdAt },
+  event: { message, user, createdAt, isManualTrigger },
   userId,
 }: TimelineMessageCancelledEventProps) {
   return (
     <TimelineItem
       icon={<TimelineIcon icon={<ForbiddenIcon />} color="white" backgroundColor="red.500" />}
     >
-      <FormattedMessage
-        id="timeline.message-cancelled-description"
-        defaultMessage="{same, select, true {You} other {{user}}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
-        values={{
-          same: userId === user?.id,
-          user: <UserReference user={user} />,
-          subject: message.emailSubject,
-          contact: <ContactReference contact={message.access.contact} />,
-          timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
-        }}
-      />
+      {isManualTrigger ? (
+        <FormattedMessage
+          id="timeline.message-cancelled-manual-description"
+          defaultMessage="{same, select, true {You} other {{user}}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+          values={{
+            same: userId === user?.id,
+            user: <UserReference user={user} />,
+            subject: message.emailSubject,
+            contact: <ContactReference contact={message.access.contact} />,
+            timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
+          }}
+        />
+      ) : (
+        <FormattedMessage
+          id="timeline.message-cancelled-auto-description"
+          defaultMessage="We cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} because an email was bounced {timeAgo}"
+          values={{
+            subject: message.emailSubject,
+            contact: <ContactReference contact={message.access.contact} />,
+            timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
+          }}
+        />
+      )}
     </TimelineItem>
   );
 }
@@ -39,6 +51,7 @@ export function TimelineMessageCancelledEvent({
 TimelineMessageCancelledEvent.fragments = {
   MessageCancelledEvent: gql`
     fragment TimelineMessageCancelledEvent_MessageCancelledEvent on MessageCancelledEvent {
+      isManualTrigger
       message {
         status
         scheduledAt

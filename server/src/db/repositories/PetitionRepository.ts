@@ -762,21 +762,23 @@ export class PetitionRepository extends BaseRepository {
     return row ?? null;
   }
 
-  async deactivateAccesses(petitionId: number, accessIds: number[], user: User) {
+  async deactivateAccesses(
+    petitionId: number,
+    accessIds: number[],
+    updatedBy: string,
+    userId?: number
+  ) {
     const [accesses, messages] = await Promise.all([
-      this.from("petition_access")
-        .whereIn("id", accessIds)
-        .where("status", "ACTIVE")
-        .update(
-          {
-            reminders_active: false,
-            next_reminder_at: null,
-            status: "INACTIVE",
-            updated_at: this.now(),
-            updated_by: `User:${user.id}`,
-          },
-          "*"
-        ),
+      this.from("petition_access").whereIn("id", accessIds).where("status", "ACTIVE").update(
+        {
+          reminders_active: false,
+          next_reminder_at: null,
+          status: "INACTIVE",
+          updated_at: this.now(),
+          updated_by: updatedBy,
+        },
+        "*"
+      ),
       this.from("petition_message")
         .whereIn("petition_access_id", accessIds)
         .where("status", "SCHEDULED")
@@ -794,7 +796,7 @@ export class PetitionRepository extends BaseRepository {
         petition_id: petitionId,
         data: {
           petition_access_id: access.id,
-          user_id: user.id,
+          user_id: userId,
         },
       })),
       ...messages.map((message) => ({
@@ -802,7 +804,7 @@ export class PetitionRepository extends BaseRepository {
         petition_id: petitionId,
         data: {
           petition_message_id: message.id,
-          user_id: user.id,
+          user_id: userId,
         },
       })),
     ]);

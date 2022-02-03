@@ -36,6 +36,11 @@ type AccessDeactivatedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
   id: GID!
+
+  """
+  If true, this event was triggered by an user action. If false, the event was triggered automatically because an email was bounced
+  """
+  isManualTrigger: Boolean!
   type: PetitionEventType!
   user: User
 }
@@ -374,6 +379,11 @@ type LandingTemplatePagination {
 type MessageCancelledEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
+
+  """
+  If true, this event was triggered by an user action. If false, the event was triggered automatically because an email was bounced
+  """
+  isManualTrigger: Boolean!
   message: PetitionMessage!
   type: PetitionEventType!
   user: User

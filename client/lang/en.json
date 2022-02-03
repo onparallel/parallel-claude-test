@@ -8585,7 +8585,12 @@
     "context": "{same, select, true {You} other {{user}}} gave access to {contact} {timeAgo}"
   },
   {
-    "term": "timeline.access-deactivated-description",
+    "term": "timeline.access-deactivated-auto-description",
+    "definition": "We removed access to {contact} because an email was bounced {timeAgo}",
+    "context": "We removed access to {contact} because an email was bounced {timeAgo}"
+  },
+  {
+    "term": "timeline.access-deactivated-manual-description",
     "definition": "{same, select, true {You} other {{user}}} removed access to {contact} {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} removed access to {contact} {timeAgo}"
   },
@@ -8635,7 +8640,12 @@
     "context": "{same, select, true {You} other {{user}}} updated {other}'s permission to {permissionType} {timeAgo}"
   },
   {
-    "term": "timeline.message-cancelled-description",
+    "term": "timeline.message-cancelled-auto-description",
+    "definition": "We cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} because an email was bounced {timeAgo}",
+    "context": "We cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} because an email was bounced {timeAgo}"
+  },
+  {
+    "term": "timeline.message-cancelled-manual-description",
     "definition": "{same, select, true {You} other {{user}}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
   },

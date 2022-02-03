@@ -45,8 +45,12 @@ createQueueWorker(
             true,
             "Worker:email-events"
           ),
+          context.petitions.deactivateAccesses(
+            message.petition_id,
+            [message.petition_access_id],
+            "Worker:email-events"
+          ),
           context.emails.sendPetitionMessageBouncedEmail(message.id),
-          context.petitions.updateRemindersForPetition(message.petition_id, null),
           context.petitions.createEvent({
             type: "PETITION_MESSAGE_BOUNCED",
             data: { petition_message_id: message.id },
@@ -58,11 +62,15 @@ createQueueWorker(
 
         await Promise.all([
           context.petitions.markPetitionAccessEmailBounceStatus(
-            reminder.petition_access_id,
+            access.id,
             true,
             "Worker:email-events"
           ),
-          context.petitions.updateRemindersForPetition(access.petition_id, null),
+          context.petitions.deactivateAccesses(
+            access.petition_id,
+            [access.id],
+            "Worker:email-events"
+          ),
           context.petitions.createEvent({
             type: "PETITION_REMINDER_BOUNCED",
             data: {

@@ -8585,7 +8585,12 @@
     "context": "{same, select, true {You} other {{user}}} gave access to {contact} {timeAgo}"
   },
   {
-    "term": "timeline.access-deactivated-description",
+    "term": "timeline.access-deactivated-auto-description",
+    "definition": "Hemos desactivado el acceso a {contact} porque el correo ha rebotado {timeAgo}",
+    "context": "We removed access to {contact} because an email was bounced {timeAgo}"
+  },
+  {
+    "term": "timeline.access-deactivated-manual-description",
     "definition": "{same, select, true {Revocaste} other {{user} revocó}} el acceso a {contact} {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} removed access to {contact} {timeAgo}"
   },
@@ -8635,7 +8640,12 @@
     "context": "{same, select, true {You} other {{user}}} updated {other}'s permission to {permissionType} {timeAgo}"
   },
   {
-    "term": "timeline.message-cancelled-description",
+    "term": "timeline.message-cancelled-auto-description",
+    "definition": "Hemos cancelado un mensaje programado {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} para {contact} porque el correo ha rebotado {timeAgo}",
+    "context": "We cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} because an email was bounced {timeAgo}"
+  },
+  {
+    "term": "timeline.message-cancelled-manual-description",
     "definition": "{same, select, true {Cancelaste} other {{user} canceló}} un mensaje programado {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} para {contact} {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
   },

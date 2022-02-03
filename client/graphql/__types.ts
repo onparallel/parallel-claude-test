@@ -62,6 +62,8 @@ export interface AccessDeactivatedEvent extends PetitionEvent {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  /** If true, this event was triggered by an user action. If false, the event was triggered automatically because an email was bounced */
+  isManualTrigger: Scalars["Boolean"];
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -315,6 +317,8 @@ export interface MessageCancelledEvent extends PetitionEvent {
   __typename?: "MessageCancelledEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  /** If true, this event was triggered by an user action. If false, the event was triggered automatically because an email was bounced */
+  isManualTrigger: Scalars["Boolean"];
   message: PetitionMessage;
   type: PetitionEventType;
   user?: Maybe<User>;
@@ -4877,6 +4881,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
       | {
           __typename?: "AccessDeactivatedEvent";
           id: string;
+          isManualTrigger: boolean;
           createdAt: string;
           user?: {
             __typename?: "User";
@@ -5013,6 +5018,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
       | {
           __typename?: "MessageCancelledEvent";
           id: string;
+          isManualTrigger: boolean;
           createdAt: string;
           message: {
             __typename?: "PetitionMessage";
@@ -5466,6 +5472,7 @@ export type PetitionActivityTimeline_PetitionEvent_AccessActivatedFromPublicPeti
 export type PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragment = {
   __typename?: "AccessDeactivatedEvent";
   id: string;
+  isManualTrigger: boolean;
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
   access: {
@@ -5560,6 +5567,7 @@ export type PetitionActivityTimeline_PetitionEvent_GroupPermissionRemovedEvent_F
 export type PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragment = {
   __typename?: "MessageCancelledEvent";
   id: string;
+  isManualTrigger: boolean;
   createdAt: string;
   message: {
     __typename?: "PetitionMessage";
@@ -6026,6 +6034,7 @@ export type TimelineAccessActivatedFromLinkEvent_AccessActivatedFromPublicPetiti
 
 export type TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment = {
   __typename?: "AccessDeactivatedEvent";
+  isManualTrigger: boolean;
   createdAt: string;
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
   access: {
@@ -6112,6 +6121,7 @@ export type TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragm
 
 export type TimelineMessageCancelledEvent_MessageCancelledEventFragment = {
   __typename?: "MessageCancelledEvent";
+  isManualTrigger: boolean;
   createdAt: string;
   message: {
     __typename?: "PetitionMessage";
@@ -10955,6 +10965,7 @@ export type PetitionActivity_PetitionFragment = {
       | {
           __typename?: "AccessDeactivatedEvent";
           id: string;
+          isManualTrigger: boolean;
           createdAt: string;
           user?: {
             __typename?: "User";
@@ -11091,6 +11102,7 @@ export type PetitionActivity_PetitionFragment = {
       | {
           __typename?: "MessageCancelledEvent";
           id: string;
+          isManualTrigger: boolean;
           createdAt: string;
           message: {
             __typename?: "PetitionMessage";
@@ -11670,6 +11682,7 @@ export type PetitionActivity_updatePetitionMutation = {
             | {
                 __typename?: "AccessDeactivatedEvent";
                 id: string;
+                isManualTrigger: boolean;
                 createdAt: string;
                 user?: {
                   __typename?: "User";
@@ -11816,6 +11829,7 @@ export type PetitionActivity_updatePetitionMutation = {
             | {
                 __typename?: "MessageCancelledEvent";
                 id: string;
+                isManualTrigger: boolean;
                 createdAt: string;
                 message: {
                   __typename?: "PetitionMessage";
@@ -12461,6 +12475,7 @@ export type PetitionActivity_petitionQuery = {
             | {
                 __typename?: "AccessDeactivatedEvent";
                 id: string;
+                isManualTrigger: boolean;
                 createdAt: string;
                 user?: {
                   __typename?: "User";
@@ -12607,6 +12622,7 @@ export type PetitionActivity_petitionQuery = {
             | {
                 __typename?: "MessageCancelledEvent";
                 id: string;
+                isManualTrigger: boolean;
                 createdAt: string;
                 message: {
                   __typename?: "PetitionMessage";
@@ -18942,6 +18958,7 @@ export const TimelineAccessActivatedEvent_AccessActivatedEventFragmentDoc = gql`
 ` as unknown as DocumentNode<TimelineAccessActivatedEvent_AccessActivatedEventFragment, unknown>;
 export const TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragmentDoc = gql`
   fragment TimelineAccessDeactivatedEvent_AccessDeactivatedEvent on AccessDeactivatedEvent {
+    isManualTrigger
     user {
       ...UserReference_User
     }
@@ -19007,6 +19024,7 @@ export const TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc = gq
 ` as unknown as DocumentNode<TimelineMessageScheduledEvent_MessageScheduledEventFragment, unknown>;
 export const TimelineMessageCancelledEvent_MessageCancelledEventFragmentDoc = gql`
   fragment TimelineMessageCancelledEvent_MessageCancelledEvent on MessageCancelledEvent {
+    isManualTrigger
     message {
       status
       scheduledAt
