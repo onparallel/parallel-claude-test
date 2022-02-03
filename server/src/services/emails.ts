@@ -5,6 +5,7 @@ import { Aws, AWS_SERVICE } from "./aws";
 import { EmailPayload } from "../workers/email-sender";
 import { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
 import { OrganizationUsageLimitName } from "../db/__types";
+import { Knex } from "knex";
 
 export interface IEmailsService {
   sendPetitionMessageEmail(messageIds: MaybeArray<number>): Promise<void>;
@@ -47,7 +48,8 @@ export interface IEmailsService {
   sendPublicPetitionLinkAccessEmail(messageIds: MaybeArray<number>): Promise<void>;
   sendOrganizationLimitsReachedEmail(
     orgId: number,
-    limitName: OrganizationUsageLimitName
+    limitName: OrganizationUsageLimitName,
+    t?: Knex.Transaction
   ): Promise<void>;
   sendSignatureCancelledNoCreditsLeftEmail(petitionId: number): Promise<void>;
 }
@@ -59,7 +61,8 @@ export class EmailsService implements IEmailsService {
 
   private async enqueueEmail<T extends keyof EmailPayload>(
     type: T,
-    data: MaybeArray<EmailPayload[T] & { id: string }>
+    data: MaybeArray<EmailPayload[T] & { id: string }>,
+    t?: Knex.Transaction
   ) {
     const payloads = unMaybeArray(data);
     await this.aws.enqueueMessages(
@@ -68,7 +71,8 @@ export class EmailsService implements IEmailsService {
         id: p.id,
         body: { type, payload: p },
         groupId: p.id,
-      }))
+      })),
+      t
     );
   }
 
@@ -235,12 +239,20 @@ export class EmailsService implements IEmailsService {
     );
   }
 
-  async sendOrganizationLimitsReachedEmail(orgId: number, limitName: OrganizationUsageLimitName) {
-    return await this.enqueueEmail("organization-limits-reached", {
-      id: this.buildQueueId("Organization", orgId),
-      org_id: orgId,
-      limit_name: limitName,
-    });
+  async sendOrganizationLimitsReachedEmail(
+    orgId: number,
+    limitName: OrganizationUsageLimitName,
+    t?: Knex.Transaction
+  ) {
+    return await this.enqueueEmail(
+      "organization-limits-reached",
+      {
+        id: this.buildQueueId("Organization", orgId),
+        org_id: orgId,
+        limit_name: limitName,
+      },
+      t
+    );
   }
 
   /**

@@ -287,7 +287,7 @@ export class OrganizationRepository extends BaseRepository {
 
     // if usage reached 80% or 100% of total credits in the period, send warning email to owner and admins
     if (usage.used === Math.round(usage.limit * 0.8) || usage.limit === usage.used) {
-      await this.emails.sendOrganizationLimitsReachedEmail(orgId, limitName);
+      await this.emails.sendOrganizationLimitsReachedEmail(orgId, limitName, t);
     }
     return usage;
   }
