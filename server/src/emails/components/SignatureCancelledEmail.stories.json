@@ -17,7 +17,7 @@
         "logoAlt": "Parallel",
         "tone": "FORMAL"
       },
-      "argsTypes": {
+      "argTypes": {
         "signatureProvider": { "control": { "type": "text" } },
         "signerName": { "control": { "type": "text" } },
         "parallelUrl": { "control": { "type": "text" } },

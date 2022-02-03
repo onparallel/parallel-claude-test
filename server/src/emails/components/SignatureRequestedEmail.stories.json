@@ -19,7 +19,7 @@
         "logoAlt": "Parallel",
         "tone": "FORMAL"
       },
-      "argsTypes": {
+      "argTypes": {
         "signerName": { "control": { "type": "text" } },
         "documentName": { "control": { "type": "text" } },
         "emailBody": { "control": { "type": "text" }, "type": { "required": false } },

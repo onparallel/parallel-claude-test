@@ -19,7 +19,7 @@
         "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel"
       },
-      "argsTypes": {
+      "argTypes": {
         "signatureProvider": { "control": { "type": "text" } },
         "senderName": { "control": { "type": "text" } },
         "petitionName": { "control": { "type": "text" } },

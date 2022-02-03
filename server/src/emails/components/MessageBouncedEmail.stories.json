@@ -21,7 +21,7 @@
         "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel"
       },
-      "argsTypes": {
+      "argTypes": {
         "senderName": { "control": { "type": "text" } },
         "contactEmail": { "control": { "type": "text" } },
         "contactFullName": { "control": { "type": "text" } },

@@ -16,7 +16,7 @@
         "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel"
       },
-      "argsTypes": {
+      "argTypes": {
         "activationUrl": { "control": { "type": "text" } },
         "userName": { "control": { "type": "text" } },
         "parallelUrl": { "control": { "type": "text" } },

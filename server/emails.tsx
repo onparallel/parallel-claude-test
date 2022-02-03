@@ -19,7 +19,7 @@ async function parseArgs(req: Request) {
   const storyPath = path.join(__dirname, `src/emails/components/${storyName}.stories.json`);
   const storyConfig = await import(storyPath);
   const story = storyConfig.stories.find((s: any) => s.parameters.server.id === storyName);
-  return mapValues(story.argsTypes, ({ control: { type } }: any, key) => {
+  return mapValues(story.argTypes, ({ control: { type } }: any, key) => {
     switch (type) {
       case "object":
         return JSON.parse(req.query[key as string] as string);

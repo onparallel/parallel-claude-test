@@ -22,7 +22,7 @@
         "logoAlt": "Parallel",
         "tone": "FORMAL"
       },
-      "argsTypes": {
+      "argTypes": {
         "senderName": { "control": { "type": "text" } },
         "senderEmail": { "control": { "type": "text" } },
         "subject": { "control": { "type": "text" } },

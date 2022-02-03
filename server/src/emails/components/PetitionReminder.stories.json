@@ -26,7 +26,7 @@
         "logoAlt": "Parallel",
         "tone": "FORMAL"
       },
-      "argsTypes": {
+      "argTypes": {
         "emailSubject": { "control": { "type": "text" }, "type": { "required": false } },
         "contactFullName": { "control": { "type": "text" } },
         "contactName": { "control": { "type": "text" } },

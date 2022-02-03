@@ -19,7 +19,7 @@
         "logoAlt": "Parallel",
         "tone": "FORMAL"
       },
-      "argsTypes": {
+      "argTypes": {
         "fullName": { "control": { "type": "text" } },
         "code": { "control": { "type": "text" } },
         "browserName": { "control": { "type": "text" } },

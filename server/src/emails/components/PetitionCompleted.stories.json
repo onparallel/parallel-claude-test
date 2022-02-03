@@ -20,7 +20,7 @@
         "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel"
       },
-      "argsTypes": {
+      "argTypes": {
         "userName": { "control": { "type": "text" }, "type": { "required": false } },
         "contactName": { "control": { "type": "text" } },
         "contactEmail": { "control": { "type": "text" } },
