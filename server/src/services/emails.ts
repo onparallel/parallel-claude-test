@@ -235,10 +235,6 @@ export class EmailsService implements IEmailsService {
     );
   }
 
-  /**
-   * notify org owner and admins that they have 20% of signature credits left.
-   * "contact with support"
-   */
   async sendOrganizationLimitsReachedEmail(orgId: number, limitName: OrganizationUsageLimitName) {
     return await this.enqueueEmail("organization-limits-reached", {
       id: this.buildQueueId("Organization", orgId),

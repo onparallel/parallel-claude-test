@@ -171,13 +171,13 @@
   },
   {
     "term": "generic.action-required.few-credits-remaining",
-    "definition": "Has consumido un {percent}% de tu plan de firmas",
-    "context": "You have consumed {percent}% of your signatures"
+    "definition": "Has consumido un {percent}% de tu{limitName, select, PETITION_SEND{s peticiones} other{ plan de firmas}}",
+    "context": "You have consumed {percent}% of your {limitName, select, PETITION_SEND{petitions} other{signatures}}"
   },
   {
     "term": "generic.action-required.last-credit-used",
-    "definition": "Has alcanzado tu límite de firmas",
-    "context": "You reached your plan's signatures limit"
+    "definition": "Has alcanzado tu límite de {limitName, select, PETITION_SEND{peticiones} other{firmas}}",
+    "context": "You reached your plan's {limitName, select, PETITION_SEND{petitions} other{signatures}} limit"
   },
   {
     "term": "generic.action-required.signature-cancelled-no-credits-left",
@@ -296,38 +296,38 @@
   },
   {
     "term": "organization-limits-reached.contact-us",
-    "definition": "Por favor, ponte en contacto con nosotros en <a>support@onparallel.com</a> para ampliar tu plan de firmas.",
-    "context": "Please contact us at <a>support@onparallel.com</a> to upgrade your signatures plan."
+    "definition": "Por favor, ponte en contacto con nosotros en <a>support@onparallel.com</a> para {limitName, select, PETITION_SEND{conseguir más peticiones} other{ampliar tu plan de firmas}}.",
+    "context": "Please contact us at <a>support@onparallel.com</a> to {limitName, select, PETITION_SEND{get more petitions} other{upgrade your signatures plan}}."
   },
   {
     "term": "organization-limits-reached.few-credits-remaining.subject",
-    "definition": "Aviso: Has consumido un {percent}% de tus firmas",
-    "context": "Alert: {percent}% of your signatures have been consumed"
+    "definition": "Aviso: Has consumido un {percent}% de tus {limitName, select, PETITION_SEND{peticiones} other{firmas}}",
+    "context": "Alert: {percent}% of your {limitName, select, PETITION_SEND{petitions} other{signatures}} have been consumed"
   },
   {
     "term": "organization-limits-reached.few-credits-remaining.text",
-    "definition": "Nos alegra que estés firmando tus documentos con Parallel. Pero parece que ya has consumido gran parte de tus firmas disponibles.",
-    "context": "We are glad that you are signing your documents with Parallel. But it looks like you have already consumed a large part of your signature plan."
+    "definition": "Nos alegra que estés {limitName, select, PETITION_SEND{acelerando tus procesos} other{firmando tus documentos}} con Parallel. Pero parece que ya has consumido gran parte de tus {limitName, select, PETITION_SEND{peticiones} other{firmas}} disponibles.",
+    "context": "We are glad that you are {limitName, select, PETITION_SEND{speeding up your processes} other{signing your documents}} with Parallel. But it looks like you have already consumed a large part of your {limitName, select, PETITION_SEND{available petitions} other{signatures plan}}."
   },
   {
     "term": "organization-limits-reached.few-credits-remaining.text-2",
-    "definition": "En el momento en el que se envió este correo, te quedaban <b>{remaining} firmas</b>, un {remainingPercent}% de las contratadas.",
-    "context": "At the time this email was sent, you had <b>{remaining} signatures left</b>, {remainingPercent}% of those you had contracted."
+    "definition": "En el momento en el que se envió este correo, te quedaban <b>{remaining} {limitName, select, PETITION_SEND{peticiones} other{firmas}}</b>, un {remainingPercent}% de las contratadas.",
+    "context": "At the time this email was sent, you had <b>{remaining} {limitName, select, PETITION_SEND{petitions} other{signatures}} left</b>, {remainingPercent}% of those you had contracted."
   },
   {
     "term": "organization-limits-reached.last-credit-used.subject",
-    "definition": "Has consumido tu límite de firma",
-    "context": "You reached your signatures limit"
+    "definition": "Has consumido tu límite de {limitName, select, PETITION_SEND{peticiones} other{firma}}",
+    "context": "You reached your {limitName, select, PETITION_SEND{petitions} other{signatures}} limit"
   },
   {
     "term": "organization-limits-reached.last-credit-used.text",
-    "definition": "Parece que Parallel está ayudándote a firmar muchos de tus documentos, y es que ya <b>has alcanzado tu límite de firmas</b>.",
-    "context": "It seems that Parallel is helping you sign many of your documents, and you already <b>reached your signature limit</b>."
+    "definition": "Parece que Parallel está ayudándote {limitName, select, PETITION_SEND{en muchos procesos} other{a firmar muchos de tus documentos}}, y es que ya <b> has alcanzado tu {limitName, select, PETITION_SEND{límite de {total} peticiones} other{límite de firmas}}</b>.",
+    "context": "It seems that Parallel is helping you {limitName, select, PETITION_SEND{in many processes} other{sign many of your documents}}, and you already <b>reached your {limitName, select, PETITION_SEND{limit of {total} petitions} other{signature limit}}</b>."
   },
   {
     "term": "organization-limits-reached.last-credit-used.text-2",
-    "definition": "Si necesitas iniciar más firmas, por favor, ponte en contacto con nosotros en <a>support@onparallel.com</a> para adquirir más.",
-    "context": "If you need to initiate more signatures, please contact us at <a>support@onparallel.com</a>."
+    "definition": "{limitName, select, PETITION_SEND{Por favor, ponte en contacto con nosotros en <a>support@onparallel.com</a> para poder continuar enviando tus procesos mediante Parallel} other{Si necesitas iniciar más firmas, for favor, ponte en contacto con nosotros en <a>support@onparallel.com</a> para adquirir más}}.",
+    "context": "{limitName, select, PETITION_SEND{Please contact us at <a>support@onparallel.com</a> so that you can continue sending your processes via Parallel} other{If you need to initiate more signatures, please contact us at <a>support@onparallel.com</a>}}."
   },
   {
     "term": "petition-closed-notification.subject",
