@@ -49,6 +49,7 @@ export interface IEmailsService {
   sendOrganizationLimitsReachedEmail(
     orgId: number,
     limitName: OrganizationUsageLimitName,
+    used: number,
     t?: Knex.Transaction
   ): Promise<void>;
   sendSignatureCancelledNoCreditsLeftEmail(petitionId: number): Promise<void>;
@@ -242,12 +243,13 @@ export class EmailsService implements IEmailsService {
   async sendOrganizationLimitsReachedEmail(
     orgId: number,
     limitName: OrganizationUsageLimitName,
+    used: number,
     t?: Knex.Transaction
   ) {
     return await this.enqueueEmail(
       "organization-limits-reached",
       {
-        id: this.buildQueueId("Organization", orgId),
+        id: this.buildQueueId(`Organization:${limitName}`, [orgId, used]),
         org_id: orgId,
         limit_name: limitName,
       },
