@@ -170,7 +170,7 @@
     "context": "Action required"
   },
   {
-    "term": "generic.action-required.org-almost-out-of-signature-credits",
+    "term": "generic.action-required.few-credits-remaining",
     "definition": "You have consumed {percent}% of your signatures",
     "context": "You have consumed {percent}% of your signatures"
   },
@@ -295,22 +295,22 @@
     "context": "{senderName} ({senderEmail}) has sent you the following petition:"
   },
   {
-    "term": "org-almost-out-of-signature-credits.contact-us",
+    "term": "organization-limits-reached.contact-us",
     "definition": "Please contact us at <a>support@onparallel.com</a> to upgrade your signatures plan.",
     "context": "Please contact us at <a>support@onparallel.com</a> to upgrade your signatures plan."
   },
   {
-    "term": "org-almost-out-of-signature-credits.subject",
+    "term": "organization-limits-reached.few-credits-remaining.subject",
     "definition": "Alert: {percent}% of your signatures have been consumed",
     "context": "Alert: {percent}% of your signatures have been consumed"
   },
   {
-    "term": "org-almost-out-of-signature-credits.text",
+    "term": "organization-limits-reached.few-credits-remaining.text",
     "definition": "We are glad that you are signing your documents with Parallel. But it looks like you have already consumed a large part of your signature plan.",
     "context": "We are glad that you are signing your documents with Parallel. But it looks like you have already consumed a large part of your signature plan."
   },
   {
-    "term": "org-almost-out-of-signature-credits.text-2",
+    "term": "organization-limits-reached.few-credits-remaining.text-2",
     "definition": "At the time this email was sent, you had <b>{remaining} signatures left</b>, {remainingPercent}% of those you had contracted.",
     "context": "At the time this email was sent, you had <b>{remaining} signatures left</b>, {remainingPercent}% of those you had contracted."
   },
@@ -325,7 +325,7 @@
     "context": "It seems that Parallel is helping you sign many of your documents, and you already <b>reached your signature limit</b>."
   },
   {
-    "term": "org-last-signature-credit-used.text-2",
+    "term": "organization-limits-reached.last-credit-used.text-2",
     "definition": "If you need to initiate more signatures, please contact us at <a>support@onparallel.com</a>.",
     "context": "If you need to initiate more signatures, please contact us at <a>support@onparallel.com</a>."
   },

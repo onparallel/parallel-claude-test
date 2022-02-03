@@ -170,12 +170,12 @@
     "context": "Action required"
   },
   {
-    "term": "generic.action-required.org-almost-out-of-signature-credits",
+    "term": "generic.action-required.few-credits-remaining",
     "definition": "Has consumido un {percent}% de tu plan de firmas",
     "context": "You have consumed {percent}% of your signatures"
   },
   {
-    "term": "generic.action-required.org-last-signature-credit-used",
+    "term": "generic.action-required.last-credit-used",
     "definition": "Has alcanzado tu límite de firmas",
     "context": "You reached your plan's signatures limit"
   },
@@ -295,37 +295,37 @@
     "context": "{senderName} ({senderEmail}) has sent you the following petition:"
   },
   {
-    "term": "org-almost-out-of-signature-credits.contact-us",
+    "term": "organization-limits-reached.contact-us",
     "definition": "Por favor, ponte en contacto con nosotros en <a>support@onparallel.com</a> para ampliar tu plan de firmas.",
     "context": "Please contact us at <a>support@onparallel.com</a> to upgrade your signatures plan."
   },
   {
-    "term": "org-almost-out-of-signature-credits.subject",
+    "term": "organization-limits-reached.few-credits-remaining.subject",
     "definition": "Aviso: Has consumido un {percent}% de tus firmas",
     "context": "Alert: {percent}% of your signatures have been consumed"
   },
   {
-    "term": "org-almost-out-of-signature-credits.text",
+    "term": "organization-limits-reached.few-credits-remaining.text",
     "definition": "Nos alegra que estés firmando tus documentos con Parallel. Pero parece que ya has consumido gran parte de tus firmas disponibles.",
     "context": "We are glad that you are signing your documents with Parallel. But it looks like you have already consumed a large part of your signature plan."
   },
   {
-    "term": "org-almost-out-of-signature-credits.text-2",
+    "term": "organization-limits-reached.few-credits-remaining.text-2",
     "definition": "En el momento en el que se envió este correo, te quedaban <b>{remaining} firmas</b>, un {remainingPercent}% de las contratadas.",
     "context": "At the time this email was sent, you had <b>{remaining} signatures left</b>, {remainingPercent}% of those you had contracted."
   },
   {
-    "term": "org-last-signature-credit-used.subject",
+    "term": "organization-limits-reached.last-credit-used.subject",
     "definition": "Has consumido tu límite de firma",
     "context": "You reached your signatures limit"
   },
   {
-    "term": "org-last-signature-credit-used.text",
+    "term": "organization-limits-reached.last-credit-used.text",
     "definition": "Parece que Parallel está ayudándote a firmar muchos de tus documentos, y es que ya <b>has alcanzado tu límite de firmas</b>.",
     "context": "It seems that Parallel is helping you sign many of your documents, and you already <b>reached your signature limit</b>."
   },
   {
-    "term": "org-last-signature-credit-used.text-2",
+    "term": "organization-limits-reached.last-credit-used.text-2",
     "definition": "Si necesitas iniciar más firmas, por favor, ponte en contacto con nosotros en <a>support@onparallel.com</a> para adquirir más.",
     "context": "If you need to initiate more signatures, please contact us at <a>support@onparallel.com</a>."
   },

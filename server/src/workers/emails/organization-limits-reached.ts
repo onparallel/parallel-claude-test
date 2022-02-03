@@ -1,25 +1,23 @@
 import { WorkerContext } from "../../context";
+import { OrganizationUsageLimitName } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
-import OrgAlmostOutOfSignatureCreditsEmail from "../../emails/components/OrgAlmostOutOfSignatureCreditsEmail";
+import OrganizationLimitsReachedEmail from "../../emails/components/OrganizationLimitsReachedEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { getLayoutProps } from "../helpers/getLayoutProps";
 
-export async function orgAlmostOutOfSignatureCredits(
-  payload: { org_id: number },
+export async function organizationLimitsReached(
+  payload: { org_id: number; limit_name: OrganizationUsageLimitName },
   context: WorkerContext
 ) {
   const [usageLimit, ownerAndAdmins, parallelOrg] = await Promise.all([
-    context.organizations.getOrganizationCurrentUsageLimit(
-      payload.org_id,
-      "SIGNATURIT_SHARED_APIKEY"
-    ),
+    context.organizations.getOrganizationCurrentUsageLimit(payload.org_id, payload.limit_name),
     context.organizations.loadOwnerAndAdmins(payload.org_id),
     context.organizations.loadRootOrganization(),
   ]);
 
   if (!usageLimit) {
     throw new Error(
-      `Could not find SIGNATURIT_SHARED_APIKEY usage limit for Organization:${payload.org_id}`
+      `Could not find ${payload.limit_name} usage limit for Organization:${payload.org_id}`
     );
   }
 
@@ -28,8 +26,9 @@ export async function orgAlmostOutOfSignatureCredits(
   const emails = [];
   for (const user of ownerAndAdmins) {
     const { html, text, subject, from } = await buildEmail(
-      OrgAlmostOutOfSignatureCreditsEmail,
+      OrganizationLimitsReachedEmail,
       {
+        limitName: payload.limit_name,
         senderName: user.first_name!,
         total: usageLimit.limit,
         used: usageLimit.used,

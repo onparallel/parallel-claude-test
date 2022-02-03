@@ -13,8 +13,7 @@ import { petitionAccessDelegated } from "./emails/petition-access-delegated";
 import { developerWebhookFailed } from "./emails/developer-webhook-failed";
 import { publicPetitionLinkAccess } from "./emails/public-petition-link-access";
 import { signatureCancelledNoCreditsLeft } from "./emails/signature-cancelled-no-credits-left";
-import { orgAlmostOutOfSignatureCredits } from "./emails/org-almost-out-of-signature-credits";
-import { lastSignatureCreditUsed } from "./emails/last-signature-credit-used";
+import { organizationLimitsReached } from "./emails/organization-limits-reached";
 
 const builders = {
   "petition-completed": petitionCompleted,
@@ -30,8 +29,7 @@ const builders = {
   "developer-webhook-failed": developerWebhookFailed,
   "public-petition-link-access": publicPetitionLinkAccess,
   "signature-cancelled-no-credits-left": signatureCancelledNoCreditsLeft,
-  "org-almost-out-of-signature-credits": orgAlmostOutOfSignatureCredits,
-  "last-signature-credit-used": lastSignatureCreditUsed,
+  "organization-limits-reached": organizationLimitsReached,
 };
 
 export type EmailType = keyof typeof builders;

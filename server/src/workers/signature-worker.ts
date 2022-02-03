@@ -107,13 +107,15 @@ async function startSignatureProcess(
         "SIGNATURIT_SHARED_APIKEY",
         1
       );
-      // if usage reached 80% of total credits in the period, send warning email to owner and admins
-      if (signatureLimit.used === Math.round(signatureLimit.limit * 0.8)) {
-        await ctx.emails.sendOrgAlmostOutOfSignatureCreditsEmail(petition.org_id);
-      }
-      // if this request was sent with the last signature credit, send warning email to owner and admins
-      else if (signatureLimit.limit === signatureLimit.used) {
-        await ctx.emails.sendLastSignatureCreditUsedEmail(petition.org_id);
+      // if usage reached 80% or 100% of total credits in the period, send warning email to owner and admins
+      if (
+        signatureLimit.used === Math.round(signatureLimit.limit * 0.8) ||
+        signatureLimit.limit === signatureLimit.used
+      ) {
+        await ctx.emails.sendOrganizationLimitsReachedEmail(
+          petition.org_id,
+          "SIGNATURIT_SHARED_APIKEY"
+        );
       }
     }
 

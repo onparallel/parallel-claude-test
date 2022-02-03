@@ -1,14 +1,15 @@
 {
-  "title": "Org Almost Out Of Signature Credits",
+  "title": "Organization Limits Reached",
   "stories": [
     {
-      "name": "Org Almost Out Of Signature Credits",
+      "name": "Organization Limits Reached",
       "parameters": {
         "server": {
-          "id": "OrgAlmostOutOfSignatureCreditsEmail"
+          "id": "OrganizationLimitsReachedEmail"
         }
       },
       "args": {
+        "limitName": "PETITION_SEND",
         "senderName": "Santi",
         "total": 100,
         "used": 90,
@@ -17,7 +18,12 @@
         "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel"
       },
-      "argsTypes": {
+      "argTypes": {
+        "limitName": {
+          "options": ["PETITION_SEND", "SIGNATURIT_SHARED_APIKEY"],
+          "control": { "type": "select" },
+          "defaultValue": "PETITION_SEND"
+        },
         "senderName": { "control": { "type": "text" } },
         "total": { "control": { "type": "number" } },
         "used": { "control": { "type": "number" } },

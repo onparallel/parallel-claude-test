@@ -4,6 +4,7 @@ import { MaybeArray, Maybe } from "../util/types";
 import { Aws, AWS_SERVICE } from "./aws";
 import { EmailPayload } from "../workers/email-sender";
 import { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
+import { OrganizationUsageLimitName } from "../db/__types";
 
 export interface IEmailsService {
   sendPetitionMessageEmail(messageIds: MaybeArray<number>): Promise<void>;
@@ -44,8 +45,10 @@ export interface IEmailsService {
   sendPetitionMessageBouncedEmail(emailLogId: number): Promise<void>;
   sendContactAuthenticationRequestEmail(requestId: number): Promise<void>;
   sendPublicPetitionLinkAccessEmail(messageIds: MaybeArray<number>): Promise<void>;
-  sendOrgAlmostOutOfSignatureCreditsEmail(orgId: number): Promise<void>;
-  sendLastSignatureCreditUsedEmail(orgId: number): Promise<void>;
+  sendOrganizationLimitsReachedEmail(
+    orgId: number,
+    limitName: OrganizationUsageLimitName
+  ): Promise<void>;
   sendSignatureCancelledNoCreditsLeftEmail(petitionId: number): Promise<void>;
 }
 export const EMAILS = Symbol.for("EMAILS");
@@ -236,21 +239,11 @@ export class EmailsService implements IEmailsService {
    * notify org owner and admins that they have 20% of signature credits left.
    * "contact with support"
    */
-  async sendOrgAlmostOutOfSignatureCreditsEmail(orgId: number) {
-    return await this.enqueueEmail("org-almost-out-of-signature-credits", {
+  async sendOrganizationLimitsReachedEmail(orgId: number, limitName: OrganizationUsageLimitName) {
+    return await this.enqueueEmail("organization-limits-reached", {
       id: this.buildQueueId("Organization", orgId),
       org_id: orgId,
-    });
-  }
-
-  /**
-   * notify org owner and admins that their last signature credit was just used
-   * "contact with support"
-   */
-  async sendLastSignatureCreditUsedEmail(orgId: number) {
-    return await this.enqueueEmail("last-signature-credit-used", {
-      id: this.buildQueueId("Organization", orgId),
-      org_id: orgId,
+      limit_name: limitName,
     });
   }
 
