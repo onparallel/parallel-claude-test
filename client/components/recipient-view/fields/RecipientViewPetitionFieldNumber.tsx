@@ -1,24 +1,24 @@
-import {
-  Center,
-  Flex,
-  List,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Center, Flex, List, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { InputCleave } from "@parallel/components/common/InputCleave";
+import { PetitionLocale } from "@parallel/graphql/__types";
+import { getSeparator } from "@parallel/utils/intl";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
-import { FocusEvent, forwardRef, KeyboardEvent, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  FocusEvent,
+  forwardRef,
+  KeyboardEvent,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import {
@@ -54,7 +54,7 @@ export function RecipientViewPetitionFieldNumber({
   const intl = useIntl();
 
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
-  const [value, setValue] = useState<string | undefined>(undefined);
+  const [value, setValue] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
   const isDeletingReplyRef = useRef<Record<string, boolean>>({});
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
@@ -65,7 +65,9 @@ export function RecipientViewPetitionFieldNumber({
 
   function handleAddNewReply() {
     setShowNewReply(true);
-    setTimeout(() => newReplyRef.current?.focus());
+    setTimeout(() => {
+      newReplyRef.current?.focus();
+    });
   }
 
   const handleUpdate = useMemoFactory(
@@ -112,7 +114,7 @@ export function RecipientViewPetitionFieldNumber({
         const replyId = await onCreateReply(value);
         if (replyId) {
           const selection = pick(newReplyRef.current!, ["selectionStart", "selectionEnd"]);
-          setValue(undefined);
+          setValue("");
           if (focusCreatedReply) {
             setShowNewReply(false);
             setTimeout(() => {
@@ -135,13 +137,28 @@ export function RecipientViewPetitionFieldNumber({
     [onCreateReply]
   );
 
+  const cleaveOptions = useMemo(
+    () => ({
+      numeral: true,
+      numeralDecimalMark: getSeparator(intl.locale as PetitionLocale, "decimal"),
+      delimiter: getSeparator(intl.locale as PetitionLocale, "group"),
+      numeralPositiveOnly:
+        field.options.range?.min !== undefined ? field.options.range?.min >= 0 : false,
+    }),
+    [intl.locale, field.options.range?.min]
+  );
+
   const inputProps = {
-    isDisabled: isDisabled,
     value,
+    id: `reply-${field.id}-new`,
+    ref: newReplyRef as any,
+    isDisabled: isDisabled,
+    isInvalid: false,
+    options: cleaveOptions,
     onKeyDown: async (event: KeyboardEvent) => {
-      if (isMetaReturn(event) && field.multiple && value !== undefined) {
-        await handleCreate.immediateIfPending(String(value), false);
-      } else if (event.key === "Backspace" && value === undefined) {
+      if (isMetaReturn(event) && field.multiple) {
+        await handleCreate.immediateIfPending(value, false);
+      } else if (event.key === "Backspace" && value === "") {
         if (field.replies.length > 0) {
           event.preventDefault();
           setShowNewReply(false);
@@ -151,30 +168,49 @@ export function RecipientViewPetitionFieldNumber({
       }
     },
     onBlur: async (event: FocusEvent<HTMLInputElement>) => {
-      const number = event.target.value;
-      if (number) {
-        if (isNaN(Number(number)) || !isBetweenLimits(options, Number(number))) return;
-        await handleCreate.immediateIfPending(number, false);
+      console.log("CREATE - onBlur - event.target.rawValue: ", event.target.rawValue);
+      console.log("CREATE - onBlur - event.target.value: ", event.target.value);
+
+      const valueAsNumber = Number(event.target.rawValue);
+      const valueAsString = event.target.value;
+
+      if (valueAsString) {
+        if (isNaN(valueAsNumber) || !isBetweenLimits(options, valueAsNumber)) {
+          // set invalid true
+          return;
+        }
+        await handleCreate.immediateIfPending(valueAsString, false);
         handleCreate.clear();
         setShowNewReply(false);
-      } else if (!number && field.replies.length > 0) {
+      } else if (field.replies.length > 0) {
         setShowNewReply(false);
       }
     },
-    onChange: (valueAsString: string, valueAsNumber: number) => {
-      console.log("onChange - create valueAsString: ", valueAsString);
-      console.log("onChange - create valueAsNumber: ", valueAsNumber);
+    onChange: (event: ChangeEvent<HTMLInputElement>) => {
+      console.log("CREATE - onChange - event.target.rawValue: ", event.target.rawValue);
+      console.log("CREATE - onChange - event.target.value: ", event.target.value);
+
+      const valueAsNumber = Number(event.target.rawValue);
+      const valueAsString = event.target.value;
 
       if (isNaN(valueAsNumber) || valueAsString.endsWith(".")) {
         setValue(valueAsString);
         return;
       }
-      if (isSaving || !isBetweenLimits(options, valueAsNumber)) return;
+      if (isSaving || !isBetweenLimits(options, valueAsNumber)) {
+        return;
+      } else {
+        // set invalid false
+      }
       setValue(valueAsString);
       handleCreate(String(valueAsNumber), true);
     },
-    max: field.options.range.isActive ? field.options.range.max : undefined,
-    min: field.options.range.isActive ? field.options.range.min : undefined,
+    placeholder:
+      options.placeholder ??
+      intl.formatMessage({
+        id: "component.recipient-view-petition-field-reply.text-placeholder",
+        defaultMessage: "Enter your answer",
+      }),
   };
 
   const hasRange =
@@ -261,27 +297,10 @@ export function RecipientViewPetitionFieldNumber({
       ) : null}
       {(field.multiple && showNewReply) || field.replies.length === 0 ? (
         <Flex flex="1" position="relative" marginTop={2}>
-          <NumberInput width="100%" {...inputProps}>
-            <NumberInputField
-              paddingRight={10}
-              id={`reply-${field.id}-new`}
-              ref={newReplyRef as any}
-              placeholder={
-                options.placeholder ??
-                intl.formatMessage({
-                  id: "component.recipient-view-petition-field-reply.text-placeholder",
-                  defaultMessage: "Enter your answer",
-                })
-              }
-            />
-            <Center boxSize={10} position="absolute" right={6} bottom={0}>
-              <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
-            </Center>
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
+          <InputCleave {...inputProps} />
+          <Center boxSize={10} position="absolute" right={0} bottom={0}>
+            <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
+          </Center>
         </Flex>
       ) : null}
     </RecipientViewPetitionFieldCard>
@@ -305,8 +324,11 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
   ref
 ) {
   const intl = useIntl();
-  const [value, setValue] = useState<string | undefined>(reply.content.text);
+  const [value, setValue] = useState(
+    reply.content.text ? intl.formatNumber(reply.content.text) : ""
+  );
   const [isSaving, setIsSaving] = useState(false);
+  const [isInvalid, setIsInvalid] = useState(false);
   const options = field.options as FieldOptions["NUMBER"];
 
   const debouncedUpdateReply = useDebouncedCallback(
@@ -321,72 +343,89 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
     [onUpdate]
   );
 
+  const cleaveOptions = useMemo(
+    () => ({
+      numeral: true,
+      numeralDecimalMark: getSeparator(intl.locale as PetitionLocale, "decimal"),
+      delimiter: getSeparator(intl.locale as PetitionLocale, "group"),
+      numeralPositiveOnly:
+        field.options.range?.min !== undefined ? Math.sign(field.options.range?.min) > -1 : false,
+    }),
+    [intl.locale, field.options.range?.min]
+  );
+
   const props = {
     value,
+    id: `reply-${field.id}-${reply.id}`,
+    ref: ref as any,
     isDisabled: isDisabled || reply.status === "APPROVED",
-    isInvalid: reply.status === "REJECTED",
+    isInvalid: reply.status === "REJECTED" || isInvalid,
+    paddingRight: 10,
+    options: cleaveOptions,
     onKeyDown: async (event: KeyboardEvent) => {
       if (isMetaReturn(event) && field.multiple) {
         onAddNewReply();
-      } else if (event.key === "Backspace" && value === undefined) {
+      } else if (event.key === "Backspace" && value === "") {
         event.preventDefault();
         debouncedUpdateReply.clear();
         onDelete(true);
       }
     },
     onBlur: async (event: FocusEvent<HTMLInputElement>) => {
-      const number = event.target.value;
-      if (number) {
-        if (isNaN(Number(number)) || !isBetweenLimits(options, Number(number))) return;
-        await debouncedUpdateReply.immediateIfPending(number);
+      console.log("Update - onBlur - event.target.rawValue: ", event.target.rawValue);
+      console.log("Update - onBlur - event.target.value: ", event.target.value);
+
+      const valueAsNumber = Number(event.target.rawValue);
+      const valueAsString = event.target.value;
+
+      if (valueAsString) {
+        if (isNaN(valueAsNumber) || !isBetweenLimits(options, valueAsNumber)) {
+          setIsInvalid(true);
+          return;
+        }
+        await debouncedUpdateReply.immediateIfPending(event.target.rawValue);
         debouncedUpdateReply.clear();
       } else {
         debouncedUpdateReply.clear();
         onDelete();
       }
     },
-    onChange: (valueAsString: string, valueAsNumber: number) => {
-      console.log("onChange - update valueAsString: ", valueAsString);
-      console.log("onChange - update valueAsNumber: ", valueAsNumber);
+    onChange: (event: ChangeEvent<HTMLInputElement>) => {
+      console.log("Update - onChange - event.target.rawValue: ", event.target.rawValue);
+      console.log("Update - onChange - event.target.value: ", event.target.value);
+
+      const valueAsNumber = Number(event.target.rawValue);
+      const valueAsString = event.target.value;
 
       if (isNaN(valueAsNumber) || valueAsString.endsWith(".")) {
         setValue(valueAsString);
         return;
       }
-      if (!isBetweenLimits(options, valueAsNumber)) return;
+      if (!isBetweenLimits(options, valueAsNumber)) {
+        return;
+      } else {
+        setIsInvalid(false);
+      }
       if (valueAsString !== value) {
         setValue(valueAsString);
         debouncedUpdateReply(String(valueAsNumber));
       }
     },
-    max: field.options.range.isActive ? field.options.range.max : undefined,
-    min: field.options.range.isActive ? field.options.range.min : undefined,
+    placeholder:
+      options.placeholder ??
+      intl.formatMessage({
+        id: "component.recipient-view-petition-field-reply.text-placeholder",
+        defaultMessage: "Enter your answer",
+      }),
   };
 
   return (
     <Stack direction="row">
       <Flex flex="1" position="relative">
-        <NumberInput width="100%" {...props}>
-          <NumberInputField
-            paddingRight={10}
-            id={`reply-${field.id}-${reply.id}`}
-            ref={ref as any}
-            placeholder={
-              options.placeholder ??
-              intl.formatMessage({
-                id: "component.recipient-view-petition-field-reply.text-placeholder",
-                defaultMessage: "Enter your answer",
-              })
-            }
-          />
-          <Center boxSize={10} position="absolute" right={6} bottom={0}>
-            <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
-          </Center>
-          <NumberInputStepper>
-            <NumberIncrementStepper />
-            <NumberDecrementStepper />
-          </NumberInputStepper>
-        </NumberInput>
+        <InputCleave {...props} />
+        <Center boxSize={10} position="absolute" right={0} bottom={0}>
+          <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
+        </Center>
       </Flex>
       <IconButtonWithTooltip
         isDisabled={isDisabled || reply.status === "APPROVED"}

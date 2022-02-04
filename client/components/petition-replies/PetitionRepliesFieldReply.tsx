@@ -39,7 +39,7 @@ export function PetitionRepliesFieldReply({
   onAction,
 }: PetitionRepliesFieldReplyProps) {
   const intl = useIntl();
-  const isTextLikeType = ["TEXT", "SHORT_TEXT", "SELECT", "NUMBER"].includes(reply.field!.type);
+  const isTextLikeType = ["TEXT", "SHORT_TEXT", "SELECT"].includes(reply.field!.type);
 
   const apollo = useApolloClient();
   const myId = getMyId(apollo);
@@ -69,6 +69,8 @@ export function PetitionRepliesFieldReply({
       <Box paddingRight={2} borderRight="2px solid" borderColor="gray.200">
         {isTextLikeType ? (
           <CopyToClipboardButton size="xs" text={reply.content.text} />
+        ) : reply.field!.type === "NUMBER" ? (
+          <CopyToClipboardButton size="xs" text={intl.formatNumber(reply.content.text)} />
         ) : reply.field!.type === "FILE_UPLOAD" ? (
           <Stack spacing={1}>
             <ReplyDownloadButton
@@ -121,6 +123,8 @@ export function PetitionRepliesFieldReply({
       <Flex flexDirection="column" justifyContent="center" flex="1" marginLeft={2}>
         {isTextLikeType ? (
           <BreakLines>{reply.content.text}</BreakLines>
+        ) : reply.field!.type === "NUMBER" ? (
+          <BreakLines>{intl.formatNumber(reply.content.text)}</BreakLines>
         ) : reply.field!.type === "FILE_UPLOAD" ? (
           <Box>
             <VisuallyHidden>
