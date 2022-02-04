@@ -176,21 +176,23 @@ async function sendSignatureReminder(
   payload: { petitionSignatureRequestId: number },
   ctx: WorkerContext
 ) {
-  const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
-  if (signature.status !== "PROCESSED") {
-    return;
-  }
+  try {
+    const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
+    if (signature.status !== "PROCESSED") {
+      return;
+    }
 
-  if (!signature.external_id) {
-    throw new Error(
-      `Can't find external_id on PetitionSignatureRequest:${payload.petitionSignatureRequestId}`
-    );
-  }
-  const { orgIntegrationId } = signature.signature_config;
-  const signatureIntegration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
+    if (!signature.external_id) {
+      throw new Error(
+        `Can't find external_id on PetitionSignatureRequest:${payload.petitionSignatureRequestId}`
+      );
+    }
+    const { orgIntegrationId } = signature.signature_config;
+    const signatureIntegration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
 
-  const signatureClient = ctx.signature.getClient(signatureIntegration);
-  await signatureClient.sendPendingSignatureReminder(signature.external_id.replace(/^.*?\//, ""));
+    const signatureClient = ctx.signature.getClient(signatureIntegration);
+    await signatureClient.sendPendingSignatureReminder(signature.external_id.replace(/^.*?\//, ""));
+  } catch {}
 }
 
 async function storeSignedDocument(

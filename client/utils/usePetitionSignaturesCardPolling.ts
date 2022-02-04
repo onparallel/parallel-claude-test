@@ -12,7 +12,7 @@ const POLL_INTERVAL = 10000;
 export function usePetitionSignaturesCardPolling(
   petition: PetitionSignaturesCard_PetitionFragment
 ) {
-  const current = petition.signatureRequests?.[0];
+  const current = petition.signatureRequests[0] as typeof petition.signatureRequests[0] | undefined;
   const { startPolling, stopPolling } = useQuery<
     PetitionSignaturesCardPolling_petitionQuery,
     PetitionSignaturesCardPolling_petitionQueryVariables
@@ -29,9 +29,12 @@ export function usePetitionSignaturesCardPolling(
   );
 
   useEffect(() => {
-    if (current) {
+    if (current && ["ENQUEUED", "PROCESSING", "PROCESSED"].includes(current.status)) {
       startPolling(POLL_INTERVAL);
-      return stopPolling;
+    } else if (current && ["COMPLETED", "CANCELLED"].includes(current.status)) {
+      stopPolling();
     }
-  });
+
+    return stopPolling;
+  }, [current?.status]);
 }

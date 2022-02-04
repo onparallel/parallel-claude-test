@@ -17,7 +17,7 @@ export async function up(knex: Knex): Promise<void> {
     drop index petition_signature_request__petition_id_processing_uniq;
 
     create unique index petition_signature_request__petition_id_processing_uniq on petition_signature_request (petition_id)
-    where (status = ANY (ARRAY ['ENQUEUED'::petition_signature_status, 'PROCESSING'::petition_signature_status, 'PROCESSED'::petition_signature_status]));
+    where (status = ANY (ARRAY ['ENQUEUED', 'PROCESSING', 'PROCESSED']::petition_signature_status[]));
   `);
 }
 

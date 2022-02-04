@@ -1061,7 +1061,7 @@ export interface NexusGenFieldTypes {
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
     sentAt: NexusGenScalars["DateTime"] | null; // DateTime
     signatureConfig: NexusGenRootTypes["SignatureConfig"] | null; // SignatureConfig
-    signatureRequests: NexusGenRootTypes["PetitionSignatureRequest"][] | null; // [PetitionSignatureRequest!]
+    signatureRequests: NexusGenRootTypes["PetitionSignatureRequest"][]; // [PetitionSignatureRequest!]!
     skipForwardSecurity: boolean; // Boolean!
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
     tags: NexusGenRootTypes["Tag"][]; // [Tag!]!

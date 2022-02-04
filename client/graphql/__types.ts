@@ -1620,7 +1620,7 @@ export interface Petition extends PetitionBase {
   /** The signature configuration for the petition. */
   signatureConfig?: Maybe<SignatureConfig>;
   /** The list of signature requests. */
-  signatureRequests?: Maybe<Array<PetitionSignatureRequest>>;
+  signatureRequests: Array<PetitionSignatureRequest>;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"];
   /** The status of the petition. */
@@ -8454,7 +8454,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
   id: string;
   status: PetitionStatus;
   name?: string | null;
-  signatureRequests?: Array<{
+  signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
     id: string;
     status: PetitionSignatureRequestStatus;
@@ -8471,7 +8471,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
       __typename?: "SignatureConfig";
       signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
     };
-  }> | null;
+  }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
     title: string;
@@ -8513,7 +8513,7 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
         id: string;
         status: PetitionStatus;
         name?: string | null;
-        signatureRequests?: Array<{
+        signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
           id: string;
           status: PetitionSignatureRequestStatus;
@@ -8530,7 +8530,7 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
             __typename?: "SignatureConfig";
             signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
           };
-        }> | null;
+        }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
           title: string;
@@ -14932,7 +14932,7 @@ export type PetitionReplies_PetitionFragment = {
         user: { __typename?: "User"; id: string; fullName?: string | null };
       }
   >;
-  signatureRequests?: Array<{
+  signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
     id: string;
     status: PetitionSignatureRequestStatus;
@@ -14949,7 +14949,7 @@ export type PetitionReplies_PetitionFragment = {
       __typename?: "SignatureConfig";
       signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
     };
-  }> | null;
+  }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
     review: boolean;
@@ -15201,7 +15201,7 @@ export type PetitionReplies_closePetitionMutation = {
           user: { __typename?: "User"; id: string; fullName?: string | null };
         }
     >;
-    signatureRequests?: Array<{
+    signatureRequests: Array<{
       __typename?: "PetitionSignatureRequest";
       id: string;
       status: PetitionSignatureRequestStatus;
@@ -15218,7 +15218,7 @@ export type PetitionReplies_closePetitionMutation = {
         __typename?: "SignatureConfig";
         signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
       };
-    }> | null;
+    }>;
     signatureConfig?: {
       __typename?: "SignatureConfig";
       review: boolean;
@@ -15345,7 +15345,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
           user: { __typename?: "User"; id: string; fullName?: string | null };
         }
     >;
-    signatureRequests?: Array<{
+    signatureRequests: Array<{
       __typename?: "PetitionSignatureRequest";
       id: string;
       status: PetitionSignatureRequestStatus;
@@ -15362,7 +15362,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         __typename?: "SignatureConfig";
         signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
       };
-    }> | null;
+    }>;
     signatureConfig?: {
       __typename?: "SignatureConfig";
       review: boolean;
@@ -15588,7 +15588,7 @@ export type PetitionReplies_petitionQuery = {
               user: { __typename?: "User"; id: string; fullName?: string | null };
             }
         >;
-        signatureRequests?: Array<{
+        signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
           id: string;
           status: PetitionSignatureRequestStatus;
@@ -15605,7 +15605,7 @@ export type PetitionReplies_petitionQuery = {
             __typename?: "SignatureConfig";
             signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
           };
-        }> | null;
+        }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
           review: boolean;
@@ -17554,7 +17554,7 @@ export type PetitionSignaturesCardPolling_petitionQuery = {
         id: string;
         status: PetitionStatus;
         name?: string | null;
-        signatureRequests?: Array<{
+        signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
           id: string;
           status: PetitionSignatureRequestStatus;
@@ -17571,7 +17571,7 @@ export type PetitionSignaturesCardPolling_petitionQuery = {
             __typename?: "SignatureConfig";
             signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
           };
-        }> | null;
+        }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
           title: string;

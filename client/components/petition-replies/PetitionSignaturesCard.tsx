@@ -138,8 +138,8 @@ export const PetitionSignaturesCard = Object.assign(
     usePetitionSignaturesCardPolling(petition);
 
     let current: Maybe<UnwrapArray<PetitionSignaturesCard_PetitionFragment["signatureRequests"]>> =
-      petition.signatureRequests![0];
-    const older = petition.signatureRequests!.slice(1);
+      petition.signatureRequests[0];
+    const older = petition.signatureRequests.slice(1);
     const signatureIntegrations = user.organization.signatureIntegrations.items;
     const signatureEnvironment = getPetitionSignatureEnvironment(petition);
     /**

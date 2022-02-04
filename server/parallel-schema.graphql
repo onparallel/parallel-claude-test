@@ -1876,7 +1876,7 @@ type Petition implements PetitionBase {
   """
   The list of signature requests.
   """
-  signatureRequests: [PetitionSignatureRequest!]
+  signatureRequests: [PetitionSignatureRequest!]!
 
   """
   Whether to skip the forward security check on the recipient view.

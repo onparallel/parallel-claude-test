@@ -98,7 +98,9 @@ function _PetitionSettings({
     signatureIntegrations[0].environment === "DEMO";
 
   const ongoingSignatureRequest =
-    petition.__typename === "Petition" && petition.currentSignatureRequest?.status === "PROCESSED"
+    petition.__typename === "Petition" &&
+    petition.currentSignatureRequest &&
+    ["ENQUEUED", "PROCESSING", "PROCESSED"].includes(petition.currentSignatureRequest.status)
       ? petition.currentSignatureRequest
       : null;
 
@@ -149,11 +151,6 @@ function _PetitionSettings({
 
       if (ongoingSignatureRequest && signatureConfigHasChanged) {
         await showConfirmSignatureConfigChanged({});
-        await cancelSignatureRequest({
-          variables: {
-            petitionSignatureRequestId: ongoingSignatureRequest!.id,
-          },
-        });
       }
       await onUpdatePetition({ signatureConfig });
 

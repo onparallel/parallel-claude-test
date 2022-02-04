@@ -242,7 +242,7 @@ export const Petition = objectType({
         return await ctx.petitions.loadLatestPetitionSignatureByPetitionId(root.id);
       },
     });
-    t.nullable.list.nonNull.field("signatureRequests", {
+    t.list.nonNull.field("signatureRequests", {
       type: "PetitionSignatureRequest",
       description: "The list of signature requests.",
       resolve: async (root, _, ctx) => {
