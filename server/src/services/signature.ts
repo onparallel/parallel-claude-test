@@ -361,7 +361,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
         widgets: [
           {
             type: "signature",
-            word_anchor: `SIGNER${recipientIndex}`,
+            word_anchor: `3cb39pzCQA9wJ${recipientIndex}`,
             height: 7, // 7% of page height
             width: 26, // 26% of page width
           },
