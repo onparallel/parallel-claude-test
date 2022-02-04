@@ -387,7 +387,7 @@ function ConditionPredicate({
   const { modifier } = condition!;
   const options = useMemo(() => {
     const options: OptionType<PseudoPetitionFieldVisibilityConditionOperator>[] = [];
-    if (field.multiple && modifier === "NUMBER_OF_REPLIES") {
+    if ((field.multiple && modifier === "NUMBER_OF_REPLIES") || field.type === "NUMBER") {
       options.push(
         { label: "=", value: "EQUAL" },
         { label: "≠", value: "NOT_EQUAL" },
@@ -395,6 +395,51 @@ function ConditionPredicate({
         { label: ">", value: "GREATER_THAN" },
         { label: "≤", value: "LESS_THAN_OR_EQUAL" },
         { label: "≥", value: "GREATER_THAN_OR_EQUAL" }
+      );
+    } else if (field.type === "DATE") {
+      options.push(
+        {
+          label: intl.formatMessage({
+            id: "component.petition-field-visibility-editor.equal-date",
+            defaultMessage: "is the",
+          }),
+          value: "EQUAL",
+        },
+        {
+          label: intl.formatMessage({
+            id: "component.petition-field-visibility-editor.not-equal-date",
+            defaultMessage: "is not the",
+          }),
+          value: "NOT_EQUAL",
+        },
+        {
+          label: intl.formatMessage({
+            id: "component.petition-field-visibility-editor.less-than-date",
+            defaultMessage: "is before the",
+          }),
+          value: "LESS_THAN",
+        },
+        {
+          label: intl.formatMessage({
+            id: "component.petition-field-visibility-editor.greater-than-date",
+            defaultMessage: "is after the",
+          }),
+          value: "GREATER_THAN",
+        },
+        {
+          label: intl.formatMessage({
+            id: "component.petition-field-visibility-editor.less-or-equal-than-date",
+            defaultMessage: "is before the (incl.)",
+          }),
+          value: "LESS_THAN_OR_EQUAL",
+        },
+        {
+          label: intl.formatMessage({
+            id: "component.petition-field-visibility-editor.greater-or-equal-than-date",
+            defaultMessage: "is after the (incl.)",
+          }),
+          value: "GREATER_THAN_OR_EQUAL",
+        }
       );
     } else if (field.type === "CHECKBOX") {
       options.push(

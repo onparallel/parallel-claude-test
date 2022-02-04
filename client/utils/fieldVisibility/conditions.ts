@@ -1,4 +1,5 @@
 import { PetitionField } from "@parallel/graphql/__types";
+import { format } from "date-fns";
 import { FieldOptions, getFirstDynamicSelectValue } from "../petitionFields";
 import {
   PetitionFieldVisibilityCondition,
@@ -18,7 +19,15 @@ export function defaultCondition<T extends Pick<PetitionField, "id" | "type" | "
   return {
     fieldId: field.id,
     modifier: isOnlyHasReplies ? "NUMBER_OF_REPLIES" : "ANY",
-    operator: isOnlyHasReplies ? "GREATER_THAN" : field.type === "CHECKBOX" ? "CONTAIN" : "EQUAL",
+    operator: isOnlyHasReplies
+      ? "GREATER_THAN"
+      : field.type === "CHECKBOX"
+      ? "CONTAIN"
+      : field.type === "NUMBER"
+      ? "GREATER_THAN"
+      : field.type === "DATE"
+      ? "LESS_THAN"
+      : "EQUAL",
     value: defaultConditionFieldValue(field, column),
     column,
   };
@@ -41,6 +50,10 @@ function defaultConditionFieldValue<T extends Pick<PetitionField, "id" | "type" 
         column!
       ) ?? null
     );
+  } else if (field.type === "NUMBER") {
+    return 0;
+  } else if (field.type === "DATE") {
+    return format(new Date(), "yyyy-MM-dd");
   } else {
     return null;
   }
