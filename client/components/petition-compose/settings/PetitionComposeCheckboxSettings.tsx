@@ -26,7 +26,7 @@ export function CheckboxSettings({
 }: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">) {
   const intl = useIntl();
 
-  const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 180, [field.id]);
+  const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 400, [field.id]);
   const rsProps = useReactSelectProps<OptionType, false, never>({ isDisabled: isReadOnly });
 
   const values = field.options?.values ?? [];

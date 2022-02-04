@@ -797,7 +797,7 @@ interface SwitchSettingProps extends Omit<SettingsRowProps, "children" | "onChan
   children?: ReactNode;
 }
 
-function SwitchSetting({
+export function SwitchSetting({
   label,
   icon,
   isChecked,

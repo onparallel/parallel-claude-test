@@ -4,6 +4,54 @@ import addFormats from "ajv-formats";
 import { isOptionsCompatible, isSettingsCompatible } from "./utils";
 
 const SCHEMAS = {
+  NUMBER: {
+    type: "object",
+    required: ["placeholder"],
+    additionalProperties: false,
+    properties: {
+      hasCommentsEnabled: {
+        type: "boolean",
+      },
+      placeholder: {
+        type: ["string", "null"],
+      },
+      range: {
+        type: "object",
+        required: ["isActive"],
+        properties: {
+          isActive: { type: "boolean" },
+          min: { type: "number" },
+          max: { type: "number" },
+        },
+      },
+    },
+  },
+  DATE: {
+    type: "object",
+    required: ["placeholder"],
+    additionalProperties: false,
+    properties: {
+      hasCommentsEnabled: {
+        type: "boolean",
+      },
+      placeholder: {
+        type: ["string", "null"],
+      },
+    },
+  },
+  PHONE: {
+    type: "object",
+    required: ["placeholder"],
+    additionalProperties: false,
+    properties: {
+      hasCommentsEnabled: {
+        type: "boolean",
+      },
+      placeholder: {
+        type: ["string", "null"],
+      },
+    },
+  },
   TEXT: {
     type: "object",
     required: ["placeholder"],
@@ -195,6 +243,14 @@ export function defaultFieldOptions(
     multiple = false;
   }
 
+  const commonSettings = {
+    optional: optional ?? false,
+    multiple: multiple ?? false,
+    is_internal: field?.is_internal ?? false,
+    show_in_pdf: field?.show_in_pdf ?? true,
+    alias: field?.alias ?? null,
+  };
+
   switch (type) {
     case "HEADING": {
       return {
@@ -209,48 +265,30 @@ export function defaultFieldOptions(
       };
     }
     case "TEXT":
+    case "SHORT_TEXT": {
       return {
-        optional: optional ?? false,
-        multiple: multiple ?? false,
-        is_internal: field?.is_internal ?? false,
-        show_in_pdf: field?.show_in_pdf ?? true,
-        alias: field?.alias ?? null,
+        ...commonSettings,
         options: {
           hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
           placeholder: options?.placeholder ?? null,
         },
       };
-    case "SHORT_TEXT":
+    }
+    case "NUMBER": {
       return {
-        optional: optional ?? false,
-        multiple: multiple ?? false,
-        is_internal: field?.is_internal ?? false,
-        show_in_pdf: field?.show_in_pdf ?? true,
-        alias: field?.alias ?? null,
+        ...commonSettings,
         options: {
           hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
           placeholder: options?.placeholder ?? null,
+          range: {
+            isActive: false,
+          },
         },
       };
-    case "FILE_UPLOAD":
-      return {
-        optional: false,
-        multiple: true,
-        is_internal: field?.is_internal ?? false,
-        show_in_pdf: field?.show_in_pdf ?? true,
-        alias: field?.alias ?? null,
-        options: {
-          hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
-          accepts: null,
-        },
-      };
+    }
     case "SELECT": {
       return {
-        optional: optional ?? false,
-        multiple: multiple ?? false,
-        is_internal: field?.is_internal ?? false,
-        show_in_pdf: field?.show_in_pdf ?? true,
-        alias: field?.alias ?? null,
+        ...commonSettings,
         options: {
           hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
           values: options?.values ?? [],
@@ -258,13 +296,19 @@ export function defaultFieldOptions(
         },
       };
     }
+    case "FILE_UPLOAD":
+      return {
+        ...commonSettings,
+        optional: false,
+        multiple: true,
+        options: {
+          hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
+          accepts: null,
+        },
+      };
     case "DYNAMIC_SELECT": {
       return {
-        optional: optional ?? false,
-        multiple: multiple ?? false,
-        is_internal: field?.is_internal ?? false,
-        show_in_pdf: field?.show_in_pdf ?? true,
-        alias: field?.alias ?? null,
+        ...commonSettings,
         options: {
           hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
           file: null,
@@ -275,11 +319,8 @@ export function defaultFieldOptions(
     }
     case "CHECKBOX": {
       return {
-        optional: optional ?? false,
+        ...commonSettings,
         multiple: false,
-        is_internal: field?.is_internal ?? false,
-        show_in_pdf: field?.show_in_pdf ?? true,
-        alias: field?.alias ?? null,
         options: {
           hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
           values: options?.values ?? [],

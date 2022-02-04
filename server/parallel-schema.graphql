@@ -2515,6 +2515,11 @@ enum PetitionFieldType {
   CHECKBOX
 
   """
+  A datepicker field.
+  """
+  DATE
+
+  """
   A dynamic select field.
   """
   DYNAMIC_SELECT
@@ -2528,6 +2533,16 @@ enum PetitionFieldType {
   A heading field.
   """
   HEADING
+
+  """
+  A only numbers field.
+  """
+  NUMBER
+
+  """
+  A phone formatted field.
+  """
+  PHONE
 
   """
   A select field.

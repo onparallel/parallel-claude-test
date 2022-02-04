@@ -830,6 +830,26 @@
     "context": "Exporting replies..."
   },
   {
+    "term": "component.field-settings-number.add-range",
+    "definition": "Añadir rango",
+    "context": "Add range"
+  },
+  {
+    "term": "component.field-settings-number.add-range-description",
+    "definition": "Habilitar esta opción permitirá limitar la respuesta del destinatario a una cantidad mínima o máxima.",
+    "context": "Enabling this option will allow you to limit the recipient's response to a minimum or maximum amount."
+  },
+  {
+    "term": "component.field-settings-number.add-range-max",
+    "definition": "Máx.",
+    "context": "Max."
+  },
+  {
+    "term": "component.field-settings-number.add-range-min",
+    "definition": "Mín.",
+    "context": "Min."
+  },
+  {
     "term": "component.file-icon.audio-file",
     "definition": "Archivo de audio",
     "context": "Audio file"
@@ -1363,6 +1383,11 @@
     "term": "component.petition-field-type-select-dropdown.heading-description",
     "definition": "Añade un bloque de texto que podrá incluir un título o solamente texto.<i>Ej: Cláusulas, Secciones...</i>",
     "context": "Add a text block that may include a title or just text.<i>E.g., clauses, sections...</i>"
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.number",
+    "definition": "Permite al destinatario responder solo con números.",
+    "context": "Allow the recipient to respond with numbers only."
   },
   {
     "term": "component.petition-field-type-select-dropdown.select-description",
@@ -2533,6 +2558,26 @@
     "term": "component.recipient-view-petition-field-card.replies-submitted-checkbox-exact",
     "definition": "{count}/{total} enviadas",
     "context": "{count}/{total} submitted"
+  },
+  {
+    "term": "component.recipient-view-petition-field-number.only-numbers",
+    "definition": "Sólo números",
+    "context": "Only numbers"
+  },
+  {
+    "term": "component.recipient-view-petition-field-number.range-max-description",
+    "definition": "menores o igual a {max}",
+    "context": "less than or equal to {max}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-number.range-min-description",
+    "definition": "mayores o igual a {min}",
+    "context": "greater than or euqal to {min}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-number.range-min-max-description",
+    "definition": "entre {min} y {max}, ambos incluidos",
+    "context": "between {min} and {max}, both included"
   },
   {
     "term": "component.recipient-view-petition-field-reply.approved-file",
@@ -5548,6 +5593,11 @@
     "term": "petition.field-type.heading",
     "definition": "Bloque de texto",
     "context": "Text block"
+  },
+  {
+    "term": "petition.field-type.number",
+    "definition": "Números",
+    "context": "Numbers"
   },
   {
     "term": "petition.field-type.select",

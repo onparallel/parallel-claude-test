@@ -7,6 +7,7 @@ import {
   FieldTextIcon,
   FieldShortTextIcon,
   FieldCheckboxIcon,
+  FieldNumberIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
@@ -27,6 +28,7 @@ export const PetitionFieldTypeIcon = chakraForwardRef<"svg", PetitionFieldTypeIc
         SELECT: FieldSelectIcon,
         DYNAMIC_SELECT: FieldDynamicSelectIcon,
         CHECKBOX: FieldCheckboxIcon,
+        NUMBER: FieldNumberIcon,
       } as Record<PetitionFieldType, ElementType>
     )[type];
     return <Icon as={icon} {...props} ref={ref} />;

@@ -327,6 +327,9 @@ export const PetitionFieldType = enumType({
     { name: "SELECT", description: "A select field." },
     { name: "DYNAMIC_SELECT", description: "A dynamic select field." },
     { name: "CHECKBOX", description: "A options list." },
+    { name: "NUMBER", description: "A only numbers field." },
+    { name: "DATE", description: "A datepicker field." },
+    { name: "PHONE", description: "A phone formatted field." },
   ],
 });
 
@@ -669,6 +672,7 @@ export const PetitionFieldReply = objectType({
           case "SHORT_TEXT":
           case "SELECT":
           case "DYNAMIC_SELECT":
+          case "NUMBER":
           case "CHECKBOX": {
             return root.content;
           }

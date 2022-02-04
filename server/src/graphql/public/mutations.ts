@@ -17,6 +17,7 @@ import { toGlobalId } from "../../util/globalId";
 import { stallFor } from "../../util/promises/stallFor";
 import { random } from "../../util/token";
 import { Maybe } from "../../util/types";
+import { isInRange } from "../../util/validators";
 import { and, chain, checkClientServerToken } from "../helpers/authorize";
 import { InvalidOptionError, WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -338,17 +339,34 @@ export const publicCreateSimpleReply = mutationField("publicCreateSimpleReply", 
     authenticatePublicAccess("keycode"),
     and(
       fieldBelongsToAccess("fieldId"),
-      fieldHasType("fieldId", ["TEXT", "SHORT_TEXT", "SELECT"]),
+      fieldHasType("fieldId", ["TEXT", "SHORT_TEXT", "SELECT", "NUMBER"]),
       fieldCanBeReplied("fieldId")
     )
   ),
   validateArgs: async (_, args, ctx, info) => {
     const field = (await ctx.petitions.loadField(args.fieldId))!;
-    if (field.type === "SELECT") {
-      const options = field.options.values as Maybe<string[]>;
-      if (!options?.includes(args.value)) {
-        throw new InvalidOptionError(info, "reply", "Invalid option");
+
+    switch (field.type) {
+      case "SELECT": {
+        const options = field.options.values as Maybe<string[]>;
+        if (!options?.includes(args.value)) {
+          throw new InvalidOptionError(info, "reply", "Invalid option");
+        }
+        break;
       }
+      case "NUMBER": {
+        const options = field.options;
+        const value = Number(args.value);
+        const min = options.range?.min ? Number(options.range?.min) : undefined;
+        const max = options.range?.max ? Number(options.range?.max) : undefined;
+
+        if (isNaN(value) || (options.range.isActive && !isInRange(value, min, max))) {
+          throw new InvalidOptionError(info, "reply", "Invalid number");
+        }
+        break;
+      }
+      default:
+        break;
     }
   },
   resolve: async (_, args, ctx) => {
@@ -377,17 +395,34 @@ export const publicUpdateSimpleReply = mutationField("publicUpdateSimpleReply", 
     authenticatePublicAccess("keycode"),
     and(
       replyBelongsToAccess("replyId"),
-      replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT"]),
+      replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT", "NUMBER"]),
       replyCanBeUpdated("replyId")
     )
   ),
   validateArgs: async (_, args, ctx, info) => {
     const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
-    if (field.type === "SELECT") {
-      const options = field.options.values as Maybe<string[]>;
-      if (!options?.includes(args.value)) {
-        throw new InvalidOptionError(info, "value", "Invalid option");
+
+    switch (field.type) {
+      case "SELECT": {
+        const options = field.options.values as Maybe<string[]>;
+        if (!options?.includes(args.value)) {
+          throw new InvalidOptionError(info, "reply", "Invalid option");
+        }
+        break;
       }
+      case "NUMBER": {
+        const options = field.options;
+        const value = Number(args.value);
+        const min = options.range?.min ? Number(options.range?.min) : undefined;
+        const max = options.range?.max ? Number(options.range?.max) : undefined;
+
+        if (isNaN(value) || (options.range.isActive && !isInRange(value, min, max))) {
+          throw new InvalidOptionError(info, "reply", "Invalid number");
+        }
+        break;
+      }
+      default:
+        break;
     }
   },
   resolve: async (_, args, ctx) => {

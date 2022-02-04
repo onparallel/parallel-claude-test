@@ -345,6 +345,7 @@ export const PublicPetitionFieldReply = objectType({
           case "SHORT_TEXT":
           case "SELECT":
           case "DYNAMIC_SELECT":
+          case "NUMBER":
           case "CHECKBOX": {
             return root.content;
           }

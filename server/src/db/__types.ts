@@ -153,7 +153,10 @@ export type PetitionFieldType =
   | "SELECT"
   | "DYNAMIC_SELECT"
   | "SHORT_TEXT"
-  | "CHECKBOX";
+  | "CHECKBOX"
+  | "NUMBER"
+  | "PHONE"
+  | "DATE";
 
 export const PetitionFieldTypeValues = [
   "TEXT",
@@ -163,6 +166,9 @@ export const PetitionFieldTypeValues = [
   "DYNAMIC_SELECT",
   "SHORT_TEXT",
   "CHECKBOX",
+  "NUMBER",
+  "PHONE",
+  "DATE",
 ] as PetitionFieldType[];
 
 export type PetitionMessageStatus = "SCHEDULED" | "CANCELLED" | "PROCESSING" | "PROCESSED";

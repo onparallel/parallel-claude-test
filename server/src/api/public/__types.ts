@@ -1963,12 +1963,18 @@ export type PetitionFieldReplyStatus =
 export type PetitionFieldType =
   /** A options list. */
   | "CHECKBOX"
+  /** A datepicker field. */
+  | "DATE"
   /** A dynamic select field. */
   | "DYNAMIC_SELECT"
   /** A file upload field. */
   | "FILE_UPLOAD"
   /** A heading field. */
   | "HEADING"
+  /** A only numbers field. */
+  | "NUMBER"
+  /** A phone formatted field. */
+  | "PHONE"
   /** A select field. */
   | "SELECT"
   /** A short text field. */

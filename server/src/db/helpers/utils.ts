@@ -11,7 +11,8 @@ export type SortBy<T> = {
 
 export const isValueCompatible = (oldType: PetitionFieldType, newType: PetitionFieldType) => {
   return (
-    ["TEXT", "SHORT_TEXT", "SELECT"].includes(oldType) && ["TEXT", "SHORT_TEXT"].includes(newType)
+    ["TEXT", "SHORT_TEXT", "SELECT", "NUMBER"].includes(oldType) &&
+    ["TEXT", "SHORT_TEXT", "NUMBER"].includes(newType)
   );
 };
 

@@ -118,7 +118,7 @@ export function RecipientViewPetitionFieldCard({
         </Flex>
       ) : null}
 
-      {field.type !== "CHECKBOX" ? (
+      {field.type !== "CHECKBOX" && field.type !== "NUMBER" ? (
         <Text fontSize="sm" color="gray.500">
           {field.type === "FILE_UPLOAD" ? (
             <FormattedMessage

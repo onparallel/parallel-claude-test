@@ -37,6 +37,7 @@ import {
 } from "./RecipientViewPetitionFieldDynamicSelect";
 import { RecipientViewPetitionFieldFileUpload } from "./RecipientViewPetitionFieldFileUpload";
 import { RecipientViewPetitionFieldHeading } from "./RecipientViewPetitionFieldHeading";
+import { RecipientViewPetitionFieldNumber } from "./RecipientViewPetitionFieldNumber";
 import { RecipientViewPetitionFieldSelect } from "./RecipientViewPetitionFieldSelect";
 import { RecipientViewPetitionFieldText } from "./RecipientViewPetitionFieldText";
 
@@ -317,6 +318,14 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
       onDeleteReply={handleDeletePetitionReply}
       onUpdateReply={handleUpdateCheckboxReply}
       onCreateReply={handleCreateCheckboxReply}
+    />
+  ) : props.field.type === "NUMBER" ? (
+    <RecipientViewPetitionFieldNumber
+      {...props}
+      {...commonProps}
+      onDeleteReply={handleDeletePetitionReply}
+      onUpdateReply={handleUpdateSimpleReply}
+      onCreateReply={handleCreateSimpleReply}
     />
   ) : null;
 }

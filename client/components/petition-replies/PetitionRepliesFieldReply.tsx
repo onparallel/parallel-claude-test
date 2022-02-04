@@ -39,7 +39,7 @@ export function PetitionRepliesFieldReply({
   onAction,
 }: PetitionRepliesFieldReplyProps) {
   const intl = useIntl();
-  const isTextLikeType = ["TEXT", "SHORT_TEXT", "SELECT"].includes(reply.field!.type);
+  const isTextLikeType = ["TEXT", "SHORT_TEXT", "SELECT", "NUMBER"].includes(reply.field!.type);
 
   const apollo = useApolloClient();
   const myId = getMyId(apollo);

@@ -55,6 +55,7 @@ export const FIELD_TYPES: PetitionFieldType[] = [
   "SELECT",
   "DYNAMIC_SELECT",
   "HEADING",
+  "NUMBER",
 ];
 
 interface PetitionFieldTypeLabelProps {
@@ -283,6 +284,11 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
               <FormattedMessage
                 id="component.petition-field-type-select-dropdown.checkbox"
                 defaultMessage="Allow the recipient to select one or more options from a short list of possible answers."
+              />
+            ) : activeType === "NUMBER" ? (
+              <FormattedMessage
+                id="component.petition-field-type-select-dropdown.number"
+                defaultMessage="Allow the recipient to respond with numbers only."
               />
             ) : null}
           </Box>

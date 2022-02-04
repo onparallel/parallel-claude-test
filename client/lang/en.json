@@ -830,6 +830,26 @@
     "context": "Exporting replies..."
   },
   {
+    "term": "component.field-settings-number.add-range",
+    "definition": "Add range",
+    "context": "Add range"
+  },
+  {
+    "term": "component.field-settings-number.add-range-description",
+    "definition": "Enabling this option will allow you to limit the recipient's response to a minimum or maximum amount.",
+    "context": "Enabling this option will allow you to limit the recipient's response to a minimum or maximum amount."
+  },
+  {
+    "term": "component.field-settings-number.add-range-max",
+    "definition": "Max.",
+    "context": "Max."
+  },
+  {
+    "term": "component.field-settings-number.add-range-min",
+    "definition": "Min.",
+    "context": "Min."
+  },
+  {
     "term": "component.file-icon.audio-file",
     "definition": "Audio file",
     "context": "Audio file"
@@ -1363,6 +1383,11 @@
     "term": "component.petition-field-type-select-dropdown.heading-description",
     "definition": "Add a text block that may include a title or just text.<i>E.g., clauses, sections...</i>",
     "context": "Add a text block that may include a title or just text.<i>E.g., clauses, sections...</i>"
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.number",
+    "definition": "Allow the recipient to respond with numbers only.",
+    "context": "Allow the recipient to respond with numbers only."
   },
   {
     "term": "component.petition-field-type-select-dropdown.select-description",
@@ -2533,6 +2558,26 @@
     "term": "component.recipient-view-petition-field-card.replies-submitted-checkbox-exact",
     "definition": "{count}/{total} submitted",
     "context": "{count}/{total} submitted"
+  },
+  {
+    "term": "component.recipient-view-petition-field-number.only-numbers",
+    "definition": "Only numbers",
+    "context": "Only numbers"
+  },
+  {
+    "term": "component.recipient-view-petition-field-number.range-max-description",
+    "definition": "less than or equal to {max}",
+    "context": "less than or equal to {max}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-number.range-min-description",
+    "definition": "greater than or euqal to {min}",
+    "context": "greater than or euqal to {min}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-number.range-min-max-description",
+    "definition": "between {min} and {max}, both included",
+    "context": "between {min} and {max}, both included"
   },
   {
     "term": "component.recipient-view-petition-field-reply.approved-file",
@@ -5548,6 +5593,11 @@
     "term": "petition.field-type.heading",
     "definition": "Text block",
     "context": "Text block"
+  },
+  {
+    "term": "petition.field-type.number",
+    "definition": "Numbers",
+    "context": "Numbers"
   },
   {
     "term": "petition.field-type.select",

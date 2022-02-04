@@ -25,6 +25,15 @@ export type FieldOptions = {
     hasCommentsEnabled: boolean;
     placeholder: Maybe<string>;
   };
+  NUMBER: {
+    hasCommentsEnabled: boolean;
+    placeholder: Maybe<string>;
+    range: {
+      isActive: boolean;
+      min: Maybe<number>;
+      max: Maybe<number>;
+    };
+  };
   SELECT: {
     hasCommentsEnabled: boolean;
     values: string[];
@@ -71,6 +80,11 @@ export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
           id: "petition.field-type.text",
           defaultMessage: "Long replies",
         });
+      case "NUMBER":
+        return intl.formatMessage({
+          id: "petition.field-type.number",
+          defaultMessage: "Numbers",
+        });
       case "HEADING":
         return intl.formatMessage({
           id: "petition.field-type.heading",
@@ -108,6 +122,7 @@ export function usePetitionFieldTypeColor(type: PetitionFieldType) {
       SELECT: theme.colors.pink[400],
       DYNAMIC_SELECT: theme.colors.pink[600],
       CHECKBOX: theme.colors.purple[500],
+      NUMBER: theme.colors.orange[400],
     } as Record<PetitionFieldType, string>
   )[type];
 }
