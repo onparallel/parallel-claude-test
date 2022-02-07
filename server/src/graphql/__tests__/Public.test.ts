@@ -1488,7 +1488,6 @@ describe("GraphQL/Public", () => {
           progress: 0,
           status: "PROCESSING",
           input: { petition_id: access.petition_id },
-          output: {},
         });
       });
 

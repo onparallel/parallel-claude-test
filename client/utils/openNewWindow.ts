@@ -6,12 +6,16 @@ import { MaybePromise } from "./types";
  * computation (e.g. the url is returned by an ajax call), otherwise the
  * browser will block it.
  */
-export async function openNewWindow(value: MaybePromise<string> | (() => MaybePromise<string>)) {
+export async function openNewWindow(
+  value: MaybePromise<string> | (() => MaybePromise<string>)
+): Promise<[Error | null]> {
   const _window = window.open(undefined, "_blank")!;
   try {
     const url = typeof value === "function" ? await value() : await value;
     _window.location.href = url!;
-  } catch {
+    return [null];
+  } catch (e) {
     _window?.close();
+    return e instanceof Error ? [e] : [null]; // return instead of throwing to avoid try-catch everywhere this function is used
   }
 }

@@ -1120,7 +1120,7 @@ export interface Task {
   status: TaskStatus; // task_status
   progress: Maybe<number>; // int4
   input: any; // jsonb
-  output: any; // jsonb
+  output: Maybe<any>; // jsonb
   error_data: Maybe<any>; // jsonb
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar

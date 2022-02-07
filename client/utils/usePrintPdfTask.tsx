@@ -10,6 +10,7 @@ import {
   usePrintPdfTask_taskDocument,
 } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
+import { isApolloError } from "./apollo/isApolloError";
 import { openNewWindow } from "./openNewWindow";
 import { withError } from "./promises/withError";
 
@@ -54,13 +55,25 @@ export function usePrintPdfTask() {
         }),
       });
     } else {
-      openNewWindow(async () => {
-        const { data } = await generateDownloadUrl({ variables: { taskId: finishedTask!.id } });
+      const [error] = await openNewWindow(async () => {
+        const { data } = await generateDownloadUrl({
+          variables: { taskId: finishedTask!.id },
+        });
         if (!data?.getTaskResultFileUrl) {
           throw new Error();
         }
         return data.getTaskResultFileUrl;
       });
+
+      if (error && isApolloError(error, "FILE_NOT_FOUND_ERROR")) {
+        await showError({
+          message: intl.formatMessage({
+            id: "generic.unexpected-error-happened",
+            defaultMessage:
+              "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
+          }),
+        });
+      }
     }
   };
 }

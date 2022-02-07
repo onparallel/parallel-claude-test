@@ -1174,10 +1174,14 @@ export const publicGetTaskResultFileUrl = mutationField("publicGetTaskResultFile
   resolve: async (_, args, ctx) => {
     const task = (await ctx.tasks.loadTask(args.taskId)) as Task<"PRINT_PDF">;
 
-    const file = isDefined(task.output.temporary_file_id)
+    const file = isDefined(task.output)
       ? await ctx.files.loadTemporaryFile(task.output.temporary_file_id)
       : null;
-    if (!file) {
+    if (
+      !file ||
+      // temporary files are deleted after 30 days on S3 bucket
+      differenceInDays(new Date(), file.created_at) >= 30
+    ) {
       throw new ApolloError(
         `Temporary file not found for Task:${task.id} output`,
         "FILE_NOT_FOUND_ERROR"

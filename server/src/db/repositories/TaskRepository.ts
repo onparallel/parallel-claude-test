@@ -13,8 +13,8 @@ export type TaskInput<TName extends TaskName> = {
 }[TName];
 
 export type TaskOutput<TName extends TaskName> = {
-  EXPORT_REPLIES: { temporary_file_id?: number };
-  PRINT_PDF: { temporary_file_id?: number };
+  EXPORT_REPLIES: { temporary_file_id: number };
+  PRINT_PDF: { temporary_file_id: number };
 }[TName];
 
 export type Task<TName extends TaskName> = Replace<
@@ -22,7 +22,7 @@ export type Task<TName extends TaskName> = Replace<
   {
     name: TName;
     input: TaskInput<TName>;
-    output: TaskOutput<TName>;
+    output: Maybe<TaskOutput<TName>>;
   }
 >;
 
