@@ -56,6 +56,7 @@ export const FIELD_TYPES: PetitionFieldType[] = [
   "SELECT",
   "NUMBER",
   "DYNAMIC_SELECT",
+  "DATE",
 ];
 
 interface PetitionFieldTypeLabelProps {
@@ -289,6 +290,11 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
               <FormattedMessage
                 id="component.petition-field-type-select-dropdown.number"
                 defaultMessage="Allow the recipient to respond with numbers only."
+              />
+            ) : activeType === "DATE" ? (
+              <FormattedMessage
+                id="component.petition-field-type-select-dropdown.date"
+                defaultMessage="Allows the recipient to respond with dates."
               />
             ) : null}
           </Box>

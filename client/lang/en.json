@@ -1375,6 +1375,11 @@
     "context": "Allow the recipient to select one or more options from a short list of possible answers."
   },
   {
+    "term": "component.petition-field-type-select-dropdown.date",
+    "definition": "Allows the recipient to respond with dates.",
+    "context": "Allows the recipient to respond with dates."
+  },
+  {
     "term": "component.petition-field-type-select-dropdown.dynamic-select-description",
     "definition": "Drop-down menu that dinamically adapts its options based on the reply to the previous drop-down.",
     "context": "Drop-down menu that dinamically adapts its options based on the reply to the previous drop-down."
@@ -5608,6 +5613,11 @@
     "term": "petition.field-type.conditional-select",
     "definition": "Conditional select",
     "context": "Conditional select"
+  },
+  {
+    "term": "petition.field-type.date",
+    "definition": "Date",
+    "context": "Date"
   },
   {
     "term": "petition.field-type.file-upload",

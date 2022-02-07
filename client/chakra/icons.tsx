@@ -1290,6 +1290,25 @@ export const FieldNumberIcon = createIcon({
   ),
 });
 
+export const FieldDateIcon = createIcon({
+  displayName: "FieldDateIcon",
+  viewBox: "0 0 20 20",
+  path: (
+    <g
+      stroke="currentColor"
+      fill="none"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m15.8333 3.33325h-11.66663c-.92048 0-1.66667.74619-1.66667 1.66667v11.66668c0 .9205.74619 1.6667 1.66667 1.6667h11.66663c.9205 0 1.6667-.7462 1.6667-1.6667v-11.66668c0-.92048-.7462-1.66667-1.6667-1.66667z" />
+      <path d="m13.3334 1.66675v3.33333" />
+      <path d="m6.66663 1.66675v3.33333" />
+      <path d="m2.5 8.33325h15" />
+    </g>
+  ),
+});
+
 export const CloudUploadIcon = createIcon({
   displayName: "CloudUploadIcon",
   viewBox: "0 0 24 24",

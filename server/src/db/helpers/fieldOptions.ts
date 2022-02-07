@@ -279,6 +279,15 @@ export function defaultFieldOptions(
         },
       };
     }
+    case "DATE": {
+      return {
+        ...commonSettings,
+        options: {
+          hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
+          placeholder: options?.placeholder ?? null,
+        },
+      };
+    }
     case "NUMBER": {
       return {
         ...commonSettings,

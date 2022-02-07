@@ -28,6 +28,8 @@ export class PetitionExcelExport {
       this.textRepliesTab.addCheckboxReply(field, replies);
     } else if (field.type === "NUMBER") {
       this.textRepliesTab.addNumericReply(field, replies);
+    } else if (field.type === "DATE") {
+      this.textRepliesTab.addDateReply(field, replies);
     }
   }
 

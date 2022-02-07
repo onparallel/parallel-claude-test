@@ -6,7 +6,7 @@ import { ExcelWorksheet } from "./ExcelWorksheet";
 export type TextReplyRow = {
   title: Maybe<string>;
   description: Maybe<string>;
-  answer: string;
+  answer: string | number | Date;
 };
 
 export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
@@ -43,6 +43,20 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
           title: field.title?.concat(field.multiple ? ` [${i + 1}]` : "") || "",
           description: field.description?.slice(0, 200) || "",
           answer: r.content.value,
+        }))
+      );
+    } else {
+      this.addEmptyReply(field);
+    }
+  }
+
+  public addDateReply(field: PetitionField, replies: PetitionFieldReply[]) {
+    if (replies.length > 0) {
+      this.addRows(
+        replies.map((r, i) => ({
+          title: field.title?.concat(field.multiple ? ` [${i + 1}]` : "") || "",
+          description: field.description?.slice(0, 200) || "",
+          answer: new Date(r.content.value),
         }))
       );
     } else {

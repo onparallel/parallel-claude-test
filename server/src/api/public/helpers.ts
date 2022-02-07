@@ -111,6 +111,8 @@ function mapFieldReplyContent(fieldType: PetitionFieldType, content: any) {
       return content.choices as string[];
     case "NUMBER":
       return content.value as number;
+    case "DATE":
+      return content.value as string;
     default:
       return content.text as string;
   }

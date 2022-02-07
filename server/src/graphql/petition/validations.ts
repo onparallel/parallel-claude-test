@@ -11,6 +11,7 @@ import {
 } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { Maybe } from "../../util/types";
+import { isValidDate } from "../../util/validators";
 import { Arg } from "../helpers/authorize";
 import { ArgValidationError, InvalidReplyError } from "../helpers/errors";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
@@ -212,6 +213,19 @@ function validateReplyValue(
       if (!options?.includes(reply)) {
         throw new InvalidReplyError(info, argName, "Invalid option", {
           subcode: "UNKNOWN_OPTION_ERROR",
+        });
+      }
+      break;
+    }
+    case "DATE": {
+      if (typeof reply !== "string") {
+        throw new InvalidReplyError(info, argName, "Value must be a string", {
+          subcode: "INVALID_TYPE_ERROR",
+        });
+      }
+      if (!isValidDate(reply)) {
+        throw new InvalidReplyError(info, argName, "Invalid date", {
+          subcode: "INVALID_VALUE_ERROR",
         });
       }
       break;

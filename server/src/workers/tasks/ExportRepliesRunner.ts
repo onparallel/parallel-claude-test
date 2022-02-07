@@ -132,7 +132,7 @@ export class ExportRepliesRunner extends TaskRunner<"EXPORT_REPLIES"> {
           }
         }
       } else if (
-        ["TEXT", "SHORT_TEXT", "SELECT", "DYNAMIC_SELECT", "CHECKBOX", "NUMBER"].includes(
+        ["TEXT", "SHORT_TEXT", "SELECT", "DYNAMIC_SELECT", "CHECKBOX", "NUMBER", "DATE"].includes(
           field.type
         )
       ) {

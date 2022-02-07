@@ -25,19 +25,22 @@ export const createSimpleReply = mutationField("createSimpleReply", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
-    fieldHasType("fieldId", ["TEXT", "SELECT", "SHORT_TEXT"]),
+    fieldHasType("fieldId", ["TEXT", "SELECT", "SHORT_TEXT", "DATE"]),
     fieldCanBeReplied("fieldId")
   ),
   validateArgs: validateFieldReply("fieldId", "reply", "reply"),
   resolve: async (_, args, ctx) => {
     const field = (await ctx.petitions.loadField(args.fieldId))!;
+
+    const content = field.type === "DATE" ? { value: args.reply } : { text: args.reply };
+
     return await ctx.petitions.createPetitionFieldReply(
       {
         petition_field_id: args.fieldId,
         user_id: ctx.user!.id,
         type: field.type,
         status: "PENDING",
-        content: { text: args.reply },
+        content,
       },
       ctx.user!
     );
@@ -55,17 +58,21 @@ export const updateSimpleReply = mutationField("updateSimpleReply", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
-    replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT"]),
+    replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT", "DATE"]),
     replyCanBeUpdated("replyId")
   ),
   validateArgs: validateReplyUpdate("replyId", "reply", "reply"),
   resolve: async (_, args, ctx) => {
+    const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
+
+    const content = field.type === "DATE" ? { value: args.reply } : { text: args.reply };
+
     return await ctx.petitions.updatePetitionFieldReply(
       args.replyId,
       {
         petition_access_id: null,
         user_id: ctx.user!.id,
-        content: { text: args.reply },
+        content,
         status: "PENDING",
       },
       ctx.user!

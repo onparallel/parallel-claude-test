@@ -56,6 +56,17 @@ describe("GraphQL/Petition Field Replies", () => {
   });
 
   describe("createSimpleReply", () => {
+    let dateField: PetitionField;
+
+    beforeAll(async () => {
+      [dateField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "DATE",
+        options: {},
+        multiple: true,
+        optional: true,
+      }));
+    });
+
     afterEach(async () => {
       await mocks.knex("petition_field_reply").delete();
       await mocks.knex("petition_event").delete();
@@ -253,6 +264,88 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(data).toBeNull();
     });
 
+    it("creates a new reply type DATE", async () => {
+      const { data, errors } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $reply: String!) {
+            createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+              id
+              status
+              content
+              field {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", dateField.id),
+          reply: "2012-02-24",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.createSimpleReply).toEqual({
+        id: data!.createSimpleReply.id,
+        status: "PENDING",
+        content: { value: "2012-02-24" },
+        field: {
+          id: toGlobalId("PetitionField", dateField.id),
+        },
+      });
+    });
+
+    it("sends error when creating a reply with wrong format date in DATE field", async () => {
+      const { data, errors } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $reply: String!) {
+            createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+              id
+              status
+              content
+              field {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", dateField.id),
+          reply: "2012.02.24",
+        },
+      });
+
+      expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when creating a reply with wrong date in DATE field", async () => {
+      const { data, errors } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $reply: String!) {
+            createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+              id
+              status
+              content
+              field {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", dateField.id),
+          reply: "2012-22-24",
+        },
+      });
+
+      expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+      expect(data).toBeNull();
+    });
+
     it("sends error when creating a reply from a SELECT field with unknown option", async () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
@@ -311,9 +404,17 @@ describe("GraphQL/Petition Field Replies", () => {
     let userTextReply: PetitionFieldReply;
     let userFileReply: PetitionFieldReply;
     let userSelectReply: PetitionFieldReply;
+    let dateReply: PetitionFieldReply;
     let approvedReply: PetitionFieldReply;
     let rejectedReply: PetitionFieldReply;
     beforeAll(async () => {
+      const [dateField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "DATE",
+        options: {},
+        multiple: true,
+        optional: true,
+      }));
+
       [recipientTextReply] = await mocks.createRandomTextReply(
         fields[0].id,
         petitionAccess.id,
@@ -350,6 +451,11 @@ describe("GraphQL/Petition Field Replies", () => {
         type: "SELECT",
         content: { text: "option 2" },
         status: "REJECTED",
+      }));
+      [dateReply] = await mocks.createRandomDateReply(dateField.id, 0, 1, () => ({
+        user_id: user.id,
+        petition_access_id: null,
+        created_by: `User:${user.id}`,
       }));
     });
 
@@ -441,6 +547,32 @@ describe("GraphQL/Petition Field Replies", () => {
         id: toGlobalId("PetitionFieldReply", rejectedReply.id),
         status: "PENDING",
         content: { text: "option 1" },
+      });
+    });
+
+    it("updates a reply type DATE", async () => {
+      const { data, errors } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $replyId: GID!, $reply: String!) {
+            updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+              id
+              status
+              content
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", dateReply.id),
+          reply: "2012-02-21",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.updateSimpleReply).toEqual({
+        id: toGlobalId("PetitionFieldReply", dateReply.id),
+        status: "PENDING",
+        content: { value: "2012-02-21" },
       });
     });
 
@@ -680,6 +812,50 @@ describe("GraphQL/Petition Field Replies", () => {
       });
 
       expect(errors).toContainGraphQLError("INVALID_FIELD_TYPE_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error trying to update a DATE field with invalid date", async () => {
+      const { data, errors } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $replyId: GID!, $reply: String!) {
+            updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+              id
+              status
+              content
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", dateReply.id),
+          reply: "2012-22-24",
+        },
+      });
+
+      expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error trying to update a DATE field with invalid format", async () => {
+      const { data, errors } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $replyId: GID!, $reply: String!) {
+            updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+              id
+              status
+              content
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", dateReply.id),
+          reply: "2012.01.24",
+        },
+      });
+
+      expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
       expect(data).toBeNull();
     });
 

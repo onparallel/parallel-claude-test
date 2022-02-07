@@ -18,6 +18,7 @@ import {
   CheckboxValue,
   RecipientViewPetitionFieldCheckbox,
 } from "../recipient-view/fields/RecipientViewPetitionFieldCheckbox";
+import { RecipientViewPetitionFieldDate } from "../recipient-view/fields/RecipientViewPetitionFieldDate";
 import {
   DynamicSelectValue,
   RecipientViewPetitionFieldDynamicSelect,
@@ -339,6 +340,14 @@ export function PreviewPetitionField({
       onDeleteReply={handleDeletePetitionReply}
       onUpdateReply={handleUpdateNumericReply}
       onCreateReply={handleCreateNumericReply}
+    />
+  ) : field.type === "DATE" ? (
+    <RecipientViewPetitionFieldDate
+      {...props}
+      {...commonProps}
+      onDeleteReply={handleDeletePetitionReply}
+      onUpdateReply={handleUpdateSimpleReply}
+      onCreateReply={handleCreateSimpleReply}
     />
   ) : null;
 }

@@ -804,6 +804,13 @@ const _TextReplySubmitContent = {
   example: "Jamie Lannister",
 } as const;
 
+const _DateReplySubmitContent = {
+  title: "DateReplySubmitContent",
+  type: "string",
+  description: "For fields of type `DATE`, with format YYYY-MM-DD.",
+  example: "2022-02-15",
+};
+
 const _NumberReplySubmitContent = {
   title: "NumberReplyContent",
   type: "number",
@@ -853,6 +860,7 @@ export const SubmitReply = schema({
     reply: {
       anyOf: [
         _TextReplySubmitContent,
+        _DateReplySubmitContent,
         _NumberReplySubmitContent,
         _CheckboxReplySubmitContent,
         _DynamicSelectReplySubmitContent,

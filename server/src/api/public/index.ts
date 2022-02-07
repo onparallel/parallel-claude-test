@@ -1325,8 +1325,9 @@ api
 const replyBodyDescription = outdent`
   For \`FILE_UPLOAD\` fields the request mut be a \`multipart/form-data\` request containing the file to upload.
   For other types of fields the request will be a normal \`application/json\` request containing the value of the reply.
-    - For \`TEXT\`, \`SHORT_TEXT\` and \`SELECT\` fields, the repy must be a string.
-    - For \`NUMBER\`, fields, the reply must be a number
+    - For \`TEXT\`, \`SHORT_TEXT\` and \`SELECT\` fields, the reply must be a string.
+    - For \`NUMBER\` fields, the reply must be a number.
+    - For \`DATE\` fields, reply must be a string representing a date with format YYYY-MM-DD.
     - For \`CHECKBOX\` fields, the reply must be an array of strings containing all the chosen options.
     - For \`DYNAMIC_SELECT\` fields, the reply must be an array of strings in which each position in the array represents the selected option in the same level. 
 `;
@@ -1365,6 +1366,7 @@ api
           case "TEXT":
           case "SHORT_TEXT":
           case "SELECT":
+          case "DATE":
             if (typeof body.reply !== "string") {
               throw new BadRequestError(`Reply for ${fieldType} field must be plain text.`);
             }
@@ -1530,6 +1532,7 @@ api
           case "TEXT":
           case "SHORT_TEXT":
           case "SELECT":
+          case "DATE":
             if (typeof body.reply !== "string") {
               throw new BadRequestError(`Reply for ${fieldType} field must be plain text.`);
             }

@@ -11,8 +11,8 @@ export type SortBy<T> = {
 
 export const isValueCompatible = (oldType: PetitionFieldType, newType: PetitionFieldType) => {
   return (
-    ["TEXT", "SHORT_TEXT", "SELECT", "NUMBER"].includes(oldType) &&
-    ["TEXT", "SHORT_TEXT", "NUMBER"].includes(newType)
+    ["TEXT", "SHORT_TEXT", "SELECT", "NUMBER", "DATE"].includes(oldType) &&
+    ["TEXT", "SHORT_TEXT"].includes(newType)
   );
 };
 
@@ -25,7 +25,7 @@ export const isOptionsCompatible = (oldType: PetitionFieldType, newType: Petitio
 
 export const isSettingsCompatible = (oldType: PetitionFieldType, newType: PetitionFieldType) => {
   return (
-    ["TEXT", "SHORT_TEXT", "SELECT", "DYNAMIC_SELECT", "CHECKBOX"].includes(oldType) &&
-    ["TEXT", "SHORT_TEXT", "SELECT", "DYNAMIC_SELECT", "CHECKBOX"].includes(newType)
+    ["TEXT", "SHORT_TEXT", "SELECT", "DYNAMIC_SELECT", "CHECKBOX", "DATE"].includes(oldType) &&
+    ["TEXT", "SHORT_TEXT", "SELECT", "DYNAMIC_SELECT", "CHECKBOX", "DATE"].includes(newType)
   );
 };

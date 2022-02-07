@@ -58,6 +58,10 @@ export type FieldOptions = {
       max: number;
     };
   };
+  DATE: {
+    hasCommentsEnabled: boolean;
+    placeholder: Maybe<string>;
+  };
 };
 
 export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
@@ -104,6 +108,11 @@ export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
           id: "petition.field-type.checkbox",
           defaultMessage: "Multiple choice",
         });
+      case "DATE":
+        return intl.formatMessage({
+          id: "petition.field-type.date",
+          defaultMessage: "Date",
+        });
       default:
         throw new Error(`Missing PetitionFieldType "${type}"`);
     }
@@ -122,6 +131,7 @@ export function usePetitionFieldTypeColor(type: PetitionFieldType) {
       DYNAMIC_SELECT: theme.colors.pink[600],
       CHECKBOX: theme.colors.purple[500],
       NUMBER: theme.colors.orange[400],
+      DATE: theme.colors.orange[300],
     } as Record<PetitionFieldType, string>
   )[type];
 }

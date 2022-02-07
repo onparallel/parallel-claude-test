@@ -71,6 +71,14 @@ export function PetitionRepliesFieldReply({
           <CopyToClipboardButton size="xs" text={reply.content.text} />
         ) : reply.field!.type === "NUMBER" ? (
           <CopyToClipboardButton size="xs" text={intl.formatNumber(reply.content.value)} />
+        ) : reply.field!.type === "DATE" ? (
+          <CopyToClipboardButton
+            size="xs"
+            text={intl.formatDate(reply.content.value, {
+              ...FORMATS.L,
+              timeZone: "UTC",
+            })}
+          />
         ) : reply.field!.type === "FILE_UPLOAD" ? (
           <Stack spacing={1}>
             <ReplyDownloadButton
@@ -125,6 +133,13 @@ export function PetitionRepliesFieldReply({
           <BreakLines>{reply.content.text}</BreakLines>
         ) : reply.field!.type === "NUMBER" ? (
           <Text wordBreak="break-all">{intl.formatNumber(reply.content.value)}</Text>
+        ) : reply.field!.type === "DATE" ? (
+          <Text>
+            {intl.formatDate(reply.content.value, {
+              ...FORMATS.L,
+              timeZone: "UTC",
+            })}
+          </Text>
         ) : reply.field!.type === "FILE_UPLOAD" ? (
           <Box>
             <VisuallyHidden>

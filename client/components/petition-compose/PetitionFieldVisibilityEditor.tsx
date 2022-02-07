@@ -638,6 +638,14 @@ function ConditionPredicate({
             onChange={onChange}
             isReadOnly={isReadOnly}
           />
+        ) : field.type === "DATE" ? (
+          <ConditionPredicateValueDate
+            field={field}
+            showError={showError}
+            value={condition}
+            onChange={onChange}
+            isReadOnly={isReadOnly}
+          />
         ) : (
           <ConditionPredicateValueString
             field={field}
@@ -649,6 +657,32 @@ function ConditionPredicate({
         )}
       </Box>
     </>
+  );
+}
+
+function ConditionPredicateValueDate({
+  showError,
+  value: condition,
+  onChange,
+  isReadOnly,
+}: ConditionPredicateProps) {
+  const intl = useIntl();
+  const [value, setValue] = useState(condition.value as string | null);
+  return (
+    <Input
+      size="sm"
+      type="date"
+      onChange={(e) => setValue(e.target.value || null)}
+      onBlur={() => onChange({ ...condition!, value })}
+      value={value ?? ""}
+      backgroundColor="white"
+      isInvalid={showError && value === null}
+      placeholder={intl.formatMessage({
+        id: "generic.enter-a-value",
+        defaultMessage: "Enter a value",
+      })}
+      isDisabled={isReadOnly}
+    />
   );
 }
 

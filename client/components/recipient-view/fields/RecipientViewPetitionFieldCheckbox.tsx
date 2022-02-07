@@ -126,7 +126,7 @@ export function RecipientViewPetitionFieldCheckbox({
         <Text color="gray.500" fontSize="sm">
           <CheckboxTypeLabel as="span" marginRight={2} options={field.options} />
           {!isSaving ? (
-            <Box as="span" color={isInvalid ? "red.600" : "gray.500"}>
+            <Box as="span" color={isInvalid ? "red.600" : "gray.500"} marginRight={2}>
               {checkedItems?.length ? (
                 <>
                   {showRadio ? null : "("}

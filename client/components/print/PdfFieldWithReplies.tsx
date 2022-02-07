@@ -1,5 +1,6 @@
 import { Box, Heading, Stack, Text } from "@chakra-ui/react";
 import { PetitionPdf_PetitionFieldFragment } from "@parallel/graphql/__types";
+import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../common/BreakLines";
 import { FileSize } from "../common/FileSize";
@@ -76,6 +77,13 @@ export function PdfFieldWithReplies({ field }: { field: PetitionPdf_PetitionFiel
             ) : field.type === "NUMBER" ? (
               <Text textAlign="justify" key={reply.id}>
                 {intl.formatNumber(reply.content.value)}
+              </Text>
+            ) : field.type === "DATE" ? (
+              <Text textAlign="justify" key={reply.id}>
+                {intl.formatDate(reply.content.value, {
+                  ...FORMATS.L,
+                  timeZone: "UTC",
+                })}
               </Text>
             ) : (
               <Text textAlign="justify" key={reply.id}>

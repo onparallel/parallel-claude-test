@@ -481,6 +481,8 @@ describe("GraphQL/Public", () => {
       let textField: PetitionField;
       let shortTextField: PetitionField;
       let selectField: PetitionField;
+      let dateField: PetitionField;
+
       beforeAll(async () => {
         [textField, shortTextField, selectField] = await mocks.createRandomPetitionFields(
           access.petition_id,
@@ -492,6 +494,12 @@ describe("GraphQL/Public", () => {
             optional: true,
           })
         );
+        [dateField] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
+          type: "DATE",
+          options: {},
+          multiple: true,
+          optional: true,
+        }));
       });
 
       it("petition status should change to PENDING when creating a reply on a already completed petition", async () => {
@@ -594,6 +602,69 @@ describe("GraphQL/Public", () => {
           status: "PENDING",
           content: { text: "a" },
         });
+      });
+
+      it("creates a reply of type DATE", async () => {
+        const { errors, data } = await testClient.mutate({
+          mutation: gql`
+            mutation ($keycode: ID!, $fieldId: GID!, $value: String!) {
+              publicCreateSimpleReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
+                status
+                content
+              }
+            }
+          `,
+          variables: {
+            keycode: access.keycode,
+            fieldId: toGlobalId("PetitionField", dateField.id),
+            value: "2012-12-24",
+          },
+        });
+        expect(errors).toBeUndefined();
+        expect(data?.publicCreateSimpleReply).toEqual({
+          status: "PENDING",
+          content: { value: "2012-12-24" },
+        });
+      });
+
+      it("sends error when try to create a reply with wrong format DATE", async () => {
+        const { errors, data } = await testClient.mutate({
+          mutation: gql`
+            mutation ($keycode: ID!, $fieldId: GID!, $value: String!) {
+              publicCreateSimpleReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
+                status
+                content
+              }
+            }
+          `,
+          variables: {
+            keycode: access.keycode,
+            fieldId: toGlobalId("PetitionField", dateField.id),
+            value: "2012.01.02",
+          },
+        });
+        expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+        expect(data).toBeNull();
+      });
+
+      it("sends error when try to create a reply with wrong date DATE", async () => {
+        const { errors, data } = await testClient.mutate({
+          mutation: gql`
+            mutation ($keycode: ID!, $fieldId: GID!, $value: String!) {
+              publicCreateSimpleReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
+                status
+                content
+              }
+            }
+          `,
+          variables: {
+            keycode: access.keycode,
+            fieldId: toGlobalId("PetitionField", dateField.id),
+            value: "2012.21.24",
+          },
+        });
+        expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+        expect(data).toBeNull();
       });
 
       it("sends error if passing invalid option on a SELECT field", async () => {
@@ -710,34 +781,40 @@ describe("GraphQL/Public", () => {
     describe("publicUpdateSimpleReply", () => {
       let textReply: PetitionFieldReply;
       let selectReply: PetitionFieldReply;
-      let validatedFieldReply: PetitionFieldReply;
       let approvedReply: PetitionFieldReply;
+      let dateReply: PetitionFieldReply;
 
       beforeAll(async () => {
-        const [textField, selectField, validatedTextField, shortTextField] =
-          await mocks.createRandomPetitionFields(access.petition_id, 4, (i) => ({
+        const [textField, selectField, shortTextField] = await mocks.createRandomPetitionFields(
+          access.petition_id,
+          4,
+          (i) => ({
             type: i === 1 ? "SELECT" : "TEXT",
             options: i === 1 ? { values: ["1", "2"] } : {},
-            validated: i === 2,
             optional: true,
-          }));
+          })
+        );
+        const [dateField] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
+          type: "DATE",
+          options: {},
+          multiple: true,
+          optional: true,
+        }));
 
         [textReply] = await mocks.createRandomTextReply(textField.id, access.id, 1);
         [selectReply] = await mocks.createRandomTextReply(selectField.id, access.id, 1, () => ({
           type: "SELECT",
           content: { text: "2" },
         }));
-        [validatedFieldReply] = await mocks.createRandomTextReply(
-          validatedTextField.id,
-          access.id,
-          1
-        );
+
         [approvedReply] = await mocks.createRandomTextReply(
           shortTextField.id,
           access.id,
           1,
           () => ({ status: "APPROVED", type: "SHORT_TEXT" })
         );
+
+        [dateReply] = await mocks.createRandomDateReply(dateField.id, access.id, 1);
       });
 
       it("petition status should change to PENDING when updating a reply on a already completed petition", async () => {
@@ -799,6 +876,76 @@ describe("GraphQL/Public", () => {
           status: "PENDING",
           content: { text: "updated reply" },
         });
+      });
+
+      it("updates a DATE reply", async () => {
+        const { errors, data } = await testClient.mutate({
+          mutation: gql`
+            mutation ($keycode: ID!, $replyId: GID!, $value: String!) {
+              publicUpdateSimpleReply(keycode: $keycode, replyId: $replyId, value: $value) {
+                id
+                status
+                content
+              }
+            }
+          `,
+          variables: {
+            keycode: access.keycode,
+            replyId: toGlobalId("PetitionFieldReply", dateReply.id),
+            value: "2077-02-12",
+          },
+        });
+
+        expect(errors).toBeUndefined();
+        expect(data?.publicUpdateSimpleReply).toEqual({
+          id: toGlobalId("PetitionFieldReply", dateReply.id),
+          status: "PENDING",
+          content: { value: "2077-02-12" },
+        });
+      });
+
+      it("sends error trying to update a DATE reply with a wrong date", async () => {
+        const { errors, data } = await testClient.mutate({
+          mutation: gql`
+            mutation ($keycode: ID!, $replyId: GID!, $value: String!) {
+              publicUpdateSimpleReply(keycode: $keycode, replyId: $replyId, value: $value) {
+                id
+                status
+                content
+              }
+            }
+          `,
+          variables: {
+            keycode: access.keycode,
+            replyId: toGlobalId("PetitionFieldReply", dateReply.id),
+            value: "2077-55-52",
+          },
+        });
+
+        expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+        expect(data).toBeNull();
+      });
+
+      it("sends error trying to update a DATE reply with a wrong format", async () => {
+        const { errors, data } = await testClient.mutate({
+          mutation: gql`
+            mutation ($keycode: ID!, $replyId: GID!, $value: String!) {
+              publicUpdateSimpleReply(keycode: $keycode, replyId: $replyId, value: $value) {
+                id
+                status
+                content
+              }
+            }
+          `,
+          variables: {
+            keycode: access.keycode,
+            replyId: toGlobalId("PetitionFieldReply", dateReply.id),
+            value: "2012.01.12",
+          },
+        });
+
+        expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+        expect(data).toBeNull();
       });
 
       it("sends error when trying to update the reply of a SELECT field with an invalid option", async () => {
@@ -1471,7 +1618,6 @@ describe("GraphQL/Public", () => {
     describe("publicDeletePetitionReply", () => {
       let simpleReply: PetitionFieldReply;
       let fileUploadReply: PetitionFieldReply;
-      let validatedFieldReply: PetitionFieldReply;
       let approvedReply: PetitionFieldReply;
       beforeAll(async () => {
         const [simpleField] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
@@ -1497,7 +1643,6 @@ describe("GraphQL/Public", () => {
         [fileUploadReply] = await mocks.createRandomFileReply(fileUploadField.id, 1, () => ({
           petition_access_id: access.id,
         }));
-        [validatedFieldReply] = await mocks.createRandomTextReply(validatedField.id, access.id, 1);
         [approvedReply] = await mocks.createRandomTextReply(simpleField.id, access.id, 1, () => ({
           status: "APPROVED",
         }));
