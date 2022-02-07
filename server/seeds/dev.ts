@@ -76,7 +76,7 @@ export async function seed(knex: Knex): Promise<any> {
     },
     {
       org_id: orgIds[0],
-      cognito_id: "3f3f3d5b-5e83-45f0-8c5f-36e4360eb704",
+      cognito_id: "8dd56de4-3b39-4d4b-850c-82be0aba21aa",
       email: "mariano@onparallel.com",
       organization_role: "ADMIN",
       first_name: "Mariano",
