@@ -440,7 +440,7 @@ export const userSignUp = mutationField("userSignUp", {
       const org = await ctx.organizations.createOrganization(
         {
           name: args.organizationName,
-          status: "ACTIVE",
+          status: "DEMO",
           logo_public_file_id: logoFile?.id ?? null,
         },
         undefined,
