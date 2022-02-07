@@ -8586,8 +8586,8 @@
   },
   {
     "term": "timeline.access-deactivated-auto-description",
-    "definition": "We removed access to {contact} because an email was bounced {timeAgo}",
-    "context": "We removed access to {contact} because an email was bounced {timeAgo}"
+    "definition": "The access for {contact} was removed because the email bounced {timeAgo}",
+    "context": "The access for {contact} was removed because the email bounced {timeAgo}"
   },
   {
     "term": "timeline.access-deactivated-manual-description",

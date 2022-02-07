@@ -21,7 +21,7 @@ export function TimelineAccessDeactivatedEvent({
     <TimelineItem
       icon={<TimelineIcon icon={<UserXIcon />} color="white" backgroundColor="red.500" />}
     >
-      {event.isManualTrigger ? (
+      {event.reason === "DEACTIVATED_BY_USER" ? (
         <FormattedMessage
           id="timeline.access-deactivated-manual-description"
           defaultMessage="{same, select, true {You} other {{user}}} removed access to {contact} {timeAgo}"
@@ -37,7 +37,7 @@ export function TimelineAccessDeactivatedEvent({
       ) : (
         <FormattedMessage
           id="timeline.access-deactivated-auto-description"
-          defaultMessage="We removed access to {contact} because an email was bounced {timeAgo}"
+          defaultMessage="The access for {contact} was removed because the email bounced {timeAgo}"
           values={{
             contact: <ContactReference contact={event.access.contact} />,
             timeAgo: (
@@ -53,7 +53,7 @@ export function TimelineAccessDeactivatedEvent({
 TimelineAccessDeactivatedEvent.fragments = {
   AccessDeactivatedEvent: gql`
     fragment TimelineAccessDeactivatedEvent_AccessDeactivatedEvent on AccessDeactivatedEvent {
-      isManualTrigger
+      reason
       user {
         ...UserReference_User
       }

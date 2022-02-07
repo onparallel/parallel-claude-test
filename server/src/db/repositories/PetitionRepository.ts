@@ -756,6 +756,7 @@ export class PetitionRepository extends BaseRepository {
         data: {
           petition_message_id: messageId,
           user_id: user.id,
+          reason: "CANCELLED_BY_USER",
         },
       }),
     ]);
@@ -797,6 +798,7 @@ export class PetitionRepository extends BaseRepository {
         data: {
           petition_access_id: access.id,
           user_id: userId,
+          reason: (isDefined(userId) ? "DEACTIVATED_BY_USER" : "EMAIL_BOUNCED") as any,
         },
       })),
       ...messages.map((message) => ({
@@ -805,6 +807,7 @@ export class PetitionRepository extends BaseRepository {
         data: {
           petition_message_id: message.id,
           user_id: userId,
+          reason: (isDefined(userId) ? "CANCELLED_BY_USER" : "EMAIL_BOUNCED") as any,
         },
       })),
     ]);
@@ -969,6 +972,7 @@ export class PetitionRepository extends BaseRepository {
             data: {
               petition_access_id: access.id,
               user_id: user.id,
+              reason: "DEACTIVATED_BY_USER",
             },
           })),
           t
@@ -982,6 +986,7 @@ export class PetitionRepository extends BaseRepository {
             data: {
               petition_message_id: message.id,
               user_id: user.id,
+              reason: "CANCELLED_BY_USER",
             },
           })),
           t

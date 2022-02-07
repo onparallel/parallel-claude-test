@@ -661,7 +661,7 @@ export interface NexusGenFieldTypes {
     access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
-    isManualTrigger: boolean; // Boolean!
+    reason: string; // String!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
@@ -816,8 +816,8 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
-    isManualTrigger: boolean; // Boolean!
     message: NexusGenRootTypes["PetitionMessage"]; // PetitionMessage!
+    reason: string; // String!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
     user: NexusGenRootTypes["User"] | null; // User
   };
@@ -1966,7 +1966,7 @@ export interface NexusGenFieldTypeNames {
     access: "PetitionAccess";
     createdAt: "DateTime";
     id: "GID";
-    isManualTrigger: "Boolean";
+    reason: "String";
     type: "PetitionEventType";
     user: "User";
   };
@@ -2121,8 +2121,8 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     createdAt: "DateTime";
     id: "GID";
-    isManualTrigger: "Boolean";
     message: "PetitionMessage";
+    reason: "String";
     type: "PetitionEventType";
     user: "User";
   };

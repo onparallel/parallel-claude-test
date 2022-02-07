@@ -990,9 +990,16 @@ export const _PetitionEvent = {
         },
         userId: {
           description:
-            "The ID of the user that deactivated the access. If `null`, the access was automatically deactivated because a bounce ocurred when trying to delivery an email.",
+            "The ID of the user that deactivated the access. Only set if `reason` is `DEACTIVATED_BY_USER`. If `null`, the access was automatically deactivated because a bounce ocurred when trying to delivery an email.",
           type: ["string", "null"],
           example: toGlobalId("User", 1),
+        },
+        reason: {
+          type: "string",
+          description:
+            "Wether the access was deactivated manually by an user, or it was deactivated automatically because an email was bounced.",
+          enum: ["DEACTIVATED_BY_USER", "EMAIL_BOUNCED"],
+          example: "DEACTIVATED_BY_USER",
         },
       },
     },
@@ -1073,9 +1080,16 @@ export const _PetitionEvent = {
         },
         userId: {
           description:
-            "The ID of the user that cancelled the send of the message. If `null`, the message was automatically cancelled because a bounce ocurred when trying to delivery an email.",
+            "The ID of the user that cancelled the send of the message. Only set if `reason` is `CANCELLED_BY_USER`. If `null`, the message was automatically cancelled because a bounce ocurred when trying to delivery an email.",
           type: ["string", "null"],
           example: toGlobalId("User", 10),
+        },
+        reason: {
+          type: "string",
+          description:
+            "Wether the message was cancelled manually by an user, or it was cancelled automatically because an email was bounced.",
+          enum: ["CANCELLED_BY_USER", "EMAIL_BOUNCED"],
+          example: "CANCELLED_BY_USER",
         },
       },
     },

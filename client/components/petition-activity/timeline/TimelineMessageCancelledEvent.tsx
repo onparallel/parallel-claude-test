@@ -14,14 +14,14 @@ export type TimelineMessageCancelledEventProps = {
 };
 
 export function TimelineMessageCancelledEvent({
-  event: { message, user, createdAt, isManualTrigger },
+  event: { message, user, createdAt, reason },
   userId,
 }: TimelineMessageCancelledEventProps) {
   return (
     <TimelineItem
       icon={<TimelineIcon icon={<ForbiddenIcon />} color="white" backgroundColor="red.500" />}
     >
-      {isManualTrigger ? (
+      {reason === "CANCELLED_BY_USER" ? (
         <FormattedMessage
           id="timeline.message-cancelled-manual-description"
           defaultMessage="{same, select, true {You} other {{user}}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
@@ -51,7 +51,7 @@ export function TimelineMessageCancelledEvent({
 TimelineMessageCancelledEvent.fragments = {
   MessageCancelledEvent: gql`
     fragment TimelineMessageCancelledEvent_MessageCancelledEvent on MessageCancelledEvent {
-      isManualTrigger
+      reason
       message {
         status
         scheduledAt

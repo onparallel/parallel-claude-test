@@ -8586,8 +8586,8 @@
   },
   {
     "term": "timeline.access-deactivated-auto-description",
-    "definition": "Hemos desactivado el acceso a {contact} porque el correo ha rebotado {timeAgo}",
-    "context": "We removed access to {contact} because an email was bounced {timeAgo}"
+    "definition": "El acceso a {contact} fue desactivado porque el correo ha rebotado {timeAgo}",
+    "context": "The access for {contact} was removed because the email bounced {timeAgo}"
   },
   {
     "term": "timeline.access-deactivated-manual-description",

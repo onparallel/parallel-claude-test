@@ -173,17 +173,8 @@ export const AccessDeactivatedEvent = createPetitionEvent("AccessDeactivatedEven
       return isDefined(root.data.user_id) ? await ctx.users.loadUser(root.data.user_id) : null;
     },
   });
-  /**
-   * null user could mean:
-   * - the event was triggered by an user, and this user is now deleted
-   * - the event was triggered automatically on an email bounce
-   *
-   * so we need this field `isManualTrigger` to be able to tell between both cases.
-   */
-  t.boolean("isManualTrigger", {
-    description:
-      "If true, this event was triggered by an user action. If false, the event was triggered automatically because an email was bounced",
-    resolve: (root) => isDefined(root.data.user_id),
+  t.string("reason", {
+    resolve: (root) => root.data.reason,
   });
 });
 
@@ -233,17 +224,8 @@ export const MessagesCancelledEvent = createPetitionEvent("MessageCancelledEvent
       return isDefined(root.data.user_id) ? await ctx.users.loadUser(root.data.user_id) : null;
     },
   });
-  /**
-   * null user could mean:
-   * - the event was triggered by an user, and this user is now deleted
-   * - the event was triggered automatically on an email bounce
-   *
-   * so we need this field `isManualTrigger` to be able to tell between both cases.
-   */
-  t.boolean("isManualTrigger", {
-    description:
-      "If true, this event was triggered by an user action. If false, the event was triggered automatically because an email was bounced",
-    resolve: (root) => isDefined(root.data.user_id),
+  t.string("reason", {
+    resolve: (root) => root.data.reason,
   });
 });
 

@@ -14,6 +14,7 @@ function mapEventPayload(event: PetitionEvent) {
       return {
         petitionAccessId: toGlobalId("PetitionAccess", event.data.petition_access_id),
         userId: isDefined(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
+        reason: event.data.reason,
       };
     }
     case "ACCESS_DELEGATED": {
@@ -53,6 +54,7 @@ function mapEventPayload(event: PetitionEvent) {
       return {
         userId: isDefined(event.data.user_id) ? toGlobalId("User", event.data.user_id) : null,
         petitionMessageId: toGlobalId("PetitionMessage", event.data.petition_message_id),
+        reason: event.data.reason,
       };
     }
     case "MESSAGE_SCHEDULED": {
