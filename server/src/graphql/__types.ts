@@ -868,6 +868,7 @@ export interface NexusGenFieldTypes {
     createExportRepliesTask: NexusGenRootTypes["Task"]; // Task!
     createFileUploadReply: NexusGenRootTypes["FileUploadReplyResponse"]; // FileUploadReplyResponse!
     createFileUploadReplyComplete: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
+    createNumericReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createOrganization: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createOrganizationUser: NexusGenRootTypes["User"]; // User!
     createPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
@@ -914,6 +915,7 @@ export interface NexusGenFieldTypes {
     publicCreateCheckboxReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicCreateDynamicSelectReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicCreateFileUploadReply: NexusGenRootTypes["PublicCreateFileUploadReply"]; // PublicCreateFileUploadReply!
+    publicCreateNumericReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicCreatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
     publicCreatePrintPdfTask: NexusGenRootTypes["Task"]; // Task!
     publicCreateSimpleReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
@@ -930,6 +932,7 @@ export interface NexusGenFieldTypes {
     publicSendVerificationCode: NexusGenRootTypes["VerificationCodeRequest"]; // VerificationCodeRequest!
     publicUpdateCheckboxReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicUpdateDynamicSelectReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
+    publicUpdateNumericReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicUpdatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
     publicUpdateSimpleReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
@@ -963,6 +966,7 @@ export interface NexusGenFieldTypes {
     updateFileUploadReply: NexusGenRootTypes["FileUploadReplyResponse"]; // FileUploadReplyResponse!
     updateFileUploadReplyComplete: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updateLandingTemplateMetadata: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    updateNumericReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updateOnboardingStatus: NexusGenRootTypes["User"]; // User!
     updateOrganizationLogo: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationPreferredTone: NexusGenRootTypes["Organization"]; // Organization!
@@ -2173,6 +2177,7 @@ export interface NexusGenFieldTypeNames {
     createExportRepliesTask: "Task";
     createFileUploadReply: "FileUploadReplyResponse";
     createFileUploadReplyComplete: "PetitionFieldReply";
+    createNumericReply: "PetitionFieldReply";
     createOrganization: "SupportMethodResponse";
     createOrganizationUser: "User";
     createPetition: "PetitionBase";
@@ -2219,6 +2224,7 @@ export interface NexusGenFieldTypeNames {
     publicCreateCheckboxReply: "PublicPetitionFieldReply";
     publicCreateDynamicSelectReply: "PublicPetitionFieldReply";
     publicCreateFileUploadReply: "PublicCreateFileUploadReply";
+    publicCreateNumericReply: "PublicPetitionFieldReply";
     publicCreatePetitionFieldComment: "PublicPetitionFieldComment";
     publicCreatePrintPdfTask: "Task";
     publicCreateSimpleReply: "PublicPetitionFieldReply";
@@ -2235,6 +2241,7 @@ export interface NexusGenFieldTypeNames {
     publicSendVerificationCode: "VerificationCodeRequest";
     publicUpdateCheckboxReply: "PublicPetitionFieldReply";
     publicUpdateDynamicSelectReply: "PublicPetitionFieldReply";
+    publicUpdateNumericReply: "PublicPetitionFieldReply";
     publicUpdatePetitionFieldComment: "PublicPetitionFieldComment";
     publicUpdateSimpleReply: "PublicPetitionFieldReply";
     reactivateAccesses: "PetitionAccess";
@@ -2268,6 +2275,7 @@ export interface NexusGenFieldTypeNames {
     updateFileUploadReply: "FileUploadReplyResponse";
     updateFileUploadReplyComplete: "PetitionFieldReply";
     updateLandingTemplateMetadata: "SupportMethodResponse";
+    updateNumericReply: "PetitionFieldReply";
     updateOnboardingStatus: "User";
     updateOrganizationLogo: "Organization";
     updateOrganizationPreferredTone: "Organization";
@@ -3379,6 +3387,12 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       replyId: NexusGenScalars["GID"]; // GID!
     };
+    createNumericReply: {
+      // args
+      fieldId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
+      reply: number; // Float!
+    };
     createOrganization: {
       // args
       name: string; // String!
@@ -3638,6 +3652,12 @@ export interface NexusGenArgTypes {
       fieldId: NexusGenScalars["GID"]; // GID!
       keycode: string; // ID!
     };
+    publicCreateNumericReply: {
+      // args
+      fieldId: NexusGenScalars["GID"]; // GID!
+      keycode: string; // ID!
+      value: number; // Float!
+    };
     publicCreatePetitionFieldComment: {
       // args
       content: string; // String!
@@ -3728,6 +3748,12 @@ export interface NexusGenArgTypes {
       keycode: string; // ID!
       replyId: NexusGenScalars["GID"]; // GID!
       value: Array<Array<string | null>>; // [[String]!]!
+    };
+    publicUpdateNumericReply: {
+      // args
+      keycode: string; // ID!
+      replyId: NexusGenScalars["GID"]; // GID!
+      value: number; // Float!
     };
     publicUpdatePetitionFieldComment: {
       // args
@@ -3913,6 +3939,12 @@ export interface NexusGenArgTypes {
       image?: NexusGenScalars["Upload"] | null; // Upload
       slug?: string | null; // String
       templateId: string; // ID!
+    };
+    updateNumericReply: {
+      // args
+      petitionId: NexusGenScalars["GID"]; // GID!
+      reply: number; // Float!
+      replyId: NexusGenScalars["GID"]; // GID!
     };
     updateOnboardingStatus: {
       // args

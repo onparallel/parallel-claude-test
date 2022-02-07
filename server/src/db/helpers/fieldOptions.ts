@@ -282,6 +282,7 @@ export function defaultFieldOptions(
           placeholder: options?.placeholder ?? null,
           range: {
             isActive: false,
+            min: 0,
           },
         },
       };

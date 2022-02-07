@@ -36,6 +36,20 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
     }
   }
 
+  public addNumericReply(field: PetitionField, replies: PetitionFieldReply[]) {
+    if (replies.length > 0) {
+      this.addRows(
+        replies.map((r, i) => ({
+          title: field.title?.concat(field.multiple ? ` [${i + 1}]` : "") || "",
+          description: field.description?.slice(0, 200) || "",
+          answer: r.content.value,
+        }))
+      );
+    } else {
+      this.addEmptyReply(field);
+    }
+  }
+
   public addDynamicSelectReply(field: PetitionField, replies: PetitionFieldReply[]) {
     if (replies.length > 0) {
       this.addRows(

@@ -45,7 +45,7 @@ const schema = {
               "NUMBER_OF_SUBREPLIES",
             ],
           },
-          value: { type: ["string", "integer", "null"] },
+          value: { type: ["string", "integer", "number", "null"] },
           column: { type: "number" },
         },
       },

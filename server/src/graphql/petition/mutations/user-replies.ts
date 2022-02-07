@@ -1,4 +1,4 @@
-import { list, mutationField, nonNull, objectType, stringArg } from "nexus";
+import { floatArg, list, mutationField, nonNull, objectType, stringArg } from "nexus";
 import { random } from "../../../util/token";
 import { Maybe } from "../../../util/types";
 import { isInRange } from "../../../util/validators";
@@ -28,7 +28,7 @@ export const createSimpleReply = mutationField("createSimpleReply", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
-    fieldHasType("fieldId", ["TEXT", "SELECT", "SHORT_TEXT", "NUMBER"]),
+    fieldHasType("fieldId", ["TEXT", "SELECT", "SHORT_TEXT"]),
     fieldCanBeReplied("fieldId")
   ),
   validateArgs: async (_, args, ctx, info) => {
@@ -39,20 +39,6 @@ export const createSimpleReply = mutationField("createSimpleReply", {
         const options = field.options.values as Maybe<string[]>;
         if (!options?.includes(args.reply)) {
           throw new InvalidOptionError(info, "reply", "Invalid option");
-        }
-        break;
-      }
-      case "NUMBER": {
-        const options = field.options;
-        const value = Number(args.reply);
-        const min = options.range?.min ? Number(options.range?.min) : undefined;
-        const max = options.range?.max ? Number(options.range?.max) : undefined;
-        console.log("HACKERMAN - value: ", value);
-        console.log("HACKERMAN - options.range.isActive: ", options.range.isActive);
-        console.log("HACKERMAN - isInRange: ", isInRange(value, min, max));
-
-        if (isNaN(value) || (options.range.isActive && !isInRange(value, min, max))) {
-          throw new InvalidOptionError(info, "reply", "Invalid number");
         }
         break;
       }
@@ -86,7 +72,7 @@ export const updateSimpleReply = mutationField("updateSimpleReply", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
-    replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT", "NUMBER"]),
+    replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT"]),
     replyCanBeUpdated("replyId")
   ),
   validateArgs: async (_, args, ctx, info) => {
@@ -100,9 +86,93 @@ export const updateSimpleReply = mutationField("updateSimpleReply", {
         }
         break;
       }
+      default:
+        break;
+    }
+  },
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.updatePetitionFieldReply(
+      args.replyId,
+      {
+        petition_access_id: null,
+        user_id: ctx.user!.id,
+        content: { text: args.reply },
+        status: "PENDING",
+      },
+      ctx.user!
+    );
+  },
+});
+
+export const createNumericReply = mutationField("createNumericReply", {
+  description: "Creates a reply to a numeric field.",
+  type: "PetitionFieldReply",
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    fieldId: nonNull(globalIdArg("PetitionField")),
+    reply: nonNull(floatArg()),
+  },
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    fieldsBelongsToPetition("petitionId", "fieldId"),
+    fieldHasType("fieldId", ["NUMBER"]),
+    fieldCanBeReplied("fieldId")
+  ),
+  validateArgs: async (_, args, ctx, info) => {
+    const field = (await ctx.petitions.loadField(args.fieldId))!;
+
+    switch (field.type) {
       case "NUMBER": {
         const options = field.options;
-        const value = Number(args.reply);
+        const value = args.reply;
+        const min = options.range?.min ? Number(options.range?.min) : undefined;
+        const max = options.range?.max ? Number(options.range?.max) : undefined;
+
+        if (isNaN(value) || (options.range.isActive && !isInRange(value, min, max))) {
+          throw new InvalidOptionError(info, "reply", "Invalid number");
+        }
+        break;
+      }
+      default:
+        break;
+    }
+  },
+  resolve: async (_, args, ctx) => {
+    const field = (await ctx.petitions.loadField(args.fieldId))!;
+    return await ctx.petitions.createPetitionFieldReply(
+      {
+        petition_field_id: args.fieldId,
+        user_id: ctx.user!.id,
+        type: field.type,
+        status: "PENDING",
+        content: { value: args.reply },
+      },
+      ctx.user!
+    );
+  },
+});
+
+export const updateNumericReply = mutationField("updateNumericReply", {
+  description: "Updates a reply to a numeric field.",
+  type: "PetitionFieldReply",
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    replyId: nonNull(globalIdArg("PetitionFieldReply")),
+    reply: nonNull(floatArg()),
+  },
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    repliesBelongsToPetition("petitionId", "replyId"),
+    replyIsForFieldOfType("replyId", ["NUMBER"]),
+    replyCanBeUpdated("replyId")
+  ),
+  validateArgs: async (_, args, ctx, info) => {
+    const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
+
+    switch (field.type) {
+      case "NUMBER": {
+        const options = field.options;
+        const value = args.reply;
         const min = options.range?.min ? Number(options.range?.min) : undefined;
         const max = options.range?.max ? Number(options.range?.max) : undefined;
 
@@ -121,7 +191,7 @@ export const updateSimpleReply = mutationField("updateSimpleReply", {
       {
         petition_access_id: null,
         user_id: ctx.user!.id,
-        content: { text: args.reply },
+        content: { value: args.reply },
         status: "PENDING",
       },
       ctx.user!

@@ -1,10 +1,11 @@
 import { Box, Heading, Stack, Text } from "@chakra-ui/react";
 import { PetitionPdf_PetitionFieldFragment } from "@parallel/graphql/__types";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../common/BreakLines";
 import { FileSize } from "../common/FileSize";
 
 export function PdfFieldWithReplies({ field }: { field: PetitionPdf_PetitionFieldFragment }) {
+  const intl = useIntl();
   return (
     <Box sx={{ pageBreakInside: field.type === "HEADING" ? "auto" : "avoid" }} marginY="4mm">
       {field.type === "HEADING" ? (
@@ -72,6 +73,10 @@ export function PdfFieldWithReplies({ field }: { field: PetitionPdf_PetitionFiel
                   </Text>
                 ))}
               </Stack>
+            ) : field.type === "NUMBER" ? (
+              <Text textAlign="justify" key={reply.id}>
+                {intl.formatNumber(reply.content.value)}
+              </Text>
             ) : (
               <Text textAlign="justify" key={reply.id}>
                 <BreakLines>{reply.content.text}</BreakLines>

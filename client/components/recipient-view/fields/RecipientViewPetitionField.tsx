@@ -6,12 +6,14 @@ import {
   RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument,
   RecipientViewPetitionField_publicCreateCheckboxReplyDocument,
   RecipientViewPetitionField_publicCreateDynamicSelectReplyDocument,
+  RecipientViewPetitionField_publicCreateNumericReplyDocument,
   RecipientViewPetitionField_publicCreateSimpleReplyDocument,
   RecipientViewPetitionField_publicDeletePetitionReplyDocument,
   RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument,
   RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc,
   RecipientViewPetitionField_publicUpdateCheckboxReplyDocument,
   RecipientViewPetitionField_publicUpdateDynamicSelectReplyDocument,
+  RecipientViewPetitionField_publicUpdateNumericReplyDocument,
   RecipientViewPetitionField_publicUpdateSimpleReplyDocument,
 } from "@parallel/graphql/__types";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
@@ -143,6 +145,47 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
         });
         updateLastSaved();
         return data?.publicCreateSimpleReply?.id;
+      } catch {}
+
+      return;
+    },
+    [createSimpleReply, updateLastSaved]
+  );
+
+  const [updateNumericReply] = useMutation(
+    RecipientViewPetitionField_publicUpdateNumericReplyDocument
+  );
+  const handleUpdateNumericReply = useCallback(
+    async (replyId: string, value: number) => {
+      try {
+        await updateNumericReply({
+          variables: {
+            replyId,
+            keycode: props.keycode,
+            value,
+          },
+        });
+        updateLastSaved();
+      } catch {}
+    },
+    [updateNumericReply, updateLastSaved]
+  );
+
+  const [createNumericReply] = useMutation(
+    RecipientViewPetitionField_publicCreateNumericReplyDocument
+  );
+  const handleCreateNumericReply = useCallback(
+    async (value: number) => {
+      try {
+        const { data } = await createNumericReply({
+          variables: {
+            value,
+            fieldId: props.field.id,
+            keycode: props.keycode,
+          },
+        });
+        updateLastSaved();
+        return data?.publicCreateNumericReply?.id;
       } catch {}
 
       return;
@@ -324,8 +367,8 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
       {...props}
       {...commonProps}
       onDeleteReply={handleDeletePetitionReply}
-      onUpdateReply={handleUpdateSimpleReply}
-      onCreateReply={handleCreateSimpleReply}
+      onUpdateReply={handleUpdateNumericReply}
+      onCreateReply={handleCreateNumericReply}
     />
   ) : null;
 }
@@ -409,6 +452,47 @@ RecipientViewPetitionField.mutations = [
       $value: String!
     ) {
       publicUpdateSimpleReply(keycode: $keycode, replyId: $replyId, value: $value) {
+        ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+        field {
+          id
+          petition {
+            id
+            status
+          }
+        }
+      }
+    }
+    ${RecipientViewPetitionFieldCard.fragments.PublicPetitionFieldReply}
+  `,
+  gql`
+    mutation RecipientViewPetitionField_publicCreateNumericReply(
+      $keycode: ID!
+      $fieldId: GID!
+      $value: Float!
+    ) {
+      publicCreateNumericReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
+        ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+        field {
+          id
+          petition {
+            id
+            status
+          }
+          replies {
+            id
+          }
+        }
+      }
+    }
+    ${RecipientViewPetitionFieldCard.fragments.PublicPetitionFieldReply}
+  `,
+  gql`
+    mutation RecipientViewPetitionField_publicUpdateNumericReply(
+      $keycode: ID!
+      $replyId: GID!
+      $value: Float!
+    ) {
+      publicUpdateNumericReply(keycode: $keycode, replyId: $replyId, value: $value) {
         ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
         field {
           id

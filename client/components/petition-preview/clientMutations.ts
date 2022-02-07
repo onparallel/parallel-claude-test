@@ -4,10 +4,12 @@ import {
   PreviewPetitionFieldMutations_createDynamicSelectReplyDocument,
   PreviewPetitionFieldMutations_createFileUploadReplyCompleteDocument,
   PreviewPetitionFieldMutations_createFileUploadReplyDocument,
+  PreviewPetitionFieldMutations_createNumericReplyDocument,
   PreviewPetitionFieldMutations_createSimpleReplyDocument,
   PreviewPetitionFieldMutations_deletePetitionReplyDocument,
   PreviewPetitionFieldMutations_updateCheckboxReplyDocument,
   PreviewPetitionFieldMutations_updateDynamicSelectReplyDocument,
+  PreviewPetitionFieldMutations_updateNumericReplyDocument,
   PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragment,
   PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragmentDoc,
   PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragmentDoc,
@@ -200,6 +202,138 @@ export function useCreateSimpleReply() {
       }
     },
     [createSimpleReply]
+  );
+}
+
+const _updateNumericReply = gql`
+  mutation PreviewPetitionFieldMutations_updateNumericReply(
+    $petitionId: GID!
+    $replyId: GID!
+    $reply: Float!
+  ) {
+    updateNumericReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+      id
+      content
+      status
+      updatedAt
+      field {
+        id
+        petition {
+          id
+          ... on Petition {
+            status
+          }
+        }
+      }
+    }
+  }
+`;
+
+export function useUpdateNumericReply() {
+  const client = useApolloClient();
+  const [updateNumericReply] = useMutation(
+    PreviewPetitionFieldMutations_updateNumericReplyDocument
+  );
+  return useCallback(
+    async function _updateNumericReply({
+      petitionId,
+      replyId,
+      reply,
+      isCacheOnly,
+    }: {
+      petitionId: string;
+      replyId: string;
+      reply: number;
+      isCacheOnly?: boolean;
+    }) {
+      if (isCacheOnly) {
+        updateReplyContent(client, replyId, (content) => ({
+          ...content,
+          text: reply,
+        }));
+      } else {
+        await updateNumericReply({
+          variables: {
+            petitionId,
+            replyId,
+            reply,
+          },
+        });
+      }
+    },
+    [updateNumericReply]
+  );
+}
+
+const _createNumericReply = gql`
+  mutation PreviewPetitionFieldMutations_createNumericReply(
+    $petitionId: GID!
+    $fieldId: GID!
+    $reply: Float!
+  ) {
+    createNumericReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+      ...RecipientViewPetitionFieldCard_PetitionFieldReply
+      field {
+        id
+        petition {
+          id
+          ... on Petition {
+            status
+          }
+        }
+        replies {
+          id
+        }
+      }
+    }
+  }
+  ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
+`;
+
+export function useCreateNumericReply() {
+  const client = useApolloClient();
+
+  const [createNumericReply] = useMutation(
+    PreviewPetitionFieldMutations_createNumericReplyDocument
+  );
+  return useCallback(
+    async function _createNumericReply({
+      petitionId,
+      fieldId,
+      reply,
+      isCacheOnly,
+    }: {
+      petitionId: string;
+      fieldId: string;
+      reply: number;
+      isCacheOnly?: boolean;
+    }) {
+      if (isCacheOnly) {
+        const id = `${fieldId}-${getRandomId()}`;
+        updatePreviewFieldReplies(client, fieldId, (replies) => [
+          ...(replies ?? []),
+          {
+            id,
+            __typename: "PetitionFieldReply",
+            status: "PENDING",
+            content: { value: reply },
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        ]);
+        return { id, __typename: "PetitionFieldReply" };
+      } else {
+        const { data } = await createNumericReply({
+          variables: {
+            petitionId,
+            fieldId,
+            reply,
+          },
+        });
+        return data?.createNumericReply;
+      }
+    },
+    [createNumericReply]
   );
 }
 

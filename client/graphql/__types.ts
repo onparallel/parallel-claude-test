@@ -397,6 +397,8 @@ export interface Mutation {
   createFileUploadReply: FileUploadReplyResponse;
   /** Notifies the backend that the upload is complete. */
   createFileUploadReplyComplete: PetitionFieldReply;
+  /** Creates a reply to a numeric field. */
+  createNumericReply: PetitionFieldReply;
   /** Creates a new organization. */
   createOrganization: SupportMethodResponse;
   /** Creates a new user in the same organization as the context user */
@@ -491,6 +493,8 @@ export interface Mutation {
   publicCreateDynamicSelectReply: PublicPetitionFieldReply;
   /** Creates a reply to a file upload field. */
   publicCreateFileUploadReply: PublicCreateFileUploadReply;
+  /** Creates a reply to a numeric field. */
+  publicCreateNumericReply: PublicPetitionFieldReply;
   /** Create a petition field comment. */
   publicCreatePetitionFieldComment: PublicPetitionFieldComment;
   /** Starts an export pdf task in a recipient context */
@@ -521,6 +525,8 @@ export interface Mutation {
   publicUpdateCheckboxReply: PublicPetitionFieldReply;
   /** Updates a reply for a dynamic select field. */
   publicUpdateDynamicSelectReply: PublicPetitionFieldReply;
+  /** Updates a reply to a numeric field. */
+  publicUpdateNumericReply: PublicPetitionFieldReply;
   /** Update a petition field comment. */
   publicUpdatePetitionFieldComment: PublicPetitionFieldComment;
   /** Updates a reply to a text or select field. */
@@ -586,6 +592,8 @@ export interface Mutation {
   updateFileUploadReplyComplete: PetitionFieldReply;
   /** Updates the metadata of a public landing template. */
   updateLandingTemplateMetadata: SupportMethodResponse;
+  /** Updates a reply to a numeric field. */
+  updateNumericReply: PetitionFieldReply;
   /** Updates the onboarding status for one of the pages. */
   updateOnboardingStatus: User;
   /** Updates the logo of an organization */
@@ -761,6 +769,12 @@ export interface MutationcreateFileUploadReplyArgs {
 export interface MutationcreateFileUploadReplyCompleteArgs {
   petitionId: Scalars["GID"];
   replyId: Scalars["GID"];
+}
+
+export interface MutationcreateNumericReplyArgs {
+  fieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+  reply: Scalars["Float"];
 }
 
 export interface MutationcreateOrganizationArgs {
@@ -1022,6 +1036,12 @@ export interface MutationpublicCreateFileUploadReplyArgs {
   keycode: Scalars["ID"];
 }
 
+export interface MutationpublicCreateNumericReplyArgs {
+  fieldId: Scalars["GID"];
+  keycode: Scalars["ID"];
+  value: Scalars["Float"];
+}
+
 export interface MutationpublicCreatePetitionFieldCommentArgs {
   content: Scalars["String"];
   keycode: Scalars["ID"];
@@ -1111,6 +1131,12 @@ export interface MutationpublicUpdateDynamicSelectReplyArgs {
   keycode: Scalars["ID"];
   replyId: Scalars["GID"];
   value: Array<Array<InputMaybe<Scalars["String"]>>>;
+}
+
+export interface MutationpublicUpdateNumericReplyArgs {
+  keycode: Scalars["ID"];
+  replyId: Scalars["GID"];
+  value: Scalars["Float"];
 }
 
 export interface MutationpublicUpdatePetitionFieldCommentArgs {
@@ -1296,6 +1322,12 @@ export interface MutationupdateLandingTemplateMetadataArgs {
   image?: InputMaybe<Scalars["Upload"]>;
   slug?: InputMaybe<Scalars["String"]>;
   templateId: Scalars["ID"];
+}
+
+export interface MutationupdateNumericReplyArgs {
+  petitionId: Scalars["GID"];
+  reply: Scalars["Float"];
+  replyId: Scalars["GID"];
 }
 
 export interface MutationupdateOnboardingStatusArgs {
@@ -7868,6 +7900,54 @@ export type PreviewPetitionFieldMutations_createSimpleReplyMutation = {
   };
 };
 
+export type PreviewPetitionFieldMutations_updateNumericReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+  reply: Scalars["Float"];
+}>;
+
+export type PreviewPetitionFieldMutations_updateNumericReplyMutation = {
+  updateNumericReply: {
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
+    updatedAt: string;
+    field?: {
+      __typename?: "PetitionField";
+      id: string;
+      petition:
+        | { __typename?: "Petition"; status: PetitionStatus; id: string }
+        | { __typename?: "PetitionTemplate"; id: string };
+    } | null;
+  };
+};
+
+export type PreviewPetitionFieldMutations_createNumericReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  reply: Scalars["Float"];
+}>;
+
+export type PreviewPetitionFieldMutations_createNumericReplyMutation = {
+  createNumericReply: {
+    __typename?: "PetitionFieldReply";
+    id: string;
+    status: PetitionFieldReplyStatus;
+    content: { [key: string]: any };
+    createdAt: string;
+    updatedAt: string;
+    field?: {
+      __typename?: "PetitionField";
+      id: string;
+      petition:
+        | { __typename?: "Petition"; status: PetitionStatus; id: string }
+        | { __typename?: "PetitionTemplate"; id: string };
+      replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+    } | null;
+  };
+};
+
 export type PreviewPetitionFieldMutations_createCheckboxReplyMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   fieldId: Scalars["GID"];
@@ -9343,6 +9423,51 @@ export type RecipientViewPetitionField_publicUpdateSimpleReplyMutationVariables 
 
 export type RecipientViewPetitionField_publicUpdateSimpleReplyMutation = {
   publicUpdateSimpleReply: {
+    __typename?: "PublicPetitionFieldReply";
+    id: string;
+    status: PetitionFieldReplyStatus;
+    content: { [key: string]: any };
+    createdAt: string;
+    updatedAt: string;
+    field: {
+      __typename?: "PublicPetitionField";
+      id: string;
+      petition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
+    };
+  };
+};
+
+export type RecipientViewPetitionField_publicCreateNumericReplyMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  fieldId: Scalars["GID"];
+  value: Scalars["Float"];
+}>;
+
+export type RecipientViewPetitionField_publicCreateNumericReplyMutation = {
+  publicCreateNumericReply: {
+    __typename?: "PublicPetitionFieldReply";
+    id: string;
+    status: PetitionFieldReplyStatus;
+    content: { [key: string]: any };
+    createdAt: string;
+    updatedAt: string;
+    field: {
+      __typename?: "PublicPetitionField";
+      id: string;
+      petition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
+      replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
+    };
+  };
+};
+
+export type RecipientViewPetitionField_publicUpdateNumericReplyMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  replyId: Scalars["GID"];
+  value: Scalars["Float"];
+}>;
+
+export type RecipientViewPetitionField_publicUpdateNumericReplyMutation = {
+  publicUpdateNumericReply: {
     __typename?: "PublicPetitionFieldReply";
     id: string;
     status: PetitionFieldReplyStatus;
@@ -22078,6 +22203,59 @@ export const PreviewPetitionFieldMutations_createSimpleReplyDocument = gql`
   PreviewPetitionFieldMutations_createSimpleReplyMutation,
   PreviewPetitionFieldMutations_createSimpleReplyMutationVariables
 >;
+export const PreviewPetitionFieldMutations_updateNumericReplyDocument = gql`
+  mutation PreviewPetitionFieldMutations_updateNumericReply(
+    $petitionId: GID!
+    $replyId: GID!
+    $reply: Float!
+  ) {
+    updateNumericReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+      id
+      content
+      status
+      updatedAt
+      field {
+        id
+        petition {
+          id
+          ... on Petition {
+            status
+          }
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  PreviewPetitionFieldMutations_updateNumericReplyMutation,
+  PreviewPetitionFieldMutations_updateNumericReplyMutationVariables
+>;
+export const PreviewPetitionFieldMutations_createNumericReplyDocument = gql`
+  mutation PreviewPetitionFieldMutations_createNumericReply(
+    $petitionId: GID!
+    $fieldId: GID!
+    $reply: Float!
+  ) {
+    createNumericReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+      ...RecipientViewPetitionFieldCard_PetitionFieldReply
+      field {
+        id
+        petition {
+          id
+          ... on Petition {
+            status
+          }
+        }
+        replies {
+          id
+        }
+      }
+    }
+  }
+  ${RecipientViewPetitionFieldCard_PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  PreviewPetitionFieldMutations_createNumericReplyMutation,
+  PreviewPetitionFieldMutations_createNumericReplyMutationVariables
+>;
 export const PreviewPetitionFieldMutations_createCheckboxReplyDocument = gql`
   mutation PreviewPetitionFieldMutations_createCheckboxReply(
     $petitionId: GID!
@@ -22734,6 +22912,53 @@ export const RecipientViewPetitionField_publicUpdateSimpleReplyDocument = gql`
 ` as unknown as DocumentNode<
   RecipientViewPetitionField_publicUpdateSimpleReplyMutation,
   RecipientViewPetitionField_publicUpdateSimpleReplyMutationVariables
+>;
+export const RecipientViewPetitionField_publicCreateNumericReplyDocument = gql`
+  mutation RecipientViewPetitionField_publicCreateNumericReply(
+    $keycode: ID!
+    $fieldId: GID!
+    $value: Float!
+  ) {
+    publicCreateNumericReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
+      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+      field {
+        id
+        petition {
+          id
+          status
+        }
+        replies {
+          id
+        }
+      }
+    }
+  }
+  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  RecipientViewPetitionField_publicCreateNumericReplyMutation,
+  RecipientViewPetitionField_publicCreateNumericReplyMutationVariables
+>;
+export const RecipientViewPetitionField_publicUpdateNumericReplyDocument = gql`
+  mutation RecipientViewPetitionField_publicUpdateNumericReply(
+    $keycode: ID!
+    $replyId: GID!
+    $value: Float!
+  ) {
+    publicUpdateNumericReply(keycode: $keycode, replyId: $replyId, value: $value) {
+      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+      field {
+        id
+        petition {
+          id
+          status
+        }
+      }
+    }
+  }
+  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  RecipientViewPetitionField_publicUpdateNumericReplyMutation,
+  RecipientViewPetitionField_publicUpdateNumericReplyMutationVariables
 >;
 export const RecipientViewPetitionField_publicCreateCheckboxReplyDocument = gql`
   mutation RecipientViewPetitionField_publicCreateCheckboxReply(

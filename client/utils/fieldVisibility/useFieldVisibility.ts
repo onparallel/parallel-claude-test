@@ -77,6 +77,8 @@ function conditionIsMet(
         ? reply.content.columns?.[condition.column]?.[1] ?? null
         : reply.content.text
         ? reply.content.text
+        : reply.content.value
+        ? reply.content.value
         : reply.content.choices;
 
     return evaluatePredicate(_value, operator, value);

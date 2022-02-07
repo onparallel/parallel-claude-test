@@ -70,7 +70,7 @@ export function PetitionRepliesFieldReply({
         {isTextLikeType ? (
           <CopyToClipboardButton size="xs" text={reply.content.text} />
         ) : reply.field!.type === "NUMBER" ? (
-          <CopyToClipboardButton size="xs" text={intl.formatNumber(reply.content.text)} />
+          <CopyToClipboardButton size="xs" text={intl.formatNumber(reply.content.value)} />
         ) : reply.field!.type === "FILE_UPLOAD" ? (
           <Stack spacing={1}>
             <ReplyDownloadButton
@@ -124,7 +124,7 @@ export function PetitionRepliesFieldReply({
         {isTextLikeType ? (
           <BreakLines>{reply.content.text}</BreakLines>
         ) : reply.field!.type === "NUMBER" ? (
-          <BreakLines>{intl.formatNumber(reply.content.text)}</BreakLines>
+          <Text wordBreak="break-all">{intl.formatNumber(reply.content.value)}</Text>
         ) : reply.field!.type === "FILE_UPLOAD" ? (
           <Box>
             <VisuallyHidden>

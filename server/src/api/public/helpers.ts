@@ -109,6 +109,8 @@ function mapFieldReplyContent(fieldType: PetitionFieldType, content: any) {
       return content.columns as [string, string][];
     case "CHECKBOX":
       return content.choices as string[];
+    case "NUMBER":
+      return content.value as number;
     default:
       return content.text as string;
   }
@@ -245,6 +247,7 @@ export function mapReplyResponse(
     ...omit(reply, ["field"]),
     content:
       reply.content.text ?? // simple replies
+      reply.content.value ?? // numeric replies
       reply.content.choices ?? // checkbox replies
       reply.content.columns ?? // dynamic_select replies
       reply.content, // file_upload replies

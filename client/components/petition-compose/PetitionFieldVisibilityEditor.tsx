@@ -15,7 +15,10 @@ import {
 } from "@chakra-ui/react";
 import { DeleteIcon, PlusCircleIcon } from "@parallel/chakra/icons";
 import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
-import { PetitionFieldVisibilityEditor_PetitionFieldFragment } from "@parallel/graphql/__types";
+import {
+  PetitionFieldVisibilityEditor_PetitionFieldFragment,
+  PetitionLocale,
+} from "@parallel/graphql/__types";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import {
   defaultCondition,
@@ -30,16 +33,27 @@ import {
   PetitionFieldVisibilityType,
   PseudoPetitionFieldVisibilityConditionOperator,
 } from "@parallel/utils/fieldVisibility/types";
+import { getSeparator } from "@parallel/utils/intl";
 import { FieldOptions, getDynamicSelectValues } from "@parallel/utils/petitionFields";
 import { useInlineReactSelectProps, useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuList";
 import { toSelectOption } from "@parallel/utils/react-select/toSelectOption";
 import { CustomSelectProps, OptionType } from "@parallel/utils/react-select/types";
 import { ValueProps } from "@parallel/utils/ValueProps";
-import { Fragment, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  ChangeEvent,
+  FocusEvent,
+  Fragment,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, { createFilter } from "react-select";
 import { pick, uniq, zip } from "remeda";
+import { InputCleave } from "../common/InputCleave";
 
 export interface PetitionFieldVisibilityProps {
   fieldId: string;
@@ -629,6 +643,14 @@ function ConditionPredicate({
             onChange={onChange}
             isReadOnly={isReadOnly}
           />
+        ) : field.type === "NUMBER" ? (
+          <ConditionPredicateValueFloat
+            field={field}
+            showError={showError}
+            value={condition}
+            onChange={onChange}
+            isReadOnly={isReadOnly}
+          />
         ) : (
           <ConditionPredicateValueString
             field={field}
@@ -640,6 +662,39 @@ function ConditionPredicate({
         )}
       </Box>
     </>
+  );
+}
+
+function ConditionPredicateValueFloat({
+  value: condition,
+  onChange,
+  isReadOnly,
+}: ConditionPredicateProps) {
+  const intl = useIntl();
+  const [value, setValue] = useState(intl.formatNumber(condition.value as number) ?? "0");
+
+  return (
+    <InputCleave
+      size="sm"
+      backgroundColor="white"
+      value={value}
+      isDisabled={isReadOnly}
+      onChange={(event: ChangeEvent<HTMLInputElement>) => {
+        setValue(event.target.value);
+      }}
+      onBlur={(event: FocusEvent<HTMLInputElement>) => {
+        onChange({ ...condition, value: Number(event.target.rawValue) });
+      }}
+      options={{
+        numeral: true,
+        numeralDecimalMark: getSeparator(intl.locale as PetitionLocale, "decimal"),
+        delimiter: getSeparator(intl.locale as PetitionLocale, "group"),
+      }}
+      placeholder={intl.formatMessage({
+        id: "generic.enter-a-value",
+        defaultMessage: "Enter a value",
+      })}
+    />
   );
 }
 

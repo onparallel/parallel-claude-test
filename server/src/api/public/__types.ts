@@ -369,6 +369,8 @@ export type Mutation = {
   createFileUploadReply: FileUploadReplyResponse;
   /** Notifies the backend that the upload is complete. */
   createFileUploadReplyComplete: PetitionFieldReply;
+  /** Creates a reply to a numeric field. */
+  createNumericReply: PetitionFieldReply;
   /** Creates a new organization. */
   createOrganization: SupportMethodResponse;
   /** Creates a new user in the same organization as the context user */
@@ -463,6 +465,8 @@ export type Mutation = {
   publicCreateDynamicSelectReply: PublicPetitionFieldReply;
   /** Creates a reply to a file upload field. */
   publicCreateFileUploadReply: PublicCreateFileUploadReply;
+  /** Creates a reply to a numeric field. */
+  publicCreateNumericReply: PublicPetitionFieldReply;
   /** Create a petition field comment. */
   publicCreatePetitionFieldComment: PublicPetitionFieldComment;
   /** Starts an export pdf task in a recipient context */
@@ -493,6 +497,8 @@ export type Mutation = {
   publicUpdateCheckboxReply: PublicPetitionFieldReply;
   /** Updates a reply for a dynamic select field. */
   publicUpdateDynamicSelectReply: PublicPetitionFieldReply;
+  /** Updates a reply to a numeric field. */
+  publicUpdateNumericReply: PublicPetitionFieldReply;
   /** Update a petition field comment. */
   publicUpdatePetitionFieldComment: PublicPetitionFieldComment;
   /** Updates a reply to a text or select field. */
@@ -558,6 +564,8 @@ export type Mutation = {
   updateFileUploadReplyComplete: PetitionFieldReply;
   /** Updates the metadata of a public landing template. */
   updateLandingTemplateMetadata: SupportMethodResponse;
+  /** Updates a reply to a numeric field. */
+  updateNumericReply: PetitionFieldReply;
   /** Updates the onboarding status for one of the pages. */
   updateOnboardingStatus: User;
   /** Updates the logo of an organization */
@@ -733,6 +741,12 @@ export type MutationcreateFileUploadReplyArgs = {
 export type MutationcreateFileUploadReplyCompleteArgs = {
   petitionId: Scalars["GID"];
   replyId: Scalars["GID"];
+};
+
+export type MutationcreateNumericReplyArgs = {
+  fieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+  reply: Scalars["Float"];
 };
 
 export type MutationcreateOrganizationArgs = {
@@ -994,6 +1008,12 @@ export type MutationpublicCreateFileUploadReplyArgs = {
   keycode: Scalars["ID"];
 };
 
+export type MutationpublicCreateNumericReplyArgs = {
+  fieldId: Scalars["GID"];
+  keycode: Scalars["ID"];
+  value: Scalars["Float"];
+};
+
 export type MutationpublicCreatePetitionFieldCommentArgs = {
   content: Scalars["String"];
   keycode: Scalars["ID"];
@@ -1083,6 +1103,12 @@ export type MutationpublicUpdateDynamicSelectReplyArgs = {
   keycode: Scalars["ID"];
   replyId: Scalars["GID"];
   value: Array<Array<InputMaybe<Scalars["String"]>>>;
+};
+
+export type MutationpublicUpdateNumericReplyArgs = {
+  keycode: Scalars["ID"];
+  replyId: Scalars["GID"];
+  value: Scalars["Float"];
 };
 
 export type MutationpublicUpdatePetitionFieldCommentArgs = {
@@ -1268,6 +1294,12 @@ export type MutationupdateLandingTemplateMetadataArgs = {
   image?: InputMaybe<Scalars["Upload"]>;
   slug?: InputMaybe<Scalars["String"]>;
   templateId: Scalars["ID"];
+};
+
+export type MutationupdateNumericReplyArgs = {
+  petitionId: Scalars["GID"];
+  reply: Scalars["Float"];
+  replyId: Scalars["GID"];
 };
 
 export type MutationupdateOnboardingStatusArgs = {

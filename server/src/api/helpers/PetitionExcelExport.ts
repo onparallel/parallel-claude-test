@@ -26,6 +26,8 @@ export class PetitionExcelExport {
       this.textRepliesTab.addSimpleReply(field, replies);
     } else if (field.type === "CHECKBOX") {
       this.textRepliesTab.addCheckboxReply(field, replies);
+    } else if (field.type === "NUMBER") {
+      this.textRepliesTab.addNumericReply(field, replies);
     }
   }
 

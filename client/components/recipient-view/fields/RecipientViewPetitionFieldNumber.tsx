@@ -15,6 +15,7 @@ import {
   FocusEvent,
   forwardRef,
   KeyboardEvent,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -36,8 +37,8 @@ export interface RecipientViewPetitionFieldNumberProps
   > {
   isDisabled: boolean;
   onDeleteReply: (replyId: string) => void;
-  onUpdateReply: (replyId: string, value: string) => void;
-  onCreateReply: (value: string) => Promise<string | undefined>;
+  onUpdateReply: (replyId: string, value: number) => void;
+  onCreateReply: (value: number) => Promise<string | undefined>;
 }
 
 export function RecipientViewPetitionFieldNumber({
@@ -54,10 +55,11 @@ export function RecipientViewPetitionFieldNumber({
   const intl = useIntl();
 
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
-  const [value, setValue] = useState<string>("");
+  const [value, setValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const isDeletingReplyRef = useRef<Record<string, boolean>>({});
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
+  const [isInvalidReply, setIsInvalidReply] = useState<Record<string, boolean>>({});
 
   const newReplyRef = useRef<HTMLInputElement>(null);
   const replyRefs = useMultipleRefs<HTMLInputElement>();
@@ -71,7 +73,7 @@ export function RecipientViewPetitionFieldNumber({
   }
 
   const handleUpdate = useMemoFactory(
-    (replyId: string) => async (value: string) => {
+    (replyId: string) => async (value: number) => {
       await onUpdateReply(replyId, value);
     },
     [onUpdateReply]
@@ -97,6 +99,7 @@ export function RecipientViewPetitionFieldNumber({
 
       delete isDeletingReplyRef.current[replyId];
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
+      handleInvalidReply(replyId, false);
       if (field.replies.length === 1) {
         handleAddNewReply();
       }
@@ -105,7 +108,7 @@ export function RecipientViewPetitionFieldNumber({
   );
 
   const handleCreate = useDebouncedCallback(
-    async (value: string, focusCreatedReply: boolean) => {
+    async (value: number, focusCreatedReply: boolean) => {
       if (!value) {
         return;
       }
@@ -137,13 +140,23 @@ export function RecipientViewPetitionFieldNumber({
     [onCreateReply]
   );
 
+  const handleInvalidReply = (replyId: string, isInvalid: boolean) => {
+    if (isInvalid) {
+      setIsInvalidReply((curr) => ({ ...curr, [replyId]: true }));
+    } else {
+      setIsInvalidReply(({ [replyId]: _, ...curr }) => curr);
+    }
+  };
+
   const cleaveOptions = useMemo(
     () => ({
       numeral: true,
       numeralDecimalMark: getSeparator(intl.locale as PetitionLocale, "decimal"),
       delimiter: getSeparator(intl.locale as PetitionLocale, "group"),
       numeralPositiveOnly:
-        field.options.range?.min !== undefined ? field.options.range?.min >= 0 : false,
+        field.options.range?.isActive && field.options.range?.min !== undefined
+          ? field.options.range?.min >= 0
+          : false,
     }),
     [intl.locale, field.options.range?.min]
   );
@@ -153,11 +166,18 @@ export function RecipientViewPetitionFieldNumber({
     id: `reply-${field.id}-new`,
     ref: newReplyRef as any,
     isDisabled: isDisabled,
-    isInvalid: false,
+    isInvalid: isInvalidReply[field.id],
     options: cleaveOptions,
     onKeyDown: async (event: KeyboardEvent) => {
-      if (isMetaReturn(event) && field.multiple) {
-        await handleCreate.immediateIfPending(value, false);
+      const valueAsNumber = Number(event.target.rawValue);
+      if (
+        isMetaReturn(event) &&
+        field.multiple &&
+        !isNaN(valueAsNumber) &&
+        isBetweenLimits(options, valueAsNumber)
+      ) {
+        await handleCreate.immediate(valueAsNumber, true);
+        handleAddNewReply();
       } else if (event.key === "Backspace" && value === "") {
         if (field.replies.length > 0) {
           event.preventDefault();
@@ -168,18 +188,13 @@ export function RecipientViewPetitionFieldNumber({
       }
     },
     onBlur: async (event: FocusEvent<HTMLInputElement>) => {
-      console.log("CREATE - onBlur - event.target.rawValue: ", event.target.rawValue);
-      console.log("CREATE - onBlur - event.target.value: ", event.target.value);
-
       const valueAsNumber = Number(event.target.rawValue);
-      const valueAsString = event.target.value;
-
-      if (valueAsString) {
+      if (valueAsNumber) {
         if (isNaN(valueAsNumber) || !isBetweenLimits(options, valueAsNumber)) {
-          // set invalid true
+          setIsInvalidReply((curr) => ({ ...curr, [field.id]: true }));
           return;
         }
-        await handleCreate.immediateIfPending(valueAsString, false);
+        await handleCreate.immediate(valueAsNumber, true);
         handleCreate.clear();
         setShowNewReply(false);
       } else if (field.replies.length > 0) {
@@ -187,23 +202,20 @@ export function RecipientViewPetitionFieldNumber({
       }
     },
     onChange: (event: ChangeEvent<HTMLInputElement>) => {
-      console.log("CREATE - onChange - event.target.rawValue: ", event.target.rawValue);
-      console.log("CREATE - onChange - event.target.value: ", event.target.value);
-
       const valueAsNumber = Number(event.target.rawValue);
       const valueAsString = event.target.value;
 
-      if (isNaN(valueAsNumber) || valueAsString.endsWith(".")) {
+      if (isNaN(valueAsNumber)) {
         setValue(valueAsString);
         return;
       }
-      if (isSaving || !isBetweenLimits(options, valueAsNumber)) {
+      if (!isBetweenLimits(options, valueAsNumber)) {
+        setIsInvalidReply((curr) => ({ ...curr, [field.id]: true }));
         return;
-      } else {
-        // set invalid false
       }
+
+      setIsInvalidReply(({ [field.id]: _, ...curr }) => curr);
       setValue(valueAsString);
-      handleCreate(String(valueAsNumber), true);
     },
     placeholder:
       options.placeholder ??
@@ -229,7 +241,11 @@ export function RecipientViewPetitionFieldNumber({
       onDownloadAttachment={onDownloadAttachment}
     >
       <Flex flexWrap="wrap" alignItems="center">
-        <Text fontSize="sm" marginRight={2}>
+        <Text
+          fontSize="sm"
+          marginRight={2}
+          color={Object.keys(isInvalidReply).length ? "red.500" : undefined}
+        >
           <FormattedMessage
             id="component.recipient-view-petition-field-number.only-numbers"
             defaultMessage="Only numbers"
@@ -289,6 +305,7 @@ export function RecipientViewPetitionFieldNumber({
                   onUpdate={handleUpdate(reply.id)}
                   onDelete={handleDelete(reply.id)}
                   onAddNewReply={handleAddNewReply}
+                  onInvalid={handleInvalidReply}
                 />
               </motion.li>
             ))}
@@ -311,31 +328,37 @@ interface RecipientViewPetitionFieldReplyNumberProps {
   field: RecipientViewPetitionFieldCard_PetitionFieldSelection;
   reply: RecipientViewPetitionFieldCard_PetitionFieldReplySelection;
   isDisabled: boolean;
-  onUpdate: (content: string) => Promise<void>;
+  onUpdate: (content: number) => Promise<void>;
   onDelete: (focusPrev?: boolean) => void;
   onAddNewReply: () => void;
+  onInvalid: (replyId: string, value: boolean) => void;
 }
 
 export const RecipientViewPetitionFieldReplyNumber = forwardRef<
   HTMLInputElement,
   RecipientViewPetitionFieldReplyNumberProps
 >(function RecipientViewPetitionFieldReplyNumber(
-  { field, reply, isDisabled, onUpdate, onDelete, onAddNewReply },
+  { field, reply, isDisabled, onUpdate, onDelete, onAddNewReply, onInvalid },
   ref
 ) {
-  const intl = useIntl();
-  const [value, setValue] = useState(
-    reply.content.text ? intl.formatNumber(reply.content.text) : ""
-  );
-  const [isSaving, setIsSaving] = useState(false);
-  const [isInvalid, setIsInvalid] = useState(false);
   const options = field.options as FieldOptions["NUMBER"];
 
+  const intl = useIntl();
+  const [value, setValue] = useState(
+    reply.content.value ? intl.formatNumber(reply.content.value) : ""
+  );
+  const [isSaving, setIsSaving] = useState(false);
+  const [isInvalid, setIsInvalid] = useState(!isBetweenLimits(options, reply.content.value));
+
+  useEffect(() => {
+    onInvalid(reply.id, isInvalid);
+  }, [isInvalid]);
+
   const debouncedUpdateReply = useDebouncedCallback(
-    async (value: string) => {
+    async (value: number) => {
       setIsSaving(true);
       try {
-        await onUpdate(value.trim());
+        await onUpdate(value);
       } catch {}
       setIsSaving(false);
     },
@@ -349,7 +372,9 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
       numeralDecimalMark: getSeparator(intl.locale as PetitionLocale, "decimal"),
       delimiter: getSeparator(intl.locale as PetitionLocale, "group"),
       numeralPositiveOnly:
-        field.options.range?.min !== undefined ? Math.sign(field.options.range?.min) > -1 : false,
+        field.options.range?.isActive && field.options.range?.min !== undefined
+          ? field.options.range?.min >= 0
+          : false,
     }),
     [intl.locale, field.options.range?.min]
   );
@@ -372,44 +397,37 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
       }
     },
     onBlur: async (event: FocusEvent<HTMLInputElement>) => {
-      console.log("Update - onBlur - event.target.rawValue: ", event.target.rawValue);
-      console.log("Update - onBlur - event.target.value: ", event.target.value);
-
       const valueAsNumber = Number(event.target.rawValue);
       const valueAsString = event.target.value;
 
-      if (valueAsString) {
+      if (valueAsNumber !== reply.content.value) {
         if (isNaN(valueAsNumber) || !isBetweenLimits(options, valueAsNumber)) {
           setIsInvalid(true);
           return;
         }
-        await debouncedUpdateReply.immediateIfPending(event.target.rawValue);
+        await debouncedUpdateReply.immediate(valueAsNumber);
         debouncedUpdateReply.clear();
-      } else {
+      } else if (!valueAsString) {
         debouncedUpdateReply.clear();
         onDelete();
       }
     },
     onChange: (event: ChangeEvent<HTMLInputElement>) => {
-      console.log("Update - onChange - event.target.rawValue: ", event.target.rawValue);
-      console.log("Update - onChange - event.target.value: ", event.target.value);
-
       const valueAsNumber = Number(event.target.rawValue);
       const valueAsString = event.target.value;
 
-      if (isNaN(valueAsNumber) || valueAsString.endsWith(".")) {
+      if (isNaN(valueAsNumber)) {
         setValue(valueAsString);
         return;
       }
+
       if (!isBetweenLimits(options, valueAsNumber)) {
+        setIsInvalid(true);
         return;
-      } else {
-        setIsInvalid(false);
       }
-      if (valueAsString !== value) {
-        setValue(valueAsString);
-        debouncedUpdateReply(String(valueAsNumber));
-      }
+
+      setIsInvalid(false);
+      setValue(valueAsString);
     },
     placeholder:
       options.placeholder ??

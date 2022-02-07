@@ -129,7 +129,9 @@ export class ExportRepliesRunner extends TaskRunner<"EXPORT_REPLIES"> {
           }
         }
       } else if (
-        ["TEXT", "SHORT_TEXT", "SELECT", "DYNAMIC_SELECT", "CHECKBOX"].includes(field.type)
+        ["TEXT", "SHORT_TEXT", "SELECT", "DYNAMIC_SELECT", "CHECKBOX", "NUMBER"].includes(
+          field.type
+        )
       ) {
         excelWorkbook.addPetitionFieldReply(field, field.replies);
       }

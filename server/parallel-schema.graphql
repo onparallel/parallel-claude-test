@@ -574,6 +574,11 @@ type Mutation {
   createFileUploadReplyComplete(petitionId: GID!, replyId: GID!): PetitionFieldReply!
 
   """
+  Creates a reply to a numeric field.
+  """
+  createNumericReply(fieldId: GID!, petitionId: GID!, reply: Float!): PetitionFieldReply!
+
+  """
   Creates a new organization.
   """
   createOrganization(
@@ -939,6 +944,11 @@ type Mutation {
   ): PublicCreateFileUploadReply!
 
   """
+  Creates a reply to a numeric field.
+  """
+  publicCreateNumericReply(fieldId: GID!, keycode: ID!, value: Float!): PublicPetitionFieldReply!
+
+  """
   Create a petition field comment.
   """
   publicCreatePetitionFieldComment(
@@ -1056,6 +1066,11 @@ type Mutation {
     replyId: GID!
     value: [[String]!]!
   ): PublicPetitionFieldReply!
+
+  """
+  Updates a reply to a numeric field.
+  """
+  publicUpdateNumericReply(keycode: ID!, replyId: GID!, value: Float!): PublicPetitionFieldReply!
 
   """
   Update a petition field comment.
@@ -1331,6 +1346,11 @@ type Mutation {
     """
     templateId: ID!
   ): SupportMethodResponse!
+
+  """
+  Updates a reply to a numeric field.
+  """
+  updateNumericReply(petitionId: GID!, reply: Float!, replyId: GID!): PetitionFieldReply!
 
   """
   Updates the onboarding status for one of the pages.

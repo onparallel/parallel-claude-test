@@ -31,10 +31,12 @@ import {
   useCreateCheckboxReply,
   useCreateDynamicSelectReply,
   useCreateFileUploadReply,
+  useCreateNumericReply,
   useCreateSimpleReply,
   useDeletePetitionReply,
   useUpdateCheckboxReply,
   useUpdateDynamicSelectReply,
+  useUpdateNumericReply,
   useUpdateSimpleReply,
 } from "./clientMutations";
 import { usePreviewPetitionFieldCommentsDialog } from "./dialogs/PreviewPetitionFieldCommentsDialog";
@@ -137,6 +139,39 @@ export function PreviewPetitionField({
       return;
     },
     [createSimpleReply]
+  );
+
+  const updateNumericReply = useUpdateNumericReply();
+  const handleUpdateNumericReply = useCallback(
+    async (replyId: string, reply: number) => {
+      try {
+        await updateNumericReply({
+          petitionId,
+          replyId,
+          reply,
+          isCacheOnly,
+        });
+      } catch {}
+    },
+    [updateNumericReply]
+  );
+
+  const createNumericReply = useCreateNumericReply();
+  const handleCreateNumericReply = useCallback(
+    async (reply: number) => {
+      try {
+        const res = await createNumericReply({
+          petitionId,
+          fieldId,
+          reply,
+          isCacheOnly,
+        });
+        return res?.id;
+      } catch {}
+
+      return;
+    },
+    [createNumericReply]
   );
 
   const updateCheckboxReply = useUpdateCheckboxReply();
@@ -302,8 +337,8 @@ export function PreviewPetitionField({
       {...props}
       {...commonProps}
       onDeleteReply={handleDeletePetitionReply}
-      onUpdateReply={handleUpdateSimpleReply}
-      onCreateReply={handleCreateSimpleReply}
+      onUpdateReply={handleUpdateNumericReply}
+      onCreateReply={handleCreateNumericReply}
     />
   ) : null;
 }

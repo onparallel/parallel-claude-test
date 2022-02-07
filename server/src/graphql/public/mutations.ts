@@ -2,6 +2,7 @@ import { ApolloError } from "apollo-server-core";
 import { differenceInDays } from "date-fns";
 import {
   booleanArg,
+  floatArg,
   idArg,
   list,
   mutationField,
@@ -339,7 +340,7 @@ export const publicCreateSimpleReply = mutationField("publicCreateSimpleReply", 
     authenticatePublicAccess("keycode"),
     and(
       fieldBelongsToAccess("fieldId"),
-      fieldHasType("fieldId", ["TEXT", "SHORT_TEXT", "SELECT", "NUMBER"]),
+      fieldHasType("fieldId", ["TEXT", "SHORT_TEXT", "SELECT"]),
       fieldCanBeReplied("fieldId")
     )
   ),
@@ -351,17 +352,6 @@ export const publicCreateSimpleReply = mutationField("publicCreateSimpleReply", 
         const options = field.options.values as Maybe<string[]>;
         if (!options?.includes(args.value)) {
           throw new InvalidOptionError(info, "reply", "Invalid option");
-        }
-        break;
-      }
-      case "NUMBER": {
-        const options = field.options;
-        const value = Number(args.value);
-        const min = options.range?.min ? Number(options.range?.min) : undefined;
-        const max = options.range?.max ? Number(options.range?.max) : undefined;
-
-        if (isNaN(value) || (options.range.isActive && !isInRange(value, min, max))) {
-          throw new InvalidOptionError(info, "reply", "Invalid number");
         }
         break;
       }
@@ -395,7 +385,7 @@ export const publicUpdateSimpleReply = mutationField("publicUpdateSimpleReply", 
     authenticatePublicAccess("keycode"),
     and(
       replyBelongsToAccess("replyId"),
-      replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT", "NUMBER"]),
+      replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT"]),
       replyCanBeUpdated("replyId")
     )
   ),
@@ -410,13 +400,98 @@ export const publicUpdateSimpleReply = mutationField("publicUpdateSimpleReply", 
         }
         break;
       }
+      default:
+        break;
+    }
+  },
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.updatePetitionFieldReply(
+      args.replyId,
+      {
+        petition_access_id: ctx.access!.id,
+        user_id: null,
+        content: { text: args.value },
+        status: "PENDING",
+      },
+      ctx.access!
+    );
+  },
+});
+
+export const publicCreateNumericReply = mutationField("publicCreateNumericReply", {
+  description: "Creates a reply to a numeric field.",
+  type: "PublicPetitionFieldReply",
+  args: {
+    keycode: nonNull(idArg()),
+    fieldId: nonNull(globalIdArg("PetitionField")),
+    value: nonNull(floatArg()),
+  },
+  authorize: chain(
+    authenticatePublicAccess("keycode"),
+    and(
+      fieldBelongsToAccess("fieldId"),
+      fieldHasType("fieldId", ["NUMBER"]),
+      fieldCanBeReplied("fieldId")
+    )
+  ),
+  validateArgs: async (_, args, ctx, info) => {
+    const field = (await ctx.petitions.loadField(args.fieldId))!;
+
+    switch (field.type) {
       case "NUMBER": {
         const options = field.options;
-        const value = Number(args.value);
         const min = options.range?.min ? Number(options.range?.min) : undefined;
         const max = options.range?.max ? Number(options.range?.max) : undefined;
 
-        if (isNaN(value) || (options.range.isActive && !isInRange(value, min, max))) {
+        if (isNaN(args.value) || (options.range.isActive && !isInRange(args.value, min, max))) {
+          throw new InvalidOptionError(info, "reply", "Invalid number");
+        }
+        break;
+      }
+      default:
+        break;
+    }
+  },
+  resolve: async (_, args, ctx) => {
+    const field = (await ctx.petitions.loadField(args.fieldId))!;
+    return await ctx.petitions.createPetitionFieldReply(
+      {
+        petition_field_id: args.fieldId,
+        petition_access_id: ctx.access!.id,
+        type: field.type,
+        content: { value: args.value },
+      },
+      ctx.contact!
+    );
+  },
+});
+
+export const publicUpdateNumericReply = mutationField("publicUpdateNumericReply", {
+  description: "Updates a reply to a numeric field.",
+  type: "PublicPetitionFieldReply",
+  args: {
+    keycode: nonNull(idArg()),
+    replyId: nonNull(globalIdArg("PetitionFieldReply")),
+    value: nonNull(floatArg()),
+  },
+  authorize: chain(
+    authenticatePublicAccess("keycode"),
+    and(
+      replyBelongsToAccess("replyId"),
+      replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT", "NUMBER"]),
+      replyCanBeUpdated("replyId")
+    )
+  ),
+  validateArgs: async (_, args, ctx, info) => {
+    const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
+
+    switch (field.type) {
+      case "NUMBER": {
+        const options = field.options;
+        const min = options.range?.min ? Number(options.range?.min) : undefined;
+        const max = options.range?.max ? Number(options.range?.max) : undefined;
+
+        if (isNaN(args.value) || (options.range.isActive && !isInRange(args.value, min, max))) {
           throw new InvalidOptionError(info, "reply", "Invalid number");
         }
         break;
@@ -431,7 +506,7 @@ export const publicUpdateSimpleReply = mutationField("publicUpdateSimpleReply", 
       {
         petition_access_id: ctx.access!.id,
         user_id: null,
-        content: { text: args.value },
+        content: { value: args.value },
         status: "PENDING",
       },
       ctx.access!
