@@ -1031,8 +1031,8 @@
   },
   {
     "term": "component.notification-signature-cancelled.no-credits-left.body",
-    "definition": "The eSignature could not be started because you hit your plan’s limit.",
-    "context": "The eSignature could not be started because you hit your plan’s limit."
+    "definition": "The eSignature could not be started because you reached your plan’s limit.",
+    "context": "The eSignature could not be started because you reached your plan’s limit."
   },
   {
     "term": "component.notification-signature-completed.body",

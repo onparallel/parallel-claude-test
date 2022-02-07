@@ -177,12 +177,12 @@
   {
     "term": "generic.action-required.org-last-signature-credit-used",
     "definition": "Has alcanzado tu límite de firmas",
-    "context": "You hit your plan's signatures limit"
+    "context": "You reached your plan's signatures limit"
   },
   {
     "term": "generic.action-required.signature-cancelled-no-credits-left",
     "definition": "Firma no iniciada",
-    "context": "You hit your plan's signatures limit"
+    "context": "You reached your plan's signatures limit"
   },
   {
     "term": "generic.complete-information-button",
@@ -317,12 +317,12 @@
   {
     "term": "org-last-signature-credit-used.subject",
     "definition": "Has consumido tu límite de firma",
-    "context": "You hit your signatures limit"
+    "context": "You reached your signatures limit"
   },
   {
     "term": "org-last-signature-credit-used.text",
     "definition": "Parece que Parallel está ayudándote a firmar muchos de tus documentos, y es que ya <b>has alcanzado tu límite de firmas</b>.",
-    "context": "It seems that Parallel is helping you sign many of your documents, and you already <b>hit your signature limit</b>."
+    "context": "It seems that Parallel is helping you sign many of your documents, and you already <b>reached your signature limit</b>."
   },
   {
     "term": "org-last-signature-credit-used.text-2",
@@ -492,7 +492,7 @@
   {
     "term": "signature-cancelled-no-credits-left.intro-text",
     "definition": "No se ha podido iniciar el siguiente proceso de firma enviado a través de {signatureProvider} por haber alcanzado tu límite de firmas.",
-    "context": "The following signing process sent through {signatureProvider} could not be started because you hit your plan's signatures limit."
+    "context": "The following signing process sent through {signatureProvider} could not be started because you reached your plan's signatures limit."
   },
   {
     "term": "signature-cancelled-no-credits-left.subject",

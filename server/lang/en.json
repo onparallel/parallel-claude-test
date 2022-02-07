@@ -176,13 +176,13 @@
   },
   {
     "term": "generic.action-required.org-last-signature-credit-used",
-    "definition": "You hit your plan's signatures limit",
-    "context": "You hit your plan's signatures limit"
+    "definition": "You reached your plan's signatures limit",
+    "context": "You reached your plan's signatures limit"
   },
   {
     "term": "generic.action-required.signature-cancelled-no-credits-left",
-    "definition": "You hit your plan's signatures limit",
-    "context": "You hit your plan's signatures limit"
+    "definition": "You reached your plan's signatures limit",
+    "context": "You reached your plan's signatures limit"
   },
   {
     "term": "generic.complete-information-button",
@@ -316,13 +316,13 @@
   },
   {
     "term": "org-last-signature-credit-used.subject",
-    "definition": "You hit your signatures limit",
-    "context": "You hit your signatures limit"
+    "definition": "You reached your signatures limit",
+    "context": "You reached your signatures limit"
   },
   {
     "term": "org-last-signature-credit-used.text",
-    "definition": "It seems that Parallel is helping you sign many of your documents, and you already <b>hit your signature limit</b>.",
-    "context": "It seems that Parallel is helping you sign many of your documents, and you already <b>hit your signature limit</b>."
+    "definition": "It seems that Parallel is helping you sign many of your documents, and you already <b>reached your signature limit</b>.",
+    "context": "It seems that Parallel is helping you sign many of your documents, and you already <b>reached your signature limit</b>."
   },
   {
     "term": "org-last-signature-credit-used.text-2",
@@ -491,8 +491,8 @@
   },
   {
     "term": "signature-cancelled-no-credits-left.intro-text",
-    "definition": "The following signing process sent through {signatureProvider} could not be started because you hit your plan's signatures limit.",
-    "context": "The following signing process sent through {signatureProvider} could not be started because you hit your plan's signatures limit."
+    "definition": "The following signing process sent through {signatureProvider} could not be started because you reached your plan's signatures limit.",
+    "context": "The following signing process sent through {signatureProvider} could not be started because you reached your plan's signatures limit."
   },
   {
     "term": "signature-cancelled-no-credits-left.subject",

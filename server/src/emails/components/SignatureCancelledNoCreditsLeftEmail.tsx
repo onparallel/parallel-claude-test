@@ -42,7 +42,7 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
       **${intl
         .formatMessage({
           id: "generic.action-required.signature-cancelled-no-credits-left",
-          defaultMessage: "You hit your plan's signatures limit",
+          defaultMessage: "You reached your plan's signatures limit",
         })
         .toUpperCase()}**
 
@@ -52,7 +52,7 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
         {
           id: "signature-cancelled-no-credits-left.intro-text",
           defaultMessage:
-            "The following signing process sent through {signatureProvider} could not be started because you hit your plan's signatures limit.",
+            "The following signing process sent through {signatureProvider} could not be started because you reached your plan's signatures limit.",
         },
         { signatureProvider }
       )}
@@ -97,7 +97,7 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
               <MjmlText align="center" color="#153E75" fontWeight={600} textTransform="uppercase">
                 <FormattedMessage
                   id="generic.action-required.signature-cancelled-no-credits-left"
-                  defaultMessage="You hit your plan's signatures limit"
+                  defaultMessage="You reached your plan's signatures limit"
                 />
               </MjmlText>
             </MjmlColumn>
@@ -110,7 +110,7 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
             <MjmlText>
               <FormattedMessage
                 id="signature-cancelled-no-credits-left.intro-text"
-                defaultMessage="The following signing process sent through {signatureProvider} could not be started because you hit your plan's signatures limit."
+                defaultMessage="The following signing process sent through {signatureProvider} could not be started because you reached your plan's signatures limit."
                 values={{ signatureProvider }}
               />
             </MjmlText>

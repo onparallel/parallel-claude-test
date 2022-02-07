@@ -24,7 +24,7 @@ const email: Email<SharedSignatureOutOfCreditsEmailProps> = {
     return used === total
       ? intl.formatMessage({
           id: "org-last-signature-credit-used.subject",
-          defaultMessage: "You hit your signatures limit",
+          defaultMessage: "You reached your signatures limit",
         })
       : intl.formatMessage(
           {
@@ -41,7 +41,7 @@ const email: Email<SharedSignatureOutOfCreditsEmailProps> = {
           ? intl
               .formatMessage({
                 id: "generic.action-required.org-last-signature-credit-used",
-                defaultMessage: "You hit your plan's signatures limit",
+                defaultMessage: "You reached your plan's signatures limit",
               })
               .toUpperCase()
           : intl
@@ -90,7 +90,7 @@ ${intl.formatMessage(
               {
                 id: "org-last-signature-credit-used.text",
                 defaultMessage:
-                  "It seems that Parallel is helping you sign many of your documents, and you already <b>hit your signature limit</b>.",
+                  "It seems that Parallel is helping you sign many of your documents, and you already <b>reached your signature limit</b>.",
               },
               { b: (chunks: any[]) => chunks }
             )}
@@ -130,7 +130,7 @@ ${intl.formatMessage(
                 {used === total ? (
                   <FormattedMessage
                     id="generic.action-required.org-last-signature-credit-used"
-                    defaultMessage="You hit your plan's signatures limit"
+                    defaultMessage="You reached your plan's signatures limit"
                   />
                 ) : (
                   <FormattedMessage
@@ -181,7 +181,7 @@ ${intl.formatMessage(
                 <MjmlText lineHeight="24px">
                   <FormattedMessage
                     id="org-last-signature-credit-used.text"
-                    defaultMessage="It seems that Parallel is helping you sign many of your documents, and you already <b>hit your signature limit</b>."
+                    defaultMessage="It seems that Parallel is helping you sign many of your documents, and you already <b>reached your signature limit</b>."
                     values={{
                       b: (chunks: any[]) => <b>{chunks}</b>,
                     }}
