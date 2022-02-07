@@ -12,7 +12,7 @@ const POLL_INTERVAL = 10000;
 export function usePetitionSignaturesCardPolling(
   petition: PetitionSignaturesCard_PetitionFragment
 ) {
-  const current = petition.signatureRequests[0] as typeof petition.signatureRequests[0] | undefined;
+  const current = petition.signatureRequests.at(0);
   const { startPolling, stopPolling } = useQuery<
     PetitionSignaturesCardPolling_petitionQuery,
     PetitionSignaturesCardPolling_petitionQueryVariables
