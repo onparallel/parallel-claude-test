@@ -280,12 +280,16 @@ function _PetitionSettings({
     assertTypename(petition, "PetitionTemplate");
     if (enable) {
       try {
-        const { permissions } = await showTemplateDefaultPermissionsDialog({
+        await showTemplateDefaultPermissionsDialog({
+          userId: user.id,
           permissions: petition.defaultPermissions,
           publicLink: petition.publicLink,
-        });
-        await updateTemplateDefaultPermissions({
-          variables: { templateId: petition.id, permissions },
+          onUpdatePermissions: async (permissions) => {
+            const { data } = await updateTemplateDefaultPermissions({
+              variables: { templateId: petition.id, permissions },
+            });
+            return data!.updateTemplateDefaultPermissions.defaultPermissions;
+          },
         });
       } catch {}
     } else {
@@ -489,7 +493,7 @@ function _PetitionSettings({
           label={
             <FormattedMessage
               id="component.petition-settings.share-automatically"
-              defaultMessage="Share automatically"
+              defaultMessage="Assign automatically to"
             />
           }
           description={
@@ -637,6 +641,7 @@ function _PetitionSettings({
 const fragments = {
   User: gql`
     fragment PetitionSettings_User on User {
+      id
       hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
       hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
       ...TestModeSignatureBadge_User

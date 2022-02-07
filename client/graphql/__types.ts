@@ -3262,6 +3262,7 @@ export type TaskStatus = "COMPLETED" | "ENQUEUED" | "FAILED" | "PROCESSING";
 export interface TemplateDefaultPermission {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
   /** wether user is will be subscribed or not to emails and alerts of the generated petition */
   isSubscribed: Scalars["Boolean"];
   /** The type of the permission. */
@@ -3277,6 +3278,7 @@ export interface TemplateDefaultUserGroupPermission extends TemplateDefaultPermi
   createdAt: Scalars["DateTime"];
   /** The group linked to the permission */
   group: UserGroup;
+  id: Scalars["GID"];
   /** wether user is will be subscribed or not to emails and alerts of the generated petition */
   isSubscribed: Scalars["Boolean"];
   /** The type of the permission. */
@@ -3290,6 +3292,7 @@ export interface TemplateDefaultUserPermission extends TemplateDefaultPermission
   __typename?: "TemplateDefaultUserPermission";
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
   /** wether user is will be subscribed or not to emails and alerts of the generated petition */
   isSubscribed: Scalars["Boolean"];
   /** The type of the permission. */
@@ -3471,7 +3474,7 @@ export type UserOrUserGroup = User | UserGroup;
 
 export interface UserOrUserGroupPermissionInput {
   isSubscribed: Scalars["Boolean"];
-  permissionType: PetitionPermissionTypeRW;
+  permissionType: PetitionPermissionType;
   userGroupId?: InputMaybe<Scalars["GID"]>;
   userId?: InputMaybe<Scalars["GID"]>;
 }
@@ -6654,14 +6657,6 @@ export type ConfirmPetitionSignersDialog_PetitionSignerFragment = {
   lastName?: string | null;
 };
 
-export type PetitionPermissionRow_UserFragment = {
-  __typename?: "User";
-  fullName?: string | null;
-  email: string;
-  avatarUrl?: string | null;
-  initials?: string | null;
-};
-
 export type PetitionSharingModal_Petition_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
@@ -7304,11 +7299,13 @@ export type TemplateDefaultPermissionsDialog_PublicPetitionLinkFragment = {
 export type TemplateDefaultPermissionsDialog_TemplateDefaultPermission_TemplateDefaultUserGroupPermission_Fragment =
   {
     __typename?: "TemplateDefaultUserGroupPermission";
-    permissionType: PetitionPermissionType;
+    id: string;
     isSubscribed: boolean;
+    permissionType: PetitionPermissionType;
     group: {
       __typename?: "UserGroup";
       id: string;
+      initials: string;
       name: string;
       members: Array<{
         __typename?: "UserGroupMember";
@@ -7320,14 +7317,72 @@ export type TemplateDefaultPermissionsDialog_TemplateDefaultPermission_TemplateD
 export type TemplateDefaultPermissionsDialog_TemplateDefaultPermission_TemplateDefaultUserPermission_Fragment =
   {
     __typename?: "TemplateDefaultUserPermission";
-    permissionType: PetitionPermissionType;
+    id: string;
     isSubscribed: boolean;
-    user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+    permissionType: PetitionPermissionType;
+    user: {
+      __typename?: "User";
+      id: string;
+      fullName?: string | null;
+      email: string;
+      avatarUrl?: string | null;
+      initials?: string | null;
+    };
   };
 
 export type TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragment =
   | TemplateDefaultPermissionsDialog_TemplateDefaultPermission_TemplateDefaultUserGroupPermission_Fragment
   | TemplateDefaultPermissionsDialog_TemplateDefaultPermission_TemplateDefaultUserPermission_Fragment;
+
+export type TemplateDefaultUserGroupPermissionRow_UserGroupFragment = {
+  __typename?: "UserGroup";
+  id: string;
+  initials: string;
+  name: string;
+  members: Array<{
+    __typename?: "UserGroupMember";
+    user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+  }>;
+};
+
+export type TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment = {
+  __typename?: "TemplateDefaultUserGroupPermission";
+  id: string;
+  permissionType: PetitionPermissionType;
+  group: {
+    __typename?: "UserGroup";
+    id: string;
+    initials: string;
+    name: string;
+    members: Array<{
+      __typename?: "UserGroupMember";
+      user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+    }>;
+  };
+};
+
+export type TemplateDefaultUserPermissionRow_UserFragment = {
+  __typename?: "User";
+  id: string;
+  fullName?: string | null;
+  email: string;
+  avatarUrl?: string | null;
+  initials?: string | null;
+};
+
+export type TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment = {
+  __typename?: "TemplateDefaultUserPermission";
+  id: string;
+  permissionType: PetitionPermissionType;
+  user: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    email: string;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  };
+};
 
 export type TemplateDetailsModal_UserFragment = {
   __typename?: "User";
@@ -7604,6 +7659,7 @@ export type PetitionFieldVisibilityEditor_PetitionFieldFragment = {
 
 export type PetitionSettings_UserFragment = {
   __typename?: "User";
+  id: string;
   firstName?: string | null;
   lastName?: string | null;
   email: string;
@@ -7716,11 +7772,13 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   defaultPermissions: Array<
     | {
         __typename?: "TemplateDefaultUserGroupPermission";
-        permissionType: PetitionPermissionType;
+        id: string;
         isSubscribed: boolean;
+        permissionType: PetitionPermissionType;
         group: {
           __typename?: "UserGroup";
           id: string;
+          initials: string;
           name: string;
           members: Array<{
             __typename?: "UserGroupMember";
@@ -7730,9 +7788,17 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
       }
     | {
         __typename?: "TemplateDefaultUserPermission";
-        permissionType: PetitionPermissionType;
+        id: string;
         isSubscribed: boolean;
-        user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+        permissionType: PetitionPermissionType;
+        user: {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null;
+          email: string;
+          avatarUrl?: string | null;
+          initials?: string | null;
+        };
       }
   >;
   organization: { __typename?: "Organization"; customHost?: string | null };
@@ -7874,11 +7940,13 @@ export type PetitionSettings_updateTemplateDefaultPermissionsMutation = {
     defaultPermissions: Array<
       | {
           __typename?: "TemplateDefaultUserGroupPermission";
-          permissionType: PetitionPermissionType;
+          id: string;
           isSubscribed: boolean;
+          permissionType: PetitionPermissionType;
           group: {
             __typename?: "UserGroup";
             id: string;
+            initials: string;
             name: string;
             members: Array<{
               __typename?: "UserGroupMember";
@@ -7888,9 +7956,17 @@ export type PetitionSettings_updateTemplateDefaultPermissionsMutation = {
         }
       | {
           __typename?: "TemplateDefaultUserPermission";
-          permissionType: PetitionPermissionType;
+          id: string;
           isSubscribed: boolean;
-          user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+          permissionType: PetitionPermissionType;
+          user: {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null;
+            email: string;
+            avatarUrl?: string | null;
+            initials?: string | null;
+          };
         }
     >;
   };
@@ -13473,11 +13549,13 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   defaultPermissions: Array<
     | {
         __typename?: "TemplateDefaultUserGroupPermission";
-        permissionType: PetitionPermissionType;
+        id: string;
         isSubscribed: boolean;
+        permissionType: PetitionPermissionType;
         group: {
           __typename?: "UserGroup";
           id: string;
+          initials: string;
           name: string;
           members: Array<{
             __typename?: "UserGroupMember";
@@ -13487,9 +13565,17 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
       }
     | {
         __typename?: "TemplateDefaultUserPermission";
-        permissionType: PetitionPermissionType;
+        id: string;
         isSubscribed: boolean;
-        user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+        permissionType: PetitionPermissionType;
+        user: {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null;
+          email: string;
+          avatarUrl?: string | null;
+          initials?: string | null;
+        };
       }
   >;
   organization: { __typename?: "Organization"; customHost?: string | null };
@@ -13721,11 +13807,13 @@ export type PetitionCompose_updatePetitionMutation = {
         defaultPermissions: Array<
           | {
               __typename?: "TemplateDefaultUserGroupPermission";
-              permissionType: PetitionPermissionType;
+              id: string;
               isSubscribed: boolean;
+              permissionType: PetitionPermissionType;
               group: {
                 __typename?: "UserGroup";
                 id: string;
+                initials: string;
                 name: string;
                 members: Array<{
                   __typename?: "UserGroupMember";
@@ -13740,9 +13828,17 @@ export type PetitionCompose_updatePetitionMutation = {
             }
           | {
               __typename?: "TemplateDefaultUserPermission";
-              permissionType: PetitionPermissionType;
+              id: string;
               isSubscribed: boolean;
-              user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+              permissionType: PetitionPermissionType;
+              user: {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null;
+                email: string;
+                avatarUrl?: string | null;
+                initials?: string | null;
+              };
             }
         >;
         organization: { __typename?: "Organization"; customHost?: string | null };
@@ -14309,11 +14405,13 @@ export type PetitionCompose_petitionQuery = {
         defaultPermissions: Array<
           | {
               __typename?: "TemplateDefaultUserGroupPermission";
-              permissionType: PetitionPermissionType;
+              id: string;
               isSubscribed: boolean;
+              permissionType: PetitionPermissionType;
               group: {
                 __typename?: "UserGroup";
                 id: string;
+                initials: string;
                 name: string;
                 members: Array<{
                   __typename?: "UserGroupMember";
@@ -14328,9 +14426,17 @@ export type PetitionCompose_petitionQuery = {
             }
           | {
               __typename?: "TemplateDefaultUserPermission";
-              permissionType: PetitionPermissionType;
+              id: string;
               isSubscribed: boolean;
-              user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+              permissionType: PetitionPermissionType;
+              user: {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null;
+                email: string;
+                avatarUrl?: string | null;
+                initials?: string | null;
+              };
             }
         >;
         organization: { __typename?: "Organization"; customHost?: string | null };
@@ -20331,24 +20437,40 @@ export const PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc = gql`
   }
   ${UserSelect_UserFragmentDoc}
 ` as unknown as DocumentNode<PublicLinkSettingsDialog_PublicPetitionLinkFragment, unknown>;
-export const PetitionPermissionRow_UserFragmentDoc = gql`
-  fragment PetitionPermissionRow_User on User {
+export const TemplateDefaultUserPermissionRow_UserFragmentDoc = gql`
+  fragment TemplateDefaultUserPermissionRow_User on User {
+    id
     fullName
     email
+    ...UserSelect_User
     ...UserAvatar_User
   }
+  ${UserSelect_UserFragmentDoc}
   ${UserAvatar_UserFragmentDoc}
-` as unknown as DocumentNode<PetitionPermissionRow_UserFragment, unknown>;
+` as unknown as DocumentNode<TemplateDefaultUserPermissionRow_UserFragment, unknown>;
 export const TemplateDefaultPermissionsDialog_PublicPetitionLinkFragmentDoc = gql`
   fragment TemplateDefaultPermissionsDialog_PublicPetitionLink on PublicPetitionLink {
     isActive
     owner {
       id
-      ...PetitionPermissionRow_User
+      ...TemplateDefaultUserPermissionRow_User
     }
   }
-  ${PetitionPermissionRow_UserFragmentDoc}
+  ${TemplateDefaultUserPermissionRow_UserFragmentDoc}
 ` as unknown as DocumentNode<TemplateDefaultPermissionsDialog_PublicPetitionLinkFragment, unknown>;
+export const TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragmentDoc = gql`
+  fragment TemplateDefaultUserPermissionRow_TemplateDefaultUserPermission on TemplateDefaultUserPermission {
+    id
+    permissionType
+    user {
+      ...TemplateDefaultUserPermissionRow_User
+    }
+  }
+  ${TemplateDefaultUserPermissionRow_UserFragmentDoc}
+` as unknown as DocumentNode<
+  TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment,
+  unknown
+>;
 export const UserSelect_UserGroupFragmentDoc = gql`
   fragment UserSelect_UserGroup on UserGroup {
     id
@@ -20361,23 +20483,43 @@ export const UserSelect_UserGroupFragmentDoc = gql`
   }
   ${UserSelect_UserFragmentDoc}
 ` as unknown as DocumentNode<UserSelect_UserGroupFragment, unknown>;
+export const TemplateDefaultUserGroupPermissionRow_UserGroupFragmentDoc = gql`
+  fragment TemplateDefaultUserGroupPermissionRow_UserGroup on UserGroup {
+    id
+    initials
+    name
+    ...UserSelect_UserGroup
+  }
+  ${UserSelect_UserGroupFragmentDoc}
+` as unknown as DocumentNode<TemplateDefaultUserGroupPermissionRow_UserGroupFragment, unknown>;
+export const TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragmentDoc =
+  gql`
+    fragment TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermission on TemplateDefaultUserGroupPermission {
+      id
+      permissionType
+      group {
+        ...TemplateDefaultUserGroupPermissionRow_UserGroup
+      }
+    }
+    ${TemplateDefaultUserGroupPermissionRow_UserGroupFragmentDoc}
+  ` as unknown as DocumentNode<
+    TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment,
+    unknown
+  >;
 export const TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragmentDoc = gql`
   fragment TemplateDefaultPermissionsDialog_TemplateDefaultPermission on TemplateDefaultPermission {
+    id
+    isSubscribed
+    permissionType
     ... on TemplateDefaultUserPermission {
-      user {
-        ...UserSelect_User
-      }
+      ...TemplateDefaultUserPermissionRow_TemplateDefaultUserPermission
     }
     ... on TemplateDefaultUserGroupPermission {
-      group {
-        ...UserSelect_UserGroup
-      }
+      ...TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermission
     }
-    permissionType
-    isSubscribed
   }
-  ${UserSelect_UserFragmentDoc}
-  ${UserSelect_UserGroupFragmentDoc}
+  ${TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragmentDoc}
+  ${TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragmentDoc}
 ` as unknown as DocumentNode<
   TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragment,
   unknown
@@ -20529,6 +20671,7 @@ export const SignatureConfigDialog_UserFragmentDoc = gql`
 ` as unknown as DocumentNode<SignatureConfigDialog_UserFragment, unknown>;
 export const PetitionSettings_UserFragmentDoc = gql`
   fragment PetitionSettings_User on User {
+    id
     hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
     hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
     ...TestModeSignatureBadge_User

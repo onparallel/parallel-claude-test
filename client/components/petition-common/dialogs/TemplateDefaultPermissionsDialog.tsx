@@ -11,93 +11,155 @@ import {
 } from "@parallel/components/common/UserSelect";
 import {
   Maybe,
+  TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment,
+  PetitionPermissionType,
   TemplateDefaultPermissionsDialog_PublicPetitionLinkFragment,
   TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragment,
   UserOrUserGroupPermissionInput,
+  TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment,
 } from "@parallel/graphql/__types";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { PetitionPermissionRow } from "./PetitionPermissionRow";
-
-interface TemplateDefaultPermissionsDialogData {
-  permissions: UserOrUserGroupPermissionInput[];
-}
+import { PetitionPermissionTypeSelect } from "../PetitionPermissionType";
+import { TemplateDefaultUserGroupPermissionRow } from "./TemplateDefaultUserGroupPermissionRow";
+import { TemplateDefaultUserPermissionRow } from "./TemplateDefaultUserPermissionRow";
 
 export interface TemplateDefaultPermissionsDialogProps {
+  userId: string;
   permissions: TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragment[];
   publicLink?: Maybe<TemplateDefaultPermissionsDialog_PublicPetitionLinkFragment>;
+  onUpdatePermissions: (
+    v: UserOrUserGroupPermissionInput[]
+  ) => Promise<TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragment[]>;
 }
 
 export function TemplateDefaultPermissionsDialog({
+  userId,
   permissions,
   publicLink,
+  onUpdatePermissions,
   ...props
-}: DialogProps<TemplateDefaultPermissionsDialogProps, TemplateDefaultPermissionsDialogData>) {
+}: DialogProps<TemplateDefaultPermissionsDialogProps>) {
   const intl = useIntl();
 
   const editorsRef = useRef<UserSelectInstance<true, true>>(null);
-  const { handleSubmit, register, watch, control } = useForm<{
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [permissionsList, setPermissionsList] = useState(permissions);
+  const { handleSubmit, register, watch, control, setValue } = useForm<{
     editors: UserSelectSelection<true>[];
+    permissionType: PetitionPermissionType;
     isSubscribed: boolean;
   }>({
-    mode: "onChange",
+    mode: "onSubmit",
     defaultValues: {
-      editors: permissions.map((p) =>
-        p.__typename === "TemplateDefaultUserPermission"
-          ? p.user
-          : p.__typename === "TemplateDefaultUserGroupPermission"
-          ? p.group
-          : (null as never)
-      ),
-      isSubscribed: permissions.length > 0 && permissions[0].isSubscribed,
+      editors: [],
+      isSubscribed: false,
+      permissionType: "WRITE",
     },
   });
   const editors = watch("editors");
+
+  useEffect(() => {
+    if (editors.length > 1 || editors[0]?.__typename === "UserGroup") {
+      setValue("permissionType", "WRITE");
+    }
+  }, [editors.length]);
+
+  const ownerPermission = permissionsList.find((p) => p.permissionType === "OWNER") as
+    | TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment
+    | undefined;
+  const userPermissions = permissionsList.filter(
+    (p) => p.__typename === "TemplateDefaultUserPermission" && p.permissionType !== "OWNER"
+  ) as TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment[];
+
+  const groupPermissions = permissionsList.filter(
+    (p) => p.__typename === "TemplateDefaultUserGroupPermission"
+  ) as TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment[];
+
   const _handleSearchUsers = useSearchUsers();
   const handleSearchUsers = useCallback(
     async (search: string, excludeUsers: string[], excludeUserGroups: string[]) => {
       return await _handleSearchUsers(search, {
-        // if there is an active public link, exclude the owner of that link from the search
-        excludeUsers:
-          publicLink?.isActive && !!publicLink.owner
+        excludeUsers: [
+          // if there is an active public link, exclude the owner of that link from the search
+          ...(publicLink?.isActive && !!publicLink.owner
             ? excludeUsers.concat(publicLink.owner.id)
-            : excludeUsers,
-        excludeUserGroups,
+            : excludeUsers),
+          ...userPermissions.map((p) => p.user.id),
+        ],
+        excludeUserGroups: [...excludeUserGroups, ...groupPermissions.map((p) => p.group.id)],
         includeGroups: true,
       });
     },
-    [_handleSearchUsers]
+    [_handleSearchUsers, userPermissions.length, groupPermissions.length]
   );
 
-  const publicLinkOwner = publicLink?.isActive ? publicLink.owner : undefined;
+  const handleRemovePermission = async (templateDefaultPermissionId: string) => {
+    const newPermissions = await onUpdatePermissions(
+      permissionsList
+        .filter((p) => p.id !== templateDefaultPermissionId)
+        .map((p) => ({
+          isSubscribed: p.isSubscribed,
+          permissionType: p.permissionType,
+          ...(p.__typename === "TemplateDefaultUserPermission"
+            ? { userId: p.user.id }
+            : p.__typename === "TemplateDefaultUserGroupPermission"
+            ? { userGroupId: p.group.id }
+            : (null as never)),
+        }))
+    );
+    setPermissionsList(newPermissions);
+  };
 
   return (
     <ConfirmDialog
-      size="lg"
+      size="xl"
       hasCloseButton
       content={{
         as: "form",
-        onSubmit: handleSubmit(({ editors, isSubscribed }) => {
-          props.onResolve({
-            permissions: editors.map((x) => ({
-              isSubscribed,
-              permissionType: "WRITE",
-              ...(x.__typename === "User"
-                ? { userId: x.id }
-                : x.__typename === "UserGroup"
-                ? { userGroupId: x.id }
-                : (null as never)),
-            })),
-          });
+        onSubmit: handleSubmit(async ({ editors, isSubscribed, permissionType }) => {
+          if (editors.length === 0) {
+            props.onResolve();
+          } else {
+            try {
+              setIsSubmitting(true);
+              const newPermissions = await onUpdatePermissions(
+                editors
+                  .map((x) => ({
+                    isSubscribed,
+                    permissionType,
+                    ...(x.__typename === "User"
+                      ? { userId: x.id }
+                      : x.__typename === "UserGroup"
+                      ? { userGroupId: x.id }
+                      : (null as never)),
+                  }))
+                  .concat(
+                    permissionsList.map((p) => ({
+                      isSubscribed: p.isSubscribed,
+                      permissionType: p.permissionType,
+                      ...(p.__typename === "TemplateDefaultUserPermission"
+                        ? { userId: p.user.id }
+                        : p.__typename === "TemplateDefaultUserGroupPermission"
+                        ? { userGroupId: p.group.id }
+                        : (null as never)),
+                    }))
+                  ) as any
+              );
+              setPermissionsList(newPermissions);
+              setValue("editors", []);
+            } catch {}
+            setIsSubmitting(false);
+          }
         }),
       }}
       initialFocusRef={editorsRef}
       header={
         <Text>
           <FormattedMessage
-            id="component.template-default-permissions-dialog.title"
-            defaultMessage="Share automatically"
+            id="component.petition-settings.share-automatically"
+            defaultMessage="Assign automatically to"
           />
         </Text>
       }
@@ -106,30 +168,45 @@ export function TemplateDefaultPermissionsDialog({
           <Text>
             <FormattedMessage
               id="component.template-default-permissions-dialog.description"
-              defaultMessage="Specify the users or teams with whom you want to share the petitions created from this template."
+              defaultMessage="Upon using this template, petitions will automatically be assigned to these users."
             />
           </Text>
-          <FormControl id="editors">
-            <Controller
-              name="editors"
-              control={control}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <UserSelect
-                  ref={editorsRef}
-                  isMulti
-                  includeGroups
-                  value={value}
-                  onChange={(users) => onChange(users)}
-                  onBlur={onBlur}
-                  onSearch={handleSearchUsers}
-                  placeholder={intl.formatMessage({
-                    id: "generic.petition-sharing-placeholder",
-                    defaultMessage: "Add users and teams from your organization",
-                  })}
-                />
-              )}
-            />
-          </FormControl>
+          <Flex>
+            <FormControl id="editors">
+              <Controller
+                name="editors"
+                control={control}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <UserSelect
+                    ref={editorsRef}
+                    isMulti
+                    includeGroups
+                    value={value}
+                    onChange={(users) => onChange(users)}
+                    onBlur={onBlur}
+                    onSearch={handleSearchUsers}
+                    placeholder={intl.formatMessage({
+                      id: "generic.petition-sharing-placeholder",
+                      defaultMessage: "Add users and teams from your organization",
+                    })}
+                  />
+                )}
+              />
+            </FormControl>
+            <FormControl id="permissionType" width="180px" marginLeft={2}>
+              <Controller
+                name="permissionType"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <PetitionPermissionTypeSelect
+                    permissionType={value}
+                    onPermissionChange={onChange}
+                    disableOwner={editors.length > 1 || editors[0]?.__typename === "UserGroup"}
+                  />
+                )}
+              />
+            </FormControl>
+          </Flex>
           <Collapse in={editors.length > 0}>
             <FormControl id="is-subscribed">
               <Checkbox {...register("isSubscribed")}>
@@ -151,15 +228,32 @@ export function TemplateDefaultPermissionsDialog({
             </FormControl>
           </Collapse>
           <Stack>
-            <PetitionPermissionRow
-              {...(publicLinkOwner && { user: publicLinkOwner, permissionType: "OWNER" })}
+            <TemplateDefaultUserPermissionRow
+              user={ownerPermission?.user}
+              permissionType="OWNER"
+              userId={userId}
             />
+            {userPermissions.map((p, key) => (
+              <TemplateDefaultUserPermissionRow
+                key={key}
+                user={p.user}
+                permissionType={p.permissionType}
+                userId={userId}
+              />
+            ))}
+            {groupPermissions.map((p, key) => (
+              <TemplateDefaultUserGroupPermissionRow key={key} permission={p} />
+            ))}
           </Stack>
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="purple" variant="solid">
-          <FormattedMessage id="generic.save" defaultMessage="Save" />
+        <Button type="submit" colorScheme="purple" variant="solid" isLoading={isSubmitting}>
+          {editors.length > 0 ? (
+            <FormattedMessage id="generic.add" defaultMessage="Add" />
+          ) : (
+            <FormattedMessage id="generic.ok" defaultMessage="OK" />
+          )}
         </Button>
       }
       {...props}
@@ -173,28 +267,25 @@ TemplateDefaultPermissionsDialog.fragments = {
       isActive
       owner {
         id
-        ...PetitionPermissionRow_User
+        ...TemplateDefaultUserPermissionRow_User
       }
     }
-    ${PetitionPermissionRow.fragments.User}
+    ${TemplateDefaultUserPermissionRow.fragments.User}
   `,
   TemplateDefaultPermission: gql`
     fragment TemplateDefaultPermissionsDialog_TemplateDefaultPermission on TemplateDefaultPermission {
+      id
+      isSubscribed
+      permissionType
       ... on TemplateDefaultUserPermission {
-        user {
-          ...UserSelect_User
-        }
+        ...TemplateDefaultUserPermissionRow_TemplateDefaultUserPermission
       }
       ... on TemplateDefaultUserGroupPermission {
-        group {
-          ...UserSelect_UserGroup
-        }
+        ...TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermission
       }
-      permissionType
-      isSubscribed
     }
-    ${UserSelect.fragments.User}
-    ${UserSelect.fragments.UserGroup}
+    ${TemplateDefaultUserPermissionRow.fragments.TemplateDefaultUserPermission}
+    ${TemplateDefaultUserGroupPermissionRow.fragments.TemplateDefaultUserGroupPermission}
   `,
 };
 

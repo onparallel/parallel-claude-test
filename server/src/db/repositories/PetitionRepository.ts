@@ -3386,7 +3386,7 @@ export class PetitionRepository extends BaseRepository {
   readonly loadTemplateDefaultPermissions = this.buildLoadMultipleBy(
     "template_default_permission",
     "template_id",
-    (q) => q.whereNull("deleted_at").whereNot("type", "OWNER").orderBy("position", "asc")
+    (q) => q.whereNull("deleted_at").orderBy("position", "asc")
   );
 
   readonly loadTemplateDefaultPermissionOwner = this.buildLoadBy(

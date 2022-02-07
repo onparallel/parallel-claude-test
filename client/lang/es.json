@@ -1812,7 +1812,7 @@
   {
     "term": "component.petition-permission-row.default-owner",
     "definition": "Usuario que inicia la petición",
-    "context": "User starting the petition"
+    "context": "Person starting the petition"
   },
   {
     "term": "component.petition-preview-signature-review-alert.signature-required",
@@ -2016,8 +2016,8 @@
   },
   {
     "term": "component.petition-settings.share-automatically",
-    "definition": "Compartir automáticamente",
-    "context": "Share automatically"
+    "definition": "Asignar automáticamente",
+    "context": "Assign automatically to"
   },
   {
     "term": "component.petition-settings.share-automatically-description",
@@ -3266,8 +3266,8 @@
   },
   {
     "term": "component.template-default-permissions-dialog.description",
-    "definition": "Indica los usuarios y equipos a los que quieras que se compartan las peticiones creadas a partir de esta plantilla.",
-    "context": "Specify the users or teams with whom you want to share the petitions created from this template."
+    "definition": "Al utilizar la plantilla, se asignará la petición a los usuarios que indiques.",
+    "context": "Upon using this template, petitions will automatically be assigned to these users."
   },
   {
     "term": "component.template-default-permissions-dialog.subscribe",
@@ -3278,11 +3278,6 @@
     "term": "component.template-default-permissions-dialog.subscribe-explanation",
     "definition": "Los usuarios recibirán notificaciones de las peticiones creadas a partir de esta plantilla.",
     "context": "These users will be receive notifications from the petitions created from this template."
-  },
-  {
-    "term": "component.template-default-permissions-dialog.title",
-    "definition": "Compartir automáticamente",
-    "context": "Share automatically"
   },
   {
     "term": "component.template-details-modal.about",
@@ -4398,6 +4393,11 @@
     "term": "generic.notifications",
     "definition": "Notificaciones",
     "context": "Notifications"
+  },
+  {
+    "term": "generic.ok",
+    "definition": "Aceptar",
+    "context": "OK"
   },
   {
     "term": "generic.omit",

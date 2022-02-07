@@ -197,7 +197,7 @@ export interface NexusGenInputs {
   UserOrUserGroupPermissionInput: {
     // input type
     isSubscribed: boolean; // Boolean!
-    permissionType: NexusGenEnums["PetitionPermissionTypeRW"]; // PetitionPermissionTypeRW!
+    permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
     userGroupId?: NexusGenScalars["GID"] | null; // GID
     userId?: NexusGenScalars["GID"] | null; // GID
   };
@@ -1775,6 +1775,7 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     group: NexusGenRootTypes["UserGroup"]; // UserGroup!
+    id: NexusGenScalars["GID"]; // GID!
     isSubscribed: boolean; // Boolean!
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -1782,6 +1783,7 @@ export interface NexusGenFieldTypes {
   TemplateDefaultUserPermission: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
     isSubscribed: boolean; // Boolean!
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -1961,6 +1963,7 @@ export interface NexusGenFieldTypes {
   TemplateDefaultPermission: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
     isSubscribed: boolean; // Boolean!
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -3105,6 +3108,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     createdAt: "DateTime";
     group: "UserGroup";
+    id: "GID";
     isSubscribed: "Boolean";
     permissionType: "PetitionPermissionType";
     updatedAt: "DateTime";
@@ -3112,6 +3116,7 @@ export interface NexusGenFieldTypeNames {
   TemplateDefaultUserPermission: {
     // field return type name
     createdAt: "DateTime";
+    id: "GID";
     isSubscribed: "Boolean";
     permissionType: "PetitionPermissionType";
     updatedAt: "DateTime";
@@ -3291,6 +3296,7 @@ export interface NexusGenFieldTypeNames {
   TemplateDefaultPermission: {
     // field return type name
     createdAt: "DateTime";
+    id: "GID";
     isSubscribed: "Boolean";
     permissionType: "PetitionPermissionType";
     updatedAt: "DateTime";

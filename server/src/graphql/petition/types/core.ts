@@ -775,7 +775,7 @@ export const UserOrUserGroupPermissionInput = inputObjectType({
   definition(t) {
     t.globalId("userId", { prefixName: "User" });
     t.globalId("userGroupId", { prefixName: "UserGroup" });
-    t.nonNull.field("permissionType", { type: "PetitionPermissionTypeRW" });
+    t.nonNull.field("permissionType", { type: "PetitionPermissionType" });
     t.nonNull.boolean("isSubscribed");
   },
 });
