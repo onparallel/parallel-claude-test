@@ -6,7 +6,7 @@
 declare module "signaturit-sdk" {
   import { PathLike } from "fs";
   export = class SignaturitClient {
-    constructor(accessToken: string, production = true);
+    constructor(accessToken: string, production?: boolean);
     /** Create a new signature request. */
     createSignature: (
       filesPath: PathLike | PathLike[],
