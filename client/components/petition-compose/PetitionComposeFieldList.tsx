@@ -421,7 +421,7 @@ export const PetitionComposeFieldList = Object.assign(
     return (
       <>
         <Card
-          id="petition-fields"
+          data-section="compose-fields"
           overflow="hidden"
           sx={{
             // safari fix round corners + overflow
@@ -444,6 +444,7 @@ export const PetitionComposeFieldList = Object.assign(
                 <PetitionComposeField
                   ref={fieldRefs[fieldId]}
                   id={`field-${fieldId}`}
+                  data-section="compose-field"
                   onMove={handleFieldMove}
                   field={field}
                   fields={fields}
@@ -479,7 +480,11 @@ export const PetitionComposeFieldList = Object.assign(
         </Card>
         {!isReadOnly ? (
           <Flex marginTop={4} justifyContent="center">
-            <BigAddFieldButton id="big-add-field-button" onSelectFieldType={onAddField} />
+            <BigAddFieldButton
+              data-action="big-add-field"
+              id="big-add-field-button"
+              onSelectFieldType={onAddField}
+            />
           </Flex>
         ) : null}
       </>

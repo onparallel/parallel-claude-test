@@ -136,6 +136,7 @@ export function RecipientViewProgressFooter({
       >
         <PopoverTrigger>
           <Button
+            data-action="finalize"
             colorScheme="purple"
             size="sm"
             isDisabled={isCompleted || isDisabled}

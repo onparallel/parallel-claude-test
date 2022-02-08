@@ -154,6 +154,7 @@ export function PetitionTemplateHeader({
         </Badge>
         <LocaleBadge locale={petition.locale} marginLeft={2} />
         <HeaderNameEditable
+          data-action="edit-template-name"
           petition={petition}
           state={state}
           onNameChange={(name) => onUpdatePetition({ name: name || null })}
@@ -204,7 +205,12 @@ export function PetitionTemplateHeader({
           })}
         />
         <Spacer minWidth={4} />
-        <Button colorScheme="purple" flexShrink={0} onClick={handleUseTemplate}>
+        <Button
+          colorScheme="purple"
+          flexShrink={0}
+          onClick={handleUseTemplate}
+          data-action="use-template"
+        >
           <FormattedMessage id="generic.use-template" defaultMessage="Use template" />
         </Button>
         <Menu>

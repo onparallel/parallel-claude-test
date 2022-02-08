@@ -255,6 +255,7 @@ function PetitionPreviewSignerInfoDialog({
       }
       confirm={
         <Button
+          data-action="start-signature"
           colorScheme="purple"
           type="submit"
           isDisabled={signers.length === 0 && additionalSigners.length === 0 && !userWillSign}

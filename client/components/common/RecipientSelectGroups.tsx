@@ -227,7 +227,7 @@ export function RecipientSelectGroups({
               ) : null}
             </FormLabel>
             <Flex>
-              <Box flex="1">
+              <Box flex="1" data-section="recipient-select">
                 <ContactSelect
                   ref={recipientGroupSelectRef[index]}
                   placeholder={intl.formatMessage({

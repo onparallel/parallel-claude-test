@@ -417,6 +417,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                         <FormattedMessage id="petition.contents" defaultMessage="Contents" />
                       </Tab>
                       <Tab
+                        data-action="petition-settings"
                         className="petition-settings"
                         padding={4}
                         lineHeight={5}

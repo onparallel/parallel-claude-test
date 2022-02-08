@@ -174,8 +174,9 @@ export function PetitionRepliesFieldReply({
           )}
         </Box>
       </Flex>
-      <Stack direction="row" spacing={1}>
+      <Stack direction="row" spacing={1} alignSelf="flex-start" data-section="approve-reject-reply">
         <IconButtonWithTooltip
+          data-action="approve-reply"
           icon={<CheckIcon />}
           label={intl.formatMessage({
             id: "petition-replies.petition-field-reply.approve",
@@ -189,6 +190,7 @@ export function PetitionRepliesFieldReply({
           onClick={() => onUpdateStatus(reply.status === "APPROVED" ? "PENDING" : "APPROVED")}
         />
         <IconButtonWithTooltip
+          data-action="reject-reply"
           icon={<CloseIcon />}
           label={intl.formatMessage({
             id: "petition-replies.petition-field-reply.reject",

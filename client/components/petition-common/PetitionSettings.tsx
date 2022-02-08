@@ -380,6 +380,7 @@ function _PetitionSettings({
           </Heading>
           {restrictEditingSwitch}
           <SwitchSetting
+            data-section="share-by-link"
             isDisabled={isPublicTemplate || petition.isRestricted}
             icon={<LinkIcon />}
             label={
@@ -459,6 +460,7 @@ function _PetitionSettings({
       ) : null}
       {petition.__typename === "PetitionTemplate" ? (
         <SwitchSetting
+          data-section="share-automatically"
           isDisabled={isPublicTemplate || petition.isRestricted}
           icon={<UserArrowIcon />}
           label={
@@ -494,6 +496,7 @@ function _PetitionSettings({
       )}
       {petition.signatureConfig || hasSignature ? (
         <SwitchSetting
+          data-section="esignature-settings"
           isDisabled={!hasSignature || isPublicTemplate}
           icon={<SignatureIcon />}
           label={
@@ -816,6 +819,7 @@ function SwitchSetting({
         <Switch
           isChecked={isChecked}
           onChange={(e) => onChange(e.target.checked)}
+          id={props.controlId}
           isDisabled={props.isDisabled}
         />
       </SettingsRow>

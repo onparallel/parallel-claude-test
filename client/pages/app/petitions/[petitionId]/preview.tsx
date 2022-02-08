@@ -238,7 +238,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         headerActions={
           isPetition && !petition.accesses?.find((a) => a.status === "ACTIVE") ? (
             <ResponsiveButtonIcon
-              data-action="compose-next"
+              data-action="preview-next"
               id="petition-next"
               colorScheme="purple"
               icon={<PaperPlaneIcon fontSize="18px" />}
@@ -291,7 +291,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 <RecipientViewContentsCard currentPage={currentPage} petition={petition} />
               </Stack>
             </Box>
-            <Flex flexDirection="column" flex="2" minWidth={0}>
+            <Flex data-section="preview-fields" flexDirection="column" flex="2" minWidth={0}>
               <Stack spacing={4} key={0}>
                 {fields.map((field) => (
                   <motion.div key={field.id} layout="position">

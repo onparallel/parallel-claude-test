@@ -624,13 +624,15 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         }
       >
         <Box padding={4}>
-          <Stack flex="2" spacing={4} id="petition-replies">
+          <Stack flex="2" spacing={4} data-section="replies-fields">
             {filterPetitionFields(petition.fields, indices, fieldVisibility ?? [], filter).map(
               (x, index) =>
                 x.type === "FIELD" ? (
                   <PetitionRepliesField
                     ref={fieldRefs[x.field.id]}
                     id={`field-${x.field.id}`}
+                    data-section="replies-field"
+                    data-field-type={x.field.type}
                     key={x.field.id}
                     petitionId={petition.id}
                     field={x.field}

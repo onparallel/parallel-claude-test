@@ -32,6 +32,7 @@ export const ToolbarPlaceholderButton = chakraForwardRef<"button", ToolbarPlaceh
     );
     return (
       <ToolbarButton
+        data-action="add-placeholder"
         icon={<SharpIcon fontSize="16px" />}
         label={intl.formatMessage({
           id: "component.rich-text-editor.personalize",

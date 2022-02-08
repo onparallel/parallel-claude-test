@@ -232,6 +232,7 @@ function NewPetition() {
             <Menu placement="bottom-end">
               <MenuButton
                 as={Button}
+                data-action="create-template"
                 aria-label={intl.formatMessage({
                   id: "new-petition.create",
                   defaultMessage: "Create",

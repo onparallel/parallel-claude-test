@@ -90,6 +90,7 @@ export function PetitionRemindersConfig({
       {hideRemindersActiveCheckbox ? null : (
         <Flex alignItems="center">
           <Checkbox
+            data-action="enable-reminders"
             colorScheme="purple"
             size="lg"
             marginRight={2}

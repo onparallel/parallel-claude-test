@@ -32,15 +32,15 @@ export type PetitionFieldType =
   | "TEXT";
 
 export async function addPetitionField(page: Page, type: PetitionFieldType) {
-  const fields = await page.$$("#petition-fields > *");
+  const fields = await page.$$(`[data-section="compose-fields"] > *`);
   const menu = await toggleMenu(page, "#menu-button-big-add-field-button");
   const create = await menu.waitForSelector(`[data-field-type="${type}"]`);
   await create.scrollIntoViewIfNeeded();
   await create!.click();
   await page.click("body"); // sometimes the menu remains open
-  await page.waitForSelector(`#petition-fields > *:nth-child(${fields.length + 2})`);
+  await page.waitForSelector(`[data-section="compose-fields"] > *:nth-child(${fields.length + 2})`);
 }
 
 export async function getFields(page: Page): Promise<ElementHandle[]> {
-  return await page.$$("#petition-fields > *:not(.add-field-button-wrapper)");
+  return await page.$$(`[data-section="compose-fields"] > *:not(.add-field-button-wrapper)`);
 }
