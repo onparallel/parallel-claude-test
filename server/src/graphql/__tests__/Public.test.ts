@@ -847,6 +847,304 @@ describe("GraphQL/Public", () => {
       });
     });
 
+    describe("publicCreateNumericReply", () => {
+      let numberField: PetitionField;
+      let limitedNumberField: PetitionField;
+
+      beforeAll(async () => {
+        [numberField] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
+          type: "NUMBER",
+          options: {
+            range: {
+              isActive: false,
+              min: 0,
+            },
+          },
+          multiple: false,
+          optional: true,
+        }));
+
+        [limitedNumberField] = await mocks.createRandomPetitionFields(
+          access.petition_id,
+          1,
+          () => ({
+            type: "NUMBER",
+            options: {
+              range: {
+                isActive: true,
+                min: -10,
+                max: 200,
+              },
+            },
+            multiple: true,
+            optional: true,
+          })
+        );
+      });
+
+      it("creates a reply of type NUMBER", async () => {
+        const { errors, data } = await testClient.mutate({
+          mutation: gql`
+            mutation ($keycode: ID!, $fieldId: GID!, $value: Float!) {
+              publicCreateNumericReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
+                status
+                content
+              }
+            }
+          `,
+          variables: {
+            keycode: access.keycode,
+            fieldId: toGlobalId("PetitionField", numberField.id),
+            value: 288,
+          },
+        });
+        expect(errors).toBeUndefined();
+        expect(data?.publicCreateNumericReply).toEqual({
+          status: "PENDING",
+          content: { value: 288 },
+        });
+      });
+
+      it("sends error if passing invalid reply on a NUMBER field", async () => {
+        const { errors, data } = await testClient.mutate({
+          mutation: gql`
+            mutation ($keycode: ID!, $fieldId: GID!, $value: Float!) {
+              publicCreateNumericReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
+                status
+                content
+              }
+            }
+          `,
+          variables: {
+            keycode: access.keycode,
+            fieldId: toGlobalId("PetitionField", numberField.id),
+            value: "invalid value",
+          },
+        });
+        expect(errors).toContainGraphQLError("BAD_USER_INPUT");
+        expect(data).toBeUndefined();
+      });
+
+      it("sends error if trying to create a reply on a single-reply field with a previously submitted reply", async () => {
+        const { errors, data } = await testClient.mutate({
+          mutation: gql`
+            mutation ($keycode: ID!, $fieldId: GID!, $value: Float!) {
+              publicCreateNumericReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
+                status
+                content
+              }
+            }
+          `,
+          variables: {
+            keycode: access.keycode,
+            fieldId: toGlobalId("PetitionField", numberField.id),
+            value: 123,
+          },
+        });
+        expect(errors).toContainGraphQLError("FIELD_ALREADY_REPLIED_ERROR");
+        expect(data).toBeNull();
+      });
+
+      it("creates a REPLY_CREATED event with petition_access_id on payload", async () => {
+        const [newField] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
+          type: "NUMBER",
+          options: {
+            range: {
+              isActive: false,
+              min: 0,
+            },
+          },
+          optional: true,
+        }));
+        const { errors, data } = await testClient.mutate({
+          mutation: gql`
+            mutation ($keycode: ID!, $fieldId: GID!, $value: Float!) {
+              publicCreateNumericReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
+                id
+              }
+            }
+          `,
+          variables: {
+            keycode: access.keycode,
+            fieldId: toGlobalId("PetitionField", newField.id),
+            value: 10,
+          },
+        });
+
+        expect(errors).toBeUndefined();
+        const replyId = fromGlobalId(data!.publicCreateNumericReply.id, "PetitionFieldReply").id;
+
+        const events = await mocks.knex
+          .from("petition_event")
+          .where("petition_id", access.petition_id)
+          .select(["type", "data"])
+          .orderBy("created_at", "desc")
+          .limit(1);
+
+        expect(events).toEqual([
+          {
+            type: "REPLY_CREATED",
+            data: {
+              petition_field_id: newField.id,
+              petition_field_reply_id: replyId,
+              petition_access_id: access.id,
+            },
+          },
+        ]);
+      });
+    });
+
+    describe("publicUpdateNumericReply", () => {
+      let numberReply: PetitionFieldReply;
+      let limitedNumberReply: PetitionFieldReply;
+      let approvedReply: PetitionFieldReply;
+
+      beforeAll(async () => {
+        const [numberField] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
+          type: "NUMBER",
+          options: {
+            range: {
+              isActive: false,
+              min: 0,
+            },
+          },
+          multiple: true,
+          optional: true,
+        }));
+
+        const [limitedNumberField] = await mocks.createRandomPetitionFields(
+          access.petition_id,
+          1,
+          () => ({
+            type: "NUMBER",
+            options: {
+              range: {
+                isActive: true,
+                min: -10,
+                max: 200,
+              },
+            },
+            multiple: true,
+            optional: true,
+          })
+        );
+
+        [numberReply] = await mocks.createRandomNumberReply(numberField.id, access.id, 1);
+        [limitedNumberReply] = await mocks.createRandomNumberReply(
+          limitedNumberField.id,
+          access.id,
+          1,
+          undefined,
+          -10,
+          200
+        );
+
+        [approvedReply] = await mocks.createRandomNumberReply(numberField.id, access.id, 1, () => ({
+          status: "APPROVED",
+          type: "NUMBER",
+        }));
+      });
+
+      it("updates a NUMBER reply", async () => {
+        const { errors, data } = await testClient.mutate({
+          mutation: gql`
+            mutation ($keycode: ID!, $replyId: GID!, $value: Float!) {
+              publicUpdateNumericReply(keycode: $keycode, replyId: $replyId, value: $value) {
+                id
+                status
+                content
+              }
+            }
+          `,
+          variables: {
+            keycode: access.keycode,
+            replyId: toGlobalId("PetitionFieldReply", numberReply.id),
+            value: 30,
+          },
+        });
+
+        expect(errors).toBeUndefined();
+        expect(data?.publicUpdateNumericReply).toEqual({
+          id: toGlobalId("PetitionFieldReply", numberReply.id),
+          status: "PENDING",
+          content: { value: 30 },
+        });
+      });
+
+      it("sends error when trying to update the reply of a NUMBER field with an invalid reply", async () => {
+        const { errors, data } = await testClient.mutate({
+          mutation: gql`
+            mutation ($keycode: ID!, $replyId: GID!, $value: Float!) {
+              publicUpdateNumericReply(keycode: $keycode, replyId: $replyId, value: $value) {
+                id
+                status
+                content
+              }
+            }
+          `,
+          variables: {
+            keycode: access.keycode,
+            replyId: toGlobalId("PetitionFieldReply", limitedNumberReply.id),
+            value: 300000,
+          },
+        });
+
+        expect(errors).toContainGraphQLError("INVALID_OPTION_ERROR");
+        expect(data).toBeNull();
+      });
+
+      it("sends error when trying to update an approved reply", async () => {
+        const { errors, data } = await testClient.mutate({
+          mutation: gql`
+            mutation ($keycode: ID!, $replyId: GID!, $value: Float!) {
+              publicUpdateNumericReply(keycode: $keycode, replyId: $replyId, value: $value) {
+                id
+                status
+                content
+              }
+            }
+          `,
+          variables: {
+            keycode: access.keycode,
+            replyId: toGlobalId("PetitionFieldReply", approvedReply.id),
+            value: 30,
+          },
+        });
+        expect(errors).toContainGraphQLError("REPLY_ALREADY_APPROVED_ERROR");
+        expect(data).toBeNull();
+      });
+
+      it("changes reply status to pending when updating a rejected reply", async () => {
+        await mocks
+          .knex("petition_field_reply")
+          .where("id", numberReply.id)
+          .update("status", "REJECTED");
+
+        const { errors, data } = await testClient.mutate({
+          mutation: gql`
+            mutation ($keycode: ID!, $replyId: GID!, $value: Float!) {
+              publicUpdateNumericReply(keycode: $keycode, replyId: $replyId, value: $value) {
+                id
+                status
+                content
+              }
+            }
+          `,
+          variables: {
+            keycode: access.keycode,
+            replyId: toGlobalId("PetitionFieldReply", numberReply.id),
+            value: 32,
+          },
+        });
+        expect(errors).toBeUndefined();
+        expect(data?.publicUpdateNumericReply).toEqual({
+          id: toGlobalId("PetitionFieldReply", numberReply.id),
+          status: "PENDING",
+          content: { value: 32 },
+        });
+      });
+    });
+
     describe("publicCreateDynamicSelectReply", () => {
       let dynamicSelectField: PetitionField;
       let validatedField: PetitionField;

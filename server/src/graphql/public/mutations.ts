@@ -478,7 +478,7 @@ export const publicUpdateNumericReply = mutationField("publicUpdateNumericReply"
     authenticatePublicAccess("keycode"),
     and(
       replyBelongsToAccess("replyId"),
-      replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT", "NUMBER"]),
+      replyIsForFieldOfType("replyId", ["NUMBER"]),
       replyCanBeUpdated("replyId")
     )
   ),

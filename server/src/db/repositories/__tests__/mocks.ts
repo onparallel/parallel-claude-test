@@ -241,6 +241,34 @@ export class Mocks {
       .returning("*");
   }
 
+  async createRandomNumberReply(
+    textFieldId: number,
+    access_id: number,
+    amount?: number,
+    builder?: (index: number) => Partial<PetitionFieldReply>,
+    min?: number,
+    max?: number
+  ) {
+    return await this.knex<PetitionFieldReply>("petition_field_reply")
+      .insert(
+        range(0, amount || 1).map<CreatePetitionFieldReply>((index) => {
+          return {
+            petition_field_id: textFieldId,
+            content: {
+              value: faker.datatype.number({
+                min,
+                max,
+              }),
+            },
+            type: "NUMBER",
+            petition_access_id: access_id,
+            ...builder?.(index),
+          };
+        })
+      )
+      .returning("*");
+  }
+
   async createRandomFileUpload(amount?: number, builder?: (index: number) => Partial<FileUpload>) {
     return await this.knex<FileUpload>("file_upload")
       .insert(
