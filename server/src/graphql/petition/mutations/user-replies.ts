@@ -124,11 +124,10 @@ export const createNumericReply = mutationField("createNumericReply", {
     switch (field.type) {
       case "NUMBER": {
         const options = field.options;
-        const value = args.reply;
         const min = options.range?.min ? Number(options.range?.min) : undefined;
         const max = options.range?.max ? Number(options.range?.max) : undefined;
 
-        if (isNaN(value) || (options.range.isActive && !isInRange(value, min, max))) {
+        if (isNaN(args.reply) || (options.range.isActive && !isInRange(args.reply, min, max))) {
           throw new InvalidOptionError(info, "reply", "Invalid number");
         }
         break;
@@ -172,11 +171,10 @@ export const updateNumericReply = mutationField("updateNumericReply", {
     switch (field.type) {
       case "NUMBER": {
         const options = field.options;
-        const value = args.reply;
         const min = options.range?.min ? Number(options.range?.min) : undefined;
         const max = options.range?.max ? Number(options.range?.max) : undefined;
 
-        if (isNaN(value) || (options.range.isActive && !isInRange(value, min, max))) {
+        if (isNaN(args.reply) || (options.range.isActive && !isInRange(args.reply, min, max))) {
           throw new InvalidOptionError(info, "reply", "Invalid number");
         }
         break;

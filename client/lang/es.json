@@ -1445,6 +1445,11 @@
     "context": "{modifier, select, ALL {end with} other {ends with}}"
   },
   {
+    "term": "component.petition-field-visibility-editor.equal-date",
+    "definition": "es igual a",
+    "context": "is the"
+  },
+  {
     "term": "component.petition-field-visibility-editor.equal-default",
     "definition": "{modifier, select, ALL {son iguales a} other {es igual a}}",
     "context": "{modifier, select, ALL {are equal to} other {is equal to}}"
@@ -1455,6 +1460,16 @@
     "context": "{modifier, select, ALL {are} other {is}}"
   },
   {
+    "term": "component.petition-field-visibility-editor.greater-or-equal-than-date",
+    "definition": "es después de (incl.)",
+    "context": "is after the (incl.)"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.greater-than-date",
+    "definition": "es después de",
+    "context": "is after the"
+  },
+  {
     "term": "component.petition-field-visibility-editor.have-reply",
     "definition": "tiene respuestas",
     "context": "has replies"
@@ -1463,6 +1478,16 @@
     "term": "component.petition-field-visibility-editor.hide",
     "definition": "Ocultar si",
     "context": "Hide when"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.less-or-equal-than-date",
+    "definition": "es antes de (incl.)",
+    "context": "is before the (incl.)"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.less-than-date",
+    "definition": "es antes de",
+    "context": "is before the"
   },
   {
     "term": "component.petition-field-visibility-editor.none",
@@ -1478,6 +1503,11 @@
     "term": "component.petition-field-visibility-editor.not-contain-default",
     "definition": "no {modifier, select, ALL {contienen} other {contiene}}",
     "context": "{modifier, select, ALL {do not contain} other {does not contain}}"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.not-equal-date",
+    "definition": "no es igual a",
+    "context": "is not the"
   },
   {
     "term": "component.petition-field-visibility-editor.not-equal-default",
