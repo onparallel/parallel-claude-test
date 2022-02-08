@@ -1,12 +1,13 @@
 import {
+  Box,
+  FormControl,
+  FormLabel,
   HStack,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  Stack,
-  Text,
 } from "@chakra-ui/react";
 import { SwitchSetting } from "@parallel/components/petition-common/PetitionSettings";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
@@ -117,10 +118,10 @@ export function NumberSettings({
         />
       }
       description={
-          <FormattedMessage
-            id="component.field-settings-number.add-range-description"
-            defaultMessage="Enabling this option will allow you to limit the recipient's response to a minimum or maximum amount."
-          />
+        <FormattedMessage
+          id="component.field-settings-number.add-range-description"
+          defaultMessage="Enabling this option will allow you to limit the recipient's response to a minimum or maximum amount."
+        />
       }
       isChecked={limitIsActive}
       onChange={(checked: boolean) => {
@@ -138,52 +139,54 @@ export function NumberSettings({
       isDisabled={isReadOnly}
       controlId="field-number-range"
     >
-      <Stack direction="row" wrap="wrap" gridGap={2} spacing={0}>
-        <HStack flex="1">
-          <Text minWidth="2.2rem">
+      <HStack spacing={4}>
+        <FormControl flex={1} as={HStack} alignItems="center">
+          <FormLabel margin={0}>
             <FormattedMessage
               id="component.field-settings-number.add-range-min"
               defaultMessage="Min."
             />
-          </Text>
-          <NumberInput
-            value={min}
-            onChange={handleMinOnChange}
-            allowMouseWheel={true}
-            isDisabled={isReadOnly}
-            flex="1"
-            minWidth="10rem"
-          >
-            <NumberInputField ref={refMin} placeholder="∞" />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-        </HStack>
-        <HStack flex="1">
-          <Text minWidth="2.2rem">
+          </FormLabel>
+          <Box flex="1">
+            <NumberInput
+              value={min}
+              onChange={handleMinOnChange}
+              allowMouseWheel={true}
+              isDisabled={isReadOnly}
+              flex="1"
+            >
+              <NumberInputField ref={refMin} placeholder="∞" />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+          </Box>
+        </FormControl>
+        <FormControl flex="1" as={HStack} alignItems="center">
+          <FormLabel margin={0}>
             <FormattedMessage
               id="component.field-settings-number.add-range-max"
               defaultMessage="Max."
             />
-          </Text>
-          <NumberInput
-            value={max}
-            onChange={handleMaxOnChange}
-            allowMouseWheel={true}
-            isDisabled={isReadOnly}
-            flex="1"
-            minWidth="10rem"
-          >
-            <NumberInputField ref={refMax} placeholder="∞" />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-        </HStack>
-      </Stack>
+          </FormLabel>
+          <Box flex="1">
+            <NumberInput
+              value={max}
+              onChange={handleMaxOnChange}
+              allowMouseWheel={true}
+              isDisabled={isReadOnly}
+              flex="1"
+            >
+              <NumberInputField ref={refMax} placeholder="∞" />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+          </Box>
+        </FormControl>
+      </HStack>
     </SwitchSetting>
   );
 }
