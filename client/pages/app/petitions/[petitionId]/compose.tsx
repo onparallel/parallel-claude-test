@@ -13,7 +13,6 @@ import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { AddPetitionAccessDialog } from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
 import { PetitionCompletedAlert } from "@parallel/components/petition-common/PetitionCompletedAlert";
 import { PetitionContents } from "@parallel/components/petition-common/PetitionContents";
-import { PetitionSettings } from "@parallel/components/petition-common/PetitionSettings";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
 import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeFieldTypeDialog";
 import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/dialogs/ConfirmDeleteFieldDialog";
@@ -22,6 +21,7 @@ import { useReferencedFieldDialog } from "@parallel/components/petition-compose/
 import { PetitionComposeField } from "@parallel/components/petition-compose/PetitionComposeField";
 import { PetitionComposeFieldList } from "@parallel/components/petition-compose/PetitionComposeFieldList";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
+import { PetitionSettings } from "@parallel/components/petition-compose/PetitionSettings";
 import { PetitionTemplateComposeMessageEditor } from "@parallel/components/petition-compose/PetitionTemplateComposeMessageEditor";
 import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
 import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/settings/PetitionComposeFieldSettings";

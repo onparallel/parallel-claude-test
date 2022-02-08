@@ -9,7 +9,7 @@ import {
   NumberInputField,
   NumberInputStepper,
 } from "@chakra-ui/react";
-import { SwitchSetting } from "@parallel/components/petition-common/PetitionSettings";
+import { SettingsRowSwitch } from "@parallel/components/petition-compose/SettingsRowSwitch";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
@@ -110,7 +110,7 @@ export function NumberSettings({
   };
 
   return (
-    <SwitchSetting
+    <SettingsRowSwitch
       label={
         <FormattedMessage
           id="component.field-settings-number.add-range"
@@ -187,6 +187,6 @@ export function NumberSettings({
           </Box>
         </FormControl>
       </HStack>
-    </SwitchSetting>
+    </SettingsRowSwitch>
   );
 }

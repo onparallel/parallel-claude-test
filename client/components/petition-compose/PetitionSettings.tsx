@@ -1,10 +1,8 @@
 import { gql, useMutation } from "@apollo/client";
 import {
-  Box,
   Button,
   Center,
   CloseButton,
-  Collapse,
   FormControl,
   FormLabel,
   Heading,
@@ -15,7 +13,6 @@ import {
   InputRightElement,
   Select,
   Stack,
-  Switch,
   Text,
 } from "@chakra-ui/react";
 import {
@@ -50,7 +47,7 @@ import { Maybe } from "@parallel/utils/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
-import { memo, ReactNode } from "react";
+import { memo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { noop, pick } from "remeda";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
@@ -59,20 +56,23 @@ import { DialogProps, useDialog } from "../common/dialogs/DialogProvider";
 import { Divider } from "../common/Divider";
 import { HelpPopover } from "../common/HelpPopover";
 import { useConfigureRemindersDialog } from "../petition-activity/dialogs/ConfigureRemindersDialog";
-import { usePetitionDeadlineDialog } from "../petition-compose/dialogs/PetitionDeadlineDialog";
-import { useRestrictPetitionDialog } from "../petition-compose/dialogs/RestrictPetitionDialog";
-import { usePasswordRestrictPetitionDialog } from "../petition-compose/dialogs/UnrestrictPetitionDialog";
-import { SettingsRow, SettingsRowProps } from "../petition-compose/settings/SettingsRow";
 import {
   PublicLinkSettingsDialog,
   usePublicLinkSettingsDialog,
-} from "./dialogs/PublicLinkSettingsDialog";
-import { SignatureConfigDialog, useSignatureConfigDialog } from "./dialogs/SignatureConfigDialog";
+} from "../petition-common/dialogs/PublicLinkSettingsDialog";
+import {
+  SignatureConfigDialog,
+  useSignatureConfigDialog,
+} from "../petition-common/dialogs/SignatureConfigDialog";
 import {
   TemplateDefaultPermissionsDialog,
   useTemplateDefaultPermissionsDialog,
-} from "./dialogs/TemplateDefaultPermissionsDialog";
-import { TestModeSignatureBadge } from "./TestModeSignatureBadge";
+} from "../petition-common/dialogs/TemplateDefaultPermissionsDialog";
+import { TestModeSignatureBadge } from "../petition-common/TestModeSignatureBadge";
+import { usePetitionDeadlineDialog } from "./dialogs/PetitionDeadlineDialog";
+import { useRestrictPetitionDialog } from "./dialogs/RestrictPetitionDialog";
+import { usePasswordRestrictPetitionDialog } from "./dialogs/UnrestrictPetitionDialog";
+import { SettingsRowSwitch } from "./SettingsRowSwitch";
 
 export interface PetitionSettingsProps {
   user: PetitionSettings_UserFragment;
@@ -347,7 +347,7 @@ function _PetitionSettings({
   };
 
   const restrictEditingSwitch = (
-    <SwitchSetting
+    <SettingsRowSwitch
       isDisabled={isPublicTemplate}
       icon={petition.isRestricted ? <LockClosedIcon /> : <LockOpenIcon />}
       label={
@@ -379,7 +379,7 @@ function _PetitionSettings({
             />
           </Heading>
           {restrictEditingSwitch}
-          <SwitchSetting
+          <SettingsRowSwitch
             data-section="share-by-link"
             isDisabled={isPublicTemplate || petition.isRestricted}
             icon={<LinkIcon />}
@@ -410,7 +410,7 @@ function _PetitionSettings({
                 isDisabled={isPublicTemplate || petition.isRestricted}
               />
             </HStack>
-          </SwitchSetting>
+          </SettingsRowSwitch>
           <Divider paddingTop={2} />
           <Heading as="h5" size="sm" paddingTop={2}>
             <FormattedMessage
@@ -459,7 +459,7 @@ function _PetitionSettings({
         </FormControl>
       ) : null}
       {petition.__typename === "PetitionTemplate" ? (
-        <SwitchSetting
+        <SettingsRowSwitch
           data-section="share-automatically"
           isDisabled={isPublicTemplate || petition.isRestricted}
           icon={<UserArrowIcon />}
@@ -490,12 +490,12 @@ function _PetitionSettings({
               />
             </Button>
           </Center>
-        </SwitchSetting>
+        </SettingsRowSwitch>
       ) : (
         restrictEditingSwitch
       )}
       {petition.signatureConfig || hasSignature ? (
-        <SwitchSetting
+        <SettingsRowSwitch
           data-section="esignature-settings"
           isDisabled={!hasSignature || isPublicTemplate}
           icon={<SignatureIcon />}
@@ -535,10 +535,10 @@ function _PetitionSettings({
               </Text>
             </Button>
           </Center>
-        </SwitchSetting>
+        </SettingsRowSwitch>
       ) : null}
       {petition.__typename === "PetitionTemplate" ? (
-        <SwitchSetting
+        <SettingsRowSwitch
           isDisabled={isPublicTemplate}
           icon={<BellSettingsIcon />}
           label={
@@ -561,10 +561,10 @@ function _PetitionSettings({
               </Text>
             </Button>
           </Center>
-        </SwitchSetting>
+        </SettingsRowSwitch>
       ) : null}
       {user.hasSkipForwardSecurity ? (
-        <SwitchSetting
+        <SettingsRowSwitch
           isDisabled={isPublicTemplate}
           icon={<ShieldIcon />}
           label={
@@ -585,7 +585,7 @@ function _PetitionSettings({
         />
       ) : null}
       {user.hasHideRecipientViewContents ? (
-        <SwitchSetting
+        <SettingsRowSwitch
           isDisabled={isPublicTemplate}
           icon={<ListIcon />}
           label={
@@ -789,48 +789,6 @@ export const PetitionSettings = Object.assign(
   ) as typeof _PetitionSettings,
   { fragments, mutations }
 );
-
-interface SwitchSettingProps extends Omit<SettingsRowProps, "children" | "onChange"> {
-  icon?: ReactNode;
-  isChecked: boolean;
-  onChange: (value: boolean) => void;
-  children?: ReactNode;
-}
-
-export function SwitchSetting({
-  label,
-  icon,
-  isChecked,
-  onChange,
-  children,
-  ...props
-}: SwitchSettingProps) {
-  return (
-    <Box>
-      <SettingsRow
-        label={
-          <Stack direction="row" alignItems="center">
-            {icon}
-            <Text as="span">{label}</Text>
-          </Stack>
-        }
-        {...props}
-      >
-        <Switch
-          isChecked={isChecked}
-          onChange={(e) => onChange(e.target.checked)}
-          id={props.controlId}
-          isDisabled={props.isDisabled}
-        />
-      </SettingsRow>
-      {children ? (
-        <Collapse in={isChecked}>
-          <Box marginTop={2}>{children}</Box>
-        </Collapse>
-      ) : null}
-    </Box>
-  );
-}
 
 function DeadlineInput({
   value,
