@@ -3,12 +3,17 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import Cleave from "cleave.js/react";
 import { ComponentProps, useImperativeHandle, useRef } from "react";
 
-export const InputCleave = chakraForwardRef<"input", InputProps & ComponentProps<typeof Cleave>>(
-  function InputCleave(props, ref) {
-    const cleaveRef = useRef<any>();
-    useImperativeHandle(ref, () => {
-      return cleaveRef.current?.element;
-    });
-    return <Input as={Cleave} ref={cleaveRef} {...props} />;
-  }
-);
+interface CleaveInputProps extends InputProps {
+  size?: "sm" | "md" | "lg";
+}
+
+export const InputCleave = chakraForwardRef<
+  "input",
+  CleaveInputProps & Omit<ComponentProps<typeof Cleave>, "size">
+>(function InputCleave(props, ref) {
+  const cleaveRef = useRef<any>();
+  useImperativeHandle(ref, () => {
+    return cleaveRef.current?.element;
+  });
+  return <Input as={Cleave} ref={cleaveRef} {...props} />;
+});

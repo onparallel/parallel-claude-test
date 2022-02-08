@@ -168,7 +168,7 @@ export function RecipientViewPetitionFieldNumber({
     isDisabled: isDisabled,
     isInvalid: isInvalidReply[field.id],
     options: cleaveOptions,
-    onKeyDown: async (event: KeyboardEvent) => {
+    onKeyDown: async (event: any) => {
       const valueAsNumber = Number(event.target.rawValue);
       if (
         isMetaReturn(event) &&
@@ -187,7 +187,7 @@ export function RecipientViewPetitionFieldNumber({
         }
       }
     },
-    onBlur: async (event: FocusEvent<HTMLInputElement>) => {
+    onBlur: async (event: FocusEvent<any>) => {
       const valueAsNumber = Number(event.target.rawValue);
       if (valueAsNumber) {
         if (isNaN(valueAsNumber) || !isBetweenLimits(options, valueAsNumber)) {
@@ -201,7 +201,7 @@ export function RecipientViewPetitionFieldNumber({
         setShowNewReply(false);
       }
     },
-    onChange: (event: ChangeEvent<HTMLInputElement>) => {
+    onChange: (event: ChangeEvent<any>) => {
       const valueAsNumber = Number(event.target.rawValue);
       const valueAsString = event.target.value;
 
@@ -396,7 +396,7 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
         onDelete(true);
       }
     },
-    onBlur: async (event: FocusEvent<HTMLInputElement>) => {
+    onBlur: async (event: FocusEvent<any>) => {
       const valueAsNumber = Number(event.target.rawValue);
       const valueAsString = event.target.value;
 
@@ -412,7 +412,7 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
         onDelete();
       }
     },
-    onChange: (event: ChangeEvent<HTMLInputElement>) => {
+    onChange: (event: ChangeEvent<any>) => {
       const valueAsNumber = Number(event.target.rawValue);
       const valueAsString = event.target.value;
 

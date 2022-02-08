@@ -682,7 +682,7 @@ function ConditionPredicateValueFloat({
       onChange={(event: ChangeEvent<HTMLInputElement>) => {
         setValue(event.target.value);
       }}
-      onBlur={(event: FocusEvent<HTMLInputElement>) => {
+      onBlur={(event: FocusEvent<any>) => {
         onChange({ ...condition, value: Number(event.target.rawValue) });
       }}
       options={{
