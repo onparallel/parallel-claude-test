@@ -1,7 +1,7 @@
 import { Center, Flex, List, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { InputCleave } from "@parallel/components/common/InputCleave";
+import { InputCleave, InputCleaveElement } from "@parallel/components/common/InputCleave";
 import { PetitionLocale } from "@parallel/graphql/__types";
 import { getSeparator } from "@parallel/utils/intl";
 import { isMetaReturn } from "@parallel/utils/keys";
@@ -9,17 +9,9 @@ import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
+import { CleaveOptions } from "cleave.js/options";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  ChangeEvent,
-  FocusEvent,
-  forwardRef,
-  KeyboardEvent,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { ComponentPropsWithRef, forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import {
@@ -61,7 +53,7 @@ export function RecipientViewPetitionFieldNumber({
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
   const [isInvalidReply, setIsInvalidReply] = useState<Record<string, boolean>>({});
 
-  const newReplyRef = useRef<HTMLInputElement>(null);
+  const newReplyRef = useRef<InputCleaveElement>(null);
   const replyRefs = useMultipleRefs<HTMLInputElement>();
   const options = field.options as FieldOptions["NUMBER"];
 
@@ -164,12 +156,12 @@ export function RecipientViewPetitionFieldNumber({
   const inputProps = {
     value,
     id: `reply-${field.id}-new`,
-    ref: newReplyRef as any,
+    ref: newReplyRef,
     isDisabled: isDisabled,
     isInvalid: isInvalidReply[field.id],
     options: cleaveOptions,
-    onKeyDown: async (event: any) => {
-      const valueAsNumber = Number(event.target.rawValue);
+    onKeyDown: async (event) => {
+      const valueAsNumber = Number((event.target as InputCleaveElement).rawValue);
       if (
         isMetaReturn(event) &&
         field.multiple &&
@@ -187,8 +179,8 @@ export function RecipientViewPetitionFieldNumber({
         }
       }
     },
-    onBlur: async (event: FocusEvent<any>) => {
-      const valueAsNumber = Number(event.target.rawValue);
+    onBlur: async (event) => {
+      const valueAsNumber = Number((event.target as InputCleaveElement).rawValue);
       if (valueAsNumber) {
         if (isNaN(valueAsNumber) || !isBetweenLimits(options, valueAsNumber)) {
           setIsInvalidReply((curr) => ({ ...curr, [field.id]: true }));
@@ -201,8 +193,8 @@ export function RecipientViewPetitionFieldNumber({
         setShowNewReply(false);
       }
     },
-    onChange: (event: ChangeEvent<any>) => {
-      const valueAsNumber = Number(event.target.rawValue);
+    onChange: (event) => {
+      const valueAsNumber = Number((event.target as InputCleaveElement).rawValue);
       const valueAsString = event.target.value;
 
       if (isNaN(valueAsNumber)) {
@@ -223,7 +215,7 @@ export function RecipientViewPetitionFieldNumber({
         id: "component.recipient-view-petition-field-reply.text-placeholder",
         defaultMessage: "Enter your answer",
       }),
-  };
+  } as ComponentPropsWithRef<typeof InputCleave>;
 
   const hasRange =
     field.options.range.isActive &&
@@ -367,27 +359,29 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
   );
 
   const cleaveOptions = useMemo(
-    () => ({
-      numeral: true,
-      numeralDecimalMark: getSeparator(intl.locale as PetitionLocale, "decimal"),
-      delimiter: getSeparator(intl.locale as PetitionLocale, "group"),
-      numeralPositiveOnly:
-        field.options.range?.isActive && field.options.range?.min !== undefined
-          ? field.options.range?.min >= 0
-          : false,
-    }),
+    () =>
+      ({
+        numeral: true,
+        numeralDecimalScale: 2,
+        numeralDecimalMark: getSeparator(intl.locale as PetitionLocale, "decimal"),
+        delimiter: getSeparator(intl.locale as PetitionLocale, "group"),
+        numeralPositiveOnly:
+          field.options.range?.isActive && field.options.range?.min !== undefined
+            ? field.options.range?.min >= 0
+            : false,
+      } as CleaveOptions),
     [intl.locale, field.options.range?.min]
   );
 
   const props = {
     value,
     id: `reply-${field.id}-${reply.id}`,
-    ref: ref as any,
+    ref: ref,
     isDisabled: isDisabled || reply.status === "APPROVED",
     isInvalid: reply.status === "REJECTED" || isInvalid,
     paddingRight: 10,
     options: cleaveOptions,
-    onKeyDown: async (event: KeyboardEvent) => {
+    onKeyDown: async (event) => {
       if (isMetaReturn(event) && field.multiple) {
         onAddNewReply();
       } else if (event.key === "Backspace" && value === "") {
@@ -396,8 +390,9 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
         onDelete(true);
       }
     },
-    onBlur: async (event: FocusEvent<any>) => {
-      const valueAsNumber = Number(event.target.rawValue);
+    onBlur: async (event) => {
+      console.log(typeof (event.target as any).rawValue as string);
+      const valueAsNumber = Number((event.target as any).rawValue as string);
       const valueAsString = event.target.value;
 
       if (valueAsNumber !== reply.content.value) {
@@ -412,8 +407,8 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
         onDelete();
       }
     },
-    onChange: (event: ChangeEvent<any>) => {
-      const valueAsNumber = Number(event.target.rawValue);
+    onChange: (event) => {
+      const valueAsNumber = Number((event.target as InputCleaveElement).rawValue);
       const valueAsString = event.target.value;
 
       if (isNaN(valueAsNumber)) {
@@ -435,7 +430,7 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
         id: "component.recipient-view-petition-field-reply.text-placeholder",
         defaultMessage: "Enter your answer",
       }),
-  };
+  } as ComponentPropsWithRef<typeof InputCleave>;
 
   return (
     <Stack direction="row">

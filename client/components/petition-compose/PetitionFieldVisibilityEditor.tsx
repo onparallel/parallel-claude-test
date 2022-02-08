@@ -40,20 +40,11 @@ import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuLis
 import { toSelectOption } from "@parallel/utils/react-select/toSelectOption";
 import { CustomSelectProps, OptionType } from "@parallel/utils/react-select/types";
 import { ValueProps } from "@parallel/utils/ValueProps";
-import {
-  ChangeEvent,
-  FocusEvent,
-  Fragment,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { Fragment, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, { createFilter } from "react-select";
 import { pick, uniq, zip } from "remeda";
-import { InputCleave } from "../common/InputCleave";
+import { InputCleave, InputCleaveElement } from "../common/InputCleave";
 
 export interface PetitionFieldVisibilityProps {
   fieldId: string;
@@ -679,11 +670,9 @@ function ConditionPredicateValueFloat({
       backgroundColor="white"
       value={value}
       isDisabled={isReadOnly}
-      onChange={(event: ChangeEvent<HTMLInputElement>) => {
-        setValue(event.target.value);
-      }}
-      onBlur={(event: FocusEvent<any>) => {
-        onChange({ ...condition, value: Number(event.target.rawValue) });
+      onChange={(event) => setValue(event.target.value)}
+      onBlur={(event) => {
+        onChange({ ...condition, value: Number((event.target as InputCleaveElement).rawValue) });
       }}
       options={{
         numeral: true,
