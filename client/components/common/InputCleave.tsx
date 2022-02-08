@@ -12,12 +12,14 @@ export interface InputCleaveElement extends HTMLInputElement {
   rawValue?: string;
 }
 
-export const InputCleave = chakraForwardRef<
-  "input",
-  CleaveInputProps,
-  HTMLInputElement & { rawValue: string }
->(function InputCleave(props, ref) {
-  const cleaveRef = useRef<InputCleaveElement>();
-  useImperativeHandle(ref, () => cleaveRef.current!.element);
-  return <Input as={Cleave} ref={cleaveRef} {...props} />;
-});
+interface CleaveInstance {
+  element: InputCleaveElement;
+}
+
+export const InputCleave = chakraForwardRef<"input", CleaveInputProps, InputCleaveElement>(
+  function InputCleave(props, ref) {
+    const cleaveRef = useRef<CleaveInstance>();
+    useImperativeHandle(ref, () => cleaveRef.current!.element);
+    return <Input as={Cleave} ref={cleaveRef as any} {...props} />;
+  }
+);

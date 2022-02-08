@@ -15,10 +15,7 @@ import {
 } from "@chakra-ui/react";
 import { DeleteIcon, PlusCircleIcon } from "@parallel/chakra/icons";
 import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
-import {
-  PetitionFieldVisibilityEditor_PetitionFieldFragment,
-  PetitionLocale,
-} from "@parallel/graphql/__types";
+import { PetitionFieldVisibilityEditor_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import {
   defaultCondition,
@@ -33,7 +30,6 @@ import {
   PetitionFieldVisibilityType,
   PseudoPetitionFieldVisibilityConditionOperator,
 } from "@parallel/utils/fieldVisibility/types";
-import { getSeparator } from "@parallel/utils/intl";
 import { FieldOptions, getDynamicSelectValues } from "@parallel/utils/petitionFields";
 import { useInlineReactSelectProps, useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuList";
@@ -44,7 +40,8 @@ import { Fragment, SetStateAction, useCallback, useEffect, useMemo, useState } f
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, { createFilter } from "react-select";
 import { pick, uniq, zip } from "remeda";
-import { InputCleave, InputCleaveElement } from "../common/InputCleave";
+import { InputCleaveElement } from "../common/InputCleave";
+import { NumeralInput } from "../common/NumeralInput";
 
 export interface PetitionFieldVisibilityProps {
   fieldId: string;
@@ -665,7 +662,7 @@ function ConditionPredicateValueFloat({
   const [value, setValue] = useState(intl.formatNumber(condition.value as number) ?? "0");
 
   return (
-    <InputCleave
+    <NumeralInput
       size="sm"
       backgroundColor="white"
       value={value}
@@ -673,11 +670,6 @@ function ConditionPredicateValueFloat({
       onChange={(event) => setValue(event.target.value)}
       onBlur={(event) => {
         onChange({ ...condition, value: Number((event.target as InputCleaveElement).rawValue) });
-      }}
-      options={{
-        numeral: true,
-        numeralDecimalMark: getSeparator(intl.locale as PetitionLocale, "decimal"),
-        delimiter: getSeparator(intl.locale as PetitionLocale, "group"),
       }}
       placeholder={intl.formatMessage({
         id: "generic.enter-a-value",

@@ -1,17 +1,15 @@
 import { Center, Flex, List, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { InputCleave, InputCleaveElement } from "@parallel/components/common/InputCleave";
-import { PetitionLocale } from "@parallel/graphql/__types";
-import { getSeparator } from "@parallel/utils/intl";
+import { InputCleaveElement } from "@parallel/components/common/InputCleave";
+import { NumeralInput } from "@parallel/components/common/NumeralInput";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
-import { CleaveOptions } from "cleave.js/options";
 import { AnimatePresence, motion } from "framer-motion";
-import { ComponentPropsWithRef, forwardRef, useEffect, useMemo, useRef, useState } from "react";
+import { ComponentPropsWithRef, forwardRef, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import {
@@ -53,7 +51,7 @@ export function RecipientViewPetitionFieldNumber({
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
   const [isInvalidReply, setIsInvalidReply] = useState<Record<string, boolean>>({});
 
-  const newReplyRef = useRef<InputCleaveElement>(null);
+  const newReplyRef = useRef<HTMLInputElement>(null);
   const replyRefs = useMultipleRefs<HTMLInputElement>();
   const options = field.options as FieldOptions["NUMBER"];
 
@@ -140,26 +138,17 @@ export function RecipientViewPetitionFieldNumber({
     }
   };
 
-  const cleaveOptions = useMemo(
-    () => ({
-      numeral: true,
-      numeralDecimalMark: getSeparator(intl.locale as PetitionLocale, "decimal"),
-      delimiter: getSeparator(intl.locale as PetitionLocale, "group"),
-      numeralPositiveOnly:
-        field.options.range?.isActive && field.options.range?.min !== undefined
-          ? field.options.range?.min >= 0
-          : false,
-    }),
-    [intl.locale, field.options.range?.min]
-  );
-
   const inputProps = {
     value,
     id: `reply-${field.id}-new`,
     ref: newReplyRef,
     isDisabled: isDisabled,
     isInvalid: isInvalidReply[field.id],
-    options: cleaveOptions,
+    decimals: 2,
+    positiveOnly:
+      field.options.range?.isActive && field.options.range?.min !== undefined
+        ? field.options.range?.min >= 0
+        : false,
     onKeyDown: async (event) => {
       const valueAsNumber = Number((event.target as InputCleaveElement).rawValue);
       if (
@@ -215,7 +204,7 @@ export function RecipientViewPetitionFieldNumber({
         id: "component.recipient-view-petition-field-reply.text-placeholder",
         defaultMessage: "Enter your answer",
       }),
-  } as ComponentPropsWithRef<typeof InputCleave>;
+  } as ComponentPropsWithRef<typeof NumeralInput>;
 
   const hasRange =
     field.options.range.isActive &&
@@ -306,7 +295,7 @@ export function RecipientViewPetitionFieldNumber({
       ) : null}
       {(field.multiple && showNewReply) || field.replies.length === 0 ? (
         <Flex flex="1" position="relative" marginTop={2}>
-          <InputCleave {...inputProps} />
+          <NumeralInput {...inputProps} />
           <Center boxSize={10} position="absolute" right={0} bottom={0}>
             <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
           </Center>
@@ -358,21 +347,6 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
     [onUpdate]
   );
 
-  const cleaveOptions = useMemo(
-    () =>
-      ({
-        numeral: true,
-        numeralDecimalScale: 2,
-        numeralDecimalMark: getSeparator(intl.locale as PetitionLocale, "decimal"),
-        delimiter: getSeparator(intl.locale as PetitionLocale, "group"),
-        numeralPositiveOnly:
-          field.options.range?.isActive && field.options.range?.min !== undefined
-            ? field.options.range?.min >= 0
-            : false,
-      } as CleaveOptions),
-    [intl.locale, field.options.range?.min]
-  );
-
   const props = {
     value,
     id: `reply-${field.id}-${reply.id}`,
@@ -380,7 +354,11 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
     isDisabled: isDisabled || reply.status === "APPROVED",
     isInvalid: reply.status === "REJECTED" || isInvalid,
     paddingRight: 10,
-    options: cleaveOptions,
+    decimals: 2,
+    numeralPositiveOnly:
+      field.options.range?.isActive && field.options.range?.min !== undefined
+        ? field.options.range?.min >= 0
+        : false,
     onKeyDown: async (event) => {
       if (isMetaReturn(event) && field.multiple) {
         onAddNewReply();
@@ -430,12 +408,12 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
         id: "component.recipient-view-petition-field-reply.text-placeholder",
         defaultMessage: "Enter your answer",
       }),
-  } as ComponentPropsWithRef<typeof InputCleave>;
+  } as ComponentPropsWithRef<typeof NumeralInput>;
 
   return (
     <Stack direction="row">
       <Flex flex="1" position="relative">
-        <InputCleave {...props} />
+        <NumeralInput {...props} />
         <Center boxSize={10} position="absolute" right={0} bottom={0}>
           <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
         </Center>
