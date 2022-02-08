@@ -1,4 +1,4 @@
-import { BoxProps, IconProps, Placement, Text, TextProps } from "@chakra-ui/react";
+import { Box, BoxProps, IconProps, Placement, TextProps } from "@chakra-ui/react";
 import { QuestionIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { ReactNode } from "react";
@@ -15,7 +15,7 @@ export const HelpPopover = chakraForwardRef<"svg", HelpPopoverProps>(function (
   { children, placement = "bottom", popoverWidth, fontSize = "sm", ...props },
   ref
 ) {
-  const content = <Text fontSize={fontSize}>{children}</Text>;
+  const content = <Box fontSize={fontSize}>{children}</Box>;
 
   return (
     <SmallPopover content={content} placement={placement} width={popoverWidth}>

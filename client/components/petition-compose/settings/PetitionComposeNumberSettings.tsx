@@ -117,12 +117,10 @@ export function NumberSettings({
         />
       }
       description={
-        <Text fontSize="sm">
           <FormattedMessage
             id="component.field-settings-number.add-range-description"
             defaultMessage="Enabling this option will allow you to limit the recipient's response to a minimum or maximum amount."
           />
-        </Text>
       }
       isChecked={limitIsActive}
       onChange={(checked: boolean) => {
