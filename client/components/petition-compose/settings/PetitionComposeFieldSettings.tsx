@@ -134,6 +134,7 @@ export function PetitionComposeFieldSettings({
             onChange={(event) =>
               onFieldEdit(field.id, {
                 isInternal: event.target.checked,
+                showInPdf: !event.target.checked,
               })
             }
             isDisabled={isReadOnly || field.isFixed}
