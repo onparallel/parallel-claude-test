@@ -3000,7 +3000,7 @@ export interface SignatureConfigInput {
 
 /** The signer that need to sign the generated document. */
 export interface SignatureConfigInputSigner {
-  contactId: Scalars["GID"];
+  contactId?: InputMaybe<Scalars["GID"]>;
   email: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
@@ -8255,6 +8255,14 @@ export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
   }>;
 };
 
+export type NewSignatureRequestRow_UserFragment = {
+  __typename?: "User";
+  id: string;
+  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+};
+
 export type NewSignatureRequestRow_PetitionFragment = {
   __typename?: "Petition";
   signatureConfig?: {
@@ -8263,7 +8271,14 @@ export type NewSignatureRequestRow_PetitionFragment = {
     review: boolean;
     timezone: string;
     title: string;
-    signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      email: string;
+      fullName: string;
+      contactId?: string | null;
+      firstName: string;
+      lastName?: string | null;
+    }>;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -8449,6 +8464,10 @@ export type PetitionSignatureRequestSignerStatusIcon_SignerStatusFragment = {
 
 export type PetitionSignaturesCard_UserFragment = {
   __typename?: "User";
+  id: string;
+  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
   hasPetitionSignature: boolean;
   organization: {
     __typename?: "Organization";
@@ -8625,6 +8644,22 @@ export type PetitionSignaturesCard_sendSignatureRequestRemindersMutationVariable
 
 export type PetitionSignaturesCard_sendSignatureRequestRemindersMutation = {
   sendSignatureRequestReminders: Result;
+};
+
+export type ConfirmPetitionSignersDialog_UserFragment = {
+  __typename?: "User";
+  id: string;
+  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+};
+
+export type ConfirmPetitionSignersDialog_PetitionSignerFragment = {
+  __typename?: "PetitionSigner";
+  contactId?: string | null;
+  email: string;
+  firstName: string;
+  lastName?: string | null;
 };
 
 export type ExportRepliesDialog_UserFragment = {
@@ -20440,11 +20475,20 @@ export const PetitionReplies_PetitionFieldFragmentDoc = gql`
   ${ExportRepliesDialog_PetitionFieldFragmentDoc}
   ${useFieldVisibility_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionReplies_PetitionFieldFragment, unknown>;
+export const ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc = gql`
+  fragment ConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
+    contactId
+    email
+    firstName
+    lastName
+  }
+` as unknown as DocumentNode<ConfirmPetitionSignersDialog_PetitionSignerFragment, unknown>;
 export const NewSignatureRequestRow_PetitionFragmentDoc = gql`
   fragment NewSignatureRequestRow_Petition on Petition {
     signatureConfig {
       signers {
         ...SignerReference_PetitionSigner
+        ...ConfirmPetitionSignersDialog_PetitionSigner
       }
       letRecipientsChooseSigners
       integration {
@@ -20458,6 +20502,7 @@ export const NewSignatureRequestRow_PetitionFragmentDoc = gql`
     }
   }
   ${SignerReference_PetitionSignerFragmentDoc}
+  ${ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
 ` as unknown as DocumentNode<NewSignatureRequestRow_PetitionFragment, unknown>;
 export const DatesList_SignerStatusFragmentDoc = gql`
   fragment DatesList_SignerStatus on PetitionSignatureRequestSignerStatus {
@@ -20573,9 +20618,24 @@ export const ExportRepliesDialog_UserFragmentDoc = gql`
     hasExportCuatrecasas: hasFeatureFlag(featureFlag: EXPORT_CUATRECASAS)
   }
 ` as unknown as DocumentNode<ExportRepliesDialog_UserFragment, unknown>;
+export const ConfirmPetitionSignersDialog_UserFragmentDoc = gql`
+  fragment ConfirmPetitionSignersDialog_User on User {
+    id
+    email
+    firstName
+    lastName
+  }
+` as unknown as DocumentNode<ConfirmPetitionSignersDialog_UserFragment, unknown>;
+export const NewSignatureRequestRow_UserFragmentDoc = gql`
+  fragment NewSignatureRequestRow_User on User {
+    ...ConfirmPetitionSignersDialog_User
+  }
+  ${ConfirmPetitionSignersDialog_UserFragmentDoc}
+` as unknown as DocumentNode<NewSignatureRequestRow_UserFragment, unknown>;
 export const PetitionSignaturesCard_UserFragmentDoc = gql`
   fragment PetitionSignaturesCard_User on User {
     ...TestModeSignatureBadge_User
+    ...NewSignatureRequestRow_User
     organization {
       signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
         items {
@@ -20587,6 +20647,7 @@ export const PetitionSignaturesCard_UserFragmentDoc = gql`
     }
   }
   ${TestModeSignatureBadge_UserFragmentDoc}
+  ${NewSignatureRequestRow_UserFragmentDoc}
   ${SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc}
 ` as unknown as DocumentNode<PetitionSignaturesCard_UserFragment, unknown>;
 export const PetitionReplies_UserFragmentDoc = gql`

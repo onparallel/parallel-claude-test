@@ -255,6 +255,36 @@
     "context": "Ongoing eSignature"
   },
   {
+    "term": "component.confirm-petition-signers-dialog.confirmation-text",
+    "definition": "When you start the signature, we will send the document to be signed to the following contacts:",
+    "context": "When you start the signature, we will send the document to be signed to the following contacts:"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.contact-select.placeholder",
+    "definition": "Add a contact to sign",
+    "context": "Add a contact to sign"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.contacts-label",
+    "definition": "Who has to sign the document?",
+    "context": "Who has to sign the document?"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.header",
+    "definition": "Sign petition",
+    "context": "Sign petition"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.n-added",
+    "definition": "({n} added)",
+    "context": "({n} added)"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.start-signature-button",
+    "definition": "Start signature",
+    "context": "Start signature"
+  },
+  {
     "term": "component.confirm-remove-member-dialog.body",
     "definition": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the team? If you continue, {count, plural, =1{he} other {they}} will lose access to petitions shared with the team.",
     "context": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the team? If you continue, {count, plural, =1{he} other {they}} will lose access to petitions shared with the team."
@@ -353,6 +383,16 @@
     "term": "component.confirm-signature-config-changed.header",
     "definition": "Ongoing eSignature",
     "context": "Ongoing eSignature"
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.footer",
+    "definition": "Continue to update the signer's data. The contact data will not be overwritten.",
+    "context": "Continue to update the signer's data. The contact data will not be overwritten."
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.title",
+    "definition": "Confirm signer's data",
+    "context": "Confirm signer's data"
   },
   {
     "term": "component.confirm-skip-forward-security.confirm",
@@ -2680,6 +2720,11 @@
     "context": "Search..."
   },
   {
+    "term": "component.selected-signer-row.remove-signer",
+    "definition": "Remove signer",
+    "context": "Remove signer"
+  },
+  {
     "term": "component.send-button.schedule",
     "definition": "Schedule send",
     "context": "Schedule send"
@@ -2835,11 +2880,6 @@
     "context": "Select the signers"
   },
   {
-    "term": "component.signature-config-dialog.contacts-label",
-    "definition": "Who has to sign the petition?",
-    "context": "Who has to sign the petition?"
-  },
-  {
     "term": "component.signature-config-dialog.dont-review-before-send.option-no.explainer",
     "definition": "The signature will be initiated when the recipient has completed the information.",
     "context": "The signature will be initiated when the recipient has completed the information."
@@ -2933,6 +2973,11 @@
     "term": "component.solve-unreviewed-replies-dialog.subheading",
     "definition": "What would you like to do with them?",
     "context": "What would you like to do with them?"
+  },
+  {
+    "term": "component.suggested-signer-row.title",
+    "definition": "Suggested:",
+    "context": "Suggested:"
   },
   {
     "term": "component.table.filter-header",

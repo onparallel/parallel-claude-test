@@ -172,7 +172,7 @@ export const UserSelect = Object.assign(
         ref={ref}
         value={_value as any}
         onChange={onChange as any}
-        isMulti={isMulti ?? (false as any)}
+        isMulti={isMulti}
         loadOptions={loadOptions}
         {...reactSelectProps}
       />

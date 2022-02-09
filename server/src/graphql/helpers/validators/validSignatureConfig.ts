@@ -48,14 +48,6 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
           `${argName}.letRecipientsChooseSigners`,
           "Invalid value with empty list of signers"
         );
-      } else {
-        const validContacts = await ctx.contacts.userHasAccessToContacts(
-          ctx.user!,
-          signersInfo.map((c) => c.contactId)
-        );
-        if (!validContacts) {
-          throw new ArgValidationError(info, `${argName}.signersInfo`, "Invalid list of signers");
-        }
       }
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

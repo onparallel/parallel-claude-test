@@ -3,36 +3,49 @@ import { Box, Button, Flex, Heading, Stack, Text } from "@chakra-ui/react";
 import { TimeIcon } from "@parallel/chakra/icons";
 import {
   NewSignatureRequestRow_PetitionFragment,
+  NewSignatureRequestRow_UserFragment,
   SignatureConfigInput,
 } from "@parallel/graphql/__types";
 import { FormattedList, FormattedMessage } from "react-intl";
 import { omit } from "remeda";
 import { SignerReference } from "../common/SignerReference";
-import { useSignerSelectDialog } from "./dialogs/SignerSelectDialog";
+import {
+  ConfirmPetitionSignersDialog,
+  useConfirmPetitionSignersDialog,
+} from "./dialogs/ConfirmPetitionSignersDialog";
 
 interface NewSignatureRequestRowProps {
   petition: NewSignatureRequestRow_PetitionFragment;
+  user: NewSignatureRequestRow_UserFragment;
   onUpdateConfig: (data: SignatureConfigInput | null) => Promise<void>;
   onStart: () => void;
 }
 
 export function NewSignatureRequestRow({
   petition,
+  user,
   onUpdateConfig,
   onStart,
 }: NewSignatureRequestRowProps) {
   const signers = petition.signatureConfig?.signers ?? [];
-  const showSignerSelectDialog = useSignerSelectDialog();
+  const allowAdditionalSigners = petition.signatureConfig?.letRecipientsChooseSigners ?? false;
+  const showConfirmPetitionSignersDialog = useConfirmPetitionSignersDialog();
   const handleStartSignature = async () => {
     try {
-      if (signers.length === 0) {
-        const { signersInfo } = await showSignerSelectDialog({});
+      const signersInfo = await showConfirmPetitionSignersDialog({
+        user,
+        fixedSigners: signers,
+        allowAdditionalSigners,
+      });
+
+      if (allowAdditionalSigners) {
         await onUpdateConfig({
           ...omit(petition.signatureConfig!, ["integration", "signers", "__typename"]),
           orgIntegrationId: petition.signatureConfig!.integration!.id,
           signersInfo,
         });
       }
+
       onStart();
     } catch {}
   };
@@ -97,11 +110,18 @@ export function NewSignatureRequestRow({
 }
 
 NewSignatureRequestRow.fragments = {
+  User: gql`
+    fragment NewSignatureRequestRow_User on User {
+      ...ConfirmPetitionSignersDialog_User
+    }
+    ${ConfirmPetitionSignersDialog.fragments.User}
+  `,
   Petition: gql`
     fragment NewSignatureRequestRow_Petition on Petition {
       signatureConfig {
         signers {
           ...SignerReference_PetitionSigner
+          ...ConfirmPetitionSignersDialog_PetitionSigner
         }
         letRecipientsChooseSigners
         integration {
@@ -115,5 +135,6 @@ NewSignatureRequestRow.fragments = {
       }
     }
     ${SignerReference.fragments.PetitionSigner}
+    ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
   `,
 };

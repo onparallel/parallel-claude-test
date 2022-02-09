@@ -230,6 +230,7 @@ export function RecipientSelectGroups({
               <Box flex="1" data-section="recipient-select">
                 <ContactSelect
                   ref={recipientGroupSelectRef[index]}
+                  isMulti
                   placeholder={intl.formatMessage({
                     id: "component.recipient-select-groups.recipients-placeholder",
                     defaultMessage: "Enter recipients...",

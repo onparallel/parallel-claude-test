@@ -45,6 +45,7 @@ const fragments = {
   User: gql`
     fragment PetitionSignaturesCard_User on User {
       ...TestModeSignatureBadge_User
+      ...NewSignatureRequestRow_User
       organization {
         signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
           items {
@@ -57,6 +58,7 @@ const fragments = {
     }
     ${SignatureConfigDialog.fragments.SignatureOrgIntegration}
     ${TestModeSignatureBadge.fragments.User}
+    ${NewSignatureRequestRow.fragments.User}
   `,
   Petition: gql`
     fragment PetitionSignaturesCard_Petition on Petition {
@@ -320,6 +322,7 @@ export const PetitionSignaturesCard = Object.assign(
           <Grid templateColumns="auto 1fr auto" alignItems="center">
             {petition.signatureConfig && !current ? (
               <NewSignatureRequestRow
+                user={user}
                 petition={petition}
                 onStart={handleStartSignatureProcess}
                 onUpdateConfig={handleUpdateSignatureConfig}

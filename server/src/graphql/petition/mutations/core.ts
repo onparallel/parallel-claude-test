@@ -431,7 +431,7 @@ export const SignatureConfigInput = inputObjectType({
         name: "SignatureConfigInputSigner",
         description: "The signer that need to sign the generated document.",
         definition(t) {
-          t.nonNull.globalId("contactId", { prefixName: "Contact" });
+          t.nullable.globalId("contactId", { prefixName: "Contact" });
           t.nonNull.string("firstName");
           t.nonNull.string("lastName");
           t.nonNull.string("email");
@@ -630,22 +630,7 @@ export const updatePetition = mutationField("updatePetition", {
       data.hide_recipient_view_contents = isRecipientViewContentsHidden;
     }
     if (signatureConfig !== undefined) {
-      const contacts = await ctx.contacts.loadContact(
-        signatureConfig?.signersInfo.map((c) => c.contactId) ?? []
-      );
-      // TODO: signersInfo should be just a list of ids
-      data.signature_config = signatureConfig && {
-        ...signatureConfig,
-        signersInfo:
-          signatureConfig.signersInfo.length > 0
-            ? contacts.map((c) => ({
-                contactId: c!.id,
-                email: c!.email,
-                lastName: c!.last_name,
-                firstName: c!.first_name,
-              }))
-            : [],
-      };
+      data.signature_config = signatureConfig;
     }
     if (description !== undefined) {
       data.template_description = description === null ? null : JSON.stringify(description);

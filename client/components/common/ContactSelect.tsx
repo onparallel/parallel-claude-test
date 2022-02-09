@@ -9,16 +9,25 @@ import {
   UseReactSelectProps,
 } from "@parallel/utils/react-select/hooks";
 import { CustomAsyncCreatableSelectProps } from "@parallel/utils/react-select/types";
+import { unMaybeArray } from "@parallel/utils/types";
 import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import useMergedRef from "@react-hook/merged-ref";
-import { ClipboardEvent, forwardRef, KeyboardEvent, useMemo, useRef, useState } from "react";
+import {
+  ClipboardEvent,
+  ForwardedRef,
+  forwardRef,
+  KeyboardEvent,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { CommonProps, components, InputActionMeta, InputProps } from "react-select";
 import AsyncCreatableSelect, {
   Props as AsyncCreatableSelectProps,
 } from "react-select/async-creatable";
-import { pick } from "remeda";
+import { isDefined, pick } from "remeda";
 import { DeletedContact } from "./DeletedContact";
 
 export type ContactSelectSelection = ContactSelect_ContactFragment & {
@@ -26,21 +35,33 @@ export type ContactSelectSelection = ContactSelect_ContactFragment & {
   isDeleted?: boolean;
 };
 
-export interface ContactSelectProps
+export interface ContactSelectProps<IsMulti extends boolean = false>
   extends UseReactSelectProps,
-    CustomAsyncCreatableSelectProps<ContactSelectSelection, true> {
+    CustomAsyncCreatableSelectProps<ContactSelectSelection, IsMulti> {
   placeholder?: string;
+  isMulti?: IsMulti;
   onCreateContact: (data: { defaultEmail?: string }) => Promise<ContactSelectSelection>;
   onSearchContacts: (search: string, exclude: string[]) => Promise<ContactSelectSelection[]>;
   onPasteEmails?: (emails: string[]) => void;
 }
 
-export type ContactSelectInstance = AsyncCreatableSelect<ContactSelectSelection, true>;
+export type ContactSelectInstance<IsMulti extends boolean = false> = AsyncCreatableSelect<
+  ContactSelectSelection,
+  IsMulti
+>;
 
 export const ContactSelect = Object.assign(
-  forwardRef<ContactSelectInstance, ContactSelectProps>(function (
-    { value, onSearchContacts, onCreateContact, onPasteEmails, onChange, ...props },
-    ref
+  forwardRef(function ContactSelect<IsMulti extends boolean = false>(
+    {
+      value,
+      isMulti,
+      onSearchContacts,
+      onCreateContact,
+      onPasteEmails,
+      onChange,
+      ...props
+    }: ContactSelectProps<IsMulti>,
+    ref: ForwardedRef<ContactSelectInstance<IsMulti>>
   ) {
     const errorToast = useExistingContactToast();
 
@@ -48,7 +69,7 @@ export const ContactSelect = Object.assign(
 
     const [options, setOptions] = useState<ContactSelectSelection[]>();
 
-    const rsProps = useContactSelectReactSelectProps({
+    const rsProps = useContactSelectReactSelectProps<IsMulti>({
       ...props,
       isDisabled: props.isDisabled || isCreating,
     });
@@ -62,10 +83,13 @@ export const ContactSelect = Object.assign(
         setOptions(undefined);
         return [];
       }
+
       const exclude: string[] = [];
-      for (const recipient of value ?? []) {
-        if (!recipient.isInvalid) {
-          exclude.push(recipient.id);
+      if (isDefined(value)) {
+        for (const recipient of unMaybeArray(value)) {
+          if (!recipient.isInvalid) {
+            exclude.push(recipient.id);
+          }
         }
       }
       const options = await onSearchContacts(search.trim(), exclude);
@@ -77,10 +101,23 @@ export const ContactSelect = Object.assign(
       setIsCreating(true);
       try {
         const contact = await onCreateContact({ defaultEmail: email });
-        onChange([
-          ...(value ?? []).filter((v) => v.id !== email),
-          pick(contact, ["id", "email", "firstName", "fullName", "hasBouncedEmail"]),
-        ]);
+        if (isMulti) {
+          onChange([
+            ...((value as ContactSelectSelection[]) ?? []).filter((v) => v.id !== email),
+            pick(contact, ["id", "email", "firstName", "lastName", "fullName", "hasBouncedEmail"]),
+          ] as any);
+        } else {
+          onChange(
+            pick(contact, [
+              "id",
+              "email",
+              "firstName",
+              "lastName",
+              "fullName",
+              "hasBouncedEmail",
+            ]) as any
+          );
+        }
         setIsCreating(false);
         return true;
       } catch (e) {
@@ -111,7 +148,7 @@ export const ContactSelect = Object.assign(
           if (EMAIL_REGEX.test(cleaned)) {
             const option = options?.find((o) => o.email === cleaned);
             if (option) {
-              onChange([...(value ?? []), option]);
+              onChange([...(value as ContactSelectSelection[]), option] as any);
               setInputValue("");
               setOptions(undefined);
             } else {
@@ -143,11 +180,11 @@ export const ContactSelect = Object.assign(
     }
 
     return (
-      <AsyncCreatableSelect<ContactSelectSelection, true, never>
+      <AsyncCreatableSelect<ContactSelectSelection, IsMulti, never>
         ref={_ref}
-        value={value}
-        isMulti
+        isMulti={isMulti}
         onChange={onChange as any}
+        value={value}
         inputValue={inputValue}
         onKeyDown={handleKeyDown}
         onInputChange={handleInputChange}
@@ -176,16 +213,17 @@ export const ContactSelect = Object.assign(
   }
 );
 
-function useContactSelectReactSelectProps(
+function useContactSelectReactSelectProps<IsMulti extends boolean = false>(
   props: UseReactSelectProps
-): AsyncCreatableSelectProps<ContactSelectSelection, true, never> {
-  const rsProps = useReactSelectProps<ContactSelectSelection, true, never>(props);
+): AsyncCreatableSelectProps<ContactSelectSelection, IsMulti, never> {
+  const rsProps = useReactSelectProps<ContactSelectSelection, IsMulti, never>(props);
 
   const components = useMemo(
     () => ({
       ...rsProps.components,
       NoOptionsMessage,
       MultiValueLabel,
+      SingleValue,
       Option,
       Input,
     }),
@@ -296,6 +334,29 @@ const MultiValueLabel: typeof components.MultiValueLabel = function MultiValueLa
         </Tooltip>
       ) : null}
     </components.MultiValueLabel>
+  );
+};
+
+const SingleValue: typeof components.SingleValue = function SingleValue(props) {
+  const { fullName, email, isDeleted, hasBouncedEmail } =
+    props.data as unknown as ContactSelectSelection;
+  const intl = useIntl();
+  return (
+    <components.SingleValue {...props}>
+      <Text as="span" marginLeft={1}>
+        {isDeleted ? <DeletedContact color="red.600" /> : `${fullName} <${email}>`}
+      </Text>
+      {hasBouncedEmail ? (
+        <Tooltip
+          label={intl.formatMessage({
+            id: "component.contact-select.bounced-email-tooltip",
+            defaultMessage: "Previously bounced email",
+          })}
+        >
+          <AlertCircleFilledIcon boxSize={4} color="yellow.500" marginLeft={2} />
+        </Tooltip>
+      ) : null}
+    </components.SingleValue>
   );
 };
 

@@ -137,7 +137,7 @@ export interface NexusGenInputs {
   };
   SignatureConfigInputSigner: {
     // input type
-    contactId: NexusGenScalars["GID"]; // GID!
+    contactId?: NexusGenScalars["GID"] | null; // GID
     email: string; // String!
     firstName: string; // String!
     lastName: string; // String!

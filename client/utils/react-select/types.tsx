@@ -11,14 +11,16 @@ export interface OptionType<T extends string = string> {
 
 export type OptionTypeValue<T extends OptionType<any>> = T extends OptionType<infer U> ? U : never;
 
-export type ValueType<T, IsMulti extends boolean> = If<IsMulti, T[], T>;
+export type ValueType<T, IsMulti extends boolean> = If<IsMulti, T[], T | null>;
 
 export interface CustomSelectProps<
   T,
   IsMulti extends boolean = false,
   GroupType extends GroupTypeBase<T> = never
-> extends Omit<SelectProps<T, IsMulti, GroupType>, "value" | "onChange" | "options">,
-    ValueProps<ValueType<T, IsMulti>> {}
+> extends Omit<SelectProps<T, IsMulti, GroupType>, "value" | "onChange" | "options"> {
+  value: ValueType<T, IsMulti>;
+  onChange: (value: ValueType<T, IsMulti>) => void;
+}
 
 export interface SelectProps<
   OptionType extends OptionTypeBase = { label: string; value: string },
@@ -30,8 +32,10 @@ export interface CustomAsyncSelectProps<
   T,
   IsMulti extends boolean = false,
   GroupType extends GroupTypeBase<T> = never
-> extends Omit<_AsyncSelectProps<T, IsMulti, GroupType>, "value" | "onChange" | "options">,
-    ValueProps<ValueType<T, IsMulti>> {}
+> extends Omit<_AsyncSelectProps<T, IsMulti, GroupType>, "value" | "onChange" | "options"> {
+  value: ValueType<T, IsMulti>;
+  onChange: (value: ValueType<T, IsMulti>) => void;
+}
 
 export interface AsyncSelectProps<
   OptionType extends OptionTypeBase = { label: string; value: string },
@@ -43,8 +47,13 @@ export interface CustomAsyncCreatableSelectProps<
   T,
   IsMulti extends boolean = false,
   GroupType extends GroupTypeBase<T> = never
-> extends Omit<_AsyncCreatableSelectProps<T, IsMulti, GroupType>, "value" | "onChange" | "options">,
-    ValueProps<ValueType<T, IsMulti>> {}
+> extends Omit<
+    _AsyncCreatableSelectProps<T, IsMulti, GroupType>,
+    "value" | "onChange" | "options"
+  > {
+  value: ValueType<T, IsMulti>;
+  onChange: (value: ValueType<T, IsMulti>) => void;
+}
 
 export interface AsyncCreatableSelectProps<
   OptionType extends OptionTypeBase = { label: string; value: string },

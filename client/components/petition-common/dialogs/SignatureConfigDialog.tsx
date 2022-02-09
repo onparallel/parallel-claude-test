@@ -282,6 +282,7 @@ export function SignatureConfigDialog({
               }}
               render={({ field: { onChange, value } }) => (
                 <ContactSelect
+                  isMulti
                   value={value}
                   onChange={onChange}
                   onSearchContacts={handleSearchContacts}

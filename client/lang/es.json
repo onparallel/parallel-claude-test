@@ -255,6 +255,36 @@
     "context": "Ongoing eSignature"
   },
   {
+    "term": "component.confirm-petition-signers-dialog.confirmation-text",
+    "definition": "Al iniciar firma enviaremos el documento a firmar a los siguientes contactos:",
+    "context": "When you start the signature, we will send the document to be signed to the following contacts:"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.contact-select.placeholder",
+    "definition": "Añade un contacto para firmar",
+    "context": "Add a contact to sign"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.contacts-label",
+    "definition": "¿Quién tiene que firmar el documento?",
+    "context": "Who has to sign the document?"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.header",
+    "definition": "Firmar petición",
+    "context": "Sign petition"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.n-added",
+    "definition": "({n, plural, =1{# añadido} other{# añadidos}})",
+    "context": "({n} added)"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.start-signature-button",
+    "definition": "Iniciar firma",
+    "context": "Start signature"
+  },
+  {
     "term": "component.confirm-remove-member-dialog.body",
     "definition": "¿Estás seguro de querer <b>quitar del equipo</b> a {count, plural, =1{{fullName}} other {los miembros seleccionados}}? Si continúas, {count, plural, =1{perderá} other {perderán}} el acceso a las peticiones compartidas con el equipo.",
     "context": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the team? If you continue, {count, plural, =1{he} other {they}} will lose access to petitions shared with the team."
@@ -353,6 +383,16 @@
     "term": "component.confirm-signature-config-changed.header",
     "definition": "Firma digital pendiente",
     "context": "Ongoing eSignature"
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.footer",
+    "definition": "Continúa para actualizar los datos del firmante. Los datos del contacto no se sobreescribirán.",
+    "context": "Continue to update the signer's data. The contact data will not be overwritten."
+  },
+  {
+    "term": "component.confirm-signer-info-dialog.title",
+    "definition": "Confirme los datos del firmante",
+    "context": "Confirm signer's data"
   },
   {
     "term": "component.confirm-skip-forward-security.confirm",
@@ -2680,6 +2720,11 @@
     "context": "Search..."
   },
   {
+    "term": "component.selected-signer-row.remove-signer",
+    "definition": "Quitar firmante",
+    "context": "Remove signer"
+  },
+  {
     "term": "component.send-button.schedule",
     "definition": "Programar envío",
     "context": "Schedule send"
@@ -2835,11 +2880,6 @@
     "context": "Select the signers"
   },
   {
-    "term": "component.signature-config-dialog.contacts-label",
-    "definition": "¿Quién tiene que firmar la petición?",
-    "context": "Who has to sign the petition?"
-  },
-  {
     "term": "component.signature-config-dialog.dont-review-before-send.option-no.explainer",
     "definition": "La firma se iniciará cuando el destinatario haya completado la información.",
     "context": "The signature will be initiated when the recipient has completed the information."
@@ -2933,6 +2973,11 @@
     "term": "component.solve-unreviewed-replies-dialog.subheading",
     "definition": "¿Qué quieres hacer con ellas?",
     "context": "What would you like to do with them?"
+  },
+  {
+    "term": "component.suggested-signer-row.title",
+    "definition": "Sugerido:",
+    "context": "Suggested:"
   },
   {
     "term": "component.table.filter-header",
