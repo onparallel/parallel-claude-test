@@ -10,7 +10,6 @@ import {
   usePublicPrintPdfTask_publicTaskDocument,
 } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
-import { isApolloError } from "./apollo/isApolloError";
 import { openNewWindow } from "./openNewWindow";
 import { withError } from "./promises/withError";
 
@@ -61,25 +60,27 @@ export function usePublicPrintPdfTask() {
         }),
       });
     } else {
-      const [error] = await openNewWindow(async () => {
-        const { data } = await publicGetTaskResultFileUrl({
-          variables: { taskId: finishedTask!.id, keycode },
-        });
-        if (!data?.publicGetTaskResultFileUrl) {
-          throw new Error();
+      openNewWindow(async () => {
+        try {
+          const { data } = await publicGetTaskResultFileUrl({
+            variables: { taskId: finishedTask!.id, keycode },
+          });
+          if (!data?.publicGetTaskResultFileUrl) {
+            throw new Error();
+          }
+          return data.publicGetTaskResultFileUrl;
+        } catch (error) {
+          // don't await this. we want to immediately rethrow the error so the new window is closed
+          showError({
+            message: intl.formatMessage({
+              id: "generic.unexpected-error-happened",
+              defaultMessage:
+                "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
+            }),
+          });
+          throw error;
         }
-        return data.publicGetTaskResultFileUrl;
       });
-
-      if (error && isApolloError(error, "FILE_NOT_FOUND_ERROR")) {
-        await showError({
-          message: intl.formatMessage({
-            id: "generic.unexpected-error-happened",
-            defaultMessage:
-              "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
-          }),
-        });
-      }
     }
   };
 }
