@@ -38,6 +38,11 @@ interface ConfirmPetitionSignersDialogProps {
   allowAdditionalSigners?: boolean;
 }
 
+export interface ConfirmPetitionSignersDialogResult {
+  signers: SignatureConfigInputSigner[];
+  message: Maybe<string>;
+}
+
 type SignerSelectSelection = ConfirmPetitionSignersDialog_PetitionSignerFragment & {
   isFixed?: boolean;
   isSuggested?: boolean;
@@ -48,10 +53,7 @@ export function ConfirmPetitionSignersDialog({
   fixedSigners,
   allowAdditionalSigners,
   ...props
-}: DialogProps<
-  ConfirmPetitionSignersDialogProps,
-  { signers: SignatureConfigInputSigner[]; message: Maybe<string> }
->) {
+}: DialogProps<ConfirmPetitionSignersDialogProps, ConfirmPetitionSignersDialogResult>) {
   const {
     control,
     handleSubmit,

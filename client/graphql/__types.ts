@@ -8044,28 +8044,6 @@ export type PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyF
   content: { [key: string]: any };
 };
 
-export type usePetitionPreviewSignerInfoDialog_PetitionSignerFragment = {
-  __typename?: "PetitionSigner";
-  firstName: string;
-  lastName?: string | null;
-  email: string;
-};
-
-export type usePetitionPreviewSignerInfoDialog_UserFragment = {
-  __typename?: "User";
-  id: string;
-  firstName?: string | null;
-  lastName?: string | null;
-  fullName?: string | null;
-  email: string;
-};
-
-export type usePetitionPreviewSignerInfoDialog_OrganizationFragment = {
-  __typename?: "Organization";
-  id: string;
-  name: string;
-};
-
 export type PreviewPetitionFieldCommentsDialog_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -14296,11 +14274,14 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
     __typename?: "SignatureConfig";
     letRecipientsChooseSigners: boolean;
     review: boolean;
+    timezone: string;
+    title: string;
     signers: Array<{
       __typename?: "PetitionSigner";
+      contactId?: string | null;
+      email: string;
       firstName: string;
       lastName?: string | null;
-      email: string;
       fullName: string;
     }>;
     integration?: {
@@ -14387,11 +14368,14 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
     __typename?: "SignatureConfig";
     letRecipientsChooseSigners: boolean;
     review: boolean;
+    timezone: string;
+    title: string;
     signers: Array<{
       __typename?: "PetitionSigner";
+      contactId?: string | null;
+      email: string;
       firstName: string;
       lastName?: string | null;
-      email: string;
     }>;
   } | null;
 };
@@ -14403,10 +14387,10 @@ export type PetitionPreview_PetitionBaseFragment =
 export type PetitionPreview_UserFragment = {
   __typename?: "User";
   id: string;
+  email: string;
   firstName?: string | null;
   lastName?: string | null;
   fullName?: string | null;
-  email: string;
   createdAt: string;
   canCreateUsers: boolean;
   role: OrganizationRole;
@@ -14497,11 +14481,14 @@ export type PetitionPreview_updatePetitionMutation = {
           __typename?: "SignatureConfig";
           letRecipientsChooseSigners: boolean;
           review: boolean;
+          timezone: string;
+          title: string;
           signers: Array<{
             __typename?: "PetitionSigner";
+            contactId?: string | null;
+            email: string;
             firstName: string;
             lastName?: string | null;
-            email: string;
             fullName: string;
           }>;
           integration?: {
@@ -14591,11 +14578,14 @@ export type PetitionPreview_updatePetitionMutation = {
           __typename?: "SignatureConfig";
           letRecipientsChooseSigners: boolean;
           review: boolean;
+          timezone: string;
+          title: string;
           signers: Array<{
             __typename?: "PetitionSigner";
+            contactId?: string | null;
+            email: string;
             firstName: string;
             lastName?: string | null;
-            email: string;
           }>;
         } | null;
       };
@@ -14675,11 +14665,14 @@ export type PetitionPreview_completePetitionMutation = {
       __typename?: "SignatureConfig";
       letRecipientsChooseSigners: boolean;
       review: boolean;
+      timezone: string;
+      title: string;
       signers: Array<{
         __typename?: "PetitionSigner";
+        contactId?: string | null;
+        email: string;
         firstName: string;
         lastName?: string | null;
-        email: string;
         fullName: string;
       }>;
       integration?: {
@@ -14782,11 +14775,14 @@ export type PetitionPreview_petitionQuery = {
           __typename?: "SignatureConfig";
           letRecipientsChooseSigners: boolean;
           review: boolean;
+          timezone: string;
+          title: string;
           signers: Array<{
             __typename?: "PetitionSigner";
+            contactId?: string | null;
+            email: string;
             firstName: string;
             lastName?: string | null;
-            email: string;
             fullName: string;
           }>;
           integration?: {
@@ -14876,11 +14872,14 @@ export type PetitionPreview_petitionQuery = {
           __typename?: "SignatureConfig";
           letRecipientsChooseSigners: boolean;
           review: boolean;
+          timezone: string;
+          title: string;
           signers: Array<{
             __typename?: "PetitionSigner";
+            contactId?: string | null;
+            email: string;
             firstName: string;
             lastName?: string | null;
-            email: string;
           }>;
         } | null;
       }
@@ -14893,10 +14892,10 @@ export type PetitionPreview_userQuery = {
   me: {
     __typename?: "User";
     id: string;
+    email: string;
     firstName?: string | null;
     lastName?: string | null;
     fullName?: string | null;
-    email: string;
     createdAt: string;
     canCreateUsers: boolean;
     role: OrganizationRole;
@@ -20276,13 +20275,14 @@ export const useGetPageFields_PetitionFieldFragmentDoc = gql`
   ${groupFieldsByPages_PetitionFieldFragmentDoc}
   ${useFieldVisibility_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<useGetPageFields_PetitionFieldFragment, unknown>;
-export const usePetitionPreviewSignerInfoDialog_PetitionSignerFragmentDoc = gql`
-  fragment usePetitionPreviewSignerInfoDialog_PetitionSigner on PetitionSigner {
+export const ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc = gql`
+  fragment ConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
+    contactId
+    email
     firstName
     lastName
-    email
   }
-` as unknown as DocumentNode<usePetitionPreviewSignerInfoDialog_PetitionSignerFragment, unknown>;
+` as unknown as DocumentNode<ConfirmPetitionSignersDialog_PetitionSignerFragment, unknown>;
 export const RecipientViewContentsCard_PetitionFieldFragmentDoc = gql`
   fragment RecipientViewContentsCard_PetitionField on PetitionField {
     id
@@ -20329,8 +20329,10 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
     signatureConfig {
       letRecipientsChooseSigners
       review
+      timezone
+      title
       signers {
-        ...usePetitionPreviewSignerInfoDialog_PetitionSigner
+        ...ConfirmPetitionSignersDialog_PetitionSigner
       }
     }
     ...RecipientViewContentsCard_PetitionBase
@@ -20340,39 +20342,30 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
   ${useSendPetitionHandler_PetitionFragmentDoc}
   ${PreviewPetitionField_PetitionFieldFragmentDoc}
   ${useGetPageFields_PetitionFieldFragmentDoc}
-  ${usePetitionPreviewSignerInfoDialog_PetitionSignerFragmentDoc}
+  ${ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
   ${RecipientViewContentsCard_PetitionBaseFragmentDoc}
   ${PetitionLayout_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionPreview_PetitionBaseFragment, unknown>;
-export const usePetitionPreviewSignerInfoDialog_OrganizationFragmentDoc = gql`
-  fragment usePetitionPreviewSignerInfoDialog_Organization on Organization {
+export const ConfirmPetitionSignersDialog_UserFragmentDoc = gql`
+  fragment ConfirmPetitionSignersDialog_User on User {
     id
-    name
-  }
-` as unknown as DocumentNode<usePetitionPreviewSignerInfoDialog_OrganizationFragment, unknown>;
-export const usePetitionPreviewSignerInfoDialog_UserFragmentDoc = gql`
-  fragment usePetitionPreviewSignerInfoDialog_User on User {
-    id
+    email
     firstName
     lastName
-    fullName
-    email
   }
-` as unknown as DocumentNode<usePetitionPreviewSignerInfoDialog_UserFragment, unknown>;
+` as unknown as DocumentNode<ConfirmPetitionSignersDialog_UserFragment, unknown>;
 export const PetitionPreview_UserFragmentDoc = gql`
   fragment PetitionPreview_User on User {
     organization {
       name
       ...isUsageLimitsReached_Organization
-      ...usePetitionPreviewSignerInfoDialog_Organization
     }
     ...PetitionLayout_User
-    ...usePetitionPreviewSignerInfoDialog_User
+    ...ConfirmPetitionSignersDialog_User
   }
   ${isUsageLimitsReached_OrganizationFragmentDoc}
-  ${usePetitionPreviewSignerInfoDialog_OrganizationFragmentDoc}
   ${PetitionLayout_UserFragmentDoc}
-  ${usePetitionPreviewSignerInfoDialog_UserFragmentDoc}
+  ${ConfirmPetitionSignersDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionPreview_UserFragment, unknown>;
 export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
   fragment PetitionRepliesFieldReply_PetitionFieldReply on PetitionFieldReply {
@@ -20477,14 +20470,6 @@ export const PetitionReplies_PetitionFieldFragmentDoc = gql`
   ${ExportRepliesDialog_PetitionFieldFragmentDoc}
   ${useFieldVisibility_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionReplies_PetitionFieldFragment, unknown>;
-export const ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc = gql`
-  fragment ConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
-    contactId
-    email
-    firstName
-    lastName
-  }
-` as unknown as DocumentNode<ConfirmPetitionSignersDialog_PetitionSignerFragment, unknown>;
 export const NewSignatureRequestRow_PetitionFragmentDoc = gql`
   fragment NewSignatureRequestRow_Petition on Petition {
     signatureConfig {
@@ -20620,14 +20605,6 @@ export const ExportRepliesDialog_UserFragmentDoc = gql`
     hasExportCuatrecasas: hasFeatureFlag(featureFlag: EXPORT_CUATRECASAS)
   }
 ` as unknown as DocumentNode<ExportRepliesDialog_UserFragment, unknown>;
-export const ConfirmPetitionSignersDialog_UserFragmentDoc = gql`
-  fragment ConfirmPetitionSignersDialog_User on User {
-    id
-    email
-    firstName
-    lastName
-  }
-` as unknown as DocumentNode<ConfirmPetitionSignersDialog_UserFragment, unknown>;
 export const NewSignatureRequestRow_UserFragmentDoc = gql`
   fragment NewSignatureRequestRow_User on User {
     ...ConfirmPetitionSignersDialog_User

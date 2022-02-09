@@ -14,11 +14,12 @@ import { PetitionPreviewSignatureReviewAlert } from "@parallel/components/petiti
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
 import { useHandledTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
-import {
-  PetitionPreviewSignerInfoDialogResult,
-  usePetitionPreviewSignerInfoDialog,
-} from "@parallel/components/petition-preview/dialogs/PetitionPreviewSignerInfoDialog";
 import { PreviewPetitionField } from "@parallel/components/petition-preview/PreviewPetitionField";
+import {
+  ConfirmPetitionSignersDialog,
+  ConfirmPetitionSignersDialogResult,
+  useConfirmPetitionSignersDialog,
+} from "@parallel/components/petition-replies/dialogs/ConfirmPetitionSignersDialog";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
@@ -43,6 +44,7 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
+import { omit } from "remeda";
 
 type PetitionPreviewProps = UnwrapPromise<ReturnType<typeof PetitionPreview.getInitialProps>>;
 
@@ -110,7 +112,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     _validatePetitionFields
   );
 
-  const showCompleteSignerInfoDialog = usePetitionPreviewSignerInfoDialog();
+  const showConfirmPetitionSignersDialog = useConfirmPetitionSignersDialog();
   const [completePetition] = useMutation(PetitionPreview_completePetitionDocument);
   const showTestSignatureDialog = useHandledTestSignatureDialog();
 
@@ -123,14 +125,12 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             !visibility[index] || f.optional || completedFieldReplies(f).length > 0 || f.isReadOnly
         );
         if (canFinalize && isPetition) {
-          let completeSignerInfoData: PetitionPreviewSignerInfoDialogResult | null = null;
-
+          const allowAdditionalSigners = petition.signatureConfig?.letRecipientsChooseSigners;
+          let completeSignerInfoData: ConfirmPetitionSignersDialogResult | null = null;
           if (petition.signatureConfig?.review === false) {
-            completeSignerInfoData = await showCompleteSignerInfoDialog({
-              recipientCanAddSigners: petition.signatureConfig?.letRecipientsChooseSigners,
-              signers: petition!.signatureConfig?.signers ?? [],
-              petitionId,
-              organization: me.organization,
+            completeSignerInfoData = await showConfirmPetitionSignersDialog({
+              allowAdditionalSigners,
+              fixedSigners: petition!.signatureConfig?.signers ?? [],
               user: me,
             });
           }
@@ -140,10 +140,24 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             petition.signatureConfig?.integration?.name
           );
 
+          if (allowAdditionalSigners) {
+            await updatePetition({
+              variables: {
+                petitionId,
+                data: {
+                  signatureConfig: {
+                    ...omit(petition.signatureConfig!, ["integration", "signers", "__typename"]),
+                    orgIntegrationId: petition.signatureConfig!.integration!.id,
+                    signersInfo: completeSignerInfoData!.signers,
+                  },
+                },
+              },
+            });
+          }
+
           await completePetition({
             variables: {
               petitionId,
-              additionalSigners: completeSignerInfoData?.additionalSigners,
               message: completeSignerInfoData?.message,
             },
           });
@@ -352,14 +366,16 @@ PetitionPreview.fragments = {
       signatureConfig {
         letRecipientsChooseSigners
         review
+        timezone
+        title
         signers {
-          ...usePetitionPreviewSignerInfoDialog_PetitionSigner
+          ...ConfirmPetitionSignersDialog_PetitionSigner
         }
       }
       ...RecipientViewContentsCard_PetitionBase
       ...PetitionLayout_PetitionBase
     }
-    ${usePetitionPreviewSignerInfoDialog.fragments.PetitionSigner}
+    ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
     ${RecipientViewProgressFooter.fragments.Petition}
     ${useSendPetitionHandler.fragments.Petition}
     ${RecipientViewContentsCard.fragments.PetitionBase}
@@ -372,14 +388,12 @@ PetitionPreview.fragments = {
       organization {
         name
         ...isUsageLimitsReached_Organization
-        ...usePetitionPreviewSignerInfoDialog_Organization
       }
       ...PetitionLayout_User
-      ...usePetitionPreviewSignerInfoDialog_User
+      ...ConfirmPetitionSignersDialog_User
     }
     ${isUsageLimitsReached.fragments.Organization}
-    ${usePetitionPreviewSignerInfoDialog.fragments.Organization}
-    ${usePetitionPreviewSignerInfoDialog.fragments.User}
+    ${ConfirmPetitionSignersDialog.fragments.User}
     ${PetitionLayout.fragments.User}
   `,
 };
