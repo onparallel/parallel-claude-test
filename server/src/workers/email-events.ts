@@ -67,6 +67,7 @@ createQueueWorker(
             "Worker:email-events"
           ),
           context.petitions.updateRemindersForPetition(access.petition_id, null),
+          context.petitions.cancelScheduledMessagesByAccessIds([access.id]),
           context.petitions.createEvent({
             type: "PETITION_REMINDER_BOUNCED",
             data: {

@@ -763,13 +763,39 @@ export class PetitionRepository extends BaseRepository {
     return row ?? null;
   }
 
+  async cancelScheduledMessagesByAccessIds(accessIds: number[], userId?: number) {
+    const messages = await this.from("petition_message")
+      .whereIn("petition_access_id", accessIds)
+      .where("status", "SCHEDULED")
+      .update(
+        {
+          status: "CANCELLED",
+        },
+        "*"
+      );
+
+    await this.createEvent(
+      messages.map((message) => ({
+        type: "MESSAGE_CANCELLED" as const,
+        petition_id: message.petition_id,
+        data: {
+          petition_message_id: message.id,
+          user_id: userId,
+          reason: (isDefined(userId) ? "CANCELLED_BY_USER" : "EMAIL_BOUNCED") as any,
+        },
+      }))
+    );
+
+    return messages;
+  }
+
   async deactivateAccesses(
     petitionId: number,
     accessIds: number[],
     updatedBy: string,
     userId?: number
   ) {
-    const [accesses, messages] = await Promise.all([
+    const [accesses] = await Promise.all([
       this.from("petition_access").whereIn("id", accessIds).where("status", "ACTIVE").update(
         {
           reminders_active: false,
@@ -780,15 +806,7 @@ export class PetitionRepository extends BaseRepository {
         },
         "*"
       ),
-      this.from("petition_message")
-        .whereIn("petition_access_id", accessIds)
-        .where("status", "SCHEDULED")
-        .update(
-          {
-            status: "CANCELLED",
-          },
-          "*"
-        ),
+      this.cancelScheduledMessagesByAccessIds(accessIds, userId),
     ]);
 
     await this.createEvent([
@@ -799,15 +817,6 @@ export class PetitionRepository extends BaseRepository {
           petition_access_id: access.id,
           user_id: userId,
           reason: (isDefined(userId) ? "DEACTIVATED_BY_USER" : "EMAIL_BOUNCED") as any,
-        },
-      })),
-      ...messages.map((message) => ({
-        type: "MESSAGE_CANCELLED" as const,
-        petition_id: petitionId,
-        data: {
-          petition_message_id: message.id,
-          user_id: userId,
-          reason: (isDefined(userId) ? "CANCELLED_BY_USER" : "EMAIL_BOUNCED") as any,
         },
       })),
     ]);
