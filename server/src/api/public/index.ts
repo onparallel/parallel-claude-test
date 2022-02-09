@@ -1454,7 +1454,7 @@ api
         return Ok(mapReplyResponse(newReply));
       } catch (error: any) {
         if (error instanceof ClientError) {
-          if (containsGraphQLError(error, "INVALID_OPTION_ERROR")) {
+          if (containsGraphQLError(error, "INVALID_REPLY_ERROR")) {
             throw new BadRequestError(
               `Your submitted reply is invalid. Expected values are [${field?.options.values}]`
             );
@@ -1592,7 +1592,7 @@ api
         return Ok(mapReplyResponse(updatedReply));
       } catch (error: any) {
         if (error instanceof ClientError) {
-          if (containsGraphQLError(error, "INVALID_OPTION_ERROR")) {
+          if (containsGraphQLError(error, "INVALID_REPLY_ERROR")) {
             throw new BadRequestError(
               `Your submitted reply is invalid. Expected values are [${field?.options.values}]`
             );

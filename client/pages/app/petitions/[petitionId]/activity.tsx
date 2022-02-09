@@ -2,6 +2,10 @@ import { gql, useMutation } from "@apollo/client";
 import { Box, useToast } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
+import {
+  FieldErrorDialog,
+  useFieldErrorDialog,
+} from "@parallel/components/common/dialogs/FieldErrorDialog";
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
@@ -76,13 +80,16 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   );
 
   const showErrorDialog = useErrorDialog();
+  const showFieldErrorDialog = useFieldErrorDialog();
   const _validatePetitionFields = async () => {
-    const { error, errorMessage, field } = validatePetitionFields(petition.fields);
+    const { error, message, fieldsWithIndices } = validatePetitionFields(petition.fields);
     if (error) {
-      await withError(showErrorDialog({ message: errorMessage }));
-      if (field) {
-        router.push(`/app/petitions/${query.petitionId}/compose#field-${field.id}`);
+      if (fieldsWithIndices && fieldsWithIndices.length > 0) {
+        await withError(showFieldErrorDialog({ message, fieldsWithIndices }));
+        const firstId = fieldsWithIndices[0].field.id;
+        router.push(`/app/petitions/${query.petitionId}/compose#field-${firstId}`);
       } else {
+        await withError(showErrorDialog({ message }));
         router.push(`/app/petitions/${query.petitionId}/compose`);
       }
       return false;
@@ -364,6 +371,7 @@ PetitionActivity.fragments = {
       ...useSendPetitionHandler_Petition
       fields {
         ...validatePetitionFields_PetitionField
+        ...FieldErrorDialog_PetitionField
       }
     }
     ${PetitionLayout.fragments.PetitionBase}
@@ -373,6 +381,7 @@ PetitionActivity.fragments = {
     ${AddPetitionAccessDialog.fragments.Petition}
     ${useSendPetitionHandler.fragments.Petition}
     ${validatePetitionFields.fragments.PetitionField}
+    ${FieldErrorDialog.fragments.PetitionField}
   `,
   User: gql`
     fragment PetitionActivity_User on User {

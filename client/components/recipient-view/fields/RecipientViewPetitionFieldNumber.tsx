@@ -1,7 +1,6 @@
 import { Center, Flex, List, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { InputCleaveElement } from "@parallel/components/common/InputCleave";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
@@ -11,7 +10,7 @@ import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
 import { ComponentPropsWithRef, forwardRef, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { pick } from "remeda";
+import { isDefined, pick } from "remeda";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
@@ -19,7 +18,6 @@ import {
   RecipientViewPetitionFieldCard_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
-
 export interface RecipientViewPetitionFieldNumberProps
   extends Omit<
     RecipientViewPetitionFieldCardProps,
@@ -45,7 +43,7 @@ export function RecipientViewPetitionFieldNumber({
   const intl = useIntl();
 
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState<number | undefined>(undefined);
   const [isSaving, setIsSaving] = useState(false);
   const isDeletingReplyRef = useRef<Record<string, boolean>>({});
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
@@ -53,7 +51,7 @@ export function RecipientViewPetitionFieldNumber({
 
   const newReplyRef = useRef<HTMLInputElement>(null);
   const replyRefs = useMultipleRefs<HTMLInputElement>();
-  const options = field.options as FieldOptions["NUMBER"];
+  const { range, placeholder } = field.options as FieldOptions["NUMBER"];
 
   function handleAddNewReply() {
     setShowNewReply(true);
@@ -76,6 +74,7 @@ export function RecipientViewPetitionFieldNumber({
         return;
       }
       isDeletingReplyRef.current[replyId] = true;
+      setIsInvalidReply(({ [replyId]: _, ...curr }) => curr);
       setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
       if (focusPrev) {
         const index = field.replies.findIndex((r) => r.id === replyId);
@@ -99,15 +98,12 @@ export function RecipientViewPetitionFieldNumber({
 
   const handleCreate = useDebouncedCallback(
     async (value: number, focusCreatedReply: boolean) => {
-      if (!value) {
-        return;
-      }
       setIsSaving(true);
       try {
         const replyId = await onCreateReply(value);
         if (replyId) {
           const selection = pick(newReplyRef.current!, ["selectionStart", "selectionEnd"]);
-          setValue("");
+          setValue(undefined);
           if (focusCreatedReply) {
             setShowNewReply(false);
             setTimeout(() => {
@@ -145,21 +141,17 @@ export function RecipientViewPetitionFieldNumber({
     isDisabled: isDisabled,
     isInvalid: isInvalidReply[field.id],
     decimals: 2,
-    positiveOnly:
-      field.options.range?.isActive && field.options.range?.min !== undefined
-        ? field.options.range?.min >= 0
-        : false,
+    positiveOnly: isDefined(range.min) && range.min >= 0,
     onKeyDown: async (event) => {
-      const valueAsNumber = Number((event.target as InputCleaveElement).rawValue);
       if (
         isMetaReturn(event) &&
         field.multiple &&
-        !isNaN(valueAsNumber) &&
-        isBetweenLimits(options, valueAsNumber)
+        isDefined(value) &&
+        isBetweenLimits(range, value)
       ) {
-        await handleCreate.immediate(valueAsNumber, true);
+        await handleCreate.immediate(value, true);
         handleAddNewReply();
-      } else if (event.key === "Backspace" && value === "") {
+      } else if (event.key === "Backspace" && value === undefined) {
         if (field.replies.length > 0) {
           event.preventDefault();
           setShowNewReply(false);
@@ -168,47 +160,41 @@ export function RecipientViewPetitionFieldNumber({
         }
       }
     },
-    onBlur: async (event) => {
-      const valueAsNumber = Number((event.target as InputCleaveElement).rawValue);
-      if (valueAsNumber) {
-        if (isNaN(valueAsNumber) || !isBetweenLimits(options, valueAsNumber)) {
-          setIsInvalidReply((curr) => ({ ...curr, [field.id]: true }));
-          return;
-        }
-        await handleCreate.immediate(valueAsNumber, true);
+    onBlur: async () => {
+      if (!isDefined(value)) {
+        setIsInvalidReply(({ [field.id]: _, ...curr }) => curr);
+      } else if (!isBetweenLimits(range, value)) {
+        setIsInvalidReply((curr) => ({ ...curr, [field.id]: true }));
+      } else {
+        await handleCreate.immediate(value, true);
         handleCreate.clear();
         setShowNewReply(false);
-      } else if (field.replies.length > 0) {
+      }
+      if (field.replies.length > 0) {
         setShowNewReply(false);
       }
     },
-    onChange: (event) => {
-      const valueAsNumber = Number((event.target as InputCleaveElement).rawValue);
-      const valueAsString = event.target.value;
-
-      if (isNaN(valueAsNumber)) {
-        setValue(valueAsString);
-        return;
+    onChange: (value) => {
+      if (!isDefined(value)) {
+        setValue(undefined);
+      } else {
+        if (!isBetweenLimits(range, value)) {
+          setIsInvalidReply((curr) => ({ ...curr, [field.id]: true }));
+        } else {
+          setIsInvalidReply(({ [field.id]: _, ...curr }) => curr);
+          setValue(value);
+        }
       }
-      if (!isBetweenLimits(options, valueAsNumber)) {
-        setIsInvalidReply((curr) => ({ ...curr, [field.id]: true }));
-        return;
-      }
-
-      setIsInvalidReply(({ [field.id]: _, ...curr }) => curr);
-      setValue(valueAsString);
     },
     placeholder:
-      options.placeholder ??
+      placeholder ??
       intl.formatMessage({
         id: "component.recipient-view-petition-field-reply.text-placeholder",
         defaultMessage: "Enter your answer",
       }),
   } as ComponentPropsWithRef<typeof NumeralInput>;
 
-  const hasRange =
-    field.options.range.isActive &&
-    (field.options.range?.min !== undefined || field.options.range?.max !== undefined);
+  const hasRange = isDefined(range.min) || isDefined(range.max);
 
   return (
     <RecipientViewPetitionFieldCard
@@ -233,25 +219,25 @@ export function RecipientViewPetitionFieldNumber({
           />{" "}
           {hasRange ? (
             <>
-              {field.options.range.min !== undefined && field.options.range.max === undefined ? (
+              {isDefined(range.min) && !isDefined(range.max) ? (
                 <FormattedMessage
                   id="component.recipient-view-petition-field-number.range-min-description"
-                  defaultMessage="greater than or euqal to {min}"
-                  values={{ min: field.options.range?.min }}
+                  defaultMessage="greater than or equal to {min}"
+                  values={{ min: range.min }}
                 />
               ) : null}
-              {field.options.range.max !== undefined && field.options.range.min === undefined ? (
+              {isDefined(range.max) && !isDefined(range.min) ? (
                 <FormattedMessage
                   id="component.recipient-view-petition-field-number.range-max-description"
                   defaultMessage="less than or equal to {max}"
-                  values={{ max: field.options.range?.max }}
+                  values={{ max: range.max }}
                 />
               ) : null}
-              {field.options.range.min !== undefined && field.options.range.max !== undefined ? (
+              {isDefined(range.min) && isDefined(range.max) ? (
                 <FormattedMessage
                   id="component.recipient-view-petition-field-number.range-min-max-description"
                   defaultMessage="between {min} and {max}, both included"
-                  values={{ min: field.options.range?.min, max: field.options.range?.max }}
+                  values={{ min: range?.min, max: range?.max }}
                 />
               ) : null}
             </>
@@ -322,14 +308,12 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
   { field, reply, isDisabled, onUpdate, onDelete, onAddNewReply, onInvalid },
   ref
 ) {
-  const options = field.options as FieldOptions["NUMBER"];
+  const { range, placeholder } = field.options as FieldOptions["NUMBER"];
 
   const intl = useIntl();
-  const [value, setValue] = useState(
-    reply.content.value ? intl.formatNumber(reply.content.value) : ""
-  );
+  const [value, setValue] = useState(reply.content.value as number | undefined);
   const [isSaving, setIsSaving] = useState(false);
-  const [isInvalid, setIsInvalid] = useState(!isBetweenLimits(options, reply.content.value));
+  const [isInvalid, setIsInvalid] = useState(!isBetweenLimits(range, reply.content.value));
 
   useEffect(() => {
     onInvalid(reply.id, isInvalid);
@@ -355,55 +339,35 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
     isInvalid: reply.status === "REJECTED" || isInvalid,
     paddingRight: 10,
     decimals: 2,
-    numeralPositiveOnly:
-      field.options.range?.isActive && field.options.range?.min !== undefined
-        ? field.options.range?.min >= 0
-        : false,
+    positiveOnly: isDefined(range.min) && range.min >= 0,
     onKeyDown: async (event) => {
       if (isMetaReturn(event) && field.multiple) {
         onAddNewReply();
-      } else if (event.key === "Backspace" && value === "") {
+      } else if (event.key === "Backspace" && value === undefined) {
         event.preventDefault();
         debouncedUpdateReply.clear();
         onDelete(true);
       }
     },
-    onBlur: async (event) => {
-      console.log(typeof (event.target as any).rawValue as string);
-      const valueAsNumber = Number((event.target as any).rawValue as string);
-      const valueAsString = event.target.value;
-
-      if (valueAsNumber !== reply.content.value) {
-        if (isNaN(valueAsNumber) || !isBetweenLimits(options, valueAsNumber)) {
+    onBlur: async () => {
+      if (value !== reply.content.value) {
+        if (!isDefined(value) || !isBetweenLimits(range, value)) {
           setIsInvalid(true);
           return;
         }
-        await debouncedUpdateReply.immediate(valueAsNumber);
+        await debouncedUpdateReply.immediate(value);
         debouncedUpdateReply.clear();
-      } else if (!valueAsString) {
+      } else if (!isDefined(value)) {
         debouncedUpdateReply.clear();
         onDelete();
       }
     },
-    onChange: (event) => {
-      const valueAsNumber = Number((event.target as InputCleaveElement).rawValue);
-      const valueAsString = event.target.value;
-
-      if (isNaN(valueAsNumber)) {
-        setValue(valueAsString);
-        return;
-      }
-
-      if (!isBetweenLimits(options, valueAsNumber)) {
-        setIsInvalid(true);
-        return;
-      }
-
-      setIsInvalid(false);
-      setValue(valueAsString);
+    onChange: (value) => {
+      setValue(value);
+      setIsInvalid(!isDefined(value) || !isBetweenLimits(range, value));
     },
     placeholder:
-      options.placeholder ??
+      placeholder ??
       intl.formatMessage({
         id: "component.recipient-view-petition-field-reply.text-placeholder",
         defaultMessage: "Enter your answer",
@@ -437,12 +401,6 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
   );
 });
 
-function isBetweenLimits(options: FieldOptions["NUMBER"], value: number) {
-  if (options.range.isActive) {
-    const min = options.range?.min ?? -Infinity;
-    const max = options.range?.max ?? Infinity;
-    if (value >= Number(min) && value <= Number(max)) return true;
-    return false;
-  }
-  return true;
+function isBetweenLimits(range: FieldOptions["NUMBER"]["range"], value: number) {
+  return value >= (range.min ?? -Infinity) && value <= (range.max ?? Infinity);
 }

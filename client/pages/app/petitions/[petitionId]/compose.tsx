@@ -4,6 +4,10 @@ import { ListIcon, PaperPlaneIcon, SettingsIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
+import {
+  FieldErrorDialog,
+  useFieldErrorDialog,
+} from "@parallel/components/common/dialogs/FieldErrorDialog";
 import { Link } from "@parallel/components/common/Link";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
@@ -110,13 +114,13 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   }, [setShowErrors, isSharedByLink]);
 
   useEffect(() => {
-    // Validate and focus fields when have "tags" in url, because provably comes from other page when validates petition fields
+    // Validate and focus fields when have "tags" in url, because it probably comes from other page when validates petition fields
     const hash = window.location.hash;
     if (hash) {
-      const { error, field } = validatePetitionFields(petition.fields);
-      if (error && field) {
+      const { error, fieldsWithIndices } = validatePetitionFields(petition.fields);
+      if (error && fieldsWithIndices && fieldsWithIndices.length > 0) {
         setShowErrors(true);
-        focusFieldTitle(field.id);
+        focusFieldTitle(fieldsWithIndices[0].field.id);
       }
     }
   }, []);
@@ -303,16 +307,21 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   );
 
   const showErrorDialog = useErrorDialog();
+  const showFieldErrorDialog = useFieldErrorDialog();
   const validPetitionFields = async () => {
-    const { error, errorMessage, field } = validatePetitionFields(petition.fields);
+    const { error, message, fieldsWithIndices } = validatePetitionFields(petition.fields);
     if (error) {
       setShowErrors(true);
-      await withError(showErrorDialog({ message: errorMessage }));
-      if (error === "NO_REPLIABLE_FIELDS") {
-        document.querySelector<HTMLButtonElement>("#menu-button-big-add-field-button")?.click();
-      } else if (field) {
-        const node = document.querySelector(`#field-${field.id}`);
+      if (fieldsWithIndices && fieldsWithIndices.length > 0) {
+        await withError(showFieldErrorDialog({ message, fieldsWithIndices }));
+        const firstId = fieldsWithIndices[0].field.id;
+        const node = document.querySelector(`#field-${firstId}`);
         await scrollIntoView(node!, { block: "center", behavior: "smooth" });
+      } else {
+        await withError(showErrorDialog({ message }));
+        if (error === "NO_REPLIABLE_FIELDS") {
+          document.querySelector<HTMLButtonElement>("#menu-button-big-add-field-button")?.click();
+        }
       }
       return false;
     }
@@ -557,10 +566,14 @@ PetitionCompose.fragments = {
         ...PetitionComposeField_PetitionField
         ...PetitionComposeFieldSettings_PetitionField
         ...PetitionContents_PetitionField
+        ...validatePetitionFields_PetitionField
+        ...FieldErrorDialog_PetitionField
       }
       ${PetitionComposeField.fragments.PetitionField}
       ${PetitionComposeFieldSettings.fragments.PetitionField}
       ${PetitionContents.fragments.PetitionField}
+      ${validatePetitionFields.fragments.PetitionField}
+      ${FieldErrorDialog.fragments.PetitionField}
     `;
   },
   get User() {

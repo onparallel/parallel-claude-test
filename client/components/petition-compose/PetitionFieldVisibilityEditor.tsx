@@ -659,7 +659,7 @@ function ConditionPredicateValueFloat({
   isReadOnly,
 }: ConditionPredicateProps) {
   const intl = useIntl();
-  const [value, setValue] = useState(intl.formatNumber(condition.value as number) ?? "0");
+  const [value, setValue] = useState((condition.value as number) ?? 0);
 
   return (
     <NumeralInput
@@ -667,10 +667,8 @@ function ConditionPredicateValueFloat({
       backgroundColor="white"
       value={value}
       isDisabled={isReadOnly}
-      onChange={(event) => setValue(event.target.value)}
-      onBlur={(event) => {
-        onChange({ ...condition, value: Number((event.target as InputCleaveElement).rawValue) });
-      }}
+      onChange={(value) => setValue(value ?? 0)}
+      onBlur={() => onChange({ ...condition, value })}
       placeholder={intl.formatMessage({
         id: "generic.enter-a-value",
         defaultMessage: "Enter a value",

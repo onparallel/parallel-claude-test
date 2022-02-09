@@ -398,7 +398,7 @@ describe("GraphQL/Public", () => {
             values: ["Option 1"],
           },
         });
-        expect(errors).toContainGraphQLError("INVALID_OPTION_ERROR");
+        expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
         expect(data).toBeNull();
       });
 
@@ -451,7 +451,7 @@ describe("GraphQL/Public", () => {
             values: ["Option 3"],
           },
         });
-        expect(errors).toContainGraphQLError("INVALID_OPTION_ERROR");
+        expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
         expect(data).toBeNull();
       });
 
@@ -612,7 +612,7 @@ describe("GraphQL/Public", () => {
             value: "unknown option",
           },
         });
-        expect(errors).toContainGraphQLError("INVALID_OPTION_ERROR");
+        expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
         expect(data).toBeNull();
       });
 
@@ -791,7 +791,7 @@ describe("GraphQL/Public", () => {
           },
         });
 
-        expect(errors).toContainGraphQLError("INVALID_OPTION_ERROR");
+        expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
         expect(data).toBeNull();
       });
 
@@ -1089,7 +1089,7 @@ describe("GraphQL/Public", () => {
           },
         });
 
-        expect(errors).toContainGraphQLError("INVALID_OPTION_ERROR");
+        expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
         expect(data).toBeNull();
       });
 
@@ -1226,7 +1226,7 @@ describe("GraphQL/Public", () => {
             value: [["Comunidad autónoma", "Cataluña"]],
           },
         });
-        expect(errors).toContainGraphQLError("INVALID_OPTION_ERROR");
+        expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
         expect(data).toBeNull();
       });
 
@@ -1246,7 +1246,7 @@ describe("GraphQL/Public", () => {
             value: [["Ciudad", "Cataluña"]],
           },
         });
-        expect(errors).toContainGraphQLError("INVALID_OPTION_ERROR");
+        expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
         expect(data).toBeNull();
       });
 
@@ -1368,7 +1368,7 @@ describe("GraphQL/Public", () => {
           },
         });
 
-        expect(errors).toContainGraphQLError("INVALID_OPTION_ERROR");
+        expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
         expect(data).toBeNull();
       });
 

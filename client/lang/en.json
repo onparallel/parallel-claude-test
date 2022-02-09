@@ -830,24 +830,34 @@
     "context": "Exporting replies..."
   },
   {
-    "term": "component.field-settings-number.add-range",
-    "definition": "Add range",
-    "context": "Add range"
+    "term": "component.field-error-dialog.header",
+    "definition": "Validation errors",
+    "context": "Validation errors"
   },
   {
     "term": "component.field-settings-number.add-range-description",
-    "definition": "Enabling this option will allow you to limit the recipient's response to a minimum or maximum amount.",
-    "context": "Enabling this option will allow you to limit the recipient's response to a minimum or maximum amount."
+    "definition": "Limit the value range of the recipient's responses.",
+    "context": "Limit the value range of the recipient's responses."
   },
   {
-    "term": "component.field-settings-number.add-range-max",
-    "definition": "Max.",
-    "context": "Max."
+    "term": "component.field-settings-number.limit-range",
+    "definition": "Limit value range",
+    "context": "Limit value range"
   },
   {
-    "term": "component.field-settings-number.add-range-min",
-    "definition": "Min.",
-    "context": "Min."
+    "term": "component.field-settings-number.range-error",
+    "definition": "Maximum can not be lower than minimum.",
+    "context": "Maximum can not be lower than minimum."
+  },
+  {
+    "term": "component.field-settings-number.range-maximum",
+    "definition": "Maximum:",
+    "context": "Maximum:"
+  },
+  {
+    "term": "component.field-settings-number.range-minimum",
+    "definition": "Minimum:",
+    "context": "Minimum:"
   },
   {
     "term": "component.file-icon.audio-file",
@@ -2670,29 +2680,19 @@
     "context": "Remove conditions"
   },
   {
-    "term": "component.referenced-field-dialog.description",
-    "definition": "The following {count, plural, =1 {field is} other {fields are}} referencing this field:",
-    "context": "The following {count, plural, =1 {field is} other {fields are}} referencing this field:"
-  },
-  {
-    "term": "component.referenced-field-dialog.description-2",
-    "definition": "To proceed you need to remove the referencing conditions.",
-    "context": "To proceed you need to remove the referencing conditions."
-  },
-  {
-    "term": "component.referenced-field-dialog.description-2-invalid-conditions",
-    "definition": "To proceed you need to remove the referencing invalid conditions.",
-    "context": "To proceed you need to remove the referencing invalid conditions."
-  },
-  {
-    "term": "component.referenced-field-dialog.description-invalid-conditions",
-    "definition": "The following {count, plural, =1 {field is} other {fields are}} referencing this field with invalid conditions:",
-    "context": "The following {count, plural, =1 {field is} other {fields are}} referencing this field with invalid conditions:"
-  },
-  {
     "term": "component.referenced-field-dialog.header",
     "definition": "This field is being referenced",
     "context": "This field is being referenced"
+  },
+  {
+    "term": "component.referenced-field-dialog.referenced-error",
+    "definition": "The {count, plural, =1 {field below is} other {fields below are}} referencing this field. To proceed you need to remove the referencing conditions.",
+    "context": "The {count, plural, =1 {field below is} other {fields below are}} referencing this field. To proceed you need to remove the referencing conditions."
+  },
+  {
+    "term": "component.referenced-field-dialog.referenced-invalid-conditions",
+    "definition": "The {count, plural, =1 {field below is} other {fields below are}} referencing this field with invalid conditions. To proceed you need to remove the referencing invalid conditions.",
+    "context": "The {count, plural, =1 {field below is} other {fields below are}} referencing this field with invalid conditions. To proceed you need to remove the referencing invalid conditions."
   },
   {
     "term": "component.remove-signature-token-dialog.body",
@@ -5595,11 +5595,6 @@
     "context": "Developers"
   },
   {
-    "term": "petition.dynamic-select-field-without-options-error",
-    "definition": "Please configure the options for the conditional select fields.",
-    "context": "Please configure the options for the conditional select fields."
-  },
-  {
     "term": "petition.field-settings",
     "definition": "Field settings",
     "context": "Field settings"
@@ -5695,21 +5690,6 @@
     "context": "Petition name"
   },
   {
-    "term": "petition.no-checkbox-fields-without-options-error",
-    "definition": "Please add one or more options to all Multiple options fields.",
-    "context": "Please add one or more options to all Multiple options fields."
-  },
-  {
-    "term": "petition.no-fields-error",
-    "definition": "Please add at least one field with information you want to ask.",
-    "context": "Please add at least one field with information you want to ask."
-  },
-  {
-    "term": "petition.no-fields-without-title-error",
-    "definition": "Please add a title to every field.",
-    "context": "Please add a title to every field."
-  },
-  {
     "term": "petition.no-reminders-left-generic.toast-description",
     "definition": "You have sent the maximum number of reminders to some of the selected contacts",
     "context": "You have sent the maximum number of reminders to some of the selected contacts"
@@ -5723,11 +5703,6 @@
     "term": "petition.no-reminders-left.toast-header",
     "definition": "No reminders left",
     "context": "No reminders left"
-  },
-  {
-    "term": "petition.no-select-fields-without-options-error",
-    "definition": "Please add two or more options to all Dropdown fields.",
-    "context": "Please add two or more options to all Dropdown fields."
   },
   {
     "term": "petition.petition-scheduled-toast.description",
@@ -8943,6 +8918,36 @@
     "term": "timeline.signature-started-description",
     "definition": "We started an eSignature process on the petition {timeAgo}",
     "context": "We started an eSignature process on the petition {timeAgo}"
+  },
+  {
+    "term": "validate-petition-fields..number-field-with-invalid-limits-error",
+    "definition": "Please fix the limit range for the following <em>number</em> {count, plural, one{field} other{fields}}. The maximum can not be lower than minimum.",
+    "context": "Please fix the limit range for the following <em>number</em> {count, plural, one{field} other{fields}}. The maximum can not be lower than minimum."
+  },
+  {
+    "term": "validate-petition-fields.checkbox-fields-without-options-error",
+    "definition": "Please add one or more options to the following <em>multiple options</em> {count, plural, one{field} other{fields}}.",
+    "context": "Please add one or more options to the following <em>multiple options</em> {count, plural, one{field} other{fields}}."
+  },
+  {
+    "term": "validate-petition-fields.dynamic-select-field-without-options-error",
+    "definition": "Please configure the options for the following <em>conditional select</em> {count, plural, one{field} other{fields}}.",
+    "context": "Please configure the options for the following <em>conditional select</em> {count, plural, one{field} other{fields}}."
+  },
+  {
+    "term": "validate-petition-fields.fields-without-title-error",
+    "definition": "Please add a title to the following {count, plural, one{field} other{fields}}.",
+    "context": "Please add a title to the following {count, plural, one{field} other{fields}}."
+  },
+  {
+    "term": "validate-petition-fields.no-fields-error",
+    "definition": "Please add at least one field with information you want to ask.",
+    "context": "Please add at least one field with information you want to ask."
+  },
+  {
+    "term": "validate-petition-fields.select-fields-without-options-error",
+    "definition": "Please add two or more options to the following <em>dropdown</em> {count, plural, one{field} other{fields}}.",
+    "context": "Please add two or more options to the following <em>dropdown</em> {count, plural, one{field} other{fields}}."
   },
   {
     "term": "view.group.edit-name",

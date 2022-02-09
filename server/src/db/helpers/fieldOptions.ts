@@ -16,10 +16,8 @@ const SCHEMAS = {
         type: ["string", "null"],
       },
       range: {
-        type: "object",
-        required: ["isActive"],
+        type: ["object"],
         properties: {
-          isActive: { type: "boolean" },
           min: { type: "number" },
           max: { type: "number" },
         },
@@ -281,7 +279,6 @@ export function defaultFieldOptions(
           hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
           placeholder: options?.placeholder ?? null,
           range: {
-            isActive: false,
             min: 0,
           },
         },

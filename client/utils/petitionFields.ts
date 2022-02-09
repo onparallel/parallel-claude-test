@@ -29,9 +29,8 @@ export type FieldOptions = {
     hasCommentsEnabled: boolean;
     placeholder: Maybe<string>;
     range: {
-      isActive: boolean;
-      min: Maybe<number>;
-      max: Maybe<number>;
+      min: number | undefined;
+      max: number | undefined;
     };
   };
   SELECT: {

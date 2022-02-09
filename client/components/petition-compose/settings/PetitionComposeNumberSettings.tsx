@@ -1,18 +1,18 @@
 import {
   Box,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   HStack,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
+  Stack,
+  Text,
 } from "@chakra-ui/react";
-import { SettingsRowSwitch } from "@parallel/components/petition-compose/SettingsRowSwitch";
-import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { useEffect, useRef, useState } from "react";
+import { HelpPopover } from "@parallel/components/common/HelpPopover";
+import { NumeralInput } from "@parallel/components/common/NumeralInput";
+import { FieldOptions } from "@parallel/utils/petitionFields";
+import { useState } from "react";
 import { FormattedMessage } from "react-intl";
+import { isDefined, pick } from "remeda";
 import { PetitionComposeFieldSettingsProps } from "./PetitionComposeFieldSettings";
 
 export function NumberSettings({
@@ -20,173 +20,103 @@ export function NumberSettings({
   onFieldEdit,
   isReadOnly,
 }: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">) {
-  const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 1000, [field.id]);
+  const options = field.options as FieldOptions["NUMBER"];
+  const [range, setRange] = useState(options.range);
 
-  const [min, setMin] = useState<number | undefined>(undefined);
-  const [max, setMax] = useState<number | undefined>(undefined);
-
-  const [limitIsActive, setLimitIsActive] = useState(field.options?.range?.isActive ?? false);
-
-  const refMin = useRef<HTMLInputElement>(null);
-  const refMax = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (document.activeElement !== refMin?.current && document.activeElement !== refMax?.current) {
-      setMin(field.options?.range?.min);
-      setMax(field.options?.range?.max);
-    }
-  }, [field.options.range]);
-
-  const handleMinOnChange = (_: never, value: number) => {
-    if (Number.isNaN(value)) {
-      setMin(_);
-
-      const rangeMax = max !== undefined ? { max } : {};
-
-      debouncedOnUpdate(field.id, {
-        options: {
-          ...field.options,
-          range: {
-            isActive: field.options.range.isActive,
-            ...rangeMax,
-          },
-        },
-      });
-      return;
-    }
-    const _min = Number(value);
-
-    if (_min !== min) {
-      const _max = max !== undefined && _min >= max ? _min + 1 : max;
-
-      setMin(_min);
-      setMax(_max);
-      debouncedOnUpdate(field.id, {
-        options: {
-          ...field.options,
-          range: {
-            ...field.options.range,
-            min: _min,
-            max: _max,
-          },
-        },
-      });
-    }
+  const handleMinChange = (value: number | undefined) => {
+    setRange((r) => ({ ...r, min: value }));
   };
 
-  const handleMaxOnChange = (_: never, value: number) => {
-    if (Number.isNaN(value)) {
-      setMax(_);
+  const handleMaxChange = (value: number | undefined) => {
+    setRange((r) => ({ ...r, max: value }));
+  };
 
-      const rangeMin = min !== undefined ? { min } : {};
-
-      debouncedOnUpdate(field.id, {
-        options: {
-          ...field.options,
-          range: {
-            isActive: field.options.range.isActive,
-            ...rangeMin,
-          },
-        },
-      });
-      return;
-    }
-
-    const _max = Number(value);
-    const _min = min !== undefined && min >= _max ? _max - 1 : min;
-
-    setMin(_min);
-    setMax(_max);
-    debouncedOnUpdate(field.id, {
+  const handleBlur = () => {
+    onFieldEdit(field.id, {
       options: {
         ...field.options,
-        range: {
-          ...field.options.range,
-          min: _min,
-          max: _max,
-        },
+        range: pick(range, ["min", "max"]),
       },
     });
   };
 
+  const isInvalid = isDefined(range.min) && isDefined(range.max) && range.min > range.max;
+
   return (
-    <SettingsRowSwitch
-      label={
+    <FormControl isInvalid={isInvalid}>
+      <Text display="flex" alignItems="center" fontWeight="normal" marginBottom={2}>
         <FormattedMessage
-          id="component.field-settings-number.add-range"
-          defaultMessage="Add range"
+          id="component.field-settings-number.limit-range"
+          defaultMessage="Limit value range"
         />
-      }
-      description={
-        <FormattedMessage
-          id="component.field-settings-number.add-range-description"
-          defaultMessage="Enabling this option will allow you to limit the recipient's response to a minimum or maximum amount."
-        />
-      }
-      isChecked={limitIsActive}
-      onChange={(checked: boolean) => {
-        setLimitIsActive(checked);
-        debouncedOnUpdate(field.id, {
-          options: {
-            ...field.options,
-            range: {
-              ...field.options.range,
-              isActive: checked,
-            },
-          },
-        });
-      }}
-      isDisabled={isReadOnly}
-      controlId="field-number-range"
-    >
-      <HStack spacing={4}>
-        <FormControl flex={1} as={HStack} alignItems="center">
-          <FormLabel margin={0}>
+        <HelpPopover>
+          {
             <FormattedMessage
-              id="component.field-settings-number.add-range-min"
-              defaultMessage="Min."
+              id="component.field-settings-number.add-range-description"
+              defaultMessage="Limit the value range of the recipient's responses."
+            />
+          }
+        </HelpPopover>
+      </Text>
+      <Stack
+        spacing={{ base: 4, md: 2, lg: 4 }}
+        direction={{ base: "row", md: "column", lg: "row" }}
+      >
+        <FormControl
+          flex={1}
+          as={HStack}
+          alignItems="center"
+          isDisabled={isReadOnly}
+          isInvalid={isInvalid}
+        >
+          <FormLabel margin={0} fontSize="sm">
+            <FormattedMessage
+              id="component.field-settings-number.range-minimum"
+              defaultMessage="Minimum:"
             />
           </FormLabel>
           <Box flex="1">
-            <NumberInput
-              value={min}
-              onChange={handleMinOnChange}
-              allowMouseWheel={true}
-              isDisabled={isReadOnly}
-              flex="1"
-            >
-              <NumberInputField ref={refMin} placeholder="∞" />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
+            <NumeralInput
+              size="sm"
+              value={range.min}
+              onChange={handleMinChange}
+              onBlur={handleBlur}
+              width="100%"
+              placeholder="-∞"
+            />
           </Box>
         </FormControl>
-        <FormControl flex="1" as={HStack} alignItems="center">
-          <FormLabel margin={0}>
+        <FormControl
+          flex="1"
+          as={HStack}
+          alignItems="center"
+          isDisabled={isReadOnly}
+          isInvalid={isInvalid}
+        >
+          <FormLabel margin={0} fontSize="sm">
             <FormattedMessage
-              id="component.field-settings-number.add-range-max"
-              defaultMessage="Max."
+              id="component.field-settings-number.range-maximum"
+              defaultMessage="Maximum:"
             />
           </FormLabel>
           <Box flex="1">
-            <NumberInput
-              value={max}
-              onChange={handleMaxOnChange}
-              allowMouseWheel={true}
-              isDisabled={isReadOnly}
-              flex="1"
-            >
-              <NumberInputField ref={refMax} placeholder="∞" />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
+            <NumeralInput
+              size="sm"
+              value={range.max}
+              onChange={handleMaxChange}
+              onBlur={handleBlur}
+              width="100%"
+              placeholder="∞"
+            />
           </Box>
         </FormControl>
-      </HStack>
-    </SettingsRowSwitch>
+      </Stack>
+      <FormErrorMessage>
+        <FormattedMessage
+          id="component.field-settings-number.range-error"
+          defaultMessage="Maximum can not be lower than minimum."
+        />
+      </FormErrorMessage>
+    </FormControl>
   );
 }

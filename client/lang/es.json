@@ -830,24 +830,34 @@
     "context": "Exporting replies..."
   },
   {
-    "term": "component.field-settings-number.add-range",
-    "definition": "Añadir rango",
-    "context": "Add range"
+    "term": "component.field-error-dialog.header",
+    "definition": "Errores de validación",
+    "context": "Validation errors"
   },
   {
     "term": "component.field-settings-number.add-range-description",
     "definition": "Habilitar esta opción permitirá limitar la respuesta del destinatario a una cantidad mínima o máxima.",
-    "context": "Enabling this option will allow you to limit the recipient's response to a minimum or maximum amount."
+    "context": "Limit the value range of the recipient's responses."
   },
   {
-    "term": "component.field-settings-number.add-range-max",
-    "definition": "Máx.",
-    "context": "Max."
+    "term": "component.field-settings-number.limit-range",
+    "definition": "Limitar el rango de valores",
+    "context": "Limit value range"
   },
   {
-    "term": "component.field-settings-number.add-range-min",
-    "definition": "Mín.",
-    "context": "Min."
+    "term": "component.field-settings-number.range-error",
+    "definition": "El máximo no puede ser inferior al mínimo.",
+    "context": "Maximum can not be lower than minimum."
+  },
+  {
+    "term": "component.field-settings-number.range-maximum",
+    "definition": "Máximo:",
+    "context": "Maximum:"
+  },
+  {
+    "term": "component.field-settings-number.range-minimum",
+    "definition": "Mínimo:",
+    "context": "Minimum:"
   },
   {
     "term": "component.file-icon.audio-file",
@@ -2670,29 +2680,19 @@
     "context": "Remove conditions"
   },
   {
-    "term": "component.referenced-field-dialog.description",
-    "definition": "{count, plural, =1 {El campo siguiente hace} other {Los campos siguientes hacen}} referencia a este campo:",
-    "context": "The following {count, plural, =1 {field is} other {fields are}} referencing this field:"
-  },
-  {
-    "term": "component.referenced-field-dialog.description-2",
-    "definition": "Para proceder, necesitas borrar las condiciones que hacen referencia.",
-    "context": "To proceed you need to remove the referencing conditions."
-  },
-  {
-    "term": "component.referenced-field-dialog.description-2-invalid-conditions",
-    "definition": "Para proceder, necesitas borrar las condiciones inválidas que hacen referencia.",
-    "context": "To proceed you need to remove the referencing invalid conditions."
-  },
-  {
-    "term": "component.referenced-field-dialog.description-invalid-conditions",
-    "definition": "{count, plural, =1 {El campo siguiente hace} other {Los campos siguientes hacen}} referencia a este campo con condiciones inválidas:",
-    "context": "The following {count, plural, =1 {field is} other {fields are}} referencing this field with invalid conditions:"
-  },
-  {
     "term": "component.referenced-field-dialog.header",
     "definition": "Este campo está siendo referenciado",
     "context": "This field is being referenced"
+  },
+  {
+    "term": "component.referenced-field-dialog.referenced-error",
+    "definition": "{count, plural, =1 {El campo siguiente hace} other {Los campos siguiente hacen}} referencia a este campo. Para continuar necesitas borrar las condiciones que hacen referencia.",
+    "context": "The {count, plural, =1 {field below is} other {fields below are}} referencing this field. To proceed you need to remove the referencing conditions."
+  },
+  {
+    "term": "component.referenced-field-dialog.referenced-invalid-conditions",
+    "definition": "{count, plural, =1 {El campo siguiente hace} other {Los campos siguiente hacen}} referencia a este campo con condiciones inválidas. Para continuar necesitas borrar las condiciones inválidas que hacen referencia.",
+    "context": "The {count, plural, =1 {field below is} other {fields below are}} referencing this field with invalid conditions. To proceed you need to remove the referencing invalid conditions."
   },
   {
     "term": "component.remove-signature-token-dialog.body",
@@ -5595,11 +5595,6 @@
     "context": "Developers"
   },
   {
-    "term": "petition.dynamic-select-field-without-options-error",
-    "definition": "Por favor, configura las opciones para los campos de desplegable condicional.",
-    "context": "Please configure the options for the conditional select fields."
-  },
-  {
     "term": "petition.field-settings",
     "definition": "Ajustes de campo",
     "context": "Field settings"
@@ -5695,21 +5690,6 @@
     "context": "Petition name"
   },
   {
-    "term": "petition.no-checkbox-fields-without-options-error",
-    "definition": "Agregue una o más opciones a todos los campos de opciones múltiples.",
-    "context": "Please add one or more options to all Multiple options fields."
-  },
-  {
-    "term": "petition.no-fields-error",
-    "definition": "Por favor, añade al menos un campo con información que quieras solicitar.",
-    "context": "Please add at least one field with information you want to ask."
-  },
-  {
-    "term": "petition.no-fields-without-title-error",
-    "definition": "Por favor, añade un título a cada campo.",
-    "context": "Please add a title to every field."
-  },
-  {
     "term": "petition.no-reminders-left-generic.toast-description",
     "definition": "Has enviado el máximo número de recordatorios a alguno de los contactos seleccionados",
     "context": "You have sent the maximum number of reminders to some of the selected contacts"
@@ -5723,11 +5703,6 @@
     "term": "petition.no-reminders-left.toast-header",
     "definition": "No hay más recordatorios",
     "context": "No reminders left"
-  },
-  {
-    "term": "petition.no-select-fields-without-options-error",
-    "definition": "Por favor, agrega dos o más opciones en todos los campos de tipo desplegable.",
-    "context": "Please add two or more options to all Dropdown fields."
   },
   {
     "term": "petition.petition-scheduled-toast.description",
@@ -8943,6 +8918,36 @@
     "term": "timeline.signature-started-description",
     "definition": "Hemos iniciado un proceso de firma digital en la petición {timeAgo}",
     "context": "We started an eSignature process on the petition {timeAgo}"
+  },
+  {
+    "term": "validate-petition-fields..number-field-with-invalid-limits-error",
+    "definition": "Por favor arregle el límite de rango en {count, plural, one{el siguiente campo} other{los siguientes campos}} de tipo <em>número</em>. El máximo no puede ser inferior al mínimo.",
+    "context": "Please fix the limit range for the following <em>number</em> {count, plural, one{field} other{fields}}. The maximum can not be lower than minimum."
+  },
+  {
+    "term": "validate-petition-fields.checkbox-fields-without-options-error",
+    "definition": "Por favor, añada una o más opciones en {count, plural, one{el siguiente campo} other{los siguientes campos}} de tipo <em>opciones</em>.",
+    "context": "Please add one or more options to the following <em>multiple options</em> {count, plural, one{field} other{fields}}."
+  },
+  {
+    "term": "validate-petition-fields.dynamic-select-field-without-options-error",
+    "definition": "Por favor, configure las opciones en {count, plural, one{el siguiente campo} other{los siguientes campos}} de tipo <em>desplegable condicional</em>.",
+    "context": "Please configure the options for the following <em>conditional select</em> {count, plural, one{field} other{fields}}."
+  },
+  {
+    "term": "validate-petition-fields.fields-without-title-error",
+    "definition": "Por favor, añada un título en {count, plural, one{el siguiente campo} other{los siguientes campos}}.",
+    "context": "Please add a title to the following {count, plural, one{field} other{fields}}."
+  },
+  {
+    "term": "validate-petition-fields.no-fields-error",
+    "definition": "Por favor, añade al menos un campo con información que quieras solicitar.",
+    "context": "Please add at least one field with information you want to ask."
+  },
+  {
+    "term": "validate-petition-fields.select-fields-without-options-error",
+    "definition": "Por favor, añada dos o más opciones en {count, plural, one{el siguiente campo} other{los siguientes campos}} de tipo <em>desplegable</em>.",
+    "context": "Please add two or more options to the following <em>dropdown</em> {count, plural, one{field} other{fields}}."
   },
   {
     "term": "view.group.edit-name",

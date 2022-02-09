@@ -18,9 +18,8 @@ import { toGlobalId } from "../../util/globalId";
 import { stallFor } from "../../util/promises/stallFor";
 import { random } from "../../util/token";
 import { Maybe } from "../../util/types";
-import { isInRange } from "../../util/validators";
 import { and, chain, checkClientServerToken } from "../helpers/authorize";
-import { InvalidOptionError, WhitelistedError } from "../helpers/errors";
+import { InvalidReplyError, WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { jsonArg } from "../helpers/json";
 import { presendPetition } from "../helpers/presendPetition";
@@ -37,6 +36,7 @@ import {
   replyCanBeUpdated,
   replyIsForFieldOfType,
 } from "../petition/authorizers";
+import { validateFieldReply, validateReplyUpdate } from "../petition/validations";
 import { tasksAreOfType } from "../task/authorizers";
 import { validateCheckboxReplyValues, validateDynamicSelectReplyValues } from "../utils";
 import {
@@ -351,7 +351,7 @@ export const publicCreateSimpleReply = mutationField("publicCreateSimpleReply", 
       case "SELECT": {
         const options = field.options.values as Maybe<string[]>;
         if (!options?.includes(args.value)) {
-          throw new InvalidOptionError(info, "reply", "Invalid option");
+          throw new InvalidReplyError(info, "reply", "Invalid option");
         }
         break;
       }
@@ -396,7 +396,7 @@ export const publicUpdateSimpleReply = mutationField("publicUpdateSimpleReply", 
       case "SELECT": {
         const options = field.options.values as Maybe<string[]>;
         if (!options?.includes(args.value)) {
-          throw new InvalidOptionError(info, "reply", "Invalid option");
+          throw new InvalidReplyError(info, "reply", "Invalid option");
         }
         break;
       }
@@ -434,24 +434,7 @@ export const publicCreateNumericReply = mutationField("publicCreateNumericReply"
       fieldCanBeReplied("fieldId")
     )
   ),
-  validateArgs: async (_, args, ctx, info) => {
-    const field = (await ctx.petitions.loadField(args.fieldId))!;
-
-    switch (field.type) {
-      case "NUMBER": {
-        const options = field.options;
-        const min = options.range?.min ? Number(options.range?.min) : undefined;
-        const max = options.range?.max ? Number(options.range?.max) : undefined;
-
-        if (isNaN(args.value) || (options.range.isActive && !isInRange(args.value, min, max))) {
-          throw new InvalidOptionError(info, "reply", "Invalid number");
-        }
-        break;
-      }
-      default:
-        break;
-    }
-  },
+  validateArgs: validateFieldReply("fieldId", "value"),
   resolve: async (_, args, ctx) => {
     const field = (await ctx.petitions.loadField(args.fieldId))!;
     return await ctx.petitions.createPetitionFieldReply(
@@ -482,24 +465,7 @@ export const publicUpdateNumericReply = mutationField("publicUpdateNumericReply"
       replyCanBeUpdated("replyId")
     )
   ),
-  validateArgs: async (_, args, ctx, info) => {
-    const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
-
-    switch (field.type) {
-      case "NUMBER": {
-        const options = field.options;
-        const min = options.range?.min ? Number(options.range?.min) : undefined;
-        const max = options.range?.max ? Number(options.range?.max) : undefined;
-
-        if (isNaN(args.value) || (options.range.isActive && !isInRange(args.value, min, max))) {
-          throw new InvalidOptionError(info, "reply", "Invalid number");
-        }
-        break;
-      }
-      default:
-        break;
-    }
-  },
+  validateArgs: validateReplyUpdate("replyId", "value"),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.updatePetitionFieldReply(
       args.replyId,
@@ -535,7 +501,7 @@ export const publicCreateCheckboxReply = mutationField("publicCreateCheckboxRepl
       const field = (await ctx.petitions.loadField(args.fieldId))!;
       validateCheckboxReplyValues(field, args.values);
     } catch (error: any) {
-      throw new InvalidOptionError(info, "values", error.message);
+      throw new InvalidReplyError(info, "values", error.message);
     }
   },
   resolve: async (_, args, ctx) => {
@@ -572,7 +538,7 @@ export const publicUpdateCheckboxReply = mutationField("publicUpdateCheckboxRepl
       const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
       validateCheckboxReplyValues(field, args.values);
     } catch (error: any) {
-      throw new InvalidOptionError(info, "values", error.message);
+      throw new InvalidReplyError(info, "values", error.message);
     }
   },
   resolve: async (_, args, ctx) => {
@@ -610,7 +576,7 @@ export const publicCreateDynamicSelectReply = mutationField("publicCreateDynamic
       const field = (await ctx.petitions.loadField(args.fieldId))!;
       validateDynamicSelectReplyValues(field, args.value);
     } catch (error: any) {
-      throw new InvalidOptionError(info, "value", error.message);
+      throw new InvalidReplyError(info, "value", error.message);
     }
   },
   resolve: async (_, args, ctx) => {
@@ -647,7 +613,7 @@ export const publicUpdateDynamicSelectReply = mutationField("publicUpdateDynamic
       const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
       validateDynamicSelectReplyValues(field, args.value);
     } catch (error: any) {
-      throw new InvalidOptionError(info, "reply", error.message);
+      throw new InvalidReplyError(info, "reply", error.message);
     }
   },
   resolve: async (_, args, ctx) => {

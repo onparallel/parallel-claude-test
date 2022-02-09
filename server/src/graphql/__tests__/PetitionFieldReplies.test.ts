@@ -275,7 +275,7 @@ describe("GraphQL/Petition Field Replies", () => {
         },
       });
 
-      expect(errors).toContainGraphQLError("INVALID_OPTION_ERROR");
+      expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
       expect(data).toBeNull();
     });
   });
@@ -670,7 +670,7 @@ describe("GraphQL/Petition Field Replies", () => {
         },
       });
 
-      expect(errors).toContainGraphQLError("INVALID_OPTION_ERROR");
+      expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
       expect(data).toBeNull();
     });
 
@@ -754,7 +754,7 @@ describe("GraphQL/Petition Field Replies", () => {
         },
       });
 
-      expect(errors).toContainGraphQLError("INVALID_OPTION_ERROR");
+      expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
       expect(data).toBeNull();
     });
 
@@ -862,7 +862,7 @@ describe("GraphQL/Petition Field Replies", () => {
         },
       });
 
-      expect(errors).toContainGraphQLError("INVALID_OPTION_ERROR");
+      expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
       expect(data).toBeNull();
     });
 
@@ -884,7 +884,7 @@ describe("GraphQL/Petition Field Replies", () => {
         },
       });
 
-      expect(errors).toContainGraphQLError("INVALID_OPTION_ERROR");
+      expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
       expect(data).toBeNull();
     });
 
@@ -985,7 +985,7 @@ describe("GraphQL/Petition Field Replies", () => {
         },
       });
 
-      expect(errors).toContainGraphQLError("INVALID_OPTION_ERROR");
+      expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
       expect(data).toBeNull();
     });
 
@@ -1008,7 +1008,7 @@ describe("GraphQL/Petition Field Replies", () => {
         },
       });
 
-      expect(errors).toContainGraphQLError("INVALID_OPTION_ERROR");
+      expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
       expect(data).toBeNull();
     });
 
@@ -1171,7 +1171,7 @@ describe("GraphQL/Petition Field Replies", () => {
         },
       });
 
-      expect(errors).toContainGraphQLError("INVALID_OPTION_ERROR");
+      expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
       expect(data).toBeNull();
     });
 

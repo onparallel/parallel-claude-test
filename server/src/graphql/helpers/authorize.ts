@@ -41,10 +41,8 @@ export function authenticateAnd<TypeName extends string, FieldName extends strin
   return chain(authenticate(), and(...resolvers));
 }
 
-export type Arg<TypeName extends string, FieldName extends string, Type = any> = KeysOfType<
-  core.ArgsValue<TypeName, FieldName>,
-  Type
->;
+export type Arg<TypeName extends string, FieldName extends string, Type = any> = string &
+  KeysOfType<core.ArgsValue<TypeName, FieldName>, Type>;
 
 export function argIsContextUserId<
   TypeName extends string,

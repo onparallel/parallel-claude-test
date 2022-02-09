@@ -3,6 +3,10 @@ import { Box, Flex, Stack, useToast } from "@chakra-ui/react";
 import { PaperPlaneIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
+import {
+  FieldErrorDialog,
+  useFieldErrorDialog,
+} from "@parallel/components/common/dialogs/FieldErrorDialog";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
@@ -92,13 +96,16 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const breakpoint = "md";
 
   const showErrorDialog = useErrorDialog();
+  const showFieldErrorDialog = useFieldErrorDialog();
   const _validatePetitionFields = async () => {
-    const { error, errorMessage, field } = validatePetitionFields(petition.fields);
+    const { error, message, fieldsWithIndices } = validatePetitionFields(petition.fields);
     if (error) {
-      await withError(showErrorDialog({ message: errorMessage }));
-      if (field) {
-        router.push(`/app/petitions/${query.petitionId}/compose#field-${field.id}`);
+      if (fieldsWithIndices && fieldsWithIndices.length > 0) {
+        await withError(showFieldErrorDialog({ message, fieldsWithIndices }));
+        const firstId = fieldsWithIndices[0].field.id;
+        router.push(`/app/petitions/${query.petitionId}/compose#field-${firstId}`);
       } else {
+        await withError(showErrorDialog({ message }));
         router.push(`/app/petitions/${query.petitionId}/compose`);
       }
       return false;
@@ -365,6 +372,8 @@ PetitionPreview.fragments = {
       fields {
         ...PreviewPetitionField_PetitionField
         ...useGetPageFields_PetitionField
+        ...validatePetitionFields_PetitionField
+        ...FieldErrorDialog_PetitionField
       }
       signatureConfig {
         letRecipientsChooseSigners
@@ -386,6 +395,8 @@ PetitionPreview.fragments = {
     ${PetitionLayout.fragments.PetitionBase}
     ${PreviewPetitionField.fragments.PetitionField}
     ${useGetPageFields.fragments.PetitionField}
+    ${validatePetitionFields.fragments.PetitionField}
+    ${FieldErrorDialog.fragments.PetitionField}
   `,
   User: gql`
     fragment PetitionPreview_User on User {

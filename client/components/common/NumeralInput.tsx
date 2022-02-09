@@ -1,17 +1,20 @@
 import { FormControlOptions, ThemingProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { CleaveOptions } from "cleave.js/options";
-import { useMemo } from "react";
+import { ChangeEvent, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
-import { InputCleave } from "./InputCleave";
+import { isDefined } from "remeda";
+import { InputCleave, InputCleaveElement } from "./InputCleave";
 
 interface NumeralInputProps extends ThemingProps<"Input">, FormControlOptions {
   decimals?: number;
   positiveOnly?: boolean;
+  onChange: (value: number | undefined) => void;
+  value: number | undefined;
 }
 
 export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(function NumeralInput(
-  { decimals, positiveOnly, ...props },
+  { decimals, positiveOnly, value, onChange, ...props },
   ref
 ) {
   const intl = useIntl();
@@ -25,11 +28,25 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
       numeralPositiveOnly: positiveOnly,
     };
   }, [intl.locale, decimals, positiveOnly]);
+  const [_value, setValue] = useState(isDefined(value) ? intl.formatNumber(value) : "");
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+    if (e.target.value === "") {
+      onChange?.(undefined);
+    } else {
+      const numericValue = Number((e.target as InputCleaveElement).rawValue);
+      if (!Number.isNaN(value)) {
+        onChange?.(numericValue);
+      }
+    }
+  };
   return (
     <InputCleave
       ref={ref}
-      inputMode={decimals === 0 ? "numeric" : "decimal"}
+      inputMode="decimal"
       options={cleaveOptions}
+      value={_value}
+      onChange={handleChange}
       {...props}
     />
   );

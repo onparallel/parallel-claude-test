@@ -497,7 +497,7 @@ export const PetitionComposeFieldList = Object.assign(
           fields {
             isFixed
             ...PetitionComposeField_PetitionField
-            ...ReferencedFieldDialogDialog_PetitionField
+            ...ReferencedFieldDialog_PetitionField
           }
         }
         ${PetitionComposeField.fragments.PetitionField}

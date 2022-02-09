@@ -2,11 +2,18 @@ import { ArgsValue } from "nexus/dist/core";
 import { GraphQLResolveInfo } from "graphql";
 import { decode } from "jsonwebtoken";
 import { isDefined } from "remeda";
-import { Petition, PetitionAccess, PetitionAccessStatus, PetitionStatus } from "../../db/__types";
+import {
+  Petition,
+  PetitionAccess,
+  PetitionAccessStatus,
+  PetitionField,
+  PetitionStatus,
+} from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { Maybe } from "../../util/types";
-import { ArgValidationError } from "../helpers/errors";
+import { ArgValidationError, InvalidReplyError } from "../helpers/errors";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
+import { Arg } from "../helpers/authorize";
 
 export function validatePetitionStatus(
   petition: Maybe<Petition>,
@@ -139,4 +146,59 @@ export function validatePublicPetitionLinkSlug<TypeName extends string, FieldNam
       );
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
+}
+
+export function validateFieldReply<
+  TypeName extends string,
+  FieldName extends string,
+  TFieldIdArg extends Arg<TypeName, FieldName, number>,
+  TValuedArg extends Arg<TypeName, FieldName>
+>(fieldIdArg: TFieldIdArg, valueArg: TValuedArg) {
+  return (async (_, args, ctx, info) => {
+    const fieldId = args[fieldIdArg] as unknown as number;
+    const value = args[valueArg] as any;
+    const field = (await ctx.petitions.loadField(fieldId))!;
+
+    validateReplyValue(field, value, info, valueArg);
+  }) as FieldValidateArgsResolver<TypeName, FieldName>;
+}
+
+export function validateReplyUpdate<
+  TypeName extends string,
+  FieldName extends string,
+  TReplyIdArg extends Arg<TypeName, FieldName, number>,
+  TValuedArg extends Arg<TypeName, FieldName>
+>(replyIdArg: TReplyIdArg, valueArg: TValuedArg) {
+  return (async (_, args, ctx, info) => {
+    const replyId = args[replyIdArg] as unknown as number;
+    const value = args[valueArg] as any;
+    const reply = (await ctx.petitions.loadFieldReply(replyId))!;
+    const field = (await ctx.petitions.loadField(reply.petition_field_id))!;
+
+    validateReplyValue(field, value, info, valueArg);
+  }) as FieldValidateArgsResolver<TypeName, FieldName>;
+}
+
+function validateReplyValue(
+  field: PetitionField,
+  value: any,
+  info: GraphQLResolveInfo,
+  valueArg: string
+) {
+  switch (field.type) {
+    case "NUMBER": {
+      if (typeof value !== "number" || Number.isNaN(value)) {
+        throw new InvalidReplyError(info, valueArg, `Value must be a number`);
+      }
+      const options = field.options;
+      const min = (options.range.min as number) ?? -Infinity;
+      const max = (options.range.max as number) ?? Infinity;
+      if (value > max || value < min) {
+        throw new InvalidReplyError(info, valueArg, `Number must be in range [${min}, ${max}]`);
+      }
+      break;
+    }
+    default:
+      break;
+  }
 }
