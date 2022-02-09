@@ -1,5 +1,7 @@
 import { gql } from "@apollo/client";
 import {
+  Avatar,
+  Box,
   Button,
   Checkbox,
   Flex,
@@ -19,10 +21,10 @@ import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import {
-  SignatureConfigInputSigner,
   ConfirmPetitionSignersDialog_PetitionSignerFragment,
   ConfirmPetitionSignersDialog_UserFragment,
   Maybe,
+  SignatureConfigInputSigner,
 } from "@parallel/graphql/__types";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { withError } from "@parallel/utils/promises/withError";
@@ -172,12 +174,11 @@ export function ConfirmPetitionSignersDialog({
               name="signers"
               control={control}
               render={({ field: { onChange } }) => (
-                <Stack>
-                  <Stack spacing={2} paddingY={1} maxH="210px" overflowY="auto">
+                <>
+                  <Stack spacing={0} paddingY={1} maxH="210px" overflowY="auto">
                     {signers.map((s, key) => (
                       <SelectedSignerRow
                         key={key}
-                        height={6}
                         isEditable={!s.isFixed}
                         signer={s}
                         onRemove={() => handleRemoveSigner(onChange)(key)}
@@ -186,7 +187,7 @@ export function ConfirmPetitionSignersDialog({
                     ))}
                   </Stack>
                   {allowAdditionalSigners || reviewBeforeSigning ? (
-                    <>
+                    <Box marginTop={2}>
                       <ContactSelect
                         // pass a variable key so we force a rerender of the select and the input is cleared every time a new signer is set
                         key={`contact-select-${signers.length}`}
@@ -198,22 +199,22 @@ export function ConfirmPetitionSignersDialog({
                           defaultMessage: "Add a contact to sign",
                         })}
                       />
-                      {!signers.find((s) => s.isSuggested) ? (
+                      {!signers.find((s) => s.email === user.email) ? (
                         <SuggestedSignerRow
                           signer={suggestedSigner}
                           onAdd={handleAddSigner(onChange)}
                         />
                       ) : null}
-                    </>
+                    </Box>
                   ) : null}
-                </Stack>
+                </>
               )}
             />
           </FormControl>
           {signers.some((s) => !s.isFixed) ? (
             <FormControl isInvalid={!!errors.message}>
               <Checkbox
-                marginY={2}
+                marginY={4}
                 colorScheme="purple"
                 isChecked={showMessage}
                 onChange={(e) => setShowMessage(e.target.checked)}
@@ -283,16 +284,16 @@ interface SuggestedSignerRowProps {
 }
 function SuggestedSignerRow({ signer, onAdd }: SuggestedSignerRowProps) {
   return (
-    <Flex justifyContent="space-between" alignItems="center">
-      <Flex>
-        <Text as="strong">
-          <FormattedMessage id="component.suggested-signer-row.title" defaultMessage="Suggested:" />
-        </Text>
-        <Text marginLeft={1}>
-          {signer.firstName} {signer.lastName} {"<"}
-          {signer.email}
-          {">"}
-        </Text>
+    <Flex justifyContent="space-between" alignItems="center" marginTop={4}>
+      <Flex alignItems="center">
+        <Avatar name={[signer.firstName, signer.lastName].join(" ")} size="sm" />
+        <Flex>
+          <Text marginLeft={2}>
+            {signer.firstName} {signer.lastName} {"<"}
+            {signer.email}
+            {">"}
+          </Text>
+        </Flex>
       </Flex>
 
       <Button onClick={() => onAdd(signer)} size="sm">
@@ -320,7 +321,8 @@ function SelectedSignerRow({
     <Flex
       justifyContent="space-between"
       alignItems="center"
-      _hover={{ backgroundColor: "gray.50" }}
+      height="32px"
+      _hover={{ backgroundColor: "gray.75" }}
       borderRadius="md"
       {...props}
     >
@@ -336,6 +338,7 @@ function SelectedSignerRow({
             size="sm"
             label={intl.formatMessage({ id: "generic.edit", defaultMessage: "Edit" })}
             icon={<EditIcon />}
+            _hover={{ backgroundColor: "gray.200" }}
             onClick={onEdit}
           />
           <IconButtonWithTooltip
@@ -347,6 +350,7 @@ function SelectedSignerRow({
             })}
             marginLeft={1}
             icon={<DeleteIcon />}
+            _hover={{ backgroundColor: "gray.200" }}
             onClick={onRemove}
           />
         </Flex>

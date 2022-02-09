@@ -1,8 +1,7 @@
-import { OptionTypeBase, GroupTypeBase, Props as _SelectProps } from "react-select";
+import { GroupTypeBase, OptionTypeBase, Props as _SelectProps } from "react-select";
 import { Props as _AsyncSelectProps } from "react-select/async";
 import { Props as _AsyncCreatableSelectProps } from "react-select/async-creatable";
 import { If } from "../types";
-import { ValueProps } from "../ValueProps";
 
 export interface OptionType<T extends string = string> {
   value: T;
