@@ -1186,6 +1186,7 @@ export type MutationsignedPetitionDownloadLinkArgs = {
 };
 
 export type MutationstartSignatureRequestArgs = {
+  message?: InputMaybe<Scalars["String"]>;
   petitionId: Scalars["GID"];
 };
 
@@ -1599,7 +1600,7 @@ export type Petition = PetitionBase & {
   /** The signature configuration for the petition. */
   signatureConfig: Maybe<SignatureConfig>;
   /** The list of signature requests. */
-  signatureRequests: Maybe<Array<PetitionSignatureRequest>>;
+  signatureRequests: Array<PetitionSignatureRequest>;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"];
   /** The status of the petition. */
@@ -2901,7 +2902,7 @@ export type SignatureConfigInput = {
 
 /** The signer that need to sign the generated document. */
 export type SignatureConfigInputSigner = {
-  contactId: Scalars["GID"];
+  contactId?: InputMaybe<Scalars["GID"]>;
   email: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
@@ -4263,7 +4264,7 @@ export type GetSignatures_petitionSignaturesQuery = {
           environment: SignatureOrgIntegrationEnvironment;
           createdAt: string;
           updatedAt: string;
-        }> | null;
+        }>;
       }
     | { __typename: "PetitionTemplate" }
     | null;

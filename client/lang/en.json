@@ -275,6 +275,16 @@
     "context": "Sign petition"
   },
   {
+    "term": "component.confirm-petition-signers-dialog.include-message",
+    "definition": "Include message",
+    "context": "Include message"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.message-placeholder",
+    "definition": "Write here a message for the signers...",
+    "context": "Write here a message for the signers..."
+  },
+  {
     "term": "component.confirm-petition-signers-dialog.n-added",
     "definition": "({n} added)",
     "context": "({n} added)"

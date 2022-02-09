@@ -1199,7 +1199,7 @@ type Mutation {
     """
     preview: Boolean
   ): FileUploadDownloadLinkResult!
-  startSignatureRequest(petitionId: GID!): PetitionSignatureRequest!
+  startSignatureRequest(message: String, petitionId: GID!): PetitionSignatureRequest!
 
   """
   Switches automatic reminders for the specified petition accesses.

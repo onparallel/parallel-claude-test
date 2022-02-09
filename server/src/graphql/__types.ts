@@ -3831,6 +3831,7 @@ export interface NexusGenArgTypes {
     };
     startSignatureRequest: {
       // args
+      message?: string | null; // String
       petitionId: NexusGenScalars["GID"]; // GID!
     };
     switchAutomaticReminders: {

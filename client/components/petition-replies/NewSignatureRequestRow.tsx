@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, Button, Flex, Heading, Stack, Text } from "@chakra-ui/react";
 import { TimeIcon } from "@parallel/chakra/icons";
 import {
+  Maybe,
   NewSignatureRequestRow_PetitionFragment,
   NewSignatureRequestRow_UserFragment,
   SignatureConfigInput,
@@ -18,7 +19,7 @@ interface NewSignatureRequestRowProps {
   petition: NewSignatureRequestRow_PetitionFragment;
   user: NewSignatureRequestRow_UserFragment;
   onUpdateConfig: (data: SignatureConfigInput | null) => Promise<void>;
-  onStart: () => void;
+  onStart: (message?: Maybe<string>) => void;
 }
 
 export function NewSignatureRequestRow({
@@ -32,7 +33,7 @@ export function NewSignatureRequestRow({
   const showConfirmPetitionSignersDialog = useConfirmPetitionSignersDialog();
   const handleStartSignature = async () => {
     try {
-      const signersInfo = await showConfirmPetitionSignersDialog({
+      const { signers: signersInfo, message } = await showConfirmPetitionSignersDialog({
         user,
         fixedSigners: signers,
         allowAdditionalSigners,
@@ -46,7 +47,7 @@ export function NewSignatureRequestRow({
         });
       }
 
-      onStart();
+      onStart(message);
     } catch {}
   };
 

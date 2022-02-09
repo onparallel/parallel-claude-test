@@ -1,5 +1,5 @@
 import { ApolloError } from "apollo-server-core";
-import { booleanArg, mutationField, nonNull } from "nexus";
+import { booleanArg, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { toGlobalId } from "../../../util/globalId";
 import { authenticateAnd } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
@@ -15,12 +15,13 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
   type: "PetitionSignatureRequest",
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
+    message: nullable(stringArg()),
   },
   authorize: authenticateAnd(
     userHasEnabledIntegration("SIGNATURE"),
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"])
   ),
-  resolve: async (_, { petitionId }, ctx) => {
+  resolve: async (_, { petitionId, message }, ctx) => {
     try {
       return await ctx.petitions.withTransaction(async (t) => {
         const [petition] = await ctx.petitions.updatePetition(
@@ -39,7 +40,7 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
 
         const { signatureRequest } = await ctx.signature.createSignatureRequest(
           petition.id,
-          petition.signature_config,
+          { ...petition.signature_config, message: message ?? undefined },
           ctx.user!,
           t
         );

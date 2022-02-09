@@ -102,8 +102,8 @@ const mutations = [
     }
   `,
   gql`
-    mutation PetitionSignaturesCard_startSignatureRequest($petitionId: GID!) {
-      startSignatureRequest(petitionId: $petitionId) {
+    mutation PetitionSignaturesCard_startSignatureRequest($petitionId: GID!, $message: String) {
+      startSignatureRequest(petitionId: $petitionId, message: $message) {
         id
         status
       }
@@ -189,33 +189,36 @@ export const PetitionSignaturesCard = Object.assign(
 
     const showErrorDialog = useErrorDialog();
 
-    const handleStartSignatureProcess = useCallback(async () => {
-      try {
-        await startSignatureRequest({
-          variables: { petitionId: petition.id },
-        });
-        await onRefetchPetition();
-      } catch (error: any) {
-        if (isApolloError(error, "SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED")) {
-          await withError(
-            showErrorDialog({
-              message: intl.formatMessage(
-                {
-                  id: "component.petition-signatures-card.no-credits-left.error",
-                  defaultMessage:
-                    "The eSignature could not be started due to lack of signature credits. Please <a>contact with support</a> to get more credits.",
-                },
-                {
-                  a: (chunks: any) => (
-                    <NormalLink href="mailto:support@onparallel.com">{chunks}</NormalLink>
-                  ),
-                }
-              ),
-            })
-          );
+    const handleStartSignatureProcess = useCallback(
+      async (message?: Maybe<string>) => {
+        try {
+          await startSignatureRequest({
+            variables: { petitionId: petition.id, message },
+          });
+          await onRefetchPetition();
+        } catch (error: any) {
+          if (isApolloError(error, "SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED")) {
+            await withError(
+              showErrorDialog({
+                message: intl.formatMessage(
+                  {
+                    id: "component.petition-signatures-card.no-credits-left.error",
+                    defaultMessage:
+                      "The eSignature could not be started due to lack of signature credits. Please <a>contact with support</a> to get more credits.",
+                  },
+                  {
+                    a: (chunks: any) => (
+                      <NormalLink href="mailto:support@onparallel.com">{chunks}</NormalLink>
+                    ),
+                  }
+                ),
+              })
+            );
+          }
         }
-      }
-    }, [startSignatureRequest, petition]);
+      },
+      [startSignatureRequest, petition]
+    );
 
     const handleDownloadSignedDoc = useCallback(
       (petitionSignatureRequestId: string) => {

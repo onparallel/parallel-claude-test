@@ -1214,6 +1214,7 @@ export interface MutationsignedPetitionDownloadLinkArgs {
 }
 
 export interface MutationstartSignatureRequestArgs {
+  message?: InputMaybe<Scalars["String"]>;
   petitionId: Scalars["GID"];
 }
 
@@ -8615,6 +8616,7 @@ export type PetitionSignaturesCard_cancelSignatureRequestMutation = {
 
 export type PetitionSignaturesCard_startSignatureRequestMutationVariables = Exact<{
   petitionId: Scalars["GID"];
+  message?: InputMaybe<Scalars["String"]>;
 }>;
 
 export type PetitionSignaturesCard_startSignatureRequestMutation = {
@@ -22264,8 +22266,8 @@ export const PetitionSignaturesCard_cancelSignatureRequestDocument = gql`
   PetitionSignaturesCard_cancelSignatureRequestMutationVariables
 >;
 export const PetitionSignaturesCard_startSignatureRequestDocument = gql`
-  mutation PetitionSignaturesCard_startSignatureRequest($petitionId: GID!) {
-    startSignatureRequest(petitionId: $petitionId) {
+  mutation PetitionSignaturesCard_startSignatureRequest($petitionId: GID!, $message: String) {
+    startSignatureRequest(petitionId: $petitionId, message: $message) {
       id
       status
     }
