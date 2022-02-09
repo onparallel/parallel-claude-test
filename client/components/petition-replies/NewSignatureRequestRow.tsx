@@ -30,16 +30,18 @@ export function NewSignatureRequestRow({
 }: NewSignatureRequestRowProps) {
   const signers = petition.signatureConfig?.signers ?? [];
   const allowAdditionalSigners = petition.signatureConfig?.letRecipientsChooseSigners ?? false;
+  const reviewBeforeSigning = petition.signatureConfig?.review ?? false;
   const showConfirmPetitionSignersDialog = useConfirmPetitionSignersDialog();
   const handleStartSignature = async () => {
     try {
       const { signers: signersInfo, message } = await showConfirmPetitionSignersDialog({
         user,
         fixedSigners: signers,
+        reviewBeforeSigning,
         allowAdditionalSigners,
       });
 
-      if (allowAdditionalSigners) {
+      if (allowAdditionalSigners || reviewBeforeSigning) {
         await onUpdateConfig({
           ...omit(petition.signatureConfig!, ["integration", "signers", "__typename"]),
           orgIntegrationId: petition.signatureConfig!.integration!.id,

@@ -35,6 +35,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 interface ConfirmPetitionSignersDialogProps {
   user: ConfirmPetitionSignersDialog_UserFragment;
   fixedSigners: ConfirmPetitionSignersDialog_PetitionSignerFragment[];
+  reviewBeforeSigning?: boolean;
   allowAdditionalSigners?: boolean;
 }
 
@@ -52,6 +53,7 @@ export function ConfirmPetitionSignersDialog({
   user,
   fixedSigners,
   allowAdditionalSigners,
+  reviewBeforeSigning,
   ...props
 }: DialogProps<ConfirmPetitionSignersDialogProps, ConfirmPetitionSignersDialogResult>) {
   const {
@@ -143,7 +145,7 @@ export function ConfirmPetitionSignersDialog({
         <>
           <FormControl id="signers" isInvalid={!!errors.signers}>
             <FormLabel>
-              {allowAdditionalSigners ? (
+              {allowAdditionalSigners || reviewBeforeSigning ? (
                 <Flex>
                   <Text as="strong">
                     <FormattedMessage
@@ -171,7 +173,7 @@ export function ConfirmPetitionSignersDialog({
               control={control}
               render={({ field: { onChange } }) => (
                 <Stack>
-                  <Stack spacing={2} maxH="180px" overflowY="auto">
+                  <Stack spacing={2} paddingY={1} maxH="210px" overflowY="auto">
                     {signers.map((s, key) => (
                       <SelectedSignerRow
                         key={key}
@@ -183,7 +185,7 @@ export function ConfirmPetitionSignersDialog({
                       />
                     ))}
                   </Stack>
-                  {allowAdditionalSigners ? (
+                  {allowAdditionalSigners || reviewBeforeSigning ? (
                     <>
                       <ContactSelect
                         // pass a variable key so we force a rerender of the select and the input is cleared every time a new signer is set
@@ -208,7 +210,7 @@ export function ConfirmPetitionSignersDialog({
               )}
             />
           </FormControl>
-          {allowAdditionalSigners && signers.some((s) => !s.isFixed) ? (
+          {signers.some((s) => !s.isFixed) ? (
             <FormControl isInvalid={!!errors.message}>
               <Checkbox
                 marginY={2}

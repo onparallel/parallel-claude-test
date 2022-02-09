@@ -125,7 +125,8 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             !visibility[index] || f.optional || completedFieldReplies(f).length > 0 || f.isReadOnly
         );
         if (canFinalize && isPetition) {
-          const allowAdditionalSigners = petition.signatureConfig?.letRecipientsChooseSigners;
+          const allowAdditionalSigners =
+            petition.signatureConfig?.letRecipientsChooseSigners ?? false;
           let completeSignerInfoData: ConfirmPetitionSignersDialogResult | null = null;
           if (petition.signatureConfig?.review === false) {
             completeSignerInfoData = await showConfirmPetitionSignersDialog({
