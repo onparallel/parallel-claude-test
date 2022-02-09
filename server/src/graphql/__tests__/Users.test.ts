@@ -2,7 +2,13 @@ import { gql } from "@apollo/client";
 import { Knex } from "knex";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Organization, Petition, PetitionPermission, User } from "../../db/__types";
+import {
+  Organization,
+  Petition,
+  PetitionPermission,
+  TemplateDefaultPermission,
+  User,
+} from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
 
@@ -86,6 +92,7 @@ describe("GraphQL/Users", () => {
     let inactiveUsers: User[];
     let user0Petition: Petition;
     let user1Petitions: Petition[];
+    let user1Template: Petition;
 
     let otherOrg: Organization;
     let otherOrgUser: User;
@@ -107,8 +114,19 @@ describe("GraphQL/Users", () => {
       }));
 
       [user0Petition] = await mocks.createRandomPetitions(organization.id, activeUsers[0].id, 1);
+      [user0Petition] = await mocks.createRandomPetitions(organization.id, activeUsers[0].id, 1);
 
       user1Petitions = await mocks.createRandomPetitions(organization.id, activeUsers[1].id, 3);
+      [user1Template] = await mocks.createRandomPetitions(
+        organization.id,
+        activeUsers[1].id,
+        1,
+        () => ({
+          is_template: true,
+          status: null,
+        })
+      );
+      await mocks.automaticShareTemplateWithUsers(user1Template.id, [activeUsers[0].id]);
 
       [otherOrg] = await mocks.createRandomOrganizations(1);
       [otherOrgUser] = await mocks.createRandomUsers(otherOrg.id, 1, () => ({
@@ -207,14 +225,23 @@ describe("GraphQL/Users", () => {
 
       const permissions = await mocks.knex
         .from<PetitionPermission>("petition_permission")
+        .where("user_id", activeUsers[0].id)
         .whereNull("deleted_at")
         .select("*");
+      expect(permissions).toHaveLength(0);
+
       const members = await mocks.knex
         .from("user_group_member")
         .where({ deleted_at: null, user_group_id: group.id });
-
-      expect(permissions.every((p) => p.user_id !== activeUsers[0].id));
       expect(members).toHaveLength(0);
+
+      const defaultPermission = await mocks.knex
+        .from<TemplateDefaultPermission>("template_default_permission")
+        .whereNull("deleted_at")
+        .where("user_id", activeUsers[0].id)
+        .where("template_id", user1Template.id)
+        .select("*");
+      expect(defaultPermission).toHaveLength(0);
     });
 
     it("updates user status to active without specifying transferToUserId argument", async () => {

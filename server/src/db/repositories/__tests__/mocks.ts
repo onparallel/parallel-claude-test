@@ -44,6 +44,7 @@ import {
   PetitionUserNotification,
   PublicPetitionLink,
   Tag,
+  TemplateDefaultPermission,
   User,
   UserAuthenticationToken,
   UserGroup,
@@ -428,6 +429,36 @@ export class Mocks {
         from_user_group_id: m.user_group_id,
         user_id: m.user_id,
         type: "WRITE",
+      }))
+    );
+  }
+
+  async automaticShareTemplateWithUsers(templateId: number, userIds: number[]) {
+    const [{ position }] = await this.knex<TemplateDefaultPermission>("template_default_permission")
+      .whereNull("deleted_at")
+      .where("template_id", templateId)
+      .select(this.knex.raw("max(position) as position"));
+    await this.knex<PetitionPermission>("template_default_permission").insert(
+      userIds.map((userId, i) => ({
+        template_id: templateId,
+        user_id: userId,
+        type: "WRITE",
+        position: (position ?? -1) + 1 + i,
+      }))
+    );
+  }
+
+  async automaticShareTemplateWithGroups(templateId: number, userGroupIds: number[]) {
+    const [{ position }] = await this.knex<TemplateDefaultPermission>("template_default_permission")
+      .whereNull("deleted_at")
+      .where("template_id", templateId)
+      .select(this.knex.raw("max(position) as position"));
+    await this.knex<PetitionPermission>("template_default_permission").insert(
+      userGroupIds.map((groupId, i) => ({
+        template_id: templateId,
+        user_group_id: groupId,
+        type: "WRITE",
+        position: (position ?? -1) + 1 + i,
       }))
     );
   }

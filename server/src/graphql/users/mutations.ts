@@ -272,6 +272,7 @@ export const deactivateUser = mutationField("deactivateUser", {
   resolve: async (_, { userIds, transferToUserId, deletePetitions }, ctx) => {
     return await ctx.petitions.withTransaction(async (t) => {
       await ctx.userGroups.removeUsersFromAllGroups(userIds, `User:${ctx.user!.id}`, t);
+
       const permissions = await ctx.petitions.loadDirectlyAssignedUserPetitionPermissionsByUserId(
         userIds
       );
@@ -282,7 +283,8 @@ export const deactivateUser = mutationField("deactivateUser", {
             userPermissions,
             (p) => p.type === "OWNER"
           );
-
+          // until allowed on the UI
+          deletePetitions = false;
           const deleteOrTransferPetitionsMethods = deletePetitions
             ? [
                 // make sure to also remove every remaining permission on deleted owned petitions
@@ -335,6 +337,11 @@ export const deactivateUser = mutationField("deactivateUser", {
                   t
                 )
               : undefined,
+            ctx.petitions.removeTemplateDefaultPermissionsForUser(
+              userId,
+              `User:${ctx.user!.id}`,
+              t
+            ),
             ...deleteOrTransferPetitionsMethods,
           ]);
 

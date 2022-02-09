@@ -15,6 +15,7 @@ describe("GraphQL/UserGroups", () => {
   let users: User[];
   let userGroups: UserGroup[];
   let petition: Petition;
+  let template: Petition;
   beforeAll(async () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
@@ -25,6 +26,10 @@ describe("GraphQL/UserGroups", () => {
     }));
 
     [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1);
+    [template] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1, () => ({
+      is_template: true,
+      status: null,
+    }));
   });
 
   afterAll(async () => {
@@ -33,6 +38,7 @@ describe("GraphQL/UserGroups", () => {
 
   beforeEach(async () => {
     await mocks.knex.from("petition_permission").delete();
+    await mocks.knex.from("template_default_permission").delete();
     await mocks.knex.from("user_group_member").delete();
     await mocks.knex.from("user_group").delete();
     userGroups = await mocks.createUserGroups(3, organization.id, (i) => ({
@@ -53,6 +59,7 @@ describe("GraphQL/UserGroups", () => {
     ]);
 
     await mocks.sharePetitionWithGroups(petition.id, [userGroups[0].id]);
+    await mocks.automaticShareTemplateWithGroups(template.id, [userGroups[0].id]);
   });
 
   it("lists all available user groups in the org", async () => {
@@ -291,6 +298,28 @@ describe("GraphQL/UserGroups", () => {
       );
 
     expect(groupPermissions).toHaveLength(0);
+  });
+
+  it("stops automatic sharing when deleting a group", async () => {
+    const { data, errors } = await testClient.mutate({
+      mutation: gql`
+        mutation UserGroups_deleteUserGroup($groupId: GID!) {
+          deleteUserGroup(ids: [$groupId])
+        }
+      `,
+      variables: {
+        groupId: toGlobalId("UserGroup", userGroups[0].id),
+      },
+    });
+    expect(errors).toBeUndefined();
+    expect(data?.deleteUserGroup).toEqual("SUCCESS");
+
+    const defaultPermissions = await mocks
+      .knex<PetitionPermission>("template_default_permission")
+      .whereNull("deleted_by")
+      .where("user_group_id", userGroups[0].id);
+
+    expect(defaultPermissions).toHaveLength(0);
   });
 
   it("add users as group members", async () => {

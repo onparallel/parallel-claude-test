@@ -3394,6 +3394,20 @@ export class PetitionRepository extends BaseRepository {
     }, t);
   }
 
+  async removeTemplateDefaultPermissionsForUser(
+    userId: number,
+    deletedBy: string,
+    t?: Knex.Transaction
+  ) {
+    await this.from("template_default_permission", t)
+      .where("user_id", userId)
+      .whereNull("deleted_at")
+      .update({
+        deleted_at: this.now(),
+        deleted_by: deletedBy,
+      });
+  }
+
   async createPermissionsFromTemplateDefaultPermissions(
     petitionId: number,
     templateId: number,

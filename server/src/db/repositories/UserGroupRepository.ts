@@ -101,26 +101,32 @@ export class UserGroupRepository extends BaseRepository {
 
   async deleteUserGroups(userGroupIds: number[], deletedBy: string) {
     await this.withTransaction(async (t) => {
-      await this.from("user_group_member", t)
-        .where({
-          deleted_at: null,
-        })
-        .whereIn("user_group_id", userGroupIds)
-        .update({ deleted_at: this.now(), deleted_by: deletedBy });
-
+      await Promise.all([
+        // remove members
+        this.from("user_group_member", t)
+          .where({
+            deleted_at: null,
+          })
+          .whereIn("user_group_id", userGroupIds)
+          .update({ deleted_at: this.now(), deleted_by: deletedBy }),
+        // stop sharing petitions with this group
+        this.from("petition_permission", t)
+          .whereNull("deleted_at")
+          .andWhere((q) =>
+            q.whereIn("user_group_id", userGroupIds).orWhereIn("from_user_group_id", userGroupIds)
+          )
+          .update({ deleted_at: this.now(), deleted_by: deletedBy }),
+        // stop automatically sharing petitions with this group
+        this.from("template_default_permission", t)
+          .whereNull("deleted_at")
+          .whereIn("user_group_id", userGroupIds)
+          .update({ deleted_at: this.now(), deleted_by: deletedBy }),
+      ]);
       await this.from("user_group", t)
         .where({
           deleted_at: null,
         })
         .whereIn("id", userGroupIds)
-        .update({ deleted_at: this.now(), deleted_by: deletedBy });
-
-      /** remove all permissions for the deleted group */
-      await this.from("petition_permission", t)
-        .whereNull("deleted_at")
-        .andWhere((q) =>
-          q.whereIn("user_group_id", userGroupIds).orWhereIn("from_user_group_id", userGroupIds)
-        )
         .update({ deleted_at: this.now(), deleted_by: deletedBy });
     });
   }
