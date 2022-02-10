@@ -23,109 +23,201 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
     });
   },
   subject({ used, total, limitName }, intl: IntlShape) {
-    return used === total
+    const petitionSendTotalCreditsUsed = limitName === "PETITION_SEND" && used === total;
+    const petitionSendFewCreditsRemaining = limitName === "PETITION_SEND" && used < total;
+    const signatureTotalCreditsUsed = limitName === "SIGNATURIT_SHARED_APIKEY" && used === total;
+    const signatureFewCreditsRemaining = limitName === "SIGNATURIT_SHARED_APIKEY" && used < total;
+
+    const percent = Math.round((used / total) * 100);
+
+    return petitionSendTotalCreditsUsed
+      ? intl.formatMessage({
+          id: "organization-limits-reached.petition-send.last-credit-used.subject",
+          defaultMessage: "You reached your petitions limit",
+        })
+      : signatureTotalCreditsUsed
+      ? intl.formatMessage({
+          id: "organization-limits-reached.signaturit-shared-apikey.last-credit-used.subject",
+          defaultMessage: "You reached your signatures limit",
+        })
+      : petitionSendFewCreditsRemaining
       ? intl.formatMessage(
           {
-            id: "organization-limits-reached.last-credit-used.subject",
-            defaultMessage:
-              "You reached your {limitName, select, PETITION_SEND{petitions} other{signatures}} limit",
+            id: "organization-limits-reached.petition-send.few-credits-remaining.subject",
+            defaultMessage: "Alert: {percent}% of your petitions have been consumed",
           },
-          { limitName }
+          { percent }
         )
-      : intl.formatMessage(
+      : signatureFewCreditsRemaining
+      ? intl.formatMessage(
           {
-            id: "organization-limits-reached.few-credits-remaining.subject",
-            defaultMessage:
-              "Alert: {percent}% of your {limitName, select, PETITION_SEND{petitions} other{signatures}} have been consumed",
+            id: "organization-limits-reached.signaturit-shared-apikey.few-credits-remaining.subject",
+            defaultMessage: "Alert: {percent}% of your signatures have been consumed",
           },
-          { percent: Math.round((used / total) * 100), limitName }
-        );
+          { percent }
+        )
+      : (null as never);
   },
   text(
     { senderName, used, total, limitName }: OrganizationLimitsReachedEmailProps,
     intl: IntlShape
   ) {
-    return outdent`
-      **${
-        used === total
-          ? intl
-              .formatMessage(
-                {
-                  id: "generic.action-required.last-credit-used",
-                  defaultMessage:
-                    "You reached your plan's {limitName, select, PETITION_SEND{petitions} other{signatures}} limit",
-                },
-                { limitName }
-              )
-              .toUpperCase()
-          : intl
-              .formatMessage(
-                {
-                  id: "generic.action-required.few-credits-remaining",
-                  defaultMessage:
-                    "You have consumed {percent}% of your {limitName, select, PETITION_SEND{petitions} other{signatures}}",
-                },
-                { percent: Math.round((used / total) * 100), limitName }
-              )
-              .toUpperCase()
-      }**
+    const petitionSendTotalCreditsUsed = used === total && limitName === "PETITION_SEND";
+    const signatureTotalCreditsUsed = used === total && limitName === "SIGNATURIT_SHARED_APIKEY";
+    const petitionSendFewCreditsRemaining = used < total && limitName === "PETITION_SEND";
+    const signatureFewCreditsRemaining = used < total && limitName === "SIGNATURIT_SHARED_APIKEY";
+
+    const percent = Math.round((used / total) * 100);
+
+    return petitionSendTotalCreditsUsed
+      ? outdent`
+      **${intl
+        .formatMessage({
+          id: "organization-limits-reached.petition-send.action-required.last-credit-used",
+          defaultMessage: "You reached your plan's petitions limit",
+        })
+        .toUpperCase()}**
 
       ${greetingUser({ name: senderName }, intl)}
 
-      ${
-        used < total
-          ? `${intl.formatMessage(
-              {
-                id: "organization-limits-reached.few-credits-remaining.text",
-                defaultMessage:
-                  "We are glad that you are {limitName, select, PETITION_SEND{speeding up your processes} other{signing your documents}} with Parallel. But it looks like you have already consumed a large part of your {limitName, select, PETITION_SEND{available petitions} other{signatures plan}}.",
-              },
-              { limitName }
-            )}
-
-${intl.formatMessage(
-  {
-    id: "organization-limits-reached.few-credits-remaining.text-2",
-    defaultMessage:
-      "At the time this email was sent, you had <b>{remaining} {limitName, select, PETITION_SEND{petitions} other{signatures}} left</b>, {remainingPercent}% of those you had contracted.",
-  },
-  {
-    limitName,
-    remaining: total - used,
-    remainingPercent: Math.round(((total - used) / total) * 100),
-    b: (chunks: any[]) => chunks,
-  }
-)}
-          
-${intl.formatMessage(
-  {
-    id: "organization-limits-reached.contact-us",
-    defaultMessage:
-      "Please contact us at <a>support@onparallel.com</a> to {limitName, select, PETITION_SEND{get more petitions} other{upgrade your signatures plan}}.",
-  },
-  { a: () => "support@onparallel.com", limitName }
-)}`
-          : `${intl.formatMessage(
-              {
-                id: "organization-limits-reached.last-credit-used.text",
-                defaultMessage:
-                  "It seems that Parallel is helping you {limitName, select, PETITION_SEND{in many processes} other{sign many of your documents}}, and you already <b>reached your {limitName, select, PETITION_SEND{limit of {total} petitions} other{signature limit}}</b>.",
-              },
-              { b: (chunks: any[]) => chunks, limitName, total }
-            )}
+      ${intl.formatMessage(
+        {
+          id: "organization-limits-reached.petition-send.last-credit-used.text",
+          defaultMessage:
+            "It seems that Parallel is helping you in many processes, and you already <b>reached your limit of {total} petitions</b>.",
+        },
+        { b: (chunks: any[]) => chunks, total }
+      )}
       
-${intl.formatMessage(
-  {
-    id: "organization-limits-reached.last-credit-used.text-2",
-    defaultMessage:
-      "{limitName, select, PETITION_SEND{Please contact us at <a>support@onparallel.com</a> so that you can continue sending your processes via Parallel} other{If you need to initiate more signatures, please contact us at <a>support@onparallel.com</a>}}.",
-  },
-  { a: () => "support@onparallel.com", limitName }
-)}`
+      ${intl.formatMessage(
+        {
+          id: "organization-limits-reached.petition-send.last-credit-used.text-2",
+          defaultMessage:
+            "Please contact us at <a>support@onparallel.com</a> so that you can continue sending your processes via Parallel.",
+        },
+        { a: () => "support@onparallel.com" }
+      )}
+          
+      ${closing({}, intl)}`
+      : signatureTotalCreditsUsed
+      ? outdent`
+      **${intl
+        .formatMessage({
+          id: "organization-limits-reached.signaturit-shared-apikey.action-required.last-credit-used",
+          defaultMessage: "You reached your plan's signatures limit",
+        })
+        .toUpperCase()}**
+
+      ${greetingUser({ name: senderName }, intl)}
+
+      ${intl.formatMessage(
+        {
+          id: "organization-limits-reached.signaturit-shared-apikey.last-credit-used.text",
+          defaultMessage:
+            "It seems that Parallel is helping you sign many of your documents, and you already <b>reached your signature limit</b>.",
+        },
+        { b: (chunks: any[]) => chunks }
+      )}
+    
+      ${intl.formatMessage(
+        {
+          id: "organization-limits-reached.signaturit-shared-apikey.last-credit-used.text-2",
+          defaultMessage:
+            "If you need to initiate more signatures, please contact us at <a>support@onparallel.com</a>.",
+        },
+        { a: () => "support@onparallel.com" }
+      )}
+    
+    ${closing({}, intl)}
+      `
+      : petitionSendFewCreditsRemaining
+      ? outdent`
+      **${intl
+        .formatMessage(
+          {
+            id: "organization-limits-reached.petition-send.action-required.few-credits-remaining",
+            defaultMessage: "You have consumed {percent}% of your petitions",
+          },
+          { percent }
+        )
+        .toUpperCase()}**
+
+    ${greetingUser({ name: senderName }, intl)}
+
+    ${intl.formatMessage({
+      id: "organization-limits-reached.petition-send.few-credits-remaining.text",
+      defaultMessage:
+        "We are glad that you are speeding up your processes with Parallel. But it looks like you have already consumed a large part of your available petitions.",
+    })}
+      
+    ${intl.formatMessage(
+      {
+        id: "organization-limits-reached.petition-send.few-credits-remaining.text-2",
+        defaultMessage:
+          "At the time this email was sent, you had <b>{remaining} petitions left</b>, {remainingPercent}% of those you had contracted.",
+      },
+      {
+        remaining: total - used,
+        remainingPercent: Math.round(((total - used) / total) * 100),
+        b: (chunks: any[]) => chunks,
       }
-            
+    )}
+      
+    ${intl.formatMessage(
+      {
+        id: "organization-limits-reached.petition-send.contact-us",
+        defaultMessage: "Please contact us at <a>support@onparallel.com</a> to get more petitions.",
+      },
+      { a: () => "support@onparallel.com" }
+    )}
+    
+    ${closing({}, intl)}
+      `
+      : signatureFewCreditsRemaining
+      ? outdent`
+      **${intl
+        .formatMessage(
+          {
+            id: "organization-limits-reached.signaturit-shared-apikey.action-required.few-credits-remaining",
+            defaultMessage: "You have consumed {percent}% of your signatures",
+          },
+          { percent }
+        )
+        .toUpperCase()}**
+
+      ${greetingUser({ name: senderName }, intl)}
+
+      ${intl.formatMessage({
+        id: "organization-limits-reached.signaturit-shared-apikey.few-credits-remaining.text",
+        defaultMessage:
+          "We are glad that you are signing your documents with Parallel. But it looks like you have already consumed a large part of your signatures plan.",
+      })}
+      
+      ${intl.formatMessage(
+        {
+          id: "organization-limits-reached.signaturit-shared-apikey.few-credits-remaining.text-2",
+          defaultMessage:
+            "At the time this email was sent, you had <b>{remaining} signatures left</b>, {remainingPercent}% of those you had contracted.",
+        },
+        {
+          remaining: total - used,
+          remainingPercent: Math.round(((total - used) / total) * 100),
+          b: (chunks: any[]) => chunks,
+        }
+      )}
+      
+      ${intl.formatMessage(
+        {
+          id: "organization-limits-reached.signaturit-shared-apikey.contact-us",
+          defaultMessage:
+            "Please contact us at <a>support@onparallel.com</a> to upgrade your signatures plan.",
+        },
+        { a: () => "support@onparallel.com" }
+      )}
+
       ${closing({}, intl)}
-    `;
+      `
+      : (null as never);
   },
   html({
     limitName,
@@ -137,6 +229,12 @@ ${intl.formatMessage(
     logoUrl,
     logoAlt,
   }: OrganizationLimitsReachedEmailProps) {
+    const petitionSendTotalCreditsUsed = used === total && limitName === "PETITION_SEND";
+    const signatureTotalCreditsUsed = used === total && limitName === "SIGNATURIT_SHARED_APIKEY";
+    const petitionSendFewCreditsRemaining = used < total && limitName === "PETITION_SEND";
+    const signatureFewCreditsRemaining = used < total && limitName === "SIGNATURIT_SHARED_APIKEY";
+
+    const percent = Math.round((used / total) * 100);
     return (
       <Layout
         assetsUrl={assetsUrl}
@@ -147,18 +245,30 @@ ${intl.formatMessage(
           <MjmlSection backgroundColor="#CEEDFF" borderRadius="5px" padding="10px 0">
             <MjmlColumn>
               <MjmlText align="center" color="#153E75" fontWeight={600} textTransform="uppercase">
-                {used === total ? (
+                {petitionSendTotalCreditsUsed ? (
                   <FormattedMessage
-                    id="generic.action-required.last-credit-used"
-                    defaultMessage="You reached your plan's {limitName, select, PETITION_SEND{petitions} other{signatures}} limit"
-                    values={{ limitName }}
+                    id="organization-limits-reached.petition-send.action-required.last-credit-used"
+                    defaultMessage="You reached your plan's petitions limit"
+                  />
+                ) : signatureTotalCreditsUsed ? (
+                  <FormattedMessage
+                    id="organization-limits-reached.signaturit-shared-apikey.action-required.last-credit-used"
+                    defaultMessage="You reached your plan's signatures limit"
+                  />
+                ) : petitionSendFewCreditsRemaining ? (
+                  <FormattedMessage
+                    id="organization-limits-reached.petition-send.action-required.few-credits-remaining"
+                    defaultMessage="You have consumed {percent}% of your petitions"
+                    values={{ percent }}
+                  />
+                ) : signatureFewCreditsRemaining ? (
+                  <FormattedMessage
+                    id="organization-limits-reached.signaturit-shared-apikey.action-required.few-credits-remaining"
+                    defaultMessage="You have consumed {percent}% of your signatures"
+                    values={{ percent }}
                   />
                 ) : (
-                  <FormattedMessage
-                    id="generic.action-required.few-credits-remaining"
-                    defaultMessage="You have consumed {percent}% of your {limitName, select, PETITION_SEND{petitions} other{signatures}}"
-                    values={{ percent: Math.round((used / total) * 100), limitName }}
-                  />
+                  (null as never)
                 )}
               </MjmlText>
             </MjmlColumn>
@@ -168,62 +278,101 @@ ${intl.formatMessage(
         <MjmlSection padding="10px 0 0 0">
           <MjmlColumn>
             <GreetingUser name={senderName} />
-            {used < total ? (
+            {petitionSendTotalCreditsUsed ? (
               <>
                 <MjmlText lineHeight="24px">
                   <FormattedMessage
-                    id="organization-limits-reached.few-credits-remaining.text"
-                    defaultMessage="We are glad that you are {limitName, select, PETITION_SEND{speeding up your processes} other{signing your documents}} with Parallel. But it looks like you have already consumed a large part of your {limitName, select, PETITION_SEND{available petitions} other{signatures plan}}."
-                    values={{ limitName }}
+                    id="organization-limits-reached.petition-send.last-credit-used.text"
+                    defaultMessage="It seems that Parallel is helping you in many processes, and you already <b>reached your limit of {total} petitions</b>."
+                    values={{ total }}
                   />
                 </MjmlText>
                 <MjmlText lineHeight="24px">
                   <FormattedMessage
-                    id="organization-limits-reached.few-credits-remaining.text-2"
-                    defaultMessage="At the time this email was sent, you had <b>{remaining} {limitName, select, PETITION_SEND{petitions} other{signatures}} left</b>, {remainingPercent}% of those you had contracted."
+                    id="organization-limits-reached.petition-send.last-credit-used.text-2"
+                    defaultMessage="Please contact us at <a>support@onparallel.com</a> so that you can continue sending your processes via Parallel."
                     values={{
-                      limitName,
+                      a: (chunks: any[]) => <a href="mailto:support@onparallel.com">{chunks}</a>,
+                    }}
+                  />
+                </MjmlText>
+              </>
+            ) : signatureTotalCreditsUsed ? (
+              <>
+                <MjmlText lineHeight="24px">
+                  <FormattedMessage
+                    id="organization-limits-reached.signaturit-shared-apikey.last-credit-used.text"
+                    defaultMessage="It seems that Parallel is helping you sign many of your documents, and you already <b>reached your signature limit</b>."
+                  />
+                </MjmlText>
+                <MjmlText lineHeight="24px">
+                  <FormattedMessage
+                    id="organization-limits-reached.signaturit-shared-apikey.last-credit-used.text-2"
+                    defaultMessage="If you need to initiate more signatures, please contact us at <a>support@onparallel.com</a>."
+                    values={{
+                      a: (chunks: any[]) => <a href="mailto:support@onparallel.com">{chunks}</a>,
+                    }}
+                  />
+                </MjmlText>
+              </>
+            ) : petitionSendFewCreditsRemaining ? (
+              <>
+                <MjmlText lineHeight="24px">
+                  <FormattedMessage
+                    id="organization-limits-reached.petition-send.few-credits-remaining.text"
+                    defaultMessage="We are glad that you are speeding up your processes with Parallel. But it looks like you have already consumed a large part of your available petitions."
+                  />
+                </MjmlText>
+                <MjmlText lineHeight="24px">
+                  <FormattedMessage
+                    id="organization-limits-reached.petition-send.few-credits-remaining.text-2"
+                    defaultMessage="At the time this email was sent, you had <b>{remaining} petitions left</b>, {remainingPercent}% of those you had contracted."
+                    values={{
                       remaining: total - used,
                       remainingPercent: Math.round(((total - used) / total) * 100),
-                      b: (chunks: any[]) => <b>{chunks}</b>,
                     }}
                   />
                 </MjmlText>
                 <MjmlText lineHeight="24px">
                   <FormattedMessage
-                    id="organization-limits-reached.contact-us"
-                    defaultMessage="Please contact us at <a>support@onparallel.com</a> to {limitName, select, PETITION_SEND{get more petitions} other{upgrade your signatures plan}}."
+                    id="organization-limits-reached.petition-send.contact-us"
+                    defaultMessage="Please contact us at <a>support@onparallel.com</a> to get more petitions."
                     values={{
                       a: (chunks: any[]) => <a href="mailto:support@onparallel.com">{chunks}</a>,
-                      limitName,
+                    }}
+                  />
+                </MjmlText>
+              </>
+            ) : signatureFewCreditsRemaining ? (
+              <>
+                <MjmlText lineHeight="24px">
+                  <FormattedMessage
+                    id="organization-limits-reached.signaturit-shared-apikey.few-credits-remaining.text"
+                    defaultMessage="We are glad that you are signing your documents with Parallel. But it looks like you have already consumed a large part of your signatures plan."
+                  />
+                </MjmlText>
+                <MjmlText lineHeight="24px">
+                  <FormattedMessage
+                    id="organization-limits-reached.signaturit-shared-apikey.few-credits-remaining.text-2"
+                    defaultMessage="At the time this email was sent, you had <b>{remaining} signatures left</b>, {remainingPercent}% of those you had contracted."
+                    values={{
+                      remaining: total - used,
+                      remainingPercent: Math.round(((total - used) / total) * 100),
+                    }}
+                  />
+                </MjmlText>
+                <MjmlText lineHeight="24px">
+                  <FormattedMessage
+                    id="organization-limits-reached.signaturit-shared-apikey.contact-us"
+                    defaultMessage="Please contact us at <a>support@onparallel.com</a> to upgrade your signatures plan."
+                    values={{
+                      a: (chunks: any[]) => <a href="mailto:support@onparallel.com">{chunks}</a>,
                     }}
                   />
                 </MjmlText>
               </>
             ) : (
-              <>
-                <MjmlText lineHeight="24px">
-                  <FormattedMessage
-                    id="organization-limits-reached.last-credit-used.text"
-                    defaultMessage="It seems that Parallel is helping you {limitName, select, PETITION_SEND{in many processes} other{sign many of your documents}}, and you already <b>reached your {limitName, select, PETITION_SEND{limit of {total} petitions} other{signature limit}}</b>."
-                    values={{
-                      b: (chunks: any[]) => <b>{chunks}</b>,
-                      limitName,
-                      total,
-                    }}
-                  />
-                </MjmlText>
-                <MjmlText lineHeight="24px">
-                  <FormattedMessage
-                    id="organization-limits-reached.last-credit-used.text-2"
-                    defaultMessage="{limitName, select, PETITION_SEND{Please contact us at <a>support@onparallel.com</a> so that you can continue sending your processes via Parallel} other{If you need to initiate more signatures, please contact us at <a>support@onparallel.com</a>}}."
-                    values={{
-                      a: (chunks: any[]) => <a href="mailto:support@onparallel.com">{chunks}</a>,
-                      limitName,
-                    }}
-                  />
-                </MjmlText>
-              </>
+              (null as never)
             )}
             <ClosingParallelTeam />
           </MjmlColumn>

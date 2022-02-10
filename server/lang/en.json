@@ -170,16 +170,6 @@
     "context": "Action required"
   },
   {
-    "term": "generic.action-required.few-credits-remaining",
-    "definition": "You have consumed {percent}% of your {limitName, select, PETITION_SEND{petitions} other{signatures}}",
-    "context": "You have consumed {percent}% of your {limitName, select, PETITION_SEND{petitions} other{signatures}}"
-  },
-  {
-    "term": "generic.action-required.last-credit-used",
-    "definition": "You reached your plan's {limitName, select, PETITION_SEND{petitions} other{signatures}} limit",
-    "context": "You reached your plan's {limitName, select, PETITION_SEND{petitions} other{signatures}} limit"
-  },
-  {
     "term": "generic.action-required.signature-cancelled-no-credits-left",
     "definition": "You reached your plan's signatures limit",
     "context": "You reached your plan's signatures limit"
@@ -295,39 +285,94 @@
     "context": "{senderName} ({senderEmail}) has sent you the following petition:"
   },
   {
-    "term": "organization-limits-reached.contact-us",
-    "definition": "Please contact us at <a>support@onparallel.com</a> to {limitName, select, PETITION_SEND{get more petitions} other{upgrade your signatures plan}}.",
-    "context": "Please contact us at <a>support@onparallel.com</a> to {limitName, select, PETITION_SEND{get more petitions} other{upgrade your signatures plan}}."
+    "term": "organization-limits-reached.petition-send.action-required.few-credits-remaining",
+    "definition": "You have consumed {percent}% of your petitions",
+    "context": "You have consumed {percent}% of your petitions"
   },
   {
-    "term": "organization-limits-reached.few-credits-remaining.subject",
-    "definition": "Alert: {percent}% of your {limitName, select, PETITION_SEND{petitions} other{signatures}} have been consumed",
-    "context": "Alert: {percent}% of your {limitName, select, PETITION_SEND{petitions} other{signatures}} have been consumed"
+    "term": "organization-limits-reached.petition-send.action-required.last-credit-used",
+    "definition": "You reached your plan's petitions limit",
+    "context": "You reached your plan's petitions limit"
   },
   {
-    "term": "organization-limits-reached.few-credits-remaining.text",
-    "definition": "We are glad that you are {limitName, select, PETITION_SEND{speeding up your processes} other{signing your documents}} with Parallel. But it looks like you have already consumed a large part of your {limitName, select, PETITION_SEND{available petitions} other{signatures plan}}.",
-    "context": "We are glad that you are {limitName, select, PETITION_SEND{speeding up your processes} other{signing your documents}} with Parallel. But it looks like you have already consumed a large part of your {limitName, select, PETITION_SEND{available petitions} other{signatures plan}}."
+    "term": "organization-limits-reached.petition-send.contact-us",
+    "definition": "Please contact us at <a>support@onparallel.com</a> to get more petitions.",
+    "context": "Please contact us at <a>support@onparallel.com</a> to get more petitions."
   },
   {
-    "term": "organization-limits-reached.few-credits-remaining.text-2",
-    "definition": "At the time this email was sent, you had <b>{remaining} {limitName, select, PETITION_SEND{petitions} other{signatures}} left</b>, {remainingPercent}% of those you had contracted.",
-    "context": "At the time this email was sent, you had <b>{remaining} {limitName, select, PETITION_SEND{petitions} other{signatures}} left</b>, {remainingPercent}% of those you had contracted."
+    "term": "organization-limits-reached.petition-send.few-credits-remaining.subject",
+    "definition": "Alert: {percent}% of your petitions have been consumed",
+    "context": "Alert: {percent}% of your petitions have been consumed"
   },
   {
-    "term": "organization-limits-reached.last-credit-used.subject",
-    "definition": "You reached your {limitName, select, PETITION_SEND{petitions} other{signatures}} limit",
-    "context": "You reached your {limitName, select, PETITION_SEND{petitions} other{signatures}} limit"
+    "term": "organization-limits-reached.petition-send.few-credits-remaining.text",
+    "definition": "We are glad that you are speeding up your processes with Parallel. But it looks like you have already consumed a large part of your available petitions.",
+    "context": "We are glad that you are speeding up your processes with Parallel. But it looks like you have already consumed a large part of your available petitions."
   },
   {
-    "term": "organization-limits-reached.last-credit-used.text",
-    "definition": "It seems that Parallel is helping you {limitName, select, PETITION_SEND{in many processes} other{sign many of your documents}}, and you already <b>reached your {limitName, select, PETITION_SEND{limit of {total} petitions} other{signature limit}}</b>.",
-    "context": "It seems that Parallel is helping you {limitName, select, PETITION_SEND{in many processes} other{sign many of your documents}}, and you already <b>reached your {limitName, select, PETITION_SEND{limit of {total} petitions} other{signature limit}}</b>."
+    "term": "organization-limits-reached.petition-send.few-credits-remaining.text-2",
+    "definition": "At the time this email was sent, you had <b>{remaining} petitions left</b>, {remainingPercent}% of those you had contracted.",
+    "context": "At the time this email was sent, you had <b>{remaining} petitions left</b>, {remainingPercent}% of those you had contracted."
   },
   {
-    "term": "organization-limits-reached.last-credit-used.text-2",
-    "definition": "{limitName, select, PETITION_SEND{Please contact us at <a>support@onparallel.com</a> so that you can continue sending your processes via Parallel} other{If you need to initiate more signatures, please contact us at <a>support@onparallel.com</a>}}.",
-    "context": "{limitName, select, PETITION_SEND{Please contact us at <a>support@onparallel.com</a> so that you can continue sending your processes via Parallel} other{If you need to initiate more signatures, please contact us at <a>support@onparallel.com</a>}}."
+    "term": "organization-limits-reached.petition-send.last-credit-used.subject",
+    "definition": "You reached your petitions limit",
+    "context": "You reached your petitions limit"
+  },
+  {
+    "term": "organization-limits-reached.petition-send.last-credit-used.text",
+    "definition": "It seems that Parallel is helping you in many processes, and you already <b>reached your limit of {total} petitions</b>.",
+    "context": "It seems that Parallel is helping you in many processes, and you already <b>reached your limit of {total} petitions</b>."
+  },
+  {
+    "term": "organization-limits-reached.petition-send.last-credit-used.text-2",
+    "definition": "Please contact us at <a>support@onparallel.com</a> so that you can continue sending your processes via Parallel.",
+    "context": "Please contact us at <a>support@onparallel.com</a> so that you can continue sending your processes via Parallel."
+  },
+  {
+    "term": "organization-limits-reached.signaturit-shared-apikey.action-required.few-credits-remaining",
+    "definition": "You have consumed {percent}% of your signatures",
+    "context": "You have consumed {percent}% of your signatures"
+  },
+  {
+    "term": "organization-limits-reached.signaturit-shared-apikey.action-required.last-credit-used",
+    "definition": "You reached your plan's signatures limit",
+    "context": "You reached your plan's signatures limit"
+  },
+  {
+    "term": "organization-limits-reached.signaturit-shared-apikey.contact-us",
+    "definition": "Please contact us at <a>support@onparallel.com</a> to upgrade your signatures plan.",
+    "context": "Please contact us at <a>support@onparallel.com</a> to upgrade your signatures plan."
+  },
+  {
+    "term": "organization-limits-reached.signaturit-shared-apikey.few-credits-remaining.subject",
+    "definition": "Alert: {percent}% of your signatures have been consumed",
+    "context": "Alert: {percent}% of your signatures have been consumed"
+  },
+  {
+    "term": "organization-limits-reached.signaturit-shared-apikey.few-credits-remaining.text",
+    "definition": "We are glad that you are signing your documents with Parallel. But it looks like you have already consumed a large part of your signatures plan.",
+    "context": "We are glad that you are signing your documents with Parallel. But it looks like you have already consumed a large part of your signatures plan."
+  },
+  {
+    "term": "organization-limits-reached.signaturit-shared-apikey.few-credits-remaining.text-2",
+    "definition": "At the time this email was sent, you had <b>{remaining} signatures left</b>, {remainingPercent}% of those you had contracted.",
+    "context": "At the time this email was sent, you had <b>{remaining} signatures left</b>, {remainingPercent}% of those you had contracted."
+  },
+  {
+    "term": "organization-limits-reached.signaturit-shared-apikey.last-credit-used.subject",
+    "definition": "You reached your signatures limit",
+    "context": "You reached your signatures limit"
+  },
+  {
+    "term": "organization-limits-reached.signaturit-shared-apikey.last-credit-used.text",
+    "definition": "It seems that Parallel is helping you sign many of your documents, and you already <b>reached your signature limit</b>.",
+    "context": "It seems that Parallel is helping you sign many of your documents, and you already <b>reached your signature limit</b>."
+  },
+  {
+    "term": "organization-limits-reached.signaturit-shared-apikey.last-credit-used.text-2",
+    "definition": "If you need to initiate more signatures, please contact us at <a>support@onparallel.com</a>.",
+    "context": "If you need to initiate more signatures, please contact us at <a>support@onparallel.com</a>."
   },
   {
     "term": "petition-closed-notification.subject",
