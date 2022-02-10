@@ -144,6 +144,10 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   minWidth: "180px",
                 },
                 align: "center",
+                cellProps: (row) => ({
+                  "data-section": "petition-progress",
+                  "data-petition-status": row.status,
+                }),
                 CellContent: ({ row }) => <PetitionStatusCellContent petition={row} />,
               },
               {

@@ -98,6 +98,8 @@ export interface TableCellProps<TRow, TContext = unknown, TFilter = unknown> {
   onToggleExpand?: (expanded: boolean) => void;
 }
 
+type MaybeFunction<TResult, TArgs extends any[] = []> = TResult | ((...args: TArgs) => TResult);
+
 export interface TableColumn<TRow, TContext = unknown, TFilter = unknown> {
   key: string;
   align?: BoxProps["textAlign"];
@@ -106,9 +108,9 @@ export interface TableColumn<TRow, TContext = unknown, TFilter = unknown> {
   Filter?: ComponentType<TableColumnFilterProps<TFilter, TContext>>;
   header: string;
   Header?: ComponentType<TableHeaderProps<TRow, TContext, TFilter>>;
-  headerProps?: HTMLChakraProps<"th">;
+  headerProps?: MaybeFunction<HTMLChakraProps<"th">, [TContext]>;
   CellContent: ComponentType<TableCellProps<TRow, TContext, TFilter>>;
-  cellProps?: HTMLChakraProps<"td">;
+  cellProps?: MaybeFunction<HTMLChakraProps<"td">, [TRow, TContext]>;
 }
 
 export interface TableColumnFilterProps<TFilter, TContext = unknown> extends ValueProps<TFilter> {
@@ -290,34 +292,42 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
           }}
         >
           {columns.map((column) => {
-            return column.Header ? (
-              <column.Header
-                key={column.key}
-                column={column}
-                context={context!}
-                sort={sort}
-                filter={filter?.[column.key]}
-                onFilterChange={(value) => onFilterChange?.(column.key, value)}
-                onSortByClick={handleOnSortByClick}
-                allSelected={allSelected}
-                anySelected={anySelected}
-                onToggleAll={toggleAll}
-              />
-            ) : (
-              <DefaultHeader
-                key={column.key}
-                column={column as any}
-                context={context}
-                sort={sort}
-                filter={filter?.[column.key]}
-                onFilterChange={(value) => onFilterChange?.(column.key, value)}
-                onSortByClick={handleOnSortByClick}
-                allSelected={allSelected}
-                anySelected={anySelected}
-                onToggleAll={toggleAll}
-                {...(column.headerProps ?? {})}
-              />
-            );
+            if (column.Header) {
+              return (
+                <column.Header
+                  key={column.key}
+                  column={column}
+                  context={context!}
+                  sort={sort}
+                  filter={filter?.[column.key]}
+                  onFilterChange={(value) => onFilterChange?.(column.key, value)}
+                  onSortByClick={handleOnSortByClick}
+                  allSelected={allSelected}
+                  anySelected={anySelected}
+                  onToggleAll={toggleAll}
+                />
+              );
+            } else {
+              const headerProps =
+                typeof column.headerProps === "function"
+                  ? column.headerProps(context!)
+                  : column.headerProps ?? {};
+              return (
+                <DefaultHeader
+                  key={column.key}
+                  column={column as any}
+                  context={context}
+                  sort={sort}
+                  filter={filter?.[column.key]}
+                  onFilterChange={(value) => onFilterChange?.(column.key, value)}
+                  onSortByClick={handleOnSortByClick}
+                  allSelected={allSelected}
+                  anySelected={anySelected}
+                  onToggleAll={toggleAll}
+                  {...headerProps}
+                />
+              );
+            }
           })}
         </Box>
       </Box>
@@ -449,6 +459,10 @@ function _Row<TRow, TContext = unknown, TImpl extends TRow = TRow>({
 const Row: typeof _Row = memo(_Row) as any;
 
 function _Cell<TRow, TContext>({ column, ...props }: TableCellProps<TRow, TContext>) {
+  const cellProps =
+    typeof column.cellProps === "function"
+      ? column.cellProps(props.row, props.context)
+      : column.cellProps ?? {};
   return (
     <Box
       as="td"
@@ -457,7 +471,7 @@ function _Cell<TRow, TContext>({ column, ...props }: TableCellProps<TRow, TConte
       _first={{ paddingLeft: 5 }}
       userSelect="none"
       textAlign={column.align ?? "left"}
-      {...(column.cellProps ?? {})}
+      {...cellProps}
     >
       <column.CellContent column={column} {...props} />
     </Box>
