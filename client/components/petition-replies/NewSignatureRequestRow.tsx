@@ -36,6 +36,7 @@ export function NewSignatureRequestRow({
     try {
       const { signers: signersInfo, message } = await showConfirmPetitionSignersDialog({
         user,
+        accesses: petition.accesses,
         fixedSigners: signers,
         reviewBeforeSigning,
         allowAdditionalSigners,
@@ -136,8 +137,12 @@ NewSignatureRequestRow.fragments = {
         timezone
         title
       }
+      accesses {
+        ...ConfirmPetitionSignersDialog_PetitionAccess
+      }
     }
     ${SignerReference.fragments.PetitionSigner}
     ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
+    ${ConfirmPetitionSignersDialog.fragments.PetitionAccess}
   `,
 };

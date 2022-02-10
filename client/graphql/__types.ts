@@ -8265,6 +8265,18 @@ export type NewSignatureRequestRow_PetitionFragment = {
       provider: SignatureOrgIntegrationProvider;
     } | null;
   } | null;
+  accesses: Array<{
+    __typename?: "PetitionAccess";
+    id: string;
+    status: PetitionAccessStatus;
+    contact?: {
+      __typename?: "Contact";
+      email: string;
+      firstName: string;
+      lastName?: string | null;
+      contactId: string;
+    } | null;
+  }>;
 };
 
 export type OlderSignatureRequestRows_PetitionSignatureRequestFragment = {
@@ -8513,6 +8525,18 @@ export type PetitionSignaturesCard_PetitionFragment = {
       fullName: string;
     }>;
   } | null;
+  accesses: Array<{
+    __typename?: "PetitionAccess";
+    id: string;
+    status: PetitionAccessStatus;
+    contact?: {
+      __typename?: "Contact";
+      email: string;
+      firstName: string;
+      lastName?: string | null;
+      contactId: string;
+    } | null;
+  }>;
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
     environment: SignatureOrgIntegrationEnvironment;
@@ -8572,6 +8596,18 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
             fullName: string;
           }>;
         } | null;
+        accesses: Array<{
+          __typename?: "PetitionAccess";
+          id: string;
+          status: PetitionAccessStatus;
+          contact?: {
+            __typename?: "Contact";
+            email: string;
+            firstName: string;
+            lastName?: string | null;
+            contactId: string;
+          } | null;
+        }>;
         currentSignatureRequest?: {
           __typename?: "PetitionSignatureRequest";
           environment: SignatureOrgIntegrationEnvironment;
@@ -8632,6 +8668,19 @@ export type ConfirmPetitionSignersDialog_UserFragment = {
   email: string;
   firstName?: string | null;
   lastName?: string | null;
+};
+
+export type ConfirmPetitionSignersDialog_PetitionAccessFragment = {
+  __typename?: "PetitionAccess";
+  id: string;
+  status: PetitionAccessStatus;
+  contact?: {
+    __typename?: "Contact";
+    email: string;
+    firstName: string;
+    lastName?: string | null;
+    contactId: string;
+  } | null;
 };
 
 export type ConfirmPetitionSignersDialog_PetitionSignerFragment = {
@@ -14924,7 +14973,18 @@ export type PetitionReplies_PetitionFragment = {
   deadline?: string | null;
   isRestricted: boolean;
   updatedAt: string;
-  accesses: Array<{ __typename?: "PetitionAccess"; id: string; status: PetitionAccessStatus }>;
+  accesses: Array<{
+    __typename?: "PetitionAccess";
+    id: string;
+    status: PetitionAccessStatus;
+    contact?: {
+      __typename?: "Contact";
+      email: string;
+      firstName: string;
+      lastName?: string | null;
+      contactId: string;
+    } | null;
+  }>;
   fields: Array<{
     __typename?: "PetitionField";
     isReadOnly: boolean;
@@ -15193,7 +15253,18 @@ export type PetitionReplies_closePetitionMutation = {
     deadline?: string | null;
     isRestricted: boolean;
     updatedAt: string;
-    accesses: Array<{ __typename?: "PetitionAccess"; id: string; status: PetitionAccessStatus }>;
+    accesses: Array<{
+      __typename?: "PetitionAccess";
+      id: string;
+      status: PetitionAccessStatus;
+      contact?: {
+        __typename?: "Contact";
+        email: string;
+        firstName: string;
+        lastName?: string | null;
+        contactId: string;
+      } | null;
+    }>;
     fields: Array<{
       __typename?: "PetitionField";
       isReadOnly: boolean;
@@ -15337,7 +15408,18 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
     deadline?: string | null;
     isRestricted: boolean;
     updatedAt: string;
-    accesses: Array<{ __typename?: "PetitionAccess"; id: string; status: PetitionAccessStatus }>;
+    accesses: Array<{
+      __typename?: "PetitionAccess";
+      id: string;
+      status: PetitionAccessStatus;
+      contact?: {
+        __typename?: "Contact";
+        email: string;
+        firstName: string;
+        lastName?: string | null;
+        contactId: string;
+      } | null;
+    }>;
     fields: Array<{
       __typename?: "PetitionField";
       isReadOnly: boolean;
@@ -15580,6 +15662,13 @@ export type PetitionReplies_petitionQuery = {
           __typename?: "PetitionAccess";
           id: string;
           status: PetitionAccessStatus;
+          contact?: {
+            __typename?: "Contact";
+            email: string;
+            firstName: string;
+            lastName?: string | null;
+            contactId: string;
+          } | null;
         }>;
         fields: Array<{
           __typename?: "PetitionField";
@@ -17659,6 +17748,18 @@ export type PetitionSignaturesCardPolling_petitionQuery = {
             fullName: string;
           }>;
         } | null;
+        accesses: Array<{
+          __typename?: "PetitionAccess";
+          id: string;
+          status: PetitionAccessStatus;
+          contact?: {
+            __typename?: "Contact";
+            email: string;
+            firstName: string;
+            lastName?: string | null;
+            contactId: string;
+          } | null;
+        }>;
         currentSignatureRequest?: {
           __typename?: "PetitionSignatureRequest";
           environment: SignatureOrgIntegrationEnvironment;
@@ -20470,6 +20571,18 @@ export const PetitionReplies_PetitionFieldFragmentDoc = gql`
   ${ExportRepliesDialog_PetitionFieldFragmentDoc}
   ${useFieldVisibility_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionReplies_PetitionFieldFragment, unknown>;
+export const ConfirmPetitionSignersDialog_PetitionAccessFragmentDoc = gql`
+  fragment ConfirmPetitionSignersDialog_PetitionAccess on PetitionAccess {
+    id
+    status
+    contact {
+      contactId: id
+      email
+      firstName
+      lastName
+    }
+  }
+` as unknown as DocumentNode<ConfirmPetitionSignersDialog_PetitionAccessFragment, unknown>;
 export const NewSignatureRequestRow_PetitionFragmentDoc = gql`
   fragment NewSignatureRequestRow_Petition on Petition {
     signatureConfig {
@@ -20487,9 +20600,13 @@ export const NewSignatureRequestRow_PetitionFragmentDoc = gql`
       timezone
       title
     }
+    accesses {
+      ...ConfirmPetitionSignersDialog_PetitionAccess
+    }
   }
   ${SignerReference_PetitionSignerFragmentDoc}
   ${ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
+  ${ConfirmPetitionSignersDialog_PetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<NewSignatureRequestRow_PetitionFragment, unknown>;
 export const DatesList_SignerStatusFragmentDoc = gql`
   fragment DatesList_SignerStatus on PetitionSignatureRequestSignerStatus {

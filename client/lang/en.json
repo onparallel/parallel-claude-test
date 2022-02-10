@@ -265,14 +265,9 @@
     "context": "Add a contact to sign"
   },
   {
-    "term": "component.confirm-petition-signers-dialog.contacts-label",
+    "term": "component.confirm-petition-signers-dialog.header",
     "definition": "Who has to sign the document?",
     "context": "Who has to sign the document?"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.header",
-    "definition": "Sign petition",
-    "context": "Sign petition"
   },
   {
     "term": "component.confirm-petition-signers-dialog.include-message",
@@ -285,14 +280,19 @@
     "context": "Write here a message for the signers..."
   },
   {
-    "term": "component.confirm-petition-signers-dialog.n-added",
-    "definition": "({n} added)",
-    "context": "({n} added)"
+    "term": "component.confirm-petition-signers-dialog.signers-added",
+    "definition": "{count, plural, =0{You haven't added any signers yet} one{1 signer added} other{# signers added}}",
+    "context": "{count, plural, =0{You haven't added any signers yet} one{1 signer added} other{# signers added}}"
   },
   {
     "term": "component.confirm-petition-signers-dialog.start-signature-button",
     "definition": "Start signature",
     "context": "Start signature"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.suggestions",
+    "definition": "Suggested:",
+    "context": "Suggested:"
   },
   {
     "term": "component.confirm-remove-member-dialog.body",
@@ -396,13 +396,13 @@
   },
   {
     "term": "component.confirm-signer-info-dialog.footer",
-    "definition": "Continue to update the signer's data. The contact data will not be overwritten.",
-    "context": "Continue to update the signer's data. The contact data will not be overwritten."
+    "definition": "Continue to update the signer's information. The contact data will not be overwritten.",
+    "context": "Continue to update the signer's information. The contact data will not be overwritten."
   },
   {
     "term": "component.confirm-signer-info-dialog.title",
-    "definition": "Confirm signer's data",
-    "context": "Confirm signer's data"
+    "definition": "Confirm the signer's information",
+    "context": "Confirm the signer's information"
   },
   {
     "term": "component.confirm-skip-forward-security.confirm",
@@ -2983,11 +2983,6 @@
     "term": "component.solve-unreviewed-replies-dialog.subheading",
     "definition": "What would you like to do with them?",
     "context": "What would you like to do with them?"
-  },
-  {
-    "term": "component.suggested-signer-row.title",
-    "definition": "Suggested:",
-    "context": "Suggested:"
   },
   {
     "term": "component.table.filter-header",

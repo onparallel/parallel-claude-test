@@ -265,14 +265,9 @@
     "context": "Add a contact to sign"
   },
   {
-    "term": "component.confirm-petition-signers-dialog.contacts-label",
+    "term": "component.confirm-petition-signers-dialog.header",
     "definition": "¿Quién tiene que firmar el documento?",
     "context": "Who has to sign the document?"
-  },
-  {
-    "term": "component.confirm-petition-signers-dialog.header",
-    "definition": "Firmar petición",
-    "context": "Sign petition"
   },
   {
     "term": "component.confirm-petition-signers-dialog.include-message",
@@ -285,14 +280,19 @@
     "context": "Write here a message for the signers..."
   },
   {
-    "term": "component.confirm-petition-signers-dialog.n-added",
-    "definition": "({n, plural, =1{# añadido} other{# añadidos}})",
-    "context": "({n} added)"
+    "term": "component.confirm-petition-signers-dialog.signers-added",
+    "definition": "{count, plural, =0{No has añadido firmantes todavía} one{1 firmante añadido} other{# firmantes añadidos}}",
+    "context": "{count, plural, =0{You haven't added any signers yet} one{1 signer added} other{# signers added}}"
   },
   {
     "term": "component.confirm-petition-signers-dialog.start-signature-button",
     "definition": "Iniciar firma",
     "context": "Start signature"
+  },
+  {
+    "term": "component.confirm-petition-signers-dialog.suggestions",
+    "definition": "Sugerido:",
+    "context": "Suggested:"
   },
   {
     "term": "component.confirm-remove-member-dialog.body",
@@ -397,12 +397,12 @@
   {
     "term": "component.confirm-signer-info-dialog.footer",
     "definition": "Continúa para actualizar los datos del firmante. Los datos del contacto no se sobreescribirán.",
-    "context": "Continue to update the signer's data. The contact data will not be overwritten."
+    "context": "Continue to update the signer's information. The contact data will not be overwritten."
   },
   {
     "term": "component.confirm-signer-info-dialog.title",
     "definition": "Confirme los datos del firmante",
-    "context": "Confirm signer's data"
+    "context": "Confirm the signer's information"
   },
   {
     "term": "component.confirm-skip-forward-security.confirm",
@@ -2983,11 +2983,6 @@
     "term": "component.solve-unreviewed-replies-dialog.subheading",
     "definition": "¿Qué quieres hacer con ellas?",
     "context": "What would you like to do with them?"
-  },
-  {
-    "term": "component.suggested-signer-row.title",
-    "definition": "Sugerido:",
-    "context": "Suggested:"
   },
   {
     "term": "component.table.filter-header",
