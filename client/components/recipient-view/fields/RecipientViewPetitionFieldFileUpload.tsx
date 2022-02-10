@@ -22,6 +22,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useState } from "react";
+import { FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
   RecipientViewPetitionFieldCard,
@@ -241,7 +242,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
 interface PetitionFieldFileUploadDropzoneProps extends BoxProps {
   isDisabled: boolean;
   field: RecipientViewPetitionFieldCard_PetitionFieldSelection;
-  onCreateReply: (files: File[]) => void;
+  onCreateReply: (files: File[]) => Promise<void>;
 }
 
 function PetitionFieldFileUploadDropzone({
@@ -272,62 +273,88 @@ function PetitionFieldFileUploadDropzone({
       })
     : undefined;
   const _isDisabled = isDisabled || (!field.multiple && field.replies.length > 0);
+
+  const MAX_FILE_SIZE = 50 * 1024 * 1024;
+  const [fileDropError, setFileDropError] = useState<string | null>(null);
+
+  async function handleFileDrop(files: File[], rejected: FileRejection[]) {
+    if (rejected.length > 0) {
+      setFileDropError(rejected[0].errors[0].code);
+    } else {
+      try {
+        setFileDropError(null);
+        await onCreateReply(files);
+      } catch {}
+    }
+  }
   return (
-    <Dropzone
-      as={Center}
-      {...props}
-      minHeight="100px"
-      textAlign="center"
-      accept={accept}
-      onDrop={onCreateReply}
-      multiple={field.multiple}
-      disabled={_isDisabled}
-    >
-      {({ isDragActive, isDragReject }) => (
-        <Box pointerEvents="none">
-          {isDragActive && isDragReject ? (
-            <>
+    <>
+      <Dropzone
+        as={Center}
+        {...props}
+        minHeight="100px"
+        textAlign="center"
+        accept={accept}
+        onDrop={handleFileDrop}
+        multiple={field.multiple}
+        disabled={_isDisabled}
+        maxSize={MAX_FILE_SIZE}
+      >
+        {({ isDragActive, isDragReject }) => (
+          <Box pointerEvents="none">
+            {isDragActive && isDragReject ? (
+              <>
+                <FormattedMessage
+                  id="generic.dropzone-allowed-types"
+                  defaultMessage="Only the following file types are allowed:"
+                />
+                <List paddingLeft={4}>
+                  {accepts!.map((type) => (
+                    <ListItem listStyleType="disc" key={type}>
+                      {type === "DOCUMENT" ? (
+                        <FormattedMessage
+                          id="generic.file-types.document"
+                          defaultMessage="Documents (.pdf, .doc, .docx)"
+                        />
+                      ) : type === "IMAGE" ? (
+                        <FormattedMessage
+                          id="generic.file-types.image"
+                          defaultMessage="Images (.jpeg, .png, etc.)"
+                        />
+                      ) : type === "VIDEO" ? (
+                        <FormattedMessage
+                          id="generic.file-types.video"
+                          defaultMessage="Videos (.mp4, .avi, etc.)"
+                        />
+                      ) : type === "PDF" ? (
+                        <FormattedMessage
+                          id="generic.file-types.pdf"
+                          defaultMessage="PDF Documents"
+                        />
+                      ) : null}
+                    </ListItem>
+                  ))}
+                </List>
+              </>
+            ) : (
               <FormattedMessage
-                id="generic.dropzone-allowed-types"
-                defaultMessage="Only the following file types are allowed:"
+                id="generic.dropzone-default"
+                defaultMessage="Drag files here, or click to select them"
               />
-              <List paddingLeft={4}>
-                {accepts!.map((type) => (
-                  <ListItem listStyleType="disc" key={type}>
-                    {type === "DOCUMENT" ? (
-                      <FormattedMessage
-                        id="generic.file-types.document"
-                        defaultMessage="Documents (.pdf, .doc, .docx)"
-                      />
-                    ) : type === "IMAGE" ? (
-                      <FormattedMessage
-                        id="generic.file-types.image"
-                        defaultMessage="Images (.jpeg, .png, etc.)"
-                      />
-                    ) : type === "VIDEO" ? (
-                      <FormattedMessage
-                        id="generic.file-types.video"
-                        defaultMessage="Videos (.mp4, .avi, etc.)"
-                      />
-                    ) : type === "PDF" ? (
-                      <FormattedMessage
-                        id="generic.file-types.pdf"
-                        defaultMessage="PDF Documents"
-                      />
-                    ) : null}
-                  </ListItem>
-                ))}
-              </List>
-            </>
-          ) : (
-            <FormattedMessage
-              id="generic.dropzone-default"
-              defaultMessage="Drag files here, or click to select them"
-            />
-          )}
-        </Box>
-      )}
-    </Dropzone>
+            )}
+          </Box>
+        )}
+      </Dropzone>
+      {fileDropError === "file-too-large" ? (
+        <Text color="red.500" fontSize="sm">
+          <FormattedMessage
+            id="dropzone.error.file-too-large"
+            defaultMessage="The file is too large. Maximum size allowed {size}"
+            values={{ size: <FileSize value={MAX_FILE_SIZE} /> }}
+          />
+        </Text>
+      ) : null}
+    </>
   );
 }
 
