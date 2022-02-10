@@ -155,9 +155,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   }, []);
 
   useEffect(() => {
-    if (activeFieldId) {
+    if (activeFieldId && activeField) {
       const timeout = setTimeout(async () => {
-        const petitionFieldCommentIds = activeField!.comments
+        const petitionFieldCommentIds = activeField.comments
           .filter((c) => c.isUnread)
           .map((c) => c.id);
         if (petitionFieldCommentIds.length > 0) {
@@ -580,14 +580,14 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         alignWith={activeFieldId ? fieldRefs[activeFieldId].current : null}
         flyout={
           <Box padding={4} paddingLeft={{ md: 0 }}>
-            {activeFieldId ? (
+            {activeFieldId && !!activeField ? (
               <PetitionRepliesFieldComments
-                key={activeFieldId!}
+                key={activeFieldId}
                 petitionId={petition.id}
                 hasCommentsEnabled={
-                  activeField?.isInternal ? false : activeField?.options.hasCommentsEnabled
+                  activeField.isInternal ? false : activeField?.options.hasCommentsEnabled
                 }
-                field={activeField!}
+                field={activeField}
                 user={me}
                 onClose={() => setActiveFieldId(null)}
                 onAddComment={handleAddComment}
