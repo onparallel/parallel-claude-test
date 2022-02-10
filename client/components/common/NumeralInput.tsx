@@ -35,7 +35,7 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
       onChange?.(undefined);
     } else {
       const numericValue = Number((e.target as InputCleaveElement).rawValue);
-      if (!Number.isNaN(value)) {
+      if (!Number.isNaN(numericValue)) {
         onChange?.(numericValue);
       }
     }
