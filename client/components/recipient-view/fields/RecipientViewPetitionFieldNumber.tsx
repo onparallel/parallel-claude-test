@@ -98,6 +98,7 @@ export function RecipientViewPetitionFieldNumber({
 
   const handleCreate = useDebouncedCallback(
     async (value: number, focusCreatedReply: boolean) => {
+      setIsInvalidReply(({ [field.id]: _, ...curr }) => curr);
       setIsSaving(true);
       try {
         const replyId = await onCreateReply(value);
@@ -211,37 +212,39 @@ export function RecipientViewPetitionFieldNumber({
         <Text
           fontSize="sm"
           marginRight={2}
-          color={Object.keys(isInvalidReply).length ? "red.500" : undefined}
+          color={Object.keys(isInvalidReply).length ? "red.500" : "gray.500"}
         >
-          <FormattedMessage
-            id="component.recipient-view-petition-field-number.only-numbers"
-            defaultMessage="Only numbers"
-          />{" "}
           {hasRange ? (
             <>
               {isDefined(range.min) && !isDefined(range.max) ? (
                 <FormattedMessage
                   id="component.recipient-view-petition-field-number.range-min-description"
-                  defaultMessage="greater than or equal to {min}"
-                  values={{ min: range.min }}
+                  defaultMessage="Numeric {multiple, select, true{answers} other {answer}} greater than or equal to {min}"
+                  values={{ min: range.min, multiple: field.multiple }}
                 />
               ) : null}
               {isDefined(range.max) && !isDefined(range.min) ? (
                 <FormattedMessage
                   id="component.recipient-view-petition-field-number.range-max-description"
-                  defaultMessage="less than or equal to {max}"
-                  values={{ max: range.max }}
+                  defaultMessage="Numeric {multiple, select, true{answers} other {answer}} lower than or equal to {max}"
+                  values={{ max: range.max, multiple: field.multiple }}
                 />
               ) : null}
               {isDefined(range.min) && isDefined(range.max) ? (
                 <FormattedMessage
                   id="component.recipient-view-petition-field-number.range-min-max-description"
-                  defaultMessage="between {min} and {max}, both included"
-                  values={{ min: range?.min, max: range?.max }}
+                  defaultMessage="Numeric {multiple, select, true{answers} other {answer}} between {min} and {max}, both included"
+                  values={{ min: range.min, max: range.max, multiple: field.multiple }}
                 />
               ) : null}
             </>
-          ) : null}
+          ) : (
+            <FormattedMessage
+              id="component.recipient-view-petition-field-number.only-numbers"
+              defaultMessage="Numeric {multiple, select, true{answers} other {answer}}"
+              values={{ multiple: field.multiple }}
+            />
+          )}
         </Text>
         {field.replies.length ? (
           <Text fontSize="sm" color="gray.500">

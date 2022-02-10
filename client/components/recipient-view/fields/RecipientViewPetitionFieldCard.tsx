@@ -99,7 +99,7 @@ export function RecipientViewPetitionFieldCard({
         ) : null}
       </Flex>
       {field.description ? (
-        <Text fontSize="sm" color="gray.600" overflowWrap="anywhere" marginBottom={2}>
+        <Text fontSize="sm" color="gray.800" overflowWrap="anywhere" marginBottom={2}>
           <Linkify>
             <BreakLines>{field.description}</BreakLines>
           </Linkify>

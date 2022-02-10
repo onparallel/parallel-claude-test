@@ -1,4 +1,4 @@
-import { Checkbox, Flex, Stack, Text } from "@chakra-ui/react";
+import { Checkbox, Box, Stack, Text } from "@chakra-ui/react";
 import { RadioButtonSelected } from "@parallel/chakra/icons";
 import { CheckboxTypeLabel } from "@parallel/components/petition-common/CheckboxTypeLabel";
 import { useState } from "react";
@@ -123,12 +123,10 @@ export function RecipientViewPetitionFieldCheckbox({
       onDownloadAttachment={onDownloadAttachment}
     >
       <Stack>
-        <Flex flexWrap="wrap" alignItems="center">
-          {field.type === "CHECKBOX" ? (
-            <CheckboxTypeLabel fontSize="sm" marginRight={2} options={field.options} />
-          ) : null}
+        <Text color="gray.500" fontSize="sm">
+          <CheckboxTypeLabel as="span" marginRight={2} options={field.options} />
           {!isSaving ? (
-            <Text fontSize="sm" mr={2} color={isInvalid ? "red.600" : "gray.500"}>
+            <Box as="span" color={isInvalid ? "red.600" : "gray.500"}>
               {checkedItems?.length ? (
                 <>
                   {showRadio ? null : "("}
@@ -153,16 +151,14 @@ export function RecipientViewPetitionFieldCheckbox({
                   {showRadio ? null : ")"}
                 </>
               ) : null}
-            </Text>
+            </Box>
           ) : null}
-          <Flex alignItems="center" boxSize={6}>
-            <RecipientViewPetitionFieldReplyStatusIndicator
-              isSaving={isSaving}
-              reply={reply}
-              showSavedIcon={false}
-            />
-          </Flex>
-        </Flex>
+          <RecipientViewPetitionFieldReplyStatusIndicator
+            isSaving={isSaving}
+            reply={reply}
+            showSavedIcon={false}
+          />
+        </Text>
 
         {values.map((option: string, index: number) => (
           <Checkbox
