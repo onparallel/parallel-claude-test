@@ -321,18 +321,21 @@ function SelectedSignerRow({
     <Flex
       justifyContent="space-between"
       alignItems="center"
-      height="32px"
-      _hover={{ backgroundColor: "gray.75" }}
+      minHeight={9}
+      _hover={isEditable ? { backgroundColor: "gray.75" } : undefined}
       borderRadius="md"
+      paddingX={2}
+      paddingY={1}
+      paddingLeft={4}
       {...props}
     >
-      <Text as="li">
+      <Text as="li" margin={1}>
         {signer.firstName} {signer.lastName} {"<"}
         {signer.email}
         {">"}
       </Text>
       {isEditable ? (
-        <Flex>
+        <Flex gridGap={1}>
           <IconButtonWithTooltip
             variant="ghost"
             size="sm"
