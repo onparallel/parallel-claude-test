@@ -58,6 +58,7 @@ export function PetitionTemplateComposeMessageEditor({
       </Box>
       <Stack spacing={2} padding={4}>
         <MessageEmailEditor
+          id={petition.id}
           showErrors={false}
           subject={subject}
           body={body}

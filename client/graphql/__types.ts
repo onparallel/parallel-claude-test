@@ -5965,6 +5965,7 @@ export type UserReference_UserFragment = {
 
 export type AddPetitionAccessDialog_PetitionFragment = {
   __typename?: "Petition";
+  id: string;
   emailSubject?: string | null;
   emailBody?: any | null;
   signatureConfig?: {
@@ -19724,6 +19725,7 @@ export const CopySignatureConfigDialog_PetitionSignerFragmentDoc = gql`
 ` as unknown as DocumentNode<CopySignatureConfigDialog_PetitionSignerFragment, unknown>;
 export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
   fragment AddPetitionAccessDialog_Petition on Petition {
+    id
     emailSubject
     emailBody
     signatureConfig {

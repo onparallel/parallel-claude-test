@@ -242,6 +242,7 @@ export function AddPetitionAccessDialog({
           />
           <Box marginTop={4}>
             <MessageEmailEditor
+              id={petition.id}
               showErrors={showErrors}
               subject={subject}
               body={body}
@@ -277,6 +278,7 @@ export function AddPetitionAccessDialog({
 AddPetitionAccessDialog.fragments = {
   Petition: gql`
     fragment AddPetitionAccessDialog_Petition on Petition {
+      id
       emailSubject
       emailBody
       signatureConfig {

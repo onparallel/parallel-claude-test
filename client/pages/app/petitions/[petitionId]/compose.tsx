@@ -470,6 +470,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             />
             {petition?.__typename === "PetitionTemplate" ? (
               <PetitionTemplateDescriptionEdit
+                petitionId={petition.id}
                 marginTop="4"
                 description={petition.description}
                 onUpdatePetition={handleUpdatePetition}

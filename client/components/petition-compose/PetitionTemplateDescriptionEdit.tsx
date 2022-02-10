@@ -10,12 +10,14 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { RichTextEditor } from "../common/slate/RichTextEditor";
 
 export interface PetitionTemplateDescriptionEditProps extends BoxProps {
+  petitionId: string;
   onUpdatePetition: (data: UpdatePetitionInput) => void;
   description: RichTextEditorValue;
   isReadOnly?: boolean;
 }
 
 export function PetitionTemplateDescriptionEdit({
+  petitionId,
   onUpdatePetition,
   description,
   isReadOnly,
@@ -42,7 +44,7 @@ export function PetitionTemplateDescriptionEdit({
       </CardHeader>
       <Box padding={4}>
         <RichTextEditor
-          id="template-description"
+          id={`template-description-${petitionId}`}
           value={templateDescription}
           onChange={handleUpdateDescription}
           placeholder={intl.formatMessage({

@@ -7,6 +7,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { RichTextEditor } from "../common/slate/RichTextEditor";
 
 export function MessageEmailEditor({
+  id,
   showErrors,
   subjectRef,
   subject,
@@ -15,6 +16,7 @@ export function MessageEmailEditor({
   onBodyChange,
   isReadOnly,
 }: {
+  id: string;
   showErrors: boolean;
   subjectRef?: Ref<HTMLInputElement>;
   subject: string;
@@ -61,7 +63,7 @@ export function MessageEmailEditor({
         id="petition-message-body"
       >
         <RichTextEditor
-          id="email-message"
+          id={`email-message-${id}`}
           value={body}
           onChange={onBodyChange}
           placeholder={intl.formatMessage({
