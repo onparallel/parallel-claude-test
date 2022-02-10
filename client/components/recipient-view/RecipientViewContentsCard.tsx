@@ -294,8 +294,10 @@ function useGetPagesAndFields<T extends UnionToArrayUnion<PetitionFieldSelection
       page -= 1;
     }
     const currentPage = pages[pages.length - 1];
-    currentPage.hasUnreadComments = currentPage.hasUnreadComments || field.unreadCommentCount > 0;
-    currentPage.commentCount += field.commentCount;
+    if (currentPage) {
+      currentPage.hasUnreadComments = currentPage.hasUnreadComments || field.unreadCommentCount > 0;
+      currentPage.commentCount += field.commentCount;
+    }
 
     if (page === 0 && isVisible) {
       _fields.push(field as any);
