@@ -35,7 +35,7 @@ export function NumberSettings({
     onFieldEdit(field.id, {
       options: {
         ...field.options,
-        range: pick(range, ["min", "max"]),
+        range,
       },
     });
   };
