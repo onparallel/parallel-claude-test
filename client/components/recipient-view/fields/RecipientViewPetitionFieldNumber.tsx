@@ -183,8 +183,8 @@ export function RecipientViewPetitionFieldNumber({
           setIsInvalidReply((curr) => ({ ...curr, [field.id]: true }));
         } else {
           setIsInvalidReply(({ [field.id]: _, ...curr }) => curr);
-          setValue(value);
         }
+        setValue(value);
       }
     },
     placeholder:

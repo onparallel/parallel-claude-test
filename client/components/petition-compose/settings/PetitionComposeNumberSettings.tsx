@@ -12,7 +12,7 @@ import { NumeralInput } from "@parallel/components/common/NumeralInput";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { isDefined, pick } from "remeda";
+import { isDefined } from "remeda";
 import { PetitionComposeFieldSettingsProps } from "./PetitionComposeFieldSettings";
 
 export function NumberSettings({
@@ -23,6 +23,8 @@ export function NumberSettings({
   const options = field.options as FieldOptions["NUMBER"];
   const [range, setRange] = useState(options.range);
 
+  const isInvalid = isDefined(range.min) && isDefined(range.max) && range.min > range.max;
+
   const handleMinChange = (value: number | undefined) => {
     setRange((r) => ({ ...r, min: value }));
   };
@@ -32,6 +34,7 @@ export function NumberSettings({
   };
 
   const handleBlur = () => {
+    if (isInvalid) return;
     onFieldEdit(field.id, {
       options: {
         ...field.options,
@@ -39,8 +42,6 @@ export function NumberSettings({
       },
     });
   };
-
-  const isInvalid = isDefined(range.min) && isDefined(range.max) && range.min > range.max;
 
   return (
     <FormControl isInvalid={isInvalid}>

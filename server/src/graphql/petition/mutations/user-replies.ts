@@ -15,7 +15,7 @@ import {
   replyIsForFieldOfType,
   userHasAccessToPetitions,
 } from "../authorizers";
-import { validateFieldReply } from "../validations";
+import { validateFieldReply, validateReplyUpdate } from "../validations";
 
 export const createSimpleReply = mutationField("createSimpleReply", {
   description: "Creates a reply to a text or select field.",
@@ -148,7 +148,7 @@ export const updateNumericReply = mutationField("updateNumericReply", {
     replyIsForFieldOfType("replyId", ["NUMBER"]),
     replyCanBeUpdated("replyId")
   ),
-  validateArgs: validateFieldReply("replyId", "reply"),
+  validateArgs: validateReplyUpdate("replyId", "reply"),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.updatePetitionFieldReply(
       args.replyId,
