@@ -43,6 +43,7 @@ createQueueWorker(
         "SIGNATURE_STARTED",
         "SIGNATURE_COMPLETED",
         "SIGNATURE_REMINDER",
+        "ORGANIZATION_LIMIT_REACHED",
       ],
       analyticsEventListener
     )

@@ -256,7 +256,8 @@ export type SystemEventType =
   | "USER_LOGGED_IN"
   | "EMAIL_OPENED"
   | "EMAIL_VERIFIED"
-  | "INVITE_SENT";
+  | "INVITE_SENT"
+  | "ORGANIZATION_LIMIT_REACHED";
 
 export const SystemEventTypeValues = [
   "USER_CREATED",
@@ -264,6 +265,7 @@ export const SystemEventTypeValues = [
   "EMAIL_OPENED",
   "EMAIL_VERIFIED",
   "INVITE_SENT",
+  "ORGANIZATION_LIMIT_REACHED",
 ] as SystemEventType[];
 
 export type TaskName = "PRINT_PDF" | "EXPORT_REPLIES";

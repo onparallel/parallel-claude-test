@@ -8,6 +8,7 @@ import {
   EmailOpenedSystemEvent,
   EmailVerifiedSystemEvent,
   InviteSentSystemEvent,
+  OrganizationLimitReachedSystemEvent,
   PetitionClonedEvent,
   PetitionClosedEvent,
   PetitionCompletedEvent,
@@ -500,6 +501,20 @@ async function trackSignatureCancelledEvent(event: SignatureCancelledEvent, ctx:
   });
 }
 
+async function trackOrganizationLimitReachedEvent(
+  event: OrganizationLimitReachedSystemEvent,
+  ctx: WorkerContext
+) {
+  const owner = await ctx.organizations.loadOrgOwner(event.data.org_id);
+  if (owner) {
+    await ctx.analytics.trackEvent({
+      type: "ORGANIZATION_LIMIT_REACHED",
+      user_id: owner.id,
+      data: event.data,
+    });
+  }
+}
+
 export const analyticsEventListener: EventListener = async (event, ctx) => {
   switch (event.type) {
     case "PETITION_CREATED":
@@ -567,6 +582,9 @@ export const analyticsEventListener: EventListener = async (event, ctx) => {
       break;
     case "SIGNATURE_CANCELLED":
       await trackSignatureCancelledEvent(event, ctx);
+      break;
+    case "ORGANIZATION_LIMIT_REACHED":
+      await trackOrganizationLimitReachedEvent(event, ctx);
       break;
     default:
       throw new Error(`Tracking to analytics not implemented for event ${JSON.stringify(event)}`);

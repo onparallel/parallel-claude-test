@@ -1,5 +1,6 @@
 import { If } from "../util/types";
 import {
+  OrganizationUsageLimitName,
   PetitionEvent as DbPetitionEvent,
   PetitionEventType,
   PetitionPermissionType,
@@ -400,6 +401,14 @@ export type SystemEventPayload<TType extends SystemEventType> = {
     petition_reminder_id?: number;
     user_agent: string;
   };
+  ORGANIZATION_LIMIT_REACHED: {
+    org_id: number;
+    limit_name: OrganizationUsageLimitName;
+    used: number;
+    total: number;
+    period_start_date: Date;
+    period_end_date: Date;
+  };
 }[TType];
 
 type GenericSystemEvent<TType extends SystemEventType, IsCreate extends boolean = false> = Omit<
@@ -433,11 +442,15 @@ export type EmailOpenedSystemEvent<IsCreate extends boolean = false> = GenericSy
   IsCreate
 >;
 
+export type OrganizationLimitReachedSystemEvent<IsCreate extends boolean = false> =
+  GenericSystemEvent<"ORGANIZATION_LIMIT_REACHED", IsCreate>;
+
 export type SystemEvent<IsCreate extends boolean = false> =
   | UserCreatedEvent<IsCreate>
   | UserLoggedInEvent<IsCreate>
   | EmailVerifiedSystemEvent<IsCreate>
   | InviteSentSystemEvent<IsCreate>
-  | EmailOpenedSystemEvent<IsCreate>;
+  | EmailOpenedSystemEvent<IsCreate>
+  | OrganizationLimitReachedSystemEvent<IsCreate>;
 
 export type CreateSystemEvent = SystemEvent<true>;

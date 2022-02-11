@@ -19,6 +19,7 @@ import {
   OrganizationUsageLimitName,
   User,
 } from "../__types";
+import { SystemRepository } from "./SystemRepository";
 
 export type OrganizationUsageDetails = {
   USER_LIMIT: number;
@@ -38,7 +39,8 @@ export class OrganizationRepository extends BaseRepository {
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(KNEX) knex: Knex,
-    @inject(EMAILS) private readonly emails: EmailsService
+    @inject(EMAILS) private readonly emails: EmailsService,
+    @inject(SystemRepository) private system: SystemRepository
   ) {
     super(knex);
   }
@@ -56,6 +58,10 @@ export class OrganizationRepository extends BaseRepository {
   };
 
   readonly loadOrg = this.buildLoadBy("organization", "id", (q) => q.whereNull("deleted_at"));
+
+  readonly loadOrgOwner = this.buildLoadBy("user", "org_id", (q) =>
+    q.whereNull("deleted_at").where("organization_role", "OWNER").where("status", "ACTIVE")
+  );
 
   readonly loadOwnerAndAdmins = this.buildLoadMultipleBy("user", "org_id", (q) =>
     q
@@ -287,7 +293,24 @@ export class OrganizationRepository extends BaseRepository {
 
     // if usage reached 80% or 100% of total credits in the period, send warning email to owner and admins
     if (usage.used === Math.round(usage.limit * 0.8) || usage.limit === usage.used) {
+      const {
+        rows: [{ period_end_date: periodEndDate }],
+      } = await this.knex.raw(`select (?::timestamptz + ?::interval) as period_end_date;`, [
+        usage.period_start_date,
+        usage.period,
+      ]);
       await this.emails.sendOrganizationLimitsReachedEmail(orgId, limitName, usage.used, t);
+      await this.system.createEvent({
+        type: "ORGANIZATION_LIMIT_REACHED",
+        data: {
+          org_id: usage.org_id,
+          limit_name: limitName,
+          total: usage.limit,
+          used: usage.used,
+          period_start_date: usage.period_start_date,
+          period_end_date: periodEndDate,
+        },
+      });
     }
     return usage;
   }

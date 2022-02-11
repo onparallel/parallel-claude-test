@@ -2,7 +2,12 @@ import Analytics from "analytics-node";
 import { inject, injectable } from "inversify";
 import { isDefined } from "remeda";
 import { Config, CONFIG } from "../config";
-import { PetitionSignatureCancelReason, PetitionStatus, User } from "../db/__types";
+import {
+  OrganizationUsageLimitName,
+  PetitionSignatureCancelReason,
+  PetitionStatus,
+  User,
+} from "../db/__types";
 import { unMaybeArray } from "../util/arrays";
 import { toGlobalId } from "../util/globalId";
 import { titleize } from "../util/strings";
@@ -29,7 +34,8 @@ export type AnalyticsEventType =
   | "SIGNATURE_SENT"
   | "SIGNATURE_COMPLETED"
   | "SIGNATURE_REMINDER"
-  | "SIGNATURE_CANCELLED";
+  | "SIGNATURE_CANCELLED"
+  | "ORGANIZATION_LIMIT_REACHED";
 
 export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
   /** User creates a petition/template from scratch */
@@ -175,6 +181,14 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
     cancel_reason: PetitionSignatureCancelReason;
     test_mode?: boolean;
   };
+  ORGANIZATION_LIMIT_REACHED: {
+    org_id: number;
+    limit_name: OrganizationUsageLimitName;
+    used: number;
+    total: number;
+    period_start_date: Date;
+    period_end_date: Date;
+  };
 }[TType];
 
 export type GenericAnalyticsEvent<TType extends AnalyticsEventType> = {
@@ -205,7 +219,8 @@ export type AnalyticsEvent =
   | GenericAnalyticsEvent<"SIGNATURE_SENT">
   | GenericAnalyticsEvent<"SIGNATURE_COMPLETED">
   | GenericAnalyticsEvent<"SIGNATURE_REMINDER">
-  | GenericAnalyticsEvent<"SIGNATURE_CANCELLED">;
+  | GenericAnalyticsEvent<"SIGNATURE_CANCELLED">
+  | GenericAnalyticsEvent<"ORGANIZATION_LIMIT_REACHED">;
 
 export const ANALYTICS = Symbol.for("ANALYTICS");
 
