@@ -120,12 +120,11 @@ export const createNumericReply = mutationField("createNumericReply", {
   ),
   validateArgs: validateFieldReply("fieldId", "reply"),
   resolve: async (_, args, ctx) => {
-    const field = (await ctx.petitions.loadField(args.fieldId))!;
     return await ctx.petitions.createPetitionFieldReply(
       {
         petition_field_id: args.fieldId,
         user_id: ctx.user!.id,
-        type: field.type,
+        type: "NUMBER",
         status: "PENDING",
         content: { value: args.reply },
       },
