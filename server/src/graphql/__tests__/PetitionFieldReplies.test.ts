@@ -37,7 +37,6 @@ describe("GraphQL/Petition Field Replies", () => {
     [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
     fields = await mocks.createRandomPetitionFields(petition.id, 3, (i) => ({
       is_fixed: false,
-      validated: false,
       type: i === 0 ? "TEXT" : i === 1 ? "SELECT" : "FILE_UPLOAD",
       options: i === 1 ? { values: ["option 1", "option 2"] } : {},
       multiple: i > 0,
@@ -350,7 +349,7 @@ describe("GraphQL/Petition Field Replies", () => {
       const [field] = await mocks.createRandomPetitionFields(completedPetition.id, 1, () => ({
         type: "TEXT",
       }));
-      const [reply] = await mocks.createRandomTextReply(field.id, access.id, 1);
+      const [reply] = await mocks.createRandomTextReply(field.id, petition.id, 1);
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
@@ -701,7 +700,6 @@ describe("GraphQL/Petition Field Replies", () => {
       [checkboxField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
         type: "CHECKBOX",
         multiple: true,
-        validated: false,
         options: {
           values: ["1", "2", "3"],
           limit: {
@@ -758,29 +756,271 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(data).toBeNull();
     });
 
-    it("sends error if trying to create a checkbox reply on an already approved field", async () => {
-      // await mocks.knex
-      //   .from("petition_field")
-      //   .where("id", checkboxField.id)
-      //   .update("validated", true);
-      // const { errors, data } = await testClient.mutate({
-      //   mutation: gql`
-      //     mutation ($petitionId: GID!, $fieldId: GID!, $values: [String!]!) {
-      //       createCheckboxReply(petitionId: $petitionId, fieldId: $fieldId, values: $values) {
-      //         status
-      //         content
-      //       }
-      //     }
-      //   `,
-      //   variables: {
-      //     petitionId: toGlobalId("Petition", petition.id),
-      //     fieldId: toGlobalId("PetitionField", checkboxField.id),
-      //     values: ["1"],
-      //   },
-      // });
-      // expect(errors).toContainGraphQLError("FIELD_ALREADY_VALIDATED_ERROR");
-      // expect(data).toBeNull();
-      // TODO: create the field, add replies, approved and try to create more
+    // it("sends error if trying to create a checkbox reply on an already approved field", async () => {
+    //   await testClient.mutate({
+    //     mutation: gql`
+    //       mutation ($petitionId: GID!, $fieldId: GID!, $values: [String!]!) {
+    //         createCheckboxReply(petitionId: $petitionId, fieldId: $fieldId, values: $values) {
+    //           status
+    //           content
+    //         }
+    //       }
+    //     `,
+    //     variables: {
+    //       petitionId: toGlobalId("Petition", petition.id),
+    //       fieldId: toGlobalId("PetitionField", checkboxField.id),
+    //       values: ["1"],
+    //     },
+    //   });
+    //   await mocks.knex
+    //     .from("petition_field_reply")
+    //     .where("petition_field_id", checkboxField.id)
+    //     .update({ status: "APPROVED" });
+    //   const { errors, data } = await testClient.mutate({
+    //     mutation: gql`
+    //       mutation ($petitionId: GID!, $fieldId: GID!, $values: [String!]!) {
+    //         createCheckboxReply(petitionId: $petitionId, fieldId: $fieldId, values: $values) {
+    //           status
+    //           content
+    //         }
+    //       }
+    //     `,
+    //     variables: {
+    //       petitionId: toGlobalId("Petition", petition.id),
+    //       fieldId: toGlobalId("PetitionField", checkboxField.id),
+    //       values: ["2"],
+    //     },
+    //   });
+    //   expect(errors).toContainGraphQLError("FIELD_ALREADY_APPROVED_ERROR");
+    //   expect(data).toBeNull();
+    // });
+  });
+
+  describe("createNumericReply", () => {
+    let numberField: PetitionField;
+
+    beforeAll(async () => {
+      [numberField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "NUMBER",
+        options: {
+          range: {
+            isActive: false,
+            min: 0,
+          },
+        },
+        multiple: false,
+        optional: true,
+      }));
+    });
+
+    it("creates a reply of type NUMBER", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $reply: Float!) {
+            createNumericReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+              status
+              content
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", numberField.id),
+          reply: 288,
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data?.createNumericReply).toEqual({
+        status: "PENDING",
+        content: { value: 288 },
+      });
+    });
+
+    it("sends error if passing invalid reply on a NUMBER field", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $reply: Float!) {
+            createNumericReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+              status
+              content
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", numberField.id),
+          reply: "invalid value",
+        },
+      });
+      expect(errors).toContainGraphQLError("BAD_USER_INPUT");
+      expect(data).toBeUndefined();
+    });
+
+    it("sends error if trying to create a reply on a single-reply field with a previously submitted reply", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $reply: Float!) {
+            createNumericReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+              status
+              content
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", numberField.id),
+          reply: 123,
+        },
+      });
+      expect(errors).toContainGraphQLError("FIELD_ALREADY_REPLIED_ERROR");
+      expect(data).toBeNull();
+    });
+  });
+
+  describe("updateNumericReply", () => {
+    let numberReply: PetitionFieldReply;
+    let limitedNumberReply: PetitionFieldReply;
+    let approvedReply: PetitionFieldReply;
+
+    beforeAll(async () => {
+      const [numberField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "NUMBER",
+        options: {
+          range: {
+            isActive: false,
+            min: 0,
+          },
+        },
+        multiple: true,
+        optional: true,
+      }));
+
+      const [limitedNumberField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "NUMBER",
+        options: {
+          range: {
+            isActive: true,
+            min: -10,
+            max: 200,
+          },
+        },
+        multiple: true,
+        optional: true,
+      }));
+
+      [numberReply] = await mocks.createRandomNumberReply(numberField.id, petition.id, 1);
+      [limitedNumberReply] = await mocks.createRandomNumberReply(
+        limitedNumberField.id,
+        petition.id,
+        1,
+        undefined,
+        -10,
+        200
+      );
+
+      [approvedReply] = await mocks.createRandomNumberReply(numberField.id, petition.id, 1, () => ({
+        status: "APPROVED",
+        type: "NUMBER",
+      }));
+    });
+
+    it("updates a NUMBER reply", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $replyId: GID!, $reply: Float!) {
+            updateNumericReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+              id
+              status
+              content
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", numberReply.id),
+          reply: 30,
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateNumericReply).toEqual({
+        id: toGlobalId("PetitionFieldReply", numberReply.id),
+        status: "PENDING",
+        content: { value: 30 },
+      });
+    });
+
+    it("sends error when trying to update the reply of a NUMBER field with an invalid reply", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $replyId: GID!, $reply: Float!) {
+            updateNumericReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+              id
+              status
+              content
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", limitedNumberReply.id),
+          reply: 300000,
+        },
+      });
+
+      expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to update an approved reply", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $replyId: GID!, $reply: Float!) {
+            updateNumericReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+              id
+              status
+              content
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", approvedReply.id),
+          reply: 30,
+        },
+      });
+      expect(errors).toContainGraphQLError("REPLY_ALREADY_APPROVED_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("changes reply status to pending when updating a rejected reply", async () => {
+      await mocks
+        .knex("petition_field_reply")
+        .where("id", numberReply.id)
+        .update("status", "REJECTED");
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $replyId: GID!, $reply: Float!) {
+            updateNumericReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+              id
+              status
+              content
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", numberReply.id),
+          reply: 32,
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data?.updateNumericReply).toEqual({
+        id: toGlobalId("PetitionFieldReply", numberReply.id),
+        status: "PENDING",
+        content: { value: 32 },
+      });
     });
   });
 
@@ -792,7 +1032,6 @@ describe("GraphQL/Petition Field Replies", () => {
       [checkboxField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
         type: "CHECKBOX",
         multiple: true,
-        validated: false,
         options: {
           values: ["1", "2", "3"],
           limit: {
@@ -920,8 +1159,6 @@ describe("GraphQL/Petition Field Replies", () => {
       [dynamicSelectField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
         type: "DYNAMIC_SELECT",
         multiple: false,
-        validated: false,
-
         options: {
           labels: ["Comunidad autónoma", "Provincia"],
           values: [
@@ -1016,7 +1253,7 @@ describe("GraphQL/Petition Field Replies", () => {
       await mocks.knex
         .from("petition_field")
         .where("id", dynamicSelectField.id)
-        .update({ validated: false, multiple: false });
+        .update({ multiple: false });
 
       await mocks.knex.from<PetitionFieldReply>("petition_field_reply").insert({
         content: {
@@ -1473,7 +1710,7 @@ describe("GraphQL/Petition Field Replies", () => {
       const [field] = await mocks.createRandomPetitionFields(completedPetition.id, 1, () => ({
         type: "TEXT",
       }));
-      const [reply] = await mocks.createRandomTextReply(field.id, access.id, 1);
+      const [reply] = await mocks.createRandomTextReply(field.id, petition.id, 1);
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`

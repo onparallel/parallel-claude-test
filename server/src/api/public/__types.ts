@@ -56,8 +56,7 @@ export type AccessDeactivatedEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  /** If true, this event was triggered by an user action. If false, the event was triggered automatically because an email was bounced */
-  isManualTrigger: Scalars["Boolean"];
+  reason: Scalars["String"];
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -291,9 +290,8 @@ export type LandingTemplatePagination = {
 export type MessageCancelledEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  /** If true, this event was triggered by an user action. If false, the event was triggered automatically because an email was bounced */
-  isManualTrigger: Scalars["Boolean"];
   message: PetitionMessage;
+  reason: Scalars["String"];
   type: PetitionEventType;
   user: Maybe<User>;
 };
