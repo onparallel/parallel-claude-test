@@ -12,21 +12,27 @@ interface ErrorBody {
 }
 
 export abstract class HttpError extends Error implements ResponseWrapper<ErrorBody> {
-  constructor(public status: number, public code: string, public message: string) {
+  constructor(
+    public status: number,
+    public code: string,
+    public message: string,
+    public extra = {}
+  ) {
     super(message);
   }
   apply(res: Response<ErrorBody>) {
     res.status(this.status).json({
       code: this.code,
       message: this.message,
+      ...this.extra,
     });
   }
 }
 
 export class BadRequestError extends HttpError {
   static readonly code = "BadRequestError";
-  constructor(public message: string) {
-    super(400, BadRequestError.code, message);
+  constructor(public message: string, extra = {}) {
+    super(400, BadRequestError.code, message, extra);
   }
 }
 

@@ -1474,7 +1474,10 @@ api
       } catch (error: any) {
         if (error instanceof ClientError) {
           if (containsGraphQLError(error, "INVALID_REPLY_ERROR")) {
-            throw new BadRequestError(error.response.errors?.[0].message ?? "INVALID_REPLY_ERROR");
+            const subcode = error.response.errors?.[0].extensions?.extra?.subcode;
+            throw new BadRequestError(error.response.errors?.[0].message ?? "INVALID_REPLY_ERROR", {
+              subcode,
+            });
           } else if (containsGraphQLError(error, "FIELD_ALREADY_REPLIED_ERROR")) {
             throw new BadRequestError(
               "The field is already replied and does not accept any more replies."
@@ -1622,7 +1625,10 @@ api
       } catch (error: any) {
         if (error instanceof ClientError) {
           if (containsGraphQLError(error, "INVALID_REPLY_ERROR")) {
-            throw new BadRequestError(error.response.errors?.[0].message ?? "INVALID_REPLY_ERROR");
+            const subcode = error.response.errors?.[0].extensions?.extra?.subcode;
+            throw new BadRequestError(error.response.errors?.[0].message ?? "INVALID_REPLY_ERROR", {
+              subcode,
+            });
           } else if (containsGraphQLError(error, "REPLY_ALREADY_APPROVED_ERROR")) {
             throw new BadRequestError("The reply is already approved and cannot be modified.");
           }
