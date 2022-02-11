@@ -40,7 +40,6 @@ import { Fragment, SetStateAction, useCallback, useEffect, useMemo, useState } f
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, { createFilter } from "react-select";
 import { pick, uniq, zip } from "remeda";
-import { InputCleaveElement } from "../common/InputCleave";
 import { NumeralInput } from "../common/NumeralInput";
 
 export interface PetitionFieldVisibilityProps {

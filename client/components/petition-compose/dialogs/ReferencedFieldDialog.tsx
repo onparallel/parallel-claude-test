@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Button, Stack, Text } from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { FieldErrorDialog } from "@parallel/components/common/dialogs/FieldErrorDialog";
 import { ReferencedFieldDialog_PetitionFieldFragment } from "@parallel/graphql/__types";
