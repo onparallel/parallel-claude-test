@@ -4521,6 +4521,22 @@ export type SubmitReply_createSimpleReplyMutation = {
   };
 };
 
+export type SubmitReply_createNumericReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  reply: Scalars["Float"];
+}>;
+
+export type SubmitReply_createNumericReplyMutation = {
+  createNumericReply: {
+    id: string;
+    content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
+    createdAt: string;
+    updatedAt: string;
+  };
+};
+
 export type SubmitReply_createCheckboxReplyMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   fieldId: Scalars["GID"];
@@ -4618,6 +4634,23 @@ export type UpdateReply_updateSimpleReplyMutationVariables = Exact<{
 
 export type UpdateReply_updateSimpleReplyMutation = {
   updateSimpleReply: {
+    id: string;
+    content: { [key: string]: any };
+    status: PetitionFieldReplyStatus;
+    createdAt: string;
+    updatedAt: string;
+    field: { id: string } | null;
+  };
+};
+
+export type UpdateReply_updateNumericReplyMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+  reply: Scalars["Float"];
+}>;
+
+export type UpdateReply_updateNumericReplyMutation = {
+  updateNumericReply: {
     id: string;
     content: { [key: string]: any };
     status: PetitionFieldReplyStatus;
@@ -5571,6 +5604,17 @@ export const SubmitReply_createSimpleReplyDocument = gql`
   SubmitReply_createSimpleReplyMutation,
   SubmitReply_createSimpleReplyMutationVariables
 >;
+export const SubmitReply_createNumericReplyDocument = gql`
+  mutation SubmitReply_createNumericReply($petitionId: GID!, $fieldId: GID!, $reply: Float!) {
+    createNumericReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+      ...PetitionFieldReply
+    }
+  }
+  ${PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  SubmitReply_createNumericReplyMutation,
+  SubmitReply_createNumericReplyMutationVariables
+>;
 export const SubmitReply_createCheckboxReplyDocument = gql`
   mutation SubmitReply_createCheckboxReply($petitionId: GID!, $fieldId: GID!, $reply: [String!]!) {
     createCheckboxReply(petitionId: $petitionId, fieldId: $fieldId, values: $reply) {
@@ -5668,6 +5712,20 @@ export const UpdateReply_updateSimpleReplyDocument = gql`
 ` as unknown as DocumentNode<
   UpdateReply_updateSimpleReplyMutation,
   UpdateReply_updateSimpleReplyMutationVariables
+>;
+export const UpdateReply_updateNumericReplyDocument = gql`
+  mutation UpdateReply_updateNumericReply($petitionId: GID!, $replyId: GID!, $reply: Float!) {
+    updateNumericReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+      ...PetitionFieldReply
+      field {
+        id
+      }
+    }
+  }
+  ${PetitionFieldReplyFragmentDoc}
+` as unknown as DocumentNode<
+  UpdateReply_updateNumericReplyMutation,
+  UpdateReply_updateNumericReplyMutationVariables
 >;
 export const UpdateReply_updateCheckboxReplyDocument = gql`
   mutation UpdateReply_updateCheckboxReply($petitionId: GID!, $replyId: GID!, $values: [String!]!) {

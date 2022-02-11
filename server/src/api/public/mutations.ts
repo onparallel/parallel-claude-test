@@ -14,6 +14,14 @@ gql`
   ${PetitionFieldReplyFragment}
 `;
 gql`
+  mutation SubmitReply_createNumericReply($petitionId: GID!, $fieldId: GID!, $reply: Float!) {
+    createNumericReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+      ...PetitionFieldReply
+    }
+  }
+  ${PetitionFieldReplyFragment}
+`;
+gql`
   mutation SubmitReply_createCheckboxReply($petitionId: GID!, $fieldId: GID!, $reply: [String!]!) {
     createCheckboxReply(petitionId: $petitionId, fieldId: $fieldId, values: $reply) {
       ...PetitionFieldReply
@@ -85,6 +93,17 @@ gql`
 gql`
   mutation UpdateReply_updateSimpleReply($petitionId: GID!, $replyId: GID!, $reply: String!) {
     updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+      ...PetitionFieldReply
+      field {
+        id
+      }
+    }
+  }
+  ${PetitionFieldReplyFragment}
+`;
+gql`
+  mutation UpdateReply_updateNumericReply($petitionId: GID!, $replyId: GID!, $reply: Float!) {
+    updateNumericReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
       ...PetitionFieldReply
       field {
         id

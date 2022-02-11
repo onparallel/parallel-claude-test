@@ -131,6 +131,7 @@ import {
   SubmitReply_createDynamicSelectReplyDocument,
   SubmitReply_createFileUploadReplyCompleteDocument,
   SubmitReply_createFileUploadReplyDocument,
+  SubmitReply_createNumericReplyDocument,
   SubmitReply_createSimpleReplyDocument,
   SubmitReply_petitionDocument,
   TagFragmentDoc,
@@ -144,6 +145,7 @@ import {
   UpdateReply_updateDynamicSelectReplyDocument,
   UpdateReply_updateFileUploadReplyCompleteDocument,
   UpdateReply_updateFileUploadReplyDocument,
+  UpdateReply_updateNumericReplyDocument,
   UpdateReply_updateSimpleReplyDocument,
   UserFragmentDoc,
 } from "./__types";
@@ -1333,6 +1335,7 @@ api
         Submits a reply on a given field of the petition.\n
         Depending on the type of the field to be replied, the \`reply\` field in the request body will be different:
         - For \`TEXT\`, \`SHORT_TEXT\` and \`SELECT\` fields, its a simple string of plain text containing the reply.
+        - For \`NUMBER\`, fields, its a valid number whitout formatting in plain text.
         - For \`FILE_UPLOAD\` fields, it's the file to be uploaded as reply.
         - For \`CHECKBOX\` fields, it's an array of strings containing all the chosen options of the field.
         - For \`DYNAMIC_SELECT\` fields, it's an array of strings in which each position in the array represents the selected option in the same level.
@@ -1370,6 +1373,22 @@ api
             );
             newReply = createSimpleReply;
             break;
+          case "NUMBER": {
+            const numericReply = Number(body.reply);
+            if (typeof body.reply !== "string" || isNaN(numericReply)) {
+              throw new BadRequestError(`Reply for ${fieldType} field must a valid number.`);
+            }
+            const { createNumericReply } = await client.request(
+              SubmitReply_createNumericReplyDocument,
+              {
+                petitionId: params.petitionId,
+                fieldId: params.fieldId,
+                reply: numericReply,
+              }
+            );
+            newReply = createNumericReply;
+            break;
+          }
           case "CHECKBOX":
             if (!Array.isArray(body.reply)) {
               throw new BadRequestError(
@@ -1455,6 +1474,13 @@ api
       } catch (error: any) {
         if (error instanceof ClientError) {
           if (containsGraphQLError(error, "INVALID_REPLY_ERROR")) {
+            if (field?.type === "NUMBER") {
+              throw new BadRequestError(
+                `Your submitted reply is invalid. Expected values are in the range: ${
+                  field?.options.range.min ?? "Infinity"
+                } to ${field?.options.range.max ?? "Infinity"}`
+              );
+            }
             throw new BadRequestError(
               `Your submitted reply is invalid. Expected values are [${field?.options.values}]`
             );
@@ -1521,6 +1547,22 @@ api
             );
             updatedReply = updateSimpleReply;
             break;
+          case "NUMBER": {
+            const numericReply = Number(body.reply);
+            if (typeof body.reply !== "string" || isNaN(numericReply)) {
+              throw new BadRequestError(`Reply for ${fieldType} field must a valid number.`);
+            }
+            const { updateNumericReply } = await client.request(
+              UpdateReply_updateNumericReplyDocument,
+              {
+                petitionId: params.petitionId,
+                replyId: params.replyId,
+                reply: numericReply,
+              }
+            );
+            updatedReply = updateNumericReply;
+            break;
+          }
           case "CHECKBOX":
             if (!Array.isArray(body.reply)) {
               throw new BadRequestError(
@@ -1593,6 +1635,13 @@ api
       } catch (error: any) {
         if (error instanceof ClientError) {
           if (containsGraphQLError(error, "INVALID_REPLY_ERROR")) {
+            if (field?.type === "NUMBER") {
+              throw new BadRequestError(
+                `Your submitted reply is invalid. Expected values are in the range: ${
+                  field?.options.range.min ?? "Infinity"
+                } to ${field?.options.range.max ?? "Infinity"}`
+              );
+            }
             throw new BadRequestError(
               `Your submitted reply is invalid. Expected values are [${field?.options.values}]`
             );
