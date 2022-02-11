@@ -4335,11 +4335,6 @@
     "context": "Something went wrong"
   },
   {
-    "term": "generic.start",
-    "definition": "Iniciar",
-    "context": "Start"
-  },
-  {
     "term": "generic.submit",
     "definition": "Enviar",
     "context": "Submit"

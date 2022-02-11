@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Avatar,
   Box,
   Button,
   Checkbox,
@@ -94,7 +93,9 @@ export function ConfirmPetitionSignersDialog({
       isSuggested: true,
     },
     ...accesses
-      .filter((a) => a.status === "ACTIVE" && isDefined(a.contact))
+      .filter(
+        (a) => a.status === "ACTIVE" && isDefined(a.contact) && a.contact.email !== user.email
+      )
       .map((a) => ({
         ...pick(a.contact!, ["email", "firstName", "lastName", "contactId"]),
         isSuggested: true,

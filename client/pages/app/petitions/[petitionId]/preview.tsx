@@ -130,6 +130,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
           let completeSignerInfoData: ConfirmPetitionSignersDialogResult | null = null;
           if (petition.signatureConfig?.review === false) {
             completeSignerInfoData = await showConfirmPetitionSignersDialog({
+              accesses: petition.accesses,
               allowAdditionalSigners,
               fixedSigners: petition!.signatureConfig?.signers ?? [],
               user: me,
@@ -356,6 +357,7 @@ PetitionPreview.fragments = {
         accesses {
           id
           status
+          ...ConfirmPetitionSignersDialog_PetitionAccess
         }
         ...RecipientViewProgressFooter_Petition
         ...useSendPetitionHandler_Petition
@@ -376,6 +378,7 @@ PetitionPreview.fragments = {
       ...RecipientViewContentsCard_PetitionBase
       ...PetitionLayout_PetitionBase
     }
+    ${ConfirmPetitionSignersDialog.fragments.PetitionAccess}
     ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
     ${RecipientViewProgressFooter.fragments.Petition}
     ${useSendPetitionHandler.fragments.Petition}

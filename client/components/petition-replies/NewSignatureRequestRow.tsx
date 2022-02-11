@@ -98,14 +98,10 @@ export function NewSignatureRequestRow({
             <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
           </Button>
           <Button width="24" colorScheme="purple" marginLeft={2} onClick={handleStartSignature}>
-            {signers.length === 0 ? (
-              <FormattedMessage
-                id="component.petition-signatures-card.start"
-                defaultMessage="Start..."
-              />
-            ) : (
-              <FormattedMessage id="generic.start" defaultMessage="Start" />
-            )}
+            <FormattedMessage
+              id="component.petition-signatures-card.start"
+              defaultMessage="Start..."
+            />
           </Button>
         </Flex>
       </Box>
