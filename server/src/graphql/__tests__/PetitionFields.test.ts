@@ -103,6 +103,7 @@ describe("GraphQL/Petition Fields", () => {
               options: {
                 hasCommentsEnabled: true,
                 placeholder: null,
+                maxLength: null,
               },
               isReadOnly: false,
               replies: [],
@@ -989,6 +990,7 @@ describe("GraphQL/Petition Fields", () => {
             options: {
               hasCommentsEnabled: true,
               placeholder: "enter text here...",
+              maxLength: 100,
             },
             title: "new title",
             visibility: {
@@ -1014,6 +1016,7 @@ describe("GraphQL/Petition Fields", () => {
         options: {
           hasCommentsEnabled: true,
           placeholder: "enter text here...",
+          maxLength: 100,
         },
         optional: true,
         multiple: true,
@@ -1469,6 +1472,7 @@ describe("GraphQL/Petition Fields", () => {
         options: {
           hasCommentsEnabled: true,
           placeholder: field.options.placeholder,
+          maxLength: null,
         },
       });
     });

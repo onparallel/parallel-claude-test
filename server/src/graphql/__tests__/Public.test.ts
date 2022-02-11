@@ -677,6 +677,34 @@ describe("GraphQL/Public", () => {
           },
         ]);
       });
+
+      it("sends error when creating a reply that exceeds field's maxLength", async () => {
+        const [field] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
+          type: "SHORT_TEXT",
+          optional: true,
+          options: {
+            maxLength: 10,
+          },
+        }));
+
+        const { data, errors } = await testClient.mutate({
+          mutation: gql`
+            mutation ($fieldId: GID!, $keycode: ID!, $value: String!) {
+              publicCreateSimpleReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
+                id
+              }
+            }
+          `,
+          variables: {
+            keycode: access.keycode,
+            fieldId: toGlobalId("PetitionField", field.id),
+            value: "A".repeat(11),
+          },
+        });
+
+        expect(errors).toContainGraphQLError("MAX_LENGTH_EXCEEDED_ERROR");
+        expect(data).toBeNull();
+      });
     });
 
     describe("publicUpdateSimpleReply", () => {
@@ -844,6 +872,37 @@ describe("GraphQL/Public", () => {
           status: "PENDING",
           content: { text: "new reply" },
         });
+      });
+
+      it("sends error if trying to update a reply with more chars than allowed on the field", async () => {
+        const [field] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
+          type: "SHORT_TEXT",
+          optional: true,
+          options: {
+            maxLength: 10,
+          },
+        }));
+        const [reply] = await mocks.createRandomTextReply(field.id, access.id, 1, () => ({
+          content: { text: "valid" },
+        }));
+
+        const { data, errors } = await testClient.mutate({
+          mutation: gql`
+            mutation ($keycode: ID!, $replyId: GID!, $value: String!) {
+              publicUpdateSimpleReply(keycode: $keycode, replyId: $replyId, value: $value) {
+                id
+              }
+            }
+          `,
+          variables: {
+            keycode: access.keycode,
+            replyId: toGlobalId("PetitionFieldReply", reply.id),
+            value: "AAA".repeat(11),
+          },
+        });
+
+        expect(errors).toContainGraphQLError("MAX_LENGTH_EXCEEDED_ERROR");
+        expect(data).toBeNull();
       });
     });
 

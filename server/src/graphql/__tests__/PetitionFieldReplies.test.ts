@@ -277,6 +277,33 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
       expect(data).toBeNull();
     });
+
+    it("sends error when creating a reply that exceeds field's maxLength", async () => {
+      const [field] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "TEXT",
+        options: {
+          maxLength: 10,
+        },
+      }));
+
+      const { data, errors } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $reply: String!) {
+            createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", field.id),
+          reply: "A".repeat(11),
+        },
+      });
+
+      expect(errors).toContainGraphQLError("MAX_LENGTH_EXCEEDED_ERROR");
+      expect(data).toBeNull();
+    });
   });
 
   describe("updateSimpleReply", () => {
@@ -693,6 +720,38 @@ describe("GraphQL/Petition Field Replies", () => {
       });
 
       expect(errors).toContainGraphQLError("REPLY_ALREADY_APPROVED_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if trying to update a reply with more chars than allowed on the field", async () => {
+      const [field] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "TEXT",
+        options: {
+          maxLength: 10,
+        },
+      }));
+      const [reply] = await mocks.createRandomTextReply(field.id, 0, 1, () => ({
+        content: { text: "valid" },
+        user_id: user.id,
+        petition_access_id: null,
+      }));
+
+      const { data, errors } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $replyId: GID!, $reply: String!) {
+            updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", reply.id),
+          reply: "AAA".repeat(11),
+        },
+      });
+
+      expect(errors).toContainGraphQLError("MAX_LENGTH_EXCEEDED_ERROR");
       expect(data).toBeNull();
     });
   });
