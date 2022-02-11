@@ -1607,42 +1607,6 @@ describe("GraphQL/Petition Fields", () => {
       });
     });
 
-    it("changes field type and sets it as not validated", async () => {
-      // const { errors, data } = await testClient.mutate({
-      //   mutation: gql`
-      //     mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!, $force: Boolean) {
-      //       changePetitionFieldType(
-      //         fieldId: $fieldId
-      //         petitionId: $petitionId
-      //         type: $type
-      //         force: $force
-      //       ) {
-      //         field {
-      //           id
-      //           type
-      //           validated
-      //         }
-      //       }
-      //     }
-      //   `,
-      //   variables: {
-      //     petitionId: toGlobalId("Petition", userPetition.id),
-      //     fieldId: toGlobalId("PetitionField", fieldWithReply.id),
-      //     type: "FILE_UPLOAD",
-      //     force: true,
-      //   },
-      // });
-      // expect(errors).toBeUndefined();
-      // expect(data!.changePetitionFieldType).toEqual({
-      //   field: {
-      //     id: toGlobalId("PetitionField", fieldWithReply.id),
-      //     type: "FILE_UPLOAD",
-      //     validated: false,
-      //   },
-      // });
-      // TODO: See if its needed, when the types are compatible and replies are persisted and validated
-    });
-
     it("sends error when trying to change a field on a private petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`

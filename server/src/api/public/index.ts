@@ -1488,10 +1488,6 @@ api
             throw new BadRequestError(
               "The field is already replied and does not accept any more replies."
             );
-          } else if (containsGraphQLError(error, "FIELD_ALREADY_VALIDATED_ERROR")) {
-            throw new BadRequestError(
-              "The field is already validated and does not accept any more replies."
-            );
           }
         }
         throw error;
@@ -1647,10 +1643,6 @@ api
             );
           } else if (containsGraphQLError(error, "REPLY_ALREADY_APPROVED_ERROR")) {
             throw new BadRequestError("The reply is already approved and cannot be modified.");
-          } else if (containsGraphQLError(error, "FIELD_ALREADY_VALIDATED_ERROR")) {
-            throw new BadRequestError(
-              "The field is already validated and does not accept any modification in its replies."
-            );
           }
         }
         throw error;
@@ -1687,13 +1679,6 @@ api
           containsGraphQLError(error, "REPLY_ALREADY_APPROVED_ERROR")
         ) {
           throw new ConflictError("The reply is already approved and cannot be deleted.");
-        } else if (
-          error instanceof ClientError &&
-          containsGraphQLError(error, "FIELD_ALREADY_VALIDATED_ERROR")
-        ) {
-          throw new BadRequestError(
-            "The field is already validated and its replies cannot be deleted."
-          );
         }
         throw error;
       }
