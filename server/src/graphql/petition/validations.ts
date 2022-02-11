@@ -1,6 +1,6 @@
-import { ArgsValue } from "nexus/dist/core";
 import { GraphQLResolveInfo } from "graphql";
 import { decode } from "jsonwebtoken";
+import { ArgsValue } from "nexus/dist/core";
 import { isDefined } from "remeda";
 import {
   Petition,
@@ -11,9 +11,10 @@ import {
 } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { Maybe } from "../../util/types";
+import { Arg } from "../helpers/authorize";
 import { ArgValidationError, InvalidReplyError } from "../helpers/errors";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
-import { Arg } from "../helpers/authorize";
+import { validateCheckboxReplyValues, validateDynamicSelectReplyValues } from "../utils";
 
 export function validatePetitionStatus(
   petition: Maybe<Petition>,
@@ -152,14 +153,14 @@ export function validateFieldReply<
   TypeName extends string,
   FieldName extends string,
   TFieldIdArg extends Arg<TypeName, FieldName, number>,
-  TValuedArg extends Arg<TypeName, FieldName>
->(fieldIdArg: TFieldIdArg, valueArg: TValuedArg) {
+  TValuedArg extends Arg<TypeName, FieldName, any>
+>(fieldIdArg: TFieldIdArg, valueArg: TValuedArg, argName: string) {
   return (async (_, args, ctx, info) => {
     const fieldId = args[fieldIdArg] as unknown as number;
     const value = args[valueArg] as any;
     const field = (await ctx.petitions.loadField(fieldId))!;
 
-    validateReplyValue(field, value, info, valueArg);
+    validateReplyValue(field, value, info, argName);
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }
 
@@ -168,34 +169,72 @@ export function validateReplyUpdate<
   FieldName extends string,
   TReplyIdArg extends Arg<TypeName, FieldName, number>,
   TValuedArg extends Arg<TypeName, FieldName>
->(replyIdArg: TReplyIdArg, valueArg: TValuedArg) {
+>(replyIdArg: TReplyIdArg, valueArg: TValuedArg, argName: string) {
   return (async (_, args, ctx, info) => {
     const replyId = args[replyIdArg] as unknown as number;
     const value = args[valueArg] as any;
-    const reply = (await ctx.petitions.loadFieldReply(replyId))!;
-    const field = (await ctx.petitions.loadField(reply.petition_field_id))!;
+    const field = (await ctx.petitions.loadFieldForReply(replyId))!;
 
-    validateReplyValue(field, value, info, valueArg);
+    validateReplyValue(field, value, info, argName);
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }
 
 function validateReplyValue(
   field: PetitionField,
-  value: any,
+  reply: any,
   info: GraphQLResolveInfo,
-  valueArg: string
+  argName: string
 ) {
   switch (field.type) {
     case "NUMBER": {
-      if (typeof value !== "number" || Number.isNaN(value)) {
-        throw new InvalidReplyError(info, valueArg, `Value must be a number`);
+      if (typeof reply !== "number" || Number.isNaN(reply)) {
+        throw new InvalidReplyError(info, argName, `Value must be a number`);
       }
       const options = field.options;
       const min = (options.range.min as number) ?? -Infinity;
       const max = (options.range.max as number) ?? Infinity;
-      if (value > max || value < min) {
-        throw new InvalidReplyError(info, valueArg, `Number must be in range [${min}, ${max}]`);
+      if (reply > max || reply < min) {
+        throw new InvalidReplyError(info, argName, `Number must be in range [${min}, ${max}]`);
       }
+      break;
+    }
+    case "SELECT": {
+      if (typeof reply !== "string") {
+        throw new InvalidReplyError(info, argName, "Value must be a string");
+      }
+      const options = field.options.values as Maybe<string[]>;
+      if (!options?.includes(reply)) {
+        throw new InvalidReplyError(info, argName, "Invalid option");
+      }
+      break;
+    }
+    case "TEXT":
+    case "SHORT_TEXT": {
+      if (typeof reply !== "string") {
+        throw new InvalidReplyError(info, argName, "Value must be a string");
+      }
+      const maxLength = (field.options.maxLength as Maybe<number>) ?? Infinity;
+      if (reply.length > maxLength) {
+        throw new InvalidReplyError(
+          info,
+          argName,
+          `Reply exceeds max length allowed of ${maxLength} chars`
+        );
+      }
+      break;
+    }
+    case "CHECKBOX": {
+      if (!Array.isArray(reply) || !reply.every((r) => typeof r === "string")) {
+        throw new InvalidReplyError(info, argName, "Values must be an array of strings");
+      }
+      validateCheckboxReplyValues(field, reply);
+      break;
+    }
+    case "DYNAMIC_SELECT": {
+      if (!Array.isArray(reply)) {
+        throw new InvalidReplyError(info, argName, "Values must be an array");
+      }
+      validateDynamicSelectReplyValues(field, reply);
       break;
     }
     default:

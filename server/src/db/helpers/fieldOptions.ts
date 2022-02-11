@@ -61,6 +61,9 @@ const SCHEMAS = {
       placeholder: {
         type: ["string", "null"],
       },
+      maxLength: {
+        type: ["integer", "null"],
+      },
     },
   },
   SHORT_TEXT: {
@@ -73,6 +76,9 @@ const SCHEMAS = {
       },
       placeholder: {
         type: ["string", "null"],
+      },
+      maxLength: {
+        type: ["integer", "null"],
       },
     },
   },
@@ -269,6 +275,7 @@ export function defaultFieldOptions(
         options: {
           hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
           placeholder: options?.placeholder ?? null,
+          maxLength: options?.maxLength ?? null,
         },
       };
     }

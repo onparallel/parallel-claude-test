@@ -1488,6 +1488,10 @@ api
             throw new BadRequestError(
               "The field is already replied and does not accept any more replies."
             );
+          } else if (containsGraphQLError(error, "MAX_LENGTH_EXCEEDED_ERROR")) {
+            throw new BadRequestError(
+              `Reply exceeds the maximum length allowed of ${field?.options.maxLength ?? 0} chars`
+            );
           }
         }
         throw error;
@@ -1643,6 +1647,10 @@ api
             );
           } else if (containsGraphQLError(error, "REPLY_ALREADY_APPROVED_ERROR")) {
             throw new BadRequestError("The reply is already approved and cannot be modified.");
+          } else if (containsGraphQLError(error, "MAX_LENGTH_EXCEEDED_ERROR")) {
+            throw new BadRequestError(
+              `Reply exceeds the maximum length allowed of ${field?.options.maxLength ?? 0} chars`
+            );
           }
         }
         throw error;

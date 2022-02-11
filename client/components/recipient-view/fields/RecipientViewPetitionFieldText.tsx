@@ -136,6 +136,7 @@ export function RecipientViewPetitionFieldText({
     ref: newReplyRef as any,
     paddingRight: 10,
     isDisabled: isDisabled,
+    maxLength: field.options.maxLength ?? undefined,
     value,
     onKeyDown: async (event: KeyboardEvent) => {
       if (isMetaReturn(event) && field.multiple) {
@@ -259,6 +260,7 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
     ref: ref as any,
     paddingRight: 10,
     value,
+    maxLength: field.options.maxLength ?? undefined,
     isDisabled: isDisabled || reply.status === "APPROVED",
     isInvalid: reply.status === "REJECTED",
     onKeyDown: async (event: KeyboardEvent) => {

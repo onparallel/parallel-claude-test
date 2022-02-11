@@ -1,11 +1,8 @@
 import { floatArg, list, mutationField, nonNull, objectType, stringArg } from "nexus";
 import { random } from "../../../util/token";
-import { Maybe } from "../../../util/types";
 import { authenticateAnd } from "../../helpers/authorize";
-import { InvalidReplyError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { fileUploadInputMaxSize } from "../../helpers/validators/maxFileSize";
-import { validateCheckboxReplyValues, validateDynamicSelectReplyValues } from "../../utils";
 import {
   fieldCanBeReplied,
   fieldHasType,
@@ -31,21 +28,7 @@ export const createSimpleReply = mutationField("createSimpleReply", {
     fieldHasType("fieldId", ["TEXT", "SELECT", "SHORT_TEXT"]),
     fieldCanBeReplied("fieldId")
   ),
-  validateArgs: async (_, args, ctx, info) => {
-    const field = (await ctx.petitions.loadField(args.fieldId))!;
-
-    switch (field.type) {
-      case "SELECT": {
-        const options = field.options.values as Maybe<string[]>;
-        if (!options?.includes(args.reply)) {
-          throw new InvalidReplyError(info, "reply", "Invalid option");
-        }
-        break;
-      }
-      default:
-        break;
-    }
-  },
+  validateArgs: validateFieldReply("fieldId", "reply", "reply"),
   resolve: async (_, args, ctx) => {
     const field = (await ctx.petitions.loadField(args.fieldId))!;
     return await ctx.petitions.createPetitionFieldReply(
@@ -75,21 +58,7 @@ export const updateSimpleReply = mutationField("updateSimpleReply", {
     replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT"]),
     replyCanBeUpdated("replyId")
   ),
-  validateArgs: async (_, args, ctx, info) => {
-    const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
-
-    switch (field.type) {
-      case "SELECT": {
-        const options = field.options.values as Maybe<string[]>;
-        if (!options?.includes(args.reply)) {
-          throw new InvalidReplyError(info, "reply", "Invalid option");
-        }
-        break;
-      }
-      default:
-        break;
-    }
-  },
+  validateArgs: validateReplyUpdate("replyId", "reply", "reply"),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.updatePetitionFieldReply(
       args.replyId,
@@ -118,7 +87,7 @@ export const createNumericReply = mutationField("createNumericReply", {
     fieldHasType("fieldId", ["NUMBER"]),
     fieldCanBeReplied("fieldId")
   ),
-  validateArgs: validateFieldReply("fieldId", "reply"),
+  validateArgs: validateFieldReply("fieldId", "reply", "reply"),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.createPetitionFieldReply(
       {
@@ -147,7 +116,7 @@ export const updateNumericReply = mutationField("updateNumericReply", {
     replyIsForFieldOfType("replyId", ["NUMBER"]),
     replyCanBeUpdated("replyId")
   ),
-  validateArgs: validateReplyUpdate("replyId", "reply"),
+  validateArgs: validateReplyUpdate("replyId", "reply", "reply"),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.updatePetitionFieldReply(
       args.replyId,
@@ -350,14 +319,7 @@ export const createCheckboxReply = mutationField("createCheckboxReply", {
     fieldHasType("fieldId", ["CHECKBOX"]),
     fieldCanBeReplied("fieldId")
   ),
-  validateArgs: async (_, { fieldId, values }, ctx, info) => {
-    try {
-      const field = (await ctx.petitions.loadField(fieldId))!;
-      validateCheckboxReplyValues(field, values);
-    } catch (error: any) {
-      throw new InvalidReplyError(info, "values", error.message);
-    }
-  },
+  validateArgs: validateFieldReply("fieldId", "values", "values"),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.createPetitionFieldReply(
       {
@@ -386,14 +348,7 @@ export const updateCheckboxReply = mutationField("updateCheckboxReply", {
     replyIsForFieldOfType("replyId", ["CHECKBOX"]),
     replyCanBeUpdated("replyId")
   ),
-  validateArgs: async (_, { replyId, values }, ctx, info) => {
-    try {
-      const field = (await ctx.petitions.loadFieldForReply(replyId))!;
-      validateCheckboxReplyValues(field, values);
-    } catch (error: any) {
-      throw new InvalidReplyError(info, "values", error.message);
-    }
-  },
+  validateArgs: validateReplyUpdate("replyId", "values", "values"),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.updatePetitionFieldReply(
       args.replyId,
@@ -422,14 +377,7 @@ export const createDynamicSelectReply = mutationField("createDynamicSelectReply"
     fieldHasType("fieldId", ["DYNAMIC_SELECT"]),
     fieldCanBeReplied("fieldId")
   ),
-  validateArgs: async (_, args, ctx, info) => {
-    try {
-      const field = (await ctx.petitions.loadField(args.fieldId))!;
-      validateDynamicSelectReplyValues(field, args.value);
-    } catch (error: any) {
-      throw new InvalidReplyError(info, "value", error.message);
-    }
-  },
+  validateArgs: validateFieldReply("fieldId", "value", "value"),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.createPetitionFieldReply(
       {
@@ -458,14 +406,7 @@ export const updateDynamicSelectReply = mutationField("updateDynamicSelectReply"
     replyIsForFieldOfType("replyId", ["DYNAMIC_SELECT"]),
     replyCanBeUpdated("replyId")
   ),
-  validateArgs: async (_, args, ctx, info) => {
-    try {
-      const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
-      validateDynamicSelectReplyValues(field, args.value);
-    } catch (error: any) {
-      throw new InvalidReplyError(info, "reply", error.message);
-    }
-  },
+  validateArgs: validateReplyUpdate("replyId", "value", "value"),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.updatePetitionFieldReply(
       args.replyId,
