@@ -82,17 +82,6 @@ export class InvalidReplyError extends ApolloError {
   }
 }
 
-export class MaxLengthExceededError extends ApolloError {
-  readonly name = "MaxLengthExceededError";
-  constructor({ parentType, fieldName }: GraphQLResolveInfo, argName: string, message: string) {
-    super(message, "MAX_LENGTH_EXCEEDED_ERROR", {
-      parentType,
-      fieldName,
-      argName,
-      message,
-    });
-  }
-}
 export class MaxFileSizeExceededError extends ApolloError {
   readonly name = "MaxFileSizeExceededError";
   constructor(

@@ -1474,23 +1474,10 @@ api
       } catch (error: any) {
         if (error instanceof ClientError) {
           if (containsGraphQLError(error, "INVALID_REPLY_ERROR")) {
-            if (field?.type === "NUMBER") {
-              throw new BadRequestError(
-                `Your submitted reply is invalid. Expected values are in the range: ${
-                  field?.options.range.min ?? "Infinity"
-                } to ${field?.options.range.max ?? "Infinity"}`
-              );
-            }
-            throw new BadRequestError(
-              `Your submitted reply is invalid. Expected values are [${field?.options.values}]`
-            );
+            throw new BadRequestError(error.response.errors?.[0].message ?? "INVALID_REPLY_ERROR");
           } else if (containsGraphQLError(error, "FIELD_ALREADY_REPLIED_ERROR")) {
             throw new BadRequestError(
               "The field is already replied and does not accept any more replies."
-            );
-          } else if (containsGraphQLError(error, "MAX_LENGTH_EXCEEDED_ERROR")) {
-            throw new BadRequestError(
-              `Reply exceeds the maximum length allowed of ${field?.options.maxLength ?? 0} chars`
             );
           }
         }
@@ -1635,22 +1622,9 @@ api
       } catch (error: any) {
         if (error instanceof ClientError) {
           if (containsGraphQLError(error, "INVALID_REPLY_ERROR")) {
-            if (field?.type === "NUMBER") {
-              throw new BadRequestError(
-                `Your submitted reply is invalid. Expected values are in the range: ${
-                  field?.options.range.min ?? "Infinity"
-                } to ${field?.options.range.max ?? "Infinity"}`
-              );
-            }
-            throw new BadRequestError(
-              `Your submitted reply is invalid. Expected values are [${field?.options.values}]`
-            );
+            throw new BadRequestError(error.response.errors?.[0].message ?? "INVALID_REPLY_ERROR");
           } else if (containsGraphQLError(error, "REPLY_ALREADY_APPROVED_ERROR")) {
             throw new BadRequestError("The reply is already approved and cannot be modified.");
-          } else if (containsGraphQLError(error, "MAX_LENGTH_EXCEEDED_ERROR")) {
-            throw new BadRequestError(
-              `Reply exceeds the maximum length allowed of ${field?.options.maxLength ?? 0} chars`
-            );
           }
         }
         throw error;

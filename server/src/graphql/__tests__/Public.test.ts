@@ -702,7 +702,7 @@ describe("GraphQL/Public", () => {
           },
         });
 
-        expect(errors).toContainGraphQLError("MAX_LENGTH_EXCEEDED_ERROR");
+        expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
         expect(data).toBeNull();
       });
     });
@@ -901,7 +901,7 @@ describe("GraphQL/Public", () => {
           },
         });
 
-        expect(errors).toContainGraphQLError("MAX_LENGTH_EXCEEDED_ERROR");
+        expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
         expect(data).toBeNull();
       });
     });

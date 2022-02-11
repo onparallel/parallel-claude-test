@@ -188,53 +188,76 @@ function validateReplyValue(
   switch (field.type) {
     case "NUMBER": {
       if (typeof reply !== "number" || Number.isNaN(reply)) {
-        throw new InvalidReplyError(info, argName, `Value must be a number`);
+        throw new InvalidReplyError(info, argName, `Value must be a number`, {
+          err_code: "INVALID_TYPE_ERROR",
+        });
       }
       const options = field.options;
       const min = (options.range.min as number) ?? -Infinity;
       const max = (options.range.max as number) ?? Infinity;
       if (reply > max || reply < min) {
-        throw new InvalidReplyError(info, argName, `Number must be in range [${min}, ${max}]`);
+        throw new InvalidReplyError(info, argName, `Number must be in range [${min}, ${max}]`, {
+          err_code: "OUT_OF_RANGE_ERROR",
+        });
       }
       break;
     }
     case "SELECT": {
       if (typeof reply !== "string") {
-        throw new InvalidReplyError(info, argName, "Value must be a string");
+        throw new InvalidReplyError(info, argName, "Value must be a string", {
+          err_code: "INVALID_TYPE_ERROR",
+        });
       }
       const options = field.options.values as Maybe<string[]>;
       if (!options?.includes(reply)) {
-        throw new InvalidReplyError(info, argName, "Invalid option");
+        throw new InvalidReplyError(info, argName, "Invalid option", {
+          err_code: "UNKNOWN_OPTION_ERROR",
+        });
       }
       break;
     }
     case "TEXT":
     case "SHORT_TEXT": {
       if (typeof reply !== "string") {
-        throw new InvalidReplyError(info, argName, "Value must be a string");
+        throw new InvalidReplyError(info, argName, "Value must be a string", {
+          err_code: "INVALID_TYPE_ERROR",
+        });
       }
       const maxLength = (field.options.maxLength as Maybe<number>) ?? Infinity;
       if (reply.length > maxLength) {
         throw new InvalidReplyError(
           info,
           argName,
-          `Reply exceeds max length allowed of ${maxLength} chars`
+          `Reply exceeds max length allowed of ${maxLength} chars`,
+          { err_code: "MAX_LENGTH_EXCEEDED_ERROR" }
         );
       }
       break;
     }
     case "CHECKBOX": {
       if (!Array.isArray(reply) || !reply.every((r) => typeof r === "string")) {
-        throw new InvalidReplyError(info, argName, "Values must be an array of strings");
+        throw new InvalidReplyError(info, argName, "Values must be an array of strings", {
+          err_code: "INVALID_TYPE_ERROR",
+        });
       }
-      validateCheckboxReplyValues(field, reply);
+      try {
+        validateCheckboxReplyValues(field, reply);
+      } catch (e: any) {
+        throw new InvalidReplyError(info, argName, e.message, { err_code: e.message });
+      }
       break;
     }
     case "DYNAMIC_SELECT": {
       if (!Array.isArray(reply)) {
-        throw new InvalidReplyError(info, argName, "Values must be an array");
+        throw new InvalidReplyError(info, argName, "Values must be an array", {
+          err_code: "INVALID_TYPE_ERROR",
+        });
       }
-      validateDynamicSelectReplyValues(field, reply);
+      try {
+        validateDynamicSelectReplyValues(field, reply);
+      } catch (e: any) {
+        throw new InvalidReplyError(info, argName, e.message, { err_code: e.message });
+      }
       break;
     }
     default:
