@@ -13,6 +13,9 @@ export class ExportRepliesRunner extends TaskRunner<"EXPORT_REPLIES"> {
   async run() {
     const { petition_id: petitionId, pattern } = this.task.input;
 
+    if (!this.task.user_id) {
+      throw new Error(`Task ${this.task.id} is missing user_id`);
+    }
     const hasAccess = await this.ctx.petitions.userHasAccessToPetitions(this.task.user_id, [
       petitionId,
     ]);
