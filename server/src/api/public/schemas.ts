@@ -796,12 +796,19 @@ export const SharePetition = schema({
   },
 } as const);
 
-const _SimpleReplySubmitContent = {
-  title: "SimpleReplyContent",
+const _TextReplySubmitContent = {
+  title: "TextReplySubmitContent",
   type: "string",
   description:
-    "For simple replies. The referred field must be of type `TEXT`, `SHORT_TEXT` or `SELECT`.",
+    "For text replies. The referred field must be of type `TEXT`, `SHORT_TEXT` or `SELECT`.",
   example: "Jamie Lannister",
+} as const;
+
+const _NumberReplySubmitContent = {
+  title: "NumberReplyContent",
+  type: "number",
+  description: "For fields of type `NUMBER`.",
+  example: 42,
 } as const;
 
 const _FileUploadReplySubmitContent = {
@@ -845,8 +852,8 @@ export const SubmitReply = schema({
   properties: {
     reply: {
       anyOf: [
-        _SimpleReplySubmitContent,
-        _FileUploadReplySubmitContent,
+        _TextReplySubmitContent,
+        _NumberReplySubmitContent,
         _CheckboxReplySubmitContent,
         _DynamicSelectReplySubmitContent,
       ],
@@ -855,20 +862,14 @@ export const SubmitReply = schema({
   },
 } as const);
 
-export const UpdateReply = schema({
-  title: "UpdateReply",
+export const SubmitFileReply = schema({
+  title: "SubmitReply",
   type: "object",
   additionalProperties: false,
   required: ["reply"],
   properties: {
-    reply: {
-      anyOf: [
-        _SimpleReplySubmitContent,
-        _FileUploadReplySubmitContent,
-        _CheckboxReplySubmitContent,
-        _DynamicSelectReplySubmitContent,
-      ],
-    },
+    reply: _FileUploadReplySubmitContent,
+    status: _PetitionFieldReplyStatus,
   },
 } as const);
 

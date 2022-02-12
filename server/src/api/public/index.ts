@@ -7,7 +7,7 @@ import { isDefined, pick } from "remeda";
 import { callbackify } from "util";
 import { toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
-import { FormDataBody, JsonBody } from "../rest/body";
+import { Body, FormDataBody, FormDataBodyContent, JsonBody, JsonBodyContent } from "../rest/body";
 import { RestApi } from "../rest/core";
 import { BadRequestError, ConflictError, UnauthorizedError } from "../rest/errors";
 import { booleanParam, enumParam, stringParam } from "../rest/params";
@@ -72,12 +72,12 @@ import {
   PetitionFieldReply,
   SendPetition,
   SharePetition,
+  SubmitFileReply,
   SubmitReply,
   Subscription,
   Template,
   UpdatePetition,
   UpdatePetitionField,
-  UpdateReply,
   User,
   _PetitionEvent,
 } from "./schemas";
@@ -1322,6 +1322,15 @@ api
     }
   );
 
+const replyBodyDescription = outdent`
+  For \`FILE_UPLOAD\` fields the request mut be a \`multipart/form-data\` request containing the file to upload.
+  For other types of fields the request will be a normal \`application/json\` request containing the value of the reply.
+    - For \`TEXT\`, \`SHORT_TEXT\` and \`SELECT\` fields, the repy must be a string.
+    - For \`NUMBER\`, fields, the reply must be a number
+    - For \`CHECKBOX\` fields, the reply must be an array of strings containing all the chosen options.
+    - For \`DYNAMIC_SELECT\` fields, the reply must be an array of strings in which each position in the array represents the selected option in the same level. 
+`;
+
 api
   .path("/petitions/:petitionId/fields/:fieldId/replies", {
     params: { petitionId, fieldId },
@@ -1332,15 +1341,11 @@ api
       operationId: "SubmitReply",
       summary: "Submit a reply",
       description: outdent`
-        Submits a reply on a given field of the petition.\n
-        Depending on the type of the field to be replied, the \`reply\` field in the request body will be different:
-        - For \`TEXT\`, \`SHORT_TEXT\` and \`SELECT\` fields, its a simple string of plain text containing the reply.
-        - For \`NUMBER\`, fields, its a valid number whitout formatting in plain text.
-        - For \`FILE_UPLOAD\` fields, it's the file to be uploaded as reply.
-        - For \`CHECKBOX\` fields, it's an array of strings containing all the chosen options of the field.
-        - For \`DYNAMIC_SELECT\` fields, it's an array of strings in which each position in the array represents the selected option in the same level.
+        Submits a reply on a given field of the petition.
       `,
-      body: FormDataBody(SubmitReply),
+      body: Body([FormDataBodyContent(SubmitFileReply), JsonBodyContent(SubmitReply)], {
+        description: replyBodyDescription,
+      }),
       responses: {
         201: SuccessResponse(PetitionFieldReply),
         400: ErrorResponse({ description: "Invalid parameters" }),
@@ -1374,8 +1379,7 @@ api
             newReply = createSimpleReply;
             break;
           case "NUMBER": {
-            const numericReply = Number(body.reply);
-            if (typeof body.reply !== "string" || isNaN(numericReply)) {
+            if (typeof body.reply !== "number") {
               throw new BadRequestError(`Reply for ${fieldType} field must a valid number.`);
             }
             const { createNumericReply } = await client.request(
@@ -1383,7 +1387,7 @@ api
               {
                 petitionId: params.petitionId,
                 fieldId: params.fieldId,
-                reply: numericReply,
+                reply: body.reply,
               }
             );
             newReply = createNumericReply;
@@ -1508,7 +1512,9 @@ api
         409: ErrorResponse({ description: "The reply cannot be updated." }),
       },
       tags: ["Petition replies"],
-      body: FormDataBody(UpdateReply),
+      body: Body([FormDataBodyContent(SubmitFileReply), JsonBodyContent(SubmitReply)], {
+        description: replyBodyDescription,
+      }),
     },
     async ({ client, body, params, files }) => {
       const { petition } = await client.request(UpdateReply_petitionDocument, {
@@ -1538,8 +1544,7 @@ api
             updatedReply = updateSimpleReply;
             break;
           case "NUMBER": {
-            const numericReply = Number(body.reply);
-            if (typeof body.reply !== "string" || isNaN(numericReply)) {
+            if (typeof body.reply !== "number") {
               throw new BadRequestError(`Reply for ${fieldType} field must a valid number.`);
             }
             const { updateNumericReply } = await client.request(
@@ -1547,7 +1552,7 @@ api
               {
                 petitionId: params.petitionId,
                 replyId: params.replyId,
-                reply: numericReply,
+                reply: body.reply,
               }
             );
             updatedReply = updateNumericReply;

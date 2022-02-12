@@ -1,52 +1,38 @@
+import { Request } from "express";
+import { outdent } from "outdent";
 import { isDefined } from "remeda";
-import { RestBody } from "./core";
+import typeIs from "type-is";
+import { unMaybeArray } from "../../util/arrays";
+import { RestApiContext, RestBody, RestBodyContent } from "./core";
 import { InvalidRequestBodyError } from "./errors";
 import { buildValidateSchema, JsonSchemaFor } from "./schemas";
 
-export interface JsonBodyOptions {
+export interface BodyOptions {
   description?: string;
   required?: boolean;
 }
 
-export function JsonBody<T>(schema: JsonSchemaFor<T>, options?: JsonBodyOptions): RestBody<T> {
-  const { description, required = true } = options ?? {};
+export function JsonBodyContent<T>(schema: JsonSchemaFor<T>): RestBodyContent<T> {
   const validate = buildValidateSchema(schema);
   return {
-    spec: {
-      description,
-      required,
-      content: {
-        "application/json": { schema: schema as any },
-      },
-    },
+    contentType: "application/json",
+    schema,
     validate: (req, context) => {
-      if (!isDefined(req.body)) {
-        if (required) {
-          throw new InvalidRequestBodyError("Body is missing but it is required");
-        }
-      } else {
-        const valid = validate(req.body);
-        if (!valid) {
-          const error = validate.errors![0];
-          throw new InvalidRequestBodyError(`Property at ${error.instancePath} ${error.message}`);
-        }
+      const valid = validate(req.body);
+      if (!valid) {
+        const error = validate.errors![0];
+        throw new InvalidRequestBodyError(`Property at ${error.instancePath} ${error.message}`);
       }
       context.body = req.body;
     },
   };
 }
 
-export function FormDataBody<T>(schema: JsonSchemaFor<T>, options?: JsonBodyOptions): RestBody<T> {
-  const { description, required = true } = options ?? {};
+export function FormDataBodyContent<T>(schema: JsonSchemaFor<T>): RestBodyContent<T> {
   const validate = buildValidateSchema(schema);
   return {
-    spec: {
-      description,
-      required,
-      content: {
-        "multipart/form-data": { schema: schema as any },
-      },
-    },
+    contentType: "multipart/form-data",
+    schema,
     validate: (req, context) => {
       const body = { ...(req.body ?? {}) };
       const files: typeof context.files = {};
@@ -77,4 +63,45 @@ export function FormDataBody<T>(schema: JsonSchemaFor<T>, options?: JsonBodyOpti
       context.files = files;
     },
   };
+}
+
+export function Body<T extends RestBodyContent<any>>(
+  contents: T[],
+  options?: BodyOptions
+): RestBody<T extends RestBodyContent<infer U> ? U : never> {
+  const { description, required = true } = options ?? {};
+  const _contents = unMaybeArray(contents);
+  return {
+    spec: {
+      description,
+      required,
+      content: Object.fromEntries(
+        _contents.map(({ contentType, schema }) => [contentType, { schema: schema as any }])
+      ),
+    },
+    validate: (req: Request, context: RestApiContext) => {
+      if (!isDefined(req.body)) {
+        if (required) {
+          throw new InvalidRequestBodyError("Body is required");
+        }
+      }
+      for (const { contentType, validate } of _contents) {
+        if (typeIs(req, [contentType])) {
+          return validate(req, context);
+        }
+      }
+      throw new InvalidRequestBodyError(outdent`
+        Invalid Content-Type.
+        The following Content-Type are accepted: ${_contents.map((c) => c.contentType).join(", ")}
+      `);
+    },
+  };
+}
+
+export function FormDataBody<T>(schema: JsonSchemaFor<T>, options?: BodyOptions): RestBody<T> {
+  return Body([FormDataBodyContent(schema)], options);
+}
+
+export function JsonBody<T>(schema: JsonSchemaFor<T>, options?: BodyOptions): RestBody<T> {
+  return Body([JsonBodyContent(schema)], options);
 }

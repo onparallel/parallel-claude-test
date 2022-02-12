@@ -8,6 +8,7 @@ import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray, MaybePromise } from "../../util/types";
 import { HttpError, InvalidParameterError, UnknownError } from "./errors";
 import { ParseError } from "./params";
+import { JsonSchemaFor } from "./schemas";
 
 export type File = Exclude<Request["file"], undefined>;
 
@@ -29,7 +30,13 @@ type PathParameters<TPath extends string> = {
 export interface RestBody<T> {
   _type?: T;
   spec: OpenAPIV3.RequestBodyObject;
-  validate?: (req: Request, context: RestApiContext) => void;
+  validate: (req: Request, context: RestApiContext) => void;
+}
+
+export interface RestBodyContent<T> {
+  contentType: string;
+  schema: JsonSchemaFor<T>;
+  validate: (req: Request, context: RestApiContext) => void;
 }
 
 export interface RestPathOptions {
