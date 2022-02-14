@@ -27,8 +27,8 @@ export function CheckboxTypeLabel({ options, ...props }: CheckboxTypeLabelProps)
         return (
           <FormattedMessage
             id="component.checkbox-type-label.exact"
-            defaultMessage="Choose {X, plural, =1{# option} other{# options}}"
-            values={{ X: max, tone }}
+            defaultMessage="Choose {max, plural, =1{# option} other{# options}}"
+            values={{ max, tone }}
           />
         );
 
@@ -36,14 +36,14 @@ export function CheckboxTypeLabel({ options, ...props }: CheckboxTypeLabelProps)
         return min === 1 || min === 0 ? (
           <FormattedMessage
             id="component.checkbox-type-label.up-to"
-            defaultMessage="Choose up to {X, plural, =1{# option} other{# options}}"
-            values={{ X: max, tone }}
+            defaultMessage="Choose up to {max, plural, =1{# option} other{# options}}"
+            values={{ max, tone }}
           />
         ) : (
           <FormattedMessage
             id="component.checkbox-type-label.range"
-            defaultMessage="Choose between {Y} and {X} options"
-            values={{ Y: min, X: max, tone }}
+            defaultMessage="Choose between {min, number} and {max, number} options"
+            values={{ min, max, tone }}
           />
         );
 

@@ -141,13 +141,13 @@
   },
   {
     "term": "component.checkbox-type-label.exact",
-    "definition": "Choose {X, plural, =1{# option} other{# options}}",
-    "context": "Choose {X, plural, =1{# option} other{# options}}"
+    "definition": "Choose {max, plural, =1{# option} other{# options}}",
+    "context": "Choose {max, plural, =1{# option} other{# options}}"
   },
   {
     "term": "component.checkbox-type-label.range",
-    "definition": "Choose between {Y} and {X} options",
-    "context": "Choose between {Y} and {X} options"
+    "definition": "Choose between {min, number} and {max, number} options",
+    "context": "Choose between {min, number} and {max, number} options"
   },
   {
     "term": "component.checkbox-type-label.unlimited",
@@ -156,8 +156,8 @@
   },
   {
     "term": "component.checkbox-type-label.up-to",
-    "definition": "Choose up to {X, plural, =1{# option} other{# options}}",
-    "context": "Choose up to {X, plural, =1{# option} other{# options}}"
+    "definition": "Choose up to {max, plural, =1{# option} other{# options}}",
+    "context": "Choose up to {max, plural, =1{# option} other{# options}}"
   },
   {
     "term": "component.close-petition-dialog.attach-pdf-export.checkbox",
