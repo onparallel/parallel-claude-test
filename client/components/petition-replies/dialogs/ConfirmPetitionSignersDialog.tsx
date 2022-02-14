@@ -97,8 +97,9 @@ export function ConfirmPetitionSignersDialog({
         (a) => a.status === "ACTIVE" && isDefined(a.contact) && a.contact.email !== user.email
       )
       .map((a) => ({
-        ...pick(a.contact!, ["email", "firstName", "lastName", "contactId"]),
+        contactId: a.contact!.id,
         isSuggested: true,
+        ...pick(a.contact!, ["email", "firstName", "lastName"]),
       })),
   ].filter((suggestion) => !signers.some((s) => s.email === suggestion.email));
 
@@ -288,7 +289,7 @@ ConfirmPetitionSignersDialog.fragments = {
       id
       status
       contact {
-        contactId: id
+        id
         email
         firstName
         lastName

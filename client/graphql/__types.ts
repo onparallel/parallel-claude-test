@@ -8364,10 +8364,10 @@ export type NewSignatureRequestRow_PetitionFragment = {
     status: PetitionAccessStatus;
     contact?: {
       __typename?: "Contact";
+      id: string;
       email: string;
       firstName: string;
       lastName?: string | null;
-      contactId: string;
     } | null;
   }>;
 };
@@ -8624,10 +8624,10 @@ export type PetitionSignaturesCard_PetitionFragment = {
     status: PetitionAccessStatus;
     contact?: {
       __typename?: "Contact";
+      id: string;
       email: string;
       firstName: string;
       lastName?: string | null;
-      contactId: string;
     } | null;
   }>;
   currentSignatureRequest?: {
@@ -8695,10 +8695,10 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
           status: PetitionAccessStatus;
           contact?: {
             __typename?: "Contact";
+            id: string;
             email: string;
             firstName: string;
             lastName?: string | null;
-            contactId: string;
           } | null;
         }>;
         currentSignatureRequest?: {
@@ -8769,10 +8769,10 @@ export type ConfirmPetitionSignersDialog_PetitionAccessFragment = {
   status: PetitionAccessStatus;
   contact?: {
     __typename?: "Contact";
+    id: string;
     email: string;
     firstName: string;
     lastName?: string | null;
-    contactId: string;
   } | null;
 };
 
@@ -14418,7 +14418,6 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
       email: string;
       firstName: string;
       lastName?: string | null;
-      contactId: string;
     } | null;
   }>;
   fields: Array<{
@@ -14632,7 +14631,6 @@ export type PetitionPreview_updatePetitionMutation = {
             email: string;
             firstName: string;
             lastName?: string | null;
-            contactId: string;
           } | null;
         }>;
         fields: Array<{
@@ -14823,7 +14821,6 @@ export type PetitionPreview_completePetitionMutation = {
         email: string;
         firstName: string;
         lastName?: string | null;
-        contactId: string;
       } | null;
     }>;
     fields: Array<{
@@ -14940,7 +14937,6 @@ export type PetitionPreview_petitionQuery = {
             email: string;
             firstName: string;
             lastName?: string | null;
-            contactId: string;
           } | null;
         }>;
         fields: Array<{
@@ -15145,10 +15141,10 @@ export type PetitionReplies_PetitionFragment = {
     status: PetitionAccessStatus;
     contact?: {
       __typename?: "Contact";
+      id: string;
       email: string;
       firstName: string;
       lastName?: string | null;
-      contactId: string;
     } | null;
   }>;
   fields: Array<{
@@ -15425,10 +15421,10 @@ export type PetitionReplies_closePetitionMutation = {
       status: PetitionAccessStatus;
       contact?: {
         __typename?: "Contact";
+        id: string;
         email: string;
         firstName: string;
         lastName?: string | null;
-        contactId: string;
       } | null;
     }>;
     fields: Array<{
@@ -15580,10 +15576,10 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       status: PetitionAccessStatus;
       contact?: {
         __typename?: "Contact";
+        id: string;
         email: string;
         firstName: string;
         lastName?: string | null;
-        contactId: string;
       } | null;
     }>;
     fields: Array<{
@@ -15830,10 +15826,10 @@ export type PetitionReplies_petitionQuery = {
           status: PetitionAccessStatus;
           contact?: {
             __typename?: "Contact";
+            id: string;
             email: string;
             firstName: string;
             lastName?: string | null;
-            contactId: string;
           } | null;
         }>;
         fields: Array<{
@@ -17920,10 +17916,10 @@ export type PetitionSignaturesCardPolling_petitionQuery = {
           status: PetitionAccessStatus;
           contact?: {
             __typename?: "Contact";
+            id: string;
             email: string;
             firstName: string;
             lastName?: string | null;
-            contactId: string;
           } | null;
         }>;
         currentSignatureRequest?: {
@@ -20435,7 +20431,7 @@ export const ConfirmPetitionSignersDialog_PetitionAccessFragmentDoc = gql`
     id
     status
     contact {
-      contactId: id
+      id
       email
       firstName
       lastName
