@@ -20,6 +20,7 @@ import { FileSize } from "@parallel/components/common/FileSize";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { FORMATS } from "@parallel/utils/dates";
 import { FieldOptions } from "@parallel/utils/petitionFields";
+import { MaybePromise } from "@parallel/utils/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useState } from "react";
 import { FileRejection } from "react-dropzone";
@@ -242,7 +243,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
 interface PetitionFieldFileUploadDropzoneProps extends BoxProps {
   isDisabled: boolean;
   field: RecipientViewPetitionFieldCard_PetitionFieldSelection;
-  onCreateReply: (files: File[]) => Promise<void>;
+  onCreateReply: (files: File[]) => MaybePromise<void>;
 }
 
 function PetitionFieldFileUploadDropzone({
