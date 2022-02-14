@@ -13,7 +13,7 @@ import { SignerReference } from "../common/SignerReference";
 import {
   ConfirmPetitionSignersDialog,
   useConfirmPetitionSignersDialog,
-} from "./dialogs/ConfirmPetitionSignersDialog";
+} from "../petition-common/dialogs/ConfirmPetitionSignersDialog";
 
 interface NewSignatureRequestRowProps {
   petition: NewSignatureRequestRow_PetitionFragment;

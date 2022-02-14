@@ -24,7 +24,7 @@ import {
   ConfirmPetitionSignersDialog,
   ConfirmPetitionSignersDialogResult,
   useConfirmPetitionSignersDialog,
-} from "@parallel/components/petition-replies/dialogs/ConfirmPetitionSignersDialog";
+} from "@parallel/components/petition-common/dialogs/ConfirmPetitionSignersDialog";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";

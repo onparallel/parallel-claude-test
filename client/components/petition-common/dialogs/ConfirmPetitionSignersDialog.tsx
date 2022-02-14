@@ -1,18 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Button,
-  Checkbox,
-  Flex,
-  FlexProps,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
-import { DeleteIcon, EditIcon } from "@parallel/chakra/icons";
+import { Box, Button, Checkbox, FormControl, Stack, Text } from "@chakra-ui/react";
 import {
   ContactSelect,
   ContactSelectInstance,
@@ -21,7 +8,6 @@ import {
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
-import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import {
   ConfirmPetitionSignersDialog_PetitionAccessFragment,
@@ -31,12 +17,14 @@ import {
   SignatureConfigInputSigner,
 } from "@parallel/graphql/__types";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
-import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, pick } from "remeda";
+import { SelectedSignerRow } from "../SelectedSignerRow";
+import { SuggestedSignerRow } from "../SuggestedSignerRow";
+import { useConfirmSignerInfoDialog } from "./ConfirmSignerInfoDialog";
 
 interface ConfirmPetitionSignersDialogProps {
   user: ConfirmPetitionSignersDialog_UserFragment;
@@ -51,7 +39,7 @@ export interface ConfirmPetitionSignersDialogResult {
   message: Maybe<string>;
 }
 
-type SignerSelectSelection = Omit<
+export type SignerSelectSelection = Omit<
   ConfirmPetitionSignersDialog_PetitionSignerFragment,
   "__typename"
 > & {
@@ -107,7 +95,7 @@ export function ConfirmPetitionSignersDialog({
   const handleCreateContact = useCreateContact();
   const intl = useIntl();
 
-  const showConfirmSignerInfo = useDialog(ConfirmSignerInfoDialog);
+  const showConfirmSignerInfo = useConfirmSignerInfoDialog();
   const [selectedContact, setSelectedContact] = useState<ContactSelectSelection | null>(null);
   const contactSelectRef = useRef<ContactSelectInstance<false>>(null);
 
@@ -302,178 +290,14 @@ ConfirmPetitionSignersDialog.fragments = {
       email
       firstName
       lastName
+      ...SelectedSignerRow_PetitionSigner
+      ...SuggestedSignerRow_PetitionSigner
     }
+    ${SelectedSignerRow.fragments.PetitionSigner}
+    ${SuggestedSignerRow.fragments.PetitionSigner}
   `,
 };
 
 export function useConfirmPetitionSignersDialog() {
   return useDialog(ConfirmPetitionSignersDialog);
-}
-
-interface SuggestedSignerRowProps {
-  signer: ConfirmPetitionSignersDialog_PetitionSignerFragment;
-  onAddClick: () => void;
-}
-function SuggestedSignerRow({ signer, onAddClick }: SuggestedSignerRowProps) {
-  return (
-    <Flex justifyContent="space-between" alignItems="center">
-      <Box>
-        {signer.firstName} {signer.lastName} {"<"}
-        {signer.email}
-        {">"}
-      </Box>
-      <Button onClick={onAddClick} size="sm">
-        <FormattedMessage id="generic.add" defaultMessage="Add" />
-      </Button>
-    </Flex>
-  );
-}
-
-interface SelectedSignerRowProps extends FlexProps {
-  signer: ConfirmPetitionSignersDialog_PetitionSignerFragment;
-  isEditable?: boolean;
-  onRemoveClick?: () => void;
-  onEditClick?: () => void;
-}
-function SelectedSignerRow({
-  signer,
-  isEditable,
-  onRemoveClick: onRemove,
-  onEditClick: onEdit,
-  ...props
-}: SelectedSignerRowProps) {
-  const intl = useIntl();
-  return (
-    <Flex
-      justifyContent="space-between"
-      alignItems="center"
-      minHeight={9}
-      _hover={isEditable ? { backgroundColor: "gray.75" } : undefined}
-      borderRadius="md"
-      paddingX={2}
-      paddingY={1}
-      paddingLeft={4}
-      {...props}
-    >
-      <Text as="li" margin={1}>
-        {signer.firstName} {signer.lastName} {"<"}
-        {signer.email}
-        {">"}
-      </Text>
-      {isEditable ? (
-        <Flex gridGap={1}>
-          <IconButtonWithTooltip
-            variant="ghost"
-            size="sm"
-            label={intl.formatMessage({ id: "generic.edit", defaultMessage: "Edit" })}
-            icon={<EditIcon />}
-            _hover={{ backgroundColor: "gray.200" }}
-            onClick={onEdit}
-          />
-          <IconButtonWithTooltip
-            variant="ghost"
-            size="sm"
-            label={intl.formatMessage({
-              id: "component.selected-signer-row.remove-signer",
-              defaultMessage: "Remove signer",
-            })}
-            marginLeft={1}
-            icon={<DeleteIcon />}
-            _hover={{ backgroundColor: "gray.200" }}
-            onClick={onRemove}
-          />
-        </Flex>
-      ) : null}
-    </Flex>
-  );
-}
-
-function ConfirmSignerInfoDialog({
-  email,
-  firstName,
-  lastName,
-  ...props
-}: DialogProps<SignerSelectSelection, SignerSelectSelection>) {
-  const {
-    handleSubmit,
-    register,
-    formState: { errors },
-  } = useForm<SignerSelectSelection>({
-    mode: "onSubmit",
-    defaultValues: {
-      email,
-      firstName,
-      lastName,
-    },
-  });
-  const firstNameRef = useRef<HTMLInputElement>(null);
-  const firstNameProps = useRegisterWithRef(firstNameRef, register, "firstName", {
-    required: true,
-  });
-  return (
-    <ConfirmDialog
-      initialFocusRef={firstNameRef}
-      size="md"
-      content={{
-        as: "form",
-        onSubmit: handleSubmit(({ firstName, lastName }) => {
-          props.onResolve({ email, firstName, lastName });
-        }),
-      }}
-      header={
-        <FormattedMessage
-          id="component.confirm-signer-info-dialog.title"
-          defaultMessage="Confirm the signer's information"
-        />
-      }
-      body={
-        <Stack>
-          <FormControl id="email">
-            <FormLabel fontWeight="bold">
-              <FormattedMessage id="generic.email" defaultMessage="Email" />
-            </FormLabel>
-            <Input {...register("email", { disabled: true })} />
-          </FormControl>
-          <Stack direction="row">
-            <FormControl isInvalid={!!errors.firstName}>
-              <FormLabel fontWeight="bold">
-                <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
-              </FormLabel>
-              <Input {...firstNameProps} />
-              <FormErrorMessage>
-                <FormattedMessage
-                  id="generic.forms.invalid-first-name-error"
-                  defaultMessage="Please, enter the first name"
-                />
-              </FormErrorMessage>
-            </FormControl>
-            <FormControl isInvalid={!!errors.lastName}>
-              <FormLabel fontWeight="bold">
-                <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
-              </FormLabel>
-              <Input {...register("lastName", { required: true })} />
-              <FormErrorMessage>
-                <FormattedMessage
-                  id="generic.forms.invalid-last-name-error"
-                  defaultMessage="Please, enter the last name"
-                />
-              </FormErrorMessage>
-            </FormControl>
-          </Stack>
-          <Text fontSize="14px">
-            <FormattedMessage
-              id="component.confirm-signer-info-dialog.footer"
-              defaultMessage="Continue to update the signer's information. The contact data will not be overwritten."
-            />
-          </Text>
-        </Stack>
-      }
-      confirm={
-        <Button colorScheme="purple" type="submit">
-          <FormattedMessage id="generic.continue" defaultMessage="Continue" />
-        </Button>
-      }
-      {...props}
-    />
-  );
 }
