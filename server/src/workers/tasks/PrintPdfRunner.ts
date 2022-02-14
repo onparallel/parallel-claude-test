@@ -23,8 +23,18 @@ export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
       );
     }
     const petition = (await this.ctx.petitions.loadPetition(petitionId))!;
+    let documentTitle: string | undefined;
+    // if the task was started by a recipient, the title of the PDF should be the message subject instead of the petition name
+    if (isDefined(this.task.petition_access_id)) {
+      const [firstMessage] = await this.ctx.petitions.loadMessagesByPetitionAccessId(
+        this.task.petition_access_id
+      );
+      documentTitle = firstMessage?.email_subject ?? undefined;
+    }
+
     const token = this.ctx.security.generateAuthToken({
       petitionId,
+      documentTitle,
     });
 
     await this.onProgress(25);
