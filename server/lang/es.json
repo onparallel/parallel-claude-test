@@ -236,7 +236,7 @@
   },
   {
     "term": "invitation.subject",
-    "definition": "{organizationUser} te invita a unirte a al equipo de {organizationName} en Parallel 🎊",
+    "definition": "{organizationUser} te invita a unirte al equipo de {organizationName} en Parallel 🎊",
     "context": "{organizationUser} invited you to join {organizationName} on Parallel 🎊"
   },
   {
