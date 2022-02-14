@@ -48,14 +48,14 @@ export const PetitionFieldTypeSelect = chakraForwardRef<"div", PetitionFieldType
 );
 
 export const FIELD_TYPES: PetitionFieldType[] = [
-  "FILE_UPLOAD",
+  "HEADING",
   "SHORT_TEXT",
   "TEXT",
+  "FILE_UPLOAD",
   "CHECKBOX",
   "SELECT",
-  "DYNAMIC_SELECT",
-  "HEADING",
   "NUMBER",
+  "DYNAMIC_SELECT",
 ];
 
 interface PetitionFieldTypeLabelProps {
