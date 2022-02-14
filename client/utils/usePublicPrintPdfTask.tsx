@@ -59,7 +59,7 @@ export function usePublicPrintPdfTask() {
             "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
         }),
       });
-    } else {
+    } else if (!error) {
       openNewWindow(async () => {
         try {
           const { data } = await publicGetTaskResultFileUrl({

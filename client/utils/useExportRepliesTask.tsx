@@ -51,7 +51,7 @@ export function useExportRepliesTask() {
             "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
         }),
       });
-    } else {
+    } else if (!error) {
       openNewWindow(async () => {
         const { data } = await generateDownloadURL({ variables: { taskId: finishedTask!.id } });
         if (!data?.getTaskResultFileUrl) {
