@@ -257,7 +257,12 @@ export function ConfirmPetitionSignersDialog({
         </>
       }
       confirm={
-        <Button colorScheme="purple" type="submit" isDisabled={signers.length === 0}>
+        <Button
+          data-action="start-signature"
+          colorScheme="purple"
+          type="submit"
+          isDisabled={signers.length === 0}
+        >
           <FormattedMessage
             id="component.confirm-petition-signers-dialog.start-signature-button"
             defaultMessage="Start signature"
