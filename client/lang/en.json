@@ -2606,18 +2606,18 @@
   },
   {
     "term": "component.recipient-view-petition-field-number.range-max-description",
-    "definition": "Numeric {multiple, select, true{answers} other {answer}} lower than or equal to {max}",
-    "context": "Numeric {multiple, select, true{answers} other {answer}} lower than or equal to {max}"
+    "definition": "Numeric {multiple, select, true{answers} other {answer}} lower than or equal to {max, number}",
+    "context": "Numeric {multiple, select, true{answers} other {answer}} lower than or equal to {max, number}"
   },
   {
     "term": "component.recipient-view-petition-field-number.range-min-description",
-    "definition": "Numeric {multiple, select, true{answers} other {answer}} greater than or equal to {min}",
-    "context": "Numeric {multiple, select, true{answers} other {answer}} greater than or equal to {min}"
+    "definition": "Numeric {multiple, select, true{answers} other {answer}} greater than or equal to {min, number}",
+    "context": "Numeric {multiple, select, true{answers} other {answer}} greater than or equal to {min, number}"
   },
   {
     "term": "component.recipient-view-petition-field-number.range-min-max-description",
-    "definition": "Numeric {multiple, select, true{answers} other {answer}} between {min} and {max}, both included",
-    "context": "Numeric {multiple, select, true{answers} other {answer}} between {min} and {max}, both included"
+    "definition": "Numeric {multiple, select, true{answers} other {answer}} between {min, number} and {max, number}, both included",
+    "context": "Numeric {multiple, select, true{answers} other {answer}} between {min, number} and {max, number}, both included"
   },
   {
     "term": "component.recipient-view-petition-field-reply.approved-file",

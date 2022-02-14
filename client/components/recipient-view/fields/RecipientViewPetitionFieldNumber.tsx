@@ -219,21 +219,21 @@ export function RecipientViewPetitionFieldNumber({
               {isDefined(range.min) && !isDefined(range.max) ? (
                 <FormattedMessage
                   id="component.recipient-view-petition-field-number.range-min-description"
-                  defaultMessage="Numeric {multiple, select, true{answers} other {answer}} greater than or equal to {min}"
+                  defaultMessage="Numeric {multiple, select, true{answers} other {answer}} greater than or equal to {min, number}"
                   values={{ min: range.min, multiple: field.multiple }}
                 />
               ) : null}
               {isDefined(range.max) && !isDefined(range.min) ? (
                 <FormattedMessage
                   id="component.recipient-view-petition-field-number.range-max-description"
-                  defaultMessage="Numeric {multiple, select, true{answers} other {answer}} lower than or equal to {max}"
+                  defaultMessage="Numeric {multiple, select, true{answers} other {answer}} lower than or equal to {max, number}"
                   values={{ max: range.max, multiple: field.multiple }}
                 />
               ) : null}
               {isDefined(range.min) && isDefined(range.max) ? (
                 <FormattedMessage
                   id="component.recipient-view-petition-field-number.range-min-max-description"
-                  defaultMessage="Numeric {multiple, select, true{answers} other {answer}} between {min} and {max}, both included"
+                  defaultMessage="Numeric {multiple, select, true{answers} other {answer}} between {min, number} and {max, number}, both included"
                   values={{ min: range.min, max: range.max, multiple: field.multiple }}
                 />
               ) : null}

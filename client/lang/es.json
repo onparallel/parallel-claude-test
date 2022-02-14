@@ -2606,18 +2606,18 @@
   },
   {
     "term": "component.recipient-view-petition-field-number.range-max-description",
-    "definition": "{multiple, select, true{Respuestas numéricas inferiores o iguales} other {Respuesta numérica inferior o igual}} a {max}",
-    "context": "Numeric {multiple, select, true{answers} other {answer}} lower than or equal to {max}"
+    "definition": "{multiple, select, true{Respuestas numéricas inferiores o iguales} other {Respuesta numérica inferior o igual}} a {max, number}",
+    "context": "Numeric {multiple, select, true{answers} other {answer}} lower than or equal to {max, number}"
   },
   {
     "term": "component.recipient-view-petition-field-number.range-min-description",
-    "definition": "{multiple, select, true{Respuestas numéricas mayores o iguales} other {Respuesta numérica mayor o igual}} a {min}",
-    "context": "Numeric {multiple, select, true{answers} other {answer}} greater than or equal to {min}"
+    "definition": "{multiple, select, true{Respuestas numéricas mayores o iguales} other {Respuesta numérica mayor o igual}} a {min, number}",
+    "context": "Numeric {multiple, select, true{answers} other {answer}} greater than or equal to {min, number}"
   },
   {
     "term": "component.recipient-view-petition-field-number.range-min-max-description",
-    "definition": "{multiple, select, true{Respuestas numéricas} other {Respuesta numérica}} entre {min} y {max}, ambos incluidos",
-    "context": "Numeric {multiple, select, true{answers} other {answer}} between {min} and {max}, both included"
+    "definition": "{multiple, select, true{Respuestas numéricas} other {Respuesta numérica}} entre {min, number} y {max, number}, ambos incluidos",
+    "context": "Numeric {multiple, select, true{answers} other {answer}} between {min, number} and {max, number}, both included"
   },
   {
     "term": "component.recipient-view-petition-field-reply.approved-file",
