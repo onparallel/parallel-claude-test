@@ -353,13 +353,12 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
       }
     },
     onBlur: async () => {
-      if (value !== reply.content.value) {
-        if (!isDefined(value) || !isBetweenLimits(range, value)) {
+      if (isDefined(value) && value !== reply.content.value) {
+        if (isBetweenLimits(range, value)) {
+          await debouncedUpdateReply.immediate(value);
+        } else {
           setIsInvalid(true);
-          return;
         }
-        await debouncedUpdateReply.immediate(value);
-        debouncedUpdateReply.clear();
       } else if (!isDefined(value)) {
         debouncedUpdateReply.clear();
         onDelete();
