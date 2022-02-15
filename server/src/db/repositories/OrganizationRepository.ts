@@ -280,7 +280,7 @@ export class OrganizationRepository extends BaseRepository {
   async updateOrganizationCurrentUsageLimitCredits(
     orgId: number,
     limitName: OrganizationUsageLimitName,
-    creditsSpent: number,
+    credits: number,
     t?: Knex.Transaction
   ) {
     const [usage] = await this.from("organization_usage_limit", t)
@@ -289,28 +289,30 @@ export class OrganizationRepository extends BaseRepository {
         limit_name: limitName,
         org_id: orgId,
       })
-      .update({ used: this.knex.raw(`used + ?`, [creditsSpent]) }, "*");
+      .update({ used: this.knex.raw(`used + ?`, [credits]) }, "*");
 
     // if usage reached 80% or 100% of total credits in the period, send warning email to owner and admins
-    if (usage.used === Math.round(usage.limit * 0.8) || usage.limit === usage.used) {
-      const {
-        rows: [{ period_end_date: periodEndDate }],
-      } = await this.knex.raw(`select (?::timestamptz + ?::interval) as period_end_date;`, [
-        usage.period_start_date,
-        usage.period,
-      ]);
-      await this.emails.sendOrganizationLimitsReachedEmail(orgId, limitName, usage.used, t);
-      await this.system.createEvent({
-        type: "ORGANIZATION_LIMIT_REACHED",
-        data: {
-          org_id: usage.org_id,
-          limit_name: limitName,
-          total: usage.limit,
-          used: usage.used,
-          period_start_date: usage.period_start_date,
-          period_end_date: periodEndDate,
-        },
-      });
+    for (const threshold of [100, 80]) {
+      const value = Math.round((usage.limit * threshold) / 100);
+      if (usage.used - credits < value && usage.used >= value) {
+        const [{ period_end_date: periodEndDate }] = await this.raw(
+          `select (?::timestamptz + ?::interval) as period_end_date;`,
+          [usage.period_start_date, usage.period]
+        );
+        await this.emails.sendOrganizationLimitsReachedEmail(orgId, limitName, usage.used, t);
+        await this.system.createEvent({
+          type: "ORGANIZATION_LIMIT_REACHED",
+          data: {
+            org_id: usage.org_id,
+            limit_name: limitName,
+            total: usage.limit,
+            used: usage.used,
+            period_start_date: usage.period_start_date,
+            period_end_date: periodEndDate,
+          },
+        });
+        break;
+      }
     }
     return usage;
   }
