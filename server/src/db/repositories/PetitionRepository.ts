@@ -1335,7 +1335,11 @@ export class PetitionRepository extends BaseRepository {
         .select("*");
       const byPetitionFieldId = groupBy(rows, (r) => r.petition_field_id);
       return ids.map((id) => {
-        return sortBy(byPetitionFieldId[id as any] || [], (r) => r.created_at);
+        return sortBy(
+          byPetitionFieldId[id] ?? [],
+          (r) => r.created_at,
+          (r) => r.id
+        );
       });
     })
   );

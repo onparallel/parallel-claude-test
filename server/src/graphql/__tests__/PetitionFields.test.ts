@@ -1764,12 +1764,12 @@ describe("GraphQL/Petition Fields", () => {
       expect(data!.updatePetitionFieldRepliesStatus).toEqual({
         replies: [
           {
-            id: toGlobalId("PetitionFieldReply", field2Replies[1].id),
-            status: "PENDING",
-          },
-          {
             id: toGlobalId("PetitionFieldReply", field2Replies[0].id),
             status: "APPROVED",
+          },
+          {
+            id: toGlobalId("PetitionFieldReply", field2Replies[1].id),
+            status: "PENDING",
           },
         ],
       });
