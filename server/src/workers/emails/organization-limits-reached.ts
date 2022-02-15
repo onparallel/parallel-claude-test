@@ -34,7 +34,7 @@ export async function organizationLimitsReached(
         used: usageLimit.used,
         ...layoutProps,
       },
-      { locale: user.details?.preferredLocale ?? "es" }
+      { locale: user.details?.preferredLocale ?? "en" }
     );
 
     emails.push(
