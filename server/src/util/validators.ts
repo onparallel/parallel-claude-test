@@ -14,9 +14,5 @@ export function isValidTime(time: string) {
 }
 
 export function isValidDate(date: string) {
-  const regEx = /^\d{4}-\d{2}-\d{2}$/;
-  if (!date.match(regEx)) return false; // Invalid format
-  const d = new Date(date);
-  if (isNaN(d.getTime())) return false; // NaN value, Invalid date
-  return d.toISOString().slice(0, 10) === date;
+  return /^\d{4}-\d{2}-\d{2}$/.test(date) && !isNaN(new Date(date).getTime());
 }

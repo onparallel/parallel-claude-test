@@ -26,14 +26,10 @@ const SCHEMAS = {
   },
   DATE: {
     type: "object",
-    required: ["placeholder"],
     additionalProperties: false,
     properties: {
       hasCommentsEnabled: {
         type: "boolean",
-      },
-      placeholder: {
-        type: ["string", "null"],
       },
     },
   },
@@ -284,7 +280,6 @@ export function defaultFieldOptions(
         ...commonSettings,
         options: {
           hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
-          placeholder: options?.placeholder ?? null,
         },
       };
     }
