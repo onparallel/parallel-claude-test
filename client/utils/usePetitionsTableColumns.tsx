@@ -276,10 +276,9 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                             <Text color="gray.800" fontSize="sm">
                               <FormattedMessage
                                 id="petitions.header.reminders-next-reminder-at.popover"
-                                defaultMessage="Next reminder configured for {date} at {hours}"
+                                defaultMessage="Next reminder configured for {date}"
                                 values={{
-                                  date: <DateTime format={FORMATS.MMMdd} value={nextReminderAt} />,
-                                  hours: <DateTime format={FORMATS.HHmm} value={nextReminderAt} />,
+                                  date: <DateTime format={FORMATS.LLL} value={nextReminderAt} />,
                                 }}
                               />
                             </Text>

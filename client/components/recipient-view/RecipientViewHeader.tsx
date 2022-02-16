@@ -196,7 +196,7 @@ export function RecipientViewHeader({
                     <FormattedMessage
                       id="recipient-view.last-saved-time"
                       defaultMessage="Last saved {time}"
-                      values={{ time: intl.formatDate(lastSaved, FORMATS.HHmm) }}
+                      values={{ time: intl.formatDate(lastSaved, FORMATS.LT) }}
                     />
                   </Text>
                   <Text
@@ -207,7 +207,7 @@ export function RecipientViewHeader({
                     <FormattedMessage
                       id="recipient-view.last-saved-time-short"
                       defaultMessage="Saved {time}"
-                      values={{ time: intl.formatDate(lastSaved, FORMATS.HHmm) }}
+                      values={{ time: intl.formatDate(lastSaved, FORMATS.LT) }}
                     />
                   </Text>
                 </HStack>

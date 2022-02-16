@@ -5891,8 +5891,8 @@
   },
   {
     "term": "petitions.header.reminders-next-reminder-at.popover",
-    "definition": "Next reminder configured for {date} at {hours}",
-    "context": "Next reminder configured for {date} at {hours}"
+    "definition": "Next reminder configured for {date}",
+    "context": "Next reminder configured for {date}"
   },
   {
     "term": "petitions.header.shared-with",
