@@ -678,8 +678,9 @@ export const PetitionFieldReply = objectType({
           case "SELECT":
           case "DYNAMIC_SELECT":
           case "NUMBER":
-          case "CHECKBOX":
-          case "DATE": {
+          case "DATE": 
+          case "PHONE":
+          case "CHECKBOX": {
             return root.content;
           }
           case "FILE_UPLOAD": {

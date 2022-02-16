@@ -26,6 +26,7 @@ import {
 import { RecipientViewPetitionFieldFileUpload } from "../recipient-view/fields/RecipientViewPetitionFieldFileUpload";
 import { RecipientViewPetitionFieldHeading } from "../recipient-view/fields/RecipientViewPetitionFieldHeading";
 import { RecipientViewPetitionFieldNumber } from "../recipient-view/fields/RecipientViewPetitionFieldNumber";
+import { RecipientViewPetitionFieldPhone } from "../recipient-view/fields/RecipientViewPetitionFieldPhone";
 import { RecipientViewPetitionFieldSelect } from "../recipient-view/fields/RecipientViewPetitionFieldSelect";
 import { RecipientViewPetitionFieldText } from "../recipient-view/fields/RecipientViewPetitionFieldText";
 import {
@@ -343,6 +344,14 @@ export function PreviewPetitionField({
     />
   ) : field.type === "DATE" ? (
     <RecipientViewPetitionFieldDate
+      {...props}
+      {...commonProps}
+      onDeleteReply={handleDeletePetitionReply}
+      onUpdateReply={handleUpdateSimpleReply}
+      onCreateReply={handleCreateSimpleReply}
+    />
+  ) : field.type === "PHONE" ? (
+    <RecipientViewPetitionFieldPhone
       {...props}
       {...commonProps}
       onDeleteReply={handleDeletePetitionReply}

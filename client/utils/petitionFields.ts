@@ -1,5 +1,6 @@
 import { useTheme } from "@chakra-ui/react";
 import { PetitionFieldType } from "@parallel/graphql/__types";
+import { CountryCode } from "libphonenumber-js";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 import { Maybe } from "./types";
@@ -32,6 +33,11 @@ export type FieldOptions = {
       min: number | undefined;
       max: number | undefined;
     };
+  };
+  PHONE: {
+    hasCommentsEnabled: boolean;
+    placeholder: Maybe<string>;
+    defaultCountry: CountryCode;
   };
   SELECT: {
     hasCommentsEnabled: boolean;
@@ -88,6 +94,11 @@ export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
           id: "petition.field-type.number",
           defaultMessage: "Numbers",
         });
+      case "PHONE":
+        return intl.formatMessage({
+          id: "petition.field-type.phone",
+          defaultMessage: "Phone number",
+        });
       case "HEADING":
         return intl.formatMessage({
           id: "petition.field-type.heading",
@@ -130,7 +141,8 @@ export function usePetitionFieldTypeColor(type: PetitionFieldType) {
       SELECT: theme.colors.pink[400],
       DYNAMIC_SELECT: theme.colors.pink[600],
       CHECKBOX: theme.colors.purple[500],
-      NUMBER: theme.colors.orange[400],
+      NUMBER: theme.colors.orange[500],
+      PHONE: theme.colors.orange[400],
       DATE: theme.colors.orange[300],
     } as Record<PetitionFieldType, string>
   )[type];

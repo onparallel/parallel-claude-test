@@ -79,6 +79,8 @@ export function PetitionRepliesFieldReply({
               timeZone: "UTC",
             })}
           />
+        ) : reply.field!.type === "PHONE" ? (
+          <CopyToClipboardButton size="xs" text={reply.content.value} />
         ) : reply.field!.type === "FILE_UPLOAD" ? (
           <Stack spacing={1}>
             <ReplyDownloadButton
@@ -140,6 +142,8 @@ export function PetitionRepliesFieldReply({
               timeZone: "UTC",
             })}
           </Text>
+        ) : reply.field!.type === "PHONE" ? (
+          <BreakLines>{reply.content.value}</BreakLines>
         ) : reply.field!.type === "FILE_UPLOAD" ? (
           <Box>
             <VisuallyHidden>

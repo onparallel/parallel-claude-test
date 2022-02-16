@@ -16,6 +16,7 @@ import { DynamicSelectSettings } from "./PetitionComposeDynamicSelectFieldSettin
 import { FileUploadSettings } from "./PetitionComposeFileUploadSettings";
 import { HeadingSettings } from "./PetitionComposeHeadingSettings";
 import { NumberSettings } from "./PetitionComposeNumberSettings";
+import { PhoneSettings } from "./PetitionComposePhoneSettings";
 import { SelectOptionSettings } from "./PetitionComposeSelectOptionSettings";
 import { TextSettings } from "./PetitionComposeTextSettings";
 import { SettingsRow } from "./SettingsRow";
@@ -233,6 +234,8 @@ export function PetitionComposeFieldSettings({
           <CheckboxSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
         ) : field.type === "NUMBER" ? (
           <NumberSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
+        ) : field.type === "PHONE" ? (
+          <PhoneSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
         ) : null}
       </Stack>
       {hasDeveloperAccess && field.type !== "HEADING" ? (

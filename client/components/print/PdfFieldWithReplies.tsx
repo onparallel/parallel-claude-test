@@ -90,6 +90,10 @@ export function PdfFieldWithReplies({ field }: { field: PetitionPdf_PetitionFiel
                   timeZone: "UTC",
                 })}
               </Text>
+            ) : field.type === "PHONE" ? (
+              <Text textAlign="justify" key={reply.id}>
+                {reply.content.value}
+              </Text>
             ) : (
               <Text textAlign="justify" key={reply.id}>
                 <BreakLines>{reply.content.text}</BreakLines>

@@ -42,6 +42,7 @@ import {
 import { RecipientViewPetitionFieldFileUpload } from "./RecipientViewPetitionFieldFileUpload";
 import { RecipientViewPetitionFieldHeading } from "./RecipientViewPetitionFieldHeading";
 import { RecipientViewPetitionFieldNumber } from "./RecipientViewPetitionFieldNumber";
+import { RecipientViewPetitionFieldPhone } from "./RecipientViewPetitionFieldPhone";
 import { RecipientViewPetitionFieldSelect } from "./RecipientViewPetitionFieldSelect";
 import { RecipientViewPetitionFieldText } from "./RecipientViewPetitionFieldText";
 
@@ -373,6 +374,14 @@ export function RecipientViewPetitionField({ tone, ...props }: RecipientViewPeti
       onDeleteReply={handleDeletePetitionReply}
       onUpdateReply={handleUpdateNumericReply}
       onCreateReply={handleCreateNumericReply}
+    />
+  ) : props.field.type === "PHONE" ? (
+    <RecipientViewPetitionFieldPhone
+      {...props}
+      {...commonProps}
+      onDeleteReply={handleDeletePetitionReply}
+      onUpdateReply={handleUpdateSimpleReply}
+      onCreateReply={handleCreateSimpleReply}
     />
   ) : props.field.type === "DATE" ? (
     <RecipientViewPetitionFieldDate

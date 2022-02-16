@@ -44,6 +44,9 @@ const SCHEMAS = {
       placeholder: {
         type: ["string", "null"],
       },
+      defaultCountry: {
+        type: "string",
+      },
     },
   },
   TEXT: {
@@ -292,6 +295,16 @@ export function defaultFieldOptions(
           range: {
             min: 0,
           },
+        },
+      };
+    }
+    case "PHONE": {
+      return {
+        ...commonSettings,
+        options: {
+          hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
+          placeholder: options?.placeholder ?? null,
+          defaultCountry: "ES",
         },
       };
     }
