@@ -92,9 +92,6 @@ export function buildConfig() {
       "organization-limits": {
         rule: process.env.WORKERS_ORGANIZATION_LIMITS_RULE!,
       },
-      reporting: {
-        rule: process.env.WORKERS_REPORTING_RULE!,
-      },
     },
     logs: {
       groupName: process.env.LOGS_GROUP_NAME!,

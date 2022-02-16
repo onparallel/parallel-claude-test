@@ -8,7 +8,6 @@ import { FileRepository } from "./db/repositories/FileRepository";
 import { IntegrationRepository } from "./db/repositories/IntegrationRepository";
 import { OrganizationRepository } from "./db/repositories/OrganizationRepository";
 import { PetitionRepository } from "./db/repositories/PetitionRepository";
-import { ReportingRepository } from "./db/repositories/ReportingRepository";
 import { SubscriptionRepository } from "./db/repositories/SubscriptionRepository";
 import { SystemRepository } from "./db/repositories/SystemRepository";
 import { TagRepository } from "./db/repositories/TagRepository";
@@ -86,7 +85,6 @@ export class WorkerContext {
     public readonly users: UserRepository,
     public readonly organizations: OrganizationRepository,
     public readonly petitions: PetitionRepository,
-    public readonly reporting: ReportingRepository,
     public readonly system: SystemRepository,
     public readonly userGroups: UserGroupRepository,
     public readonly subscriptions: SubscriptionRepository,
