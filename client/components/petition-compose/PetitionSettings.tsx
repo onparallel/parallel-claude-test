@@ -146,7 +146,7 @@ function _PetitionSettings({
             .join(","),
         ],
         [signatureConfig.title, previous?.title],
-        [signatureConfig.letRecipientsChooseSigners, previous?.letRecipientsChooseSigners],
+        [signatureConfig.allowAdditionalSigners, previous?.allowAdditionalSigners],
       ].some(([after, before]) => after !== before);
 
       if (ongoingSignatureRequest && signatureConfigHasChanged) {

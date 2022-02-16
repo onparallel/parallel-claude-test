@@ -66,7 +66,7 @@ export function SignatureConfigDialog({
 
   const step2Props = useSignatureConfigDialogBodyStep2Props({
     fixedSigners: petition.signatureConfig?.signers ?? [],
-    allowAdditionalSigners: petition.signatureConfig?.letRecipientsChooseSigners ?? false,
+    allowAdditionalSigners: petition.signatureConfig?.allowAdditionalSigners ?? false,
   });
 
   const review = step1Props.form.watch("review");
@@ -111,8 +111,7 @@ export function SignatureConfigDialog({
           lastName: s.lastName ?? "",
         })),
         review,
-        letRecipientsChooseSigners:
-          review || data.allowAdditionalSigners || data.signers.length === 0,
+        allowAdditionalSigners: review || data.allowAdditionalSigners || data.signers.length === 0,
       });
     }
   }
@@ -194,7 +193,7 @@ SignatureConfigDialog.fragments = {
           }
           title
           review
-          letRecipientsChooseSigners
+          allowAdditionalSigners
         }
         ... on Petition {
           status

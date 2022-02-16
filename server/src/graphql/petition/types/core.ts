@@ -532,9 +532,10 @@ export const SignatureConfig = objectType({
         "If true, lets the user review the replies before starting the signature process",
       resolve: (o) => o.review ?? false,
     });
-    t.boolean("letRecipientsChooseSigners", {
-      description: "If true, allows the recipients of the petition to select additional signers",
-      resolve: (o) => o.letRecipientsChooseSigners ?? false,
+    t.boolean("allowAdditionalSigners", {
+      description:
+        "If true, allows the recipients or users of the petition to select additional signers",
+      resolve: (o) => o.allowAdditionalSigners ?? false,
     });
   },
   sourceType: /* ts */ `{
@@ -547,7 +548,7 @@ export const SignatureConfig = objectType({
     timezone: string;
     title: string;
     review?: boolean;
-    letRecipientsChooseSigners?: boolean;
+    allowAdditionalSigners?: boolean;
   }`,
 });
 

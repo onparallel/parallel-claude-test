@@ -29,7 +29,7 @@ export function NewSignatureRequestRow({
   onStart,
 }: NewSignatureRequestRowProps) {
   const signers = petition.signatureConfig?.signers ?? [];
-  const allowAdditionalSigners = petition.signatureConfig?.letRecipientsChooseSigners ?? false;
+  const allowAdditionalSigners = petition.signatureConfig?.allowAdditionalSigners ?? false;
   const reviewBeforeSigning = petition.signatureConfig?.review ?? false;
   const showConfirmPetitionSignersDialog = useConfirmPetitionSignersDialog();
   const handleStartSignature = async () => {
@@ -122,7 +122,7 @@ NewSignatureRequestRow.fragments = {
           ...SignerReference_PetitionSigner
           ...ConfirmPetitionSignersDialog_PetitionSigner
         }
-        letRecipientsChooseSigners
+        allowAdditionalSigners
         integration {
           id
           name

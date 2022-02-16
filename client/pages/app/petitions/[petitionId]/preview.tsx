@@ -136,7 +136,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         if (canFinalize && isPetition) {
           const fixedSigners = petition!.signatureConfig?.signers ?? [];
           const allowAdditionalSigners =
-            (fixedSigners.length === 0 || petition.signatureConfig?.letRecipientsChooseSigners) ??
+            (fixedSigners.length === 0 || petition.signatureConfig?.allowAdditionalSigners) ??
             false;
           let completeSignerInfoData: ConfirmPetitionSignersDialogResult | null = null;
           if (petition.signatureConfig?.review === false) {
@@ -389,7 +389,7 @@ PetitionPreview.fragments = {
         ...useLiquidScope_PetitionField
       }
       signatureConfig {
-        letRecipientsChooseSigners
+        allowAdditionalSigners
         review
         timezone
         title

@@ -14,7 +14,7 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
   return (async (_, args, ctx, info) => {
     const signatureConfig = prop(args);
     if (signatureConfig) {
-      const { orgIntegrationId, signersInfo, timezone, title, letRecipientsChooseSigners, review } =
+      const { orgIntegrationId, signersInfo, timezone, title, allowAdditionalSigners, review } =
         signatureConfig;
 
       const integration = await ctx.integrations.loadIntegration(orgIntegrationId);
@@ -42,10 +42,10 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
         throw new ArgValidationError(info, `${argName}.title`, "Value must be defined");
       }
 
-      if (!letRecipientsChooseSigners && signersInfo.length === 0 && !review) {
+      if (!allowAdditionalSigners && signersInfo.length === 0 && !review) {
         throw new ArgValidationError(
           info,
-          `${argName}.letRecipientsChooseSigners`,
+          `${argName}.allowAdditionalSigners`,
           "Invalid value with empty list of signers"
         );
       }

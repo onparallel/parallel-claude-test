@@ -448,8 +448,9 @@ export const SignatureConfigInput = inputObjectType({
       description:
         "If true, lets the user review the replies before starting the signature process",
     });
-    t.nonNull.boolean("letRecipientsChooseSigners", {
-      description: "If true, allows the recipients of the petition to select additional signers",
+    t.nonNull.boolean("allowAdditionalSigners", {
+      description:
+        "If true, allows the recipients or users of the petition to select additional signers",
     });
   },
 });
@@ -1152,7 +1153,7 @@ export const bulkSendPetition = mutationField("bulkSendPetition", {
                   ...petition.signature_config!,
                   signersInfo: [],
                   review: false,
-                  letRecipientsChooseSigners: true,
+                  allowAdditionalSigners: true,
                 }
               : null,
         },

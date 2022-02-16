@@ -128,7 +128,7 @@ export interface NexusGenInputs {
   };
   SignatureConfigInput: {
     // input type
-    letRecipientsChooseSigners: boolean; // Boolean!
+    allowAdditionalSigners: boolean; // Boolean!
     orgIntegrationId: NexusGenScalars["GID"]; // GID!
     review: boolean; // Boolean!
     signersInfo: NexusGenInputs["SignatureConfigInputSigner"][]; // [SignatureConfigInputSigner!]!
@@ -507,7 +507,7 @@ export interface NexusGenObjects {
   PublicSignatureConfig: {
     signersInfo: any[];
     review?: boolean;
-    letRecipientsChooseSigners?: boolean;
+    allowAdditionalSigners?: boolean;
     additionalSignersInfo?: any[];
   };
   PublicUser: db.User;
@@ -546,7 +546,7 @@ export interface NexusGenObjects {
     timezone: string;
     title: string;
     review?: boolean;
-    letRecipientsChooseSigners?: boolean;
+    allowAdditionalSigners?: boolean;
   };
   SignatureOpenedEvent: events.SignatureOpenedEvent;
   SignatureOrgIntegration: db.OrgIntegration;
@@ -1522,7 +1522,7 @@ export interface NexusGenFieldTypes {
   PublicSignatureConfig: {
     // field return type
     additionalSigners: NexusGenRootTypes["PetitionSigner"][]; // [PetitionSigner!]!
-    letRecipientsChooseSigners: boolean; // Boolean!
+    allowAdditionalSigners: boolean; // Boolean!
     review: boolean; // Boolean!
     signers: NexusGenRootTypes["PetitionSigner"][]; // [PetitionSigner!]!
   };
@@ -1685,8 +1685,8 @@ export interface NexusGenFieldTypes {
   };
   SignatureConfig: {
     // field return type
+    allowAdditionalSigners: boolean; // Boolean!
     integration: NexusGenRootTypes["SignatureOrgIntegration"] | null; // SignatureOrgIntegration
-    letRecipientsChooseSigners: boolean; // Boolean!
     review: boolean; // Boolean!
     signers: NexusGenRootTypes["PetitionSigner"][]; // [PetitionSigner!]!
     timezone: string; // String!
@@ -2840,7 +2840,7 @@ export interface NexusGenFieldTypeNames {
   PublicSignatureConfig: {
     // field return type name
     additionalSigners: "PetitionSigner";
-    letRecipientsChooseSigners: "Boolean";
+    allowAdditionalSigners: "Boolean";
     review: "Boolean";
     signers: "PetitionSigner";
   };
@@ -3003,8 +3003,8 @@ export interface NexusGenFieldTypeNames {
   };
   SignatureConfig: {
     // field return type name
+    allowAdditionalSigners: "Boolean";
     integration: "SignatureOrgIntegration";
-    letRecipientsChooseSigners: "Boolean";
     review: "Boolean";
     signers: "PetitionSigner";
     timezone: "String";

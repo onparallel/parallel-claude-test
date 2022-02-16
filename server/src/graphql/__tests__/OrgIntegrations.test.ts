@@ -89,7 +89,7 @@ describe("GraphQL/OrgIntegrations", () => {
             signersInfo: [],
             timezone: "Europe/Madrid",
             title: "test",
-            letRecipientsChooseSigners: true,
+            allowAdditionalSigners: true,
             review: false,
           },
         },

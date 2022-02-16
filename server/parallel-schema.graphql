@@ -3530,9 +3530,9 @@ type PublicSignatureConfig {
   additionalSigners: [PetitionSigner!]!
 
   """
-  If true, allows the recipients of the petition to select additional signers
+  If true, allows the recipients or users of the petition to select additional signers
   """
-  letRecipientsChooseSigners: Boolean!
+  allowAdditionalSigners: Boolean!
 
   """
   If true, lets the user review the replies before starting the signature process
@@ -4051,14 +4051,14 @@ The signature settings of a petition
 """
 type SignatureConfig {
   """
+  If true, allows the recipients or users of the petition to select additional signers
+  """
+  allowAdditionalSigners: Boolean!
+
+  """
   The signature integration selected for this signature config.
   """
   integration: SignatureOrgIntegration
-
-  """
-  If true, allows the recipients of the petition to select additional signers
-  """
-  letRecipientsChooseSigners: Boolean!
 
   """
   If true, lets the user review the replies before starting the signature process
@@ -4086,9 +4086,9 @@ The signature settings for the petition
 """
 input SignatureConfigInput {
   """
-  If true, allows the recipients of the petition to select additional signers
+  If true, allows the recipients or users of the petition to select additional signers
   """
-  letRecipientsChooseSigners: Boolean!
+  allowAdditionalSigners: Boolean!
 
   """
   The Global ID of the signature integration to be used.

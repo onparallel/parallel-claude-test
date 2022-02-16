@@ -109,7 +109,7 @@ export type PetitionSignatureConfig = {
   timezone: string;
   title: string;
   review?: boolean;
-  letRecipientsChooseSigners?: boolean;
+  allowAdditionalSigners?: boolean;
   message?: string;
   additionalSignersInfo?: PetitionSignatureConfigSigner[];
 };
@@ -1713,7 +1713,7 @@ export class PetitionRepository extends BaseRepository {
               ? {
                   ...sourcePetition.signature_config,
                   signersInfo: [],
-                  letRecipientsChooseSigners: true,
+                  allowAdditionalSigners: true,
                   orgIntegrationId: defaultSignatureOrgIntegration.id,
                 }
               : sourcePetition?.signature_config,

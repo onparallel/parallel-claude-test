@@ -98,7 +98,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
           let completeSignerInfoData: CompleteSignerInfoDialogResult | null = null;
           if (petition.signatureConfig?.review === false) {
             completeSignerInfoData = await showCompleteSignerInfoDialog({
-              recipientCanAddSigners: petition.signatureConfig.letRecipientsChooseSigners,
+              recipientCanAddSigners: petition.signatureConfig.allowAdditionalSigners,
               signers,
               keycode,
               organization: granter.organization.name,
@@ -481,7 +481,7 @@ RecipientView.fragments = {
         }
         signatureConfig {
           review
-          letRecipientsChooseSigners
+          allowAdditionalSigners
           signers {
             fullName
             ...useCompleteSignerInfoDialog_PetitionSigner

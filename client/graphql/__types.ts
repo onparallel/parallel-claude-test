@@ -2618,8 +2618,8 @@ export interface PublicSignatureConfig {
   __typename?: "PublicSignatureConfig";
   /** The signers assigned by the petition recipient */
   additionalSigners: Array<PetitionSigner>;
-  /** If true, allows the recipients of the petition to select additional signers */
-  letRecipientsChooseSigners: Scalars["Boolean"];
+  /** If true, allows the recipients or users of the petition to select additional signers */
+  allowAdditionalSigners: Scalars["Boolean"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"];
   /** The contacts that need to sign the generated document. */
@@ -3031,10 +3031,10 @@ export interface SignatureCompletedUserNotification extends PetitionUserNotifica
 /** The signature settings of a petition */
 export interface SignatureConfig {
   __typename?: "SignatureConfig";
+  /** If true, allows the recipients or users of the petition to select additional signers */
+  allowAdditionalSigners: Scalars["Boolean"];
   /** The signature integration selected for this signature config. */
   integration?: Maybe<SignatureOrgIntegration>;
-  /** If true, allows the recipients of the petition to select additional signers */
-  letRecipientsChooseSigners: Scalars["Boolean"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"];
   /** The signers of the generated document. */
@@ -3047,8 +3047,8 @@ export interface SignatureConfig {
 
 /** The signature settings for the petition */
 export interface SignatureConfigInput {
-  /** If true, allows the recipients of the petition to select additional signers */
-  letRecipientsChooseSigners: Scalars["Boolean"];
+  /** If true, allows the recipients or users of the petition to select additional signers */
+  allowAdditionalSigners: Scalars["Boolean"];
   /** The Global ID of the signature integration to be used. */
   orgIntegrationId: Scalars["GID"];
   /** If true, lets the user review the replies before starting the signature process */
@@ -7098,7 +7098,7 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
     __typename?: "SignatureConfig";
     title: string;
     review: boolean;
-    letRecipientsChooseSigners: boolean;
+    allowAdditionalSigners: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -7123,7 +7123,7 @@ export type SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment = {
     __typename?: "SignatureConfig";
     title: string;
     review: boolean;
-    letRecipientsChooseSigners: boolean;
+    allowAdditionalSigners: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -7500,7 +7500,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
     __typename?: "SignatureConfig";
     title: string;
     review: boolean;
-    letRecipientsChooseSigners: boolean;
+    allowAdditionalSigners: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -7573,7 +7573,7 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
     __typename?: "SignatureConfig";
     title: string;
     review: boolean;
-    letRecipientsChooseSigners: boolean;
+    allowAdditionalSigners: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -8405,7 +8405,7 @@ export type NewSignatureRequestRow_PetitionFragment = {
   __typename?: "Petition";
   signatureConfig?: {
     __typename?: "SignatureConfig";
-    letRecipientsChooseSigners: boolean;
+    allowAdditionalSigners: boolean;
     review: boolean;
     timezone: string;
     title: string;
@@ -8665,7 +8665,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
     __typename?: "SignatureConfig";
     title: string;
     review: boolean;
-    letRecipientsChooseSigners: boolean;
+    allowAdditionalSigners: boolean;
     timezone: string;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -8736,7 +8736,7 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
           __typename?: "SignatureConfig";
           title: string;
           review: boolean;
-          letRecipientsChooseSigners: boolean;
+          allowAdditionalSigners: boolean;
           timezone: string;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -13426,7 +13426,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     __typename?: "SignatureConfig";
     title: string;
     review: boolean;
-    letRecipientsChooseSigners: boolean;
+    allowAdditionalSigners: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       environment: SignatureOrgIntegrationEnvironment;
@@ -13597,7 +13597,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     __typename?: "SignatureConfig";
     title: string;
     review: boolean;
-    letRecipientsChooseSigners: boolean;
+    allowAdditionalSigners: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
@@ -13727,7 +13727,7 @@ export type PetitionCompose_updatePetitionMutation = {
           __typename?: "SignatureConfig";
           title: string;
           review: boolean;
-          letRecipientsChooseSigners: boolean;
+          allowAdditionalSigners: boolean;
           signers: Array<{
             __typename?: "PetitionSigner";
             contactId?: string | null;
@@ -13832,7 +13832,7 @@ export type PetitionCompose_updatePetitionMutation = {
           __typename?: "SignatureConfig";
           title: string;
           review: boolean;
-          letRecipientsChooseSigners: boolean;
+          allowAdditionalSigners: boolean;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -14228,7 +14228,7 @@ export type PetitionCompose_petitionQuery = {
           __typename?: "SignatureConfig";
           title: string;
           review: boolean;
-          letRecipientsChooseSigners: boolean;
+          allowAdditionalSigners: boolean;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             environment: SignatureOrgIntegrationEnvironment;
@@ -14407,7 +14407,7 @@ export type PetitionCompose_petitionQuery = {
           __typename?: "SignatureConfig";
           title: string;
           review: boolean;
-          letRecipientsChooseSigners: boolean;
+          allowAdditionalSigners: boolean;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             id: string;
@@ -14508,7 +14508,7 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
   }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
-    letRecipientsChooseSigners: boolean;
+    allowAdditionalSigners: boolean;
     review: boolean;
     timezone: string;
     title: string;
@@ -14603,7 +14603,7 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
   }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
-    letRecipientsChooseSigners: boolean;
+    allowAdditionalSigners: boolean;
     review: boolean;
     timezone: string;
     title: string;
@@ -14723,7 +14723,7 @@ export type PetitionPreview_updatePetitionMutation = {
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          letRecipientsChooseSigners: boolean;
+          allowAdditionalSigners: boolean;
           review: boolean;
           timezone: string;
           title: string;
@@ -14821,7 +14821,7 @@ export type PetitionPreview_updatePetitionMutation = {
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          letRecipientsChooseSigners: boolean;
+          allowAdditionalSigners: boolean;
           review: boolean;
           timezone: string;
           title: string;
@@ -14915,7 +14915,7 @@ export type PetitionPreview_completePetitionMutation = {
     }>;
     signatureConfig?: {
       __typename?: "SignatureConfig";
-      letRecipientsChooseSigners: boolean;
+      allowAdditionalSigners: boolean;
       review: boolean;
       timezone: string;
       title: string;
@@ -15032,7 +15032,7 @@ export type PetitionPreview_petitionQuery = {
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          letRecipientsChooseSigners: boolean;
+          allowAdditionalSigners: boolean;
           review: boolean;
           timezone: string;
           title: string;
@@ -15130,7 +15130,7 @@ export type PetitionPreview_petitionQuery = {
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          letRecipientsChooseSigners: boolean;
+          allowAdditionalSigners: boolean;
           review: boolean;
           timezone: string;
           title: string;
@@ -15289,7 +15289,7 @@ export type PetitionReplies_PetitionFragment = {
     __typename?: "SignatureConfig";
     review: boolean;
     title: string;
-    letRecipientsChooseSigners: boolean;
+    allowAdditionalSigners: boolean;
     timezone: string;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -15573,7 +15573,7 @@ export type PetitionReplies_closePetitionMutation = {
       __typename?: "SignatureConfig";
       review: boolean;
       title: string;
-      letRecipientsChooseSigners: boolean;
+      allowAdditionalSigners: boolean;
       timezone: string;
       integration?: {
         __typename?: "SignatureOrgIntegration";
@@ -15730,7 +15730,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       __typename?: "SignatureConfig";
       review: boolean;
       title: string;
-      letRecipientsChooseSigners: boolean;
+      allowAdditionalSigners: boolean;
       timezone: string;
       integration?: {
         __typename?: "SignatureOrgIntegration";
@@ -15982,7 +15982,7 @@ export type PetitionReplies_petitionQuery = {
           __typename?: "SignatureConfig";
           review: boolean;
           title: string;
-          letRecipientsChooseSigners: boolean;
+          allowAdditionalSigners: boolean;
           timezone: string;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -16869,7 +16869,7 @@ export type RecipientView_PublicPetitionAccessFragment = {
     signatureConfig?: {
       __typename?: "PublicSignatureConfig";
       review: boolean;
-      letRecipientsChooseSigners: boolean;
+      allowAdditionalSigners: boolean;
       signers: Array<{
         __typename?: "PetitionSigner";
         fullName: string;
@@ -16964,7 +16964,7 @@ export type RecipientView_PublicPetitionFragment = {
   signatureConfig?: {
     __typename?: "PublicSignatureConfig";
     review: boolean;
-    letRecipientsChooseSigners: boolean;
+    allowAdditionalSigners: boolean;
     signers: Array<{
       __typename?: "PetitionSigner";
       fullName: string;
@@ -17089,7 +17089,7 @@ export type RecipientView_publicCompletePetitionMutation = {
     signatureConfig?: {
       __typename?: "PublicSignatureConfig";
       review: boolean;
-      letRecipientsChooseSigners: boolean;
+      allowAdditionalSigners: boolean;
       signers: Array<{
         __typename?: "PetitionSigner";
         fullName: string;
@@ -17168,7 +17168,7 @@ export type RecipientView_accessQuery = {
       signatureConfig?: {
         __typename?: "PublicSignatureConfig";
         review: boolean;
-        letRecipientsChooseSigners: boolean;
+        allowAdditionalSigners: boolean;
         signers: Array<{
           __typename?: "PetitionSigner";
           fullName: string;
@@ -17976,7 +17976,7 @@ export type PetitionSignaturesCardPolling_petitionQuery = {
           __typename?: "SignatureConfig";
           title: string;
           review: boolean;
-          letRecipientsChooseSigners: boolean;
+          allowAdditionalSigners: boolean;
           timezone: string;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -20272,7 +20272,7 @@ export const SignatureConfigDialog_PetitionBaseFragmentDoc = gql`
       }
       title
       review
-      letRecipientsChooseSigners
+      allowAdditionalSigners
     }
     ... on Petition {
       status
@@ -20734,7 +20734,7 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
       ...useLiquidScope_PetitionField
     }
     signatureConfig {
-      letRecipientsChooseSigners
+      allowAdditionalSigners
       review
       timezone
       title
@@ -20890,7 +20890,7 @@ export const NewSignatureRequestRow_PetitionFragmentDoc = gql`
         ...SignerReference_PetitionSigner
         ...ConfirmPetitionSignersDialog_PetitionSigner
       }
-      letRecipientsChooseSigners
+      allowAdditionalSigners
       integration {
         id
         name
@@ -21429,7 +21429,7 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
     }
     signatureConfig {
       review
-      letRecipientsChooseSigners
+      allowAdditionalSigners
       signers {
         fullName
         ...useCompleteSignerInfoDialog_PetitionSigner

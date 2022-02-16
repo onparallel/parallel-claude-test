@@ -887,7 +887,7 @@ describe("GraphQL/Petitions", () => {
                 contactId: 30,
               },
             ],
-            letRecipientsChooseSigners: true,
+            allowAdditionalSigners: true,
           },
         })
       );
@@ -912,7 +912,7 @@ describe("GraphQL/Petitions", () => {
                 timezone
                 title
                 review
-                letRecipientsChooseSigners
+                allowAdditionalSigners
               }
             }
           }
@@ -933,7 +933,7 @@ describe("GraphQL/Petitions", () => {
           timezone: "Europe/Madrid",
           title: "aaaa",
           review: false,
-          letRecipientsChooseSigners: true,
+          allowAdditionalSigners: true,
         },
       });
     });
@@ -973,7 +973,7 @@ describe("GraphQL/Petitions", () => {
                 contactId: 30,
               },
             ],
-            letRecipientsChooseSigners: false,
+            allowAdditionalSigners: false,
           },
         })
       );
@@ -998,7 +998,7 @@ describe("GraphQL/Petitions", () => {
                 timezone
                 title
                 review
-                letRecipientsChooseSigners
+                allowAdditionalSigners
               }
             }
           }
@@ -1021,7 +1021,7 @@ describe("GraphQL/Petitions", () => {
           timezone: "Europe/Madrid",
           title: "aaaa",
           review: false,
-          letRecipientsChooseSigners: true,
+          allowAdditionalSigners: true,
         },
       });
     });
@@ -3466,7 +3466,7 @@ describe("GraphQL/Petitions", () => {
                 timezone: "Europe/Madrid",
                 title: "Signature!",
                 review: false,
-                letRecipientsChooseSigners: false,
+                allowAdditionalSigners: false,
               }
             : i === 2
             ? {
@@ -3475,7 +3475,7 @@ describe("GraphQL/Petitions", () => {
                 timezone: "Europe/Madrid",
                 title: "Signature!",
                 review: false,
-                letRecipientsChooseSigners: false,
+                allowAdditionalSigners: false,
               }
             : null,
       }));
@@ -3759,7 +3759,7 @@ describe("GraphQL/Petitions", () => {
             timezone: "Europe/Madrid",
             title: "Signature!",
             review: false,
-            letRecipientsChooseSigners: false,
+            allowAdditionalSigners: false,
           },
         })
         .where("id", petitions[1].id);

@@ -2533,8 +2533,8 @@ export type PublicPublicPetitionLink = {
 export type PublicSignatureConfig = {
   /** The signers assigned by the petition recipient */
   additionalSigners: Array<PetitionSigner>;
-  /** If true, allows the recipients of the petition to select additional signers */
-  letRecipientsChooseSigners: Scalars["Boolean"];
+  /** If true, allows the recipients or users of the petition to select additional signers */
+  allowAdditionalSigners: Scalars["Boolean"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"];
   /** The contacts that need to sign the generated document. */
@@ -2929,10 +2929,10 @@ export type SignatureCompletedUserNotification = PetitionUserNotification & {
 
 /** The signature settings of a petition */
 export type SignatureConfig = {
+  /** If true, allows the recipients or users of the petition to select additional signers */
+  allowAdditionalSigners: Scalars["Boolean"];
   /** The signature integration selected for this signature config. */
   integration: Maybe<SignatureOrgIntegration>;
-  /** If true, allows the recipients of the petition to select additional signers */
-  letRecipientsChooseSigners: Scalars["Boolean"];
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"];
   /** The signers of the generated document. */
@@ -2945,8 +2945,8 @@ export type SignatureConfig = {
 
 /** The signature settings for the petition */
 export type SignatureConfigInput = {
-  /** If true, allows the recipients of the petition to select additional signers */
-  letRecipientsChooseSigners: Scalars["Boolean"];
+  /** If true, allows the recipients or users of the petition to select additional signers */
+  allowAdditionalSigners: Scalars["Boolean"];
   /** The Global ID of the signature integration to be used. */
   orgIntegrationId: Scalars["GID"];
   /** If true, lets the user review the replies before starting the signature process */
