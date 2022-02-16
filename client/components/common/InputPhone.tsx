@@ -1,8 +1,8 @@
 import { Input, InputGroup, InputLeftElement, InputProps } from "@chakra-ui/react";
 import { FieldPhoneIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { countryFlags } from "@parallel/utils/useCountryName";
-import PhoneFormatter from "react-headless-phone-input";
+import { countryFlags } from "@parallel/utils/flags";
+import PhoneFormatter from "react-headless-phone-input/lazy";
 import { PhoneFormatterProps } from "react-headless-phone-input/types/PhoneFormatterProps";
 
 export const InputPhone = chakraForwardRef<

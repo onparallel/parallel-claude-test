@@ -18,6 +18,7 @@ import {
   RecipientViewPetitionFieldCard_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
+import { isValidPhoneNumber } from "libphonenumber-js";
 
 export interface RecipientViewPetitionFieldPhoneProps
   extends Omit<
@@ -61,6 +62,7 @@ export function RecipientViewPetitionFieldPhone({
 
   const handleUpdate = useMemoFactory(
     (replyId: string) => async (value: string) => {
+      if (!isValidPhoneNumber(value)) return;
       await onUpdateReply(replyId, value);
     },
     [onUpdateReply]
@@ -97,7 +99,7 @@ export function RecipientViewPetitionFieldPhone({
 
   const handleCreate = useDebouncedCallback(
     async (value: string, focusCreatedReply: boolean) => {
-      if (!value) {
+      if (!value || !isValidPhoneNumber(value)) {
         return;
       }
       setIsSaving(true);

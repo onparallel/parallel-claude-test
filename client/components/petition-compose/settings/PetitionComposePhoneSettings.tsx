@@ -1,16 +1,14 @@
 import { Box, HStack, Stack, Text } from "@chakra-ui/react";
+import { countryFlags } from "@parallel/utils/flags";
 import { FieldOptions } from "@parallel/utils/petitionFields";
+import { countryPhoneCodes } from "@parallel/utils/phoneCodes";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { OptionType } from "@parallel/utils/react-select/types";
-import {
-  countryFlags,
-  countryPhoneCodes,
-  useLoadCountryNames,
-} from "@parallel/utils/useCountryName";
+import { useLoadCountryNames } from "@parallel/utils/useCountryName";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import Select from "react-select";
+import Select, { createFilter } from "react-select";
 import { PetitionComposeFieldSettingsProps } from "./PetitionComposeFieldSettings";
 import { SettingsRowPlaceholder } from "./SettingsRowPlaceholder";
 
@@ -76,7 +74,7 @@ export function PhoneSettings({
     debouncedOnUpdate(field.id, {
       options: {
         ...field.options,
-        defaultCountry: option?.value ?? "",
+        defaultCountry: option?.value ?? "ES",
       },
     });
   };
@@ -93,6 +91,7 @@ export function PhoneSettings({
         <Box flex="1">
           <Select
             ref={selectRef}
+            filterOption={createFilter({ ignoreAccents: false })}
             options={selectOptions}
             isSearchable={true}
             formatOptionLabel={formatOptionLabel}
