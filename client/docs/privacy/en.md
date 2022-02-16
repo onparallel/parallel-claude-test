@@ -95,13 +95,14 @@ The processing of the above personal data is only carried out for the provision 
 In this respect, the following sub-processors are deemed as authorized by the User:
 
 - Amazon Web Services, Inc. as provider of the hosting of the Service, through servers located in Ireland.
+- Signaturit Solutions, S.L. as provider of electronic signatures.
 - Google services: Google Analytics
 
-  3.4. PARALLEL shall guarantee the confidentiality of the Accessed Data, even after the termination of the Service.
+3.4. PARALLEL shall guarantee the confidentiality of the Accessed Data, even after the termination of the Service.
 
-  3.5. The User is the data controller of the processing of the Accessed Data within the meaning in GDPR. The User is the only one deciding the purposes and means for the processing of Accessed Data, so PARALLEL does not use Accessed Data for its own purposes and only uses them for the rendering of the Service and on behalf of the User. To such extent, the User shall have to comply with applicable obligations under data protection regulations, including relying on an appropriate legal basis for the processing of personal data of the recipients of the emails sent through the Service. The User, and not PARALLEL, shall be solely responsible for the compliance with such obligations.
+3.5. The User is the data controller of the processing of the Accessed Data within the meaning in GDPR. The User is the only one deciding the purposes and means for the processing of Accessed Data, so PARALLEL does not use Accessed Data for its own purposes and only uses them for the rendering of the Service and on behalf of the User. To such extent, the User shall have to comply with applicable obligations under data protection regulations, including relying on an appropriate legal basis for the processing of personal data of the recipients of the emails sent through the Service. The User, and not PARALLEL, shall be solely responsible for the compliance with such obligations.
 
-  3.6. The User acknowledges and agrees that the use of the Service and the processing of the Accessed Data as a result of the same is its own free and exclusive decision and has verified that the conditions of the Service and the processing of the Accessed Data are in line with its interests.
+3.6. The User acknowledges and agrees that the use of the Service and the processing of the Accessed Data as a result of the same is its own free and exclusive decision and has verified that the conditions of the Service and the processing of the Accessed Data are in line with its interests.
 
 ## 4. Security
 
