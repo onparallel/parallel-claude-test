@@ -38,7 +38,6 @@ export function NewSignatureRequestRow({
         user,
         accesses: petition.accesses,
         fixedSigners: signers,
-        reviewBeforeSigning,
         allowAdditionalSigners,
       });
 

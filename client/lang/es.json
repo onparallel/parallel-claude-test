@@ -2935,19 +2935,14 @@
     "context": "Select a user or team"
   },
   {
-    "term": "component.signature-config-dialog.alert",
-    "definition": "Se asignarán estos firmantes a todas las peticiones que se creen desde esta plantilla.",
-    "context": "These signers will be assigned to all the petitions that are created from this template."
-  },
-  {
-    "term": "component.signature-config-dialog.allow-recipient-to-choose.help",
+    "term": "component.signature-config-dialog.allow-additional-signers.help",
     "definition": "Si esta opción está desactivada, solo podrán firmar el documento las personas indicadas.",
-    "context": "If this option is disabled, only the assigned people will be able to sign."
+    "context": "If this option is disabled, only the indicated persons will be able to sign the document."
   },
   {
-    "term": "component.signature-config-dialog.allow-recipient-to-choose.label",
-    "definition": "Permitir que el destinatario escoja firmantes",
-    "context": "Allow the recipient to choose signers"
+    "term": "component.signature-config-dialog.allow-additional-signers.label",
+    "definition": "Permitir que se añadan más firmantes",
+    "context": "Allow additional signers to be added"
   },
   {
     "term": "component.signature-config-dialog.confirm-start",
@@ -2955,34 +2950,29 @@
     "context": "Start signature"
   },
   {
-    "term": "component.signature-config-dialog.contact-select.label",
-    "definition": "¿Quién tiene que firmar la petición?",
-    "context": "Who has to sign the petition?"
+    "term": "component.signature-config-dialog.contact-select.add-contact-to-sign.placeholder",
+    "definition": "Añade un contacto para firmar",
+    "context": "Add a contact to sign"
   },
   {
-    "term": "component.signature-config-dialog.contact-select.placeholder-optional",
-    "definition": "Dejar que escoja el destinatario",
-    "context": "Let the recipient choose"
-  },
-  {
-    "term": "component.signature-config-dialog.contact-select.placeholder-required",
-    "definition": "Seleccione los firmantes",
-    "context": "Select the signers"
+    "term": "component.signature-config-dialog.contact-select.choose-when-starting.placeholder",
+    "definition": "Escoger al iniciar",
+    "context": "Choose when starting"
   },
   {
     "term": "component.signature-config-dialog.dont-review-before-send.option-no.explainer",
-    "definition": "La firma se iniciará cuando el destinatario haya completado la información.",
-    "context": "The signature will be initiated when the recipient has completed the information."
+    "definition": "La firma se iniciará cuando se complete toda la información.",
+    "context": "The signature will be initiated when all the information has been completed."
   },
   {
-    "term": "component.signature-config-dialog.header",
-    "definition": "Ajustes de firma digital",
-    "context": "eSignature configuration"
+    "term": "component.signature-config-dialog.header.help-link",
+    "definition": "<a>Más sobre la firma</a>",
+    "context": "<a>More about eSignature</a>"
   },
   {
     "term": "component.signature-config-dialog.header.subtitle",
-    "definition": "Se generará un PDF con todas las respuestas y se enviará al proveedor para su firma. Puedes definir el momento y quién debe firmar dicho documento.",
-    "context": "A PDF with all the replies will be generated and sent to the eSignature provider. You can define when and by whom the document should be signed."
+    "definition": "Firma un documento PDF con todas las respuestas.",
+    "context": "Sign a PDF document with all the replies."
   },
   {
     "term": "component.signature-config-dialog.provider-label",
@@ -2991,23 +2981,38 @@
   },
   {
     "term": "component.signature-config-dialog.review-before-send-label",
-    "definition": "¿Quieres revisar la información antes de que se firme el documento?",
-    "context": "Do you want to review the information before it is sent to sign?"
+    "definition": "¿Cuando quieres que se inicie la firma?",
+    "context": "When do you want the eSignature to be started?"
   },
   {
     "term": "component.signature-config-dialog.review-before-send.option-no",
-    "definition": "No, iniciar automáticamente al completar la petición",
-    "context": "No, start automatically when completing the petition"
+    "definition": "Al completar la petición",
+    "context": "After completing the petition"
   },
   {
     "term": "component.signature-config-dialog.review-before-send.option-yes",
-    "definition": "Sí, revisar antes de iniciar la firma",
-    "context": "Yes, review before starting the signature process"
+    "definition": "Tras revisar la información",
+    "context": "After reviewing the information"
   },
   {
     "term": "component.signature-config-dialog.review-before-send.option-yes.explainer",
-    "definition": "Tras aprobar toda la información tendrás que iniciar la firma manualmente.",
-    "context": "After approving all the information you will have to start the signature manually."
+    "definition": "Tras revisar la información tendrás que iniciar la firma manualmente.",
+    "context": "After reviewing the information you will have to start the signature manually."
+  },
+  {
+    "term": "component.signature-config-dialog.signers-added",
+    "definition": "{count, plural, =0{No has añadido firmantes todavía} one{1 firmante añadido} other{# firmantes añadidos}}",
+    "context": "{count, plural, =0{You haven't added any signers yet} one{1 signer added} other{# signers added}}"
+  },
+  {
+    "term": "component.signature-config-dialog.step-1.header",
+    "definition": "Ajustes de firma digital",
+    "context": "eSignature configuration"
+  },
+  {
+    "term": "component.signature-config-dialog.step-2.header",
+    "definition": "¿Quién tiene que firmar el documento?",
+    "context": "Who has to sign the document?"
   },
   {
     "term": "component.signature-config-dialog.title-help",

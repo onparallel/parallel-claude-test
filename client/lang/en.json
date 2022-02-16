@@ -2935,19 +2935,14 @@
     "context": "Select a user or team"
   },
   {
-    "term": "component.signature-config-dialog.alert",
-    "definition": "These signers will be assigned to all the petitions that are created from this template.",
-    "context": "These signers will be assigned to all the petitions that are created from this template."
+    "term": "component.signature-config-dialog.allow-additional-signers.help",
+    "definition": "If this option is disabled, only the indicated persons will be able to sign the document.",
+    "context": "If this option is disabled, only the indicated persons will be able to sign the document."
   },
   {
-    "term": "component.signature-config-dialog.allow-recipient-to-choose.help",
-    "definition": "If this option is disabled, only the assigned people will be able to sign.",
-    "context": "If this option is disabled, only the assigned people will be able to sign."
-  },
-  {
-    "term": "component.signature-config-dialog.allow-recipient-to-choose.label",
-    "definition": "Allow the recipient to choose signers",
-    "context": "Allow the recipient to choose signers"
+    "term": "component.signature-config-dialog.allow-additional-signers.label",
+    "definition": "Allow additional signers to be added",
+    "context": "Allow additional signers to be added"
   },
   {
     "term": "component.signature-config-dialog.confirm-start",
@@ -2955,34 +2950,29 @@
     "context": "Start signature"
   },
   {
-    "term": "component.signature-config-dialog.contact-select.label",
-    "definition": "Who has to sign the petition?",
-    "context": "Who has to sign the petition?"
+    "term": "component.signature-config-dialog.contact-select.add-contact-to-sign.placeholder",
+    "definition": "Add a contact to sign",
+    "context": "Add a contact to sign"
   },
   {
-    "term": "component.signature-config-dialog.contact-select.placeholder-optional",
-    "definition": "Let the recipient choose",
-    "context": "Let the recipient choose"
-  },
-  {
-    "term": "component.signature-config-dialog.contact-select.placeholder-required",
-    "definition": "Select the signers",
-    "context": "Select the signers"
+    "term": "component.signature-config-dialog.contact-select.choose-when-starting.placeholder",
+    "definition": "Choose when starting",
+    "context": "Choose when starting"
   },
   {
     "term": "component.signature-config-dialog.dont-review-before-send.option-no.explainer",
-    "definition": "The signature will be initiated when the recipient has completed the information.",
-    "context": "The signature will be initiated when the recipient has completed the information."
+    "definition": "The signature will be initiated when all the information has been completed.",
+    "context": "The signature will be initiated when all the information has been completed."
   },
   {
-    "term": "component.signature-config-dialog.header",
-    "definition": "eSignature configuration",
-    "context": "eSignature configuration"
+    "term": "component.signature-config-dialog.header.help-link",
+    "definition": "<a>More about eSignature</a>",
+    "context": "<a>More about eSignature</a>"
   },
   {
     "term": "component.signature-config-dialog.header.subtitle",
-    "definition": "A PDF with all the replies will be generated and sent to the eSignature provider. You can define when and by whom the document should be signed.",
-    "context": "A PDF with all the replies will be generated and sent to the eSignature provider. You can define when and by whom the document should be signed."
+    "definition": "Sign a PDF document with all the replies.",
+    "context": "Sign a PDF document with all the replies."
   },
   {
     "term": "component.signature-config-dialog.provider-label",
@@ -2991,23 +2981,38 @@
   },
   {
     "term": "component.signature-config-dialog.review-before-send-label",
-    "definition": "Do you want to review the information before it is sent to sign?",
-    "context": "Do you want to review the information before it is sent to sign?"
+    "definition": "When do you want the eSignature to be started?",
+    "context": "When do you want the eSignature to be started?"
   },
   {
     "term": "component.signature-config-dialog.review-before-send.option-no",
-    "definition": "No, start automatically when completing the petition",
-    "context": "No, start automatically when completing the petition"
+    "definition": "After completing the petition",
+    "context": "After completing the petition"
   },
   {
     "term": "component.signature-config-dialog.review-before-send.option-yes",
-    "definition": "Yes, review before starting the signature process",
-    "context": "Yes, review before starting the signature process"
+    "definition": "After reviewing the information",
+    "context": "After reviewing the information"
   },
   {
     "term": "component.signature-config-dialog.review-before-send.option-yes.explainer",
-    "definition": "After approving all the information you will have to start the signature manually.",
-    "context": "After approving all the information you will have to start the signature manually."
+    "definition": "After reviewing the information you will have to start the signature manually.",
+    "context": "After reviewing the information you will have to start the signature manually."
+  },
+  {
+    "term": "component.signature-config-dialog.signers-added",
+    "definition": "{count, plural, =0{You haven't added any signers yet} one{1 signer added} other{# signers added}}",
+    "context": "{count, plural, =0{You haven't added any signers yet} one{1 signer added} other{# signers added}}"
+  },
+  {
+    "term": "component.signature-config-dialog.step-1.header",
+    "definition": "eSignature configuration",
+    "context": "eSignature configuration"
+  },
+  {
+    "term": "component.signature-config-dialog.step-2.header",
+    "definition": "Who has to sign the document?",
+    "context": "Who has to sign the document?"
   },
   {
     "term": "component.signature-config-dialog.title-help",

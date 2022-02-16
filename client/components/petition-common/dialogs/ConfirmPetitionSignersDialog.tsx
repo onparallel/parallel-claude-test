@@ -30,8 +30,7 @@ interface ConfirmPetitionSignersDialogProps {
   user: ConfirmPetitionSignersDialog_UserFragment;
   accesses: ConfirmPetitionSignersDialog_PetitionAccessFragment[];
   fixedSigners: ConfirmPetitionSignersDialog_PetitionSignerFragment[];
-  reviewBeforeSigning?: boolean;
-  allowAdditionalSigners?: boolean;
+  allowAdditionalSigners: boolean;
 }
 
 export interface ConfirmPetitionSignersDialogResult {
@@ -52,7 +51,6 @@ export function ConfirmPetitionSignersDialog({
   accesses,
   fixedSigners,
   allowAdditionalSigners,
-  reviewBeforeSigning,
   ...props
 }: DialogProps<ConfirmPetitionSignersDialogProps, ConfirmPetitionSignersDialogResult>) {
   const {
@@ -107,7 +105,7 @@ export function ConfirmPetitionSignersDialog({
         as: "form",
         onSubmit: handleSubmit(({ signers, message }) => {
           props.onResolve({
-            message,
+            message: showMessage ? message : null,
             signers: signers.map((s) => ({
               contactId: s.contactId,
               email: s.email,
@@ -126,7 +124,7 @@ export function ConfirmPetitionSignersDialog({
       body={
         <>
           <FormControl id="signers" isInvalid={!!errors.signers}>
-            {allowAdditionalSigners || reviewBeforeSigning ? (
+            {allowAdditionalSigners ? (
               <Text color="gray.500" marginLeft={1}>
                 <FormattedMessage
                   id="component.confirm-petition-signers-dialog.signers-added"
@@ -164,7 +162,7 @@ export function ConfirmPetitionSignersDialog({
                       />
                     ))}
                   </Stack>
-                  {allowAdditionalSigners || reviewBeforeSigning ? (
+                  {allowAdditionalSigners ? (
                     <Box marginTop={2}>
                       <ContactSelect
                         ref={contactSelectRef}
