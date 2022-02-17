@@ -1,5 +1,5 @@
 import { Box, HStack, Stack, Text } from "@chakra-ui/react";
-import { countryFlags } from "@parallel/utils/flags";
+import { countryFlags, CountryISO } from "@parallel/utils/flags";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { countryPhoneCodes } from "@parallel/utils/phoneCodes";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
@@ -29,33 +29,33 @@ export function PhoneSettings({
 
   const selectOptions =
     !data.loading && data.countries
-      ? Object.entries(data.countries).map(([key, value]) => {
+      ? (Object.entries(data.countries).map(([key, value]) => {
           return {
             label: value,
             value: key,
           };
-        })
+        }) as OptionType<string>[])
       : undefined;
 
   const formatOptionLabel = ({ value, label }: { value: string; label: string }) => (
     <HStack>
       <Text as="span" minWidth={4} role="presentation">
-        {countryFlags[value]}
+        {countryFlags[value as CountryISO]}
       </Text>
       <Text as="span">{label}</Text>
       <Text as="span" color="gray.500">
-        {countryPhoneCodes[value]}
+        {countryPhoneCodes[value as CountryISO]}
       </Text>
     </HStack>
   );
 
   useEffect(() => {
-    if (!data.loading && selectRef.current) {
+    if (!data.loading && selectRef.current && selectOptions) {
       selectRef.current.select.selectOption(
-        selectOptions?.find((o) => o.value === options.defaultCountry)
+        selectOptions.find((o) => o.value === options.defaultCountry) ?? selectOptions[0]
       );
     }
-  }, [data.loading, selectRef.current]);
+  }, [data.loading, selectRef.current, selectOptions]);
 
   const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 300, [field.id]);
 

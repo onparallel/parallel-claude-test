@@ -68,7 +68,6 @@ export const countryFlags = {
   ER: "🇪🇷",
   ES: "🇪🇸",
   ET: "🇪🇹",
-  EU: "🇪🇺",
   FI: "🇫🇮",
   FJ: "🇫🇯",
   FK: "🇫🇰",
@@ -251,3 +250,5 @@ export const countryFlags = {
   ZM: "🇿🇲",
   ZW: "🇿🇼",
 };
+
+export type CountryISO = keyof typeof countryFlags;

@@ -16,6 +16,7 @@ import { Arg } from "../helpers/authorize";
 import { ArgValidationError, InvalidReplyError } from "../helpers/errors";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
 import { validateCheckboxReplyValues, validateDynamicSelectReplyValues } from "../utils";
+import { isValidPhoneNumber } from "libphonenumber-js";
 
 export function validatePetitionStatus(
   petition: Maybe<Petition>,
@@ -244,6 +245,22 @@ function validateReplyValue(
           argName,
           `Reply exceeds max length allowed of ${maxLength} chars`,
           { subcode: "MAX_LENGTH_EXCEEDED_ERROR" }
+        );
+      }
+      break;
+    }
+    case "PHONE": {
+      if (typeof reply !== "string") {
+        throw new InvalidReplyError(info, argName, "Value must be a string", {
+          subcode: "INVALID_TYPE_ERROR",
+        });
+      }
+      if (!isValidPhoneNumber(reply)) {
+        throw new InvalidReplyError(
+          info,
+          argName,
+          `Value must be a valid phone number in e164 format`,
+          { subcode: "INVALID_PHONE_NUMBER" }
         );
       }
       break;

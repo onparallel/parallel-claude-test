@@ -112,6 +112,7 @@ function mapFieldReplyContent(fieldType: PetitionFieldType, content: any) {
     case "NUMBER":
       return content.value as number;
     case "DATE":
+    case "PHONE":
       return content.value as string;
     default:
       return content.text as string;

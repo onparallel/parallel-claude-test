@@ -800,7 +800,7 @@ const _TextReplySubmitContent = {
   title: "TextReplySubmitContent",
   type: "string",
   description:
-    "For text replies. The referred field must be of type `TEXT`, `SHORT_TEXT` or `SELECT`.",
+    "For text replies. The referred field must be of type `TEXT`, `SHORT_TEXT`, `SELECT` or `PHONE`.",
   example: "Jamie Lannister",
 } as const;
 

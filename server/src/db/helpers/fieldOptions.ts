@@ -35,7 +35,7 @@ const SCHEMAS = {
   },
   PHONE: {
     type: "object",
-    required: ["placeholder"],
+    required: ["placeholder", "defaultCountry"],
     additionalProperties: false,
     properties: {
       hasCommentsEnabled: {

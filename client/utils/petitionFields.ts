@@ -1,6 +1,5 @@
 import { useTheme } from "@chakra-ui/react";
 import { PetitionFieldType } from "@parallel/graphql/__types";
-import { CountryCode } from "libphonenumber-js";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 import { Maybe } from "./types";
@@ -37,7 +36,7 @@ export type FieldOptions = {
   PHONE: {
     hasCommentsEnabled: boolean;
     placeholder: Maybe<string>;
-    defaultCountry: CountryCode;
+    defaultCountry: string;
   };
   SELECT: {
     hasCommentsEnabled: boolean;
