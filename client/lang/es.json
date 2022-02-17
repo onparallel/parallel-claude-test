@@ -1741,8 +1741,8 @@
   },
   {
     "term": "component.petition-preview-signature-review-alert.signature-required",
-    "definition": "<b>Firma pendiente</b>, puedes iniciarla desde la pestaña de Respuestas.",
-    "context": "<b>Pending eSignature</b>, you can start it from the Replies tab."
+    "definition": "<b>Firma pendiente</b>, puedes iniciarla desde la pestaña de {tabName}.",
+    "context": "<b>Pending eSignature</b>, you can start it from the {tabName} tab."
   },
   {
     "term": "component.petition-preview-signature-review-alert.signature-review",

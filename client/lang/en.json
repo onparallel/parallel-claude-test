@@ -1741,8 +1741,8 @@
   },
   {
     "term": "component.petition-preview-signature-review-alert.signature-required",
-    "definition": "<b>Pending eSignature</b>, you can start it from the Replies tab.",
-    "context": "<b>Pending eSignature</b>, you can start it from the Replies tab."
+    "definition": "<b>Pending eSignature</b>, you can start it from the {tabName} tab.",
+    "context": "<b>Pending eSignature</b>, you can start it from the {tabName} tab."
   },
   {
     "term": "component.petition-preview-signature-review-alert.signature-review",
