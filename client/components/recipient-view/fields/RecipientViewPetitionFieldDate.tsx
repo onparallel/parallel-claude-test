@@ -152,12 +152,6 @@ export function RecipientViewPetitionFieldDate({
       setValue(event.target.value);
       handleCreate(event.target.value, true);
     },
-    placeholder:
-      options.placeholder ??
-      intl.formatMessage({
-        id: "component.recipient-view-petition-field-reply.text-placeholder",
-        defaultMessage: "Enter your answer",
-      }),
   };
   return (
     <RecipientViewPetitionFieldCard
@@ -267,12 +261,6 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
       setValue(event.target.value);
       debouncedUpdateReply(event.target.value);
     },
-    placeholder:
-      options.placeholder ??
-      intl.formatMessage({
-        id: "component.recipient-view-petition-field-reply.text-placeholder",
-        defaultMessage: "Enter your answer",
-      }),
   };
 
   return (

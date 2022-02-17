@@ -6474,280 +6474,6 @@ export type PetitionContents_PetitionFieldFragment = {
   }>;
 };
 
-export type PetitionSettings_UserFragment = {
-  __typename?: "User";
-  hasDeveloperAccess: boolean;
-  hasSkipForwardSecurity: boolean;
-  hasHideRecipientViewContents: boolean;
-  hasPetitionSignature: boolean;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    signatureIntegrations: {
-      __typename?: "OrgIntegrationPagination";
-      items: Array<
-        | {
-            __typename?: "SignatureOrgIntegration";
-            id: string;
-            name: string;
-            isDefault: boolean;
-            environment: SignatureOrgIntegrationEnvironment;
-          }
-        | { __typename?: "SsoOrgIntegration" }
-        | { __typename?: "UserProvisioningOrgIntegration" }
-      >;
-    };
-  };
-};
-
-export type PetitionSettings_PetitionBase_Petition_Fragment = {
-  __typename?: "Petition";
-  status: PetitionStatus;
-  deadline?: string | null;
-  id: string;
-  locale: PetitionLocale;
-  skipForwardSecurity: boolean;
-  isRecipientViewContentsHidden: boolean;
-  isRestricted: boolean;
-  isRestrictedWithPassword: boolean;
-  name?: string | null;
-  currentSignatureRequest?: {
-    __typename?: "PetitionSignatureRequest";
-    id: string;
-    status: PetitionSignatureRequestStatus;
-  } | null;
-  signatureConfig?: {
-    __typename?: "SignatureConfig";
-    title: string;
-    review: boolean;
-    letRecipientsChooseSigners: boolean;
-    integration?: {
-      __typename?: "SignatureOrgIntegration";
-      id: string;
-      name: string;
-      isDefault: boolean;
-      environment: SignatureOrgIntegrationEnvironment;
-    } | null;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      contactId?: string | null;
-      firstName: string;
-      lastName?: string | null;
-      email: string;
-    }>;
-  } | null;
-};
-
-export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
-  __typename?: "PetitionTemplate";
-  isPublic: boolean;
-  id: string;
-  locale: PetitionLocale;
-  skipForwardSecurity: boolean;
-  isRecipientViewContentsHidden: boolean;
-  isRestricted: boolean;
-  isRestrictedWithPassword: boolean;
-  name?: string | null;
-  remindersConfig?: {
-    __typename?: "RemindersConfig";
-    offset: number;
-    time: string;
-    timezone: string;
-    weekdaysOnly: boolean;
-  } | null;
-  publicLink?: {
-    __typename?: "PublicPetitionLink";
-    id: string;
-    url: string;
-    isActive: boolean;
-    title: string;
-    description: string;
-    slug: string;
-    owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
-  } | null;
-  defaultPermissions: Array<
-    | {
-        __typename?: "TemplateDefaultUserGroupPermission";
-        permissionType: PetitionPermissionType;
-        isSubscribed: boolean;
-        group: {
-          __typename?: "UserGroup";
-          id: string;
-          name: string;
-          members: Array<{
-            __typename?: "UserGroupMember";
-            user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
-          }>;
-        };
-      }
-    | {
-        __typename?: "TemplateDefaultUserPermission";
-        permissionType: PetitionPermissionType;
-        isSubscribed: boolean;
-        user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
-      }
-  >;
-  organization: { __typename?: "Organization"; customHost?: string | null };
-  owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
-  signatureConfig?: {
-    __typename?: "SignatureConfig";
-    title: string;
-    review: boolean;
-    letRecipientsChooseSigners: boolean;
-    integration?: {
-      __typename?: "SignatureOrgIntegration";
-      id: string;
-      name: string;
-      isDefault: boolean;
-      environment: SignatureOrgIntegrationEnvironment;
-    } | null;
-    signers: Array<{
-      __typename?: "PetitionSigner";
-      contactId?: string | null;
-      firstName: string;
-      lastName?: string | null;
-      email: string;
-    }>;
-  } | null;
-};
-
-export type PetitionSettings_PetitionBaseFragment =
-  | PetitionSettings_PetitionBase_Petition_Fragment
-  | PetitionSettings_PetitionBase_PetitionTemplate_Fragment;
-
-export type PetitionSettings_updatePetitionRestrictionMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  isRestricted: Scalars["Boolean"];
-  password?: InputMaybe<Scalars["String"]>;
-}>;
-
-export type PetitionSettings_updatePetitionRestrictionMutation = {
-  updatePetitionRestriction:
-    | {
-        __typename?: "Petition";
-        id: string;
-        isRestricted: boolean;
-        isRestrictedWithPassword: boolean;
-      }
-    | {
-        __typename?: "PetitionTemplate";
-        id: string;
-        isRestricted: boolean;
-        isRestrictedWithPassword: boolean;
-      };
-};
-
-export type PetitionSettings_cancelPetitionSignatureRequestMutationVariables = Exact<{
-  petitionSignatureRequestId: Scalars["GID"];
-}>;
-
-export type PetitionSettings_cancelPetitionSignatureRequestMutation = {
-  cancelSignatureRequest: {
-    __typename?: "PetitionSignatureRequest";
-    id: string;
-    status: PetitionSignatureRequestStatus;
-  };
-};
-
-export type PetitionSettings_startPetitionSignatureRequestMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-}>;
-
-export type PetitionSettings_startPetitionSignatureRequestMutation = {
-  startSignatureRequest: {
-    __typename?: "PetitionSignatureRequest";
-    id: string;
-    status: PetitionSignatureRequestStatus;
-  };
-};
-
-export type PetitionSettings_createPublicPetitionLinkMutationVariables = Exact<{
-  templateId: Scalars["GID"];
-  title: Scalars["String"];
-  description: Scalars["String"];
-  ownerId: Scalars["GID"];
-  slug?: InputMaybe<Scalars["String"]>;
-}>;
-
-export type PetitionSettings_createPublicPetitionLinkMutation = {
-  createPublicPetitionLink: {
-    __typename?: "PublicPetitionLink";
-    id: string;
-    isActive: boolean;
-    title: string;
-    description: string;
-    slug: string;
-    url: string;
-    template: {
-      __typename?: "PetitionTemplate";
-      id: string;
-      publicLink?: { __typename?: "PublicPetitionLink"; id: string } | null;
-    };
-    owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
-  };
-};
-
-export type PetitionSettings_updatePublicPetitionLinkMutationVariables = Exact<{
-  publicPetitionLinkId: Scalars["GID"];
-  isActive?: InputMaybe<Scalars["Boolean"]>;
-  title?: InputMaybe<Scalars["String"]>;
-  description?: InputMaybe<Scalars["String"]>;
-  ownerId?: InputMaybe<Scalars["GID"]>;
-  slug?: InputMaybe<Scalars["String"]>;
-}>;
-
-export type PetitionSettings_updatePublicPetitionLinkMutation = {
-  updatePublicPetitionLink: {
-    __typename?: "PublicPetitionLink";
-    id: string;
-    isActive: boolean;
-    title: string;
-    description: string;
-    slug: string;
-    url: string;
-    template: {
-      __typename?: "PetitionTemplate";
-      id: string;
-      publicLink?: { __typename?: "PublicPetitionLink"; id: string } | null;
-    };
-    owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
-  };
-};
-
-export type PetitionSettings_updateTemplateDefaultPermissionsMutationVariables = Exact<{
-  templateId: Scalars["GID"];
-  permissions: Array<UserOrUserGroupPermissionInput> | UserOrUserGroupPermissionInput;
-}>;
-
-export type PetitionSettings_updateTemplateDefaultPermissionsMutation = {
-  updateTemplateDefaultPermissions: {
-    __typename?: "PetitionTemplate";
-    id: string;
-    defaultPermissions: Array<
-      | {
-          __typename?: "TemplateDefaultUserGroupPermission";
-          permissionType: PetitionPermissionType;
-          isSubscribed: boolean;
-          group: {
-            __typename?: "UserGroup";
-            id: string;
-            name: string;
-            members: Array<{
-              __typename?: "UserGroupMember";
-              user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
-            }>;
-          };
-        }
-      | {
-          __typename?: "TemplateDefaultUserPermission";
-          permissionType: PetitionPermissionType;
-          isSubscribed: boolean;
-          user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
-        }
-    >;
-  };
-};
-
 export type TestModeSignatureBadge_UserFragment = {
   __typename?: "User";
   hasPetitionSignature: boolean;
@@ -7660,6 +7386,280 @@ export type PetitionFieldVisibilityEditor_PetitionFieldFragment = {
   options: { [key: string]: any };
   isReadOnly: boolean;
   title?: string | null;
+};
+
+export type PetitionSettings_UserFragment = {
+  __typename?: "User";
+  hasDeveloperAccess: boolean;
+  hasSkipForwardSecurity: boolean;
+  hasHideRecipientViewContents: boolean;
+  hasPetitionSignature: boolean;
+  organization: {
+    __typename?: "Organization";
+    id: string;
+    signatureIntegrations: {
+      __typename?: "OrgIntegrationPagination";
+      items: Array<
+        | {
+            __typename?: "SignatureOrgIntegration";
+            id: string;
+            name: string;
+            isDefault: boolean;
+            environment: SignatureOrgIntegrationEnvironment;
+          }
+        | { __typename?: "SsoOrgIntegration" }
+        | { __typename?: "UserProvisioningOrgIntegration" }
+      >;
+    };
+  };
+};
+
+export type PetitionSettings_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+  status: PetitionStatus;
+  deadline?: string | null;
+  id: string;
+  locale: PetitionLocale;
+  skipForwardSecurity: boolean;
+  isRecipientViewContentsHidden: boolean;
+  isRestricted: boolean;
+  isRestrictedWithPassword: boolean;
+  name?: string | null;
+  currentSignatureRequest?: {
+    __typename?: "PetitionSignatureRequest";
+    id: string;
+    status: PetitionSignatureRequestStatus;
+  } | null;
+  signatureConfig?: {
+    __typename?: "SignatureConfig";
+    title: string;
+    review: boolean;
+    letRecipientsChooseSigners: boolean;
+    integration?: {
+      __typename?: "SignatureOrgIntegration";
+      id: string;
+      name: string;
+      isDefault: boolean;
+      environment: SignatureOrgIntegrationEnvironment;
+    } | null;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      contactId?: string | null;
+      firstName: string;
+      lastName?: string | null;
+      email: string;
+    }>;
+  } | null;
+};
+
+export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  isPublic: boolean;
+  id: string;
+  locale: PetitionLocale;
+  skipForwardSecurity: boolean;
+  isRecipientViewContentsHidden: boolean;
+  isRestricted: boolean;
+  isRestrictedWithPassword: boolean;
+  name?: string | null;
+  remindersConfig?: {
+    __typename?: "RemindersConfig";
+    offset: number;
+    time: string;
+    timezone: string;
+    weekdaysOnly: boolean;
+  } | null;
+  publicLink?: {
+    __typename?: "PublicPetitionLink";
+    id: string;
+    url: string;
+    isActive: boolean;
+    title: string;
+    description: string;
+    slug: string;
+    owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+  } | null;
+  defaultPermissions: Array<
+    | {
+        __typename?: "TemplateDefaultUserGroupPermission";
+        permissionType: PetitionPermissionType;
+        isSubscribed: boolean;
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          name: string;
+          members: Array<{
+            __typename?: "UserGroupMember";
+            user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+          }>;
+        };
+      }
+    | {
+        __typename?: "TemplateDefaultUserPermission";
+        permissionType: PetitionPermissionType;
+        isSubscribed: boolean;
+        user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+      }
+  >;
+  organization: { __typename?: "Organization"; customHost?: string | null };
+  owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+  signatureConfig?: {
+    __typename?: "SignatureConfig";
+    title: string;
+    review: boolean;
+    letRecipientsChooseSigners: boolean;
+    integration?: {
+      __typename?: "SignatureOrgIntegration";
+      id: string;
+      name: string;
+      isDefault: boolean;
+      environment: SignatureOrgIntegrationEnvironment;
+    } | null;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      contactId?: string | null;
+      firstName: string;
+      lastName?: string | null;
+      email: string;
+    }>;
+  } | null;
+};
+
+export type PetitionSettings_PetitionBaseFragment =
+  | PetitionSettings_PetitionBase_Petition_Fragment
+  | PetitionSettings_PetitionBase_PetitionTemplate_Fragment;
+
+export type PetitionSettings_updatePetitionRestrictionMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  isRestricted: Scalars["Boolean"];
+  password?: InputMaybe<Scalars["String"]>;
+}>;
+
+export type PetitionSettings_updatePetitionRestrictionMutation = {
+  updatePetitionRestriction:
+    | {
+        __typename?: "Petition";
+        id: string;
+        isRestricted: boolean;
+        isRestrictedWithPassword: boolean;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        isRestricted: boolean;
+        isRestrictedWithPassword: boolean;
+      };
+};
+
+export type PetitionSettings_cancelPetitionSignatureRequestMutationVariables = Exact<{
+  petitionSignatureRequestId: Scalars["GID"];
+}>;
+
+export type PetitionSettings_cancelPetitionSignatureRequestMutation = {
+  cancelSignatureRequest: {
+    __typename?: "PetitionSignatureRequest";
+    id: string;
+    status: PetitionSignatureRequestStatus;
+  };
+};
+
+export type PetitionSettings_startPetitionSignatureRequestMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type PetitionSettings_startPetitionSignatureRequestMutation = {
+  startSignatureRequest: {
+    __typename?: "PetitionSignatureRequest";
+    id: string;
+    status: PetitionSignatureRequestStatus;
+  };
+};
+
+export type PetitionSettings_createPublicPetitionLinkMutationVariables = Exact<{
+  templateId: Scalars["GID"];
+  title: Scalars["String"];
+  description: Scalars["String"];
+  ownerId: Scalars["GID"];
+  slug?: InputMaybe<Scalars["String"]>;
+}>;
+
+export type PetitionSettings_createPublicPetitionLinkMutation = {
+  createPublicPetitionLink: {
+    __typename?: "PublicPetitionLink";
+    id: string;
+    isActive: boolean;
+    title: string;
+    description: string;
+    slug: string;
+    url: string;
+    template: {
+      __typename?: "PetitionTemplate";
+      id: string;
+      publicLink?: { __typename?: "PublicPetitionLink"; id: string } | null;
+    };
+    owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+  };
+};
+
+export type PetitionSettings_updatePublicPetitionLinkMutationVariables = Exact<{
+  publicPetitionLinkId: Scalars["GID"];
+  isActive?: InputMaybe<Scalars["Boolean"]>;
+  title?: InputMaybe<Scalars["String"]>;
+  description?: InputMaybe<Scalars["String"]>;
+  ownerId?: InputMaybe<Scalars["GID"]>;
+  slug?: InputMaybe<Scalars["String"]>;
+}>;
+
+export type PetitionSettings_updatePublicPetitionLinkMutation = {
+  updatePublicPetitionLink: {
+    __typename?: "PublicPetitionLink";
+    id: string;
+    isActive: boolean;
+    title: string;
+    description: string;
+    slug: string;
+    url: string;
+    template: {
+      __typename?: "PetitionTemplate";
+      id: string;
+      publicLink?: { __typename?: "PublicPetitionLink"; id: string } | null;
+    };
+    owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+  };
+};
+
+export type PetitionSettings_updateTemplateDefaultPermissionsMutationVariables = Exact<{
+  templateId: Scalars["GID"];
+  permissions: Array<UserOrUserGroupPermissionInput> | UserOrUserGroupPermissionInput;
+}>;
+
+export type PetitionSettings_updateTemplateDefaultPermissionsMutation = {
+  updateTemplateDefaultPermissions: {
+    __typename?: "PetitionTemplate";
+    id: string;
+    defaultPermissions: Array<
+      | {
+          __typename?: "TemplateDefaultUserGroupPermission";
+          permissionType: PetitionPermissionType;
+          isSubscribed: boolean;
+          group: {
+            __typename?: "UserGroup";
+            id: string;
+            name: string;
+            members: Array<{
+              __typename?: "UserGroupMember";
+              user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+            }>;
+          };
+        }
+      | {
+          __typename?: "TemplateDefaultUserPermission";
+          permissionType: PetitionPermissionType;
+          isSubscribed: boolean;
+          user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+        }
+    >;
+  };
 };
 
 export type PetitionTemplateComposeMessageEditor_PetitionFragment = {
@@ -21768,125 +21768,6 @@ export const CreateUserDialog_emailIsAvailableDocument = gql`
   CreateUserDialog_emailIsAvailableQuery,
   CreateUserDialog_emailIsAvailableQueryVariables
 >;
-export const PetitionSettings_updatePetitionRestrictionDocument = gql`
-  mutation PetitionSettings_updatePetitionRestriction(
-    $petitionId: GID!
-    $isRestricted: Boolean!
-    $password: String
-  ) {
-    updatePetitionRestriction(
-      petitionId: $petitionId
-      isRestricted: $isRestricted
-      password: $password
-    ) {
-      id
-      isRestricted
-      isRestrictedWithPassword
-    }
-  }
-` as unknown as DocumentNode<
-  PetitionSettings_updatePetitionRestrictionMutation,
-  PetitionSettings_updatePetitionRestrictionMutationVariables
->;
-export const PetitionSettings_cancelPetitionSignatureRequestDocument = gql`
-  mutation PetitionSettings_cancelPetitionSignatureRequest($petitionSignatureRequestId: GID!) {
-    cancelSignatureRequest(petitionSignatureRequestId: $petitionSignatureRequestId) {
-      id
-      status
-    }
-  }
-` as unknown as DocumentNode<
-  PetitionSettings_cancelPetitionSignatureRequestMutation,
-  PetitionSettings_cancelPetitionSignatureRequestMutationVariables
->;
-export const PetitionSettings_startPetitionSignatureRequestDocument = gql`
-  mutation PetitionSettings_startPetitionSignatureRequest($petitionId: GID!) {
-    startSignatureRequest(petitionId: $petitionId) {
-      id
-      status
-    }
-  }
-` as unknown as DocumentNode<
-  PetitionSettings_startPetitionSignatureRequestMutation,
-  PetitionSettings_startPetitionSignatureRequestMutationVariables
->;
-export const PetitionSettings_createPublicPetitionLinkDocument = gql`
-  mutation PetitionSettings_createPublicPetitionLink(
-    $templateId: GID!
-    $title: String!
-    $description: String!
-    $ownerId: GID!
-    $slug: String
-  ) {
-    createPublicPetitionLink(
-      templateId: $templateId
-      title: $title
-      description: $description
-      ownerId: $ownerId
-      slug: $slug
-    ) {
-      ...PublicLinkSettingsDialog_PublicPetitionLink
-      template {
-        id
-        publicLink {
-          id
-        }
-      }
-    }
-  }
-  ${PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc}
-` as unknown as DocumentNode<
-  PetitionSettings_createPublicPetitionLinkMutation,
-  PetitionSettings_createPublicPetitionLinkMutationVariables
->;
-export const PetitionSettings_updatePublicPetitionLinkDocument = gql`
-  mutation PetitionSettings_updatePublicPetitionLink(
-    $publicPetitionLinkId: GID!
-    $isActive: Boolean
-    $title: String
-    $description: String
-    $ownerId: GID
-    $slug: String
-  ) {
-    updatePublicPetitionLink(
-      publicPetitionLinkId: $publicPetitionLinkId
-      isActive: $isActive
-      title: $title
-      description: $description
-      ownerId: $ownerId
-      slug: $slug
-    ) {
-      ...PublicLinkSettingsDialog_PublicPetitionLink
-      template {
-        id
-        publicLink {
-          id
-        }
-      }
-    }
-  }
-  ${PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc}
-` as unknown as DocumentNode<
-  PetitionSettings_updatePublicPetitionLinkMutation,
-  PetitionSettings_updatePublicPetitionLinkMutationVariables
->;
-export const PetitionSettings_updateTemplateDefaultPermissionsDocument = gql`
-  mutation PetitionSettings_updateTemplateDefaultPermissions(
-    $templateId: GID!
-    $permissions: [UserOrUserGroupPermissionInput!]!
-  ) {
-    updateTemplateDefaultPermissions(templateId: $templateId, permissions: $permissions) {
-      id
-      defaultPermissions {
-        ...TemplateDefaultPermissionsDialog_TemplateDefaultPermission
-      }
-    }
-  }
-  ${TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragmentDoc}
-` as unknown as DocumentNode<
-  PetitionSettings_updateTemplateDefaultPermissionsMutation,
-  PetitionSettings_updateTemplateDefaultPermissionsMutationVariables
->;
 export const PetitionSharingModal_addPetitionPermissionDocument = gql`
   mutation PetitionSharingModal_addPetitionPermission(
     $petitionIds: [GID!]!
@@ -22089,6 +21970,125 @@ export const PetitionComposeField_petitionFieldAttachmentDownloadLinkDocument = 
 ` as unknown as DocumentNode<
   PetitionComposeField_petitionFieldAttachmentDownloadLinkMutation,
   PetitionComposeField_petitionFieldAttachmentDownloadLinkMutationVariables
+>;
+export const PetitionSettings_updatePetitionRestrictionDocument = gql`
+  mutation PetitionSettings_updatePetitionRestriction(
+    $petitionId: GID!
+    $isRestricted: Boolean!
+    $password: String
+  ) {
+    updatePetitionRestriction(
+      petitionId: $petitionId
+      isRestricted: $isRestricted
+      password: $password
+    ) {
+      id
+      isRestricted
+      isRestrictedWithPassword
+    }
+  }
+` as unknown as DocumentNode<
+  PetitionSettings_updatePetitionRestrictionMutation,
+  PetitionSettings_updatePetitionRestrictionMutationVariables
+>;
+export const PetitionSettings_cancelPetitionSignatureRequestDocument = gql`
+  mutation PetitionSettings_cancelPetitionSignatureRequest($petitionSignatureRequestId: GID!) {
+    cancelSignatureRequest(petitionSignatureRequestId: $petitionSignatureRequestId) {
+      id
+      status
+    }
+  }
+` as unknown as DocumentNode<
+  PetitionSettings_cancelPetitionSignatureRequestMutation,
+  PetitionSettings_cancelPetitionSignatureRequestMutationVariables
+>;
+export const PetitionSettings_startPetitionSignatureRequestDocument = gql`
+  mutation PetitionSettings_startPetitionSignatureRequest($petitionId: GID!) {
+    startSignatureRequest(petitionId: $petitionId) {
+      id
+      status
+    }
+  }
+` as unknown as DocumentNode<
+  PetitionSettings_startPetitionSignatureRequestMutation,
+  PetitionSettings_startPetitionSignatureRequestMutationVariables
+>;
+export const PetitionSettings_createPublicPetitionLinkDocument = gql`
+  mutation PetitionSettings_createPublicPetitionLink(
+    $templateId: GID!
+    $title: String!
+    $description: String!
+    $ownerId: GID!
+    $slug: String
+  ) {
+    createPublicPetitionLink(
+      templateId: $templateId
+      title: $title
+      description: $description
+      ownerId: $ownerId
+      slug: $slug
+    ) {
+      ...PublicLinkSettingsDialog_PublicPetitionLink
+      template {
+        id
+        publicLink {
+          id
+        }
+      }
+    }
+  }
+  ${PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc}
+` as unknown as DocumentNode<
+  PetitionSettings_createPublicPetitionLinkMutation,
+  PetitionSettings_createPublicPetitionLinkMutationVariables
+>;
+export const PetitionSettings_updatePublicPetitionLinkDocument = gql`
+  mutation PetitionSettings_updatePublicPetitionLink(
+    $publicPetitionLinkId: GID!
+    $isActive: Boolean
+    $title: String
+    $description: String
+    $ownerId: GID
+    $slug: String
+  ) {
+    updatePublicPetitionLink(
+      publicPetitionLinkId: $publicPetitionLinkId
+      isActive: $isActive
+      title: $title
+      description: $description
+      ownerId: $ownerId
+      slug: $slug
+    ) {
+      ...PublicLinkSettingsDialog_PublicPetitionLink
+      template {
+        id
+        publicLink {
+          id
+        }
+      }
+    }
+  }
+  ${PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc}
+` as unknown as DocumentNode<
+  PetitionSettings_updatePublicPetitionLinkMutation,
+  PetitionSettings_updatePublicPetitionLinkMutationVariables
+>;
+export const PetitionSettings_updateTemplateDefaultPermissionsDocument = gql`
+  mutation PetitionSettings_updateTemplateDefaultPermissions(
+    $templateId: GID!
+    $permissions: [UserOrUserGroupPermissionInput!]!
+  ) {
+    updateTemplateDefaultPermissions(templateId: $templateId, permissions: $permissions) {
+      id
+      defaultPermissions {
+        ...TemplateDefaultPermissionsDialog_TemplateDefaultPermission
+      }
+    }
+  }
+  ${TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragmentDoc}
+` as unknown as DocumentNode<
+  PetitionSettings_updateTemplateDefaultPermissionsMutation,
+  PetitionSettings_updateTemplateDefaultPermissionsMutationVariables
 >;
 export const DynamicSelectSettings_uploadDynamicSelectFieldFileDocument = gql`
   mutation DynamicSelectSettings_uploadDynamicSelectFieldFile(

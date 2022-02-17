@@ -54,9 +54,9 @@ export const FIELD_TYPES: PetitionFieldType[] = [
   "FILE_UPLOAD",
   "CHECKBOX",
   "SELECT",
+  "DATE",
   "NUMBER",
   "DYNAMIC_SELECT",
-  "DATE",
 ];
 
 interface PetitionFieldTypeLabelProps {
