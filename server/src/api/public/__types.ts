@@ -4607,7 +4607,7 @@ export type SubmitReply_createDynamicSelectReplyMutation = {
 export type UpdateReplyStatus_updatePetitionFieldRepliesStatusMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   fieldId: Scalars["GID"];
-  replyId: Scalars["GID"];
+  replyIds: Array<Scalars["GID"]> | Scalars["GID"];
   status: PetitionFieldReplyStatus;
 }>;
 
@@ -5675,13 +5675,13 @@ export const UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument = gql`
   mutation UpdateReplyStatus_updatePetitionFieldRepliesStatus(
     $petitionId: GID!
     $fieldId: GID!
-    $replyId: GID!
+    $replyIds: [GID!]!
     $status: PetitionFieldReplyStatus!
   ) {
     updatePetitionFieldRepliesStatus(
       petitionId: $petitionId
       petitionFieldId: $fieldId
-      petitionFieldReplyIds: [$replyId]
+      petitionFieldReplyIds: $replyIds
       status: $status
     ) {
       replies {

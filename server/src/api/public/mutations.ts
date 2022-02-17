@@ -71,13 +71,13 @@ gql`
   mutation UpdateReplyStatus_updatePetitionFieldRepliesStatus(
     $petitionId: GID!
     $fieldId: GID!
-    $replyId: GID!
+    $replyIds: [GID!]!
     $status: PetitionFieldReplyStatus!
   ) {
     updatePetitionFieldRepliesStatus(
       petitionId: $petitionId
       petitionFieldId: $fieldId
-      petitionFieldReplyIds: [$replyId]
+      petitionFieldReplyIds: $replyIds
       status: $status
     ) {
       replies {

@@ -1464,16 +1464,17 @@ api
         }
 
         if (isDefined(body.status)) {
+          const replyId = newReply.id;
           const { updatePetitionFieldRepliesStatus } = await client.request(
             UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
             {
               petitionId: params.petitionId,
               fieldId: params.fieldId,
-              replyId: newReply.id,
+              replyIds: [replyId],
               status: body.status,
             }
           );
-          newReply = updatePetitionFieldRepliesStatus.replies[0];
+          newReply = updatePetitionFieldRepliesStatus.replies.find((r) => r.id === replyId)!;
         }
 
         return Ok(mapReplyResponse(newReply));
@@ -1703,11 +1704,13 @@ api
         {
           petitionId: params.petitionId,
           fieldId: params.fieldId,
-          replyId: params.replyId,
+          replyIds: [params.replyId],
           status: "APPROVED",
         }
       );
-      const updatedReply = updatePetitionFieldRepliesStatus.replies[0];
+      const updatedReply = updatePetitionFieldRepliesStatus.replies.find(
+        (r) => r.id === params.replyId
+      )!;
       return Ok(mapReplyResponse(updatedReply));
     }
   );
@@ -1733,11 +1736,13 @@ api
         {
           petitionId: params.petitionId,
           fieldId: params.fieldId,
-          replyId: params.replyId,
+          replyIds: [params.replyId],
           status: "REJECTED",
         }
       );
-      const updatedReply = updatePetitionFieldRepliesStatus.replies[0];
+      const updatedReply = updatePetitionFieldRepliesStatus.replies.find(
+        (r) => r.id === params.replyId
+      )!;
       return Ok(mapReplyResponse(updatedReply));
     }
   );
