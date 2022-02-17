@@ -126,6 +126,9 @@ export function PetitionTemplateHeader({
           id: "petition.header.compose-tab",
           defaultMessage: "Compose",
         }),
+        attributes: {
+          "data-action": "template-compose",
+        },
       },
       {
         section: "preview",
@@ -133,6 +136,9 @@ export function PetitionTemplateHeader({
           id: "template.header.preview-tab",
           defaultMessage: "Preview",
         }),
+        attributes: {
+          "data-action": "template-preview",
+        },
       },
     ],
     [petition.isRestricted, intl.locale]
@@ -285,10 +291,14 @@ export function PetitionTemplateHeader({
         </Menu>
       </Flex>
       <PetitionHeaderTabs>
-        {sections.map(({ section, label, rightIcon }) => {
+        {sections.map(({ section, label, rightIcon, attributes }) => {
           return (
             <NakedLink key={section} href={`/app/petitions/${petition.id}/${section}`}>
-              <PetitionHeaderTab isActive={current === section} rightIcon={rightIcon}>
+              <PetitionHeaderTab
+                isActive={current === section}
+                rightIcon={rightIcon}
+                {...attributes}
+              >
                 {label}
               </PetitionHeaderTab>
             </NakedLink>

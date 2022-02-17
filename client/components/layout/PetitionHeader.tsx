@@ -151,6 +151,9 @@ export function PetitionHeader({
           id: "petition.header.compose-tab",
           defaultMessage: "Compose",
         }),
+        attributes: {
+          "data-action": "petition-compose",
+        },
       },
       {
         section: "preview",
@@ -158,6 +161,9 @@ export function PetitionHeader({
           id: "petition.header.preview-tab",
           defaultMessage: "Input",
         }),
+        attributes: {
+          "data-action": "petition-preview",
+        },
       },
       {
         section: "replies",
@@ -165,6 +171,9 @@ export function PetitionHeader({
           id: "petition.header.replies-tab",
           defaultMessage: "Review",
         }),
+        attributes: {
+          "data-action": "petition-replies",
+        },
       },
       {
         section: "activity",
@@ -172,6 +181,9 @@ export function PetitionHeader({
           id: "petition.header.activity-tab",
           defaultMessage: "Activity",
         }),
+        attributes: {
+          "data-action": "petition-activity",
+        },
       },
     ],
     [petition.status, petition.isRestricted, intl.locale]
@@ -400,10 +412,14 @@ export function PetitionHeader({
         </Stack>
       </Flex>
       <PetitionHeaderTabs>
-        {sections.map(({ section, label, rightIcon }) => {
+        {sections.map(({ section, label, rightIcon, attributes }) => {
           return (
             <NakedLink key={section} href={`/app/petitions/${petition.id}/${section}`}>
-              <PetitionHeaderTab isActive={current === section} rightIcon={rightIcon}>
+              <PetitionHeaderTab
+                isActive={current === section}
+                rightIcon={rightIcon}
+                {...attributes}
+              >
                 {label}
               </PetitionHeaderTab>
             </NakedLink>
