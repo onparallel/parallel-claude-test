@@ -2,7 +2,6 @@ import { Center, Flex, Input, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { isMetaReturn } from "@parallel/utils/keys";
-import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
@@ -39,8 +38,6 @@ export function RecipientViewPetitionFieldDate({
   onCreateReply,
   onCommentsButtonClick,
 }: RecipientViewPetitionFieldDateProps) {
-  const intl = useIntl();
-
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
   const [value, setValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -49,8 +46,6 @@ export function RecipientViewPetitionFieldDate({
 
   const newReplyRef = useRef<HTMLInputElement>(null);
   const replyRefs = useMultipleRefs<HTMLInputElement>();
-
-  const options = field.options as FieldOptions["DATE"];
 
   function handleAddNewReply() {
     setShowNewReply(true);
@@ -218,7 +213,6 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
   const intl = useIntl();
   const [value, setValue] = useState(reply.content.value ?? "");
   const [isSaving, setIsSaving] = useState(false);
-  const options = field.options as FieldOptions["DATE"];
 
   const debouncedUpdateReply = useDebouncedCallback(
     async (value: string) => {
