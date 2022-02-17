@@ -5,7 +5,7 @@ export function getPetitionSignatureStatus(petition: getPetitionSignatureStatus_
   return petition.signatureConfig?.review &&
     ["COMPLETED", "CLOSED"].includes(petition.status) &&
     (!petition.currentSignatureRequest ||
-      !["ENQUEUED", "PROCESSING"].includes(petition.currentSignatureRequest.status))
+      !["ENQUEUED", "PROCESSING", "PROCESSED"].includes(petition.currentSignatureRequest.status))
     ? "START"
     : petition.currentSignatureRequest?.status ?? (petition.signatureConfig ? "PROCESSING" : null);
 }
