@@ -54,7 +54,7 @@ export function SignatureConfigDialog({
     isAtMax: isLastStep,
     increment: nextStep,
     decrement: previousStep,
-  } = useCounter({ min: 1, max: 2, defaultValue: 1 });
+  } = useCounter({ min: 0, max: 1, defaultValue: 0 });
 
   const titleRef = useRef<HTMLInputElement>(null);
 
@@ -90,8 +90,8 @@ export function SignatureConfigDialog({
     } = step2Props.form;
 
     if (
-      (currentStep === 1 && Object.keys(step1Errors).length > 0) ||
-      (currentStep === 2 && Object.keys(step2Errors).length > 0)
+      (currentStep === 0 && Object.keys(step1Errors).length > 0) ||
+      (currentStep === 1 && Object.keys(step2Errors).length > 0)
     ) {
       return;
     }
@@ -140,16 +140,16 @@ export function SignatureConfigDialog({
       content={{ as: "form" }}
       header={
         <Flex alignItems="center">
-          {stepHeaders[currentStep - 1]}
+          {stepHeaders[currentStep]}
           {!review && (
             <Text marginLeft={2} color="gray.600" fontSize="md" fontWeight="400">
-              {currentStep}/2
+              {currentStep + 1}/2
             </Text>
           )}
         </Flex>
       }
       body={
-        <Steps currentStep={currentStep} startingIndex={1}>
+        <Steps currentStep={currentStep}>
           <SignatureConfigDialogBodyStep1 {...step1Props} />
           <SignatureConfigDialogBodyStep2 {...step2Props} />
         </Steps>
