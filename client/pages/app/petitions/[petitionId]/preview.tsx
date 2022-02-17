@@ -135,9 +135,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         );
         if (canFinalize && isPetition) {
           const fixedSigners = petition!.signatureConfig?.signers ?? [];
-          const allowAdditionalSigners =
-            (fixedSigners.length === 0 || petition.signatureConfig?.allowAdditionalSigners) ??
-            false;
+          const allowAdditionalSigners = petition.signatureConfig?.allowAdditionalSigners ?? false;
           let completeSignerInfoData: ConfirmPetitionSignersDialogResult | null = null;
           if (petition.signatureConfig?.review === false) {
             completeSignerInfoData = await showConfirmPetitionSignersDialog({
@@ -153,7 +151,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             petition.signatureConfig?.integration?.name
           );
 
-          if (allowAdditionalSigners) {
+          if (completeSignerInfoData !== null) {
             await updatePetition({
               variables: {
                 petitionId,

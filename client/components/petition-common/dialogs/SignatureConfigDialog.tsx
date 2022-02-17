@@ -65,7 +65,7 @@ export function SignatureConfigDialog({
   });
 
   const step2Props = useSignatureConfigDialogBodyStep2Props({
-    fixedSigners: petition.signatureConfig?.signers ?? [],
+    signers: petition.signatureConfig?.signers ?? [],
     allowAdditionalSigners: petition.signatureConfig?.allowAdditionalSigners ?? false,
   });
 
@@ -104,12 +104,14 @@ export function SignatureConfigDialog({
         title: data.title,
         orgIntegrationId: data.provider.id,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        signersInfo: data.signers.map((s) => ({
-          contactId: s.contactId,
-          email: s.email,
-          firstName: s.firstName,
-          lastName: s.lastName ?? "",
-        })),
+        signersInfo: review
+          ? []
+          : data.signers.map((s) => ({
+              contactId: s.contactId,
+              email: s.email,
+              firstName: s.firstName,
+              lastName: s.lastName ?? "",
+            })),
         review,
         allowAdditionalSigners: review || data.allowAdditionalSigners || data.signers.length === 0,
       });
@@ -240,7 +242,7 @@ function useSignatureConfigDialogBodyStep1Props({
           petition.signatureConfig?.integration ??
           providers.find((p) => p.isDefault) ??
           providers[0],
-        review: petition.signatureConfig?.review ?? true,
+        review: petition.signatureConfig?.review ?? false,
         title: petition.signatureConfig?.title ?? petition.name ?? "",
       },
     }),
@@ -277,17 +279,17 @@ function SignatureConfigDialogBodyStep1({
   const reviewBeforeSendOptions = useMemo(
     () => [
       {
-        value: "YES",
-        label: intl.formatMessage({
-          id: "component.signature-config-dialog.review-before-send.option-yes",
-          defaultMessage: "After reviewing the information",
-        }),
-      },
-      {
         value: "NO",
         label: intl.formatMessage({
           id: "component.signature-config-dialog.review-before-send.option-no",
           defaultMessage: "After completing the petition",
+        }),
+      },
+      {
+        value: "YES",
+        label: intl.formatMessage({
+          id: "component.signature-config-dialog.review-before-send.option-yes",
+          defaultMessage: "After reviewing the information",
         }),
       },
     ],
@@ -391,7 +393,7 @@ function SignatureConfigDialogBodyStep1({
             <>
               <Select
                 {...reactSelectProps}
-                value={reviewBeforeSendOptions[review ? 0 : 1]}
+                value={reviewBeforeSendOptions[review ? 1 : 0]}
                 options={reviewBeforeSendOptions}
                 onChange={(v: any) => onChange(v.value === "YES")}
                 isDisabled={petitionIsCompleted}
@@ -418,10 +420,10 @@ function SignatureConfigDialogBodyStep1({
 }
 
 function useSignatureConfigDialogBodyStep2Props({
-  fixedSigners,
+  signers,
   allowAdditionalSigners,
 }: {
-  fixedSigners: SignerSelectSelection[];
+  signers: SignerSelectSelection[];
   allowAdditionalSigners?: boolean;
 }) {
   return {
@@ -431,7 +433,7 @@ function useSignatureConfigDialogBodyStep2Props({
     }>({
       mode: "onChange",
       defaultValues: {
-        signers: fixedSigners.map((s) => ({ ...s, isFixed: true })),
+        signers,
         allowAdditionalSigners,
       },
     }),
@@ -483,7 +485,7 @@ export function SignatureConfigDialogBodyStep2({
                 {signers.map((signer, index) => (
                   <SelectedSignerRow
                     key={index}
-                    isEditable={!signer.isFixed}
+                    isEditable
                     signer={signer}
                     onRemoveClick={() => onChange(signers.filter((_, i) => index !== i))}
                     onEditClick={async () => {
