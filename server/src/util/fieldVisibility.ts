@@ -92,12 +92,8 @@ function conditionIsMet(
   function evaluator(reply: any) {
     const _value =
       condition.column !== undefined
-        ? reply.content.columns?.[condition.column]?.[1] ?? null
-        : reply.content.text
-        ? reply.content.text
-        : reply.content.value
-        ? reply.content.value
-        : reply.content.choices;
+        ? reply.content.value?.[condition.column]?.[1] ?? null
+        : reply.content.value;
     return evaluatePredicate(_value, operator, value);
   }
 

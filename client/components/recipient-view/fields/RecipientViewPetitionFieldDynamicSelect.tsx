@@ -176,7 +176,7 @@ const RecipientViewPetitionFieldReplyDynamicSelect = forwardRef<
   );
 
   async function handleChange(value: string, level: number) {
-    const current = reply.content.columns as [string, string][];
+    const current = reply.content.value as [string, string][];
     if (current[level][1] === value) {
       return;
     }
@@ -191,11 +191,11 @@ const RecipientViewPetitionFieldReplyDynamicSelect = forwardRef<
   }
 
   const repliedLabelsCount = reply
-    ? countBy(reply.content.columns as [string, string | null][], ([, value]) => value !== null)
+    ? countBy(reply.content.value as [string, string | null][], ([, value]) => value !== null)
     : 0;
 
   const options =
-    (reply?.content.columns as string[][]) ?? fieldOptions.labels.map((label) => [label, null]);
+    (reply?.content.value as string[][]) ?? fieldOptions.labels.map((label) => [label, null]);
 
   return (
     <Stack>
@@ -256,7 +256,7 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
   const { options, value } = useMemo(() => {
     let values: string[] | DynamicSelectOption[] = fieldOptions.values;
 
-    const replies = (reply?.content.columns as [string, string][]) ?? [];
+    const replies = (reply?.content.value as [string, string][]) ?? [];
     for (let i = 0; i < level; ++i) {
       values =
         (values as DynamicSelectOption[]).find(([label]) => label === replies[i][1])?.[1] ?? [];
@@ -267,10 +267,10 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
         : (values as string[])
       ).map((value) => toSelectOption(value)!),
       value: reply
-        ? toSelectOption((reply.content.columns as [string, string | null][])[level][1] ?? null)
+        ? toSelectOption((reply.content.value as [string, string | null][])[level][1] ?? null)
         : toSelectOption(null),
     };
-  }, [fieldOptions, reply?.content.columns, level]);
+  }, [fieldOptions, reply?.content.value, level]);
 
   async function handleOptionChange(option: OptionType | null) {
     setIsSaving(true);
@@ -286,7 +286,7 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
   // and the recipient tries to update an option with outdated labels, backend will throw error.
   // so we disable the outdated selectors to avoid throwing error
   const labelsAreOutdated =
-    (reply && reply.content.columns[level][0] !== field.options.labels[level]) ?? false;
+    (reply && reply.content.value[level][0] !== field.options.labels[level]) ?? false;
 
   return (
     <FormControl id={rsProps.inputId} isDisabled={labelsAreOutdated}>

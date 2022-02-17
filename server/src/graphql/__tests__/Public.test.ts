@@ -432,7 +432,7 @@ describe("GraphQL/Public", () => {
         expect(errors).toBeUndefined();
         expect(data?.publicCreateCheckboxReply).toEqual({
           id: data?.publicCreateCheckboxReply.id,
-          content: { choices: ["Option 1"] },
+          content: { value: ["Option 1"] },
         });
       });
 
@@ -472,7 +472,7 @@ describe("GraphQL/Public", () => {
         });
         expect(errors).toBeUndefined();
         expect(data?.publicUpdateCheckboxReply).toEqual({
-          content: { choices: ["Option 1", "Option 2"] },
+          content: { value: ["Option 1", "Option 2"] },
         });
       });
     });
@@ -561,7 +561,7 @@ describe("GraphQL/Public", () => {
         expect(errors).toBeUndefined();
         expect(data?.publicCreateSimpleReply).toEqual({
           status: "PENDING",
-          content: { text: "my text reply" },
+          content: { value: "my text reply" },
         });
       });
 
@@ -584,7 +584,7 @@ describe("GraphQL/Public", () => {
         expect(errors).toBeUndefined();
         expect(data?.publicCreateSimpleReply).toEqual({
           status: "PENDING",
-          content: { text: "my short text reply" },
+          content: { value: "my short text reply" },
         });
       });
 
@@ -607,7 +607,7 @@ describe("GraphQL/Public", () => {
         expect(errors).toBeUndefined();
         expect(data?.publicCreateSimpleReply).toEqual({
           status: "PENDING",
-          content: { text: "a" },
+          content: { value: "a" },
         });
       });
 
@@ -885,7 +885,7 @@ describe("GraphQL/Public", () => {
         [textReply] = await mocks.createRandomTextReply(textField.id, access.id, 1);
         [selectReply] = await mocks.createRandomTextReply(selectField.id, access.id, 1, () => ({
           type: "SELECT",
-          content: { text: "2" },
+          content: { value: "2" },
         }));
 
         [approvedReply] = await mocks.createRandomTextReply(
@@ -924,7 +924,7 @@ describe("GraphQL/Public", () => {
         });
         expect(errors).toBeUndefined();
         expect(data?.publicUpdateSimpleReply).toEqual({
-          content: { text: "updated reply" },
+          content: { value: "updated reply" },
           field: {
             petition: {
               id: toGlobalId("Petition", access.petition_id),
@@ -956,7 +956,7 @@ describe("GraphQL/Public", () => {
         expect(data?.publicUpdateSimpleReply).toEqual({
           id: toGlobalId("PetitionFieldReply", textReply.id),
           status: "PENDING",
-          content: { text: "updated reply" },
+          content: { value: "updated reply" },
         });
       });
 
@@ -1147,7 +1147,7 @@ describe("GraphQL/Public", () => {
         expect(data?.publicUpdateSimpleReply).toEqual({
           id: toGlobalId("PetitionFieldReply", textReply.id),
           status: "PENDING",
-          content: { text: "new reply" },
+          content: { value: "new reply" },
         });
       });
 
@@ -1160,7 +1160,7 @@ describe("GraphQL/Public", () => {
           },
         }));
         const [reply] = await mocks.createRandomTextReply(field.id, access.id, 1, () => ({
-          content: { text: "valid" },
+          content: { value: "valid" },
         }));
 
         const { data, errors } = await testClient.mutate({
@@ -1507,7 +1507,7 @@ describe("GraphQL/Public", () => {
         await mocks.createRandomTextReply(singleReplyField.id, access.id, 1, () => ({
           type: "DYNAMIC_SELECT",
           content: {
-            columns: [
+            value: [
               ["Comunidad autónoma", "Cataluña"],
               ["Provincia", "Barcelona"],
             ],
@@ -1538,7 +1538,7 @@ describe("GraphQL/Public", () => {
         expect(data?.publicCreateDynamicSelectReply).toEqual({
           status: "PENDING",
           content: {
-            columns: [
+            value: [
               ["Comunidad autónoma", "Cataluña"],
               ["Provincia", "Barcelona"],
             ],
@@ -1640,7 +1640,7 @@ describe("GraphQL/Public", () => {
           () => ({
             type: "DYNAMIC_SELECT",
             content: {
-              columns: [
+              value: [
                 ["Comunidad autónoma", "Aragón"],
                 ["Provincia", null],
               ],
@@ -1674,7 +1674,7 @@ describe("GraphQL/Public", () => {
         expect(data?.publicUpdateDynamicSelectReply).toEqual({
           id: toGlobalId("PetitionFieldReply", dynamicSelectReply.id),
           content: {
-            columns: [
+            value: [
               ["Comunidad autónoma", "Aragón"],
               ["Provincia", "Zaragoza"],
             ],

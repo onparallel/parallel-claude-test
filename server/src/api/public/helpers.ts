@@ -106,16 +106,13 @@ function mapFieldReplyContent(fieldType: PetitionFieldType, content: any) {
         size: number;
       };
     case "DYNAMIC_SELECT":
-      return content.columns as [string, string][];
+      return content.value as [string, string][];
     case "CHECKBOX":
-      return content.choices as string[];
+      return content.value as string[];
     case "NUMBER":
       return content.value as number;
-    case "DATE":
-    case "PHONE":
-      return content.value as string;
     default:
-      return content.text as string;
+      return content.value as string;
   }
 }
 
@@ -248,11 +245,6 @@ export function mapReplyResponse(
 ) {
   return {
     ...omit(reply, ["field"]),
-    content:
-      reply.content.text ?? // simple replies
-      reply.content.value ?? // numeric replies
-      reply.content.choices ?? // checkbox replies
-      reply.content.columns ?? // dynamic_select replies
-      reply.content, // file_upload replies
+    content: reply.content.value ?? reply.content,
   };
 }

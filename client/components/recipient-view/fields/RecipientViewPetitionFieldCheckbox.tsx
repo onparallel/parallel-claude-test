@@ -24,14 +24,14 @@ export interface RecipientViewPetitionFieldCheckboxProps
 
 const haveChanges = ({
   checked,
-  choices,
+  value,
   max,
 }: {
   checked: string[];
-  choices: string[];
+  value: string[];
   max: number;
 }) => {
-  return max === 1 ? checked[0] !== choices[0] : checked.length !== choices.length;
+  return max === 1 ? checked[0] !== value[0] : checked.length !== value.length;
 };
 
 function CustomIcon() {
@@ -57,7 +57,7 @@ export function RecipientViewPetitionFieldCheckbox({
   const isRejected = reply?.status === "REJECTED" ?? false;
   const showRadio = max === 1 && type !== "UNLIMITED";
 
-  const [checkedItems, setCheckedItems] = useState<string[]>(reply?.content?.choices ?? []);
+  const [checkedItems, setCheckedItems] = useState<string[]>(reply?.content?.value ?? []);
   const [isSaving, setIsSaving] = useState(false);
 
   const handleUpdate = async (value: string[]) => {
@@ -102,7 +102,7 @@ export function RecipientViewPetitionFieldCheckbox({
       if (
         haveChanges({
           checked: filteredChecked,
-          choices: reply.content.choices,
+          value: reply.content.value,
           max: type === "UNLIMITED" ? values.length : max,
         })
       ) {

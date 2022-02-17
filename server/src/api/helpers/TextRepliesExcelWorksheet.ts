@@ -22,7 +22,7 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
       this.addRows(
         replies.map((r, i) => ({
           title: field.title?.concat(field.multiple ? ` [${i + 1}]` : "") || "",
-          answer: r.content.text,
+          answer: r.content.value,
         }))
       );
     } else {
@@ -60,7 +60,7 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
     if (replies.length > 0) {
       this.addRows(
         replies.flatMap((r, i) =>
-          (r.content.columns as [string, string | null][]).map(([label, value]) => ({
+          (r.content.value as [string, string | null][]).map(([label, value]) => ({
             title: field.title?.concat(` (${label})`, field.multiple ? ` [${i + 1}]` : "") || "",
             answer: value ?? this.noAnswerLabel,
           }))
@@ -75,7 +75,7 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
     if (replies.length > 0) {
       this.addRows(
         replies.flatMap((r, i) =>
-          (r.content.choices as [string]).map((value) => ({
+          (r.content.value as [string]).map((value) => ({
             title: field.title || "",
             answer: value,
           }))

@@ -346,15 +346,12 @@ export const publicCreateSimpleReply = mutationField("publicCreateSimpleReply", 
   validateArgs: validateFieldReply("fieldId", "value", "value"),
   resolve: async (_, args, ctx) => {
     const field = (await ctx.petitions.loadField(args.fieldId))!;
-    const content = ["PHONE", "DATE"].includes(field.type)
-      ? { value: args.value }
-      : { text: args.value };
     return await ctx.petitions.createPetitionFieldReply(
       {
         petition_field_id: args.fieldId,
         petition_access_id: ctx.access!.id,
         type: field.type,
-        content,
+        content: { value: args.value },
       },
       ctx.contact!
     );
@@ -379,16 +376,12 @@ export const publicUpdateSimpleReply = mutationField("publicUpdateSimpleReply", 
   ),
   validateArgs: validateReplyUpdate("replyId", "value", "value"),
   resolve: async (_, args, ctx) => {
-    const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
-    const content = ["PHONE", "DATE"].includes(field.type)
-      ? { value: args.value }
-      : { text: args.value };
     return await ctx.petitions.updatePetitionFieldReply(
       args.replyId,
       {
         petition_access_id: ctx.access!.id,
         user_id: null,
-        content,
+        content: { value: args.value },
         status: "PENDING",
       },
       ctx.access!
@@ -480,7 +473,7 @@ export const publicCreateCheckboxReply = mutationField("publicCreateCheckboxRepl
         petition_field_id: args.fieldId,
         petition_access_id: ctx.access!.id,
         type: "CHECKBOX",
-        content: { choices: args.values },
+        content: { value: args.values },
       },
       ctx.contact!
     );
@@ -510,7 +503,7 @@ export const publicUpdateCheckboxReply = mutationField("publicUpdateCheckboxRepl
       {
         petition_access_id: ctx.access!.id,
         user_id: null,
-        content: { choices: args.values },
+        content: { value: args.values },
         status: "PENDING",
       },
       ctx.access!
@@ -541,7 +534,7 @@ export const publicCreateDynamicSelectReply = mutationField("publicCreateDynamic
         petition_field_id: args.fieldId,
         petition_access_id: ctx.access!.id,
         type: "DYNAMIC_SELECT",
-        content: { columns: args.value },
+        content: { value: args.value },
       },
       ctx.contact!
     );
@@ -571,7 +564,7 @@ export const publicUpdateDynamicSelectReply = mutationField("publicUpdateDynamic
       {
         petition_access_id: ctx.access!.id,
         user_id: null,
-        content: { columns: args.value },
+        content: { value: args.value },
         status: "PENDING",
       },
       ctx.access!

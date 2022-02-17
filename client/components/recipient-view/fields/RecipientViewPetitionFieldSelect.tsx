@@ -175,7 +175,7 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
   ref
 ) {
   const intl = useIntl();
-  const [value, setValue] = useState(toSelectOption(reply.content.text));
+  const [value, setValue] = useState(toSelectOption(reply.content.value));
   const [isSaving, setIsSaving] = useState(false);
 
   const options = field.options as FieldOptions["SELECT"];

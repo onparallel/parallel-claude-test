@@ -59,7 +59,7 @@ export function PdfFieldWithReplies({ field }: { field: PetitionPdf_PetitionFiel
               </Text>
             ) : field.type === "DYNAMIC_SELECT" ? (
               <Stack spacing={0} key={reply.id}>
-                {(reply.content.columns as [string, string | null][]).map(([label, value], i) => (
+                {(reply.content.value as [string, string | null][]).map(([label, value], i) => (
                   <Text textAlign="justify" key={i}>
                     {label}:{" "}
                     {value ?? (
@@ -75,7 +75,7 @@ export function PdfFieldWithReplies({ field }: { field: PetitionPdf_PetitionFiel
               </Stack>
             ) : field.type === "CHECKBOX" ? (
               <Stack spacing={0} key={reply.id}>
-                {(reply.content.choices as [string]).map((value, i) => (
+                {(reply.content.value as [string]).map((value, i) => (
                   <Text textAlign="justify" key={i}>
                     {value}
                   </Text>
@@ -101,7 +101,7 @@ export function PdfFieldWithReplies({ field }: { field: PetitionPdf_PetitionFiel
               </Text>
             ) : (
               <Text textAlign="justify" key={reply.id}>
-                <BreakLines>{reply.content.text}</BreakLines>
+                <BreakLines>{reply.content.value}</BreakLines>
               </Text>
             )
           )}

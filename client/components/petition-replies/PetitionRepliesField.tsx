@@ -249,7 +249,7 @@ export const PetitionRepliesField = Object.assign(
                 divider={<ArrowForwardIcon border="none" />}
                 marginBottom={2}
               >
-                {(field.replies[0].content.columns as string[][])?.map(([label], index) => (
+                {(field.replies[0].content.value as string[][])?.map(([label], index) => (
                   <Box key={index} as="li">
                     {label}
                   </Box>

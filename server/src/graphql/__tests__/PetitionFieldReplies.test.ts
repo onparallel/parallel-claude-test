@@ -125,7 +125,7 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(errors).toBeUndefined();
       expect(data?.createSimpleReply).toEqual({
         id: data!.createSimpleReply.id,
-        content: { text: "my reply" },
+        content: { value: "my reply" },
         field: {
           id: toGlobalId("PetitionField", field.id),
           replies: [{ id: data!.createSimpleReply.id }],
@@ -188,7 +188,7 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(errors).toBeUndefined();
       expect(omit(data!.createSimpleReply, ["id"])).toEqual({
         status: "PENDING",
-        content: { text: "this is my text reply" },
+        content: { value: "this is my text reply" },
         field: {
           id: toGlobalId("PetitionField", fields[0].id),
         },
@@ -542,20 +542,20 @@ describe("GraphQL/Petition Field Replies", () => {
         user_id: user.id,
         petition_access_id: null,
         type: "SELECT",
-        content: { text: "option 1" },
+        content: { value: "option 1" },
       }));
       [approvedReply] = await mocks.createRandomTextReply(fields[1].id, 0, 1, () => ({
         user_id: user.id,
         petition_access_id: null,
         type: "SELECT",
-        content: { text: "option 1" },
+        content: { value: "option 1" },
         status: "APPROVED",
       }));
       [rejectedReply] = await mocks.createRandomTextReply(fields[1].id, 0, 1, () => ({
         user_id: user.id,
         petition_access_id: null,
         type: "SELECT",
-        content: { text: "option 2" },
+        content: { value: "option 2" },
         status: "REJECTED",
       }));
       [dateReply] = await mocks.createRandomDateReply(dateField.id, 0, 1, () => ({
@@ -657,7 +657,7 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(data!.updateSimpleReply).toEqual({
         id: toGlobalId("PetitionFieldReply", rejectedReply.id),
         status: "PENDING",
-        content: { text: "option 1" },
+        content: { value: "option 1" },
       });
     });
 
@@ -734,7 +734,7 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(errors).toBeUndefined();
       expect(omit(data!.updateSimpleReply, ["id"])).toEqual({
         status: "PENDING",
-        content: { text: "my new reply" },
+        content: { value: "my new reply" },
       });
 
       const replyId = fromGlobalId(data!.updateSimpleReply.id, "PetitionFieldReply").id;
@@ -1066,7 +1066,7 @@ describe("GraphQL/Petition Field Replies", () => {
         },
       }));
       const [reply] = await mocks.createRandomTextReply(field.id, 0, 1, () => ({
-        content: { text: "valid" },
+        content: { value: "valid" },
         user_id: user.id,
         petition_access_id: null,
       }));
@@ -1128,7 +1128,7 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(errors).toBeUndefined();
       expect(data?.createCheckboxReply).toEqual({
         status: "PENDING",
-        content: { choices: ["1", "2"] },
+        content: { value: ["1", "2"] },
       });
     });
 
@@ -1462,7 +1462,7 @@ describe("GraphQL/Petition Field Replies", () => {
       [fieldReply] = await mocks.knex
         .from<PetitionFieldReply>("petition_field_reply")
         .insert({
-          content: { choices: ["1"] },
+          content: { value: ["1"] },
           petition_field_id: checkboxField.id,
           user_id: user.id,
           status: "PENDING",
@@ -1493,7 +1493,7 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(data?.updateCheckboxReply).toEqual({
         id: toGlobalId("PetitionFieldReply", fieldReply.id),
         status: "PENDING",
-        content: { choices: ["2"] },
+        content: { value: ["2"] },
       });
     });
 
@@ -1612,7 +1612,7 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(errors).toBeUndefined();
       expect(data?.createDynamicSelectReply).toEqual({
         content: {
-          columns: [
+          value: [
             ["Comunidad autónoma", "Andalucía"],
             ["Provincia", "Cadiz"],
           ],
@@ -1671,7 +1671,7 @@ describe("GraphQL/Petition Field Replies", () => {
 
       await mocks.knex.from<PetitionFieldReply>("petition_field_reply").insert({
         content: {
-          columns: [
+          value: [
             ["Comunidad autónoma", "Andalucía"],
             ["Provincia", "Cadiz"],
           ],
@@ -1728,7 +1728,7 @@ describe("GraphQL/Petition Field Replies", () => {
         .insert({
           type: "DYNAMIC_SELECT",
           content: {
-            columns: [
+            value: [
               ["Comunidad autónoma", "Andalucía"],
               ["Provincia", "Cadiz"],
             ],
@@ -1763,7 +1763,7 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(data?.updateDynamicSelectReply).toEqual({
         id: toGlobalId("PetitionFieldReply", dynamicSelectReply.id),
         content: {
-          columns: [
+          value: [
             ["Comunidad autónoma", "Canarias"],
             ["Provincia", "Lanzarote"],
           ],
@@ -1795,7 +1795,7 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(data?.updateDynamicSelectReply).toEqual({
         id: toGlobalId("PetitionFieldReply", dynamicSelectReply.id),
         content: {
-          columns: [
+          value: [
             ["Comunidad autónoma", "Canarias"],
             ["Provincia", null],
           ],
@@ -1846,7 +1846,7 @@ describe("GraphQL/Petition Field Replies", () => {
       const [reply] = await mocks.knex.from<PetitionFieldReply>("petition_field_reply").insert(
         {
           content: {
-            columns: [
+            value: [
               ["Comunidad autónoma", "Andalucía"],
               ["Provincia", "Cadiz"],
             ],

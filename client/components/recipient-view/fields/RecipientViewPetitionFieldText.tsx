@@ -236,7 +236,7 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
   ref
 ) {
   const intl = useIntl();
-  const [value, setValue] = useState(reply.content.text ?? "");
+  const [value, setValue] = useState(reply.content.value ?? "");
   const [isSaving, setIsSaving] = useState(false);
   const options =
     field.type === "TEXT"

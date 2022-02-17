@@ -51,7 +51,7 @@ export function PetitionRepliesFieldReply({
     <Flex>
       <Box paddingRight={2} borderRight="2px solid" borderColor="gray.200">
         {isTextLikeType ? (
-          <CopyToClipboardButton size="xs" text={reply.content.text} />
+          <CopyToClipboardButton size="xs" text={reply.content.value} />
         ) : reply.field!.type === "NUMBER" ? (
           <CopyToClipboardButton
             size="xs"
@@ -94,7 +94,7 @@ export function PetitionRepliesFieldReply({
           </Stack>
         ) : reply.field!.type === "DYNAMIC_SELECT" ? (
           <Stack spacing={1}>
-            {(reply.content.columns as [string, string | null][]).map(([label, value], index) =>
+            {(reply.content.value as [string, string | null][]).map(([label, value], index) =>
               value ? (
                 <CopyToClipboardButton
                   key={index}
@@ -113,7 +113,7 @@ export function PetitionRepliesFieldReply({
           </Stack>
         ) : reply.field!.type === "CHECKBOX" ? (
           <Stack spacing={1}>
-            {(reply.content.choices as string[]).map((value, index) => (
+            {(reply.content.value as string[]).map((value, index) => (
               <CopyToClipboardButton key={index} size="xs" text={value} />
             ))}
           </Stack>
@@ -121,7 +121,7 @@ export function PetitionRepliesFieldReply({
       </Box>
       <Flex flexDirection="column" justifyContent="center" flex="1" marginLeft={2}>
         {isTextLikeType ? (
-          <BreakLines>{reply.content.text}</BreakLines>
+          <BreakLines>{reply.content.value}</BreakLines>
         ) : reply.field!.type === "NUMBER" ? (
           <Text wordBreak="break-all" whiteSpace="pre">
             {formatNumberWithPrefix(
@@ -164,13 +164,13 @@ export function PetitionRepliesFieldReply({
           </Box>
         ) : reply.field!.type === "DYNAMIC_SELECT" ? (
           <List spacing={1}>
-            {(reply.content.columns as [string, string][]).map(([, value], index) => (
+            {(reply.content.value as [string, string][]).map(([, value], index) => (
               <ListItem key={index}>{value}</ListItem>
             ))}
           </List>
         ) : reply.field!.type === "CHECKBOX" ? (
           <List spacing={1}>
-            {(reply.content.choices as string[]).map((value, index) => (
+            {(reply.content.value as string[]).map((value, index) => (
               <ListItem key={index}>{value}</ListItem>
             ))}
           </List>

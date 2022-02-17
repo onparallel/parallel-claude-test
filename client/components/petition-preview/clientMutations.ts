@@ -119,8 +119,7 @@ export function useUpdateSimpleReply() {
       if (isCacheOnly) {
         updateReplyContent(client, replyId, (content) => ({
           ...content,
-          text: reply,
-          value: reply, // this is a temporal fix and will be removed once feat/ch2213 is released
+          value: reply,
         }));
       } else {
         await updateSimpleReply({
@@ -185,7 +184,7 @@ export function useCreateSimpleReply() {
             id,
             __typename: "PetitionFieldReply",
             status: "PENDING",
-            content: { text: reply, value: reply },
+            content: { value: reply },
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           },
@@ -389,7 +388,7 @@ export function useCreateCheckboxReply() {
             id,
             __typename: "PetitionFieldReply",
             status: "PENDING",
-            content: { choices: values },
+            content: { value: values },
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           },
@@ -455,7 +454,7 @@ export function useUpdateCheckboxReply() {
       if (isCacheOnly) {
         updateReplyContent(client, replyId, (content) => ({
           ...content,
-          choices: values,
+          value: values,
         }));
       } else {
         await updateCheckboxReply({
@@ -522,7 +521,7 @@ export function useCreateDynamicSelectReply() {
             id,
             __typename: "PetitionFieldReply",
             status: "PENDING",
-            content: { columns: value },
+            content: { value },
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           },
@@ -588,7 +587,7 @@ export function useUpdateDynamicSelectReply() {
       if (isCacheOnly) {
         updateReplyContent(client, replyId, (content) => ({
           ...content,
-          columns: value,
+          value,
         }));
       } else {
         await updateDynamicSelectReply({

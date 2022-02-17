@@ -345,16 +345,6 @@ export const PublicPetitionFieldReply = objectType({
       description: "The public content of the reply",
       resolve: async (root, _, ctx) => {
         switch (root.type) {
-          case "TEXT":
-          case "SHORT_TEXT":
-          case "SELECT":
-          case "DYNAMIC_SELECT":
-          case "NUMBER":
-          case "PHONE":
-          case "DATE":
-          case "CHECKBOX": {
-            return root.content;
-          }
           case "FILE_UPLOAD": {
             const file = await ctx.files.loadFileUpload(root.content["file_upload_id"]);
             return file
@@ -368,7 +358,7 @@ export const PublicPetitionFieldReply = objectType({
               : {};
           }
           default:
-            return {};
+            return root.content ?? {};
         }
       },
     });

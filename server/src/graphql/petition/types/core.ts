@@ -673,16 +673,6 @@ export const PetitionFieldReply = objectType({
       description: "The content of the reply.",
       resolve: async (root, _, ctx) => {
         switch (root.type) {
-          case "TEXT":
-          case "SHORT_TEXT":
-          case "SELECT":
-          case "DYNAMIC_SELECT":
-          case "NUMBER":
-          case "DATE":
-          case "PHONE":
-          case "CHECKBOX": {
-            return root.content;
-          }
           case "FILE_UPLOAD": {
             const file = await ctx.files.loadFileUpload(root.content["file_upload_id"]);
             return file
@@ -696,7 +686,7 @@ export const PetitionFieldReply = objectType({
               : {};
           }
           default:
-            return {};
+            return root.content ?? {};
         }
       },
     });
