@@ -567,3 +567,37 @@ export const updateFeatureFlag = mutationField("updateFeatureFlag", {
     }
   },
 });
+
+export const updateOrganizationUserLimit = mutationField("updateOrganizationUserLimit", {
+  description: "Updates the user limit for a organization",
+  type: "SupportMethodResponse",
+  args: {
+    orgId: nonNull(intArg({ description: "Numeric ID of the organization" })),
+    limit: nonNull(intArg({ description: "How many users allow the org to create" })),
+  },
+  authorize: supportMethodAccess(),
+  resolve: async (_, { orgId, limit }, ctx) => {
+    try {
+      const org = await ctx.organizations.loadOrg(orgId);
+      if (!org) {
+        return { result: RESULT.FAILURE, message: `Organization:${orgId} not found` };
+      }
+      await ctx.organizations.updateOrganization(
+        orgId,
+        {
+          usage_details: {
+            ...org.usage_details,
+            USER_LIMIT: limit,
+          },
+        },
+        `User:${ctx.user!.id}`
+      );
+      return {
+        result: RESULT.SUCCESS,
+        message: `Organization "${org.name}" with ID ${orgId}, USER_LIMIT has been updated from ${org.usage_details.USER_LIMIT} to ${limit}.`,
+      };
+    } catch (error: any) {
+      return { result: RESULT.FAILURE, message: error.message };
+    }
+  },
+});

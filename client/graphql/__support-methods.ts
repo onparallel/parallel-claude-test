@@ -589,6 +589,46 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "updateOrganizationUserLimit",
+      description: "Updates the user limit for a organization",
+      args: [
+        {
+          name: "limit",
+          description: "How many users allow the org to create",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "Int", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "orgId",
+          description: "Numeric ID of the organization",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "Int", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "uploadUserAvatar",
       description: "Uploads a user avatar image",
       args: [

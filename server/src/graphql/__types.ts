@@ -971,6 +971,7 @@ export interface NexusGenFieldTypes {
     updateOrganizationLogo: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationPreferredTone: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationUser: NexusGenRootTypes["User"]; // User!
+    updateOrganizationUserLimit: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updatePetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     updatePetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
@@ -2280,6 +2281,7 @@ export interface NexusGenFieldTypeNames {
     updateOrganizationLogo: "Organization";
     updateOrganizationPreferredTone: "Organization";
     updateOrganizationUser: "User";
+    updateOrganizationUserLimit: "SupportMethodResponse";
     updatePetition: "PetitionBase";
     updatePetitionField: "PetitionField";
     updatePetitionFieldComment: "PetitionFieldComment";
@@ -3963,6 +3965,11 @@ export interface NexusGenArgTypes {
       // args
       role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
       userId: NexusGenScalars["GID"]; // GID!
+    };
+    updateOrganizationUserLimit: {
+      // args
+      limit: number; // Int!
+      orgId: number; // Int!
     };
     updatePetition: {
       // args

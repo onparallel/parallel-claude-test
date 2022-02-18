@@ -572,6 +572,8 @@ export type Mutation = {
   updateOrganizationPreferredTone: Organization;
   /** Updates the role of another user in the organization. */
   updateOrganizationUser: User;
+  /** Updates the user limit for a organization */
+  updateOrganizationUserLimit: SupportMethodResponse;
   /** Updates a petition. */
   updatePetition: PetitionBase;
   /** Updates a petition field. */
@@ -1316,6 +1318,11 @@ export type MutationupdateOrganizationPreferredToneArgs = {
 export type MutationupdateOrganizationUserArgs = {
   role: OrganizationRole;
   userId: Scalars["GID"];
+};
+
+export type MutationupdateOrganizationUserLimitArgs = {
+  limit: Scalars["Int"];
+  orgId: Scalars["Int"];
 };
 
 export type MutationupdatePetitionArgs = {

@@ -602,6 +602,8 @@ export interface Mutation {
   updateOrganizationPreferredTone: Organization;
   /** Updates the role of another user in the organization. */
   updateOrganizationUser: User;
+  /** Updates the user limit for a organization */
+  updateOrganizationUserLimit: SupportMethodResponse;
   /** Updates a petition. */
   updatePetition: PetitionBase;
   /** Updates a petition field. */
@@ -1346,6 +1348,11 @@ export interface MutationupdateOrganizationPreferredToneArgs {
 export interface MutationupdateOrganizationUserArgs {
   role: OrganizationRole;
   userId: Scalars["GID"];
+}
+
+export interface MutationupdateOrganizationUserLimitArgs {
+  limit: Scalars["Int"];
+  orgId: Scalars["Int"];
 }
 
 export interface MutationupdatePetitionArgs {

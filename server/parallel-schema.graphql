@@ -1373,6 +1373,21 @@ type Mutation {
   updateOrganizationUser(role: OrganizationRole!, userId: GID!): User!
 
   """
+  Updates the user limit for a organization
+  """
+  updateOrganizationUserLimit(
+    """
+    How many users allow the org to create
+    """
+    limit: Int!
+
+    """
+    Numeric ID of the organization
+    """
+    orgId: Int!
+  ): SupportMethodResponse!
+
+  """
   Updates a petition.
   """
   updatePetition(data: UpdatePetitionInput!, petitionId: GID!): PetitionBase!
