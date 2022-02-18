@@ -293,6 +293,40 @@ export class Mocks {
       .returning("*");
   }
 
+  async createRandomPhoneReply(
+    phoneFieldId: number,
+    access_id: number,
+    amount?: number,
+    builder?: (index: number) => Partial<PetitionFieldReply>
+  ) {
+    const phoneNumbers = [
+      "+44 7911 123456",
+      "+1-212-456-7890",
+      "+37060112345",
+      "+442012341234",
+      "+1-541-754-3010",
+      "+49-89-636-48018",
+      "+34 625 15 54 81",
+      "+7 (952) 814 16 48",
+    ];
+
+    return await this.knex<PetitionFieldReply>("petition_field_reply")
+      .insert(
+        range(0, amount || 1).map<CreatePetitionFieldReply>((index) => {
+          return {
+            petition_field_id: phoneFieldId,
+            content: {
+              value: phoneNumbers[Math.floor(Math.random() * phoneNumbers.length)],
+            },
+            type: "PHONE",
+            petition_access_id: access_id,
+            ...builder?.(index),
+          };
+        })
+      )
+      .returning("*");
+  }
+
   async createRandomFileUpload(amount?: number, builder?: (index: number) => Partial<FileUpload>) {
     return await this.knex<FileUpload>("file_upload")
       .insert(

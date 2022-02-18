@@ -57,10 +57,18 @@ describe("GraphQL/Petition Field Replies", () => {
 
   describe("createSimpleReply", () => {
     let dateField: PetitionField;
+    let phoneField: PetitionField;
 
     beforeAll(async () => {
       [dateField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
         type: "DATE",
+        options: {},
+        multiple: true,
+        optional: true,
+      }));
+
+      [phoneField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "PHONE",
         options: {},
         multiple: true,
         optional: true,
@@ -296,6 +304,70 @@ describe("GraphQL/Petition Field Replies", () => {
       });
     });
 
+    it("creates a new reply type PHONE with spanish number", async () => {
+      const { data, errors } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $reply: String!) {
+            createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+              id
+              status
+              content
+              field {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", phoneField.id),
+          reply: "+34 672 62 55 77",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.createSimpleReply).toEqual({
+        id: data!.createSimpleReply.id,
+        status: "PENDING",
+        content: { value: "+34 672 62 55 77" },
+        field: {
+          id: toGlobalId("PetitionField", phoneField.id),
+        },
+      });
+    });
+
+    it("creates a new reply type PHONE with russian number", async () => {
+      const { data, errors } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $reply: String!) {
+            createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+              id
+              status
+              content
+              field {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", phoneField.id),
+          reply: "+7 (958) 822 25 34",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.createSimpleReply).toEqual({
+        id: data!.createSimpleReply.id,
+        status: "PENDING",
+        content: { value: "+7 (958) 822 25 34" },
+        field: {
+          id: toGlobalId("PetitionField", phoneField.id),
+        },
+      });
+    });
+
     it("sends error when creating a reply with wrong format date in DATE field", async () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
@@ -339,6 +411,31 @@ describe("GraphQL/Petition Field Replies", () => {
           petitionId: toGlobalId("Petition", petition.id),
           fieldId: toGlobalId("PetitionField", dateField.id),
           reply: "2012-22-24",
+        },
+      });
+
+      expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when creating a reply with invalid phone in PHONE field", async () => {
+      const { data, errors } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $reply: String!) {
+            createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+              id
+              status
+              content
+              field {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", phoneField.id),
+          reply: "+34 672 622 553 774",
         },
       });
 
@@ -407,9 +504,18 @@ describe("GraphQL/Petition Field Replies", () => {
     let dateReply: PetitionFieldReply;
     let approvedReply: PetitionFieldReply;
     let rejectedReply: PetitionFieldReply;
+    let phoneReply: PetitionFieldReply;
+
     beforeAll(async () => {
       const [dateField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
         type: "DATE",
+        options: {},
+        multiple: true,
+        optional: true,
+      }));
+
+      const [phoneField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "PHONE",
         options: {},
         multiple: true,
         optional: true,
@@ -453,6 +559,11 @@ describe("GraphQL/Petition Field Replies", () => {
         status: "REJECTED",
       }));
       [dateReply] = await mocks.createRandomDateReply(dateField.id, 0, 1, () => ({
+        user_id: user.id,
+        petition_access_id: null,
+        created_by: `User:${user.id}`,
+      }));
+      [phoneReply] = await mocks.createRandomPhoneReply(phoneField.id, 0, 1, () => ({
         user_id: user.id,
         petition_access_id: null,
         created_by: `User:${user.id}`,
@@ -573,6 +684,32 @@ describe("GraphQL/Petition Field Replies", () => {
         id: toGlobalId("PetitionFieldReply", dateReply.id),
         status: "PENDING",
         content: { value: "2012-02-21" },
+      });
+    });
+
+    it("updates a reply type PHONE", async () => {
+      const { data, errors } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $replyId: GID!, $reply: String!) {
+            updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+              id
+              status
+              content
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", phoneReply.id),
+          reply: "+34 674 15 15 36",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.updateSimpleReply).toEqual({
+        id: toGlobalId("PetitionFieldReply", phoneReply.id),
+        status: "PENDING",
+        content: { value: "+34 674 15 15 36" },
       });
     });
 
@@ -852,6 +989,28 @@ describe("GraphQL/Petition Field Replies", () => {
           petitionId: toGlobalId("Petition", petition.id),
           replyId: toGlobalId("PetitionFieldReply", dateReply.id),
           reply: "2012.01.24",
+        },
+      });
+
+      expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error trying to update a PHONE reply with a invalid phone", async () => {
+      const { data, errors } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $replyId: GID!, $reply: String!) {
+            updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+              id
+              status
+              content
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          replyId: toGlobalId("PetitionFieldReply", phoneReply.id),
+          reply: "tel: +34 674 15 15 36",
         },
       });
 
