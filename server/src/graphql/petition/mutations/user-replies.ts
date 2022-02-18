@@ -31,7 +31,9 @@ export const createSimpleReply = mutationField("createSimpleReply", {
   validateArgs: validateFieldReply("fieldId", "reply", "reply"),
   resolve: async (_, args, ctx) => {
     const field = (await ctx.petitions.loadField(args.fieldId))!;
-    const content = ["PHONE", "DATE"].includes(field.type) ? { value: args.reply } : { text: args.reply };
+    const content = ["PHONE", "DATE"].includes(field.type)
+      ? { value: args.reply }
+      : { text: args.reply };
     return await ctx.petitions.createPetitionFieldReply(
       {
         petition_field_id: args.fieldId,
@@ -62,7 +64,9 @@ export const updateSimpleReply = mutationField("updateSimpleReply", {
   validateArgs: validateReplyUpdate("replyId", "reply", "reply"),
   resolve: async (_, args, ctx) => {
     const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
-    const content = ["PHONE", "DATE"].includes(field.type) ? { value: args.reply } : { text: args.reply };
+    const content = ["PHONE", "DATE"].includes(field.type)
+      ? { value: args.reply }
+      : { text: args.reply };
     return await ctx.petitions.updatePetitionFieldReply(
       args.replyId,
       {

@@ -678,7 +678,7 @@ export const PetitionFieldReply = objectType({
           case "SELECT":
           case "DYNAMIC_SELECT":
           case "NUMBER":
-          case "DATE": 
+          case "DATE":
           case "PHONE":
           case "CHECKBOX": {
             return root.content;
