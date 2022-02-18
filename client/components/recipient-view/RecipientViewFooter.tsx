@@ -18,8 +18,8 @@ export function RecipientViewFooter(props: RecipientViewFooterProps) {
     <Flex flexDirection="column" marginTop={12} as="footer" alignItems="center" {...props}>
       <Flex fontSize="sm" alignItems="center">
         <FormattedMessage
-          id="recipient-view.powered-by"
-          defaultMessage="Powered by {parallel}"
+          id="recipient-view.created-with"
+          defaultMessage="Created with {parallel}"
           values={{
             parallel: (
               <NakedLink

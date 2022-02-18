@@ -8425,9 +8425,9 @@
     "context": "Subject"
   },
   {
-    "term": "recipient-view.powered-by",
-    "definition": "Powered by {parallel}",
-    "context": "Powered by {parallel}"
+    "term": "recipient-view.created-with",
+    "definition": "Created with {parallel}",
+    "context": "Created with {parallel}"
   },
   {
     "term": "recipient-view.progress",

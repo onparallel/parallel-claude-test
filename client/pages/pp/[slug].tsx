@@ -265,8 +265,8 @@ function PublicPetitionLink({
                 whiteSpace="nowrap"
               >
                 <FormattedMessage
-                  id="recipient-view.powered-by"
-                  defaultMessage="Powered by {parallel}"
+                  id="recipient-view.created-with"
+                  defaultMessage="Created with {parallel}"
                   values={{ parallel: <Text as="b">Parallel</Text> }}
                 />
               </Box>
