@@ -127,12 +127,9 @@ import {
   RemoveUserPermission_removePetitionPermissionDocument,
   SharePetition_addPetitionPermissionDocument,
   StopSharing_removePetitionPermissionDocument,
-  SubmitReply_createCheckboxReplyDocument,
-  SubmitReply_createDynamicSelectReplyDocument,
   SubmitReply_createFileUploadReplyCompleteDocument,
   SubmitReply_createFileUploadReplyDocument,
-  SubmitReply_createNumericReplyDocument,
-  SubmitReply_createSimpleReplyDocument,
+  SubmitReply_createPetitionFieldReplyDocument,
   SubmitReply_petitionDocument,
   TagFragmentDoc,
   TemplateFragment as TemplateFragmentType,
@@ -141,12 +138,9 @@ import {
   UpdatePetition_updatePetitionDocument,
   UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument,
   UpdateReply_petitionDocument,
-  UpdateReply_updateCheckboxReplyDocument,
-  UpdateReply_updateDynamicSelectReplyDocument,
   UpdateReply_updateFileUploadReplyCompleteDocument,
   UpdateReply_updateFileUploadReplyDocument,
-  UpdateReply_updateNumericReplyDocument,
-  UpdateReply_updateSimpleReplyDocument,
+  UpdateReply_updatePetitionFieldReplyDocument,
   UserFragmentDoc,
 } from "./__types";
 
@@ -1372,29 +1366,28 @@ api
             if (typeof body.reply !== "string") {
               throw new BadRequestError(`Reply for ${fieldType} field must be plain text.`);
             }
-            const { createSimpleReply } = await client.request(
-              SubmitReply_createSimpleReplyDocument,
+            ({ createPetitionFieldReply: newReply } = await client.request(
+              SubmitReply_createPetitionFieldReplyDocument,
               {
                 petitionId: params.petitionId,
                 fieldId: params.fieldId,
                 reply: body.reply,
               }
-            );
-            newReply = createSimpleReply;
+            ));
             break;
           case "NUMBER": {
             if (typeof body.reply !== "number") {
               throw new BadRequestError(`Reply for ${fieldType} field must a valid number.`);
             }
-            const { createNumericReply } = await client.request(
-              SubmitReply_createNumericReplyDocument,
+            ({ createPetitionFieldReply: newReply } = await client.request(
+              SubmitReply_createPetitionFieldReplyDocument,
               {
                 petitionId: params.petitionId,
                 fieldId: params.fieldId,
                 reply: body.reply,
               }
-            );
-            newReply = createNumericReply;
+            ));
+
             break;
           }
           case "CHECKBOX":
@@ -1403,15 +1396,14 @@ api
                 `Reply for ${fieldType} field must be an array with the chosen options.`
               );
             }
-            const { createCheckboxReply } = await client.request(
-              SubmitReply_createCheckboxReplyDocument,
+            ({ createPetitionFieldReply: newReply } = await client.request(
+              SubmitReply_createPetitionFieldReplyDocument,
               {
                 petitionId: params.petitionId,
                 fieldId: params.fieldId,
-                reply: body.reply as string[],
+                reply: body.reply,
               }
-            );
-            newReply = createCheckboxReply;
+            ));
             break;
           case "DYNAMIC_SELECT":
             if (!Array.isArray(body.reply)) {
@@ -1423,15 +1415,14 @@ api
               ?.labels as string[];
             const replies = body.reply as Maybe<string>[];
 
-            const { createDynamicSelectReply } = await client.request(
-              SubmitReply_createDynamicSelectReplyDocument,
+            ({ createPetitionFieldReply: newReply } = await client.request(
+              SubmitReply_createPetitionFieldReplyDocument,
               {
                 petitionId: params.petitionId,
                 fieldId: params.fieldId,
-                value: labels.map((label, i) => [label, replies[i]]),
+                reply: labels.map((label, i) => [label, replies[i]]),
               }
-            );
-            newReply = createDynamicSelectReply;
+            ));
             break;
           case "FILE_UPLOAD":
             const file = files["reply"]?.[0];
@@ -1540,29 +1531,28 @@ api
             if (typeof body.reply !== "string") {
               throw new BadRequestError(`Reply for ${fieldType} field must be plain text.`);
             }
-            const { updateSimpleReply } = await client.request(
-              UpdateReply_updateSimpleReplyDocument,
+            ({ updatePetitionFieldReply: updatedReply } = await client.request(
+              UpdateReply_updatePetitionFieldReplyDocument,
               {
                 petitionId: params.petitionId,
                 replyId: params.replyId,
                 reply: body.reply,
               }
-            );
-            updatedReply = updateSimpleReply;
+            ));
             break;
           case "NUMBER": {
             if (typeof body.reply !== "number") {
               throw new BadRequestError(`Reply for ${fieldType} field must a valid number.`);
             }
-            const { updateNumericReply } = await client.request(
-              UpdateReply_updateNumericReplyDocument,
+            ({ updatePetitionFieldReply: updatedReply } = await client.request(
+              UpdateReply_updatePetitionFieldReplyDocument,
               {
                 petitionId: params.petitionId,
                 replyId: params.replyId,
                 reply: body.reply,
               }
-            );
-            updatedReply = updateNumericReply;
+            ));
+
             break;
           }
           case "CHECKBOX":
@@ -1571,15 +1561,15 @@ api
                 `Reply for ${fieldType} field must be an array with the chosen options.`
               );
             }
-            const { updateCheckboxReply } = await client.request(
-              UpdateReply_updateCheckboxReplyDocument,
+            ({ updatePetitionFieldReply: updatedReply } = await client.request(
+              UpdateReply_updatePetitionFieldReplyDocument,
               {
                 petitionId: params.petitionId,
                 replyId: params.replyId,
-                values: body.reply,
+                reply: body.reply,
               }
-            );
-            updatedReply = updateCheckboxReply;
+            ));
+
             break;
           case "DYNAMIC_SELECT":
             if (!Array.isArray(body.reply)) {
@@ -1590,15 +1580,15 @@ api
             const labels = field?.options?.labels as string[];
             const replies = body.reply as Maybe<string>[];
 
-            const { updateDynamicSelectReply } = await client.request(
-              UpdateReply_updateDynamicSelectReplyDocument,
+            ({ updatePetitionFieldReply: updatedReply } = await client.request(
+              UpdateReply_updatePetitionFieldReplyDocument,
               {
                 petitionId: params.petitionId,
                 replyId: params.replyId,
-                value: labels.map((label, i) => [label, replies[i]]),
+                reply: labels.map((label, i) => [label, replies[i]]),
               }
-            );
-            updatedReply = updateDynamicSelectReply;
+            ));
+
             break;
 
           case "FILE_UPLOAD":

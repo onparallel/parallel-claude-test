@@ -539,6 +539,7 @@ type Mutation {
   Creates a reply to a checkbox field.
   """
   createCheckboxReply(fieldId: GID!, petitionId: GID!, values: [String!]!): PetitionFieldReply!
+    @deprecated(reason: "use createPetitionFieldReply instead")
 
   """
   Create a contact.
@@ -552,7 +553,7 @@ type Mutation {
     fieldId: GID!
     petitionId: GID!
     value: [[String]!]!
-  ): PetitionFieldReply!
+  ): PetitionFieldReply! @deprecated(reason: "use createPetitionFieldReply instead")
 
   """
   Creates an event subscription for the user's petitions
@@ -585,6 +586,7 @@ type Mutation {
   Creates a reply to a numeric field.
   """
   createNumericReply(fieldId: GID!, petitionId: GID!, reply: Float!): PetitionFieldReply!
+    @deprecated(reason: "use createPetitionFieldReply instead")
 
   """
   Creates a new organization.
@@ -679,6 +681,11 @@ type Mutation {
   ): PetitionFieldComment!
 
   """
+  Creates a reply on a petition field
+  """
+  createPetitionFieldReply(fieldId: GID!, petitionId: GID!, reply: JSON!): PetitionFieldReply!
+
+  """
   Creates a task for printing a PDF of the petition and sends it to the queue
   """
   createPrintPdfTask(petitionId: GID!): Task!
@@ -708,6 +715,7 @@ type Mutation {
   Creates a reply to a text or select field.
   """
   createSimpleReply(fieldId: GID!, petitionId: GID!, reply: String!): PetitionFieldReply!
+    @deprecated(reason: "use createPetitionFieldReply instead")
 
   """
   Creates a tag in the user's organization
@@ -1294,6 +1302,7 @@ type Mutation {
   Updates a reply of a checkbox field
   """
   updateCheckboxReply(petitionId: GID!, replyId: GID!, values: [String!]!): PetitionFieldReply!
+    @deprecated(reason: "use updatePetitionFieldReply instead")
 
   """
   Updates a contact.
@@ -1307,7 +1316,7 @@ type Mutation {
     petitionId: GID!
     replyId: GID!
     value: [[String]!]!
-  ): PetitionFieldReply!
+  ): PetitionFieldReply! @deprecated(reason: "use updatePetitionFieldReply instead")
 
   """
   Updates an existing event subscription for the user's petitions
@@ -1385,6 +1394,7 @@ type Mutation {
   Updates a reply to a numeric field.
   """
   updateNumericReply(petitionId: GID!, reply: Float!, replyId: GID!): PetitionFieldReply!
+    @deprecated(reason: "use updatePetitionFieldReply instead")
 
   """
   Updates the onboarding status for one of the pages.
@@ -1454,6 +1464,11 @@ type Mutation {
     petitionId: GID!
     status: PetitionFieldReplyStatus!
   ): PetitionField!
+
+  """
+  Updates a reply on a petition field
+  """
+  updatePetitionFieldReply(petitionId: GID!, reply: JSON!, replyId: GID!): PetitionFieldReply!
 
   """
   Updates the metada of the specified petition field reply
@@ -1528,6 +1543,7 @@ type Mutation {
   Updates a reply to a text or select field.
   """
   updateSimpleReply(petitionId: GID!, reply: String!, replyId: GID!): PetitionFieldReply!
+    @deprecated(reason: "use updatePetitionFieldReply instead")
 
   """
   Updates the name and color of a given tag

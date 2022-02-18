@@ -359,11 +359,17 @@ export type Mutation = {
    * If the petition has a signature configured and does not require a review, starts the signing process.
    */
   completePetition: Petition;
-  /** Creates a reply to a checkbox field. */
+  /**
+   * Creates a reply to a checkbox field.
+   * @deprecated use createPetitionFieldReply instead
+   */
   createCheckboxReply: PetitionFieldReply;
   /** Create a contact. */
   createContact: Contact;
-  /** Creates a reply for a dynamic select field. */
+  /**
+   * Creates a reply for a dynamic select field.
+   * @deprecated use createPetitionFieldReply instead
+   */
   createDynamicSelectReply: PetitionFieldReply;
   /** Creates an event subscription for the user's petitions */
   createEventSubscription: PetitionEventSubscription;
@@ -373,7 +379,10 @@ export type Mutation = {
   createFileUploadReply: FileUploadReplyResponse;
   /** Notifies the backend that the upload is complete. */
   createFileUploadReplyComplete: PetitionFieldReply;
-  /** Creates a reply to a numeric field. */
+  /**
+   * Creates a reply to a numeric field.
+   * @deprecated use createPetitionFieldReply instead
+   */
   createNumericReply: PetitionFieldReply;
   /** Creates a new organization. */
   createOrganization: SupportMethodResponse;
@@ -389,13 +398,18 @@ export type Mutation = {
   createPetitionFieldAttachmentUploadLink: PetitionFieldAttachmentUploadData;
   /** Create a petition field comment. */
   createPetitionFieldComment: PetitionFieldComment;
+  /** Creates a reply on a petition field */
+  createPetitionFieldReply: PetitionFieldReply;
   /** Creates a task for printing a PDF of the petition and sends it to the queue */
   createPrintPdfTask: Task;
   /** Creates a public link from a user's template */
   createPublicPetitionLink: PublicPetitionLink;
   /** Creates a new signature integration on the user's organization */
   createSignatureIntegration: SignatureOrgIntegration;
-  /** Creates a reply to a text or select field. */
+  /**
+   * Creates a reply to a text or select field.
+   * @deprecated use createPetitionFieldReply instead
+   */
   createSimpleReply: PetitionFieldReply;
   /** Creates a tag in the user's organization */
   createTag: Tag;
@@ -550,11 +564,17 @@ export type Mutation = {
   transferPetitionOwnership: Array<PetitionBase>;
   /** Removes the given tag from the given petition */
   untagPetition: PetitionBase;
-  /** Updates a reply of a checkbox field */
+  /**
+   * Updates a reply of a checkbox field
+   * @deprecated use updatePetitionFieldReply instead
+   */
   updateCheckboxReply: PetitionFieldReply;
   /** Updates a contact. */
   updateContact: Contact;
-  /** Updates a reply for a dynamic select field. */
+  /**
+   * Updates a reply for a dynamic select field.
+   * @deprecated use updatePetitionFieldReply instead
+   */
   updateDynamicSelectReply: PetitionFieldReply;
   /** Updates an existing event subscription for the user's petitions */
   updateEventSubscription: PetitionEventSubscription;
@@ -568,7 +588,10 @@ export type Mutation = {
   updateFileUploadReplyComplete: PetitionFieldReply;
   /** Updates the metadata of a public landing template. */
   updateLandingTemplateMetadata: SupportMethodResponse;
-  /** Updates a reply to a numeric field. */
+  /**
+   * Updates a reply to a numeric field.
+   * @deprecated use updatePetitionFieldReply instead
+   */
   updateNumericReply: PetitionFieldReply;
   /** Updates the onboarding status for one of the pages. */
   updateOnboardingStatus: User;
@@ -588,6 +611,8 @@ export type Mutation = {
   updatePetitionFieldComment: PetitionFieldComment;
   /** Updates the status of a petition field reply. */
   updatePetitionFieldRepliesStatus: PetitionField;
+  /** Updates a reply on a petition field */
+  updatePetitionFieldReply: PetitionFieldReply;
   /** Updates the metada of the specified petition field reply */
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
   /** Updates the subscription flag on a PetitionPermission */
@@ -607,7 +632,10 @@ export type Mutation = {
   /** Updates template_public from template */
   updatePublicTemplateVisibility: SupportMethodResponse;
   updateSignatureRequestMetadata: PetitionSignatureRequest;
-  /** Updates a reply to a text or select field. */
+  /**
+   * Updates a reply to a text or select field.
+   * @deprecated use updatePetitionFieldReply instead
+   */
   updateSimpleReply: PetitionFieldReply;
   /** Updates the name and color of a given tag */
   updateTag: Tag;
@@ -803,6 +831,12 @@ export type MutationcreatePetitionFieldCommentArgs = {
   isInternal?: InputMaybe<Scalars["Boolean"]>;
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
+};
+
+export type MutationcreatePetitionFieldReplyArgs = {
+  fieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+  reply: Scalars["JSON"];
 };
 
 export type MutationcreatePrintPdfTaskArgs = {
@@ -1361,6 +1395,12 @@ export type MutationupdatePetitionFieldRepliesStatusArgs = {
   petitionFieldReplyIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
   status: PetitionFieldReplyStatus;
+};
+
+export type MutationupdatePetitionFieldReplyArgs = {
+  petitionId: Scalars["GID"];
+  reply: Scalars["JSON"];
+  replyId: Scalars["GID"];
 };
 
 export type MutationupdatePetitionFieldReplyMetadataArgs = {
@@ -4548,46 +4588,14 @@ export type EventSubscriptions_deleteSubscriptionMutationVariables = Exact<{
 
 export type EventSubscriptions_deleteSubscriptionMutation = { deleteEventSubscriptions: Result };
 
-export type SubmitReply_createSimpleReplyMutationVariables = Exact<{
+export type SubmitReply_createPetitionFieldReplyMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   fieldId: Scalars["GID"];
-  reply: Scalars["String"];
+  reply: Scalars["JSON"];
 }>;
 
-export type SubmitReply_createSimpleReplyMutation = {
-  createSimpleReply: {
-    id: string;
-    content: { [key: string]: any };
-    status: PetitionFieldReplyStatus;
-    createdAt: string;
-    updatedAt: string;
-  };
-};
-
-export type SubmitReply_createNumericReplyMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  fieldId: Scalars["GID"];
-  reply: Scalars["Float"];
-}>;
-
-export type SubmitReply_createNumericReplyMutation = {
-  createNumericReply: {
-    id: string;
-    content: { [key: string]: any };
-    status: PetitionFieldReplyStatus;
-    createdAt: string;
-    updatedAt: string;
-  };
-};
-
-export type SubmitReply_createCheckboxReplyMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  fieldId: Scalars["GID"];
-  reply: Array<Scalars["String"]> | Scalars["String"];
-}>;
-
-export type SubmitReply_createCheckboxReplyMutation = {
-  createCheckboxReply: {
+export type SubmitReply_createPetitionFieldReplyMutation = {
+  createPetitionFieldReply: {
     id: string;
     content: { [key: string]: any };
     status: PetitionFieldReplyStatus;
@@ -4630,25 +4638,6 @@ export type SubmitReply_createFileUploadReplyCompleteMutation = {
   };
 };
 
-export type SubmitReply_createDynamicSelectReplyMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  fieldId: Scalars["GID"];
-  value:
-    | Array<Array<InputMaybe<Scalars["String"]>> | InputMaybe<Scalars["String"]>>
-    | Array<InputMaybe<Scalars["String"]>>
-    | InputMaybe<Scalars["String"]>;
-}>;
-
-export type SubmitReply_createDynamicSelectReplyMutation = {
-  createDynamicSelectReply: {
-    id: string;
-    content: { [key: string]: any };
-    status: PetitionFieldReplyStatus;
-    createdAt: string;
-    updatedAt: string;
-  };
-};
-
 export type UpdateReplyStatus_updatePetitionFieldRepliesStatusMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   fieldId: Scalars["GID"];
@@ -4669,68 +4658,14 @@ export type UpdateReplyStatus_updatePetitionFieldRepliesStatusMutation = {
   };
 };
 
-export type UpdateReply_updateSimpleReplyMutationVariables = Exact<{
+export type UpdateReply_updatePetitionFieldReplyMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   replyId: Scalars["GID"];
-  reply: Scalars["String"];
+  reply: Scalars["JSON"];
 }>;
 
-export type UpdateReply_updateSimpleReplyMutation = {
-  updateSimpleReply: {
-    id: string;
-    content: { [key: string]: any };
-    status: PetitionFieldReplyStatus;
-    createdAt: string;
-    updatedAt: string;
-    field: { id: string } | null;
-  };
-};
-
-export type UpdateReply_updateNumericReplyMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
-  reply: Scalars["Float"];
-}>;
-
-export type UpdateReply_updateNumericReplyMutation = {
-  updateNumericReply: {
-    id: string;
-    content: { [key: string]: any };
-    status: PetitionFieldReplyStatus;
-    createdAt: string;
-    updatedAt: string;
-    field: { id: string } | null;
-  };
-};
-
-export type UpdateReply_updateCheckboxReplyMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
-  values: Array<Scalars["String"]> | Scalars["String"];
-}>;
-
-export type UpdateReply_updateCheckboxReplyMutation = {
-  updateCheckboxReply: {
-    id: string;
-    content: { [key: string]: any };
-    status: PetitionFieldReplyStatus;
-    createdAt: string;
-    updatedAt: string;
-    field: { id: string } | null;
-  };
-};
-
-export type UpdateReply_updateDynamicSelectReplyMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
-  value:
-    | Array<Array<InputMaybe<Scalars["String"]>> | InputMaybe<Scalars["String"]>>
-    | Array<InputMaybe<Scalars["String"]>>
-    | InputMaybe<Scalars["String"]>;
-}>;
-
-export type UpdateReply_updateDynamicSelectReplyMutation = {
-  updateDynamicSelectReply: {
+export type UpdateReply_updatePetitionFieldReplyMutation = {
+  updatePetitionFieldReply: {
     id: string;
     content: { [key: string]: any };
     status: PetitionFieldReplyStatus;
@@ -5636,38 +5571,16 @@ export const EventSubscriptions_deleteSubscriptionDocument = gql`
   EventSubscriptions_deleteSubscriptionMutation,
   EventSubscriptions_deleteSubscriptionMutationVariables
 >;
-export const SubmitReply_createSimpleReplyDocument = gql`
-  mutation SubmitReply_createSimpleReply($petitionId: GID!, $fieldId: GID!, $reply: String!) {
-    createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+export const SubmitReply_createPetitionFieldReplyDocument = gql`
+  mutation SubmitReply_createPetitionFieldReply($petitionId: GID!, $fieldId: GID!, $reply: JSON!) {
+    createPetitionFieldReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
       ...PetitionFieldReply
     }
   }
   ${PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<
-  SubmitReply_createSimpleReplyMutation,
-  SubmitReply_createSimpleReplyMutationVariables
->;
-export const SubmitReply_createNumericReplyDocument = gql`
-  mutation SubmitReply_createNumericReply($petitionId: GID!, $fieldId: GID!, $reply: Float!) {
-    createNumericReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
-      ...PetitionFieldReply
-    }
-  }
-  ${PetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<
-  SubmitReply_createNumericReplyMutation,
-  SubmitReply_createNumericReplyMutationVariables
->;
-export const SubmitReply_createCheckboxReplyDocument = gql`
-  mutation SubmitReply_createCheckboxReply($petitionId: GID!, $fieldId: GID!, $reply: [String!]!) {
-    createCheckboxReply(petitionId: $petitionId, fieldId: $fieldId, values: $reply) {
-      ...PetitionFieldReply
-    }
-  }
-  ${PetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<
-  SubmitReply_createCheckboxReplyMutation,
-  SubmitReply_createCheckboxReplyMutationVariables
+  SubmitReply_createPetitionFieldReplyMutation,
+  SubmitReply_createPetitionFieldReplyMutationVariables
 >;
 export const SubmitReply_createFileUploadReplyDocument = gql`
   mutation SubmitReply_createFileUploadReply(
@@ -5701,21 +5614,6 @@ export const SubmitReply_createFileUploadReplyCompleteDocument = gql`
   SubmitReply_createFileUploadReplyCompleteMutation,
   SubmitReply_createFileUploadReplyCompleteMutationVariables
 >;
-export const SubmitReply_createDynamicSelectReplyDocument = gql`
-  mutation SubmitReply_createDynamicSelectReply(
-    $petitionId: GID!
-    $fieldId: GID!
-    $value: [[String]!]!
-  ) {
-    createDynamicSelectReply(petitionId: $petitionId, fieldId: $fieldId, value: $value) {
-      ...PetitionFieldReply
-    }
-  }
-  ${PetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<
-  SubmitReply_createDynamicSelectReplyMutation,
-  SubmitReply_createDynamicSelectReplyMutationVariables
->;
 export const UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument = gql`
   mutation UpdateReplyStatus_updatePetitionFieldRepliesStatus(
     $petitionId: GID!
@@ -5742,9 +5640,9 @@ export const UpdateReplyStatus_updatePetitionFieldRepliesStatusDocument = gql`
   UpdateReplyStatus_updatePetitionFieldRepliesStatusMutation,
   UpdateReplyStatus_updatePetitionFieldRepliesStatusMutationVariables
 >;
-export const UpdateReply_updateSimpleReplyDocument = gql`
-  mutation UpdateReply_updateSimpleReply($petitionId: GID!, $replyId: GID!, $reply: String!) {
-    updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+export const UpdateReply_updatePetitionFieldReplyDocument = gql`
+  mutation UpdateReply_updatePetitionFieldReply($petitionId: GID!, $replyId: GID!, $reply: JSON!) {
+    updatePetitionFieldReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
       ...PetitionFieldReply
       field {
         id
@@ -5753,54 +5651,8 @@ export const UpdateReply_updateSimpleReplyDocument = gql`
   }
   ${PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<
-  UpdateReply_updateSimpleReplyMutation,
-  UpdateReply_updateSimpleReplyMutationVariables
->;
-export const UpdateReply_updateNumericReplyDocument = gql`
-  mutation UpdateReply_updateNumericReply($petitionId: GID!, $replyId: GID!, $reply: Float!) {
-    updateNumericReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
-      ...PetitionFieldReply
-      field {
-        id
-      }
-    }
-  }
-  ${PetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<
-  UpdateReply_updateNumericReplyMutation,
-  UpdateReply_updateNumericReplyMutationVariables
->;
-export const UpdateReply_updateCheckboxReplyDocument = gql`
-  mutation UpdateReply_updateCheckboxReply($petitionId: GID!, $replyId: GID!, $values: [String!]!) {
-    updateCheckboxReply(petitionId: $petitionId, replyId: $replyId, values: $values) {
-      ...PetitionFieldReply
-      field {
-        id
-      }
-    }
-  }
-  ${PetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<
-  UpdateReply_updateCheckboxReplyMutation,
-  UpdateReply_updateCheckboxReplyMutationVariables
->;
-export const UpdateReply_updateDynamicSelectReplyDocument = gql`
-  mutation UpdateReply_updateDynamicSelectReply(
-    $petitionId: GID!
-    $replyId: GID!
-    $value: [[String]!]!
-  ) {
-    updateDynamicSelectReply(petitionId: $petitionId, replyId: $replyId, value: $value) {
-      ...PetitionFieldReply
-      field {
-        id
-      }
-    }
-  }
-  ${PetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<
-  UpdateReply_updateDynamicSelectReplyMutation,
-  UpdateReply_updateDynamicSelectReplyMutationVariables
+  UpdateReply_updatePetitionFieldReplyMutation,
+  UpdateReply_updatePetitionFieldReplyMutationVariables
 >;
 export const UpdateReply_updateFileUploadReplyDocument = gql`
   mutation UpdateReply_updateFileUploadReply(

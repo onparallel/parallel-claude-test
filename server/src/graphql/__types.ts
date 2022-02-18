@@ -896,6 +896,7 @@ export interface NexusGenFieldTypes {
     createPetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     createPetitionFieldAttachmentUploadLink: NexusGenRootTypes["PetitionFieldAttachmentUploadData"]; // PetitionFieldAttachmentUploadData!
     createPetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
+    createPetitionFieldReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createPrintPdfTask: NexusGenRootTypes["Task"]; // Task!
     createPublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
     createSignatureIntegration: NexusGenRootTypes["SignatureOrgIntegration"]; // SignatureOrgIntegration!
@@ -996,6 +997,7 @@ export interface NexusGenFieldTypes {
     updatePetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     updatePetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionField"]; // PetitionField!
+    updatePetitionFieldReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updatePetitionFieldReplyMetadata: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updatePetitionPermissionSubscription: NexusGenRootTypes["Petition"]; // Petition!
     updatePetitionRestriction: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
@@ -2223,6 +2225,7 @@ export interface NexusGenFieldTypeNames {
     createPetitionField: "PetitionField";
     createPetitionFieldAttachmentUploadLink: "PetitionFieldAttachmentUploadData";
     createPetitionFieldComment: "PetitionFieldComment";
+    createPetitionFieldReply: "PetitionFieldReply";
     createPrintPdfTask: "Task";
     createPublicPetitionLink: "PublicPetitionLink";
     createSignatureIntegration: "SignatureOrgIntegration";
@@ -2323,6 +2326,7 @@ export interface NexusGenFieldTypeNames {
     updatePetitionField: "PetitionField";
     updatePetitionFieldComment: "PetitionFieldComment";
     updatePetitionFieldRepliesStatus: "PetitionField";
+    updatePetitionFieldReply: "PetitionFieldReply";
     updatePetitionFieldReplyMetadata: "PetitionFieldReply";
     updatePetitionPermissionSubscription: "Petition";
     updatePetitionRestriction: "PetitionBase";
@@ -3492,6 +3496,12 @@ export interface NexusGenArgTypes {
       petitionFieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
+    createPetitionFieldReply: {
+      // args
+      fieldId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
+      reply: NexusGenScalars["JSON"]; // JSON!
+    };
     createPrintPdfTask: {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
@@ -4049,6 +4059,12 @@ export interface NexusGenArgTypes {
       petitionFieldReplyIds: NexusGenScalars["GID"][]; // [GID!]!
       petitionId: NexusGenScalars["GID"]; // GID!
       status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
+    };
+    updatePetitionFieldReply: {
+      // args
+      petitionId: NexusGenScalars["GID"]; // GID!
+      reply: NexusGenScalars["JSON"]; // JSON!
+      replyId: NexusGenScalars["GID"]; // GID!
     };
     updatePetitionFieldReplyMetadata: {
       // args

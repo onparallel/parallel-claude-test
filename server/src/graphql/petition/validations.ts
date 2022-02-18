@@ -271,7 +271,11 @@ function validateReplyValue(
       break;
     }
     case "CHECKBOX": {
-      if (!Array.isArray(reply) || !reply.every((r) => typeof r === "string")) {
+      if (
+        !Array.isArray(reply) ||
+        !reply.every((r) => typeof r === "string") ||
+        reply.length === 0
+      ) {
         throw new InvalidReplyError(info, argName, "Values must be an array of strings", {
           subcode: "INVALID_TYPE_ERROR",
         });

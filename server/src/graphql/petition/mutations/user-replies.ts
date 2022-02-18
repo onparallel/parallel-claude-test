@@ -14,28 +14,37 @@ import {
 } from "../authorizers";
 import { validateFieldReply, validateReplyUpdate } from "../validations";
 
-export const createSimpleReply = mutationField("createSimpleReply", {
-  description: "Creates a reply to a text or select field.",
+export const createPetitionFieldReply = mutationField("createPetitionFieldReply", {
+  description: "Creates a reply on a petition field",
   type: "PetitionFieldReply",
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     fieldId: nonNull(globalIdArg("PetitionField")),
-    reply: nonNull(stringArg()),
+    reply: nonNull("JSON"),
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
-    fieldHasType("fieldId", ["TEXT", "SELECT", "SHORT_TEXT", "DATE", "PHONE"]),
+    fieldHasType("fieldId", [
+      "TEXT",
+      "SHORT_TEXT",
+      "SELECT",
+      "PHONE",
+      "NUMBER",
+      "DYNAMIC_SELECT",
+      "DATE",
+      "CHECKBOX",
+    ]),
     fieldCanBeReplied("fieldId")
   ),
   validateArgs: validateFieldReply("fieldId", "reply", "reply"),
   resolve: async (_, args, ctx) => {
-    const field = (await ctx.petitions.loadField(args.fieldId))!;
+    const { type } = (await ctx.petitions.loadField(args.fieldId))!;
     return await ctx.petitions.createPetitionFieldReply(
       {
         petition_field_id: args.fieldId,
         user_id: ctx.user!.id,
-        type: field.type,
+        type,
         status: "PENDING",
         content: { value: args.reply },
       },
@@ -44,76 +53,27 @@ export const createSimpleReply = mutationField("createSimpleReply", {
   },
 });
 
-export const updateSimpleReply = mutationField("updateSimpleReply", {
-  description: "Updates a reply to a text or select field.",
+export const updatePetitionFieldReply = mutationField("updatePetitionFieldReply", {
+  description: "Updates a reply on a petition field",
   type: "PetitionFieldReply",
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
-    reply: nonNull(stringArg()),
+    reply: nonNull("JSON"),
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
-    replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT", "DATE", "PHONE"]),
-    replyCanBeUpdated("replyId")
-  ),
-  validateArgs: validateReplyUpdate("replyId", "reply", "reply"),
-  resolve: async (_, args, ctx) => {
-    return await ctx.petitions.updatePetitionFieldReply(
-      args.replyId,
-      {
-        petition_access_id: null,
-        user_id: ctx.user!.id,
-        content: { value: args.reply },
-        status: "PENDING",
-      },
-      ctx.user!
-    );
-  },
-});
-
-export const createNumericReply = mutationField("createNumericReply", {
-  description: "Creates a reply to a numeric field.",
-  type: "PetitionFieldReply",
-  args: {
-    petitionId: nonNull(globalIdArg("Petition")),
-    fieldId: nonNull(globalIdArg("PetitionField")),
-    reply: nonNull(floatArg()),
-  },
-  authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
-    fieldsBelongsToPetition("petitionId", "fieldId"),
-    fieldHasType("fieldId", ["NUMBER"]),
-    fieldCanBeReplied("fieldId")
-  ),
-  validateArgs: validateFieldReply("fieldId", "reply", "reply"),
-  resolve: async (_, args, ctx) => {
-    return await ctx.petitions.createPetitionFieldReply(
-      {
-        petition_field_id: args.fieldId,
-        user_id: ctx.user!.id,
-        type: "NUMBER",
-        status: "PENDING",
-        content: { value: args.reply },
-      },
-      ctx.user!
-    );
-  },
-});
-
-export const updateNumericReply = mutationField("updateNumericReply", {
-  description: "Updates a reply to a numeric field.",
-  type: "PetitionFieldReply",
-  args: {
-    petitionId: nonNull(globalIdArg("Petition")),
-    replyId: nonNull(globalIdArg("PetitionFieldReply")),
-    reply: nonNull(floatArg()),
-  },
-  authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
-    repliesBelongsToPetition("petitionId", "replyId"),
-    replyIsForFieldOfType("replyId", ["NUMBER"]),
+    replyIsForFieldOfType("replyId", [
+      "TEXT",
+      "SHORT_TEXT",
+      "SELECT",
+      "PHONE",
+      "NUMBER",
+      "DYNAMIC_SELECT",
+      "DATE",
+      "CHECKBOX",
+    ]),
     replyCanBeUpdated("replyId")
   ),
   validateArgs: validateReplyUpdate("replyId", "reply", "reply"),
@@ -305,8 +265,149 @@ export const updateFileUploadReplyComplete = mutationField("updateFileUploadRepl
   },
 });
 
+export const deletePetitionReply = mutationField("deletePetitionReply", {
+  description: "Deletes a reply to a petition field.",
+  type: "PetitionField",
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    replyId: nonNull(globalIdArg("PetitionFieldReply")),
+  },
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    repliesBelongsToPetition("petitionId", "replyId"),
+    replyCanBeUpdated("replyId")
+  ),
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.deletePetitionFieldReply(args.replyId, ctx.user!);
+  },
+});
+
+/**  DEPRECATED MUTATIONS FROM HERE */
+
+export const createSimpleReply = mutationField("createSimpleReply", {
+  description: "Creates a reply to a text or select field.",
+  deprecation: "use createPetitionFieldReply instead",
+  type: "PetitionFieldReply",
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    fieldId: nonNull(globalIdArg("PetitionField")),
+    reply: nonNull(stringArg()),
+  },
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    fieldsBelongsToPetition("petitionId", "fieldId"),
+    fieldHasType("fieldId", ["TEXT", "SELECT", "SHORT_TEXT", "DATE"]),
+    fieldCanBeReplied("fieldId")
+  ),
+  validateArgs: validateFieldReply("fieldId", "reply", "reply"),
+  resolve: async (_, args, ctx) => {
+    const field = (await ctx.petitions.loadField(args.fieldId))!;
+    return await ctx.petitions.createPetitionFieldReply(
+      {
+        petition_field_id: args.fieldId,
+        user_id: ctx.user!.id,
+        type: field.type,
+        status: "PENDING",
+        content: { value: args.reply },
+      },
+      ctx.user!
+    );
+  },
+});
+
+export const updateSimpleReply = mutationField("updateSimpleReply", {
+  description: "Updates a reply to a text or select field.",
+  deprecation: "use updatePetitionFieldReply instead",
+  type: "PetitionFieldReply",
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    replyId: nonNull(globalIdArg("PetitionFieldReply")),
+    reply: nonNull(stringArg()),
+  },
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    repliesBelongsToPetition("petitionId", "replyId"),
+    replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT", "DATE"]),
+    replyCanBeUpdated("replyId")
+  ),
+  validateArgs: validateReplyUpdate("replyId", "reply", "reply"),
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.updatePetitionFieldReply(
+      args.replyId,
+      {
+        petition_access_id: null,
+        user_id: ctx.user!.id,
+        content: { value: args.reply },
+        status: "PENDING",
+      },
+      ctx.user!
+    );
+  },
+});
+
+export const createNumericReply = mutationField("createNumericReply", {
+  description: "Creates a reply to a numeric field.",
+  deprecation: "use createPetitionFieldReply instead",
+  type: "PetitionFieldReply",
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    fieldId: nonNull(globalIdArg("PetitionField")),
+    reply: nonNull(floatArg()),
+  },
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    fieldsBelongsToPetition("petitionId", "fieldId"),
+    fieldHasType("fieldId", ["NUMBER"]),
+    fieldCanBeReplied("fieldId")
+  ),
+  validateArgs: validateFieldReply("fieldId", "reply", "reply"),
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.createPetitionFieldReply(
+      {
+        petition_field_id: args.fieldId,
+        user_id: ctx.user!.id,
+        type: "NUMBER",
+        status: "PENDING",
+        content: { value: args.reply },
+      },
+      ctx.user!
+    );
+  },
+});
+
+export const updateNumericReply = mutationField("updateNumericReply", {
+  description: "Updates a reply to a numeric field.",
+  deprecation: "use updatePetitionFieldReply instead",
+  type: "PetitionFieldReply",
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    replyId: nonNull(globalIdArg("PetitionFieldReply")),
+    reply: nonNull(floatArg()),
+  },
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    repliesBelongsToPetition("petitionId", "replyId"),
+    replyIsForFieldOfType("replyId", ["NUMBER"]),
+    replyCanBeUpdated("replyId")
+  ),
+  validateArgs: validateReplyUpdate("replyId", "reply", "reply"),
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.updatePetitionFieldReply(
+      args.replyId,
+      {
+        petition_access_id: null,
+        user_id: ctx.user!.id,
+        content: { value: args.reply },
+        status: "PENDING",
+      },
+      ctx.user!
+    );
+  },
+});
+
 export const createCheckboxReply = mutationField("createCheckboxReply", {
   description: "Creates a reply to a checkbox field.",
+  deprecation: "use createPetitionFieldReply instead",
   type: "PetitionFieldReply",
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -336,6 +437,7 @@ export const createCheckboxReply = mutationField("createCheckboxReply", {
 
 export const updateCheckboxReply = mutationField("updateCheckboxReply", {
   description: "Updates a reply of a checkbox field",
+  deprecation: "use updatePetitionFieldReply instead",
   type: "PetitionFieldReply",
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -365,6 +467,7 @@ export const updateCheckboxReply = mutationField("updateCheckboxReply", {
 
 export const createDynamicSelectReply = mutationField("createDynamicSelectReply", {
   description: "Creates a reply for a dynamic select field.",
+  deprecation: "use createPetitionFieldReply instead",
   type: "PetitionFieldReply",
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -394,6 +497,7 @@ export const createDynamicSelectReply = mutationField("createDynamicSelectReply"
 
 export const updateDynamicSelectReply = mutationField("updateDynamicSelectReply", {
   description: "Updates a reply for a dynamic select field.",
+  deprecation: "use updatePetitionFieldReply instead",
   type: "PetitionFieldReply",
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -418,22 +522,5 @@ export const updateDynamicSelectReply = mutationField("updateDynamicSelectReply"
       },
       ctx.user!
     );
-  },
-});
-
-export const deletePetitionReply = mutationField("deletePetitionReply", {
-  description: "Deletes a reply to a petition field.",
-  type: "PetitionField",
-  args: {
-    petitionId: nonNull(globalIdArg("Petition")),
-    replyId: nonNull(globalIdArg("PetitionFieldReply")),
-  },
-  authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
-    repliesBelongsToPetition("petitionId", "replyId"),
-    replyCanBeUpdated("replyId")
-  ),
-  resolve: async (_, args, ctx) => {
-    return await ctx.petitions.deletePetitionFieldReply(args.replyId, ctx.user!);
   },
 });

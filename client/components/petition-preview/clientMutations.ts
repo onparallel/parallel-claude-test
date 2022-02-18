@@ -1,19 +1,13 @@
 import { DataProxy, gql, useApolloClient, useMutation } from "@apollo/client";
 import {
-  PreviewPetitionFieldMutations_createCheckboxReplyDocument,
-  PreviewPetitionFieldMutations_createDynamicSelectReplyDocument,
   PreviewPetitionFieldMutations_createFileUploadReplyCompleteDocument,
   PreviewPetitionFieldMutations_createFileUploadReplyDocument,
-  PreviewPetitionFieldMutations_createNumericReplyDocument,
-  PreviewPetitionFieldMutations_createSimpleReplyDocument,
+  PreviewPetitionFieldMutations_createPetitionFieldReplyDocument,
   PreviewPetitionFieldMutations_deletePetitionReplyDocument,
-  PreviewPetitionFieldMutations_updateCheckboxReplyDocument,
-  PreviewPetitionFieldMutations_updateDynamicSelectReplyDocument,
-  PreviewPetitionFieldMutations_updateNumericReplyDocument,
+  PreviewPetitionFieldMutations_updatePetitionFieldReplyDocument,
   PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragment,
   PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragmentDoc,
   PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragmentDoc,
-  PreviewPetitionFieldMutations_updateSimpleReplyDocument,
   Scalars,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
@@ -21,7 +15,6 @@ import { uploadFile } from "@parallel/utils/uploadFile";
 import { customAlphabet } from "nanoid";
 import { MutableRefObject, useCallback } from "react";
 import { RecipientViewPetitionFieldCard } from "../recipient-view/fields/RecipientViewPetitionFieldCard";
-import { DynamicSelectValue } from "../recipient-view/fields/RecipientViewPetitionFieldDynamicSelect";
 
 function getRandomId() {
   const nanoid = customAlphabet("1234567890abcdefgihjklmnopqrstvwxyz", 6);
@@ -77,13 +70,13 @@ export function useDeletePetitionReply() {
   );
 }
 
-const _updateSimpleReply = gql`
-  mutation PreviewPetitionFieldMutations_updateSimpleReply(
+const _updatePetitionFieldReply = gql`
+  mutation PreviewPetitionFieldMutations_updatePetitionFieldReply(
     $petitionId: GID!
     $replyId: GID!
-    $reply: String!
+    $reply: JSON!
   ) {
-    updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+    updatePetitionFieldReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
       id
       content
       status
@@ -101,11 +94,13 @@ const _updateSimpleReply = gql`
   }
 `;
 
-export function useUpdateSimpleReply() {
+export function useUpdatePetitionFieldReply() {
   const client = useApolloClient();
-  const [updateSimpleReply] = useMutation(PreviewPetitionFieldMutations_updateSimpleReplyDocument);
+  const [updatePetitionFieldReply] = useMutation(
+    PreviewPetitionFieldMutations_updatePetitionFieldReplyDocument
+  );
   return useCallback(
-    async function _updateSimpleReply({
+    async function _updatePetitionFieldReply({
       petitionId,
       replyId,
       reply,
@@ -113,7 +108,7 @@ export function useUpdateSimpleReply() {
     }: {
       petitionId: string;
       replyId: string;
-      reply: string;
+      reply: any;
       isCacheOnly?: boolean;
     }) {
       if (isCacheOnly) {
@@ -122,7 +117,7 @@ export function useUpdateSimpleReply() {
           value: reply,
         }));
       } else {
-        await updateSimpleReply({
+        await updatePetitionFieldReply({
           variables: {
             petitionId,
             replyId,
@@ -131,17 +126,17 @@ export function useUpdateSimpleReply() {
         });
       }
     },
-    [updateSimpleReply]
+    [updatePetitionFieldReply]
   );
 }
 
-const _createSimpleReply = gql`
-  mutation PreviewPetitionFieldMutations_createSimpleReply(
+const _createPetitionFieldReply = gql`
+  mutation PreviewPetitionFieldMutations_createPetitionFieldReply(
     $petitionId: GID!
     $fieldId: GID!
-    $reply: String!
+    $reply: JSON!
   ) {
-    createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+    createPetitionFieldReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
       ...RecipientViewPetitionFieldCard_PetitionFieldReply
       field {
         id
@@ -160,12 +155,14 @@ const _createSimpleReply = gql`
   ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
 `;
 
-export function useCreateSimpleReply() {
+export function useCreatePetitionFieldReply() {
   const client = useApolloClient();
 
-  const [createSimpleReply] = useMutation(PreviewPetitionFieldMutations_createSimpleReplyDocument);
+  const [createPetitionFieldReply] = useMutation(
+    PreviewPetitionFieldMutations_createPetitionFieldReplyDocument
+  );
   return useCallback(
-    async function _createSimpleReply({
+    async function _createPetitionFieldReply({
       petitionId,
       fieldId,
       reply,
@@ -173,7 +170,7 @@ export function useCreateSimpleReply() {
     }: {
       petitionId: string;
       fieldId: string;
-      reply: string;
+      reply: any;
       isCacheOnly?: boolean;
     }) {
       if (isCacheOnly) {
@@ -191,415 +188,17 @@ export function useCreateSimpleReply() {
         ]);
         return { id, __typename: "PetitionFieldReply" };
       } else {
-        const { data } = await createSimpleReply({
+        const { data } = await createPetitionFieldReply({
           variables: {
             petitionId,
             fieldId,
             reply,
           },
         });
-        return data?.createSimpleReply;
+        return data?.createPetitionFieldReply;
       }
     },
-    [createSimpleReply]
-  );
-}
-
-const _updateNumericReply = gql`
-  mutation PreviewPetitionFieldMutations_updateNumericReply(
-    $petitionId: GID!
-    $replyId: GID!
-    $reply: Float!
-  ) {
-    updateNumericReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
-      id
-      content
-      status
-      updatedAt
-      field {
-        id
-        petition {
-          id
-          ... on Petition {
-            status
-          }
-        }
-      }
-    }
-  }
-`;
-
-export function useUpdateNumericReply() {
-  const client = useApolloClient();
-  const [updateNumericReply] = useMutation(
-    PreviewPetitionFieldMutations_updateNumericReplyDocument
-  );
-  return useCallback(
-    async function _updateNumericReply({
-      petitionId,
-      replyId,
-      reply,
-      isCacheOnly,
-    }: {
-      petitionId: string;
-      replyId: string;
-      reply: number;
-      isCacheOnly?: boolean;
-    }) {
-      if (isCacheOnly) {
-        updateReplyContent(client, replyId, (content) => ({
-          ...content,
-          value: reply,
-        }));
-      } else {
-        await updateNumericReply({
-          variables: {
-            petitionId,
-            replyId,
-            reply,
-          },
-        });
-      }
-    },
-    [updateNumericReply]
-  );
-}
-
-const _createNumericReply = gql`
-  mutation PreviewPetitionFieldMutations_createNumericReply(
-    $petitionId: GID!
-    $fieldId: GID!
-    $reply: Float!
-  ) {
-    createNumericReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
-      ...RecipientViewPetitionFieldCard_PetitionFieldReply
-      field {
-        id
-        petition {
-          id
-          ... on Petition {
-            status
-          }
-        }
-        replies {
-          id
-        }
-      }
-    }
-  }
-  ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
-`;
-
-export function useCreateNumericReply() {
-  const client = useApolloClient();
-
-  const [createNumericReply] = useMutation(
-    PreviewPetitionFieldMutations_createNumericReplyDocument
-  );
-  return useCallback(
-    async function _createNumericReply({
-      petitionId,
-      fieldId,
-      reply,
-      isCacheOnly,
-    }: {
-      petitionId: string;
-      fieldId: string;
-      reply: number;
-      isCacheOnly?: boolean;
-    }) {
-      if (isCacheOnly) {
-        const id = `${fieldId}-${getRandomId()}`;
-        updatePreviewFieldReplies(client, fieldId, (replies) => [
-          ...(replies ?? []),
-          {
-            id,
-            __typename: "PetitionFieldReply",
-            status: "PENDING",
-            content: { value: reply },
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-        ]);
-        return { id, __typename: "PetitionFieldReply" };
-      } else {
-        const { data } = await createNumericReply({
-          variables: {
-            petitionId,
-            fieldId,
-            reply,
-          },
-        });
-        return data?.createNumericReply;
-      }
-    },
-    [createNumericReply]
-  );
-}
-
-const _createCheckboxReply = gql`
-  mutation PreviewPetitionFieldMutations_createCheckboxReply(
-    $petitionId: GID!
-    $fieldId: GID!
-    $values: [String!]!
-  ) {
-    createCheckboxReply(petitionId: $petitionId, fieldId: $fieldId, values: $values) {
-      ...RecipientViewPetitionFieldCard_PetitionFieldReply
-      field {
-        id
-        petition {
-          id
-          ... on Petition {
-            status
-          }
-        }
-        replies {
-          id
-        }
-      }
-    }
-  }
-  ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
-`;
-
-export function useCreateCheckboxReply() {
-  const client = useApolloClient();
-
-  const [createCheckboxReply] = useMutation(
-    PreviewPetitionFieldMutations_createCheckboxReplyDocument
-  );
-  return useCallback(
-    async function _createCheckboxReply({
-      petitionId,
-      fieldId,
-      values,
-      isCacheOnly,
-    }: {
-      petitionId: string;
-      fieldId: string;
-      values: string[];
-      isCacheOnly?: boolean;
-    }) {
-      if (isCacheOnly) {
-        const id = `${fieldId}-${getRandomId()}`;
-        updatePreviewFieldReplies(client, fieldId, (replies) => [
-          ...(replies ?? []),
-          {
-            id,
-            __typename: "PetitionFieldReply",
-            status: "PENDING",
-            content: { value: values },
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-        ]);
-        return { id, __typename: "PetitionFieldReply" };
-      } else {
-        const { data } = await createCheckboxReply({
-          variables: {
-            petitionId,
-            fieldId,
-            values,
-          },
-        });
-        return data?.createCheckboxReply;
-      }
-    },
-    [createCheckboxReply]
-  );
-}
-
-const _updateCheckboxReply = gql`
-  mutation PreviewPetitionFieldMutations_updateCheckboxReply(
-    $petitionId: GID!
-    $replyId: GID!
-    $values: [String!]!
-  ) {
-    updateCheckboxReply(petitionId: $petitionId, replyId: $replyId, values: $values) {
-      id
-      content
-      status
-      updatedAt
-      field {
-        id
-        petition {
-          id
-          ... on Petition {
-            status
-          }
-        }
-      }
-    }
-  }
-`;
-
-export function useUpdateCheckboxReply() {
-  const client = useApolloClient();
-
-  const [updateCheckboxReply] = useMutation(
-    PreviewPetitionFieldMutations_updateCheckboxReplyDocument
-  );
-  return useCallback(
-    async function _updateCheckboxReply({
-      petitionId,
-      replyId,
-      values,
-      isCacheOnly,
-    }: {
-      petitionId: string;
-      replyId: string;
-      values: string[];
-      isCacheOnly?: boolean;
-    }) {
-      if (isCacheOnly) {
-        updateReplyContent(client, replyId, (content) => ({
-          ...content,
-          value: values,
-        }));
-      } else {
-        await updateCheckboxReply({
-          variables: {
-            petitionId,
-            replyId,
-            values,
-          },
-        });
-      }
-    },
-    [updateCheckboxReply]
-  );
-}
-
-const _createDynamicSelectReply = gql`
-  mutation PreviewPetitionFieldMutations_createDynamicSelectReply(
-    $petitionId: GID!
-    $fieldId: GID!
-    $value: [[String]!]!
-  ) {
-    createDynamicSelectReply(petitionId: $petitionId, fieldId: $fieldId, value: $value) {
-      ...RecipientViewPetitionFieldCard_PetitionFieldReply
-      field {
-        id
-        petition {
-          id
-          ... on Petition {
-            status
-          }
-        }
-        replies {
-          id
-        }
-      }
-    }
-  }
-  ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
-`;
-
-export function useCreateDynamicSelectReply() {
-  const client = useApolloClient();
-
-  const [createDynamicSelectReply] = useMutation(
-    PreviewPetitionFieldMutations_createDynamicSelectReplyDocument
-  );
-  return useCallback(
-    async function _createDynamicSelectReply({
-      petitionId,
-      fieldId,
-      value,
-      isCacheOnly,
-    }: {
-      petitionId: string;
-      fieldId: string;
-      value: DynamicSelectValue;
-      isCacheOnly?: boolean;
-    }) {
-      if (isCacheOnly) {
-        const id = `${fieldId}-${getRandomId()}`;
-        updatePreviewFieldReplies(client, fieldId, (replies) => [
-          ...(replies ?? []),
-          {
-            id,
-            __typename: "PetitionFieldReply",
-            status: "PENDING",
-            content: { value },
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-        ]);
-        return { id, __typename: "PetitionFieldReply" };
-      } else {
-        const { data } = await createDynamicSelectReply({
-          variables: {
-            petitionId,
-            fieldId,
-            value,
-          },
-        });
-        return data?.createDynamicSelectReply;
-      }
-    },
-    [createDynamicSelectReply]
-  );
-}
-
-const _updateDynamicSelectReply = gql`
-  mutation PreviewPetitionFieldMutations_updateDynamicSelectReply(
-    $petitionId: GID!
-    $replyId: GID!
-    $value: [[String]!]!
-  ) {
-    updateDynamicSelectReply(petitionId: $petitionId, replyId: $replyId, value: $value) {
-      id
-      content
-      status
-      updatedAt
-      field {
-        id
-        petition {
-          id
-          ... on Petition {
-            status
-          }
-        }
-      }
-    }
-  }
-`;
-
-export function useUpdateDynamicSelectReply() {
-  const client = useApolloClient();
-
-  const [updateDynamicSelectReply] = useMutation(
-    PreviewPetitionFieldMutations_updateDynamicSelectReplyDocument
-  );
-  return useCallback(
-    async function _updateDynamicSelectReply({
-      petitionId,
-      replyId,
-      value,
-      isCacheOnly,
-    }: {
-      petitionId: string;
-      replyId: string;
-      value: DynamicSelectValue;
-      isCacheOnly?: boolean;
-    }) {
-      if (isCacheOnly) {
-        updateReplyContent(client, replyId, (content) => ({
-          ...content,
-          value,
-        }));
-      } else {
-        await updateDynamicSelectReply({
-          variables: {
-            petitionId,
-            replyId,
-            value,
-          },
-        });
-      }
-    },
-    [updateDynamicSelectReply]
+    [createPetitionFieldReply]
   );
 }
 

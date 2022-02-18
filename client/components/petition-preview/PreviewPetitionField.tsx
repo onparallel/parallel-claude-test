@@ -13,17 +13,11 @@ import { useFailureGeneratingLinkDialog } from "../petition-replies/dialogs/Fail
 import { UploadCache } from "../recipient-view/fields/RecipientViewPetitionField";
 import {
   RecipientViewPetitionFieldCard,
-  RecipientViewPetitionFieldCardProps,
+  RecipientViewPetitionFieldCardProps
 } from "../recipient-view/fields/RecipientViewPetitionFieldCard";
-import {
-  CheckboxValue,
-  RecipientViewPetitionFieldCheckbox,
-} from "../recipient-view/fields/RecipientViewPetitionFieldCheckbox";
+import { RecipientViewPetitionFieldCheckbox } from "../recipient-view/fields/RecipientViewPetitionFieldCheckbox";
 import { RecipientViewPetitionFieldDate } from "../recipient-view/fields/RecipientViewPetitionFieldDate";
-import {
-  DynamicSelectValue,
-  RecipientViewPetitionFieldDynamicSelect,
-} from "../recipient-view/fields/RecipientViewPetitionFieldDynamicSelect";
+import { RecipientViewPetitionFieldDynamicSelect } from "../recipient-view/fields/RecipientViewPetitionFieldDynamicSelect";
 import { RecipientViewPetitionFieldFileUpload } from "../recipient-view/fields/RecipientViewPetitionFieldFileUpload";
 import { RecipientViewPetitionFieldHeading } from "../recipient-view/fields/RecipientViewPetitionFieldHeading";
 import { RecipientViewPetitionFieldNumber } from "../recipient-view/fields/RecipientViewPetitionFieldNumber";
@@ -31,16 +25,10 @@ import { RecipientViewPetitionFieldPhone } from "../recipient-view/fields/Recipi
 import { RecipientViewPetitionFieldSelect } from "../recipient-view/fields/RecipientViewPetitionFieldSelect";
 import { RecipientViewPetitionFieldText } from "../recipient-view/fields/RecipientViewPetitionFieldText";
 import {
-  useCreateCheckboxReply,
-  useCreateDynamicSelectReply,
   useCreateFileUploadReply,
-  useCreateNumericReply,
-  useCreateSimpleReply,
+  useCreatePetitionFieldReply,
   useDeletePetitionReply,
-  useUpdateCheckboxReply,
-  useUpdateDynamicSelectReply,
-  useUpdateNumericReply,
-  useUpdateSimpleReply,
+  useUpdatePetitionFieldReply
 } from "./clientMutations";
 import { usePreviewPetitionFieldCommentsDialog } from "./dialogs/PreviewPetitionFieldCommentsDialog";
 
@@ -114,11 +102,11 @@ export function PreviewPetitionField({
     [deletePetitionReply]
   );
 
-  const updateSimpleReply = useUpdateSimpleReply();
-  const handleUpdateSimpleReply = useCallback(
-    async (replyId: string, reply: string) => {
+  const updatePetitionFieldReply = useUpdatePetitionFieldReply();
+  const handleUpdatePetitionFieldReply = useCallback(
+    async (replyId: string, reply: any) => {
       try {
-        await updateSimpleReply({
+        await updatePetitionFieldReply({
           petitionId,
           replyId,
           reply,
@@ -126,14 +114,14 @@ export function PreviewPetitionField({
         });
       } catch {}
     },
-    [updateSimpleReply]
+    [updatePetitionFieldReply]
   );
 
-  const createSimpleReply = useCreateSimpleReply();
-  const handleCreateSimpleReply = useCallback(
-    async (reply: string) => {
+  const createPetitionFieldReply = useCreatePetitionFieldReply();
+  const handleCreatePetitionFieldReply = useCallback(
+    async (reply: any) => {
       try {
-        const res = await createSimpleReply({
+        const res = await createPetitionFieldReply({
           petitionId,
           fieldId,
           reply,
@@ -144,100 +132,7 @@ export function PreviewPetitionField({
 
       return;
     },
-    [createSimpleReply]
-  );
-
-  const updateNumericReply = useUpdateNumericReply();
-  const handleUpdateNumericReply = useCallback(
-    async (replyId: string, reply: number) => {
-      try {
-        await updateNumericReply({
-          petitionId,
-          replyId,
-          reply,
-          isCacheOnly,
-        });
-      } catch {}
-    },
-    [updateNumericReply]
-  );
-
-  const createNumericReply = useCreateNumericReply();
-  const handleCreateNumericReply = useCallback(
-    async (reply: number) => {
-      try {
-        const res = await createNumericReply({
-          petitionId,
-          fieldId,
-          reply,
-          isCacheOnly,
-        });
-        return res?.id;
-      } catch {}
-
-      return;
-    },
-    [createNumericReply]
-  );
-
-  const updateCheckboxReply = useUpdateCheckboxReply();
-  const handleUpdateCheckboxReply = useCallback(
-    async (replyId: string, values: string[]) => {
-      try {
-        await updateCheckboxReply({
-          petitionId,
-          replyId,
-          values,
-          isCacheOnly,
-        });
-      } catch {}
-    },
-    [updateCheckboxReply]
-  );
-
-  const createCheckboxReply = useCreateCheckboxReply();
-  const handleCreateCheckboxReply = useCallback(
-    async (values: CheckboxValue) => {
-      try {
-        await createCheckboxReply({
-          petitionId,
-          fieldId,
-          values,
-          isCacheOnly,
-        });
-      } catch {}
-    },
-    [createCheckboxReply]
-  );
-
-  const updateDynamicSelectReply = useUpdateDynamicSelectReply();
-  const handleUpdateDynamicSelectReply = useCallback(
-    async (replyId: string, value: DynamicSelectValue) => {
-      await updateDynamicSelectReply({
-        petitionId,
-        replyId,
-        value,
-        isCacheOnly,
-      });
-    },
-    [updateDynamicSelectReply]
-  );
-
-  const createDynamicSelectReply = useCreateDynamicSelectReply();
-  const handleCreateDynamicSelectReply = useCallback(
-    async (value: DynamicSelectValue) => {
-      try {
-        const reply = await createDynamicSelectReply({
-          petitionId,
-          fieldId,
-          value,
-          isCacheOnly,
-        });
-
-        return reply?.id;
-      } catch {}
-    },
-    [createDynamicSelectReply]
+    [createPetitionFieldReply]
   );
 
   const createFileUploadReply = useCreateFileUploadReply();
@@ -293,76 +188,36 @@ export function PreviewPetitionField({
     petitionId,
     onCommentsButtonClick: handleCommentsButtonClick,
     onDownloadAttachment: handleDownloadAttachment,
+    onDeleteReply: handleDeletePetitionReply,
+    onUpdateReply: handleUpdatePetitionFieldReply,
+    onCreateReply: handleCreatePetitionFieldReply,
   };
 
   return field.type === "HEADING" ? (
     <RecipientViewPetitionFieldHeading {...props} {...commonProps} />
   ) : field.type === "TEXT" || field.type === "SHORT_TEXT" ? (
-    <RecipientViewPetitionFieldText
-      {...props}
-      {...commonProps}
-      onDeleteReply={handleDeletePetitionReply}
-      onUpdateReply={handleUpdateSimpleReply}
-      onCreateReply={handleCreateSimpleReply}
-    />
+    <RecipientViewPetitionFieldText {...props} {...commonProps} />
   ) : field.type === "SELECT" ? (
-    <RecipientViewPetitionFieldSelect
-      {...props}
-      {...commonProps}
-      onDeleteReply={handleDeletePetitionReply}
-      onUpdateReply={handleUpdateSimpleReply}
-      onCreateReply={handleCreateSimpleReply}
-    />
+    <RecipientViewPetitionFieldSelect {...props} {...commonProps} />
   ) : field.type === "FILE_UPLOAD" ? (
     <RecipientViewPetitionFieldFileUpload
       {...props}
       {...commonProps}
-      onDeleteReply={handleDeletePetitionReply}
       onCreateReply={handleCreateFileUploadReply}
       onDownloadReply={handleDownloadFileUploadReply}
       isCacheOnly={isCacheOnly}
     />
   ) : field.type === "DYNAMIC_SELECT" ? (
-    <RecipientViewPetitionFieldDynamicSelect
-      {...props}
-      {...commonProps}
-      onDeleteReply={handleDeletePetitionReply}
-      onUpdateReply={handleUpdateDynamicSelectReply}
-      onCreateReply={handleCreateDynamicSelectReply}
-    />
+    <RecipientViewPetitionFieldDynamicSelect {...props} {...commonProps} />
   ) : field.type === "CHECKBOX" ? (
-    <RecipientViewPetitionFieldCheckbox
-      {...props}
-      {...commonProps}
-      onDeleteReply={handleDeletePetitionReply}
-      onUpdateReply={handleUpdateCheckboxReply}
-      onCreateReply={handleCreateCheckboxReply}
-    />
+    <RecipientViewPetitionFieldCheckbox {...props} {...commonProps} />
   ) : field.type === "NUMBER" ? (
-    <RecipientViewPetitionFieldNumber
-      {...props}
-      {...commonProps}
-      onDeleteReply={handleDeletePetitionReply}
-      onUpdateReply={handleUpdateNumericReply}
-      onCreateReply={handleCreateNumericReply}
-    />
+    <RecipientViewPetitionFieldNumber {...props} {...commonProps} />
   ) : field.type === "DATE" ? (
-    <RecipientViewPetitionFieldDate
-      {...props}
-      {...commonProps}
-      onDeleteReply={handleDeletePetitionReply}
-      onUpdateReply={handleUpdateSimpleReply}
-      onCreateReply={handleCreateSimpleReply}
-    />
-  ) : field.type === "PHONE" ? (
-    <RecipientViewPetitionFieldPhone
-      {...props}
-      {...commonProps}
-      onDeleteReply={handleDeletePetitionReply}
-      onUpdateReply={handleUpdateSimpleReply}
-      onCreateReply={handleCreateSimpleReply}
-    />
-  ) : null;
+    <RecipientViewPetitionFieldDate {...props} {...commonProps} />
+  ) : field.type==="PHONE" ? (
+    <RecipientViewPetitionFieldPhone {...props} {...commonProps} />
+  );
 }
 
 PreviewPetitionField.fragments = {

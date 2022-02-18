@@ -6,24 +6,8 @@ import {
 } from "./fragments";
 
 gql`
-  mutation SubmitReply_createSimpleReply($petitionId: GID!, $fieldId: GID!, $reply: String!) {
-    createSimpleReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
-      ...PetitionFieldReply
-    }
-  }
-  ${PetitionFieldReplyFragment}
-`;
-gql`
-  mutation SubmitReply_createNumericReply($petitionId: GID!, $fieldId: GID!, $reply: Float!) {
-    createNumericReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
-      ...PetitionFieldReply
-    }
-  }
-  ${PetitionFieldReplyFragment}
-`;
-gql`
-  mutation SubmitReply_createCheckboxReply($petitionId: GID!, $fieldId: GID!, $reply: [String!]!) {
-    createCheckboxReply(petitionId: $petitionId, fieldId: $fieldId, values: $reply) {
+  mutation SubmitReply_createPetitionFieldReply($petitionId: GID!, $fieldId: GID!, $reply: JSON!) {
+    createPetitionFieldReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
       ...PetitionFieldReply
     }
   }
@@ -56,18 +40,6 @@ gql`
   ${PetitionFieldReplyFragment}
 `;
 gql`
-  mutation SubmitReply_createDynamicSelectReply(
-    $petitionId: GID!
-    $fieldId: GID!
-    $value: [[String]!]!
-  ) {
-    createDynamicSelectReply(petitionId: $petitionId, fieldId: $fieldId, value: $value) {
-      ...PetitionFieldReply
-    }
-  }
-  ${PetitionFieldReplyFragment}
-`;
-gql`
   mutation UpdateReplyStatus_updatePetitionFieldRepliesStatus(
     $petitionId: GID!
     $fieldId: GID!
@@ -91,45 +63,8 @@ gql`
   ${PetitionFieldReplyFragment}
 `;
 gql`
-  mutation UpdateReply_updateSimpleReply($petitionId: GID!, $replyId: GID!, $reply: String!) {
-    updateSimpleReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
-      ...PetitionFieldReply
-      field {
-        id
-      }
-    }
-  }
-  ${PetitionFieldReplyFragment}
-`;
-gql`
-  mutation UpdateReply_updateNumericReply($petitionId: GID!, $replyId: GID!, $reply: Float!) {
-    updateNumericReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
-      ...PetitionFieldReply
-      field {
-        id
-      }
-    }
-  }
-  ${PetitionFieldReplyFragment}
-`;
-gql`
-  mutation UpdateReply_updateCheckboxReply($petitionId: GID!, $replyId: GID!, $values: [String!]!) {
-    updateCheckboxReply(petitionId: $petitionId, replyId: $replyId, values: $values) {
-      ...PetitionFieldReply
-      field {
-        id
-      }
-    }
-  }
-  ${PetitionFieldReplyFragment}
-`;
-gql`
-  mutation UpdateReply_updateDynamicSelectReply(
-    $petitionId: GID!
-    $replyId: GID!
-    $value: [[String]!]!
-  ) {
-    updateDynamicSelectReply(petitionId: $petitionId, replyId: $replyId, value: $value) {
+  mutation UpdateReply_updatePetitionFieldReply($petitionId: GID!, $replyId: GID!, $reply: JSON!) {
+    updatePetitionFieldReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
       ...PetitionFieldReply
       field {
         id
