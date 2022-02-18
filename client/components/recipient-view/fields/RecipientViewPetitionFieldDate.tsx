@@ -116,12 +116,12 @@ export function RecipientViewPetitionFieldDate({
     type: "date",
     id: `reply-${field.id}-new`,
     ref: newReplyRef as any,
-    paddingRight: 10,
+    paddingRight: 3,
     isDisabled: isDisabled,
     value,
     onKeyDown: async (event: KeyboardEvent) => {
       if (isMetaReturn(event) && field.multiple) {
-        await handleCreate.immediateIfPending(value, false);
+        await handleCreate.immediate(value, false);
       } else if (event.key === "Backspace" && value === "") {
         if (field.replies.length > 0) {
           event.preventDefault();
@@ -133,7 +133,7 @@ export function RecipientViewPetitionFieldDate({
     },
     onBlur: async () => {
       if (value) {
-        await handleCreate.immediateIfPending(value, false);
+        await handleCreate.immediate(value, false);
         setShowNewReply(false);
       } else if (!value && field.replies.length > 0) {
         setShowNewReply(false);
@@ -145,7 +145,6 @@ export function RecipientViewPetitionFieldDate({
         return;
       }
       setValue(event.target.value);
-      handleCreate(event.target.value, true);
     },
   };
   return (
@@ -185,7 +184,7 @@ export function RecipientViewPetitionFieldDate({
       {(field.multiple && showNewReply) || field.replies.length === 0 ? (
         <Flex flex="1" position="relative" marginTop={2}>
           <Input {...inputProps} />
-          <Center boxSize={10} position="absolute" right={0} bottom={0}>
+          <Center boxSize={10} position="absolute" right={8} bottom={0}>
             <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
           </Center>
         </Flex>
@@ -230,7 +229,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
     type: "date",
     id: `reply-${field.id}-${reply.id}`,
     ref: ref as any,
-    paddingRight: 10,
+    paddingRight: 3,
     value,
     isDisabled: isDisabled || reply.status === "APPROVED",
     isInvalid: reply.status === "REJECTED",
@@ -244,16 +243,15 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
       }
     },
     onBlur: async () => {
-      if (value) {
-        await debouncedUpdateReply.immediateIfPending(value);
-      } else {
+      if (value && value !== reply.content.value) {
+        await debouncedUpdateReply.immediate(value);
+      } else if (!value) {
         debouncedUpdateReply.clear();
         onDelete();
       }
     },
     onChange: (event: ChangeEvent<HTMLInputElement>) => {
       setValue(event.target.value);
-      debouncedUpdateReply(event.target.value);
     },
   };
 
@@ -261,7 +259,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
     <Stack direction="row">
       <Flex flex="1" position="relative">
         <Input {...props} />
-        <Center boxSize={10} position="absolute" right={0} bottom={0}>
+        <Center boxSize={10} position="absolute" right={8} bottom={0}>
           <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
         </Center>
       </Flex>
