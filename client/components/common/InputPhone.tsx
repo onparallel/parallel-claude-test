@@ -1,5 +1,4 @@
 import { Input, InputGroup, InputLeftElement, InputProps } from "@chakra-ui/react";
-import { FieldPhoneIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { countryFlags, CountryISO } from "@parallel/utils/flags";
 import { PhoneFormatterProps } from "react-headless-phone-input/types/PhoneFormatterProps";
@@ -16,7 +15,9 @@ export const InputPhone = chakraForwardRef<
         return (
           <InputGroup>
             <InputLeftElement pointerEvents="none">
-              {country ? countryFlags[country as CountryISO] : <FieldPhoneIcon color="gray.400" />}
+              {country
+                ? countryFlags[country as CountryISO]
+                : countryFlags[defaultCountry as CountryISO]}
             </InputLeftElement>
             <Input
               ref={ref}

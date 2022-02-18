@@ -1,4 +1,4 @@
-import { Suspense, lazy } from "react";
+import { lazy, Suspense } from "react";
 import { PhoneFormatterProps } from "react-headless-phone-input/types/PhoneFormatterProps";
 const PhoneFormatter = lazy(() => import("react-headless-phone-input"));
 /**

@@ -1,5 +1,6 @@
 import { GraphQLResolveInfo } from "graphql";
 import { decode } from "jsonwebtoken";
+import { isValidPhoneNumber } from "libphonenumber-js";
 import { ArgsValue } from "nexus/dist/core";
 import { isDefined } from "remeda";
 import {
@@ -16,7 +17,6 @@ import { Arg } from "../helpers/authorize";
 import { ArgValidationError, InvalidReplyError } from "../helpers/errors";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
 import { validateCheckboxReplyValues, validateDynamicSelectReplyValues } from "../utils";
-import { isValidPhoneNumber } from "libphonenumber-js";
 
 export function validatePetitionStatus(
   petition: Maybe<Petition>,
@@ -225,9 +225,14 @@ function validateReplyValue(
         });
       }
       if (!isValidDate(reply)) {
-        throw new InvalidReplyError(info, argName, "Invalid date", {
-          subcode: "INVALID_VALUE_ERROR",
-        });
+        throw new InvalidReplyError(
+          info,
+          argName,
+          "Invalid date, date must have YYYY-MM-DD format",
+          {
+            subcode: "INVALID_VALUE_ERROR",
+          }
+        );
       }
       break;
     }

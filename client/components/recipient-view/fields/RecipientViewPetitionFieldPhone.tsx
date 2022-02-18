@@ -2,8 +2,10 @@ import { Center, Flex, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { InputPhone } from "@parallel/components/common/InputPhone";
+import { CountryISO } from "@parallel/utils/flags";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
+import { countryPhoneCodes } from "@parallel/utils/phoneCodes";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
@@ -18,7 +20,6 @@ import {
   RecipientViewPetitionFieldCard_PetitionFieldSelection,
 } from "./RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
-import { isValidPhoneNumber } from "libphonenumber-js";
 
 export interface RecipientViewPetitionFieldPhoneProps
   extends Omit<
@@ -42,8 +43,6 @@ export function RecipientViewPetitionFieldPhone({
   onCreateReply,
   onCommentsButtonClick,
 }: RecipientViewPetitionFieldPhoneProps) {
-  const intl = useIntl();
-
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
   const [value, setValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -62,7 +61,6 @@ export function RecipientViewPetitionFieldPhone({
 
   const handleUpdate = useMemoFactory(
     (replyId: string) => async (value: string) => {
-      if (!isValidPhoneNumber(value)) return;
       await onUpdateReply(replyId, value);
     },
     [onUpdateReply]
@@ -99,7 +97,7 @@ export function RecipientViewPetitionFieldPhone({
 
   const handleCreate = useDebouncedCallback(
     async (value: string, focusCreatedReply: boolean) => {
-      if (!value || !isValidPhoneNumber(value)) {
+      if (!value) {
         return;
       }
       setIsSaving(true);
@@ -147,12 +145,7 @@ export function RecipientViewPetitionFieldPhone({
         }
       }
     },
-    placeholder:
-      options.placeholder ??
-      intl.formatMessage({
-        id: "component.recipient-view-petition-field-reply.text-placeholder",
-        defaultMessage: "Enter your answer",
-      }),
+    placeholder: options.placeholder ?? countryPhoneCodes[options.defaultCountry as CountryISO],
   };
 
   return (
@@ -267,12 +260,7 @@ export const RecipientViewPetitionFieldReplyPhone = forwardRef<
         onDelete(true);
       }
     },
-    placeholder:
-      options.placeholder ??
-      intl.formatMessage({
-        id: "component.recipient-view-petition-field-reply.text-placeholder",
-        defaultMessage: "Enter your answer",
-      }),
+    placeholder: options.placeholder ?? countryPhoneCodes[options.defaultCountry as CountryISO],
   };
 
   return (

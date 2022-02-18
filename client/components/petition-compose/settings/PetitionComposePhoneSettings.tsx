@@ -55,11 +55,11 @@ export function PhoneSettings({
         selectOptions.find((o) => o.value === options.defaultCountry) ?? selectOptions[0]
       );
     }
-  }, [data.loading, selectRef.current, selectOptions]);
+  }, [data.loading, selectRef.current]);
 
   const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 300, [field.id]);
 
-  const handlePlaceholderChange = function (event: ChangeEvent<HTMLInputElement>) {
+  const handlePlaceholderChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setPlaceholder(value);
     debouncedOnUpdate(field.id, {
@@ -70,7 +70,7 @@ export function PhoneSettings({
     });
   };
 
-  const handleDefaultCountryChange = function (option: OptionType | null) {
+  const handleDefaultCountryChange = (option: OptionType | null) => {
     debouncedOnUpdate(field.id, {
       options: {
         ...field.options,
