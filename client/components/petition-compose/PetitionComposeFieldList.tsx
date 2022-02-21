@@ -68,6 +68,7 @@ export interface PetitionComposeFieldListProps extends BoxProps {
   onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => Promise<void>;
   isReadOnly?: boolean;
   isPublicTemplate?: boolean;
+  isTemplate?: boolean;
 }
 
 export const PetitionComposeFieldList = Object.assign(
@@ -84,6 +85,7 @@ export const PetitionComposeFieldList = Object.assign(
     onFieldEdit,
     isReadOnly,
     isPublicTemplate,
+    isTemplate,
     ...props
   }: PetitionComposeFieldListProps) {
     const [{ fieldsById, fieldIds }, setState] = useState(reset(fields));
@@ -470,6 +472,7 @@ export const PetitionComposeFieldList = Object.assign(
                       left="50%"
                       transform="translate(-50%, 50%)"
                       className="add-field-after-button"
+                      colorScheme={isTemplate ? "purple" : undefined}
                       {...addButtonMouseHandlers(fieldId)}
                     />
                   </Box>
@@ -484,6 +487,7 @@ export const PetitionComposeFieldList = Object.assign(
               data-action="big-add-field"
               id="big-add-field-button"
               onSelectFieldType={onAddField}
+              colorScheme={isTemplate ? "purple" : undefined}
             />
           </Flex>
         ) : null}
@@ -543,7 +547,7 @@ const AddFieldButton = memo(
 );
 
 const BigAddFieldButton = memo(
-  chakraForwardRef<"button", ButtonProps & AddFieldPopoverProps>(function AddFieldButton(
+  chakraForwardRef<"button", ButtonProps & AddFieldPopoverProps>(function BigAddFieldButton(
     props,
     ref
   ) {

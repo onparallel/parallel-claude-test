@@ -402,6 +402,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         }
       >
         <PaneWithFlyout
+          backgroundColor={petition?.__typename === "PetitionTemplate" ? "purple.50" : undefined}
           isFlyoutActive={Boolean(activeField)}
           alignWith={activeField ? activeFieldElement : null}
           flyout={
@@ -476,6 +477,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               onFieldSettingsClick={handleFieldSettingsClick}
               isReadOnly={petition.isRestricted || isPublicTemplate}
               isPublicTemplate={isPublicTemplate}
+              isTemplate={petition?.__typename === "PetitionTemplate"}
             />
             {petition?.__typename === "PetitionTemplate" ? (
               <PetitionTemplateDescriptionEdit

@@ -1,25 +1,26 @@
 import { Box, Flex } from "@chakra-ui/react";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Maybe } from "@parallel/utils/types";
+import useMergedRef from "@react-hook/merged-ref";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import ResizeObserver from "react-resize-observer";
+import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
-export type PaneWithFlyoutProps = {
+export interface PaneWithFlyoutProps {
   isFlyoutActive: boolean;
   flyout: ReactNode;
   alignWith: Maybe<HTMLElement>;
   children: ReactNode;
-};
+}
 
-export function PaneWithFlyout({
-  isFlyoutActive,
-  flyout,
-  alignWith,
-  children,
-}: PaneWithFlyoutProps) {
+export const PaneWithFlyout = chakraForwardRef<"div", PaneWithFlyoutProps>(function PaneWithFlyout(
+  { isFlyoutActive, flyout, alignWith, children, ...props },
+  ref
+) {
   const [flyoutOffset, setFlyoutOffset] = useState(0);
   const flyoutRef = useRef<HTMLDivElement>(null);
   const paneRef = useRef<HTMLDivElement>(null);
+  const _paneRef = useMergedRef(ref, paneRef);
 
   useEffect(positionFlyout, [isFlyoutActive, alignWith]);
   useEffect(scrollFlyoutIntoView, [isFlyoutActive, alignWith]);
@@ -52,7 +53,7 @@ export function PaneWithFlyout({
   }
 
   return (
-    <Flex ref={paneRef} minHeight="100%">
+    <Flex ref={_paneRef} minHeight="100%" {...props}>
       <Box flex="2" minWidth={0} display={{ base: isFlyoutActive ? "none" : "block", md: "block" }}>
         {children}
       </Box>
@@ -76,4 +77,4 @@ export function PaneWithFlyout({
       </Box>
     </Flex>
   );
-}
+});

@@ -211,12 +211,7 @@ export function PetitionTemplateHeader({
           })}
         />
         <Spacer minWidth={4} />
-        <Button
-          colorScheme="purple"
-          flexShrink={0}
-          onClick={handleUseTemplate}
-          data-action="use-template"
-        >
+        <Button flexShrink={0} onClick={handleUseTemplate} data-action="use-template">
           <FormattedMessage id="generic.use-template" defaultMessage="Use template" />
         </Button>
         <Menu>

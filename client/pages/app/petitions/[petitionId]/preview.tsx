@@ -290,7 +290,12 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
           </>
         }
       >
-        <Flex backgroundColor="gray.50" minHeight="100%" flexDirection="column" alignItems="center">
+        <Flex
+          backgroundColor={isPetition ? "gray.50" : "purple.50"}
+          minHeight="100%"
+          flexDirection="column"
+          alignItems="center"
+        >
           <Flex
             flex="1"
             flexDirection={{ base: "column", [breakpoint]: "row" }}
