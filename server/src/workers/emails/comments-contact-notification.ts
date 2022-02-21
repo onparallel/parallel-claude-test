@@ -60,6 +60,7 @@ export async function commentsContactNotification(
   const email = await context.emailLogs.createEmail({
     from: buildFrom(from, emailFrom),
     to: contact.email,
+    reply_to: context.config.misc.emailFrom,
     subject,
     text,
     html,
