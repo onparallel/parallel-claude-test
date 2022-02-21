@@ -251,14 +251,15 @@ export class OrganizationRepository extends BaseRepository {
     return row;
   }
 
-  async getOrganizationExpiredUsageLimitsAndDetails(): Promise<
-    Array<OrganizationUsageLimit & { usage_details: OrganizationUsageDetails }>
-  > {
-    return await this.from("organization_usage_limit")
-      .whereNull("period_end_date")
-      .whereRaw(`"period_start_date" + "period" < now()`)
-      .join(this.knex.raw("organization o on o.id = organization_usage_limit.org_id"))
-      .select("organization_usage_limit.*", "o.usage_details");
+  async getOrganizationExpiredUsageLimitsAndDetails() {
+    return await this.raw<
+      OrganizationUsageLimit & { usage_details: OrganizationUsageDetails }
+    >(/* sql */ `
+      select oul.*, o.usage_details
+        from organization_usage_limit oul
+        join organization o on o.id = oul.org_id
+      where period_end_date is null and ("period_start_date" at time zone 'UTC') + "period" < now()
+    `);
   }
 
   async createOrganizationUsageLimit(
