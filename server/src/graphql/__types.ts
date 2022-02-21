@@ -981,6 +981,7 @@ export interface NexusGenFieldTypes {
     updatePetitionRestriction: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionUserNotificationReadStatus: NexusGenRootTypes["PetitionUserNotification"][]; // [PetitionUserNotification!]!
     updatePublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
+    updatePublicTemplateVisibility: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateSignatureRequestMetadata: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     updateSimpleReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updateTag: NexusGenRootTypes["Tag"]; // Tag!
@@ -2292,6 +2293,7 @@ export interface NexusGenFieldTypeNames {
     updatePetitionRestriction: "PetitionBase";
     updatePetitionUserNotificationReadStatus: "PetitionUserNotification";
     updatePublicPetitionLink: "PublicPetitionLink";
+    updatePublicTemplateVisibility: "SupportMethodResponse";
     updateSignatureRequestMetadata: "PetitionSignatureRequest";
     updateSimpleReply: "PetitionFieldReply";
     updateTag: "Tag";
@@ -4031,6 +4033,11 @@ export interface NexusGenArgTypes {
       publicPetitionLinkId: NexusGenScalars["GID"]; // GID!
       slug?: string | null; // String
       title?: string | null; // String
+    };
+    updatePublicTemplateVisibility: {
+      // args
+      isPublic: boolean; // Boolean!
+      templateId: string; // ID!
     };
     updateSignatureRequestMetadata: {
       // args

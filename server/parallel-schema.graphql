@@ -1470,6 +1470,21 @@ type Mutation {
     slug: String
     title: String
   ): PublicPetitionLink!
+
+  """
+  Updates template_public from template
+  """
+  updatePublicTemplateVisibility(
+    """
+    Public visiblity of template
+    """
+    isPublic: Boolean!
+
+    """
+    global ID of the template
+    """
+    templateId: ID!
+  ): SupportMethodResponse!
   updateSignatureRequestMetadata(
     metadata: JSONObject!
     petitionSignatureRequestId: GID!

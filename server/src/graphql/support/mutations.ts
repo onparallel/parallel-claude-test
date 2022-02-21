@@ -601,3 +601,31 @@ export const updateOrganizationUserLimit = mutationField("updateOrganizationUser
     }
   },
 });
+
+export const updatePublicTemplateVisibility = mutationField("updatePublicTemplateVisibility", {
+  description: "Updates template_public from template",
+  type: "SupportMethodResponse",
+  args: {
+    templateId: nonNull(idArg({ description: "global ID of the template" })),
+    isPublic: nonNull(booleanArg({ description: "Public visiblity of template" })),
+  },
+  authorize: supportMethodAccess(),
+  resolve: async (_, { templateId, isPublic }, ctx, info) => {
+    try {
+      const { id } = fromGlobalId(templateId, "Petition");
+      const template = await ctx.petitions.loadPetition(id);
+      if (!template || !template.is_template) {
+        throw new ArgValidationError(info, "templateId", "Id does not correspond to a template");
+      }
+
+      await ctx.petitions.updatePetition(id, { template_public: isPublic }, `User:${ctx.user!.id}`);
+
+      return {
+        result: RESULT.SUCCESS,
+        message: `Template "${template.name}" with ID ${templateId}, TEMPLATE_PUBLIC has been updated from ${template.template_public} to ${isPublic}.`,
+      };
+    } catch (error: any) {
+      return { result: RESULT.FAILURE, message: error.message };
+    }
+  },
+});

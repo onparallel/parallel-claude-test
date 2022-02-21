@@ -629,6 +629,46 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "updatePublicTemplateVisibility",
+      description: "Updates template_public from template",
+      args: [
+        {
+          name: "isPublic",
+          description: "Public visiblity of template",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "Boolean", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "templateId",
+          description: "global ID of the template",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "ID", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "uploadUserAvatar",
       description: "Uploads a user avatar image",
       args: [

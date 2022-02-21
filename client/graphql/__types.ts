@@ -628,6 +628,8 @@ export interface Mutation {
   updatePetitionUserNotificationReadStatus: Array<PetitionUserNotification>;
   /** Updates the info and permissions of a public link */
   updatePublicPetitionLink: PublicPetitionLink;
+  /** Updates template_public from template */
+  updatePublicTemplateVisibility: SupportMethodResponse;
   updateSignatureRequestMetadata: PetitionSignatureRequest;
   /** Updates a reply to a text or select field. */
   updateSimpleReply: PetitionFieldReply;
@@ -1412,6 +1414,11 @@ export interface MutationupdatePublicPetitionLinkArgs {
   publicPetitionLinkId: Scalars["GID"];
   slug?: InputMaybe<Scalars["String"]>;
   title?: InputMaybe<Scalars["String"]>;
+}
+
+export interface MutationupdatePublicTemplateVisibilityArgs {
+  isPublic: Scalars["Boolean"];
+  templateId: Scalars["ID"];
 }
 
 export interface MutationupdateSignatureRequestMetadataArgs {
