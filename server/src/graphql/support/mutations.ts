@@ -4,6 +4,7 @@ import { fullName } from "../../util/fullName";
 import { fromGlobalId } from "../../util/globalId";
 import { hash, random } from "../../util/token";
 import { ArgValidationError } from "../helpers/errors";
+import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
 import { uploadArg } from "../helpers/upload";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
@@ -606,19 +607,22 @@ export const updatePublicTemplateVisibility = mutationField("updatePublicTemplat
   description: "Updates template_public from template",
   type: "SupportMethodResponse",
   args: {
-    templateId: nonNull(idArg({ description: "global ID of the template" })),
+    templateId: nonNull(globalIdArg({ description: "global ID of the template" })),
     isPublic: nonNull(booleanArg({ description: "Public visiblity of template" })),
   },
   authorize: supportMethodAccess(),
   resolve: async (_, { templateId, isPublic }, ctx, info) => {
     try {
-      const { id } = fromGlobalId(templateId, "Petition");
-      const template = await ctx.petitions.loadPetition(id);
+      const template = await ctx.petitions.loadPetition(templateId);
       if (!template || !template.is_template) {
         throw new ArgValidationError(info, "templateId", "Id does not correspond to a template");
       }
 
-      await ctx.petitions.updatePetition(id, { template_public: isPublic }, `User:${ctx.user!.id}`);
+      await ctx.petitions.updatePetition(
+        templateId,
+        { template_public: isPublic },
+        `User:${ctx.user!.id}`
+      );
 
       return {
         result: RESULT.SUCCESS,

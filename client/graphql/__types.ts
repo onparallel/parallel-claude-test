@@ -1418,7 +1418,7 @@ export interface MutationupdatePublicPetitionLinkArgs {
 
 export interface MutationupdatePublicTemplateVisibilityArgs {
   isPublic: Scalars["Boolean"];
-  templateId: Scalars["ID"];
+  templateId: Scalars["GID"];
 }
 
 export interface MutationupdateSignatureRequestMetadataArgs {

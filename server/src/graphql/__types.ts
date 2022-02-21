@@ -4037,7 +4037,7 @@ export interface NexusGenArgTypes {
     updatePublicTemplateVisibility: {
       // args
       isPublic: boolean; // Boolean!
-      templateId: string; // ID!
+      templateId: NexusGenScalars["GID"]; // GID!
     };
     updateSignatureRequestMetadata: {
       // args

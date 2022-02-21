@@ -1483,7 +1483,7 @@ type Mutation {
     """
     global ID of the template
     """
-    templateId: ID!
+    templateId: GID!
   ): SupportMethodResponse!
   updateSignatureRequestMetadata(
     metadata: JSONObject!
