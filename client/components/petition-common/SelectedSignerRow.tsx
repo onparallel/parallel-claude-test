@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Flex, FlexProps, Text } from "@chakra-ui/react";
+import { Flex, FlexProps, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon, EditIcon } from "@parallel/chakra/icons";
 import { SelectedSignerRow_PetitionSignerFragment } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
@@ -38,7 +38,7 @@ export function SelectedSignerRow({
         {">"}
       </Text>
       {isEditable ? (
-        <Flex gridGap={1}>
+        <Stack direction="row" spacing={1}>
           <IconButtonWithTooltip
             variant="ghost"
             size="sm"
@@ -50,16 +50,13 @@ export function SelectedSignerRow({
           <IconButtonWithTooltip
             variant="ghost"
             size="sm"
-            label={intl.formatMessage({
-              id: "component.selected-signer-row.remove-signer",
-              defaultMessage: "Remove signer",
-            })}
+            label={intl.formatMessage({ id: "generic.remove", defaultMessage: "Remove" })}
             marginLeft={1}
             icon={<DeleteIcon />}
             _hover={{ backgroundColor: "gray.200" }}
             onClick={onRemove}
           />
-        </Flex>
+        </Stack>
       ) : null}
     </Flex>
   );

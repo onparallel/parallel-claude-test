@@ -298,36 +298,30 @@ function SignatureConfigDialogBodyStep1({
 
   return (
     <Stack spacing={4}>
-      <Text>
-        <FormattedMessage
-          id="component.signature-config-dialog.header.subtitle"
-          defaultMessage="Sign a PDF document with all the replies."
-        />
-        <Text marginTop={2}>
+      <Stack spacing={2}>
+        <Text>
           <FormattedMessage
-            id="component.signature-config-dialog.header.help-link"
-            defaultMessage="<a>More about eSignature</a>"
-            values={{
-              a: (chunks: any[]) => (
-                <NormalLink
-                  target="_blank"
-                  href={
-                    intl.locale === "es"
-                      ? "https://support.onparallel.com/hc/es/articles/360017087398-Activar-la-firma-electr%C3%B3nica#h_01FRGJTBC90ECANWFJ5DTE2629"
-                      : "https://support.onparallel.com/hc/en-us/articles/360017087398-How-to-enable-the-eSignature-in-a-petition"
-                  }
-                  display="flex"
-                  alignItems="center"
-                  width="fit-content"
-                >
-                  {chunks}
-                  <ExternalLinkIcon marginLeft={1} />
-                </NormalLink>
-              ),
-            }}
+            id="component.signature-config-dialog.header.subtitle"
+            defaultMessage="Sign a PDF document with all the replies."
           />
         </Text>
-      </Text>
+        <Text>
+          <NormalLink
+            isExternal
+            href={
+              intl.locale === "es"
+                ? "https://support.onparallel.com/hc/es/articles/360017087398-Activar-la-firma-electr%C3%B3nica#h_01FRGJTBC90ECANWFJ5DTE2629"
+                : "https://support.onparallel.com/hc/en-us/articles/360017087398-How-to-enable-the-eSignature-in-a-petition"
+            }
+          >
+            <FormattedMessage
+              id="component.signature-config-dialog.header.help-link"
+              defaultMessage="More about eSignature"
+            />
+            <ExternalLinkIcon verticalAlign="sub" marginLeft={1} />
+          </NormalLink>
+        </Text>
+      </Stack>
       <FormControl hidden={providers.length < 2}>
         <FormLabel>
           <FormattedMessage

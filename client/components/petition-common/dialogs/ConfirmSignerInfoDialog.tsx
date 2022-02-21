@@ -61,7 +61,7 @@ function ConfirmSignerInfoDialog({
             </FormLabel>
             <Input {...register("email", { disabled: true })} />
           </FormControl>
-          <Stack direction="row">
+          <Stack direction={{ base: "column", sm: "row" }}>
             <FormControl isInvalid={!!errors.firstName}>
               <FormLabel fontWeight="bold">
                 <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />

@@ -2810,11 +2810,6 @@
     "context": "Search..."
   },
   {
-    "term": "component.selected-signer-row.remove-signer",
-    "definition": "Quitar firmante",
-    "context": "Remove signer"
-  },
-  {
     "term": "component.send-button.schedule",
     "definition": "Programar envío",
     "context": "Schedule send"
@@ -2966,8 +2961,8 @@
   },
   {
     "term": "component.signature-config-dialog.header.help-link",
-    "definition": "<a>Más sobre la firma</a>",
-    "context": "<a>More about eSignature</a>"
+    "definition": "Más sobre la firma",
+    "context": "More about eSignature"
   },
   {
     "term": "component.signature-config-dialog.header.subtitle",
