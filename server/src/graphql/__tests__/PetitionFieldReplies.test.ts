@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
-import { access } from "fs";
 import { Knex } from "knex";
-import { omit, reject } from "remeda";
+import { omit } from "remeda";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
@@ -49,6 +48,11 @@ describe("GraphQL/Petition Field Replies", () => {
   });
 
   describe("createPetitionFieldReply", () => {
+    afterEach(async () => {
+      await mocks.knex("petition_field_reply").delete();
+      await mocks.knex("petition_event").delete();
+    });
+
     describe("TEXT, SHORT_TEXT", () => {
       let textField: PetitionField;
       let shortTextField: PetitionField;
@@ -61,11 +65,6 @@ describe("GraphQL/Petition Field Replies", () => {
             options: i === 1 ? { maxLength: 15 } : {},
           })
         );
-      });
-
-      afterEach(async () => {
-        await mocks.knex("petition_field_reply").delete();
-        await mocks.knex("petition_event").delete();
       });
 
       it("petition status should change to DRAFT when creating a reply on a already completed petition without recipients", async () => {
@@ -349,11 +348,6 @@ describe("GraphQL/Petition Field Replies", () => {
         }));
       });
 
-      afterEach(async () => {
-        await mocks.knex("petition_field_reply").delete();
-        await mocks.knex("petition_event").delete();
-      });
-
       it("creates a SELECT reply as an User", async () => {
         const { data, errors } = await testClient.execute(
           gql`
@@ -481,11 +475,6 @@ describe("GraphQL/Petition Field Replies", () => {
         }));
       });
 
-      afterEach(async () => {
-        await mocks.knex("petition_field_reply").delete();
-        await mocks.knex("petition_event").delete();
-      });
-
       it("creates a new reply type DATE", async () => {
         const { data, errors } = await testClient.execute(
           gql`
@@ -571,11 +560,6 @@ describe("GraphQL/Petition Field Replies", () => {
           multiple: true,
           optional: true,
         }));
-      });
-
-      afterEach(async () => {
-        await mocks.knex("petition_field_reply").delete();
-        await mocks.knex("petition_event").delete();
       });
 
       it("creates a reply of type NUMBER", async () => {
@@ -751,11 +735,6 @@ describe("GraphQL/Petition Field Replies", () => {
             },
           },
         }));
-      });
-
-      afterEach(async () => {
-        await mocks.knex("petition_field_reply").delete();
-        await mocks.knex("petition_event").delete();
       });
 
       it("creates a checkbox reply of UNLIMITED subtype", async () => {
@@ -964,11 +943,6 @@ describe("GraphQL/Petition Field Replies", () => {
         }));
       });
 
-      afterEach(async () => {
-        await mocks.knex("petition_field_reply").delete();
-        await mocks.knex("petition_event").delete();
-      });
-
       it("creates a reply of type DYNAMIC_SELECT", async () => {
         const { errors, data } = await testClient.execute(
           gql`
@@ -1106,6 +1080,10 @@ describe("GraphQL/Petition Field Replies", () => {
   });
 
   describe("updatePetitionFieldReply", () => {
+    afterEach(async () => {
+      await mocks.knex("petition_event").delete();
+    });
+
     describe("TEXT, SHORT_TEXT", () => {
       let textField: PetitionField;
       let rejectedReply: PetitionFieldReply;
@@ -1143,10 +1121,6 @@ describe("GraphQL/Petition Field Replies", () => {
           1,
           () => ({ created_by: `Contact:${contact.id}` })
         );
-      });
-
-      afterEach(async () => {
-        await mocks.knex("petition_event").delete();
       });
 
       it("petition status should change to PENDING when updating a reply on a already completed petition with active accesses", async () => {
@@ -1750,16 +1724,9 @@ describe("GraphQL/Petition Field Replies", () => {
           },
         }));
 
-        [checkboxReply] = await mocks.knex
-          .from<PetitionFieldReply>("petition_field_reply")
-          .insert({
-            content: { value: ["1"] },
-            petition_field_id: checkboxField.id,
-            user_id: user.id,
-            status: "PENDING",
-            type: "CHECKBOX",
-          })
-          .returning("*");
+        checkboxReply = await mocks.createCheckboxReply(checkboxField.id, { userId: user.id }, [
+          "1",
+        ]);
       });
 
       it("updates a checkbox reply", async () => {

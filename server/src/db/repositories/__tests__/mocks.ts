@@ -716,6 +716,27 @@ export class Mocks {
     const [task] = await this.knex<Task<TName>>("task").insert(data, "*");
     return task;
   }
+
+  async createCheckboxReply(
+    fieldId: number,
+    userOrAccess: { userId?: number; accessId?: number },
+    value: string[]
+  ) {
+    const [reply] = await this.knex
+      .from<PetitionFieldReply>("petition_field_reply")
+      .insert({
+        content: { value },
+        petition_field_id: fieldId,
+        ...(userOrAccess.userId
+          ? { user_id: userOrAccess.userId! }
+          : { petition_access_id: userOrAccess.accessId! }),
+        status: "PENDING",
+        type: "CHECKBOX",
+      })
+      .returning("*");
+
+    return reply;
+  }
 }
 
 function randomPetitionStatus() {

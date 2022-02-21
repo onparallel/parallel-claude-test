@@ -477,26 +477,40 @@ export type Mutation = {
   publicCompletePetition: PublicPetition;
   /** Creates and sends the petition linked to the PublicPetitionLink to the contact passed in args */
   publicCreateAndSendPetitionFromPublicLink: Result;
-  /** Creates a reply to a checkbox field. */
+  /**
+   * Creates a reply to a checkbox field.
+   * @deprecated use publicCreatePetitionFieldReply instead
+   */
   publicCreateCheckboxReply: PublicPetitionFieldReply;
-  /** Creates a reply for a dynamic select field. */
+  /**
+   * Creates a reply for a dynamic select field.
+   * @deprecated use publicCreatePetitionFieldReply instead
+   */
   publicCreateDynamicSelectReply: PublicPetitionFieldReply;
   /** Creates a reply to a file upload field. */
   publicCreateFileUploadReply: PublicCreateFileUploadReply;
-  /** Creates a reply to a numeric field. */
+  /**
+   * Creates a reply to a numeric field.
+   * @deprecated use publicCreatePetitionFieldReply instead
+   */
   publicCreateNumericReply: PublicPetitionFieldReply;
   /** Create a petition field comment. */
   publicCreatePetitionFieldComment: PublicPetitionFieldComment;
+  /** Creates a reply on a petition field as recipient. */
+  publicCreatePetitionFieldReply: PublicPetitionFieldReply;
   /** Starts an export pdf task in a recipient context */
   publicCreatePrintPdfTask: Task;
-  /** Creates a reply to a text or select field. */
+  /**
+   * Creates a reply to a text or select field.
+   * @deprecated use publicCreatePetitionFieldReply instead
+   */
   publicCreateSimpleReply: PublicPetitionFieldReply;
   /** Lets a recipient delegate access to the petition to another contact in the same organization */
   publicDelegateAccessToContact: PublicPetitionAccess;
   /** Delete a petition field comment. */
   publicDeletePetitionFieldComment: PublicPetitionField;
   /** Deletes a reply to a petition field. */
-  publicDeletePetitionReply: PublicPetitionField;
+  publicDeletePetitionFieldReply: PublicPetitionField;
   /** Notifies the backend that the upload is complete. */
   publicFileUploadReplyComplete: PublicPetitionFieldReply;
   /** Generates a download link for a file reply on a public context. */
@@ -511,15 +525,29 @@ export type Mutation = {
   publicPetitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   publicSendReminder: Result;
   publicSendVerificationCode: VerificationCodeRequest;
-  /** Updates a reply of checkbox field. */
+  /**
+   * Updates a reply of checkbox field.
+   * @deprecated use publicUpdatePetitionFieldReply instead
+   */
   publicUpdateCheckboxReply: PublicPetitionFieldReply;
-  /** Updates a reply for a dynamic select field. */
+  /**
+   * Updates a reply for a dynamic select field.
+   * @deprecated use publicUpdatePetitionFieldReply instead
+   */
   publicUpdateDynamicSelectReply: PublicPetitionFieldReply;
-  /** Updates a reply to a numeric field. */
+  /**
+   * Updates a reply to a numeric field.
+   * @deprecated use publicUpdatePetitionFieldReply instead
+   */
   publicUpdateNumericReply: PublicPetitionFieldReply;
   /** Update a petition field comment. */
   publicUpdatePetitionFieldComment: PublicPetitionFieldComment;
-  /** Updates a reply to a text or select field. */
+  /** Creates a reply on a petition field as recipient. */
+  publicUpdatePetitionFieldReply: PublicPetitionFieldReply;
+  /**
+   * Updates a reply to a text or select field.
+   * @deprecated use publicUpdatePetitionFieldReply instead
+   */
   publicUpdateSimpleReply: PublicPetitionFieldReply;
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
@@ -1067,6 +1095,12 @@ export type MutationpublicCreatePetitionFieldCommentArgs = {
   petitionFieldId: Scalars["GID"];
 };
 
+export type MutationpublicCreatePetitionFieldReplyArgs = {
+  fieldId: Scalars["GID"];
+  keycode: Scalars["ID"];
+  reply: Scalars["JSON"];
+};
+
 export type MutationpublicCreatePrintPdfTaskArgs = {
   keycode: Scalars["ID"];
 };
@@ -1091,7 +1125,7 @@ export type MutationpublicDeletePetitionFieldCommentArgs = {
   petitionFieldId: Scalars["GID"];
 };
 
-export type MutationpublicDeletePetitionReplyArgs = {
+export type MutationpublicDeletePetitionFieldReplyArgs = {
   keycode: Scalars["ID"];
   replyId: Scalars["GID"];
 };
@@ -1163,6 +1197,12 @@ export type MutationpublicUpdatePetitionFieldCommentArgs = {
   keycode: Scalars["ID"];
   petitionFieldCommentId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
+};
+
+export type MutationpublicUpdatePetitionFieldReplyArgs = {
+  keycode: Scalars["ID"];
+  reply: Scalars["JSON"];
+  replyId: Scalars["GID"];
 };
 
 export type MutationpublicUpdateSimpleReplyArgs = {

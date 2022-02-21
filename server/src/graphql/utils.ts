@@ -6,6 +6,9 @@ export function validateDynamicSelectReplyValues(field: PetitionField, reply: (s
   const levels = field.options.labels.length;
   const labels = field.options.labels as string[];
   let values = field.options.values as string[] | DynamicSelectOption[];
+  if (reply.length > levels) {
+    throw new Error("INVALID_VALUE_ERROR");
+  }
   for (let level = 0; level < levels; level++) {
     if (reply[level][0] !== labels[level]) {
       throw new Error("INVALID_VALUE_ERROR");

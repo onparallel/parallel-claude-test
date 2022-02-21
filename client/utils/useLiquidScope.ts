@@ -40,25 +40,10 @@ export function useLiquidScope(
 }
 
 function getReplyValue(type: PetitionFieldType, content: any) {
-  switch (type) {
-    case "DYNAMIC_SELECT":
-      return content.columns as [string, string][];
-    case "CHECKBOX":
-      return content.choices as string[];
-    case "TEXT":
-      return content.text as string;
-    case "SHORT_TEXT":
-      return content.text as string;
-    case "SELECT":
-      return content.text as string;
-    case "NUMBER":
-      return content.value as number;
-    case "DATE":
-      return content.value as string;
-    case "PHONE":
-      return content.value as string;
-    default:
-      return undefined;
+  if (type === "FILE_UPLOAD") {
+    return undefined;
+  } else {
+    return content.value;
   }
 }
 
