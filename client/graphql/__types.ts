@@ -508,26 +508,40 @@ export interface Mutation {
   publicCompletePetition: PublicPetition;
   /** Creates and sends the petition linked to the PublicPetitionLink to the contact passed in args */
   publicCreateAndSendPetitionFromPublicLink: Result;
-  /** Creates a reply to a checkbox field. */
+  /**
+   * Creates a reply to a checkbox field.
+   * @deprecated use publicCreatePetitionFieldReply instead
+   */
   publicCreateCheckboxReply: PublicPetitionFieldReply;
-  /** Creates a reply for a dynamic select field. */
+  /**
+   * Creates a reply for a dynamic select field.
+   * @deprecated use publicCreatePetitionFieldReply instead
+   */
   publicCreateDynamicSelectReply: PublicPetitionFieldReply;
   /** Creates a reply to a file upload field. */
   publicCreateFileUploadReply: PublicCreateFileUploadReply;
-  /** Creates a reply to a numeric field. */
+  /**
+   * Creates a reply to a numeric field.
+   * @deprecated use publicCreatePetitionFieldReply instead
+   */
   publicCreateNumericReply: PublicPetitionFieldReply;
   /** Create a petition field comment. */
   publicCreatePetitionFieldComment: PublicPetitionFieldComment;
+  /** Creates a reply on a petition field as recipient. */
+  publicCreatePetitionFieldReply: PublicPetitionFieldReply;
   /** Starts an export pdf task in a recipient context */
   publicCreatePrintPdfTask: Task;
-  /** Creates a reply to a text or select field. */
+  /**
+   * Creates a reply to a text or select field.
+   * @deprecated use publicCreatePetitionFieldReply instead
+   */
   publicCreateSimpleReply: PublicPetitionFieldReply;
   /** Lets a recipient delegate access to the petition to another contact in the same organization */
   publicDelegateAccessToContact: PublicPetitionAccess;
   /** Delete a petition field comment. */
   publicDeletePetitionFieldComment: PublicPetitionField;
   /** Deletes a reply to a petition field. */
-  publicDeletePetitionReply: PublicPetitionField;
+  publicDeletePetitionFieldReply: PublicPetitionField;
   /** Notifies the backend that the upload is complete. */
   publicFileUploadReplyComplete: PublicPetitionFieldReply;
   /** Generates a download link for a file reply on a public context. */
@@ -542,15 +556,29 @@ export interface Mutation {
   publicPetitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   publicSendReminder: Result;
   publicSendVerificationCode: VerificationCodeRequest;
-  /** Updates a reply of checkbox field. */
+  /**
+   * Updates a reply of checkbox field.
+   * @deprecated use publicUpdatePetitionFieldReply instead
+   */
   publicUpdateCheckboxReply: PublicPetitionFieldReply;
-  /** Updates a reply for a dynamic select field. */
+  /**
+   * Updates a reply for a dynamic select field.
+   * @deprecated use publicUpdatePetitionFieldReply instead
+   */
   publicUpdateDynamicSelectReply: PublicPetitionFieldReply;
-  /** Updates a reply to a numeric field. */
+  /**
+   * Updates a reply to a numeric field.
+   * @deprecated use publicUpdatePetitionFieldReply instead
+   */
   publicUpdateNumericReply: PublicPetitionFieldReply;
   /** Update a petition field comment. */
   publicUpdatePetitionFieldComment: PublicPetitionFieldComment;
-  /** Updates a reply to a text or select field. */
+  /** Creates a reply on a petition field as recipient. */
+  publicUpdatePetitionFieldReply: PublicPetitionFieldReply;
+  /**
+   * Updates a reply to a text or select field.
+   * @deprecated use publicUpdatePetitionFieldReply instead
+   */
   publicUpdateSimpleReply: PublicPetitionFieldReply;
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
@@ -1098,6 +1126,12 @@ export interface MutationpublicCreatePetitionFieldCommentArgs {
   petitionFieldId: Scalars["GID"];
 }
 
+export interface MutationpublicCreatePetitionFieldReplyArgs {
+  fieldId: Scalars["GID"];
+  keycode: Scalars["ID"];
+  reply: Scalars["JSON"];
+}
+
 export interface MutationpublicCreatePrintPdfTaskArgs {
   keycode: Scalars["ID"];
 }
@@ -1122,7 +1156,7 @@ export interface MutationpublicDeletePetitionFieldCommentArgs {
   petitionFieldId: Scalars["GID"];
 }
 
-export interface MutationpublicDeletePetitionReplyArgs {
+export interface MutationpublicDeletePetitionFieldReplyArgs {
   keycode: Scalars["ID"];
   replyId: Scalars["GID"];
 }
@@ -1194,6 +1228,12 @@ export interface MutationpublicUpdatePetitionFieldCommentArgs {
   keycode: Scalars["ID"];
   petitionFieldCommentId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
+}
+
+export interface MutationpublicUpdatePetitionFieldReplyArgs {
+  keycode: Scalars["ID"];
+  reply: Scalars["JSON"];
+  replyId: Scalars["GID"];
 }
 
 export interface MutationpublicUpdateSimpleReplyArgs {
@@ -9390,13 +9430,13 @@ export type RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLink
   };
 };
 
-export type RecipientViewPetitionField_publicDeletePetitionReplyMutationVariables = Exact<{
+export type RecipientViewPetitionField_publicDeletePetitionFieldReplyMutationVariables = Exact<{
   replyId: Scalars["GID"];
   keycode: Scalars["ID"];
 }>;
 
-export type RecipientViewPetitionField_publicDeletePetitionReplyMutation = {
-  publicDeletePetitionReply: {
+export type RecipientViewPetitionField_publicDeletePetitionFieldReplyMutation = {
+  publicDeletePetitionFieldReply: {
     __typename?: "PublicPetitionField";
     id: string;
     replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
@@ -9404,14 +9444,14 @@ export type RecipientViewPetitionField_publicDeletePetitionReplyMutation = {
   };
 };
 
-export type RecipientViewPetitionField_publicCreateSimpleReplyMutationVariables = Exact<{
+export type RecipientViewPetitionField_publicCreatePetitionFieldReplyMutationVariables = Exact<{
   keycode: Scalars["ID"];
   fieldId: Scalars["GID"];
-  value: Scalars["String"];
+  reply: Scalars["JSON"];
 }>;
 
-export type RecipientViewPetitionField_publicCreateSimpleReplyMutation = {
-  publicCreateSimpleReply: {
+export type RecipientViewPetitionField_publicCreatePetitionFieldReplyMutation = {
+  publicCreatePetitionFieldReply: {
     __typename?: "PublicPetitionFieldReply";
     id: string;
     status: PetitionFieldReplyStatus;
@@ -9427,155 +9467,14 @@ export type RecipientViewPetitionField_publicCreateSimpleReplyMutation = {
   };
 };
 
-export type RecipientViewPetitionField_publicUpdateSimpleReplyMutationVariables = Exact<{
+export type RecipientViewPetitionField_publicUpdatePetitionFieldReplyMutationVariables = Exact<{
   keycode: Scalars["ID"];
   replyId: Scalars["GID"];
-  value: Scalars["String"];
+  reply: Scalars["JSON"];
 }>;
 
-export type RecipientViewPetitionField_publicUpdateSimpleReplyMutation = {
-  publicUpdateSimpleReply: {
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    status: PetitionFieldReplyStatus;
-    content: { [key: string]: any };
-    createdAt: string;
-    updatedAt: string;
-    field: {
-      __typename?: "PublicPetitionField";
-      id: string;
-      petition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
-    };
-  };
-};
-
-export type RecipientViewPetitionField_publicCreateNumericReplyMutationVariables = Exact<{
-  keycode: Scalars["ID"];
-  fieldId: Scalars["GID"];
-  value: Scalars["Float"];
-}>;
-
-export type RecipientViewPetitionField_publicCreateNumericReplyMutation = {
-  publicCreateNumericReply: {
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    status: PetitionFieldReplyStatus;
-    content: { [key: string]: any };
-    createdAt: string;
-    updatedAt: string;
-    field: {
-      __typename?: "PublicPetitionField";
-      id: string;
-      petition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
-      replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
-    };
-  };
-};
-
-export type RecipientViewPetitionField_publicUpdateNumericReplyMutationVariables = Exact<{
-  keycode: Scalars["ID"];
-  replyId: Scalars["GID"];
-  value: Scalars["Float"];
-}>;
-
-export type RecipientViewPetitionField_publicUpdateNumericReplyMutation = {
-  publicUpdateNumericReply: {
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    status: PetitionFieldReplyStatus;
-    content: { [key: string]: any };
-    createdAt: string;
-    updatedAt: string;
-    field: {
-      __typename?: "PublicPetitionField";
-      id: string;
-      petition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
-    };
-  };
-};
-
-export type RecipientViewPetitionField_publicCreateCheckboxReplyMutationVariables = Exact<{
-  keycode: Scalars["ID"];
-  fieldId: Scalars["GID"];
-  values: Array<Scalars["String"]> | Scalars["String"];
-}>;
-
-export type RecipientViewPetitionField_publicCreateCheckboxReplyMutation = {
-  publicCreateCheckboxReply: {
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    status: PetitionFieldReplyStatus;
-    content: { [key: string]: any };
-    createdAt: string;
-    updatedAt: string;
-    field: {
-      __typename?: "PublicPetitionField";
-      id: string;
-      petition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
-      replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
-    };
-  };
-};
-
-export type RecipientViewPetitionField_publicUpdateCheckboxReplyMutationVariables = Exact<{
-  keycode: Scalars["ID"];
-  replyId: Scalars["GID"];
-  values: Array<Scalars["String"]> | Scalars["String"];
-}>;
-
-export type RecipientViewPetitionField_publicUpdateCheckboxReplyMutation = {
-  publicUpdateCheckboxReply: {
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    status: PetitionFieldReplyStatus;
-    content: { [key: string]: any };
-    createdAt: string;
-    updatedAt: string;
-    field: {
-      __typename?: "PublicPetitionField";
-      id: string;
-      petition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
-    };
-  };
-};
-
-export type RecipientViewPetitionField_publicCreateDynamicSelectReplyMutationVariables = Exact<{
-  keycode: Scalars["ID"];
-  fieldId: Scalars["GID"];
-  value:
-    | Array<Array<InputMaybe<Scalars["String"]>> | InputMaybe<Scalars["String"]>>
-    | Array<InputMaybe<Scalars["String"]>>
-    | InputMaybe<Scalars["String"]>;
-}>;
-
-export type RecipientViewPetitionField_publicCreateDynamicSelectReplyMutation = {
-  publicCreateDynamicSelectReply: {
-    __typename?: "PublicPetitionFieldReply";
-    id: string;
-    status: PetitionFieldReplyStatus;
-    content: { [key: string]: any };
-    createdAt: string;
-    updatedAt: string;
-    field: {
-      __typename?: "PublicPetitionField";
-      id: string;
-      petition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
-      replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
-    };
-  };
-};
-
-export type RecipientViewPetitionField_publicUpdateDynamicSelectReplyMutationVariables = Exact<{
-  keycode: Scalars["ID"];
-  replyId: Scalars["GID"];
-  values:
-    | Array<Array<InputMaybe<Scalars["String"]>> | InputMaybe<Scalars["String"]>>
-    | Array<InputMaybe<Scalars["String"]>>
-    | InputMaybe<Scalars["String"]>;
-}>;
-
-export type RecipientViewPetitionField_publicUpdateDynamicSelectReplyMutation = {
-  publicUpdateDynamicSelectReply: {
+export type RecipientViewPetitionField_publicUpdatePetitionFieldReplyMutation = {
+  publicUpdatePetitionFieldReply: {
     __typename?: "PublicPetitionFieldReply";
     id: string;
     status: PetitionFieldReplyStatus;
@@ -22940,9 +22839,12 @@ export const RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLin
   RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkMutation,
   RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkMutationVariables
 >;
-export const RecipientViewPetitionField_publicDeletePetitionReplyDocument = gql`
-  mutation RecipientViewPetitionField_publicDeletePetitionReply($replyId: GID!, $keycode: ID!) {
-    publicDeletePetitionReply(replyId: $replyId, keycode: $keycode) {
+export const RecipientViewPetitionField_publicDeletePetitionFieldReplyDocument = gql`
+  mutation RecipientViewPetitionField_publicDeletePetitionFieldReply(
+    $replyId: GID!
+    $keycode: ID!
+  ) {
+    publicDeletePetitionFieldReply(replyId: $replyId, keycode: $keycode) {
       id
       replies {
         id
@@ -22954,16 +22856,16 @@ export const RecipientViewPetitionField_publicDeletePetitionReplyDocument = gql`
     }
   }
 ` as unknown as DocumentNode<
-  RecipientViewPetitionField_publicDeletePetitionReplyMutation,
-  RecipientViewPetitionField_publicDeletePetitionReplyMutationVariables
+  RecipientViewPetitionField_publicDeletePetitionFieldReplyMutation,
+  RecipientViewPetitionField_publicDeletePetitionFieldReplyMutationVariables
 >;
-export const RecipientViewPetitionField_publicCreateSimpleReplyDocument = gql`
-  mutation RecipientViewPetitionField_publicCreateSimpleReply(
+export const RecipientViewPetitionField_publicCreatePetitionFieldReplyDocument = gql`
+  mutation RecipientViewPetitionField_publicCreatePetitionFieldReply(
     $keycode: ID!
     $fieldId: GID!
-    $value: String!
+    $reply: JSON!
   ) {
-    publicCreateSimpleReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
+    publicCreatePetitionFieldReply(keycode: $keycode, fieldId: $fieldId, reply: $reply) {
       ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
       field {
         id
@@ -22979,16 +22881,16 @@ export const RecipientViewPetitionField_publicCreateSimpleReplyDocument = gql`
   }
   ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<
-  RecipientViewPetitionField_publicCreateSimpleReplyMutation,
-  RecipientViewPetitionField_publicCreateSimpleReplyMutationVariables
+  RecipientViewPetitionField_publicCreatePetitionFieldReplyMutation,
+  RecipientViewPetitionField_publicCreatePetitionFieldReplyMutationVariables
 >;
-export const RecipientViewPetitionField_publicUpdateSimpleReplyDocument = gql`
-  mutation RecipientViewPetitionField_publicUpdateSimpleReply(
+export const RecipientViewPetitionField_publicUpdatePetitionFieldReplyDocument = gql`
+  mutation RecipientViewPetitionField_publicUpdatePetitionFieldReply(
     $keycode: ID!
     $replyId: GID!
-    $value: String!
+    $reply: JSON!
   ) {
-    publicUpdateSimpleReply(keycode: $keycode, replyId: $replyId, value: $value) {
+    publicUpdatePetitionFieldReply(keycode: $keycode, replyId: $replyId, reply: $reply) {
       ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
       field {
         id
@@ -23001,149 +22903,8 @@ export const RecipientViewPetitionField_publicUpdateSimpleReplyDocument = gql`
   }
   ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<
-  RecipientViewPetitionField_publicUpdateSimpleReplyMutation,
-  RecipientViewPetitionField_publicUpdateSimpleReplyMutationVariables
->;
-export const RecipientViewPetitionField_publicCreateNumericReplyDocument = gql`
-  mutation RecipientViewPetitionField_publicCreateNumericReply(
-    $keycode: ID!
-    $fieldId: GID!
-    $value: Float!
-  ) {
-    publicCreateNumericReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
-      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
-      field {
-        id
-        petition {
-          id
-          status
-        }
-        replies {
-          id
-        }
-      }
-    }
-  }
-  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<
-  RecipientViewPetitionField_publicCreateNumericReplyMutation,
-  RecipientViewPetitionField_publicCreateNumericReplyMutationVariables
->;
-export const RecipientViewPetitionField_publicUpdateNumericReplyDocument = gql`
-  mutation RecipientViewPetitionField_publicUpdateNumericReply(
-    $keycode: ID!
-    $replyId: GID!
-    $value: Float!
-  ) {
-    publicUpdateNumericReply(keycode: $keycode, replyId: $replyId, value: $value) {
-      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
-      field {
-        id
-        petition {
-          id
-          status
-        }
-      }
-    }
-  }
-  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<
-  RecipientViewPetitionField_publicUpdateNumericReplyMutation,
-  RecipientViewPetitionField_publicUpdateNumericReplyMutationVariables
->;
-export const RecipientViewPetitionField_publicCreateCheckboxReplyDocument = gql`
-  mutation RecipientViewPetitionField_publicCreateCheckboxReply(
-    $keycode: ID!
-    $fieldId: GID!
-    $values: [String!]!
-  ) {
-    publicCreateCheckboxReply(keycode: $keycode, fieldId: $fieldId, values: $values) {
-      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
-      field {
-        id
-        petition {
-          id
-          status
-        }
-        replies {
-          id
-        }
-      }
-    }
-  }
-  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<
-  RecipientViewPetitionField_publicCreateCheckboxReplyMutation,
-  RecipientViewPetitionField_publicCreateCheckboxReplyMutationVariables
->;
-export const RecipientViewPetitionField_publicUpdateCheckboxReplyDocument = gql`
-  mutation RecipientViewPetitionField_publicUpdateCheckboxReply(
-    $keycode: ID!
-    $replyId: GID!
-    $values: [String!]!
-  ) {
-    publicUpdateCheckboxReply(keycode: $keycode, replyId: $replyId, values: $values) {
-      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
-      field {
-        id
-        petition {
-          id
-          status
-        }
-      }
-    }
-  }
-  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<
-  RecipientViewPetitionField_publicUpdateCheckboxReplyMutation,
-  RecipientViewPetitionField_publicUpdateCheckboxReplyMutationVariables
->;
-export const RecipientViewPetitionField_publicCreateDynamicSelectReplyDocument = gql`
-  mutation RecipientViewPetitionField_publicCreateDynamicSelectReply(
-    $keycode: ID!
-    $fieldId: GID!
-    $value: [[String]!]!
-  ) {
-    publicCreateDynamicSelectReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
-      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
-      field {
-        id
-        petition {
-          id
-          status
-        }
-        replies {
-          id
-        }
-      }
-    }
-  }
-  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<
-  RecipientViewPetitionField_publicCreateDynamicSelectReplyMutation,
-  RecipientViewPetitionField_publicCreateDynamicSelectReplyMutationVariables
->;
-export const RecipientViewPetitionField_publicUpdateDynamicSelectReplyDocument = gql`
-  mutation RecipientViewPetitionField_publicUpdateDynamicSelectReply(
-    $keycode: ID!
-    $replyId: GID!
-    $values: [[String]!]!
-  ) {
-    publicUpdateDynamicSelectReply(keycode: $keycode, replyId: $replyId, value: $values) {
-      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
-      field {
-        id
-        petition {
-          id
-          status
-        }
-      }
-    }
-  }
-  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
-` as unknown as DocumentNode<
-  RecipientViewPetitionField_publicUpdateDynamicSelectReplyMutation,
-  RecipientViewPetitionField_publicUpdateDynamicSelectReplyMutationVariables
+  RecipientViewPetitionField_publicUpdatePetitionFieldReplyMutation,
+  RecipientViewPetitionField_publicUpdatePetitionFieldReplyMutationVariables
 >;
 export const RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument = gql`
   mutation RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLink(
