@@ -12372,6 +12372,11 @@ linkify-it@^3.0.3:
   dependencies:
     uc.micro "^1.0.1"
 
+liquidjs@^9.34.0:
+  version "9.34.0"
+  resolved "https://registry.yarnpkg.com/liquidjs/-/liquidjs-9.34.0.tgz#b1a9cca1267aacce7ece13f8036751ca8f1664ee"
+  integrity sha512-LIOqPT3hvnmJQKwhJwBLcEwaEthdWJH2uvNjC9Q6K/n25+tuXQuvd/bwH1WwWBtBpzvESjcDWdM2SHpRlTLvqg==
+
 listenercount@~1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/listenercount/-/listenercount-1.0.1.tgz#84c8a72ab59c4725321480c975e6508342e70937"

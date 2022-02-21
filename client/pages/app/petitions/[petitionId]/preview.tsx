@@ -7,6 +7,7 @@ import {
   FieldErrorDialog,
   useFieldErrorDialog,
 } from "@parallel/components/common/dialogs/FieldErrorDialog";
+import { LiquidScopeProvider } from "@parallel/utils/useLiquid";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
@@ -42,6 +43,7 @@ import { isUsageLimitsReached } from "@parallel/utils/isUsageLimitsReached";
 import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGetPageFields } from "@parallel/utils/useGetPageFields";
+import { useLiquidScope } from "@parallel/utils/useLiquidScope";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { motion } from "framer-motion";
@@ -249,6 +251,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const displayPetitionLimitReachedAlert =
     isUsageLimitsReached(me.organization) && isPetition && petition.status === "DRAFT";
 
+  const scope = useLiquidScope(petition.fields, petition.__typename === "PetitionTemplate");
   return (
     <ToneProvider value={petition.tone}>
       <PetitionLayout
@@ -321,21 +324,23 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             </Box>
             <Flex data-section="preview-fields" flexDirection="column" flex="2" minWidth={0}>
               <Stack spacing={4} key={0}>
-                {fields.map((field) => (
-                  <motion.div key={field.id} layout="position">
-                    <PreviewPetitionField
-                      key={field.id}
-                      petitionId={petition.id}
-                      field={field}
-                      isDisabled={isPetition && petition.status === "CLOSED"}
-                      isInvalid={
-                        finalized && completedFieldReplies(field).length === 0 && !field.optional
-                      }
-                      hasCommentsEnabled={field.options.hasCommentsEnabled}
-                      isCacheOnly={!isPetition}
-                    />
-                  </motion.div>
-                ))}
+                <LiquidScopeProvider scope={scope}>
+                  {fields.map((field) => (
+                    <motion.div key={field.id} layout="position">
+                      <PreviewPetitionField
+                        key={field.id}
+                        petitionId={petition.id}
+                        field={field}
+                        isDisabled={isPetition && petition.status === "CLOSED"}
+                        isInvalid={
+                          finalized && completedFieldReplies(field).length === 0 && !field.optional
+                        }
+                        hasCommentsEnabled={field.options.hasCommentsEnabled}
+                        isCacheOnly={!isPetition}
+                      />
+                    </motion.div>
+                  ))}
+                </LiquidScopeProvider>
               </Stack>
               <Spacer />
               {pages > 1 ? (
@@ -379,6 +384,7 @@ PetitionPreview.fragments = {
         ...useGetPageFields_PetitionField
         ...validatePetitionFields_PetitionField
         ...FieldErrorDialog_PetitionField
+        ...useLiquidScope_PetitionField
       }
       signatureConfig {
         letRecipientsChooseSigners
@@ -402,6 +408,7 @@ PetitionPreview.fragments = {
     ${useGetPageFields.fragments.PetitionField}
     ${validatePetitionFields.fragments.PetitionField}
     ${FieldErrorDialog.fragments.PetitionField}
+    ${useLiquidScope.fragments.PetitionField}
   `,
   User: gql`
     fragment PetitionPreview_User on User {

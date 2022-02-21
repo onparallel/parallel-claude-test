@@ -1441,6 +1441,7 @@ export interface NexusGenFieldTypes {
   };
   PublicPetitionField: {
     // field return type
+    alias: string | null; // String
     attachments: NexusGenRootTypes["PetitionFieldAttachment"][]; // [PetitionFieldAttachment!]!
     commentCount: number; // Int!
     comments: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
@@ -2751,6 +2752,7 @@ export interface NexusGenFieldTypeNames {
   };
   PublicPetitionField: {
     // field return type name
+    alias: "String";
     attachments: "PetitionFieldAttachment";
     commentCount: "Int";
     comments: "PublicPetitionFieldComment";

@@ -103,6 +103,8 @@ import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types"
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { useExportRepliesTask } from "@parallel/utils/useExportRepliesTask";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
+import { LiquidScopeProvider } from "@parallel/utils/useLiquid";
+import { useLiquidScope } from "@parallel/utils/useLiquidScope";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { usePrintPdfTask } from "@parallel/utils/usePrintPdfTask";
@@ -459,6 +461,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     petition.__typename === "Petition" &&
     petition.status === "DRAFT";
 
+  const scope = useLiquidScope(petition.fields);
+
   return (
     <PetitionLayout
       key={petition.id}
@@ -625,32 +629,34 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       >
         <Box padding={4}>
           <Stack flex="2" spacing={4} data-section="replies-fields">
-            {filterPetitionFields(petition.fields, indices, fieldVisibility ?? [], filter).map(
-              (x, index) =>
-                x.type === "FIELD" ? (
-                  <PetitionRepliesField
-                    ref={fieldRefs[x.field.id]}
-                    id={`field-${x.field.id}`}
-                    data-section="replies-field"
-                    data-field-type={x.field.type}
-                    key={x.field.id}
-                    petitionId={petition.id}
-                    field={x.field}
-                    isVisible={true}
-                    fieldIndex={x.fieldIndex}
-                    onAction={handleAction}
-                    isActive={activeFieldId === x.field.id}
-                    onToggleComments={() =>
-                      setActiveFieldId(activeFieldId === x.field.id ? null : x.field.id)
-                    }
-                    onUpdateReplyStatus={(replyId, status) =>
-                      handleUpdateRepliesStatus(x.field.id, [replyId], status)
-                    }
-                  />
-                ) : (
-                  <PetitionRepliesFilteredFields key={index} count={x.count} />
-                )
-            )}
+            <LiquidScopeProvider scope={scope}>
+              {filterPetitionFields(petition.fields, indices, fieldVisibility ?? [], filter).map(
+                (x, index) =>
+                  x.type === "FIELD" ? (
+                    <PetitionRepliesField
+                      ref={fieldRefs[x.field.id]}
+                      id={`field-${x.field.id}`}
+                      data-section="replies-field"
+                      data-field-type={x.field.type}
+                      key={x.field.id}
+                      petitionId={petition.id}
+                      field={x.field}
+                      isVisible={true}
+                      fieldIndex={x.fieldIndex}
+                      onAction={handleAction}
+                      isActive={activeFieldId === x.field.id}
+                      onToggleComments={() =>
+                        setActiveFieldId(activeFieldId === x.field.id ? null : x.field.id)
+                      }
+                      onUpdateReplyStatus={(replyId, status) =>
+                        handleUpdateRepliesStatus(x.field.id, [replyId], status)
+                      }
+                    />
+                  ) : (
+                    <PetitionRepliesFilteredFields key={index} count={x.count} />
+                  )
+              )}
+            </LiquidScopeProvider>
           </Stack>
 
           {petition.attachments.length > 0 && (
@@ -718,12 +724,14 @@ PetitionReplies.fragments = {
         ...PetitionRepliesFieldComments_PetitionField
         ...ExportRepliesDialog_PetitionField
         ...useFieldVisibility_PetitionField
+        ...useLiquidScope_PetitionField
       }
       ${PetitionRepliesField.fragments.PetitionField}
       ${PetitionRepliesFieldComments.fragments.PetitionField}
       ${ExportRepliesDialog.fragments.PetitionField}
       ${PetitionContents.fragments.PetitionField}
       ${useFieldVisibility.fragments.PetitionField}
+      ${useLiquidScope.fragments.PetitionField}
     `;
   },
   get User() {

@@ -3,6 +3,7 @@ import { PetitionPdf_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../common/BreakLines";
+import { FieldDescription } from "../common/FieldDescription";
 import { FileSize } from "../common/FileSize";
 
 export function PdfFieldWithReplies({ field }: { field: PetitionPdf_PetitionFieldFragment }) {
@@ -13,13 +14,15 @@ export function PdfFieldWithReplies({ field }: { field: PetitionPdf_PetitionFiel
         <Stack>
           {field.title ? (
             <Heading textAlign="justify" size="lg">
-              {field.title ?? "-"}
+              {field.title}
             </Heading>
           ) : null}
           {field.description ? (
-            <Text textAlign="justify" paddingLeft="2mm">
-              <BreakLines>{field.description}</BreakLines>
-            </Text>
+            <FieldDescription
+              description={field.description}
+              textAlign="justify"
+              paddingLeft="2mm"
+            />
           ) : null}
         </Stack>
       ) : (
@@ -28,9 +31,11 @@ export function PdfFieldWithReplies({ field }: { field: PetitionPdf_PetitionFiel
             {field.title ?? "-"}
           </Text>
           {field.description ? (
-            <Text textAlign="justify" paddingLeft="2mm">
-              <BreakLines>{field.description}</BreakLines>
-            </Text>
+            <FieldDescription
+              description={field.description}
+              textAlign="justify"
+              paddingLeft="2mm"
+            />
           ) : null}
           {field.replies.map((reply) =>
             field.type === "FILE_UPLOAD" ? (

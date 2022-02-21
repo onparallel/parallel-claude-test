@@ -184,6 +184,9 @@ export const PublicPetitionField = objectType({
       type: "PetitionFieldType",
       description: "The type of the petition field.",
     });
+    t.nullable.string("alias", {
+      description: "Alias of the petition field.",
+    });
     t.nullable.string("title", {
       description: "The title of the petition field.",
     });

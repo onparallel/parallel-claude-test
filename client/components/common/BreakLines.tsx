@@ -1,4 +1,4 @@
-import { cloneElement, Fragment, isValidElement, ReactNode } from "react";
+import { cloneElement, isValidElement, ReactNode } from "react";
 
 export function BreakLines({ children }: { children: ReactNode }) {
   return <>{parse(children)}</>;

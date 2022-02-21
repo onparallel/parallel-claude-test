@@ -2,10 +2,10 @@ import { gql } from "@apollo/client";
 import { Box, Center, Flex, Heading, Text, Tooltip } from "@chakra-ui/react";
 import { AddIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
+import { FieldDescription } from "@parallel/components/common/FieldDescription";
 import { FileAttachmentButton } from "@parallel/components/common/FileAttachmentButton";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "@parallel/components/common/InternalFieldBadge";
-import { Linkify } from "@parallel/components/common/Linkify";
 import {
   RecipientViewPetitionFieldCard_PetitionFieldFragment,
   RecipientViewPetitionFieldCard_PetitionFieldReplyFragment,
@@ -15,7 +15,6 @@ import {
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { BreakLines } from "../../common/BreakLines";
 import { CommentsButton } from "../CommentsButton";
 import { RecipientViewPetitionFieldCommentsDialog } from "../dialogs/RecipientViewPetitionFieldCommentsDialog";
 
@@ -99,11 +98,14 @@ export function RecipientViewPetitionFieldCard({
         ) : null}
       </Flex>
       {field.description ? (
-        <Text fontSize="sm" color="gray.800" overflowWrap="anywhere" marginBottom={2}>
-          <Linkify>
-            <BreakLines>{field.description}</BreakLines>
-          </Linkify>
-        </Text>
+        <FieldDescription
+          description={field.description}
+          linkify
+          color="gray.800"
+          fontSize="sm"
+          overflowWrap="anywhere"
+          marginBottom={2}
+        />
       ) : null}
       {field.attachments.length ? (
         <Flex flexWrap="wrap" gridGap={2} marginBottom={1}>

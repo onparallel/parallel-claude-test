@@ -3318,6 +3318,11 @@ A field within a petition.
 """
 type PublicPetitionField {
   """
+  Alias of the petition field.
+  """
+  alias: String
+
+  """
   A list of files attached to this field.
   """
   attachments: [PetitionFieldAttachment!]!

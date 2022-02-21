@@ -12,6 +12,8 @@ import {
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
 import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
+import { LiquidProvider, LiquidScopeProvider } from "@parallel/utils/useLiquid";
+import { useLiquidScope } from "@parallel/utils/useLiquidScope";
 import jwtDecode from "jwt-decode";
 import { useMemo } from "react";
 import { FormattedMessage } from "react-intl";
@@ -50,51 +52,53 @@ function PetitionPdf({ token }: { token: string }) {
       }),
     [petition.fields, fieldVisibility]
   );
-
+  const scope = useLiquidScope(petition.fields);
   return (
-    <>
-      {pages.map((fields, pageNum) => (
-        <PdfPage key={pageNum}>
-          {pageNum === 0 ? (
-            <>
-              {orgLogo ? (
-                <Image margin="5mm auto" src={orgLogo} alt={orgName} width="40%" />
-              ) : (
-                <Logo width="50mm" justifyContent="center" display="flex" margin="5mm auto" />
-              )}
-              <Heading justifyContent="center" display="flex">
-                {tokenPayload.documentTitle ?? petition.name}
-              </Heading>
-            </>
-          ) : undefined}
-          {fields.map((field) => (
-            <PdfFieldWithReplies key={field.id} field={field} />
-          ))}
-          {tokenPayload.showSignatureBoxes &&
-            pageNum === pages.length - 1 &&
-            (signers ?? []).length > 0 && (
-              <Box sx={{ pageBreakInside: "avoid" }}>
-                <Text textAlign="center" margin="15mm 4mm 5mm 4mm" fontStyle="italic">
-                  <FormattedMessage
-                    id="petition.print-pdf.signatures-disclaimer"
-                    defaultMessage="I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current identification information."
-                  />
-                </Text>
-                {fromTemplateId ? <HardcodedSignatures fromTemplateId={fromTemplateId} /> : null}
-                <SignaturesGrid>
-                  {signers!.map(({ email, fullName }, key) => (
-                    <SignatureBox
-                      key={key}
-                      signer={{ email, fullName, key }}
-                      timezone={timezone!}
+    <LiquidProvider>
+      <LiquidScopeProvider scope={scope}>
+        {pages.map((fields, pageNum) => (
+          <PdfPage key={pageNum}>
+            {pageNum === 0 ? (
+              <>
+                {orgLogo ? (
+                  <Image margin="5mm auto" src={orgLogo} alt={orgName} width="40%" />
+                ) : (
+                  <Logo width="50mm" justifyContent="center" display="flex" margin="5mm auto" />
+                )}
+                <Heading justifyContent="center" display="flex">
+                  {tokenPayload.documentTitle ?? petition.name}
+                </Heading>
+              </>
+            ) : undefined}
+            {fields.map((field) => (
+              <PdfFieldWithReplies key={field.id} field={field} />
+            ))}
+            {tokenPayload.showSignatureBoxes &&
+              pageNum === pages.length - 1 &&
+              (signers ?? []).length > 0 && (
+                <Box sx={{ pageBreakInside: "avoid" }}>
+                  <Text textAlign="center" margin="15mm 4mm 5mm 4mm" fontStyle="italic">
+                    <FormattedMessage
+                      id="petition.print-pdf.signatures-disclaimer"
+                      defaultMessage="I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current identification information."
                     />
-                  ))}
-                </SignaturesGrid>
-              </Box>
-            )}
-        </PdfPage>
-      ))}
-    </>
+                  </Text>
+                  {fromTemplateId ? <HardcodedSignatures fromTemplateId={fromTemplateId} /> : null}
+                  <SignaturesGrid>
+                    {signers!.map(({ email, fullName }, key) => (
+                      <SignatureBox
+                        key={key}
+                        signer={{ email, fullName, key }}
+                        timezone={timezone!}
+                      />
+                    ))}
+                  </SignaturesGrid>
+                </Box>
+              )}
+          </PdfPage>
+        ))}
+      </LiquidScopeProvider>
+    </LiquidProvider>
   );
 }
 
@@ -106,6 +110,7 @@ PetitionPdf.fragments = {
         name
         fields {
           ...PetitionPdf_PetitionField
+          ...useLiquidScope_PetitionField
         }
         organization {
           name
@@ -123,6 +128,7 @@ PetitionPdf.fragments = {
         }
       }
       ${this.PetitionField}
+      ${useLiquidScope.fragments.PetitionField}
     `;
   },
   get PetitionField() {

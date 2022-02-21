@@ -47,6 +47,8 @@ import { compose } from "@parallel/utils/compose";
 import { resolveUrl } from "@parallel/utils/next";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGetPageFields } from "@parallel/utils/useGetPageFields";
+import { LiquidScopeProvider } from "@parallel/utils/useLiquid";
+import { useLiquidScope } from "@parallel/utils/useLiquidScope";
 import { AnimatePresence, motion } from "framer-motion";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -160,6 +162,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
   }, []);
 
   const breakpoint = "md";
+  const scope = useLiquidScope(petition.fields);
 
   return (
     <LastSavedProvider>
@@ -339,28 +342,30 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
             </Box>
             <Flex flexDirection="column" flex="2" minWidth={0}>
               <Stack spacing={4} key={currentPage}>
-                <AnimatePresence initial={false}>
-                  {fields.map((field) => {
-                    return (
-                      <motion.div key={field.id} layout="position">
-                        <RecipientViewPetitionField
-                          key={field.id}
-                          petitionId={petition.id}
-                          keycode={keycode}
-                          access={access!}
-                          field={field}
-                          isDisabled={petition.status === "CLOSED"}
-                          isInvalid={
-                            finalized &&
-                            completedFieldReplies(field).length === 0 &&
-                            !field.optional
-                          }
-                          hasCommentsEnabled={field.options.hasCommentsEnabled}
-                        />
-                      </motion.div>
-                    );
-                  })}
-                </AnimatePresence>
+                <LiquidScopeProvider scope={scope}>
+                  <AnimatePresence initial={false}>
+                    {fields.map((field) => {
+                      return (
+                        <motion.div key={field.id} layout="position">
+                          <RecipientViewPetitionField
+                            key={field.id}
+                            petitionId={petition.id}
+                            keycode={keycode}
+                            access={access!}
+                            field={field}
+                            isDisabled={petition.status === "CLOSED"}
+                            isInvalid={
+                              finalized &&
+                              completedFieldReplies(field).length === 0 &&
+                              !field.optional
+                            }
+                            hasCommentsEnabled={field.options.hasCommentsEnabled}
+                          />
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
+                </LiquidScopeProvider>
               </Stack>
               <Spacer />
               {pages > 1 ? (
@@ -508,10 +513,12 @@ RecipientView.fragments = {
         ...RecipientViewPetitionField_PublicPetitionField
         ...RecipientViewContentsCard_PublicPetitionField
         ...RecipientViewProgressFooter_PublicPetitionField
+        ...useLiquidScope_PublicPetitionField
       }
       ${RecipientViewPetitionField.fragments.PublicPetitionField}
       ${RecipientViewContentsCard.fragments.PublicPetitionField}
       ${RecipientViewProgressFooter.fragments.PublicPetitionField}
+      ${useLiquidScope.fragments.PublicPetitionField}
     `;
   },
   get PublicUser() {

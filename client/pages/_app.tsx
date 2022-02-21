@@ -2,6 +2,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { theme } from "@parallel/chakra/theme";
 import { I18nProps, I18nProvider } from "@parallel/components/common/I18nProvider";
 import { initSentry } from "@parallel/utils/sentry";
+import { LiquidProvider } from "@parallel/utils/useLiquid";
 import { AnimateSharedLayout } from "framer-motion";
 import { AppProps } from "next/app";
 import Router from "next/router";
@@ -26,13 +27,15 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
   }, []);
 
   return (
-    <I18nProvider {...props}>
-      <ChakraProvider theme={theme} resetCSS portalZIndex={40}>
-        <AnimateSharedLayout>
-          <Component {...pageProps} />
-        </AnimateSharedLayout>
-      </ChakraProvider>
-    </I18nProvider>
+    <LiquidProvider>
+      <I18nProvider {...props}>
+        <ChakraProvider theme={theme} resetCSS portalZIndex={40}>
+          <AnimateSharedLayout>
+            <Component {...pageProps} />
+          </AnimateSharedLayout>
+        </ChakraProvider>
+      </I18nProvider>
+    </LiquidProvider>
   );
 }
 

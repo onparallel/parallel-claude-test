@@ -1,8 +1,7 @@
-import { Box, Flex, Heading, HStack, Stack, Text } from "@chakra-ui/react";
-import { BreakLines } from "@parallel/components/common/BreakLines";
+import { Box, Flex, Heading, HStack, Stack } from "@chakra-ui/react";
+import { FieldDescription } from "@parallel/components/common/FieldDescription";
 import { FileAttachmentButton } from "@parallel/components/common/FileAttachmentButton";
 import { InternalFieldBadge } from "@parallel/components/common/InternalFieldBadge";
-import { Linkify } from "@parallel/components/common/Linkify";
 import { CommentsButton } from "../CommentsButton";
 import { RecipientViewPetitionFieldCard_PetitionFieldSelection } from "./RecipientViewPetitionFieldCard";
 
@@ -42,11 +41,13 @@ export function RecipientViewPetitionFieldHeading({
       </HStack>
 
       {field.description ? (
-        <Text color="gray.600" fontSize="sm" overflowWrap="anywhere">
-          <Linkify>
-            <BreakLines>{field.description}</BreakLines>
-          </Linkify>
-        </Text>
+        <FieldDescription
+          description={field.description}
+          linkify
+          color="gray.600"
+          fontSize="sm"
+          overflowWrap="anywhere"
+        />
       ) : null}
       {field.attachments.length ? (
         <Box>

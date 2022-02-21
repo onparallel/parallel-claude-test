@@ -32,7 +32,7 @@ import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { forwardRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { BreakLines } from "../common/BreakLines";
+import { FieldDescription } from "../common/FieldDescription";
 import { FileAttachmentButton } from "../common/FileAttachmentButton";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
@@ -121,9 +121,13 @@ export const PetitionRepliesField = Object.assign(
         </Box>
         <Box gridArea="desc">
           {field.description ? (
-            <Text color="gray.600" fontSize="sm" overflowWrap="anywhere" marginTop={1.5}>
-              <BreakLines>{field.description}</BreakLines>
-            </Text>
+            <FieldDescription
+              description={field.description}
+              color="gray.600"
+              fontSize="sm"
+              overflowWrap="anywhere"
+              marginTop={1.5}
+            />
           ) : null}
           {field.attachments.length ? (
             <Box paddingY={1}>
@@ -215,9 +219,13 @@ export const PetitionRepliesField = Object.assign(
           </Box>
           <Box gridArea="desc">
             {field.description ? (
-              <Text marginTop={1} color="gray.600" fontSize="sm" overflowWrap="anywhere">
-                <BreakLines>{field.description}</BreakLines>
-              </Text>
+              <FieldDescription
+                description={field.description}
+                marginTop={1}
+                color="gray.600"
+                fontSize="sm"
+                overflowWrap="anywhere"
+              />
             ) : null}
             {field.attachments.length ? (
               <Box marginTop={2} paddingY={1}>

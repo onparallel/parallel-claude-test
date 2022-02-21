@@ -53,6 +53,7 @@
     "graphql": "^15.6.1",
     "jwt-decode": "^3.1.2",
     "linkify-it": "^3.0.3",
+    "liquidjs": "^9.34.0",
     "markdown-to-jsx": "^7.1.6",
     "mobx": "^6.3.13",
     "nanoid": "^3.2.0",
