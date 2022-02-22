@@ -5,7 +5,6 @@ import { ExcelWorksheet } from "./ExcelWorksheet";
 
 export type TextReplyRow = {
   title: Maybe<string>;
-  description: Maybe<string>;
   answer: string | number | Date;
 };
 
@@ -14,10 +13,6 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
     super(locale === "en" ? "Replies" : "Respuestas", locale, wb);
     this.page.columns = [
       { key: "title", header: locale === "en" ? "Field" : "Campo" },
-      {
-        key: "description",
-        header: locale === "en" ? "Description" : "Descripción",
-      },
       { key: "answer", header: locale === "en" ? "Reply" : "Respuesta" },
     ];
   }
@@ -27,7 +22,6 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
       this.addRows(
         replies.map((r, i) => ({
           title: field.title?.concat(field.multiple ? ` [${i + 1}]` : "") || "",
-          description: field.description?.slice(0, 200) || "",
           answer: r.content.text,
         }))
       );
@@ -41,7 +35,6 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
       this.addRows(
         replies.map((r, i) => ({
           title: field.title?.concat(field.multiple ? ` [${i + 1}]` : "") || "",
-          description: field.description?.slice(0, 200) || "",
           answer: r.content.value,
         }))
       );
@@ -55,7 +48,6 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
       this.addRows(
         replies.map((r, i) => ({
           title: field.title?.concat(field.multiple ? ` [${i + 1}]` : "") || "",
-          description: field.description?.slice(0, 200) || "",
           answer: new Date(r.content.value),
         }))
       );
@@ -70,7 +62,6 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
         replies.flatMap((r, i) =>
           (r.content.columns as [string, string | null][]).map(([label, value]) => ({
             title: field.title?.concat(` (${label})`, field.multiple ? ` [${i + 1}]` : "") || "",
-            description: field.description?.slice(0, 200) || "",
             answer: value ?? this.noAnswerLabel,
           }))
         )
@@ -86,7 +77,6 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
         replies.flatMap((r, i) =>
           (r.content.choices as [string]).map((value) => ({
             title: field.title || "",
-            description: field.description?.slice(0, 200) || "",
             answer: value,
           }))
         )
@@ -101,7 +91,6 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
       [
         {
           title: data.title || "",
-          description: data.description?.slice(0, 200) || "",
           answer: this.noAnswerLabel,
         },
       ],
