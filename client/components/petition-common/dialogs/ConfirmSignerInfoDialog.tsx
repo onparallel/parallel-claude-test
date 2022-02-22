@@ -9,18 +9,24 @@ import {
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { fullName } from "@parallel/utils/fullName";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { SignerSelectSelection } from "./ConfirmPetitionSignersDialog";
 
+interface ConfirmSignerInfoDialogProps {
+  selection: SignerSelectSelection;
+  repeatedSigners: { firstName: string; lastName?: string | null }[];
+}
+
 function ConfirmSignerInfoDialog({
-  email,
-  firstName,
-  lastName,
+  selection,
+  repeatedSigners,
   ...props
-}: DialogProps<SignerSelectSelection, SignerSelectSelection>) {
+}: DialogProps<ConfirmSignerInfoDialogProps, SignerSelectSelection>) {
+  const intl = useIntl();
   const {
     handleSubmit,
     register,
@@ -28,15 +34,16 @@ function ConfirmSignerInfoDialog({
   } = useForm<SignerSelectSelection>({
     mode: "onSubmit",
     defaultValues: {
-      email,
-      firstName,
-      lastName,
+      email: selection.email,
+      firstName: selection.firstName,
+      lastName: selection.lastName,
     },
   });
   const firstNameRef = useRef<HTMLInputElement>(null);
   const firstNameProps = useRegisterWithRef(firstNameRef, register, "firstName", {
     required: true,
   });
+
   return (
     <ConfirmDialog
       initialFocusRef={firstNameRef}
@@ -44,7 +51,7 @@ function ConfirmSignerInfoDialog({
       content={{
         as: "form",
         onSubmit: handleSubmit(({ firstName, lastName }) => {
-          props.onResolve({ email, firstName, lastName });
+          props.onResolve({ email: selection.email, firstName, lastName });
         }),
       }}
       header={
@@ -55,6 +62,19 @@ function ConfirmSignerInfoDialog({
       }
       body={
         <Stack>
+          {repeatedSigners.length > 0 ? (
+            <Text fontSize="14px">
+              <FormattedMessage
+                id="component.confirm-signer-info-dialog.header"
+                defaultMessage="You already added this email for {signersList}. You can modify the name and add it again."
+                values={{
+                  signersList: intl.formatList(
+                    repeatedSigners.map((s) => fullName(s.firstName, s.lastName))
+                  ),
+                }}
+              />
+            </Text>
+          ) : null}
           <FormControl id="email">
             <FormLabel fontWeight="bold">
               <FormattedMessage id="generic.email" defaultMessage="Email" />
@@ -87,12 +107,6 @@ function ConfirmSignerInfoDialog({
               </FormErrorMessage>
             </FormControl>
           </Stack>
-          <Text fontSize="14px">
-            <FormattedMessage
-              id="component.confirm-signer-info-dialog.footer"
-              defaultMessage="Continue to update the signer's information. The contact data will not be overwritten."
-            />
-          </Text>
         </Stack>
       }
       confirm={

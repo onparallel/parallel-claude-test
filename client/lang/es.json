@@ -395,9 +395,9 @@
     "context": "Ongoing eSignature"
   },
   {
-    "term": "component.confirm-signer-info-dialog.footer",
-    "definition": "Continúa para actualizar los datos del firmante. Los datos del contacto no se sobreescribirán.",
-    "context": "Continue to update the signer's information. The contact data will not be overwritten."
+    "term": "component.confirm-signer-info-dialog.header",
+    "definition": "Ya has añadido este correo para {signersList}. Puedes modificar el nombre y añadirlo de nuevo.",
+    "context": "You already added this email for {signersList}. You can modify the name and add it again."
   },
   {
     "term": "component.confirm-signer-info-dialog.title",

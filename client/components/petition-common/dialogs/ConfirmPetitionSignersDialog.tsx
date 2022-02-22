@@ -97,6 +97,35 @@ export function ConfirmPetitionSignersDialog({
   const [selectedContact, setSelectedContact] = useState<ContactSelectSelection | null>(null);
   const contactSelectRef = useRef<ContactSelectInstance<false>>(null);
 
+  const handleContactSelectOnChange =
+    (onChange: (...events: any[]) => void) => async (contact: ContactSelectSelection) => {
+      try {
+        const repeatedSigners = signers.filter((s) => s.email === contact.email);
+        onChange([
+          ...signers,
+          repeatedSigners.length > 0
+            ? await showConfirmSignerInfo({ selection: contact, repeatedSigners })
+            : contact,
+        ]);
+      } catch {}
+      setSelectedContact(null);
+    };
+
+  const handleSelectedSignerRowOnEditClick =
+    (onChange: (...events: any[]) => void, signer: SignerSelectSelection, index: number) =>
+    async () => {
+      try {
+        onChange([
+          ...signers.slice(0, index),
+          await showConfirmSignerInfo({
+            selection: signer,
+            repeatedSigners: [],
+          }),
+          ...signers.slice(index + 1),
+        ]);
+      } catch {}
+    };
+
   return (
     <ConfirmDialog
       size="xl"
@@ -150,34 +179,16 @@ export function ConfirmPetitionSignersDialog({
                         isEditable={!signer.isFixed}
                         signer={signer}
                         onRemoveClick={() => onChange(signers.filter((_, i) => index !== i))}
-                        onEditClick={async () => {
-                          try {
-                            onChange([
-                              ...signers.slice(0, index),
-                              await showConfirmSignerInfo(signer),
-                              ...signers.slice(index + 1),
-                            ]);
-                          } catch {}
-                        }}
+                        onEditClick={handleSelectedSignerRowOnEditClick(onChange, signer, index)}
                       />
                     ))}
                   </Stack>
                   {allowAdditionalSigners ? (
                     <Box marginTop={2}>
                       <ContactSelect
-                        ref={contactSelectRef}
+                        ref={contactSelectRef as any}
                         value={selectedContact}
-                        onChange={async (contact: ContactSelectSelection) => {
-                          try {
-                            onChange([
-                              ...signers,
-                              signers.find((s) => s.email === contact.email)
-                                ? await showConfirmSignerInfo(contact)
-                                : contact,
-                            ]);
-                          } catch {}
-                          setSelectedContact(null);
-                        }}
+                        onChange={handleContactSelectOnChange(onChange)}
                         onSearchContacts={handleSearchContacts}
                         onCreateContact={handleCreateContact}
                         placeholder={intl.formatMessage({

@@ -467,6 +467,35 @@ export function SignatureConfigDialogBodyStep2({
     }),
   };
 
+  const handleContactSelectOnChange =
+    (onChange: (...events: any[]) => void) => async (contact: ContactSelectSelection) => {
+      try {
+        const repeatedSigners = signers.filter((s) => s.email === contact.email);
+        onChange([
+          ...signers,
+          repeatedSigners.length > 0
+            ? await showConfirmSignerInfo({ selection: contact, repeatedSigners })
+            : contact,
+        ]);
+      } catch {}
+      setSelectedContact(null);
+    };
+
+  const handleSelectedSignerRowOnEditClick =
+    (onChange: (...events: any[]) => void, signer: SignerSelectSelection, index: number) =>
+    async () => {
+      try {
+        onChange([
+          ...signers.slice(0, index),
+          await showConfirmSignerInfo({
+            selection: signer,
+            repeatedSigners: [],
+          }),
+          ...signers.slice(index + 1),
+        ]);
+      } catch {}
+    };
+
   return (
     <>
       <FormControl id="signers" isInvalid={!!errors.signers}>
@@ -490,15 +519,7 @@ export function SignatureConfigDialogBodyStep2({
                     isEditable
                     signer={signer}
                     onRemoveClick={() => onChange(signers.filter((_, i) => index !== i))}
-                    onEditClick={async () => {
-                      try {
-                        onChange([
-                          ...signers.slice(0, index),
-                          await showConfirmSignerInfo(signer),
-                          ...signers.slice(index + 1),
-                        ]);
-                      } catch {}
-                    }}
+                    onEditClick={handleSelectedSignerRowOnEditClick(onChange, signer, index)}
                   />
                 ))}
               </Stack>
@@ -517,17 +538,7 @@ export function SignatureConfigDialogBodyStep2({
               <Box marginTop={2}>
                 <ContactSelect
                   value={selectedContact}
-                  onChange={async (contact: ContactSelectSelection) => {
-                    try {
-                      onChange([
-                        ...signers,
-                        signers.find((s) => s.email === contact.email)
-                          ? await showConfirmSignerInfo(contact)
-                          : contact,
-                      ]);
-                    } catch {}
-                    setSelectedContact(null);
-                  }}
+                  onChange={handleContactSelectOnChange(onChange)}
                   onSearchContacts={handleSearchContacts}
                   onCreateContact={handleCreateContact}
                   placeholder={intl.formatMessage({

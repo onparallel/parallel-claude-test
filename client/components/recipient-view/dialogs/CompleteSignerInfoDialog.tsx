@@ -14,12 +14,12 @@ import {
   useCompleteSignerInfoDialog_PetitionSignerFragment,
   useCompleteSignerInfoDialog_PublicContactFragment,
 } from "@parallel/graphql/__types";
+import { fullName } from "@parallel/utils/fullName";
 import { withError } from "@parallel/utils/promises/withError";
 import autosize from "autosize";
 import outdent from "outdent";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
 import { useAddNewSignerDialog } from "./AddNewSignerDialog";
 
 const messages: Record<PetitionLocale, (organization: string, contactName: string) => string> = {
@@ -40,11 +40,6 @@ const messages: Record<PetitionLocale, (organization: string, contactName: strin
   ${contactName}.
 `,
 };
-
-function fullName(firstName: Maybe<string> | undefined, lastName: Maybe<string> | undefined) {
-  const parts = [firstName, lastName];
-  return parts.filter(isDefined).join(" ");
-}
 
 type CompleteSignerInfoDialogProps = {
   signers: useCompleteSignerInfoDialog_PetitionSignerFragment[];
