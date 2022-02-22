@@ -1,5 +1,7 @@
 import { gql } from "@apollo/client";
 import {
+  AlertDescription,
+  AlertIcon,
   Box,
   Button,
   Checkbox,
@@ -13,6 +15,7 @@ import {
   useCounter,
 } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@parallel/chakra/icons";
+import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
 import { ContactSelect, ContactSelectSelection } from "@parallel/components/common/ContactSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -66,6 +69,7 @@ export function SignatureConfigDialog({
 
   const step2Props = useSignatureConfigDialogBodyStep2Props({
     signers: petition.signatureConfig?.signers ?? [],
+    isTemplate: petition.__typename === "PetitionTemplate",
     allowAdditionalSigners: petition.signatureConfig?.allowAdditionalSigners ?? false,
   });
 
@@ -414,13 +418,16 @@ function SignatureConfigDialogBodyStep1({
 }
 
 function useSignatureConfigDialogBodyStep2Props({
+  isTemplate,
   signers,
   allowAdditionalSigners,
 }: {
+  isTemplate: boolean;
   signers: SignerSelectSelection[];
   allowAdditionalSigners?: boolean;
 }) {
   return {
+    isTemplate,
     form: useForm<{
       signers: SignerSelectSelection[];
       allowAdditionalSigners: boolean;
@@ -441,6 +448,7 @@ export function SignatureConfigDialogBodyStep2({
     watch,
     register,
   },
+  isTemplate,
 }: ReturnType<typeof useSignatureConfigDialogBodyStep2Props>) {
   const signers = watch("signers");
 
@@ -494,6 +502,17 @@ export function SignatureConfigDialogBodyStep2({
                   />
                 ))}
               </Stack>
+              {isTemplate && signers.length > 0 ? (
+                <CloseableAlert status="info" borderRadius="base">
+                  <AlertIcon color="blue.500" />
+                  <AlertDescription>
+                    <FormattedMessage
+                      id="component.signature-config-dialog.template-alert"
+                      defaultMessage="These signers will be assigned to all petitions created from this template."
+                    />
+                  </AlertDescription>
+                </CloseableAlert>
+              ) : null}
 
               <Box marginTop={2}>
                 <ContactSelect

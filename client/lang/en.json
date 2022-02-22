@@ -3010,6 +3010,11 @@
     "context": "Who has to sign the document?"
   },
   {
+    "term": "component.signature-config-dialog.template-alert",
+    "definition": "These signers will be assigned to all petitions created from this template.",
+    "context": "These signers will be assigned to all petitions created from this template."
+  },
+  {
     "term": "component.signature-config-dialog.title-help",
     "definition": "We will use this as the title of the signing document",
     "context": "We will use this as the title of the signing document"
