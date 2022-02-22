@@ -10,6 +10,8 @@ import {
   FormLabel,
   HStack,
   Input,
+  Radio,
+  RadioGroup,
   Stack,
   Text,
   useCounter,
@@ -31,10 +33,10 @@ import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
-import { RefObject, useMemo, useRef, useState } from "react";
+import { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import Select, { Props } from "react-select";
+import Select from "react-select";
 import { SelectedSignerRow } from "../SelectedSignerRow";
 import { SignerSelectSelection } from "./ConfirmPetitionSignersDialog";
 import { useConfirmSignerInfoDialog } from "./ConfirmSignerInfoDialog";
@@ -447,6 +449,8 @@ export function SignatureConfigDialogBodyStep2({
     control,
     watch,
     register,
+    setValue,
+    trigger,
   },
   isTemplate,
 }: ReturnType<typeof useSignatureConfigDialogBodyStep2Props>) {
@@ -458,14 +462,6 @@ export function SignatureConfigDialogBodyStep2({
   const showConfirmSignerInfo = useConfirmSignerInfoDialog();
 
   const [selectedContact, setSelectedContact] = useState<ContactSelectSelection | null>(null);
-
-  const emptyContactSelectProps: Props<ContactSelectSelection, false, never> = {
-    styles: { placeholder: (v) => ({ ...v, color: "gray.800" }) },
-    placeholder: intl.formatMessage({
-      id: "component.signature-config-dialog.contact-select.choose-when-starting.placeholder",
-      defaultMessage: "Choose when starting",
-    }),
-  };
 
   const handleContactSelectOnChange =
     (onChange: (...events: any[]) => void) => async (contact: ContactSelectSelection) => {
@@ -496,8 +492,44 @@ export function SignatureConfigDialogBodyStep2({
       } catch {}
     };
 
+  const [radioSelection, setRadioSelection] = useState<"choose-after" | "choose-now">(
+    signers.length === 0 ? "choose-after" : "choose-now"
+  );
+
+  useEffect(() => {
+    trigger("signers");
+    if (radioSelection === "choose-after") {
+      setValue("signers", []);
+    }
+  }, [radioSelection, setValue]);
+
   return (
     <>
+      <RadioGroup
+        as={Stack}
+        marginBottom={4}
+        rowGap={2}
+        value={radioSelection}
+        onChange={(value: any) => setRadioSelection(value)}
+      >
+        <Radio value="choose-after">
+          <Flex>
+            <FormattedMessage
+              id="component.signature-config-dialog.radiobutton.option-1"
+              defaultMessage="Indicate once the petition is completed"
+            />
+            <Text color="gray.500" marginLeft={2}>
+              (<FormattedMessage id="generic.recommended" defaultMessage="Recommended" />)
+            </Text>
+          </Flex>
+        </Radio>
+        <Radio value="choose-now">
+          <FormattedMessage
+            id="component.signature-config-dialog.radiobutton.option-2"
+            defaultMessage="Include signers"
+          />
+        </Radio>
+      </RadioGroup>
       <FormControl id="signers" isInvalid={!!errors.signers}>
         <Text color="gray.500" marginLeft={1}>
           <FormattedMessage
@@ -510,6 +542,10 @@ export function SignatureConfigDialogBodyStep2({
         <Controller
           name="signers"
           control={control}
+          rules={{
+            validate: (value: any[]) => radioSelection === "choose-after" || value.length > 0,
+            deps: [radioSelection],
+          }}
           render={({ field: { onChange, value: signers } }) => (
             <>
               <Stack spacing={0} paddingY={1} maxH="210px" overflowY="auto">
@@ -538,6 +574,7 @@ export function SignatureConfigDialogBodyStep2({
               <Box marginTop={2}>
                 <ContactSelect
                   value={selectedContact}
+                  onFocus={() => setRadioSelection("choose-now")}
                   onChange={handleContactSelectOnChange(onChange)}
                   onSearchContacts={handleSearchContacts}
                   onCreateContact={handleCreateContact}
@@ -545,7 +582,6 @@ export function SignatureConfigDialogBodyStep2({
                     id: "component.signature-config-dialog.contact-select.add-contact-to-sign.placeholder",
                     defaultMessage: "Add a contact to sign",
                   })}
-                  {...(signers.length === 0 ? emptyContactSelectProps : undefined)}
                 />
               </Box>
             </>

@@ -2950,11 +2950,6 @@
     "context": "Add a contact to sign"
   },
   {
-    "term": "component.signature-config-dialog.contact-select.choose-when-starting.placeholder",
-    "definition": "Choose when starting",
-    "context": "Choose when starting"
-  },
-  {
     "term": "component.signature-config-dialog.dont-review-before-send.option-no.explainer",
     "definition": "The signature will be initiated when all the information has been completed.",
     "context": "The signature will be initiated when all the information has been completed."
@@ -2973,6 +2968,16 @@
     "term": "component.signature-config-dialog.provider-label",
     "definition": "eSignature provider",
     "context": "eSignature provider"
+  },
+  {
+    "term": "component.signature-config-dialog.radiobutton.option-1",
+    "definition": "Indicate once the petition is completed",
+    "context": "Indicate once the petition is completed"
+  },
+  {
+    "term": "component.signature-config-dialog.radiobutton.option-2",
+    "definition": "Include signers",
+    "context": "Include signers"
   },
   {
     "term": "component.signature-config-dialog.review-before-send-label",
@@ -4328,6 +4333,11 @@
     "term": "generic.previous-page",
     "definition": "Previous page",
     "context": "Previous page"
+  },
+  {
+    "term": "generic.recommended",
+    "definition": "Recommended",
+    "context": "Recommended"
   },
   {
     "term": "generic.reload-data",

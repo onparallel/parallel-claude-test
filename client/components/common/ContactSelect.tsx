@@ -43,6 +43,7 @@ export interface ContactSelectProps<IsMulti extends boolean = false>
   onCreateContact: (data: { defaultEmail?: string }) => Promise<ContactSelectSelection>;
   onSearchContacts: (search: string, exclude: string[]) => Promise<ContactSelectSelection[]>;
   onPasteEmails?: (emails: string[]) => void;
+  onFocus?: () => void;
 }
 
 export type ContactSelectInstance<IsMulti extends boolean = false> = AsyncCreatableSelect<
@@ -59,6 +60,7 @@ export const ContactSelect = Object.assign(
       onCreateContact,
       onPasteEmails,
       onChange,
+      onFocus,
       ...props
     }: ContactSelectProps<IsMulti>,
     ref: ForwardedRef<ContactSelectInstance<IsMulti>>
@@ -184,6 +186,7 @@ export const ContactSelect = Object.assign(
         ref={_ref}
         isMulti={isMulti}
         onChange={onChange as any}
+        onFocus={onFocus}
         value={value}
         inputValue={inputValue}
         onKeyDown={handleKeyDown}
