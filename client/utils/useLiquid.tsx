@@ -54,7 +54,7 @@ function useCreateLiquid() {
       });
     });
 
-    for (const filter of ["newline_to_br", "strip_html"]) {
+    for (const filter of ["escape", "escape_once", "url_decode", "newline_to_br", "strip_html"]) {
       engine.registerFilter(filter, function () {
         throw new Error(`filter "${filter}" disabled`);
       });
