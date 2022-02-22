@@ -328,8 +328,8 @@ export function PetitionHeader({
                     isDisabled={user.role === "COLLABORATOR"}
                   >
                     <FormattedMessage
-                      id="component.petition-header.clone-label"
-                      defaultMessage="Clone petition"
+                      id="component.petition-header.duplicate-label"
+                      defaultMessage="Duplicate petition"
                     />
                   </MenuItem>
                   <MenuItem

@@ -1570,11 +1570,6 @@
     "context": "{modifier, select, ALL {start with} other {starts with}}"
   },
   {
-    "term": "component.petition-header.clone-label",
-    "definition": "Clonar petición",
-    "context": "Clone petition"
-  },
-  {
     "term": "component.petition-header.compose-tab.readonly",
     "definition": "Edición restringida. Para realizar cambios, puede desactivar la protección en la pestaña Ajustes.",
     "context": "Edition restricted. To make changes, you can disable the protection on the Settings tab."
@@ -1583,6 +1578,11 @@
     "term": "component.petition-header.delete-label",
     "definition": "Eliminar petición",
     "context": "Delete petition"
+  },
+  {
+    "term": "component.petition-header.duplicate-label",
+    "definition": "Duplicar petición",
+    "context": "Duplicate petition"
   },
   {
     "term": "component.petition-header.export-pdf",
@@ -1630,16 +1630,6 @@
     "context": "You have reached your limit of petitions sent, <a>reach out to us to upgrade your plan.</a>"
   },
   {
-    "term": "component.petition-list-header.clone-petition-label",
-    "definition": "Clonar {count, plural, =1{petición} other{peticiones}}",
-    "context": "Clone {count, plural, =1{petition} other{petitions}}"
-  },
-  {
-    "term": "component.petition-list-header.clone-template-label",
-    "definition": "Clonar {count, plural, =1{plantilla} other{plantillas}}",
-    "context": "Clone {count, plural, =1{template} other{templates}}"
-  },
-  {
     "term": "component.petition-list-header.delete-petition-label",
     "definition": "Borrar {count, plural, =1{petición} other{peticiones}}",
     "context": "Delete {count, plural, =1{petition} other{petitions}}"
@@ -1648,6 +1638,16 @@
     "term": "component.petition-list-header.delete-template-label",
     "definition": "Borrar {count, plural, =1{plantilla} other{plantillas}}",
     "context": "Delete {count, plural, =1{template} other{templates}}"
+  },
+  {
+    "term": "component.petition-list-header.duplicate-petition-label",
+    "definition": "Duplicar {count, plural, =1{petición} other{peticiones}}",
+    "context": "Duplicate {count, plural, =1{petition} other{petitions}}"
+  },
+  {
+    "term": "component.petition-list-header.duplicate-template-label",
+    "definition": "Duplicar {count, plural, =1{plantilla} other{plantillas}}",
+    "context": "Duplicate {count, plural, =1{template} other{templates}}"
   },
   {
     "term": "component.petition-list-header.save-as-template-label",
@@ -3145,14 +3145,14 @@
     "context": "About this template"
   },
   {
-    "term": "component.template-details-modal.clone-template",
-    "definition": "Clonar plantilla",
-    "context": "Clone template"
-  },
-  {
     "term": "component.template-details-modal.created-by",
     "definition": "Creado por {name} de {organization}.",
     "context": "Created by {name} from {organization}."
+  },
+  {
+    "term": "component.template-details-modal.duplicate-template",
+    "definition": "Duplicar plantilla",
+    "context": "Duplicate template"
   },
   {
     "term": "component.template-details-modal.edit-template",
@@ -3175,9 +3175,9 @@
     "context": "No description provided."
   },
   {
-    "term": "component.template-header.clone-label",
-    "definition": "Clonar plantilla",
-    "context": "Clone template"
+    "term": "component.template-header.duplicate-label",
+    "definition": "Duplicar plantilla",
+    "context": "Duplicate template"
   },
   {
     "term": "component.template-header.share-label",
@@ -8250,6 +8250,11 @@
     "context": "Contents"
   },
   {
+    "term": "recipient-view.created-with",
+    "definition": "Creado con {parallel}",
+    "context": "Created with {parallel}"
+  },
+  {
     "term": "recipient-view.doubts-button",
     "definition": "¿Dudas?",
     "context": "Questions?"
@@ -8423,11 +8428,6 @@
     "term": "recipient-view.petition-subject",
     "definition": "Motivo",
     "context": "Subject"
-  },
-  {
-    "term": "recipient-view.created-with",
-    "definition": "Creado con {parallel}",
-    "context": "Created with {parallel}"
   },
   {
     "term": "recipient-view.progress",

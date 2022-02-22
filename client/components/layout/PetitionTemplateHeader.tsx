@@ -262,8 +262,8 @@ export function PetitionTemplateHeader({
                 isDisabled={user.role === "COLLABORATOR"}
               >
                 <FormattedMessage
-                  id="component.template-header.clone-label"
-                  defaultMessage="Clone template"
+                  id="component.template-header.duplicate-label"
+                  defaultMessage="Duplicate template"
                 />
               </MenuItem>
               {petition.isPublic ? null : (

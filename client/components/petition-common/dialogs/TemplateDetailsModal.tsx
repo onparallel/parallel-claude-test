@@ -199,8 +199,8 @@ export function TemplateDetailsModal({ me, template, ...props }: TemplateDetails
                         isDisabled={me.role === "COLLABORATOR"}
                       >
                         <FormattedMessage
-                          id="component.template-details-modal.clone-template"
-                          defaultMessage="Clone template"
+                          id="component.template-details-modal.duplicate-template"
+                          defaultMessage="Duplicate template"
                         />
                       </MenuItem>
                       {hasAccess ? (

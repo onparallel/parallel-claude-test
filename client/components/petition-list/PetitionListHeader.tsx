@@ -117,14 +117,14 @@ export function PetitionListHeader({
               >
                 {filter.type === "PETITION" ? (
                   <FormattedMessage
-                    id="component.petition-list-header.clone-petition-label"
-                    defaultMessage="Clone {count, plural, =1{petition} other{petitions}}"
+                    id="component.petition-list-header.duplicate-petition-label"
+                    defaultMessage="Duplicate {count, plural, =1{petition} other{petitions}}"
                     values={{ count: selectedCount }}
                   />
                 ) : (
                   <FormattedMessage
-                    id="component.petition-list-header.clone-template-label"
-                    defaultMessage="Clone {count, plural, =1{template} other{templates}}"
+                    id="component.petition-list-header.duplicate-template-label"
+                    defaultMessage="Duplicate {count, plural, =1{template} other{templates}}"
                     values={{ count: selectedCount }}
                   />
                 )}
