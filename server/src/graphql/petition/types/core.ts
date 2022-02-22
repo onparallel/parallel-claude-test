@@ -131,6 +131,10 @@ export const PetitionBase = interfaceType({
       description: "The body of the petition.",
       resolve: (o) => safeJsonParse(o.email_body),
     });
+    t.nullable.json("closingEmailBody", {
+      description: "The closing email body of the petition.",
+      resolve: (o) => safeJsonParse(o.closing_email_body),
+    });
     t.nullable.field("remindersConfig", {
       type: "RemindersConfig",
       description: "The reminders configuration for the petition.",

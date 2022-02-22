@@ -167,6 +167,7 @@ export interface NexusGenInputs {
   };
   UpdatePetitionInput: {
     // input type
+    closingEmailBody?: NexusGenScalars["JSON"] | null; // JSON
     deadline?: NexusGenScalars["DateTime"] | null; // DateTime
     description?: NexusGenScalars["JSON"] | null; // JSON
     emailBody?: NexusGenScalars["JSON"] | null; // JSON
@@ -1062,6 +1063,7 @@ export interface NexusGenFieldTypes {
     // field return type
     accesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     attachments: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
+    closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     currentSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"] | null; // PetitionSignatureRequest
     customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
@@ -1352,6 +1354,7 @@ export interface NexusGenFieldTypes {
   PetitionTemplate: {
     // field return type
     attachments: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
+    closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
     defaultPermissions: NexusGenRootTypes["TemplateDefaultPermission"][]; // [TemplateDefaultPermission!]!
@@ -1896,6 +1899,7 @@ export interface NexusGenFieldTypes {
   PetitionBase: {
     // field return type
     attachments: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
+    closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
     emailBody: NexusGenScalars["JSON"] | null; // JSON
@@ -2380,6 +2384,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     accesses: "PetitionAccess";
     attachments: "PetitionAttachment";
+    closingEmailBody: "JSON";
     createdAt: "DateTime";
     currentSignatureRequest: "PetitionSignatureRequest";
     customProperties: "JSONObject";
@@ -2670,6 +2675,7 @@ export interface NexusGenFieldTypeNames {
   PetitionTemplate: {
     // field return type name
     attachments: "PetitionAttachment";
+    closingEmailBody: "JSON";
     createdAt: "DateTime";
     customProperties: "JSONObject";
     defaultPermissions: "TemplateDefaultPermission";
@@ -3214,6 +3220,7 @@ export interface NexusGenFieldTypeNames {
   PetitionBase: {
     // field return type name
     attachments: "PetitionAttachment";
+    closingEmailBody: "JSON";
     createdAt: "DateTime";
     customProperties: "JSONObject";
     emailBody: "JSON";

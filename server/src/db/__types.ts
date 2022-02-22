@@ -672,6 +672,7 @@ export interface Petition {
   restricted_password_hash: Maybe<string>; // varchar
   restricted_password_salt: Maybe<string>; // varchar
   credits_used: number; // int4
+  closing_email_body: Maybe<string>; // text
 }
 
 export type CreatePetition = PartialProps<
@@ -705,6 +706,7 @@ export type CreatePetition = PartialProps<
   | "restricted_password_hash"
   | "restricted_password_salt"
   | "credits_used"
+  | "closing_email_body"
 >;
 
 export interface PetitionAccess {

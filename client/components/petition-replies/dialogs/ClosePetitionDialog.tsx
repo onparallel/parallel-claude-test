@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Button,
   Center,
@@ -12,45 +13,25 @@ import { PaperPlaneIcon, ThumbUpIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PetitionLocale } from "@parallel/graphql/__types";
-import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
-import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/placeholders/textWithPlaceholderToSlateNodes";
 import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/slate/placeholders/usePetitionMessagePlaceholderOptions";
+import { emptyRTEValue } from "@parallel/utils/slate/RichTextEditor/emptyRTEValue";
+import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
+import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { Maybe } from "@parallel/utils/types";
-import outdent from "outdent";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { HelpPopover } from "../../common/HelpPopover";
 import { PaddedCollapse } from "../../common/PaddedCollapse";
 import { RichTextEditor, RichTextEditorInstance } from "../../common/slate/RichTextEditor";
-import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
-
-const messages: Record<PetitionLocale, string> = {
-  en: outdent`
-    Dear #contact-first-name#,
-
-    We have reviewed all the information that we requested, and we can confirm that everything is correct.
-
-    Let us know if you have any questions or comments.
-    
-    Best regards.
-  `,
-  es: outdent`
-    Apreciado/a #contact-first-name#,
-
-    Le comunicamos que hemos revisado toda la información que le requerimos y le confirmamos que está todo correcto.
-    
-    Quedamos a su entera disposición para aclarar o comentar cualquier aspecto que considere oportuno.
-    
-    Reciba un cordial saludo.
-  `,
-};
 
 interface ClosePetitionDialogInput {
+  id: string;
   locale: PetitionLocale;
   petitionName: Maybe<string>;
   hasPetitionPdfExport: boolean;
   requiredMessage: boolean;
   showNotify: boolean;
+  emailMessage?: RichTextEditorValue;
 }
 
 interface ClosePetitionDialogNotification {
@@ -59,18 +40,18 @@ interface ClosePetitionDialogNotification {
 }
 
 export function ClosePetitionDialog({
+  id,
   locale,
   petitionName,
   hasPetitionPdfExport,
   requiredMessage,
   showNotify,
+  emailMessage,
   ...props
 }: DialogProps<ClosePetitionDialogInput, ClosePetitionDialogNotification>) {
   const intl = useIntl();
-  const placeholders = usePetitionMessagePlaceholderOptions();
-  const [message, setMessage] = useState<RichTextEditorValue>(
-    textWithPlaceholderToSlateNodes(messages[locale], placeholders)
-  );
+
+  const [message, setMessage] = useState<RichTextEditorValue>(emailMessage ?? emptyRTEValue());
   const [sendMessage, setSendMessage] = useState(requiredMessage);
   const messageRef = useRef<RichTextEditorInstance>(null);
 
@@ -78,8 +59,13 @@ export function ClosePetitionDialog({
   const pdfExportTitleRef = useRef<HTMLInputElement>(null);
   const [pdfExportTitle, setPdfExportTitle] = useState(petitionName ?? "");
 
-  const isInvalid =
-    (sendMessage && isEmptyRTEValue(message)) || (attachPdfExport && !pdfExportTitle);
+  const [isInvalid, setIsInvalid] = useState(false);
+
+  useEffect(() => {
+    if (!isEmptyRTEValue(message)) {
+      setIsInvalid(false);
+    }
+  }, [message]);
 
   const placeholderOptions = usePetitionMessagePlaceholderOptions();
 
@@ -128,8 +114,8 @@ export function ClosePetitionDialog({
               <PaddedCollapse in={requiredMessage || sendMessage}>
                 <Stack>
                   <RichTextEditor
-                    id="close-petition-message"
-                    isInvalid={sendMessage && isEmptyRTEValue(message)}
+                    id={`close-petition-message-${id}`}
+                    isInvalid={isInvalid}
                     ref={messageRef}
                     value={message}
                     onChange={setMessage}
@@ -190,15 +176,19 @@ export function ClosePetitionDialog({
       }
       confirm={
         <Button
-          disabled={isInvalid}
           leftIcon={sendMessage ? <PaperPlaneIcon /> : undefined}
           colorScheme="purple"
-          onClick={() =>
+          onClick={() => {
+            if (sendMessage && (isEmptyRTEValue(message) || (attachPdfExport && !pdfExportTitle))) {
+              if (isEmptyRTEValue(message)) setIsInvalid(true);
+              return;
+            }
+
             props.onResolve({
               message: sendMessage ? message : null,
               pdfExportTitle: attachPdfExport ? pdfExportTitle : null,
-            })
-          }
+            });
+          }}
         >
           {sendMessage ? (
             <FormattedMessage
@@ -221,3 +211,12 @@ export function ClosePetitionDialog({
 export function useClosePetitionDialog() {
   return useDialog(ClosePetitionDialog);
 }
+
+useClosePetitionDialog.fragments = {
+  Petition: gql`
+    fragment useClosePetitionDialog_Petition on Petition {
+      id
+      closingEmailBody
+    }
+  `,
+};

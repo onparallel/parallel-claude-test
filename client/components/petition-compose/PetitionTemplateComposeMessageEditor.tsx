@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, BoxProps, Heading, Stack } from "@chakra-ui/react";
+import { BoxProps, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
 import {
   PetitionTemplateComposeMessageEditor_PetitionFragment,
@@ -11,6 +11,7 @@ import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types"
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useCallback, useState } from "react";
 import { FormattedMessage } from "react-intl";
+import { MessageClosingEmailEditor } from "../petition-common/MessageClosingEmailEditor";
 import { MessageEmailEditor } from "../petition-common/MessageEmailEditor";
 
 export interface PetitionTemplateComposeMessageEditorProps extends BoxProps {
@@ -25,6 +26,9 @@ export function PetitionTemplateComposeMessageEditor({
 }: PetitionTemplateComposeMessageEditorProps) {
   const [subject, setSubject] = useState(petition.emailSubject ?? "");
   const [body, setBody] = useState<RichTextEditorValue>(petition.emailBody ?? emptyRTEValue());
+  const [finishBody, setFinishBody] = useState<RichTextEditorValue>(
+    petition.closingEmailBody ?? emptyRTEValue()
+  );
 
   const updatePetition = useDebouncedCallback(onUpdatePetition, 500, [onUpdatePetition]);
 
@@ -32,6 +36,7 @@ export function PetitionTemplateComposeMessageEditor({
 
   const handleSubjectChange = useCallback(
     (value: string) => {
+      if (value === subject) return;
       setSubject(value);
       updatePetition({ emailSubject: value || null });
     },
@@ -46,27 +51,54 @@ export function PetitionTemplateComposeMessageEditor({
     [updatePetition]
   );
 
+  const handleFinishBodyChange = useCallback(
+    (value: RichTextEditorValue) => {
+      setFinishBody(value);
+      updatePetition({ closingEmailBody: isEmptyRTEValue(value) ? null : value });
+    },
+    [updatePetition]
+  );
+
   return (
     <Card id="petition-template-message-compose" {...props}>
-      <Box padding={4} borderBottom="1px solid" borderBottomColor="gray.200">
-        <Heading as="h2" size="sm">
-          <FormattedMessage
-            id="template.message-settings.header"
-            defaultMessage="Email to send with the template"
-          />
-        </Heading>
-      </Box>
-      <Stack spacing={2} padding={4}>
-        <MessageEmailEditor
-          id={petition.id}
-          showErrors={false}
-          subject={subject}
-          body={body}
-          onSubjectChange={handleSubjectChange}
-          onBodyChange={handleBodyChange}
-          isReadOnly={petition.isRestricted || isPublicTemplate}
-        />
-      </Stack>
+      <Tabs variant="enclosed">
+        <TabList marginX="-1px" marginTop="-1px">
+          <Tab padding={4} lineHeight={5} fontWeight="bold">
+            <FormattedMessage
+              id="component.petition-template-compose-message-editor.message-to-be-sent"
+              defaultMessage="Message to be sent"
+            />
+          </Tab>
+          <Tab padding={4} lineHeight={5} fontWeight="bold">
+            <FormattedMessage
+              id="component.petition-template-compose-message-editor.message-at-completion"
+              defaultMessage="Message at completion"
+            />
+          </Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel padding={4}>
+            <MessageEmailEditor
+              id={petition.id}
+              showErrors={false}
+              subject={subject}
+              body={body}
+              onSubjectChange={handleSubjectChange}
+              onBodyChange={handleBodyChange}
+              isReadOnly={petition.isRestricted || isPublicTemplate}
+            />
+          </TabPanel>
+          <TabPanel padding={4}>
+            <MessageClosingEmailEditor
+              id={petition.id}
+              showErrors={false}
+              body={finishBody}
+              onBodyChange={handleFinishBodyChange}
+              isReadOnly={petition.isRestricted || isPublicTemplate}
+            />
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
     </Card>
   );
 }
@@ -77,6 +109,7 @@ PetitionTemplateComposeMessageEditor.fragments = {
       id
       emailSubject
       emailBody
+      closingEmailBody
       description
       isRestricted
       isPublic

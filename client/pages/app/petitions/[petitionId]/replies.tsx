@@ -331,11 +331,13 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
       try {
         const data = await showClosePetitionDialog({
+          id: petition.id,
           locale: petition.locale,
           petitionName: petition.name ?? null,
           hasPetitionPdfExport: me.hasPetitionPdfExport,
           requiredMessage,
           showNotify: petition.accesses.length > 0,
+          emailMessage: petition.closingEmailBody,
         });
 
         message = data.message;
@@ -705,6 +707,7 @@ PetitionReplies.fragments = {
         ...getPetitionSignatureStatus_Petition
         ...getPetitionSignatureEnvironment_Petition
         ...PetitionAttachmentsCard_Petition
+        ...useClosePetitionDialog_Petition
       }
       ${PetitionLayout.fragments.PetitionBase}
       ${this.PetitionField}
@@ -713,6 +716,7 @@ PetitionReplies.fragments = {
       ${getPetitionSignatureStatus.fragments.Petition}
       ${getPetitionSignatureEnvironment.fragments.Petition}
       ${PetitionAttachmentsCard.fragments.Petition}
+      ${useClosePetitionDialog.fragments.Petition}
     `;
   },
   get PetitionField() {

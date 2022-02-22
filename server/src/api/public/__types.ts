@@ -1606,6 +1606,8 @@ export type Petition = PetitionBase & {
   accesses: Array<PetitionAccess>;
   /** The attachments linked to this petition */
   attachments: Array<PetitionAttachment>;
+  /** The closing email body of the petition. */
+  closingEmailBody: Maybe<Scalars["JSON"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The current signature request. */
@@ -1733,6 +1735,8 @@ export type PetitionAttachmentUploadData = {
 export type PetitionBase = {
   /** The attachments linked to this petition */
   attachments: Array<PetitionAttachment>;
+  /** The closing email body of the petition. */
+  closingEmailBody: Maybe<Scalars["JSON"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom user properties */
@@ -2242,6 +2246,8 @@ export type PetitionStatus =
 export type PetitionTemplate = PetitionBase & {
   /** The attachments linked to this petition */
   attachments: Array<PetitionAttachment>;
+  /** The closing email body of the petition. */
+  closingEmailBody: Maybe<Scalars["JSON"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom user properties */
@@ -3131,6 +3137,7 @@ export type UpdatePetitionFieldInput = {
 };
 
 export type UpdatePetitionInput = {
+  closingEmailBody?: InputMaybe<Scalars["JSON"]>;
   deadline?: InputMaybe<Scalars["DateTime"]>;
   description?: InputMaybe<Scalars["JSON"]>;
   emailBody?: InputMaybe<Scalars["JSON"]>;

@@ -970,6 +970,11 @@
     "context": "Int"
   },
   {
+    "term": "component.message-closing-email-editor.body-label",
+    "definition": "Este mensaje solo se enviará si se selecciona la opción de <b>notificar al cliente</b> al cerrarse la petición.",
+    "context": "This message will only be sent if the option to <b>notify the customer</b> when the request is closed is selected."
+  },
+  {
     "term": "component.message-email-editor.body-placeholder",
     "definition": "Escribe un mensaje para incluir en el correo electrónico",
     "context": "Write a message to include in the email"
@@ -2088,6 +2093,16 @@
     "term": "component.petition-signatures-card.status",
     "definition": "Estado",
     "context": "Status"
+  },
+  {
+    "term": "component.petition-template-compose-message-editor.message-at-completion",
+    "definition": "Mensaje al finalizar",
+    "context": "Message at completion"
+  },
+  {
+    "term": "component.petition-template-compose-message-editor.message-to-be-sent",
+    "definition": "Mensaje de envío",
+    "context": "Message to be sent"
   },
   {
     "term": "component.petition-template.delete-label",
@@ -8703,11 +8718,6 @@
     "term": "template.header.preview-tab",
     "definition": "Previsualizar",
     "context": "Preview"
-  },
-  {
-    "term": "template.message-settings.header",
-    "definition": "Email a enviar junto con la plantilla",
-    "context": "Email to send with the template"
   },
   {
     "term": "timeline.access-activated-description",

@@ -1848,6 +1848,11 @@ type Petition implements PetitionBase {
   attachments: [PetitionAttachment!]!
 
   """
+  The closing email body of the petition.
+  """
+  closingEmailBody: JSON
+
+  """
   Time when the resource was created.
   """
   createdAt: DateTime!
@@ -2109,6 +2114,11 @@ interface PetitionBase {
   The attachments linked to this petition
   """
   attachments: [PetitionAttachment!]!
+
+  """
+  The closing email body of the petition.
+  """
+  closingEmailBody: JSON
 
   """
   Time when the resource was created.
@@ -2995,6 +3005,11 @@ type PetitionTemplate implements PetitionBase {
   The attachments linked to this petition
   """
   attachments: [PetitionAttachment!]!
+
+  """
+  The closing email body of the petition.
+  """
+  closingEmailBody: JSON
 
   """
   Time when the resource was created.
@@ -4396,6 +4411,7 @@ input UpdatePetitionFieldInput {
 }
 
 input UpdatePetitionInput {
+  closingEmailBody: JSON
   deadline: DateTime
   description: JSON
   emailBody: JSON

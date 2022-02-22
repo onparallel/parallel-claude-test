@@ -566,6 +566,7 @@ export const updatePetition = mutationField("updatePetition", {
           t.nullable.datetime("deadline");
           t.nullable.string("emailSubject");
           t.nullable.json("emailBody");
+          t.nullable.json("closingEmailBody");
           t.nullable.field("remindersConfig", {
             type: "RemindersConfigInput",
           });
@@ -583,6 +584,7 @@ export const updatePetition = mutationField("updatePetition", {
     maxLength((args) => args.data.emailSubject, "data.emailSubject", 255),
     maxLength((args) => args.data.description, "data.description", 1000),
     validRichTextContent((args) => args.data.emailBody, "data.emailBody"),
+    validRichTextContent((args) => args.data.closingEmailBody, "data.closingEmailBody"),
     validRichTextContent((args) => args.data.description, "data.description"),
     validRemindersConfig((args) => args.data.remindersConfig, "data.remindersConfig"),
     validSignatureConfig((args) => args.data.signatureConfig, "data.signatureConfig")
@@ -594,6 +596,7 @@ export const updatePetition = mutationField("updatePetition", {
       deadline,
       emailSubject,
       emailBody,
+      closingEmailBody,
       remindersConfig,
       skipForwardSecurity,
       isRecipientViewContentsHidden,
@@ -615,6 +618,9 @@ export const updatePetition = mutationField("updatePetition", {
     }
     if (emailBody !== undefined) {
       data.email_body = emailBody && JSON.stringify(emailBody);
+    }
+    if (closingEmailBody !== undefined) {
+      data.closing_email_body = closingEmailBody && JSON.stringify(closingEmailBody);
     }
     if (remindersConfig !== undefined) {
       if (remindersConfig === null) {

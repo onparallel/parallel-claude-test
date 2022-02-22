@@ -1645,6 +1645,8 @@ export interface Petition extends PetitionBase {
   accesses: Array<PetitionAccess>;
   /** The attachments linked to this petition */
   attachments: Array<PetitionAttachment>;
+  /** The closing email body of the petition. */
+  closingEmailBody?: Maybe<Scalars["JSON"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The current signature request. */
@@ -1776,6 +1778,8 @@ export interface PetitionAttachmentUploadData {
 export interface PetitionBase {
   /** The attachments linked to this petition */
   attachments: Array<PetitionAttachment>;
+  /** The closing email body of the petition. */
+  closingEmailBody?: Maybe<Scalars["JSON"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom user properties */
@@ -2313,6 +2317,8 @@ export interface PetitionTemplate extends PetitionBase {
   __typename?: "PetitionTemplate";
   /** The attachments linked to this petition */
   attachments: Array<PetitionAttachment>;
+  /** The closing email body of the petition. */
+  closingEmailBody?: Maybe<Scalars["JSON"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom user properties */
@@ -3243,6 +3249,7 @@ export interface UpdatePetitionFieldInput {
 }
 
 export interface UpdatePetitionInput {
+  closingEmailBody?: InputMaybe<Scalars["JSON"]>;
   deadline?: InputMaybe<Scalars["DateTime"]>;
   description?: InputMaybe<Scalars["JSON"]>;
   emailBody?: InputMaybe<Scalars["JSON"]>;
@@ -7737,6 +7744,7 @@ export type PetitionTemplateComposeMessageEditor_PetitionFragment = {
   id: string;
   emailSubject?: string | null;
   emailBody?: any | null;
+  closingEmailBody?: any | null;
   description?: any | null;
   isRestricted: boolean;
   isPublic: boolean;
@@ -13516,6 +13524,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   name?: string | null;
   emailSubject?: string | null;
   emailBody?: any | null;
+  closingEmailBody?: any | null;
   description?: any | null;
   locale: PetitionLocale;
   skipForwardSecurity: boolean;
@@ -13784,6 +13793,7 @@ export type PetitionCompose_updatePetitionMutation = {
         isRestrictedWithPassword: boolean;
         emailSubject?: string | null;
         emailBody?: any | null;
+        closingEmailBody?: any | null;
         description?: any | null;
         updatedAt: string;
         remindersConfig?: {
@@ -14321,6 +14331,7 @@ export type PetitionCompose_petitionQuery = {
         name?: string | null;
         emailSubject?: string | null;
         emailBody?: any | null;
+        closingEmailBody?: any | null;
         description?: any | null;
         locale: PetitionLocale;
         skipForwardSecurity: boolean;
@@ -15184,6 +15195,7 @@ export type PetitionReplies_PetitionFragment = {
   id: string;
   name?: string | null;
   status: PetitionStatus;
+  closingEmailBody?: any | null;
   locale: PetitionLocale;
   deadline?: string | null;
   isRestricted: boolean;
@@ -15468,6 +15480,7 @@ export type PetitionReplies_closePetitionMutation = {
     id: string;
     name?: string | null;
     status: PetitionStatus;
+    closingEmailBody?: any | null;
     locale: PetitionLocale;
     deadline?: string | null;
     isRestricted: boolean;
@@ -15625,6 +15638,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
     id: string;
     name?: string | null;
     status: PetitionStatus;
+    closingEmailBody?: any | null;
     locale: PetitionLocale;
     deadline?: string | null;
     isRestricted: boolean;
@@ -15877,6 +15891,7 @@ export type PetitionReplies_petitionQuery = {
         id: string;
         name?: string | null;
         status: PetitionStatus;
+        closingEmailBody?: any | null;
         locale: PetitionLocale;
         deadline?: string | null;
         isRestricted: boolean;
@@ -20250,6 +20265,7 @@ export const PetitionTemplateComposeMessageEditor_PetitionFragmentDoc = gql`
     id
     emailSubject
     emailBody
+    closingEmailBody
     description
     isRestricted
     isPublic
@@ -20988,6 +21004,12 @@ export const PetitionAttachmentsCard_PetitionFragmentDoc = gql`
   }
   ${FileAttachmentButton_FileUploadFragmentDoc}
 ` as unknown as DocumentNode<PetitionAttachmentsCard_PetitionFragment, unknown>;
+export const useClosePetitionDialog_PetitionFragmentDoc = gql`
+  fragment useClosePetitionDialog_Petition on Petition {
+    id
+    closingEmailBody
+  }
+` as unknown as DocumentNode<useClosePetitionDialog_PetitionFragment, unknown>;
 export const PetitionReplies_PetitionFragmentDoc = gql`
   fragment PetitionReplies_Petition on Petition {
     id
@@ -21008,6 +21030,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
     ...getPetitionSignatureStatus_Petition
     ...getPetitionSignatureEnvironment_Petition
     ...PetitionAttachmentsCard_Petition
+    ...useClosePetitionDialog_Petition
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionReplies_PetitionFieldFragmentDoc}
@@ -21016,6 +21039,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
   ${getPetitionSignatureStatus_PetitionFragmentDoc}
   ${getPetitionSignatureEnvironment_PetitionFragmentDoc}
   ${PetitionAttachmentsCard_PetitionFragmentDoc}
+  ${useClosePetitionDialog_PetitionFragmentDoc}
 ` as unknown as DocumentNode<PetitionReplies_PetitionFragment, unknown>;
 export const PetitionRepliesFieldComments_UserFragmentDoc = gql`
   fragment PetitionRepliesFieldComments_User on User {
