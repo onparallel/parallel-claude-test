@@ -598,6 +598,8 @@ export type Mutation = {
   updatePetitionUserNotificationReadStatus: Array<PetitionUserNotification>;
   /** Updates the info and permissions of a public link */
   updatePublicPetitionLink: PublicPetitionLink;
+  /** Updates template_public from template */
+  updatePublicTemplateVisibility: SupportMethodResponse;
   updateSignatureRequestMetadata: PetitionSignatureRequest;
   /** Updates a reply to a text or select field. */
   updateSimpleReply: PetitionFieldReply;
@@ -1384,6 +1386,11 @@ export type MutationupdatePublicPetitionLinkArgs = {
   title?: InputMaybe<Scalars["String"]>;
 };
 
+export type MutationupdatePublicTemplateVisibilityArgs = {
+  isPublic: Scalars["Boolean"];
+  templateId: Scalars["GID"];
+};
+
 export type MutationupdateSignatureRequestMetadataArgs = {
   metadata: Scalars["JSONObject"];
   petitionSignatureRequestId: Scalars["GID"];
@@ -1547,10 +1554,16 @@ export type OrganizationStatus =
 
 export type OrganizationUsageLimit = {
   petitions: OrganizationUsagePetitionLimit;
+  signatures: OrganizationUsageSignaturesLimit;
   users: OrganizationUsageUserLimit;
 };
 
 export type OrganizationUsagePetitionLimit = {
+  limit: Scalars["Int"];
+  used: Scalars["Int"];
+};
+
+export type OrganizationUsageSignaturesLimit = {
   limit: Scalars["Int"];
   used: Scalars["Int"];
 };
@@ -2417,6 +2430,8 @@ export type PublicPetitionAccess = {
 
 /** A field within a petition. */
 export type PublicPetitionField = {
+  /** Alias of the petition field. */
+  alias: Maybe<Scalars["String"]>;
   /** A list of files attached to this field. */
   attachments: Array<PetitionFieldAttachment>;
   commentCount: Scalars["Int"];

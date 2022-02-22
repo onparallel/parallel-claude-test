@@ -33,7 +33,7 @@ function OrganizationUsage() {
 
   const {
     activeUserCount,
-    usageLimits: { petitions, users },
+    usageLimits: { petitions, users, signatures },
   } = organization;
 
   return (
@@ -77,6 +77,14 @@ function OrganizationUsage() {
             })}
             usage={petitions.used}
             limit={petitions.limit}
+          />
+          <UsageCard
+            title={intl.formatMessage({
+              id: "generic.signature-type-plural",
+              defaultMessage: "Signatures",
+            })}
+            usage={signatures.used}
+            limit={signatures.limit}
           />
         </Grid>
       </Box>
@@ -129,6 +137,10 @@ OrganizationUsage.queries = [
               limit
             }
             petitions {
+              used
+              limit
+            }
+            signatures {
               used
               limit
             }

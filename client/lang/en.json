@@ -4410,6 +4410,11 @@
     "context": "Production"
   },
   {
+    "term": "generic.signature-type-plural",
+    "definition": "Signatures",
+    "context": "Signatures"
+  },
+  {
     "term": "generic.something-went-wrong",
     "definition": "Something went wrong",
     "context": "Something went wrong"

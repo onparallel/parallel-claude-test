@@ -1768,10 +1768,16 @@ enum OrganizationStatus {
 
 type OrganizationUsageLimit {
   petitions: OrganizationUsagePetitionLimit!
+  signatures: OrganizationUsageSignaturesLimit!
   users: OrganizationUsageUserLimit!
 }
 
 type OrganizationUsagePetitionLimit {
+  limit: Int!
+  used: Int!
+}
+
+type OrganizationUsageSignaturesLimit {
   limit: Int!
   used: Int!
 }

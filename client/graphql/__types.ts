@@ -1588,11 +1588,18 @@ export type OrganizationStatus =
 export interface OrganizationUsageLimit {
   __typename?: "OrganizationUsageLimit";
   petitions: OrganizationUsagePetitionLimit;
+  signatures: OrganizationUsageSignaturesLimit;
   users: OrganizationUsageUserLimit;
 }
 
 export interface OrganizationUsagePetitionLimit {
   __typename?: "OrganizationUsagePetitionLimit";
+  limit: Scalars["Int"];
+  used: Scalars["Int"];
+}
+
+export interface OrganizationUsageSignaturesLimit {
+  __typename?: "OrganizationUsageSignaturesLimit";
   limit: Scalars["Int"];
   used: Scalars["Int"];
 }
@@ -10971,6 +10978,11 @@ export type OrganizationUsage_userQuery = {
         __typename?: "OrganizationUsageLimit";
         users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
+        signatures: {
+          __typename?: "OrganizationUsageSignaturesLimit";
+          used: number;
+          limit: number;
+        };
       };
     };
   };
@@ -23640,6 +23652,10 @@ export const OrganizationUsage_userDocument = gql`
             limit
           }
           petitions {
+            used
+            limit
+          }
+          signatures {
             used
             limit
           }

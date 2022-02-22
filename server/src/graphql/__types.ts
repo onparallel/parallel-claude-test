@@ -373,8 +373,17 @@ export interface NexusGenObjects {
     users: {
       limit: number;
     };
+    signatures: {
+      limit: number;
+      used: number;
+    };
   };
   OrganizationUsagePetitionLimit: {
+    // root type
+    limit: number; // Int!
+    used: number; // Int!
+  };
+  OrganizationUsageSignaturesLimit: {
     // root type
     limit: number; // Int!
     used: number; // Int!
@@ -1023,9 +1032,15 @@ export interface NexusGenFieldTypes {
   OrganizationUsageLimit: {
     // field return type
     petitions: NexusGenRootTypes["OrganizationUsagePetitionLimit"]; // OrganizationUsagePetitionLimit!
+    signatures: NexusGenRootTypes["OrganizationUsageSignaturesLimit"]; // OrganizationUsageSignaturesLimit!
     users: NexusGenRootTypes["OrganizationUsageUserLimit"]; // OrganizationUsageUserLimit!
   };
   OrganizationUsagePetitionLimit: {
+    // field return type
+    limit: number; // Int!
+    used: number; // Int!
+  };
+  OrganizationUsageSignaturesLimit: {
     // field return type
     limit: number; // Int!
     used: number; // Int!
@@ -2335,9 +2350,15 @@ export interface NexusGenFieldTypeNames {
   OrganizationUsageLimit: {
     // field return type name
     petitions: "OrganizationUsagePetitionLimit";
+    signatures: "OrganizationUsageSignaturesLimit";
     users: "OrganizationUsageUserLimit";
   };
   OrganizationUsagePetitionLimit: {
+    // field return type name
+    limit: "Int";
+    used: "Int";
+  };
+  OrganizationUsageSignaturesLimit: {
     // field return type name
     limit: "Int";
     used: "Int";

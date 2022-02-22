@@ -127,6 +127,10 @@ export const Organization = objectType({
           },
           users: {
             limit: number,
+          },
+          signatures: {
+            limit: number,
+            used: number,
           }
         }`,
         definition(t) {
@@ -147,12 +151,22 @@ export const Organization = objectType({
               },
             }),
           });
+          t.nonNull.field("signatures", {
+            type: objectType({
+              name: "OrganizationUsageSignaturesLimit",
+              definition(d) {
+                d.nonNull.int("limit");
+                d.nonNull.int("used");
+              },
+            }),
+          });
         },
       }),
       resolve: async (root, _, ctx) => {
-        const [organization, petitionSendLimits] = await Promise.all([
+        const [organization, petitionSendLimits, signatureSendLimits] = await Promise.all([
           ctx.organizations.loadOrg(root.id),
           ctx.organizations.getOrganizationCurrentUsageLimit(root.id, "PETITION_SEND"),
+          ctx.organizations.getOrganizationCurrentUsageLimit(root.id, "SIGNATURIT_SHARED_APIKEY"),
         ]);
 
         return {
@@ -162,6 +176,10 @@ export const Organization = objectType({
           },
           users: {
             limit: organization!.usage_details.USER_LIMIT,
+          },
+          signatures: {
+            limit: signatureSendLimits?.limit || 0,
+            used: signatureSendLimits?.used || 0,
           },
         };
       },
