@@ -518,7 +518,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           slug: publicPetitionLink.slug,
           contactFirstName: "Bojack",
           contactLastName: "Horseman",
-          contactEmail: "bojack@test.com",
+          contactEmail: "bojack@gmail.com",
         },
       });
 
@@ -565,7 +565,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           slug: publicPetitionLink.slug,
           contactFirstName: "Bojack",
           contactLastName: "Horseman",
-          contactEmail: "bojack@test.com",
+          contactEmail: "bojack@gmail.com",
         },
       });
 
@@ -595,7 +595,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           slug: publicPetitionLink.slug,
           contactFirstName: "Bojack",
           contactLastName: "Horseman",
-          contactEmail: "bojack@test.com",
+          contactEmail: "bojack@gmail.com",
         },
       });
 
@@ -629,7 +629,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           slug: publicPetitionLink.slug,
           contactFirstName: "Bojack",
           contactLastName: "Horseman",
-          contactEmail: "bojack@test.com",
+          contactEmail: "bojack@gmail.com",
         },
       });
 
