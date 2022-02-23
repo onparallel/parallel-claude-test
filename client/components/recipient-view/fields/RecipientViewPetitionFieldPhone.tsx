@@ -1,7 +1,7 @@
 import { Center, Flex, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { PhoneInput } from "@parallel/components/common/PhoneInput";
+import { PhoneInputLazy } from "@parallel/components/common/PhoneInputLazy";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { phoneCodes } from "@parallel/utils/phoneCodes";
@@ -42,16 +42,17 @@ export function RecipientViewPetitionFieldPhone({
   onCreateReply,
   onCommentsButtonClick,
 }: RecipientViewPetitionFieldPhoneProps) {
+  const options = field.options as FieldOptions["PHONE"];
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(
+    options.defaultCountry ? phoneCodes[options.defaultCountry] : ""
+  );
   const [isSaving, setIsSaving] = useState(false);
   const isDeletingReplyRef = useRef<Record<string, boolean>>({});
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
 
   const newReplyRef = useRef<HTMLInputElement>(null);
   const replyRefs = useMultipleRefs<HTMLInputElement>();
-
-  const options = field.options as FieldOptions["PHONE"];
 
   function handleAddNewReply() {
     setShowNewReply(true);
@@ -183,10 +184,10 @@ export function RecipientViewPetitionFieldPhone({
       ) : null}
       {(field.multiple && showNewReply) || field.replies.length === 0 ? (
         <Flex flex="1" position="relative" marginTop={2}>
-          <PhoneInput
+          <PhoneInputLazy
             defaultCountry={options.defaultCountry}
             value={value}
-            onChange={(value: string) => {
+            onChange={(value: string, { isValid }) => {
               if (isSaving) {
                 // prevent creating 2 replies
                 return;
@@ -265,7 +266,7 @@ export const RecipientViewPetitionFieldReplyPhone = forwardRef<
   return (
     <Stack direction="row">
       <Flex flex="1" position="relative">
-        <PhoneInput
+        <PhoneInputLazy
           defaultCountry={options.defaultCountry}
           value={value}
           onChange={(value: string) => {

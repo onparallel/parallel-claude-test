@@ -9,71 +9,85 @@ import {
 import { FieldPhoneIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { flags } from "@parallel/utils/flags";
-import { lazy, Suspense } from "react";
-import type { PhoneFormatterProps } from "react-headless-phone-input/types/PhoneFormatterProps";
+import { useConstant } from "@parallel/utils/useConstant";
+import { AsYouType } from "libphonenumber-js/min/index";
+import { ChangeEvent, useEffect, useState } from "react";
+import { isDefined } from "remeda";
 
-interface PhoneInputProps
-  extends ThemingProps<"Input">,
-    FormControlOptions,
-    Omit<PhoneFormatterProps, "children"> {}
+export interface PhoneInputProps extends ThemingProps<"Input">, FormControlOptions {
+  defaultCountry?: string;
+  value: string | undefined;
+  onChange(
+    value: string | undefined,
+    metadata: { isValid: boolean; country: string | undefined }
+  ): void;
+}
 
-export const PhoneInput = chakraForwardRef<"input", PhoneInputProps>(function InputPhone(
-  { onChange, onBlur, defaultCountry, value, isInvalid, ...props },
+export default chakraForwardRef<"input", PhoneInputProps>(function PhoneInput(
+  { value, onChange, defaultCountry, ...props },
   ref
 ) {
+  const formatter = useConstant(() => new AsYouType());
+  const [inputValue, setInputValue] = useState("");
+  const [country, setCountry] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (formatter.getNumberValue() !== value) {
+      formatter.reset();
+      if (isDefined(value) && value !== "") {
+        formatter.input(value);
+      }
+      const formatted = (formatter as any).formattedOutput;
+      setInputValue(formatted);
+      const _country = formatter.getCountry();
+      if (_country !== country) {
+        setCountry(_country as string);
+      }
+    }
+  }, [value]);
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    if (inputValue === newValue) {
+      return;
+    }
+
+    // The as-you-type formatter only works with append-only inputs.
+    // Changes other than append require a reset.
+    const isAppend =
+      newValue.length > inputValue.length && newValue.slice(0, inputValue.length) === inputValue;
+
+    if (isAppend) {
+      const appended = newValue.slice(inputValue.length);
+      formatter.input(appended);
+    } else {
+      // Reset the formatter, but do not reformat.
+      // Doing so now will cause the user to loose their cursor position
+      // Wait until blur or append to reformat.
+      formatter.reset();
+      formatter.input(newValue);
+    }
+    const formatted = (formatter as any).formattedOutput;
+    setInputValue(formatted);
+    const country = formatter.getCountry();
+    const isValid = formatter.isPossible();
+    const value = formatter.getNumberValue();
+    setCountry(country);
+    onChange(value, { country, isValid });
+  };
+
   return (
-    <LazyPhoneFormatter defaultCountry={defaultCountry} value={value} onChange={onChange}>
-      {({ country, impossible, onBlur: _onBlur, onInputChange, inputValue }) => {
-        console.log(country);
-        return (
-          <InputGroup>
-            <InputLeftElement pointerEvents="none">
-              {country ? (
-                <Box fontSize="xl">{flags[country]}</Box>
-              ) : defaultCountry ? (
-                <Box fontSize="xl">{flags[defaultCountry]}</Box>
-              ) : (
-                <FieldPhoneIcon />
-              )}
-            </InputLeftElement>
-            <Input
-              ref={ref}
-              type="tel"
-              isInvalid={isInvalid || Boolean(impossible)}
-              value={inputValue}
-              onBlur={(event) => {
-                onBlur?.(event);
-                _onBlur();
-              }}
-              onChange={(e) => {
-                onInputChange(e.target.value);
-              }}
-              {...props}
-            />
-          </InputGroup>
-        );
-      }}
-    </LazyPhoneFormatter>
+    <InputGroup>
+      <InputLeftElement pointerEvents="none">
+        {country ? (
+          <Box fontSize="xl">{flags[country]}</Box>
+        ) : defaultCountry ? (
+          <Box fontSize="xl">{flags[defaultCountry]}</Box>
+        ) : (
+          <FieldPhoneIcon />
+        )}
+      </InputLeftElement>
+      <Input ref={ref} type="tel" value={inputValue} onChange={handleChange} {...props} />
+    </InputGroup>
   );
 });
-
-const PhoneFormatter = lazy(() => import("react-headless-phone-input"));
-function LazyPhoneFormatter(props: PhoneFormatterProps) {
-  return (
-    <Suspense
-      fallback={
-        <>
-          {props.children({
-            inputValue: props.value || "",
-            onInputChange(v) {
-              props.onChange(v);
-            },
-            onBlur() {},
-          })}
-        </>
-      }
-    >
-      <PhoneFormatter {...props} />
-    </Suspense>
-  );
-}
