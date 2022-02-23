@@ -117,14 +117,14 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     // Validate and focus fields when have "tags" in url, because it probably comes from other page when validates petition fields
     const hash = window.location.hash;
     if (hash) {
-      const { error, fieldsWithIndices } = validatePetitionFields(petition.fields);
-      if (error && fieldsWithIndices && fieldsWithIndices.length > 0) {
-        setShowErrors(true);
-        focusFieldTitle(fieldsWithIndices[0].field.id);
-      }
-
       if (hash.includes("#field-settings-")) {
         handleFieldSettingsClick(hash.replace("#field-settings-", ""));
+      } else {
+        const { error, fieldsWithIndices } = validatePetitionFields(petition.fields);
+        if (error && fieldsWithIndices && fieldsWithIndices.length > 0) {
+          setShowErrors(true);
+          focusFieldTitle(fieldsWithIndices[0].field.id);
+        }
       }
     }
   }, []);
