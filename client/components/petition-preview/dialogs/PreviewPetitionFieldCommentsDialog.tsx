@@ -224,25 +224,31 @@ export function PreviewPetitionFieldCommentsDialog({
               ) : (
                 <Stack alignItems="center" textAlign="center">
                   <AlertCircleIcon boxSize="64px" color="gray.200" />
+                  {hasInternalComments ? (
+                    <Text color="gray.400">
+                      <FormattedMessage
+                        id="petition-replies.field-comments.disabled-comments-1"
+                        defaultMessage="This field only accepts internal comments."
+                      />
+                    </Text>
+                  ) : null}
                   <Text color="gray.400">
                     <FormattedMessage
-                      id="petition-replies.field-comments.disabled-comments-1"
-                      defaultMessage="Comments are disabled. Enable them on the petition settings in the <a>Compose</a> tab."
+                      id="petition-replies.field-comments.disabled-comments-2"
+                      defaultMessage="You can enable comments from the <a>Field settings</a> in the {editTab} tab."
                       values={{
+                        editTab: intl.formatMessage({
+                          id: "petition.header.compose-tab",
+                          defaultMessage: "Compose",
+                        }),
                         a: (chunks: any) => (
-                          <Link href={`/app/petitions/${petitionId}/compose`}>{chunks}</Link>
+                          <Link href={`/app/petitions/${petitionId}/compose#${field.id}`}>
+                            {chunks}
+                          </Link>
                         ),
                       }}
                     />
                   </Text>
-                  {hasInternalComments ? (
-                    <Text color="gray.400">
-                      <FormattedMessage
-                        id="petition-replies.field-comments.disabled-comments-2"
-                        defaultMessage="Only internal comments will be displayed here."
-                      />
-                    </Text>
-                  ) : null}
                 </Stack>
               )}
             </Flex>

@@ -5325,14 +5325,14 @@
     "context": "Export replies"
   },
   {
-    "term": "petition-replies.field-comments.disabled-comments-1",
-    "definition": "Los comentarios están deshabilitados. Habilítalos desde los ajustes de petición en la pestaña de <a>Edición</a>.",
-    "context": "Comments are disabled. Enable them on the petition settings in the <a>Compose</a> tab."
+    "term": "petition-replies.field-comments.disabled-comments-2",
+    "definition": "Puedes habilitar los comentarios desde los <a>Ajustes del campo</a> en la pestaña de {editTab}.",
+    "context": "You can enable comments from the <a>Field settings</a> in the {editTab} tab."
   },
   {
-    "term": "petition-replies.field-comments.disabled-comments-2",
-    "definition": "Solo se mostrarán comentarios internos aquí.",
-    "context": "Only internal comments will be displayed here."
+    "term": "petition-replies.field-comments.disabled-comments-1",
+    "definition": "Este campo solo admite comentarios internos.",
+    "context": "This field only accepts internal comments."
   },
   {
     "term": "petition-replies.field-comments.placeholder",
