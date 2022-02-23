@@ -1,12 +1,12 @@
-import { PetitionFieldType, CreatePetitionField, PetitionField } from "../__types";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
-import { isOptionsCompatible, isSettingsCompatible } from "./utils";
+import { isDefined } from "remeda";
+import { CreatePetitionField, PetitionField, PetitionFieldType } from "../__types";
 
 const SCHEMAS = {
   NUMBER: {
     type: "object",
-    required: ["placeholder"],
+    required: ["hasCommentsEnabled", "placeholder", "range"],
     additionalProperties: false,
     properties: {
       hasCommentsEnabled: {
@@ -16,7 +16,7 @@ const SCHEMAS = {
         type: ["string", "null"],
       },
       range: {
-        type: ["object"],
+        type: ["object", "null"],
         properties: {
           min: { type: "number" },
           max: { type: "number" },
@@ -35,7 +35,7 @@ const SCHEMAS = {
   },
   PHONE: {
     type: "object",
-    required: ["placeholder", "defaultCountry"],
+    required: ["hasCommentsEnabled", "placeholder", "defaultCountry"],
     additionalProperties: false,
     properties: {
       hasCommentsEnabled: {
@@ -45,13 +45,13 @@ const SCHEMAS = {
         type: ["string", "null"],
       },
       defaultCountry: {
-        type: "string",
+        type: ["string", "null"],
       },
     },
   },
   TEXT: {
     type: "object",
-    required: ["placeholder"],
+    required: ["hasCommentsEnabled", "placeholder", "maxLength"],
     additionalProperties: false,
     properties: {
       hasCommentsEnabled: {
@@ -67,7 +67,7 @@ const SCHEMAS = {
   },
   SHORT_TEXT: {
     type: "object",
-    required: ["placeholder"],
+    required: ["hasCommentsEnabled", "placeholder", "maxLength"],
     additionalProperties: false,
     properties: {
       hasCommentsEnabled: {
@@ -83,7 +83,7 @@ const SCHEMAS = {
   },
   FILE_UPLOAD: {
     type: "object",
-    required: ["accepts"],
+    required: ["hasCommentsEnabled", "accepts"],
     additionalProperties: false,
     properties: {
       hasCommentsEnabled: {
@@ -100,7 +100,7 @@ const SCHEMAS = {
   },
   HEADING: {
     type: "object",
-    required: ["hasPageBreak"],
+    required: ["hasCommentsEnabled", "hasPageBreak"],
     additionalProperties: false,
     properties: {
       hasCommentsEnabled: {
@@ -113,7 +113,7 @@ const SCHEMAS = {
   },
   SELECT: {
     type: "object",
-    required: ["values"],
+    required: ["hasCommentsEnabled", "values", "placeholder"],
     additionalProperties: false,
     properties: {
       hasCommentsEnabled: {
@@ -148,7 +148,7 @@ const SCHEMAS = {
       },
       root: {
         type: "object",
-        required: ["values", "labels"],
+        required: ["hasCommentsEnabled", "values", "labels"],
         additionalProperties: false,
         properties: {
           hasCommentsEnabled: {
@@ -181,7 +181,7 @@ const SCHEMAS = {
   },
   CHECKBOX: {
     type: "object",
-    required: ["values"],
+    required: ["hasCommentsEnabled", "values", "limit"],
     additionalProperties: false,
     properties: {
       hasCommentsEnabled: {
@@ -194,7 +194,7 @@ const SCHEMAS = {
         },
       },
       limit: {
-        type: "object",
+        type: ["object"],
         required: ["min", "max", "type"],
         properties: {
           type: {
@@ -231,130 +231,119 @@ export function defaultFieldOptions(
   type: PetitionFieldType,
   field?: PetitionField
 ): Partial<CreatePetitionField> {
-  let { options, multiple, optional } = field || {};
+  const hasCommentsEnabled =
+    type === "HEADING" // HEADING always false by default
+      ? false
+      : field?.type === "HEADING" // Inherit if not coming from HEADING
+      ? true
+      : field?.options.hasCommentsEnabled ?? true;
+  // Always inherit optional
+  const optional = field?.optional ?? false;
+  const multiple =
+    type === "FILE_UPLOAD" // FILE_UPLOAD always true
+      ? true
+      : type === "CHECKBOX" // CHECKBOX always false
+      ? false
+      : field?.type === "FILE_UPLOAD" // Inherit if not coming from a FILE_UPLOAD
+      ? false
+      : field?.multiple ?? false;
 
-  if (!field || !isOptionsCompatible(field.type, type)) {
-    // check if old field is HEADING for not drag the default disabled option, otherwise take the old value
-    options = {
-      // common options here
-      hasCommentsEnabled: field?.type === "HEADING" ? true : options?.hasCommentsEnabled ?? true,
-    };
-  }
-
-  if (!field || !isSettingsCompatible(field.type, type)) {
-    optional = false;
-    multiple = false;
-  }
-
-  const commonSettings = {
-    optional: optional ?? false,
-    multiple: multiple ?? false,
-    is_internal: field?.is_internal ?? false,
-    show_in_pdf: field?.show_in_pdf ?? true,
-    alias: field?.alias ?? null,
-  };
-
-  switch (type) {
-    case "HEADING": {
-      return {
-        optional: true,
-        multiple: false,
-        is_internal: false,
-        show_in_pdf: true,
-        options: {
-          hasCommentsEnabled: false,
+  const options = ((): any => {
+    switch (type) {
+      case "HEADING": {
+        return {
+          hasCommentsEnabled,
           hasPageBreak: false,
-        },
-      };
-    }
-    case "TEXT":
-    case "SHORT_TEXT": {
-      return {
-        ...commonSettings,
-        options: {
-          hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
-          placeholder: options?.placeholder ?? null,
-          maxLength: options?.maxLength ?? null,
-        },
-      };
-    }
-    case "DATE": {
-      return {
-        ...commonSettings,
-        options: {
-          hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
-        },
-      };
-    }
-    case "NUMBER": {
-      return {
-        ...commonSettings,
-        options: {
-          hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
-          placeholder: options?.placeholder ?? null,
+        };
+      }
+      case "TEXT":
+      case "SHORT_TEXT": {
+        return {
+          hasCommentsEnabled,
+          placeholder:
+            isDefined(field) && hasPlaceholder(field.type) ? field.options.placeholder : null,
+          maxLength:
+            isDefined(field) && ["TEXT", "SHORT_TEXT"].includes(field.type)
+              ? field.options.maxLength
+              : null,
+        };
+      }
+      case "DATE": {
+        return {
+          hasCommentsEnabled,
+        };
+      }
+      case "NUMBER": {
+        return {
+          hasCommentsEnabled,
+          placeholder:
+            isDefined(field) && hasPlaceholder(field.type) ? field.options.placeholder : null,
           range: {
             min: 0,
           },
-        },
-      };
-    }
-    case "PHONE": {
-      return {
-        ...commonSettings,
-        options: {
-          hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
-          placeholder: options?.placeholder ?? null,
-          defaultCountry: "ES",
-        },
-      };
-    }
-    case "SELECT": {
-      return {
-        ...commonSettings,
-        options: {
-          hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
-          values: options?.values ?? [],
-          placeholder: options?.placeholder ?? null,
-        },
-      };
-    }
-    case "FILE_UPLOAD":
-      return {
-        ...commonSettings,
-        optional: false,
-        multiple: true,
-        options: {
-          hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
+        };
+      }
+      case "PHONE": {
+        return {
+          hasCommentsEnabled,
+          placeholder:
+            isDefined(field) && hasPlaceholder(field.type) ? field.options.placeholder : null,
+          defaultCountry: null,
+        };
+      }
+      case "SELECT": {
+        return {
+          hasCommentsEnabled,
+          values:
+            isDefined(field) && ["SELECT", "CHECKBOX"].includes(field.type)
+              ? field.options.values
+              : [],
+          placeholder:
+            isDefined(field) && hasPlaceholder(field.type) ? field.options.placeholder : null,
+        };
+      }
+      case "FILE_UPLOAD":
+        return {
+          hasCommentsEnabled,
           accepts: null,
-        },
-      };
-    case "DYNAMIC_SELECT": {
-      return {
-        ...commonSettings,
-        options: {
-          hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
+        };
+      case "DYNAMIC_SELECT": {
+        return {
+          hasCommentsEnabled,
           file: null,
           values: [],
           labels: [],
-        },
-      };
-    }
-    case "CHECKBOX": {
-      return {
-        ...commonSettings,
-        multiple: false,
-        options: {
-          hasCommentsEnabled: options?.hasCommentsEnabled ?? true,
-          values: options?.values ?? [],
+        };
+      }
+      case "CHECKBOX": {
+        return {
+          hasCommentsEnabled,
+          values:
+            isDefined(field) && ["SELECT", "CHECKBOX"].includes(field.type)
+              ? field.options.values
+              : [],
           limit: {
             type: "UNLIMITED",
             min: optional ?? false ? 0 : 1,
             max: 1,
           },
-        },
-      };
+        };
+      }
+      default:
+        throw new Error();
     }
-    default:
-      return {};
-  }
+  })();
+
+  return {
+    optional,
+    multiple,
+    is_internal: field?.is_internal ?? false,
+    show_in_pdf: field?.show_in_pdf ?? true,
+    alias: field?.alias ?? null,
+    options,
+  };
+}
+
+function hasPlaceholder(type: PetitionFieldType) {
+  return ["TEXT", "SHORT_TEXT", "SELECT", "NUMBER", "PHONE"].includes(type);
 }

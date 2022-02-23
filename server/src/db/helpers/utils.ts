@@ -15,17 +15,3 @@ export const isValueCompatible = (oldType: PetitionFieldType, newType: PetitionF
     ["TEXT", "SHORT_TEXT"].includes(newType)
   );
 };
-
-export const isOptionsCompatible = (oldType: PetitionFieldType, newType: PetitionFieldType) => {
-  return (
-    ["TEXT", "SHORT_TEXT", "SELECT", "CHECKBOX"].includes(oldType) &&
-    ["TEXT", "SHORT_TEXT", "SELECT", "CHECKBOX"].includes(newType)
-  );
-};
-
-export const isSettingsCompatible = (oldType: PetitionFieldType, newType: PetitionFieldType) => {
-  return (
-    ["TEXT", "SHORT_TEXT", "SELECT", "DYNAMIC_SELECT", "CHECKBOX", "DATE"].includes(oldType) &&
-    ["TEXT", "SHORT_TEXT", "SELECT", "DYNAMIC_SELECT", "CHECKBOX", "DATE"].includes(newType)
-  );
-};
