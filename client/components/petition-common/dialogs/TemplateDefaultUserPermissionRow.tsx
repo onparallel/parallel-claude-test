@@ -13,7 +13,8 @@ import { PetitionPermissionTypeText } from "../PetitionPermissionType";
 interface TemplateDefaultUserPermissionRowProps {
   user?: TemplateDefaultUserPermissionRow_UserFragment;
   permissionType?: PetitionPermissionType;
-  onRemove?: (id: string) => Promise<void>;
+  onRemove?: () => void;
+  onTransfer?: () => void;
   userId: string;
 }
 
@@ -22,6 +23,7 @@ export function TemplateDefaultUserPermissionRow({
   permissionType,
   userId,
   onRemove,
+  onTransfer,
 }: TemplateDefaultUserPermissionRowProps) {
   return (
     <Flex alignItems="center">
@@ -72,13 +74,21 @@ export function TemplateDefaultUserPermissionRow({
             <PetitionPermissionTypeText type={permissionType} />
           </MenuButton>
           <MenuList minWidth={40}>
-            <MenuItem icon={<UserArrowIcon display="block" boxSize={4} />}>
+            <MenuItem
+              isDisabled={permissionType === "OWNER"}
+              icon={<UserArrowIcon display="block" boxSize={4} />}
+              onClick={onTransfer}
+            >
               <FormattedMessage
                 id="generic.transfer-ownership"
                 defaultMessage="Transfer ownership"
               />
             </MenuItem>
-            <MenuItem color="red.500" icon={<DeleteIcon display="block" boxSize={4} />}>
+            <MenuItem
+              color="red.500"
+              icon={<DeleteIcon display="block" boxSize={4} />}
+              onClick={onRemove}
+            >
               <FormattedMessage id="generic.remove" defaultMessage="Remove" />
             </MenuItem>
           </MenuList>

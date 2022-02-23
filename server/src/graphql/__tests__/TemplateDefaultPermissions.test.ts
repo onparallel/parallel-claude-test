@@ -3,7 +3,13 @@ import { Knex } from "knex";
 import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Organization, Petition, PublicPetitionLink, User, UserGroup } from "../../db/__types";
+import {
+  Organization,
+  Petition,
+  TemplateDefaultPermission,
+  User,
+  UserGroup,
+} from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
 
@@ -46,6 +52,7 @@ describe("GraphQL/TemplateDefaultPermissions", () => {
 
   afterEach(async () => {
     await knex.from("template_default_permission").delete();
+    await mocks.knex.from("public_petition_link").delete();
   });
 
   afterAll(async () => {
@@ -335,6 +342,74 @@ describe("GraphQL/TemplateDefaultPermissions", () => {
       });
     });
 
+    it("transfers the ownership if passing a different owner when updating", async () => {
+      await mocks.knex<TemplateDefaultPermission>("template_default_permission").insert([
+        {
+          template_id: templates[0].id,
+          type: "OWNER",
+          user_id: users[0].id,
+          position: 0,
+        },
+        {
+          template_id: templates[0].id,
+          type: "WRITE",
+          user_id: users[1].id,
+          position: 1,
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]!) {
+            updateTemplateDefaultPermissions(templateId: $templateId, permissions: $permissions) {
+              ... on PetitionTemplate {
+                defaultPermissions {
+                  permissionType
+                  isSubscribed
+                  ... on TemplateDefaultUserPermission {
+                    user {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          templateId: toGlobalId("Petition", templates[0].id),
+          permissions: [
+            {
+              userId: toGlobalId("User", users[1].id),
+              permissionType: "OWNER",
+              isSubscribed: true,
+            },
+            {
+              userId: toGlobalId("User", users[0].id),
+              permissionType: "WRITE",
+              isSubscribed: false,
+            },
+          ],
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateTemplateDefaultPermissions).toEqual({
+        defaultPermissions: [
+          {
+            permissionType: "OWNER",
+            user: { id: toGlobalId("User", users[1].id) },
+            isSubscribed: true,
+          },
+          {
+            permissionType: "WRITE",
+            user: { id: toGlobalId("User", users[0].id) },
+            isSubscribed: false,
+          },
+        ],
+      });
+    });
+
     it("adds default permissions so petitions created from the template inherit them", async () => {
       const res = await testClient.mutate({
         mutation: gql`
@@ -414,12 +489,6 @@ describe("GraphQL/TemplateDefaultPermissions", () => {
     });
 
     it("sends error if trying to give read/write permissions to a user that is the owner of an active public link", async () => {
-      await mocks.knex.from("public_petition_link").where("template_id", templates[0].id).delete();
-      await mocks.knex
-        .from("template_default_permission")
-        .where("template_id", templates[0].id)
-        .delete();
-
       await mocks.createRandomPublicPetitionLink(templates[0].id, users[0].id);
 
       const { errors, data } = await testClient.mutate({
@@ -447,12 +516,6 @@ describe("GraphQL/TemplateDefaultPermissions", () => {
     });
 
     it("overwrites the permission if giving read/write access to a user that is the owner of an inactive public link, and nulls the link owner", async () => {
-      await mocks.knex.from("public_petition_link").where("template_id", templates[0].id).delete();
-      await mocks.knex
-        .from("template_default_permission")
-        .where("template_id", templates[0].id)
-        .delete();
-
       await mocks.createRandomPublicPetitionLink(templates[0].id, users[0].id, () => ({
         is_active: false,
       }));
@@ -506,6 +569,40 @@ describe("GraphQL/TemplateDefaultPermissions", () => {
             },
           },
         ],
+      });
+    });
+
+    it.only("should disable public link if removing owner from default permissions", async () => {
+      const publicLink = await mocks.createRandomPublicPetitionLink(templates[0].id, users[0].id);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]!) {
+            updateTemplateDefaultPermissions(templateId: $templateId, permissions: $permissions) {
+              defaultPermissions {
+                __typename
+              }
+              publicLink {
+                id
+                isActive
+                owner {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        { templateId: toGlobalId("Petition", templates[0].id), permissions: [] }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateTemplateDefaultPermissions).toEqual({
+        defaultPermissions: [],
+        publicLink: {
+          id: toGlobalId("PublicPetitionLink", publicLink.id),
+          isActive: false,
+          owner: null,
+        },
       });
     });
   });

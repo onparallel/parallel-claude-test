@@ -1609,7 +1609,7 @@ export const updateTemplateDefaultPermissions = mutationField("updateTemplateDef
         "UPDATE_TEMPLATE_DEFAULT_PERMISSIONS_ERROR"
       );
     }
-    await ctx.petitions.upsertTemplateDefaultPermissions(
+    await ctx.petitions.resetTemplateDefaultPermissions(
       args.templateId,
       args.permissions as any,
       `User:${ctx.user!.id}`

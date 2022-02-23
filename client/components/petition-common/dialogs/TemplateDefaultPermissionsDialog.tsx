@@ -11,12 +11,12 @@ import {
 } from "@parallel/components/common/UserSelect";
 import {
   Maybe,
-  TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment,
   PetitionPermissionType,
   TemplateDefaultPermissionsDialog_PublicPetitionLinkFragment,
   TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragment,
-  UserOrUserGroupPermissionInput,
   TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment,
+  TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment,
+  UserOrUserGroupPermissionInput,
 } from "@parallel/graphql/__types";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -60,12 +60,6 @@ export function TemplateDefaultPermissionsDialog({
   });
   const editors = watch("editors");
 
-  useEffect(() => {
-    if (editors.length > 1 || editors[0]?.__typename === "UserGroup") {
-      setValue("permissionType", "WRITE");
-    }
-  }, [editors.length]);
-
   const ownerPermission = permissionsList.find((p) => p.permissionType === "OWNER") as
     | TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment
     | undefined;
@@ -77,6 +71,12 @@ export function TemplateDefaultPermissionsDialog({
     (p) => p.__typename === "TemplateDefaultUserGroupPermission"
   ) as TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment[];
 
+  useEffect(() => {
+    if (!!ownerPermission || editors.length > 1 || editors[0]?.__typename === "UserGroup") {
+      setValue("permissionType", "WRITE");
+    }
+  }, [editors.length, ownerPermission?.id]);
+
   const _handleSearchUsers = useSearchUsers();
   const handleSearchUsers = useCallback(
     async (search: string, excludeUsers: string[], excludeUserGroups: string[]) => {
@@ -87,28 +87,52 @@ export function TemplateDefaultPermissionsDialog({
             ? excludeUsers.concat(publicLink.owner.id)
             : excludeUsers),
           ...userPermissions.map((p) => p.user.id),
+          ...(ownerPermission ? [ownerPermission.user.id] : []),
         ],
         excludeUserGroups: [...excludeUserGroups, ...groupPermissions.map((p) => p.group.id)],
         includeGroups: true,
       });
     },
-    [_handleSearchUsers, userPermissions.length, groupPermissions.length]
+    [_handleSearchUsers, userPermissions.length, groupPermissions.length, ownerPermission?.user.id]
   );
+
+  function mapPermission(p: TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragment) {
+    return {
+      isSubscribed: p.isSubscribed,
+      permissionType: p.permissionType,
+      ...(p.__typename === "TemplateDefaultUserPermission"
+        ? { userId: p.user.id }
+        : p.__typename === "TemplateDefaultUserGroupPermission"
+        ? { userGroupId: p.group.id }
+        : (null as never)),
+    };
+  }
 
   const handleRemovePermission = async (templateDefaultPermissionId: string) => {
     const newPermissions = await onUpdatePermissions(
-      permissionsList
-        .filter((p) => p.id !== templateDefaultPermissionId)
-        .map((p) => ({
-          isSubscribed: p.isSubscribed,
-          permissionType: p.permissionType,
-          ...(p.__typename === "TemplateDefaultUserPermission"
-            ? { userId: p.user.id }
-            : p.__typename === "TemplateDefaultUserGroupPermission"
-            ? { userGroupId: p.group.id }
-            : (null as never)),
-        }))
+      permissionsList.filter((p) => p.id !== templateDefaultPermissionId).map(mapPermission)
     );
+    setPermissionsList(newPermissions);
+  };
+
+  const handleTransferOwnership = async (templateDefaultPermissionId: string) => {
+    const oldOwner = permissionsList.find((p) => p.permissionType === "OWNER");
+    const newOwner = permissionsList.find((p) => p.id === templateDefaultPermissionId)!;
+
+    const newPermissions = await onUpdatePermissions(
+      permissionsList
+        .map((p) => {
+          if (p.id === oldOwner?.id) {
+            return { ...p, permissionType: newOwner.permissionType };
+          } else if (p.id === newOwner.id) {
+            return { ...p, permissionType: "OWNER" } as const;
+          } else {
+            return p;
+          }
+        })
+        .map(mapPermission)
+    );
+
     setPermissionsList(newPermissions);
   };
 
@@ -135,17 +159,7 @@ export function TemplateDefaultPermissionsDialog({
                       ? { userGroupId: x.id }
                       : (null as never)),
                   }))
-                  .concat(
-                    permissionsList.map((p) => ({
-                      isSubscribed: p.isSubscribed,
-                      permissionType: p.permissionType,
-                      ...(p.__typename === "TemplateDefaultUserPermission"
-                        ? { userId: p.user.id }
-                        : p.__typename === "TemplateDefaultUserGroupPermission"
-                        ? { userGroupId: p.group.id }
-                        : (null as never)),
-                    }))
-                  ) as any
+                  .concat(permissionsList.map(mapPermission))
               );
               setPermissionsList(newPermissions);
               setValue("editors", []);
@@ -201,7 +215,11 @@ export function TemplateDefaultPermissionsDialog({
                   <PetitionPermissionTypeSelect
                     permissionType={value}
                     onPermissionChange={onChange}
-                    disableOwner={editors.length > 1 || editors[0]?.__typename === "UserGroup"}
+                    disableOwner={
+                      !!ownerPermission ||
+                      editors.length > 1 ||
+                      editors[0]?.__typename === "UserGroup"
+                    }
                   />
                 )}
               />
@@ -232,6 +250,7 @@ export function TemplateDefaultPermissionsDialog({
               user={ownerPermission?.user}
               permissionType="OWNER"
               userId={userId}
+              onRemove={() => ownerPermission && handleRemovePermission(ownerPermission.id)}
             />
             {userPermissions.map((p, key) => (
               <TemplateDefaultUserPermissionRow
@@ -239,10 +258,16 @@ export function TemplateDefaultPermissionsDialog({
                 user={p.user}
                 permissionType={p.permissionType}
                 userId={userId}
+                onRemove={() => handleRemovePermission(p.id)}
+                onTransfer={() => handleTransferOwnership(p.id)}
               />
             ))}
             {groupPermissions.map((p, key) => (
-              <TemplateDefaultUserGroupPermissionRow key={key} permission={p} />
+              <TemplateDefaultUserGroupPermissionRow
+                key={key}
+                permission={p}
+                onRemove={() => handleRemovePermission(p.id)}
+              />
             ))}
           </Stack>
         </Stack>

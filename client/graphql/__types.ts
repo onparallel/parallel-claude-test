@@ -7969,6 +7969,7 @@ export type PetitionSettings_updateTemplateDefaultPermissionsMutation = {
           };
         }
     >;
+    publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
   };
 };
 
@@ -22427,6 +22428,10 @@ export const PetitionSettings_updateTemplateDefaultPermissionsDocument = gql`
       id
       defaultPermissions {
         ...TemplateDefaultPermissionsDialog_TemplateDefaultPermission
+      }
+      publicLink {
+        id
+        isActive
       }
     }
   }

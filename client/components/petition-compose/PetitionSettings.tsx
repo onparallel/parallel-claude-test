@@ -804,6 +804,10 @@ const mutations = [
         defaultPermissions {
           ...TemplateDefaultPermissionsDialog_TemplateDefaultPermission
         }
+        publicLink {
+          id
+          isActive
+        }
       }
     }
     ${TemplateDefaultPermissionsDialog.fragments.TemplateDefaultPermission}

@@ -20,7 +20,7 @@ import { PetitionPermissionTypeText } from "../PetitionPermissionType";
 
 interface TemplateDefaultUserGroupPermissionRowProps {
   permission: TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment;
-  onRemove?: (id: string) => Promise<void>;
+  onRemove?: () => void;
 }
 
 export function TemplateDefaultUserGroupPermissionRow({
@@ -58,7 +58,11 @@ export function TemplateDefaultUserGroupPermissionRow({
           <PetitionPermissionTypeText type={permission.permissionType} />
         </MenuButton>
         <MenuList minWidth={40}>
-          <MenuItem color="red.500" icon={<DeleteIcon display="block" boxSize={4} />}>
+          <MenuItem
+            color="red.500"
+            icon={<DeleteIcon display="block" boxSize={4} />}
+            onClick={onRemove}
+          >
             <FormattedMessage id="generic.remove" defaultMessage="Remove" />
           </MenuItem>
         </MenuList>

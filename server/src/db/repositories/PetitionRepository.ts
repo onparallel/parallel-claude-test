@@ -3395,6 +3395,46 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.whereNull("deleted_at").where("type", "OWNER")
   );
 
+  async resetTemplateDefaultPermissions(
+    templateId: number,
+    permissions: TemplateDefaultPermissionInput[],
+    updatedBy: string,
+    t?: Knex.Transaction
+  ) {
+    return await this.withTransaction(async (t) => {
+      await this.from("template_default_permission", t)
+        .where("template_id", templateId)
+        .whereNull("deleted_at")
+        .update({ deleted_at: this.now(), deleted_by: updatedBy });
+
+      if (permissions.length > 0) {
+        await this.insert(
+          "template_default_permission",
+          permissions.map((p, i) => ({
+            template_id: templateId,
+            position: i,
+            type: p.permissionType,
+            is_subscribed: p.isSubscribed,
+            created_at: this.now(),
+            created_by: updatedBy,
+            ...("userId" in p ? { user_id: p.userId } : { user_group_id: p.userGroupId }),
+          })),
+          t
+        );
+      }
+
+      // if no OWNER will be set for the template, we hace to make sure the public link is disabled
+      if (!permissions.find((p) => p.permissionType === "OWNER")) {
+        await this.from("public_petition_link", t).where("template_id", templateId).update({
+          is_active: false,
+          updated_at: this.now(),
+          updated_by: updatedBy,
+        });
+        this.loadPublicPetitionLinksByTemplateId.dataloader.clear(templateId);
+      }
+    }, t);
+  }
+
   async upsertTemplateDefaultPermissions(
     templateId: number,
     permissions: TemplateDefaultPermissionInput[],
@@ -3435,7 +3475,6 @@ export class PetitionRepository extends BaseRepository {
       await this.from("template_default_permission", t)
         .where("template_id", templateId)
         .whereNull("deleted_at")
-        .whereNot("type", "OWNER")
         .whereNotIn(
           "id",
           rows.map((p) => p.id)
