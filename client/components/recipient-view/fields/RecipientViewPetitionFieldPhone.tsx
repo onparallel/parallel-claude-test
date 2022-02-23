@@ -1,11 +1,10 @@
 import { Center, Flex, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { InputPhone } from "@parallel/components/common/InputPhone";
-import { CountryISO } from "@parallel/utils/flags";
+import { PhoneInput } from "@parallel/components/common/PhoneInput";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
-import { countryPhoneCodes } from "@parallel/utils/phoneCodes";
+import { phoneCodes } from "@parallel/utils/phoneCodes";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
@@ -145,7 +144,7 @@ export function RecipientViewPetitionFieldPhone({
         }
       }
     },
-    placeholder: options.placeholder ?? countryPhoneCodes[options.defaultCountry as CountryISO],
+    placeholder: options.placeholder ?? phoneCodes[options.defaultCountry],
   };
 
   return (
@@ -184,7 +183,7 @@ export function RecipientViewPetitionFieldPhone({
       ) : null}
       {(field.multiple && showNewReply) || field.replies.length === 0 ? (
         <Flex flex="1" position="relative" marginTop={2}>
-          <InputPhone
+          <PhoneInput
             defaultCountry={options.defaultCountry}
             value={value}
             onChange={(value: string) => {
@@ -260,13 +259,13 @@ export const RecipientViewPetitionFieldReplyPhone = forwardRef<
         onDelete(true);
       }
     },
-    placeholder: options.placeholder ?? countryPhoneCodes[options.defaultCountry as CountryISO],
+    placeholder: options.placeholder ?? phoneCodes[options.defaultCountry],
   };
 
   return (
     <Stack direction="row">
       <Flex flex="1" position="relative">
-        <InputPhone
+        <PhoneInput
           defaultCountry={options.defaultCountry}
           value={value}
           onChange={(value: string) => {

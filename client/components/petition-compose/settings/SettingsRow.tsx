@@ -24,6 +24,7 @@ export function SettingsRow({
         display="flex"
         alignItems="center"
         fontWeight="normal"
+        whiteSpace="nowrap"
         margin={0}
         minHeight={8}
       >

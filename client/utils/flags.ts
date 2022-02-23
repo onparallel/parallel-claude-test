@@ -1,4 +1,4 @@
-export const countryFlags = {
+export const flags: Record<string, string> = {
   AD: "🇦🇩",
   AE: "🇦🇪",
   AF: "🇦🇫",
@@ -250,5 +250,3 @@ export const countryFlags = {
   ZM: "🇿🇲",
   ZW: "🇿🇼",
 };
-
-export type CountryISO = keyof typeof countryFlags;

@@ -1,4 +1,4 @@
-export const countryPhoneCodes = {
+export const phoneCodes: Record<string, string> = {
   AD: "+376",
   AE: "+971",
   AF: "+93",
@@ -59,7 +59,7 @@ export const countryPhoneCodes = {
   DJ: "+253",
   DK: "+45",
   DM: "+1-767",
-  DO: "+1-809 and 1-829",
+  DO: "+1-809, 1-829",
   DZ: "+213",
   EC: "+593",
   EE: "+372",
