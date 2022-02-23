@@ -349,7 +349,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           slug: publicPetitionLink.slug,
           contactFirstName: "Roger",
           contactLastName: "Waters",
-          contactEmail: "rogerwaters@gmail.com",
+          contactEmail: "rogerwaters@rogerwaters.com",
         },
       });
 
@@ -359,7 +359,7 @@ describe("GraphQL/PublicPetitionLink", () => {
       // a new contact should be created on the organization
       const contacts = await knex
         .from("contact")
-        .where({ email: "rogerwaters@gmail.com", org_id: organization.id, deleted_at: null })
+        .where({ email: "rogerwaters@rogerwaters.com", org_id: organization.id, deleted_at: null })
         .select("*");
       expect(contacts.length).toEqual(1);
 
@@ -518,7 +518,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           slug: publicPetitionLink.slug,
           contactFirstName: "Bojack",
           contactLastName: "Horseman",
-          contactEmail: "bojack@gmail.com",
+          contactEmail: "bojack@test.com",
         },
       });
 
@@ -565,7 +565,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           slug: publicPetitionLink.slug,
           contactFirstName: "Bojack",
           contactLastName: "Horseman",
-          contactEmail: "bojack@gmail.com",
+          contactEmail: "bojack@test.com",
         },
       });
 
@@ -595,7 +595,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           slug: publicPetitionLink.slug,
           contactFirstName: "Bojack",
           contactLastName: "Horseman",
-          contactEmail: "bojack@gmail.com",
+          contactEmail: "bojack@test.com",
         },
       });
 
@@ -629,7 +629,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           slug: publicPetitionLink.slug,
           contactFirstName: "Bojack",
           contactLastName: "Horseman",
-          contactEmail: "bojack@gmail.com",
+          contactEmail: "bojack@test.com",
         },
       });
 
@@ -700,7 +700,7 @@ describe("GraphQL/PublicPetitionLink", () => {
         `,
         variables: {
           slug: newPetitionLink.slug,
-          contactEmail: "contact@gmail.com",
+          contactEmail: "contact@test.com",
         },
       });
       expect(errors).toBeUndefined();
@@ -733,7 +733,7 @@ describe("GraphQL/PublicPetitionLink", () => {
           slug: newPetitionLink.slug,
           contactFirstName: "Roger",
           contactLastName: "Waters",
-          contactEmail: "rogerwaters@gmail.com",
+          contactEmail: "rogerwaters@rogerwaters.com",
         },
       });
       expect(createErrors).toBeUndefined();
@@ -745,7 +745,7 @@ describe("GraphQL/PublicPetitionLink", () => {
         `,
         variables: {
           slug: newPetitionLink.slug,
-          contactEmail: "rogerwaters@gmail.com",
+          contactEmail: "rogerwaters@rogerwaters.com",
         },
       });
       expect(errors).toBeUndefined();
@@ -769,7 +769,7 @@ describe("GraphQL/PublicPetitionLink", () => {
         `,
         variables: {
           slug: newPetitionLink.slug,
-          contactEmail: "rogerwaters@gmail.com",
+          contactEmail: "rogerwaters@rogerwaters.com",
         },
       });
 
@@ -798,7 +798,7 @@ describe("GraphQL/PublicPetitionLink", () => {
         `,
         variables: {
           slug: newPetitionLink.slug,
-          contactEmail: "rogerwaters@gmail.com",
+          contactEmail: "rogerwaters@rogerwaters.com",
         },
       });
 
@@ -820,7 +820,7 @@ describe("GraphQL/PublicPetitionLink", () => {
         `,
         variables: {
           slug: newPetitionLink.slug,
-          contactEmail: "rogerwaters@gmail.com",
+          contactEmail: "rogerwaters@rogerwaters.com",
         },
       });
 

@@ -6,6 +6,8 @@ import { EmailPayload } from "../workers/email-sender";
 import { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
 import { OrganizationUsageLimitName } from "../db/__types";
 import { Knex } from "knex";
+import { resolveMx } from "dns/promises";
+import { MxRecord } from "dns";
 
 export interface IEmailsService {
   sendPetitionMessageEmail(messageIds: MaybeArray<number>): Promise<void>;
@@ -53,6 +55,7 @@ export interface IEmailsService {
     t?: Knex.Transaction
   ): Promise<void>;
   sendSignatureCancelledNoCreditsLeftEmail(petitionId: number): Promise<void>;
+  resolveMx(domain: string): Promise<MxRecord[]>;
 }
 export const EMAILS = Symbol.for("EMAILS");
 
@@ -265,5 +268,9 @@ export class EmailsService implements IEmailsService {
       id: this.buildQueueId("Petition", petitionId),
       petition_id: petitionId,
     });
+  }
+
+  async resolveMx(domain: string) {
+    return await resolveMx(domain);
   }
 }

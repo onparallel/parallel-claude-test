@@ -36,7 +36,7 @@ describe("repositories/PetitionRepository", () => {
     ({ organization, user } = await mocks.createSessionUserAndOrganization());
 
     [contact] = await mocks.createRandomContacts(organization.id, 1, () => ({
-      email: "jesse.pinkman@gmail.com",
+      email: "jesse.pinkman@test.com",
       first_name: "Jesse",
       last_name: "Pinkman",
     }));
@@ -100,7 +100,7 @@ describe("repositories/PetitionRepository", () => {
       const result = await petitions.loadPetitionsForUser(user.id, {
         offset: 0,
         limit: 10,
-        search: "jesse.pinkman@gmail.com",
+        search: "jesse.pinkman@test.com",
       });
       expect(result.totalCount).toBe(1);
       expect(result.items).toMatchObject([_petitions[0]]);

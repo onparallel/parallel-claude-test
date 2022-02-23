@@ -1,3 +1,4 @@
+import { MxRecord } from "dns";
 import { IncomingMessage } from "http";
 import { injectable } from "inversify";
 import { Response } from "node-fetch";
@@ -70,6 +71,9 @@ export class MockEmailsService implements IEmailsService {
   async sendPublicPetitionLinkAccessEmail() {}
   async sendOrganizationLimitsReachedEmail() {}
   async sendSignatureCancelledNoCreditsLeftEmail() {}
+  async resolveMx() {
+    return [] as MxRecord[];
+  }
 }
 
 @injectable()

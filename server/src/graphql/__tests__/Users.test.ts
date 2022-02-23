@@ -825,7 +825,7 @@ describe("GraphQL/Users", () => {
           }
         `,
         variables: {
-          email: "michael.scott@gmail.com",
+          email: "michael.scott@test.com",
           firstName: "Michael",
           lastName: "Scott",
           role: "ADMIN",
@@ -856,7 +856,7 @@ describe("GraphQL/Users", () => {
           }
         `,
         variables: {
-          email: "jim.halpert@gmail.com",
+          email: "jim.halpert@test.com",
           firstName: "Jim",
           lastName: "Halpert",
           role: "NORMAL",

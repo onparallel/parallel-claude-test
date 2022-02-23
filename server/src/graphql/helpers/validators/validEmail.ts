@@ -1,10 +1,9 @@
 import { core } from "nexus";
-import { FieldValidateArgsResolver } from "../validateArgsPlugin";
-import { ArgValidationError } from "../errors";
-import { MaybeArray } from "../../../util/types";
-import { unMaybeArray } from "../../../util/arrays";
-import { resolveMx } from "dns/promises";
 import pMap from "p-map";
+import { unMaybeArray } from "../../../util/arrays";
+import { MaybeArray } from "../../../util/types";
+import { ArgValidationError } from "../errors";
+import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export const EMAIL_REGEX =
   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -21,7 +20,7 @@ export function validEmail<TypeName extends string, FieldName extends string>(
         async (email) => {
           if (EMAIL_REGEX.test(email)) {
             try {
-              await resolveMx(email.split("@")[1]);
+              await ctx.emails.resolveMx(email.split("@")[1]);
               return true;
             } catch {}
           }
