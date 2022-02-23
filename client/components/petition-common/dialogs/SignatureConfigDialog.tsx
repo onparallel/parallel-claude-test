@@ -293,7 +293,7 @@ function SignatureConfigDialogBodyStep1({
         value: "NO",
         label: intl.formatMessage({
           id: "component.signature-config-dialog.review-before-send.option-no",
-          defaultMessage: "After completing the petition",
+          defaultMessage: "After the petition is completed",
         }),
       },
       {
@@ -388,7 +388,7 @@ function SignatureConfigDialogBodyStep1({
         <FormLabel>
           <FormattedMessage
             id="component.signature-config-dialog.review-before-send-label"
-            defaultMessage="When do you want the eSignature to be started?"
+            defaultMessage="When do you want the eSignature to start?"
           />
         </FormLabel>
         <Controller
@@ -412,7 +412,7 @@ function SignatureConfigDialogBodyStep1({
                 ) : (
                   <FormattedMessage
                     id="component.signature-config-dialog.dont-review-before-send.option-no.explainer"
-                    defaultMessage=" The signature will be initiated when all the information has been completed."
+                    defaultMessage=" The signature process will start when all the information has been completed."
                   />
                 )}
               </Text>
@@ -518,15 +518,13 @@ export function SignatureConfigDialogBodyStep2({
         onChange={(value: any) => setRadioSelection(value)}
       >
         <Radio value="choose-after">
-          <Flex>
-            <FormattedMessage
-              id="component.signature-config-dialog.radiobutton.option-1"
-              defaultMessage="Indicate once the petition is completed"
-            />
-            <Text color="gray.500" marginLeft={2}>
-              (<FormattedMessage id="generic.recommended" defaultMessage="Recommended" />)
-            </Text>
-          </Flex>
+          <FormattedMessage
+            id="component.signature-config-dialog.radiobutton.option-1"
+            defaultMessage="Indicate once the petition is completed"
+          />
+          <Text as="span" color="gray.500" marginLeft={2}>
+            (<FormattedMessage id="generic.recommended" defaultMessage="Recommended" />)
+          </Text>
         </Radio>
         <Radio value="choose-now">
           <FormattedMessage
@@ -603,7 +601,7 @@ export function SignatureConfigDialogBodyStep2({
               <HelpPopover>
                 <FormattedMessage
                   id="component.signature-config-dialog.allow-additional-signers.help"
-                  defaultMessage="If this option is disabled, only the indicated persons will be able to sign the document."
+                  defaultMessage="If this option is disabled, only the indicated people will be able to sign the document."
                 />
               </HelpPopover>
             </HStack>

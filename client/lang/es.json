@@ -2932,7 +2932,7 @@
   {
     "term": "component.signature-config-dialog.allow-additional-signers.help",
     "definition": "Si esta opción está desactivada, solo podrán firmar el documento las personas indicadas.",
-    "context": "If this option is disabled, only the indicated persons will be able to sign the document."
+    "context": "If this option is disabled, only the indicated people will be able to sign the document."
   },
   {
     "term": "component.signature-config-dialog.allow-additional-signers.label",
@@ -2952,7 +2952,7 @@
   {
     "term": "component.signature-config-dialog.dont-review-before-send.option-no.explainer",
     "definition": "La firma se iniciará cuando se complete toda la información.",
-    "context": "The signature will be initiated when all the information has been completed."
+    "context": "The signature process will start when all the information has been completed."
   },
   {
     "term": "component.signature-config-dialog.header.help-link",
@@ -2982,12 +2982,12 @@
   {
     "term": "component.signature-config-dialog.review-before-send-label",
     "definition": "¿Cuando quieres que se inicie la firma?",
-    "context": "When do you want the eSignature to be started?"
+    "context": "When do you want the eSignature to start?"
   },
   {
     "term": "component.signature-config-dialog.review-before-send.option-no",
     "definition": "Al completar la petición",
-    "context": "After completing the petition"
+    "context": "After the petition is completed"
   },
   {
     "term": "component.signature-config-dialog.review-before-send.option-yes",
