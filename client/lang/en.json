@@ -971,8 +971,8 @@
   },
   {
     "term": "component.message-closing-email-editor.body-label",
-    "definition": "This message will only be sent if the option to <b>notify the customer</b> when the request is closed is selected.",
-    "context": "This message will only be sent if the option to <b>notify the customer</b> when the request is closed is selected."
+    "definition": "This message will only be sent if the option to <b>notify the recipient</b> when the petition is closed is selected.",
+    "context": "This message will only be sent if the option to <b>notify the recipient</b> when the petition is closed is selected."
   },
   {
     "term": "component.message-email-editor.body-placeholder",
@@ -2095,14 +2095,14 @@
     "context": "Status"
   },
   {
-    "term": "component.petition-template-compose-message-editor.message-at-completion",
-    "definition": "Message at completion",
-    "context": "Message at completion"
+    "term": "component.petition-template-compose-message-editor.message-at-finish",
+    "definition": "Message at finish",
+    "context": "Message at finish"
   },
   {
-    "term": "component.petition-template-compose-message-editor.message-to-be-sent",
-    "definition": "Message to be sent",
-    "context": "Message to be sent"
+    "term": "component.petition-template-compose-message-editor.message-to-send",
+    "definition": "Message to send",
+    "context": "Message to send"
   },
   {
     "term": "component.petition-template.delete-label",

@@ -65,14 +65,14 @@ export function PetitionTemplateComposeMessageEditor({
         <TabList marginX="-1px" marginTop="-1px">
           <Tab padding={4} lineHeight={5} fontWeight="bold">
             <FormattedMessage
-              id="component.petition-template-compose-message-editor.message-to-be-sent"
-              defaultMessage="Message to be sent"
+              id="component.petition-template-compose-message-editor.message-to-send"
+              defaultMessage="Message to send"
             />
           </Tab>
           <Tab padding={4} lineHeight={5} fontWeight="bold">
             <FormattedMessage
-              id="component.petition-template-compose-message-editor.message-at-completion"
-              defaultMessage="Message at completion"
+              id="component.petition-template-compose-message-editor.message-at-finish"
+              defaultMessage="Message at finish"
             />
           </Tab>
         </TabList>
