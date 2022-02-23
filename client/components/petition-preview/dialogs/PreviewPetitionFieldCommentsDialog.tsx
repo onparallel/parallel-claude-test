@@ -205,6 +205,7 @@ export function PreviewPetitionFieldCommentsDialog({
             </Center>
           ) : comments.length === 0 ? (
             <Flex
+              overflow="auto"
               flexDirection="column"
               paddingX={4}
               paddingY={8}
