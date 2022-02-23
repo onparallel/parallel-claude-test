@@ -122,7 +122,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         setShowErrors(true);
         focusFieldTitle(fieldsWithIndices[0].field.id);
       }
-      handleFieldSettingsClick(hash.replace("#", ""));
+
+      if (hash.includes("#field-settings-")) {
+        handleFieldSettingsClick(hash.replace("#field-settings-", ""));
+      }
     }
   }, []);
 

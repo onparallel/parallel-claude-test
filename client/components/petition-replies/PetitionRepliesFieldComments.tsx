@@ -163,14 +163,16 @@ export function PetitionRepliesFieldComments({
                 <Text color="gray.400">
                   <FormattedMessage
                     id="petition-replies.field-comments.disabled-comments-2"
-                    defaultMessage="You can enable comments from the <a>Field settings</a> in the {editTab} tab."
+                    defaultMessage="You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
                     values={{
-                      editTab: intl.formatMessage({
+                      composeTab: intl.formatMessage({
                         id: "petition.header.compose-tab",
                         defaultMessage: "Compose",
                       }),
                       a: (chunks: any) => (
-                        <Link href={`/app/petitions/${petitionId}/compose#${field.id}`}>
+                        <Link
+                          href={`/app/petitions/${petitionId}/compose#field-settings-${field.id}`}
+                        >
                           {chunks}
                         </Link>
                       ),

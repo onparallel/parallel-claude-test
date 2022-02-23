@@ -5326,8 +5326,8 @@
   },
   {
     "term": "petition-replies.field-comments.disabled-comments-2",
-    "definition": "Puedes habilitar los comentarios desde los <a>Ajustes del campo</a> en la pestaña de {editTab}.",
-    "context": "You can enable comments from the <a>Field settings</a> in the {editTab} tab."
+    "definition": "Puedes habilitar los comentarios desde los <a>Ajustes del campo</a> en la pestaña de {composeTab}.",
+    "context": "You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
   },
   {
     "term": "petition-replies.field-comments.disabled-comments-1",
