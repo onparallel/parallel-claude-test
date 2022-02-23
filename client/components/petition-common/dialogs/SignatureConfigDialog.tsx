@@ -30,13 +30,15 @@ import {
   SignatureConfigInput,
 } from "@parallel/graphql/__types";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
+import { withError } from "@parallel/utils/promises/withError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { RefObject, useEffect, useMemo, useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, UseFormHandleSubmit } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
+import { noop } from "remeda";
 import { SelectedSignerRow } from "../SelectedSignerRow";
 import { SignerSelectSelection } from "./ConfirmPetitionSignersDialog";
 import { useConfirmSignerInfoDialog } from "./ConfirmSignerInfoDialog";
@@ -85,19 +87,22 @@ export function SignatureConfigDialog({
     }
   }
 
-  function handleClickNextStep() {
-    const {
-      getValues: step1Values,
-      formState: { errors: step1Errors },
-    } = step1Props.form;
-    const {
-      getValues: step2Values,
-      formState: { errors: step2Errors },
-    } = step2Props.form;
+  async function isSubmitSuccessful(handleSubmit: UseFormHandleSubmit<any>) {
+    const [error] = await withError(
+      handleSubmit(noop, () => {
+        throw new Error();
+      })
+    );
 
+    return !error;
+  }
+
+  async function handleClickNextStep() {
+    const { handleSubmit: step1Submit, getValues: step1Values } = step1Props.form;
+    const { handleSubmit: step2Submit, getValues: step2Values } = step2Props.form;
     if (
-      (currentStep === 0 && Object.keys(step1Errors).length > 0) ||
-      (currentStep === 1 && Object.keys(step2Errors).length > 0)
+      (currentStep === 0 && !(await isSubmitSuccessful(step1Submit))) ||
+      (currentStep === 1 && !(await isSubmitSuccessful(step2Submit)))
     ) {
       return;
     }
@@ -242,7 +247,7 @@ function useSignatureConfigDialogBodyStep1Props({
       review: boolean;
       title: string;
     }>({
-      mode: "onBlur",
+      mode: "onSubmit",
       defaultValues: {
         provider:
           petition.signatureConfig?.integration ??
@@ -434,7 +439,7 @@ function useSignatureConfigDialogBodyStep2Props({
       signers: SignerSelectSelection[];
       allowAdditionalSigners: boolean;
     }>({
-      mode: "onChange",
+      mode: "onSubmit",
       defaultValues: {
         signers,
         allowAdditionalSigners,
@@ -450,7 +455,7 @@ export function SignatureConfigDialogBodyStep2({
     watch,
     register,
     setValue,
-    trigger,
+    clearErrors,
   },
   isTemplate,
 }: ReturnType<typeof useSignatureConfigDialogBodyStep2Props>) {
@@ -497,9 +502,9 @@ export function SignatureConfigDialogBodyStep2({
   );
 
   useEffect(() => {
-    trigger("signers");
     if (radioSelection === "choose-after") {
       setValue("signers", []);
+      clearErrors("signers");
     }
   }, [radioSelection, setValue]);
 
@@ -544,7 +549,6 @@ export function SignatureConfigDialogBodyStep2({
           control={control}
           rules={{
             validate: (value: any[]) => radioSelection === "choose-after" || value.length > 0,
-            deps: [radioSelection],
           }}
           render={({ field: { onChange, value: signers } }) => (
             <>
