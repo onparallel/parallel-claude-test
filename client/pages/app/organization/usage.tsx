@@ -64,7 +64,7 @@ function OrganizationUsage() {
         >
           <UsageCard
             title={intl.formatMessage({
-              id: "organizations.header.user-count",
+              id: "page.usage.users",
               defaultMessage: "Users",
             })}
             usage={activeUserCount}
@@ -72,7 +72,7 @@ function OrganizationUsage() {
           />
           <UsageCard
             title={intl.formatMessage({
-              id: "generic.petition-type-plural",
+              id: "page.usage.petitions",
               defaultMessage: "Petitions",
             })}
             usage={petitions.used}
@@ -80,7 +80,7 @@ function OrganizationUsage() {
           />
           <UsageCard
             title={intl.formatMessage({
-              id: "generic.signature-type-plural",
+              id: "page.usage.signatures",
               defaultMessage: "Signatures",
             })}
             usage={signatures.used}

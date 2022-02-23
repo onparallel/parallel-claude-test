@@ -4410,11 +4410,6 @@
     "context": "Production"
   },
   {
-    "term": "generic.signature-type-plural",
-    "definition": "Signatures",
-    "context": "Signatures"
-  },
-  {
     "term": "generic.something-went-wrong",
     "definition": "Something went wrong",
     "context": "Something went wrong"
@@ -5143,6 +5138,21 @@
     "term": "page.signature.upgrade-plan-alert-2",
     "definition": "<b>Upgrade your plan</b> to access signature integration.",
     "context": "<b>Upgrade your plan</b> to access signature integration."
+  },
+  {
+    "term": "page.usage.petitions",
+    "definition": "Petitions",
+    "context": "Petitions"
+  },
+  {
+    "term": "page.usage.signatures",
+    "definition": "Signatures",
+    "context": "Signatures"
+  },
+  {
+    "term": "page.usage.users",
+    "definition": "Users",
+    "context": "Users"
   },
   {
     "term": "petition-access.click-here-to-send",
