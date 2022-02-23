@@ -190,6 +190,13 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
+  const handleFieldTypeIndicatorClick = useCallback(
+    function (fieldId: string) {
+      setActiveFieldId(fieldId);
+    },
+    [petitionId]
+  );
+
   const handleSettingsClose = useCallback(
     function () {
       setActiveFieldId(null);
@@ -479,6 +486,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               onUpdateFieldPositions={handleUpdateFieldPositions}
               onFieldEdit={handleFieldEdit}
               onFieldSettingsClick={handleFieldSettingsClick}
+              onFieldTypeIndicatorClick={handleFieldTypeIndicatorClick}
               isReadOnly={petition.isRestricted || isPublicTemplate}
               isPublicTemplate={isPublicTemplate}
               isTemplate={petition?.__typename === "PetitionTemplate"}

@@ -63,6 +63,7 @@ export interface PetitionComposeFieldListProps extends BoxProps {
   onUpdateFieldPositions: (fieldIds: string[]) => void;
   onCloneField: (fieldId: string) => void;
   onFieldSettingsClick: (fieldId: string) => void;
+  onFieldTypeIndicatorClick: (fieldId: string) => void;
   onDeleteField: (fieldId: string) => Promise<void>;
   onAddField: (type: PetitionFieldType, position?: number) => void;
   onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => Promise<void>;
@@ -80,6 +81,7 @@ export const PetitionComposeFieldList = Object.assign(
     onUpdateFieldPositions,
     onCloneField,
     onFieldSettingsClick,
+    onFieldTypeIndicatorClick,
     onDeleteField,
     onAddField,
     onFieldEdit,
@@ -150,6 +152,7 @@ export const PetitionComposeFieldList = Object.assign(
         | "petitionId"
         | "onCloneField"
         | "onSettingsClick"
+        | "onTypeIndicatorClick"
         | "onDeleteClick"
         | "onFieldEdit"
         | "onFieldVisibilityClick"
@@ -160,6 +163,7 @@ export const PetitionComposeFieldList = Object.assign(
         petitionId,
         onCloneField: () => onCloneField(fieldId),
         onSettingsClick: () => onFieldSettingsClick(fieldId),
+        onTypeIndicatorClick: () => onFieldTypeIndicatorClick(fieldId),
         onDeleteClick: async () => {
           const { fields } = fieldsDataRef.current!;
           // if this field is being referenced by any other field ask the user

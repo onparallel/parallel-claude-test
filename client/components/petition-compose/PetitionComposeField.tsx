@@ -74,6 +74,7 @@ export interface PetitionComposeFieldProps {
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
   onCloneField: () => void;
   onSettingsClick: () => void;
+  onTypeIndicatorClick: () => void;
   onFieldVisibilityClick: () => void;
   onDeleteClick: () => void;
   onFocusNextField: () => void;
@@ -105,6 +106,7 @@ const _PetitionComposeField = chakraForwardRef<
     onFocus,
     onCloneField,
     onSettingsClick,
+    onTypeIndicatorClick,
     onDeleteClick,
     onFieldEdit,
     onFieldVisibilityClick,
@@ -359,8 +361,8 @@ const _PetitionComposeField = chakraForwardRef<
           <PetitionFieldTypeIndicator
             type={field.type}
             fieldIndex={fieldIndex}
-            as={field.isFixed ? "div" : "button"}
-            onClick={field.isFixed ? undefined : onSettingsClick}
+            as="button"
+            onClick={onTypeIndicatorClick}
             marginTop="10px"
             alignSelf="flex-start"
           />
