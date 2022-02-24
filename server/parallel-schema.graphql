@@ -517,10 +517,7 @@ type Mutation {
   """
   closePetition(petitionId: GID!): Petition!
 
-  """
-  Marks a petition as COMPLETED.
-  If the petition has a signature configured and does not require a review, starts the signing process.
-  """
+  "\n    Marks a petition as COMPLETED.\n    If the petition has a signature configured and does not require a review, starts the signing process."
   completePetition(
     additionalSigners: [PublicPetitionSignerDataInput!]
     message: String
@@ -891,10 +888,7 @@ type Mutation {
   ): PetitionFieldAttachment!
   publicCheckVerificationCode(code: String!, keycode: ID!, token: ID!): VerificationCodeCheck!
 
-  """
-  Marks a filled petition as COMPLETED.
-  If the petition does not require a review, starts the signing process. Otherwise sends email to user.
-  """
+  "\n    Marks a filled petition as COMPLETED.\n    If the petition does not require a review, starts the signing process. Otherwise sends email to user."
   publicCompletePetition(
     additionalSigners: [PublicPetitionSignerDataInput!]
     keycode: ID!

@@ -68,7 +68,7 @@ export function ConfirmSendReminderDialog({
                       </Text>
                       <UnorderedList paddingLeft={2}>
                         {optedOut.map((pa) => (
-                          <ListItem key={pa.id} s>
+                          <ListItem key={pa.id}>
                             <ContactReference contact={pa.contact} />
                           </ListItem>
                         ))}

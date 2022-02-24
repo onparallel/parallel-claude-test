@@ -19,9 +19,10 @@ import { Editor, Transforms } from "slate";
 import { ReactEditor } from "slate-react";
 import { ConfirmDialog } from "../dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "../dialogs/DialogProvider";
-import { ToolbarButton } from "./ToolbarButton";
+import { ToolbarButton, ToolbarButtonProps } from "./ToolbarButton";
 
-export interface ToolbarLinkButtonProps {
+export interface ToolbarLinkButtonProps
+  extends Omit<ToolbarButtonProps, "isToggeable" | "type" | "label" | "icon"> {
   editor: CustomEditor;
 }
 

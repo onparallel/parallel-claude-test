@@ -100,7 +100,7 @@ function OptOut({ keycode, access }: OptOutProps) {
               spacing={6}
               maxWidth={"container.xs"}
             >
-              <Circle boxSize="88px" background="green.500">
+              <Circle size="88px" background="green.500">
                 <CheckIcon color="white" fontSize="2.5rem" />
               </Circle>
               <Heading>

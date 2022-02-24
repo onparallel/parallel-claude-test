@@ -218,7 +218,7 @@ function usePetitionAccessesColumns(): TableColumn<
                 })}
               >
                 <BellOffIcon
-                  alt={intl.formatMessage({
+                  aria-label={intl.formatMessage({
                     id: "petition-accesses.reminders-opt-out-popover",
                     defaultMessage: "Opted out from receiving reminders",
                   })}

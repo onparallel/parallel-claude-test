@@ -238,7 +238,7 @@ export const AppLayout = Object.assign(
               backgroundColor="black"
               opacity={0.5}
               position="fixed"
-              boxSize="60px"
+              size="60px"
               bottom="20px"
               right="20px"
             />

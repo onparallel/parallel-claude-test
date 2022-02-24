@@ -40,7 +40,7 @@ export const CommentCreatedUserNotification = Object.assign(
           isFirst={isFirst}
           notification={notification}
           icon={
-            <Circle boxSize="36px" background="gray.200">
+            <Circle size="36px" background="gray.200">
               <CommentIcon fontSize="16px" />
             </Circle>
           }

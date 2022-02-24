@@ -294,7 +294,7 @@ export function RecipientSelectGroups({
             color="gray.900"
             fontWeight="normal"
             leftIcon={
-              <Circle backgroundColor="purple.500" boxSize={5}>
+              <Circle backgroundColor="purple.500" size={5}>
                 <AddIcon color="white" fontSize="xs" />
               </Circle>
             }

@@ -413,7 +413,7 @@ const SingleValue: typeof components.SingleValue = function SingleValue(props) {
             marginRight={2}
             position="relative"
             top={-0.5}
-            alt={intl.formatMessage({
+            aria-label={intl.formatMessage({
               id: "component.user-select.user-group-icon-alt",
               defaultMessage: "Team",
             })}
@@ -446,7 +446,7 @@ const MultiValueLabel: typeof components.MultiValueLabel = function MultiValueLa
           <Box>
             <UsersIcon
               marginRight={1}
-              alt={intl.formatMessage({
+              aria-label={intl.formatMessage({
                 id: "component.user-select.user-group-icon-alt",
                 defaultMessage: "Team",
               })}
@@ -489,7 +489,7 @@ const Option: typeof components.Option = function Option({ children, ...props })
           <UsersIcon
             marginRight={2}
             position="relative"
-            alt={intl.formatMessage({
+            aria-label={intl.formatMessage({
               id: "component.user-select.user-group-icon-alt",
               defaultMessage: "Team",
             })}

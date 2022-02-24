@@ -1,19 +1,18 @@
 diff --git a/node_modules/graphql-request/dist/index.d.ts b/node_modules/graphql-request/dist/index.d.ts
-index 433489e..4cfe182 100644
+index 265ae30..d1de660 100644
 --- a/node_modules/graphql-request/dist/index.d.ts
 +++ b/node_modules/graphql-request/dist/index.d.ts
-@@ -1,4 +1,5 @@
- import { BatchRequestDocument, ClientError, RequestDocument, Variables } from './types';
+@@ -1,3 +1,4 @@
 +import { TypedDocumentNode } from '@graphql-typed-document-node/core';
+ import { BatchRequestDocument, BatchRequestsOptions, ClientError, RawRequestOptions, RequestDocument, RequestOptions, BatchRequestsExtendedOptions, RawRequestExtendedOptions, RequestExtendedOptions, Variables } from './types';
  import * as Dom from './types.dom';
- export { BatchRequestDocument, ClientError, RequestDocument, Variables };
- /**
-@@ -17,7 +18,7 @@ export declare class GraphQLClient {
+ export { BatchRequestDocument, BatchRequestsOptions, BatchRequestsExtendedOptions, ClientError, RawRequestOptions, RawRequestExtendedOptions, RequestDocument, RequestOptions, RequestExtendedOptions, Variables, };
+@@ -26,7 +27,7 @@ export declare class GraphQLClient {
      /**
       * Send a GraphQL document to the server.
       */
 -    request<T = any, V = Variables>(document: RequestDocument, variables?: V, requestHeaders?: Dom.RequestInit['headers']): Promise<T>;
 +    request<T = any, V = Variables>(document: RequestDocument | TypedDocumentNode<T, V>, variables?: V, requestHeaders?: Dom.RequestInit['headers']): Promise<T>;
+     request<T = any, V = Variables>(options: RequestOptions<V>): Promise<T>;
      /**
-      * Send a GraphQL document to the server.
-      */
+      * Send GraphQL documents in batch to the server.

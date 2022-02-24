@@ -19,7 +19,7 @@ export const SignatureCompletedUserNotification = Object.assign(
           isFirst={isFirst}
           notification={notification}
           icon={
-            <Circle boxSize="36px" background="green.500">
+            <Circle size="36px" background="green.500">
               <SignatureIcon color="white" fontSize="1rem" />
             </Circle>
           }

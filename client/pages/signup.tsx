@@ -164,7 +164,7 @@ function Signup() {
                           <Box key={i}>
                             <Image
                               width="460"
-                              heigth="100"
+                              height="100"
                               role="presentation"
                               src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/signup/${imageName}`}
                               opacity={step === 0 ? 0 : 1}

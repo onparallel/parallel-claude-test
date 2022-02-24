@@ -21,7 +21,7 @@ export const PetitionCompletedUserNotification = Object.assign(
           isFirst={isFirst}
           notification={notification}
           icon={
-            <Circle boxSize="36px" background="green.600">
+            <Circle size="36px" background="green.600">
               <CheckIcon color="white" fontSize="1rem" />
             </Circle>
           }

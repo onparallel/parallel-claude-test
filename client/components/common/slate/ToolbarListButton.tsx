@@ -4,7 +4,7 @@ import { getPreventDefaultHandler, someNode } from "@udecode/plate-common";
 import { toggleList } from "@udecode/plate-list";
 import { ToolbarButton, ToolbarButtonProps } from "./ToolbarButton";
 
-export interface ToolbarListButtonProps extends Pick<ToolbarButtonProps, "label" | "icon"> {
+export interface ToolbarListButtonProps extends Omit<ToolbarButtonProps, "isToggleable" | "type"> {
   editor: CustomEditor;
   type: string;
 }

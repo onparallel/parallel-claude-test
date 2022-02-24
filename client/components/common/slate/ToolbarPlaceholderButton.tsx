@@ -7,9 +7,10 @@ import { useCallback } from "react";
 import { useIntl } from "react-intl";
 import { Transforms } from "slate";
 import { ReactEditor } from "slate-react";
-import { ToolbarButton } from "./ToolbarButton";
+import { ToolbarButton, ToolbarButtonProps } from "./ToolbarButton";
 
-export interface ToolbarPlaceholderButtonProps {
+export interface ToolbarPlaceholderButtonProps
+  extends Omit<ToolbarButtonProps, "isToggeable" | "type" | "label" | "icon"> {
   editor: CustomEditor;
 }
 

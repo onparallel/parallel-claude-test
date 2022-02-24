@@ -475,7 +475,7 @@ export function PetitionSharingDialog({
                         </Text>
                         <UnorderedList paddingLeft={2}>
                           {petitionsRW.map((petition) => (
-                            <ListItem key={petition!.id} s>
+                            <ListItem key={petition!.id}>
                               <Text as="span" textStyle={petition!.name ? undefined : "hint"}>
                                 {petition?.name ??
                                   intl.formatMessage({

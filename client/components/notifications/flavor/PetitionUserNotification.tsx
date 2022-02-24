@@ -76,7 +76,7 @@ export const PetitionUserNotification = Object.assign(
         borderColor="gray.200"
       >
         <Flex minWidth={16} paddingLeft={4} alignItems="center" justifyContent="flex-end">
-          {isRead ? null : <Circle boxSize={2} backgroundColor="purple.400" marginRight={1} />}
+          {isRead ? null : <Circle size={2} backgroundColor="purple.400" marginRight={1} />}
           {icon}
         </Flex>
         <Stack flex="1 1 auto" minWidth="0" spacing={0} ref={bodyRef}>

@@ -157,7 +157,7 @@ export function PetitionTagListCellContent({
                 },
               }}
             >
-              <Circle border="1px solid" borderColor="gray.400" boxSize="16px" role="presentation">
+              <Circle border="1px solid" borderColor="gray.400" size="16px" role="presentation">
                 <AddIcon fontSize="8px" color="gray.600" />
               </Circle>
               <Text as="div" whiteSpace="nowrap" fontSize="sm" color="gray.400">

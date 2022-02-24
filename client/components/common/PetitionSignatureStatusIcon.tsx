@@ -35,7 +35,7 @@ export function PetitionSignatureStatusIcon({
     <Tooltip label={label} placement={tooltipPlacement}>
       <Flex alignItems="center" gridGap={0} position="relative" paddingX={1}>
         {status === "START" ? (
-          <Circle boxSize={2} backgroundColor="purple.500" marginRight="2px" />
+          <Circle size={2} backgroundColor="purple.500" marginRight="2px" />
         ) : null}
         <SignatureIcon
           color={environment === "DEMO" ? "yellow.700" : "gray.700"}

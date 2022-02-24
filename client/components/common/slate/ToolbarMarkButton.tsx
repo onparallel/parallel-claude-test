@@ -3,7 +3,7 @@ import { CustomEditor } from "@parallel/utils/slate/types";
 import { getPreventDefaultHandler, isMarkActive, toggleMark } from "@udecode/plate-common";
 import { ToolbarButton, ToolbarButtonProps } from "./ToolbarButton";
 
-export interface ToolbarMarkButtonProps extends Pick<ToolbarButtonProps, "label" | "icon"> {
+export interface ToolbarMarkButtonProps extends Omit<ToolbarButtonProps, "isToggeable" | "type"> {
   editor: CustomEditor;
   type: string;
 }
