@@ -79,6 +79,13 @@ function LandingTemplateDetails({
 
   const indices = useFieldIndices(filteredFields);
 
+  function handleClickPreview() {
+    window.analytics?.track("Preview Template Clicked", {
+      templateId: template.id,
+      url: template.publicLinkUrl!,
+    });
+  }
+
   return (
     <PublicLayout
       title={name as string}
@@ -149,7 +156,7 @@ function LandingTemplateDetails({
                   </NakedLink>
                   {template.publicLinkUrl ? (
                     <NakedLink href={template.publicLinkUrl}>
-                      <Button as="a" variant="outline" target="_blank">
+                      <Button as="a" variant="outline" target="_blank" onClick={handleClickPreview}>
                         <FormattedMessage id="public.preview-button" defaultMessage="Preview" />
                       </Button>
                     </NakedLink>
