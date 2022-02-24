@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  PetitionFieldType,
   useLiquidScope_PetitionFieldFragment,
   useLiquidScope_PublicPetitionFieldFragment,
 } from "@parallel/graphql/__types";
@@ -24,9 +23,9 @@ export function useLiquidScope(
           ? field.previewReplies
           : field.replies;
       const value = field.multiple
-        ? replies.map((r) => getReplyValue(field.type, r.content))
+        ? replies.map((r) => r.content.value)
         : replies.length > 0
-        ? getReplyValue(field.type, replies.at(-1)!.content)
+        ? replies.at(-1)!.content.value
         : undefined;
       if (field.type !== "HEADING" && field.type !== "FILE_UPLOAD") {
         scope._[fieldIndex] = value;
@@ -37,14 +36,6 @@ export function useLiquidScope(
     }
     return scope;
   }, [fields]);
-}
-
-function getReplyValue(type: PetitionFieldType, content: any) {
-  if (type === "FILE_UPLOAD") {
-    return undefined;
-  } else {
-    return content.value;
-  }
 }
 
 useLiquidScope.fragments = {

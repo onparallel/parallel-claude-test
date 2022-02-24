@@ -1357,70 +1357,31 @@ api
       try {
         const fieldType = field?.type;
         let newReply;
+        let replyValue: any = body.reply;
+        if (fieldType === "DYNAMIC_SELECT") {
+          const labels = petition?.fields.find((f) => f.id === params.fieldId)?.options
+            ?.labels as string[];
+          const replies = body.reply as Maybe<string>[];
+          if (replies.length === 0) {
+            throw new BadRequestError(`Reply must be an array of strings`);
+          }
+          replyValue = labels.map((label, i) => [label, replies[i]]);
+        }
         switch (fieldType) {
           case "TEXT":
           case "SHORT_TEXT":
           case "SELECT":
           case "DATE":
           case "PHONE":
-            if (typeof body.reply !== "string") {
-              throw new BadRequestError(`Reply for ${fieldType} field must be plain text.`);
-            }
-            ({ createPetitionFieldReply: newReply } = await client.request(
-              SubmitReply_createPetitionFieldReplyDocument,
-              {
-                petitionId: params.petitionId,
-                fieldId: params.fieldId,
-                reply: body.reply,
-              }
-            ));
-            break;
-          case "NUMBER": {
-            if (typeof body.reply !== "number") {
-              throw new BadRequestError(`Reply for ${fieldType} field must a valid number.`);
-            }
-            ({ createPetitionFieldReply: newReply } = await client.request(
-              SubmitReply_createPetitionFieldReplyDocument,
-              {
-                petitionId: params.petitionId,
-                fieldId: params.fieldId,
-                reply: body.reply,
-              }
-            ));
-
-            break;
-          }
+          case "NUMBER":
           case "CHECKBOX":
-            if (!Array.isArray(body.reply)) {
-              throw new BadRequestError(
-                `Reply for ${fieldType} field must be an array with the chosen options.`
-              );
-            }
-            ({ createPetitionFieldReply: newReply } = await client.request(
-              SubmitReply_createPetitionFieldReplyDocument,
-              {
-                petitionId: params.petitionId,
-                fieldId: params.fieldId,
-                reply: body.reply,
-              }
-            ));
-            break;
           case "DYNAMIC_SELECT":
-            if (!Array.isArray(body.reply)) {
-              throw new BadRequestError(
-                `Reply for ${fieldType} field must be an array with the chosen options.`
-              );
-            }
-            const labels = petition?.fields.find((f) => f.id === params.fieldId)?.options
-              ?.labels as string[];
-            const replies = body.reply as Maybe<string>[];
-
             ({ createPetitionFieldReply: newReply } = await client.request(
               SubmitReply_createPetitionFieldReplyDocument,
               {
                 petitionId: params.petitionId,
                 fieldId: params.fieldId,
-                reply: labels.map((label, i) => [label, replies[i]]),
+                reply: replyValue,
               }
             ));
             break;

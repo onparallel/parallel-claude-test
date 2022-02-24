@@ -2,7 +2,7 @@ import { GraphQLResolveInfo } from "graphql";
 import { decode } from "jsonwebtoken";
 import { isPossiblePhoneNumber } from "libphonenumber-js";
 import { ArgsValue } from "nexus/dist/core";
-import { isDefined } from "remeda";
+import { difference, isDefined } from "remeda";
 import {
   Petition,
   PetitionAccess,
@@ -15,8 +15,8 @@ import { Maybe } from "../../util/types";
 import { isValidDate } from "../../util/validators";
 import { Arg } from "../helpers/authorize";
 import { ArgValidationError, InvalidReplyError } from "../helpers/errors";
+import { DynamicSelectOption } from "../helpers/parseDynamicSelectValues";
 import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
-import { validateCheckboxReplyValues, validateDynamicSelectReplyValues } from "../utils";
 
 export function validatePetitionStatus(
   petition: Maybe<Petition>,
@@ -190,7 +190,7 @@ function validateReplyValue(
   switch (field.type) {
     case "NUMBER": {
       if (typeof reply !== "number" || Number.isNaN(reply)) {
-        throw new InvalidReplyError(info, argName, `Value must be a number`, {
+        throw new InvalidReplyError(info, argName, "Reply must be of type number.", {
           subcode: "INVALID_TYPE_ERROR",
         });
       }
@@ -198,7 +198,7 @@ function validateReplyValue(
       const min = (options.range.min as number) ?? -Infinity;
       const max = (options.range.max as number) ?? Infinity;
       if (reply > max || reply < min) {
-        throw new InvalidReplyError(info, argName, `Number must be in range [${min}, ${max}]`, {
+        throw new InvalidReplyError(info, argName, `Reply must be in range [${min}, ${max}].`, {
           subcode: "OUT_OF_RANGE_ERROR",
         });
       }
@@ -206,21 +206,24 @@ function validateReplyValue(
     }
     case "SELECT": {
       if (typeof reply !== "string") {
-        throw new InvalidReplyError(info, argName, "Value must be a string", {
+        throw new InvalidReplyError(info, argName, "Reply must be of type string.", {
           subcode: "INVALID_TYPE_ERROR",
         });
       }
       const options = field.options.values as Maybe<string[]>;
       if (!options?.includes(reply)) {
-        throw new InvalidReplyError(info, argName, "Invalid option", {
-          subcode: "UNKNOWN_OPTION_ERROR",
-        });
+        throw new InvalidReplyError(
+          info,
+          argName,
+          `Reply must be one of [${(options ?? []).map((opt) => `"${opt}"`).join(", ")}].`,
+          { subcode: "UNKNOWN_OPTION_ERROR" }
+        );
       }
       break;
     }
     case "DATE": {
       if (typeof reply !== "string") {
-        throw new InvalidReplyError(info, argName, "Value must be a string", {
+        throw new InvalidReplyError(info, argName, "Reply must be of type string.", {
           subcode: "INVALID_TYPE_ERROR",
         });
       }
@@ -228,10 +231,8 @@ function validateReplyValue(
         throw new InvalidReplyError(
           info,
           argName,
-          "Invalid date, date must have YYYY-MM-DD format",
-          {
-            subcode: "INVALID_VALUE_ERROR",
-          }
+          "Reply is not a valid date with YYYY-MM-DD format.",
+          { subcode: "INVALID_VALUE_ERROR" }
         );
       }
       break;
@@ -239,7 +240,7 @@ function validateReplyValue(
     case "TEXT":
     case "SHORT_TEXT": {
       if (typeof reply !== "string") {
-        throw new InvalidReplyError(info, argName, "Value must be a string", {
+        throw new InvalidReplyError(info, argName, "Reply must be of type string.", {
           subcode: "INVALID_TYPE_ERROR",
         });
       }
@@ -248,7 +249,7 @@ function validateReplyValue(
         throw new InvalidReplyError(
           info,
           argName,
-          `Reply exceeds max length allowed of ${maxLength} chars`,
+          `Reply exceeds max length allowed of ${maxLength} chars.`,
           { subcode: "MAX_LENGTH_EXCEEDED_ERROR" }
         );
       }
@@ -276,27 +277,114 @@ function validateReplyValue(
         !reply.every((r) => typeof r === "string") ||
         reply.length === 0
       ) {
-        throw new InvalidReplyError(info, argName, "Values must be an array of strings", {
-          subcode: "INVALID_TYPE_ERROR",
-        });
+        throw new InvalidReplyError(
+          info,
+          argName,
+          "Reply must be an array of strings with at least one value.",
+          { subcode: "INVALID_TYPE_ERROR" }
+        );
       }
-      try {
-        validateCheckboxReplyValues(field, reply);
-      } catch (e: any) {
-        throw new InvalidReplyError(info, argName, e.message, { subcode: e.message });
+
+      const { type: subtype, min, max } = field.options.limit;
+      if (subtype === "RADIO" && reply.length > 1) {
+        throw new InvalidReplyError(info, argName, "Reply must contain exactly 1 choice.", {
+          subcode: "INVALID_VALUE_ERROR",
+        });
+      } else if (subtype === "EXACT" && (reply.length > max || reply.length < min)) {
+        throw new InvalidReplyError(info, argName, `Reply must contain exactly ${min} choice(s).`, {
+          subcode: "INVALID_VALUE_ERROR",
+        });
+      } else if (subtype === "RANGE" && (reply.length > max || reply.length < min)) {
+        throw new InvalidReplyError(
+          info,
+          argName,
+          `Reply must contain between ${min} and ${max} choices.`,
+          { subcode: "INVALID_VALUE_ERROR" }
+        );
+      }
+
+      const differences = difference(reply, field.options.values);
+      if (differences.length !== 0) {
+        throw new InvalidReplyError(
+          info,
+          argName,
+          `Reply must be some of [${(field.options.values ?? [])
+            .map((opt: string) => `'${opt}'`)
+            .join(", ")}].`,
+          { subcode: "UNKNOWN_OPTION_ERROR" }
+        );
       }
       break;
     }
     case "DYNAMIC_SELECT": {
+      console.log(reply);
       if (!Array.isArray(reply)) {
-        throw new InvalidReplyError(info, argName, "Values must be an array", {
-          subcode: "INVALID_TYPE_ERROR",
-        });
+        throw new InvalidReplyError(
+          info,
+          argName,
+          "Reply must be an array with the selected options.",
+          {
+            subcode: "INVALID_TYPE_ERROR",
+          }
+        );
       }
-      try {
-        validateDynamicSelectReplyValues(field, reply);
-      } catch (e: any) {
-        throw new InvalidReplyError(info, argName, e.message, { subcode: e.message });
+
+      const labels = field.options.labels as string[];
+      let values = field.options.values as string[] | DynamicSelectOption[];
+      if (reply.length > labels.length) {
+        throw new InvalidReplyError(
+          info,
+          argName,
+          `Reply must be an array of length ${labels.length}.`,
+          { subcode: "INVALID_VALUE_ERROR" }
+        );
+      }
+      for (let level = 0; level < labels.length; level++) {
+        if (reply[level]?.[0] !== labels[level]) {
+          throw new InvalidReplyError(
+            info,
+            argName,
+            `Expected '${labels[level]}' as label, received '${reply[level]?.[0]}'.`,
+            { subcode: "INVALID_VALUE_ERROR" }
+          );
+        }
+        if (reply[level]?.[1] === null) {
+          if (!reply.slice(level + 1).every(([, value]) => value === null)) {
+            throw new InvalidReplyError(
+              info,
+              argName,
+              `A partial reply must contain null values starting from index ${level}.`,
+              { subcode: "INVALID_VALUE_ERROR" }
+            );
+          }
+        } else if (level === labels.length - 1) {
+          if (!(values as string[]).includes(reply[level][1]!)) {
+            throw new InvalidReplyError(
+              info,
+              argName,
+              `Reply for label '${reply[level][0]}' must be one of [${(values as string[])
+                .map((opt) => `'${opt}'`)
+                .join(", ")}], received '${reply[level][1]}'.`,
+              { subcode: "UNKNOWN_OPTION_ERROR" }
+            );
+          }
+        } else {
+          if (!(values as DynamicSelectOption[]).some(([value]) => value === reply[level][1])) {
+            throw new InvalidReplyError(
+              info,
+              argName,
+              `Reply for label '${reply[level][0]}' must be one of [${(
+                values as DynamicSelectOption[]
+              )
+                .map(([opt]) => `'${opt}'`)
+                .join(", ")}], received '${reply[level][1]}'.`,
+              { subcode: "UNKNOWN_OPTION_ERROR" }
+            );
+          }
+          values =
+            (values as DynamicSelectOption[]).find(([value]) => value === reply[level][1])?.[1] ??
+            [];
+        }
       }
       break;
     }
