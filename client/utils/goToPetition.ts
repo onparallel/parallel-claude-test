@@ -6,9 +6,15 @@ export function useGoToPetition() {
   return useCallback(function (
     id: string,
     section: "compose" | "replies" | "activity" | "preview",
-    event?: MouseEvent
+    options?: {
+      event?: MouseEvent;
+      query?: Record<string, string>;
+    }
   ) {
-    navigate(`/app/petitions/${id}/${section}`, event);
-  },
-  []);
+    let url = `/app/petitions/${id}/${section}`;
+    if (options?.query) {
+      url += `?${new URLSearchParams(options.query)}`;
+    }
+    navigate(url, options?.event);
+  }, []);
 }

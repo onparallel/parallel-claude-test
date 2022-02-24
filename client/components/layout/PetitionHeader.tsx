@@ -90,7 +90,7 @@ export function PetitionHeader({
       const [petitionId] = await clonePetitions({
         petitionIds: [petition.id],
       });
-      goToPetition(petitionId, "compose");
+      goToPetition(petitionId, "compose", { query: { new: "true" } });
     } catch {}
   };
 
@@ -101,7 +101,7 @@ export function PetitionHeader({
         petitionId: petition.id,
         type: "TEMPLATE",
       });
-      goToPetition(templateId, "compose");
+      goToPetition(templateId, "compose", { query: { new: "true" } });
     } catch {}
   };
 

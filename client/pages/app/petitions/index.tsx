@@ -140,7 +140,7 @@ function Petitions() {
           petitionId: selected[0],
           type: "TEMPLATE",
         });
-        goToPetition(templateId, "compose");
+        goToPetition(templateId, "compose", { query: { new: "true" } });
       } catch {}
     },
     [petitions, selected]
@@ -152,7 +152,7 @@ function Petitions() {
         const petitionId = await createPetition({
           petitionId: selected[0],
         });
-        goToPetition(petitionId, "preview");
+        goToPetition(petitionId, "preview", { query: { new: "true" } });
       } catch {}
     },
     [petitions, selected]
@@ -166,7 +166,7 @@ function Petitions() {
           petitionIds: selected,
         });
         if (petitionIds.length === 1) {
-          goToPetition(petitionIds[0], "compose");
+          goToPetition(petitionIds[0], "compose", { query: { new: "true" } });
         } else {
           refetch();
         }
@@ -199,7 +199,7 @@ function Petitions() {
             } as const
           )[row.status]
         : "compose",
-      event
+      { event }
     );
   }, []);
 

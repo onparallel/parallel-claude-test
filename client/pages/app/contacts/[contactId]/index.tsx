@@ -78,7 +78,7 @@ function Contact({ contactId }: ContactProps) {
           CLOSED: "replies",
         } as const
       )[row.petition!.status],
-      event
+      { event }
     );
   }
 

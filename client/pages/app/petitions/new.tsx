@@ -159,7 +159,7 @@ function NewPetition() {
     async (type: PetitionBaseType) => {
       try {
         const id = await createPetition({ type });
-        goToPetition(id, "compose");
+        goToPetition(id, "compose", { query: { new: "true" } });
       } catch {}
     },
     [goToPetition, createPetition]

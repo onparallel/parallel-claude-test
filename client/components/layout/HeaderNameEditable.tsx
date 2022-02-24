@@ -13,7 +13,8 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { HeaderNameEditable_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { PetitionState } from "@parallel/utils/usePetitionState";
-import { useState } from "react";
+import { useRouter } from "next/router";
+import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 export interface HeaderNameEditableProps extends EditableProps {
@@ -28,9 +29,19 @@ export const HeaderNameEditable = Object.assign(
     ref
   ) {
     const intl = useIntl();
+    const router = useRouter();
     const [name, setName] = useState(petition.name ?? "");
 
     const isPublic = petition.__typename === "PetitionTemplate" && petition.isPublic;
+
+    const editablePreviewRef = useRef<HTMLSpanElement | null>(null);
+
+    useEffect(() => {
+      if (router.query.new === "true") {
+        setTimeout(() => editablePreviewRef.current?.focus());
+        router.replace(router.asPath.split("?")[0]);
+      }
+    }, []);
 
     return (
       <Editable
@@ -67,6 +78,7 @@ export const HeaderNameEditable = Object.assign(
                     offset={[0, -1]}
                   >
                     <EditablePreview
+                      ref={editablePreviewRef}
                       color={name ? undefined : "gray.400"}
                       paddingY={1}
                       paddingX={2}

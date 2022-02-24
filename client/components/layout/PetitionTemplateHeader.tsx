@@ -79,7 +79,7 @@ export function PetitionTemplateHeader({
       const [petitionId] = await clonePetitions({
         petitionIds: [petition.id],
       });
-      goToPetition(petitionId, "compose");
+      goToPetition(petitionId, "compose", { query: { new: "true" } });
     } catch {}
   };
 
@@ -89,7 +89,7 @@ export function PetitionTemplateHeader({
       const petitionId = await createPetition({
         petitionId: petition.id,
       });
-      goToPetition(petitionId, "preview");
+      goToPetition(petitionId, "preview", { query: { new: "true" } });
     } catch {}
   };
 
