@@ -9,9 +9,10 @@ import {
 import { FieldPhoneIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { flags } from "@parallel/utils/flags";
+import { phoneCodes } from "@parallel/utils/phoneCodes";
 import { useConstant } from "@parallel/utils/useConstant";
 import { AsYouType } from "libphonenumber-js/min/index";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
 import { isDefined } from "remeda";
 
 export interface PhoneInputProps extends ThemingProps<"Input">, FormControlOptions {
@@ -21,10 +22,14 @@ export interface PhoneInputProps extends ThemingProps<"Input">, FormControlOptio
     value: string | undefined,
     metadata: { isValid: boolean; country: string | undefined }
   ): void;
+  onBlur(
+    value: string | undefined,
+    metadata: { isValid: boolean; country: string | undefined }
+  ): void;
 }
 
 export default chakraForwardRef<"input", PhoneInputProps>(function PhoneInput(
-  { value, onChange, defaultCountry, ...props },
+  { value, onLoad, onChange, onBlur, defaultCountry, ...props },
   ref
 ) {
   const formatter = useConstant(() => new AsYouType());
@@ -47,9 +52,16 @@ export default chakraForwardRef<"input", PhoneInputProps>(function PhoneInput(
   }, [value]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
+    let newValue = e.target.value;
     if (inputValue === newValue) {
       return;
+    }
+    if (newValue && !newValue.startsWith("+")) {
+      if (defaultCountry) {
+        newValue = phoneCodes[defaultCountry] + newValue;
+      } else {
+        newValue = "+" + newValue;
+      }
     }
 
     // The as-you-type formatter only works with append-only inputs.
@@ -76,6 +88,19 @@ export default chakraForwardRef<"input", PhoneInputProps>(function PhoneInput(
     onChange(value, { country, isValid });
   };
 
+  const handleBlur = (e: FocusEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    formatter.reset();
+    formatter.input(newValue);
+    const formatted = (formatter as any).formattedOutput;
+    setInputValue(formatted);
+    const country = formatter.getCountry();
+    const isValid = formatter.isPossible();
+    const value = formatter.getNumberValue();
+    setCountry(country);
+    onBlur(value, { country, isValid });
+  };
+
   return (
     <InputGroup>
       <InputLeftElement pointerEvents="none">
@@ -87,7 +112,14 @@ export default chakraForwardRef<"input", PhoneInputProps>(function PhoneInput(
           <FieldPhoneIcon />
         )}
       </InputLeftElement>
-      <Input ref={ref} type="tel" value={inputValue} onChange={handleChange} {...props} />
+      <Input
+        ref={ref}
+        type="tel"
+        value={inputValue}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        {...props}
+      />
     </InputGroup>
   );
 });

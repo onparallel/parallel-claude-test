@@ -1,7 +1,6 @@
-import { Box, HStack, Stack, Text } from "@chakra-ui/react";
+import { Box, Stack } from "@chakra-ui/react";
 import { PhoneCodeSelect } from "@parallel/components/common/PhoneCodeInput";
 import { FieldOptions } from "@parallel/utils/petitionFields";
-import { OptionType } from "@parallel/utils/react-select/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useState } from "react";
 import { FormattedMessage } from "react-intl";

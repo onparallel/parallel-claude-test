@@ -7,7 +7,7 @@ import type { PhoneInputProps } from "./PhoneInput";
 const LazyPhoneInput = lazy(() => import("./PhoneInput"));
 
 export const PhoneInputLazy = chakraForwardRef<"input", PhoneInputProps>(function InputPhone(
-  { onChange, defaultCountry, value, ...props },
+  { onChange, onBlur, defaultCountry, value, ...props },
   ref
 ) {
   return (
@@ -25,6 +25,7 @@ export const PhoneInputLazy = chakraForwardRef<"input", PhoneInputProps>(functio
         ref={ref}
         value={value}
         onChange={onChange}
+        onBlur={onBlur}
         defaultCountry={defaultCountry}
         {...props}
       />

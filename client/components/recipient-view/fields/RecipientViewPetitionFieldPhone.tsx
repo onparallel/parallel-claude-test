@@ -44,12 +44,11 @@ export function RecipientViewPetitionFieldPhone({
 }: RecipientViewPetitionFieldPhoneProps) {
   const options = field.options as FieldOptions["PHONE"];
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
-  const [value, setValue] = useState(
-    options.defaultCountry ? phoneCodes[options.defaultCountry] : ""
-  );
+  const [value, setValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const isDeletingReplyRef = useRef<Record<string, boolean>>({});
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
+  const [isInvalidValue, setIsInvalidValue] = useState(false);
 
   const newReplyRef = useRef<HTMLInputElement>(null);
   const replyRefs = useMultipleRefs<HTMLInputElement>();
@@ -133,6 +132,7 @@ export function RecipientViewPetitionFieldPhone({
     ref: newReplyRef as any,
     paddingRight: 10,
     isDisabled: isDisabled,
+    isInvalid: isInvalidValue,
     onKeyDown: async (event: KeyboardEvent) => {
       if (isMetaReturn(event) && field.multiple) {
         await handleCreate.immediate(value, false);
@@ -145,7 +145,7 @@ export function RecipientViewPetitionFieldPhone({
         }
       }
     },
-    placeholder: options.placeholder ?? phoneCodes[options.defaultCountry],
+    placeholder: options.placeholder ?? phoneCodes[options.defaultCountry] ?? "+",
   };
 
   return (
@@ -192,10 +192,11 @@ export function RecipientViewPetitionFieldPhone({
                 // prevent creating 2 replies
                 return;
               }
+              setIsInvalidValue(!isValid && isDefined(value));
               setValue(value);
             }}
-            onBlur={async () => {
-              if (value) {
+            onBlur={async (value: string, { isValid }) => {
+              if (value && isValid) {
                 await handleCreate.immediate(value, false);
                 setShowNewReply(false);
               } else if (!value && field.replies.length > 0) {
@@ -233,6 +234,7 @@ export const RecipientViewPetitionFieldReplyPhone = forwardRef<
   const [value, setValue] = useState(reply.content.value ?? "");
   const [isSaving, setIsSaving] = useState(false);
   const options = field.options as FieldOptions["PHONE"];
+  const [isInvalidValue, setIsInvalidValue] = useState(false);
 
   const debouncedUpdateReply = useDebouncedCallback(
     async (value: string) => {
@@ -251,6 +253,7 @@ export const RecipientViewPetitionFieldReplyPhone = forwardRef<
     ref: ref as any,
     paddingRight: 10,
     isDisabled: isDisabled || reply.status === "APPROVED",
+    isInvalid: isInvalidValue || reply.status === "REJECTED",
     onKeyDown: async (event: KeyboardEvent) => {
       if (isMetaReturn(event) && field.multiple) {
         onAddNewReply();
@@ -269,12 +272,12 @@ export const RecipientViewPetitionFieldReplyPhone = forwardRef<
         <PhoneInputLazy
           defaultCountry={options.defaultCountry}
           value={value}
-          onChange={(value: string) => {
+          onChange={(value: string, { isValid }) => {
+            setIsInvalidValue(!isValid && isDefined(value));
             setValue(value);
           }}
-          isInvalid={reply.status === "REJECTED"}
-          onBlur={async () => {
-            if (isDefined(value) && value !== reply.content.value) {
+          onBlur={async (value: string, { isValid }) => {
+            if (isValid && isDefined(value) && value !== reply.content.value) {
               await debouncedUpdateReply.immediate(value);
             } else if (!isDefined(value)) {
               debouncedUpdateReply.clear();

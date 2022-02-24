@@ -1,6 +1,6 @@
 import { GraphQLResolveInfo } from "graphql";
 import { decode } from "jsonwebtoken";
-import { isValidPhoneNumber } from "libphonenumber-js";
+import { isPossiblePhoneNumber } from "libphonenumber-js";
 import { ArgsValue } from "nexus/dist/core";
 import { isDefined } from "remeda";
 import {
@@ -260,7 +260,7 @@ function validateReplyValue(
           subcode: "INVALID_TYPE_ERROR",
         });
       }
-      if (!isValidPhoneNumber(reply)) {
+      if (!isPossiblePhoneNumber(reply)) {
         throw new InvalidReplyError(
           info,
           argName,

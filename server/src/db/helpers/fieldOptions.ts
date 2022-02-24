@@ -244,6 +244,8 @@ export function defaultFieldOptions(
       ? true
       : type === "CHECKBOX" // CHECKBOX always false
       ? false
+      : type === "HEADING" // HEADING always false
+      ? false
       : field?.type === "FILE_UPLOAD" // Inherit if not coming from a FILE_UPLOAD
       ? false
       : field?.multiple ?? false;
@@ -263,7 +265,9 @@ export function defaultFieldOptions(
           placeholder:
             isDefined(field) && hasPlaceholder(field.type) ? field.options.placeholder : null,
           maxLength:
-            isDefined(field) && ["TEXT", "SHORT_TEXT"].includes(field.type)
+            isDefined(field) &&
+            ["TEXT", "SHORT_TEXT"].includes(field.type) &&
+            isDefined(field.options.maxLength)
               ? field.options.maxLength
               : null,
         };
