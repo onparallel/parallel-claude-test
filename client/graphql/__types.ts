@@ -9226,7 +9226,7 @@ export type RecipientViewProgressFooter_PublicPetitionFieldFragment = {
   }>;
 };
 
-export type useCompleteSignerInfoDialog_PetitionSignerFragment = {
+export type useRecipientViewConfirmPetitionSignersDialog_PetitionSignerFragment = {
   __typename?: "PetitionSigner";
   firstName: string;
   lastName?: string | null;
@@ -9234,7 +9234,7 @@ export type useCompleteSignerInfoDialog_PetitionSignerFragment = {
   email: string;
 };
 
-export type useCompleteSignerInfoDialog_PublicContactFragment = {
+export type useRecipientViewConfirmPetitionSignersDialog_PublicContactFragment = {
   __typename?: "PublicContact";
   firstName: string;
   lastName?: string | null;
@@ -16835,6 +16835,14 @@ export type RecipientView_PublicPetitionAccessFragment = {
     isRecipientViewContentsHidden: boolean;
     tone: Tone;
     signatureStatus?: PublicSignatureStatus | null;
+    recipients: Array<{
+      __typename?: "PublicContact";
+      firstName: string;
+      lastName?: string | null;
+      email: string;
+      id: string;
+      fullName: string;
+    }>;
     fields: Array<{
       __typename?: "PublicPetitionField";
       id: string;
@@ -16889,13 +16897,6 @@ export type RecipientView_PublicPetitionAccessFragment = {
         email: string;
       }>;
     } | null;
-    recipients: Array<{
-      __typename?: "PublicContact";
-      id: string;
-      fullName: string;
-      firstName: string;
-      email: string;
-    }>;
   } | null;
   granter?: {
     __typename?: "PublicUser";
@@ -17134,6 +17135,14 @@ export type RecipientView_accessQuery = {
       isRecipientViewContentsHidden: boolean;
       tone: Tone;
       signatureStatus?: PublicSignatureStatus | null;
+      recipients: Array<{
+        __typename?: "PublicContact";
+        firstName: string;
+        lastName?: string | null;
+        email: string;
+        id: string;
+        fullName: string;
+      }>;
       fields: Array<{
         __typename?: "PublicPetitionField";
         id: string;
@@ -17188,13 +17197,6 @@ export type RecipientView_accessQuery = {
           email: string;
         }>;
       } | null;
-      recipients: Array<{
-        __typename?: "PublicContact";
-        id: string;
-        fullName: string;
-        firstName: string;
-        email: string;
-      }>;
     } | null;
     granter?: {
       __typename?: "PublicUser";
@@ -21384,14 +21386,21 @@ export const useGetPageFields_PublicPetitionFieldFragmentDoc = gql`
   ${groupFieldsByPages_PublicPetitionFieldFragmentDoc}
   ${useFieldVisibility_PublicPetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<useGetPageFields_PublicPetitionFieldFragment, unknown>;
-export const useCompleteSignerInfoDialog_PetitionSignerFragmentDoc = gql`
-  fragment useCompleteSignerInfoDialog_PetitionSigner on PetitionSigner {
+export const useRecipientViewConfirmPetitionSignersDialog_PetitionSignerFragmentDoc = gql`
+  fragment useRecipientViewConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
     firstName
     lastName
     fullName
     email
+    ...SelectedSignerRow_PetitionSigner
+    ...SuggestedSignerRow_PetitionSigner
   }
-` as unknown as DocumentNode<useCompleteSignerInfoDialog_PetitionSignerFragment, unknown>;
+  ${SelectedSignerRow_PetitionSignerFragmentDoc}
+  ${SuggestedSignerRow_PetitionSignerFragmentDoc}
+` as unknown as DocumentNode<
+  useRecipientViewConfirmPetitionSignersDialog_PetitionSignerFragment,
+  unknown
+>;
 export const RecipientViewHeader_PublicContactFragmentDoc = gql`
   fragment RecipientViewHeader_PublicContact on PublicContact {
     id
@@ -21436,10 +21445,10 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
       allowAdditionalSigners
       signers {
         fullName
-        ...useCompleteSignerInfoDialog_PetitionSigner
+        ...useRecipientViewConfirmPetitionSignersDialog_PetitionSigner
       }
       additionalSigners {
-        ...useCompleteSignerInfoDialog_PetitionSigner
+        ...useRecipientViewConfirmPetitionSignersDialog_PetitionSigner
       }
     }
     recipients {
@@ -21451,11 +21460,21 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
   }
   ${RecipientView_PublicPetitionFieldFragmentDoc}
   ${useGetPageFields_PublicPetitionFieldFragmentDoc}
-  ${useCompleteSignerInfoDialog_PetitionSignerFragmentDoc}
+  ${useRecipientViewConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
   ${RecipientViewHeader_PublicContactFragmentDoc}
   ${RecipientViewContentsCard_PublicPetitionFragmentDoc}
   ${RecipientViewProgressFooter_PublicPetitionFragmentDoc}
 ` as unknown as DocumentNode<RecipientView_PublicPetitionFragment, unknown>;
+export const useRecipientViewConfirmPetitionSignersDialog_PublicContactFragmentDoc = gql`
+  fragment useRecipientViewConfirmPetitionSignersDialog_PublicContact on PublicContact {
+    firstName
+    lastName
+    email
+  }
+` as unknown as DocumentNode<
+  useRecipientViewConfirmPetitionSignersDialog_PublicContactFragment,
+  unknown
+>;
 export const RecipientViewHeader_PublicUserFragmentDoc = gql`
   fragment RecipientViewHeader_PublicUser on PublicUser {
     id
@@ -21481,13 +21500,6 @@ export const RecipientView_PublicUserFragmentDoc = gql`
   ${RecipientViewHeader_PublicUserFragmentDoc}
   ${RecipientViewContentsCard_PublicUserFragmentDoc}
 ` as unknown as DocumentNode<RecipientView_PublicUserFragment, unknown>;
-export const useCompleteSignerInfoDialog_PublicContactFragmentDoc = gql`
-  fragment useCompleteSignerInfoDialog_PublicContact on PublicContact {
-    firstName
-    lastName
-    email
-  }
-` as unknown as DocumentNode<useCompleteSignerInfoDialog_PublicContactFragment, unknown>;
 export const RecipientView_PublicPetitionMessageFragmentDoc = gql`
   fragment RecipientView_PublicPetitionMessage on PublicPetitionMessage {
     id
@@ -21517,13 +21529,16 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
   fragment RecipientView_PublicPetitionAccess on PublicPetitionAccess {
     petition {
       ...RecipientView_PublicPetition
+      recipients {
+        ...useRecipientViewConfirmPetitionSignersDialog_PublicContact
+      }
     }
     granter {
       ...RecipientView_PublicUser
     }
     contact {
       ...RecipientViewHeader_PublicContact
-      ...useCompleteSignerInfoDialog_PublicContact
+      ...useRecipientViewConfirmPetitionSignersDialog_PublicContact
     }
     message {
       ...RecipientView_PublicPetitionMessage
@@ -21531,9 +21546,9 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
     ...RecipientViewPetitionField_PublicPetitionAccess
   }
   ${RecipientView_PublicPetitionFragmentDoc}
+  ${useRecipientViewConfirmPetitionSignersDialog_PublicContactFragmentDoc}
   ${RecipientView_PublicUserFragmentDoc}
   ${RecipientViewHeader_PublicContactFragmentDoc}
-  ${useCompleteSignerInfoDialog_PublicContactFragmentDoc}
   ${RecipientView_PublicPetitionMessageFragmentDoc}
   ${RecipientViewPetitionField_PublicPetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<RecipientView_PublicPetitionAccessFragment, unknown>;

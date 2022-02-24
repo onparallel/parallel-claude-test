@@ -2680,6 +2680,46 @@
     "context": "Enter your answer"
   },
   {
+    "term": "component.recipient-view.confirm-petition-signers-dialog.add-signer.button",
+    "definition": "Añadir firmantes",
+    "context": "Add signers"
+  },
+  {
+    "term": "component.recipient-view.confirm-petition-signers-dialog.confirmation-text",
+    "definition": "Al iniciar firma enviaremos el documento a firmar a los siguientes contactos:",
+    "context": "When you start the signature, we will send the document to be signed to the following contacts:"
+  },
+  {
+    "term": "component.recipient-view.confirm-petition-signers-dialog.header",
+    "definition": "¿Quién tiene que firmar el documento?",
+    "context": "Who has to sign the document?"
+  },
+  {
+    "term": "component.recipient-view.confirm-petition-signers-dialog.include-message",
+    "definition": "Incluir mensaje",
+    "context": "Include message"
+  },
+  {
+    "term": "component.recipient-view.confirm-petition-signers-dialog.message-placeholder",
+    "definition": "Escribe aquí un mensaje para los firmantes...",
+    "context": "Write here a message for the signers..."
+  },
+  {
+    "term": "component.recipient-view.confirm-petition-signers-dialog.signers-added",
+    "definition": "{count, plural, =0{No has añadido firmantes todavía} one{1 firmante añadido} other{# firmantes añadidos}}",
+    "context": "{count, plural, =0{You haven't added any signers yet} one{1 signer added} other{# signers added}}"
+  },
+  {
+    "term": "component.recipient-view.confirm-petition-signers-dialog.start-signature-button",
+    "definition": "Iniciar firma",
+    "context": "Start signature"
+  },
+  {
+    "term": "component.recipient-view.confirm-petition-signers-dialog.suggestions",
+    "definition": "Sugerido:",
+    "context": "Suggested:"
+  },
+  {
     "term": "component.recipient-view.reminder-submit",
     "definition": "{tone, select, INFORMAL{Recuerda finalizar cuando completes todos los campos.} other{Recuerde finalizar una vez haya completado todos los campos.}}",
     "context": "Remember to click Finalize when you finish entering all the information."
@@ -2943,11 +2983,6 @@
     "term": "component.signature-config-dialog.allow-additional-signers.label",
     "definition": "Permitir que se añadan más firmantes",
     "context": "Allow additional signers to be added"
-  },
-  {
-    "term": "component.signature-config-dialog.confirm-start",
-    "definition": "Iniciar firma",
-    "context": "Start signature"
   },
   {
     "term": "component.signature-config-dialog.contact-select.add-contact-to-sign.placeholder",
@@ -8218,51 +8253,6 @@
     "term": "public.who-trust-us.title",
     "definition": "Ya confían en nosotros",
     "context": "Already trust us"
-  },
-  {
-    "term": "recipient-view.complete-signer-info-dialog.add-more-signers.button",
-    "definition": "Añadir más firmantes",
-    "context": "Add more signers"
-  },
-  {
-    "term": "recipient-view.complete-signer-info-dialog.header",
-    "definition": "Firmar petición",
-    "context": "Sign petition"
-  },
-  {
-    "term": "recipient-view.complete-signer-info-dialog.include-message",
-    "definition": "Incluir mensaje",
-    "context": "Include message"
-  },
-  {
-    "term": "recipient-view.complete-signer-info-dialog.no-selected-signers.question",
-    "definition": "¿Quién tiene que firmar el documento?",
-    "context": "Who has to sign the document?"
-  },
-  {
-    "term": "recipient-view.complete-signer-info-dialog.recipient-will-sign",
-    "definition": "Firmaré yo ({email})",
-    "context": "I will sign ({email})"
-  },
-  {
-    "term": "recipient-view.complete-signer-info-dialog.remove-signer-button.tooltip",
-    "definition": "Quitar firmante",
-    "context": "Remove signer"
-  },
-  {
-    "term": "recipient-view.complete-signer-info-dialog.subtitle",
-    "definition": "{tone, select, INFORMAL{Para completar esta petición se necesita una <b>firma digital</b>.} other{Esta petición requiere de firma digital para ser completada.}}",
-    "context": "{tone, select, INFORMAL{An <b>eSignature</b> is required to complete this petition.} other{This petition requires an eSignature in order to be completed.}}"
-  },
-  {
-    "term": "recipient-view.complete-signer-info-dialog.subtitle.recipient-can-add",
-    "definition": "Puedes añadir más firmantes si lo consideras necesario.",
-    "context": "You can add more signers if you consider it necessary."
-  },
-  {
-    "term": "recipient-view.complete-signer-info-dialog.subtitle.with-signers",
-    "definition": "{tone, select, INFORMAL{Clica en <b>{button}</b> y enviaremos un email con información sobre cómo completarla a las siguientes personas:} other{Al hacer click en <b>{button}</b>, enviaremos un email con información sobre cómo completar el proceso a las siguientes personas:}}",
-    "context": "{tone, select, INFORMAL{Click on <b>{button}</b> and} other{After you click on <b>{button}</b>,}} we will send an email with information on how to complete the process to the following people:"
   },
   {
     "term": "recipient-view.completed-petition.toast-description",

@@ -25,9 +25,9 @@ import {
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import {
-  CompleteSignerInfoDialogResult,
-  useCompleteSignerInfoDialog,
-} from "@parallel/components/recipient-view/dialogs/CompleteSignerInfoDialog";
+  RecipientViewConfirmPetitionSignersDialogResult,
+  useRecipientViewConfirmPetitionSignersDialog,
+} from "@parallel/components/recipient-view/dialogs/RecipientViewConfirmPetitionSignersDialog";
 import { RecipientViewPetitionField } from "@parallel/components/recipient-view/fields/RecipientViewPetitionField";
 import { LastSavedProvider } from "@parallel/components/recipient-view/LastSavedProvider";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
@@ -80,7 +80,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
 
   const [finalized, setFinalized] = useState(false);
   const [publicCompletePetition] = useMutation(RecipientView_publicCompletePetitionDocument);
-  const showCompleteSignerInfoDialog = useCompleteSignerInfoDialog();
+  const showCompleteSignerInfoDialog = useRecipientViewConfirmPetitionSignersDialog();
   const showReviewBeforeSigningDialog = useDialog(ReviewBeforeSignDialog);
   const handleFinalize = useCallback(
     async function () {
@@ -95,11 +95,12 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
             f.isReadOnly
         );
         if (canFinalize) {
-          let completeSignerInfoData: CompleteSignerInfoDialogResult | null = null;
+          let completeSignerInfoData: RecipientViewConfirmPetitionSignersDialogResult | null = null;
           if (petition.signatureConfig?.review === false) {
             completeSignerInfoData = await showCompleteSignerInfoDialog({
-              recipientCanAddSigners: petition.signatureConfig.allowAdditionalSigners,
-              signers,
+              recipients: petition.recipients,
+              allowAdditionalSigners: petition.signatureConfig.allowAdditionalSigners,
+              fixedSigners: signers,
               keycode,
               organization: granter.organization.name,
               contact,
@@ -439,13 +440,16 @@ RecipientView.fragments = {
       fragment RecipientView_PublicPetitionAccess on PublicPetitionAccess {
         petition {
           ...RecipientView_PublicPetition
+          recipients {
+            ...useRecipientViewConfirmPetitionSignersDialog_PublicContact
+          }
         }
         granter {
           ...RecipientView_PublicUser
         }
         contact {
           ...RecipientViewHeader_PublicContact
-          ...useCompleteSignerInfoDialog_PublicContact
+          ...useRecipientViewConfirmPetitionSignersDialog_PublicContact
         }
         message {
           ...RecipientView_PublicPetitionMessage
@@ -455,7 +459,7 @@ RecipientView.fragments = {
       ${this.PublicPetition}
       ${this.PublicUser}
       ${RecipientViewHeader.fragments.PublicContact}
-      ${useCompleteSignerInfoDialog.fragments.PublicContact}
+      ${useRecipientViewConfirmPetitionSignersDialog.fragments.PublicContact}
       ${RecipientViewPetitionField.fragments.PublicPetitionAccess}
       ${this.PublicPetitionMessage}
     `;
@@ -485,10 +489,10 @@ RecipientView.fragments = {
           allowAdditionalSigners
           signers {
             fullName
-            ...useCompleteSignerInfoDialog_PetitionSigner
+            ...useRecipientViewConfirmPetitionSignersDialog_PetitionSigner
           }
           additionalSigners {
-            ...useCompleteSignerInfoDialog_PetitionSigner
+            ...useRecipientViewConfirmPetitionSignersDialog_PetitionSigner
           }
         }
         recipients {
@@ -500,7 +504,7 @@ RecipientView.fragments = {
       }
 
       ${this.PublicPetitionField}
-      ${useCompleteSignerInfoDialog.fragments.PetitionSigner}
+      ${useRecipientViewConfirmPetitionSignersDialog.fragments.PetitionSigner}
       ${RecipientViewContentsCard.fragments.PublicPetition}
       ${RecipientViewProgressFooter.fragments.PublicPetition}
       ${RecipientViewHeader.fragments.PublicContact}
