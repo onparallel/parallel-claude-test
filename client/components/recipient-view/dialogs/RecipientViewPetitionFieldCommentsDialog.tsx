@@ -25,6 +25,7 @@ import {
   RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldDocument,
   RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment,
   RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument,
+  Tone,
 } from "@parallel/graphql/__types";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
@@ -38,12 +39,14 @@ interface RecipientViewPetitionFieldCommentsDialogProps {
   keycode: string;
   access: RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment;
   field: RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment;
+  tone: Tone;
 }
 
 export function RecipientViewPetitionFieldCommentsDialog({
   keycode,
   access,
   field,
+  tone,
   ...props
 }: DialogProps<RecipientViewPetitionFieldCommentsDialogProps>) {
   const intl = useIntl();
@@ -203,13 +206,14 @@ export function RecipientViewPetitionFieldCommentsDialog({
                 {access.granter!.fullName ? (
                   <FormattedMessage
                     id="recipient-view.field-comments.cta-with-name"
-                    defaultMessage="Have any questions? Ask {name} here"
-                    values={{ name: access.granter!.fullName }}
+                    defaultMessage="{tone, select, INFORMAL{Have} other{Do you have}} any questions? Ask {name} here"
+                    values={{ name: access.granter!.fullName, tone }}
                   />
                 ) : (
                   <FormattedMessage
                     id="recipient-view.field-comments.cta"
-                    defaultMessage="Have any questions? Ask here"
+                    defaultMessage="{tone, select, INFORMAL{Have} other{Do you have}} any questions? Ask here"
+                    values={{ tone }}
                   />
                 )}
               </Text>

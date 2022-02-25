@@ -15,6 +15,7 @@ import {
   RecipientViewPetitionField_publicUpdateDynamicSelectReplyDocument,
   RecipientViewPetitionField_publicUpdateNumericReplyDocument,
   RecipientViewPetitionField_publicUpdateSimpleReplyDocument,
+  Tone,
 } from "@parallel/graphql/__types";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
@@ -54,11 +55,12 @@ export interface RecipientViewPetitionFieldProps
   access: RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment;
   petitionId: string;
   isDisabled: boolean;
+  tone: Tone;
 }
 
 export type UploadCache = Record<string, XMLHttpRequest>;
 
-export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProps) {
+export function RecipientViewPetitionField({ tone, ...props }: RecipientViewPetitionFieldProps) {
   const uploads = useRef<UploadCache>({});
   const { updateLastSaved } = useLastSaved();
 
@@ -86,6 +88,7 @@ export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProp
         keycode: props.keycode,
         access: props.access,
         field: props.field,
+        tone,
       });
     } catch {}
   }

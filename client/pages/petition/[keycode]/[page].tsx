@@ -349,6 +349,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                         <motion.div key={field.id} layout="position">
                           <RecipientViewPetitionField
                             key={field.id}
+                            tone={tone}
                             petitionId={petition.id}
                             keycode={keycode}
                             access={access!}

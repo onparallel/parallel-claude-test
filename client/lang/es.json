@@ -2120,6 +2120,11 @@
     "context": "<b>Preview only</b> - comments are disabled."
   },
   {
+    "term": "component.preview-petition-field-comments-dialog.comments-cta",
+    "definition": "¿Alguna duda? Pregunta por aquí",
+    "context": "Have any questions? Ask here"
+  },
+  {
     "term": "component.pricing-table.compare-plans",
     "definition": "Comparativa de planes",
     "context": "Compare plans"
@@ -5325,14 +5330,14 @@
     "context": "Export replies"
   },
   {
-    "term": "petition-replies.field-comments.disabled-comments-2",
-    "definition": "Puedes habilitar los comentarios desde los <a>Ajustes del campo</a> en la pestaña de {composeTab}.",
-    "context": "You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
-  },
-  {
     "term": "petition-replies.field-comments.disabled-comments-1",
     "definition": "Este campo solo admite comentarios internos.",
     "context": "This field only accepts internal comments."
+  },
+  {
+    "term": "petition-replies.field-comments.disabled-comments-2",
+    "definition": "Puedes habilitar los comentarios desde los <a>Ajustes del campo</a> en la pestaña de {composeTab}.",
+    "context": "You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
   },
   {
     "term": "petition-replies.field-comments.placeholder",
@@ -8306,13 +8311,13 @@
   },
   {
     "term": "recipient-view.field-comments.cta",
-    "definition": "¿Alguna duda? Pregunte por aquí",
-    "context": "Have any questions? Ask here"
+    "definition": "{tone, select, INFORMAL{¿Alguna duda? Pregunta por aquí} other{¿Tiene alguna duda? Pregunte por aquí}}",
+    "context": "{tone, select, INFORMAL{Have} other{Do you have}} any questions? Ask here"
   },
   {
     "term": "recipient-view.field-comments.cta-with-name",
-    "definition": "¿Alguna duda? Pregunte por aquí a {name}",
-    "context": "Have any questions? Ask {name} here"
+    "definition": "{tone, select, INFORMAL{¿Alguna duda? Pregúntale aquí a {name}} other{¿Tiene alguna duda? Pregunte por aquí a {name}}}",
+    "context": "{tone, select, INFORMAL{Have} other{Do you have}} any questions? Ask {name} here"
   },
   {
     "term": "recipient-view.field-comments.placeholder",

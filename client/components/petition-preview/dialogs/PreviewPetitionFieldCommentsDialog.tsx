@@ -217,7 +217,7 @@ export function PreviewPetitionFieldCommentsDialog({
                   <CommentIcon color="gray.300" boxSize="64px" />
                   <Text color="gray.500">
                     <FormattedMessage
-                      id="recipient-view.field-comments.cta"
+                      id="component.preview-petition-field-comments-dialog.comments-cta"
                       defaultMessage="Have any questions? Ask here"
                     />
                   </Text>
