@@ -1561,6 +1561,7 @@ export interface NexusGenFieldTypes {
     petitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
     petitionsById: Array<NexusGenRootTypes["PetitionBase"] | null>; // [PetitionBase]!
+    publicGetCountry: string | null; // String
     publicOrgLogoUrl: string | null; // String
     publicPetitionField: NexusGenRootTypes["PublicPetitionField"]; // PublicPetitionField!
     publicPetitionLinkBySlug: NexusGenRootTypes["PublicPublicPetitionLink"] | null; // PublicPublicPetitionLink
@@ -2882,6 +2883,7 @@ export interface NexusGenFieldTypeNames {
     petitionField: "PetitionField";
     petitions: "PetitionBasePagination";
     petitionsById: "PetitionBase";
+    publicGetCountry: "String";
     publicOrgLogoUrl: "String";
     publicPetitionField: "PublicPetitionField";
     publicPetitionLinkBySlug: "PublicPublicPetitionLink";

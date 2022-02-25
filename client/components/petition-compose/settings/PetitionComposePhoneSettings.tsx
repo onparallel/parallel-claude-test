@@ -14,18 +14,10 @@ export function PhoneSettings({
   isReadOnly,
 }: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">) {
   const options = field.options as FieldOptions["PHONE"];
-  // const selectRef = useRef<Select<OptionType, false, never>>(null);
   const [placeholder, setPlaceholder] = useState(options.placeholder ?? "");
+  const [phoneCode, setPhoneCode] = useState(options.defaultCountry);
 
-  // useEffect(() => {
-  //   if (!data.loading && selectRef.current && selectOptions) {
-  //     selectRef.current.select.selectOption(
-  //       selectOptions.find((o) => o.value === options.defaultCountry) ?? selectOptions[0]
-  //     );
-  //   }
-  // }, [data.loading, selectRef.current]);
-
-  const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 300, [field.id]);
+  const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 100, [field.id]);
 
   const handlePlaceholderChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -39,6 +31,7 @@ export function PhoneSettings({
   };
 
   const handleDefaultCountryChange = (country: string | null) => {
+    setPhoneCode(country);
     debouncedOnUpdate(field.id, {
       options: {
         ...field.options,
@@ -60,11 +53,7 @@ export function PhoneSettings({
         controlId="default-country"
       >
         <Box width="100%">
-          <PhoneCodeSelect
-            size="sm"
-            value={options.defaultCountry}
-            onChange={handleDefaultCountryChange}
-          />
+          <PhoneCodeSelect size="sm" value={phoneCode} onChange={handleDefaultCountryChange} />
         </Box>
       </SettingsRow>
       <SettingsRowPlaceholder

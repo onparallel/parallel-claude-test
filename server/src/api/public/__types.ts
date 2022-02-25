@@ -2602,6 +2602,7 @@ export type Query = {
   /** The petitions of the user */
   petitions: PetitionBasePagination;
   petitionsById: Array<Maybe<PetitionBase>>;
+  publicGetCountry: Maybe<Scalars["String"]>;
   publicOrgLogoUrl: Maybe<Scalars["String"]>;
   /** The comments for this field. */
   publicPetitionField: PublicPetitionField;

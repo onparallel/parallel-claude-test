@@ -3,6 +3,7 @@ import { HighlightText } from "@parallel/components/common/HighlightText";
 import { flags } from "@parallel/utils/flags";
 import { phoneCodes } from "@parallel/utils/phoneCodes";
 import { UseReactSelectProps, useReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuList";
 import { OptionType } from "@parallel/utils/react-select/types";
 import { useLoadCountryNames } from "@parallel/utils/useCountryName";
 import { forwardRef, useMemo } from "react";
@@ -27,19 +28,28 @@ export const PhoneCodeSelect = forwardRef<
   const intl = useIntl();
   const { countries } = useLoadCountryNames(intl.locale);
   const options = useMemo<PhoneCodeSelectOptionType[] | undefined>(() => {
-    return isDefined(countries)
-      ? Object.entries(countries).map(([key, value]) => {
-          return {
-            label: value,
-            value: key,
-            flag: flags[key],
-            code: phoneCodes[key],
-          };
-        })
-      : undefined;
+    if (!isDefined(countries)) return undefined;
+
+    const sortedCountries = Object.entries(countries).sort((a, b) =>
+      a[1].localeCompare(b[1], intl.locale)
+    );
+
+    return sortedCountries.map(([key, value]) => {
+      return {
+        label: value,
+        value: key,
+        flag: flags[key],
+        code: phoneCodes[key],
+      };
+    });
   }, [countries]);
   const _value = useMemo(() => options?.find((o) => o.value === value), [options, value]);
-  const rsProps = useReactSelectProps<PhoneCodeSelectOptionType, false, never>(props);
+  const rsProps = useReactSelectProps<PhoneCodeSelectOptionType, false, never>({
+    components: {
+      MenuList: OptimizedMenuList,
+    },
+    ...props,
+  });
   return (
     <Select
       ref={ref}
@@ -63,22 +73,19 @@ export const PhoneCodeSelect = forwardRef<
   );
 });
 
-const formatOptionLabel: SelectProps<
-  PhoneCodeSelectOptionType,
-  false,
-  never
->["formatOptionLabel"] = ({ label, flag, code }, { inputValue }) => {
-  return (
-    <HStack>
-      <Text as="span" minWidth={4} role="presentation">
-        {flag}
-      </Text>
-      <Text as="span">
-        <HighlightText text={label} search={inputValue} />
-      </Text>
-      <Text as="span" color="gray.500">
-        {code}
-      </Text>
-    </HStack>
-  );
-};
+const formatOptionLabel: SelectProps<PhoneCodeSelectOptionType, false, never>["formatOptionLabel"] =
+  ({ label, flag, code }, { inputValue }) => {
+    return (
+      <HStack>
+        <Text as="span" minWidth={4} role="presentation">
+          {flag}
+        </Text>
+        <Text as="span">
+          <HighlightText text={label} search={inputValue} />
+        </Text>
+        <Text as="span" color="gray.500">
+          {code}
+        </Text>
+      </HStack>
+    );
+  };

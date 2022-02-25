@@ -145,7 +145,7 @@ export function RecipientViewPetitionFieldPhone({
         }
       }
     },
-    placeholder: options.placeholder ?? phoneCodes[options.defaultCountry] ?? "+",
+    placeholder: options.placeholder ?? phoneCodes[options.defaultCountry ?? ""] ?? "+",
   };
 
   return (
@@ -185,7 +185,7 @@ export function RecipientViewPetitionFieldPhone({
       {(field.multiple && showNewReply) || field.replies.length === 0 ? (
         <Flex flex="1" position="relative" marginTop={2}>
           <PhoneInputLazy
-            defaultCountry={options.defaultCountry}
+            defaultCountry={options.defaultCountry ?? undefined}
             value={value}
             onChange={(value: string, { isValid }) => {
               if (isSaving) {
@@ -263,14 +263,14 @@ export const RecipientViewPetitionFieldReplyPhone = forwardRef<
         onDelete(true);
       }
     },
-    placeholder: options.placeholder ?? phoneCodes[options.defaultCountry],
+    placeholder: options.placeholder ?? phoneCodes[options.defaultCountry ?? ""] + "+",
   };
 
   return (
     <Stack direction="row">
       <Flex flex="1" position="relative">
         <PhoneInputLazy
-          defaultCountry={options.defaultCountry}
+          defaultCountry={options.defaultCountry ?? undefined}
           value={value}
           onChange={(value: string, { isValid }) => {
             setIsInvalidValue(!isValid && isDefined(value));

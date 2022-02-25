@@ -38,6 +38,7 @@
   "dependencies": {
     "@foundernest/namecase": "^1.0.5",
     "@graphql-typed-document-node/core": "^3.1.1",
+    "@types/geoip-country": "^4.0.0",
     "ajv": "^8.10.0",
     "ajv-formats": "^2.1.1",
     "amazon-cognito-identity-js": "^5.2.6",
@@ -67,6 +68,7 @@
     "fold-to-ascii": "^5.0.0",
     "form-data": "^4.0.0",
     "fuse.js": "^6.5.3",
+    "geoip-country": "^4.0.109",
     "graphemer": "^1.3.0",
     "graphql": "^16.3.0",
     "graphql-request": "^4.0.0",

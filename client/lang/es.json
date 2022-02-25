@@ -1340,9 +1340,9 @@
     "context": "Too many attachments"
   },
   {
-    "term": "component.petition-compose-phone-settings.default",
-    "definition": "Por defecto:",
-    "context": "Default:"
+    "term": "component.petition-compose-phone-settings.default-country",
+    "definition": "País por defecto",
+    "context": "Default country"
   },
   {
     "term": "component.petition-contents.hidden-fields-divider",
@@ -2128,6 +2128,11 @@
     "term": "component.petition-user-notification.mark-as-unread",
     "definition": "Marcar como no leído",
     "context": "Mark as unread"
+  },
+  {
+    "term": "component.phone-code-input.placeholder",
+    "definition": "Selecciona un país...",
+    "context": "Select a country..."
   },
   {
     "term": "component.placeholder-input.hint",

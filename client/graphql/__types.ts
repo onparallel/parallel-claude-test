@@ -2689,6 +2689,7 @@ export interface Query {
   /** The petitions of the user */
   petitions: PetitionBasePagination;
   petitionsById: Array<Maybe<PetitionBase>>;
+  publicGetCountry?: Maybe<Scalars["String"]>;
   publicOrgLogoUrl?: Maybe<Scalars["String"]>;
   /** The comments for this field. */
   publicPetitionField: PublicPetitionField;
@@ -18008,6 +18009,10 @@ export type useGetPageFields_PetitionFieldFragment = {
   }>;
 };
 
+export type useGetUserCountryISO_publicGetCountryQueryVariables = Exact<{ [key: string]: never }>;
+
+export type useGetUserCountryISO_publicGetCountryQuery = { publicGetCountry?: string | null };
+
 export type useLiquidScope_PetitionFieldFragment = {
   __typename?: "PetitionField";
   type: PetitionFieldType;
@@ -24960,6 +24965,14 @@ export const useExportRepliesTask_getTaskResultFileUrlDocument = gql`
 ` as unknown as DocumentNode<
   useExportRepliesTask_getTaskResultFileUrlMutation,
   useExportRepliesTask_getTaskResultFileUrlMutationVariables
+>;
+export const useGetUserCountryISO_publicGetCountryDocument = gql`
+  query useGetUserCountryISO_publicGetCountry {
+    publicGetCountry
+  }
+` as unknown as DocumentNode<
+  useGetUserCountryISO_publicGetCountryQuery,
+  useGetUserCountryISO_publicGetCountryQueryVariables
 >;
 export const PetitionSignaturesCardPolling_petitionDocument = gql`
   query PetitionSignaturesCardPolling_petition($petitionId: GID!) {

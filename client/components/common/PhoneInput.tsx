@@ -11,6 +11,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { flags } from "@parallel/utils/flags";
 import { phoneCodes } from "@parallel/utils/phoneCodes";
 import { useConstant } from "@parallel/utils/useConstant";
+import { useGetUserCountryISO } from "@parallel/utils/useGetUserCountryISO";
 import { AsYouType } from "libphonenumber-js/min/index";
 import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
 import { isDefined } from "remeda";
@@ -36,6 +37,8 @@ export default chakraForwardRef<"input", PhoneInputProps>(function PhoneInput(
   const [inputValue, setInputValue] = useState("");
   const [country, setCountry] = useState<string | undefined>(undefined);
 
+  const usersCountry = useGetUserCountryISO();
+
   useEffect(() => {
     if (formatter.getNumberValue() !== value) {
       formatter.reset();
@@ -57,8 +60,9 @@ export default chakraForwardRef<"input", PhoneInputProps>(function PhoneInput(
       return;
     }
     if (newValue && !newValue.startsWith("+")) {
-      if (defaultCountry) {
-        newValue = phoneCodes[defaultCountry] + newValue;
+      const phoneCode = phoneCodes[defaultCountry ?? usersCountry ?? ""];
+      if (phoneCode) {
+        newValue = phoneCode + newValue;
       } else {
         newValue = "+" + newValue;
       }
@@ -108,6 +112,8 @@ export default chakraForwardRef<"input", PhoneInputProps>(function PhoneInput(
           <Box fontSize="xl">{flags[country]}</Box>
         ) : defaultCountry ? (
           <Box fontSize="xl">{flags[defaultCountry]}</Box>
+        ) : usersCountry ? (
+          <Box fontSize="xl">{flags[usersCountry]}</Box>
         ) : (
           <FieldPhoneIcon />
         )}

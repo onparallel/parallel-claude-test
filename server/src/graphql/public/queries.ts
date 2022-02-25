@@ -2,6 +2,8 @@ import { idArg, nonNull, nullable, queryField } from "nexus";
 import { chain } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { authenticatePublicAccess, fieldBelongsToAccess, taskBelongsToAccess } from "./authorizers";
+import { lookup } from "geoip-country";
+import { getClientIp } from "request-ip";
 
 export const accessQuery = queryField("access", {
   type: nullable("PublicPetitionAccess"),
@@ -34,6 +36,15 @@ export const publicOrgLogo = queryField("publicOrgLogoUrl", {
   },
   resolve: async (_, { id }, ctx) => {
     return await ctx.organizations.getOrgLogoUrl(id);
+  },
+});
+
+export const publicGetCountry = queryField("publicGetCountry", {
+  type: nullable("String"),
+  resolve: async (_, args, ctx) => {
+    const ip = getClientIp(ctx.req);
+    const geo = lookup(ip ?? "");
+    return geo?.country ?? null;
   },
 });
 

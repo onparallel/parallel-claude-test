@@ -3773,6 +3773,7 @@ type Query {
     sortBy: [QueryPetitions_OrderBy!]
   ): PetitionBasePagination!
   petitionsById(ids: [GID!]!): [PetitionBase]!
+  publicGetCountry: String
   publicOrgLogoUrl(id: GID!): String
 
   """

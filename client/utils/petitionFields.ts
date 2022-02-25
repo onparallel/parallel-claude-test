@@ -36,7 +36,7 @@ export type FieldOptions = {
   PHONE: {
     hasCommentsEnabled: boolean;
     placeholder: Maybe<string>;
-    defaultCountry: string;
+    defaultCountry: string | null;
   };
   SELECT: {
     hasCommentsEnabled: boolean;
