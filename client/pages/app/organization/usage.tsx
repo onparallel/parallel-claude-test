@@ -78,14 +78,14 @@ function OrganizationUsage() {
             usage={petitions.used}
             limit={petitions.limit}
           />
-          <UsageCard
+          {/* <UsageCard
             title={intl.formatMessage({
               id: "page.usage.signatures",
               defaultMessage: "Signatures",
             })}
             usage={signatures.used}
             limit={signatures.limit}
-          />
+          /> */}
         </Grid>
       </Box>
     </SettingsLayout>
