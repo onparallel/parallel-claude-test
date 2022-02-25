@@ -222,7 +222,9 @@ async function createPetitionSharedUserNotifications(
       },
     ]);
   } else if (event.type === "GROUP_PERMISSION_ADDED") {
-    const members = await ctx.userGroups.loadUserGroupMembers(event.data.user_group_id);
+    const members = (await ctx.userGroups.loadUserGroupMembers(event.data.user_group_id))
+      // avoid sending notification to the user that shared the petition if he is a member of the group
+      .filter((m) => m.user_id !== event.data.user_id);
     await ctx.petitions.createPetitionUserNotification(
       members.map((m) => ({
         type: "PETITION_SHARED",
