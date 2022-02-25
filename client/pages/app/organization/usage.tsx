@@ -33,7 +33,11 @@ function OrganizationUsage() {
 
   const {
     activeUserCount,
-    usageLimits: { petitions, users, signatures },
+    usageLimits: {
+      petitions,
+      users,
+      // signatures
+    },
   } = organization;
 
   return (
