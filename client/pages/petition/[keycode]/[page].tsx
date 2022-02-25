@@ -238,7 +238,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                   </Flex>
                 </CloseableAlert>
               ) : (
-                <CloseableAlert zIndex={2}>
+                <CloseableAlert status="warning" zIndex={2}>
                   <Flex
                     maxWidth="container.lg"
                     alignItems="center"
