@@ -73,19 +73,22 @@ export const PhoneCodeSelect = forwardRef<
   );
 });
 
-const formatOptionLabel: SelectProps<PhoneCodeSelectOptionType, false, never>["formatOptionLabel"] =
-  ({ label, flag, code }, { inputValue }) => {
-    return (
-      <HStack>
-        <Text as="span" minWidth={4} role="presentation">
-          {flag}
-        </Text>
-        <Text as="span">
-          <HighlightText text={label} search={inputValue} />
-        </Text>
-        <Text as="span" color="gray.500">
-          {code}
-        </Text>
-      </HStack>
-    );
-  };
+const formatOptionLabel: SelectProps<
+  PhoneCodeSelectOptionType,
+  false,
+  never
+>["formatOptionLabel"] = ({ label, flag, code }, { inputValue }) => {
+  return (
+    <HStack>
+      <Text as="span" minWidth={4} role="presentation">
+        {flag}
+      </Text>
+      <Text as="span">
+        <HighlightText text={label} search={inputValue} />
+      </Text>
+      <Text as="span" color="gray.500">
+        {code}
+      </Text>
+    </HStack>
+  );
+};

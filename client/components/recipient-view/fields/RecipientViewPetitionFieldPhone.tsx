@@ -270,7 +270,7 @@ export const RecipientViewPetitionFieldReplyPhone = forwardRef<
       }
     },
     placeholder:
-      options.placeholder ?? phoneCodes[options.defaultCountry ?? usersCountry ?? ""] + "+",
+      options.placeholder ?? phoneCodes[options.defaultCountry ?? usersCountry ?? ""] ?? "+",
   };
 
   return (
