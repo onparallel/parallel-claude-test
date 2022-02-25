@@ -272,11 +272,7 @@ function OrganizationUsers() {
           onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           onRowClick={(user) =>
-            me.id !== user.id &&
-            isAdmin(me) &&
-            !user.isSsoUser &&
-            user.role !== "OWNER" &&
-            handleUpdateUser(user)
+            me.id !== user.id && isAdmin(me) && user.role !== "OWNER" && handleUpdateUser(user)
           }
           header={
             <OrganizationUsersListTableHeader
