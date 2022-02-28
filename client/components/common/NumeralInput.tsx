@@ -11,10 +11,12 @@ interface NumeralInputProps extends ThemingProps<"Input">, FormControlOptions {
   positiveOnly?: boolean;
   onChange: (value: number | undefined) => void;
   value: number | undefined;
+  prefix?: string;
+  tailPrefix?: boolean;
 }
 
 export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(function NumeralInput(
-  { decimals, positiveOnly, value, onChange, ...props },
+  { decimals, positiveOnly, value, prefix, tailPrefix, onChange, ...props },
   ref
 ) {
   const intl = useIntl();
@@ -26,15 +28,22 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
       delimiter: parts.find((p) => p.type === "group")!.value,
       numeralDecimalScale: decimals ?? 5,
       numeralPositiveOnly: positiveOnly,
+      prefix,
+      tailPrefix,
+      noImmediatePrefix: true,
     };
   }, [intl.locale, decimals, positiveOnly]);
+
   const [_value, setValue] = useState(isDefined(value) ? intl.formatNumber(value) : "");
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
     if (e.target.value === "") {
       onChange?.(undefined);
     } else {
-      const numericValue = Number((e.target as InputCleaveElement).rawValue);
+      const rawValue = prefix
+        ? (e.target as InputCleaveElement).rawValue?.replace(prefix, "")
+        : (e.target as InputCleaveElement).rawValue;
+      const numericValue = Number(rawValue);
       if (!Number.isNaN(numericValue)) {
         onChange?.(numericValue);
       }

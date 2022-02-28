@@ -835,6 +835,26 @@
     "context": "Limit the value range of the recipient's responses."
   },
   {
+    "term": "component.field-settings-number.add-text-symbols",
+    "definition": "Add text or symbols",
+    "context": "Add text or symbols"
+  },
+  {
+    "term": "component.field-settings-number.add-text-symbols-description",
+    "definition": "Add symbols or text that you want to appear before or after the replies:",
+    "context": "Add symbols or text that you want to appear before or after the replies:"
+  },
+  {
+    "term": "component.field-settings-number.add-text-symbols-example",
+    "definition": "Example:",
+    "context": "Example:"
+  },
+  {
+    "term": "component.field-settings-number.decimals",
+    "definition": "No. of decimals allowed:",
+    "context": "No. of decimals allowed:"
+  },
+  {
     "term": "component.field-settings-number.limit-range",
     "definition": "Limit value range",
     "context": "Limit value range"
@@ -3810,6 +3830,11 @@
     "context": "Added at"
   },
   {
+    "term": "generic.after",
+    "definition": "After",
+    "context": "After"
+  },
+  {
     "term": "generic.all-categories",
     "definition": "All categories",
     "context": "All categories"
@@ -3828,6 +3853,11 @@
     "term": "generic.attached-file",
     "definition": "Attached file: {filename}",
     "context": "Attached file: {filename}"
+  },
+  {
+    "term": "generic.before",
+    "definition": "Before",
+    "context": "Before"
   },
   {
     "term": "generic.by",

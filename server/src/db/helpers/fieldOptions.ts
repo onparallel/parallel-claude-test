@@ -22,6 +22,15 @@ const SCHEMAS = {
           max: { type: "number" },
         },
       },
+      decimals: {
+        type: "number",
+      },
+      prefix: {
+        type: ["string", "null"],
+      },
+      suffix: {
+        type: ["string", "null"],
+      },
     },
   },
   DATE: {
@@ -285,6 +294,9 @@ export function defaultFieldOptions(
           range: {
             min: 0,
           },
+          decimals: 2,
+          prefix: null,
+          suffix: null,
         };
       }
       case "PHONE": {

@@ -14,6 +14,8 @@ import {
 } from "@parallel/graphql/__types";
 import { getMyId } from "@parallel/utils/apollo/getMyId";
 import { FORMATS } from "@parallel/utils/dates";
+import { formatNumberWithPrefix } from "@parallel/utils/formatNumberWithPrefix";
+import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
 import useMergedRef from "@react-hook/merged-ref";
@@ -134,7 +136,12 @@ export function PetitionRepliesFieldReply({
         {isTextLikeType ? (
           <BreakLines>{reply.content.text}</BreakLines>
         ) : reply.field!.type === "NUMBER" ? (
-          <Text wordBreak="break-all">{intl.formatNumber(reply.content.value)}</Text>
+          <Text wordBreak="break-all" whiteSpace="pre">
+            {formatNumberWithPrefix(
+              reply.content.value,
+              reply.field!.options as FieldOptions["NUMBER"]
+            )}
+          </Text>
         ) : reply.field!.type === "DATE" ? (
           <Text>
             {intl.formatDate(reply.content.value, {
@@ -241,6 +248,7 @@ PetitionRepliesFieldReply.fragments = {
       metadata
       field {
         type
+        options
       }
       updatedBy {
         ... on User {

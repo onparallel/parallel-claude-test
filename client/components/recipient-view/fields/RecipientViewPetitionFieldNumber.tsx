@@ -10,7 +10,7 @@ import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
 import { ComponentPropsWithRef, forwardRef, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, pick } from "remeda";
+import { isDefined } from "remeda";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
@@ -51,7 +51,12 @@ export function RecipientViewPetitionFieldNumber({
 
   const newReplyRef = useRef<HTMLInputElement>(null);
   const replyRefs = useMultipleRefs<HTMLInputElement>();
-  const { range, placeholder } = field.options as FieldOptions["NUMBER"];
+
+  const { range, placeholder, decimals, prefix, suffix } = field.options as FieldOptions["NUMBER"];
+
+  const hasPrefix = isDefined(prefix) || isDefined(suffix) ? true : false;
+  const isTailPrefix = isDefined(suffix);
+  const prefixValue = isTailPrefix ? suffix : prefix;
 
   function handleAddNewReply() {
     setShowNewReply(true);
@@ -103,21 +108,9 @@ export function RecipientViewPetitionFieldNumber({
       try {
         const replyId = await onCreateReply(value);
         if (replyId) {
-          const selection = pick(newReplyRef.current!, ["selectionStart", "selectionEnd"]);
           setValue(undefined);
           if (focusCreatedReply) {
             setShowNewReply(false);
-            setTimeout(() => {
-              const newReplyElement = replyRefs[replyId].current!;
-              if (newReplyElement) {
-                Object.assign(newReplyElement, selection);
-                newReplyElement.focus();
-                newReplyElement.setSelectionRange(
-                  newReplyElement.value.length,
-                  newReplyElement.value.length
-                );
-              }
-            });
           }
         }
       } catch {}
@@ -141,8 +134,10 @@ export function RecipientViewPetitionFieldNumber({
     ref: newReplyRef,
     isDisabled: isDisabled,
     isInvalid: isInvalidReply[field.id],
-    decimals: 2,
     positiveOnly: isDefined(range.min) && range.min >= 0,
+    decimals: decimals ?? 2,
+    prefix: hasPrefix ? prefixValue : undefined,
+    tailPrefix: hasPrefix ? isTailPrefix : undefined,
     onKeyDown: async (event) => {
       if (
         isMetaReturn(event) &&
@@ -171,7 +166,10 @@ export function RecipientViewPetitionFieldNumber({
         handleCreate.clear();
         setShowNewReply(false);
       }
-      if (field.replies.length > 0) {
+      if (
+        (field.replies.length > 0 && !isDefined(value)) ||
+        (isDefined(value) && isBetweenLimits(range, value))
+      ) {
         setShowNewReply(false);
       }
     },
@@ -188,11 +186,12 @@ export function RecipientViewPetitionFieldNumber({
       }
     },
     placeholder:
-      placeholder ??
-      intl.formatMessage({
-        id: "component.recipient-view-petition-field-reply.text-placeholder",
-        defaultMessage: "Enter your answer",
-      }),
+      placeholder ?? hasPrefix
+        ? prefixValue
+        : intl.formatMessage({
+            id: "component.recipient-view-petition-field-reply.text-placeholder",
+            defaultMessage: "Enter your answer",
+          }),
   } as ComponentPropsWithRef<typeof NumeralInput>;
 
   const hasRange = isDefined(range.min) || isDefined(range.max);
@@ -311,7 +310,11 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
   { field, reply, isDisabled, onUpdate, onDelete, onAddNewReply, onInvalid },
   ref
 ) {
-  const { range, placeholder } = field.options as FieldOptions["NUMBER"];
+  const { range, placeholder, decimals, prefix, suffix } = field.options as FieldOptions["NUMBER"];
+
+  const hasPrefix = isDefined(prefix) || isDefined(suffix) ? true : false;
+  const isTailPrefix = isDefined(suffix);
+  const prefixValue = isTailPrefix ? suffix : prefix;
 
   const intl = useIntl();
   const [value, setValue] = useState(reply.content.value as number | undefined);
@@ -341,8 +344,10 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
     isDisabled: isDisabled || reply.status === "APPROVED",
     isInvalid: reply.status === "REJECTED" || isInvalid,
     paddingRight: 10,
-    decimals: 2,
     positiveOnly: isDefined(range.min) && range.min >= 0,
+    decimals: decimals ?? 2,
+    prefix: hasPrefix ? prefixValue : undefined,
+    tailPrefix: hasPrefix ? isTailPrefix : undefined,
     onKeyDown: async (event) => {
       if (isMetaReturn(event) && field.multiple) {
         onAddNewReply();
@@ -366,14 +371,17 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
     },
     onChange: (value) => {
       setValue(value);
-      setIsInvalid(!isDefined(value) || !isBetweenLimits(range, value));
+      if (isDefined(value)) {
+        setIsInvalid(!isBetweenLimits(range, value));
+      }
     },
     placeholder:
-      placeholder ??
-      intl.formatMessage({
-        id: "component.recipient-view-petition-field-reply.text-placeholder",
-        defaultMessage: "Enter your answer",
-      }),
+      placeholder ?? hasPrefix
+        ? prefixValue
+        : intl.formatMessage({
+            id: "component.recipient-view-petition-field-reply.text-placeholder",
+            defaultMessage: "Enter your answer",
+          }),
   } as ComponentPropsWithRef<typeof NumeralInput>;
 
   return (

@@ -32,6 +32,9 @@ export type FieldOptions = {
       min: number | undefined;
       max: number | undefined;
     };
+    decimals: number;
+    prefix: Maybe<string>;
+    suffix: Maybe<string>;
   };
   PHONE: {
     hasCommentsEnabled: boolean;

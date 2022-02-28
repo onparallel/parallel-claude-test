@@ -109,6 +109,7 @@ PetitionPdf.fragments = {
         id
         name
         fields {
+          options
           ...PetitionPdf_PetitionField
           ...useLiquidScope_PetitionField
         }

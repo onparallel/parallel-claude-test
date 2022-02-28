@@ -8548,7 +8548,11 @@ export type PetitionRepliesField_PetitionFieldFragment = {
     status: PetitionFieldReplyStatus;
     createdAt: string;
     metadata: { [key: string]: any };
-    field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null;
+    field?: {
+      __typename?: "PetitionField";
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+    } | null;
     updatedBy?:
       | {
           __typename?: "PetitionAccess";
@@ -8584,7 +8588,11 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
   status: PetitionFieldReplyStatus;
   createdAt: string;
   metadata: { [key: string]: any };
-  field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null;
+  field?: {
+    __typename?: "PetitionField";
+    type: PetitionFieldType;
+    options: { [key: string]: any };
+  } | null;
   updatedBy?:
     | {
         __typename?: "PetitionAccess";
@@ -8640,7 +8648,11 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
   status: PetitionFieldReplyStatus;
   createdAt: string;
   metadata: { [key: string]: any };
-  field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null;
+  field?: {
+    __typename?: "PetitionField";
+    type: PetitionFieldType;
+    options: { [key: string]: any };
+  } | null;
   updatedBy?:
     | {
         __typename?: "PetitionAccess";
@@ -15306,7 +15318,11 @@ export type PetitionReplies_PetitionFragment = {
       status: PetitionFieldReplyStatus;
       createdAt: string;
       metadata: { [key: string]: any };
-      field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null;
+      field?: {
+        __typename?: "PetitionField";
+        type: PetitionFieldType;
+        options: { [key: string]: any };
+      } | null;
       updatedBy?:
         | {
             __typename?: "PetitionAccess";
@@ -15435,7 +15451,11 @@ export type PetitionReplies_PetitionFieldFragment = {
     status: PetitionFieldReplyStatus;
     createdAt: string;
     metadata: { [key: string]: any };
-    field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null;
+    field?: {
+      __typename?: "PetitionField";
+      type: PetitionFieldType;
+      options: { [key: string]: any };
+    } | null;
     updatedBy?:
       | {
           __typename?: "PetitionAccess";
@@ -15591,7 +15611,11 @@ export type PetitionReplies_closePetitionMutation = {
         status: PetitionFieldReplyStatus;
         createdAt: string;
         metadata: { [key: string]: any };
-        field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null;
+        field?: {
+          __typename?: "PetitionField";
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+        } | null;
         updatedBy?:
           | {
               __typename?: "PetitionAccess";
@@ -15749,7 +15773,11 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         status: PetitionFieldReplyStatus;
         createdAt: string;
         metadata: { [key: string]: any };
-        field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null;
+        field?: {
+          __typename?: "PetitionField";
+          type: PetitionFieldType;
+          options: { [key: string]: any };
+        } | null;
         updatedBy?:
           | {
               __typename?: "PetitionAccess";
@@ -16002,7 +16030,11 @@ export type PetitionReplies_petitionQuery = {
             status: PetitionFieldReplyStatus;
             createdAt: string;
             metadata: { [key: string]: any };
-            field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null;
+            field?: {
+              __typename?: "PetitionField";
+              type: PetitionFieldType;
+              options: { [key: string]: any };
+            } | null;
             updatedBy?:
               | {
                   __typename?: "PetitionAccess";
@@ -17449,10 +17481,10 @@ export type PetitionPdf_PetitionFragment = {
   fromTemplateId?: string | null;
   fields: Array<{
     __typename?: "PetitionField";
+    options: { [key: string]: any };
     id: string;
     type: PetitionFieldType;
     title?: string | null;
-    options: { [key: string]: any };
     description?: string | null;
     showInPdf: boolean;
     multiple: boolean;
@@ -17517,10 +17549,10 @@ export type PetitionPdf_petitionQuery = {
     fromTemplateId?: string | null;
     fields: Array<{
       __typename?: "PetitionField";
+      options: { [key: string]: any };
       id: string;
       type: PetitionFieldType;
       title?: string | null;
-      options: { [key: string]: any };
       description?: string | null;
       showInPdf: boolean;
       multiple: boolean;
@@ -20902,6 +20934,7 @@ export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
     metadata
     field {
       type
+      options
     }
     updatedBy {
       ... on User {
@@ -21727,6 +21760,7 @@ export const PetitionPdf_PetitionFragmentDoc = gql`
     id
     name
     fields {
+      options
       ...PetitionPdf_PetitionField
       ...useLiquidScope_PetitionField
     }
