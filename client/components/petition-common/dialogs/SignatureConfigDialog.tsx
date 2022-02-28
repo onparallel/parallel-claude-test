@@ -27,6 +27,7 @@ import { Steps } from "@parallel/components/common/Steps";
 import {
   SignatureConfigDialog_PetitionBaseFragment,
   SignatureConfigDialog_SignatureOrgIntegrationFragment,
+  SignatureConfigDialog_UserFragment,
   SignatureConfigInput,
 } from "@parallel/graphql/__types";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
@@ -38,19 +39,22 @@ import { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm, UseFormHandleSubmit } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
-import { noop } from "remeda";
+import { isDefined, noop, pick } from "remeda";
 import { SelectedSignerRow } from "../SelectedSignerRow";
+import { SuggestedSigners } from "../SuggestedSigners";
 import { SignerSelectSelection } from "./ConfirmPetitionSignersDialog";
 import { useConfirmSignerInfoDialog } from "./ConfirmSignerInfoDialog";
 
 export type SignatureConfigDialogProps = {
   petition: SignatureConfigDialog_PetitionBaseFragment;
   providers: SignatureConfigDialog_SignatureOrgIntegrationFragment[];
+  user: SignatureConfigDialog_UserFragment;
 };
 
 export function SignatureConfigDialog({
   petition,
   providers,
+  user,
   ...props
 }: DialogProps<SignatureConfigDialogProps, SignatureConfigInput>) {
   const intl = useIntl();
@@ -71,13 +75,10 @@ export function SignatureConfigDialog({
     titleRef,
   });
 
-  const step2Props = useSignatureConfigDialogBodyStep2Props({
-    signers: petition.signatureConfig?.signers ?? [],
-    isTemplate: petition.__typename === "PetitionTemplate",
-    allowAdditionalSigners: petition.signatureConfig?.allowAdditionalSigners ?? false,
-  });
+  const step2Props = useSignatureConfigDialogBodyStep2Props({ petition, user });
 
   const review = step1Props.form.watch("review");
+  const { petitionIsCompleted } = step2Props;
 
   function handleClickPreviousStep() {
     if (isFirstStep) {
@@ -168,7 +169,14 @@ export function SignatureConfigDialog({
       confirm={
         <Button colorScheme="purple" onClick={handleClickNextStep}>
           {isLastStep || review ? (
-            <FormattedMessage id="generic.save" defaultMessage="Save" />
+            petitionIsCompleted ? (
+              <FormattedMessage
+                id="component.signature-config-dialog.confirm-start"
+                defaultMessage="Start signature"
+              />
+            ) : (
+              <FormattedMessage id="generic.save" defaultMessage="Save" />
+            )
           ) : (
             <FormattedMessage id="generic.continue" defaultMessage="Continue" />
           )}
@@ -210,12 +218,20 @@ SignatureConfigDialog.fragments = {
         }
         ... on Petition {
           status
+          accesses {
+            status
+            contact {
+              id
+              firstName
+              lastName
+              email
+            }
+          }
         }
       }
       ${this.SignatureOrgIntegration}
     `;
   },
-
   get SignatureOrgIntegration() {
     return gql`
       fragment SignatureConfigDialog_SignatureOrgIntegration on SignatureOrgIntegration {
@@ -223,6 +239,15 @@ SignatureConfigDialog.fragments = {
         name
         isDefault
         environment
+      }
+    `;
+  },
+  get User() {
+    return gql`
+      fragment SignatureConfigDialog_User on User {
+        firstName
+        lastName
+        email
       }
     `;
   },
@@ -425,16 +450,22 @@ function SignatureConfigDialogBodyStep1({
 }
 
 function useSignatureConfigDialogBodyStep2Props({
-  isTemplate,
-  signers,
-  allowAdditionalSigners,
+  petition,
+  user,
 }: {
-  isTemplate: boolean;
-  signers: SignerSelectSelection[];
-  allowAdditionalSigners?: boolean;
+  petition: SignatureConfigDialog_PetitionBaseFragment;
+  user: SignatureConfigDialog_UserFragment;
 }) {
+  const signers = petition.signatureConfig?.signers ?? [];
+  const allowAdditionalSigners = petition.signatureConfig?.allowAdditionalSigners ?? false;
+  const petitionIsCompleted =
+    petition.__typename === "Petition" && ["COMPLETED", "CLOSED"].includes(petition.status);
+
   return {
-    isTemplate,
+    user,
+    accesses: petition.__typename === "Petition" ? petition.accesses : [],
+    petitionIsCompleted,
+    isTemplate: petition.__typename === "PetitionTemplate",
     form: useForm<{
       signers: SignerSelectSelection[];
       allowAdditionalSigners: boolean;
@@ -458,6 +489,9 @@ export function SignatureConfigDialogBodyStep2({
     clearErrors,
   },
   isTemplate,
+  petitionIsCompleted,
+  user,
+  accesses,
 }: ReturnType<typeof useSignatureConfigDialogBodyStep2Props>) {
   const signers = watch("signers");
 
@@ -465,6 +499,26 @@ export function SignatureConfigDialogBodyStep2({
   const handleSearchContacts = useSearchContacts();
   const handleCreateContact = useCreateContact();
   const showConfirmSignerInfo = useConfirmSignerInfoDialog();
+
+  const suggestions: SignerSelectSelection[] = petitionIsCompleted
+    ? [
+        {
+          email: user.email,
+          firstName: user.firstName ?? "",
+          lastName: user.lastName,
+          isSuggested: true,
+        },
+        ...accesses
+          .filter(
+            (a) => a.status === "ACTIVE" && isDefined(a.contact) && a.contact.email !== user.email
+          )
+          .map((a) => ({
+            contactId: a.contact!.id,
+            isSuggested: true,
+            ...pick(a.contact!, ["email", "firstName", "lastName"]),
+          })),
+      ].filter((suggestion) => !signers.some((s) => s.email === suggestion.email))
+    : [];
 
   const [selectedContact, setSelectedContact] = useState<ContactSelectSelection | null>(null);
 
@@ -498,7 +552,7 @@ export function SignatureConfigDialogBodyStep2({
     };
 
   const [radioSelection, setRadioSelection] = useState<"choose-after" | "choose-now">(
-    signers.length === 0 ? "choose-after" : "choose-now"
+    petitionIsCompleted || signers.length > 0 ? "choose-now" : "choose-after"
   );
 
   useEffect(() => {
@@ -517,7 +571,7 @@ export function SignatureConfigDialogBodyStep2({
         value={radioSelection}
         onChange={(value: any) => setRadioSelection(value)}
       >
-        <Radio value="choose-after">
+        <Radio value="choose-after" isDisabled={petitionIsCompleted}>
           <FormattedMessage
             id="component.signature-config-dialog.radiobutton.option-1"
             defaultMessage="Indicate once the petition is completed"
@@ -584,6 +638,10 @@ export function SignatureConfigDialogBodyStep2({
                     id: "component.signature-config-dialog.contact-select.add-contact-to-sign.placeholder",
                     defaultMessage: "Add a contact to sign",
                   })}
+                />
+                <SuggestedSigners
+                  suggestions={suggestions}
+                  onAddSigner={(s) => onChange([...signers, s])}
                 />
               </Box>
             </>

@@ -290,11 +290,6 @@
     "context": "Start signature"
   },
   {
-    "term": "component.confirm-petition-signers-dialog.suggestions",
-    "definition": "Sugerido:",
-    "context": "Suggested:"
-  },
-  {
     "term": "component.confirm-remove-member-dialog.body",
     "definition": "¿Estás seguro de querer <b>quitar del equipo</b> a {count, plural, =1{{fullName}} other {los miembros seleccionados}}? Si continúas, {count, plural, =1{perderá} other {perderán}} el acceso a las peticiones compartidas con el equipo.",
     "context": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the team? If you continue, {count, plural, =1{he} other {they}} will lose access to petitions shared with the team."
@@ -2730,11 +2725,6 @@
     "context": "Start signature"
   },
   {
-    "term": "component.recipient-view.confirm-petition-signers-dialog.suggestions",
-    "definition": "Sugerido:",
-    "context": "Suggested:"
-  },
-  {
     "term": "component.recipient-view.reminder-submit",
     "definition": "{tone, select, INFORMAL{Recuerda finalizar cuando completes todos los campos.} other{Recuerde finalizar una vez haya completado todos los campos.}}",
     "context": "Remember to click Finalize when you finish entering all the information."
@@ -3000,6 +2990,11 @@
     "context": "Allow additional signers to be added"
   },
   {
+    "term": "component.signature-config-dialog.confirm-start",
+    "definition": "Iniciar firma",
+    "context": "Start signature"
+  },
+  {
     "term": "component.signature-config-dialog.contact-select.add-contact-to-sign.placeholder",
     "definition": "Añade un contacto para firmar",
     "context": "Add a contact to sign"
@@ -3128,6 +3123,11 @@
     "term": "component.solve-unreviewed-replies-dialog.subheading",
     "definition": "¿Qué quieres hacer con ellas?",
     "context": "What would you like to do with them?"
+  },
+  {
+    "term": "component.suggested-signers.header",
+    "definition": "Sugerido:",
+    "context": "Suggested:"
   },
   {
     "term": "component.table.filter-header",

@@ -8,7 +8,7 @@ import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import { SignerSelectSelection } from "@parallel/components/petition-common/dialogs/ConfirmPetitionSignersDialog";
 import { useConfirmSignerInfoDialog } from "@parallel/components/petition-common/dialogs/ConfirmSignerInfoDialog";
 import { SelectedSignerRow } from "@parallel/components/petition-common/SelectedSignerRow";
-import { SuggestedSignerRow } from "@parallel/components/petition-common/SuggestedSignerRow";
+import { SuggestedSigners } from "@parallel/components/petition-common/SuggestedSigners";
 import {
   Maybe,
   PublicPetitionSignerDataInput,
@@ -174,27 +174,10 @@ function RecipientViewConfirmPetitionSignersDialog({
                           defaultMessage="Add signers"
                         />
                       </Button>
-                      {suggestions.length > 0 ? (
-                        <>
-                          <Text fontWeight="bold" marginTop={4}>
-                            <FormattedMessage
-                              id="component.recipient-view.confirm-petition-signers-dialog.suggestions"
-                              defaultMessage="Suggested:"
-                            />
-                          </Text>
-                          <Stack marginTop={2} paddingLeft={2}>
-                            {suggestions.map((suggestion, i) => (
-                              <SuggestedSignerRow
-                                key={i}
-                                signer={suggestion}
-                                onAddClick={() => {
-                                  onChange([...signers, suggestion]);
-                                }}
-                              />
-                            ))}
-                          </Stack>
-                        </>
-                      ) : null}
+                      <SuggestedSigners
+                        suggestions={suggestions}
+                        onAddSigner={(s) => onChange([...signers, s])}
+                      />
                     </Box>
                   ) : null}
                 </>
@@ -264,10 +247,10 @@ useRecipientViewConfirmPetitionSignersDialog.fragments = {
       fullName
       email
       ...SelectedSignerRow_PetitionSigner
-      ...SuggestedSignerRow_PetitionSigner
+      ...SuggestedSigners_PetitionSigner
     }
     ${SelectedSignerRow.fragments.PetitionSigner}
-    ${SuggestedSignerRow.fragments.PetitionSigner}
+    ${SuggestedSigners.fragments.PetitionSigner}
   `,
   PublicContact: gql`
     fragment useRecipientViewConfirmPetitionSignersDialog_PublicContact on PublicContact {

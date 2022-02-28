@@ -23,7 +23,7 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, pick } from "remeda";
 import { SelectedSignerRow } from "../SelectedSignerRow";
-import { SuggestedSignerRow } from "../SuggestedSignerRow";
+import { SuggestedSigners } from "../SuggestedSigners";
 import { useConfirmSignerInfoDialog } from "./ConfirmSignerInfoDialog";
 
 interface ConfirmPetitionSignersDialogProps {
@@ -196,27 +196,10 @@ export function ConfirmPetitionSignersDialog({
                           defaultMessage: "Add a contact to sign",
                         })}
                       />
-                      {suggestions.length > 0 ? (
-                        <>
-                          <Text fontWeight="bold" marginTop={4}>
-                            <FormattedMessage
-                              id="component.confirm-petition-signers-dialog.suggestions"
-                              defaultMessage="Suggested:"
-                            />
-                          </Text>
-                          <Stack marginTop={2} paddingLeft={2}>
-                            {suggestions.map((suggestion, i) => (
-                              <SuggestedSignerRow
-                                key={i}
-                                signer={suggestion}
-                                onAddClick={() => {
-                                  onChange([...signers, suggestion]);
-                                }}
-                              />
-                            ))}
-                          </Stack>
-                        </>
-                      ) : null}
+                      <SuggestedSigners
+                        suggestions={suggestions}
+                        onAddSigner={(s) => onChange([...signers, s])}
+                      />
                     </Box>
                   ) : null}
                 </>
@@ -300,10 +283,10 @@ ConfirmPetitionSignersDialog.fragments = {
       firstName
       lastName
       ...SelectedSignerRow_PetitionSigner
-      ...SuggestedSignerRow_PetitionSigner
+      ...SuggestedSigners_PetitionSigner
     }
     ${SelectedSignerRow.fragments.PetitionSigner}
-    ${SuggestedSignerRow.fragments.PetitionSigner}
+    ${SuggestedSigners.fragments.PetitionSigner}
   `,
 };
 

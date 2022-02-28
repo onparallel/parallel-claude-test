@@ -290,11 +290,6 @@
     "context": "Start signature"
   },
   {
-    "term": "component.confirm-petition-signers-dialog.suggestions",
-    "definition": "Suggested:",
-    "context": "Suggested:"
-  },
-  {
     "term": "component.confirm-remove-member-dialog.body",
     "definition": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the team? If you continue, {count, plural, =1{he} other {they}} will lose access to petitions shared with the team.",
     "context": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the team? If you continue, {count, plural, =1{he} other {they}} will lose access to petitions shared with the team."
@@ -2730,11 +2725,6 @@
     "context": "Start signature"
   },
   {
-    "term": "component.recipient-view.confirm-petition-signers-dialog.suggestions",
-    "definition": "Suggested:",
-    "context": "Suggested:"
-  },
-  {
     "term": "component.recipient-view.reminder-submit",
     "definition": "Remember to click Finalize when you finish entering all the information.",
     "context": "Remember to click Finalize when you finish entering all the information."
@@ -3000,6 +2990,11 @@
     "context": "Allow additional signers to be added"
   },
   {
+    "term": "component.signature-config-dialog.confirm-start",
+    "definition": "Start signature",
+    "context": "Start signature"
+  },
+  {
     "term": "component.signature-config-dialog.contact-select.add-contact-to-sign.placeholder",
     "definition": "Add a contact to sign",
     "context": "Add a contact to sign"
@@ -3128,6 +3123,11 @@
     "term": "component.solve-unreviewed-replies-dialog.subheading",
     "definition": "What would you like to do with them?",
     "context": "What would you like to do with them?"
+  },
+  {
+    "term": "component.suggested-signers.header",
+    "definition": "Suggested:",
+    "context": "Suggested:"
   },
   {
     "term": "component.table.filter-header",

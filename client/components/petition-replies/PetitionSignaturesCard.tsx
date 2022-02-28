@@ -46,6 +46,7 @@ const fragments = {
     fragment PetitionSignaturesCard_User on User {
       ...TestModeSignatureBadge_User
       ...NewSignatureRequestRow_User
+      ...SignatureConfigDialog_User
       organization {
         signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
           items {
@@ -59,6 +60,7 @@ const fragments = {
     ${SignatureConfigDialog.fragments.SignatureOrgIntegration}
     ${TestModeSignatureBadge.fragments.User}
     ${NewSignatureRequestRow.fragments.User}
+    ${SignatureConfigDialog.fragments.User}
   `,
   Petition: gql`
     fragment PetitionSignaturesCard_Petition on Petition {
@@ -245,6 +247,7 @@ export const PetitionSignaturesCard = Object.assign(
           await showConfirmRestartSignature({});
         }
         const signatureConfig = await showSignatureConfigDialog({
+          user,
           petition,
           providers: signatureIntegrations,
         });

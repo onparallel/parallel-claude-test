@@ -130,6 +130,7 @@ function _PetitionSettings({
       }
       assertTypenameArray(signatureIntegrations, "SignatureOrgIntegration");
       const signatureConfig = await showSignatureConfigDialog({
+        user,
         petition,
         providers: signatureIntegrations,
       });
@@ -628,9 +629,11 @@ const fragments = {
           }
         }
       }
+      ...SignatureConfigDialog_User
     }
     ${TestModeSignatureBadge.fragments.User}
     ${SignatureConfigDialog.fragments.SignatureOrgIntegration}
+    ${SignatureConfigDialog.fragments.User}
   `,
   PetitionBase: gql`
     fragment PetitionSettings_PetitionBase on PetitionBase {
