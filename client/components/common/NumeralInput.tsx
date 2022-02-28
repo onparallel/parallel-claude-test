@@ -6,6 +6,7 @@ import { ChangeEvent, FocusEvent, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { InputCleave, InputCleaveElement } from "./InputCleave";
+import escapeStringRegexp from "escape-string-regexp";
 
 interface NumeralInputProps extends ThemingProps<"Input">, FormControlOptions {
   decimals?: number;
@@ -43,7 +44,7 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
     isDefined(value)
       ? intl.formatNumber(value, {
           minimumFractionDigits: 0,
-          maximumFractionDigits: 20,
+          maximumFractionDigits: decimals ?? 5,
         })
       : ""
   );
@@ -53,7 +54,12 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
       onChange?.(undefined);
     } else {
       const rawValue = prefix
-        ? (e.target as InputCleaveElement).rawValue?.replace(prefix, "")
+        ? (e.target as InputCleaveElement).rawValue?.replace(
+            new RegExp(
+              tailPrefix ? `${escapeStringRegexp(prefix)}$` : `^${escapeStringRegexp(prefix)}`
+            ),
+            ""
+          )
         : (e.target as InputCleaveElement).rawValue;
       const numericValue = Number(rawValue);
       if (!Number.isNaN(numericValue)) {
@@ -63,17 +69,19 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
   };
 
   const handleOnFocus = (e: FocusEvent<HTMLInputElement>) => {
-    onFocus?.(e);
-    if (prefix && tailPrefix) {
-      setTimeout(() => {
-        // move he cursor before the suffix
-        inputRef.current?.focus();
-        inputRef.current?.setSelectionRange(
-          e.target.value.length - prefix.length,
-          e.target.value.length - prefix.length
-        );
-      });
+    if (
+      prefix &&
+      tailPrefix &&
+      isDefined(e.target.selectionStart) &&
+      e.target.selectionStart > e.target.value.length - prefix.length
+    ) {
+      // move he cursor before the suffix
+      inputRef.current?.setSelectionRange(
+        e.target.value.length - prefix.length,
+        e.target.value.length - prefix.length
+      );
     }
+    onFocus?.(e);
   };
   return (
     <InputCleave
@@ -82,7 +90,7 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
       options={cleaveOptions}
       value={_value}
       onChange={handleChange}
-      onFocusCapture={handleOnFocus}
+      onFocus={handleOnFocus}
       {...props}
     />
   );
