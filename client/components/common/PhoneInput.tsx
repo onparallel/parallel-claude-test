@@ -11,8 +11,9 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { flags } from "@parallel/utils/flags";
 import { phoneCodes } from "@parallel/utils/phoneCodes";
 import { useConstant } from "@parallel/utils/useConstant";
+import useMergedRef from "@react-hook/merged-ref";
 import { AsYouType } from "libphonenumber-js/min/index";
-import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
+import { ChangeEvent, FocusEvent, useEffect, useRef, useState } from "react";
 import { isDefined } from "remeda";
 
 export interface PhoneInputProps extends ThemingProps<"Input">, FormControlOptions {
@@ -32,6 +33,9 @@ export default chakraForwardRef<"input", PhoneInputProps>(function PhoneInput(
   { value, onLoad, onChange, onBlur, defaultCountry, ...props },
   ref
 ) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const mergedRef = useMergedRef(ref, inputRef);
+
   const formatter = useConstant(() => new AsYouType());
   const [inputValue, setInputValue] = useState("");
   const [country, setCountry] = useState<string | undefined>(undefined);
@@ -53,6 +57,10 @@ export default chakraForwardRef<"input", PhoneInputProps>(function PhoneInput(
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     let newValue = e.target.value;
+    const cursorPosition = [
+      inputRef.current?.selectionStart ?? null,
+      inputRef.current?.selectionEnd ?? null,
+    ];
     if (inputValue === newValue) {
       return;
     }
@@ -78,6 +86,11 @@ export default chakraForwardRef<"input", PhoneInputProps>(function PhoneInput(
       // Wait until blur or append to reformat.
       formatter.reset();
       formatter.input(newValue);
+      setTimeout(() => {
+        // move back the cursor to the correct position
+        inputRef.current?.focus();
+        inputRef.current?.setSelectionRange(cursorPosition[0], cursorPosition[1]);
+      });
     }
     const formatted = (formatter as any).formattedOutput;
     setInputValue(formatted);
@@ -113,7 +126,7 @@ export default chakraForwardRef<"input", PhoneInputProps>(function PhoneInput(
         )}
       </InputLeftElement>
       <Input
-        ref={ref}
+        ref={mergedRef}
         type="tel"
         value={inputValue}
         onChange={handleChange}
