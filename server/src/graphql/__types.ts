@@ -3422,7 +3422,11 @@ export interface NexusGenArgTypes {
     };
     createOrganization: {
       // args
+      email: string; // String!
+      firstName: string; // String!
+      lastName: string; // String!
       name: string; // String!
+      password: string; // String!
       status: NexusGenEnums["OrganizationStatus"]; // OrganizationStatus!
     };
     createOrganizationUser: {

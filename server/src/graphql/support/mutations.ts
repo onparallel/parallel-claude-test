@@ -1,5 +1,8 @@
+import { Knex } from "knex";
 import { arg, booleanArg, idArg, intArg, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { isDefined, uniq } from "remeda";
+import { ApiContext } from "../../context";
+import { UserOrganizationRole } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { fromGlobalId } from "../../util/globalId";
 import { hash, random } from "../../util/token";
@@ -14,6 +17,47 @@ import { validateRegex } from "../helpers/validators/validateRegex";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validateHexColor } from "../tag/validators";
 import { supportMethodAccess } from "./authorizers";
+
+async function supportCreateUser(
+  args: {
+    orgId: number;
+    orgName: string;
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    role: UserOrganizationRole;
+    locale?: string;
+  },
+  ctx: ApiContext,
+  t?: Knex.Transaction
+) {
+  const email = args.email.trim().toLowerCase();
+  const cognitoId = await ctx.aws.createCognitoUser(
+    email,
+    args.password,
+    args.firstName,
+    args.lastName,
+    {
+      locale: args.locale ?? "en",
+      organizationName: args.orgName,
+      organizationUser: fullName(ctx.user!.first_name, ctx.user!.last_name),
+    }
+  );
+  return await ctx.users.createUser(
+    {
+      cognito_id: cognitoId!,
+      org_id: args.orgId,
+      organization_role: args.role,
+      email,
+      first_name: args.firstName,
+      last_name: args.lastName,
+      details: { source: "parallel", preferredLocale: args.locale ?? "en" },
+    },
+    `User:${ctx.user!.id}`,
+    t
+  );
+}
 
 export const assignPetitionToUser = mutationField("assignPetitionToUser", {
   description: "Clones the petition and assigns the given user as owner and creator.",
@@ -81,22 +125,52 @@ export const createOrganization = mutationField("createOrganization", {
   type: "SupportMethodResponse",
   args: {
     name: nonNull(stringArg({ description: "Name of the organization" })),
-    status: nonNull(arg({ type: "OrganizationStatus" })),
+    status: nonNull("OrganizationStatus"),
+    firstName: nonNull(stringArg({ description: "First name of the organization owner" })),
+    lastName: nonNull(stringArg({ description: "Last name of the organization owner" })),
+    email: nonNull(stringArg({ description: "Email of the organization owner" })),
+    password: nonNull(stringArg({ description: "Temporary password of the organization owner" })),
   },
   authorize: supportMethodAccess(),
+  validateArgs: validateAnd(
+    validEmail((args) => args.email, "email"),
+    emailIsAvailable((args) => args.email),
+    (_, { status }, ctx, info) => {
+      if (status === "ROOT") {
+        throw new ArgValidationError(info, "status", "Can't create an org with ROOT status");
+      }
+    }
+  ),
   resolve: async (_, args, ctx) => {
     try {
-      const org = await ctx.organizations.createOrganization(
-        {
-          name: args.name.trim(),
-          status: args.status,
-        },
-        `User:${ctx.user!.id}`
-      );
-      return {
-        result: RESULT.SUCCESS,
-        message: `Organization created with id ${org.id}`,
-      };
+      return await ctx.petitions.withTransaction(async (t) => {
+        const org = await ctx.organizations.createOrganization(
+          {
+            name: args.name.trim(),
+            status: args.status,
+          },
+          `User:${ctx.user!.id}`,
+          t
+        );
+        await supportCreateUser(
+          {
+            orgId: org.id,
+            orgName: org.name,
+            email: args.email,
+            firstName: args.firstName,
+            lastName: args.lastName,
+            password: args.password,
+            role: "OWNER",
+            locale: "es",
+          },
+          ctx,
+          t
+        );
+        return {
+          result: RESULT.SUCCESS,
+          message: `Organization:${org.id} created successfully with owner ${args.email}.`,
+        };
+      });
     } catch (e: any) {
       return { result: RESULT.FAILURE, message: e.message };
     }
@@ -122,33 +196,22 @@ export const createUser = mutationField("createUser", {
   authorize: supportMethodAccess(),
   resolve: async (_, args, ctx) => {
     try {
-      const email = args.email.trim().toLowerCase();
       const org = await ctx.organizations.loadOrg(args.organizationId);
       if (!org) {
         throw new Error(`Organization with id ${args.organizationId} does not exist.`);
       }
-      const cognitoId = await ctx.aws.createCognitoUser(
-        email,
-        args.password,
-        args.firstName,
-        args.lastName,
+      const user = await supportCreateUser(
         {
+          orgId: org.id,
+          orgName: org.name,
+          email: args.email,
+          firstName: args.firstName,
+          lastName: args.lastName,
+          password: args.password,
+          role: args.role,
           locale: args.locale ?? "en",
-          organizationName: org.name,
-          organizationUser: fullName(ctx.user!.first_name, ctx.user!.last_name),
-        }
-      );
-      const user = await ctx.users.createUser(
-        {
-          cognito_id: cognitoId!,
-          org_id: args.organizationId,
-          organization_role: args.role,
-          email,
-          first_name: args.firstName,
-          last_name: args.lastName,
-          details: { source: "parallel", preferredLocale: args.locale ?? "en" },
         },
-        `User:${ctx.user!.id}`
+        ctx
       );
       return {
         result: RESULT.SUCCESS,

@@ -580,9 +580,29 @@ type Mutation {
   """
   createOrganization(
     """
+    Email of the organization owner
+    """
+    email: String!
+
+    """
+    First name of the organization owner
+    """
+    firstName: String!
+
+    """
+    Last name of the organization owner
+    """
+    lastName: String!
+
+    """
     Name of the organization
     """
     name: String!
+
+    """
+    Temporary password of the organization owner
+    """
+    password: String!
     status: OrganizationStatus!
   ): SupportMethodResponse!
 
