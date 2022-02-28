@@ -13,7 +13,7 @@ import { useFailureGeneratingLinkDialog } from "../petition-replies/dialogs/Fail
 import { UploadCache } from "../recipient-view/fields/RecipientViewPetitionField";
 import {
   RecipientViewPetitionFieldCard,
-  RecipientViewPetitionFieldCardProps
+  RecipientViewPetitionFieldCardProps,
 } from "../recipient-view/fields/RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldCheckbox } from "../recipient-view/fields/RecipientViewPetitionFieldCheckbox";
 import { RecipientViewPetitionFieldDate } from "../recipient-view/fields/RecipientViewPetitionFieldDate";
@@ -28,7 +28,7 @@ import {
   useCreateFileUploadReply,
   useCreatePetitionFieldReply,
   useDeletePetitionReply,
-  useUpdatePetitionFieldReply
+  useUpdatePetitionFieldReply,
 } from "./clientMutations";
 import { usePreviewPetitionFieldCommentsDialog } from "./dialogs/PreviewPetitionFieldCommentsDialog";
 
@@ -215,9 +215,9 @@ export function PreviewPetitionField({
     <RecipientViewPetitionFieldNumber {...props} {...commonProps} />
   ) : field.type === "DATE" ? (
     <RecipientViewPetitionFieldDate {...props} {...commonProps} />
-  ) : field.type==="PHONE" ? (
+  ) : field.type === "PHONE" ? (
     <RecipientViewPetitionFieldPhone {...props} {...commonProps} />
-  );
+  ) : null;
 }
 
 PreviewPetitionField.fragments = {

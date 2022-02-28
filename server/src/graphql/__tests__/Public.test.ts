@@ -1110,6 +1110,107 @@ describe("GraphQL/Public", () => {
           }
         });
       });
+
+      describe("PHONE", () => {
+        let phoneField: PetitionField;
+
+        beforeAll(async () => {
+          [phoneField] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
+            type: "PHONE",
+            options: {},
+            multiple: true,
+            optional: true,
+          }));
+        });
+
+        it("creates a reply of type PHONE with spanish number", async () => {
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
+                publicCreatePetitionFieldReply(
+                  keycode: $keycode
+                  fieldId: $fieldId
+                  reply: $reply
+                ) {
+                  status
+                  content
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+              fieldId: toGlobalId("PetitionField", phoneField.id),
+              reply: "+34 672 62 55 77",
+            }
+          );
+          expect(errors).toBeUndefined();
+          expect(data?.publicCreatePetitionFieldReply).toEqual({
+            status: "PENDING",
+            content: { value: "+34 672 62 55 77" },
+          });
+        });
+
+        it("creates a reply of type PHONE with russian number", async () => {
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
+                publicCreatePetitionFieldReply(
+                  keycode: $keycode
+                  fieldId: $fieldId
+                  reply: $reply
+                ) {
+                  status
+                  content
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+              fieldId: toGlobalId("PetitionField", phoneField.id),
+              reply: "+7 (958) 822 25 34",
+            }
+          );
+          expect(errors).toBeUndefined();
+          expect(data?.publicCreatePetitionFieldReply).toEqual({
+            status: "PENDING",
+            content: { value: "+7 (958) 822 25 34" },
+          });
+        });
+
+        it("sends error when creating a PHONE reply with invalid values", async () => {
+          for (const reply of [
+            "+34 672 622 553 774",
+            "1234",
+            "+5465251237",
+            "tel: +34 674 15 15 36",
+            true,
+            1,
+          ]) {
+            const { data, errors } = await testClient.execute(
+              gql`
+                mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
+                  publicCreatePetitionFieldReply(
+                    keycode: $keycode
+                    fieldId: $fieldId
+                    reply: $reply
+                  ) {
+                    id
+                  }
+                }
+              `,
+              {
+                keycode: access.keycode,
+                fieldId: toGlobalId("PetitionField", phoneField.id),
+                reply,
+              }
+            );
+
+            expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+            expect(data).toBeNull();
+            setCookieHeader(testClient, access.contact_id, cookieValue);
+          }
+        });
+      });
     });
 
     describe("publicUpdatePetitionFieldReply", () => {
@@ -1763,6 +1864,82 @@ describe("GraphQL/Public", () => {
             expect(data).toBeNull();
             setCookieHeader(testClient, access.contact_id, cookieValue);
           }
+        });
+      });
+
+      describe("PHONE", () => {
+        let phoneReply: PetitionFieldReply;
+
+        beforeAll(async () => {
+          const [phoneField] = await mocks.createRandomPetitionFields(
+            access.petition_id,
+            1,
+            () => ({
+              type: "PHONE",
+              optional: true,
+              multiple: true,
+            })
+          );
+
+          [phoneReply] = await mocks.createRandomPhoneReply(phoneField.id, access.id, 1, () => ({
+            status: "REJECTED",
+          }));
+        });
+
+        it("updates a PHONE reply", async () => {
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
+                publicUpdatePetitionFieldReply(
+                  keycode: $keycode
+                  replyId: $replyId
+                  reply: $reply
+                ) {
+                  id
+                  status
+                  content
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+              replyId: toGlobalId("PetitionFieldReply", phoneReply.id),
+              reply: "+34 674 15 15 36",
+            }
+          );
+
+          expect(errors).toBeUndefined();
+          expect(data?.publicUpdatePetitionFieldReply).toEqual({
+            id: toGlobalId("PetitionFieldReply", phoneReply.id),
+            status: "PENDING",
+            content: { value: "+34 674 15 15 36" },
+          });
+        });
+
+        it("sends error trying to update a PHONE reply with a invalid phone", async () => {
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
+                publicUpdatePetitionFieldReply(
+                  keycode: $keycode
+                  replyId: $replyId
+                  reply: $reply
+                ) {
+                  id
+                  status
+                  content
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+              replyId: toGlobalId("PetitionFieldReply", phoneReply.id),
+              reply: "tel: +34 674 15 15 36",
+            }
+          );
+
+          expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
+          expect(data).toBeNull();
         });
       });
     });

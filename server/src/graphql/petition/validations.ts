@@ -257,7 +257,7 @@ function validateReplyValue(
     }
     case "PHONE": {
       if (typeof reply !== "string") {
-        throw new InvalidReplyError(info, argName, "Value must be a string", {
+        throw new InvalidReplyError(info, argName, "Reply must be of type string.", {
           subcode: "INVALID_TYPE_ERROR",
         });
       }
@@ -265,7 +265,7 @@ function validateReplyValue(
         throw new InvalidReplyError(
           info,
           argName,
-          `Value must be a valid phone number in e164 format`,
+          `Reply must be a valid phone number in e164 format`,
           { subcode: "INVALID_PHONE_NUMBER" }
         );
       }
@@ -317,7 +317,6 @@ function validateReplyValue(
       break;
     }
     case "DYNAMIC_SELECT": {
-      console.log(reply);
       if (!Array.isArray(reply)) {
         throw new InvalidReplyError(
           info,
