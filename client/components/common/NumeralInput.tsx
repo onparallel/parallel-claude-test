@@ -1,7 +1,8 @@
 import { FormControlOptions, ThemingProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import useMergedRef from "@react-hook/merged-ref";
 import { CleaveOptions } from "cleave.js/options";
-import { ChangeEvent, useMemo, useState } from "react";
+import { ChangeEvent, FocusEvent, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { InputCleave, InputCleaveElement } from "./InputCleave";
@@ -16,10 +17,14 @@ interface NumeralInputProps extends ThemingProps<"Input">, FormControlOptions {
 }
 
 export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(function NumeralInput(
-  { decimals, positiveOnly, value, prefix, tailPrefix, onChange, ...props },
+  { decimals, positiveOnly, value, prefix, tailPrefix, onChange, onFocus, ...props },
   ref
 ) {
   const intl = useIntl();
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const mergedRef = useMergedRef(ref, inputRef);
+
   const cleaveOptions = useMemo<CleaveOptions>(() => {
     const parts = Intl.NumberFormat(intl.locale).formatToParts(10000.1);
     return {
@@ -34,7 +39,14 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
     };
   }, [intl.locale, decimals, positiveOnly]);
 
-  const [_value, setValue] = useState(isDefined(value) ? intl.formatNumber(value) : "");
+  const [_value, setValue] = useState(
+    isDefined(value)
+      ? intl.formatNumber(value, {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 20,
+        })
+      : ""
+  );
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
     if (e.target.value === "") {
@@ -49,13 +61,28 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
       }
     }
   };
+
+  const handleOnFocus = (e: FocusEvent<HTMLInputElement>) => {
+    onFocus?.(e);
+    if (prefix && tailPrefix) {
+      setTimeout(() => {
+        // move he cursor before the suffix
+        inputRef.current?.focus();
+        inputRef.current?.setSelectionRange(
+          e.target.value.length - prefix.length,
+          e.target.value.length - prefix.length
+        );
+      });
+    }
+  };
   return (
     <InputCleave
-      ref={ref}
+      ref={mergedRef}
       inputMode="decimal"
       options={cleaveOptions}
       value={_value}
       onChange={handleChange}
+      onFocusCapture={handleOnFocus}
       {...props}
     />
   );

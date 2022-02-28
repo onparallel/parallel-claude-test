@@ -9,6 +9,11 @@ import {
   Stack,
   Text,
   Image,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
 } from "@chakra-ui/react";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
@@ -30,6 +35,7 @@ export function NumberSettings({
   const options = field.options as FieldOptions["NUMBER"];
   const [range, setRange] = useState(options.range);
   const [decimals, setDecimals] = useState(options.decimals ?? 2);
+
   const [placeholder, setPlaceholder] = useState(options.placeholder ?? "");
   const [hasPrefix, setHasPrefix] = useState(
     isDefined(options.prefix) || isDefined(options.suffix) ? true : false
@@ -73,12 +79,14 @@ export function NumberSettings({
   };
 
   const handleDecimalsBlur = () => {
-    debouncedOnUpdate(field.id, {
-      options: {
-        ...field.options,
-        decimals,
-      },
-    });
+    if (decimals <= 16) {
+      debouncedOnUpdate(field.id, {
+        options: {
+          ...field.options,
+          decimals,
+        },
+      });
+    }
   };
 
   const handleTogglePrefix = (selected: boolean) => {
@@ -120,17 +128,25 @@ export function NumberSettings({
           />
         </FormLabel>
         <Box flex="1">
-          <NumeralInput
+          <NumberInput
             size="sm"
             value={decimals}
-            onChange={(value) => setDecimals(value ?? 0)}
+            min={0}
+            max={10}
+            onChange={(_, value) => {
+              if (value > 10) return;
+              setDecimals(Number.isNaN(value) ? 0 : value);
+            }}
             onBlur={handleDecimalsBlur}
-            width="100%"
-            placeholder="2"
-            positiveOnly={true}
-            max={12}
-            decimals={0}
-          />
+            allowMouseWheel={true}
+            isDisabled={isReadOnly}
+          >
+            <NumberInputField />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
         </Box>
       </FormControl>
       <FormControl isInvalid={isRangeInvalid}>

@@ -72,7 +72,13 @@ export function PetitionRepliesFieldReply({
         {isTextLikeType ? (
           <CopyToClipboardButton size="xs" text={reply.content.text} />
         ) : reply.field!.type === "NUMBER" ? (
-          <CopyToClipboardButton size="xs" text={intl.formatNumber(reply.content.value)} />
+          <CopyToClipboardButton
+            size="xs"
+            text={intl.formatNumber(reply.content.value, {
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 20,
+            })}
+          />
         ) : reply.field!.type === "DATE" ? (
           <CopyToClipboardButton
             size="xs"

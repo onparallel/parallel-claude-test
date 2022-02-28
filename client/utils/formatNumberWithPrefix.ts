@@ -5,7 +5,10 @@ import { FieldOptions } from "./petitionFields";
 export function formatNumberWithPrefix(value: number, options: FieldOptions["NUMBER"]): string {
   const intl = useIntl();
   const hasPrefix = isDefined(options.prefix) || isDefined(options.suffix) ? true : false;
-  const formattedValue = intl.formatNumber(value);
+  const formattedValue = intl.formatNumber(value, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 20,
+  });
 
   if (hasPrefix) {
     if (isDefined(options.prefix)) {
