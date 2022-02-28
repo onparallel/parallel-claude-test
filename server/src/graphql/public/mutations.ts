@@ -11,6 +11,7 @@ import {
   objectType,
   stringArg,
 } from "nexus";
+import { outdent } from "outdent";
 import { isDefined } from "remeda";
 import { getClientIp } from "request-ip";
 import { Task } from "../../db/repositories/TaskRepository";
@@ -579,7 +580,7 @@ export const publicUpdateDynamicSelectReply = mutationField("publicUpdateDynamic
 });
 
 export const publicCompletePetition = mutationField("publicCompletePetition", {
-  description: `
+  description: outdent`
     Marks a filled petition as COMPLETED.
     If the petition does not require a review, starts the signing process. Otherwise sends email to user.`,
   type: "PublicPetition",

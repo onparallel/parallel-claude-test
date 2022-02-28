@@ -349,9 +349,8 @@ export type Mutation = {
   /** Closes an open petition. */
   closePetition: Petition;
   /**
-   *
-   *     Marks a petition as COMPLETED.
-   *     If the petition has a signature configured and does not require a review, starts the signing process.
+   * Marks a petition as COMPLETED.
+   * If the petition has a signature configured and does not require a review, starts the signing process.
    */
   completePetition: Petition;
   /** Creates a reply to a checkbox field. */
@@ -452,9 +451,8 @@ export type Mutation = {
   petitionFieldAttachmentUploadComplete: PetitionFieldAttachment;
   publicCheckVerificationCode: VerificationCodeCheck;
   /**
-   *
-   *     Marks a filled petition as COMPLETED.
-   *     If the petition does not require a review, starts the signing process. Otherwise sends email to user.
+   * Marks a filled petition as COMPLETED.
+   * If the petition does not require a review, starts the signing process. Otherwise sends email to user.
    */
   publicCompletePetition: PublicPetition;
   /** Creates and sends the petition linked to the PublicPetitionLink to the contact passed in args */

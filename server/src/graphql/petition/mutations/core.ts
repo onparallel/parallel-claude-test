@@ -11,6 +11,7 @@ import {
   nullable,
   stringArg,
 } from "nexus";
+import { outdent } from "outdent";
 import pMap from "p-map";
 import { isDefined, omit, zip } from "remeda";
 import { defaultFieldOptions } from "../../../db/helpers/fieldOptions";
@@ -1718,7 +1719,7 @@ export const modifyPetitionCustomProperty = mutationField("modifyPetitionCustomP
 });
 
 export const completePetition = mutationField("completePetition", {
-  description: `
+  description: outdent`
     Marks a petition as COMPLETED.
     If the petition has a signature configured and does not require a review, starts the signing process.`,
   type: "Petition",
