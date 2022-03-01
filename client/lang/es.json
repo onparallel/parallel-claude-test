@@ -972,7 +972,7 @@
   {
     "term": "component.message-closing-email-editor.body-label",
     "definition": "Este mensaje solo se enviará si se selecciona la opción de <b>notificar al destinatario</b> al cerrarse la petición.",
-    "context": "This message will only be sent if the option to <b>notify the recipient</b> when the petition is closed is selected."
+    "context": "This message will only be sent if the option to <b>notify the recipient</b> is selected when closing the petition."
   },
   {
     "term": "component.message-email-editor.body-placeholder",
@@ -2095,14 +2095,14 @@
     "context": "Status"
   },
   {
-    "term": "component.petition-template-compose-message-editor.message-at-finish",
+    "term": "component.petition-template-compose-message-editor.closing-message",
     "definition": "Mensaje al finalizar",
-    "context": "Message at finish"
+    "context": "Closing message"
   },
   {
-    "term": "component.petition-template-compose-message-editor.message-to-send",
+    "term": "component.petition-template-compose-message-editor.email-message",
     "definition": "Mensaje de envío",
-    "context": "Message to send"
+    "context": "Email message"
   },
   {
     "term": "component.petition-template.delete-label",

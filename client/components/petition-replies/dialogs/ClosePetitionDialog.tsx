@@ -18,7 +18,7 @@ import { emptyRTEValue } from "@parallel/utils/slate/RichTextEditor/emptyRTEValu
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { Maybe } from "@parallel/utils/types";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { HelpPopover } from "../../common/HelpPopover";
 import { PaddedCollapse } from "../../common/PaddedCollapse";
@@ -61,11 +61,12 @@ export function ClosePetitionDialog({
 
   const [isInvalid, setIsInvalid] = useState(false);
 
-  useEffect(() => {
-    if (!isEmptyRTEValue(message)) {
+  const handleMessageChange = (value: RichTextEditorValue) => {
+    setMessage(value);
+    if (!isEmptyRTEValue(value) && isInvalid) {
       setIsInvalid(false);
     }
-  }, [message]);
+  };
 
   const placeholderOptions = usePetitionMessagePlaceholderOptions();
 
@@ -118,7 +119,7 @@ export function ClosePetitionDialog({
                     isInvalid={isInvalid}
                     ref={messageRef}
                     value={message}
-                    onChange={setMessage}
+                    onChange={handleMessageChange}
                     placeholder={intl.formatMessage({
                       id: "component.close-petition-dialog.notify-recipient.message-placeholder",
                       defaultMessage: "Add a message to include in the email",

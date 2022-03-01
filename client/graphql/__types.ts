@@ -8833,6 +8833,12 @@ export type PetitionSignaturesCard_sendSignatureRequestRemindersMutation = {
   sendSignatureRequestReminders: Result;
 };
 
+export type useClosePetitionDialog_PetitionFragment = {
+  __typename?: "Petition";
+  id: string;
+  closingEmailBody?: any | null;
+};
+
 export type ExportRepliesDialog_UserFragment = {
   __typename?: "User";
   hasExportCuatrecasas: boolean;

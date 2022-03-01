@@ -26,7 +26,7 @@ export function PetitionTemplateComposeMessageEditor({
 }: PetitionTemplateComposeMessageEditorProps) {
   const [subject, setSubject] = useState(petition.emailSubject ?? "");
   const [body, setBody] = useState<RichTextEditorValue>(petition.emailBody ?? emptyRTEValue());
-  const [finishBody, setFinishBody] = useState<RichTextEditorValue>(
+  const [closingEmailBody, setClosingEmailBody] = useState<RichTextEditorValue>(
     petition.closingEmailBody ?? emptyRTEValue()
   );
 
@@ -51,9 +51,9 @@ export function PetitionTemplateComposeMessageEditor({
     [updatePetition]
   );
 
-  const handleFinishBodyChange = useCallback(
+  const handleclosingEmailBodyChange = useCallback(
     (value: RichTextEditorValue) => {
-      setFinishBody(value);
+      setClosingEmailBody(value);
       updatePetition({ closingEmailBody: isEmptyRTEValue(value) ? null : value });
     },
     [updatePetition]
@@ -65,14 +65,14 @@ export function PetitionTemplateComposeMessageEditor({
         <TabList marginX="-1px" marginTop="-1px">
           <Tab padding={4} lineHeight={5} fontWeight="bold">
             <FormattedMessage
-              id="component.petition-template-compose-message-editor.message-to-send"
-              defaultMessage="Message to send"
+              id="component.petition-template-compose-message-editor.email-message"
+              defaultMessage="Email message"
             />
           </Tab>
           <Tab padding={4} lineHeight={5} fontWeight="bold">
             <FormattedMessage
-              id="component.petition-template-compose-message-editor.message-at-finish"
-              defaultMessage="Message at finish"
+              id="component.petition-template-compose-message-editor.closing-message"
+              defaultMessage="Closing message"
             />
           </Tab>
         </TabList>
@@ -92,8 +92,8 @@ export function PetitionTemplateComposeMessageEditor({
             <MessageClosingEmailEditor
               id={petition.id}
               showErrors={false}
-              body={finishBody}
-              onBodyChange={handleFinishBodyChange}
+              body={closingEmailBody}
+              onBodyChange={handleclosingEmailBodyChange}
               isReadOnly={petition.isRestricted || isPublicTemplate}
             />
           </TabPanel>
