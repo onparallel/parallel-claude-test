@@ -180,7 +180,7 @@ function OrganizationBranding() {
               <Center marginTop={2}>
                 <Text fontSize="sm" color="gray.600">
                   <FormattedMessage
-                    id="organization.branding.logo-atach-requirements-dropbox"
+                    id="organization.branding.logo-attach-requirements-dropbox"
                     defaultMessage="(PNG image, max. {size})"
                     values={{
                       size: <FileSize value={MAX_FILE_SIZE} />,

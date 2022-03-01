@@ -8,7 +8,7 @@ export function PublicSignupFormInbox({ email }: { email: string }) {
       <Text as="h1" fontSize="2xl" fontWeight="bold" marginTop={0}>
         <FormattedMessage
           id="component.public-signup-form-inbox.heading"
-          defaultMessage="Ckeck your inbox"
+          defaultMessage="Check your inbox"
         />
       </Text>
       <Text>

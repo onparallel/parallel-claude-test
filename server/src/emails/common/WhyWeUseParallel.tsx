@@ -42,7 +42,7 @@ export function WhyWeUseParallel({ tone, assetsUrl }: WhyWeUseParallelProps) {
         {
           id: "component.why-we-use-parallel.autosave-body",
           defaultMessage:
-            "Every <b>response is saved automatically and synchronised</b> with your sender, allowing you to exit at any time and resume later.",
+            "Every <b>response is saved automatically and synchronized</b> with your sender, allowing you to exit at any time and resume later.",
         },
         { tone }
       ),

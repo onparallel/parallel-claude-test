@@ -64,7 +64,7 @@ export function BrandingPreview({
             </Center>
             <Text>
               <FormattedMessage
-                id="component.branding-preview.grettings"
+                id="component.branding-preview.greetings"
                 defaultMessage="{tone, select, INFORMAL{🔔 Hello <b>[Recipient Name]</b>!} other{Dear <b>[Recipient Name]</b>,}}"
                 values={{ tone }}
               />

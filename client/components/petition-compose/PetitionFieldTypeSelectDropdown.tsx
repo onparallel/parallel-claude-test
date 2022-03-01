@@ -279,7 +279,7 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
             ) : activeType === "DYNAMIC_SELECT" ? (
               <FormattedMessage
                 id="component.petition-field-type-select-dropdown.dynamic-select-description"
-                defaultMessage="Drop-down menu that dinamically adapts its options based on the reply to the previous drop-down."
+                defaultMessage="Drop-down menu that dynamically adapts its options based on the reply to the previous drop-down."
               />
             ) : activeType === "CHECKBOX" ? (
               <FormattedMessage

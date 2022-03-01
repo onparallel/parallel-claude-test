@@ -115,7 +115,7 @@
     "context": "An example of the emails your customers will receive."
   },
   {
-    "term": "component.branding-preview.grettings",
+    "term": "component.branding-preview.greetings",
     "definition": "{tone, select, INFORMAL{🔔 ¡Hola <b>[Nombre destinatario]</b>!} other{Estimado/a <b>[Nombre destinatario],</b>}}",
     "context": "{tone, select, INFORMAL{🔔 Hello <b>[Recipient Name]</b>!} other{Dear <b>[Recipient Name]</b>,}}"
   },
@@ -611,7 +611,7 @@
   },
   {
     "term": "component.delete-petitions.confirm-delete-petition.header",
-    "definition": "Eliminar {count, plural, =1 {petición} other {peticiónes}}",
+    "definition": "Eliminar {count, plural, =1 {petición} other {peticiones}}",
     "context": "Delete {count, plural, =1 {petition} other {petitions}}"
   },
   {
@@ -1382,7 +1382,7 @@
   {
     "term": "component.petition-field-type-select-dropdown.dynamic-select-description",
     "definition": "Menús desplegables que adaptan sus opciones dinámicamente según la respuesta del destinatario al desplegable anterior.",
-    "context": "Drop-down menu that dinamically adapts its options based on the reply to the previous drop-down."
+    "context": "Drop-down menu that dynamically adapts its options based on the reply to the previous drop-down."
   },
   {
     "term": "component.petition-field-type-select-dropdown.file-upload-description",
@@ -2347,7 +2347,7 @@
   {
     "term": "component.public-signup-form-inbox.heading",
     "definition": "Revisa tu bandeja de entrada",
-    "context": "Ckeck your inbox"
+    "context": "Check your inbox"
   },
   {
     "term": "component.public-signup-form-name.description",
@@ -2875,7 +2875,7 @@
     "context": "Invalid link, please make sure it meets the requirements."
   },
   {
-    "term": "component.settings-public-link-dialog.link-error-exemple",
+    "term": "component.settings-public-link-dialog.link-error-example",
     "definition": "Ej: abc-ABC-123",
     "context": "E.g., abc-ABC-123"
   },
@@ -3746,7 +3746,7 @@
   },
   {
     "term": "generic.all-categories",
-    "definition": "Todas las categorias",
+    "definition": "Todas las categorías",
     "context": "All categories"
   },
   {
@@ -4750,14 +4750,14 @@
     "context": "Error loading image. Please upload again."
   },
   {
-    "term": "organization.branding.logo-atach-requirements-dropbox",
-    "definition": "(Imagen PNG, máx. {size})",
-    "context": "(PNG image, max. {size})"
-  },
-  {
     "term": "organization.branding.logo-attach-help",
     "definition": "Adjunta una imagen que quieras que mostremos en tus correos.",
     "context": "Attach an image that you would like us to display in your emails."
+  },
+  {
+    "term": "organization.branding.logo-attach-requirements-dropbox",
+    "definition": "(Imagen PNG, máx. {size})",
+    "context": "(PNG image, max. {size})"
   },
   {
     "term": "organization.branding.logo-attach-requirements-help",
@@ -5165,11 +5165,6 @@
     "context": "Petitions"
   },
   {
-    "term": "page.usage.signatures",
-    "definition": "Firmas",
-    "context": "Signatures"
-  },
-  {
     "term": "page.usage.users",
     "definition": "Usuarios",
     "context": "Users"
@@ -5351,7 +5346,7 @@
   },
   {
     "term": "petition-replies.internal-comment-check.help",
-    "definition": "Al marcar este campo, el comentario será visible sólamente para personas dentro de tu organización.",
+    "definition": "Al marcar este campo, el comentario será visible solamente para personas dentro de tu organización.",
     "context": "By checking this field, the comment will be visible only to users in your organization."
   },
   {
@@ -5361,7 +5356,7 @@
   },
   {
     "term": "petition-replies.internal-comment-popover",
-    "definition": "Este comentario es visible sólamente para personas dentro de tu organización.",
+    "definition": "Este comentario es visible solamente para personas dentro de tu organización.",
     "context": "This comment is only visible for people in your organization."
   },
   {
@@ -5456,7 +5451,7 @@
   },
   {
     "term": "petition-sharing.insufficient-permissions-list",
-    "definition": "{count, plural, =1 {La siguiente petición se ha descartado y no se podrá} other {Las siguientes peticiónes se han descartado y no se podrán}} compartir por falta de permisos:",
+    "definition": "{count, plural, =1 {La siguiente petición se ha descartado y no se podrá} other {Las siguientes peticiones se han descartado y no se podrán}} compartir por falta de permisos:",
     "context": "The following {count, plural, =1 {petition has} other {petitions have}} been ignored and cannot be shared due to lack of permissions:"
   },
   {
@@ -6086,7 +6081,7 @@
   },
   {
     "term": "public-templates.categories.business-development",
-    "definition": "Desarollo de negocio",
+    "definition": "Desarrollo de negocio",
     "context": "Business development"
   },
   {
@@ -6541,7 +6536,7 @@
   },
   {
     "term": "public.consultancy.hero-alt",
-    "definition": "Imagen que muestra las siguientes plantillas de Parallel: KYC, Due Diligence, Consitución de una S.L, ampliación de capital y escisión parcial de una sociedad.",
+    "definition": "Imagen que muestra las siguientes plantillas de Parallel: KYC, Due Diligence, Constitución de una S.L, ampliación de capital y escisión parcial de una sociedad.",
     "context": "A picture showcasing the following templates from Parallel: KYC, Due Diligence, incorporation of a limited liability company, share capital increase and carve-out of a company."
   },
   {
@@ -6956,7 +6951,7 @@
   },
   {
     "term": "public.law-firms.hero-alt",
-    "definition": "Imagen que muestra las siguientes plantillas de Parallel: KYC, Due Diligence, Consitución de una S.L, ampliación de capital y escisión parcial de una sociedad.",
+    "definition": "Imagen que muestra las siguientes plantillas de Parallel: KYC, Due Diligence, Constitución de una S.L, ampliación de capital y escisión parcial de una sociedad.",
     "context": "A picture showcasing the following templates from Parallel: KYC, income tax, incorporation of a limited liability company, share capital increase and carve-out of a company."
   },
   {
@@ -7116,7 +7111,7 @@
   },
   {
     "term": "public.login.register-for-free",
-    "definition": "¿No tienes cuenta?  <a>Regístrate gratís</a>",
+    "definition": "¿No tienes cuenta?  <a>Regístrate gratis</a>",
     "context": "Don't have an account? <a>Register for free</a>"
   },
   {
@@ -8616,7 +8611,7 @@
   },
   {
     "term": "settings.developers.no-tokens-message",
-    "definition": "No has creado ningun token API todavía",
+    "definition": "No has creado ningún token API todavía",
     "context": "You haven't created any API tokens yet"
   },
   {
@@ -8626,7 +8621,7 @@
   },
   {
     "term": "settings.developers.subscriptions-title",
-    "definition": "Subscripciones",
+    "definition": "Suscripciones",
     "context": "Subscriptions"
   },
   {

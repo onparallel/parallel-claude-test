@@ -21,7 +21,7 @@
   },
   {
     "term": "account-verification.intro-text.plain",
-    "definition": "Ya casi está tu cuenta creada, para empezar a usar Parallel sólamente haz click en el siguiente enlace:",
+    "definition": "Ya casi está tu cuenta creada, para empezar a usar Parallel solamente haz click en el siguiente enlace:",
     "context": "You are almost ready, to start using Parallel just click on the link below."
   },
   {
@@ -72,7 +72,7 @@
   {
     "term": "component.why-we-use-parallel.autosave-body",
     "definition": "{tone, select, INFORMAL{Tus <b>respuestas se autoguardan y sincronizan</b> con el remitente para que puedas cerrar y volver a completarlo cuando quieras.} other{Cada <b>respuesta se autoguarda y sincroniza</b> con el remitente para permitirle cerrar en cualquier momento y terminar de completarlo más adelante.}}",
-    "context": "Every <b>response is saved automatically and synchronised</b> with your sender, allowing you to exit at any time and resume later."
+    "context": "Every <b>response is saved automatically and synchronized</b> with your sender, allowing you to exit at any time and resume later."
   },
   {
     "term": "component.why-we-use-parallel.autosave-title",
@@ -111,12 +111,12 @@
   },
   {
     "term": "developer.webhook-error-email.text",
-    "definition": "Hemos detectado un error en tu subscripción.",
+    "definition": "Hemos detectado un error en tu suscripción.",
     "context": "We found an error regarding your event subscription."
   },
   {
     "term": "developer.webhook-error-email.tip",
-    "definition": "Por favor, asegúrate que la configuración de tu subscripción es correcta y la URL es válida y acepta llamados.",
+    "definition": "Por favor, asegúrate que la configuración de tu suscripción es correcta y la URL es válida y acepta llamadas.",
     "context": "Please, make sure your subscription configuration is correct and the URL is valid and accepts requests."
   },
   {

@@ -71,8 +71,8 @@
   },
   {
     "term": "component.why-we-use-parallel.autosave-body",
-    "definition": "Every <b>response is saved automatically and synchronised</b> with your sender, allowing you to exit at any time and resume later.",
-    "context": "Every <b>response is saved automatically and synchronised</b> with your sender, allowing you to exit at any time and resume later."
+    "definition": "Every <b>response is saved automatically and synchronized</b> with your sender, allowing you to exit at any time and resume later.",
+    "context": "Every <b>response is saved automatically and synchronized</b> with your sender, allowing you to exit at any time and resume later."
   },
   {
     "term": "component.why-we-use-parallel.autosave-title",
