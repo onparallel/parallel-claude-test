@@ -15814,6 +15814,11 @@ react-google-recaptcha@^2.1.0:
     prop-types "^15.5.0"
     react-async-script "^1.1.1"
 
+react-headless-phone-input@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/react-headless-phone-input/-/react-headless-phone-input-2.0.0.tgz#2e4a5ae10c56f803831d1514de597c2ac639773e"
+  integrity sha512-Pg6/nAvlCCP19x3Gxr4Ph/4p0qbXhcpaaTEkNJwFNiPhTa/4H6cGBOkXkUdyfekUAm+3ZRgtxtpFOkTvLYC5YA==
+
 react-helmet-async@^1.0.7:
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/react-helmet-async/-/react-helmet-async-1.2.3.tgz#57326a69304ea3293036eafb49475e9ba454cb37"

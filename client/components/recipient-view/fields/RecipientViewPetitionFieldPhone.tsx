@@ -6,7 +6,7 @@ import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { phoneCodes } from "@parallel/utils/phoneCodes";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { useGetUserCountryISO } from "@parallel/utils/useGetUserCountryISO";
+import { useGetUserMetadata } from "@parallel/utils/useGetUserMetadata";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
@@ -54,7 +54,7 @@ export function RecipientViewPetitionFieldPhone({
   const newReplyRef = useRef<HTMLInputElement>(null);
   const replyRefs = useMultipleRefs<HTMLInputElement>();
 
-  const usersCountry = useGetUserCountryISO();
+  const userMetadata = useGetUserMetadata();
 
   function handleAddNewReply() {
     setShowNewReply(true);
@@ -149,7 +149,9 @@ export function RecipientViewPetitionFieldPhone({
       }
     },
     placeholder:
-      options.placeholder ?? phoneCodes[options.defaultCountry ?? usersCountry ?? ""] ?? "+",
+      options.placeholder ??
+      phoneCodes[options.defaultCountry ?? userMetadata?.countryISO ?? ""] ??
+      "+",
   };
 
   return (
@@ -189,7 +191,7 @@ export function RecipientViewPetitionFieldPhone({
       {(field.multiple && showNewReply) || field.replies.length === 0 ? (
         <Flex flex="1" position="relative" marginTop={2}>
           <PhoneInputLazy
-            defaultCountry={options.defaultCountry ?? usersCountry ?? undefined}
+            defaultCountry={options.defaultCountry ?? userMetadata?.countryISO ?? undefined}
             value={value}
             onChange={(value: string, { isValid }) => {
               if (isSaving) {
@@ -240,7 +242,7 @@ export const RecipientViewPetitionFieldReplyPhone = forwardRef<
   const options = field.options as FieldOptions["PHONE"];
   const [isInvalidValue, setIsInvalidValue] = useState(false);
 
-  const usersCountry = useGetUserCountryISO();
+  const userMetadata = useGetUserMetadata();
 
   const debouncedUpdateReply = useDebouncedCallback(
     async (value: string) => {
@@ -270,14 +272,16 @@ export const RecipientViewPetitionFieldReplyPhone = forwardRef<
       }
     },
     placeholder:
-      options.placeholder ?? phoneCodes[options.defaultCountry ?? usersCountry ?? ""] ?? "+",
+      options.placeholder ??
+      phoneCodes[options.defaultCountry ?? userMetadata?.countryISO ?? ""] ??
+      "+",
   };
 
   return (
     <Stack direction="row">
       <Flex flex="1" position="relative">
         <PhoneInputLazy
-          defaultCountry={options.defaultCountry ?? usersCountry ?? undefined}
+          defaultCountry={options.defaultCountry ?? userMetadata?.countryISO ?? undefined}
           value={value}
           onChange={(value: string, { isValid }) => {
             setIsInvalidValue(!isValid && isDefined(value));

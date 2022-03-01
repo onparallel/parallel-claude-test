@@ -3773,7 +3773,6 @@ type Query {
     sortBy: [QueryPetitions_OrderBy!]
   ): PetitionBasePagination!
   petitionsById(ids: [GID!]!): [PetitionBase]!
-  publicGetCountry: String
   publicOrgLogoUrl(id: GID!): String
 
   """
@@ -3783,6 +3782,7 @@ type Query {
   publicPetitionLinkBySlug(slug: ID!): PublicPublicPetitionLink
   publicTask(keycode: ID!, taskId: GID!): Task!
   publicTemplateCategories: [String!]!
+  publicUserMetadata: UserMetadata!
 
   """
   Search users and user groups
@@ -4576,6 +4576,14 @@ type UserGroupPagination {
   The total count of items in the list.
   """
   totalCount: Int!
+}
+
+"""
+A information from a user like IP and CountryISO.
+"""
+type UserMetadata {
+  countryISO: String
+  ip: String
 }
 
 type UserNotifications_Pagination {

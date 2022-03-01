@@ -578,6 +578,11 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     totalCount: number; // Int!
   };
+  UserMetadata: {
+    // root type
+    countryISO?: string | null; // String
+    ip?: string | null; // String
+  };
   UserNotifications_Pagination: {
     // root type
     hasMore: boolean; // Boolean!
@@ -1561,12 +1566,12 @@ export interface NexusGenFieldTypes {
     petitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
     petitionsById: Array<NexusGenRootTypes["PetitionBase"] | null>; // [PetitionBase]!
-    publicGetCountry: string | null; // String
     publicOrgLogoUrl: string | null; // String
     publicPetitionField: NexusGenRootTypes["PublicPetitionField"]; // PublicPetitionField!
     publicPetitionLinkBySlug: NexusGenRootTypes["PublicPublicPetitionLink"] | null; // PublicPublicPetitionLink
     publicTask: NexusGenRootTypes["Task"]; // Task!
     publicTemplateCategories: string[]; // [String!]!
+    publicUserMetadata: NexusGenRootTypes["UserMetadata"]; // UserMetadata!
     searchUsers: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
     subscriptions: NexusGenRootTypes["PetitionEventSubscription"][]; // [PetitionEventSubscription!]!
     tags: NexusGenRootTypes["TagPagination"]; // TagPagination!
@@ -1831,6 +1836,11 @@ export interface NexusGenFieldTypes {
     // field return type
     items: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     totalCount: number; // Int!
+  };
+  UserMetadata: {
+    // field return type
+    countryISO: string | null; // String
+    ip: string | null; // String
   };
   UserNotifications_Pagination: {
     // field return type
@@ -2883,12 +2893,12 @@ export interface NexusGenFieldTypeNames {
     petitionField: "PetitionField";
     petitions: "PetitionBasePagination";
     petitionsById: "PetitionBase";
-    publicGetCountry: "String";
     publicOrgLogoUrl: "String";
     publicPetitionField: "PublicPetitionField";
     publicPetitionLinkBySlug: "PublicPublicPetitionLink";
     publicTask: "Task";
     publicTemplateCategories: "String";
+    publicUserMetadata: "UserMetadata";
     searchUsers: "UserOrUserGroup";
     subscriptions: "PetitionEventSubscription";
     tags: "TagPagination";
@@ -3153,6 +3163,11 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     items: "UserGroup";
     totalCount: "Int";
+  };
+  UserMetadata: {
+    // field return type name
+    countryISO: "String";
+    ip: "String";
   };
   UserNotifications_Pagination: {
     // field return type name

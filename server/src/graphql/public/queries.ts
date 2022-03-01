@@ -1,4 +1,4 @@
-import { idArg, nonNull, nullable, queryField } from "nexus";
+import { idArg, nonNull, nullable, objectType, queryField } from "nexus";
 import { chain } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { authenticatePublicAccess, fieldBelongsToAccess, taskBelongsToAccess } from "./authorizers";
@@ -39,12 +39,23 @@ export const publicOrgLogo = queryField("publicOrgLogoUrl", {
   },
 });
 
-export const publicGetCountry = queryField("publicGetCountry", {
-  type: nullable("String"),
+export const publicUserMetadata = queryField("publicUserMetadata", {
+  type: objectType({
+    name: "UserMetadata",
+    description: "A information from a user like IP and CountryISO.",
+    definition(t) {
+      t.nullable.string("ip");
+      t.nullable.string("countryISO");
+    },
+  }),
   resolve: async (_, args, ctx) => {
     const ip = getClientIp(ctx.req);
     const geo = lookup(ip ?? "");
-    return geo?.country ?? null;
+
+    return {
+      ip,
+      countryISO: geo?.country ?? null,
+    };
   },
 });
 

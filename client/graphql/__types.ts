@@ -379,8 +379,9 @@ export interface Mutation {
   /** Closes an open petition. */
   closePetition: Petition;
   /**
-   * Marks a petition as COMPLETED.
-   * If the petition has a signature configured and does not require a review, starts the signing process.
+   *
+   *     Marks a petition as COMPLETED.
+   *     If the petition has a signature configured and does not require a review, starts the signing process.
    */
   completePetition: Petition;
   /** Creates a reply to a checkbox field. */
@@ -481,8 +482,9 @@ export interface Mutation {
   petitionFieldAttachmentUploadComplete: PetitionFieldAttachment;
   publicCheckVerificationCode: VerificationCodeCheck;
   /**
-   * Marks a filled petition as COMPLETED.
-   * If the petition does not require a review, starts the signing process. Otherwise sends email to user.
+   *
+   *     Marks a filled petition as COMPLETED.
+   *     If the petition does not require a review, starts the signing process. Otherwise sends email to user.
    */
   publicCompletePetition: PublicPetition;
   /** Creates and sends the petition linked to the PublicPetitionLink to the contact passed in args */
@@ -2689,13 +2691,13 @@ export interface Query {
   /** The petitions of the user */
   petitions: PetitionBasePagination;
   petitionsById: Array<Maybe<PetitionBase>>;
-  publicGetCountry?: Maybe<Scalars["String"]>;
   publicOrgLogoUrl?: Maybe<Scalars["String"]>;
   /** The comments for this field. */
   publicPetitionField: PublicPetitionField;
   publicPetitionLinkBySlug?: Maybe<PublicPublicPetitionLink>;
   publicTask: Task;
   publicTemplateCategories: Array<Scalars["String"]>;
+  publicUserMetadata: UserMetadata;
   /** Search users and user groups */
   searchUsers: Array<UserOrUserGroup>;
   subscriptions: Array<PetitionEventSubscription>;
@@ -3364,6 +3366,13 @@ export interface UserGroupPagination {
   items: Array<UserGroup>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
+}
+
+/** A information from a user like IP, countryISO, etc... */
+export interface UserMetadata {
+  __typename?: "UserMetadata";
+  countryISO?: Maybe<Scalars["String"]>;
+  ip?: Maybe<Scalars["String"]>;
 }
 
 export interface UserNotifications_Pagination {
@@ -18009,9 +18018,11 @@ export type useGetPageFields_PetitionFieldFragment = {
   }>;
 };
 
-export type useGetUserCountryISO_publicGetCountryQueryVariables = Exact<{ [key: string]: never }>;
+export type useGetUserMetadata_publicUserMetadataQueryVariables = Exact<{ [key: string]: never }>;
 
-export type useGetUserCountryISO_publicGetCountryQuery = { publicGetCountry?: string | null };
+export type useGetUserMetadata_publicUserMetadataQuery = {
+  publicUserMetadata: { __typename?: "UserMetadata"; countryISO?: string | null };
+};
 
 export type useLiquidScope_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -24966,13 +24977,15 @@ export const useExportRepliesTask_getTaskResultFileUrlDocument = gql`
   useExportRepliesTask_getTaskResultFileUrlMutation,
   useExportRepliesTask_getTaskResultFileUrlMutationVariables
 >;
-export const useGetUserCountryISO_publicGetCountryDocument = gql`
-  query useGetUserCountryISO_publicGetCountry {
-    publicGetCountry
+export const useGetUserMetadata_publicUserMetadataDocument = gql`
+  query useGetUserMetadata_publicUserMetadata {
+    publicUserMetadata {
+      countryISO
+    }
   }
 ` as unknown as DocumentNode<
-  useGetUserCountryISO_publicGetCountryQuery,
-  useGetUserCountryISO_publicGetCountryQueryVariables
+  useGetUserMetadata_publicUserMetadataQuery,
+  useGetUserMetadata_publicUserMetadataQueryVariables
 >;
 export const PetitionSignaturesCardPolling_petitionDocument = gql`
   query PetitionSignaturesCardPolling_petition($petitionId: GID!) {
