@@ -2701,7 +2701,7 @@
   },
   {
     "term": "component.recipient-view.confirm-petition-signers-dialog.message-placeholder",
-    "definition": "Escribe aquí un mensaje para los firmantes...",
+    "definition": "{tone, select, INFORMAL {Escribe} other {Escriba}} aquí un mensaje para los firmantes...",
     "context": "Write here a message for the signers..."
   },
   {

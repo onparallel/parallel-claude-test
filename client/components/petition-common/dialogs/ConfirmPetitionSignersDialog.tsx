@@ -29,7 +29,7 @@ import { useConfirmSignerInfoDialog } from "./ConfirmSignerInfoDialog";
 interface ConfirmPetitionSignersDialogProps {
   user: ConfirmPetitionSignersDialog_UserFragment;
   accesses: ConfirmPetitionSignersDialog_PetitionAccessFragment[];
-  fixedSigners: ConfirmPetitionSignersDialog_PetitionSignerFragment[];
+  presetSigners: ConfirmPetitionSignersDialog_PetitionSignerFragment[];
   allowAdditionalSigners: boolean;
 }
 
@@ -42,14 +42,14 @@ export type SignerSelectSelection = Omit<
   ConfirmPetitionSignersDialog_PetitionSignerFragment,
   "__typename"
 > & {
-  isFixed?: boolean;
+  isPreset?: boolean;
   isSuggested?: boolean;
 };
 
 export function ConfirmPetitionSignersDialog({
   user,
   accesses,
-  fixedSigners,
+  presetSigners,
   allowAdditionalSigners,
   ...props
 }: DialogProps<ConfirmPetitionSignersDialogProps, ConfirmPetitionSignersDialogResult>) {
@@ -62,7 +62,7 @@ export function ConfirmPetitionSignersDialog({
   } = useForm<{ signers: SignerSelectSelection[]; message: Maybe<string> }>({
     mode: "onChange",
     defaultValues: {
-      signers: fixedSigners.map((s) => ({ ...s, isFixed: true })),
+      signers: presetSigners.map((s) => ({ ...s, isPreset: true })),
       message: null,
     },
   });
@@ -176,7 +176,7 @@ export function ConfirmPetitionSignersDialog({
                     {signers.map((signer, index) => (
                       <SelectedSignerRow
                         key={index}
-                        isEditable={!signer.isFixed}
+                        isEditable={!signer.isPreset}
                         signer={signer}
                         onRemoveClick={() => onChange(signers.filter((_, i) => index !== i))}
                         onEditClick={handleSelectedSignerRowOnEditClick(onChange, signer, index)}
@@ -223,7 +223,7 @@ export function ConfirmPetitionSignersDialog({
               )}
             />
           </FormControl>
-          {signers.some((s) => !s.isFixed) ? (
+          {signers.some((s) => !s.isPreset) ? (
             <FormControl isInvalid={!!errors.message}>
               <Checkbox
                 marginY={4}

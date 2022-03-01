@@ -37,7 +37,7 @@ export function NewSignatureRequestRow({
       const { signers: signersInfo, message } = await showConfirmPetitionSignersDialog({
         user,
         accesses: petition.accesses,
-        fixedSigners: signers,
+        presetSigners: signers,
         allowAdditionalSigners,
       });
 

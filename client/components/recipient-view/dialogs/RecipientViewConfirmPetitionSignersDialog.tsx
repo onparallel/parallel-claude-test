@@ -24,7 +24,7 @@ import { useAddNewSignerDialog } from "./AddNewSignerDialog";
 
 type RecipientViewConfirmPetitionSignersDialogProps = {
   keycode: string;
-  fixedSigners: useRecipientViewConfirmPetitionSignersDialog_PetitionSignerFragment[];
+  presetSigners: useRecipientViewConfirmPetitionSignersDialog_PetitionSignerFragment[];
   recipients: useRecipientViewConfirmPetitionSignersDialog_PublicContactFragment[];
   contact: useRecipientViewConfirmPetitionSignersDialog_PublicContactFragment;
   organization: string;
@@ -39,7 +39,7 @@ export type RecipientViewConfirmPetitionSignersDialogResult = {
 
 function RecipientViewConfirmPetitionSignersDialog({
   keycode,
-  fixedSigners,
+  presetSigners,
   recipients,
   contact,
   organization,
@@ -60,7 +60,7 @@ function RecipientViewConfirmPetitionSignersDialog({
   } = useForm<{ signers: SignerSelectSelection[]; message: Maybe<string> }>({
     mode: "onChange",
     defaultValues: {
-      signers: fixedSigners.map((s) => ({ ...s, isFixed: true })),
+      signers: presetSigners.map((s) => ({ ...s, isPreset: true })),
       message: null,
     },
   });
@@ -117,7 +117,7 @@ function RecipientViewConfirmPetitionSignersDialog({
           props.onResolve({
             message: showMessage ? message : null,
             additionalSigners: signers
-              .filter((s) => !s.isFixed)
+              .filter((s) => !s.isPreset)
               .map((s) => ({
                 email: s.email,
                 firstName: s.firstName,
@@ -158,7 +158,7 @@ function RecipientViewConfirmPetitionSignersDialog({
                     {signers.map((signer, index) => (
                       <SelectedSignerRow
                         key={index}
-                        isEditable={!signer.isFixed}
+                        isEditable={!signer.isPreset}
                         signer={signer}
                         onRemoveClick={() => onChange(signers.filter((_, i) => index !== i))}
                         onEditClick={handleSelectedSignerRowOnEditClick(onChange, signer, index)}
@@ -201,7 +201,7 @@ function RecipientViewConfirmPetitionSignersDialog({
               )}
             />
           </FormControl>
-          {signers.some((s) => !s.isFixed) ? (
+          {signers.some((s) => !s.isPreset) ? (
             <FormControl isInvalid={!!errors.message}>
               <Checkbox
                 marginY={4}
@@ -218,14 +218,20 @@ function RecipientViewConfirmPetitionSignersDialog({
                 <GrowingTextarea
                   {...register("message", { required: showMessage })}
                   maxHeight="30vh"
-                  aria-label={intl.formatMessage({
-                    id: "component.recipient-view.confirm-petition-signers-dialog.message-placeholder",
-                    defaultMessage: "Write here a message for the signers...",
-                  })}
-                  placeholder={intl.formatMessage({
-                    id: "component.recipient-view.confirm-petition-signers-dialog.message-placeholder",
-                    defaultMessage: "Write here a message for the signers...",
-                  })}
+                  aria-label={intl.formatMessage(
+                    {
+                      id: "component.recipient-view.confirm-petition-signers-dialog.message-placeholder",
+                      defaultMessage: "Write here a message for the signers...",
+                    },
+                    { tone }
+                  )}
+                  placeholder={intl.formatMessage(
+                    {
+                      id: "component.recipient-view.confirm-petition-signers-dialog.message-placeholder",
+                      defaultMessage: "Write here a message for the signers...",
+                    },
+                    { tone }
+                  )}
                 />
               </PaddedCollapse>
             </FormControl>

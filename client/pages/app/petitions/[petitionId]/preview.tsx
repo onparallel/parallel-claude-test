@@ -134,13 +134,13 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             !visibility[index] || f.optional || completedFieldReplies(f).length > 0 || f.isReadOnly
         );
         if (canFinalize && isPetition) {
-          const fixedSigners = petition!.signatureConfig?.signers ?? [];
+          const presetSigners = petition!.signatureConfig?.signers ?? [];
           const allowAdditionalSigners = petition.signatureConfig?.allowAdditionalSigners ?? false;
           let completeSignerInfoData: ConfirmPetitionSignersDialogResult | null = null;
           if (petition.signatureConfig?.review === false) {
             completeSignerInfoData = await showConfirmPetitionSignersDialog({
               accesses: petition.accesses,
-              fixedSigners,
+              presetSigners,
               user: me,
               allowAdditionalSigners,
             });

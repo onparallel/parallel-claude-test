@@ -80,7 +80,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
 
   const [finalized, setFinalized] = useState(false);
   const [publicCompletePetition] = useMutation(RecipientView_publicCompletePetitionDocument);
-  const showCompleteSignerInfoDialog = useRecipientViewConfirmPetitionSignersDialog();
+  const showConfirmPetitionSignersDialog = useRecipientViewConfirmPetitionSignersDialog();
   const showReviewBeforeSigningDialog = useDialog(ReviewBeforeSignDialog);
   const handleFinalize = useCallback(
     async function () {
@@ -95,12 +95,12 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
             f.isReadOnly
         );
         if (canFinalize) {
-          let completeSignerInfoData: RecipientViewConfirmPetitionSignersDialogResult | null = null;
+          let confirmSignerInfoData: RecipientViewConfirmPetitionSignersDialogResult | null = null;
           if (petition.signatureConfig?.review === false) {
-            completeSignerInfoData = await showCompleteSignerInfoDialog({
+            confirmSignerInfoData = await showConfirmPetitionSignersDialog({
               recipients: petition.recipients,
               allowAdditionalSigners: petition.signatureConfig.allowAdditionalSigners,
-              fixedSigners: signers,
+              presetSigners: signers,
               keycode,
               organization: granter.organization.name,
               contact,
@@ -110,8 +110,8 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
           await publicCompletePetition({
             variables: {
               keycode,
-              additionalSigners: completeSignerInfoData?.additionalSigners,
-              message: completeSignerInfoData?.message,
+              additionalSigners: confirmSignerInfoData?.additionalSigners,
+              message: confirmSignerInfoData?.message,
             },
           });
           if (petition.signatureConfig?.review) {
