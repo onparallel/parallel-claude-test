@@ -1,6 +1,6 @@
 import { extension } from "mime-types";
 import { core, enumType, inputObjectType, objectType, unionType } from "nexus";
-import { Contact } from "../../db/__types";
+import { isDefined } from "remeda";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 
@@ -107,7 +107,7 @@ export const PublicPetition = objectType({
       resolve: async (root, _, ctx) => {
         const accesses = await ctx.petitions.loadAccessesForPetition(root.id);
         const contactIds = accesses.filter((a) => a.status === "ACTIVE").map((a) => a.contact_id);
-        return (await ctx.contacts.loadContact(contactIds)) as Contact[];
+        return (await ctx.contacts.loadContact(contactIds)).filter(isDefined);
       },
     });
     t.boolean("isRecipientViewContentsHidden", {

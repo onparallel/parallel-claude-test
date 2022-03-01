@@ -24,7 +24,7 @@ import {
 import { FORMATS } from "@parallel/utils/dates";
 import { MouseEvent, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { maxBy, minBy } from "remeda";
+import { isDefined, maxBy, minBy } from "remeda";
 import { EnumerateList } from "./EnumerateList";
 import { useGoToContact } from "./goToContact";
 import { useGoToPetition } from "./goToPetition";
@@ -96,7 +96,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                 },
                 CellContent: ({ row }) => {
                   const recipients = row.accesses
-                    .filter((a) => a.status === "ACTIVE")
+                    .filter((a) => a.status === "ACTIVE" && isDefined(a.contact))
                     .map((a) => a.contact!);
                   if (recipients.length === 0) {
                     return null;

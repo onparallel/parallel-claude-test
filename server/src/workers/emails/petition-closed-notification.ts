@@ -39,12 +39,15 @@ export async function petitionClosedNotification(
   for (const accessId of payload.petition_access_ids) {
     const access = await context.petitions.loadAccess(accessId);
     const contact = await context.contacts.loadContact(access!.contact_id);
+    if (!contact) {
+      continue;
+    }
 
     const renderContext = { contact, user: sender, petition };
     const { html, text, subject, from } = await buildEmail(
       PetitionClosedNotification,
       {
-        contactFullName: fullName(contact!.first_name, contact!.last_name)!,
+        contactFullName: fullName(contact.first_name, contact.last_name)!,
         senderName: fullName(sender.first_name, sender.last_name)!,
         senderEmail: sender.email,
         bodyHtml: toHtml(payload.message, renderContext),
@@ -55,7 +58,7 @@ export async function petitionClosedNotification(
     );
     const email = await context.emailLogs.createEmail({
       from: buildFrom(from, emailFrom),
-      to: contact!.email,
+      to: contact.email,
       subject,
       text,
       html,
