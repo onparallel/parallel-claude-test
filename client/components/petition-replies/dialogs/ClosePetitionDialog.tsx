@@ -13,11 +13,12 @@ import { PaperPlaneIcon, ThumbUpIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { PetitionLocale } from "@parallel/graphql/__types";
+import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/placeholders/textWithPlaceholderToSlateNodes";
 import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/slate/placeholders/usePetitionMessagePlaceholderOptions";
-import { emptyRTEValue } from "@parallel/utils/slate/RichTextEditor/emptyRTEValue";
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { Maybe } from "@parallel/utils/types";
+import { outdent } from "outdent";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { HelpPopover } from "../../common/HelpPopover";
@@ -39,6 +40,27 @@ interface ClosePetitionDialogNotification {
   pdfExportTitle: Maybe<string>;
 }
 
+const messages: Record<PetitionLocale, string> = {
+  en: outdent`
+    Dear #contact-first-name#,
+
+    We have reviewed all the information that we requested, and we can confirm that everything is correct.
+
+    Let us know if you have any questions or comments.
+    
+    Best regards.
+  `,
+  es: outdent`
+    Apreciado/a #contact-first-name#,
+
+    Le comunicamos que hemos revisado toda la información que le requerimos y le confirmamos que está todo correcto.
+    
+    Quedamos a su entera disposición para aclarar o comentar cualquier aspecto que considere oportuno.
+    
+    Reciba un cordial saludo.
+  `,
+};
+
 export function ClosePetitionDialog({
   id,
   locale,
@@ -50,8 +72,10 @@ export function ClosePetitionDialog({
   ...props
 }: DialogProps<ClosePetitionDialogInput, ClosePetitionDialogNotification>) {
   const intl = useIntl();
-
-  const [message, setMessage] = useState<RichTextEditorValue>(emailMessage ?? emptyRTEValue());
+  const placeholders = usePetitionMessagePlaceholderOptions();
+  const [message, setMessage] = useState<RichTextEditorValue>(
+    emailMessage ?? textWithPlaceholderToSlateNodes(messages[locale], placeholders)
+  );
   const [sendMessage, setSendMessage] = useState(requiredMessage);
   const messageRef = useRef<RichTextEditorInstance>(null);
 
