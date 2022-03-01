@@ -11,6 +11,7 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { fullName } from "@parallel/utils/fullName";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
+import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -50,8 +51,8 @@ function ConfirmSignerInfoDialog({
       size="md"
       content={{
         as: "form",
-        onSubmit: handleSubmit(({ firstName, lastName }) => {
-          props.onResolve({ email: selection.email, firstName, lastName });
+        onSubmit: handleSubmit(({ email, firstName, lastName }) => {
+          props.onResolve({ email, firstName, lastName });
         }),
       }}
       header={
@@ -75,11 +76,27 @@ function ConfirmSignerInfoDialog({
               />
             </Text>
           ) : null}
-          <FormControl id="email">
+          <FormControl id="email" isInvalid={!!errors.email}>
             <FormLabel fontWeight="bold">
               <FormattedMessage id="generic.email" defaultMessage="Email" />
             </FormLabel>
-            <Input {...register("email", { disabled: true })} />
+            <Input
+              type="email"
+              {...register("email", {
+                required: true,
+                pattern: EMAIL_REGEX,
+              })}
+              placeholder={intl.formatMessage({
+                id: "generic.forms.company-email-placeholder",
+                defaultMessage: "example@company.com",
+              })}
+            />
+            <FormErrorMessage>
+              <FormattedMessage
+                id="generic.forms.invalid-email-error"
+                defaultMessage="Please, enter a valid email"
+              />
+            </FormErrorMessage>
           </FormControl>
           <Stack direction={{ base: "column", sm: "row" }}>
             <FormControl isInvalid={!!errors.firstName}>
