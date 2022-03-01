@@ -19,7 +19,7 @@ import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { noop } from "remeda";
+import { isDefined, noop } from "remeda";
 
 export function useSendPetitionHandler(
   petition: useSendPetitionHandler_PetitionFragment | null,
@@ -44,7 +44,7 @@ export function useSendPetitionHandler(
 
     try {
       const currentRecipientIds = petition.accesses
-        .filter((a) => a.contact)
+        .filter((a) => isDefined(a.contact))
         .map((a) => a.contact!.id);
 
       await showTestSignatureDialog(

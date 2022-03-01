@@ -8556,10 +8556,9 @@ export type PetitionRepliesField_PetitionFieldFragment = {
     updatedBy?:
       | {
           __typename?: "PetitionAccess";
-          id: string;
-          contact?: { __typename?: "Contact"; id: string; fullName: string } | null;
+          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
         }
-      | { __typename?: "User"; id: string; fullName?: string | null }
+      | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
       | null;
   }>;
   comments: Array<{
@@ -8596,10 +8595,9 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
   updatedBy?:
     | {
         __typename?: "PetitionAccess";
-        id: string;
-        contact?: { __typename?: "Contact"; id: string; fullName: string } | null;
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
       }
-    | { __typename?: "User"; id: string; fullName?: string | null }
+    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
 };
 
@@ -8656,10 +8654,9 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
   updatedBy?:
     | {
         __typename?: "PetitionAccess";
-        id: string;
-        contact?: { __typename?: "Contact"; id: string; fullName: string } | null;
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
       }
-    | { __typename?: "User"; id: string; fullName?: string | null }
+    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
 };
 
@@ -15326,10 +15323,14 @@ export type PetitionReplies_PetitionFragment = {
       updatedBy?:
         | {
             __typename?: "PetitionAccess";
-            id: string;
-            contact?: { __typename?: "Contact"; id: string; fullName: string } | null;
+            contact?: {
+              __typename?: "Contact";
+              id: string;
+              fullName: string;
+              email: string;
+            } | null;
           }
-        | { __typename?: "User"; id: string; fullName?: string | null }
+        | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
         | null;
     }>;
     comments: Array<{
@@ -15459,10 +15460,9 @@ export type PetitionReplies_PetitionFieldFragment = {
     updatedBy?:
       | {
           __typename?: "PetitionAccess";
-          id: string;
-          contact?: { __typename?: "Contact"; id: string; fullName: string } | null;
+          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
         }
-      | { __typename?: "User"; id: string; fullName?: string | null }
+      | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
       | null;
   }>;
   comments: Array<{
@@ -15619,10 +15619,14 @@ export type PetitionReplies_closePetitionMutation = {
         updatedBy?:
           | {
               __typename?: "PetitionAccess";
-              id: string;
-              contact?: { __typename?: "Contact"; id: string; fullName: string } | null;
+              contact?: {
+                __typename?: "Contact";
+                id: string;
+                fullName: string;
+                email: string;
+              } | null;
             }
-          | { __typename?: "User"; id: string; fullName?: string | null }
+          | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
           | null;
       }>;
       comments: Array<{
@@ -15781,10 +15785,14 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         updatedBy?:
           | {
               __typename?: "PetitionAccess";
-              id: string;
-              contact?: { __typename?: "Contact"; id: string; fullName: string } | null;
+              contact?: {
+                __typename?: "Contact";
+                id: string;
+                fullName: string;
+                email: string;
+              } | null;
             }
-          | { __typename?: "User"; id: string; fullName?: string | null }
+          | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
           | null;
       }>;
       comments: Array<{
@@ -16038,10 +16046,14 @@ export type PetitionReplies_petitionQuery = {
             updatedBy?:
               | {
                   __typename?: "PetitionAccess";
-                  id: string;
-                  contact?: { __typename?: "Contact"; id: string; fullName: string } | null;
+                  contact?: {
+                    __typename?: "Contact";
+                    id: string;
+                    fullName: string;
+                    email: string;
+                  } | null;
                 }
-              | { __typename?: "User"; id: string; fullName?: string | null }
+              | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
               | null;
           }>;
           comments: Array<{
@@ -20937,19 +20949,10 @@ export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
       options
     }
     updatedBy {
-      ... on User {
-        id
-        fullName
-      }
-      ... on PetitionAccess {
-        id
-        contact {
-          id
-          fullName
-        }
-      }
+      ...UserOrContactReference_UserOrPetitionAccess
     }
   }
+  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<PetitionRepliesFieldReply_PetitionFieldReplyFragment, unknown>;
 export const PetitionRepliesField_PetitionFieldReplyFragmentDoc = gql`
   fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {

@@ -6,11 +6,16 @@ import { ContactReference } from "../common/ContactReference";
 import { UserReference } from "./UserReference";
 
 interface UserOrContactReferenceProps extends TextProps {
+  isLink?: boolean;
   userOrAccess?: Maybe<UserOrContactReference_UserOrPetitionAccessFragment>;
 }
-export function UserOrContactReference({ userOrAccess, ...props }: UserOrContactReferenceProps) {
+export function UserOrContactReference({
+  userOrAccess,
+  isLink,
+  ...props
+}: UserOrContactReferenceProps) {
   return userOrAccess?.__typename === "PetitionAccess" ? (
-    <ContactReference contact={userOrAccess.contact} {...props} />
+    <ContactReference isLink={isLink} contact={userOrAccess.contact} {...props} />
   ) : (
     <UserReference user={userOrAccess?.__typename === "User" ? userOrAccess : null} />
   );

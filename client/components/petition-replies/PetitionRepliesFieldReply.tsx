@@ -26,6 +26,7 @@ import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { UserOrContactReference } from "../petition-activity/UserOrContactReference";
 
 export interface PetitionRepliesFieldReplyProps {
   reply: PetitionRepliesFieldReply_PetitionFieldReplyFragment;
@@ -45,26 +46,6 @@ export function PetitionRepliesFieldReply({
 
   const apollo = useApolloClient();
   const myId = getMyId(apollo);
-
-  const getUpdatedBy = (reply: PetitionRepliesFieldReply_PetitionFieldReplyFragment) => {
-    const updatedBy =
-      reply.updatedBy?.__typename === "User"
-        ? reply.updatedBy
-        : reply.updatedBy?.__typename === "PetitionAccess"
-        ? reply.updatedBy.contact
-        : null;
-
-    if (!updatedBy) return null;
-
-    if (updatedBy.id === myId) {
-      return `${intl.formatMessage({
-        id: "generic.you",
-        defaultMessage: "You",
-      })}, `;
-    } else {
-      return `${updatedBy.fullName}, `;
-    }
-  };
 
   return (
     <Flex>
@@ -204,7 +185,12 @@ export function PetitionRepliesFieldReply({
             </Text>
           ) : (
             <Text color="gray.500">
-              {getUpdatedBy(reply)}
+              {reply.updatedBy?.__typename === "User" && reply.updatedBy.id === myId ? (
+                <FormattedMessage id="generic.you" defaultMessage="You" />
+              ) : (
+                <UserOrContactReference userOrAccess={reply.updatedBy} isLink={false} />
+              )}
+              {", "}
               <DateTime as="span" value={reply.createdAt} format={FORMATS.LLL} />
             </Text>
           )}
@@ -257,19 +243,10 @@ PetitionRepliesFieldReply.fragments = {
         options
       }
       updatedBy {
-        ... on User {
-          id
-          fullName
-        }
-        ... on PetitionAccess {
-          id
-          contact {
-            id
-            fullName
-          }
-        }
+        ...UserOrContactReference_UserOrPetitionAccess
       }
     }
+    ${UserOrContactReference.fragments.UserOrPetitionAccess}
   `,
 };
 
