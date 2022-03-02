@@ -78,7 +78,7 @@ export const HeaderNameEditable = Object.assign(
                     })}
                     offset={[0, -1]}
                   >
-                    <Box>
+                    <Box minWidth="0">
                       <EditablePreview
                         ref={editablePreviewRef}
                         color={name ? undefined : "gray.400"}
