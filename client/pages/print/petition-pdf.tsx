@@ -160,9 +160,16 @@ type HardcodedSigner = {
 };
 function HardcodedSignatures({ fromTemplateId }: { fromTemplateId: string }) {
   const signaturesByTemplateId: Record<string, HardcodedSigner[] | undefined> = useMemo(() => {
+    const guillermo: HardcodedSigner = {
+      name: "Guillermo Preckler",
+      imgSrc: "static/images/signatures/guillermo-preckler-brickbro.png",
+    };
     switch (process.env.NEXT_PUBLIC_ENVIRONMENT) {
       case "production":
-        return {};
+        return {
+          EAwW2jXkP4C9LjU2b3: [guillermo],
+          EAwW2jXkP4C9LjU2fS: [guillermo],
+        };
       case "staging":
         return {};
       default:
