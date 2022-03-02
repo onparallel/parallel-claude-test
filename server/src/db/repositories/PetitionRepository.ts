@@ -612,6 +612,12 @@ export class PetitionRepository extends BaseRepository {
 
   readonly loadAccessByKeycode = this.buildLoadBy("petition_access", "keycode");
 
+  readonly loadActiveAccessByContactId = this.buildLoadMultipleBy(
+    "petition_access",
+    "contact_id",
+    (q) => q.where("status", "ACTIVE")
+  );
+
   readonly loadAccessesForPetition = this.buildLoadMultipleBy(
     "petition_access",
     "petition_id",

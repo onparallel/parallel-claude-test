@@ -1,18 +1,22 @@
 import { nameCase } from "@foundernest/namecase";
-import { inputObjectType, list, mutationField, nonNull } from "nexus";
+import { ApolloError } from "apollo-server-core";
+import { booleanArg, inputObjectType, list, mutationField, nonNull, nullable } from "nexus";
 import pMap from "p-map";
-import { chunk, isDefined, uniqBy } from "remeda";
+import { chunk, countBy, isDefined, uniqBy } from "remeda";
 import { CreateContact } from "../../db/__types";
+import { unMaybeArray } from "../../util/arrays";
 import { withError } from "../../util/promises/withError";
-import { authenticate, chain } from "../helpers/authorize";
+import { authenticate, authenticateAnd } from "../helpers/authorize";
 import { ExcelParsingError, WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { importFromExcel } from "../helpers/importDataFromExcel";
 import { parseContactList } from "../helpers/parseContactList";
+import { RESULT } from "../helpers/result";
 import { uploadArg } from "../helpers/upload";
 import { notEmptyObject } from "../helpers/validators/notEmptyObject";
 import { validateFile } from "../helpers/validators/validateFile";
 import { validEmail } from "../helpers/validators/validEmail";
+import { contextUserHasRole } from "../users/authorizers";
 import { userHasAccessToContacts } from "./authorizers";
 
 export const createContact = mutationField("createContact", {
@@ -57,7 +61,7 @@ export const createContact = mutationField("createContact", {
 export const updateContact = mutationField("updateContact", {
   description: "Updates a contact.",
   type: "Contact",
-  authorize: chain(authenticate(), userHasAccessToContacts("id")),
+  authorize: authenticateAnd(userHasAccessToContacts("id")),
   args: {
     id: nonNull(globalIdArg("Contact")),
     data: nonNull(
@@ -81,20 +85,6 @@ export const updateContact = mutationField("updateContact", {
       data.last_name = lastName;
     }
     return await ctx.contacts.updateContact(args.id, data, ctx.user!);
-  },
-});
-
-export const deleteContacts = mutationField("deleteContacts", {
-  description: "Delete contacts.",
-  type: "Result",
-  authorize: chain(authenticate(), userHasAccessToContacts("ids")),
-  args: {
-    ids: nonNull(list(nonNull(globalIdArg("Contact")))),
-  },
-  resolve: async (_, args, ctx) => {
-    throw new WhitelistedError("Contact deletion is disabled.", "DELETE_CONTACT_ERROR");
-    // await ctx.contacts.deleteContactById(args.ids, ctx.user!);
-    // return RESULT.SUCCESS;
   },
 });
 
@@ -156,5 +146,45 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
     ).flat();
 
     return uniqBy(contacts, (c) => c.email);
+  },
+});
+
+export const deleteContacts = mutationField("deleteContacts", {
+  description: "Delete contacts.",
+  type: "Result",
+  authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasAccessToContacts("ids")),
+  args: {
+    ids: nonNull(list(nonNull(globalIdArg("Contact")))),
+    force: nullable(
+      booleanArg({
+        description:
+          "Pass true to force deleting contacts with active accesses. Their accesses will be set as INACTIVE",
+      })
+    ),
+  },
+  resolve: async (_, { ids, force }, ctx) => {
+    const activeAccesses = await ctx.petitions.loadActiveAccessByContactId(ids);
+    if (activeAccesses.some((contactAccess) => contactAccess.length > 0) && !force) {
+      let data: any = {};
+      if (ids.length === 1) {
+        // fill extra error data only if we wanted to delete 1 contact
+        const petitions = (
+          await ctx.petitions.loadPetition(activeAccesses[0].map((a) => a.petition_id))
+        ).filter(isDefined);
+        data = {
+          PENDING: countBy(petitions, (p) => p.status === "PENDING"),
+          COMPLETED: countBy(petitions, (p) => p.status === "COMPLETED"),
+          CLOSED: countBy(petitions, (p) => p.status === "CLOSED"),
+        };
+      }
+      throw new ApolloError(
+        "The contact has active accesses. Pass force=true to force deletion",
+        "CONTACT_HAS_ACTIVE_ACCESSES_ERROR",
+        data
+      );
+    }
+
+    await ctx.contacts.deleteContactById(ids, ctx.user!);
+    return RESULT.SUCCESS;
   },
 });

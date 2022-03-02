@@ -223,21 +223,41 @@ export class ContactRepository extends BaseRepository {
   }
 
   async deleteContactById(contactId: MaybeArray<number>, user: User) {
-    return await this.withTransaction(async (t) => {
+    const ids = unMaybeArray(contactId);
+    if (ids.length === 0) {
+      return;
+    }
+
+    await this.withTransaction(async (t) => {
       await this.from("contact", t)
         .update({
           deleted_at: this.now(),
           deleted_by: `User:${user.id}`,
         })
-        .whereIn("id", unMaybeArray(contactId));
+        .whereIn("id", ids);
 
-      await this.from("petition_access", t)
-        .update({
-          status: "INACTIVE",
-          reminders_active: false,
-          next_reminder_at: null,
-        })
-        .whereIn("contact_id", unMaybeArray(contactId));
+      const accesses = await this.from("petition_access", t)
+        .whereIn("contact_id", ids)
+        .where({ status: "ACTIVE" })
+        .update(
+          {
+            status: "INACTIVE",
+            reminders_active: false,
+            next_reminder_at: null,
+          },
+          "*"
+        );
+      if (accesses.length > 0) {
+        await this.from("petition_message", t)
+          .whereIn(
+            "petition_access_id",
+            accesses.map((a) => a.id)
+          )
+          .where({ status: "SCHEDULED" })
+          .update({
+            status: "CANCELLED",
+          });
+      }
     });
   }
 

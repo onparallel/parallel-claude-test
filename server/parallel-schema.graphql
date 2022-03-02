@@ -768,7 +768,13 @@ type Mutation {
   """
   Delete contacts.
   """
-  deleteContacts(ids: [GID!]!): Result!
+  deleteContacts(
+    """
+    Pass true to force deleting contacts with active accesses. Their accesses will be set as INACTIVE
+    """
+    force: Boolean
+    ids: [GID!]!
+  ): Result!
 
   """
   Deletes event subscriptions

@@ -3550,6 +3550,7 @@ export interface NexusGenArgTypes {
     };
     deleteContacts: {
       // args
+      force?: boolean | null; // Boolean
       ids: NexusGenScalars["GID"][]; // [GID!]!
     };
     deleteEventSubscriptions: {
