@@ -122,6 +122,13 @@ export interface CommentPublishedEvent extends PetitionEvent {
   type: PetitionEventType;
 }
 
+/** Information from the connection. */
+export interface ConnectionMetadata {
+  __typename?: "ConnectionMetadata";
+  country?: Maybe<Scalars["String"]>;
+  ip?: Maybe<Scalars["String"]>;
+}
+
 /** A contact in the system. */
 export interface Contact extends Timestamps {
   __typename?: "Contact";
@@ -379,9 +386,8 @@ export interface Mutation {
   /** Closes an open petition. */
   closePetition: Petition;
   /**
-   *
-   *     Marks a petition as COMPLETED.
-   *     If the petition has a signature configured and does not require a review, starts the signing process.
+   * Marks a petition as COMPLETED.
+   * If the petition has a signature configured and does not require a review, starts the signing process.
    */
   completePetition: Petition;
   /** Creates a reply to a checkbox field. */
@@ -482,9 +488,8 @@ export interface Mutation {
   petitionFieldAttachmentUploadComplete: PetitionFieldAttachment;
   publicCheckVerificationCode: VerificationCodeCheck;
   /**
-   *
-   *     Marks a filled petition as COMPLETED.
-   *     If the petition does not require a review, starts the signing process. Otherwise sends email to user.
+   * Marks a filled petition as COMPLETED.
+   * If the petition does not require a review, starts the signing process. Otherwise sends email to user.
    */
   publicCompletePetition: PublicPetition;
   /** Creates and sends the petition linked to the PublicPetitionLink to the contact passed in args */
@@ -2681,6 +2686,7 @@ export interface Query {
   landingTemplateCategorySamples: Array<LandingTemplateCategorySample>;
   landingTemplates: LandingTemplatePagination;
   me: User;
+  metadata: ConnectionMetadata;
   organization?: Maybe<Organization>;
   /** The organizations registered in Parallel. */
   organizations: OrganizationPagination;
@@ -2697,7 +2703,6 @@ export interface Query {
   publicPetitionLinkBySlug?: Maybe<PublicPublicPetitionLink>;
   publicTask: Task;
   publicTemplateCategories: Array<Scalars["String"]>;
-  publicUserMetadata: UserMetadata;
   /** Search users and user groups */
   searchUsers: Array<UserOrUserGroup>;
   subscriptions: Array<PetitionEventSubscription>;
@@ -2765,6 +2770,10 @@ export interface QuerylandingTemplatesArgs {
   limit?: InputMaybe<Scalars["Int"]>;
   locale: PetitionLocale;
   offset?: InputMaybe<Scalars["Int"]>;
+}
+
+export interface QuerymetadataArgs {
+  keycode?: InputMaybe<Scalars["ID"]>;
 }
 
 export interface QueryorganizationArgs {
@@ -3366,13 +3375,6 @@ export interface UserGroupPagination {
   items: Array<UserGroup>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
-}
-
-/** A information from a user like IP, countryISO, etc... */
-export interface UserMetadata {
-  __typename?: "UserMetadata";
-  countryISO?: Maybe<Scalars["String"]>;
-  ip?: Maybe<Scalars["String"]>;
 }
 
 export interface UserNotifications_Pagination {
@@ -15259,6 +15261,7 @@ export type PetitionPreview_userQuery = {
       };
     };
   };
+  metadata: { __typename?: "ConnectionMetadata"; country?: string | null };
 };
 
 export type PetitionReplies_PetitionFragment = {
@@ -17302,6 +17305,7 @@ export type RecipientView_accessQuery = {
     } | null;
     message?: { __typename?: "PublicPetitionMessage"; id: string; subject?: string | null } | null;
   } | null;
+  metadata: { __typename?: "ConnectionMetadata"; country?: string | null };
 };
 
 export type RecipientViewVerify_verifyPublicAccessMutationVariables = Exact<{
@@ -18016,12 +18020,6 @@ export type useGetPageFields_PetitionFieldFragment = {
     id: string;
     content: { [key: string]: any };
   }>;
-};
-
-export type useGetUserMetadata_publicUserMetadataQueryVariables = Exact<{ [key: string]: never }>;
-
-export type useGetUserMetadata_publicUserMetadataQuery = {
-  publicUserMetadata: { __typename?: "UserMetadata"; countryISO?: string | null };
 };
 
 export type useLiquidScope_PetitionFieldFragment = {
@@ -24240,6 +24238,9 @@ export const PetitionPreview_userDocument = gql`
     me {
       ...PetitionPreview_User
     }
+    metadata {
+      country
+    }
   }
   ${PetitionPreview_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionPreview_userQuery, PetitionPreview_userQueryVariables>;
@@ -24625,6 +24626,9 @@ export const RecipientView_accessDocument = gql`
     access(keycode: $keycode) {
       ...RecipientView_PublicPetitionAccess
     }
+    metadata {
+      country
+    }
   }
   ${RecipientView_PublicPetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<RecipientView_accessQuery, RecipientView_accessQueryVariables>;
@@ -24976,16 +24980,6 @@ export const useExportRepliesTask_getTaskResultFileUrlDocument = gql`
 ` as unknown as DocumentNode<
   useExportRepliesTask_getTaskResultFileUrlMutation,
   useExportRepliesTask_getTaskResultFileUrlMutationVariables
->;
-export const useGetUserMetadata_publicUserMetadataDocument = gql`
-  query useGetUserMetadata_publicUserMetadata {
-    publicUserMetadata {
-      countryISO
-    }
-  }
-` as unknown as DocumentNode<
-  useGetUserMetadata_publicUserMetadataQuery,
-  useGetUserMetadata_publicUserMetadataQueryVariables
 >;
 export const PetitionSignaturesCardPolling_petitionDocument = gql`
   query PetitionSignaturesCardPolling_petition($petitionId: GID!) {

@@ -111,6 +111,12 @@ export type CommentPublishedEvent = PetitionEvent & {
   type: PetitionEventType;
 };
 
+/** Information from the connection. */
+export type ConnectionMetadata = {
+  country: Maybe<Scalars["String"]>;
+  ip: Maybe<Scalars["String"]>;
+};
+
 /** A contact in the system. */
 export type Contact = Timestamps & {
   /** The petition accesses for this contact */
@@ -349,9 +355,8 @@ export type Mutation = {
   /** Closes an open petition. */
   closePetition: Petition;
   /**
-   *
-   *     Marks a petition as COMPLETED.
-   *     If the petition has a signature configured and does not require a review, starts the signing process.
+   * Marks a petition as COMPLETED.
+   * If the petition has a signature configured and does not require a review, starts the signing process.
    */
   completePetition: Petition;
   /** Creates a reply to a checkbox field. */
@@ -452,9 +457,8 @@ export type Mutation = {
   petitionFieldAttachmentUploadComplete: PetitionFieldAttachment;
   publicCheckVerificationCode: VerificationCodeCheck;
   /**
-   *
-   *     Marks a filled petition as COMPLETED.
-   *     If the petition does not require a review, starts the signing process. Otherwise sends email to user.
+   * Marks a filled petition as COMPLETED.
+   * If the petition does not require a review, starts the signing process. Otherwise sends email to user.
    */
   publicCompletePetition: PublicPetition;
   /** Creates and sends the petition linked to the PublicPetitionLink to the contact passed in args */
@@ -2594,6 +2598,7 @@ export type Query = {
   landingTemplateCategorySamples: Array<LandingTemplateCategorySample>;
   landingTemplates: LandingTemplatePagination;
   me: User;
+  metadata: ConnectionMetadata;
   organization: Maybe<Organization>;
   /** The organizations registered in Parallel. */
   organizations: OrganizationPagination;
@@ -2610,7 +2615,6 @@ export type Query = {
   publicPetitionLinkBySlug: Maybe<PublicPublicPetitionLink>;
   publicTask: Task;
   publicTemplateCategories: Array<Scalars["String"]>;
-  publicUserMetadata: UserMetadata;
   /** Search users and user groups */
   searchUsers: Array<UserOrUserGroup>;
   subscriptions: Array<PetitionEventSubscription>;
@@ -2678,6 +2682,10 @@ export type QuerylandingTemplatesArgs = {
   limit?: InputMaybe<Scalars["Int"]>;
   locale: PetitionLocale;
   offset?: InputMaybe<Scalars["Int"]>;
+};
+
+export type QuerymetadataArgs = {
+  keycode?: InputMaybe<Scalars["ID"]>;
 };
 
 export type QueryorganizationArgs = {
@@ -3249,12 +3257,6 @@ export type UserGroupPagination = {
   items: Array<UserGroup>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
-};
-
-/** A information from a user like IP, countryISO, etc... */
-export type UserMetadata = {
-  countryISO: Maybe<Scalars["String"]>;
-  ip: Maybe<Scalars["String"]>;
 };
 
 export type UserNotifications_Pagination = {

@@ -11,6 +11,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { flags } from "@parallel/utils/flags";
 import { phoneCodes } from "@parallel/utils/phoneCodes";
 import { useConstant } from "@parallel/utils/useConstant";
+import { useMetadata } from "@parallel/utils/withMetadata";
 import useMergedRef from "@react-hook/merged-ref";
 import { AsYouType } from "libphonenumber-js/min/index";
 import { ChangeEvent, FocusEvent, useEffect, useRef, useState } from "react";
@@ -30,13 +31,15 @@ export interface PhoneInputProps extends ThemingProps<"Input">, FormControlOptio
 }
 
 export default chakraForwardRef<"input", PhoneInputProps>(function PhoneInput(
-  { value, onLoad, onChange, onBlur, defaultCountry, ...props },
+  { value, placeholder, onLoad, onChange, onBlur, defaultCountry, ...props },
   ref
 ) {
   const inputRef = useRef<HTMLInputElement>(null);
   const mergedRef = useMergedRef(ref, inputRef);
+  const metadata = useMetadata();
+  const _defaultCountry = defaultCountry ?? metadata?.country ?? undefined;
 
-  const formatter = useConstant(() => new AsYouType());
+  const formatter = useConstant(() => new AsYouType({ defaultCountry: _defaultCountry as any }));
   const [inputValue, setInputValue] = useState("");
   const [country, setCountry] = useState<string | undefined>(undefined);
 
@@ -131,6 +134,7 @@ export default chakraForwardRef<"input", PhoneInputProps>(function PhoneInput(
         value={inputValue}
         onChange={handleChange}
         onBlur={handleBlur}
+        placeholder={placeholder ?? (_defaultCountry ? phoneCodes[_defaultCountry] : "+")}
         {...props}
       />
     </InputGroup>

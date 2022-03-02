@@ -49,6 +49,7 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { useGetPageFields } from "@parallel/utils/useGetPageFields";
 import { LiquidScopeProvider } from "@parallel/utils/useLiquid";
 import { useLiquidScope } from "@parallel/utils/useLiquidScope";
+import { withMetadata } from "@parallel/utils/withMetadata";
 import { AnimatePresence, motion } from "framer-motion";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -57,7 +58,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 import ResizeObserver, { DOMRect } from "react-resize-observer";
 
 type RecipientViewProps = UnwrapPromise<ReturnType<typeof RecipientView.getInitialProps>>;
-
 function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) {
   const intl = useIntl();
   const router = useRouter();
@@ -564,6 +564,9 @@ RecipientView.queries = [
       access(keycode: $keycode) {
         ...RecipientView_PublicPetitionAccess
       }
+      metadata {
+        country
+      }
     }
     ${RecipientView.fragments.PublicPetitionAccess}
   `,
@@ -576,20 +579,19 @@ RecipientView.getInitialProps = async ({ query, pathname, fetchQuery }: WithApol
     throw new RedirectError(resolveUrl(pathname, { ...query, page: "1" }));
   }
 
-  const result = await fetchQuery(RecipientView_accessDocument, {
+  const { data } = await fetchQuery(RecipientView_accessDocument, {
     variables: { keycode },
   });
-  if (!result.data?.access?.petition) {
+  if (!data?.access?.petition) {
     throw new Error();
   }
   const pageCount =
-    result.data.access.petition.fields.filter(
-      (f) => f.type === "HEADING" && f.options!.hasPageBreak
-    ).length + 1;
+    data.access.petition.fields.filter((f) => f.type === "HEADING" && f.options!.hasPageBreak)
+      .length + 1;
   if (page > pageCount) {
     throw new RedirectError(resolveUrl(pathname, { ...query, page: "1" }));
   }
-  return { keycode, currentPage: page, pageCount };
+  return { keycode, currentPage: page, pageCount, metadata: data.metadata };
 };
 
-export default compose(withDialogs, withApolloData)(RecipientView);
+export default compose(withMetadata, withDialogs, withApolloData)(RecipientView);

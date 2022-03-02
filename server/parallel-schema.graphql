@@ -105,6 +105,14 @@ type CommentPublishedEvent implements PetitionEvent {
 }
 
 """
+Information from the connection.
+"""
+type ConnectionMetadata {
+  country: String
+  ip: String
+}
+
+"""
 A contact in the system.
 """
 type Contact implements Timestamps {
@@ -3707,6 +3715,7 @@ type Query {
     offset: Int
   ): LandingTemplatePagination!
   me: User!
+  metadata(keycode: ID): ConnectionMetadata!
   organization(id: GID!): Organization
 
   """
@@ -3782,7 +3791,6 @@ type Query {
   publicPetitionLinkBySlug(slug: ID!): PublicPublicPetitionLink
   publicTask(keycode: ID!, taskId: GID!): Task!
   publicTemplateCategories: [String!]!
-  publicUserMetadata: UserMetadata!
 
   """
   Search users and user groups
@@ -4576,14 +4584,6 @@ type UserGroupPagination {
   The total count of items in the list.
   """
   totalCount: Int!
-}
-
-"""
-A information from a user like IP and CountryISO.
-"""
-type UserMetadata {
-  countryISO: String
-  ip: String
 }
 
 type UserNotifications_Pagination {

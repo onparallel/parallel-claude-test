@@ -1,9 +1,10 @@
+import { lookup } from "geoip-country";
 import { idArg, nonNull, nullable, objectType, queryField } from "nexus";
-import { chain } from "../helpers/authorize";
+import { isDefined } from "remeda";
+import { getClientIp } from "request-ip";
+import { authenticate, chain, ifArgDefined } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { authenticatePublicAccess, fieldBelongsToAccess, taskBelongsToAccess } from "./authorizers";
-import { lookup } from "geoip-country";
-import { getClientIp } from "request-ip";
 
 export const accessQuery = queryField("access", {
   type: nullable("PublicPetitionAccess"),
@@ -13,6 +14,30 @@ export const accessQuery = queryField("access", {
   authorize: authenticatePublicAccess("keycode"),
   resolve: async (root, args, ctx) => {
     return ctx.access!;
+  },
+});
+
+export const metadata = queryField("metadata", {
+  type: objectType({
+    name: "ConnectionMetadata",
+    description: "Information from the connection.",
+    definition(t) {
+      t.nullable.string("ip");
+      t.nullable.string("country");
+    },
+  }),
+  args: {
+    keycode: idArg(),
+  },
+  authorize: ifArgDefined("keycode", authenticatePublicAccess("keycode" as never), authenticate()),
+  resolve: async (_, args, ctx) => {
+    const ip = getClientIp(ctx.req);
+    let country: string | null = null;
+    if (isDefined(ip)) {
+      const geo = lookup(ip);
+      country = geo?.country ?? null;
+    }
+    return { ip, country };
   },
 });
 
@@ -36,26 +61,6 @@ export const publicOrgLogo = queryField("publicOrgLogoUrl", {
   },
   resolve: async (_, { id }, ctx) => {
     return await ctx.organizations.getOrgLogoUrl(id);
-  },
-});
-
-export const publicUserMetadata = queryField("publicUserMetadata", {
-  type: objectType({
-    name: "UserMetadata",
-    description: "A information from a user like IP and CountryISO.",
-    definition(t) {
-      t.nullable.string("ip");
-      t.nullable.string("countryISO");
-    },
-  }),
-  resolve: async (_, args, ctx) => {
-    const ip = getClientIp(ctx.req);
-    const geo = lookup(ip ?? "");
-
-    return {
-      ip,
-      countryISO: geo?.country ?? null,
-    };
   },
 });
 

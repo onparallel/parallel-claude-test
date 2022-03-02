@@ -8,7 +8,7 @@ import { createUploadLink } from "apollo-upload-client";
 import { parse as parseCookie, serialize as serializeCookie } from "cookie";
 import { IncomingMessage } from "http";
 import Router from "next/router";
-import { filter, indexBy, map, pipe, sortBy, uniqBy } from "remeda";
+import { filter, indexBy, map, pick, pipe, sortBy, uniqBy } from "remeda";
 import typeDefs from "./client-schema.graphql";
 
 export interface CreateApolloClientOptions {
@@ -47,8 +47,7 @@ export function mergeArraysBy(path: string[]): FieldMergeFunction {
 
 let _cached: ApolloClient<any>;
 export function createApolloClient(initialState: any, { req }: CreateApolloClientOptions) {
-  // Make sure to create a new client for every server-side request so that data
-  // isn't shared between connections
+  // Make sure to create a new client for every server-side request so that data isn't shared between connections
   if (typeof window !== "undefined" && _cached) {
     return _cached;
   }
@@ -57,13 +56,16 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
     uri: typeof window !== "undefined" ? "/graphql" : "http://localhost:4000/graphql",
   });
 
-  const authLink = setContext((_, { headers, ...re }) => {
+  const authLink = setContext((_, { headers }) => {
     return {
       headers: {
         ...headers,
         ...(typeof window !== "undefined"
           ? {}
-          : { cookie: filterCookies(req!.headers["cookie"]!) }),
+          : {
+              ...pick(req!.headers, ["x-forwarded-for"]),
+              cookie: filterCookies(req!.headers["cookie"]!),
+            }),
       },
     };
   });

@@ -51,6 +51,7 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { omit } from "remeda";
+import { withMetadata } from "@parallel/utils/withMetadata";
 
 type PetitionPreviewProps = UnwrapPromise<ReturnType<typeof PetitionPreview.getInitialProps>>;
 
@@ -466,6 +467,9 @@ PetitionPreview.queries = [
       me {
         ...PetitionPreview_User
       }
+      metadata {
+        country
+      }
     }
     ${PetitionPreview.fragments.User}
   `,
@@ -473,14 +477,23 @@ PetitionPreview.queries = [
 
 PetitionPreview.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const petitionId = query.petitionId as string;
-  await Promise.all([
+  const [
+    {
+      data: { metadata },
+    },
+  ] = await Promise.all([
     fetchQuery(PetitionPreview_userDocument),
     fetchQuery(PetitionPreview_petitionDocument, {
       variables: { id: petitionId },
       ignoreCache: true,
     }),
   ]);
-  return { petitionId };
+  return { petitionId, metadata };
 };
 
-export default compose(withPetitionState, withDialogs, withApolloData)(PetitionPreview);
+export default compose(
+  withMetadata,
+  withPetitionState,
+  withDialogs,
+  withApolloData
+)(PetitionPreview);

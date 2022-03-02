@@ -312,6 +312,11 @@ export interface NexusGenObjects {
   CommentCreatedUserNotification: notifications.CommentCreatedUserNotification;
   CommentDeletedEvent: events.CommentDeletedEvent;
   CommentPublishedEvent: events.CommentPublishedEvent;
+  ConnectionMetadata: {
+    // root type
+    country?: string | null; // String
+    ip?: string | null; // String
+  };
   Contact: db.Contact;
   ContactPagination: {
     // root type
@@ -578,11 +583,6 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     totalCount: number; // Int!
   };
-  UserMetadata: {
-    // root type
-    countryISO?: string | null; // String
-    ip?: string | null; // String
-  };
   UserNotifications_Pagination: {
     // root type
     hasMore: boolean; // Boolean!
@@ -719,6 +719,11 @@ export interface NexusGenFieldTypes {
     field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
     id: NexusGenScalars["GID"]; // GID!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
+  };
+  ConnectionMetadata: {
+    // field return type
+    country: string | null; // String
+    ip: string | null; // String
   };
   Contact: {
     // field return type
@@ -1559,6 +1564,7 @@ export interface NexusGenFieldTypes {
     landingTemplateCategorySamples: NexusGenRootTypes["LandingTemplateCategorySample"][]; // [LandingTemplateCategorySample!]!
     landingTemplates: NexusGenRootTypes["LandingTemplatePagination"]; // LandingTemplatePagination!
     me: NexusGenRootTypes["User"]; // User!
+    metadata: NexusGenRootTypes["ConnectionMetadata"]; // ConnectionMetadata!
     organization: NexusGenRootTypes["Organization"] | null; // Organization
     organizations: NexusGenRootTypes["OrganizationPagination"]; // OrganizationPagination!
     petition: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
@@ -1571,7 +1577,6 @@ export interface NexusGenFieldTypes {
     publicPetitionLinkBySlug: NexusGenRootTypes["PublicPublicPetitionLink"] | null; // PublicPublicPetitionLink
     publicTask: NexusGenRootTypes["Task"]; // Task!
     publicTemplateCategories: string[]; // [String!]!
-    publicUserMetadata: NexusGenRootTypes["UserMetadata"]; // UserMetadata!
     searchUsers: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
     subscriptions: NexusGenRootTypes["PetitionEventSubscription"][]; // [PetitionEventSubscription!]!
     tags: NexusGenRootTypes["TagPagination"]; // TagPagination!
@@ -1837,11 +1842,6 @@ export interface NexusGenFieldTypes {
     items: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     totalCount: number; // Int!
   };
-  UserMetadata: {
-    // field return type
-    countryISO: string | null; // String
-    ip: string | null; // String
-  };
   UserNotifications_Pagination: {
     // field return type
     hasMore: boolean; // Boolean!
@@ -2046,6 +2046,11 @@ export interface NexusGenFieldTypeNames {
     field: "PetitionField";
     id: "GID";
     type: "PetitionEventType";
+  };
+  ConnectionMetadata: {
+    // field return type name
+    country: "String";
+    ip: "String";
   };
   Contact: {
     // field return type name
@@ -2886,6 +2891,7 @@ export interface NexusGenFieldTypeNames {
     landingTemplateCategorySamples: "LandingTemplateCategorySample";
     landingTemplates: "LandingTemplatePagination";
     me: "User";
+    metadata: "ConnectionMetadata";
     organization: "Organization";
     organizations: "OrganizationPagination";
     petition: "PetitionBase";
@@ -2898,7 +2904,6 @@ export interface NexusGenFieldTypeNames {
     publicPetitionLinkBySlug: "PublicPublicPetitionLink";
     publicTask: "Task";
     publicTemplateCategories: "String";
-    publicUserMetadata: "UserMetadata";
     searchUsers: "UserOrUserGroup";
     subscriptions: "PetitionEventSubscription";
     tags: "TagPagination";
@@ -3163,11 +3168,6 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     items: "UserGroup";
     totalCount: "Int";
-  };
-  UserMetadata: {
-    // field return type name
-    countryISO: "String";
-    ip: "String";
   };
   UserNotifications_Pagination: {
     // field return type name
@@ -4232,6 +4232,10 @@ export interface NexusGenArgTypes {
       limit?: number | null; // Int
       locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
       offset?: number | null; // Int
+    };
+    metadata: {
+      // args
+      keycode?: string | null; // ID
     };
     organization: {
       // args
