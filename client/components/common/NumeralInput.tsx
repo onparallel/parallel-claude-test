@@ -2,11 +2,11 @@ import { FormControlOptions, ThemingProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import useMergedRef from "@react-hook/merged-ref";
 import { CleaveOptions } from "cleave.js/options";
-import { ChangeEvent, FocusEvent, useMemo, useRef, useState } from "react";
+import escapeStringRegexp from "escape-string-regexp";
+import { ChangeEvent, KeyboardEvent, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { InputCleave, InputCleaveElement } from "./InputCleave";
-import escapeStringRegexp from "escape-string-regexp";
 
 interface NumeralInputProps extends ThemingProps<"Input">, FormControlOptions {
   decimals?: number;
@@ -18,7 +18,7 @@ interface NumeralInputProps extends ThemingProps<"Input">, FormControlOptions {
 }
 
 export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(function NumeralInput(
-  { decimals, positiveOnly, value, prefix, tailPrefix, onChange, onFocus, ...props },
+  { decimals, positiveOnly, value, prefix, tailPrefix, onChange, onKeyDown, ...props },
   ref
 ) {
   const intl = useIntl();
@@ -68,21 +68,25 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
     }
   };
 
-  const handleOnFocus = (e: FocusEvent<HTMLInputElement>) => {
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (
+      event.key === "Backspace" &&
       prefix &&
       tailPrefix &&
-      isDefined(e.target.selectionStart) &&
-      e.target.selectionStart > e.target.value.length - prefix.length
+      inputRef.current &&
+      isDefined(inputRef.current.selectionStart) &&
+      inputRef.current.selectionStart > inputRef.current.value.length - prefix.length
     ) {
-      // move he cursor before the suffix
-      inputRef.current?.setSelectionRange(
-        e.target.value.length - prefix.length,
-        e.target.value.length - prefix.length
+      const newValue = inputRef.current.value.replace(
+        new RegExp(
+          tailPrefix ? `${escapeStringRegexp(prefix)}$` : `^${escapeStringRegexp(prefix)}`
+        ),
+        ""
       );
+      setValue(newValue.slice(0, -1));
     }
-    onFocus?.(e);
   };
+
   return (
     <InputCleave
       ref={mergedRef}
@@ -90,7 +94,7 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
       options={cleaveOptions}
       value={_value}
       onChange={handleChange}
-      onFocus={handleOnFocus}
+      onKeyDown={handleKeyDown}
       {...props}
     />
   );

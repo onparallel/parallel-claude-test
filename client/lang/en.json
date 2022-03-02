@@ -860,6 +860,11 @@
     "context": "Limit value range"
   },
   {
+    "term": "component.field-settings-number.prefix-error",
+    "definition": "Numbers, commas and periods are not allowed.",
+    "context": "Numbers, commas and periods are not allowed."
+  },
+  {
     "term": "component.field-settings-number.range-error",
     "definition": "Maximum can not be lower than minimum.",
     "context": "Maximum can not be lower than minimum."

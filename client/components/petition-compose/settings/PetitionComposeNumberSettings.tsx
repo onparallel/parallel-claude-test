@@ -4,16 +4,16 @@ import {
   FormErrorMessage,
   FormLabel,
   HStack,
-  Input,
-  Select,
-  Stack,
-  Text,
   Image,
+  Input,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
+  Select,
+  Stack,
+  Text,
 } from "@chakra-ui/react";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
@@ -44,6 +44,8 @@ export function NumberSettings({
   const [prefixValue, setPrefixValue] = useState(
     isDefined(options.prefix) ? options.prefix : options.suffix ?? ""
   );
+
+  const [isInvalidPrefix, setIsInvalidPrefix] = useState(false);
 
   const isRangeInvalid = isDefined(range.min) && isDefined(range.max) && range.min > range.max;
 
@@ -104,6 +106,13 @@ export function NumberSettings({
   };
 
   const handlePrefixBlur = (option: string) => {
+    if (/[\d.,]/.test(prefixValue)) {
+      setIsInvalidPrefix(true);
+      return;
+    } else if (isInvalidPrefix) {
+      setIsInvalidPrefix(false);
+    }
+
     debouncedOnUpdate(field.id, {
       options: {
         ...field.options,
@@ -256,48 +265,63 @@ export function NumberSettings({
         isChecked={hasPrefix}
         controlId="number-prefix-suffix"
       >
-        <Stack>
-          <HStack>
-            <Box>
-              <Select
+        <FormControl isInvalid={isInvalidPrefix}>
+          <Stack>
+            <HStack>
+              <Box>
+                <Select
+                  isInvalid={false}
+                  size="sm"
+                  borderRadius="md"
+                  value={prefixOption}
+                  onChange={handleChangePrefixOption}
+                >
+                  <option value="prefix">
+                    {intl.formatMessage({
+                      id: "generic.before",
+                      defaultMessage: "Before",
+                    })}
+                  </option>
+                  <option value="suffix">
+                    {intl.formatMessage({
+                      id: "generic.after",
+                      defaultMessage: "After",
+                    })}
+                  </option>
+                </Select>
+              </Box>
+              <Input
+                flex="1"
                 size="sm"
-                borderRadius="md"
-                value={prefixOption}
-                onChange={handleChangePrefixOption}
-              >
-                <option value="prefix">
-                  {intl.formatMessage({
-                    id: "generic.before",
-                    defaultMessage: "Before",
-                  })}
-                </option>
-                <option value="suffix">
-                  {intl.formatMessage({
-                    id: "generic.after",
-                    defaultMessage: "After",
-                  })}
-                </option>
-              </Select>
-            </Box>
-            <Input
-              flex="1"
-              size="sm"
-              placeholder="%, €, $..."
-              value={prefixValue}
-              onChange={(e) => setPrefixValue(e.target.value)}
-              onBlur={() => handlePrefixBlur(prefixOption)}
-            />
-          </HStack>
-          <Text fontSize="sm" color="gray.500" whiteSpace="pre">
-            <FormattedMessage
-              id="component.field-settings-number.add-text-symbols-example"
-              defaultMessage="Example:"
-            />{" "}
-            {`${prefixOption === "prefix" ? prefixValue : ""}100${
-              prefixOption === "suffix" ? prefixValue : ""
-            }`}
-          </Text>
-        </Stack>
+                placeholder="%, €, $..."
+                value={prefixValue}
+                onChange={(e) => setPrefixValue(e.target.value)}
+                onBlur={() => handlePrefixBlur(prefixOption)}
+              />
+            </HStack>
+            <Text
+              fontSize="sm"
+              color="gray.500"
+              whiteSpace="pre"
+              display={isInvalidPrefix ? "none" : "block"}
+              height={5}
+            >
+              <FormattedMessage
+                id="component.field-settings-number.add-text-symbols-example"
+                defaultMessage="Example:"
+              />{" "}
+              {`${prefixOption === "prefix" ? prefixValue : ""}100${
+                prefixOption === "suffix" ? prefixValue : ""
+              }`}
+            </Text>
+            <FormErrorMessage fontSize="sm" height={5}>
+              <FormattedMessage
+                id="component.field-settings-number.prefix-error"
+                defaultMessage="Numbers, commas and periods are not allowed."
+              />
+            </FormErrorMessage>
+          </Stack>
+        </FormControl>
       </SettingsRowSwitch>
       <SettingsRowPlaceholder
         placeholder={placeholder}
