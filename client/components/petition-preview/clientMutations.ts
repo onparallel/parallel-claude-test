@@ -120,6 +120,7 @@ export function useUpdateSimpleReply() {
         updateReplyContent(client, replyId, (content) => ({
           ...content,
           text: reply,
+          value: reply, // this is a temporal fix and will be removed once feat/ch2213 is released
         }));
       } else {
         await updateSimpleReply({
@@ -184,7 +185,7 @@ export function useCreateSimpleReply() {
             id,
             __typename: "PetitionFieldReply",
             status: "PENDING",
-            content: { text: reply },
+            content: { text: reply, value: reply },
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           },
@@ -249,7 +250,7 @@ export function useUpdateNumericReply() {
       if (isCacheOnly) {
         updateReplyContent(client, replyId, (content) => ({
           ...content,
-          text: reply,
+          value: reply,
         }));
       } else {
         await updateNumericReply({
