@@ -4,7 +4,6 @@ import { booleanArg, inputObjectType, list, mutationField, nonNull, nullable } f
 import pMap from "p-map";
 import { chunk, countBy, isDefined, uniqBy } from "remeda";
 import { CreateContact } from "../../db/__types";
-import { unMaybeArray } from "../../util/arrays";
 import { withError } from "../../util/promises/withError";
 import { authenticate, authenticateAnd } from "../helpers/authorize";
 import { ExcelParsingError, WhitelistedError } from "../helpers/errors";

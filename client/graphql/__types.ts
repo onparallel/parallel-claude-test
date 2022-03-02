@@ -893,6 +893,7 @@ export interface MutationdeactivateUserArgs {
 }
 
 export interface MutationdeleteContactsArgs {
+  force?: InputMaybe<Scalars["Boolean"]>;
   ids: Array<Scalars["GID"]>;
 }
 
@@ -3882,6 +3883,12 @@ export type HasFeatureFlagQuery = {
 export type WithSuperAdminAccessQueryVariables = Exact<{ [key: string]: never }>;
 
 export type WithSuperAdminAccessQuery = { me: { __typename?: "User"; isSuperAdmin: boolean } };
+
+export type useConfirmDeleteContactsDialog_ContactFragment = {
+  __typename?: "Contact";
+  fullName: string;
+  email: string;
+};
 
 export type ImportContactsDialog_bulkCreateContactsMutationVariables = Exact<{
   file: Scalars["Upload"];
@@ -10426,12 +10433,6 @@ export type Contacts_UserFragment = {
     };
   };
 };
-
-export type Contacts_deleteContactsMutationVariables = Exact<{
-  ids: Array<Scalars["GID"]> | Scalars["GID"];
-}>;
-
-export type Contacts_deleteContactsMutation = { deleteContacts: Result };
 
 export type Contacts_contactsQueryVariables = Exact<{
   offset: Scalars["Int"];
@@ -17918,6 +17919,20 @@ export type useCreatePetition_createPetitionMutation = {
     | { __typename?: "PetitionTemplate"; id: string };
 };
 
+export type useDeleteContacts_deleteContactsMutationVariables = Exact<{
+  ids: Array<Scalars["GID"]> | Scalars["GID"];
+  force?: InputMaybe<Scalars["Boolean"]>;
+}>;
+
+export type useDeleteContacts_deleteContactsMutation = { deleteContacts: Result };
+
+export type useDeleteContacts_ContactFragment = {
+  __typename?: "Contact";
+  id: string;
+  fullName: string;
+  email: string;
+};
+
 export type ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
@@ -19132,6 +19147,19 @@ export const Contact_Contact_ProfileFragmentDoc = gql`
     lastName
   }
 ` as unknown as DocumentNode<Contact_Contact_ProfileFragment, unknown>;
+export const useConfirmDeleteContactsDialog_ContactFragmentDoc = gql`
+  fragment useConfirmDeleteContactsDialog_Contact on Contact {
+    fullName
+    email
+  }
+` as unknown as DocumentNode<useConfirmDeleteContactsDialog_ContactFragment, unknown>;
+export const useDeleteContacts_ContactFragmentDoc = gql`
+  fragment useDeleteContacts_Contact on Contact {
+    id
+    ...useConfirmDeleteContactsDialog_Contact
+  }
+  ${useConfirmDeleteContactsDialog_ContactFragmentDoc}
+` as unknown as DocumentNode<useDeleteContacts_ContactFragment, unknown>;
 export const UserListPopover_UserFragmentDoc = gql`
   fragment UserListPopover_User on User {
     id
@@ -19246,6 +19274,7 @@ export const Contact_ContactFragmentDoc = gql`
   fragment Contact_Contact on Contact {
     id
     ...Contact_Contact_Profile
+    ...useDeleteContacts_Contact
     accesses(limit: 100) {
       items {
         ...Contact_PetitionAccess
@@ -19253,6 +19282,7 @@ export const Contact_ContactFragmentDoc = gql`
     }
   }
   ${Contact_Contact_ProfileFragmentDoc}
+  ${useDeleteContacts_ContactFragmentDoc}
   ${Contact_PetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<Contact_ContactFragment, unknown>;
 export const Contact_UserFragmentDoc = gql`
@@ -19270,9 +19300,11 @@ export const Contacts_ContactsListFragmentDoc = gql`
       lastName
       email
       createdAt
+      ...useDeleteContacts_Contact
     }
     totalCount
   }
+  ${useDeleteContacts_ContactFragmentDoc}
 ` as unknown as DocumentNode<Contacts_ContactsListFragment, unknown>;
 export const Contacts_UserFragmentDoc = gql`
   fragment Contacts_User on User {
@@ -23548,14 +23580,6 @@ export const Contact_contactDocument = gql`
   }
   ${Contact_ContactFragmentDoc}
 ` as unknown as DocumentNode<Contact_contactQuery, Contact_contactQueryVariables>;
-export const Contacts_deleteContactsDocument = gql`
-  mutation Contacts_deleteContacts($ids: [GID!]!) {
-    deleteContacts(ids: $ids)
-  }
-` as unknown as DocumentNode<
-  Contacts_deleteContactsMutation,
-  Contacts_deleteContactsMutationVariables
->;
 export const Contacts_contactsDocument = gql`
   query Contacts_contacts(
     $offset: Int!
@@ -24951,6 +24975,14 @@ export const useCreatePetition_createPetitionDocument = gql`
 ` as unknown as DocumentNode<
   useCreatePetition_createPetitionMutation,
   useCreatePetition_createPetitionMutationVariables
+>;
+export const useDeleteContacts_deleteContactsDocument = gql`
+  mutation useDeleteContacts_deleteContacts($ids: [GID!]!, $force: Boolean) {
+    deleteContacts(ids: $ids, force: $force)
+  }
+` as unknown as DocumentNode<
+  useDeleteContacts_deleteContactsMutation,
+  useDeleteContacts_deleteContactsMutationVariables
 >;
 export const useDeletePetitions_deletePetitionsDocument = gql`
   mutation useDeletePetitions_deletePetitions($ids: [GID!]!) {

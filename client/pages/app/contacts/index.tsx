@@ -1,12 +1,7 @@
-import { gql, useMutation } from "@apollo/client";
-import { Button, Flex, Text, useToast } from "@chakra-ui/react";
-import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
+import { gql } from "@apollo/client";
+import { Flex, Text, useToast } from "@chakra-ui/react";
 import { DateTime } from "@parallel/components/common/DateTime";
-import {
-  DialogProps,
-  useDialog,
-  withDialogs,
-} from "@parallel/components/common/dialogs/DialogProvider";
+import { useDialog, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
@@ -16,20 +11,19 @@ import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
   Contacts_contactsDocument,
   Contacts_ContactsListFragment,
-  Contacts_deleteContactsDocument,
   Contacts_userDocument,
   QueryContacts_OrderBy,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import {
   useAssertQuery,
   useAssertQueryOrPreviousData,
 } from "@parallel/utils/apollo/useAssertQuery";
-import { clearCache } from "@parallel/utils/apollo/clearCache";
-import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useGoToContact } from "@parallel/utils/goToContact";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
+import { useDeleteContacts } from "@parallel/utils/mutations/useDeleteContacts";
 import { withError } from "@parallel/utils/promises/withError";
 import {
   integer,
@@ -77,15 +71,7 @@ function Contacts() {
   });
   const createContact = useCreateContact();
 
-  const [deleteContact] = useMutation(Contacts_deleteContactsDocument, {
-    update(cache) {
-      clearCache(cache, /\$ROOT_QUERY\.contacts\(/);
-      refetch();
-    },
-  });
-
-  const [selected, setSelected] = useState<string[]>();
-  const confirmDelete = useDialog(ConfirmDeleteContacts);
+  const [selected, setSelected] = useState<string[]>([]);
 
   function handleSearchChange(value: string | null) {
     setQueryState((current) => ({
@@ -110,15 +96,11 @@ function Contacts() {
       }
     }
   }
-
+  const deleteContacts = useDeleteContacts();
   async function handleDeleteClick() {
     try {
-      await confirmDelete({
-        selected: contacts.items.filter((p) => selected!.includes(p.id)),
-      });
-      await deleteContact({
-        variables: { ids: selected! },
-      });
+      await deleteContacts(contacts.items.filter((c) => selected.includes(c.id)));
+      await refetch();
     } catch {}
   }
 
@@ -174,7 +156,7 @@ function Contacts() {
           header={
             <ContactListHeader
               search={state.search}
-              showActions={false}
+              selectionCount={selected.length}
               onSearchChange={handleSearchChange}
               onReload={() => refetch()}
               onCreateClick={handleCreateClick}
@@ -276,39 +258,6 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
   );
 }
 
-function ConfirmDeleteContacts({
-  selected,
-  ...props
-}: DialogProps<{
-  selected: ContactSelection[];
-}>) {
-  const count = selected.length;
-  const email = selected.length && selected[0].email;
-  return (
-    <ConfirmDialog
-      header={
-        <FormattedMessage id="contacts.confirm-delete.header" defaultMessage="Delete contacts" />
-      }
-      body={
-        <FormattedMessage
-          id="contacts.confirm-delete.body"
-          defaultMessage="Are you sure you want to delete {count, plural, =1 {<b>{email}</b>} other {the <b>#</b> selected contacts}}?"
-          values={{
-            count,
-            email,
-          }}
-        />
-      }
-      confirm={
-        <Button colorScheme="red" onClick={() => props.onResolve()}>
-          <FormattedMessage id="generic.confirm-delete-button" defaultMessage="Yes, delete" />
-        </Button>
-      }
-      {...props}
-    />
-  );
-}
-
 Contacts.fragments = {
   Contacts: gql`
     fragment Contacts_ContactsList on ContactPagination {
@@ -319,9 +268,11 @@ Contacts.fragments = {
         lastName
         email
         createdAt
+        ...useDeleteContacts_Contact
       }
       totalCount
     }
+    ${useDeleteContacts.fragments.Contact}
   `,
   User: gql`
     fragment Contacts_User on User {
@@ -330,14 +281,6 @@ Contacts.fragments = {
     ${AppLayout.fragments.User}
   `,
 };
-
-Contacts.mutations = [
-  gql`
-    mutation Contacts_deleteContacts($ids: [GID!]!) {
-      deleteContacts(ids: $ids)
-    }
-  `,
-];
 
 Contacts.queries = [
   gql`

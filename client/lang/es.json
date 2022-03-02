@@ -230,6 +230,51 @@
     "context": "Ongoing eSignature"
   },
   {
+    "term": "component.confirm-delete-contacts-dialog.alert.closed-petitions",
+    "definition": "{count, plural, =1{# petición cerrada} other{# peticiones cerradas}}",
+    "context": "{count} closed {count, plural, =1{petition} other{petitions}}"
+  },
+  {
+    "term": "component.confirm-delete-contacts-dialog.alert.completed-petitions",
+    "definition": "{count, plural, =1{# petición completada} other{# peticiones completadas}}",
+    "context": "{count} completed {count, plural, =1{petition} other{petitions}}"
+  },
+  {
+    "term": "component.confirm-delete-contacts-dialog.alert.multiple.text",
+    "definition": "Hay peticiones enviadas al menos a uno de estos contactos.",
+    "context": "There are petitions sent to at least one of these contacts."
+  },
+  {
+    "term": "component.confirm-delete-contacts-dialog.alert.pending-petitions",
+    "definition": "{count, plural, =1{# petición pendiente} other{# peticiones pendientes}}",
+    "context": "{count} pending {count, plural, =1{petition} other{petitions}}"
+  },
+  {
+    "term": "component.confirm-delete-contacts-dialog.alert.single.text",
+    "definition": "Se han encontrado: {petitionsCount} con este contacto.",
+    "context": "We have found: {petitionsCount} with this contact."
+  },
+  {
+    "term": "component.confirm-delete-contacts-dialog.body.1",
+    "definition": "Si continúas, {count, plural, =1{el contacto se eliminará} other{los contactos se eliminarán}} de la organización y no {count, plural, =1{podrá} other {podrán}} volver a acceder a ninguna de ellas.",
+    "context": "If you continue, the {count, plural, =1{contact} other{contacts}} will be removed from the organization and will no longer be able to access any of them."
+  },
+  {
+    "term": "component.confirm-delete-contacts-dialog.body.2",
+    "definition": "¿Estás seguro de que quieres eliminar a {count, plural, =1{<b>{fullName} <{email}></b>} other {estos contactos}}?",
+    "context": "Are you sure you want to delete {count, plural, =1{<b>{fullName} <{email}></b>} other{these contacts}}?"
+  },
+  {
+    "term": "component.confirm-delete-contacts-dialog.delete-button",
+    "definition": "Si, eliminar {count, plural, =1{contacto} other {contactos}}",
+    "context": "Yes, delete {count, plural, =1{contact} other {contacts}}"
+  },
+  {
+    "term": "component.confirm-delete-contacts-dialog.header",
+    "definition": "Eliminar {count, plural, =1{{email}} other {# contactos}}",
+    "context": "Delete {count, plural, =1{{email}} other {# contacts}}"
+  },
+  {
     "term": "component.confirm-disable-ongoing-signature-petition-close.body",
     "definition": "Hay un proceso de firma digital pendiente. Si cierras esta petición, el proceso será cancelado.",
     "context": "There is an ongoing eSignature process. If you close this petition now, the process will be cancelled."
@@ -408,11 +453,6 @@
     "term": "component.confirm-skip-forward-security.header",
     "definition": "Deshabilitar protección de reenvío",
     "context": "Disable Forward Security"
-  },
-  {
-    "term": "component.contact-list-header.actions-button",
-    "definition": "Acciones",
-    "context": "Actions"
   },
   {
     "term": "component.contact-list-header.create-contact-button",
@@ -3548,16 +3588,6 @@
     "term": "contact.petitions-header",
     "definition": "Peticiones enviadas{name, select, null {} other { a {name}}}",
     "context": "Petitions sent{name, select, null {} other { to {name}}}"
-  },
-  {
-    "term": "contacts.confirm-delete.body",
-    "definition": "¿Está seguro de que desea eliminar {count, plural, =1 {<b>{email}</b>} other {los <b>#</b> contactos seleccionados}}?",
-    "context": "Are you sure you want to delete {count, plural, =1 {<b>{email}</b>} other {the <b>#</b> selected contacts}}?"
-  },
-  {
-    "term": "contacts.confirm-delete.header",
-    "definition": "Eliminar contactos",
-    "context": "Delete contacts"
   },
   {
     "term": "contacts.create-new-contact.header",

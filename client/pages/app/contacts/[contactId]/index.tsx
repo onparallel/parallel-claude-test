@@ -10,11 +10,12 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { EditIcon } from "@parallel/chakra/icons";
+import { DeleteIcon, EditIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { PetitionSignatureCellContent } from "@parallel/components/common/PetitionSignatureCellContent";
 import { PetitionStatusCellContent } from "@parallel/components/common/PetitionStatusCellContent";
@@ -34,6 +35,8 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
+import { useDeleteContacts } from "@parallel/utils/mutations/useDeleteContacts";
+import { useHandleNavigation } from "@parallel/utils/navigation";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -102,6 +105,15 @@ function Contact({ contactId }: ContactProps) {
   const columns = useContactPetitionAccessesColumns();
   const context = useMemo(() => ({ user: me }), [me]);
 
+  const deleteContact = useDeleteContacts();
+  const navigate = useHandleNavigation();
+  const handleDeleteClick = async () => {
+    try {
+      await deleteContact([contact!]);
+      navigate("/app/contacts");
+    } catch {}
+  };
+
   return (
     <AppLayout title={contact!.fullName ?? contact!.email} user={me}>
       <Flex flex="1" padding={4}>
@@ -112,7 +124,19 @@ function Contact({ contactId }: ContactProps) {
             id="contact-details"
           >
             <CardHeader as="h2" size="md">
-              {`${contact!.fullName ?? ""} <${contact!.email}>`}
+              <Flex alignItems="center">
+                {`${contact!.fullName ?? ""} <${contact!.email}>`}
+                <Spacer />
+                <IconButtonWithTooltip
+                  icon={<DeleteIcon />}
+                  variant="outline"
+                  label={intl.formatMessage({
+                    id: "generic.delete",
+                    defaultMessage: "Delete",
+                  })}
+                  onClick={handleDeleteClick}
+                />
+              </Flex>
             </CardHeader>
             <Stack padding={4}>
               <FormControl id="contact-first-name">
@@ -314,6 +338,7 @@ Contact.fragments = {
       fragment Contact_Contact on Contact {
         id
         ...Contact_Contact_Profile
+        ...useDeleteContacts_Contact
         accesses(limit: 100) {
           items {
             ...Contact_PetitionAccess
@@ -321,6 +346,7 @@ Contact.fragments = {
         }
       }
       ${this.Contact_Profile}
+      ${useDeleteContacts.fragments.Contact}
       ${this.PetitionAccess}
     `;
   },

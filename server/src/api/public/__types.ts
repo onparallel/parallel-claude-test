@@ -862,6 +862,7 @@ export type MutationdeactivateUserArgs = {
 };
 
 export type MutationdeleteContactsArgs = {
+  force?: InputMaybe<Scalars["Boolean"]>;
   ids: Array<Scalars["GID"]>;
 };
 

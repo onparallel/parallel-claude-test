@@ -1,5 +1,5 @@
-import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Portal, Stack } from "@chakra-ui/react";
-import { ChevronDownIcon, DeleteIcon, RepeatIcon } from "@parallel/chakra/icons";
+import { Box, Button, Stack } from "@chakra-ui/react";
+import { DeleteIcon, RepeatIcon } from "@parallel/chakra/icons";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -9,7 +9,7 @@ import { Spacer } from "../common/Spacer";
 
 export interface ContactListHeaderProps {
   search: string | null;
-  showActions: boolean;
+  selectionCount: number;
   onSearchChange: (value: string | null) => void;
   onReload: () => void;
   onDeleteClick: () => void;
@@ -19,7 +19,7 @@ export interface ContactListHeaderProps {
 
 export function ContactListHeader({
   search: _search,
-  showActions,
+  selectionCount,
   onSearchChange,
   onReload,
   onCreateClick,
@@ -53,29 +53,16 @@ export function ContactListHeader({
           defaultMessage: "Reload",
         })}
       />
-      <Spacer />
-      {showActions ? (
-        <Box>
-          <Menu>
-            <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-              <FormattedMessage
-                id="component.contact-list-header.actions-button"
-                defaultMessage="Actions"
-              />
-            </MenuButton>
-            <Portal>
-              <MenuList minWidth="160px">
-                <MenuItem onClick={onDeleteClick} icon={<DeleteIcon display="block" boxSize={4} />}>
-                  <FormattedMessage
-                    id="component.contact-list-header.delete-label"
-                    defaultMessage="Delete selected"
-                  />
-                </MenuItem>
-              </MenuList>
-            </Portal>
-          </Menu>
-        </Box>
+      {selectionCount > 0 ? (
+        <Button variant="outline" colorScheme="red" onClick={onDeleteClick}>
+          <DeleteIcon marginRight={2} />
+          <FormattedMessage
+            id="component.contact-list-header.delete-label"
+            defaultMessage="Delete selected"
+          />
+        </Button>
       ) : null}
+      <Spacer />
       <Button variant="outline" onClick={onImportClick}>
         <FormattedMessage
           id="component.contact-list-header.import-contacts-button"
