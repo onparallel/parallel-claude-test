@@ -69,6 +69,9 @@ const SCHEMAS = {
       maxLength: {
         type: ["integer", "null"],
       },
+      format: {
+        type: ["string", "null"],
+      },
     },
   },
   FILE_UPLOAD: {
@@ -226,7 +229,19 @@ export function defaultFieldOptions(
           hasPageBreak: false,
         };
       }
-      case "TEXT":
+      case "TEXT": {
+        return {
+          hasCommentsEnabled,
+          placeholder:
+            isDefined(field) && hasPlaceholder(field.type) ? field.options.placeholder : null,
+          maxLength:
+            isDefined(field) &&
+            ["TEXT", "SHORT_TEXT"].includes(field.type) &&
+            isDefined(field.options.maxLength)
+              ? field.options.maxLength
+              : null,
+        };
+      }
       case "SHORT_TEXT": {
         return {
           placeholder:
@@ -237,6 +252,7 @@ export function defaultFieldOptions(
             isDefined(field.options.maxLength)
               ? field.options.maxLength
               : null,
+          format: null,
         };
       }
       case "DATE": {

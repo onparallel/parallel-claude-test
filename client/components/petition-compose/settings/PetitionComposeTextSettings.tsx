@@ -10,10 +10,7 @@ export function TextSettings({
   onFieldEdit,
   isReadOnly,
 }: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">) {
-  const options =
-    field.type === "TEXT"
-      ? (field.options as FieldOptions["TEXT"])
-      : (field.options as FieldOptions["SHORT_TEXT"]);
+  const options = field.options as FieldOptions["TEXT"];
   const [placeholder, setPlaceholder] = useState(options.placeholder ?? "");
 
   const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 300, [field.id]);

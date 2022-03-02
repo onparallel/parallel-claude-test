@@ -23,6 +23,7 @@ import { RecipientViewPetitionFieldHeading } from "../recipient-view/fields/Reci
 import { RecipientViewPetitionFieldNumber } from "../recipient-view/fields/RecipientViewPetitionFieldNumber";
 import { RecipientViewPetitionFieldPhone } from "../recipient-view/fields/RecipientViewPetitionFieldPhone";
 import { RecipientViewPetitionFieldSelect } from "../recipient-view/fields/RecipientViewPetitionFieldSelect";
+import { RecipientViewPetitionFieldShortText } from "../recipient-view/fields/RecipientViewPetitionFieldShortText";
 import { RecipientViewPetitionFieldText } from "../recipient-view/fields/RecipientViewPetitionFieldText";
 import {
   useCreateFileUploadReply,
@@ -198,8 +199,10 @@ export function PreviewPetitionField({
 
   return field.type === "HEADING" ? (
     <RecipientViewPetitionFieldHeading {...props} {...commonProps} />
-  ) : field.type === "TEXT" || field.type === "SHORT_TEXT" ? (
+  ) : field.type === "TEXT" ? (
     <RecipientViewPetitionFieldText {...props} {...commonProps} />
+  ) : field.type === "SHORT_TEXT" ? (
+    <RecipientViewPetitionFieldShortText {...props} {...commonProps} />
   ) : field.type === "SELECT" ? (
     <RecipientViewPetitionFieldSelect {...props} {...commonProps} />
   ) : field.type === "FILE_UPLOAD" ? (

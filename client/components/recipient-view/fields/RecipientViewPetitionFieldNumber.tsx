@@ -85,7 +85,6 @@ export function RecipientViewPetitionFieldNumber({
         return;
       }
       isDeletingReplyRef.current[replyId] = true;
-      setIsInvalidReply(({ [replyId]: _, ...curr }) => curr);
       setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
       if (focusPrev) {
         const index = field.replies.findIndex((r) => r.id === replyId);
@@ -96,7 +95,6 @@ export function RecipientViewPetitionFieldNumber({
         }
       }
       await onDeleteReply(replyId);
-
       delete isDeletingReplyRef.current[replyId];
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
       handleInvalidReply(replyId, false);
@@ -164,9 +162,9 @@ export function RecipientViewPetitionFieldNumber({
     },
     onBlur: async () => {
       if (!isDefined(value)) {
-        setIsInvalidReply(({ [field.id]: _, ...curr }) => curr);
+        handleInvalidReply(field.id, false);
       } else if (!isBetweenLimits(range, value)) {
-        setIsInvalidReply((curr) => ({ ...curr, [field.id]: true }));
+        handleInvalidReply(field.id, true);
       } else {
         await handleCreate.immediate(value, true);
         handleCreate.clear();
@@ -184,9 +182,9 @@ export function RecipientViewPetitionFieldNumber({
         setValue(undefined);
       } else {
         if (!isBetweenLimits(range, value)) {
-          setIsInvalidReply((curr) => ({ ...curr, [field.id]: true }));
+          handleInvalidReply(field.id, true);
         } else {
-          setIsInvalidReply(({ [field.id]: _, ...curr }) => curr);
+          handleInvalidReply(field.id, false);
         }
         setValue(value);
       }

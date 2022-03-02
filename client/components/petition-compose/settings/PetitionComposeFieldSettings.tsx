@@ -18,6 +18,7 @@ import { HeadingSettings } from "./PetitionComposeHeadingSettings";
 import { NumberSettings } from "./PetitionComposeNumberSettings";
 import { PhoneSettings } from "./PetitionComposePhoneSettings";
 import { SelectOptionSettings } from "./PetitionComposeSelectOptionSettings";
+import { ShortTextSettings } from "./PetitionComposeShortTextSettings";
 import { TextSettings } from "./PetitionComposeTextSettings";
 import { SettingsRow } from "./SettingsRow";
 import { SettingsRowAlias } from "./SettingsRowAlias";
@@ -217,8 +218,10 @@ export function PetitionComposeFieldSettings({
           <HeadingSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
         ) : field.type === "FILE_UPLOAD" ? (
           <FileUploadSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
-        ) : field.type === "TEXT" || field.type === "SHORT_TEXT" ? (
+        ) : field.type === "TEXT" ? (
           <TextSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
+        ) : field.type === "SHORT_TEXT" ? (
+          <ShortTextSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
         ) : field.type === "SELECT" ? (
           <SelectOptionSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
         ) : field.type === "DYNAMIC_SELECT" ? (

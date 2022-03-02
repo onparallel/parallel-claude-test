@@ -1476,8 +1476,9 @@ describe("GraphQL/Petition Fields", () => {
         multiple: field.multiple,
         hasCommentsEnabled: true,
         options: {
-          placeholder: field.options.placeholder,
+          format: null,
           maxLength: null,
+          placeholder: field.options.placeholder,
         },
       });
     });

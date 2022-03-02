@@ -17,6 +17,7 @@ export type FieldOptions = {
   };
   SHORT_TEXT: {
     placeholder: Maybe<string>;
+    format: Maybe<string>;
     maxLength: Maybe<number>;
   };
   TEXT: {

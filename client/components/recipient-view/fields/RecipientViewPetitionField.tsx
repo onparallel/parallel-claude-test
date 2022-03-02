@@ -32,6 +32,7 @@ import { RecipientViewPetitionFieldHeading } from "./RecipientViewPetitionFieldH
 import { RecipientViewPetitionFieldNumber } from "./RecipientViewPetitionFieldNumber";
 import { RecipientViewPetitionFieldPhone } from "./RecipientViewPetitionFieldPhone";
 import { RecipientViewPetitionFieldSelect } from "./RecipientViewPetitionFieldSelect";
+import { RecipientViewPetitionFieldShortText } from "./RecipientViewPetitionFieldShortText";
 import { RecipientViewPetitionFieldText } from "./RecipientViewPetitionFieldText";
 
 export interface RecipientViewPetitionFieldProps
@@ -202,8 +203,10 @@ export function RecipientViewPetitionField({ tone, ...props }: RecipientViewPeti
 
   return props.field.type === "HEADING" ? (
     <RecipientViewPetitionFieldHeading {...props} {...commonProps} />
-  ) : props.field.type === "TEXT" || props.field.type === "SHORT_TEXT" ? (
+  ) : props.field.type === "TEXT" ? (
     <RecipientViewPetitionFieldText {...props} {...commonProps} />
+  ) : props.field.type === "SHORT_TEXT" ? (
+    <RecipientViewPetitionFieldShortText {...props} {...commonProps} />
   ) : props.field.type === "SELECT" ? (
     <RecipientViewPetitionFieldSelect {...props} {...commonProps} />
   ) : props.field.type === "FILE_UPLOAD" ? (

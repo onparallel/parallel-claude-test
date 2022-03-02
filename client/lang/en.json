@@ -1400,6 +1400,56 @@
     "context": "Too many attachments"
   },
   {
+    "term": "component.petition-compose-text-settings.cif-format",
+    "definition": "Spanish tax ID number",
+    "context": "Spanish tax ID number"
+  },
+  {
+    "term": "component.petition-compose-text-settings.dni-format",
+    "definition": "Spanish ID number",
+    "context": "Spanish ID number"
+  },
+  {
+    "term": "component.petition-compose-text-settings.email-format",
+    "definition": "E-mail",
+    "context": "E-mail"
+  },
+  {
+    "term": "component.petition-compose-text-settings.format",
+    "definition": "Format:",
+    "context": "Format:"
+  },
+  {
+    "term": "component.petition-compose-text-settings.format-placeholder",
+    "definition": "Without format",
+    "context": "Without format"
+  },
+  {
+    "term": "component.petition-compose-text-settings.iban-format",
+    "definition": "Account number (IBAN)",
+    "context": "Account number (IBAN)"
+  },
+  {
+    "term": "component.petition-compose-text-settings.postal-spain-format",
+    "definition": "Postal code (Spain)",
+    "context": "Postal code (Spain)"
+  },
+  {
+    "term": "component.petition-compose-text-settings.postal-usa-format",
+    "definition": "Postal code (USA)",
+    "context": "Postal code (USA)"
+  },
+  {
+    "term": "component.petition-compose-text-settings.ssn-spain-format",
+    "definition": "Social Security number (Spain)",
+    "context": "Social Security number (Spain)"
+  },
+  {
+    "term": "component.petition-compose-text-settings.ssn-usa-format",
+    "definition": "Social Security number (USA)",
+    "context": "Social Security number (USA)"
+  },
+  {
     "term": "component.petition-contents.hidden-fields-divider",
     "definition": "{count, plural, =1 {1 field is} other {# fields are}} not applicable",
     "context": "{count, plural, =1 {1 field is} other {# fields are}} not applicable"

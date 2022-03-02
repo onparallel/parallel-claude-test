@@ -1400,6 +1400,56 @@
     "context": "Too many attachments"
   },
   {
+    "term": "component.petition-compose-text-settings.cif-format",
+    "definition": "CIF de empresa",
+    "context": "Spanish tax ID number"
+  },
+  {
+    "term": "component.petition-compose-text-settings.dni-format",
+    "definition": "DNI/NIE",
+    "context": "Spanish ID number"
+  },
+  {
+    "term": "component.petition-compose-text-settings.email-format",
+    "definition": "Correo electrónico",
+    "context": "E-mail"
+  },
+  {
+    "term": "component.petition-compose-text-settings.format",
+    "definition": "Formato:",
+    "context": "Format:"
+  },
+  {
+    "term": "component.petition-compose-text-settings.format-placeholder",
+    "definition": "Sin formato",
+    "context": "Without format"
+  },
+  {
+    "term": "component.petition-compose-text-settings.iban-format",
+    "definition": "Nº de cuenta (IBAN)",
+    "context": "Account number (IBAN)"
+  },
+  {
+    "term": "component.petition-compose-text-settings.postal-spain-format",
+    "definition": "Código postal (España)",
+    "context": "Postal code (Spain)"
+  },
+  {
+    "term": "component.petition-compose-text-settings.postal-usa-format",
+    "definition": "Código postal (EEUU)",
+    "context": "Postal code (USA)"
+  },
+  {
+    "term": "component.petition-compose-text-settings.ssn-spain-format",
+    "definition": "Nº de seguridad social (España)",
+    "context": "Social Security number (Spain)"
+  },
+  {
+    "term": "component.petition-compose-text-settings.ssn-usa-format",
+    "definition": "Nº de seguridad social (EEUU)",
+    "context": "Social Security number (USA)"
+  },
+  {
     "term": "component.petition-contents.hidden-fields-divider",
     "definition": "{count, plural, =1 {1 campo no aplica} other {# campos no aplican}}",
     "context": "{count, plural, =1 {1 field is} other {# fields are}} not applicable"

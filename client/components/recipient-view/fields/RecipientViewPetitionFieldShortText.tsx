@@ -1,16 +1,17 @@
-import { Center, Flex, List, Stack } from "@chakra-ui/react";
+import { Center, Flex, FormControl, FormErrorMessage, Input, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
-import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { MaskedInput } from "@parallel/components/common/MaskedInput";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
+import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChangeEvent, forwardRef, KeyboardEvent, useRef, useState } from "react";
-import { useIntl } from "react-intl";
-import { pick } from "remeda";
+import { ChangeEvent, forwardRef, KeyboardEvent, useEffect, useRef, useState } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined, pick } from "remeda";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
@@ -19,7 +20,7 @@ import {
 } from "./RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
 
-export interface RecipientViewPetitionFieldTextProps
+export interface RecipientViewPetitionFieldShortTextProps
   extends Omit<
     RecipientViewPetitionFieldCardProps,
     "children" | "showAddNewReply" | "onAddNewReply"
@@ -30,7 +31,7 @@ export interface RecipientViewPetitionFieldTextProps
   onCreateReply: (value: string) => Promise<string | undefined>;
 }
 
-export function RecipientViewPetitionFieldText({
+export function RecipientViewPetitionFieldShortText({
   field,
   isDisabled,
   isInvalid,
@@ -39,7 +40,7 @@ export function RecipientViewPetitionFieldText({
   onUpdateReply,
   onCreateReply,
   onCommentsButtonClick,
-}: RecipientViewPetitionFieldTextProps) {
+}: RecipientViewPetitionFieldShortTextProps) {
   const intl = useIntl();
 
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
@@ -47,11 +48,12 @@ export function RecipientViewPetitionFieldText({
   const [isSaving, setIsSaving] = useState(false);
   const isDeletingReplyRef = useRef<Record<string, boolean>>({});
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
+  const [isInvalidReply, setIsInvalidReply] = useState<Record<string, boolean>>({});
 
-  const newReplyRef = useRef<HTMLTextAreaElement>(null);
-  const replyRefs = useMultipleRefs<HTMLTextAreaElement>();
+  const newReplyRef = useRef<HTMLInputElement>(null);
+  const replyRefs = useMultipleRefs<HTMLInputElement>();
 
-  const options = field.options as FieldOptions["TEXT"];
+  const options = field.options as FieldOptions["SHORT_TEXT"];
 
   function handleAddNewReply() {
     setShowNewReply(true);
@@ -85,6 +87,7 @@ export function RecipientViewPetitionFieldText({
 
       delete isDeletingReplyRef.current[replyId];
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
+      handleInvalidReply(replyId, false);
       if (field.replies.length === 1) {
         handleAddNewReply();
       }
@@ -107,14 +110,14 @@ export function RecipientViewPetitionFieldText({
             setShowNewReply(false);
             setTimeout(() => {
               const newReplyElement = replyRefs[replyId].current!;
-              if (newReplyElement) {
+              if (options.format !== "EMAIL") {
                 Object.assign(newReplyElement, selection);
-                newReplyElement.focus();
-                newReplyElement.setSelectionRange(
+                newReplyElement?.setSelectionRange(
                   newReplyElement.value.length,
                   newReplyElement.value.length
                 );
               }
+              newReplyElement?.focus();
             });
           }
         }
@@ -125,16 +128,33 @@ export function RecipientViewPetitionFieldText({
     [onCreateReply]
   );
 
+  const handleInvalidReply = (replyId: string, isInvalid: boolean) => {
+    if (isInvalid) {
+      setIsInvalidReply((curr) => ({ ...curr, [replyId]: true }));
+    } else {
+      setIsInvalidReply(({ [replyId]: _, ...curr }) => curr);
+    }
+  };
+
+  const handleOnChange = (value: string) => {
+    setValue(value);
+  };
+
   const inputProps = {
     id: `reply-${field.id}-new`,
     ref: newReplyRef as any,
     paddingRight: 10,
     isDisabled: isDisabled,
+    isInvalid: isInvalidReply[field.id],
     maxLength: field.options.maxLength ?? undefined,
     value,
     onKeyDown: async (event: KeyboardEvent) => {
+      if (options.format === "EMAIL" && !EMAIL_REGEX.test(value)) {
+        return;
+      }
       if (isMetaReturn(event) && field.multiple) {
-        await handleCreate.immediateIfPending(value, false);
+        await handleCreate.immediate(value, true);
+        handleAddNewReply();
       } else if (event.key === "Backspace" && value === "") {
         if (field.replies.length > 0) {
           event.preventDefault();
@@ -145,20 +165,28 @@ export function RecipientViewPetitionFieldText({
       }
     },
     onBlur: async () => {
-      if (value) {
-        await handleCreate.immediateIfPending(value, false);
+      if (!value) {
+        handleInvalidReply(field.id, false);
+      } else if (options.format === "EMAIL" && !EMAIL_REGEX.test(value)) {
+        handleInvalidReply(field.id, true);
+      } else {
+        await handleCreate.immediate(value, false);
         setShowNewReply(false);
-      } else if (!value && field.replies.length > 0) {
+      }
+
+      if (!value && field.replies.length > 0) {
         setShowNewReply(false);
       }
     },
-    onChange: (event: ChangeEvent<HTMLTextAreaElement>) => {
-      if (isSaving) {
-        // prevent creating 2 replies
-        return;
+    onChange: (event: ChangeEvent<HTMLInputElement>) => {
+      if (
+        isInvalidReply[field.id] &&
+        options.format === "EMAIL" &&
+        EMAIL_REGEX.test(event.target.value)
+      ) {
+        handleInvalidReply(field.id, false);
       }
-      setValue(event.target.value);
-      handleCreate(event.target.value, true);
+      handleOnChange(event.target.value);
     },
     placeholder:
       options.placeholder ??
@@ -177,61 +205,85 @@ export function RecipientViewPetitionFieldText({
       onAddNewReply={handleAddNewReply}
       onDownloadAttachment={onDownloadAttachment}
     >
-      {field.replies.length ? (
-        <List as={Stack} marginTop={2}>
-          <AnimatePresence initial={false}>
-            {field.replies.map((reply) => (
-              <motion.li
-                key={reply.id}
-                animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
-                exit={{ opacity: 0, x: -100, transition: { duration: 0.2 } }}
-              >
-                <RecipientViewPetitionFieldReplyText
-                  ref={replyRefs[reply.id]}
-                  field={field}
-                  reply={reply}
-                  isDisabled={isDisabled || isDeletingReply[reply.id]}
-                  onUpdate={handleUpdate(reply.id)}
-                  onDelete={handleDelete(reply.id)}
-                  onAddNewReply={handleAddNewReply}
-                />
-              </motion.li>
-            ))}
-          </AnimatePresence>
-        </List>
-      ) : null}
-      {(field.multiple && showNewReply) || field.replies.length === 0 ? (
-        <Flex flex="1" position="relative" marginTop={2}>
-          <GrowingTextarea {...inputProps} />
-          <Center boxSize={10} position="absolute" right={0} bottom={0}>
-            <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
-          </Center>
-        </Flex>
-      ) : null}
+      <FormControl isInvalid={Boolean(Object.keys(isInvalidReply).length)}>
+        {field.replies.length ? (
+          <List as={Stack} marginTop={2}>
+            <AnimatePresence initial={false}>
+              {field.replies.map((reply) => (
+                <motion.li
+                  key={reply.id}
+                  animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: -100, transition: { duration: 0.2 } }}
+                >
+                  <RecipientViewPetitionFieldReplyShortText
+                    ref={replyRefs[reply.id]}
+                    field={field}
+                    reply={reply}
+                    isDisabled={isDisabled || isDeletingReply[reply.id]}
+                    onUpdate={handleUpdate(reply.id)}
+                    onDelete={handleDelete(reply.id)}
+                    onAddNewReply={handleAddNewReply}
+                    onInvalid={handleInvalidReply}
+                  />
+                </motion.li>
+              ))}
+            </AnimatePresence>
+          </List>
+        ) : null}
+        {(field.multiple && showNewReply) || field.replies.length === 0 ? (
+          <Flex flex="1" position="relative" marginTop={2}>
+            {isDefined(options.format) && options.format !== "EMAIL" ? (
+              <MaskedInput {...inputProps} onChange={handleOnChange} format={options.format} />
+            ) : (
+              <Input
+                {...inputProps}
+                type={options.format === "EMAIL" ? "email" : undefined}
+                name={options.format === "EMAIL" ? "email" : undefined}
+              />
+            )}
+            <Center boxSize={10} position="absolute" right={0} bottom={0}>
+              <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
+            </Center>
+          </Flex>
+        ) : null}
+        <FormErrorMessage>
+          <FormattedMessage
+            id="generic.forms.invalid-email-error"
+            defaultMessage="Please, enter a valid email"
+          />
+        </FormErrorMessage>
+      </FormControl>
     </RecipientViewPetitionFieldCard>
   );
 }
 
-interface RecipientViewPetitionFieldReplyTextProps {
+interface RecipientViewPetitionFieldReplyShortTextProps {
   field: RecipientViewPetitionFieldCard_PetitionFieldSelection;
   reply: RecipientViewPetitionFieldCard_PetitionFieldReplySelection;
   isDisabled: boolean;
   onUpdate: (content: string) => Promise<void>;
   onDelete: (focusPrev?: boolean) => void;
   onAddNewReply: () => void;
+  onInvalid: (replyId: string, value: boolean) => void;
 }
 
-export const RecipientViewPetitionFieldReplyText = forwardRef<
-  HTMLTextAreaElement,
-  RecipientViewPetitionFieldReplyTextProps
->(function RecipientViewPetitionFieldReplyText(
-  { field, reply, isDisabled, onUpdate, onDelete, onAddNewReply },
+export const RecipientViewPetitionFieldReplyShortText = forwardRef<
+  HTMLInputElement,
+  RecipientViewPetitionFieldReplyShortTextProps
+>(function RecipientViewPetitionFieldReplyShortText(
+  { field, reply, isDisabled, onUpdate, onDelete, onAddNewReply, onInvalid },
   ref
 ) {
   const intl = useIntl();
   const [value, setValue] = useState(reply.content.value ?? "");
   const [isSaving, setIsSaving] = useState(false);
-  const options = field.options as FieldOptions["TEXT"];
+  const [isInvalid, setIsInvalid] = useState(false);
+
+  useEffect(() => {
+    onInvalid(reply.id, isInvalid);
+  }, [isInvalid]);
+
+  const options = field.options as FieldOptions["SHORT_TEXT"];
 
   const debouncedUpdateReply = useDebouncedCallback(
     async (value: string) => {
@@ -245,6 +297,10 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
     [onUpdate]
   );
 
+  const handleOnChange = (value: string) => {
+    setValue(value);
+  };
+
   const props = {
     id: `reply-${field.id}-${reply.id}`,
     ref: ref as any,
@@ -252,7 +308,7 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
     value,
     maxLength: field.options.maxLength ?? undefined,
     isDisabled: isDisabled || reply.status === "APPROVED",
-    isInvalid: reply.status === "REJECTED",
+    isInvalid: reply.status === "REJECTED" || isInvalid,
     onKeyDown: async (event: KeyboardEvent) => {
       if (isMetaReturn(event) && field.multiple) {
         onAddNewReply();
@@ -263,16 +319,23 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
       }
     },
     onBlur: async () => {
-      if (value) {
-        await debouncedUpdateReply.immediateIfPending(value);
-      } else {
+      if (value && value !== reply.content.value) {
+        if (options.format === "EMAIL" && !EMAIL_REGEX.test(value)) {
+          setIsInvalid(true);
+          return;
+        }
+        if (isInvalid) setIsInvalid(false);
+        await debouncedUpdateReply.immediate(value);
+      } else if (!value) {
         debouncedUpdateReply.clear();
         onDelete();
       }
     },
-    onChange: (event: ChangeEvent<HTMLTextAreaElement>) => {
-      setValue(event.target.value);
-      debouncedUpdateReply(event.target.value);
+    onChange: (event: ChangeEvent<HTMLInputElement>) => {
+      if (isInvalid && options.format === "EMAIL" && EMAIL_REGEX.test(event.target.value)) {
+        setIsInvalid(false);
+      }
+      handleOnChange(event.target.value);
     },
     placeholder:
       options.placeholder ??
@@ -285,7 +348,15 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
   return (
     <Stack direction="row">
       <Flex flex="1" position="relative">
-        <GrowingTextarea {...props} />
+        {isDefined(options.format) && options.format !== "EMAIL" ? (
+          <MaskedInput {...props} onChange={handleOnChange} format={options.format} />
+        ) : (
+          <Input
+            {...props}
+            type={options.format === "EMAIL" ? "email" : undefined}
+            name={options.format === "EMAIL" ? "email" : undefined}
+          />
+        )}
         <Center boxSize={10} position="absolute" right={0} bottom={0}>
           <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
         </Center>

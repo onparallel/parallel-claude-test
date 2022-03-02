@@ -71,6 +71,7 @@
     "react-google-recaptcha": "^2.1.0",
     "react-headless-phone-input": "^2.0.0",
     "react-hook-form": "^7.27.1",
+    "react-imask": "^6.4.2",
     "react-infinite-scroll-component": "^6.1.0",
     "react-intl": "^5.24.6",
     "react-joyride": "^2.3.2",
