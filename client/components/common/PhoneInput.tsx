@@ -20,17 +20,17 @@ import { isDefined } from "remeda";
 export interface PhoneInputProps extends ThemingProps<"Input">, FormControlOptions {
   defaultCountry?: string;
   value: string | undefined;
-  onChange(
+  onChange?(
     value: string | undefined,
     metadata: { isValid: boolean; country: string | undefined }
   ): void;
-  onBlur(
+  onBlur?(
     value: string | undefined,
     metadata: { isValid: boolean; country: string | undefined }
   ): void;
 }
 
-export default chakraForwardRef<"input", PhoneInputProps>(function PhoneInput(
+const PhoneInput = chakraForwardRef<"input", PhoneInputProps>(function PhoneInput(
   { value, placeholder, onLoad, onChange, onBlur, defaultCountry, ...props },
   ref
 ) {
@@ -101,7 +101,7 @@ export default chakraForwardRef<"input", PhoneInputProps>(function PhoneInput(
     const isValid = formatter.isPossible();
     const value = formatter.getNumberValue();
     setCountry(country);
-    onChange(value, { country, isValid });
+    onChange?.(value, { country, isValid });
   };
 
   const handleBlur = (e: FocusEvent<HTMLInputElement>) => {
@@ -114,7 +114,7 @@ export default chakraForwardRef<"input", PhoneInputProps>(function PhoneInput(
     const isValid = formatter.isPossible();
     const value = formatter.getNumberValue();
     setCountry(country);
-    onBlur(value, { country, isValid });
+    onBlur?.(value, { country, isValid });
   };
 
   return (
@@ -140,3 +140,7 @@ export default chakraForwardRef<"input", PhoneInputProps>(function PhoneInput(
     </InputGroup>
   );
 });
+
+export type PhoneInputType = typeof PhoneInput;
+
+export default PhoneInput;
