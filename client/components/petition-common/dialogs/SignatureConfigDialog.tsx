@@ -648,7 +648,7 @@ export function SignatureConfigDialogBodyStep2({
           )}
         />
       </FormControl>
-      <FormControl hidden={signers.length === 0}>
+      <FormControl hidden={signers.length === 0 || petitionIsCompleted}>
         <FormLabel>
           <Checkbox marginTop={4} colorScheme="purple" {...register("allowAdditionalSigners")}>
             <HStack alignContent="center">
