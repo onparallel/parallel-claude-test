@@ -165,7 +165,7 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
       maxHeight="240px"
       {...props}
     >
-      <Box flex="1" position="relative">
+      <Box flex="1" position="relative" height="fit-content">
         <Box
           display={{ base: "none", sm: showHeader ? "flex" : "none" }}
           top={0}

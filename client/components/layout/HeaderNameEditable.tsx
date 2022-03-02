@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import {
+  Box,
   Editable,
   EditableInput,
   EditablePreview,
@@ -77,22 +78,24 @@ export const HeaderNameEditable = Object.assign(
                     })}
                     offset={[0, -1]}
                   >
-                    <EditablePreview
-                      ref={editablePreviewRef}
-                      color={name ? undefined : "gray.400"}
-                      paddingY={1}
-                      paddingX={2}
-                      display="block"
-                      isTruncated
-                    />
+                    <Box>
+                      <EditablePreview
+                        ref={editablePreviewRef}
+                        color={name ? undefined : "gray.400"}
+                        paddingY={1}
+                        paddingX={2}
+                        display="block"
+                        isTruncated
+                      />
+                      <EditableInput
+                        paddingY={1}
+                        paddingX={2}
+                        maxLength={255}
+                        width={props.maxWidth}
+                        transition="all 250ms, width 0s"
+                      />
+                    </Box>
                   </Tooltip>
-                  <EditableInput
-                    paddingY={1}
-                    paddingX={2}
-                    maxLength={255}
-                    width={props.maxWidth}
-                    transition="all 250ms, width 0s"
-                  />
                 </>
               )}
             </Flex>
