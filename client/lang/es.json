@@ -1365,11 +1365,6 @@
     "context": "Too many attachments"
   },
   {
-    "term": "component.petition-compose-phone-settings.default-country",
-    "definition": "País por defecto",
-    "context": "Default country"
-  },
-  {
     "term": "component.petition-contents.hidden-fields-divider",
     "definition": "{count, plural, =1 {1 campo no aplica} other {# campos no aplican}}",
     "context": "{count, plural, =1 {1 field is} other {# fields are}} not applicable"
