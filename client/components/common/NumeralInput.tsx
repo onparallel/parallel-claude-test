@@ -1,45 +1,24 @@
-import { FormControlOptions, ThemingProps } from "@chakra-ui/react";
+import { FormControlOptions, Input, ThemingProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import useMergedRef from "@react-hook/merged-ref";
-import { CleaveOptions } from "cleave.js/options";
-import escapeStringRegexp from "escape-string-regexp";
-import { ChangeEvent, KeyboardEvent, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useIntl } from "react-intl";
+import NumberFormat, { NumberFormatValues, SourceInfo } from "react-number-format";
 import { isDefined } from "remeda";
-import { InputCleave, InputCleaveElement } from "./InputCleave";
 
 interface NumeralInputProps extends ThemingProps<"Input">, FormControlOptions {
   decimals?: number;
-  positiveOnly?: boolean;
+  allowNegative?: boolean;
   onChange: (value: number | undefined) => void;
   value: number | undefined;
   prefix?: string;
-  tailPrefix?: boolean;
+  suffix?: string;
 }
 
 export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(function NumeralInput(
-  { decimals, positiveOnly, value, prefix, tailPrefix, onChange, onKeyDown, ...props },
+  { decimals, allowNegative, value, prefix, suffix, onChange, ...props },
   ref
 ) {
   const intl = useIntl();
-
-  const inputRef = useRef<HTMLInputElement>(null);
-  const mergedRef = useMergedRef(ref, inputRef);
-
-  const cleaveOptions = useMemo<CleaveOptions>(() => {
-    const parts = Intl.NumberFormat(intl.locale).formatToParts(10000.1);
-    return {
-      numeral: true,
-      numeralDecimalMark: parts.find((p) => p.type === "decimal")!.value,
-      delimiter: parts.find((p) => p.type === "group")!.value,
-      numeralDecimalScale: decimals ?? 5,
-      numeralPositiveOnly: positiveOnly,
-      prefix,
-      tailPrefix,
-      noImmediatePrefix: true,
-    };
-  }, [intl.locale, decimals, positiveOnly]);
-
   const [_value, setValue] = useState(
     isDefined(value)
       ? intl.formatNumber(value, {
@@ -48,53 +27,42 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
         })
       : ""
   );
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
-    if (e.target.value === "") {
-      onChange?.(undefined);
-    } else {
-      const rawValue = prefix
-        ? (e.target as InputCleaveElement).rawValue?.replace(
-            new RegExp(
-              tailPrefix ? `${escapeStringRegexp(prefix)}$` : `^${escapeStringRegexp(prefix)}`
-            ),
-            ""
-          )
-        : (e.target as InputCleaveElement).rawValue;
-      const numericValue = Number(rawValue);
-      if (!Number.isNaN(numericValue)) {
-        onChange?.(numericValue);
-      }
-    }
-  };
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (
-      event.key === "Backspace" &&
-      prefix &&
-      tailPrefix &&
-      inputRef.current &&
-      isDefined(inputRef.current.selectionStart) &&
-      inputRef.current.selectionStart > inputRef.current.value.length - prefix.length
-    ) {
-      const newValue = inputRef.current.value.replace(
-        new RegExp(
-          tailPrefix ? `${escapeStringRegexp(prefix)}$` : `^${escapeStringRegexp(prefix)}`
-        ),
-        ""
-      );
-      setValue(newValue.slice(0, -1));
+  const { decimalSeparator, thousandSeparator } = useMemo<{
+    decimalSeparator: string;
+    thousandSeparator: string;
+  }>(() => {
+    const parts = Intl.NumberFormat(intl.locale).formatToParts(10000.1);
+    return {
+      decimalSeparator: parts.find((p) => p.type === "decimal")!.value,
+      thousandSeparator: parts.find((p) => p.type === "group")!.value,
+    };
+  }, [intl.locale]);
+
+  const handleOnValueChange = (values: NumberFormatValues, sourceInfo: SourceInfo) => {
+    const { formattedValue, floatValue } = values;
+    setValue(formattedValue);
+
+    // Event is a Synthetic Event wrapper which holds target and other information.
+    // Source tells whether the reason for this function being triggered was an 'event' or due to a 'prop' change
+    const { event, source } = sourceInfo;
+    if (source === "event" && (event.type === "change" || event.type === "keydown")) {
+      onChange(floatValue);
     }
   };
 
   return (
-    <InputCleave
-      ref={mergedRef}
-      inputMode="decimal"
-      options={cleaveOptions}
+    <Input
+      as={NumberFormat}
+      getInputRef={ref}
+      prefix={prefix ?? ""}
+      suffix={suffix ?? ""}
+      thousandSeparator={thousandSeparator}
+      decimalSeparator={decimalSeparator}
+      decimalScale={decimals ?? 5}
+      allowNegative={allowNegative ?? true}
       value={_value}
-      onChange={handleChange}
-      onKeyDown={handleKeyDown}
+      onValueChange={handleOnValueChange}
       {...props}
     />
   );

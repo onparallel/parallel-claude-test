@@ -9,10 +9,13 @@ export function formatNumberWithPrefix(value: number, options: FieldOptions["NUM
     minimumFractionDigits: 0,
     maximumFractionDigits: 20,
   });
+  const isNegative = value < 0;
 
   if (hasPrefix) {
     if (isDefined(options.prefix)) {
-      return options.prefix + formattedValue;
+      return isNegative
+        ? formattedValue.replace("-", "-" + options.prefix)
+        : options.prefix + formattedValue;
     } else {
       return formattedValue + options.suffix;
     }

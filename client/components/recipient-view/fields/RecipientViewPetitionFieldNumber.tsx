@@ -55,8 +55,8 @@ export function RecipientViewPetitionFieldNumber({
   const { range, placeholder, decimals, prefix, suffix } = field.options as FieldOptions["NUMBER"];
 
   const hasPrefix = isDefined(prefix) || isDefined(suffix) ? true : false;
-  const isTailPrefix = isDefined(suffix);
-  const prefixValue = isTailPrefix ? suffix : prefix;
+  const isSuffix = isDefined(suffix);
+  const prefixValue = isSuffix ? suffix : prefix;
 
   function handleAddNewReply() {
     setShowNewReply(true);
@@ -134,10 +134,10 @@ export function RecipientViewPetitionFieldNumber({
     ref: newReplyRef,
     isDisabled: isDisabled,
     isInvalid: isInvalidReply[field.id],
-    positiveOnly: isDefined(range.min) && range.min >= 0,
+    allowNegative: !isDefined(range.min) || range.min < 0,
     decimals: decimals ?? 2,
-    prefix: hasPrefix ? prefixValue : undefined,
-    tailPrefix: hasPrefix ? isTailPrefix : undefined,
+    prefix,
+    suffix,
     onKeyDown: async (event) => {
       if (
         isMetaReturn(event) &&
@@ -313,8 +313,8 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
   const { range, placeholder, decimals, prefix, suffix } = field.options as FieldOptions["NUMBER"];
 
   const hasPrefix = isDefined(prefix) || isDefined(suffix) ? true : false;
-  const isTailPrefix = isDefined(suffix);
-  const prefixValue = isTailPrefix ? suffix : prefix;
+  const isSuffix = isDefined(suffix);
+  const prefixValue = isSuffix ? suffix : prefix;
 
   const intl = useIntl();
   const [value, setValue] = useState(reply.content.value as number | undefined);
@@ -339,15 +339,15 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
 
   const props = {
     value,
+    ref,
+    prefix,
+    suffix,
     id: `reply-${field.id}-${reply.id}`,
-    ref: ref,
     isDisabled: isDisabled || reply.status === "APPROVED",
     isInvalid: reply.status === "REJECTED" || isInvalid,
-    paddingRight: 10,
-    positiveOnly: isDefined(range.min) && range.min >= 0,
+    allowNegative: !isDefined(range.min) || range.min < 0,
     decimals: decimals ?? 2,
-    prefix: hasPrefix ? prefixValue : undefined,
-    tailPrefix: hasPrefix ? isTailPrefix : undefined,
+    paddingRight: 10,
     onKeyDown: async (event) => {
       if (isMetaReturn(event) && field.multiple) {
         onAddNewReply();
