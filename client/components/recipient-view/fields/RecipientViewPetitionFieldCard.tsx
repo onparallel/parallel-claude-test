@@ -29,7 +29,6 @@ export type RecipientViewPetitionFieldCard_PetitionFieldReplySelection =
 export interface RecipientViewPetitionFieldCardProps {
   field: RecipientViewPetitionFieldCard_PetitionFieldSelection;
   isInvalid: boolean;
-  hasCommentsEnabled: boolean;
   showAddNewReply?: boolean;
   addNewReplyIsDisabled?: boolean;
   children: ReactNode;
@@ -41,7 +40,6 @@ export interface RecipientViewPetitionFieldCardProps {
 export function RecipientViewPetitionFieldCard({
   field,
   isInvalid,
-  hasCommentsEnabled,
   showAddNewReply,
   addNewReplyIsDisabled,
   onAddNewReply,
@@ -89,7 +87,7 @@ export function RecipientViewPetitionFieldCard({
             )}
           </Heading>
         </Box>
-        {hasCommentsEnabled || isPetitionField ? (
+        {field.hasCommentsEnabled || isPetitionField ? (
           <CommentsButton
             commentCount={field.commentCount}
             hasUnreadComments={field.unreadCommentCount > 0}
@@ -182,6 +180,7 @@ RecipientViewPetitionFieldCard.fragments = {
         commentCount
         unreadCommentCount
         ...RecipientViewPetitionFieldCommentsDialog_PetitionField
+        hasCommentsEnabled
       }
       ${this.PetitionFieldReply}
       ${FileAttachmentButton.fragments.FileUpload}
@@ -221,6 +220,7 @@ RecipientViewPetitionFieldCard.fragments = {
         }
         commentCount
         unreadCommentCount
+        hasCommentsEnabled
         ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
       }
       ${this.PublicPetitionFieldReply}

@@ -31,7 +31,6 @@ export function RecipientViewPetitionFieldDate({
   field,
   isDisabled,
   isInvalid,
-  hasCommentsEnabled,
   onDownloadAttachment,
   onDeleteReply,
   onUpdateReply,
@@ -151,7 +150,6 @@ export function RecipientViewPetitionFieldDate({
     <RecipientViewPetitionFieldCard
       field={field}
       isInvalid={isInvalid}
-      hasCommentsEnabled={hasCommentsEnabled}
       onCommentsButtonClick={onCommentsButtonClick}
       showAddNewReply={!isDisabled && field.multiple}
       addNewReplyIsDisabled={showNewReply}

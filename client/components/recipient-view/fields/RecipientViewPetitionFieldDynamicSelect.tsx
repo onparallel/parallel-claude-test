@@ -41,7 +41,6 @@ export function RecipientViewPetitionFieldDynamicSelect({
   field,
   isDisabled,
   isInvalid,
-  hasCommentsEnabled,
   onDownloadAttachment,
   onDeleteReply,
   onUpdateReply,
@@ -100,7 +99,6 @@ export function RecipientViewPetitionFieldDynamicSelect({
     <RecipientViewPetitionFieldCard
       field={field}
       isInvalid={isInvalid}
-      hasCommentsEnabled={hasCommentsEnabled}
       onCommentsButtonClick={onCommentsButtonClick}
       showAddNewReply={showAddNewReply}
       addNewReplyIsDisabled={

@@ -200,6 +200,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
               paddingY={8}
               justifyContent="center"
               alignItems="center"
+              textAlign="center"
             >
               <CommentIcon color="gray.300" boxSize="64px" />
               <Text color="gray.500">

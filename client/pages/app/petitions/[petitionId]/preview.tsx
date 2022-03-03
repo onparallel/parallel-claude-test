@@ -337,7 +337,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                         isInvalid={
                           finalized && completedFieldReplies(field).length === 0 && !field.optional
                         }
-                        hasCommentsEnabled={field.options.hasCommentsEnabled}
                         isCacheOnly={!isPetition}
                       />
                     </motion.div>

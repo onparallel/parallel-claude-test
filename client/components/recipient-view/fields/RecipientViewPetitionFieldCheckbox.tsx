@@ -42,7 +42,6 @@ export function RecipientViewPetitionFieldCheckbox({
   field,
   isDisabled,
   isInvalid,
-  hasCommentsEnabled,
   onDownloadAttachment,
   onDeleteReply,
   onUpdateReply,
@@ -117,7 +116,6 @@ export function RecipientViewPetitionFieldCheckbox({
     <RecipientViewPetitionFieldCard
       field={field}
       isInvalid={isInvalid}
-      hasCommentsEnabled={hasCommentsEnabled}
       onCommentsButtonClick={onCommentsButtonClick}
       showAddNewReply={false}
       onDownloadAttachment={onDownloadAttachment}

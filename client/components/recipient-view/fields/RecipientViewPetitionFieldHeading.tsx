@@ -29,7 +29,7 @@ export function RecipientViewPetitionFieldHeading({
             </Heading>
           ) : null}
         </Box>
-        {field.options.hasCommentsEnabled || field.__typename === "PetitionField" ? (
+        {field.hasCommentsEnabled || field.__typename === "PetitionField" ? (
           <Box paddingRight={2}>
             <CommentsButton
               commentCount={field.commentCount}

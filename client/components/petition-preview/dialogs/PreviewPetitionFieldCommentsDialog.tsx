@@ -78,9 +78,9 @@ export function PreviewPetitionFieldCommentsDialog({
     onBlurDelay: 300,
   });
 
-  const hasCommentsEnabled = field.isInternal ? false : field.options.hasCommentsEnabled;
+  const hasCommentsEnabled = field.isInternal ? false : field.hasCommentsEnabled;
 
-  const [isInternalComment, setInternalComment] = useState(hasCommentsEnabled ? false : true);
+  const [isInternalComment, setInternalComment] = useState(!hasCommentsEnabled);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -374,6 +374,7 @@ PreviewPetitionFieldCommentsDialog.fragments = {
         comments {
           ...FieldComment_PetitionFieldComment
         }
+        hasCommentsEnabled
       }
       ${FieldComment.fragments.PetitionFieldComment}
     `;

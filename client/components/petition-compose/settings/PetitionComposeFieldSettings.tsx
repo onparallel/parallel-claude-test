@@ -99,10 +99,10 @@ export function PetitionComposeFieldSettings({
             display="block"
             id="enable-comments"
             color="green"
-            isChecked={field.isInternal ? false : field.options.hasCommentsEnabled}
+            isChecked={field.isInternal ? false : field.hasCommentsEnabled}
             onChange={(event) =>
               onFieldEdit(field.id, {
-                options: { ...field.options, hasCommentsEnabled: event.target.checked },
+                hasCommentsEnabled: event.target.checked,
               })
             }
             isDisabled={isReadOnly || field.isInternal}
@@ -268,6 +268,7 @@ PetitionComposeFieldSettings.fragments = {
       position
       visibility
       alias
+      hasCommentsEnabled
     }
   `,
 };

@@ -590,9 +590,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               <PetitionRepliesFieldComments
                 key={activeFieldId}
                 petitionId={petition.id}
-                hasCommentsEnabled={
-                  activeField.isInternal ? false : activeField?.options.hasCommentsEnabled
-                }
                 field={activeField}
                 user={me}
                 onClose={() => setActiveFieldId(null)}

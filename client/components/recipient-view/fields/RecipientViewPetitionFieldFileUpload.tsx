@@ -48,7 +48,6 @@ export function RecipientViewPetitionFieldFileUpload({
   field,
   isDisabled,
   isInvalid,
-  hasCommentsEnabled,
   onDownloadAttachment,
   onDeleteReply,
   onCreateReply,
@@ -71,7 +70,6 @@ export function RecipientViewPetitionFieldFileUpload({
     <RecipientViewPetitionFieldCard
       field={field}
       isInvalid={isInvalid}
-      hasCommentsEnabled={hasCommentsEnabled}
       onCommentsButtonClick={onCommentsButtonClick}
       onDownloadAttachment={onDownloadAttachment}
     >

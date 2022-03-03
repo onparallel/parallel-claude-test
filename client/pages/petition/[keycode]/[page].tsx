@@ -361,7 +361,6 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                               completedFieldReplies(field).length === 0 &&
                               !field.optional
                             }
-                            hasCommentsEnabled={field.options.hasCommentsEnabled}
                           />
                         </motion.div>
                       );

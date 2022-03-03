@@ -30,7 +30,10 @@ import {
   useDeletePetitionReply,
   useUpdatePetitionFieldReply,
 } from "./clientMutations";
-import { usePreviewPetitionFieldCommentsDialog } from "./dialogs/PreviewPetitionFieldCommentsDialog";
+import {
+  PreviewPetitionFieldCommentsDialog,
+  usePreviewPetitionFieldCommentsDialog,
+} from "./dialogs/PreviewPetitionFieldCommentsDialog";
 
 export interface PreviewPetitionFieldProps
   extends Omit<
@@ -224,12 +227,14 @@ PreviewPetitionField.fragments = {
   PetitionField: gql`
     fragment PreviewPetitionField_PetitionField on PetitionField {
       ...RecipientViewPetitionFieldCard_PetitionField
+      ...PreviewPetitionFieldCommentsDialog_PetitionField
       previewReplies @client {
         ...RecipientViewPetitionFieldCard_PetitionFieldReply
       }
     }
     ${RecipientViewPetitionFieldCard.fragments.PetitionField}
     ${RecipientViewPetitionFieldCard.fragments.PetitionFieldReply}
+    ${PreviewPetitionFieldCommentsDialog.fragments.PetitionField}
   `,
   PetitionFieldReply: gql`
     fragment PreviewPetitionField_PetitionFieldReply on PetitionFieldReply {

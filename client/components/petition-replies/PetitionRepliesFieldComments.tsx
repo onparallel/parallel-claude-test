@@ -24,7 +24,6 @@ export type PetitionRepliesFieldCommentsProps = {
   petitionId: string;
   field: PetitionRepliesFieldComments_PetitionFieldFragment;
   user: PetitionReplies_UserFragment;
-  hasCommentsEnabled: boolean;
   onAddComment: (value: string, internal?: boolean) => void;
   onDeleteComment: (petitionFieldCommentId: string) => void;
   onUpdateComment: (petitionFieldCommentId: string, content: string) => void;
@@ -36,7 +35,6 @@ export function PetitionRepliesFieldComments({
   petitionId,
   field,
   user,
-  hasCommentsEnabled,
   onAddComment,
   onDeleteComment,
   onUpdateComment,
@@ -47,7 +45,9 @@ export function PetitionRepliesFieldComments({
 
   const [draft, setDraft] = useState("");
 
-  const [isInternalComment, setInternalComment] = useState(hasCommentsEnabled ? false : true);
+  const hasCommentsEnabled = field.isInternal ? false : field.hasCommentsEnabled;
+
+  const [isInternalComment, setInternalComment] = useState(!hasCommentsEnabled);
   const [inputFocused, inputFocusBind] = useFocus({ onBlurDelay: 300 });
 
   const commentsRef = useRef<HTMLDivElement>(null);
@@ -272,6 +272,7 @@ PetitionRepliesFieldComments.fragments = {
         replies {
           ...PetitionRepliesFieldComments_PetitionFieldReply
         }
+        hasCommentsEnabled
       }
       fragment PetitionRepliesFieldComments_PetitionFieldReply on PetitionFieldReply {
         id

@@ -10,23 +10,20 @@ export type DynamicSelectOption = [string, string[] | DynamicSelectOption[]];
 
 export type FieldOptions = {
   HEADING: {
-    hasCommentsEnabled: boolean;
     hasPageBreak: boolean;
   };
   FILE_UPLOAD: {
-    hasCommentsEnabled: boolean;
     accepts: Maybe<FileUploadAccepts[]>;
   };
   SHORT_TEXT: {
-    hasCommentsEnabled: boolean;
     placeholder: Maybe<string>;
+    maxLength: Maybe<number>;
   };
   TEXT: {
-    hasCommentsEnabled: boolean;
     placeholder: Maybe<string>;
+    maxLength: Maybe<number>;
   };
   NUMBER: {
-    hasCommentsEnabled: boolean;
     placeholder: Maybe<string>;
     range: {
       min: number | undefined;
@@ -37,16 +34,13 @@ export type FieldOptions = {
     suffix: Maybe<string>;
   };
   PHONE: {
-    hasCommentsEnabled: boolean;
     placeholder: Maybe<string>;
   };
   SELECT: {
-    hasCommentsEnabled: boolean;
     values: string[];
     placeholder: Maybe<string>;
   };
   DYNAMIC_SELECT: {
-    hasCommentsEnabled: boolean;
     values: DynamicSelectOption[];
     labels: string[];
     file?: {
@@ -57,7 +51,6 @@ export type FieldOptions = {
     };
   };
   CHECKBOX: {
-    hasCommentsEnabled: boolean;
     values: string[];
     limit: {
       type: string;
@@ -65,10 +58,7 @@ export type FieldOptions = {
       max: number;
     };
   };
-  DATE: {
-    hasCommentsEnabled: boolean;
-    placeholder: Maybe<string>;
-  };
+  DATE: {};
 };
 
 export function usePetitionFieldTypeLabel(type: PetitionFieldType) {

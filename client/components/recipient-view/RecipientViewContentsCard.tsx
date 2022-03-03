@@ -70,8 +70,7 @@ export function RecipientViewContentsCard({
 
   const showCommentsCount = (field: PetitionFieldSelection) => {
     return (
-      field.commentCount > 0 &&
-      (field.__typename === "PetitionField" || field.options.hasCommentsEnabled)
+      field.commentCount > 0 && (field.__typename === "PetitionField" || field.hasCommentsEnabled)
     );
   };
 
@@ -342,6 +341,7 @@ RecipientViewContentsCard.fragments = {
         }
         commentCount
         unreadCommentCount
+        hasCommentsEnabled
         ...useFieldVisibility_PublicPetitionField
       }
       ${useFieldVisibility.fragments.PublicPetitionField}
@@ -373,6 +373,7 @@ RecipientViewContentsCard.fragments = {
         }
         commentCount
         unreadCommentCount
+        hasCommentsEnabled
         ...useFieldVisibility_PetitionField
       }
       ${useFieldVisibility.fragments.PetitionField}
