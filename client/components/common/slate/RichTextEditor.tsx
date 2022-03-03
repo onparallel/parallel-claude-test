@@ -28,6 +28,7 @@ import {
   createReactPlugin,
   Plate,
   usePlateEditorState,
+  withPlateProvider,
 } from "@udecode/plate-core";
 import { createHeadingPlugin, ELEMENT_H1, ELEMENT_H2 } from "@udecode/plate-heading";
 import { createLinkPlugin, ELEMENT_LINK } from "@udecode/plate-link";
@@ -85,8 +86,8 @@ export interface RichTextEditorInstance {
   focus(): void;
 }
 
-export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorProps>(
-  function RichTextEditor(
+export const RichTextEditor = withPlateProvider(
+  forwardRef<RichTextEditorInstance, RichTextEditorProps>(function RichTextEditor(
     {
       id,
       value,
@@ -279,7 +280,7 @@ export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorP
         </Portal>
       </Box>
     );
-  }
+  })
 );
 
 function RenderElement({ attributes, nodeProps, styles, element, editor, ...props }: any) {
