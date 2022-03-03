@@ -153,7 +153,7 @@ export function ConfirmPetitionSignersDialog({
       body={
         <>
           <FormControl id="signers" isInvalid={!!errors.signers}>
-            {allowAdditionalSigners ? (
+            {signers.length === 0 || allowAdditionalSigners ? (
               <Text color="gray.500" marginLeft={1}>
                 <FormattedMessage
                   id="component.confirm-petition-signers-dialog.signers-added"
@@ -183,7 +183,7 @@ export function ConfirmPetitionSignersDialog({
                       />
                     ))}
                   </Stack>
-                  {allowAdditionalSigners ? (
+                  {signers.length === 0 || allowAdditionalSigners ? (
                     <Box marginTop={2}>
                       <ContactSelect
                         ref={contactSelectRef as any}

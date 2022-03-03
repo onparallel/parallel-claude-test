@@ -135,7 +135,7 @@ function RecipientViewConfirmPetitionSignersDialog({
       body={
         <>
           <FormControl id="signers" isInvalid={!!errors.signers}>
-            {allowAdditionalSigners ? (
+            {signers.length === 0 || allowAdditionalSigners ? (
               <Text color="gray.500" marginLeft={1}>
                 <FormattedMessage
                   id="component.recipient-view.confirm-petition-signers-dialog.signers-added"
@@ -165,7 +165,7 @@ function RecipientViewConfirmPetitionSignersDialog({
                       />
                     ))}
                   </Stack>
-                  {allowAdditionalSigners ? (
+                  {signers.length === 0 || allowAdditionalSigners ? (
                     <Box marginTop={2}>
                       <Button variant="outline" paddingX={3} onClick={handleAddNewSigner(onChange)}>
                         <PlusCircleFilledIcon color="purple.500" fontSize="xl" marginRight={2} />
