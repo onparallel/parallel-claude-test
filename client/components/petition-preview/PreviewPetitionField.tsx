@@ -4,6 +4,7 @@ import {
   PreviewPetitionField_PetitionFieldFragment,
   PreviewPetitionField_PetitionFieldReplyFragmentDoc,
   RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkDocument,
+  Tone,
 } from "@parallel/graphql/__types";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
@@ -52,12 +53,14 @@ export interface PreviewPetitionFieldProps
   petitionId: string;
   isDisabled: boolean;
   isCacheOnly: boolean;
+  tone: Tone;
 }
 
 export function PreviewPetitionField({
   field,
   petitionId,
   isCacheOnly,
+  tone,
   ...props
 }: PreviewPetitionFieldProps) {
   const uploads = useRef<UploadCache>({});
@@ -87,6 +90,7 @@ export function PreviewPetitionField({
         petitionId,
         field,
         isTemplate: isCacheOnly,
+        tone,
       });
     } catch {}
   }

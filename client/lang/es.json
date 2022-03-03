@@ -8341,7 +8341,7 @@
   },
   {
     "term": "recipient-view.field-comments.placeholder",
-    "definition": "Escriba aquí sus dudas y preguntas",
+    "definition": "{tone, select, INFORMAL{Escribe aquí tus} other{Escriba aquí sus}} dudas y preguntas",
     "context": "Ask here your questions and doubts"
   },
   {

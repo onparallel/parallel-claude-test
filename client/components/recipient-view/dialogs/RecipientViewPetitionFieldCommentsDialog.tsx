@@ -242,10 +242,13 @@ export function RecipientViewPetitionFieldCommentsDialog({
             minHeight={0}
             maxHeight={20}
             rows={1}
-            placeholder={intl.formatMessage({
-              id: "recipient-view.field-comments.placeholder",
-              defaultMessage: "Ask here your questions and doubts",
-            })}
+            placeholder={intl.formatMessage(
+              {
+                id: "recipient-view.field-comments.placeholder",
+                defaultMessage: "Ask here your questions and doubts",
+              },
+              { tone }
+            )}
             value={draft}
             onKeyDown={handleKeyDown as any}
             onChange={handleDraftChange as any}

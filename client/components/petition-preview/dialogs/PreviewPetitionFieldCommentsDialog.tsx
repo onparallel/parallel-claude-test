@@ -31,6 +31,7 @@ import {
   PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument,
   PreviewPetitionFieldCommentsDialog_userDocument,
   PreviewPetitionField_PetitionFieldFragment,
+  Tone,
 } from "@parallel/graphql/__types";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
@@ -45,12 +46,14 @@ interface PreviewPetitionFieldCommentsDialogProps {
   petitionId: string;
   field: PreviewPetitionField_PetitionFieldFragment;
   isTemplate?: boolean;
+  tone: Tone;
 }
 
 export function PreviewPetitionFieldCommentsDialog({
   petitionId,
   field,
   isTemplate,
+  tone,
   ...props
 }: DialogProps<PreviewPetitionFieldCommentsDialogProps>) {
   const intl = useIntl();
@@ -293,10 +296,13 @@ export function PreviewPetitionFieldCommentsDialog({
             minHeight={0}
             maxHeight={20}
             rows={1}
-            placeholder={intl.formatMessage({
-              id: "recipient-view.field-comments.placeholder",
-              defaultMessage: "Ask here your questions and doubts",
-            })}
+            placeholder={intl.formatMessage(
+              {
+                id: "recipient-view.field-comments.placeholder",
+                defaultMessage: "Ask here your questions and doubts",
+              },
+              { tone }
+            )}
             value={draft}
             onKeyDown={handleKeyDown as any}
             onChange={handleDraftChange as any}
