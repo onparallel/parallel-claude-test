@@ -33,7 +33,8 @@
     "emails": "concurrently \"ts-node-dev --watch ./emails.tsx --ignore-watch ./src --files ./emails.tsx --respawn\" \"start-storybook --port 60000 --quiet\"",
     "postinstall": "cd .. && yarn patch-package",
     "generate-graphql-types": "graphql-codegen",
-    "run-ts-script": "ts-node --project tsconfig.json --transpile-only"
+    "run-ts-script": "ts-node --project tsconfig.json --transpile-only",
+    "flush-sqs": "docker-compose -f ../ops/dev/docker-compose.yml restart queue"
   },
   "dependencies": {
     "@foundernest/namecase": "^1.0.5",
