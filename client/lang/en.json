@@ -230,6 +230,16 @@
     "context": "Ongoing eSignature"
   },
   {
+    "term": "component.confirm-delete-contacts-dialog.alert-multiple-text",
+    "definition": "We have found petitions sent to some of these contacts.",
+    "context": "We have found petitions sent to some of these contacts."
+  },
+  {
+    "term": "component.confirm-delete-contacts-dialog.alert-single-text",
+    "definition": "This contact has access to:",
+    "context": "This contact has access to:"
+  },
+  {
     "term": "component.confirm-delete-contacts-dialog.alert.closed-petitions",
     "definition": "{count} closed {count, plural, =1{petition} other{petitions}}",
     "context": "{count} closed {count, plural, =1{petition} other{petitions}}"
@@ -240,24 +250,14 @@
     "context": "{count} completed {count, plural, =1{petition} other{petitions}}"
   },
   {
-    "term": "component.confirm-delete-contacts-dialog.alert.multiple.text",
-    "definition": "There are petitions sent to at least one of these contacts.",
-    "context": "There are petitions sent to at least one of these contacts."
-  },
-  {
     "term": "component.confirm-delete-contacts-dialog.alert.pending-petitions",
     "definition": "{count} pending {count, plural, =1{petition} other{petitions}}",
     "context": "{count} pending {count, plural, =1{petition} other{petitions}}"
   },
   {
-    "term": "component.confirm-delete-contacts-dialog.alert.single.text",
-    "definition": "We have found: {petitionsCount} with this contact.",
-    "context": "We have found: {petitionsCount} with this contact."
-  },
-  {
     "term": "component.confirm-delete-contacts-dialog.body.1",
-    "definition": "If you continue, the {count, plural, =1{contact} other{contacts}} will be removed from the organization and will no longer be able to access any of them.",
-    "context": "If you continue, the {count, plural, =1{contact} other{contacts}} will be removed from the organization and will no longer be able to access any of them."
+    "definition": "If you continue, the {count, plural, =1{contact} other{contacts}} won't be able to access their replies anymore.",
+    "context": "If you continue, the {count, plural, =1{contact} other{contacts}} won't be able to access their replies anymore."
   },
   {
     "term": "component.confirm-delete-contacts-dialog.body.2",

@@ -230,6 +230,16 @@
     "context": "Ongoing eSignature"
   },
   {
+    "term": "component.confirm-delete-contacts-dialog.alert-multiple-text",
+    "definition": "Hemos encontrado peticiones enviadas a algunos de estos contactos.",
+    "context": "We have found petitions sent to some of these contacts."
+  },
+  {
+    "term": "component.confirm-delete-contacts-dialog.alert-single-text",
+    "definition": "Este contacto tiene acceso a:",
+    "context": "This contact has access to:"
+  },
+  {
     "term": "component.confirm-delete-contacts-dialog.alert.closed-petitions",
     "definition": "{count, plural, =1{# petición cerrada} other{# peticiones cerradas}}",
     "context": "{count} closed {count, plural, =1{petition} other{petitions}}"
@@ -240,24 +250,14 @@
     "context": "{count} completed {count, plural, =1{petition} other{petitions}}"
   },
   {
-    "term": "component.confirm-delete-contacts-dialog.alert.multiple.text",
-    "definition": "Hay peticiones enviadas al menos a uno de estos contactos.",
-    "context": "There are petitions sent to at least one of these contacts."
-  },
-  {
     "term": "component.confirm-delete-contacts-dialog.alert.pending-petitions",
     "definition": "{count, plural, =1{# petición pendiente} other{# peticiones pendientes}}",
     "context": "{count} pending {count, plural, =1{petition} other{petitions}}"
   },
   {
-    "term": "component.confirm-delete-contacts-dialog.alert.single.text",
-    "definition": "Se han encontrado: {petitionsCount} con este contacto.",
-    "context": "We have found: {petitionsCount} with this contact."
-  },
-  {
     "term": "component.confirm-delete-contacts-dialog.body.1",
-    "definition": "Si continúas, {count, plural, =1{el contacto se eliminará} other{los contactos se eliminarán}} de la organización y no {count, plural, =1{podrá} other {podrán}} volver a acceder a ninguna de ellas.",
-    "context": "If you continue, the {count, plural, =1{contact} other{contacts}} will be removed from the organization and will no longer be able to access any of them."
+    "definition": "Si continúas, {count, plural, =1{el contacto ya no podrá} other{los contactos ya no podrán}} acceder a sus respuestas.",
+    "context": "If you continue, the {count, plural, =1{contact} other{contacts}} won't be able to access their replies anymore."
   },
   {
     "term": "component.confirm-delete-contacts-dialog.body.2",

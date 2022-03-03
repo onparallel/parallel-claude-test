@@ -1,11 +1,4 @@
-import {
-  FormControl,
-  FormControlProps,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Text,
-} from "@chakra-ui/react";
+import { FormControl, FormControlProps, FormLabel, Input, Text } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { usePreviousValue } from "beautiful-react-hooks";
 import { ChangeEvent, useState } from "react";
@@ -44,13 +37,15 @@ export const ConfirmInput = chakraForwardRef<"div", ConfirmInputProps>(function 
   return (
     <FormControl ref={ref} {...props}>
       <FormLabel>
-        <FormattedMessage
-          id="generic.type-to-confirm"
-          defaultMessage="Please type {confirmation} to confirm"
-          values={{
-            confirmation: <Text as="strong">{confirmation}</Text>,
-          }}
-        />
+        <Text color={props.isInvalid ? "red.500" : "inherit"}>
+          <FormattedMessage
+            id="generic.type-to-confirm"
+            defaultMessage="Please type {confirmation} to confirm"
+            values={{
+              confirmation: <Text as="strong">{confirmation}</Text>,
+            }}
+          />
+        </Text>
       </FormLabel>
       <Input
         name={name}
@@ -62,15 +57,9 @@ export const ConfirmInput = chakraForwardRef<"div", ConfirmInputProps>(function 
           { confirmation }
         )}
         value={value}
+        placeholder={confirmation}
         onChange={handleChange}
       />
-      <FormErrorMessage>
-        <FormattedMessage
-          id="generic.type-to-confirm"
-          defaultMessage="Please type {confirmation} to confirm"
-          values={{ confirmation }}
-        />
-      </FormErrorMessage>
     </FormControl>
   );
 });

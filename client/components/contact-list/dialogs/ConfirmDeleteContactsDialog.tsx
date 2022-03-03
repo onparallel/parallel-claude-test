@@ -1,10 +1,11 @@
 import { gql } from "@apollo/client";
-import { Alert, AlertIcon, Button, Stack, Text } from "@chakra-ui/react";
+import { Alert, AlertIcon, Box, Button, Stack, Text } from "@chakra-ui/react";
+import { ConfirmInput } from "@parallel/components/common/ConfirmInput";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { useConfirmDeleteContactsDialog_ContactFragment } from "@parallel/graphql/__types";
-import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { Controller, useForm } from "react-hook-form";
+import { FormattedMessage } from "react-intl";
 
 function ConfirmDeleteContactsDialog({
   contacts,
@@ -14,9 +15,17 @@ function ConfirmDeleteContactsDialog({
   contacts: useConfirmDeleteContactsDialog_ContactFragment[];
   extra: { PENDING: number; COMPLETED: number; CLOSED: number };
 }>) {
-  const intl = useIntl();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<{
+    confirm: boolean;
+  }>();
+
   return (
     <ConfirmDialog
+      content={{ as: "form", onSubmit: handleSubmit(() => props.onResolve()) }}
       size="lg"
       header={
         <FormattedMessage
@@ -26,61 +35,56 @@ function ConfirmDeleteContactsDialog({
         />
       }
       body={
-        <Stack spacing={4}>
+        <Stack spacing={2}>
           <Alert status="warning" borderRadius="md">
             <AlertIcon color="yellow.500" />
             {contacts.length === 1 ? (
-              <FormattedMessage
-                id="component.confirm-delete-contacts-dialog.alert.single.text"
-                defaultMessage="We have found: {petitionsCount} with this contact."
-                values={{
-                  petitionsCount: intl.formatList(
-                    [
-                      extra.PENDING > 0
-                        ? intl.formatMessage(
-                            {
-                              id: "component.confirm-delete-contacts-dialog.alert.pending-petitions",
-                              defaultMessage:
-                                "{count} pending {count, plural, =1{petition} other{petitions}}",
-                            },
-                            { count: extra.PENDING }
-                          )
-                        : null,
-                      extra.COMPLETED > 0
-                        ? intl.formatMessage(
-                            {
-                              id: "component.confirm-delete-contacts-dialog.alert.completed-petitions",
-                              defaultMessage:
-                                "{count} completed {count, plural, =1{petition} other{petitions}}",
-                            },
-                            { count: extra.COMPLETED }
-                          )
-                        : null,
-                      extra.CLOSED > 0
-                        ? intl.formatMessage(
-                            {
-                              id: "component.confirm-delete-contacts-dialog.alert.closed-petitions",
-                              defaultMessage:
-                                "{count} closed {count, plural, =1{petition} other{petitions}}",
-                            },
-                            { count: extra.CLOSED }
-                          )
-                        : null,
-                    ].filter(isDefined)
-                  ),
-                }}
-              />
+              <Box>
+                <FormattedMessage
+                  id="component.confirm-delete-contacts-dialog.alert-single-text"
+                  defaultMessage="This contact has access to:"
+                />
+                <Stack as="ul" paddingLeft={8} spacing={0}>
+                  {extra.PENDING > 0 ? (
+                    <Text as="li">
+                      <FormattedMessage
+                        id="component.confirm-delete-contacts-dialog.alert.pending-petitions"
+                        defaultMessage="{count} pending {count, plural, =1{petition} other{petitions}}"
+                        values={{ count: extra.PENDING }}
+                      />
+                    </Text>
+                  ) : null}
+                  {extra.COMPLETED > 0 ? (
+                    <Text as="li">
+                      <FormattedMessage
+                        id="component.confirm-delete-contacts-dialog.alert.completed-petitions"
+                        defaultMessage="{count} completed {count, plural, =1{petition} other{petitions}}"
+                        values={{ count: extra.COMPLETED }}
+                      />
+                    </Text>
+                  ) : null}
+                  {extra.CLOSED > 0 ? (
+                    <Text as="li">
+                      <FormattedMessage
+                        id="component.confirm-delete-contacts-dialog.alert.closed-petitions"
+                        defaultMessage="{count} closed {count, plural, =1{petition} other{petitions}}"
+                        values={{ count: extra.CLOSED }}
+                      />
+                    </Text>
+                  ) : null}
+                </Stack>
+              </Box>
             ) : (
               <FormattedMessage
-                id="component.confirm-delete-contacts-dialog.alert.multiple.text"
-                defaultMessage="There are petitions sent to at least one of these contacts."
+                id="component.confirm-delete-contacts-dialog.alert-multiple-text"
+                defaultMessage="We have found petitions sent to some of these contacts."
               />
             )}
           </Alert>
           <Text>
             <FormattedMessage
               id="component.confirm-delete-contacts-dialog.body.1"
-              defaultMessage="If you continue, the {count, plural, =1{contact} other{contacts}} will be removed from the organization and will no longer be able to access any of them."
+              defaultMessage="If you continue, the {count, plural, =1{contact} other{contacts}} won't be able to access their replies anymore."
               values={{ count: contacts.length }}
             />
           </Text>
@@ -95,10 +99,16 @@ function ConfirmDeleteContactsDialog({
               }}
             />
           </Text>
+          <Controller
+            name="confirm"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => <ConfirmInput {...field} isInvalid={!!errors.confirm} />}
+          />
         </Stack>
       }
       confirm={
-        <Button colorScheme="red" onClick={() => props.onResolve()}>
+        <Button colorScheme="red" type="submit">
           <FormattedMessage
             id="component.confirm-delete-contacts-dialog.delete-button"
             defaultMessage="Yes, delete {count, plural, =1{contact} other {contacts}}"
