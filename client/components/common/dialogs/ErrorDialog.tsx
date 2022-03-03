@@ -30,7 +30,7 @@ export function ErrorDialog({ message, header, ...props }: DialogProps<ErrorDial
       body={message}
       confirm={
         <Button ref={focusRef} colorScheme="purple" minWidth={24} onClick={() => props.onResolve()}>
-          <FormattedMessage id="component.error-dialog.ok-button" defaultMessage="OK" />
+          <FormattedMessage id="generic.ok" defaultMessage="OK" />
         </Button>
       }
       cancel={<></>}

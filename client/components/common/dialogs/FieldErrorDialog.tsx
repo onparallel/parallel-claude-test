@@ -98,7 +98,7 @@ export function FieldErrorDialog({
             minWidth={24}
             onClick={() => props.onResolve()}
           >
-            <FormattedMessage id="component.error-dialog.ok-button" defaultMessage="OK" />
+            <FormattedMessage id="generic.ok" defaultMessage="OK" />
           </Button>
         )
       }

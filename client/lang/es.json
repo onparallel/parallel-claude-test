@@ -745,11 +745,6 @@
     "context": "Error"
   },
   {
-    "term": "component.error-dialog.ok-button",
-    "definition": "Aceptar",
-    "context": "OK"
-  },
-  {
     "term": "component.existing-contact-toast.description",
     "definition": "Este contacto ya existe.",
     "context": "This contact already exists."
