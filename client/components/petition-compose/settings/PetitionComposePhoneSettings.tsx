@@ -15,7 +15,6 @@ export function PhoneSettings({
 }: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">) {
   const options = field.options as FieldOptions["PHONE"];
   const [placeholder, setPlaceholder] = useState(options.placeholder ?? "");
-  const [phoneCode, setPhoneCode] = useState(options.defaultCountry);
 
   const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 100, [field.id]);
 
@@ -30,32 +29,8 @@ export function PhoneSettings({
     });
   };
 
-  const handleDefaultCountryChange = (country: string | null) => {
-    setPhoneCode(country);
-    debouncedOnUpdate(field.id, {
-      options: {
-        ...field.options,
-        defaultCountry: country,
-      },
-    });
-  };
-
   return (
     <Stack spacing={4}>
-      <SettingsRow
-        isDisabled={isReadOnly}
-        label={
-          <FormattedMessage
-            id="component.petition-compose-phone-settings.default-country"
-            defaultMessage="Default country"
-          />
-        }
-        controlId="default-country"
-      >
-        <Box width="100%">
-          <PhoneCodeSelect size="sm" value={phoneCode} onChange={handleDefaultCountryChange} />
-        </Box>
-      </SettingsRow>
       <SettingsRowPlaceholder
         placeholder={placeholder}
         onChange={handlePlaceholderChange}

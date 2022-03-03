@@ -53,9 +53,6 @@ const SCHEMAS = {
       placeholder: {
         type: ["string", "null"],
       },
-      defaultCountry: {
-        type: ["string", "null"],
-      },
     },
   },
   TEXT: {
@@ -304,7 +301,6 @@ export function defaultFieldOptions(
           hasCommentsEnabled,
           placeholder:
             isDefined(field) && hasPlaceholder(field.type) ? field.options.placeholder : null,
-          defaultCountry: null,
         };
       }
       case "SELECT": {
