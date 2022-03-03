@@ -1,11 +1,8 @@
-import { Box, Stack } from "@chakra-ui/react";
-import { PhoneCodeSelect } from "@parallel/components/common/PhoneCodeInput";
+import { Stack } from "@chakra-ui/react";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useState } from "react";
-import { FormattedMessage } from "react-intl";
 import { PetitionComposeFieldSettingsProps } from "./PetitionComposeFieldSettings";
-import { SettingsRow } from "./SettingsRow";
 import { SettingsRowPlaceholder } from "./SettingsRowPlaceholder";
 
 export function PhoneSettings({
