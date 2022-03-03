@@ -204,6 +204,10 @@ export class Auth implements IAuth {
       if (auth.AuthenticationResult) {
         const token = await this.storeSession(auth.AuthenticationResult as any);
         const user = await this.getUserFromAuthenticationResult(auth.AuthenticationResult);
+        if (!user) {
+          res.status(401).send({ error: "UnknownError" });
+          return;
+        }
         await this.trackSessionLogin(user);
         this.setSession(res, token);
         res.status(201).send({ preferredLocale: user.details?.preferredLocale });
@@ -225,7 +229,10 @@ export class Auth implements IAuth {
           res.status(401).send({ error: "InvalidUsernameOrPassword" });
           return;
       }
-      req.context.logger.error(error?.message, { stack: error?.stack, body: req.body });
+      req.context.logger.error(error?.message, {
+        stack: error?.stack,
+        body: { email: req.body.email }, // be careful not to expose the password!
+      });
       res.status(401).send({ error: "InvalidUsernameOrPassword" });
     }
   }
@@ -245,6 +252,10 @@ export class Auth implements IAuth {
       );
       if (challenge.AuthenticationResult) {
         const user = await this.getUserFromAuthenticationResult(challenge.AuthenticationResult);
+        if (!user) {
+          res.status(401).send({ error: "UnknownError" });
+          return;
+        }
         await this.trackSessionLogin(user);
         const token = await this.storeSession(challenge.AuthenticationResult as any);
         this.setSession(res, token);
@@ -364,9 +375,13 @@ export class Auth implements IAuth {
   }
 
   private async getUserFromAuthenticationResult(result: AuthenticationResultType) {
-    const payload = decode(result.IdToken!) as any;
-    const cognitoId = payload["cognito:username"] as string;
-    return await this.users.loadUserByCognitoId(cognitoId);
+    if (result.IdToken) {
+      const payload = decode(result.IdToken) as any;
+      const cognitoId = payload["cognito:username"] as string;
+      return await this.users.loadUserByCognitoId(cognitoId);
+    } else {
+      return null;
+    }
   }
 
   private async trackSessionLogin(user: User) {
@@ -513,7 +528,7 @@ export class Auth implements IAuth {
           return null;
         }
       }
-      return this.users.loadUserByCognitoId(cognitoId);
+      return await this.users.loadUserByCognitoId(cognitoId);
     } catch (error: any) {
       return null;
     }

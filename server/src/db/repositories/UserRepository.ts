@@ -25,7 +25,7 @@ export class UserRepository extends BaseRepository {
   }
 
   readonly loadUserByCognitoId = fromDataLoader(
-    new DataLoader<string, User>(async (cognitoIds) => {
+    new DataLoader<string, User | null>(async (cognitoIds) => {
       const rows = await this.from("user")
         .update({ last_active_at: this.now() })
         .whereIn("cognito_id", cognitoIds)
