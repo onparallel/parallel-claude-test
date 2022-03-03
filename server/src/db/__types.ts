@@ -832,6 +832,7 @@ export interface PetitionField {
   alias: Maybe<string>; // varchar
   is_internal: boolean; // bool
   show_in_pdf: boolean; // bool
+  has_comments_enabled: boolean; // bool
 }
 
 export type CreatePetitionField = PartialProps<
@@ -854,6 +855,7 @@ export type CreatePetitionField = PartialProps<
   | "alias"
   | "is_internal"
   | "show_in_pdf"
+  | "has_comments_enabled"
 >;
 
 export interface PetitionFieldAttachment {

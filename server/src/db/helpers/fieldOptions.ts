@@ -6,12 +6,9 @@ import { CreatePetitionField, PetitionField, PetitionFieldType } from "../__type
 const SCHEMAS = {
   NUMBER: {
     type: "object",
-    required: ["hasCommentsEnabled", "placeholder", "range"],
+    required: ["placeholder", "range", "decimals"],
     additionalProperties: false,
     properties: {
-      hasCommentsEnabled: {
-        type: "boolean",
-      },
       placeholder: {
         type: ["string", "null"],
       },
@@ -36,20 +33,13 @@ const SCHEMAS = {
   DATE: {
     type: "object",
     additionalProperties: false,
-    properties: {
-      hasCommentsEnabled: {
-        type: "boolean",
-      },
-    },
+    properties: {},
   },
   PHONE: {
     type: "object",
-    required: ["hasCommentsEnabled", "placeholder"],
+    required: ["placeholder"],
     additionalProperties: false,
     properties: {
-      hasCommentsEnabled: {
-        type: "boolean",
-      },
       placeholder: {
         type: ["string", "null"],
       },
@@ -57,12 +47,9 @@ const SCHEMAS = {
   },
   TEXT: {
     type: "object",
-    required: ["hasCommentsEnabled", "placeholder", "maxLength"],
+    required: ["placeholder", "maxLength"],
     additionalProperties: false,
     properties: {
-      hasCommentsEnabled: {
-        type: "boolean",
-      },
       placeholder: {
         type: ["string", "null"],
       },
@@ -73,12 +60,9 @@ const SCHEMAS = {
   },
   SHORT_TEXT: {
     type: "object",
-    required: ["hasCommentsEnabled", "placeholder", "maxLength"],
+    required: ["placeholder", "maxLength"],
     additionalProperties: false,
     properties: {
-      hasCommentsEnabled: {
-        type: "boolean",
-      },
       placeholder: {
         type: ["string", "null"],
       },
@@ -89,12 +73,9 @@ const SCHEMAS = {
   },
   FILE_UPLOAD: {
     type: "object",
-    required: ["hasCommentsEnabled", "accepts"],
+    required: ["accepts"],
     additionalProperties: false,
     properties: {
-      hasCommentsEnabled: {
-        type: "boolean",
-      },
       accepts: {
         type: ["array", "null"],
         items: {
@@ -106,12 +87,9 @@ const SCHEMAS = {
   },
   HEADING: {
     type: "object",
-    required: ["hasCommentsEnabled", "hasPageBreak"],
+    required: ["hasPageBreak"],
     additionalProperties: false,
     properties: {
-      hasCommentsEnabled: {
-        type: "boolean",
-      },
       hasPageBreak: {
         type: "boolean",
       },
@@ -119,12 +97,9 @@ const SCHEMAS = {
   },
   SELECT: {
     type: "object",
-    required: ["hasCommentsEnabled", "values", "placeholder"],
+    required: ["values", "placeholder"],
     additionalProperties: false,
     properties: {
-      hasCommentsEnabled: {
-        type: "boolean",
-      },
       values: {
         type: ["array", "null"],
         items: {
@@ -154,12 +129,9 @@ const SCHEMAS = {
       },
       root: {
         type: "object",
-        required: ["hasCommentsEnabled", "values", "labels"],
+        required: ["values", "labels"],
         additionalProperties: false,
         properties: {
-          hasCommentsEnabled: {
-            type: "boolean",
-          },
           values: {
             type: "array",
             items: { $ref: "#/definitions/option" },
@@ -187,12 +159,9 @@ const SCHEMAS = {
   },
   CHECKBOX: {
     type: "object",
-    required: ["hasCommentsEnabled", "values", "limit"],
+    required: ["values", "limit"],
     additionalProperties: false,
     properties: {
-      hasCommentsEnabled: {
-        type: "boolean",
-      },
       values: {
         type: ["array", "null"],
         items: {
@@ -200,7 +169,7 @@ const SCHEMAS = {
         },
       },
       limit: {
-        type: ["object"],
+        type: "object",
         required: ["min", "max", "type"],
         properties: {
           type: {
@@ -237,12 +206,6 @@ export function defaultFieldOptions(
   type: PetitionFieldType,
   field?: PetitionField
 ): Partial<CreatePetitionField> {
-  const hasCommentsEnabled =
-    type === "HEADING" // HEADING always false by default
-      ? false
-      : field?.type === "HEADING" // Inherit if not coming from HEADING
-      ? true
-      : field?.options.hasCommentsEnabled ?? true;
   // Always inherit optional
   const optional = field?.optional ?? false;
   const multiple =
@@ -260,14 +223,12 @@ export function defaultFieldOptions(
     switch (type) {
       case "HEADING": {
         return {
-          hasCommentsEnabled,
           hasPageBreak: false,
         };
       }
       case "TEXT":
       case "SHORT_TEXT": {
         return {
-          hasCommentsEnabled,
           placeholder:
             isDefined(field) && hasPlaceholder(field.type) ? field.options.placeholder : null,
           maxLength:
@@ -279,13 +240,10 @@ export function defaultFieldOptions(
         };
       }
       case "DATE": {
-        return {
-          hasCommentsEnabled,
-        };
+        return {};
       }
       case "NUMBER": {
         return {
-          hasCommentsEnabled,
           placeholder:
             isDefined(field) && hasPlaceholder(field.type) ? field.options.placeholder : null,
           range: {
@@ -298,14 +256,12 @@ export function defaultFieldOptions(
       }
       case "PHONE": {
         return {
-          hasCommentsEnabled,
           placeholder:
             isDefined(field) && hasPlaceholder(field.type) ? field.options.placeholder : null,
         };
       }
       case "SELECT": {
         return {
-          hasCommentsEnabled,
           values:
             isDefined(field) && ["SELECT", "CHECKBOX"].includes(field.type)
               ? field.options.values
@@ -316,12 +272,10 @@ export function defaultFieldOptions(
       }
       case "FILE_UPLOAD":
         return {
-          hasCommentsEnabled,
           accepts: null,
         };
       case "DYNAMIC_SELECT": {
         return {
-          hasCommentsEnabled,
           file: null,
           values: [],
           labels: [],
@@ -329,7 +283,6 @@ export function defaultFieldOptions(
       }
       case "CHECKBOX": {
         return {
-          hasCommentsEnabled,
           values:
             isDefined(field) && ["SELECT", "CHECKBOX"].includes(field.type)
               ? field.options.values
@@ -352,6 +305,7 @@ export function defaultFieldOptions(
     is_internal: field?.is_internal ?? false,
     show_in_pdf: field?.show_in_pdf ?? true,
     alias: field?.alias ?? null,
+    has_comments_enabled: type === "HEADING" ? false : true,
     options,
   };
 }

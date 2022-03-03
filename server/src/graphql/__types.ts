@@ -157,6 +157,7 @@ export interface NexusGenInputs {
     // input type
     alias?: string | null; // String
     description?: string | null; // String
+    hasCommentsEnabled?: boolean | null; // Boolean
     isInternal?: boolean | null; // Boolean
     multiple?: boolean | null; // Boolean
     optional?: boolean | null; // Boolean
@@ -1217,6 +1218,7 @@ export interface NexusGenFieldTypes {
     comments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     description: string | null; // String
     fromPetitionFieldId: NexusGenScalars["GID"] | null; // GID
+    hasCommentsEnabled: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     isFixed: boolean; // Boolean!
     isInternal: boolean; // Boolean!
@@ -1479,6 +1481,7 @@ export interface NexusGenFieldTypes {
     commentCount: number; // Int!
     comments: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     description: string | null; // String
+    hasCommentsEnabled: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     isInternal: boolean; // Boolean!
     isReadOnly: boolean; // Boolean!
@@ -2550,6 +2553,7 @@ export interface NexusGenFieldTypeNames {
     comments: "PetitionFieldComment";
     description: "String";
     fromPetitionFieldId: "GID";
+    hasCommentsEnabled: "Boolean";
     id: "GID";
     isFixed: "Boolean";
     isInternal: "Boolean";
@@ -2812,6 +2816,7 @@ export interface NexusGenFieldTypeNames {
     commentCount: "Int";
     comments: "PublicPetitionFieldComment";
     description: "String";
+    hasCommentsEnabled: "Boolean";
     id: "GID";
     isInternal: "Boolean";
     isReadOnly: "Boolean";

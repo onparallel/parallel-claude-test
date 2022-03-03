@@ -269,6 +269,9 @@ export const PublicPetitionField = objectType({
         return await ctx.petitions.loadFieldAttachmentsByFieldId(o.id);
       },
     });
+    t.nonNull.boolean("hasCommentsEnabled", {
+      resolve: (o) => o.has_comments_enabled,
+    });
   },
 });
 

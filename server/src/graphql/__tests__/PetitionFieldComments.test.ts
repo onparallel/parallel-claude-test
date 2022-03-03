@@ -34,14 +34,14 @@ describe("GraphQL/Petition Fields Comments", () => {
       2,
       (i) => ({
         type: i === 0 ? "HEADING" : "TEXT",
-        options: { hasCommentsEnabled: i === 0 },
+        has_comments_enabled: i === 0,
       })
     );
 
     [textFieldInternal] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
       type: "TEXT",
       is_internal: true,
-      options: { hasCommentsEnabled: true },
+      has_comments_enabled: true,
     }));
 
     await mocks.createFeatureFlags([{ name: "INTERNAL_COMMENTS", default_value: true }]);

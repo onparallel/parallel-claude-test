@@ -69,6 +69,7 @@ describe("GraphQL/Petition Fields", () => {
                   optional
                   multiple
                   options
+                  hasCommentsEnabled
                   isReadOnly
                   replies {
                     id
@@ -100,8 +101,8 @@ describe("GraphQL/Petition Fields", () => {
               isFixed: false,
               optional: false,
               multiple: false,
+              hasCommentsEnabled: true,
               options: {
-                hasCommentsEnabled: true,
                 placeholder: null,
                 maxLength: null,
               },
@@ -130,6 +131,7 @@ describe("GraphQL/Petition Fields", () => {
                   optional
                   multiple
                   options
+                  hasCommentsEnabled
                   isReadOnly
                   replies {
                     id
@@ -161,8 +163,8 @@ describe("GraphQL/Petition Fields", () => {
               isFixed: false,
               optional: true,
               multiple: false,
+              hasCommentsEnabled: false,
               options: {
-                hasCommentsEnabled: false,
                 hasPageBreak: false,
               },
               isReadOnly: true,
@@ -189,6 +191,7 @@ describe("GraphQL/Petition Fields", () => {
                   isFixed
                   optional
                   multiple
+                  hasCommentsEnabled
                   options
                   isReadOnly
                   replies {
@@ -221,8 +224,8 @@ describe("GraphQL/Petition Fields", () => {
               isFixed: false,
               optional: false,
               multiple: true,
+              hasCommentsEnabled: true,
               options: {
-                hasCommentsEnabled: true,
                 accepts: null,
               },
               isReadOnly: false,
@@ -973,6 +976,7 @@ describe("GraphQL/Petition Fields", () => {
               id
               title
               description
+              hasCommentsEnabled
               options
               optional
               multiple
@@ -987,8 +991,8 @@ describe("GraphQL/Petition Fields", () => {
             description: "this is the new description",
             multiple: true,
             optional: true,
+            hasCommentsEnabled: true,
             options: {
-              hasCommentsEnabled: true,
               placeholder: "enter text here...",
               maxLength: 100,
             },
@@ -1013,8 +1017,8 @@ describe("GraphQL/Petition Fields", () => {
         id: fieldGIDs[4],
         title: "new title",
         description: "this is the new description",
+        hasCommentsEnabled: true,
         options: {
-          hasCommentsEnabled: true,
           placeholder: "enter text here...",
           maxLength: 100,
         },
@@ -1453,6 +1457,7 @@ describe("GraphQL/Petition Fields", () => {
               optional
               multiple
               options
+              hasCommentsEnabled
             }
           }
         `,
@@ -1469,8 +1474,8 @@ describe("GraphQL/Petition Fields", () => {
         type: "SHORT_TEXT",
         optional: field.optional,
         multiple: field.multiple,
+        hasCommentsEnabled: true,
         options: {
-          hasCommentsEnabled: true,
           placeholder: field.options.placeholder,
           maxLength: null,
         },
@@ -1487,6 +1492,7 @@ describe("GraphQL/Petition Fields", () => {
               optional
               multiple
               options
+              hasCommentsEnabled
             }
           }
         `,
@@ -1503,8 +1509,8 @@ describe("GraphQL/Petition Fields", () => {
         type: "HEADING",
         optional: true,
         multiple: false,
+        hasCommentsEnabled: false,
         options: {
-          hasCommentsEnabled: false,
           hasPageBreak: false,
         },
       });
@@ -1520,6 +1526,7 @@ describe("GraphQL/Petition Fields", () => {
               optional
               multiple
               options
+              hasCommentsEnabled
             }
           }
         `,
@@ -1536,8 +1543,8 @@ describe("GraphQL/Petition Fields", () => {
         type: "FILE_UPLOAD",
         optional: false,
         multiple: true,
+        hasCommentsEnabled: true,
         options: {
-          hasCommentsEnabled: true,
           accepts: null,
         },
       });

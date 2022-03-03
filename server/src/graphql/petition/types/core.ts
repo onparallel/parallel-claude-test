@@ -459,6 +459,9 @@ export const PetitionField = objectType({
       type: "PetitionBase",
       resolve: async (o, _, ctx) => (await ctx.petitions.loadPetition(o.petition_id))!,
     });
+    t.nonNull.boolean("hasCommentsEnabled", {
+      resolve: (o) => o.has_comments_enabled,
+    });
   },
   sourceType: "db.PetitionField",
 });

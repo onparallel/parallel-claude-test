@@ -2429,6 +2429,7 @@ type PetitionField {
   The field GID used from which this field was cloned
   """
   fromPetitionFieldId: GID
+  hasCommentsEnabled: Boolean!
 
   """
   The ID of the petition field.
@@ -3445,6 +3446,7 @@ type PublicPetitionField {
   The description of the petition field.
   """
   description: String
+  hasCommentsEnabled: Boolean!
 
   """
   The ID of the petition field.
@@ -4456,6 +4458,7 @@ input UpdateEventSubscriptionInput {
 input UpdatePetitionFieldInput {
   alias: String
   description: String
+  hasCommentsEnabled: Boolean
   isInternal: Boolean
   multiple: Boolean
   optional: Boolean

@@ -223,7 +223,7 @@ export class PetitionRepository extends BaseRepository {
     }
     const [{ count }] = await this.from("petition_field")
       .whereIn("id", fieldIds)
-      .whereRaw(/* sql */ `("options" ->> 'hasCommentsEnabled')::boolean = true`)
+      .where("has_comments_enabled", true)
       .select(this.count());
 
     return count === new Set(fieldIds).size;

@@ -797,6 +797,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           t.nullable.boolean("showInPdf");
           t.nullable.field("visibility", { type: "JSONObject" });
           t.nullable.string("alias");
+          t.nullable.boolean("hasCommentsEnabled");
         },
       }).asArg()
     ),
@@ -826,6 +827,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       alias,
       isInternal,
       showInPdf,
+      hasCommentsEnabled,
     } = args.data;
     const data: Partial<CreatePetitionField> = {};
     if (title !== undefined) {
@@ -874,6 +876,10 @@ export const updatePetitionField = mutationField("updatePetitionField", {
                 fieldId: fromGlobalId(c.fieldId, "PetitionField").id,
               })),
             };
+    }
+
+    if (isDefined(hasCommentsEnabled)) {
+      data.has_comments_enabled = hasCommentsEnabled;
     }
 
     try {

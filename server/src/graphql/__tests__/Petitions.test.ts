@@ -2512,7 +2512,7 @@ describe("GraphQL/Petitions", () => {
         variables: {
           petitionId: toGlobalId("Petition", readonlyPetition.id),
           fieldId: toGlobalId("PetitionField", fields[1].id),
-          data: { options: { hasCommentsEnabled: false } },
+          data: { hasCommentsEnabled: false },
         },
       });
       expect(errors).toContainGraphQLError("FORBIDDEN");
