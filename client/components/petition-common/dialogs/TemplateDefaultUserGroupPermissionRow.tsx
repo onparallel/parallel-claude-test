@@ -72,27 +72,13 @@ export function TemplateDefaultUserGroupPermissionRow({
 }
 
 TemplateDefaultUserGroupPermissionRow.fragments = {
-  get UserGroup() {
-    return gql`
-      fragment TemplateDefaultUserGroupPermissionRow_UserGroup on UserGroup {
-        id
-        initials
-        name
-        ...UserSelect_UserGroup
-      }
-      ${UserSelect.fragments.UserGroup}
-    `;
-  },
-  get TemplateDefaultUserGroupPermission() {
-    return gql`
-      fragment TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermission on TemplateDefaultUserGroupPermission {
-        id
-        permissionType
-        group {
-          ...TemplateDefaultUserGroupPermissionRow_UserGroup
-        }
-      }
-      ${this.UserGroup}
-    `;
-  },
+  UserGroup: gql`
+    fragment TemplateDefaultUserGroupPermissionRow_UserGroup on UserGroup {
+      id
+      initials
+      name
+      ...UserSelect_UserGroup
+    }
+    ${UserSelect.fragments.UserGroup}
+  `,
 };

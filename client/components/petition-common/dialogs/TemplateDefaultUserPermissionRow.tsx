@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { Box, Button, Flex, Menu, MenuButton, MenuItem, MenuList, Text } from "@chakra-ui/react";
 import { ChevronDownIcon, DeleteIcon, UserArrowIcon, UserIcon } from "@parallel/chakra/icons";
 import { UserAvatar } from "@parallel/components/common/UserAvatar";
-import { UserSelect } from "@parallel/components/common/UserSelect";
 import {
   PetitionPermissionType,
   TemplateDefaultUserPermissionRow_UserFragment,
@@ -99,29 +98,13 @@ export function TemplateDefaultUserPermissionRow({
 }
 
 TemplateDefaultUserPermissionRow.fragments = {
-  get User() {
-    return gql`
-      fragment TemplateDefaultUserPermissionRow_User on User {
-        id
-        fullName
-        email
-        ...UserSelect_User
-        ...UserAvatar_User
-      }
-      ${UserSelect.fragments.User}
-      ${UserAvatar.fragments.User}
-    `;
-  },
-  get TemplateDefaultUserPermission() {
-    return gql`
-      fragment TemplateDefaultUserPermissionRow_TemplateDefaultUserPermission on TemplateDefaultUserPermission {
-        id
-        permissionType
-        user {
-          ...TemplateDefaultUserPermissionRow_User
-        }
-      }
-      ${this.User}
-    `;
-  },
+  User: gql`
+    fragment TemplateDefaultUserPermissionRow_User on User {
+      id
+      fullName
+      email
+      ...UserAvatar_User
+    }
+    ${UserAvatar.fragments.User}
+  `,
 };

@@ -21,7 +21,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { PetitionPermissionTypeSelect } from "../PetitionPermissionType";
+import { PetitionPermissionTypeSelect } from "../PetitionPermissionTypeSelect";
 import { TemplateDefaultUserGroupPermissionRow } from "./TemplateDefaultUserGroupPermissionRow";
 import { TemplateDefaultUserPermissionRow } from "./TemplateDefaultUserPermissionRow";
 
@@ -213,8 +213,8 @@ export function TemplateDefaultPermissionsDialog({
                 control={control}
                 render={({ field: { value, onChange } }) => (
                   <PetitionPermissionTypeSelect
-                    permissionType={value}
-                    onPermissionChange={onChange}
+                    value={value}
+                    onChange={onChange}
                     disableOwner={
                       !!ownerPermission ||
                       editors.length > 1 ||
@@ -303,14 +303,18 @@ TemplateDefaultPermissionsDialog.fragments = {
       isSubscribed
       permissionType
       ... on TemplateDefaultUserPermission {
-        ...TemplateDefaultUserPermissionRow_TemplateDefaultUserPermission
+        user {
+          ...TemplateDefaultUserPermissionRow_User
+        }
       }
       ... on TemplateDefaultUserGroupPermission {
-        ...TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermission
+        group {
+          ...TemplateDefaultUserGroupPermissionRow_UserGroup
+        }
       }
     }
-    ${TemplateDefaultUserPermissionRow.fragments.TemplateDefaultUserPermission}
-    ${TemplateDefaultUserGroupPermissionRow.fragments.TemplateDefaultUserGroupPermission}
+    ${TemplateDefaultUserPermissionRow.fragments.User}
+    ${TemplateDefaultUserGroupPermissionRow.fragments.UserGroup}
   `,
 };
 

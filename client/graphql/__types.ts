@@ -7345,22 +7345,6 @@ export type TemplateDefaultUserGroupPermissionRow_UserGroupFragment = {
   }>;
 };
 
-export type TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment = {
-  __typename?: "TemplateDefaultUserGroupPermission";
-  id: string;
-  permissionType: PetitionPermissionType;
-  group: {
-    __typename?: "UserGroup";
-    id: string;
-    initials: string;
-    name: string;
-    members: Array<{
-      __typename?: "UserGroupMember";
-      user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
-    }>;
-  };
-};
-
 export type TemplateDefaultUserPermissionRow_UserFragment = {
   __typename?: "User";
   id: string;
@@ -7368,20 +7352,6 @@ export type TemplateDefaultUserPermissionRow_UserFragment = {
   email: string;
   avatarUrl?: string | null;
   initials?: string | null;
-};
-
-export type TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment = {
-  __typename?: "TemplateDefaultUserPermission";
-  id: string;
-  permissionType: PetitionPermissionType;
-  user: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    email: string;
-    avatarUrl?: string | null;
-    initials?: string | null;
-  };
 };
 
 export type TemplateDetailsModal_UserFragment = {
@@ -20443,10 +20413,8 @@ export const TemplateDefaultUserPermissionRow_UserFragmentDoc = gql`
     id
     fullName
     email
-    ...UserSelect_User
     ...UserAvatar_User
   }
-  ${UserSelect_UserFragmentDoc}
   ${UserAvatar_UserFragmentDoc}
 ` as unknown as DocumentNode<TemplateDefaultUserPermissionRow_UserFragment, unknown>;
 export const TemplateDefaultPermissionsDialog_PublicPetitionLinkFragmentDoc = gql`
@@ -20459,19 +20427,6 @@ export const TemplateDefaultPermissionsDialog_PublicPetitionLinkFragmentDoc = gq
   }
   ${TemplateDefaultUserPermissionRow_UserFragmentDoc}
 ` as unknown as DocumentNode<TemplateDefaultPermissionsDialog_PublicPetitionLinkFragment, unknown>;
-export const TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragmentDoc = gql`
-  fragment TemplateDefaultUserPermissionRow_TemplateDefaultUserPermission on TemplateDefaultUserPermission {
-    id
-    permissionType
-    user {
-      ...TemplateDefaultUserPermissionRow_User
-    }
-  }
-  ${TemplateDefaultUserPermissionRow_UserFragmentDoc}
-` as unknown as DocumentNode<
-  TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment,
-  unknown
->;
 export const UserSelect_UserGroupFragmentDoc = gql`
   fragment UserSelect_UserGroup on UserGroup {
     id
@@ -20493,34 +20448,24 @@ export const TemplateDefaultUserGroupPermissionRow_UserGroupFragmentDoc = gql`
   }
   ${UserSelect_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<TemplateDefaultUserGroupPermissionRow_UserGroupFragment, unknown>;
-export const TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragmentDoc =
-  gql`
-    fragment TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermission on TemplateDefaultUserGroupPermission {
-      id
-      permissionType
-      group {
-        ...TemplateDefaultUserGroupPermissionRow_UserGroup
-      }
-    }
-    ${TemplateDefaultUserGroupPermissionRow_UserGroupFragmentDoc}
-  ` as unknown as DocumentNode<
-    TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment,
-    unknown
-  >;
 export const TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragmentDoc = gql`
   fragment TemplateDefaultPermissionsDialog_TemplateDefaultPermission on TemplateDefaultPermission {
     id
     isSubscribed
     permissionType
     ... on TemplateDefaultUserPermission {
-      ...TemplateDefaultUserPermissionRow_TemplateDefaultUserPermission
+      user {
+        ...TemplateDefaultUserPermissionRow_User
+      }
     }
     ... on TemplateDefaultUserGroupPermission {
-      ...TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermission
+      group {
+        ...TemplateDefaultUserGroupPermissionRow_UserGroup
+      }
     }
   }
-  ${TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragmentDoc}
-  ${TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragmentDoc}
+  ${TemplateDefaultUserPermissionRow_UserFragmentDoc}
+  ${TemplateDefaultUserGroupPermissionRow_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<
   TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragment,
   unknown
