@@ -68,8 +68,8 @@ const PhoneInput = chakraForwardRef<"input", PhoneInputProps>(function PhoneInpu
       return;
     }
     if (newValue && !newValue.startsWith("+")) {
-      if (defaultCountry) {
-        newValue = phoneCodes[defaultCountry] + newValue;
+      if (_defaultCountry) {
+        newValue = phoneCodes[_defaultCountry] + newValue;
       } else {
         newValue = "+" + newValue;
       }
@@ -120,13 +120,7 @@ const PhoneInput = chakraForwardRef<"input", PhoneInputProps>(function PhoneInpu
   return (
     <InputGroup>
       <InputLeftElement pointerEvents="none">
-        {country ? (
-          <Box fontSize="xl">{flags[country]}</Box>
-        ) : defaultCountry ? (
-          <Box fontSize="xl">{flags[defaultCountry]}</Box>
-        ) : (
-          <FieldPhoneIcon />
-        )}
+        {country ? <Box fontSize="xl">{flags[country]}</Box> : <FieldPhoneIcon />}
       </InputLeftElement>
       <Input
         ref={mergedRef}
