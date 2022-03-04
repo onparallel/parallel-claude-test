@@ -954,13 +954,13 @@ describe("GraphQL/PublicPetitionLink", () => {
         defaultPermissions: [
           {
             isSubscribed: true,
-            permissionType: "READ",
-            user: { id: toGlobalId("User", otherUsers[0].id) },
+            permissionType: "WRITE",
+            group: { id: toGlobalId("UserGroup", userGroup.id) },
           },
           {
             isSubscribed: true,
-            permissionType: "WRITE",
-            group: { id: toGlobalId("UserGroup", userGroup.id) },
+            permissionType: "READ",
+            user: { id: toGlobalId("User", otherUsers[0].id) },
           },
         ],
       });

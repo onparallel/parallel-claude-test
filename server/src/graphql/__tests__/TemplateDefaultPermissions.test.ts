@@ -486,7 +486,7 @@ describe("GraphQL/TemplateDefaultPermissions", () => {
       });
     });
 
-    it("sends error if trying to give read/write permissions to a user that is the owner of an active public link", async () => {
+    it("sends error if trying to give read/write permissions to a user that is the owner of an active public link without passing a new owner", async () => {
       await mocks.createRandomPublicPetitionLink(templates[0].id, users[0].id);
 
       const { errors, data } = await testClient.mutate({

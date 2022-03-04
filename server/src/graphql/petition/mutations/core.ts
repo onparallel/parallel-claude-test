@@ -1602,7 +1602,8 @@ export const updateTemplateDefaultPermissions = mutationField("updateTemplateDef
     if (
       publicLink?.is_active &&
       templateDefaultPermissionOwner &&
-      args.permissions.some((p) => p.userId === templateDefaultPermissionOwner.user_id)
+      args.permissions.some((p) => p.userId === templateDefaultPermissionOwner.user_id) &&
+      !args.permissions.some((p) => p.permissionType === "OWNER")
     ) {
       throw new ApolloError(
         "Can't update template default permissions on the owner of a public link",
