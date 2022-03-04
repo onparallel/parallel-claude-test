@@ -29,7 +29,6 @@ export type PetitionComposeFieldSettingsProps = {
   onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => void;
   onClose: () => void;
   isReadOnly?: boolean;
-  hasDeveloperAccess?: boolean;
 };
 
 export function PetitionComposeFieldSettings({
@@ -39,7 +38,6 @@ export function PetitionComposeFieldSettings({
   onFieldTypeChange,
   onClose,
   isReadOnly,
-  hasDeveloperAccess,
 }: PetitionComposeFieldSettingsProps) {
   const [alias, setAlias] = useState(field.alias ?? "");
   const [aliasIsInvalid, setAliasIsInvalid] = useState(false);
@@ -238,10 +236,10 @@ export function PetitionComposeFieldSettings({
           <PhoneSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
         ) : null}
       </Stack>
-      {hasDeveloperAccess && field.type !== "HEADING" ? (
+      {field.type !== "HEADING" ? (
         <Stack padding={4} paddingTop={2} spacing={3}>
           <Heading flex="1" as="h4" size="sm" overflowWrap="anywhere">
-            <FormattedMessage id="petition.developers" defaultMessage="Developers" />
+            <FormattedMessage id="petition.advanced-options" defaultMessage="Advanced options" />
           </Heading>
           <SettingsRowAlias
             alias={alias}

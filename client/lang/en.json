@@ -3721,8 +3721,8 @@
   },
   {
     "term": "field-settings.alias-description",
-    "definition": "Unique identifier within the petition that serves to easily identify the field in API responses.",
-    "context": "Unique identifier within the petition that serves to easily identify the field in API responses."
+    "definition": "Allows to easily identify the field in API replies. In addition, it can be inserted into the field description to automatically replace the content.",
+    "context": "Allows to easily identify the field in API replies. In addition, it can be inserted into the field description to automatically replace the content."
   },
   {
     "term": "field-settings.alias-exists-error",
@@ -3731,8 +3731,8 @@
   },
   {
     "term": "field-settings.alias-label",
-    "definition": "Alias",
-    "context": "Alias"
+    "definition": "References",
+    "context": "References"
   },
   {
     "term": "field-settings.dynamic-select.import-from-excel.attach-xlsx",
@@ -4333,6 +4333,11 @@
     "term": "generic.last-used-at",
     "definition": "Last used at",
     "context": "Last used at"
+  },
+  {
+    "term": "generic.learn-more",
+    "definition": "Learn more",
+    "context": "Learn more"
   },
   {
     "term": "generic.members",
@@ -5650,6 +5655,11 @@
     "context": "Add recipient"
   },
   {
+    "term": "petition.advanced-options",
+    "definition": "Advanced options",
+    "context": "Advanced options"
+  },
+  {
     "term": "petition.already-sent",
     "definition": "This petition has already been sent.",
     "context": "This petition has already been sent."
@@ -5748,11 +5758,6 @@
     "term": "petition.deadline-label",
     "definition": "Deadline",
     "context": "Deadline"
-  },
-  {
-    "term": "petition.developers",
-    "definition": "Developers",
-    "context": "Developers"
   },
   {
     "term": "petition.field-settings",

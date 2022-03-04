@@ -7587,7 +7587,6 @@ export type PetitionSettings_UserFragment = {
   firstName?: string | null;
   lastName?: string | null;
   email: string;
-  hasDeveloperAccess: boolean;
   hasSkipForwardSecurity: boolean;
   hasHideRecipientViewContents: boolean;
   hasPetitionSignature: boolean;
@@ -13536,7 +13535,6 @@ export type PetitionCompose_UserFragment = {
   isSuperAdmin: boolean;
   avatarUrl?: string | null;
   initials?: string | null;
-  hasDeveloperAccess: boolean;
   hasSkipForwardSecurity: boolean;
   hasHideRecipientViewContents: boolean;
   hasPetitionPdfExport: boolean;
@@ -14047,7 +14045,6 @@ export type PetitionCompose_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasDeveloperAccess: boolean;
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
     hasPetitionPdfExport: boolean;
@@ -20456,7 +20453,6 @@ export const SignatureConfigDialog_UserFragmentDoc = gql`
 ` as unknown as DocumentNode<SignatureConfigDialog_UserFragment, unknown>;
 export const PetitionSettings_UserFragmentDoc = gql`
   fragment PetitionSettings_User on User {
-    hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
     hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
     hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
     ...TestModeSignatureBadge_User

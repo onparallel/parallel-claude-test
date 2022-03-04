@@ -615,7 +615,6 @@ function _PetitionSettings({
 const fragments = {
   User: gql`
     fragment PetitionSettings_User on User {
-      hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
       hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
       hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
       ...TestModeSignatureBadge_User

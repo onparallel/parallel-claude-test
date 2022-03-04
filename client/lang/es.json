@@ -3721,8 +3721,8 @@
   },
   {
     "term": "field-settings.alias-description",
-    "definition": "Identificador único dentro de la petición que sirve para identificar fácilmente el campo en las respuestas de la API.",
-    "context": "Unique identifier within the petition that serves to easily identify the field in API responses."
+    "definition": "Permite identificar fácilmente el campo en las respuestas de la API. Además, puede insertarse en la descripción del campo para reemplazar automáticamente el contenido.",
+    "context": "Allows to easily identify the field in API replies. In addition, it can be inserted into the field description to automatically replace the content."
   },
   {
     "term": "field-settings.alias-exists-error",
@@ -3731,8 +3731,8 @@
   },
   {
     "term": "field-settings.alias-label",
-    "definition": "Alias",
-    "context": "Alias"
+    "definition": "Referencias",
+    "context": "References"
   },
   {
     "term": "field-settings.dynamic-select.import-from-excel.attach-xlsx",
@@ -4333,6 +4333,11 @@
     "term": "generic.last-used-at",
     "definition": "Usado por última vez",
     "context": "Last used at"
+  },
+  {
+    "term": "generic.learn-more",
+    "definition": "Saber más",
+    "context": "Learn more"
   },
   {
     "term": "generic.members",
@@ -5650,6 +5655,11 @@
     "context": "Add recipient"
   },
   {
+    "term": "petition.advanced-options",
+    "definition": "Opciones avanzadas",
+    "context": "Advanced options"
+  },
+  {
     "term": "petition.already-sent",
     "definition": "Esta petición ya ha sido enviada.",
     "context": "This petition has already been sent."
@@ -5748,11 +5758,6 @@
     "term": "petition.deadline-label",
     "definition": "Vencimiento:",
     "context": "Deadline"
-  },
-  {
-    "term": "petition.developers",
-    "definition": "Desarrolladores",
-    "context": "Developers"
   },
   {
     "term": "petition.field-settings",

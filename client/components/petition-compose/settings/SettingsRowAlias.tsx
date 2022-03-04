@@ -1,6 +1,8 @@
-import { Input, Text, FormErrorMessage, Stack } from "@chakra-ui/react";
+import { FormErrorMessage, Input, Stack, Text } from "@chakra-ui/react";
+import { ExternalLinkIcon } from "@parallel/chakra/icons";
+import { NormalLink } from "@parallel/components/common/Link";
 import { ChangeEvent } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { SettingsRow } from "./SettingsRow";
 
 type SettingsRowAliasProps = {
@@ -16,16 +18,29 @@ export function SettingsRowAlias({
   isReadOnly,
   isInvalid,
 }: SettingsRowAliasProps) {
+  const intl = useIntl();
   return (
     <SettingsRow
       isDisabled={isReadOnly}
-      label={<FormattedMessage id="field-settings.alias-label" defaultMessage="Alias" />}
+      label={<FormattedMessage id="field-settings.alias-label" defaultMessage="References" />}
       description={
         <Text fontSize="sm">
           <FormattedMessage
             id="field-settings.alias-description"
-            defaultMessage="Unique identifier within the petition that serves to easily identify the field in API responses."
+            defaultMessage="Allows to easily identify the field in API replies. In addition, it can be inserted into the field description to automatically replace the content."
           />
+          <NormalLink
+            marginLeft={1}
+            isExternal
+            href={
+              intl.locale === "es"
+                ? "https://help.onparallel.com/es/articles/5998723-como-generar-textos-dinamicos"
+                : "https://help.onparallel.com/en/articles/5998723-how-to-generate-dynamic-texts-references"
+            }
+          >
+            <FormattedMessage id="generic.learn-more" defaultMessage="Learn more" />
+            <ExternalLinkIcon verticalAlign="sub" marginLeft={1} />
+          </NormalLink>
         </Text>
       }
       controlId="alias-field"
