@@ -3403,35 +3403,70 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.whereNull("deleted_at").where("type", "OWNER")
   );
 
+  async replaceTemplateDefaultPermissionOwner(
+    templateId: number,
+    newOwner: Maybe<{ userId: number; isSubscribed: boolean }>,
+    updatedBy: string,
+    t?: Knex.Transaction
+  ) {
+    await this.from("template_default_permission", t)
+      .where({
+        template_id: templateId,
+        deleted_at: null,
+        type: "OWNER",
+      })
+      .update({ deleted_at: this.now(), deleted_by: updatedBy }, "*");
+
+    // insert new owner if its found on permissions array
+    // upsert to update permission type if the new owner already has R/W
+    if (newOwner) {
+      await this.raw<TemplateDefaultPermission>(
+        /* sql */ `
+        ?
+        on conflict (template_id, user_id) where deleted_at is null
+          do update set
+            type = EXCLUDED.type, is_subscribed = EXCLUDED.is_subscribed, updated_by = ?, updated_at = NOW()
+        returning *;
+      `,
+        [
+          this.knex.from({ tdp: "template_default_permission" }).insert({
+            template_id: templateId,
+            type: "OWNER",
+            user_id: newOwner.userId,
+            is_subscribed: newOwner.isSubscribed,
+            created_by: updatedBy,
+            updated_by: updatedBy,
+          }),
+          updatedBy,
+        ],
+        t
+      );
+    }
+  }
+
   async resetTemplateDefaultPermissions(
     templateId: number,
     permissions: TemplateDefaultPermissionInput[],
     updatedBy: string,
     t?: Knex.Transaction
   ) {
-    return await this.withTransaction(async (t) => {
-      await this.from("template_default_permission", t)
-        .where("template_id", templateId)
-        .whereNull("deleted_at")
-        .update({ deleted_at: this.now(), deleted_by: updatedBy });
+    const [[newOwner], rwPermissions] = partition(permissions, (p) => p.permissionType === "OWNER");
 
-      if (permissions.length > 0) {
-        await this.insert(
-          "template_default_permission",
-          permissions.map((p, i) => ({
-            template_id: templateId,
-            type: p.permissionType,
-            is_subscribed: p.isSubscribed,
-            created_at: this.now(),
-            created_by: updatedBy,
-            ...("userId" in p ? { user_id: p.userId } : { user_group_id: p.userGroupId }),
-          })),
-          t
-        );
-      }
+    return await this.withTransaction(async (t) => {
+      // first of all, replace current owner to avoid triggering template_default_permission__owner constraint
+      await this.replaceTemplateDefaultPermissionOwner(
+        templateId,
+        newOwner && "userId" in newOwner
+          ? { userId: newOwner.userId, isSubscribed: newOwner.isSubscribed }
+          : null,
+        updatedBy,
+        t
+      );
+      //now upsert every read/write permission
+      await this.upsertTemplateDefaultRWPermissions(templateId, rwPermissions, updatedBy, t);
 
       // if no OWNER will be set for the template, we have to make sure the public link is disabled
-      if (!permissions.find((p) => p.permissionType === "OWNER")) {
+      if (!newOwner) {
         await this.from("public_petition_link", t)
           .where({ template_id: templateId, is_active: true })
           .update({
@@ -3444,12 +3479,15 @@ export class PetitionRepository extends BaseRepository {
     }, t);
   }
 
-  async upsertTemplateDefaultPermissions(
+  async upsertTemplateDefaultRWPermissions(
     templateId: number,
     permissions: TemplateDefaultPermissionInput[],
     updatedBy: string,
     t?: Knex.Transaction
   ) {
+    if (permissions.some((p) => p.permissionType === "OWNER")) {
+      throw new Error("There should be no OWNER permission in the array");
+    }
     return await this.withTransaction(async (t) => {
       const rows = await pMap(
         permissions,
@@ -3483,6 +3521,7 @@ export class PetitionRepository extends BaseRepository {
       await this.from("template_default_permission", t)
         .where("template_id", templateId)
         .whereNull("deleted_at")
+        .whereNot("type", "OWNER")
         .whereNotIn(
           "id",
           rows.map((p) => p.id)

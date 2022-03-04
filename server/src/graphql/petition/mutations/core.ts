@@ -1641,9 +1641,13 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
   ),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.withTransaction(async (t) => {
-      await ctx.petitions.upsertTemplateDefaultPermissions(
+      // if we want to insert a new OWNER permission, replace the current owner first to avoid template_default_permission__owner constraint
+      await ctx.petitions.replaceTemplateDefaultPermissionOwner(
         args.templateId,
-        [{ isSubscribed: true, permissionType: "OWNER", userId: args.ownerId }],
+        {
+          isSubscribed: true,
+          userId: args.ownerId,
+        },
         `User:${ctx.user!.id}`,
         t
       );
