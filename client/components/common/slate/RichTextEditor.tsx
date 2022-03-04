@@ -9,6 +9,7 @@ import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types"
 import { CustomEditor } from "@parallel/utils/slate/types";
 import { useEditorPopper } from "@parallel/utils/slate/useEditorPopper";
 import { useConstant } from "@parallel/utils/useConstant";
+import { useFocus } from "@parallel/utils/useFocus";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { createAutoformatPlugin } from "@udecode/plate-autoformat";
@@ -98,6 +99,8 @@ export const RichTextEditor = withPlateProvider(
       isReadOnly,
       placeholder,
       placeholderOptions = [],
+      onFocus,
+      onBlur,
       ...props
     },
     ref
@@ -204,7 +207,9 @@ export const RichTextEditor = withPlateProvider(
       _invalid: (inputStyleConfig as any)._invalid,
     } as any;
 
-    const isMenuOpen = Boolean(target && values.length > 0);
+    const [isFocused, focusProps] = useFocus({ onBlur, onFocus });
+
+    const isMenuOpen = Boolean(isFocused && target && values.length > 0);
     const selected = isMenuOpen ? values[index] : undefined;
 
     const placeholderMenuId = useId(undefined, "rte-placeholder-menu");
@@ -222,8 +227,9 @@ export const RichTextEditor = withPlateProvider(
         "aria-controls": placeholderMenuId,
         "aria-autocomplete": "list" as const,
         "aria-activedescendant": selected ? `${itemIdPrefix}-${selected.value}` : undefined,
+        ...focusProps,
       }),
-      [isDisabled, placeholder, placeholderMenuId, itemIdPrefix, selected?.value]
+      [isDisabled, placeholder, placeholderMenuId, itemIdPrefix, selected?.value, focusProps]
     );
 
     const { popperRef } = useEditorPopper(editorRef.current!, target, {

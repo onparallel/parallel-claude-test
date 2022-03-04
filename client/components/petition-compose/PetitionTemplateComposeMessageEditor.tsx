@@ -61,7 +61,7 @@ export function PetitionTemplateComposeMessageEditor({
 
   return (
     <Card id="petition-template-message-compose" {...props}>
-      <Tabs isLazy variant="enclosed">
+      <Tabs variant="enclosed">
         <TabList marginX="-1px" marginTop="-1px">
           <Tab padding={4} lineHeight={5} fontWeight="bold">
             <FormattedMessage
