@@ -16,13 +16,12 @@ import {
   Text,
   useCounter,
 } from "@chakra-ui/react";
-import { ExternalLinkIcon } from "@parallel/chakra/icons";
 import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
 import { ContactSelect, ContactSelectSelection } from "@parallel/components/common/ContactSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
-import { NormalLink } from "@parallel/components/common/Link";
+import { ExternalLink } from "@parallel/components/common/Link";
 import { Steps } from "@parallel/components/common/Steps";
 import {
   SignatureConfigDialog_PetitionBaseFragment,
@@ -342,8 +341,7 @@ function SignatureConfigDialogBodyStep1({
           />
         </Text>
         <Text>
-          <NormalLink
-            isExternal
+          <ExternalLink
             href={
               intl.locale === "es"
                 ? "https://support.onparallel.com/hc/es/articles/360017087398-Activar-la-firma-electr%C3%B3nica#h_01FRGJTBC90ECANWFJ5DTE2629"
@@ -354,8 +352,7 @@ function SignatureConfigDialogBodyStep1({
               id="component.signature-config-dialog.header.help-link"
               defaultMessage="More about eSignature"
             />
-            <ExternalLinkIcon verticalAlign="sub" marginLeft={1} />
-          </NormalLink>
+          </ExternalLink>
         </Text>
       </Stack>
       <FormControl hidden={providers.length < 2}>

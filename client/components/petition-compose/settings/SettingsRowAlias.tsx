@@ -1,6 +1,5 @@
 import { FormErrorMessage, Input, Stack, Text } from "@chakra-ui/react";
-import { ExternalLinkIcon } from "@parallel/chakra/icons";
-import { NormalLink } from "@parallel/components/common/Link";
+import { ExternalLink } from "@parallel/components/common/Link";
 import { ChangeEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { SettingsRow } from "./SettingsRow";
@@ -29,9 +28,8 @@ export function SettingsRowAlias({
             id="field-settings.alias-description"
             defaultMessage="Allows to easily identify the field in API replies. In addition, it can be inserted into the field description to automatically replace the content."
           />
-          <NormalLink
+          <ExternalLink
             marginLeft={1}
-            isExternal
             href={
               intl.locale === "es"
                 ? "https://help.onparallel.com/es/articles/5998723-como-generar-textos-dinamicos"
@@ -39,8 +37,7 @@ export function SettingsRowAlias({
             }
           >
             <FormattedMessage id="generic.learn-more" defaultMessage="Learn more" />
-            <ExternalLinkIcon verticalAlign="sub" marginLeft={1} />
-          </NormalLink>
+          </ExternalLink>
         </Text>
       }
       controlId="alias-field"
