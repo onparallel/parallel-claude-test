@@ -318,12 +318,7 @@ export const deactivateUser = mutationField("deactivateUser", {
                       t
                     )
                   : undefined,
-                ctx.petitions.transferPublicLinkOwnership(
-                  [userId],
-                  transferToUserId!,
-                  ctx.user!,
-                  t
-                ),
+                ctx.petitions.transferPublicLinkOwnership(userId, transferToUserId!, ctx.user!, t),
               ];
 
           const [[user]] = await Promise.all([

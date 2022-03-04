@@ -3272,26 +3272,34 @@ export class PetitionRepository extends BaseRepository {
    * Update the owner of the petition links owned by one of the given ownerIds
    */
   async transferPublicLinkOwnership(
-    ownersIds: number[],
-    toUserId: number,
+    ownerId: number,
+    newOwnerId: number,
     updatedBy: User,
     t?: Knex.Transaction
   ) {
-    await this.from("template_default_permission", t)
-      .whereIn("user_id", ownersIds)
-      .where("type", "OWNER")
+    const [deleted] = await this.from("template_default_permission", t)
+      .where({ user_id: ownerId, type: "OWNER", deleted_at: null })
       .whereRaw(
         /* sql */ `
         exists(select * from public_petition_link ppl where ppl.template_id = template_default_permission.template_id)
         `
       )
-      .whereNull("deleted_at")
       .update({
-        updated_by: `User:${updatedBy.id}`,
-        updated_at: this.now(),
-        user_id: toUserId,
+        deleted_by: `User:${updatedBy.id}`,
+        deleted_at: this.now(),
       })
       .returning("*");
+
+    if (deleted) {
+      await this.from("template_default_permission", t).insert({
+        user_id: newOwnerId,
+        type: "OWNER",
+        is_subscribed: deleted.is_subscribed,
+        template_id: deleted.template_id,
+        created_at: this.now(),
+        created_by: `User:${updatedBy.id}`,
+      });
+    }
   }
 
   /**
@@ -3422,13 +3430,15 @@ export class PetitionRepository extends BaseRepository {
         );
       }
 
-      // if no OWNER will be set for the template, we hace to make sure the public link is disabled
+      // if no OWNER will be set for the template, we have to make sure the public link is disabled
       if (!permissions.find((p) => p.permissionType === "OWNER")) {
-        await this.from("public_petition_link", t).where("template_id", templateId).update({
-          is_active: false,
-          updated_at: this.now(),
-          updated_by: updatedBy,
-        });
+        await this.from("public_petition_link", t)
+          .where({ template_id: templateId, is_active: true })
+          .update({
+            is_active: false,
+            updated_at: this.now(),
+            updated_by: updatedBy,
+          });
         this.loadPublicPetitionLinksByTemplateId.dataloader.clear(templateId);
       }
     }, t);
