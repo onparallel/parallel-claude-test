@@ -21,7 +21,9 @@ export async function up(knex: Knex): Promise<void> {
       created_by,
       created_at as "updated_at",
       created_by as "updated_by"
-    from public_petition_link;
+    from public_petition_link
+    on conflict (template_id, user_id) where deleted_at is null
+    do update set type = EXCLUDED.type returning *;
   `);
 }
 

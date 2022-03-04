@@ -7,7 +7,7 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(knex: Knex): Promise<void> {
-  await knex.schema.alterTable("template_default_permission", (t) => {
-    t.integer("position").notNullable().defaultTo(0);
-  });
+  await knex.raw(/* sql */ `
+    update template_default_permission set position = 0;
+    alter table "template_default_permission" alter column "position" set not null`);
 }
