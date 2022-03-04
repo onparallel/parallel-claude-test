@@ -540,31 +540,21 @@ export class Mocks {
   }
 
   async automaticShareTemplateWithUsers(templateId: number, userIds: number[]) {
-    const [{ position }] = await this.knex<TemplateDefaultPermission>("template_default_permission")
-      .whereNull("deleted_at")
-      .where("template_id", templateId)
-      .select(this.knex.raw("max(position) as position"));
     await this.knex<PetitionPermission>("template_default_permission").insert(
       userIds.map((userId, i) => ({
         template_id: templateId,
         user_id: userId,
         type: "WRITE",
-        position: (position ?? -1) + 1 + i,
       }))
     );
   }
 
   async automaticShareTemplateWithGroups(templateId: number, userGroupIds: number[]) {
-    const [{ position }] = await this.knex<TemplateDefaultPermission>("template_default_permission")
-      .whereNull("deleted_at")
-      .where("template_id", templateId)
-      .select(this.knex.raw("max(position) as position"));
     await this.knex<PetitionPermission>("template_default_permission").insert(
       userGroupIds.map((groupId, i) => ({
         template_id: templateId,
         user_group_id: groupId,
         type: "WRITE",
-        position: (position ?? -1) + 1 + i,
       }))
     );
   }
@@ -663,7 +653,6 @@ export class Mocks {
   ) {
     await this.knex<TemplateDefaultPermission>("template_default_permission").insert({
       is_subscribed: false,
-      position: 0,
       template_id: templateId,
       user_id: ownerId,
       type: "OWNER",

@@ -1665,7 +1665,6 @@ describe("GraphQL/Petitions", () => {
         template_id: templateWithDefaultPermissions.id,
         type: "WRITE",
         user_id: user.id,
-        position: 1,
       });
 
       const { errors, data } = await testClient.mutate({

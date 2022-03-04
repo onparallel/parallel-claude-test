@@ -496,7 +496,6 @@ describe("GraphQL/PublicPetitionLink", () => {
         user_id: otherUser.id,
         type: "READ",
         is_subscribed: false,
-        position: 0,
       });
 
       const { errors, data } = await testClient.mutate({
@@ -1076,7 +1075,6 @@ describe("GraphQL/PublicPetitionLink", () => {
       await mocks.knex.from("template_default_permission").delete();
 
       await mocks.knex<TemplateDefaultPermission>("template_default_permission").insert({
-        position: 0,
         template_id: templates[0].id,
         user_id: user.id,
         type: "READ",

@@ -210,12 +210,12 @@ describe("GraphQL/TemplateDefaultPermissions", () => {
           templateId: toGlobalId("Petition", templates[0].id),
           permissions: [
             {
-              userId: toGlobalId("User", users[2].id),
+              userGroupId: toGlobalId("UserGroup", userGroup.id),
               permissionType: "READ",
               isSubscribed: true,
             },
             {
-              userGroupId: toGlobalId("UserGroup", userGroup.id),
+              userId: toGlobalId("User", users[2].id),
               permissionType: "READ",
               isSubscribed: true,
             },
@@ -348,13 +348,11 @@ describe("GraphQL/TemplateDefaultPermissions", () => {
           template_id: templates[0].id,
           type: "OWNER",
           user_id: users[0].id,
-          position: 0,
         },
         {
           template_id: templates[0].id,
           type: "WRITE",
           user_id: users[1].id,
-          position: 1,
         },
       ]);
 
@@ -572,7 +570,7 @@ describe("GraphQL/TemplateDefaultPermissions", () => {
       });
     });
 
-    it.only("should disable public link if removing owner from default permissions", async () => {
+    it("should disable public link if removing owner from default permissions", async () => {
       const publicLink = await mocks.createRandomPublicPetitionLink(templates[0].id, users[0].id);
 
       const { errors, data } = await testClient.execute(

@@ -1793,8 +1793,8 @@ export class PetitionRepository extends BaseRepository {
           ? this.raw(
               /* sql */ `
               insert into template_default_permission (
-                template_id, "type", user_id, user_group_id, is_subscribed, position, created_by, updated_by)
-              select ?, "type", user_id, user_group_id, is_subscribed, position, ?, ?
+                template_id, "type", user_id, user_group_id, is_subscribed, created_by, updated_by)
+              select ?, "type", user_id, user_group_id, is_subscribed, ?, ?
                 from template_default_permission where template_id = ? and deleted_at is null
             `,
               [cloned.id, createdBy, createdBy, petitionId],
@@ -3386,7 +3386,7 @@ export class PetitionRepository extends BaseRepository {
   readonly loadTemplateDefaultPermissions = this.buildLoadMultipleBy(
     "template_default_permission",
     "template_id",
-    (q) => q.whereNull("deleted_at").orderBy("position", "asc")
+    (q) => q.whereNull("deleted_at").orderByRaw(`"type" asc, "id" desc`)
   );
 
   readonly loadTemplateDefaultPermissionOwner = this.buildLoadBy(
@@ -3412,7 +3412,6 @@ export class PetitionRepository extends BaseRepository {
           "template_default_permission",
           permissions.map((p, i) => ({
             template_id: templateId,
-            position: i,
             type: p.permissionType,
             is_subscribed: p.isSubscribed,
             created_at: this.now(),
@@ -3462,7 +3461,6 @@ export class PetitionRepository extends BaseRepository {
                 is_subscribed: p.isSubscribed,
                 created_by: updatedBy,
                 updated_by: updatedBy,
-                position: i,
               }),
               updatedBy,
             ],
@@ -4043,7 +4041,6 @@ export class PetitionRepository extends BaseRepository {
           is_subscribed: true,
           created_by: updatedBy,
           updated_by: updatedBy,
-          position: 0,
         }),
         updatedBy,
       ],
