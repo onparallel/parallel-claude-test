@@ -40,12 +40,10 @@ export function NumberSettings({
   const [hasPrefix, setHasPrefix] = useState(
     isDefined(options.prefix) || isDefined(options.suffix) ? true : false
   );
-  const [prefixOption, setPrefixOption] = useState(isDefined(options.suffix) ? "suffix" : "prefix");
+  const [prefixOption, setPrefixOption] = useState(isDefined(options.prefix) ? "prefix" : "suffix");
   const [prefixValue, setPrefixValue] = useState(
     isDefined(options.prefix) ? options.prefix : options.suffix ?? ""
   );
-
-  const [isInvalidPrefix, setIsInvalidPrefix] = useState(false);
 
   const isRangeInvalid = isDefined(range.min) && isDefined(range.max) && range.min > range.max;
 
@@ -106,17 +104,10 @@ export function NumberSettings({
   };
 
   const handlePrefixBlur = (option: string) => {
-    if (/[\d.,]/.test(prefixValue)) {
-      setIsInvalidPrefix(true);
-      return;
-    } else if (isInvalidPrefix) {
-      setIsInvalidPrefix(false);
-    }
-
     debouncedOnUpdate(field.id, {
       options: {
         ...field.options,
-        [option]: prefixValue || null,
+        [option]: prefixValue && prefixValue.trim() ? prefixValue : null,
         [option === "prefix" ? "suffix" : "prefix"]: null,
       },
     });
@@ -265,63 +256,49 @@ export function NumberSettings({
         isChecked={hasPrefix}
         controlId="number-prefix-suffix"
       >
-        <FormControl isInvalid={isInvalidPrefix}>
-          <Stack>
-            <HStack>
-              <Box>
-                <Select
-                  isInvalid={false}
-                  size="sm"
-                  borderRadius="md"
-                  value={prefixOption}
-                  onChange={handleChangePrefixOption}
-                >
-                  <option value="prefix">
-                    {intl.formatMessage({
-                      id: "generic.before",
-                      defaultMessage: "Before",
-                    })}
-                  </option>
-                  <option value="suffix">
-                    {intl.formatMessage({
-                      id: "generic.after",
-                      defaultMessage: "After",
-                    })}
-                  </option>
-                </Select>
-              </Box>
-              <Input
-                flex="1"
+        <Stack>
+          <HStack>
+            <Box>
+              <Select
+                isInvalid={false}
                 size="sm"
-                placeholder="%, €, $..."
-                value={prefixValue}
-                onChange={(e) => setPrefixValue(e.target.value)}
-                onBlur={() => handlePrefixBlur(prefixOption)}
-              />
-            </HStack>
-            <Text
-              fontSize="sm"
-              color="gray.500"
-              whiteSpace="pre"
-              display={isInvalidPrefix ? "none" : "block"}
-              height={5}
-            >
-              <FormattedMessage
-                id="component.field-settings-number.add-text-symbols-example"
-                defaultMessage="Example:"
-              />{" "}
-              {`${prefixOption === "prefix" ? prefixValue : ""}100${
-                prefixOption === "suffix" ? prefixValue : ""
-              }`}
-            </Text>
-            <FormErrorMessage fontSize="sm" height={5}>
-              <FormattedMessage
-                id="component.field-settings-number.prefix-error"
-                defaultMessage="Numbers, commas and periods are not allowed."
-              />
-            </FormErrorMessage>
-          </Stack>
-        </FormControl>
+                borderRadius="md"
+                value={prefixOption}
+                onChange={handleChangePrefixOption}
+              >
+                <option value="suffix">
+                  {intl.formatMessage({
+                    id: "generic.after",
+                    defaultMessage: "After",
+                  })}
+                </option>
+                <option value="prefix">
+                  {intl.formatMessage({
+                    id: "generic.before",
+                    defaultMessage: "Before",
+                  })}
+                </option>
+              </Select>
+            </Box>
+            <Input
+              flex="1"
+              size="sm"
+              placeholder="%, €, $..."
+              value={prefixValue}
+              onChange={(e) => setPrefixValue(e.target.value)}
+              onBlur={() => handlePrefixBlur(prefixOption)}
+            />
+          </HStack>
+          <Text fontSize="sm" color="gray.500" whiteSpace="pre" height={5}>
+            <FormattedMessage
+              id="component.field-settings-number.add-text-symbols-example"
+              defaultMessage="Example:"
+            />{" "}
+            {`${prefixOption === "prefix" ? prefixValue : ""}100${
+              prefixOption === "suffix" ? prefixValue : ""
+            }`}
+          </Text>
+        </Stack>
       </SettingsRowSwitch>
       <SettingsRowPlaceholder
         placeholder={placeholder}
