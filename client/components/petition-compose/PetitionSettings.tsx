@@ -504,7 +504,7 @@ function _PetitionSettings({
           }
           isChecked={hasDefaultPermissions}
           onChange={handleUpdateTemplateDefaultPermissions}
-          controlId="share-by-link"
+          controlId="share-automatically"
         >
           <Center>
             <Button
