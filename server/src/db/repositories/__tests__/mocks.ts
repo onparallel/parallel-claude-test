@@ -171,7 +171,7 @@ export class Mocks {
           return {
             org_id: orgId,
             is_template: false,
-            status: randomPetitionStatus(),
+            status: builder?.(index).is_template ? null : randomPetitionStatus(),
             name: faker.random.words(),
             locale: randomSupportedLocale(),
             ...builder?.(index),

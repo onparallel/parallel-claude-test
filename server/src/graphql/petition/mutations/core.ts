@@ -125,13 +125,47 @@ export const createPetition = mutationField("createPetition", {
     let petition: Petition;
     if (petitionId) {
       const original = (await ctx.petitions.loadPetition(petitionId))!;
-      petition = await ctx.petitions.clonePetition(petitionId, ctx.user!, {
-        is_template: isTemplate,
-        status: isTemplate ? null : "DRAFT",
-        name: original.is_template && !isTemplate ? name : original.name,
-      });
 
-      if (original.is_template && original.org_id === ctx.user!.org_id) {
+      const isCreatingFromSameOrgTemplate =
+        original.is_template && original.org_id === ctx.user!.org_id;
+
+      const defaultPermissions = await ctx.petitions.loadTemplateDefaultPermissions(original.id);
+
+      const hasCustomOwner =
+        isCreatingFromSameOrgTemplate &&
+        (defaultPermissions.find((p) => p.type === "OWNER")?.user_id ?? ctx.user!.id) !==
+          ctx.user!.id;
+
+      petition = await ctx.petitions.clonePetition(
+        petitionId,
+        ctx.user!,
+        {
+          is_template: isTemplate,
+          status: isTemplate ? null : "DRAFT",
+          name: original.is_template && !isTemplate ? name : original.name,
+        },
+        { insertPermissions: !hasCustomOwner }
+      );
+
+      if (hasCustomOwner && !defaultPermissions.find((p) => p.user_id === ctx.user!.id)) {
+        // if the template has a custom template_default_permission OWNER and no permissions set for session user,
+        // we have to give them WRITE permissions
+        // OWNER will be set inside createPermissionsFromTemplateDefaultPermissions
+        await ctx.petitions.addPetitionPermissions(
+          [petition.id],
+          [
+            {
+              id: ctx.user!.id,
+              type: "User",
+              isSubscribed: true,
+              permissionType: "WRITE",
+            },
+          ],
+          `User:${ctx.user!.id}`
+        );
+      }
+
+      if (isCreatingFromSameOrgTemplate) {
         await ctx.petitions.createPermissionsFromTemplateDefaultPermissions(
           petition.id,
           original.id,
@@ -1141,7 +1175,7 @@ export const bulkSendPetition = mutationField("bulkSendPetition", {
           args.petitionId,
           owner, // set the owner of the original petition as owner of the cloned ones
           {},
-          true, // also clone the petition replies
+          { cloneReplies: true }, // also clone the petition replies
           `User:${ctx.user!.id}`
         ),
       { concurrency: 5 }

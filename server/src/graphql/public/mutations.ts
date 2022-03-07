@@ -631,7 +631,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
               status: "DRAFT",
               from_public_petition_link_id: link.id,
             },
-            false,
+            undefined,
             `PublicPetitionLink:${link.id}`,
             t
           ),

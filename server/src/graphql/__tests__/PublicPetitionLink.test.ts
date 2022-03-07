@@ -675,6 +675,72 @@ describe("GraphQL/PublicPetitionLink", () => {
         .where("id", petitionSendLimit.id)
         .update({ used: 0, limit: 100 });
     });
+
+    it("creates a petition from a public link with custom template permissions", async () => {
+      const [template] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+        is_template: true,
+      }));
+      const users = await mocks.createRandomUsers(organization.id, 3);
+      const link = await mocks.createRandomPublicPetitionLink(template.id, users[2].id);
+      await mocks.knex.from<TemplateDefaultPermission>("template_default_permission").insert([
+        {
+          user_id: users[1].id,
+          type: "READ",
+          template_id: template.id,
+        },
+        {
+          user_id: users[0].id,
+          type: "WRITE",
+          template_id: template.id,
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $slug: ID!
+            $contactFirstName: String!
+            $contactLastName: String!
+            $contactEmail: String!
+          ) {
+            publicCreateAndSendPetitionFromPublicLink(
+              slug: $slug
+              contactFirstName: $contactFirstName
+              contactLastName: $contactLastName
+              contactEmail: $contactEmail
+              force: true
+            )
+          }
+        `,
+        {
+          slug: link.slug,
+          contactFirstName: "Roger",
+          contactLastName: "Waters",
+          contactEmail: "rogerwaters@rogerwaters.com",
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.publicCreateAndSendPetitionFromPublicLink).toEqual("SUCCESS");
+
+      const [lastPetition] = await knex
+        .from("petition")
+        .where("from_public_petition_link_id", link.id)
+        .select("*")
+        .orderBy("created_at", "desc");
+
+      const permissions = await knex
+        .from("petition_permission")
+        .where({ petition_id: lastPetition.id, deleted_at: null })
+        .select("type", "user_id", "petition_id")
+        .orderBy("type", "asc");
+
+      expect(permissions).toMatchObject([
+        { type: "OWNER", user_id: users[2].id, petition_id: lastPetition.id },
+        { type: "WRITE", user_id: users[0].id, petition_id: lastPetition.id },
+        { type: "READ", user_id: users[1].id, petition_id: lastPetition.id },
+      ]);
+    });
   });
 
   describe("publicSendReminder", () => {

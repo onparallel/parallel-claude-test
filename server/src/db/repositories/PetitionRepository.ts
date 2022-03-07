@@ -1655,7 +1655,8 @@ export class PetitionRepository extends BaseRepository {
     petitionId: number,
     owner: User,
     data: Partial<TableTypes["petition"]> = {},
-    cloneReplies = false,
+    options?: { insertPermissions?: boolean; cloneReplies?: boolean },
+
     createdBy = `User:${owner.id}`,
     t?: Knex.Transaction
   ) {
@@ -1759,21 +1760,23 @@ export class PetitionRepository extends BaseRepository {
               t
             ).returning("*"),
         // copy permissions
-        this.insert(
-          "petition_permission",
-          {
-            petition_id: cloned.id,
-            user_id: owner.id,
-            type: "OWNER",
-            // if cloning a petition clone, the is_subscribed from the original
-            is_subscribed: sourcePetition!.is_template
-              ? true
-              : userPermissions.find((p) => p.user_id === owner.id)?.is_subscribed ?? true,
-            created_by: createdBy,
-            updated_by: createdBy,
-          },
-          t
-        ),
+        options?.insertPermissions ?? true
+          ? this.insert(
+              "petition_permission",
+              {
+                petition_id: cloned.id,
+                user_id: owner.id,
+                type: "OWNER",
+                // if cloning a petition clone, the is_subscribed from the original
+                is_subscribed: sourcePetition!.is_template
+                  ? true
+                  : userPermissions.find((p) => p.user_id === owner.id)?.is_subscribed ?? true,
+                created_by: createdBy,
+                updated_by: createdBy,
+              },
+              t
+            )
+          : null,
         // clone tags if source petition is from same org
         sourcePetition?.org_id === owner.org_id
           ? this.raw(
@@ -1811,7 +1814,7 @@ export class PetitionRepository extends BaseRepository {
         )
       );
 
-      if (cloneReplies) {
+      if (options?.cloneReplies) {
         await Promise.all([
           // insert petition replies into cloned fields
           this.clonePetitionReplies(newIds, t),

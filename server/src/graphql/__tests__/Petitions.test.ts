@@ -16,6 +16,7 @@ import {
   PetitionPermission,
   PetitionSignatureRequest,
   Tag,
+  TemplateDefaultPermission,
   User,
   UserGroup,
 } from "../../db/__types";
@@ -1340,9 +1341,191 @@ describe("GraphQL/Petitions", () => {
 
       expect(errors).toBeUndefined();
     });
+
+    it("give user WRITE permissions if creating a petition from a template with custom default owner", async () => {
+      const [template] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ is_template: true })
+      );
+      const [user] = await mocks.createRandomUsers(organization.id, 1);
+      await mocks.knex.from("template_default_permission").delete();
+      await mocks.knex.from<TemplateDefaultPermission>("template_default_permission").insert({
+        type: "OWNER",
+        user_id: user.id,
+        template_id: template.id,
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!) {
+            createPetition(petitionId: $petitionId) {
+              permissions {
+                permissionType
+                ... on PetitionUserPermission {
+                  user {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `,
+        { petitionId: toGlobalId("Petition", template.id) }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetition).toEqual({
+        permissions: [
+          { permissionType: "OWNER", user: { id: toGlobalId("User", user.id) } },
+          { permissionType: "WRITE", user: { id: toGlobalId("User", sessionUser.id) } },
+        ],
+      });
+    });
+
+    it("creates a petition from a template with custom default permissions", async () => {
+      const [template] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ is_template: true })
+      );
+      const users = await mocks.createRandomUsers(organization.id, 2);
+      await mocks.knex.from("template_default_permission").delete();
+      await mocks.knex.from<TemplateDefaultPermission>("template_default_permission").insert([
+        {
+          type: "READ",
+          user_id: users[0].id,
+          template_id: template.id,
+        },
+        {
+          type: "WRITE",
+          user_id: users[1].id,
+          template_id: template.id,
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!) {
+            createPetition(petitionId: $petitionId) {
+              permissions {
+                permissionType
+                ... on PetitionUserPermission {
+                  user {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `,
+        { petitionId: toGlobalId("Petition", template.id) }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetition).toEqual({
+        permissions: [
+          { permissionType: "OWNER", user: { id: toGlobalId("User", sessionUser.id) } },
+          { permissionType: "WRITE", user: { id: toGlobalId("User", users[1].id) } },
+          { permissionType: "READ", user: { id: toGlobalId("User", users[0].id) } },
+        ],
+      });
+    });
+
+    it("give user OWNER permission if creating a petition from a template with only default READ permission for the same user", async () => {
+      const [template] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ is_template: true })
+      );
+      const users = await mocks.createRandomUsers(organization.id, 2);
+      await mocks.knex.from("template_default_permission").delete();
+      await mocks.knex.from<TemplateDefaultPermission>("template_default_permission").insert({
+        type: "READ",
+        user_id: sessionUser.id,
+        template_id: template.id,
+      });
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!) {
+            createPetition(petitionId: $petitionId) {
+              permissions {
+                permissionType
+                ... on PetitionUserPermission {
+                  user {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `,
+        { petitionId: toGlobalId("Petition", template.id) }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetition).toEqual({
+        permissions: [
+          { permissionType: "OWNER", user: { id: toGlobalId("User", sessionUser.id) } },
+        ],
+      });
+    });
+
+    it("give user R/W permission on new petition if they have a R/W row on template_default_permission and there is another OWNER set", async () => {
+      const [template] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ is_template: true })
+      );
+      const [user] = await mocks.createRandomUsers(organization.id, 1);
+      await mocks.knex.from("template_default_permission").delete();
+      await mocks.knex.from<TemplateDefaultPermission>("template_default_permission").insert([
+        {
+          type: "READ",
+          user_id: sessionUser.id,
+          template_id: template.id,
+        },
+        {
+          type: "OWNER",
+          user_id: user.id,
+          template_id: template.id,
+        },
+      ]);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!) {
+            createPetition(petitionId: $petitionId) {
+              permissions {
+                permissionType
+                ... on PetitionUserPermission {
+                  user {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `,
+        { petitionId: toGlobalId("Petition", template.id) }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.createPetition).toEqual({
+        permissions: [
+          { permissionType: "OWNER", user: { id: toGlobalId("User", user.id) } },
+          { permissionType: "READ", user: { id: toGlobalId("User", sessionUser.id) } },
+        ],
+      });
+    });
   });
 
-  describe("clonePetition", () => {
+  describe("clonePetitions", () => {
     it("clones a single petition from a valid id", async () => {
       const petition = petitions[3];
       const petitionGID = toGlobalId("Petition", petition.id);
