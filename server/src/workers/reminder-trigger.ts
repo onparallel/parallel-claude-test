@@ -7,18 +7,23 @@ createCronWorker("reminder-trigger", async (context) => {
   const accesses = await context.petitions.getRemindableAccesses();
   for (const [, batch] of Object.entries(groupBy(accesses, (a) => a.petition_id))) {
     // Update next reminders
-    await pMap(
-      batch,
-      async (access) => {
-        await context.petitions.updatePetitionAccessNextReminder(
-          access.id,
-          calculateNextReminder(new Date(), access.reminders_config!)
-        );
-      },
-      { concurrency: 5 }
-    );
+    const remindableAccesses = (
+      await pMap(
+        batch,
+        async (access) => {
+          const petition = await context.petitions.loadPetition(access.petition_id);
+          return await context.petitions.updatePetitionAccessNextReminder(
+            access.id,
+            petition?.status === "PENDING"
+              ? calculateNextReminder(new Date(), access.reminders_config!)
+              : null
+          );
+        },
+        { concurrency: 5 }
+      )
+    ).filter((access) => access.next_reminder_at !== null);
     const reminders = await context.petitions.createReminders(
-      batch.map((access) => ({
+      remindableAccesses.map((access) => ({
         petition_access_id: access.id,
         status: "PROCESSING",
         type: "AUTOMATIC",
@@ -29,7 +34,7 @@ createCronWorker("reminder-trigger", async (context) => {
     await context.petitions.createEvent(
       reminders.map((reminder) => ({
         type: "REMINDER_SENT",
-        petition_id: batch[0].petition_id,
+        petition_id: remindableAccesses[0].petition_id,
         data: {
           petition_reminder_id: reminder.id,
         },
