@@ -108,6 +108,8 @@ type CommentPublishedEvent implements PetitionEvent {
 Information from the connection.
 """
 type ConnectionMetadata {
+  browserName: String
+  browserVersion: String
   country: String
   ip: String
 }

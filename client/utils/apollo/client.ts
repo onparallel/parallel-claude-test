@@ -63,7 +63,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
         ...(typeof window !== "undefined"
           ? {}
           : {
-              ...pick(req!.headers, ["x-forwarded-for"]),
+              ...pick(req!.headers, ["x-forwarded-for", "user-agent"]),
               cookie: filterCookies(req!.headers["cookie"]!),
             }),
       },

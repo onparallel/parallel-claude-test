@@ -25,6 +25,7 @@ export function useMetadata() {
   const metadata = useContext(MetadataContext);
   if (process.env.NODE_ENV === "development" && !isDefined(metadata)) {
     console.warn("useMetadata is being used without using withMetadata");
+    return {};
   }
-  return metadata;
+  return metadata!;
 }

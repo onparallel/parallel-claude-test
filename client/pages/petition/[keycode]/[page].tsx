@@ -565,6 +565,7 @@ RecipientView.queries = [
       }
       metadata(keycode: $keycode) {
         country
+        browserName
       }
     }
     ${RecipientView.fragments.PublicPetitionAccess}

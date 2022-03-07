@@ -315,6 +315,8 @@ export interface NexusGenObjects {
   CommentPublishedEvent: events.CommentPublishedEvent;
   ConnectionMetadata: {
     // root type
+    browserName?: string | null; // String
+    browserVersion?: string | null; // String
     country?: string | null; // String
     ip?: string | null; // String
   };
@@ -723,6 +725,8 @@ export interface NexusGenFieldTypes {
   };
   ConnectionMetadata: {
     // field return type
+    browserName: string | null; // String
+    browserVersion: string | null; // String
     country: string | null; // String
     ip: string | null; // String
   };
@@ -2058,6 +2062,8 @@ export interface NexusGenFieldTypeNames {
   };
   ConnectionMetadata: {
     // field return type name
+    browserName: "String";
+    browserVersion: "String";
     country: "String";
     ip: "String";
   };

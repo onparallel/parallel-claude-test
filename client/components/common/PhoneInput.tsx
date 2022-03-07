@@ -40,7 +40,7 @@ const PhoneInput = chakraForwardRef<"input", PhoneInputProps>(function PhoneInpu
   const { countries } = useLoadCountryNames(intl.locale);
   const mergedRef = useMergedRef(ref, inputRef);
   const metadata = useMetadata();
-  const _defaultCountry = defaultCountry ?? metadata?.country ?? undefined;
+  const _defaultCountry = defaultCountry ?? metadata.country ?? undefined;
 
   const formatter = useConstant(() => new AsYouType({ defaultCountry: _defaultCountry as any }));
   const [inputValue, setInputValue] = useState("");

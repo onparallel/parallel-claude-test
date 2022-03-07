@@ -469,6 +469,7 @@ PetitionPreview.queries = [
       }
       metadata {
         country
+        browserName
       }
     }
     ${PetitionPreview.fragments.User}

@@ -125,6 +125,8 @@ export interface CommentPublishedEvent extends PetitionEvent {
 /** Information from the connection. */
 export interface ConnectionMetadata {
   __typename?: "ConnectionMetadata";
+  browserName?: Maybe<Scalars["String"]>;
+  browserVersion?: Maybe<Scalars["String"]>;
   country?: Maybe<Scalars["String"]>;
   ip?: Maybe<Scalars["String"]>;
 }
@@ -15386,7 +15388,11 @@ export type PetitionPreview_userQuery = {
       };
     };
   };
-  metadata: { __typename?: "ConnectionMetadata"; country?: string | null };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    country?: string | null;
+    browserName?: string | null;
+  };
 };
 
 export type PetitionReplies_PetitionFragment = {
@@ -17475,7 +17481,11 @@ export type RecipientView_accessQuery = {
     } | null;
     message?: { __typename?: "PublicPetitionMessage"; id: string; subject?: string | null } | null;
   } | null;
-  metadata: { __typename?: "ConnectionMetadata"; country?: string | null };
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    country?: string | null;
+    browserName?: string | null;
+  };
 };
 
 export type RecipientViewVerify_verifyPublicAccessMutationVariables = Exact<{
@@ -24181,6 +24191,7 @@ export const PetitionPreview_userDocument = gql`
     }
     metadata {
       country
+      browserName
     }
   }
   ${PetitionPreview_UserFragmentDoc}
@@ -24569,6 +24580,7 @@ export const RecipientView_accessDocument = gql`
     }
     metadata(keycode: $keycode) {
       country
+      browserName
     }
   }
   ${RecipientView_PublicPetitionAccessFragmentDoc}

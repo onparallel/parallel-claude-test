@@ -2,8 +2,10 @@ import { lookup } from "geoip-country";
 import { idArg, nonNull, nullable, objectType, queryField } from "nexus";
 import { isDefined } from "remeda";
 import { getClientIp } from "request-ip";
+import { UAParser } from "ua-parser-js";
 import { authenticate, chain, ifArgDefined } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
+import { NexusGenObjects } from "../__types";
 import { authenticatePublicAccess, fieldBelongsToAccess, taskBelongsToAccess } from "./authorizers";
 
 export const accessQuery = queryField("access", {
@@ -24,6 +26,8 @@ export const metadata = queryField("metadata", {
     definition(t) {
       t.nullable.string("ip");
       t.nullable.string("country");
+      t.nullable.string("browserName");
+      t.nullable.string("browserVersion");
     },
   }),
   args: {
@@ -31,13 +35,23 @@ export const metadata = queryField("metadata", {
   },
   authorize: ifArgDefined("keycode", authenticatePublicAccess("keycode" as never), authenticate()),
   resolve: async (_, args, ctx) => {
+    const data: NexusGenObjects["ConnectionMetadata"] = {};
     const ip = getClientIp(ctx.req);
-    let country: string | null = null;
     if (isDefined(ip)) {
+      data.ip = ip;
       const geo = lookup(ip);
-      country = geo?.country ?? null;
+      data.country = geo?.country ?? null;
     }
-    return { ip, country };
+    const userAgent = ctx.req.headers["user-agent"];
+    console.log(userAgent);
+    if (isDefined(userAgent)) {
+      const ua = new UAParser(userAgent);
+      const browser = ua.getBrowser();
+      data.browserName = browser.name;
+      data.browserVersion = browser.version;
+    }
+    console.log(data);
+    return data;
   },
 });
 

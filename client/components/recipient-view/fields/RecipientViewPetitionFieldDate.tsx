@@ -1,10 +1,11 @@
 import { Center, Flex, Input, List, Stack } from "@chakra-ui/react";
-import { DeleteIcon } from "@parallel/chakra/icons";
+import { DeleteIcon, FieldDateIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
+import { useMetadata } from "@parallel/utils/withMetadata";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChangeEvent, forwardRef, KeyboardEvent, useRef, useState } from "react";
 import { useIntl } from "react-intl";
@@ -111,6 +112,8 @@ export function RecipientViewPetitionFieldDate({
     [onCreateReply]
   );
 
+  const { browserName } = useMetadata();
+
   const inputProps = {
     type: "date",
     id: `reply-${field.id}-new`,
@@ -118,6 +121,21 @@ export function RecipientViewPetitionFieldDate({
     paddingRight: 3,
     isDisabled: isDisabled,
     value,
+    // This removes the reset button on Firefox
+    required: true,
+    sx: {
+      paddingRight: 1.5,
+      "&::-webkit-calendar-picker-indicator": {
+        color: "transparent",
+        background: "transparent",
+      },
+      ...(browserName === "Safari" // Safari does stupid things
+        ? {
+            color: "gray.800",
+            ...(value ? {} : { "&:not(:focus)": { color: "rgba(0,0,0,0.3)" } }),
+          }
+        : {}),
+    },
     onKeyDown: async (event: KeyboardEvent) => {
       if (isMetaReturn(event) && field.multiple) {
         await handleCreate.immediate(value, false);
@@ -182,6 +200,9 @@ export function RecipientViewPetitionFieldDate({
       {(field.multiple && showNewReply) || field.replies.length === 0 ? (
         <Flex flex="1" position="relative" marginTop={2}>
           <Input {...inputProps} />
+          <Center boxSize={10} position="absolute" right={0} bottom={0} pointerEvents="none">
+            <FieldDateIcon fontSize="18px" />
+          </Center>
           <Center boxSize={10} position="absolute" right={8} bottom={0}>
             <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
           </Center>
@@ -223,12 +244,29 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
     [onUpdate]
   );
 
+  const { browserName } = useMetadata();
+
   const props = {
     type: "date",
     id: `reply-${field.id}-${reply.id}`,
     ref: ref as any,
     paddingRight: 3,
     value,
+    // This removes the reset button on Firefox
+    required: true,
+    sx: {
+      paddingRight: 1.5,
+      "&::-webkit-calendar-picker-indicator": {
+        color: "transparent",
+        background: "transparent",
+      },
+      ...(browserName === "Safari" // Safari does stupid things
+        ? {
+            color: "gray.800",
+            ...(value ? {} : { "&:not(:focus)": { color: "rgba(0,0,0,0.3)" } }),
+          }
+        : {}),
+    },
     isDisabled: isDisabled || reply.status === "APPROVED",
     isInvalid: reply.status === "REJECTED",
     onKeyDown: async (event: KeyboardEvent) => {
@@ -257,6 +295,9 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
     <Stack direction="row">
       <Flex flex="1" position="relative">
         <Input {...props} />
+        <Center boxSize={10} position="absolute" right={0} bottom={0} pointerEvents="none">
+          <FieldDateIcon fontSize="18px" />
+        </Center>
         <Center boxSize={10} position="absolute" right={8} bottom={0}>
           <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
         </Center>
