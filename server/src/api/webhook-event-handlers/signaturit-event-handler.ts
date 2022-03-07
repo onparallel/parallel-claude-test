@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { pick } from "remeda";
 import { SignatureEvents } from "signaturit-sdk";
 import { ApiContext } from "../../context";
 import { SignatureStartedEvent } from "../../db/events";
@@ -245,6 +246,7 @@ async function emailBounced(ctx: ApiContext, data: SignaturItEventBody, petition
   const cancelData: PetitionSignatureRequestCancelData<"REQUEST_ERROR"> = {
     error: data.reason ?? `email ${data.document.email} bounced`,
     error_code: "EMAIL_BOUNCED",
+    extra: pick(data.document, ["email", "name"]),
   };
 
   await Promise.all([

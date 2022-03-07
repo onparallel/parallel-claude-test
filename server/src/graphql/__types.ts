@@ -1683,6 +1683,7 @@ export interface NexusGenFieldTypes {
     cancellerReason: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     errorCode: string | null; // String
+    extraErrorData: NexusGenScalars["JSON"] | null; // JSON
     id: NexusGenScalars["GID"]; // GID!
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
@@ -1690,6 +1691,7 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     errorCode: string | null; // String
+    extraErrorData: NexusGenScalars["JSON"] | null; // JSON
     id: NexusGenScalars["GID"]; // GID!
     isRead: boolean; // Boolean!
     petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
@@ -3020,6 +3022,7 @@ export interface NexusGenFieldTypeNames {
     cancellerReason: "String";
     createdAt: "DateTime";
     errorCode: "String";
+    extraErrorData: "JSON";
     id: "GID";
     type: "PetitionEventType";
   };
@@ -3027,6 +3030,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     createdAt: "DateTime";
     errorCode: "String";
+    extraErrorData: "JSON";
     id: "GID";
     isRead: "Boolean";
     petition: "PetitionBase";

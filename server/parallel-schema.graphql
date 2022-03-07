@@ -4112,6 +4112,7 @@ type SignatureCancelledEvent implements PetitionEvent {
   cancellerReason: String
   createdAt: DateTime!
   errorCode: String
+  extraErrorData: JSON
   id: GID!
   type: PetitionEventType!
 }
@@ -4119,6 +4120,7 @@ type SignatureCancelledEvent implements PetitionEvent {
 type SignatureCancelledUserNotification implements PetitionUserNotification {
   createdAt: DateTime!
   errorCode: String
+  extraErrorData: JSON
   id: GID!
   isRead: Boolean!
   petition: PetitionBase!

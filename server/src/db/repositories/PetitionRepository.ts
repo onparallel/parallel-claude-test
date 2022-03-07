@@ -126,7 +126,7 @@ export type PetitionSignatureRequestCancelData<CancelReason extends PetitionSign
       canceller: Maybe<{ firstName: string; lastName: string; email: string }>;
       decline_reason?: string;
     };
-    REQUEST_ERROR: { error: any; error_code: string; file?: string };
+    REQUEST_ERROR: { error: any; error_code: string; file?: string; extra?: any };
     REQUEST_RESTARTED: { petition_access_id?: number; user_id?: number }; // id of the contact or user that restarted the signature request (modify replies and finish petition)
   }[CancelReason];
 

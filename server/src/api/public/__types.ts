@@ -2001,6 +2001,7 @@ export type PetitionField = {
   description: Maybe<Scalars["String"]>;
   /** The field GID used from which this field was cloned */
   fromPetitionFieldId: Maybe<Scalars["GID"]>;
+  hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition field. */
   id: Scalars["GID"];
   /** Determines if the field can be moved or deleted. */
@@ -2536,6 +2537,7 @@ export type PublicPetitionField = {
   comments: Array<PublicPetitionFieldComment>;
   /** The description of the petition field. */
   description: Maybe<Scalars["String"]>;
+  hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition field. */
   id: Scalars["GID"];
   /** Determines if the field is visible by the recipients. */
@@ -3003,6 +3005,7 @@ export type SignatureCancelledEvent = PetitionEvent & {
   cancellerReason: Maybe<Scalars["String"]>;
   createdAt: Scalars["DateTime"];
   errorCode: Maybe<Scalars["String"]>;
+  extraErrorData: Maybe<Scalars["JSON"]>;
   id: Scalars["GID"];
   type: PetitionEventType;
 };
@@ -3010,6 +3013,7 @@ export type SignatureCancelledEvent = PetitionEvent & {
 export type SignatureCancelledUserNotification = PetitionUserNotification & {
   createdAt: Scalars["DateTime"];
   errorCode: Maybe<Scalars["String"]>;
+  extraErrorData: Maybe<Scalars["JSON"]>;
   id: Scalars["GID"];
   isRead: Scalars["Boolean"];
   petition: PetitionBase;
@@ -3150,6 +3154,7 @@ export type TaskStatus = "COMPLETED" | "ENQUEUED" | "FAILED" | "PROCESSING";
 export type TemplateDefaultPermission = {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
   /** wether user is will be subscribed or not to emails and alerts of the generated petition */
   isSubscribed: Scalars["Boolean"];
   /** The type of the permission. */
@@ -3165,6 +3170,7 @@ export type TemplateDefaultUserGroupPermission = TemplateDefaultPermission &
     createdAt: Scalars["DateTime"];
     /** The group linked to the permission */
     group: UserGroup;
+    id: Scalars["GID"];
     /** wether user is will be subscribed or not to emails and alerts of the generated petition */
     isSubscribed: Scalars["Boolean"];
     /** The type of the permission. */
@@ -3178,6 +3184,7 @@ export type TemplateDefaultUserPermission = TemplateDefaultPermission &
   Timestamps & {
     /** Time when the resource was created. */
     createdAt: Scalars["DateTime"];
+    id: Scalars["GID"];
     /** wether user is will be subscribed or not to emails and alerts of the generated petition */
     isSubscribed: Scalars["Boolean"];
     /** The type of the permission. */
@@ -3218,6 +3225,7 @@ export type UpdateEventSubscriptionInput = {
 export type UpdatePetitionFieldInput = {
   alias?: InputMaybe<Scalars["String"]>;
   description?: InputMaybe<Scalars["String"]>;
+  hasCommentsEnabled?: InputMaybe<Scalars["Boolean"]>;
   isInternal?: InputMaybe<Scalars["Boolean"]>;
   multiple?: InputMaybe<Scalars["Boolean"]>;
   optional?: InputMaybe<Scalars["Boolean"]>;
@@ -3352,7 +3360,7 @@ export type UserOrUserGroup = User | UserGroup;
 
 export type UserOrUserGroupPermissionInput = {
   isSubscribed: Scalars["Boolean"];
-  permissionType: PetitionPermissionTypeRW;
+  permissionType: PetitionPermissionType;
   userGroupId?: InputMaybe<Scalars["GID"]>;
   userId?: InputMaybe<Scalars["GID"]>;
 };

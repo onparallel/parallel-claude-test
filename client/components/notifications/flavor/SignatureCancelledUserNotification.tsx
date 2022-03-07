@@ -31,6 +31,15 @@ export const SignatureCancelledUserNotification = Object.assign(
               id="component.notification-signature-cancelled.no-credits-left.body"
               defaultMessage="The eSignature could not be started because you reached your plan’s limit."
             />
+          ) : notification.errorCode === "EMAIL_BOUNCED" ? (
+            <FormattedMessage
+              id="component.notification-signature-cancelled.email-bounced.body"
+              defaultMessage="The eSignature has been cancelled due to an error with {hasEmail, select, true{<{signerEmail}>} other{an email}}"
+              values={{
+                hasEmail: Boolean(notification.extraErrorData?.email),
+                signerEmail: notification.extraErrorData?.email,
+              }}
+            />
           ) : (
             <FormattedMessage
               id="component.notification-signature-cancelled.generic.body"
@@ -46,6 +55,7 @@ export const SignatureCancelledUserNotification = Object.assign(
       SignatureCancelledUserNotification: gql`
         fragment SignatureCancelledUserNotification_SignatureCancelledUserNotification on SignatureCancelledUserNotification {
           errorCode
+          extraErrorData
           ...PetitionUserNotification_PetitionUserNotification
         }
         ${PetitionUserNotification.fragments.PetitionUserNotification}

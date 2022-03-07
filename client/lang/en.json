@@ -895,11 +895,6 @@
     "context": "Limit value range"
   },
   {
-    "term": "component.field-settings-number.prefix-error",
-    "definition": "Numbers, commas and periods are not allowed.",
-    "context": "Numbers, commas and periods are not allowed."
-  },
-  {
     "term": "component.field-settings-number.range-error",
     "definition": "Maximum can not be lower than minimum.",
     "context": "Maximum can not be lower than minimum."
@@ -1163,6 +1158,11 @@
     "term": "component.notification-reminders-opt-out.body",
     "definition": "{name} has opted out from receiving reminders: {reason}",
     "context": "{name} has opted out from receiving reminders: {reason}"
+  },
+  {
+    "term": "component.notification-signature-cancelled.email-bounced.body",
+    "definition": "The eSignature has been cancelled due to an error with {hasEmail, select, true{<{signerEmail}>} other{an email}}",
+    "context": "The eSignature has been cancelled due to an error with {hasEmail, select, true{<{signerEmail}>} other{an email}}"
   },
   {
     "term": "component.notification-signature-cancelled.generic.body",
@@ -8998,6 +8998,11 @@
     "term": "timeline.signature-cancelled-by-user.description",
     "definition": "{same, select, true {You} other {{name}}} cancelled the eSignature process {timeAgo}",
     "context": "{same, select, true {You} other {{name}}} cancelled the eSignature process {timeAgo}"
+  },
+  {
+    "term": "timeline.signature-cancelled-request-error.email-bounced.description",
+    "definition": "The eSignature process has been cancelled due to an error with {hasEmail, select, true{<b><{signerEmail}></b>} other{an email}} {timeAgo}",
+    "context": "The eSignature process has been cancelled due to an error with {hasEmail, select, true{<b><{signerEmail}></b>} other{an email}} {timeAgo}"
   },
   {
     "term": "timeline.signature-cancelled-request-error.insufficient-credits.description",

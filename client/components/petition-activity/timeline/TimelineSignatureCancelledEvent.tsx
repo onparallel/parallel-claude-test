@@ -86,6 +86,22 @@ export function TimelineSignatureCancelledEvent({
                   ),
                 }}
               />
+            ) : event.errorCode === "EMAIL_BOUNCED" ? (
+              <FormattedMessage
+                id="timeline.signature-cancelled-request-error.email-bounced.description"
+                defaultMessage="The eSignature process has been cancelled due to an error with {hasEmail, select, true{<b><{signerEmail}></b>} other{an email}} {timeAgo}"
+                values={{
+                  timeAgo: (
+                    <DateTime
+                      value={event.createdAt}
+                      format={FORMATS.LLL}
+                      useRelativeTime="always"
+                    />
+                  ),
+                  hasEmail: Boolean(event.extraErrorData?.email),
+                  signerEmail: event.extraErrorData?.email,
+                }}
+              />
             ) : (
               <FormattedMessage
                 id="timeline.signature-cancelled-request-error.unknown.description"
@@ -126,6 +142,7 @@ TimelineSignatureCancelledEvent.fragments = {
       }
       cancelType
       errorCode
+      extraErrorData
       cancellerReason
       createdAt
     }
