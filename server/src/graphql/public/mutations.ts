@@ -216,7 +216,7 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
               httpOnly: true,
               sameSite: "lax",
               secure: process.env.NODE_ENV === "production",
-              maxAge: 60 * 60 * 24 * 365 * 10,
+              maxAge: 60 * 60 * 24 * 365 * 10 * 1000,
             }
           );
         }
