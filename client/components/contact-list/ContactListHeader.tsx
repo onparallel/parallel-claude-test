@@ -4,6 +4,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { ResponsiveButtonIcon } from "../common/ResponsiveButtonIcon";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
 
@@ -54,13 +55,17 @@ export function ContactListHeader({
         })}
       />
       {selectionCount > 0 ? (
-        <Button variant="outline" colorScheme="red" onClick={onDeleteClick}>
-          <DeleteIcon marginRight={2} />
-          <FormattedMessage
-            id="component.contact-list-header.delete-label"
-            defaultMessage="Delete selected"
-          />
-        </Button>
+        <ResponsiveButtonIcon
+          breakpoint="lg"
+          icon={<DeleteIcon />}
+          variant="outline"
+          colorScheme="red"
+          onClick={onDeleteClick}
+          label={intl.formatMessage({
+            id: "component.contact-list-header.delete-label",
+            defaultMessage: "Delete selected",
+          })}
+        />
       ) : null}
       <Spacer />
       <Button variant="outline" onClick={onImportClick}>
