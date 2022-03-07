@@ -10,6 +10,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { indexBy } from "remeda";
+import { assert } from "ts-essentials";
 import { completedFieldReplies } from "../completedFieldReplies";
 import { UnionToArrayUnion } from "../types";
 import {
@@ -22,40 +23,72 @@ type PetitionFieldSelection =
   | useFieldVisibility_PublicPetitionFieldFragment
   | useFieldVisibility_PetitionFieldFragment;
 
-function evaluatePredicate<T extends string | number | string[]>(
-  reply: T | string[],
+function evaluatePredicate(
+  reply: string | number | string[],
   operator: PetitionFieldVisibilityConditionOperator,
-  value: T | null
+  value: string | number | null
 ) {
-  if (value === null) {
-    return false;
-  }
-  const a = typeof reply === "string" ? reply.toLowerCase() : reply;
-  const b = Array.isArray(reply) ? value : typeof value === "string" ? value.toLowerCase() : value;
+  try {
+    if (reply === undefined || value === undefined || value === null) {
+      return false;
+    }
 
-  switch (operator) {
-    case "LESS_THAN":
-      return a < b;
-    case "LESS_THAN_OR_EQUAL":
-      return a <= b;
-    case "GREATER_THAN":
-      return a > b;
-    case "GREATER_THAN_OR_EQUAL":
-      return a >= b;
-    case "EQUAL":
-      return a === b;
-    case "NOT_EQUAL":
-      return a !== b;
-    case "START_WITH":
-      return a.toString().startsWith(b.toString());
-    case "END_WITH":
-      return a.toString().endsWith(b.toString());
-    case "CONTAIN":
-      return a.toString().includes(b.toString());
-    case "NOT_CONTAIN":
-      return !a.toString().includes(b.toString());
-    case "NUMBER_OF_SUBREPLIES":
-      return (a as string[]).length === b;
+    // CHECKBOX
+    if (Array.isArray(reply)) {
+      switch (operator) {
+        case "CONTAIN":
+          assert(typeof value === "string");
+          return reply.includes(value);
+        case "NOT_CONTAIN":
+          assert(typeof value === "string");
+          return !reply.includes(value);
+        case "NUMBER_OF_SUBREPLIES":
+          assert(typeof value === "number");
+          return reply.length === value;
+        default:
+          return false;
+      }
+    }
+
+    // make matching case-insensitive
+    const _reply = typeof reply === "string" ? reply.toLowerCase() : reply;
+    const _value = typeof value === "string" ? value.toLowerCase() : value;
+
+    if (_reply === null || _value === null) return false;
+    switch (operator) {
+      case "LESS_THAN":
+        return _reply < _value;
+      case "LESS_THAN_OR_EQUAL":
+        return _reply <= _value;
+      case "GREATER_THAN":
+        return _reply > _value;
+      case "GREATER_THAN_OR_EQUAL":
+        return _reply >= _value;
+      case "EQUAL":
+        return _reply === _value;
+      case "NOT_EQUAL":
+        return _reply !== _value;
+      case "START_WITH":
+        assert(typeof _reply === "string");
+        assert(typeof _value === "string");
+        return _reply.startsWith(_value);
+      case "END_WITH":
+        assert(typeof _reply === "string");
+        assert(typeof _value === "string");
+        return _reply.endsWith(_value);
+      case "CONTAIN":
+        assert(typeof _reply === "string");
+        assert(typeof _value === "string");
+        return _reply.includes(_value);
+      case "NOT_CONTAIN":
+        assert(typeof _reply === "string");
+        assert(typeof _value === "string");
+        return !_reply.includes(_value);
+      default:
+        return false;
+    }
+  } catch (e) {
+    return false;
   }
 }
 
