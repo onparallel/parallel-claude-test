@@ -24660,7 +24660,7 @@ export const RecipientView_accessDocument = gql`
     access(keycode: $keycode) {
       ...RecipientView_PublicPetitionAccess
     }
-    metadata {
+    metadata(keycode: $keycode) {
       country
     }
   }

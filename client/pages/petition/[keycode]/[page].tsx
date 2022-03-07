@@ -564,7 +564,7 @@ RecipientView.queries = [
       access(keycode: $keycode) {
         ...RecipientView_PublicPetitionAccess
       }
-      metadata {
+      metadata(keycode: $keycode) {
         country
       }
     }
