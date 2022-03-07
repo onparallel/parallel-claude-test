@@ -1,6 +1,6 @@
 import {
-  Box,
   FormControlOptions,
+  Image,
   Input,
   InputGroup,
   InputLeftElement,
@@ -8,13 +8,14 @@ import {
 } from "@chakra-ui/react";
 import { FieldPhoneIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { flags } from "@parallel/utils/flags";
 import { phoneCodes } from "@parallel/utils/phoneCodes";
 import { useConstant } from "@parallel/utils/useConstant";
+import { useLoadCountryNames } from "@parallel/utils/useCountryName";
 import { useMetadata } from "@parallel/utils/withMetadata";
 import useMergedRef from "@react-hook/merged-ref";
 import { AsYouType } from "libphonenumber-js/min/index";
 import { ChangeEvent, FocusEvent, useEffect, useRef, useState } from "react";
+import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
 
 export interface PhoneInputProps extends ThemingProps<"Input">, FormControlOptions {
@@ -35,6 +36,8 @@ const PhoneInput = chakraForwardRef<"input", PhoneInputProps>(function PhoneInpu
   ref
 ) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const intl = useIntl();
+  const { countries } = useLoadCountryNames(intl.locale);
   const mergedRef = useMergedRef(ref, inputRef);
   const metadata = useMetadata();
   const _defaultCountry = defaultCountry ?? metadata?.country ?? undefined;
@@ -120,7 +123,17 @@ const PhoneInput = chakraForwardRef<"input", PhoneInputProps>(function PhoneInpu
   return (
     <InputGroup>
       <InputLeftElement pointerEvents="none">
-        {country ? <Box fontSize="xl">{flags[country]}</Box> : <FieldPhoneIcon />}
+        {country ? (
+          <Image
+            alt={countries?.[country]}
+            boxSize={6}
+            src={`${
+              process.env.NEXT_PUBLIC_ASSETS_URL
+            }/static/countries/flags/${country.toLowerCase()}.png`}
+          />
+        ) : (
+          <FieldPhoneIcon />
+        )}
       </InputLeftElement>
       <Input
         ref={mergedRef}
