@@ -58,6 +58,13 @@ export function RecipientViewPetitionFieldNumber({
   const isSuffix = isDefined(suffix);
   const prefixValue = isSuffix ? suffix : prefix;
 
+  const defaultPlaceholder = hasPrefix
+    ? prefixValue
+    : intl.formatMessage({
+        id: "component.recipient-view-petition-field-reply.text-placeholder",
+        defaultMessage: "Enter your answer",
+      });
+
   function handleAddNewReply() {
     setShowNewReply(true);
     setTimeout(() => {
@@ -185,13 +192,7 @@ export function RecipientViewPetitionFieldNumber({
         setValue(value);
       }
     },
-    placeholder:
-      placeholder ?? hasPrefix
-        ? prefixValue
-        : intl.formatMessage({
-            id: "component.recipient-view-petition-field-reply.text-placeholder",
-            defaultMessage: "Enter your answer",
-          }),
+    placeholder: placeholder ?? defaultPlaceholder,
   } as ComponentPropsWithRef<typeof NumeralInput>;
 
   const hasRange = isDefined(range.min) || isDefined(range.max);
@@ -321,6 +322,13 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
   const [isSaving, setIsSaving] = useState(false);
   const [isInvalid, setIsInvalid] = useState(!isBetweenLimits(range, reply.content.value));
 
+  const defaultPlaceholder = hasPrefix
+    ? prefixValue
+    : intl.formatMessage({
+        id: "component.recipient-view-petition-field-reply.text-placeholder",
+        defaultMessage: "Enter your answer",
+      });
+
   useEffect(() => {
     onInvalid(reply.id, isInvalid);
   }, [isInvalid]);
@@ -375,13 +383,7 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
         setIsInvalid(!isBetweenLimits(range, value));
       }
     },
-    placeholder:
-      placeholder ?? hasPrefix
-        ? prefixValue
-        : intl.formatMessage({
-            id: "component.recipient-view-petition-field-reply.text-placeholder",
-            defaultMessage: "Enter your answer",
-          }),
+    placeholder: placeholder ?? defaultPlaceholder,
   } as ComponentPropsWithRef<typeof NumeralInput>;
 
   return (
