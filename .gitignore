@@ -1,6 +1,7 @@
 node_modules
 
 client/.next
+client/.env.local
 client/public/static/lang
 
 server/dist
