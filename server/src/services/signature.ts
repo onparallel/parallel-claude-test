@@ -350,7 +350,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
             type: "signature",
             word_anchor: `3cb39pzCQA9wJ${recipientIndex}`,
             height: 7, // 7% of page height
-            width: 28, // 28% of page width
+            width: 26, // 26% of page width
           },
         ],
       })),

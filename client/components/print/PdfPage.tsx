@@ -11,9 +11,11 @@ export function PdfPage({ children, heading, footer, ...props }: PdfPageProps) {
   return (
     <Flex
       sx={{
-        width: "100%",
+        width: "210mm",
         height: "auto",
-        margin: "0 auto",
+        maxHeight: "297mm",
+        margin: "auto",
+        padding: "10mm",
         display: "block",
         position: "relative",
         pageBreakAfter: "always",
