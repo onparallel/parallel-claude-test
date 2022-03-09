@@ -8,7 +8,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
-import { forwardRef, KeyboardEvent, useRef, useState } from "react";
+import { ComponentProps, forwardRef, KeyboardEvent, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { isDefined, pick } from "remeda";
 import {
@@ -125,9 +125,9 @@ export function RecipientViewPetitionFieldPhone({
     [onCreateReply]
   );
 
-  const props = {
+  const props: ComponentProps<typeof PhoneInputLazy> = {
     id: `reply-${field.id}-new`,
-    ref: newReplyRef as any,
+    inputRef: newReplyRef,
     paddingRight: 10,
     isDisabled: isDisabled,
     isInvalid: isInvalidValue,
@@ -244,9 +244,9 @@ export const RecipientViewPetitionFieldReplyPhone = forwardRef<
     [onUpdate]
   );
 
-  const props = {
+  const props: ComponentProps<typeof PhoneInputLazy> = {
     id: `reply-${field.id}-${reply.id}`,
-    ref: ref as any,
+    inputRef: ref,
     paddingRight: 10,
     isDisabled: isDisabled || reply.status === "APPROVED",
     isInvalid: isInvalidValue || reply.status === "REJECTED",

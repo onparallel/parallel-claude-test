@@ -14,13 +14,14 @@ import { useLoadCountryNames } from "@parallel/utils/useCountryName";
 import { useMetadata } from "@parallel/utils/withMetadata";
 import useMergedRef from "@react-hook/merged-ref";
 import { AsYouType } from "libphonenumber-js/min/index";
-import { ChangeEvent, FocusEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, FocusEvent, Ref, useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
 
 export interface PhoneInputProps extends ThemingProps<"Input">, FormControlOptions {
+  inputRef?: Ref<HTMLInputElement>;
   defaultCountry?: string;
-  value: string | undefined;
+  value?: string;
   onChange?(
     value: string | undefined,
     metadata: { isValid: boolean; country: string | undefined }
@@ -32,13 +33,13 @@ export interface PhoneInputProps extends ThemingProps<"Input">, FormControlOptio
 }
 
 const PhoneInput = chakraForwardRef<"input", PhoneInputProps>(function PhoneInput(
-  { value, placeholder, onLoad, onChange, onBlur, defaultCountry, ...props },
+  { value, placeholder, onLoad, onChange, onBlur, defaultCountry, inputRef, ...props },
   ref
 ) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const _ref = useRef<HTMLInputElement>(null);
   const intl = useIntl();
   const { countries } = useLoadCountryNames(intl.locale);
-  const mergedRef = useMergedRef(ref, inputRef);
+  const mergedRef = useMergedRef(ref, _ref, ...(inputRef ? [inputRef] : []));
   const metadata = useMetadata();
   const _defaultCountry = defaultCountry ?? metadata.country ?? undefined;
 
@@ -64,8 +65,8 @@ const PhoneInput = chakraForwardRef<"input", PhoneInputProps>(function PhoneInpu
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     let newValue = e.target.value;
     const cursorPosition = [
-      inputRef.current?.selectionStart ?? null,
-      inputRef.current?.selectionEnd ?? null,
+      _ref.current?.selectionStart ?? null,
+      _ref.current?.selectionEnd ?? null,
     ];
     if (inputValue === newValue) {
       return;
@@ -94,8 +95,8 @@ const PhoneInput = chakraForwardRef<"input", PhoneInputProps>(function PhoneInpu
       formatter.input(newValue);
       setTimeout(() => {
         // move back the cursor to the correct position
-        inputRef.current?.focus();
-        inputRef.current?.setSelectionRange(cursorPosition[0], cursorPosition[1]);
+        _ref.current?.focus();
+        _ref.current?.setSelectionRange(cursorPosition[0], cursorPosition[1]);
       });
     }
     const formatted = (formatter as any).formattedOutput;
