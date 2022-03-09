@@ -113,6 +113,8 @@ export type CommentPublishedEvent = PetitionEvent & {
 
 /** Information from the connection. */
 export type ConnectionMetadata = {
+  browserName: Maybe<Scalars["String"]>;
+  browserVersion: Maybe<Scalars["String"]>;
   country: Maybe<Scalars["String"]>;
   ip: Maybe<Scalars["String"]>;
 };
@@ -1420,6 +1422,7 @@ export type MutationupdatePetitionArgs = {
 export type MutationupdatePetitionFieldArgs = {
   data: UpdatePetitionFieldInput;
   fieldId: Scalars["GID"];
+  force?: InputMaybe<Scalars["Boolean"]>;
   petitionId: Scalars["GID"];
 };
 

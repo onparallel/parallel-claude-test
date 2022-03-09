@@ -231,7 +231,6 @@ export function defaultFieldOptions(
       }
       case "TEXT": {
         return {
-          hasCommentsEnabled,
           placeholder:
             isDefined(field) && hasPlaceholder(field.type) ? field.options.placeholder : null,
           maxLength:

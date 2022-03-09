@@ -801,6 +801,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
         },
       }).asArg()
     ),
+    force: booleanArg({ default: false }),
   },
   validateArgs: validateAnd(
     notEmptyObject((args) => args.data, "data"),
@@ -860,6 +861,27 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           options,
         });
         data.options = { ...field.options, ...options };
+
+        if (
+          field.type === "SHORT_TEXT" &&
+          isDefined(data.options.format) &&
+          field.options.format !== data.options.format
+        ) {
+          const replies = await ctx.petitions.loadRepliesForField(args.fieldId, {
+            cache: false,
+          });
+
+          if (!args.force && replies.length > 0) {
+            throw new WhitelistedError(
+              "The petition field has replies.",
+              "FIELD_HAS_REPLIES_ERROR"
+            );
+          }
+
+          if (replies.length > 0) {
+            await ctx.petitions.deletePetitionFieldReplies(args.fieldId, ctx.user!);
+          }
+        }
       } catch (e: any) {
         throw new ArgValidationError(info, "data.options", e.toString());
       }

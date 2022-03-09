@@ -955,6 +955,41 @@
     "context": "Zip file"
   },
   {
+    "term": "component.format-placeholder.cif",
+    "definition": "E.g., B76365789",
+    "context": "E.g., B76365789"
+  },
+  {
+    "term": "component.format-placeholder.dni-nie",
+    "definition": "E.g., 12345678A",
+    "context": "E.g., 12345678A"
+  },
+  {
+    "term": "component.format-placeholder.iban",
+    "definition": "E.g., GB33 BUKB 2020 1555 5555 55",
+    "context": "E.g., GB33 BUKB 2020 1555 5555 55"
+  },
+  {
+    "term": "component.format-placeholder.postal-spain",
+    "definition": "E.g., 08001",
+    "context": "E.g., 08001"
+  },
+  {
+    "term": "component.format-placeholder.postal-usa",
+    "definition": "E.g., 99301",
+    "context": "E.g., 99301"
+  },
+  {
+    "term": "component.format-placeholder.ssn-spain",
+    "definition": "E.g., 08 11621612 13",
+    "context": "E.g., 08 11621612 13"
+  },
+  {
+    "term": "component.format-placeholder.ssn-usa",
+    "definition": "E.g., 504-88-5752",
+    "context": "E.g., 504-88-5752"
+  },
+  {
     "term": "component.generate-new-token-dialog.api-key-label",
     "definition": "API token",
     "context": "API token"
@@ -5763,6 +5798,21 @@
     "term": "petition.confirm-change-field-type.header",
     "definition": "Change field type",
     "context": "Change field type"
+  },
+  {
+    "term": "petition.confirm-change-short-text-format.body",
+    "definition": "This field contains collected replies. If you change the format of this field you will lose those replies <b>forever</b>.",
+    "context": "This field contains collected replies. If you change the format of this field you will lose those replies <b>forever</b>."
+  },
+  {
+    "term": "petition.confirm-change-short-text-format.confirm",
+    "definition": "Change format",
+    "context": "Change format"
+  },
+  {
+    "term": "petition.confirm-change-short-text-format.header",
+    "definition": "Change format type",
+    "context": "Change format type"
   },
   {
     "term": "petition.confirm-deactivate-access-message.body",

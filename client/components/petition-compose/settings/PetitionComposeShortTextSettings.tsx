@@ -17,7 +17,6 @@ export function ShortTextSettings({
   const intl = useIntl();
   const options = field.options as FieldOptions["SHORT_TEXT"];
   const [placeholder, setPlaceholder] = useState(options.placeholder ?? "");
-  const [format, setFormat] = useState<string | null>(options.format);
 
   const rsProps = useInlineReactSelectProps<any, false, never>({
     size: "sm",
@@ -86,8 +85,8 @@ export function ShortTextSettings({
   );
 
   const _value = useMemo(
-    () => formatOptions.find((o) => o.value === format),
-    [format, formatOptions]
+    () => formatOptions.find((o) => o.value === options.format),
+    [options.format, formatOptions]
   );
 
   const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 300, [field.id]);
@@ -105,8 +104,7 @@ export function ShortTextSettings({
 
   const handleFormatChange = (selected: OptionType) => {
     const format = selected?.value ?? null;
-    setFormat(format);
-    debouncedOnUpdate(field.id, {
+    onFieldEdit(field.id, {
       options: {
         ...field.options,
         format,
@@ -126,7 +124,7 @@ export function ShortTextSettings({
         <Box flex="1">
           <Select
             options={formatOptions}
-            value={_value}
+            value={_value ?? null}
             onChange={handleFormatChange}
             {...rsProps}
             isSearchable

@@ -5,6 +5,7 @@ import { MaskedInput } from "@parallel/components/common/MaskedInput";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { useFormatPlacehoders } from "@parallel/utils/useFormatPlaceholders";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
@@ -54,6 +55,8 @@ export function RecipientViewPetitionFieldShortText({
   const replyRefs = useMultipleRefs<HTMLInputElement>();
 
   const options = field.options as FieldOptions["SHORT_TEXT"];
+
+  const formatPlaceholder = useFormatPlacehoders(options.format ?? "");
 
   function handleAddNewReply() {
     setShowNewReply(true);
@@ -190,6 +193,7 @@ export function RecipientViewPetitionFieldShortText({
     },
     placeholder:
       options.placeholder ??
+      formatPlaceholder ??
       intl.formatMessage({
         id: "component.recipient-view-petition-field-reply.text-placeholder",
         defaultMessage: "Enter your answer",
@@ -285,6 +289,8 @@ export const RecipientViewPetitionFieldReplyShortText = forwardRef<
 
   const options = field.options as FieldOptions["SHORT_TEXT"];
 
+  const formatPlaceholder = useFormatPlacehoders(options.format ?? "");
+
   const debouncedUpdateReply = useDebouncedCallback(
     async (value: string) => {
       setIsSaving(true);
@@ -339,6 +345,7 @@ export const RecipientViewPetitionFieldReplyShortText = forwardRef<
     },
     placeholder:
       options.placeholder ??
+      formatPlaceholder ??
       intl.formatMessage({
         id: "component.recipient-view-petition-field-reply.text-placeholder",
         defaultMessage: "Enter your answer",

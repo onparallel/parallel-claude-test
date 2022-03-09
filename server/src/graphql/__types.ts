@@ -4079,6 +4079,7 @@ export interface NexusGenArgTypes {
       // args
       data: NexusGenInputs["UpdatePetitionFieldInput"]; // UpdatePetitionFieldInput!
       fieldId: NexusGenScalars["GID"]; // GID!
+      force?: boolean | null; // Boolean
       petitionId: NexusGenScalars["GID"]; // GID!
     };
     updatePetitionFieldComment: {

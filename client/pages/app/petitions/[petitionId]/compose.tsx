@@ -19,6 +19,7 @@ import { PetitionCompletedAlert } from "@parallel/components/petition-common/Pet
 import { PetitionContents } from "@parallel/components/petition-common/PetitionContents";
 import { useSendPetitionHandler } from "@parallel/components/petition-common/useSendPetitionHandler";
 import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeFieldTypeDialog";
+import { useConfirmChangeShortTextFormatDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeShortTextFormatDialog";
 import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/dialogs/ConfirmDeleteFieldDialog";
 import { usePublicTemplateDialog } from "@parallel/components/petition-compose/dialogs/PublicTemplateDialog";
 import { useReferencedFieldDialog } from "@parallel/components/petition-compose/dialogs/ReferencedFieldDialog";
@@ -204,9 +205,11 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
+  const confirmChangeFormat = useConfirmChangeShortTextFormatDialog();
+
   const [updatePetitionField] = useMutation(PetitionCompose_updatePetitionFieldDocument);
   const _handleFieldEdit = useCallback(
-    async function (fieldId: string, data: UpdatePetitionFieldInput) {
+    async function (fieldId: string, data: UpdatePetitionFieldInput, force?: boolean) {
       const { fields } = petitionDataRef.current!;
       if (data.multiple === false) {
         // check no field is referencing with invalid NUMBER_OF_REPLIES condition
@@ -246,9 +249,19 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           }
         }
       }
-      await updatePetitionField({
-        variables: { petitionId, fieldId, data },
-      });
+
+      try {
+        await updatePetitionField({
+          variables: { petitionId, fieldId, data },
+        });
+        return;
+      } catch {}
+      try {
+        await confirmChangeFormat({});
+        await updatePetitionField({
+          variables: { petitionId, fieldId, data, force: true },
+        });
+      } catch {}
     },
     [petitionId]
   );
@@ -693,8 +706,9 @@ PetitionCompose.mutations = [
       $petitionId: GID!
       $fieldId: GID!
       $data: UpdatePetitionFieldInput!
+      $force: Boolean
     ) {
-      updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+      updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data, force: $force) {
         id
         ...PetitionCompose_PetitionField
         petition {

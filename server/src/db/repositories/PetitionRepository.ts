@@ -1215,6 +1215,18 @@ export class PetitionRepository extends BaseRepository {
     }, t);
   }
 
+  async deletePetitionFieldReplies(fieldId: number, user: User, t?: Knex.Transaction) {
+    return await this.from("petition_field_reply", t)
+      .update({
+        deleted_at: this.now(),
+        deleted_by: `User:${user.id}`,
+      })
+      .where({
+        petition_field_id: fieldId,
+        deleted_at: null,
+      });
+  }
+
   async deletePetitionField(petitionId: number, fieldId: number, user: User) {
     return await this.withTransaction(async (t) => {
       const [field] = await this.from("petition_field", t)

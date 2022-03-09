@@ -1466,6 +1466,7 @@ type Mutation {
   updatePetitionField(
     data: UpdatePetitionFieldInput!
     fieldId: GID!
+    force: Boolean = false
     petitionId: GID!
   ): PetitionField!
 

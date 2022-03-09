@@ -1453,6 +1453,7 @@ export interface MutationupdatePetitionArgs {
 export interface MutationupdatePetitionFieldArgs {
   data: UpdatePetitionFieldInput;
   fieldId: Scalars["GID"];
+  force?: InputMaybe<Scalars["Boolean"]>;
   petitionId: Scalars["GID"];
 }
 
@@ -14084,6 +14085,7 @@ export type PetitionCompose_updatePetitionFieldMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   fieldId: Scalars["GID"];
   data: UpdatePetitionFieldInput;
+  force?: InputMaybe<Scalars["Boolean"]>;
 }>;
 
 export type PetitionCompose_updatePetitionFieldMutation = {
@@ -24073,8 +24075,9 @@ export const PetitionCompose_updatePetitionFieldDocument = gql`
     $petitionId: GID!
     $fieldId: GID!
     $data: UpdatePetitionFieldInput!
+    $force: Boolean
   ) {
-    updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+    updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data, force: $force) {
       id
       ...PetitionCompose_PetitionField
       petition {

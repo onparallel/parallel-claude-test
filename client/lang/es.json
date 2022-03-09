@@ -955,6 +955,41 @@
     "context": "Zip file"
   },
   {
+    "term": "component.format-placeholder.cif",
+    "definition": "Ej: B76365789",
+    "context": "E.g., B76365789"
+  },
+  {
+    "term": "component.format-placeholder.dni-nie",
+    "definition": "Ej: 12345678Z",
+    "context": "E.g., 12345678A"
+  },
+  {
+    "term": "component.format-placeholder.iban",
+    "definition": "Ej: ES91 2100 0418 4502 0005 1332",
+    "context": "E.g., GB33 BUKB 2020 1555 5555 55"
+  },
+  {
+    "term": "component.format-placeholder.postal-spain",
+    "definition": "Ej: 08001",
+    "context": "E.g., 08001"
+  },
+  {
+    "term": "component.format-placeholder.postal-usa",
+    "definition": "Ej: 99301",
+    "context": "E.g., 99301"
+  },
+  {
+    "term": "component.format-placeholder.ssn-spain",
+    "definition": "Ej: 08 11621612 13",
+    "context": "E.g., 08 11621612 13"
+  },
+  {
+    "term": "component.format-placeholder.ssn-usa",
+    "definition": "Ej: 504-88-5752",
+    "context": "E.g., 504-88-5752"
+  },
+  {
     "term": "component.generate-new-token-dialog.api-key-label",
     "definition": "Token API",
     "context": "API token"
@@ -5763,6 +5798,21 @@
     "term": "petition.confirm-change-field-type.header",
     "definition": "Cambiar tipo de campo",
     "context": "Change field type"
+  },
+  {
+    "term": "petition.confirm-change-short-text-format.body",
+    "definition": "Este campo contiene respuestas. Si cambias el formato de este campo perderás <b>de forma definitiva</b> estas respuestas.",
+    "context": "This field contains collected replies. If you change the format of this field you will lose those replies <b>forever</b>."
+  },
+  {
+    "term": "petition.confirm-change-short-text-format.confirm",
+    "definition": "Cambiar el formato",
+    "context": "Change format"
+  },
+  {
+    "term": "petition.confirm-change-short-text-format.header",
+    "definition": "Cambiar el tipo de formato",
+    "context": "Change format type"
   },
   {
     "term": "petition.confirm-deactivate-access-message.body",
