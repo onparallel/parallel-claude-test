@@ -4126,7 +4126,7 @@
   },
   {
     "term": "generic.forms.company-email-placeholder",
-    "definition": "ejemplo@companía.com",
+    "definition": "ejemplo@empresa.com",
     "context": "example@company.com"
   },
   {
