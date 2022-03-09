@@ -38,7 +38,7 @@ import {
   PetitionSettings_UserFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
-import { assertTypename, assertTypenameArray } from "@parallel/utils/apollo/assertTypename";
+import { assertTypename, assertTypenameArray } from "@parallel/utils/apollo/typename";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { FORMATS } from "@parallel/utils/dates";
@@ -283,7 +283,6 @@ function _PetitionSettings({
         await showTemplateDefaultPermissionsDialog({
           userId: user.id,
           permissions: petition.defaultPermissions,
-          publicLink: petition.publicLink,
           onUpdatePermissions: async (permissions) => {
             const { data } = await updateTemplateDefaultPermissions({
               variables: { templateId: petition.id, permissions },

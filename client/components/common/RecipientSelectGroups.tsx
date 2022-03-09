@@ -54,7 +54,7 @@ export function RecipientSelectGroups({
   onCreateContact,
 }: RecipientSelectGroupsProps) {
   const intl = useIntl();
-  const recipientGroupSelectRef = useMultipleRefs<ContactSelectInstance>();
+  const recipientGroupSelectRef = useMultipleRefs<ContactSelectInstance<true>>();
   const recipientGroupFormControlRef = useMultipleRefs<HTMLDivElement>();
 
   function handleRecipientsChange(groupNumber: number) {

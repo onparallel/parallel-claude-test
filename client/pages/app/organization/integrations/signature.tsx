@@ -35,7 +35,7 @@ import {
   IntegrationsSignature_userDocument,
 } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
-import { assertTypenameArray } from "@parallel/utils/apollo/assertTypename";
+import { assertTypenameArray } from "@parallel/utils/apollo/typename";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { compose } from "@parallel/utils/compose";
 import { integer, parseQuery, useQueryState, values } from "@parallel/utils/queryState";

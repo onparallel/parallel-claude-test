@@ -12,7 +12,7 @@ import {
   PetitionSignaturesCard_UserFragment,
   SignatureConfigInput,
 } from "@parallel/graphql/__types";
-import { assertTypenameArray } from "@parallel/utils/apollo/assertTypename";
+import { assertTypenameArray } from "@parallel/utils/apollo/typename";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { getPetitionSignatureEnvironment } from "@parallel/utils/getPetitionSignatureEnvironment";
 import { openNewWindow } from "@parallel/utils/openNewWindow";

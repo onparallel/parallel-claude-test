@@ -7,6 +7,14 @@ export function assertTypename<T extends { __typename?: string }, Typename exten
   }
 }
 
+export function isTypename<Typename extends string>(typename: Typename) {
+  return function _isTypename<T extends { __typename?: string }>(
+    value: T
+  ): value is T & { __typename: Typename } {
+    return value.__typename === typename;
+  };
+}
+
 export function assertTypenameArray<
   T extends { __typename?: string },
   Typename extends T["__typename"]

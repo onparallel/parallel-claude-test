@@ -14,10 +14,9 @@ import {
   PetitionPermissionType,
   TemplateDefaultPermissionsDialog_PublicPetitionLinkFragment,
   TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragment,
-  TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment,
-  TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment,
   UserOrUserGroupPermissionInput,
 } from "@parallel/graphql/__types";
+import { isTypename } from "@parallel/utils/apollo/typename";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -60,16 +59,11 @@ export function TemplateDefaultPermissionsDialog({
   });
   const editors = watch("editors");
 
-  const ownerPermission = permissionsList.find((p) => p.permissionType === "OWNER") as
-    | TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment
-    | undefined;
-  const userPermissions = permissionsList.filter(
-    (p) => p.__typename === "TemplateDefaultUserPermission" && p.permissionType !== "OWNER"
-  ) as TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment[];
+  const userPermissions = permissionsList.filter(isTypename("TemplateDefaultUserPermission"));
+  const ownerPermission = userPermissions.find((p) => p.permissionType === "OWNER");
+  const nonOwnerUserPermissions = userPermissions.filter((p) => p.permissionType !== "OWNER");
 
-  const groupPermissions = permissionsList.filter(
-    (p) => p.__typename === "TemplateDefaultUserGroupPermission"
-  ) as TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment[];
+  const groupPermissions = permissionsList.filter(isTypename("TemplateDefaultUserGroupPermission"));
 
   useEffect(() => {
     if (!!ownerPermission || editors.length > 1 || editors[0]?.__typename === "UserGroup") {
@@ -80,20 +74,22 @@ export function TemplateDefaultPermissionsDialog({
   const _handleSearchUsers = useSearchUsers();
   const handleSearchUsers = useCallback(
     async (search: string, excludeUsers: string[], excludeUserGroups: string[]) => {
+      const _excludeUsers = excludeUsers.slice(0);
+      const _excludeUserGroups = excludeUserGroups.slice(0);
+      for (const permission of permissionsList) {
+        if (permission.__typename === "TemplateDefaultUserPermission") {
+          _excludeUsers.push(permission.user.id);
+        } else if (permission.__typename === "TemplateDefaultUserGroupPermission") {
+          _excludeUserGroups.push(permission.group.id);
+        }
+      }
       return await _handleSearchUsers(search, {
-        excludeUsers: [
-          // if there is an active public link, exclude the owner of that link from the search
-          ...(publicLink?.isActive && !!publicLink.owner
-            ? excludeUsers.concat(publicLink.owner.id)
-            : excludeUsers),
-          ...userPermissions.map((p) => p.user.id),
-          ...(ownerPermission ? [ownerPermission.user.id] : []),
-        ],
-        excludeUserGroups: [...excludeUserGroups, ...groupPermissions.map((p) => p.group.id)],
+        excludeUsers: _excludeUsers,
+        excludeUserGroups: _excludeUserGroups,
         includeGroups: true,
       });
     },
-    [_handleSearchUsers, userPermissions.length, groupPermissions.length, ownerPermission?.user.id]
+    [_handleSearchUsers, permissionsList]
   );
 
   function mapPermission(p: TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragment) {
@@ -247,26 +243,24 @@ export function TemplateDefaultPermissionsDialog({
           </Collapse>
           <Stack>
             <TemplateDefaultUserPermissionRow
-              user={ownerPermission?.user}
-              permissionType="OWNER"
+              permission={ownerPermission}
               userId={userId}
               onRemove={() => ownerPermission && handleRemovePermission(ownerPermission.id)}
             />
-            {userPermissions.map((p, key) => (
+            {nonOwnerUserPermissions.map((permission, index) => (
               <TemplateDefaultUserPermissionRow
-                key={key}
-                user={p.user}
-                permissionType={p.permissionType}
+                key={index}
+                permission={permission}
                 userId={userId}
-                onRemove={() => handleRemovePermission(p.id)}
-                onTransfer={() => handleTransferOwnership(p.id)}
+                onRemove={() => handleRemovePermission(permission.id)}
+                onTransfer={() => handleTransferOwnership(permission.id)}
               />
             ))}
-            {groupPermissions.map((p, key) => (
+            {groupPermissions.map((permission, index) => (
               <TemplateDefaultUserGroupPermissionRow
-                key={key}
-                permission={p}
-                onRemove={() => handleRemovePermission(p.id)}
+                key={index}
+                permission={permission}
+                onRemove={() => handleRemovePermission(permission.id)}
               />
             ))}
           </Stack>
@@ -290,12 +284,7 @@ TemplateDefaultPermissionsDialog.fragments = {
   PublicPetitionLink: gql`
     fragment TemplateDefaultPermissionsDialog_PublicPetitionLink on PublicPetitionLink {
       isActive
-      owner {
-        id
-        ...TemplateDefaultUserPermissionRow_User
-      }
     }
-    ${TemplateDefaultUserPermissionRow.fragments.User}
   `,
   TemplateDefaultPermission: gql`
     fragment TemplateDefaultPermissionsDialog_TemplateDefaultPermission on TemplateDefaultPermission {
@@ -303,18 +292,14 @@ TemplateDefaultPermissionsDialog.fragments = {
       isSubscribed
       permissionType
       ... on TemplateDefaultUserPermission {
-        user {
-          ...TemplateDefaultUserPermissionRow_User
-        }
+        ...TemplateDefaultUserPermissionRow_TemplateDefaultUserPermission
       }
       ... on TemplateDefaultUserGroupPermission {
-        group {
-          ...TemplateDefaultUserGroupPermissionRow_UserGroup
-        }
+        ...TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermission
       }
     }
-    ${TemplateDefaultUserPermissionRow.fragments.User}
-    ${TemplateDefaultUserGroupPermissionRow.fragments.UserGroup}
+    ${TemplateDefaultUserPermissionRow.fragments.TemplateDefaultUserPermission}
+    ${TemplateDefaultUserGroupPermissionRow.fragments.TemplateDefaultUserGroupPermission}
   `,
 };
 
