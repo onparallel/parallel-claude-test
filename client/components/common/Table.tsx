@@ -572,22 +572,6 @@ export function DefaultHeader({
             : "none"
           : undefined
       }
-      sx={{
-        ".sort-by-button,.filter-by-button": {
-          opacity: filter || isFilterOpen ? 1 : 0,
-        },
-        "&.sort-active .sort-by-button": {
-          opacity: 1,
-        },
-        "&.filter-active .filter-by-button": {
-          opacity: 1,
-        },
-        "&:hover, &:focus-within": {
-          ".sort-by-button,.filter-by-button": {
-            opacity: 1,
-          },
-        },
-      }}
       {...props}
     >
       <HStack
@@ -601,7 +585,6 @@ export function DefaultHeader({
         {column.isFilterable ? (
           <IconButtonWithTooltip
             ref={filterButtonRef}
-            className="filter-by-button"
             icon={<FilterIcon />}
             label={intl.formatMessage({
               id: "components.table.filter-button",
