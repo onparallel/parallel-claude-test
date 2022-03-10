@@ -608,6 +608,7 @@ type Mutation {
     Last name of the organization owner
     """
     lastName: String!
+    locale: PetitionLocale!
 
     """
     Name of the organization
@@ -742,7 +743,7 @@ type Mutation {
     Last name of the user
     """
     lastName: String!
-    locale: String
+    locale: PetitionLocale!
 
     """
     ID of the organization

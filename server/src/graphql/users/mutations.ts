@@ -159,6 +159,7 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
     locale: stringArg(),
   },
   validateArgs: validateAnd(
+    validLocale((args) => args.locale, "locale"),
     validEmail((args) => args.email, "email"),
     emailIsAvailable((args) => args.email),
     (_, { role }, ctx, info) => {
@@ -400,6 +401,7 @@ export const userSignUp = mutationField("userSignUp", {
   },
   authorize: verifyCaptcha("captcha"),
   validateArgs: validateAnd(
+    validLocale((args) => args.locale, "locale"),
     validPassword((args) => args.password),
     validEmail((args) => args.email, "email"),
     emailIsAvailable((args) => args.email),
@@ -583,12 +585,7 @@ export const setUserPreferredLocale = mutationField("setUserPreferredLocale", {
     locale: nonNull(stringArg()),
   },
   authorize: authenticate(),
-  validateArgs: (_, { locale }, ctx, info) => {
-    // only supported locales
-    if (!["en", "es"].includes(locale)) {
-      throw new ArgValidationError(info, "locale", `Unknown locale ${locale}.`);
-    }
-  },
+  validateArgs: validLocale((args) => args.locale, "locale"),
   resolve: async (_, { locale }, ctx) => {
     const [user] = await ctx.users.updateUserById(
       ctx.user!.id,

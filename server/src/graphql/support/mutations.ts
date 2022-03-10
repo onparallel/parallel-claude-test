@@ -15,6 +15,7 @@ import { emailIsAvailable } from "../helpers/validators/emailIsAvailable";
 import { validateFile } from "../helpers/validators/validateFile";
 import { validateRegex } from "../helpers/validators/validateRegex";
 import { validEmail } from "../helpers/validators/validEmail";
+import { validLocale } from "../helpers/validators/validLocale";
 import { validateHexColor } from "../tag/validators";
 import { supportMethodAccess } from "./authorizers";
 
@@ -27,7 +28,7 @@ async function supportCreateUser(
     firstName: string;
     lastName: string;
     role: UserOrganizationRole;
-    locale?: string;
+    locale: string;
   },
   ctx: ApiContext,
   t?: Knex.Transaction
@@ -130,9 +131,11 @@ export const createOrganization = mutationField("createOrganization", {
     lastName: nonNull(stringArg({ description: "Last name of the organization owner" })),
     email: nonNull(stringArg({ description: "Email of the organization owner" })),
     password: nonNull(stringArg({ description: "Temporary password of the organization owner" })),
+    locale: nonNull("PetitionLocale"),
   },
   authorize: supportMethodAccess(),
   validateArgs: validateAnd(
+    validLocale((args) => args.locale, "locale"),
     validEmail((args) => args.email, "email"),
     emailIsAvailable((args) => args.email),
     (_, { status }, ctx, info) => {
@@ -161,7 +164,7 @@ export const createOrganization = mutationField("createOrganization", {
             lastName: args.lastName,
             password: args.password,
             role: "OWNER",
-            locale: "es",
+            locale: args.locale ?? "es",
           },
           ctx,
           t
@@ -187,9 +190,10 @@ export const createUser = mutationField("createUser", {
     lastName: nonNull(stringArg({ description: "Last name of the user" })),
     role: nonNull(arg({ type: "OrganizationRole", description: "Role of the user" })),
     organizationId: nonNull(intArg({ description: "ID of the organization" })),
-    locale: stringArg(),
+    locale: nonNull("PetitionLocale"),
   },
   validateArgs: validateAnd(
+    validLocale((args) => args.locale, "locale"),
     validEmail((args) => args.email, "email"),
     emailIsAvailable((args) => args.email)
   ),

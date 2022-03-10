@@ -86,6 +86,18 @@ export const supportMethods: {
           deprecationReason: null,
         },
         {
+          name: "locale",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "ENUM", name: "PetitionLocale", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
           name: "name",
           description: "Name of the organization",
           type: {
@@ -176,7 +188,11 @@ export const supportMethods: {
         {
           name: "locale",
           description: null,
-          type: { kind: "SCALAR", name: "String", ofType: null },
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "ENUM", name: "PetitionLocale", ofType: null },
+          },
           defaultValue: null,
           isDeprecated: false,
           deprecationReason: null,
@@ -806,6 +822,20 @@ export const schemaTypes: IntrospectionType[] = [
   },
   {
     kind: "ENUM",
+    name: "PetitionLocale",
+    description: "The locale used for rendering the petition to the contact.",
+    specifiedByURL: null,
+    fields: null,
+    inputFields: null,
+    interfaces: null,
+    enumValues: [
+      { name: "en", description: null, isDeprecated: false, deprecationReason: null },
+      { name: "es", description: null, isDeprecated: false, deprecationReason: null },
+    ],
+    possibleTypes: null,
+  },
+  {
+    kind: "ENUM",
     name: "OrganizationStatus",
     description: "The status of the organization.",
     specifiedByURL: null,
@@ -870,20 +900,6 @@ export const schemaTypes: IntrospectionType[] = [
       { name: "Organization", description: null, isDeprecated: false, deprecationReason: null },
       { name: "Petition", description: null, isDeprecated: false, deprecationReason: null },
       { name: "User", description: null, isDeprecated: false, deprecationReason: null },
-    ],
-    possibleTypes: null,
-  },
-  {
-    kind: "ENUM",
-    name: "PetitionLocale",
-    description: "The locale used for rendering the petition to the contact.",
-    specifiedByURL: null,
-    fields: null,
-    inputFields: null,
-    interfaces: null,
-    enumValues: [
-      { name: "en", description: null, isDeprecated: false, deprecationReason: null },
-      { name: "es", description: null, isDeprecated: false, deprecationReason: null },
     ],
     possibleTypes: null,
   },

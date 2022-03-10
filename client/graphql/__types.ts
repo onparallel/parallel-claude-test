@@ -850,6 +850,7 @@ export interface MutationcreateOrganizationArgs {
   email: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
+  locale: PetitionLocale;
   name: Scalars["String"];
   password: Scalars["String"];
   status: OrganizationStatus;
@@ -934,7 +935,7 @@ export interface MutationcreateUserArgs {
   email: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
-  locale?: InputMaybe<Scalars["String"]>;
+  locale: PetitionLocale;
   organizationId: Scalars["Int"];
   password: Scalars["String"];
   role: OrganizationRole;

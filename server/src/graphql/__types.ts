@@ -3482,6 +3482,7 @@ export interface NexusGenArgTypes {
       email: string; // String!
       firstName: string; // String!
       lastName: string; // String!
+      locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
       name: string; // String!
       password: string; // String!
       status: NexusGenEnums["OrganizationStatus"]; // OrganizationStatus!
@@ -3566,7 +3567,7 @@ export interface NexusGenArgTypes {
       email: string; // String!
       firstName: string; // String!
       lastName: string; // String!
-      locale?: string | null; // String
+      locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
       organizationId: number; // Int!
       password: string; // String!
       role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
