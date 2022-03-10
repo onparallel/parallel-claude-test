@@ -32,8 +32,8 @@ import {
   NewPetitionSharedFilter,
   NewPetitionSharedFilterValues,
 } from "@parallel/components/petition-new/NewPetitionSharedFilter";
-import { NewPetitionTemplatesList } from "@parallel/components/petition-new/NewPetitionTemplatesList";
-import { PublishedTemplateCard } from "@parallel/components/petition-new/PublishedTemplateCard";
+import { GridInfiniteScrollList } from "@parallel/components/petition-new/GridInfiniteScrollList";
+import { PublicTemplateCard } from "@parallel/components/petition-new/PublicTemplateCard";
 import { TemplateCard } from "@parallel/components/petition-new/TemplateCard";
 import {
   NewPetition_templateDocument,
@@ -321,7 +321,7 @@ function NewPetition() {
                 </Stack>
               </Stack>
               {templates.length > 0 ? (
-                <NewPetitionTemplatesList
+                <GridInfiniteScrollList
                   items={templates}
                   onLoadMore={handleLoadMore}
                   hasMore={hasMore}
@@ -337,7 +337,7 @@ function NewPetition() {
                       />
                     );
                   }}
-                </NewPetitionTemplatesList>
+                </GridInfiniteScrollList>
               ) : hasTemplates ? (
                 <NewPetitionEmptySearch
                   flex="1"
@@ -397,14 +397,14 @@ function NewPetition() {
                 />
               </Grid>
               {templates.length > 0 ? (
-                <NewPetitionTemplatesList
+                <GridInfiniteScrollList
                   items={templates}
                   onLoadMore={handleLoadMore}
                   hasMore={hasMore}
                 >
                   {(template, i) => {
                     return (
-                      <PublishedTemplateCard
+                      <PublicTemplateCard
                         data-template-id={template.id}
                         data-template-first={i === 0 ? "" : undefined}
                         key={template.id}
@@ -413,7 +413,7 @@ function NewPetition() {
                       />
                     );
                   }}
-                </NewPetitionTemplatesList>
+                </GridInfiniteScrollList>
               ) : (
                 <NewPetitionEmptySearch
                   flex="1"
@@ -441,10 +441,10 @@ NewPetition.fragments = {
   PetitionTemplate: gql`
     fragment NewPetition_PetitionTemplate on PetitionTemplate {
       ...TemplateCard_PetitionTemplate
-      ...PublishedTemplateCard_PetitionTemplate
+      ...PublicTemplateCard_PetitionTemplate
     }
     ${TemplateCard.fragments.PetitionTemplate}
-    ${PublishedTemplateCard.fragments.PetitionTemplate}
+    ${PublicTemplateCard.fragments.PetitionTemplate}
   `,
   User: gql`
     fragment NewPetition_User on User {

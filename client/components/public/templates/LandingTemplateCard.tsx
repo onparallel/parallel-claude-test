@@ -1,15 +1,15 @@
 import { gql } from "@apollo/client";
 import { Center, Image, LinkBox, LinkOverlay, Stack, Text } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
-import { PublicTemplateCard_LandingTemplateFragment } from "@parallel/graphql/__types";
+import { LandingTemplateCard_LandingTemplateFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Card } from "../../common/Card";
 
-export interface PublicTemplateCardProps {
-  template: PublicTemplateCard_LandingTemplateFragment;
+export interface LandingTemplateCardProps {
+  template: LandingTemplateCard_LandingTemplateFragment;
 }
 
-export function PublicTemplateCard({ template }: PublicTemplateCardProps) {
+export function LandingTemplateCard({ template }: LandingTemplateCardProps) {
   const intl = useIntl();
 
   const { name, slug, locale, imageUrl, backgroundColor, ownerFullName, organizationName } =
@@ -71,9 +71,9 @@ export function PublicTemplateCard({ template }: PublicTemplateCardProps) {
   );
 }
 
-PublicTemplateCard.fragments = {
+LandingTemplateCard.fragments = {
   LandingTemplate: gql`
-    fragment PublicTemplateCard_LandingTemplate on LandingTemplate {
+    fragment LandingTemplateCard_LandingTemplate on LandingTemplate {
       id
       locale
       name

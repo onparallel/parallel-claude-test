@@ -19,13 +19,13 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { UserAvatar } from "@parallel/components/common/UserAvatar";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
-import { PublicTemplateCard } from "@parallel/components/public/templates/PublicTemplateCard";
+import { LandingTemplateCard } from "@parallel/components/public/templates/LandingTemplateCard";
 import {
   LandingTemplateDetails_landingTemplateBySlugDocument,
   LandingTemplateDetails_LandingTemplateFragment,
   LandingTemplateDetails_landingTemplatesDocument,
   PetitionLocale,
-  PublicTemplateCard_LandingTemplateFragment,
+  LandingTemplateCard_LandingTemplateFragment,
 } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { FORMATS } from "@parallel/utils/dates";
@@ -336,7 +336,7 @@ function LandingTemplateDetails({
                 .filter((t) => t.slug !== slug)
                 .slice(0, 3)
                 .map((t) => (
-                  <PublicTemplateCard key={t.id} template={t} />
+                  <LandingTemplateCard key={t.id} template={t} />
                 ))}
             </Grid>
           </Stack>
@@ -392,18 +392,18 @@ LandingTemplateDetails.queries = [
     ) {
       landingTemplates(offset: $offset, limit: $limit, locale: $locale, categories: $categories) {
         items {
-          ...PublicTemplateCard_LandingTemplate
+          ...LandingTemplateCard_LandingTemplate
         }
         totalCount
       }
     }
-    ${PublicTemplateCard.fragments.LandingTemplate}
+    ${LandingTemplateCard.fragments.LandingTemplate}
   `,
 ];
 
 export const getServerSideProps: GetServerSideProps<{
   template: LandingTemplateDetails_LandingTemplateFragment;
-  relatedTemplates: PublicTemplateCard_LandingTemplateFragment[];
+  relatedTemplates: LandingTemplateCard_LandingTemplateFragment[];
 }> = async function getServerSideProps({ req, ...ctx }) {
   const slug = ctx.query.template as string;
   const locale = ctx.locale as PetitionLocale;

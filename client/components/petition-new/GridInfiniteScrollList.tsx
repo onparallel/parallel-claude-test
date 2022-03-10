@@ -2,19 +2,19 @@ import { Center, Grid, Spinner } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
-interface NewPetitionTemplatesListProps<T> {
+interface GridInfiniteScrollListProps<T> {
   items: T[];
   onLoadMore: () => void;
   hasMore: boolean;
   children: (item: T, index: number) => ReactNode;
 }
 
-export function NewPetitionTemplatesList<T>({
+export function GridInfiniteScrollList<T>({
   items,
   onLoadMore,
   hasMore,
   children,
-}: NewPetitionTemplatesListProps<T>) {
+}: GridInfiniteScrollListProps<T>) {
   return (
     <InfiniteScroll
       dataLength={items.length}

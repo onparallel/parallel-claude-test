@@ -1,13 +1,12 @@
 import {
   List,
+  ListItem,
   Popover,
   PopoverArrow,
   PopoverBody,
   PopoverContent,
   PopoverTrigger,
   Portal,
-  Stack,
-  Text,
 } from "@chakra-ui/react";
 import { ReactNode } from "react";
 
@@ -23,11 +22,11 @@ export function StringListPopover({ items, children }: { items: string[]; childr
         <PopoverContent width="fit-content">
           <PopoverArrow />
           <PopoverBody padding={2} overflow="auto" maxHeight="300px">
-            <Stack as={List} fontSize="sm">
+            <List fontSize="sm">
               {items.map((item, i) => (
-                <Text key={i}>{item}</Text>
+                <ListItem key={i}>{item}</ListItem>
               ))}
-            </Stack>
+            </List>
           </PopoverBody>
         </PopoverContent>
       </Portal>

@@ -3,7 +3,7 @@ import { Button, Flex, Grid, Heading, Stack } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
-import { PublicTemplateCard } from "@parallel/components/public/templates/PublicTemplateCard";
+import { LandingTemplateCard } from "@parallel/components/public/templates/LandingTemplateCard";
 import { PublicTemplatesContainer } from "@parallel/components/public/templates/PublicTemplatesContainer";
 import { PublicTemplatesHero } from "@parallel/components/public/templates/PublicTemplatesHero";
 import {
@@ -11,7 +11,7 @@ import {
   LandingTemplatesCategory_landingTemplatesDocument,
   LandintTemplatesCategory_LandingTemplateCategorySampleFragment,
   PetitionLocale,
-  PublicTemplateCard_LandingTemplateFragment,
+  LandingTemplateCard_LandingTemplateFragment,
 } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
@@ -74,7 +74,7 @@ function LandingTemplatesCategory({
             gap={6}
           >
             {templates.map((t) => (
-              <PublicTemplateCard key={t.id} template={t} />
+              <LandingTemplateCard key={t.id} template={t} />
             ))}
           </Grid>
         </Stack>
@@ -136,11 +136,11 @@ LandingTemplatesCategory.queries = [
       landingTemplates(offset: $offset, limit: $limit, categories: [$category], locale: $locale) {
         totalCount
         items {
-          ...PublicTemplateCard_LandingTemplate
+          ...LandingTemplateCard_LandingTemplate
         }
       }
     }
-    ${PublicTemplateCard.fragments.LandingTemplate}
+    ${LandingTemplateCard.fragments.LandingTemplate}
   `,
   gql`
     query LandingTemplatesCategory_categorySamples($locale: PetitionLocale!) {
@@ -155,7 +155,7 @@ LandingTemplatesCategory.queries = [
 export const getServerSideProps: GetServerSideProps<{
   category: string;
   samples: LandintTemplatesCategory_LandingTemplateCategorySampleFragment[];
-  templates: PublicTemplateCard_LandingTemplateFragment[];
+  templates: LandingTemplateCard_LandingTemplateFragment[];
 }> = async function getServerSideProps({ req, ...ctx }) {
   const client = createApolloClient({}, { req });
   const category = ctx.query.category as string;

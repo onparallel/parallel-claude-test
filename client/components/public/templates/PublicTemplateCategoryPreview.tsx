@@ -1,16 +1,16 @@
 import { Button, Flex, Grid, GridItem, Heading } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
-import { PublicTemplateCard_LandingTemplateFragment } from "@parallel/graphql/__types";
+import { LandingTemplateCard_LandingTemplateFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { PublicTemplateCategory } from "../../../utils/usePublicTemplateCategories";
-import { PublicTemplateCard } from "./PublicTemplateCard";
+import { LandingTemplateCard } from "./LandingTemplateCard";
 
 export function PublicTemplateCategoryPreview({
   category,
   templates,
 }: {
   category: PublicTemplateCategory;
-  templates: PublicTemplateCard_LandingTemplateFragment[];
+  templates: LandingTemplateCard_LandingTemplateFragment[];
 }) {
   const { label, slug } = category;
 
@@ -52,7 +52,7 @@ export function PublicTemplateCategoryPreview({
           gap={6}
         >
           {templates.map((t) => (
-            <PublicTemplateCard key={t.id} template={t} />
+            <LandingTemplateCard key={t.id} template={t} />
           ))}
         </Grid>
       </GridItem>

@@ -3,7 +3,7 @@ import { Button, Flex, Heading } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
-import { PublicTemplateCard } from "@parallel/components/public/templates/PublicTemplateCard";
+import { LandingTemplateCard } from "@parallel/components/public/templates/LandingTemplateCard";
 import { PublicTemplateCategoryPreview } from "@parallel/components/public/templates/PublicTemplateCategoryPreview";
 import { PublicTemplatesContainer } from "@parallel/components/public/templates/PublicTemplatesContainer";
 import { PublicTemplatesHero } from "@parallel/components/public/templates/PublicTemplatesHero";
@@ -91,13 +91,13 @@ Templates.queries = [
         category
         templates(offset: $offset, limit: $limit, locale: $locale) {
           items {
-            ...PublicTemplateCard_LandingTemplate
+            ...LandingTemplateCard_LandingTemplate
           }
           totalCount
         }
       }
     }
-    ${PublicTemplateCard.fragments.LandingTemplate}
+    ${LandingTemplateCard.fragments.LandingTemplate}
   `,
 ];
 

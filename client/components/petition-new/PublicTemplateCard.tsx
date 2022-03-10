@@ -15,20 +15,20 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { LocaleBadge } from "@parallel/components/common/LocaleBadge";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { PublishedTemplateCard_PetitionTemplateFragment } from "@parallel/graphql/__types";
+import { PublicTemplateCard_PetitionTemplateFragment } from "@parallel/graphql/__types";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
 import { useRoleButton } from "@parallel/utils/useRoleButton";
 import { FormattedMessage, useIntl } from "react-intl";
 import { StringListPopover } from "../common/StringListPopover";
 import { UserAvatarList } from "../common/UserAvatarList";
 
-export interface PublishedTemplateCardProps {
-  template: PublishedTemplateCard_PetitionTemplateFragment;
+export interface PublicTemplateCardProps {
+  template: PublicTemplateCard_PetitionTemplateFragment;
   onPress: () => void;
 }
 
-export const PublishedTemplateCard = Object.assign(
-  chakraForwardRef<"div", PublishedTemplateCardProps>(function TemplateCard(
+export const PublicTemplateCard = Object.assign(
+  chakraForwardRef<"div", PublicTemplateCardProps>(function TemplateCard(
     { template, onPress, ...props },
     ref
   ) {
@@ -174,7 +174,7 @@ export const PublishedTemplateCard = Object.assign(
   {
     fragments: {
       PetitionTemplate: gql`
-        fragment PublishedTemplateCard_PetitionTemplate on PetitionTemplate {
+        fragment PublicTemplateCard_PetitionTemplate on PetitionTemplate {
           id
           name
           descriptionExcerpt

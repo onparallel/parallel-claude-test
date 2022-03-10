@@ -8046,7 +8046,7 @@ export type PetitionListTagFilter_tagsQuery = {
   };
 };
 
-export type PublishedTemplateCard_PetitionTemplateFragment = {
+export type PublicTemplateCard_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
   name?: string | null;
@@ -9077,7 +9077,7 @@ export type PublicSignupForm_emailIsAvailableQueryVariables = Exact<{
 
 export type PublicSignupForm_emailIsAvailableQuery = { emailIsAvailable: boolean };
 
-export type PublicTemplateCard_LandingTemplateFragment = {
+export type LandingTemplateCard_LandingTemplateFragment = {
   __typename?: "LandingTemplate";
   id: string;
   locale: PetitionLocale;
@@ -19188,8 +19188,8 @@ export const ExportRepliesProgressDialog_PetitionFragmentDoc = gql`
   ${useFilenamePlaceholdersRename_PetitionFieldFragmentDoc}
   ${useFilenamePlaceholdersRename_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<ExportRepliesProgressDialog_PetitionFragment, unknown>;
-export const PublicTemplateCard_LandingTemplateFragmentDoc = gql`
-  fragment PublicTemplateCard_LandingTemplate on LandingTemplate {
+export const LandingTemplateCard_LandingTemplateFragmentDoc = gql`
+  fragment LandingTemplateCard_LandingTemplate on LandingTemplate {
     id
     locale
     name
@@ -19199,7 +19199,7 @@ export const PublicTemplateCard_LandingTemplateFragmentDoc = gql`
     ownerFullName
     organizationName
   }
-` as unknown as DocumentNode<PublicTemplateCard_LandingTemplateFragment, unknown>;
+` as unknown as DocumentNode<LandingTemplateCard_LandingTemplateFragment, unknown>;
 export const RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc = gql`
   fragment RecipientViewPetitionField_PublicPetitionFieldReply on PublicPetitionFieldReply {
     content
@@ -21598,8 +21598,8 @@ export const TemplateCard_PetitionTemplateFragmentDoc = gql`
   ${UserAvatarList_UserFragmentDoc}
   ${UserAvatarList_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<TemplateCard_PetitionTemplateFragment, unknown>;
-export const PublishedTemplateCard_PetitionTemplateFragmentDoc = gql`
-  fragment PublishedTemplateCard_PetitionTemplate on PetitionTemplate {
+export const PublicTemplateCard_PetitionTemplateFragmentDoc = gql`
+  fragment PublicTemplateCard_PetitionTemplate on PetitionTemplate {
     id
     name
     descriptionExcerpt
@@ -21619,14 +21619,14 @@ export const PublishedTemplateCard_PetitionTemplateFragmentDoc = gql`
       time
     }
   }
-` as unknown as DocumentNode<PublishedTemplateCard_PetitionTemplateFragment, unknown>;
+` as unknown as DocumentNode<PublicTemplateCard_PetitionTemplateFragment, unknown>;
 export const NewPetition_PetitionTemplateFragmentDoc = gql`
   fragment NewPetition_PetitionTemplate on PetitionTemplate {
     ...TemplateCard_PetitionTemplate
-    ...PublishedTemplateCard_PetitionTemplate
+    ...PublicTemplateCard_PetitionTemplate
   }
   ${TemplateCard_PetitionTemplateFragmentDoc}
-  ${PublishedTemplateCard_PetitionTemplateFragmentDoc}
+  ${PublicTemplateCard_PetitionTemplateFragmentDoc}
 ` as unknown as DocumentNode<NewPetition_PetitionTemplateFragment, unknown>;
 export const TemplateDetailsModal_UserFragmentDoc = gql`
   fragment TemplateDetailsModal_User on User {
@@ -24836,12 +24836,12 @@ export const LandingTemplateDetails_landingTemplatesDocument = gql`
   ) {
     landingTemplates(offset: $offset, limit: $limit, locale: $locale, categories: $categories) {
       items {
-        ...PublicTemplateCard_LandingTemplate
+        ...LandingTemplateCard_LandingTemplate
       }
       totalCount
     }
   }
-  ${PublicTemplateCard_LandingTemplateFragmentDoc}
+  ${LandingTemplateCard_LandingTemplateFragmentDoc}
 ` as unknown as DocumentNode<
   LandingTemplateDetails_landingTemplatesQuery,
   LandingTemplateDetails_landingTemplatesQueryVariables
@@ -24856,11 +24856,11 @@ export const LandingTemplatesCategory_landingTemplatesDocument = gql`
     landingTemplates(offset: $offset, limit: $limit, categories: [$category], locale: $locale) {
       totalCount
       items {
-        ...PublicTemplateCard_LandingTemplate
+        ...LandingTemplateCard_LandingTemplate
       }
     }
   }
-  ${PublicTemplateCard_LandingTemplateFragmentDoc}
+  ${LandingTemplateCard_LandingTemplateFragmentDoc}
 ` as unknown as DocumentNode<
   LandingTemplatesCategory_landingTemplatesQuery,
   LandingTemplatesCategory_landingTemplatesQueryVariables
@@ -24882,13 +24882,13 @@ export const LandingTemplates_categorySamplesDocument = gql`
       category
       templates(offset: $offset, limit: $limit, locale: $locale) {
         items {
-          ...PublicTemplateCard_LandingTemplate
+          ...LandingTemplateCard_LandingTemplate
         }
         totalCount
       }
     }
   }
-  ${PublicTemplateCard_LandingTemplateFragmentDoc}
+  ${LandingTemplateCard_LandingTemplateFragmentDoc}
 ` as unknown as DocumentNode<
   LandingTemplates_categorySamplesQuery,
   LandingTemplates_categorySamplesQueryVariables
