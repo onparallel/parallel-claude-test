@@ -3266,8 +3266,23 @@
   },
   {
     "term": "component.template-card.active-link",
-    "definition": "Enabled link",
-    "context": "Enabled link"
+    "definition": "Link activated",
+    "context": "Link activated"
+  },
+  {
+    "term": "component.template-card.automatic-reminders-active",
+    "definition": "Automatic reminders activated",
+    "context": "Automatic reminders activated"
+  },
+  {
+    "term": "component.template-card.esignature-active",
+    "definition": "eSignature activated",
+    "context": "eSignature activated"
+  },
+  {
+    "term": "component.template-card.restricted-edition",
+    "definition": "Restricted edition",
+    "context": "Restricted edition"
   },
   {
     "term": "component.template-default-permissions-dialog.description",
@@ -3893,11 +3908,6 @@
     "term": "generic.before",
     "definition": "Before",
     "context": "Before"
-  },
-  {
-    "term": "generic.by",
-    "definition": "by {name}",
-    "context": "by {name}"
   },
   {
     "term": "generic.cancel",

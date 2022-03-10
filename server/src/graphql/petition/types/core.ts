@@ -316,6 +316,21 @@ export const PetitionTemplate = objectType({
         return await ctx.petitions.loadTemplateDefaultPermissions(root.id);
       },
     });
+    t.nullable.string("backgroundColor", {
+      resolve: (o) => o.public_metadata?.background_color,
+    });
+    t.nullable.list.nonNull.string("categories", {
+      resolve: (o) => o.public_metadata?.categories,
+    });
+    t.nullable.string("imageUrl", {
+      resolve: async (o, _, ctx) => {
+        if (o.public_metadata?.image_public_file_id) {
+          const file = await ctx.files.loadPublicFile(o.public_metadata.image_public_file_id);
+          return `${ctx.config.misc.uploadsUrl}/${file!.path}`;
+        }
+        return null;
+      },
+    });
   },
   sourceType: "db.Petition",
 });

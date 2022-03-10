@@ -2409,6 +2409,8 @@ export interface PetitionTemplate extends PetitionBase {
   __typename?: "PetitionTemplate";
   /** The attachments linked to this petition */
   attachments: Array<PetitionAttachment>;
+  backgroundColor?: Maybe<Scalars["String"]>;
+  categories?: Maybe<Array<Scalars["String"]>>;
   /** The closing email body of the petition. */
   closingEmailBody?: Maybe<Scalars["JSON"]>;
   /** Time when the resource was created. */
@@ -2432,6 +2434,7 @@ export interface PetitionTemplate extends PetitionBase {
   fields: Array<PetitionField>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
+  imageUrl?: Maybe<Scalars["String"]>;
   /** Whether the template is publicly available or not */
   isPublic: Scalars["Boolean"];
   /**
@@ -8043,36 +8046,46 @@ export type PetitionListTagFilter_tagsQuery = {
   };
 };
 
-export type NewPetitionTemplatesList_PetitionTemplateFragment = {
+export type PublishedTemplateCard_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
   name?: string | null;
   descriptionExcerpt?: string | null;
   locale: PetitionLocale;
-  owner: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    avatarUrl?: string | null;
-    initials?: string | null;
-  };
+  isRestricted: boolean;
+  backgroundColor?: string | null;
+  categories?: Array<string> | null;
+  imageUrl?: string | null;
+  signatureConfig?: { __typename?: "SignatureConfig"; title: string } | null;
   publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
+  remindersConfig?: { __typename?: "RemindersConfig"; time: string } | null;
 };
 
 export type TemplateCard_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
   name?: string | null;
-  descriptionExcerpt?: string | null;
   locale: PetitionLocale;
-  owner: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    avatarUrl?: string | null;
-    initials?: string | null;
-  };
+  isRestricted: boolean;
+  permissions: Array<
+    | {
+        __typename?: "PetitionUserGroupPermission";
+        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+      }
+    | {
+        __typename?: "PetitionUserPermission";
+        user: {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null;
+          avatarUrl?: string | null;
+          initials?: string | null;
+        };
+      }
+  >;
+  signatureConfig?: { __typename?: "SignatureConfig"; title: string } | null;
   publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
+  remindersConfig?: { __typename?: "RemindersConfig"; time: string } | null;
 };
 
 export type PreviewPetitionField_PetitionFieldFragment = {
@@ -16626,16 +16639,31 @@ export type NewPetition_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
   name?: string | null;
-  descriptionExcerpt?: string | null;
   locale: PetitionLocale;
-  owner: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    avatarUrl?: string | null;
-    initials?: string | null;
-  };
+  isRestricted: boolean;
+  descriptionExcerpt?: string | null;
+  backgroundColor?: string | null;
+  categories?: Array<string> | null;
+  imageUrl?: string | null;
+  permissions: Array<
+    | {
+        __typename?: "PetitionUserGroupPermission";
+        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+      }
+    | {
+        __typename?: "PetitionUserPermission";
+        user: {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null;
+          avatarUrl?: string | null;
+          initials?: string | null;
+        };
+      }
+  >;
+  signatureConfig?: { __typename?: "SignatureConfig"; title: string } | null;
   publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
+  remindersConfig?: { __typename?: "RemindersConfig"; time: string } | null;
 };
 
 export type NewPetition_UserFragment = {
@@ -16679,16 +16707,31 @@ export type NewPetition_templatesQuery = {
       __typename?: "PetitionTemplate";
       id: string;
       name?: string | null;
-      descriptionExcerpt?: string | null;
       locale: PetitionLocale;
-      owner: {
-        __typename?: "User";
-        id: string;
-        fullName?: string | null;
-        avatarUrl?: string | null;
-        initials?: string | null;
-      };
+      isRestricted: boolean;
+      descriptionExcerpt?: string | null;
+      backgroundColor?: string | null;
+      categories?: Array<string> | null;
+      imageUrl?: string | null;
+      permissions: Array<
+        | {
+            __typename?: "PetitionUserGroupPermission";
+            group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+          }
+        | {
+            __typename?: "PetitionUserPermission";
+            user: {
+              __typename?: "User";
+              id: string;
+              fullName?: string | null;
+              avatarUrl?: string | null;
+              initials?: string | null;
+            };
+          }
+      >;
+      signatureConfig?: { __typename?: "SignatureConfig"; title: string } | null;
       publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
+      remindersConfig?: { __typename?: "RemindersConfig"; time: string } | null;
     }>;
   };
 };
@@ -21527,32 +21570,63 @@ export const TemplateCard_PetitionTemplateFragmentDoc = gql`
   fragment TemplateCard_PetitionTemplate on PetitionTemplate {
     id
     name
-    descriptionExcerpt
     locale
-    owner {
-      id
-      fullName
-      ...UserAvatar_User
+    isRestricted
+    permissions {
+      ... on PetitionUserPermission {
+        user {
+          ...UserAvatarList_User
+        }
+      }
+      ... on PetitionUserGroupPermission {
+        group {
+          ...UserAvatarList_UserGroup
+        }
+      }
+    }
+    signatureConfig {
+      title
     }
     publicLink {
       id
       isActive
     }
+    remindersConfig {
+      time
+    }
   }
-  ${UserAvatar_UserFragmentDoc}
+  ${UserAvatarList_UserFragmentDoc}
+  ${UserAvatarList_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<TemplateCard_PetitionTemplateFragment, unknown>;
-export const NewPetitionTemplatesList_PetitionTemplateFragmentDoc = gql`
-  fragment NewPetitionTemplatesList_PetitionTemplate on PetitionTemplate {
+export const PublishedTemplateCard_PetitionTemplateFragmentDoc = gql`
+  fragment PublishedTemplateCard_PetitionTemplate on PetitionTemplate {
     id
-    ...TemplateCard_PetitionTemplate
+    name
+    descriptionExcerpt
+    locale
+    isRestricted
+    backgroundColor
+    categories
+    imageUrl
+    signatureConfig {
+      title
+    }
+    publicLink {
+      id
+      isActive
+    }
+    remindersConfig {
+      time
+    }
   }
-  ${TemplateCard_PetitionTemplateFragmentDoc}
-` as unknown as DocumentNode<NewPetitionTemplatesList_PetitionTemplateFragment, unknown>;
+` as unknown as DocumentNode<PublishedTemplateCard_PetitionTemplateFragment, unknown>;
 export const NewPetition_PetitionTemplateFragmentDoc = gql`
   fragment NewPetition_PetitionTemplate on PetitionTemplate {
-    ...NewPetitionTemplatesList_PetitionTemplate
+    ...TemplateCard_PetitionTemplate
+    ...PublishedTemplateCard_PetitionTemplate
   }
-  ${NewPetitionTemplatesList_PetitionTemplateFragmentDoc}
+  ${TemplateCard_PetitionTemplateFragmentDoc}
+  ${PublishedTemplateCard_PetitionTemplateFragmentDoc}
 ` as unknown as DocumentNode<NewPetition_PetitionTemplateFragment, unknown>;
 export const TemplateDetailsModal_UserFragmentDoc = gql`
   fragment TemplateDetailsModal_User on User {

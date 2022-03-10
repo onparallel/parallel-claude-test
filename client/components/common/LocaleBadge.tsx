@@ -13,6 +13,7 @@ export const LocaleBadge = chakraForwardRef<"abbr", { locale: PetitionLocale }>(
           ref={ref}
           as="abbr"
           title={localeLabel}
+          fontWeight="normal"
           cursor="default"
           sx={{ "&[title]": { textDecoration: "none" } }}
           {...props}

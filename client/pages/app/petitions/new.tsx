@@ -33,6 +33,8 @@ import {
   NewPetitionSharedFilterValues,
 } from "@parallel/components/petition-new/NewPetitionSharedFilter";
 import { NewPetitionTemplatesList } from "@parallel/components/petition-new/NewPetitionTemplatesList";
+import { PublishedTemplateCard } from "@parallel/components/petition-new/PublishedTemplateCard";
+import { TemplateCard } from "@parallel/components/petition-new/TemplateCard";
 import {
   NewPetition_templateDocument,
   NewPetition_templatesDocument,
@@ -323,8 +325,19 @@ function NewPetition() {
                   items={templates}
                   onLoadMore={handleLoadMore}
                   hasMore={hasMore}
-                  onClickTemplate={handleTemplateClick}
-                />
+                >
+                  {(template, i) => {
+                    return (
+                      <TemplateCard
+                        data-template-id={template.id}
+                        data-template-first={i === 0 ? "" : undefined}
+                        key={template.id}
+                        template={template}
+                        onPress={() => handleTemplateClick(template.id)}
+                      />
+                    );
+                  }}
+                </NewPetitionTemplatesList>
               ) : hasTemplates ? (
                 <NewPetitionEmptySearch
                   flex="1"
@@ -388,8 +401,19 @@ function NewPetition() {
                   items={templates}
                   onLoadMore={handleLoadMore}
                   hasMore={hasMore}
-                  onClickTemplate={handleTemplateClick}
-                />
+                >
+                  {(template, i) => {
+                    return (
+                      <PublishedTemplateCard
+                        data-template-id={template.id}
+                        data-template-first={i === 0 ? "" : undefined}
+                        key={template.id}
+                        template={template}
+                        onPress={() => handleTemplateClick(template.id)}
+                      />
+                    );
+                  }}
+                </NewPetitionTemplatesList>
               ) : (
                 <NewPetitionEmptySearch
                   flex="1"
@@ -416,9 +440,11 @@ function NewPetition() {
 NewPetition.fragments = {
   PetitionTemplate: gql`
     fragment NewPetition_PetitionTemplate on PetitionTemplate {
-      ...NewPetitionTemplatesList_PetitionTemplate
+      ...TemplateCard_PetitionTemplate
+      ...PublishedTemplateCard_PetitionTemplate
     }
-    ${NewPetitionTemplatesList.fragments.PetitionTemplate}
+    ${TemplateCard.fragments.PetitionTemplate}
+    ${PublishedTemplateCard.fragments.PetitionTemplate}
   `,
   User: gql`
     fragment NewPetition_User on User {

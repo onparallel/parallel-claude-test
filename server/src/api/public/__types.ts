@@ -2337,6 +2337,8 @@ export type PetitionStatus =
 export type PetitionTemplate = PetitionBase & {
   /** The attachments linked to this petition */
   attachments: Array<PetitionAttachment>;
+  backgroundColor: Maybe<Scalars["String"]>;
+  categories: Maybe<Array<Scalars["String"]>>;
   /** The closing email body of the petition. */
   closingEmailBody: Maybe<Scalars["JSON"]>;
   /** Time when the resource was created. */
@@ -2360,6 +2362,7 @@ export type PetitionTemplate = PetitionBase & {
   fields: Array<PetitionField>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
+  imageUrl: Maybe<Scalars["String"]>;
   /** Whether the template is publicly available or not */
   isPublic: Scalars["Boolean"];
   /**

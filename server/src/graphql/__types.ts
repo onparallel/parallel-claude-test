@@ -1374,6 +1374,8 @@ export interface NexusGenFieldTypes {
   PetitionTemplate: {
     // field return type
     attachments: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
+    backgroundColor: string | null; // String
+    categories: string[] | null; // [String!]
     closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
@@ -1386,6 +1388,7 @@ export interface NexusGenFieldTypes {
     fieldCount: number; // Int!
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     id: NexusGenScalars["GID"]; // GID!
+    imageUrl: string | null; // String
     isPublic: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     isRestricted: boolean; // Boolean!
@@ -2713,6 +2716,8 @@ export interface NexusGenFieldTypeNames {
   PetitionTemplate: {
     // field return type name
     attachments: "PetitionAttachment";
+    backgroundColor: "String";
+    categories: "String";
     closingEmailBody: "JSON";
     createdAt: "DateTime";
     customProperties: "JSONObject";
@@ -2725,6 +2730,7 @@ export interface NexusGenFieldTypeNames {
     fieldCount: "Int";
     fields: "PetitionField";
     id: "GID";
+    imageUrl: "String";
     isPublic: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
     isRestricted: "Boolean";

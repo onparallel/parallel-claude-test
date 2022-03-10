@@ -33,6 +33,7 @@ export const UserAvatarList = Object.assign(
         flexDirection="row-reverse"
         justifyContent="flex-end"
         alignItems="center"
+        minWidth="26px"
       >
         {excess && (
           <UserListPopover usersOrGroups={usersOrGroups}>

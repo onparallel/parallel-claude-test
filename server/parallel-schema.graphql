@@ -3061,6 +3061,8 @@ type PetitionTemplate implements PetitionBase {
   The attachments linked to this petition
   """
   attachments: [PetitionAttachment!]!
+  backgroundColor: String
+  categories: [String!]
 
   """
   The closing email body of the petition.
@@ -3117,6 +3119,7 @@ type PetitionTemplate implements PetitionBase {
   The ID of the petition or template.
   """
   id: GID!
+  imageUrl: String
 
   """
   Whether the template is publicly available or not

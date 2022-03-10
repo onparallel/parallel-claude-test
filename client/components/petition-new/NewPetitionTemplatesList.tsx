@@ -1,22 +1,20 @@
-import { gql } from "@apollo/client";
 import { Center, Grid, Spinner } from "@chakra-ui/react";
-import { NewPetitionTemplatesList_PetitionTemplateFragment } from "@parallel/graphql/__types";
+import { ReactNode } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { TemplateCard } from "./TemplateCard";
 
-interface NewPetitionTemplatesListProps {
-  items: NewPetitionTemplatesList_PetitionTemplateFragment[];
+interface NewPetitionTemplatesListProps<T> {
+  items: T[];
   onLoadMore: () => void;
   hasMore: boolean;
-  onClickTemplate: (templateId: string) => void;
+  children: (item: T, index: number) => ReactNode;
 }
 
-export const NewPetitionTemplatesList = ({
+export function NewPetitionTemplatesList<T>({
   items,
   onLoadMore,
   hasMore,
-  onClickTemplate,
-}: NewPetitionTemplatesListProps) => {
+  children,
+}: NewPetitionTemplatesListProps<T>) {
   return (
     <InfiniteScroll
       dataLength={items.length}
@@ -39,26 +37,8 @@ export const NewPetitionTemplatesList = ({
         paddingX={6}
         paddingBottom={16}
       >
-        {items.map((template, i) => (
-          <TemplateCard
-            data-template-id={template.id}
-            data-template-first={i === 0 ? "" : undefined}
-            key={template.id}
-            template={template}
-            onPress={() => onClickTemplate(template.id)}
-          />
-        ))}
+        {items.map((item, i) => children(item, i))}
       </Grid>
     </InfiniteScroll>
   );
-};
-
-NewPetitionTemplatesList.fragments = {
-  PetitionTemplate: gql`
-    fragment NewPetitionTemplatesList_PetitionTemplate on PetitionTemplate {
-      id
-      ...TemplateCard_PetitionTemplate
-    }
-    ${TemplateCard.fragments.PetitionTemplate}
-  `,
-};
+}
