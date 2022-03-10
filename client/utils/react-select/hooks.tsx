@@ -8,12 +8,13 @@ import {
   components,
   GroupTypeBase,
   IndicatorProps,
+  mergeStyles,
   OptionTypeBase,
   SelectComponentsConfig,
   StylesConfig,
   Theme,
 } from "react-select";
-import { omit } from "remeda";
+import { isDefined, omit } from "remeda";
 import { OptionType, SelectProps } from "./types";
 
 export const SIZES = {
@@ -67,11 +68,13 @@ export function useReactSelectProps<
   OptionType extends OptionTypeBase = { label: string; value: string },
   IsMulti extends boolean = any,
   GroupType extends GroupTypeBase<OptionType> = never
->({ size = "md", placeholder, usePortal = true, ...props }: UseReactSelectProps = {}): SelectProps<
-  OptionType,
-  IsMulti,
-  GroupType
-> {
+>({
+  size = "md",
+  placeholder,
+  usePortal = true,
+  styles: _styles,
+  ...props
+}: UseReactSelectProps = {}): SelectProps<OptionType, IsMulti, GroupType> {
   const { colors, radii, fontSizes } = useTheme();
 
   const { id: inputId, "aria-invalid": isInvalid, disabled: isDisabled } = useFormControl(props);
@@ -107,8 +110,8 @@ export function useReactSelectProps<
     [size, colors]
   );
 
-  const styles = useMemo<StylesConfig<OptionType, IsMulti, GroupType>>(
-    () => ({
+  const styles = useMemo(() => {
+    const styles: StylesConfig<OptionType, IsMulti, GroupType> = {
       menuPortal: (styles) => ({
         ...styles,
         zIndex: 40,
@@ -138,11 +141,11 @@ export function useReactSelectProps<
             : isFocused
             ? `0 0 0 1px ${borderColor}`
             : undefined,
+          pointerEvents: isDisabled ? "none" : undefined,
+          fontSize: fontSize,
           "&:hover": {
             borderColor: isInvalid ? error : isFocused ? borderColor : borderColorHover,
           },
-          pointerEvents: isDisabled ? "none" : undefined,
-          fontSize: fontSize,
         };
       },
       placeholder: (styles, { theme }) => {
@@ -230,10 +233,9 @@ export function useReactSelectProps<
           alignItems: "center",
         };
       },
-      ...props.styles,
-    }),
-    [props.styles]
-  );
+    };
+    return isDefined(_styles) ? mergeStyles(styles, _styles) : styles;
+  }, [_styles]);
 
   const components = useMemo<SelectComponentsConfig<OptionType, IsMulti, GroupType>>(
     () => ({

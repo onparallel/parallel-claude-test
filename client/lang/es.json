@@ -880,11 +880,6 @@
     "context": "Add symbols or text that you want to appear before or after the replies:"
   },
   {
-    "term": "component.field-settings-number.add-text-symbols-example",
-    "definition": "Ejemplo:",
-    "context": "Example:"
-  },
-  {
     "term": "component.field-settings-number.decimals",
     "definition": "Nº de decimales permitidos",
     "context": "No. of decimals allowed:"
@@ -953,41 +948,6 @@
     "term": "component.file-icon.zip-file",
     "definition": "Archivo ZIP",
     "context": "Zip file"
-  },
-  {
-    "term": "component.format-placeholder.cif",
-    "definition": "Ej: B76365789",
-    "context": "E.g., B76365789"
-  },
-  {
-    "term": "component.format-placeholder.dni-nie",
-    "definition": "Ej: 12345678Z",
-    "context": "E.g., 12345678A"
-  },
-  {
-    "term": "component.format-placeholder.iban",
-    "definition": "Ej: ES91 2100 0418 4502 0005 1332",
-    "context": "E.g., GB33 BUKB 2020 1555 5555 55"
-  },
-  {
-    "term": "component.format-placeholder.postal-spain",
-    "definition": "Ej: 08001",
-    "context": "E.g., 08001"
-  },
-  {
-    "term": "component.format-placeholder.postal-usa",
-    "definition": "Ej: 99301",
-    "context": "E.g., 99301"
-  },
-  {
-    "term": "component.format-placeholder.ssn-spain",
-    "definition": "Ej: 08 11621612 13",
-    "context": "E.g., 08 11621612 13"
-  },
-  {
-    "term": "component.format-placeholder.ssn-usa",
-    "definition": "Ej: 504-88-5752",
-    "context": "E.g., 504-88-5752"
   },
   {
     "term": "component.generate-new-token-dialog.api-key-label",
@@ -1435,21 +1395,6 @@
     "context": "Too many attachments"
   },
   {
-    "term": "component.petition-compose-text-settings.cif-format",
-    "definition": "CIF de empresa",
-    "context": "Spanish tax ID number"
-  },
-  {
-    "term": "component.petition-compose-text-settings.dni-format",
-    "definition": "DNI/NIE",
-    "context": "Spanish ID number"
-  },
-  {
-    "term": "component.petition-compose-text-settings.email-format",
-    "definition": "Correo electrónico",
-    "context": "E-mail"
-  },
-  {
     "term": "component.petition-compose-text-settings.format",
     "definition": "Formato:",
     "context": "Format:"
@@ -1457,32 +1402,7 @@
   {
     "term": "component.petition-compose-text-settings.format-placeholder",
     "definition": "Sin formato",
-    "context": "Without format"
-  },
-  {
-    "term": "component.petition-compose-text-settings.iban-format",
-    "definition": "Nº de cuenta (IBAN)",
-    "context": "Account number (IBAN)"
-  },
-  {
-    "term": "component.petition-compose-text-settings.postal-spain-format",
-    "definition": "Código postal (España)",
-    "context": "Postal code (Spain)"
-  },
-  {
-    "term": "component.petition-compose-text-settings.postal-usa-format",
-    "definition": "Código postal (EEUU)",
-    "context": "Postal code (USA)"
-  },
-  {
-    "term": "component.petition-compose-text-settings.ssn-spain-format",
-    "definition": "Nº de seguridad social (España)",
-    "context": "Social Security number (Spain)"
-  },
-  {
-    "term": "component.petition-compose-text-settings.ssn-usa-format",
-    "definition": "Nº de seguridad social (EEUU)",
-    "context": "Social Security number (USA)"
+    "context": "No format"
   },
   {
     "term": "component.petition-contents.hidden-fields-divider",
@@ -2850,6 +2770,11 @@
     "context": "Enter your answer"
   },
   {
+    "term": "component.recipient-view-petition-field-short-text.format-error",
+    "definition": "Por favor, introduzca un {format} válido.",
+    "context": "Please, enter a valid {format}."
+  },
+  {
     "term": "component.recipient-view.confirm-petition-signers-dialog.add-signer.button",
     "definition": "Añadir firmantes",
     "context": "Add signers"
@@ -4155,6 +4080,11 @@
     "context": "Email"
   },
   {
+    "term": "generic.email-example",
+    "definition": "email@ejemplo.com",
+    "context": "email@example.com"
+  },
+  {
     "term": "generic.empty-heading",
     "definition": "Encabezado vacío",
     "context": "Untitled heading"
@@ -4163,6 +4093,11 @@
     "term": "generic.enter-a-value",
     "definition": "Introduce un valor",
     "context": "Enter a value"
+  },
+  {
+    "term": "generic.example",
+    "definition": "Ejemplo: {example}",
+    "context": "Example: {example}"
   },
   {
     "term": "generic.expand",
@@ -8863,6 +8798,51 @@
     "term": "settings.title",
     "definition": "Ajustes",
     "context": "Settings"
+  },
+  {
+    "term": "short-text-formats.email",
+    "definition": "correo electrónico",
+    "context": "email"
+  },
+  {
+    "term": "short-text-formats.es-dni",
+    "definition": "DNI/NIE",
+    "context": "national ID number"
+  },
+  {
+    "term": "short-text-formats.es-nif",
+    "definition": "NIF",
+    "context": "tax ID number"
+  },
+  {
+    "term": "short-text-formats.es-postalcode",
+    "definition": "código postal",
+    "context": "postal code"
+  },
+  {
+    "term": "short-text-formats.es-ssn",
+    "definition": "número de la seguridad social",
+    "context": "social security number"
+  },
+  {
+    "term": "short-text-formats.group-generic",
+    "definition": "Genérico",
+    "context": "Generic"
+  },
+  {
+    "term": "short-text-formats.iban",
+    "definition": "número de cuenta IBAN",
+    "context": "IBAN account number"
+  },
+  {
+    "term": "short-text-formats.us-postalcode",
+    "definition": "código postal",
+    "context": "zip code"
+  },
+  {
+    "term": "short-text-formats.us-ssn",
+    "definition": "número de la seguridad social",
+    "context": "social security number"
   },
   {
     "term": "supported-locales.english",

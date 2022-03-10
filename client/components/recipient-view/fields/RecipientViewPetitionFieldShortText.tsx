@@ -1,16 +1,29 @@
-import { Center, Flex, FormControl, FormErrorMessage, Input, List, Stack } from "@chakra-ui/react";
+import {
+  Center,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormErrorMessageProps,
+  HStack,
+  Input,
+  InputProps,
+  List,
+  Stack,
+} from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { MaskedInput } from "@parallel/components/common/MaskedInput";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
+import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { useFormatPlacehoders } from "@parallel/utils/useFormatPlaceholders";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
+import { ShortTextFormat, useShortTextFormats } from "@parallel/utils/useShortTextFormats";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChangeEvent, forwardRef, KeyboardEvent, useEffect, useRef, useState } from "react";
+import { ComponentProps, forwardRef, useImperativeHandle, useRef, useState } from "react";
+import { IMaskInput } from "react-imask";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, pick } from "remeda";
 import {
@@ -56,46 +69,49 @@ export function RecipientViewPetitionFieldShortText({
 
   const options = field.options as FieldOptions["SHORT_TEXT"];
 
-  const formatPlaceholder = useFormatPlacehoders(options.format ?? "");
-
   function handleAddNewReply() {
     setShowNewReply(true);
     setTimeout(() => newReplyRef.current?.focus());
   }
 
-  const handleUpdate = useMemoFactory(
-    (replyId: string) => async (value: string) => {
-      await onUpdateReply(replyId, value);
-    },
-    [onUpdateReply]
-  );
-
-  const handleDelete = useMemoFactory(
-    (replyId: string) => async (focusPrev?: boolean) => {
-      if (isDeletingReplyRef.current[replyId]) {
-        // avoid double delete when backspace + blur
-        return;
-      }
-      isDeletingReplyRef.current[replyId] = true;
-      setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
-      if (focusPrev) {
-        const index = field.replies.findIndex((r) => r.id === replyId);
-        if (index > 0) {
-          const prevId = field.replies[index - 1].id;
-          replyRefs[prevId].current!.selectionStart = replyRefs[prevId].current!.value.length;
-          replyRefs[prevId].current!.focus();
+  const replyProps = useMemoFactory(
+    (replyId: string) => ({
+      onUpdate: async (value: string) => {
+        await onUpdateReply(replyId, value);
+      },
+      onDelete: async (focusPrev?: boolean) => {
+        if (isDeletingReplyRef.current[replyId]) {
+          // avoid double delete when backspace + blur
+          return;
         }
-      }
-      await onDeleteReply(replyId);
+        isDeletingReplyRef.current[replyId] = true;
+        setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
+        if (focusPrev) {
+          const index = field.replies.findIndex((r) => r.id === replyId);
+          if (index > 0) {
+            const prevId = field.replies[index - 1].id;
+            replyRefs[prevId].current!.selectionStart = replyRefs[prevId].current!.value.length;
+            replyRefs[prevId].current!.focus();
+          }
+        }
+        await onDeleteReply(replyId);
 
-      delete isDeletingReplyRef.current[replyId];
-      setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
-      handleInvalidReply(replyId, false);
-      if (field.replies.length === 1) {
-        handleAddNewReply();
-      }
-    },
-    [field.replies, onDeleteReply]
+        delete isDeletingReplyRef.current[replyId];
+        setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
+        handleInvalidReply(replyId, false);
+        if (field.replies.length === 1) {
+          handleAddNewReply();
+        }
+      },
+      onInvalid: (isInvalid: boolean) => {
+        if (isInvalid) {
+          setIsInvalidReply((curr) => ({ ...curr, [replyId]: true }));
+        } else {
+          setIsInvalidReply(({ [replyId]: _, ...curr }) => curr);
+        }
+      },
+    }),
+    [onUpdateReply, field.replies, onDeleteReply]
   );
 
   const handleCreate = useDebouncedCallback(
@@ -139,19 +155,17 @@ export function RecipientViewPetitionFieldShortText({
     }
   };
 
-  const handleOnChange = (value: string) => {
-    setValue(value);
-  };
-
-  const inputProps = {
+  const formats = useShortTextFormats();
+  const format = isDefined(options.format) ? formats.find((f) => f.value === options.format) : null;
+  const inputProps: ComponentProps<typeof ShortTextInput> = {
     id: `reply-${field.id}-new`,
-    ref: newReplyRef as any,
+    ref: newReplyRef,
     paddingRight: 10,
     isDisabled: isDisabled,
     isInvalid: isInvalidReply[field.id],
     maxLength: field.options.maxLength ?? undefined,
     value,
-    onKeyDown: async (event: KeyboardEvent) => {
+    onKeyDown: async (event) => {
       if (options.format === "EMAIL" && !EMAIL_REGEX.test(value)) {
         return;
       }
@@ -170,7 +184,7 @@ export function RecipientViewPetitionFieldShortText({
     onBlur: async () => {
       if (!value) {
         handleInvalidReply(field.id, false);
-      } else if (options.format === "EMAIL" && !EMAIL_REGEX.test(value)) {
+      } else if (format?.validate && !format.validate(value)) {
         handleInvalidReply(field.id, true);
       } else {
         await handleCreate.immediate(value, false);
@@ -181,24 +195,28 @@ export function RecipientViewPetitionFieldShortText({
         setShowNewReply(false);
       }
     },
-    onChange: (event: ChangeEvent<HTMLInputElement>) => {
-      if (
-        isInvalidReply[field.id] &&
-        options.format === "EMAIL" &&
-        EMAIL_REGEX.test(event.target.value)
-      ) {
+    onValueChange: (value) => {
+      if (isInvalidReply[field.id] && format?.validate && format.validate(value)) {
         handleInvalidReply(field.id, false);
       }
-      handleOnChange(event.target.value);
+      setValue(value);
     },
     placeholder:
       options.placeholder ??
-      formatPlaceholder ??
-      intl.formatMessage({
-        id: "component.recipient-view-petition-field-reply.text-placeholder",
-        defaultMessage: "Enter your answer",
-      }),
+      (format
+        ? intl.formatMessage(
+            {
+              id: "generic.for-example",
+              defaultMessage: "E.g. {example}",
+            },
+            { example: format.example }
+          )
+        : intl.formatMessage({
+            id: "component.recipient-view-petition-field-reply.text-placeholder",
+            defaultMessage: "Enter your answer",
+          })),
   };
+
   return (
     <RecipientViewPetitionFieldCard
       field={field}
@@ -209,53 +227,39 @@ export function RecipientViewPetitionFieldShortText({
       onAddNewReply={handleAddNewReply}
       onDownloadAttachment={onDownloadAttachment}
     >
-      <FormControl isInvalid={Boolean(Object.keys(isInvalidReply).length)}>
-        {field.replies.length ? (
-          <List as={Stack} marginTop={2}>
-            <AnimatePresence initial={false}>
-              {field.replies.map((reply) => (
-                <motion.li
-                  key={reply.id}
-                  animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, x: -100, transition: { duration: 0.2 } }}
-                >
-                  <RecipientViewPetitionFieldReplyShortText
-                    ref={replyRefs[reply.id]}
-                    field={field}
-                    reply={reply}
-                    isDisabled={isDisabled || isDeletingReply[reply.id]}
-                    onUpdate={handleUpdate(reply.id)}
-                    onDelete={handleDelete(reply.id)}
-                    onAddNewReply={handleAddNewReply}
-                    onInvalid={handleInvalidReply}
-                  />
-                </motion.li>
-              ))}
-            </AnimatePresence>
-          </List>
-        ) : null}
+      {field.replies.length ? (
+        <List as={Stack} marginTop={2}>
+          <AnimatePresence initial={false}>
+            {field.replies.map((reply) => (
+              <motion.li
+                key={reply.id}
+                animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+                exit={{ opacity: 0, x: -100, transition: { duration: 0.2 } }}
+              >
+                <RecipientViewPetitionFieldReplyShortText
+                  ref={replyRefs[reply.id]}
+                  field={field}
+                  reply={reply}
+                  isDisabled={isDisabled || isDeletingReply[reply.id]}
+                  onAddNewReply={handleAddNewReply}
+                  isInvalid={isInvalidReply[reply.id]}
+                  {...replyProps(reply.id)}
+                />
+              </motion.li>
+            ))}
+          </AnimatePresence>
+        </List>
+      ) : null}
+      <FormControl isInvalid={isInvalidReply[field.id]}>
         {(field.multiple && showNewReply) || field.replies.length === 0 ? (
           <Flex flex="1" position="relative" marginTop={2}>
-            {isDefined(options.format) && options.format !== "EMAIL" ? (
-              <MaskedInput {...inputProps} onChange={handleOnChange} format={options.format} />
-            ) : (
-              <Input
-                {...inputProps}
-                type={options.format === "EMAIL" ? "email" : undefined}
-                name={options.format === "EMAIL" ? "email" : undefined}
-              />
-            )}
+            <ShortTextInput {...inputProps} format={format} />
             <Center boxSize={10} position="absolute" right={0} bottom={0}>
               <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
             </Center>
           </Flex>
         ) : null}
-        <FormErrorMessage>
-          <FormattedMessage
-            id="generic.forms.invalid-email-error"
-            defaultMessage="Please, enter a valid email"
-          />
-        </FormErrorMessage>
+        {isDefined(format) ? <FormatFormErrorMessage format={format} /> : null}
       </FormControl>
     </RecipientViewPetitionFieldCard>
   );
@@ -265,31 +269,25 @@ interface RecipientViewPetitionFieldReplyShortTextProps {
   field: RecipientViewPetitionFieldCard_PetitionFieldSelection;
   reply: RecipientViewPetitionFieldCard_PetitionFieldReplySelection;
   isDisabled: boolean;
+  isInvalid: boolean;
   onUpdate: (content: string) => Promise<void>;
   onDelete: (focusPrev?: boolean) => void;
   onAddNewReply: () => void;
-  onInvalid: (replyId: string, value: boolean) => void;
+  onInvalid: (invalid: boolean) => void;
 }
 
 export const RecipientViewPetitionFieldReplyShortText = forwardRef<
   HTMLInputElement,
   RecipientViewPetitionFieldReplyShortTextProps
 >(function RecipientViewPetitionFieldReplyShortText(
-  { field, reply, isDisabled, onUpdate, onDelete, onAddNewReply, onInvalid },
+  { field, reply, isDisabled, isInvalid, onInvalid, onUpdate, onDelete, onAddNewReply },
   ref
 ) {
   const intl = useIntl();
   const [value, setValue] = useState(reply.content.value ?? "");
   const [isSaving, setIsSaving] = useState(false);
-  const [isInvalid, setIsInvalid] = useState(false);
-
-  useEffect(() => {
-    onInvalid(reply.id, isInvalid);
-  }, [isInvalid]);
 
   const options = field.options as FieldOptions["SHORT_TEXT"];
-
-  const formatPlaceholder = useFormatPlacehoders(options.format ?? "");
 
   const debouncedUpdateReply = useDebouncedCallback(
     async (value: string) => {
@@ -303,86 +301,150 @@ export const RecipientViewPetitionFieldReplyShortText = forwardRef<
     [onUpdate]
   );
 
-  const handleOnChange = (value: string) => {
-    setValue(value);
-  };
+  const formats = useShortTextFormats();
+  const format = isDefined(options.format) ? formats.find((f) => f.value === options.format) : null;
 
-  const props = {
+  const props: ComponentProps<typeof ShortTextInput> = {
     id: `reply-${field.id}-${reply.id}`,
-    ref: ref as any,
+    ref,
     paddingRight: 10,
     value,
     maxLength: field.options.maxLength ?? undefined,
     isDisabled: isDisabled || reply.status === "APPROVED",
-    isInvalid: reply.status === "REJECTED" || isInvalid,
-    onKeyDown: async (event: KeyboardEvent) => {
-      if (isMetaReturn(event) && field.multiple) {
+    onKeyDown: async (e) => {
+      if (isMetaReturn(e) && field.multiple) {
         onAddNewReply();
-      } else if (event.key === "Backspace" && value === "") {
-        event.preventDefault();
+      } else if (e.key === "Backspace" && value === "") {
+        e.preventDefault();
         debouncedUpdateReply.clear();
         onDelete(true);
       }
     },
     onBlur: async () => {
       if (value && value !== reply.content.value) {
-        if (options.format === "EMAIL" && !EMAIL_REGEX.test(value)) {
-          setIsInvalid(true);
+        if (format?.validate && !format.validate(value)) {
+          onInvalid(true);
           return;
         }
-        if (isInvalid) setIsInvalid(false);
+        if (isInvalid) {
+          onInvalid(false);
+        }
         await debouncedUpdateReply.immediate(value);
       } else if (!value) {
         debouncedUpdateReply.clear();
         onDelete();
       }
     },
-    onChange: (event: ChangeEvent<HTMLInputElement>) => {
-      if (isInvalid && options.format === "EMAIL" && EMAIL_REGEX.test(event.target.value)) {
-        setIsInvalid(false);
+    onValueChange: (value) => {
+      if (isInvalid && format?.validate && format.validate(value)) {
+        onInvalid(false);
       }
-      handleOnChange(event.target.value);
+      setValue(value);
     },
     placeholder:
       options.placeholder ??
-      formatPlaceholder ??
-      intl.formatMessage({
-        id: "component.recipient-view-petition-field-reply.text-placeholder",
-        defaultMessage: "Enter your answer",
-      }),
+      (format
+        ? intl.formatMessage(
+            {
+              id: "generic.for-example",
+              defaultMessage: "E.g. {example}",
+            },
+            { example: format.example }
+          )
+        : intl.formatMessage({
+            id: "component.recipient-view-petition-field-reply.text-placeholder",
+            defaultMessage: "Enter your answer",
+          })),
   };
 
   return (
-    <Stack direction="row">
-      <Flex flex="1" position="relative">
-        {isDefined(options.format) && options.format !== "EMAIL" ? (
-          <MaskedInput {...props} onChange={handleOnChange} format={options.format} />
-        ) : (
-          <Input
-            {...props}
-            type={options.format === "EMAIL" ? "email" : undefined}
-            name={options.format === "EMAIL" ? "email" : undefined}
-          />
-        )}
-        <Center boxSize={10} position="absolute" right={0} bottom={0}>
-          <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
-        </Center>
-      </Flex>
-      <IconButtonWithTooltip
-        isDisabled={isDisabled || reply.status === "APPROVED"}
-        onClick={() => {
-          debouncedUpdateReply.clear();
-          onDelete();
-        }}
-        variant="ghost"
-        icon={<DeleteIcon />}
-        size="md"
-        placement="bottom"
-        label={intl.formatMessage({
-          id: "component.recipient-view-petition-field-reply.remove-reply-label",
-          defaultMessage: "Remove reply",
-        })}
+    <FormControl isInvalid={reply.status === "REJECTED" || isInvalid}>
+      <HStack>
+        <Flex flex="1" position="relative">
+          <ShortTextInput {...props} format={format} />
+          <Center boxSize={10} position="absolute" right={0} bottom={0}>
+            <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
+          </Center>
+        </Flex>
+        <IconButtonWithTooltip
+          isDisabled={isDisabled || reply.status === "APPROVED"}
+          onClick={() => {
+            debouncedUpdateReply.clear();
+            onDelete();
+          }}
+          variant="ghost"
+          icon={<DeleteIcon />}
+          size="md"
+          placement="bottom"
+          label={intl.formatMessage({
+            id: "component.recipient-view-petition-field-reply.remove-reply-label",
+            defaultMessage: "Remove reply",
+          })}
+        />
+      </HStack>
+      {isInvalid && isDefined(format) ? <FormatFormErrorMessage format={format} /> : null}
+    </FormControl>
+  );
+});
+
+const ShortTextInput = chakraForwardRef<
+  "input",
+  InputProps & {
+    onValueChange: (value: string) => void;
+    format?: Maybe<ShortTextFormat>;
+  }
+>(function ShortTextInput({ format, onValueChange, ...props }, ref) {
+  const inputRef = useRef<any>(null);
+  useImperativeHandle(
+    ref,
+    () => {
+      if (format?.type === "MASK") {
+        return inputRef.current?.element;
+      } else {
+        return inputRef.current;
+      }
+    },
+    [format?.type]
+  );
+  const [maskProps, setMaskProps] = useState(
+    format?.type === "MASK" ? format.maskProps((props.value as string) ?? "") : null
+  );
+  return (
+    <Input
+      ref={inputRef}
+      {...(format?.type === "MASK"
+        ? {
+            as: IMaskInput,
+            ...maskProps,
+            onAccept: (value: string) => {
+              if (format?.type === "MASK") {
+                setMaskProps(format.maskProps(value));
+              }
+              onValueChange(value);
+            },
+          }
+        : {
+            onChange: (e) => onValueChange(e.target.value),
+          })}
+      {...format?.inputProps}
+      {...props}
+    />
+  );
+});
+
+const FormatFormErrorMessage = chakraForwardRef<
+  "div",
+  Omit<FormErrorMessageProps, "children"> & {
+    format: ShortTextFormat;
+  }
+>(function FormatFormErrorMessage({ format, ...props }, ref) {
+  return (
+    <FormErrorMessage ref={ref} {...props}>
+      <FormattedMessage
+        id="component.recipient-view-petition-field-short-text.format-error"
+        defaultMessage="Please, enter a valid {format}."
+        values={{ format: format.label }}
       />
-    </Stack>
+    </FormErrorMessage>
   );
 });

@@ -1,11 +1,14 @@
 import { Box, HStack, Stack, Text } from "@chakra-ui/react";
 import { FieldOptions } from "@parallel/utils/petitionFields";
-import { useInlineReactSelectProps } from "@parallel/utils/react-select/hooks";
-import { OptionType } from "@parallel/utils/react-select/types";
+import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import {
+  ShortTextFormat,
+  useShortTextFormatsSelectOptions,
+} from "@parallel/utils/useShortTextFormats";
 import { ChangeEvent, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import Select from "react-select";
+import Select, { GroupTypeBase, components } from "react-select";
 import { PetitionComposeFieldSettingsProps } from "./PetitionComposeFieldSettings";
 import { SettingsRowPlaceholder } from "./SettingsRowPlaceholder";
 
@@ -18,75 +21,25 @@ export function ShortTextSettings({
   const options = field.options as FieldOptions["SHORT_TEXT"];
   const [placeholder, setPlaceholder] = useState(options.placeholder ?? "");
 
-  const rsProps = useInlineReactSelectProps<any, false, never>({
+  const rsProps = useReactSelectProps<ShortTextFormat, false, GroupTypeBase<ShortTextFormat>>({
     size: "sm",
+    components: {
+      SingleValue: FormatSingleValue,
+    },
+    styles: useMemo(
+      () => ({
+        option: (base) => ({ ...base, textTransform: "capitalize" }),
+        singleValue: (base) => ({ ...base, textTransform: "capitalize" }),
+      }),
+      []
+    ),
   });
 
-  const formatOptions = useMemo<OptionType[]>(
-    () => [
-      {
-        value: "EMAIL",
-        label: intl.formatMessage({
-          id: "component.petition-compose-text-settings.email-format",
-          defaultMessage: "E-mail",
-        }),
-      },
-      {
-        value: "DNI",
-        label: intl.formatMessage({
-          id: "component.petition-compose-text-settings.dni-format",
-          defaultMessage: "Spanish ID number",
-        }),
-      },
-      {
-        value: "CIF",
-        label: intl.formatMessage({
-          id: "component.petition-compose-text-settings.cif-format",
-          defaultMessage: "Spanish tax ID number",
-        }),
-      },
-      {
-        value: "IBAN",
-        label: intl.formatMessage({
-          id: "component.petition-compose-text-settings.iban-format",
-          defaultMessage: "Account number (IBAN)",
-        }),
-      },
-      {
-        value: "SSN_SPAIN",
-        label: intl.formatMessage({
-          id: "component.petition-compose-text-settings.ssn-spain-format",
-          defaultMessage: "Social Security number (Spain)",
-        }),
-      },
-      {
-        value: "SSN_USA",
-        label: intl.formatMessage({
-          id: "component.petition-compose-text-settings.ssn-usa-format",
-          defaultMessage: "Social Security number (USA)",
-        }),
-      },
-      {
-        value: "POSTAL_SPAIN",
-        label: intl.formatMessage({
-          id: "component.petition-compose-text-settings.postal-spain-format",
-          defaultMessage: "Postal code (Spain)",
-        }),
-      },
-      {
-        value: "POSTAL_USA",
-        label: intl.formatMessage({
-          id: "component.petition-compose-text-settings.postal-usa-format",
-          defaultMessage: "Postal code (USA)",
-        }),
-      },
-    ],
-    [intl.locale]
-  );
+  const { grouped, allFormats } = useShortTextFormatsSelectOptions();
 
   const _value = useMemo(
-    () => formatOptions.find((o) => o.value === options.format),
-    [options.format, formatOptions]
+    () => allFormats.find((o) => o.value === options.format),
+    [options.format, allFormats]
   );
 
   const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 300, [field.id]);
@@ -102,40 +55,50 @@ export function ShortTextSettings({
     });
   };
 
-  const handleFormatChange = (selected: OptionType) => {
-    const format = selected?.value ?? null;
+  const handleFormatChange = (format: ShortTextFormat | null) => {
     onFieldEdit(field.id, {
       options: {
         ...field.options,
-        format,
+        format: format?.value ?? null,
       },
     });
   };
 
   return (
     <Stack spacing={4}>
-      <HStack spacing={4}>
-        <Text>
-          <FormattedMessage
-            id="component.petition-compose-text-settings.format"
-            defaultMessage="Format:"
-          />
-        </Text>
-        <Box flex="1">
-          <Select
-            options={formatOptions}
-            value={_value ?? null}
-            onChange={handleFormatChange}
-            {...rsProps}
-            isSearchable
-            isClearable
-            placeholder={intl.formatMessage({
-              id: "component.petition-compose-text-settings.format-placeholder",
-              defaultMessage: "Without format",
-            })}
-          />
-        </Box>
-      </HStack>
+      <Stack>
+        <HStack spacing={4}>
+          <Text>
+            <FormattedMessage
+              id="component.petition-compose-text-settings.format"
+              defaultMessage="Format:"
+            />
+          </Text>
+          <Box flex="1">
+            <Select
+              options={grouped}
+              value={_value ?? null}
+              onChange={handleFormatChange}
+              {...rsProps}
+              isSearchable
+              isClearable
+              placeholder={intl.formatMessage({
+                id: "component.petition-compose-text-settings.format-placeholder",
+                defaultMessage: "No format",
+              })}
+            />
+          </Box>
+        </HStack>
+        {_value ? (
+          <Text fontSize="sm" color="gray.500">
+            <FormattedMessage
+              id="generic.example"
+              defaultMessage="Example: {example}"
+              values={{ example: _value.example }}
+            />
+          </Text>
+        ) : null}
+      </Stack>
       <SettingsRowPlaceholder
         placeholder={placeholder}
         onChange={handlePlaceholderChange}
@@ -144,3 +107,19 @@ export function ShortTextSettings({
     </Stack>
   );
 }
+
+const FormatSingleValue: typeof components.SingleValue = function FormatSingleValue(props) {
+  const { label, countryName } = props.data as unknown as ShortTextFormat;
+  return (
+    <components.SingleValue {...props}>
+      <Text as="span">{label}</Text>
+      {countryName ? (
+        <Text as="span">
+          {" ("}
+          {countryName}
+          {")"}
+        </Text>
+      ) : null}
+    </components.SingleValue>
+  );
+};

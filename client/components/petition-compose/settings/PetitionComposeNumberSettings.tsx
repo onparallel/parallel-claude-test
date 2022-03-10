@@ -289,14 +289,22 @@ export function NumberSettings({
               onBlur={() => handlePrefixBlur(prefixOption)}
             />
           </HStack>
-          <Text fontSize="sm" color="gray.500" whiteSpace="pre" height={5}>
+          <Text fontSize="sm" color="gray.500">
             <FormattedMessage
-              id="component.field-settings-number.add-text-symbols-example"
-              defaultMessage="Example:"
-            />{" "}
-            {`${prefixOption === "prefix" ? prefixValue : ""}100${
-              prefixOption === "suffix" ? prefixValue : ""
-            }`}
+              id="generic.example"
+              defaultMessage="Example: {example}"
+              values={{
+                example: (
+                  <Text as="span" whiteSpace="pre">
+                    {[
+                      prefixOption === "prefix" ? prefixValue : "",
+                      intl.formatNumber(1234),
+                      prefixOption === "suffix" ? prefixValue : "",
+                    ].join("")}
+                  </Text>
+                ),
+              }}
+            />
           </Text>
         </Stack>
       </SettingsRowSwitch>
