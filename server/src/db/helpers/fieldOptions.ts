@@ -60,7 +60,7 @@ const SCHEMAS = {
   },
   SHORT_TEXT: {
     type: "object",
-    required: ["placeholder", "maxLength"],
+    required: ["placeholder", "maxLength", "format"],
     additionalProperties: false,
     properties: {
       placeholder: {
