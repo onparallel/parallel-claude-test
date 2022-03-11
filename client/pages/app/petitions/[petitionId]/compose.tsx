@@ -257,10 +257,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         });
       } catch (e) {
         try {
-          if (
-            isApolloError(e) &&
-            e.graphQLErrors[0]?.extensions?.code === "FIELD_HAS_REPLIES_ERROR"
-          ) {
+          if (isApolloError(e, "FIELD_HAS_REPLIES_ERROR")) {
             await confirmChangeFormat({});
             await updatePetitionField({
               variables: { petitionId, fieldId, data, force: true },
