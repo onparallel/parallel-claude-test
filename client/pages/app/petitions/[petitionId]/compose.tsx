@@ -45,6 +45,7 @@ import {
   UpdatePetitionFieldInput,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
@@ -254,14 +255,19 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         await updatePetitionField({
           variables: { petitionId, fieldId, data },
         });
-        return;
-      } catch {}
-      try {
-        await confirmChangeFormat({});
-        await updatePetitionField({
-          variables: { petitionId, fieldId, data, force: true },
-        });
-      } catch {}
+      } catch (e) {
+        try {
+          if (
+            isApolloError(e) &&
+            e.graphQLErrors[0]?.extensions?.code === "FIELD_HAS_REPLIES_ERROR"
+          ) {
+            await confirmChangeFormat({});
+            await updatePetitionField({
+              variables: { petitionId, fieldId, data, force: true },
+            });
+          }
+        } catch {}
+      }
     },
     [petitionId]
   );

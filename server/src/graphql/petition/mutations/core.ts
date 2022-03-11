@@ -883,7 +883,11 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           }
         }
       } catch (e: any) {
-        throw new ArgValidationError(info, "data.options", e.toString());
+        if (e.name === "WhitelistedError") {
+          throw e;
+        } else {
+          throw new ArgValidationError(info, "data.options", e.toString());
+        }
       }
     }
 
