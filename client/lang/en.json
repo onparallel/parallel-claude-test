@@ -3305,9 +3305,9 @@
     "context": "About this template"
   },
   {
-    "term": "component.template-details-modal.created-by",
-    "definition": "Created by {name} from {organization}.",
-    "context": "Created by {name} from {organization}."
+    "term": "component.template-details-modal.content",
+    "definition": "Content",
+    "context": "Content"
   },
   {
     "term": "component.template-details-modal.duplicate-template",
@@ -3333,6 +3333,16 @@
     "term": "component.template-details-modal.no-description-provided",
     "definition": "No description provided.",
     "context": "No description provided."
+  },
+  {
+    "term": "component.template-details-modal.save-to-edit",
+    "definition": "Save to edit",
+    "context": "Save to edit"
+  },
+  {
+    "term": "component.template-details-modal.shadre-with",
+    "definition": "Shared with:",
+    "context": "Shared with:"
   },
   {
     "term": "component.template-header.duplicate-label",

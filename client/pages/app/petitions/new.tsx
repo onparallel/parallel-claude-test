@@ -431,6 +431,7 @@ function NewPetition() {
           onClose={() => setQueryState((current) => omit(current, ["template"]))}
           me={me}
           template={templateData?.petition as any}
+          isFromPublicTemplates={state.public}
         />
       ) : null}
     </AppLayout>

@@ -1,9 +1,14 @@
 import { gql } from "@apollo/client";
 import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
   Box,
   Button,
-  ButtonGroup,
-  Heading,
+  Flex,
+  HStack,
   IconButton,
   Menu,
   MenuButton,
@@ -22,15 +27,16 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import {
-  ChevronDownIcon,
   CopyIcon,
   EditIcon,
   LinkIcon,
+  MoreVerticalIcon,
   PaperPlaneIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { Divider } from "@parallel/components/common/Divider";
+import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
+import { TemplateActiveSettingsIcons } from "@parallel/components/petition-new/TemplateActiveSettingsIcons";
 import {
   TemplateDetailsModal_PetitionTemplateFragment,
   TemplateDetailsModal_UserFragment,
@@ -48,9 +54,15 @@ import { usePetitionSharingDialog } from "./PetitionSharingDialog";
 export interface TemplateDetailsModalProps extends Omit<ModalProps, "children"> {
   me: TemplateDetailsModal_UserFragment;
   template: TemplateDetailsModal_PetitionTemplateFragment;
+  isFromPublicTemplates?: boolean;
 }
 
-export function TemplateDetailsModal({ me, template, ...props }: TemplateDetailsModalProps) {
+export function TemplateDetailsModal({
+  me,
+  template,
+  isFromPublicTemplates,
+  ...props
+}: TemplateDetailsModalProps) {
   const intl = useIntl();
 
   const hasAccess = Boolean(
@@ -108,9 +120,31 @@ export function TemplateDetailsModal({ me, template, ...props }: TemplateDetails
     <Modal size="4xl" {...props}>
       <ModalOverlay>
         <ModalContent>
-          <ModalHeader paddingRight={12} paddingBottom={0}>
+          <ModalHeader
+            paddingLeft={6}
+            paddingTop={6}
+            paddingRight={12}
+            paddingBottom={0}
+            as={Stack}
+            spacing={2}
+          >
+            <Text as="span" fontSize="sm" fontWeight="normal" color="gray.600">
+              <FormattedMessage
+                id="component.template-details-modal.last-updated-on"
+                defaultMessage="Last updated on {date}."
+                values={{
+                  date: (
+                    <DateTime
+                      value={template.updatedAt}
+                      format={FORMATS.LL}
+                      title={intl.formatDate(template.updatedAt, FORMATS.LLL)}
+                    />
+                  ),
+                }}
+              />
+            </Text>
             {template.name ? (
-              <Text as="div" noOfLines={2}>
+              <Text as="div" fontSize="lg" noOfLines={2}>
                 {template.name}
               </Text>
             ) : (
@@ -128,165 +162,224 @@ export function TemplateDetailsModal({ me, template, ...props }: TemplateDetails
               defaultMessage: "Close",
             })}
           />
-          <ModalBody>
-            <Text as="span" fontSize="sm" fontWeight="normal">
-              <FormattedMessage
-                id="component.template-details-modal.created-by"
-                defaultMessage="Created by {name} from {organization}."
-                values={{
-                  name: <strong>{template.owner.fullName}</strong>,
-                  organization: template.owner.organization.name,
-                }}
-              />{" "}
-              <FormattedMessage
-                id="component.template-details-modal.last-updated-on"
-                defaultMessage="Last updated on {date}."
-                values={{
-                  date: (
-                    <DateTime
-                      value={template.updatedAt}
-                      format={FORMATS.LL}
-                      title={intl.formatDate(template.updatedAt, FORMATS.LLL)}
+          <ModalBody paddingBottom={6} paddingTop={4}>
+            <Flex alignItems="center">
+              <TemplateActiveSettingsIcons template={template} spacing={4} />
+              {isFromPublicTemplates ? null : (
+                <HStack marginLeft={6}>
+                  <Text>
+                    <FormattedMessage
+                      id="component.template-details-modal.shadre-with"
+                      defaultMessage="Shared with:"
                     />
-                  ),
-                }}
-              />
-            </Text>
-            <Stack marginY={4} spacing={4} flexDirection={{ base: "column", md: "row-reverse" }}>
-              <ButtonGroup isAttached>
+                  </Text>
+                  <UserAvatarList
+                    usersOrGroups={template!.permissions.map((p) =>
+                      p.__typename === "PetitionUserPermission"
+                        ? p.user
+                        : p.__typename === "PetitionUserGroupPermission"
+                        ? p.group
+                        : (null as never)
+                    )}
+                  />
+                </HStack>
+              )}
+            </Flex>
+            <Flex marginY={6} flexDirection={{ base: "column-reverse", md: "row" }} gridGap={3}>
+              <Box flex="1">
+                {template.isPublic ? (
+                  <Button width="100%" onClick={handleCloneTemplate} leftIcon={<CopyIcon />}>
+                    <FormattedMessage
+                      id="component.template-details-modal.save-to-edit"
+                      defaultMessage="Save to edit"
+                    />
+                  </Button>
+                ) : template.publicLink?.isActive ? (
+                  <Button
+                    width="100%"
+                    leftIcon={<LinkIcon />}
+                    onClick={() => onCopyPublicLink({ value: template.publicLink!.url })}
+                  >
+                    <FormattedMessage id="generic.copy-link" defaultMessage="Copy link" />
+                  </Button>
+                ) : (
+                  <Button
+                    width="100%"
+                    onClick={handlePetitionSharingClick}
+                    leftIcon={<UserArrowIcon />}
+                  >
+                    <FormattedMessage
+                      id="component.template-header.share-label"
+                      defaultMessage="Share template"
+                    />
+                  </Button>
+                )}
+              </Box>
+              <HStack flex="1" spacing={3}>
                 <Button
+                  width="100%"
                   data-action="use-template"
-                  justifyContent="left"
                   colorScheme="purple"
                   leftIcon={<PaperPlaneIcon />}
                   onClick={handleCreatePetition}
                 >
                   <FormattedMessage id="generic.use-template" defaultMessage="Use template" />
                 </Button>
-                <Divider isVertical color="purple.600" />
-                <Menu placement="bottom-end">
-                  <Tooltip
-                    label={intl.formatMessage({
-                      id: "generic.more-options",
-                      defaultMessage: "More options...",
-                    })}
-                  >
-                    <MenuButton
-                      as={IconButton}
-                      colorScheme="purple"
-                      icon={<ChevronDownIcon />}
-                      aria-label={intl.formatMessage({
+                {isFromPublicTemplates && !template.publicLink?.isActive ? null : (
+                  <Menu>
+                    <Tooltip
+                      placement="bottom-end"
+                      label={intl.formatMessage({
                         id: "generic.more-options",
                         defaultMessage: "More options...",
                       })}
-                      minWidth={8}
+                      whiteSpace="nowrap"
+                    >
+                      <MenuButton
+                        as={IconButton}
+                        variant="outline"
+                        icon={<MoreVerticalIcon />}
+                        aria-label={intl.formatMessage({
+                          id: "generic.more-options",
+                          defaultMessage: "More options...",
+                        })}
+                      />
+                    </Tooltip>
+                    <Portal>
+                      <MenuList width="min-content">
+                        {hasAccess && template.publicLink?.isActive ? (
+                          <MenuItem
+                            onClick={handlePetitionSharingClick}
+                            icon={<UserArrowIcon display="block" boxSize={4} />}
+                          >
+                            <FormattedMessage
+                              id="component.template-header.share-label"
+                              defaultMessage="Share template"
+                            />
+                          </MenuItem>
+                        ) : null}
+                        {!isFromPublicTemplates ? (
+                          <MenuItem
+                            onClick={handleCloneTemplate}
+                            icon={<CopyIcon display="block" boxSize={4} />}
+                            isDisabled={me.role === "COLLABORATOR"}
+                          >
+                            <FormattedMessage
+                              id="component.template-details-modal.duplicate-template"
+                              defaultMessage="Duplicate template"
+                            />
+                          </MenuItem>
+                        ) : null}
+                        {hasAccess ? (
+                          <MenuItem
+                            justifyContent="left"
+                            type="submit"
+                            onClick={handleEditTemplate}
+                            icon={<EditIcon display="block" boxSize={4} />}
+                          >
+                            <FormattedMessage
+                              id="component.template-details-modal.edit-template"
+                              defaultMessage="Edit template"
+                            />
+                          </MenuItem>
+                        ) : null}
+                        {template.publicLink?.isActive && isFromPublicTemplates ? (
+                          <MenuItem
+                            justifyContent="left"
+                            icon={<LinkIcon display="block" boxSize={4} />}
+                            onClick={() => onCopyPublicLink({ value: template.publicLink!.url })}
+                          >
+                            <FormattedMessage id="generic.copy-link" defaultMessage="Copy link" />
+                          </MenuItem>
+                        ) : null}
+                      </MenuList>
+                    </Portal>
+                  </Menu>
+                )}
+              </HStack>
+            </Flex>
+            <Accordion
+              defaultIndex={[template.descriptionHtml ? 0 : 1]}
+              sx={{
+                Button: {
+                  _hover: { backgroundColor: "gray.75" },
+                  _expanded: {
+                    borderBottomRadius: "md",
+                  },
+                },
+              }}
+            >
+              <AccordionItem borderTop="none">
+                <AccordionButton borderTopRadius="md">
+                  <Text as="b" flex="1" textAlign="left">
+                    <FormattedMessage
+                      id="component.template-details-modal.about"
+                      defaultMessage="About this template"
                     />
-                  </Tooltip>
-                  <Portal>
-                    <MenuList minWidth={0}>
-                      {template.publicLink?.isActive && (
-                        <MenuItem
-                          justifyContent="left"
-                          icon={<LinkIcon display="block" boxSize={4} />}
-                          onClick={() => onCopyPublicLink({ value: template.publicLink!.url })}
-                        >
-                          <FormattedMessage id="generic.copy-link" defaultMessage="Copy link" />
-                        </MenuItem>
-                      )}
-                      <MenuItem
-                        onClick={handleCloneTemplate}
-                        icon={<CopyIcon display="block" boxSize={4} />}
-                        isDisabled={me.role === "COLLABORATOR"}
-                      >
-                        <FormattedMessage
-                          id="component.template-details-modal.duplicate-template"
-                          defaultMessage="Duplicate template"
-                        />
-                      </MenuItem>
-                      {hasAccess ? (
-                        <MenuItem
-                          justifyContent="left"
-                          type="submit"
-                          onClick={handleEditTemplate}
-                          icon={<EditIcon display="block" boxSize={4} />}
-                        >
-                          <FormattedMessage
-                            id="component.template-details-modal.edit-template"
-                            defaultMessage="Edit template"
-                          />
-                        </MenuItem>
-                      ) : null}
-                      {hasAccess ? (
-                        <MenuItem
-                          onClick={handlePetitionSharingClick}
-                          icon={<UserArrowIcon display="block" boxSize={4} />}
-                        >
-                          <FormattedMessage
-                            id="component.template-header.share-label"
-                            defaultMessage="Share template"
-                          />
-                        </MenuItem>
-                      ) : null}
-                    </MenuList>
-                  </Portal>
-                </Menu>
-              </ButtonGroup>
-              <Heading flex="1" size="md">
-                <FormattedMessage
-                  id="component.template-details-modal.about"
-                  defaultMessage="About this template"
-                />
-              </Heading>
-            </Stack>
-            {template.descriptionHtml ? (
-              <Box
-                sx={{
-                  a: { color: "purple.600", _hover: { color: "purple.800" } },
-                }}
-                dangerouslySetInnerHTML={{ __html: template.descriptionHtml }}
-              />
-            ) : (
-              <Text textAlign="center" textStyle="hint">
-                <FormattedMessage
-                  id="component.template-details-modal.no-description-provided"
-                  defaultMessage="No description provided."
-                />
-              </Text>
-            )}
-            <Heading size="md" marginTop={8} marginBottom={4}>
-              <FormattedMessage
-                id="component.template-details-modal.fields-list"
-                defaultMessage="Information list"
-              />
-            </Heading>
-            <Box paddingLeft={8}>
-              {zip(filteredFields, indices).map(([field, index]) => {
-                return field.type === "HEADING" ? (
-                  <Text key={field.id} fontWeight="bold" marginBottom={2}>
-                    {index}.{" "}
-                    <Text as="span" fontWeight="bold">
-                      {field.title}
-                    </Text>
                   </Text>
-                ) : (
-                  <Text key={field.id} marginLeft={4} marginBottom={2}>
-                    {index}.{" "}
-                    {field.title ? (
-                      <Text as="span" aria-label={field.title}>
-                        {field.title}
+                  <AccordionIcon />
+                </AccordionButton>
+
+                <AccordionPanel paddingBottom={3}>
+                  {template.descriptionHtml ? (
+                    <Box
+                      sx={{
+                        a: { color: "purple.600", _hover: { color: "purple.800" } },
+                      }}
+                      dangerouslySetInnerHTML={{ __html: template.descriptionHtml }}
+                    />
+                  ) : (
+                    <Text textAlign="center" textStyle="hint">
+                      <FormattedMessage
+                        id="component.template-details-modal.no-description-provided"
+                        defaultMessage="No description provided."
+                      />
+                    </Text>
+                  )}
+                </AccordionPanel>
+              </AccordionItem>
+
+              <AccordionItem>
+                <AccordionButton>
+                  <Text as="b" flex="1" textAlign="left">
+                    <FormattedMessage
+                      id="component.template-details-modal.content"
+                      defaultMessage="Content"
+                    />
+                  </Text>
+                  <AccordionIcon />
+                </AccordionButton>
+
+                <AccordionPanel paddingLeft={7} paddingBottom={3}>
+                  {zip(filteredFields, indices).map(([field, index]) => {
+                    return field.type === "HEADING" ? (
+                      <Text key={field.id} fontWeight="bold" marginBottom={2}>
+                        {index}.{" "}
+                        <Text as="span" fontWeight="bold">
+                          {field.title}
+                        </Text>
                       </Text>
                     ) : (
-                      <Text as="span" textStyle="hint">
-                        <FormattedMessage
-                          id="generic.untitled-field"
-                          defaultMessage="Untitled field"
-                        />
+                      <Text key={field.id} marginLeft={4} marginBottom={2}>
+                        {index}.{" "}
+                        {field.title ? (
+                          <Text as="span" aria-label={field.title}>
+                            {field.title}
+                          </Text>
+                        ) : (
+                          <Text as="span" textStyle="hint">
+                            <FormattedMessage
+                              id="generic.untitled-field"
+                              defaultMessage="Untitled field"
+                            />
+                          </Text>
+                        )}
                       </Text>
-                    )}
-                  </Text>
-                );
-              })}
-            </Box>
+                    );
+                  })}
+                </AccordionPanel>
+              </AccordionItem>
+            </Accordion>
           </ModalBody>
         </ModalContent>
       </ModalOverlay>
@@ -306,7 +399,19 @@ TemplateDetailsModal.fragments = {
       id
       descriptionHtml
       name
-      locale
+      isPublic
+      permissions {
+        ... on PetitionUserPermission {
+          user {
+            ...UserAvatarList_User
+          }
+        }
+        ... on PetitionUserGroupPermission {
+          group {
+            ...UserAvatarList_UserGroup
+          }
+        }
+      }
       fields {
         id
         title
@@ -330,7 +435,9 @@ TemplateDetailsModal.fragments = {
         slug
         url
       }
+      ...TemplateActiveSettingsIcons_PetitionTemplate
       updatedAt
     }
+    ${TemplateActiveSettingsIcons.fragments.PetitionTemplate}
   `,
 };

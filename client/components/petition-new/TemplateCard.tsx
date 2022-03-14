@@ -1,14 +1,13 @@
 import { gql } from "@apollo/client";
-import { Flex, HStack, Stack, Text, Tooltip } from "@chakra-ui/react";
-import { BellSettingsIcon, LinkIcon, LockClosedIcon, SignatureIcon } from "@parallel/chakra/icons";
+import { Flex, Stack, Text } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
-import { LocaleBadge } from "@parallel/components/common/LocaleBadge";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { TemplateCard_PetitionTemplateFragment } from "@parallel/graphql/__types";
 import { useRoleButton } from "@parallel/utils/useRoleButton";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage } from "react-intl";
 import { UserAvatarList } from "../common/UserAvatarList";
+import { TemplateActiveSettingsIcons } from "./TemplateActiveSettingsIcons";
 
 export interface TemplateCardProps {
   template: TemplateCard_PetitionTemplateFragment;
@@ -20,7 +19,6 @@ export const TemplateCard = Object.assign(
     { template, onPress, ...props },
     ref
   ) {
-    const intl = useIntl();
     const buttonProps = useRoleButton(onPress);
 
     return (
@@ -55,49 +53,7 @@ export const TemplateCard = Object.assign(
         )}
         <Spacer />
         <Flex alignItems="center">
-          <HStack>
-            <LocaleBadge locale={template.locale} gridGap={2} />
-            {template.isRestricted ? (
-              <Tooltip
-                label={intl.formatMessage({
-                  id: "component.template-card.restricted-edition",
-                  defaultMessage: "Restricted edition",
-                })}
-              >
-                <LockClosedIcon color="gray.600" boxSize={4} />
-              </Tooltip>
-            ) : null}
-            {template.publicLink?.isActive ? (
-              <Tooltip
-                label={intl.formatMessage({
-                  id: "component.template-card.active-link",
-                  defaultMessage: "Link activated",
-                })}
-              >
-                <LinkIcon color="gray.600" boxSize={4} />
-              </Tooltip>
-            ) : null}
-            {template.signatureConfig ? (
-              <Tooltip
-                label={intl.formatMessage({
-                  id: "component.template-card.esignature-active",
-                  defaultMessage: "eSignature activated",
-                })}
-              >
-                <SignatureIcon color="gray.600" boxSize={4} />
-              </Tooltip>
-            ) : null}
-            {template.remindersConfig ? (
-              <Tooltip
-                label={intl.formatMessage({
-                  id: "component.template-card.automatic-reminders-active",
-                  defaultMessage: "Automatic reminders activated",
-                })}
-              >
-                <BellSettingsIcon color="gray.600" boxSize={4} />
-              </Tooltip>
-            ) : null}
-          </HStack>
+          <TemplateActiveSettingsIcons template={template} spacing={2.5} />
           <Spacer />
           <UserAvatarList
             usersOrGroups={template!.permissions.map((p) =>
@@ -118,8 +74,6 @@ export const TemplateCard = Object.assign(
         fragment TemplateCard_PetitionTemplate on PetitionTemplate {
           id
           name
-          locale
-          isRestricted
           permissions {
             ... on PetitionUserPermission {
               user {
@@ -132,19 +86,11 @@ export const TemplateCard = Object.assign(
               }
             }
           }
-          signatureConfig {
-            title
-          }
-          publicLink {
-            id
-            isActive
-          }
-          remindersConfig {
-            time
-          }
+          ...TemplateActiveSettingsIcons_PetitionTemplate
         }
         ${UserAvatarList.fragments.User}
         ${UserAvatarList.fragments.UserGroup}
+        ${TemplateActiveSettingsIcons.fragments.PetitionTemplate}
       `,
     },
   }
