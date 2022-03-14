@@ -5366,7 +5366,7 @@
   },
   {
     "term": "petition-accesses.deactivate-access",
-    "definition": "Revocar acceso",
+    "definition": "Quitar acceso",
     "context": "Remove access"
   },
   {
@@ -5761,17 +5761,17 @@
   },
   {
     "term": "petition.confirm-deactivate-access-message.body",
-    "definition": "¿Estás seguro de que quieres <b>revocar el acceso</b> a {nameOrEmail}?",
+    "definition": "¿Estás seguro de que quieres <b>quitar el acceso</b> a {nameOrEmail}?",
     "context": "Are you sure you want to <b>remove access</b> to {nameOrEmail}?"
   },
   {
     "term": "petition.confirm-deactivate-access-message.confirm",
-    "definition": "Sí, revocar acceso",
+    "definition": "Sí, quitar acceso",
     "context": "Yes, remove access"
   },
   {
     "term": "petition.confirm-deactivate-access-message.header",
-    "definition": "Revocar acceso a contacto",
+    "definition": "Quitar acceso a contacto",
     "context": "Remove contact access"
   },
   {
