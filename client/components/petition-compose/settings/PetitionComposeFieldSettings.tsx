@@ -8,7 +8,7 @@ import {
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, ReactNode, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { PetitionFieldTypeSelect } from "../PetitionFieldTypeSelectDropdown";
 import { CheckboxSettings } from "./PetitionComposeCheckboxSettings";
@@ -30,6 +30,7 @@ export type PetitionComposeFieldSettingsProps = {
   onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => void;
   onClose: () => void;
   isReadOnly?: boolean;
+  children?: ReactNode;
 };
 
 export function PetitionComposeFieldSettings({
@@ -68,6 +69,139 @@ export function PetitionComposeFieldSettings({
     });
   };
 
+  const commonSettings = (
+    <>
+      <SettingsRow
+        isDisabled={isReadOnly || field.isInternal}
+        label={
+          <FormattedMessage
+            id="component.petition-settings.petition-comments-enable"
+            defaultMessage="Allow comments"
+          />
+        }
+        controlId="enable-comments"
+      >
+        <Switch
+          height="20px"
+          display="block"
+          id="enable-comments"
+          color="green"
+          isChecked={field.isInternal ? false : field.hasCommentsEnabled}
+          onChange={(event) =>
+            onFieldEdit(field.id, {
+              hasCommentsEnabled: event.target.checked,
+            })
+          }
+          isDisabled={isReadOnly || field.isInternal}
+        />
+      </SettingsRow>
+
+      <SettingsRow
+        isDisabled={isReadOnly || field.isFixed}
+        label={
+          <FormattedMessage
+            id="component.petition-settings.petition-internal-field"
+            defaultMessage="Internal field"
+          />
+        }
+        description={
+          <FormattedMessage
+            id="field-settings.internal-field-description"
+            defaultMessage="Enabling this will make the field invisible to the recipient."
+          />
+        }
+        controlId="internal-field"
+      >
+        <Switch
+          height="20px"
+          display="block"
+          id="internal-field"
+          color="green"
+          isChecked={field.isInternal}
+          onChange={(event) =>
+            onFieldEdit(field.id, {
+              isInternal: event.target.checked,
+              showInPdf: !event.target.checked,
+            })
+          }
+          isDisabled={isReadOnly || field.isFixed}
+        />
+      </SettingsRow>
+      <SettingsRow
+        isDisabled={isReadOnly}
+        label={
+          <FormattedMessage
+            id="component.petition-settings.petition-shown-in-pdf"
+            defaultMessage="Show in PDF"
+          />
+        }
+        description={
+          <FormattedMessage
+            id="field-settings.show-in-pdf-description"
+            defaultMessage="Enabling this option will make the content appear in the exported PDF and the document to be signed."
+          />
+        }
+        controlId="show-in-pdf"
+      >
+        <Switch
+          height="20px"
+          display="block"
+          id="show-in-pdf"
+          color="green"
+          isChecked={field.showInPdf}
+          onChange={(event) =>
+            onFieldEdit(field.id, {
+              showInPdf: event.target.checked,
+            })
+          }
+          isDisabled={isReadOnly}
+        />
+      </SettingsRow>
+      {!field.isReadOnly && field.type !== "CHECKBOX" && (
+        <SettingsRow
+          isDisabled={isReadOnly}
+          label={
+            field.type === "FILE_UPLOAD" ? (
+              <FormattedMessage
+                id="field-settings.file-multiple-label"
+                defaultMessage="Allow uploading more than one file"
+              />
+            ) : (
+              <FormattedMessage
+                id="field-settings.multiple-label"
+                defaultMessage="Allow more than one reply"
+              />
+            )
+          }
+          description={
+            field.type === "FILE_UPLOAD" ? (
+              <FormattedMessage
+                id="field-settings.file-multiple-description"
+                defaultMessage="Enabling this allows the recipient to upload multiple files to this field."
+              />
+            ) : (
+              <FormattedMessage
+                id="field-settings.multiple-description"
+                defaultMessage="Enabling this allows the recipient to submit multiple answers to this field."
+              />
+            )
+          }
+          controlId="field-multiple"
+        >
+          <Switch
+            height="20px"
+            display="block"
+            id="field-multiple"
+            color="green"
+            isChecked={field.multiple}
+            onChange={(event) => onFieldEdit(field.id, { multiple: event.target.checked })}
+            isDisabled={isReadOnly}
+          />
+        </SettingsRow>
+      )}
+    </>
+  );
+
   return (
     <Card>
       <CardHeader isCloseable onClose={onClose}>
@@ -85,135 +219,7 @@ export function PetitionComposeFieldSettings({
             isDisabled={isReadOnly || field.isFixed}
           />
         </Box>
-        <SettingsRow
-          isDisabled={isReadOnly || field.isInternal}
-          label={
-            <FormattedMessage
-              id="component.petition-settings.petition-comments-enable"
-              defaultMessage="Allow comments"
-            />
-          }
-          controlId="enable-comments"
-        >
-          <Switch
-            height="20px"
-            display="block"
-            id="enable-comments"
-            color="green"
-            isChecked={field.isInternal ? false : field.hasCommentsEnabled}
-            onChange={(event) =>
-              onFieldEdit(field.id, {
-                hasCommentsEnabled: event.target.checked,
-              })
-            }
-            isDisabled={isReadOnly || field.isInternal}
-          />
-        </SettingsRow>
-
-        <SettingsRow
-          isDisabled={isReadOnly || field.isFixed}
-          label={
-            <FormattedMessage
-              id="component.petition-settings.petition-internal-field"
-              defaultMessage="Internal field"
-            />
-          }
-          description={
-            <FormattedMessage
-              id="field-settings.internal-field-description"
-              defaultMessage="Enabling this will make the field invisible to the recipient."
-            />
-          }
-          controlId="internal-field"
-        >
-          <Switch
-            height="20px"
-            display="block"
-            id="internal-field"
-            color="green"
-            isChecked={field.isInternal}
-            onChange={(event) =>
-              onFieldEdit(field.id, {
-                isInternal: event.target.checked,
-                showInPdf: !event.target.checked,
-              })
-            }
-            isDisabled={isReadOnly || field.isFixed}
-          />
-        </SettingsRow>
-        <SettingsRow
-          isDisabled={isReadOnly}
-          label={
-            <FormattedMessage
-              id="component.petition-settings.petition-shown-in-pdf"
-              defaultMessage="Show in PDF"
-            />
-          }
-          description={
-            <FormattedMessage
-              id="field-settings.show-in-pdf-description"
-              defaultMessage="Enabling this option will make the content appear in the exported PDF and the document to be signed."
-            />
-          }
-          controlId="show-in-pdf"
-        >
-          <Switch
-            height="20px"
-            display="block"
-            id="show-in-pdf"
-            color="green"
-            isChecked={field.showInPdf}
-            onChange={(event) =>
-              onFieldEdit(field.id, {
-                showInPdf: event.target.checked,
-              })
-            }
-            isDisabled={isReadOnly}
-          />
-        </SettingsRow>
-
-        {!field.isReadOnly && field.type !== "CHECKBOX" && (
-          <SettingsRow
-            isDisabled={isReadOnly}
-            label={
-              field.type === "FILE_UPLOAD" ? (
-                <FormattedMessage
-                  id="field-settings.file-multiple-label"
-                  defaultMessage="Allow uploading more than one file"
-                />
-              ) : (
-                <FormattedMessage
-                  id="field-settings.multiple-label"
-                  defaultMessage="Allow more than one reply"
-                />
-              )
-            }
-            description={
-              field.type === "FILE_UPLOAD" ? (
-                <FormattedMessage
-                  id="field-settings.file-multiple-description"
-                  defaultMessage="Enabling this allows the recipient to upload multiple files to this field."
-                />
-              ) : (
-                <FormattedMessage
-                  id="field-settings.multiple-description"
-                  defaultMessage="Enabling this allows the recipient to submit multiple answers to this field."
-                />
-              )
-            }
-            controlId="field-multiple"
-          >
-            <Switch
-              height="20px"
-              display="block"
-              id="field-multiple"
-              color="green"
-              isChecked={field.multiple}
-              onChange={(event) => onFieldEdit(field.id, { multiple: event.target.checked })}
-              isDisabled={isReadOnly}
-            />
-          </SettingsRow>
-        )}
+        {field.type !== "SHORT_TEXT" ? commonSettings : null}
         {field.type === "HEADING" ? (
           <HeadingSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
         ) : field.type === "FILE_UPLOAD" ? (
@@ -221,7 +227,9 @@ export function PetitionComposeFieldSettings({
         ) : field.type === "TEXT" ? (
           <TextSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
         ) : field.type === "SHORT_TEXT" ? (
-          <ShortTextSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
+          <ShortTextSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly}>
+            {commonSettings}
+          </ShortTextSettings>
         ) : field.type === "SELECT" ? (
           <SelectOptionSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
         ) : field.type === "DYNAMIC_SELECT" ? (

@@ -16,7 +16,8 @@ export function ShortTextSettings({
   field,
   onFieldEdit,
   isReadOnly,
-}: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">) {
+  children,
+}: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly" | "children">) {
   const intl = useIntl();
   const options = field.options as FieldOptions["SHORT_TEXT"];
   const [placeholder, setPlaceholder] = useState(options.placeholder ?? "");
@@ -99,6 +100,7 @@ export function ShortTextSettings({
           </Text>
         ) : null}
       </Stack>
+      {children}
       <SettingsRowPlaceholder
         placeholder={placeholder}
         onChange={handlePlaceholderChange}
