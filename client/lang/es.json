@@ -3615,6 +3615,16 @@
     "context": "Enter the contact details"
   },
   {
+    "term": "contacts.email-error.check-correct-email",
+    "definition": "Por favor, asegúrate de que el correo sea el correcto.",
+    "context": "Please make sure that the email is correct."
+  },
+  {
+    "term": "contacts.email-error.validation-failed",
+    "definition": "La validación del correo ha fallado",
+    "context": "The email validation has failed"
+  },
+  {
     "term": "contacts.header.email",
     "definition": "Correo electrónico",
     "context": "Email"

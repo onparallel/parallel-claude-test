@@ -52,6 +52,7 @@ const QUERY_STATE = {
 
 function Contacts() {
   const intl = useIntl();
+  const showToast = useToast();
   const errorToast = useExistingContactToast();
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const {
@@ -94,6 +95,21 @@ function Contacts() {
       if (isApolloError(error, "EXISTING_CONTACT")) {
         errorToast();
       }
+      if (isApolloError(error, "ARG_VALIDATION_ERROR")) {
+        showToast({
+          title: intl.formatMessage({
+            id: "contacts.email-error.validation-failed",
+            defaultMessage: "The email validation has failed",
+          }),
+          description: intl.formatMessage({
+            id: "contacts.email-error.check-correct-email",
+            defaultMessage: "Please make sure that the email is correct.",
+          }),
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
     }
   }
   const deleteContacts = useDeleteContacts();
@@ -105,7 +121,7 @@ function Contacts() {
   }
 
   const showImportContactsDialog = useDialog(ImportContactsDialog);
-  const showToast = useToast();
+
   async function handleImportClick() {
     const [error, data] = await withError(showImportContactsDialog({}));
     if (!error) {
