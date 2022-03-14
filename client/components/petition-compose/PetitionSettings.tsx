@@ -216,21 +216,10 @@ function _PetitionSettings({
         }
       }
       if (publicLink) {
-        // if the public link owner is not found, it means its permissions have been modified on the TemplateDefaultPermissionsDialog
-        // so, before reactivating the link we need to ask for a new owner
-        let ownerId = publicLink.owner?.id;
-        if (!ownerId) {
-          const { ownerId: newOwnerId } = await showPublicLinkSettingDialog({
-            template: petition,
-            publicLink,
-          });
-          ownerId = newOwnerId;
-        }
         await updatePublicPetitionLink({
           variables: {
             publicPetitionLinkId: publicLink.id,
             isActive: !publicLink.isActive,
-            ownerId: publicLink.owner?.id ?? ownerId,
           },
         });
       } else {
@@ -744,14 +733,12 @@ const mutations = [
       $templateId: GID!
       $title: String!
       $description: String!
-      $ownerId: GID!
       $slug: String
     ) {
       createPublicPetitionLink(
         templateId: $templateId
         title: $title
         description: $description
-        ownerId: $ownerId
         slug: $slug
       ) {
         ...PublicLinkSettingsDialog_PublicPetitionLink
@@ -771,7 +758,6 @@ const mutations = [
       $isActive: Boolean
       $title: String
       $description: String
-      $ownerId: GID
       $slug: String
     ) {
       updatePublicPetitionLink(
@@ -779,7 +765,6 @@ const mutations = [
         isActive: $isActive
         title: $title
         description: $description
-        ownerId: $ownerId
         slug: $slug
       ) {
         ...PublicLinkSettingsDialog_PublicPetitionLink

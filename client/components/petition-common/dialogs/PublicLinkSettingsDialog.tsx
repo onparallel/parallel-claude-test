@@ -19,7 +19,7 @@ import { CheckIcon, CloseIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
-import { UserSelect, useSearchUsers } from "@parallel/components/common/UserSelect";
+import { ExternalLink } from "@parallel/components/common/Link";
 import {
   PublicLinkSettingsDialog_getSlugDocument,
   PublicLinkSettingsDialog_isValidSlugDocument,
@@ -30,15 +30,14 @@ import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useAsyncEffect } from "@parallel/utils/useAsyncEffect";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
-import { useCallback, useRef } from "react";
+import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, pick } from "remeda";
+import { pick } from "remeda";
 
 interface PublicLinkSettingsData {
   title: string;
   description: string;
-  ownerId: string;
   slug: string;
 }
 
@@ -53,7 +52,6 @@ export function PublicLinkSettingsDialog({
 }: DialogProps<PublicLinkSettingsDialogProps, PublicLinkSettingsData>) {
   const apollo = useApolloClient();
   const intl = useIntl();
-  const _handleSearchUsers = useSearchUsers();
 
   const { handleSubmit, register, control, setValue, formState } =
     useForm<PublicLinkSettingsDialog_PublicPetitionLinkFragment>({
@@ -62,7 +60,6 @@ export function PublicLinkSettingsDialog({
         title: publicLink?.title ?? "",
         description: publicLink?.description ?? "",
         slug: publicLink?.slug ?? "",
-        owner: publicLink?.owner ?? template.owner,
       },
     });
   const { errors, dirtyFields, isValidating } = formState;
@@ -86,15 +83,6 @@ export function PublicLinkSettingsDialog({
   const titleRegisterProps = useRegisterWithRef(titleRef, register, "title", {
     required: true,
   });
-
-  const handleSearchOwner = useCallback(
-    async (search: string, excludeUsers: string[]) => {
-      return await _handleSearchUsers(search, {
-        excludeUsers: [...excludeUsers],
-      });
-    },
-    [_handleSearchUsers]
-  );
 
   const debouncedIsValidSlug = useDebouncedAsync(
     async (slug: string) => {
@@ -134,15 +122,12 @@ export function PublicLinkSettingsDialog({
 
   return (
     <ConfirmDialog
-      size="2xl"
+      size="xl"
       hasCloseButton
       content={{
         as: "form",
         onSubmit: handleSubmit((data) => {
-          props.onResolve({
-            ...pick(data, ["title", "description", "slug"]),
-            ownerId: data.owner!.id,
-          });
+          props.onResolve(pick(data, ["title", "description", "slug"]));
         }),
       }}
       initialFocusRef={titleRef}
@@ -170,13 +155,34 @@ export function PublicLinkSettingsDialog({
               </Stack>
             </Alert>
           ) : null}
-
-          <Text>
-            <FormattedMessage
-              id="component.settings-public-link-dialog.description"
-              defaultMessage="Complete the information for users who access the link and define who will have access to the created petitions."
-            />
-          </Text>
+          <Stack spacing={2}>
+            <Text>
+              <FormattedMessage
+                id="component.settings-public-link-dialog.description"
+                defaultMessage="Generates a link that allows your recipients to start a petition. These petitions will be assigned by default to the template owner."
+              />
+            </Text>
+            <Text>
+              <FormattedMessage
+                id="component.settings-public-link-dialog.know-more"
+                defaultMessage="<a>More about the link</a>"
+                values={{
+                  a: (chunks: any[]) => (
+                    <ExternalLink
+                      fontWeight="bold"
+                      href={
+                        intl.locale === "es"
+                          ? "https://help.onparallel.com/es/articles/6050184-que-son-y-como-funcionan-los-enlaces-publicos"
+                          : "https://help.onparallel.com/en/articles/6050184-what-are-public-links-and-how-do-they-work"
+                      }
+                    >
+                      {chunks}
+                    </ExternalLink>
+                  ),
+                }}
+              />
+            </Text>
+          </Stack>
           <FormControl id="title" isInvalid={!!errors.title}>
             <FormLabel>
               <Text as="span">
@@ -229,38 +235,6 @@ export function PublicLinkSettingsDialog({
                 defaultMessage="Description is required"
               />
             </FormErrorMessage>
-          </FormControl>
-          <FormControl id="owner">
-            <FormLabel>
-              <Text as="span">
-                <FormattedMessage id="petition-permission-type.owner" defaultMessage="Owner" />
-              </Text>
-              <Text as="span" marginLeft={0.5}>
-                *
-              </Text>
-            </FormLabel>
-            <Controller
-              name="owner"
-              control={control}
-              rules={{ validate: { isDefined }, required: true }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <UserSelect
-                  value={value!}
-                  onKeyDown={(e: KeyboardEvent) => {
-                    if (e.key === "Enter" && !(e.target as HTMLInputElement).value) {
-                      e.preventDefault();
-                    }
-                  }}
-                  onChange={onChange}
-                  onBlur={onBlur}
-                  onSearch={handleSearchOwner}
-                  placeholder={intl.formatMessage({
-                    id: "component.settings-public-link-dialog.owner-placeholder",
-                    defaultMessage: "Select an owner",
-                  })}
-                />
-              )}
-            />
           </FormControl>
           <FormControl
             isInvalid={errors.slug && errors.slug.message !== "DEBOUNCED" && dirtyFields.slug}
@@ -372,11 +346,7 @@ PublicLinkSettingsDialog.fragments = {
       organization {
         customHost
       }
-      owner {
-        ...UserSelect_User
-      }
     }
-    ${UserSelect.fragments.User}
   `,
   PublicPetitionLink: gql`
     fragment PublicLinkSettingsDialog_PublicPetitionLink on PublicPetitionLink {
@@ -386,11 +356,7 @@ PublicLinkSettingsDialog.fragments = {
       description
       slug
       url
-      owner {
-        ...UserSelect_User
-      }
     }
-    ${UserSelect.fragments.User}
   `,
 };
 

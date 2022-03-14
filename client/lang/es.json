@@ -2971,8 +2971,8 @@
   },
   {
     "term": "component.settings-public-link-dialog.description",
-    "definition": "Completa la información que verán los usuarios que accedan al enlace y define quién tendrá acceso a las peticiones creadas.",
-    "context": "Complete the information for users who access the link and define who will have access to the created petitions."
+    "definition": "Genera un enlace que permita a tus destinatarios comenzar una petición. Estas peticiones se asignarán por defecto al propietario de la plantilla.",
+    "context": "Generates a link that allows your recipients to start a petition. These petitions will be assigned by default to the template owner."
   },
   {
     "term": "component.settings-public-link-dialog.description-error",
@@ -2993,6 +2993,11 @@
     "term": "component.settings-public-link-dialog.generate-link",
     "definition": "Generar enlace",
     "context": "Generate link"
+  },
+  {
+    "term": "component.settings-public-link-dialog.know-more",
+    "definition": "<a>Más sobre el enlace</a>",
+    "context": "<a>More about the link</a>"
   },
   {
     "term": "component.settings-public-link-dialog.link-edited-alert",
@@ -3018,11 +3023,6 @@
     "term": "component.settings-public-link-dialog.link-popover",
     "definition": "Personaliza tu enlace público. Añade entre 8 y 30 caracteres, solamente se permiten alfanuméricos y guiones.",
     "context": "Customize your public link. Add between 8 and 30 characters, only alphanumeric and hyphens are allowed."
-  },
-  {
-    "term": "component.settings-public-link-dialog.owner-placeholder",
-    "definition": "Selecciona el propietario de la petición",
-    "context": "Select an owner"
   },
   {
     "term": "component.settings-public-link-dialog.page-title-error",

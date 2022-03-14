@@ -2971,8 +2971,8 @@
   },
   {
     "term": "component.settings-public-link-dialog.description",
-    "definition": "Complete the information for users who access the link and define who will have access to the created petitions.",
-    "context": "Complete the information for users who access the link and define who will have access to the created petitions."
+    "definition": "Generates a link that allows your recipients to start a petition. These petitions will be assigned by default to the template owner.",
+    "context": "Generates a link that allows your recipients to start a petition. These petitions will be assigned by default to the template owner."
   },
   {
     "term": "component.settings-public-link-dialog.description-error",
@@ -2993,6 +2993,11 @@
     "term": "component.settings-public-link-dialog.generate-link",
     "definition": "Generate link",
     "context": "Generate link"
+  },
+  {
+    "term": "component.settings-public-link-dialog.know-more",
+    "definition": "<a>More about the link</a>",
+    "context": "<a>More about the link</a>"
   },
   {
     "term": "component.settings-public-link-dialog.link-edited-alert",
@@ -3018,11 +3023,6 @@
     "term": "component.settings-public-link-dialog.link-popover",
     "definition": "Customize your public link. Add between 8 and 30 characters, only alphanumeric and hyphens are allowed.",
     "context": "Customize your public link. Add between 8 and 30 characters, only alphanumeric and hyphens are allowed."
-  },
-  {
-    "term": "component.settings-public-link-dialog.owner-placeholder",
-    "definition": "Select an owner",
-    "context": "Select an owner"
   },
   {
     "term": "component.settings-public-link-dialog.page-title-error",

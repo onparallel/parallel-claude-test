@@ -643,7 +643,7 @@ export type Mutation = {
   updatePetitionFieldRepliesStatus: PetitionField;
   /** Updates a reply on a petition field */
   updatePetitionFieldReply: PetitionFieldReply;
-  /** Updates the metada of the specified petition field reply */
+  /** Updates the metadata of the specified petition field reply */
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
   /** Updates the subscription flag on a PetitionPermission */
   updatePetitionPermissionSubscription: Petition;
@@ -876,7 +876,6 @@ export type MutationcreatePrintPdfTaskArgs = {
 
 export type MutationcreatePublicPetitionLinkArgs = {
   description: Scalars["String"];
-  ownerId: Scalars["GID"];
   slug?: InputMaybe<Scalars["String"]>;
   templateId: Scalars["GID"];
   title: Scalars["String"];
@@ -1475,7 +1474,6 @@ export type MutationupdatePetitionUserNotificationReadStatusArgs = {
 export type MutationupdatePublicPetitionLinkArgs = {
   description?: InputMaybe<Scalars["String"]>;
   isActive?: InputMaybe<Scalars["Boolean"]>;
-  ownerId?: InputMaybe<Scalars["GID"]>;
   publicPetitionLinkId: Scalars["GID"];
   slug?: InputMaybe<Scalars["String"]>;
   title?: InputMaybe<Scalars["String"]>;
@@ -2629,7 +2627,7 @@ export type PublicPublicPetitionLink = {
   isActive: Scalars["Boolean"];
   /** If the organization has enough credits to send a petition with this public link or not */
   isAvailable: Scalars["Boolean"];
-  owner: PublicUser;
+  owner: Maybe<PublicUser>;
   slug: Scalars["String"];
   title: Scalars["String"];
 };

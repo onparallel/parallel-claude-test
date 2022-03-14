@@ -674,7 +674,7 @@ export interface Mutation {
   updatePetitionFieldRepliesStatus: PetitionField;
   /** Updates a reply on a petition field */
   updatePetitionFieldReply: PetitionFieldReply;
-  /** Updates the metada of the specified petition field reply */
+  /** Updates the metadata of the specified petition field reply */
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
   /** Updates the subscription flag on a PetitionPermission */
   updatePetitionPermissionSubscription: Petition;
@@ -907,7 +907,6 @@ export interface MutationcreatePrintPdfTaskArgs {
 
 export interface MutationcreatePublicPetitionLinkArgs {
   description: Scalars["String"];
-  ownerId: Scalars["GID"];
   slug?: InputMaybe<Scalars["String"]>;
   templateId: Scalars["GID"];
   title: Scalars["String"];
@@ -1506,7 +1505,6 @@ export interface MutationupdatePetitionUserNotificationReadStatusArgs {
 export interface MutationupdatePublicPetitionLinkArgs {
   description?: InputMaybe<Scalars["String"]>;
   isActive?: InputMaybe<Scalars["Boolean"]>;
-  ownerId?: InputMaybe<Scalars["GID"]>;
   publicPetitionLinkId: Scalars["GID"];
   slug?: InputMaybe<Scalars["String"]>;
   title?: InputMaybe<Scalars["String"]>;
@@ -2714,7 +2712,7 @@ export interface PublicPublicPetitionLink {
   isActive: Scalars["Boolean"];
   /** If the organization has enough credits to send a petition with this public link or not */
   isAvailable: Scalars["Boolean"];
-  owner: PublicUser;
+  owner?: Maybe<PublicUser>;
   slug: Scalars["String"];
   title: Scalars["String"];
 }
@@ -7857,7 +7855,6 @@ export type PetitionSettings_createPublicPetitionLinkMutationVariables = Exact<{
   templateId: Scalars["GID"];
   title: Scalars["String"];
   description: Scalars["String"];
-  ownerId: Scalars["GID"];
   slug?: InputMaybe<Scalars["String"]>;
 }>;
 
@@ -7883,7 +7880,6 @@ export type PetitionSettings_updatePublicPetitionLinkMutationVariables = Exact<{
   isActive?: InputMaybe<Scalars["Boolean"]>;
   title?: InputMaybe<Scalars["String"]>;
   description?: InputMaybe<Scalars["String"]>;
-  ownerId?: InputMaybe<Scalars["GID"]>;
   slug?: InputMaybe<Scalars["String"]>;
 }>;
 
@@ -17602,12 +17598,12 @@ export type PublicPetitionLink_PublicPublicPetitionLinkFragment = {
   title: string;
   isAvailable: boolean;
   description: string;
-  owner: {
+  owner?: {
     __typename?: "PublicUser";
     fullName: string;
     email: string;
     organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
-  };
+  } | null;
 };
 
 export type PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutationVariables = Exact<{
@@ -17639,12 +17635,12 @@ export type PublicPetitionLink_publicPetitionLinkBySlugQuery = {
     title: string;
     isAvailable: boolean;
     description: string;
-    owner: {
+    owner?: {
       __typename?: "PublicUser";
       fullName: string;
       email: string;
       organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
-    };
+    } | null;
   } | null;
 };
 
@@ -22589,14 +22585,12 @@ export const PetitionSettings_createPublicPetitionLinkDocument = gql`
     $templateId: GID!
     $title: String!
     $description: String!
-    $ownerId: GID!
     $slug: String
   ) {
     createPublicPetitionLink(
       templateId: $templateId
       title: $title
       description: $description
-      ownerId: $ownerId
       slug: $slug
     ) {
       ...PublicLinkSettingsDialog_PublicPetitionLink
@@ -22619,7 +22613,6 @@ export const PetitionSettings_updatePublicPetitionLinkDocument = gql`
     $isActive: Boolean
     $title: String
     $description: String
-    $ownerId: GID
     $slug: String
   ) {
     updatePublicPetitionLink(
@@ -22627,7 +22620,6 @@ export const PetitionSettings_updatePublicPetitionLinkDocument = gql`
       isActive: $isActive
       title: $title
       description: $description
-      ownerId: $ownerId
       slug: $slug
     ) {
       ...PublicLinkSettingsDialog_PublicPetitionLink
