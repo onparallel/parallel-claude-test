@@ -159,29 +159,22 @@ export function PublicLinkSettingsDialog({
             <Text>
               <FormattedMessage
                 id="component.settings-public-link-dialog.description"
-                defaultMessage="Generates a link that allows your recipients to start a petition. These petitions will be assigned by default to the template owner."
+                defaultMessage="Generates a link that allows third parties to start a petition. These petitions will be assigned by default to the template owner."
               />
             </Text>
-            <Text>
+            <ExternalLink
+              fontWeight="bold"
+              href={
+                intl.locale === "es"
+                  ? "https://help.onparallel.com/es/articles/6050184-que-son-y-como-funcionan-los-enlaces-publicos"
+                  : "https://help.onparallel.com/en/articles/6050184-what-are-public-links-and-how-do-they-work"
+              }
+            >
               <FormattedMessage
                 id="component.settings-public-link-dialog.know-more"
-                defaultMessage="<a>More about the link</a>"
-                values={{
-                  a: (chunks: any[]) => (
-                    <ExternalLink
-                      fontWeight="bold"
-                      href={
-                        intl.locale === "es"
-                          ? "https://help.onparallel.com/es/articles/6050184-que-son-y-como-funcionan-los-enlaces-publicos"
-                          : "https://help.onparallel.com/en/articles/6050184-what-are-public-links-and-how-do-they-work"
-                      }
-                    >
-                      {chunks}
-                    </ExternalLink>
-                  ),
-                }}
+                defaultMessage="Learn more about sharing via link"
               />
-            </Text>
+            </ExternalLink>
           </Stack>
           <FormControl id="title" isInvalid={!!errors.title}>
             <FormLabel>
@@ -195,13 +188,7 @@ export function PublicLinkSettingsDialog({
                 *
               </Text>
             </FormLabel>
-            <Input
-              {...titleRegisterProps}
-              placeholder={intl.formatMessage({
-                id: "component.settings-public-link-dialog.page-title-placeholder",
-                defaultMessage: "Include the title your recipients will see",
-              })}
-            />
+            <Input {...titleRegisterProps} />
             <FormErrorMessage>
               <FormattedMessage
                 id="component.settings-public-link-dialog.page-title-error"

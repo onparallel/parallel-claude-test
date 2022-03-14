@@ -1659,6 +1659,15 @@ export const updateTemplateDefaultPermissions = mutationField("updateTemplateDef
     templateId: nonNull(globalIdArg("Petition")),
     permissions: nonNull(list(nonNull("UserOrUserGroupPermissionInput"))),
   },
+  validateArgs: (_, args, ctx, info) => {
+    const ownerPermissions = args.permissions.filter((p) => p.permissionType === "OWNER");
+    if (
+      ownerPermissions.length > 1 || // 0 or 1 OWNER defined in the array
+      (ownerPermissions.length === 1 && !isDefined(ownerPermissions[0].userId)) // if there is an owner, userId must be defined
+    ) {
+      throw new ArgValidationError(info, "permissions", "Invalid permissions array");
+    }
+  },
   resolve: async (_, args, ctx) => {
     await ctx.petitions.resetTemplateDefaultPermissions(
       args.templateId,

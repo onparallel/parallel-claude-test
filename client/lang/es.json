@@ -2971,8 +2971,8 @@
   },
   {
     "term": "component.settings-public-link-dialog.description",
-    "definition": "Genera un enlace que permita a tus destinatarios comenzar una petición. Estas peticiones se asignarán por defecto al propietario de la plantilla.",
-    "context": "Generates a link that allows your recipients to start a petition. These petitions will be assigned by default to the template owner."
+    "definition": "Genera un enlace que permita a terceros comenzar una petición. Estas peticiones se asignarán por defecto al propietario de la plantilla.",
+    "context": "Generates a link that allows third parties to start a petition. These petitions will be assigned by default to the template owner."
   },
   {
     "term": "component.settings-public-link-dialog.description-error",
@@ -2996,8 +2996,8 @@
   },
   {
     "term": "component.settings-public-link-dialog.know-more",
-    "definition": "<a>Más sobre el enlace</a>",
-    "context": "<a>More about the link</a>"
+    "definition": "Más sobre compartir enlace",
+    "context": "Learn more about sharing via link"
   },
   {
     "term": "component.settings-public-link-dialog.link-edited-alert",

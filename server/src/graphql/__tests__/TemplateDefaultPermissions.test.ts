@@ -136,6 +136,8 @@ describe("GraphQL/TemplateDefaultPermissions", () => {
           ],
         },
       });
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
 
     it("deletes previous user permissions", async () => {
@@ -484,6 +486,35 @@ describe("GraphQL/TemplateDefaultPermissions", () => {
           },
         ],
       });
+    });
+
+    it("throws error when trying to update template permissions with more than 1 owner", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($templateId: GID!, $permissions: [UserOrUserGroupPermissionInput!]!) {
+            updateTemplateDefaultPermissions(templateId: $templateId, permissions: $permissions) {
+              id
+            }
+          }
+        `,
+        variables: {
+          templateId: toGlobalId("Petition", templates[0].id),
+          permissions: [
+            {
+              userId: toGlobalId("User", users[2].id),
+              permissionType: "OWNER",
+              isSubscribed: true,
+            },
+            {
+              userId: toGlobalId("User", users[1].id),
+              permissionType: "OWNER",
+              isSubscribed: true,
+            },
+          ],
+        },
+      });
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
     });
   });
 });
