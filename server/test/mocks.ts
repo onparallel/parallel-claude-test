@@ -26,7 +26,9 @@ export class MockAuth implements IAuth {
        */
       return null;
     }
-    return await this.users.loadUserByCognitoId(USER_COGNITO_ID);
+    // TODO manage users.length >1
+    const [user] = await this.users.loadUsersByCognitoId(USER_COGNITO_ID);
+    return user;
   }
   async guessLogin() {}
   async callback() {}

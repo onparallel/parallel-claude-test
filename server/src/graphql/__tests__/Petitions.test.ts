@@ -18,6 +18,7 @@ import {
   Tag,
   TemplateDefaultPermission,
   User,
+  UserData,
   UserGroup,
 } from "../../db/__types";
 import { AUTH, IAuth } from "../../services/auth";
@@ -70,6 +71,7 @@ describe("GraphQL/Petitions", () => {
 
   let organization: Organization;
   let sessionUser: User;
+  let sessionUserData: UserData;
   let collaboratorUser: User;
   let petitions: Petition[];
   let sameOrgUser: User;
@@ -97,6 +99,7 @@ describe("GraphQL/Petitions", () => {
     mocks = new Mocks(knex);
 
     ({ organization, user: sessionUser } = await mocks.createSessionUserAndOrganization());
+    sessionUserData = await mocks.loadUserData(sessionUser.user_data_id);
 
     // secondary org
     [otherOrg] = await mocks.createRandomOrganizations(1);
@@ -2892,7 +2895,7 @@ describe("GraphQL/Petitions", () => {
     let contacts: Contact[];
     beforeAll(async () => {
       contacts = await mocks.createRandomContacts(organization.id, 3, (i) => ({
-        email: i === 0 ? sessionUser.email : faker.internet.email(),
+        email: i === 0 ? sessionUserData.email : faker.internet.email(),
       }));
       usageLimit = await mocks.createOrganizationUsageLimit(organization.id, "PETITION_SEND", 0);
     });

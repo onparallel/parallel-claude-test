@@ -8,6 +8,7 @@ import {
   PetitionPermission,
   TemplateDefaultPermission,
   User,
+  UserData,
 } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
@@ -17,6 +18,7 @@ describe("GraphQL/Users", () => {
   let testClient: TestClient;
   let organization: Organization;
   let sessionUser: User;
+  let sessionUserData: UserData;
   let sessionUserGID: string;
 
   beforeAll(async () => {
@@ -24,9 +26,8 @@ describe("GraphQL/Users", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    ({ organization, user: sessionUser } = await mocks.createSessionUserAndOrganization({
-      organization_role: "ADMIN",
-    }));
+    ({ organization, user: sessionUser } = await mocks.createSessionUserAndOrganization("ADMIN"));
+    sessionUserData = await mocks.loadUserData(sessionUser.user_data_id);
 
     sessionUserGID = toGlobalId("User", sessionUser.id);
   });
@@ -750,7 +751,7 @@ describe("GraphQL/Users", () => {
           }
         `,
         variables: {
-          email: sessionUser.email,
+          email: sessionUserData.email,
           firstName: "Michael",
           lastName: "Scott",
           role: "ADMIN",
@@ -770,7 +771,7 @@ describe("GraphQL/Users", () => {
         is_enabled: true,
       });
 
-      const [, sessionUserDomain] = sessionUser.email.split("@");
+      const [, sessionUserDomain] = sessionUserData.email.split("@");
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation (

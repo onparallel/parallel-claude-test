@@ -17,15 +17,21 @@ export async function petitionShared(
   },
   context: WorkerContext
 ) {
-  const [user, permissions] = await Promise.all([
+  const [user, userData, permissions] = await Promise.all([
     context.users.loadUser(payload.user_id),
+    context.users.loadUserDataByUserId(payload.user_id),
     context.petitions.loadPetitionPermission(payload.petition_permission_ids),
   ]);
   if (!user) {
-    throw new Error(`User not found for user_id ${payload.user_id}`);
+    throw new Error(`User:${payload.user_id} not found`);
   }
-  const [permissionUsers, petitions] = await Promise.all([
-    context.users.loadUser(uniq(permissions.filter(isDefined).map((p) => p.user_id!))),
+  if (!userData) {
+    throw new Error(`UserData not found for User:${payload.user_id}`);
+  }
+  const userIds = uniq(permissions.filter(isDefined).map((p) => p.user_id!));
+  const [permissionUsers, permissionUsersData, petitions] = await Promise.all([
+    context.users.loadUser(userIds),
+    context.users.loadUserDataByUserId(userIds),
     context.petitions.loadPetition(uniq(permissions.filter(isDefined).map((p) => p.petition_id))),
   ]);
   const permissionUsersById = indexBy(permissionUsers.filter(isDefined), (p) => p.id);
@@ -36,15 +42,18 @@ export async function petitionShared(
   for (const permission of permissions) {
     if (permission) {
       const permissionUser = permissionUsersById[permission.user_id!];
+      const permissionUserData = permissionUsersData.find(
+        (ud) => ud!.id === permissionUser.user_data_id
+      )!;
       const petition = petitionsById[permission.petition_id];
       const { html, text, subject, from } = await buildEmail(
         PetitionSharedEmail,
         {
           petitionId: toGlobalId("Petition", petition.id),
           petitionName: petition.name,
-          name: permissionUser.first_name,
-          ownerName: fullName(user.first_name, user.last_name)!,
-          ownerEmail: user.email,
+          name: permissionUserData.first_name,
+          ownerName: fullName(userData.first_name, userData.last_name)!,
+          ownerEmail: userData.email,
           message: payload.message,
           isTemplate: petition.is_template,
           ...layoutProps,
@@ -53,7 +62,7 @@ export async function petitionShared(
       );
       const email = await context.emailLogs.createEmail({
         from: buildFrom(from, emailFrom),
-        to: permissionUser.email,
+        to: permissionUserData.email,
         subject,
         text,
         html,

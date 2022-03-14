@@ -6,13 +6,13 @@ import { fullName } from "../../util/fullName";
 
 async function fetchCommentAuthor(c: PetitionFieldComment, context: WorkerContext) {
   if (c.user_id) {
-    const user = await context.users.loadUser(c.user_id);
-    if (!user) {
-      throw new Error(`Can't find user with id ${c.user_id}`);
+    const userData = await context.users.loadUserDataByUserId(c.user_id);
+    if (!userData) {
+      throw new Error(`UserData not found for User:${c.user_id}`);
     }
     return {
-      id: `User:${user.id}`,
-      name: fullName(user.first_name, user.last_name) || user.email,
+      id: `User:${c.user_id}`,
+      name: fullName(userData.first_name, userData.last_name) || userData.email,
     };
   } else if (c.petition_access_id) {
     const contact = await context.contacts.loadContactByAccessId(c.petition_access_id);

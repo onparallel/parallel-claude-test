@@ -31,10 +31,10 @@ export async function petitionAccessDelegated(
     throw new Error(`Petition access with id ${payload.original_access_id} not found`);
   }
 
-  const [contact, delegator, petitionOwner, originalMessage] = await Promise.all([
+  const [contact, delegator, petitionOwnerData, originalMessage] = await Promise.all([
     context.contacts.loadContact(newAccess.contact_id),
     context.contacts.loadContact(originalAccess.contact_id),
-    context.users.loadUser(originalAccess.granter_id),
+    context.users.loadUserDataByUserId(originalAccess.granter_id),
     loadOriginalMessageByPetitionAccess(payload.original_access_id, payload.petition_id, context),
   ]);
 
@@ -48,8 +48,8 @@ export async function petitionAccessDelegated(
       `Contact ${originalAccess.contact_id} not found for petition_access with id ${originalAccess.id}`
     );
   }
-  if (!petitionOwner) {
-    throw new Error(`User with id ${originalAccess.granter_id} not found`);
+  if (!petitionOwnerData) {
+    throw new Error(`UserData for User:${originalAccess.granter_id} not found`);
   }
 
   const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
@@ -65,8 +65,8 @@ export async function petitionAccessDelegated(
     {
       senderName: fullName(delegator.first_name, delegator.last_name)!,
       senderEmail: delegator.email,
-      petitionOwnerFullName: fullName(petitionOwner.first_name, petitionOwner.last_name)!,
-      petitionOwnerEmail: petitionOwner.email,
+      petitionOwnerFullName: fullName(petitionOwnerData.first_name, petitionOwnerData.last_name)!,
+      petitionOwnerEmail: petitionOwnerData.email,
       deadline: petition.deadline,
       bodyHtml: toHtml(payload.message_body),
       bodyPlainText: toPlainText(payload.message_body),

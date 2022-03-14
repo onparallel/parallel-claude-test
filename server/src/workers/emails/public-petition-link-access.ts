@@ -13,9 +13,10 @@ export async function publicPetitionLinkAccess(
   if (!message) {
     throw new Error(`PetitionMessage:${payload.petition_message_id} not found`);
   }
-  const [petition, sender, access] = await Promise.all([
+  const [petition, sender, senderData, access] = await Promise.all([
     context.petitions.loadPetition(message.petition_id),
     context.users.loadUser(message.sender_id),
+    context.users.loadUserDataByUserId(message.sender_id),
     context.petitions.loadAccess(message.petition_access_id),
   ]);
   if (!petition) {
@@ -28,6 +29,9 @@ export async function publicPetitionLinkAccess(
   }
   if (!sender) {
     throw new Error(`User:${message.sender_id} not found`);
+  }
+  if (!senderData) {
+    throw new Error(`UserData not found for User:${message.sender_id}`);
   }
   if (!access) {
     throw new Error(`PetitionAccess:${message.petition_access_id} not found`);
@@ -55,7 +59,7 @@ export async function publicPetitionLinkAccess(
     {
       name: contact.first_name,
       fullName: fullName(contact.first_name, contact.last_name),
-      senderName: fullName(sender.first_name, sender.last_name)!,
+      senderName: fullName(senderData.first_name, senderData.last_name)!,
       emailSubject: petition.email_subject,
       petitionTitle: publicPetitionLink.title,
       keycode: access.keycode,
@@ -71,7 +75,7 @@ export async function publicPetitionLinkAccess(
     subject,
     text,
     html,
-    reply_to: sender.email,
+    reply_to: senderData.email,
     track_opens: true,
     created_from: `PetitionMessage:${payload.petition_message_id}`,
   });

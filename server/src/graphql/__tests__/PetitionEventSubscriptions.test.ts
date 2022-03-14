@@ -25,7 +25,7 @@ describe("GraphQL/PetitionEventSubscription", () => {
 
     ({ organization, user: sessionUser } = await mocks.createSessionUserAndOrganization());
 
-    [otherUser] = await mocks.createRandomUsers(organization.id, 1, (i) => ({
+    [otherUser] = await mocks.createRandomUsers(organization.id, 1, undefined, (i) => ({
       cognito_id: "1234",
       first_name: "Harvey",
       last_name: "Specter",

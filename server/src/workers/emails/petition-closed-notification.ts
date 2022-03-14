@@ -21,16 +21,20 @@ export async function petitionClosedNotification(
   },
   context: WorkerContext
 ) {
-  const [petition, sender] = await Promise.all([
+  const [petition, sender, senderData] = await Promise.all([
     context.petitions.loadPetition(payload.petition_id),
     context.users.loadUser(payload.user_id),
+    context.users.loadUserDataByUserId(payload.user_id),
   ]);
 
   if (!petition) {
     return; // if the petition was deleted, return without throwing error
   }
   if (!sender) {
-    throw new Error(`User not found for user_id ${payload.user_id}`);
+    throw new Error(`User:${payload.user_id} not found`);
+  }
+  if (!senderData) {
+    throw new Error(`UserData not found for User:${payload.user_id}`);
   }
 
   const { emailFrom, ...layoutProps } = await getLayoutProps(sender.org_id, context);
@@ -43,13 +47,13 @@ export async function petitionClosedNotification(
       continue;
     }
 
-    const renderContext = { contact, user: sender, petition };
+    const renderContext = { contact, user: senderData, petition };
     const { html, text, subject, from } = await buildEmail(
       PetitionClosedNotification,
       {
         contactFullName: fullName(contact.first_name, contact.last_name)!,
-        senderName: fullName(sender.first_name, sender.last_name)!,
-        senderEmail: sender.email,
+        senderName: fullName(senderData.first_name, senderData.last_name)!,
+        senderEmail: senderData.email,
         bodyHtml: toHtml(payload.message, renderContext),
         bodyPlainText: toPlainText(payload.message, renderContext),
         ...layoutProps,
@@ -62,7 +66,7 @@ export async function petitionClosedNotification(
       subject,
       text,
       html,
-      reply_to: sender.email,
+      reply_to: senderData.email,
       track_opens: true,
       created_from: `PetitionClosedNotification:${accessId}`,
     });

@@ -59,7 +59,6 @@ export const updateUser = mutationField("updateUser", {
         definition(t) {
           t.string("firstName");
           t.string("lastName");
-          t.field("role", { type: "OrganizationRole" });
         },
       }).asArg()
     ),
@@ -70,15 +69,16 @@ export const updateUser = mutationField("updateUser", {
   ),
   resolve: async (_, args, ctx) => {
     const { firstName, lastName } = args.data;
-    const [user] = await ctx.users.updateUserById(
-      args.id,
+    const userData = (await ctx.users.loadUserData(ctx.user!.user_data_id))!;
+    await ctx.users.updateUserData(
+      userData.id,
       removeNotDefined({
         first_name: firstName,
         last_name: lastName,
       }),
       `User:${ctx.user!.id}`
     );
-    return user;
+    return ctx.user!;
   },
 });
 
@@ -137,7 +137,10 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
     }
   ),
   resolve: async (_, args, ctx) => {
-    const organization = await ctx.organizations.loadOrg(ctx.user!.org_id);
+    const [organization, userData] = await Promise.all([
+      ctx.organizations.loadOrg(ctx.user!.org_id),
+      ctx.users.loadUserData(ctx.user!.user_data_id),
+    ]);
     const email = args.email.trim().toLowerCase();
     const cognitoId = await ctx.aws.createCognitoUser(
       email,
@@ -147,16 +150,18 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
       {
         locale: args.locale ?? "en",
         organizationName: organization!.name,
-        organizationUser: fullName(ctx.user!.first_name, ctx.user!.last_name),
+        organizationUser: fullName(userData!.first_name, userData!.last_name),
       },
       true
     );
     const [user] = await Promise.all([
       ctx.users.createUser(
         {
-          cognito_id: cognitoId!,
           org_id: ctx.user!.org_id,
           organization_role: args.role,
+        },
+        {
+          cognito_id: cognitoId!,
           email,
           first_name: args.firstName,
           last_name: args.lastName,
@@ -464,13 +469,15 @@ export const userSignUp = mutationField("userSignUp", {
 
       const user = await ctx.users.createUser(
         {
+          organization_role: "OWNER",
+          org_id: org.id,
+          status: "ACTIVE",
+        },
+        {
           cognito_id: cognitoId!,
           email: args.email,
-          org_id: org.id,
           first_name: args.firstName,
           last_name: args.lastName,
-          organization_role: "OWNER",
-          status: "ACTIVE",
           details: {
             source: "self-service",
             industry: args.industry,
@@ -486,6 +493,12 @@ export const userSignUp = mutationField("userSignUp", {
       // once the user is created, we need to update the created_by column on the different entries
       const [[newUser]] = await Promise.all([
         ctx.users.updateUserById(user.id, { created_by: `User:${user.id}` }, `User:${user.id}`, t),
+        ctx.users.updateUserData(
+          user.user_data_id,
+          { created_by: `User:${user.id}` },
+          `User:${user.id}`,
+          t
+        ),
         logoFile
           ? ctx.files.updatePublicFile(
               logoFile.id,
@@ -522,18 +535,26 @@ export const resendVerificationCode = mutationField("resendVerificationCode", {
   ),
   resolve: async (_, { email, locale }, ctx) => {
     try {
-      const user = await ctx.users.loadUserByEmail(email);
+      const users = (await ctx.users.loadUsersByEmail(email)).filter(isDefined);
+      if (users.length === 0) {
+        return RESULT.SUCCESS;
+      }
+
+      const [user] = users;
+      const userData = await ctx.users.loadUserData(user.user_data_id);
+      if (!userData) {
+        return RESULT.SUCCESS;
+      }
       if (
-        user &&
-        !user.is_sso_user &&
-        (!user.details.verificationCodeSentAt ||
-          differenceInMinutes(new Date(), new Date(user.details.verificationCodeSentAt)) >= 60)
+        !userData.is_sso_user &&
+        (!userData.details.verificationCodeSentAt ||
+          differenceInMinutes(new Date(), new Date(userData.details.verificationCodeSentAt)) >= 60)
       ) {
-        await ctx.users.updateUserById(
-          user.id,
+        await ctx.users.updateUserData(
+          userData.id,
           {
             details: {
-              ...(user.details ?? {}),
+              ...(userData.details ?? {}),
               verificationCodeSentAt: new Date(),
             },
           },
@@ -560,26 +581,41 @@ export const resetTemporaryPassword = mutationField("resetTemporaryPassword", {
   ),
   resolve: async (_, { email, locale }, ctx) => {
     try {
-      const [user, cognitoUser] = await Promise.all([
-        ctx.users.loadUserByEmail(email),
+      const [users, cognitoUser] = await Promise.all([
+        ctx.users.loadUsersByEmail(email),
         ctx.aws.getUser(email),
       ]);
-      const organization = user ? await ctx.organizations.loadOrg(user.org_id) : null;
+      const definedUsers = users.filter(isDefined);
+      if (definedUsers.length === 0) {
+        return RESULT.SUCCESS;
+      }
+
+      // TODO which org to use??
+      const user = definedUsers[0];
+      const [organization, userData] = await Promise.all([
+        user ? await ctx.organizations.loadOrg(user.org_id) : null,
+        user ? await ctx.users.loadUserData(user.user_data_id) : null,
+      ]);
 
       if (
         user &&
-        !user.is_sso_user &&
         organization &&
+        userData &&
+        !userData.is_sso_user &&
         cognitoUser.UserStatus === "FORCE_CHANGE_PASSWORD" &&
         cognitoUser.UserLastModifiedDate &&
         // allow 1 reset every hour
         differenceInMinutes(new Date(), cognitoUser.UserLastModifiedDate) >= 60
       ) {
         const orgOwner = await ctx.organizations.getOrganizationOwner(organization.id);
+        const orgOwnerData = await ctx.users.loadUserData(orgOwner.user_data_id);
+        if (!orgOwnerData) {
+          return RESULT.SUCCESS;
+        }
         await ctx.aws.resetUserPassword(email, {
           locale: locale ?? "en",
           organizationName: organization.name,
-          organizationUser: fullName(orgOwner.first_name, orgOwner.last_name),
+          organizationUser: fullName(orgOwnerData.first_name, orgOwnerData.last_name),
         });
       }
     } catch {}
@@ -598,16 +634,17 @@ export const setUserPreferredLocale = mutationField("setUserPreferredLocale", {
   authorize: authenticate(),
   validateArgs: validLocale((args) => args.locale, "locale"),
   resolve: async (_, { locale }, ctx) => {
-    const [user] = await ctx.users.updateUserById(
-      ctx.user!.id,
+    const userData = (await ctx.users.loadUserData(ctx.user!.user_data_id))!;
+    await ctx.users.updateUserData(
+      userData.id,
       {
         details: {
-          ...(ctx.user!.details ?? {}),
+          ...(userData.details ?? {}),
           preferredLocale: locale,
         },
       },
       `User:${ctx.user!.id}`
     );
-    return user;
+    return ctx.user!;
   },
 });

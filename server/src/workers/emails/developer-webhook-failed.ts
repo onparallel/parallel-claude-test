@@ -26,10 +26,10 @@ export async function developerWebhookFailed(
       `PetitionEventSubscription not found for payload.petition_event_subscription_id ${payload.petition_event_subscription_id}`
     );
   }
-  const subscribedUser = await context.users.loadUser(subscription.user_id);
-  if (!subscribedUser) {
+  const subscribedUserData = await context.users.loadUserDataByUserId(subscription.user_id);
+  if (!subscribedUserData) {
     throw new Error(
-      `User not found for PetitionEventSubscription:${payload.petition_event_subscription_id}`
+      `UserData not found for User:${subscription.user_id} on PetitionEventSubscription:${payload.petition_event_subscription_id}`
     );
   }
 
@@ -37,7 +37,7 @@ export async function developerWebhookFailed(
   const { html, text, subject, from } = await buildEmail(
     DeveloperWebhookFailedEmail,
     {
-      userName: fullName(subscribedUser.first_name, subscribedUser.last_name)!,
+      userName: fullName(subscribedUserData.first_name, subscribedUserData.last_name)!,
       errorMessage: payload.error_message,
       postBody: payload.post_body,
       ...layoutProps,
@@ -46,7 +46,7 @@ export async function developerWebhookFailed(
   );
   return await context.emailLogs.createEmail({
     from: buildFrom(from, emailFrom),
-    to: subscribedUser.email,
+    to: subscribedUserData.email,
     subject,
     text,
     html,

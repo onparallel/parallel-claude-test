@@ -1,6 +1,6 @@
 import Excel from "exceljs";
 import { ApiContext, WorkerContext } from "../../context";
-import { Contact, PetitionField, PetitionFieldComment, User } from "../../db/__types";
+import { Contact, PetitionField, PetitionFieldComment, UserData } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { Maybe } from "../../util/types";
 import { ExcelWorksheet } from "./ExcelWorksheet";
@@ -63,13 +63,14 @@ export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow>
     });
   }
 
-  private async loadCommentAuthor(comment: PetitionFieldComment): Promise<Contact | User> {
+  private async loadCommentAuthor(comment: PetitionFieldComment): Promise<Contact | UserData> {
     if (comment.user_id) {
-      const author = await this.context.users.loadUser(comment.user_id);
-      if (!author) {
-        throw new Error(`User with id ${comment.user_id} not found`);
+      const user = await this.context.users.loadUser(comment.user_id);
+      const authorData = user ? await this.context.users.loadUserData(user.user_data_id) : null;
+      if (!authorData) {
+        throw new Error(`UserData for User:${comment.user_id} not found`);
       }
-      return author;
+      return authorData;
     }
 
     if (comment.petition_access_id) {

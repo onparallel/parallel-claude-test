@@ -24,6 +24,10 @@ export async function signatureCancelledNoCreditsLeft(
   const orgOwner = (await context.organizations.loadOwnerAndAdmins(petition.org_id)).find(
     (u) => u.organization_role === "OWNER"
   )!;
+  const orgOwnerData = await context.users.loadUserData(orgOwner.user_data_id);
+  if (!orgOwnerData) {
+    throw new Error(`UserData:${orgOwner.user_data_id} not found for User:${orgOwner.id}`);
+  }
 
   const emails = [];
   for (const user of users) {
@@ -32,14 +36,18 @@ export async function signatureCancelledNoCreditsLeft(
       continue;
     }
 
+    const userData = await context.users.loadUserData(user.user_data_id);
+    if (!userData) {
+      throw new Error(`UserData:${user.user_data_id} not found for User:${user.id}`);
+    }
     const { emailFrom, ...layoutProps } = await getLayoutProps(parallelOrg.id, context);
 
     const { html, text, subject, from } = await buildEmail(
       SignatureCancelledNoCreditsLeftEmail,
       {
-        orgContactEmail: orgOwner.email,
-        orgContactName: fullName(orgOwner.first_name, orgOwner.last_name),
-        senderName: user.first_name!,
+        orgContactEmail: orgOwnerData.email,
+        orgContactName: fullName(orgOwnerData.first_name, orgOwnerData.last_name),
+        senderName: userData.first_name!,
         petitionName: petition.name,
         signatureProvider: signatureIntegration!.name,
         ...layoutProps,
@@ -50,7 +58,7 @@ export async function signatureCancelledNoCreditsLeft(
     emails.push(
       await context.emailLogs.createEmail({
         from: buildFrom(from, emailFrom),
-        to: user.email,
+        to: userData.email,
         subject,
         text,
         html,

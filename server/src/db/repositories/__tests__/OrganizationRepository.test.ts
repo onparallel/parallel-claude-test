@@ -69,12 +69,19 @@ describe("repositories/OrganizationRepository", () => {
     beforeAll(async () => {
       [org1, org2, org3] = await mocks.createRandomOrganizations(3);
       org1Users = await mocks.createRandomUsers(org1.id, 42);
-      org2Users = await mocks.createRandomUsers(org2.id, 10, (i) => ({
-        // sets info to search later
-        ...setData(i),
-        // delete even i
-        deleted_at: i % 2 === 0 ? new Date(2000, 1, 1) : null,
-      }));
+      org2Users = await mocks.createRandomUsers(
+        org2.id,
+        10,
+        (i) => ({
+          deleted_at: i % 2 === 0 ? new Date(2000, 1, 1) : null,
+        }),
+        (i) => ({
+          // sets info to search later
+          ...setData(i),
+          // delete even i
+          deleted_at: i % 2 === 0 ? new Date(2000, 1, 1) : null,
+        })
+      );
     });
 
     test("returns an empty page without options", async () => {
@@ -114,33 +121,71 @@ describe("repositories/OrganizationRepository", () => {
     });
 
     test("filters results by first name", async () => {
+      const [userData] = await mocks
+        .knex("user_data")
+        .where("email", "joffrey@kingslanding.com")
+        .select("*");
+
       const result = await organizations.loadOrgUsers(org2.id, {
         limit: 10,
         search: "Joffr",
       });
 
       expect(result.totalCount).toBe(1);
-      expect(result.items).toMatchObject([usersToSearch[0]]);
+      expect(result.items).toMatchObject([
+        {
+          user_data_id: userData.id,
+          org_id: org2.id,
+          organization_role: "NORMAL",
+        },
+      ]);
     });
 
     test("filters results by full name", async () => {
+      const [userData] = await mocks
+        .knex("user_data")
+        .where("email", "joffrey@kingslanding.com")
+        .select("*");
+
       const result = await organizations.loadOrgUsers(org2.id, {
         limit: 10,
         search: "Joffrey Barath",
       });
 
       expect(result.totalCount).toBe(1);
-      expect(result.items).toMatchObject([usersToSearch[0]]);
+      expect(result.items).toMatchObject([
+        {
+          user_data_id: userData.id,
+          org_id: org2.id,
+          organization_role: "NORMAL",
+        },
+      ]);
     });
 
     test("filters results by email", async () => {
+      const userData = await mocks
+        .knex("user_data")
+        .whereRaw(`"email" like '%@kingslanding.com'`)
+        .select("*");
+
       const result = await organizations.loadOrgUsers(org2.id, {
         limit: 10,
         search: "kingslanding.com",
       });
 
       expect(result.totalCount).toBe(2);
-      expect(result.items).toMatchObject(usersToSearch);
+      expect(result.items).toMatchObject([
+        {
+          user_data_id: userData.find((ud) => ud.email === "joffrey@kingslanding.com")!.id,
+          org_id: org2.id,
+          organization_role: "NORMAL",
+        },
+        {
+          user_data_id: userData.find((ud) => ud.email === "robert.the.king@kingslanding.com")!.id,
+          org_id: org2.id,
+          organization_role: "NORMAL",
+        },
+      ]);
     });
   });
 });

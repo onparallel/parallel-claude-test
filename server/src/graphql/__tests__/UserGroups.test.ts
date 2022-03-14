@@ -21,9 +21,7 @@ describe("GraphQL/UserGroups", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    ({ organization, user: sessionUser } = await mocks.createSessionUserAndOrganization({
-      organization_role: "ADMIN",
-    }));
+    ({ organization, user: sessionUser } = await mocks.createSessionUserAndOrganization("ADMIN"));
 
     [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1);
     [template] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1, () => ({

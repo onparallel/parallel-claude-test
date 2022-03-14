@@ -187,7 +187,6 @@ export interface NexusGenInputs {
     // input type
     firstName?: string | null; // String
     lastName?: string | null; // String
-    role?: NexusGenEnums["OrganizationRole"] | null; // OrganizationRole
   };
   UserOrUserGroupPermissionInput: {
     // input type

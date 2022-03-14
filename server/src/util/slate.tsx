@@ -1,11 +1,11 @@
 import { createElement, Fragment, ReactNode } from "react";
 import { renderToString } from "react-dom/server";
-import { Contact, Petition, User } from "../db/__types";
+import { Contact, Petition, UserData } from "../db/__types";
 import { fullName } from "./fullName";
 
 interface SlateContext {
   petition?: Partial<Petition> | null;
-  user?: Partial<User> | null;
+  user?: Partial<UserData> | null;
   contact?: Partial<Contact> | null;
 }
 

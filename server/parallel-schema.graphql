@@ -4450,7 +4450,6 @@ input UpdateUserGroupInput {
 input UpdateUserInput {
   firstName: String
   lastName: String
-  role: OrganizationRole
 }
 
 """

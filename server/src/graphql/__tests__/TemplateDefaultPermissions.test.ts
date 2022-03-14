@@ -33,7 +33,7 @@ describe("GraphQL/TemplateDefaultPermissions", () => {
     [organization] = await mocks.createRandomOrganizations(1, () => ({ name: "Parallel" }));
     [otherOrganization] = await mocks.createRandomOrganizations(1);
 
-    users = await mocks.createRandomUsers(organization.id, 3, (i) =>
+    users = await mocks.createRandomUsers(organization.id, 3, undefined, (i) =>
       i === 0 ? { cognito_id: USER_COGNITO_ID } : {}
     );
     otherUsers = await mocks.createRandomUsers(otherOrganization.id, 2);

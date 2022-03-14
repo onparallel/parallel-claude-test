@@ -25,22 +25,26 @@ export async function organizationLimitsReached(
 
   const emails = [];
   for (const user of ownerAndAdmins) {
+    const userData = await context.users.loadUserData(user.user_data_id);
+    if (!userData) {
+      throw new Error(`UserData:${user.user_data_id} not found for User:${user.id}`);
+    }
     const { html, text, subject, from } = await buildEmail(
       OrganizationLimitsReachedEmail,
       {
         limitName: payload.limit_name,
-        senderName: user.first_name!,
+        senderName: userData.first_name!,
         total: usageLimit.limit,
         used: usageLimit.used,
         ...layoutProps,
       },
-      { locale: user.details?.preferredLocale ?? "en" }
+      { locale: userData.details?.preferredLocale ?? "en" }
     );
 
     emails.push(
       await context.emailLogs.createEmail({
         from: buildFrom(from, emailFrom),
-        to: user.email,
+        to: userData.email,
         subject,
         text,
         html,

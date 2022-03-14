@@ -49,15 +49,16 @@ export const PetitionMessage = objectType({
       resolve: async (o, _, ctx) => {
         if (!o.email_body) return null;
 
-        const [contact, petition] = await Promise.all([
+        const [contact, petition, userData] = await Promise.all([
           ctx.contacts.loadContactByAccessId(o.petition_access_id),
           ctx.petitions.loadPetition(o.petition_id),
+          ctx.user ? ctx.users.loadUserData(ctx.user.user_data_id) : null,
         ]);
 
         return toHtml(JSON.parse(o.email_body), {
           petition,
           contact,
-          user: ctx.user,
+          user: userData,
         });
       },
     });

@@ -22,6 +22,7 @@ import {
   CreateTag,
   CreateTemporaryFile,
   CreateUser,
+  CreateUserData,
   CreateUserGroup,
   EmailLog,
   FileUpload,
@@ -52,9 +53,11 @@ import {
   TemporaryFile,
   User,
   UserAuthenticationToken,
+  UserData,
   UserGroup,
   UserGroupMember,
   UserPetitionEventLog,
+  UserOrganizationRole,
 } from "../../__types";
 import { Task } from "../TaskRepository";
 
@@ -80,17 +83,29 @@ export class Mocks {
     return petition;
   }
 
-  async createSessionUserAndOrganization(userData?: Partial<CreateUser>) {
+  async loadUserData(id: number) {
+    const [data] = await this.knex
+      .from<UserData>("user_data")
+      .whereNull("deleted_at")
+      .where("id", id)
+      .select("*");
+
+    return data;
+  }
+
+  async createSessionUserAndOrganization(orgRole?: UserOrganizationRole) {
     const [organization] = await this.createRandomOrganizations(1, () => ({
       name: "Parallel",
       status: "DEV",
     }));
-    const [user] = await this.createRandomUsers(organization.id, 1, () => ({
-      cognito_id: USER_COGNITO_ID,
-      first_name: "Harvey",
-      last_name: "Specter",
-      ...userData,
-    }));
+    const [user] = await this.createRandomUsers(
+      organization.id,
+      1,
+      () => ({
+        organization_role: orgRole,
+      }),
+      () => ({ cognito_id: USER_COGNITO_ID, first_name: "Harvey", last_name: "Specter" })
+    );
 
     return { user, organization };
   }
@@ -115,20 +130,32 @@ export class Mocks {
   async createRandomUsers(
     orgId: number,
     amount: number,
-    builder?: (index: number) => Partial<User>
+    userBuilder?: (index: number) => Partial<User>,
+    userDataBuilder?: (index: number) => Partial<UserData>
   ) {
+    const userDatas = await this.knex<UserData>("user_data").insert(
+      range(0, amount).map<CreateUserData>((index) => {
+        const firstName = faker.name.firstName();
+        const lastName = faker.name.lastName();
+        return {
+          first_name: firstName,
+          last_name: lastName,
+          email: faker.internet.email(firstName, lastName).toLowerCase(),
+          cognito_id: faker.datatype.uuid(),
+          ...userDataBuilder?.(index),
+        };
+      }),
+      "*"
+    );
+
     return await this.knex<User>("user")
       .insert(
         range(0, amount).map<CreateUser>((index) => {
-          const firstName = faker.name.firstName();
-          const lastName = faker.name.lastName();
+          const userData = userDatas[index];
           return {
+            user_data_id: userData.id,
             org_id: orgId,
-            first_name: firstName,
-            last_name: lastName,
-            email: faker.internet.email(firstName, lastName).toLowerCase(),
-            cognito_id: faker.datatype.uuid(),
-            ...builder?.(index),
+            ...userBuilder?.(index),
           };
         })
       )

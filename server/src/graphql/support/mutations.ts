@@ -35,6 +35,7 @@ async function supportCreateUser(
   t?: Knex.Transaction
 ) {
   const email = args.email.trim().toLowerCase();
+  const userData = (await ctx.users.loadUserData(ctx.user!.user_data_id))!;
   const cognitoId = await ctx.aws.createCognitoUser(
     email,
     args.password,
@@ -43,14 +44,16 @@ async function supportCreateUser(
     {
       locale: args.locale ?? "en",
       organizationName: args.orgName,
-      organizationUser: fullName(ctx.user!.first_name, ctx.user!.last_name),
+      organizationUser: fullName(userData.first_name, userData.last_name),
     }
   );
   return await ctx.users.createUser(
     {
-      cognito_id: cognitoId!,
       org_id: args.orgId,
       organization_role: args.role,
+    },
+    {
+      cognito_id: cognitoId!,
       email,
       first_name: args.firstName,
       last_name: args.lastName,
@@ -77,14 +80,15 @@ export const assignPetitionToUser = mutationField("assignPetitionToUser", {
         throw new Error(`Petition ${args.petitionId} not found`);
       }
       const user = await ctx.users.loadUser(args.userId);
-      if (!user) {
+      const userData = user ? await ctx.users.loadUserData(user?.user_data_id) : null;
+      if (!user || !userData) {
         throw new Error(`User ${args.userId} not found`);
       }
       const newPetition = await ctx.petitions.clonePetition(petitionId, user);
 
       return {
         result: RESULT.SUCCESS,
-        message: `Petition successfully assigned to ${user.first_name} ${user.last_name}, new id: ${newPetition.id}`,
+        message: `Petition successfully assigned to ${userData.first_name} ${userData.last_name}, new id: ${newPetition.id}`,
       };
     } catch (e: any) {
       return { result: RESULT.FAILURE, message: e.message };
@@ -220,7 +224,7 @@ export const createUser = mutationField("createUser", {
       );
       return {
         result: RESULT.SUCCESS,
-        message: `User with email ${user.email} created in org ${org.name}`,
+        message: `User:${user.id} with email ${args.email} created in org ${org.name}`,
       };
     } catch (e: any) {
       return { result: RESULT.FAILURE, message: e.message };
@@ -270,13 +274,19 @@ export const resetUserPassword = mutationField("resetUserPassword", {
   validateArgs: validEmail((args) => args.email, "email"),
   resolve: async (_, { email, locale }, ctx) => {
     try {
-      const user = await ctx.users.loadUserByEmail(email);
-      if (user) {
-        const organization = await ctx.organizations.loadOrg(user.org_id);
+      const users = (await ctx.users.loadUsersByEmail(email)).filter(isDefined);
+      if (users.length > 0) {
+        // TODO how do we know which org_id to use ???
+        const user = users[0];
+        const [userData, organization] = await Promise.all([
+          ctx.users.loadUserData(ctx.user!.user_data_id),
+          ctx.organizations.loadOrg(user.org_id),
+        ]);
+
         await ctx.aws.resetUserPassword(email, {
           locale,
           organizationName: organization!.name,
-          organizationUser: fullName(ctx.user!.first_name, ctx.user!.last_name),
+          organizationUser: fullName(userData?.first_name, userData?.last_name),
         });
         return {
           result: RESULT.SUCCESS,
@@ -311,13 +321,16 @@ export const getApiTokenOwner = mutationField("getApiTokenOwner", {
       if (!isDefined(userToken)) {
         throw new Error("Token not found");
       }
-      const user = await ctx.users.loadUser(userToken.user_id);
-      if (!isDefined(user)) {
+      const [user, userData] = await Promise.all([
+        ctx.users.loadUser(userToken.user_id),
+        ctx.users.loadUserDataByUserId(userToken.user_id),
+      ]);
+      if (!isDefined(user) || !isDefined(userData)) {
         throw new Error("Token found but user is deleted");
       }
       return {
         result: RESULT.SUCCESS,
-        message: `User:${user.id} with email ${user.email}.`,
+        message: `User:${user.id} with email ${userData.email}.`,
       };
     } catch (error: any) {
       return {
@@ -490,7 +503,15 @@ export const uploadUserAvatar = mutationField("uploadUserAvatar", {
   ),
   resolve: async (_, { userId, image }, ctx) => {
     try {
-      const { createReadStream, mimetype } = await image;
+      const [{ createReadStream, mimetype }, user] = await Promise.all([
+        image,
+        ctx.users.loadUser(userId),
+      ]);
+      const userData = user ? await ctx.users.loadUserData(user.user_data_id) : null;
+
+      if (!userData) {
+        throw new Error(`UserData not found for User:${userId}`);
+      }
 
       const filename = random(16);
       const path = `uploads/${filename}`;
@@ -505,8 +526,8 @@ export const uploadUserAvatar = mutationField("uploadUserAvatar", {
         `User:${ctx.user!.id}`
       );
 
-      await ctx.users.updateUserById(
-        userId,
+      await ctx.users.updateUserData(
+        userData.id,
         { avatar_public_file_id: file.id },
         `User:${ctx.user!.id}`
       );

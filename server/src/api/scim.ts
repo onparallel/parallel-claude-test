@@ -1,6 +1,6 @@
 import { json, Router } from "express";
-import { isDefined } from "remeda";
-import { CreateUser, User } from "../db/__types";
+import { isDefined, pick } from "remeda";
+import { CreateUser, CreateUserData, User, UserData } from "../db/__types";
 import { Maybe } from "../util/types";
 
 export const scim = Router().use(
@@ -40,14 +40,15 @@ scim
   .route("/Users")
   .get(async (req, res) => {
     const externalId = getExternalId(req.query.filter);
-    let user: User | undefined;
+    let user: Maybe<User> = null;
     if (externalId) {
       user = await req.context.users.loadUserByExternalId({
         externalId,
         orgId: req.context.organization!.id,
       });
     }
-    if (!user) {
+    const userData = user ? await req.context.users.loadUserData(user.user_data_id) : null;
+    if (!user || !userData) {
       res.json({
         totalResults: 0,
         Resources: [],
@@ -55,7 +56,12 @@ scim
     } else {
       res.json({
         totalResults: 1,
-        Resources: [toScimUser(user)],
+        Resources: [
+          toScimUser({
+            ...pick(user, ["status"]),
+            ...pick(userData, ["email", "first_name", "last_name", "external_id"]),
+          }),
+        ],
       });
     }
   })
@@ -71,27 +77,40 @@ scim
       name: { givenName: string; familyName: string };
       emails: { type: string; value: string }[];
     } = req.body;
-    let user = await req.context.users.loadUserByExternalId({
+    const user = await req.context.users.loadUserByExternalId({
       externalId,
       orgId: req.context.organization!.id,
     });
-    if (user) {
-      if (
-        user.first_name !== givenName ||
-        user.last_name !== familyName ||
-        (user.status === "ACTIVE") !== active
-      ) {
-        [user] = await req.context.users.updateUserById(
+    const userData = user ? await req.context.users.loadUserData(user.user_data_id) : null;
+    if (user && userData) {
+      if ((user.status === "ACTIVE") !== active) {
+        await req.context.users.updateUserById(
           user.id,
           {
             status: active ? "ACTIVE" : "INACTIVE",
+          },
+          `Provisioning:${req.context.organization!.id}`
+        );
+      }
+      if (userData.first_name !== givenName || userData.last_name !== familyName) {
+        await req.context.users.updateUserData(
+          userData.id,
+          {
             first_name: givenName,
             last_name: familyName,
           },
           `Provisioning:${req.context.organization!.id}`
         );
       }
-      res.json(toScimUser(user));
+      res.json(
+        toScimUser({
+          email: userData.email,
+          external_id: userData.external_id,
+          first_name: givenName,
+          last_name: familyName,
+          status: active ? "ACTIVE" : "INACTIVE",
+        })
+      );
     } else {
       const orgId = req.context.organization!.id;
       const ssoIntegrations = await req.context.integrations.loadIntegrationsByOrgId(orgId, "SSO");
@@ -99,19 +118,27 @@ scim
       if (ssoIntegrations.length > 0 && email) {
         const user = await req.context.users.createUser(
           {
+            org_id: orgId,
+            status: active ? "ACTIVE" : "INACTIVE",
+          },
+          {
             // fake unique cognitoId, should update when user logs in
             cognito_id: `${req.context.organization!.id}_${externalId}`,
-            org_id: orgId,
             email: email.toLowerCase(),
             first_name: givenName,
             last_name: familyName,
-            status: active ? "ACTIVE" : "INACTIVE",
             external_id: externalId,
             details: { source: "SCIM" },
           },
           `Provisioning:${req.context.organization!.id}`
         );
-        res.json(toScimUser(user));
+        const userData = (await req.context.users.loadUserData(user.user_data_id))!;
+        res.json(
+          toScimUser({
+            ...pick(user, ["status"]),
+            ...pick(userData, ["email", "first_name", "last_name", "external_id"]),
+          })
+        );
       } else {
         res.sendStatus(401);
       }
@@ -137,58 +164,113 @@ scim
     }
   })
   .get(async (req, res) => {
-    const user = await req.context.users.loadUserByExternalId({
+    const user = (await req.context.users.loadUserByExternalId({
       externalId: req.params.externalId,
       orgId: req.context.organization!.id,
-    });
-    res.json(toScimUser(user!));
+    }))!;
+    const userData = (await req.context.users.loadUserData(user.user_data_id))!;
+    res.json(
+      toScimUser({
+        ...pick(user, ["status"]),
+        ...pick(userData, ["email", "first_name", "last_name", "external_id"]),
+      })
+    );
   })
   .patch(async (req, res) => {
-    const data: Partial<CreateUser> = {};
+    const userUpdate: Partial<CreateUser> = {};
+    const userDataUpdate: Partial<CreateUserData> = {};
     req.body.Operations.forEach((op: any) => {
       if (op.op === "Replace") {
         switch (op.path) {
           case "name.givenName":
-            data.first_name = op.value;
+            userDataUpdate.first_name = op.value;
             break;
           case "name.familyName":
-            data.last_name = op.value;
+            userDataUpdate.last_name = op.value;
             break;
           case "active":
-            data.status = op.value === "True" ? "ACTIVE" : "INACTIVE";
+            userUpdate.status = op.value === "True" ? "ACTIVE" : "INACTIVE";
             break;
           default:
             break;
         }
       }
     });
-    const [user] = await req.context.users.updateUserByExternalId(
-      req.params.externalId,
-      req.context.organization!.id,
-      data,
-      `Provisioning:${req.context.organization!.id}`
-    );
-    res.json(toScimUser(user));
+    if (isDefined(userUpdate.status)) {
+      await req.context.users.updateUserByExternalId(
+        req.params.externalId,
+        req.context.organization!.id,
+        userUpdate,
+        `Provisioning:${req.context.organization!.id}`
+      );
+    }
+    if (isDefined(userDataUpdate.first_name) || isDefined(userDataUpdate.last_name)) {
+      // TODO user_data.external_id should be unique?
+      await req.context.users.updateUserDataByExternalId(
+        req.params.externalId,
+        userDataUpdate,
+        `Provisioning:${req.context.organization!.id}`
+      );
+    }
+    const user = await req.context.users.loadUserByExternalId({
+      orgId: req.context.organization!.id,
+      externalId: req.params.externalId,
+    });
+    if (!user) {
+      res.sendStatus(401);
+    } else {
+      const userData = (await req.context.users.loadUserData(user.user_data_id))!;
+      res.json(
+        toScimUser({
+          ...pick(user, ["status"]),
+          ...pick(userData, ["email", "first_name", "last_name", "external_id"]),
+        })
+      );
+    }
   })
   .put(async (req, res) => {
-    const data: Partial<CreateUser> = {};
+    const userUpdate: Partial<CreateUser> = {};
+    const userDataUpdate: Partial<CreateUserData> = {};
     if (isDefined(req.body.name.givenName)) {
-      data.first_name = req.body.name.givenName;
+      userDataUpdate.first_name = req.body.name.givenName;
     }
     if (isDefined(req.body.name.familyName)) {
-      data.last_name = req.body.name.familyName;
+      userDataUpdate.last_name = req.body.name.familyName;
     }
     if (isDefined(req.body.active)) {
-      data.status = req.body.active === "True" ? "ACTIVE" : "INACTIVE";
+      userUpdate.status = req.body.active === "True" ? "ACTIVE" : "INACTIVE";
     }
 
-    const [user] = await req.context.users.updateUserByExternalId(
-      req.params.externalId,
-      req.context.organization!.id,
-      data,
-      `Provisioning:${req.context.organization!.id}`
-    );
-    res.json(toScimUser(user));
+    if (isDefined(userUpdate.status)) {
+      await req.context.users.updateUserByExternalId(
+        req.params.externalId,
+        req.context.organization!.id,
+        userUpdate,
+        `Provisioning:${req.context.organization!.id}`
+      );
+    }
+    if (isDefined(userDataUpdate.first_name) || isDefined(userDataUpdate.last_name)) {
+      await req.context.users.updateUserDataByExternalId(
+        req.params.externalId,
+        userDataUpdate,
+        `Provisioning:${req.context.organization!.id}`
+      );
+    }
+    const user = await req.context.users.loadUserByExternalId({
+      orgId: req.context.organization!.id,
+      externalId: req.params.externalId,
+    });
+    if (!user) {
+      res.sendStatus(401);
+    } else {
+      const userData = (await req.context.users.loadUserData(user.user_data_id))!;
+      res.json(
+        toScimUser({
+          ...pick(user, ["status"]),
+          ...pick(userData, ["email", "first_name", "last_name", "external_id"]),
+        })
+      );
+    }
   })
   .delete(async (req, res) => {
     await req.context.users.updateUserByExternalId(
@@ -206,7 +288,9 @@ function getExternalId(filter: any): Maybe<string> {
   return match?.[1] ?? null;
 }
 
-function toScimUser(user: User) {
+function toScimUser(
+  user: Pick<User, "status"> & Pick<UserData, "external_id" | "first_name" | "last_name" | "email">
+) {
   return {
     schemas: ["urn:ietf:params:scim:schemas:core:2.0:User"],
     id: user.external_id,

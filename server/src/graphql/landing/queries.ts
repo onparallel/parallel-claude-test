@@ -54,7 +54,7 @@ export const LandingTemplate = objectType({
     t.nullable.string("ownerAvatarUrl", {
       resolve: async (o, _, ctx) => {
         const owner = (await ctx.petitions.loadPetitionOwner(o.id))!;
-        return ctx.users.loadAvatarUrl(owner.id);
+        return ctx.users.loadAvatarUrlByUserDataId(owner.user_data_id);
       },
     });
     t.string("organizationName", {

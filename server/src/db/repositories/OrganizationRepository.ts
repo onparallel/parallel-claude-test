@@ -84,22 +84,25 @@ export class OrganizationRepository extends BaseRepository {
       includeInactive?: boolean | null;
     } & PageOpts
   ) {
-    return await this.loadPageAndCount(
+    return await this.loadPageAndCount<any, User[]>(
       this.from("user")
-        .where({ org_id: orgId, deleted_at: null })
+        .join("user_data", "user.user_data_id", "user_data.id")
+        .where({ org_id: orgId })
+        .whereNull("user.deleted_at")
+        .whereNull("user_data.deleted_at")
         .mmodify((q) => {
           const { search, excludeIds, sortBy, includeInactive } = opts;
           if (search) {
             q.andWhere((q2) => {
               q2.whereEscapedILike(
-                this.knex.raw(`concat("first_name", ' ', "last_name")`) as any,
+                this.knex.raw(`concat(user_data.first_name, ' ', user_data.last_name)`) as any,
                 `%${escapeLike(search, "\\")}%`,
                 "\\"
-              ).or.whereEscapedILike("email", `%${escapeLike(search, "\\")}%`, "\\");
+              ).or.whereEscapedILike("user_data.email", `%${escapeLike(search, "\\")}%`, "\\");
             });
           }
           if (excludeIds) {
-            q.whereNotIn("id", excludeIds);
+            q.whereNotIn("user.id", excludeIds);
           }
           if (sortBy) {
             q.orderByRaw(
@@ -111,7 +114,7 @@ export class OrganizationRepository extends BaseRepository {
                     return `"${s.column}" ${s.order} NULLS ${nulls}`;
                   } else if (s.column === "full_name") {
                     const nulls = s.order === "asc" ? "FIRST" : "LAST";
-                    return `"first_name" ${s.order} NULLS ${nulls}, "last_name" ${s.order} NULLS ${nulls}`;
+                    return `"user_data.first_name" ${s.order} NULLS ${nulls}, "user_data.last_name" ${s.order} NULLS ${nulls}`;
                   } else {
                     return `"${s.column}" ${s.order}`;
                   }
@@ -123,8 +126,8 @@ export class OrganizationRepository extends BaseRepository {
             q.where("status", "ACTIVE");
           }
         })
-        .orderBy("id")
-        .select("*"),
+        .orderBy("user.id")
+        .select("user.*"),
       opts
     );
   }

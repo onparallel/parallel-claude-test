@@ -16,16 +16,16 @@ export async function commentsUserNotification(
   },
   context: WorkerContext
 ) {
-  const [petition, _comments, user] = await Promise.all([
+  const [petition, _comments, userData] = await Promise.all([
     context.petitions.loadPetition(payload.petition_id),
     context.petitions.loadPetitionFieldComment(payload.petition_field_comment_ids),
-    context.users.loadUser(payload.user_id),
+    context.users.loadUserDataByUserId(payload.user_id),
   ]);
   if (!petition) {
     return; // if the petition was deleted, return without throwing error
   }
-  if (!user) {
-    throw new Error(`User not found for user_id ${payload.user_id}`);
+  if (!userData) {
+    throw new Error(`UserData not found for User:${payload.user_id}`);
   }
 
   const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
@@ -41,7 +41,7 @@ export async function commentsUserNotification(
   const { html, text, subject, from } = await buildEmail(
     PetitionCommentsUserNotification,
     {
-      userName: user.first_name,
+      userName: userData.first_name,
       petitionId: toGlobalId("Petition", petition.id),
       petitionName: petition.name,
       fields,
@@ -51,7 +51,7 @@ export async function commentsUserNotification(
   );
   const email = await context.emailLogs.createEmail({
     from: buildFrom(from, emailFrom),
-    to: user.email,
+    to: userData.email,
     reply_to: context.config.misc.emailFrom,
     subject,
     text,

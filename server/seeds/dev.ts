@@ -12,6 +12,7 @@ import {
   PetitionField,
   PetitionPermission,
   User,
+  UserData,
   UserGroup,
   UserGroupMember,
 } from "../src/db/__types";
@@ -46,49 +47,68 @@ export async function seed(knex: Knex): Promise<any> {
     "id"
   );
   const orgIds = orgs.map((o) => o.id);
+  const usersInfo = [
+    {
+      org_id: orgIds[0],
+      cognito_id: "123e4567-e89b-12d3-a456-426655440000",
+      email: "harvey@onparallel.com",
+      organization_role: "OWNER",
+      first_name: "Harvey",
+      last_name: "Specter",
+    },
+    {
+      org_id: orgIds[0],
+      cognito_id: "f3a469da-cd92-46de-84d1-cc09b4e57788",
+      email: "mike@onparallel.com",
+      organization_role: "NORMAL",
+      first_name: "Mike",
+      last_name: "Ross",
+    },
+    {
+      org_id: orgIds[0],
+      cognito_id: "bd82c5a1-5622-41a5-9116-1686a44cf3fa",
+      email: "santialbo@gmail.com",
+      organization_role: "ADMIN",
+      first_name: "Santi",
+      last_name: "Albo",
+    },
+    {
+      org_id: orgIds[0],
+      cognito_id: "8dd56de4-3b39-4d4b-850c-82be0aba21aa",
+      email: "mariano@onparallel.com",
+      organization_role: "ADMIN",
+      first_name: "Mariano",
+      last_name: "Rodriguez",
+    },
+    {
+      org_id: orgIds[0],
+      cognito_id: "013f5bce-5459-4e7c-bc64-773a4ffcd084",
+      email: "konstantin@onparallel.com",
+      organization_role: "ADMIN",
+      first_name: "Konstantin",
+      last_name: "Klykov",
+    },
+  ] as (User & UserData)[];
+
+  const usersData = await knex<UserData>("user_data").insert(
+    usersInfo.map((u) => ({
+      email: u.email,
+      cognito_id: u.cognito_id,
+      first_name: u.first_name,
+      last_name: u.last_name,
+    })),
+    "*"
+  );
+
   const users = await knex<User>("user").insert(
-    [
-      {
-        org_id: orgIds[0],
-        cognito_id: "123e4567-e89b-12d3-a456-426655440000",
-        email: "harvey@onparallel.com",
-        organization_role: "OWNER",
-        first_name: "Harvey",
-        last_name: "Specter",
-      },
-      {
-        org_id: orgIds[0],
-        cognito_id: "f3a469da-cd92-46de-84d1-cc09b4e57788",
-        email: "mike@onparallel.com",
-        organization_role: "NORMAL",
-        first_name: "Mike",
-        last_name: "Ross",
-      },
-      {
-        org_id: orgIds[0],
-        cognito_id: "bd82c5a1-5622-41a5-9116-1686a44cf3fa",
-        email: "santialbo@gmail.com",
-        organization_role: "ADMIN",
-        first_name: "Santi",
-        last_name: "Albo",
-      },
-      {
-        org_id: orgIds[0],
-        cognito_id: "8dd56de4-3b39-4d4b-850c-82be0aba21aa",
-        email: "mariano@onparallel.com",
-        organization_role: "ADMIN",
-        first_name: "Mariano",
-        last_name: "Rodriguez",
-      },
-      {
-        org_id: orgIds[0],
-        cognito_id: "013f5bce-5459-4e7c-bc64-773a4ffcd084",
-        email: "konstantin@onparallel.com",
-        organization_role: "ADMIN",
-        first_name: "Konstantin",
-        last_name: "Klykov",
-      },
-    ],
+    usersData.map((ud) => {
+      const user = usersInfo.find(({ email }) => email === ud.email)!;
+      return {
+        user_data_id: ud.id,
+        org_id: user.org_id,
+        organization_role: user.organization_role,
+      };
+    }),
     "id"
   );
   const userIds = users.map((u) => u.id);

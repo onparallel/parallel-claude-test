@@ -62,13 +62,15 @@ export async function petitionCompleted(
   const emails: EmailLog[] = [];
 
   const subscribedUserIds = permissions.filter((p) => p.is_subscribed).map((p) => p.user_id!);
-  const subscribedUsers = (await context.users.loadUser(subscribedUserIds)).filter(isDefined);
-  for (const user of subscribedUsers) {
+  const subscribedUsersData = (await context.users.loadUserDataByUserId(subscribedUserIds)).filter(
+    isDefined
+  );
+  for (const userData of subscribedUsersData) {
     const { html, text, subject, from } = await buildEmail(
       PetitionCompleted,
       {
         isSigned: !!payload.signer,
-        userName: user.first_name,
+        userName: userData.first_name,
         petitionId: toGlobalId("Petition", petitionId),
         petitionName: petition.name,
         contactName: fullName(contact.first_name, contact.last_name),
@@ -80,7 +82,7 @@ export async function petitionCompleted(
     emails.push(
       await context.emailLogs.createEmail({
         from: buildFrom(from, emailFrom),
-        to: user!.email,
+        to: userData!.email,
         subject,
         text,
         html,

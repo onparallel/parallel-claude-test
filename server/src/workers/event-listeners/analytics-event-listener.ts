@@ -54,9 +54,17 @@ async function loadContactByAccessId(petitionAccessId: number, ctx: WorkerContex
 async function loadUser(userId: number, ctx: WorkerContext) {
   const user = await ctx.users.loadUser(userId);
   if (!user) {
-    throw new Error(`User not found with id ${userId}`);
+    throw new Error(`User:${userId} not found`);
   }
   return user;
+}
+
+async function loadUserDataByUserId(userId: number, ctx: WorkerContext) {
+  const userData = await ctx.users.loadUserDataByUserId(userId);
+  if (!userData) {
+    throw new Error(`UserData for User:${userId} not found`);
+  }
+  return userData;
 }
 
 async function loadUserStats(userId: number, ctx: WorkerContext) {
@@ -131,6 +139,8 @@ async function trackAccessActivatedEvent(event: AccessActivatedEvent, ctx: Worke
     loadContactByAccessId(event.data.petition_access_id, ctx),
   ]);
 
+  const userData = (await ctx.users.loadUserData(user.user_data_id))!;
+
   await ctx.analytics.trackEvent({
     type: "PETITION_SENT",
     user_id: event.data.user_id,
@@ -140,7 +150,7 @@ async function trackAccessActivatedEvent(event: AccessActivatedEvent, ctx: Worke
       org_id: petition.org_id,
       petition_id: event.petition_id,
       from_public_link: false,
-      same_domain: user.email.split("@")[1] === contact.email.split("@")[1],
+      same_domain: userData.email.split("@")[1] === contact.email.split("@")[1],
       from_template_id: petition.from_template_id,
     },
   });
@@ -158,6 +168,8 @@ async function trackAccessActivatedFromPublicLinkEvent(
     loadContactByAccessId(event.data.petition_access_id, ctx),
   ]);
 
+  const userData = (await ctx.users.loadUserData(user.user_data_id))!;
+
   await ctx.analytics.trackEvent({
     type: "PETITION_SENT",
     user_id: user.id,
@@ -167,7 +179,7 @@ async function trackAccessActivatedFromPublicLinkEvent(
       org_id: petition.org_id,
       petition_id: event.petition_id,
       from_public_link: true,
-      same_domain: user.email.split("@")[1] === contact.email.split("@")[1],
+      same_domain: userData.email.split("@")[1] === contact.email.split("@")[1],
       from_template_id: petition.from_template_id,
     },
   });
@@ -184,6 +196,13 @@ async function trackPetitionCompletedEvent(event: PetitionCompletedEvent, ctx: W
     loadPetitionOwner(event.petition_id, ctx),
   ]);
 
+  const completedByEmail =
+    "user_data_id" in completedBy
+      ? (await loadUserDataByUserId(completedBy.user_data_id, ctx)).email
+      : completedBy.email;
+
+  const ownerData = (await ctx.users.loadUserData(owner.user_data_id))!;
+
   await ctx.analytics.trackEvent({
     type: "PETITION_COMPLETED",
     user_id: owner.id,
@@ -194,7 +213,7 @@ async function trackPetitionCompletedEvent(event: PetitionCompletedEvent, ctx: W
       org_id: owner.org_id,
       petition_id: event.petition_id,
       requires_signature: isDefined(petition.signature_config),
-      same_domain: owner.email.split("@")[1] === completedBy.email.split("@")[1],
+      same_domain: ownerData.email.split("@")[1] === completedByEmail.split("@")[1],
     },
   });
 }
@@ -216,17 +235,18 @@ async function trackPetitionDeletedEvent(event: PetitionDeletedEvent, ctx: Worke
 }
 
 async function trackUserLoggedInEvent(event: UserLoggedInEvent, ctx: WorkerContext) {
-  const [user, stats] = await Promise.all([
+  const [user, userData, stats] = await Promise.all([
     loadUser(event.data.user_id, ctx),
+    loadUserDataByUserId(event.data.user_id, ctx),
     loadUserStats(event.data.user_id, ctx),
   ]);
-  await ctx.analytics.identifyUser(user, stats);
+  await ctx.analytics.identifyUser(user, userData, stats);
   await ctx.analytics.trackEvent({
     type: "USER_LOGGED_IN",
     user_id: event.data.user_id,
     data: {
       user_id: user.id,
-      email: user.email,
+      email: userData.email,
       org_id: user.org_id,
     },
   });
@@ -271,18 +291,21 @@ async function trackTemplateUsedEvent(event: TemplateUsedEvent, ctx: WorkerConte
 }
 
 async function trackUserCreatedEvent(event: UserCreatedEvent, ctx: WorkerContext) {
-  const user = await loadUser(event.data.user_id, ctx);
-  await ctx.analytics.identifyUser(user);
+  const [user, userData] = await Promise.all([
+    loadUser(event.data.user_id, ctx),
+    loadUserDataByUserId(event.data.user_id, ctx),
+  ]);
+  await ctx.analytics.identifyUser(user, userData);
   await ctx.analytics.trackEvent({
     type: "USER_CREATED",
     user_id: event.data.user_id,
     data: {
       user_id: event.data.user_id,
       org_id: user.org_id,
-      email: user.email,
-      industry: user.details?.industry ?? null,
-      position: user.details?.position ?? null,
-      role: user.details?.role ?? null,
+      email: userData.email,
+      industry: userData.details?.industry ?? null,
+      position: userData.details?.position ?? null,
+      role: userData.details?.role ?? null,
       from: event.data.from,
     },
   });
@@ -306,12 +329,12 @@ async function trackAccessOpenedEvent(event: AccessOpenedEvent, ctx: WorkerConte
 }
 
 async function trackEmailVerifiedEvent(event: EmailVerifiedSystemEvent, ctx: WorkerContext) {
-  const user = await loadUser(event.data.user_id, ctx);
+  const userData = await loadUserDataByUserId(event.data.user_id, ctx);
   await ctx.analytics.trackEvent({
     type: "EMAIL_VERIFIED",
-    user_id: user.id,
+    user_id: event.data.user_id,
     data: {
-      email: user.email,
+      email: userData.email,
     },
   });
 }

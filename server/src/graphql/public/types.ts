@@ -286,18 +286,43 @@ export const PublicUser = objectType({
     });
     t.string("email", {
       description: "The email of the user.",
+      resolve: async (o, _, ctx) => {
+        const userData = await ctx.users.loadUserData(o.user_data_id);
+        if (!userData) {
+          throw new Error(`UserData:${o.user_data_id} for User:${o.id} not found`);
+        }
+        return userData.email;
+      },
     });
     t.nullable.string("firstName", {
       description: "The first name of the user.",
-      resolve: (o) => o.first_name,
+      resolve: async (o, _, ctx) => {
+        const userData = await ctx.users.loadUserData(o.user_data_id);
+        if (!userData) {
+          throw new Error(`UserData:${o.user_data_id} for User:${o.id} not found`);
+        }
+        return userData.first_name;
+      },
     });
     t.nullable.string("lastName", {
       description: "The last name of the user.",
-      resolve: (o) => o.last_name,
+      resolve: async (o, _, ctx) => {
+        const userData = await ctx.users.loadUserData(o.user_data_id);
+        if (!userData) {
+          throw new Error(`UserData:${o.user_data_id} for User:${o.id} not found`);
+        }
+        return userData.last_name;
+      },
     });
     t.string("fullName", {
       description: "The full name of the user.",
-      resolve: (o) => fullName(o.first_name, o.last_name),
+      resolve: async (o, _, ctx) => {
+        const userData = await ctx.users.loadUserData(o.user_data_id);
+        if (!userData) {
+          throw new Error(`UserData:${o.user_data_id} for User:${o.id} not found`);
+        }
+        return fullName(userData.first_name, userData.last_name);
+      },
     });
     t.field("organization", {
       description: "The organization of the user.",

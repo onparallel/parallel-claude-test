@@ -7,6 +7,7 @@ import {
   PetitionSignatureCancelReason,
   PetitionStatus,
   User,
+  UserData,
 } from "../db/__types";
 import { unMaybeArray } from "../util/arrays";
 import { toGlobalId } from "../util/globalId";
@@ -225,8 +226,7 @@ export type AnalyticsEvent =
 export const ANALYTICS = Symbol.for("ANALYTICS");
 
 export interface IAnalyticsService {
-  identifyUser(user: User, extraTraits?: any): void;
-
+  identifyUser(user: User, userData: UserData, extraTraits?: any): void;
   trackEvent(events: MaybeArray<AnalyticsEvent>): void;
 }
 
@@ -242,20 +242,20 @@ export class AnalyticsService implements IAnalyticsService {
     }
   }
 
-  identifyUser(user: User, extraTraits?: any) {
+  identifyUser(user: User, userData: UserData, extraTraits?: any) {
     this.analytics?.identify({
       userId: toGlobalId("User", user.id),
       traits: {
-        email: user.email,
-        firstName: user.first_name,
-        lastName: user.last_name,
+        email: userData.email,
+        firstName: userData.first_name,
+        lastName: userData.last_name,
         createdAt: user.created_at.toISOString(),
         lastActiveAt: user.last_active_at?.toISOString(),
-        industry: user.details?.industry,
-        role: user.details?.role,
-        position: user.details?.position,
-        source: user.details?.source,
-        locale: user.details?.preferredLocale,
+        industry: userData.details?.industry,
+        role: userData.details?.role,
+        position: userData.details?.position,
+        source: userData.details?.source,
+        locale: userData.details?.preferredLocale,
         orgId: user.org_id,
         ...extraTraits,
       },

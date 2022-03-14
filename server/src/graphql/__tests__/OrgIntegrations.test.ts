@@ -31,9 +31,7 @@ describe("GraphQL/OrgIntegrations", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    ({ organization, user } = await mocks.createSessionUserAndOrganization({
-      organization_role: "ADMIN",
-    }));
+    ({ organization, user } = await mocks.createSessionUserAndOrganization("ADMIN"));
 
     const [normalUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
       organization_role: "NORMAL",

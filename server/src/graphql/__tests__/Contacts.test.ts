@@ -22,9 +22,7 @@ describe("GraphQL/Contacts", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    ({ user, organization } = await mocks.createSessionUserAndOrganization({
-      organization_role: "ADMIN",
-    }));
+    ({ user, organization } = await mocks.createSessionUserAndOrganization("ADMIN"));
 
     userContacts = await mocks.createRandomContacts(organization.id, 5, (n) => ({
       email: n === 4 ? "email.search@onparallel.com" : faker.internet.email().toLowerCase(),

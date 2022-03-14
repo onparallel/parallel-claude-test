@@ -135,10 +135,10 @@ export class Auth implements IAuth {
       const lastName = payload["family_name"] as string;
       const email = (payload["email"] as string).toLowerCase();
       const externalId = payload["identities"][0].userId as string;
-      let user = await this.users.loadUserByEmail(email);
-      if (isDefined(user) && user.org_id !== orgId) {
-        throw new Error("Invalid user");
-      }
+      const users = (await this.users.loadUsersByEmail(email)).filter(isDefined);
+      // TODO check this when users have more than 1 organization
+      let user = users.find((u) => u.org_id === orgId);
+      const userData = user ? await this.users.loadUserData(user.user_data_id) : null;
       if (!isDefined(user)) {
         const [, domain] = email.split("@");
         const integration = await this.integrations.loadSSOIntegrationByDomain(domain);
@@ -147,11 +147,13 @@ export class Auth implements IAuth {
         }
         user = await this.users.createUser(
           {
+            org_id: org.id,
+          },
+          {
             first_name: firstName,
             last_name: lastName,
             email: email,
             cognito_id: cognitoId,
-            org_id: org.id,
             is_sso_user: true,
             external_id: externalId,
             details: { source: "SSO" },
@@ -160,13 +162,14 @@ export class Auth implements IAuth {
         );
       } else {
         if (
-          user.first_name !== firstName ||
-          user.last_name !== lastName ||
-          user.cognito_id !== cognitoId ||
-          user.external_id !== externalId
+          userData &&
+          (userData.first_name !== firstName ||
+            userData.last_name !== lastName ||
+            userData.cognito_id !== cognitoId ||
+            userData.external_id !== externalId)
         ) {
-          await this.users.updateUserById(
-            user.id,
+          await this.users.updateUserData(
+            userData.id,
             {
               first_name: firstName,
               last_name: lastName,
@@ -186,7 +189,7 @@ export class Auth implements IAuth {
       });
       this.setSession(res, token);
       const prefix =
-        user.details?.preferredLocale ?? state.has("locale") ? `/${state.get("locale")}` : "";
+        userData?.details?.preferredLocale ?? state.has("locale") ? `/${state.get("locale")}` : "";
       const path =
         state.has("redirect") && state.get("redirect")!.startsWith("/")
           ? state.get("redirect")!
@@ -208,9 +211,10 @@ export class Auth implements IAuth {
           res.status(401).send({ error: "UnknownError" });
           return;
         }
+        const userData = await this.users.loadUserData(user.user_data_id);
         await this.trackSessionLogin(user);
         this.setSession(res, token);
-        res.status(201).send({ preferredLocale: user.details?.preferredLocale });
+        res.status(201).send({ preferredLocale: userData?.details?.preferredLocale });
       } else if (auth.ChallengeName === "NEW_PASSWORD_REQUIRED") {
         res.status(401).send({ error: "NewPasswordRequired" });
       } else {
@@ -271,8 +275,9 @@ export class Auth implements IAuth {
   async forgotPassword(req: Request, res: Response, next: NextFunction) {
     const { email, locale } = req.body;
     try {
-      const user = await this.users.loadUserByEmail(email);
-      if (user?.is_sso_user) {
+      const [user] = await this.users.loadUsersByEmail(email);
+      const userData = user ? await this.users.loadUserData(user.user_data_id) : null;
+      if (userData?.is_sso_user) {
         res.status(401).send({ error: "ExternalUser" });
         return;
       } else {
@@ -378,7 +383,9 @@ export class Auth implements IAuth {
     if (result.IdToken) {
       const payload = decode(result.IdToken) as any;
       const cognitoId = payload["cognito:username"] as string;
-      return await this.users.loadUserByCognitoId(cognitoId);
+      // TODO manage when users.length > 1
+      const [user] = await this.users.loadUsersByCognitoId(cognitoId);
+      return user;
     } else {
       return null;
     }
@@ -528,7 +535,9 @@ export class Auth implements IAuth {
           return null;
         }
       }
-      return await this.users.loadUserByCognitoId(cognitoId);
+      // TODO manage when users.length > 1
+      const [user] = await this.users.loadUsersByCognitoId(cognitoId);
+      return user;
     } catch (error: any) {
       return null;
     }
@@ -549,7 +558,7 @@ export class Auth implements IAuth {
   async verifyEmail(req: Request, res: Response, next: NextFunction) {
     const { email, code, locale } = req.query as { email: string; code: string; locale: string };
     try {
-      const user = await req.context.users.loadUserByEmail(email);
+      const [user] = await req.context.users.loadUsersByEmail(email);
       if (user) {
         await this.cognito
           .confirmSignUp({

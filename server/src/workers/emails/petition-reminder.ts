@@ -28,9 +28,10 @@ export async function petitionReminder(
         `Petition access not found for id petition_reminder.petition_access_id ${reminder.petition_access_id}`
       );
     }
-    const [petition, granter, contact, fields, originalMessage] = await Promise.all([
+    const [petition, granter, granterData, contact, fields, originalMessage] = await Promise.all([
       context.petitions.loadPetition(access.petition_id),
       context.users.loadUser(access.granter_id),
+      context.users.loadUserDataByUserId(access.granter_id),
       context.contacts.loadContact(access.contact_id),
       context.petitions.loadFieldsForPetition(access.petition_id),
       loadOriginalMessageByPetitionAccess(access.id, access.petition_id, context),
@@ -45,6 +46,9 @@ export async function petitionReminder(
     }
     if (!granter) {
       throw new Error(`User not found for petition_access.granter_id ${access.granter_id}`);
+    }
+    if (!granterData) {
+      throw new Error(`UserData not found for User:${access.granter_id}`);
     }
     if (!contact) {
       throw new Error(`Contact not found for petition_access.contact_id ${access.contact_id}`);
@@ -68,7 +72,7 @@ export async function petitionReminder(
     const { emailFrom, ...layoutProps } = await getLayoutProps(granter.org_id, context);
 
     const bodyJson = reminder.email_body ? JSON.parse(reminder.email_body) : null;
-    const renderContext = { contact, user: granter, petition };
+    const renderContext = { contact, user: granterData, petition };
 
     const organization = await context.organizations.loadOrg(petition.org_id);
     const hasRemoveWhyWeUseParallel = await context.featureFlags.orgHasFeatureFlag(
@@ -82,8 +86,8 @@ export async function petitionReminder(
         emailSubject: originalMessage?.email_subject ?? null,
         contactName: contact.first_name,
         contactFullName: fullName(contact.first_name, contact.last_name),
-        senderName: fullName(granter.first_name, granter.last_name)!,
-        senderEmail: granter.email,
+        senderName: fullName(granterData.first_name, granterData.last_name)!,
+        senderEmail: granterData.email,
         missingFieldCount,
         totalFieldCount: repliableFields.length,
         bodyHtml: bodyJson ? toHtml(bodyJson, renderContext) : null,
@@ -102,7 +106,7 @@ export async function petitionReminder(
       subject,
       text,
       html,
-      reply_to: granter.email,
+      reply_to: granterData.email,
       created_from: `PetitionReminder:${reminder.id}`,
     });
 
