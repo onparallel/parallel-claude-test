@@ -819,11 +819,11 @@ export const PublicPetitionLink = objectType({
         return `${prefix}/${template.locale}/pp/${root.slug}`;
       },
     });
-    t.nullable.field("owner", {
+    t.field("owner", {
       type: "User",
       resolve: async (root, _, ctx) => {
         const owner = await ctx.petitions.loadTemplateDefaultOwner(root.template_id);
-        return owner?.user ?? null;
+        return owner!.user;
       },
     });
     t.nonNull.field("template", {

@@ -3572,7 +3572,7 @@ type PublicPetitionLink {
   description: String!
   id: GID!
   isActive: Boolean!
-  owner: User
+  owner: User!
   slug: String!
   template: PetitionTemplate!
   title: String!

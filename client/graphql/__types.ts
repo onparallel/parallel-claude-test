@@ -2684,7 +2684,7 @@ export interface PublicPetitionLink {
   description: Scalars["String"];
   id: Scalars["GID"];
   isActive: Scalars["Boolean"];
-  owner?: Maybe<User>;
+  owner: User;
   slug: Scalars["String"];
   template: PetitionTemplate;
   title: Scalars["String"];
