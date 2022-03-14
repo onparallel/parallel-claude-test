@@ -303,14 +303,11 @@ export function TemplateDetailsModal({
               sx={{
                 Button: {
                   _hover: { backgroundColor: "gray.75" },
-                  _expanded: {
-                    borderBottomRadius: "md",
-                  },
                 },
               }}
             >
               <AccordionItem borderTop="none">
-                <AccordionButton borderTopRadius="md">
+                <AccordionButton>
                   <Text as="b" flex="1" textAlign="left">
                     <FormattedMessage
                       id="component.template-details-modal.about"
