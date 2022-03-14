@@ -10,20 +10,16 @@ export async function up(knex: Knex): Promise<void> {
       where type = 'OWNER' AND deleted_at IS NULL;
   `);
   await knex.raw(/* sql */ `
-    insert into template_default_permission (template_id, type, user_id, is_subscribed, position, created_at, created_by, updated_at, updated_by)
-    select
-      template_id as "template_id",
-      'OWNER'::petition_permission_type as "type",
-      owner_id as "user_id",
-      true as "is_subscribed",
-      0 as "position", -- as there will always be only 1 OWNER per public_link, it's ok to hardcode the position to 0
-      created_at,
-      created_by,
-      created_at as "updated_at",
-      created_by as "updated_by"
-    from public_petition_link
+    insert into template_default_permission (template_id, type, user_id, is_subscribed, created_at, created_by, updated_at, updated_by)
+    select p.id, 'OWNER', u1.id, true, ppl.created_at , ppl.created_by , ppl.updated_at , ppl.updated_by from petition p
+    join petition_permission pp on p.id = pp.petition_id
+    join public_petition_link ppl on p.id = ppl.template_id
+    join "user" u1 on ppl.owner_id = u1.id
+    where pp.type = 'OWNER' and pp.deleted_at is null and p.deleted_at is null
+    and pp.user_id != ppl.owner_id
+    and ppl.is_active and p.is_template = true
     on conflict (template_id, user_id) where deleted_at is null
-    do update set type = EXCLUDED.type returning *;
+    do update set "type" = EXCLUDED.type returning *; 
   `);
 }
 
