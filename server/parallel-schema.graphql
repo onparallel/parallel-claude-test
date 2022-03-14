@@ -3608,7 +3608,7 @@ type PublicPublicPetitionLink {
   If the organization has enough credits to send a petition with this public link or not
   """
   isAvailable: Boolean!
-  owner: PublicUser
+  owner: PublicUser!
   slug: String!
   title: String!
 }

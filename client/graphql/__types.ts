@@ -2712,7 +2712,7 @@ export interface PublicPublicPetitionLink {
   isActive: Scalars["Boolean"];
   /** If the organization has enough credits to send a petition with this public link or not */
   isAvailable: Scalars["Boolean"];
-  owner?: Maybe<PublicUser>;
+  owner: PublicUser;
   slug: Scalars["String"];
   title: Scalars["String"];
 }
@@ -17598,12 +17598,12 @@ export type PublicPetitionLink_PublicPublicPetitionLinkFragment = {
   title: string;
   isAvailable: boolean;
   description: string;
-  owner?: {
+  owner: {
     __typename?: "PublicUser";
     fullName: string;
     email: string;
     organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
-  } | null;
+  };
 };
 
 export type PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutationVariables = Exact<{
@@ -17635,12 +17635,12 @@ export type PublicPetitionLink_publicPetitionLinkBySlugQuery = {
     title: string;
     isAvailable: boolean;
     description: string;
-    owner?: {
+    owner: {
       __typename?: "PublicUser";
       fullName: string;
       email: string;
       organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
-    } | null;
+    };
   } | null;
 };
 

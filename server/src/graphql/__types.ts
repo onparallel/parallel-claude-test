@@ -1541,7 +1541,7 @@ export interface NexusGenFieldTypes {
     description: string; // String!
     isActive: boolean; // Boolean!
     isAvailable: boolean; // Boolean!
-    owner: NexusGenRootTypes["PublicUser"] | null; // PublicUser
+    owner: NexusGenRootTypes["PublicUser"]; // PublicUser!
     slug: string; // String!
     title: string; // String!
   };

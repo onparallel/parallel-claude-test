@@ -477,10 +477,10 @@ export const PublicPublicPetitionLink = objectType({
     t.nonNull.boolean("isActive", {
       resolve: (o) => o.is_active,
     });
-    t.nullable.field("owner", {
+    t.field("owner", {
       type: "PublicUser",
       resolve: async (root, _, ctx) => {
-        return (await ctx.petitions.loadTemplateDefaultOwner(root.template_id))?.user ?? null;
+        return (await ctx.petitions.loadTemplateDefaultOwner(root.template_id))!.user;
       },
     });
     t.nonNull.boolean("isAvailable", {
