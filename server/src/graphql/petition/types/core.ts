@@ -822,7 +822,8 @@ export const PublicPetitionLink = objectType({
     t.nullable.field("owner", {
       type: "User",
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.getPublicPetitionLinkOwner(root.id);
+        const owner = await ctx.petitions.loadTemplateDefaultOwner(root.template_id);
+        return owner?.user ?? null;
       },
     });
     t.nonNull.field("template", {

@@ -698,7 +698,6 @@ type Mutation {
   """
   createPublicPetitionLink(
     description: String!
-    ownerId: GID!
     slug: String
     templateId: GID!
     title: String!
@@ -1497,7 +1496,7 @@ type Mutation {
   updatePetitionFieldReply(petitionId: GID!, reply: JSON!, replyId: GID!): PetitionFieldReply!
 
   """
-  Updates the metada of the specified petition field reply
+  Updates the metadata of the specified petition field reply
   """
   updatePetitionFieldReplyMetadata(
     metadata: JSONObject!
@@ -1540,7 +1539,6 @@ type Mutation {
   updatePublicPetitionLink(
     description: String
     isActive: Boolean
-    ownerId: GID
     publicPetitionLinkId: GID!
     slug: String
     title: String
@@ -3610,7 +3608,7 @@ type PublicPublicPetitionLink {
   If the organization has enough credits to send a petition with this public link or not
   """
   isAvailable: Boolean!
-  owner: PublicUser!
+  owner: PublicUser
   slug: String!
   title: String!
 }

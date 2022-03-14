@@ -1541,7 +1541,7 @@ export interface NexusGenFieldTypes {
     description: string; // String!
     isActive: boolean; // Boolean!
     isAvailable: boolean; // Boolean!
-    owner: NexusGenRootTypes["PublicUser"]; // PublicUser!
+    owner: NexusGenRootTypes["PublicUser"] | null; // PublicUser
     slug: string; // String!
     title: string; // String!
   };
@@ -3539,7 +3539,6 @@ export interface NexusGenArgTypes {
     createPublicPetitionLink: {
       // args
       description: string; // String!
-      ownerId: NexusGenScalars["GID"]; // GID!
       slug?: string | null; // String
       templateId: NexusGenScalars["GID"]; // GID!
       title: string; // String!
@@ -4138,7 +4137,6 @@ export interface NexusGenArgTypes {
       // args
       description?: string | null; // String
       isActive?: boolean | null; // Boolean
-      ownerId?: NexusGenScalars["GID"] | null; // GID
       publicPetitionLinkId: NexusGenScalars["GID"]; // GID!
       slug?: string | null; // String
       title?: string | null; // String

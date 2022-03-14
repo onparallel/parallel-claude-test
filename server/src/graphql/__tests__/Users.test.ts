@@ -493,44 +493,6 @@ describe("GraphQL/Users", () => {
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
-
-    it("transfers public link ownership when updating user to inactive", async () => {
-      await mocks.createRandomPublicPetitionLink(user1Template.id, activeUsers[1].id);
-
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation ($userIds: [GID!]!, $transferToUserId: GID) {
-            deactivateUser(userIds: $userIds, transferToUserId: $transferToUserId) {
-              id
-              status
-            }
-          }
-        `,
-        {
-          userIds: [toGlobalId("User", activeUsers[1].id)],
-          transferToUserId: toGlobalId("User", sessionUser.id),
-        }
-      );
-
-      expect(errors).toBeUndefined();
-      expect(data?.deactivateUser).toEqual([
-        {
-          id: toGlobalId("User", activeUsers[1].id),
-          status: "INACTIVE",
-        },
-      ]);
-
-      const templatePermissions = await mocks.knex
-        .from("template_default_permission")
-        .where({
-          template_id: user1Template.id,
-          type: "OWNER",
-          deleted_at: null,
-        })
-        .select("user_id");
-
-      expect(templatePermissions).toEqual([{ user_id: sessionUser.id }]);
-    });
   });
 
   describe("updateOrganizationUser", () => {

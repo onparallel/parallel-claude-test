@@ -648,19 +648,16 @@ export class Mocks {
 
   async createRandomPublicPetitionLink(
     templateId: number,
-    ownerId: number,
     builder?: () => Partial<PublicPetitionLink>
   ) {
-    await this.knex<TemplateDefaultPermission>("template_default_permission").insert({
-      is_subscribed: false,
-      template_id: templateId,
-      user_id: ownerId,
-      type: "OWNER",
-    });
+    // select a valid user_id only to not having problems with foreign key "owner_id"
+    // TODO remove this line once owner_id is dropped
+    const [user] = await this.knex<User>("user").whereNull("deleted_at").select("id");
+
     const [data] = await this.knex<PublicPetitionLink>("public_petition_link")
       .insert({
         template_id: templateId,
-        owner_id: ownerId, // TODO remove, deprecated
+        owner_id: user.id, // TODO remove, deprecated
         description: faker.lorem.paragraph(),
         title: faker.lorem.words(),
         is_active: true,
@@ -670,6 +667,18 @@ export class Mocks {
       .returning("*");
 
     return data;
+  }
+
+  async createTemplateDefaultOwner(templateId: number, userId: number) {
+    const [row] = await this.knex<TemplateDefaultPermission>("template_default_permission")
+      .insert({
+        type: "OWNER",
+        user_id: userId,
+        template_id: templateId,
+        is_subscribed: true,
+      })
+      .returning("*");
+    return row;
   }
 
   async createOrganizationUsageLimit(

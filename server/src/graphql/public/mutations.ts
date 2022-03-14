@@ -616,7 +616,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
         );
       }
 
-      const owner = await ctx.petitions.getPublicPetitionLinkOwner(link.id);
+      const owner = await ctx.petitions.loadTemplateDefaultOwner(link.template_id);
       if (!isDefined(owner)) {
         throw new Error(`Can't find owner of PublicPetitionLink:${link.id}`);
       }
@@ -625,13 +625,13 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
         const [petition, [contact]] = await Promise.all([
           ctx.petitions.clonePetition(
             link!.template_id,
-            owner,
+            owner.user,
             {
               is_template: false,
               status: "DRAFT",
               from_public_petition_link_id: link.id,
             },
-            undefined,
+            { insertPermissions: !owner.isDefault },
             `PublicPetitionLink:${link.id}`,
             t
           ),
@@ -640,7 +640,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
               email: args.contactEmail,
               first_name: args.contactFirstName,
               last_name: args.contactLastName,
-              org_id: owner!.org_id,
+              org_id: owner.user.org_id,
             },
             `PublicPetitionLink:${link.id}`,
             t
@@ -654,7 +654,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
             body: JSON.parse(petition.email_body!),
             remindersConfig: petition.reminders_config ?? null,
           },
-          owner!,
+          owner.user,
           true,
           ctx,
           new Date(),
@@ -711,7 +711,7 @@ export const publicSendReminder = mutationField("publicSendReminder", {
     const link = (await ctx.petitions.loadPublicPetitionLinkBySlug(args.slug))!;
     const [access, owner] = await Promise.all([
       ctx.petitions.getLatestPetitionAccessFromPublicPetitionLink(link.id, args.contactEmail),
-      ctx.petitions.getPublicPetitionLinkOwner(link.id),
+      ctx.petitions.loadTemplateDefaultOwner(link.template_id),
     ]);
 
     if (!access || access.status === "INACTIVE" || access.reminders_left === 0 || !owner) {
@@ -736,7 +736,7 @@ export const publicSendReminder = mutationField("publicSendReminder", {
           type: "MANUAL",
           status: "PROCESSING",
           petition_access_id: access.id,
-          sender_id: owner.id,
+          sender_id: owner.user.id,
           email_body: null,
           created_by: `Contact:${access.contact_id}`,
         },

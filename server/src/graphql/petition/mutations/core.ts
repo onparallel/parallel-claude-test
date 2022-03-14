@@ -92,7 +92,6 @@ import { ArgValidationError, WhitelistedError } from "./../../helpers/errors";
 import {
   userHasAccessToPublicPetitionLink,
   userHasAccessToUserOrUserGroupPermissions,
-  userHasAccessToUsers,
 } from "./authorizers";
 
 export const createPetition = mutationField("createPetition", {
@@ -1628,7 +1627,7 @@ export const reopenPetition = mutationField("reopenPetition", {
 });
 
 export const updatePetitionFieldReplyMetadata = mutationField("updatePetitionFieldReplyMetadata", {
-  description: "Updates the metada of the specified petition field reply",
+  description: "Updates the metadata of the specified petition field reply",
   type: "PetitionFieldReply",
   authorize: chain(
     authenticate(),
@@ -1661,26 +1660,13 @@ export const updateTemplateDefaultPermissions = mutationField("updateTemplateDef
     permissions: nonNull(list(nonNull("UserOrUserGroupPermissionInput"))),
   },
   resolve: async (_, args, ctx) => {
-    const [templateDefaultPermissionOwner, [publicLink]] = await Promise.all([
-      ctx.petitions.loadTemplateDefaultPermissionOwner(args.templateId),
-      ctx.petitions.loadPublicPetitionLinksByTemplateId(args.templateId),
-    ]);
-    if (
-      publicLink?.is_active &&
-      templateDefaultPermissionOwner &&
-      args.permissions.some((p) => p.userId === templateDefaultPermissionOwner.user_id) &&
-      !args.permissions.some((p) => p.permissionType === "OWNER")
-    ) {
-      throw new ApolloError(
-        "Can't update template default permissions on the owner of a public link",
-        "UPDATE_TEMPLATE_DEFAULT_PERMISSIONS_ERROR"
-      );
-    }
     await ctx.petitions.resetTemplateDefaultPermissions(
       args.templateId,
       args.permissions as any,
       `User:${ctx.user!.id}`
     );
+    ctx.petitions.loadTemplateDefaultPermissions.dataloader.clear(args.templateId);
+    ctx.petitions.loadTemplateDefaultOwner.dataloader.clear(args.templateId);
     return (await ctx.petitions.loadPetition(args.templateId))!;
   },
 });
@@ -1691,61 +1677,46 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
   authorize: authenticateAnd(
     userHasAccessToPetitions("templateId"),
     petitionsAreOfTypeTemplate("templateId"),
-    templateDoesNotHavePublicPetitionLink("templateId"),
-    userHasAccessToUsers("ownerId")
+    templateDoesNotHavePublicPetitionLink("templateId")
   ),
   args: {
     templateId: nonNull(globalIdArg("Petition")),
     title: nonNull(stringArg()),
     description: nonNull(stringArg()),
-    ownerId: nonNull(globalIdArg("User")),
     slug: nullable(stringArg()),
   },
   validateArgs: validateIfDefined(
     (args) => args.slug,
     validatePublicPetitionLinkSlug((args) => args.slug!, "slug")
   ),
-  resolve: async (_, args, ctx) => {
-    return await ctx.petitions.withTransaction(async (t) => {
-      // if we want to insert a new OWNER permission, replace the current owner first to avoid template_default_permission__owner constraint
-      await ctx.petitions.replaceTemplateDefaultPermissionOwner(
-        args.templateId,
-        {
-          isSubscribed: true,
-          userId: args.ownerId,
-        },
-        `User:${ctx.user!.id}`,
-        t
-      );
-      return await ctx.petitions.createPublicPetitionLink(
-        {
-          template_id: args.templateId,
-          title: args.title,
-          description: args.description,
-          slug: args.slug ?? random(10),
-          owner_id: args.ownerId, // TODO remove, deprecated
-          is_active: true,
-        },
-        `User:${ctx.user!.id}`,
-        t
-      );
-    });
+  resolve: async (_, { templateId, title, description, slug }, ctx) => {
+    // TODO this is temporal and will be removed once owner_id col is dropped
+    // we are saving it only if its necessary to do a rollback after releasing
+    const owner = (await ctx.petitions.loadTemplateDefaultOwner(templateId))!;
+
+    return await ctx.petitions.createPublicPetitionLink(
+      {
+        template_id: templateId,
+        title,
+        description,
+        slug: slug ?? random(10),
+        owner_id: owner.user.id, // TODO remove, deprecated
+        is_active: true,
+      },
+      `User:${ctx.user!.id}`
+    );
   },
 });
 
 export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink", {
   description: "Updates the info and permissions of a public link",
   type: "PublicPetitionLink",
-  authorize: authenticateAnd(
-    userHasAccessToPublicPetitionLink("publicPetitionLinkId"),
-    ifArgDefined((args) => args.ownerId, userHasAccessToUsers("ownerId" as any))
-  ),
+  authorize: authenticateAnd(userHasAccessToPublicPetitionLink("publicPetitionLinkId")),
   args: {
     publicPetitionLinkId: nonNull(globalIdArg("PublicPetitionLink")),
     isActive: booleanArg(),
     title: stringArg(),
     description: stringArg(),
-    ownerId: globalIdArg("User"),
     slug: stringArg(),
   },
   validateArgs: validateIf(
@@ -1771,23 +1742,6 @@ export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink"
       publicPetitionLinkData.slug = args.slug;
     }
 
-    const publicLink = (await ctx.petitions.loadPublicPetitionLink(args.publicPetitionLinkId))!;
-    if (isDefined(args.ownerId)) {
-      try {
-        await ctx.petitions.updatePublicPetitionLinkOwner(
-          publicLink.template_id,
-          args.ownerId,
-          `User:${ctx.user!.id}`
-        );
-      } catch (error: any) {
-        if (error.constraint === "template_default_permission__template_id__user_id") {
-          // trying to set as OWNER a user that already has READ/WRITE default permissions on this template
-          // ignore this error and continue
-        } else {
-          throw error;
-        }
-      }
-    }
     return await ctx.petitions.updatePublicPetitionLink(
       args.publicPetitionLinkId,
       publicPetitionLinkData,

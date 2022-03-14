@@ -52,14 +52,10 @@ describe("GraphQL/PublicPetitionLink", () => {
     await mocks.createRandomPetitionFields(templates[0].id, 1, () => ({ type: "TEXT" }));
     await mocks.createRandomPetitionFields(templates[1].id, 1, () => ({ type: "TEXT" }));
 
-    publicPetitionLink = await mocks.createRandomPublicPetitionLink(
-      templates[0].id,
-      user.id,
-      () => ({
-        slug: "public-link-slug",
-        is_active: true,
-      })
-    );
+    publicPetitionLink = await mocks.createRandomPublicPetitionLink(templates[0].id, () => ({
+      slug: "public-link-slug",
+      is_active: true,
+    }));
   });
 
   afterAll(async () => {
@@ -681,7 +677,8 @@ describe("GraphQL/PublicPetitionLink", () => {
         is_template: true,
       }));
       const users = await mocks.createRandomUsers(organization.id, 3);
-      const link = await mocks.createRandomPublicPetitionLink(template.id, users[2].id);
+      await mocks.createTemplateDefaultOwner(template.id, users[2].id);
+      const link = await mocks.createRandomPublicPetitionLink(template.id);
       await mocks.knex.from<TemplateDefaultPermission>("template_default_permission").insert([
         {
           user_id: users[1].id,
@@ -752,7 +749,7 @@ describe("GraphQL/PublicPetitionLink", () => {
         is_template: true,
       }));
       await mocks.createRandomPetitionFields(newTemplate.id, 1, () => ({ type: "TEXT" }));
-      newPetitionLink = await mocks.createRandomPublicPetitionLink(newTemplate.id, user.id, () => ({
+      newPetitionLink = await mocks.createRandomPublicPetitionLink(newTemplate.id, () => ({
         slug: "1234",
       }));
     });
@@ -928,12 +925,11 @@ describe("GraphQL/PublicPetitionLink", () => {
     it("sends error if user does not have access to the template", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($templateId: GID!, $title: String!, $description: String!, $ownerId: GID!) {
+          mutation ($templateId: GID!, $title: String!, $description: String!) {
             createPublicPetitionLink(
               templateId: $templateId
               title: $title
               description: $description
-              ownerId: $ownerId
             ) {
               id
             }
@@ -943,7 +939,6 @@ describe("GraphQL/PublicPetitionLink", () => {
           templateId: toGlobalId("Petition", privateTemplate.id),
           title: "link title",
           description: "link description",
-          ownerId: toGlobalId("User", otherUsers[0].id),
         },
       });
 
@@ -954,12 +949,11 @@ describe("GraphQL/PublicPetitionLink", () => {
     it("sends error if trying to pass a petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($templateId: GID!, $title: String!, $description: String!, $ownerId: GID!) {
+          mutation ($templateId: GID!, $title: String!, $description: String!) {
             createPublicPetitionLink(
               templateId: $templateId
               title: $title
               description: $description
-              ownerId: $ownerId
             ) {
               id
             }
@@ -969,7 +963,6 @@ describe("GraphQL/PublicPetitionLink", () => {
           templateId: toGlobalId("Petition", petition.id),
           title: "link title",
           description: "link description",
-          ownerId: toGlobalId("User", user.id),
         },
       });
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -1033,18 +1026,11 @@ describe("GraphQL/PublicPetitionLink", () => {
       expect(errors1).toBeUndefined();
       const { errors: errors2, data: data2 } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $templateId: GID!
-            $title: String!
-            $description: String!
-            $ownerId: GID!
-            $slug: String
-          ) {
+          mutation ($templateId: GID!, $title: String!, $description: String!, $slug: String) {
             createPublicPetitionLink(
               templateId: $templateId
               title: $title
               description: $description
-              ownerId: $ownerId
               slug: $slug
             ) {
               isActive
@@ -1059,7 +1045,6 @@ describe("GraphQL/PublicPetitionLink", () => {
           templateId: toGlobalId("Petition", templates[0].id),
           title: "link title",
           description: "link description",
-          ownerId: toGlobalId("User", user.id),
           slug: "this-is-my-valid-slug",
         },
       });
@@ -1074,12 +1059,11 @@ describe("GraphQL/PublicPetitionLink", () => {
     it("sends error if trying to create a second public link on the same template", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($templateId: GID!, $title: String!, $description: String!, $ownerId: GID!) {
+          mutation ($templateId: GID!, $title: String!, $description: String!) {
             createPublicPetitionLink(
               templateId: $templateId
               title: $title
               description: $description
-              ownerId: $ownerId
             ) {
               id
             }
@@ -1089,7 +1073,6 @@ describe("GraphQL/PublicPetitionLink", () => {
           templateId: toGlobalId("Petition", templates[0].id),
           title: "link title",
           description: "link description",
-          ownerId: toGlobalId("User", user.id),
         },
       });
 
@@ -1100,18 +1083,11 @@ describe("GraphQL/PublicPetitionLink", () => {
     it("sends error if passing an invalid slug", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $templateId: GID!
-            $title: String!
-            $description: String!
-            $ownerId: GID!
-            $slug: String
-          ) {
+          mutation ($templateId: GID!, $title: String!, $description: String!, $slug: String) {
             createPublicPetitionLink(
               templateId: $templateId
               title: $title
               description: $description
-              ownerId: $ownerId
               slug: $slug
             ) {
               id
@@ -1122,7 +1098,6 @@ describe("GraphQL/PublicPetitionLink", () => {
           templateId: toGlobalId("Petition", templates[1].id),
           title: "link title",
           description: "link description",
-          ownerId: toGlobalId("User", user.id),
           slug: "you cant use this slug!!!",
         },
       });
@@ -1130,65 +1105,6 @@ describe("GraphQL/PublicPetitionLink", () => {
         extra: { code: "INVALID_SLUG_CHARS_VALIDATION_ERROR" },
       });
       expect(data).toBeNull();
-    });
-
-    it("overwrites permission if creating a link and the link owner already has read or write permissions on the template", async () => {
-      await mocks.knex
-        .from("petition")
-        .whereNotNull("from_public_petition_link_id")
-        .update("from_public_petition_link_id", null);
-      await mocks.knex.from("public_petition_link").delete();
-      await mocks.knex.from("template_default_permission").delete();
-
-      await mocks.knex<TemplateDefaultPermission>("template_default_permission").insert({
-        template_id: templates[0].id,
-        user_id: user.id,
-        type: "READ",
-      });
-
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($templateId: GID!, $title: String!, $description: String!, $ownerId: GID!) {
-            createPublicPetitionLink(
-              templateId: $templateId
-              title: $title
-              description: $description
-              ownerId: $ownerId
-            ) {
-              owner {
-                id
-              }
-            }
-          }
-        `,
-        variables: {
-          templateId: toGlobalId("Petition", templates[0].id),
-          title: "public link title",
-          description: "this is the description",
-          ownerId: toGlobalId("User", user.id),
-        },
-      });
-
-      expect(errors).toBeUndefined();
-      expect(data?.createPublicPetitionLink).toEqual({
-        owner: {
-          id: toGlobalId("User", user.id),
-        },
-      });
-
-      const templateDefaultPermissions = await mocks
-        .knex<TemplateDefaultPermission>("template_default_permission")
-        .where("template_id", templates[0].id)
-        .whereNull("deleted_at")
-        .select("template_id", "type", "user_id");
-
-      expect(templateDefaultPermissions).toEqual([
-        {
-          template_id: templates[0].id,
-          type: "OWNER",
-          user_id: user.id,
-        },
-      ]);
     });
   });
 
@@ -1209,7 +1125,6 @@ describe("GraphQL/PublicPetitionLink", () => {
       );
       privatePublicPetitionLink = await mocks.createRandomPublicPetitionLink(
         privateTemplate.id,
-        otherUser.id,
         () => ({ slug: "aaaaa" })
       );
 
@@ -1217,7 +1132,7 @@ describe("GraphQL/PublicPetitionLink", () => {
         is_template: true,
         status: null,
       }));
-      publicPetitionLink = await mocks.createRandomPublicPetitionLink(template.id, user.id, () => ({
+      publicPetitionLink = await mocks.createRandomPublicPetitionLink(template.id, () => ({
         slug: "bbbb",
       }));
     });
@@ -1241,33 +1156,6 @@ describe("GraphQL/PublicPetitionLink", () => {
       });
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
-    });
-
-    it("updates the owner of the public link", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($publicPetitionLinkId: GID!, $ownerId: GID) {
-            updatePublicPetitionLink(
-              publicPetitionLinkId: $publicPetitionLinkId
-              ownerId: $ownerId
-            ) {
-              id
-              owner {
-                id
-              }
-            }
-          }
-        `,
-        variables: {
-          publicPetitionLinkId: toGlobalId("PublicPetitionLink", publicPetitionLink.id),
-          ownerId: toGlobalId("User", otherUser.id),
-        },
-      });
-      expect(errors).toBeUndefined();
-      expect(data?.updatePublicPetitionLink).toEqual({
-        id: toGlobalId("PublicPetitionLink", publicPetitionLink.id),
-        owner: { id: toGlobalId("User", otherUser.id) },
-      });
     });
 
     it("sets the public link as inactive", async () => {

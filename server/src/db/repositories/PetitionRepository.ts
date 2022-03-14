@@ -3413,13 +3413,30 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.whereNull("deleted_at").orderByRaw(`"type" asc, "id" desc`)
   );
 
-  readonly loadTemplateDefaultPermissionOwner = this.buildLoadBy(
-    "template_default_permission",
-    "template_id",
-    (q) => q.whereNull("deleted_at").where("type", "OWNER")
-  );
+  async resetTemplateDefaultPermissions(
+    templateId: number,
+    permissions: TemplateDefaultPermissionInput[],
+    updatedBy: string,
+    t?: Knex.Transaction
+  ) {
+    const [[newOwner], rwPermissions] = partition(permissions, (p) => p.permissionType === "OWNER");
 
-  async replaceTemplateDefaultPermissionOwner(
+    return await this.withTransaction(async (t) => {
+      // first of all, replace current owner to avoid triggering template_default_permission__owner constraint
+      await this.replaceTemplateDefaultPermissionOwner(
+        templateId,
+        newOwner && "userId" in newOwner
+          ? { userId: newOwner.userId, isSubscribed: newOwner.isSubscribed }
+          : null,
+        updatedBy,
+        t
+      );
+      //now upsert every read/write permission
+      await this.upsertTemplateDefaultRWPermissions(templateId, rwPermissions, updatedBy, t);
+    }, t);
+  }
+
+  private async replaceTemplateDefaultPermissionOwner(
     templateId: number,
     newOwner: Maybe<{ userId: number; isSubscribed: boolean }>,
     updatedBy: string,
@@ -3460,42 +3477,7 @@ export class PetitionRepository extends BaseRepository {
     }
   }
 
-  async resetTemplateDefaultPermissions(
-    templateId: number,
-    permissions: TemplateDefaultPermissionInput[],
-    updatedBy: string,
-    t?: Knex.Transaction
-  ) {
-    const [[newOwner], rwPermissions] = partition(permissions, (p) => p.permissionType === "OWNER");
-
-    return await this.withTransaction(async (t) => {
-      // first of all, replace current owner to avoid triggering template_default_permission__owner constraint
-      await this.replaceTemplateDefaultPermissionOwner(
-        templateId,
-        newOwner && "userId" in newOwner
-          ? { userId: newOwner.userId, isSubscribed: newOwner.isSubscribed }
-          : null,
-        updatedBy,
-        t
-      );
-      //now upsert every read/write permission
-      await this.upsertTemplateDefaultRWPermissions(templateId, rwPermissions, updatedBy, t);
-
-      // if no OWNER will be set for the template, we have to make sure the public link is disabled
-      if (!newOwner) {
-        await this.from("public_petition_link", t)
-          .where({ template_id: templateId, is_active: true })
-          .update({
-            is_active: false,
-            updated_at: this.now(),
-            updated_by: updatedBy,
-          });
-        this.loadPublicPetitionLinksByTemplateId.dataloader.clear(templateId);
-      }
-    }, t);
-  }
-
-  async upsertTemplateDefaultRWPermissions(
+  private async upsertTemplateDefaultRWPermissions(
     templateId: number,
     permissions: TemplateDefaultPermissionInput[],
     updatedBy: string,
@@ -4011,21 +3993,50 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.orderBy("created_at", "asc")
   );
 
-  async getPublicPetitionLinkOwner(publicPetitionLinkId: number) {
-    const [user] = await this.raw<User | null>(
-      /* sql */ `
-    select u.* from public_petition_link ppl 
-    left join template_default_permission tdp on ppl.template_id = tdp.template_id
-    left join "user" u on tdp.user_id = u.id
-    where tdp."type" = 'OWNER'
-    and tdp.deleted_at is null
-    and ppl.id = ?;
-  `,
-      [publicPetitionLinkId]
-    );
+  readonly loadTemplateDefaultOwner = fromDataLoader(
+    new DataLoader<number, { isDefault: boolean; user: User } | null>(async (templateIds) => {
+      const [templateDefaultOwners, templateOwners] = await Promise.all([
+        this.from("template_default_permission")
+          .whereNull("deleted_at")
+          .where({ type: "OWNER" })
+          .whereIn("template_id", templateIds)
+          .select("*"),
+        this.from("petition_permission")
+          .whereNull("deleted_at")
+          .where({ type: "OWNER" })
+          .whereIn("petition_id", templateIds)
+          .select("*"),
+      ]);
 
-    return user;
-  }
+      const defaultOwnerByTemplateId = indexBy(templateDefaultOwners, (tdp) => tdp.template_id);
+      const templateOwnerByTemplateId = indexBy(templateOwners, (t) => t.petition_id);
+
+      const userIds = uniq([
+        ...templateDefaultOwners.map((tdp) => tdp.user_id),
+        ...templateOwners.map((t) => t.user_id),
+      ]).filter(isDefined);
+
+      const users = await this.from("user")
+        .whereIn("id", userIds)
+        .whereNull("deleted_at")
+        .select("*");
+
+      return templateIds.map((templateId) => {
+        const isDefault = isDefined(defaultOwnerByTemplateId[templateId]?.user_id);
+        const ownerId =
+          defaultOwnerByTemplateId[templateId]?.user_id ??
+          templateOwnerByTemplateId[templateId]?.user_id;
+        const user = users.find((u) => u.id === ownerId) ?? null;
+
+        return user
+          ? {
+              isDefault,
+              user,
+            }
+          : null;
+      });
+    })
+  );
 
   async createPublicPetitionLink(
     data: CreatePublicPetitionLink,
@@ -4062,54 +4073,6 @@ export class PetitionRepository extends BaseRepository {
       );
 
     return row;
-  }
-
-  async updatePublicPetitionLinkOwner(
-    templateId: number,
-    newOwnerId: number,
-    updatedBy: string,
-    t?: Knex.Transaction
-  ) {
-    const templatePermissions = await this.from("template_default_permission", t)
-      .whereNull("deleted_at")
-      .where("template_id", templateId)
-      .select("*");
-
-    // if the new owner of the public link already has read/write permissions on the template,
-    // we need to delete this first before doing the upsert below so the query doesn't throw a constraint error
-    const newOwnerCurrentRWPermissions = templatePermissions.filter(
-      (p) => p.user_id === newOwnerId && ["READ", "WRITE"].includes(p.type)
-    );
-    if (newOwnerCurrentRWPermissions.length > 0) {
-      await this.from("template_default_permission", t)
-        .whereIn(
-          "id",
-          newOwnerCurrentRWPermissions.map((p) => p.id)
-        )
-        .update({ deleted_at: this.now(), deleted_by: updatedBy });
-    }
-
-    await this.raw(
-      /* sql */ `
-          ?
-          on conflict (template_id) where type = 'OWNER' and deleted_at is null
-            do update set
-              user_id = EXCLUDED.user_id, is_subscribed = EXCLUDED.is_subscribed, updated_by = ?, updated_at = NOW()
-          returning *;
-        `,
-      [
-        this.knex.from({ tdp: "template_default_permission" }).insert({
-          template_id: templateId,
-          type: "OWNER",
-          user_id: newOwnerId,
-          is_subscribed: true,
-          created_by: updatedBy,
-          updated_by: updatedBy,
-        }),
-        updatedBy,
-      ],
-      t
-    );
   }
 
   async contactHasAccessFromPublicPetitionLink(contactEmail: string, publicPetitionLinkId: number) {

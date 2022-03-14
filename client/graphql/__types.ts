@@ -7207,7 +7207,6 @@ export type PublicLinkSettingsDialog_PetitionTemplateFragment = {
   name?: string | null;
   locale: PetitionLocale;
   organization: { __typename?: "Organization"; customHost?: string | null };
-  owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
 };
 
 export type PublicLinkSettingsDialog_PublicPetitionLinkFragment = {
@@ -7218,7 +7217,6 @@ export type PublicLinkSettingsDialog_PublicPetitionLinkFragment = {
   description: string;
   slug: string;
   url: string;
-  owner?: { __typename?: "User"; id: string; fullName?: string | null; email: string } | null;
 };
 
 export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
@@ -7749,7 +7747,6 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
     title: string;
     description: string;
     slug: string;
-    owner?: { __typename?: "User"; id: string; fullName?: string | null; email: string } | null;
   } | null;
   defaultPermissions: Array<
     | {
@@ -7784,7 +7781,6 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
       }
   >;
   organization: { __typename?: "Organization"; customHost?: string | null };
-  owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
   signatureConfig?: {
     __typename?: "SignatureConfig";
     title: string;
@@ -7879,7 +7875,6 @@ export type PetitionSettings_createPublicPetitionLinkMutation = {
       id: string;
       publicLink?: { __typename?: "PublicPetitionLink"; id: string } | null;
     };
-    owner?: { __typename?: "User"; id: string; fullName?: string | null; email: string } | null;
   };
 };
 
@@ -7906,7 +7901,6 @@ export type PetitionSettings_updatePublicPetitionLinkMutation = {
       id: string;
       publicLink?: { __typename?: "PublicPetitionLink"; id: string } | null;
     };
-    owner?: { __typename?: "User"; id: string; fullName?: string | null; email: string } | null;
   };
 };
 
@@ -13566,7 +13560,6 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     title: string;
     description: string;
     slug: string;
-    owner?: { __typename?: "User"; id: string; fullName?: string | null; email: string } | null;
   } | null;
   defaultPermissions: Array<
     | {
@@ -13601,7 +13594,6 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
       }
   >;
   organization: { __typename?: "Organization"; customHost?: string | null };
-  owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
   signatureConfig?: {
     __typename?: "SignatureConfig";
     title: string;
@@ -13818,12 +13810,6 @@ export type PetitionCompose_updatePetitionMutation = {
           title: string;
           description: string;
           slug: string;
-          owner?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            email: string;
-          } | null;
         } | null;
         defaultPermissions: Array<
           | {
@@ -13863,7 +13849,6 @@ export type PetitionCompose_updatePetitionMutation = {
             }
         >;
         organization: { __typename?: "Organization"; customHost?: string | null };
-        owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
         signatureConfig?: {
           __typename?: "SignatureConfig";
           title: string;
@@ -14421,12 +14406,6 @@ export type PetitionCompose_petitionQuery = {
           title: string;
           description: string;
           slug: string;
-          owner?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            email: string;
-          } | null;
         } | null;
         defaultPermissions: Array<
           | {
@@ -14466,7 +14445,6 @@ export type PetitionCompose_petitionQuery = {
             }
         >;
         organization: { __typename?: "Organization"; customHost?: string | null };
-        owner: { __typename?: "User"; id: string; fullName?: string | null; email: string };
         signatureConfig?: {
           __typename?: "SignatureConfig";
           title: string;
@@ -20617,11 +20595,7 @@ export const PublicLinkSettingsDialog_PetitionTemplateFragmentDoc = gql`
     organization {
       customHost
     }
-    owner {
-      ...UserSelect_User
-    }
   }
-  ${UserSelect_UserFragmentDoc}
 ` as unknown as DocumentNode<PublicLinkSettingsDialog_PetitionTemplateFragment, unknown>;
 export const PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc = gql`
   fragment PublicLinkSettingsDialog_PublicPetitionLink on PublicPetitionLink {
@@ -20631,11 +20605,7 @@ export const PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc = gql`
     description
     slug
     url
-    owner {
-      ...UserSelect_User
-    }
   }
-  ${UserSelect_UserFragmentDoc}
 ` as unknown as DocumentNode<PublicLinkSettingsDialog_PublicPetitionLinkFragment, unknown>;
 export const TemplateDefaultPermissionsDialog_PublicPetitionLinkFragmentDoc = gql`
   fragment TemplateDefaultPermissionsDialog_PublicPetitionLink on PublicPetitionLink {
