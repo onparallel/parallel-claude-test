@@ -200,7 +200,7 @@ export class Mocks {
     const [{ count }] = await this.knex("petition_field")
       .where("petition_id", petitionId)
       .whereNull("deleted_at")
-      .count("*");
+      .select(this.knex.raw(`count(*)::int as count`));
 
     return await this.knex<PetitionField>("petition_field")
       .insert(

@@ -1,24 +1,19 @@
 import { Knex } from "knex";
-
 import {
   Contact,
   CreateContact,
-  CreateOrganization,
-  CreateUser,
-  CreateUserGroup,
+  CreatePetitionField,
+  CreatePetitionPermission,
   CreateUserGroupMember,
   Organization,
   OrganizationUsageLimit,
   OrgIntegration,
+  Petition,
+  PetitionField,
+  PetitionPermission,
   User,
   UserGroup,
   UserGroupMember,
-  CreatePetition,
-  CreatePetitionField,
-  Petition,
-  PetitionField,
-  CreatePetitionPermission,
-  PetitionPermission,
 } from "../src/db/__types";
 import { deleteAllData } from "../src/util/knexUtils";
 
@@ -30,68 +25,73 @@ export async function seed(knex: Knex): Promise<any> {
     select unnest(enum_range(NULL::feature_flag_name)) as name, true as default_value
   `);
 
-  const orgs: CreateOrganization[] = [
-    {
-      name: "Parallel",
-      status: "ROOT",
-      usage_details: {
-        USER_LIMIT: 100,
-        PETITION_SEND: {
-          limit: 5000,
-          period: "1 month",
-        },
-        SIGNATURIT_SHARED_APIKEY: {
-          limit: 5000,
-          period: "1 month",
+  const orgs = await knex<Organization>("organization").insert(
+    [
+      {
+        name: "Parallel",
+        status: "ROOT",
+        usage_details: {
+          USER_LIMIT: 100,
+          PETITION_SEND: {
+            limit: 5000,
+            period: "1 month",
+          },
+          SIGNATURIT_SHARED_APIKEY: {
+            limit: 5000,
+            period: "1 month",
+          },
         },
       },
-    },
-  ];
-
-  const orgIds = await knex<Organization>("organization").insert(orgs, "id");
-  const users: CreateUser[] = [
-    {
-      org_id: orgIds[0],
-      cognito_id: "123e4567-e89b-12d3-a456-426655440000",
-      email: "harvey@onparallel.com",
-      organization_role: "OWNER",
-      first_name: "Harvey",
-      last_name: "Specter",
-    },
-    {
-      org_id: orgIds[0],
-      cognito_id: "f3a469da-cd92-46de-84d1-cc09b4e57788",
-      email: "mike@onparallel.com",
-      organization_role: "NORMAL",
-      first_name: "Mike",
-      last_name: "Ross",
-    },
-    {
-      org_id: orgIds[0],
-      cognito_id: "bd82c5a1-5622-41a5-9116-1686a44cf3fa",
-      email: "santialbo@gmail.com",
-      organization_role: "ADMIN",
-      first_name: "Santi",
-      last_name: "Albo",
-    },
-    {
-      org_id: orgIds[0],
-      cognito_id: "8dd56de4-3b39-4d4b-850c-82be0aba21aa",
-      email: "mariano@onparallel.com",
-      organization_role: "ADMIN",
-      first_name: "Mariano",
-      last_name: "Rodriguez",
-    },
-    {
-      org_id: orgIds[0],
-      cognito_id: "013f5bce-5459-4e7c-bc64-773a4ffcd084",
-      email: "konstantin@onparallel.com",
-      organization_role: "ADMIN",
-      first_name: "Konstantin",
-      last_name: "Klykov",
-    },
-  ];
-  const userIds = await knex<User>("user").insert(users, "id");
+    ],
+    "id"
+  );
+  const orgIds = orgs.map((o) => o.id);
+  const users = await knex<User>("user").insert(
+    [
+      {
+        org_id: orgIds[0],
+        cognito_id: "123e4567-e89b-12d3-a456-426655440000",
+        email: "harvey@onparallel.com",
+        organization_role: "OWNER",
+        first_name: "Harvey",
+        last_name: "Specter",
+      },
+      {
+        org_id: orgIds[0],
+        cognito_id: "f3a469da-cd92-46de-84d1-cc09b4e57788",
+        email: "mike@onparallel.com",
+        organization_role: "NORMAL",
+        first_name: "Mike",
+        last_name: "Ross",
+      },
+      {
+        org_id: orgIds[0],
+        cognito_id: "bd82c5a1-5622-41a5-9116-1686a44cf3fa",
+        email: "santialbo@gmail.com",
+        organization_role: "ADMIN",
+        first_name: "Santi",
+        last_name: "Albo",
+      },
+      {
+        org_id: orgIds[0],
+        cognito_id: "8dd56de4-3b39-4d4b-850c-82be0aba21aa",
+        email: "mariano@onparallel.com",
+        organization_role: "ADMIN",
+        first_name: "Mariano",
+        last_name: "Rodriguez",
+      },
+      {
+        org_id: orgIds[0],
+        cognito_id: "013f5bce-5459-4e7c-bc64-773a4ffcd084",
+        email: "konstantin@onparallel.com",
+        organization_role: "ADMIN",
+        first_name: "Konstantin",
+        last_name: "Klykov",
+      },
+    ],
+    "id"
+  );
+  const userIds = users.map((u) => u.id);
   await knex<Organization>("organization")
     .where("id", orgIds[0])
     .update({
@@ -176,27 +176,31 @@ export async function seed(knex: Knex): Promise<any> {
     is_default: true,
   });
 
-  const groups: CreateUserGroup[] = [
-    {
-      org_id: orgIds[0],
-      name: "Empty",
-      created_by: `User:${userIds[2]}`,
-      updated_by: `User:${userIds[2]}`,
-    },
-    {
-      org_id: orgIds[0],
-      name: "Dev",
-      created_by: `User:${userIds[2]}`,
-      updated_by: `User:${userIds[2]}`,
-    },
-    {
-      org_id: orgIds[0],
-      name: "All",
-      created_by: `User:${userIds[2]}`,
-      updated_by: `User:${userIds[2]}`,
-    },
-  ];
-  const userGroupIds = await knex<UserGroup>("user_group").insert(groups, "id");
+  const groups = await knex<UserGroup>("user_group").insert(
+    [
+      {
+        org_id: orgIds[0],
+        name: "Empty",
+        created_by: `User:${userIds[2]}`,
+        updated_by: `User:${userIds[2]}`,
+      },
+      {
+        org_id: orgIds[0],
+        name: "Dev",
+        created_by: `User:${userIds[2]}`,
+        updated_by: `User:${userIds[2]}`,
+      },
+      {
+        org_id: orgIds[0],
+        name: "All",
+        created_by: `User:${userIds[2]}`,
+        updated_by: `User:${userIds[2]}`,
+      },
+    ],
+    "id"
+  );
+
+  const userGroupIds = groups.map((g) => g.id);
 
   const userGroupMembers: CreateUserGroupMember[] = [
     {
@@ -223,30 +227,31 @@ export async function seed(knex: Knex): Promise<any> {
 
   await knex<UserGroupMember>("user_group_member").insert(userGroupMembers);
 
-  const petitions: CreatePetition[] = [
-    {
-      org_id: orgIds[0],
-      name: "Tu primer envío con Parallel",
-      custom_ref: null,
-      locale: "es",
-      is_template: true,
-      status: null,
-      deadline: null,
-      email_subject: "Petición de prueba",
-      email_body:
-        '[{"type":"paragraph","children":[{"text":"Hola "},{"children":[{"text":""}],"placeholder":"contact-first-name","type":"placeholder"},{"text":","}]},{"children":[{"text":""}],"type":"paragraph"},{"children":[{"text":"Este es el mensaje que enviarás a tu destinatario. Muchas de nuestras plantillas vienen con mensajes configurados por defecto como este, con personalización de mensaje para que tú, "},{"children":[{"text":""}],"placeholder":"user-first-name","type":"placeholder"},{"text":", solo tengas que darle a enviar. No obstante, puedes cambiarlo siempre que quieras por tus propias palabras. "}],"type":"paragraph"},{"children":[{"text":""}],"type":"paragraph"},{"children":[{"text":"Un saludo,"}],"type":"paragraph"},{"children":[{"text":"Paco"}],"type":"paragraph"}]',
-      reminders_active: false,
-      created_by: `User:${userIds[2]}`,
-      updated_by: `User:${userIds[2]}`,
-      reminders_config: null,
-      template_description:
-        '[{"type":"paragraph","children":[{"text":"Esta plantilla está pensada para facilitarte lo máximo posible tus primeros pasos con Parallel."}]},{"children":[{"text":""}],"type":"paragraph"},{"children":[{"text":"Te recomendamos utilizarla para"},{"bold":true,"text":" realizar un primer envío y enviártela a tu propia dirección de correo"},{"text":" de forma que puedas ver la experiencia que tendrán tus destinatarios."}],"type":"paragraph"},{"children":[{"text":""}],"type":"paragraph"},{"children":[{"text":"El listado de información que aparece abajo, son los campos que luego verás como destinatario. Algunos campos están ocultos, de forma que solo se mostrarán si se cumplen las condiciones."}],"type":"paragraph"}]',
-      template_public: true,
-      from_template_id: null,
-      signature_config: null,
-      hide_recipient_view_contents: false,
-      skip_forward_security: false,
-      public_metadata: `{
+  const petitions = await knex<Petition>("petition").insert(
+    [
+      {
+        org_id: orgIds[0],
+        name: "Tu primer envío con Parallel",
+        custom_ref: null,
+        locale: "es",
+        is_template: true,
+        status: null,
+        deadline: null,
+        email_subject: "Petición de prueba",
+        email_body:
+          '[{"type":"paragraph","children":[{"text":"Hola "},{"children":[{"text":""}],"placeholder":"contact-first-name","type":"placeholder"},{"text":","}]},{"children":[{"text":""}],"type":"paragraph"},{"children":[{"text":"Este es el mensaje que enviarás a tu destinatario. Muchas de nuestras plantillas vienen con mensajes configurados por defecto como este, con personalización de mensaje para que tú, "},{"children":[{"text":""}],"placeholder":"user-first-name","type":"placeholder"},{"text":", solo tengas que darle a enviar. No obstante, puedes cambiarlo siempre que quieras por tus propias palabras. "}],"type":"paragraph"},{"children":[{"text":""}],"type":"paragraph"},{"children":[{"text":"Un saludo,"}],"type":"paragraph"},{"children":[{"text":"Paco"}],"type":"paragraph"}]',
+        reminders_active: false,
+        created_by: `User:${userIds[2]}`,
+        updated_by: `User:${userIds[2]}`,
+        reminders_config: null,
+        template_description:
+          '[{"type":"paragraph","children":[{"text":"Esta plantilla está pensada para facilitarte lo máximo posible tus primeros pasos con Parallel."}]},{"children":[{"text":""}],"type":"paragraph"},{"children":[{"text":"Te recomendamos utilizarla para"},{"bold":true,"text":" realizar un primer envío y enviártela a tu propia dirección de correo"},{"text":" de forma que puedas ver la experiencia que tendrán tus destinatarios."}],"type":"paragraph"},{"children":[{"text":""}],"type":"paragraph"},{"children":[{"text":"El listado de información que aparece abajo, son los campos que luego verás como destinatario. Algunos campos están ocultos, de forma que solo se mostrarán si se cumplen las condiciones."}],"type":"paragraph"}]',
+        template_public: true,
+        from_template_id: null,
+        signature_config: null,
+        hide_recipient_view_contents: false,
+        skip_forward_security: false,
+        public_metadata: `{
         "slug": "first-petition",
         "categories": [
           "legal"
@@ -255,15 +260,16 @@ export async function seed(knex: Knex): Promise<any> {
         "background_color": "#81E6D9",
         "image_public_file_id": null
       }`,
-      from_public_petition_link_id: null,
-    },
-  ];
-
-  const petitionsIds = await knex<Petition>("petition").insert(petitions, "id");
+        from_public_petition_link_id: null,
+      },
+    ],
+    "id"
+  );
+  const petitionIds = petitions.map((p) => p.id);
 
   const petitionOwners: CreatePetitionPermission[] = [
     {
-      petition_id: petitionsIds[0],
+      petition_id: petitionIds[0],
       user_id: userIds[2],
       created_by: `User:${userIds[2]}`,
       updated_by: `User:${userIds[2]}`,
@@ -276,7 +282,7 @@ export async function seed(knex: Knex): Promise<any> {
 
   const petitionFieldsPrimerEnvio: CreatePetitionField[] = [
     {
-      petition_id: petitionsIds[0],
+      petition_id: petitionIds[0],
       position: 0,
       type: "HEADING",
       title: "Te presentamos la vista de destinatario",
@@ -294,7 +300,7 @@ export async function seed(knex: Knex): Promise<any> {
       has_comments_enabled: false,
     },
     {
-      petition_id: petitionsIds[0],
+      petition_id: petitionIds[0],
       position: 1,
       type: "CHECKBOX",
       title: "¿Qué te gustaría saber ahora?",
@@ -312,7 +318,7 @@ export async function seed(knex: Knex): Promise<any> {
       has_comments_enabled: true,
     },
     {
-      petition_id: petitionsIds[0],
+      petition_id: petitionIds[0],
       position: 2,
       type: "HEADING",
       title: "Esto es una Sección",
@@ -330,7 +336,7 @@ export async function seed(knex: Knex): Promise<any> {
       has_comments_enabled: true,
     },
     {
-      petition_id: petitionsIds[0],
+      petition_id: petitionIds[0],
       position: 3,
       type: "SHORT_TEXT",
       title: "Esto es un campo de Respuestas cortas",
@@ -347,7 +353,7 @@ export async function seed(knex: Knex): Promise<any> {
       has_comments_enabled: true,
     },
     {
-      petition_id: petitionsIds[0],
+      petition_id: petitionIds[0],
       position: 4,
       type: "TEXT",
       title: "Esto es un campo de Respuestas largas",
@@ -365,7 +371,7 @@ export async function seed(knex: Knex): Promise<any> {
       has_comments_enabled: true,
     },
     {
-      petition_id: petitionsIds[0],
+      petition_id: petitionIds[0],
       position: 5,
       type: "FILE_UPLOAD",
       title: "Esto es un campo de Documentos y archivos",
@@ -382,7 +388,7 @@ export async function seed(knex: Knex): Promise<any> {
       has_comments_enabled: true,
     },
     {
-      petition_id: petitionsIds[0],
+      petition_id: petitionIds[0],
       position: 6,
       type: "CHECKBOX",
       title: "Esto es un campo de Opciones",
@@ -401,7 +407,7 @@ export async function seed(knex: Knex): Promise<any> {
       has_comments_enabled: true,
     },
     {
-      petition_id: petitionsIds[0],
+      petition_id: petitionIds[0],
       position: 7,
       type: "SELECT",
       title: "Esto es un campo de Desplegable",
@@ -419,7 +425,7 @@ export async function seed(knex: Knex): Promise<any> {
       has_comments_enabled: true,
     },
     {
-      petition_id: petitionsIds[0],
+      petition_id: petitionIds[0],
       position: 8,
       type: "HEADING",
       title: "Claro, te animamos a que vuelvas a tu cuenta de Parallel y te mostraremos cómo.",
@@ -437,7 +443,7 @@ export async function seed(knex: Knex): Promise<any> {
       has_comments_enabled: true,
     },
     {
-      petition_id: petitionsIds[0],
+      petition_id: petitionIds[0],
       position: 9,
       type: "HEADING",
       title: "Hemos redactado toda la información que necesitas en nuestra Guía de Parallel",
@@ -455,7 +461,7 @@ export async function seed(knex: Knex): Promise<any> {
       has_comments_enabled: true,
     },
     {
-      petition_id: petitionsIds[0],
+      petition_id: petitionIds[0],
       position: 10,
       type: "HEADING",
       title: "Si sigues teniendo dudas",

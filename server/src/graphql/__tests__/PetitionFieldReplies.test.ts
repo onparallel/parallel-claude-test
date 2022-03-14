@@ -1526,7 +1526,7 @@ describe("GraphQL/Petition Field Replies", () => {
             user_id: user.id,
             petition_field_reply_id: rejectedReply.id,
           },
-          created_at: "2010-01-01",
+          created_at: new Date("2010-01-01"),
         });
 
         const { errors, data } = await testClient.execute(

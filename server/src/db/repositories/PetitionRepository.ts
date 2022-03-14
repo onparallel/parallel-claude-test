@@ -1166,7 +1166,7 @@ export class PetitionRepository extends BaseRepository {
       } else {
         position = position === -1 ? max + 1 : Math.min(max + 1, position);
       }
-      const fieldIds = await this.from("petition_field", t)
+      const fields = await this.from("petition_field", t)
         .where("petition_id", petitionId)
         .whereNull("deleted_at")
         .where("position", ">=", position)
@@ -1177,6 +1177,7 @@ export class PetitionRepository extends BaseRepository {
           },
           "id"
         );
+      const fieldIds = fields.map((f) => f.id);
 
       const [[field]] = await Promise.all([
         this.insert(
@@ -1207,7 +1208,7 @@ export class PetitionRepository extends BaseRepository {
           ),
       ]);
 
-      if (fieldIds.length > 0) {
+      if (fields.length > 0) {
         await this.from("petition_field", t).whereIn("id", fieldIds).update({ deleted_at: null });
       }
 
@@ -3855,16 +3856,15 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async isUserSubscribedToPetition(userId: number, petitionId: number) {
-    const [permission] = await this.from("petition_permission")
-      .join("user", "user.id", "petition_permission.user_id")
-      .where({
-        "petition_permission.user_id": userId,
-        "petition_permission.petition_id": petitionId,
-      })
-      .whereNull("petition_permission.deleted_at")
-      .whereNull("user.deleted_at")
-      .select<PetitionPermission[]>("petition_permission.*");
-
+    const [permission] = await this.raw<PetitionPermission>(
+      /* sql */ `
+      select pp.*
+        from petition_permission pp
+        join "user" u on u.id = pp.user_id
+      where pp.user_id = ? and pp.petition_id = ? and pp.deleted_at is null and u.deleted_at is null
+    `,
+      [userId, petitionId]
+    );
     return permission.is_subscribed;
   }
 

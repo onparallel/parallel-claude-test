@@ -3,8 +3,13 @@ import { Knex, knex } from "knex";
 import { CONFIG, Config } from "../config";
 import { LOGGER, ILogger } from "../services/logger";
 import "./helpers/knexExtensions";
+import { TableTypes } from "./__types";
 
 export const KNEX = Symbol.for("KNEX");
+
+declare module "knex/types/tables" {
+  interface Tables extends TableTypes {}
+}
 
 export function createKnex({ container }: interfaces.Context): Knex {
   const config = container.get<Config>(CONFIG);
@@ -23,5 +28,5 @@ export function createKnex({ container }: interfaces.Context): Knex {
       logger.debug(sql, { bindings });
     });
   }
-  return instance;
+  return instance as any;
 }

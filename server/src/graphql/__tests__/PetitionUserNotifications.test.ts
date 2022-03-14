@@ -74,7 +74,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     notifications = await knex("petition_user_notification")
       .insert([
         {
-          created_at: "2021-06-10T10:00:00Z",
+          created_at: new Date("2021-06-10T10:00:00Z"),
           type: "PETITION_SHARED",
           user_id: sessionUser.id,
           is_read: true,
@@ -86,7 +86,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
           },
         },
         {
-          created_at: "2021-06-10T09:00:00Z",
+          created_at: new Date("2021-06-10T09:00:00Z"),
           type: "COMMENT_CREATED",
           user_id: otherUser.id,
           petition_id: petition.id,
@@ -96,7 +96,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
           },
         },
         {
-          created_at: "2021-01-10T10:00:00Z",
+          created_at: new Date("2021-01-10T10:00:00Z"),
           type: "PETITION_COMPLETED",
           user_id: sessionUser.id,
           petition_id: petition.id,
@@ -105,7 +105,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
           },
         },
         {
-          created_at: "2021-01-01T10:00:00Z",
+          created_at: new Date("2021-01-01T10:00:00Z"),
           type: "SIGNATURE_COMPLETED",
           user_id: sessionUser.id,
           petition_id: petition.id,
@@ -114,7 +114,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
           },
         },
         {
-          created_at: "2019-06-10T09:00:00Z",
+          created_at: new Date("2019-06-10T09:00:00Z"),
           type: "COMMENT_CREATED",
           user_id: sessionUser.id,
           petition_id: petition.id,
@@ -732,7 +732,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     const [groupPetition] = await mocks.createRandomPetitions(organization.id, otherUser.id, 1);
     await mocks.sharePetitionWithGroups(groupPetition.id, [userGroup.id]);
     await knex("petition_user_notification").insert({
-      created_at: "2021-07-10T10:00:00Z",
+      created_at: new Date("2021-07-10T10:00:00Z"),
       type: "PETITION_SHARED",
       user_id: sessionUser.id,
       is_read: true,
