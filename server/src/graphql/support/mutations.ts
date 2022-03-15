@@ -276,7 +276,7 @@ export const resetUserPassword = mutationField("resetUserPassword", {
   validateArgs: validEmail((args) => args.email, "email"),
   resolve: async (_, { email, locale }, ctx) => {
     try {
-      const users = (await ctx.users.loadUsersByEmail(email)).filter(isDefined);
+      const users = await ctx.users.loadUsersByEmail(email);
       if (users.length > 0) {
         // the ForgotPassword email will come from the organization of the user selected here
         const [user] = users;

@@ -535,7 +535,7 @@ export const resendVerificationCode = mutationField("resendVerificationCode", {
   ),
   resolve: async (_, { email, locale }, ctx) => {
     try {
-      const users = (await ctx.users.loadUsersByEmail(email)).filter(isDefined);
+      const users = await ctx.users.loadUsersByEmail(email);
       if (users.length === 0) {
         return RESULT.SUCCESS;
       }

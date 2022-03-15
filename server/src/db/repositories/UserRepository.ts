@@ -1,7 +1,7 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { groupBy, indexBy } from "remeda";
+import { groupBy, indexBy, omit } from "remeda";
 import { CONFIG, Config } from "../../config";
 import { unMaybeArray } from "../../util/arrays";
 import { fromDataLoader } from "../../util/fromDataLoader";
@@ -47,17 +47,17 @@ export class UserRepository extends BaseRepository {
 
   readonly loadUserDataByUserId = fromDataLoader(
     new DataLoader<number, Maybe<UserData>>(async (ids) => {
-      const users = await this.raw<UserData>(
+      const users = await this.raw<UserData & { user_id: number }>(
         /* sql */ `
-        select ud.* from "user" u join "user_data" ud on u.user_data_id = ud.id
+        select u.id as user_id, ud.* from "user" u join "user_data" ud on u.user_data_id = ud.id
         where u.id in (${ids.map(() => "?").join(",")})
         and u.deleted_at is null and ud.deleted_at is null
       `,
         ids
       );
 
-      const byUserId = indexBy(users, (u) => u.id);
-      return ids.map((id) => byUserId[id]);
+      const byUserId = indexBy(users, (u) => u.user_id);
+      return ids.map((id) => (byUserId[id] ? omit(byUserId[id], ["user_id"]) : null));
     })
   );
 
@@ -81,18 +81,18 @@ export class UserRepository extends BaseRepository {
   );
 
   readonly loadUsersByEmail = fromDataLoader(
-    new DataLoader<string, (User | null)[]>(async (emails) => {
+    new DataLoader<string, User[]>(async (emails) => {
       const users = await this.raw<User & { email: string }>(
         /* sql */ `
-        select u.* from "user" u join "user_data" ud on u.user_data_id = ud.id
+        select u.*, ud.email from "user" u join "user_data" ud on u.user_data_id = ud.id
         where u.deleted_at is null and ud.deleted_at is null and ud.email in (${emails
           .map(() => "?")
           .join(",")})
       `,
         emails
       );
-      const byEmails = groupBy(users, (u) => u.email);
-      return emails.map((email) => byEmails[email]);
+      const byEmail = groupBy(users, (u) => u.email);
+      return emails.map((email) => byEmail[email] ?? []);
     })
   );
 

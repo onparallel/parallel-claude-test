@@ -1,6 +1,8 @@
 import { gql } from "@apollo/client";
+import faker from "@faker-js/faker";
 import { Knex } from "knex";
 import { KNEX } from "../../db/knex";
+import { UserRepository } from "../../db/repositories/UserRepository";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
   Organization,
@@ -9,6 +11,7 @@ import {
   TemplateDefaultPermission,
   User,
   UserData,
+  UserGroup,
 } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
@@ -21,11 +24,13 @@ describe("GraphQL/Users", () => {
   let sessionUserData: UserData;
   let sessionUserGID: string;
 
+  let userRepo: UserRepository;
+
   beforeAll(async () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
+    userRepo = testClient.container.get<UserRepository>(UserRepository);
     mocks = new Mocks(knex);
-
     ({ organization, user: sessionUser } = await mocks.createSessionUserAndOrganization("ADMIN"));
     sessionUserData = await mocks.loadUserData(sessionUser.user_data_id);
 
@@ -37,6 +42,41 @@ describe("GraphQL/Users", () => {
   });
 
   describe("queries", () => {
+    let users: User[];
+    let userGroups: UserGroup[];
+    beforeAll(async () => {
+      users = await mocks.createRandomUsers(
+        organization.id,
+        6,
+        (i) => ({
+          status: i === 0 ? "INACTIVE" : "ACTIVE",
+        }),
+        (i) => ({
+          email: i < 3 ? `user${i}@onparallel.com` : faker.internet.email(),
+        })
+      );
+
+      userGroups = await mocks.createUserGroups(2, organization.id, (i) => ({
+        name: i === 0 ? "onparallel" : faker.word.noun(),
+      }));
+      await mocks.insertUserGroupMembers(
+        userGroups[0].id,
+        users.slice(1, 3).map((u) => u.id)
+      );
+    });
+
+    afterAll(async () => {
+      await mocks.knex.from("user_group_member").delete();
+      await mocks.knex.from("user_group").delete();
+      await mocks.knex
+        .from("user")
+        .whereIn(
+          "id",
+          users.map((u) => u.id)
+        )
+        .delete();
+    });
+
     it("fetches session user", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
@@ -59,6 +99,187 @@ describe("GraphQL/Users", () => {
           name: "Parallel",
         },
       });
+    });
+
+    it("searches active users by email domain on the org", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query UserSearch($search: String!) {
+            searchUsers(search: $search) {
+              ... on User {
+                id
+                email
+              }
+              ... on UserGroup {
+                id
+              }
+            }
+          }
+        `,
+        {
+          search: "@onparallel.com",
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.searchUsers).toEqual([
+        { id: toGlobalId("User", users[1].id), email: "user1@onparallel.com" },
+        { id: toGlobalId("User", users[2].id), email: "user2@onparallel.com" },
+      ]);
+    });
+
+    it("searches users and groups with active members", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query UserSearch($search: String!) {
+            searchUsers(search: $search, includeGroups: true) {
+              __typename
+              ... on User {
+                id
+                email
+              }
+              ... on UserGroup {
+                id
+                name
+                members {
+                  user {
+                    id
+                    email
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          search: "onparal",
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.searchUsers).toEqual([
+        {
+          __typename: "UserGroup",
+          id: toGlobalId("UserGroup", userGroups[0].id),
+          name: "onparallel",
+          members: [
+            { user: { id: toGlobalId("User", users[1].id), email: "user1@onparallel.com" } },
+            { user: { id: toGlobalId("User", users[2].id), email: "user2@onparallel.com" } },
+          ],
+        },
+        {
+          __typename: "User",
+          id: toGlobalId("User", users[1].id),
+          email: "user1@onparallel.com",
+        },
+        {
+          __typename: "User",
+          id: toGlobalId("User", users[2].id),
+          email: "user2@onparallel.com",
+        },
+      ]);
+    });
+
+    it("includes inactive users", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query UserSearch($search: String!) {
+            searchUsers(search: $search, includeInactive: true) {
+              ... on User {
+                id
+                status
+                email
+              }
+              ... on UserGroup {
+                id
+              }
+            }
+          }
+        `,
+        {
+          search: "@onparallel.com",
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.searchUsers).toEqual([
+        {
+          id: toGlobalId("User", users[0].id),
+          email: "user0@onparallel.com",
+          status: "INACTIVE",
+        },
+        {
+          id: toGlobalId("User", users[1].id),
+          email: "user1@onparallel.com",
+          status: "ACTIVE",
+        },
+        {
+          id: toGlobalId("User", users[2].id),
+          email: "user2@onparallel.com",
+          status: "ACTIVE",
+        },
+      ]);
+    });
+
+    it("correctly refreshes dataloader cache when loading user after updating its data", async () => {
+      // first request to cache user data
+      const { errors: query1Errors, data: query1Data } = await testClient.execute(
+        gql`
+          query GetUsersOrGroups($id: ID!) {
+            getUsersOrGroups(ids: [$id]) {
+              ... on User {
+                id
+                email
+                isSsoUser
+                role
+              }
+            }
+          }
+        `,
+        { id: toGlobalId("User", users[2].id) }
+      );
+
+      expect(query1Errors).toBeUndefined();
+      expect(query1Data?.getUsersOrGroups).toEqual([
+        {
+          id: toGlobalId("User", users[2].id),
+          email: "user2@onparallel.com",
+          isSsoUser: false,
+          role: "NORMAL",
+        },
+      ]);
+
+      await userRepo.updateUserData(
+        users[2].id,
+        { email: "newemail@gmail.com", is_sso_user: true },
+        "Test"
+      );
+
+      const { errors: query2Errors, data: query2Data } = await testClient.execute(
+        gql`
+          query GetUsersOrGroups($id: ID!) {
+            getUsersOrGroups(ids: [$id]) {
+              ... on User {
+                id
+                email
+                isSsoUser
+                role
+              }
+            }
+          }
+        `,
+        { id: toGlobalId("User", users[2].id) }
+      );
+
+      expect(query2Errors).toBeUndefined();
+      expect(query2Data?.getUsersOrGroups).toEqual([
+        {
+          id: toGlobalId("User", users[2].id),
+          email: "newemail@gmail.com",
+          isSsoUser: true,
+          role: "NORMAL",
+        },
+      ]);
     });
   });
 
@@ -85,6 +306,50 @@ describe("GraphQL/Users", () => {
         id: sessionUserGID,
         fullName: "Mike Ross",
       });
+    });
+    it("refreshes correctly when updating user info", async () => {
+      const { errors: query1Errors, data: query1Data } = await testClient.execute(
+        gql`
+          query {
+            me {
+              id
+              fullName
+            }
+          }
+        `
+      );
+      expect(query1Errors).toBeUndefined();
+      expect(query1Data?.me).toEqual({ id: sessionUserGID, fullName: "Mike Ross" });
+
+      const { errors: updateErrors, data: updateData } = await testClient.execute(
+        gql`
+          mutation ($userId: GID!, $data: UpdateUserInput!) {
+            updateUser(id: $userId, data: $data) {
+              id
+              fullName
+            }
+          }
+        `,
+        { userId: sessionUserGID, data: { firstName: "Bond,", lastName: "James Bond" } }
+      );
+
+      expect(updateErrors).toBeUndefined();
+      expect(updateData?.updateUser).toEqual({
+        id: sessionUserGID,
+        fullName: "Bond, James Bond",
+      });
+
+      const { data: query2Data } = await testClient.execute(
+        gql`
+          query {
+            me {
+              id
+              fullName
+            }
+          }
+        `
+      );
+      expect(query2Data?.me).toEqual({ id: sessionUserGID, fullName: "Bond, James Bond" });
     });
   });
 

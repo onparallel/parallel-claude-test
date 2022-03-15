@@ -135,7 +135,7 @@ export class Auth implements IAuth {
       const lastName = payload["family_name"] as string;
       const email = (payload["email"] as string).toLowerCase();
       const externalId = payload["identities"][0].userId as string;
-      const users = (await this.users.loadUsersByEmail(email)).filter(isDefined);
+      const users = await this.users.loadUsersByEmail(email);
       // TODO check this when users have more than 1 organization
       let user = users.find((u) => u.org_id === orgId);
       const userData = user ? await this.users.loadUserData(user.user_data_id) : null;
