@@ -148,6 +148,7 @@ export class Auth implements IAuth {
         user = await this.users.createUser(
           {
             org_id: org.id,
+            external_id: externalId,
           },
           {
             first_name: firstName,
@@ -155,30 +156,35 @@ export class Auth implements IAuth {
             email: email,
             cognito_id: cognitoId,
             is_sso_user: true,
-            external_id: externalId,
             details: { source: "SSO" },
           },
           `OrganizationSSO:${org.id}`
         );
       } else {
-        if (
-          userData &&
-          (userData.first_name !== firstName ||
+        if (userData) {
+          if (
+            userData.first_name !== firstName ||
             userData.last_name !== lastName ||
-            userData.cognito_id !== cognitoId ||
-            userData.external_id !== externalId)
-        ) {
-          await this.users.updateUserData(
-            userData.id,
-            {
-              first_name: firstName,
-              last_name: lastName,
-              cognito_id: cognitoId,
-              external_id: externalId,
-              is_sso_user: true,
-            },
-            `OrganizationSSO:${org.id}`
-          );
+            userData.cognito_id !== cognitoId
+          ) {
+            await this.users.updateUserData(
+              userData.id,
+              {
+                first_name: firstName,
+                last_name: lastName,
+                cognito_id: cognitoId,
+                is_sso_user: true,
+              },
+              `OrganizationSSO:${org.id}`
+            );
+          }
+          if (user.external_id !== externalId) {
+            await this.users.updateUserById(
+              user.id,
+              { external_id: externalId },
+              `OrganizationSSO:${org.id}`
+            );
+          }
         }
       }
       await this.trackSessionLogin(user);

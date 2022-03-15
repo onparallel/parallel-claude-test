@@ -58,8 +58,8 @@ scim
         totalResults: 1,
         Resources: [
           toScimUser({
-            ...pick(user, ["status"]),
-            ...pick(userData, ["email", "first_name", "last_name", "external_id"]),
+            ...pick(user, ["status", "external_id"]),
+            ...pick(userData, ["email", "first_name", "last_name"]),
           }),
         ],
       });
@@ -105,7 +105,7 @@ scim
       res.json(
         toScimUser({
           email: userData.email,
-          external_id: userData.external_id,
+          external_id: user.external_id,
           first_name: givenName,
           last_name: familyName,
           status: active ? "ACTIVE" : "INACTIVE",
@@ -120,6 +120,7 @@ scim
           {
             org_id: orgId,
             status: active ? "ACTIVE" : "INACTIVE",
+            external_id: externalId,
           },
           {
             // fake unique cognitoId, should update when user logs in
@@ -127,7 +128,6 @@ scim
             email: email.toLowerCase(),
             first_name: givenName,
             last_name: familyName,
-            external_id: externalId,
             details: { source: "SCIM" },
           },
           `Provisioning:${req.context.organization!.id}`
@@ -135,8 +135,8 @@ scim
         const userData = (await req.context.users.loadUserData(user.user_data_id))!;
         res.json(
           toScimUser({
-            ...pick(user, ["status"]),
-            ...pick(userData, ["email", "first_name", "last_name", "external_id"]),
+            ...pick(user, ["status", "external_id"]),
+            ...pick(userData, ["email", "first_name", "last_name"]),
           })
         );
       } else {
@@ -171,8 +171,8 @@ scim
     const userData = (await req.context.users.loadUserData(user.user_data_id))!;
     res.json(
       toScimUser({
-        ...pick(user, ["status"]),
-        ...pick(userData, ["email", "first_name", "last_name", "external_id"]),
+        ...pick(user, ["status", "external_id"]),
+        ...pick(userData, ["email", "first_name", "last_name"]),
       })
     );
   })
@@ -205,9 +205,9 @@ scim
       );
     }
     if (isDefined(userDataUpdate.first_name) || isDefined(userDataUpdate.last_name)) {
-      // TODO user_data.external_id should be unique?
       await req.context.users.updateUserDataByExternalId(
         req.params.externalId,
+        req.context.organization!.id,
         userDataUpdate,
         `Provisioning:${req.context.organization!.id}`
       );
@@ -222,8 +222,8 @@ scim
       const userData = (await req.context.users.loadUserData(user.user_data_id))!;
       res.json(
         toScimUser({
-          ...pick(user, ["status"]),
-          ...pick(userData, ["email", "first_name", "last_name", "external_id"]),
+          ...pick(user, ["status", "external_id"]),
+          ...pick(userData, ["email", "first_name", "last_name"]),
         })
       );
     }
@@ -252,6 +252,7 @@ scim
     if (isDefined(userDataUpdate.first_name) || isDefined(userDataUpdate.last_name)) {
       await req.context.users.updateUserDataByExternalId(
         req.params.externalId,
+        req.context.organization!.id,
         userDataUpdate,
         `Provisioning:${req.context.organization!.id}`
       );
@@ -266,8 +267,8 @@ scim
       const userData = (await req.context.users.loadUserData(user.user_data_id))!;
       res.json(
         toScimUser({
-          ...pick(user, ["status"]),
-          ...pick(userData, ["email", "first_name", "last_name", "external_id"]),
+          ...pick(user, ["status", "external_id"]),
+          ...pick(userData, ["email", "first_name", "last_name"]),
         })
       );
     }
@@ -289,7 +290,7 @@ function getExternalId(filter: any): Maybe<string> {
 }
 
 function toScimUser(
-  user: Pick<User, "status"> & Pick<UserData, "external_id" | "first_name" | "last_name" | "email">
+  user: Pick<User, "status" | "external_id"> & Pick<UserData, "first_name" | "last_name" | "email">
 ) {
   return {
     schemas: ["urn:ietf:params:scim:schemas:core:2.0:User"],

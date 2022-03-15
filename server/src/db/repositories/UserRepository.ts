@@ -1,7 +1,7 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { groupBy, indexBy, omit } from "remeda";
+import { groupBy, indexBy } from "remeda";
 import { CONFIG, Config } from "../../config";
 import { unMaybeArray } from "../../util/arrays";
 import { fromDataLoader } from "../../util/fromDataLoader";
@@ -68,21 +68,20 @@ export class UserRepository extends BaseRepository {
 
   readonly loadUserByExternalId = fromDataLoader(
     new DataLoader<{ orgId: number; externalId: string }, Maybe<User>>(async (args) => {
-      const users = await this.raw<User & { external_id: Maybe<string> }>(
+      const users = await this.raw<User>(
         /* sql */ `
-          select u.*, ud.external_id from "user" u join "user_data" ud on u.user_data_id = ud.id
-          where (${args.map(() => "(u.org_id = ? and ud.external_id = ?)").join(" or ")})
+          select u.* from "user"
+          where (${args.map(() => "(org_id = ? and external_id = ?)").join(" or ")})
             and u.deleted_at is null
             and ud.deleted_at is null;          
         `,
         [...args.flatMap(({ orgId, externalId }) => [orgId, externalId])]
       );
 
-      return args.map((arg) => {
-        const user =
-          users.find((u) => u.org_id === arg.orgId && u.external_id === arg.externalId) ?? null;
-        return user ? (omit(user, ["external_id"]) as User) : null;
-      });
+      return args.map(
+        (arg) =>
+          users.find((u) => u.org_id === arg.orgId && u.external_id === arg.externalId) ?? null
+      );
     })
   );
 
@@ -156,14 +155,7 @@ export class UserRepository extends BaseRepository {
     data: Partial<CreateUser>,
     updatedBy: string,
     t?: Knex.Transaction
-  ) {
-    // TODO try to do all this in 1 query
-    const [userData] = await this.from("user_data")
-      .where({ deleted_at: null, external_id: externalId })
-      .select("*");
-
-    if (!userData) return null;
-
+  ): Promise<User | null> {
     const [user] = await this.from("user", t)
       .update({
         ...data,
@@ -171,32 +163,42 @@ export class UserRepository extends BaseRepository {
         updated_by: updatedBy,
       })
       .where({
-        user_data_id: userData.id,
+        external_id: externalId,
         org_id: orgId,
         deleted_at: null,
       })
       .returning("*");
-
     return user;
   }
 
   async updateUserDataByExternalId(
     externalId: string,
-    data: Partial<CreateUserData>,
+    orgId: number,
+    data: Pick<CreateUserData, "first_name" | "last_name">,
     updatedBy: string,
     t?: Knex.Transaction
   ) {
-    const [userData] = await this.from("user_data", t)
-      .where({
-        deleted_at: null,
-        external_id: externalId,
-      })
-      .update({
-        ...data,
-        updated_at: this.now(),
-        updated_by: updatedBy,
-      })
-      .returning("*");
+    const bindings = [data.first_name, data.last_name, orgId, externalId].filter(
+      (v) => v !== undefined
+    ) as Knex.RawBinding[];
+
+    const [userData] = await this.raw<UserData>(
+      /* sql */ `
+      update "user_data" ud
+      set 
+        first_name = ?,
+        last_name = ?
+      from "user" u 
+      where u.user_data_id = ud.id
+        and u.org_id = ?
+        and u.external_id = ? 
+        and u.deleted_at is null
+        and ud.deleted_at is null
+      returning *;
+    `,
+      bindings
+    );
+
     return userData;
   }
 
