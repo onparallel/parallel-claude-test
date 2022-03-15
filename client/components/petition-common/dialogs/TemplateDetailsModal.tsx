@@ -169,7 +169,7 @@ export function TemplateDetailsModal({
                 <HStack marginLeft={6}>
                   <Text>
                     <FormattedMessage
-                      id="component.template-details-modal.shadre-with"
+                      id="component.template-details-modal.shared-with"
                       defaultMessage="Shared with:"
                     />
                   </Text>
@@ -226,7 +226,7 @@ export function TemplateDetailsModal({
                   <FormattedMessage id="generic.use-template" defaultMessage="Use template" />
                 </Button>
                 {isFromPublicTemplates && !template.publicLink?.isActive ? null : (
-                  <Menu>
+                  <Menu placement="bottom-end">
                     <Tooltip
                       placement="bottom-end"
                       label={intl.formatMessage({
