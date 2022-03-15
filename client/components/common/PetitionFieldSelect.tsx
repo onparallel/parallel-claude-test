@@ -48,14 +48,17 @@ export function PetitionFieldSelect<
   const styles = useMemo<StylesConfig<PetitionFieldSelectOption<T>, false, never>>(
     () => ({
       ...rsProps.styles,
-      singleValue: (styles) => {
-        return {
-          maxWidth: "calc(100% - 6px)",
-          display: "flex",
-          flex: "0 1 auto",
-          alignItems: "center",
-        };
-      },
+      singleValue: () => ({
+        maxWidth: "calc(100% - 6px)",
+        display: "flex",
+        flex: "0 1 auto",
+        alignItems: "center",
+      }),
+      option: (styles) => ({
+        ...styles,
+        display: "flex",
+        padding: "6px 8px",
+      }),
     }),
     [rsProps.styles]
   );

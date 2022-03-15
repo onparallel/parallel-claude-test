@@ -1,4 +1,4 @@
-import { Box, CloseButton, Flex, Text, useFormControl, useTheme } from "@chakra-ui/react";
+import { CloseButton, Flex, Text, useFormControl, useTheme } from "@chakra-ui/react";
 import { ChevronDownIcon, CloseIcon } from "@parallel/chakra/icons";
 import { useRehydrated } from "@parallel/utils/useRehydrated";
 import { useCallback, useMemo } from "react";
@@ -176,11 +176,10 @@ export function useReactSelectProps<
         return {
           ...styles,
           cursor: "pointer",
-          padding: `0 ${padding}px`,
-          minHeight: "32px",
-          display: "flex",
-          alignItems: "center",
+          padding: `6px ${padding}px`,
           fontSize: fontSize,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
           whiteSpace: "nowrap",
         };
       },
@@ -245,7 +244,6 @@ export function useReactSelectProps<
       NoOptionsMessage,
       MultiValueRemove,
       LoadingMessage,
-      Option,
       ...props.components,
     }),
     [props.components]
@@ -414,15 +412,5 @@ const LoadingMessage: typeof components.LoadingMessage = function LoadingMessage
     <Text as="div" color="gray.400" textAlign="center" paddingY={2}>
       <FormattedMessage id="component.react-select.loading" defaultMessage="Loading..." />
     </Text>
-  );
-};
-
-const Option: typeof components.Option = function Option({ children, ...props }) {
-  return (
-    <components.Option {...props}>
-      <Box flex="1" isTruncated>
-        {children}
-      </Box>
-    </components.Option>
   );
 };

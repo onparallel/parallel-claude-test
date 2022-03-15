@@ -29,8 +29,8 @@ export function ShortTextSettings({
     },
     styles: useMemo(
       () => ({
-        option: (base) => ({ ...base, textTransform: "capitalize" }),
-        singleValue: (base) => ({ ...base, textTransform: "capitalize" }),
+        option: (base) => ({ ...base, ":first-letter": { textTransform: "capitalize" } }),
+        singleValue: (base) => ({ ...base, ":first-letter": { textTransform: "capitalize" } }),
       }),
       []
     ),
