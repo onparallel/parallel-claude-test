@@ -77,14 +77,14 @@ scim
       name: { givenName: string; familyName: string };
       emails: { type: string; value: string }[];
     } = req.body;
-    const user = await req.context.users.loadUserByExternalId({
+    let user = await req.context.users.loadUserByExternalId({
       externalId,
       orgId: req.context.organization!.id,
     });
-    const userData = user ? await req.context.users.loadUserData(user.user_data_id) : null;
+    let userData = user ? await req.context.users.loadUserData(user.user_data_id) : null;
     if (user && userData) {
       if ((user.status === "ACTIVE") !== active) {
-        await req.context.users.updateUserById(
+        [user] = await req.context.users.updateUserById(
           user.id,
           {
             status: active ? "ACTIVE" : "INACTIVE",
@@ -93,7 +93,7 @@ scim
         );
       }
       if (userData.first_name !== givenName || userData.last_name !== familyName) {
-        await req.context.users.updateUserData(
+        [userData] = await req.context.users.updateUserData(
           userData.id,
           {
             first_name: givenName,
@@ -106,9 +106,9 @@ scim
         toScimUser({
           email: userData.email,
           external_id: user.external_id,
-          first_name: givenName,
-          last_name: familyName,
-          status: active ? "ACTIVE" : "INACTIVE",
+          first_name: userData.first_name,
+          last_name: userData.last_name,
+          status: user.status,
         })
       );
     } else {

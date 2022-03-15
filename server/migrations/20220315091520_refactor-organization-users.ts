@@ -62,6 +62,19 @@ export async function up(knex: Knex): Promise<void> {
     where u.email = ud.email;
   `);
 
+  // null every deprecated column in user table to make sure its not being used anymore
+  await knex.raw(/* sql */ `
+    update "user" u
+    set 
+      cognito_id = null,
+      email = null,
+      first_name = null,
+      last_name = null,
+      is_sso_user = null, 
+      avatar_public_file_id = null,
+      details = null;
+`);
+
   // make user_data_id not nullable
   await knex.schema.alterTable("user", (t) => {
     t.integer("user_data_id").notNullable().alter();

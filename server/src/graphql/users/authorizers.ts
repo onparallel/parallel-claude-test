@@ -1,5 +1,4 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { isDefined } from "remeda";
 import { UserOrganizationRole } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
@@ -38,9 +37,8 @@ export function userIsNotSSO<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const userIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
-    const users = (await ctx.users.loadUser(userIds)).filter(isDefined);
-    const userDatas = await ctx.users.loadUserData(users.map((u) => u.user_data_id));
-    return users.length === userIds.length && userDatas.every((ud) => ud && !ud.is_sso_user);
+    const userDatas = await ctx.users.loadUserDataByUserId(userIds);
+    return userDatas.every((ud) => ud && !ud.is_sso_user);
   };
 }
 

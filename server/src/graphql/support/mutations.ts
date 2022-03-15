@@ -4,7 +4,7 @@ import { isDefined, uniq } from "remeda";
 import { ApiContext } from "../../context";
 import { UserOrganizationRole } from "../../db/__types";
 import { fullName } from "../../util/fullName";
-import { fromGlobalId } from "../../util/globalId";
+import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { hash, random } from "../../util/token";
 import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -80,7 +80,7 @@ export const assignPetitionToUser = mutationField("assignPetitionToUser", {
         throw new Error(`Petition ${args.petitionId} not found`);
       }
       const user = await ctx.users.loadUser(args.userId);
-      const userData = user ? await ctx.users.loadUserData(user?.user_data_id) : null;
+      const userData = user ? await ctx.users.loadUserData(user.user_data_id) : null;
       if (!user || !userData) {
         throw new Error(`User ${args.userId} not found`);
       }
@@ -88,7 +88,9 @@ export const assignPetitionToUser = mutationField("assignPetitionToUser", {
 
       return {
         result: RESULT.SUCCESS,
-        message: `Petition successfully assigned to ${userData.first_name} ${userData.last_name}, new id: ${newPetition.id}`,
+        message: `Petition successfully assigned to ${userData.first_name} ${
+          userData.last_name
+        }, new petition id: ${toGlobalId("Petition", newPetition.id)}`,
       };
     } catch (e: any) {
       return { result: RESULT.FAILURE, message: e.message };
@@ -276,8 +278,8 @@ export const resetUserPassword = mutationField("resetUserPassword", {
     try {
       const users = (await ctx.users.loadUsersByEmail(email)).filter(isDefined);
       if (users.length > 0) {
-        // TODO how do we know which org_id to use ???
-        const user = users[0];
+        // the ForgotPassword email will come from the organization of the user selected here
+        const [user] = users;
         const [userData, organization] = await Promise.all([
           ctx.users.loadUserData(ctx.user!.user_data_id),
           ctx.organizations.loadOrg(user.org_id),
@@ -286,7 +288,7 @@ export const resetUserPassword = mutationField("resetUserPassword", {
         await ctx.aws.resetUserPassword(email, {
           locale,
           organizationName: organization!.name,
-          organizationUser: fullName(userData?.first_name, userData?.last_name),
+          organizationUser: fullName(userData!.first_name, userData!.last_name),
         });
         return {
           result: RESULT.SUCCESS,
@@ -321,10 +323,9 @@ export const getApiTokenOwner = mutationField("getApiTokenOwner", {
       if (!isDefined(userToken)) {
         throw new Error("Token not found");
       }
-      const [user, userData] = await Promise.all([
-        ctx.users.loadUser(userToken.user_id),
-        ctx.users.loadUserDataByUserId(userToken.user_id),
-      ]);
+      const user = await ctx.users.loadUser(userToken.user_id);
+      const userData = user ? await ctx.users.loadUserData(user.user_data_id) : null;
+
       if (!isDefined(user) || !isDefined(userData)) {
         throw new Error("Token found but user is deleted");
       }

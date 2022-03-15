@@ -24,25 +24,20 @@ export class UserRepository extends BaseRepository {
 
   readonly loadUsersByCognitoId = fromDataLoader(
     new DataLoader<string, (User | null)[]>(async (cognitoIds) => {
-      const userDatas = await this.from("user_data")
-        .whereIn("cognito_id", cognitoIds)
-        .whereNull("deleted_at")
-        .select("*");
-
-      const rows = await this.from("user")
-        .update({ last_active_at: this.now() })
-        .whereIn(
-          "user_data_id",
-          userDatas.map((data) => data.id)
-        )
-        .whereNull("deleted_at")
-        .returning("*");
-
-      const byUserDataId = groupBy(rows, (r) => r.user_data_id);
-      return cognitoIds.map((cognitoId) => {
-        const userData = userDatas.find((ud) => ud.cognito_id === cognitoId);
-        return userData ? byUserDataId[userData.id] : [null];
-      });
+      const users = await this.raw<User & { cognito_id: string }>(
+        /* sql */ `
+        update "user" u set last_active_at = NOW()
+        from user_data ud 
+        where ud.id = u.user_data_id
+        and u.deleted_at is null and ud.deleted_at is null and ud.cognito_id in (${cognitoIds
+          .map(() => "?")
+          .join(",")})
+        returning u.*, ud.cognito_id
+      `,
+        cognitoIds
+      );
+      const byCognitoId = groupBy(users, (u) => u.cognito_id);
+      return cognitoIds.map((id) => byCognitoId[id]);
     })
   );
 
@@ -87,24 +82,17 @@ export class UserRepository extends BaseRepository {
 
   readonly loadUsersByEmail = fromDataLoader(
     new DataLoader<string, (User | null)[]>(async (emails) => {
-      const userDatas = await this.from("user_data")
-        .whereIn("email", emails)
-        .whereNull("deleted_at")
-        .select("*");
-
-      const rows = await this.from("user")
-        .whereIn(
-          "user_data_id",
-          userDatas.map((data) => data.id)
-        )
-        .whereNull("deleted_at")
-        .returning("*");
-
-      const byUserDataId = groupBy(rows, (r) => r.user_data_id);
-      return emails.map((email) => {
-        const userData = userDatas.find((ud) => ud.email === email);
-        return userData ? byUserDataId[userData.id] : [null];
-      });
+      const users = await this.raw<User & { email: string }>(
+        /* sql */ `
+        select u.* from "user" u join "user_data" ud on u.user_data_id = ud.id
+        where u.deleted_at is null and ud.deleted_at is null and ud.email in (${emails
+          .map(() => "?")
+          .join(",")})
+      `,
+        emails
+      );
+      const byEmails = groupBy(users, (u) => u.email);
+      return emails.map((email) => byEmails[email]);
     })
   );
 
@@ -178,27 +166,29 @@ export class UserRepository extends BaseRepository {
     updatedBy: string,
     t?: Knex.Transaction
   ) {
-    const bindings = [data.first_name, data.last_name, orgId, externalId].filter(
-      (v) => v !== undefined
-    ) as Knex.RawBinding[];
-
     const [userData] = await this.raw<UserData>(
       /* sql */ `
       update "user_data" ud
       set 
         first_name = ?,
-        last_name = ?
+        last_name = ?,
+        updated_at = NOW(),
+        updated_by = ?
       from "user" u 
       where u.user_data_id = ud.id
         and u.org_id = ?
         and u.external_id = ? 
         and u.deleted_at is null
         and ud.deleted_at is null
-      returning *;
+      returning ud.*;
     `,
-      bindings
+      [data.first_name, data.last_name, updatedBy, orgId, externalId].filter(
+        (v) => v !== undefined
+      ) as Knex.RawBinding[],
+      t
     );
-
+    userData ? this.loadUserData.dataloader.clear(userData.id) : null;
+    this.loadUserByExternalId.dataloader.clear({ externalId, orgId });
     return userData;
   }
 
@@ -267,24 +257,27 @@ export class UserRepository extends BaseRepository {
   ) {
     const [users, userGroups] = await Promise.all([
       this.from("user")
+        .join("user_data", "user.user_data_id", "user_data.id")
         .where({
           org_id: orgId,
-          deleted_at: null,
+
           ...(opts.includeInactive ? {} : { status: "ACTIVE" }),
         })
+        .whereNull("user.deleted_at")
+        .whereNull("user_data.deleted_at")
         .mmodify((q) => {
           if (opts.excludeUsers.length > 0) {
-            q.whereNotIn("id", opts.excludeUsers);
+            q.whereNotIn("user.id", opts.excludeUsers);
           }
           q.andWhere((q) => {
             q.whereEscapedILike(
-              this.knex.raw(`concat("first_name", ' ', "last_name")`) as any,
+              this.knex.raw(`concat(user_data.first_name, ' ', user_data.last_name)`) as any,
               `%${escapeLike(search, "\\")}%`,
               "\\"
-            ).or.whereEscapedILike("email", `%${escapeLike(search, "\\")}%`, "\\");
+            ).or.whereEscapedILike("user_data.email", `%${escapeLike(search, "\\")}%`, "\\");
           });
         })
-        .select<({ __type: "User" } & User)[]>("*", this.knex.raw(`'User' as __type`)),
+        .select<({ __type: "User" } & User)[]>("user.*", this.knex.raw(`'User' as __type`)),
       opts.includeGroups
         ? this.from("user_group")
             .where({

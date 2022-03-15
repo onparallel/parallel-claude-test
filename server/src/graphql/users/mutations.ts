@@ -69,9 +69,8 @@ export const updateUser = mutationField("updateUser", {
   ),
   resolve: async (_, args, ctx) => {
     const { firstName, lastName } = args.data;
-    const userData = (await ctx.users.loadUserData(ctx.user!.user_data_id))!;
     await ctx.users.updateUserData(
-      userData.id,
+      ctx.user!.user_data_id,
       removeNotDefined({
         first_name: firstName,
         last_name: lastName,
@@ -432,13 +431,14 @@ export const userSignUp = mutationField("userSignUp", {
     )
   ),
   resolve: async (_, args, ctx) => {
+    const email = args.email.trim().toLowerCase();
     const [error, cognitoId] = await withError(
-      ctx.aws.signUpUser(args.email, args.password, args.firstName, args.lastName, {
+      ctx.aws.signUpUser(email, args.password, args.firstName, args.lastName, {
         locale: args.locale ?? "en",
       })
     );
     if (error) {
-      await withError(ctx.aws.deleteUser(args.email));
+      await withError(ctx.aws.deleteUser(email));
       throw error;
     }
 
@@ -475,7 +475,7 @@ export const userSignUp = mutationField("userSignUp", {
         },
         {
           cognito_id: cognitoId!,
-          email: args.email,
+          email,
           first_name: args.firstName,
           last_name: args.lastName,
           details: {
