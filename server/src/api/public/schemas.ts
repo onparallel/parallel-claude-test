@@ -908,680 +908,682 @@ const _PetitionSigner = {
   },
 } as const;
 
-export const _PetitionEvent = {
-  type: "object",
-  oneOf: Object.entries({
-    ACCESS_ACTIVATED: {
-      description: "The user created or reactivated an access on the petition",
-      properties: {
-        petitionAccessId: {
-          description: "The ID of the petition access",
-          type: "string",
-          example: toGlobalId("PetitionAccess", 2),
-        },
-        userId: {
-          description: "The ID of the user",
-          type: "string",
-          example: toGlobalId("User", 1),
-        },
+const PetitionEventSchemas = {
+  ACCESS_ACTIVATED: {
+    description: "The user created or reactivated an access on the petition",
+    properties: {
+      petitionAccessId: {
+        description: "The ID of the petition access",
+        type: "string",
+        example: toGlobalId("PetitionAccess", 2),
+      },
+      userId: {
+        description: "The ID of the user",
+        type: "string",
+        example: toGlobalId("User", 1),
       },
     },
-    ACCESS_DEACTIVATED: {
-      description: "An access on the petition has been deactivated.",
-      properties: {
-        petitionAccessId: {
-          description: "The ID of the petition access",
-          type: "string",
-          example: toGlobalId("PetitionAccess", 2),
-        },
-        userId: {
-          description:
-            "The ID of the user that deactivated the access. Only set if `reason` is `DEACTIVATED_BY_USER`. If `null`, the access was automatically deactivated because a bounce ocurred when trying to delivery an email.",
-          type: ["string", "null"],
-          example: toGlobalId("User", 1),
-        },
-        reason: {
-          type: "string",
-          description:
-            "Wether the access was deactivated manually by an user, or it was deactivated automatically because an email was bounced.",
-          enum: ["DEACTIVATED_BY_USER", "EMAIL_BOUNCED"],
-          example: "DEACTIVATED_BY_USER",
-        },
+  },
+  ACCESS_DEACTIVATED: {
+    description: "An access on the petition has been deactivated.",
+    properties: {
+      petitionAccessId: {
+        description: "The ID of the petition access",
+        type: "string",
+        example: toGlobalId("PetitionAccess", 2),
+      },
+      userId: {
+        description:
+          "The ID of the user that deactivated the access. Only set if `reason` is `DEACTIVATED_BY_USER`. If `null`, the access was automatically deactivated because a bounce ocurred when trying to delivery an email.",
+        type: ["string", "null"],
+        example: toGlobalId("User", 1),
+      },
+      reason: {
+        type: "string",
+        description:
+          "Wether the access was deactivated manually by an user, or it was deactivated automatically because an email was bounced.",
+        enum: ["DEACTIVATED_BY_USER", "EMAIL_BOUNCED"],
+        example: "DEACTIVATED_BY_USER",
       },
     },
-    ACCESS_DELEGATED: {
-      description:
-        "A recipient delegated their petition to another person, creating a new access on the petition",
-      properties: {
-        newPetitionAccessId: {
-          description: "The ID of the new access created by the recipient",
-          type: "string",
-          example: toGlobalId("PetitionAccess", 21),
-        },
-        petitionAccessId: {
-          description: "The ID of the original access where the delegation happened",
-          type: "string",
-          example: toGlobalId("PetitionAccess", 20),
-        },
+  },
+  ACCESS_DELEGATED: {
+    description:
+      "A recipient delegated their petition to another person, creating a new access on the petition",
+    properties: {
+      newPetitionAccessId: {
+        description: "The ID of the new access created by the recipient",
+        type: "string",
+        example: toGlobalId("PetitionAccess", 21),
+      },
+      petitionAccessId: {
+        description: "The ID of the original access where the delegation happened",
+        type: "string",
+        example: toGlobalId("PetitionAccess", 20),
       },
     },
-    ACCESS_OPENED: {
-      description: "A recipient opened their access to the petition",
-      properties: {
-        petitionAccessId: {
-          description: "The ID of the petition access",
-          type: "string",
-          example: toGlobalId("PetitionAccess", 2),
-        },
+  },
+  ACCESS_OPENED: {
+    description: "A recipient opened their access to the petition",
+    properties: {
+      petitionAccessId: {
+        description: "The ID of the petition access",
+        type: "string",
+        example: toGlobalId("PetitionAccess", 2),
       },
     },
-    COMMENT_DELETED: {
-      description: "A comment was deleted either by a recipient or an user.",
-      properties: {
-        petitionFieldCommentId: {
-          description: "The ID of the comment",
-          type: "string",
-          example: toGlobalId("PetitionFieldComment", 10),
-        },
-        petitionFieldId: {
-          description: "The ID of the field where the comment belongs",
-          type: "string",
-          example: toGlobalId("PetitionField", 10),
-        },
-        petitionAccessId: {
-          description:
-            "The ID of the access where the comment was deleted. If set, the comment was deleted by the recipient linked to this access",
-          type: ["string", "null"],
-          example: toGlobalId("PetitionAccess", 10),
-        },
-        userId: {
-          description: "The ID of the user. If set, the comment was deleted by this user.",
-          type: ["string", "null"],
-          example: null,
-        },
+  },
+  COMMENT_DELETED: {
+    description: "A comment was deleted either by a recipient or an user.",
+    properties: {
+      petitionFieldCommentId: {
+        description: "The ID of the comment",
+        type: "string",
+        example: toGlobalId("PetitionFieldComment", 10),
+      },
+      petitionFieldId: {
+        description: "The ID of the field where the comment belongs",
+        type: "string",
+        example: toGlobalId("PetitionField", 10),
+      },
+      petitionAccessId: {
+        description:
+          "The ID of the access where the comment was deleted. If set, the comment was deleted by the recipient linked to this access",
+        type: ["string", "null"],
+        example: toGlobalId("PetitionAccess", 10),
+      },
+      userId: {
+        description: "The ID of the user. If set, the comment was deleted by this user.",
+        type: ["string", "null"],
+        example: null,
       },
     },
-    COMMENT_PUBLISHED: {
-      description: "A comment was published on a petition field",
-      properties: {
-        petitionFieldCommentId: {
-          description: "The ID of the comment",
-          type: "string",
-          example: toGlobalId("PetitionFieldComment", 10),
-        },
-        petitionFieldId: {
-          description: "The ID of the field where the comment belongs",
-          type: "string",
-          example: toGlobalId("PetitionField", 10),
-        },
+  },
+  COMMENT_PUBLISHED: {
+    description: "A comment was published on a petition field",
+    properties: {
+      petitionFieldCommentId: {
+        description: "The ID of the comment",
+        type: "string",
+        example: toGlobalId("PetitionFieldComment", 10),
+      },
+      petitionFieldId: {
+        description: "The ID of the field where the comment belongs",
+        type: "string",
+        example: toGlobalId("PetitionField", 10),
       },
     },
-    MESSAGE_CANCELLED: {
-      description: "A user cancelled a scheduled message",
-      properties: {
-        petitionMessageId: {
-          description: "The ID of the cancelled message",
-          type: "string",
-          example: toGlobalId("PetitionMessage", 10),
-        },
-        userId: {
-          description:
-            "The ID of the user that cancelled the send of the message. Only set if `reason` is `CANCELLED_BY_USER`. If `null`, the message was automatically cancelled because a bounce ocurred when trying to delivery an email.",
-          type: ["string", "null"],
-          example: toGlobalId("User", 10),
-        },
-        reason: {
-          type: "string",
-          description:
-            "Wether the message was cancelled manually by an user, or it was cancelled automatically because an email was bounced.",
-          enum: ["CANCELLED_BY_USER", "EMAIL_BOUNCED"],
-          example: "CANCELLED_BY_USER",
-        },
+  },
+  MESSAGE_CANCELLED: {
+    description: "A user cancelled a scheduled message",
+    properties: {
+      petitionMessageId: {
+        description: "The ID of the cancelled message",
+        type: "string",
+        example: toGlobalId("PetitionMessage", 10),
+      },
+      userId: {
+        description:
+          "The ID of the user that cancelled the send of the message. Only set if `reason` is `CANCELLED_BY_USER`. If `null`, the message was automatically cancelled because a bounce ocurred when trying to delivery an email.",
+        type: ["string", "null"],
+        example: toGlobalId("User", 10),
+      },
+      reason: {
+        type: "string",
+        description:
+          "Wether the message was cancelled manually by an user, or it was cancelled automatically because an email was bounced.",
+        enum: ["CANCELLED_BY_USER", "EMAIL_BOUNCED"],
+        example: "CANCELLED_BY_USER",
       },
     },
-    MESSAGE_SCHEDULED: {
-      description: "A user scheduled a message",
-      properties: {
-        petitionMessageId: {
-          description: "The ID of the scheduled message",
-          type: "string",
-          example: toGlobalId("PetitionMessage", 10),
-        },
+  },
+  MESSAGE_SCHEDULED: {
+    description: "A user scheduled a message",
+    properties: {
+      petitionMessageId: {
+        description: "The ID of the scheduled message",
+        type: "string",
+        example: toGlobalId("PetitionMessage", 10),
       },
     },
-    MESSAGE_SENT: {
-      description: "A user sent a message",
-      properties: {
-        petitionMessageId: {
-          description: "The ID of the message",
-          type: "string",
-          example: toGlobalId("PetitionMessage", 10),
-        },
+  },
+  MESSAGE_SENT: {
+    description: "A user sent a message",
+    properties: {
+      petitionMessageId: {
+        description: "The ID of the message",
+        type: "string",
+        example: toGlobalId("PetitionMessage", 10),
       },
     },
-    OWNERSHIP_TRANSFERRED: {
-      description: "A user transferred the ownership of a petition to another user",
-      properties: {
-        userId: {
-          description: "The ID of the user that transferred the petition",
-          type: "string",
-          example: toGlobalId("User", 10),
-        },
-        ownerId: {
-          description: "The ID of the new owner of the petition",
-          type: "string",
-          example: toGlobalId("User", 1),
-        },
-        previousOwnerId: {
-          description: "The ID of the previous owner of the petition",
-          type: ["string", "null"],
-          example: toGlobalId("User", 2),
-        },
+  },
+  OWNERSHIP_TRANSFERRED: {
+    description: "A user transferred the ownership of a petition to another user",
+    properties: {
+      userId: {
+        description: "The ID of the user that transferred the petition",
+        type: "string",
+        example: toGlobalId("User", 10),
+      },
+      ownerId: {
+        description: "The ID of the new owner of the petition",
+        type: "string",
+        example: toGlobalId("User", 1),
+      },
+      previousOwnerId: {
+        description: "The ID of the previous owner of the petition",
+        type: ["string", "null"],
+        example: toGlobalId("User", 2),
       },
     },
-    PETITION_CLOSED: {
-      description: "A petition was marked as `closed` by an user",
-      properties: {
-        userId: {
-          description: "The ID of the user that closed the petition",
-          type: "string",
-          example: toGlobalId("User", 1),
-        },
+  },
+  PETITION_CLOSED: {
+    description: "A petition was marked as `closed` by an user",
+    properties: {
+      userId: {
+        description: "The ID of the user that closed the petition",
+        type: "string",
+        example: toGlobalId("User", 1),
       },
     },
-    PETITION_CLOSED_NOTIFIED: {
-      description: "A user notified a recipient that the petition was closed",
-      properties: {
-        userId: {
-          description: "The ID of the user",
-          type: "string",
-          example: toGlobalId("User", 1),
-        },
-        petitionAccessId: {
-          description: "The ID of the petition access",
-          type: "string",
-          example: toGlobalId("PetitionAccess", 1),
-        },
+  },
+  PETITION_CLOSED_NOTIFIED: {
+    description: "A user notified a recipient that the petition was closed",
+    properties: {
+      userId: {
+        description: "The ID of the user",
+        type: "string",
+        example: toGlobalId("User", 1),
+      },
+      petitionAccessId: {
+        description: "The ID of the petition access",
+        type: "string",
+        example: toGlobalId("PetitionAccess", 1),
       },
     },
-    PETITION_COMPLETED: {
-      description:
-        "A petition was completed. If a user completed it, `userId` will be set in the event data. Else, `petitionAccessId` will be set.",
-      properties: {
-        userId: {
-          description: "The ID of the user that completed the petition",
-          type: ["string", "null"],
-          example: toGlobalId("User", 1),
-        },
-        petitionAccessId: {
-          description: "The ID of the petition access linked to the recipient",
-          type: ["string", "null"],
-          example: toGlobalId("PetitionAccess", 1),
-        },
+  },
+  PETITION_COMPLETED: {
+    description:
+      "A petition was completed. If a user completed it, `userId` will be set in the event data. Else, `petitionAccessId` will be set.",
+    properties: {
+      userId: {
+        description: "The ID of the user that completed the petition",
+        type: ["string", "null"],
+        example: toGlobalId("User", 1),
+      },
+      petitionAccessId: {
+        description: "The ID of the petition access linked to the recipient",
+        type: ["string", "null"],
+        example: toGlobalId("PetitionAccess", 1),
       },
     },
-    PETITION_CREATED: {
-      description: "A petition was created",
-      properties: {
-        userId: {
-          description: "The ID of the user that created the petition",
-          type: "string",
-          example: toGlobalId("User", 10),
-        },
+  },
+  PETITION_CREATED: {
+    description: "A petition was created",
+    properties: {
+      userId: {
+        description: "The ID of the user that created the petition",
+        type: "string",
+        example: toGlobalId("User", 10),
       },
     },
-    PETITION_REOPENED: {
-      description: "A user reopened a closed petition",
-      properties: {
-        userId: {
-          description: "The ID of the user that reopened the petition",
-          type: "string",
-          example: toGlobalId("User", 5),
-        },
+  },
+  PETITION_REOPENED: {
+    description: "A user reopened a closed petition",
+    properties: {
+      userId: {
+        description: "The ID of the user that reopened the petition",
+        type: "string",
+        example: toGlobalId("User", 5),
       },
     },
-    REMINDER_SENT: {
-      description: "A manual or automatic reminder was sent to the petition recipients",
-      properties: {
-        petitionReminderId: {
-          description: "The ID of the reminder",
-          type: "string",
-          example: toGlobalId("PetitionReminder", 100),
-        },
+  },
+  REMINDER_SENT: {
+    description: "A manual or automatic reminder was sent to the petition recipients",
+    properties: {
+      petitionReminderId: {
+        description: "The ID of the reminder",
+        type: "string",
+        example: toGlobalId("PetitionReminder", 100),
       },
     },
-    REPLY_CREATED: {
-      description: "A reply on the petition was submitted either by a recipient or an user.",
-      properties: {
-        petitionAccessId: {
-          description:
-            "The ID of the access. If set, the reply was submitted by the recipient linked to this access",
-          type: ["string", "null"],
-          example: toGlobalId("PetitionAccess", 1),
-        },
-        userId: {
-          description: "The ID of the user. If set, the reply was submitted by this user.",
-          type: ["string", "null"],
-          example: null,
-        },
-        petitionFieldId: {
-          description: "The ID of the field replied by the recipient",
-          type: "string",
-          example: toGlobalId("PetitionField", 14),
-        },
-        petitionFieldReplyId: {
-          description: "The ID of the new reply",
-          type: "string",
-          example: toGlobalId("PetitionFieldReply", 11),
-        },
+  },
+  REPLY_CREATED: {
+    description: "A reply on the petition was submitted either by a recipient or an user.",
+    properties: {
+      petitionAccessId: {
+        description:
+          "The ID of the access. If set, the reply was submitted by the recipient linked to this access",
+        type: ["string", "null"],
+        example: toGlobalId("PetitionAccess", 1),
+      },
+      userId: {
+        description: "The ID of the user. If set, the reply was submitted by this user.",
+        type: ["string", "null"],
+        example: null,
+      },
+      petitionFieldId: {
+        description: "The ID of the field replied by the recipient",
+        type: "string",
+        example: toGlobalId("PetitionField", 14),
+      },
+      petitionFieldReplyId: {
+        description: "The ID of the new reply",
+        type: "string",
+        example: toGlobalId("PetitionFieldReply", 11),
       },
     },
-    REPLY_DELETED: {
-      description: "A reply on the petition was deleted either by a recipient or an user.",
-      properties: {
-        petitionAccessId: {
-          description:
-            "The ID of the access. If set, the reply was deleted by the recipient linked to this access",
-          type: ["string", "null"],
-          example: toGlobalId("PetitionAccess", 1),
-        },
-        userId: {
-          description: "The ID of the user. If set, the reply was deleted by this user.",
-          type: ["string", "null"],
-          example: toGlobalId("User", 1),
-        },
-        petitionFieldId: {
-          description: "The ID of the field where the reply belongs",
-          type: "string",
-          example: toGlobalId("PetitionField", 1),
-        },
-        petitionFieldReplyId: {
-          description: "The ID of the deleted reply",
-          type: "string",
-          example: toGlobalId("PetitionFieldReply", 1),
-        },
+  },
+  REPLY_DELETED: {
+    description: "A reply on the petition was deleted either by a recipient or an user.",
+    properties: {
+      petitionAccessId: {
+        description:
+          "The ID of the access. If set, the reply was deleted by the recipient linked to this access",
+        type: ["string", "null"],
+        example: toGlobalId("PetitionAccess", 1),
+      },
+      userId: {
+        description: "The ID of the user. If set, the reply was deleted by this user.",
+        type: ["string", "null"],
+        example: toGlobalId("User", 1),
+      },
+      petitionFieldId: {
+        description: "The ID of the field where the reply belongs",
+        type: "string",
+        example: toGlobalId("PetitionField", 1),
+      },
+      petitionFieldReplyId: {
+        description: "The ID of the deleted reply",
+        type: "string",
+        example: toGlobalId("PetitionFieldReply", 1),
       },
     },
-    REPLY_UPDATED: {
-      description: "A reply on the petition was updated either by a recipient or an user.",
-      properties: {
-        petitionAccessId: {
-          description:
-            "The ID of the access. If set, the reply was updated by the recipient linked to this access",
-          type: ["string", "null"],
-          example: toGlobalId("PetitionAccess", 1),
-        },
-        userId: {
-          description: "The ID of the user. If set, the reply was updated by this user.",
-          type: ["string", "null"],
-          example: null,
-        },
-        petitionFieldId: {
-          description: "The ID of the field where the reply belongs",
-          type: "string",
-          example: toGlobalId("PetitionField", 1),
-        },
-        petitionFieldReplyId: {
-          description: "The ID of the updated reply",
-          type: "string",
-          example: toGlobalId("PetitionFieldReply", 1),
-        },
+  },
+  REPLY_UPDATED: {
+    description: "A reply on the petition was updated either by a recipient or an user.",
+    properties: {
+      petitionAccessId: {
+        description:
+          "The ID of the access. If set, the reply was updated by the recipient linked to this access",
+        type: ["string", "null"],
+        example: toGlobalId("PetitionAccess", 1),
+      },
+      userId: {
+        description: "The ID of the user. If set, the reply was updated by this user.",
+        type: ["string", "null"],
+        example: null,
+      },
+      petitionFieldId: {
+        description: "The ID of the field where the reply belongs",
+        type: "string",
+        example: toGlobalId("PetitionField", 1),
+      },
+      petitionFieldReplyId: {
+        description: "The ID of the updated reply",
+        type: "string",
+        example: toGlobalId("PetitionFieldReply", 1),
       },
     },
-    SIGNATURE_CANCELLED: {
-      description: "An eSignature request on the petition was cancelled.",
-      properties: {
-        petitionSignatureRequestId: {
-          description:
-            "The ID of the eSignature request. Only set if the request was already started when the cancellation happens.",
-          type: ["string", "null"],
-          example: toGlobalId("PetitionSignatureRequest", 1),
-        },
-        cancelReason: {
-          description: "The reason of the cancel.",
-          type: "string",
-          enum: ["CANCELLED_BY_USER", "DECLINED_BY_SIGNER", "REQUEST_ERROR", "REQUEST_RESTARTED"],
-          example: "CANCELLED_BY_USER",
-        },
-        cancelData: {
-          description: "Information about who and why cancelled the eSignature request",
-          type: "object",
-          properties: {
-            userId: {
-              type: ["string", "null"],
-              description: outdent`
-                The ID of the user that cancelled or restarted the signature.  
-                Only set if cancelReason is \`CANCELLED_BY_USER\` or \`REQUEST_RESTARTED\`.
-              `,
-              example: toGlobalId("User", 2),
-            },
-            petitionAccessId: {
-              type: ["string", "null"],
-              description: outdent`
-                The ID of the petition access linked to the recipient that restarted the signature.
-                Only set if cancelReason is \`REQUEST_RESTARTED\`.
-              `,
-              example: null,
-            },
-            declineReason: {
-              type: ["string", "null"],
-              description: outdent`
-                Reason of cancellation.  
-                Only set if cancelReason is \`DECLINED_BY_SIGNER\`.
+  },
+  SIGNATURE_CANCELLED: {
+    description: "An eSignature request on the petition was cancelled.",
+    properties: {
+      petitionSignatureRequestId: {
+        description:
+          "The ID of the eSignature request. Only set if the request was already started when the cancellation happens.",
+        type: ["string", "null"],
+        example: toGlobalId("PetitionSignatureRequest", 1),
+      },
+      cancelReason: {
+        description: "The reason of the cancel.",
+        type: "string",
+        enum: ["CANCELLED_BY_USER", "DECLINED_BY_SIGNER", "REQUEST_ERROR", "REQUEST_RESTARTED"],
+        example: "CANCELLED_BY_USER",
+      },
+      cancelData: {
+        description: "Information about who and why cancelled the eSignature request",
+        type: "object",
+        properties: {
+          userId: {
+            type: ["string", "null"],
+            description: outdent`
+              The ID of the user that cancelled or restarted the signature.  
+              Only set if cancelReason is \`CANCELLED_BY_USER\` or \`REQUEST_RESTARTED\`.
             `,
-              example: null,
+            example: toGlobalId("User", 2),
+          },
+          petitionAccessId: {
+            type: ["string", "null"],
+            description: outdent`
+              The ID of the petition access linked to the recipient that restarted the signature.
+              Only set if cancelReason is \`REQUEST_RESTARTED\`.
+            `,
+            example: null,
+          },
+          declineReason: {
+            type: ["string", "null"],
+            description: outdent`
+              Reason of cancellation.  
+              Only set if cancelReason is \`DECLINED_BY_SIGNER\`.
+          `,
+            example: null,
+          },
+          canceller: {
+            description: outdent`
+              Information about the signer that declined the request.
+              Only set if cancelReason is \`DECLINED_BY_SIGNER\`.
+            `,
+            type: ["object", "null"],
+            properties: {
+              firstName: { type: "string" },
+              lastName: { type: "string" },
+              email: { type: "string" },
             },
-            canceller: {
-              description: outdent`
-                Information about the signer that declined the request.
-                Only set if cancelReason is \`DECLINED_BY_SIGNER\`.
-              `,
-              type: ["object", "null"],
-              properties: {
-                firstName: { type: "string" },
-                lastName: { type: "string" },
-                email: { type: "string" },
-              },
-              example: null,
-            },
-            error: {
-              description: outdent`
-                The server error that cancelled the signature.
-                Only set of cancelReason is \`REQUEST_ERROR\`.
-              `,
-              type: ["string", "null"],
-              example: null,
-            },
-            errorCode: {
-              description: outdent`
-                The error code of the cancelled the signature.
-                Only set of cancelReason is \`REQUEST_ERROR\`.
-              `,
-              type: ["string", "null"],
-              example: null,
-            },
+            example: null,
+          },
+          error: {
+            description: outdent`
+              The server error that cancelled the signature.
+              Only set of cancelReason is \`REQUEST_ERROR\`.
+            `,
+            type: ["string", "null"],
+            example: null,
+          },
+          errorCode: {
+            description: outdent`
+              The error code of the cancelled the signature.
+              Only set of cancelReason is \`REQUEST_ERROR\`.
+            `,
+            type: ["string", "null"],
+            example: null,
           },
         },
       },
     },
-    SIGNATURE_OPENED: {
-      description: "A signer has opened the signing page on the signature provider",
-      properties: {
-        signer: _PetitionSigner,
-        petitionSignatureRequestId: {
-          type: "string",
-          description: "The ID of the signature request",
-          example: toGlobalId("PetitionSignatureRequest", 2),
-        },
+  },
+  SIGNATURE_OPENED: {
+    description: "A signer has opened the signing page on the signature provider",
+    properties: {
+      signer: _PetitionSigner,
+      petitionSignatureRequestId: {
+        type: "string",
+        description: "The ID of the signature request",
+        example: toGlobalId("PetitionSignatureRequest", 2),
       },
     },
-    SIGNATURE_COMPLETED: {
-      description: "The eSignature request on the petition was completed",
-      properties: {
-        fileUploadId: {
-          description: "The ID of the signed PDF file",
-          type: "string",
-          example: toGlobalId("FileUpload", 1),
-        },
-        petitionSignatureRequestId: {
-          description: "The ID of the eSignature request",
-          type: "string",
-          example: toGlobalId("PetitionSignatureRequest", 1),
-        },
+  },
+  SIGNATURE_COMPLETED: {
+    description: "The eSignature request on the petition was completed",
+    properties: {
+      fileUploadId: {
+        description: "The ID of the signed PDF file",
+        type: "string",
+        example: toGlobalId("FileUpload", 1),
+      },
+      petitionSignatureRequestId: {
+        description: "The ID of the eSignature request",
+        type: "string",
+        example: toGlobalId("PetitionSignatureRequest", 1),
       },
     },
-    SIGNATURE_STARTED: {
-      description: "An eSignature request on the petition started",
-      properties: {
-        petitionSignatureRequestId: {
-          description: "The ID of the eSignature request",
-          type: "string",
-          example: toGlobalId("PetitionSignatureRequest", 1),
-        },
+  },
+  SIGNATURE_STARTED: {
+    description: "An eSignature request on the petition started",
+    properties: {
+      petitionSignatureRequestId: {
+        description: "The ID of the eSignature request",
+        type: "string",
+        example: toGlobalId("PetitionSignatureRequest", 1),
       },
     },
-    SIGNATURE_REMINDER: {
-      description: "A user sent a reminder email to the pending signers",
-      properties: {
-        userId: {
-          description: "The ID of the user that sent the reminder",
-          type: "string",
-          example: toGlobalId("User", 1),
-        },
-        petitionSignatureRequestId: {
-          description: "The ID of the eSignature request",
-          type: "string",
-          example: toGlobalId("PetitionSignatureRequest", 11),
-        },
+  },
+  SIGNATURE_REMINDER: {
+    description: "A user sent a reminder email to the pending signers",
+    properties: {
+      userId: {
+        description: "The ID of the user that sent the reminder",
+        type: "string",
+        example: toGlobalId("User", 1),
+      },
+      petitionSignatureRequestId: {
+        description: "The ID of the eSignature request",
+        type: "string",
+        example: toGlobalId("PetitionSignatureRequest", 11),
       },
     },
-    USER_PERMISSION_ADDED: {
-      description: "The user shared their petition with another user",
-      properties: {
-        permissionType: {
-          description: "The type of permission for the new user",
-          type: "string",
-          enum: ["READ", "WRITE"],
-          example: "WRITE",
-        },
-        userId: {
-          description: "The ID of the user that shared the petition",
-          type: "string",
-          example: toGlobalId("User", 10),
-        },
-        permissionUserId: {
-          description: "The ID of the user linked to the new permission",
-          type: "string",
-          example: toGlobalId("User", 100),
-        },
+  },
+  USER_PERMISSION_ADDED: {
+    description: "The user shared their petition with another user",
+    properties: {
+      permissionType: {
+        description: "The type of permission for the new user",
+        type: "string",
+        enum: ["READ", "WRITE"],
+        example: "WRITE",
+      },
+      userId: {
+        description: "The ID of the user that shared the petition",
+        type: "string",
+        example: toGlobalId("User", 10),
+      },
+      permissionUserId: {
+        description: "The ID of the user linked to the new permission",
+        type: "string",
+        example: toGlobalId("User", 100),
       },
     },
-    USER_PERMISSION_EDITED: {
-      description: "The user modified the type of permission on a shared petition",
-      properties: {
-        permissionType: {
-          description: "The new permission for the user",
-          type: "string",
-          enum: ["READ", "WRITE"],
-          example: "READ",
-        },
-        userId: {
-          description: "The ID of the user that edited the permission",
-          type: "string",
-          example: toGlobalId("User", 10),
-        },
-        permissionUserId: {
-          description: "The ID of the user linked to the modified permission",
-          type: "string",
-          example: toGlobalId("User", 20),
-        },
+  },
+  USER_PERMISSION_EDITED: {
+    description: "The user modified the type of permission on a shared petition",
+    properties: {
+      permissionType: {
+        description: "The new permission for the user",
+        type: "string",
+        enum: ["READ", "WRITE"],
+        example: "READ",
+      },
+      userId: {
+        description: "The ID of the user that edited the permission",
+        type: "string",
+        example: toGlobalId("User", 10),
+      },
+      permissionUserId: {
+        description: "The ID of the user linked to the modified permission",
+        type: "string",
+        example: toGlobalId("User", 20),
       },
     },
-    USER_PERMISSION_REMOVED: {
-      description: "The user removed a permission on their petition",
-      properties: {
-        userId: {
-          description: "The ID of the user that removed the permission",
-          type: "string",
-          example: toGlobalId("User", 10),
-        },
-        permissionUserId: {
-          description: "The ID of the user that lost its permission",
-          type: "string",
-          example: toGlobalId("User", 20),
-        },
+  },
+  USER_PERMISSION_REMOVED: {
+    description: "The user removed a permission on their petition",
+    properties: {
+      userId: {
+        description: "The ID of the user that removed the permission",
+        type: "string",
+        example: toGlobalId("User", 10),
+      },
+      permissionUserId: {
+        description: "The ID of the user that lost its permission",
+        type: "string",
+        example: toGlobalId("User", 20),
       },
     },
-    GROUP_PERMISSION_ADDED: {
-      description: "The user shared their petition with a user group",
-      properties: {
-        permissionType: {
-          description: "The type of permission for the group members",
-          type: "string",
-          enum: ["READ", "WRITE"],
-          example: "READ",
-        },
-        userId: {
-          description: "The ID of the user that shared the petition",
-          type: "string",
-          example: toGlobalId("User", 10),
-        },
-        userGroupId: {
-          description: "The ID of the group linked to the new permission",
-          type: "string",
-          example: toGlobalId("UserGroup", 10),
-        },
+  },
+  GROUP_PERMISSION_ADDED: {
+    description: "The user shared their petition with a user group",
+    properties: {
+      permissionType: {
+        description: "The type of permission for the group members",
+        type: "string",
+        enum: ["READ", "WRITE"],
+        example: "READ",
+      },
+      userId: {
+        description: "The ID of the user that shared the petition",
+        type: "string",
+        example: toGlobalId("User", 10),
+      },
+      userGroupId: {
+        description: "The ID of the group linked to the new permission",
+        type: "string",
+        example: toGlobalId("UserGroup", 10),
       },
     },
-    GROUP_PERMISSION_EDITED: {
-      description: "The user modified the type of permission on a shared petition",
-      properties: {
-        permissionType: {
-          description: "The new permission for the group",
-          type: "string",
-          enum: ["READ", "WRITE"],
-          example: "WRITE",
-        },
-        userId: {
-          description: "The ID of the user that edited the permission",
-          type: "string",
-          example: toGlobalId("User", 10),
-        },
-        userGroupId: {
-          description: "The ID of the group linked to the modified permission",
-          type: "string",
-          example: toGlobalId("UserGroup", 10),
-        },
+  },
+  GROUP_PERMISSION_EDITED: {
+    description: "The user modified the type of permission on a shared petition",
+    properties: {
+      permissionType: {
+        description: "The new permission for the group",
+        type: "string",
+        enum: ["READ", "WRITE"],
+        example: "WRITE",
+      },
+      userId: {
+        description: "The ID of the user that edited the permission",
+        type: "string",
+        example: toGlobalId("User", 10),
+      },
+      userGroupId: {
+        description: "The ID of the group linked to the modified permission",
+        type: "string",
+        example: toGlobalId("UserGroup", 10),
       },
     },
-    GROUP_PERMISSION_REMOVED: {
-      description: "The user removed a permission on their petition",
-      properties: {
-        userId: {
-          description: "The ID of the user that removed the permission",
-          type: "string",
-          example: toGlobalId("User", 10),
-        },
-        userGroupId: {
-          description: "The ID of the group that lost its permission",
-          type: "string",
-          example: toGlobalId("UserGroup", 10),
-        },
+  },
+  GROUP_PERMISSION_REMOVED: {
+    description: "The user removed a permission on their petition",
+    properties: {
+      userId: {
+        description: "The ID of the user that removed the permission",
+        type: "string",
+        example: toGlobalId("User", 10),
+      },
+      userGroupId: {
+        description: "The ID of the group that lost its permission",
+        type: "string",
+        example: toGlobalId("UserGroup", 10),
       },
     },
-    PETITION_CLONED: {
-      description: "The user cloned a petition",
-      properties: {
-        newPetitionId: {
-          description: "The ID of the new created petition",
-          type: "string",
-          example: toGlobalId("Petition", 1),
-        },
-        type: {
-          description: "The type of the new created petition",
-          enum: ["PETITION", "TEMPLATE"],
-          example: "PETITION",
-        },
-        userId: {
-          description: "The ID of the user that cloned the petition",
-          type: "string",
-          example: toGlobalId("User", 10),
-        },
+  },
+  PETITION_CLONED: {
+    description: "The user cloned a petition",
+    properties: {
+      newPetitionId: {
+        description: "The ID of the new created petition",
+        type: "string",
+        example: toGlobalId("Petition", 1),
+      },
+      type: {
+        description: "The type of the new created petition",
+        enum: ["PETITION", "TEMPLATE"],
+        example: "PETITION",
+      },
+      userId: {
+        description: "The ID of the user that cloned the petition",
+        type: "string",
+        example: toGlobalId("User", 10),
       },
     },
-    PETITION_DELETED: {
-      description: "The user deleted a petition",
-      properties: {
-        userId: {
-          description: "The ID of the user that deleted the petition",
-          type: "string",
-          example: toGlobalId("User", 10),
-        },
-        status: {
-          description: "The status of the petition in the moment it was deleted",
-          enum: ["CLOSED", "COMPLETED", "DRAFT", "PENDING"],
-          example: "COMPLETED",
-        },
+  },
+  PETITION_DELETED: {
+    description: "The user deleted a petition",
+    properties: {
+      userId: {
+        description: "The ID of the user that deleted the petition",
+        type: "string",
+        example: toGlobalId("User", 10),
+      },
+      status: {
+        description: "The status of the petition in the moment it was deleted",
+        enum: ["CLOSED", "COMPLETED", "DRAFT", "PENDING"],
+        example: "COMPLETED",
       },
     },
-    TEMPLATE_USED: {
-      description: "A template has been used to create a petition",
-      properties: {
-        userId: {
-          description: "The ID of the user that used the template",
-          type: "string",
-          example: toGlobalId("User", 10),
-        },
-        newPetitionId: {
-          description: "The ID of the new created petition",
-          type: "string",
-          example: toGlobalId("Petition", 1),
-        },
+  },
+  TEMPLATE_USED: {
+    description: "A template has been used to create a petition",
+    properties: {
+      userId: {
+        description: "The ID of the user that used the template",
+        type: "string",
+        example: toGlobalId("User", 10),
+      },
+      newPetitionId: {
+        description: "The ID of the new created petition",
+        type: "string",
+        example: toGlobalId("Petition", 1),
       },
     },
-    REMINDERS_OPT_OUT: {
-      description: "The contact has opted out from receiving reminders for this petition",
-      properties: {
-        petitionAccessId: {
-          description: "The ID of the petition access",
-          type: "string",
-          example: toGlobalId("PetitionAccess", 10),
-        },
-        reason: {
-          description: "Code representing the reason for opting out.",
-          type: "string",
-          enum: ["NOT_INTERESTED", "NOT_REQUESTED", "WRONG_PERSON", "NO_REMINDERS", "OTHER"],
-          example: "NOT_INTERESTED",
-        },
-        other: {
-          description: "If reason is OTHER, this will be the explanation added by the contact",
-          type: ["string", "null"],
-          example: null,
-        },
+  },
+  REMINDERS_OPT_OUT: {
+    description: "The contact has opted out from receiving reminders for this petition",
+    properties: {
+      petitionAccessId: {
+        description: "The ID of the petition access",
+        type: "string",
+        example: toGlobalId("PetitionAccess", 10),
+      },
+      reason: {
+        description: "Code representing the reason for opting out.",
+        type: "string",
+        enum: ["NOT_INTERESTED", "NOT_REQUESTED", "WRONG_PERSON", "NO_REMINDERS", "OTHER"],
+        example: "NOT_INTERESTED",
+      },
+      other: {
+        description: "If reason is OTHER, this will be the explanation added by the contact",
+        type: ["string", "null"],
+        example: null,
       },
     },
-    ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK: {
-      description: "A contact started and sent itself a petition through a public petition link",
-      properties: {
-        petitionAccessId: {
-          description: "The ID of the petition access",
-          type: "string",
-          example: toGlobalId("PetitionAccess", 10),
-        },
+  },
+  ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK: {
+    description: "A contact started and sent itself a petition through a public petition link",
+    properties: {
+      petitionAccessId: {
+        description: "The ID of the petition access",
+        type: "string",
+        example: toGlobalId("PetitionAccess", 10),
       },
     },
-    PETITION_MESSAGE_BOUNCED: {
-      description: "A message email has bounced",
-      properties: {
-        petitionMessageId: {
-          description: "The ID of the petition message that caused the bounce",
-          type: "string",
-          example: toGlobalId("PetitionMessage", 10),
-        },
+  },
+  PETITION_MESSAGE_BOUNCED: {
+    description: "A message email has bounced",
+    properties: {
+      petitionMessageId: {
+        description: "The ID of the petition message that caused the bounce",
+        type: "string",
+        example: toGlobalId("PetitionMessage", 10),
       },
     },
-    PETITION_REMINDER_BOUNCED: {
-      description: "A reminder email has bounced",
-      properties: {
-        petitionReminderId: {
-          description: "The ID of the petition reminder that caused the bounce",
-          type: "string",
-          example: toGlobalId("PetitionReminder", 10),
-        },
+  },
+  PETITION_REMINDER_BOUNCED: {
+    description: "A reminder email has bounced",
+    properties: {
+      petitionReminderId: {
+        description: "The ID of the petition reminder that caused the bounce",
+        type: "string",
+        example: toGlobalId("PetitionReminder", 10),
       },
     },
-    RECIPIENT_SIGNED: {
-      description: "A recipient has signed the document.",
-      properties: {
-        signer: _PetitionSigner,
-        petitionSignatureRequestId: {
-          type: "string",
-          description: "The ID of the signature request",
-          example: toGlobalId("PetitionSignatureRequest", 2),
-        },
+  },
+  RECIPIENT_SIGNED: {
+    description: "A recipient has signed the document.",
+    properties: {
+      signer: _PetitionSigner,
+      petitionSignatureRequestId: {
+        type: "string",
+        description: "The ID of the signature request",
+        example: toGlobalId("PetitionSignatureRequest", 2),
       },
     },
-  } as Record<PetitionEventType, JsonSchema>)
+  },
+} as Record<PetitionEventType, JsonSchema>;
+
+export const _PetitionEvent = {
+  type: "object",
+  oneOf: Object.entries(PetitionEventSchemas)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(
       ([event, data]) =>
@@ -1598,7 +1600,7 @@ export const _PetitionEvent = {
             },
             type: {
               type: "string",
-              const: event,
+              const: event as PetitionEventType,
               description: `\`${event}\``,
               example: event,
             },
@@ -1657,7 +1659,7 @@ const _Subscription = {
       type: ["array", "null"],
       description: "The events linked with the subscription. If null, every event will be sent.",
       example: ["PETITION_COMPLETED", "MESSAGE_SENT"],
-      items: { type: "string" },
+      items: { type: "string", enum: Object.keys(PetitionEventSchemas) },
     },
   },
 } as const;
@@ -1686,7 +1688,7 @@ export const CreateSubscription = schema({
       example: ["PETITION_COMPLETED", "COMMENT_PUBLISHED", "SIGNATURE_STARTED"],
       items: {
         type: "string",
-        enum: _PetitionEvent.oneOf.map((e) => e.title.split(" ").join("_").toUpperCase()),
+        enum: Object.keys(PetitionEventSchemas) as PetitionEventType[],
       },
     },
   },

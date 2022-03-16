@@ -5,7 +5,6 @@ import { outdent } from "outdent";
 import pMap from "p-map";
 import { isDefined, pick } from "remeda";
 import { callbackify } from "util";
-import { PetitionEventType } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
 import { Body, FormDataBody, FormDataBodyContent, JsonBody, JsonBodyContent } from "../rest/body";
@@ -2630,8 +2629,8 @@ api
         `;
         const result = await client.request(EventSubscriptions_createSubscriptionDocument, {
           eventsUrl: body.eventsUrl,
-          eventTypes: body.eventTypes as Maybe<PetitionEventType[]>,
-          name: body.name || null,
+          eventTypes: body.eventTypes,
+          name: body.name,
         });
 
         assert("id" in result.createEventSubscription);

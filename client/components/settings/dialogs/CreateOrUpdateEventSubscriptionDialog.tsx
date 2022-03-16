@@ -71,7 +71,7 @@ export function CreateOrUpdateEventSubscriptionDialog(
               : [],
           }
         : {
-            name: null,
+            name: "",
             eventsUrl: "",
             eventsMode: "ALL",
             eventTypes: [],

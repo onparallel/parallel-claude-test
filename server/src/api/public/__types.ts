@@ -3227,7 +3227,6 @@ export type UpdateEventSubscriptionInput = {
   eventTypes?: InputMaybe<Array<PetitionEventType>>;
   eventsUrl?: InputMaybe<Scalars["String"]>;
   isEnabled?: InputMaybe<Scalars["Boolean"]>;
-  name?: InputMaybe<Scalars["String"]>;
 };
 
 export type UpdatePetitionFieldInput = {
