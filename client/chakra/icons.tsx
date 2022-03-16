@@ -835,6 +835,23 @@ export const ArrowForwardIcon = createIcon({
   ),
 });
 
+export const ArrowShortRightIcon = createIcon({
+  displayName: "ArrowShortRightIcon",
+  viewBox: "0 0 16 16",
+  path: (
+    <g
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      fill="none"
+    >
+      <path d="m3.33331 8h9.33329" />
+      <path d="m8 3.3335 4.6667 4.66666-4.6667 4.66664" />
+    </g>
+  ),
+});
+
 export const ArrowBackIcon = createIcon({
   displayName: "ArrowBackIcon",
   viewBox: "0 0 24 24",

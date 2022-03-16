@@ -16,6 +16,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import {
+  ArrowShortRightIcon,
   BellSettingsIcon,
   LinkIcon,
   ListIcon,
@@ -25,7 +26,6 @@ import {
   ShieldIcon,
   SignatureIcon,
   TimeIcon,
-  UserArrowIcon,
 } from "@parallel/chakra/icons";
 import {
   PetitionSettings_cancelPetitionSignatureRequestDocument,
@@ -38,8 +38,8 @@ import {
   PetitionSettings_UserFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
-import { assertTypename, assertTypenameArray } from "@parallel/utils/apollo/typename";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { assertTypename, assertTypenameArray } from "@parallel/utils/apollo/typename";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { FORMATS } from "@parallel/utils/dates";
 import { withError } from "@parallel/utils/promises/withError";
@@ -477,7 +477,7 @@ function _PetitionSettings({
         <SettingsRowSwitch
           data-section="share-automatically"
           isDisabled={isPublicTemplate || petition.isRestricted}
-          icon={<UserArrowIcon />}
+          icon={<ArrowShortRightIcon />}
           label={
             <FormattedMessage
               id="component.petition-settings.share-automatically"
