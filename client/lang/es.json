@@ -8430,6 +8430,11 @@
     "context": "Already trust us"
   },
   {
+    "term": "recipient-view.complete-petition.error-message",
+    "definition": "Parece que la petición ha sido actualizada desde la última vez que ha accedido. Por favor, actualice su navegador e inténtelo de nuevo. No perderá sus respuestas enviadas.",
+    "context": "It looks like the petition has been updated since you last accessed it. Please refresh your browser and try again. You will not lose your submitted answers."
+  },
+  {
     "term": "recipient-view.completed-petition.toast-description",
     "definition": "Hemos notificado a {name} para que proceda a su revisión.",
     "context": "{name} will be notified for its revision."

@@ -274,6 +274,11 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
           "Can't complete the petition without signers information",
           "REQUIRED_SIGNER_INFO_ERROR"
         );
+      } else if (error.message === "CANT_COMPLETE_PETITION_ERROR") {
+        throw new ApolloError(
+          "Can't transition status to COMPLETED",
+          "CANT_COMPLETE_PETITION_ERROR"
+        );
       } else if (error.message === "SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED") {
         // update signature_config with additional signers specified by recipient so user can restart the signature request knowing who are the signers
         let petition = (await ctx.petitions.loadPetition(ctx.access!.petition_id))!;

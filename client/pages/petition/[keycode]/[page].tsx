@@ -17,6 +17,7 @@ import {
   useDialog,
   withDialogs,
 } from "@parallel/components/common/dialogs/DialogProvider";
+import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import {
@@ -41,6 +42,7 @@ import {
   RecipientView_PublicUserFragment,
   Tone,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { compose } from "@parallel/utils/compose";
@@ -78,6 +80,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
     hideInternalFields: true,
   });
 
+  const showErrorDialog = useErrorDialog();
   const [finalized, setFinalized] = useState(false);
   const [publicCompletePetition] = useMutation(RecipientView_publicCompletePetitionDocument);
   const showConfirmPetitionSignersDialog = useRecipientViewConfirmPetitionSignersDialog();
@@ -152,7 +155,20 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
           const { keycode } = router.query;
           router.push(`/petition/${keycode}/${page}#field-${field.id}`);
         }
-      } catch {}
+      } catch (e) {
+        if (isApolloError(e, "CANT_COMPLETE_PETITION_ERROR")) {
+          try {
+            await showErrorDialog({
+              message: intl.formatMessage({
+                id: "recipient-view.complete-petition.error-message",
+                defaultMessage:
+                  "It looks like the petition has been updated since you last accessed it. Please refresh your browser and try again. You will not lose your submitted answers.",
+              }),
+            });
+            window.location.reload();
+          } catch {}
+        }
+      }
     },
     [petition.fields, visibility, granter, router.query]
   );

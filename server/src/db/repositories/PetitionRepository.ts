@@ -1643,7 +1643,7 @@ export class PetitionRepository extends BaseRepository {
       }, t);
       return petition;
     } else {
-      throw new Error("Can't transition status to COMPLETED");
+      throw new Error("CANT_COMPLETE_PETITION_ERROR");
     }
   }
 

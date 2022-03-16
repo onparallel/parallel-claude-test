@@ -8430,6 +8430,11 @@
     "context": "Already trust us"
   },
   {
+    "term": "recipient-view.complete-petition.error-message",
+    "definition": "It looks like the petition has been updated since you last accessed it. Please refresh your browser and try again. You will not lose your submitted answers.",
+    "context": "It looks like the petition has been updated since you last accessed it. Please refresh your browser and try again. You will not lose your submitted answers."
+  },
+  {
     "term": "recipient-view.completed-petition.toast-description",
     "definition": "{name} will be notified for its revision.",
     "context": "{name} will be notified for its revision."
