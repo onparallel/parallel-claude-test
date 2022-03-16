@@ -23,8 +23,8 @@ export class UserRepository extends BaseRepository {
   }
 
   readonly loadUsersByCognitoId = fromDataLoader(
-    new DataLoader<string, (User | null)[]>(async (cognitoIds) => {
-      const users = await this.raw<User & { cognito_id: string }>(
+    new DataLoader<string, User[]>(async (cognitoIds) => {
+      const users = await this.raw<User & { ud_cognito_id: string }>(
         /* sql */ `
         update "user" u set last_active_at = NOW()
         from user_data ud 
@@ -32,12 +32,12 @@ export class UserRepository extends BaseRepository {
         and u.deleted_at is null and ud.deleted_at is null and ud.cognito_id in (${cognitoIds
           .map(() => "?")
           .join(",")})
-        returning u.*, ud.cognito_id
+        returning u.*, ud.cognito_id as ud_cognito_id
       `,
         cognitoIds
       );
-      const byCognitoId = groupBy(users, (u) => u.cognito_id);
-      return cognitoIds.map((id) => byCognitoId[id]);
+      const byCognitoId = groupBy(users, (u) => u.ud_cognito_id);
+      return cognitoIds.map((id) => byCognitoId[id]?.map((u) => omit(u, ["ud_cognito_id"])) ?? []);
     })
   );
 
@@ -82,17 +82,17 @@ export class UserRepository extends BaseRepository {
 
   readonly loadUsersByEmail = fromDataLoader(
     new DataLoader<string, User[]>(async (emails) => {
-      const users = await this.raw<User & { email: string }>(
+      const users = await this.raw<User & { ud_email: string }>(
         /* sql */ `
-        select u.*, ud.email from "user" u join "user_data" ud on u.user_data_id = ud.id
+        select u.*, ud.email as ud_email from "user" u join "user_data" ud on u.user_data_id = ud.id
         where u.deleted_at is null and ud.deleted_at is null and ud.email in (${emails
           .map(() => "?")
           .join(",")})
       `,
         emails
       );
-      const byEmail = groupBy(users, (u) => u.email);
-      return emails.map((email) => byEmail[email] ?? []);
+      const byEmail = groupBy(users, (u) => u.ud_email);
+      return emails.map((email) => byEmail[email]?.map((u) => omit(u, ["ud_email"])) ?? []);
     })
   );
 
