@@ -32,6 +32,7 @@ export function RestrictPetitionDialog({ ...props }: DialogProps<{}, RestrictPet
 
   return (
     <ConfirmDialog
+      hasCloseButton
       initialFocusRef={passwordRef}
       header={
         <FormattedMessage

@@ -43,6 +43,7 @@ export function ConfigureRemindersDialog({
   return (
     <ConfirmDialog
       size="xl"
+      hasCloseButton
       header={
         <FormattedMessage
           id="component.configure-reminder-settings-dialog.header"

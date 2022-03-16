@@ -179,7 +179,7 @@ export function PublicFooter(props: BoxProps) {
       <Stack direction={{ base: "column", md: "row" }} spacing={8}>
         <Flex flex="1">
           <Box flex={{ base: "1", md: "unset" }}>
-            <Text fontSize="xs">© 2020 Parallel Solutions, S.L.</Text>
+            <Text fontSize="xs">© {new Date().getFullYear()} Parallel Solutions, S.L.</Text>
             <Select
               size="sm"
               width="auto"

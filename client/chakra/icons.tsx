@@ -1234,6 +1234,24 @@ export const FieldFileUploadIcon = createIcon({
   ),
 });
 
+export const UploadIcon = createIcon({
+  displayName: "UploadIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m21 15v4c0 .5304-.2107 1.0391-.5858 1.4142s-.8838.5858-1.4142.5858h-14c-.53043 0-1.03914-.2107-1.41421-.5858-.37508-.3751-.58579-.8838-.58579-1.4142v-4" />
+      <path d="m17 8-5-5-5 5" />
+      <path d="m12 3v12" />
+    </g>
+  ),
+});
+
 export const FieldTextIcon = createIcon({
   displayName: "FieldTextIcon",
   viewBox: "0 0 24 24",

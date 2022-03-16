@@ -50,6 +50,7 @@ export function GenerateNewTokenDialog(props: DialogProps) {
   return (
     <ConfirmDialog
       size="lg"
+      hasCloseButton
       closeOnEsc={!apiKey}
       closeOnOverlayClick={!apiKey}
       initialFocusRef={tokenNameRef}

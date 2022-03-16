@@ -24,7 +24,7 @@ export const PetitionHeaderTab = chakraForwardRef<
       <Center
         ref={ref}
         as="a"
-        paddingX={5}
+        paddingX={{ base: 2.5, md: 5 }}
         aria-current={isActive ? "page" : undefined}
         aria-disabled={isDisabled ? true : undefined}
         textTransform="uppercase"
