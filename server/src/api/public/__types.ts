@@ -3227,6 +3227,7 @@ export type UpdateEventSubscriptionInput = {
   eventTypes?: InputMaybe<Array<PetitionEventType>>;
   eventsUrl?: InputMaybe<Scalars["String"]>;
   isEnabled?: InputMaybe<Scalars["Boolean"]>;
+  name?: InputMaybe<Scalars["String"]>;
 };
 
 export type UpdatePetitionFieldInput = {
@@ -3619,6 +3620,7 @@ export type PermissionFragment =
 
 export type SubscriptionFragment = {
   id: string;
+  name: string | null;
   eventsUrl: string;
   isEnabled: boolean;
   eventTypes: Array<PetitionEventType> | null;
@@ -4617,6 +4619,7 @@ export type EventSubscriptions_getSubscriptionsQueryVariables = Exact<{ [key: st
 export type EventSubscriptions_getSubscriptionsQuery = {
   subscriptions: Array<{
     id: string;
+    name: string | null;
     eventsUrl: string;
     isEnabled: boolean;
     eventTypes: Array<PetitionEventType> | null;
@@ -4625,11 +4628,14 @@ export type EventSubscriptions_getSubscriptionsQuery = {
 
 export type EventSubscriptions_createSubscriptionMutationVariables = Exact<{
   eventsUrl: Scalars["String"];
+  eventTypes?: InputMaybe<Array<PetitionEventType> | PetitionEventType>;
+  name?: InputMaybe<Scalars["String"]>;
 }>;
 
 export type EventSubscriptions_createSubscriptionMutation = {
   createEventSubscription: {
     id: string;
+    name: string | null;
     eventsUrl: string;
     isEnabled: boolean;
     eventTypes: Array<PetitionEventType> | null;
@@ -5033,6 +5039,7 @@ export const PermissionFragmentDoc = gql`
 export const SubscriptionFragmentDoc = gql`
   fragment Subscription on PetitionEventSubscription {
     id
+    name
     eventsUrl
     isEnabled
     eventTypes
@@ -5607,8 +5614,12 @@ export const EventSubscriptions_getSubscriptionsDocument = gql`
   EventSubscriptions_getSubscriptionsQueryVariables
 >;
 export const EventSubscriptions_createSubscriptionDocument = gql`
-  mutation EventSubscriptions_createSubscription($eventsUrl: String!) {
-    createEventSubscription(eventsUrl: $eventsUrl) {
+  mutation EventSubscriptions_createSubscription(
+    $eventsUrl: String!
+    $eventTypes: [PetitionEventType!]
+    $name: String
+  ) {
+    createEventSubscription(eventsUrl: $eventsUrl, eventTypes: $eventTypes, name: $name) {
       ...Subscription
     }
   }

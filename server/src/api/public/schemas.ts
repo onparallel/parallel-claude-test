@@ -893,78 +893,6 @@ export const FieldReplyDownloadContent = schema({
   description: "The text-content of the reply, or a download URL for `FILE` replies",
 } as const);
 
-const _Subscription = {
-  title: "Subscription",
-  type: "object",
-  additionalProperties: false,
-  required: ["id", "eventsUrl", "isEnabled", "eventTypes"],
-  properties: {
-    id: {
-      type: "string",
-      description: "ID of the subscription",
-      example: toGlobalId("OrgIntegration", 10),
-    },
-    eventsUrl: {
-      type: "string",
-      description: "URL where we will send POST requests with real-time petition events",
-      example: "https://www.example.com/events",
-    },
-    isEnabled: {
-      type: "boolean",
-      description: "Wether this subscription is currently enabled or not",
-      example: true,
-    },
-    eventTypes: {
-      type: ["array", "null"],
-      description: "The events linked with the subscription. If null, every event will be sent.",
-      example: ["PETITION_COMPLETED", "MESSAGE_SENT"],
-      items: { type: "string" },
-    },
-  },
-} as const;
-export const ListOfSubscriptions = ListOf(_Subscription);
-export const Subscription = schema(_Subscription);
-export const CreateSubscription = schema({
-  title: "CreateSubscription",
-  type: "object",
-  additionalProperties: false,
-  required: ["eventsUrl"],
-  properties: {
-    eventsUrl: {
-      description: "The URL where you will receive POST requests with real time petition events",
-      type: "string",
-      example: "https://www.example.com/events",
-    },
-  },
-} as const);
-
-function PaginatedListOf<T extends Exclude<JsonSchema, boolean>>(item: T) {
-  return schema({
-    title: `PaginatedList<${item.title ?? "*missing item title*"}>`,
-    type: "object",
-    description: "Paginated resource",
-    additionalProperties: false,
-    required: ["items", "totalCount"],
-    properties: {
-      items: {
-        description: "The requested slice of items from this paginated resource",
-        type: "array",
-        items: item,
-      },
-      totalCount: {
-        description: "The total count of elements in this paginated resource",
-        type: "integer",
-        minimum: 0,
-        example: 42,
-      },
-    },
-  } as const);
-}
-
-function ListOf<T extends JsonSchema>(item: T) {
-  return schema(_ListOf(item));
-}
-
 const _PetitionSigner = {
   type: "object",
   description: "Information about the signer",
@@ -1698,6 +1626,98 @@ export const _PetitionEvent = {
 } as const;
 
 export const PetitionEvent = schema(_PetitionEvent);
+
+const _Subscription = {
+  title: "Subscription",
+  type: "object",
+  additionalProperties: false,
+  required: ["id", "name", "eventsUrl", "isEnabled", "eventTypes"],
+  properties: {
+    id: {
+      type: "string",
+      description: "ID of the subscription",
+      example: toGlobalId("OrgIntegration", 10),
+    },
+    name: {
+      type: ["string", "null"],
+      description: "Name of the subscription",
+      example: "My subscription",
+    },
+    eventsUrl: {
+      type: "string",
+      description: "URL where we will send POST requests with real-time petition events",
+      example: "https://www.example.com/events",
+    },
+    isEnabled: {
+      type: "boolean",
+      description: "Wether this subscription is currently enabled or not",
+      example: true,
+    },
+    eventTypes: {
+      type: ["array", "null"],
+      description: "The events linked with the subscription. If null, every event will be sent.",
+      example: ["PETITION_COMPLETED", "MESSAGE_SENT"],
+      items: { type: "string" },
+    },
+  },
+} as const;
+export const ListOfSubscriptions = ListOf(_Subscription);
+export const Subscription = schema(_Subscription);
+export const CreateSubscription = schema({
+  title: "CreateSubscription",
+  type: "object",
+  additionalProperties: false,
+  required: ["eventsUrl"],
+  properties: {
+    name: {
+      type: ["string", "null"],
+      description: "Optional name to identify the subscription",
+      example: "My subscription",
+    },
+    eventsUrl: {
+      description: "The URL where you will receive POST requests with real time petition events",
+      type: "string",
+      example: "https://www.example.com/events",
+    },
+    eventTypes: {
+      type: ["array", "null"],
+      description:
+        "The type of events you want to subscribe to. If null, you will be subscribed to all the events.",
+      example: ["PETITION_COMPLETED", "COMMENT_PUBLISHED", "SIGNATURE_STARTED"],
+      items: {
+        type: "string",
+        enum: _PetitionEvent.oneOf.map((e) => e.title.split(" ").join("_").toUpperCase()),
+      },
+    },
+  },
+} as const);
+
+function PaginatedListOf<T extends Exclude<JsonSchema, boolean>>(item: T) {
+  return schema({
+    title: `PaginatedList<${item.title ?? "*missing item title*"}>`,
+    type: "object",
+    description: "Paginated resource",
+    additionalProperties: false,
+    required: ["items", "totalCount"],
+    properties: {
+      items: {
+        description: "The requested slice of items from this paginated resource",
+        type: "array",
+        items: item,
+      },
+      totalCount: {
+        description: "The total count of elements in this paginated resource",
+        type: "integer",
+        minimum: 0,
+        example: 42,
+      },
+    },
+  } as const);
+}
+
+function ListOf<T extends JsonSchema>(item: T) {
+  return schema(_ListOf(item));
+}
 
 export const PetitionCustomProperties = schema({
   type: "object",

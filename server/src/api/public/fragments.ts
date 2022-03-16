@@ -176,6 +176,7 @@ export const PermissionFragment = gql`
 export const SubscriptionFragment = gql`
   fragment Subscription on PetitionEventSubscription {
     id
+    name
     eventsUrl
     isEnabled
     eventTypes
