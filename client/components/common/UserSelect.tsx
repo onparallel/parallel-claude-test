@@ -85,8 +85,10 @@ const queries = [
   `,
 ];
 
-interface UserSelectProps<IsMulti extends boolean = false, IncludeGroups extends boolean = false>
-  extends UseReactSelectProps,
+export interface UserSelectProps<
+  IsMulti extends boolean = false,
+  IncludeGroups extends boolean = false
+> extends UseReactSelectProps,
     Omit<
       AsyncSelectProps<UserSelectSelection<IncludeGroups>, IsMulti, never>,
       "value" | "onChange" | "options"
@@ -201,11 +203,11 @@ function useUserSelectReactSelectProps<IsMulti extends boolean, IncludeGroups ex
 
   const components = useMemo(
     () => ({
-      ...rsProps.components,
       NoOptionsMessage,
       SingleValue,
       MultiValueLabel,
       Option,
+      ...rsProps.components,
     }),
     [rsProps.components]
   );

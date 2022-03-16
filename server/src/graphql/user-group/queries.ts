@@ -1,8 +1,8 @@
-import { userHasAccessToUserGroups } from "./authorizers";
-import { nonNull, queryField } from "nexus";
-import { authenticate, chain } from "../helpers/authorize";
+import { list, nonNull, queryField, stringArg } from "nexus";
+import { authenticate, authenticateAnd, chain, ifArgDefined } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
+import { userHasAccessToUserGroups } from "./authorizers";
 
 export const userGroupsQuery = queryField((t) => {
   t.paginationField("userGroups", {
@@ -38,4 +38,21 @@ export const userGroupsQuery = queryField((t) => {
       return await ctx.userGroups.loadUserGroup(args.id);
     },
   });
+});
+
+export const searchUserGroups = queryField("searchUserGroups", {
+  type: list("UserGroup"),
+  description: "Search user groups",
+  authorize: authenticateAnd(
+    ifArgDefined("excludeUserGroups", userHasAccessToUserGroups("excludeUserGroups" as never))
+  ),
+  args: {
+    search: nonNull(stringArg()),
+    excludeUserGroups: list(nonNull(globalIdArg("UserGroup"))),
+  },
+  resolve: async (_, { search, excludeUserGroups }, ctx) => {
+    return await ctx.userGroups.searchUserGroups(ctx.user!.org_id, search, {
+      excludeUserGroups: excludeUserGroups ?? [],
+    });
+  },
 });

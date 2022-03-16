@@ -45,6 +45,15 @@ export class UserGroupRepository extends BaseRepository {
     (q) => q.whereNull("deleted_at").orderBy("created_at")
   );
 
+  async loadUserGroupsByUserId(userId: number) {
+    const userGroupMembers = await this.from("user_group_member").where({
+      user_id: userId,
+      deleted_at: null,
+    });
+    const userGroupIds = userGroupMembers.map((gm) => gm.user_group_id);
+    return await this.from("user_group").whereIn("id", userGroupIds).select("*");
+  }
+
   async updateUserGroupById(
     id: MaybeArray<number>,
     data: Partial<CreateUserGroup>,
@@ -212,6 +221,28 @@ export class UserGroupRepository extends BaseRepository {
         await this.addUserGroupMemberPermissions(userGroupId, ids, createdBy, t);
       }, t);
     }
+  }
+
+  async searchUserGroups(
+    orgId: number,
+    search: string,
+    opts: {
+      excludeUserGroups: number[];
+    }
+  ) {
+    const userGroups = await this.from("user_group")
+      .where({
+        org_id: orgId,
+        deleted_at: null,
+      })
+      .mmodify((q) => {
+        if (opts.excludeUserGroups.length > 0) {
+          q.whereNotIn("id", opts.excludeUserGroups);
+        }
+      })
+      .whereEscapedILike("name", `%${escapeLike(search, "\\")}%`, "\\")
+      .select<({ __type: "UserGroup" } & UserGroup)[]>("*", this.knex.raw(`'UserGroup' as __type`));
+    return userGroups;
   }
 
   private async addUserGroupMemberPermissions(

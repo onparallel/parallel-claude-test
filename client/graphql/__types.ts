@@ -863,6 +863,7 @@ export interface MutationcreateOrganizationUserArgs {
   lastName: Scalars["String"];
   locale?: InputMaybe<Scalars["String"]>;
   role: OrganizationRole;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]>>;
 }
 
 export interface MutationcreatePetitionArgs {
@@ -1438,6 +1439,7 @@ export interface MutationupdateOrganizationPreferredToneArgs {
 
 export interface MutationupdateOrganizationUserArgs {
   role: OrganizationRole;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]>>;
   userId: Scalars["GID"];
 }
 
@@ -2792,6 +2794,8 @@ export interface Query {
   publicPetitionLinkBySlug?: Maybe<PublicPublicPetitionLink>;
   publicTask: Task;
   publicTemplateCategories: Array<Scalars["String"]>;
+  /** Search user groups */
+  searchUserGroups: Array<UserGroup>;
   /** Search users and user groups */
   searchUsers: Array<UserOrUserGroup>;
   subscriptions: Array<PetitionEventSubscription>;
@@ -2918,6 +2922,11 @@ export interface QuerypublicPetitionLinkBySlugArgs {
 export interface QuerypublicTaskArgs {
   keycode: Scalars["ID"];
   taskId: Scalars["GID"];
+}
+
+export interface QuerysearchUserGroupsArgs {
+  excludeUserGroups?: InputMaybe<Array<Scalars["GID"]>>;
+  search: Scalars["String"];
 }
 
 export interface QuerysearchUsersArgs {
@@ -3421,6 +3430,7 @@ export interface User extends Timestamps {
   unreadNotificationIds: Array<Scalars["ID"]>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
+  userGroups?: Maybe<Array<UserGroup>>;
 }
 
 /** A user in the system. */
@@ -3834,21 +3844,6 @@ export type UserAvatarList_UserGroupFragment = {
   initials: string;
 };
 
-export type UserListPopover_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: string | null;
-  avatarUrl?: string | null;
-  initials?: string | null;
-};
-
-export type UserListPopover_UserGroupFragment = {
-  __typename?: "UserGroup";
-  id: string;
-  name: string;
-  initials: string;
-};
-
 export type UserSelect_UserFragment = {
   __typename?: "User";
   id: string;
@@ -3864,6 +3859,38 @@ export type UserSelect_UserGroupFragment = {
     __typename?: "UserGroupMember";
     user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
   }>;
+};
+
+export type useSearchUserGroups_searchUserGroupsQueryVariables = Exact<{
+  search: Scalars["String"];
+  excludeUserGroups?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+}>;
+
+export type useSearchUserGroups_searchUserGroupsQuery = {
+  searchUserGroups: Array<{
+    __typename?: "UserGroup";
+    id: string;
+    name: string;
+    members: Array<{
+      __typename?: "UserGroupMember";
+      user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+    }>;
+  }>;
+};
+
+export type UserListPopover_UserFragment = {
+  __typename?: "User";
+  id: string;
+  fullName?: string | null;
+  avatarUrl?: string | null;
+  initials?: string | null;
+};
+
+export type UserListPopover_UserGroupFragment = {
+  __typename?: "UserGroup";
+  id: string;
+  name: string;
+  initials: string;
 };
 
 export type UserSelect_canCreateUsersQueryVariables = Exact<{ [key: string]: never }>;
@@ -4960,6 +4987,16 @@ export type OrganizationUsersListTableHeader_UserFragment = {
   __typename?: "User";
   id: string;
   role: OrganizationRole;
+};
+
+export type useCreateOrUpdateUserDialog_UserGroupFragment = {
+  __typename?: "UserGroup";
+  id: string;
+  name: string;
+  members: Array<{
+    __typename?: "UserGroupMember";
+    user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+  }>;
 };
 
 export type CreateUserDialog_emailIsAvailableQueryVariables = Exact<{
@@ -11024,6 +11061,15 @@ export type OrganizationUsers_UserFragment = {
   lastActiveAt?: string | null;
   status: UserStatus;
   isSsoUser: boolean;
+  userGroups?: Array<{
+    __typename?: "UserGroup";
+    id: string;
+    name: string;
+    members: Array<{
+      __typename?: "UserGroupMember";
+      user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+    }>;
+  }> | null;
 };
 
 export type OrganizationUsers_createOrganizationUserMutationVariables = Exact<{
@@ -11032,6 +11078,7 @@ export type OrganizationUsers_createOrganizationUserMutationVariables = Exact<{
   email: Scalars["String"];
   role: OrganizationRole;
   locale?: InputMaybe<Scalars["String"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
 }>;
 
 export type OrganizationUsers_createOrganizationUserMutation = {
@@ -11047,12 +11094,22 @@ export type OrganizationUsers_createOrganizationUserMutation = {
     lastActiveAt?: string | null;
     status: UserStatus;
     isSsoUser: boolean;
+    userGroups?: Array<{
+      __typename?: "UserGroup";
+      id: string;
+      name: string;
+      members: Array<{
+        __typename?: "UserGroupMember";
+        user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+      }>;
+    }> | null;
   };
 };
 
 export type OrganizationUsers_updateOrganizationUserMutationVariables = Exact<{
   userId: Scalars["GID"];
   role: OrganizationRole;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
 }>;
 
 export type OrganizationUsers_updateOrganizationUserMutation = {
@@ -11068,6 +11125,15 @@ export type OrganizationUsers_updateOrganizationUserMutation = {
     lastActiveAt?: string | null;
     status: UserStatus;
     isSsoUser: boolean;
+    userGroups?: Array<{
+      __typename?: "UserGroup";
+      id: string;
+      name: string;
+      members: Array<{
+        __typename?: "UserGroupMember";
+        user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+      }>;
+    }> | null;
   };
 };
 
@@ -11130,6 +11196,15 @@ export type OrganizationUsers_userQuery = {
           lastActiveAt?: string | null;
           status: UserStatus;
           isSsoUser: boolean;
+          userGroups?: Array<{
+            __typename?: "UserGroup";
+            id: string;
+            name: string;
+            members: Array<{
+              __typename?: "UserGroupMember";
+              user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+            }>;
+          }> | null;
         }>;
       };
       usageLimits: {
@@ -19595,6 +19670,25 @@ export const IntegrationsSignature_SignatureOrgIntegrationFragmentDoc = gql`
     environment
   }
 ` as unknown as DocumentNode<IntegrationsSignature_SignatureOrgIntegrationFragment, unknown>;
+export const UserSelect_UserGroupFragmentDoc = gql`
+  fragment UserSelect_UserGroup on UserGroup {
+    id
+    name
+    members {
+      user {
+        ...UserSelect_User
+      }
+    }
+  }
+  ${UserSelect_UserFragmentDoc}
+` as unknown as DocumentNode<UserSelect_UserGroupFragment, unknown>;
+export const useCreateOrUpdateUserDialog_UserGroupFragmentDoc = gql`
+  fragment useCreateOrUpdateUserDialog_UserGroup on UserGroup {
+    id
+    ...UserSelect_UserGroup
+  }
+  ${UserSelect_UserGroupFragmentDoc}
+` as unknown as DocumentNode<useCreateOrUpdateUserDialog_UserGroupFragment, unknown>;
 export const OrganizationUsers_UserFragmentDoc = gql`
   fragment OrganizationUsers_User on User {
     id
@@ -19607,7 +19701,12 @@ export const OrganizationUsers_UserFragmentDoc = gql`
     lastActiveAt
     status
     isSsoUser
+    userGroups {
+      id
+      ...useCreateOrUpdateUserDialog_UserGroup
+    }
   }
+  ${useCreateOrUpdateUserDialog_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<OrganizationUsers_UserFragment, unknown>;
 export const HeaderNameEditable_PetitionBaseFragmentDoc = gql`
   fragment HeaderNameEditable_PetitionBase on PetitionBase {
@@ -20714,18 +20813,6 @@ export const TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragm
   TemplateDefaultUserPermissionRow_TemplateDefaultUserPermissionFragment,
   unknown
 >;
-export const UserSelect_UserGroupFragmentDoc = gql`
-  fragment UserSelect_UserGroup on UserGroup {
-    id
-    name
-    members {
-      user {
-        ...UserSelect_User
-      }
-    }
-  }
-  ${UserSelect_UserFragmentDoc}
-` as unknown as DocumentNode<UserSelect_UserGroupFragment, unknown>;
 export const TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragmentDoc =
   gql`
     fragment TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermission on TemplateDefaultUserGroupPermission {
@@ -22226,6 +22313,17 @@ export const PetitionTagListCellContent_createTagDocument = gql`
 ` as unknown as DocumentNode<
   PetitionTagListCellContent_createTagMutation,
   PetitionTagListCellContent_createTagMutationVariables
+>;
+export const useSearchUserGroups_searchUserGroupsDocument = gql`
+  query useSearchUserGroups_searchUserGroups($search: String!, $excludeUserGroups: [GID!]) {
+    searchUserGroups(search: $search, excludeUserGroups: $excludeUserGroups) {
+      ...UserSelect_UserGroup
+    }
+  }
+  ${UserSelect_UserGroupFragmentDoc}
+` as unknown as DocumentNode<
+  useSearchUserGroups_searchUserGroupsQuery,
+  useSearchUserGroups_searchUserGroupsQueryVariables
 >;
 export const UserSelect_canCreateUsersDocument = gql`
   query UserSelect_canCreateUsers {
@@ -23905,6 +24003,7 @@ export const OrganizationUsers_createOrganizationUserDocument = gql`
     $email: String!
     $role: OrganizationRole!
     $locale: String
+    $userGroupIds: [GID!]
   ) {
     createOrganizationUser(
       email: $email
@@ -23912,6 +24011,7 @@ export const OrganizationUsers_createOrganizationUserDocument = gql`
       lastName: $lastName
       role: $role
       locale: $locale
+      userGroupIds: $userGroupIds
     ) {
       ...OrganizationUsers_User
     }
@@ -23922,8 +24022,12 @@ export const OrganizationUsers_createOrganizationUserDocument = gql`
   OrganizationUsers_createOrganizationUserMutationVariables
 >;
 export const OrganizationUsers_updateOrganizationUserDocument = gql`
-  mutation OrganizationUsers_updateOrganizationUser($userId: GID!, $role: OrganizationRole!) {
-    updateOrganizationUser(userId: $userId, role: $role) {
+  mutation OrganizationUsers_updateOrganizationUser(
+    $userId: GID!
+    $role: OrganizationRole!
+    $userGroupIds: [GID!]
+  ) {
+    updateOrganizationUser(userId: $userId, role: $role, userGroupIds: $userGroupIds) {
       ...OrganizationUsers_User
     }
   }

@@ -632,6 +632,7 @@ type Mutation {
     lastName: String!
     locale: String
     role: OrganizationRole!
+    userGroupIds: [GID!]
   ): User!
 
   """
@@ -1439,7 +1440,7 @@ type Mutation {
   """
   Updates the role of another user in the organization.
   """
-  updateOrganizationUser(role: OrganizationRole!, userId: GID!): User!
+  updateOrganizationUser(role: OrganizationRole!, userGroupIds: [GID!], userId: GID!): User!
 
   """
   Updates the user limit for a organization
@@ -3845,6 +3846,11 @@ type Query {
   publicTemplateCategories: [String!]!
 
   """
+  Search user groups
+  """
+  searchUserGroups(excludeUserGroups: [GID!], search: String!): [UserGroup!]!
+
+  """
   Search users and user groups
   """
   searchUsers(
@@ -4595,6 +4601,7 @@ type User implements Timestamps {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+  userGroups: [UserGroup!]
 }
 
 type UserAuthenticationToken implements CreatedAt {

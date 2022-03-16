@@ -5,6 +5,7 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
+  HStack,
   Input,
   InputGroup,
   InputRightElement,
@@ -14,6 +15,8 @@ import {
 import { CheckIcon, CloseIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { UserGroupSelect, useSearchUserGroups } from "@parallel/components/common/UserGroupSelect";
+import { UserSelect, UserSelectSelection } from "@parallel/components/common/UserSelect";
 import {
   CreateUserDialog_emailIsAvailableDocument,
   OrganizationRole,
@@ -23,8 +26,8 @@ import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterW
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
-import { useRef } from "react";
-import { useForm } from "react-hook-form";
+import { useCallback, useRef } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
 interface CreateOrUpdateUserDialogData {
@@ -32,6 +35,7 @@ interface CreateOrUpdateUserDialogData {
   lastName: string;
   email: string;
   role: OrganizationRole;
+  userGroups: UserSelectSelection<true>[];
 }
 
 function CreateOrUpdateUserDialog({
@@ -41,13 +45,14 @@ function CreateOrUpdateUserDialog({
   CreateOrUpdateUserDialogData
 >) {
   const intl = useIntl();
-  const { handleSubmit, register, formState } = useForm<CreateOrUpdateUserDialogData>({
+  const { handleSubmit, register, formState, control } = useForm<CreateOrUpdateUserDialogData>({
     mode: "onChange",
     defaultValues: {
       firstName: props.user?.firstName ?? undefined,
       lastName: props.user?.lastName ?? undefined,
       email: props.user?.email ?? "",
       role: props.user?.role ?? "NORMAL",
+      userGroups: props.user?.userGroups ?? [],
     },
   });
 
@@ -65,6 +70,18 @@ function CreateOrUpdateUserDialog({
     },
     300,
     []
+  );
+
+  const groupsToExclude = [] as string[];
+
+  const _handleSearchUserGroups = useSearchUserGroups();
+  const handleSearchUserGroups = useCallback(
+    async (search: string, excludeUserGroups: string[]) => {
+      return await _handleSearchUserGroups(search, {
+        excludeUserGroups: [...excludeUserGroups, ...groupsToExclude],
+      });
+    },
+    [_handleSearchUserGroups, groupsToExclude.join(",")]
   );
 
   const roles = useOrganizationRoles();
@@ -153,38 +170,43 @@ function CreateOrUpdateUserDialog({
               </FormErrorMessage>
             ) : null}
           </FormControl>
-          <FormControl
-            id="create-user-firstname"
-            isInvalid={!!errors.firstName}
-            isDisabled={props.type === "update"}
-          >
-            <FormLabel>
-              <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
-            </FormLabel>
-            <Input {...register("firstName", { required: true })} />
-            <FormErrorMessage>
-              <FormattedMessage
-                id="generic.forms.invalid-first-name-error"
-                defaultMessage="Please, enter the first name"
-              />
-            </FormErrorMessage>
-          </FormControl>
-          <FormControl
-            id="create-user-lastname"
-            isInvalid={!!errors.lastName}
-            isDisabled={props.type === "update"}
-          >
-            <FormLabel>
-              <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
-            </FormLabel>
-            <Input {...register("lastName", { required: true })} />
-            <FormErrorMessage>
-              <FormattedMessage
-                id="generic.forms.invalid-last-name-error"
-                defaultMessage="Please, enter the last name"
-              />
-            </FormErrorMessage>
-          </FormControl>
+          <HStack alignItems="flex-start" gridGap={4} spacing={0} flexWrap="wrap">
+            <FormControl
+              id="create-user-firstname"
+              isInvalid={!!errors.firstName}
+              isDisabled={props.type === "update"}
+              flex="1"
+            >
+              <FormLabel>
+                <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
+              </FormLabel>
+              <Input {...register("firstName", { required: true })} />
+              <FormErrorMessage>
+                <FormattedMessage
+                  id="generic.forms.invalid-first-name-error"
+                  defaultMessage="Please, enter the first name"
+                />
+              </FormErrorMessage>
+            </FormControl>
+            <FormControl
+              id="create-user-lastname"
+              isInvalid={!!errors.lastName}
+              isDisabled={props.type === "update"}
+              flex="1"
+            >
+              <FormLabel>
+                <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
+              </FormLabel>
+              <Input {...register("lastName", { required: true })} />
+              <FormErrorMessage>
+                <FormattedMessage
+                  id="generic.forms.invalid-last-name-error"
+                  defaultMessage="Please, enter the last name"
+                />
+              </FormErrorMessage>
+            </FormControl>
+          </HStack>
+
           <FormControl id="create-user-role" isInvalid={!!errors.role}>
             <FormLabel>
               <FormattedMessage
@@ -202,6 +224,46 @@ function CreateOrUpdateUserDialog({
                 ))}
             </Select>
           </FormControl>
+          <FormControl id="selection">
+            <FormLabel>
+              {props.type === "update" ? (
+                <FormattedMessage
+                  id="organization-users.invite-user.member-in"
+                  defaultMessage="Member in (optional)"
+                />
+              ) : (
+                <FormattedMessage
+                  id="organization-users.invite-user.add-as-member-in"
+                  defaultMessage="Add as a member in (optional)"
+                />
+              )}
+            </FormLabel>
+            <Controller
+              name="userGroups"
+              control={control}
+              rules={{ minLength: 1 }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <UserGroupSelect
+                  isMulti
+                  value={value}
+                  onKeyDown={(e: KeyboardEvent) => {
+                    if (e.key === "Enter" && !(e.target as HTMLInputElement).value) {
+                      e.preventDefault();
+                    }
+                  }}
+                  onChange={(userGroups: any) => {
+                    onChange(userGroups);
+                  }}
+                  onBlur={onBlur}
+                  onSearch={handleSearchUserGroups}
+                  placeholder={intl.formatMessage({
+                    id: "generic.select-teams-placeholder",
+                    defaultMessage: "Select teams from your organization",
+                  })}
+                />
+              )}
+            />
+          </FormControl>
         </Stack>
       }
       confirm={
@@ -217,6 +279,18 @@ function CreateOrUpdateUserDialog({
     />
   );
 }
+
+useCreateOrUpdateUserDialog.fragments = {
+  get UserGroup() {
+    return gql`
+      fragment useCreateOrUpdateUserDialog_UserGroup on UserGroup {
+        id
+        ...UserSelect_UserGroup
+      }
+      ${UserSelect.fragments.UserGroup}
+    `;
+  },
+};
 
 CreateOrUpdateUserDialog.queries = [
   gql`

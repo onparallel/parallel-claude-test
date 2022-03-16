@@ -10,7 +10,7 @@ import {
   stringArg,
 } from "nexus";
 import pMap from "p-map";
-import { isDefined, zip } from "remeda";
+import { difference, isDefined, zip } from "remeda";
 import { RESULT } from "..";
 import { PublicFileUpload } from "../../db/__types";
 import { partition } from "../../util/arrays";
@@ -44,6 +44,7 @@ import { validLocale } from "../helpers/validators/validLocale";
 import { validPassword } from "../helpers/validators/validPassword";
 import { orgCanCreateNewUser, orgDoesNotHaveSsoProvider } from "../organization/authorizers";
 import { argUserHasActiveStatus, userHasAccessToUsers } from "../petition/mutations/authorizers";
+import { userHasAccessToUserGroups } from "../user-group/authorizers";
 import {
   contextUserHasRole,
   contextUserIsNotSso,
@@ -149,7 +150,8 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
   authorize: authenticateAnd(
     contextUserHasRole("ADMIN"),
     orgDoesNotHaveSsoProvider(),
-    orgCanCreateNewUser()
+    orgCanCreateNewUser(),
+    ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never))
   ),
   args: {
     email: nonNull(stringArg()),
@@ -157,6 +159,7 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
     lastName: nonNull(stringArg()),
     role: nonNull(arg({ type: "OrganizationRole" })),
     locale: stringArg(),
+    userGroupIds: list(nonNull(globalIdArg("UserGroup"))),
   },
   validateArgs: validateAnd(
     validLocale((args) => args.locale, "locale"),
@@ -207,6 +210,13 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
         },
       }),
     ]);
+
+    if (args.userGroupIds) {
+      await pMap(args.userGroupIds, (userGroupId) =>
+        ctx.userGroups.addUsersToGroup(userGroupId, user.id, `User:${ctx.user!.id}`)
+      );
+    }
+
     return user;
   },
 });
@@ -355,11 +365,13 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
   authorize: authenticateAnd(
     contextUserHasRole("ADMIN"),
     userIsNotContextUser("userId"),
-    userHasAccessToUsers("userId")
+    userHasAccessToUsers("userId"),
+    ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never))
   ),
   args: {
     userId: nonNull(globalIdArg("User")),
     role: nonNull("OrganizationRole"),
+    userGroupIds: list(nonNull(globalIdArg("UserGroup"))),
   },
   validateArgs: async (_, { role, userId }, ctx, info) => {
     const user = (await ctx.users.loadUser(userId))!;
@@ -370,14 +382,36 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
       throw new ArgValidationError(info, "role", "'Can't update the role of an OWNER");
     }
   },
-  resolve: async (_, { userId, role }, ctx) => {
-    const [user] = await ctx.users.updateUserById(
-      userId,
-      { organization_role: role },
-      `User:${ctx.user!.id}`
-    );
+  resolve: async (_, { userId, role, userGroupIds }, ctx) => {
+    return await ctx.petitions.withTransaction(async (t) => {
+      const [user] = await ctx.users.updateUserById(
+        userId,
+        { organization_role: role },
+        `User:${ctx.user!.id}`,
+        t
+      );
 
-    return user;
+      if (userGroupIds) {
+        const userGroups = await ctx.userGroups.loadUserGroupsByUserId(userId);
+        const actualUserGroupsIds = userGroups.map((userGroup) => userGroup.id);
+
+        const userGroupsIdsToDelete = difference(actualUserGroupsIds, userGroupIds);
+        const userGroupsIdsToAdd = difference(userGroupIds, actualUserGroupsIds);
+
+        await pMap(userGroupsIdsToAdd, (userGroupId) =>
+          ctx.userGroups.addUsersToGroup(userGroupId, userId, `User:${ctx.user!.id}`, t)
+        );
+
+        await ctx.userGroups.removeUsersFromGroups(
+          [userId],
+          userGroupsIdsToDelete,
+          `User:${ctx.user!.id}`,
+          t
+        );
+      }
+
+      return user;
+    });
   },
 });
 

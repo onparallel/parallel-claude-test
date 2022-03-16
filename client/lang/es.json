@@ -3440,6 +3440,16 @@
     "context": "Save preferences"
   },
   {
+    "term": "component.user-group-select.no-options",
+    "definition": "No se han encontrado equipos",
+    "context": "No teams have been found"
+  },
+  {
+    "term": "component.user-group-select.search-hint-teams",
+    "definition": "Busca equipos existentes",
+    "context": "Search for existing teams"
+  },
+  {
     "term": "component.user-menu.log-out",
     "definition": "Cerrar sesión",
     "context": "Log out"
@@ -4555,6 +4565,11 @@
     "context": "Select an option"
   },
   {
+    "term": "generic.select-teams-placeholder",
+    "definition": "Selecciona equipos de tu organización",
+    "context": "Select teams from your organization"
+  },
+  {
     "term": "generic.send",
     "definition": "Enviar",
     "context": "Send"
@@ -4893,6 +4908,16 @@
     "term": "organization-users.invite-user",
     "definition": "Invitar usuario",
     "context": "Invite user"
+  },
+  {
+    "term": "organization-users.invite-user.add-as-member-in",
+    "definition": "Añadir como miembro en (opcional)",
+    "context": "Add as a member in (optional)"
+  },
+  {
+    "term": "organization-users.invite-user.member-in",
+    "definition": "Miembro en (opcional)",
+    "context": "Member in (optional)"
   },
   {
     "term": "organization-users.max-limit-reached",

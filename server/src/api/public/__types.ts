@@ -832,6 +832,7 @@ export type MutationcreateOrganizationUserArgs = {
   lastName: Scalars["String"];
   locale?: InputMaybe<Scalars["String"]>;
   role: OrganizationRole;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]>>;
 };
 
 export type MutationcreatePetitionArgs = {
@@ -1407,6 +1408,7 @@ export type MutationupdateOrganizationPreferredToneArgs = {
 
 export type MutationupdateOrganizationUserArgs = {
   role: OrganizationRole;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]>>;
   userId: Scalars["GID"];
 };
 
@@ -2704,6 +2706,8 @@ export type Query = {
   publicPetitionLinkBySlug: Maybe<PublicPublicPetitionLink>;
   publicTask: Task;
   publicTemplateCategories: Array<Scalars["String"]>;
+  /** Search user groups */
+  searchUserGroups: Array<UserGroup>;
   /** Search users and user groups */
   searchUsers: Array<UserOrUserGroup>;
   subscriptions: Array<PetitionEventSubscription>;
@@ -2830,6 +2834,11 @@ export type QuerypublicPetitionLinkBySlugArgs = {
 export type QuerypublicTaskArgs = {
   keycode: Scalars["ID"];
   taskId: Scalars["GID"];
+};
+
+export type QuerysearchUserGroupsArgs = {
+  excludeUserGroups?: InputMaybe<Array<Scalars["GID"]>>;
+  search: Scalars["String"];
 };
 
 export type QuerysearchUsersArgs = {
@@ -3307,6 +3316,7 @@ export type User = Timestamps & {
   unreadNotificationIds: Array<Scalars["ID"]>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
+  userGroups: Maybe<Array<UserGroup>>;
 };
 
 /** A user in the system. */

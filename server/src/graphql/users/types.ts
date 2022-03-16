@@ -159,6 +159,12 @@ export const User = objectType({
     t.nullable.string("preferredLocale", {
       resolve: (root) => root.details?.preferredLocale ?? null,
     });
+    t.nullable.list.field("userGroups", {
+      type: "UserGroup",
+      resolve: async (root, _, ctx) => {
+        return await ctx.userGroups.loadUserGroupsByUserId(root.id);
+      },
+    });
   },
 });
 

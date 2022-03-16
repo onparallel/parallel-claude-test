@@ -120,9 +120,19 @@ function OrganizationUsers() {
   const showCreateOrUpdateUserDialog = useCreateOrUpdateUserDialog();
   const handleCreateUser = async () => {
     try {
-      const newUser = await showCreateOrUpdateUserDialog({ type: "create" });
+      const { firstName, lastName, email, role, userGroups } = await showCreateOrUpdateUserDialog({
+        type: "create",
+      });
+
       await createOrganizationUser({
-        variables: { ...newUser, locale: intl.locale },
+        variables: {
+          firstName,
+          lastName,
+          email,
+          role,
+          userGroupIds: userGroups.map((userGroup) => userGroup.id),
+          locale: intl.locale,
+        },
         update: () => {
           refetch();
         },
@@ -138,7 +148,7 @@ function OrganizationUsers() {
             defaultMessage:
               "We have sent an email to {email} with instructions to register in Parallel.",
           },
-          { email: newUser.email }
+          { email }
         ),
         status: "success",
         duration: 5000,
@@ -157,18 +167,23 @@ function OrganizationUsers() {
   const [updateOrganizationUser] = useMutation(OrganizationUsers_updateOrganizationUserDocument);
   const handleUpdateUser = async (user: OrganizationUsers_UserFragment) => {
     try {
-      const { role } = await showCreateOrUpdateUserDialog({
+      const { role, userGroups } = await showCreateOrUpdateUserDialog({
         type: "update",
         user: {
           email: user.email,
           firstName: user.firstName ?? undefined,
           lastName: user.lastName ?? undefined,
           role: user.role,
+          userGroups: (user.userGroups as UserSelectSelection<true>[]) ?? [],
         },
       });
 
       await updateOrganizationUser({
-        variables: { userId: user.id, role },
+        variables: {
+          userId: user.id,
+          role,
+          userGroupIds: userGroups.map((userGroup) => userGroup.id),
+        },
       });
       toast({
         title: intl.formatMessage({
@@ -431,7 +446,12 @@ OrganizationUsers.fragments = {
         lastActiveAt
         status
         isSsoUser
+        userGroups {
+          id
+          ...useCreateOrUpdateUserDialog_UserGroup
+        }
       }
+      ${useCreateOrUpdateUserDialog.fragments.UserGroup}
     `;
   },
 };
@@ -444,6 +464,7 @@ OrganizationUsers.mutations = [
       $email: String!
       $role: OrganizationRole!
       $locale: String
+      $userGroupIds: [GID!]
     ) {
       createOrganizationUser(
         email: $email
@@ -451,6 +472,7 @@ OrganizationUsers.mutations = [
         lastName: $lastName
         role: $role
         locale: $locale
+        userGroupIds: $userGroupIds
       ) {
         ...OrganizationUsers_User
       }
@@ -458,8 +480,12 @@ OrganizationUsers.mutations = [
     ${OrganizationUsers.fragments.User}
   `,
   gql`
-    mutation OrganizationUsers_updateOrganizationUser($userId: GID!, $role: OrganizationRole!) {
-      updateOrganizationUser(userId: $userId, role: $role) {
+    mutation OrganizationUsers_updateOrganizationUser(
+      $userId: GID!
+      $role: OrganizationRole!
+      $userGroupIds: [GID!]
+    ) {
+      updateOrganizationUser(userId: $userId, role: $role, userGroupIds: $userGroupIds) {
         ...OrganizationUsers_User
       }
     }

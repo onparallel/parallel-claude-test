@@ -1591,6 +1591,7 @@ export interface NexusGenFieldTypes {
     publicPetitionLinkBySlug: NexusGenRootTypes["PublicPublicPetitionLink"] | null; // PublicPublicPetitionLink
     publicTask: NexusGenRootTypes["Task"]; // Task!
     publicTemplateCategories: string[]; // [String!]!
+    searchUserGroups: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     searchUsers: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
     subscriptions: NexusGenRootTypes["PetitionEventSubscription"][]; // [PetitionEventSubscription!]!
     tags: NexusGenRootTypes["TagPagination"]; // TagPagination!
@@ -1832,6 +1833,7 @@ export interface NexusGenFieldTypes {
     tokens: NexusGenRootTypes["UserAuthenticationToken"][]; // [UserAuthenticationToken!]!
     unreadNotificationIds: string[]; // [ID!]!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+    userGroups: NexusGenRootTypes["UserGroup"][] | null; // [UserGroup!]
   };
   UserAuthenticationToken: {
     // field return type
@@ -2934,6 +2936,7 @@ export interface NexusGenFieldTypeNames {
     publicPetitionLinkBySlug: "PublicPublicPetitionLink";
     publicTask: "Task";
     publicTemplateCategories: "String";
+    searchUserGroups: "UserGroup";
     searchUsers: "UserOrUserGroup";
     subscriptions: "PetitionEventSubscription";
     tags: "TagPagination";
@@ -3175,6 +3178,7 @@ export interface NexusGenFieldTypeNames {
     tokens: "UserAuthenticationToken";
     unreadNotificationIds: "ID";
     updatedAt: "DateTime";
+    userGroups: "UserGroup";
   };
   UserAuthenticationToken: {
     // field return type name
@@ -3497,6 +3501,7 @@ export interface NexusGenArgTypes {
       lastName: string; // String!
       locale?: string | null; // String
       role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
+      userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
     };
     createPetition: {
       // args
@@ -4072,6 +4077,7 @@ export interface NexusGenArgTypes {
     updateOrganizationUser: {
       // args
       role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
+      userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
       userId: NexusGenScalars["GID"]; // GID!
     };
     updateOrganizationUserLimit: {
@@ -4352,6 +4358,11 @@ export interface NexusGenArgTypes {
       // args
       keycode: string; // ID!
       taskId: NexusGenScalars["GID"]; // GID!
+    };
+    searchUserGroups: {
+      // args
+      excludeUserGroups?: NexusGenScalars["GID"][] | null; // [GID!]
+      search: string; // String!
     };
     searchUsers: {
       // args
