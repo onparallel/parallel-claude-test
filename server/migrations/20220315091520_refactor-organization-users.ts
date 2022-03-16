@@ -99,6 +99,8 @@ export async function down(knex: Knex): Promise<void> {
       avatar_public_file_id = ud.avatar_public_file_id,
       details = ud.details
     from "user_data" ud where u.user_data_id = ud.id; 
+
+    update "user" set onboarding_status = '{}'::jsonb where onboarding_status is null;
   `);
 
   await knex.schema.alterTable("user", (t) => {
@@ -107,7 +109,7 @@ export async function down(knex: Knex): Promise<void> {
     t.string("cognito_id").notNullable().alter();
     t.string("email").notNullable().alter();
     t.boolean("is_sso_user").notNullable().defaultTo(false).alter();
-    t.jsonb("onboarding_status").notNullable().defaultTo(knex.raw("'{}'::jsonb")).alter();
+    t.jsonb("onboarding_status").notNullable().alter();
   });
 
   await knex.raw(/* sql */ `
