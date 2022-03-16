@@ -1,6 +1,9 @@
+import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
+import { groupBy, omit } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
+import { fromDataLoader } from "../../util/fromDataLoader";
 import { MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { escapeLike, SortBy } from "../helpers/utils";
@@ -45,14 +48,22 @@ export class UserGroupRepository extends BaseRepository {
     (q) => q.whereNull("deleted_at").orderBy("created_at")
   );
 
-  async loadUserGroupsByUserId(userId: number) {
-    const userGroupMembers = await this.from("user_group_member").where({
-      user_id: userId,
-      deleted_at: null,
-    });
-    const userGroupIds = userGroupMembers.map((gm) => gm.user_group_id);
-    return await this.from("user_group").whereIn("id", userGroupIds).select("*");
-  }
+  readonly loadUserGroupsByUserId = fromDataLoader(
+    new DataLoader<number, UserGroup[]>(async (userIds) => {
+      const userGroups = await this.raw<UserGroup & { user_id: number }>(
+        /* sql */ `
+        select ug.*, ugm.user_id from "user_group" ug join "user_group_member" ugm on ugm.user_group_id = ug.id 
+        where ug.deleted_at is null and ugm.deleted_at is null and ugm.user_id in (${userIds
+          .map(() => "?")
+          .join(",")})
+      `,
+        userIds
+      );
+
+      const byUserId = groupBy(userGroups, (ug) => ug.user_id);
+      return userIds.map((id) => byUserId[id]?.map((g) => omit(g, ["user_id"])) ?? []);
+    })
+  );
 
   async updateUserGroupById(
     id: MaybeArray<number>,

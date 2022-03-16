@@ -215,6 +215,8 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
       await pMap(args.userGroupIds, (userGroupId) =>
         ctx.userGroups.addUsersToGroup(userGroupId, user.id, `User:${ctx.user!.id}`)
       );
+
+      ctx.userGroups.loadUserGroupsByUserId.dataloader.clear(user.id);
     }
 
     return user;
@@ -408,6 +410,8 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
           `User:${ctx.user!.id}`,
           t
         );
+
+        ctx.userGroups.loadUserGroupsByUserId.dataloader.clear(userId);
       }
 
       return user;
