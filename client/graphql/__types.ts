@@ -822,6 +822,7 @@ export interface MutationcreateDynamicSelectReplyArgs {
 export interface MutationcreateEventSubscriptionArgs {
   eventTypes?: InputMaybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"];
+  name?: InputMaybe<Scalars["String"]>;
 }
 
 export interface MutationcreateExportRepliesTaskArgs {
@@ -2002,6 +2003,7 @@ export interface PetitionEventSubscription {
   eventsUrl: Scalars["String"];
   id: Scalars["GID"];
   isEnabled: Scalars["Boolean"];
+  name?: Maybe<Scalars["String"]>;
 }
 
 export type PetitionEventType =
@@ -9802,6 +9804,7 @@ export type CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragm
   __typename?: "PetitionEventSubscription";
   eventsUrl: string;
   eventTypes?: Array<PetitionEventType> | null;
+  name?: string | null;
 };
 
 export type GenerateNewTokenDialog_generateUserAuthTokenMutationVariables = Exact<{
@@ -16950,6 +16953,7 @@ export type Developers_PetitionEventSubscriptionFragment = {
   eventsUrl: string;
   eventTypes?: Array<PetitionEventType> | null;
   isEnabled: boolean;
+  name?: string | null;
 };
 
 export type Developers_revokeUserAuthTokenMutationVariables = Exact<{
@@ -16961,6 +16965,7 @@ export type Developers_revokeUserAuthTokenMutation = { revokeUserAuthToken: Resu
 export type Developers_createEventSubscriptionMutationVariables = Exact<{
   eventsUrl: Scalars["String"];
   eventTypes?: InputMaybe<Array<PetitionEventType> | PetitionEventType>;
+  name?: InputMaybe<Scalars["String"]>;
 }>;
 
 export type Developers_createEventSubscriptionMutation = {
@@ -16970,6 +16975,7 @@ export type Developers_createEventSubscriptionMutation = {
     eventsUrl: string;
     eventTypes?: Array<PetitionEventType> | null;
     isEnabled: boolean;
+    name?: string | null;
   };
 };
 
@@ -16985,6 +16991,7 @@ export type Developers_updateEventSubscriptionMutation = {
     eventsUrl: string;
     eventTypes?: Array<PetitionEventType> | null;
     isEnabled: boolean;
+    name?: string | null;
   };
 };
 
@@ -17019,6 +17026,7 @@ export type Developers_subscriptionsQuery = {
     eventsUrl: string;
     eventTypes?: Array<PetitionEventType> | null;
     isEnabled: boolean;
+    name?: string | null;
   }>;
 };
 
@@ -21702,6 +21710,7 @@ export const CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFrag
   fragment CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscription on PetitionEventSubscription {
     eventsUrl
     eventTypes
+    name
   }
 ` as unknown as DocumentNode<
   CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragment,
@@ -21713,6 +21722,7 @@ export const Developers_PetitionEventSubscriptionFragmentDoc = gql`
     eventsUrl
     eventTypes
     isEnabled
+    name
     ...CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscription
   }
   ${CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragmentDoc}
@@ -24533,8 +24543,9 @@ export const Developers_createEventSubscriptionDocument = gql`
   mutation Developers_createEventSubscription(
     $eventsUrl: String!
     $eventTypes: [PetitionEventType!]
+    $name: String
   ) {
-    createEventSubscription(eventsUrl: $eventsUrl, eventTypes: $eventTypes) {
+    createEventSubscription(eventsUrl: $eventsUrl, eventTypes: $eventTypes, name: $name) {
       ...Developers_PetitionEventSubscription
     }
   }

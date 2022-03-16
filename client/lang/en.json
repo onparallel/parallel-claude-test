@@ -571,8 +571,8 @@
   },
   {
     "term": "component.create-or-edit-event-subscription-dialog.explanation",
-    "definition": "Events URL where you want to be notified.",
-    "context": "Events URL where you want to be notified."
+    "definition": "Events URL where you want to be notified",
+    "context": "Events URL where you want to be notified"
   },
   {
     "term": "component.create-or-edit-event-subscription-dialog.failed-challenge",
@@ -583,6 +583,11 @@
     "term": "component.create-or-edit-event-subscription-dialog.invalid-url",
     "definition": "Please, provide a valid URL.",
     "context": "Please, provide a valid URL."
+  },
+  {
+    "term": "component.create-or-edit-event-subscription-dialog.name",
+    "definition": "Subscription name",
+    "context": "Subscription name"
   },
   {
     "term": "component.create-or-edit-event-subscription-dialog.specific-events",
@@ -3033,11 +3038,6 @@
     "term": "component.settings-public-link-dialog.page-title-label",
     "definition": "Title of the page",
     "context": "Title of the page"
-  },
-  {
-    "term": "component.settings-public-link-dialog.page-title-placeholder",
-    "definition": "Include the title your recipients will see",
-    "context": "Include the title your recipients will see"
   },
   {
     "term": "component.settings-public-link-dialog.title",
@@ -8795,9 +8795,19 @@
     "context": "Enabled"
   },
   {
+    "term": "settings.developers.subscriptions.header.name",
+    "definition": "Name",
+    "context": "Name"
+  },
+  {
     "term": "settings.developers.subscriptions.n-events",
     "definition": "{count} events",
     "context": "{count} events"
+  },
+  {
+    "term": "settings.developers.subscriptions.unnamed-subscription",
+    "definition": "Unnamed subscription",
+    "context": "Unnamed subscription"
   },
   {
     "term": "settings.security",

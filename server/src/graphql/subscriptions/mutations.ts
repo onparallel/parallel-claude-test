@@ -1,4 +1,4 @@
-import { inputObjectType, list, mutationField, nonNull } from "nexus";
+import { inputObjectType, list, mutationField, nonNull, stringArg } from "nexus";
 import { isDefined } from "remeda";
 import { RESULT } from "..";
 import { PetitionEventSubscription } from "../../db/__types";
@@ -26,6 +26,7 @@ export const createEventSubscription = mutationField("createEventSubscription", 
   args: {
     eventsUrl: nonNull("String"),
     eventTypes: list(nonNull("PetitionEventType")),
+    name: stringArg(),
   },
   validateArgs: validUrl((args) => args.eventsUrl, "eventsUrl"),
   resolve: async (_, args, ctx) => {
@@ -38,6 +39,7 @@ export const createEventSubscription = mutationField("createEventSubscription", 
     }
     return await ctx.subscriptions.createSubscription(
       {
+        name: args.name?.trim() || null,
         user_id: ctx.user!.id,
         is_enabled: true,
         endpoint: args.eventsUrl,

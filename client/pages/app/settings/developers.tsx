@@ -380,12 +380,30 @@ function useSubscriptionsColumns(): TableColumn<
   return useMemo(
     () => [
       {
+        key: "name",
+        header: intl.formatMessage({
+          id: "settings.developers.subscriptions.header.name",
+          defaultMessage: "Name",
+        }),
+        CellContent: ({ row }) => (
+          <Text textStyle={row.name ? undefined : "hint"}>
+            {row.name ?? (
+              <FormattedMessage
+                id="settings.developers.subscriptions.unnamed-subscription"
+                defaultMessage="Unnamed subscription"
+              />
+            )}
+          </Text>
+        ),
+      },
+      {
         key: "eventsUrl",
         header: intl.formatMessage({
           id: "settings.developers.subscriptions.header.events-url",
           defaultMessage: "Events URL",
         }),
         cellProps: {
+          width: "50%",
           userSelect: "auto",
           fontSize: "sm",
           paddingY: 0,
@@ -492,6 +510,7 @@ Developers.fragments = {
       eventsUrl
       eventTypes
       isEnabled
+      name
       ...CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscription
     }
     ${CreateOrUpdateEventSubscriptionDialog.fragments.PetitionEventSubscription}
@@ -508,8 +527,9 @@ Developers.mutations = [
     mutation Developers_createEventSubscription(
       $eventsUrl: String!
       $eventTypes: [PetitionEventType!]
+      $name: String
     ) {
-      createEventSubscription(eventsUrl: $eventsUrl, eventTypes: $eventTypes) {
+      createEventSubscription(eventsUrl: $eventsUrl, eventTypes: $eventTypes, name: $name) {
         ...Developers_PetitionEventSubscription
       }
     }

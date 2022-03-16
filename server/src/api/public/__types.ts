@@ -791,6 +791,7 @@ export type MutationcreateDynamicSelectReplyArgs = {
 export type MutationcreateEventSubscriptionArgs = {
   eventTypes?: InputMaybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"];
+  name?: InputMaybe<Scalars["String"]>;
 };
 
 export type MutationcreateExportRepliesTaskArgs = {
@@ -1948,6 +1949,7 @@ export type PetitionEventSubscription = {
   eventsUrl: Scalars["String"];
   id: Scalars["GID"];
   isEnabled: Scalars["Boolean"];
+  name: Maybe<Scalars["String"]>;
 };
 
 export type PetitionEventType =

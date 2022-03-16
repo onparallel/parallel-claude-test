@@ -91,9 +91,10 @@ describe("GraphQL/PetitionEventSubscription", () => {
       const spy = jest.spyOn(fetch, "fetchWithTimeout");
       const { data, errors } = await testClient.mutate({
         mutation: gql`
-          mutation ($eventsUrl: String!) {
-            createEventSubscription(eventsUrl: $eventsUrl) {
+          mutation ($eventsUrl: String!, $name: String) {
+            createEventSubscription(eventsUrl: $eventsUrl, name: $name) {
               id
+              name
               eventsUrl
               isEnabled
             }
@@ -101,11 +102,13 @@ describe("GraphQL/PetitionEventSubscription", () => {
         `,
         variables: {
           eventsUrl: "https://www.example.com/api",
+          name: "example",
         },
       });
       expect(errors).toBeUndefined();
       expect(data?.createEventSubscription).toMatchObject({
         isEnabled: true,
+        name: "example",
         eventsUrl: "https://www.example.com/api",
       });
       subscriptionId = data!.createEventSubscription.id;

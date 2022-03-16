@@ -20,7 +20,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
-import { MaybePromise } from "@parallel/utils/types";
+import { Maybe, MaybePromise } from "@parallel/utils/types";
 import { useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -32,6 +32,7 @@ interface CreateOrUpdateEventSubscriptionDialogProps {
   onCreateEventSubscription?: (props: {
     eventsUrl: string;
     eventTypes: PetitionEventType[] | null;
+    name: string | null;
   }) => MaybePromise<void>;
   onUpdateEventSubscription?: (props: {
     eventsUrl: string;
@@ -40,6 +41,7 @@ interface CreateOrUpdateEventSubscriptionDialogProps {
 }
 
 interface CreateOrUpdateEventSubscriptionDialogFormData {
+  name: Maybe<string>;
   eventsUrl: string;
   eventsMode: "ALL" | "SPECIFIC";
   eventTypes: OptionTypeBase[];
@@ -54,13 +56,14 @@ export function CreateOrUpdateEventSubscriptionDialog(
     register,
     control,
     watch,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     setError,
     clearErrors,
   } = useForm<CreateOrUpdateEventSubscriptionDialogFormData>({
     defaultValues:
       "eventSubscription" in props && isDefined(props.eventSubscription)
         ? {
+            name: props.eventSubscription.name,
             eventsUrl: props.eventSubscription.eventsUrl,
             eventsMode: isDefined(props.eventSubscription.eventTypes) ? "SPECIFIC" : "ALL",
             eventTypes: isDefined(props.eventSubscription.eventTypes)
@@ -68,6 +71,7 @@ export function CreateOrUpdateEventSubscriptionDialog(
               : [],
           }
         : {
+            name: null,
             eventsUrl: "",
             eventsMode: "ALL",
             eventTypes: [],
@@ -110,6 +114,7 @@ export function CreateOrUpdateEventSubscriptionDialog(
               props.onResolve();
             } else {
               await props.onCreateEventSubscription!({
+                name: data.name,
                 eventsUrl: data.eventsUrl,
                 eventTypes: data.eventsMode === "ALL" ? null : data.eventTypes.map((x) => x.value),
               });
@@ -134,11 +139,20 @@ export function CreateOrUpdateEventSubscriptionDialog(
       }
       body={
         <Stack>
+          <FormControl isInvalid={!!errors.name}>
+            <FormLabel>
+              <FormattedMessage
+                id="component.create-or-edit-event-subscription-dialog.name"
+                defaultMessage="Subscription name"
+              />
+            </FormLabel>
+            <Input {...register("name", { disabled: isDefined(props.eventSubscription) })} />
+          </FormControl>
           <FormControl isInvalid={!!errors.eventsUrl}>
             <FormLabel>
               <FormattedMessage
                 id="component.create-or-edit-event-subscription-dialog.explanation"
-                defaultMessage="Events URL where you want to be notified."
+                defaultMessage="Events URL where you want to be notified"
               />
             </FormLabel>
             <Input
@@ -226,7 +240,7 @@ export function CreateOrUpdateEventSubscriptionDialog(
         </Stack>
       }
       confirm={
-        <Button colorScheme="purple" type="submit">
+        <Button colorScheme="purple" type="submit" isLoading={isSubmitting}>
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }
@@ -239,6 +253,7 @@ CreateOrUpdateEventSubscriptionDialog.fragments = {
     fragment CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscription on PetitionEventSubscription {
       eventsUrl
       eventTypes
+      name
     }
   `,
 };

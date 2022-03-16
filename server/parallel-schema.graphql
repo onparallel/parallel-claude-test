@@ -563,6 +563,7 @@ type Mutation {
   createEventSubscription(
     eventTypes: [PetitionEventType!]
     eventsUrl: String!
+    name: String
   ): PetitionEventSubscription!
 
   """
@@ -2359,6 +2360,7 @@ type PetitionEventSubscription {
   eventsUrl: String!
   id: GID!
   isEnabled: Boolean!
+  name: String
 }
 
 enum PetitionEventType {

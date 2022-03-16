@@ -10,5 +10,6 @@ export const PetitionEventSubscription = objectType({
       type: "PetitionEventType",
       resolve: (o) => o.event_types,
     });
+    t.nullable.string("name");
   },
 });

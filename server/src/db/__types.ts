@@ -795,6 +795,7 @@ export interface PetitionEventSubscription {
   deleted_by: Maybe<string>; // varchar
   is_enabled: boolean; // bool
   event_types: Maybe<any>; // jsonb
+  name: Maybe<string>; // varchar
 }
 
 export type CreatePetitionEventSubscription = PartialProps<
@@ -807,6 +808,7 @@ export type CreatePetitionEventSubscription = PartialProps<
   | "deleted_by"
   | "is_enabled"
   | "event_types"
+  | "name"
 >;
 
 export interface PetitionField {
