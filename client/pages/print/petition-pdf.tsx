@@ -165,16 +165,11 @@ function HardcodedSignatures({ fromTemplateId }: { fromTemplateId: string }) {
       name: "Guillermo Preckler",
       imgSrc: "static/images/signatures/guillermo-preckler-brickbro.png",
     };
-    const rosa: HardcodedSigner = {
-      name: "Rosa Valero Gonzalo",
-      imgSrc: "static/images/signatures/rosa-valero-gonzalo-tiko.png",
-    };
     switch (process.env.NEXT_PUBLIC_ENVIRONMENT) {
       case "production":
         return {
           EAwW2jXkP4C9LjU2b3: [guillermo],
           EAwW2jXkP4C9LjU2fS: [guillermo],
-          EAwW2jXkP4C9LbfNRr: [rosa],
         };
       case "staging":
         return {};
