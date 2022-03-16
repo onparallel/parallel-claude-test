@@ -1,14 +1,27 @@
 import { Button, Stack, Text } from "@chakra-ui/react";
+import { ConfirmInput } from "@parallel/components/common/ConfirmInput";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 
 export function DeleteSubscriptionDialog({
   selectedCount,
   ...props
 }: DialogProps<{ selectedCount: number }>) {
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<{
+    confirm: boolean;
+  }>();
   return (
     <ConfirmDialog
+      content={{
+        as: "form",
+        onSubmit: handleSubmit(() => props.onResolve()),
+      }}
       header={
         <FormattedMessage
           id="component.delete-event-subscription-dialog.header"
@@ -32,10 +45,16 @@ export function DeleteSubscriptionDialog({
               values={{ count: selectedCount }}
             />
           </Text>
+          <Controller
+            name="confirm"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => <ConfirmInput {...field} isInvalid={!!errors.confirm} />}
+          />
         </Stack>
       }
       confirm={
-        <Button colorScheme="red" onClick={() => props.onResolve()}>
+        <Button colorScheme="red" type="submit">
           <FormattedMessage id="generic.confirm-delete-button" defaultMessage="Yes, delete" />
         </Button>
       }

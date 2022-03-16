@@ -1,4 +1,4 @@
-import { ApolloError, gql } from "@apollo/client";
+import { ApolloError } from "@apollo/client";
 import {
   Button,
   Collapse,
@@ -14,10 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import {
-  CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragment,
-  PetitionEventType,
-} from "@parallel/graphql/__types";
+import { PetitionEventType } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { Maybe, MaybePromise } from "@parallel/utils/types";
@@ -25,30 +22,24 @@ import { useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, { OptionTypeBase } from "react-select";
-import { isDefined } from "remeda";
 
-interface CreateOrUpdateEventSubscriptionDialogProps {
-  eventSubscription?: CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragment;
-  onCreateEventSubscription?: (props: {
+interface CreateEventSubscriptionDialogProps {
+  onCreate: (props: {
     eventsUrl: string;
     eventTypes: PetitionEventType[] | null;
     name: string | null;
   }) => MaybePromise<void>;
-  onUpdateEventSubscription?: (props: {
-    eventsUrl: string;
-    eventTypes: PetitionEventType[] | null;
-  }) => MaybePromise<void>;
 }
 
-interface CreateOrUpdateEventSubscriptionDialogFormData {
+interface CreateEventSubscriptionDialogFormData {
   name: Maybe<string>;
   eventsUrl: string;
   eventsMode: "ALL" | "SPECIFIC";
   eventTypes: OptionTypeBase[];
 }
 
-export function CreateOrUpdateEventSubscriptionDialog(
-  props: DialogProps<CreateOrUpdateEventSubscriptionDialogProps>
+export function CreateEventSubscriptionDialog(
+  props: DialogProps<CreateEventSubscriptionDialogProps>
 ) {
   const intl = useIntl();
   const {
@@ -59,23 +50,13 @@ export function CreateOrUpdateEventSubscriptionDialog(
     formState: { errors, isSubmitting },
     setError,
     clearErrors,
-  } = useForm<CreateOrUpdateEventSubscriptionDialogFormData>({
-    defaultValues:
-      "eventSubscription" in props && isDefined(props.eventSubscription)
-        ? {
-            name: props.eventSubscription.name,
-            eventsUrl: props.eventSubscription.eventsUrl,
-            eventsMode: isDefined(props.eventSubscription.eventTypes) ? "SPECIFIC" : "ALL",
-            eventTypes: isDefined(props.eventSubscription.eventTypes)
-              ? props.eventSubscription.eventTypes.map((x) => ({ label: x, value: x }))
-              : [],
-          }
-        : {
-            name: "",
-            eventsUrl: "",
-            eventsMode: "ALL",
-            eventTypes: [],
-          },
+  } = useForm<CreateEventSubscriptionDialogFormData>({
+    defaultValues: {
+      name: "",
+      eventsUrl: "",
+      eventsMode: "ALL",
+      eventTypes: [],
+    },
   });
   const eventsMode = watch("eventsMode");
 
@@ -103,24 +84,14 @@ export function CreateOrUpdateEventSubscriptionDialog(
       content={{
         as: "form",
         onSubmit: handleSubmit(async (data) => {
-          const isEditing = "eventSubscription" in props && isDefined(props.eventSubscription);
           try {
-            if (isEditing) {
-              await props.onUpdateEventSubscription!({
-                eventsUrl: data.eventsUrl,
-                eventTypes: data.eventsMode === "ALL" ? null : data.eventTypes.map((x) => x.value),
-              });
-              clearErrors("eventsUrl");
-              props.onResolve();
-            } else {
-              await props.onCreateEventSubscription!({
-                name: data.name,
-                eventsUrl: data.eventsUrl,
-                eventTypes: data.eventsMode === "ALL" ? null : data.eventTypes.map((x) => x.value),
-              });
-              clearErrors("eventsUrl");
-              props.onResolve();
-            }
+            await props.onCreate({
+              name: data.name,
+              eventsUrl: data.eventsUrl,
+              eventTypes: data.eventsMode === "ALL" ? null : data.eventTypes.map((x) => x.value),
+            });
+            clearErrors("eventsUrl");
+            props.onResolve();
           } catch (error) {
             if (error instanceof ApolloError) {
               const code = error.graphQLErrors[0]?.extensions?.code;
@@ -133,25 +104,25 @@ export function CreateOrUpdateEventSubscriptionDialog(
       }}
       header={
         <FormattedMessage
-          id="component.create-or-edit-event-subscription-dialog.title"
+          id="component.create-event-subscription-dialog.title"
           defaultMessage="Event subscription"
         />
       }
       body={
         <Stack>
-          <FormControl isInvalid={!!errors.name}>
+          <FormControl>
             <FormLabel>
               <FormattedMessage
-                id="component.create-or-edit-event-subscription-dialog.name"
+                id="component.create-event-subscription-dialog.name"
                 defaultMessage="Subscription name"
               />
             </FormLabel>
-            <Input {...register("name", { disabled: isDefined(props.eventSubscription) })} />
+            <Input {...register("name")} />
           </FormControl>
           <FormControl isInvalid={!!errors.eventsUrl}>
             <FormLabel>
               <FormattedMessage
-                id="component.create-or-edit-event-subscription-dialog.explanation"
+                id="component.create-event-subscription-dialog.explanation"
                 defaultMessage="Events URL where you want to be notified"
               />
             </FormLabel>
@@ -165,12 +136,12 @@ export function CreateOrUpdateEventSubscriptionDialog(
             <FormErrorMessage>
               {errors.eventsUrl?.type === "validate" || errors.eventsUrl?.type === "required" ? (
                 <FormattedMessage
-                  id="component.create-or-edit-event-subscription-dialog.invalid-url"
+                  id="component.create-event-subscription-dialog.invalid-url"
                   defaultMessage="Please, provide a valid URL."
                 />
               ) : errors.eventsUrl?.type === "challengeFailed" ? (
                 <FormattedMessage
-                  id="component.create-or-edit-event-subscription-dialog.failed-challenge"
+                  id="component.create-event-subscription-dialog.failed-challenge"
                   defaultMessage="Your URL does not seem to accept POST requests."
                 />
               ) : null}
@@ -178,7 +149,7 @@ export function CreateOrUpdateEventSubscriptionDialog(
           </FormControl>
           <Text fontSize="sm">
             <FormattedMessage
-              id="component.create-or-edit-event-subscription-dialog.challenge-explanation"
+              id="component.create-event-subscription-dialog.challenge-explanation"
               defaultMessage="When you click continue an HTTP POST request will be sent to this URL which must respond with status code 200."
             />
           </Text>
@@ -195,7 +166,7 @@ export function CreateOrUpdateEventSubscriptionDialog(
                     </Radio>
                     <Radio value="SPECIFIC">
                       <FormattedMessage
-                        id="component.create-or-edit-event-subscription-dialog.specific-events"
+                        id="component.create-event-subscription-dialog.specific-events"
                         defaultMessage="Specific events"
                       />
                     </Radio>
@@ -208,7 +179,7 @@ export function CreateOrUpdateEventSubscriptionDialog(
             <Stack paddingLeft={6}>
               <Text fontSize="sm">
                 <FormattedMessage
-                  id="component.create-or-edit-event-subscription-dialog.events-documentation"
+                  id="component.create-event-subscription-dialog.events-documentation"
                   defaultMessage="For a complete list of events visit our <a>API documentation</a>"
                   values={{
                     a: (chunks: any) => (
@@ -222,19 +193,30 @@ export function CreateOrUpdateEventSubscriptionDialog(
                   }}
                 />
               </Text>
-              <Controller
-                name="eventTypes"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <Select
-                    value={value}
-                    onChange={onChange}
-                    isMulti
-                    options={options}
-                    {...reactSelectProps}
-                  />
-                )}
-              />
+              <FormControl isInvalid={!!errors.eventTypes}>
+                <Controller
+                  name="eventTypes"
+                  control={control}
+                  rules={{ required: eventsMode === "SPECIFIC", validate: (v) => v.length > 0 }}
+                  render={({ field: { onChange, value } }) => (
+                    <>
+                      <Select
+                        value={value}
+                        onChange={onChange}
+                        isMulti
+                        options={options}
+                        {...reactSelectProps}
+                      />
+                      <FormErrorMessage>
+                        <FormattedMessage
+                          id="component.create-event-subscription-dialog.invalid-event-types"
+                          defaultMessage="Please, select at least one event type."
+                        />
+                      </FormErrorMessage>
+                    </>
+                  )}
+                />
+              </FormControl>
             </Stack>
           </Collapse>
         </Stack>
@@ -248,18 +230,9 @@ export function CreateOrUpdateEventSubscriptionDialog(
     />
   );
 }
-CreateOrUpdateEventSubscriptionDialog.fragments = {
-  PetitionEventSubscription: gql`
-    fragment CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscription on PetitionEventSubscription {
-      eventsUrl
-      eventTypes
-      name
-    }
-  `,
-};
 
-export function useCreateOrUpdateEventSubscriptionDialog() {
-  return useDialog(CreateOrUpdateEventSubscriptionDialog);
+export function useCreateEventSubscriptionDialog() {
+  return useDialog(CreateEventSubscriptionDialog);
 }
 
 const eventTypes: PetitionEventType[] = [

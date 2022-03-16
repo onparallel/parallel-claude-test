@@ -124,8 +124,8 @@ describe("GraphQL/PetitionEventSubscription", () => {
     it("disables a subscription for the user's petitions", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($id: GID!, $data: UpdateEventSubscriptionInput!) {
-            updateEventSubscription(id: $id, data: $data) {
+          mutation ($id: GID!, $isEnabled: Boolean!) {
+            updateEventSubscription(id: $id, isEnabled: $isEnabled) {
               id
               eventsUrl
               isEnabled
@@ -134,9 +134,7 @@ describe("GraphQL/PetitionEventSubscription", () => {
         `,
         variables: {
           id: subscriptionId,
-          data: {
-            isEnabled: false,
-          },
+          isEnabled: false,
         },
       });
 
@@ -148,97 +146,22 @@ describe("GraphQL/PetitionEventSubscription", () => {
       });
     });
 
-    it("updates the settings of a subscription ", async () => {
-      const fetch = testClient.container.get<IFetchService>(FETCH_SERVICE);
-      const spy = jest.spyOn(fetch, "fetchWithTimeout");
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($id: GID!, $data: UpdateEventSubscriptionInput!) {
-            updateEventSubscription(id: $id, data: $data) {
-              id
-              eventsUrl
-              isEnabled
-            }
-          }
-        `,
-        variables: {
-          id: subscriptionId,
-          data: {
-            eventsUrl: "https://www.example.com/new-api",
-            isEnabled: true,
-          },
-        },
-      });
-      expect(spy).toHaveBeenCalledWith(
-        "https://www.example.com/new-api",
-        expect.anything(),
-        expect.anything()
-      );
-
-      expect(errors).toBeUndefined();
-      expect(data?.updateEventSubscription).toEqual({
-        id: subscriptionId,
-        eventsUrl: "https://www.example.com/new-api",
-        isEnabled: true,
-      });
-    });
-
     it("throws error if trying to update another user's subscription", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($id: GID!, $data: UpdateEventSubscriptionInput!) {
-            updateEventSubscription(id: $id, data: $data) {
+          mutation ($id: GID!, $isEnabled: Boolean!) {
+            updateEventSubscription(id: $id, isEnabled: $isEnabled) {
               id
             }
           }
         `,
         variables: {
           id: toGlobalId("PetitionEventSubscription", subscriptions[0].id),
-          data: {
-            isEnabled: true,
-          },
+          isEnabled: true,
         },
       });
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
-    });
-
-    it("throws error if update data is empty", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($id: GID!, $data: UpdateEventSubscriptionInput!) {
-            updateEventSubscription(id: $id, data: $data) {
-              id
-            }
-          }
-        `,
-        variables: {
-          id: subscriptionId,
-          data: {},
-        },
-      });
-
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
-      expect(data).toBeNull();
-    });
-
-    it("throws error if trying to update subscription with invalid URL", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($id: GID!, $data: UpdateEventSubscriptionInput!) {
-            updateEventSubscription(id: $id, data: $data) {
-              id
-            }
-          }
-        `,
-        variables: {
-          id: subscriptionId,
-          data: { eventsUrl: "invalid url!" },
-        },
-      });
-
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
   });

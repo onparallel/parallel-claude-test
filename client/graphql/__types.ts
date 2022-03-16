@@ -1383,8 +1383,8 @@ export interface MutationupdateDynamicSelectReplyArgs {
 }
 
 export interface MutationupdateEventSubscriptionArgs {
-  data: UpdateEventSubscriptionInput;
   id: Scalars["GID"];
+  isEnabled: Scalars["Boolean"];
 }
 
 export interface MutationupdateFeatureFlagArgs {
@@ -3343,12 +3343,6 @@ export type Tone = "FORMAL" | "INFORMAL";
 export interface UpdateContactInput {
   firstName?: InputMaybe<Scalars["String"]>;
   lastName?: InputMaybe<Scalars["String"]>;
-}
-
-export interface UpdateEventSubscriptionInput {
-  eventTypes?: InputMaybe<Array<PetitionEventType>>;
-  eventsUrl?: InputMaybe<Scalars["String"]>;
-  isEnabled?: InputMaybe<Scalars["Boolean"]>;
 }
 
 export interface UpdatePetitionFieldInput {
@@ -9855,13 +9849,6 @@ export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMut
 
 export type RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment =
   { __typename?: "PublicPetitionFieldReply"; content: { [key: string]: any } };
-
-export type CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragment = {
-  __typename?: "PetitionEventSubscription";
-  eventsUrl: string;
-  eventTypes?: Array<PetitionEventType> | null;
-  name?: string | null;
-};
 
 export type GenerateNewTokenDialog_generateUserAuthTokenMutationVariables = Exact<{
   tokenName: Scalars["String"];
@@ -17075,7 +17062,7 @@ export type Developers_createEventSubscriptionMutation = {
 
 export type Developers_updateEventSubscriptionMutationVariables = Exact<{
   id: Scalars["GID"];
-  data: UpdateEventSubscriptionInput;
+  isEnabled: Scalars["Boolean"];
 }>;
 
 export type Developers_updateEventSubscriptionMutation = {
@@ -21826,16 +21813,6 @@ export const Developers_UserAuthenticationTokenFragmentDoc = gql`
     lastUsedAt
   }
 ` as unknown as DocumentNode<Developers_UserAuthenticationTokenFragment, unknown>;
-export const CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragmentDoc = gql`
-  fragment CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscription on PetitionEventSubscription {
-    eventsUrl
-    eventTypes
-    name
-  }
-` as unknown as DocumentNode<
-  CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragment,
-  unknown
->;
 export const Developers_PetitionEventSubscriptionFragmentDoc = gql`
   fragment Developers_PetitionEventSubscription on PetitionEventSubscription {
     id
@@ -21843,9 +21820,7 @@ export const Developers_PetitionEventSubscriptionFragmentDoc = gql`
     eventTypes
     isEnabled
     name
-    ...CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscription
   }
-  ${CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscriptionFragmentDoc}
 ` as unknown as DocumentNode<Developers_PetitionEventSubscriptionFragment, unknown>;
 export const RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc = gql`
   fragment RecipientViewPetitionFieldCard_PublicPetitionFieldReply on PublicPetitionFieldReply {
@@ -24692,8 +24667,8 @@ export const Developers_createEventSubscriptionDocument = gql`
   Developers_createEventSubscriptionMutationVariables
 >;
 export const Developers_updateEventSubscriptionDocument = gql`
-  mutation Developers_updateEventSubscription($id: GID!, $data: UpdateEventSubscriptionInput!) {
-    updateEventSubscription(id: $id, data: $data) {
+  mutation Developers_updateEventSubscription($id: GID!, $isEnabled: Boolean!) {
+    updateEventSubscription(id: $id, isEnabled: $isEnabled) {
       ...Developers_PetitionEventSubscription
     }
   }

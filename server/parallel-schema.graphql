@@ -1347,7 +1347,7 @@ type Mutation {
   """
   Updates an existing event subscription for the user's petitions
   """
-  updateEventSubscription(data: UpdateEventSubscriptionInput!, id: GID!): PetitionEventSubscription!
+  updateEventSubscription(id: GID!, isEnabled: Boolean!): PetitionEventSubscription!
 
   """
   Activate or deactivate an organization feature flag
@@ -4462,12 +4462,6 @@ enum Tone {
 input UpdateContactInput {
   firstName: String
   lastName: String
-}
-
-input UpdateEventSubscriptionInput {
-  eventTypes: [PetitionEventType!]
-  eventsUrl: String
-  isEnabled: Boolean
 }
 
 input UpdatePetitionFieldInput {

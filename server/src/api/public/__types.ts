@@ -1352,8 +1352,8 @@ export type MutationupdateDynamicSelectReplyArgs = {
 };
 
 export type MutationupdateEventSubscriptionArgs = {
-  data: UpdateEventSubscriptionInput;
   id: Scalars["GID"];
+  isEnabled: Scalars["Boolean"];
 };
 
 export type MutationupdateFeatureFlagArgs = {
@@ -3230,12 +3230,6 @@ export type Tone = "FORMAL" | "INFORMAL";
 export type UpdateContactInput = {
   firstName?: InputMaybe<Scalars["String"]>;
   lastName?: InputMaybe<Scalars["String"]>;
-};
-
-export type UpdateEventSubscriptionInput = {
-  eventTypes?: InputMaybe<Array<PetitionEventType>>;
-  eventsUrl?: InputMaybe<Scalars["String"]>;
-  isEnabled?: InputMaybe<Scalars["Boolean"]>;
 };
 
 export type UpdatePetitionFieldInput = {

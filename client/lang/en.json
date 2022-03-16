@@ -225,6 +225,26 @@
     "context": "Ongoing eSignature"
   },
   {
+    "term": "component.confirm-deactivate-event-subscription-dialog.body",
+    "definition": "Are you sure you want to deactivate the selected event subscription?",
+    "context": "Are you sure you want to deactivate the selected event subscription?"
+  },
+  {
+    "term": "component.confirm-deactivate-event-subscription-dialog.confirm-button",
+    "definition": "Yes, deactivate",
+    "context": "Yes, deactivate"
+  },
+  {
+    "term": "component.confirm-deactivate-event-subscription-dialog.header",
+    "definition": "Deactivate event subscription",
+    "context": "Deactivate event subscription"
+  },
+  {
+    "term": "component.confirm-deactivate-event-subscription-dialog.warning",
+    "definition": "Any applications or scripts using this event subscription will no longer receive event notifications from Parallel.",
+    "context": "Any applications or scripts using this event subscription will no longer receive event notifications from Parallel."
+  },
+  {
     "term": "component.confirm-delete-contacts-dialog.alert-multiple-text",
     "definition": "We have found petitions sent to some of these contacts.",
     "context": "We have found petitions sent to some of these contacts."
@@ -530,6 +550,51 @@
     "context": "Copy to clipboard"
   },
   {
+    "term": "component.create-event-subscription-dialog.challenge-explanation",
+    "definition": "When you click continue an HTTP POST request will be sent to this URL which must respond with status code 200.",
+    "context": "When you click continue an HTTP POST request will be sent to this URL which must respond with status code 200."
+  },
+  {
+    "term": "component.create-event-subscription-dialog.events-documentation",
+    "definition": "For a complete list of events visit our <a>API documentation</a>",
+    "context": "For a complete list of events visit our <a>API documentation</a>"
+  },
+  {
+    "term": "component.create-event-subscription-dialog.explanation",
+    "definition": "Events URL where you want to be notified",
+    "context": "Events URL where you want to be notified"
+  },
+  {
+    "term": "component.create-event-subscription-dialog.failed-challenge",
+    "definition": "Your URL does not seem to accept POST requests.",
+    "context": "Your URL does not seem to accept POST requests."
+  },
+  {
+    "term": "component.create-event-subscription-dialog.invalid-event-types",
+    "definition": "Please, select at least one event type.",
+    "context": "Please, select at least one event type."
+  },
+  {
+    "term": "component.create-event-subscription-dialog.invalid-url",
+    "definition": "Please, provide a valid URL.",
+    "context": "Please, provide a valid URL."
+  },
+  {
+    "term": "component.create-event-subscription-dialog.name",
+    "definition": "Subscription name",
+    "context": "Subscription name"
+  },
+  {
+    "term": "component.create-event-subscription-dialog.specific-events",
+    "definition": "Specific events",
+    "context": "Specific events"
+  },
+  {
+    "term": "component.create-event-subscription-dialog.title",
+    "definition": "Event subscription",
+    "context": "Event subscription"
+  },
+  {
     "term": "component.create-group-dialog.confirm-button",
     "definition": "Create team",
     "context": "Create team"
@@ -548,46 +613,6 @@
     "term": "component.create-group-dialog.title",
     "definition": "New team",
     "context": "New team"
-  },
-  {
-    "term": "component.create-or-edit-event-subscription-dialog.challenge-explanation",
-    "definition": "When you click continue an HTTP POST request will be sent to this URL which must respond with status code 200.",
-    "context": "When you click continue an HTTP POST request will be sent to this URL which must respond with status code 200."
-  },
-  {
-    "term": "component.create-or-edit-event-subscription-dialog.events-documentation",
-    "definition": "For a complete list of events visit our <a>API documentation</a>",
-    "context": "For a complete list of events visit our <a>API documentation</a>"
-  },
-  {
-    "term": "component.create-or-edit-event-subscription-dialog.explanation",
-    "definition": "Events URL where you want to be notified",
-    "context": "Events URL where you want to be notified"
-  },
-  {
-    "term": "component.create-or-edit-event-subscription-dialog.failed-challenge",
-    "definition": "Your URL does not seem to accept POST requests.",
-    "context": "Your URL does not seem to accept POST requests."
-  },
-  {
-    "term": "component.create-or-edit-event-subscription-dialog.invalid-url",
-    "definition": "Please, provide a valid URL.",
-    "context": "Please, provide a valid URL."
-  },
-  {
-    "term": "component.create-or-edit-event-subscription-dialog.name",
-    "definition": "Subscription name",
-    "context": "Subscription name"
-  },
-  {
-    "term": "component.create-or-edit-event-subscription-dialog.specific-events",
-    "definition": "Specific events",
-    "context": "Specific events"
-  },
-  {
-    "term": "component.create-or-edit-event-subscription-dialog.title",
-    "definition": "Event subscription",
-    "context": "Event subscription"
   },
   {
     "term": "component.date-picker.next-month",

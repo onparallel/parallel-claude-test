@@ -147,12 +147,6 @@ export interface NexusGenInputs {
     firstName?: string | null; // String
     lastName?: string | null; // String
   };
-  UpdateEventSubscriptionInput: {
-    // input type
-    eventTypes?: NexusGenEnums["PetitionEventType"][] | null; // [PetitionEventType!]
-    eventsUrl?: string | null; // String
-    isEnabled?: boolean | null; // Boolean
-  };
   UpdatePetitionFieldInput: {
     // input type
     alias?: string | null; // String
@@ -4021,8 +4015,8 @@ export interface NexusGenArgTypes {
     };
     updateEventSubscription: {
       // args
-      data: NexusGenInputs["UpdateEventSubscriptionInput"]; // UpdateEventSubscriptionInput!
       id: NexusGenScalars["GID"]; // GID!
+      isEnabled: boolean; // Boolean!
     };
     updateFeatureFlag: {
       // args

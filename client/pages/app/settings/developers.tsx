@@ -12,7 +12,7 @@ import {
   Switch,
   Text,
 } from "@chakra-ui/react";
-import { EditIcon, RepeatIcon } from "@parallel/chakra/icons";
+import { RepeatIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -26,10 +26,8 @@ import { Table, TableColumn } from "@parallel/components/common/Table";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import {
-  CreateOrUpdateEventSubscriptionDialog,
-  useCreateOrUpdateEventSubscriptionDialog,
-} from "@parallel/components/settings/dialogs/CreateOrUpdateEventSubscriptionDialog";
+import { useConfirmDeactivateEventSubscriptionDialog } from "@parallel/components/settings/dialogs/ConfirmDeactivateEventSubscriptionDialog";
+import { useCreateEventSubscriptionDialog } from "@parallel/components/settings/dialogs/CreateEventSubscriptionDialog";
 import { useDeleteAccessTokenDialog } from "@parallel/components/settings/dialogs/DeleteAccessTokenDialog";
 import { useDeleteSubscriptionDialog } from "@parallel/components/settings/dialogs/DeleteSubscriptionDialog";
 import { useGenerateNewTokenDialog } from "@parallel/components/settings/dialogs/GenerateNewTokenDialog";
@@ -96,12 +94,12 @@ function Developers() {
   const apiTokensColumns = useApiTokensColumns();
   const subscriptionsColumns = useSubscriptionsColumns();
 
-  const showCreateOrUpdateEventSubscriptionDialog = useCreateOrUpdateEventSubscriptionDialog();
+  const showCreateEventSubscriptionDialog = useCreateEventSubscriptionDialog();
   const [createEventSubscription] = useMutation(Developers_createEventSubscriptionDocument);
   const handleCreateEventSubscription = async () => {
     try {
-      await showCreateOrUpdateEventSubscriptionDialog({
-        onCreateEventSubscription: async (data) => {
+      await showCreateEventSubscriptionDialog({
+        onCreate: async (data) => {
           await createEventSubscription({ variables: data });
           await refetchSubscriptions();
         },
@@ -125,23 +123,12 @@ function Developers() {
   };
 
   const [updateEventSubscription] = useMutation(Developers_updateEventSubscriptionDocument);
-  const handleUpdateEventSubscription = async () => {
-    const id = selectedSubscriptions[0];
-    try {
-      await showCreateOrUpdateEventSubscriptionDialog({
-        eventSubscription: subscriptions.find((x) => id === selectedSubscriptions[0]),
-        onUpdateEventSubscription: async (data) => {
-          await updateEventSubscription({ variables: { id: selectedSubscriptions[0], data } });
-          await refetchSubscriptions();
-        },
-      });
-    } catch {}
-  };
+
   const subscriptionsTableContext = useMemo<SubscriptionsTableContext>(
     () => ({
       onToggleEnabled: async (id: string, isEnabled: boolean) => {
         await updateEventSubscription({
-          variables: { id, data: { isEnabled } },
+          variables: { id, isEnabled },
         });
       },
     }),
@@ -264,11 +251,6 @@ function Developers() {
               {selectedSubscriptions.length ? (
                 <Button colorScheme="red" variant="ghost" onClick={handleDeleteEventSubscriptions}>
                   <FormattedMessage id="generic.delete" defaultMessage="Delete" />
-                </Button>
-              ) : null}
-              {selectedSubscriptions.length === 1 ? (
-                <Button leftIcon={<EditIcon />} onClick={handleUpdateEventSubscription}>
-                  <FormattedMessage id="generic.edit" defaultMessage="Edit" />
                 </Button>
               ) : null}
               <Button colorScheme="purple" onClick={handleCreateEventSubscription}>
@@ -482,12 +464,19 @@ function useSubscriptionsColumns(): TableColumn<
         align: "center",
         cellProps: { width: "1%" },
         CellContent: ({ row, context: { onToggleEnabled } }) => {
-          return (
-            <Switch
-              isChecked={row.isEnabled}
-              onChange={(e) => onToggleEnabled(row.id, e.target.checked)}
-            />
-          );
+          const showConfirmDeactivateEventSubscriptionDialog =
+            useConfirmDeactivateEventSubscriptionDialog();
+          async function handleToggleChange(e: any) {
+            try {
+              if (!e.target.checked) {
+                await showConfirmDeactivateEventSubscriptionDialog({});
+                onToggleEnabled(row.id, false);
+              } else {
+                onToggleEnabled(row.id, true);
+              }
+            } catch {}
+          }
+          return <Switch isChecked={row.isEnabled} onChange={handleToggleChange} />;
         },
       },
     ],
@@ -511,9 +500,7 @@ Developers.fragments = {
       eventTypes
       isEnabled
       name
-      ...CreateOrUpdateEventSubscriptionDialog_PetitionEventSubscription
     }
-    ${CreateOrUpdateEventSubscriptionDialog.fragments.PetitionEventSubscription}
   `,
 };
 
@@ -536,8 +523,8 @@ Developers.mutations = [
     ${Developers.fragments.PetitionEventSubscription}
   `,
   gql`
-    mutation Developers_updateEventSubscription($id: GID!, $data: UpdateEventSubscriptionInput!) {
-      updateEventSubscription(id: $id, data: $data) {
+    mutation Developers_updateEventSubscription($id: GID!, $isEnabled: Boolean!) {
+      updateEventSubscription(id: $id, isEnabled: $isEnabled) {
         ...Developers_PetitionEventSubscription
       }
     }
