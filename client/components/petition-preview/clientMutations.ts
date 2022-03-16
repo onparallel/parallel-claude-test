@@ -351,6 +351,19 @@ function updatePreviewFieldReplies(
   });
 }
 
+export function cleanPreviewFieldReplies(proxy: DataProxy, fieldId: string) {
+  updateFragment(proxy, {
+    id: fieldId,
+    fragment: PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragmentDoc,
+    fragmentName: "PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionField",
+    data: (cached) => ({
+      ...cached,
+      replies: [],
+      previewReplies: [],
+    }),
+  });
+}
+
 updatePreviewFieldReplies.fragments = {
   get PetitionFieldReply() {
     return gql`

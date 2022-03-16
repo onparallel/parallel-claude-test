@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql, useApolloClient, useMutation } from "@apollo/client";
 import { Box, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
 import { ListIcon, PaperPlaneIcon, SettingsIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
@@ -30,6 +30,7 @@ import { PetitionSettings } from "@parallel/components/petition-compose/Petition
 import { PetitionTemplateComposeMessageEditor } from "@parallel/components/petition-compose/PetitionTemplateComposeMessageEditor";
 import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
 import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/settings/PetitionComposeFieldSettings";
+import { cleanPreviewFieldReplies } from "@parallel/components/petition-preview/clientMutations";
 import {
   PetitionCompose_changePetitionFieldTypeDocument,
   PetitionCompose_clonePetitionFieldDocument,
@@ -79,6 +80,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     variables: { id: petitionId },
   });
   const petition = data.petition!;
+
+  const apollo = useApolloClient();
 
   const updateIsReadNotification = useUpdateIsReadNotification();
   useEffect(() => {
@@ -309,6 +312,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         await changePetitionFieldType({
           variables: { petitionId, fieldId, type },
         });
+        cleanPreviewFieldReplies(apollo, fieldId);
         return;
       } catch {}
       try {

@@ -1,4 +1,4 @@
-import { Checkbox, Box, Stack, Text } from "@chakra-ui/react";
+import { Box, Checkbox, HStack, Stack } from "@chakra-ui/react";
 import { RadioButtonSelected } from "@parallel/chakra/icons";
 import { CheckboxTypeLabel } from "@parallel/components/petition-common/CheckboxTypeLabel";
 import { useState } from "react";
@@ -121,34 +121,30 @@ export function RecipientViewPetitionFieldCheckbox({
       onDownloadAttachment={onDownloadAttachment}
     >
       <Stack>
-        <Text color="gray.500" fontSize="sm">
-          <CheckboxTypeLabel as="span" marginRight={2} options={field.options} />
-          {!isSaving ? (
-            <Box as="span" color={isInvalid ? "red.600" : "gray.500"} marginRight={2}>
-              {checkedItems?.length ? (
-                <>
-                  {showRadio ? null : "("}
-                  {type === "RADIO" || (max === 1 && type !== "UNLIMITED") ? (
-                    <FormattedMessage
-                      id="component.recipient-view-petition-field-card.replies-submitted-checkbox"
-                      defaultMessage="Reply submitted"
-                    />
-                  ) : type === "EXACT" ? (
-                    <FormattedMessage
-                      id="component.recipient-view-petition-field-card.replies-submitted-checkbox-exact"
-                      defaultMessage="{count}/{total} submitted"
-                      values={{ count: checkedItems.length, total: max }}
-                    />
-                  ) : (
-                    <FormattedMessage
-                      id="component.recipient-view-petition-field-card.replies-submitted-checkbox-count"
-                      defaultMessage="{count} submitted"
-                      values={{ count: checkedItems.length }}
-                    />
-                  )}
-                  {showRadio ? null : ")"}
-                </>
-              ) : null}
+        <HStack wrap="wrap" color="gray.500" fontSize="sm" gridGap={2} spacing={0}>
+          <CheckboxTypeLabel as="span" options={field.options} />
+          {!isSaving && checkedItems?.length ? (
+            <Box as="span" color={isInvalid ? "red.600" : "gray.500"}>
+              {showRadio ? null : "("}
+              {type === "RADIO" || (max === 1 && type !== "UNLIMITED") ? (
+                <FormattedMessage
+                  id="component.recipient-view-petition-field-card.replies-submitted-checkbox"
+                  defaultMessage="Reply submitted"
+                />
+              ) : type === "EXACT" ? (
+                <FormattedMessage
+                  id="component.recipient-view-petition-field-card.replies-submitted-checkbox-exact"
+                  defaultMessage="{count}/{total} submitted"
+                  values={{ count: checkedItems.length, total: max }}
+                />
+              ) : (
+                <FormattedMessage
+                  id="component.recipient-view-petition-field-card.replies-submitted-checkbox-count"
+                  defaultMessage="{count} submitted"
+                  values={{ count: checkedItems.length }}
+                />
+              )}
+              {showRadio ? null : ")"}
             </Box>
           ) : null}
           <RecipientViewPetitionFieldReplyStatusIndicator
@@ -156,7 +152,7 @@ export function RecipientViewPetitionFieldCheckbox({
             reply={reply}
             showSavedIcon={false}
           />
-        </Text>
+        </HStack>
 
         {values.map((option: string, index: number) => (
           <Checkbox
