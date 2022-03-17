@@ -3444,6 +3444,8 @@ export type UserFragment = {
   lastName: string | null;
 };
 
+export type OrganizationFragment = { id: string; name: string };
+
 export type UserGroupFragment = { id: string; name: string };
 
 export type ContactFragment = {
@@ -3659,6 +3661,7 @@ export type GetMe_userQuery = {
     fullName: string | null;
     firstName: string | null;
     lastName: string | null;
+    organization: { id: string; name: string };
   };
 };
 
@@ -4893,6 +4896,12 @@ export const PetitionAttachmentFragmentDoc = gql`
     createdAt
   }
 ` as unknown as DocumentNode<PetitionAttachmentFragment, unknown>;
+export const OrganizationFragmentDoc = gql`
+  fragment Organization on Organization {
+    id
+    name
+  }
+` as unknown as DocumentNode<OrganizationFragment, unknown>;
 export const ContactFragmentDoc = gql`
   fragment Contact on Contact {
     id
@@ -5082,9 +5091,13 @@ export const GetMe_userDocument = gql`
   query GetMe_user {
     me {
       ...User
+      organization {
+        ...Organization
+      }
     }
   }
   ${UserFragmentDoc}
+  ${OrganizationFragmentDoc}
 ` as unknown as DocumentNode<GetMe_userQuery, GetMe_userQueryVariables>;
 export const GetTags_tagsDocument = gql`
   query GetTags_tags($offset: Int!, $limit: Int!, $search: String) {

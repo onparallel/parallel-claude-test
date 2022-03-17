@@ -61,6 +61,37 @@ const _User = {
   },
 } as const;
 
+const _Organization = {
+  title: "Organization",
+  type: "object",
+  additionalProperties: false,
+  required: ["id", "name"],
+  properties: {
+    id: {
+      description: "The ID of the organization",
+      type: "string",
+    },
+    name: {
+      description: "The name of the organization",
+      type: "string",
+    },
+  },
+  example: {
+    id: "yw7RQt2cQ4XDHdrbtL3",
+    name: "Pied Piper",
+  },
+} as const;
+
+const _UserWithOrg = {
+  ..._User,
+  required: [..._User.required, "organization"],
+  properties: { ..._User.properties, organization: _Organization },
+  example: {
+    ..._User.example,
+    organization: _Organization.example,
+  },
+} as const;
+
 const _UserGroup = {
   title: "UserGroup",
   type: "object",
@@ -667,6 +698,7 @@ export const Template = schema(_Template);
 export const PaginatedTemplates = PaginatedListOf(_Template);
 export const Contact = schema(_Contact);
 export const User = schema(_User);
+export const UserWithOrg = schema(_UserWithOrg);
 export const CreateContact = schema({
   title: "CreateContact",
   type: "object",

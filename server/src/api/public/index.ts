@@ -78,7 +78,7 @@ import {
   Template,
   UpdatePetition,
   UpdatePetitionField,
-  User,
+  UserWithOrg,
   _PetitionEvent,
 } from "./schemas";
 import {
@@ -120,6 +120,7 @@ import {
   GetTemplates_templatesDocument,
   GetTemplate_templateDocument,
   Maybe,
+  OrganizationFragmentDoc,
   PetitionFragment as PetitionFragmentType,
   PetitionReplies_repliesDocument,
   ReadPetitionCustomPropertiesDocument,
@@ -348,7 +349,7 @@ api.path("/me").get(
     Get the information for the user who owns the token.
   `,
     responses: {
-      200: SuccessResponse(User),
+      200: SuccessResponse(UserWithOrg),
     },
     tags: ["Users"],
   },
@@ -357,9 +358,13 @@ api.path("/me").get(
       query GetMe_user {
         me {
           ...User
+          organization {
+            ...Organization
+          }
         }
       }
       ${UserFragmentDoc}
+      ${OrganizationFragmentDoc}
     `;
     const result = await client.request(GetMe_userDocument);
     return Ok(result.me);

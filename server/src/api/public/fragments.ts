@@ -30,6 +30,13 @@ export const UserFragment = gql`
   }
 `;
 
+export const OrganizationFragment = gql`
+  fragment Organization on Organization {
+    id
+    name
+  }
+`;
+
 export const UserGroupFragment = gql`
   fragment UserGroup on UserGroup {
     id
