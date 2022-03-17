@@ -61,7 +61,6 @@ function useCreateLiquid() {
     }
 
     for (const tag of [
-      "assign",
       "capture",
       "comment",
       "cycle",
