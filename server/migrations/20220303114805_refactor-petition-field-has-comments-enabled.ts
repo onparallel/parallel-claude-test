@@ -6,9 +6,12 @@ export async function up(knex: Knex): Promise<void> {
   });
 
   await knex.raw(/* sql */ `
-    update petition_field set has_comments_enabled = true where ("options"->>'hasCommentsEnabled')::boolean is null; -- this fixes a bug on DYNAMIC_SELECT field
-    update petition_field set has_comments_enabled = ("options"->>'hasCommentsEnabled')::boolean where ("options"->>'hasCommentsEnabled')::boolean is not null;
-    update petition_field set options = options - 'hasCommentsEnabled' where ("options"->>'hasCommentsEnabled')::boolean is not null;
+    update petition_field
+      set has_comments_enabled = case 
+        when ("options"->'hasCommentsEnabled') is null then true
+        else ("options"->'hasCommentsEnabled')::bool
+      end,
+      options = options - 'hasCommentsEnabled'
   `);
 }
 
