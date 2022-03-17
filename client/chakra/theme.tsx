@@ -183,7 +183,7 @@ export const theme = extendTheme({
     Switch: {
       defaultProps: {
         size: "md",
-        colorScheme: "green",
+        colorScheme: "purple",
       },
     },
     Modal: {

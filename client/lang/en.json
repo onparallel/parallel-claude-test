@@ -1946,13 +1946,8 @@
   },
   {
     "term": "component.petition-settings.automatic-reminders",
-    "definition": "Enable automatic reminders",
-    "context": "Enable automatic reminders"
-  },
-  {
-    "term": "component.petition-settings.automatic-reminders-configure",
-    "definition": "Configure reminders",
-    "context": "Configure reminders"
+    "definition": "Automatic reminders",
+    "context": "Automatic reminders"
   },
   {
     "term": "component.petition-settings.deadline-description",
@@ -2000,14 +1995,9 @@
     "context": "Show in PDF"
   },
   {
-    "term": "component.petition-settings.petition-signature-configure",
-    "definition": "Configure eSignature",
-    "context": "Configure eSignature"
-  },
-  {
     "term": "component.petition-settings.petition-signature-enable",
-    "definition": "Include eSignature process",
-    "context": "Include eSignature process"
+    "definition": "eSignature process",
+    "context": "eSignature process"
   },
   {
     "term": "component.petition-settings.restrict-editing",
@@ -2028,11 +2018,6 @@
     "term": "component.petition-settings.share-automatically-description",
     "definition": "Specify which users or teams the petitions created from this template are shared with",
     "context": "Specify which users or teams the petitions created from this template are shared with"
-  },
-  {
-    "term": "component.petition-settings.share-automatically-settings",
-    "definition": "Sharing settings",
-    "context": "Sharing settings"
   },
   {
     "term": "component.petition-settings.share-by-link",
@@ -3045,6 +3030,16 @@
     "context": "Public link configuration"
   },
   {
+    "term": "component.settings-row-button.edit-settings",
+    "definition": "Edit settings",
+    "context": "Edit settings"
+  },
+  {
+    "term": "component.settings-row-button.remove-setting",
+    "definition": "Remove setting",
+    "context": "Remove setting"
+  },
+  {
     "term": "component.share-button.petition-not-shared",
     "definition": "This petition has not been shared yet.",
     "context": "This petition has not been shared yet."
@@ -3938,11 +3933,6 @@
     "term": "generic.cancel-save-changes",
     "definition": "Cancel",
     "context": "Cancel"
-  },
-  {
-    "term": "generic.change",
-    "definition": "Change",
-    "context": "Change"
   },
   {
     "term": "generic.changes-saved",

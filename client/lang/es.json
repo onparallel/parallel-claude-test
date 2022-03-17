@@ -1946,13 +1946,8 @@
   },
   {
     "term": "component.petition-settings.automatic-reminders",
-    "definition": "Activar recordatorios automáticos",
-    "context": "Enable automatic reminders"
-  },
-  {
-    "term": "component.petition-settings.automatic-reminders-configure",
-    "definition": "Configurar recordatorios",
-    "context": "Configure reminders"
+    "definition": "Recordatorios automáticos",
+    "context": "Automatic reminders"
   },
   {
     "term": "component.petition-settings.deadline-description",
@@ -2000,14 +1995,9 @@
     "context": "Show in PDF"
   },
   {
-    "term": "component.petition-settings.petition-signature-configure",
-    "definition": "Ajustes de firma digital",
-    "context": "Configure eSignature"
-  },
-  {
     "term": "component.petition-settings.petition-signature-enable",
-    "definition": "Incluir proceso de firma",
-    "context": "Include eSignature process"
+    "definition": "Proceso de firma digital",
+    "context": "eSignature process"
   },
   {
     "term": "component.petition-settings.restrict-editing",
@@ -2028,11 +2018,6 @@
     "term": "component.petition-settings.share-automatically-description",
     "definition": "Indica los usuarios y equipos a los que quieras que se compartan las peticiones creadas a partir de esta plantilla.",
     "context": "Specify which users or teams the petitions created from this template are shared with"
-  },
-  {
-    "term": "component.petition-settings.share-automatically-settings",
-    "definition": "Ajustes de compartido",
-    "context": "Sharing settings"
   },
   {
     "term": "component.petition-settings.share-by-link",
@@ -3045,6 +3030,16 @@
     "context": "Public link configuration"
   },
   {
+    "term": "component.settings-row-button.edit-settings",
+    "definition": "Editar configuración",
+    "context": "Edit settings"
+  },
+  {
+    "term": "component.settings-row-button.remove-setting",
+    "definition": "Quitar ajuste",
+    "context": "Remove setting"
+  },
+  {
     "term": "component.share-button.petition-not-shared",
     "definition": "Esta petición no se ha compartido todavía.",
     "context": "This petition has not been shared yet."
@@ -3938,11 +3933,6 @@
     "term": "generic.cancel-save-changes",
     "definition": "Cancelar",
     "context": "Cancel"
-  },
-  {
-    "term": "generic.change",
-    "definition": "Cambiar",
-    "context": "Change"
   },
   {
     "term": "generic.changes-saved",

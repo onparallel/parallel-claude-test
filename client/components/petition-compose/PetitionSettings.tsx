@@ -1,15 +1,15 @@
 import { gql, useMutation } from "@apollo/client";
 import {
+  Box,
   Button,
-  Center,
   CloseButton,
   FormControl,
   FormLabel,
   Heading,
   HStack,
-  IconButton,
   Input,
   InputGroup,
+  InputRightAddon,
   InputRightElement,
   Select,
   Stack,
@@ -18,14 +18,14 @@ import {
 import {
   ArrowShortRightIcon,
   BellSettingsIcon,
+  EmailIcon,
+  FieldDateIcon,
   LinkIcon,
   ListIcon,
   LockClosedIcon,
   LockOpenIcon,
-  SettingsIcon,
   ShieldIcon,
   SignatureIcon,
-  TimeIcon,
 } from "@parallel/chakra/icons";
 import {
   PetitionSettings_cancelPetitionSignatureRequestDocument,
@@ -72,6 +72,7 @@ import { TestModeSignatureBadge } from "../petition-common/TestModeSignatureBadg
 import { usePetitionDeadlineDialog } from "./dialogs/PetitionDeadlineDialog";
 import { useRestrictPetitionDialog } from "./dialogs/RestrictPetitionDialog";
 import { usePasswordRestrictPetitionDialog } from "./dialogs/UnrestrictPetitionDialog";
+import { SettingsRowButton } from "./SettingsRowButton";
 import { SettingsRowSwitch } from "./SettingsRowSwitch";
 
 export interface PetitionSettingsProps {
@@ -364,7 +365,7 @@ function _PetitionSettings({
   const restrictEditingSwitch = (
     <SettingsRowSwitch
       isDisabled={isPublicTemplate}
-      icon={petition.isRestricted ? <LockClosedIcon /> : <LockOpenIcon />}
+      icon={petition.isRestricted ? <LockClosedIcon color="purple.600" /> : <LockOpenIcon />}
       label={
         <FormattedMessage
           id="component.petition-settings.restrict-editing"
@@ -394,10 +395,9 @@ function _PetitionSettings({
             />
           </Heading>
           {restrictEditingSwitch}
-          <SettingsRowSwitch
-            data-section="share-by-link"
+          <SettingsRowButton
             isDisabled={isPublicTemplate || petition.isRestricted}
-            icon={<LinkIcon />}
+            icon={<LinkIcon color={hasActivePublicLink ? "purple.600" : undefined} />}
             label={
               <FormattedMessage
                 id="component.petition-settings.share-by-link"
@@ -410,22 +410,31 @@ function _PetitionSettings({
                 defaultMessage="Share an open link that allows your clients create petitions by themselves. They will be managed by the owner."
               />
             }
-            isChecked={hasActivePublicLink}
-            onChange={handleToggleShareByLink}
+            isActive={hasActivePublicLink}
+            onAdd={handleToggleShareByLink}
+            onRemove={handleToggleShareByLink}
+            onConfig={handleEditPublicPetitionLink}
             controlId="share-by-link"
           >
-            <HStack paddingLeft={6}>
-              <Input type="text" value={petition.publicLink?.url} onChange={noop} />
-              <CopyToClipboardButton text={petition.publicLink?.url as string} />
-              <IconButton
-                variant="outline"
-                aria-label="public link settings"
-                onClick={handleEditPublicPetitionLink}
-                icon={<SettingsIcon boxSize={"1.125rem"} />}
-                isDisabled={isPublicTemplate || petition.isRestricted}
+            <InputGroup size="sm">
+              <Input
+                size="sm"
+                borderRadius="md"
+                type="text"
+                value={petition.publicLink?.url}
+                onChange={noop}
               />
-            </HStack>
-          </SettingsRowSwitch>
+              <InputRightAddon borderRadius="md" padding={0}>
+                <CopyToClipboardButton
+                  size="sm"
+                  border={"1px solid"}
+                  borderColor="inherit"
+                  borderLeftRadius={0}
+                  text={petition.publicLink?.url as string}
+                />
+              </InputRightAddon>
+            </InputGroup>
+          </SettingsRowButton>
           <Divider paddingTop={2} />
           <Heading as="h5" size="sm" paddingTop={2}>
             <FormattedMessage
@@ -437,47 +446,59 @@ function _PetitionSettings({
       ) : null}
 
       <FormControl id="petition-locale" isDisabled={petition.isRestricted}>
-        <FormLabel display="flex" alignItems="center">
-          <FormattedMessage
-            id="component.petition-settings.locale-label"
-            defaultMessage="Language used in the communications"
-          />
-        </FormLabel>
-        <Select
-          name="petition-locale"
-          value={petition.locale}
-          onChange={(event) => onUpdatePetition({ locale: event.target.value as any })}
-          isDisabled={petition.isRestricted || isPublicTemplate}
-        >
-          {locales.map((locale) => (
-            <option key={locale.key} value={locale.key}>
-              {locale.localizedLabel}
-            </option>
-          ))}
-        </Select>
+        <HStack>
+          <EmailIcon />
+          <FormLabel display="flex" alignItems="center">
+            <FormattedMessage
+              id="component.petition-settings.locale-label"
+              defaultMessage="Language used in the communications"
+            />
+          </FormLabel>
+          <Box flex="1">
+            <Select
+              size="sm"
+              borderRadius="md"
+              paddingLeft={2}
+              name="petition-locale"
+              minWidth="120px"
+              value={petition.locale}
+              onChange={(event) => onUpdatePetition({ locale: event.target.value as any })}
+              isDisabled={petition.isRestricted || isPublicTemplate}
+            >
+              {locales.map((locale) => (
+                <option key={locale.key} value={locale.key}>
+                  {locale.localizedLabel}
+                </option>
+              ))}
+            </Select>
+          </Box>
+        </HStack>
       </FormControl>
       {petition.__typename === "Petition" ? (
         <FormControl id="petition-deadline">
-          <FormLabel display="flex" alignItems="center">
-            <FormattedMessage id="petition.deadline-label" defaultMessage="Deadline" />
-            <HelpPopover>
-              <FormattedMessage
-                id="component.petition-settings.deadline-description"
-                defaultMessage="This date is used to inform the recipients of the deadline for which you need to have the information."
-              />
-            </HelpPopover>
-          </FormLabel>
-          <DeadlineInput
-            value={petition.deadline ? new Date(petition.deadline) : null}
-            onChange={(value) => onUpdatePetition({ deadline: value?.toISOString() ?? null })}
-          />
+          <HStack>
+            <FieldDateIcon color={Boolean(petition.deadline) ? "purple.600" : undefined} />
+            <FormLabel display="flex" alignItems="center">
+              <FormattedMessage id="petition.deadline-label" defaultMessage="Deadline" />
+              <HelpPopover>
+                <FormattedMessage
+                  id="component.petition-settings.deadline-description"
+                  defaultMessage="This date is used to inform the recipients of the deadline for which you need to have the information."
+                />
+              </HelpPopover>
+            </FormLabel>
+            <DeadlineInput
+              value={petition.deadline ? new Date(petition.deadline) : null}
+              onChange={(value) => onUpdatePetition({ deadline: value?.toISOString() ?? null })}
+            />
+          </HStack>
         </FormControl>
       ) : null}
       {petition.__typename === "PetitionTemplate" ? (
-        <SettingsRowSwitch
+        <SettingsRowButton
           data-section="share-automatically"
           isDisabled={isPublicTemplate || petition.isRestricted}
-          icon={<ArrowShortRightIcon />}
+          icon={<ArrowShortRightIcon color={hasDefaultPermissions ? "purple.600" : undefined} />}
           label={
             <FormattedMessage
               id="component.petition-settings.share-automatically"
@@ -490,36 +511,28 @@ function _PetitionSettings({
               defaultMessage="Specify which users or teams the petitions created from this template are shared with"
             />
           }
-          isChecked={hasDefaultPermissions}
-          onChange={handleUpdateTemplateDefaultPermissions}
           controlId="share-automatically"
-        >
-          <Center>
-            <Button
-              onClick={() => handleUpdateTemplateDefaultPermissions(true)}
-              isDisabled={isPublicTemplate || petition.isRestricted}
-            >
-              <FormattedMessage
-                id="component.petition-settings.share-automatically-settings"
-                defaultMessage="Sharing settings"
-              />
-            </Button>
-          </Center>
-        </SettingsRowSwitch>
+          isActive={hasDefaultPermissions}
+          onAdd={() => handleUpdateTemplateDefaultPermissions(true)}
+          onRemove={() => handleUpdateTemplateDefaultPermissions(false)}
+          onConfig={() => handleUpdateTemplateDefaultPermissions(true)}
+        />
       ) : (
         restrictEditingSwitch
       )}
       {petition.signatureConfig || hasSignature ? (
-        <SettingsRowSwitch
+        <SettingsRowButton
           data-section="esignature-settings"
           isDisabled={!hasSignature || isPublicTemplate}
-          icon={<SignatureIcon />}
+          icon={
+            <SignatureIcon color={Boolean(petition.signatureConfig) ? "purple.600" : undefined} />
+          }
           label={
             <HStack>
               <Text as="span">
                 <FormattedMessage
                   id="component.petition-settings.petition-signature-enable"
-                  defaultMessage="Include eSignature process"
+                  defaultMessage="eSignature process"
                 />
               </Text>
               <HelpPopover>
@@ -533,55 +546,38 @@ function _PetitionSettings({
               ) : null}
             </HStack>
           }
-          onChange={handleSignatureChange}
-          isChecked={Boolean(petition.signatureConfig)}
+          isActive={Boolean(petition.signatureConfig)}
+          onAdd={() => handleSignatureChange(true)}
+          onRemove={() => handleSignatureChange(false)}
+          onConfig={() => handleConfigureSignatureClick()}
           controlId="enable-esignature"
-        >
-          <Center>
-            <Button
-              onClick={handleConfigureSignatureClick}
-              isDisabled={!hasSignature || isPublicTemplate}
-            >
-              <Text as="span">
-                <FormattedMessage
-                  id="component.petition-settings.petition-signature-configure"
-                  defaultMessage="Configure eSignature"
-                />
-              </Text>
-            </Button>
-          </Center>
-        </SettingsRowSwitch>
+        />
       ) : null}
       {petition.__typename === "PetitionTemplate" ? (
-        <SettingsRowSwitch
+        <SettingsRowButton
           isDisabled={isPublicTemplate}
-          icon={<BellSettingsIcon />}
+          icon={
+            <BellSettingsIcon
+              color={Boolean(petition.remindersConfig) ? "purple.600" : undefined}
+            />
+          }
           label={
             <FormattedMessage
               id="component.petition-settings.automatic-reminders"
-              defaultMessage="Enable automatic reminders"
+              defaultMessage="Automatic reminders"
             />
           }
-          isChecked={Boolean(petition.remindersConfig)}
-          onChange={handleAutomaticReminders}
+          isActive={Boolean(petition.remindersConfig)}
+          onAdd={() => handleAutomaticReminders(true)}
+          onRemove={() => handleAutomaticReminders(false)}
+          onConfig={() => handleConfigureAutomaticReminders()}
           controlId="automatic-reminders"
-        >
-          <Center>
-            <Button onClick={handleConfigureAutomaticReminders} isDisabled={isPublicTemplate}>
-              <Text as="span">
-                <FormattedMessage
-                  id="component.petition-settings.automatic-reminders-configure"
-                  defaultMessage="Configure reminders"
-                />
-              </Text>
-            </Button>
-          </Center>
-        </SettingsRowSwitch>
+        />
       ) : null}
       {user.hasSkipForwardSecurity ? (
         <SettingsRowSwitch
           isDisabled={isPublicTemplate}
-          icon={<ShieldIcon />}
+          icon={<ShieldIcon color={petition.skipForwardSecurity ? "purple.600" : undefined} />}
           label={
             <FormattedMessage
               id="component.petition-settings.skip-forward-security"
@@ -602,7 +598,9 @@ function _PetitionSettings({
       {user.hasHideRecipientViewContents ? (
         <SettingsRowSwitch
           isDisabled={isPublicTemplate}
-          icon={<ListIcon />}
+          icon={
+            <ListIcon color={petition.isRecipientViewContentsHidden ? "purple.600" : undefined} />
+          }
           label={
             <FormattedMessage
               id="component.petition-settings.hide-recipient-view-contents"
@@ -826,59 +824,52 @@ function DeadlineInput({
     } catch {}
   }
   return (
-    <Stack direction={{ base: "column", sm: "row" }}>
-      <InputGroup size="md" flex="1">
-        <Input
-          isReadOnly
-          placeholder={
-            value
-              ? undefined
-              : intl.formatMessage({
-                  id: "generic.no-deadline",
-                  defaultMessage: "No deadline",
-                })
+    <InputGroup size="sm" borderRadius="md" flex="1" paddingLeft={2}>
+      <Input
+        isReadOnly
+        placeholder={
+          value
+            ? undefined
+            : intl.formatMessage({
+                id: "generic.no-deadline",
+                defaultMessage: "No deadline",
+              })
+        }
+        value={
+          value
+            ? intl.formatDate(value, {
+                ...FORMATS.LLL,
+                weekday: "long",
+              })
+            : ""
+        }
+        onChange={() => {}}
+        onKeyUp={(event) => {
+          switch (event.key) {
+            case " ":
+            case "Enter":
+              handleOpenDeadlineDialog();
           }
-          value={
-            value
-              ? intl.formatDate(value, {
-                  ...FORMATS.LLL,
-                  weekday: "long",
-                })
-              : ""
-          }
-          onChange={() => {}}
-          onKeyUp={(event) => {
-            switch (event.key) {
-              case " ":
-              case "Enter":
-                handleOpenDeadlineDialog();
-            }
-          }}
-          onClick={handleOpenDeadlineDialog}
-        />
-        {value ? (
-          <InputRightElement>
-            <CloseButton
-              size="sm"
-              aria-label={intl.formatMessage({
-                id: "generic.clear",
-                defaultMessage: "Clear",
-              })}
-              onClick={() => onChange(null)}
-            />
-          </InputRightElement>
-        ) : null}
-      </InputGroup>
-      <Button
-        leftIcon={<TimeIcon fontSize="18px" />}
-        onClick={(event) => {
-          event.stopPropagation();
-          handleOpenDeadlineDialog();
         }}
-      >
-        <FormattedMessage id="generic.change" defaultMessage="Change" />
-      </Button>
-    </Stack>
+        onClick={handleOpenDeadlineDialog}
+      />
+      {value ? (
+        <InputRightElement>
+          <CloseButton
+            size="sm"
+            aria-label={intl.formatMessage({
+              id: "generic.clear",
+              defaultMessage: "Clear",
+            })}
+            onClick={() => onChange(null)}
+          />
+        </InputRightElement>
+      ) : (
+        <InputRightElement pointerEvents="none">
+          <FieldDateIcon />
+        </InputRightElement>
+      )}
+    </InputGroup>
   );
 }
 
