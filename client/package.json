@@ -12,7 +12,9 @@
     "generate-graphql-types": "graphql-codegen",
     "extract-i18n-terms": "yarn workspace @parallel/bin extract-i18n-terms --locales en es --input '../client/{components,pages,utils}/**/*.{ts,tsx}' --output '../client/lang'",
     "generate-i18n-files": "yarn workspace @parallel/bin generate-i18n-files --locales en es --input '../client/lang' --output-raw '../client/public/static/lang' --output-compiled '../client/public/static/lang/compiled'",
-    "download-flag-emojis": "yarn workspace @parallel/bin download-flag-emojis --output '../client/public/static/countries/flags'"
+    "download-flag-emojis": "yarn workspace @parallel/bin download-flag-emojis --output '../client/public/static/countries/flags'",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "dependencies": {
     "@apollo/client": "^3.5.10",
@@ -97,12 +99,19 @@
     "userflow.js": "^2.3.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.17.7",
     "@emotion/babel-plugin": "^11.7.2",
     "@graphql-codegen/cli": "^2.6.2",
     "@graphql-codegen/fragment-matcher": "^3.2.1",
     "@graphql-codegen/typed-document-node": "^2.2.7",
     "@graphql-codegen/typescript": "^2.4.7",
     "@graphql-codegen/typescript-operations": "^2.3.4",
+    "@storybook/addon-actions": "^6.4.19",
+    "@storybook/addon-essentials": "^6.4.19",
+    "@storybook/addon-interactions": "^6.4.19",
+    "@storybook/addon-links": "^6.4.19",
+    "@storybook/react": "^6.4.19",
+    "@storybook/testing-library": "^0.0.9",
     "@types/apollo-upload-client": "^17.0.0",
     "@types/autosize": "^4.0.1",
     "@types/cookie": "^0.4.1",
@@ -117,6 +126,7 @@
     "@types/request-ip": "^0.0.37",
     "@types/truncate-utf8-bytes": "^1.0.0",
     "@types/ua-parser-js": "^0.7.36",
+    "babel-loader": "^8.2.3",
     "cross-env": "^7.0.3",
     "rimraf": "^3.0.2",
     "svgo": "^2.8.0",
