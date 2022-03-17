@@ -156,7 +156,7 @@ PetitionPdf.fragments = {
 };
 
 type HardcodedSigner = {
-  name: string;
+  name?: string;
   imgSrc: string;
 };
 function HardcodedSignatures({ fromTemplateId }: { fromTemplateId: string }) {
@@ -165,11 +165,15 @@ function HardcodedSignatures({ fromTemplateId }: { fromTemplateId: string }) {
       name: "Guillermo Preckler",
       imgSrc: "static/images/signatures/guillermo-preckler-brickbro.png",
     };
+    const selloTiko: HardcodedSigner = {
+      imgSrc: "static/images/signatures/sello-tiko.png",
+    };
     switch (process.env.NEXT_PUBLIC_ENVIRONMENT) {
       case "production":
         return {
           EAwW2jXkP4C9LjU2b3: [guillermo],
           EAwW2jXkP4C9LjU2fS: [guillermo],
+          EAwW2jXkP4C9LbfNRp: [selloTiko],
         };
       case "staging":
         return {};
@@ -183,7 +187,7 @@ function HardcodedSignatures({ fromTemplateId }: { fromTemplateId: string }) {
       {(signaturesByTemplateId[fromTemplateId] ?? []).map((signer, index) => (
         <Box key={index}>
           <Image height="35mm" src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/${signer.imgSrc}`} />
-          <Text textAlign="center">{signer.name}</Text>
+          {signer.name ? <Text textAlign="center">{signer.name}</Text> : null}
         </Box>
       ))}
     </SignaturesGrid>
