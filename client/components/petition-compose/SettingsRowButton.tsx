@@ -32,7 +32,9 @@ export function SettingsRowButton({
         label={
           <Stack direction="row" alignItems="center">
             {icon}
-            <Text as="span">{label}</Text>
+            <Text as="span" whiteSpace="break-spaces">
+              {label}
+            </Text>
           </Stack>
         }
         {...props}
