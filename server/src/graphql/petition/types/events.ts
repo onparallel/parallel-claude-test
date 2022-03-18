@@ -2,6 +2,7 @@ import { core, enumType, interfaceType, objectType } from "nexus";
 import { isDefined } from "remeda";
 import { ApiContext } from "../../../context";
 import { PetitionAccess, PetitionEventTypeValues, User } from "../../../db/__types";
+import { mapEventPayload } from "../../../util/eventMapper";
 
 export async function userOrPetitionAccessResolver(
   root: { data: { user_id?: number; petition_access_id?: number } },
@@ -28,9 +29,14 @@ export const PetitionEvent = interfaceType({
         members: PetitionEventTypeValues,
       }),
     });
+    t.nullable.field("petition", {
+      type: "Petition",
+      resolve: async (o, _, ctx) => await ctx.petitions.loadPetition(o.petition_id),
+    });
     t.datetime("createdAt", {
       resolve: (o) => o.created_at,
     });
+    t.jsonObject("data", { resolve: (o) => mapEventPayload(o) });
   },
   resolveType: (p) => {
     switch (p.type) {

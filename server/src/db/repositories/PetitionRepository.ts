@@ -2086,6 +2086,43 @@ export class PetitionRepository extends BaseRepository {
     return events as any;
   }
 
+  async getPetitionEventsForUser(
+    userId: number,
+    options: {
+      before?: Maybe<number>;
+      limit: number;
+    }
+  ) {
+    const ids = await this.from("user_petition_event_log")
+      .select("petition_event_id")
+      .where("user_id", userId)
+      .where((q) => {
+        if (isDefined(options.before)) {
+          q.where("petition_event_id", "<", options.before);
+        }
+      })
+      .orderBy("petition_event_id", "desc")
+      .limit(options.limit);
+
+    return await this.from("petition_event")
+      .whereIn(
+        "id",
+        ids.map((id) => id.petition_event_id)
+      )
+      .orderBy("id", "desc")
+      .select("*");
+  }
+
+  async attachPetitionEventsToUsers(petitionEventId: number, userIds: number[]) {
+    await this.insert(
+      "user_petition_event_log",
+      userIds.map((userId) => ({
+        petition_event_id: petitionEventId,
+        user_id: userId,
+      }))
+    );
+  }
+
   async shouldNotifyPetitionClosed(petitionId: number) {
     const events = await this.loadLastEventsByType(petitionId, [
       "PETITION_CLOSED_NOTIFIED",

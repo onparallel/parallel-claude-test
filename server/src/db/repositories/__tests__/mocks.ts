@@ -32,7 +32,9 @@ import {
   Petition,
   PetitionAccess,
   PetitionAttachment,
+  PetitionEvent,
   PetitionEventSubscription,
+  PetitionEventTypeValues,
   PetitionField,
   PetitionFieldAttachment,
   PetitionFieldComment,
@@ -52,6 +54,7 @@ import {
   UserAuthenticationToken,
   UserGroup,
   UserGroupMember,
+  UserPetitionEventLog,
 } from "../../__types";
 import { Task } from "../TaskRepository";
 
@@ -740,6 +743,29 @@ export class Mocks {
       .returning("*");
 
     return reply;
+  }
+
+  async createRandomPetitionEvents(userId: number, petitionId: number, amount: number) {
+    const petitionEvents = await this.knex<PetitionEvent>("petition_event")
+      .insert(
+        range(0, amount || 1).map(() => ({
+          type: PetitionEventTypeValues[Math.floor(Math.random() * PetitionEventTypeValues.length)],
+          data: {},
+          petition_id: petitionId,
+        }))
+      )
+      .returning("*");
+
+    await this.knex<UserPetitionEventLog>("user_petition_event_log")
+      .insert(
+        petitionEvents.map((e) => ({
+          petition_event_id: e.id,
+          user_id: userId,
+        }))
+      )
+      .returning("*");
+
+    return petitionEvents;
   }
 }
 

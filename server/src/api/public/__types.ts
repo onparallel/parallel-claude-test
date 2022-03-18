@@ -32,7 +32,9 @@ export type AWSPresignedPostData = {
 export type AccessActivatedEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -40,7 +42,9 @@ export type AccessActivatedEvent = PetitionEvent & {
 export type AccessActivatedFromPublicPetitionLinkEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -55,7 +59,9 @@ export type AccessActivatedFromPublicPetitionLinkUserNotification = PetitionUser
 export type AccessDeactivatedEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   reason: Scalars["String"];
   type: PetitionEventType;
   user: Maybe<User>;
@@ -63,16 +69,20 @@ export type AccessDeactivatedEvent = PetitionEvent & {
 
 export type AccessDelegatedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   newAccess: PetitionAccess;
   originalAccess: PetitionAccess;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
 export type AccessOpenedEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -97,17 +107,21 @@ export type CommentCreatedUserNotification = PetitionUserNotification & {
 
 export type CommentDeletedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   deletedBy: Maybe<UserOrPetitionAccess>;
   field: Maybe<PetitionField>;
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
 export type CommentPublishedEvent = PetitionEvent & {
   comment: Maybe<PetitionFieldComment>;
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   field: Maybe<PetitionField>;
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -223,26 +237,32 @@ export type GenerateUserAuthTokenResponse = {
 
 export type GroupPermissionAddedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   permissionGroup: Maybe<UserGroup>;
   permissionType: PetitionPermissionType;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
 
 export type GroupPermissionEditedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   permissionGroup: Maybe<UserGroup>;
   permissionType: PetitionPermissionType;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
 
 export type GroupPermissionRemovedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   permissionGroup: Maybe<UserGroup>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -298,8 +318,10 @@ export type LandingTemplatePagination = {
 
 export type MessageCancelledEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   message: PetitionMessage;
+  petition: Maybe<Petition>;
   reason: Scalars["String"];
   type: PetitionEventType;
   user: Maybe<User>;
@@ -315,15 +337,19 @@ export type MessageEmailBouncedUserNotification = PetitionUserNotification & {
 
 export type MessageScheduledEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   message: PetitionMessage;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
 export type MessageSentEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   message: PetitionMessage;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -1510,8 +1536,10 @@ export type OrganizationUsers_OrderBy =
 
 export type OwnershipTransferredEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   owner: Maybe<User>;
+  petition: Maybe<Petition>;
   previousOwner: Maybe<User>;
   type: PetitionEventType;
   user: Maybe<User>;
@@ -1710,14 +1738,18 @@ export type PetitionBaseType = "PETITION" | "TEMPLATE";
 
 export type PetitionClonedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
 
 export type PetitionClosedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -1725,7 +1757,9 @@ export type PetitionClosedEvent = PetitionEvent & {
 export type PetitionClosedNotifiedEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -1733,7 +1767,9 @@ export type PetitionClosedNotifiedEvent = PetitionEvent & {
 export type PetitionCompletedEvent = PetitionEvent & {
   completedBy: Maybe<UserOrPetitionAccess>;
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -1747,20 +1783,26 @@ export type PetitionCompletedUserNotification = PetitionUserNotification & {
 
 export type PetitionCreatedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
 
 export type PetitionDeletedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
 export type PetitionEvent = {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -2000,8 +2042,10 @@ export type PetitionMessage = CreatedAt & {
 
 export type PetitionMessageBouncedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   message: PetitionMessage;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -2059,7 +2103,9 @@ export type PetitionReminder = CreatedAt & {
 
 export type PetitionReminderBouncedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   reminder: PetitionReminder;
   type: PetitionEventType;
 };
@@ -2073,7 +2119,9 @@ export type PetitionReminderType =
 
 export type PetitionReopenedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -2520,6 +2568,7 @@ export type Query = {
   organizations: OrganizationPagination;
   petition: Maybe<PetitionBase>;
   petitionAuthToken: Maybe<Petition>;
+  petitionEvents: Array<PetitionEvent>;
   /** A field of the petition. */
   petitionField: PetitionField;
   /** The petitions of the user */
@@ -2624,6 +2673,10 @@ export type QuerypetitionArgs = {
 
 export type QuerypetitionAuthTokenArgs = {
   token: Scalars["String"];
+};
+
+export type QuerypetitionEventsArgs = {
+  before?: InputMaybe<Scalars["GID"]>;
 };
 
 export type QuerypetitionFieldArgs = {
@@ -2741,7 +2794,9 @@ export type QueryUserGroups_OrderBy = "createdAt_ASC" | "createdAt_DESC" | "name
 
 export type RecipientSignedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   signer: Maybe<PetitionSigner>;
   type: PetitionEventType;
 };
@@ -2756,7 +2811,9 @@ export type ReminderEmailBouncedUserNotification = PetitionUserNotification & {
 
 export type ReminderSentEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   reminder: PetitionReminder;
   type: PetitionEventType;
 };
@@ -2788,8 +2845,10 @@ export type RemindersConfigInput = {
 export type RemindersOptOutEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   other: Maybe<Scalars["String"]>;
+  petition: Maybe<Petition>;
   reason: Scalars["String"];
   type: PetitionEventType;
 };
@@ -2807,24 +2866,30 @@ export type RemindersOptOutNotification = PetitionUserNotification & {
 export type ReplyCreatedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   createdBy: Maybe<UserOrPetitionAccess>;
+  data: Scalars["JSONObject"];
   field: Maybe<PetitionField>;
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   reply: Maybe<PetitionFieldReply>;
   type: PetitionEventType;
 };
 
 export type ReplyDeletedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   deletedBy: Maybe<UserOrPetitionAccess>;
   field: Maybe<PetitionField>;
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
 export type ReplyUpdatedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   field: Maybe<PetitionField>;
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   reply: Maybe<PetitionFieldReply>;
   type: PetitionEventType;
   updatedBy: Maybe<UserOrPetitionAccess>;
@@ -2845,9 +2910,11 @@ export type SignatureCancelledEvent = PetitionEvent & {
   canceller: Maybe<PetitionSigner>;
   cancellerReason: Maybe<Scalars["String"]>;
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   errorCode: Maybe<Scalars["String"]>;
   extraErrorData: Maybe<Scalars["JSON"]>;
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -2862,7 +2929,9 @@ export type SignatureCancelledUserNotification = PetitionUserNotification & {
 
 export type SignatureCompletedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -2914,7 +2983,9 @@ export type SignatureConfigInputSigner = {
 
 export type SignatureOpenedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   signer: Maybe<PetitionSigner>;
   type: PetitionEventType;
 };
@@ -2938,7 +3009,9 @@ export type SignatureOrgIntegrationProvider = "SIGNATURIT";
 
 export type SignatureReminderEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -2946,9 +3019,11 @@ export type SignatureReminderEvent = PetitionEvent & {
 export type SignatureStartedEvent = PetitionEvent & {
   bouncedAt: Maybe<Scalars["DateTime"]>;
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   deliveredAt: Maybe<Scalars["DateTime"]>;
   id: Scalars["GID"];
   openedAt: Maybe<Scalars["DateTime"]>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -3038,7 +3113,9 @@ export type TemplateDefaultUserPermission = TemplateDefaultPermission &
 
 export type TemplateUsedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition: Maybe<Petition>;
   type: PetitionEventType;
 };
 
@@ -3210,26 +3287,32 @@ export type UserPagination = {
 
 export type UserPermissionAddedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   permissionType: PetitionPermissionType;
   permissionUser: Maybe<User>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
 
 export type UserPermissionEditedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   permissionType: PetitionPermissionType;
   permissionUser: Maybe<User>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
 
 export type UserPermissionRemovedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   permissionUser: Maybe<User>;
+  petition: Maybe<Petition>;
   type: PetitionEventType;
   user: Maybe<User>;
 };
@@ -4479,6 +4562,281 @@ export type EventSubscriptions_deleteSubscriptionMutationVariables = Exact<{
 
 export type EventSubscriptions_deleteSubscriptionMutation = { deleteEventSubscriptions: Result };
 
+export type GetPetitionEvents_PetitionEventsQueryVariables = Exact<{
+  before?: InputMaybe<Scalars["GID"]>;
+}>;
+
+export type GetPetitionEvents_PetitionEventsQuery = {
+  petitionEvents: Array<
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
+  >;
+};
+
 export type SubmitReply_createPetitionFieldReplyMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   fieldId: Scalars["GID"];
@@ -5476,6 +5834,22 @@ export const EventSubscriptions_deleteSubscriptionDocument = gql`
 ` as unknown as DocumentNode<
   EventSubscriptions_deleteSubscriptionMutation,
   EventSubscriptions_deleteSubscriptionMutationVariables
+>;
+export const GetPetitionEvents_PetitionEventsDocument = gql`
+  query GetPetitionEvents_PetitionEvents($before: GID) {
+    petitionEvents(before: $before) {
+      id
+      data
+      petition {
+        id
+      }
+      type
+      createdAt
+    }
+  }
+` as unknown as DocumentNode<
+  GetPetitionEvents_PetitionEventsQuery,
+  GetPetitionEvents_PetitionEventsQueryVariables
 >;
 export const SubmitReply_createPetitionFieldReplyDocument = gql`
   mutation SubmitReply_createPetitionFieldReply($petitionId: GID!, $fieldId: GID!, $reply: JSON!) {

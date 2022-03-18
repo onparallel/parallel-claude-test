@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 import { WorkerContext } from "../../context";
 import { PetitionEvent } from "../../db/events";
 import { EventListener } from "../event-processor";
-import { mapEvent } from "../helpers/eventMapper";
+import { mapEvent } from "../../util/eventMapper";
 
 export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (
   event: PetitionEvent,
@@ -16,6 +16,8 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (
   const userIds = (await ctx.petitions.loadEffectivePermissions(petition.id)).map(
     (p) => p.user_id!
   );
+
+  await ctx.petitions.attachPetitionEventsToUsers(event.id, userIds);
 
   const userSubscriptions = (await ctx.subscriptions.loadSubscriptionsByUserId(userIds))
     .flat()

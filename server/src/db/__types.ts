@@ -335,6 +335,7 @@ export interface TableTypes {
   user_authentication_token: UserAuthenticationToken;
   user_group: UserGroup;
   user_group_member: UserGroupMember;
+  user_petition_event_log: UserPetitionEventLog;
 }
 
 export interface TableCreateTypes {
@@ -377,6 +378,7 @@ export interface TableCreateTypes {
   user_authentication_token: CreateUserAuthenticationToken;
   user_group: CreateUserGroup;
   user_group_member: CreateUserGroupMember;
+  user_petition_event_log: CreateUserPetitionEventLog;
 }
 
 export interface TablePrimaryKeys {
@@ -419,6 +421,7 @@ export interface TablePrimaryKeys {
   user_authentication_token: "id";
   user_group: "id";
   user_group_member: "id";
+  user_petition_event_log: "id";
 }
 
 export interface Contact {
@@ -1295,4 +1298,15 @@ export interface UserGroupMember {
 export type CreateUserGroupMember = PartialProps<
   Omit<UserGroupMember, "id">,
   "created_at" | "created_by" | "deleted_at" | "deleted_by"
+>;
+
+export interface UserPetitionEventLog {
+  id: string; // int8
+  user_id: Maybe<number>; // int4
+  petition_event_id: Maybe<number>; // int4
+}
+
+export type CreateUserPetitionEventLog = PartialProps<
+  Omit<UserPetitionEventLog, "id">,
+  "user_id" | "petition_event_id"
 >;

@@ -3,7 +3,7 @@ import { gql } from "graphql-request";
 import { Knex } from "knex";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Organization, PetitionEventSubscription, User } from "../../db/__types";
+import { Organization, PetitionEvent, PetitionEventSubscription, User } from "../../db/__types";
 import { FETCH_SERVICE, IFetchService } from "../../services/fetch";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
@@ -14,14 +14,14 @@ describe("GraphQL/PetitionEventSubscription", () => {
   let sessionUser: User;
   let otherUser: User;
 
+  let organization: Organization;
+
   let subscriptions: PetitionEventSubscription[];
 
   beforeAll(async () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
-
-    let organization: Organization;
 
     ({ organization, user: sessionUser } = await mocks.createSessionUserAndOrganization());
 
@@ -81,6 +81,49 @@ describe("GraphQL/PetitionEventSubscription", () => {
           isEnabled: true,
         },
       ]);
+    });
+  });
+
+  describe("petitionEvents", () => {
+    let orderedEvents: PetitionEvent[] = [];
+    beforeAll(async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1);
+      orderedEvents = (
+        await mocks.createRandomPetitionEvents(sessionUser.id, petition.id, 15)
+      ).sort((a, b) => b.id - a.id);
+    });
+
+    it("fetches last 10 petition events for the user", async () => {
+      const { errors, data } = await testClient.execute(gql`
+        query {
+          petitionEvents {
+            id
+          }
+        }
+      `);
+
+      expect(errors).toBeUndefined();
+      expect(data?.petitionEvents).toEqual(
+        orderedEvents.slice(0, 10).map((e) => ({ id: toGlobalId("PetitionEvent", e.id) }))
+      );
+    });
+
+    it("fetches last 5 petition events for the user", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($before: GID) {
+            petitionEvents(before: $before) {
+              id
+            }
+          }
+        `,
+        { before: toGlobalId("PetitionEvent", orderedEvents[9].id) }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.petitionEvents).toEqual(
+        orderedEvents.slice(10).map((e) => ({ id: toGlobalId("PetitionEvent", e.id) }))
+      );
     });
   });
 

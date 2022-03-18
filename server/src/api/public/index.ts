@@ -57,6 +57,7 @@ import {
   ListOfPermissions,
   ListOfPetitionAccesses,
   ListOfPetitionAttachments,
+  ListOfPetitionEvents,
   ListOfPetitionFieldsWithReplies,
   ListOfSignatureRequests,
   ListOfSubscriptions,
@@ -112,6 +113,7 @@ import {
   GetOrganizationUsers_usersDocument,
   GetPermissions_permissionsDocument,
   GetPetitionAttachments_petitionDocument,
+  GetPetitionEvents_PetitionEventsDocument,
   GetPetitionRecipients_petitionAccessesDocument,
   GetPetitions_petitionsDocument,
   GetPetition_petitionDocument,
@@ -210,6 +212,7 @@ export const api = new RestApi({
         "Contacts",
         "Users",
         "Subscriptions",
+        "Petition Events",
       ],
     },
     { name: "Events", tags: ["Petition Event"] },
@@ -252,6 +255,10 @@ export const api = new RestApi({
     },
     {
       name: "Subscriptions",
+      description: "Subscribe to our events to get real time updates on your petitions",
+    },
+    {
+      name: "Petition Event",
       description: "Subscribe to our events to get real time updates on your petitions",
     },
     {
@@ -2672,5 +2679,53 @@ api.path("/subscriptions/:subscriptionId", { params: { subscriptionId } }).delet
       ids: [params.subscriptionId],
     });
     return NoContent();
+  }
+);
+
+api.path("/petition-events").get(
+  {
+    operationId: "GetPetitionEvents",
+    summary: "Get your latest petition events",
+    description: "Returns a list with your latest petition events",
+    query: {
+      before: idParam({
+        type: "PetitionEvent",
+        description: "Fetch events that ocurred before this ID",
+        required: false,
+      }),
+    },
+    responses: { 200: SuccessResponse(ListOfPetitionEvents) },
+    tags: ["Petition Events"],
+  },
+  async ({ client, query }) => {
+    const _query = gql`
+      query GetPetitionEvents_PetitionEvents($before: GID) {
+        petitionEvents(before: $before) {
+          id
+          data
+          petition {
+            id
+          }
+          type
+          createdAt
+        }
+      }
+    `;
+
+    const result = await client.request(GetPetitionEvents_PetitionEventsDocument, {
+      before: query.before,
+    });
+
+    return Ok(
+      result.petitionEvents
+        .filter((e) => isDefined(e.petition))
+        .map((e) => ({
+          id: e.id,
+          petitionId: e.petition!.id,
+          type: e.type,
+          data: e.data,
+          createdAt: e.createdAt,
+        }))
+    );
   }
 );

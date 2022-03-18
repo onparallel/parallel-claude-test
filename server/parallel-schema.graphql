@@ -12,7 +12,9 @@ type AWSPresignedPostData {
 type AccessActivatedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -20,7 +22,9 @@ type AccessActivatedEvent implements PetitionEvent {
 type AccessActivatedFromPublicPetitionLinkEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -35,7 +39,9 @@ type AccessActivatedFromPublicPetitionLinkUserNotification implements PetitionUs
 type AccessDeactivatedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
+  petition: Petition
   reason: String!
   type: PetitionEventType!
   user: User
@@ -43,16 +49,20 @@ type AccessDeactivatedEvent implements PetitionEvent {
 
 type AccessDelegatedEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   newAccess: PetitionAccess!
   originalAccess: PetitionAccess!
+  petition: Petition
   type: PetitionEventType!
 }
 
 type AccessOpenedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -90,17 +100,21 @@ type CommentCreatedUserNotification implements PetitionUserNotification {
 
 type CommentDeletedEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   deletedBy: UserOrPetitionAccess
   field: PetitionField
   id: GID!
+  petition: Petition
   type: PetitionEventType!
 }
 
 type CommentPublishedEvent implements PetitionEvent {
   comment: PetitionFieldComment
   createdAt: DateTime!
+  data: JSONObject!
   field: PetitionField
   id: GID!
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -278,26 +292,32 @@ type GenerateUserAuthTokenResponse {
 
 type GroupPermissionAddedEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   permissionGroup: UserGroup
   permissionType: PetitionPermissionType!
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
 
 type GroupPermissionEditedEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   permissionGroup: UserGroup
   permissionType: PetitionPermissionType!
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
 
 type GroupPermissionRemovedEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   permissionGroup: UserGroup
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -385,8 +405,10 @@ type LandingTemplatePagination {
 
 type MessageCancelledEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   message: PetitionMessage!
+  petition: Petition
   reason: String!
   type: PetitionEventType!
   user: User
@@ -402,15 +424,19 @@ type MessageEmailBouncedUserNotification implements PetitionUserNotification {
 
 type MessageScheduledEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   message: PetitionMessage!
+  petition: Petition
   type: PetitionEventType!
 }
 
 type MessageSentEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   message: PetitionMessage!
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -1769,8 +1795,10 @@ enum OrganizationUsers_OrderBy {
 
 type OwnershipTransferredEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   owner: User
+  petition: Petition
   previousOwner: User
   type: PetitionEventType!
   user: User
@@ -2177,14 +2205,18 @@ enum PetitionBaseType {
 
 type PetitionClonedEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
 
 type PetitionClosedEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -2192,7 +2224,9 @@ type PetitionClosedEvent implements PetitionEvent {
 type PetitionClosedNotifiedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -2200,7 +2234,9 @@ type PetitionClosedNotifiedEvent implements PetitionEvent {
 type PetitionCompletedEvent implements PetitionEvent {
   completedBy: UserOrPetitionAccess
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -2214,20 +2250,26 @@ type PetitionCompletedUserNotification implements PetitionUserNotification {
 
 type PetitionCreatedEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
 
 type PetitionDeletedEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
+  petition: Petition
   type: PetitionEventType!
 }
 
 interface PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -2674,8 +2716,10 @@ type PetitionMessage implements CreatedAt {
 
 type PetitionMessageBouncedEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   message: PetitionMessage!
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -2793,7 +2837,9 @@ type PetitionReminder implements CreatedAt {
 
 type PetitionReminderBouncedEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
+  petition: Petition
   reminder: PetitionReminder!
   type: PetitionEventType!
 }
@@ -2815,7 +2861,9 @@ enum PetitionReminderType {
 
 type PetitionReopenedEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -3689,6 +3737,12 @@ type Query {
   ): OrganizationPagination!
   petition(id: GID!): PetitionBase
   petitionAuthToken(token: String!): Petition
+  petitionEvents(
+    """
+    Filter events that happened before the specified event id
+    """
+    before: GID
+  ): [PetitionEvent!]!
 
   """
   A field of the petition.
@@ -3874,7 +3928,9 @@ enum QueryUserGroups_OrderBy {
 
 type RecipientSignedEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
+  petition: Petition
   signer: PetitionSigner
   type: PetitionEventType!
 }
@@ -3889,7 +3945,9 @@ type ReminderEmailBouncedUserNotification implements PetitionUserNotification {
 
 type ReminderSentEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
+  petition: Petition
   reminder: PetitionReminder!
   type: PetitionEventType!
 }
@@ -3947,8 +4005,10 @@ input RemindersConfigInput {
 type RemindersOptOutEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   other: String
+  petition: Petition
   reason: String!
   type: PetitionEventType!
 }
@@ -3966,24 +4026,30 @@ type RemindersOptOutNotification implements PetitionUserNotification {
 type ReplyCreatedEvent implements PetitionEvent {
   createdAt: DateTime!
   createdBy: UserOrPetitionAccess
+  data: JSONObject!
   field: PetitionField
   id: GID!
+  petition: Petition
   reply: PetitionFieldReply
   type: PetitionEventType!
 }
 
 type ReplyDeletedEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   deletedBy: UserOrPetitionAccess
   field: PetitionField
   id: GID!
+  petition: Petition
   type: PetitionEventType!
 }
 
 type ReplyUpdatedEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   field: PetitionField
   id: GID!
+  petition: Petition
   reply: PetitionFieldReply
   type: PetitionEventType!
   updatedBy: UserOrPetitionAccess
@@ -4009,9 +4075,11 @@ type SignatureCancelledEvent implements PetitionEvent {
   canceller: PetitionSigner
   cancellerReason: String
   createdAt: DateTime!
+  data: JSONObject!
   errorCode: String
   extraErrorData: JSON
   id: GID!
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -4026,7 +4094,9 @@ type SignatureCancelledUserNotification implements PetitionUserNotification {
 
 type SignatureCompletedEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -4115,7 +4185,9 @@ input SignatureConfigInputSigner {
 
 type SignatureOpenedEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
+  petition: Petition
   signer: PetitionSigner
   type: PetitionEventType!
 }
@@ -4155,7 +4227,9 @@ enum SignatureOrgIntegrationProvider {
 
 type SignatureReminderEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
@@ -4163,9 +4237,11 @@ type SignatureReminderEvent implements PetitionEvent {
 type SignatureStartedEvent implements PetitionEvent {
   bouncedAt: DateTime
   createdAt: DateTime!
+  data: JSONObject!
   deliveredAt: DateTime
   id: GID!
   openedAt: DateTime
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -4322,7 +4398,9 @@ type TemplateDefaultUserPermission implements TemplateDefaultPermission & Timest
 
 type TemplateUsedEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
+  petition: Petition
   type: PetitionEventType!
 }
 
@@ -4569,26 +4647,32 @@ type UserPagination {
 
 type UserPermissionAddedEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   permissionType: PetitionPermissionType!
   permissionUser: User
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
 
 type UserPermissionEditedEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   permissionType: PetitionPermissionType!
   permissionUser: User
+  petition: Petition
   type: PetitionEventType!
   user: User
 }
 
 type UserPermissionRemovedEvent implements PetitionEvent {
   createdAt: DateTime!
+  data: JSONObject!
   id: GID!
   permissionUser: User
+  petition: Petition
   type: PetitionEventType!
   user: User
 }

@@ -18,7 +18,6 @@ import {
   Petition,
   PetitionSignatureRequest,
   TableCreateTypes as _TableCreateTypes,
-  TablePrimaryKeys,
   TableTypes as _TableTypes,
 } from "../__types";
 
@@ -63,8 +62,6 @@ export interface PageOpts {
 }
 
 type TableNames = keyof TableTypes;
-type TableKey<TName extends TableNames> = TableTypes[TName][TablePrimaryKeys[TName]] &
-  (string | number);
 
 type QueryBuilderFunction<TRecord, TResult = TRecord> = (
   q: Knex.QueryBuilder<TRecord, TResult>
@@ -121,7 +118,7 @@ export class BaseRepository {
       new DataLoader<TableTypes[TName][TColumn], TableTypes[TName] | null>(async (values) => {
         const rows = (await this.knex
           .from<TableTypes[TName]>(tableName)
-          .whereIn(column as any, values as TableKey<TName>[])
+          .whereIn(column as any, values)
           .modify((q) => builder?.(q))
           .select("*")) as TableTypes[TName][];
         const byValue = indexBy(rows, (r) => r[column]);
@@ -138,7 +135,7 @@ export class BaseRepository {
       new DataLoader<TableTypes[TName][TColumn], TableTypes[TName][]>(async (values) => {
         const rows = (await this.knex
           .from<TableTypes[TName]>(tableName)
-          .whereIn(column as any, values as TableKey<TName>[])
+          .whereIn(column as any, values)
           .modify((q) => builder?.(q))
           .select("*")) as TableTypes[TName][];
         const byValue = groupBy(rows, (r) => (r as any)[column as string]);
@@ -159,7 +156,7 @@ export class BaseRepository {
       new DataLoader<TableTypes[TName][TColumn], number>(async (values) => {
         const rows = (await this.knex
           .from<TableTypes[TName]>(tableName)
-          .whereIn(column as any, values as TableKey<TName>[])
+          .whereIn(column as any, values)
           .modify((q) => builder?.(q))
           .groupBy(column)
           .select(this.knex.raw(`?? as aggr`, [column as string]), this.count())) as {

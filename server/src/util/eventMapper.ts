@@ -1,8 +1,8 @@
 import { isDefined } from "remeda";
-import { PetitionEvent } from "../../db/events";
-import { toGlobalId } from "../../util/globalId";
+import { PetitionEvent } from "../db/events";
+import { toGlobalId } from "./globalId";
 
-function mapEventPayload(event: PetitionEvent) {
+export function mapEventPayload(event: PetitionEvent) {
   switch (event.type) {
     case "ACCESS_ACTIVATED": {
       return {

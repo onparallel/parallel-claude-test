@@ -34,7 +34,9 @@ export interface AccessActivatedEvent extends PetitionEvent {
   __typename?: "AccessActivatedEvent";
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -43,7 +45,9 @@ export interface AccessActivatedFromPublicPetitionLinkEvent extends PetitionEven
   __typename?: "AccessActivatedFromPublicPetitionLinkEvent";
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
 }
 
@@ -61,7 +65,9 @@ export interface AccessDeactivatedEvent extends PetitionEvent {
   __typename?: "AccessDeactivatedEvent";
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   reason: Scalars["String"];
   type: PetitionEventType;
   user?: Maybe<User>;
@@ -70,9 +76,11 @@ export interface AccessDeactivatedEvent extends PetitionEvent {
 export interface AccessDelegatedEvent extends PetitionEvent {
   __typename?: "AccessDelegatedEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   newAccess: PetitionAccess;
   originalAccess: PetitionAccess;
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
 }
 
@@ -80,7 +88,9 @@ export interface AccessOpenedEvent extends PetitionEvent {
   __typename?: "AccessOpenedEvent";
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
 }
 
@@ -107,9 +117,11 @@ export interface CommentCreatedUserNotification extends PetitionUserNotification
 export interface CommentDeletedEvent extends PetitionEvent {
   __typename?: "CommentDeletedEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   deletedBy?: Maybe<UserOrPetitionAccess>;
   field?: Maybe<PetitionField>;
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
 }
 
@@ -117,8 +129,10 @@ export interface CommentPublishedEvent extends PetitionEvent {
   __typename?: "CommentPublishedEvent";
   comment?: Maybe<PetitionFieldComment>;
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   field?: Maybe<PetitionField>;
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
 }
 
@@ -243,9 +257,11 @@ export interface GenerateUserAuthTokenResponse {
 export interface GroupPermissionAddedEvent extends PetitionEvent {
   __typename?: "GroupPermissionAddedEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   permissionGroup?: Maybe<UserGroup>;
   permissionType: PetitionPermissionType;
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -253,9 +269,11 @@ export interface GroupPermissionAddedEvent extends PetitionEvent {
 export interface GroupPermissionEditedEvent extends PetitionEvent {
   __typename?: "GroupPermissionEditedEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   permissionGroup?: Maybe<UserGroup>;
   permissionType: PetitionPermissionType;
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -263,8 +281,10 @@ export interface GroupPermissionEditedEvent extends PetitionEvent {
 export interface GroupPermissionRemovedEvent extends PetitionEvent {
   __typename?: "GroupPermissionRemovedEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   permissionGroup?: Maybe<UserGroup>;
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -325,8 +345,10 @@ export interface LandingTemplatePagination {
 export interface MessageCancelledEvent extends PetitionEvent {
   __typename?: "MessageCancelledEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   message: PetitionMessage;
+  petition?: Maybe<Petition>;
   reason: Scalars["String"];
   type: PetitionEventType;
   user?: Maybe<User>;
@@ -344,16 +366,20 @@ export interface MessageEmailBouncedUserNotification extends PetitionUserNotific
 export interface MessageScheduledEvent extends PetitionEvent {
   __typename?: "MessageScheduledEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   message: PetitionMessage;
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
 }
 
 export interface MessageSentEvent extends PetitionEvent {
   __typename?: "MessageSentEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   message: PetitionMessage;
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
 }
 
@@ -1549,8 +1575,10 @@ export type OrganizationUsers_OrderBy =
 export interface OwnershipTransferredEvent extends PetitionEvent {
   __typename?: "OwnershipTransferredEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   owner?: Maybe<User>;
+  petition?: Maybe<Petition>;
   previousOwner?: Maybe<User>;
   type: PetitionEventType;
   user?: Maybe<User>;
@@ -1756,7 +1784,9 @@ export type PetitionBaseType = "PETITION" | "TEMPLATE";
 export interface PetitionClonedEvent extends PetitionEvent {
   __typename?: "PetitionClonedEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -1764,7 +1794,9 @@ export interface PetitionClonedEvent extends PetitionEvent {
 export interface PetitionClosedEvent extends PetitionEvent {
   __typename?: "PetitionClosedEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -1773,7 +1805,9 @@ export interface PetitionClosedNotifiedEvent extends PetitionEvent {
   __typename?: "PetitionClosedNotifiedEvent";
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -1782,7 +1816,9 @@ export interface PetitionCompletedEvent extends PetitionEvent {
   __typename?: "PetitionCompletedEvent";
   completedBy?: Maybe<UserOrPetitionAccess>;
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
 }
 
@@ -1798,7 +1834,9 @@ export interface PetitionCompletedUserNotification extends PetitionUserNotificat
 export interface PetitionCreatedEvent extends PetitionEvent {
   __typename?: "PetitionCreatedEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -1806,13 +1844,17 @@ export interface PetitionCreatedEvent extends PetitionEvent {
 export interface PetitionDeletedEvent extends PetitionEvent {
   __typename?: "PetitionDeletedEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
 }
 
 export interface PetitionEvent {
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
 }
 
@@ -2063,8 +2105,10 @@ export interface PetitionMessage extends CreatedAt {
 export interface PetitionMessageBouncedEvent extends PetitionEvent {
   __typename?: "PetitionMessageBouncedEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   message: PetitionMessage;
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
 }
 
@@ -2125,7 +2169,9 @@ export interface PetitionReminder extends CreatedAt {
 export interface PetitionReminderBouncedEvent extends PetitionEvent {
   __typename?: "PetitionReminderBouncedEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   reminder: PetitionReminder;
   type: PetitionEventType;
 }
@@ -2140,7 +2186,9 @@ export type PetitionReminderType =
 export interface PetitionReopenedEvent extends PetitionEvent {
   __typename?: "PetitionReopenedEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -2608,6 +2656,7 @@ export interface Query {
   organizations: OrganizationPagination;
   petition?: Maybe<PetitionBase>;
   petitionAuthToken?: Maybe<Petition>;
+  petitionEvents: Array<PetitionEvent>;
   /** A field of the petition. */
   petitionField: PetitionField;
   /** The petitions of the user */
@@ -2712,6 +2761,10 @@ export interface QuerypetitionArgs {
 
 export interface QuerypetitionAuthTokenArgs {
   token: Scalars["String"];
+}
+
+export interface QuerypetitionEventsArgs {
+  before?: InputMaybe<Scalars["GID"]>;
 }
 
 export interface QuerypetitionFieldArgs {
@@ -2830,7 +2883,9 @@ export type QueryUserGroups_OrderBy = "createdAt_ASC" | "createdAt_DESC" | "name
 export interface RecipientSignedEvent extends PetitionEvent {
   __typename?: "RecipientSignedEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   signer?: Maybe<PetitionSigner>;
   type: PetitionEventType;
 }
@@ -2847,7 +2902,9 @@ export interface ReminderEmailBouncedUserNotification extends PetitionUserNotifi
 export interface ReminderSentEvent extends PetitionEvent {
   __typename?: "ReminderSentEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   reminder: PetitionReminder;
   type: PetitionEventType;
 }
@@ -2881,8 +2938,10 @@ export interface RemindersOptOutEvent extends PetitionEvent {
   __typename?: "RemindersOptOutEvent";
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   other?: Maybe<Scalars["String"]>;
+  petition?: Maybe<Petition>;
   reason: Scalars["String"];
   type: PetitionEventType;
 }
@@ -2902,8 +2961,10 @@ export interface ReplyCreatedEvent extends PetitionEvent {
   __typename?: "ReplyCreatedEvent";
   createdAt: Scalars["DateTime"];
   createdBy?: Maybe<UserOrPetitionAccess>;
+  data: Scalars["JSONObject"];
   field?: Maybe<PetitionField>;
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   reply?: Maybe<PetitionFieldReply>;
   type: PetitionEventType;
 }
@@ -2911,17 +2972,21 @@ export interface ReplyCreatedEvent extends PetitionEvent {
 export interface ReplyDeletedEvent extends PetitionEvent {
   __typename?: "ReplyDeletedEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   deletedBy?: Maybe<UserOrPetitionAccess>;
   field?: Maybe<PetitionField>;
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
 }
 
 export interface ReplyUpdatedEvent extends PetitionEvent {
   __typename?: "ReplyUpdatedEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   field?: Maybe<PetitionField>;
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   reply?: Maybe<PetitionFieldReply>;
   type: PetitionEventType;
   updatedBy?: Maybe<UserOrPetitionAccess>;
@@ -2944,9 +3009,11 @@ export interface SignatureCancelledEvent extends PetitionEvent {
   canceller?: Maybe<PetitionSigner>;
   cancellerReason?: Maybe<Scalars["String"]>;
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   errorCode?: Maybe<Scalars["String"]>;
   extraErrorData?: Maybe<Scalars["JSON"]>;
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
 }
 
@@ -2963,7 +3030,9 @@ export interface SignatureCancelledUserNotification extends PetitionUserNotifica
 export interface SignatureCompletedEvent extends PetitionEvent {
   __typename?: "SignatureCompletedEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
 }
 
@@ -3018,7 +3087,9 @@ export interface SignatureConfigInputSigner {
 export interface SignatureOpenedEvent extends PetitionEvent {
   __typename?: "SignatureOpenedEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   signer?: Maybe<PetitionSigner>;
   type: PetitionEventType;
 }
@@ -3044,7 +3115,9 @@ export type SignatureOrgIntegrationProvider = "SIGNATURIT";
 export interface SignatureReminderEvent extends PetitionEvent {
   __typename?: "SignatureReminderEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -3053,9 +3126,11 @@ export interface SignatureStartedEvent extends PetitionEvent {
   __typename?: "SignatureStartedEvent";
   bouncedAt?: Maybe<Scalars["DateTime"]>;
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   deliveredAt?: Maybe<Scalars["DateTime"]>;
   id: Scalars["GID"];
   openedAt?: Maybe<Scalars["DateTime"]>;
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
 }
 
@@ -3151,7 +3226,9 @@ export interface TemplateDefaultUserPermission extends TemplateDefaultPermission
 export interface TemplateUsedEvent extends PetitionEvent {
   __typename?: "TemplateUsedEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
 }
 
@@ -3331,9 +3408,11 @@ export interface UserPagination {
 export interface UserPermissionAddedEvent extends PetitionEvent {
   __typename?: "UserPermissionAddedEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   permissionType: PetitionPermissionType;
   permissionUser?: Maybe<User>;
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -3341,9 +3420,11 @@ export interface UserPermissionAddedEvent extends PetitionEvent {
 export interface UserPermissionEditedEvent extends PetitionEvent {
   __typename?: "UserPermissionEditedEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   permissionType: PetitionPermissionType;
   permissionUser?: Maybe<User>;
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }
@@ -3351,8 +3432,10 @@ export interface UserPermissionEditedEvent extends PetitionEvent {
 export interface UserPermissionRemovedEvent extends PetitionEvent {
   __typename?: "UserPermissionRemovedEvent";
   createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
   id: Scalars["GID"];
   permissionUser?: Maybe<User>;
+  petition?: Maybe<Petition>;
   type: PetitionEventType;
   user?: Maybe<User>;
 }

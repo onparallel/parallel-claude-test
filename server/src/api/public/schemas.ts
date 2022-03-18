@@ -1,9 +1,10 @@
 import { JSONSchema6TypeName } from "json-schema";
+import { FromSchema } from "json-schema-to-ts";
 import { outdent } from "outdent";
 import { PetitionEventType } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { titleize } from "../../util/strings";
-import { JsonSchema, schema } from "../rest/schemas";
+import { JsonSchema, JsonSchemaFor, schema } from "../rest/schemas";
 
 function _ListOf<T extends JsonSchema>(item: T) {
   return {
@@ -1659,7 +1660,15 @@ export const _PetitionEvent = {
     ),
 } as const;
 
-export const PetitionEvent = schema(_PetitionEvent);
+export const PetitionEvent = _PetitionEvent as JsonSchemaFor<{
+  id: string;
+  type: PetitionEventType;
+  petitionId: string;
+  data: any;
+  createdAt: string;
+}>;
+
+export const ListOfPetitionEvents = ListOf(PetitionEvent);
 
 const _Subscription = {
   title: "Subscription",
@@ -1749,8 +1758,12 @@ function PaginatedListOf<T extends Exclude<JsonSchema, boolean>>(item: T) {
   } as const);
 }
 
-function ListOf<T extends JsonSchema>(item: T) {
-  return schema(_ListOf(item));
+function ListOf<T extends JsonSchemaFor<any>>(
+  item: T
+): T extends JsonSchemaFor<infer U> ? JsonSchemaFor<U[]> : never;
+function ListOf<T extends JsonSchema>(item: T): JsonSchemaFor<FromSchema<T>[]>;
+function ListOf(item: any) {
+  return _ListOf(item);
 }
 
 export const PetitionCustomProperties = schema({
