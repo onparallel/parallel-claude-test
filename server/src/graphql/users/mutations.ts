@@ -45,12 +45,7 @@ import { validPassword } from "../helpers/validators/validPassword";
 import { orgCanCreateNewUser, orgDoesNotHaveSsoProvider } from "../organization/authorizers";
 import { argUserHasActiveStatus, userHasAccessToUsers } from "../petition/mutations/authorizers";
 import { userHasAccessToUserGroups } from "../user-group/authorizers";
-import {
-  contextUserHasRole,
-  contextUserIsNotSso,
-  userIsNotContextUser,
-  userIsNotSSO,
-} from "./authorizers";
+import { contextUserHasRole, contextUserIsNotSso, userIsNotSSO } from "./authorizers";
 
 export const updateUser = mutationField("updateUser", {
   type: "User",
@@ -366,7 +361,6 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
   type: "User",
   authorize: authenticateAnd(
     contextUserHasRole("ADMIN"),
-    userIsNotContextUser("userId"),
     userHasAccessToUsers("userId"),
     ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never))
   ),
@@ -377,6 +371,9 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
   },
   validateArgs: async (_, { role, userId }, ctx, info) => {
     const user = (await ctx.users.loadUser(userId))!;
+    if (user.id === ctx.user!.id && user.organization_role !== role) {
+      throw new ArgValidationError(info, "role", "Can't update your own role");
+    }
     if (role === "OWNER" && user.organization_role !== "OWNER") {
       throw new ArgValidationError(info, "role", "Can't update the role of a user to OWNER.");
     }
