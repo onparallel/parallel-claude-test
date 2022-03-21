@@ -120,16 +120,11 @@ function OrganizationUsers() {
   const showCreateOrUpdateUserDialog = useCreateOrUpdateUserDialog();
   const handleCreateUser = async () => {
     try {
-      const { firstName, lastName, email, role, userGroups } = await showCreateOrUpdateUserDialog({
-        type: "create",
-      });
+      const { userGroups, ...user } = await showCreateOrUpdateUserDialog({});
 
       await createOrganizationUser({
         variables: {
-          firstName,
-          lastName,
-          email,
-          role,
+          ...user,
           userGroupIds: userGroups.map((userGroup) => userGroup.id),
           locale: intl.locale,
         },
@@ -148,7 +143,7 @@ function OrganizationUsers() {
             defaultMessage:
               "We have sent an email to {email} with instructions to register in Parallel.",
           },
-          { email }
+          { email: user.email }
         ),
         status: "success",
         duration: 5000,
@@ -167,16 +162,7 @@ function OrganizationUsers() {
   const [updateOrganizationUser] = useMutation(OrganizationUsers_updateOrganizationUserDocument);
   const handleUpdateUser = async (user: OrganizationUsers_UserFragment) => {
     try {
-      const { role, userGroups } = await showCreateOrUpdateUserDialog({
-        type: "update",
-        user: {
-          email: user.email,
-          firstName: user.firstName ?? undefined,
-          lastName: user.lastName ?? undefined,
-          role: user.role,
-          userGroups: user.userGroups ?? [],
-        },
-      });
+      const { role, userGroups } = await showCreateOrUpdateUserDialog({ user });
 
       await updateOrganizationUser({
         variables: {

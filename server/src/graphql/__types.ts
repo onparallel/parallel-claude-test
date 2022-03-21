@@ -1833,7 +1833,7 @@ export interface NexusGenFieldTypes {
     tokens: NexusGenRootTypes["UserAuthenticationToken"][]; // [UserAuthenticationToken!]!
     unreadNotificationIds: string[]; // [ID!]!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
-    userGroups: NexusGenRootTypes["UserGroup"][] | null; // [UserGroup!]
+    userGroups: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
   };
   UserAuthenticationToken: {
     // field return type

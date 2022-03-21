@@ -20,6 +20,7 @@ import { UserSelect } from "@parallel/components/common/UserSelect";
 import {
   CreateUserDialog_emailIsAvailableDocument,
   OrganizationRole,
+  useCreateOrUpdateUserDialog_UserFragment,
   UserSelect_UserGroupFragment,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
@@ -30,6 +31,11 @@ import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
+
+interface CreateOrUpdateUserDialogProps {
+  user?: useCreateOrUpdateUserDialog_UserFragment;
+}
 
 interface CreateOrUpdateUserDialogData {
   firstName: string;
@@ -40,20 +46,19 @@ interface CreateOrUpdateUserDialogData {
 }
 
 function CreateOrUpdateUserDialog({
+  user,
   ...props
-}: DialogProps<
-  { user?: Partial<CreateOrUpdateUserDialogData>; type?: "create" | "update" },
-  CreateOrUpdateUserDialogData
->) {
+}: DialogProps<CreateOrUpdateUserDialogProps, CreateOrUpdateUserDialogData>) {
+  const isUpdate = isDefined(user);
   const intl = useIntl();
   const { handleSubmit, register, formState, control } = useForm<CreateOrUpdateUserDialogData>({
     mode: "onChange",
     defaultValues: {
-      firstName: props.user?.firstName ?? undefined,
-      lastName: props.user?.lastName ?? undefined,
-      email: props.user?.email ?? "",
-      role: props.user?.role ?? "NORMAL",
-      userGroups: props.user?.userGroups ?? [],
+      firstName: user?.firstName ?? "",
+      lastName: user?.lastName ?? "",
+      email: user?.email ?? "",
+      role: user?.role ?? "NORMAL",
+      userGroups: user?.userGroups ?? [],
     },
   });
 
@@ -106,7 +111,7 @@ function CreateOrUpdateUserDialog({
   const emailRegisterProps = useRegisterWithRef(emailRef, register, "email", {
     required: true,
     pattern: EMAIL_REGEX,
-    validate: props.type === "update" ? undefined : { emailIsAvailable },
+    validate: isUpdate ? undefined : { emailIsAvailable },
   });
 
   return (
@@ -118,7 +123,7 @@ function CreateOrUpdateUserDialog({
       }}
       initialFocusRef={emailRef}
       header={
-        props.type === "update" ? (
+        isUpdate ? (
           <FormattedMessage id="organization-users.update-user" defaultMessage="Update user" />
         ) : (
           <FormattedMessage id="organization-users.invite-user" defaultMessage="Invite user" />
@@ -126,11 +131,7 @@ function CreateOrUpdateUserDialog({
       }
       body={
         <Stack>
-          <FormControl
-            id="create-user-email"
-            isInvalid={!!errors.email}
-            isDisabled={props.type === "update"}
-          >
+          <FormControl id="create-user-email" isInvalid={!!errors.email} isDisabled={isUpdate}>
             <FormLabel>
               <FormattedMessage id="generic.forms.email-label" defaultMessage="Email" />
             </FormLabel>
@@ -175,7 +176,7 @@ function CreateOrUpdateUserDialog({
             <FormControl
               id="create-user-firstname"
               isInvalid={!!errors.firstName}
-              isDisabled={props.type === "update"}
+              isDisabled={isUpdate}
               flex="1"
             >
               <FormLabel>
@@ -192,7 +193,7 @@ function CreateOrUpdateUserDialog({
             <FormControl
               id="create-user-lastname"
               isInvalid={!!errors.lastName}
-              isDisabled={props.type === "update"}
+              isDisabled={isUpdate}
               flex="1"
             >
               <FormLabel>
@@ -227,7 +228,7 @@ function CreateOrUpdateUserDialog({
           </FormControl>
           <FormControl id="selection">
             <FormLabel>
-              {props.type === "update" ? (
+              {isUpdate ? (
                 <FormattedMessage
                   id="organization-users.invite-user.member-in"
                   defaultMessage="Member in (optional)"
@@ -269,7 +270,7 @@ function CreateOrUpdateUserDialog({
       }
       confirm={
         <Button type="submit" colorScheme="purple" variant="solid">
-          {props.type === "update" ? (
+          {isUpdate ? (
             <FormattedMessage id="organization-users.update-user" defaultMessage="Update user" />
           ) : (
             <FormattedMessage id="organization-users.invite-user" defaultMessage="Invite user" />
@@ -282,6 +283,20 @@ function CreateOrUpdateUserDialog({
 }
 
 useCreateOrUpdateUserDialog.fragments = {
+  get User() {
+    return gql`
+      fragment useCreateOrUpdateUserDialog_User on User {
+        firstName
+        lastName
+        email
+        role
+        userGroups {
+          ...useCreateOrUpdateUserDialog_UserGroup
+        }
+      }
+      ${this.UserGroup}
+    `;
+  },
   get UserGroup() {
     return gql`
       fragment useCreateOrUpdateUserDialog_UserGroup on UserGroup {

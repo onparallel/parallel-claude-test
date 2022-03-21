@@ -3430,7 +3430,7 @@ export interface User extends Timestamps {
   unreadNotificationIds: Array<Scalars["ID"]>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-  userGroups?: Maybe<Array<UserGroup>>;
+  userGroups: Array<UserGroup>;
 }
 
 /** A user in the system. */
@@ -3844,23 +3844,6 @@ export type UserAvatarList_UserGroupFragment = {
   initials: string;
 };
 
-export type UserSelect_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: string | null;
-  email: string;
-};
-
-export type UserSelect_UserGroupFragment = {
-  __typename?: "UserGroup";
-  id: string;
-  name: string;
-  members: Array<{
-    __typename?: "UserGroupMember";
-    user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
-  }>;
-};
-
 export type useSearchUserGroups_searchUserGroupsQueryVariables = Exact<{
   search: Scalars["String"];
   excludeUserGroups?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
@@ -3891,6 +3874,23 @@ export type UserListPopover_UserGroupFragment = {
   id: string;
   name: string;
   initials: string;
+};
+
+export type UserSelect_UserFragment = {
+  __typename?: "User";
+  id: string;
+  fullName?: string | null;
+  email: string;
+};
+
+export type UserSelect_UserGroupFragment = {
+  __typename?: "UserGroup";
+  id: string;
+  name: string;
+  members: Array<{
+    __typename?: "UserGroupMember";
+    user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+  }>;
 };
 
 export type UserSelect_canCreateUsersQueryVariables = Exact<{ [key: string]: never }>;
@@ -4987,6 +4987,23 @@ export type OrganizationUsersListTableHeader_UserFragment = {
   __typename?: "User";
   id: string;
   role: OrganizationRole;
+};
+
+export type useCreateOrUpdateUserDialog_UserFragment = {
+  __typename?: "User";
+  firstName?: string | null;
+  lastName?: string | null;
+  email: string;
+  role: OrganizationRole;
+  userGroups: Array<{
+    __typename?: "UserGroup";
+    id: string;
+    name: string;
+    members: Array<{
+      __typename?: "UserGroupMember";
+      user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
+    }>;
+  }>;
 };
 
 export type useCreateOrUpdateUserDialog_UserGroupFragment = {
@@ -11061,7 +11078,7 @@ export type OrganizationUsers_UserFragment = {
   lastActiveAt?: string | null;
   status: UserStatus;
   isSsoUser: boolean;
-  userGroups?: Array<{
+  userGroups: Array<{
     __typename?: "UserGroup";
     id: string;
     name: string;
@@ -11069,7 +11086,7 @@ export type OrganizationUsers_UserFragment = {
       __typename?: "UserGroupMember";
       user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
     }>;
-  }> | null;
+  }>;
 };
 
 export type OrganizationUsers_createOrganizationUserMutationVariables = Exact<{
@@ -11094,7 +11111,7 @@ export type OrganizationUsers_createOrganizationUserMutation = {
     lastActiveAt?: string | null;
     status: UserStatus;
     isSsoUser: boolean;
-    userGroups?: Array<{
+    userGroups: Array<{
       __typename?: "UserGroup";
       id: string;
       name: string;
@@ -11102,7 +11119,7 @@ export type OrganizationUsers_createOrganizationUserMutation = {
         __typename?: "UserGroupMember";
         user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
       }>;
-    }> | null;
+    }>;
   };
 };
 
@@ -11125,7 +11142,7 @@ export type OrganizationUsers_updateOrganizationUserMutation = {
     lastActiveAt?: string | null;
     status: UserStatus;
     isSsoUser: boolean;
-    userGroups?: Array<{
+    userGroups: Array<{
       __typename?: "UserGroup";
       id: string;
       name: string;
@@ -11133,7 +11150,7 @@ export type OrganizationUsers_updateOrganizationUserMutation = {
         __typename?: "UserGroupMember";
         user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
       }>;
-    }> | null;
+    }>;
   };
 };
 
@@ -11196,7 +11213,7 @@ export type OrganizationUsers_userQuery = {
           lastActiveAt?: string | null;
           status: UserStatus;
           isSsoUser: boolean;
-          userGroups?: Array<{
+          userGroups: Array<{
             __typename?: "UserGroup";
             id: string;
             name: string;
@@ -11204,7 +11221,7 @@ export type OrganizationUsers_userQuery = {
               __typename?: "UserGroupMember";
               user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
             }>;
-          }> | null;
+          }>;
         }>;
       };
       usageLimits: {
@@ -19024,6 +19041,37 @@ export const UserSelect_UserFragmentDoc = gql`
     email
   }
 ` as unknown as DocumentNode<UserSelect_UserFragment, unknown>;
+export const UserSelect_UserGroupFragmentDoc = gql`
+  fragment UserSelect_UserGroup on UserGroup {
+    id
+    name
+    members {
+      user {
+        ...UserSelect_User
+      }
+    }
+  }
+  ${UserSelect_UserFragmentDoc}
+` as unknown as DocumentNode<UserSelect_UserGroupFragment, unknown>;
+export const useCreateOrUpdateUserDialog_UserGroupFragmentDoc = gql`
+  fragment useCreateOrUpdateUserDialog_UserGroup on UserGroup {
+    id
+    ...UserSelect_UserGroup
+  }
+  ${UserSelect_UserGroupFragmentDoc}
+` as unknown as DocumentNode<useCreateOrUpdateUserDialog_UserGroupFragment, unknown>;
+export const useCreateOrUpdateUserDialog_UserFragmentDoc = gql`
+  fragment useCreateOrUpdateUserDialog_User on User {
+    firstName
+    lastName
+    email
+    role
+    userGroups {
+      ...useCreateOrUpdateUserDialog_UserGroup
+    }
+  }
+  ${useCreateOrUpdateUserDialog_UserGroupFragmentDoc}
+` as unknown as DocumentNode<useCreateOrUpdateUserDialog_UserFragment, unknown>;
 export const PetitionSharingModal_UserFragmentDoc = gql`
   fragment PetitionSharingModal_User on User {
     id
@@ -19670,25 +19718,6 @@ export const IntegrationsSignature_SignatureOrgIntegrationFragmentDoc = gql`
     environment
   }
 ` as unknown as DocumentNode<IntegrationsSignature_SignatureOrgIntegrationFragment, unknown>;
-export const UserSelect_UserGroupFragmentDoc = gql`
-  fragment UserSelect_UserGroup on UserGroup {
-    id
-    name
-    members {
-      user {
-        ...UserSelect_User
-      }
-    }
-  }
-  ${UserSelect_UserFragmentDoc}
-` as unknown as DocumentNode<UserSelect_UserGroupFragment, unknown>;
-export const useCreateOrUpdateUserDialog_UserGroupFragmentDoc = gql`
-  fragment useCreateOrUpdateUserDialog_UserGroup on UserGroup {
-    id
-    ...UserSelect_UserGroup
-  }
-  ${UserSelect_UserGroupFragmentDoc}
-` as unknown as DocumentNode<useCreateOrUpdateUserDialog_UserGroupFragment, unknown>;
 export const OrganizationUsers_UserFragmentDoc = gql`
   fragment OrganizationUsers_User on User {
     id

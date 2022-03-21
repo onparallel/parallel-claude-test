@@ -4,7 +4,7 @@ import {
   UserSelect_UserGroupFragment,
   useSearchUserGroups_searchUserGroupsDocument,
 } from "@parallel/graphql/__types";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { FormattedMessage } from "react-intl";
 import { components } from "react-select";
 import { EmptySearchTemplatesIcon } from "../petition-new/icons/EmtpySearchTemplatesIcon";
@@ -18,9 +18,8 @@ export function UserGroupSelect<IsMulti extends boolean>({
   isMulti,
   ...props
 }: UserGroupSelectProps<IsMulti>) {
-  return (
-    <UserSelect isMulti={isMulti} includeGroups components={{ NoOptionsMessage }} {...props} />
-  );
+  const components = useMemo(() => ({ NoOptionsMessage }), []);
+  return <UserSelect isMulti={isMulti} includeGroups components={components} {...props} />;
 }
 
 const NoOptionsMessage: typeof components.NoOptionsMessage = function NoOptionsMessage(props) {

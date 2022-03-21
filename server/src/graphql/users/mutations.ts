@@ -400,8 +400,11 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
         const userGroupsIdsToDelete = difference(actualUserGroupsIds, userGroupIds);
         const userGroupsIdsToAdd = difference(userGroupIds, actualUserGroupsIds);
 
-        await pMap(userGroupsIdsToAdd, (userGroupId) =>
-          ctx.userGroups.addUsersToGroup(userGroupId, userId, `User:${ctx.user!.id}`, t)
+        await pMap(
+          userGroupsIdsToAdd,
+          async (userGroupId) =>
+            await ctx.userGroups.addUsersToGroup(userGroupId, userId, `User:${ctx.user!.id}`, t),
+          { concurrency: 5 }
         );
 
         await ctx.userGroups.removeUsersFromGroups(
