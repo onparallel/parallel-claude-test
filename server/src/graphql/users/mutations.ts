@@ -377,10 +377,10 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
   },
   validateArgs: async (_, { role, userId }, ctx, info) => {
     const user = (await ctx.users.loadUser(userId))!;
-    if (role === "OWNER") {
+    if (role === "OWNER" && user.organization_role !== "OWNER") {
       throw new ArgValidationError(info, "role", "Can't update the role of a user to OWNER.");
     }
-    if (user.organization_role === "OWNER") {
+    if (user.organization_role === "OWNER" && role !== "OWNER") {
       throw new ArgValidationError(info, "role", "'Can't update the role of an OWNER");
     }
   },
