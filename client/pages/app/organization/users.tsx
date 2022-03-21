@@ -174,7 +174,7 @@ function OrganizationUsers() {
           firstName: user.firstName ?? undefined,
           lastName: user.lastName ?? undefined,
           role: user.role,
-          userGroups: (user.userGroups as UserSelectSelection<true>[]) ?? [],
+          userGroups: user.userGroups ?? [],
         },
       });
 

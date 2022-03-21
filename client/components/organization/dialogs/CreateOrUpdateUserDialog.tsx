@@ -16,10 +16,11 @@ import { CheckIcon, CloseIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { UserGroupSelect, useSearchUserGroups } from "@parallel/components/common/UserGroupSelect";
-import { UserSelect, UserSelectSelection } from "@parallel/components/common/UserSelect";
+import { UserSelect } from "@parallel/components/common/UserSelect";
 import {
   CreateUserDialog_emailIsAvailableDocument,
   OrganizationRole,
+  UserSelect_UserGroupFragment,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
@@ -35,7 +36,7 @@ interface CreateOrUpdateUserDialogData {
   lastName: string;
   email: string;
   role: OrganizationRole;
-  userGroups: UserSelectSelection<true>[];
+  userGroups: UserSelect_UserGroupFragment[];
 }
 
 function CreateOrUpdateUserDialog({

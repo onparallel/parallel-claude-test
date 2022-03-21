@@ -87,31 +87,15 @@ const queries = [
 
 export interface UserSelectProps<
   IsMulti extends boolean = false,
-  IncludeGroups extends boolean = false
+  IncludeGroups extends boolean = false,
+  T extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>
 > extends UseReactSelectProps,
-    Omit<
-      AsyncSelectProps<UserSelectSelection<IncludeGroups>, IsMulti, never>,
-      "value" | "onChange" | "options"
-    > {
+    Omit<AsyncSelectProps<T, IsMulti, never>, "value" | "onChange" | "options"> {
   isMulti?: IsMulti;
-  value: If<
-    IsMulti,
-    UserSelectSelection<IncludeGroups>[] | string[],
-    UserSelectSelection<IncludeGroups> | string | null
-  >;
-  onChange: (
-    value: If<
-      IsMulti,
-      UserSelectSelection<IncludeGroups>[],
-      UserSelectSelection<IncludeGroups> | null
-    >
-  ) => void;
+  value: If<IsMulti, T[] | string[], T | string | null>;
+  onChange: (value: If<IsMulti, T[], T | null>) => void;
   includeGroups?: IncludeGroups;
-  onSearch: (
-    search: string,
-    excludeUsers: string[],
-    excludeUserGroups: string[]
-  ) => Promise<UserSelectSelection<IncludeGroups>[]>;
+  onSearch: (search: string, excludeUsers: string[], excludeUserGroups: string[]) => Promise<T[]>;
 }
 
 export const UserSelect = Object.assign(
@@ -179,8 +163,12 @@ export const UserSelect = Object.assign(
         {...reactSelectProps}
       />
     );
-  }) as <IsMulti extends boolean = false, IncludeGroups extends boolean = false>(
-    props: UserSelectProps<IsMulti, IncludeGroups> &
+  }) as <
+    IsMulti extends boolean = false,
+    IncludeGroups extends boolean = false,
+    T extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>
+  >(
+    props: UserSelectProps<IsMulti, IncludeGroups, T> &
       RefAttributes<UserSelectInstance<IsMulti, IncludeGroups>>
   ) => ReactElement | null,
   { fragments, queries }
