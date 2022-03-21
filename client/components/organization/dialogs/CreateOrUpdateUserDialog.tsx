@@ -218,7 +218,7 @@ function CreateOrUpdateUserDialog({
           <FormControl
             id="create-user-role"
             isInvalid={!!errors.role}
-            isDisabled={user?.id === myId || user?.role === "OWNER"}
+            isDisabled={user?.id === myId || user?.role === "OWNER" || user?.status === "INACTIVE"}
           >
             <FormLabel>
               <FormattedMessage
@@ -236,7 +236,7 @@ function CreateOrUpdateUserDialog({
               )}
             </Select>
           </FormControl>
-          <FormControl id="create-user-groups">
+          <FormControl id="create-user-groups" isDisabled={user?.status === "INACTIVE"}>
             <FormLabel>
               {isUpdate ? (
                 <FormattedMessage
@@ -275,7 +275,12 @@ function CreateOrUpdateUserDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="purple" variant="solid">
+        <Button
+          type="submit"
+          colorScheme="purple"
+          variant="solid"
+          isDisabled={user?.status === "INACTIVE"}
+        >
           {isUpdate ? (
             <FormattedMessage
               id="components.create-or-update-user-dialog.update-user"
@@ -303,6 +308,7 @@ useCreateOrUpdateUserDialog.fragments = {
         lastName
         email
         role
+        status
         userGroups {
           ...useCreateOrUpdateUserDialog_UserGroup
         }

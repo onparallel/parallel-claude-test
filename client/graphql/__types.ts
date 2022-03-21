@@ -4996,6 +4996,7 @@ export type useCreateOrUpdateUserDialog_UserFragment = {
   lastName?: string | null;
   email: string;
   role: OrganizationRole;
+  status: UserStatus;
   userGroups: Array<{
     __typename?: "UserGroup";
     id: string;
@@ -19068,6 +19069,7 @@ export const useCreateOrUpdateUserDialog_UserFragmentDoc = gql`
     lastName
     email
     role
+    status
     userGroups {
       ...useCreateOrUpdateUserDialog_UserGroup
     }

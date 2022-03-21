@@ -380,6 +380,9 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
     if (user.organization_role === "OWNER" && role !== "OWNER") {
       throw new ArgValidationError(info, "role", "'Can't update the role of an OWNER");
     }
+    if (user.status === "INACTIVE") {
+      throw new ArgValidationError(info, "role", "'Can't update an INACTIVE user");
+    }
   },
   resolve: async (_, { userId, role, userGroupIds }, ctx) => {
     return await ctx.petitions.withTransaction(async (t) => {
