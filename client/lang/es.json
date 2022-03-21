@@ -1976,8 +1976,8 @@
   },
   {
     "term": "component.petition-settings.locale-label",
-    "definition": "Idioma de las comunicaciones",
-    "context": "Language used in the communications"
+    "definition": "Idioma comunicaciones",
+    "context": "Communications language"
   },
   {
     "term": "component.petition-settings.petition-comments-enable",
@@ -1996,7 +1996,7 @@
   },
   {
     "term": "component.petition-settings.petition-signature-enable",
-    "definition": "Proceso de firma digital",
+    "definition": "Firma digital",
     "context": "eSignature process"
   },
   {
@@ -5811,7 +5811,7 @@
   },
   {
     "term": "petition.deadline-label",
-    "definition": "Vencimiento:",
+    "definition": "Vencimiento",
     "context": "Deadline"
   },
   {

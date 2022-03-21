@@ -1976,8 +1976,8 @@
   },
   {
     "term": "component.petition-settings.locale-label",
-    "definition": "Language used in the communications",
-    "context": "Language used in the communications"
+    "definition": "Communications language",
+    "context": "Communications language"
   },
   {
     "term": "component.petition-settings.petition-comments-enable",

@@ -1,6 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
 import {
-  Box,
   Button,
   CloseButton,
   Heading,
@@ -450,29 +449,25 @@ function _PetitionSettings({
         label={
           <FormattedMessage
             id="component.petition-settings.locale-label"
-            defaultMessage="Language used in the communications"
+            defaultMessage="Communications language"
           />
         }
-        ignoreSpacer
       >
-        <Box flex="1">
-          <Select
-            size="sm"
-            borderRadius="md"
-            paddingLeft={4}
-            name="petition-locale"
-            minWidth="120px"
-            value={petition.locale}
-            onChange={(event) => onUpdatePetition({ locale: event.target.value as any })}
-            isDisabled={petition.isRestricted || isPublicTemplate}
-          >
-            {locales.map((locale) => (
-              <option key={locale.key} value={locale.key}>
-                {locale.localizedLabel}
-              </option>
-            ))}
-          </Select>
-        </Box>
+        <Select
+          size="sm"
+          borderRadius="md"
+          name="petition-locale"
+          minWidth="120px"
+          value={petition.locale}
+          onChange={(event) => onUpdatePetition({ locale: event.target.value as any })}
+          isDisabled={petition.isRestricted || isPublicTemplate}
+        >
+          {locales.map((locale) => (
+            <option key={locale.key} value={locale.key}>
+              {locale.localizedLabel}
+            </option>
+          ))}
+        </Select>
       </SettingsRow>
       {petition.__typename === "Petition" ? (
         <SettingsRow
@@ -486,7 +481,6 @@ function _PetitionSettings({
               defaultMessage="This date is used to inform the recipients of the deadline for which you need to have the information."
             />
           }
-          ignoreSpacer
         >
           <DeadlineInput
             value={petition.deadline ? new Date(petition.deadline) : null}
