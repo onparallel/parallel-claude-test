@@ -3,8 +3,6 @@ import {
   Box,
   Button,
   CloseButton,
-  FormControl,
-  FormLabel,
   Heading,
   HStack,
   Input,
@@ -72,6 +70,7 @@ import { TestModeSignatureBadge } from "../petition-common/TestModeSignatureBadg
 import { usePetitionDeadlineDialog } from "./dialogs/PetitionDeadlineDialog";
 import { useRestrictPetitionDialog } from "./dialogs/RestrictPetitionDialog";
 import { usePasswordRestrictPetitionDialog } from "./dialogs/UnrestrictPetitionDialog";
+import { SettingsRow } from "./settings/SettingsRow";
 import { SettingsRowButton } from "./SettingsRowButton";
 import { SettingsRowSwitch } from "./SettingsRowSwitch";
 
@@ -365,7 +364,7 @@ function _PetitionSettings({
   const restrictEditingSwitch = (
     <SettingsRowSwitch
       isDisabled={isPublicTemplate}
-      icon={petition.isRestricted ? <LockClosedIcon color="purple.600" /> : <LockOpenIcon />}
+      icon={petition.isRestricted ? <LockClosedIcon /> : <LockOpenIcon />}
       label={
         <FormattedMessage
           id="component.petition-settings.restrict-editing"
@@ -397,7 +396,7 @@ function _PetitionSettings({
           {restrictEditingSwitch}
           <SettingsRowButton
             isDisabled={isPublicTemplate || petition.isRestricted}
-            icon={<LinkIcon color={hasActivePublicLink ? "purple.600" : undefined} />}
+            icon={<LinkIcon />}
             label={
               <FormattedMessage
                 id="component.petition-settings.share-by-link"
@@ -444,61 +443,62 @@ function _PetitionSettings({
           </Heading>
         </>
       ) : null}
-
-      <FormControl id="petition-locale" isDisabled={petition.isRestricted}>
-        <HStack>
-          <EmailIcon />
-          <FormLabel display="flex" alignItems="center">
-            <FormattedMessage
-              id="component.petition-settings.locale-label"
-              defaultMessage="Language used in the communications"
-            />
-          </FormLabel>
-          <Box flex="1">
-            <Select
-              size="sm"
-              borderRadius="md"
-              paddingLeft={2}
-              name="petition-locale"
-              minWidth="120px"
-              value={petition.locale}
-              onChange={(event) => onUpdatePetition({ locale: event.target.value as any })}
-              isDisabled={petition.isRestricted || isPublicTemplate}
-            >
-              {locales.map((locale) => (
-                <option key={locale.key} value={locale.key}>
-                  {locale.localizedLabel}
-                </option>
-              ))}
-            </Select>
-          </Box>
-        </HStack>
-      </FormControl>
+      <SettingsRow
+        controlId="petition-locale"
+        isDisabled={petition.isRestricted}
+        icon={<EmailIcon />}
+        label={
+          <FormattedMessage
+            id="component.petition-settings.locale-label"
+            defaultMessage="Language used in the communications"
+          />
+        }
+        ignoreSpacer
+      >
+        <Box flex="1">
+          <Select
+            size="sm"
+            borderRadius="md"
+            paddingLeft={4}
+            name="petition-locale"
+            minWidth="120px"
+            value={petition.locale}
+            onChange={(event) => onUpdatePetition({ locale: event.target.value as any })}
+            isDisabled={petition.isRestricted || isPublicTemplate}
+          >
+            {locales.map((locale) => (
+              <option key={locale.key} value={locale.key}>
+                {locale.localizedLabel}
+              </option>
+            ))}
+          </Select>
+        </Box>
+      </SettingsRow>
       {petition.__typename === "Petition" ? (
-        <FormControl id="petition-deadline">
-          <HStack>
-            <FieldDateIcon color={Boolean(petition.deadline) ? "purple.600" : undefined} />
-            <FormLabel display="flex" alignItems="center">
-              <FormattedMessage id="petition.deadline-label" defaultMessage="Deadline" />
-              <HelpPopover>
-                <FormattedMessage
-                  id="component.petition-settings.deadline-description"
-                  defaultMessage="This date is used to inform the recipients of the deadline for which you need to have the information."
-                />
-              </HelpPopover>
-            </FormLabel>
-            <DeadlineInput
-              value={petition.deadline ? new Date(petition.deadline) : null}
-              onChange={(value) => onUpdatePetition({ deadline: value?.toISOString() ?? null })}
+        <SettingsRow
+          controlId="petition-deadline"
+          isActive={Boolean(petition.deadline)}
+          icon={<FieldDateIcon />}
+          label={<FormattedMessage id="petition.deadline-label" defaultMessage="Deadline" />}
+          description={
+            <FormattedMessage
+              id="component.petition-settings.deadline-description"
+              defaultMessage="This date is used to inform the recipients of the deadline for which you need to have the information."
             />
-          </HStack>
-        </FormControl>
+          }
+          ignoreSpacer
+        >
+          <DeadlineInput
+            value={petition.deadline ? new Date(petition.deadline) : null}
+            onChange={(value) => onUpdatePetition({ deadline: value?.toISOString() ?? null })}
+          />
+        </SettingsRow>
       ) : null}
       {petition.__typename === "PetitionTemplate" ? (
         <SettingsRowButton
           data-section="share-automatically"
           isDisabled={isPublicTemplate || petition.isRestricted}
-          icon={<ArrowShortRightIcon color={hasDefaultPermissions ? "purple.600" : undefined} />}
+          icon={<ArrowShortRightIcon />}
           label={
             <FormattedMessage
               id="component.petition-settings.share-automatically"
@@ -524,9 +524,7 @@ function _PetitionSettings({
         <SettingsRowButton
           data-section="esignature-settings"
           isDisabled={!hasSignature || isPublicTemplate}
-          icon={
-            <SignatureIcon color={Boolean(petition.signatureConfig) ? "purple.600" : undefined} />
-          }
+          icon={<SignatureIcon />}
           label={
             <HStack>
               <Text as="span">
@@ -556,11 +554,7 @@ function _PetitionSettings({
       {petition.__typename === "PetitionTemplate" ? (
         <SettingsRowButton
           isDisabled={isPublicTemplate}
-          icon={
-            <BellSettingsIcon
-              color={Boolean(petition.remindersConfig) ? "purple.600" : undefined}
-            />
-          }
+          icon={<BellSettingsIcon />}
           label={
             <FormattedMessage
               id="component.petition-settings.automatic-reminders"
@@ -577,7 +571,7 @@ function _PetitionSettings({
       {user.hasSkipForwardSecurity ? (
         <SettingsRowSwitch
           isDisabled={isPublicTemplate}
-          icon={<ShieldIcon color={petition.skipForwardSecurity ? "purple.600" : undefined} />}
+          icon={<ShieldIcon />}
           label={
             <FormattedMessage
               id="component.petition-settings.skip-forward-security"
@@ -598,9 +592,7 @@ function _PetitionSettings({
       {user.hasHideRecipientViewContents ? (
         <SettingsRowSwitch
           isDisabled={isPublicTemplate}
-          icon={
-            <ListIcon color={petition.isRecipientViewContentsHidden ? "purple.600" : undefined} />
-          }
+          icon={<ListIcon />}
           label={
             <FormattedMessage
               id="component.petition-settings.hide-recipient-view-contents"
@@ -824,7 +816,7 @@ function DeadlineInput({
     } catch {}
   }
   return (
-    <InputGroup size="sm" borderRadius="md" flex="1" paddingLeft={2}>
+    <InputGroup size="sm" borderRadius="md" flex="1" paddingLeft={4}>
       <Input
         isReadOnly
         placeholder={

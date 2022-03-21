@@ -1,19 +1,25 @@
-import { FormControl, FormControlProps, FormLabel } from "@chakra-ui/react";
+import { Center, FormControl, FormControlProps, FormLabel, Stack, Text } from "@chakra-ui/react";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { ReactNode } from "react";
 
 export interface SettingsRowProps extends Omit<FormControlProps, "label"> {
   label: ReactNode;
+  icon?: ReactNode;
+  isActive?: boolean;
   controlId: string;
   children: ReactNode;
   description?: ReactNode;
+  ignoreSpacer?: boolean;
 }
 
 export function SettingsRow({
   label,
+  icon,
+  isActive,
   controlId,
   description,
+  ignoreSpacer,
   children,
   ...props
 }: SettingsRowProps) {
@@ -28,10 +34,15 @@ export function SettingsRow({
         margin={0}
         minHeight={8}
       >
-        {label}
+        <Stack direction="row" alignItems="center">
+          {icon ? <Center color={isActive ? "purple.600" : undefined}>{icon}</Center> : null}
+          <Text as="span" whiteSpace="break-spaces">
+            {label}
+          </Text>
+        </Stack>
         {description ? <HelpPopover>{description}</HelpPopover> : null}
       </FormLabel>
-      <Spacer minWidth={6} />
+      {ignoreSpacer ? null : <Spacer minWidth={6} />}
       {children}
     </FormControl>
   );

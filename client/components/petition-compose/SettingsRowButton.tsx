@@ -1,4 +1,4 @@
-import { Box, Button, Collapse, HStack, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Collapse, HStack } from "@chakra-ui/react";
 import { DeleteIcon, SettingsIcon } from "@parallel/chakra/icons";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -15,8 +15,6 @@ interface SettingsRowButtonProps extends Omit<SettingsRowProps, "children" | "on
 }
 
 export function SettingsRowButton({
-  label,
-  icon,
   isActive,
   onAdd,
   onRemove,
@@ -28,17 +26,7 @@ export function SettingsRowButton({
 
   return (
     <Box>
-      <SettingsRow
-        label={
-          <Stack direction="row" alignItems="center">
-            {icon}
-            <Text as="span" whiteSpace="break-spaces">
-              {label}
-            </Text>
-          </Stack>
-        }
-        {...props}
-      >
+      <SettingsRow isActive={isActive} {...props}>
         {isActive ? (
           <HStack>
             <IconButtonWithTooltip

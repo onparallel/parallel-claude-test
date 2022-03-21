@@ -1,4 +1,4 @@
-import { Box, Collapse, Stack, Switch, Text } from "@chakra-ui/react";
+import { Box, Collapse, Switch } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import { SettingsRow, SettingsRowProps } from "./settings/SettingsRow";
 
@@ -9,27 +9,10 @@ export interface SwitchSettingProps extends Omit<SettingsRowProps, "children" | 
   children?: ReactNode;
 }
 
-export function SettingsRowSwitch({
-  label,
-  icon,
-  isChecked,
-  onChange,
-  children,
-  ...props
-}: SwitchSettingProps) {
+export function SettingsRowSwitch({ isChecked, onChange, children, ...props }: SwitchSettingProps) {
   return (
     <Box>
-      <SettingsRow
-        label={
-          <Stack direction="row" alignItems="center">
-            {icon}
-            <Text as="span" whiteSpace="break-spaces">
-              {label}
-            </Text>
-          </Stack>
-        }
-        {...props}
-      >
+      <SettingsRow isActive={isChecked} {...props}>
         <Switch
           isChecked={isChecked}
           onChange={(e) => onChange(e.target.checked)}
