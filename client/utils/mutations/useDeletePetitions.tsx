@@ -47,8 +47,8 @@ export function useDeletePetitions() {
           name:
             cachedPetition!.name ||
             intl.formatMessage({
-              id: "generic.untitled-petition",
-              defaultMessage: "Untitled petition",
+              id: "generic.unnamed-petition",
+              defaultMessage: "Unnamed petition",
             }),
           isTemplate: cachedPetition?.__typename === "PetitionTemplate",
         });
@@ -81,8 +81,8 @@ export function useDeletePetitions() {
           const petitionName =
             cachedPetitions[0].name ||
             intl.formatMessage({
-              id: "generic.untitled-petition",
-              defaultMessage: "Untitled petition",
+              id: "generic.unnamed-petition",
+              defaultMessage: "Unnamed petition",
             });
 
           const type =
@@ -110,8 +110,8 @@ export function useDeletePetitions() {
                       {petition.name
                         ? petition.name
                         : intl.formatMessage({
-                            id: "generic.untitled-petition",
-                            defaultMessage: "Untitled petition",
+                            id: "generic.unnamed-petition",
+                            defaultMessage: "Unnamed petition",
                           })}
                     </ListItem>
                   ))}
@@ -151,8 +151,8 @@ export function useDeletePetitions() {
                     <ListItem key={petition!.id} textStyle={petition!.name ? undefined : "hint"}>
                       {petition?.name ??
                         intl.formatMessage({
-                          id: "generic.untitled-petition",
-                          defaultMessage: "Untitled petition",
+                          id: "generic.unnamed-petition",
+                          defaultMessage: "Unnamed petition",
                         })}
                     </ListItem>
                   ))}
@@ -187,8 +187,8 @@ export function useDeletePetitions() {
                     <ListItem key={petition!.id} textStyle={petition!.name ? undefined : "hint"}>
                       {petition?.name ??
                         intl.formatMessage({
-                          id: "generic.untitled-template",
-                          defaultMessage: "Untitled template",
+                          id: "generic.unnamed-template",
+                          defaultMessage: "Unnamed petition",
                         })}
                     </ListItem>
                   ))}

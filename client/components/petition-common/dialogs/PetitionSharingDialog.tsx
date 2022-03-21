@@ -479,8 +479,8 @@ export function PetitionSharingDialog({
                               <Text as="span" textStyle={petition!.name ? undefined : "hint"}>
                                 {petition?.name ??
                                   intl.formatMessage({
-                                    id: "generic.untitled-petition",
-                                    defaultMessage: "Untitled petition",
+                                    id: "generic.unnamed-petition",
+                                    defaultMessage: "Unnamed petition",
                                   })}
                               </Text>
                             </ListItem>

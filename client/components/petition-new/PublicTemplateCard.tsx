@@ -112,10 +112,7 @@ export const PublicTemplateCard = Object.assign(
               </Text>
             ) : (
               <Text as="h2" fontSize="lg" noOfLines={2} fontWeight="normal" fontStyle="italic">
-                <FormattedMessage
-                  id="generic.untitled-template"
-                  defaultMessage="Untitled template"
-                />
+                <FormattedMessage id="generic.unnamed-template" defaultMessage="Unnamed petition" />
               </Text>
             )}
             <Spacer />

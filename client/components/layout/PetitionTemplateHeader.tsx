@@ -201,8 +201,8 @@ export function PetitionTemplateHeader({
             petition.name
               ? ""
               : intl.formatMessage({
-                  id: "generic.untitled-template",
-                  defaultMessage: "Untitled template",
+                  id: "generic.unnamed-template",
+                  defaultMessage: "Unnamed petition",
                 })
           }
           aria-label={intl.formatMessage({

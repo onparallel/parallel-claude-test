@@ -64,8 +64,8 @@ const email: Email<MessageBouncedEmailProps> = {
           petitionName:
             petitionName ??
             intl.formatMessage({
-              id: "generic.untitled-petition",
-              defaultMessage: "Untitled petition",
+              id: "generic.unnamed-petition",
+              defaultMessage: "Unnamed petition",
             }),
         }
       )}
@@ -136,8 +136,8 @@ const email: Email<MessageBouncedEmailProps> = {
                   ) : (
                     <i>
                       {intl.formatMessage({
-                        id: "generic.untitled-petition",
-                        defaultMessage: "Untitled petition",
+                        id: "generic.unnamed-petition",
+                        defaultMessage: "Unnamed petition",
                       })}
                     </i>
                   ),

@@ -72,12 +72,12 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                 ? row.name
                 : type === "PETITION"
                 ? intl.formatMessage({
-                    id: "generic.untitled-petition",
-                    defaultMessage: "Untitled petition",
+                    id: "generic.unnamed-petition",
+                    defaultMessage: "Unnamed petition",
                   })
                 : intl.formatMessage({
-                    id: "generic.untitled-template",
-                    defaultMessage: "Untitled template",
+                    id: "generic.unnamed-template",
+                    defaultMessage: "Unnamed petition",
                   })}
             </OverflownText>
           ),

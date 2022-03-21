@@ -111,12 +111,12 @@ export const PetitionUserNotification = Object.assign(
                 {petition.name ??
                   (petition.__typename === "Petition"
                     ? intl.formatMessage({
-                        id: "generic.untitled-petition",
-                        defaultMessage: "Untitled petition",
+                        id: "generic.unnamed-petition",
+                        defaultMessage: "Unnamed petition",
                       })
                     : intl.formatMessage({
-                        id: "generic.untitled-template",
-                        defaultMessage: "Untitled template",
+                        id: "generic.unnamed-template",
+                        defaultMessage: "Unnamed petition",
                       }))}
               </Text>
             </LinkOverlay>

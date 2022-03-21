@@ -4690,6 +4690,16 @@
     "context": "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help."
   },
   {
+    "term": "generic.unnamed-petition",
+    "definition": "Unnamed petition",
+    "context": "Unnamed petition"
+  },
+  {
+    "term": "generic.unnamed-template",
+    "definition": "Unnamed petition",
+    "context": "Unnamed petition"
+  },
+  {
     "term": "generic.unsubscribed",
     "definition": "Unsubscribed",
     "context": "Unsubscribed"
@@ -4698,16 +4708,6 @@
     "term": "generic.untitled-field",
     "definition": "Untitled field",
     "context": "Untitled field"
-  },
-  {
-    "term": "generic.untitled-petition",
-    "definition": "Untitled petition",
-    "context": "Untitled petition"
-  },
-  {
-    "term": "generic.untitled-template",
-    "definition": "Untitled template",
-    "context": "Untitled template"
   },
   {
     "term": "generic.upgrade-to-enable",

@@ -67,8 +67,8 @@ const email: Email<PetitionSharedEmailProps> = {
       ${
         petitionName ||
         intl.formatMessage({
-          id: "generic.untitled-petition",
-          defaultMessage: "Untitled petition",
+          id: "generic.unnamed-petition",
+          defaultMessage: "Unnamed petition",
         })
       }
 
@@ -126,8 +126,8 @@ const email: Email<PetitionSharedEmailProps> = {
               ) : (
                 <li style={{ color: "#A0AEC0", fontStyle: "italic" }}>
                   <FormattedMessage
-                    id="generic.untitled-petition"
-                    defaultMessage="Untitled petition"
+                    id="generic.unnamed-petition"
+                    defaultMessage="Unnamed petition"
                   />
                 </li>
               )}

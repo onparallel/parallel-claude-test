@@ -260,8 +260,8 @@ function useContactPetitionAccessesColumns() {
               {row.petition?.name
                 ? row.petition.name
                 : intl.formatMessage({
-                    id: "generic.untitled-petition",
-                    defaultMessage: "Untitled petition",
+                    id: "generic.unnamed-petition",
+                    defaultMessage: "Unnamed petition",
                   })}
             </OverflownText>
           ),
