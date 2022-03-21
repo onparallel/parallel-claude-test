@@ -103,7 +103,15 @@ export const UserSelect = Object.assign(
     IsMulti extends boolean = false,
     IncludeGroups extends boolean = false
   >(
-    { value, onSearch, onChange, isMulti, ...props }: UserSelectProps<IsMulti, IncludeGroups>,
+    {
+      value,
+      onSearch,
+      onChange,
+      isMulti,
+      includeGroups,
+      placeholder: _placeholder,
+      ...props
+    }: UserSelectProps<IsMulti, IncludeGroups>,
     ref: ForwardedRef<UserSelectInstance<IsMulti, IncludeGroups>>
   ) {
     const needsLoading =
@@ -131,6 +139,33 @@ export const UserSelect = Object.assign(
             .map((x) => x.id)
             .join(","),
     ]);
+    const intl = useIntl();
+    const placeholder = useMemo(() => {
+      return (
+        _placeholder ??
+        (isMulti && includeGroups
+          ? intl.formatMessage({
+              id: "component.user-select.placeholder-multi-with-groups",
+              defaultMessage: "Select users or teams from your organization",
+            })
+          : isMulti && !includeGroups
+          ? intl.formatMessage({
+              id: "component.user-select.placeholder-multi-without-groups",
+              defaultMessage: "Select users from your organization",
+            })
+          : !isMulti && includeGroups
+          ? intl.formatMessage({
+              id: "component.user-select.placeholder-single-with-groups",
+              defaultMessage: "Select a user or team from your organization",
+            })
+          : !isMulti && !includeGroups
+          ? intl.formatMessage({
+              id: "component.user-select.placeholder-single-without-groups",
+              defaultMessage: "Select a user from your organization",
+            })
+          : (null as never))
+      );
+    }, [_placeholder, isMulti, includeGroups]);
 
     const loadOptions = useCallback(
       async (search) => {
@@ -149,6 +184,7 @@ export const UserSelect = Object.assign(
     const data = apollo.cache.readQuery({ query: UserSelect_canCreateUsersDocument })!;
 
     const reactSelectProps = useUserSelectReactSelectProps<IsMulti, IncludeGroups>({
+      placeholder,
       ...props,
       canCreateUsers: data.me.canCreateUsers,
     });

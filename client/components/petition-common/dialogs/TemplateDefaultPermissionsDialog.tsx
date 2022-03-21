@@ -19,7 +19,7 @@ import {
 import { isTypename } from "@parallel/utils/apollo/typename";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage } from "react-intl";
 import { PetitionPermissionTypeSelect } from "../PetitionPermissionTypeSelect";
 import { TemplateDefaultUserGroupPermissionRow } from "./TemplateDefaultUserGroupPermissionRow";
 import { TemplateDefaultUserPermissionRow } from "./TemplateDefaultUserPermissionRow";
@@ -40,8 +40,6 @@ export function TemplateDefaultPermissionsDialog({
   onUpdatePermissions,
   ...props
 }: DialogProps<TemplateDefaultPermissionsDialogProps>) {
-  const intl = useIntl();
-
   const editorsRef = useRef<UserSelectInstance<true, true>>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [permissionsList, setPermissionsList] = useState(permissions);
@@ -195,10 +193,6 @@ export function TemplateDefaultPermissionsDialog({
                     onChange={(users) => onChange(users)}
                     onBlur={onBlur}
                     onSearch={handleSearchUsers}
-                    placeholder={intl.formatMessage({
-                      id: "generic.petition-sharing-placeholder",
-                      defaultMessage: "Add users and teams from your organization",
-                    })}
                   />
                 )}
               />

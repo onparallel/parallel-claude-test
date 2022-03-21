@@ -10,15 +10,13 @@ import {
 import { AppLayout_UserFragment } from "@parallel/graphql/__types";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage } from "react-intl";
 
 function ConfirmDeactivateUserDialog({
   selected,
   me,
   ...props
 }: DialogProps<{ selected: string[]; me: AppLayout_UserFragment }, UserSelectSelection>) {
-  const intl = useIntl();
-
   const {
     control,
     handleSubmit,
@@ -98,10 +96,6 @@ function ConfirmDeactivateUserDialog({
                   onChange={onChange}
                   onBlur={onBlur}
                   onSearch={handleSearchUsers}
-                  placeholder={intl.formatMessage({
-                    id: "organization.confirm-deactivate.user-select.input-placeholder",
-                    defaultMessage: "Select a user from your organization",
-                  })}
                 />
               )}
             />

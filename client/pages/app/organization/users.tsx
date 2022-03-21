@@ -120,7 +120,7 @@ function OrganizationUsers() {
   const showCreateOrUpdateUserDialog = useCreateOrUpdateUserDialog();
   const handleCreateUser = async () => {
     try {
-      const { userGroups, ...user } = await showCreateOrUpdateUserDialog({});
+      const { userGroups, ...user } = await showCreateOrUpdateUserDialog({ myId: me.id });
 
       await createOrganizationUser({
         variables: {
@@ -162,7 +162,7 @@ function OrganizationUsers() {
   const [updateOrganizationUser] = useMutation(OrganizationUsers_updateOrganizationUserDocument);
   const handleUpdateUser = async (user: OrganizationUsers_UserFragment) => {
     try {
-      const { role, userGroups } = await showCreateOrUpdateUserDialog({ user });
+      const { role, userGroups } = await showCreateOrUpdateUserDialog({ user, myId: me.id });
 
       await updateOrganizationUser({
         variables: {
@@ -272,9 +272,7 @@ function OrganizationUsers() {
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
-          onRowClick={(user) =>
-            me.id !== user.id && isAdmin(me) && user.role !== "OWNER" && handleUpdateUser(user)
-          }
+          onRowClick={(user) => handleUpdateUser(user)}
           header={
             <OrganizationUsersListTableHeader
               me={me}

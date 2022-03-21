@@ -4,7 +4,7 @@ import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage } from "react-intl";
 import {
   UserSelect,
   UserSelectInstance,
@@ -27,7 +27,6 @@ export function AddMemberGroupDialog({
     },
   });
 
-  const intl = useIntl();
   const usersRef = useRef<UserSelectInstance<true>>(null);
 
   const _handleSearchUsers = useSearchUsers();
@@ -88,10 +87,6 @@ export function AddMemberGroupDialog({
                   }}
                   onBlur={onBlur}
                   onSearch={handleSearchUsers}
-                  placeholder={intl.formatMessage({
-                    id: "component.add-member-group-dialog.members-placeholder",
-                    defaultMessage: "Select users from your organization",
-                  })}
                 />
               )}
             />

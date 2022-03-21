@@ -266,10 +266,7 @@ export function PetitionSharingDialog({
                       isDisabled={!petitionsOwned.length}
                       placeholder={
                         petitionsOwned.length
-                          ? intl.formatMessage({
-                              id: "generic.petition-sharing-placeholder",
-                              defaultMessage: "Add users and teams from your organization",
-                            })
+                          ? undefined
                           : intl.formatMessage({
                               id: "petition-sharing.input-placeholder-not-owner",
                               defaultMessage: "Only the petition owner can share it",

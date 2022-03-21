@@ -4991,6 +4991,7 @@ export type OrganizationUsersListTableHeader_UserFragment = {
 
 export type useCreateOrUpdateUserDialog_UserFragment = {
   __typename?: "User";
+  id: string;
   firstName?: string | null;
   lastName?: string | null;
   email: string;
@@ -19062,6 +19063,7 @@ export const useCreateOrUpdateUserDialog_UserGroupFragmentDoc = gql`
 ` as unknown as DocumentNode<useCreateOrUpdateUserDialog_UserGroupFragment, unknown>;
 export const useCreateOrUpdateUserDialog_UserFragmentDoc = gql`
   fragment useCreateOrUpdateUserDialog_User on User {
+    id
     firstName
     lastName
     email

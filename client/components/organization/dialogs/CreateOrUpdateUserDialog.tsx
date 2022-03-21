@@ -5,7 +5,6 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  HStack,
   Input,
   InputGroup,
   InputRightElement,
@@ -35,6 +34,7 @@ import { isDefined } from "remeda";
 
 interface CreateOrUpdateUserDialogProps {
   user?: useCreateOrUpdateUserDialog_UserFragment;
+  myId: string;
 }
 
 interface CreateOrUpdateUserDialogData {
@@ -46,6 +46,7 @@ interface CreateOrUpdateUserDialogData {
 }
 
 function CreateOrUpdateUserDialog({
+  myId,
   user,
   ...props
 }: DialogProps<CreateOrUpdateUserDialogProps, CreateOrUpdateUserDialogData>) {
@@ -124,9 +125,15 @@ function CreateOrUpdateUserDialog({
       initialFocusRef={emailRef}
       header={
         isUpdate ? (
-          <FormattedMessage id="organization-users.update-user" defaultMessage="Update user" />
+          <FormattedMessage
+            id="components.create-or-update-user-dialog.update-user"
+            defaultMessage="Update user"
+          />
         ) : (
-          <FormattedMessage id="organization-users.invite-user" defaultMessage="Invite user" />
+          <FormattedMessage
+            id="components.create-or-update-user-dialog.invite-user"
+            defaultMessage="Invite user"
+          />
         )
       }
       body={
@@ -172,7 +179,7 @@ function CreateOrUpdateUserDialog({
               </FormErrorMessage>
             ) : null}
           </FormControl>
-          <HStack alignItems="flex-start" gridGap={4} spacing={0} flexWrap="wrap">
+          <Stack direction={{ base: "column", sm: "row" }}>
             <FormControl
               id="create-user-firstname"
               isInvalid={!!errors.firstName}
@@ -207,9 +214,12 @@ function CreateOrUpdateUserDialog({
                 />
               </FormErrorMessage>
             </FormControl>
-          </HStack>
-
-          <FormControl id="create-user-role" isInvalid={!!errors.role}>
+          </Stack>
+          <FormControl
+            id="create-user-role"
+            isInvalid={!!errors.role}
+            isDisabled={user?.id === myId || user?.role === "OWNER"}
+          >
             <FormLabel>
               <FormattedMessage
                 id="generic.forms.organization-role-label"
@@ -217,26 +227,26 @@ function CreateOrUpdateUserDialog({
               />
             </FormLabel>
             <Select {...register("role", { required: true })}>
-              {roles
-                .filter((r) => r.role !== "OWNER")
-                .map((r) => (
+              {(user?.role === "OWNER" ? roles : roles.filter((r) => r.role !== "OWNER")).map(
+                (r) => (
                   <option key={r.role} value={r.role}>
                     {r.label}
                   </option>
-                ))}
+                )
+              )}
             </Select>
           </FormControl>
-          <FormControl id="selection">
+          <FormControl id="create-user-groups">
             <FormLabel>
               {isUpdate ? (
                 <FormattedMessage
-                  id="organization-users.invite-user.member-in"
-                  defaultMessage="Member in (optional)"
+                  id="components.create-or-update-user-dialog.member-of"
+                  defaultMessage="Member of (optional)"
                 />
               ) : (
                 <FormattedMessage
                   id="organization-users.invite-user.add-as-member-in"
-                  defaultMessage="Add as a member in (optional)"
+                  defaultMessage="Add as a member of (optional)"
                 />
               )}
             </FormLabel>
@@ -258,10 +268,6 @@ function CreateOrUpdateUserDialog({
                   }}
                   onBlur={onBlur}
                   onSearch={handleSearchUserGroups}
-                  placeholder={intl.formatMessage({
-                    id: "generic.select-teams-placeholder",
-                    defaultMessage: "Select teams from your organization",
-                  })}
                 />
               )}
             />
@@ -271,9 +277,15 @@ function CreateOrUpdateUserDialog({
       confirm={
         <Button type="submit" colorScheme="purple" variant="solid">
           {isUpdate ? (
-            <FormattedMessage id="organization-users.update-user" defaultMessage="Update user" />
+            <FormattedMessage
+              id="components.create-or-update-user-dialog.update-user"
+              defaultMessage="Update user"
+            />
           ) : (
-            <FormattedMessage id="organization-users.invite-user" defaultMessage="Invite user" />
+            <FormattedMessage
+              id="components.create-or-update-user-dialog.invite-user"
+              defaultMessage="Invite user"
+            />
           )}
         </Button>
       }
@@ -286,6 +298,7 @@ useCreateOrUpdateUserDialog.fragments = {
   get User() {
     return gql`
       fragment useCreateOrUpdateUserDialog_User on User {
+        id
         firstName
         lastName
         email

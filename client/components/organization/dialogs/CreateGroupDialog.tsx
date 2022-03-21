@@ -10,7 +10,7 @@ import {
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage } from "react-intl";
 
 interface CreateGroupDialogData {
   name: string;
@@ -28,7 +28,6 @@ export function CreateGroupDialog({ ...props }: DialogProps<{}, CreateGroupDialo
 
   const { errors } = formState;
 
-  const intl = useIntl();
   const usersRef = useRef<UserSelectInstance<true>>(null);
 
   const nameRef = useRef<HTMLInputElement>(null);
@@ -100,10 +99,6 @@ export function CreateGroupDialog({ ...props }: DialogProps<{}, CreateGroupDialo
                   }}
                   onBlur={onBlur}
                   onSearch={handleSearchUsers}
-                  placeholder={intl.formatMessage({
-                    id: "component.create-group-dialog.members-placeholder",
-                    defaultMessage: "Select users from your organization",
-                  })}
                 />
               )}
             />

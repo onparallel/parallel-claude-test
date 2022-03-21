@@ -97,10 +97,6 @@ export function PetitionListSharedWithFilterLine({
             onChange({ ...value, value: (userOrGroup?.id ?? null) as any });
           }}
           onSearch={handleSearchUsers}
-          placeholder={intl.formatMessage({
-            id: "component.shared-filter.add-user-or-group",
-            defaultMessage: "Select a user or team",
-          })}
           usePortal={false}
         />
       </Box>

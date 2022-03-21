@@ -20,11 +20,6 @@
     "context": "Add to team"
   },
   {
-    "term": "component.add-member-group-dialog.members-placeholder",
-    "definition": "Selecciona usuarios de su organización",
-    "context": "Select users from your organization"
-  },
-  {
     "term": "component.add-member-group-dialog.title",
     "definition": "Agregar miembros al equipo",
     "context": "Add members to the team"
@@ -543,11 +538,6 @@
     "term": "component.create-group-dialog.members-label",
     "definition": "Miembros",
     "context": "Members"
-  },
-  {
-    "term": "component.create-group-dialog.members-placeholder",
-    "definition": "Seleccionar usuarios de su organización",
-    "context": "Select users from your organization"
   },
   {
     "term": "component.create-group-dialog.name-label",
@@ -3055,11 +3045,6 @@
     "context": "This template has not been shared yet."
   },
   {
-    "term": "component.shared-filter.add-user-or-group",
-    "definition": "Selecciona un usuario o equipo",
-    "context": "Select a user or team"
-  },
-  {
     "term": "component.signature-config-dialog.allow-additional-signers.help",
     "definition": "Si esta opción está desactivada, solo podrán firmar el documento las personas indicadas.",
     "context": "If this option is disabled, only the indicated people will be able to sign the document."
@@ -3445,6 +3430,11 @@
     "context": "No teams have been found"
   },
   {
+    "term": "component.user-group-select.placeholder",
+    "definition": "Selecciona equipos de tu organización",
+    "context": "Select teams from your organization"
+  },
+  {
     "term": "component.user-group-select.search-hint-teams",
     "definition": "Busca equipos existentes",
     "context": "Search for existing teams"
@@ -3480,6 +3470,26 @@
     "context": "Contact with <a>the owner or an admin</a> of your organization to create them an account."
   },
   {
+    "term": "component.user-select.placeholder-multi-with-groups",
+    "definition": "Selecciona usuarios o equipos de tu organización",
+    "context": "Select users or teams from your organization"
+  },
+  {
+    "term": "component.user-select.placeholder-multi-without-groups",
+    "definition": "Selecciona usuarios de tu organización",
+    "context": "Select users from your organization"
+  },
+  {
+    "term": "component.user-select.placeholder-single-with-groups",
+    "definition": "Selecciona un usuario o equipo de tu organización",
+    "context": "Select a user or team from your organization"
+  },
+  {
+    "term": "component.user-select.placeholder-single-without-groups",
+    "definition": "Selecciona un usuario de tu organización",
+    "context": "Select a user from your organization"
+  },
+  {
     "term": "component.user-select.search-hint",
     "definition": "Busca usuarios existentes",
     "context": "Search for existing users"
@@ -3498,6 +3508,21 @@
     "term": "components.add-new-signer-dialog.header",
     "definition": "{tone, select, INFORMAL{Introduce} other{Introduzca}} los datos del firmante",
     "context": "Enter the signer's information"
+  },
+  {
+    "term": "components.create-or-update-user-dialog.invite-user",
+    "definition": "Invitar usuario",
+    "context": "Invite user"
+  },
+  {
+    "term": "components.create-or-update-user-dialog.member-of",
+    "definition": "Miembro en (opcional)",
+    "context": "Member of (optional)"
+  },
+  {
+    "term": "components.create-or-update-user-dialog.update-user",
+    "definition": "Actualizar usuario",
+    "context": "Update user"
   },
   {
     "term": "components.multiple-emails-pasted-dialog.header",
@@ -4460,11 +4485,6 @@
     "context": "Page break"
   },
   {
-    "term": "generic.petition-sharing-placeholder",
-    "definition": "Añade usuarios y equipos de tu organización",
-    "context": "Add users and teams from your organization"
-  },
-  {
     "term": "generic.petition-status.closed",
     "definition": "Cerrada",
     "context": "Closed"
@@ -4563,11 +4583,6 @@
     "term": "generic.select-an-option",
     "definition": "Selecciona una opción",
     "context": "Select an option"
-  },
-  {
-    "term": "generic.select-teams-placeholder",
-    "definition": "Selecciona equipos de tu organización",
-    "context": "Select teams from your organization"
   },
   {
     "term": "generic.send",
@@ -4905,29 +4920,14 @@
     "context": "Email"
   },
   {
-    "term": "organization-users.invite-user",
-    "definition": "Invitar usuario",
-    "context": "Invite user"
-  },
-  {
     "term": "organization-users.invite-user.add-as-member-in",
     "definition": "Añadir como miembro en (opcional)",
-    "context": "Add as a member in (optional)"
-  },
-  {
-    "term": "organization-users.invite-user.member-in",
-    "definition": "Miembro en (opcional)",
-    "context": "Member in (optional)"
+    "context": "Add as a member of (optional)"
   },
   {
     "term": "organization-users.max-limit-reached",
     "definition": "Has alcanzado la cantidad máxima de usuarios que puedes crear, <a>contacta con nosotros para mejorar tu plan.</a>",
     "context": "You reached the maximum amount of users you can create, <a>reach out to us to upgrade your plan.</a>"
-  },
-  {
-    "term": "organization-users.update-user",
-    "definition": "Actualizar usuario",
-    "context": "Update user"
   },
   {
     "term": "organization-users.update-user-status.error.deactivate-own-user",
@@ -5008,11 +5008,6 @@
     "term": "organization.confirm-deactivate.user-select.input-error",
     "definition": "Por favor, selecciona un usuario",
     "context": "Please, select a user"
-  },
-  {
-    "term": "organization.confirm-deactivate.user-select.input-placeholder",
-    "definition": "Selecciona un usuario en tu organización",
-    "context": "Select a user from your organization"
   },
   {
     "term": "organization.integrations.parallel-api-description",
