@@ -10,6 +10,7 @@ import {
   UpdatePetitionInput,
   useSendPetitionHandler_bulkSendPetitionDocument,
   useSendPetitionHandler_PetitionFragment,
+  useSendPetitionHandler_UserFragment,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FORMATS } from "@parallel/utils/dates";
@@ -22,6 +23,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, noop } from "remeda";
 
 export function useSendPetitionHandler(
+  user: useSendPetitionHandler_UserFragment,
   petition: useSendPetitionHandler_PetitionFragment | null,
   onUpdatePetition: (data: UpdatePetitionInput) => Promise<any>,
   validator: () => Promise<boolean>,
@@ -60,6 +62,7 @@ export function useSendPetitionHandler(
         scheduledAt,
         bulkSendSigningMode,
       } = await showAddPetitionAccessDialog({
+        user,
         petition,
         onUpdatePetition,
         canAddRecipientGroups: currentRecipientIds.length === 0, // can only do a bulk send if the petition has no accesses yet
@@ -181,6 +184,13 @@ export function useSendPetitionHandler(
 }
 
 useSendPetitionHandler.fragments = {
+  User: gql`
+    fragment useSendPetitionHandler_User on User {
+      ...ConfirmPetitionSignersDialog_User
+      ...AddPetitionAccessDialog_User
+    }
+    ${AddPetitionAccessDialog.fragments.User}
+  `,
   Petition: gql`
     fragment useSendPetitionHandler_Petition on Petition {
       id

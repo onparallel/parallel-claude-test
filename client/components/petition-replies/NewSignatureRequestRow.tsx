@@ -34,22 +34,26 @@ export function NewSignatureRequestRow({
   const showConfirmPetitionSignersDialog = useConfirmPetitionSignersDialog();
   const handleStartSignature = async () => {
     try {
-      const { signers: signersInfo, message } = await showConfirmPetitionSignersDialog({
+      const {
+        signers: signersInfo,
+        message,
+        allowAdditionalSigners: allowMoreSigners,
+      } = await showConfirmPetitionSignersDialog({
         user,
         accesses: petition.accesses,
         presetSigners: signers,
         allowAdditionalSigners,
+        isUpdate: !petition.signatureConfig?.review,
       });
 
-      if (allowAdditionalSigners || reviewBeforeSigning) {
-        await onUpdateConfig({
-          ...omit(petition.signatureConfig!, ["integration", "signers", "__typename"]),
-          orgIntegrationId: petition.signatureConfig!.integration!.id,
-          signersInfo,
-        });
-      }
+      await onUpdateConfig({
+        ...omit(petition.signatureConfig!, ["integration", "signers", "__typename"]),
+        orgIntegrationId: petition.signatureConfig!.integration!.id,
+        allowAdditionalSigners: allowMoreSigners,
+        signersInfo,
+      });
 
-      onStart(message);
+      if (reviewBeforeSigning) onStart(message);
     } catch {}
   };
 
@@ -96,11 +100,18 @@ export function NewSignatureRequestRow({
           <Button width="24" onClick={() => onUpdateConfig(null)}>
             <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
           </Button>
-          <Button width="24" colorScheme="purple" marginLeft={2} onClick={handleStartSignature}>
-            <FormattedMessage
-              id="component.petition-signatures-card.start"
-              defaultMessage="Start..."
-            />
+          <Button colorScheme="purple" marginLeft={2} onClick={handleStartSignature}>
+            {reviewBeforeSigning ? (
+              <FormattedMessage
+                id="component.petition-signatures-card.start"
+                defaultMessage="Start..."
+              />
+            ) : (
+              <FormattedMessage
+                id="component.petition-signatures-card.edit-signers"
+                defaultMessage="Edit signers"
+              />
+            )}
           </Button>
         </Flex>
       </Box>

@@ -6017,6 +6017,14 @@ export type UserReference_UserFragment = {
   status: UserStatus;
 };
 
+export type AddPetitionAccessDialog_UserFragment = {
+  __typename?: "User";
+  id: string;
+  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+};
+
 export type AddPetitionAccessDialog_PetitionFragment = {
   __typename?: "Petition";
   id: string;
@@ -6024,7 +6032,19 @@ export type AddPetitionAccessDialog_PetitionFragment = {
   emailBody?: any | null;
   signatureConfig?: {
     __typename?: "SignatureConfig";
-    signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+    review: boolean;
+    timezone: string;
+    title: string;
+    allowAdditionalSigners: boolean;
+    integration?: { __typename?: "SignatureOrgIntegration"; id: string } | null;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      email: string;
+      fullName: string;
+      contactId?: string | null;
+      firstName: string;
+      lastName?: string | null;
+    }>;
   } | null;
   remindersConfig?: {
     __typename?: "RemindersConfig";
@@ -6041,6 +6061,18 @@ export type AddPetitionAccessDialog_PetitionFragment = {
       petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
     };
   };
+  accesses: Array<{
+    __typename?: "PetitionAccess";
+    id: string;
+    status: PetitionAccessStatus;
+    contact?: {
+      __typename?: "Contact";
+      id: string;
+      email: string;
+      firstName: string;
+      lastName?: string | null;
+    } | null;
+  }>;
 };
 
 export type SentPetitionMessageDialog_PetitionMessageFragment = {
@@ -7285,6 +7317,14 @@ export type TemplateDetailsModal_PetitionTemplateFragment = {
   remindersConfig?: { __typename?: "RemindersConfig"; time: string } | null;
 };
 
+export type useSendPetitionHandler_UserFragment = {
+  __typename?: "User";
+  id: string;
+  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+};
+
 export type useSendPetitionHandler_PetitionFragment = {
   __typename?: "Petition";
   id: string;
@@ -7292,17 +7332,36 @@ export type useSendPetitionHandler_PetitionFragment = {
   emailBody?: any | null;
   accesses: Array<{
     __typename?: "PetitionAccess";
-    contact?: { __typename?: "Contact"; id: string } | null;
+    id: string;
+    status: PetitionAccessStatus;
+    contact?: {
+      __typename?: "Contact";
+      id: string;
+      email: string;
+      firstName: string;
+      lastName?: string | null;
+    } | null;
   }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
+    review: boolean;
+    timezone: string;
+    title: string;
+    allowAdditionalSigners: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
       environment: SignatureOrgIntegrationEnvironment;
       name: string;
     } | null;
-    signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      email: string;
+      fullName: string;
+      contactId?: string | null;
+      firstName: string;
+      lastName?: string | null;
+    }>;
   } | null;
   remindersConfig?: {
     __typename?: "RemindersConfig";
@@ -11048,7 +11107,14 @@ export type PetitionActivity_PetitionFragment = {
     remindersActive: boolean;
     remindersOptOut: boolean;
     createdAt: string;
-    contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+    contact?: {
+      __typename?: "Contact";
+      id: string;
+      email: string;
+      firstName: string;
+      lastName?: string | null;
+      fullName: string;
+    } | null;
     remindersConfig?: {
       __typename?: "RemindersConfig";
       offset: number;
@@ -11683,13 +11749,24 @@ export type PetitionActivity_PetitionFragment = {
   >;
   signatureConfig?: {
     __typename?: "SignatureConfig";
-    signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+    review: boolean;
+    timezone: string;
+    title: string;
+    allowAdditionalSigners: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
       id: string;
       environment: SignatureOrgIntegrationEnvironment;
       name: string;
     } | null;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      email: string;
+      fullName: string;
+      contactId?: string | null;
+      firstName: string;
+      lastName?: string | null;
+    }>;
   } | null;
   remindersConfig?: {
     __typename?: "RemindersConfig";
@@ -11766,7 +11843,14 @@ export type PetitionActivity_updatePetitionMutation = {
           remindersActive: boolean;
           remindersOptOut: boolean;
           createdAt: string;
-          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+          contact?: {
+            __typename?: "Contact";
+            id: string;
+            email: string;
+            firstName: string;
+            lastName?: string | null;
+            fullName: string;
+          } | null;
           remindersConfig?: {
             __typename?: "RemindersConfig";
             offset: number;
@@ -12440,13 +12524,24 @@ export type PetitionActivity_updatePetitionMutation = {
         >;
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+          review: boolean;
+          timezone: string;
+          title: string;
+          allowAdditionalSigners: boolean;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             id: string;
             environment: SignatureOrgIntegrationEnvironment;
             name: string;
           } | null;
+          signers: Array<{
+            __typename?: "PetitionSigner";
+            email: string;
+            fullName: string;
+            contactId?: string | null;
+            firstName: string;
+            lastName?: string | null;
+          }>;
         } | null;
         remindersConfig?: {
           __typename?: "RemindersConfig";
@@ -12560,7 +12655,14 @@ export type PetitionActivity_petitionQuery = {
           remindersActive: boolean;
           remindersOptOut: boolean;
           createdAt: string;
-          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+          contact?: {
+            __typename?: "Contact";
+            id: string;
+            email: string;
+            firstName: string;
+            lastName?: string | null;
+            fullName: string;
+          } | null;
           remindersConfig?: {
             __typename?: "RemindersConfig";
             offset: number;
@@ -13234,13 +13336,24 @@ export type PetitionActivity_petitionQuery = {
         >;
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
+          review: boolean;
+          timezone: string;
+          title: string;
+          allowAdditionalSigners: boolean;
           integration?: {
             __typename?: "SignatureOrgIntegration";
             id: string;
             environment: SignatureOrgIntegrationEnvironment;
             name: string;
           } | null;
+          signers: Array<{
+            __typename?: "PetitionSigner";
+            email: string;
+            fullName: string;
+            contactId?: string | null;
+            firstName: string;
+            lastName?: string | null;
+          }>;
         } | null;
         remindersConfig?: {
           __typename?: "RemindersConfig";
@@ -13329,8 +13442,9 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
-    title: string;
     review: boolean;
+    timezone: string;
+    title: string;
     allowAdditionalSigners: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -13641,9 +13755,17 @@ export type PetitionCompose_updatePetitionMutation = {
         } | null;
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          title: string;
           review: boolean;
+          timezone: string;
+          title: string;
           allowAdditionalSigners: boolean;
+          integration?: {
+            __typename?: "SignatureOrgIntegration";
+            id: string;
+            name: string;
+            isDefault: boolean;
+            environment: SignatureOrgIntegrationEnvironment;
+          } | null;
           signers: Array<{
             __typename?: "PetitionSigner";
             contactId?: string | null;
@@ -13652,13 +13774,6 @@ export type PetitionCompose_updatePetitionMutation = {
             email: string;
             fullName: string;
           }>;
-          integration?: {
-            __typename?: "SignatureOrgIntegration";
-            id: string;
-            name: string;
-            isDefault: boolean;
-            environment: SignatureOrgIntegrationEnvironment;
-          } | null;
         } | null;
         remindersConfig?: {
           __typename?: "RemindersConfig";
@@ -13679,13 +13794,10 @@ export type PetitionCompose_updatePetitionMutation = {
             };
           };
         };
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        } | null;
         accesses: Array<{
           __typename?: "PetitionAccess";
           status: PetitionAccessStatus;
+          id: string;
           contact?: {
             __typename?: "Contact";
             id: string;
@@ -13694,6 +13806,10 @@ export type PetitionCompose_updatePetitionMutation = {
             email: string;
           } | null;
         }>;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          isSubscribed: boolean;
+        } | null;
       }
     | {
         __typename?: "PetitionTemplate";
@@ -14172,8 +14288,9 @@ export type PetitionCompose_petitionQuery = {
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          title: string;
           review: boolean;
+          timezone: string;
+          title: string;
           allowAdditionalSigners: boolean;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -20406,14 +20523,60 @@ export const CopySignatureConfigDialog_PetitionSignerFragmentDoc = gql`
     fullName
   }
 ` as unknown as DocumentNode<CopySignatureConfigDialog_PetitionSignerFragment, unknown>;
+export const SelectedSignerRow_PetitionSignerFragmentDoc = gql`
+  fragment SelectedSignerRow_PetitionSigner on PetitionSigner {
+    firstName
+    lastName
+    email
+  }
+` as unknown as DocumentNode<SelectedSignerRow_PetitionSignerFragment, unknown>;
+export const SuggestedSigners_PetitionSignerFragmentDoc = gql`
+  fragment SuggestedSigners_PetitionSigner on PetitionSigner {
+    firstName
+    lastName
+    email
+  }
+` as unknown as DocumentNode<SuggestedSigners_PetitionSignerFragment, unknown>;
+export const ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc = gql`
+  fragment ConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
+    contactId
+    email
+    firstName
+    lastName
+    ...SelectedSignerRow_PetitionSigner
+    ...SuggestedSigners_PetitionSigner
+  }
+  ${SelectedSignerRow_PetitionSignerFragmentDoc}
+  ${SuggestedSigners_PetitionSignerFragmentDoc}
+` as unknown as DocumentNode<ConfirmPetitionSignersDialog_PetitionSignerFragment, unknown>;
+export const ConfirmPetitionSignersDialog_PetitionAccessFragmentDoc = gql`
+  fragment ConfirmPetitionSignersDialog_PetitionAccess on PetitionAccess {
+    id
+    status
+    contact {
+      id
+      email
+      firstName
+      lastName
+    }
+  }
+` as unknown as DocumentNode<ConfirmPetitionSignersDialog_PetitionAccessFragment, unknown>;
 export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
   fragment AddPetitionAccessDialog_Petition on Petition {
     id
     emailSubject
     emailBody
     signatureConfig {
+      review
+      timezone
+      title
+      allowAdditionalSigners
+      integration {
+        id
+      }
       signers {
         ...CopySignatureConfigDialog_PetitionSigner
+        ...ConfirmPetitionSignersDialog_PetitionSigner
       }
     }
     remindersConfig {
@@ -20431,8 +20594,13 @@ export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
         }
       }
     }
+    accesses {
+      ...ConfirmPetitionSignersDialog_PetitionAccess
+    }
   }
   ${CopySignatureConfigDialog_PetitionSignerFragmentDoc}
+  ${ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
+  ${ConfirmPetitionSignersDialog_PetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<AddPetitionAccessDialog_PetitionFragment, unknown>;
 export const useSendPetitionHandler_PetitionFragmentDoc = gql`
   fragment useSendPetitionHandler_Petition on Petition {
@@ -20519,6 +20687,28 @@ export const useUpdateIsReadNotification_UserFragmentDoc = gql`
     unreadNotificationIds
   }
 ` as unknown as DocumentNode<useUpdateIsReadNotification_UserFragment, unknown>;
+export const ConfirmPetitionSignersDialog_UserFragmentDoc = gql`
+  fragment ConfirmPetitionSignersDialog_User on User {
+    id
+    email
+    firstName
+    lastName
+  }
+` as unknown as DocumentNode<ConfirmPetitionSignersDialog_UserFragment, unknown>;
+export const AddPetitionAccessDialog_UserFragmentDoc = gql`
+  fragment AddPetitionAccessDialog_User on User {
+    ...ConfirmPetitionSignersDialog_User
+  }
+  ${ConfirmPetitionSignersDialog_UserFragmentDoc}
+` as unknown as DocumentNode<AddPetitionAccessDialog_UserFragment, unknown>;
+export const useSendPetitionHandler_UserFragmentDoc = gql`
+  fragment useSendPetitionHandler_User on User {
+    ...ConfirmPetitionSignersDialog_User
+    ...AddPetitionAccessDialog_User
+  }
+  ${ConfirmPetitionSignersDialog_UserFragmentDoc}
+  ${AddPetitionAccessDialog_UserFragmentDoc}
+` as unknown as DocumentNode<useSendPetitionHandler_UserFragment, unknown>;
 export const PetitionActivity_UserFragmentDoc = gql`
   fragment PetitionActivity_User on User {
     organization {
@@ -20527,10 +20717,12 @@ export const PetitionActivity_UserFragmentDoc = gql`
     }
     ...PetitionLayout_User
     ...useUpdateIsReadNotification_User
+    ...useSendPetitionHandler_User
   }
   ${isUsageLimitsReached_OrganizationFragmentDoc}
   ${PetitionLayout_UserFragmentDoc}
   ${useUpdateIsReadNotification_UserFragmentDoc}
+  ${useSendPetitionHandler_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionActivity_UserFragment, unknown>;
 export const PetitionTemplateComposeMessageEditor_PetitionFragmentDoc = gql`
   fragment PetitionTemplateComposeMessageEditor_Petition on PetitionTemplate {
@@ -20830,6 +21022,7 @@ export const PetitionCompose_UserFragmentDoc = gql`
     ...PetitionLayout_User
     ...PetitionSettings_User
     ...useUpdateIsReadNotification_User
+    ...useSendPetitionHandler_User
     organization {
       ...isUsageLimitsReached_Organization
     }
@@ -20837,20 +21030,9 @@ export const PetitionCompose_UserFragmentDoc = gql`
   ${PetitionLayout_UserFragmentDoc}
   ${PetitionSettings_UserFragmentDoc}
   ${useUpdateIsReadNotification_UserFragmentDoc}
+  ${useSendPetitionHandler_UserFragmentDoc}
   ${isUsageLimitsReached_OrganizationFragmentDoc}
 ` as unknown as DocumentNode<PetitionCompose_UserFragment, unknown>;
-export const ConfirmPetitionSignersDialog_PetitionAccessFragmentDoc = gql`
-  fragment ConfirmPetitionSignersDialog_PetitionAccess on PetitionAccess {
-    id
-    status
-    contact {
-      id
-      email
-      firstName
-      lastName
-    }
-  }
-` as unknown as DocumentNode<ConfirmPetitionSignersDialog_PetitionAccessFragment, unknown>;
 export const useFieldVisibility_PetitionFieldFragmentDoc = gql`
   fragment useFieldVisibility_PetitionField on PetitionField {
     id
@@ -21029,32 +21211,6 @@ export const useLiquidScope_PetitionFieldFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<useLiquidScope_PetitionFieldFragment, unknown>;
-export const SelectedSignerRow_PetitionSignerFragmentDoc = gql`
-  fragment SelectedSignerRow_PetitionSigner on PetitionSigner {
-    firstName
-    lastName
-    email
-  }
-` as unknown as DocumentNode<SelectedSignerRow_PetitionSignerFragment, unknown>;
-export const SuggestedSigners_PetitionSignerFragmentDoc = gql`
-  fragment SuggestedSigners_PetitionSigner on PetitionSigner {
-    firstName
-    lastName
-    email
-  }
-` as unknown as DocumentNode<SuggestedSigners_PetitionSignerFragment, unknown>;
-export const ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc = gql`
-  fragment ConfirmPetitionSignersDialog_PetitionSigner on PetitionSigner {
-    contactId
-    email
-    firstName
-    lastName
-    ...SelectedSignerRow_PetitionSigner
-    ...SuggestedSigners_PetitionSigner
-  }
-  ${SelectedSignerRow_PetitionSignerFragmentDoc}
-  ${SuggestedSigners_PetitionSignerFragmentDoc}
-` as unknown as DocumentNode<ConfirmPetitionSignersDialog_PetitionSignerFragment, unknown>;
 export const RecipientViewContentsCard_PetitionFieldFragmentDoc = gql`
   fragment RecipientViewContentsCard_PetitionField on PetitionField {
     id
@@ -21127,14 +21283,6 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
   ${RecipientViewContentsCard_PetitionBaseFragmentDoc}
   ${PetitionLayout_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionPreview_PetitionBaseFragment, unknown>;
-export const ConfirmPetitionSignersDialog_UserFragmentDoc = gql`
-  fragment ConfirmPetitionSignersDialog_User on User {
-    id
-    email
-    firstName
-    lastName
-  }
-` as unknown as DocumentNode<ConfirmPetitionSignersDialog_UserFragment, unknown>;
 export const PetitionPreview_UserFragmentDoc = gql`
   fragment PetitionPreview_User on User {
     organization {
@@ -21142,10 +21290,12 @@ export const PetitionPreview_UserFragmentDoc = gql`
       ...isUsageLimitsReached_Organization
     }
     ...PetitionLayout_User
+    ...useSendPetitionHandler_User
     ...ConfirmPetitionSignersDialog_User
   }
   ${isUsageLimitsReached_OrganizationFragmentDoc}
   ${PetitionLayout_UserFragmentDoc}
+  ${useSendPetitionHandler_UserFragmentDoc}
   ${ConfirmPetitionSignersDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionPreview_UserFragment, unknown>;
 export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`

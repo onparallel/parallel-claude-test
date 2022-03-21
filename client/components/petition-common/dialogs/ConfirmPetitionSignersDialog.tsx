@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Checkbox, FormControl, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Checkbox, FormControl, HStack, Stack, Text } from "@chakra-ui/react";
 import {
   ContactSelect,
   ContactSelectInstance,
@@ -8,6 +8,7 @@ import {
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
+import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import {
   ConfirmPetitionSignersDialog_PetitionAccessFragment,
@@ -31,11 +32,13 @@ interface ConfirmPetitionSignersDialogProps {
   accesses: ConfirmPetitionSignersDialog_PetitionAccessFragment[];
   presetSigners: ConfirmPetitionSignersDialog_PetitionSignerFragment[];
   allowAdditionalSigners: boolean;
+  isUpdate?: boolean;
 }
 
 export interface ConfirmPetitionSignersDialogResult {
   signers: SignatureConfigInputSigner[];
   message: Maybe<string>;
+  allowAdditionalSigners: boolean;
 }
 
 export type SignerSelectSelection = Omit<
@@ -51,6 +54,7 @@ export function ConfirmPetitionSignersDialog({
   accesses,
   presetSigners,
   allowAdditionalSigners,
+  isUpdate,
   ...props
 }: DialogProps<ConfirmPetitionSignersDialogProps, ConfirmPetitionSignersDialogResult>) {
   const {
@@ -59,11 +63,16 @@ export function ConfirmPetitionSignersDialog({
     watch,
     register,
     formState: { errors },
-  } = useForm<{ signers: SignerSelectSelection[]; message: Maybe<string> }>({
+  } = useForm<{
+    signers: SignerSelectSelection[];
+    message: Maybe<string>;
+    allowAdditionalSigners: boolean;
+  }>({
     mode: "onChange",
     defaultValues: {
       signers: presetSigners.map((s) => ({ ...s, isPreset: true })),
       message: null,
+      allowAdditionalSigners: allowAdditionalSigners ?? false,
     },
   });
 
@@ -132,7 +141,8 @@ export function ConfirmPetitionSignersDialog({
       initialFocusRef={contactSelectRef}
       content={{
         as: "form",
-        onSubmit: handleSubmit(({ signers, message }) => {
+        onSubmit: handleSubmit(({ signers, message, allowAdditionalSigners }) => {
+          const hasSigners = signers.length > 0;
           props.onResolve({
             message: showMessage ? message : null,
             signers: signers.map((s) => ({
@@ -141,6 +151,7 @@ export function ConfirmPetitionSignersDialog({
               firstName: s.firstName,
               lastName: s.lastName ?? "",
             })),
+            allowAdditionalSigners: hasSigners ? allowAdditionalSigners : true,
           });
         }),
       }}
@@ -176,14 +187,14 @@ export function ConfirmPetitionSignersDialog({
                     {signers.map((signer, index) => (
                       <SelectedSignerRow
                         key={index}
-                        isEditable={!signer.isPreset}
+                        isEditable={isUpdate ? true : !signer.isPreset}
                         signer={signer}
                         onRemoveClick={() => onChange(signers.filter((_, i) => index !== i))}
                         onEditClick={handleSelectedSignerRowOnEditClick(onChange, signer, index)}
                       />
                     ))}
                   </Stack>
-                  {signers.length === 0 || allowAdditionalSigners ? (
+                  {signers.length === 0 || allowAdditionalSigners || isUpdate ? (
                     <Box marginTop={2}>
                       <ContactSelect
                         ref={contactSelectRef as any}
@@ -206,34 +217,51 @@ export function ConfirmPetitionSignersDialog({
               )}
             />
           </FormControl>
-          {signers.some((s) => !s.isPreset) ? (
-            <FormControl isInvalid={!!errors.message}>
-              <Checkbox
-                marginY={4}
-                colorScheme="purple"
-                isChecked={showMessage}
-                onChange={(e) => setShowMessage(e.target.checked)}
-              >
-                <FormattedMessage
-                  id="component.confirm-petition-signers-dialog.include-message"
-                  defaultMessage="Include message"
-                />
+          {signers.some((s) => (isUpdate ? true : !s.isPreset)) ? (
+            isUpdate ? (
+              <Checkbox marginTop={4} colorScheme="purple" {...register("allowAdditionalSigners")}>
+                <HStack alignContent="center">
+                  <FormattedMessage
+                    id="component.signature-config-dialog.allow-additional-signers.label"
+                    defaultMessage="Allow additional signers to be added"
+                  />
+                  <HelpPopover>
+                    <FormattedMessage
+                      id="component.signature-config-dialog.allow-additional-signers.help"
+                      defaultMessage="If this option is disabled, only the indicated people will be able to sign the document."
+                    />
+                  </HelpPopover>
+                </HStack>
               </Checkbox>
-              <PaddedCollapse in={showMessage}>
-                <GrowingTextarea
-                  {...register("message", { required: showMessage })}
-                  maxHeight="30vh"
-                  aria-label={intl.formatMessage({
-                    id: "component.confirm-petition-signers-dialog.message-placeholder",
-                    defaultMessage: "Write here a message for the signers...",
-                  })}
-                  placeholder={intl.formatMessage({
-                    id: "component.confirm-petition-signers-dialog.message-placeholder",
-                    defaultMessage: "Write here a message for the signers...",
-                  })}
-                />
-              </PaddedCollapse>
-            </FormControl>
+            ) : (
+              <FormControl isInvalid={!!errors.message}>
+                <Checkbox
+                  marginY={4}
+                  colorScheme="purple"
+                  isChecked={showMessage}
+                  onChange={(e) => setShowMessage(e.target.checked)}
+                >
+                  <FormattedMessage
+                    id="component.confirm-petition-signers-dialog.include-message"
+                    defaultMessage="Include message"
+                  />
+                </Checkbox>
+                <PaddedCollapse in={showMessage}>
+                  <GrowingTextarea
+                    {...register("message", { required: showMessage })}
+                    maxHeight="30vh"
+                    aria-label={intl.formatMessage({
+                      id: "component.confirm-petition-signers-dialog.message-placeholder",
+                      defaultMessage: "Write here a message for the signers...",
+                    })}
+                    placeholder={intl.formatMessage({
+                      id: "component.confirm-petition-signers-dialog.message-placeholder",
+                      defaultMessage: "Write here a message for the signers...",
+                    })}
+                  />
+                </PaddedCollapse>
+              </FormControl>
+            )
           ) : null}
         </>
       }
@@ -242,12 +270,16 @@ export function ConfirmPetitionSignersDialog({
           data-action="start-signature"
           colorScheme="purple"
           type="submit"
-          isDisabled={signers.length === 0}
+          isDisabled={isUpdate ? false : signers.length === 0}
         >
-          <FormattedMessage
-            id="component.confirm-petition-signers-dialog.start-signature-button"
-            defaultMessage="Start signature"
-          />
+          {isUpdate ? (
+            <FormattedMessage id="generic.save" defaultMessage="Save" />
+          ) : (
+            <FormattedMessage
+              id="component.confirm-petition-signers-dialog.start-signature-button"
+              defaultMessage="Start signature"
+            />
+          )}
         </Button>
       }
       {...props}

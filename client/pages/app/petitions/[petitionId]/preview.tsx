@@ -117,6 +117,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   };
 
   const handleNextClick = useSendPetitionHandler(
+    me,
     isPetition ? petition : null,
     handleUpdatePetition,
     _validatePetitionFields
@@ -418,8 +419,10 @@ PetitionPreview.fragments = {
         ...isUsageLimitsReached_Organization
       }
       ...PetitionLayout_User
+      ...useSendPetitionHandler_User
       ...ConfirmPetitionSignersDialog_User
     }
+    ${useSendPetitionHandler.fragments.User}
     ${isUsageLimitsReached.fragments.Organization}
     ${ConfirmPetitionSignersDialog.fragments.User}
     ${PetitionLayout.fragments.User}

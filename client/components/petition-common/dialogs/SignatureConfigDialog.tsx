@@ -571,11 +571,13 @@ export function SignatureConfigDialogBodyStep2({
         <Radio value="choose-after" isDisabled={petitionIsCompleted}>
           <FormattedMessage
             id="component.signature-config-dialog.radiobutton.option-1"
-            defaultMessage="Indicate once the petition is completed"
+            defaultMessage="Indicate later"
           />
-          <Text as="span" color="gray.500" marginLeft={2}>
-            (<FormattedMessage id="generic.recommended" defaultMessage="Recommended" />)
-          </Text>
+          {isTemplate ? (
+            <Text as="span" color="gray.500" marginLeft={2}>
+              (<FormattedMessage id="generic.recommended" defaultMessage="Recommended" />)
+            </Text>
+          ) : null}
         </Radio>
         <Radio value="choose-now">
           <FormattedMessage

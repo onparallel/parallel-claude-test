@@ -1,11 +1,27 @@
 import { gql } from "@apollo/client";
-import { Alert, AlertIcon, Box, Button, Flex, Heading, Image, Stack, Text } from "@chakra-ui/react";
+import {
+  Alert,
+  AlertIcon,
+  Box,
+  Button,
+  Center,
+  Flex,
+  Heading,
+  HStack,
+  Image,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import {
   ContactSelectProps,
   ContactSelectSelection,
 } from "@parallel/components/common/ContactSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import {
+  ConfirmPetitionSignersDialog,
+  useConfirmPetitionSignersDialog,
+} from "@parallel/components/petition-common/dialogs/ConfirmPetitionSignersDialog";
 import {
   CopySignatureConfigDialog,
   useCopySignatureConfigDialog,
@@ -14,6 +30,7 @@ import { useScheduleMessageDialog } from "@parallel/components/petition-compose/
 import { PetitionRemindersConfig } from "@parallel/components/petition-compose/PetitionRemindersConfig";
 import {
   AddPetitionAccessDialog_PetitionFragment,
+  AddPetitionAccessDialog_UserFragment,
   BulkSendSigningMode,
   RemindersConfig,
   UpdatePetitionInput,
@@ -28,7 +45,7 @@ import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useSearchContactsByEmail } from "@parallel/utils/useSearchContactsByEmail";
 import { useCallback, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { noop, omit } from "remeda";
+import { noop, omit, pick } from "remeda";
 import { HelpPopover } from "../../common/HelpPopover";
 import { RecipientSelectGroups } from "../../common/RecipientSelectGroups";
 import { MessageEmailEditor } from "../../petition-common/MessageEmailEditor";
@@ -40,6 +57,7 @@ export type AddPetitionAccessDialogProps = {
   onUpdatePetition?: (data: UpdatePetitionInput) => void;
   canAddRecipientGroups?: boolean;
   petition: AddPetitionAccessDialog_PetitionFragment;
+  user: AddPetitionAccessDialog_UserFragment;
 };
 
 export type AddPetitionAccessDialogResult = {
@@ -52,6 +70,7 @@ export type AddPetitionAccessDialogResult = {
 };
 
 export function AddPetitionAccessDialog({
+  user,
   petition,
   canAddRecipientGroups,
   onUpdatePetition = noop,
@@ -67,6 +86,17 @@ export function AddPetitionAccessDialog({
   const [body, setBody] = useState<RichTextEditorValue>(petition.emailBody ?? emptyRTEValue());
   const [remindersConfig, setRemindersConfig] = useState<Maybe<RemindersConfig>>(
     petition.remindersConfig ? omit(petition.remindersConfig, ["__typename"]) : null
+  );
+  const [signatureConfig, setSignatureConfig] = useState<
+    Maybe<{
+      signers: any[];
+      allowAdditionalSigners: boolean;
+      review: boolean;
+    }>
+  >(
+    petition.signatureConfig
+      ? pick(petition.signatureConfig, ["signers", "allowAdditionalSigners", "review"])
+      : null
   );
 
   const handleSearchContactsByEmail = useSearchContactsByEmail();
@@ -147,6 +177,40 @@ export function AddPetitionAccessDialog({
     } catch {}
   };
 
+  const showConfirmPetitionSignersDialog = useConfirmPetitionSignersDialog();
+
+  const handleEditPetitionSigners = async () => {
+    try {
+      const { signers, allowAdditionalSigners } = await showConfirmPetitionSignersDialog({
+        user,
+        accesses: petition.accesses,
+        presetSigners: signatureConfig?.signers ?? [],
+        allowAdditionalSigners: signatureConfig?.allowAdditionalSigners ?? false,
+        isUpdate: true,
+      });
+
+      setSignatureConfig({
+        signers,
+        allowAdditionalSigners,
+        review: petition.signatureConfig!.review,
+      });
+
+      await onUpdatePetition({
+        signatureConfig: {
+          ...omit(petition.signatureConfig!, [
+            "allowAdditionalSigners",
+            "signers",
+            "integration",
+            "__typename",
+          ]),
+          orgIntegrationId: petition.signatureConfig!.integration!.id,
+          signersInfo: signers,
+          allowAdditionalSigners,
+        },
+      });
+    } catch {}
+  };
+
   const { used, limit } = petition.organization.usageLimits.petitions;
 
   return (
@@ -155,6 +219,7 @@ export function AddPetitionAccessDialog({
       closeOnEsc={false}
       closeOnOverlayClick={false}
       initialFocusRef={recipientsRef}
+      hasCloseButton
       size="2xl"
       header={
         <Flex alignItems="center">
@@ -217,18 +282,53 @@ export function AddPetitionAccessDialog({
           {limit - used <= 10 ? (
             <Alert status="warning" borderRadius="md" mb={2}>
               <AlertIcon color="yellow.500" />
-              {limit === used ? (
-                <FormattedMessage
-                  id="component.add-petition-access-dialog.petition-limit-reached.text"
-                  defaultMessage="You reached the limit of petitions sent."
-                />
-              ) : (
-                <FormattedMessage
-                  id="component.add-petition-access-dialog.petition-limit-near.text"
-                  defaultMessage="You can send {left, plural, =1{# more petition} other{# more petitions}}."
-                  values={{ left: limit - used }}
-                />
-              )}
+              <Text>
+                {limit === used ? (
+                  <FormattedMessage
+                    id="component.add-petition-access-dialog.petition-limit-reached.text"
+                    defaultMessage="You reached the limit of petitions sent."
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="component.add-petition-access-dialog.petition-limit-near.text"
+                    defaultMessage="You can send {left, plural, =1{# more petition} other{# more petitions}}."
+                    values={{ left: limit - used }}
+                  />
+                )}
+              </Text>
+            </Alert>
+          ) : null}
+          {signatureConfig && !signatureConfig.review && signatureConfig.allowAdditionalSigners ? (
+            <Alert status="info" borderRadius="md" mb={2}>
+              <AlertIcon />
+              <HStack>
+                <Text>
+                  <FormattedMessage
+                    id="component.add-petition-access-dialog.add-signers-text"
+                    defaultMessage="Before sending, we recommend <b>including who has to sign</b> to make your recipient's job easier."
+                  />
+                </Text>
+                <Center>
+                  <Button
+                    variant="outline"
+                    backgroundColor="white"
+                    colorScheme="blue"
+                    onClick={handleEditPetitionSigners}
+                  >
+                    {signatureConfig.signers.length ? (
+                      <FormattedMessage
+                        id="component.add-petition-access-dialog.edit-signers"
+                        defaultMessage="Edit signers"
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id="component.add-petition-access-dialog.add-signers"
+                        defaultMessage="Add signers"
+                      />
+                    )}
+                  </Button>
+                </Center>
+              </HStack>
             </Alert>
           ) : null}
           <RecipientSelectGroups
@@ -276,14 +376,28 @@ export function AddPetitionAccessDialog({
 }
 
 AddPetitionAccessDialog.fragments = {
+  User: gql`
+    fragment AddPetitionAccessDialog_User on User {
+      ...ConfirmPetitionSignersDialog_User
+    }
+    ${ConfirmPetitionSignersDialog.fragments.User}
+  `,
   Petition: gql`
     fragment AddPetitionAccessDialog_Petition on Petition {
       id
       emailSubject
       emailBody
       signatureConfig {
+        review
+        timezone
+        title
+        allowAdditionalSigners
+        integration {
+          id
+        }
         signers {
           ...CopySignatureConfigDialog_PetitionSigner
+          ...ConfirmPetitionSignersDialog_PetitionSigner
         }
       }
       remindersConfig {
@@ -301,8 +415,13 @@ AddPetitionAccessDialog.fragments = {
           }
         }
       }
+      accesses {
+        ...ConfirmPetitionSignersDialog_PetitionAccess
+      }
     }
     ${CopySignatureConfigDialog.fragments.PetitionSigner}
+    ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
+    ${ConfirmPetitionSignersDialog.fragments.PetitionAccess}
   `,
 };
 

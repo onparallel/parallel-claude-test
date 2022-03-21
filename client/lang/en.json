@@ -25,6 +25,21 @@
     "context": "Add members to the team"
   },
   {
+    "term": "component.add-petition-access-dialog.add-signers",
+    "definition": "Add signers",
+    "context": "Add signers"
+  },
+  {
+    "term": "component.add-petition-access-dialog.add-signers-text",
+    "definition": "Before sending, we recommend <b>including who has to sign</b> to make your recipient's job easier.",
+    "context": "Before sending, we recommend <b>including who has to sign</b> to make your recipient's job easier."
+  },
+  {
+    "term": "component.add-petition-access-dialog.edit-signers",
+    "definition": "Edit signers",
+    "context": "Edit signers"
+  },
+  {
     "term": "component.add-petition-access-dialog.petition-limit-near.text",
     "definition": "You can send {left, plural, =1{# more petition} other{# more petitions}}.",
     "context": "You can send {left, plural, =1{# more petition} other{# more petitions}}."
@@ -2120,6 +2135,11 @@
     "context": "Add signature"
   },
   {
+    "term": "component.petition-signatures-card.edit-signers",
+    "definition": "Edit signers",
+    "context": "Edit signers"
+  },
+  {
     "term": "component.petition-signatures-card.header",
     "definition": "Petition eSignature",
     "context": "Petition eSignature"
@@ -3111,8 +3131,8 @@
   },
   {
     "term": "component.signature-config-dialog.radiobutton.option-1",
-    "definition": "Indicate once the petition is completed",
-    "context": "Indicate once the petition is completed"
+    "definition": "Indicate later",
+    "context": "Indicate later"
   },
   {
     "term": "component.signature-config-dialog.radiobutton.option-2",

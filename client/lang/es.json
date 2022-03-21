@@ -25,6 +25,21 @@
     "context": "Add members to the team"
   },
   {
+    "term": "component.add-petition-access-dialog.add-signers",
+    "definition": "Añadir firmantes",
+    "context": "Add signers"
+  },
+  {
+    "term": "component.add-petition-access-dialog.add-signers-text",
+    "definition": "Antes de enviar, <b>recomendamos incluir quién tiene que firmar</b> para facilitarle el trabajo a tu destinatario.",
+    "context": "Before sending, we recommend <b>including who has to sign</b> to make your recipient's job easier."
+  },
+  {
+    "term": "component.add-petition-access-dialog.edit-signers",
+    "definition": "Editar firmantes",
+    "context": "Edit signers"
+  },
+  {
     "term": "component.add-petition-access-dialog.petition-limit-near.text",
     "definition": "Puedes enviar {left, plural, =1{# petición} other{# peticiones}} más.",
     "context": "You can send {left, plural, =1{# more petition} other{# more petitions}}."
@@ -2120,6 +2135,11 @@
     "context": "Add signature"
   },
   {
+    "term": "component.petition-signatures-card.edit-signers",
+    "definition": "Editar firmantes",
+    "context": "Edit signers"
+  },
+  {
     "term": "component.petition-signatures-card.header",
     "definition": "Firma digital de petición",
     "context": "Petition eSignature"
@@ -3111,8 +3131,8 @@
   },
   {
     "term": "component.signature-config-dialog.radiobutton.option-1",
-    "definition": "Indicar una vez completada la petición",
-    "context": "Indicate once the petition is completed"
+    "definition": "Indicar más adelante",
+    "context": "Indicate later"
   },
   {
     "term": "component.signature-config-dialog.radiobutton.option-2",

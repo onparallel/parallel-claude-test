@@ -98,7 +98,14 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   };
 
   const handleNextClick = (opts: { redirect: boolean }) =>
-    useSendPetitionHandler(petition, handleUpdatePetition, _validatePetitionFields, refetch, opts);
+    useSendPetitionHandler(
+      me,
+      petition,
+      handleUpdatePetition,
+      _validatePetitionFields,
+      refetch,
+      opts
+    );
 
   const showNoRemindersLeftToast = (petitionAccessId?: string) => {
     const access = petition.accesses.find((a) => a.id === petitionAccessId)!;
@@ -391,9 +398,11 @@ PetitionActivity.fragments = {
       }
       ...PetitionLayout_User
       ...useUpdateIsReadNotification_User
+      ...useSendPetitionHandler_User
     }
     ${PetitionLayout.fragments.User}
     ${useUpdateIsReadNotification.fragments.User}
+    ${useSendPetitionHandler.fragments.User}
     ${isUsageLimitsReached.fragments.Organization}
   `,
 };

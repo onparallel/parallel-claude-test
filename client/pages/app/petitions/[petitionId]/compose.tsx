@@ -360,6 +360,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   };
 
   const handleNextClick = useSendPetitionHandler(
+    me,
     petition?.__typename === "Petition" ? petition : null,
     handleUpdatePetition,
     validPetitionFields
@@ -617,12 +618,14 @@ PetitionCompose.fragments = {
         ...PetitionLayout_User
         ...PetitionSettings_User
         ...useUpdateIsReadNotification_User
+        ...useSendPetitionHandler_User
         organization {
           ...isUsageLimitsReached_Organization
         }
       }
       ${PetitionLayout.fragments.User}
       ${PetitionSettings.fragments.User}
+      ${useSendPetitionHandler.fragments.User}
       ${useUpdateIsReadNotification.fragments.User}
       ${isUsageLimitsReached.fragments.Organization}
     `;
