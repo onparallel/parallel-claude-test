@@ -75,7 +75,7 @@ export function PetitionLayout({
             })
           : intl.formatMessage({
               id: "generic.unnamed-template",
-              defaultMessage: "Unnamed petition",
+              defaultMessage: "Unnamed template",
             }))
       } - ${title}`}
       user={user}

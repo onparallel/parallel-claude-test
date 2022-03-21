@@ -188,7 +188,7 @@ export function useDeletePetitions() {
                       {petition?.name ??
                         intl.formatMessage({
                           id: "generic.unnamed-template",
-                          defaultMessage: "Unnamed petition",
+                          defaultMessage: "Unnamed template",
                         })}
                     </ListItem>
                   ))}

@@ -149,7 +149,7 @@ export function TemplateDetailsModal({
               </Text>
             ) : (
               <Text>
-                <FormattedMessage id="generic.unnamed-template" defaultMessage="Unnamed petition" />
+                <FormattedMessage id="generic.unnamed-template" defaultMessage="Unnamed template" />
               </Text>
             )}
           </ModalHeader>

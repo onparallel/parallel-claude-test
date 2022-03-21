@@ -48,7 +48,7 @@ export const TemplateCard = Object.assign(
           </Text>
         ) : (
           <Text as="h2" size="lg" noOfLines={2} fontWeight="normal" fontStyle="italic">
-            <FormattedMessage id="generic.unnamed-template" defaultMessage="Unnamed petition" />
+            <FormattedMessage id="generic.unnamed-template" defaultMessage="Unnamed template" />
           </Text>
         )}
         <Spacer />

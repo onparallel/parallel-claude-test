@@ -116,7 +116,7 @@ export const PetitionUserNotification = Object.assign(
                       })
                     : intl.formatMessage({
                         id: "generic.unnamed-template",
-                        defaultMessage: "Unnamed petition",
+                        defaultMessage: "Unnamed template",
                       }))}
               </Text>
             </LinkOverlay>

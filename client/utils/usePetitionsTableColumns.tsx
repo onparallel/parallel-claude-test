@@ -77,7 +77,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   })
                 : intl.formatMessage({
                     id: "generic.unnamed-template",
-                    defaultMessage: "Unnamed petition",
+                    defaultMessage: "Unnamed template",
                   })}
             </OverflownText>
           ),

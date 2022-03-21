@@ -202,7 +202,7 @@ export function PetitionTemplateHeader({
               ? ""
               : intl.formatMessage({
                   id: "generic.unnamed-template",
-                  defaultMessage: "Unnamed petition",
+                  defaultMessage: "Unnamed template",
                 })
           }
           aria-label={intl.formatMessage({
