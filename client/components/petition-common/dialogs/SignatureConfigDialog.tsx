@@ -653,7 +653,7 @@ export function SignatureConfigDialogBodyStep2({
             <HStack alignContent="center">
               <FormattedMessage
                 id="component.signature-config-dialog.allow-additional-signers.label"
-                defaultMessage="Allow additional signers to be added"
+                defaultMessage="Allow recipients to add additional signers"
               />
               <HelpPopover>
                 <FormattedMessage

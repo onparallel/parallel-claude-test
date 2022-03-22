@@ -298,7 +298,7 @@ export function AddPetitionAccessDialog({
               </Text>
             </Alert>
           ) : null}
-          {signatureConfig && !signatureConfig.review && signatureConfig.allowAdditionalSigners ? (
+          {signatureConfig && !signatureConfig.review ? (
             <Alert status="info" borderRadius="md" mb={2}>
               <AlertIcon />
               <HStack>

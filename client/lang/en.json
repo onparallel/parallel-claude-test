@@ -3096,8 +3096,8 @@
   },
   {
     "term": "component.signature-config-dialog.allow-additional-signers.label",
-    "definition": "Allow additional signers to be added",
-    "context": "Allow additional signers to be added"
+    "definition": "Allow recipients to add additional signers",
+    "context": "Allow recipients to add additional signers"
   },
   {
     "term": "component.signature-config-dialog.confirm-start",

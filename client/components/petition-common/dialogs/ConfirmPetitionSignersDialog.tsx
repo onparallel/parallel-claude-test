@@ -164,7 +164,7 @@ export function ConfirmPetitionSignersDialog({
       body={
         <>
           <FormControl id="signers" isInvalid={!!errors.signers}>
-            {signers.length === 0 || allowAdditionalSigners ? (
+            {signers.length === 0 ? (
               <Text color="gray.500" marginLeft={1}>
                 <FormattedMessage
                   id="component.confirm-petition-signers-dialog.signers-added"
@@ -187,43 +187,41 @@ export function ConfirmPetitionSignersDialog({
                     {signers.map((signer, index) => (
                       <SelectedSignerRow
                         key={index}
-                        isEditable={isUpdate ? true : !signer.isPreset}
+                        isEditable
                         signer={signer}
                         onRemoveClick={() => onChange(signers.filter((_, i) => index !== i))}
                         onEditClick={handleSelectedSignerRowOnEditClick(onChange, signer, index)}
                       />
                     ))}
                   </Stack>
-                  {signers.length === 0 || allowAdditionalSigners || isUpdate ? (
-                    <Box marginTop={2}>
-                      <ContactSelect
-                        ref={contactSelectRef as any}
-                        value={selectedContact}
-                        onChange={handleContactSelectOnChange(onChange)}
-                        onSearchContacts={handleSearchContacts}
-                        onCreateContact={handleCreateContact}
-                        placeholder={intl.formatMessage({
-                          id: "component.confirm-petition-signers-dialog.contact-select.placeholder",
-                          defaultMessage: "Add a contact to sign",
-                        })}
-                      />
-                      <SuggestedSigners
-                        suggestions={suggestions}
-                        onAddSigner={(s) => onChange([...signers, s])}
-                      />
-                    </Box>
-                  ) : null}
+                  <Box marginTop={2}>
+                    <ContactSelect
+                      ref={contactSelectRef as any}
+                      value={selectedContact}
+                      onChange={handleContactSelectOnChange(onChange)}
+                      onSearchContacts={handleSearchContacts}
+                      onCreateContact={handleCreateContact}
+                      placeholder={intl.formatMessage({
+                        id: "component.confirm-petition-signers-dialog.contact-select.placeholder",
+                        defaultMessage: "Add a contact to sign",
+                      })}
+                    />
+                    <SuggestedSigners
+                      suggestions={suggestions}
+                      onAddSigner={(s) => onChange([...signers, s])}
+                    />
+                  </Box>
                 </>
               )}
             />
           </FormControl>
-          {signers.some((s) => (isUpdate ? true : !s.isPreset)) ? (
+          {signers.length > 0 ? (
             isUpdate ? (
               <Checkbox marginTop={4} colorScheme="purple" {...register("allowAdditionalSigners")}>
                 <HStack alignContent="center">
                   <FormattedMessage
                     id="component.signature-config-dialog.allow-additional-signers.label"
-                    defaultMessage="Allow additional signers to be added"
+                    defaultMessage="Allow recipients to add additional signers"
                   />
                   <HelpPopover>
                     <FormattedMessage
