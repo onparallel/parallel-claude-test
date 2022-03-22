@@ -23,6 +23,7 @@ export type AccessDelegatedEmailProps = {
   deadline: Date | null;
   keycode: string;
   tone: Tone;
+  removeWhyWeUseParallel: boolean;
 } & LayoutProps;
 
 const email: Email<AccessDelegatedEmailProps> = {
@@ -112,6 +113,7 @@ const email: Email<AccessDelegatedEmailProps> = {
     logoUrl,
     logoAlt,
     tone,
+    removeWhyWeUseParallel,
   }: AccessDelegatedEmailProps) {
     const { locale } = useIntl();
     return (
@@ -167,7 +169,7 @@ const email: Email<AccessDelegatedEmailProps> = {
             <Disclaimer email={senderEmail} />
           </MjmlColumn>
         </MjmlSection>
-        <WhyWeUseParallel assetsUrl={assetsUrl} tone={tone} />
+        {removeWhyWeUseParallel ? null : <WhyWeUseParallel assetsUrl={assetsUrl} tone={tone} />}
       </Layout>
     );
   },

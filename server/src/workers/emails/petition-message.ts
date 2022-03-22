@@ -40,6 +40,10 @@ export async function petitionMessage(
   const renderContext = { contact, user: sender, petition };
 
   const organization = await context.organizations.loadOrg(petition.org_id);
+  const hasRemoveWhyWeUseParallel = await context.featureFlags.orgHasFeatureFlag(
+    organization!.id,
+    "REMOVE_WHY_WE_USE_PARALLEL"
+  );
 
   const { html, text, subject, from } = await buildEmail(
     PetitionMessage,
@@ -52,6 +56,7 @@ export async function petitionMessage(
       deadline: petition.deadline,
       keycode: access.keycode,
       tone: organization!.preferred_tone,
+      removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
       ...layoutProps,
     },
     { locale: petition.locale }

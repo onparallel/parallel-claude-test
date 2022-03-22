@@ -80,6 +80,7 @@ export class WorkerContext {
     // Repositories
     public readonly contacts: ContactRepository,
     public readonly emailLogs: EmailLogRepository,
+    public readonly featureFlags: FeatureFlagRepository,
     public readonly files: FileRepository,
     public readonly integrations: IntegrationRepository,
     public readonly users: UserRepository,

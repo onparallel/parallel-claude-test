@@ -55,6 +55,10 @@ export async function petitionAccessDelegated(
   const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
 
   const organization = await context.organizations.loadOrg(petition.org_id);
+  const hasRemoveWhyWeUseParallel = await context.featureFlags.orgHasFeatureFlag(
+    organization!.id,
+    "REMOVE_WHY_WE_USE_PARALLEL"
+  );
 
   const { html, text, subject, from } = await buildEmail(
     AccessDelegatedEmail,
@@ -69,6 +73,7 @@ export async function petitionAccessDelegated(
       emailSubject: originalMessage?.email_subject ?? null,
       keycode: newAccess.keycode,
       tone: organization!.preferred_tone,
+      removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
       ...layoutProps,
     },
     { locale: petition.locale }

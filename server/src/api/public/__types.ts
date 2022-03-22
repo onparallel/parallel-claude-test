@@ -181,6 +181,7 @@ export type FeatureFlag =
   | "INTERNAL_COMMENTS"
   | "PETITION_PDF_EXPORT"
   | "PETITION_SIGNATURE"
+  | "REMOVE_WHY_WE_USE_PARALLEL"
   | "SKIP_FORWARD_SECURITY";
 
 export type FileUpload = {

@@ -21,6 +21,7 @@ export type PetitionMessageProps = {
   deadline: Date | null;
   keycode: string;
   tone: Tone;
+  removeWhyWeUseParallel: boolean;
 } & LayoutProps;
 
 const email: Email<PetitionMessageProps> = {
@@ -91,6 +92,7 @@ const email: Email<PetitionMessageProps> = {
     logoUrl,
     logoAlt,
     tone,
+    removeWhyWeUseParallel,
   }: PetitionMessageProps) {
     const intl = useIntl();
 
@@ -153,7 +155,7 @@ const email: Email<PetitionMessageProps> = {
             <Disclaimer email={senderEmail} />
           </MjmlColumn>
         </MjmlSection>
-        <WhyWeUseParallel assetsUrl={assetsUrl} tone={tone} />
+        {removeWhyWeUseParallel ? null : <WhyWeUseParallel assetsUrl={assetsUrl} tone={tone} />}
       </Layout>
     );
   },

@@ -77,6 +77,65 @@ export class FeatureFlagRepository extends BaseRepository {
     )
   );
 
+  async orgHasFeatureFlag(
+    orgId: number,
+    featureFlag: FeatureFlagName,
+    opts?: FromDataLoaderOptions
+  ): Promise<boolean>;
+  async orgHasFeatureFlag(
+    orgId: number,
+    featureFlags: FeatureFlagName[],
+    opts?: FromDataLoaderOptions
+  ): Promise<boolean[]>;
+  async orgHasFeatureFlag(
+    orgId: number,
+    featureFlag: MaybeArray<FeatureFlagName>,
+    opts?: FromDataLoaderOptions
+  ): Promise<boolean | boolean[]> {
+    return Array.isArray(featureFlag)
+      ? ((await this._orgHasFeatureFlag(
+          featureFlag.map((featureFlag) => ({ orgId, featureFlag })),
+          opts
+        )) as boolean[])
+      : await this._orgHasFeatureFlag({ orgId, featureFlag }, opts);
+  }
+
+  private readonly _orgHasFeatureFlag = fromDataLoader(
+    new DataLoader<{ orgId: number; featureFlag: FeatureFlagName }, boolean, string>(
+      async (keys) => {
+        const orgIds = uniq(keys.map((k) => k.orgId));
+        const featureFlags = uniq(keys.map((k) => k.featureFlag));
+        const { rows } = await this.knex.raw<{
+          rows: { org_id: number; feature_flag: number; value: boolean }[];
+        }>(
+          /* sql */ `
+          with selected_org as (
+            select id as org_id from "organization"
+              where id in (${orgIds.map(() => "?").join(",")})
+          )
+          select
+            so.org_id as org_id,
+            ff.name as feature_flag,
+            coalesce(ffoo.value, ff.default_value) as value
+          from selected_org so
+            join feature_flag ff
+              on ff.name in (${featureFlags.map(() => "?").join(",")})
+            left join feature_flag_override ffoo
+              on ffoo.feature_flag_name = ff.name and ffoo.org_id = so.org_id and ffoo.user_id is null
+        `,
+          [...orgIds, ...featureFlags]
+        );
+        const results = indexBy(rows, keyBuilder(["org_id", "feature_flag"]));
+        return keys
+          .map(keyBuilder(["orgId", "featureFlag"]))
+          .map((key) => results[key]?.value ?? false);
+      },
+      {
+        cacheKeyFn: keyBuilder(["orgId", "featureFlag"]),
+      }
+    )
+  );
+
   async addOrUpdateFeatureFlagOverride(featureFlag: FeatureFlag, orgId: number, value: boolean) {
     return await this.raw(
       /* sql */ `

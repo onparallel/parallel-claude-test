@@ -944,6 +944,12 @@ export const schemaTypes: IntrospectionType[] = [
         deprecationReason: null,
       },
       {
+        name: "REMOVE_WHY_WE_USE_PARALLEL",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
+      {
         name: "SKIP_FORWARD_SECURITY",
         description: null,
         isDeprecated: false,
