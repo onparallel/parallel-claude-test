@@ -538,24 +538,9 @@ type Mutation {
   ): Petition!
 
   """
-  Creates a reply to a checkbox field.
-  """
-  createCheckboxReply(fieldId: GID!, petitionId: GID!, values: [String!]!): PetitionFieldReply!
-    @deprecated(reason: "use createPetitionFieldReply instead")
-
-  """
   Create a contact.
   """
   createContact(data: CreateContactInput!): Contact!
-
-  """
-  Creates a reply for a dynamic select field.
-  """
-  createDynamicSelectReply(
-    fieldId: GID!
-    petitionId: GID!
-    value: [[String]!]!
-  ): PetitionFieldReply! @deprecated(reason: "use createPetitionFieldReply instead")
 
   """
   Creates an event subscription for the user's petitions
@@ -584,12 +569,6 @@ type Mutation {
   Notifies the backend that the upload is complete.
   """
   createFileUploadReplyComplete(petitionId: GID!, replyId: GID!): PetitionFieldReply!
-
-  """
-  Creates a reply to a numeric field.
-  """
-  createNumericReply(fieldId: GID!, petitionId: GID!, reply: Float!): PetitionFieldReply!
-    @deprecated(reason: "use createPetitionFieldReply instead")
 
   """
   Creates a new organization.
@@ -714,12 +693,6 @@ type Mutation {
     name: String!
     provider: SignatureOrgIntegrationProvider!
   ): SignatureOrgIntegration!
-
-  """
-  Creates a reply to a text or select field.
-  """
-  createSimpleReply(fieldId: GID!, petitionId: GID!, reply: String!): PetitionFieldReply!
-    @deprecated(reason: "use createPetitionFieldReply instead")
 
   """
   Creates a tag in the user's organization
@@ -963,24 +936,6 @@ type Mutation {
   ): Result!
 
   """
-  Creates a reply to a checkbox field.
-  """
-  publicCreateCheckboxReply(
-    fieldId: GID!
-    keycode: ID!
-    values: [String!]!
-  ): PublicPetitionFieldReply! @deprecated(reason: "use publicCreatePetitionFieldReply instead")
-
-  """
-  Creates a reply for a dynamic select field.
-  """
-  publicCreateDynamicSelectReply(
-    fieldId: GID!
-    keycode: ID!
-    value: [[String]!]!
-  ): PublicPetitionFieldReply! @deprecated(reason: "use publicCreatePetitionFieldReply instead")
-
-  """
   Creates a reply to a file upload field.
   """
   publicCreateFileUploadReply(
@@ -988,12 +943,6 @@ type Mutation {
     fieldId: GID!
     keycode: ID!
   ): PublicCreateFileUploadReply!
-
-  """
-  Creates a reply to a numeric field.
-  """
-  publicCreateNumericReply(fieldId: GID!, keycode: ID!, value: Float!): PublicPetitionFieldReply!
-    @deprecated(reason: "use publicCreatePetitionFieldReply instead")
 
   """
   Create a petition field comment.
@@ -1017,12 +966,6 @@ type Mutation {
   Starts an export pdf task in a recipient context
   """
   publicCreatePrintPdfTask(keycode: ID!): Task!
-
-  """
-  Creates a reply to a text or select field.
-  """
-  publicCreateSimpleReply(fieldId: GID!, keycode: ID!, value: String!): PublicPetitionFieldReply!
-    @deprecated(reason: "use publicCreatePetitionFieldReply instead")
 
   """
   Lets a recipient delegate access to the petition to another contact in the same organization
@@ -1107,30 +1050,6 @@ type Mutation {
   publicSendVerificationCode(keycode: ID!): VerificationCodeRequest!
 
   """
-  Updates a reply of checkbox field.
-  """
-  publicUpdateCheckboxReply(
-    keycode: ID!
-    replyId: GID!
-    values: [String!]!
-  ): PublicPetitionFieldReply! @deprecated(reason: "use publicUpdatePetitionFieldReply instead")
-
-  """
-  Updates a reply for a dynamic select field.
-  """
-  publicUpdateDynamicSelectReply(
-    keycode: ID!
-    replyId: GID!
-    value: [[String]!]!
-  ): PublicPetitionFieldReply! @deprecated(reason: "use publicUpdatePetitionFieldReply instead")
-
-  """
-  Updates a reply to a numeric field.
-  """
-  publicUpdateNumericReply(keycode: ID!, replyId: GID!, value: Float!): PublicPetitionFieldReply!
-    @deprecated(reason: "use publicUpdatePetitionFieldReply instead")
-
-  """
   Update a petition field comment.
   """
   publicUpdatePetitionFieldComment(
@@ -1148,12 +1067,6 @@ type Mutation {
     reply: JSON!
     replyId: GID!
   ): PublicPetitionFieldReply!
-
-  """
-  Updates a reply to a text or select field.
-  """
-  publicUpdateSimpleReply(keycode: ID!, replyId: GID!, value: String!): PublicPetitionFieldReply!
-    @deprecated(reason: "use publicUpdatePetitionFieldReply instead")
 
   """
   Reactivates the specified inactive petition accesses.
@@ -1325,24 +1238,9 @@ type Mutation {
   untagPetition(petitionId: GID!, tagId: GID!): PetitionBase!
 
   """
-  Updates a reply of a checkbox field
-  """
-  updateCheckboxReply(petitionId: GID!, replyId: GID!, values: [String!]!): PetitionFieldReply!
-    @deprecated(reason: "use updatePetitionFieldReply instead")
-
-  """
   Updates a contact.
   """
   updateContact(data: UpdateContactInput!, id: GID!): Contact!
-
-  """
-  Updates a reply for a dynamic select field.
-  """
-  updateDynamicSelectReply(
-    petitionId: GID!
-    replyId: GID!
-    value: [[String]!]!
-  ): PetitionFieldReply! @deprecated(reason: "use updatePetitionFieldReply instead")
 
   """
   Updates an existing event subscription for the user's petitions
@@ -1415,12 +1313,6 @@ type Mutation {
     """
     templateId: ID!
   ): SupportMethodResponse!
-
-  """
-  Updates a reply to a numeric field.
-  """
-  updateNumericReply(petitionId: GID!, reply: Float!, replyId: GID!): PetitionFieldReply!
-    @deprecated(reason: "use updatePetitionFieldReply instead")
 
   """
   Updates the onboarding status for one of the pages.
@@ -1564,12 +1456,6 @@ type Mutation {
     metadata: JSONObject!
     petitionSignatureRequestId: GID!
   ): PetitionSignatureRequest!
-
-  """
-  Updates a reply to a text or select field.
-  """
-  updateSimpleReply(petitionId: GID!, reply: String!, replyId: GID!): PetitionFieldReply!
-    @deprecated(reason: "use updatePetitionFieldReply instead")
 
   """
   Updates the name and color of a given tag

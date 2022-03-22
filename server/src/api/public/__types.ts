@@ -361,18 +361,8 @@ export type Mutation = {
    * If the petition has a signature configured and does not require a review, starts the signing process.
    */
   completePetition: Petition;
-  /**
-   * Creates a reply to a checkbox field.
-   * @deprecated use createPetitionFieldReply instead
-   */
-  createCheckboxReply: PetitionFieldReply;
   /** Create a contact. */
   createContact: Contact;
-  /**
-   * Creates a reply for a dynamic select field.
-   * @deprecated use createPetitionFieldReply instead
-   */
-  createDynamicSelectReply: PetitionFieldReply;
   /** Creates an event subscription for the user's petitions */
   createEventSubscription: PetitionEventSubscription;
   /** Creates a task for exporting a ZIP file with petition replies and sends it to the queue */
@@ -381,11 +371,6 @@ export type Mutation = {
   createFileUploadReply: FileUploadReplyResponse;
   /** Notifies the backend that the upload is complete. */
   createFileUploadReplyComplete: PetitionFieldReply;
-  /**
-   * Creates a reply to a numeric field.
-   * @deprecated use createPetitionFieldReply instead
-   */
-  createNumericReply: PetitionFieldReply;
   /** Creates a new organization. */
   createOrganization: SupportMethodResponse;
   /** Creates a new user in the same organization as the context user */
@@ -408,11 +393,6 @@ export type Mutation = {
   createPublicPetitionLink: PublicPetitionLink;
   /** Creates a new signature integration on the user's organization */
   createSignatureIntegration: SignatureOrgIntegration;
-  /**
-   * Creates a reply to a text or select field.
-   * @deprecated use createPetitionFieldReply instead
-   */
-  createSimpleReply: PetitionFieldReply;
   /** Creates a tag in the user's organization */
   createTag: Tag;
   /** Creates a new user in the specified organization. */
@@ -479,34 +459,14 @@ export type Mutation = {
   publicCompletePetition: PublicPetition;
   /** Creates and sends the petition linked to the PublicPetitionLink to the contact passed in args */
   publicCreateAndSendPetitionFromPublicLink: Result;
-  /**
-   * Creates a reply to a checkbox field.
-   * @deprecated use publicCreatePetitionFieldReply instead
-   */
-  publicCreateCheckboxReply: PublicPetitionFieldReply;
-  /**
-   * Creates a reply for a dynamic select field.
-   * @deprecated use publicCreatePetitionFieldReply instead
-   */
-  publicCreateDynamicSelectReply: PublicPetitionFieldReply;
   /** Creates a reply to a file upload field. */
   publicCreateFileUploadReply: PublicCreateFileUploadReply;
-  /**
-   * Creates a reply to a numeric field.
-   * @deprecated use publicCreatePetitionFieldReply instead
-   */
-  publicCreateNumericReply: PublicPetitionFieldReply;
   /** Create a petition field comment. */
   publicCreatePetitionFieldComment: PublicPetitionFieldComment;
   /** Creates a reply on a petition field as recipient. */
   publicCreatePetitionFieldReply: PublicPetitionFieldReply;
   /** Starts an export pdf task in a recipient context */
   publicCreatePrintPdfTask: Task;
-  /**
-   * Creates a reply to a text or select field.
-   * @deprecated use publicCreatePetitionFieldReply instead
-   */
-  publicCreateSimpleReply: PublicPetitionFieldReply;
   /** Lets a recipient delegate access to the petition to another contact in the same organization */
   publicDelegateAccessToContact: PublicPetitionAccess;
   /** Delete a petition field comment. */
@@ -527,30 +487,10 @@ export type Mutation = {
   publicPetitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   publicSendReminder: Result;
   publicSendVerificationCode: VerificationCodeRequest;
-  /**
-   * Updates a reply of checkbox field.
-   * @deprecated use publicUpdatePetitionFieldReply instead
-   */
-  publicUpdateCheckboxReply: PublicPetitionFieldReply;
-  /**
-   * Updates a reply for a dynamic select field.
-   * @deprecated use publicUpdatePetitionFieldReply instead
-   */
-  publicUpdateDynamicSelectReply: PublicPetitionFieldReply;
-  /**
-   * Updates a reply to a numeric field.
-   * @deprecated use publicUpdatePetitionFieldReply instead
-   */
-  publicUpdateNumericReply: PublicPetitionFieldReply;
   /** Update a petition field comment. */
   publicUpdatePetitionFieldComment: PublicPetitionFieldComment;
   /** Creates a reply on a petition field as recipient. */
   publicUpdatePetitionFieldReply: PublicPetitionFieldReply;
-  /**
-   * Updates a reply to a text or select field.
-   * @deprecated use publicUpdatePetitionFieldReply instead
-   */
-  publicUpdateSimpleReply: PublicPetitionFieldReply;
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
   /** Removes permissions on given petitions and users */
@@ -594,18 +534,8 @@ export type Mutation = {
   transferPetitionOwnership: Array<PetitionBase>;
   /** Removes the given tag from the given petition */
   untagPetition: PetitionBase;
-  /**
-   * Updates a reply of a checkbox field
-   * @deprecated use updatePetitionFieldReply instead
-   */
-  updateCheckboxReply: PetitionFieldReply;
   /** Updates a contact. */
   updateContact: Contact;
-  /**
-   * Updates a reply for a dynamic select field.
-   * @deprecated use updatePetitionFieldReply instead
-   */
-  updateDynamicSelectReply: PetitionFieldReply;
   /** Updates an existing event subscription for the user's petitions */
   updateEventSubscription: PetitionEventSubscription;
   /** Activate or deactivate an organization feature flag */
@@ -618,11 +548,6 @@ export type Mutation = {
   updateFileUploadReplyComplete: PetitionFieldReply;
   /** Updates the metadata of a public landing template. */
   updateLandingTemplateMetadata: SupportMethodResponse;
-  /**
-   * Updates a reply to a numeric field.
-   * @deprecated use updatePetitionFieldReply instead
-   */
-  updateNumericReply: PetitionFieldReply;
   /** Updates the onboarding status for one of the pages. */
   updateOnboardingStatus: User;
   /** Updates the logo of an organization */
@@ -662,11 +587,6 @@ export type Mutation = {
   /** Updates template_public from template */
   updatePublicTemplateVisibility: SupportMethodResponse;
   updateSignatureRequestMetadata: PetitionSignatureRequest;
-  /**
-   * Updates a reply to a text or select field.
-   * @deprecated use updatePetitionFieldReply instead
-   */
-  updateSimpleReply: PetitionFieldReply;
   /** Updates the name and color of a given tag */
   updateTag: Tag;
   /** Updates the template default permissions */
@@ -772,20 +692,8 @@ export type MutationcompletePetitionArgs = {
   petitionId: Scalars["GID"];
 };
 
-export type MutationcreateCheckboxReplyArgs = {
-  fieldId: Scalars["GID"];
-  petitionId: Scalars["GID"];
-  values: Array<Scalars["String"]>;
-};
-
 export type MutationcreateContactArgs = {
   data: CreateContactInput;
-};
-
-export type MutationcreateDynamicSelectReplyArgs = {
-  fieldId: Scalars["GID"];
-  petitionId: Scalars["GID"];
-  value: Array<Array<InputMaybe<Scalars["String"]>>>;
 };
 
 export type MutationcreateEventSubscriptionArgs = {
@@ -808,12 +716,6 @@ export type MutationcreateFileUploadReplyArgs = {
 export type MutationcreateFileUploadReplyCompleteArgs = {
   petitionId: Scalars["GID"];
   replyId: Scalars["GID"];
-};
-
-export type MutationcreateNumericReplyArgs = {
-  fieldId: Scalars["GID"];
-  petitionId: Scalars["GID"];
-  reply: Scalars["Float"];
 };
 
 export type MutationcreateOrganizationArgs = {
@@ -888,12 +790,6 @@ export type MutationcreateSignatureIntegrationArgs = {
   isDefault?: InputMaybe<Scalars["Boolean"]>;
   name: Scalars["String"];
   provider: SignatureOrgIntegrationProvider;
-};
-
-export type MutationcreateSimpleReplyArgs = {
-  fieldId: Scalars["GID"];
-  petitionId: Scalars["GID"];
-  reply: Scalars["String"];
 };
 
 export type MutationcreateTagArgs = {
@@ -1069,28 +965,10 @@ export type MutationpublicCreateAndSendPetitionFromPublicLinkArgs = {
   slug: Scalars["ID"];
 };
 
-export type MutationpublicCreateCheckboxReplyArgs = {
-  fieldId: Scalars["GID"];
-  keycode: Scalars["ID"];
-  values: Array<Scalars["String"]>;
-};
-
-export type MutationpublicCreateDynamicSelectReplyArgs = {
-  fieldId: Scalars["GID"];
-  keycode: Scalars["ID"];
-  value: Array<Array<InputMaybe<Scalars["String"]>>>;
-};
-
 export type MutationpublicCreateFileUploadReplyArgs = {
   data: FileUploadInput;
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
-};
-
-export type MutationpublicCreateNumericReplyArgs = {
-  fieldId: Scalars["GID"];
-  keycode: Scalars["ID"];
-  value: Scalars["Float"];
 };
 
 export type MutationpublicCreatePetitionFieldCommentArgs = {
@@ -1107,12 +985,6 @@ export type MutationpublicCreatePetitionFieldReplyArgs = {
 
 export type MutationpublicCreatePrintPdfTaskArgs = {
   keycode: Scalars["ID"];
-};
-
-export type MutationpublicCreateSimpleReplyArgs = {
-  fieldId: Scalars["GID"];
-  keycode: Scalars["ID"];
-  value: Scalars["String"];
 };
 
 export type MutationpublicDelegateAccessToContactArgs = {
@@ -1178,24 +1050,6 @@ export type MutationpublicSendVerificationCodeArgs = {
   keycode: Scalars["ID"];
 };
 
-export type MutationpublicUpdateCheckboxReplyArgs = {
-  keycode: Scalars["ID"];
-  replyId: Scalars["GID"];
-  values: Array<Scalars["String"]>;
-};
-
-export type MutationpublicUpdateDynamicSelectReplyArgs = {
-  keycode: Scalars["ID"];
-  replyId: Scalars["GID"];
-  value: Array<Array<InputMaybe<Scalars["String"]>>>;
-};
-
-export type MutationpublicUpdateNumericReplyArgs = {
-  keycode: Scalars["ID"];
-  replyId: Scalars["GID"];
-  value: Scalars["Float"];
-};
-
 export type MutationpublicUpdatePetitionFieldCommentArgs = {
   content: Scalars["String"];
   keycode: Scalars["ID"];
@@ -1207,12 +1061,6 @@ export type MutationpublicUpdatePetitionFieldReplyArgs = {
   keycode: Scalars["ID"];
   reply: Scalars["JSON"];
   replyId: Scalars["GID"];
-};
-
-export type MutationpublicUpdateSimpleReplyArgs = {
-  keycode: Scalars["ID"];
-  replyId: Scalars["GID"];
-  value: Scalars["String"];
 };
 
 export type MutationreactivateAccessesArgs = {
@@ -1334,21 +1182,9 @@ export type MutationuntagPetitionArgs = {
   tagId: Scalars["GID"];
 };
 
-export type MutationupdateCheckboxReplyArgs = {
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
-  values: Array<Scalars["String"]>;
-};
-
 export type MutationupdateContactArgs = {
   data: UpdateContactInput;
   id: Scalars["GID"];
-};
-
-export type MutationupdateDynamicSelectReplyArgs = {
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
-  value: Array<Array<InputMaybe<Scalars["String"]>>>;
 };
 
 export type MutationupdateEventSubscriptionArgs = {
@@ -1385,12 +1221,6 @@ export type MutationupdateLandingTemplateMetadataArgs = {
   image?: InputMaybe<Scalars["Upload"]>;
   slug?: InputMaybe<Scalars["String"]>;
   templateId: Scalars["ID"];
-};
-
-export type MutationupdateNumericReplyArgs = {
-  petitionId: Scalars["GID"];
-  reply: Scalars["Float"];
-  replyId: Scalars["GID"];
 };
 
 export type MutationupdateOnboardingStatusArgs = {
@@ -1490,12 +1320,6 @@ export type MutationupdatePublicTemplateVisibilityArgs = {
 export type MutationupdateSignatureRequestMetadataArgs = {
   metadata: Scalars["JSONObject"];
   petitionSignatureRequestId: Scalars["GID"];
-};
-
-export type MutationupdateSimpleReplyArgs = {
-  petitionId: Scalars["GID"];
-  reply: Scalars["String"];
-  replyId: Scalars["GID"];
 };
 
 export type MutationupdateTagArgs = {
@@ -3310,7 +3134,7 @@ export type User = Timestamps & {
   unreadNotificationIds: Array<Scalars["ID"]>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-  userGroups: Maybe<Array<UserGroup>>;
+  userGroups: Array<UserGroup>;
 };
 
 /** A user in the system. */
