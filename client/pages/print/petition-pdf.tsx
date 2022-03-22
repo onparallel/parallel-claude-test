@@ -3,7 +3,6 @@ import { Box, Grid, GridProps, Heading, Image, Text } from "@chakra-ui/react";
 import { Logo } from "@parallel/components/common/Logo";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PdfFieldWithReplies } from "@parallel/components/print/PdfFieldWithReplies";
-import { PdfPage } from "@parallel/components/print/PdfPage";
 import { SignatureBox } from "@parallel/components/print/SignatureBox";
 import {
   PetitionPdf_petitionDocument,
@@ -56,47 +55,75 @@ function PetitionPdf({ token }: { token: string }) {
   return (
     <LiquidProvider>
       <LiquidScopeProvider scope={scope}>
-        {pages.map((fields, pageNum) => (
-          <PdfPage key={pageNum}>
-            {pageNum === 0 ? (
-              <>
-                {orgLogo ? (
-                  <Image margin="5mm auto" src={orgLogo} alt={orgName} width="40%" />
-                ) : (
-                  <Logo width="50mm" justifyContent="center" display="flex" margin="5mm auto" />
-                )}
-                <Heading justifyContent="center" display="flex">
-                  {tokenPayload.documentTitle ?? petition.name}
-                </Heading>
-              </>
-            ) : undefined}
-            {fields.map((field) => (
-              <PdfFieldWithReplies key={field.id} field={field} />
-            ))}
-            {tokenPayload.showSignatureBoxes &&
-              pageNum === pages.length - 1 &&
-              (signers ?? []).length > 0 && (
-                <Box sx={{ pageBreakInside: "avoid" }}>
-                  <Text textAlign="center" margin="15mm 4mm 5mm 4mm" fontStyle="italic">
-                    <FormattedMessage
-                      id="petition.print-pdf.signatures-disclaimer"
-                      defaultMessage="I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current identification information."
-                    />
-                  </Text>
-                  {fromTemplateId ? <HardcodedSignatures fromTemplateId={fromTemplateId} /> : null}
-                  <SignaturesGrid>
-                    {signers!.map(({ email, fullName }, key) => (
-                      <SignatureBox
-                        key={key}
-                        signer={{ email, fullName, key }}
-                        timezone={timezone!}
-                      />
-                    ))}
-                  </SignaturesGrid>
+        <Box
+          sx={{
+            "@page": {
+              size: "A4",
+              margin: "1in",
+            },
+          }}
+        >
+          {pages.map((fields, pageIndex) => (
+            <Box
+              key={pageIndex}
+              sx={{
+                position: "relative",
+                pageBreakAfter: "always",
+                padding: "1px",
+              }}
+            >
+              {pageIndex === 0 ? (
+                <>
+                  {orgLogo ? (
+                    <Image marginX="auto" src={orgLogo} alt={orgName} width="40%" />
+                  ) : (
+                    <Logo width="50mm" marginX="auto" aria-label="Parallel" />
+                  )}
+                  <Heading
+                    justifyContent="center"
+                    display="flex"
+                    marginBottom="10mm"
+                    marginTop="5mm"
+                  >
+                    {tokenPayload.documentTitle ?? petition.name}
+                  </Heading>
+                </>
+              ) : undefined}
+              {fields.map((field, index) => (
+                <Box key={field.id} marginTop={index > 0 ? "5mm" : 0}>
+                  <PdfFieldWithReplies field={field} />
                 </Box>
-              )}
-          </PdfPage>
-        ))}
+              ))}
+              {tokenPayload.showSignatureBoxes &&
+                pageIndex === pages.length - 1 &&
+                (signers ?? []).length > 0 && (
+                  <Box sx={{ pageBreakInside: "avoid" }}>
+                    <Text textAlign="center" margin="15mm 4mm 5mm 4mm" fontStyle="italic">
+                      <FormattedMessage
+                        id="petition.print-pdf.signatures-disclaimer"
+                        defaultMessage="I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current identification information."
+                      />
+                    </Text>
+                    {fromTemplateId ? (
+                      <HardcodedSignatures fromTemplateId={fromTemplateId} />
+                    ) : null}
+                    <Box position="relative">
+                      <SignaturesGrid>
+                        {signers!.map((signer, index) => (
+                          <SignatureBox
+                            key={index}
+                            signer={signer}
+                            timezone={timezone!}
+                            wordAnchor={`3cb39pzCQA9wJ${index}`}
+                          />
+                        ))}
+                      </SignaturesGrid>
+                    </Box>
+                  </Box>
+                )}
+            </Box>
+          ))}
+        </Box>
       </LiquidScopeProvider>
     </LiquidProvider>
   );
@@ -198,10 +225,8 @@ function SignaturesGrid({ children, ...props }: GridProps) {
   return (
     <Grid
       templateColumns="repeat(3, 1fr)"
-      autoRows="minmax(150px, auto)"
-      alignItems="center"
-      justifyItems="center"
-      width="100%"
+      templateRows="35mm"
+      gridGap="5mm"
       marginBottom="10px"
       {...props}
     >

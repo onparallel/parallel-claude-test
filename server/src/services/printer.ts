@@ -15,16 +15,9 @@ export class Printer implements IPrinter {
     const page = await context.newPage();
     await page.goto(url, { waitUntil: "load" });
     const buffer = await page.pdf({
+      format: "A4",
       printBackground: true,
       displayHeaderFooter: false,
-      height: "297mm",
-      width: "210mm",
-      margin: {
-        top: "10mm",
-        bottom: "10mm",
-        left: "10mm",
-        right: "10mm",
-      },
       path,
     });
     await browser.close();
