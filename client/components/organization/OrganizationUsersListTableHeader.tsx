@@ -1,4 +1,3 @@
-import { gql } from "@apollo/client";
 import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Portal, Stack } from "@chakra-ui/react";
 import {
   ChevronDownIcon,
@@ -7,21 +6,17 @@ import {
   UserPlusIcon,
   UserXIcon,
 } from "@parallel/chakra/icons";
-import {
-  OrganizationUsersListTableHeader_UserFragment,
-  OrganizationUsers_UserFragment,
-  UserStatus,
-} from "@parallel/graphql/__types";
+import { OrganizationUsers_UserFragment, UserStatus } from "@parallel/graphql/__types";
 import { withError } from "@parallel/utils/promises/withError";
-import { isAdmin } from "@parallel/utils/roles";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
+import { WhenOrgRole } from "../common/WhenOrgRole";
 
 export type OrganizationUsersListTableHeaderProps = {
-  me: OrganizationUsersListTableHeader_UserFragment;
+  myId: string;
   search: string | null;
   selectedUsers: OrganizationUsers_UserFragment[];
   hasSsoProvider: boolean;
@@ -34,7 +29,7 @@ export type OrganizationUsersListTableHeaderProps = {
 };
 
 export function OrganizationUsersListTableHeader({
-  me,
+  myId,
   search,
   selectedUsers,
   hasSsoProvider,
@@ -51,7 +46,7 @@ export function OrganizationUsersListTableHeader({
 
   const showErrorDialog = useErrorDialog();
   const handleUpdateSelectedUsersStatus = async (newStatus: UserStatus) => {
-    if (selectedUsers.some((u) => u.id === me.id)) {
+    if (selectedUsers.some((u) => u.id === myId)) {
       await withError(
         showErrorDialog({
           message: intl.formatMessage({
@@ -97,69 +92,58 @@ export function OrganizationUsersListTableHeader({
           defaultMessage: "Reload",
         })}
       />
-      {isAdmin(me) ? (
-        <>
-          <Spacer />
-          <Box>
-            <Menu>
-              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} isDisabled={!showActions}>
-                <FormattedMessage id="generic.actions-button" defaultMessage="Actions" />
-              </MenuButton>
-              <Portal>
-                <MenuList minWidth="160px">
-                  <MenuItem
-                    isDisabled={
-                      selectedUsers.every((u) => u.status === "ACTIVE") ||
-                      isActivateUserButtonDisabled
-                    }
-                    onClick={() => handleUpdateSelectedUsersStatus("ACTIVE")}
-                    icon={<UserCheckIcon display="block" boxSize={4} />}
-                  >
-                    <FormattedMessage
-                      id="organization-users.activate"
-                      defaultMessage="Activate {count, plural, =1{user} other {users}}"
-                      values={{ count: selectedUsers.length }}
-                    />
-                  </MenuItem>
-                  <MenuItem
-                    isDisabled={selectedUsers.every((u) => u.status === "INACTIVE")}
-                    onClick={() => handleUpdateSelectedUsersStatus("INACTIVE")}
-                    icon={<UserXIcon display="block" boxSize={4} />}
-                  >
-                    <FormattedMessage
-                      id="organization-users.deactivate"
-                      defaultMessage="Deactivate {count, plural, =1{user} other {users}}"
-                      values={{ count: selectedUsers.length }}
-                    />
-                  </MenuItem>
-                </MenuList>
-              </Portal>
-            </Menu>
-          </Box>
-          {hasSsoProvider ? null : (
-            <Button
-              isDisabled={isCreateUserButtonDisabled}
-              colorScheme="purple"
-              leftIcon={<UserPlusIcon fontSize="18px" />}
-              onClick={onCreateUser}
-            >
-              <FormattedMessage
-                id="components.create-or-update-user-dialog.invite-user"
-                defaultMessage="Invite user"
-              />
-            </Button>
-          )}
-        </>
-      ) : null}
+      <WhenOrgRole role="ADMIN">
+        <Spacer />
+        <Box>
+          <Menu>
+            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} isDisabled={!showActions}>
+              <FormattedMessage id="generic.actions-button" defaultMessage="Actions" />
+            </MenuButton>
+            <Portal>
+              <MenuList minWidth="160px">
+                <MenuItem
+                  isDisabled={
+                    selectedUsers.every((u) => u.status === "ACTIVE") ||
+                    isActivateUserButtonDisabled
+                  }
+                  onClick={() => handleUpdateSelectedUsersStatus("ACTIVE")}
+                  icon={<UserCheckIcon display="block" boxSize={4} />}
+                >
+                  <FormattedMessage
+                    id="organization-users.activate"
+                    defaultMessage="Activate {count, plural, =1{user} other {users}}"
+                    values={{ count: selectedUsers.length }}
+                  />
+                </MenuItem>
+                <MenuItem
+                  isDisabled={selectedUsers.every((u) => u.status === "INACTIVE")}
+                  onClick={() => handleUpdateSelectedUsersStatus("INACTIVE")}
+                  icon={<UserXIcon display="block" boxSize={4} />}
+                >
+                  <FormattedMessage
+                    id="organization-users.deactivate"
+                    defaultMessage="Deactivate {count, plural, =1{user} other {users}}"
+                    values={{ count: selectedUsers.length }}
+                  />
+                </MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
+        </Box>
+        {hasSsoProvider ? null : (
+          <Button
+            isDisabled={isCreateUserButtonDisabled}
+            colorScheme="purple"
+            leftIcon={<UserPlusIcon fontSize="18px" />}
+            onClick={onCreateUser}
+          >
+            <FormattedMessage
+              id="components.create-or-update-user-dialog.invite-user"
+              defaultMessage="Invite user"
+            />
+          </Button>
+        )}
+      </WhenOrgRole>
     </Stack>
   );
 }
-
-OrganizationUsersListTableHeader.fragments = {
-  User: gql`
-    fragment OrganizationUsersListTableHeader_User on User {
-      id
-      role
-    }
-  `,
-};

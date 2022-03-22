@@ -11,7 +11,7 @@ import {
   VisuallyHidden,
 } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
-import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
+import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { OrganizationUsage_userDocument } from "@parallel/graphql/__types";
@@ -160,4 +160,4 @@ OrganizationUsage.getInitialProps = async ({ fetchQuery }: WithApolloDataContext
   await fetchQuery(OrganizationUsage_userDocument);
 };
 
-export default compose(withDialogs, withAdminOrganizationRole, withApolloData)(OrganizationUsage);
+export default compose(withDialogs, withOrgRole("ADMIN"), withApolloData)(OrganizationUsage);

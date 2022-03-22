@@ -275,7 +275,7 @@ function OrganizationUsers() {
           onRowClick={(user) => handleUpdateUser(user)}
           header={
             <OrganizationUsersListTableHeader
-              me={me}
+              myId={me.id}
               search={search}
               selectedUsers={selectedUsers}
               hasSsoProvider={hasSsoProvider}
@@ -533,12 +533,10 @@ OrganizationUsers.queries = [
           }
         }
         ...SettingsLayout_User
-        ...OrganizationUsersListTableHeader_User
       }
     }
     ${SettingsLayout.fragments.User}
     ${OrganizationUsers.fragments.User}
-    ${OrganizationUsersListTableHeader.fragments.User}
   `,
 ];
 

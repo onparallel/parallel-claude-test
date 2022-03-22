@@ -3759,6 +3759,10 @@ export type useSearchUsers_searchUsersQuery = {
   >;
 };
 
+export type WhenOrgRoleQueryVariables = Exact<{ [key: string]: never }>;
+
+export type WhenOrgRoleQuery = { me: { __typename?: "User"; role: OrganizationRole } };
+
 export type FieldErrorDialog_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -3805,12 +3809,6 @@ export type TaskProgressDialog_TaskFragment = {
   progress?: number | null;
 };
 
-export type WithAdminOrganizationRoleQueryVariables = Exact<{ [key: string]: never }>;
-
-export type WithAdminOrganizationRoleQuery = {
-  me: { __typename?: "User"; role: OrganizationRole };
-};
-
 export type HasFeatureFlagQueryVariables = Exact<{
   featureFlag: FeatureFlag;
 }>;
@@ -3818,6 +3816,10 @@ export type HasFeatureFlagQueryVariables = Exact<{
 export type HasFeatureFlagQuery = {
   me: { __typename?: "User"; id: string; hasFeatureFlag: boolean };
 };
+
+export type WithOrgRoleQueryVariables = Exact<{ [key: string]: never }>;
+
+export type WithOrgRoleQuery = { me: { __typename?: "User"; role: OrganizationRole } };
 
 export type WithSuperAdminAccessQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -4787,24 +4789,6 @@ export type SignatureCompletedUserNotification_SignatureCompletedUserNotificatio
   petition:
     | { __typename?: "Petition"; id: string; name?: string | null }
     | { __typename?: "PetitionTemplate"; id: string; name?: string | null };
-};
-
-export type OrganizationGroupListTableHeader_UserFragment = {
-  __typename?: "User";
-  id: string;
-  role: OrganizationRole;
-};
-
-export type OrganizationGroupsListTableHeader_UserFragment = {
-  __typename?: "User";
-  id: string;
-  role: OrganizationRole;
-};
-
-export type OrganizationUsersListTableHeader_UserFragment = {
-  __typename?: "User";
-  id: string;
-  role: OrganizationRole;
 };
 
 export type useCreateOrUpdateUserDialog_UserFragment = {
@@ -10495,7 +10479,6 @@ export type OrganizationGroup_userQuery = {
   me: {
     __typename?: "User";
     id: string;
-    role: OrganizationRole;
     fullName?: string | null;
     firstName?: string | null;
     lastName?: string | null;
@@ -10503,6 +10486,7 @@ export type OrganizationGroup_userQuery = {
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
+    role: OrganizationRole;
     avatarUrl?: string | null;
     initials?: string | null;
     organization: {
@@ -10667,7 +10651,6 @@ export type OrganizationGroups_userQuery = {
   me: {
     __typename?: "User";
     id: string;
-    role: OrganizationRole;
     fullName?: string | null;
     firstName?: string | null;
     lastName?: string | null;
@@ -10675,6 +10658,7 @@ export type OrganizationGroups_userQuery = {
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
+    role: OrganizationRole;
     avatarUrl?: string | null;
     initials?: string | null;
     organization: {
@@ -10996,7 +10980,6 @@ export type OrganizationUsers_userQuery = {
   me: {
     __typename?: "User";
     id: string;
-    role: OrganizationRole;
     fullName?: string | null;
     firstName?: string | null;
     lastName?: string | null;
@@ -11004,6 +10987,7 @@ export type OrganizationUsers_userQuery = {
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
+    role: OrganizationRole;
     avatarUrl?: string | null;
     initials?: string | null;
     organization: {
@@ -18119,7 +18103,7 @@ export type useUpdateIsReadNotification_updatePetitionUserNotificationReadStatus
   >;
 };
 
-export type isAdmin_UserFragment = { __typename?: "User"; role: OrganizationRole };
+export type roles_UserFragment = { __typename?: "User"; role: OrganizationRole };
 
 export type uploadFile_AWSPresignedPostDataFragment = {
   __typename?: "AWSPresignedPostData";
@@ -18829,24 +18813,6 @@ export const NotificationsDrawer_PetitionUserNotificationFragmentDoc = gql`
   }
   ${NotificationsList_PetitionUserNotificationFragmentDoc}
 ` as unknown as DocumentNode<NotificationsDrawer_PetitionUserNotificationFragment, unknown>;
-export const OrganizationGroupListTableHeader_UserFragmentDoc = gql`
-  fragment OrganizationGroupListTableHeader_User on User {
-    id
-    role
-  }
-` as unknown as DocumentNode<OrganizationGroupListTableHeader_UserFragment, unknown>;
-export const OrganizationGroupsListTableHeader_UserFragmentDoc = gql`
-  fragment OrganizationGroupsListTableHeader_User on User {
-    id
-    role
-  }
-` as unknown as DocumentNode<OrganizationGroupsListTableHeader_UserFragment, unknown>;
-export const OrganizationUsersListTableHeader_UserFragmentDoc = gql`
-  fragment OrganizationUsersListTableHeader_User on User {
-    id
-    role
-  }
-` as unknown as DocumentNode<OrganizationUsersListTableHeader_UserFragment, unknown>;
 export const UserSelect_UserFragmentDoc = gql`
   fragment UserSelect_User on User {
     id
@@ -22083,11 +22049,11 @@ export const useUpdateIsReadNotification_PetitionFieldCommentFragmentDoc = gql`
     isUnread
   }
 ` as unknown as DocumentNode<useUpdateIsReadNotification_PetitionFieldCommentFragment, unknown>;
-export const isAdmin_UserFragmentDoc = gql`
-  fragment isAdmin_User on User {
+export const roles_UserFragmentDoc = gql`
+  fragment roles_User on User {
     role
   }
-` as unknown as DocumentNode<isAdmin_UserFragment, unknown>;
+` as unknown as DocumentNode<roles_UserFragment, unknown>;
 export const uploadFile_AWSPresignedPostDataFragmentDoc = gql`
   fragment uploadFile_AWSPresignedPostData on AWSPresignedPostData {
     url
@@ -22213,6 +22179,13 @@ export const useSearchUsers_searchUsersDocument = gql`
   useSearchUsers_searchUsersQuery,
   useSearchUsers_searchUsersQueryVariables
 >;
+export const WhenOrgRoleDocument = gql`
+  query WhenOrgRole {
+    me {
+      role
+    }
+  }
+` as unknown as DocumentNode<WhenOrgRoleQuery, WhenOrgRoleQueryVariables>;
 export const TagEditDialog_tagsDocument = gql`
   query TagEditDialog_tags {
     tags {
@@ -22234,16 +22207,6 @@ export const TagEditDialog_updateTagDocument = gql`
   TagEditDialog_updateTagMutation,
   TagEditDialog_updateTagMutationVariables
 >;
-export const WithAdminOrganizationRoleDocument = gql`
-  query WithAdminOrganizationRole {
-    me {
-      role
-    }
-  }
-` as unknown as DocumentNode<
-  WithAdminOrganizationRoleQuery,
-  WithAdminOrganizationRoleQueryVariables
->;
 export const HasFeatureFlagDocument = gql`
   query HasFeatureFlag($featureFlag: FeatureFlag!) {
     me {
@@ -22252,6 +22215,13 @@ export const HasFeatureFlagDocument = gql`
     }
   }
 ` as unknown as DocumentNode<HasFeatureFlagQuery, HasFeatureFlagQueryVariables>;
+export const WithOrgRoleDocument = gql`
+  query WithOrgRole {
+    me {
+      role
+    }
+  }
+` as unknown as DocumentNode<WithOrgRoleQuery, WithOrgRoleQueryVariables>;
 export const WithSuperAdminAccessDocument = gql`
   query WithSuperAdminAccess {
     me {
@@ -23647,11 +23617,9 @@ export const OrganizationGroup_userDocument = gql`
   query OrganizationGroup_user {
     me {
       ...OrganizationGroup_User
-      ...OrganizationGroupListTableHeader_User
     }
   }
   ${OrganizationGroup_UserFragmentDoc}
-  ${OrganizationGroupListTableHeader_UserFragmentDoc}
 ` as unknown as DocumentNode<OrganizationGroup_userQuery, OrganizationGroup_userQueryVariables>;
 export const OrganizationGroups_createUserGroupDocument = gql`
   mutation OrganizationGroups_createUserGroup($name: String!, $userIds: [GID!]!) {
@@ -23703,11 +23671,9 @@ export const OrganizationGroups_userDocument = gql`
   query OrganizationGroups_user {
     me {
       ...OrganizationGroups_User
-      ...OrganizationGroupsListTableHeader_User
     }
   }
   ${OrganizationGroups_UserFragmentDoc}
-  ${OrganizationGroupsListTableHeader_UserFragmentDoc}
 ` as unknown as DocumentNode<OrganizationGroups_userQuery, OrganizationGroups_userQueryVariables>;
 export const OrganizationSettings_userDocument = gql`
   query OrganizationSettings_user {
@@ -23929,12 +23895,10 @@ export const OrganizationUsers_userDocument = gql`
         }
       }
       ...SettingsLayout_User
-      ...OrganizationUsersListTableHeader_User
     }
   }
   ${OrganizationUsers_UserFragmentDoc}
   ${SettingsLayout_UserFragmentDoc}
-  ${OrganizationUsersListTableHeader_UserFragmentDoc}
 ` as unknown as DocumentNode<OrganizationUsers_userQuery, OrganizationUsers_userQueryVariables>;
 export const PetitionActivity_updatePetitionDocument = gql`
   mutation PetitionActivity_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {

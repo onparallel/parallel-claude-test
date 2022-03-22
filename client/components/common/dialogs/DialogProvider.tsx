@@ -63,8 +63,10 @@ function DialogOpenerProvider({ children }: { children?: ReactNode }) {
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export function withDialogs<P>(Component: ComponentType<P>): ComponentType<P> {
+export function withDialogs<P = {}>(
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  Component: NextComponentType<any, P, P>
+): NextComponentType<any, P, P> {
   const WithDialogs: NextComponentType = function ({ ...props }) {
     return (
       <DialogOpenerProvider>

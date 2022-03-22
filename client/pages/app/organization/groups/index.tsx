@@ -270,7 +270,6 @@ function OrganizationGroups() {
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
             <OrganizationGroupsListTableHeader
-              me={me}
               search={search}
               selectedGroups={selectedGroups}
               onReload={() => refetch()}
@@ -502,11 +501,9 @@ OrganizationGroups.queries = [
     query OrganizationGroups_user {
       me {
         ...OrganizationGroups_User
-        ...OrganizationGroupsListTableHeader_User
       }
     }
     ${OrganizationGroups.fragments.User}
-    ${OrganizationGroupsListTableHeader.fragments.User}
   `,
 ];
 

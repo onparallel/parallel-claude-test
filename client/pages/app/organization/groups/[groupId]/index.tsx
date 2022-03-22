@@ -23,6 +23,7 @@ import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider"
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
+import { WhenOrgRole } from "@parallel/components/common/WhenOrgRole";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
@@ -44,7 +45,6 @@ import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { withError } from "@parallel/utils/promises/withError";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
-import { isAdmin } from "@parallel/utils/roles";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
@@ -245,11 +245,15 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
       }
       header={
         <Flex width="100%" justifyContent="space-between" alignItems="center">
-          <EditableHeading
-            isDisabled={!isAdmin(me)}
-            value={name}
-            onChange={handleChangeGroupName}
-          />
+          <WhenOrgRole role="ADMIN">
+            {(hasRole) => (
+              <EditableHeading
+                isDisabled={!hasRole}
+                value={name}
+                onChange={handleChangeGroupName}
+              />
+            )}
+          </WhenOrgRole>
           <Menu>
             <Tooltip
               placement="left"
@@ -319,7 +323,6 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
             <OrganizationGroupListTableHeader
-              me={me}
               search={search}
               selectedMembers={selectedMembers}
               onReload={() => refetch()}
@@ -568,11 +571,9 @@ OrganizationGroup.queries = [
     query OrganizationGroup_user {
       me {
         ...OrganizationGroup_User
-        ...OrganizationGroupListTableHeader_User
       }
     }
     ${OrganizationGroup.fragments.User}
-    ${OrganizationGroupListTableHeader.fragments.User}
   `,
 ];
 

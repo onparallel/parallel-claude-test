@@ -1,15 +1,12 @@
-import { gql } from "@apollo/client";
 import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Portal, Stack } from "@chakra-ui/react";
 import { ChevronDownIcon, CopyIcon, DeleteIcon, RepeatIcon } from "@parallel/chakra/icons";
-import { OrganizationGroupsListTableHeader_UserFragment } from "@parallel/graphql/__types";
-import { isAdmin } from "@parallel/utils/roles";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
+import { WhenOrgRole } from "../common/WhenOrgRole";
 
 export type OrganizationGroupsListTableHeaderProps = {
-  me: OrganizationGroupsListTableHeader_UserFragment;
   search: string | null;
   selectedGroups: any[];
   onSearchChange: (value: string | null) => void;
@@ -20,7 +17,6 @@ export type OrganizationGroupsListTableHeaderProps = {
 };
 
 export function OrganizationGroupsListTableHeader({
-  me,
   search,
   selectedGroups,
   onSearchChange,
@@ -48,55 +44,44 @@ export function OrganizationGroupsListTableHeader({
           defaultMessage: "Reload",
         })}
       />
-      {isAdmin(me) ? (
-        <>
-          <Spacer />
-          <Box>
-            <Menu>
-              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} isDisabled={!showActions}>
-                <FormattedMessage id="generic.actions-button" defaultMessage="Actions" />
-              </MenuButton>
-              <Portal>
-                <MenuList minWidth="160px">
-                  <MenuItem
-                    onClick={() => onCloneGroup()}
-                    icon={<CopyIcon display="block" boxSize={4} />}
-                  >
-                    <FormattedMessage
-                      id="organization-groups.clone-group"
-                      defaultMessage="Clone {count, plural, =1{team} other {teams}}"
-                      values={{ count: selectedGroups.length }}
-                    />
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => onRemoveGroup()}
-                    color="red.500"
-                    icon={<DeleteIcon display="block" boxSize={4} />}
-                  >
-                    <FormattedMessage
-                      id="organization-groups.delete-group"
-                      defaultMessage="Delete {count, plural, =1{team} other {teams}}"
-                      values={{ count: selectedGroups.length }}
-                    />
-                  </MenuItem>
-                </MenuList>
-              </Portal>
-            </Menu>
-          </Box>
-          <Button colorScheme="purple" onClick={onCreateGroup}>
-            <FormattedMessage id="organization-groups.create-group" defaultMessage="Create team" />
-          </Button>
-        </>
-      ) : null}
+      <WhenOrgRole role="ADMIN">
+        <Spacer />
+        <Box>
+          <Menu>
+            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} isDisabled={!showActions}>
+              <FormattedMessage id="generic.actions-button" defaultMessage="Actions" />
+            </MenuButton>
+            <Portal>
+              <MenuList minWidth="160px">
+                <MenuItem
+                  onClick={() => onCloneGroup()}
+                  icon={<CopyIcon display="block" boxSize={4} />}
+                >
+                  <FormattedMessage
+                    id="organization-groups.clone-group"
+                    defaultMessage="Clone {count, plural, =1{team} other {teams}}"
+                    values={{ count: selectedGroups.length }}
+                  />
+                </MenuItem>
+                <MenuItem
+                  onClick={() => onRemoveGroup()}
+                  color="red.500"
+                  icon={<DeleteIcon display="block" boxSize={4} />}
+                >
+                  <FormattedMessage
+                    id="organization-groups.delete-group"
+                    defaultMessage="Delete {count, plural, =1{team} other {teams}}"
+                    values={{ count: selectedGroups.length }}
+                  />
+                </MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
+        </Box>
+        <Button colorScheme="purple" onClick={onCreateGroup}>
+          <FormattedMessage id="organization-groups.create-group" defaultMessage="Create team" />
+        </Button>
+      </WhenOrgRole>
     </Stack>
   );
 }
-
-OrganizationGroupsListTableHeader.fragments = {
-  User: gql`
-    fragment OrganizationGroupsListTableHeader_User on User {
-      id
-      role
-    }
-  `,
-};

@@ -17,7 +17,7 @@ import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider"
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileSize } from "@parallel/components/common/FileSize";
-import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
+import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { BrandingPreview } from "@parallel/components/organization/BrandingPreview";
@@ -267,8 +267,4 @@ OrganizationBranding.getInitialProps = async ({ fetchQuery }: WithApolloDataCont
   await fetchQuery(OrganizationBranding_userDocument);
 };
 
-export default compose(
-  withDialogs,
-  withAdminOrganizationRole,
-  withApolloData
-)(OrganizationBranding);
+export default compose(withDialogs, withOrgRole("ADMIN"), withApolloData)(OrganizationBranding);

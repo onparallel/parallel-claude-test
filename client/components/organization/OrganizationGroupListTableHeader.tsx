@@ -1,15 +1,12 @@
-import { gql } from "@apollo/client";
 import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Portal, Stack } from "@chakra-ui/react";
 import { ChevronDownIcon, RepeatIcon, UserPlusIcon, UserXIcon } from "@parallel/chakra/icons";
-import { OrganizationGroupListTableHeader_UserFragment } from "@parallel/graphql/__types";
-import { isAdmin } from "@parallel/utils/roles";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
+import { WhenOrgRole } from "../common/WhenOrgRole";
 
 export type OrganizationGroupListTableHeaderProps = {
-  me: OrganizationGroupListTableHeader_UserFragment;
   search: string | null;
   selectedMembers: any[];
   onSearchChange: (value: string | null) => void;
@@ -19,7 +16,6 @@ export type OrganizationGroupListTableHeaderProps = {
 };
 
 export function OrganizationGroupListTableHeader({
-  me,
   search,
   selectedMembers,
   onSearchChange,
@@ -45,48 +41,37 @@ export function OrganizationGroupListTableHeader({
           defaultMessage: "Reload",
         })}
       />
-      {isAdmin(me) ? (
-        <>
-          <Spacer />
-          <Box>
-            <Menu>
-              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} isDisabled={!showActions}>
-                <FormattedMessage id="generic.actions-button" defaultMessage="Actions" />
-              </MenuButton>
-              <Portal>
-                <MenuList minWidth="160px">
-                  <MenuItem
-                    onClick={() => onRemoveMember()}
-                    color="red.500"
-                    icon={<UserXIcon display="block" boxSize={4} />}
-                  >
-                    <FormattedMessage
-                      id="organization-groups.remove-from-group"
-                      defaultMessage="Remove from team"
-                    />
-                  </MenuItem>
-                </MenuList>
-              </Portal>
-            </Menu>
-          </Box>
-          <Button
-            colorScheme="purple"
-            leftIcon={<UserPlusIcon fontSize="18px" />}
-            onClick={onAddMember}
-          >
-            <FormattedMessage id="organization-groups.add-member" defaultMessage="Add member" />
-          </Button>
-        </>
-      ) : null}
+      <WhenOrgRole role="ADMIN">
+        <Spacer />
+        <Box>
+          <Menu>
+            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} isDisabled={!showActions}>
+              <FormattedMessage id="generic.actions-button" defaultMessage="Actions" />
+            </MenuButton>
+            <Portal>
+              <MenuList minWidth="160px">
+                <MenuItem
+                  onClick={() => onRemoveMember()}
+                  color="red.500"
+                  icon={<UserXIcon display="block" boxSize={4} />}
+                >
+                  <FormattedMessage
+                    id="organization-groups.remove-from-group"
+                    defaultMessage="Remove from team"
+                  />
+                </MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
+        </Box>
+        <Button
+          colorScheme="purple"
+          leftIcon={<UserPlusIcon fontSize="18px" />}
+          onClick={onAddMember}
+        >
+          <FormattedMessage id="organization-groups.add-member" defaultMessage="Add member" />
+        </Button>
+      </WhenOrgRole>
     </Stack>
   );
 }
-
-OrganizationGroupListTableHeader.fragments = {
-  User: gql`
-    fragment OrganizationGroupListTableHeader_User on User {
-      id
-      role
-    }
-  `,
-};

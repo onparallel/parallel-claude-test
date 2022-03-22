@@ -12,7 +12,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
-import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
+import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { IntegrationCard } from "@parallel/components/organization/IntegrationCard";
@@ -164,8 +164,4 @@ OrganizationIntegrations.getInitialProps = async ({ fetchQuery }: WithApolloData
   await fetchQuery(OrganizationIntegrations_userDocument);
 };
 
-export default compose(
-  withDialogs,
-  withAdminOrganizationRole,
-  withApolloData
-)(OrganizationIntegrations);
+export default compose(withDialogs, withOrgRole("ADMIN"), withApolloData)(OrganizationIntegrations);
