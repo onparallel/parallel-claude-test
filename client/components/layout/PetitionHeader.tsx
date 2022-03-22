@@ -255,7 +255,7 @@ export function PetitionHeader({
                 40 /* more options button width */
               }px)`,
               lg: `calc((100vw - ${
-                96 /* left navbar width */ + 500 /* petition navigation tabs width */
+                96 /* left navbar width */ + 460 /* petition navigation tabs width */
               }px)/2 - ${
                 32 /* heading padding l+r */ +
                 24 /* petition status icon width */ +
