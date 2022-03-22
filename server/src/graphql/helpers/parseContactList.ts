@@ -1,5 +1,4 @@
 import { ExcelParsingError } from "./errors";
-import { EMAIL_REGEX } from "./validators/validEmail";
 
 type ParsedContact = {
   firstName: string;
@@ -9,7 +8,7 @@ type ParsedContact = {
 
 export async function parseContactList(
   data: string[][],
-  options?: {
+  options: {
     validateEmail: (email: string) => Promise<boolean>;
   }
 ): Promise<ParsedContact[]> {
@@ -32,7 +31,7 @@ export async function parseContactList(
     }
     const lastName = row[1]?.trim();
     const email = row[2]?.trim().toLowerCase();
-    if (!(await options?.validateEmail(email)) ?? !EMAIL_REGEX.test(email)) {
+    if (!(await options.validateEmail(email))) {
       errors.push(new ExcelParsingError(`${email} is not a valid email`, index + 2, 3));
     }
 
