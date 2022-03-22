@@ -7,7 +7,12 @@ type ParsedContact = {
   email: string;
 };
 
-export function parseContactList(data: string[][]): ParsedContact[] {
+export async function parseContactList(
+  data: string[][],
+  options?: {
+    validateEmail: (email: string) => Promise<boolean>;
+  }
+): Promise<ParsedContact[]> {
   const errors = [] as ExcelParsingError[];
 
   // first row is column headers
@@ -27,7 +32,7 @@ export function parseContactList(data: string[][]): ParsedContact[] {
     }
     const lastName = row[1]?.trim();
     const email = row[2]?.trim().toLowerCase();
-    if (!EMAIL_REGEX.test(email)) {
+    if (!(await options?.validateEmail(email)) ?? !EMAIL_REGEX.test(email)) {
       errors.push(new ExcelParsingError(`${email} is not a valid email`, index + 2, 3));
     }
 

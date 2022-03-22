@@ -8,6 +8,7 @@ import { OrganizationUsageLimitName } from "../db/__types";
 import { Knex } from "knex";
 import { resolveMx } from "dns/promises";
 import { MxRecord } from "dns";
+import { EMAIL_REGEX } from "../graphql/helpers/validators/validEmail";
 
 export interface IEmailsService {
   sendPetitionMessageEmail(messageIds: MaybeArray<number>): Promise<void>;
@@ -272,5 +273,18 @@ export class EmailsService implements IEmailsService {
 
   async resolveMx(domain: string) {
     return await resolveMx(domain);
+  }
+
+  async validateEmail(email: string) {
+    if (EMAIL_REGEX.test(email)) {
+      try {
+        await this.resolveMx(email.split("@")[1]);
+        return true;
+      } catch {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
 }

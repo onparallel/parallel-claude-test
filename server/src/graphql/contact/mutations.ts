@@ -110,7 +110,12 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
       throw new WhitelistedError("Invalid file", "INVALID_FORMAT_ERROR");
     }
 
-    const [parsedErrors, parsedContacts] = await withError(() => parseContactList(importResult!));
+    const [parsedErrors, parsedContacts] = await withError(
+      async () =>
+        await parseContactList(importResult!, {
+          validateEmail: (email: string) => ctx.emails.validateEmail(email),
+        })
+    );
 
     if (parsedErrors && parsedErrors instanceof AggregateError) {
       const rows = parsedErrors.errors.map((e: ExcelParsingError) => e.row);
