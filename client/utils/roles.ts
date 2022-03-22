@@ -1,21 +1,27 @@
-import { gql } from "@apollo/client";
-import { roles_UserFragment, OrganizationRole } from "@parallel/graphql/__types";
+import { gql, useQuery } from "@apollo/client";
+import { OrganizationRole, useOrgRole_MeDocument } from "@parallel/graphql/__types";
 
 const ROLES = ["OWNER", "ADMIN", "NORMAL", "COLLABORATOR"] as OrganizationRole[];
 
-export function isAdmin(user: roles_UserFragment) {
-  return isAtLeast("ADMIN", user);
+export function isAdmin(userRole: OrganizationRole) {
+  return isAtLeast("ADMIN", userRole);
 }
 
-export function isAtLeast(role: OrganizationRole, user: roles_UserFragment) {
-  return ROLES.indexOf(role) >= ROLES.indexOf(user.role);
+export function isAtLeast(role: OrganizationRole, userRole: OrganizationRole) {
+  return ROLES.indexOf(role) >= ROLES.indexOf(userRole);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const fragments = {
-  User: gql`
-    fragment roles_User on User {
-      role
+export function useOrgRole() {
+  const { data } = useQuery(useOrgRole_MeDocument);
+  return data?.me.role ?? null;
+}
+
+useOrgRole.queries = [
+  gql`
+    query useOrgRole_Me {
+      me {
+        role
+      }
     }
   `,
-};
+];

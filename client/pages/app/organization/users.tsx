@@ -294,7 +294,7 @@ function OrganizationUsers() {
 }
 
 function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
-  const userIsAdmin = isAdmin(user);
+  const userIsAdmin = isAdmin(user.role);
   const intl = useIntl();
   const roles = useOrganizationRoles();
   return useMemo<TableColumn<OrganizationUsers_UserFragment>[]>(

@@ -4,7 +4,7 @@ import { useIntl } from "react-intl";
 import { isAdmin } from "./roles";
 
 export function useOrganizationSections(user: Pick<User, "role">) {
-  const userIsAdmin = isAdmin(user);
+  const userIsAdmin = isAdmin(user.role);
   const intl = useIntl();
   return useMemo(
     () => [

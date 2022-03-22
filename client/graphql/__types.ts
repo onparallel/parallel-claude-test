@@ -3759,10 +3759,6 @@ export type useSearchUsers_searchUsersQuery = {
   >;
 };
 
-export type WhenOrgRoleQueryVariables = Exact<{ [key: string]: never }>;
-
-export type WhenOrgRoleQuery = { me: { __typename?: "User"; role: OrganizationRole } };
-
 export type FieldErrorDialog_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -18103,7 +18099,9 @@ export type useUpdateIsReadNotification_updatePetitionUserNotificationReadStatus
   >;
 };
 
-export type roles_UserFragment = { __typename?: "User"; role: OrganizationRole };
+export type useOrgRole_MeQueryVariables = Exact<{ [key: string]: never }>;
+
+export type useOrgRole_MeQuery = { me: { __typename?: "User"; role: OrganizationRole } };
 
 export type uploadFile_AWSPresignedPostDataFragment = {
   __typename?: "AWSPresignedPostData";
@@ -22049,11 +22047,6 @@ export const useUpdateIsReadNotification_PetitionFieldCommentFragmentDoc = gql`
     isUnread
   }
 ` as unknown as DocumentNode<useUpdateIsReadNotification_PetitionFieldCommentFragment, unknown>;
-export const roles_UserFragmentDoc = gql`
-  fragment roles_User on User {
-    role
-  }
-` as unknown as DocumentNode<roles_UserFragment, unknown>;
 export const uploadFile_AWSPresignedPostDataFragmentDoc = gql`
   fragment uploadFile_AWSPresignedPostData on AWSPresignedPostData {
     url
@@ -22179,13 +22172,6 @@ export const useSearchUsers_searchUsersDocument = gql`
   useSearchUsers_searchUsersQuery,
   useSearchUsers_searchUsersQueryVariables
 >;
-export const WhenOrgRoleDocument = gql`
-  query WhenOrgRole {
-    me {
-      role
-    }
-  }
-` as unknown as DocumentNode<WhenOrgRoleQuery, WhenOrgRoleQueryVariables>;
 export const TagEditDialog_tagsDocument = gql`
   query TagEditDialog_tags {
     tags {
@@ -24926,6 +24912,13 @@ export const useUpdateIsReadNotification_updatePetitionUserNotificationReadStatu
   useUpdateIsReadNotification_updatePetitionUserNotificationReadStatusMutation,
   useUpdateIsReadNotification_updatePetitionUserNotificationReadStatusMutationVariables
 >;
+export const useOrgRole_MeDocument = gql`
+  query useOrgRole_Me {
+    me {
+      role
+    }
+  }
+` as unknown as DocumentNode<useOrgRole_MeQuery, useOrgRole_MeQueryVariables>;
 export const useExportRepliesTask_taskDocument = gql`
   query useExportRepliesTask_task($id: GID!) {
     task(id: $id) {
