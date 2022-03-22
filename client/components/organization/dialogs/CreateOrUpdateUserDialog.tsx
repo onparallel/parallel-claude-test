@@ -35,6 +35,7 @@ import { isDefined } from "remeda";
 interface CreateOrUpdateUserDialogProps {
   user?: useCreateOrUpdateUserDialog_UserFragment;
   myId: string;
+  myRole: OrganizationRole;
 }
 
 interface CreateOrUpdateUserDialogData {
@@ -47,6 +48,7 @@ interface CreateOrUpdateUserDialogData {
 
 function CreateOrUpdateUserDialog({
   myId,
+  myRole,
   user,
   ...props
 }: DialogProps<CreateOrUpdateUserDialogProps, CreateOrUpdateUserDialogData>) {
@@ -62,6 +64,8 @@ function CreateOrUpdateUserDialog({
       userGroups: user?.userGroups ?? [],
     },
   });
+
+  const cantEdit = ["COLLABORATOR", "NORMAL"].includes(myRole);
 
   const { errors } = formState;
 
@@ -138,7 +142,11 @@ function CreateOrUpdateUserDialog({
       }
       body={
         <Stack>
-          <FormControl id="create-user-email" isInvalid={!!errors.email} isDisabled={isUpdate}>
+          <FormControl
+            id="create-user-email"
+            isInvalid={!!errors.email}
+            isDisabled={isUpdate || cantEdit}
+          >
             <FormLabel>
               <FormattedMessage id="generic.forms.email-label" defaultMessage="Email" />
             </FormLabel>
@@ -183,7 +191,7 @@ function CreateOrUpdateUserDialog({
             <FormControl
               id="create-user-firstname"
               isInvalid={!!errors.firstName}
-              isDisabled={isUpdate}
+              isDisabled={isUpdate || cantEdit}
               flex="1"
             >
               <FormLabel>
@@ -218,7 +226,9 @@ function CreateOrUpdateUserDialog({
           <FormControl
             id="create-user-role"
             isInvalid={!!errors.role}
-            isDisabled={user?.id === myId || user?.role === "OWNER" || user?.status === "INACTIVE"}
+            isDisabled={
+              user?.id === myId || user?.role === "OWNER" || user?.status === "INACTIVE" || cantEdit
+            }
           >
             <FormLabel>
               <FormattedMessage
@@ -236,7 +246,7 @@ function CreateOrUpdateUserDialog({
               )}
             </Select>
           </FormControl>
-          <FormControl id="create-user-groups" isDisabled={user?.status === "INACTIVE"}>
+          <FormControl id="create-user-groups" isDisabled={user?.status === "INACTIVE" || cantEdit}>
             <FormLabel>
               {isUpdate ? (
                 <FormattedMessage
@@ -279,7 +289,7 @@ function CreateOrUpdateUserDialog({
           type="submit"
           colorScheme="purple"
           variant="solid"
-          isDisabled={user?.status === "INACTIVE"}
+          isDisabled={user?.status === "INACTIVE" || cantEdit}
         >
           {isUpdate ? (
             <FormattedMessage
