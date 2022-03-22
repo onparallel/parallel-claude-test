@@ -18,15 +18,11 @@ export function validEmail<TypeName extends string, FieldName extends string>(
       await pMap(
         unMaybeArray(emails),
         async (email) => {
-          if (EMAIL_REGEX.test(email)) {
-            try {
-              await ctx.emails.resolveMx(email.split("@")[1]);
-              return true;
-            } catch {}
+          if (!(await ctx.emails.validateEmail(email))) {
+            throw new ArgValidationError(info, argName, `${email} is not a valid email.`);
           }
-          throw new ArgValidationError(info, argName, `${email} is not a valid email.`);
         },
-        { concurrency: 5 }
+        { concurrency: 20 }
       );
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

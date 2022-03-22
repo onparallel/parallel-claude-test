@@ -1,8 +1,8 @@
-import { MxRecord } from "dns";
 import { IncomingMessage } from "http";
 import { injectable } from "inversify";
 import { Response } from "node-fetch";
 import { UserRepository } from "../src/db/repositories/UserRepository";
+import { EMAIL_REGEX } from "../src/graphql/helpers/validators/validEmail";
 import { IAnalyticsService } from "../src/services/analytics";
 import { IAuth } from "../src/services/auth";
 import { IAws } from "../src/services/aws";
@@ -71,8 +71,8 @@ export class MockEmailsService implements IEmailsService {
   async sendPublicPetitionLinkAccessEmail() {}
   async sendOrganizationLimitsReachedEmail() {}
   async sendSignatureCancelledNoCreditsLeftEmail() {}
-  async resolveMx() {
-    return [] as MxRecord[];
+  async validateEmail(email: string) {
+    return EMAIL_REGEX.test(email);
   }
 }
 

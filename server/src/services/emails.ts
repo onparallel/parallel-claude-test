@@ -1,14 +1,16 @@
+import DataLoader from "dataloader";
+import { resolveMx } from "dns/promises";
+import emailProviders from "email-providers/all.json";
 import { inject, injectable } from "inversify";
-import { unMaybeArray } from "../util/arrays";
-import { MaybeArray, Maybe } from "../util/types";
-import { Aws, AWS_SERVICE } from "./aws";
-import { EmailPayload } from "../workers/email-sender";
+import { Knex } from "knex";
+import pMap from "p-map";
 import { PetitionSignatureConfigSigner } from "../db/repositories/PetitionRepository";
 import { OrganizationUsageLimitName } from "../db/__types";
-import { Knex } from "knex";
-import { resolveMx } from "dns/promises";
-import { MxRecord } from "dns";
 import { EMAIL_REGEX } from "../graphql/helpers/validators/validEmail";
+import { unMaybeArray } from "../util/arrays";
+import { Maybe, MaybeArray } from "../util/types";
+import { EmailPayload } from "../workers/email-sender";
+import { Aws, AWS_SERVICE } from "./aws";
 
 export interface IEmailsService {
   sendPetitionMessageEmail(messageIds: MaybeArray<number>): Promise<void>;
@@ -56,7 +58,7 @@ export interface IEmailsService {
     t?: Knex.Transaction
   ): Promise<void>;
   sendSignatureCancelledNoCreditsLeftEmail(petitionId: number): Promise<void>;
-  resolveMx(domain: string): Promise<MxRecord[]>;
+  validateEmail(email: string): Promise<boolean>;
 }
 export const EMAILS = Symbol.for("EMAILS");
 
@@ -271,20 +273,25 @@ export class EmailsService implements IEmailsService {
     });
   }
 
-  async resolveMx(domain: string) {
-    return await resolveMx(domain);
-  }
+  private readonly resolveMx = (() => {
+    const knownProviders = new Set(emailProviders);
+    return new DataLoader<string, boolean>(async (domains) => {
+      return await pMap(
+        domains,
+        async (domain) => {
+          try {
+            if (knownProviders.has(domain) || (await resolveMx(domain))) {
+              return true;
+            }
+          } catch {}
+          return false;
+        },
+        { concurrency: 20 }
+      );
+    });
+  })();
 
   async validateEmail(email: string) {
-    if (EMAIL_REGEX.test(email)) {
-      try {
-        await this.resolveMx(email.split("@")[1]);
-        return true;
-      } catch {
-        return false;
-      }
-    } else {
-      return false;
-    }
+    return EMAIL_REGEX.test(email) && (await this.resolveMx.load(email.split("@")[1]));
   }
 }
