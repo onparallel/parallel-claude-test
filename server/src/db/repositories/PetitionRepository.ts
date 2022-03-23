@@ -2089,28 +2089,31 @@ export class PetitionRepository extends BaseRepository {
   async getPetitionEventsForUser(
     userId: number,
     options: {
+      eventTypes?: Maybe<PetitionEventType[]>;
       before?: Maybe<number>;
       limit: number;
     }
   ) {
-    const ids = await this.from("user_petition_event_log")
-      .select("petition_event_id")
-      .where("user_id", userId)
-      .where((q) => {
-        if (isDefined(options.before)) {
-          q.where("petition_event_id", "<", options.before);
+    return await this.raw<PetitionEvent>(
+      /* sql */ `
+      select pe.* from user_petition_event_log upel
+      join petition_event pe on upel.petition_event_id = pe.id
+      where upel.user_id = ?
+        ${isDefined(options.before) ? /* sql */ `and upel.petition_event_id < ?` : ""}
+        ${
+          isDefined(options.eventTypes)
+            ? /* sql */ `and pe.type in (${options.eventTypes.map(() => "?").join(", ")})`
+            : ""
         }
-      })
-      .orderBy("petition_event_id", "desc")
-      .limit(options.limit);
-
-    return await this.from("petition_event")
-      .whereIn(
-        "id",
-        ids.map((id) => id.petition_event_id)
-      )
-      .orderBy("id", "desc")
-      .select("*");
+      order by pe.id desc
+      limit ${options.limit};
+    `,
+      [
+        userId,
+        ...(isDefined(options.before) ? [options.before] : []),
+        ...(options.eventTypes ?? []),
+      ]
+    );
   }
 
   async attachPetitionEventsToUsers(petitionEventId: number, userIds: number[]) {

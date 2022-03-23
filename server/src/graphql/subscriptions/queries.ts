@@ -12,13 +12,18 @@ export const PetitionEventsQuery = queryField("petitionEvents", {
   type: nonNull(list("PetitionEvent")),
   authorize: authenticate(),
   args: {
+    eventTypes: list(nonNull("PetitionEventType")),
     before: nullable(
       globalIdArg("PetitionEvent", {
         description: "Filter events that happened before the specified event id",
       })
     ),
   },
-  resolve: async (root, { before }, ctx) => {
-    return await ctx.petitions.getPetitionEventsForUser(ctx.user!.id, { limit: 10, before });
+  resolve: async (root, { before, eventTypes }, ctx) => {
+    return await ctx.petitions.getPetitionEventsForUser(ctx.user!.id, {
+      limit: 10,
+      before,
+      eventTypes,
+    });
   },
 });

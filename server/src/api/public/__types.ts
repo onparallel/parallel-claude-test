@@ -2677,6 +2677,7 @@ export type QuerypetitionAuthTokenArgs = {
 
 export type QuerypetitionEventsArgs = {
   before?: InputMaybe<Scalars["GID"]>;
+  eventTypes?: InputMaybe<Array<PetitionEventType>>;
 };
 
 export type QuerypetitionFieldArgs = {
@@ -4564,6 +4565,7 @@ export type EventSubscriptions_deleteSubscriptionMutation = { deleteEventSubscri
 
 export type GetPetitionEvents_PetitionEventsQueryVariables = Exact<{
   before?: InputMaybe<Scalars["GID"]>;
+  eventTypes?: InputMaybe<Array<PetitionEventType> | PetitionEventType>;
 }>;
 
 export type GetPetitionEvents_PetitionEventsQuery = {
@@ -5836,8 +5838,8 @@ export const EventSubscriptions_deleteSubscriptionDocument = gql`
   EventSubscriptions_deleteSubscriptionMutationVariables
 >;
 export const GetPetitionEvents_PetitionEventsDocument = gql`
-  query GetPetitionEvents_PetitionEvents($before: GID) {
-    petitionEvents(before: $before) {
+  query GetPetitionEvents_PetitionEvents($before: GID, $eventTypes: [PetitionEventType!]) {
+    petitionEvents(before: $before, eventTypes: $eventTypes) {
       id
       data
       petition {

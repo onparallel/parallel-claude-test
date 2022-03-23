@@ -69,6 +69,7 @@ import {
   Petition,
   PetitionAttachment,
   PetitionCustomProperties,
+  petitionEventTypes,
   PetitionField,
   PetitionFieldReply,
   SendPetition,
@@ -2693,14 +2694,20 @@ api.path("/petition-events").get(
         description: "Fetch events that ocurred before this ID",
         required: false,
       }),
+      eventTypes: enumParam({
+        values: petitionEventTypes,
+        description: "Filter events by types",
+        required: false,
+        array: true,
+      }),
     },
     responses: { 200: SuccessResponse(ListOfPetitionEvents) },
     tags: ["Petition Events"],
   },
   async ({ client, query }) => {
     const _query = gql`
-      query GetPetitionEvents_PetitionEvents($before: GID) {
-        petitionEvents(before: $before) {
+      query GetPetitionEvents_PetitionEvents($before: GID, $eventTypes: [PetitionEventType!]) {
+        petitionEvents(before: $before, eventTypes: $eventTypes) {
           id
           data
           petition {
@@ -2714,6 +2721,7 @@ api.path("/petition-events").get(
 
     const result = await client.request(GetPetitionEvents_PetitionEventsDocument, {
       before: query.before,
+      eventTypes: query.eventTypes,
     });
 
     return Ok(

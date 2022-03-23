@@ -4351,6 +4351,7 @@ export interface NexusGenArgTypes {
     petitionEvents: {
       // args
       before?: NexusGenScalars["GID"] | null; // GID
+      eventTypes?: NexusGenEnums["PetitionEventType"][] | null; // [PetitionEventType!]
     };
     petitionField: {
       // args

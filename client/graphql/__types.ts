@@ -2765,6 +2765,7 @@ export interface QuerypetitionAuthTokenArgs {
 
 export interface QuerypetitionEventsArgs {
   before?: InputMaybe<Scalars["GID"]>;
+  eventTypes?: InputMaybe<Array<PetitionEventType>>;
 }
 
 export interface QuerypetitionFieldArgs {

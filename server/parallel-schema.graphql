@@ -3742,6 +3742,7 @@ type Query {
     Filter events that happened before the specified event id
     """
     before: GID
+    eventTypes: [PetitionEventType!]
   ): [PetitionEvent!]!
 
   """

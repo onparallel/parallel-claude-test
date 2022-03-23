@@ -1614,6 +1614,8 @@ const PetitionEventSchemas = {
   },
 } as Record<PetitionEventType, JsonSchema>;
 
+export const petitionEventTypes = Object.keys(PetitionEventSchemas) as PetitionEventType[];
+
 export const _PetitionEvent = {
   type: "object",
   oneOf: Object.entries(PetitionEventSchemas)
@@ -1700,7 +1702,7 @@ const _Subscription = {
       type: ["array", "null"],
       description: "The events linked with the subscription. If null, every event will be sent.",
       example: ["PETITION_COMPLETED", "MESSAGE_SENT"],
-      items: { type: "string", enum: Object.keys(PetitionEventSchemas) },
+      items: { type: "string", enum: petitionEventTypes },
     },
   },
 } as const;
@@ -1729,7 +1731,7 @@ export const CreateSubscription = schema({
       example: ["PETITION_COMPLETED", "COMMENT_PUBLISHED", "SIGNATURE_STARTED"],
       items: {
         type: "string",
-        enum: Object.keys(PetitionEventSchemas) as PetitionEventType[],
+        enum: petitionEventTypes,
       },
     },
   },
