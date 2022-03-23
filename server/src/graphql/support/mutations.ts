@@ -18,6 +18,7 @@ import { validEmail } from "../helpers/validators/validEmail";
 import { validLocale } from "../helpers/validators/validLocale";
 import { validateHexColor } from "../tag/validators";
 import { supportMethodAccess } from "./authorizers";
+import { validatePublicTemplateCategories } from "./validators";
 
 async function supportCreateUser(
   args: {
@@ -391,6 +392,7 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
     image: nullable(uploadArg()),
   },
   validateArgs: validateAnd(
+    validatePublicTemplateCategories((args) => args.categories, "categories"),
     validateHexColor((args) => args.backgroundColor, "backgroundColor"),
     validateRegex((args) => args.slug, "slug", /^[a-z-]+$/),
     validateIf(
