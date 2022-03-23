@@ -321,7 +321,11 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 position={{ base: "relative", [breakpoint]: "sticky" }}
                 top={{ base: 0, [breakpoint]: 6 }}
               >
-                <RecipientViewContentsCard currentPage={currentPage} petition={petition} />
+                <RecipientViewContentsCard
+                  currentPage={currentPage}
+                  petition={petition}
+                  maxHeight="calc(100vh - 10.5rem)"
+                />
               </Stack>
             </Box>
             <Flex data-section="preview-fields" flexDirection="column" flex="2" minWidth={0}>

@@ -353,7 +353,11 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                 top={{ base: 0, [breakpoint]: `${sidebarTop}px` }}
               >
                 {petition.isRecipientViewContentsHidden ? null : (
-                  <RecipientViewContentsCard currentPage={currentPage} petition={petition} />
+                  <RecipientViewContentsCard
+                    currentPage={currentPage}
+                    petition={petition}
+                    maxHeight="calc(100vh - 18rem)"
+                  />
                 )}
               </Stack>
             </Box>

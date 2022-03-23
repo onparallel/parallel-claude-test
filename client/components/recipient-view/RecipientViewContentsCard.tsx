@@ -79,7 +79,7 @@ export function RecipientViewContentsCard({
       <CardHeader as="h3" size="sm">
         <FormattedMessage id="recipient-view.contents-header" defaultMessage="Contents" />
       </CardHeader>
-      <Stack as={List} spacing={1} paddingY={2} paddingX={1.5}>
+      <Stack as={List} spacing={1} paddingY={2} paddingX={1.5} minHeight="10rem" overflow="auto">
         {pages.map(
           (
             {
