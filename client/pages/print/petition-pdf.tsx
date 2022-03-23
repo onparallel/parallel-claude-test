@@ -75,7 +75,14 @@ function PetitionPdf({ token }: { token: string }) {
               {pageIndex === 0 ? (
                 <>
                   {orgLogo ? (
-                    <Image marginX="auto" src={orgLogo} alt={orgName} width="40%" />
+                    <Image
+                      marginX="auto"
+                      src={orgLogo}
+                      alt={orgName}
+                      width="40%"
+                      maxHeight="56px"
+                      objectFit="contain"
+                    />
                   ) : (
                     <Logo width="50mm" marginX="auto" aria-label="Parallel" />
                   )}
