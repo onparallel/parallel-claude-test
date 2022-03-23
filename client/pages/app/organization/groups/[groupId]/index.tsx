@@ -45,6 +45,7 @@ import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { withError } from "@parallel/utils/promises/withError";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
+import { isAdmin } from "@parallel/utils/roles";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
@@ -88,6 +89,8 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
       id: groupId,
     },
   });
+
+  const canEdit = isAdmin(me.role);
 
   const [userList, searchedList] = useMemo(() => {
     const {
@@ -245,60 +248,54 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
       }
       header={
         <Flex width="100%" justifyContent="space-between" alignItems="center">
+          <EditableHeading isDisabled={!canEdit} value={name} onChange={handleChangeGroupName} />
           <WhenOrgRole role="ADMIN">
-            {(hasRole) => (
-              <EditableHeading
-                isDisabled={!hasRole}
-                value={name}
-                onChange={handleChangeGroupName}
-              />
-            )}
-          </WhenOrgRole>
-          <Menu>
-            <Tooltip
-              placement="left"
-              label={intl.formatMessage({
-                id: "generic.more-options",
-                defaultMessage: "More options...",
-              })}
-              whiteSpace="nowrap"
-            >
-              <MenuButton
-                as={IconButton}
-                variant="outline"
-                icon={<MoreVerticalIcon />}
-                marginLeft={4}
-                aria-label={intl.formatMessage({
+            <Menu>
+              <Tooltip
+                placement="left"
+                label={intl.formatMessage({
                   id: "generic.more-options",
                   defaultMessage: "More options...",
                 })}
-              />
-            </Tooltip>
-            <Portal>
-              <MenuList>
-                <MenuItem
-                  onClick={handleCloneGroup}
-                  icon={<CopyIcon display="block" boxSize={4} />}
-                >
-                  <FormattedMessage
-                    id="component.group-header.clone-label"
-                    defaultMessage="Clone team"
-                  />
-                </MenuItem>
-                <MenuDivider />
-                <MenuItem
-                  color="red.500"
-                  onClick={handleDeleteGroup}
-                  icon={<DeleteIcon display="block" boxSize={4} />}
-                >
-                  <FormattedMessage
-                    id="component.group-header.delete-label"
-                    defaultMessage="Delete team"
-                  />
-                </MenuItem>
-              </MenuList>
-            </Portal>
-          </Menu>
+                whiteSpace="nowrap"
+              >
+                <MenuButton
+                  as={IconButton}
+                  variant="outline"
+                  icon={<MoreVerticalIcon />}
+                  marginLeft={4}
+                  aria-label={intl.formatMessage({
+                    id: "generic.more-options",
+                    defaultMessage: "More options...",
+                  })}
+                />
+              </Tooltip>
+              <Portal>
+                <MenuList>
+                  <MenuItem
+                    onClick={handleCloneGroup}
+                    icon={<CopyIcon display="block" boxSize={4} />}
+                  >
+                    <FormattedMessage
+                      id="component.group-header.clone-label"
+                      defaultMessage="Clone team"
+                    />
+                  </MenuItem>
+                  <MenuDivider />
+                  <MenuItem
+                    color="red.500"
+                    onClick={handleDeleteGroup}
+                    icon={<DeleteIcon display="block" boxSize={4} />}
+                  >
+                    <FormattedMessage
+                      id="component.group-header.delete-label"
+                      defaultMessage="Delete team"
+                    />
+                  </MenuItem>
+                </MenuList>
+              </Portal>
+            </Menu>
+          </WhenOrgRole>
         </Flex>
       }
       showBackButton={true}
@@ -307,7 +304,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
         <TablePage
           flex="0 1 auto"
           minHeight={0}
-          isSelectable
+          isSelectable={canEdit}
           isHighlightable
           columns={columns}
           rows={userList}

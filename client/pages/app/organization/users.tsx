@@ -76,6 +76,8 @@ function OrganizationUsers() {
     },
   });
 
+  const canEdit = isAdmin(me.role);
+
   const [showDialog, setShowDialog] = useQueryStateSlice(state, setQueryState, "dialog");
 
   const hasSsoProvider = me.organization.hasSsoProvider;
@@ -122,7 +124,6 @@ function OrganizationUsers() {
     try {
       const { userGroups, ...user } = await showCreateOrUpdateUserDialog({
         myId: me.id,
-        myRole: me.role,
       });
 
       await createOrganizationUser({
@@ -168,7 +169,6 @@ function OrganizationUsers() {
       const { role, userGroups } = await showCreateOrUpdateUserDialog({
         user,
         myId: me.id,
-        myRole: me.role,
       });
 
       await updateOrganizationUser({
@@ -265,7 +265,7 @@ function OrganizationUsers() {
         <TablePage
           flex="0 1 auto"
           minHeight={0}
-          isSelectable
+          isSelectable={canEdit}
           isHighlightable
           columns={columns}
           rows={userList.items}
@@ -279,7 +279,7 @@ function OrganizationUsers() {
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
-          onRowClick={(user) => handleUpdateUser(user)}
+          onRowClick={canEdit ? (user) => handleUpdateUser(user) : undefined}
           header={
             <OrganizationUsersListTableHeader
               myId={me.id}

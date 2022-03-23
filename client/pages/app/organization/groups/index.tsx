@@ -44,6 +44,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isAdmin } from "@parallel/utils/roles";
 
 const SORTING = ["name", "members", "createdAt"] as const;
 
@@ -80,6 +81,8 @@ function OrganizationGroups() {
       sortBy: [`${state.sort.field}_${state.sort.direction}` as QueryUserGroups_OrderBy],
     },
   });
+
+  const canEdit = isAdmin(me.role);
 
   const selectedGroups = useMemo(
     () =>
@@ -253,7 +256,7 @@ function OrganizationGroups() {
         <TablePage
           flex="0 1 auto"
           minHeight={0}
-          isSelectable
+          isSelectable={canEdit}
           isHighlightable
           columns={columns}
           rows={userGroups.items}
