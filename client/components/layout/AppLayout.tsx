@@ -13,6 +13,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { AppLayout_UserFragment } from "@parallel/graphql/__types";
 import { useCheckForNewVersion } from "@parallel/utils/useCheckForNewVersion";
 import { useRehydrated } from "@parallel/utils/useRehydrated";
+import * as Sentry from "@sentry/node";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
@@ -26,7 +27,6 @@ import { NotificationsDrawer } from "../notifications/NotificationsDrawer";
 import { Segment } from "../scripts/Segment";
 import { Zendesk } from "../scripts/Zendesk";
 import { AppLayoutNavbar } from "./AppLayoutNavbar";
-import * as Sentry from "@sentry/node";
 
 export interface AppLayoutProps {
   title: string;
@@ -116,12 +116,12 @@ export const AppLayout = Object.assign(
     }, [user.id]);
 
     const isMobile = useBreakpointValue({ base: true, sm: false });
+
     function handleHelpCenterClick() {
       window.analytics?.track("Help Center Clicked", {
         userId: user.id,
         from: isMobile ? "mobile" : "desktop",
       });
-      window.zE?.activate?.({ hideOnClose: true });
     }
 
     function handleZendeskLoad() {

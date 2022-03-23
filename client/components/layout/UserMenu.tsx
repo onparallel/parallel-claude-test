@@ -1,18 +1,18 @@
 import { gql } from "@apollo/client";
 import {
   Button,
+  HStack,
   Menu,
   MenuButton,
   MenuDivider,
   MenuItem,
   MenuList,
   Portal,
+  Stack,
+  Text,
+  Tooltip,
   useBreakpointValue,
   UsePopperProps,
-  HStack,
-  Text,
-  Stack,
-  Tooltip,
 } from "@chakra-ui/react";
 import {
   BellIcon,
@@ -127,6 +127,10 @@ export function UserMenu({ placement, user, onHelpCenterClick }: UserMenuProps) 
 
           {isMobile ? (
             <MenuItem
+              as="a"
+              href={`https://help.onparallel.com/${intl.locale}`}
+              target="_blank"
+              rel="noopener"
               icon={<HelpOutlineIcon display="block" boxSize={4} />}
               onClick={onHelpCenterClick}
             >
