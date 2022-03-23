@@ -2909,7 +2909,7 @@ export type SignatureConfigInputSigner = {
   contactId?: InputMaybe<Scalars["GID"]>;
   email: Scalars["String"];
   firstName: Scalars["String"];
-  lastName: Scalars["String"];
+  lastName?: InputMaybe<Scalars["String"]>;
 };
 
 export type SignatureOpenedEvent = PetitionEvent & {

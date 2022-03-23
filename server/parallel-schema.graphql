@@ -4110,7 +4110,7 @@ input SignatureConfigInputSigner {
   contactId: GID
   email: String!
   firstName: String!
-  lastName: String!
+  lastName: String
 }
 
 type SignatureOpenedEvent implements PetitionEvent {

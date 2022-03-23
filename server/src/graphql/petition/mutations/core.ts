@@ -467,7 +467,7 @@ export const SignatureConfigInput = inputObjectType({
         definition(t) {
           t.nullable.globalId("contactId", { prefixName: "Contact" });
           t.nonNull.string("firstName");
-          t.nonNull.string("lastName");
+          t.string("lastName");
           t.nonNull.string("email");
         },
       }),

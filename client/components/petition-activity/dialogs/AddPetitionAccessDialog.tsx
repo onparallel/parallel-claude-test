@@ -33,6 +33,7 @@ import {
   AddPetitionAccessDialog_UserFragment,
   BulkSendSigningMode,
   RemindersConfig,
+  SignatureConfigInputSigner,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
@@ -89,7 +90,7 @@ export function AddPetitionAccessDialog({
   );
   const [signatureConfig, setSignatureConfig] = useState<
     Maybe<{
-      signers: any[];
+      signers: SignatureConfigInputSigner[];
       allowAdditionalSigners: boolean;
       review: boolean;
     }>

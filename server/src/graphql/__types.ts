@@ -140,7 +140,7 @@ export interface NexusGenInputs {
     contactId?: NexusGenScalars["GID"] | null; // GID
     email: string; // String!
     firstName: string; // String!
-    lastName: string; // String!
+    lastName?: string | null; // String
   };
   UpdateContactInput: {
     // input type
