@@ -161,7 +161,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
             <FileSize value={reply.content?.size} />
           </Text>
         </Flex>
-        {reply.content!.progress !== undefined ? (
+        {reply.content!.uploadComplete === false ? (
           <Center height="18px">
             <Progress
               borderRadius="sm"
@@ -211,7 +211,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
         </Center>
       ) : null}
       <IconButtonWithTooltip
-        isDisabled={uploadHasFailed || reply.content!.progress < 1 || isDownloadDisabled}
+        isDisabled={reply.content!.uploadComplete === false || isDownloadDisabled}
         onClick={() => onDownload(reply.id)}
         variant="ghost"
         icon={<DownloadIcon />}
