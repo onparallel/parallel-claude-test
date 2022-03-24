@@ -43,11 +43,11 @@ export const TemplateCard = Object.assign(
         {...props}
       >
         {template.name ? (
-          <Text as="h2" size="lg" noOfLines={2} fontWeight="bold">
+          <Text as="h2" fontSize="lg" noOfLines={2} fontWeight="bold">
             {template.name}
           </Text>
         ) : (
-          <Text as="h2" size="lg" noOfLines={2} fontWeight="normal" fontStyle="italic">
+          <Text as="h2" fontSize="lg" noOfLines={2} fontWeight="normal" fontStyle="italic">
             <FormattedMessage id="generic.unnamed-template" defaultMessage="Unnamed template" />
           </Text>
         )}
