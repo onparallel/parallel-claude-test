@@ -30,11 +30,7 @@ export function SettingsRowAlias({
           />
           <ExternalLink
             marginLeft={1}
-            href={
-              intl.locale === "es"
-                ? "https://help.onparallel.com/es/articles/5998723-como-generar-textos-dinamicos"
-                : "https://help.onparallel.com/en/articles/5998723-how-to-generate-dynamic-texts-references"
-            }
+            href={`https://help.onparallel.com/${intl.locale}/articles/5998723`}
           >
             <FormattedMessage id="generic.learn-more" defaultMessage="Learn more" />
           </ExternalLink>

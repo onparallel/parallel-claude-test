@@ -164,11 +164,7 @@ export function PublicLinkSettingsDialog({
             </Text>
             <ExternalLink
               fontWeight="bold"
-              href={
-                intl.locale === "es"
-                  ? "https://help.onparallel.com/es/articles/6050184-que-son-y-como-funcionan-los-enlaces-publicos"
-                  : "https://help.onparallel.com/en/articles/6050184-what-are-public-links-and-how-do-they-work"
-              }
+              href={`https://help.onparallel.com/${intl.locale}/articles/6050184`}
             >
               <FormattedMessage
                 id="component.settings-public-link-dialog.know-more"

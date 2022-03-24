@@ -23,7 +23,6 @@ import { QuestionOutlineIcon } from "@parallel/chakra/icons";
 import { NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
-import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -54,14 +53,7 @@ export function PublicPetitionInitialForm({
   isLoading,
   isDisabled,
 }: PublicPetitionInitialFormProps) {
-  const router = useRouter();
   const intl = useIntl();
-
-  const supportUrl =
-    {
-      en: "https://support.onparallel.com/hc/en-us",
-      es: "https://support.onparallel.com/hc/es",
-    }[router.locale!] ?? "https://support.onparallel.com/hc";
 
   const [isDialogOpen, setDialogIsOpen] = useState(false);
   const onCloseDialog = () => setDialogIsOpen(false);
@@ -293,9 +285,7 @@ export function PublicPetitionInitialForm({
               </Stack>
             </ModalBody>
             <ModalFooter justifyContent="space-between">
-              <NormalLink
-                href={`${supportUrl}/categories/360001331677-FAQ-Frequently-asked-questions`}
-              >
+              <NormalLink href={`https://help.onparallel.com/${intl.locale}/collections/3391072`}>
                 <FormattedMessage
                   id="public-petition.help.more-faq"
                   defaultMessage="See more frequently asked questions"

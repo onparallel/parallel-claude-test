@@ -65,7 +65,6 @@ function Account() {
   function handleLocaleChange(locale: string) {
     setUserLocale({ variables: { locale } });
     window.analytics?.identify(me.id, { locale });
-    window.zE?.("webWidget", "setLocale", locale);
     router.push(router.asPath, undefined, { locale });
   }
 

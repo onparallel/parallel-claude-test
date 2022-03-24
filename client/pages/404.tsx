@@ -4,25 +4,18 @@ import { NormalLink } from "@parallel/components/common/Link";
 import { ErrorPage } from "@parallel/components/public/ErrorPage";
 import languages from "@parallel/lang/languages.json";
 import NextLink from "next/link";
-import { useEffect, useState } from "react";
-import { FormattedMessage } from "react-intl";
+import { useEffect } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
 
 export default function Custom404() {
   const setLocale = useSetLocale();
-  const [supportUrl, setSupportUrl] = useState("https://support.onparallel.com/hc");
+  const intl = useIntl();
+
   useEffect(() => {
     const match = document.location.pathname.match(/^\/([a-z-]*)\//i);
     const locale = match?.[1]?.toLowerCase();
     if (locale && languages.some((l) => l.locale === locale) && locale !== "en") {
       setLocale(locale);
-      setSupportUrl(
-        (
-          {
-            en: "https://support.onparallel.com/hc/en-us",
-            es: "https://support.onparallel.com/hc/es",
-          } as any
-        )[locale]
-      );
     }
   }, []);
   return (
@@ -50,12 +43,12 @@ export default function Custom404() {
           </NextLink>
         </ListItem>
         <ListItem>
-          <NormalLink href={supportUrl}>
+          <NormalLink href={`https://help.onparallel.com/${intl.locale}`}>
             <FormattedMessage id="public.support.support-center" defaultMessage="Support center" />
           </NormalLink>
         </ListItem>
         <ListItem>
-          <NormalLink href={`${supportUrl}/categories/360001331677-FAQ-Frequently-asked-questions`}>
+          <NormalLink href={`https://help.onparallel.com/${intl.locale}/collections/3391072`}>
             <FormattedMessage id="public.support.faq" defaultMessage="FAQ" />
           </NormalLink>
         </ListItem>

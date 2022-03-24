@@ -341,13 +341,7 @@ function SignatureConfigDialogBodyStep1({
           />
         </Text>
         <Text>
-          <ExternalLink
-            href={
-              intl.locale === "es"
-                ? "https://support.onparallel.com/hc/es/articles/360017087398-Activar-la-firma-electr%C3%B3nica#h_01FRGJTBC90ECANWFJ5DTE2629"
-                : "https://support.onparallel.com/hc/en-us/articles/360017087398-How-to-enable-the-eSignature-in-a-petition"
-            }
-          >
+          <ExternalLink href={`https://help.onparallel.com/${intl.locale}/articles/6022979`}>
             <FormattedMessage
               id="component.signature-config-dialog.header.help-link"
               defaultMessage="More about eSignature"

@@ -1,19 +1,12 @@
-import { FlexProps, Flex, List, ListItem, Stack } from "@chakra-ui/react";
+import { Flex, FlexProps, List, ListItem, Stack } from "@chakra-ui/react";
 import { Link, NakedLink, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
-import { useRouter } from "next/router";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 
 export type RecipientViewFooterProps = FlexProps;
 
 export function RecipientViewFooter(props: RecipientViewFooterProps) {
-  const router = useRouter();
-  const supportUrl = (
-    {
-      en: "https://support.onparallel.com/hc/en-us",
-      es: "https://support.onparallel.com/hc/es",
-    } as any
-  )[router.locale!];
+  const intl = useIntl();
   return (
     <Flex flexDirection="column" marginTop={12} as="footer" alignItems="center" {...props}>
       <Flex fontSize="sm" alignItems="center">
@@ -44,7 +37,7 @@ export function RecipientViewFooter(props: RecipientViewFooterProps) {
       >
         <ListItem>
           <NormalLink
-            href={`${supportUrl}/categories/360001331677-FAQ-Frequently-asked-questions?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients`}
+            href={`https://help.onparallel.com/${intl.locale}/collections/3391072?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients`}
             isExternal
           >
             <FormattedMessage id="public.support.faq" defaultMessage="FAQ" />

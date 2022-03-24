@@ -25,7 +25,6 @@ import userflow from "userflow.js";
 import { CloseableAlert } from "../common/CloseableAlert";
 import { NotificationsDrawer } from "../notifications/NotificationsDrawer";
 import { Segment } from "../scripts/Segment";
-import { Zendesk } from "../scripts/Zendesk";
 import { AppLayoutNavbar } from "./AppLayoutNavbar";
 
 export interface AppLayoutProps {
@@ -68,17 +67,6 @@ export const AppLayout = Object.assign(
           setIsLoading(false);
         }
       }
-    }, []);
-
-    // Hide zendesk launcher on route changes
-    useEffect(() => {
-      const hide = () => window.zE?.hide?.();
-      router.events.on("routeChangeStart", hide);
-      window.addEventListener("load", hide);
-      return () => {
-        router.events.off("routeChangeStart", hide);
-        window.removeEventListener("load", hide);
-      };
     }, []);
 
     // Load Segment analytics and identify user
@@ -124,15 +112,6 @@ export const AppLayout = Object.assign(
       });
     }
 
-    function handleZendeskLoad() {
-      window.zE?.("webWidget", "hide");
-      window.zE?.("webWidget", "prefill", {
-        name: { value: user.fullName, readOnly: true },
-        email: { value: user.email, readOnly: true },
-      });
-      window.zE?.("webWidget", "setLocale", router.locale);
-    }
-
     return (
       <>
         <Head>
@@ -144,7 +123,6 @@ export const AppLayout = Object.assign(
         </Head>
         {process.env.NODE_ENV !== "development" ? (
           <>
-            <Zendesk onLoad={handleZendeskLoad} />
             <Segment />
           </>
         ) : null}

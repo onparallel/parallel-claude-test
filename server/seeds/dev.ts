@@ -430,7 +430,7 @@ export async function seed(knex: Knex): Promise<any> {
       type: "HEADING",
       title: "Claro, te animamos a que vuelvas a tu cuenta de Parallel y te mostraremos cómo.",
       description:
-        "Además, encontrarás todo por escrito en el siguiente enlace: https://support.onparallel.com/hc/es/articles/360016853557-Revisa-y-trabaja-con-las-respuestas-de-un-Parallel",
+        "Además, encontrarás todo por escrito en el siguiente enlace: https://help.onparallel.com",
       optional: true,
       multiple: false,
       options: '{"hasPageBreak":false}',
@@ -447,8 +447,7 @@ export async function seed(knex: Knex): Promise<any> {
       position: 9,
       type: "HEADING",
       title: "Hemos redactado toda la información que necesitas en nuestra Guía de Parallel",
-      description:
-        "https://support.onparallel.com/hc/es/categories/360001333897-Gu%C3%ADa-de-Parallel",
+      description: "https://help.onparallel.com",
       optional: true,
       multiple: false,
       options: '{"hasPageBreak":false}',

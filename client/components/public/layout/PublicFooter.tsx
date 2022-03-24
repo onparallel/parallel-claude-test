@@ -26,11 +26,6 @@ import { PublicFooterBox } from "./PublicFooterBox";
 export function PublicFooter(props: BoxProps) {
   const router = useRouter();
   const intl = useIntl();
-  const supportUrl =
-    {
-      en: "https://support.onparallel.com/hc/en-us",
-      es: "https://support.onparallel.com/hc/es",
-    }[router.locale!] ?? "https://support.onparallel.com/hc";
 
   function handleLangChange(event: ChangeEvent<HTMLSelectElement>) {
     const locale = event.target.value;
@@ -92,7 +87,7 @@ export function PublicFooter(props: BoxProps) {
               </NormalLink>
             </ListItem>
             <ListItem>
-              <NormalLink href={supportUrl}>
+              <NormalLink href={`https://help.onparallel.com/${intl.locale}`}>
                 <FormattedMessage
                   id="public.resources.support-center"
                   defaultMessage="Support center"
@@ -100,9 +95,7 @@ export function PublicFooter(props: BoxProps) {
               </NormalLink>
             </ListItem>
             <ListItem>
-              <NormalLink
-                href={`${supportUrl}/categories/360001331677-FAQ-Frequently-asked-questions`}
-              >
+              <NormalLink href={`https://help.onparallel.com/${intl.locale}/collections/3391072`}>
                 <FormattedMessage id="public.resources.faq" defaultMessage="FAQ" />
               </NormalLink>
             </ListItem>
