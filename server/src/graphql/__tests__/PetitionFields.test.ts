@@ -465,7 +465,6 @@ describe("GraphQL/Petition Fields", () => {
       fields = await mocks.createRandomPetitionFields(userPetition.id, 6, (index) => ({
         type: index === 0 ? "HEADING" : "TEXT",
         is_fixed: index === 0,
-        validated: index < 4,
       }));
 
       await mocks.knex.raw(
@@ -1730,7 +1729,6 @@ describe("GraphQL/Petition Fields", () => {
         options: {
           placeholder: faker.random.words(3),
         },
-        validated: false,
       }));
 
       field2Replies = await mocks.createRandomTextReply(fields[2].id, access.id, 2, () => ({

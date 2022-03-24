@@ -656,13 +656,7 @@ export const updatePetition = mutationField("updatePetition", {
       data.closing_email_body = closingEmailBody && JSON.stringify(closingEmailBody);
     }
     if (remindersConfig !== undefined) {
-      if (remindersConfig === null) {
-        data.reminders_config = null;
-        data.reminders_active = false;
-      } else {
-        data.reminders_config = remindersConfig;
-        data.reminders_active = true;
-      }
+      data.reminders_config = remindersConfig;
     }
     if (isDefined(skipForwardSecurity)) {
       data.skip_forward_security = skipForwardSecurity;
@@ -1699,17 +1693,12 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
     validatePublicPetitionLinkSlug((args) => args.slug!, "slug")
   ),
   resolve: async (_, { templateId, title, description, slug }, ctx) => {
-    // TODO this is temporal and will be removed once owner_id col is dropped
-    // we are saving it only if its necessary to do a rollback after releasing
-    const owner = (await ctx.petitions.loadTemplateDefaultOwner(templateId))!;
-
     return await ctx.petitions.createPublicPetitionLink(
       {
         template_id: templateId,
         title,
         description,
         slug: slug ?? random(10),
-        owner_id: owner.user.id, // TODO remove, deprecated
         is_active: true,
       },
       `User:${ctx.user!.id}`

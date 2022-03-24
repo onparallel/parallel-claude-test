@@ -823,7 +823,6 @@ describe("GraphQL/Petitions", () => {
           is_template: true,
           status: null,
           name: "KYC",
-          reminders_active: true,
           reminders_config: {
             time: "12:00",
             offset: 1,
@@ -1100,7 +1099,6 @@ describe("GraphQL/Petitions", () => {
           status: "DRAFT",
           name: "KYC",
           deadline,
-          reminders_active: true,
           reminders_config: {
             time: "12:00",
             offset: 1,

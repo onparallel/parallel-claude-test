@@ -109,36 +109,6 @@ export const changePassword = mutationField("changePassword", {
   },
 });
 
-export const OnboardingKey = enumType({
-  name: "OnboardingKey",
-  members: [
-    "PETITIONS_LIST",
-    "PETITION_COMPOSE",
-    "PETITION_REVIEW",
-    "PETITION_ACTIVITY",
-    "CONTACT_LIST",
-    "CONTACT_DETAILS",
-  ],
-});
-
-export const OnboardingStatus = enumType({
-  name: "OnboardingStatus",
-  members: ["FINISHED", "SKIPPED"],
-});
-
-export const updateOnboardingStatus = mutationField("updateOnboardingStatus", {
-  description: "Updates the onboarding status for one of the pages.",
-  type: "User",
-  authorize: authenticate(),
-  args: {
-    key: nonNull(arg({ type: "OnboardingKey" })),
-    status: nonNull(arg({ type: "OnboardingStatus" })),
-  },
-  resolve: async (o, { key, status }, ctx) => {
-    return ctx.users.updateUserOnboardingStatus(key, status, ctx.user!);
-  },
-});
-
 export const createOrganizationUser = mutationField("createOrganizationUser", {
   description: "Creates a new user in the same organization as the context user",
   type: "User",

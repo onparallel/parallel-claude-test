@@ -1342,11 +1342,6 @@ type Mutation {
   ): SupportMethodResponse!
 
   """
-  Updates the onboarding status for one of the pages.
-  """
-  updateOnboardingStatus(key: OnboardingKey!, status: OnboardingStatus!): User!
-
-  """
   Updates the logo of an organization
   """
   updateOrganizationLogo(file: Upload!): Organization!
@@ -1550,20 +1545,6 @@ type Mutation {
     token: ID!
     userAgent: String
   ): PublicAccessVerification!
-}
-
-enum OnboardingKey {
-  CONTACT_DETAILS
-  CONTACT_LIST
-  PETITIONS_LIST
-  PETITION_ACTIVITY
-  PETITION_COMPOSE
-  PETITION_REVIEW
-}
-
-enum OnboardingStatus {
-  FINISHED
-  SKIPPED
 }
 
 interface OrgIntegration {
@@ -4541,11 +4522,6 @@ type User implements Timestamps {
     """
     limit: Int
   ): UserNotifications_Pagination!
-
-  """
-  The onboarding status for the different views of the app.
-  """
-  onboardingStatus: JSONObject!
   organization: Organization!
   preferredLocale: String
   role: OrganizationRole!

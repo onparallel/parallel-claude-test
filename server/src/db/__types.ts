@@ -655,7 +655,6 @@ export interface Petition {
   deadline: Maybe<Date>; // timestamptz
   email_subject: Maybe<string>; // varchar
   email_body: Maybe<string>; // text
-  reminders_active: boolean; // bool
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
   updated_at: Date; // timestamptz
@@ -689,7 +688,6 @@ export type CreatePetition = PartialProps<
   | "deadline"
   | "email_subject"
   | "email_body"
-  | "reminders_active"
   | "created_at"
   | "created_by"
   | "updated_at"
@@ -826,7 +824,6 @@ export interface PetitionField {
   optional: boolean; // bool
   multiple: boolean; // bool
   options: Maybe<any>; // jsonb
-  validated: boolean; // bool
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
   updated_at: Date; // timestamptz
@@ -849,7 +846,6 @@ export type CreatePetitionField = PartialProps<
   | "optional"
   | "multiple"
   | "options"
-  | "validated"
   | "created_at"
   | "created_by"
   | "updated_at"
@@ -1097,7 +1093,6 @@ export interface PublicPetitionLink {
   created_by: Maybe<string>; // varchar
   updated_at: Date; // timestamptz
   updated_by: Maybe<string>; // varchar
-  owner_id: number; // int4
 }
 
 export type CreatePublicPetitionLink = PartialProps<
@@ -1170,7 +1165,6 @@ export interface TemplateDefaultPermission {
   user_id: Maybe<number>; // int4
   user_group_id: Maybe<number>; // int4
   is_subscribed: boolean; // bool
-  position: Maybe<number>; // int4
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
   updated_at: Date; // timestamptz
@@ -1184,7 +1178,6 @@ export type CreateTemplateDefaultPermission = PartialProps<
   | "user_id"
   | "user_group_id"
   | "is_subscribed"
-  | "position"
   | "created_at"
   | "created_by"
   | "updated_at"
@@ -1223,7 +1216,6 @@ export interface User {
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
   last_active_at: Maybe<Date>; // timestamptz
-  onboarding_status: any; // jsonb
   status: UserStatus; // user_status
   is_sso_user: boolean; // bool
   external_id: Maybe<string>; // varchar
@@ -1243,7 +1235,6 @@ export type CreateUser = PartialProps<
   | "deleted_at"
   | "deleted_by"
   | "last_active_at"
-  | "onboarding_status"
   | "status"
   | "is_sso_user"
   | "external_id"

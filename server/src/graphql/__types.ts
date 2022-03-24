@@ -206,14 +206,6 @@ export interface NexusGenEnums {
   FilterSharedWithLogicalOperator: "AND" | "OR";
   FilterSharedWithOperator: "IS_OWNER" | "NOT_IS_OWNER" | "NOT_SHARED_WITH" | "SHARED_WITH";
   IntegrationType: db.IntegrationType;
-  OnboardingKey:
-    | "CONTACT_DETAILS"
-    | "CONTACT_LIST"
-    | "PETITIONS_LIST"
-    | "PETITION_ACTIVITY"
-    | "PETITION_COMPOSE"
-    | "PETITION_REVIEW";
-  OnboardingStatus: "FINISHED" | "SKIPPED";
   OrganizationRole: "ADMIN" | "COLLABORATOR" | "NORMAL" | "OWNER";
   OrganizationStatus: db.OrganizationStatus;
   OrganizationUsers_OrderBy:
@@ -1000,7 +992,6 @@ export interface NexusGenFieldTypes {
     updateFileUploadReply: NexusGenRootTypes["FileUploadReplyResponse"]; // FileUploadReplyResponse!
     updateFileUploadReplyComplete: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updateLandingTemplateMetadata: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
-    updateOnboardingStatus: NexusGenRootTypes["User"]; // User!
     updateOrganizationLogo: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationPreferredTone: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationUser: NexusGenRootTypes["User"]; // User!
@@ -1874,7 +1865,6 @@ export interface NexusGenFieldTypes {
     lastActiveAt: NexusGenScalars["DateTime"] | null; // DateTime
     lastName: string | null; // String
     notifications: NexusGenRootTypes["UserNotifications_Pagination"]; // UserNotifications_Pagination!
-    onboardingStatus: NexusGenScalars["JSONObject"]; // JSONObject!
     organization: NexusGenRootTypes["Organization"]; // Organization!
     preferredLocale: string | null; // String
     role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
@@ -2409,7 +2399,6 @@ export interface NexusGenFieldTypeNames {
     updateFileUploadReply: "FileUploadReplyResponse";
     updateFileUploadReplyComplete: "PetitionFieldReply";
     updateLandingTemplateMetadata: "SupportMethodResponse";
-    updateOnboardingStatus: "User";
     updateOrganizationLogo: "Organization";
     updateOrganizationPreferredTone: "Organization";
     updateOrganizationUser: "User";
@@ -3283,7 +3272,6 @@ export interface NexusGenFieldTypeNames {
     lastActiveAt: "DateTime";
     lastName: "String";
     notifications: "UserNotifications_Pagination";
-    onboardingStatus: "JSONObject";
     organization: "Organization";
     preferredLocale: "String";
     role: "OrganizationRole";
@@ -4092,11 +4080,6 @@ export interface NexusGenArgTypes {
       image?: NexusGenScalars["Upload"] | null; // Upload
       slug?: string | null; // String
       templateId: string; // ID!
-    };
-    updateOnboardingStatus: {
-      // args
-      key: NexusGenEnums["OnboardingKey"]; // OnboardingKey!
-      status: NexusGenEnums["OnboardingStatus"]; // OnboardingStatus!
     };
     updateOrganizationLogo: {
       // args

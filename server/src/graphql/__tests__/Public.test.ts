@@ -1963,7 +1963,6 @@ describe("GraphQL/Public", () => {
           1,
           () => ({
             type: "TEXT",
-            validated: true,
             optional: true,
           })
         );

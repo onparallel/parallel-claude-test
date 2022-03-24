@@ -96,23 +96,6 @@ export class UserRepository extends BaseRepository {
       .returning("*");
   }
 
-  async updateUserOnboardingStatus(key: string, value: "FINISHED" | "SKIPPED", user: User) {
-    if (!/^\w+$/.test(key)) {
-      throw new Error("Invalid onboarding key");
-    }
-    const rows = await this.from("user")
-      .update({
-        onboarding_status: this.knex.raw(
-          `jsonb_set("onboarding_status", '{${key}}', '{"${value}": true}')`
-        ),
-        updated_at: this.now(),
-        updated_by: `User:${user.id}`,
-      })
-      .where("id", user.id)
-      .returning("*");
-    return rows[0];
-  }
-
   async createUser(data: CreateUser, createdBy?: string, t?: Knex.Transaction) {
     const [user] = await this.insert(
       "user",

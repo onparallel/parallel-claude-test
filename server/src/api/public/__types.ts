@@ -575,8 +575,6 @@ export type Mutation = {
   updateFileUploadReplyComplete: PetitionFieldReply;
   /** Updates the metadata of a public landing template. */
   updateLandingTemplateMetadata: SupportMethodResponse;
-  /** Updates the onboarding status for one of the pages. */
-  updateOnboardingStatus: User;
   /** Updates the logo of an organization */
   updateOrganizationLogo: Organization;
   /** Changes the organization preferred tone */
@@ -1250,11 +1248,6 @@ export type MutationupdateLandingTemplateMetadataArgs = {
   templateId: Scalars["ID"];
 };
 
-export type MutationupdateOnboardingStatusArgs = {
-  key: OnboardingKey;
-  status: OnboardingStatus;
-};
-
 export type MutationupdateOrganizationLogoArgs = {
   file: Scalars["Upload"];
 };
@@ -1400,16 +1393,6 @@ export type MutationverifyPublicAccessArgs = {
   token: Scalars["ID"];
   userAgent?: InputMaybe<Scalars["String"]>;
 };
-
-export type OnboardingKey =
-  | "CONTACT_DETAILS"
-  | "CONTACT_LIST"
-  | "PETITIONS_LIST"
-  | "PETITION_ACTIVITY"
-  | "PETITION_COMPOSE"
-  | "PETITION_REVIEW";
-
-export type OnboardingStatus = "FINISHED" | "SKIPPED";
 
 export type OrgIntegration = {
   id: Scalars["GID"];
@@ -3202,8 +3185,6 @@ export type User = Timestamps & {
   lastName: Maybe<Scalars["String"]>;
   /** Read and unread user notifications about events on their petitions */
   notifications: UserNotifications_Pagination;
-  /** The onboarding status for the different views of the app. */
-  onboardingStatus: Scalars["JSONObject"];
   organization: Organization;
   preferredLocale: Maybe<Scalars["String"]>;
   role: OrganizationRole;

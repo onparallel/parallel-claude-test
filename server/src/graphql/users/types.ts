@@ -83,11 +83,6 @@ export const User = objectType({
         return (await ctx.organizations.loadOrg(o.org_id))!;
       },
     });
-    t.jsonObject("onboardingStatus", {
-      authorize: rootIsContextUser(),
-      description: "The onboarding status for the different views of the app.",
-      resolve: (o) => o.onboarding_status,
-    });
     t.boolean("hasFeatureFlag", {
       authorize: rootIsContextUser(),
       args: {

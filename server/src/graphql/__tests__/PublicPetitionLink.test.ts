@@ -40,7 +40,6 @@ describe("GraphQL/PublicPetitionLink", () => {
     templates = await mocks.createRandomPetitions(organization.id, user.id, 2, () => ({
       is_template: true,
       status: null,
-      reminders_active: true,
       reminders_config: {
         time: "17:30",
         offset: 5,
@@ -398,7 +397,6 @@ describe("GraphQL/PublicPetitionLink", () => {
         is_template: false,
         from_public_petition_link_id: publicPetitionLink.id,
         org_id: organization.id,
-        reminders_active: true,
         reminders_config: {
           time: "17:30",
           offset: 5,

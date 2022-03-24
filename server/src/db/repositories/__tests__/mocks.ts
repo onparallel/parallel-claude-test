@@ -653,14 +653,9 @@ export class Mocks {
     templateId: number,
     builder?: () => Partial<PublicPetitionLink>
   ) {
-    // select a valid user_id only to not having problems with foreign key "owner_id"
-    // TODO remove this line once owner_id is dropped
-    const [user] = await this.knex<User>("user").whereNull("deleted_at").select("id");
-
     const [data] = await this.knex<PublicPetitionLink>("public_petition_link")
       .insert({
         template_id: templateId,
-        owner_id: user.id, // TODO remove, deprecated
         description: faker.lorem.paragraph(),
         title: faker.lorem.words(),
         is_active: true,

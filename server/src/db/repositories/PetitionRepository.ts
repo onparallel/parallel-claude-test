@@ -1137,7 +1137,6 @@ export class PetitionRepository extends BaseRepository {
         "position",
         "created_at",
         "updated_at",
-        "validated",
         "is_fixed",
         "from_petition_field_id",
         "alias",
@@ -1764,7 +1763,7 @@ export class PetitionRepository extends BaseRepository {
           : this.insert(
               "petition_field",
               fields.map((field) => ({
-                ...omit(field, ["id", "petition_id", "created_at", "updated_at", "validated"]),
+                ...omit(field, ["id", "petition_id", "created_at", "updated_at"]),
                 petition_id: cloned.id,
                 from_petition_field_id: field.id,
                 created_by: createdBy,
@@ -2896,7 +2895,6 @@ export class PetitionRepository extends BaseRepository {
         fieldId,
         {
           type,
-          validated: false,
           ...defaultFieldOptions(type, field),
         },
         user,
