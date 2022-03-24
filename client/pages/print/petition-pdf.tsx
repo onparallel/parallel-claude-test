@@ -80,7 +80,7 @@ function PetitionPdf({ token }: { token: string }) {
                       src={orgLogo}
                       alt={orgName}
                       width="40%"
-                      maxHeight="56px"
+                      maxHeight="64px"
                       objectFit="contain"
                     />
                   ) : (
