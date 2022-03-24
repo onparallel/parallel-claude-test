@@ -59,7 +59,7 @@ function PetitionPdf({ token }: { token: string }) {
           sx={{
             "@page": {
               size: "A4",
-              margin: "1in",
+              margin: "10mm",
             },
           }}
         >
