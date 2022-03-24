@@ -4745,6 +4745,11 @@
     "context": "Please type {confirmation} to confirm"
   },
   {
+    "term": "generic.unavailable",
+    "definition": "No disponible",
+    "context": "Unavailable"
+  },
+  {
     "term": "generic.understood",
     "definition": "Entendido",
     "context": "Understood"
@@ -8803,6 +8808,11 @@
     "term": "settings.developers.api-tokens-title",
     "definition": "Tokens API",
     "context": "API Tokens"
+  },
+  {
+    "term": "settings.developers.api-tokens.header.hint",
+    "definition": "Indicio",
+    "context": "Hint"
   },
   {
     "term": "settings.developers.api-tokens.header.token-name",

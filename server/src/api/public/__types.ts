@@ -3231,6 +3231,7 @@ export type UsernotificationsArgs = {
 export type UserAuthenticationToken = CreatedAt & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  hint: Maybe<Scalars["String"]>;
   id: Scalars["GID"];
   lastUsedAt: Maybe<Scalars["DateTime"]>;
   tokenName: Scalars["String"];

@@ -4569,6 +4569,7 @@ type UserAuthenticationToken implements CreatedAt {
   Time when the resource was created.
   """
   createdAt: DateTime!
+  hint: String
   id: GID!
   lastUsedAt: DateTime
   tokenName: String!

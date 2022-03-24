@@ -305,6 +305,27 @@ function useApiTokensColumns(): TableColumn<Developers_UserAuthenticationTokenFr
         },
       },
       {
+        key: "hint",
+        header: intl.formatMessage({
+          id: "settings.developers.api-tokens.header.hint",
+          defaultMessage: "Hint",
+        }),
+        CellContent: ({ row }) => {
+          return (
+            <Text as="span" textStyle={row.hint ? undefined : "hint"}>
+              {row.hint?.concat("...") ??
+                intl.formatMessage({
+                  id: "generic.unavailable",
+                  defaultMessage: "Unavailable",
+                })}
+            </Text>
+          );
+        },
+        cellProps: {
+          width: "150px",
+        },
+      },
+      {
         key: "lastUsedAt",
         header: intl.formatMessage({
           id: "generic.last-used-at",
@@ -489,6 +510,7 @@ Developers.fragments = {
     fragment Developers_UserAuthenticationToken on UserAuthenticationToken {
       id
       tokenName
+      hint
       createdAt
       lastUsedAt
     }

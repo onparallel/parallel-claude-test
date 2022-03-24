@@ -3346,6 +3346,7 @@ export interface UserAuthenticationToken extends CreatedAt {
   __typename?: "UserAuthenticationToken";
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  hint?: Maybe<Scalars["String"]>;
   id: Scalars["GID"];
   lastUsedAt?: Maybe<Scalars["DateTime"]>;
   tokenName: Scalars["String"];
@@ -17030,6 +17031,7 @@ export type Developers_UserAuthenticationTokenFragment = {
   __typename?: "UserAuthenticationToken";
   id: string;
   tokenName: string;
+  hint?: string | null;
   createdAt: string;
   lastUsedAt?: string | null;
 };
@@ -17098,6 +17100,7 @@ export type Developers_tokensQuery = {
       __typename?: "UserAuthenticationToken";
       id: string;
       tokenName: string;
+      hint?: string | null;
       createdAt: string;
       lastUsedAt?: string | null;
     }>;
@@ -21832,6 +21835,7 @@ export const Developers_UserAuthenticationTokenFragmentDoc = gql`
   fragment Developers_UserAuthenticationToken on UserAuthenticationToken {
     id
     tokenName
+    hint
     createdAt
     lastUsedAt
   }

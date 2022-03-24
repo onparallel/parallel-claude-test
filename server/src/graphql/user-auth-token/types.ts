@@ -10,6 +10,9 @@ export const UserAuthenticationToken = objectType({
     t.nullable.datetime("lastUsedAt", {
       resolve: (o) => o.last_used_at,
     });
+    t.nullable.string("hint", {
+      resolve: (o) => o.token_hint,
+    });
     t.implements("CreatedAt");
   },
 });

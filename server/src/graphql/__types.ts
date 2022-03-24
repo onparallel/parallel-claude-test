@@ -1887,6 +1887,7 @@ export interface NexusGenFieldTypes {
   UserAuthenticationToken: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    hint: string | null; // String
     id: NexusGenScalars["GID"]; // GID!
     lastUsedAt: NexusGenScalars["DateTime"] | null; // DateTime
     tokenName: string; // String!
@@ -3295,6 +3296,7 @@ export interface NexusGenFieldTypeNames {
   UserAuthenticationToken: {
     // field return type name
     createdAt: "DateTime";
+    hint: "String";
     id: "GID";
     lastUsedAt: "DateTime";
     tokenName: "String";

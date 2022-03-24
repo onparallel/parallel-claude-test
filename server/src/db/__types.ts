@@ -1261,11 +1261,12 @@ export interface UserAuthenticationToken {
   created_by: Maybe<string>; // varchar
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
+  token_hint: Maybe<string>; // varchar
 }
 
 export type CreateUserAuthenticationToken = PartialProps<
   Omit<UserAuthenticationToken, "id">,
-  "last_used_at" | "created_at" | "created_by" | "deleted_at" | "deleted_by"
+  "last_used_at" | "created_at" | "created_by" | "deleted_at" | "deleted_by" | "token_hint"
 >;
 
 export interface UserGroup {
