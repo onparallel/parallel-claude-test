@@ -9825,6 +9825,103 @@ export type Admin_userQuery = {
   };
 };
 
+export type OrganizationMembers_UserFragment = {
+  __typename?: "User";
+  id: string;
+  fullName?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  email: string;
+  createdAt: string;
+  canCreateUsers: boolean;
+  isSuperAdmin: boolean;
+  role: OrganizationRole;
+  avatarUrl?: string | null;
+  initials?: string | null;
+  organization: {
+    __typename?: "Organization";
+    id: string;
+    usageLimits: {
+      __typename?: "OrganizationUsageLimit";
+      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+    };
+  };
+};
+
+export type OrganizationMembers_OrganizationUserFragment = {
+  __typename?: "User";
+  id: string;
+  fullName?: string | null;
+  email: string;
+  role: OrganizationRole;
+  createdAt: string;
+  lastActiveAt?: string | null;
+  status: UserStatus;
+};
+
+export type OrganizationMembers_OrganizationFragment = {
+  __typename?: "Organization";
+  id: string;
+  name: string;
+};
+
+export type OrganizationMembers_userQueryVariables = Exact<{ [key: string]: never }>;
+
+export type OrganizationMembers_userQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    canCreateUsers: boolean;
+    isSuperAdmin: boolean;
+    role: OrganizationRole;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
+    };
+  };
+};
+
+export type OrganizationMembers_organizationQueryVariables = Exact<{
+  id: Scalars["GID"];
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+  search?: InputMaybe<Scalars["String"]>;
+  sortBy?: InputMaybe<Array<OrganizationUsers_OrderBy> | OrganizationUsers_OrderBy>;
+}>;
+
+export type OrganizationMembers_organizationQuery = {
+  organization?: {
+    __typename?: "Organization";
+    id: string;
+    name: string;
+    users: {
+      __typename?: "UserPagination";
+      totalCount: number;
+      items: Array<{
+        __typename?: "User";
+        id: string;
+        fullName?: string | null;
+        email: string;
+        role: OrganizationRole;
+        createdAt: string;
+        lastActiveAt?: string | null;
+        status: UserStatus;
+      }>;
+    };
+  } | null;
+};
+
 export type AdminOrganizations_OrganizationFragment = {
   __typename?: "Organization";
   id: string;
@@ -19393,25 +19490,6 @@ export const RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetiti
     RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment,
     unknown
   >;
-export const AdminOrganizations_OrganizationFragmentDoc = gql`
-  fragment AdminOrganizations_Organization on Organization {
-    id
-    _id
-    name
-    status
-    activeUserCount
-    createdAt
-    usageLimits {
-      users {
-        limit
-      }
-      petitions {
-        used
-        limit
-      }
-    }
-  }
-` as unknown as DocumentNode<AdminOrganizations_OrganizationFragment, unknown>;
 export const UserMenu_UserFragmentDoc = gql`
   fragment UserMenu_User on User {
     isSuperAdmin
@@ -19451,6 +19529,48 @@ export const AppLayout_UserFragmentDoc = gql`
   }
   ${AppLayoutNavbar_UserFragmentDoc}
 ` as unknown as DocumentNode<AppLayout_UserFragment, unknown>;
+export const OrganizationMembers_UserFragmentDoc = gql`
+  fragment OrganizationMembers_User on User {
+    ...AppLayout_User
+  }
+  ${AppLayout_UserFragmentDoc}
+` as unknown as DocumentNode<OrganizationMembers_UserFragment, unknown>;
+export const OrganizationMembers_OrganizationUserFragmentDoc = gql`
+  fragment OrganizationMembers_OrganizationUser on User {
+    id
+    fullName
+    email
+    role
+    createdAt
+    lastActiveAt
+    status
+  }
+` as unknown as DocumentNode<OrganizationMembers_OrganizationUserFragment, unknown>;
+export const OrganizationMembers_OrganizationFragmentDoc = gql`
+  fragment OrganizationMembers_Organization on Organization {
+    id
+    name
+  }
+` as unknown as DocumentNode<OrganizationMembers_OrganizationFragment, unknown>;
+export const AdminOrganizations_OrganizationFragmentDoc = gql`
+  fragment AdminOrganizations_Organization on Organization {
+    id
+    _id
+    name
+    status
+    activeUserCount
+    createdAt
+    usageLimits {
+      users {
+        limit
+      }
+      petitions {
+        used
+        limit
+      }
+    }
+  }
+` as unknown as DocumentNode<AdminOrganizations_OrganizationFragment, unknown>;
 export const AdminOrganizations_UserFragmentDoc = gql`
   fragment AdminOrganizations_User on User {
     ...AppLayout_User
@@ -23622,6 +23742,44 @@ export const Admin_userDocument = gql`
   }
   ${AppLayout_UserFragmentDoc}
 ` as unknown as DocumentNode<Admin_userQuery, Admin_userQueryVariables>;
+export const OrganizationMembers_userDocument = gql`
+  query OrganizationMembers_user {
+    me {
+      ...OrganizationMembers_User
+    }
+  }
+  ${OrganizationMembers_UserFragmentDoc}
+` as unknown as DocumentNode<OrganizationMembers_userQuery, OrganizationMembers_userQueryVariables>;
+export const OrganizationMembers_organizationDocument = gql`
+  query OrganizationMembers_organization(
+    $id: GID!
+    $offset: Int!
+    $limit: Int!
+    $search: String
+    $sortBy: [OrganizationUsers_OrderBy!]
+  ) {
+    organization(id: $id) {
+      ...OrganizationMembers_Organization
+      users(
+        offset: $offset
+        limit: $limit
+        search: $search
+        sortBy: $sortBy
+        includeInactive: true
+      ) {
+        totalCount
+        items {
+          ...OrganizationMembers_OrganizationUser
+        }
+      }
+    }
+  }
+  ${OrganizationMembers_OrganizationFragmentDoc}
+  ${OrganizationMembers_OrganizationUserFragmentDoc}
+` as unknown as DocumentNode<
+  OrganizationMembers_organizationQuery,
+  OrganizationMembers_organizationQueryVariables
+>;
 export const AdminOrganizations_organizationsDocument = gql`
   query AdminOrganizations_organizations(
     $offset: Int!

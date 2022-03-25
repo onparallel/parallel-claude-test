@@ -24,6 +24,7 @@ import {
 } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
+import { useHandleNavigation } from "@parallel/utils/navigation";
 import {
   integer,
   parseQuery,
@@ -34,7 +35,7 @@ import {
 } from "@parallel/utils/queryState";
 import { useAdminSections } from "@parallel/utils/useAdminSections";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { ChangeEvent, useCallback, useMemo, useState } from "react";
+import { ChangeEvent, MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 
 const SORTING = ["name", "createdAt"] as const;
@@ -96,6 +97,11 @@ function AdminOrganizations() {
     [debouncedOnSearchChange]
   );
 
+  const navigate = useHandleNavigation();
+  const handleRowClick = useCallback(function (row: OrganizationSelection, event: MouseEvent) {
+    navigate(`/app/admin/organizations/${row.id}`, event);
+  }, []);
+
   return (
     <SettingsLayout
       title={intl.formatMessage({
@@ -118,6 +124,7 @@ function AdminOrganizations() {
           minHeight={0}
           columns={columns}
           rows={organizations.items}
+          onRowClick={handleRowClick}
           rowKeyProp={"id"}
           isHighlightable
           loading={loading}

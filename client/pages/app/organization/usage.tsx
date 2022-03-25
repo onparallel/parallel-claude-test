@@ -1,24 +1,15 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Flex,
-  Grid,
-  Heading,
-  HStack,
-  Progress,
-  Stack,
-  Text,
-  VisuallyHidden,
-} from "@chakra-ui/react";
+import { Box, Grid, Heading } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
-import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { UsageCard } from "@parallel/components/organization/UsageCard";
 import { OrganizationUsage_userDocument } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
-import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 
 function OrganizationUsage() {
   const intl = useIntl();
@@ -93,38 +84,6 @@ function OrganizationUsage() {
         </Grid>
       </Box>
     </SettingsLayout>
-  );
-}
-
-function UsageCard({ title, limit, usage }: { title: string; limit: number; usage: number }) {
-  return (
-    <Flex direction="column" shadow="md" rounded="md" overflow="hidden" background="white">
-      <Stack as="dl" padding={4} margin={0}>
-        <Text as="dt" fontSize="sm" fontWeight="medium" color="gay.500">
-          {title}
-        </Text>
-        <HStack as="dd" align="center" fontWeight="bold">
-          <Text as="span" fontSize="2xl">
-            <FormattedNumber value={usage} />
-          </Text>
-          <HStack align="center" color="gray.500" fontWeight="semibold">
-            <Text as="span" aria-hidden="true">
-              /
-            </Text>
-            <VisuallyHidden>
-              <FormattedMessage
-                id="organization-usage.visually-hidden.out-of"
-                defaultMessage="out of"
-              />
-            </VisuallyHidden>
-            <Text as="span">
-              <FormattedNumber value={limit} />
-            </Text>
-          </HStack>
-        </HStack>
-      </Stack>
-      <Progress height="0.3rem" value={(usage / limit) * 100} />
-    </Flex>
   );
 }
 
