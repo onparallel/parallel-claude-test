@@ -72,10 +72,6 @@ export class Aws implements IAws {
     return new AWS.SQS();
   }
 
-  @Memoize() private get logs() {
-    return new AWS.CloudWatchLogs();
-  }
-
   @Memoize() private get cognitoIdP() {
     return new AWS.CognitoIdentityServiceProvider();
   }

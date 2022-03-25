@@ -1,8 +1,9 @@
+import { CloudWatchLogs } from "@aws-sdk/client-cloudwatch-logs";
+import stringify from "fast-safe-stringify";
 import { interfaces } from "inversify";
 import winston from "winston";
 import WinstonCloudWatch from "winston-cloudwatch";
 import { Config, CONFIG } from "../config";
-import stringify from "fast-safe-stringify";
 
 export const LOGGER = Symbol.for("LOGGER");
 
@@ -34,10 +35,8 @@ export function createLogger({ container }: interfaces.Context): ILogger {
       }),
       new WinstonCloudWatch({
         name: "cloudwatch",
+        cloudWatchLogs: new CloudWatchLogs({ ...config.aws }),
         level: "info",
-        awsAccessKeyId: config.aws.accessKeyId,
-        awsSecretKey: config.aws.secretAccessKey,
-        awsRegion: config.aws.region,
         retentionInDays: 30,
         messageFormatter: ({ level, message, ...rest }) => {
           return stringify({ level, message, ...rest });
