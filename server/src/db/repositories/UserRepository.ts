@@ -1,10 +1,11 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { groupBy, indexBy, omit } from "remeda";
+import { groupBy, indexBy, omit, uniq } from "remeda";
 import { CONFIG, Config } from "../../config";
 import { unMaybeArray } from "../../util/arrays";
 import { fromDataLoader } from "../../util/fromDataLoader";
+import { keyBuilder } from "../../util/keyBuilder";
 import { Maybe, MaybeArray } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { escapeLike } from "../helpers/utils";
@@ -29,12 +30,10 @@ export class UserRepository extends BaseRepository {
         update "user" u set last_active_at = NOW()
         from user_data ud 
         where ud.id = u.user_data_id
-        and u.deleted_at is null and ud.deleted_at is null and ud.cognito_id in (${cognitoIds
-          .map(() => "?")
-          .join(",")})
+        and u.deleted_at is null and ud.deleted_at is null and ud.cognito_id in ?
         returning u.*, ud.cognito_id as ud_cognito_id
       `,
-        cognitoIds
+        [this.sqlIn(cognitoIds)]
       );
       const byCognitoId = groupBy(users, (u) => u.ud_cognito_id);
       return cognitoIds.map((id) => byCognitoId[id]?.map((u) => omit(u, ["ud_cognito_id"])) ?? []);
@@ -50,10 +49,10 @@ export class UserRepository extends BaseRepository {
       const users = await this.raw<UserData & { user_id: number }>(
         /* sql */ `
         select u.id as user_id, ud.* from "user" u join "user_data" ud on u.user_data_id = ud.id
-        where u.id in (${ids.map(() => "?").join(",")})
+        where u.id in ?
         and u.deleted_at is null and ud.deleted_at is null
       `,
-        ids
+        [this.sqlIn(ids)]
       );
 
       const byUserId = indexBy(users, (u) => u.user_id);
@@ -62,22 +61,19 @@ export class UserRepository extends BaseRepository {
   );
 
   readonly loadUserByExternalId = fromDataLoader(
-    new DataLoader<{ orgId: number; externalId: string }, Maybe<User>>(async (args) => {
-      const users = await this.raw<User>(
-        /* sql */ `
-          select u.* from "user"
-          where (${args.map(() => "(org_id = ? and external_id = ?)").join(" or ")})
-            and u.deleted_at is null
-            and ud.deleted_at is null;          
-        `,
-        [...args.flatMap(({ orgId, externalId }) => [orgId, externalId])]
-      );
+    new DataLoader<{ orgId: number; externalId: string }, Maybe<User>, string>(
+      async (ids) => {
+        const users = await this.from("user")
+          .whereIn("org_id", uniq(ids.map((x) => x.orgId)))
+          .whereIn("external_idd", uniq(ids.map((x) => x.externalId)))
+          .whereNull("deleted_at");
 
-      return args.map(
-        (arg) =>
-          users.find((u) => u.org_id === arg.orgId && u.external_id === arg.externalId) ?? null
-      );
-    })
+        const byId = indexBy(users, keyBuilder(["org_id", "external_id"]));
+
+        return ids.map(keyBuilder(["orgId", "externalId"])).map((key) => byId[key] ?? null);
+      },
+      { cacheKeyFn: keyBuilder(["orgId", "externalId"]) }
+    )
   );
 
   readonly loadUsersByEmail = fromDataLoader(
@@ -85,11 +81,9 @@ export class UserRepository extends BaseRepository {
       const users = await this.raw<User & { ud_email: string }>(
         /* sql */ `
         select u.*, ud.email as ud_email from "user" u join "user_data" ud on u.user_data_id = ud.id
-        where u.deleted_at is null and ud.deleted_at is null and ud.email in (${emails
-          .map(() => "?")
-          .join(",")})
+        where u.deleted_at is null and ud.deleted_at is null and ud.email in ?
       `,
-        emails
+        [this.sqlIn(emails)]
       );
       const byEmail = groupBy(users, (u) => u.ud_email);
       return emails.map((email) => byEmail[email]?.map((u) => omit(u, ["ud_email"])) ?? []);
@@ -192,7 +186,7 @@ export class UserRepository extends BaseRepository {
     return userData;
   }
 
-  async loadOrCreateUserData(data: CreateUserData, createdBy?: string, t?: Knex.Transaction) {
+  async getOrCreateUserData(data: CreateUserData, createdBy?: string, t?: Knex.Transaction) {
     const [userData] = await this.raw<UserData>(
       /* sql */ `
       ? 
@@ -219,7 +213,7 @@ export class UserRepository extends BaseRepository {
     createdBy?: string,
     t?: Knex.Transaction
   ) {
-    const _userData = await this.loadOrCreateUserData(userData, createdBy, t);
+    const _userData = await this.getOrCreateUserData(userData, createdBy, t);
     const [user] = await this.insert(
       "user",
       {
