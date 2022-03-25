@@ -154,11 +154,11 @@ export class PetitionRepository extends BaseRepository {
         /* sql */ `
       select pf.*, pfr.id as _pfr_id from petition_field_reply pfr
       join petition_field pf on pfr.petition_field_id = pf.id
-      where pfr.id in (${ids.map(() => "?").join(", ")})
+      where pfr.id in ?
         and pf.deleted_at is null
         and pfr.deleted_at is null
     `,
-        [...ids]
+        [this.sqlIn(ids)]
       );
       const byPfrId = indexBy(fields, (f) => f._pfr_id);
       return ids.map((id) => (byPfrId[id] ? omit(byPfrId[id], ["_pfr_id"]) : null));
@@ -303,10 +303,10 @@ export class PetitionRepository extends BaseRepository {
         from petition_field_reply as pfr
         where
           pfr.petition_field_id = ?
-          and pfr.id in (${replyIds.map(() => "?").join(", ")})
+          and pfr.id in ?
           and pfr.deleted_at is null
     `,
-      [fieldId, ...replyIds]
+      [fieldId, this.sqlIn(replyIds)]
     );
     return count === new Set(replyIds).size;
   }
@@ -321,10 +321,10 @@ export class PetitionRepository extends BaseRepository {
           join petition_field_reply as pfr on pfr.petition_field_id = pf.id
         where
           pf.petition_id = ?
-          and pfr.id in (${replyIds.map(() => "?").join(", ")})
+          and pfr.id in ?
           and pf.deleted_at is null and pfr.deleted_at is null
     `,
-      [petitionId, ...replyIds]
+      [petitionId, this.sqlIn(replyIds)]
     );
     return count === new Set(replyIds).size;
   }
@@ -375,13 +375,9 @@ export class PetitionRepository extends BaseRepository {
         if (filters?.tagIds) {
           q.joinRaw(/* sql */ `left join petition_tag pt on pt.petition_id = petition.id`);
           if (filters.tagIds.length) {
-            q.havingRaw(
-              /* sql */ `
-              array_agg(distinct pt.tag_id) @>
-                array[${filters.tagIds.map(() => "?").join(", ")}]::int[]
-            `,
-              filters.tagIds
-            );
+            q.havingRaw(/* sql */ `array_agg(distinct pt.tag_id) @> ?`, [
+              this.sqlArray(filters.tagIds, "int"),
+            ]);
           } else {
             q.havingRaw(/* sql */ `
               count(distinct pt.tag_id) = 0
@@ -1093,12 +1089,15 @@ export class PetitionRepository extends BaseRepository {
       update petition_field as pf set
         position = t.position,
         deleted_at = NOW() -- temporarily delete to avoid unique index constraint
-      from (
-        values ${fieldIds.map(() => "(?::int, ?::int)").join(", ")}
-      ) as t (id, position)
+      from (?) as t (id, position)
       where t.id = pf.id;
     `,
-        fieldIds.flatMap((id, i) => [id, i])
+        [
+          this.sqlValues(
+            fieldIds.map((id, i) => [id, i]),
+            ["int", "int"]
+          ),
+        ]
       );
 
       await this.from("petition_field", t)
@@ -1848,25 +1847,28 @@ export class PetitionRepository extends BaseRepository {
               /* sql */ `
             update petition_field as pf set
               visibility = t.visibility
-            from (
-              values ${toUpdate.map(() => "(?::int, ?::jsonb)").join(", ")}
-            ) as t (id, visibility)
+            from (?) as t (id, visibility)
             where t.id = pf.id
             returning *;
           `,
-              toUpdate.flatMap((field) => {
-                const visibility = field.visibility as PetitionFieldVisibility;
-                return [
-                  field.id,
-                  JSON.stringify({
-                    ...visibility,
-                    conditions: visibility.conditions.map((condition) => ({
-                      ...condition,
-                      fieldId: newIds[condition.fieldId],
-                    })),
+              [
+                this.sqlValues(
+                  toUpdate.map((field) => {
+                    const visibility = field.visibility as PetitionFieldVisibility;
+                    return [
+                      field.id,
+                      JSON.stringify({
+                        ...visibility,
+                        conditions: visibility.conditions.map((condition) => ({
+                          ...condition,
+                          fieldId: newIds[condition.fieldId],
+                        })),
+                      }),
+                    ];
                   }),
-                ];
-              }),
+                  ["int", "jsonb"]
+                ),
+              ],
               t
             )
           : [],
@@ -2099,18 +2101,14 @@ export class PetitionRepository extends BaseRepository {
       join petition_event pe on upel.petition_event_id = pe.id
       where upel.user_id = ?
         ${isDefined(options.before) ? /* sql */ `and upel.petition_event_id < ?` : ""}
-        ${
-          isDefined(options.eventTypes)
-            ? /* sql */ `and pe.type in (${options.eventTypes.map(() => "?").join(", ")})`
-            : ""
-        }
+        ${isDefined(options.eventTypes) ? /* sql */ `and pe.type in ?` : ""}
       order by pe.id desc
       limit ${options.limit};
     `,
       [
         userId,
         ...(isDefined(options.before) ? [options.before] : []),
-        ...(options.eventTypes ?? []),
+        ...(isDefined(options.eventTypes) ? [this.sqlIn(options.eventTypes)] : []),
       ]
     );
   }
@@ -2847,10 +2845,10 @@ export class PetitionRepository extends BaseRepository {
         from petition_access as pa
           join contact as c on c.id = pa.contact_id
         where
-          pa.id in (${accessIds.map(() => "?").join(", ")})
+          pa.id in ?
           and c.deleted_at is null
     `,
-      [...accessIds]
+      [this.sqlIn(accessIds)]
     );
     return count === new Set(accessIds).size;
   }
@@ -2915,10 +2913,10 @@ export class PetitionRepository extends BaseRepository {
         from petition_permission 
           where deleted_at is null 
           and user_group_id is null
-          and petition_id in (${petitionIds.map(() => "?").join(", ")})
+          and petition_id in ? 
           group by user_id, petition_id
       `,
-        petitionIds
+        [this.sqlIn(petitionIds)]
       );
 
       const byPetitionId = groupBy(rows, (r) => r.petition_id);
@@ -2995,14 +2993,20 @@ export class PetitionRepository extends BaseRepository {
       /* sql */ `
         with
           u as (select user_id, type, is_subscribed, user_group_id, from_user_group_id from petition_permission where petition_id = ? and deleted_at is null),
-          p as (select * from (values ${toPetitionIds
-            .map(() => "(?::int)")
-            .join(",")}) as t (petition_id))
+          p as (select * from (?) as t (petition_id))
         insert into petition_permission(petition_id, user_id, type, is_subscribed, user_group_id, from_user_group_id, created_by, updated_by)
         select p.petition_id, u.user_id, u.type, u.is_subscribed, u.user_group_id, u.from_user_group_id, ?, ? from u cross join p
         on conflict do nothing 
         `,
-      [fromPetitionId, ...toPetitionIds, createdBy, createdBy],
+      [
+        fromPetitionId,
+        this.sqlValues(
+          toPetitionIds.map((id) => [id]),
+          ["int"]
+        ),
+        createdBy,
+        createdBy,
+      ],
       t
     );
   }
@@ -3079,27 +3083,31 @@ export class PetitionRepository extends BaseRepository {
                 select ugm.user_id, ugm.user_group_id, ugm_info.is_subscribed, ugm_info.permission_type
                 from user_group_member ugm
                 -- each user group may have different is_subscribed and permission_type values assigned
-                join (select user_group_id, is_subscribed, permission_type from (values ${newUserGroups
-                  .map(() => `(?::int, ?::bool, ?::petition_permission_type)`)
-                  .join(
-                    ","
-                  )}) as t(user_group_id, is_subscribed, permission_type)) as ugm_info on ugm_info.user_group_id = ugm.user_group_id
-                where ugm.deleted_at is null and ugm.user_group_id in (${newUserGroups
-                  .map(() => `(?::int)`)
-                  .join(", ")})),
+                join (
+                  select * from (?) as t(user_group_id, is_subscribed, permission_type)
+                ) as ugm_info on ugm_info.user_group_id = ugm.user_group_id
+                where ugm.deleted_at is null and ugm.user_group_id in ?
+              ),
               p as (
-                select petition_id from (
-                  values ${petitionIds.map(() => "(?::int)").join(", ")}
-                ) as t(petition_id))
+                select petition_id from (?) as t(petition_id))
               insert into petition_permission(petition_id, user_id, from_user_group_id, is_subscribed, type, created_by, updated_by)
               select p.petition_id, gm.user_id, gm.user_group_id, gm.is_subscribed, gm.permission_type, ?, ? 
               from gm cross join p
               on conflict do nothing returning *;
             `,
               [
-                ...newUserGroups.map((ug) => [ug.id, ug.isSubscribed, ug.permissionType]).flat(),
-                ...newUserGroups.map((ug) => ug.id),
-                ...petitionIds,
+                this.sqlValues(
+                  newUserGroups.map((ug) => [ug.id, ug.isSubscribed, ug.permissionType]),
+                  ["int", "bool", "petition_permission_type"]
+                ),
+                this.sqlIn(
+                  newUserGroups.map((ug) => ug.id),
+                  "int"
+                ),
+                this.sqlValues(
+                  petitionIds.map((id) => [id]),
+                  ["int"]
+                ),
                 createdBy,
                 createdBy,
               ],
@@ -3735,19 +3743,17 @@ export class PetitionRepository extends BaseRepository {
 
   readonly loadLatestPetitionSignatureByPetitionId = fromDataLoader(
     new DataLoader<number, PetitionSignatureRequest | null>(async (keys) => {
-      const { rows } = await this.knex.raw<{
-        rows: (PetitionSignatureRequest & { _rank: number })[];
-      }>(
+      const signatures = await this.raw<PetitionSignatureRequest & { _rank: number }>(
         /* sql */ `
         with cte as (
           select *, rank() over (partition by petition_id order by created_at desc) _rank
           from petition_signature_request
-          where petition_id in (${keys.map(() => "?").join(", ")})
+          where petition_id in ?
         ) select * from cte where _rank = 1
       `,
-        [...keys]
+        [this.sqlIn(keys)]
       );
-      const byPetitionId = indexBy(rows, (r) => r.petition_id);
+      const byPetitionId = indexBy(signatures, (r) => r.petition_id);
       return keys.map((key) => (byPetitionId[key] ? omit(byPetitionId[key], ["_rank"]) : null));
     })
   );

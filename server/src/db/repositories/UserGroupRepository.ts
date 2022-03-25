@@ -53,11 +53,9 @@ export class UserGroupRepository extends BaseRepository {
       const userGroups = await this.raw<UserGroup & { user_id: number }>(
         /* sql */ `
         select ug.*, ugm.user_id from "user_group" ug join "user_group_member" ugm on ugm.user_group_id = ug.id 
-        where ug.deleted_at is null and ugm.deleted_at is null and ugm.user_id in (${userIds
-          .map(() => "?")
-          .join(",")})
+        where ug.deleted_at is null and ugm.deleted_at is null and ugm.user_id in ? 
       `,
-        userIds
+        [this.sqlIn(userIds)]
       );
 
       const byUserId = groupBy(userGroups, (ug) => ug.user_id);
@@ -268,15 +266,21 @@ export class UserGroupRepository extends BaseRepository {
           /* sql */ `
           with 
             pp as (select * from petition_permission where user_group_id = ? and deleted_at is null),
-            u as (select * from (values ${memberIds
-              .map(() => "(?::int)")
-              .join(", ")}) as t(user_id))
+            u as (select * from (?) as t(user_id))
           insert into petition_permission(type, user_id, petition_id, from_user_group_id, created_by, updated_by)
             select pp.type, u.user_id, pp.petition_id, pp.user_group_id, ?, ?
             from pp cross join u
           on conflict do nothing;
         `,
-          [userGroupId, ...memberIds, createdBy, createdBy]
+          [
+            userGroupId,
+            this.sqlValues(
+              memberIds.map((id) => [id]),
+              ["int"]
+            ),
+            createdBy,
+            createdBy,
+          ]
         ),
       t
     );

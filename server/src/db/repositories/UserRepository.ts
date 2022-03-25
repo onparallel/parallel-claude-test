@@ -178,9 +178,9 @@ export class UserRepository extends BaseRepository {
         /* sql */ `
         select u.id, pfu.path from "user" u
           join public_file_upload pfu on u.avatar_public_file_id = pfu.id
-          where u.id in (${userIds.map(() => "?").join(",")})
+          where u.id in ? 
       `,
-        [...userIds]
+        [this.sqlIn(userIds)]
       );
       const resultsById = indexBy(results, (x) => x.id);
       return userIds.map((id) =>

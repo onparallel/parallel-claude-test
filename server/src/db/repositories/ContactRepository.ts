@@ -58,9 +58,9 @@ export class ContactRepository extends BaseRepository {
         /* sql */ `
         select c.*, pa.id as access_id from contact c
         left join petition_access pa on pa.contact_id = c.id
-        where pa.id in (${ids.map(() => "?").join(",")})
+        where pa.id in ? 
       `,
-        [...ids]
+        [this.sqlIn(ids)]
       );
 
       const byAccessId = indexBy(contacts, (r) => r.access_id);

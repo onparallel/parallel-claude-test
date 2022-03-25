@@ -215,9 +215,9 @@ export class OrganizationRepository extends BaseRepository {
         /* sql */ `
         select o.id, pfu.path from organization o
           join public_file_upload pfu on o.logo_public_file_id = pfu.id
-          where o.id in (${orgIds.map(() => "?").join(",")})
+          where o.id in ?
       `,
-        [...orgIds]
+        [this.sqlIn(orgIds)]
       );
       const resultsById = indexBy(results, (x) => x.id);
       return orgIds.map((id) =>

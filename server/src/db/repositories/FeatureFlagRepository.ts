@@ -50,7 +50,7 @@ export class FeatureFlagRepository extends BaseRepository {
           /* sql */ `
           with selected_user as (
             select id as user_id, org_id from "user"
-              where id in (${userIds.map(() => "?").join(",")})
+              where id in ?
           )
           select
             su.user_id as user_id,
@@ -58,13 +58,13 @@ export class FeatureFlagRepository extends BaseRepository {
             coalesce(ffou.value, ffoo.value, ff.default_value) as value
           from selected_user su
             join feature_flag ff
-              on ff.name in (${featureFlags.map(() => "?").join(",")})
+              on ff.name in ?
             left join feature_flag_override ffoo
               on ffoo.feature_flag_name = ff.name and ffoo.org_id = su.org_id and ffoo.user_id is null
             left join feature_flag_override ffou
               on ffou.feature_flag_name = ff.name and ffou.user_id = su.user_id and ffou.org_id is null
         `,
-          [...userIds, ...featureFlags]
+          [this.sqlIn(userIds), this.sqlIn(featureFlags)]
         );
         const results = indexBy(rows, keyBuilder(["user_id", "feature_flag"]));
         return keys
@@ -105,25 +105,21 @@ export class FeatureFlagRepository extends BaseRepository {
       async (keys) => {
         const orgIds = uniq(keys.map((k) => k.orgId));
         const featureFlags = uniq(keys.map((k) => k.featureFlag));
-        const { rows } = await this.knex.raw<{
-          rows: { org_id: number; feature_flag: number; value: boolean }[];
-        }>(
+        const rows = await this.raw<{ org_id: number; feature_flag: number; value: boolean }>(
           /* sql */ `
           with selected_org as (
-            select id as org_id from "organization"
-              where id in (${orgIds.map(() => "?").join(",")})
+            select id as org_id from "organization" where id in ? 
           )
           select
             so.org_id as org_id,
             ff.name as feature_flag,
             coalesce(ffoo.value, ff.default_value) as value
           from selected_org so
-            join feature_flag ff
-              on ff.name in (${featureFlags.map(() => "?").join(",")})
+            join feature_flag ff on ff.name in ?
             left join feature_flag_override ffoo
               on ffoo.feature_flag_name = ff.name and ffoo.org_id = so.org_id and ffoo.user_id is null
         `,
-          [...orgIds, ...featureFlags]
+          [this.sqlIn(orgIds), this.sqlIn(featureFlags)]
         );
         const results = indexBy(rows, keyBuilder(["org_id", "feature_flag"]));
         return keys
