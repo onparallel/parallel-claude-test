@@ -347,7 +347,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         await withError(showFieldErrorDialog({ message, fieldsWithIndices }));
         const firstId = fieldsWithIndices[0].field.id;
         const node = document.querySelector(`#field-${firstId}`);
-        await scrollIntoView(node!, { block: "center", behavior: "smooth" });
+        await scrollIntoView(node!, { block: "start", behavior: "smooth" });
       } else {
         await withError(showErrorDialog({ message }));
         if (error === "NO_REPLIABLE_FIELDS") {
@@ -371,6 +371,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     if (fieldElement) {
       focusFieldTitle(fieldId);
       await scrollIntoView(fieldElement, {
+        block: "start",
         behavior: "smooth",
         scrollMode: "if-needed",
       });
