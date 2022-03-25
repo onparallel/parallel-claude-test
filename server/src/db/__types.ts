@@ -333,6 +333,7 @@ export interface TableTypes {
   temporary_file: TemporaryFile;
   user: User;
   user_authentication_token: UserAuthenticationToken;
+  user_data: UserData;
   user_group: UserGroup;
   user_group_member: UserGroupMember;
   user_petition_event_log: UserPetitionEventLog;
@@ -376,6 +377,7 @@ export interface TableCreateTypes {
   temporary_file: CreateTemporaryFile;
   user: CreateUser;
   user_authentication_token: CreateUserAuthenticationToken;
+  user_data: CreateUserData;
   user_group: CreateUserGroup;
   user_group_member: CreateUserGroupMember;
   user_petition_event_log: CreateUserPetitionEventLog;
@@ -419,6 +421,7 @@ export interface TablePrimaryKeys {
   temporary_file: "id";
   user: "id";
   user_authentication_token: "id";
+  user_data: "id";
   user_group: "id";
   user_group_member: "id";
   user_petition_event_log: "id";
@@ -1203,10 +1206,10 @@ export type CreateTemporaryFile = PartialProps<
 
 export interface User {
   id: number; // int4
-  cognito_id: string; // varchar
+  cognito_id: Maybe<string>; // varchar
   org_id: number; // int4
   organization_role: UserOrganizationRole; // user_organization_role
-  email: string; // varchar
+  email: Maybe<string>; // varchar
   first_name: Maybe<string>; // varchar
   last_name: Maybe<string>; // varchar
   created_at: Date; // timestamptz
@@ -1217,15 +1220,18 @@ export interface User {
   deleted_by: Maybe<string>; // varchar
   last_active_at: Maybe<Date>; // timestamptz
   status: UserStatus; // user_status
-  is_sso_user: boolean; // bool
+  is_sso_user: Maybe<boolean>; // bool
   external_id: Maybe<string>; // varchar
   avatar_public_file_id: Maybe<number>; // int4
   details: Maybe<any>; // jsonb
+  user_data_id: number; // int4
 }
 
 export type CreateUser = PartialProps<
   Omit<User, "id">,
+  | "cognito_id"
   | "organization_role"
+  | "email"
   | "first_name"
   | "last_name"
   | "created_at"
@@ -1258,6 +1264,38 @@ export interface UserAuthenticationToken {
 export type CreateUserAuthenticationToken = PartialProps<
   Omit<UserAuthenticationToken, "id">,
   "last_used_at" | "created_at" | "created_by" | "deleted_at" | "deleted_by" | "token_hint"
+>;
+
+export interface UserData {
+  id: number; // int4
+  cognito_id: string; // varchar
+  email: string; // varchar
+  first_name: Maybe<string>; // varchar
+  last_name: Maybe<string>; // varchar
+  is_sso_user: boolean; // bool
+  avatar_public_file_id: Maybe<number>; // int4
+  details: Maybe<any>; // jsonb
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateUserData = PartialProps<
+  Omit<UserData, "id">,
+  | "first_name"
+  | "last_name"
+  | "is_sso_user"
+  | "avatar_public_file_id"
+  | "details"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
 >;
 
 export interface UserGroup {

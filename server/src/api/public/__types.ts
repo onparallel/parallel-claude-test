@@ -3157,7 +3157,6 @@ export type UpdateUserGroupInput = {
 export type UpdateUserInput = {
   firstName?: InputMaybe<Scalars["String"]>;
   lastName?: InputMaybe<Scalars["String"]>;
-  role?: InputMaybe<OrganizationRole>;
 };
 
 /** A user in the system. */

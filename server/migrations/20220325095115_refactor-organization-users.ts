@@ -32,9 +32,6 @@ export async function up(knex: Knex): Promise<void> {
     t.string("cognito_id").nullable().alter();
     t.string("email").nullable().alter();
     t.boolean("is_sso_user").nullable().alter();
-
-    // onboarding_status is deprecated and will not be used anymore
-    t.jsonb("onboarding_status").nullable().alter();
   });
 
   await knex.raw(/* sql */ `
@@ -100,7 +97,7 @@ export async function down(knex: Knex): Promise<void> {
       details = ud.details
     from "user_data" ud where u.user_data_id = ud.id; 
 
-    update "user" set onboarding_status = '{}'::jsonb where onboarding_status is null;
+  
   `);
 
   await knex.schema.alterTable("user", (t) => {
@@ -109,7 +106,6 @@ export async function down(knex: Knex): Promise<void> {
     t.string("cognito_id").notNullable().alter();
     t.string("email").notNullable().alter();
     t.boolean("is_sso_user").notNullable().defaultTo(false).alter();
-    t.jsonb("onboarding_status").notNullable().alter();
   });
 
   await knex.raw(/* sql */ `

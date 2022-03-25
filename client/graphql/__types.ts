@@ -3270,7 +3270,6 @@ export interface UpdateUserGroupInput {
 export interface UpdateUserInput {
   firstName?: InputMaybe<Scalars["String"]>;
   lastName?: InputMaybe<Scalars["String"]>;
-  role?: InputMaybe<OrganizationRole>;
 }
 
 /** A user in the system. */
