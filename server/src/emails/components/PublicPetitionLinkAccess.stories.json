@@ -1,11 +1,11 @@
 {
-  "title": "Public Petition Link Access",
+  "title": "Emails",
   "stories": [
     {
       "name": "Public Petition Link Access",
       "parameters": {
         "server": {
-          "id": "PublicPetitionLinkAccess"
+          "id": "emails/components/PublicPetitionLinkAccess"
         }
       },
       "args": {

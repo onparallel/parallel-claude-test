@@ -1,11 +1,11 @@
 {
-  "title": "Invitation",
+  "title": "Emails",
   "stories": [
     {
       "name": "Invitation",
       "parameters": {
         "server": {
-          "id": "Invitation"
+          "id": "emails/components/Invitation"
         }
       },
       "args": {

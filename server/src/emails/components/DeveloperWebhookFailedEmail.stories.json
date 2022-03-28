@@ -1,11 +1,11 @@
 {
-  "title": "Developer Webhook Failed Email",
+  "title": "Emails",
   "stories": [
     {
       "name": "Developer Webhook Failed Email",
       "parameters": {
         "server": {
-          "id": "DeveloperWebhookFailedEmail"
+          "id": "emails/components/DeveloperWebhookFailedEmail"
         }
       },
       "args": {

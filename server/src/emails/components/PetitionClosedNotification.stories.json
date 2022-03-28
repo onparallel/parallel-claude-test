@@ -1,11 +1,11 @@
 {
-  "title": "Petition Closed Notification",
+  "title": "Emails",
   "stories": [
     {
       "name": "Petition Closed Notification",
       "parameters": {
         "server": {
-          "id": "PetitionClosedNotification"
+          "id": "emails/components/PetitionClosedNotification"
         }
       },
       "args": {

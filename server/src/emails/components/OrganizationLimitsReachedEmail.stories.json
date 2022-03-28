@@ -1,11 +1,11 @@
 {
-  "title": "Organization Limits Reached",
+  "title": "Emails",
   "stories": [
     {
       "name": "Organization Limits Reached",
       "parameters": {
         "server": {
-          "id": "OrganizationLimitsReachedEmail"
+          "id": "emails/components/OrganizationLimitsReachedEmail"
         }
       },
       "args": {

@@ -1,11 +1,11 @@
 {
-  "title": "Petition Shared Email",
+  "title": "Emails",
   "stories": [
     {
       "name": "Petition Shared Email",
       "parameters": {
         "server": {
-          "id": "PetitionSharedEmail"
+          "id": "emails/components/PetitionSharedEmail"
         }
       },
       "args": {

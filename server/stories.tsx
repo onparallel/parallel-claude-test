@@ -7,7 +7,7 @@ import { render } from "mjml-react";
 import path from "path";
 import { createIntl, IntlProvider } from "react-intl";
 import { mapValues } from "remeda";
-import { loadMessages } from "./src/emails/utils/loadMessages";
+import { loadMessages } from "./src/util/loadMessages";
 
 const app = express();
 app.use(cors());
@@ -16,7 +16,7 @@ const LR_SCRIPT = `<script src="http://localhost:35729/livereload.js?snipver=1">
 
 async function parseArgs(req: Request) {
   const storyName = req.path.replace(/^\//, "");
-  const storyPath = path.join(__dirname, `src/emails/components/${storyName}.stories.json`);
+  const storyPath = path.join(__dirname, `src/${storyName}.stories.json`);
   const storyConfig = await import(storyPath);
   const story = storyConfig.stories.find((s: any) => s.parameters.server.id === storyName);
   return mapValues(story.argTypes, ({ control: { type } }: any, key) => {
@@ -35,7 +35,8 @@ async function parseArgs(req: Request) {
   });
 }
 
-app.get("/:email", async (req, res, next) => {
+app.get("/emails/components/:email", async (req, res, next) => {
+  console.log(req.params.email);
   try {
     // clear cache
     for (const entry of Object.keys(require.cache)) {

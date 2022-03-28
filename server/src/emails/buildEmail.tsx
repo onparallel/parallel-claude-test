@@ -1,7 +1,7 @@
 import { render } from "mjml-react";
 import { ComponentType, createElement } from "react";
 import { IntlProvider, IntlShape, createIntl } from "react-intl";
-import { loadMessages } from "./utils/loadMessages";
+import { loadMessages } from "../util/loadMessages";
 
 export interface EmailOptions {
   locale: string;

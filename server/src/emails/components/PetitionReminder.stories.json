@@ -1,11 +1,11 @@
 {
-  "title": "Petition Reminder",
+  "title": "Emails",
   "stories": [
     {
       "name": "Petition Reminder",
       "parameters": {
         "server": {
-          "id": "PetitionReminder"
+          "id": "emails/components/PetitionReminder"
         }
       },
       "args": {

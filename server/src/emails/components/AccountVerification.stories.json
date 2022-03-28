@@ -1,11 +1,11 @@
 {
-  "title": "Account Verification",
+  "title": "Emails",
   "stories": [
     {
       "name": "Account Verification",
       "parameters": {
         "server": {
-          "id": "AccountVerification"
+          "id": "emails/components/AccountVerification"
         }
       },
       "args": {

@@ -1,11 +1,11 @@
 {
-  "title": "Petition Comments Contact Notification",
+  "title": "Emails",
   "stories": [
     {
       "name": "Petition Comments Contact Notification",
       "parameters": {
         "server": {
-          "id": "PetitionCommentsContactNotification"
+          "id": "emails/components/PetitionCommentsContactNotification"
         }
       },
       "args": {

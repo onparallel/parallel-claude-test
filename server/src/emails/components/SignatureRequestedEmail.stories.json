@@ -1,11 +1,11 @@
 {
-  "title": "Signature Requested Email",
+  "title": "Emails",
   "stories": [
     {
       "name": "Signature Requested Email",
       "parameters": {
         "server": {
-          "id": "SignatureRequestedEmail"
+          "id": "emails/components/SignatureRequestedEmail"
         }
       },
       "args": {

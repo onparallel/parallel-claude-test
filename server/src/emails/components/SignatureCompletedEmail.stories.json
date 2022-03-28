@@ -1,11 +1,11 @@
 {
-  "title": "Signature Completed Email",
+  "title": "Emails",
   "stories": [
     {
       "name": "Signature Completed Email",
       "parameters": {
         "server": {
-          "id": "SignatureCompletedEmail"
+          "id": "emails/components/SignatureCompletedEmail"
         }
       },
       "args": {

@@ -1,11 +1,11 @@
 {
-  "title": "Signature Cancelled No Credits Left",
+  "title": "Emails",
   "stories": [
     {
       "name": "Signature Cancelled No Credits Left",
       "parameters": {
         "server": {
-          "id": "SignatureCancelledNoCreditsLeftEmail"
+          "id": "emails/components/SignatureCancelledNoCreditsLeftEmail"
         }
       },
       "args": {

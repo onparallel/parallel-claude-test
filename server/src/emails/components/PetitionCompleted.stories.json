@@ -1,11 +1,11 @@
 {
-  "title": "Petition Completed",
+  "title": "Emails",
   "stories": [
     {
       "name": "Petition Completed",
       "parameters": {
         "server": {
-          "id": "PetitionCompleted"
+          "id": "emails/components/PetitionCompleted"
         }
       },
       "args": {

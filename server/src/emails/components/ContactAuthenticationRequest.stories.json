@@ -1,11 +1,11 @@
 {
-  "title": "Contact Authentication Request",
+  "title": "Emails",
   "stories": [
     {
       "name": "Contact Authentication Request",
       "parameters": {
         "server": {
-          "id": "ContactAuthenticationRequest"
+          "id": "emails/components/ContactAuthenticationRequest"
         }
       },
       "args": {

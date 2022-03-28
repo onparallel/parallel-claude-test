@@ -1,11 +1,11 @@
 {
-  "title": "Access Delegated Email",
+  "title": "Emails",
   "stories": [
     {
       "name": "Access Delegated Email",
       "parameters": {
         "server": {
-          "id": "AccessDelegatedEmail"
+          "id": "emails/components/AccessDelegatedEmail"
         }
       },
       "args": {
