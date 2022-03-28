@@ -1353,8 +1353,8 @@ export type MutationupdateTemplateDefaultPermissionsArgs = {
 };
 
 export type MutationupdateUserArgs = {
-  data: UpdateUserInput;
-  id: Scalars["GID"];
+  firstName?: InputMaybe<Scalars["String"]>;
+  lastName?: InputMaybe<Scalars["String"]>;
 };
 
 export type MutationupdateUserGroupArgs = {
@@ -3152,11 +3152,6 @@ export type UpdateTagInput = {
 
 export type UpdateUserGroupInput = {
   name?: InputMaybe<Scalars["String"]>;
-};
-
-export type UpdateUserInput = {
-  firstName?: InputMaybe<Scalars["String"]>;
-  lastName?: InputMaybe<Scalars["String"]>;
 };
 
 /** A user in the system. */

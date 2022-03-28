@@ -44,19 +44,6 @@ export function authenticateAnd<TypeName extends string, FieldName extends strin
 export type Arg<TypeName extends string, FieldName extends string, Type = any> = string &
   KeysOfType<core.ArgsValue<TypeName, FieldName>, Type>;
 
-export function argIsContextUserId<
-  TypeName extends string,
-  FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>
->(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
-  return (_, args, ctx) => {
-    try {
-      return ctx.user!.id === (args[argName] as unknown as number);
-    } catch {}
-    return false;
-  };
-}
-
 function _all<TypeName extends string, FieldName extends string>(
   resolvers: FieldAuthorizeResolver<TypeName, FieldName>[],
   concurrency: number

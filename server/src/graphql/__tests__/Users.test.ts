@@ -287,15 +287,14 @@ describe("GraphQL/Users", () => {
     it("changes user name", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($userId: GID!, $firstName: String, $lastName: String) {
-            updateUser(id: $userId, data: { firstName: $firstName, lastName: $lastName }) {
+          mutation ($firstName: String, $lastName: String) {
+            updateUser(firstName: $firstName, lastName: $lastName) {
               id
               fullName
             }
           }
         `,
         variables: {
-          userId: sessionUserGID,
           firstName: "Mike",
           lastName: "Ross",
         },
@@ -323,14 +322,14 @@ describe("GraphQL/Users", () => {
 
       const { errors: updateErrors, data: updateData } = await testClient.execute(
         gql`
-          mutation ($userId: GID!, $data: UpdateUserInput!) {
-            updateUser(id: $userId, data: $data) {
+          mutation ($firstName: String, $lastName: String) {
+            updateUser(firstName: $firstName, lastName: $lastName) {
               id
               fullName
             }
           }
         `,
-        { userId: sessionUserGID, data: { firstName: "Bond,", lastName: "James Bond" } }
+        { firstName: "Bond,", lastName: "James Bond" }
       );
 
       expect(updateErrors).toBeUndefined();

@@ -1495,7 +1495,7 @@ type Mutation {
   """
   Updates the user with the provided data.
   """
-  updateUser(data: UpdateUserInput!, id: GID!): User!
+  updateUser(firstName: String, lastName: String): User!
 
   """
   Updates the name of a given user group
@@ -4445,11 +4445,6 @@ input UpdateTagInput {
 
 input UpdateUserGroupInput {
   name: String
-}
-
-input UpdateUserInput {
-  firstName: String
-  lastName: String
 }
 
 """

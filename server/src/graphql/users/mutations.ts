@@ -1,14 +1,5 @@
 import { differenceInMinutes } from "date-fns";
-import {
-  arg,
-  booleanArg,
-  enumType,
-  inputObjectType,
-  list,
-  mutationField,
-  nonNull,
-  stringArg,
-} from "nexus";
+import { arg, booleanArg, enumType, list, mutationField, nonNull, stringArg } from "nexus";
 import pMap from "p-map";
 import { difference, isDefined, zip } from "remeda";
 import { RESULT } from "..";
@@ -21,7 +12,6 @@ import { random } from "../../util/token";
 import { Maybe } from "../../util/types";
 import {
   and,
-  argIsContextUserId,
   authenticate,
   authenticateAnd,
   ifArgDefined,
@@ -50,25 +40,17 @@ import { contextUserHasRole, contextUserIsNotSso, userIsNotSSO } from "./authori
 export const updateUser = mutationField("updateUser", {
   type: "User",
   description: "Updates the user with the provided data.",
-  authorize: authenticateAnd(argIsContextUserId("id"), contextUserIsNotSso()),
+  authorize: authenticateAnd(contextUserIsNotSso()),
   args: {
-    id: nonNull(globalIdArg("User")),
-    data: nonNull(
-      inputObjectType({
-        name: "UpdateUserInput",
-        definition(t) {
-          t.string("firstName");
-          t.string("lastName");
-        },
-      }).asArg()
-    ),
+    firstName: stringArg(),
+    lastName: stringArg(),
   },
   validateArgs: validateAnd(
-    maxLength((args) => args.data.firstName, "data.firstName", 255),
-    maxLength((args) => args.data.lastName, "data.lastName", 255)
+    maxLength((args) => args.firstName, "data.firstName", 255),
+    maxLength((args) => args.lastName, "data.lastName", 255)
   ),
   resolve: async (_, args, ctx) => {
-    const { firstName, lastName } = args.data;
+    const { firstName, lastName } = args;
     await ctx.users.updateUserData(
       ctx.user!.user_data_id,
       removeNotDefined({

@@ -59,7 +59,7 @@ function Account() {
 
   function onSaveName({ firstName, lastName }: NameChangeFormData) {
     window.analytics?.identify(me.id, { firstName, lastName });
-    updateAccount({ variables: { id: me.id, data: { firstName, lastName } } });
+    updateAccount({ variables: { firstName, lastName } });
   }
 
   function handleLocaleChange(locale: string) {
@@ -186,8 +186,8 @@ Account.fragments = {
 
 Account.mutations = [
   gql`
-    mutation Account_updateAccount($id: GID!, $data: UpdateUserInput!) {
-      updateUser(id: $id, data: $data) {
+    mutation Account_updateAccount($firstName: String, $lastName: String) {
+      updateUser(firstName: $firstName, lastName: $lastName) {
         id
         firstName
         lastName

@@ -183,11 +183,6 @@ export interface NexusGenInputs {
     // input type
     name?: string | null; // String
   };
-  UpdateUserInput: {
-    // input type
-    firstName?: string | null; // String
-    lastName?: string | null; // String
-  };
   UserOrUserGroupPermissionInput: {
     // input type
     isSubscribed: boolean; // Boolean!
@@ -4186,8 +4181,8 @@ export interface NexusGenArgTypes {
     };
     updateUser: {
       // args
-      data: NexusGenInputs["UpdateUserInput"]; // UpdateUserInput!
-      id: NexusGenScalars["GID"]; // GID!
+      firstName?: string | null; // String
+      lastName?: string | null; // String
     };
     updateUserGroup: {
       // args

@@ -1384,8 +1384,8 @@ export interface MutationupdateTemplateDefaultPermissionsArgs {
 }
 
 export interface MutationupdateUserArgs {
-  data: UpdateUserInput;
-  id: Scalars["GID"];
+  firstName?: InputMaybe<Scalars["String"]>;
+  lastName?: InputMaybe<Scalars["String"]>;
 }
 
 export interface MutationupdateUserGroupArgs {
@@ -3265,11 +3265,6 @@ export interface UpdateTagInput {
 
 export interface UpdateUserGroupInput {
   name?: InputMaybe<Scalars["String"]>;
-}
-
-export interface UpdateUserInput {
-  firstName?: InputMaybe<Scalars["String"]>;
-  lastName?: InputMaybe<Scalars["String"]>;
 }
 
 /** A user in the system. */
@@ -17027,8 +17022,8 @@ export type Account_UserFragment = {
 };
 
 export type Account_updateAccountMutationVariables = Exact<{
-  id: Scalars["GID"];
-  data: UpdateUserInput;
+  firstName?: InputMaybe<Scalars["String"]>;
+  lastName?: InputMaybe<Scalars["String"]>;
 }>;
 
 export type Account_updateAccountMutation = {
@@ -24763,8 +24758,8 @@ export const NewPetition_templateDocument = gql`
   ${TemplateDetailsModal_PetitionTemplateFragmentDoc}
 ` as unknown as DocumentNode<NewPetition_templateQuery, NewPetition_templateQueryVariables>;
 export const Account_updateAccountDocument = gql`
-  mutation Account_updateAccount($id: GID!, $data: UpdateUserInput!) {
-    updateUser(id: $id, data: $data) {
+  mutation Account_updateAccount($firstName: String, $lastName: String) {
+    updateUser(firstName: $firstName, lastName: $lastName) {
       id
       firstName
       lastName
