@@ -245,7 +245,14 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
 
   const rsProps = useRecipientViewReactSelectProps({
     id: `reply-${field.id}-${reply?.id ? `${reply.id}-${level}` : "new"}`,
-    isDisabled: isDisabled || reply?.status === "APPROVED",
+    isDisabled:
+      (isDisabled ||
+        reply?.status === "APPROVED" ||
+        // if the user modified the labels on the field settings
+        // and the recipient tries to update an option with outdated labels, backend will throw error.
+        // so we disable the outdated selectors to avoid throwing error
+        (reply && reply.content.value[level][0] !== field.options.labels[level])) ??
+      false,
     isInvalid: reply?.status === "REJECTED",
   });
 
@@ -280,14 +287,8 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
     setIsSaving(false);
   }
 
-  // if the user modified the labels on the field settings
-  // and the recipient tries to update an option with outdated labels, backend will throw error.
-  // so we disable the outdated selectors to avoid throwing error
-  const labelsAreOutdated =
-    (reply && reply.content.value[level][0] !== field.options.labels[level]) ?? false;
-
   return (
-    <FormControl id={rsProps.inputId} isDisabled={labelsAreOutdated}>
+    <FormControl id={rsProps.inputId} isDisabled={isDisabled}>
       <FormLabel>{label}</FormLabel>
       <Flex alignItems="center">
         <Box flex="1" position="relative">
@@ -300,7 +301,6 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
             placeholder={
               <FormattedMessage id="generic.select-an-option" defaultMessage="Select an option" />
             }
-            isDisabled={labelsAreOutdated}
           />
           {reply && value && (
             <Center height="100%" position="absolute" right="42px" top={0}>
