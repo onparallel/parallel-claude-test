@@ -65,7 +65,7 @@ export class UserRepository extends BaseRepository {
       async (ids) => {
         const users = await this.from("user")
           .whereIn("org_id", uniq(ids.map((x) => x.orgId)))
-          .whereIn("external_idd", uniq(ids.map((x) => x.externalId)))
+          .whereIn("external_id", uniq(ids.map((x) => x.externalId)))
           .whereNull("deleted_at");
 
         const byId = indexBy(users, keyBuilder(["org_id", "external_id"]));
