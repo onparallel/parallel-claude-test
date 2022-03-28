@@ -1,7 +1,7 @@
 #! /bin/bash
 
 nodejs_version="16"
-nginx_version="nginx-1.20.1"
+nginx_version="1.20.1"
 
 echo "Adding public keys"
 cat authorized_keys >> .ssh/authorized_keys
@@ -18,17 +18,19 @@ yum install -y \
     zlib-devel \
     openssl-devel \
     perl-ExtUtils-Embed \
+    ghostscript \
 
 echo "Installing node.js"
 curl -sL https://rpm.nodesource.com/setup_${nodejs_version}.x | bash -
+
 echo "Installing yarn"
 curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo
 yum -y install yarn
 
 echo "Installing nginx"
-curl -O https://nginx.org/download/${nginx_version}.tar.gz
-tar -xvf ${nginx_version}.tar.gz 
-pushd ${nginx_version}
+curl -O https://nginx.org/download/nginx-${nginx_version}.tar.gz
+tar -xvf nginx-${nginx_version}.tar.gz 
+pushd nginx-${nginx_version}
 ./configure \
     --prefix=/usr/share/nginx \
     --sbin-path=/usr/sbin/nginx \
@@ -90,4 +92,5 @@ systemctl daemon-reload
 systemctl enable nginx.service 
 systemctl start nginx.service
 
+echo "Installing Google Chrome"
 bash install-google-chrome.sh
