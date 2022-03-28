@@ -4,7 +4,7 @@ The server image is built by copying all files inside `ops/prod/image` in a vani
 
 ```
 cd ops/prod/image
-scp * ec2-user@[INSTANCE_IP]:~
+scp -i ~/.ssh/ops.pem * ec2-user@[INSTANCE_IP]:~
 ssh ec2-user@[INSTANCE_IP]
 sudo bash build.sh
 ```
