@@ -58,48 +58,42 @@ export const User = objectType({
     t.boolean("isSsoUser", {
       resolve: async (o, _, ctx) => {
         const userData = await ctx.users.loadUserData(o.user_data_id);
-        if (!userData) throw new Error(`UserData:${o.user_data_id} not found for User:${o.id}`);
-        return userData?.is_sso_user ?? false;
+        return userData!.is_sso_user ?? false;
       },
     });
     t.string("email", {
       description: "The email of the user.",
       resolve: async (o, _, ctx) => {
         const userData = await ctx.users.loadUserData(o.user_data_id);
-        if (!userData) throw new Error(`UserData:${o.user_data_id} not found for User:${o.id}`);
-        return userData.email;
+        return userData!.email;
       },
     });
     t.nullable.string("firstName", {
       description: "The first name of the user.",
       resolve: async (o, _, ctx) => {
         const userData = await ctx.users.loadUserData(o.user_data_id);
-        if (!userData) throw new Error(`UserData:${o.user_data_id} not found for User:${o.id}`);
-        return userData.first_name;
+        return userData!.first_name;
       },
     });
     t.nullable.string("lastName", {
       description: "The last name of the user.",
       resolve: async (o, _, ctx) => {
         const userData = await ctx.users.loadUserData(o.user_data_id);
-        if (!userData) throw new Error(`UserData:${o.user_data_id} not found for User:${o.id}`);
-        return userData.last_name;
+        return userData!.last_name;
       },
     });
     t.nullable.string("fullName", {
       description: "The full name of the user.",
       resolve: async (o, _, ctx) => {
         const userData = await ctx.users.loadUserData(o.user_data_id);
-        if (!userData) throw new Error(`UserData:${o.user_data_id} not found for User:${o.id}`);
-        return fullName(userData.first_name, userData.last_name);
+        return fullName(userData!.first_name, userData!.last_name);
       },
     });
     t.nullable.string("initials", {
       description: "The initials of the user.",
       resolve: async (o, _, ctx) => {
-        const userData = await ctx.users.loadUserData(o.user_data_id);
-        if (!userData) throw new Error(`UserData:${o.user_data_id} not found for User:${o.id}`);
-        return getInitials(fullName(userData.first_name, userData.last_name));
+        const userData = (await ctx.users.loadUserData(o.user_data_id))!;
+        return getInitials(fullName(userData!.first_name, userData!.last_name));
       },
     });
     t.field("organization", {
@@ -179,8 +173,7 @@ export const User = objectType({
     t.nullable.string("preferredLocale", {
       resolve: async (o, _, ctx) => {
         const userData = await ctx.users.loadUserData(o.user_data_id);
-        if (!userData) throw new Error(`UserData:${o.user_data_id} not found for User:${o.id}`);
-        return userData.details?.preferredLocale ?? null;
+        return userData!.details?.preferredLocale ?? null;
       },
     });
     t.list.field("userGroups", {
