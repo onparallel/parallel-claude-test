@@ -105,7 +105,7 @@ export const ContactSelect = Object.assign(
         const contact = await onCreateContact({ defaultEmail: email });
         if (isMulti) {
           onChange([
-            ...((value as ContactSelectSelection[]) ?? []).filter((v) => v.id !== email),
+            ...((value ?? []) as ContactSelectSelection[]).filter((v) => v.id !== email),
             pick(contact, ["id", "email", "firstName", "lastName", "fullName", "hasBouncedEmail"]),
           ] as any);
         } else {
@@ -150,7 +150,7 @@ export const ContactSelect = Object.assign(
           if (EMAIL_REGEX.test(cleaned)) {
             const option = options?.find((o) => o.email === cleaned);
             if (option) {
-              onChange([...(value as ContactSelectSelection[]), option] as any);
+              onChange([...((value ?? []) as ContactSelectSelection[]), option] as any);
               setInputValue("");
               setOptions(undefined);
             } else {
