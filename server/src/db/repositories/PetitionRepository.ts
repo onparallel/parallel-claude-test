@@ -4270,10 +4270,24 @@ export class PetitionRepository extends BaseRepository {
         t
       );
 
-      // TODO also manage deleted_at entries!!
       const [accesses, fields] = await Promise.all([
         this.loadAccessesForPetition(petitionId, { cache: false }),
         this.loadFieldsForPetition(petitionId, { cache: false }),
+      ]);
+
+      const [replies, comments] = await Promise.all([
+        this.loadRepliesForField(
+          fields.map((f) => f.id),
+          { cache: false }
+        ),
+        this.loadPetitionFieldCommentsForField(
+          fields.map((f) => ({
+            petitionFieldId: f.id,
+            loadInternalComments: true,
+            petitionId: petitionId,
+          })),
+          { cache: false }
+        ),
       ]);
 
       const [messages, reminders] = await Promise.all([
@@ -4282,14 +4296,8 @@ export class PetitionRepository extends BaseRepository {
           accesses.map((a) => a.id),
           t
         ),
-        this.anonymizePetitionFieldReplies(
-          fields.map((f) => f.id),
-          t
-        ),
-        this.anonymizePetitionFieldComments(
-          fields.map((f) => f.id),
-          t
-        ),
+        this.anonymizePetitionFieldReplies(replies.flat(), t),
+        this.anonymizePetitionFieldComments(comments.flat(), t),
         this.deactivateAccesses(
           petitionId,
           accesses.map((a) => a.id),
@@ -4313,50 +4321,55 @@ export class PetitionRepository extends BaseRepository {
     });
   }
 
-  private async anonymizePetitionFieldReplies(
-    petitionFieldIds: MaybeArray<number>,
-    t: Knex.Transaction
+  async anonymizePetitionFieldReplies(
+    replies: MaybeArray<PetitionFieldReply>,
+    t?: Knex.Transaction
   ) {
-    const ids = unMaybeArray(petitionFieldIds);
-    if (ids.length === 0) return;
+    const repliesArray = unMaybeArray(replies);
+    if (repliesArray.length === 0) return;
 
-    const replies = (await this.loadRepliesForField(ids, { cache: false })).flat();
-    const fileUploadIds = replies
+    const fileUploadIds = repliesArray
       .filter((r) => r.type === "FILE_UPLOAD")
       .map((r) => r.content.file_upload_id as number);
 
-    await this.raw(
-      /* sql */ `
-      update petition_field_reply pfr
-      set anonymized_at = NOW(),
-      content = case pfr.type
+    await this.from("petition_field_reply", t)
+      .whereIn(
+        "id",
+        repliesArray.map((r) => r.id)
+      )
+      .update({
+        anonymized_at: this.now(),
+        content: this.knex.raw(/* sql */ `
+          case "type"
             when 'FILE_UPLOAD' then
             content || '{"file_upload_id": null}'::jsonb
             else 
               content || '{"value": null}'::jsonb
             end
-      where petition_field_id in ?
-    `,
-      [this.sqlIn(ids)],
-      t
-    );
+        `),
+      });
 
     await this.safeDeleteFileUpload(fileUploadIds, undefined, t);
 
-    ids.forEach((id) => this.loadRepliesForField.dataloader.clear(id));
+    repliesArray.forEach(({ id }) => this.loadRepliesForField.dataloader.clear(id));
   }
 
-  private async anonymizePetitionFieldComments(
-    petitionFieldIds: MaybeArray<number>,
-    t: Knex.Transaction
+  async anonymizePetitionFieldComments(
+    comments: MaybeArray<PetitionFieldComment>,
+    t?: Knex.Transaction
   ) {
-    const ids = unMaybeArray(petitionFieldIds);
-    if (ids.length === 0) return;
+    const commentsArray = unMaybeArray(comments);
+    if (commentsArray.length === 0) return;
 
-    await this.from("petition_field_comment", t).whereIn("petition_field_id", ids).update({
-      anonymized_at: this.now(),
-      content: "", // TODO make null instead of empty string
-    });
+    await this.from("petition_field_comment", t)
+      .whereIn(
+        "id",
+        commentsArray.map((c) => c.id)
+      )
+      .update({
+        anonymized_at: this.now(),
+        content: "", // TODO make null instead of empty string
+      });
   }
 
   private async anonymizePetitionMessages(petitionId: number, t: Knex.Transaction) {
@@ -4423,5 +4436,16 @@ export class PetitionRepository extends BaseRepository {
       .map((s) => s.file_upload_id!);
 
     await this.safeDeleteFileUpload(fileUploadIds, undefined, t);
+  }
+
+  async getDeletedFrom<TName extends keyof TableTypes>(table: TName, days = 30) {
+    return await this.from(table)
+      .whereRaw(
+        /* sql */ `
+      "deleted_at" < NOW() - '? days'::interval
+    `,
+        [days]
+      )
+      .select("*");
   }
 }

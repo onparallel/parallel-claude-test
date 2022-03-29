@@ -12,6 +12,7 @@ if [[ "$COMMAND" == "start" ]]; then
   sudo systemctl ${COMMAND} parallel-scheduled-trigger-cron.service
   sudo systemctl ${COMMAND} parallel-petition-notifications-cron.service
   sudo systemctl ${COMMAND} parallel-organization-limits-cron.service
+  sudo systemctl ${COMMAND} parallel-petition-anonymizer-cron.service
 else
   sudo systemctl ${COMMAND} parallel-*-{cron,queue}.service
 fi

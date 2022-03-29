@@ -30,6 +30,7 @@
     "worker:tasks": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/task-worker.ts",
     "worker:petition-notifications": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/petition-notifications.ts",
     "worker:organization-limits": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/organization-limits.ts",
+    "worker:petition-anonymizer": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/petition-anonymizer.ts",
     "localtunnel": "cross-env DEBUG=* ts-node ./bin/launch-localtunnel.ts",
     "storybook": "concurrently \"ts-node-dev --watch ./stories.tsx --ignore-watch ./src --files ./stories.tsx --transpile-only --respawn\" \"start-storybook --port 60000 --quiet\"",
     "postinstall": "cd .. && yarn patch-package",

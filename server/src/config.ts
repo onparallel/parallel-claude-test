@@ -94,6 +94,10 @@ export function buildConfig() {
       "organization-limits": {
         rule: process.env.WORKERS_ORGANIZATION_LIMITS_RULE!,
       },
+      "petition-anonymizer": {
+        rule: process.env.WORKERS_PETITION_ANONYMIZER_RULE!,
+        anonymizeAfterDays: parseInt(process.env.WORKERS_PETITION_ANONYMIZER_AFTER_DAYS!),
+      },
     },
     logs: {
       groupName: process.env.LOGS_GROUP_NAME!,

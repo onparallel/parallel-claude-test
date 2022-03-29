@@ -85,7 +85,6 @@ export class MockEmailsService implements IEmailsService {
 
 @injectable()
 export class MockAwsService implements IAws {
-  constructor(private readonly storage = new MockStorage()) {}
   async getUser() {
     return {} as any;
   }
@@ -102,13 +101,13 @@ export class MockAwsService implements IAws {
     return "";
   }
   @Memoize() public get fileUploads() {
-    return this.storage;
+    return new MockStorage();
   }
   @Memoize() public get publicFiles() {
-    return this.storage;
+    return new MockStorage();
   }
   @Memoize() public get temporaryFiles() {
-    return this.storage;
+    return new MockStorage();
   }
 }
 
