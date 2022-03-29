@@ -3745,7 +3745,6 @@ type Query {
     status: OrganizationStatus
   ): OrganizationPagination!
   petition(id: GID!): PetitionBase
-  petitionAuthToken(token: String!): Petition
   petitionEvents(
     """
     Filter events that happened before the specified event id

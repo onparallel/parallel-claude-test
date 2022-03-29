@@ -1,4 +1,4 @@
-import { promises as fs } from "fs";
+import { createWriteStream, promises as fs } from "fs";
 import { tmpdir } from "os";
 import { resolve } from "path";
 import { URLSearchParams } from "url";
@@ -50,6 +50,7 @@ async function startSignatureProcess(
   );
 
   try {
+    const owner = await ctx.petitions.loadPetitionOwner(petition.id);
     const signatureIntegration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
     const settings = signatureIntegration.settings as IntegrationSettings<"SIGNATURE">;
     const recipients = signersInfo.map((signer) => ({
@@ -57,18 +58,16 @@ async function startSignatureProcess(
       email: signer.email,
     }));
 
-    const token = ctx.security.generateAuthToken({
+    const stream = await ctx.printer.petitionExport(owner!.id, {
       petitionId: petition.id,
-      showSignatureBoxes: true,
       documentTitle: title,
+      showSignatureBoxes: true,
     });
 
-    await ctx.printer.pdf(
-      `http://localhost:3000/${petition.locale}/print/petition-pdf?${new URLSearchParams({
-        token,
-      })}`,
-      tmpPdfPath
-    );
+    // TODO check this works
+    await new Promise((resolve, reject) => {
+      stream.pipe(createWriteStream(tmpPdfPath)).on("error", reject).on("close", resolve);
+    });
 
     const signatureClient = ctx.signature.getClient(signatureIntegration);
 

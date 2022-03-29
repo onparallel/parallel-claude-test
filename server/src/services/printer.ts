@@ -1,26 +1,44 @@
-import { injectable } from "inversify";
-import { chromium } from "playwright";
+import { GraphQLClient } from "graphql-request";
+import { inject, injectable } from "inversify";
+import { PetitionRepository } from "../db/repositories/PetitionRepository";
+import { buildPdf } from "../pdf/buildPdf";
+import PetitionExport, { PetitionExportInitialData } from "../pdf/documents/PetitionExport";
+import { toGlobalId } from "../util/globalId";
+import { AUTH, IAuth } from "./auth";
 
 export interface IPrinter {
-  pdf(url: string, path?: string): Promise<Buffer>;
+  petitionExport(
+    userId: number,
+    data: Omit<PetitionExportInitialData, "petitionId"> & { petitionId: number }
+  ): Promise<NodeJS.ReadableStream>;
 }
 
 export const PRINTER = Symbol.for("PRINTER");
 
 @injectable()
 export class Printer implements IPrinter {
-  public async pdf(url: string, path?: string): Promise<Buffer> {
-    const browser = await chromium.launch({ headless: true });
-    const context = await browser.newContext();
-    const page = await context.newPage();
-    await page.goto(url, { waitUntil: "load" });
-    const buffer = await page.pdf({
-      format: "A4",
-      printBackground: true,
-      displayHeaderFooter: false,
-      path,
+  constructor(@inject(AUTH) private auth: IAuth, private petitions: PetitionRepository) {}
+
+  private createClient(token: string) {
+    return new GraphQLClient("http://localhost/graphql", {
+      headers: { authorization: `Bearer ${token}` },
     });
-    await browser.close();
-    return buffer;
+  }
+
+  public async petitionExport(
+    userId: number,
+    { petitionId, ...data }: Omit<PetitionExportInitialData, "petitionId"> & { petitionId: number }
+  ) {
+    const petition = await this.petitions.loadPetition(petitionId);
+    if (!petition) {
+      throw new Error("Petition not available");
+    }
+    const token = await this.auth.generateTempAuthToken(userId);
+    const client = this.createClient(token);
+    return await buildPdf(
+      PetitionExport,
+      { ...data, petitionId: toGlobalId("Petition", petitionId) },
+      { client, locale: petition.locale }
+    );
   }
 }

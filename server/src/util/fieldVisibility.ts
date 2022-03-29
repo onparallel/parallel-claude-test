@@ -37,7 +37,7 @@ export interface PetitionFieldVisibilityCondition {
 }
 
 type VisibilityField = {
-  id: number;
+  id: number | string;
   type: PetitionFieldType;
   options: any;
   visibility: PetitionFieldVisibility | null;
@@ -154,16 +154,11 @@ export function evaluateFieldVisibility<T extends VisibilityField>(fields: T[]):
   const visibilitiesById: { [fieldId: string]: boolean } = {};
   for (const field of fields) {
     if (field.visibility) {
-      const v = field.visibility as PetitionFieldVisibility;
-      const result =
-        v.operator === "OR"
-          ? v.conditions.some((c) =>
-              conditionIsMet(c, fieldsById[c.fieldId], visibilitiesById[c.fieldId])
-            )
-          : v.conditions.every((c) =>
-              conditionIsMet(c, fieldsById[c.fieldId], visibilitiesById[c.fieldId])
-            );
-      visibilitiesById[field.id] = v.type === "SHOW" ? result : !result;
+      const { conditions, operator, type } = field.visibility as PetitionFieldVisibility;
+      const result = conditions[operator === "OR" ? "some" : "every"]((c) =>
+        conditionIsMet(c, fieldsById[c.fieldId], visibilitiesById[c.fieldId])
+      );
+      visibilitiesById[field.id] = type === "SHOW" ? result : !result;
     } else {
       visibilitiesById[field.id] = true;
     }

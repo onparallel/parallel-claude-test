@@ -1,9 +1,37 @@
 schema:
   - parallel-schema.graphql
-documents:
-  - "src/api/public/**/*.ts"
 generates:
   ./src/api/public/__types.ts:
+    documents:
+      - "src/api/public/**/*.{tsx,ts}"
+    plugins:
+      - typescript
+      - typescript-operations
+      - typed-document-node
+    config:
+      strictScalars: true
+      scalars:
+        DateTime: string
+        JSON: any
+        JSONObject: "{ [key: string]: any }"
+        Upload: any
+        GID: string
+      skipTypename: true
+      avoidOptionals:
+        field: true
+        inputValue: false
+        object: false
+        defaultValue: false
+      namingConvention: keep
+      exportFragmentSpreadSubTypes: true
+      preResolveTypes: true
+      maybeValue: T | null
+      enumsAsTypes: true
+      addDocBlocks: false
+      documentMode: graphQLTag
+  ./src/pdf/__types.ts:
+    documents:
+      - "src/pdf/**/*.{tsx,ts}"
     plugins:
       - typescript
       - typescript-operations

@@ -200,19 +200,6 @@ export const templatesQuery = queryField((t) => {
   });
 });
 
-export const petitionAuthToken = queryField("petitionAuthToken", {
-  type: nullable("Petition"),
-  args: {
-    token: nonNull(stringArg()),
-  },
-  authorize: (_, { token }, ctx) => ctx.security.verifyAuthToken(token),
-  validateArgs: validateAuthTokenPayload((args) => args.token, "petitionId", "token"),
-  resolve: async (_, { token }, ctx) => {
-    const payload: any = decode(token);
-    return await ctx.petitions.loadPetition(payload.petitionId);
-  },
-});
-
 export const getSlugForPublicPetitionLink = queryField("getSlugForPublicPetitionLink", {
   type: "String",
   args: {

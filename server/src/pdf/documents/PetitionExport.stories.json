@@ -10,25 +10,12 @@
       },
       "args": {
         "documentTitle": "Título del documento",
-        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
-        "theme": {
-          "marginHorizontal": 25.4,
-          "marginVertical": 25.4,
-          "title1FontFamily": "Roboto",
-          "title1Color": "#333333",
-          "title1FontSize": 16,
-          "title2FontFamily": "Roboto",
-          "title2Color": "#333333",
-          "title2FontSize": 14,
-          "textFontFamily": "Roboto",
-          "textColor": "#333333",
-          "textFontSize": 12
-        }
+        "showSignatureBoxes": true
       },
       "argTypes": {
+        "petitionId": { "control": { "type": "text" } },
         "documentTitle": { "control": { "type": "text" } },
-        "logoUrl": { "control": { "type": "text" } },
-        "theme": { "control": { "type": "object" } }
+        "showSignatureBoxes": { "control": { "type": "bool" } }
       }
     }
   ]

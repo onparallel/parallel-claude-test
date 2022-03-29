@@ -1596,7 +1596,6 @@ export interface NexusGenFieldTypes {
     organization: NexusGenRootTypes["Organization"] | null; // Organization
     organizations: NexusGenRootTypes["OrganizationPagination"]; // OrganizationPagination!
     petition: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
-    petitionAuthToken: NexusGenRootTypes["Petition"] | null; // Petition
     petitionEvents: NexusGenRootTypes["PetitionEvent"][]; // [PetitionEvent!]!
     petitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
@@ -3011,7 +3010,6 @@ export interface NexusGenFieldTypeNames {
     organization: "Organization";
     organizations: "OrganizationPagination";
     petition: "PetitionBase";
-    petitionAuthToken: "Petition";
     petitionEvents: "PetitionEvent";
     petitionField: "PetitionField";
     petitions: "PetitionBasePagination";
@@ -4343,10 +4341,6 @@ export interface NexusGenArgTypes {
     petition: {
       // args
       id: NexusGenScalars["GID"]; // GID!
-    };
-    petitionAuthToken: {
-      // args
-      token: string; // String!
     };
     petitionEvents: {
       // args

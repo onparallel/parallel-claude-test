@@ -1,6 +1,6 @@
-import { IncomingMessage } from "http";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
+import { isDefined } from "remeda";
 import { hash, random } from "../../util/token";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
@@ -12,22 +12,10 @@ export class UserAuthenticationRepository extends BaseRepository {
     super(knex);
   }
 
-  private getApiKeyFromRequest(req: IncomingMessage): string | null {
-    const authorization = req.headers.authorization;
-    if (authorization?.startsWith("Bearer ")) {
-      return authorization.replace(/^Bearer /, "");
-    }
-    return null;
-  }
-
-  async validateApiKey(req: IncomingMessage) {
-    const apiKey = this.getApiKeyFromRequest(req);
-    if (!apiKey) {
-      return null;
-    }
-    const tokenHash = await hash(apiKey, "");
+  async getUserFromUat(token: string) {
+    const tokenHash = await hash(token, "");
     return await this.withTransaction(async (t) => {
-      const [token] = await this.from("user_authentication_token", t)
+      const [uat] = await this.from("user_authentication_token", t)
         .where({
           deleted_at: null,
           token_hash: tokenHash,
@@ -35,10 +23,10 @@ export class UserAuthenticationRepository extends BaseRepository {
         .update({ last_used_at: this.now() })
         .returning("*");
 
-      if (!token) return null;
+      if (!uat) return null;
 
       const [user] = await this.from("user", t)
-        .where({ deleted_at: null, id: token.user_id })
+        .where({ deleted_at: null, id: uat.user_id })
         .select();
 
       if (!user) {
@@ -46,10 +34,10 @@ export class UserAuthenticationRepository extends BaseRepository {
         return null;
       }
 
-      if (!token.token_hint) {
+      if (!isDefined(uat.token_hint)) {
         await this.from("user_authentication_token", t)
-          .where("id", token.id)
-          .update({ token_hint: apiKey.slice(0, 5) });
+          .where("id", uat.id)
+          .update({ token_hint: token.slice(0, 5) });
       }
 
       return user;

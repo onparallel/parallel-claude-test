@@ -7,12 +7,13 @@ import { parse as parseCookie } from "cookie";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { IncomingMessage } from "http";
 import { inject, injectable } from "inversify";
-import { decode } from "jsonwebtoken";
+import { decode, sign, verify, VerifyOptions, JwtPayload, Secret, SignOptions } from "jsonwebtoken";
 import fetch from "node-fetch";
 import { isDefined, pick } from "remeda";
 import { getClientIp } from "request-ip";
 import { Memoize } from "typescript-memoize";
 import { URL, URLSearchParams } from "url";
+import { promisify } from "util";
 import { CONFIG, Config } from "../config";
 import {
   IntegrationRepository,
@@ -20,10 +21,12 @@ import {
 } from "../db/repositories/IntegrationRepository";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { SystemRepository } from "../db/repositories/SystemRepository";
+import { UserAuthenticationRepository } from "../db/repositories/UserAuthenticationRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
 import { User } from "../db/__types";
 import { withError } from "../util/promises/withError";
 import { random } from "../util/token";
+import { MaybePromise } from "../util/types";
 import { Aws, AWS_SERVICE } from "./aws";
 import { IRedis, REDIS } from "./redis";
 
@@ -35,7 +38,8 @@ export interface IAuth {
   newPassword: RequestHandler;
   forgotPassword: RequestHandler;
   confirmForgotPassword: RequestHandler;
-  validateSession(req: IncomingMessage): Promise<User | null>;
+  validateRequestAuthentication(req: IncomingMessage): Promise<User | null>;
+  generateTempAuthToken(userId: number): MaybePromise<string>;
 }
 
 export const AUTH = Symbol.for("AUTH");
@@ -61,6 +65,7 @@ export class Auth implements IAuth {
     private orgs: OrganizationRepository,
     private integrations: IntegrationRepository,
     private users: UserRepository,
+    private userAuthentication: UserAuthenticationRepository,
     private system: SystemRepository
   ) {}
 
@@ -511,14 +516,30 @@ export class Auth implements IAuth {
       .promise();
   }
 
-  private getTokenFromRequest(req: IncomingMessage): string | null {
+  async validateRequestAuthentication(req: IncomingMessage) {
+    return (
+      (await this.validateSession(req)) ??
+      (await this.validateTempAuthToken(req)) ??
+      (await this.validateUserAuthToken(req))
+    );
+  }
+
+  private getSessionToken(req: IncomingMessage): string | null {
     const cookies = parseCookie(req.headers.cookie ?? "");
     return cookies["parallel_session"] ?? null;
   }
 
-  async validateSession(req: IncomingMessage) {
+  private getBearerToken(req: IncomingMessage): string | null {
+    const authorization = req.headers.authorization;
+    if (authorization?.startsWith("Bearer ")) {
+      return authorization.replace(/^Bearer /, "");
+    }
+    return null;
+  }
+
+  private async validateSession(req: IncomingMessage) {
     try {
-      const token = this.getTokenFromRequest(req);
+      const token = this.getSessionToken(req);
       if (!token) {
         return null;
       }
@@ -549,8 +570,48 @@ export class Auth implements IAuth {
     }
   }
 
+  async validateUserAuthToken(req: IncomingMessage) {
+    const token = this.getBearerToken(req);
+    if (!token) {
+      return null;
+    }
+    return await this.userAuthentication.getUserFromUat(token);
+  }
+
+  async generateTempAuthToken(userId: number) {
+    return await promisify<{ userId: number }, Secret, SignOptions, string>(sign)(
+      { userId },
+      this.config.security.jwtSecret,
+      {
+        expiresIn: 30,
+        issuer: "parallel-server",
+        algorithm: "HS256",
+      }
+    );
+  }
+
+  async validateTempAuthToken(req: IncomingMessage) {
+    const token = this.getBearerToken(req);
+    if (!token || !token.includes(".")) {
+      return null;
+    }
+    try {
+      const { userId } = await promisify<string, string, VerifyOptions, JwtPayload>(verify)(
+        token,
+        this.config.security.jwtSecret,
+        {
+          algorithms: ["HS256"],
+          issuer: "parallel-server",
+        }
+      );
+      return await this.users.loadUser(userId);
+    } catch {
+      return null;
+    }
+  }
+
   async changePassword(req: IncomingMessage, password: string, newPassword: string) {
-    const token = this.getTokenFromRequest(req);
+    const token = this.getSessionToken(req);
     const accessToken = await this.redis.get(`session:${token}:accessToken`);
     await this.cognito
       .changePassword({

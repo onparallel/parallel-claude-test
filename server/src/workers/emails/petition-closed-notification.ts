@@ -1,3 +1,4 @@
+import { Readable } from "stream";
 import { URLSearchParams } from "url";
 import { WorkerContext } from "../../context";
 import { EmailLog } from "../../db/__types";
@@ -72,25 +73,22 @@ export async function petitionClosedNotification(
     });
 
     if (payload.attach_pdf_export) {
-      const token = context.security.generateAuthToken({
+      const owner = await context.petitions.loadPetitionOwner(petition.id);
+      const stream = await context.printer.petitionExport(owner!.id, {
         petitionId: petition.id,
-        documentTitle: payload.pdf_export_title,
+        documentTitle: payload.pdf_export_title ?? "",
+        showSignatureBoxes: false,
       });
-
-      const buffer = await context.printer.pdf(
-        `http://localhost:3000/${petition.locale}/print/petition-pdf?${new URLSearchParams({
-          token,
-        })}`
-      );
-
+      const readable = new Readable();
+      readable.wrap(stream);
       const path = random(16);
-      await context.aws.temporaryFiles.uploadFile(path, "application/pdf", buffer);
+      const res = await context.aws.temporaryFiles.uploadFile(path, "application/pdf", readable);
       const attachment = await context.files.createTemporaryFile(
         {
           path,
           content_type: "application/pdf",
           filename: sanitizeFilenameWithSuffix(payload.pdf_export_title ?? "parallel", ".pdf"),
-          size: buffer.byteLength.toString(),
+          size: res["ContentLength"]!.toString(),
         },
         `User:${sender.id}`
       );

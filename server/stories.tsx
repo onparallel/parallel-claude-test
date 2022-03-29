@@ -1,14 +1,17 @@
-import { renderToStream, Text } from "@react-pdf/renderer";
+import { Document, Page, renderToStream, Text, View } from "@react-pdf/renderer";
 import Convert from "ansi-to-html";
 import cors from "cors";
+import { config } from "dotenv";
 import escapeHTML from "escape-html";
 import express, { Request } from "express";
+import { GraphQLClient } from "graphql-request";
 import { createServer } from "livereload";
-import { render } from "mjml-react";
 import path from "path";
-import { createIntl, IntlProvider } from "react-intl";
-import { mapValues } from "remeda";
-import { loadMessages } from "./src/util/loadMessages";
+import { mapValues, pick } from "remeda";
+import { buildEmail } from "./src/emails/buildEmail";
+import { buildPdf } from "./src/pdf/buildPdf";
+
+config({ path: path.resolve(process.cwd(), ".development.env") });
 
 const app = express();
 app.use(cors());
@@ -60,36 +63,26 @@ app
       }
       const document = req.params.document;
       const locale = req.query.locale as string;
+      const client = new GraphQLClient("http://localhost/graphql", {
+        headers: { authorization: `Bearer ${process.env.ACCESS_TOKEN}` },
+      });
       const { default: Component } = await import(`./src/pdf/documents/${document}.tsx`);
       const params = await parseArgs(req, req.path.replace(/^\//, "").replace("/file.pdf", ""));
-      const messages = await loadMessages(locale);
-      const intlProps = {
-        messages,
-        locale,
-        defaultRichTextElements: {
-          b: (chunks: any) => <Text>{chunks}</Text>,
-        },
-      };
-      const stream = await renderToStream(
-        <IntlProvider {...intlProps}>
-          <Component {...params} />
-        </IntlProvider>
-      );
-      stream.pipe(res);
-    } catch (error: any) {
-      const convert = new Convert();
-      console.log(">>>>", error);
-      res.status(500).send(/* html */ `
-      <html>
-      <body>
-        <pre style="background-color: #333; color: #fff; max-width: 100vw; white-space: pre-wrap;">${convert.toHtml(
-          escapeHTML(error.toString()),
-          { bg: "#333", fg: "#fff" }
-        )}</pre> 
-        ${LR_SCRIPT}
-      </body>
-      </html>
-    `);
+      (await buildPdf(Component, params, { client, locale })).pipe(res);
+    } catch (error) {
+      if (error instanceof Error) {
+        (
+          await renderToStream(
+            <Document>
+              <Page>
+                <View>
+                  <Text>{error.toString()}</Text>
+                </View>
+              </Page>
+            </Document>
+          )
+        ).pipe(res);
+      }
     }
   });
 
@@ -101,53 +94,24 @@ app.get("/emails/components/:email", async (req, res, next) => {
         delete require.cache[entry];
       }
     }
-    const email = req.params.email;
+    const name = req.params.email;
     const locale = req.query.locale as string;
     const type = req.query.type as string;
-    const {
-      default: { html: Component, text, subject, from },
-    } = await import(`./src/emails/components/${email}.tsx`);
+    const { default: email } = await import(`./src/emails/components/${name}.tsx`);
     const params = await parseArgs(req, req.path.replace(/^\//, ""));
-    const messages = await loadMessages(locale);
-    const intlProps = {
-      messages,
-      locale,
-      defaultRichTextElements: {
-        b: (chunks: any) => <strong>{chunks}</strong>,
-      },
-    };
-    const intl = createIntl(intlProps);
+    const result = await buildEmail(email, params, { locale });
     if (type === "html") {
-      const { html } = render(
-        <IntlProvider {...intlProps}>
-          <Component {...params} />
-        </IntlProvider>,
-        {
-          keepComments: true,
-          minify: false,
-          validationLevel: "soft",
-        }
-      );
       res.send(
-        html
-          .replace(
-            /(<body[^>]*>)/,
-            /* html */ `$1${header({
-              subject: subject(params, intl),
-              from: from(params, intl),
-            })}`
-          )
+        result.html
+          .replace(/(<body[^>]*>)/, /* html */ `$1${header(pick(result, ["subject", "from"]))}`)
           .replace(/<\/body>/, LR_SCRIPT + "\n</body>")
       );
     } else {
       res.send(/* html */ `
         <html>
         <body>
-          ${header({
-            subject: subject(params, intl),
-            from: from(params, intl),
-          })}
-          <pre>${text(params, intl)}</pre>
+          ${header(pick(result, ["subject", "from"]))}
+          <pre>${result.text}</pre>
           ${LR_SCRIPT}
         </body>
         </html>

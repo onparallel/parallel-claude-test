@@ -43,14 +43,12 @@ export const metadata = queryField("metadata", {
       data.country = geo?.country ?? null;
     }
     const userAgent = ctx.req.headers["user-agent"];
-    console.log(userAgent);
     if (isDefined(userAgent)) {
       const ua = new UAParser(userAgent);
       const browser = ua.getBrowser();
       data.browserName = browser.name;
       data.browserVersion = browser.version;
     }
-    console.log(data);
     return data;
   },
 });

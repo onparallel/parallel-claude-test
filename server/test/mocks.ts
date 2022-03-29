@@ -17,7 +17,10 @@ export const USER_COGNITO_ID = "test-cognito-id";
 @injectable()
 export class MockAuth implements IAuth {
   constructor(private users: UserRepository) {}
-  async validateSession(req: IncomingMessage) {
+  generateTempAuthToken(userId: number) {
+    return `userId:${userId}`;
+  }
+  async validateRequestAuthentication(req: IncomingMessage) {
     if (req.headers.authorization?.startsWith("Bearer ")) {
       /*
         if an apiKey is set in headers, return null 

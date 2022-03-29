@@ -1,4 +1,5 @@
 import { EventEmitter } from "events";
+import { createReadStream } from "fs";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import "reflect-metadata";

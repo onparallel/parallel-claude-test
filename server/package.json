@@ -4,7 +4,7 @@
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "dev": "cross-env NODE_ENV=development ts-node-dev --ignore-watch graphql/__types.ts --no-notify --transpile-only --respawn ./src",
+    "dev": "cross-env NODE_ENV=development ts-node-dev --ignore-watch \"(graphql/__types.ts|src/(emails|pdf))\" --no-notify --transpile-only --respawn ./src",
     "debug": "cross-env NODE_ENV=development ts-node-dev --inspect --ignore-watch graphql/__types.ts --no-notify --transpile-only --respawn ./src",
     "build": "tsc --project tsconfig.prod.json",
     "prebuild": "yarn generate-i18n-files",
@@ -30,7 +30,7 @@
     "worker:petition-notifications": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/petition-notifications.ts",
     "worker:organization-limits": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/organization-limits.ts",
     "localtunnel": "cross-env DEBUG=* ts-node ./bin/launch-localtunnel.ts",
-    "storybook": "concurrently \"ts-node-dev --watch ./stories.tsx --ignore-watch ./src --files ./stories.tsx --respawn\" \"start-storybook --port 60000 --quiet\"",
+    "storybook": "concurrently \"ts-node-dev --watch ./stories.tsx --ignore-watch ./src --files ./stories.tsx --transpile-only --respawn\" \"start-storybook --port 60000 --quiet\"",
     "postinstall": "cd .. && yarn patch-package",
     "generate-graphql-types": "graphql-codegen",
     "run-ts-script": "ts-node --project tsconfig.json --transpile-only",
