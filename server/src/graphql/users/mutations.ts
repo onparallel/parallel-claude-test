@@ -33,6 +33,7 @@ import { validIsDefined } from "../helpers/validators/validIsDefined";
 import { validLocale } from "../helpers/validators/validLocale";
 import { validPassword } from "../helpers/validators/validPassword";
 import { orgCanCreateNewUser, orgDoesNotHaveSsoProvider } from "../organization/authorizers";
+import { userHasFeatureFlag } from "../petition/authorizers";
 import { argUserHasActiveStatus, userHasAccessToUsers } from "../petition/mutations/authorizers";
 import { userHasAccessToUserGroups } from "../user-group/authorizers";
 import { contextUserHasRole, contextUserIsNotSso, userIsNotSSO } from "./authorizers";
@@ -606,6 +607,7 @@ export const resetTemporaryPassword = mutationField("resetTemporaryPassword", {
     return RESULT.SUCCESS;
   },
 });
+
 export const setUserPreferredLocale = mutationField("setUserPreferredLocale", {
   description:
     "Sets the locale passed as arg as the preferred language of the user to see the page",
@@ -628,5 +630,36 @@ export const setUserPreferredLocale = mutationField("setUserPreferredLocale", {
       `User:${ctx.user!.id}`
     );
     return ctx.user!;
+  },
+});
+
+export const setDelegatesUser = mutationField("setDelegatesUser", {
+  description: "Set the delegades of a user",
+  type: "Result",
+  args: {
+    delegateIds: nonNull(list(nonNull(globalIdArg("User")))),
+  },
+  authorize: authenticateAnd(userHasFeatureFlag("ON_BEHALF_OF")),
+  resolve: async (_, { delegateIds }, ctx) => {
+    try {
+      const delegates = await ctx.users.loadUsersDelegatesByUserId(ctx.user!.id);
+
+      const actualDelegatesIds = delegates.map((d) => d.id);
+
+      const delegatesIdsToDelete = difference(actualDelegatesIds, delegateIds);
+      const delegatesIdsToAdd = difference(delegateIds, actualDelegatesIds);
+
+      await Promise.all([
+        delegatesIdsToDelete.length
+          ? ctx.users.deleteDelegates(ctx.user!.id, delegatesIdsToDelete, ctx.user!)
+          : undefined,
+        delegatesIdsToAdd.length
+          ? ctx.users.addDelegates(ctx.user!.id, delegatesIdsToAdd, ctx.user!)
+          : undefined,
+      ]);
+
+      return RESULT.SUCCESS;
+    } catch {}
+    return RESULT.FAILURE;
   },
 });

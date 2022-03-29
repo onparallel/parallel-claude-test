@@ -208,6 +208,7 @@ export type FeatureFlag =
   | "EXPORT_CUATRECASAS"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "INTERNAL_COMMENTS"
+  | "ON_BEHALF_OF"
   | "PETITION_PDF_EXPORT"
   | "PETITION_SIGNATURE"
   | "REMOVE_WHY_WE_USE_PARALLEL"
@@ -575,6 +576,8 @@ export interface Mutation {
   sendReminders: Result;
   /** Sends a reminder email to the pending signers */
   sendSignatureRequestReminders: Result;
+  /** Set the delegades of a user */
+  setDelegatesUser: Result;
   /** Sets the locale passed as arg as the preferred language of the user to see the page */
   setUserPreferredLocale: User;
   /** Shares our SignaturIt production APIKEY with the passed Org, and creates corresponding usage limits. */
@@ -700,6 +703,7 @@ export interface MutationbulkSendPetitionArgs {
   petitionId: Scalars["GID"];
   remindersConfig?: InputMaybe<RemindersConfigInput>;
   scheduledAt?: InputMaybe<Scalars["DateTime"]>;
+  senderId?: InputMaybe<Scalars["GID"]>;
   subject: Scalars["String"];
 }
 
@@ -1188,6 +1192,10 @@ export interface MutationsendRemindersArgs {
 
 export interface MutationsendSignatureRequestRemindersArgs {
   petitionSignatureRequestId: Scalars["GID"];
+}
+
+export interface MutationsetDelegatesUserArgs {
+  delegateIds: Array<Scalars["GID"]>;
 }
 
 export interface MutationsetUserPreferredLocaleArgs {
@@ -3275,6 +3283,8 @@ export interface User extends Timestamps {
   canCreateUsers: Scalars["Boolean"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  delegates: Array<User>;
+  delegatesOf: Array<User>;
   /** The email of the user. */
   email: Scalars["String"];
   /** The first name of the user. */
@@ -6080,9 +6090,12 @@ export type UserReference_UserFragment = {
 export type AddPetitionAccessDialog_UserFragment = {
   __typename?: "User";
   id: string;
+  fullName?: string | null;
   email: string;
   firstName?: string | null;
   lastName?: string | null;
+  hasOnBehalfOf: boolean;
+  delegatesOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
 };
 
 export type AddPetitionAccessDialog_PetitionFragment = {
@@ -6090,6 +6103,18 @@ export type AddPetitionAccessDialog_PetitionFragment = {
   id: string;
   emailSubject?: string | null;
   emailBody?: any | null;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+  } | null;
+  permissions: Array<
+    | { __typename?: "PetitionUserGroupPermission"; isSubscribed: boolean }
+    | {
+        __typename?: "PetitionUserPermission";
+        isSubscribed: boolean;
+        user: { __typename?: "User"; id: string };
+      }
+  >;
   signatureConfig?: {
     __typename?: "SignatureConfig";
     review: boolean;
@@ -7383,6 +7408,9 @@ export type useSendPetitionHandler_UserFragment = {
   email: string;
   firstName?: string | null;
   lastName?: string | null;
+  fullName?: string | null;
+  hasOnBehalfOf: boolean;
+  delegatesOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
 };
 
 export type useSendPetitionHandler_PetitionFragment = {
@@ -7423,6 +7451,18 @@ export type useSendPetitionHandler_PetitionFragment = {
       lastName?: string | null;
     }>;
   } | null;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+  } | null;
+  permissions: Array<
+    | { __typename?: "PetitionUserGroupPermission"; isSubscribed: boolean }
+    | {
+        __typename?: "PetitionUserPermission";
+        isSubscribed: boolean;
+        user: { __typename?: "User"; id: string };
+      }
+  >;
   remindersConfig?: {
     __typename?: "RemindersConfig";
     offset: number;
@@ -7451,6 +7491,7 @@ export type useSendPetitionHandler_bulkSendPetitionMutationVariables = Exact<{
   remindersConfig?: InputMaybe<RemindersConfigInput>;
   scheduledAt?: InputMaybe<Scalars["DateTime"]>;
   bulkSendSigningMode?: InputMaybe<BulkSendSigningMode>;
+  senderId?: InputMaybe<Scalars["GID"]>;
 }>;
 
 export type useSendPetitionHandler_bulkSendPetitionMutation = {
@@ -7459,6 +7500,92 @@ export type useSendPetitionHandler_bulkSendPetitionMutation = {
     result: Result;
     petition?: { __typename?: "Petition"; id: string; status: PetitionStatus } | null;
   }>;
+};
+
+export type useSendPetitionHandler_addPetitionPermissionMutationVariables = Exact<{
+  petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
+  userIds?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  permissionType: PetitionPermissionTypeRW;
+  notify?: InputMaybe<Scalars["Boolean"]>;
+  subscribe?: InputMaybe<Scalars["Boolean"]>;
+  message?: InputMaybe<Scalars["String"]>;
+}>;
+
+export type useSendPetitionHandler_addPetitionPermissionMutation = {
+  addPetitionPermission: Array<
+    | {
+        __typename?: "Petition";
+        id: string;
+        emailSubject?: string | null;
+        emailBody?: any | null;
+        accesses: Array<{
+          __typename?: "PetitionAccess";
+          id: string;
+          status: PetitionAccessStatus;
+          contact?: {
+            __typename?: "Contact";
+            id: string;
+            email: string;
+            firstName: string;
+            lastName?: string | null;
+          } | null;
+        }>;
+        signatureConfig?: {
+          __typename?: "SignatureConfig";
+          review: boolean;
+          timezone: string;
+          title: string;
+          allowAdditionalSigners: boolean;
+          integration?: {
+            __typename?: "SignatureOrgIntegration";
+            id: string;
+            environment: SignatureOrgIntegrationEnvironment;
+            name: string;
+          } | null;
+          signers: Array<{
+            __typename?: "PetitionSigner";
+            email: string;
+            fullName: string;
+            contactId?: string | null;
+            firstName: string;
+            lastName?: string | null;
+          }>;
+        } | null;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+        } | null;
+        permissions: Array<
+          | { __typename?: "PetitionUserGroupPermission"; isSubscribed: boolean }
+          | {
+              __typename?: "PetitionUserPermission";
+              isSubscribed: boolean;
+              user: { __typename?: "User"; id: string };
+            }
+        >;
+        remindersConfig?: {
+          __typename?: "RemindersConfig";
+          offset: number;
+          time: string;
+          timezone: string;
+          weekdaysOnly: boolean;
+        } | null;
+        organization: {
+          __typename?: "Organization";
+          id: string;
+          usageLimits: {
+            __typename?: "OrganizationUsageLimit";
+            petitions: {
+              __typename?: "OrganizationUsagePetitionLimit";
+              limit: number;
+              used: number;
+            };
+          };
+        };
+      }
+    | { __typename?: "PetitionTemplate" }
+  >;
 };
 
 export type PetitionComposeField_PetitionFieldFragment = {
@@ -9774,6 +9901,25 @@ export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMut
 export type RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment =
   { __typename?: "PublicPetitionFieldReply"; content: { [key: string]: any } };
 
+export type AccountChangeName_UserFragment = {
+  __typename?: "User";
+  firstName?: string | null;
+  lastName?: string | null;
+  isSsoUser: boolean;
+};
+
+export type AccountDelegates_UserFragment = {
+  __typename?: "User";
+  id: string;
+  hasOnBehalfOf: boolean;
+  delegates: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
+};
+
+export type AccountLocaleChange_UserFragment = {
+  __typename?: "User";
+  preferredLocale?: string | null;
+};
+
 export type GenerateNewTokenDialog_generateUserAuthTokenMutationVariables = Exact<{
   tokenName: Scalars["String"];
 }>;
@@ -11896,14 +12042,21 @@ export type PetitionActivity_PetitionFragment = {
     | {
         __typename?: "PetitionUserGroupPermission";
         permissionType: PetitionPermissionType;
+        isSubscribed: boolean;
         group: { __typename?: "UserGroup"; id: string; name: string };
       }
     | {
         __typename?: "PetitionUserPermission";
         permissionType: PetitionPermissionType;
+        isSubscribed: boolean;
         user: { __typename?: "User"; id: string; fullName?: string | null };
       }
   >;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+    isSubscribed: boolean;
+  } | null;
   signatureConfig?: {
     __typename?: "SignatureConfig";
     review: boolean;
@@ -11940,10 +12093,6 @@ export type PetitionActivity_PetitionFragment = {
       petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
     };
   };
-  myEffectivePermission?: {
-    __typename?: "EffectivePetitionUserPermission";
-    isSubscribed: boolean;
-  } | null;
 };
 
 export type PetitionActivity_UserFragment = {
@@ -11961,6 +12110,7 @@ export type PetitionActivity_UserFragment = {
   avatarUrl?: string | null;
   initials?: string | null;
   hasPetitionPdfExport: boolean;
+  hasOnBehalfOf: boolean;
   organization: {
     __typename?: "Organization";
     name: string;
@@ -11970,6 +12120,7 @@ export type PetitionActivity_UserFragment = {
       petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
     };
   };
+  delegatesOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
 };
 
 export type PetitionActivity_updatePetitionMutationVariables = Exact<{
@@ -12671,14 +12822,21 @@ export type PetitionActivity_updatePetitionMutation = {
           | {
               __typename?: "PetitionUserGroupPermission";
               permissionType: PetitionPermissionType;
+              isSubscribed: boolean;
               group: { __typename?: "UserGroup"; id: string; name: string };
             }
           | {
               __typename?: "PetitionUserPermission";
               permissionType: PetitionPermissionType;
+              isSubscribed: boolean;
               user: { __typename?: "User"; id: string; fullName?: string | null };
             }
         >;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+          isSubscribed: boolean;
+        } | null;
         signatureConfig?: {
           __typename?: "SignatureConfig";
           review: boolean;
@@ -12719,10 +12877,6 @@ export type PetitionActivity_updatePetitionMutation = {
             };
           };
         };
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        } | null;
       }
     | { __typename?: "PetitionTemplate" };
 };
@@ -13483,14 +13637,21 @@ export type PetitionActivity_petitionQuery = {
           | {
               __typename?: "PetitionUserGroupPermission";
               permissionType: PetitionPermissionType;
+              isSubscribed: boolean;
               group: { __typename?: "UserGroup"; id: string; name: string };
             }
           | {
               __typename?: "PetitionUserPermission";
               permissionType: PetitionPermissionType;
+              isSubscribed: boolean;
               user: { __typename?: "User"; id: string; fullName?: string | null };
             }
         >;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+          isSubscribed: boolean;
+        } | null;
         signatureConfig?: {
           __typename?: "SignatureConfig";
           review: boolean;
@@ -13531,10 +13692,6 @@ export type PetitionActivity_petitionQuery = {
             };
           };
         };
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        } | null;
       }
     | { __typename?: "PetitionTemplate" }
     | null;
@@ -13558,6 +13715,7 @@ export type PetitionActivity_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasPetitionPdfExport: boolean;
+    hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
       name: string;
@@ -13567,6 +13725,12 @@ export type PetitionActivity_userQuery = {
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
       };
     };
+    delegatesOf: Array<{
+      __typename?: "User";
+      id: string;
+      fullName?: string | null;
+      email: string;
+    }>;
   };
 };
 
@@ -13659,6 +13823,19 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     id: string;
     status: PetitionSignatureRequestStatus;
   } | null;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+    isSubscribed: boolean;
+  } | null;
+  permissions: Array<
+    | { __typename?: "PetitionUserGroupPermission"; isSubscribed: boolean }
+    | {
+        __typename?: "PetitionUserPermission";
+        isSubscribed: boolean;
+        user: { __typename?: "User"; id: string };
+      }
+  >;
   remindersConfig?: {
     __typename?: "RemindersConfig";
     offset: number;
@@ -13674,10 +13851,6 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
       petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
     };
   };
-  myEffectivePermission?: {
-    __typename?: "EffectivePetitionUserPermission";
-    isSubscribed: boolean;
-  } | null;
 };
 
 export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
@@ -13860,6 +14033,7 @@ export type PetitionCompose_UserFragment = {
   hasHideRecipientViewContents: boolean;
   hasPetitionPdfExport: boolean;
   hasPetitionSignature: boolean;
+  hasOnBehalfOf: boolean;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -13882,6 +14056,7 @@ export type PetitionCompose_UserFragment = {
       petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
     };
   };
+  delegatesOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
 };
 
 export type PetitionCompose_updatePetitionMutationVariables = Exact<{
@@ -13910,6 +14085,19 @@ export type PetitionCompose_updatePetitionMutation = {
           id: string;
           status: PetitionSignatureRequestStatus;
         } | null;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+          isSubscribed: boolean;
+        } | null;
+        permissions: Array<
+          | { __typename?: "PetitionUserGroupPermission"; isSubscribed: boolean }
+          | {
+              __typename?: "PetitionUserPermission";
+              isSubscribed: boolean;
+              user: { __typename?: "User"; id: string };
+            }
+        >;
         signatureConfig?: {
           __typename?: "SignatureConfig";
           review: boolean;
@@ -13963,10 +14151,6 @@ export type PetitionCompose_updatePetitionMutation = {
             email: string;
           } | null;
         }>;
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        } | null;
       }
     | {
         __typename?: "PetitionTemplate";
@@ -14385,6 +14569,7 @@ export type PetitionCompose_userQuery = {
     hasHideRecipientViewContents: boolean;
     hasPetitionPdfExport: boolean;
     hasPetitionSignature: boolean;
+    hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -14407,6 +14592,12 @@ export type PetitionCompose_userQuery = {
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
       };
     };
+    delegatesOf: Array<{
+      __typename?: "User";
+      id: string;
+      fullName?: string | null;
+      email: string;
+    }>;
   };
 };
 
@@ -14505,6 +14696,19 @@ export type PetitionCompose_petitionQuery = {
           id: string;
           status: PetitionSignatureRequestStatus;
         } | null;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+          isSubscribed: boolean;
+        } | null;
+        permissions: Array<
+          | { __typename?: "PetitionUserGroupPermission"; isSubscribed: boolean }
+          | {
+              __typename?: "PetitionUserPermission";
+              isSubscribed: boolean;
+              user: { __typename?: "User"; id: string };
+            }
+        >;
         remindersConfig?: {
           __typename?: "RemindersConfig";
           offset: number;
@@ -14524,10 +14728,6 @@ export type PetitionCompose_petitionQuery = {
             };
           };
         };
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        } | null;
       }
     | {
         __typename?: "PetitionTemplate";
@@ -14781,6 +14981,19 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
       name: string;
     } | null;
   } | null;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+    isSubscribed: boolean;
+  } | null;
+  permissions: Array<
+    | { __typename?: "PetitionUserGroupPermission"; isSubscribed: boolean }
+    | {
+        __typename?: "PetitionUserPermission";
+        isSubscribed: boolean;
+        user: { __typename?: "User"; id: string };
+      }
+  >;
   remindersConfig?: {
     __typename?: "RemindersConfig";
     offset: number;
@@ -14796,10 +15009,6 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
       petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
     };
   };
-  myEffectivePermission?: {
-    __typename?: "EffectivePetitionUserPermission";
-    isSubscribed: boolean;
-  } | null;
 };
 
 export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
@@ -14912,6 +15121,7 @@ export type PetitionPreview_UserFragment = {
   avatarUrl?: string | null;
   initials?: string | null;
   hasPetitionPdfExport: boolean;
+  hasOnBehalfOf: boolean;
   organization: {
     __typename?: "Organization";
     name: string;
@@ -14921,6 +15131,7 @@ export type PetitionPreview_UserFragment = {
       petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
     };
   };
+  delegatesOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
 };
 
 export type PetitionPreview_updatePetitionMutationVariables = Exact<{
@@ -15042,6 +15253,19 @@ export type PetitionPreview_updatePetitionMutation = {
             name: string;
           } | null;
         } | null;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+          isSubscribed: boolean;
+        } | null;
+        permissions: Array<
+          | { __typename?: "PetitionUserGroupPermission"; isSubscribed: boolean }
+          | {
+              __typename?: "PetitionUserPermission";
+              isSubscribed: boolean;
+              user: { __typename?: "User"; id: string };
+            }
+        >;
         remindersConfig?: {
           __typename?: "RemindersConfig";
           offset: number;
@@ -15061,10 +15285,6 @@ export type PetitionPreview_updatePetitionMutation = {
             };
           };
         };
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        } | null;
       }
     | {
         __typename?: "PetitionTemplate";
@@ -15280,6 +15500,19 @@ export type PetitionPreview_completePetitionMutation = {
         name: string;
       } | null;
     } | null;
+    myEffectivePermission?: {
+      __typename?: "EffectivePetitionUserPermission";
+      permissionType: PetitionPermissionType;
+      isSubscribed: boolean;
+    } | null;
+    permissions: Array<
+      | { __typename?: "PetitionUserGroupPermission"; isSubscribed: boolean }
+      | {
+          __typename?: "PetitionUserPermission";
+          isSubscribed: boolean;
+          user: { __typename?: "User"; id: string };
+        }
+    >;
     remindersConfig?: {
       __typename?: "RemindersConfig";
       offset: number;
@@ -15295,10 +15528,6 @@ export type PetitionPreview_completePetitionMutation = {
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
       };
     };
-    myEffectivePermission?: {
-      __typename?: "EffectivePetitionUserPermission";
-      isSubscribed: boolean;
-    } | null;
   };
 };
 
@@ -15420,6 +15649,19 @@ export type PetitionPreview_petitionQuery = {
             name: string;
           } | null;
         } | null;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+          isSubscribed: boolean;
+        } | null;
+        permissions: Array<
+          | { __typename?: "PetitionUserGroupPermission"; isSubscribed: boolean }
+          | {
+              __typename?: "PetitionUserPermission";
+              isSubscribed: boolean;
+              user: { __typename?: "User"; id: string };
+            }
+        >;
         remindersConfig?: {
           __typename?: "RemindersConfig";
           offset: number;
@@ -15439,10 +15681,6 @@ export type PetitionPreview_petitionQuery = {
             };
           };
         };
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          isSubscribed: boolean;
-        } | null;
       }
     | {
         __typename?: "PetitionTemplate";
@@ -15555,6 +15793,7 @@ export type PetitionPreview_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasPetitionPdfExport: boolean;
+    hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
       name: string;
@@ -15564,6 +15803,12 @@ export type PetitionPreview_userQuery = {
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
       };
     };
+    delegatesOf: Array<{
+      __typename?: "User";
+      id: string;
+      fullName?: string | null;
+      email: string;
+    }>;
   };
   metadata: {
     __typename?: "ConnectionMetadata";
@@ -16997,13 +17242,13 @@ export type NewPetition_templateQuery = {
 
 export type Account_UserFragment = {
   __typename?: "User";
+  id: string;
   firstName?: string | null;
   lastName?: string | null;
   isSsoUser: boolean;
-  email: string;
   preferredLocale?: string | null;
-  id: string;
   fullName?: string | null;
+  email: string;
   createdAt: string;
   canCreateUsers: boolean;
   isSuperAdmin: boolean;
@@ -17011,6 +17256,8 @@ export type Account_UserFragment = {
   avatarUrl?: string | null;
   initials?: string | null;
   hasDeveloperAccess: boolean;
+  hasOnBehalfOf: boolean;
+  delegates: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -17048,9 +17295,9 @@ export type Account_setUserPreferredLocaleMutation = {
     firstName?: string | null;
     lastName?: string | null;
     isSsoUser: boolean;
-    email: string;
     preferredLocale?: string | null;
     fullName?: string | null;
+    email: string;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
@@ -17058,6 +17305,8 @@ export type Account_setUserPreferredLocaleMutation = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasDeveloperAccess: boolean;
+    hasOnBehalfOf: boolean;
+    delegates: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -17069,6 +17318,12 @@ export type Account_setUserPreferredLocaleMutation = {
   };
 };
 
+export type Account_setDelegatesUserMutationVariables = Exact<{
+  delegateIds: Array<Scalars["GID"]> | Scalars["GID"];
+}>;
+
+export type Account_setDelegatesUserMutation = { setDelegatesUser: Result };
+
 export type Account_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type Account_userQuery = {
@@ -17078,9 +17333,9 @@ export type Account_userQuery = {
     firstName?: string | null;
     lastName?: string | null;
     isSsoUser: boolean;
-    email: string;
     preferredLocale?: string | null;
     fullName?: string | null;
+    email: string;
     createdAt: string;
     canCreateUsers: boolean;
     isSuperAdmin: boolean;
@@ -17088,6 +17343,8 @@ export type Account_userQuery = {
     avatarUrl?: string | null;
     initials?: string | null;
     hasDeveloperAccess: boolean;
+    hasOnBehalfOf: boolean;
+    delegates: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -20749,6 +21006,17 @@ export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
     id
     emailSubject
     emailBody
+    myEffectivePermission {
+      permissionType
+    }
+    permissions {
+      isSubscribed
+      ... on PetitionUserPermission {
+        user {
+          id
+        }
+      }
+    }
     signatureConfig {
       review
       timezone
@@ -20880,6 +21148,15 @@ export const ConfirmPetitionSignersDialog_UserFragmentDoc = gql`
 ` as unknown as DocumentNode<ConfirmPetitionSignersDialog_UserFragment, unknown>;
 export const AddPetitionAccessDialog_UserFragmentDoc = gql`
   fragment AddPetitionAccessDialog_User on User {
+    id
+    fullName
+    email
+    delegatesOf {
+      id
+      fullName
+      email
+    }
+    hasOnBehalfOf: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
     ...ConfirmPetitionSignersDialog_User
   }
   ${ConfirmPetitionSignersDialog_UserFragmentDoc}
@@ -21914,18 +22191,42 @@ export const useSettingsSections_UserFragmentDoc = gql`
     hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
   }
 ` as unknown as DocumentNode<useSettingsSections_UserFragment, unknown>;
-export const Account_UserFragmentDoc = gql`
-  fragment Account_User on User {
+export const AccountChangeName_UserFragmentDoc = gql`
+  fragment AccountChangeName_User on User {
     firstName
     lastName
     isSsoUser
-    email
+  }
+` as unknown as DocumentNode<AccountChangeName_UserFragment, unknown>;
+export const AccountLocaleChange_UserFragmentDoc = gql`
+  fragment AccountLocaleChange_User on User {
     preferredLocale
+  }
+` as unknown as DocumentNode<AccountLocaleChange_UserFragment, unknown>;
+export const AccountDelegates_UserFragmentDoc = gql`
+  fragment AccountDelegates_User on User {
+    id
+    delegates {
+      ...UserSelect_User
+    }
+    hasOnBehalfOf: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
+  }
+  ${UserSelect_UserFragmentDoc}
+` as unknown as DocumentNode<AccountDelegates_UserFragment, unknown>;
+export const Account_UserFragmentDoc = gql`
+  fragment Account_User on User {
+    id
     ...SettingsLayout_User
     ...useSettingsSections_User
+    ...AccountChangeName_User
+    ...AccountLocaleChange_User
+    ...AccountDelegates_User
   }
   ${SettingsLayout_UserFragmentDoc}
   ${useSettingsSections_UserFragmentDoc}
+  ${AccountChangeName_UserFragmentDoc}
+  ${AccountLocaleChange_UserFragmentDoc}
+  ${AccountDelegates_UserFragmentDoc}
 ` as unknown as DocumentNode<Account_UserFragment, unknown>;
 export const Developers_UserAuthenticationTokenFragmentDoc = gql`
   fragment Developers_UserAuthenticationToken on UserAuthenticationToken {
@@ -22722,6 +23023,7 @@ export const useSendPetitionHandler_bulkSendPetitionDocument = gql`
     $remindersConfig: RemindersConfigInput
     $scheduledAt: DateTime
     $bulkSendSigningMode: BulkSendSigningMode
+    $senderId: GID
   ) {
     bulkSendPetition(
       petitionId: $petitionId
@@ -22731,6 +23033,7 @@ export const useSendPetitionHandler_bulkSendPetitionDocument = gql`
       remindersConfig: $remindersConfig
       scheduledAt: $scheduledAt
       bulkSendSigningMode: $bulkSendSigningMode
+      senderId: $senderId
     ) {
       result
       petition {
@@ -22742,6 +23045,33 @@ export const useSendPetitionHandler_bulkSendPetitionDocument = gql`
 ` as unknown as DocumentNode<
   useSendPetitionHandler_bulkSendPetitionMutation,
   useSendPetitionHandler_bulkSendPetitionMutationVariables
+>;
+export const useSendPetitionHandler_addPetitionPermissionDocument = gql`
+  mutation useSendPetitionHandler_addPetitionPermission(
+    $petitionIds: [GID!]!
+    $userIds: [GID!]
+    $userGroupIds: [GID!]
+    $permissionType: PetitionPermissionTypeRW!
+    $notify: Boolean
+    $subscribe: Boolean
+    $message: String
+  ) {
+    addPetitionPermission(
+      petitionIds: $petitionIds
+      userIds: $userIds
+      userGroupIds: $userGroupIds
+      permissionType: $permissionType
+      notify: $notify
+      subscribe: $subscribe
+      message: $message
+    ) {
+      ...useSendPetitionHandler_Petition
+    }
+  }
+  ${useSendPetitionHandler_PetitionFragmentDoc}
+` as unknown as DocumentNode<
+  useSendPetitionHandler_addPetitionPermissionMutation,
+  useSendPetitionHandler_addPetitionPermissionMutationVariables
 >;
 export const PetitionComposeField_createPetitionFieldAttachmentUploadLinkDocument = gql`
   mutation PetitionComposeField_createPetitionFieldAttachmentUploadLink(
@@ -24780,6 +25110,14 @@ export const Account_setUserPreferredLocaleDocument = gql`
 ` as unknown as DocumentNode<
   Account_setUserPreferredLocaleMutation,
   Account_setUserPreferredLocaleMutationVariables
+>;
+export const Account_setDelegatesUserDocument = gql`
+  mutation Account_setDelegatesUser($delegateIds: [GID!]!) {
+    setDelegatesUser(delegateIds: $delegateIds)
+  }
+` as unknown as DocumentNode<
+  Account_setDelegatesUserMutation,
+  Account_setDelegatesUserMutationVariables
 >;
 export const Account_userDocument = gql`
   query Account_user {

@@ -1152,6 +1152,7 @@ export const bulkSendPetition = mutationField("bulkSendPetition", {
     body: nonNull(jsonArg()),
     scheduledAt: datetimeArg(),
     remindersConfig: arg({ type: "RemindersConfigInput" }),
+    senderId: globalIdArg("User"),
     bulkSendSigningMode: arg({
       type: enumType({
         name: "BulkSendSigningMode",
@@ -1236,10 +1237,13 @@ export const bulkSendPetition = mutationField("bulkSendPetition", {
       );
     }
 
+    const sender = isDefined(args.senderId) ? await ctx.users.loadUser(args.senderId) : null;
+
     const results = await presendPetition(
       zip([petition, ...clonedPetitions], args.contactIdGroups),
       args,
       ctx.user!,
+      sender,
       false,
       ctx
     );
@@ -1317,6 +1321,7 @@ export const sendPetition = mutationField("sendPetition", {
           body,
         },
         ctx.user!,
+        null,
         false,
         ctx
       );

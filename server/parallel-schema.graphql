@@ -241,6 +241,7 @@ enum FeatureFlag {
   EXPORT_CUATRECASAS
   HIDE_RECIPIENT_VIEW_CONTENTS
   INTERNAL_COMMENTS
+  ON_BEHALF_OF
   PETITION_PDF_EXPORT
   PETITION_SIGNATURE
   REMOVE_WHY_WE_USE_PARALLEL
@@ -510,6 +511,7 @@ type Mutation {
     petitionId: GID!
     remindersConfig: RemindersConfigInput
     scheduledAt: DateTime
+    senderId: GID
     subject: String!
   ): [SendPetitionResult!]!
 
@@ -1181,6 +1183,11 @@ type Mutation {
   Sends a reminder email to the pending signers
   """
   sendSignatureRequestReminders(petitionSignatureRequestId: GID!): Result!
+
+  """
+  Set the delegades of a user
+  """
+  setDelegatesUser(delegateIds: [GID!]!): Result!
 
   """
   Sets the locale passed as arg as the preferred language of the user to see the page
@@ -4466,6 +4473,8 @@ type User implements Timestamps {
   Time when the resource was created.
   """
   createdAt: DateTime!
+  delegates: [User!]!
+  delegatesOf: [User!]!
 
   """
   The email of the user.

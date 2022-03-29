@@ -629,7 +629,12 @@ export class PetitionRepository extends BaseRepository {
     petitionId: number,
     data: Pick<
       CreatePetitionAccess,
-      "contact_id" | "next_reminder_at" | "reminders_active" | "reminders_config" | "reminders_left"
+      | "contact_id"
+      | "next_reminder_at"
+      | "reminders_active"
+      | "reminders_config"
+      | "reminders_left"
+      | "delegate_granter_id"
     >[],
     user: User,
     fromPublicPetitionLink: boolean,
@@ -646,8 +651,8 @@ export class PetitionRepository extends BaseRepository {
               granter_id: user.id,
               keycode: random(16),
               status: "ACTIVE",
-              created_by: `User:${user.id}`,
-              updated_by: `User:${user.id}`,
+              created_by: `User:${item.delegate_granter_id ? item.delegate_granter_id : user.id}`,
+              updated_by: `User:${item.delegate_granter_id ? item.delegate_granter_id : user.id}`,
             })),
             t
           );

@@ -11,6 +11,7 @@ import {
   useSendPetitionHandler_bulkSendPetitionDocument,
   useSendPetitionHandler_PetitionFragment,
   useSendPetitionHandler_UserFragment,
+  useSendPetitionHandler_addPetitionPermissionDocument,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FORMATS } from "@parallel/utils/dates";
@@ -35,6 +36,8 @@ export function useSendPetitionHandler(
   const toast = useToast();
 
   const [bulkSendPetition] = useMutation(useSendPetitionHandler_bulkSendPetitionDocument);
+  const [addPetitionPermission] = useMutation(useSendPetitionHandler_addPetitionPermissionDocument);
+
   const showAddPetitionAccessDialog = useAddPetitionAccessDialog();
   const showLongBulkSendDialog = useBlockingDialog();
   const showPetitionLimitReachedErrorDialog = usePetitionLimitReachedErrorDialog();
@@ -61,6 +64,8 @@ export function useSendPetitionHandler(
         remindersConfig,
         scheduledAt,
         bulkSendSigningMode,
+        subscribeSender,
+        senderId,
       } = await showAddPetitionAccessDialog({
         user,
         petition,
@@ -78,6 +83,7 @@ export function useSendPetitionHandler(
           remindersConfig,
           scheduledAt: scheduledAt?.toISOString() ?? null,
           bulkSendSigningMode,
+          senderId,
         },
       });
       if (recipientIdGroups.length > 20) {
@@ -120,6 +126,19 @@ export function useSendPetitionHandler(
           }),
         });
         return;
+      }
+      if (senderId) {
+        await addPetitionPermission({
+          variables: {
+            petitionIds: [petition.id],
+            userIds: [senderId],
+            userGroupIds: null,
+            permissionType: "WRITE",
+            notify: false,
+            subscribe: subscribeSender,
+            message: null,
+          },
+        });
       }
       if (scheduledAt) {
         toast({
@@ -222,6 +241,7 @@ useSendPetitionHandler.mutations = [
       $remindersConfig: RemindersConfigInput
       $scheduledAt: DateTime
       $bulkSendSigningMode: BulkSendSigningMode
+      $senderId: GID
     ) {
       bulkSendPetition(
         petitionId: $petitionId
@@ -231,6 +251,7 @@ useSendPetitionHandler.mutations = [
         remindersConfig: $remindersConfig
         scheduledAt: $scheduledAt
         bulkSendSigningMode: $bulkSendSigningMode
+        senderId: $senderId
       ) {
         result
         petition {
@@ -239,5 +260,29 @@ useSendPetitionHandler.mutations = [
         }
       }
     }
+  `,
+  gql`
+    mutation useSendPetitionHandler_addPetitionPermission(
+      $petitionIds: [GID!]!
+      $userIds: [GID!]
+      $userGroupIds: [GID!]
+      $permissionType: PetitionPermissionTypeRW!
+      $notify: Boolean
+      $subscribe: Boolean
+      $message: String
+    ) {
+      addPetitionPermission(
+        petitionIds: $petitionIds
+        userIds: $userIds
+        userGroupIds: $userGroupIds
+        permissionType: $permissionType
+        notify: $notify
+        subscribe: $subscribe
+        message: $message
+      ) {
+        ...useSendPetitionHandler_Petition
+      }
+    }
+    ${useSendPetitionHandler.fragments.Petition}
   `,
 ];

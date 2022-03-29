@@ -44,6 +44,65 @@ export class UserRepository extends BaseRepository {
 
   readonly loadUserData = this.buildLoadBy("user_data", "id", (q) => q.whereNull("deleted_at"));
 
+  async loadUsersDelegatesByUserId(id: number): Promise<User[]> {
+    const users = await this.from("user")
+      .whereIn(
+        "id",
+        this.from("user_delegate")
+          .where("user_id", id)
+          .whereNull("deleted_at")
+          .select("delegate_user_id")
+      )
+      .whereNull("deleted_at")
+      .returning("*");
+
+    return users;
+  }
+
+  async loadUsersDelegatesOfByUserId(id: number): Promise<User[]> {
+    const users = await this.from("user")
+      .whereIn(
+        "id",
+        this.from("user_delegate")
+          .where("delegate_user_id", id)
+          .whereNull("deleted_at")
+          .select("user_id")
+      )
+      .whereNull("deleted_at")
+      .returning("*");
+
+    return users;
+  }
+
+  async addDelegates(
+    userId: number,
+    delegateUserIds: MaybeArray<number>,
+    user: User,
+    t?: Knex.Transaction
+  ) {
+    const dataArr = unMaybeArray(delegateUserIds).map((id) => ({
+      user_id: userId,
+      delegate_user_id: id,
+      created_by: `User:${user.id}`,
+    }));
+    return await this.insert("user_delegate", dataArr, t);
+  }
+
+  async deleteDelegates(
+    userId: number,
+    delegateUserIds: MaybeArray<number>,
+    user: User,
+    t?: Knex.Transaction
+  ) {
+    await this.from("user_delegate", t)
+      .whereIn("delegate_user_id", unMaybeArray(delegateUserIds))
+      .andWhere("user_id", userId)
+      .update({
+        deleted_at: this.now(),
+        deleted_by: `User:${user.id}`,
+      });
+  }
+
   readonly loadUserDataByUserId = fromDataLoader(
     new DataLoader<number, Maybe<UserData>>(async (ids) => {
       const users = await this.raw<UserData & { user_id: number }>(

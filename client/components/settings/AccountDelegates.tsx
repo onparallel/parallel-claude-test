@@ -1,0 +1,154 @@
+import { gql } from "@apollo/client";
+import {
+  Alert,
+  AlertIcon,
+  Button,
+  Center,
+  FormControl,
+  FormLabel,
+  Heading,
+  HStack,
+  Stack,
+  StackProps,
+  Text,
+} from "@chakra-ui/react";
+import {
+  UserSelect,
+  UserSelectInstance,
+  useSearchUsers,
+} from "@parallel/components/common/UserSelect";
+import { AccountDelegates_UserFragment, UserSelect_UserFragment } from "@parallel/graphql/__types";
+import { useCallback, useRef } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { FormattedMessage } from "react-intl";
+
+export interface AccountDelegatesData {
+  delegates: UserSelect_UserFragment[];
+}
+
+interface AccountDelegatesProps extends Omit<StackProps, "onSubmit"> {
+  user: AccountDelegates_UserFragment;
+  onSubmit: (ids: string[]) => void;
+}
+
+export function AccountDelegates({ user, onSubmit, ...props }: AccountDelegatesProps) {
+  const { handleSubmit, control, watch } = useForm<AccountDelegatesData>({
+    defaultValues: {
+      delegates: user.delegates ?? [],
+    },
+  });
+
+  const delegates = watch("delegates");
+
+  const usersRef = useRef<UserSelectInstance<true>>(null);
+
+  const _handleSearchUsers = useSearchUsers();
+
+  const handleSearchUsers = useCallback(
+    async (search: string, excludeUsers: string[]) => {
+      const exclude = delegates.map((d) => d.id) ?? [];
+      return await _handleSearchUsers(search, {
+        excludeUsers: [...excludeUsers, ...exclude, user.id],
+      });
+    },
+    [_handleSearchUsers, delegates]
+  );
+
+  return (
+    <Stack {...props}>
+      <Heading as="h4" size="md" marginBottom={2}>
+        <FormattedMessage id="component.account-delegates.delegates" defaultMessage="Delegates" />
+      </Heading>
+      <Stack
+        as="form"
+        onSubmit={handleSubmit(({ delegates }) => onSubmit(delegates.map((d) => d.id)))}
+        spacing={4}
+      >
+        <FormControl id="delegates" isDisabled={!user.hasOnBehalfOf}>
+          <Stack spacing={4} paddingBottom={2}>
+            {user.hasOnBehalfOf ? null : (
+              <Alert status="info" rounded="md">
+                <AlertIcon />
+                <HStack spacing={8}>
+                  <Text flex="1">
+                    <FormattedMessage
+                      id="component.account-delegates.upgrade-delegates"
+                      defaultMessage="Upgrade your plan to be able to assign delegates."
+                    />
+                  </Text>
+                  <Center>
+                    <Button
+                      as="a"
+                      variant="outline"
+                      backgroundColor="white"
+                      colorScheme="blue"
+                      href="mailto:support@onparallel.com"
+                    >
+                      <FormattedMessage id="generic.contact" defaultMessage="Contact" />
+                    </Button>
+                  </Center>
+                </HStack>
+              </Alert>
+            )}
+            <Text>
+              <FormattedMessage
+                id="component.account-delegates.delegates-description"
+                defaultMessage="Delegates can submit petitions on your behalf."
+              />
+            </Text>
+            <FormLabel>
+              <FormattedMessage
+                id="component.account-delegates.delegates-label"
+                defaultMessage="Delegates"
+              />
+            </FormLabel>
+          </Stack>
+
+          <Controller
+            name="delegates"
+            control={control}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <UserSelect
+                ref={usersRef}
+                isMulti
+                value={value}
+                onKeyDown={(e: KeyboardEvent) => {
+                  if (e.key === "Enter" && !(e.target as HTMLInputElement).value) {
+                    e.preventDefault();
+                  }
+                }}
+                onChange={(users) => {
+                  onChange(users);
+                }}
+                onBlur={onBlur}
+                onSearch={handleSearchUsers}
+              />
+            )}
+          />
+        </FormControl>
+
+        <Button
+          type="submit"
+          colorScheme="purple"
+          width="min-content"
+          isDisabled={!user.hasOnBehalfOf}
+        >
+          <FormattedMessage id="generic.save" defaultMessage="Save" />
+        </Button>
+      </Stack>
+    </Stack>
+  );
+}
+
+AccountDelegates.fragments = {
+  User: gql`
+    fragment AccountDelegates_User on User {
+      id
+      delegates {
+        ...UserSelect_User
+      }
+      hasOnBehalfOf: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
+    }
+    ${UserSelect.fragments.User}
+  `,
+};

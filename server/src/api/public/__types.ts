@@ -193,6 +193,7 @@ export type FeatureFlag =
   | "EXPORT_CUATRECASAS"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "INTERNAL_COMMENTS"
+  | "ON_BEHALF_OF"
   | "PETITION_PDF_EXPORT"
   | "PETITION_SIGNATURE"
   | "REMOVE_WHY_WE_USE_PARALLEL"
@@ -544,6 +545,8 @@ export type Mutation = {
   sendReminders: Result;
   /** Sends a reminder email to the pending signers */
   sendSignatureRequestReminders: Result;
+  /** Set the delegades of a user */
+  setDelegatesUser: Result;
   /** Sets the locale passed as arg as the preferred language of the user to see the page */
   setUserPreferredLocale: User;
   /** Shares our SignaturIt production APIKEY with the passed Org, and creates corresponding usage limits. */
@@ -669,6 +672,7 @@ export type MutationbulkSendPetitionArgs = {
   petitionId: Scalars["GID"];
   remindersConfig?: InputMaybe<RemindersConfigInput>;
   scheduledAt?: InputMaybe<Scalars["DateTime"]>;
+  senderId?: InputMaybe<Scalars["GID"]>;
   subject: Scalars["String"];
 };
 
@@ -1157,6 +1161,10 @@ export type MutationsendRemindersArgs = {
 
 export type MutationsendSignatureRequestRemindersArgs = {
   petitionSignatureRequestId: Scalars["GID"];
+};
+
+export type MutationsetDelegatesUserArgs = {
+  delegateIds: Array<Scalars["GID"]>;
 };
 
 export type MutationsetUserPreferredLocaleArgs = {
@@ -3161,6 +3169,8 @@ export type User = Timestamps & {
   canCreateUsers: Scalars["Boolean"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  delegates: Array<User>;
+  delegatesOf: Array<User>;
   /** The email of the user. */
   email: Scalars["String"];
   /** The first name of the user. */

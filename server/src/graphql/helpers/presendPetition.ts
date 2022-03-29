@@ -19,6 +19,7 @@ export async function presendPetition(
     body: any;
   },
   user: User,
+  userDelegate: User | null,
   fromPublicPetitionLink: boolean,
   ctx: ApiContext,
   // use a fixed base date to avoid small time increments on each send time caused by the execution of the code
@@ -53,6 +54,7 @@ export async function presendPetition(
                   contactIds.map((contactId) => ({
                     petition_id: petition.id,
                     contact_id: contactId,
+                    delegate_granter_id: userDelegate ? user.id : null,
                     reminders_left: 10,
                     reminders_active: Boolean(args.remindersConfig),
                     reminders_config: args.remindersConfig,
@@ -60,7 +62,7 @@ export async function presendPetition(
                       ? calculateNextReminder(scheduledAt ?? baseDate, args.remindersConfig)
                       : null,
                   })),
-                  user,
+                  userDelegate ? userDelegate : user,
                   fromPublicPetitionLink,
                   t
                 );
@@ -73,7 +75,7 @@ export async function presendPetition(
                     email_subject: args.subject,
                     email_body: JSON.stringify(args.body ?? []),
                   })),
-                  user,
+                  userDelegate ? userDelegate : user,
                   t
                 );
                 const [updatedPetition] = await ctx.petitions.updatePetition(

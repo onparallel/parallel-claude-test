@@ -15,6 +15,26 @@
     "context": "Admin panel"
   },
   {
+    "term": "component.account-delegates.delegates",
+    "definition": "Delegates",
+    "context": "Delegates"
+  },
+  {
+    "term": "component.account-delegates.delegates-description",
+    "definition": "Delegates can submit petitions on your behalf.",
+    "context": "Delegates can submit petitions on your behalf."
+  },
+  {
+    "term": "component.account-delegates.delegates-label",
+    "definition": "Delegates",
+    "context": "Delegates"
+  },
+  {
+    "term": "component.account-delegates.upgrade-delegates",
+    "definition": "Upgrade your plan to be able to assign delegates.",
+    "context": "Upgrade your plan to be able to assign delegates."
+  },
+  {
     "term": "component.add-member-group-dialog.members-label",
     "definition": "Add to team",
     "context": "Add to team"
@@ -68,6 +88,21 @@
     "term": "component.add-petition-access-dialog.recipients-label",
     "definition": "Recipients",
     "context": "Recipients"
+  },
+  {
+    "term": "component.add-petition-access-dialog.send-as",
+    "definition": "Send as...",
+    "context": "Send as..."
+  },
+  {
+    "term": "component.add-petition-access-dialog.subscribe-to-notifications",
+    "definition": "Subscribe {name} to notifications",
+    "context": "Subscribe {name} to notifications"
+  },
+  {
+    "term": "component.add-petition-access-dialog.subscribe-to-notifications-description",
+    "definition": "Users will receive notifications about the activity of this petition.",
+    "context": "Users will receive notifications about the activity of this petition."
   },
   {
     "term": "component.add-signature-api-key-dialog.api-key-help",
@@ -8783,6 +8818,16 @@
     "term": "settings.account.sso-user-explanation",
     "definition": "SSO users are not able to change their name",
     "context": "SSO users are not able to change their name"
+  },
+  {
+    "term": "settings.account.success-toast-description",
+    "definition": "Your account has been successfully updated.",
+    "context": "Your account has been successfully updated."
+  },
+  {
+    "term": "settings.account.success-toast-title",
+    "definition": "Changes saved correctly",
+    "context": "Changes saved correctly"
   },
   {
     "term": "settings.account.update-name-button",

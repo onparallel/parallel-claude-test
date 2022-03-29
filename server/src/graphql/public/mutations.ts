@@ -660,6 +660,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
             remindersConfig: petition.reminders_config ?? null,
           },
           owner.user,
+          null,
           true,
           ctx,
           new Date(),

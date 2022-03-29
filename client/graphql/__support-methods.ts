@@ -931,6 +931,7 @@ export const schemaTypes: IntrospectionType[] = [
         isDeprecated: false,
         deprecationReason: null,
       },
+      { name: "ON_BEHALF_OF", description: null, isDeprecated: false, deprecationReason: null },
       {
         name: "PETITION_PDF_EXPORT",
         description: null,

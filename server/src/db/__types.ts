@@ -15,7 +15,8 @@ export type FeatureFlagName =
   | "SKIP_FORWARD_SECURITY"
   | "EXPORT_CUATRECASAS"
   | "DEVELOPER_ACCESS"
-  | "REMOVE_WHY_WE_USE_PARALLEL";
+  | "REMOVE_WHY_WE_USE_PARALLEL"
+  | "ON_BEHALF_OF";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -26,6 +27,7 @@ export const FeatureFlagNameValues = [
   "EXPORT_CUATRECASAS",
   "DEVELOPER_ACCESS",
   "REMOVE_WHY_WE_USE_PARALLEL",
+  "ON_BEHALF_OF",
 ] as FeatureFlagName[];
 
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
@@ -334,6 +336,7 @@ export interface TableTypes {
   user: User;
   user_authentication_token: UserAuthenticationToken;
   user_data: UserData;
+  user_delegate: UserDelegate;
   user_group: UserGroup;
   user_group_member: UserGroupMember;
   user_petition_event_log: UserPetitionEventLog;
@@ -378,6 +381,7 @@ export interface TableCreateTypes {
   user: CreateUser;
   user_authentication_token: CreateUserAuthenticationToken;
   user_data: CreateUserData;
+  user_delegate: CreateUserDelegate;
   user_group: CreateUserGroup;
   user_group_member: CreateUserGroupMember;
   user_petition_event_log: CreateUserPetitionEventLog;
@@ -422,6 +426,7 @@ export interface TablePrimaryKeys {
   user: "id";
   user_authentication_token: "id";
   user_data: "id";
+  user_delegate: "id";
   user_group: "id";
   user_group_member: "id";
   user_petition_event_log: "id";
@@ -732,6 +737,7 @@ export interface PetitionAccess {
   updated_by: Maybe<string>; // varchar
   reminders_opt_out: boolean; // bool
   delegator_contact_id: Maybe<number>; // int4
+  delegate_granter_id: Maybe<number>; // int4
 }
 
 export type CreatePetitionAccess = PartialProps<
@@ -746,6 +752,7 @@ export type CreatePetitionAccess = PartialProps<
   | "updated_by"
   | "reminders_opt_out"
   | "delegator_contact_id"
+  | "delegate_granter_id"
 >;
 
 export interface PetitionAttachment {
@@ -1296,6 +1303,21 @@ export type CreateUserData = PartialProps<
   | "updated_by"
   | "deleted_at"
   | "deleted_by"
+>;
+
+export interface UserDelegate {
+  id: number; // int4
+  user_id: number; // int4
+  delegate_user_id: number; // int4
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateUserDelegate = PartialProps<
+  Omit<UserDelegate, "id">,
+  "created_at" | "created_by" | "deleted_at" | "deleted_by"
 >;
 
 export interface UserGroup {

@@ -182,6 +182,18 @@ export const User = objectType({
         return await ctx.userGroups.loadUserGroupsByUserId(root.id);
       },
     });
+    t.list.field("delegates", {
+      type: "User",
+      resolve: async (root, _, ctx) => {
+        return await ctx.users.loadUsersDelegatesByUserId(root.id);
+      },
+    });
+    t.list.field("delegatesOf", {
+      type: "User",
+      resolve: async (root, _, ctx) => {
+        return await ctx.users.loadUsersDelegatesOfByUserId(root.id);
+      },
+    });
   },
 });
 

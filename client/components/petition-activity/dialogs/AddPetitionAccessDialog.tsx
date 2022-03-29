@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Center,
+  Checkbox,
   Flex,
   Heading,
   HStack,
@@ -37,6 +38,8 @@ import {
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
+import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { OptionType } from "@parallel/utils/react-select/types";
 import { emptyRTEValue } from "@parallel/utils/slate/RichTextEditor/emptyRTEValue";
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
@@ -46,6 +49,7 @@ import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useSearchContactsByEmail } from "@parallel/utils/useSearchContactsByEmail";
 import { useCallback, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
+import Select from "react-select";
 import { noop, omit, pick } from "remeda";
 import { HelpPopover } from "../../common/HelpPopover";
 import { RecipientSelectGroups } from "../../common/RecipientSelectGroups";
@@ -68,6 +72,8 @@ export type AddPetitionAccessDialogResult = {
   remindersConfig: Maybe<RemindersConfig>;
   scheduledAt: Maybe<Date>;
   bulkSendSigningMode?: BulkSendSigningMode;
+  subscribeSender: boolean;
+  senderId: string | null;
 };
 
 export function AddPetitionAccessDialog({
@@ -83,6 +89,13 @@ export function AddPetitionAccessDialog({
   const [showErrors, setShowErrors] = useState(false);
   const [recipientGroups, setRecipientGroups] = useState<ContactSelectSelection[][]>([[]]);
 
+  const [sender, setSender] = useState<{
+    id: string;
+    fullName?: string | null;
+    email: string;
+  }>(pick(user, ["id", "fullName", "email"]));
+
+  const [subscribeSender, setSubscribeSender] = useState(false);
   const [subject, setSubject] = useState(petition.emailSubject ?? "");
   const [body, setBody] = useState<RichTextEditorValue>(petition.emailBody ?? emptyRTEValue());
   const [remindersConfig, setRemindersConfig] = useState<Maybe<RemindersConfig>>(
@@ -99,6 +112,26 @@ export function AddPetitionAccessDialog({
       ? pick(petition.signatureConfig, ["signers", "allowAdditionalSigners", "review"])
       : null
   );
+
+  const showSendAs =
+    user.hasOnBehalfOf &&
+    user.delegatesOf.length &&
+    petition.myEffectivePermission?.permissionType === "OWNER";
+
+  const showSubscribeSender =
+    petition.permissions.find(
+      (p) => p.__typename === "PetitionUserPermission" && p.user.id === sender.id
+    ) === undefined;
+
+  const reactSelectProps = useReactSelectProps<OptionType, false, never>();
+
+  const delegateOptions = [
+    { label: `${user.fullName} <${user.email}>`, value: user.id },
+    ...user.delegatesOf.map((d) => ({
+      label: `${d.fullName} <${d.email}>`,
+      value: d.id,
+    })),
+  ];
 
   const handleSearchContactsByEmail = useSearchContactsByEmail();
 
@@ -167,6 +200,8 @@ export function AddPetitionAccessDialog({
         bulkSendSigningMode = option;
       }
 
+      const hasDelegatedSender = sender.id !== user.id;
+
       props.onResolve({
         recipientIdGroups: recipientGroups.map((group) => group.map((g) => g.id)),
         subject,
@@ -174,6 +209,8 @@ export function AddPetitionAccessDialog({
         remindersConfig,
         scheduledAt,
         bulkSendSigningMode,
+        subscribeSender: hasDelegatedSender && subscribeSender,
+        senderId: hasDelegatedSender ? sender.id : null,
       });
     } catch {}
   };
@@ -332,6 +369,56 @@ export function AddPetitionAccessDialog({
               </HStack>
             </Alert>
           ) : null}
+          {showSendAs ? (
+            <Stack paddingBottom={4}>
+              <Text>
+                <FormattedMessage
+                  id="component.add-petition-access-dialog.send-as"
+                  defaultMessage="Send as..."
+                />
+              </Text>
+              <Select
+                {...reactSelectProps}
+                value={delegateOptions.find((p) => p.value === sender.id)}
+                onChange={(selection) => {
+                  const selectedSender = user.delegatesOf.find((d) => d.id === selection?.value);
+
+                  setSender({
+                    id: selectedSender?.id ?? user.id,
+                    fullName: selectedSender?.fullName ?? user.fullName,
+                    email: selectedSender?.email ?? user.email,
+                  });
+                }}
+                options={delegateOptions}
+                isSearchable={true}
+              />
+              {showSubscribeSender ? (
+                <Checkbox
+                  isChecked={subscribeSender}
+                  colorScheme="purple"
+                  onChange={(event) => setSubscribeSender(event.target.checked)}
+                >
+                  <Flex alignItems="center">
+                    <Text as="span">
+                      <FormattedMessage
+                        id="component.add-petition-access-dialog.subscribe-to-notifications"
+                        defaultMessage="Subscribe {name} to notifications"
+                        values={{
+                          name: sender.fullName,
+                        }}
+                      />
+                    </Text>
+                    <HelpPopover>
+                      <FormattedMessage
+                        id="component.add-petition-access-dialog.subscribe-to-notifications-description"
+                        defaultMessage="Users will receive notifications about the activity of this petition."
+                      />
+                    </HelpPopover>
+                  </Flex>
+                </Checkbox>
+              ) : null}
+            </Stack>
+          ) : null}
           <RecipientSelectGroups
             recipientGroups={recipientGroups}
             onChangeRecipientGroups={setRecipientGroups}
@@ -379,6 +466,15 @@ export function AddPetitionAccessDialog({
 AddPetitionAccessDialog.fragments = {
   User: gql`
     fragment AddPetitionAccessDialog_User on User {
+      id
+      fullName
+      email
+      delegatesOf {
+        id
+        fullName
+        email
+      }
+      hasOnBehalfOf: hasFeatureFlag(featureFlag: ON_BEHALF_OF)
       ...ConfirmPetitionSignersDialog_User
     }
     ${ConfirmPetitionSignersDialog.fragments.User}
@@ -388,6 +484,17 @@ AddPetitionAccessDialog.fragments = {
       id
       emailSubject
       emailBody
+      myEffectivePermission {
+        permissionType
+      }
+      permissions {
+        isSubscribed
+        ... on PetitionUserPermission {
+          user {
+            id
+          }
+        }
+      }
       signatureConfig {
         review
         timezone

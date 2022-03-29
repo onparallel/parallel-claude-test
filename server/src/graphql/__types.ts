@@ -970,6 +970,7 @@ export interface NexusGenFieldTypes {
     sendPetitionClosedNotification: NexusGenRootTypes["Petition"]; // Petition!
     sendReminders: NexusGenEnums["Result"]; // Result!
     sendSignatureRequestReminders: NexusGenEnums["Result"]; // Result!
+    setDelegatesUser: NexusGenEnums["Result"]; // Result!
     setUserPreferredLocale: NexusGenRootTypes["User"]; // User!
     shareSignaturitApiKey: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     signedPetitionDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
@@ -1848,6 +1849,8 @@ export interface NexusGenFieldTypes {
     avatarUrl: string | null; // String
     canCreateUsers: boolean; // Boolean!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    delegates: NexusGenRootTypes["User"][]; // [User!]!
+    delegatesOf: NexusGenRootTypes["User"][]; // [User!]!
     email: string; // String!
     firstName: string | null; // String
     fullName: string | null; // String
@@ -2377,6 +2380,7 @@ export interface NexusGenFieldTypeNames {
     sendPetitionClosedNotification: "Petition";
     sendReminders: "Result";
     sendSignatureRequestReminders: "Result";
+    setDelegatesUser: "Result";
     setUserPreferredLocale: "User";
     shareSignaturitApiKey: "SupportMethodResponse";
     signedPetitionDownloadLink: "FileUploadDownloadLinkResult";
@@ -3255,6 +3259,8 @@ export interface NexusGenFieldTypeNames {
     avatarUrl: "String";
     canCreateUsers: "Boolean";
     createdAt: "DateTime";
+    delegates: "User";
+    delegatesOf: "User";
     email: "String";
     firstName: "String";
     fullName: "String";
@@ -3497,6 +3503,7 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
       scheduledAt?: NexusGenScalars["DateTime"] | null; // DateTime
+      senderId?: NexusGenScalars["GID"] | null; // GID
       subject: string; // String!
     };
     cancelScheduledMessage: {
@@ -3985,6 +3992,10 @@ export interface NexusGenArgTypes {
     sendSignatureRequestReminders: {
       // args
       petitionSignatureRequestId: NexusGenScalars["GID"]; // GID!
+    };
+    setDelegatesUser: {
+      // args
+      delegateIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     setUserPreferredLocale: {
       // args

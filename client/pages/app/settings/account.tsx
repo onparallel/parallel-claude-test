@@ -1,71 +1,86 @@
 import { gql, useMutation } from "@apollo/client";
-import {
-  Alert,
-  AlertIcon,
-  Button,
-  Divider,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Heading,
-  Input,
-  Radio,
-  RadioGroup,
-  Stack,
-} from "@chakra-ui/react";
+import { Divider, Heading, Stack, useToast } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
+  AccountChangeName,
+  AccountChangeNameData,
+} from "@parallel/components/settings/AccountChangeName";
+import { AccountDelegates } from "@parallel/components/settings/AccountDelegates";
+import { AccountLocaleChange } from "@parallel/components/settings/AccountLocaleChange";
+import {
+  Account_setDelegatesUserDocument,
   Account_setUserPreferredLocaleDocument,
   Account_updateAccountDocument,
   Account_userDocument,
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
+import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useSettingsSections } from "@parallel/utils/useSettingsSections";
-import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { useRouter } from "next/router";
-import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-
-interface NameChangeFormData {
-  firstName: string;
-  lastName: string;
-}
 
 function Account() {
   const intl = useIntl();
   const router = useRouter();
+  const toast = useToast();
+  const genericErrorToast = useGenericErrorToast();
+
+  const updateSuccessToast = () => {
+    toast({
+      title: intl.formatMessage({
+        id: "settings.account.success-toast-title",
+        defaultMessage: "Changes saved correctly",
+      }),
+      description: intl.formatMessage({
+        id: "settings.account.success-toast-description",
+        defaultMessage: "Your account has been successfully updated.",
+      }),
+      status: "success",
+      isClosable: true,
+    });
+  };
 
   const {
     data: { me },
   } = useAssertQuery(Account_userDocument);
   const sections = useSettingsSections(me);
 
-  const {
-    handleSubmit,
-    register,
-    formState: { errors },
-  } = useForm<NameChangeFormData>({
-    defaultValues: {
-      firstName: me.firstName ?? undefined,
-      lastName: me.lastName ?? undefined,
-    },
-  });
   const [updateAccount] = useMutation(Account_updateAccountDocument);
   const [setUserLocale] = useMutation(Account_setUserPreferredLocaleDocument);
-  const locales = useSupportedLocales();
+  const [setDelegatesUser] = useMutation(Account_setDelegatesUserDocument);
 
-  function onSaveName({ firstName, lastName }: NameChangeFormData) {
-    window.analytics?.identify(me.id, { firstName, lastName });
-    updateAccount({ variables: { firstName, lastName } });
+  async function onSaveName({ firstName, lastName }: AccountChangeNameData) {
+    try {
+      window.analytics?.identify(me.id, { firstName, lastName });
+      await updateAccount({ variables: { firstName, lastName } });
+      updateSuccessToast();
+    } catch {
+      genericErrorToast();
+    }
   }
 
-  function handleLocaleChange(locale: string) {
-    setUserLocale({ variables: { locale } });
-    window.analytics?.identify(me.id, { locale });
-    router.push(router.asPath, undefined, { locale });
+  async function onSaveDelegates(ids: string[]) {
+    const { data } = await setDelegatesUser({ variables: { delegateIds: ids } });
+
+    if (data && data.setDelegatesUser === "SUCCESS") {
+      updateSuccessToast();
+    } else {
+      genericErrorToast();
+    }
+  }
+
+  async function handleLocaleChange(locale: string) {
+    try {
+      await setUserLocale({ variables: { locale } });
+      window.analytics?.identify(me.id, { locale });
+      router.push(router.asPath, undefined, { locale });
+    } catch {
+      genericErrorToast();
+    }
   }
 
   return (
@@ -84,85 +99,21 @@ function Account() {
         </Heading>
       }
     >
-      <Stack padding={6} spacing={8} maxWidth="container.2xs" width="100%" paddingBottom={16}>
-        <Stack>
-          <Heading as="h4" size="md" marginBottom={2}>
-            <FormattedMessage id="settings.account.name-header" defaultMessage="Name" />
-          </Heading>
-          {me.isSsoUser ? (
-            <Alert borderRadius="md">
-              <AlertIcon />
-              <FormattedMessage
-                id="settings.account.sso-user-explanation"
-                defaultMessage="SSO users are not able to change their name"
-              />
-            </Alert>
-          ) : null}
-          <Stack as="form" onSubmit={handleSubmit(onSaveName)} spacing={4}>
-            <FormControl id="first-name" isInvalid={!!errors.firstName} isDisabled={me.isSsoUser}>
-              <FormLabel fontWeight="semibold">
-                <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
-              </FormLabel>
-              <Input
-                backgroundColor="white"
-                {...register("firstName", { required: true, maxLength: 255 })}
-              />
-              <FormErrorMessage>
-                <FormattedMessage
-                  id="generic.forms.required-first-name-error"
-                  defaultMessage="First name is required"
-                />
-              </FormErrorMessage>
-            </FormControl>
-            <FormControl
-              id="last-name"
-              isInvalid={!!errors.lastName}
-              isDisabled={me.isSsoUser}
-              mb={2}
-            >
-              <FormLabel fontWeight="semibold">
-                <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
-              </FormLabel>
-              <Input
-                backgroundColor="white"
-                {...register("lastName", { required: true, maxLength: 255 })}
-              />
-              <FormErrorMessage>
-                <FormattedMessage
-                  id="generic.forms.required-last-name-error"
-                  defaultMessage="Last name is required"
-                />
-              </FormErrorMessage>
-            </FormControl>
-            <Button
-              type="submit"
-              colorScheme="purple"
-              isDisabled={me.isSsoUser}
-              width="min-content"
-            >
-              <FormattedMessage
-                id="settings.account.update-name-button"
-                defaultMessage="Save changes"
-              />
-            </Button>
-          </Stack>
-        </Stack>
+      <Stack padding={6} spacing={8} maxWidth="container.xs" width="100%" paddingBottom={16}>
+        <AccountChangeName
+          user={me}
+          onSubmit={useDebouncedCallback(onSaveName, 300, [onSaveName])}
+        />
         <Divider borderColor="gray.300" />
-        <Stack>
-          <Heading as="h4" size="md" marginBottom={2}>
-            <FormattedMessage id="settings.account.language" defaultMessage="Language" />
-          </Heading>
-          <RadioGroup onChange={handleLocaleChange} value={me.preferredLocale ?? intl.locale}>
-            <Stack>
-              {locales.map(({ key, localizedLabel }) => (
-                <Radio backgroundColor="white" key={key} value={key}>
-                  {localizedLabel}
-                </Radio>
-              ))}
-            </Stack>
-          </RadioGroup>
-        </Stack>
+        <AccountLocaleChange
+          user={me}
+          onChange={useDebouncedCallback(handleLocaleChange, 100, [handleLocaleChange])}
+        />
         <Divider borderColor="gray.300" />
+        <AccountDelegates
+          user={me}
+          onSubmit={useDebouncedCallback(onSaveDelegates, 300, [onSaveDelegates])}
+        />
       </Stack>
     </SettingsLayout>
   );
@@ -171,16 +122,18 @@ function Account() {
 Account.fragments = {
   User: gql`
     fragment Account_User on User {
-      firstName
-      lastName
-      isSsoUser
-      email
-      preferredLocale
+      id
       ...SettingsLayout_User
       ...useSettingsSections_User
+      ...AccountChangeName_User
+      ...AccountLocaleChange_User
+      ...AccountDelegates_User
     }
     ${SettingsLayout.fragments.User}
     ${useSettingsSections.fragments.User}
+    ${AccountChangeName.fragments.User}
+    ${AccountLocaleChange.fragments.User}
+    ${AccountDelegates.fragments.User}
   `,
 };
 
@@ -204,6 +157,11 @@ Account.mutations = [
       }
     }
     ${Account.fragments.User}
+  `,
+  gql`
+    mutation Account_setDelegatesUser($delegateIds: [GID!]!) {
+      setDelegatesUser(delegateIds: $delegateIds)
+    }
   `,
 ];
 

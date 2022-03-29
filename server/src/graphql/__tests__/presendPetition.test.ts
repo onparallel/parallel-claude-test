@@ -54,6 +54,7 @@ describe("presendPetition", () => {
       [[petition, [contactIds[0], contactIds[1]]]],
       { body: [], subject: "test" },
       user,
+      null,
       false,
       apiContext
     );
@@ -122,6 +123,7 @@ describe("presendPetition", () => {
         subject: "test",
       },
       user,
+      null,
       true,
       apiContext
     );
@@ -181,6 +183,7 @@ describe("presendPetition", () => {
         scheduledAt: null,
       },
       user,
+      null,
       false,
       apiContext,
       now
@@ -219,6 +222,7 @@ describe("presendPetition", () => {
       [[petitions[0], contactIds]],
       { body: [], subject: "test" },
       user,
+      null,
       false,
       apiContext,
       now
@@ -261,6 +265,7 @@ describe("presendPetition", () => {
         scheduledAt,
       },
       user,
+      null,
       false,
       apiContext
     );
@@ -302,6 +307,7 @@ describe("presendPetition", () => {
         subject: "test",
       },
       user,
+      null,
       false,
       apiContext,
       now
