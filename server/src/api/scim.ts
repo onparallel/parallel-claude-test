@@ -92,16 +92,17 @@ scim
           `Provisioning:${req.context.organization!.id}`
         );
       }
-      if (userData.first_name !== givenName || userData.last_name !== familyName) {
-        [userData] = await req.context.users.updateUserData(
-          userData.id,
-          {
-            first_name: givenName,
-            last_name: familyName,
-          },
-          `Provisioning:${req.context.organization!.id}`
-        );
-      }
+      // TODO: descomentar cuando Cuatre deje de hacer cosas raras
+      // if (userData.first_name !== givenName || userData.last_name !== familyName) {
+      //   [userData] = await req.context.users.updateUserData(
+      //     userData.id,
+      //     {
+      //       first_name: givenName,
+      //       last_name: familyName,
+      //     },
+      //     `Provisioning:${req.context.organization!.id}`
+      //   );
+      // }
       res.json(
         toScimUser({
           email: userData.email,
