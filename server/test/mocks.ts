@@ -1,6 +1,7 @@
 import { IncomingMessage } from "http";
 import { injectable } from "inversify";
 import { Response } from "node-fetch";
+import { Memoize } from "typescript-memoize";
 import { UserAuthenticationRepository } from "../src/db/repositories/UserAuthenticationRepository";
 import { UserRepository } from "../src/db/repositories/UserRepository";
 import { User } from "../src/db/__types";
@@ -84,6 +85,7 @@ export class MockEmailsService implements IEmailsService {
 
 @injectable()
 export class MockAwsService implements IAws {
+  constructor(private readonly storage = new MockStorage()) {}
   async getUser() {
     return {} as any;
   }
@@ -99,14 +101,14 @@ export class MockAwsService implements IAws {
   async createCognitoUser() {
     return "";
   }
-  public get fileUploads() {
-    return new MockStorage();
+  @Memoize() public get fileUploads() {
+    return this.storage;
   }
-  public get publicFiles() {
-    return new MockStorage();
+  @Memoize() public get publicFiles() {
+    return this.storage;
   }
-  public get temporaryFiles() {
-    return new MockStorage();
+  @Memoize() public get temporaryFiles() {
+    return this.storage;
   }
 }
 

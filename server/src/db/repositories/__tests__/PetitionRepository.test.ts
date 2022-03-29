@@ -1,28 +1,34 @@
+import faker from "@faker-js/faker";
 import { Container } from "inversify";
 import { Knex } from "knex";
+import { isDefined, pick, range, sortBy } from "remeda";
+import { createTestContainer } from "../../../../test/testContainer";
+import { AWS_SERVICE, IAws } from "../../../services/aws";
 import { deleteAllData } from "../../../util/knexUtils";
+import { MaybeArray } from "../../../util/types";
 import { KNEX } from "../../knex";
 import {
-  Organization,
-  User,
-  Petition,
-  PetitionField,
-  PetitionAccess,
   Contact,
-  PetitionUserNotification,
+  Organization,
+  Petition,
+  PetitionAccess,
   PetitionContactNotification,
+  PetitionField,
+  PetitionUserNotification,
+  User,
 } from "../../__types";
-import { Mocks } from "./mocks";
+import { EmailLogRepository } from "../EmailLogRepository";
+import { FileRepository } from "../FileRepository";
 import { PetitionRepository } from "../PetitionRepository";
-import { pick, range, sortBy } from "remeda";
-import faker from "@faker-js/faker";
-import { createTestContainer } from "../../../../test/testContainer";
+import { Mocks } from "./mocks";
 
 describe("repositories/PetitionRepository", () => {
   let container: Container;
   let knex: Knex;
   let mocks: Mocks;
   let petitions: PetitionRepository;
+  let filesRepo: FileRepository;
+  let emailLogsRepo: EmailLogRepository;
 
   let organization: Organization;
   let user: User;
@@ -42,6 +48,8 @@ describe("repositories/PetitionRepository", () => {
     }));
 
     petitions = container.get(PetitionRepository);
+    filesRepo = container.get(FileRepository);
+    emailLogsRepo = container.get(EmailLogRepository);
   });
 
   afterAll(async () => {
@@ -855,6 +863,224 @@ describe("repositories/PetitionRepository", () => {
             user_id: userId,
           },
         ]);
+      });
+    });
+  });
+
+  describe("Petition Anonymizer", () => {
+    describe("anonymizePetition", () => {
+      let petition: Petition;
+      let fields: PetitionField[] = [];
+      let accesses: PetitionAccess[] = [];
+      let deleteFileUploadSpy: jest.SpyInstance<Promise<void>, [key: MaybeArray<string>]>;
+
+      beforeEach(async () => {
+        [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+          is_template: false,
+          signature_config: {},
+        }));
+
+        fields = await mocks.createRandomPetitionFields(petition.id, 20, (i) => ({
+          type: i < 5 ? "FILE_UPLOAD" : undefined,
+        }));
+
+        const contacts = await mocks.createRandomContacts(organization.id, 4);
+        accesses = await mocks.createPetitionAccess(
+          petition.id,
+          user.id,
+          contacts.map((c) => c.id),
+          user.id
+        );
+
+        deleteFileUploadSpy = jest.spyOn(
+          container.get<IAws>(AWS_SERVICE).fileUploads,
+          "deleteFile"
+        );
+      });
+
+      afterEach(() => {
+        deleteFileUploadSpy.mockReset();
+      });
+
+      it("marks petition as anonymized", async () => {
+        await petitions.anonymizePetition(petition.id);
+
+        const after = (await petitions.loadPetition(petition.id))!;
+        expect(petition.signature_config).not.toBeNull();
+        expect(after.signature_config).toBeNull();
+        expect(after.anonymized_at).not.toBeNull();
+      });
+
+      it("erases the content of every reply", async () => {
+        const fileUploadIds: number[] = [];
+
+        expect(fields.length).toBeGreaterThan(0);
+        for (let i = 0; i < fields.length; i++) {
+          if (i < 5) {
+            const fileReplies = await mocks.createRandomFileReply(fields[i].id, 2, () => ({
+              user_id: user.id,
+            }));
+            fileUploadIds.push(...fileReplies.map((r) => r.content.file_upload_id));
+          } else {
+            await mocks.createRandomTextReply(fields[i].id, undefined, 3, () => ({
+              user_id: user.id,
+            }));
+          }
+        }
+
+        await petitions.anonymizePetition(petition.id);
+
+        const repliesAfter = (await petitions.loadRepliesForField(fields.map((f) => f.id))).flat();
+        expect(repliesAfter.length).toBeGreaterThan(0);
+
+        for (const reply of repliesAfter) {
+          expect(reply.anonymized_at).not.toBeNull();
+          if (reply.type === "FILE_UPLOAD") {
+            expect(reply.content.file_upload_id).toBeNull();
+          } else {
+            expect(reply.content.value).toBeNull();
+          }
+        }
+        // deletes every file_upload on replies
+        const currentFiles = await filesRepo.loadFileUpload(fileUploadIds);
+        expect(currentFiles.filter(isDefined)).toHaveLength(0);
+
+        expect(deleteFileUploadSpy).toHaveBeenCalledTimes(fileUploadIds.length);
+      });
+
+      it("erases the content of every comment", async () => {
+        await Promise.all([
+          mocks.createRandomCommentsFromUser(user.id, fields[3].id, petition.id, 2),
+          mocks.createRandomCommentsFromUser(user.id, fields[1].id, petition.id, 3),
+          mocks.createRandomCommentsFromAccess(accesses[0].id, fields[3].id, petition.id, 2),
+        ]);
+
+        await petitions.anonymizePetition(petition.id);
+
+        const commentsAfter = (
+          await petitions.loadPetitionFieldCommentsForField(
+            fields.map((f) => ({
+              petitionFieldId: f.id,
+              petitionId: petition.id,
+              loadInternalComments: true,
+            }))
+          )
+        ).flat();
+
+        expect(commentsAfter.every((c) => c.anonymized_at !== null && c.content === "")).toEqual(
+          true
+        );
+      });
+
+      it("deactivates every access on the petition", async () => {
+        await petitions.anonymizePetition(petition.id);
+
+        const accesses = await petitions.loadAccessesForPetition(petition.id);
+        expect(accesses.length).toBeGreaterThan(0);
+        expect(accesses.every((a) => a.status === "INACTIVE")).toEqual(true);
+      });
+
+      it("erases the content of every message and reminder", async () => {
+        await Promise.all([
+          await mocks.createRandomPetitionMessage(petition.id, accesses[0].id, user.id),
+          await mocks.createRandomPetitionReminder(accesses[3].id, user.id),
+        ]);
+
+        await petitions.anonymizePetition(petition.id);
+
+        const messages = (
+          await petitions.loadMessagesByPetitionAccessId(accesses.map((a) => a.id))
+        ).flat();
+        const reminders = (
+          await petitions.loadRemindersByAccessId(accesses.map((a) => a.id))
+        ).flat();
+
+        expect(messages.length).toBeGreaterThan(0);
+        expect(reminders.length).toBeGreaterThan(0);
+
+        expect(
+          messages.every(
+            (m) => m.email_body === null && m.email_subject === null && m.anonymized_at !== null
+          )
+        ).toEqual(true);
+
+        expect(reminders.every((r) => r.email_body === null && r.anonymized_at !== null)).toEqual(
+          true
+        );
+      });
+
+      it("erases the content of every email log", async () => {
+        const [messageEmailLog, reminderEmailLog] = await mocks.createRandomEmailLog(2);
+        await mocks.createRandomPetitionMessage(petition.id, accesses[0].id, user.id, () => ({
+          email_log_id: messageEmailLog.id,
+        }));
+        await mocks.createRandomPetitionReminder(accesses[3].id, user.id, () => ({
+          email_log_id: reminderEmailLog.id,
+        }));
+
+        await petitions.anonymizePetition(petition.id);
+
+        const emailLogs = (
+          await emailLogsRepo.loadEmailLog([messageEmailLog.id, reminderEmailLog.id])
+        ).filter(isDefined);
+
+        expect(emailLogs.length).toBeGreaterThan(0);
+        expect(
+          emailLogs.every(
+            (e) =>
+              e &&
+              e.text === "" &&
+              e.html === "" &&
+              e.to === "" &&
+              e.subject === "" &&
+              e.anonymized_at !== null
+          )
+        ).toEqual(true);
+      });
+
+      it("nulls signature request configs and deletes the signed documents", async () => {
+        const [signedDocument] = await mocks.createRandomFileUpload(1);
+        await Promise.all([
+          mocks.createRandomPetitionSignatureRequest(petition.id, () => ({
+            status: "COMPLETED",
+            file_upload_id: signedDocument.id,
+          })),
+          mocks.createRandomPetitionSignatureRequest(petition.id, () => ({
+            status: "PROCESSING",
+          })),
+          mocks.createRandomPetitionSignatureRequest(petition.id, () => ({
+            status: "CANCELLED",
+            cancel_data: { reason: "this is my reason" },
+            cancel_reason: "DECLINED_BY_SIGNER",
+          })),
+        ]);
+
+        await petitions.anonymizePetition(petition.id);
+
+        const signatures = await petitions.loadPetitionSignaturesByPetitionId(petition.id);
+
+        expect(signatures.length).toBeGreaterThan(0);
+        expect(
+          signatures.every(
+            (s) =>
+              JSON.stringify(s.signature_config) === "{}" &&
+              ((s.cancel_reason === "DECLINED_BY_SIGNER" &&
+                JSON.stringify(s.cancel_data) === "{}") ||
+                s.cancel_reason !== "DECLINED_BY_SIGNER") &&
+              s.data === null &&
+              s.event_logs === null &&
+              s.anonymized_at !== null
+          )
+        ).toEqual(true);
+
+        const signedFileIds = signatures
+          .filter((s) => isDefined(s.file_upload_id))
+          .map((s) => s.id);
+        expect(signedFileIds.length).toBeGreaterThan(0);
+        const fileUploads = (await filesRepo.loadFileUpload(signedFileIds)).filter(isDefined);
+        expect(fileUploads).toHaveLength(0);
+
+        expect(deleteFileUploadSpy).toHaveBeenCalledTimes(1);
       });
     });
   });

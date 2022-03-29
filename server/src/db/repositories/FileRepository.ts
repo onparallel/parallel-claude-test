@@ -57,7 +57,7 @@ export class FileRepository extends BaseRepository {
       .where({ id: id, upload_complete: false });
   }
 
-  async deleteFileUpload(id: number, deletedBy: string, t?: Knex.Transaction) {
+  async deleteFileUpload(id: number, deletedBy?: string, t?: Knex.Transaction) {
     await this.from("file_upload", t)
       .update(
         {

@@ -775,8 +775,12 @@ export class PetitionRepository extends BaseRepository {
     return row ?? null;
   }
 
-  async cancelScheduledMessagesByAccessIds(accessIds: number[], userId?: number) {
-    const messages = await this.from("petition_message")
+  async cancelScheduledMessagesByAccessIds(
+    accessIds: number[],
+    userId?: number,
+    t?: Knex.Transaction
+  ) {
+    const messages = await this.from("petition_message", t)
       .whereIn("petition_access_id", accessIds)
       .where("status", "SCHEDULED")
       .update(
@@ -795,7 +799,8 @@ export class PetitionRepository extends BaseRepository {
           user_id: userId,
           reason: (isDefined(userId) ? "CANCELLED_BY_USER" : "EMAIL_BOUNCED") as any,
         },
-      }))
+      })),
+      t
     );
 
     return messages;
@@ -804,11 +809,12 @@ export class PetitionRepository extends BaseRepository {
   async deactivateAccesses(
     petitionId: number,
     accessIds: number[],
-    updatedBy: string,
-    userId?: number
+    updatedBy?: string,
+    userId?: number,
+    t?: Knex.Transaction
   ) {
     const [accesses] = await Promise.all([
-      this.from("petition_access").whereIn("id", accessIds).where("status", "ACTIVE").update(
+      this.from("petition_access", t).whereIn("id", accessIds).where("status", "ACTIVE").update(
         {
           reminders_active: false,
           next_reminder_at: null,
@@ -818,20 +824,23 @@ export class PetitionRepository extends BaseRepository {
         },
         "*"
       ),
-      this.cancelScheduledMessagesByAccessIds(accessIds, userId),
+      this.cancelScheduledMessagesByAccessIds(accessIds, userId, t),
     ]);
 
-    await this.createEvent([
-      ...accesses.map((access) => ({
-        type: "ACCESS_DEACTIVATED" as const,
-        petition_id: petitionId,
-        data: {
-          petition_access_id: access.id,
-          user_id: userId,
-          reason: (isDefined(userId) ? "DEACTIVATED_BY_USER" : "EMAIL_BOUNCED") as any,
-        },
-      })),
-    ]);
+    await this.createEvent(
+      [
+        ...accesses.map((access) => ({
+          type: "ACCESS_DEACTIVATED" as const,
+          petition_id: petitionId,
+          data: {
+            petition_access_id: access.id,
+            user_id: userId,
+            reason: (isDefined(userId) ? "DEACTIVATED_BY_USER" : "EMAIL_BOUNCED") as any,
+          },
+        })),
+      ],
+      t
+    );
 
     return accesses;
   }
@@ -1032,7 +1041,7 @@ export class PetitionRepository extends BaseRepository {
   async updatePetition(
     petitionIds: MaybeArray<number>,
     data: Partial<TableTypes["petition"]>,
-    updatedBy: string,
+    updatedBy?: string,
     t?: Knex.Transaction
   ) {
     const ids = unMaybeArray(petitionIds);
@@ -1252,15 +1261,26 @@ export class PetitionRepository extends BaseRepository {
         throw new Error("Invalid petition field id");
       }
 
-      await this.from("petition_field_reply", t)
-        .update({
-          deleted_at: this.now(),
-          deleted_by: `User:${user.id}`,
-        })
-        .where({
-          petition_field_id: fieldId,
-          deleted_at: null,
-        });
+      await Promise.all([
+        this.from("petition_field_reply", t)
+          .update({
+            deleted_at: this.now(),
+            deleted_by: `User:${user.id}`,
+          })
+          .where({
+            petition_field_id: fieldId,
+            deleted_at: null,
+          }),
+        this.from("petition_field_comment", t)
+          .update({
+            deleted_at: this.now(),
+            deleted_by: `User:${user.id}`,
+          })
+          .where({
+            petition_field_id: fieldId,
+            deleted_at: null,
+          }),
+      ]);
 
       const [[petition]] = await Promise.all([
         this.from("petition", t).where("id", petitionId).select("*"),
@@ -1485,7 +1505,7 @@ export class PetitionRepository extends BaseRepository {
    */
   async safeDeleteFileUpload(
     fileUploadIds: MaybeArray<number>,
-    deletedBy: string,
+    deletedBy?: string,
     t?: Knex.Transaction
   ) {
     const ids = unMaybeArray(fileUploadIds);
@@ -1503,6 +1523,11 @@ export class PetitionRepository extends BaseRepository {
         this.files.deleteFileUpload(f!.id, deletedBy, t),
         samePathFiles.length === 1 ? this.aws.fileUploads.deleteFile(samePathFiles[0].path) : null,
       ]);
+    });
+
+    files.forEach((f) => {
+      this.files.loadFileUpload.dataloader.clear(f!.id);
+      this.files.loadFileUploadsByPath.dataloader.clear(f!.path);
     });
   }
 
@@ -4234,5 +4259,169 @@ export class PetitionRepository extends BaseRepository {
       [value, key, key, value, updatedBy, petitionId]
     );
     return petition;
+  }
+
+  async anonymizePetition(petitionId: number) {
+    await this.withTransaction(async (t) => {
+      await this.updatePetition(
+        petitionId,
+        { signature_config: null, anonymized_at: this.now() },
+        undefined,
+        t
+      );
+
+      // TODO also manage deleted_at entries!!
+      const [accesses, fields] = await Promise.all([
+        this.loadAccessesForPetition(petitionId, { cache: false }),
+        this.loadFieldsForPetition(petitionId, { cache: false }),
+      ]);
+
+      const [messages, reminders] = await Promise.all([
+        this.anonymizePetitionMessages(petitionId, t),
+        this.anonymizePetitionReminders(
+          accesses.map((a) => a.id),
+          t
+        ),
+        this.anonymizePetitionFieldReplies(
+          fields.map((f) => f.id),
+          t
+        ),
+        this.anonymizePetitionFieldComments(
+          fields.map((f) => f.id),
+          t
+        ),
+        this.deactivateAccesses(
+          petitionId,
+          accesses.map((a) => a.id),
+          undefined,
+          undefined,
+          t
+        ),
+      ]);
+
+      await this.anonymizeEmailLogs(
+        [
+          ...messages.filter((m) => isDefined(m.email_log_id)).map((m) => m.email_log_id!),
+          ...reminders.filter((m) => isDefined(m.email_log_id)).map((m) => m.email_log_id!),
+        ],
+        t
+      );
+
+      await this.anonymizePetitionSignatureRequests(petitionId, t);
+
+      await this.loadAccessesForPetition.dataloader.clear(petitionId);
+    });
+  }
+
+  private async anonymizePetitionFieldReplies(
+    petitionFieldIds: MaybeArray<number>,
+    t: Knex.Transaction
+  ) {
+    const ids = unMaybeArray(petitionFieldIds);
+    if (ids.length === 0) return;
+
+    const replies = (await this.loadRepliesForField(ids, { cache: false })).flat();
+    const fileUploadIds = replies
+      .filter((r) => r.type === "FILE_UPLOAD")
+      .map((r) => r.content.file_upload_id as number);
+
+    await this.raw(
+      /* sql */ `
+      update petition_field_reply pfr
+      set anonymized_at = NOW(),
+      content = case pfr.type
+            when 'FILE_UPLOAD' then
+            content || '{"file_upload_id": null}'::jsonb
+            else 
+              content || '{"value": null}'::jsonb
+            end
+      where petition_field_id in ?
+    `,
+      [this.sqlIn(ids)],
+      t
+    );
+
+    await this.safeDeleteFileUpload(fileUploadIds, undefined, t);
+
+    ids.forEach((id) => this.loadRepliesForField.dataloader.clear(id));
+  }
+
+  private async anonymizePetitionFieldComments(
+    petitionFieldIds: MaybeArray<number>,
+    t: Knex.Transaction
+  ) {
+    const ids = unMaybeArray(petitionFieldIds);
+    if (ids.length === 0) return;
+
+    await this.from("petition_field_comment", t).whereIn("petition_field_id", ids).update({
+      anonymized_at: this.now(),
+      content: "", // TODO make null instead of empty string
+    });
+  }
+
+  private async anonymizePetitionMessages(petitionId: number, t: Knex.Transaction) {
+    return await this.from("petition_message", t).where("petition_id", petitionId).update(
+      {
+        anonymized_at: this.now(),
+        email_body: null,
+        email_subject: null,
+      },
+      "*"
+    );
+  }
+
+  private async anonymizePetitionReminders(petitionAccessIds: number[], t: Knex.Transaction) {
+    if (petitionAccessIds.length === 0) {
+      return [];
+    }
+    return await this.from("petition_reminder", t)
+      .whereIn("petition_access_id", petitionAccessIds)
+      .update(
+        {
+          anonymized_at: this.now(),
+          email_body: null,
+        },
+        "*"
+      );
+  }
+
+  private async anonymizeEmailLogs(emailLogIds: number[], t: Knex.Transaction) {
+    if (emailLogIds.length === 0) {
+      return;
+    }
+    await this.from("email_log", t).whereIn("id", emailLogIds).update(
+      {
+        anonymized_at: this.now(),
+        html: "", // TODO make this 4 nullable
+        text: "",
+        to: "",
+        subject: "",
+      },
+      "*"
+    );
+  }
+
+  private async anonymizePetitionSignatureRequests(petitionId: number, t: Knex.Transaction) {
+    const signatures = await this.from("petition_signature_request", t)
+      .where("petition_id", petitionId)
+      .update(
+        {
+          anonymized_at: this.now(),
+          signature_config: {} as any, // TODO make null
+          data: null,
+          event_logs: null,
+          // DECLINED_BY_SIGNER signatures have text written by recipient on cancel_data
+          cancel_data: this.knex.raw(/* sql */ `
+            case cancel_reason when 'DECLINED_BY_SIGNER' then '{}'::jsonb else cancel_data end
+          `),
+        },
+        "*"
+      );
+
+    const fileUploadIds = signatures
+      .filter((s) => isDefined(s.file_upload_id))
+      .map((s) => s.file_upload_id!);
+
+    await this.safeDeleteFileUpload(fileUploadIds, undefined, t);
   }
 }

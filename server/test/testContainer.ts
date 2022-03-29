@@ -4,10 +4,9 @@ import { AUTH, IAuth } from "../src/services/auth";
 import { AWS_SERVICE, IAws } from "../src/services/aws";
 import { EMAILS, IEmailsService } from "../src/services/emails";
 import { FETCH_SERVICE, IFetchService } from "../src/services/fetch";
-import { LOGGER, ILogger } from "../src/services/logger";
+import { ILogger, LOGGER } from "../src/services/logger";
 import { IRedis, REDIS } from "../src/services/redis";
 import { ISignatureService, SIGNATURE } from "../src/services/signature";
-import { IStorage, StorageFactory, STORAGE_FACTORY } from "../src/services/storage";
 import {
   MockAnalyticsService,
   MockAuth,
@@ -16,7 +15,6 @@ import {
   MockFetchService,
   MockRedis,
   MockSignatureService,
-  MockStorage,
 } from "./mocks";
 
 export function createTestContainer() {
@@ -27,10 +25,6 @@ export function createTestContainer() {
   container.rebind<IAnalyticsService>(ANALYTICS).to(MockAnalyticsService);
   container.rebind<IEmailsService>(EMAILS).to(MockEmailsService).inSingletonScope();
   container.rebind<IAws>(AWS_SERVICE).to(MockAwsService).inSingletonScope();
-
-  container.rebind<IStorage>(STORAGE_FACTORY).toFactory(() => {
-    return (() => new MockStorage()) as StorageFactory;
-  });
   container.rebind<IFetchService>(FETCH_SERVICE).to(MockFetchService).inSingletonScope();
   container.rebind<ISignatureService>(SIGNATURE).to(MockSignatureService).inSingletonScope();
   return container;

@@ -3,6 +3,7 @@ import { Knex } from "knex";
 import { range } from "remeda";
 import { USER_COGNITO_ID } from "../../../../test/mocks";
 import { unMaybeArray } from "../../../util/arrays";
+import { removeNotDefined } from "../../../util/remedaExtensions";
 import { titleize } from "../../../util/strings";
 import { hash, random } from "../../../util/token";
 import { MaybeArray, Replace } from "../../../util/types";
@@ -44,6 +45,8 @@ import {
   PetitionMessage,
   PetitionPermission,
   PetitionPermissionType,
+  PetitionReminder,
+  PetitionSignatureRequest,
   PetitionStatus,
   PetitionUserNotification,
   PublicPetitionLink,
@@ -56,8 +59,8 @@ import {
   UserData,
   UserGroup,
   UserGroupMember,
-  UserPetitionEventLog,
   UserOrganizationRole,
+  UserPetitionEventLog,
 } from "../../__types";
 import { Task } from "../TaskRepository";
 
@@ -277,7 +280,7 @@ export class Mocks {
             title: faker.random.words(),
             type: type,
             options: randomPetitionFieldOptions(type),
-            ...data,
+            ...removeNotDefined(data),
           };
         })
       )
@@ -286,7 +289,7 @@ export class Mocks {
 
   async createRandomTextReply(
     textFieldId: number,
-    access_id: number,
+    access_id?: number,
     amount?: number,
     builder?: (index: number) => Partial<PetitionFieldReply>
   ) {
@@ -295,7 +298,7 @@ export class Mocks {
         range(0, amount || 1).map<CreatePetitionFieldReply>((index) => {
           return {
             petition_field_id: textFieldId,
-            content: { text: faker.lorem.words(10) },
+            content: { value: faker.lorem.words(10) },
             type: "TEXT",
             petition_access_id: access_id,
             ...builder?.(index),
@@ -451,14 +454,14 @@ export class Mocks {
     amount?: number,
     builder?: (index: number) => Partial<PetitionFieldReply>
   ) {
-    const [fileUpload] = await this.createRandomFileUpload(1);
+    const fileUploads = await this.createRandomFileUpload(amount || 1);
     return await this.knex<PetitionFieldReply>("petition_field_reply")
       .insert(
         range(0, amount || 1).map<CreatePetitionFieldReply>((index) => {
           return {
             petition_field_id: fieldId,
             type: "FILE_UPLOAD",
-            content: { file_upload_id: fileUpload.id },
+            content: { file_upload_id: fileUploads[index].id },
             ...builder?.(index),
           };
         })
@@ -695,18 +698,35 @@ export class Mocks {
       .returning("*");
   }
 
-  async createRandomEmailLog() {
+  async createRandomPetitionReminder(
+    petitionAccessId: number,
+    senderId: number,
+    builder?: () => Partial<PetitionReminder>
+  ) {
+    return await this.knex<PetitionReminder>("petition_reminder").insert({
+      email_body: faker.lorem.paragraphs(),
+      petition_access_id: petitionAccessId,
+      sender_id: senderId,
+      status: "PROCESSED",
+      type: "MANUAL",
+      ...builder?.(),
+    });
+  }
+
+  async createRandomEmailLog(amount?: number) {
     return await this.knex<EmailLog>("email_log")
-      .insert({
-        to: faker.internet.email(),
-        from: faker.internet.email(),
-        subject: faker.lorem.words(),
-        text: faker.lorem.paragraphs(),
-        html: faker.lorem.paragraphs(),
-        track_opens: false,
-        created_at: new Date(),
-        created_from: faker.internet.email(),
-      })
+      .insert(
+        range(0, amount || 1).map(() => ({
+          to: faker.internet.email(),
+          from: faker.internet.email(),
+          subject: faker.lorem.words(),
+          text: faker.lorem.paragraphs(),
+          html: faker.lorem.paragraphs(),
+          track_opens: false,
+          created_at: new Date(),
+          created_from: faker.internet.email(),
+        }))
+      )
       .returning("*");
   }
 
@@ -822,6 +842,30 @@ export class Mocks {
       .returning("*");
 
     return petitionEvents;
+  }
+
+  async createRandomPetitionSignatureRequest(
+    petitionId: number,
+    builder?: () => Partial<PetitionSignatureRequest>
+  ) {
+    return await this.knex<PetitionSignatureRequest>("petition_signature_request").insert(
+      {
+        petition_id: petitionId,
+        status: "PROCESSED",
+        signature_config: {
+          orgIntegrationId: 1,
+          signersInfo: [],
+          timezone: "Europe/Madrid",
+          title: "sign this!",
+          allowAdditionalSigners: true,
+          review: false,
+        },
+        data: {},
+        event_logs: [],
+        ...builder?.(),
+      },
+      "*"
+    );
   }
 }
 
