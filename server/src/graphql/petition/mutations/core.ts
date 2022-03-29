@@ -90,6 +90,7 @@ import {
 } from "../validations";
 import { ArgValidationError, WhitelistedError } from "./../../helpers/errors";
 import {
+  userCanSendAs,
   userHasAccessToPublicPetitionLink,
   userHasAccessToUserOrUserGroupPermissions,
 } from "./authorizers";
@@ -1143,7 +1144,8 @@ export const bulkSendPetition = mutationField("bulkSendPetition", {
     orgHasAvailablePetitionSendCredits(
       (args) => args.petitionId,
       (args) => args.contactIdGroups.length
-    )
+    ),
+    userCanSendAs("senderId" as never)
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),

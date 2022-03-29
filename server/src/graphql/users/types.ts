@@ -184,12 +184,14 @@ export const User = objectType({
     });
     t.list.field("delegates", {
       type: "User",
+      description: "Users that the user can send on behalf of",
       resolve: async (root, _, ctx) => {
         return await ctx.users.loadUsersDelegatesByUserId(root.id);
       },
     });
     t.list.field("delegatesOf", {
       type: "User",
+      description: "Users that the user allows to send on their behalf",
       resolve: async (root, _, ctx) => {
         return await ctx.users.loadUsersDelegatesOfByUserId(root.id);
       },

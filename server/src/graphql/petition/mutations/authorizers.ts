@@ -2,7 +2,7 @@ import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin"
 import { isDefined } from "remeda";
 import { ApiContext } from "../../../context";
 import { partition, unMaybeArray } from "../../../util/arrays";
-import { MaybeArray } from "../../../util/types";
+import { Maybe, MaybeArray } from "../../../util/types";
 import { Arg } from "../../helpers/authorize";
 import { contextUserHasAccessToUserGroups } from "../../user-group/authorizers";
 
@@ -118,6 +118,22 @@ export function userHasAccessToPublicPetitionLink<
         ctx.user!.id,
         publicPetitionLinks.map((ppl) => ppl.template_id)
       );
+    } catch {}
+    return false;
+  };
+}
+
+export function userCanSendAs<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, Maybe<number>>
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const senderId = args[argName] as unknown as Maybe<number>;
+    if (!senderId) return true;
+    try {
+      const delegates = await ctx.users.loadUsersDelegatesByUserId(ctx.user!.id);
+      if (delegates.find((d) => d.id === senderId)) return true;
     } catch {}
     return false;
   };

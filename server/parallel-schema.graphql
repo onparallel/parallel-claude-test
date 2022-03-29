@@ -4473,7 +4473,15 @@ type User implements Timestamps {
   Time when the resource was created.
   """
   createdAt: DateTime!
+
+  """
+  Users that the user can send on behalf of
+  """
   delegates: [User!]!
+
+  """
+  Users that the user allows to send on their behalf
+  """
   delegatesOf: [User!]!
 
   """
