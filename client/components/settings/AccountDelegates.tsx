@@ -32,7 +32,14 @@ interface AccountDelegatesProps extends Omit<StackProps, "onSubmit"> {
 }
 
 export function AccountDelegates({ user, onSubmit, ...props }: AccountDelegatesProps) {
-  const { handleSubmit, control, watch } = useForm<AccountDelegatesData>({
+  const {
+    handleSubmit,
+    control,
+    watch,
+    reset,
+    formState: { isDirty },
+  } = useForm<AccountDelegatesData>({
+    mode: "onSubmit",
     defaultValues: {
       delegates: user.delegates ?? [],
     },
@@ -61,7 +68,10 @@ export function AccountDelegates({ user, onSubmit, ...props }: AccountDelegatesP
       </Heading>
       <Stack
         as="form"
-        onSubmit={handleSubmit(({ delegates }) => onSubmit(delegates.map((d) => d.id)))}
+        onSubmit={handleSubmit((values) => {
+          onSubmit(values.delegates.map((d) => d.id));
+          reset(values);
+        })}
         spacing={4}
       >
         <FormControl id="delegates" isDisabled={!user.hasOnBehalfOf}>
@@ -131,7 +141,7 @@ export function AccountDelegates({ user, onSubmit, ...props }: AccountDelegatesP
           type="submit"
           colorScheme="purple"
           width="min-content"
-          isDisabled={!user.hasOnBehalfOf}
+          isDisabled={!user.hasOnBehalfOf || !isDirty}
         >
           <FormattedMessage id="generic.save" defaultMessage="Save" />
         </Button>

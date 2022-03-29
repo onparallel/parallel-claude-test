@@ -17,7 +17,6 @@ import {
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useSettingsSections } from "@parallel/utils/useSettingsSections";
 import { useRouter } from "next/router";
@@ -100,20 +99,11 @@ function Account() {
       }
     >
       <Stack padding={6} spacing={8} maxWidth="container.xs" width="100%" paddingBottom={16}>
-        <AccountChangeName
-          user={me}
-          onSubmit={useDebouncedCallback(onSaveName, 300, [onSaveName])}
-        />
+        <AccountChangeName user={me} onSubmit={onSaveName} />
         <Divider borderColor="gray.300" />
-        <AccountLocaleChange
-          user={me}
-          onChange={useDebouncedCallback(handleLocaleChange, 100, [handleLocaleChange])}
-        />
+        <AccountLocaleChange user={me} onChange={handleLocaleChange} />
         <Divider borderColor="gray.300" />
-        <AccountDelegates
-          user={me}
-          onSubmit={useDebouncedCallback(onSaveDelegates, 300, [onSaveDelegates])}
-        />
+        <AccountDelegates user={me} onSubmit={onSaveDelegates} />
       </Stack>
     </SettingsLayout>
   );

@@ -8830,11 +8830,6 @@
     "context": "Changes saved correctly"
   },
   {
-    "term": "settings.account.update-name-button",
-    "definition": "Guardar cambios",
-    "context": "Save changes"
-  },
-  {
     "term": "settings.api-tokens.generate-new-token",
     "definition": "Crear token",
     "context": "Create token"

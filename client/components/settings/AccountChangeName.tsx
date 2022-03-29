@@ -29,7 +29,8 @@ export function AccountChangeName({ user, onSubmit, ...props }: AccountChangeNam
   const {
     handleSubmit,
     register,
-    formState: { errors },
+    reset,
+    formState: { errors, isDirty },
   } = useForm<AccountChangeNameData>({
     defaultValues: {
       firstName: user.firstName ?? undefined,
@@ -51,7 +52,14 @@ export function AccountChangeName({ user, onSubmit, ...props }: AccountChangeNam
           />
         </Alert>
       ) : null}
-      <Stack as="form" onSubmit={handleSubmit(onSubmit)} spacing={4}>
+      <Stack
+        as="form"
+        onSubmit={handleSubmit((values) => {
+          onSubmit(values);
+          reset(values);
+        })}
+        spacing={4}
+      >
         <FormControl id="first-name" isInvalid={!!errors.firstName} isDisabled={user.isSsoUser}>
           <FormLabel fontWeight="semibold">
             <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
@@ -87,11 +95,13 @@ export function AccountChangeName({ user, onSubmit, ...props }: AccountChangeNam
             />
           </FormErrorMessage>
         </FormControl>
-        <Button type="submit" colorScheme="purple" isDisabled={user.isSsoUser} width="min-content">
-          <FormattedMessage
-            id="settings.account.update-name-button"
-            defaultMessage="Save changes"
-          />
+        <Button
+          type="submit"
+          colorScheme="purple"
+          isDisabled={user.isSsoUser || !isDirty}
+          width="min-content"
+        >
+          <FormattedMessage id="generic.save" defaultMessage="Save" />
         </Button>
       </Stack>
     </Stack>
