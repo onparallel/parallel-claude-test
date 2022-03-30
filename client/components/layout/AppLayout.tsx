@@ -80,6 +80,7 @@ export const AppLayout = Object.assign(
         firstName: user.firstName,
         lastName: user.lastName,
         createdAt: user.createdAt,
+        orgRole: user.role,
       });
     }, [user.id]);
 
@@ -237,6 +238,7 @@ export const AppLayout = Object.assign(
           email
           createdAt
           canCreateUsers
+          role
           ...AppLayoutNavbar_User
         }
         ${AppLayoutNavbar.fragments.User}

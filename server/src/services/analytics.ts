@@ -257,6 +257,7 @@ export class AnalyticsService implements IAnalyticsService {
         source: userData.details?.source,
         locale: userData.details?.preferredLocale,
         orgId: user.org_id,
+        orgRole: user.organization_role,
         ...extraTraits,
       },
     });

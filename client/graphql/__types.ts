@@ -19519,6 +19519,7 @@ export const AppLayout_UserFragmentDoc = gql`
     email
     createdAt
     canCreateUsers
+    role
     ...AppLayoutNavbar_User
   }
   ${AppLayoutNavbar_UserFragmentDoc}
