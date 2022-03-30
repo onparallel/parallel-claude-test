@@ -1,9 +1,10 @@
 import { Container } from "inversify";
 import { Knex } from "knex";
+import { isDefined } from "remeda";
 import { createTestContainer } from "../../../../test/testContainer";
 import { deleteAllData } from "../../../util/knexUtils";
 import { KNEX } from "../../knex";
-import { Organization } from "../../__types";
+import { Contact, Organization } from "../../__types";
 import { ContactRepository } from "../ContactRepository";
 import { Mocks } from "./mocks";
 
@@ -13,6 +14,7 @@ describe("repositories/ContactRepository", () => {
   let c: ContactRepository;
 
   let orgs: Organization[];
+  let mocks: Mocks;
 
   beforeAll(async () => {
     container = createTestContainer();
@@ -27,7 +29,7 @@ describe("repositories/ContactRepository", () => {
 
   beforeAll(async () => {
     await deleteAllData(knex);
-    const mocks = new Mocks(knex);
+    mocks = new Mocks(knex);
     orgs = await mocks.createRandomOrganizations(2);
     await mocks.createRandomContacts(orgs[0].id, 3, (index) => ({
       email: `contact.${index}@onparallel.com`,
@@ -76,6 +78,33 @@ describe("repositories/ContactRepository", () => {
         },
         null,
       ]);
+    });
+  });
+
+  describe("anonymizeContacts", () => {
+    let contacts: Contact[] = [];
+
+    beforeEach(async () => {
+      contacts = await mocks.createRandomContacts(orgs[0].id, 4);
+    });
+
+    it("anonymizes passed contacts", async () => {
+      expect(
+        contacts.every((c) => c.email !== "" && c.first_name !== "" && c.last_name !== "")
+      ).toEqual(true);
+
+      await c.anonymizeContacts(contacts);
+
+      const contactsAfter = (await c.loadContact(contacts.map((c) => c.id))).filter(isDefined);
+
+      expect(contactsAfter.length).toEqual(contacts.length);
+
+      expect(
+        contactsAfter.every(
+          (c) =>
+            c.anonymized_at !== null && c.email === "" && c.first_name === "" && c.last_name === ""
+        )
+      ).toEqual(true);
     });
   });
 });

@@ -38,6 +38,7 @@ export class ContactRepository extends BaseRepository {
         );
         const rows = await this.from("contact")
           .whereNull("deleted_at")
+          .where("email", "<>", "") // need this to use the index 'contact__org_id__email'
           .where((qb) => {
             for (const [orgId, emails] of byOrgId) {
               qb.orWhere((qb) => qb.where("org_id", parseInt(orgId)).whereIn("email", emails));
@@ -353,5 +354,20 @@ export class ContactRepository extends BaseRepository {
       .where("id", requestId)
       .update({ email_log_id: emailLogId }, "*");
     return row;
+  }
+
+  async anonymizeContacts(contacts: Contact[]) {
+    await this.from("contact")
+      .whereIn(
+        "id",
+        contacts.map((c) => c.id)
+      )
+      .whereNull("anonymized_at")
+      .update({
+        anonymized_at: this.now(),
+        email: "",
+        first_name: "",
+        last_name: "",
+      });
   }
 }

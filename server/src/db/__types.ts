@@ -447,6 +447,7 @@ export interface Contact {
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
   last_email_bounced: boolean; // bool
+  anonymized_at: Maybe<Date>; // timestamptz
 }
 
 export type CreateContact = PartialProps<
@@ -459,6 +460,7 @@ export type CreateContact = PartialProps<
   | "deleted_at"
   | "deleted_by"
   | "last_email_bounced"
+  | "anonymized_at"
 >;
 
 export interface ContactAuthentication {

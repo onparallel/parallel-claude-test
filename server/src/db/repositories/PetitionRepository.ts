@@ -4454,14 +4454,4 @@ export class PetitionRepository extends BaseRepository {
 
     await this.safeDeleteFileUpload(fileUploadIds, undefined, t);
   }
-
-  async getDeletedFrom<TName extends keyof TableTypes>(
-    table: TableTypes[TName] extends { anonymized_at: Maybe<Date> } ? TName : never, // make sure the table has "anonymized_at" column
-    days: number
-  ) {
-    return await this.from(table)
-      .whereRaw(/* sql */ `"deleted_at" < NOW() - ?::interval`, [`${days} days`])
-      .whereNull("anonymized_at")
-      .select("*");
-  }
 }
