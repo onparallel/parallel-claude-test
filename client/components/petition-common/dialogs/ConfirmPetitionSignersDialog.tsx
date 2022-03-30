@@ -72,7 +72,7 @@ export function ConfirmPetitionSignersDialog({
     defaultValues: {
       signers: presetSigners.map((s) => ({ ...s, isPreset: true })),
       message: null,
-      allowAdditionalSigners: allowAdditionalSigners ?? false,
+      allowAdditionalSigners: presetSigners.length ? allowAdditionalSigners : false,
     },
   });
 
