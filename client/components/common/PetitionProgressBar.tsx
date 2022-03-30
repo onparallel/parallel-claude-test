@@ -1,4 +1,4 @@
-import { Box, BoxProps, ChakraProps, Flex, FlexProps, Square, Stack, Text } from "@chakra-ui/react";
+import { Box, BoxProps, Flex, FlexProps, Square, Stack, Text } from "@chakra-ui/react";
 import { CheckIcon, QuestionIcon } from "@parallel/chakra/icons";
 import { PetitionProgress, PetitionStatus } from "@parallel/graphql/__types";
 import { generateCssStripe } from "@parallel/utils/css";
@@ -20,7 +20,7 @@ const STYLES = (() => {
     },
     EMPTY: { backgroundColor: "gray.200" },
   };
-  return styles as Record<keyof typeof styles, ChakraProps>;
+  return styles as Record<keyof typeof styles, any>;
 })();
 
 export function PetitionProgressBar({

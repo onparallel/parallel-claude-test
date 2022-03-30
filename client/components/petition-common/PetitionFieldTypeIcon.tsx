@@ -15,7 +15,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { ElementType } from "react";
 
-export interface PetitionFieldTypeIconProps extends IconProps {
+export interface PetitionFieldTypeIconProps {
   type: PetitionFieldType;
 }
 

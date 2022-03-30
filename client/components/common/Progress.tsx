@@ -1,4 +1,5 @@
 import { Box, BoxProps, Flex } from "@chakra-ui/react";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 
 export interface ProgressIndicatorProps extends BoxProps {
   min: number;
@@ -17,16 +18,20 @@ const progressbarSizes = {
   sm: "0.5rem",
 };
 
-export interface ProgressTrackProps extends Omit<BoxProps, "size"> {
+export interface ProgressTrackProps {
   size: keyof typeof progressbarSizes;
   min: number;
   max: number;
   value: number;
 }
 
-export function ProgressTrack({ size, min, max, value, ...rest }: ProgressTrackProps) {
+export const ProgressTrack = chakraForwardRef<"div", ProgressTrackProps>(function ProgressTrack(
+  { size, min, max, value, ...rest },
+  ref
+) {
   return (
     <Flex
+      ref={ref}
       height={progressbarSizes[size]}
       aria-valuemax={max}
       aria-valuemin={min}
@@ -38,7 +43,7 @@ export function ProgressTrack({ size, min, max, value, ...rest }: ProgressTrackP
       {...rest}
     />
   );
-}
+});
 
 function valueToPercent(value: number, min: number, max: number) {
   return ((value - min) * 100) / (max - min);
