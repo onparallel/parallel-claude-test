@@ -1038,7 +1038,7 @@ describe("repositories/PetitionRepository", () => {
         ).toEqual(true);
       });
 
-      it("nulls signature request configs and deletes the signed documents", async () => {
+      it("nulls singers in signature request configs and deletes the signed documents", async () => {
         const [signedDocument] = await mocks.createRandomFileUpload(1);
         await Promise.all([
           mocks.createRandomPetitionSignatureRequest(petition.id, () => ({
@@ -1063,7 +1063,7 @@ describe("repositories/PetitionRepository", () => {
         expect(
           signatures.every(
             (s) =>
-              JSON.stringify(s.signature_config) === "{}" &&
+              s.signature_config.signersInfo.every((s) => s === null) &&
               ((s.cancel_reason === "DECLINED_BY_SIGNER" &&
                 JSON.stringify(s.cancel_data) === "{}") ||
                 s.cancel_reason !== "DECLINED_BY_SIGNER") &&

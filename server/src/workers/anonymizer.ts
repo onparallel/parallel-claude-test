@@ -1,6 +1,6 @@
 import { createCronWorker } from "./helpers/createCronWorker";
 
-createCronWorker("petition-anonymizer", async (ctx, config) => {
+createCronWorker("anonymizer", async (ctx, config) => {
   const [deletedPetitions, deletedReplies, deletedComments] = await Promise.all([
     ctx.petitions.getDeletedFrom("petition", config.anonymizeAfterDays),
     ctx.petitions.getDeletedFrom("petition_field_reply", config.anonymizeAfterDays),

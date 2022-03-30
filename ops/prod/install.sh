@@ -24,7 +24,7 @@ sudo systemctl enable parallel-reminder-trigger-cron.service
 sudo systemctl enable parallel-scheduled-trigger-cron.service
 sudo systemctl enable parallel-petition-notifications-cron.service
 sudo systemctl enable parallel-organization-limits-cron.service
-sudo systemctl enable parallel-petition-anonymizer-cron.service
+sudo systemctl enable parallel-anonymizer-cron.service
 
 sudo systemctl start parallel-server
 sudo systemctl start parallel-client

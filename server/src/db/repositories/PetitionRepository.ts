@@ -4329,7 +4329,12 @@ export class PetitionRepository extends BaseRepository {
     if (repliesArray.length === 0) return;
 
     const fileUploadIds = repliesArray
-      .filter((r) => r.type === "FILE_UPLOAD")
+      .filter(
+        (r) =>
+          r.type === "FILE_UPLOAD" &&
+          isDefined(r.content.file_upload_id) &&
+          r.anonymized_at === null
+      )
       .map((r) => r.content.file_upload_id as number);
 
     await this.from("petition_field_reply", t)
@@ -4337,6 +4342,7 @@ export class PetitionRepository extends BaseRepository {
         "id",
         repliesArray.map((r) => r.id)
       )
+      .whereNull("anonymized_at")
       .update({
         anonymized_at: this.now(),
         content: this.knex.raw(/* sql */ `
@@ -4366,21 +4372,25 @@ export class PetitionRepository extends BaseRepository {
         "id",
         commentsArray.map((c) => c.id)
       )
+      .whereNull("anonymized_at")
       .update({
         anonymized_at: this.now(),
-        content: "", // TODO make null instead of empty string
+        content: "",
       });
   }
 
   private async anonymizePetitionMessages(petitionId: number, t: Knex.Transaction) {
-    return await this.from("petition_message", t).where("petition_id", petitionId).update(
-      {
-        anonymized_at: this.now(),
-        email_body: null,
-        email_subject: null,
-      },
-      "*"
-    );
+    return await this.from("petition_message", t)
+      .where("petition_id", petitionId)
+      .whereNull("anonymized_at")
+      .update(
+        {
+          anonymized_at: this.now(),
+          email_body: null,
+          email_subject: null,
+        },
+        "*"
+      );
   }
 
   private async anonymizePetitionReminders(petitionAccessIds: number[], t: Knex.Transaction) {
@@ -4389,6 +4399,7 @@ export class PetitionRepository extends BaseRepository {
     }
     return await this.from("petition_reminder", t)
       .whereIn("petition_access_id", petitionAccessIds)
+      .whereNull("anonymized_at")
       .update(
         {
           anonymized_at: this.now(),
@@ -4402,10 +4413,10 @@ export class PetitionRepository extends BaseRepository {
     if (emailLogIds.length === 0) {
       return;
     }
-    await this.from("email_log", t).whereIn("id", emailLogIds).update(
+    await this.from("email_log", t).whereIn("id", emailLogIds).whereNull("anonymized_at").update(
       {
         anonymized_at: this.now(),
-        html: "", // TODO make this 4 nullable
+        html: "",
         text: "",
         to: "",
         subject: "",
@@ -4417,10 +4428,16 @@ export class PetitionRepository extends BaseRepository {
   private async anonymizePetitionSignatureRequests(petitionId: number, t: Knex.Transaction) {
     const signatures = await this.from("petition_signature_request", t)
       .where("petition_id", petitionId)
+      .whereNull("anonymized_at")
       .update(
         {
           anonymized_at: this.now(),
-          signature_config: {} as any, // TODO make null
+          signature_config: this.knex.raw(/* sql */ `
+            -- replace every entry in 'signersInfo' with null 
+            "signature_config" || jsonb_build_object('signersInfo', array_to_json(
+              array_fill(null::jsonb, array[jsonb_array_length("signature_config"->'signersInfo')])
+            ))
+          `),
           data: null,
           event_logs: null,
           // DECLINED_BY_SIGNER signatures have text written by recipient on cancel_data
@@ -4438,14 +4455,13 @@ export class PetitionRepository extends BaseRepository {
     await this.safeDeleteFileUpload(fileUploadIds, undefined, t);
   }
 
-  async getDeletedFrom<TName extends keyof TableTypes>(table: TName, days = 30) {
+  async getDeletedFrom<TName extends keyof TableTypes>(
+    table: TableTypes[TName] extends { anonymized_at: Maybe<Date> } ? TName : never, // make sure the table has "anonymized_at" column
+    days: number
+  ) {
     return await this.from(table)
-      .whereRaw(
-        /* sql */ `
-      "deleted_at" < NOW() - '? days'::interval
-    `,
-        [days]
-      )
+      .whereRaw(/* sql */ `"deleted_at" < NOW() - ?::interval`, [`${days} days`])
+      .whereNull("anonymized_at")
       .select("*");
   }
 }
