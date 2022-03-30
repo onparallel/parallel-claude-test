@@ -170,8 +170,8 @@ export class Auth implements IAuth {
             await this.users.updateUserData(
               userData.id,
               {
-                first_name: firstName,
-                last_name: lastName,
+                // first_name: firstName,
+                // last_name: lastName,
                 cognito_id: cognitoId,
                 is_sso_user: true,
               },

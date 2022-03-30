@@ -81,7 +81,7 @@ scim
       externalId,
       orgId: req.context.organization!.id,
     });
-    let userData = user ? await req.context.users.loadUserData(user.user_data_id) : null;
+    const userData = user ? await req.context.users.loadUserData(user.user_data_id) : null;
     if (user && userData) {
       if ((user.status === "ACTIVE") !== active) {
         [user] = await req.context.users.updateUserById(
