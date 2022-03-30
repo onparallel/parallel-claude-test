@@ -227,6 +227,7 @@ type EffectivePetitionUserPermission {
   The type of the permission.
   """
   permissionType: PetitionPermissionType!
+  user: User!
 }
 
 enum EntityType {
@@ -1832,6 +1833,11 @@ type Petition implements PetitionBase {
   deadline: DateTime
 
   """
+  The effective permissions on the petition
+  """
+  effectivePermissions: [EffectivePetitionUserPermission!]!
+
+  """
   The body of the petition.
   """
   emailBody: JSON
@@ -1889,7 +1895,7 @@ type Petition implements PetitionBase {
   locale: PetitionLocale!
 
   """
-  The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates).
+  The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates).
   """
   myEffectivePermission: EffectivePetitionUserPermission
 
@@ -2095,6 +2101,11 @@ interface PetitionBase {
   customProperties: JSONObject!
 
   """
+  The effective permissions on the petition
+  """
+  effectivePermissions: [EffectivePetitionUserPermission!]!
+
+  """
   The body of the petition.
   """
   emailBody: JSON
@@ -2132,7 +2143,7 @@ interface PetitionBase {
   locale: PetitionLocale!
 
   """
-  The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates).
+  The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates).
   """
   myEffectivePermission: EffectivePetitionUserPermission
 
@@ -3026,6 +3037,11 @@ type PetitionTemplate implements PetitionBase {
   descriptionHtml: String
 
   """
+  The effective permissions on the petition
+  """
+  effectivePermissions: [EffectivePetitionUserPermission!]!
+
+  """
   The body of the petition.
   """
   emailBody: JSON
@@ -3069,7 +3085,7 @@ type PetitionTemplate implements PetitionBase {
   locale: PetitionLocale!
 
   """
-  The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates).
+  The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates).
   """
   myEffectivePermission: EffectivePetitionUserPermission
 
@@ -4480,14 +4496,14 @@ type User implements Timestamps {
   createdAt: DateTime!
 
   """
+  Users that the user can send on behalf of
+  """
+  delegateOf: [User!]!
+
+  """
   Users that the user allows to send on their behalf
   """
   delegates: [User!]!
-
-  """
-  Users that the user can send on behalf of
-  """
-  delegatesOf: [User!]!
 
   """
   The email of the user.

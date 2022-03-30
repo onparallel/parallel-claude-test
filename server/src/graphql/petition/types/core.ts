@@ -101,10 +101,17 @@ export const PetitionBase = interfaceType({
         return await ctx.petitions.loadUserAndUserGroupPermissionsByPetitionId(root.id);
       },
     });
+    t.list.field("effectivePermissions", {
+      type: "EffectivePetitionUserPermission",
+      description: "The effective permissions on the petition",
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadEffectivePermissions(root.id);
+      },
+    });
     t.nullable.field("myEffectivePermission", {
       type: "EffectivePetitionUserPermission",
       description:
-        "The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates).",
+        "The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates).",
       resolve: async (root, _, ctx) => {
         const permissions = await ctx.petitions.loadEffectivePermissions(root.id);
         return permissions.find((p) => p.user_id === ctx.user!.id) ?? null;

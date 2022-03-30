@@ -132,7 +132,7 @@ export function userCanSendAs<
     const senderId = args[argName] as unknown as Maybe<number>;
     if (!isDefined(senderId)) return true;
     try {
-      const delegates = await ctx.users.loadUsersDelegatesOfByUserId(ctx.user!.id);
+      const delegates = await ctx.users.loadReverseUserDelegatesByUserId(ctx.user!.id);
       if (delegates.find((d) => d.id === senderId)) return true;
     } catch {}
     return false;

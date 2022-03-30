@@ -745,6 +745,7 @@ export interface NexusGenFieldTypes {
     // field return type
     isSubscribed: boolean; // Boolean!
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
+    user: NexusGenRootTypes["User"]; // User!
   };
   FileUpload: {
     // field return type
@@ -1079,6 +1080,7 @@ export interface NexusGenFieldTypes {
     currentSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"] | null; // PetitionSignatureRequest
     customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
     deadline: NexusGenScalars["DateTime"] | null; // DateTime
+    effectivePermissions: NexusGenRootTypes["EffectivePetitionUserPermission"][]; // [EffectivePetitionUserPermission!]!
     emailBody: NexusGenScalars["JSON"] | null; // JSON
     emailSubject: string | null; // String
     events: NexusGenRootTypes["PetitionEventPagination"]; // PetitionEventPagination!
@@ -1395,6 +1397,7 @@ export interface NexusGenFieldTypes {
     description: NexusGenScalars["JSON"] | null; // JSON
     descriptionExcerpt: string | null; // String
     descriptionHtml: string | null; // String
+    effectivePermissions: NexusGenRootTypes["EffectivePetitionUserPermission"][]; // [EffectivePetitionUserPermission!]!
     emailBody: NexusGenScalars["JSON"] | null; // JSON
     emailSubject: string | null; // String
     fieldCount: number; // Int!
@@ -1850,8 +1853,8 @@ export interface NexusGenFieldTypes {
     avatarUrl: string | null; // String
     canCreateUsers: boolean; // Boolean!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    delegateOf: NexusGenRootTypes["User"][]; // [User!]!
     delegates: NexusGenRootTypes["User"][]; // [User!]!
-    delegatesOf: NexusGenRootTypes["User"][]; // [User!]!
     email: string; // String!
     firstName: string | null; // String
     fullName: string | null; // String
@@ -1977,6 +1980,7 @@ export interface NexusGenFieldTypes {
     closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
+    effectivePermissions: NexusGenRootTypes["EffectivePetitionUserPermission"][]; // [EffectivePetitionUserPermission!]!
     emailBody: NexusGenScalars["JSON"] | null; // JSON
     emailSubject: string | null; // String
     fieldCount: number; // Int!
@@ -2156,6 +2160,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     isSubscribed: "Boolean";
     permissionType: "PetitionPermissionType";
+    user: "User";
   };
   FileUpload: {
     // field return type name
@@ -2490,6 +2495,7 @@ export interface NexusGenFieldTypeNames {
     currentSignatureRequest: "PetitionSignatureRequest";
     customProperties: "JSONObject";
     deadline: "DateTime";
+    effectivePermissions: "EffectivePetitionUserPermission";
     emailBody: "JSON";
     emailSubject: "String";
     events: "PetitionEventPagination";
@@ -2806,6 +2812,7 @@ export interface NexusGenFieldTypeNames {
     description: "JSON";
     descriptionExcerpt: "String";
     descriptionHtml: "String";
+    effectivePermissions: "EffectivePetitionUserPermission";
     emailBody: "JSON";
     emailSubject: "String";
     fieldCount: "Int";
@@ -3261,8 +3268,8 @@ export interface NexusGenFieldTypeNames {
     avatarUrl: "String";
     canCreateUsers: "Boolean";
     createdAt: "DateTime";
+    delegateOf: "User";
     delegates: "User";
-    delegatesOf: "User";
     email: "String";
     firstName: "String";
     fullName: "String";
@@ -3388,6 +3395,7 @@ export interface NexusGenFieldTypeNames {
     closingEmailBody: "JSON";
     createdAt: "DateTime";
     customProperties: "JSONObject";
+    effectivePermissions: "EffectivePetitionUserPermission";
     emailBody: "JSON";
     emailSubject: "String";
     fieldCount: "Int";

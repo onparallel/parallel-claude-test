@@ -11,7 +11,7 @@ import { EmptySearchTemplatesIcon } from "../petition-new/icons/EmtpySearchTempl
 import { UserSelect, UserSelectComponentProps, UserSelectProps } from "./UserSelect";
 
 interface UserGroupSelectProps<IsMulti extends boolean>
-  extends UserSelectProps<IsMulti, true, UserSelect_UserGroupFragment> {}
+  extends UserSelectProps<IsMulti, true, true, UserSelect_UserGroupFragment> {}
 
 export function UserGroupSelect<IsMulti extends boolean>({
   includeGroups,

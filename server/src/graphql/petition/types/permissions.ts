@@ -52,6 +52,12 @@ export const EffectivePetitionUserPermission = objectType({
   sourceType: `Pick<db.PetitionPermission, "petition_id" | "user_id" | "type" | "is_subscribed">`,
   description: "The effective permission for a petition and user",
   definition(t) {
+    t.field("user", {
+      type: "User",
+      resolve: async (o, _, ctx) => {
+        return (await ctx.users.loadUser(o.user_id))!;
+      },
+    });
     t.field("permissionType", {
       type: "PetitionPermissionType",
       description: "The type of the permission.",

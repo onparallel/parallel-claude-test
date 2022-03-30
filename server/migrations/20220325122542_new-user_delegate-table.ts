@@ -1,22 +1,22 @@
 import { Knex } from "knex";
 import { addFeatureFlag, removeFeatureFlag } from "./helpers/featureFlags";
+import { timestamps } from "./helpers/timestamps";
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable("user_delegate", (t) => {
     t.increments("id");
     t.integer("user_id").notNullable().references("user.id");
     t.integer("delegate_user_id").notNullable().references("user.id");
-    t.timestamp("created_at").notNullable().defaultTo(knex.raw("CURRENT_TIMESTAMP"));
-    t.string("created_by");
-    t.timestamp("deleted_at").nullable();
-    t.string("deleted_by");
-  }).raw(/* sql */ `
-        create unique index "user_delegate__user_id_delegate_user_id" 
-        on "user_delegate" ("user_id", "delegate_user_id") where "deleted_at" is null;
-      `).raw(/* sql */ `
-        create index "user_delegate__delegate_user_id_user_id" 
-        on "user_delegate" ("delegate_user_id", "user_id") where "deleted_at" is null;
-      `);
+    timestamps(t, { updated: false });
+  });
+  await knex.raw(/* sql */ `
+    create unique index "user_delegate__user_id__delegate_user_id" 
+    on "user_delegate" ("user_id", "delegate_user_id") where "deleted_at" is null;
+  `);
+  await knex.raw(/* sql */ `
+    create index "user_delegate__delegate_user_id__user_id" 
+    on "user_delegate" ("delegate_user_id", "user_id") where "deleted_at" is null;
+  `);
 
   await knex.schema.alterTable("petition_access", (t) => {
     t.integer("delegate_granter_id").nullable().references("user.id");

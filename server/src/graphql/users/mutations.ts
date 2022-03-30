@@ -645,7 +645,7 @@ export const setDelegatesUser = mutationField("setDelegatesUser", {
   ),
   resolve: async (_, { delegateIds }, ctx) => {
     try {
-      const delegates = await ctx.users.loadUsersDelegatesByUserId(ctx.user!.id);
+      const delegates = await ctx.users.loadUserDelegatesByUserId(ctx.user!.id);
 
       const actualDelegatesIds = delegates.map((d) => d.id);
 

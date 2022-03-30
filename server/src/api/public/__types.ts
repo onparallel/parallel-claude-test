@@ -3174,7 +3174,7 @@ export type User = Timestamps & {
   /** Users that the user allows to send on their behalf */
   delegates: Array<User>;
   /** Users that the user can send on behalf of */
-  delegatesOf: Array<User>;
+  delegateOf: Array<User>;
   /** The email of the user. */
   email: Scalars["String"];
   /** The first name of the user. */

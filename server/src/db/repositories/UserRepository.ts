@@ -44,7 +44,7 @@ export class UserRepository extends BaseRepository {
 
   readonly loadUserData = this.buildLoadBy("user_data", "id", (q) => q.whereNull("deleted_at"));
 
-  readonly loadUsersDelegatesByUserId = fromDataLoader(
+  readonly loadUserDelegatesByUserId = fromDataLoader(
     new DataLoader<number, User[]>(async (userIds) => {
       const users = await this.raw<User & { user_id: number }>(
         /* sql */ `
@@ -59,7 +59,7 @@ export class UserRepository extends BaseRepository {
     })
   );
 
-  readonly loadUsersDelegatesOfByUserId = fromDataLoader(
+  readonly loadReverseUserDelegatesByUserId = fromDataLoader(
     new DataLoader<number, User[]>(async (userIds) => {
       const users = await this.raw<User & { delegate_user_id: number }>(
         /* sql */ `

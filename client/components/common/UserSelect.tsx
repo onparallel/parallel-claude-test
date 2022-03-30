@@ -20,6 +20,7 @@ import { useAsyncMemo } from "@parallel/utils/useAsyncMemo";
 import { ForwardedRef, forwardRef, ReactElement, RefAttributes, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { CommonProps, components } from "react-select";
+import Select from "react-select";
 import AsyncSelect, { Props as AsyncSelectProps } from "react-select/async";
 import { indexBy, zip } from "remeda";
 import { EmptySearchTemplatesIcon } from "../petition-new/icons/EmtpySearchTemplatesIcon";
@@ -32,8 +33,11 @@ export type UserSelectSelection<IncludeGroups extends boolean = false> =
 
 export type UserSelectInstance<
   IsMulti extends boolean,
-  IncludeGroups extends boolean = false
-> = AsyncSelect<UserSelectSelection<IncludeGroups>, IsMulti, never>;
+  IncludeGroups extends boolean = false,
+  IsAsync extends boolean = true
+> = IsAsync extends true
+  ? AsyncSelect<UserSelectSelection<IncludeGroups>, IsMulti, never>
+  : Select<UserSelectSelection<IncludeGroups>, IsMulti, never>;
 
 const fragments = {
   get User() {
@@ -85,34 +89,42 @@ const queries = [
   `,
 ];
 
-export interface UserSelectProps<
+export type UserSelectProps<
   IsMulti extends boolean = false,
   IncludeGroups extends boolean = false,
+  IsAsync extends boolean = true,
   T extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>
-> extends UseReactSelectProps,
-    Omit<AsyncSelectProps<T, IsMulti, never>, "value" | "onChange" | "options"> {
-  isMulti?: IsMulti;
-  value: If<IsMulti, T[] | string[], T | string | null>;
-  onChange: (value: If<IsMulti, T[], T | null>) => void;
-  includeGroups?: IncludeGroups;
-  onSearch: (search: string, excludeUsers: string[], excludeUserGroups: string[]) => Promise<T[]>;
-}
+> = UseReactSelectProps &
+  Omit<AsyncSelectProps<T, IsMulti, never>, "value" | "onChange" | "options"> & {
+    isMulti?: IsMulti;
+    value: If<IsMulti, T[] | string[], T | string | null>;
+    onChange: (value: If<IsMulti, T[], T | null>) => void;
+    includeGroups?: IncludeGroups;
+  } & (IsAsync extends true
+    ? {
+        onSearch: (
+          search: string,
+          excludeUsers: string[],
+          excludeUserGroups: string[]
+        ) => Promise<T[]>;
+      }
+    : {
+        options: IsAsync extends true ? never : T[];
+      });
 
 export const UserSelect = Object.assign(
-  forwardRef(function UserSelect<
-    IsMulti extends boolean = false,
-    IncludeGroups extends boolean = false
-  >(
+  forwardRef(function UserSelect(
     {
       value,
       onSearch,
       onChange,
+      options,
       isMulti,
       includeGroups,
       placeholder: _placeholder,
       ...props
-    }: UserSelectProps<IsMulti, IncludeGroups>,
-    ref: ForwardedRef<UserSelectInstance<IsMulti, IncludeGroups>>
+    }: UserSelectProps<boolean, boolean, boolean>,
+    ref: ForwardedRef<UserSelectInstance<boolean, boolean, boolean>>
   ) {
     const needsLoading =
       typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
@@ -124,7 +136,7 @@ export const UserSelect = Object.assign(
       if (needsLoading) {
         return await getUsersOrGroups(value as any);
       } else {
-        return value;
+        return value as MaybeArray<UserSelectSelection<boolean>>;
       }
     }, [
       needsLoading,
@@ -167,15 +179,17 @@ export const UserSelect = Object.assign(
       );
     }, [_placeholder, isMulti, includeGroups]);
 
-    const loadOptions = useCallback(
-      async (search) => {
-        const items = unMaybeArray(_value ?? []) as UserSelectSelection<IncludeGroups>[];
-        return await onSearch(
-          search,
-          items.filter((item) => item.__typename === "User").map((item) => item.id),
-          items.filter((item) => item.__typename === "UserGroup").map((item) => item.id)
-        );
-      },
+    const loadOptions = useMemo(
+      () =>
+        onSearch &&
+        (async (search: string) => {
+          const items = unMaybeArray(_value ?? []) as UserSelectSelection<boolean>[];
+          return await onSearch(
+            search,
+            items.filter((item) => item.__typename === "User").map((item) => item.id),
+            items.filter((item) => item.__typename === "UserGroup").map((item) => item.id)
+          );
+        }),
       [onSearch, _value]
     );
 
@@ -183,29 +197,39 @@ export const UserSelect = Object.assign(
 
     const data = apollo.cache.readQuery({ query: UserSelect_canCreateUsersDocument })!;
 
-    const reactSelectProps = useUserSelectReactSelectProps<IsMulti, IncludeGroups>({
+    const reactSelectProps = useUserSelectReactSelectProps<boolean, boolean>({
       placeholder,
       ...props,
       canCreateUsers: data.me.canCreateUsers,
     });
 
-    return (
-      <AsyncSelect<UserSelectSelection<IncludeGroups>, IsMulti, never>
-        ref={ref}
+    return loadOptions ? (
+      <AsyncSelect<UserSelectSelection<boolean>, boolean, never>
+        ref={ref as any}
         value={_value as any}
         onChange={onChange as any}
         isMulti={isMulti}
         loadOptions={loadOptions}
         {...reactSelectProps}
       />
+    ) : (
+      <Select<UserSelectSelection<boolean>, boolean, never>
+        ref={ref as any}
+        value={_value as any}
+        onChange={onChange as any}
+        isMulti={isMulti}
+        options={options}
+        {...reactSelectProps}
+      />
     );
   }) as <
     IsMulti extends boolean = false,
     IncludeGroups extends boolean = false,
+    IsAsync extends boolean = true,
     T extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>
   >(
-    props: UserSelectProps<IsMulti, IncludeGroups, T> &
-      RefAttributes<UserSelectInstance<IsMulti, IncludeGroups>>
+    props: UserSelectProps<IsMulti, IncludeGroups, IsAsync, T> &
+      RefAttributes<UserSelectInstance<IsMulti, IncludeGroups, IsAsync>>
   ) => ReactElement | null,
   { fragments, queries }
 );
