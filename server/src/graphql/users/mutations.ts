@@ -639,7 +639,10 @@ export const setDelegatesUser = mutationField("setDelegatesUser", {
   args: {
     delegateIds: nonNull(list(nonNull(globalIdArg("User")))),
   },
-  authorize: authenticateAnd(userHasFeatureFlag("ON_BEHALF_OF")),
+  authorize: authenticateAnd(
+    userHasFeatureFlag("ON_BEHALF_OF"),
+    userHasAccessToUsers("delegateIds")
+  ),
   resolve: async (_, { delegateIds }, ctx) => {
     try {
       const delegates = await ctx.users.loadUsersDelegatesByUserId(ctx.user!.id);

@@ -44,35 +44,35 @@ export class UserRepository extends BaseRepository {
 
   readonly loadUserData = this.buildLoadBy("user_data", "id", (q) => q.whereNull("deleted_at"));
 
-  async loadUsersDelegatesByUserId(id: number): Promise<User[]> {
-    const users = await this.from("user")
-      .whereIn(
-        "id",
-        this.from("user_delegate")
-          .where("user_id", id)
-          .whereNull("deleted_at")
-          .select("delegate_user_id")
-      )
-      .whereNull("deleted_at")
-      .returning("*");
+  readonly loadUsersDelegatesByUserId = fromDataLoader(
+    new DataLoader<number, User[]>(async (userIds) => {
+      const users = await this.raw<User & { user_id: number }>(
+        /* sql */ `
+        select ud.user_id as user_id, u.* from "user" u
+          join user_delegate ud on ud.delegate_user_id = u.id
+          where ud.user_id in ? and u.deleted_at is null and ud.deleted_at is null
+      `,
+        [this.sqlIn(userIds)]
+      );
+      const byUserId = groupBy(users, (u) => u.user_id);
+      return userIds.map((id) => byUserId[id]?.map((u) => omit(u, ["user_id"])) ?? []);
+    })
+  );
 
-    return users;
-  }
-
-  async loadUsersDelegatesOfByUserId(id: number): Promise<User[]> {
-    const users = await this.from("user")
-      .whereIn(
-        "id",
-        this.from("user_delegate")
-          .where("delegate_user_id", id)
-          .whereNull("deleted_at")
-          .select("user_id")
-      )
-      .whereNull("deleted_at")
-      .returning("*");
-
-    return users;
-  }
+  readonly loadUsersDelegatesOfByUserId = fromDataLoader(
+    new DataLoader<number, User[]>(async (userIds) => {
+      const users = await this.raw<User & { delegate_user_id: number }>(
+        /* sql */ `
+        select ud.delegate_user_id as delegate_user_id, u.* from "user" u
+          join user_delegate ud on ud.user_id = u.id
+          where ud.delegate_user_id in ? and u.deleted_at is null and ud.deleted_at is null
+      `,
+        [this.sqlIn(userIds)]
+      );
+      const byUserId = groupBy(users, (u) => u.delegate_user_id);
+      return userIds.map((id) => byUserId[id]?.map((u) => omit(u, ["delegate_user_id"])) ?? []);
+    })
+  );
 
   async addDelegates(
     userId: number,

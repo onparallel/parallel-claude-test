@@ -1658,6 +1658,8 @@ export interface PetitionAccess extends Timestamps {
   contact?: Maybe<Contact>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  /** The original user who granted the access as other user. */
+  delegateGranter?: Maybe<User>;
   /** The user who granted the original access. */
   granter?: Maybe<User>;
   /** The ID of the petition access. */
@@ -3283,7 +3285,9 @@ export interface User extends Timestamps {
   canCreateUsers: Scalars["Boolean"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  /** Users that the user allows to send on their behalf */
   delegates: Array<User>;
+  /** Users that the user can send on behalf of */
   delegatesOf: Array<User>;
   /** The email of the user. */
   email: Scalars["String"];
@@ -5212,6 +5216,12 @@ export type PetitionActivityTimeline_PetitionFragment = {
             };
             access: {
               __typename?: "PetitionAccess";
+              delegateGranter?: {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null;
+                status: UserStatus;
+              } | null;
               contact?: {
                 __typename?: "Contact";
                 id: string;
@@ -5739,6 +5749,12 @@ export type PetitionActivityTimeline_PetitionEvent_MessageSentEvent_Fragment = {
     sender: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
     access: {
       __typename?: "PetitionAccess";
+      delegateGranter?: {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null;
+        status: UserStatus;
+      } | null;
       contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
   };
@@ -6339,6 +6355,12 @@ export type TimelineMessageSentEvent_MessageSentEventFragment = {
     sender: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
     access: {
       __typename?: "PetitionAccess";
+      delegateGranter?: {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null;
+        status: UserStatus;
+      } | null;
       contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
   };
@@ -11684,6 +11706,12 @@ export type PetitionActivity_PetitionFragment = {
             };
             access: {
               __typename?: "PetitionAccess";
+              delegateGranter?: {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null;
+                status: UserStatus;
+              } | null;
               contact?: {
                 __typename?: "Contact";
                 id: string;
@@ -12435,6 +12463,12 @@ export type PetitionActivity_updatePetitionMutation = {
                   };
                   access: {
                     __typename?: "PetitionAccess";
+                    delegateGranter?: {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null;
+                      status: UserStatus;
+                    } | null;
                     contact?: {
                       __typename?: "Contact";
                       id: string;
@@ -13250,6 +13284,12 @@ export type PetitionActivity_petitionQuery = {
                   };
                   access: {
                     __typename?: "PetitionAccess";
+                    delegateGranter?: {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null;
+                      status: UserStatus;
+                    } | null;
                     contact?: {
                       __typename?: "Contact";
                       id: string;
@@ -20297,6 +20337,9 @@ export const TimelineMessageSentEvent_MessageSentEventFragmentDoc = gql`
       emailSubject
       scheduledAt
       access {
+        delegateGranter {
+          ...UserReference_User
+        }
         contact {
           ...ContactReference_Contact
         }

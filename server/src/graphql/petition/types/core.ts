@@ -611,6 +611,13 @@ export const PetitionAccess = objectType({
         return (await ctx.users.loadUser(root.granter_id))!;
       },
     });
+    t.nullable.field("delegateGranter", {
+      type: "User",
+      description: "The original user who granted the access as other user.",
+      resolve: async (root, _, ctx) => {
+        return root.delegate_granter_id ? await ctx.users.loadUser(root.delegate_granter_id) : null;
+      },
+    });
     t.nullable.field("contact", {
       type: "Contact",
       description: "The contact of this access.",

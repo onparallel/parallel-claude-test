@@ -1617,6 +1617,8 @@ export type PetitionAccess = Timestamps & {
   contact: Maybe<Contact>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  /** The original user who granted the access as other user. */
+  delegateGranter: Maybe<User>;
   /** The user who granted the original access. */
   granter: Maybe<User>;
   /** The ID of the petition access. */
@@ -3169,7 +3171,9 @@ export type User = Timestamps & {
   canCreateUsers: Scalars["Boolean"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  /** Users that the user allows to send on their behalf */
   delegates: Array<User>;
+  /** Users that the user can send on behalf of */
   delegatesOf: Array<User>;
   /** The email of the user. */
   email: Scalars["String"];

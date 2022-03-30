@@ -130,9 +130,9 @@ export function userCanSendAs<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const senderId = args[argName] as unknown as Maybe<number>;
-    if (!senderId) return true;
+    if (!isDefined(senderId)) return true;
     try {
-      const delegates = await ctx.users.loadUsersDelegatesByUserId(ctx.user!.id);
+      const delegates = await ctx.users.loadUsersDelegatesOfByUserId(ctx.user!.id);
       if (delegates.find((d) => d.id === senderId)) return true;
     } catch {}
     return false;

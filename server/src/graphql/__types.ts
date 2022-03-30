@@ -1110,6 +1110,7 @@ export interface NexusGenFieldTypes {
     // field return type
     contact: NexusGenRootTypes["Contact"] | null; // Contact
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    delegateGranter: NexusGenRootTypes["User"] | null; // User
     granter: NexusGenRootTypes["User"] | null; // User
     id: NexusGenScalars["GID"]; // GID!
     nextReminderAt: NexusGenScalars["DateTime"] | null; // DateTime
@@ -2520,6 +2521,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     contact: "Contact";
     createdAt: "DateTime";
+    delegateGranter: "User";
     granter: "User";
     id: "GID";
     nextReminderAt: "DateTime";

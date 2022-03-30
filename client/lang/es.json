@@ -9120,9 +9120,19 @@
     "context": "{same, select, true {You} other {{user}}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
   },
   {
+    "term": "timeline.message-sent-description-manual-granted",
+    "definition": "{sameAsGranter, select, true {Enviaste} other {{delegateGranter} envió}} un mensaje como {same, select, true {tú} other {{user}}} {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} para {contact} {timeAgo}",
+    "context": "{sameAsGranter, select, true {You} other {{delegateGranter}}} sent a message as {same, select, true {you} other {{user}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+  },
+  {
     "term": "timeline.message-sent-description-scheduled",
     "definition": "Un mensaje programado por {same, select, true {ti} other {{user}}} {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} fue enviado a {contact} {timeAgo}",
     "context": "A message scheduled by {same, select, true {you} other {{user}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
+  },
+  {
+    "term": "timeline.message-sent-description-scheduled-granted",
+    "definition": "Un mensaje programado por {sameAsGranter, select, true {ti} other {{delegateGranter}}} como {same, select, true {tú} other {{user}}} {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} fue enviado a {contact} {timeAgo}",
+    "context": "A message scheduled by {sameAsGranter, select, true {you} other {{delegateGranter}}} as {same, select, true {you} other {{user}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
   },
   {
     "term": "timeline.message-sent-see-message",

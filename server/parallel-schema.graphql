@@ -1971,6 +1971,11 @@ type PetitionAccess implements Timestamps {
   createdAt: DateTime!
 
   """
+  The original user who granted the access as other user.
+  """
+  delegateGranter: User
+
+  """
   The user who granted the original access.
   """
   granter: User
@@ -4475,12 +4480,12 @@ type User implements Timestamps {
   createdAt: DateTime!
 
   """
-  Users that the user can send on behalf of
+  Users that the user allows to send on their behalf
   """
   delegates: [User!]!
 
   """
-  Users that the user allows to send on their behalf
+  Users that the user can send on behalf of
   """
   delegatesOf: [User!]!
 

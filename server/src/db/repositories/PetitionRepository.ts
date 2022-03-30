@@ -651,8 +651,8 @@ export class PetitionRepository extends BaseRepository {
               granter_id: user.id,
               keycode: random(16),
               status: "ACTIVE",
-              created_by: `User:${item.delegate_granter_id ? item.delegate_granter_id : user.id}`,
-              updated_by: `User:${item.delegate_granter_id ? item.delegate_granter_id : user.id}`,
+              created_by: `User:${item.delegate_granter_id ?? user.id}`,
+              updated_by: `User:${item.delegate_granter_id ?? user.id}`,
             })),
             t
           );
