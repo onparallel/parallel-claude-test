@@ -81,7 +81,7 @@ export class ContactRepository extends BaseRepository {
     return await this.raw<Contact>(
       /* sql */ `
       ? 
-      ON CONFLICT (org_id, email) WHERE deleted_at is NULL
+      ON CONFLICT (org_id, email) WHERE deleted_at is NULL and email != ''
       DO UPDATE SET
         -- need to do an update for the RETURNING to return the row
         email=EXCLUDED.email
@@ -111,7 +111,7 @@ export class ContactRepository extends BaseRepository {
     return await this.raw<Contact>(
       /* sql */ `
       ? 
-      ON CONFLICT (org_id, email) WHERE deleted_at is NULL
+      ON CONFLICT (org_id, email) WHERE deleted_at is NULL and email != ''
       DO UPDATE SET
         first_name = EXCLUDED.first_name,
         last_name = EXCLUDED.last_name
