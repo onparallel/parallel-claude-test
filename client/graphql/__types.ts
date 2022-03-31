@@ -578,7 +578,7 @@ export interface Mutation {
   /** Sends a reminder email to the pending signers */
   sendSignatureRequestReminders: Result;
   /** Set the delegades of a user */
-  setDelegatesUser: Result;
+  setUserDelegates: User;
   /** Sets the locale passed as arg as the preferred language of the user to see the page */
   setUserPreferredLocale: User;
   /** Shares our SignaturIt production APIKEY with the passed Org, and creates corresponding usage limits. */
@@ -1195,7 +1195,7 @@ export interface MutationsendSignatureRequestRemindersArgs {
   petitionSignatureRequestId: Scalars["GID"];
 }
 
-export interface MutationsetDelegatesUserArgs {
+export interface MutationsetUserDelegatesArgs {
   delegateIds: Array<Scalars["GID"]>;
 }
 
@@ -3926,8 +3926,8 @@ export type AppLayout_UserFragment = {
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
-  isSuperAdmin: boolean;
   role: OrganizationRole;
+  isSuperAdmin: boolean;
   avatarUrl?: string | null;
   initials?: string | null;
   organization: {
@@ -4106,8 +4106,8 @@ export type SettingsLayout_UserFragment = {
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
-  isSuperAdmin: boolean;
   role: OrganizationRole;
+  isSuperAdmin: boolean;
   avatarUrl?: string | null;
   initials?: string | null;
   organization: {
@@ -9970,8 +9970,8 @@ export type Admin_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     organization: {
@@ -9994,8 +9994,8 @@ export type OrganizationMembers_UserFragment = {
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
-  isSuperAdmin: boolean;
   role: OrganizationRole;
+  isSuperAdmin: boolean;
   avatarUrl?: string | null;
   initials?: string | null;
   organization: {
@@ -10037,8 +10037,8 @@ export type OrganizationMembers_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     organization: {
@@ -10106,8 +10106,8 @@ export type AdminOrganizations_UserFragment = {
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
-  isSuperAdmin: boolean;
   role: OrganizationRole;
+  isSuperAdmin: boolean;
   avatarUrl?: string | null;
   initials?: string | null;
   organization: {
@@ -10161,8 +10161,8 @@ export type AdminOrganizations_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     organization: {
@@ -10185,8 +10185,8 @@ export type AdminSupportMethods_UserFragment = {
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
-  isSuperAdmin: boolean;
   role: OrganizationRole;
+  isSuperAdmin: boolean;
   avatarUrl?: string | null;
   initials?: string | null;
   organization: {
@@ -10211,8 +10211,8 @@ export type AdminSupportMethods_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     organization: {
@@ -10431,8 +10431,8 @@ export type Contact_UserFragment = {
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
-  isSuperAdmin: boolean;
   role: OrganizationRole;
+  isSuperAdmin: boolean;
   avatarUrl?: string | null;
   initials?: string | null;
   organization: {
@@ -10473,8 +10473,8 @@ export type Contact_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     organization: {
@@ -10588,8 +10588,8 @@ export type Contacts_UserFragment = {
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
-  isSuperAdmin: boolean;
   role: OrganizationRole;
+  isSuperAdmin: boolean;
   avatarUrl?: string | null;
   initials?: string | null;
   organization: {
@@ -10637,8 +10637,8 @@ export type Contacts_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     organization: {
@@ -10686,8 +10686,8 @@ export type OrganizationBranding_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     organization: {
@@ -10733,8 +10733,8 @@ export type OrganizationGroup_UserFragment = {
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
-  isSuperAdmin: boolean;
   role: OrganizationRole;
+  isSuperAdmin: boolean;
   avatarUrl?: string | null;
   initials?: string | null;
   organization: {
@@ -10864,8 +10864,8 @@ export type OrganizationGroup_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     organization: {
@@ -10926,8 +10926,8 @@ export type OrganizationGroups_UserFragment = {
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
-  isSuperAdmin: boolean;
   role: OrganizationRole;
+  isSuperAdmin: boolean;
   avatarUrl?: string | null;
   initials?: string | null;
   organization: {
@@ -11036,8 +11036,8 @@ export type OrganizationGroups_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     organization: {
@@ -11063,8 +11063,8 @@ export type OrganizationSettings_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     organization: {
@@ -11090,8 +11090,8 @@ export type OrganizationIntegrations_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasPetitionSignature: boolean;
@@ -11176,8 +11176,8 @@ export type IntegrationsSignature_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasPetitionSignature: boolean;
@@ -11220,8 +11220,8 @@ export type OrganizationUsage_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     organization: {
@@ -11365,8 +11365,8 @@ export type OrganizationUsers_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     organization: {
@@ -17262,8 +17262,8 @@ export type Account_UserFragment = {
   email: string;
   createdAt: string;
   canCreateUsers: boolean;
-  isSuperAdmin: boolean;
   role: OrganizationRole;
+  isSuperAdmin: boolean;
   avatarUrl?: string | null;
   initials?: string | null;
   hasDeveloperAccess: boolean;
@@ -17311,8 +17311,8 @@ export type Account_setUserPreferredLocaleMutation = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasDeveloperAccess: boolean;
@@ -17329,11 +17329,18 @@ export type Account_setUserPreferredLocaleMutation = {
   };
 };
 
-export type Account_setDelegatesUserMutationVariables = Exact<{
+export type Account_setUserDelegatesMutationVariables = Exact<{
   delegateIds: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
-export type Account_setDelegatesUserMutation = { setDelegatesUser: Result };
+export type Account_setUserDelegatesMutation = {
+  setUserDelegates: {
+    __typename?: "User";
+    id: string;
+    hasOnBehalfOf: boolean;
+    delegates: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
+  };
+};
 
 export type Account_userQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -17349,8 +17356,8 @@ export type Account_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasDeveloperAccess: boolean;
@@ -17472,8 +17479,8 @@ export type Developers_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasDeveloperAccess: boolean;
@@ -17500,8 +17507,8 @@ export type Settings_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasDeveloperAccess: boolean;
@@ -17536,8 +17543,8 @@ export type Security_userQuery = {
     email: string;
     createdAt: string;
     canCreateUsers: boolean;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
     hasDeveloperAccess: boolean;
@@ -25123,13 +25130,17 @@ export const Account_setUserPreferredLocaleDocument = gql`
   Account_setUserPreferredLocaleMutation,
   Account_setUserPreferredLocaleMutationVariables
 >;
-export const Account_setDelegatesUserDocument = gql`
-  mutation Account_setDelegatesUser($delegateIds: [GID!]!) {
-    setDelegatesUser(delegateIds: $delegateIds)
+export const Account_setUserDelegatesDocument = gql`
+  mutation Account_setUserDelegates($delegateIds: [GID!]!) {
+    setUserDelegates(delegateIds: $delegateIds) {
+      id
+      ...AccountDelegates_User
+    }
   }
+  ${AccountDelegates_UserFragmentDoc}
 ` as unknown as DocumentNode<
-  Account_setDelegatesUserMutation,
-  Account_setDelegatesUserMutationVariables
+  Account_setUserDelegatesMutation,
+  Account_setUserDelegatesMutationVariables
 >;
 export const Account_userDocument = gql`
   query Account_user {

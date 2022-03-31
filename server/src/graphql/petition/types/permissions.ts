@@ -55,7 +55,7 @@ export const EffectivePetitionUserPermission = objectType({
     t.field("user", {
       type: "User",
       resolve: async (o, _, ctx) => {
-        return (await ctx.users.loadUser(o.user_id))!;
+        return (await ctx.users.loadUser(o.user_id!))!;
       },
     });
     t.field("permissionType", {

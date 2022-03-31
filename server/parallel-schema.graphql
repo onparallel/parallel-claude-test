@@ -1188,7 +1188,7 @@ type Mutation {
   """
   Set the delegades of a user
   """
-  setDelegatesUser(delegateIds: [GID!]!): Result!
+  setUserDelegates(delegateIds: [GID!]!): User!
 
   """
   Sets the locale passed as arg as the preferred language of the user to see the page

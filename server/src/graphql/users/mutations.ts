@@ -633,9 +633,9 @@ export const setUserPreferredLocale = mutationField("setUserPreferredLocale", {
   },
 });
 
-export const setDelegatesUser = mutationField("setDelegatesUser", {
+export const setUserDelegates = mutationField("setUserDelegates", {
   description: "Set the delegades of a user",
-  type: "Result",
+  type: "User",
   args: {
     delegateIds: nonNull(list(nonNull(globalIdArg("User")))),
   },
@@ -644,25 +644,7 @@ export const setDelegatesUser = mutationField("setDelegatesUser", {
     userHasAccessToUsers("delegateIds")
   ),
   resolve: async (_, { delegateIds }, ctx) => {
-    try {
-      const delegates = await ctx.users.loadUserDelegatesByUserId(ctx.user!.id);
-
-      const actualDelegatesIds = delegates.map((d) => d.id);
-
-      const delegatesIdsToDelete = difference(actualDelegatesIds, delegateIds);
-      const delegatesIdsToAdd = difference(delegateIds, actualDelegatesIds);
-
-      await Promise.all([
-        delegatesIdsToDelete.length
-          ? ctx.users.deleteDelegates(ctx.user!.id, delegatesIdsToDelete, ctx.user!)
-          : undefined,
-        delegatesIdsToAdd.length
-          ? ctx.users.addDelegates(ctx.user!.id, delegatesIdsToAdd, ctx.user!)
-          : undefined,
-      ]);
-
-      return RESULT.SUCCESS;
-    } catch {}
-    return RESULT.FAILURE;
+    await ctx.users.syncDelegates(ctx.user!.id, delegateIds, ctx.user!);
+    return ctx.user!;
   },
 });

@@ -74,33 +74,35 @@ export class UserRepository extends BaseRepository {
     })
   );
 
-  async addDelegates(
-    userId: number,
-    delegateUserIds: MaybeArray<number>,
-    user: User,
-    t?: Knex.Transaction
-  ) {
-    const dataArr = unMaybeArray(delegateUserIds).map((id) => ({
-      user_id: userId,
-      delegate_user_id: id,
-      created_by: `User:${user.id}`,
-    }));
-    return await this.insert("user_delegate", dataArr, t);
-  }
-
-  async deleteDelegates(
-    userId: number,
-    delegateUserIds: MaybeArray<number>,
-    user: User,
-    t?: Knex.Transaction
-  ) {
-    await this.from("user_delegate", t)
-      .whereIn("delegate_user_id", unMaybeArray(delegateUserIds))
-      .andWhere("user_id", userId)
-      .update({
-        deleted_at: this.now(),
-        deleted_by: `User:${user.id}`,
-      });
+  async syncDelegates(userId: number, delegateUserIds: MaybeArray<number>, user: User) {
+    const _delegateUserIds = unMaybeArray(delegateUserIds);
+    await this.withTransaction(async (t) => {
+      await Promise.all([
+        this.from("user_delegate", t)
+          .where("user_id", userId)
+          .whereNotIn("delegate_user_id", _delegateUserIds)
+          .update({ deleted_at: this.now(), deleted_by: `User:${user.id}` }),
+        _delegateUserIds.length > 0
+          ? this.raw(
+              /* sql */ `? on conflict do nothing returning *`,
+              [
+                this.from("user_delegate").insert(
+                  _delegateUserIds.map((id) => ({
+                    user_id: userId,
+                    delegate_user_id: id,
+                    created_by: `User:${user.id}`,
+                  }))
+                ),
+              ],
+              t
+            )
+          : null,
+      ]);
+    });
+    this.loadUserDelegatesByUserId.dataloader.clear(userId);
+    for (const delegateuserId of _delegateUserIds) {
+      this.loadReverseUserDelegatesByUserId.dataloader.clear(delegateuserId);
+    }
   }
 
   readonly loadUserDataByUserId = fromDataLoader(

@@ -33,17 +33,21 @@ export function createLogger({ container }: interfaces.Context): ILogger {
                 winston.format.simple()
               ),
       }),
-      new WinstonCloudWatch({
-        name: "cloudwatch",
-        cloudWatchLogs: new CloudWatchLogs({ ...config.aws }),
-        level: "info",
-        retentionInDays: 30,
-        messageFormatter: ({ level, message, ...rest }) => {
-          return stringify({ level, message, ...rest });
-        },
-        logGroupName: config.logs.groupName,
-        logStreamName: config.logs.streamName,
-      }),
+      ...(process.env.NODE_ENV === "production"
+        ? [
+            new WinstonCloudWatch({
+              name: "cloudwatch",
+              cloudWatchLogs: new CloudWatchLogs({ ...config.aws }),
+              level: "info",
+              retentionInDays: 30,
+              messageFormatter: ({ level, message, ...rest }) => {
+                return stringify({ level, message, ...rest });
+              },
+              logGroupName: config.logs.groupName,
+              logStreamName: config.logs.streamName,
+            }),
+          ]
+        : []),
     ],
   });
   return logger;

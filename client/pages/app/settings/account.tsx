@@ -10,7 +10,7 @@ import {
 import { AccountDelegates } from "@parallel/components/settings/AccountDelegates";
 import { AccountLocaleChange } from "@parallel/components/settings/AccountLocaleChange";
 import {
-  Account_setDelegatesUserDocument,
+  Account_setUserDelegatesDocument,
   Account_setUserPreferredLocaleDocument,
   Account_updateAccountDocument,
   Account_userDocument,
@@ -50,7 +50,7 @@ function Account() {
 
   const [updateAccount] = useMutation(Account_updateAccountDocument);
   const [setUserLocale] = useMutation(Account_setUserPreferredLocaleDocument);
-  const [setDelegatesUser] = useMutation(Account_setDelegatesUserDocument);
+  const [setUserDelegates] = useMutation(Account_setUserDelegatesDocument);
 
   async function onSaveName({ firstName, lastName }: AccountChangeNameData) {
     try {
@@ -63,12 +63,11 @@ function Account() {
   }
 
   async function onSaveDelegates(ids: string[]) {
-    const { data } = await setDelegatesUser({ variables: { delegateIds: ids } });
-
-    if (data && data.setDelegatesUser === "SUCCESS") {
-      updateSuccessToast();
-    } else {
+    const { errors } = await setUserDelegates({ variables: { delegateIds: ids } });
+    if (errors?.length) {
       genericErrorToast();
+    } else {
+      updateSuccessToast();
     }
   }
 
@@ -149,9 +148,13 @@ Account.mutations = [
     ${Account.fragments.User}
   `,
   gql`
-    mutation Account_setDelegatesUser($delegateIds: [GID!]!) {
-      setDelegatesUser(delegateIds: $delegateIds)
+    mutation Account_setUserDelegates($delegateIds: [GID!]!) {
+      setUserDelegates(delegateIds: $delegateIds) {
+        id
+        ...AccountDelegates_User
+      }
     }
+    ${AccountDelegates.fragments.User}
   `,
 ];
 

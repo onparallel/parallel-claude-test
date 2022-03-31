@@ -971,7 +971,7 @@ export interface NexusGenFieldTypes {
     sendPetitionClosedNotification: NexusGenRootTypes["Petition"]; // Petition!
     sendReminders: NexusGenEnums["Result"]; // Result!
     sendSignatureRequestReminders: NexusGenEnums["Result"]; // Result!
-    setDelegatesUser: NexusGenEnums["Result"]; // Result!
+    setUserDelegates: NexusGenRootTypes["User"]; // User!
     setUserPreferredLocale: NexusGenRootTypes["User"]; // User!
     shareSignaturitApiKey: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     signedPetitionDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
@@ -2386,7 +2386,7 @@ export interface NexusGenFieldTypeNames {
     sendPetitionClosedNotification: "Petition";
     sendReminders: "Result";
     sendSignatureRequestReminders: "Result";
-    setDelegatesUser: "Result";
+    setUserDelegates: "User";
     setUserPreferredLocale: "User";
     shareSignaturitApiKey: "SupportMethodResponse";
     signedPetitionDownloadLink: "FileUploadDownloadLinkResult";
@@ -4003,7 +4003,7 @@ export interface NexusGenArgTypes {
       // args
       petitionSignatureRequestId: NexusGenScalars["GID"]; // GID!
     };
-    setDelegatesUser: {
+    setUserDelegates: {
       // args
       delegateIds: NexusGenScalars["GID"][]; // [GID!]!
     };
