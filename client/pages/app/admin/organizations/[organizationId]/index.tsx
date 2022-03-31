@@ -37,6 +37,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 
 const SORTING = ["fullName", "email", "createdAt", "lastActiveAt"] as const;
 
@@ -57,24 +58,30 @@ type OrganizationMembersProps = UnwrapPromise<
 function OrganizationMembers({ organizationId }: OrganizationMembersProps) {
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const [search, setSearch] = useState(state.search);
-
+  const [selected, setSelected] = useState<string[]>([]);
   const {
     data: { me },
   } = useAssertQuery(OrganizationMembers_userDocument);
 
-  const {
-    data: { organization },
-    loading,
-    refetch,
-  } = useAssertQueryOrPreviousData(OrganizationMembers_organizationDocument, {
-    variables: {
-      id: organizationId,
-      offset: state.items * (state.page - 1),
-      limit: state.items,
-      search: state.search,
-      sortBy: [`${state.sort.field}_${state.sort.direction}` as OrganizationUsers_OrderBy],
-    },
-  });
+  const { data, loading, refetch } = useAssertQueryOrPreviousData(
+    OrganizationMembers_organizationDocument,
+    {
+      variables: {
+        id: organizationId,
+        offset: state.items * (state.page - 1),
+        limit: state.items,
+        search: state.search,
+        sortBy: [`${state.sort.field}_${state.sort.direction}` as OrganizationUsers_OrderBy],
+      },
+    }
+  );
+  const organization = data.organization!;
+  const users = organization.users.items;
+
+  const selectedUsers = useMemo(
+    () => selected.map((userId) => users.find((u) => u.id === userId)).filter(isDefined),
+    [selected.join(","), users]
+  );
 
   const sections = useAdminSections();
   const columns = useOrganizationMembersTableColumns();
@@ -116,27 +123,30 @@ function OrganizationMembers({ organizationId }: OrganizationMembersProps) {
         <TablePage
           flex="0 1 auto"
           minHeight={0}
+          isSelectable
           isHighlightable
           columns={columns}
-          rows={organization?.users.items ?? []}
+          rows={users ?? []}
           rowKeyProp="id"
           loading={loading}
           page={state.page}
           pageSize={state.items}
           totalCount={organization?.users.totalCount ?? 0}
           sort={state.sort}
+          onSelectionChange={setSelected}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
             <OrganizationMembersListTableHeader
               search={search}
+              selectedUsers={selectedUsers}
               onReload={() => refetch()}
               onSearchChange={handleSearchChange}
             />
           }
           body={
-            organization?.users.items.length === 0 && !loading ? (
+            users.length === 0 && !loading ? (
               state.search ? (
                 <Flex flex="1" alignItems="center" justifyContent="center">
                   <Text color="gray.300" fontSize="lg">

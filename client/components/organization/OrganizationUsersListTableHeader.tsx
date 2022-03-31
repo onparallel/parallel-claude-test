@@ -1,6 +1,7 @@
 import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Portal, Stack } from "@chakra-ui/react";
 import {
   ChevronDownIcon,
+  LogOutIcon,
   RepeatIcon,
   UserCheckIcon,
   UserPlusIcon,
@@ -20,6 +21,7 @@ export type OrganizationUsersListTableHeaderProps = {
   search: string | null;
   selectedUsers: OrganizationUsers_UserFragment[];
   hasSsoProvider: boolean;
+  hasGhostLogin: boolean;
   isCreateUserButtonDisabled?: boolean;
   isActivateUserButtonDisabled?: boolean;
   onSearchChange: (value: string | null) => void;
@@ -33,6 +35,7 @@ export function OrganizationUsersListTableHeader({
   search,
   selectedUsers,
   hasSsoProvider,
+  hasGhostLogin,
   isCreateUserButtonDisabled,
   isActivateUserButtonDisabled,
   onSearchChange,
@@ -126,6 +129,17 @@ export function OrganizationUsersListTableHeader({
                     values={{ count: selectedUsers.length }}
                   />
                 </MenuItem>
+                {hasGhostLogin ? (
+                  <MenuItem
+                    icon={<LogOutIcon display="block" boxSize={4} />}
+                    isDisabled={selectedUsers.length !== 1}
+                  >
+                    <FormattedMessage
+                      id="organization-users.login-as"
+                      defaultMessage="Login as..."
+                    />
+                  </MenuItem>
+                ) : null}
               </MenuList>
             </Portal>
           </Menu>

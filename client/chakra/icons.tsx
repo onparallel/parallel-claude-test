@@ -191,6 +191,24 @@ export const LogOutIcon = createIcon({
   ),
 });
 
+export const LogInIcon = createIcon({
+  displayName: "LogInIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      stroke="currentColor"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M15.3333 22H19.7777C20.3671 22 20.9323 21.7658 21.3491 21.3491C21.7658 20.9323 21.9999 20.3671 21.9999 19.7777V4.22222C21.9999 3.63285 21.7658 3.06762 21.3491 2.65087C20.9323 2.23413 20.3671 2 19.7777 2H15.3333" />
+      <path d="M7.55554 17.5555L2 12L7.55554 6.44444" />
+      <path d="M2 12H15.3333" />
+    </g>
+  ),
+});
+
 export const AlertCircleIcon = createIcon({
   displayName: "AlertCircleIcon",
   viewBox: "0 0 24 24",

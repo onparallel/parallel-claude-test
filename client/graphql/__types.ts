@@ -207,6 +207,7 @@ export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 export type FeatureFlag =
   | "DEVELOPER_ACCESS"
   | "EXPORT_CUATRECASAS"
+  | "GHOST_LOGIN"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "INTERNAL_COMMENTS"
   | "ON_BEHALF_OF"
@@ -11383,6 +11384,7 @@ export type OrganizationUsers_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasGhostLogin: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -24488,6 +24490,7 @@ export const OrganizationUsers_userDocument = gql`
     $sortBy: [OrganizationUsers_OrderBy!]
   ) {
     me {
+      hasGhostLogin: hasFeatureFlag(featureFlag: GHOST_LOGIN)
       organization {
         id
         hasSsoProvider

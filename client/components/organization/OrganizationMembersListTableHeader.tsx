@@ -1,17 +1,22 @@
-import { Box, Stack } from "@chakra-ui/react";
-import { RepeatIcon } from "@parallel/chakra/icons";
-import { useIntl } from "react-intl";
+import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Portal, Stack } from "@chakra-ui/react";
+import { ChevronDownIcon, LogOutIcon, RepeatIcon } from "@parallel/chakra/icons";
+import { OrganizationMembers_OrganizationUserFragment } from "@parallel/graphql/__types";
+import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
+import { Spacer } from "../common/Spacer";
+import { WhenOrgRole } from "../common/WhenOrgRole";
 
 export type OrganizationMembersListTableHeaderProps = {
   search: string | null;
+  selectedUsers: OrganizationMembers_OrganizationUserFragment[];
   onSearchChange: (value: string | null) => void;
   onReload: () => void;
 };
 
 export function OrganizationMembersListTableHeader({
   search,
+  selectedUsers,
   onSearchChange,
   onReload,
 }: OrganizationMembersListTableHeaderProps) {
@@ -32,6 +37,30 @@ export function OrganizationMembersListTableHeader({
           defaultMessage: "Reload",
         })}
       />
+      <WhenOrgRole role="ADMIN">
+        <Spacer />
+        <Box>
+          <Menu>
+            <MenuButton
+              as={Button}
+              rightIcon={<ChevronDownIcon />}
+              isDisabled={selectedUsers.length === 0}
+            >
+              <FormattedMessage id="generic.actions-button" defaultMessage="Actions" />
+            </MenuButton>
+            <Portal>
+              <MenuList minWidth="160px">
+                <MenuItem
+                  icon={<LogOutIcon display="block" boxSize={4} />}
+                  isDisabled={selectedUsers.length !== 1}
+                >
+                  <FormattedMessage id="organization-users.login-as" defaultMessage="Login as..." />
+                </MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
+        </Box>
+      </WhenOrgRole>
     </Stack>
   );
 }

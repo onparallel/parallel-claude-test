@@ -20,6 +20,7 @@ import {
   CommentIcon,
   HelpOutlineIcon,
   KeyIcon,
+  LogInIcon,
   LogOutIcon,
   MapIcon,
   UserIcon,
@@ -50,6 +51,8 @@ export function UserMenu({ placement, user, onHelpCenterClick }: UserMenuProps) 
   const isMobile = useBreakpointValue({ base: true, sm: false });
   const { onOpen: onOpenNotifications } = useNotificationsState();
 
+  const ghostLogged = true;
+
   return (
     <Menu placement={placement}>
       <Tooltip
@@ -79,7 +82,7 @@ export function UserMenu({ placement, user, onHelpCenterClick }: UserMenuProps) 
           paddingRight={0}
           transition="all 200ms"
         >
-          <UserAvatar user={user} size="md" />
+          <UserAvatar user={user} showBadge badgeUser={user} size="md" />
         </MenuButton>
       </Tooltip>
       <Portal>
@@ -97,6 +100,28 @@ export function UserMenu({ placement, user, onHelpCenterClick }: UserMenuProps) 
           </HStack>
 
           <MenuDivider />
+          {ghostLogged ? (
+            <>
+              <MenuItem icon={<LogInIcon display="block" boxSize={4} />}>
+                <Text>
+                  <FormattedMessage
+                    id="component.user-menu.back-to-account"
+                    defaultMessage="Back to my account"
+                  />
+                </Text>
+                <Text color="gray.600" fontSize="sm">
+                  <FormattedMessage
+                    id="component.user-menu.login-from-user"
+                    defaultMessage="Login from {user}"
+                    values={{
+                      user: "Joshuaaaa",
+                    }}
+                  />
+                </Text>
+              </MenuItem>
+              <MenuDivider />
+            </>
+          ) : null}
 
           {isMobile ? (
             <MenuItem onClick={onOpenNotifications} icon={<BellIcon display="block" boxSize={4} />}>

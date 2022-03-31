@@ -286,6 +286,7 @@ function OrganizationUsers() {
               search={search}
               selectedUsers={selectedUsers}
               hasSsoProvider={hasSsoProvider}
+              hasGhostLogin={me.hasGhostLogin}
               isCreateUserButtonDisabled={isUserLimitReached}
               isActivateUserButtonDisabled={isActivateUserButtonDisabled}
               onCreateUser={handleCreateUser}
@@ -517,6 +518,7 @@ OrganizationUsers.queries = [
       $sortBy: [OrganizationUsers_OrderBy!]
     ) {
       me {
+        hasGhostLogin: hasFeatureFlag(featureFlag: GHOST_LOGIN)
         organization {
           id
           hasSsoProvider

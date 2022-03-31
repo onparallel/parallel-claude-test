@@ -3530,9 +3530,19 @@
     "context": "Search for existing teams"
   },
   {
+    "term": "component.user-menu.back-to-account",
+    "definition": "Volver a mi cuenta",
+    "context": "Back to my account"
+  },
+  {
     "term": "component.user-menu.log-out",
     "definition": "Cerrar sesión",
     "context": "Log out"
+  },
+  {
+    "term": "component.user-menu.login-from-user",
+    "definition": "Acceso desde {user}",
+    "context": "Login from {user}"
   },
   {
     "term": "component.user-menu.notifications",
@@ -5018,6 +5028,11 @@
     "term": "organization-users.invite-user.add-as-member-in",
     "definition": "Añadir como miembro en (opcional)",
     "context": "Add as a member of (optional)"
+  },
+  {
+    "term": "organization-users.login-as",
+    "definition": "Acceder como...",
+    "context": "Login as..."
   },
   {
     "term": "organization-users.max-limit-reached",
