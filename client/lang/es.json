@@ -9111,8 +9111,13 @@
   },
   {
     "term": "timeline.message-scheduled-description",
-    "definition": "{same, select, true {Programaste} other {{user} programó}} un mensaje para el {scheduledAt} {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} para {contact} {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} scheduled a message for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+    "definition": "{senderIsYou, select, true {Tú programaste} other {{sender} programó}} un mensaje para el {scheduledAt} {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} para {contact} {timeAgo}",
+    "context": "{senderIsYou, select, true {You} other {{sender}}} scheduled a message for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+  },
+  {
+    "term": "timeline.message-scheduled-description-delegated",
+    "definition": "{delegateIsYou, select, true {Tú programaste} other {{delegate} programó}} un mensaje como {senderIsYou, select, true {tú} other {{sender}}} para el {scheduledAt} {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} para {contact} {timeAgo}",
+    "context": "{delegateIsYou, select, true {You} other {{delegate}}} scheduled a message as {senderIsYou, select, true {you} other {{sender}}} for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
   },
   {
     "term": "timeline.message-sent-description-manual",

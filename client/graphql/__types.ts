@@ -5193,6 +5193,12 @@ export type PetitionActivityTimeline_PetitionFragment = {
             };
             access: {
               __typename?: "PetitionAccess";
+              delegateGranter?: {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null;
+                status: UserStatus;
+              } | null;
               contact?: {
                 __typename?: "Contact";
                 id: string;
@@ -5735,6 +5741,12 @@ export type PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragmen
     sender: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
     access: {
       __typename?: "PetitionAccess";
+      delegateGranter?: {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null;
+        status: UserStatus;
+      } | null;
       contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
   };
@@ -6339,6 +6351,12 @@ export type TimelineMessageScheduledEvent_MessageScheduledEventFragment = {
     sender: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
     access: {
       __typename?: "PetitionAccess";
+      delegateGranter?: {
+        __typename?: "User";
+        id: string;
+        fullName?: string | null;
+        status: UserStatus;
+      } | null;
       contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     };
   };
@@ -11674,6 +11692,12 @@ export type PetitionActivity_PetitionFragment = {
             };
             access: {
               __typename?: "PetitionAccess";
+              delegateGranter?: {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null;
+                status: UserStatus;
+              } | null;
               contact?: {
                 __typename?: "Contact";
                 id: string;
@@ -12434,6 +12458,12 @@ export type PetitionActivity_updatePetitionMutation = {
                   };
                   access: {
                     __typename?: "PetitionAccess";
+                    delegateGranter?: {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null;
+                      status: UserStatus;
+                    } | null;
                     contact?: {
                       __typename?: "Contact";
                       id: string;
@@ -13258,6 +13288,12 @@ export type PetitionActivity_petitionQuery = {
                   };
                   access: {
                     __typename?: "PetitionAccess";
+                    delegateGranter?: {
+                      __typename?: "User";
+                      id: string;
+                      fullName?: string | null;
+                      status: UserStatus;
+                    } | null;
                     contact?: {
                       __typename?: "Contact";
                       id: string;
@@ -20266,6 +20302,9 @@ export const TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc = gq
       scheduledAt
       emailSubject
       access {
+        delegateGranter {
+          ...UserReference_User
+        }
         contact {
           ...ContactReference_Contact
         }
