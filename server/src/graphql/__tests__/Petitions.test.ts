@@ -2991,6 +2991,91 @@ describe("GraphQL/Petitions", () => {
       expect(data).toBeNull();
     });
 
+    it("should not be able to send a petition as other user without on behalf of permissions", async () => {
+      await mocks.knex
+        .from("organization_usage_limit")
+        .where("id", usageLimit.id)
+        .update({ used: 0, limit: 50 });
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $petitionId: GID!
+            $contactIdGroups: [[GID!]!]!
+            $subject: String!
+            $body: JSON!
+            $senderId: GID
+          ) {
+            bulkSendPetition(
+              petitionId: $petitionId
+              contactIdGroups: $contactIdGroups
+              subject: $subject
+              body: $body
+              senderId: $senderId
+            ) {
+              result
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          contactIdGroups: [[toGlobalId("Contact", contacts[1].id)]],
+          subject: "petition send subject",
+          body: [],
+          senderId: toGlobalId("User", sameOrgUser.id),
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("should be able to send a petition as other user with on behalf of permissions", async () => {
+      await mocks.knex
+        .from("organization_usage_limit")
+        .where("id", usageLimit.id)
+        .update({ used: 0, limit: 50 });
+
+      await mocks.knex("user_delegate").insert({
+        user_id: sameOrgUser.id,
+        delegate_user_id: sessionUser.id,
+        created_at: new Date(),
+        created_by: "User:1",
+      });
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $petitionId: GID!
+            $contactIdGroups: [[GID!]!]!
+            $subject: String!
+            $body: JSON!
+            $senderId: GID
+          ) {
+            bulkSendPetition(
+              petitionId: $petitionId
+              contactIdGroups: $contactIdGroups
+              subject: $subject
+              body: $body
+              senderId: $senderId
+            ) {
+              result
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          contactIdGroups: [[toGlobalId("Contact", contacts[1].id)]],
+          subject: "petition send subject",
+          body: [],
+          senderId: toGlobalId("User", sameOrgUser.id),
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.bulkSendPetition).toEqual([{ result: "SUCCESS" }]);
+    });
+
     it("batch sends should be limited to the amount of remaining petition send credits", async () => {
       await mocks.knex
         .from("organization_usage_limit")
