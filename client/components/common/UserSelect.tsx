@@ -526,7 +526,7 @@ const Option: typeof components.Option = function Option({ children, ...props })
             <Text as="span" verticalAlign="baseline">
               <Text as="span">{data.fullName}</Text>
               <Text as="span" display="inline-block" width={2} />
-              <Text as="span" fontSize="sm" color="gray.500">
+              <Text as="span" fontSize="sm" opacity={0.7}>
                 {data.email}
               </Text>
             </Text>
