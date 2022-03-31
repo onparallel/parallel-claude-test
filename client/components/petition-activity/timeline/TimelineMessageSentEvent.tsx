@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex } from "@chakra-ui/react";
+import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { EmailSentIcon } from "@parallel/chakra/icons";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -76,7 +76,16 @@ export function TimelineMessageSentEvent({
                 delegate: <UserReference user={message.access.delegateGranter} />,
                 senderIsYou: userId === message.sender?.id,
                 sender: <UserReference user={message.sender} />,
-                subject: message.emailSubject,
+                subject: message.isAnonymized ? (
+                  <Text as="span" textStyle="hint" fontWeight="normal">
+                    <FormattedMessage
+                      id="timeline.message-sent-description.subject-unavailable"
+                      defaultMessage="Subject unavailable"
+                    />
+                  </Text>
+                ) : (
+                  message.emailSubject
+                ),
                 contact: <ContactReference contact={message.access.contact} />,
                 timeAgo: (
                   <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
@@ -90,7 +99,16 @@ export function TimelineMessageSentEvent({
               values={{
                 senderIsYou: userId === message.sender!.id,
                 sender: <UserReference user={message.sender} />,
-                subject: message.emailSubject,
+                subject: message.isAnonymized ? (
+                  <Text as="span" textStyle="hint" fontWeight="normal">
+                    <FormattedMessage
+                      id="timeline.message-sent-description.subject-unavailable"
+                      defaultMessage="Subject unavailable"
+                    />
+                  </Text>
+                ) : (
+                  message.emailSubject
+                ),
                 contact: <ContactReference contact={message.access.contact} />,
                 timeAgo: (
                   <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
@@ -127,6 +145,7 @@ TimelineMessageSentEvent.fragments = {
             ...ContactReference_Contact
           }
         }
+        isAnonymized
         ...EmailEventsIndicator_PetitionMessage
         ...SentPetitionMessageDialog_PetitionMessage
       }

@@ -2655,6 +2655,7 @@ type PetitionFieldComment {
   The ID of the petition field comment.
   """
   id: GID!
+  isAnonymized: Boolean!
 
   """
   Whether the comment has been edited after being published.
@@ -2876,6 +2877,7 @@ type PetitionMessage implements CreatedAt {
   The ID of the petition message.
   """
   id: GID!
+  isAnonymized: Boolean!
 
   """
   Tells when the email was opened for the first time.
@@ -3713,6 +3715,7 @@ type PublicPetitionFieldComment {
   The ID of the petition field comment.
   """
   id: GID!
+  isAnonymized: Boolean!
 
   """
   Whether the comment has been read or not.

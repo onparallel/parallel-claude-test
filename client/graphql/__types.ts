@@ -2135,6 +2135,7 @@ export interface PetitionFieldComment {
   field: PetitionField;
   /** The ID of the petition field comment. */
   id: Scalars["GID"];
+  isAnonymized: Scalars["Boolean"];
   /** Whether the comment has been edited after being published. */
   isEdited: Scalars["Boolean"];
   /** Whether the comment is internal (only visible to org users) or public (visible for users and accesses) */
@@ -2239,6 +2240,7 @@ export interface PetitionMessage extends CreatedAt {
   emailSubject?: Maybe<Scalars["JSON"]>;
   /** The ID of the petition message. */
   id: Scalars["GID"];
+  isAnonymized: Scalars["Boolean"];
   /** Tells when the email was opened for the first time. */
   openedAt?: Maybe<Scalars["DateTime"]>;
   /** Time at which the message will be sent. */
@@ -2722,6 +2724,7 @@ export interface PublicPetitionFieldComment {
   field: PublicPetitionField;
   /** The ID of the petition field comment. */
   id: Scalars["GID"];
+  isAnonymized: Scalars["Boolean"];
   /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
 }
@@ -3730,6 +3733,7 @@ export type FieldComment_PublicPetitionFieldCommentFragment = {
   content: string;
   createdAt: string;
   isUnread: boolean;
+  isAnonymized: boolean;
   author?:
     | { __typename?: "PublicContact"; id: string; fullName: string }
     | { __typename?: "PublicUser"; id: string; fullName: string }
@@ -3744,6 +3748,7 @@ export type FieldComment_PetitionFieldCommentFragment = {
   isUnread: boolean;
   isInternal: boolean;
   isEdited: boolean;
+  isAnonymized: boolean;
   author?:
     | {
         __typename?: "PetitionAccess";
@@ -5379,6 +5384,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
             __typename?: "PetitionFieldComment";
             isEdited: boolean;
             content: string;
+            isAnonymized: boolean;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -5501,6 +5507,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
             __typename?: "PetitionMessage";
             emailSubject?: any | null;
             scheduledAt?: string | null;
+            isAnonymized: boolean;
             bouncedAt?: string | null;
             deliveredAt?: string | null;
             openedAt?: string | null;
@@ -5957,6 +5964,7 @@ export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragmen
     __typename?: "PetitionFieldComment";
     isEdited: boolean;
     content: string;
+    isAnonymized: boolean;
     author?:
       | {
           __typename?: "PetitionAccess";
@@ -6045,6 +6053,7 @@ export type PetitionActivityTimeline_PetitionEvent_MessageSentEvent_Fragment = {
     __typename?: "PetitionMessage";
     emailSubject?: any | null;
     scheduledAt?: string | null;
+    isAnonymized: boolean;
     bouncedAt?: string | null;
     deliveredAt?: string | null;
     openedAt?: string | null;
@@ -6586,6 +6595,7 @@ export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
     __typename?: "PetitionFieldComment";
     isEdited: boolean;
     content: string;
+    isAnonymized: boolean;
     author?:
       | {
           __typename?: "PetitionAccess";
@@ -6667,6 +6677,7 @@ export type TimelineMessageSentEvent_MessageSentEventFragment = {
     __typename?: "PetitionMessage";
     emailSubject?: any | null;
     scheduledAt?: string | null;
+    isAnonymized: boolean;
     bouncedAt?: string | null;
     deliveredAt?: string | null;
     openedAt?: string | null;
@@ -8982,6 +8993,7 @@ export type PreviewPetitionField_PetitionFieldFragment = {
     isUnread: boolean;
     isInternal: boolean;
     isEdited: boolean;
+    isAnonymized: boolean;
     author?:
       | {
           __typename?: "PetitionAccess";
@@ -9255,6 +9267,7 @@ export type PreviewPetitionFieldCommentsDialog_PetitionFieldFragment = {
     isUnread: boolean;
     isInternal: boolean;
     isEdited: boolean;
+    isAnonymized: boolean;
     author?:
       | {
           __typename?: "PetitionAccess";
@@ -9294,6 +9307,7 @@ export type PreviewPetitionFieldCommentsDialog_petitionFieldQueryQuery = {
       isUnread: boolean;
       isInternal: boolean;
       isEdited: boolean;
+      isAnonymized: boolean;
       author?:
         | {
             __typename?: "PetitionAccess";
@@ -9327,6 +9341,7 @@ export type PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentMutatio
     isUnread: boolean;
     isInternal: boolean;
     isEdited: boolean;
+    isAnonymized: boolean;
     field: {
       __typename?: "PetitionField";
       id: string;
@@ -9361,6 +9376,7 @@ export type PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutatio
     isUnread: boolean;
     isInternal: boolean;
     isEdited: boolean;
+    isAnonymized: boolean;
     field: {
       __typename?: "PetitionField";
       id: string;
@@ -9400,6 +9416,7 @@ export type PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutatio
       isUnread: boolean;
       isInternal: boolean;
       isEdited: boolean;
+      isAnonymized: boolean;
       author?:
         | {
             __typename?: "PetitionAccess";
@@ -10335,6 +10352,7 @@ export type RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldQuery = 
       content: string;
       createdAt: string;
       isUnread: boolean;
+      isAnonymized: boolean;
       author?:
         | { __typename?: "PublicContact"; id: string; fullName: string }
         | { __typename?: "PublicUser"; id: string; fullName: string }
@@ -10371,6 +10389,7 @@ export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentM
     content: string;
     createdAt: string;
     isUnread: boolean;
+    isAnonymized: boolean;
     field: {
       __typename?: "PublicPetitionField";
       id: string;
@@ -10400,6 +10419,7 @@ export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentM
     content: string;
     createdAt: string;
     isUnread: boolean;
+    isAnonymized: boolean;
     author?:
       | { __typename?: "PublicContact"; id: string; fullName: string }
       | { __typename?: "PublicUser"; id: string; fullName: string }
@@ -12503,6 +12523,7 @@ export type PetitionActivity_PetitionFragment = {
             __typename?: "PetitionFieldComment";
             isEdited: boolean;
             content: string;
+            isAnonymized: boolean;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -12625,6 +12646,7 @@ export type PetitionActivity_PetitionFragment = {
             __typename?: "PetitionMessage";
             emailSubject?: any | null;
             scheduledAt?: string | null;
+            isAnonymized: boolean;
             bouncedAt?: string | null;
             deliveredAt?: string | null;
             openedAt?: string | null;
@@ -13287,6 +13309,7 @@ export type PetitionActivity_updatePetitionMutation = {
                   __typename?: "PetitionFieldComment";
                   isEdited: boolean;
                   content: string;
+                  isAnonymized: boolean;
                   author?:
                     | {
                         __typename?: "PetitionAccess";
@@ -13414,6 +13437,7 @@ export type PetitionActivity_updatePetitionMutation = {
                   __typename?: "PetitionMessage";
                   emailSubject?: any | null;
                   scheduledAt?: string | null;
+                  isAnonymized: boolean;
                   bouncedAt?: string | null;
                   deliveredAt?: string | null;
                   openedAt?: string | null;
@@ -14130,6 +14154,7 @@ export type PetitionActivity_petitionQuery = {
                   __typename?: "PetitionFieldComment";
                   isEdited: boolean;
                   content: string;
+                  isAnonymized: boolean;
                   author?:
                     | {
                         __typename?: "PetitionAccess";
@@ -14257,6 +14282,7 @@ export type PetitionActivity_petitionQuery = {
                   __typename?: "PetitionMessage";
                   emailSubject?: any | null;
                   scheduledAt?: string | null;
+                  isAnonymized: boolean;
                   bouncedAt?: string | null;
                   deliveredAt?: string | null;
                   openedAt?: string | null;
@@ -16243,6 +16269,7 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
       isUnread: boolean;
       isInternal: boolean;
       isEdited: boolean;
+      isAnonymized: boolean;
       author?:
         | {
             __typename?: "PetitionAccess";
@@ -16367,6 +16394,7 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
       isUnread: boolean;
       isInternal: boolean;
       isEdited: boolean;
+      isAnonymized: boolean;
       author?:
         | {
             __typename?: "PetitionAccess";
@@ -16535,6 +16563,7 @@ export type PetitionPreview_updatePetitionMutation = {
             isUnread: boolean;
             isInternal: boolean;
             isEdited: boolean;
+            isAnonymized: boolean;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -16662,6 +16691,7 @@ export type PetitionPreview_updatePetitionMutation = {
             isUnread: boolean;
             isInternal: boolean;
             isEdited: boolean;
+            isAnonymized: boolean;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -16792,6 +16822,7 @@ export type PetitionPreview_completePetitionMutation = {
         isUnread: boolean;
         isInternal: boolean;
         isEdited: boolean;
+        isAnonymized: boolean;
         author?:
           | {
               __typename?: "PetitionAccess";
@@ -16951,6 +16982,7 @@ export type PetitionPreview_petitionQuery = {
             isUnread: boolean;
             isInternal: boolean;
             isEdited: boolean;
+            isAnonymized: boolean;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -17078,6 +17110,7 @@ export type PetitionPreview_petitionQuery = {
             isUnread: boolean;
             isInternal: boolean;
             isEdited: boolean;
+            isAnonymized: boolean;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -20792,6 +20825,7 @@ export const FieldComment_PublicPetitionFieldCommentFragmentDoc = gql`
         fullName
       }
     }
+    isAnonymized
   }
 ` as unknown as DocumentNode<FieldComment_PublicPetitionFieldCommentFragment, unknown>;
 export const UserListPopover_UserGroupFragmentDoc = gql`
@@ -21985,6 +22019,7 @@ export const TimelineMessageSentEvent_MessageSentEventFragmentDoc = gql`
           ...ContactReference_Contact
         }
       }
+      isAnonymized
       ...EmailEventsIndicator_PetitionMessage
       ...SentPetitionMessageDialog_PetitionMessage
     }
@@ -22113,6 +22148,7 @@ export const TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc = gq
       }
       isEdited
       content
+      isAnonymized
     }
     createdAt
   }
@@ -23518,6 +23554,7 @@ export const FieldComment_PetitionFieldCommentFragmentDoc = gql`
         }
       }
     }
+    isAnonymized
   }
   ${UserReference_UserFragmentDoc}
   ${ContactReference_ContactFragmentDoc}

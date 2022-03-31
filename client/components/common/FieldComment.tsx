@@ -142,7 +142,7 @@ export function FieldComment({
           </Text>
         ) : null}
         <Spacer />
-        {isAuthor || comment.__typename === "PetitionFieldComment" ? (
+        {!comment.isAnonymized && (isAuthor || comment.__typename === "PetitionFieldComment") ? (
           <Menu placement="bottom-end">
             <Tooltip
               label={intl.formatMessage({
@@ -186,7 +186,14 @@ export function FieldComment({
           </Menu>
         ) : null}
       </Box>
-      {isEditing ? (
+      {comment.isAnonymized ? (
+        <Box fontSize="sm" textStyle="hint">
+          <FormattedMessage
+            id="component.field-comment.message-not-available"
+            defaultMessage="Message not available"
+          />
+        </Box>
+      ) : isEditing ? (
         <Box marginTop={1} marginX={-2}>
           <GrowingTextarea
             ref={textareaRef}
@@ -236,6 +243,7 @@ FieldComment.fragments = {
             fullName
           }
         }
+        isAnonymized
       }
     `;
   },
@@ -260,6 +268,7 @@ FieldComment.fragments = {
             }
           }
         }
+        isAnonymized
       }
       ${UserReference.fragments.User}
       ${ContactReference.fragments.Contact}

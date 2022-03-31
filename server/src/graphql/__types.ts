@@ -1337,6 +1337,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     field: NexusGenRootTypes["PetitionField"]; // PetitionField!
     id: NexusGenScalars["GID"]; // GID!
+    isAnonymized: boolean; // Boolean!
     isEdited: boolean; // Boolean!
     isInternal: boolean; // Boolean!
     isUnread: boolean; // Boolean!
@@ -1368,6 +1369,7 @@ export interface NexusGenFieldTypes {
     emailBody: string | null; // String
     emailSubject: NexusGenScalars["JSON"] | null; // JSON
     id: NexusGenScalars["GID"]; // GID!
+    isAnonymized: boolean; // Boolean!
     openedAt: NexusGenScalars["DateTime"] | null; // DateTime
     scheduledAt: NexusGenScalars["DateTime"] | null; // DateTime
     sender: NexusGenRootTypes["User"]; // User!
@@ -1610,6 +1612,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     field: NexusGenRootTypes["PublicPetitionField"]; // PublicPetitionField!
     id: NexusGenScalars["GID"]; // GID!
+    isAnonymized: boolean; // Boolean!
     isUnread: boolean; // Boolean!
   };
   PublicPetitionFieldReply: {
@@ -2815,6 +2818,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     field: "PetitionField";
     id: "GID";
+    isAnonymized: "Boolean";
     isEdited: "Boolean";
     isInternal: "Boolean";
     isUnread: "Boolean";
@@ -2846,6 +2850,7 @@ export interface NexusGenFieldTypeNames {
     emailBody: "String";
     emailSubject: "JSON";
     id: "GID";
+    isAnonymized: "Boolean";
     openedAt: "DateTime";
     scheduledAt: "DateTime";
     sender: "User";
@@ -3088,6 +3093,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     field: "PublicPetitionField";
     id: "GID";
+    isAnonymized: "Boolean";
     isUnread: "Boolean";
   };
   PublicPetitionFieldReply: {

@@ -71,5 +71,6 @@ export const PetitionFieldComment = objectType({
       type: "PetitionField",
       resolve: async (o, _, ctx) => (await ctx.petitions.loadField(o.petition_field_id))!,
     });
+    t.boolean("isAnonymized", { resolve: (o) => o.anonymized_at !== null });
   },
 });

@@ -58,7 +58,16 @@ export function TimelineCommentPublishedEvent({
             ) : null}
           </Box>
           <Divider />
-          <Box padding={4}>{content}</Box>
+          <Box padding={4} textStyle={comment.isAnonymized ? "hint" : undefined}>
+            {comment.isAnonymized ? (
+              <FormattedMessage
+                id="timeline.comment-published.message-not-available"
+                defaultMessage="Message not available"
+              />
+            ) : (
+              content
+            )}
+          </Box>
         </Card>
       </Box>
     );
@@ -99,6 +108,7 @@ TimelineCommentPublishedEvent.fragments = {
         }
         isEdited
         content
+        isAnonymized
       }
       createdAt
     }

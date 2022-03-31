@@ -111,5 +111,6 @@ export const PetitionMessage = objectType({
         return events.find((e) => e.event === "open")?.created_at ?? null;
       },
     });
+    t.boolean("isAnonymized", { resolve: (o) => o.anonymized_at !== null });
   },
 });

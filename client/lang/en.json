@@ -995,6 +995,11 @@
     "context": "Generating report..."
   },
   {
+    "term": "component.field-comment.message-not-available",
+    "definition": "Message not available",
+    "context": "Message not available"
+  },
+  {
     "term": "component.field-error-dialog.header",
     "definition": "Validation errors",
     "context": "Validation errors"
@@ -9475,6 +9480,11 @@
     "context": "{userIsYou, select, true {You} other {{author}}} commented on field {field} {timeAgo}"
   },
   {
+    "term": "timeline.comment-published.message-not-available",
+    "definition": "Message not available",
+    "context": "Message not available"
+  },
+  {
     "term": "timeline.edit-group-permission-description",
     "definition": "{userIsYou, select, true {You} other {{user}}} updated {groupName}'s permission to {permissionType} {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{user}}} updated {groupName}'s permission to {permissionType} {timeAgo}"
@@ -9528,6 +9538,11 @@
     "term": "timeline.message-sent-description-scheduled-delegated",
     "definition": "A message scheduled by {delegateIsYou, select, true {you} other {{delegate}}} as {senderIsYou, select, true {you} other {{sender}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}",
     "context": "A message scheduled by {delegateIsYou, select, true {you} other {{delegate}}} as {senderIsYou, select, true {you} other {{sender}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
+  },
+  {
+    "term": "timeline.message-sent-description.subject-unavailable",
+    "definition": "Subject unavailable",
+    "context": "Subject unavailable"
   },
   {
     "term": "timeline.message-sent-see-message",
