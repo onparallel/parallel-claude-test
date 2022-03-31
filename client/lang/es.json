@@ -9116,23 +9116,23 @@
   },
   {
     "term": "timeline.message-sent-description-manual",
-    "definition": "{same, select, true {Enviaste} other {{user} envió}} un mensaje {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} para {contact} {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+    "definition": "{senderIsYou, select, true {Enviaste} other {{sender} envió}} un mensaje {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} para {contact} {timeAgo}",
+    "context": "{senderIsYou, select, true {You} other {{sender}}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
   },
   {
-    "term": "timeline.message-sent-description-manual-granted",
-    "definition": "{sameAsGranter, select, true {Enviaste} other {{delegateGranter} envió}} un mensaje como {same, select, true {tú} other {{user}}} {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} para {contact} {timeAgo}",
-    "context": "{sameAsGranter, select, true {You} other {{delegateGranter}}} sent a message as {same, select, true {you} other {{user}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+    "term": "timeline.message-sent-description-manual-delegated",
+    "definition": "{senderIsYou, select, true {Enviaste} other {{delegate} envió}} un mensaje como {senderIsYou, select, true {tú} other {{sender}}} {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} para {contact} {timeAgo}",
+    "context": "{senderIsYou, select, true {You} other {{delegate}}} sent a message as {senderIsYou, select, true {you} other {{sender}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
   },
   {
     "term": "timeline.message-sent-description-scheduled",
-    "definition": "Un mensaje programado por {same, select, true {ti} other {{user}}} {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} fue enviado a {contact} {timeAgo}",
-    "context": "A message scheduled by {same, select, true {you} other {{user}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
+    "definition": "Un mensaje programado por {senderIsYou, select, true {ti} other {{sender}}} {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} fue enviado a {contact} {timeAgo}",
+    "context": "A message scheduled by {senderIsYou, select, true {you} other {{sender}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
   },
   {
-    "term": "timeline.message-sent-description-scheduled-granted",
-    "definition": "Un mensaje programado por {sameAsGranter, select, true {ti} other {{delegateGranter}}} como {same, select, true {tú} other {{user}}} {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} fue enviado a {contact} {timeAgo}",
-    "context": "A message scheduled by {sameAsGranter, select, true {you} other {{delegateGranter}}} as {same, select, true {you} other {{user}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
+    "term": "timeline.message-sent-description-scheduled-delegated",
+    "definition": "Un mensaje programado por {delegateIsYou, select, true {ti} other {{delegate}}} como {senderIsYou, select, true {tú} other {{sender}}} {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} fue enviado a {contact} {timeAgo}",
+    "context": "A message scheduled by {delegateIsYou, select, true {you} other {{delegate}}} as {senderIsYou, select, true {you} other {{sender}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
   },
   {
     "term": "timeline.message-sent-see-message",

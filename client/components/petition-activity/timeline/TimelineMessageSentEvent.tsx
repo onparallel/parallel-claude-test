@@ -38,13 +38,13 @@ export function TimelineMessageSentEvent({
           {message.scheduledAt ? (
             message.access.delegateGranter ? (
               <FormattedMessage
-                id="timeline.message-sent-description-scheduled-granted"
-                defaultMessage="A message scheduled by {sameAsGranter, select, true {you} other {{delegateGranter}}} as {same, select, true {you} other {{user}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
+                id="timeline.message-sent-description-scheduled-delegated"
+                defaultMessage="A message scheduled by {delegateIsYou, select, true {you} other {{delegate}}} as {senderIsYou, select, true {you} other {{sender}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
                 values={{
-                  same: userId === message.sender?.id,
-                  sameAsGranter: userId === message.access.delegateGranter!.id,
-                  delegateGranter: <UserReference user={message.access.delegateGranter} />,
-                  user: <UserReference user={message.sender} />,
+                  senderIsYou: userId === message.sender?.id,
+                  delegateIsYou: userId === message.access.delegateGranter?.id,
+                  delegate: <UserReference user={message.access.delegateGranter} />,
+                  sender: <UserReference user={message.sender} />,
                   subject: message.emailSubject,
                   contact: <ContactReference contact={message.access.contact} />,
                   timeAgo: (
@@ -55,10 +55,10 @@ export function TimelineMessageSentEvent({
             ) : (
               <FormattedMessage
                 id="timeline.message-sent-description-scheduled"
-                defaultMessage="A message scheduled by {same, select, true {you} other {{user}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
+                defaultMessage="A message scheduled by {senderIsYou, select, true {you} other {{sender}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
                 values={{
-                  same: userId === message.sender?.id,
-                  user: <UserReference user={message.sender} />,
+                  senderIsYou: userId === message.sender?.id,
+                  sender: <UserReference user={message.sender} />,
                   subject: message.emailSubject,
                   contact: <ContactReference contact={message.access.contact} />,
                   timeAgo: (
@@ -69,13 +69,13 @@ export function TimelineMessageSentEvent({
             )
           ) : message.access.delegateGranter ? (
             <FormattedMessage
-              id="timeline.message-sent-description-manual-granted"
-              defaultMessage="{sameAsGranter, select, true {You} other {{delegateGranter}}} sent a message as {same, select, true {you} other {{user}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+              id="timeline.message-sent-description-manual-delegated"
+              defaultMessage="{senderIsYou, select, true {You} other {{delegate}}} sent a message as {senderIsYou, select, true {you} other {{sender}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
               values={{
-                same: userId === message.sender?.id,
-                sameAsGranter: userId === message.access.delegateGranter!.id,
-                delegateGranter: <UserReference user={message.access.delegateGranter} />,
-                user: <UserReference user={message.sender} />,
+                senderIsYou: userId === message.sender?.id,
+                delegateIsYou: userId === message.access.delegateGranter?.id,
+                delegate: <UserReference user={message.access.delegateGranter} />,
+                sender: <UserReference user={message.sender} />,
                 subject: message.emailSubject,
                 contact: <ContactReference contact={message.access.contact} />,
                 timeAgo: (
@@ -86,10 +86,10 @@ export function TimelineMessageSentEvent({
           ) : (
             <FormattedMessage
               id="timeline.message-sent-description-manual"
-              defaultMessage="{same, select, true {You} other {{user}}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+              defaultMessage="{senderIsYou, select, true {You} other {{sender}}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
               values={{
-                same: userId === message.sender!.id,
-                user: <UserReference user={message.sender} />,
+                senderIsYou: userId === message.sender!.id,
+                sender: <UserReference user={message.sender} />,
                 subject: message.emailSubject,
                 contact: <ContactReference contact={message.access.contact} />,
                 timeAgo: (
