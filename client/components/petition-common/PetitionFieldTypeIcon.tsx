@@ -1,4 +1,4 @@
-import { Icon, IconProps } from "@chakra-ui/react";
+import { Icon } from "@chakra-ui/react";
 import {
   FieldDynamicSelectIcon,
   FieldFileUploadIcon,
