@@ -1,6 +1,6 @@
 import { extension } from "mime-types";
 import { arg, enumType, inputObjectType, interfaceType, objectType } from "nexus";
-import { minBy } from "remeda";
+import { isDefined, minBy } from "remeda";
 import { fullName } from "../../../util/fullName";
 import { toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
@@ -747,7 +747,9 @@ export const PetitionFieldReply = objectType({
       description: "The content of the reply.",
       resolve: async (root, _, ctx) => {
         if (isFileTypeField(root.type)) {
-          const file = await ctx.files.loadFileUpload(root.content["file_upload_id"]);
+          const file = isDefined(root.content.file_upload_id)
+            ? await ctx.files.loadFileUpload(root.content.file_upload_id)
+            : null;
           return file
             ? {
                 filename: file.filename,
@@ -787,6 +789,7 @@ export const PetitionFieldReply = objectType({
         }
       },
     });
+    t.boolean("isAnonymized", { resolve: (o) => o.anonymized_at !== null });
   },
 });
 

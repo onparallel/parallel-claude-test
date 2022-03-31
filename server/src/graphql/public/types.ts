@@ -425,7 +425,9 @@ export const PublicPetitionFieldReply = objectType({
       description: "The public content of the reply",
       resolve: async (root, _, ctx) => {
         if (isFileTypeField(root.type)) {
-          const file = await ctx.files.loadFileUpload(root.content["file_upload_id"]);
+          const file = isDefined(root.content.file_upload_id)
+            ? await ctx.files.loadFileUpload(root.content.file_upload_id)
+            : null;
           return file
             ? {
                 filename: file.filename,
@@ -446,6 +448,7 @@ export const PublicPetitionFieldReply = objectType({
         return (await ctx.petitions.loadField(root.petition_field_id))!;
       },
     });
+    t.boolean("isAnonymized", { resolve: (o) => o.anonymized_at !== null });
   },
 });
 

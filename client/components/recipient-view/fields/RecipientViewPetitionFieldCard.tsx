@@ -202,10 +202,12 @@ RecipientViewPetitionFieldCard.fragments = {
         unreadCommentCount
         ...RecipientViewPetitionFieldCommentsDialog_PetitionField
         hasCommentsEnabled
+        ...completedFieldReplies_PetitionField
       }
       ${this.PetitionFieldReply}
       ${FileAttachmentButton.fragments.FileUpload}
       ${RecipientViewPetitionFieldCommentsDialog.fragments.PetitionField}
+      ${completedFieldReplies.fragments.PetitionField}
     `;
   },
   get PetitionFieldReply() {
@@ -216,6 +218,7 @@ RecipientViewPetitionFieldCard.fragments = {
         content
         createdAt
         updatedAt
+        isAnonymized
       }
     `;
   },
@@ -243,10 +246,12 @@ RecipientViewPetitionFieldCard.fragments = {
         unreadCommentCount
         hasCommentsEnabled
         ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
+        ...completedFieldReplies_PublicPetitionField
       }
       ${this.PublicPetitionFieldReply}
       ${FileAttachmentButton.fragments.FileUpload}
       ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionField}
+      ${completedFieldReplies.fragments.PublicPetitionField}
     `;
   },
   get PublicPetitionFieldReply() {
@@ -257,6 +262,7 @@ RecipientViewPetitionFieldCard.fragments = {
         content
         createdAt
         updatedAt
+        isAnonymized
       }
     `;
   },

@@ -244,7 +244,7 @@ export function RecipientViewPetitionFieldShortText({
                   ref={replyRefs[reply.id]}
                   field={field}
                   reply={reply}
-                  isDisabled={isDisabled || isDeletingReply[reply.id]}
+                  isDisabled={isDisabled || isDeletingReply[reply.id] || reply.isAnonymized}
                   onAddNewReply={handleAddNewReply}
                   isInvalid={isInvalidReply[reply.id]}
                   {...replyProps(reply.id)}
@@ -345,20 +345,25 @@ export const RecipientViewPetitionFieldReplyShortText = forwardRef<
       }
       setValue(value);
     },
-    placeholder:
-      options.placeholder ??
-      (format
-        ? intl.formatMessage(
-            {
-              id: "generic.for-example",
-              defaultMessage: "E.g. {example}",
-            },
-            { example: format.example }
-          )
-        : intl.formatMessage({
-            id: "component.recipient-view-petition-field-reply.text-placeholder",
-            defaultMessage: "Enter your answer",
-          })),
+    placeholder: reply.isAnonymized
+      ? intl.formatMessage({
+          id: "component.recipient-view-petition-field-reply.not-available",
+          defaultMessage: "Reply not available",
+        })
+      : options.placeholder ??
+        (format
+          ? intl.formatMessage(
+              {
+                id: "generic.for-example",
+                defaultMessage: "E.g. {example}",
+              },
+              { example: format.example }
+            )
+          : intl.formatMessage({
+              id: "component.recipient-view-petition-field-reply.text-placeholder",
+              defaultMessage: "Enter your answer",
+            })),
+    sx: { _placeholderShown: { fontStyle: reply.isAnonymized ? "italic" : "normal" } },
   };
 
   return (

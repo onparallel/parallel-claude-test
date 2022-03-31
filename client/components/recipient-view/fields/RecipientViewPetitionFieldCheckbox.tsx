@@ -1,4 +1,4 @@
-import { Box, Checkbox, HStack, Stack } from "@chakra-ui/react";
+import { Box, Checkbox, HStack, Stack, Text } from "@chakra-ui/react";
 import { RadioButtonSelected } from "@parallel/chakra/icons";
 import { CheckboxTypeLabel } from "@parallel/components/petition-common/CheckboxTypeLabel";
 import { useState } from "react";
@@ -123,6 +123,16 @@ export function RecipientViewPetitionFieldCheckbox({
       <Stack>
         <HStack wrap="wrap" color="gray.600" fontSize="sm" gridGap={2} spacing={0}>
           <CheckboxTypeLabel as="span" options={field.options} />
+          {reply?.isAnonymized ? (
+            <Text>
+              {"("}
+              <FormattedMessage
+                id="component.recipient-view-petition-field-reply.not-available"
+                defaultMessage="Reply not available"
+              />
+              {")"}
+            </Text>
+          ) : null}
           {!isSaving && checkedItems?.length ? (
             <Box as="span" color={isInvalid ? "red.600" : "gray.600"}>
               {showRadio ? null : "("}
@@ -158,7 +168,7 @@ export function RecipientViewPetitionFieldCheckbox({
           <Checkbox
             key={index}
             isInvalid={isRejected}
-            isDisabled={isDisabled || reply?.status === "APPROVED"}
+            isDisabled={isDisabled || reply?.status === "APPROVED" || reply?.isAnonymized}
             isChecked={checkedItems.includes(option)}
             onChange={(e) => {
               e.preventDefault();

@@ -116,7 +116,7 @@ export function RecipientViewPetitionFieldDynamicSelect({
                   ref={replyRefs[reply.id]}
                   field={field}
                   reply={reply}
-                  isDisabled={isDisabled || isDeletingReply[reply.id]}
+                  isDisabled={isDisabled || isDeletingReply[reply.id] || reply.isAnonymized}
                   onDelete={handleDelete(reply.id)}
                   onChange={handleUpdate(reply.id)}
                 />
@@ -184,9 +184,10 @@ const RecipientViewPetitionFieldReplyDynamicSelect = forwardRef<
     }
   }
 
-  const repliedLabelsCount = reply
-    ? countBy(reply.content.value as [string, string | null][], ([, value]) => value !== null)
-    : 0;
+  const repliedLabelsCount =
+    reply && !reply.isAnonymized
+      ? countBy(reply.content.value as [string, string | null][], ([, value]) => value !== null)
+      : 0;
 
   const options =
     (reply?.content.value as string[][]) ?? fieldOptions.labels.map((label) => [label, null]);
@@ -292,11 +293,22 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
               setIsSaving(false);
             }}
             placeholder={
-              <FormattedMessage id="generic.select-an-option" defaultMessage="Select an option" />
+              reply?.isAnonymized ? (
+                <FormattedMessage
+                  id="component.recipient-view-petition-field-reply.not-available"
+                  defaultMessage="Reply not available"
+                />
+              ) : (
+                <FormattedMessage id="generic.select-an-option" defaultMessage="Select an option" />
+              )
             }
             styles={{
               menu: (styles) => ({ ...styles, zIndex: 100 }),
               valueContainer: (styles) => ({ ...styles, paddingRight: 32 }),
+              placeholder: (base) => ({
+                ...base,
+                fontStyle: reply?.isAnonymized ? "italic" : "normal",
+              }),
             }}
           />
           {reply && (

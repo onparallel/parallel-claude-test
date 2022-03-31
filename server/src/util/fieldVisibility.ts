@@ -41,7 +41,7 @@ type VisibilityField = {
   type: PetitionFieldType;
   options: any;
   visibility: PetitionFieldVisibility | null;
-  replies: { content: any }[];
+  replies: { content: any; anonymized_at: Date | null }[];
 };
 
 function evaluatePredicate(
@@ -118,9 +118,9 @@ function conditionIsMet(
   field: VisibilityField,
   isVisible: boolean
 ) {
-  const replies = isVisible ? (field.replies as any[]) : [];
+  const replies = isVisible ? field.replies : [];
   const { operator, value, modifier } = condition;
-  function evaluator(reply: any) {
+  function evaluator(reply: VisibilityField["replies"][0]) {
     const _value =
       condition.column !== undefined
         ? reply.content.value?.[condition.column]?.[1] ?? null
@@ -149,7 +149,7 @@ function conditionIsMet(
   }
 }
 
-export function evaluateFieldVisibility<T extends VisibilityField>(fields: T[]): boolean[] {
+export function evaluateFieldVisibility(fields: VisibilityField[]): boolean[] {
   const fieldsById = indexBy(fields, (f) => f.id);
   const visibilitiesById: { [fieldId: string]: boolean } = {};
   for (const field of fields) {

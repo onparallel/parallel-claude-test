@@ -196,8 +196,10 @@ RecipientViewProgressFooter.fragments = {
           id
         }
         ...useFieldVisibility_PetitionField
+        ...completedFieldReplies_PetitionField
       }
       ${useFieldVisibility.fragments.PetitionField}
+      ${completedFieldReplies.fragments.PetitionField}
     `;
   },
   get PublicPetition() {
@@ -226,8 +228,10 @@ RecipientViewProgressFooter.fragments = {
           id
         }
         ...useFieldVisibility_PublicPetitionField
+        ...completedFieldReplies_PublicPetitionField
       }
       ${useFieldVisibility.fragments.PublicPetitionField}
+      ${completedFieldReplies.fragments.PublicPetitionField}
     `;
   },
 };

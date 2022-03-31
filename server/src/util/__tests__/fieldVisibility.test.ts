@@ -8,14 +8,14 @@ describe("fieldVisibility", () => {
         type: "TEXT",
         options: {},
         visibility: null,
-        replies: [{ content: { value: "Yes" } }],
+        replies: [{ content: { value: "Yes" }, anonymized_at: null }],
       },
       {
         id: 2,
         type: "TEXT",
         options: {},
         visibility: null,
-        replies: [{ content: { value: "No" } }],
+        replies: [{ content: { value: "No" }, anonymized_at: null }],
       },
     ]);
 
@@ -29,7 +29,7 @@ describe("fieldVisibility", () => {
         type: "TEXT",
         options: {},
         visibility: null,
-        replies: [{ content: { value: "Jon Snow" } }],
+        replies: [{ content: { value: "Jon Snow" }, anonymized_at: null }],
       },
       {
         id: 2,
@@ -47,7 +47,7 @@ describe("fieldVisibility", () => {
             },
           ],
         },
-        replies: [{ content: { value: "." } }],
+        replies: [{ content: { value: "." }, anonymized_at: null }],
       },
     ]);
 
@@ -62,7 +62,7 @@ describe("fieldVisibility", () => {
           type: "TEXT",
           options: {},
           visibility: null,
-          replies: [{ content: { value: "Jon Snow" } }],
+          replies: [{ content: { value: "Jon Snow" }, anonymized_at: null }],
         },
         {
           id: 2,
@@ -80,7 +80,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
       ]);
 
@@ -95,8 +95,8 @@ describe("fieldVisibility", () => {
           options: {},
           visibility: null,
           replies: [
-            { content: { value: "Jon Snow" } },
-            { content: { value: "Daenerys Targaryen" } },
+            { content: { value: "Jon Snow" }, anonymized_at: null },
+            { content: { value: "Daenerys Targaryen" }, anonymized_at: null },
           ],
         },
         {
@@ -115,7 +115,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
       ]);
 
@@ -130,9 +130,9 @@ describe("fieldVisibility", () => {
           options: {},
           visibility: null,
           replies: [
-            { content: { value: "Robb Stark" } },
-            { content: { value: "Sansa Stark" } },
-            { content: { value: "Ned Stark" } },
+            { content: { value: "Robb Stark" }, anonymized_at: null },
+            { content: { value: "Sansa Stark" }, anonymized_at: null },
+            { content: { value: "Ned Stark" }, anonymized_at: null },
           ],
         },
         {
@@ -151,7 +151,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
       ]);
       expect(fields).toMatchObject([true, true]);
@@ -165,8 +165,8 @@ describe("fieldVisibility", () => {
           options: {},
           visibility: null,
           replies: [
-            { content: { value: "Robert Baratheon, king of Westeros" } },
-            { content: { value: "Daenerys Targaryen, Mother of Dragons" } },
+            { content: { value: "Robert Baratheon, king of Westeros" }, anonymized_at: null },
+            { content: { value: "Daenerys Targaryen, Mother of Dragons" }, anonymized_at: null },
           ],
         },
         {
@@ -185,7 +185,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
       ]);
 
@@ -200,11 +200,11 @@ describe("fieldVisibility", () => {
           options: {},
           visibility: null,
           replies: [
-            { content: { value: "Robb" } },
-            { content: { value: "Sansa" } },
-            { content: { value: "Arya" } },
-            { content: { value: "Bran" } },
-            { content: { value: "Rickon" } },
+            { content: { value: "Robb" }, anonymized_at: null },
+            { content: { value: "Sansa" }, anonymized_at: null },
+            { content: { value: "Arya" }, anonymized_at: null },
+            { content: { value: "Bran" }, anonymized_at: null },
+            { content: { value: "Rickon" }, anonymized_at: null },
           ],
         },
         {
@@ -223,7 +223,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
       ]);
 
@@ -239,7 +239,7 @@ describe("fieldVisibility", () => {
           type: "TEXT",
           options: {},
           visibility: null,
-          replies: [{ content: { value: "Jon Snow" } }],
+          replies: [{ content: { value: "Jon Snow" }, anonymized_at: null }],
         },
         {
           id: 2,
@@ -263,7 +263,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
       ]);
 
@@ -278,10 +278,10 @@ describe("fieldVisibility", () => {
           options: {},
           visibility: null,
           replies: [
-            { content: { value: "King in the North" } },
-            { content: { value: "Hand of the King" } },
-            { content: { value: "Kingkiller" } },
-            { content: { value: "The Madking" } },
+            { content: { value: "King in the North" }, anonymized_at: null },
+            { content: { value: "Hand of the King" }, anonymized_at: null },
+            { content: { value: "Kingkiller" }, anonymized_at: null },
+            { content: { value: "The Madking" }, anonymized_at: null },
           ],
         },
         {
@@ -306,7 +306,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
       ]);
 
@@ -321,10 +321,10 @@ describe("fieldVisibility", () => {
           options: {},
           visibility: null,
           replies: [
-            { content: { value: "Jon Snow" } },
-            { content: { value: "Tyrion Lannister" } },
-            { content: { value: "Jaime Lannister" } },
-            { content: { value: "Aerys Targaryen" } },
+            { content: { value: "Jon Snow" }, anonymized_at: null },
+            { content: { value: "Tyrion Lannister" }, anonymized_at: null },
+            { content: { value: "Jaime Lannister" }, anonymized_at: null },
+            { content: { value: "Aerys Targaryen" }, anonymized_at: null },
           ],
         },
         {
@@ -333,10 +333,10 @@ describe("fieldVisibility", () => {
           options: {},
           visibility: null,
           replies: [
-            { content: { value: "King in the North" } },
-            { content: { value: "Hand of the King" } },
-            { content: { value: "Kingkiller" } },
-            { content: { value: "The Madking" } },
+            { content: { value: "King in the North" }, anonymized_at: null },
+            { content: { value: "Hand of the King" }, anonymized_at: null },
+            { content: { value: "Kingkiller" }, anonymized_at: null },
+            { content: { value: "The Madking" }, anonymized_at: null },
           ],
         },
         {
@@ -367,7 +367,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
       ]);
 
@@ -388,7 +388,7 @@ describe("fieldVisibility", () => {
             },
           },
           visibility: null,
-          replies: [{ content: { value: ["Choice 1", "Choice 2"] } }],
+          replies: [{ content: { value: ["Choice 1", "Choice 2"] }, anonymized_at: null }],
         },
         {
           id: 2,
@@ -406,7 +406,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
         {
           id: 3,
@@ -424,7 +424,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
       ]);
 
@@ -445,7 +445,7 @@ describe("fieldVisibility", () => {
             },
           },
           visibility: null,
-          replies: [{ content: { value: ["Choice 1", "Choice 2"] } }],
+          replies: [{ content: { value: ["Choice 1", "Choice 2"] }, anonymized_at: null }],
         },
         {
           id: 2,
@@ -463,7 +463,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
         {
           id: 3,
@@ -481,7 +481,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
       ]);
 
@@ -502,7 +502,7 @@ describe("fieldVisibility", () => {
             },
           },
           visibility: null,
-          replies: [{ content: { value: ["Choice 1", "Choice 2"] } }],
+          replies: [{ content: { value: ["Choice 1", "Choice 2"] }, anonymized_at: null }],
         },
         {
           id: 2,
@@ -520,7 +520,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
         {
           id: 3,
@@ -538,7 +538,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
         {
           id: 4,
@@ -556,7 +556,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
       ]);
 
@@ -577,7 +577,7 @@ describe("fieldVisibility", () => {
             },
           },
           visibility: null,
-          replies: [{ content: { value: ["Choice 1", "Choice 2"] } }],
+          replies: [{ content: { value: ["Choice 1", "Choice 2"] }, anonymized_at: null }],
         },
         {
           id: 2,
@@ -595,7 +595,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
         {
           id: 3,
@@ -613,7 +613,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
       ]);
 
@@ -634,7 +634,9 @@ describe("fieldVisibility", () => {
             },
           },
           visibility: null,
-          replies: [{ content: { value: ["Choice 1", "Choice 2", "Choice 3"] } }],
+          replies: [
+            { content: { value: ["Choice 1", "Choice 2", "Choice 3"] }, anonymized_at: null },
+          ],
         },
         {
           id: 2,
@@ -652,7 +654,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
         {
           id: 3,
@@ -670,7 +672,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
       ]);
 
@@ -691,7 +693,7 @@ describe("fieldVisibility", () => {
             },
           },
           visibility: null,
-          replies: [{ content: { value: ["Choice 1", "Choice 2"] } }],
+          replies: [{ content: { value: ["Choice 1", "Choice 2"] }, anonymized_at: null }],
         },
         {
           id: 2,
@@ -709,7 +711,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
         {
           id: 3,
@@ -727,7 +729,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
       ]);
 
@@ -748,7 +750,9 @@ describe("fieldVisibility", () => {
             },
           },
           visibility: null,
-          replies: [{ content: { value: ["Choice 1", "Choice 2", "Choice 3"] } }],
+          replies: [
+            { content: { value: ["Choice 1", "Choice 2", "Choice 3"] }, anonymized_at: null },
+          ],
         },
         {
           id: 2,
@@ -766,7 +770,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
         {
           id: 3,
@@ -784,7 +788,7 @@ describe("fieldVisibility", () => {
               },
             ],
           },
-          replies: [{ content: { value: "." } }],
+          replies: [{ content: { value: "." }, anonymized_at: null }],
         },
       ]);
 

@@ -187,7 +187,7 @@ export function RecipientViewPetitionFieldDate({
                   ref={replyRefs[reply.id]}
                   field={field}
                   reply={reply}
-                  isDisabled={isDisabled || isDeletingReply[reply.id]}
+                  isDisabled={isDisabled || isDeletingReply[reply.id] || reply.isAnonymized}
                   onUpdate={handleUpdate(reply.id)}
                   onDelete={handleDelete(reply.id)}
                   onAddNewReply={handleAddNewReply}
@@ -247,7 +247,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
   const { browserName } = useMetadata();
 
   const props = {
-    type: "date",
+    type: reply.isAnonymized ? "text" : "date",
     id: `reply-${field.id}-${reply.id}`,
     ref: ref as any,
     paddingRight: 3,
@@ -266,6 +266,7 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
             ...(value ? {} : { "&:not(:focus)": { color: "rgba(0,0,0,0.3)" } }),
           }
         : {}),
+      _placeholderShown: { fontStyle: reply.isAnonymized ? "italic" : "normal" },
     },
     isDisabled: isDisabled || reply.status === "APPROVED",
     isInvalid: reply.status === "REJECTED",
@@ -289,6 +290,12 @@ export const RecipientViewPetitionFieldReplyDate = forwardRef<
     onChange: (event: ChangeEvent<HTMLInputElement>) => {
       setValue(event.target.value);
     },
+    placeholder: reply.isAnonymized
+      ? intl.formatMessage({
+          id: "component.recipient-view-petition-field-reply.not-available",
+          defaultMessage: "Reply not available",
+        })
+      : undefined,
   };
 
   return (

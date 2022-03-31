@@ -169,7 +169,7 @@ export function RecipientViewPetitionFieldPhone({
                   ref={replyRefs[reply.id]}
                   field={field}
                   reply={reply}
-                  isDisabled={isDisabled || isDeletingReply[reply.id]}
+                  isDisabled={isDisabled || isDeletingReply[reply.id] || reply.isAnonymized}
                   onUpdate={handleUpdate(reply.id)}
                   onDelete={handleDelete(reply.id)}
                   onAddNewReply={handleAddNewReply}
@@ -259,7 +259,13 @@ export const RecipientViewPetitionFieldReplyPhone = forwardRef<
         onDelete(true);
       }
     },
-    placeholder: options.placeholder ?? undefined,
+    placeholder: reply.isAnonymized
+      ? intl.formatMessage({
+          id: "component.recipient-view-petition-field-reply.not-available",
+          defaultMessage: "Reply not available",
+        })
+      : options.placeholder ?? undefined,
+    sx: { _placeholderShown: { fontStyle: reply.isAnonymized ? "italic" : "normal" } },
   };
 
   return (

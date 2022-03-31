@@ -414,6 +414,7 @@ PetitionPreview.fragments = {
         ...useGetPageFields_PetitionField
         ...validatePetitionFields_PetitionField
         ...FieldErrorDialog_PetitionField
+        ...completedFieldReplies_PetitionField
       }
       signatureConfig {
         allowAdditionalSigners
@@ -439,6 +440,7 @@ PetitionPreview.fragments = {
     ${validatePetitionFields.fragments.PetitionField}
     ${FieldErrorDialog.fragments.PetitionField}
     ${useLiquidScope.fragments.PetitionBase}
+    ${completedFieldReplies.fragments.PetitionField}
   `,
   Query: gql`
     fragment PetitionPreview_Query on Query {

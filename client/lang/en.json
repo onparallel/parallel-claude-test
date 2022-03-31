@@ -2950,6 +2950,11 @@
     "context": "This reply has been approved"
   },
   {
+    "term": "component.recipient-view-petition-field-reply.document-not-available",
+    "definition": "Document not available",
+    "context": "Document not available"
+  },
+  {
     "term": "component.recipient-view-petition-field-reply.download-label",
     "definition": "Download file",
     "context": "Download file"
@@ -2958,6 +2963,11 @@
     "term": "component.recipient-view-petition-field-reply.file-incomplete",
     "definition": "This file was not uploaded correctly. Please, delete it and try again.",
     "context": "This file was not uploaded correctly. Please, delete it and try again."
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.not-available",
+    "definition": "Reply not available",
+    "context": "Reply not available"
   },
   {
     "term": "component.recipient-view-petition-field-reply.rejected-file",

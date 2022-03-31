@@ -267,7 +267,7 @@ export function RecipientViewPetitionFieldNumber({
                   ref={replyRefs[reply.id]}
                   field={field}
                   reply={reply}
-                  isDisabled={isDisabled || isDeletingReply[reply.id]}
+                  isDisabled={isDisabled || isDeletingReply[reply.id] || reply.isAnonymized}
                   onUpdate={handleUpdate(reply.id)}
                   onDelete={handleDelete(reply.id)}
                   onAddNewReply={handleAddNewReply}
@@ -379,7 +379,13 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
         setIsInvalid(!isBetweenLimits(range, value));
       }
     },
-    placeholder: placeholder ?? defaultPlaceholder,
+    placeholder: reply.isAnonymized
+      ? intl.formatMessage({
+          id: "component.recipient-view-petition-field-reply.not-available",
+          defaultMessage: "Reply not available",
+        })
+      : placeholder ?? defaultPlaceholder,
+    sx: { _placeholderShown: { fontStyle: reply.isAnonymized ? "italic" : "normal" } },
   } as ComponentPropsWithRef<typeof NumeralInput>;
 
   return (

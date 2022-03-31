@@ -565,10 +565,12 @@ RecipientView.fragments = {
         ...RecipientViewPetitionField_PublicPetitionField
         ...RecipientViewContentsCard_PublicPetitionField
         ...RecipientViewProgressFooter_PublicPetitionField
+        ...completedFieldReplies_PublicPetitionField
       }
       ${RecipientViewPetitionField.fragments.PublicPetitionField}
       ${RecipientViewContentsCard.fragments.PublicPetitionField}
       ${RecipientViewProgressFooter.fragments.PublicPetitionField}
+      ${completedFieldReplies.fragments.PublicPetitionField}
     `;
   },
   get PublicUser() {

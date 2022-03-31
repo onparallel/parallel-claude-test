@@ -173,7 +173,9 @@ useFieldVisibility.fragments = {
         id
         content
       }
+      ...completedFieldReplies_PublicPetitionField
     }
+    ${completedFieldReplies.fragments.PublicPetitionField}
   `,
   PetitionField: gql`
     fragment useFieldVisibility_PetitionField on PetitionField {
@@ -184,11 +186,14 @@ useFieldVisibility.fragments = {
       replies {
         id
         content
+        isAnonymized
       }
       previewReplies @client {
         id
         content
       }
+      ...completedFieldReplies_PetitionField
     }
+    ${completedFieldReplies.fragments.PetitionField}
   `,
 };

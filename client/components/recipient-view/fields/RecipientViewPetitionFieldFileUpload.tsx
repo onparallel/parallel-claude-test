@@ -86,10 +86,10 @@ export function RecipientViewPetitionFieldFileUpload({
               >
                 <RecipientViewPetitionFieldReplyFileUpload
                   reply={reply}
-                  isDisabled={isDisabled || isDeletingReply[reply.id]}
+                  isDisabled={isDisabled || isDeletingReply[reply.id] || reply.isAnonymized}
                   onRemove={() => handleDeletePetitionReply({ replyId: reply.id })}
                   onDownload={onDownloadReply}
-                  isDownloadDisabled={isCacheOnly}
+                  isDownloadDisabled={isCacheOnly || reply.isAnonymized}
                 />
               </motion.li>
             ))}
@@ -140,30 +140,43 @@ export function RecipientViewPetitionFieldReplyFileUpload({
         fontWeight="bold"
         textTransform="uppercase"
       >
-        <FileIcon
-          boxSize={5}
-          filename={reply.content!.filename}
-          contentType={reply.content!.contentType}
-          hasFailed={uploadHasFailed}
-        />
+        {!reply.isAnonymized ? (
+          <FileIcon
+            boxSize={5}
+            filename={reply.content!.filename}
+            contentType={reply.content!.contentType}
+            hasFailed={uploadHasFailed}
+          />
+        ) : null}
       </Center>
       <Box flex="1" overflow="hidden" paddingBottom="2px">
         <Flex minWidth={0} whiteSpace="nowrap" alignItems="baseline">
-          <FileName value={reply.content?.filename} />
-          <Text as="span" marginX={2}>
-            -
-          </Text>
-          <Text as="span" fontSize="xs" color="gray.500">
-            <FileSize value={reply.content?.size} />
-          </Text>
+          {!reply.isAnonymized ? (
+            <>
+              <FileName value={reply.content?.filename} />
+              <Text as="span" marginX={2}>
+                -
+              </Text>
+              <Text as="span" fontSize="xs" color="gray.500">
+                <FileSize value={reply.content?.size} />
+              </Text>
+            </>
+          ) : (
+            <Text textStyle="hint">
+              <FormattedMessage
+                id="component.recipient-view-petition-field-reply.document-not-available"
+                defaultMessage="Document not available"
+              />
+            </Text>
+          )}
         </Flex>
-        {reply.content!.uploadComplete === false ? (
+        {reply.isAnonymized || reply.content!.uploadComplete === false ? (
           <Center height="18px">
             <Progress
               borderRadius="sm"
               width="100%"
               isIndeterminate={reply.content!.progress === 1}
-              value={reply.content!.progress * 100}
+              value={reply.isAnonymized ? undefined : reply.content!.progress * 100}
               size="xs"
               colorScheme="green"
             />

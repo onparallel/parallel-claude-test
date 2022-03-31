@@ -107,7 +107,7 @@ export function RecipientViewPetitionFieldSelect({
                   ref={replyRefs[reply.id]}
                   field={field}
                   reply={reply}
-                  isDisabled={isDisabled || isDeletingReply[reply.id]}
+                  isDisabled={isDisabled || isDeletingReply[reply.id] || reply.isAnonymized}
                   onUpdate={handleUpdate(reply.id)}
                   onDelete={handleDelete(reply.id)}
                 />
@@ -206,15 +206,24 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
               setIsSaving(false);
             }}
             placeholder={
-              options.placeholder ??
-              intl.formatMessage({
-                id: "generic.select-an-option",
-                defaultMessage: "Select an option",
-              })
+              reply.isAnonymized
+                ? intl.formatMessage({
+                    id: "component.recipient-view-petition-field-reply.not-available",
+                    defaultMessage: "Reply not available",
+                  })
+                : options.placeholder ??
+                  intl.formatMessage({
+                    id: "generic.select-an-option",
+                    defaultMessage: "Select an option",
+                  })
             }
             styles={{
               menu: (styles) => ({ ...styles, zIndex: 100 }),
               valueContainer: (styles) => ({ ...styles, paddingRight: 32 }),
+              placeholder: (base) => ({
+                ...base,
+                fontStyle: reply.isAnonymized ? "italic" : "normal",
+              }),
             }}
           />
           <Center height="100%" position="absolute" right="42px" top={0}>

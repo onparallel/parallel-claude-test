@@ -580,6 +580,7 @@ export class PetitionRepository extends BaseRepository {
                     }
                   : null,
                 status: reply.status,
+                anonymized_at: reply.anonymized_at,
               };
             })
             .filter((r) => r.content !== null),

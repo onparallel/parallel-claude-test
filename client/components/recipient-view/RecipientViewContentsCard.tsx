@@ -269,8 +269,10 @@ export const RecipientViewContentsCard = Object.assign(
             unreadCommentCount
             hasCommentsEnabled
             ...useFieldVisibility_PublicPetitionField
+            ...completedFieldReplies_PublicPetitionField
           }
           ${useFieldVisibility.fragments.PublicPetitionField}
+          ${completedFieldReplies.fragments.PublicPetitionField}
         `;
       },
       get PetitionBase() {
@@ -301,8 +303,10 @@ export const RecipientViewContentsCard = Object.assign(
             unreadCommentCount
             hasCommentsEnabled
             ...useFieldVisibility_PetitionField
+            ...completedFieldReplies_PetitionField
           }
           ${useFieldVisibility.fragments.PetitionField}
+          ${completedFieldReplies.fragments.PetitionField}
         `;
       },
     },

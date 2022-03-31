@@ -194,7 +194,7 @@ export function RecipientViewPetitionFieldText({
                   ref={replyRefs[reply.id]}
                   field={field}
                   reply={reply}
-                  isDisabled={isDisabled || isDeletingReply[reply.id]}
+                  isDisabled={isDisabled || isDeletingReply[reply.id] || reply.isAnonymized}
                   onUpdate={handleUpdate(reply.id)}
                   onDelete={handleDelete(reply.id)}
                   onAddNewReply={handleAddNewReply}
@@ -278,12 +278,17 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
       setValue(event.target.value);
       debouncedUpdateReply(event.target.value);
     },
-    placeholder:
-      options.placeholder ??
-      intl.formatMessage({
-        id: "component.recipient-view-petition-field-reply.text-placeholder",
-        defaultMessage: "Enter your answer",
-      }),
+    placeholder: reply.isAnonymized
+      ? intl.formatMessage({
+          id: "component.recipient-view-petition-field-reply.not-available",
+          defaultMessage: "Reply not available",
+        })
+      : options.placeholder ??
+        intl.formatMessage({
+          id: "component.recipient-view-petition-field-reply.text-placeholder",
+          defaultMessage: "Enter your answer",
+        }),
+    sx: { _placeholderShown: { fontStyle: reply.isAnonymized ? "italic" : "normal" } },
   };
 
   return (

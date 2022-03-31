@@ -3,12 +3,15 @@ import { PetitionFieldType } from "../db/__types";
 type PartialField = {
   type: PetitionFieldType;
   options: any;
-  replies: { content: any }[];
+  replies: { content: any; anonymized_at: Date | null }[];
 };
 
 // ALERT: Same logic in completedFieldReplies in client side
 /** returns the field replies that are fully completed */
-export function completedFieldReplies<T extends PartialField>(field: T) {
+export function completedFieldReplies(field: PartialField) {
+  if (field.replies.every((r) => r.anonymized_at !== null)) {
+    return field.replies;
+  }
   switch (field.type) {
     case "DYNAMIC_SELECT":
       return field.replies.filter((reply) =>

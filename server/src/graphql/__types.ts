@@ -1355,6 +1355,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
     id: NexusGenScalars["GID"]; // GID!
+    isAnonymized: boolean; // Boolean!
     metadata: NexusGenScalars["JSONObject"]; // JSONObject!
     status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -1621,6 +1622,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     field: NexusGenRootTypes["PublicPetitionField"]; // PublicPetitionField!
     id: NexusGenScalars["GID"]; // GID!
+    isAnonymized: boolean; // Boolean!
     status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
@@ -2836,6 +2838,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     field: "PetitionField";
     id: "GID";
+    isAnonymized: "Boolean";
     metadata: "JSONObject";
     status: "PetitionFieldReplyStatus";
     updatedAt: "DateTime";
@@ -3102,6 +3105,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     field: "PublicPetitionField";
     id: "GID";
+    isAnonymized: "Boolean";
     status: "PetitionFieldReplyStatus";
     updatedAt: "DateTime";
   };

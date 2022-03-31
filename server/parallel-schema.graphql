@@ -2721,6 +2721,7 @@ type PetitionFieldReply implements Timestamps {
   The ID of the petition field reply.
   """
   id: GID!
+  isAnonymized: Boolean!
 
   """
   Metadata for this reply.
@@ -3742,6 +3743,7 @@ type PublicPetitionFieldReply implements Timestamps {
   The ID of the petition field reply.
   """
   id: GID!
+  isAnonymized: Boolean!
 
   """
   The status of the petition field reply.
