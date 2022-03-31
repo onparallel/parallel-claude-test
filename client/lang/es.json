@@ -9121,8 +9121,8 @@
   },
   {
     "term": "timeline.message-sent-description-manual-delegated",
-    "definition": "{senderIsYou, select, true {Enviaste} other {{delegate} envió}} un mensaje como {senderIsYou, select, true {tú} other {{sender}}} {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} para {contact} {timeAgo}",
-    "context": "{senderIsYou, select, true {You} other {{delegate}}} sent a message as {senderIsYou, select, true {you} other {{sender}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+    "definition": "{delegateIsYou, select, true {Enviaste} other {{delegate} envió}} un mensaje como {senderIsYou, select, true {tú} other {{sender}}} {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} para {contact} {timeAgo}",
+    "context": "{delegateIsYou, select, true {You} other {{delegate}}} sent a message as {senderIsYou, select, true {you} other {{sender}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
   },
   {
     "term": "timeline.message-sent-description-scheduled",

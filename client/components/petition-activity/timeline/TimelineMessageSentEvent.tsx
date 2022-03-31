@@ -41,9 +41,9 @@ export function TimelineMessageSentEvent({
                 id="timeline.message-sent-description-scheduled-delegated"
                 defaultMessage="A message scheduled by {delegateIsYou, select, true {you} other {{delegate}}} as {senderIsYou, select, true {you} other {{sender}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
                 values={{
-                  senderIsYou: userId === message.sender?.id,
                   delegateIsYou: userId === message.access.delegateGranter?.id,
                   delegate: <UserReference user={message.access.delegateGranter} />,
+                  senderIsYou: userId === message.sender?.id,
                   sender: <UserReference user={message.sender} />,
                   subject: message.emailSubject,
                   contact: <ContactReference contact={message.access.contact} />,
@@ -70,11 +70,11 @@ export function TimelineMessageSentEvent({
           ) : message.access.delegateGranter ? (
             <FormattedMessage
               id="timeline.message-sent-description-manual-delegated"
-              defaultMessage="{senderIsYou, select, true {You} other {{delegate}}} sent a message as {senderIsYou, select, true {you} other {{sender}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+              defaultMessage="{delegateIsYou, select, true {You} other {{delegate}}} sent a message as {senderIsYou, select, true {you} other {{sender}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
               values={{
-                senderIsYou: userId === message.sender?.id,
                 delegateIsYou: userId === message.access.delegateGranter?.id,
                 delegate: <UserReference user={message.access.delegateGranter} />,
+                senderIsYou: userId === message.sender?.id,
                 sender: <UserReference user={message.sender} />,
                 subject: message.emailSubject,
                 contact: <ContactReference contact={message.access.contact} />,
