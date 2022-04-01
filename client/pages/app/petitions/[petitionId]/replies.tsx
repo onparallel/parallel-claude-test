@@ -122,7 +122,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const intl = useIntl();
 
   const {
-    data: { me },
+    data: { me, realMe },
   } = useAssertQuery(PetitionReplies_userDocument);
   const { data, refetch } = useAssertQuery(PetitionReplies_petitionDocument, {
     variables: {
@@ -468,7 +468,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   return (
     <PetitionLayout
       key={petition.id}
-      user={me}
+      me={me}
+      realMe={realMe}
       petition={petition}
       onUpdatePetition={handleUpdatePetition}
       section="replies"
@@ -591,7 +592,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 key={activeFieldId}
                 petitionId={petition.id}
                 field={activeField}
-                user={me}
+                myId={me.id}
+                hasInternalComments={me.hasInternalComments}
                 onClose={() => setActiveFieldId(null)}
                 onAddComment={handleAddComment}
                 onUpdateComment={handleUpdateComment}
@@ -735,22 +737,24 @@ PetitionReplies.fragments = {
       ${useFieldVisibility.fragments.PetitionField}
     `;
   },
-  get User() {
+  get Query() {
     return gql`
-      fragment PetitionReplies_User on User {
-        organization {
-          name
-          ...isUsageLimitsReached_Organization
+      fragment PetitionReplies_Query on Query {
+        ...PetitionLayout_Query
+        me {
+          organization {
+            name
+            ...isUsageLimitsReached_Organization
+          }
+          hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
+          hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
+          ...PetitionRepliesFieldComments_User
+          ...ExportRepliesDialog_User
+          ...PetitionSignaturesCard_User
+          ...useUpdateIsReadNotification_User
         }
-        hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
-        hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
-        ...PetitionLayout_User
-        ...PetitionRepliesFieldComments_User
-        ...ExportRepliesDialog_User
-        ...PetitionSignaturesCard_User
-        ...useUpdateIsReadNotification_User
       }
-      ${PetitionLayout.fragments.User}
+      ${PetitionLayout.fragments.Query}
       ${PetitionRepliesFieldComments.fragments.User}
       ${ExportRepliesDialog.fragments.User}
       ${PetitionSignaturesCard.fragments.User}
@@ -955,11 +959,9 @@ function PetitionContentsIndicators({ field }: { field: PetitionReplies_Petition
 PetitionReplies.queries = [
   gql`
     query PetitionReplies_user {
-      me {
-        ...PetitionReplies_User
-      }
+      ...PetitionReplies_Query
     }
-    ${PetitionReplies.fragments.User}
+    ${PetitionReplies.fragments.Query}
   `,
   gql`
     query PetitionReplies_petition($id: GID!) {

@@ -57,7 +57,7 @@ function AdminOrganizations() {
   const intl = useIntl();
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const {
-    data: { me },
+    data: { me, realMe },
   } = useAssertQuery(AdminOrganizations_userDocument);
   const {
     data: { organizations },
@@ -110,7 +110,8 @@ function AdminOrganizations() {
       })}
       basePath="/app/admin"
       sections={sections}
-      user={me}
+      me={me}
+      realMe={realMe}
       sectionsHeader={<FormattedMessage id="admin.title" defaultMessage="Admin panel" />}
       header={
         <Heading as="h3" size="md">
@@ -278,14 +279,6 @@ AdminOrganizations.fragments = {
       }
     `;
   },
-  get User() {
-    return gql`
-      fragment AdminOrganizations_User on User {
-        ...AppLayout_User
-      }
-      ${AppLayout.fragments.User}
-    `;
-  },
 };
 
 AdminOrganizations.queries = [
@@ -314,11 +307,9 @@ AdminOrganizations.queries = [
   `,
   gql`
     query AdminOrganizations_user {
-      me {
-        ...AdminOrganizations_User
-      }
+      ...AppLayout_Query
     }
-    ${AdminOrganizations.fragments.User}
+    ${AppLayout.fragments.Query}
   `,
 ];
 

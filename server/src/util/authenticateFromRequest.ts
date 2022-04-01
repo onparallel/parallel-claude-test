@@ -1,14 +1,18 @@
 import { IncomingMessage } from "http";
+import { isDefined } from "remeda";
 import { ApiContext } from "../context";
 
 export async function authenticateFromRequest(req: IncomingMessage, ctx: ApiContext) {
-  const user = await ctx.auth.validateRequestAuthentication(req);
-  if (!user) {
-    throw new Error("User not found");
-  } else if (user.status === "INACTIVE") {
-    throw new Error("User inactive");
+  const users = await ctx.auth.validateRequestAuthentication(req);
+  if (!isDefined(users)) {
+    return false;
+  }
+  const [user, realUser] = users;
+  if (!(user.status === "ACTIVE") || (isDefined(realUser) && !(realUser.status === "ACTIVE"))) {
+    return false;
   } else {
     ctx.user = user;
+    ctx.realUser = realUser ?? null;
     return true;
   }
 }

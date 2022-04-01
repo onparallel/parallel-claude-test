@@ -9,7 +9,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 export function Settings() {
   const intl = useIntl();
   const {
-    data: { me },
+    data: { me, realMe },
   } = useAssertQuery(Settings_userDocument);
   const sections = useSettingsSections(me);
 
@@ -22,7 +22,8 @@ export function Settings() {
       isBase
       basePath="/app/settings"
       sections={sections}
-      user={me}
+      me={me}
+      realMe={realMe}
       sectionsHeader={<FormattedMessage id="settings.title" defaultMessage="Settings" />}
     />
   );
@@ -31,13 +32,13 @@ export function Settings() {
 Settings.queries = [
   gql`
     query Settings_user {
+      ...SettingsLayout_Query
       me {
         id
-        ...SettingsLayout_User
         ...useSettingsSections_User
       }
     }
-    ${SettingsLayout.fragments.User}
+    ${SettingsLayout.fragments.Query}
     ${useSettingsSections.fragments.User}
   `,
 ];

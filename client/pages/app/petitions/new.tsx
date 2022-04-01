@@ -73,7 +73,7 @@ function NewPetition() {
   const mainRef = useRef<HTMLDivElement>(null);
 
   const {
-    data: { me, hasTemplates: _hasTemplates, publicTemplateCategories },
+    data: { me, realMe, hasTemplates: _hasTemplates, publicTemplateCategories },
   } = useAssertQuery(NewPetition_userDocument);
 
   const { data: templateData } = useQuery(NewPetition_templateDocument, {
@@ -188,7 +188,8 @@ function NewPetition() {
         id: "new-petition.title",
         defaultMessage: "New petition",
       })}
-      user={me}
+      me={me}
+      realMe={realMe}
     >
       <Container maxWidth="container.xl" flex="1" display="flex" flexDirection="column">
         <Tabs
@@ -447,14 +448,6 @@ NewPetition.fragments = {
     ${TemplateCard.fragments.PetitionTemplate}
     ${PublicTemplateCard.fragments.PetitionTemplate}
   `,
-  User: gql`
-    fragment NewPetition_User on User {
-      ...AppLayout_User
-      ...TemplateDetailsModal_User
-    }
-    ${AppLayout.fragments.User}
-    ${TemplateDetailsModal.fragments.User}
-  `,
 };
 
 NewPetition.queries = [
@@ -487,15 +480,17 @@ NewPetition.queries = [
   `,
   gql`
     query NewPetition_user {
+      ...AppLayout_Query
       me {
-        ...NewPetition_User
+        ...TemplateDetailsModal_User
       }
       hasTemplates: petitions(filters: { type: TEMPLATE }) {
         totalCount
       }
       publicTemplateCategories
     }
-    ${NewPetition.fragments.User}
+    ${AppLayout.fragments.Query}
+    ${TemplateDetailsModal.fragments.User}
   `,
   gql`
     query NewPetition_template($templateId: GID!) {

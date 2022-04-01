@@ -16,7 +16,7 @@ import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
 import { WhenOrgRole } from "../common/WhenOrgRole";
 
-export type OrganizationUsersListTableHeaderProps = {
+export interface OrganizationUsersListTableHeaderProps {
   myId: string;
   search: string | null;
   selectedUsers: OrganizationUsers_UserFragment[];
@@ -24,11 +24,12 @@ export type OrganizationUsersListTableHeaderProps = {
   hasGhostLogin: boolean;
   isCreateUserButtonDisabled?: boolean;
   isActivateUserButtonDisabled?: boolean;
-  onSearchChange: (value: string | null) => void;
-  onReload: () => void;
-  onCreateUser: () => void;
-  onUpdateUserStatus: (userIds: string[], status: UserStatus) => void;
-};
+  onSearchChange(value: string | null): void;
+  onReload(): void;
+  onCreateUser(): void;
+  onUpdateUserStatus(status: UserStatus): void;
+  onLoginAs(): void;
+}
 
 export function OrganizationUsersListTableHeader({
   myId,
@@ -42,6 +43,7 @@ export function OrganizationUsersListTableHeader({
   onReload,
   onCreateUser,
   onUpdateUserStatus,
+  onLoginAs,
 }: OrganizationUsersListTableHeaderProps) {
   const intl = useIntl();
 
@@ -73,10 +75,7 @@ export function OrganizationUsersListTableHeader({
         })
       );
     } else {
-      onUpdateUserStatus(
-        selectedUsers.map((u) => u.id),
-        newStatus
-      );
+      onUpdateUserStatus(newStatus);
     }
   };
 
@@ -133,6 +132,7 @@ export function OrganizationUsersListTableHeader({
                   <MenuItem
                     icon={<LogOutIcon display="block" boxSize={4} />}
                     isDisabled={selectedUsers.length !== 1}
+                    onClick={onLoginAs}
                   >
                     <FormattedMessage
                       id="organization-users.login-as"

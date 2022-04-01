@@ -56,7 +56,7 @@ function Contacts() {
   const errorToast = useExistingContactToast();
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const {
-    data: { me },
+    data: { me, realMe },
   } = useAssertQuery(Contacts_userDocument);
   const {
     data: { contacts },
@@ -148,7 +148,8 @@ function Contacts() {
         id: "contacts.title",
         defaultMessage: "Contacts",
       })}
-      user={me}
+      me={me}
+      realMe={realMe}
     >
       <Flex flexDirection="column" flex="1" minHeight={0} padding={4} paddingBottom={16}>
         <TablePage
@@ -290,12 +291,6 @@ Contacts.fragments = {
     }
     ${useDeleteContacts.fragments.Contact}
   `,
-  User: gql`
-    fragment Contacts_User on User {
-      ...AppLayout_User
-    }
-    ${AppLayout.fragments.User}
-  `,
 };
 
 Contacts.queries = [
@@ -314,11 +309,9 @@ Contacts.queries = [
   `,
   gql`
     query Contacts_user {
-      me {
-        ...Contacts_User
-      }
+      ...AppLayout_Query
     }
-    ${Contacts.fragments.User}
+    ${AppLayout.fragments.Query}
   `,
 ];
 

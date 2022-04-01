@@ -10,7 +10,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 function OrganizationSettings() {
   const intl = useIntl();
   const {
-    data: { me },
+    data: { me, realMe },
   } = useAssertQuery(OrganizationSettings_userDocument);
   const sections = useOrganizationSections(me);
 
@@ -23,7 +23,8 @@ function OrganizationSettings() {
       isBase
       basePath="/app/organization"
       sections={sections}
-      user={me}
+      me={me}
+      realMe={realMe}
       sectionsHeader={
         <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
       }
@@ -34,12 +35,9 @@ function OrganizationSettings() {
 OrganizationSettings.queries = [
   gql`
     query OrganizationSettings_user {
-      me {
-        id
-        ...SettingsLayout_User
-      }
+      ...SettingsLayout_Query
     }
-    ${SettingsLayout.fragments.User}
+    ${SettingsLayout.fragments.Query}
   `,
 ];
 

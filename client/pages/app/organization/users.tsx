@@ -41,6 +41,7 @@ import {
 import { isAdmin } from "@parallel/utils/roles";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { useLoginAs } from "@parallel/utils/useLoginAs";
 import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -64,7 +65,7 @@ function OrganizationUsers() {
   const toast = useToast();
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const {
-    data: { me },
+    data: { me, realMe },
     loading,
     refetch,
   } = useAssertQueryOrPreviousData(OrganizationUsers_userDocument, {
@@ -195,26 +196,23 @@ function OrganizationUsers() {
   const [activateUser] = useMutation(OrganizationUsers_activateUserDocument);
   const [deactivateUser] = useMutation(OrganizationUsers_deactivateUserDocument);
 
-  const handleUpdateUserStatus = async (userIds: string[], newStatus: UserStatus) => {
+  const handleUpdateUserStatus = async (newStatus: UserStatus) => {
     try {
       let transferToUser: Maybe<UserSelectSelection> = null;
       if (newStatus === "ACTIVE") {
-        await showConfirmActivateUserDialog({ count: userIds.length });
+        await showConfirmActivateUserDialog({ count: selected.length });
 
         await activateUser({
           variables: {
-            userIds,
+            userIds: selected,
           },
         });
       } else if (newStatus === "INACTIVE") {
-        transferToUser = await showConfirmDeactivateUserDialog({
-          selected: userIds,
-          me,
-        });
+        transferToUser = await showConfirmDeactivateUserDialog({ selected });
 
         await deactivateUser({
           variables: {
-            userIds,
+            userIds: selected,
             transferToUserId: transferToUser?.id,
           },
         });
@@ -235,6 +233,11 @@ function OrganizationUsers() {
     } catch {}
   };
 
+  const loginAs = useLoginAs();
+  const handleLoginAs = async () => {
+    await loginAs(selected[0]);
+  };
+
   const isUserLimitReached =
     me.organization.activeUserCount >= me.organization.usageLimits.users.limit;
 
@@ -250,7 +253,8 @@ function OrganizationUsers() {
       })}
       basePath="/app/organization"
       sections={sections}
-      user={me}
+      me={me}
+      realMe={realMe}
       sectionsHeader={
         <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
       }
@@ -293,6 +297,7 @@ function OrganizationUsers() {
               onReload={() => refetch()}
               onSearchChange={handleSearchChange}
               onUpdateUserStatus={handleUpdateUserStatus}
+              onLoginAs={handleLoginAs}
             />
           }
         />
@@ -448,7 +453,7 @@ OrganizationUsers.fragments = {
   },
 };
 
-OrganizationUsers.mutations = [
+const _mutations = [
   gql`
     mutation OrganizationUsers_createOrganizationUser(
       $firstName: String!
@@ -517,6 +522,7 @@ OrganizationUsers.queries = [
       $search: String
       $sortBy: [OrganizationUsers_OrderBy!]
     ) {
+      ...SettingsLayout_Query
       me {
         hasGhostLogin: hasFeatureFlag(featureFlag: GHOST_LOGIN)
         organization {
@@ -541,10 +547,9 @@ OrganizationUsers.queries = [
             }
           }
         }
-        ...SettingsLayout_User
       }
     }
-    ${SettingsLayout.fragments.User}
+    ${SettingsLayout.fragments.Query}
     ${OrganizationUsers.fragments.User}
   `,
 ];

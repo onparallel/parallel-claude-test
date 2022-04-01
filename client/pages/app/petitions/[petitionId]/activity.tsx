@@ -56,7 +56,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const { query } = router;
 
   const {
-    data: { me },
+    data: { me, realMe },
   } = useAssertQuery(PetitionActivity_userDocument);
   const { data, refetch } = useAssertQuery(PetitionActivity_petitionDocument, {
     variables: { id: petitionId },
@@ -323,7 +323,8 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   return (
     <PetitionLayout
       key={petition.id}
-      user={me}
+      me={me}
+      realMe={realMe}
       petition={petition}
       onUpdatePetition={handleUpdatePetition}
       section="activity"
@@ -390,17 +391,19 @@ PetitionActivity.fragments = {
     ${validatePetitionFields.fragments.PetitionField}
     ${FieldErrorDialog.fragments.PetitionField}
   `,
-  User: gql`
-    fragment PetitionActivity_User on User {
-      organization {
-        name
-        ...isUsageLimitsReached_Organization
+  Query: gql`
+    fragment PetitionActivity_Query on Query {
+      ...PetitionLayout_Query
+      me {
+        organization {
+          name
+          ...isUsageLimitsReached_Organization
+        }
+        ...useUpdateIsReadNotification_User
+        ...useSendPetitionHandler_User
       }
-      ...PetitionLayout_User
-      ...useUpdateIsReadNotification_User
-      ...useSendPetitionHandler_User
     }
-    ${PetitionLayout.fragments.User}
+    ${PetitionLayout.fragments.Query}
     ${useUpdateIsReadNotification.fragments.User}
     ${useSendPetitionHandler.fragments.User}
     ${isUsageLimitsReached.fragments.Organization}
@@ -475,11 +478,9 @@ PetitionActivity.queries = [
   `,
   gql`
     query PetitionActivity_user {
-      me {
-        ...PetitionActivity_User
-      }
+      ...PetitionActivity_Query
     }
-    ${PetitionActivity.fragments.User}
+    ${PetitionActivity.fragments.Query}
   `,
 ];
 

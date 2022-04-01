@@ -74,7 +74,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const intl = useIntl();
 
   const {
-    data: { me },
+    data: { me, realMe },
   } = useAssertQuery(PetitionCompose_userDocument);
   const { data, refetch } = useAssertQuery(PetitionCompose_petitionDocument, {
     variables: { id: petitionId },
@@ -401,7 +401,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     <ToneProvider value={petition.tone}>
       <PetitionLayout
         key={petition.id}
-        user={me}
+        me={me}
+        realMe={realMe}
         petition={petition}
         onUpdatePetition={handleUpdatePetition}
         section="compose"
@@ -612,19 +613,21 @@ PetitionCompose.fragments = {
       ${FieldErrorDialog.fragments.PetitionField}
     `;
   },
-  get User() {
+  get Query() {
     return gql`
-      fragment PetitionCompose_User on User {
-        id
-        ...PetitionLayout_User
-        ...PetitionSettings_User
-        ...useUpdateIsReadNotification_User
-        ...useSendPetitionHandler_User
-        organization {
-          ...isUsageLimitsReached_Organization
+      fragment PetitionCompose_Query on Query {
+        ...PetitionLayout_Query
+        me {
+          id
+          ...PetitionSettings_User
+          ...useUpdateIsReadNotification_User
+          ...useSendPetitionHandler_User
+          organization {
+            ...isUsageLimitsReached_Organization
+          }
         }
       }
-      ${PetitionLayout.fragments.User}
+      ${PetitionLayout.fragments.Query}
       ${PetitionSettings.fragments.User}
       ${useSendPetitionHandler.fragments.User}
       ${useUpdateIsReadNotification.fragments.User}
@@ -764,11 +767,9 @@ PetitionCompose.mutations = [
 PetitionCompose.queries = [
   gql`
     query PetitionCompose_user {
-      me {
-        ...PetitionCompose_User
-      }
+      ...PetitionCompose_Query
     }
-    ${PetitionCompose.fragments.User}
+    ${PetitionCompose.fragments.Query}
   `,
   gql`
     query PetitionCompose_petition($id: GID!) {

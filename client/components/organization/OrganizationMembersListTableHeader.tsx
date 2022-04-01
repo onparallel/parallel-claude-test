@@ -7,18 +7,20 @@ import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
 import { WhenOrgRole } from "../common/WhenOrgRole";
 
-export type OrganizationMembersListTableHeaderProps = {
+export interface OrganizationMembersListTableHeaderProps {
   search: string | null;
   selectedUsers: OrganizationMembers_OrganizationUserFragment[];
-  onSearchChange: (value: string | null) => void;
-  onReload: () => void;
-};
+  onSearchChange(value: string | null): void;
+  onReload(): void;
+  onLoginAs(): void;
+}
 
 export function OrganizationMembersListTableHeader({
   search,
   selectedUsers,
   onSearchChange,
   onReload,
+  onLoginAs,
 }: OrganizationMembersListTableHeaderProps) {
   const intl = useIntl();
 
@@ -53,6 +55,7 @@ export function OrganizationMembersListTableHeader({
                 <MenuItem
                   icon={<LogOutIcon display="block" boxSize={4} />}
                   isDisabled={selectedUsers.length !== 1}
+                  onClick={onLoginAs}
                 >
                   <FormattedMessage id="organization-users.login-as" defaultMessage="Login as..." />
                 </MenuItem>

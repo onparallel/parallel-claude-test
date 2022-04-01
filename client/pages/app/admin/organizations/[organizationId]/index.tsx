@@ -34,6 +34,7 @@ import {
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useAdminSections } from "@parallel/utils/useAdminSections";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { useLoginAs } from "@parallel/utils/useLoginAs";
 import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -60,7 +61,7 @@ function OrganizationMembers({ organizationId }: OrganizationMembersProps) {
   const [search, setSearch] = useState(state.search);
   const [selected, setSelected] = useState<string[]>([]);
   const {
-    data: { me },
+    data: { me, realMe },
   } = useAssertQuery(OrganizationMembers_userDocument);
 
   const { data, loading, refetch } = useAssertQueryOrPreviousData(
@@ -105,12 +106,18 @@ function OrganizationMembers({ organizationId }: OrganizationMembersProps) {
     [debouncedOnSearchChange]
   );
 
+  const loginAs = useLoginAs();
+  const handleLoginAs = async () => {
+    await loginAs(selected[0]);
+  };
+
   return (
     <SettingsLayout
       title={organization?.name ?? ""}
       basePath="/app/admin/organizations"
       sections={sections}
-      user={me}
+      me={me}
+      realMe={realMe}
       sectionsHeader={<FormattedMessage id="admin.title" defaultMessage="Admin panel" />}
       header={
         <Heading as="h3" size="md">
@@ -143,6 +150,7 @@ function OrganizationMembers({ organizationId }: OrganizationMembersProps) {
               selectedUsers={selectedUsers}
               onReload={() => refetch()}
               onSearchChange={handleSearchChange}
+              onLoginAs={handleLoginAs}
             />
           }
           body={
@@ -293,14 +301,6 @@ function useOrganizationMembersTableColumns() {
 }
 
 OrganizationMembers.fragments = {
-  get User() {
-    return gql`
-      fragment OrganizationMembers_User on User {
-        ...AppLayout_User
-      }
-      ${AppLayout.fragments.User}
-    `;
-  },
   get OrganizationUser() {
     return gql`
       fragment OrganizationMembers_OrganizationUser on User {
@@ -320,19 +320,16 @@ OrganizationMembers.fragments = {
         id
         name
       }
-      ${AppLayout.fragments.User}
     `;
   },
 };
 
-OrganizationMembers.queries = [
+const _queries = [
   gql`
     query OrganizationMembers_user {
-      me {
-        ...OrganizationMembers_User
-      }
+      ...AppLayout_Query
     }
-    ${OrganizationMembers.fragments.User}
+    ${AppLayout.fragments.Query}
   `,
   gql`
     query OrganizationMembers_organization(

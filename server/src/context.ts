@@ -30,6 +30,7 @@ import { Smtp } from "./services/smtp";
 @injectable()
 export class ApiContext {
   user: User | null = null;
+  realUser: User | null = null;
   contact: Contact | null = null;
   access: PetitionAccess | null = null;
   organization: Organization | null = null;

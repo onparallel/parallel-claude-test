@@ -73,7 +73,7 @@ function Petitions() {
       ? ({ field: "sentAt", direction: "DESC" } as const)
       : ({ field: "createdAt", direction: "DESC" } as const));
   const {
-    data: { me },
+    data: { me, realMe },
   } = useAssertQuery(Petitions_userDocument);
   const { data, loading, refetch } = useQueryOrPreviousData(Petitions_petitionsDocument, {
     variables: {
@@ -226,7 +226,8 @@ function Petitions() {
               defaultMessage: "Templates",
             })
       }
-      user={me}
+      me={me}
+      realMe={realMe}
     >
       <Flex flexDirection="column" flex="1" minHeight={0} padding={4} paddingBottom={16}>
         <TablePage
@@ -380,12 +381,12 @@ Petitions.fragments = {
 Petitions.queries = [
   gql`
     query Petitions_user {
+      ...AppLayout_Query
       me {
-        ...AppLayout_User
         ...PetitionListHeader_User
       }
     }
-    ${AppLayout.fragments.User}
+    ${AppLayout.fragments.Query}
     ${PetitionListHeader.fragments.User}
   `,
   gql`

@@ -16,10 +16,11 @@ export function authenticate<
 >(): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, _, ctx) => {
     try {
-      await authenticateFromRequest(ctx.req, ctx);
+      if (!(await authenticateFromRequest(ctx.req, ctx))) {
+        throw new Error();
+      }
       return true;
     } catch (e) {
-      console.log(e);
       throw new AuthenticationError("Invalid session");
     }
   };

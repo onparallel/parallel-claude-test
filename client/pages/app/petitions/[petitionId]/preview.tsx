@@ -62,7 +62,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const toast = useToast();
 
   const {
-    data: { me },
+    data: { me, realMe },
   } = useAssertQuery(PetitionPreview_userDocument);
   const { data } = useAssertQuery(PetitionPreview_petitionDocument, {
     variables: { id: petitionId },
@@ -258,7 +258,8 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     <ToneProvider value={petition.tone}>
       <PetitionLayout
         key={petition.id}
-        user={me}
+        me={me}
+        realMe={realMe}
         petition={petition}
         onUpdatePetition={handleUpdatePetition}
         section="preview"
@@ -416,20 +417,23 @@ PetitionPreview.fragments = {
     ${FieldErrorDialog.fragments.PetitionField}
     ${useLiquidScope.fragments.PetitionBase}
   `,
-  User: gql`
-    fragment PetitionPreview_User on User {
-      organization {
-        name
-        ...isUsageLimitsReached_Organization
+  Query: gql`
+    fragment PetitionPreview_Query on Query {
+      ...PetitionLayout_Query
+      me {
+        id
+        organization {
+          name
+          ...isUsageLimitsReached_Organization
+        }
+        ...useSendPetitionHandler_User
+        ...ConfirmPetitionSignersDialog_User
       }
-      ...PetitionLayout_User
-      ...useSendPetitionHandler_User
-      ...ConfirmPetitionSignersDialog_User
     }
+    ${PetitionLayout.fragments.Query}
     ${useSendPetitionHandler.fragments.User}
     ${isUsageLimitsReached.fragments.Organization}
     ${ConfirmPetitionSignersDialog.fragments.User}
-    ${PetitionLayout.fragments.User}
   `,
 };
 
@@ -471,15 +475,13 @@ PetitionPreview.queries = [
   `,
   gql`
     query PetitionPreview_user {
-      me {
-        ...PetitionPreview_User
-      }
+      ...PetitionPreview_Query
       metadata {
         country
         browserName
       }
     }
-    ${PetitionPreview.fragments.User}
+    ${PetitionPreview.fragments.Query}
   `,
 ];
 

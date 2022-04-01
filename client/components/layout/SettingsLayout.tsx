@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, Flex, Heading, IconButton, Text } from "@chakra-ui/react";
 import { ArrowBackIcon, ChevronRightIcon } from "@parallel/chakra/icons";
-import { SettingsLayout_UserFragment } from "@parallel/graphql/__types";
+import { SettingsLayout_QueryFragment } from "@parallel/graphql/__types";
 import { useOnMediaQueryChange } from "@parallel/utils/useOnMediaQueryChange";
 import { useRouter } from "next/router";
 import { ReactNode, useCallback } from "react";
@@ -9,22 +9,22 @@ import { useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
 import { AppLayout } from "./AppLayout";
 
-export type SettingsLayoutProps = {
+export interface SettingsLayoutProps extends SettingsLayout_QueryFragment {
   basePath: string;
   title: string;
-  user: SettingsLayout_UserFragment;
   sections: { title: string; path: string }[];
   sectionsHeader: ReactNode;
   isBase?: boolean;
   showBackButton?: boolean;
   header?: ReactNode;
   children?: ReactNode;
-};
+}
 
 export function SettingsLayout({
   basePath,
   title,
-  user,
+  me,
+  realMe,
   sections,
   sectionsHeader,
   isBase,
@@ -47,7 +47,7 @@ export function SettingsLayout({
   );
 
   return (
-    <AppLayout title={title} user={user}>
+    <AppLayout title={title} me={me} realMe={realMe}>
       <Flex flex="1" maxHeight="100vh">
         <Box
           backgroundColor="white"
@@ -124,11 +124,11 @@ export function SettingsLayout({
 }
 
 SettingsLayout.fragments = {
-  User: gql`
-    fragment SettingsLayout_User on User {
-      ...AppLayout_User
+  Query: gql`
+    fragment SettingsLayout_Query on Query {
+      ...AppLayout_Query
     }
-    ${AppLayout.fragments.User}
+    ${AppLayout.fragments.Query}
   `,
 };
 

@@ -1,4 +1,4 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql, useApolloClient, useQuery } from "@apollo/client";
 import { Box, Button, Stack, Text } from "@chakra-ui/react";
 import { UsersIcon } from "@parallel/chakra/icons";
 import {
@@ -193,14 +193,12 @@ export const UserSelect = Object.assign(
       [onSearch, _value]
     );
 
-    const apollo = useApolloClient();
-
-    const data = apollo.cache.readQuery({ query: UserSelect_canCreateUsersDocument })!;
+    const { data } = useQuery(UserSelect_canCreateUsersDocument);
 
     const reactSelectProps = useUserSelectReactSelectProps<boolean, boolean>({
       placeholder,
       ...props,
-      canCreateUsers: data.me.canCreateUsers,
+      canCreateUsers: data?.me.canCreateUsers ?? false,
     });
 
     return loadOptions ? (

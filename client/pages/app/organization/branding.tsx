@@ -39,7 +39,7 @@ function OrganizationBranding() {
   const intl = useIntl();
 
   const {
-    data: { me },
+    data: { me, realMe },
   } = useAssertQueryOrPreviousData(OrganizationBranding_userDocument);
 
   const sections = useOrganizationSections(me);
@@ -88,7 +88,8 @@ function OrganizationBranding() {
       })}
       basePath="/app/organization"
       sections={sections}
-      user={me}
+      me={me}
+      realMe={realMe}
       sectionsHeader={
         <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
       }
@@ -248,8 +249,8 @@ OrganizationBranding.mutations = [
 OrganizationBranding.queries = [
   gql`
     query OrganizationBranding_user {
+      ...SettingsLayout_Query
       me {
-        ...SettingsLayout_User
         fullName
         organization {
           id
@@ -259,7 +260,7 @@ OrganizationBranding.queries = [
         }
       }
     }
-    ${SettingsLayout.fragments.User}
+    ${SettingsLayout.fragments.Query}
   `,
 ];
 

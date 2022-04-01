@@ -932,6 +932,7 @@ export interface NexusGenFieldTypes {
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
     getApiTokenOwner: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     getTaskResultFileUrl: string; // String!
+    loginAs: NexusGenEnums["Result"]; // Result!
     markSignatureIntegrationAsDefault: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
     modifyPetitionCustomProperty: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     petitionAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
@@ -966,6 +967,7 @@ export interface NexusGenFieldTypes {
     resetSignaturitOrganizationBranding: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     resetTemporaryPassword: NexusGenEnums["Result"]; // Result!
     resetUserPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    restoreLogin: NexusGenEnums["Result"]; // Result!
     revokeUserAuthToken: NexusGenEnums["Result"]; // Result!
     sendPetition: NexusGenRootTypes["SendPetitionResult"]; // SendPetitionResult!
     sendPetitionClosedNotification: NexusGenRootTypes["Petition"]; // Petition!
@@ -1606,6 +1608,7 @@ export interface NexusGenFieldTypes {
     publicPetitionLinkBySlug: NexusGenRootTypes["PublicPublicPetitionLink"] | null; // PublicPublicPetitionLink
     publicTask: NexusGenRootTypes["Task"]; // Task!
     publicTemplateCategories: string[]; // [String!]!
+    realMe: NexusGenRootTypes["User"] | null; // User
     searchUserGroups: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     searchUsers: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
     subscriptions: NexusGenRootTypes["PetitionEventSubscription"][]; // [PetitionEventSubscription!]!
@@ -2347,6 +2350,7 @@ export interface NexusGenFieldTypeNames {
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
     getApiTokenOwner: "SupportMethodResponse";
     getTaskResultFileUrl: "String";
+    loginAs: "Result";
     markSignatureIntegrationAsDefault: "OrgIntegration";
     modifyPetitionCustomProperty: "PetitionBase";
     petitionAttachmentDownloadLink: "FileUploadDownloadLinkResult";
@@ -2381,6 +2385,7 @@ export interface NexusGenFieldTypeNames {
     resetSignaturitOrganizationBranding: "SupportMethodResponse";
     resetTemporaryPassword: "Result";
     resetUserPassword: "SupportMethodResponse";
+    restoreLogin: "Result";
     revokeUserAuthToken: "Result";
     sendPetition: "SendPetitionResult";
     sendPetitionClosedNotification: "Petition";
@@ -3021,6 +3026,7 @@ export interface NexusGenFieldTypeNames {
     publicPetitionLinkBySlug: "PublicPublicPetitionLink";
     publicTask: "Task";
     publicTemplateCategories: "String";
+    realMe: "User";
     searchUserGroups: "UserGroup";
     searchUsers: "UserOrUserGroup";
     subscriptions: "PetitionEventSubscription";
@@ -3781,6 +3787,10 @@ export interface NexusGenArgTypes {
       // args
       preview?: boolean | null; // Boolean
       taskId: NexusGenScalars["GID"]; // GID!
+    };
+    loginAs: {
+      // args
+      userId: NexusGenScalars["GID"]; // GID!
     };
     markSignatureIntegrationAsDefault: {
       // args

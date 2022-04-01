@@ -77,7 +77,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
   const [state, setQueryState] = useQueryState(QUERY_STATE);
 
   const {
-    data: { me },
+    data: { me, realMe },
   } = useAssertQuery(OrganizationGroup_userDocument);
 
   const {
@@ -242,7 +242,8 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
       title={name}
       basePath="/app/organization/groups"
       sections={sections}
-      user={me}
+      me={me}
+      realMe={realMe}
       sectionsHeader={
         <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
       }
@@ -505,14 +506,6 @@ OrganizationGroup.fragments = {
       }
     `;
   },
-  get User() {
-    return gql`
-      fragment OrganizationGroup_User on User {
-        ...AppLayout_User
-      }
-      ${AppLayout.fragments.User}
-    `;
-  },
 };
 
 OrganizationGroup.mutations = [
@@ -566,11 +559,9 @@ OrganizationGroup.queries = [
   `,
   gql`
     query OrganizationGroup_user {
-      me {
-        ...OrganizationGroup_User
-      }
+      ...AppLayout_Query
     }
-    ${OrganizationGroup.fragments.User}
+    ${AppLayout.fragments.Query}
   `,
 ];
 

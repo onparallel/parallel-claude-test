@@ -192,6 +192,7 @@ export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 export type FeatureFlag =
   | "DEVELOPER_ACCESS"
   | "EXPORT_CUATRECASAS"
+  | "GHOST_LOGIN"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "INTERNAL_COMMENTS"
   | "ON_BEHALF_OF"

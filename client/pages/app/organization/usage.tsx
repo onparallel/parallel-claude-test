@@ -15,7 +15,7 @@ function OrganizationUsage() {
   const intl = useIntl();
 
   const {
-    data: { me },
+    data: { me, realMe },
   } = useAssertQueryOrPreviousData(OrganizationUsage_userDocument);
 
   const sections = useOrganizationSections(me);
@@ -39,7 +39,8 @@ function OrganizationUsage() {
       })}
       basePath="/app/organization"
       sections={sections}
-      user={me}
+      me={me}
+      realMe={realMe}
       sectionsHeader={
         <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
       }
@@ -90,8 +91,8 @@ function OrganizationUsage() {
 OrganizationUsage.queries = [
   gql`
     query OrganizationUsage_user {
+      ...SettingsLayout_Query
       me {
-        ...SettingsLayout_User
         organization {
           id
           activeUserCount
@@ -111,7 +112,7 @@ OrganizationUsage.queries = [
         }
       }
     }
-    ${SettingsLayout.fragments.User}
+    ${SettingsLayout.fragments.Query}
   `,
 ];
 

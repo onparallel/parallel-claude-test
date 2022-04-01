@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import {
+  AvatarBadge,
   Button,
   HStack,
   Menu,
@@ -25,20 +26,20 @@ import {
   MapIcon,
   UserIcon,
 } from "@parallel/chakra/icons";
-import { UserMenu_UserFragment } from "@parallel/graphql/__types";
+import { UserMenu_QueryFragment } from "@parallel/graphql/__types";
+import { useLoginAs } from "@parallel/utils/useLoginAs";
 import { useNotificationsState } from "@parallel/utils/useNotificationsState";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NakedLink, NormalLink } from "../common/Link";
 import { UserAvatar } from "../common/UserAvatar";
 
-export interface UserMenuProps {
+export interface UserMenuProps extends UserMenu_QueryFragment {
   placement?: UsePopperProps["placement"];
-  user: UserMenu_UserFragment;
   onHelpCenterClick: () => void;
 }
 
-export function UserMenu({ placement, user, onHelpCenterClick }: UserMenuProps) {
+export function UserMenu({ placement, me, realMe, onHelpCenterClick }: UserMenuProps) {
   const intl = useIntl();
   const router = useRouter();
 
@@ -51,7 +52,10 @@ export function UserMenu({ placement, user, onHelpCenterClick }: UserMenuProps) 
   const isMobile = useBreakpointValue({ base: true, sm: false });
   const { onOpen: onOpenNotifications } = useNotificationsState();
 
-  const ghostLogged = true;
+  const loginAs = useLoginAs();
+  const handleRestoreLogin = async () => {
+    await loginAs(null);
+  };
 
   return (
     <Menu placement={placement}>
@@ -82,27 +86,36 @@ export function UserMenu({ placement, user, onHelpCenterClick }: UserMenuProps) 
           paddingRight={0}
           transition="all 200ms"
         >
-          <UserAvatar user={user} showBadge badgeUser={user} size="md" />
+          <UserAvatar user={me} size="md">
+            {realMe ? (
+              <AvatarBadge bgColor="white">
+                <UserAvatar user={realMe} size="xs" />
+              </AvatarBadge>
+            ) : null}
+          </UserAvatar>
         </MenuButton>
       </Tooltip>
       <Portal>
         <MenuList>
           <HStack paddingX={3.5} paddingY={1}>
-            <UserAvatar user={user} size="sm" />
+            <UserAvatar user={me} size="sm" />
             <Stack spacing={0}>
               <Text as="div" fontWeight="semibold">
-                {user.fullName}
+                {me.fullName}
               </Text>
               <Text as="div" color="gray.600" fontSize="sm">
-                {user.email}
+                {me.email}
               </Text>
             </Stack>
           </HStack>
 
           <MenuDivider />
-          {ghostLogged ? (
+          {realMe ? (
             <>
-              <MenuItem icon={<LogInIcon display="block" boxSize={4} />}>
+              <MenuItem
+                icon={<LogInIcon display="block" boxSize={4} />}
+                onClick={handleRestoreLogin}
+              >
                 <Text>
                   <FormattedMessage
                     id="component.user-menu.back-to-account"
@@ -114,7 +127,7 @@ export function UserMenu({ placement, user, onHelpCenterClick }: UserMenuProps) 
                     id="component.user-menu.login-from-user"
                     defaultMessage="Login from {user}"
                     values={{
-                      user: "Joshuaaaa",
+                      user: realMe.fullName,
                     }}
                   />
                 </Text>
@@ -131,17 +144,20 @@ export function UserMenu({ placement, user, onHelpCenterClick }: UserMenuProps) 
               />
             </MenuItem>
           ) : null}
+
           <NakedLink href="/app/settings">
             <MenuItem as="a" icon={<UserIcon display="block" boxSize={4} />}>
               <FormattedMessage id="settings.title" defaultMessage="Settings" />
             </MenuItem>
           </NakedLink>
+
           <NakedLink href="/app/organization">
             <MenuItem as="a" icon={<BusinessIcon display="block" boxSize={4} />}>
               <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
             </MenuItem>
           </NakedLink>
-          {user.isSuperAdmin ? (
+
+          {me.isSuperAdmin ? (
             <NakedLink href="/app/admin">
               <MenuItem as="a" icon={<KeyIcon display="block" boxSize={4} />}>
                 <FormattedMessage id="admin.title" defaultMessage="Admin panel" />
@@ -188,12 +204,18 @@ export function UserMenu({ placement, user, onHelpCenterClick }: UserMenuProps) 
 }
 
 UserMenu.fragments = {
-  User: gql`
-    fragment UserMenu_User on User {
-      isSuperAdmin
-      role
-      email
-      ...UserAvatar_User
+  Query: gql`
+    fragment UserMenu_Query on Query {
+      me {
+        isSuperAdmin
+        role
+        email
+        ...UserAvatar_User
+      }
+      realMe {
+        id
+        ...UserAvatar_User
+      }
     }
     ${UserAvatar.fragments.User}
   `,

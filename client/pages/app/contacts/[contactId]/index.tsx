@@ -29,7 +29,6 @@ import {
   Contact_PetitionAccessFragment,
   Contact_updateContactDocument,
   Contact_userDocument,
-  Contact_UserFragment,
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -53,7 +52,7 @@ function Contact({ contactId }: ContactProps) {
   const intl = useIntl();
 
   const {
-    data: { me },
+    data: { me, realMe },
   } = useAssertQuery(Contact_userDocument);
   const {
     data: { contact },
@@ -115,7 +114,7 @@ function Contact({ contactId }: ContactProps) {
   };
 
   return (
-    <AppLayout title={contact!.fullName ?? contact!.email} user={me}>
+    <AppLayout title={contact!.fullName ?? contact!.email} me={me} realMe={realMe}>
       <Flex flex="1" padding={4}>
         <Box flex="2">
           <Card
@@ -282,7 +281,7 @@ function useContactPetitionAccessesColumns() {
           align: "center",
           headerProps: { padding: 0, width: 8 },
           cellProps: { padding: 0 },
-          CellContent: ({ row: { petition }, context }) => (
+          CellContent: ({ row: { petition } }) => (
             <Flex alignItems="center" paddingRight="2">
               <PetitionSignatureCellContent petition={petition!} />
             </Flex>
@@ -327,7 +326,7 @@ function useContactPetitionAccessesColumns() {
             />
           ),
         },
-      ] as TableColumn<PetitionAccessSelection, { user: Contact_UserFragment }>[],
+      ] as TableColumn<PetitionAccessSelection>[],
     [intl.locale]
   );
 }
@@ -398,12 +397,6 @@ Contact.fragments = {
     ${PetitionStatusCellContent.fragments.Petition}
     ${PetitionSignatureCellContent.fragments.Petition}
   `,
-  User: gql`
-    fragment Contact_User on User {
-      ...AppLayout_User
-    }
-    ${AppLayout.fragments.User}
-  `,
 };
 
 Contact.mutations = [
@@ -420,11 +413,9 @@ Contact.mutations = [
 Contact.queries = [
   gql`
     query Contact_user {
-      me {
-        ...Contact_User
-      }
+      ...AppLayout_Query
     }
-    ${Contact.fragments.User}
+    ${AppLayout.fragments.Query}
   `,
   gql`
     query Contact_contact($id: GID!) {

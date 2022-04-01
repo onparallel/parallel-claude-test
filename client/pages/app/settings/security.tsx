@@ -32,7 +32,7 @@ function Security() {
   const toast = useToast();
   const intl = useIntl();
   const {
-    data: { me },
+    data: { me, realMe },
   } = useAssertQuery(Security_userDocument);
   const sections = useSettingsSections(me);
 
@@ -90,7 +90,8 @@ function Security() {
       })}
       basePath="/app/settings"
       sections={sections}
-      user={me}
+      me={me}
+      realMe={realMe}
       sectionsHeader={<FormattedMessage id="settings.title" defaultMessage="Settings" />}
       header={
         <Heading as="h3" size="md">
@@ -224,13 +225,13 @@ Security.mutations = [
 Security.queries = [
   gql`
     query Security_user {
+      ...SettingsLayout_Query
       me {
         isSsoUser
-        ...SettingsLayout_User
         ...useSettingsSections_User
       }
     }
-    ${SettingsLayout.fragments.User}
+    ${SettingsLayout.fragments.Query}
     ${useSettingsSections.fragments.User}
   `,
 ];

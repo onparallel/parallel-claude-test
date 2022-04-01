@@ -15,6 +15,8 @@ import {
   authenticate,
   authenticateAnd,
   ifArgDefined,
+  or,
+  userIsSuperAdmin,
   verifyCaptcha,
 } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
@@ -646,5 +648,28 @@ export const setUserDelegates = mutationField("setUserDelegates", {
   resolve: async (_, { delegateIds }, ctx) => {
     await ctx.users.syncDelegates(ctx.user!.id, delegateIds, ctx.user!);
     return ctx.user!;
+  },
+});
+
+export const loginAs = mutationField("loginAs", {
+  type: "Result",
+  args: {
+    userId: nonNull(globalIdArg("User")),
+  },
+  authorize: authenticateAnd(
+    or(userIsSuperAdmin(), and(contextUserHasRole("ADMIN"), userHasAccessToUsers("userId")))
+  ),
+  resolve: async (_, { userId }, ctx) => {
+    await ctx.auth.updateSessionLogin(ctx.req, (ctx.realUser ?? ctx.user!).id, userId);
+    return RESULT.SUCCESS;
+  },
+});
+
+export const restoreLogin = mutationField("restoreLogin", {
+  type: "Result",
+  authorize: authenticate(),
+  resolve: async (_, args, ctx) => {
+    await ctx.auth.restoreSessionLogin(ctx.req, (ctx.realUser ?? ctx.user!).id);
+    return RESULT.SUCCESS;
   },
 });

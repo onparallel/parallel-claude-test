@@ -7,16 +7,14 @@ import {
   UserSelectSelection,
   useSearchUsers,
 } from "@parallel/components/common/UserSelect";
-import { AppLayout_UserFragment } from "@parallel/graphql/__types";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 
 function ConfirmDeactivateUserDialog({
   selected,
-  me,
   ...props
-}: DialogProps<{ selected: string[]; me: AppLayout_UserFragment }, UserSelectSelection>) {
+}: DialogProps<{ selected: string[] }, UserSelectSelection>) {
   const {
     control,
     handleSubmit,

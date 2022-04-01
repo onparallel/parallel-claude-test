@@ -27,6 +27,7 @@ import { User } from "../db/__types";
 import { withError } from "../util/promises/withError";
 import { random } from "../util/token";
 import { MaybePromise } from "../util/types";
+import { userHasRole } from "../util/userHasRole";
 import { Aws, AWS_SERVICE } from "./aws";
 import { IRedis, REDIS } from "./redis";
 
@@ -38,7 +39,7 @@ export interface IAuth {
   newPassword: RequestHandler;
   forgotPassword: RequestHandler;
   confirmForgotPassword: RequestHandler;
-  validateRequestAuthentication(req: IncomingMessage): Promise<User | null>;
+  validateRequestAuthentication(req: IncomingMessage): Promise<[User] | [User, User] | null>;
   generateTempAuthToken(userId: number): MaybePromise<string>;
 }
 
@@ -193,7 +194,7 @@ export class Auth implements IAuth {
         }
       }
       await this.trackSessionLogin(user);
-      const token = await this.storeSession({
+      const token = await this.storeSessionInRedis({
         IdToken: tokens["id_token"],
         AccessToken: tokens["access_token"],
         RefreshToken: tokens["refresh_token"],
@@ -216,7 +217,7 @@ export class Auth implements IAuth {
       const { email, password } = req.body;
       const auth = await this.initiateAuth(email, password, req);
       if (auth.AuthenticationResult) {
-        const token = await this.storeSession(auth.AuthenticationResult as any);
+        const token = await this.storeSessionInRedis(auth.AuthenticationResult as any);
         const user = await this.getUserFromAuthenticationResult(auth.AuthenticationResult);
         if (!user) {
           res.status(401).send({ error: "UnknownError" });
@@ -272,7 +273,7 @@ export class Auth implements IAuth {
           return;
         }
         await this.trackSessionLogin(user);
-        const token = await this.storeSession(challenge.AuthenticationResult as any);
+        const token = await this.storeSessionInRedis(challenge.AuthenticationResult as any);
         this.setSession(res, token);
         res.status(201).send({});
       } else {
@@ -361,7 +362,7 @@ export class Auth implements IAuth {
 
   async logout(req: Request, res: Response, next: NextFunction) {
     const cookie = req.cookies["parallel_session"];
-    await this.deleteSession(cookie);
+    await this.deleteSessionFromRedis(cookie);
     res.clearCookie("parallel_session");
     // if custom hostname pass hostname to canonical hostname for later redirect in logout/callback
     if (req.hostname !== new URL(this.config.misc.parallelUrl).hostname) {
@@ -418,17 +419,16 @@ export class Auth implements IAuth {
     });
   }
 
-  /** Delete session on Redis */
-  private async deleteSession(token: string) {
+  private async deleteSessionFromRedis(token: string) {
     await this.redis.delete(
       `session:${token}:idToken`,
       `session:${token}:accessToken`,
-      `session:${token}:refreshToken`
+      `session:${token}:refreshToken`,
+      `session:${token}:meta`
     );
   }
 
-  /** Store session on Redis */
-  private async storeSession(session: CognitoSession) {
+  private async storeSessionInRedis(session: CognitoSession) {
     const token = random(48);
     const { IdToken, AccessToken, RefreshToken } = session;
     const prefix = `session:${token}`;
@@ -516,7 +516,7 @@ export class Auth implements IAuth {
       .promise();
   }
 
-  async validateRequestAuthentication(req: IncomingMessage) {
+  async validateRequestAuthentication(req: IncomingMessage): Promise<[User] | [User, User] | null> {
     return (
       (await this.validateSession(req)) ??
       (await this.validateTempAuthToken(req)) ??
@@ -537,7 +537,7 @@ export class Auth implements IAuth {
     return null;
   }
 
-  private async validateSession(req: IncomingMessage) {
+  private async validateSession(req: IncomingMessage): Promise<[User] | [User, User] | null> {
     try {
       const token = this.getSessionToken(req);
       if (!token) {
@@ -562,35 +562,50 @@ export class Auth implements IAuth {
           return null;
         }
       }
-      // TODO manage when users.length > 1
-      const [user] = await this.users.loadUsersByCognitoId(cognitoId);
-      return user;
+      const meta = await this.redis.get(`session:${token}:meta`);
+      const users = await this.users.loadUsersByCognitoId(cognitoId);
+      if (isDefined(meta)) {
+        const { userId, asUserId } = JSON.parse(meta) as { userId: number; asUserId?: number };
+        const user = users.find((u) => u.id === userId);
+        if (!isDefined(user)) {
+          // who dis
+          return null;
+        }
+        if (isDefined(asUserId)) {
+          // make sure user can ghost login
+          if (!userHasRole(user, "ADMIN")) {
+            // can't ghost login if not admin
+            return null;
+          }
+          const org = (await this.orgs.loadOrg(user.org_id))!;
+          const asUser = await this.users.loadUser(asUserId);
+          if (!isDefined(asUser)) {
+            // who dis
+            return null;
+          }
+          if (org.status === "ROOT" || user.org_id === asUser.org_id) {
+            return [asUser, user];
+          } else {
+            return null;
+          }
+        }
+      }
+      return users.length > 0 ? [users[0]] : null;
     } catch (error: any) {
       return null;
     }
   }
 
-  async validateUserAuthToken(req: IncomingMessage) {
+  private async validateUserAuthToken(req: IncomingMessage): Promise<[User] | null> {
     const token = this.getBearerToken(req);
     if (!token) {
       return null;
     }
-    return await this.userAuthentication.getUserFromUat(token);
+    const user = await this.userAuthentication.getUserFromUat(token);
+    return user && [user];
   }
 
-  async generateTempAuthToken(userId: number) {
-    return await promisify<{ userId: number }, Secret, SignOptions, string>(sign)(
-      { userId },
-      this.config.security.jwtSecret,
-      {
-        expiresIn: 30,
-        issuer: "parallel-server",
-        algorithm: "HS256",
-      }
-    );
-  }
-
-  async validateTempAuthToken(req: IncomingMessage) {
+  private async validateTempAuthToken(req: IncomingMessage): Promise<[User] | null> {
     const token = this.getBearerToken(req);
     if (!token || !token.includes(".")) {
       return null;
@@ -604,10 +619,23 @@ export class Auth implements IAuth {
           issuer: "parallel-server",
         }
       );
-      return await this.users.loadUser(userId);
+      const user = await this.users.loadUser(userId);
+      return user && [user];
     } catch {
       return null;
     }
+  }
+
+  async generateTempAuthToken(userId: number) {
+    return await promisify<{ userId: number }, Secret, SignOptions, string>(sign)(
+      { userId },
+      this.config.security.jwtSecret,
+      {
+        expiresIn: 30,
+        issuer: "parallel-server",
+        algorithm: "HS256",
+      }
+    );
   }
 
   async changePassword(req: IncomingMessage, password: string, newPassword: string) {
@@ -643,5 +671,23 @@ export class Auth implements IAuth {
       }
     } catch {}
     res.redirect(`${process.env.PARALLEL_URL}/${locale}/login`);
+  }
+
+  async updateSessionLogin(req: Request, userId: number, asUserId: number) {
+    const token = this.getSessionToken(req);
+    if (!token) {
+      throw new Error("Missing session token");
+    }
+    const prefix = `session:${token}`;
+    await this.redis.set(`${prefix}:meta`, JSON.stringify({ userId, asUserId }), this.EXPIRY);
+  }
+
+  async restoreSessionLogin(req: Request, userId: number) {
+    const token = this.getSessionToken(req);
+    if (!token) {
+      throw new Error("Missing session token");
+    }
+    const prefix = `session:${token}`;
+    await this.redis.set(`${prefix}:meta`, JSON.stringify({ userId }), this.EXPIRY);
   }
 }

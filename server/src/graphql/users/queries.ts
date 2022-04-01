@@ -1,5 +1,5 @@
-import { booleanArg, idArg, list, nonNull, queryField, stringArg } from "nexus";
 import { ForbiddenError } from "apollo-server-express";
+import { booleanArg, idArg, list, nonNull, queryField, stringArg } from "nexus";
 import { fromGlobalId } from "../../util/globalId";
 import { authenticate, authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -11,6 +11,14 @@ import { userHasAccessToUsers } from "../petition/mutations/authorizers";
 import { userHasAccessToUserGroups } from "../user-group/authorizers";
 
 export const userQueries = queryField((t) => {
+  t.nullable.field("realMe", {
+    type: "User",
+    authorize: authenticate(),
+    resolve: (_, args, ctx) => {
+      return ctx.realUser;
+    },
+  });
+
   t.field("me", {
     type: "User",
     authorize: authenticate(),

@@ -12,7 +12,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 function Admin() {
   const intl = useIntl();
   const {
-    data: { me },
+    data: { me, realMe },
   } = useAssertQuery(Admin_userDocument);
   const sections = useAdminSections();
 
@@ -25,7 +25,8 @@ function Admin() {
       isBase
       basePath="/app/Admin"
       sections={sections}
-      user={me}
+      me={me}
+      realMe={realMe}
       sectionsHeader={<FormattedMessage id="admin.title" defaultMessage="Admin panel" />}
     />
   );
@@ -34,12 +35,9 @@ function Admin() {
 Admin.queries = [
   gql`
     query Admin_user {
-      me {
-        id
-        ...AppLayout_User
-      }
+      ...AppLayout_Query
     }
-    ${AppLayout.fragments.User}
+    ${AppLayout.fragments.Query}
   `,
 ];
 

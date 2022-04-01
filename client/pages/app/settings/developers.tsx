@@ -54,7 +54,7 @@ function Developers() {
   const intl = useIntl();
 
   const {
-    data: { me },
+    data: { me, realMe },
   } = useAssertQuery(Developers_userDocument);
   const {
     data: {
@@ -143,7 +143,8 @@ function Developers() {
       })}
       basePath="/app/settings"
       sections={sections}
-      user={me}
+      me={me}
+      realMe={realMe}
       sectionsHeader={<FormattedMessage id="settings.title" defaultMessage="Settings" />}
       header={
         <Heading as="h2" size="md">
@@ -581,13 +582,13 @@ Developers.queries = [
   `,
   gql`
     query Developers_user {
+      ...SettingsLayout_Query
       me {
         id
-        ...SettingsLayout_User
         ...useSettingsSections_User
       }
     }
-    ${SettingsLayout.fragments.User}
+    ${SettingsLayout.fragments.Query}
     ${useSettingsSections.fragments.User}
   `,
 ];

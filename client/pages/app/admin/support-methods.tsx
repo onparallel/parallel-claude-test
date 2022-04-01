@@ -26,7 +26,7 @@ type AdminSupportMethodsProps = Exclude<
 function AdminSupportMethods({ supportMethods, schemaTypes }: AdminSupportMethodsProps) {
   const intl = useIntl();
   const {
-    data: { me },
+    data: { me, realMe },
   } = useAssertQuery(AdminSupportMethods_userDocument);
   const sections = useAdminSections();
 
@@ -51,7 +51,8 @@ function AdminSupportMethods({ supportMethods, schemaTypes }: AdminSupportMethod
       })}
       basePath="/app/admin"
       sections={sections}
-      user={me}
+      me={me}
+      realMe={realMe}
       sectionsHeader={<FormattedMessage id="admin.title" defaultMessage="Admin panel" />}
       header={
         <Heading as="h3" size="md">
@@ -112,25 +113,12 @@ function AdminSupportMethods({ supportMethods, schemaTypes }: AdminSupportMethod
   );
 }
 
-AdminSupportMethods.fragments = {
-  get User() {
-    return gql`
-      fragment AdminSupportMethods_User on User {
-        ...AppLayout_User
-      }
-      ${AppLayout.fragments.User}
-    `;
-  },
-};
-
 AdminSupportMethods.queries = [
   gql`
     query AdminSupportMethods_user {
-      me {
-        ...AdminSupportMethods_User
-      }
+      ...AppLayout_Query
     }
-    ${AdminSupportMethods.fragments.User}
+    ${AppLayout.fragments.Query}
   `,
 ];
 

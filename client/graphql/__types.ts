@@ -500,6 +500,7 @@ export interface Mutation {
   getApiTokenOwner: SupportMethodResponse;
   /** Returns a signed download url for tasks with file output */
   getTaskResultFileUrl: Scalars["String"];
+  loginAs: Result;
   /** marks a Signature integration as default */
   markSignatureIntegrationAsDefault: OrgIntegration;
   /** Adds, edits or deletes a custom property on the petition */
@@ -568,6 +569,7 @@ export interface Mutation {
   resetTemporaryPassword: Result;
   /** Resets the given user password on AWS Cognito and sends an email with new temporary. */
   resetUserPassword: SupportMethodResponse;
+  restoreLogin: Result;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
   /** Sends the petition and creates the corresponding accesses and messages. */
@@ -973,6 +975,10 @@ export interface MutationgetApiTokenOwnerArgs {
 export interface MutationgetTaskResultFileUrlArgs {
   preview?: InputMaybe<Scalars["Boolean"]>;
   taskId: Scalars["GID"];
+}
+
+export interface MutationloginAsArgs {
+  userId: Scalars["GID"];
 }
 
 export interface MutationmarkSignatureIntegrationAsDefaultArgs {
@@ -2669,6 +2675,7 @@ export interface Query {
   publicPetitionLinkBySlug?: Maybe<PublicPublicPetitionLink>;
   publicTask: Task;
   publicTemplateCategories: Array<Scalars["String"]>;
+  realMe?: Maybe<User>;
   /** Search user groups */
   searchUserGroups: Array<UserGroup>;
   /** Search users and user groups */
@@ -3914,46 +3921,63 @@ export type ImportContactsDialog_bulkCreateContactsMutation = {
   bulkCreateContacts: Array<{ __typename?: "Contact"; id: string }>;
 };
 
-export type AppLayout_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  role: OrganizationRole;
-  isSuperAdmin: boolean;
-  avatarUrl?: string | null;
-  initials?: string | null;
-  organization: {
-    __typename?: "Organization";
+export type AppLayout_QueryFragment = {
+  me: {
+    __typename?: "User";
     id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
     };
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
-export type AppLayoutNavbar_UserFragment = {
-  __typename?: "User";
-  id: string;
-  email: string;
-  isSuperAdmin: boolean;
-  role: OrganizationRole;
-  fullName?: string | null;
-  avatarUrl?: string | null;
-  initials?: string | null;
-  organization: {
-    __typename?: "Organization";
+export type AppLayoutNavbar_QueryFragment = {
+  me: {
+    __typename?: "User";
     id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+    isSuperAdmin: boolean;
+    role: OrganizationRole;
+    email: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
     };
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type HeaderNameEditable_PetitionBase_Petition_Fragment = {
@@ -3988,11 +4012,8 @@ export type PetitionHeader_PetitionFragment = {
   } | null;
 };
 
-export type PetitionHeader_UserFragment = {
-  __typename?: "User";
-  id: string;
-  role: OrganizationRole;
-  hasPetitionPdfExport: boolean;
+export type PetitionHeader_QueryFragment = {
+  me: { __typename?: "User"; id: string; role: OrganizationRole; hasPetitionPdfExport: boolean };
 };
 
 export type PetitionHeader_reopenPetitionMutationVariables = Exact<{
@@ -4053,28 +4074,36 @@ export type PetitionLayout_PetitionBaseFragment =
   | PetitionLayout_PetitionBase_Petition_Fragment
   | PetitionLayout_PetitionBase_PetitionTemplate_Fragment;
 
-export type PetitionLayout_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  role: OrganizationRole;
-  isSuperAdmin: boolean;
-  avatarUrl?: string | null;
-  initials?: string | null;
-  hasPetitionPdfExport: boolean;
-  organization: {
-    __typename?: "Organization";
+export type PetitionLayout_QueryFragment = {
+  me: {
+    __typename?: "User";
     id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasPetitionPdfExport: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
     };
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type PetitionTemplateHeader_PetitionTemplateFragment = {
@@ -4087,44 +4116,58 @@ export type PetitionTemplateHeader_PetitionTemplateFragment = {
   updatedAt: string;
 };
 
-export type PetitionTemplateHeader_UserFragment = {
-  __typename?: "User";
-  id: string;
-  role: OrganizationRole;
-  hasPetitionPdfExport: boolean;
+export type PetitionTemplateHeader_QueryFragment = {
+  me: { __typename?: "User"; id: string; role: OrganizationRole; hasPetitionPdfExport: boolean };
 };
 
-export type SettingsLayout_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  role: OrganizationRole;
-  isSuperAdmin: boolean;
-  avatarUrl?: string | null;
-  initials?: string | null;
-  organization: {
-    __typename?: "Organization";
+export type SettingsLayout_QueryFragment = {
+  me: {
+    __typename?: "User";
     id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
     };
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
-export type UserMenu_UserFragment = {
-  __typename?: "User";
-  isSuperAdmin: boolean;
-  role: OrganizationRole;
-  email: string;
-  fullName?: string | null;
-  avatarUrl?: string | null;
-  initials?: string | null;
+export type UserMenu_QueryFragment = {
+  me: {
+    __typename?: "User";
+    isSuperAdmin: boolean;
+    role: OrganizationRole;
+    email: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type Notifications_UnreadPetitionUserNotificationIdsQueryVariables = Exact<{
@@ -9984,7 +10027,6 @@ export type Admin_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -9998,29 +10040,13 @@ export type Admin_userQuery = {
       };
     };
   };
-};
-
-export type OrganizationMembers_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  role: OrganizationRole;
-  isSuperAdmin: boolean;
-  avatarUrl?: string | null;
-  initials?: string | null;
-  organization: {
-    __typename?: "Organization";
+  realMe?: {
+    __typename?: "User";
     id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
-  };
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type OrganizationMembers_OrganizationUserFragment = {
@@ -10051,7 +10077,6 @@ export type OrganizationMembers_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -10065,6 +10090,13 @@ export type OrganizationMembers_userQuery = {
       };
     };
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type OrganizationMembers_organizationQueryVariables = Exact<{
@@ -10112,29 +10144,6 @@ export type AdminOrganizations_OrganizationFragment = {
   };
 };
 
-export type AdminOrganizations_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  role: OrganizationRole;
-  isSuperAdmin: boolean;
-  avatarUrl?: string | null;
-  initials?: string | null;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
-  };
-};
-
 export type AdminOrganizations_organizationsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
@@ -10175,7 +10184,6 @@ export type AdminOrganizations_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -10189,29 +10197,13 @@ export type AdminOrganizations_userQuery = {
       };
     };
   };
-};
-
-export type AdminSupportMethods_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  role: OrganizationRole;
-  isSuperAdmin: boolean;
-  avatarUrl?: string | null;
-  initials?: string | null;
-  organization: {
-    __typename?: "Organization";
+  realMe?: {
+    __typename?: "User";
     id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
-  };
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type AdminSupportMethods_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -10225,7 +10217,6 @@ export type AdminSupportMethods_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -10239,6 +10230,13 @@ export type AdminSupportMethods_userQuery = {
       };
     };
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type Contact_ContactFragment = {
@@ -10437,29 +10435,6 @@ export type Contact_PetitionFragment = {
   } | null;
 };
 
-export type Contact_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  role: OrganizationRole;
-  isSuperAdmin: boolean;
-  avatarUrl?: string | null;
-  initials?: string | null;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
-  };
-};
-
 export type Contact_updateContactMutationVariables = Exact<{
   id: Scalars["GID"];
   data: UpdateContactInput;
@@ -10487,7 +10462,6 @@ export type Contact_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -10501,6 +10475,13 @@ export type Contact_userQuery = {
       };
     };
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type Contact_contactQueryVariables = Exact<{
@@ -10594,29 +10575,6 @@ export type Contacts_ContactsListFragment = {
   }>;
 };
 
-export type Contacts_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  role: OrganizationRole;
-  isSuperAdmin: boolean;
-  avatarUrl?: string | null;
-  initials?: string | null;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
-  };
-};
-
 export type Contacts_contactsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
@@ -10651,7 +10609,6 @@ export type Contacts_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -10665,6 +10622,13 @@ export type Contacts_userQuery = {
       };
     };
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type AppRedirect_petitionsQueryVariables = Exact<{ [key: string]: never }>;
@@ -10700,7 +10664,6 @@ export type OrganizationBranding_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -10717,6 +10680,13 @@ export type OrganizationBranding_userQuery = {
       };
     };
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type OrganizationGroup_UserGroupFragment = {
@@ -10737,29 +10707,6 @@ export type OrganizationGroup_UserGroupMemberFragment = {
   id: string;
   addedAt: string;
   user: { __typename?: "User"; id: string; fullName?: string | null; email: string };
-};
-
-export type OrganizationGroup_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  role: OrganizationRole;
-  isSuperAdmin: boolean;
-  avatarUrl?: string | null;
-  initials?: string | null;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
-  };
 };
 
 export type OrganizationGroup_updateUserGroupMutationVariables = Exact<{
@@ -10878,7 +10825,6 @@ export type OrganizationGroup_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -10892,6 +10838,13 @@ export type OrganizationGroup_userQuery = {
       };
     };
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type OrganizationGroups_UserGroupPaginationFragment = {
@@ -10930,29 +10883,6 @@ export type OrganizationGroups_UserGroupFragment = {
       initials?: string | null;
     };
   }>;
-};
-
-export type OrganizationGroups_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  role: OrganizationRole;
-  isSuperAdmin: boolean;
-  avatarUrl?: string | null;
-  initials?: string | null;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
-  };
 };
 
 export type OrganizationGroups_createUserGroupMutationVariables = Exact<{
@@ -11050,7 +10980,6 @@ export type OrganizationGroups_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -11064,6 +10993,13 @@ export type OrganizationGroups_userQuery = {
       };
     };
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type OrganizationSettings_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -11077,7 +11013,6 @@ export type OrganizationSettings_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -11091,6 +11026,13 @@ export type OrganizationSettings_userQuery = {
       };
     };
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type OrganizationIntegrations_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -11104,7 +11046,6 @@ export type OrganizationIntegrations_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -11120,6 +11061,13 @@ export type OrganizationIntegrations_userQuery = {
       };
     };
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type IntegrationsSignature_SignatureOrgIntegrationFragment = {
@@ -11190,7 +11138,6 @@ export type IntegrationsSignature_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -11221,6 +11168,13 @@ export type IntegrationsSignature_userQuery = {
       };
     };
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type OrganizationUsage_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -11234,7 +11188,6 @@ export type OrganizationUsage_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -11255,6 +11208,13 @@ export type OrganizationUsage_userQuery = {
       };
     };
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type OrganizationUsers_UserFragment = {
@@ -11379,7 +11339,6 @@ export type OrganizationUsers_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -11423,6 +11382,13 @@ export type OrganizationUsers_userQuery = {
       };
     };
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type PetitionActivity_PetitionFragment = {
@@ -12146,32 +12112,40 @@ export type PetitionActivity_PetitionFragment = {
   };
 };
 
-export type PetitionActivity_UserFragment = {
-  __typename?: "User";
-  id: string;
-  unreadNotificationIds: Array<string>;
-  fullName?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  role: OrganizationRole;
-  isSuperAdmin: boolean;
-  avatarUrl?: string | null;
-  initials?: string | null;
-  hasPetitionPdfExport: boolean;
-  hasOnBehalfOf: boolean;
-  organization: {
-    __typename?: "Organization";
-    name: string;
+export type PetitionActivity_QueryFragment = {
+  me: {
+    __typename?: "User";
     id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    isSuperAdmin: boolean;
+    unreadNotificationIds: Array<string>;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasPetitionPdfExport: boolean;
+    hasOnBehalfOf: boolean;
+    organization: {
+      __typename?: "Organization";
+      name: string;
+      id: string;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
     };
+    delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
-  delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type PetitionActivity_updatePetitionMutationVariables = Exact<{
@@ -13784,15 +13758,14 @@ export type PetitionActivity_userQuery = {
   me: {
     __typename?: "User";
     id: string;
-    unreadNotificationIds: Array<string>;
     fullName?: string | null;
     firstName?: string | null;
     lastName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
+    unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
     hasPetitionPdfExport: boolean;
@@ -13808,6 +13781,13 @@ export type PetitionActivity_userQuery = {
     };
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type PetitionCompose_PetitionBase_Petition_Fragment = {
@@ -14088,48 +14068,56 @@ export type PetitionCompose_PetitionFieldFragment = {
   }>;
 };
 
-export type PetitionCompose_UserFragment = {
-  __typename?: "User";
-  id: string;
-  unreadNotificationIds: Array<string>;
-  fullName?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  role: OrganizationRole;
-  isSuperAdmin: boolean;
-  avatarUrl?: string | null;
-  initials?: string | null;
-  hasSkipForwardSecurity: boolean;
-  hasHideRecipientViewContents: boolean;
-  hasPetitionPdfExport: boolean;
-  hasPetitionSignature: boolean;
-  hasOnBehalfOf: boolean;
-  organization: {
-    __typename?: "Organization";
+export type PetitionCompose_QueryFragment = {
+  me: {
+    __typename?: "User";
     id: string;
-    signatureIntegrations: {
-      __typename?: "OrgIntegrationPagination";
-      items: Array<
-        | {
-            __typename?: "SignatureOrgIntegration";
-            id: string;
-            name: string;
-            isDefault: boolean;
-            environment: SignatureOrgIntegrationEnvironment;
-          }
-        | { __typename?: "SsoOrgIntegration" }
-        | { __typename?: "UserProvisioningOrgIntegration" }
-      >;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    isSuperAdmin: boolean;
+    unreadNotificationIds: Array<string>;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasPetitionPdfExport: boolean;
+    hasSkipForwardSecurity: boolean;
+    hasHideRecipientViewContents: boolean;
+    hasPetitionSignature: boolean;
+    hasOnBehalfOf: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
+      signatureIntegrations: {
+        __typename?: "OrgIntegrationPagination";
+        items: Array<
+          | {
+              __typename?: "SignatureOrgIntegration";
+              id: string;
+              name: string;
+              isDefault: boolean;
+              environment: SignatureOrgIntegrationEnvironment;
+            }
+          | { __typename?: "SsoOrgIntegration" }
+          | { __typename?: "UserProvisioningOrgIntegration" }
+        >;
+      };
     };
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
+    delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
-  delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type PetitionCompose_updatePetitionMutationVariables = Exact<{
@@ -14624,25 +14612,28 @@ export type PetitionCompose_userQuery = {
   me: {
     __typename?: "User";
     id: string;
-    unreadNotificationIds: Array<string>;
     fullName?: string | null;
     firstName?: string | null;
     lastName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
+    unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasPetitionPdfExport: boolean;
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
-    hasPetitionPdfExport: boolean;
     hasPetitionSignature: boolean;
     hasOnBehalfOf: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
       signatureIntegrations: {
         __typename?: "OrgIntegrationPagination";
         items: Array<
@@ -14657,13 +14648,16 @@ export type PetitionCompose_userQuery = {
           | { __typename?: "UserProvisioningOrgIntegration" }
         >;
       };
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
     };
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type PetitionCompose_petitionQueryVariables = Exact<{
@@ -15166,31 +15160,39 @@ export type PetitionPreview_PetitionBaseFragment =
   | PetitionPreview_PetitionBase_Petition_Fragment
   | PetitionPreview_PetitionBase_PetitionTemplate_Fragment;
 
-export type PetitionPreview_UserFragment = {
-  __typename?: "User";
-  id: string;
-  email: string;
-  firstName?: string | null;
-  lastName?: string | null;
-  fullName?: string | null;
-  createdAt: string;
-  canCreateUsers: boolean;
-  role: OrganizationRole;
-  isSuperAdmin: boolean;
-  avatarUrl?: string | null;
-  initials?: string | null;
-  hasPetitionPdfExport: boolean;
-  hasOnBehalfOf: boolean;
-  organization: {
-    __typename?: "Organization";
-    name: string;
+export type PetitionPreview_QueryFragment = {
+  me: {
+    __typename?: "User";
     id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasPetitionPdfExport: boolean;
+    hasOnBehalfOf: boolean;
+    organization: {
+      __typename?: "Organization";
+      name: string;
+      id: string;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
     };
+    delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
-  delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type PetitionPreview_updatePetitionMutationVariables = Exact<{
@@ -15829,15 +15831,19 @@ export type PetitionPreview_petitionQuery = {
 export type PetitionPreview_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type PetitionPreview_userQuery = {
+  metadata: {
+    __typename?: "ConnectionMetadata";
+    country?: string | null;
+    browserName?: string | null;
+  };
   me: {
     __typename?: "User";
     id: string;
-    email: string;
+    fullName?: string | null;
     firstName?: string | null;
     lastName?: string | null;
-    fullName?: string | null;
+    email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -15855,11 +15861,13 @@ export type PetitionPreview_userQuery = {
     };
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
-  metadata: {
-    __typename?: "ConnectionMetadata";
-    country?: string | null;
-    browserName?: string | null;
-  };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type PetitionReplies_PetitionFragment = {
@@ -16078,47 +16086,55 @@ export type PetitionReplies_PetitionFieldFragment = {
   }>;
 };
 
-export type PetitionReplies_UserFragment = {
-  __typename?: "User";
-  id: string;
-  unreadNotificationIds: Array<string>;
-  fullName?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  role: OrganizationRole;
-  isSuperAdmin: boolean;
-  avatarUrl?: string | null;
-  initials?: string | null;
-  hasPetitionSignature: boolean;
-  hasPetitionPdfExport: boolean;
-  hasInternalComments: boolean;
-  hasExportCuatrecasas: boolean;
-  organization: {
-    __typename?: "Organization";
-    name: string;
+export type PetitionReplies_QueryFragment = {
+  me: {
+    __typename?: "User";
     id: string;
-    signatureIntegrations: {
-      __typename?: "OrgIntegrationPagination";
-      items: Array<
-        | {
-            __typename?: "SignatureOrgIntegration";
-            id: string;
-            name: string;
-            isDefault: boolean;
-            environment: SignatureOrgIntegrationEnvironment;
-          }
-        | { __typename?: "SsoOrgIntegration" }
-        | { __typename?: "UserProvisioningOrgIntegration" }
-      >;
-    };
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    isSuperAdmin: boolean;
+    unreadNotificationIds: Array<string>;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasPetitionSignature: boolean;
+    hasPetitionPdfExport: boolean;
+    hasInternalComments: boolean;
+    hasExportCuatrecasas: boolean;
+    organization: {
+      __typename?: "Organization";
+      name: string;
+      id: string;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
+      signatureIntegrations: {
+        __typename?: "OrgIntegrationPagination";
+        items: Array<
+          | {
+              __typename?: "SignatureOrgIntegration";
+              id: string;
+              name: string;
+              isDefault: boolean;
+              environment: SignatureOrgIntegrationEnvironment;
+            }
+          | { __typename?: "SsoOrgIntegration" }
+          | { __typename?: "UserProvisioningOrgIntegration" }
+        >;
+      };
     };
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type PetitionReplies_updatePetitionMutationVariables = Exact<{
@@ -16540,15 +16556,14 @@ export type PetitionReplies_userQuery = {
   me: {
     __typename?: "User";
     id: string;
-    unreadNotificationIds: Array<string>;
     fullName?: string | null;
     firstName?: string | null;
     lastName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
+    unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
     hasPetitionSignature: boolean;
@@ -16559,6 +16574,10 @@ export type PetitionReplies_userQuery = {
       __typename?: "Organization";
       name: string;
       id: string;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
       signatureIntegrations: {
         __typename?: "OrgIntegrationPagination";
         items: Array<
@@ -16573,12 +16592,15 @@ export type PetitionReplies_userQuery = {
           | { __typename?: "UserProvisioningOrgIntegration" }
         >;
       };
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
     };
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type PetitionReplies_petitionQueryVariables = Exact<{
@@ -16960,7 +16982,6 @@ export type Petitions_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -16974,6 +16995,13 @@ export type Petitions_userQuery = {
       };
     };
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type Petitions_petitionsQueryVariables = Exact<{
@@ -17122,29 +17150,6 @@ export type NewPetition_PetitionTemplateFragment = {
   remindersConfig?: { __typename?: "RemindersConfig"; time: string } | null;
 };
 
-export type NewPetition_UserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  role: OrganizationRole;
-  isSuperAdmin: boolean;
-  avatarUrl?: string | null;
-  initials?: string | null;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-    };
-  };
-};
-
 export type NewPetition_templatesQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
@@ -17204,7 +17209,6 @@ export type NewPetition_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -17219,6 +17223,13 @@ export type NewPetition_userQuery = {
     };
   };
   hasTemplates: { __typename?: "PetitionBasePagination"; totalCount: number };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type NewPetition_templateQueryVariables = Exact<{
@@ -17283,32 +17294,40 @@ export type NewPetition_templateQuery = {
     | null;
 };
 
-export type Account_UserFragment = {
-  __typename?: "User";
-  id: string;
-  firstName?: string | null;
-  lastName?: string | null;
-  isSsoUser: boolean;
-  preferredLocale?: string | null;
-  fullName?: string | null;
-  email: string;
-  createdAt: string;
-  canCreateUsers: boolean;
-  role: OrganizationRole;
-  isSuperAdmin: boolean;
-  avatarUrl?: string | null;
-  initials?: string | null;
-  hasDeveloperAccess: boolean;
-  hasOnBehalfOf: boolean;
-  delegates: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
-  organization: {
-    __typename?: "Organization";
+export type Account_QueryFragment = {
+  me: {
+    __typename?: "User";
     id: string;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    isSuperAdmin: boolean;
+    isSsoUser: boolean;
+    preferredLocale?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasDeveloperAccess: boolean;
+    hasOnBehalfOf: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
     };
+    delegates: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type Account_updateAccountMutationVariables = Exact<{
@@ -17332,33 +17351,7 @@ export type Account_setUserPreferredLocaleMutationVariables = Exact<{
 }>;
 
 export type Account_setUserPreferredLocaleMutation = {
-  setUserPreferredLocale: {
-    __typename?: "User";
-    id: string;
-    firstName?: string | null;
-    lastName?: string | null;
-    isSsoUser: boolean;
-    preferredLocale?: string | null;
-    fullName?: string | null;
-    email: string;
-    createdAt: string;
-    canCreateUsers: boolean;
-    role: OrganizationRole;
-    isSuperAdmin: boolean;
-    avatarUrl?: string | null;
-    initials?: string | null;
-    hasDeveloperAccess: boolean;
-    hasOnBehalfOf: boolean;
-    delegates: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
-    organization: {
-      __typename?: "Organization";
-      id: string;
-      usageLimits: {
-        __typename?: "OrganizationUsageLimit";
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-      };
-    };
-  };
+  setUserPreferredLocale: { __typename?: "User"; id: string; preferredLocale?: string | null };
 };
 
 export type Account_setUserDelegatesMutationVariables = Exact<{
@@ -17380,21 +17373,19 @@ export type Account_userQuery = {
   me: {
     __typename?: "User";
     id: string;
+    fullName?: string | null;
     firstName?: string | null;
     lastName?: string | null;
-    isSsoUser: boolean;
-    preferredLocale?: string | null;
-    fullName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
+    isSsoUser: boolean;
+    preferredLocale?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
     hasDeveloperAccess: boolean;
     hasOnBehalfOf: boolean;
-    delegates: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -17403,7 +17394,15 @@ export type Account_userQuery = {
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
       };
     };
+    delegates: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type Developers_UserAuthenticationTokenFragment = {
@@ -17510,7 +17509,6 @@ export type Developers_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -17525,6 +17523,13 @@ export type Developers_userQuery = {
       };
     };
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type Settings_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -17538,7 +17543,6 @@ export type Settings_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -17553,6 +17557,13 @@ export type Settings_userQuery = {
       };
     };
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type Security_updatePasswordMutationVariables = Exact<{
@@ -17574,7 +17585,6 @@ export type Security_userQuery = {
     lastName?: string | null;
     email: string;
     createdAt: string;
-    canCreateUsers: boolean;
     role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
@@ -17589,6 +17599,13 @@ export type Security_userQuery = {
       };
     };
   };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
 };
 
 export type Forgot_resendVerificationCodeMutationVariables = Exact<{
@@ -18699,6 +18716,16 @@ export type useLiquidScope_PublicPetitionFragment = {
   }>;
 };
 
+export type useLoginAs_loginAsMutationVariables = Exact<{
+  userId: Scalars["GID"];
+}>;
+
+export type useLoginAs_loginAsMutation = { loginAs: Result };
+
+export type useLoginAs_restoreLoginMutationVariables = Exact<{ [key: string]: never }>;
+
+export type useLoginAs_restoreLoginMutation = { restoreLogin: Result };
+
 export type PetitionSignaturesCardPolling_petitionQueryVariables = Exact<{
   petitionId: Scalars["GID"];
 }>;
@@ -19065,13 +19092,15 @@ export const TaskProgressDialog_TaskFragmentDoc = gql`
     progress
   }
 ` as unknown as DocumentNode<TaskProgressDialog_TaskFragment, unknown>;
-export const PetitionTemplateHeader_UserFragmentDoc = gql`
-  fragment PetitionTemplateHeader_User on User {
-    id
-    role
-    hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
+export const PetitionTemplateHeader_QueryFragmentDoc = gql`
+  fragment PetitionTemplateHeader_Query on Query {
+    me {
+      id
+      role
+      hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
+    }
   }
-` as unknown as DocumentNode<PetitionTemplateHeader_UserFragment, unknown>;
+` as unknown as DocumentNode<PetitionTemplateHeader_QueryFragment, unknown>;
 export const PetitionUserNotification_PetitionUserNotificationFragmentDoc = gql`
   fragment PetitionUserNotification_PetitionUserNotification on PetitionUserNotification {
     id
@@ -19408,6 +19437,12 @@ export const PetitionSharingModal_PetitionFragmentDoc = gql`
   ${PetitionSharingModal_PetitionUserPermissionFragmentDoc}
   ${PetitionSharingModal_PetitionUserGroupPermissionFragmentDoc}
 ` as unknown as DocumentNode<PetitionSharingModal_PetitionFragment, unknown>;
+export const TemplateDetailsModal_UserFragmentDoc = gql`
+  fragment TemplateDetailsModal_User on User {
+    id
+    role
+  }
+` as unknown as DocumentNode<TemplateDetailsModal_UserFragment, unknown>;
 export const UserListPopover_UserFragmentDoc = gql`
   fragment UserListPopover_User on User {
     id
@@ -19706,52 +19741,6 @@ export const RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetiti
     RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment,
     unknown
   >;
-export const UserMenu_UserFragmentDoc = gql`
-  fragment UserMenu_User on User {
-    isSuperAdmin
-    role
-    email
-    ...UserAvatar_User
-  }
-  ${UserAvatar_UserFragmentDoc}
-` as unknown as DocumentNode<UserMenu_UserFragment, unknown>;
-export const AppLayoutNavbar_UserFragmentDoc = gql`
-  fragment AppLayoutNavbar_User on User {
-    id
-    email
-    ...UserMenu_User
-    organization {
-      id
-      usageLimits {
-        petitions {
-          limit
-          used
-        }
-      }
-    }
-  }
-  ${UserMenu_UserFragmentDoc}
-` as unknown as DocumentNode<AppLayoutNavbar_UserFragment, unknown>;
-export const AppLayout_UserFragmentDoc = gql`
-  fragment AppLayout_User on User {
-    id
-    fullName
-    firstName
-    lastName
-    email
-    createdAt
-    canCreateUsers
-    role
-    ...AppLayoutNavbar_User
-  }
-  ${AppLayoutNavbar_UserFragmentDoc}
-` as unknown as DocumentNode<AppLayout_UserFragment, unknown>;
-export const OrganizationMembers_UserFragmentDoc = gql`
-  fragment OrganizationMembers_User on User {
-    ...AppLayout_User
-  }
-  ${AppLayout_UserFragmentDoc}
-` as unknown as DocumentNode<OrganizationMembers_UserFragment, unknown>;
 export const OrganizationMembers_OrganizationUserFragmentDoc = gql`
   fragment OrganizationMembers_OrganizationUser on User {
     id
@@ -19788,18 +19777,6 @@ export const AdminOrganizations_OrganizationFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<AdminOrganizations_OrganizationFragment, unknown>;
-export const AdminOrganizations_UserFragmentDoc = gql`
-  fragment AdminOrganizations_User on User {
-    ...AppLayout_User
-  }
-  ${AppLayout_UserFragmentDoc}
-` as unknown as DocumentNode<AdminOrganizations_UserFragment, unknown>;
-export const AdminSupportMethods_UserFragmentDoc = gql`
-  fragment AdminSupportMethods_User on User {
-    ...AppLayout_User
-  }
-  ${AppLayout_UserFragmentDoc}
-` as unknown as DocumentNode<AdminSupportMethods_UserFragment, unknown>;
 export const Contact_Contact_ProfileFragmentDoc = gql`
   fragment Contact_Contact_Profile on Contact {
     id
@@ -19922,12 +19899,6 @@ export const Contact_ContactFragmentDoc = gql`
   ${useDeleteContacts_ContactFragmentDoc}
   ${Contact_PetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<Contact_ContactFragment, unknown>;
-export const Contact_UserFragmentDoc = gql`
-  fragment Contact_User on User {
-    ...AppLayout_User
-  }
-  ${AppLayout_UserFragmentDoc}
-` as unknown as DocumentNode<Contact_UserFragment, unknown>;
 export const Contacts_ContactsListFragmentDoc = gql`
   fragment Contacts_ContactsList on ContactPagination {
     items {
@@ -19943,12 +19914,6 @@ export const Contacts_ContactsListFragmentDoc = gql`
   }
   ${useDeleteContacts_ContactFragmentDoc}
 ` as unknown as DocumentNode<Contacts_ContactsListFragment, unknown>;
-export const Contacts_UserFragmentDoc = gql`
-  fragment Contacts_User on User {
-    ...AppLayout_User
-  }
-  ${AppLayout_UserFragmentDoc}
-` as unknown as DocumentNode<Contacts_UserFragment, unknown>;
 export const OrganizationGroup_UserGroupMemberFragmentDoc = gql`
   fragment OrganizationGroup_UserGroupMember on UserGroupMember {
     id
@@ -19971,12 +19936,6 @@ export const OrganizationGroup_UserGroupFragmentDoc = gql`
   }
   ${OrganizationGroup_UserGroupMemberFragmentDoc}
 ` as unknown as DocumentNode<OrganizationGroup_UserGroupFragment, unknown>;
-export const OrganizationGroup_UserFragmentDoc = gql`
-  fragment OrganizationGroup_User on User {
-    ...AppLayout_User
-  }
-  ${AppLayout_UserFragmentDoc}
-` as unknown as DocumentNode<OrganizationGroup_UserFragment, unknown>;
 export const OrganizationGroups_UserGroupFragmentDoc = gql`
   fragment OrganizationGroups_UserGroup on UserGroup {
     id
@@ -19999,18 +19958,6 @@ export const OrganizationGroups_UserGroupPaginationFragmentDoc = gql`
   }
   ${OrganizationGroups_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<OrganizationGroups_UserGroupPaginationFragment, unknown>;
-export const SettingsLayout_UserFragmentDoc = gql`
-  fragment SettingsLayout_User on User {
-    ...AppLayout_User
-  }
-  ${AppLayout_UserFragmentDoc}
-` as unknown as DocumentNode<SettingsLayout_UserFragment, unknown>;
-export const OrganizationGroups_UserFragmentDoc = gql`
-  fragment OrganizationGroups_User on User {
-    ...SettingsLayout_User
-  }
-  ${SettingsLayout_UserFragmentDoc}
-` as unknown as DocumentNode<OrganizationGroups_UserFragment, unknown>;
 export const IntegrationsSignature_SignatureOrgIntegrationFragmentDoc = gql`
   fragment IntegrationsSignature_SignatureOrgIntegration on SignatureOrgIntegration {
     id
@@ -21076,6 +21023,71 @@ export const PetitionActivity_PetitionFragmentDoc = gql`
   ${validatePetitionFields_PetitionFieldFragmentDoc}
   ${FieldErrorDialog_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionActivity_PetitionFragment, unknown>;
+export const UserMenu_QueryFragmentDoc = gql`
+  fragment UserMenu_Query on Query {
+    me {
+      isSuperAdmin
+      role
+      email
+      ...UserAvatar_User
+    }
+    realMe {
+      id
+      ...UserAvatar_User
+    }
+  }
+  ${UserAvatar_UserFragmentDoc}
+` as unknown as DocumentNode<UserMenu_QueryFragment, unknown>;
+export const AppLayoutNavbar_QueryFragmentDoc = gql`
+  fragment AppLayoutNavbar_Query on Query {
+    ...UserMenu_Query
+    me {
+      id
+      organization {
+        id
+        usageLimits {
+          petitions {
+            limit
+            used
+          }
+        }
+      }
+    }
+  }
+  ${UserMenu_QueryFragmentDoc}
+` as unknown as DocumentNode<AppLayoutNavbar_QueryFragment, unknown>;
+export const AppLayout_QueryFragmentDoc = gql`
+  fragment AppLayout_Query on Query {
+    me {
+      id
+      fullName
+      firstName
+      lastName
+      email
+      createdAt
+      role
+    }
+    ...AppLayoutNavbar_Query
+  }
+  ${AppLayoutNavbar_QueryFragmentDoc}
+` as unknown as DocumentNode<AppLayout_QueryFragment, unknown>;
+export const PetitionHeader_QueryFragmentDoc = gql`
+  fragment PetitionHeader_Query on Query {
+    me {
+      id
+      role
+      hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
+    }
+  }
+` as unknown as DocumentNode<PetitionHeader_QueryFragment, unknown>;
+export const PetitionLayout_QueryFragmentDoc = gql`
+  fragment PetitionLayout_Query on Query {
+    ...AppLayout_Query
+    ...PetitionHeader_Query
+  }
+  ${AppLayout_QueryFragmentDoc}
+  ${PetitionHeader_QueryFragmentDoc}
+` as unknown as DocumentNode<PetitionLayout_QueryFragment, unknown>;
 export const isUsageLimitsReached_OrganizationFragmentDoc = gql`
   fragment isUsageLimitsReached_Organization on Organization {
     usageLimits {
@@ -21086,21 +21098,6 @@ export const isUsageLimitsReached_OrganizationFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<isUsageLimitsReached_OrganizationFragment, unknown>;
-export const PetitionHeader_UserFragmentDoc = gql`
-  fragment PetitionHeader_User on User {
-    id
-    role
-    hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
-  }
-` as unknown as DocumentNode<PetitionHeader_UserFragment, unknown>;
-export const PetitionLayout_UserFragmentDoc = gql`
-  fragment PetitionLayout_User on User {
-    ...AppLayout_User
-    ...PetitionHeader_User
-  }
-  ${AppLayout_UserFragmentDoc}
-  ${PetitionHeader_UserFragmentDoc}
-` as unknown as DocumentNode<PetitionLayout_UserFragment, unknown>;
 export const useUpdateIsReadNotification_UserFragmentDoc = gql`
   fragment useUpdateIsReadNotification_User on User {
     id
@@ -21138,21 +21135,23 @@ export const useSendPetitionHandler_UserFragmentDoc = gql`
   ${ConfirmPetitionSignersDialog_UserFragmentDoc}
   ${AddPetitionAccessDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<useSendPetitionHandler_UserFragment, unknown>;
-export const PetitionActivity_UserFragmentDoc = gql`
-  fragment PetitionActivity_User on User {
-    organization {
-      name
-      ...isUsageLimitsReached_Organization
+export const PetitionActivity_QueryFragmentDoc = gql`
+  fragment PetitionActivity_Query on Query {
+    ...PetitionLayout_Query
+    me {
+      organization {
+        name
+        ...isUsageLimitsReached_Organization
+      }
+      ...useUpdateIsReadNotification_User
+      ...useSendPetitionHandler_User
     }
-    ...PetitionLayout_User
-    ...useUpdateIsReadNotification_User
-    ...useSendPetitionHandler_User
   }
+  ${PetitionLayout_QueryFragmentDoc}
   ${isUsageLimitsReached_OrganizationFragmentDoc}
-  ${PetitionLayout_UserFragmentDoc}
   ${useUpdateIsReadNotification_UserFragmentDoc}
   ${useSendPetitionHandler_UserFragmentDoc}
-` as unknown as DocumentNode<PetitionActivity_UserFragment, unknown>;
+` as unknown as DocumentNode<PetitionActivity_QueryFragment, unknown>;
 export const PetitionTemplateComposeMessageEditor_PetitionFragmentDoc = gql`
   fragment PetitionTemplateComposeMessageEditor_Petition on PetitionTemplate {
     id
@@ -21445,23 +21444,25 @@ export const PetitionSettings_UserFragmentDoc = gql`
   ${SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc}
   ${SignatureConfigDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionSettings_UserFragment, unknown>;
-export const PetitionCompose_UserFragmentDoc = gql`
-  fragment PetitionCompose_User on User {
-    id
-    ...PetitionLayout_User
-    ...PetitionSettings_User
-    ...useUpdateIsReadNotification_User
-    ...useSendPetitionHandler_User
-    organization {
-      ...isUsageLimitsReached_Organization
+export const PetitionCompose_QueryFragmentDoc = gql`
+  fragment PetitionCompose_Query on Query {
+    ...PetitionLayout_Query
+    me {
+      id
+      ...PetitionSettings_User
+      ...useUpdateIsReadNotification_User
+      ...useSendPetitionHandler_User
+      organization {
+        ...isUsageLimitsReached_Organization
+      }
     }
   }
-  ${PetitionLayout_UserFragmentDoc}
+  ${PetitionLayout_QueryFragmentDoc}
   ${PetitionSettings_UserFragmentDoc}
   ${useUpdateIsReadNotification_UserFragmentDoc}
   ${useSendPetitionHandler_UserFragmentDoc}
   ${isUsageLimitsReached_OrganizationFragmentDoc}
-` as unknown as DocumentNode<PetitionCompose_UserFragment, unknown>;
+` as unknown as DocumentNode<PetitionCompose_QueryFragment, unknown>;
 export const useFieldVisibility_PetitionFieldFragmentDoc = gql`
   fragment useFieldVisibility_PetitionField on PetitionField {
     id
@@ -21715,21 +21716,24 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${useLiquidScope_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionPreview_PetitionBaseFragment, unknown>;
-export const PetitionPreview_UserFragmentDoc = gql`
-  fragment PetitionPreview_User on User {
-    organization {
-      name
-      ...isUsageLimitsReached_Organization
+export const PetitionPreview_QueryFragmentDoc = gql`
+  fragment PetitionPreview_Query on Query {
+    ...PetitionLayout_Query
+    me {
+      id
+      organization {
+        name
+        ...isUsageLimitsReached_Organization
+      }
+      ...useSendPetitionHandler_User
+      ...ConfirmPetitionSignersDialog_User
     }
-    ...PetitionLayout_User
-    ...useSendPetitionHandler_User
-    ...ConfirmPetitionSignersDialog_User
   }
+  ${PetitionLayout_QueryFragmentDoc}
   ${isUsageLimitsReached_OrganizationFragmentDoc}
-  ${PetitionLayout_UserFragmentDoc}
   ${useSendPetitionHandler_UserFragmentDoc}
   ${ConfirmPetitionSignersDialog_UserFragmentDoc}
-` as unknown as DocumentNode<PetitionPreview_UserFragment, unknown>;
+` as unknown as DocumentNode<PetitionPreview_QueryFragment, unknown>;
 export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
   fragment PetitionRepliesFieldReply_PetitionFieldReply on PetitionFieldReply {
     id
@@ -22001,27 +22005,29 @@ export const PetitionSignaturesCard_UserFragmentDoc = gql`
   ${SignatureConfigDialog_UserFragmentDoc}
   ${SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc}
 ` as unknown as DocumentNode<PetitionSignaturesCard_UserFragment, unknown>;
-export const PetitionReplies_UserFragmentDoc = gql`
-  fragment PetitionReplies_User on User {
-    organization {
-      name
-      ...isUsageLimitsReached_Organization
+export const PetitionReplies_QueryFragmentDoc = gql`
+  fragment PetitionReplies_Query on Query {
+    ...PetitionLayout_Query
+    me {
+      organization {
+        name
+        ...isUsageLimitsReached_Organization
+      }
+      hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
+      hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
+      ...PetitionRepliesFieldComments_User
+      ...ExportRepliesDialog_User
+      ...PetitionSignaturesCard_User
+      ...useUpdateIsReadNotification_User
     }
-    hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
-    hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
-    ...PetitionLayout_User
-    ...PetitionRepliesFieldComments_User
-    ...ExportRepliesDialog_User
-    ...PetitionSignaturesCard_User
-    ...useUpdateIsReadNotification_User
   }
+  ${PetitionLayout_QueryFragmentDoc}
   ${isUsageLimitsReached_OrganizationFragmentDoc}
-  ${PetitionLayout_UserFragmentDoc}
   ${PetitionRepliesFieldComments_UserFragmentDoc}
   ${ExportRepliesDialog_UserFragmentDoc}
   ${PetitionSignaturesCard_UserFragmentDoc}
   ${useUpdateIsReadNotification_UserFragmentDoc}
-` as unknown as DocumentNode<PetitionReplies_UserFragment, unknown>;
+` as unknown as DocumentNode<PetitionReplies_QueryFragment, unknown>;
 export const PetitionTagListCellContent_TagFragmentDoc = gql`
   fragment PetitionTagListCellContent_Tag on Tag {
     id
@@ -22144,20 +22150,12 @@ export const NewPetition_PetitionTemplateFragmentDoc = gql`
   ${TemplateCard_PetitionTemplateFragmentDoc}
   ${PublicTemplateCard_PetitionTemplateFragmentDoc}
 ` as unknown as DocumentNode<NewPetition_PetitionTemplateFragment, unknown>;
-export const TemplateDetailsModal_UserFragmentDoc = gql`
-  fragment TemplateDetailsModal_User on User {
-    id
-    role
+export const SettingsLayout_QueryFragmentDoc = gql`
+  fragment SettingsLayout_Query on Query {
+    ...AppLayout_Query
   }
-` as unknown as DocumentNode<TemplateDetailsModal_UserFragment, unknown>;
-export const NewPetition_UserFragmentDoc = gql`
-  fragment NewPetition_User on User {
-    ...AppLayout_User
-    ...TemplateDetailsModal_User
-  }
-  ${AppLayout_UserFragmentDoc}
-  ${TemplateDetailsModal_UserFragmentDoc}
-` as unknown as DocumentNode<NewPetition_UserFragment, unknown>;
+  ${AppLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<SettingsLayout_QueryFragment, unknown>;
 export const useSettingsSections_UserFragmentDoc = gql`
   fragment useSettingsSections_User on User {
     hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
@@ -22185,21 +22183,22 @@ export const AccountDelegates_UserFragmentDoc = gql`
   }
   ${UserSelect_UserFragmentDoc}
 ` as unknown as DocumentNode<AccountDelegates_UserFragment, unknown>;
-export const Account_UserFragmentDoc = gql`
-  fragment Account_User on User {
-    id
-    ...SettingsLayout_User
-    ...useSettingsSections_User
-    ...AccountChangeName_User
-    ...AccountLocaleChange_User
-    ...AccountDelegates_User
+export const Account_QueryFragmentDoc = gql`
+  fragment Account_Query on Query {
+    ...SettingsLayout_Query
+    me {
+      ...useSettingsSections_User
+      ...AccountChangeName_User
+      ...AccountLocaleChange_User
+      ...AccountDelegates_User
+    }
   }
-  ${SettingsLayout_UserFragmentDoc}
+  ${SettingsLayout_QueryFragmentDoc}
   ${useSettingsSections_UserFragmentDoc}
   ${AccountChangeName_UserFragmentDoc}
   ${AccountLocaleChange_UserFragmentDoc}
   ${AccountDelegates_UserFragmentDoc}
-` as unknown as DocumentNode<Account_UserFragment, unknown>;
+` as unknown as DocumentNode<Account_QueryFragment, unknown>;
 export const Developers_UserAuthenticationTokenFragmentDoc = gql`
   fragment Developers_UserAuthenticationToken on UserAuthenticationToken {
     id
@@ -23989,20 +23988,15 @@ export const GenerateNewTokenDialog_generateUserAuthTokenDocument = gql`
 >;
 export const Admin_userDocument = gql`
   query Admin_user {
-    me {
-      id
-      ...AppLayout_User
-    }
+    ...AppLayout_Query
   }
-  ${AppLayout_UserFragmentDoc}
+  ${AppLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<Admin_userQuery, Admin_userQueryVariables>;
 export const OrganizationMembers_userDocument = gql`
   query OrganizationMembers_user {
-    me {
-      ...OrganizationMembers_User
-    }
+    ...AppLayout_Query
   }
-  ${OrganizationMembers_UserFragmentDoc}
+  ${AppLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<OrganizationMembers_userQuery, OrganizationMembers_userQueryVariables>;
 export const OrganizationMembers_organizationDocument = gql`
   query OrganizationMembers_organization(
@@ -24062,19 +24056,15 @@ export const AdminOrganizations_organizationsDocument = gql`
 >;
 export const AdminOrganizations_userDocument = gql`
   query AdminOrganizations_user {
-    me {
-      ...AdminOrganizations_User
-    }
+    ...AppLayout_Query
   }
-  ${AdminOrganizations_UserFragmentDoc}
+  ${AppLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<AdminOrganizations_userQuery, AdminOrganizations_userQueryVariables>;
 export const AdminSupportMethods_userDocument = gql`
   query AdminSupportMethods_user {
-    me {
-      ...AdminSupportMethods_User
-    }
+    ...AppLayout_Query
   }
-  ${AdminSupportMethods_UserFragmentDoc}
+  ${AppLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<AdminSupportMethods_userQuery, AdminSupportMethods_userQueryVariables>;
 export const Contact_updateContactDocument = gql`
   mutation Contact_updateContact($id: GID!, $data: UpdateContactInput!) {
@@ -24086,11 +24076,9 @@ export const Contact_updateContactDocument = gql`
 ` as unknown as DocumentNode<Contact_updateContactMutation, Contact_updateContactMutationVariables>;
 export const Contact_userDocument = gql`
   query Contact_user {
-    me {
-      ...Contact_User
-    }
+    ...AppLayout_Query
   }
-  ${Contact_UserFragmentDoc}
+  ${AppLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<Contact_userQuery, Contact_userQueryVariables>;
 export const Contact_contactDocument = gql`
   query Contact_contact($id: GID!) {
@@ -24115,11 +24103,9 @@ export const Contacts_contactsDocument = gql`
 ` as unknown as DocumentNode<Contacts_contactsQuery, Contacts_contactsQueryVariables>;
 export const Contacts_userDocument = gql`
   query Contacts_user {
-    me {
-      ...Contacts_User
-    }
+    ...AppLayout_Query
   }
-  ${Contacts_UserFragmentDoc}
+  ${AppLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<Contacts_userQuery, Contacts_userQueryVariables>;
 export const AppRedirect_petitionsDocument = gql`
   query AppRedirect_petitions {
@@ -24152,8 +24138,8 @@ export const OrganizationBranding_updateOrganizationPreferredToneDocument = gql`
 >;
 export const OrganizationBranding_userDocument = gql`
   query OrganizationBranding_user {
+    ...SettingsLayout_Query
     me {
-      ...SettingsLayout_User
       fullName
       organization {
         id
@@ -24163,7 +24149,7 @@ export const OrganizationBranding_userDocument = gql`
       }
     }
   }
-  ${SettingsLayout_UserFragmentDoc}
+  ${SettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<
   OrganizationBranding_userQuery,
   OrganizationBranding_userQueryVariables
@@ -24233,11 +24219,9 @@ export const OrganizationGroup_userGroupDocument = gql`
 >;
 export const OrganizationGroup_userDocument = gql`
   query OrganizationGroup_user {
-    me {
-      ...OrganizationGroup_User
-    }
+    ...AppLayout_Query
   }
-  ${OrganizationGroup_UserFragmentDoc}
+  ${AppLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<OrganizationGroup_userQuery, OrganizationGroup_userQueryVariables>;
 export const OrganizationGroups_createUserGroupDocument = gql`
   mutation OrganizationGroups_createUserGroup($name: String!, $userIds: [GID!]!) {
@@ -24287,34 +24271,29 @@ export const OrganizationGroups_userGroupsDocument = gql`
 >;
 export const OrganizationGroups_userDocument = gql`
   query OrganizationGroups_user {
-    me {
-      ...OrganizationGroups_User
-    }
+    ...SettingsLayout_Query
   }
-  ${OrganizationGroups_UserFragmentDoc}
+  ${SettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<OrganizationGroups_userQuery, OrganizationGroups_userQueryVariables>;
 export const OrganizationSettings_userDocument = gql`
   query OrganizationSettings_user {
-    me {
-      id
-      ...SettingsLayout_User
-    }
+    ...SettingsLayout_Query
   }
-  ${SettingsLayout_UserFragmentDoc}
+  ${SettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<
   OrganizationSettings_userQuery,
   OrganizationSettings_userQueryVariables
 >;
 export const OrganizationIntegrations_userDocument = gql`
   query OrganizationIntegrations_user {
+    ...SettingsLayout_Query
     me {
       id
       hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
       hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
-      ...SettingsLayout_User
     }
   }
-  ${SettingsLayout_UserFragmentDoc}
+  ${SettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<
   OrganizationIntegrations_userQuery,
   OrganizationIntegrations_userQueryVariables
@@ -24361,10 +24340,10 @@ export const IntegrationsSignature_deleteSignatureIntegrationDocument = gql`
 >;
 export const IntegrationsSignature_userDocument = gql`
   query IntegrationsSignature_user($limit: Int!, $offset: Int!) {
+    ...SettingsLayout_Query
     me {
       id
       hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
-      ...SettingsLayout_User
       organization {
         id
         signatureIntegrations: integrations(type: SIGNATURE, limit: $limit, offset: $offset) {
@@ -24382,15 +24361,15 @@ export const IntegrationsSignature_userDocument = gql`
       }
     }
   }
-  ${SettingsLayout_UserFragmentDoc}
+  ${SettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<
   IntegrationsSignature_userQuery,
   IntegrationsSignature_userQueryVariables
 >;
 export const OrganizationUsage_userDocument = gql`
   query OrganizationUsage_user {
+    ...SettingsLayout_Query
     me {
-      ...SettingsLayout_User
       organization {
         id
         activeUserCount
@@ -24410,7 +24389,7 @@ export const OrganizationUsage_userDocument = gql`
       }
     }
   }
-  ${SettingsLayout_UserFragmentDoc}
+  ${SettingsLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<OrganizationUsage_userQuery, OrganizationUsage_userQueryVariables>;
 export const OrganizationUsers_createOrganizationUserDocument = gql`
   mutation OrganizationUsers_createOrganizationUser(
@@ -24489,6 +24468,7 @@ export const OrganizationUsers_userDocument = gql`
     $search: String
     $sortBy: [OrganizationUsers_OrderBy!]
   ) {
+    ...SettingsLayout_Query
     me {
       hasGhostLogin: hasFeatureFlag(featureFlag: GHOST_LOGIN)
       organization {
@@ -24513,11 +24493,10 @@ export const OrganizationUsers_userDocument = gql`
           }
         }
       }
-      ...SettingsLayout_User
     }
   }
+  ${SettingsLayout_QueryFragmentDoc}
   ${OrganizationUsers_UserFragmentDoc}
-  ${SettingsLayout_UserFragmentDoc}
 ` as unknown as DocumentNode<OrganizationUsers_userQuery, OrganizationUsers_userQueryVariables>;
 export const PetitionActivity_updatePetitionDocument = gql`
   mutation PetitionActivity_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
@@ -24604,11 +24583,9 @@ export const PetitionActivity_petitionDocument = gql`
 >;
 export const PetitionActivity_userDocument = gql`
   query PetitionActivity_user {
-    me {
-      ...PetitionActivity_User
-    }
+    ...PetitionActivity_Query
   }
-  ${PetitionActivity_UserFragmentDoc}
+  ${PetitionActivity_QueryFragmentDoc}
 ` as unknown as DocumentNode<PetitionActivity_userQuery, PetitionActivity_userQueryVariables>;
 export const PetitionCompose_updatePetitionDocument = gql`
   mutation PetitionCompose_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
@@ -24754,11 +24731,9 @@ export const PetitionCompose_changePetitionFieldTypeDocument = gql`
 >;
 export const PetitionCompose_userDocument = gql`
   query PetitionCompose_user {
-    me {
-      ...PetitionCompose_User
-    }
+    ...PetitionCompose_Query
   }
-  ${PetitionCompose_UserFragmentDoc}
+  ${PetitionCompose_QueryFragmentDoc}
 ` as unknown as DocumentNode<PetitionCompose_userQuery, PetitionCompose_userQueryVariables>;
 export const PetitionCompose_petitionDocument = gql`
   query PetitionCompose_petition($id: GID!) {
@@ -24818,15 +24793,13 @@ export const PetitionPreview_petitionDocument = gql`
 ` as unknown as DocumentNode<PetitionPreview_petitionQuery, PetitionPreview_petitionQueryVariables>;
 export const PetitionPreview_userDocument = gql`
   query PetitionPreview_user {
-    me {
-      ...PetitionPreview_User
-    }
+    ...PetitionPreview_Query
     metadata {
       country
       browserName
     }
   }
-  ${PetitionPreview_UserFragmentDoc}
+  ${PetitionPreview_QueryFragmentDoc}
 ` as unknown as DocumentNode<PetitionPreview_userQuery, PetitionPreview_userQueryVariables>;
 export const PetitionReplies_updatePetitionDocument = gql`
   mutation PetitionReplies_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
@@ -24933,11 +24906,9 @@ export const PetitionReplies_sendPetitionClosedNotificationDocument = gql`
 >;
 export const PetitionReplies_userDocument = gql`
   query PetitionReplies_user {
-    me {
-      ...PetitionReplies_User
-    }
+    ...PetitionReplies_Query
   }
-  ${PetitionReplies_UserFragmentDoc}
+  ${PetitionReplies_QueryFragmentDoc}
 ` as unknown as DocumentNode<PetitionReplies_userQuery, PetitionReplies_userQueryVariables>;
 export const PetitionReplies_petitionDocument = gql`
   query PetitionReplies_petition($id: GID!) {
@@ -24949,12 +24920,12 @@ export const PetitionReplies_petitionDocument = gql`
 ` as unknown as DocumentNode<PetitionReplies_petitionQuery, PetitionReplies_petitionQueryVariables>;
 export const Petitions_userDocument = gql`
   query Petitions_user {
+    ...AppLayout_Query
     me {
-      ...AppLayout_User
       ...PetitionListHeader_User
     }
   }
-  ${AppLayout_UserFragmentDoc}
+  ${AppLayout_QueryFragmentDoc}
   ${PetitionListHeader_UserFragmentDoc}
 ` as unknown as DocumentNode<Petitions_userQuery, Petitions_userQueryVariables>;
 export const Petitions_petitionsDocument = gql`
@@ -25000,15 +24971,17 @@ export const NewPetition_templatesDocument = gql`
 ` as unknown as DocumentNode<NewPetition_templatesQuery, NewPetition_templatesQueryVariables>;
 export const NewPetition_userDocument = gql`
   query NewPetition_user {
+    ...AppLayout_Query
     me {
-      ...NewPetition_User
+      ...TemplateDetailsModal_User
     }
     hasTemplates: petitions(filters: { type: TEMPLATE }) {
       totalCount
     }
     publicTemplateCategories
   }
-  ${NewPetition_UserFragmentDoc}
+  ${AppLayout_QueryFragmentDoc}
+  ${TemplateDetailsModal_UserFragmentDoc}
 ` as unknown as DocumentNode<NewPetition_userQuery, NewPetition_userQueryVariables>;
 export const NewPetition_templateDocument = gql`
   query NewPetition_template($templateId: GID!) {
@@ -25033,10 +25006,10 @@ export const Account_setUserPreferredLocaleDocument = gql`
   mutation Account_setUserPreferredLocale($locale: String!) {
     setUserPreferredLocale(locale: $locale) {
       id
-      ...Account_User
+      ...AccountLocaleChange_User
     }
   }
-  ${Account_UserFragmentDoc}
+  ${AccountLocaleChange_UserFragmentDoc}
 ` as unknown as DocumentNode<
   Account_setUserPreferredLocaleMutation,
   Account_setUserPreferredLocaleMutationVariables
@@ -25055,12 +25028,9 @@ export const Account_setUserDelegatesDocument = gql`
 >;
 export const Account_userDocument = gql`
   query Account_user {
-    me {
-      id
-      ...Account_User
-    }
+    ...Account_Query
   }
-  ${Account_UserFragmentDoc}
+  ${Account_QueryFragmentDoc}
 ` as unknown as DocumentNode<Account_userQuery, Account_userQueryVariables>;
 export const Developers_revokeUserAuthTokenDocument = gql`
   mutation Developers_revokeUserAuthToken($authTokenIds: [GID!]!) {
@@ -25125,24 +25095,24 @@ export const Developers_subscriptionsDocument = gql`
 ` as unknown as DocumentNode<Developers_subscriptionsQuery, Developers_subscriptionsQueryVariables>;
 export const Developers_userDocument = gql`
   query Developers_user {
+    ...SettingsLayout_Query
     me {
       id
-      ...SettingsLayout_User
       ...useSettingsSections_User
     }
   }
-  ${SettingsLayout_UserFragmentDoc}
+  ${SettingsLayout_QueryFragmentDoc}
   ${useSettingsSections_UserFragmentDoc}
 ` as unknown as DocumentNode<Developers_userQuery, Developers_userQueryVariables>;
 export const Settings_userDocument = gql`
   query Settings_user {
+    ...SettingsLayout_Query
     me {
       id
-      ...SettingsLayout_User
       ...useSettingsSections_User
     }
   }
-  ${SettingsLayout_UserFragmentDoc}
+  ${SettingsLayout_QueryFragmentDoc}
   ${useSettingsSections_UserFragmentDoc}
 ` as unknown as DocumentNode<Settings_userQuery, Settings_userQueryVariables>;
 export const Security_updatePasswordDocument = gql`
@@ -25155,13 +25125,13 @@ export const Security_updatePasswordDocument = gql`
 >;
 export const Security_userDocument = gql`
   query Security_user {
+    ...SettingsLayout_Query
     me {
       isSsoUser
-      ...SettingsLayout_User
       ...useSettingsSections_User
     }
   }
-  ${SettingsLayout_UserFragmentDoc}
+  ${SettingsLayout_QueryFragmentDoc}
   ${useSettingsSections_UserFragmentDoc}
 ` as unknown as DocumentNode<Security_userQuery, Security_userQueryVariables>;
 export const Forgot_resendVerificationCodeDocument = gql`
@@ -25585,6 +25555,19 @@ export const useExportRepliesTask_getTaskResultFileUrlDocument = gql`
 ` as unknown as DocumentNode<
   useExportRepliesTask_getTaskResultFileUrlMutation,
   useExportRepliesTask_getTaskResultFileUrlMutationVariables
+>;
+export const useLoginAs_loginAsDocument = gql`
+  mutation useLoginAs_loginAs($userId: GID!) {
+    loginAs(userId: $userId)
+  }
+` as unknown as DocumentNode<useLoginAs_loginAsMutation, useLoginAs_loginAsMutationVariables>;
+export const useLoginAs_restoreLoginDocument = gql`
+  mutation useLoginAs_restoreLogin {
+    restoreLogin
+  }
+` as unknown as DocumentNode<
+  useLoginAs_restoreLoginMutation,
+  useLoginAs_restoreLoginMutationVariables
 >;
 export const PetitionSignaturesCardPolling_petitionDocument = gql`
   query PetitionSignaturesCardPolling_petition($petitionId: GID!) {

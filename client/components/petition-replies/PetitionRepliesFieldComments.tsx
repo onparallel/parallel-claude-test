@@ -4,7 +4,6 @@ import { AlertCircleIcon, CommentIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import {
   PetitionRepliesFieldComments_PetitionFieldFragment,
-  PetitionReplies_UserFragment,
   PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument,
 } from "@parallel/graphql/__types";
 import { isMetaReturn } from "@parallel/utils/keys";
@@ -20,21 +19,23 @@ import { HelpPopover } from "../common/HelpPopover";
 import { Link } from "../common/Link";
 import { PaddedCollapse } from "../common/PaddedCollapse";
 
-export type PetitionRepliesFieldCommentsProps = {
+export interface PetitionRepliesFieldCommentsProps {
   petitionId: string;
   field: PetitionRepliesFieldComments_PetitionFieldFragment;
-  user: PetitionReplies_UserFragment;
+  myId: string;
+  hasInternalComments: boolean;
   onAddComment: (value: string, internal?: boolean) => void;
   onDeleteComment: (petitionFieldCommentId: string) => void;
   onUpdateComment: (petitionFieldCommentId: string, content: string) => void;
   onMarkAsUnread: (petitionFieldCommentId: string) => void;
   onClose: () => void;
-};
+}
 
 export function PetitionRepliesFieldComments({
   petitionId,
   field,
-  user,
+  myId,
+  hasInternalComments,
   onAddComment,
   onDeleteComment,
   onUpdateComment,
@@ -130,7 +131,7 @@ export function PetitionRepliesFieldComments({
             <Fragment key={comment.id}>
               <FieldComment
                 comment={comment}
-                isAuthor={user.id === comment.author?.id}
+                isAuthor={myId === comment.author?.id}
                 onEdit={(content) => onUpdateComment(comment.id, content)}
                 onDelete={() => onDeleteComment(comment.id)}
                 onMarkAsUnread={() => onMarkAsUnread(comment.id)}
@@ -152,7 +153,7 @@ export function PetitionRepliesFieldComments({
             ) : (
               <Stack alignItems="center" textAlign="center">
                 <AlertCircleIcon boxSize="64px" color="gray.200" />
-                {user.hasInternalComments ? (
+                {hasInternalComments ? (
                   <Text color="gray.400">
                     <FormattedMessage
                       id="petition-replies.field-comments.disabled-comments-1"
@@ -198,7 +199,7 @@ export function PetitionRepliesFieldComments({
             id: "petition-replies.field-comments.placeholder",
             defaultMessage: "Type a new comment",
           })}
-          isDisabled={!hasCommentsEnabled && !user.hasInternalComments}
+          isDisabled={!hasCommentsEnabled && !hasInternalComments}
           value={draft}
           onKeyDown={handleKeyDown as any}
           onChange={handleDraftChange as any}
@@ -209,9 +210,9 @@ export function PetitionRepliesFieldComments({
             <Stack
               paddingTop={2}
               direction="row"
-              justifyContent={user.hasInternalComments ? "space-between" : "flex-end"}
+              justifyContent={hasInternalComments ? "space-between" : "flex-end"}
             >
-              {user.hasInternalComments && (
+              {hasInternalComments && (
                 <Stack display="flex" alignItems="center" direction="row">
                   <Checkbox
                     marginLeft={1}

@@ -61,7 +61,7 @@ function IntegrationsSignature() {
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const toast = useToast();
   const {
-    data: { me },
+    data: { me, realMe },
     loading,
     refetch,
   } = useAssertQueryOrPreviousData(IntegrationsSignature_userDocument, {
@@ -161,7 +161,8 @@ function IntegrationsSignature() {
       })}
       basePath="/app/organization/integrations"
       sections={sections}
-      user={me}
+      me={me}
+      realMe={realMe}
       sectionsHeader={
         <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
       }
@@ -444,10 +445,10 @@ IntegrationsSignature.mutations = [
 IntegrationsSignature.queries = [
   gql`
     query IntegrationsSignature_user($limit: Int!, $offset: Int!) {
+      ...SettingsLayout_Query
       me {
         id
         hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
-        ...SettingsLayout_User
         organization {
           id
           signatureIntegrations: integrations(type: SIGNATURE, limit: $limit, offset: $offset) {
@@ -465,7 +466,7 @@ IntegrationsSignature.queries = [
         }
       }
     }
-    ${SettingsLayout.fragments.User}
+    ${SettingsLayout.fragments.Query}
   `,
 ];
 

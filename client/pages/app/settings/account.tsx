@@ -44,7 +44,7 @@ function Account() {
   };
 
   const {
-    data: { me },
+    data: { me, realMe },
   } = useAssertQuery(Account_userDocument);
   const sections = useSettingsSections(me);
 
@@ -89,7 +89,8 @@ function Account() {
       })}
       basePath="/app/settings"
       sections={sections}
-      user={me}
+      me={me}
+      realMe={realMe}
       sectionsHeader={<FormattedMessage id="settings.title" defaultMessage="Settings" />}
       header={
         <Heading as="h3" size="md">
@@ -109,16 +110,17 @@ function Account() {
 }
 
 Account.fragments = {
-  User: gql`
-    fragment Account_User on User {
-      id
-      ...SettingsLayout_User
-      ...useSettingsSections_User
-      ...AccountChangeName_User
-      ...AccountLocaleChange_User
-      ...AccountDelegates_User
+  Query: gql`
+    fragment Account_Query on Query {
+      ...SettingsLayout_Query
+      me {
+        ...useSettingsSections_User
+        ...AccountChangeName_User
+        ...AccountLocaleChange_User
+        ...AccountDelegates_User
+      }
     }
-    ${SettingsLayout.fragments.User}
+    ${SettingsLayout.fragments.Query}
     ${useSettingsSections.fragments.User}
     ${AccountChangeName.fragments.User}
     ${AccountLocaleChange.fragments.User}
@@ -142,10 +144,10 @@ Account.mutations = [
     mutation Account_setUserPreferredLocale($locale: String!) {
       setUserPreferredLocale(locale: $locale) {
         id
-        ...Account_User
+        ...AccountLocaleChange_User
       }
     }
-    ${Account.fragments.User}
+    ${AccountLocaleChange.fragments.User}
   `,
   gql`
     mutation Account_setUserDelegates($delegateIds: [GID!]!) {
@@ -161,12 +163,9 @@ Account.mutations = [
 Account.queries = [
   gql`
     query Account_user {
-      me {
-        id
-        ...Account_User
-      }
+      ...Account_Query
     }
-    ${Account.fragments.User}
+    ${Account.fragments.Query}
   `,
 ];
 

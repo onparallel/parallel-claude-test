@@ -25,7 +25,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 function OrganizationIntegrations() {
   const intl = useIntl();
   const {
-    data: { me },
+    data: { me, realMe },
   } = useAssertQuery(OrganizationIntegrations_userDocument);
   const sections = useOrganizationSections(me);
 
@@ -105,7 +105,8 @@ function OrganizationIntegrations() {
       })}
       basePath="/app/organization"
       sections={sections}
-      user={me}
+      me={me}
+      realMe={realMe}
       sectionsHeader={
         <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
       }
@@ -149,14 +150,14 @@ function OrganizationIntegrations() {
 OrganizationIntegrations.queries = [
   gql`
     query OrganizationIntegrations_user {
+      ...SettingsLayout_Query
       me {
         id
         hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
         hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
-        ...SettingsLayout_User
       }
     }
-    ${SettingsLayout.fragments.User}
+    ${SettingsLayout.fragments.Query}
   `,
 ];
 

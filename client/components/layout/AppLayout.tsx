@@ -10,7 +10,7 @@ import {
   useBreakpointValue,
 } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { AppLayout_UserFragment } from "@parallel/graphql/__types";
+import { AppLayout_QueryFragment } from "@parallel/graphql/__types";
 import { useCheckForNewVersion } from "@parallel/utils/useCheckForNewVersion";
 import { useRehydrated } from "@parallel/utils/useRehydrated";
 import * as Sentry from "@sentry/node";
@@ -27,14 +27,13 @@ import { NotificationsDrawer } from "../notifications/NotificationsDrawer";
 import { Segment } from "../scripts/Segment";
 import { AppLayoutNavbar } from "./AppLayoutNavbar";
 
-export interface AppLayoutProps {
+export interface AppLayoutProps extends AppLayout_QueryFragment {
   title: string;
-  user: AppLayout_UserFragment;
 }
 
 export const AppLayout = Object.assign(
   chakraForwardRef<"div", AppLayoutProps>(function AppLayout(
-    { title, user, children, ...props },
+    { title, me, realMe, children, ...props },
     ref
   ) {
     const rehydrated = useRehydrated();
@@ -74,41 +73,41 @@ export const AppLayout = Object.assign(
       if (window.analytics && !(window.analytics as any).initialized) {
         window.analytics?.load(process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY);
       }
-      window.analytics?.identify(user.id, {
-        email: user.email,
+      window.analytics?.identify(me.id, {
+        email: me.email,
         locale: router.locale,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        createdAt: user.createdAt,
-        orgRole: user.role,
+        firstName: me.firstName,
+        lastName: me.lastName,
+        createdAt: me.createdAt,
+        orgRole: me.role,
       });
-    }, [user.id]);
+    }, [me.id]);
 
     // Initialize userflow
     useEffect(() => {
       if (!userflow.isIdentified()) {
         userflow.init(process.env.NEXT_PUBLIC_USERFLOW_TOKEN);
-        userflow.identify(user.id, {
-          name: user.fullName,
-          email: user.email,
-          signed_up_at: user.createdAt,
+        userflow.identify(me.id, {
+          name: me.fullName,
+          email: me.email,
+          signed_up_at: me.createdAt,
         });
       }
-    }, [user.id]);
+    }, [me.id]);
 
     // Identify user in Sentry
     useEffect(() => {
-      Sentry.setUser({ id: user.id, email: user.email });
+      Sentry.setUser({ id: me.id, email: me.email });
       return () => {
         Sentry.setUser(null);
       };
-    }, [user.id]);
+    }, [me.id]);
 
     const isMobile = useBreakpointValue({ base: true, sm: false });
 
     function handleHelpCenterClick() {
       window.analytics?.track("Help Center Clicked", {
-        userId: user.id,
+        userId: me.id,
         from: isMobile ? "mobile" : "desktop",
       });
     }
@@ -148,7 +147,8 @@ export const AppLayout = Object.assign(
               overflow={{ base: "auto hidden", sm: "hidden auto" }}
             >
               <AppLayoutNavbar
-                user={user}
+                me={me}
+                realMe={realMe}
                 onHelpCenterClick={handleHelpCenterClick}
                 flex="1"
                 zIndex="2"
@@ -228,20 +228,20 @@ export const AppLayout = Object.assign(
   }),
   {
     fragments: {
-      // UserSelect reads canCreateUsers from cache{
-      User: gql`
-        fragment AppLayout_User on User {
-          id
-          fullName
-          firstName
-          lastName
-          email
-          createdAt
-          canCreateUsers
-          role
-          ...AppLayoutNavbar_User
+      Query: gql`
+        fragment AppLayout_Query on Query {
+          me {
+            id
+            fullName
+            firstName
+            lastName
+            email
+            createdAt
+            role
+          }
+          ...AppLayoutNavbar_Query
         }
-        ${AppLayoutNavbar.fragments.User}
+        ${AppLayoutNavbar.fragments.Query}
       `,
     },
   }
