@@ -164,7 +164,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
           ) : (
             <Text textStyle="hint">
               <FormattedMessage
-                id="component.recipient-view-petition-field-reply.document-not-available"
+                id="generic.document-not-available"
                 defaultMessage="Document not available"
               />
             </Text>

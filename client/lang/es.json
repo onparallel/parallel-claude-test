@@ -2950,11 +2950,6 @@
     "context": "This reply has been approved"
   },
   {
-    "term": "component.recipient-view-petition-field-reply.document-not-available",
-    "definition": "Documento no disponible",
-    "context": "Document not available"
-  },
-  {
     "term": "component.recipient-view-petition-field-reply.download-label",
     "definition": "Descargar archivo",
     "context": "Download file"
@@ -2963,11 +2958,6 @@
     "term": "component.recipient-view-petition-field-reply.file-incomplete",
     "definition": "Este archivo no se subió correctamente. Por favor, elimínelo y vuelva a intentar.",
     "context": "This file was not uploaded correctly. Please, delete it and try again."
-  },
-  {
-    "term": "component.recipient-view-petition-field-reply.not-available",
-    "definition": "Respuesta no disponible",
-    "context": "Reply not available"
   },
   {
     "term": "component.recipient-view-petition-field-reply.rejected-file",
@@ -4465,6 +4455,11 @@
     "context": "Deleted team"
   },
   {
+    "term": "generic.document-not-available",
+    "definition": "Documento no disponible",
+    "context": "Document not available"
+  },
+  {
     "term": "generic.done",
     "definition": "Listo",
     "context": "Done"
@@ -4938,6 +4933,11 @@
     "term": "generic.remove",
     "definition": "Quitar",
     "context": "Remove"
+  },
+  {
+    "term": "generic.reply-not-available",
+    "definition": "Respuesta no disponible",
+    "context": "Reply not available"
   },
   {
     "term": "generic.required-field",

@@ -142,7 +142,7 @@ export function FieldComment({
           </Text>
         ) : null}
         <Spacer />
-        {!comment.isAnonymized && (isAuthor || comment.__typename === "PetitionFieldComment") ? (
+        {isAuthor || comment.__typename === "PetitionFieldComment" ? (
           <Menu placement="bottom-end">
             <Tooltip
               label={intl.formatMessage({
@@ -151,6 +151,7 @@ export function FieldComment({
               })}
             >
               <MenuButton
+                disabled={comment.isAnonymized}
                 as={IconButton}
                 variant="ghost"
                 size="xs"

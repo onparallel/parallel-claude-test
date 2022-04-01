@@ -1,9 +1,9 @@
 import { gql, useApolloClient } from "@apollo/client";
 import { Box, Flex, List, ListItem, Stack, Text, VisuallyHidden } from "@chakra-ui/react";
-import { CheckIcon, CloseIcon, DownloadIcon, EyeIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { CheckIcon, CloseIcon } from "@parallel/chakra/icons";
 import {
   PetitionFieldReplyStatus,
+  PetitionFieldType,
   PetitionRepliesFieldReply_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
 import { getMyId } from "@parallel/utils/apollo/getMyId";
@@ -11,18 +11,13 @@ import { FORMATS } from "@parallel/utils/dates";
 import { formatNumberWithPrefix } from "@parallel/utils/formatNumberWithPrefix";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { FieldOptions } from "@parallel/utils/petitionFields";
-import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
-import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
-import useMergedRef from "@react-hook/merged-ref";
-import { useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../common/BreakLines";
-import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { NetDocumentsIconButton } from "../common/NetDocumentsLink";
 import { UserOrContactReference } from "../petition-activity/UserOrContactReference";
+import { CopyOrDownloadReplyButton } from "./CopyOrDownloadReplyButton";
 
 export interface PetitionRepliesFieldReplyProps {
   reply: PetitionRepliesFieldReply_PetitionFieldReplyFragment;
@@ -45,121 +40,81 @@ export function PetitionRepliesFieldReply({
 
   return (
     <Flex>
-      <Stack spacing={1} paddingRight={2} borderRight="2px solid" borderColor="gray.200">
-        {isTextLikeType ? (
-          <CopyToClipboardButton size="xs" text={reply.content.value} />
-        ) : reply.field!.type === "NUMBER" ? (
-          <CopyToClipboardButton
-            size="xs"
-            text={intl.formatNumber(reply.content.value, {
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 20,
-            })}
-          />
-        ) : reply.field!.type === "DATE" ? (
-          <CopyToClipboardButton
-            size="xs"
-            text={intl.formatDate(reply.content.value, {
-              ...FORMATS.L,
-              timeZone: "UTC",
-            })}
-          />
-        ) : reply.field!.type === "PHONE" ? (
-          <CopyToClipboardButton size="xs" text={reply.content.value} />
-        ) : isFileTypeField(reply.field!.type) ? (
-          <ReplyDownloadButton
-            isDisabled={reply.content.uploadComplete === false}
-            contentType={reply.content.contentType}
-            onDownload={(preview) => onAction(preview ? "PREVIEW_FILE" : "DOWNLOAD_FILE")}
-          />
-        ) : reply.field!.type === "DYNAMIC_SELECT" ? (
-          <Stack spacing={1}>
-            {(reply.content.value as [string, string | null][]).map(([label, value], index) =>
-              value ? (
-                <CopyToClipboardButton
-                  key={index}
-                  aria-label={intl.formatMessage(
-                    {
-                      id: "petition-replies.petition-field-reply.copy-dynamic-select-reply",
-                      defaultMessage: "Copy {label} to clipboard",
-                    },
-                    { label }
-                  )}
-                  size="xs"
-                  text={value}
-                />
-              ) : null
-            )}
-          </Stack>
-        ) : reply.field!.type === "CHECKBOX" ? (
-          <Stack spacing={1}>
-            {(reply.content.value as string[]).map((value, index) => (
-              <CopyToClipboardButton key={index} size="xs" text={value} />
-            ))}
-          </Stack>
-        ) : null}
-        {reply.metadata.EXTERNAL_ID_CUATRECASAS ? (
-          <NetDocumentsIconButton
-            externalId={reply.metadata.EXTERNAL_ID_CUATRECASAS}
-            size="xs"
-            placement="right"
-          />
-        ) : null}
-      </Stack>
+      <CopyOrDownloadReplyButton reply={reply} onAction={onAction} />
       <Flex flexDirection="column" justifyContent="center" flex="1" marginLeft={2}>
         {isTextLikeType ? (
-          <BreakLines>{reply.content.value}</BreakLines>
+          reply.isAnonymized ? (
+            <ReplyNotAvailable />
+          ) : (
+            <BreakLines>{reply.content.value}</BreakLines>
+          )
         ) : reply.field!.type === "NUMBER" ? (
-          <Text wordBreak="break-all" whiteSpace="pre">
-            {formatNumberWithPrefix(
-              reply.content.value,
-              reply.field!.options as FieldOptions["NUMBER"]
-            )}
-          </Text>
+          reply.isAnonymized ? (
+            <ReplyNotAvailable />
+          ) : (
+            <Text wordBreak="break-all" whiteSpace="pre">
+              {formatNumberWithPrefix(
+                reply.content.value,
+                reply.field!.options as FieldOptions["NUMBER"]
+              )}
+            </Text>
+          )
         ) : reply.field!.type === "DATE" ? (
-          <Text>
-            {intl.formatDate(reply.content.value, {
-              ...FORMATS.L,
-              timeZone: "UTC",
-            })}
-          </Text>
+          reply.isAnonymized ? (
+            <ReplyNotAvailable />
+          ) : (
+            <Text>
+              {intl.formatDate(reply.content.value, {
+                ...FORMATS.L,
+                timeZone: "UTC",
+              })}
+            </Text>
+          )
         ) : reply.field!.type === "PHONE" ? (
-          <BreakLines>{reply.content.value}</BreakLines>
+          reply.isAnonymized ? (
+            <ReplyNotAvailable />
+          ) : (
+            <BreakLines>{reply.content.value}</BreakLines>
+          )
         ) : isFileTypeField(reply.field!.type) ? (
-          <Box>
-            <VisuallyHidden>
-              {intl.formatMessage({
-                id: "generic.file-name",
-                defaultMessage: "File name",
-              })}
-            </VisuallyHidden>
-            <Text as="span">{reply.content.filename}</Text>
-            <Text as="span" marginX={2}>
-              -
-            </Text>
-            <Text
-              as="span"
-              aria-label={intl.formatMessage({
-                id: "generic.file-size",
-                defaultMessage: "File size",
-              })}
-              fontSize="sm"
-              color="gray.500"
-            >
-              <FileSize value={reply.content.size} />
-            </Text>
-          </Box>
+          reply.isAnonymized ? (
+            <ReplyNotAvailable type={reply.field!.type} />
+          ) : (
+            <Box>
+              <VisuallyHidden>
+                {intl.formatMessage({
+                  id: "generic.file-name",
+                  defaultMessage: "File name",
+                })}
+              </VisuallyHidden>
+              <Text as="span">{reply.content.filename}</Text>
+              <Text as="span" marginX={2}>
+                -
+              </Text>
+              <Text
+                as="span"
+                aria-label={intl.formatMessage({
+                  id: "generic.file-size",
+                  defaultMessage: "File size",
+                })}
+                fontSize="sm"
+                color="gray.500"
+              >
+                <FileSize value={reply.content.size} />
+              </Text>
+            </Box>
+          )
         ) : reply.field!.type === "DYNAMIC_SELECT" ? (
           <List spacing={1}>
-            {(reply.content.value as [string, string][]).map(([, value], index) => (
-              <ListItem key={index}>{value}</ListItem>
-            ))}
+            {(reply.content.value as [string, string][]).map(([, value], index) =>
+              reply.isAnonymized ? <ReplyNotAvailable /> : <ListItem key={index}>{value}</ListItem>
+            )}
           </List>
         ) : reply.field!.type === "CHECKBOX" ? (
           <List spacing={1}>
-            {(reply.content.value as string[]).map((value, index) => (
-              <ListItem key={index}>{value}</ListItem>
-            ))}
+            {(reply.content.value as string[]).map((value, index) =>
+              reply.isAnonymized ? <ReplyNotAvailable /> : <ListItem key={index}>{value}</ListItem>
+            )}
           </List>
         ) : null}
         <Box fontSize="sm">
@@ -232,45 +187,25 @@ PetitionRepliesFieldReply.fragments = {
       updatedBy {
         ...UserOrContactReference_UserOrPetitionAccess
       }
+      isAnonymized
+      ...CopyOrDownloadReplyButton_PetitionFieldReply
     }
     ${UserOrContactReference.fragments.UserOrPetitionAccess}
+    ${CopyOrDownloadReplyButton.fragments.PetitionFieldReply}
   `,
 };
 
-const ReplyDownloadButton = chakraForwardRef<
-  "button",
-  { contentType: string; onDownload: (preview: boolean) => void; isDisabled: boolean }
->(function ReplyDownloadButton({ contentType, onDownload, ...props }, ref) {
-  const intl = useIntl();
-  const isPreviewable = contentType === "application/pdf" || contentType.startsWith("image/");
-  const innerRef = useRef<HTMLElement>(null);
-  const _ref = useMergedRef(ref, innerRef);
-  const isMouseOver = useIsMouseOver(innerRef);
-  const isShiftDown = useIsGlobalKeyDown("Shift");
-  const mode: "PREVIEW" | "DOWNLOAD" = isPreviewable
-    ? isMouseOver && isShiftDown
-      ? "DOWNLOAD"
-      : "PREVIEW"
-    : "DOWNLOAD";
+function ReplyNotAvailable({ type }: { type?: PetitionFieldType }) {
   return (
-    <IconButtonWithTooltip
-      ref={_ref}
-      {...props}
-      size="xs"
-      icon={mode === "PREVIEW" ? <EyeIcon /> : <DownloadIcon />}
-      placement="right"
-      label={
-        isPreviewable
-          ? intl.formatMessage({
-              id: "petition-replies.petition-field-reply.file-preview-download",
-              defaultMessage: "Preview file. ⇧ + click to download",
-            })
-          : intl.formatMessage({
-              id: "petition-replies.petition-field-reply.file-download",
-              defaultMessage: "Download file",
-            })
-      }
-      onClick={() => onDownload(mode === "PREVIEW")}
-    />
+    <Text textStyle="hint">
+      {type === "FILE_UPLOAD" ? (
+        <FormattedMessage
+          id="generic.document-not-available"
+          defaultMessage="Document not available"
+        />
+      ) : (
+        <FormattedMessage id="generic.reply-not-available" defaultMessage="Reply not available" />
+      )}
+    </Text>
   );
-});
+}

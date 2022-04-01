@@ -249,11 +249,12 @@ export const PetitionRepliesField = Object.assign(
                 divider={<ArrowForwardIcon border="none" />}
                 marginBottom={2}
               >
-                {(field.replies[0].content.value as string[][])?.map(([label], index) => (
-                  <Box key={index} as="li">
-                    {label}
-                  </Box>
-                ))}
+                {field.replies.length > 0 &&
+                  (field.options.labels as string[]).map((label, index) => (
+                    <Box key={index} as="li">
+                      {label}
+                    </Box>
+                  ))}
               </Stack>
             ) : null}
             <Stack spacing={4}>
@@ -298,6 +299,7 @@ export const PetitionRepliesField = Object.assign(
           title
           description
           optional
+          options
           isInternal
           replies {
             ...PetitionRepliesField_PetitionFieldReply

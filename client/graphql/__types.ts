@@ -9443,6 +9443,14 @@ export type PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutatio
   };
 };
 
+export type CopyOrDownloadReplyButton_PetitionFieldReplyFragment = {
+  __typename?: "PetitionFieldReply";
+  content: { [key: string]: any };
+  metadata: { [key: string]: any };
+  isAnonymized: boolean;
+  field?: { __typename?: "PetitionField"; type: PetitionFieldType } | null;
+};
+
 export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
   __typename?: "PetitionSignatureRequest";
   id: string;
@@ -9565,6 +9573,7 @@ export type PetitionRepliesField_PetitionFieldFragment = {
   title?: string | null;
   description?: string | null;
   optional: boolean;
+  options: { [key: string]: any };
   isInternal: boolean;
   replies: Array<{
     __typename?: "PetitionFieldReply";
@@ -9573,6 +9582,7 @@ export type PetitionRepliesField_PetitionFieldFragment = {
     status: PetitionFieldReplyStatus;
     createdAt: string;
     metadata: { [key: string]: any };
+    isAnonymized: boolean;
     field?: {
       __typename?: "PetitionField";
       type: PetitionFieldType;
@@ -9612,6 +9622,7 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
   status: PetitionFieldReplyStatus;
   createdAt: string;
   metadata: { [key: string]: any };
+  isAnonymized: boolean;
   field?: {
     __typename?: "PetitionField";
     type: PetitionFieldType;
@@ -9672,6 +9683,7 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
   status: PetitionFieldReplyStatus;
   createdAt: string;
   metadata: { [key: string]: any };
+  isAnonymized: boolean;
   field?: {
     __typename?: "PetitionField";
     type: PetitionFieldType;
@@ -17261,8 +17273,8 @@ export type PetitionReplies_PetitionFragment = {
     title?: string | null;
     description?: string | null;
     optional: boolean;
-    isInternal: boolean;
     options: { [key: string]: any };
+    isInternal: boolean;
     hasCommentsEnabled: boolean;
     visibility?: { [key: string]: any } | null;
     previewReplies: Array<{
@@ -17406,8 +17418,8 @@ export type PetitionReplies_PetitionFieldFragment = {
   title?: string | null;
   description?: string | null;
   optional: boolean;
-  isInternal: boolean;
   options: { [key: string]: any };
+  isInternal: boolean;
   hasCommentsEnabled: boolean;
   visibility?: { [key: string]: any } | null;
   replies: Array<{
@@ -17577,8 +17589,8 @@ export type PetitionReplies_closePetitionMutation = {
       title?: string | null;
       description?: string | null;
       optional: boolean;
-      isInternal: boolean;
       options: { [key: string]: any };
+      isInternal: boolean;
       hasCommentsEnabled: boolean;
       visibility?: { [key: string]: any } | null;
       previewReplies: Array<{
@@ -17753,8 +17765,8 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       title?: string | null;
       description?: string | null;
       optional: boolean;
-      isInternal: boolean;
       options: { [key: string]: any };
+      isInternal: boolean;
       hasCommentsEnabled: boolean;
       visibility?: { [key: string]: any } | null;
       previewReplies: Array<{
@@ -18032,8 +18044,8 @@ export type PetitionReplies_petitionQuery = {
           title?: string | null;
           description?: string | null;
           optional: boolean;
-          isInternal: boolean;
           options: { [key: string]: any };
+          isInternal: boolean;
           hasCommentsEnabled: boolean;
           visibility?: { [key: string]: any } | null;
           previewReplies: Array<{
@@ -23816,6 +23828,16 @@ export const PetitionPreview_QueryFragmentDoc = gql`
   ${useSendPetitionHandler_UserFragmentDoc}
   ${ConfirmPetitionSignersDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionPreview_QueryFragment, unknown>;
+export const CopyOrDownloadReplyButton_PetitionFieldReplyFragmentDoc = gql`
+  fragment CopyOrDownloadReplyButton_PetitionFieldReply on PetitionFieldReply {
+    content
+    metadata
+    isAnonymized
+    field {
+      type
+    }
+  }
+` as unknown as DocumentNode<CopyOrDownloadReplyButton_PetitionFieldReplyFragment, unknown>;
 export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
   fragment PetitionRepliesFieldReply_PetitionFieldReply on PetitionFieldReply {
     id
@@ -23830,8 +23852,11 @@ export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
     updatedBy {
       ...UserOrContactReference_UserOrPetitionAccess
     }
+    isAnonymized
+    ...CopyOrDownloadReplyButton_PetitionFieldReply
   }
   ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
+  ${CopyOrDownloadReplyButton_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<PetitionRepliesFieldReply_PetitionFieldReplyFragment, unknown>;
 export const PetitionRepliesField_PetitionFieldReplyFragmentDoc = gql`
   fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
@@ -23847,6 +23872,7 @@ export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
     title
     description
     optional
+    options
     isInternal
     replies {
       ...PetitionRepliesField_PetitionFieldReply

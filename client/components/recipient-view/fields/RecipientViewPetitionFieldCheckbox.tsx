@@ -127,7 +127,7 @@ export function RecipientViewPetitionFieldCheckbox({
             <Text>
               {"("}
               <FormattedMessage
-                id="component.recipient-view-petition-field-reply.not-available"
+                id="generic.reply-not-available"
                 defaultMessage="Reply not available"
               />
               {")"}

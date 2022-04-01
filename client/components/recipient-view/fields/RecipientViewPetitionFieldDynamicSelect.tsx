@@ -189,8 +189,11 @@ const RecipientViewPetitionFieldReplyDynamicSelect = forwardRef<
       ? countBy(reply.content.value as [string, string | null][], ([, value]) => value !== null)
       : 0;
 
-  const options =
-    (reply?.content.value as string[][]) ?? fieldOptions.labels.map((label) => [label, null]);
+  const options = (
+    !reply.isAnonymized
+      ? (reply?.content.value as string[][])
+      : fieldOptions.labels.map((label) => [label, null])
+  ) as [string, string | null][];
 
   return (
     <Stack>

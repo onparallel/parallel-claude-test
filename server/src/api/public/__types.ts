@@ -2073,6 +2073,7 @@ export type PetitionFieldComment = {
   field: PetitionField;
   /** The ID of the petition field comment. */
   id: Scalars["GID"];
+  isAnonymized: Scalars["Boolean"];
   /** Whether the comment has been edited after being published. */
   isEdited: Scalars["Boolean"];
   /** Whether the comment is internal (only visible to org users) or public (visible for users and accesses) */
@@ -2103,6 +2104,7 @@ export type PetitionFieldReply = Timestamps & {
   field: Maybe<PetitionField>;
   /** The ID of the petition field reply. */
   id: Scalars["GID"];
+  isAnonymized: Scalars["Boolean"];
   /** Metadata for this reply. */
   metadata: Scalars["JSONObject"];
   /** The status of the reply. */
@@ -2174,6 +2176,7 @@ export type PetitionMessage = CreatedAt & {
   emailSubject: Maybe<Scalars["JSON"]>;
   /** The ID of the petition message. */
   id: Scalars["GID"];
+  isAnonymized: Scalars["Boolean"];
   /** Tells when the email was opened for the first time. */
   openedAt: Maybe<Scalars["DateTime"]>;
   /** Time at which the message will be sent. */
@@ -2637,6 +2640,7 @@ export type PublicPetitionFieldComment = {
   field: PublicPetitionField;
   /** The ID of the petition field comment. */
   id: Scalars["GID"];
+  isAnonymized: Scalars["Boolean"];
   /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
 };
@@ -2650,6 +2654,7 @@ export type PublicPetitionFieldReply = Timestamps & {
   field: PublicPetitionField;
   /** The ID of the petition field reply. */
   id: Scalars["GID"];
+  isAnonymized: Scalars["Boolean"];
   /** The status of the petition field reply. */
   status: PetitionFieldReplyStatus;
   /** Time when the resource was last updated. */
