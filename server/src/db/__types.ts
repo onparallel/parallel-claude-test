@@ -890,7 +890,7 @@ export interface PetitionFieldComment {
   id: number; // int4
   petition_id: number; // int4
   petition_field_id: number; // int4
-  content: string; // text
+  content: string; // varchar
   user_id: Maybe<number>; // int4
   petition_access_id: Maybe<number>; // int4
   created_at: Date; // timestamptz

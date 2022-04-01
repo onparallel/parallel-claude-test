@@ -242,23 +242,12 @@ function SignaturesGrid({ children, ...props }: GridProps) {
   );
 }
 
-PetitionPdf.queries = [
-  gql`
-    query PetitionPdf_petition($token: String!) {
-      petitionAuthToken(token: $token) {
-        ...PetitionPdf_Petition
-      }
-    }
-    ${PetitionPdf.fragments.Petition}
-  `,
-];
-
 PetitionPdf.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
-  const token = decodeURIComponent(query.token as string);
-  await fetchQuery(PetitionPdf_petitionDocument, {
-    variables: { token },
-  });
-  return { token };
+  // const token = decodeURIComponent(query.token as string);
+  // await fetchQuery(PetitionPdf_petitionDocument, {
+  //   variables: { token },
+  // });
+  // return { token };
 };
 
 export default withApolloData(PetitionPdf);

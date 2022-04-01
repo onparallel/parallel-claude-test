@@ -2655,7 +2655,6 @@ export interface Query {
   /** The organizations registered in Parallel. */
   organizations: OrganizationPagination;
   petition?: Maybe<PetitionBase>;
-  petitionAuthToken?: Maybe<Petition>;
   petitionEvents: Array<PetitionEvent>;
   /** A field of the petition. */
   petitionField: PetitionField;
@@ -2757,10 +2756,6 @@ export interface QueryorganizationsArgs {
 
 export interface QuerypetitionArgs {
   id: Scalars["GID"];
-}
-
-export interface QuerypetitionAuthTokenArgs {
-  token: Scalars["String"];
 }
 
 export interface QuerypetitionEventsArgs {
@@ -18238,52 +18233,6 @@ export type PetitionPdf_PetitionFieldFragment = {
   }>;
 };
 
-export type PetitionPdf_petitionQueryVariables = Exact<{
-  token: Scalars["String"];
-}>;
-
-export type PetitionPdf_petitionQuery = {
-  petitionAuthToken?: {
-    __typename?: "Petition";
-    id: string;
-    name?: string | null;
-    fromTemplateId?: string | null;
-    fields: Array<{
-      __typename?: "PetitionField";
-      options: { [key: string]: any };
-      id: string;
-      type: PetitionFieldType;
-      title?: string | null;
-      description?: string | null;
-      showInPdf: boolean;
-      multiple: boolean;
-      alias?: string | null;
-      visibility?: { [key: string]: any } | null;
-      isInternal: boolean;
-      replies: Array<{
-        __typename?: "PetitionFieldReply";
-        id: string;
-        status: PetitionFieldReplyStatus;
-        content: { [key: string]: any };
-      }>;
-      previewReplies: Array<{
-        __typename?: "PetitionFieldReply";
-        content: { [key: string]: any };
-        id: string;
-      }>;
-    }>;
-    organization: { __typename?: "Organization"; name: string; logoUrl?: string | null };
-    currentSignatureRequest?: {
-      __typename?: "PetitionSignatureRequest";
-      signatureConfig: {
-        __typename?: "SignatureConfig";
-        timezone: string;
-        signers: Array<{ __typename?: "PetitionSigner"; fullName: string; email: string }>;
-      };
-    } | null;
-  } | null;
-};
-
 export type Signup_userSignUpMutationVariables = Exact<{
   email: Scalars["String"];
   password: Scalars["String"];
@@ -25470,14 +25419,6 @@ export const PublicPetitionLink_publicPetitionLinkBySlugDocument = gql`
   PublicPetitionLink_publicPetitionLinkBySlugQuery,
   PublicPetitionLink_publicPetitionLinkBySlugQueryVariables
 >;
-export const PetitionPdf_petitionDocument = gql`
-  query PetitionPdf_petition($token: String!) {
-    petitionAuthToken(token: $token) {
-      ...PetitionPdf_Petition
-    }
-  }
-  ${PetitionPdf_PetitionFragmentDoc}
-` as unknown as DocumentNode<PetitionPdf_petitionQuery, PetitionPdf_petitionQueryVariables>;
 export const Signup_userSignUpDocument = gql`
   mutation Signup_userSignUp(
     $email: String!

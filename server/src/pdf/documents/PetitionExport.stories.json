@@ -15,7 +15,7 @@
       "argTypes": {
         "petitionId": { "control": { "type": "text" } },
         "documentTitle": { "control": { "type": "text" } },
-        "showSignatureBoxes": { "control": { "type": "bool" } }
+        "showSignatureBoxes": { "control": { "type": "boolean" } }
       }
     }
   ]

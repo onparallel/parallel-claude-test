@@ -184,6 +184,7 @@ export type EffectivePetitionUserPermission = {
   isSubscribed: Scalars["Boolean"];
   /** The type of the permission. */
   permissionType: PetitionPermissionType;
+  user: User;
 };
 
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
@@ -546,7 +547,7 @@ export type Mutation = {
   /** Sends a reminder email to the pending signers */
   sendSignatureRequestReminders: Result;
   /** Set the delegades of a user */
-  setDelegatesUser: Result;
+  setUserDelegates: User;
   /** Sets the locale passed as arg as the preferred language of the user to see the page */
   setUserPreferredLocale: User;
   /** Shares our SignaturIt production APIKEY with the passed Org, and creates corresponding usage limits. */
@@ -1163,7 +1164,7 @@ export type MutationsendSignatureRequestRemindersArgs = {
   petitionSignatureRequestId: Scalars["GID"];
 };
 
-export type MutationsetDelegatesUserArgs = {
+export type MutationsetUserDelegatesArgs = {
   delegateIds: Array<Scalars["GID"]>;
 };
 
@@ -1552,6 +1553,8 @@ export type Petition = PetitionBase & {
   customProperties: Scalars["JSONObject"];
   /** The deadline of the petition. */
   deadline: Maybe<Scalars["DateTime"]>;
+  /** The effective permissions on the petition */
+  effectivePermissions: Array<EffectivePetitionUserPermission>;
   /** The body of the petition. */
   emailBody: Maybe<Scalars["JSON"]>;
   /** The subject of the petition. */
@@ -1575,7 +1578,7 @@ export type Petition = PetitionBase & {
   isRestrictedWithPassword: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
-  /** The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates). */
+  /** The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates). */
   myEffectivePermission: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
   name: Maybe<Scalars["String"]>;
@@ -1679,6 +1682,8 @@ export type PetitionBase = {
   createdAt: Scalars["DateTime"];
   /** Custom user properties */
   customProperties: Scalars["JSONObject"];
+  /** The effective permissions on the petition */
+  effectivePermissions: Array<EffectivePetitionUserPermission>;
   /** The body of the petition. */
   emailBody: Maybe<Scalars["JSON"]>;
   /** The subject of the petition. */
@@ -1698,7 +1703,7 @@ export type PetitionBase = {
   isRestrictedWithPassword: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
-  /** The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates). */
+  /** The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates). */
   myEffectivePermission: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
   name: Maybe<Scalars["String"]>;
@@ -2221,6 +2226,8 @@ export type PetitionTemplate = PetitionBase & {
   descriptionExcerpt: Maybe<Scalars["String"]>;
   /** HTML description of the template. */
   descriptionHtml: Maybe<Scalars["String"]>;
+  /** The effective permissions on the petition */
+  effectivePermissions: Array<EffectivePetitionUserPermission>;
   /** The body of the petition. */
   emailBody: Maybe<Scalars["JSON"]>;
   /** The subject of the petition. */
@@ -2243,7 +2250,7 @@ export type PetitionTemplate = PetitionBase & {
   isRestrictedWithPassword: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
-  /** The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates). */
+  /** The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates). */
   myEffectivePermission: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
   name: Maybe<Scalars["String"]>;
@@ -2560,7 +2567,6 @@ export type Query = {
   /** The organizations registered in Parallel. */
   organizations: OrganizationPagination;
   petition: Maybe<PetitionBase>;
-  petitionAuthToken: Maybe<Petition>;
   petitionEvents: Array<PetitionEvent>;
   /** A field of the petition. */
   petitionField: PetitionField;
@@ -2662,10 +2668,6 @@ export type QueryorganizationsArgs = {
 
 export type QuerypetitionArgs = {
   id: Scalars["GID"];
-};
-
-export type QuerypetitionAuthTokenArgs = {
-  token: Scalars["String"];
 };
 
 export type QuerypetitionEventsArgs = {
@@ -3171,10 +3173,10 @@ export type User = Timestamps & {
   canCreateUsers: Scalars["Boolean"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  /** Users that the user can send on behalf of */
+  delegateOf: Array<User>;
   /** Users that the user allows to send on their behalf */
   delegates: Array<User>;
-  /** Users that the user can send on behalf of */
-  delegatesOf: Array<User>;
   /** The email of the user. */
   email: Scalars["String"];
   /** The first name of the user. */
