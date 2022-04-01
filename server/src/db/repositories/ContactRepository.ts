@@ -38,7 +38,6 @@ export class ContactRepository extends BaseRepository {
         );
         const rows = await this.from("contact")
           .whereNull("deleted_at")
-          .where("email", "<>", "") // need this to use the index 'contact__org_id__email'
           .where((qb) => {
             for (const [orgId, emails] of byOrgId) {
               qb.orWhere((qb) => qb.where("org_id", parseInt(orgId)).whereIn("email", emails));
@@ -81,7 +80,7 @@ export class ContactRepository extends BaseRepository {
     return await this.raw<Contact>(
       /* sql */ `
       ? 
-      ON CONFLICT (org_id, email) WHERE deleted_at is NULL and email != ''
+      ON CONFLICT (org_id, email) WHERE deleted_at is NULL
       DO UPDATE SET
         -- need to do an update for the RETURNING to return the row
         email=EXCLUDED.email
@@ -111,7 +110,7 @@ export class ContactRepository extends BaseRepository {
     return await this.raw<Contact>(
       /* sql */ `
       ? 
-      ON CONFLICT (org_id, email) WHERE deleted_at is NULL and email != ''
+      ON CONFLICT (org_id, email) WHERE deleted_at is NULL
       DO UPDATE SET
         first_name = EXCLUDED.first_name,
         last_name = EXCLUDED.last_name
@@ -356,13 +355,11 @@ export class ContactRepository extends BaseRepository {
     return row;
   }
 
-  async anonymizeContacts(contacts: Contact[]) {
+  async anonymizeDeletedContacts(daysAfterDeletion: number) {
     await this.from("contact")
-      .whereIn(
-        "id",
-        contacts.map((c) => c.id)
-      )
+      .whereNotNull("deleted_at")
       .whereNull("anonymized_at")
+      .whereRaw(/* sql */ `"deleted_at" < NOW() - make_interval(days => ?)`, [daysAfterDeletion])
       .update({
         anonymized_at: this.now(),
         email: "",

@@ -1,7 +1,6 @@
 import { IncomingMessage } from "http";
 import { injectable } from "inversify";
 import { Response } from "node-fetch";
-import { Memoize } from "typescript-memoize";
 import { UserAuthenticationRepository } from "../src/db/repositories/UserAuthenticationRepository";
 import { UserRepository } from "../src/db/repositories/UserRepository";
 import { User } from "../src/db/__types";
@@ -101,13 +100,13 @@ export class MockAwsService implements IAws {
   async createCognitoUser() {
     return "";
   }
-  @Memoize() public get fileUploads() {
+  public get fileUploads() {
     return this.storage;
   }
-  @Memoize() public get publicFiles() {
+  public get publicFiles() {
     return this.storage;
   }
-  @Memoize() public get temporaryFiles() {
+  public get temporaryFiles() {
     return this.storage;
   }
 }

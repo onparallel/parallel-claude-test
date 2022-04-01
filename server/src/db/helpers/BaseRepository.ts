@@ -237,14 +237,4 @@ export class BaseRepository {
       ...tuples.flatMap((t) => t),
     ]);
   }
-
-  async getRowsToAnonymizeFrom<TName extends keyof TableTypes>(
-    table: TableTypes[TName] extends { anonymized_at: Date | null } ? TName : never, // make sure the table has "anonymized_at" column
-    days: number
-  ) {
-    return await this.from(table)
-      .whereRaw(/* sql */ `"deleted_at" < NOW() - ?::interval`, [`${days} days`])
-      .whereNull("anonymized_at")
-      .select("*");
-  }
 }

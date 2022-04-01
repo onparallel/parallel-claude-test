@@ -809,7 +809,7 @@ export class PetitionRepository extends BaseRepository {
   async deactivateAccesses(
     petitionId: number,
     accessIds: number[],
-    updatedBy?: string,
+    updatedBy: string,
     userId?: number,
     t?: Knex.Transaction
   ) {
@@ -1041,7 +1041,7 @@ export class PetitionRepository extends BaseRepository {
   async updatePetition(
     petitionIds: MaybeArray<number>,
     data: Partial<TableTypes["petition"]>,
-    updatedBy?: string,
+    updatedBy: string,
     t?: Knex.Transaction
   ) {
     const ids = unMaybeArray(petitionIds);
@@ -1505,7 +1505,7 @@ export class PetitionRepository extends BaseRepository {
    */
   async safeDeleteFileUpload(
     fileUploadIds: MaybeArray<number>,
-    deletedBy?: string,
+    deletedBy: string,
     t?: Knex.Transaction
   ) {
     const ids = unMaybeArray(fileUploadIds);
@@ -4261,12 +4261,36 @@ export class PetitionRepository extends BaseRepository {
     return petition;
   }
 
+  async getPetitionsToAnonymize(daysAfterDeletion: number) {
+    return await this.from("petition")
+      .whereNotNull("deleted_at")
+      .whereNull("anonymized_at")
+      .whereRaw(/* sql */ `"deleted_at" < NOW() - make_interval(days => ?)`, [daysAfterDeletion])
+      .select("*");
+  }
+
+  async getPetitionFieldRepliesToAnonymize(daysAfterDeletion: number) {
+    return await this.from("petition_field_reply")
+      .whereNotNull("deleted_at")
+      .whereNull("anonymized_at")
+      .whereRaw(/* sql */ `"deleted_at" < NOW() - make_interval(days => ?)`, [daysAfterDeletion])
+      .select("*");
+  }
+
+  async getPetitionFieldCommentsToAnonymize(daysAfterDeletion: number) {
+    return await this.from("petition_field_comment")
+      .whereNotNull("deleted_at")
+      .whereNull("anonymized_at")
+      .whereRaw(/* sql */ `"deleted_at" < NOW() - make_interval(days => ?)`, [daysAfterDeletion])
+      .select("*");
+  }
+
   async anonymizePetition(petitionId: number) {
     await this.withTransaction(async (t) => {
       await this.updatePetition(
         petitionId,
         { signature_config: null, anonymized_at: this.now() },
-        undefined,
+        "Worker:Anonymizer",
         t
       );
 
@@ -4301,7 +4325,7 @@ export class PetitionRepository extends BaseRepository {
         this.deactivateAccesses(
           petitionId,
           accesses.map((a) => a.id),
-          undefined,
+          "Worker:Anonymizer",
           undefined,
           t
         ),
@@ -4355,7 +4379,7 @@ export class PetitionRepository extends BaseRepository {
         `),
       });
 
-    await this.safeDeleteFileUpload(fileUploadIds, undefined, t);
+    await this.safeDeleteFileUpload(fileUploadIds, "Worker:Anonymizer", t);
 
     repliesArray.forEach(({ id }) => this.loadRepliesForField.dataloader.clear(id));
   }
@@ -4452,6 +4476,6 @@ export class PetitionRepository extends BaseRepository {
       .filter((s) => isDefined(s.file_upload_id))
       .map((s) => s.file_upload_id!);
 
-    await this.safeDeleteFileUpload(fileUploadIds, undefined, t);
+    await this.safeDeleteFileUpload(fileUploadIds, "Worker:Anonymizer", t);
   }
 }

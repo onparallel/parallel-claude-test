@@ -85,7 +85,9 @@ describe("repositories/ContactRepository", () => {
     let contacts: Contact[] = [];
 
     beforeEach(async () => {
-      contacts = await mocks.createRandomContacts(orgs[0].id, 4);
+      contacts = await mocks.createRandomContacts(orgs[0].id, 4, () => ({
+        deleted_at: new Date(),
+      }));
     });
 
     it("anonymizes passed contacts", async () => {
@@ -93,7 +95,7 @@ describe("repositories/ContactRepository", () => {
         contacts.every((c) => c.email !== "" && c.first_name !== "" && c.last_name !== "")
       ).toEqual(true);
 
-      await c.anonymizeContacts(contacts);
+      await c.anonymizeDeletedContacts(0);
 
       const contactsAfter = (await c.loadContact(contacts.map((c) => c.id))).filter(isDefined);
 
