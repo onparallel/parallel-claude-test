@@ -1753,6 +1753,7 @@ export class PetitionRepository extends BaseRepository {
             "updated_at",
             "template_public",
             "from_template_id",
+            "anonymized_at",
             // avoid copying deadline data if creating a template or cloning from a template
             ...(data?.is_template || sourcePetition?.is_template
               ? (["deadline"] as const)
@@ -1942,7 +1943,7 @@ export class PetitionRepository extends BaseRepository {
 
       await this.from("petition_field_reply", t).insert(
         [...newFileReplies, ...otherReplies].map((r) => ({
-          ...omit(r, ["id"]),
+          ...omit(r, ["id", "anonymized_at"]),
           petition_field_id: newFieldsMap[r.petition_field_id],
         }))
       );
