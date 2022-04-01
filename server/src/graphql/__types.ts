@@ -1155,6 +1155,7 @@ export interface NexusGenFieldTypes {
     fromTemplate: NexusGenRootTypes["PetitionTemplate"] | null; // PetitionTemplate
     fromTemplateId: NexusGenScalars["GID"] | null; // GID
     id: NexusGenScalars["GID"]; // GID!
+    isAnonymized: boolean; // Boolean!
     isCompletingMessageEnabled: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     isRestricted: boolean; // Boolean!
@@ -1480,6 +1481,7 @@ export interface NexusGenFieldTypes {
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     id: NexusGenScalars["GID"]; // GID!
     imageUrl: string | null; // String
+    isAnonymized: boolean; // Boolean!
     isCompletingMessageEnabled: boolean; // Boolean!
     isPublic: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
@@ -2087,6 +2089,7 @@ export interface NexusGenFieldTypes {
     fieldCount: number; // Int!
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     id: NexusGenScalars["GID"]; // GID!
+    isAnonymized: boolean; // Boolean!
     isCompletingMessageEnabled: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     isRestricted: boolean; // Boolean!
@@ -2638,6 +2641,7 @@ export interface NexusGenFieldTypeNames {
     fromTemplate: "PetitionTemplate";
     fromTemplateId: "GID";
     id: "GID";
+    isAnonymized: "Boolean";
     isCompletingMessageEnabled: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
     isRestricted: "Boolean";
@@ -2963,6 +2967,7 @@ export interface NexusGenFieldTypeNames {
     fields: "PetitionField";
     id: "GID";
     imageUrl: "String";
+    isAnonymized: "Boolean";
     isCompletingMessageEnabled: "Boolean";
     isPublic: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
@@ -3570,6 +3575,7 @@ export interface NexusGenFieldTypeNames {
     fieldCount: "Int";
     fields: "PetitionField";
     id: "GID";
+    isAnonymized: "Boolean";
     isCompletingMessageEnabled: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
     isRestricted: "Boolean";

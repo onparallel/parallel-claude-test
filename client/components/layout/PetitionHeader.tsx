@@ -315,6 +315,7 @@ export const PetitionHeader = Object.assign(
                     {me.hasPetitionPdfExport ? (
                       <MenuItem
                         onClick={() => handlePrintPdfTask(petition.id)}
+                        isDisabled={petition.isAnonymized}
                         icon={<DownloadIcon display="block" boxSize={4} />}
                       >
                         <FormattedMessage
@@ -444,6 +445,7 @@ export const PetitionHeader = Object.assign(
           deadline
           status
           isRestricted
+          isAnonymized
           myEffectivePermission {
             isSubscribed
           }

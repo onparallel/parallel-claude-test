@@ -224,6 +224,7 @@ export const PetitionBase = interfaceType({
       description: "Metadata for this petition.",
       resolve: (o) => o.metadata,
     });
+    t.boolean("isAnonymized", { resolve: (o) => o.anonymized_at !== null });
   },
   resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),
   sourceType: "db.Petition",

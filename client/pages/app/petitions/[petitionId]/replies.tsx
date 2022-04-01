@@ -494,7 +494,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             />
             <Button
               data-action="close-petition"
-              hidden={petition.status === "CLOSED"}
+              hidden={petition.status === "CLOSED" || petition.isAnonymized}
               colorScheme="green"
               leftIcon={<CheckIcon />}
               onClick={handleClosePetition}
@@ -505,7 +505,11 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               />
             </Button>
             <Button
-              hidden={petition.status !== "CLOSED" || petition.accesses.length === 0}
+              hidden={
+                petition.status !== "CLOSED" ||
+                petition.accesses.length === 0 ||
+                petition.isAnonymized
+              }
               colorScheme="blue"
               leftIcon={<ThumbUpIcon fontSize="lg" display="block" />}
               onClick={async () => {
@@ -519,7 +523,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 defaultMessage="Notify that it is correct"
               />
             </Button>
-            {showDownloadAll ? (
+            {showDownloadAll && !petition.isAnonymized ? (
               <ButtonGroup isAttached colorScheme="purple">
                 <Button
                   leftIcon={<DownloadIcon fontSize="lg" display="block" />}
@@ -591,6 +595,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 field={activeField}
                 myId={me.id}
                 hasInternalComments={me.hasInternalComments}
+                isDisabled={petition.isAnonymized}
                 onClose={() => setActiveFieldId(null)}
                 onAddComment={handleAddComment}
                 onUpdateComment={handleUpdateComment}
@@ -674,6 +679,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             layerStyle="highlightable"
             marginTop={8}
             onRefetchPetition={refetch}
+            isDisabled={petition.isAnonymized}
           />
         </Box>
       </PaneWithFlyout>
@@ -699,6 +705,7 @@ PetitionReplies.fragments = {
           id
           status
         }
+        isAnonymized
         ...PetitionSignaturesCard_Petition
         ...getPetitionSignatureStatus_Petition
         ...getPetitionSignatureEnvironment_Petition

@@ -85,6 +85,7 @@ export function PreviewPetitionField({
         petitionId,
         field,
         isTemplate: isCacheOnly,
+        isDisabled: props.isDisabled,
         tone,
       });
     } catch {}

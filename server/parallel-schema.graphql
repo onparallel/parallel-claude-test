@@ -2029,6 +2029,7 @@ type Petition implements PetitionBase {
   The ID of the petition or template.
   """
   id: GID!
+  isAnonymized: Boolean!
 
   """
   Wether the completion message will be shown to the recipients or not.
@@ -2298,6 +2299,7 @@ interface PetitionBase {
   The ID of the petition or template.
   """
   id: GID!
+  isAnonymized: Boolean!
 
   """
   Wether the completion message will be shown to the recipients or not.
@@ -3264,6 +3266,7 @@ type PetitionTemplate implements PetitionBase {
   """
   id: GID!
   imageUrl(options: ImageOptions): String
+  isAnonymized: Boolean!
 
   """
   Wether the completion message will be shown to the recipients or not.

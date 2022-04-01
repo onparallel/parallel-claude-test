@@ -120,7 +120,7 @@ export function NumberSettings({
 
   return (
     <Stack spacing={4}>
-      <FormControl as={HStack} flex={1}>
+      <FormControl as={HStack} flex={1} isDisabled={isReadOnly}>
         <FormLabel margin={0}>
           <FormattedMessage
             id="component.field-settings-number.decimals"
@@ -149,8 +149,8 @@ export function NumberSettings({
           </NumberInput>
         </Box>
       </FormControl>
-      <FormControl isInvalid={isRangeInvalid}>
-        <Text display="flex" alignItems="center" fontWeight="normal" marginBottom={2}>
+      <FormControl isInvalid={isRangeInvalid} isDisabled={isReadOnly}>
+        <FormLabel display="flex" alignItems="center" fontWeight="normal" marginBottom={2}>
           <FormattedMessage
             id="component.field-settings-number.limit-range"
             defaultMessage="Limit value range"
@@ -163,7 +163,8 @@ export function NumberSettings({
               />
             }
           </HelpPopover>
-        </Text>
+        </FormLabel>
+
         <Stack
           spacing={{ base: 4, md: 2, lg: 4 }}
           direction={{ base: "row", md: "column", lg: "row" }}
@@ -265,6 +266,7 @@ export function NumberSettings({
                 borderRadius="md"
                 value={prefixOption}
                 onChange={handleChangePrefixOption}
+                isDisabled={isReadOnly}
               >
                 <option value="suffix">
                   {intl.formatMessage({
@@ -285,6 +287,7 @@ export function NumberSettings({
               size="sm"
               placeholder="%, €, $..."
               value={prefixValue}
+              isDisabled={isReadOnly}
               onChange={(e) => setPrefixValue(e.target.value)}
               onBlur={() => handlePrefixBlur(prefixOption)}
             />

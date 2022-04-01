@@ -74,7 +74,8 @@ export function PetitionAccessesTable({
     onConfigureReminders(selected);
   }, [selected]);
 
-  const showActions = selection.length > 0 && selected.every((a) => a.status === "ACTIVE");
+  const showActions =
+    !petition.isAnonymized && selection.length > 0 && selected.every((a) => a.status === "ACTIVE");
 
   const columns = usePetitionAccessesColumns();
   const context = useMemo(
@@ -106,7 +107,8 @@ export function PetitionAccessesTable({
                     <MenuItem
                       isDisabled={
                         petition.status !== "PENDING" ||
-                        selected.some((a) => a.status === "INACTIVE")
+                        selected.some((a) => a.status === "INACTIVE") ||
+                        petition.isAnonymized
                       }
                       onClick={handleSendReminders}
                       icon={<BellIcon display="block" boxSize={4} />}
@@ -120,7 +122,8 @@ export function PetitionAccessesTable({
                       isDisabled={
                         petition.status !== "PENDING" ||
                         selected.some((a) => a.status === "INACTIVE") ||
-                        optedOut.length === selected.length
+                        optedOut.length === selected.length ||
+                        petition.isAnonymized
                       }
                       onClick={handleConfigureReminders}
                       icon={<SettingsIcon display="block" boxSize={4} />}
@@ -134,7 +137,11 @@ export function PetitionAccessesTable({
                 </Portal>
               </Menu>
             ) : null}
-            <Button leftIcon={<UserPlusIcon fontSize="18px" />} onClick={onAddPetitionAccess}>
+            <Button
+              leftIcon={<UserPlusIcon fontSize="18px" />}
+              onClick={onAddPetitionAccess}
+              isDisabled={petition.isAnonymized}
+            >
               {intl.formatMessage({
                 id: "petition.add-recipient-button",
                 defaultMessage: "Add recipient",
@@ -167,17 +174,19 @@ export function PetitionAccessesTable({
                     defaultMessage="You haven't sent this petition yet."
                   />
                 </Text>
-                <Text>
-                  <FormattedMessage
-                    id="petition-access.click-here-to-send"
-                    defaultMessage="Click <a>here</a> to send it."
-                    values={{
-                      a: (chunks: any) => (
-                        <NormalLink onClick={onPetitionSend}>{chunks}</NormalLink>
-                      ),
-                    }}
-                  />
-                </Text>
+                {!petition.isAnonymized ? (
+                  <Text>
+                    <FormattedMessage
+                      id="petition-access.click-here-to-send"
+                      defaultMessage="Click <a>here</a> to send it."
+                      values={{
+                        a: (chunks: any) => (
+                          <NormalLink onClick={onPetitionSend}>{chunks}</NormalLink>
+                        ),
+                      }}
+                    />
+                  </Text>
+                ) : null}
               </Stack>
             </Center>
           </>
@@ -325,7 +334,7 @@ function usePetitionAccessesColumns(): TableColumn<
               {status === "ACTIVE" ? (
                 <>
                   <IconButtonWithTooltip
-                    isDisabled={petition.status !== "PENDING"}
+                    isDisabled={petition.status !== "PENDING" || petition.isAnonymized}
                     label={intl.formatMessage({
                       id: "petition-accesses.send-reminder",
                       defaultMessage: "Send reminder",
@@ -336,7 +345,9 @@ function usePetitionAccessesColumns(): TableColumn<
                     size="sm"
                   />
                   <IconButtonWithTooltip
-                    isDisabled={petition.status !== "PENDING" || remindersOptOut}
+                    isDisabled={
+                      petition.status !== "PENDING" || remindersOptOut || petition.isAnonymized
+                    }
                     label={intl.formatMessage({
                       id: "petition-accesses.reminder-settings",
                       defaultMessage: "Reminder settings",
@@ -355,6 +366,7 @@ function usePetitionAccessesColumns(): TableColumn<
                     placement="bottom"
                     icon={<UserXIcon fontSize="16px" />}
                     size="sm"
+                    isDisabled={petition.isAnonymized}
                   />
                 </>
               ) : (
@@ -367,6 +379,7 @@ function usePetitionAccessesColumns(): TableColumn<
                   placement="left"
                   icon={<UserCheckIcon fontSize="16px" />}
                   size="sm"
+                  isDisabled={petition.isAnonymized}
                 />
               )}
             </Stack>
@@ -385,6 +398,7 @@ PetitionAccessesTable.fragments = {
       accesses {
         ...PetitionAccessTable_PetitionAccess
       }
+      isAnonymized
     }
     fragment PetitionAccessTable_PetitionAccessRemindersConfig on RemindersConfig {
       offset

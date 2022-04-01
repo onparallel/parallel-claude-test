@@ -40,6 +40,7 @@ export interface PetitionSignaturesCardProps {
   petition: PetitionSignaturesCard_PetitionFragment;
   user: PetitionSignaturesCard_UserFragment;
   onRefetchPetition: () => void;
+  isDisabled: boolean;
 }
 
 const fragments = {
@@ -137,7 +138,7 @@ const mutations = [
 
 export const PetitionSignaturesCard = Object.assign(
   chakraForwardRef<"section", PetitionSignaturesCardProps>(function PetitionSignaturesCard(
-    { petition, user, onRefetchPetition, ...props },
+    { petition, user, isDisabled, onRefetchPetition, ...props },
     ref
   ) {
     usePetitionSignaturesCardPolling(petition);
@@ -309,6 +310,7 @@ export const PetitionSignaturesCard = Object.assign(
             current?.status === "COMPLETED" ||
             current?.status === "CANCELLED" ? (
               <IconButtonWithTooltip
+                isDisabled={isDisabled}
                 label={intl.formatMessage({
                   id: "component.petition-signatures-card.add-signature.label",
                   defaultMessage: "Add signature",

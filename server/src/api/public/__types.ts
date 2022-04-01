@@ -1701,6 +1701,7 @@ export type Petition = PetitionBase & {
   fromTemplateId: Maybe<Scalars["GID"]>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
+  isAnonymized: Scalars["Boolean"];
   /** Wether the completion message will be shown to the recipients or not. */
   isCompletingMessageEnabled: Scalars["Boolean"];
   /**
@@ -1835,6 +1836,7 @@ export type PetitionBase = {
   fields: Array<PetitionField>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
+  isAnonymized: Scalars["Boolean"];
   /** Wether the completion message will be shown to the recipients or not. */
   isCompletingMessageEnabled: Scalars["Boolean"];
   /**
@@ -2394,6 +2396,7 @@ export type PetitionTemplate = PetitionBase & {
   /** The ID of the petition or template. */
   id: Scalars["GID"];
   imageUrl: Maybe<Scalars["String"]>;
+  isAnonymized: Scalars["Boolean"];
   /** Wether the completion message will be shown to the recipients or not. */
   isCompletingMessageEnabled: Scalars["Boolean"];
   /** Whether the template is publicly available or not */

@@ -375,7 +375,7 @@ function _PetitionSettings({
 
   const restrictEditingSwitch = (
     <SettingsRowSwitch
-      isDisabled={isPublicTemplate}
+      isDisabled={isPublicTemplate || petition.isAnonymized}
       icon={petition.isRestricted ? <LockClosedIcon /> : <LockOpenIcon />}
       label={
         <FormattedMessage
@@ -464,7 +464,7 @@ function _PetitionSettings({
       )}
       <SettingsRow
         controlId="petition-locale"
-        isDisabled={petition.isRestricted}
+        isDisabled={petition.isRestricted || petition.isAnonymized}
         icon={<EmailIcon />}
         label={
           <FormattedMessage
@@ -481,7 +481,7 @@ function _PetitionSettings({
             minWidth="120px"
             value={petition.locale}
             onChange={(event) => onUpdatePetition({ locale: event.target.value as any })}
-            isDisabled={petition.isRestricted || isPublicTemplate}
+            isDisabled={petition.isRestricted || isPublicTemplate || petition.isAnonymized}
           >
             {locales.map((locale) => (
               <option key={locale.key} value={locale.key}>
@@ -496,6 +496,7 @@ function _PetitionSettings({
           controlId="petition-deadline"
           isActive={Boolean(petition.deadline)}
           icon={<FieldDateIcon />}
+          isDisabled={petition.isAnonymized}
           label={<FormattedMessage id="petition.deadline-label" defaultMessage="Deadline" />}
           description={
             <FormattedMessage
@@ -539,7 +540,7 @@ function _PetitionSettings({
       {petition.signatureConfig || hasSignature ? (
         <SettingsRowButton
           data-section="esignature-settings"
-          isDisabled={!hasSignature || isPublicTemplate}
+          isDisabled={!hasSignature || isPublicTemplate || petition.isAnonymized}
           icon={<SignatureIcon />}
           label={
             <HStack>
@@ -586,7 +587,7 @@ function _PetitionSettings({
       ) : null}
       {user.hasSkipForwardSecurity ? (
         <SettingsRowSwitch
-          isDisabled={isPublicTemplate}
+          isDisabled={isPublicTemplate || petition.isAnonymized}
           icon={<ShieldIcon />}
           label={
             <FormattedMessage
@@ -607,7 +608,7 @@ function _PetitionSettings({
       ) : null}
       {user.hasHideRecipientViewContents ? (
         <SettingsRowSwitch
-          isDisabled={isPublicTemplate}
+          isDisabled={isPublicTemplate || petition.isAnonymized}
           icon={<ListIcon />}
           label={
             <FormattedMessage
@@ -729,6 +730,7 @@ const fragments = {
           ...TemplateDefaultPermissionsDialog_TemplateDefaultPermission
         }
       }
+      isAnonymized
     }
     ${SignatureConfigDialog.fragments.PetitionBase}
     ${PublicLinkSettingsDialog.fragments.PetitionTemplate}

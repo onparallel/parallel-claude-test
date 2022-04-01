@@ -47,6 +47,7 @@ interface PreviewPetitionFieldCommentsDialogProps {
   field: PreviewPetitionField_PetitionFieldFragment;
   isTemplate?: boolean;
   tone: Tone;
+  isDisabled: boolean;
 }
 
 export function PreviewPetitionFieldCommentsDialog({
@@ -54,6 +55,7 @@ export function PreviewPetitionFieldCommentsDialog({
   field,
   isTemplate,
   tone,
+  isDisabled,
   ...props
 }: DialogProps<PreviewPetitionFieldCommentsDialogProps>) {
   const intl = useIntl();
@@ -306,7 +308,7 @@ export function PreviewPetitionFieldCommentsDialog({
             value={draft}
             onKeyDown={handleKeyDown as any}
             onChange={handleDraftChange as any}
-            isDisabled={!hasCommentsEnabled && !hasInternalComments}
+            isDisabled={isDisabled || (!hasCommentsEnabled && !hasInternalComments)}
             {...inputFocusBind}
           />
           <PaddedCollapse in={isExpanded}>

@@ -1744,6 +1744,7 @@ export interface Petition extends PetitionBase {
   fromTemplateId?: Maybe<Scalars["GID"]>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
+  isAnonymized: Scalars["Boolean"];
   /** Wether the completion message will be shown to the recipients or not. */
   isCompletingMessageEnabled: Scalars["Boolean"];
   /**
@@ -1882,6 +1883,7 @@ export interface PetitionBase {
   fields: Array<PetitionField>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
+  isAnonymized: Scalars["Boolean"];
   /** Wether the completion message will be shown to the recipients or not. */
   isCompletingMessageEnabled: Scalars["Boolean"];
   /**
@@ -2469,6 +2471,7 @@ export interface PetitionTemplate extends PetitionBase {
   /** The ID of the petition or template. */
   id: Scalars["GID"];
   imageUrl?: Maybe<Scalars["String"]>;
+  isAnonymized: Scalars["Boolean"];
   /** Wether the completion message will be shown to the recipients or not. */
   isCompletingMessageEnabled: Scalars["Boolean"];
   /** Whether the template is publicly available or not */
@@ -4249,6 +4252,7 @@ export type PetitionHeader_PetitionFragment = {
   deadline?: string | null;
   status: PetitionStatus;
   isRestricted: boolean;
+  isAnonymized: boolean;
   name?: string | null;
   updatedAt: string;
   myEffectivePermission?: {
@@ -4298,6 +4302,7 @@ export type PetitionLayout_PetitionBase_Petition_Fragment = {
   deadline?: string | null;
   status: PetitionStatus;
   isRestricted: boolean;
+  isAnonymized: boolean;
   updatedAt: string;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
@@ -5213,6 +5218,7 @@ export type EmailEventsIndicator_SignatureStartedEventFragment = {
 export type PetitionAccessTable_PetitionFragment = {
   __typename?: "Petition";
   status: PetitionStatus;
+  isAnonymized: boolean;
   accesses: Array<{
     __typename?: "PetitionAccess";
     id: string;
@@ -8344,6 +8350,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
   isRecipientViewContentsHidden: boolean;
   isRestricted: boolean;
   isRestrictedWithPassword: boolean;
+  isAnonymized: boolean;
   name?: string | null;
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
@@ -8406,6 +8413,7 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   isRecipientViewContentsHidden: boolean;
   isRestricted: boolean;
   isRestrictedWithPassword: boolean;
+  isAnonymized: boolean;
   name?: string | null;
   remindersConfig?: {
     __typename?: "RemindersConfig";
@@ -12401,6 +12409,7 @@ export type PetitionActivity_PetitionFragment = {
   id: string;
   name?: string | null;
   status: PetitionStatus;
+  isAnonymized: boolean;
   emailSubject?: string | null;
   emailBody?: any | null;
   locale: PetitionLocale;
@@ -13182,6 +13191,7 @@ export type PetitionActivity_updatePetitionMutation = {
         id: string;
         name?: string | null;
         status: PetitionStatus;
+        isAnonymized: boolean;
         emailSubject?: string | null;
         emailBody?: any | null;
         locale: PetitionLocale;
@@ -14027,6 +14037,7 @@ export type PetitionActivity_petitionQuery = {
         id: string;
         name?: string | null;
         status: PetitionStatus;
+        isAnonymized: boolean;
         emailSubject?: string | null;
         emailBody?: any | null;
         locale: PetitionLocale;
@@ -14850,6 +14861,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   id: string;
   tone: Tone;
   isRestricted: boolean;
+  isAnonymized: boolean;
   name?: string | null;
   deadline?: string | null;
   fromTemplateId?: string | null;
@@ -14982,6 +14994,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   id: string;
   tone: Tone;
   isRestricted: boolean;
+  isAnonymized: boolean;
   name?: string | null;
   locale: PetitionLocale;
   skipForwardSecurity: boolean;
@@ -15211,6 +15224,7 @@ export type PetitionCompose_updatePetitionMutation = {
         isRecipientViewContentsHidden: boolean;
         isRestricted: boolean;
         isRestrictedWithPassword: boolean;
+        isAnonymized: boolean;
         emailSubject?: string | null;
         emailBody?: any | null;
         updatedAt: string;
@@ -15307,6 +15321,7 @@ export type PetitionCompose_updatePetitionMutation = {
         isRecipientViewContentsHidden: boolean;
         isRestricted: boolean;
         isRestrictedWithPassword: boolean;
+        isAnonymized: boolean;
         updatedAt: string;
         remindersConfig?: {
           __typename?: "RemindersConfig";
@@ -15401,6 +15416,7 @@ export type PetitionCompose_updateFieldPositionsMutation = {
         deadline?: string | null;
         status: PetitionStatus;
         isRestricted: boolean;
+        isAnonymized: boolean;
         updatedAt: string;
         fields: Array<{ __typename?: "PetitionField"; id: string }>;
         myEffectivePermission?: {
@@ -15453,6 +15469,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
           deadline?: string | null;
           status: PetitionStatus;
           isRestricted: boolean;
+          isAnonymized: boolean;
           updatedAt: string;
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
           myEffectivePermission?: {
@@ -15522,6 +15539,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           deadline?: string | null;
           status: PetitionStatus;
           isRestricted: boolean;
+          isAnonymized: boolean;
           updatedAt: string;
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
           myEffectivePermission?: {
@@ -15575,6 +15593,7 @@ export type PetitionCompose_deletePetitionFieldMutation = {
         deadline?: string | null;
         status: PetitionStatus;
         isRestricted: boolean;
+        isAnonymized: boolean;
         updatedAt: string;
         fields: Array<{ __typename?: "PetitionField"; id: string }>;
         myEffectivePermission?: {
@@ -15761,6 +15780,7 @@ export type PetitionCompose_petitionQuery = {
         id: string;
         tone: Tone;
         isRestricted: boolean;
+        isAnonymized: boolean;
         name?: string | null;
         deadline?: string | null;
         fromTemplateId?: string | null;
@@ -15896,6 +15916,7 @@ export type PetitionCompose_petitionQuery = {
         id: string;
         tone: Tone;
         isRestricted: boolean;
+        isAnonymized: boolean;
         name?: string | null;
         locale: PetitionLocale;
         skipForwardSecurity: boolean;
@@ -16036,6 +16057,7 @@ export type PetitionMessages_PetitionBase_Petition_Fragment = {
   deadline?: string | null;
   status: PetitionStatus;
   isRestricted: boolean;
+  isAnonymized: boolean;
   updatedAt: string;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
@@ -16152,6 +16174,7 @@ export type PetitionMessages_petitionQuery = {
         deadline?: string | null;
         status: PetitionStatus;
         isRestricted: boolean;
+        isAnonymized: boolean;
         updatedAt: string;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -16194,6 +16217,7 @@ export type PetitionMessages_updatePetitionMutation = {
         deadline?: string | null;
         status: PetitionStatus;
         isRestricted: boolean;
+        isAnonymized: boolean;
         updatedAt: string;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -16223,6 +16247,7 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
   tone: Tone;
+  isAnonymized: boolean;
   status: PetitionStatus;
   name?: string | null;
   emailSubject?: string | null;
@@ -16378,6 +16403,7 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
   tone: Tone;
+  isAnonymized: boolean;
   name?: string | null;
   locale: PetitionLocale;
   isPublic: boolean;
@@ -16521,6 +16547,7 @@ export type PetitionPreview_updatePetitionMutation = {
         __typename?: "Petition";
         id: string;
         tone: Tone;
+        isAnonymized: boolean;
         status: PetitionStatus;
         name?: string | null;
         emailSubject?: string | null;
@@ -16679,6 +16706,7 @@ export type PetitionPreview_updatePetitionMutation = {
         __typename?: "PetitionTemplate";
         id: string;
         tone: Tone;
+        isAnonymized: boolean;
         name?: string | null;
         locale: PetitionLocale;
         isPublic: boolean;
@@ -16784,6 +16812,7 @@ export type PetitionPreview_completePetitionMutation = {
     __typename?: "Petition";
     id: string;
     tone: Tone;
+    isAnonymized: boolean;
     status: PetitionStatus;
     name?: string | null;
     emailSubject?: string | null;
@@ -16946,6 +16975,7 @@ export type PetitionPreview_petitionQuery = {
         __typename?: "Petition";
         id: string;
         tone: Tone;
+        isAnonymized: boolean;
         status: PetitionStatus;
         name?: string | null;
         emailSubject?: string | null;
@@ -17104,6 +17134,7 @@ export type PetitionPreview_petitionQuery = {
         __typename?: "PetitionTemplate";
         id: string;
         tone: Tone;
+        isAnonymized: boolean;
         name?: string | null;
         locale: PetitionLocale;
         isPublic: boolean;
@@ -17244,6 +17275,7 @@ export type PetitionPreview_userQuery = {
 export type PetitionReplies_PetitionFragment = {
   __typename?: "Petition";
   id: string;
+  isAnonymized: boolean;
   name?: string | null;
   status: PetitionStatus;
   closingEmailBody?: any | null;
@@ -17535,6 +17567,7 @@ export type PetitionReplies_updatePetitionMutation = {
         deadline?: string | null;
         status: PetitionStatus;
         isRestricted: boolean;
+        isAnonymized: boolean;
         updatedAt: string;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
@@ -17560,6 +17593,7 @@ export type PetitionReplies_closePetitionMutation = {
   closePetition: {
     __typename?: "Petition";
     id: string;
+    isAnonymized: boolean;
     name?: string | null;
     status: PetitionStatus;
     closingEmailBody?: any | null;
@@ -17736,6 +17770,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
   approveOrRejectPetitionFieldReplies: {
     __typename?: "Petition";
     id: string;
+    isAnonymized: boolean;
     name?: string | null;
     status: PetitionStatus;
     closingEmailBody?: any | null;
@@ -18015,6 +18050,7 @@ export type PetitionReplies_petitionQuery = {
     | {
         __typename?: "Petition";
         id: string;
+        isAnonymized: boolean;
         name?: string | null;
         status: PetitionStatus;
         closingEmailBody?: any | null;
@@ -21891,6 +21927,7 @@ export const PetitionHeader_PetitionFragmentDoc = gql`
     deadline
     status
     isRestricted
+    isAnonymized
     myEffectivePermission {
       isSubscribed
     }
@@ -21956,6 +21993,7 @@ export const PetitionAccessTable_PetitionFragmentDoc = gql`
     accesses {
       ...PetitionAccessTable_PetitionAccess
     }
+    isAnonymized
   }
   ${PetitionAccessTable_PetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<PetitionAccessTable_PetitionFragment, unknown>;
@@ -23231,6 +23269,7 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
         ...TemplateDefaultPermissionsDialog_TemplateDefaultPermission
       }
     }
+    isAnonymized
   }
   ${SignatureConfigDialog_PetitionBaseFragmentDoc}
   ${PublicLinkSettingsDialog_PetitionTemplateFragmentDoc}
@@ -23390,6 +23429,7 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
       isPublic
       description
     }
+    isAnonymized
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionSettings_PetitionBaseFragmentDoc}
@@ -23761,6 +23801,7 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
   fragment PetitionPreview_PetitionBase on PetitionBase {
     id
     tone
+    isAnonymized
     ... on Petition {
       accesses {
         id
@@ -24066,6 +24107,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
       id
       status
     }
+    isAnonymized
     ...PetitionSignaturesCard_Petition
     ...getPetitionSignatureStatus_Petition
     ...getPetitionSignatureEnvironment_Petition

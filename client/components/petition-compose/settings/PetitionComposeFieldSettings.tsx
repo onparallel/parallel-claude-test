@@ -289,7 +289,13 @@ export function PetitionComposeFieldSettings({
       </Stack>
       {field.type !== "HEADING" ? (
         <Stack padding={4} paddingTop={2} spacing={3}>
-          <Heading flex="1" as="h4" size="sm" overflowWrap="anywhere">
+          <Heading
+            flex="1"
+            as="h4"
+            size="sm"
+            overflowWrap="anywhere"
+            textStyle={isReadOnly ? "muted" : undefined}
+          >
             <FormattedMessage id="petition.advanced-options" defaultMessage="Advanced options" />
           </Heading>
           <SettingsRowAlias

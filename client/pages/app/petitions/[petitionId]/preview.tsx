@@ -286,6 +286,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               id="petition-next"
               colorScheme="purple"
               icon={<PaperPlaneIcon fontSize="18px" />}
+              isDisabled={petition.isAnonymized}
               label={intl.formatMessage({
                 id: "generic.send-to",
                 defaultMessage: "Send to...",
@@ -355,7 +356,9 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                         key={field.id}
                         petitionId={petition.id}
                         field={field}
-                        isDisabled={isPetition && petition.status === "CLOSED"}
+                        isDisabled={
+                          (isPetition && petition.status === "CLOSED") || petition.isAnonymized
+                        }
                         isInvalid={
                           finalized && completedFieldReplies(field).length === 0 && !field.optional
                         }
@@ -379,7 +382,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             <RecipientViewProgressFooter
               petition={petition}
               onFinalize={handleFinalize}
-              isDisabled={displayPetitionLimitReachedAlert}
+              isDisabled={displayPetitionLimitReachedAlert || petition.isAnonymized}
             />
           )}
         </Flex>
@@ -393,6 +396,7 @@ PetitionPreview.fragments = {
     fragment PetitionPreview_PetitionBase on PetitionBase {
       id
       tone
+      isAnonymized
       ... on Petition {
         accesses {
           id

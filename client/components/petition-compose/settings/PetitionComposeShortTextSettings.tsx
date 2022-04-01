@@ -43,7 +43,7 @@ export function ShortTextSettings({
     <Stack spacing={4}>
       <Stack>
         <HStack spacing={4}>
-          <Text>
+          <Text textStyle={isReadOnly ? "muted" : undefined}>
             <FormattedMessage
               id="component.petition-compose-text-settings.format"
               defaultMessage="Format:"

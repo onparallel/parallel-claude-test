@@ -128,7 +128,7 @@ export function RecipientViewProgressFooter({
       </Flex>
       <Popover
         returnFocusOnClose={false}
-        isOpen={replied + optional === total && !isCompleted && !poppoverClosed}
+        isOpen={!isDisabled && replied + optional === total && !isCompleted && !poppoverClosed}
         placement="top-end"
         closeOnBlur={false}
         onClose={() => setPoppoverClosed(true)}

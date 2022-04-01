@@ -438,6 +438,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               id="petition-next"
               colorScheme="purple"
               icon={<PaperPlaneIcon fontSize="18px" />}
+              isDisabled={petition.isAnonymized}
               label={intl.formatMessage({
                 id: "generic.send-to",
                 defaultMessage: "Send to...",
@@ -472,7 +473,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   onFieldEdit={handleFieldEdit}
                   onFieldTypeChange={handleFieldTypeChange}
                   onClose={handleSettingsClose}
-                  isReadOnly={petition.isRestricted || isPublicTemplate}
+                  isReadOnly={petition.isRestricted || isPublicTemplate || petition.isAnonymized}
                   user={me}
                 />
               ) : (
@@ -535,7 +536,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               onFieldEdit={handleFieldEdit}
               onFieldSettingsClick={handleFieldSettingsClick}
               onFieldTypeIndicatorClick={handleFieldTypeIndicatorClick}
-              isReadOnly={petition.isRestricted || isPublicTemplate}
+              isReadOnly={petition.isRestricted || isPublicTemplate || petition.isAnonymized}
               isPublicTemplate={isPublicTemplate}
               isTemplate={petition?.__typename === "PetitionTemplate"}
             />
@@ -606,6 +607,7 @@ PetitionCompose.fragments = {
           isPublic
           description
         }
+        isAnonymized
       }
       ${useSendPetitionHandler.fragments.Petition}
       ${PetitionLayout.fragments.PetitionBase}

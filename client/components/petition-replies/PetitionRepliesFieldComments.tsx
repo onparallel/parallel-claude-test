@@ -29,6 +29,7 @@ export interface PetitionRepliesFieldCommentsProps {
   onUpdateComment: (petitionFieldCommentId: string, content: string) => void;
   onMarkAsUnread: (petitionFieldCommentId: string) => void;
   onClose: () => void;
+  isDisabled: boolean;
 }
 
 export function PetitionRepliesFieldComments({
@@ -41,6 +42,7 @@ export function PetitionRepliesFieldComments({
   onUpdateComment,
   onMarkAsUnread,
   onClose,
+  isDisabled,
 }: PetitionRepliesFieldCommentsProps) {
   const intl = useIntl();
 
@@ -199,7 +201,7 @@ export function PetitionRepliesFieldComments({
             id: "petition-replies.field-comments.placeholder",
             defaultMessage: "Type a new comment",
           })}
-          isDisabled={!hasCommentsEnabled && !hasInternalComments}
+          isDisabled={isDisabled || (!hasCommentsEnabled && !user.hasInternalComments)}
           value={draft}
           onKeyDown={handleKeyDown as any}
           onChange={handleDraftChange as any}
