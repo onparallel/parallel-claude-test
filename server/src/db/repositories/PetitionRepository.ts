@@ -4372,9 +4372,24 @@ export class PetitionRepository extends BaseRepository {
         content: this.knex.raw(/* sql */ `
           case "type"
             when 'FILE_UPLOAD' then
-            content || '{"file_upload_id": null}'::jsonb
+              content || jsonb_build_object('file_upload_id', null)
+            -- for CHECKBOX, replace replies in content.value array with null
+            when 'CHECKBOX' then
+              content || jsonb_build_object('value', 
+                array_to_json(array_fill(null::jsonb, array[jsonb_array_length("content"->'value')]))
+              )
+            -- for DYNAMIC_SELECT, replace content.value with [null,null][]
+            when 'DYNAMIC_SELECT' then
+              content || jsonb_build_object('value', 
+                array_to_json(
+                  array_fill(
+                    array_to_json(array_fill(null::jsonb, array[2])),
+                      array[jsonb_array_length("content"->'value')]
+                  )
+                )
+              )
             else 
-              content || '{"value": null}'::jsonb
+              content || jsonb_build_object('value', null)
             end
         `),
       });

@@ -97,9 +97,10 @@ describe("repositories/ContactRepository", () => {
 
       await c.anonymizeDeletedContacts(0);
 
-      const contactsAfter = (await c.loadContact(contacts.map((c) => c.id))).filter(isDefined);
-
-      expect(contactsAfter.length).toEqual(contacts.length);
+      const contactsAfter = await knex.from("contact").whereIn(
+        "id",
+        contacts.map((c) => c.id)
+      );
 
       expect(
         contactsAfter.every(

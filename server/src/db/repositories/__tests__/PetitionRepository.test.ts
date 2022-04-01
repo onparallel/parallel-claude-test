@@ -881,7 +881,7 @@ describe("repositories/PetitionRepository", () => {
         }));
 
         fields = await mocks.createRandomPetitionFields(petition.id, 20, (i) => ({
-          type: i < 5 ? "FILE_UPLOAD" : undefined,
+          type: i < 5 ? "FILE_UPLOAD" : i === 10 ? "CHECKBOX" : undefined,
         }));
 
         const contacts = await mocks.createRandomContacts(organization.id, 4);
@@ -922,8 +922,11 @@ describe("repositories/PetitionRepository", () => {
             }));
             fileUploadIds.push(...fileReplies.map((r) => r.content.file_upload_id));
           } else {
+            const { type } = fields[i];
             await mocks.createRandomTextReply(fields[i].id, undefined, 3, () => ({
               user_id: user.id,
+              type,
+              content: { value: type === "CHECKBOX" ? ["1", "2"] : faker.lorem.words(10) },
             }));
           }
         }
@@ -937,6 +940,10 @@ describe("repositories/PetitionRepository", () => {
           expect(reply.anonymized_at).not.toBeNull();
           if (reply.type === "FILE_UPLOAD") {
             expect(reply.content.file_upload_id).toBeNull();
+          } else if (reply.type === "CHECKBOX") {
+            expect(Array.isArray(reply.content.value)).toEqual(true);
+            expect((reply.content.value as any[]).length).toBeGreaterThan(0);
+            expect((reply.content.value as any[]).every((v) => v === null)).toEqual(true);
           } else {
             expect(reply.content.value).toBeNull();
           }
