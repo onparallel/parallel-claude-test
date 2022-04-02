@@ -1,11 +1,14 @@
 import { ApolloClient, FieldMergeFunction, from, InMemoryCache } from "@apollo/client";
+import { BatchHttpLink } from "@apollo/client/link/batch-http";
 import { setContext } from "@apollo/client/link/context";
+import { split } from "@apollo/client/link/core";
 import { onError } from "@apollo/client/link/error";
 import { getOperationName } from "@apollo/client/utilities";
 import fragmentMatcher from "@parallel/graphql/__fragment-matcher";
 import { Login_currentUserDocument } from "@parallel/graphql/__types";
 import { createUploadLink } from "apollo-upload-client";
 import { parse as parseCookie, serialize as serializeCookie } from "cookie";
+import { DefinitionNode, Kind, OperationDefinitionNode, OperationTypeNode } from "graphql";
 import { IncomingMessage } from "http";
 import Router from "next/router";
 import { filter, indexBy, map, pick, pipe, sortBy, uniqBy } from "remeda";
@@ -52,9 +55,18 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
     return _cached;
   }
 
-  const httpLink = createUploadLink({
-    uri: typeof window !== "undefined" ? "/graphql" : "http://localhost:4000/graphql",
-  });
+  const uri = typeof window !== "undefined" ? "/graphql" : "http://localhost:4000/graphql";
+  const isDefinitionNode = (node: DefinitionNode): node is OperationDefinitionNode =>
+    node.kind === Kind.OPERATION_DEFINITION;
+  const terminalLink = split(
+    (op) => {
+      const definition = op.query.definitions.find(isDefinitionNode);
+      return definition?.operation === OperationTypeNode.QUERY;
+    },
+    // Batch requests happening concurrently
+    new BatchHttpLink({ uri, batchInterval: 0 }),
+    createUploadLink({ uri })
+  );
 
   const authLink = setContext((_, { headers }) => {
     return {
@@ -84,7 +96,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
   });
 
   const client = new ApolloClient({
-    link: from([authLink, authErrorHandler, httpLink]),
+    link: from([authLink, authErrorHandler, terminalLink]),
     ssrMode: typeof window === "undefined",
     cache: new InMemoryCache({
       dataIdFromObject: (o) => o.id as string,
