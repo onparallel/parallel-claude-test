@@ -28,7 +28,7 @@ export class MockAuth implements IAuth {
   async validateRequestAuthentication(req: IncomingMessage) {
     if (req.headers.authorization?.startsWith("Bearer ")) {
       const token = req.headers.authorization.replace(/^Bearer /, "");
-      return await this.userAuthentication.getUserFromUat(token);
+      return [await this.userAuthentication.getUserFromUat(token)] as [User];
     }
     // TODO manage users.length >1
     const [user] = await this.users.loadUsersByCognitoId(USER_COGNITO_ID);

@@ -4,6 +4,7 @@ import {
   ContextDataType,
 } from "aws-sdk/clients/cognitoidentityserviceprovider";
 import { parse as parseCookie } from "cookie";
+import DataLoader from "dataloader";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { IncomingMessage } from "http";
 import { inject, injectable } from "inversify";
@@ -24,6 +25,7 @@ import { SystemRepository } from "../db/repositories/SystemRepository";
 import { UserAuthenticationRepository } from "../db/repositories/UserAuthenticationRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
 import { User } from "../db/__types";
+import { fromDataLoader } from "../util/fromDataLoader";
 import { withError } from "../util/promises/withError";
 import { random } from "../util/token";
 import { MaybePromise } from "../util/types";
@@ -537,64 +539,87 @@ export class Auth implements IAuth {
     return null;
   }
 
-  private async validateSession(req: IncomingMessage): Promise<[User] | [User, User] | null> {
-    try {
-      const token = this.getSessionToken(req);
-      if (!token) {
-        return null;
-      }
-      const idToken = await this.redis.get(`session:${token}:idToken`);
-      if (idToken === null) {
-        return null;
-      }
-      const payload = decode(idToken) as any;
-      const expiresAt = payload["exp"] as number;
-      const cognitoId = payload["cognito:username"] as string;
-      if (Date.now() > expiresAt * 1000) {
-        const refreshToken = await this.redis.get(`session:${token}:refreshToken`);
-        if (refreshToken === null) {
-          return null;
-        }
-        const auth = await this.refreshToken(refreshToken, req);
-        if (auth.AuthenticationResult) {
-          await this.updateSession(token, auth.AuthenticationResult as any);
-        } else {
-          return null;
-        }
-      }
-      const meta = await this.redis.get(`session:${token}:meta`);
-      const users = await this.users.loadUsersByCognitoId(cognitoId);
-      if (isDefined(meta)) {
-        const { userId, asUserId } = JSON.parse(meta) as { userId: number; asUserId?: number };
-        const user = users.find((u) => u.id === userId);
-        if (!isDefined(user)) {
-          // who dis
-          return null;
-        }
-        if (isDefined(asUserId)) {
-          // make sure user can ghost login
-          if (!userHasRole(user, "ADMIN")) {
-            // can't ghost login if not admin
-            return null;
-          }
-          const org = (await this.orgs.loadOrg(user.org_id))!;
-          const asUser = await this.users.loadUser(asUserId);
-          if (!isDefined(asUser)) {
-            // who dis
-            return null;
-          }
-          if (org.status === "ROOT" || user.org_id === asUser.org_id) {
-            return [asUser, user];
-          } else {
-            return null;
-          }
-        }
-      }
-      return users.length > 0 ? [users[0]] : null;
-    } catch (error: any) {
+  private async validateSession(req: IncomingMessage) {
+    const token = this.getSessionToken(req);
+    if (!token) {
       return null;
     }
+    const result = await this.getUserFromToken({ token, req });
+    this.getUserFromToken.dataloader.clearAll();
+    return result;
   }
+
+  // When the same query contains different fields at the Query level, the authorizers will be
+  // called for each one of them. This will in turn call validateSession many times. To avoid executing
+  // the logic more than once we use a DataLoader to process all requests happening within the same
+  // Node tick. The DataLoader is cleared right after.
+  private getUserFromToken = fromDataLoader(
+    new DataLoader<{ token: string; req: IncomingMessage }, [User] | [User, User] | null, string>(
+      async (payloads) => {
+        // It will always be called with the same token so we just use the first element
+        const { token, req } = payloads[0];
+        const result = await (async () => {
+          try {
+            const idToken = await this.redis.get(`session:${token}:idToken`);
+            if (idToken === null) {
+              return null;
+            }
+            const payload = decode(idToken) as any;
+            const expiresAt = payload["exp"] as number;
+            const cognitoId = payload["cognito:username"] as string;
+            if (Date.now() > expiresAt * 1000) {
+              const refreshToken = await this.redis.get(`session:${token}:refreshToken`);
+              if (refreshToken === null) {
+                return null;
+              }
+              const auth = await this.refreshToken(refreshToken, req);
+              if (auth.AuthenticationResult) {
+                await this.updateSession(token, auth.AuthenticationResult as any);
+              } else {
+                return null;
+              }
+            }
+            const meta = await this.redis.get(`session:${token}:meta`);
+            const users = await this.users.loadUsersByCognitoId(cognitoId);
+            if (isDefined(meta)) {
+              const { userId, asUserId } = JSON.parse(meta) as {
+                userId: number;
+                asUserId?: number;
+              };
+              const user = users.find((u) => u.id === userId);
+              if (!isDefined(user)) {
+                // who dis
+                return null;
+              }
+              if (isDefined(asUserId)) {
+                // make sure user can ghost login
+                if (!userHasRole(user, "ADMIN")) {
+                  // can't ghost login if not admin
+                  return null;
+                }
+                const org = (await this.orgs.loadOrg(user.org_id))!;
+                const asUser = await this.users.loadUser(asUserId);
+                if (!isDefined(asUser)) {
+                  // who dis
+                  return null;
+                }
+                if (org.status === "ROOT" || user.org_id === asUser.org_id) {
+                  return [asUser, user] as [User, User];
+                } else {
+                  return null;
+                }
+              }
+            }
+            return users.length > 0 ? ([users[0]] as [User]) : null;
+          } catch (error: any) {
+            return null;
+          }
+        })();
+        return payloads.map(() => result);
+      },
+      { cacheKeyFn: (payload) => payload.token }
+    )
+  );
 
   private async validateUserAuthToken(req: IncomingMessage): Promise<[User] | null> {
     const token = this.getBearerToken(req);
