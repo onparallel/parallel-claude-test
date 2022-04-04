@@ -1,0 +1,37 @@
+{
+  "title": "Emails",
+  "stories": [
+    {
+      "name": "Petition Completed",
+      "parameters": {
+        "server": {
+          "id": "emails/PetitionCompleted"
+        }
+      },
+      "args": {
+        "userName": "Derek",
+        "contactName": "Santi Albo",
+        "contactEmail": "santialbo@onparallel.com",
+        "petitionName": "Declaración de la renta",
+        "petitionId": "1234567890",
+        "isSigned": true,
+        "parallelUrl": "https://staging.onparallel.com",
+        "assetsUrl": "https://static-staging.onparallel.com",
+        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
+        "logoAlt": "Parallel"
+      },
+      "argTypes": {
+        "userName": { "control": { "type": "text" }, "type": { "required": false } },
+        "contactName": { "control": { "type": "text" } },
+        "contactEmail": { "control": { "type": "text" } },
+        "petitionName": { "control": { "type": "text" }, "type": { "required": false } },
+        "petitionId": { "control": { "type": "text" } },
+        "isSigned": { "control": { "type": "boolean" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 import { UAParser } from "ua-parser-js";
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
-import ContactAuthenticationRequest from "../../emails/components/ContactAuthenticationRequest";
+import ContactAuthenticationRequest from "../../emails/emails/ContactAuthenticationRequest";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { getLayoutProps } from "../helpers/getLayoutProps";

@@ -3,7 +3,7 @@ import { WorkerContext } from "../../context";
 import { PetitionSignatureConfigSigner } from "../../db/repositories/PetitionRepository";
 import { Contact, EmailLog, PetitionAccess } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
-import PetitionCompleted from "../../emails/components/PetitionCompleted";
+import PetitionCompleted from "../../emails/emails/PetitionCompleted";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";

@@ -1,0 +1,76 @@
+{
+  "title": "Emails",
+  "stories": [
+    {
+      "name": "Petition Comments Contact Notification",
+      "parameters": {
+        "server": {
+          "id": "emails/PetitionCommentsContactNotification"
+        }
+      },
+      "args": {
+        "emailSubject": "Proceso de KYC",
+        "contactFullName": "Santi Albo",
+        "contactName": "Santi",
+        "keycode": "1234567890",
+        "fields": [
+          {
+            "id": 1,
+            "title": "Nominas",
+            "position": 2,
+            "comments": [
+              {
+                "id": 1,
+                "content": "De dónde saco esto tio?\n No lo encuentro por ningun lado",
+                "author": {
+                  "id": "Access:1",
+                  "name": "Mariano Rodriguez"
+                }
+              },
+              {
+                "id": 2,
+                "content": "Ni caso, ya lo encontré",
+                "author": {
+                  "id": "Access:1",
+                  "name": "Mariano Rodriguez"
+                }
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "title": "Dividendos",
+            "position": 4,
+            "comments": [
+              {
+                "id": 3,
+                "content": "Ya sale en el borrador",
+                "author": {
+                  "id": "User:1",
+                  "name": "Derek Lou"
+                }
+              }
+            ]
+          }
+        ],
+        "parallelUrl": "https://staging.onparallel.com",
+        "assetsUrl": "https://static-staging.onparallel.com",
+        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
+        "logoAlt": "Parallel",
+        "tone": "FORMAL"
+      },
+      "argTypes": {
+        "emailSubject": { "control": { "type": "text" }, "type": { "required": false } },
+        "contactFullName": { "control": { "type": "text" } },
+        "contactName": { "control": { "type": "text" } },
+        "keycode": { "control": { "type": "text" } },
+        "fields": { "control": { "type": "object" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } },
+        "tone": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}

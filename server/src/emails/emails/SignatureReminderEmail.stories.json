@@ -1,0 +1,33 @@
+{
+  "title": "Emails",
+  "stories": [
+    {
+      "name": "Signature Reminder Email",
+      "parameters": {
+        "server": {
+          "id": "emails/SignatureReminderEmail"
+        }
+      },
+      "args": {
+        "signerName": "{{signer_name}}",
+        "documentName": "{{filename}}",
+        "signButton": "{{sign_button}}",
+        "parallelUrl": "https://staging.onparallel.com",
+        "assetsUrl": "https://static-staging.onparallel.com",
+        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
+        "logoAlt": "Parallel",
+        "tone": "FORMAL"
+      },
+      "argTypes": {
+        "signerName": { "control": { "type": "text" } },
+        "documentName": { "control": { "type": "text" } },
+        "signButton": { "control": { "type": "text" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } },
+        "tone": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}

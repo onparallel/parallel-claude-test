@@ -2,9 +2,9 @@ import { ClientMetadataType } from "aws-sdk/clients/cognitoidentityserviceprovid
 import { Handler, json, Router } from "express";
 import { Config } from "../config";
 import { buildEmail } from "../emails/buildEmail";
-import AccountVerification from "../emails/components/AccountVerification";
-import ForgotPassword from "../emails/components/ForgotPassword";
-import Invitation from "../emails/components/Invitation";
+import AccountVerification from "../emails/emails/AccountVerification";
+import ForgotPassword from "../emails/emails/ForgotPassword";
+import Invitation from "../emails/emails/Invitation";
 import { fullName } from "../util/fullName";
 
 interface CustomMessageRequest {

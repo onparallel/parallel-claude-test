@@ -1,0 +1,46 @@
+{
+  "title": "Emails",
+  "stories": [
+    {
+      "name": "Petition Message",
+      "parameters": {
+        "server": {
+          "id": "emails/PetitionMessage"
+        }
+      },
+      "args": {
+        "senderName": "Santi Albo",
+        "senderEmail": "santi@onparallel.com",
+        "subject": "Datos de Alta",
+        "bodyHtml": "Buenos días Juan, <br/><br/>Tal y como comentamos, te mando la información que necesitamos de cara a tu próxima incorporación con nosotros para prepararte el contrato y darte de alta en la Seguridad Social.<br/><br/>Si tienes cualquier duda me dices,<br/><br/>Gracias y un abrazo!<br/><br/>Luisa.",
+        "bodyPlainText": "Buenos días Juan, \nTal y como comentamos, te mando la información que necesitamos de cara a tu próxima incorporación con nosotros para prepararte el contrato y darte de alta en la Seguridad Social. \nSi tienes cualquier duda me dices, \nGracias y un abrazo! \nLuisa",
+        "deadline": "2022-12-11T17:29:24.601Z",
+        "keycode": "asdfghjkl",
+        "parallelUrl": "https://staging.onparallel.com",
+        "assetsUrl": "https://static-staging.onparallel.com",
+        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
+        "logoAlt": "Parallel",
+        "tone": "FORMAL",
+        "removeWhyWeUseParallel": false
+      },
+      "argTypes": {
+        "senderName": { "control": { "type": "text" } },
+        "senderEmail": { "control": { "type": "text" } },
+        "subject": { "control": { "type": "text" } },
+        "bodyHtml": { "control": { "type": "text" } },
+        "bodyPlainText": { "control": { "type": "text" } },
+        "deadline": {
+          "control": { "type": "text" },
+          "type": { "required": false }
+        },
+        "keycode": { "control": { "type": "text" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } },
+        "tone": { "control": { "type": "text" } },
+        "removeWhyWeUseParallel": { "control": { "type": "boolean" } }
+      }
+    }
+  ]
+}

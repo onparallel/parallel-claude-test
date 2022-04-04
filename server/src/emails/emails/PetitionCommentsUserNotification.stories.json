@@ -1,0 +1,104 @@
+{
+  "title": "Emails",
+  "stories": [
+    {
+      "name": "Petition Comments User Notification",
+      "parameters": {
+        "server": {
+          "id": "emails/PetitionCommentsUserNotification"
+        }
+      },
+      "args": {
+        "userName": "Santi",
+        "petitionName": "Declaración de la renta",
+        "petitionId": "1234567890",
+        "fields": [
+          {
+            "id": 1,
+            "title": "Nominas",
+            "position": 2,
+            "comments": [
+              {
+                "id": 1,
+                "content": "De dónde saco esto tio?\nNo lo encuentro por ningún lado",
+                "author": {
+                  "id": "Access:1",
+                  "name": "Mariano Rodriguez"
+                }
+              },
+              {
+                "id": 2,
+                "content": "Ni caso, ya lo encontré 😅",
+                "author": {
+                  "id": "Access:1",
+                  "name": "Mariano Rodriguez"
+                }
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "title": "Dividendos",
+            "position": 4,
+            "comments": [
+              {
+                "id": 3,
+                "content": "Ya sale en el borrador",
+                "author": {
+                  "id": "User:2",
+                  "name": "Derek Lou"
+                }
+              },
+              {
+                "id": 4,
+                "content": "Cualquier cosa me avisas",
+                "author": {
+                  "id": "User:2",
+                  "name": "Derek Lou"
+                }
+              },
+              {
+                "id": 5,
+                "content": "Ostia que chulo este sistema de comentarios 😎",
+                "author": {
+                  "id": "User:3",
+                  "name": "Angela Velasco"
+                }
+              },
+              {
+                "id": 6,
+                "content": "Ok!",
+                "author": {
+                  "id": "Access:1",
+                  "name": "Mariano Rodriguez"
+                }
+              },
+              {
+                "id": 7,
+                "content": "Ya está todo",
+                "author": {
+                  "id": "Access:1",
+                  "name": "Mariano Rodriguez"
+                }
+              }
+            ]
+          }
+        ],
+        "parallelUrl": "https://staging.onparallel.com",
+        "assetsUrl": "https://static-staging.onparallel.com",
+        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
+        "logoAlt": "Parallel"
+      },
+      "argTypes": {
+        "userName": { "control": { "type": "text" }, "type": { "required": false } },
+        "petitionName": { "control": { "type": "text" }, "type": { "required": false } },
+        "petitionId": { "control": { "type": "text" } },
+        "fields": { "control": { "type": "object" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}

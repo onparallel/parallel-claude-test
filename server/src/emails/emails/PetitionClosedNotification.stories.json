@@ -1,0 +1,35 @@
+{
+  "title": "Emails",
+  "stories": [
+    {
+      "name": "Petition Closed Notification",
+      "parameters": {
+        "server": {
+          "id": "emails/PetitionClosedNotification"
+        }
+      },
+      "args": {
+        "contactFullName": "Derek Lou",
+        "senderName": "Santi",
+        "senderEmail": "santi@onparallel.com",
+        "bodyHtml": "<p style=\"margin:0\"><span>hola </span><span></span><span>, enviame los </span><span>documentos </span><span style=\"font-weight:bold\">siguientes </span><span style=\"font-weight:bold;text-decoration:underline\">super guays</span></p><p style=\"margin:0\"><span>hmmm</span></p><ul style=\"margin:0;margin-left:24px;padding-left:0\"><li style=\"margin-left:0\"><p style=\"margin:0\"><span style=\"font-weight:bold;text-decoration:underline\">foto</span></p></li><li style=\"margin-left:0\"><p style=\"margin:0\"><span style=\"font-style:italic\">pasaporte</span></p><ul style=\"margin:0;margin-left:24px;padding-left:0\"><li style=\"margin-left:0\"><p style=\"margin:0\"><span style=\"font-weight:bold;text-decoration:underline\">foto</span></p></li><li style=\"margin-left:0\"><p style=\"margin:0\"><span style=\"font-style:italic\">pasaporte</span></p></li></ul></li></ul>",
+        "bodyPlainText": "Hola Derek,\\n\\nYa hemos revisado toda la información. Te confirmamos que está todo correcto.\\n\\nVamos a ponernos a trabajar y si tenemos cualquier duda o necesitamos cualquier información más te lo haremos saber.\\n\\nUn saludo.",
+        "parallelUrl": "https://staging.onparallel.com",
+        "assetsUrl": "https://static-staging.onparallel.com",
+        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
+        "logoAlt": "Parallel"
+      },
+      "argTypes": {
+        "contactFullName": { "control": { "type": "text" } },
+        "senderName": { "control": { "type": "text" } },
+        "senderEmail": { "control": { "type": "text" } },
+        "bodyHtml": { "control": { "type": "text" } },
+        "bodyPlainText": { "control": { "type": "text" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}

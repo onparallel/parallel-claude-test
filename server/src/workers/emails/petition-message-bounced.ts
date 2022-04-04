@@ -1,6 +1,6 @@
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
-import MessageBouncedEmail from "../../emails/components/MessageBouncedEmail";
+import MessageBouncedEmail from "../../emails/emails/MessageBouncedEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";

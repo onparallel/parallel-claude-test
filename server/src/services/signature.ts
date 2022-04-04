@@ -15,10 +15,10 @@ import { OrganizationRepository } from "../db/repositories/OrganizationRepositor
 import { PetitionRepository, PetitionSignatureConfig } from "../db/repositories/PetitionRepository";
 import { OrgIntegration, PetitionAccess, User } from "../db/__types";
 import { buildEmail } from "../emails/buildEmail";
-import SignatureCancelledEmail from "../emails/components/SignatureCancelledEmail";
-import SignatureCompletedEmail from "../emails/components/SignatureCompletedEmail";
-import SignatureReminderEmail from "../emails/components/SignatureReminderEmail";
-import SignatureRequestedEmail from "../emails/components/SignatureRequestedEmail";
+import SignatureCancelledEmail from "../emails/emails/SignatureCancelledEmail";
+import SignatureCompletedEmail from "../emails/emails/SignatureCompletedEmail";
+import SignatureReminderEmail from "../emails/emails/SignatureReminderEmail";
+import SignatureRequestedEmail from "../emails/emails/SignatureRequestedEmail";
 import { toGlobalId } from "../util/globalId";
 import { downloadImageBase64 } from "../util/images";
 import { getBaseWebhookUrl } from "../workers/helpers/getBaseWebhookUrl";

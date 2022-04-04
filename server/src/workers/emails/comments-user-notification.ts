@@ -2,7 +2,7 @@ import pMap from "p-map";
 import { groupBy, isDefined, sortBy, uniq } from "remeda";
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
-import PetitionCommentsUserNotification from "../../emails/components/PetitionCommentsUserNotification";
+import PetitionCommentsUserNotification from "../../emails/emails/PetitionCommentsUserNotification";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { toGlobalId } from "../../util/globalId";
 import { buildFieldWithComments } from "../helpers/getFieldWithComments";

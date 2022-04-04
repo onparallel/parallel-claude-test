@@ -1,6 +1,6 @@
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
-import PetitionMessage from "../../emails/components/PetitionMessage";
+import PetitionMessage from "../../emails/emails/PetitionMessage";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { toHtml, toPlainText } from "../../util/slate";

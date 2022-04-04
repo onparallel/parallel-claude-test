@@ -5,7 +5,7 @@
       "name": "Petition Export",
       "parameters": {
         "server": {
-          "id": "pdf/documents/PetitionExport"
+          "id": "documents/PetitionExport"
         }
       },
       "args": {

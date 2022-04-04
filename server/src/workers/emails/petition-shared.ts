@@ -2,7 +2,7 @@ import { indexBy, isDefined, uniq } from "remeda";
 import { WorkerContext } from "../../context";
 import { EmailLog } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
-import PetitionSharedEmail from "../../emails/components/PetitionSharedEmail";
+import PetitionSharedEmail from "../../emails/emails/PetitionSharedEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";

@@ -18,10 +18,10 @@ app.use(cors());
 
 const LR_SCRIPT = `<script src="http://localhost:35729/livereload.js?snipver=1"></script>`;
 
-async function parseArgs(req: Request, storyName: string) {
-  const storyPath = path.join(__dirname, `src/${storyName}.stories.json`);
+async function parseArgs(req: Request, storyPath: string) {
   const storyConfig = await import(storyPath);
-  const story = storyConfig.stories.find((s: any) => s.parameters.server.id === storyName);
+  console.log(storyConfig);
+  const story = storyConfig.stories[0];
   return mapValues(story.argTypes, ({ control: { type } }: any, key) => {
     switch (type) {
       case "object":
@@ -39,10 +39,10 @@ async function parseArgs(req: Request, storyName: string) {
 }
 
 app
-  .get("/pdf/documents/:document", async (req, res, next) => {
+  .get("/documents/:document", async (req, res, next) => {
     const query = new URLSearchParams(req.query as any);
     const url = encodeURIComponent(
-      `http://localhost:5000/pdf/documents/${req.params.document}/file.pdf?${query}`
+      `http://localhost:5000/documents/${req.params.document}/file.pdf?${query}`
     );
     res.send(/* html */ `
       <html>
@@ -53,7 +53,7 @@ app
       </html>
     `);
   })
-  .get("/pdf/documents/:document/file.pdf", async (req, res, next) => {
+  .get("/documents/:document/file.pdf", async (req, res, next) => {
     try {
       // clear cache
       for (const entry of Object.keys(require.cache)) {
@@ -67,7 +67,7 @@ app
         headers: { authorization: `Bearer ${process.env.ACCESS_TOKEN}` },
       });
       const { default: Component } = await import(`./src/pdf/documents/${document}.tsx`);
-      const params = await parseArgs(req, req.path.replace(/^\//, "").replace("/file.pdf", ""));
+      const params = await parseArgs(req, `./src/pdf/documents/${document}.stories.json`);
       (await buildPdf(Component, params, { client, locale })).pipe(res);
     } catch (error) {
       if (error instanceof Error) {
@@ -86,7 +86,7 @@ app
     }
   });
 
-app.get("/emails/components/:email", async (req, res, next) => {
+app.get("/emails/:email", async (req, res, next) => {
   try {
     // clear cache
     for (const entry of Object.keys(require.cache)) {
@@ -97,8 +97,8 @@ app.get("/emails/components/:email", async (req, res, next) => {
     const name = req.params.email;
     const locale = req.query.locale as string;
     const type = req.query.type as string;
-    const { default: email } = await import(`./src/emails/components/${name}.tsx`);
-    const params = await parseArgs(req, req.path.replace(/^\//, ""));
+    const { default: email } = await import(`./src/emails/emails/${name}.tsx`);
+    const params = await parseArgs(req, `./src/emails/emails/${name}.stories.json`);
     const result = await buildEmail(email, params, { locale });
     if (type === "html") {
       res.send(
@@ -158,8 +158,8 @@ const lr = createServer({
 });
 
 lr.watch([
+  __dirname + "/src/emails/emails",
   __dirname + "/src/emails/components",
-  __dirname + "/src/emails/common",
   __dirname + "/src/emails/lang",
   __dirname + "/src/emails/utils",
   __dirname + "/src/pdf/documents",

@@ -1,6 +1,6 @@
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
-import AccessDelegatedEmail from "../../emails/components/AccessDelegatedEmail";
+import AccessDelegatedEmail from "../../emails/emails/AccessDelegatedEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { toHtml, toPlainText } from "../../util/slate";

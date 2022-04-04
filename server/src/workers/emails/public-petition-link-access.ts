@@ -1,6 +1,6 @@
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
-import PublicPetitionLinkAccess from "../../emails/components/PublicPetitionLinkAccess";
+import PublicPetitionLinkAccess from "../../emails/emails/PublicPetitionLinkAccess";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { getLayoutProps } from "../helpers/getLayoutProps";

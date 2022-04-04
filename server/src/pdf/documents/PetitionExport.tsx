@@ -12,7 +12,7 @@ import {
   PetitionExport_PetitionFieldFragment,
   PetitionExport_PetitionFragment,
 } from "../__types";
-import { HardcodedSignatures } from "./HardcodedSignatures";
+import { HardcodedSignatures } from "../components/HardcodedSignatures";
 
 export interface PetitionExportTheme {
   marginHorizontal: number;

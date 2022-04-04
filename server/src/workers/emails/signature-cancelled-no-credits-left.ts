@@ -1,7 +1,7 @@
 import { WorkerContext } from "../../context";
 import { PetitionSignatureConfig } from "../../db/repositories/PetitionRepository";
 import { buildEmail } from "../../emails/buildEmail";
-import SignatureCancelledNoCreditsLeftEmail from "../../emails/components/SignatureCancelledNoCreditsLeftEmail";
+import SignatureCancelledNoCreditsLeftEmail from "../../emails/emails/SignatureCancelledNoCreditsLeftEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { getLayoutProps } from "../helpers/getLayoutProps";

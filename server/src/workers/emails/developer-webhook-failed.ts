@@ -1,6 +1,6 @@
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
-import DeveloperWebhookFailedEmail from "../../emails/components/DeveloperWebhookFailedEmail";
+import DeveloperWebhookFailedEmail from "../../emails/emails/DeveloperWebhookFailedEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { getLayoutProps } from "../helpers/getLayoutProps";
