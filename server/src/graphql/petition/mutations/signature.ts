@@ -6,6 +6,8 @@ import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { RESULT } from "../../helpers/result";
 import { jsonObjectArg } from "../../helpers/scalars";
 import {
+  petitionIsNotAnonymized,
+  signatureRequestIsNotAnonymized,
   userHasAccessToPetitions,
   userHasAccessToSignatureRequest,
   userHasEnabledIntegration,
@@ -19,7 +21,8 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
   },
   authorize: authenticateAnd(
     userHasEnabledIntegration("SIGNATURE"),
-    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"])
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionIsNotAnonymized("petitionId")
   ),
   resolve: async (_, { petitionId, message }, ctx) => {
     try {
@@ -105,7 +108,8 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
   },
   authorize: authenticateAnd(
     userHasEnabledIntegration("SIGNATURE"),
-    userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"])
+    userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"]),
+    signatureRequestIsNotAnonymized("petitionSignatureRequestId")
   ),
   resolve: async (_, { petitionSignatureRequestId }, ctx) => {
     const signature = await ctx.petitions.loadPetitionSignatureById(petitionSignatureRequestId);
@@ -149,7 +153,8 @@ export const updateSignatureRequestMetadata = mutationField("updateSignatureRequ
   type: nonNull("PetitionSignatureRequest"),
   authorize: authenticateAnd(
     userHasEnabledIntegration("SIGNATURE"),
-    userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"])
+    userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"]),
+    signatureRequestIsNotAnonymized("petitionSignatureRequestId")
   ),
   args: {
     petitionSignatureRequestId: nonNull(globalIdArg()),
@@ -167,7 +172,8 @@ export const signedPetitionDownloadLink = mutationField("signedPetitionDownloadL
   type: "FileUploadDownloadLinkResult",
   authorize: authenticateAnd(
     userHasEnabledIntegration("SIGNATURE"),
-    userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"])
+    userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"]),
+    signatureRequestIsNotAnonymized("petitionSignatureRequestId")
   ),
   args: {
     petitionSignatureRequestId: nonNull(globalIdArg("PetitionSignatureRequest")),
@@ -225,7 +231,8 @@ export const sendSignatureRequestReminders = mutationField("sendSignatureRequest
   type: "Result",
   authorize: authenticateAnd(
     userHasEnabledIntegration("SIGNATURE"),
-    userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"])
+    userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"]),
+    signatureRequestIsNotAnonymized("petitionSignatureRequestId")
   ),
   args: {
     petitionSignatureRequestId: nonNull(globalIdArg("PetitionSignatureRequest")),

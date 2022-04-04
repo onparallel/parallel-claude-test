@@ -492,7 +492,7 @@ export function replyCanBeUpdated<
 
     const reply = await ctx.petitions.loadFieldReply(replyId);
 
-    if (reply!.status === "APPROVED") {
+    if (reply!.status === "APPROVED" || reply!.anonymized_at !== null) {
       throw new ApolloError(
         `The reply has been approved and cannot be updated.`,
         "REPLY_ALREADY_APPROVED_ERROR"
@@ -500,5 +500,29 @@ export function replyCanBeUpdated<
     }
 
     return true;
+  };
+}
+
+export function petitionIsNotAnonymized<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends Arg<TypeName, FieldName, number>
+>(argPetitionId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const petition = await ctx.petitions.loadPetition(args[argPetitionId] as unknown as number);
+    return petition?.anonymized_at === null;
+  };
+}
+
+export function signatureRequestIsNotAnonymized<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends Arg<TypeName, FieldName, number>
+>(argSignatureRequestId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const signature = await ctx.petitions.loadPetitionSignatureById(
+      args[argSignatureRequestId] as unknown as number
+    );
+    return signature?.anonymized_at === null;
   };
 }

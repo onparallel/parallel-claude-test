@@ -345,6 +345,7 @@ export const PetitionHeader = Object.assign(
                     </MenuItem>
                     <MenuItem
                       onClick={handleReopenPetition}
+                      isDisabled={petition.isAnonymized}
                       hidden={petition.status !== "CLOSED"}
                       icon={<EditIcon display="block" boxSize={4} />}
                     >

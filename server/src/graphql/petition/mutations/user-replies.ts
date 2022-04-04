@@ -14,6 +14,7 @@ import {
   fieldCanBeReplied,
   fieldHasType,
   fieldsBelongsToPetition,
+  petitionIsNotAnonymized,
   repliesBelongsToPetition,
   replyCanBeUpdated,
   replyIsForFieldOfType,
@@ -42,7 +43,8 @@ export const createPetitionFieldReply = mutationField("createPetitionFieldReply"
       "DATE",
       "CHECKBOX",
     ]),
-    fieldCanBeReplied("fieldId")
+    fieldCanBeReplied("fieldId"),
+    petitionIsNotAnonymized("petitionId")
   ),
   validateArgs: validateFieldReply("fieldId", "reply", "reply"),
   resolve: async (_, args, ctx) => {
@@ -81,7 +83,8 @@ export const updatePetitionFieldReply = mutationField("updatePetitionFieldReply"
       "DATE",
       "CHECKBOX",
     ]),
-    replyCanBeUpdated("replyId")
+    replyCanBeUpdated("replyId"),
+    petitionIsNotAnonymized("petitionId")
   ),
   validateArgs: validateReplyUpdate("replyId", "reply", "reply"),
   resolve: async (_, args, ctx) => {
@@ -120,7 +123,8 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["FILE_UPLOAD"]),
-    fieldCanBeReplied("fieldId")
+    fieldCanBeReplied("fieldId"),
+    petitionIsNotAnonymized("petitionId")
   ),
   validateArgs: fileUploadInputMaxSize((args) => args.file, 50 * 1024 * 1024, "file"),
   resolve: async (_, args, ctx) => {
@@ -164,7 +168,8 @@ export const createFileUploadReplyComplete = mutationField("createFileUploadRepl
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
-    replyIsForFieldOfType("replyId", ["FILE_UPLOAD"])
+    replyIsForFieldOfType("replyId", ["FILE_UPLOAD"]),
+    petitionIsNotAnonymized("petitionId")
   ),
   resolve: async (_, args, ctx) => {
     const reply = (await ctx.petitions.loadFieldReply(args.replyId))!;
@@ -190,7 +195,8 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
     userHasAccessToPetitions("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["FILE_UPLOAD"]),
-    replyCanBeUpdated("replyId")
+    replyCanBeUpdated("replyId"),
+    petitionIsNotAnonymized("petitionId")
   ),
   validateArgs: fileUploadInputMaxSize((args) => args.file, 50 * 1024 * 1024, "file"),
   resolve: async (_, args, ctx) => {
@@ -242,7 +248,8 @@ export const updateFileUploadReplyComplete = mutationField("updateFileUploadRepl
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
-    replyIsForFieldOfType("replyId", ["FILE_UPLOAD"])
+    replyIsForFieldOfType("replyId", ["FILE_UPLOAD"]),
+    petitionIsNotAnonymized("petitionId")
   ),
   resolve: async (_, args, ctx) => {
     const reply = (await ctx.petitions.loadFieldReply(args.replyId))!;
@@ -282,7 +289,8 @@ export const deletePetitionReply = mutationField("deletePetitionReply", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     repliesBelongsToPetition("petitionId", "replyId"),
-    replyCanBeUpdated("replyId")
+    replyCanBeUpdated("replyId"),
+    petitionIsNotAnonymized("petitionId")
   ),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.deletePetitionFieldReply(args.replyId, ctx.user!);

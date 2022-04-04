@@ -6,6 +6,7 @@ import {
   fieldsAreNotInternal,
   fieldsBelongsToPetition,
   fieldsHaveCommentsEnabled,
+  petitionIsNotAnonymized,
   userHasAccessToPetitions,
   userHasFeatureFlag,
 } from "../authorizers";
@@ -23,7 +24,8 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
       userHasFeatureFlag("INTERNAL_COMMENTS"),
       fieldsHaveCommentsEnabled("petitionFieldId")
     ),
-    ifArgEquals("isInternal", false, fieldsAreNotInternal("petitionFieldId"))
+    ifArgEquals("isInternal", false, fieldsAreNotInternal("petitionFieldId")),
+    petitionIsNotAnonymized("petitionId")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -59,7 +61,8 @@ export const deletePetitionFieldComment = mutationField("deletePetitionFieldComm
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
-    commentsBelongsToPetition("petitionId", "petitionFieldCommentId")
+    commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
+    petitionIsNotAnonymized("petitionId")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -84,7 +87,8 @@ export const updatePetitionFieldComment = mutationField("updatePetitionFieldComm
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
     commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
-    userIsCommentAuthor("petitionFieldCommentId")
+    userIsCommentAuthor("petitionFieldCommentId"),
+    petitionIsNotAnonymized("petitionId")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),

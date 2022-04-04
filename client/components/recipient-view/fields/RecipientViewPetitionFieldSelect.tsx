@@ -208,7 +208,7 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
             placeholder={
               reply.isAnonymized
                 ? intl.formatMessage({
-                    id: "component.recipient-view-petition-field-reply.not-available",
+                    id: "generic.reply-not-available",
                     defaultMessage: "Reply not available",
                   })
                 : options.placeholder ??

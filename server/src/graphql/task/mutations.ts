@@ -7,14 +7,17 @@ import { isValidTimezone } from "../../util/validators";
 import { authenticateAnd } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { userHasAccessToPetitions } from "../petition/authorizers";
+import { petitionIsNotAnonymized, userHasAccessToPetitions } from "../petition/authorizers";
 import { contextUserHasRole } from "../users/authorizers";
 import { tasksAreOfType, userHasAccessToTasks } from "./authorizers";
 
 export const createPrintPdfTask = mutationField("createPrintPdfTask", {
   description: "Creates a task for printing a PDF of the petition and sends it to the queue",
   type: "Task",
-  authorize: authenticateAnd(userHasAccessToPetitions("petitionId")),
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    petitionIsNotAnonymized("petitionId")
+  ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     skipAttachments: nullable(booleanArg()),
@@ -39,7 +42,10 @@ export const createExportRepliesTask = mutationField("createExportRepliesTask", 
   description:
     "Creates a task for exporting a ZIP file with petition replies and sends it to the queue",
   type: "Task",
-  authorize: authenticateAnd(userHasAccessToPetitions("petitionId")),
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    petitionIsNotAnonymized("petitionId")
+  ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     pattern: nullable("String"),

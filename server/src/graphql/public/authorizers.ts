@@ -17,6 +17,9 @@ export function authenticatePublicAccess<
 >(argKeycode: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return chain(fetchPetitionAccess(argKeycode), async function (_, args, ctx) {
     const petition = (await ctx.petitions.loadPetition(ctx.access!.petition_id))!;
+    if (petition.anonymized_at !== null) {
+      return false;
+    }
     if (petition.skip_forward_security) {
       return true;
     }
