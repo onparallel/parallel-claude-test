@@ -227,6 +227,7 @@ describe("GraphQL/Petition Fields", () => {
               hasCommentsEnabled: true,
               options: {
                 accepts: null,
+                attachToPdf: false,
               },
               isReadOnly: false,
               replies: [],
@@ -1546,6 +1547,7 @@ describe("GraphQL/Petition Fields", () => {
         hasCommentsEnabled: true,
         options: {
           accepts: null,
+          attachToPdf: false,
         },
       });
     });

@@ -67,8 +67,8 @@ export class PetitionBinder implements IPetitionBinder {
     }: PetitionBinderOptions
   ) {
     const [petition, fields] = await Promise.all([
-      this.petitions.loadPetition(petitionId),
-      this.petitions.loadFieldsForPetition(petitionId),
+      this.petitions.loadPetition(petitionId, { refresh: true }),
+      this.petitions.loadFieldsForPetition(petitionId, { refresh: true }),
     ]);
 
     const fieldIds = fields.map((f) => f.id);
@@ -80,7 +80,8 @@ export class PetitionBinder implements IPetitionBinder {
 
     const visibleFieldIds = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies))
       .filter(
-        ([field, isVisible]) => isVisible && field.type === "FILE_UPLOAD" && field.show_in_pdf
+        ([field, isVisible]) =>
+          isVisible && field.type === "FILE_UPLOAD" && !!field.options.attachToPdf
       )
       .map(([field]) => field.id);
 

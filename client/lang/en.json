@@ -2045,6 +2045,16 @@
     "context": "Communications language"
   },
   {
+    "term": "component.petition-settings.petition-attach-files-to-pdf",
+    "definition": "Attach files to PDF",
+    "context": "Attach files to PDF"
+  },
+  {
+    "term": "component.petition-settings.petition-attach-files-to-pdf.description",
+    "definition": "When this option is enabled, the image and pdf files uploaded to this field will be appended to the end of the exported PDF and the document to be signed.",
+    "context": "When this option is enabled, the image and pdf files uploaded to this field will be appended to the end of the exported PDF and the document to be signed."
+  },
+  {
     "term": "component.petition-settings.petition-comments-enable",
     "definition": "Allow comments",
     "context": "Allow comments"

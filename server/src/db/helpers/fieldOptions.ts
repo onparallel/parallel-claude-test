@@ -76,7 +76,7 @@ const SCHEMAS = {
   },
   FILE_UPLOAD: {
     type: "object",
-    required: ["accepts"],
+    required: ["accepts", "attachToPdf"],
     additionalProperties: false,
     properties: {
       accepts: {
@@ -85,6 +85,9 @@ const SCHEMAS = {
           type: "string",
           enum: ["PDF", "IMAGE", "VIDEO", "DOCUMENT"],
         },
+      },
+      attachToPdf: {
+        type: ["boolean", "null"],
       },
     },
   },
@@ -288,6 +291,7 @@ export function defaultFieldOptions(
       case "FILE_UPLOAD":
         return {
           accepts: null,
+          attachToPdf: false,
         };
       case "DYNAMIC_SELECT": {
         return {

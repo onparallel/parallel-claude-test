@@ -2045,6 +2045,16 @@
     "context": "Communications language"
   },
   {
+    "term": "component.petition-settings.petition-attach-files-to-pdf",
+    "definition": "Adjuntar archivos al PDF",
+    "context": "Attach files to PDF"
+  },
+  {
+    "term": "component.petition-settings.petition-attach-files-to-pdf.description",
+    "definition": "Al activar esta opción, los archivos de imagen y pdf subidos a este campo se anexarán al final en la exportación de PDF y en el documento a firmar.",
+    "context": "When this option is enabled, the image and pdf files uploaded to this field will be appended to the end of the exported PDF and the document to be signed."
+  },
+  {
     "term": "component.petition-settings.petition-comments-enable",
     "definition": "Permitir comentarios",
     "context": "Allow comments"
@@ -3966,7 +3976,7 @@
   },
   {
     "term": "field-settings.show-in-pdf-description",
-    "definition": "Al activar esta opción, se mostrará el contenido en la exportación de PDF y en el documento a firmar.",
+    "definition": "Esta opción muestra el contenido en la exportación de PDF y en el documento a firmar.",
     "context": "Enabling this option will make the content appear in the exported PDF and the document to be signed."
   },
   {

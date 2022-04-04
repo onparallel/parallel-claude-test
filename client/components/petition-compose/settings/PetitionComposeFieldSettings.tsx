@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Heading, Stack, Switch } from "@chakra-ui/react";
+import { Box, Heading, Image, Stack, Switch } from "@chakra-ui/react";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import {
   PetitionComposeFieldSettings_PetitionFieldFragment,
@@ -9,7 +9,7 @@ import {
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, ReactNode, useState } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { PetitionFieldTypeSelect } from "../PetitionFieldTypeSelectDropdown";
 import { CheckboxSettings } from "./PetitionComposeCheckboxSettings";
 import { DynamicSelectSettings } from "./PetitionComposeDynamicSelectFieldSettings";
@@ -41,6 +41,7 @@ export function PetitionComposeFieldSettings({
   onClose,
   isReadOnly,
 }: PetitionComposeFieldSettingsProps) {
+  const intl = useIntl();
   const [alias, setAlias] = useState(field.alias ?? "");
   const [aliasIsInvalid, setAliasIsInvalid] = useState(false);
 
@@ -136,10 +137,16 @@ export function PetitionComposeFieldSettings({
           />
         }
         description={
-          <FormattedMessage
-            id="field-settings.show-in-pdf-description"
-            defaultMessage="Enabling this option will make the content appear in the exported PDF and the document to be signed."
-          />
+          <>
+            <FormattedMessage
+              id="field-settings.show-in-pdf-description"
+              defaultMessage="Enabling this option will make the content appear in the exported PDF and the document to be signed."
+            />
+            <Image
+              marginTop={2}
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/field-types/FILE_UPLOAD_show_in_pdf_setting_${intl.locale}.png`}
+            />
+          </>
         }
         controlId="show-in-pdf"
       >
