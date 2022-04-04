@@ -65,7 +65,9 @@ export async function down(knex: Knex): Promise<void> {
         "PETITION_MESSAGE_BOUNCED",
       ])
       .whereRaw(
-        /* sql */ `"data"->'petition_message_id'::int in (${messageIds.map(() => "?").join(",")})`,
+        /* sql */ `("data"->'petition_message_id')::int in (${messageIds
+          .map(() => "?")
+          .join(",")})`,
         messageIds
       )
       .delete();
@@ -86,7 +88,7 @@ export async function down(knex: Knex): Promise<void> {
       .from("petition_event")
       .whereIn("type", ["REMINDER_SENT", "PETITION_REMINDER_BOUNCED"])
       .whereRaw(
-        /* sql */ `"data"->'petition_reminder_id'::int in (${reminderIds
+        /* sql */ `("data"->'petition_reminder_id')::int in (${reminderIds
           .map(() => "?")
           .join(",")})`,
         reminderIds
@@ -121,7 +123,7 @@ export async function down(knex: Knex): Promise<void> {
         "RECIPIENT_SIGNED",
       ])
       .whereRaw(
-        /* sql */ `"data"->'petition_signature_request_id'::int in (${signatureIds
+        /* sql */ `("data"->'petition_signature_request_id')::int in (${signatureIds
           .map(() => "?")
           .join(",")})`,
         signatureIds
