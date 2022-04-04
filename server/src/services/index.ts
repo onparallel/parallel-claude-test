@@ -7,7 +7,6 @@ import { FetchService, FETCH_SERVICE, IFetchService } from "./fetch";
 import { createLogger, ILogger, LOGGER } from "./logger";
 import { IPrinter, Printer, PRINTER } from "./printer";
 import { IRedis, REDIS, Redis } from "./redis";
-import { SECURITY, SecurityService } from "./security";
 import { SIGNATURE, SignatureService } from "./signature";
 import { Smtp } from "./smtp";
 import { IStorage, Storage, StorageFactory, STORAGE_FACTORY } from "./storage";
@@ -22,7 +21,6 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<Smtp>(Smtp).toSelf().inSingletonScope();
   bind<IPrinter>(PRINTER).to(Printer).inSingletonScope();
   bind<SignatureService>(SIGNATURE).to(SignatureService);
-  bind<SecurityService>(SECURITY).to(SecurityService);
   bind<IStorage>(STORAGE_FACTORY).toFactory(() => {
     return ((...args) => new Storage(...args)) as StorageFactory;
   });

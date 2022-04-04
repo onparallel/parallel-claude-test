@@ -31,7 +31,7 @@ export function checkClientServerToken<
   TArg extends Arg<TypeName, FieldName, string>
 >(tokenArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx) => {
-    return ctx.security.checkClientServerToken(args[tokenArg] as unknown as string);
+    return (args[tokenArg] as unknown as string) === ctx.config.misc.clientServerToken;
   };
 }
 

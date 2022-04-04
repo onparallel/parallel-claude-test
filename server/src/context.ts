@@ -23,7 +23,6 @@ import { EMAILS, EmailsService } from "./services/emails";
 import { FetchService, FETCH_SERVICE } from "./services/fetch";
 import { LOGGER, ILogger } from "./services/logger";
 import { PRINTER, Printer } from "./services/printer";
-import { SECURITY, SecurityService } from "./services/security";
 import { SIGNATURE, SignatureService } from "./services/signature";
 import { Smtp } from "./services/smtp";
 
@@ -40,7 +39,6 @@ export class ApiContext {
     // Services
     @inject(AUTH) public readonly auth: Auth,
     @inject(EMAILS) public readonly emails: EmailsService,
-    @inject(SECURITY) public readonly security: SecurityService,
     @inject(SIGNATURE) public readonly signature: SignatureService,
     @inject(PRINTER) public readonly printer: Printer,
     @inject(AWS_SERVICE) public readonly aws: Aws,
@@ -76,7 +74,6 @@ export class WorkerContext {
     @inject(ANALYTICS) public readonly analytics: AnalyticsService,
     @inject(PRINTER) public readonly printer: Printer,
     @inject(SIGNATURE) public readonly signature: SignatureService,
-    @inject(SECURITY) public readonly security: SecurityService,
     // Repositories
     public readonly contacts: ContactRepository,
     public readonly emailLogs: EmailLogRepository,
