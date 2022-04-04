@@ -1435,6 +1435,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     environment: NexusGenEnums["SignatureOrgIntegrationEnvironment"]; // SignatureOrgIntegrationEnvironment!
     id: NexusGenScalars["GID"]; // GID!
+    isAnonymized: boolean; // Boolean!
     metadata: NexusGenScalars["JSONObject"]; // JSONObject!
     petition: NexusGenRootTypes["Petition"]; // Petition!
     signatureConfig: NexusGenRootTypes["SignatureConfig"]; // SignatureConfig!
@@ -1845,7 +1846,7 @@ export interface NexusGenFieldTypes {
     allowAdditionalSigners: boolean; // Boolean!
     integration: NexusGenRootTypes["SignatureOrgIntegration"] | null; // SignatureOrgIntegration
     review: boolean; // Boolean!
-    signers: NexusGenRootTypes["PetitionSigner"][]; // [PetitionSigner!]!
+    signers: Array<NexusGenRootTypes["PetitionSigner"] | null>; // [PetitionSigner]!
     timezone: string; // String!
     title: string; // String!
   };
@@ -2921,6 +2922,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     environment: "SignatureOrgIntegrationEnvironment";
     id: "GID";
+    isAnonymized: "Boolean";
     metadata: "JSONObject";
     petition: "Petition";
     signatureConfig: "SignatureConfig";

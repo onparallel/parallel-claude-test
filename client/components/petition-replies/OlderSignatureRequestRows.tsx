@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, GridItem, Heading, HStack } from "@chakra-ui/react";
+import { Box, Button, Flex, GridItem, Heading, HStack, Text } from "@chakra-ui/react";
 import { OlderSignatureRequestRows_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { Fragment } from "react";
 import { FormattedList, FormattedMessage } from "react-intl";
@@ -35,11 +35,17 @@ export function OlderSignatureRequestRows({
             <PetitionSignatureRequestStatusText status={signature.status} />
           </Box>
           <GridItem padding={2} colSpan={signature.status === "COMPLETED" ? 1 : 2}>
-            <FormattedList
-              value={signature.signatureConfig.signers.map((signer, index) => (
-                <SignerReference signer={signer} key={index} />
-              ))}
-            />
+            {signature.isAnonymized ? (
+              <Text textStyle="hint">
+                <FormattedMessage id="generic.not-available" defaultMessage="Not available" />
+              </Text>
+            ) : (
+              <FormattedList
+                value={signature.signatureConfig.signers.map((signer, index) => (
+                  <SignerReference signer={signer} key={index} />
+                ))}
+              />
+            )}
           </GridItem>
           {signature.status === "COMPLETED" ? (
             <Flex justifyContent="flex-end" padding={2} paddingRight={4}>
@@ -55,6 +61,7 @@ export function OlderSignatureRequestRows({
                   fontSize="sm"
                   height={8}
                   onClick={() => onDownload(signature.id)}
+                  isDisabled={signature.isAnonymized}
                 >
                   <FormattedMessage id="generic.download" defaultMessage="Download" />
                 </Button>
@@ -78,6 +85,7 @@ OlderSignatureRequestRows.fragments = {
         }
       }
       metadata
+      isAnonymized
     }
     ${SignerReference.fragments.PetitionSigner}
   `,

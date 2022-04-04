@@ -869,7 +869,10 @@ export class PetitionRepository extends BaseRepository {
           data: {
             petition_access_id: access.id,
             user_id: userId,
-            reason: (isDefined(userId) ? "DEACTIVATED_BY_USER" : "EMAIL_BOUNCED") as any,
+            reason:
+              updatedBy === "Worker:Anonymizer"
+                ? "PETITION_ANONYMIZED"
+                : ((isDefined(userId) ? "DEACTIVATED_BY_USER" : "EMAIL_BOUNCED") as any),
           },
         })),
       ],

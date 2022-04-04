@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Heading, HStack } from "@chakra-ui/react";
+import { Box, Button, Heading, HStack, Text } from "@chakra-ui/react";
 import { BellIcon } from "@parallel/chakra/icons";
 import { CurrentSignatureRequestRow_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { withError } from "@parallel/utils/promises/withError";
@@ -69,21 +69,27 @@ export function CurrentSignatureRequestRow({
           />
         </Heading>
         <Box>
-          <FormattedList
-            value={signerStatus.map((sStatus, index) => (
-              <Fragment key={index}>
-                <SignerReference signer={sStatus.signer} />
-                {isAwaitingSignature ? (
-                  <PetitionSignatureRequestSignerStatusIcon
-                    signerStatus={sStatus}
-                    position="relative"
-                    top={-0.5}
-                    marginX={0.5}
-                  />
-                ) : null}
-              </Fragment>
-            ))}
-          />
+          {!signatureRequest.isAnonymized ? (
+            <FormattedList
+              value={signerStatus.map((sStatus, index) => (
+                <Fragment key={index}>
+                  <SignerReference signer={sStatus.signer} />
+                  {isAwaitingSignature ? (
+                    <PetitionSignatureRequestSignerStatusIcon
+                      signerStatus={sStatus}
+                      position="relative"
+                      top={-0.5}
+                      marginX={0.5}
+                    />
+                  ) : null}
+                </Fragment>
+              ))}
+            />
+          ) : (
+            <Text textStyle="hint">
+              <FormattedMessage id="generic.not-available" defaultMessage="Not available" />
+            </Text>
+          )}
         </Box>
       </Box>
       <Box padding={2} paddingRight={4}>
@@ -110,7 +116,12 @@ export function CurrentSignatureRequestRow({
                 fontSize="xl"
               />
             ) : null}
-            <Button width="24" colorScheme="purple" onClick={() => onDownload(signatureRequest.id)}>
+            <Button
+              width="24"
+              colorScheme="purple"
+              onClick={() => onDownload(signatureRequest.id)}
+              isDisabled={signatureRequest.isAnonymized}
+            >
               <FormattedMessage id="generic.download" defaultMessage="Download" />
             </Button>
           </HStack>
@@ -125,6 +136,7 @@ CurrentSignatureRequestRow.fragments = {
     fragment CurrentSignatureRequestRow_PetitionSignatureRequest on PetitionSignatureRequest {
       id
       status
+      isAnonymized
       signerStatus {
         signer {
           ...SignerReference_PetitionSigner

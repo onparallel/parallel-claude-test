@@ -306,7 +306,8 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             ) : null}
             {isPetition &&
             !petition.signatureConfig?.review &&
-            ["COMPLETED", "CLOSED"].includes(petition.status) ? (
+            ["COMPLETED", "CLOSED"].includes(petition.status) &&
+            !petition.isAnonymized ? (
               <PetitionCompletedAlert />
             ) : null}
           </>

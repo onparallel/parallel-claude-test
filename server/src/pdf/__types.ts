@@ -2310,6 +2310,7 @@ export type PetitionSignatureRequest = Timestamps & {
   /** The environment of the petition signature. */
   environment: SignatureOrgIntegrationEnvironment;
   id: Scalars["GID"];
+  isAnonymized: Scalars["Boolean"];
   /** Metadata for this signature request. */
   metadata: Scalars["JSONObject"];
   petition: Petition;
@@ -3146,7 +3147,7 @@ export type SignatureConfig = {
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"];
   /** The signers of the generated document. */
-  signers: Array<PetitionSigner>;
+  signers: Array<Maybe<PetitionSigner>>;
   /** The timezone used to generate the document. */
   timezone: Scalars["String"];
   /** Title of the signature document */
@@ -3552,7 +3553,7 @@ export type VerificationCodeRequest = {
 
 export type SignaturesBlock_SignatureConfigFragment = {
   timezone: string;
-  signers: Array<{ fullName: string; email: string }>;
+  signers: Array<{ fullName: string; email: string } | null>;
 };
 
 export type AnnexCoverPage_meQueryVariables = Exact<{ [key: string]: never }>;
@@ -3573,7 +3574,10 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
   id: string;
   name: string | null;
   currentSignatureRequest: {
-    signatureConfig: { timezone: string; signers: Array<{ fullName: string; email: string }> };
+    signatureConfig: {
+      timezone: string;
+      signers: Array<{ fullName: string; email: string } | null>;
+    };
   } | null;
   fields: Array<{
     options: { [key: string]: any };
@@ -3653,7 +3657,7 @@ export type PetitionExport_petitionQuery = {
         currentSignatureRequest: {
           signatureConfig: {
             timezone: string;
-            signers: Array<{ fullName: string; email: string }>;
+            signers: Array<{ fullName: string; email: string } | null>;
           };
         } | null;
         fields: Array<{

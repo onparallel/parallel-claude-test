@@ -2310,6 +2310,7 @@ export type PetitionSignatureRequest = Timestamps & {
   /** The environment of the petition signature. */
   environment: SignatureOrgIntegrationEnvironment;
   id: Scalars["GID"];
+  isAnonymized: Scalars["Boolean"];
   /** Metadata for this signature request. */
   metadata: Scalars["JSONObject"];
   petition: Petition;
@@ -3146,7 +3147,7 @@ export type SignatureConfig = {
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"];
   /** The signers of the generated document. */
-  signers: Array<PetitionSigner>;
+  signers: Array<Maybe<PetitionSigner>>;
   /** The timezone used to generate the document. */
   timezone: Scalars["String"];
   /** Title of the signature document */

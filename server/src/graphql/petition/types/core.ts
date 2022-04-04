@@ -555,12 +555,12 @@ export const PetitionSigner = objectType({
   definition(t) {
     t.nullable.globalId("contactId", {
       prefixName: "Contact",
-      resolve: (root) => root.contactId ?? null,
+      resolve: (o) => o?.contactId ?? null,
     });
-    t.string("firstName");
-    t.nullable.string("lastName");
-    t.string("fullName", { resolve: (o) => fullName(o.firstName, o.lastName) });
-    t.string("email");
+    t.string("firstName", { resolve: (o) => o?.firstName ?? "" });
+    t.nullable.string("lastName", { resolve: (o) => o?.lastName ?? null });
+    t.string("fullName", { resolve: (o) => fullName(o?.firstName, o?.lastName) ?? "" });
+    t.string("email", { resolve: (o) => o?.email ?? "" });
   },
   sourceType: /* ts */ `{
     contactId?: number;
@@ -581,7 +581,7 @@ export const SignatureConfig = objectType({
         return await ctx.integrations.loadIntegration(o.orgIntegrationId);
       },
     });
-    t.list.field("signers", {
+    t.list.nullable.field("signers", {
       type: "PetitionSigner",
       description: "The signers of the generated document.",
       resolve: (o) => o.signersInfo,

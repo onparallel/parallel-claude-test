@@ -453,7 +453,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               <PetitionLimitReachedAlert limit={me.organization.usageLimits.petitions.limit} />
             ) : null}
             {petition?.__typename === "Petition" &&
-            ["COMPLETED", "CLOSED"].includes(petition.status) ? (
+            ["COMPLETED", "CLOSED"].includes(petition.status) &&
+            !petition.isAnonymized ? (
               <PetitionCompletedAlert />
             ) : null}
           </>

@@ -554,7 +554,17 @@ export const closePetition = mutationField("closePetition", {
   type: "Petition",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
-    petitionsAreNotPublicTemplates("petitionId")
+    petitionsAreNotPublicTemplates("petitionId"),
+    async (_, args, ctx) => {
+      const signature = await ctx.petitions.loadLatestPetitionSignatureByPetitionId(
+        args.petitionId
+      );
+      // all signature requests must be finished before the petition is closed
+      if (signature && ["ENQUEUED", "PROCESSED", "PROCESSING"].includes(signature.status)) {
+        return false;
+      }
+      return true;
+    }
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),

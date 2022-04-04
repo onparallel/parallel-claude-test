@@ -34,10 +34,21 @@ export function TimelineAccessDeactivatedEvent({
             ),
           }}
         />
-      ) : (
+      ) : event.reason === "EMAIL_BOUNCED" ? (
         <FormattedMessage
           id="timeline.access-deactivated-auto-description"
           defaultMessage="The access for {contact} was removed because the email bounced {timeAgo}"
+          values={{
+            contact: <ContactReference contact={event.access.contact} />,
+            timeAgo: (
+              <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+            ),
+          }}
+        />
+      ) : (
+        <FormattedMessage
+          id="timeline.access-deactivated-generic-description"
+          defaultMessage="The access for {contact} was removed {timeAgo}"
           values={{
             contact: <ContactReference contact={event.access.contact} />,
             timeAgo: (

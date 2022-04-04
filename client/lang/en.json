@@ -4825,6 +4825,11 @@
     "context": "No deadline"
   },
   {
+    "term": "generic.not-available",
+    "definition": "Not available",
+    "context": "Not available"
+  },
+  {
     "term": "generic.not-sent",
     "definition": "Not sent",
     "context": "Not sent"
@@ -9448,6 +9453,11 @@
     "term": "timeline.access-deactivated-auto-description",
     "definition": "The access for {contact} was removed because the email bounced {timeAgo}",
     "context": "The access for {contact} was removed because the email bounced {timeAgo}"
+  },
+  {
+    "term": "timeline.access-deactivated-generic-description",
+    "definition": "The access for {contact} was removed {timeAgo}",
+    "context": "The access for {contact} was removed {timeAgo}"
   },
   {
     "term": "timeline.access-deactivated-manual-description",

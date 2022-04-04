@@ -111,5 +111,6 @@ export const PetitionSignatureRequest = objectType({
       description: "Metadata for this signature request.",
       resolve: (o) => o.metadata,
     });
+    t.boolean("isAnonymized", { resolve: (o) => o.anonymized_at !== null });
   },
 });
