@@ -1029,6 +1029,7 @@ export interface NexusGenFieldTypes {
     integrations: NexusGenRootTypes["OrgIntegrationPagination"]; // OrgIntegrationPagination!
     logoUrl: string | null; // String
     name: string; // String!
+    pdfDocumentTheme: NexusGenScalars["JSONObject"]; // JSONObject!
     preferredTone: NexusGenEnums["Tone"]; // Tone!
     status: NexusGenEnums["OrganizationStatus"]; // OrganizationStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -2443,6 +2444,7 @@ export interface NexusGenFieldTypeNames {
     integrations: "OrgIntegrationPagination";
     logoUrl: "String";
     name: "String";
+    pdfDocumentTheme: "JSONObject";
     preferredTone: "Tone";
     status: "OrganizationStatus";
     updatedAt: "DateTime";

@@ -1646,6 +1646,7 @@ type Organization implements Timestamps {
   The name of the organization.
   """
   name: String!
+  pdfDocumentTheme: JSONObject!
 
   """
   The preferred tone of organization.

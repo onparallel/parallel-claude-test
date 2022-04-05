@@ -1440,6 +1440,7 @@ export type Organization = Timestamps & {
   logoUrl: Maybe<Scalars["String"]>;
   /** The name of the organization. */
   name: Scalars["String"];
+  pdfDocumentTheme: Scalars["JSONObject"];
   /** The preferred tone of organization. */
   preferredTone: Tone;
   /** The status of the organization. */

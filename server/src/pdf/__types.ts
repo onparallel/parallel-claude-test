@@ -1440,6 +1440,7 @@ export type Organization = Timestamps & {
   logoUrl: Maybe<Scalars["String"]>;
   /** The name of the organization. */
   name: Scalars["String"];
+  pdfDocumentTheme: Scalars["JSONObject"];
   /** The preferred tone of organization. */
   preferredTone: Tone;
   /** The status of the organization. */
@@ -3356,7 +3357,7 @@ export type PetitionExport_PetitionFragment = {
       content: { [key: string]: any };
     }>;
   }>;
-  organization: { name: string; logoUrl: string | null };
+  organization: { name: string; logoUrl: string | null; pdfDocumentTheme: { [key: string]: any } };
   currentSignatureRequest: {
     signatureConfig: { timezone: string; signers: Array<{ fullName: string; email: string }> };
   } | null;
@@ -3397,7 +3398,11 @@ export type PetitionExport_petitionQuery = {
             content: { [key: string]: any };
           }>;
         }>;
-        organization: { name: string; logoUrl: string | null };
+        organization: {
+          name: string;
+          logoUrl: string | null;
+          pdfDocumentTheme: { [key: string]: any };
+        };
         currentSignatureRequest: {
           signatureConfig: {
             timezone: string;
@@ -3445,6 +3450,7 @@ export const PetitionExport_PetitionFragmentDoc = gql`
     organization {
       name
       logoUrl
+      pdfDocumentTheme
     }
     fromTemplateId
     currentSignatureRequest {

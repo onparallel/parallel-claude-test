@@ -8,7 +8,7 @@ import { fileSize } from "../../util/fileSize";
 import { formatNumberWithPrefix } from "../../util/formatNumberWithPrefix";
 import { SignaturesBlock } from "../components/SignaturesBlock";
 import { PdfDocumentGetProps } from "../utils/pdf";
-import { PetitionExportTheme, ThemeProvider } from "../utils/ThemeProvider";
+import { PdfDocumentTheme, ThemeProvider } from "../utils/ThemeProvider";
 import {
   PetitionExport_petitionDocument,
   PetitionExport_PetitionFieldFragment,
@@ -25,30 +25,13 @@ export interface PetitionExportProps extends Omit<PetitionExportInitialData, "pe
   petition: PetitionExport_PetitionFragment;
 }
 
-const theme: PetitionExportTheme = {
-  marginLeft: 10,
-  marginRight: 10,
-  marginTop: 10,
-  marginBottom: 10,
-  title1FontFamily: "IBM Plex Sans",
-  title1Color: "#000000",
-  title1FontSize: 16,
-  title2FontFamily: "IBM Plex Sans",
-  title2Color: "#000000",
-  title2FontSize: 14,
-  textFontFamily: "IBM Plex Sans",
-  textColor: "#000000",
-  textFontSize: 12,
-  logoPosition: "center",
-  paginationPosition: "right",
-};
-
 export default function PetitionExport({
   documentTitle,
   showSignatureBoxes,
   petition,
 }: PetitionExportProps) {
   const intl = useIntl();
+  const theme = petition.organization.pdfDocumentTheme as PdfDocumentTheme;
   const styles = StyleSheet.create({
     page: {
       paddingLeft: `${theme.marginLeft}mm`,
@@ -344,6 +327,7 @@ PetitionExport.fragments = {
         organization {
           name
           logoUrl
+          pdfDocumentTheme
         }
         fromTemplateId
         currentSignatureRequest {

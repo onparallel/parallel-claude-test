@@ -1,6 +1,6 @@
 import { createContext, PropsWithChildren, useContext } from "react";
 
-export interface PetitionExportTheme {
+export interface PdfDocumentTheme {
   marginLeft: number;
   marginRight: number;
   marginTop: number;
@@ -18,12 +18,12 @@ export interface PetitionExportTheme {
   paginationPosition: "center" | "left" | "right";
 }
 
-const ThemeContext = createContext<PetitionExportTheme | undefined>(undefined);
+const ThemeContext = createContext<PdfDocumentTheme | undefined>(undefined);
 
 export function ThemeProvider({
   theme: value,
   children,
-}: PropsWithChildren<{ theme: PetitionExportTheme }>) {
+}: PropsWithChildren<{ theme: PdfDocumentTheme }>) {
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 

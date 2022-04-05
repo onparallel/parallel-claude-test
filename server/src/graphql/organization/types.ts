@@ -191,5 +191,26 @@ export const Organization = objectType({
         return o.preferred_tone;
       },
     });
+    t.nonNull.jsonObject("pdfDocumentTheme", {
+      resolve: () => {
+        return {
+          marginLeft: 10,
+          marginRight: 10,
+          marginTop: 10,
+          marginBottom: 10,
+          title1FontFamily: "IBM Plex Sans",
+          title1Color: "#000000",
+          title1FontSize: 16,
+          title2FontFamily: "IBM Plex Sans",
+          title2Color: "#000000",
+          title2FontSize: 14,
+          textFontFamily: "IBM Plex Sans",
+          textColor: "#000000",
+          textFontSize: 12,
+          logoPosition: "center",
+          paginationPosition: "right",
+        };
+      },
+    });
   },
 });
