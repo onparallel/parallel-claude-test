@@ -3,7 +3,7 @@ import { Style } from "@react-pdf/types";
 import { gql } from "apollo-server-core";
 import { FormattedMessage, useIntl } from "react-intl";
 import { chunk, times } from "remeda";
-import { FORMATS } from "../../emails/utils/dates";
+import { FORMATS } from "../../util/dates";
 import { useTheme } from "../utils/ThemeProvider";
 import { SignaturesBlock_SignatureConfigFragment } from "../__types";
 import { SignatureBox, SignatureBoxProps } from "./SignatureBox";

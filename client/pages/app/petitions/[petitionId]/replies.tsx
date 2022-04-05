@@ -463,7 +463,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     petition.__typename === "Petition" &&
     petition.status === "DRAFT";
 
-  const scope = useLiquidScope(petition.fields);
+  const scope = useLiquidScope(petition);
 
   return (
     <PetitionLayout
@@ -705,6 +705,7 @@ PetitionReplies.fragments = {
         ...getPetitionSignatureEnvironment_Petition
         ...PetitionAttachmentsCard_Petition
         ...useClosePetitionDialog_Petition
+        ...useLiquidScope_PetitionBase
       }
       ${PetitionLayout.fragments.PetitionBase}
       ${this.PetitionField}
@@ -714,6 +715,7 @@ PetitionReplies.fragments = {
       ${getPetitionSignatureEnvironment.fragments.Petition}
       ${PetitionAttachmentsCard.fragments.Petition}
       ${useClosePetitionDialog.fragments.Petition}
+      ${useLiquidScope.fragments.PetitionBase}
     `;
   },
   get PetitionField() {
@@ -725,14 +727,12 @@ PetitionReplies.fragments = {
         ...PetitionRepliesFieldComments_PetitionField
         ...ExportRepliesDialog_PetitionField
         ...useFieldVisibility_PetitionField
-        ...useLiquidScope_PetitionField
       }
       ${PetitionRepliesField.fragments.PetitionField}
       ${PetitionRepliesFieldComments.fragments.PetitionField}
       ${ExportRepliesDialog.fragments.PetitionField}
       ${PetitionContents.fragments.PetitionField}
       ${useFieldVisibility.fragments.PetitionField}
-      ${useLiquidScope.fragments.PetitionField}
     `;
   },
   get User() {

@@ -3345,16 +3345,18 @@ export type PetitionExport_PetitionFragment = {
   fromTemplateId: string | null;
   fields: Array<{
     options: { [key: string]: any };
-    id: string;
     type: PetitionFieldType;
+    multiple: boolean;
+    alias: string | null;
+    id: string;
     title: string | null;
     description: string | null;
     showInPdf: boolean;
     visibility: { [key: string]: any } | null;
     replies: Array<{
+      content: { [key: string]: any };
       id: string;
       status: PetitionFieldReplyStatus;
-      content: { [key: string]: any };
     }>;
   }>;
   organization: { name: string; logoUrl: string | null; pdfDocumentTheme: { [key: string]: any } };
@@ -3386,16 +3388,18 @@ export type PetitionExport_petitionQuery = {
         fromTemplateId: string | null;
         fields: Array<{
           options: { [key: string]: any };
-          id: string;
           type: PetitionFieldType;
+          multiple: boolean;
+          alias: string | null;
+          id: string;
           title: string | null;
           description: string | null;
           showInPdf: boolean;
           visibility: { [key: string]: any } | null;
           replies: Array<{
+            content: { [key: string]: any };
             id: string;
             status: PetitionFieldReplyStatus;
-            content: { [key: string]: any };
           }>;
         }>;
         organization: {
@@ -3412,6 +3416,16 @@ export type PetitionExport_petitionQuery = {
       }
     | {}
     | null;
+};
+
+export type useLiquidScope_PetitionBaseFragment = {
+  id: string;
+  fields: Array<{
+    type: PetitionFieldType;
+    multiple: boolean;
+    alias: string | null;
+    replies: Array<{ content: { [key: string]: any } }>;
+  }>;
 };
 
 export const PetitionExport_PetitionFieldFragmentDoc = gql`
@@ -3439,6 +3453,19 @@ export const SignaturesBlock_SignatureConfigFragmentDoc = gql`
     timezone
   }
 ` as unknown as DocumentNode<SignaturesBlock_SignatureConfigFragment, unknown>;
+export const useLiquidScope_PetitionBaseFragmentDoc = gql`
+  fragment useLiquidScope_PetitionBase on Petition {
+    id
+    fields {
+      type
+      multiple
+      alias
+      replies {
+        content
+      }
+    }
+  }
+` as unknown as DocumentNode<useLiquidScope_PetitionBaseFragment, unknown>;
 export const PetitionExport_PetitionFragmentDoc = gql`
   fragment PetitionExport_Petition on Petition {
     id
@@ -3458,9 +3485,11 @@ export const PetitionExport_PetitionFragmentDoc = gql`
         ...SignaturesBlock_SignatureConfig
       }
     }
+    ...useLiquidScope_PetitionBase
   }
   ${PetitionExport_PetitionFieldFragmentDoc}
   ${SignaturesBlock_SignatureConfigFragmentDoc}
+  ${useLiquidScope_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionExport_PetitionFragment, unknown>;
 export const PetitionExport_petitionDocument = gql`
   query PetitionExport_petition($petitionId: GID!) {

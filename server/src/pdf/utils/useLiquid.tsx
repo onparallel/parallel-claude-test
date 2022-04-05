@@ -1,12 +1,11 @@
 import { Liquid } from "liquidjs";
-import { createContext, PropsWithChildren, useContext } from "react";
+import { createContext, PropsWithChildren, useContext, useMemo } from "react";
 import { IntlShape, useIntl } from "react-intl";
 import { isDefined } from "remeda";
-import { FORMATS } from "./dates";
-import { useConstant } from "./useConstant";
+import { FORMATS } from "../../util/dates";
 
 function useCreateLiquid() {
-  return useConstant(() => {
+  return useMemo(() => {
     const engine = new Liquid({ cache: true });
 
     engine.registerFilter("number", function (value: number | string, digits?: number) {
@@ -90,7 +89,7 @@ function useCreateLiquid() {
       });
     }
     return engine;
-  });
+  }, []);
 }
 
 const LiquidContext = createContext<Liquid | null>(null);

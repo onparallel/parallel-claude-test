@@ -1,23 +1,25 @@
 import { gql } from "@apollo/client";
 import {
-  useLiquidScope_PetitionFieldFragment,
-  useLiquidScope_PublicPetitionFieldFragment,
+  useLiquidScope_PetitionBaseFragment,
+  useLiquidScope_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { isDefined, zip } from "remeda";
 import { getFieldIndices, PetitionFieldIndex } from "./fieldIndices";
+import { UnwrapArray } from "./types";
 
 export function useLiquidScope(
-  fields: useLiquidScope_PetitionFieldFragment[] | useLiquidScope_PublicPetitionFieldFragment[],
+  petition: useLiquidScope_PetitionBaseFragment | useLiquidScope_PublicPetitionFragment,
   usePreviewReplies?: boolean
 ) {
   return useMemo(() => {
-    const indices = getFieldIndices(fields);
-    const scope: Record<string, any> = { _: {} };
+    const indices = getFieldIndices(petition.fields);
+    const scope: Record<string, any> = { petitionId: petition.id, _: {} };
     for (const [fieldIndex, field] of zip<
       PetitionFieldIndex,
-      useLiquidScope_PetitionFieldFragment | useLiquidScope_PublicPetitionFieldFragment
-    >(indices, fields)) {
+      | UnwrapArray<useLiquidScope_PetitionBaseFragment["fields"]>
+      | UnwrapArray<useLiquidScope_PublicPetitionFragment["fields"]>
+    >(indices, petition.fields)) {
       const replies =
         field.__typename === "PetitionField" && usePreviewReplies
           ? field.previewReplies
@@ -35,30 +37,36 @@ export function useLiquidScope(
       }
     }
     return scope;
-  }, [fields]);
+  }, [petition.fields]);
 }
 
 useLiquidScope.fragments = {
-  PetitionField: gql`
-    fragment useLiquidScope_PetitionField on PetitionField {
-      type
-      multiple
-      alias
-      previewReplies @client {
-        content
-      }
-      replies {
-        content
+  PetitionBase: gql`
+    fragment useLiquidScope_PetitionBase on PetitionBase {
+      id
+      fields {
+        type
+        multiple
+        alias
+        previewReplies @client {
+          content
+        }
+        replies {
+          content
+        }
       }
     }
   `,
-  PublicPetitionField: gql`
-    fragment useLiquidScope_PublicPetitionField on PublicPetitionField {
-      type
-      multiple
-      alias
-      replies {
-        content
+  PublicPetition: gql`
+    fragment useLiquidScope_PublicPetition on PublicPetition {
+      id
+      fields {
+        type
+        multiple
+        alias
+        replies {
+          content
+        }
       }
     }
   `,

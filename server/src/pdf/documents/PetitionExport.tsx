@@ -2,13 +2,15 @@ import { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/render
 import { gql } from "apollo-server-core";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, zip } from "remeda";
-import { FORMATS } from "../../emails/utils/dates";
+import { FORMATS } from "../../util/dates";
 import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { fileSize } from "../../util/fileSize";
 import { formatNumberWithPrefix } from "../../util/formatNumberWithPrefix";
 import { SignaturesBlock } from "../components/SignaturesBlock";
 import { PdfDocumentGetProps } from "../utils/pdf";
 import { PdfDocumentTheme, ThemeProvider } from "../utils/ThemeProvider";
+import { LiquidProvider, LiquidScopeProvider, useLiquid } from "../utils/useLiquid";
+import { useLiquidScope } from "../utils/useLiquidScope";
 import {
   PetitionExport_petitionDocument,
   PetitionExport_PetitionFieldFragment,
@@ -58,6 +60,7 @@ export default function PetitionExport({
     },
     noReplies: {
       fontStyle: "italic",
+      opacity: 0.7,
     },
     // header: {
     //   position: "absolute",
@@ -141,154 +144,171 @@ export default function PetitionExport({
 
   const visibility = evaluateFieldVisibility(petition.fields as any);
   const pages = groupFieldsByPages(petition.fields as any, visibility);
+  const scope = useLiquidScope(petition);
 
   return (
-    <ThemeProvider theme={theme}>
-      <Document>
-        {pages.map((page, i) => (
-          <Page key={i} style={styles.page} wrap>
-            {i === 0 ? (
-              <View style={styles.documentStart}>
-                <Image
-                  src={
-                    petition.organization.logoUrl ??
-                    "http://static.onparallel.com/static/emails/logo.png"
-                  }
-                  style={styles.documentLogo}
-                />
-                <View style={styles.documentTitle}>
-                  <Text style={styles.title1}>{documentTitle}</Text>
-                </View>
-              </View>
-            ) : null}
-            {page.map((field, i) => (
-              <View key={i} style={{ marginBottom: "5mm" }}>
-                {field.type === "HEADING" ? (
-                  <View>
-                    {field.title ? (
-                      <Text
-                        style={[
-                          styles.headerTitle,
-                          styles.title2,
-                          ...(field.description ? [{ marginBottom: "2mm" }] : []),
-                        ]}
-                      >
-                        {field.title}
-                      </Text>
-                    ) : null}
-                    {field.description ? (
-                      <Text style={[styles.text, styles.headerDescription]}>
-                        {field.description}
-                      </Text>
-                    ) : null}
-                  </View>
-                ) : (
-                  <View key={i} style={styles.field} wrap={false}>
-                    <Text style={[styles.text, styles.fieldTitle]}>{field.title}</Text>
-                    {field.description ? (
-                      <Text style={[styles.text, styles.fieldDescription, { marginTop: "2mm" }]}>
-                        {field.description}
-                      </Text>
-                    ) : null}
-                    <View style={styles.fieldReplies}>
-                      {field.replies.map((reply) =>
-                        field.type === "FILE_UPLOAD" ? (
-                          <Text style={[styles.text]} key={reply.id}>
-                            {`${reply.content.filename} - ${fileSize(intl, reply.content.size)}`}
-                            {reply.status === "APPROVED" ? null : (
-                              <Text style={[styles.text]}>
-                                {" "}
-                                <FormattedMessage
-                                  id="petition-signature.file-submitted.pending-review"
-                                  defaultMessage="(Pending review)"
-                                />
-                              </Text>
-                            )}
-                          </Text>
-                        ) : field.type === "DYNAMIC_SELECT" ? (
-                          <View key={reply.id}>
-                            {(reply.content.value as [string, string | null][]).map(
-                              ([label, value], i) => (
-                                <Text style={[styles.text]} key={i}>
-                                  {label}:{" "}
-                                  {value ?? (
-                                    <Text>
-                                      <FormattedMessage
-                                        id="petition-signature.no-reply-submitted"
-                                        defaultMessage="No replies have been submitted."
-                                      />
-                                    </Text>
-                                  )}
-                                </Text>
-                              )
-                            )}
-                          </View>
-                        ) : field.type === "CHECKBOX" ? (
-                          <View key={reply.id}>
-                            {(reply.content.value as [string]).map((value, i) => (
-                              <Text style={[styles.text]} key={i}>
-                                {value}
-                              </Text>
-                            ))}
-                          </View>
-                        ) : field.type === "NUMBER" ? (
-                          <Text style={[styles.text]} key={reply.id}>
-                            {formatNumberWithPrefix(reply.content.value, field!.options)}
-                          </Text>
-                        ) : field.type === "DATE" ? (
-                          <Text style={[styles.text]} key={reply.id}>
-                            {intl.formatDate(reply.content.value, {
-                              ...FORMATS.L,
-                              timeZone: "UTC",
-                            })}
-                          </Text>
-                        ) : field.type === "PHONE" ? (
-                          <Text style={[styles.text]} key={reply.id}>
-                            {reply.content.value}
-                          </Text>
-                        ) : (
-                          <Text style={[styles.text]} key={reply.id}>
-                            {reply.content.value}
-                          </Text>
-                        )
-                      )}
-                      {field.replies.length === 0 ? (
-                        <Text style={[styles.text, styles.noReplies]}>
-                          {field.type === "FILE_UPLOAD" ? (
-                            <FormattedMessage
-                              id="petition-signature.file-not-submitted"
-                              defaultMessage="File not submitted"
-                            />
-                          ) : (
-                            <FormattedMessage
-                              id="petition-signature.no-reply-submitted"
-                              defaultMessage="No replies have been submitted."
-                            />
-                          )}
-                        </Text>
-                      ) : null}
+    <LiquidProvider>
+      <LiquidScopeProvider scope={scope}>
+        <ThemeProvider theme={theme}>
+          <Document>
+            {pages.map((page, i) => (
+              <Page key={i} style={styles.page} wrap>
+                {i === 0 ? (
+                  <View style={styles.documentStart}>
+                    <Image
+                      src={
+                        petition.organization.logoUrl ??
+                        "http://static.onparallel.com/static/emails/logo.png"
+                      }
+                      style={styles.documentLogo}
+                    />
+                    <View style={styles.documentTitle}>
+                      <Text style={styles.title1}>{documentTitle}</Text>
                     </View>
                   </View>
-                )}
-              </View>
+                ) : null}
+                {page.map((field, i) => (
+                  <View key={i} style={{ marginBottom: "5mm" }}>
+                    {field.type === "HEADING" ? (
+                      <View>
+                        {field.title ? (
+                          <Text
+                            style={[
+                              styles.headerTitle,
+                              styles.title2,
+                              ...(field.description ? [{ marginBottom: "2mm" }] : []),
+                            ]}
+                          >
+                            {field.title}
+                          </Text>
+                        ) : null}
+                        {field.description ? (
+                          <Text style={[styles.text, styles.headerDescription]}>
+                            <FieldDescription description={field.description} />
+                          </Text>
+                        ) : null}
+                      </View>
+                    ) : (
+                      <View key={i} style={styles.field} wrap={false}>
+                        <Text style={[styles.text, styles.fieldTitle]}>{field.title}</Text>
+                        {field.description ? (
+                          <Text
+                            style={[styles.text, styles.fieldDescription, { marginTop: "2mm" }]}
+                          >
+                            <FieldDescription description={field.description} />
+                          </Text>
+                        ) : null}
+                        <View style={styles.fieldReplies}>
+                          {field.replies.map((reply) =>
+                            field.type === "FILE_UPLOAD" ? (
+                              <Text style={[styles.text]} key={reply.id}>
+                                {`${reply.content.filename} - ${fileSize(
+                                  intl,
+                                  reply.content.size
+                                )}`}
+                                {reply.status === "APPROVED" ? null : (
+                                  <Text style={[styles.text]}>
+                                    {" "}
+                                    <FormattedMessage
+                                      id="document.petition-export.file-pending-review"
+                                      defaultMessage="(Pending review)"
+                                    />
+                                  </Text>
+                                )}
+                              </Text>
+                            ) : field.type === "DYNAMIC_SELECT" ? (
+                              <View key={reply.id}>
+                                {(reply.content.value as [string, string | null][]).map(
+                                  ([label, value], i) => (
+                                    <Text style={[styles.text]} key={i}>
+                                      {label}:{" "}
+                                      {value ?? (
+                                        <Text style={[styles.text, styles.noReplies]}>
+                                          <FormattedMessage
+                                            id="document.petition-export.no-replies"
+                                            defaultMessage="No replies have been submitted."
+                                          />
+                                        </Text>
+                                      )}
+                                    </Text>
+                                  )
+                                )}
+                              </View>
+                            ) : field.type === "CHECKBOX" ? (
+                              <View key={reply.id}>
+                                {(reply.content.value as [string]).map((value, i) => (
+                                  <Text style={[styles.text]} key={i}>
+                                    {value}
+                                  </Text>
+                                ))}
+                              </View>
+                            ) : field.type === "NUMBER" ? (
+                              <Text style={[styles.text]} key={reply.id}>
+                                {formatNumberWithPrefix(reply.content.value, field!.options)}
+                              </Text>
+                            ) : field.type === "DATE" ? (
+                              <Text style={[styles.text]} key={reply.id}>
+                                {intl.formatDate(reply.content.value, {
+                                  ...FORMATS.L,
+                                  timeZone: "UTC",
+                                })}
+                              </Text>
+                            ) : field.type === "PHONE" ? (
+                              <Text style={[styles.text]} key={reply.id}>
+                                {reply.content.value}
+                              </Text>
+                            ) : (
+                              <Text style={[styles.text]} key={reply.id}>
+                                {reply.content.value}
+                              </Text>
+                            )
+                          )}
+                          {field.replies.length === 0 ? (
+                            <Text style={[styles.text, styles.noReplies]}>
+                              {field.type === "FILE_UPLOAD" ? (
+                                <FormattedMessage
+                                  id="document.petition-export.no-files"
+                                  defaultMessage="No files have been submitted"
+                                />
+                              ) : (
+                                <FormattedMessage
+                                  id="document.petition-export.no-replies"
+                                  defaultMessage="No replies have been submitted."
+                                />
+                              )}
+                            </Text>
+                          ) : null}
+                        </View>
+                      </View>
+                    )}
+                  </View>
+                ))}
+                {showSignatureBoxes && isDefined(petition.currentSignatureRequest) ? (
+                  <SignaturesBlock
+                    signatureConfig={petition.currentSignatureRequest.signatureConfig}
+                    templateId={petition.fromTemplateId}
+                    style={styles.signaturesBlock}
+                  />
+                ) : null}
+                <View
+                  fixed
+                  style={styles.footer}
+                  render={({ pageNumber }) => (
+                    <Text style={styles.footerPageNumber}>{pageNumber}</Text>
+                  )}
+                />
+              </Page>
             ))}
-            {showSignatureBoxes && isDefined(petition.currentSignatureRequest) ? (
-              <SignaturesBlock
-                signatureConfig={petition.currentSignatureRequest.signatureConfig}
-                templateId={petition.fromTemplateId}
-                style={styles.signaturesBlock}
-              />
-            ) : null}
-            <View
-              fixed
-              style={styles.footer}
-              render={({ pageNumber }) => <Text style={styles.footerPageNumber}>{pageNumber}</Text>}
-            />
-          </Page>
-        ))}
-      </Document>
-    </ThemeProvider>
+          </Document>
+        </ThemeProvider>
+      </LiquidScopeProvider>
+    </LiquidProvider>
   );
+}
+
+function FieldDescription({ description }: { description: string }) {
+  const text = useLiquid(description);
+  return <Text>{text}</Text>;
 }
 
 function groupFieldsByPages<T extends PetitionExport_PetitionFieldFragment>(
@@ -335,9 +355,11 @@ PetitionExport.fragments = {
             ...SignaturesBlock_SignatureConfig
           }
         }
+        ...useLiquidScope_PetitionBase
       }
       ${this.PetitionField}
       ${SignaturesBlock.fragments.SignatureConfig}
+      ${useLiquidScope.fragments.PetitionBase}
     `;
   },
   get PetitionField() {

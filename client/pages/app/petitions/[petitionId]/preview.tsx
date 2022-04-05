@@ -253,7 +253,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const displayPetitionLimitReachedAlert =
     isUsageLimitsReached(me.organization) && isPetition && petition.status === "DRAFT";
 
-  const scope = useLiquidScope(petition.fields, petition.__typename === "PetitionTemplate");
+  const scope = useLiquidScope(petition, petition.__typename === "PetitionTemplate");
   return (
     <ToneProvider value={petition.tone}>
       <PetitionLayout
@@ -390,7 +390,6 @@ PetitionPreview.fragments = {
         ...useGetPageFields_PetitionField
         ...validatePetitionFields_PetitionField
         ...FieldErrorDialog_PetitionField
-        ...useLiquidScope_PetitionField
       }
       signatureConfig {
         allowAdditionalSigners
@@ -403,6 +402,7 @@ PetitionPreview.fragments = {
       }
       ...RecipientViewContentsCard_PetitionBase
       ...PetitionLayout_PetitionBase
+      ...useLiquidScope_PetitionBase
     }
     ${ConfirmPetitionSignersDialog.fragments.PetitionAccess}
     ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
@@ -414,7 +414,7 @@ PetitionPreview.fragments = {
     ${useGetPageFields.fragments.PetitionField}
     ${validatePetitionFields.fragments.PetitionField}
     ${FieldErrorDialog.fragments.PetitionField}
-    ${useLiquidScope.fragments.PetitionField}
+    ${useLiquidScope.fragments.PetitionBase}
   `,
   User: gql`
     fragment PetitionPreview_User on User {

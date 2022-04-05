@@ -1,4 +1,4 @@
-import { DateTimeFormatOptions } from "../utils/dates";
+import { DateTimeFormatOptions } from "../../util/dates";
 import { FormattedDate } from "react-intl";
 
 export type DateTimeProps = {

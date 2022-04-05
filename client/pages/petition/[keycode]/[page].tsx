@@ -179,7 +179,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
   }, []);
 
   const breakpoint = "md";
-  const scope = useLiquidScope(petition.fields);
+  const scope = useLiquidScope(petition);
 
   return (
     <LastSavedProvider>
@@ -520,6 +520,7 @@ RecipientView.fragments = {
         signatureStatus
         ...RecipientViewContentsCard_PublicPetition
         ...RecipientViewProgressFooter_PublicPetition
+        ...useLiquidScope_PublicPetition
       }
 
       ${this.PublicPetitionField}
@@ -528,6 +529,7 @@ RecipientView.fragments = {
       ${RecipientViewProgressFooter.fragments.PublicPetition}
       ${RecipientViewHeader.fragments.PublicContact}
       ${useGetPageFields.fragments.PublicPetitionField}
+      ${useLiquidScope.fragments.PublicPetition}
     `;
   },
   get PublicPetitionField() {
@@ -537,12 +539,10 @@ RecipientView.fragments = {
         ...RecipientViewPetitionField_PublicPetitionField
         ...RecipientViewContentsCard_PublicPetitionField
         ...RecipientViewProgressFooter_PublicPetitionField
-        ...useLiquidScope_PublicPetitionField
       }
       ${RecipientViewPetitionField.fragments.PublicPetitionField}
       ${RecipientViewContentsCard.fragments.PublicPetitionField}
       ${RecipientViewProgressFooter.fragments.PublicPetitionField}
-      ${useLiquidScope.fragments.PublicPetitionField}
     `;
   },
   get PublicUser() {

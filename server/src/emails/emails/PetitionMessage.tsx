@@ -9,7 +9,7 @@ import { Layout, LayoutProps } from "../components/Layout";
 import { disclaimer } from "../components/texts";
 import { UserMessageBox } from "../components/UserMessageBox";
 import { WhyWeUseParallel } from "../components/WhyWeUseParallel";
-import { FORMATS } from "../utils/dates";
+import { FORMATS } from "../../util/dates";
 import { Tone } from "../utils/types";
 
 export type PetitionMessageProps = {
