@@ -125,6 +125,26 @@
     "context": "This is an email sent via Parallel from the verified account {email}"
   },
   {
+    "term": "document.petition-export.file-pending-review",
+    "definition": "(Pendiente de revisión)",
+    "context": "(Pending review)"
+  },
+  {
+    "term": "document.petition-export.no-files",
+    "definition": "No se ha subido ningun archivo.",
+    "context": "No files have been submitted."
+  },
+  {
+    "term": "document.petition-export.no-replies",
+    "definition": "No se ha subido ninguna respuesta.",
+    "context": "No replies have been submitted."
+  },
+  {
+    "term": "document.petition-export.signatures-disclaimer",
+    "definition": "Declaro que los datos y la documentación facilitados, así como las copias o fotocopias enviadas, reproducen fielmente los documentos originales y la información actual de identificación.",
+    "context": "I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current identification information."
+  },
+  {
     "term": "footer.slogan",
     "definition": "Trabaja mejor con",
     "context": "Work better with"

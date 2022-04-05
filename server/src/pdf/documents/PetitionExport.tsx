@@ -267,7 +267,7 @@ export default function PetitionExport({
                               {field.type === "FILE_UPLOAD" ? (
                                 <FormattedMessage
                                   id="document.petition-export.no-files"
-                                  defaultMessage="No files have been submitted"
+                                  defaultMessage="No files have been submitted."
                                 />
                               ) : (
                                 <FormattedMessage
@@ -291,7 +291,6 @@ export default function PetitionExport({
                 ) : null}
                 <View
                   fixed
-                  debug
                   style={styles.footer}
                   render={({ pageNumber }) => (
                     <Text style={styles.footerPageNumber}>{pageNumber}</Text>

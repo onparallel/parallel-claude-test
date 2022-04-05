@@ -5765,21 +5765,6 @@
     "context": "Pending start"
   },
   {
-    "term": "petition-signature.file-not-submitted",
-    "definition": "Archivo no enviado.",
-    "context": "File not submitted"
-  },
-  {
-    "term": "petition-signature.file-submitted.pending-review",
-    "definition": "(Pendiente de revisión)",
-    "context": "(Pending review)"
-  },
-  {
-    "term": "petition-signature.no-reply-submitted",
-    "definition": "No se ha subido ninguna respuesta.",
-    "context": "No replies have been submitted."
-  },
-  {
     "term": "petition.add-access.header",
     "definition": "¿A quién quieres enviárselo?",
     "context": "Who do you want to send it to?"
@@ -6068,11 +6053,6 @@
     "term": "petition.petition-sent-toast.title",
     "definition": "{count, plural, =1{Petición enviada} other{Peticiones enviadas}}.",
     "context": "{count, plural, =1{Petition} other{Petitions}} sent"
-  },
-  {
-    "term": "petition.print-pdf.signatures-disclaimer",
-    "definition": "Declaro que los datos y la documentación facilitados, así como las copias o fotocopias enviadas, reproducen fielmente los documentos originales y la información actual de identificación.",
-    "context": "I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current identification information."
   },
   {
     "term": "petition.public-template-dialog.body",

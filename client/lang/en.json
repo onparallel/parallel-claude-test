@@ -5765,21 +5765,6 @@
     "context": "Pending start"
   },
   {
-    "term": "petition-signature.file-not-submitted",
-    "definition": "File not submitted",
-    "context": "File not submitted"
-  },
-  {
-    "term": "petition-signature.file-submitted.pending-review",
-    "definition": "(Pending review)",
-    "context": "(Pending review)"
-  },
-  {
-    "term": "petition-signature.no-reply-submitted",
-    "definition": "No replies have been submitted.",
-    "context": "No replies have been submitted."
-  },
-  {
     "term": "petition.add-access.header",
     "definition": "Who do you want to send it to?",
     "context": "Who do you want to send it to?"
@@ -6068,11 +6053,6 @@
     "term": "petition.petition-sent-toast.title",
     "definition": "{count, plural, =1{Petition} other{Petitions}} sent",
     "context": "{count, plural, =1{Petition} other{Petitions}} sent"
-  },
-  {
-    "term": "petition.print-pdf.signatures-disclaimer",
-    "definition": "I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current identification information.",
-    "context": "I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current identification information."
   },
   {
     "term": "petition.public-template-dialog.body",
