@@ -2159,7 +2159,7 @@ describe("GraphQL/Petitions", () => {
 
     it("R/W user with group permissions should not be able to delete", async () => {
       jest
-        .spyOn(testClient.container.get<IAuth>(AUTH), "validateSession")
+        .spyOn(testClient.container.get<IAuth>(AUTH), "validateRequestAuthentication")
         .mockResolvedValueOnce(users[0]);
 
       const { errors, data } = await testClient.mutate({
@@ -2177,7 +2177,7 @@ describe("GraphQL/Petitions", () => {
 
     it("R/W user with directly assigned and group permissions should not be able to delete", async () => {
       jest
-        .spyOn(testClient.container.get<IAuth>(AUTH), "validateSession")
+        .spyOn(testClient.container.get<IAuth>(AUTH), "validateRequestAuthentication")
         .mockResolvedValueOnce(users[1]);
 
       const { errors, data } = await testClient.mutate({

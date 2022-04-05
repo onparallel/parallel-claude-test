@@ -1,5 +1,4 @@
 import ASCIIFolder from "fold-to-ascii";
-import { decode } from "jsonwebtoken";
 import {
   arg,
   booleanArg,
@@ -22,7 +21,7 @@ import {
   petitionsArePublicTemplates,
   userHasAccessToPetitions,
 } from "./authorizers";
-import { validateAuthTokenPayload, validatePublicPetitionLinkSlug } from "./validations";
+import { validatePublicPetitionLinkSlug } from "./validations";
 
 export const petitionsQuery = queryField((t) => {
   t.paginationField("petitions", {

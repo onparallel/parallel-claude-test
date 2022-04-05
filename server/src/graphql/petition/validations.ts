@@ -1,8 +1,7 @@
 import { GraphQLResolveInfo } from "graphql";
-import { decode } from "jsonwebtoken";
 import { isPossiblePhoneNumber } from "libphonenumber-js";
 import { ArgsValue } from "nexus/dist/core";
-import { difference, isDefined } from "remeda";
+import { difference } from "remeda";
 import {
   Petition,
   PetitionAccess,
@@ -80,29 +79,6 @@ export function petitionAccessesNotOptedOut(
       );
     }
   }
-}
-
-/**
- * checks that auth token payload contains the required keys
- */
-export function validateAuthTokenPayload<TypeName extends string, FieldName extends string>(
-  prop: (args: ArgsValue<TypeName, FieldName>) => string | null | undefined,
-  requiredKey: string,
-  argName: string
-) {
-  return (async (_, args, ctx, info) => {
-    const token = prop(args)!;
-    const payload: any = decode(token);
-
-    const keys = requiredKey.split(".");
-    let data = payload;
-    keys.forEach((key) => {
-      data = data[key];
-      if (!isDefined(data)) {
-        throw new ArgValidationError(info, argName, "Invalid token");
-      }
-    });
-  }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }
 
 export function validatePublicPetitionLinkSlug<TypeName extends string, FieldName extends string>(

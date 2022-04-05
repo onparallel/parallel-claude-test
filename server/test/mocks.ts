@@ -1,6 +1,7 @@
 import { IncomingMessage } from "http";
 import { injectable } from "inversify";
 import { Response } from "node-fetch";
+import { UserAuthenticationRepository } from "../src/db/repositories/UserAuthenticationRepository";
 import { UserRepository } from "../src/db/repositories/UserRepository";
 import { EMAIL_REGEX } from "../src/graphql/helpers/validators/validEmail";
 import { IAnalyticsService } from "../src/services/analytics";
@@ -16,18 +17,17 @@ export const USER_COGNITO_ID = "test-cognito-id";
 
 @injectable()
 export class MockAuth implements IAuth {
-  constructor(private users: UserRepository) {}
+  constructor(
+    private users: UserRepository,
+    private userAuthentication: UserAuthenticationRepository
+  ) {}
   generateTempAuthToken(userId: number) {
     return `userId:${userId}`;
   }
   async validateRequestAuthentication(req: IncomingMessage) {
     if (req.headers.authorization?.startsWith("Bearer ")) {
-      /*
-        if an apiKey is set in headers, return null 
-        so authentication can be resolved by UserAuthenticationRepository.validateApiKey method
-        This is useful for executing queries/mutations as other users when testing
-       */
-      return null;
+      const token = req.headers.authorization.replace(/^Bearer /, "");
+      return await this.userAuthentication.getUserFromUat(token);
     }
     // TODO manage users.length >1
     const [user] = await this.users.loadUsersByCognitoId(USER_COGNITO_ID);

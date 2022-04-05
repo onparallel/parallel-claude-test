@@ -1,5 +1,4 @@
 import { Readable } from "stream";
-import { URLSearchParams } from "url";
 import { WorkerContext } from "../../context";
 import { EmailLog } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";

@@ -1,7 +1,6 @@
 import { createWriteStream, promises as fs } from "fs";
 import { tmpdir } from "os";
 import { resolve } from "path";
-import { URLSearchParams } from "url";
 import { WorkerContext } from "../context";
 import { IntegrationSettings } from "../db/repositories/IntegrationRepository";
 import {
