@@ -25,9 +25,9 @@ export function TimelineReplyCreatedEvent({
     >
       <FormattedMessage
         id="timeline.reply-created-description"
-        defaultMessage="{same, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}"
+        defaultMessage="{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}"
         values={{
-          same: createdBy?.__typename === "User" && createdBy.id === userId,
+          userIsYou: createdBy?.__typename === "User" && createdBy.id === userId,
           createdBy:
             createdBy?.__typename === "PetitionAccess" ? (
               <ContactReference contact={createdBy.contact} />

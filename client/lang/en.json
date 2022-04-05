@@ -9036,8 +9036,8 @@
   },
   {
     "term": "timeline.access-activated-description",
-    "definition": "{same, select, true {You} other {{user}}} gave access to {contact} {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} gave access to {contact} {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{user}}} gave access to {contact} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} gave access to {contact} {timeAgo}"
   },
   {
     "term": "timeline.access-deactivated-auto-description",
@@ -9046,8 +9046,8 @@
   },
   {
     "term": "timeline.access-deactivated-manual-description",
-    "definition": "{same, select, true {You} other {{user}}} removed access to {contact} {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} removed access to {contact} {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{user}}} removed access to {contact} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} removed access to {contact} {timeAgo}"
   },
   {
     "term": "timeline.access-delegated-description",
@@ -9061,18 +9061,18 @@
   },
   {
     "term": "timeline.add-group-permission-description",
-    "definition": "{same, select, true {You} other {{user}}} shared this petition with {groupName} as {permissionType} {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} shared this petition with {groupName} as {permissionType} {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{user}}} shared this petition with {groupName} as {permissionType} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} shared this petition with {groupName} as {permissionType} {timeAgo}"
   },
   {
     "term": "timeline.add-user-permission-description",
-    "definition": "{same, select, true {You} other {{user}}} shared this petition with {other} as {permissionType} {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} shared this petition with {other} as {permissionType} {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{user}}} shared this petition with {other} as {permissionType} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} shared this petition with {other} as {permissionType} {timeAgo}"
   },
   {
     "term": "timeline.comment-deleted",
-    "definition": "{same, select, true {You} other {{someone}}} deleted a comment on field {field} {timeAgo}",
-    "context": "{same, select, true {You} other {{someone}}} deleted a comment on field {field} {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{someone}}} deleted a comment on field {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{someone}}} deleted a comment on field {field} {timeAgo}"
   },
   {
     "term": "timeline.comment-published-deleted",
@@ -9081,18 +9081,18 @@
   },
   {
     "term": "timeline.comment-published-description",
-    "definition": "{same, select, true {You} other {{author}}} commented on field {field} {timeAgo}",
-    "context": "{same, select, true {You} other {{author}}} commented on field {field} {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{author}}} commented on field {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{author}}} commented on field {field} {timeAgo}"
   },
   {
     "term": "timeline.edit-group-permission-description",
-    "definition": "{same, select, true {You} other {{user}}} updated {groupName}'s permission to {permissionType} {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} updated {groupName}'s permission to {permissionType} {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{user}}} updated {groupName}'s permission to {permissionType} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} updated {groupName}'s permission to {permissionType} {timeAgo}"
   },
   {
     "term": "timeline.edit-user-permission-description",
-    "definition": "{same, select, true {You} other {{user}}} updated {other}'s permission to {permissionType} {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} updated {other}'s permission to {permissionType} {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{user}}} updated {other}'s permission to {permissionType} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} updated {other}'s permission to {permissionType} {timeAgo}"
   },
   {
     "term": "timeline.message-cancelled-auto-description",
@@ -9101,8 +9101,8 @@
   },
   {
     "term": "timeline.message-cancelled-manual-description",
-    "definition": "{same, select, true {You} other {{user}}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{user}}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
   },
   {
     "term": "timeline.message-scheduled-cancel",
@@ -9146,33 +9146,33 @@
   },
   {
     "term": "timeline.ownership-transferred-description",
-    "definition": "{same, select, true {You} other {{user}}} transferred the ownership of this petition {previousOwner, select, null {} other {from {previousOwner} }}to {owner} {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} transferred the ownership of this petition {previousOwner, select, null {} other {from {previousOwner} }}to {owner} {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{user}}} transferred the ownership of this petition {previousOwner, select, null {} other {from {previousOwner} }}to {owner} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} transferred the ownership of this petition {previousOwner, select, null {} other {from {previousOwner} }}to {owner} {timeAgo}"
   },
   {
     "term": "timeline.petition-cloned-description",
-    "definition": "{same, select, true {You} other {{user}}} cloned this petition {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} cloned this petition {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{user}}} cloned this petition {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} cloned this petition {timeAgo}"
   },
   {
     "term": "timeline.petition-closed-description",
-    "definition": "{same, select, true {You} other {{user}}} closed the petition {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} closed the petition {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{user}}} closed the petition {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} closed the petition {timeAgo}"
   },
   {
     "term": "timeline.petition-completed-description",
-    "definition": "{same, select, true {You} other {{name}}} completed the petition {timeAgo}",
-    "context": "{same, select, true {You} other {{name}}} completed the petition {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{name}}} completed the petition {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{name}}} completed the petition {timeAgo}"
   },
   {
     "term": "timeline.petition-correct-notified-description",
-    "definition": "{same, select, true {You} other {{user}}} notified {contact} that the petition is correct {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} notified {contact} that the petition is correct {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{user}}} notified {contact} that the petition is correct {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} notified {contact} that the petition is correct {timeAgo}"
   },
   {
     "term": "timeline.petition-created-description",
-    "definition": "{same, select, true {You} other {{user}}} created this petition {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} created this petition {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{user}}} created this petition {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} created this petition {timeAgo}"
   },
   {
     "term": "timeline.petition-message-bounced-description",
@@ -9186,8 +9186,8 @@
   },
   {
     "term": "timeline.petition-reopened-description",
-    "definition": "{same, select, true {You} other {{user}}} reopened the petition {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} reopened the petition {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{user}}} reopened the petition {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} reopened the petition {timeAgo}"
   },
   {
     "term": "timeline.public-petition-link-created-description",
@@ -9206,8 +9206,8 @@
   },
   {
     "term": "timeline.reminder-sent-description-manual",
-    "definition": "{same, select, true {You} other {{user}}} sent a manual reminder to {contact} {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} sent a manual reminder to {contact} {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{user}}} sent a manual reminder to {contact} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} sent a manual reminder to {contact} {timeAgo}"
   },
   {
     "term": "timeline.reminders-opt-out-description",
@@ -9216,33 +9216,33 @@
   },
   {
     "term": "timeline.remove-group-permission-description",
-    "definition": "{same, select, true {You} other {{user}}} stopped sharing this petition with {groupName} {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} stopped sharing this petition with {groupName} {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{user}}} stopped sharing this petition with {groupName} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} stopped sharing this petition with {groupName} {timeAgo}"
   },
   {
     "term": "timeline.remove-user-permission-description",
-    "definition": "{same, select, true {You} other {{user}}} stopped sharing this petition with {other} {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} stopped sharing this petition with {other} {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{user}}} stopped sharing this petition with {other} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} stopped sharing this petition with {other} {timeAgo}"
   },
   {
     "term": "timeline.reply-created-description",
-    "definition": "{same, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}",
-    "context": "{same, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}"
   },
   {
     "term": "timeline.reply-deleted-description",
-    "definition": "{same, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} {timeAgo}",
-    "context": "{same, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} {timeAgo}"
   },
   {
     "term": "timeline.reply-updated-description",
-    "definition": "{same, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}",
-    "context": "{same, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}"
   },
   {
     "term": "timeline.signature-cancelled-by-user.description",
-    "definition": "{same, select, true {You} other {{name}}} cancelled the eSignature process {timeAgo}",
-    "context": "{same, select, true {You} other {{name}}} cancelled the eSignature process {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{name}}} cancelled the eSignature process {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{name}}} cancelled the eSignature process {timeAgo}"
   },
   {
     "term": "timeline.signature-cancelled-request-error.email-bounced.description",
@@ -9281,8 +9281,8 @@
   },
   {
     "term": "timeline.signature-reminder.description",
-    "definition": "{same, select, true {You} other {{user}}} sent a reminder to the pending signers {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} sent a reminder to the pending signers {timeAgo}"
+    "definition": "{userIsYou, select, true {You} other {{user}}} sent a reminder to the pending signers {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} sent a reminder to the pending signers {timeAgo}"
   },
   {
     "term": "timeline.signature-restarted.description",

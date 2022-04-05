@@ -22,9 +22,9 @@ export function TimelineUserPermissionRemovedEvent({
     >
       <FormattedMessage
         id="timeline.remove-user-permission-description"
-        defaultMessage="{same, select, true {You} other {{user}}} stopped sharing this petition with {other} {timeAgo}"
+        defaultMessage="{userIsYou, select, true {You} other {{user}}} stopped sharing this petition with {other} {timeAgo}"
         values={{
-          same: userId === event.user?.id,
+          userIsYou: userId === event.user?.id,
           user: <UserReference user={event.user} />,
           other: <UserReference user={event.permissionUser} />,
           timeAgo: (

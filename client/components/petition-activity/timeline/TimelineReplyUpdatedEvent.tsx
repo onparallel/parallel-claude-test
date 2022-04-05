@@ -25,9 +25,9 @@ export function TimelineReplyUpdatedEvent({
     >
       <FormattedMessage
         id="timeline.reply-updated-description"
-        defaultMessage="{same, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}"
+        defaultMessage="{userIsYou, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}"
         values={{
-          same: updatedBy?.__typename === "User" && updatedBy.id === userId,
+          userIsYou: updatedBy?.__typename === "User" && updatedBy.id === userId,
           updatedBy:
             updatedBy?.__typename === "PetitionAccess" ? (
               <ContactReference contact={updatedBy.contact} />

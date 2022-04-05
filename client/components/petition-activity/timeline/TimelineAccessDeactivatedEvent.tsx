@@ -24,9 +24,9 @@ export function TimelineAccessDeactivatedEvent({
       {event.reason === "DEACTIVATED_BY_USER" ? (
         <FormattedMessage
           id="timeline.access-deactivated-manual-description"
-          defaultMessage="{same, select, true {You} other {{user}}} removed access to {contact} {timeAgo}"
+          defaultMessage="{userIsYou, select, true {You} other {{user}}} removed access to {contact} {timeAgo}"
           values={{
-            same: userId === event.user?.id,
+            userIsYou: userId === event.user?.id,
             user: <UserReference user={event.user} />,
             contact: <ContactReference contact={event.access.contact} />,
             timeAgo: (

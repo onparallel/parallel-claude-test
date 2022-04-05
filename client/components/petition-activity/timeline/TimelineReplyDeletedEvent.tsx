@@ -25,9 +25,9 @@ export function TimelineReplyDeletedEvent({
     >
       <FormattedMessage
         id="timeline.reply-deleted-description"
-        defaultMessage="{same, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} {timeAgo}"
+        defaultMessage="{userIsYou, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} {timeAgo}"
         values={{
-          same: deletedBy?.__typename === "User" && deletedBy.id === userId,
+          userIsYou: deletedBy?.__typename === "User" && deletedBy.id === userId,
           deletedBy:
             deletedBy?.__typename === "PetitionAccess" ? (
               <ContactReference contact={deletedBy.contact} />

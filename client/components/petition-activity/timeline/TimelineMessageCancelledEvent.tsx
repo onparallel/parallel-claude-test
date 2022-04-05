@@ -24,9 +24,9 @@ export function TimelineMessageCancelledEvent({
       {reason === "CANCELLED_BY_USER" ? (
         <FormattedMessage
           id="timeline.message-cancelled-manual-description"
-          defaultMessage="{same, select, true {You} other {{user}}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+          defaultMessage="{userIsYou, select, true {You} other {{user}}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
           values={{
-            same: userId === user?.id,
+            userIsYou: userId === user?.id,
             user: <UserReference user={user} />,
             subject: message.emailSubject,
             contact: <ContactReference contact={message.access.contact} />,

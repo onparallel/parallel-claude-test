@@ -37,9 +37,9 @@ export function TimelineReminderSentEvent({
           {reminder.type === "MANUAL" ? (
             <FormattedMessage
               id="timeline.reminder-sent-description-manual"
-              defaultMessage="{same, select, true {You} other {{user}}} sent a manual reminder to {contact} {timeAgo}"
+              defaultMessage="{userIsYou, select, true {You} other {{user}}} sent a manual reminder to {contact} {timeAgo}"
               values={{
-                same: userId === reminder.sender?.id,
+                userIsYou: userId === reminder.sender?.id,
                 user: <UserReference user={reminder.sender} />,
                 contact: <ContactReference contact={reminder.access.contact} />,
                 timeAgo: (

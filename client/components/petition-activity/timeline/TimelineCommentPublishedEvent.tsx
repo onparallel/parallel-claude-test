@@ -39,10 +39,10 @@ export function TimelineCommentPublishedEvent({
           <Box paddingX={4} paddingY={2} backgroundColor="gray.50">
             <FormattedMessage
               id="timeline.comment-published-description"
-              defaultMessage="{same, select, true {You} other {{author}}} commented on field {field} {timeAgo}"
+              defaultMessage="{userIsYou, select, true {You} other {{author}}} commented on field {field} {timeAgo}"
               values={{
                 ...values,
-                same: author?.__typename === "User" && author?.id === userId,
+                userIsYou: author?.__typename === "User" && author?.id === userId,
                 author:
                   author?.__typename === "PetitionAccess" ? (
                     <ContactReference contact={author.contact} />

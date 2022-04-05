@@ -23,9 +23,9 @@ export function TimelineUserPermissionEditedEvent({
     >
       <FormattedMessage
         id="timeline.edit-user-permission-description"
-        defaultMessage="{same, select, true {You} other {{user}}} updated {other}'s permission to {permissionType} {timeAgo}"
+        defaultMessage="{userIsYou, select, true {You} other {{user}}} updated {other}'s permission to {permissionType} {timeAgo}"
         values={{
-          same: userId === event.user?.id,
+          userIsYou: userId === event.user?.id,
           user: <UserReference user={event.user} />,
           other: <UserReference user={event.permissionUser} />,
           permissionType: (

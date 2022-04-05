@@ -22,9 +22,9 @@ export function TimelineOwnershipTransferredEvent({
     >
       <FormattedMessage
         id="timeline.ownership-transferred-description"
-        defaultMessage="{same, select, true {You} other {{user}}} transferred the ownership of this petition {previousOwner, select, null {} other {from {previousOwner} }}to {owner} {timeAgo}"
+        defaultMessage="{userIsYou, select, true {You} other {{user}}} transferred the ownership of this petition {previousOwner, select, null {} other {from {previousOwner} }}to {owner} {timeAgo}"
         values={{
-          same: userId === event.user?.id,
+          userIsYou: userId === event.user?.id,
           previousOwner:
             event.previousOwner && userId !== event.previousOwner.id ? (
               <UserReference user={event.previousOwner} />

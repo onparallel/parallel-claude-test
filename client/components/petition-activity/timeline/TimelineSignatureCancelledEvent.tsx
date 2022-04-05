@@ -38,9 +38,10 @@ export function TimelineSignatureCancelledEvent({
           {event.cancelType === "CANCELLED_BY_USER" && (
             <FormattedMessage
               id="timeline.signature-cancelled-by-user.description"
-              defaultMessage="{same, select, true {You} other {{name}}} cancelled the eSignature process {timeAgo}"
+              defaultMessage="{userIsYou, select, true {You} other {{name}}} cancelled the eSignature process {timeAgo}"
               values={{
-                same: event.cancelledBy?.__typename === "User" && userId === event.cancelledBy.id,
+                userIsYou:
+                  event.cancelledBy?.__typename === "User" && userId === event.cancelledBy.id,
                 name: <UserOrContactReference userOrAccess={event.cancelledBy} />,
                 timeAgo: (
                   <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />

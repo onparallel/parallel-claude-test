@@ -23,9 +23,9 @@ export function TimelineGroupPermissionRemovedEvent({
     >
       <FormattedMessage
         id="timeline.remove-group-permission-description"
-        defaultMessage="{same, select, true {You} other {{user}}} stopped sharing this petition with {groupName} {timeAgo}"
+        defaultMessage="{userIsYou, select, true {You} other {{user}}} stopped sharing this petition with {groupName} {timeAgo}"
         values={{
-          same: userId === event.user?.id,
+          userIsYou: userId === event.user?.id,
           user: <UserReference user={event.user} />,
           groupName: <UserGroupReference userGroup={event.permissionGroup} />,
           timeAgo: (
