@@ -129,7 +129,6 @@ export default function PetitionExport({
       bottom: 0,
       left: 0,
       right: 0,
-      paddingBottom: `${theme.marginBottom * 0.5}mm`,
       paddingLeft: `${theme.marginLeft}mm`,
       paddingRight: `${theme.marginRight}mm`,
       height: `${theme.marginBottom}mm`,
@@ -292,6 +291,7 @@ export default function PetitionExport({
                 ) : null}
                 <View
                   fixed
+                  debug
                   style={styles.footer}
                   render={({ pageNumber }) => (
                     <Text style={styles.footerPageNumber}>{pageNumber}</Text>
