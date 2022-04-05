@@ -1,6 +1,5 @@
 import { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { gql } from "apollo-server-core";
-import { Children } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, zip } from "remeda";
 import { FORMATS } from "../../emails/utils/dates";
@@ -31,14 +30,14 @@ const theme: PetitionExportTheme = {
   marginRight: 10,
   marginTop: 10,
   marginBottom: 10,
-  title1FontFamily: "Roboto",
-  title1Color: "#1A202C",
+  title1FontFamily: "IBM Plex Sans",
+  title1Color: "#000000",
   title1FontSize: 16,
-  title2FontFamily: "Roboto",
-  title2Color: "#1A202C",
+  title2FontFamily: "IBM Plex Sans",
+  title2Color: "#000000",
   title2FontSize: 14,
-  textFontFamily: "Roboto",
-  textColor: "#1A202C",
+  textFontFamily: "IBM Plex Sans",
+  textColor: "#000000",
   textFontSize: 12,
   logoPosition: "center",
   paginationPosition: "right",

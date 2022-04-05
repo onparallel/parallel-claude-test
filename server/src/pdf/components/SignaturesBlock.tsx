@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from "@react-pdf/renderer";
 import { Style } from "@react-pdf/types";
 import { gql } from "apollo-server-core";
 import { FormattedMessage, useIntl } from "react-intl";
-import { chunk, isDefined, times } from "remeda";
+import { chunk, times } from "remeda";
 import { FORMATS } from "../../emails/utils/dates";
 import { useTheme } from "../utils/ThemeProvider";
 import { SignaturesBlock_SignatureConfigFragment } from "../__types";

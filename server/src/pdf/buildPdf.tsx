@@ -3,29 +3,60 @@ import { createElement } from "react";
 import { IntlProvider } from "react-intl";
 import { loadMessages } from "../util/loadMessages";
 import { PdfDocument, PdfDocumentGetPropsContext } from "./utils/pdf";
+import fonts from "./utils/fonts.json";
 
-// get ttf links from https://developers.google.com/fonts/docs/developer_api
-Font.register({
-  family: "Roboto",
-  fonts: [
-    {
-      src: "http://fonts.gstatic.com/s/roboto/v29/KFOmCnqEu92Fr1Me5WZLCzYlKw.ttf",
-    },
-    {
-      src: "http://fonts.gstatic.com/s/roboto/v29/KFOkCnqEu92Fr1Mu52xPKTM1K9nz.ttf",
-      fontStyle: "italic",
-    },
-    {
-      src: "http://fonts.gstatic.com/s/roboto/v29/KFOlCnqEu92Fr1MmWUlvAx05IsDqlA.ttf",
-      fontWeight: "bold",
-    },
-    {
-      src: "http://fonts.gstatic.com/s/roboto/v29/KFOjCnqEu92Fr1Mu51TzBhc9AMX6lJBP.ttf",
-      fontStyle: "italic",
-      fontWeight: "bold",
-    },
-  ],
-});
+const WHITELISTED_FONTS = [
+  "Roboto Slab",
+  "Merriweather",
+  "Playfair Display",
+  "Lora",
+  "PT Serif",
+  "Source Serif Pro",
+  "IBM Plex Serif",
+  "Cormorant Garamond",
+  "Alegreya",
+  "Tinos",
+  "Libre Baskerville",
+  "Noto Serif",
+  "Roboto",
+  "Open Sans",
+  "IBM Plex Sans",
+  "Lato",
+  "Montserrat",
+  "Poppins",
+  "Source Sans Pro",
+  "Noto Sans",
+  "Raleway",
+  "Nunito",
+  "Rubik",
+  "Parisienne",
+  "Rubik Wet Paint",
+  "Inconsolata",
+];
+
+// get json from https://developers.google.com/fonts/docs/developer_api?apix_params=%7B%22fields%22%3A%22items.files%2Citems.family%2Citems.kind%2Citems.category%22%7D
+for (const font of fonts.items as { family: string; files: Record<string, string> }[]) {
+  if (WHITELISTED_FONTS.includes(font.family)) {
+    Font.register({
+      family: font.family,
+      fonts: Object.entries(font.files).map(([key, url]) => {
+        if (key === "regular") {
+          return { src: url };
+        } else if (key === "italic") {
+          return { src: url, fontStyle: "italic" };
+        } else {
+          const match = key.match(/^(\d{3})(italic)?$/);
+          if (match) {
+            const [_, fontWeight, italic] = match;
+            return { src: url, fontStyle: italic, fontWeight: parseInt(fontWeight) };
+          } else {
+            throw "Unhandled font definition";
+          }
+        }
+      }),
+    });
+  }
+}
 
 Font.registerEmojiSource({
   format: "png",
