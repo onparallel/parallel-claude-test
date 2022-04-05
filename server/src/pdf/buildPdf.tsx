@@ -2,7 +2,7 @@ import { renderToStream, Font } from "@react-pdf/renderer";
 import { createElement } from "react";
 import { IntlProvider } from "react-intl";
 import { loadMessages } from "../util/loadMessages";
-import { PdfDocument, PdfDocumentGetPropsContext } from "./utils";
+import { PdfDocument, PdfDocumentGetPropsContext } from "./utils/pdf";
 
 // get ttf links from https://developers.google.com/fonts/docs/developer_api
 Font.register({

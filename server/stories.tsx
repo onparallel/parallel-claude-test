@@ -20,7 +20,6 @@ const LR_SCRIPT = `<script src="http://localhost:35729/livereload.js?snipver=1">
 
 async function parseArgs(req: Request, storyPath: string) {
   const storyConfig = await import(storyPath);
-  console.log(storyConfig);
   const story = storyConfig.stories[0];
   return mapValues(story.argTypes, ({ control: { type } }: any, key) => {
     switch (type) {
@@ -77,6 +76,9 @@ app
               <Page>
                 <View>
                   <Text>{error.toString()}</Text>
+                </View>
+                <View>
+                  <Text>{error.stack}</Text>
                 </View>
               </Page>
             </Document>
@@ -157,10 +159,4 @@ const lr = createServer({
   exts: ["tsx", "ts", "jsx", "js", "json"],
 });
 
-lr.watch([
-  __dirname + "/src/emails/emails",
-  __dirname + "/src/emails/components",
-  __dirname + "/src/emails/lang",
-  __dirname + "/src/emails/utils",
-  __dirname + "/src/pdf/documents",
-]);
+lr.watch([__dirname + "/src/emails", __dirname + "/src/pdf"]);

@@ -1,6 +1,6 @@
 import { GraphQLClient } from "graphql-request";
 import { ComponentType } from "react";
-import { MaybePromise } from "../util/types";
+import { MaybePromise } from "../../util/types";
 
 export interface PdfDocumentGetPropsContext {
   client?: GraphQLClient;

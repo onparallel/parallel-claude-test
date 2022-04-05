@@ -3333,6 +3333,11 @@ export type VerificationCodeRequest = {
   token: Scalars["ID"];
 };
 
+export type SignaturesBlock_SignatureConfigFragment = {
+  timezone: string;
+  signers: Array<{ fullName: string; email: string }>;
+};
+
 export type PetitionExport_PetitionFragment = {
   id: string;
   name: string | null;
@@ -3420,6 +3425,15 @@ export const PetitionExport_PetitionFieldFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<PetitionExport_PetitionFieldFragment, unknown>;
+export const SignaturesBlock_SignatureConfigFragmentDoc = gql`
+  fragment SignaturesBlock_SignatureConfig on SignatureConfig {
+    signers {
+      fullName
+      email
+    }
+    timezone
+  }
+` as unknown as DocumentNode<SignaturesBlock_SignatureConfigFragment, unknown>;
 export const PetitionExport_PetitionFragmentDoc = gql`
   fragment PetitionExport_Petition on Petition {
     id
@@ -3435,15 +3449,12 @@ export const PetitionExport_PetitionFragmentDoc = gql`
     fromTemplateId
     currentSignatureRequest {
       signatureConfig {
-        signers {
-          fullName
-          email
-        }
-        timezone
+        ...SignaturesBlock_SignatureConfig
       }
     }
   }
   ${PetitionExport_PetitionFieldFragmentDoc}
+  ${SignaturesBlock_SignatureConfigFragmentDoc}
 ` as unknown as DocumentNode<PetitionExport_PetitionFragment, unknown>;
 export const PetitionExport_petitionDocument = gql`
   query PetitionExport_petition($petitionId: GID!) {
