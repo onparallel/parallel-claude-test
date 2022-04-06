@@ -3,8 +3,6 @@ import chalk from "chalk";
 import { execSync } from "child_process";
 import yargs from "yargs";
 import { run } from "./utils/run";
-import { promises as fs } from "fs";
-import rimraf from "rimraf";
 import { token } from "./utils/token";
 
 AWS.config.credentials = new AWS.SharedIniFileCredentials({
