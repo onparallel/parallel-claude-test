@@ -38,6 +38,7 @@ type PetitionBinderOptions = {
   documentTitle: string;
   maxOutputSize?: number;
   includeAnnexedDocuments?: boolean;
+  outputFileName?: string;
 };
 
 export interface IPetitionBinder {
@@ -64,6 +65,7 @@ export class PetitionBinder implements IPetitionBinder {
       showSignatureBoxes,
       maxOutputSize,
       includeAnnexedDocuments,
+      outputFileName,
     }: PetitionBinderOptions
   ) {
     const [petition, fields] = await Promise.all([
@@ -139,6 +141,6 @@ export class PetitionBinder implements IPetitionBinder {
       });
     });
 
-    return await this.pdf.merge(tmpDocPaths, { maxOutputSize });
+    return await this.pdf.merge(tmpDocPaths, { maxOutputSize, outputFileName });
   }
 }

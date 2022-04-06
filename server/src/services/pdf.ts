@@ -6,14 +6,17 @@ import { resolve } from "path";
 import { random } from "../util/token";
 
 export interface IPdfService {
-  merge(pdfPaths: string[], opts?: { maxOutputSize?: number }): Promise<string>;
+  merge(
+    pdfPaths: string[],
+    opts?: { maxOutputSize?: number; outputFileName?: string }
+  ): Promise<string>;
 }
 
 export const PDF_SERVICE = Symbol.for("PDF_SERVICE");
 
 @injectable()
 export class PdfService implements IPdfService {
-  async merge(paths: string[], opts?: { maxOutputSize?: number }) {
+  async merge(paths: string[], opts?: { maxOutputSize?: number; outputFileName?: string }) {
     const DPIValues = [300, 144, 110, 96, 72];
     let iteration = -1;
     let mergedFilePath = null;
@@ -22,7 +25,7 @@ export class PdfService implements IPdfService {
       iteration++;
       mergedFilePath = this.mergeFiles(
         paths,
-        resolve(tmpdir(), `${random(10)}.pdf`),
+        resolve(tmpdir(), opts?.outputFileName ?? `${random(10)}.pdf`),
         DPIValues[iteration]
       );
       mergedFileSize = (await stat(mergedFilePath)).size;
