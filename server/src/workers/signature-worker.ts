@@ -1,7 +1,4 @@
-import { existsSync, promises as fs } from "fs";
-import { mkdir, writeFile } from "fs/promises";
-import { tmpdir } from "os";
-import { resolve } from "path";
+import { promises as fs } from "fs";
 import { WorkerContext } from "../context";
 import { IntegrationSettings } from "../db/repositories/IntegrationRepository";
 import {
@@ -42,9 +39,7 @@ async function startSignatureProcess(
 
   const { title, orgIntegrationId, signersInfo, message } = signature.signature_config;
 
-  const tmpPdfDir = resolve(tmpdir(), "print", random(16));
-  const tmpPdfPath = resolve(tmpPdfDir, sanitizeFilenameWithSuffix(title, ".pdf"));
-
+  let documentTmpPath: string | null = null;
   try {
     const owner = await ctx.petitions.loadPetitionOwner(petition.id);
     const signatureIntegration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
@@ -54,23 +49,20 @@ async function startSignatureProcess(
       email: signer.email,
     }));
 
-    const stream = await ctx.printer.petitionExport(owner!.id, {
+    documentTmpPath = await ctx.petitionBinder.createBinder(owner!.id, {
       petitionId: petition.id,
       documentTitle: title,
       showSignatureBoxes: true,
+      includeAnnexedDocuments: true,
+      maxOutputSize: 13 * 1024 * 1024, // signaturit has a 15MB limit for emails
     });
-
-    if (!existsSync(tmpPdfDir)) {
-      await mkdir(tmpPdfDir, { recursive: true });
-    }
-    await writeFile(tmpPdfPath, stream);
 
     const signatureClient = ctx.signature.getClient(signatureIntegration);
 
     // send request to signature client
     const data = await signatureClient.startSignatureRequest(
       toGlobalId("Petition", petition.id),
-      tmpPdfPath,
+      documentTmpPath,
       recipients,
       {
         locale: petition.locale,
@@ -122,7 +114,9 @@ async function startSignatureProcess(
     throw error;
   } finally {
     try {
-      await fs.unlink(tmpPdfPath);
+      if (documentTmpPath) {
+        await fs.unlink(documentTmpPath);
+      }
     } catch {}
   }
 }

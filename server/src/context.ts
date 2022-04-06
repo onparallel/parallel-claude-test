@@ -22,6 +22,7 @@ import { Aws, AWS_SERVICE } from "./services/aws";
 import { EMAILS, EmailsService } from "./services/emails";
 import { FetchService, FETCH_SERVICE } from "./services/fetch";
 import { LOGGER, ILogger } from "./services/logger";
+import { PetitionBinder, PETITION_BINDER } from "./services/petition-binder";
 import { PRINTER, Printer } from "./services/printer";
 import { SIGNATURE, SignatureService } from "./services/signature";
 import { Smtp } from "./services/smtp";
@@ -74,6 +75,7 @@ export class WorkerContext {
     @inject(ANALYTICS) public readonly analytics: AnalyticsService,
     @inject(PRINTER) public readonly printer: Printer,
     @inject(SIGNATURE) public readonly signature: SignatureService,
+    @inject(PETITION_BINDER) public readonly petitionBinder: PetitionBinder,
     // Repositories
     public readonly contacts: ContactRepository,
     public readonly emailLogs: EmailLogRepository,

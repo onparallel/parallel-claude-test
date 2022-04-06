@@ -1,5 +1,5 @@
+import { createReadStream } from "fs";
 import { isDefined } from "remeda";
-import { Readable } from "stream";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
 import { random } from "../../util/token";
 import { Maybe } from "../../util/types";
@@ -23,14 +23,17 @@ export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
         } has no access to petition ${petitionId}`
       );
     }
-    const petition = await this.ctx.petitions.loadPetition(petitionId);
+    const [petition, owner] = await Promise.all([
+      this.ctx.petitions.loadPetition(petitionId),
+      this.ctx.petitions.loadPetitionOwner(petitionId),
+    ]);
     if (!isDefined(petition)) {
       throw new Error(`Petition:${petitionId} not found`);
     }
-    const owner = await this.ctx.petitions.loadPetitionOwner(petition.id);
     if (!isDefined(owner)) {
       throw new Error(`Owner of petition Petition:${petitionId} not found`);
     }
+
     let documentTitle: Maybe<string> | undefined;
     // if the task was started by a recipient, the title of the PDF should be the message subject instead of the petition name
     if (isDefined(this.task.petition_access_id)) {
@@ -44,23 +47,26 @@ export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
 
     await this.onProgress(25);
 
-    const stream = await this.ctx.printer.petitionExport(owner.id, {
+    const tmpFilePath = await this.ctx.petitionBinder.createBinder(owner.id, {
       petitionId,
       documentTitle: documentTitle ?? "",
       showSignatureBoxes: false,
+      includeAnnexedDocuments: true,
     });
 
     await this.onProgress(75);
 
     const path = random(16);
-    const readable = new Readable();
-    readable.wrap(stream);
-    const res = await this.ctx.aws.temporaryFiles.uploadFile(path, "application/pdf", readable);
+    const res = await this.ctx.aws.temporaryFiles.uploadFile(
+      path,
+      "application/pdf",
+      createReadStream(tmpFilePath)
+    );
     const tmpFile = await this.ctx.files.createTemporaryFile(
       {
         path,
         content_type: "application/pdf",
-        filename: sanitizeFilenameWithSuffix(petition!.name ?? "parallel", ".pdf"),
+        filename: sanitizeFilenameWithSuffix(documentTitle ?? "parallel", ".pdf"),
         size: res["ContentLength"]!.toString(),
       },
       `TaskWorker:${this.task.id}`

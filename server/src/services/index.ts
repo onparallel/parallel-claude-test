@@ -7,6 +7,7 @@ import { EMAILS, EmailsService, IEmailsService } from "./emails";
 import { FetchService, FETCH_SERVICE, IFetchService } from "./fetch";
 import { createLogger, ILogger, LOGGER } from "./logger";
 import { IPdfService, PdfService, PDF_SERVICE } from "./pdf";
+import { IPetitionBinder, PetitionBinder, PETITION_BINDER } from "./petition-binder";
 import { IPrinter, Printer, PRINTER } from "./printer";
 import { IRedis, REDIS, Redis } from "./redis";
 import { SIGNATURE, SignatureService } from "./signature";
@@ -29,4 +30,5 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IFetchService>(FETCH_SERVICE).to(FetchService).inSingletonScope();
   bind<IPdfService>(PDF_SERVICE).to(PdfService).inSingletonScope();
   bind<IApiClientService>(API_CLIENT_SERVICE).to(ApiClientService).inSingletonScope();
+  bind<IPetitionBinder>(PETITION_BINDER).to(PetitionBinder).inSingletonScope();
 });
