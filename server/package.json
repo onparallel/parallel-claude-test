@@ -81,7 +81,7 @@
     "inversify": "^6.0.1",
     "json-schema-to-ts": "^1.6.5",
     "jsonwebtoken": "^8.5.1",
-    "knex": "^1.0.4",
+    "knex": "^1.0.5",
     "mime-match": "^1.0.2",
     "mime-types": "^2.1.35",
     "mjml": "^4.12.0",
