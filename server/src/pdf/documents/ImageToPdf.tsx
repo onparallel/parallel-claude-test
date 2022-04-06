@@ -4,6 +4,7 @@ import { PdfDocumentGetProps } from "../utils/pdf";
 import { PdfDocumentTheme } from "../utils/ThemeProvider";
 import { ImageToPdf_meDocument } from "../__types";
 
+export interface ImageToPdfInitialData extends Omit<ImageToPdfProps, "theme"> {}
 interface ImageToPdfProps {
   imageUrl: string;
   theme: PdfDocumentTheme;
@@ -57,4 +58,4 @@ ImageToPdf.getProps = (async ({ imageUrl }, { client }) => {
     imageUrl,
     theme: response.me.organization.pdfDocumentTheme,
   };
-}) as PdfDocumentGetProps<Omit<ImageToPdfProps, "theme">, ImageToPdfProps>;
+}) as PdfDocumentGetProps<ImageToPdfInitialData, ImageToPdfProps>;

@@ -5,7 +5,7 @@ import { PdfDocumentGetProps } from "../utils/pdf";
 import { PdfDocumentTheme } from "../utils/ThemeProvider";
 import { AnnexCoverPage_meDocument } from "../__types";
 
-interface AnnexCoverPageInitialData {
+export interface AnnexCoverPageInitialData {
   fieldTitle: string | null;
   fieldNumber: number;
 }
