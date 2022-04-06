@@ -29,7 +29,7 @@ export class Printer implements IPrinter {
     userId: number,
     { petitionId, ...data }: Omit<PetitionExportInitialData, "petitionId"> & { petitionId: number }
   ) {
-    const petition = await this.petitions.loadPetition(petitionId);
+    const petition = await this.petitions.loadPetition(petitionId, { refresh: true }); // refresh to get the correct petition.locale in case it has been recently updated
     if (!petition) {
       throw new Error("Petition not available");
     }

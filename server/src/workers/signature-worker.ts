@@ -1,4 +1,5 @@
-import { createWriteStream, promises as fs } from "fs";
+import { existsSync, promises as fs } from "fs";
+import { mkdir, writeFile } from "fs/promises";
 import { tmpdir } from "os";
 import { resolve } from "path";
 import { WorkerContext } from "../context";
@@ -41,12 +42,8 @@ async function startSignatureProcess(
 
   const { title, orgIntegrationId, signersInfo, message } = signature.signature_config;
 
-  const tmpPdfPath = resolve(
-    tmpdir(),
-    "print",
-    random(16),
-    sanitizeFilenameWithSuffix(title, ".pdf")
-  );
+  const tmpPdfDir = resolve(tmpdir(), "print", random(16));
+  const tmpPdfPath = resolve(tmpPdfDir, sanitizeFilenameWithSuffix(title, ".pdf"));
 
   try {
     const owner = await ctx.petitions.loadPetitionOwner(petition.id);
@@ -63,10 +60,10 @@ async function startSignatureProcess(
       showSignatureBoxes: true,
     });
 
-    // TODO check this works
-    await new Promise((resolve, reject) => {
-      stream.pipe(createWriteStream(tmpPdfPath)).on("error", reject).on("close", resolve);
-    });
+    if (!existsSync(tmpPdfDir)) {
+      await mkdir(tmpPdfDir, { recursive: true });
+    }
+    await writeFile(tmpPdfPath, stream);
 
     const signatureClient = ctx.signature.getClient(signatureIntegration);
 

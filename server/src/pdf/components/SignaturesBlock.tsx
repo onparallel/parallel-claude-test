@@ -84,15 +84,13 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
       {chunk(signers, 3).map((row, i) => (
         <View key={i} style={{ flexDirection: "row", marginTop: "5mm" }}>
           {row.map((signer, i) => (
-            <SignatureBox
-              key={i}
-              {...signer}
-              style={{ flex: 1, marginLeft: i === 0 ? 0 : "5mm" }}
-            />
+            <View key={i} style={{ flex: 1, marginLeft: i === 0 ? 0 : "5mm" }}>
+              <SignatureBox {...signer} />
+            </View>
           ))}
           {/* Add dummy views with same width as signatures to ensure the widths of the actual signatures */}
-          {times(3 - signers.length, (i) => (
-            <View key={i} style={{ flex: 1, marginLeft: i === 0 ? 0 : "5mm" }} />
+          {times(3 - row.length, (i) => (
+            <View key={i} style={{ flex: 1, marginLeft: "5mm" }} />
           ))}
         </View>
       ))}
