@@ -125,6 +125,11 @@
     "context": "This is an email sent via Parallel from the verified account {email}"
   },
   {
+    "term": "document.annex-cover-page.title",
+    "definition": "Anexo {n}",
+    "context": "Annex {n}"
+  },
+  {
     "term": "document.petition-export.file-pending-review",
     "definition": "(Pendiente de revisión)",
     "context": "(Pending review)"

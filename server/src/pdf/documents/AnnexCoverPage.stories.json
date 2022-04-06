@@ -1,0 +1,21 @@
+{
+  "title": "Documents",
+  "stories": [
+    {
+      "name": "Annex Cover Page",
+      "parameters": {
+        "server": {
+          "id": "documents/AnnexCoverPage"
+        }
+      },
+      "args": {
+        "fieldTitle": "Título del campo",
+        "fieldNumber": 1
+      },
+      "argTypes": {
+        "fieldTitle": { "control": { "type": "text" } },
+        "fieldNumber": { "control": { "type": "number" } }
+      }
+    }
+  ]
+}

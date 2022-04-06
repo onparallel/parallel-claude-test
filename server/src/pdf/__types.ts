@@ -3339,6 +3339,18 @@ export type SignaturesBlock_SignatureConfigFragment = {
   signers: Array<{ fullName: string; email: string }>;
 };
 
+export type AnnexCoverPage_meQueryVariables = Exact<{ [key: string]: never }>;
+
+export type AnnexCoverPage_meQuery = {
+  me: { organization: { pdfDocumentTheme: { [key: string]: any } } };
+};
+
+export type ImageToPdf_meQueryVariables = Exact<{ [key: string]: never }>;
+
+export type ImageToPdf_meQuery = {
+  me: { organization: { pdfDocumentTheme: { [key: string]: any } } };
+};
+
 export type PetitionExport_PetitionFragment = {
   id: string;
   name: string | null;
@@ -3491,6 +3503,24 @@ export const PetitionExport_PetitionFragmentDoc = gql`
   ${SignaturesBlock_SignatureConfigFragmentDoc}
   ${useLiquidScope_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionExport_PetitionFragment, unknown>;
+export const AnnexCoverPage_meDocument = gql`
+  query AnnexCoverPage_me {
+    me {
+      organization {
+        pdfDocumentTheme
+      }
+    }
+  }
+` as unknown as DocumentNode<AnnexCoverPage_meQuery, AnnexCoverPage_meQueryVariables>;
+export const ImageToPdf_meDocument = gql`
+  query ImageToPdf_me {
+    me {
+      organization {
+        pdfDocumentTheme
+      }
+    }
+  }
+` as unknown as DocumentNode<ImageToPdf_meQuery, ImageToPdf_meQueryVariables>;
 export const PetitionExport_petitionDocument = gql`
   query PetitionExport_petition($petitionId: GID!) {
     petition(id: $petitionId) {

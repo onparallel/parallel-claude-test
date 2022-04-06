@@ -1,0 +1,19 @@
+{
+  "title": "Documents",
+  "stories": [
+    {
+      "name": "Image to PDF",
+      "parameters": {
+        "server": {
+          "id": "documents/ImageToPdf"
+        }
+      },
+      "args": {
+        "imageUrl": "https://static.onparallel.com/static/emails/logo.png"
+      },
+      "argTypes": {
+        "imageUrl": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}
