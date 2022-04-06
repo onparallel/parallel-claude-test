@@ -19,6 +19,7 @@
     "test": "jest --runInBand",
     "extract-i18n-terms": "yarn workspace @parallel/bin extract-i18n-terms --locales en es --input '../server/src/{emails,pdf}/**/*.{ts,tsx}' --output '../server/lang'",
     "generate-i18n-files": "yarn workspace @parallel/bin generate-i18n-files --locales en es --input '../server/lang' --output-compiled '../server/lang/compiled'",
+    "download-pdf-fonts": "yarn workspace @parallel/bin download-fonts --output '../client/public/static/fonts/pdf'",
     "dev-workers": "yarn concurrently \"yarn:worker:* start\"",
     "worker:email-events": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/email-events.ts",
     "worker:email-sender": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/email-sender.ts",

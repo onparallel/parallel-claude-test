@@ -11,6 +11,7 @@ import { mapValues, pick } from "remeda";
 import { buildEmail } from "./src/emails/buildEmail";
 import { buildPdf } from "./src/pdf/buildPdf";
 
+config({ path: path.resolve(process.cwd(), ".env") });
 config({ path: path.resolve(process.cwd(), ".development.env") });
 
 const app = express();

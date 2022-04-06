@@ -3,71 +3,52 @@ import { createElement } from "react";
 import { IntlProvider } from "react-intl";
 import { loadMessages } from "../util/loadMessages";
 import { PdfDocument, PdfDocumentGetPropsContext } from "./utils/pdf";
-import fonts from "./utils/fonts.json";
+import families from "./utils/fonts.json";
 
-const WHITELISTED_FONTS = [
-  "Roboto Slab",
-  "Merriweather",
-  "Playfair Display",
-  "Lora",
-  "PT Serif",
-  "Source Serif Pro",
-  "IBM Plex Serif",
-  "Cormorant Garamond",
-  "Alegreya",
-  "Tinos",
-  "Libre Baskerville",
-  "Noto Serif",
-  "Roboto",
-  "Open Sans",
-  "IBM Plex Sans",
-  "Lato",
-  "Montserrat",
-  "Poppins",
-  "Source Sans Pro",
-  "Noto Sans",
-  "Raleway",
-  "Nunito",
-  "Rubik",
-  "Parisienne",
-  "Rubik Wet Paint",
-  "Inconsolata",
-];
+let hasInit = false;
 
-// get json from https://developers.google.com/fonts/docs/developer_api?apix_params=%7B%22fields%22%3A%22items.files%2Citems.family%2Citems.kind%2Citems.category%22%7D
-for (const font of fonts.items as { family: string; files: Record<string, string> }[]) {
-  if (WHITELISTED_FONTS.includes(font.family)) {
+function init() {
+  for (const family of families) {
+    const fonts = family.fonts.map((font) => ({
+      ...font,
+      src: font.src.replace(/^URL/, `${process.env.ASSETS_URL!}/static/fonts/pdf`),
+    }));
     Font.register({
-      family: font.family,
-      fonts: Object.entries(font.files).map(([key, url]) => {
-        if (key === "regular") {
-          return { src: url };
-        } else if (key === "italic") {
-          return { src: url, fontStyle: "italic" };
-        } else {
-          const match = key.match(/^(\d{3})(italic)?$/);
-          if (match) {
-            const [_, fontWeight, italic] = match;
-            return { src: url, fontStyle: italic, fontWeight: parseInt(fontWeight) };
-          } else {
-            throw "Unhandled font definition";
-          }
-        }
-      }),
+      family: family.family,
+      fonts: [
+        ...fonts,
+        // Add fallback for fonts with missing italic style
+        ...(fonts.some((font) => font.fontStyle === "italic")
+          ? []
+          : [
+              {
+                ...fonts.find(
+                  (font) =>
+                    (font.fontStyle !== "italic" && font.fontWeight === undefined) ||
+                    font.fontWeight === 400
+                )!,
+                fontStyle: "italic",
+              },
+            ]),
+      ],
     });
   }
-}
 
-Font.registerEmojiSource({
-  format: "png",
-  url: "https://twemoji.maxcdn.com/2/72x72/",
-});
+  Font.registerEmojiSource({
+    format: "png",
+    url: "https://twemoji.maxcdn.com/2/72x72/",
+  });
+}
 
 export async function buildPdf<ID, P>(
   document: PdfDocument<ID, P>,
   initial: ID,
   context: PdfDocumentGetPropsContext
 ) {
+  if (!hasInit) {
+    init();
+    hasInit = true;
+  }
   const messages = await loadMessages(context.locale);
   const props = document.getProps ? await document.getProps(initial, context) : initial;
   const intlProps = { messages, locale: context.locale, defaultRichTextElements: {} };
