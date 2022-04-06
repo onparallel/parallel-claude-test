@@ -8,8 +8,6 @@ const chalk_1 = __importDefault(require("chalk"));
 const child_process_1 = require("child_process");
 const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
-const fs_1 = require("fs");
-const rimraf_1 = __importDefault(require("rimraf"));
 const token_1 = require("./utils/token");
 aws_sdk_1.default.config.credentials = new aws_sdk_1.default.SharedIniFileCredentials({
     profile: "parallel-deploy",
@@ -40,22 +38,12 @@ async function main() {
     (0, child_process_1.execSync)(`git checkout ${commit}`, { cwd: buildDir, encoding: "utf-8" });
     (0, child_process_1.execSync)(`rm -rf .git`, { cwd: buildDir, encoding: "utf-8" });
     console.log("Installing dependencies...");
-    (0, child_process_1.execSync)(`PLAYWRIGHT_BROWSERS_PATH=0 yarn install \
+    (0, child_process_1.execSync)(`yarn install \
      --prefer-offline \
      --frozen-lockfile`, {
         cwd: buildDir,
         encoding: "utf-8",
     });
-    // remove unused browsers to keep the artifact small
-    const contents = await fs_1.promises.readdir(`${buildDir}/node_modules/playwright/.local-browsers`, {
-        withFileTypes: true,
-    });
-    for (const content of contents) {
-        if (content.isDirectory() &&
-            ["firefox-", "webkit-"].some((prefix) => content.name.startsWith(prefix))) {
-            rimraf_1.default.sync(`${buildDir}/node_modules/playwright/.local-browsers/${content.name}`);
-        }
-    }
     console.log("Getting the secrets 🤫");
     (0, child_process_1.execSync)("git clone --depth 1 git@github.com:onparallel/secrets.git secrets", {
         cwd: WORK_DIR,
@@ -98,7 +86,7 @@ async function main() {
     console.log("Building the server");
     (0, child_process_1.execSync)(`yarn build`, { cwd: `${buildDir}/server`, encoding: "utf-8" });
     console.log("Pruning devDependencies");
-    (0, child_process_1.execSync)(`PLAYWRIGHT_BROWSERS_PATH=0 yarn install \
+    (0, child_process_1.execSync)(`yarn install \
     --production \
     --ignore-scripts \
     --prefer-offline \

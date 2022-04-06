@@ -7,8 +7,6 @@ Environment=PORT=4000
 Environment=NODE_ENV=production
 Environment=ENV=#ENV#
 Environment=DOTENV_PATH=/home/ec2-user/main/server
-# TODO: Remove once pdf export is moved to a worker
-Environment=PLAYWRIGHT_BROWSERS_PATH=0
 WorkingDirectory=/home/ec2-user/main/server
 Type=simple
 User=ec2-user

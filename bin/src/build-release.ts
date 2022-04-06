@@ -42,7 +42,7 @@ async function main() {
 
   console.log("Installing dependencies...");
   execSync(
-    `PLAYWRIGHT_BROWSERS_PATH=0 yarn install \
+    `yarn install \
      --prefer-offline \
      --frozen-lockfile`,
     {
@@ -50,18 +50,6 @@ async function main() {
       encoding: "utf-8",
     }
   );
-  // remove unused browsers to keep the artifact small
-  const contents = await fs.readdir(`${buildDir}/node_modules/playwright/.local-browsers`, {
-    withFileTypes: true,
-  });
-  for (const content of contents) {
-    if (
-      content.isDirectory() &&
-      ["firefox-", "webkit-"].some((prefix) => content.name.startsWith(prefix))
-    ) {
-      rimraf.sync(`${buildDir}/node_modules/playwright/.local-browsers/${content.name}`);
-    }
-  }
 
   console.log("Getting the secrets 🤫");
   execSync("git clone --depth 1 git@github.com:onparallel/secrets.git secrets", {
@@ -116,7 +104,7 @@ async function main() {
 
   console.log("Pruning devDependencies");
   execSync(
-    `PLAYWRIGHT_BROWSERS_PATH=0 yarn install \
+    `yarn install \
     --production \
     --ignore-scripts \
     --prefer-offline \

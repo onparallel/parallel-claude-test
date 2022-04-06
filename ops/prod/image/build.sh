@@ -91,6 +91,3 @@ chgrp nginx /var/lib/nginx/tmp
 systemctl daemon-reload
 systemctl enable nginx.service 
 systemctl start nginx.service
-
-echo "Installing Google Chrome"
-bash install-google-chrome.sh
