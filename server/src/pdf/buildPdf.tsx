@@ -11,7 +11,7 @@ function init() {
   for (const family of families) {
     const fonts = family.fonts.map((font) => ({
       ...font,
-      src: font.src.replace(/^URL/, `${process.env.ASSETS_URL!}/static/fonts/pdf`),
+      src: `${process.env.ASSETS_URL!}/static/fonts/pdf` + font.src,
     }));
     Font.register({
       family: family.family,
