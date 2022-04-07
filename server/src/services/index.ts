@@ -1,6 +1,5 @@
 import { ContainerModule } from "inversify";
 import { ANALYTICS, AnalyticsService, IAnalyticsService } from "./analytics";
-import { ApiClientService, API_CLIENT_SERVICE, IApiClientService } from "./api-client";
 import { AUTH, Auth, IAuth } from "./auth";
 import { Aws, AWS_SERVICE, IAws } from "./aws";
 import { EMAILS, EmailsService, IEmailsService } from "./emails";
@@ -29,6 +28,5 @@ export const servicesModule = new ContainerModule((bind) => {
   });
   bind<IFetchService>(FETCH_SERVICE).to(FetchService).inSingletonScope();
   bind<IPdfService>(PDF_SERVICE).to(PdfService).inSingletonScope();
-  bind<IApiClientService>(API_CLIENT_SERVICE).to(ApiClientService).inSingletonScope();
   bind<IPetitionBinder>(PETITION_BINDER).to(PetitionBinder).inSingletonScope();
 });

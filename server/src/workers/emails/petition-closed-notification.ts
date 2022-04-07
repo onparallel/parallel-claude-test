@@ -1,4 +1,4 @@
-import { createReadStream } from "fs";
+import { Readable } from "stream";
 import { WorkerContext } from "../../context";
 import { EmailLog } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
@@ -73,20 +73,16 @@ export async function petitionClosedNotification(
 
     if (payload.attach_pdf_export) {
       const owner = await context.petitions.loadPetitionOwner(petition.id);
-      const documentPath = await context.petitionBinder.createBinder(owner!.id, {
+      const documentStream = await context.printer.petitionExport(owner!.id, {
         petitionId: petition.id,
         documentTitle: payload.pdf_export_title ?? "",
         showSignatureBoxes: false,
-        includeAnnexedDocuments: false,
-        maxOutputSize: 8 * 1024 * 1024, // limitation of AWS SES (max 10MB per email including attachments)
       });
       const path = random(16);
 
-      const res = await context.aws.temporaryFiles.uploadFile(
-        path,
-        "application/pdf",
-        createReadStream(documentPath)
-      );
+      const readable = new Readable();
+      readable.wrap(documentStream);
+      const res = await context.aws.temporaryFiles.uploadFile(path, "application/pdf", readable);
       const attachment = await context.files.createTemporaryFile(
         {
           path,

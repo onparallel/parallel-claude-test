@@ -306,7 +306,8 @@ export default function PetitionExport({
 }
 
 function FieldDescription({ description }: { description: string }) {
-  const text = useLiquid(description);
+  let text = useLiquid(description);
+  text = text.replace(/\t/g, " ".repeat(4));
   return <Text>{text}</Text>;
 }
 

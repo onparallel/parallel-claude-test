@@ -1,3 +1,4 @@
+import { GraphQLClient } from "graphql-request";
 import { inject, injectable } from "inversify";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { buildPdf } from "../pdf/buildPdf";
@@ -5,7 +6,7 @@ import AnnexCoverPage, { AnnexCoverPageInitialData } from "../pdf/documents/Anne
 import ImageToPdf, { ImageToPdfInitialData } from "../pdf/documents/ImageToPdf";
 import PetitionExport, { PetitionExportInitialData } from "../pdf/documents/PetitionExport";
 import { toGlobalId } from "../util/globalId";
-import { API_CLIENT_SERVICE, IApiClientService } from "./api-client";
+import { AUTH, IAuth } from "./auth";
 
 export interface IPrinter {
   petitionExport(
@@ -24,10 +25,14 @@ export const PRINTER = Symbol.for("PRINTER");
 
 @injectable()
 export class Printer implements IPrinter {
-  constructor(
-    @inject(API_CLIENT_SERVICE) private api: IApiClientService,
-    private petitions: PetitionRepository
-  ) {}
+  constructor(@inject(AUTH) protected auth: IAuth, private petitions: PetitionRepository) {}
+
+  private async createClient(userId: number) {
+    const token = await this.auth.generateTempAuthToken(userId);
+    return new GraphQLClient("http://localhost/graphql", {
+      headers: { authorization: `Bearer ${token}` },
+    });
+  }
 
   public async petitionExport(
     userId: number,
@@ -37,7 +42,7 @@ export class Printer implements IPrinter {
     if (!petition) {
       throw new Error("Petition not available");
     }
-    const client = await this.api.createClient(userId);
+    const client = await this.createClient(userId);
     return await buildPdf(
       PetitionExport,
       { ...data, petitionId: toGlobalId("Petition", petitionId) },
@@ -46,12 +51,12 @@ export class Printer implements IPrinter {
   }
 
   public async annexCoverPage(userId: number, data: AnnexCoverPageInitialData, locale: string) {
-    const client = await this.api.createClient(userId);
+    const client = await this.createClient(userId);
     return await buildPdf(AnnexCoverPage, data, { client, locale });
   }
 
   public async imageToPdf(userId: number, data: ImageToPdfInitialData) {
-    const client = await this.api.createClient(userId);
+    const client = await this.createClient(userId);
     return await buildPdf(ImageToPdf, data, {
       client,
       locale: "es" /* locale doesn't matter here as this is an image-only document */,
