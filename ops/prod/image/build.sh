@@ -19,7 +19,9 @@ yum install -y \
     openssl-devel \
     perl-ExtUtils-Embed \
     ghostscript \
-
+    ImageMagick \
+    ImageMagick-devel \
+    
 echo "Installing node.js"
 curl -sL https://rpm.nodesource.com/setup_${nodejs_version}.x | bash -
 
