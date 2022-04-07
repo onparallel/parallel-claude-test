@@ -28,7 +28,7 @@ function getFieldTitleByFileUploadId(
 function isPrintableContentType(contentType?: string) {
   return (
     contentType !== undefined &&
-    (contentType === "application/pdf" || contentType.startsWith("image/"))
+    ["application/pdf", "image/png", "image/jpeg"].includes(contentType)
   );
 }
 
