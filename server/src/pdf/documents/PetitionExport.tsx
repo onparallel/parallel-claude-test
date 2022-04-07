@@ -95,9 +95,9 @@ export default function PetitionExport({
       width: "84mm",
       maxHeight: "50mm",
       objectFit: "contain",
-      marginBottom: "10mm",
     },
     documentTitle: {
+      marginTop: "10mm",
       textAlign: "center",
     },
     field: {
@@ -161,9 +161,11 @@ export default function PetitionExport({
                       }
                       style={styles.documentLogo}
                     />
-                    <View style={styles.documentTitle}>
-                      <Text style={styles.title1}>{documentTitle}</Text>
-                    </View>
+                    {documentTitle ? (
+                      <View style={styles.documentTitle}>
+                        <Text style={styles.title1}>{documentTitle}</Text>
+                      </View>
+                    ) : null}
                   </View>
                 ) : null}
                 {page.map((field, i) => (
