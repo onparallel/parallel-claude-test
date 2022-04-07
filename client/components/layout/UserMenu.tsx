@@ -55,6 +55,7 @@ export function UserMenu({ placement, me, realMe, onHelpCenterClick }: UserMenuP
   const loginAs = useLoginAs();
   const handleRestoreLogin = async () => {
     await loginAs(null);
+    window.location.reload();
   };
 
   return (
