@@ -657,7 +657,14 @@ export const loginAs = mutationField("loginAs", {
     userId: nonNull(globalIdArg("User")),
   },
   authorize: authenticateAnd(
-    or(userIsSuperAdmin(), and(contextUserHasRole("ADMIN"), userHasAccessToUsers("userId")))
+    or(
+      userIsSuperAdmin(),
+      and(
+        contextUserHasRole("ADMIN"),
+        userHasAccessToUsers("userId"),
+        userHasFeatureFlag("GHOST_LOGIN")
+      )
+    )
   ),
   resolve: async (_, { userId }, ctx) => {
     await ctx.auth.updateSessionLogin(ctx.req, (ctx.realUser ?? ctx.user!).id, userId);
