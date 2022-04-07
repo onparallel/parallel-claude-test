@@ -74,7 +74,7 @@ export class PetitionBinder implements IPetitionBinder {
     ]);
 
     const fieldIds = fields.map((f) => f.id);
-    const fieldReplies = await this.petitions.loadRepliesForField(fieldIds);
+    const fieldReplies = await this.petitions.loadRepliesForField(fieldIds, { refresh: true });
     const repliesByFieldId = Object.fromEntries(
       fieldIds.map((id, index) => [id, fieldReplies[index]])
     );
@@ -92,7 +92,12 @@ export class PetitionBinder implements IPetitionBinder {
       .filter((r) => visibleFieldIds.includes(r.petition_field_id));
 
     const printableFiles = includeAnnexedDocuments
-      ? (await this.files.loadFileUpload(visibleFileReplies.map((r) => r.content.file_upload_id)))
+      ? (
+          await this.files.loadFileUpload(
+            visibleFileReplies.map((r) => r.content.file_upload_id),
+            { refresh: true }
+          )
+        )
           .filter((f) => isPrintableContentType(f?.content_type))
           .map((f) => ({
             title: getFieldTitleByFileUploadId(f!.id, visibleFileReplies, fields),
