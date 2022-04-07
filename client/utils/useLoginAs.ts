@@ -3,7 +3,6 @@ import {
   useLoginAs_loginAsDocument,
   useLoginAs_restoreLoginDocument,
 } from "@parallel/graphql/__types";
-import { useRouter } from "next/router";
 import { isDefined } from "remeda";
 
 const _mutations = [
@@ -23,7 +22,6 @@ export function useLoginAs() {
   const [loginAs] = useMutation(useLoginAs_loginAsDocument);
   const [restoreLogin] = useMutation(useLoginAs_restoreLoginDocument);
   const apollo = useApolloClient();
-  const router = useRouter();
   return async function (userId: string | null) {
     if (isDefined(userId)) {
       await loginAs({ variables: { userId } });
@@ -31,6 +29,7 @@ export function useLoginAs() {
       await restoreLogin();
     }
     await apollo.clearStore();
-    await router.push("/app");
+    // reload removing anything after /app
+    window.location.href = window.location.pathname.replace(/(?<=(\/(en|es))?\/app).*/, "");
   };
 }
