@@ -1,9 +1,10 @@
+import { spawnSync } from "child_process";
 import { createWriteStream } from "fs";
+import { stat } from "fs/promises";
 import { inject, injectable } from "inversify";
 import { tmpdir } from "os";
 import pMap from "p-map";
-import path from "path";
-
+import path, { resolve } from "path";
 import { pick, zip } from "remeda";
 import { FileRepository } from "../db/repositories/FileRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
@@ -11,7 +12,6 @@ import { PetitionField, PetitionFieldReply } from "../db/__types";
 import { evaluateFieldVisibility } from "../util/fieldVisibility";
 import { random } from "../util/token";
 import { AWS_SERVICE, IAws } from "./aws";
-import { PdfService, PDF_SERVICE } from "./pdf";
 import { Printer, PRINTER } from "./printer";
 
 function getFieldTitleByFileUploadId(
@@ -53,8 +53,7 @@ export class PetitionBinder implements IPetitionBinder {
     @inject(PetitionRepository) private petitions: PetitionRepository,
     @inject(FileRepository) private files: FileRepository,
     @inject(AWS_SERVICE) private aws: IAws,
-    @inject(PRINTER) private printer: Printer,
-    @inject(PDF_SERVICE) private pdf: PdfService
+    @inject(PRINTER) private printer: Printer
   ) {}
 
   async createBinder(
@@ -69,12 +68,12 @@ export class PetitionBinder implements IPetitionBinder {
     }: PetitionBinderOptions
   ) {
     const [petition, fields] = await Promise.all([
-      this.petitions.loadPetition(petitionId, { refresh: true }),
-      this.petitions.loadFieldsForPetition(petitionId, { refresh: true }),
+      this.petitions.loadPetition(petitionId),
+      this.petitions.loadFieldsForPetition(petitionId),
     ]);
 
     const fieldIds = fields.map((f) => f.id);
-    const fieldReplies = await this.petitions.loadRepliesForField(fieldIds, { refresh: true });
+    const fieldReplies = await this.petitions.loadRepliesForField(fieldIds);
     const repliesByFieldId = Object.fromEntries(
       fieldIds.map((id, index) => [id, fieldReplies[index]])
     );
@@ -92,12 +91,7 @@ export class PetitionBinder implements IPetitionBinder {
       .filter((r) => visibleFieldIds.includes(r.petition_field_id));
 
     const printableFiles = includeAnnexedDocuments
-      ? (
-          await this.files.loadFileUpload(
-            visibleFileReplies.map((r) => r.content.file_upload_id),
-            { refresh: true }
-          )
-        )
+      ? (await this.files.loadFileUpload(visibleFileReplies.map((r) => r.content.file_upload_id)))
           .filter((f) => isPrintableContentType(f?.content_type))
           .map((f) => ({
             title: getFieldTitleByFileUploadId(f!.id, visibleFileReplies, fields),
@@ -146,6 +140,70 @@ export class PetitionBinder implements IPetitionBinder {
       });
     });
 
-    return await this.pdf.merge(tmpDocPaths, { maxOutputSize, outputFileName });
+    return await this.merge(tmpDocPaths, { maxOutputSize, outputFileName });
+  }
+
+  private async merge(paths: string[], opts?: { maxOutputSize?: number; outputFileName?: string }) {
+    const DPIValues = [300, 144, 110, 96, 72];
+    let iteration = -1;
+    let mergedFilePath = null;
+    let mergedFileSize = 0;
+    do {
+      iteration++;
+      mergedFilePath = this.mergeFiles(
+        paths,
+        resolve(tmpdir(), opts?.outputFileName ?? `${random(10)}.pdf`),
+        DPIValues[iteration]
+      );
+      mergedFileSize = (await stat(mergedFilePath)).size;
+    } while (
+      mergedFileSize > (opts?.maxOutputSize ?? Infinity) &&
+      iteration < DPIValues.length - 1
+    );
+
+    if (mergedFileSize > (opts?.maxOutputSize ?? Infinity)) {
+      throw new Error("MAX_SIZE_EXCEEDED");
+    }
+
+    return mergedFilePath;
+  }
+
+  private mergeFiles(paths: string[], output: string, dpi: number) {
+    const { stderr, status } = spawnSync("gs", [
+      "-sDEVICE=pdfwrite",
+      "-dBATCH",
+      "-dPDFSETTINGS=/screen",
+      "-dNOPAUSE",
+      "-dQUIET",
+      "-dCompatibilityLevel=1.5",
+      "-dSubsetFonts=true",
+      "-dCompressFonts=true",
+      "-dEmbedAllFonts=true",
+      "-sProcessColorModel=DeviceRGB",
+      "-sColorConversionStrategy=RGB",
+      "-sColorConversionStrategyForImages=RGB",
+      "-dConvertCMYKImagesToRGB=true",
+      "-dDetectDuplicateImages=true",
+      "-dColorImageDownsampleType=/Bicubic",
+      "-dGrayImageDownsampleType=/Bicubic",
+      "-dMonoImageDownsampleType=/Bicubic",
+      "-dDownsampleColorImages=true",
+      "-dDoThumbnails=false",
+      "-dCreateJobTicket=false",
+      "-dPreserveEPSInfo=false",
+      "-dPreserveOPIComments=false",
+      "-dPreserveOverprintSettings=false",
+      "-dUCRandBGInfo=/Remove",
+      `-dColorImageResolution=${dpi}`,
+      `-dGrayImageResolution=${dpi}`,
+      `-dMonoImageResolution=${dpi}`,
+      `-sOutputFile=${output}`,
+      ...paths,
+    ]);
+    if (status === 0) {
+      return output;
+    } else {
+      throw new Error((stderr || "").toString());
+    }
   }
 }

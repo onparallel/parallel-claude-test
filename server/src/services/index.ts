@@ -5,7 +5,6 @@ import { Aws, AWS_SERVICE, IAws } from "./aws";
 import { EMAILS, EmailsService, IEmailsService } from "./emails";
 import { FetchService, FETCH_SERVICE, IFetchService } from "./fetch";
 import { createLogger, ILogger, LOGGER } from "./logger";
-import { IPdfService, PdfService, PDF_SERVICE } from "./pdf";
 import { IPetitionBinder, PetitionBinder, PETITION_BINDER } from "./petition-binder";
 import { IPrinter, Printer, PRINTER } from "./printer";
 import { IRedis, REDIS, Redis } from "./redis";
@@ -21,12 +20,11 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IAnalyticsService>(ANALYTICS).to(AnalyticsService).inSingletonScope();
   bind<IRedis>(REDIS).to(Redis).inSingletonScope();
   bind<Smtp>(Smtp).toSelf().inSingletonScope();
-  bind<IPrinter>(PRINTER).to(Printer).inSingletonScope();
+  bind<IPrinter>(PRINTER).to(Printer);
   bind<SignatureService>(SIGNATURE).to(SignatureService);
   bind<IStorage>(STORAGE_FACTORY).toFactory(() => {
     return ((...args) => new Storage(...args)) as StorageFactory;
   });
   bind<IFetchService>(FETCH_SERVICE).to(FetchService).inSingletonScope();
-  bind<IPdfService>(PDF_SERVICE).to(PdfService).inSingletonScope();
-  bind<IPetitionBinder>(PETITION_BINDER).to(PetitionBinder).inSingletonScope();
+  bind<IPetitionBinder>(PETITION_BINDER).to(PetitionBinder);
 });
