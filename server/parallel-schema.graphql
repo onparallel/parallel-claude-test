@@ -493,9 +493,9 @@ type Mutation {
     petitionId: ID!
 
     """
-    ID of the user
+    Global ID of the user
     """
-    userId: Int!
+    userId: GID!
   ): SupportMethodResponse!
 
   """
@@ -1260,9 +1260,9 @@ type Mutation {
     organizationId: Int!
 
     """
-    Numeric ID of the new owner
+    Global ID of the new owner
     """
-    userId: Int!
+    userId: GID!
   ): SupportMethodResponse!
 
   """
@@ -1525,9 +1525,9 @@ type Mutation {
     image: Upload!
 
     """
-    Numeric ID of the user
+    Global ID of the user
     """
-    userId: Int!
+    userId: GID!
   ): SupportMethodResponse!
 
   """

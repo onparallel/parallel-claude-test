@@ -660,7 +660,7 @@ export type MutationapproveOrRejectPetitionFieldRepliesArgs = {
 
 export type MutationassignPetitionToUserArgs = {
   petitionId: Scalars["ID"];
-  userId: Scalars["Int"];
+  userId: Scalars["GID"];
 };
 
 export type MutationbulkCreateContactsArgs = {
@@ -1204,7 +1204,7 @@ export type MutationtagPetitionArgs = {
 
 export type MutationtransferOrganizationOwnershipArgs = {
   organizationId: Scalars["Int"];
-  userId: Scalars["Int"];
+  userId: Scalars["GID"];
 };
 
 export type MutationtransferPetitionOwnershipArgs = {
@@ -1380,7 +1380,7 @@ export type MutationuploadDynamicSelectFieldFileArgs = {
 
 export type MutationuploadUserAvatarArgs = {
   image: Scalars["Upload"];
-  userId: Scalars["Int"];
+  userId: Scalars["GID"];
 };
 
 export type MutationuserSignUpArgs = {

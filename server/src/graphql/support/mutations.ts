@@ -69,7 +69,7 @@ export const assignPetitionToUser = mutationField("assignPetitionToUser", {
   type: "SupportMethodResponse",
   args: {
     petitionId: nonNull(idArg({ description: "Global ID of the petition" })),
-    userId: nonNull(intArg({ description: "ID of the user" })),
+    userId: nonNull(globalIdArg("User", { description: "Global ID of the user" })),
   },
   authorize: supportMethodAccess(),
   resolve: async (_, args, ctx) => {
@@ -348,7 +348,7 @@ export const transferOrganizationOwnership = mutationField("transferOrganization
   type: "SupportMethodResponse",
   args: {
     organizationId: nonNull(intArg({ description: "Numeric ID of the organization" })),
-    userId: nonNull(intArg({ description: "Numeric ID of the new owner" })),
+    userId: nonNull(globalIdArg("User", { description: "Global ID of the new owner" })),
   },
   authorize: supportMethodAccess(),
   resolve: async (_, { organizationId, userId }, ctx) => {
@@ -494,7 +494,7 @@ export const uploadUserAvatar = mutationField("uploadUserAvatar", {
   type: "SupportMethodResponse",
   authorize: supportMethodAccess(),
   args: {
-    userId: nonNull(intArg({ description: "Numeric ID of the user" })),
+    userId: nonNull(globalIdArg("User", { description: "Global ID of the user" })),
     image: nonNull(uploadArg()),
   },
   validateArgs: validateFile(

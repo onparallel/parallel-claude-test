@@ -33,6 +33,7 @@ import {
 } from "@parallel/utils/queryState";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useAdminSections } from "@parallel/utils/useAdminSections";
+import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useLoginAs } from "@parallel/utils/useLoginAs";
 import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
@@ -187,6 +188,26 @@ function useOrganizationMembersTableColumns() {
   const roles = useOrganizationRoles();
   return useMemo<TableColumn<OrganizationMembers_OrganizationUserFragment>[]>(
     () => [
+      {
+        key: "id",
+        header: intl.formatMessage({
+          id: "organization-users.header.id",
+          defaultMessage: "ID",
+        }),
+        CellContent: ({ row }) => {
+          const copyToClipboard = useClipboardWithToast({
+            text: intl.formatMessage({
+              id: "organization-users.header.id.copied-toast",
+              defaultMessage: "ID copied to clipboard",
+            }),
+          });
+          return (
+            <Text cursor="pointer" onClick={() => copyToClipboard({ value: row.id })}>
+              {row.id}
+            </Text>
+          );
+        },
+      },
       {
         key: "fullName",
         isSortable: true,

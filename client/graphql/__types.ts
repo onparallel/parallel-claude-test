@@ -693,7 +693,7 @@ export interface MutationapproveOrRejectPetitionFieldRepliesArgs {
 
 export interface MutationassignPetitionToUserArgs {
   petitionId: Scalars["ID"];
-  userId: Scalars["Int"];
+  userId: Scalars["GID"];
 }
 
 export interface MutationbulkCreateContactsArgs {
@@ -1241,7 +1241,7 @@ export interface MutationtagPetitionArgs {
 
 export interface MutationtransferOrganizationOwnershipArgs {
   organizationId: Scalars["Int"];
-  userId: Scalars["Int"];
+  userId: Scalars["GID"];
 }
 
 export interface MutationtransferPetitionOwnershipArgs {
@@ -1417,7 +1417,7 @@ export interface MutationuploadDynamicSelectFieldFileArgs {
 
 export interface MutationuploadUserAvatarArgs {
   image: Scalars["Upload"];
-  userId: Scalars["Int"];
+  userId: Scalars["GID"];
 }
 
 export interface MutationuserSignUpArgs {

@@ -23,11 +23,11 @@ export const supportMethods: {
         },
         {
           name: "userId",
-          description: "ID of the user",
+          description: "Global ID of the user",
           type: {
             kind: "NON_NULL",
             name: null,
-            ofType: { kind: "SCALAR", name: "Int", ofType: null },
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
           },
           defaultValue: null,
           isDeprecated: false,
@@ -510,11 +510,11 @@ export const supportMethods: {
         },
         {
           name: "userId",
-          description: "Numeric ID of the new owner",
+          description: "Global ID of the new owner",
           type: {
             kind: "NON_NULL",
             name: null,
-            ofType: { kind: "SCALAR", name: "Int", ofType: null },
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
           },
           defaultValue: null,
           isDeprecated: false,
@@ -750,11 +750,11 @@ export const supportMethods: {
         },
         {
           name: "userId",
-          description: "Numeric ID of the user",
+          description: "Global ID of the user",
           type: {
             kind: "NON_NULL",
             name: null,
-            ofType: { kind: "SCALAR", name: "Int", ofType: null },
+            ofType: { kind: "SCALAR", name: "GID", ofType: null },
           },
           defaultValue: null,
           isDeprecated: false,

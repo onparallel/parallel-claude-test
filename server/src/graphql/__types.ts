@@ -3505,7 +3505,7 @@ export interface NexusGenArgTypes {
     assignPetitionToUser: {
       // args
       petitionId: string; // ID!
-      userId: number; // Int!
+      userId: NexusGenScalars["GID"]; // GID!
     };
     bulkCreateContacts: {
       // args
@@ -4053,7 +4053,7 @@ export interface NexusGenArgTypes {
     transferOrganizationOwnership: {
       // args
       organizationId: number; // Int!
-      userId: number; // Int!
+      userId: NexusGenScalars["GID"]; // GID!
     };
     transferPetitionOwnership: {
       // args
@@ -4229,7 +4229,7 @@ export interface NexusGenArgTypes {
     uploadUserAvatar: {
       // args
       image: NexusGenScalars["Upload"]; // Upload!
-      userId: number; // Int!
+      userId: NexusGenScalars["GID"]; // GID!
     };
     userSignUp: {
       // args

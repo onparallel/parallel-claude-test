@@ -5010,6 +5010,16 @@
     "context": "Deactivate {count, plural, =1{user} other {users}}"
   },
   {
+    "term": "organization-users.header.id",
+    "definition": "ID",
+    "context": "ID"
+  },
+  {
+    "term": "organization-users.header.id.copied-toast",
+    "definition": "ID copied to clipboard",
+    "context": "ID copied to clipboard"
+  },
+  {
     "term": "organization-users.header.inactive-user",
     "definition": "Inactive user",
     "context": "Inactive user"
