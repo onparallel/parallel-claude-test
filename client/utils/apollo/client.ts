@@ -196,7 +196,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
         Organization: {
           fields: {
             users: { merge: false },
-            usageLimits: { merge: false },
+            usageLimits: { merge: true },
             integrations: { merge: false },
           },
         },
