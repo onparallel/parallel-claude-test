@@ -120,6 +120,7 @@ export function NotificationsDrawer() {
       size="sm"
       isFullHeight
       initialFocusRef={filterRef}
+      returnFocusOnClose={false}
     >
       <DrawerOverlay />
       <DrawerContent>
