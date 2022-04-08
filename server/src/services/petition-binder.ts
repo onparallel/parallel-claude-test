@@ -100,7 +100,7 @@ export class PetitionBinder implements IPetitionBinder {
         if (file.content_type.startsWith("image/")) {
           const filePath =
             file.content_type !== "image/jpeg"
-              ? await this.convertImage(file.path, file.content_type, "jpeg")
+              ? await this.convertImage(file.path, file.content_type)
               : await this.aws.fileUploads.getSignedDownloadEndpoint(
                   file.path,
                   title ?? `file_${index}`,
@@ -189,15 +189,12 @@ export class PetitionBinder implements IPetitionBinder {
     }
   }
 
-  private async convertImage(
-    fileS3Path: string,
-    contentType: string,
-    outputFormat: "jpeg" | "png" = "jpeg"
-  ) {
+  private async convertImage(fileS3Path: string, contentType: string) {
     const fileStream = await this.aws.fileUploads.downloadFile(fileS3Path);
     const tmpPath = resolve(tmpdir(), random(10));
     await writeFile(tmpPath, fileStream);
 
+    const outputFormat = ["image/png", "image/gif"].includes(contentType) ? "png" : "jpeg";
     const output = resolve(tmpdir(), `${random(10)}.${outputFormat}`);
     const { stderr, status } = spawnSync("convert", [
       // for GIF images, we only need the first frame
