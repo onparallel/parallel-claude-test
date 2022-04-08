@@ -14,7 +14,7 @@ import { useLiquidScope } from "../utils/useLiquidScope";
 import {
   PetitionExport_petitionDocument,
   PetitionExport_PetitionFieldFragment,
-  PetitionExport_PetitionFragment,
+  PetitionExport_PetitionBaseFragment,
 } from "../__types";
 
 export interface PetitionExportInitialData {
@@ -24,7 +24,7 @@ export interface PetitionExportInitialData {
 }
 
 export interface PetitionExportProps extends Omit<PetitionExportInitialData, "petitionId"> {
-  petition: PetitionExport_PetitionFragment;
+  petition: PetitionExport_PetitionBaseFragment;
 }
 
 export default function PetitionExport({
@@ -284,7 +284,9 @@ export default function PetitionExport({
                     )}
                   </View>
                 ))}
-                {showSignatureBoxes && isDefined(petition.currentSignatureRequest) ? (
+                {showSignatureBoxes &&
+                petition.__typename === "Petition" &&
+                isDefined(petition.currentSignatureRequest) ? (
                   <SignaturesBlock
                     signatureConfig={petition.currentSignatureRequest.signatureConfig}
                     templateId={petition.fromTemplateId}
@@ -337,9 +339,9 @@ function groupFieldsByPages<T extends PetitionExport_PetitionFieldFragment>(
 }
 
 PetitionExport.fragments = {
-  get Petition() {
+  get PetitionBase() {
     return gql`
-      fragment PetitionExport_Petition on Petition {
+      fragment PetitionExport_PetitionBase on PetitionBase {
         id
         name
         fields {
@@ -351,13 +353,16 @@ PetitionExport.fragments = {
           logoUrl
           pdfDocumentTheme
         }
-        fromTemplateId
-        currentSignatureRequest {
-          signatureConfig {
-            ...SignaturesBlock_SignatureConfig
+        ... on Petition {
+          fromTemplateId
+          currentSignatureRequest {
+            signatureConfig {
+              ...SignaturesBlock_SignatureConfig
+            }
           }
         }
         ...useLiquidScope_PetitionBase
+        __typename
       }
       ${this.PetitionField}
       ${SignaturesBlock.fragments.SignatureConfig}
@@ -388,10 +393,10 @@ PetitionExport.queries = [
   gql`
     query PetitionExport_petition($petitionId: GID!) {
       petition(id: $petitionId) {
-        ...PetitionExport_Petition
+        ...PetitionExport_PetitionBase
       }
     }
-    ${PetitionExport.fragments.Petition}
+    ${PetitionExport.fragments.PetitionBase}
   `,
 ];
 

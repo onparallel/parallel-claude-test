@@ -469,6 +469,7 @@ export type Mutation = {
   getApiTokenOwner: SupportMethodResponse;
   /** Returns a signed download url for tasks with file output */
   getTaskResultFileUrl: Scalars["String"];
+  loginAs: Result;
   /** marks a Signature integration as default */
   markSignatureIntegrationAsDefault: OrgIntegration;
   /** Adds, edits or deletes a custom property on the petition */
@@ -537,6 +538,7 @@ export type Mutation = {
   resetTemporaryPassword: Result;
   /** Resets the given user password on AWS Cognito and sends an email with new temporary. */
   resetUserPassword: SupportMethodResponse;
+  restoreLogin: Result;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
   /** Sends the petition and creates the corresponding accesses and messages. */
@@ -942,6 +944,10 @@ export type MutationgetApiTokenOwnerArgs = {
 export type MutationgetTaskResultFileUrlArgs = {
   preview?: InputMaybe<Scalars["Boolean"]>;
   taskId: Scalars["GID"];
+};
+
+export type MutationloginAsArgs = {
+  userId: Scalars["GID"];
 };
 
 export type MutationmarkSignatureIntegrationAsDefaultArgs = {
@@ -2581,6 +2587,7 @@ export type Query = {
   publicPetitionLinkBySlug: Maybe<PublicPublicPetitionLink>;
   publicTask: Task;
   publicTemplateCategories: Array<Scalars["String"]>;
+  realMe: Maybe<User>;
   /** Search user groups */
   searchUserGroups: Array<UserGroup>;
   /** Search users and user groups */
@@ -3352,10 +3359,14 @@ export type ImageToPdf_meQuery = {
   me: { organization: { pdfDocumentTheme: { [key: string]: any } } };
 };
 
-export type PetitionExport_PetitionFragment = {
+export type PetitionExport_PetitionBase_Petition_Fragment = {
+  __typename: "Petition";
+  fromTemplateId: string | null;
   id: string;
   name: string | null;
-  fromTemplateId: string | null;
+  currentSignatureRequest: {
+    signatureConfig: { timezone: string; signers: Array<{ fullName: string; email: string }> };
+  } | null;
   fields: Array<{
     options: { [key: string]: any };
     type: PetitionFieldType;
@@ -3373,10 +3384,34 @@ export type PetitionExport_PetitionFragment = {
     }>;
   }>;
   organization: { name: string; logoUrl: string | null; pdfDocumentTheme: { [key: string]: any } };
-  currentSignatureRequest: {
-    signatureConfig: { timezone: string; signers: Array<{ fullName: string; email: string }> };
-  } | null;
 };
+
+export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
+  __typename: "PetitionTemplate";
+  id: string;
+  name: string | null;
+  fields: Array<{
+    options: { [key: string]: any };
+    type: PetitionFieldType;
+    multiple: boolean;
+    alias: string | null;
+    id: string;
+    title: string | null;
+    description: string | null;
+    showInPdf: boolean;
+    visibility: { [key: string]: any } | null;
+    replies: Array<{
+      content: { [key: string]: any };
+      id: string;
+      status: PetitionFieldReplyStatus;
+    }>;
+  }>;
+  organization: { name: string; logoUrl: string | null; pdfDocumentTheme: { [key: string]: any } };
+};
+
+export type PetitionExport_PetitionBaseFragment =
+  | PetitionExport_PetitionBase_Petition_Fragment
+  | PetitionExport_PetitionBase_PetitionTemplate_Fragment;
 
 export type PetitionExport_PetitionFieldFragment = {
   id: string;
@@ -3396,9 +3431,16 @@ export type PetitionExport_petitionQueryVariables = Exact<{
 export type PetitionExport_petitionQuery = {
   petition:
     | {
+        __typename: "Petition";
+        fromTemplateId: string | null;
         id: string;
         name: string | null;
-        fromTemplateId: string | null;
+        currentSignatureRequest: {
+          signatureConfig: {
+            timezone: string;
+            signers: Array<{ fullName: string; email: string }>;
+          };
+        } | null;
         fields: Array<{
           options: { [key: string]: any };
           type: PetitionFieldType;
@@ -3420,18 +3462,37 @@ export type PetitionExport_petitionQuery = {
           logoUrl: string | null;
           pdfDocumentTheme: { [key: string]: any };
         };
-        currentSignatureRequest: {
-          signatureConfig: {
-            timezone: string;
-            signers: Array<{ fullName: string; email: string }>;
-          };
-        } | null;
       }
-    | {}
+    | {
+        __typename: "PetitionTemplate";
+        id: string;
+        name: string | null;
+        fields: Array<{
+          options: { [key: string]: any };
+          type: PetitionFieldType;
+          multiple: boolean;
+          alias: string | null;
+          id: string;
+          title: string | null;
+          description: string | null;
+          showInPdf: boolean;
+          visibility: { [key: string]: any } | null;
+          replies: Array<{
+            content: { [key: string]: any };
+            id: string;
+            status: PetitionFieldReplyStatus;
+          }>;
+        }>;
+        organization: {
+          name: string;
+          logoUrl: string | null;
+          pdfDocumentTheme: { [key: string]: any };
+        };
+      }
     | null;
 };
 
-export type useLiquidScope_PetitionBaseFragment = {
+export type useLiquidScope_PetitionBase_Petition_Fragment = {
   id: string;
   fields: Array<{
     type: PetitionFieldType;
@@ -3440,6 +3501,20 @@ export type useLiquidScope_PetitionBaseFragment = {
     replies: Array<{ content: { [key: string]: any } }>;
   }>;
 };
+
+export type useLiquidScope_PetitionBase_PetitionTemplate_Fragment = {
+  id: string;
+  fields: Array<{
+    type: PetitionFieldType;
+    multiple: boolean;
+    alias: string | null;
+    replies: Array<{ content: { [key: string]: any } }>;
+  }>;
+};
+
+export type useLiquidScope_PetitionBaseFragment =
+  | useLiquidScope_PetitionBase_Petition_Fragment
+  | useLiquidScope_PetitionBase_PetitionTemplate_Fragment;
 
 export const PetitionExport_PetitionFieldFragmentDoc = gql`
   fragment PetitionExport_PetitionField on PetitionField {
@@ -3467,7 +3542,7 @@ export const SignaturesBlock_SignatureConfigFragmentDoc = gql`
   }
 ` as unknown as DocumentNode<SignaturesBlock_SignatureConfigFragment, unknown>;
 export const useLiquidScope_PetitionBaseFragmentDoc = gql`
-  fragment useLiquidScope_PetitionBase on Petition {
+  fragment useLiquidScope_PetitionBase on PetitionBase {
     id
     fields {
       type
@@ -3479,8 +3554,8 @@ export const useLiquidScope_PetitionBaseFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<useLiquidScope_PetitionBaseFragment, unknown>;
-export const PetitionExport_PetitionFragmentDoc = gql`
-  fragment PetitionExport_Petition on Petition {
+export const PetitionExport_PetitionBaseFragmentDoc = gql`
+  fragment PetitionExport_PetitionBase on PetitionBase {
     id
     name
     fields {
@@ -3492,18 +3567,21 @@ export const PetitionExport_PetitionFragmentDoc = gql`
       logoUrl
       pdfDocumentTheme
     }
-    fromTemplateId
-    currentSignatureRequest {
-      signatureConfig {
-        ...SignaturesBlock_SignatureConfig
+    ... on Petition {
+      fromTemplateId
+      currentSignatureRequest {
+        signatureConfig {
+          ...SignaturesBlock_SignatureConfig
+        }
       }
     }
     ...useLiquidScope_PetitionBase
+    __typename
   }
   ${PetitionExport_PetitionFieldFragmentDoc}
   ${SignaturesBlock_SignatureConfigFragmentDoc}
   ${useLiquidScope_PetitionBaseFragmentDoc}
-` as unknown as DocumentNode<PetitionExport_PetitionFragment, unknown>;
+` as unknown as DocumentNode<PetitionExport_PetitionBaseFragment, unknown>;
 export const AnnexCoverPage_meDocument = gql`
   query AnnexCoverPage_me {
     me {
@@ -3525,8 +3603,8 @@ export const ImageToPdf_meDocument = gql`
 export const PetitionExport_petitionDocument = gql`
   query PetitionExport_petition($petitionId: GID!) {
     petition(id: $petitionId) {
-      ...PetitionExport_Petition
+      ...PetitionExport_PetitionBase
     }
   }
-  ${PetitionExport_PetitionFragmentDoc}
+  ${PetitionExport_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionExport_petitionQuery, PetitionExport_petitionQueryVariables>;

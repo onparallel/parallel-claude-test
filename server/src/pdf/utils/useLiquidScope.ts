@@ -28,7 +28,7 @@ export function useLiquidScope(petition: useLiquidScope_PetitionBaseFragment) {
 
 useLiquidScope.fragments = {
   PetitionBase: gql`
-    fragment useLiquidScope_PetitionBase on Petition {
+    fragment useLiquidScope_PetitionBase on PetitionBase {
       id
       fields {
         type

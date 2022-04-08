@@ -469,6 +469,7 @@ export type Mutation = {
   getApiTokenOwner: SupportMethodResponse;
   /** Returns a signed download url for tasks with file output */
   getTaskResultFileUrl: Scalars["String"];
+  loginAs: Result;
   /** marks a Signature integration as default */
   markSignatureIntegrationAsDefault: OrgIntegration;
   /** Adds, edits or deletes a custom property on the petition */
@@ -537,6 +538,7 @@ export type Mutation = {
   resetTemporaryPassword: Result;
   /** Resets the given user password on AWS Cognito and sends an email with new temporary. */
   resetUserPassword: SupportMethodResponse;
+  restoreLogin: Result;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
   /** Sends the petition and creates the corresponding accesses and messages. */
@@ -942,6 +944,10 @@ export type MutationgetApiTokenOwnerArgs = {
 export type MutationgetTaskResultFileUrlArgs = {
   preview?: InputMaybe<Scalars["Boolean"]>;
   taskId: Scalars["GID"];
+};
+
+export type MutationloginAsArgs = {
+  userId: Scalars["GID"];
 };
 
 export type MutationmarkSignatureIntegrationAsDefaultArgs = {
@@ -2581,6 +2587,7 @@ export type Query = {
   publicPetitionLinkBySlug: Maybe<PublicPublicPetitionLink>;
   publicTask: Task;
   publicTemplateCategories: Array<Scalars["String"]>;
+  realMe: Maybe<User>;
   /** Search user groups */
   searchUserGroups: Array<UserGroup>;
   /** Search users and user groups */
