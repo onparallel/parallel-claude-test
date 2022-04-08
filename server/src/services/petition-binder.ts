@@ -29,7 +29,15 @@ function getFieldTitleByFileUploadId(
 function isPrintableContentType(contentType?: string) {
   return (
     contentType !== undefined &&
-    ["application/pdf", "image/png", "image/jpeg", "image/gif"].includes(contentType)
+    [
+      "application/pdf",
+      "image/png",
+      "image/jpeg",
+      "image/gif",
+      "image/heic",
+      "image/tiff",
+      "image/webp",
+    ].includes(contentType)
   );
 }
 
@@ -90,13 +98,14 @@ export class PetitionBinder implements IPetitionBinder {
         );
 
         if (file.content_type.startsWith("image/")) {
-          const filePath = ["image/png", "image/gif"].includes(file.content_type)
-            ? await this.flattenImage(file.path, file.content_type)
-            : await this.aws.fileUploads.getSignedDownloadEndpoint(
-                file.path,
-                title ?? `file_${index}`,
-                "inline"
-              );
+          const filePath =
+            file.content_type !== "image/jpeg"
+              ? await this.convertImage(file.path, file.content_type, "jpeg")
+              : await this.aws.fileUploads.getSignedDownloadEndpoint(
+                  file.path,
+                  title ?? `file_${index}`,
+                  "inline"
+                );
 
           const pdfStream = await this.printer.imageToPdf(userId, {
             imageUrl: filePath,
@@ -180,12 +189,16 @@ export class PetitionBinder implements IPetitionBinder {
     }
   }
 
-  private async flattenImage(fileS3Path: string, contentType: string) {
+  private async convertImage(
+    fileS3Path: string,
+    contentType: string,
+    outputFormat: "jpeg" | "png" = "jpeg"
+  ) {
     const fileStream = await this.aws.fileUploads.downloadFile(fileS3Path);
     const tmpPath = resolve(tmpdir(), random(10));
     await writeFile(tmpPath, fileStream);
 
-    const output = resolve(tmpdir(), `${random(10)}.png`);
+    const output = resolve(tmpdir(), `${random(10)}.${outputFormat}`);
     const { stderr, status } = spawnSync("convert", [
       // for GIF images, we only need the first frame
       contentType === "image/gif" ? `${tmpPath}[0]` : tmpPath,
