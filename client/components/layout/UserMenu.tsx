@@ -16,12 +16,12 @@ import {
   UsePopperProps,
 } from "@chakra-ui/react";
 import {
+  ArrowBackIcon,
   BellIcon,
   BusinessIcon,
   CommentIcon,
   HelpOutlineIcon,
   KeyIcon,
-  LogInIcon,
   LogOutIcon,
   MapIcon,
   UserIcon,
@@ -113,7 +113,7 @@ export function UserMenu({ placement, me, realMe, onHelpCenterClick }: UserMenuP
           {realMe ? (
             <>
               <MenuItem
-                icon={<LogInIcon display="block" boxSize={4} />}
+                icon={<ArrowBackIcon display="block" boxSize={4} />}
                 onClick={handleRestoreLogin}
               >
                 <Text>
