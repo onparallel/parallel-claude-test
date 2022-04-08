@@ -98,7 +98,7 @@ function Account() {
         </Heading>
       }
     >
-      <Stack padding={6} spacing={8} maxWidth="container.xs" width="100%" paddingBottom={16}>
+      <Stack padding={6} spacing={8} maxWidth="container.sm" width="100%" paddingBottom={16}>
         <AccountChangeName user={me} onSubmit={onSaveName} />
         <Divider borderColor="gray.300" />
         <AccountLocaleChange user={me} onChange={handleLocaleChange} />

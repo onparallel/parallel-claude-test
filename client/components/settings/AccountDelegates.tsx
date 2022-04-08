@@ -3,7 +3,6 @@ import {
   Alert,
   AlertIcon,
   Button,
-  Center,
   FormControl,
   FormLabel,
   Heading,
@@ -20,7 +19,8 @@ import {
 import { AccountDelegates_UserFragment, UserSelect_UserFragment } from "@parallel/graphql/__types";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
+import { SupportLink } from "../common/SupportLink";
 
 export interface AccountDelegatesData {
   delegates: UserSelect_UserFragment[];
@@ -32,6 +32,7 @@ interface AccountDelegatesProps extends Omit<StackProps, "onSubmit"> {
 }
 
 export function AccountDelegates({ user, onSubmit, ...props }: AccountDelegatesProps) {
+  const intl = useIntl();
   const {
     handleSubmit,
     control,
@@ -76,36 +77,38 @@ export function AccountDelegates({ user, onSubmit, ...props }: AccountDelegatesP
       >
         <FormControl id="delegates" isDisabled={!user.hasOnBehalfOf}>
           <Stack spacing={4} paddingBottom={2}>
-            {user.hasOnBehalfOf ? null : (
-              <Alert status="info" rounded="md">
-                <AlertIcon />
-                <HStack spacing={8}>
-                  <Text flex="1">
-                    <FormattedMessage
-                      id="component.account-delegates.upgrade-delegates"
-                      defaultMessage="Upgrade your plan to be able to assign delegates."
-                    />
-                  </Text>
-                  <Center>
-                    <Button
-                      as="a"
-                      variant="outline"
-                      backgroundColor="white"
-                      colorScheme="blue"
-                      href="mailto:support@onparallel.com"
-                    >
-                      <FormattedMessage id="generic.contact" defaultMessage="Contact" />
-                    </Button>
-                  </Center>
-                </HStack>
-              </Alert>
-            )}
             <Text>
               <FormattedMessage
                 id="component.account-delegates.delegates-description"
                 defaultMessage="Delegates can submit petitions on your behalf."
               />
             </Text>
+            {user.hasOnBehalfOf ? null : (
+              <Alert status="info" rounded="md">
+                <AlertIcon />
+                <HStack spacing={3}>
+                  <Text flex="1">
+                    <FormattedMessage
+                      id="component.account-delegates.upgrade-delegates"
+                      defaultMessage="This is an Enterprise feature. Contact with our support team for more information."
+                    />
+                  </Text>
+                  <Button
+                    as={SupportLink}
+                    variant="outline"
+                    colorScheme="blue"
+                    backgroundColor="white"
+                    message={intl.formatMessage({
+                      id: "component.account-delegates.upgrade-delegates-support-message",
+                      defaultMessage:
+                        "Hi, I would like more information about sending petitions on behalf of another user.",
+                    })}
+                  >
+                    <FormattedMessage id="generic.contact" defaultMessage="Contact" />
+                  </Button>
+                </HStack>
+              </Alert>
+            )}
             <FormLabel>
               <FormattedMessage
                 id="component.account-delegates.delegates-label"

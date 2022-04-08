@@ -31,8 +31,13 @@
   },
   {
     "term": "component.account-delegates.upgrade-delegates",
-    "definition": "Actualiza tu plan para poder asignar delegados.",
-    "context": "Upgrade your plan to be able to assign delegates."
+    "definition": "Esta es una funcionalidad enterprise. Contacta con nuestro equipo de soporte para más información.",
+    "context": "This is an Enterprise feature. Contact with our support team for more information."
+  },
+  {
+    "term": "component.account-delegates.upgrade-delegates-support-message",
+    "definition": "Hola, Me gustaría saber más sobre delegar el envío de peticiones a otros usuarios.",
+    "context": "Hi, I would like more information about sending petitions on behalf of another user."
   },
   {
     "term": "component.add-member-group-dialog.members-label",
