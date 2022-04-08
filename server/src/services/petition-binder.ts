@@ -1,11 +1,12 @@
 import { spawnSync } from "child_process";
 import { createWriteStream } from "fs";
-import { stat } from "fs/promises";
+import { stat, writeFile } from "fs/promises";
 import { inject, injectable } from "inversify";
 import { tmpdir } from "os";
 import pMap from "p-map";
-import path, { resolve } from "path";
+import { resolve } from "path";
 import { pick, zip } from "remeda";
+import { Readable } from "stream";
 import { FileRepository } from "../db/repositories/FileRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { PetitionField, PetitionFieldReply } from "../db/__types";
@@ -28,7 +29,7 @@ function getFieldTitleByFileUploadId(
 function isPrintableContentType(contentType?: string) {
   return (
     contentType !== undefined &&
-    ["application/pdf", "image/png", "image/jpeg"].includes(contentType)
+    ["application/pdf", "image/png", "image/jpeg", "image/gif"].includes(contentType)
   );
 }
 
@@ -72,32 +73,7 @@ export class PetitionBinder implements IPetitionBinder {
       this.petitions.loadFieldsForPetition(petitionId),
     ]);
 
-    const fieldIds = fields.map((f) => f.id);
-    const fieldReplies = await this.petitions.loadRepliesForField(fieldIds);
-    const repliesByFieldId = Object.fromEntries(
-      fieldIds.map((id, index) => [id, fieldReplies[index]])
-    );
-    const fieldsWithReplies = fields.map((f) => ({ ...f, replies: repliesByFieldId[f.id] }));
-
-    const visibleFieldIds = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies))
-      .filter(
-        ([field, isVisible]) =>
-          isVisible && field.type === "FILE_UPLOAD" && !!field.options.attachToPdf
-      )
-      .map(([field]) => field.id);
-
-    const visibleFileReplies = fieldReplies
-      .flat()
-      .filter((r) => visibleFieldIds.includes(r.petition_field_id));
-
-    const printableFiles = includeAnnexedDocuments
-      ? (await this.files.loadFileUpload(visibleFileReplies.map((r) => r.content.file_upload_id)))
-          .filter((f) => isPrintableContentType(f?.content_type))
-          .map((f) => ({
-            title: getFieldTitleByFileUploadId(f!.id, visibleFileReplies, fields),
-            file: pick(f!, ["path", "content_type"]),
-          }))
-      : [];
+    const printableFiles = includeAnnexedDocuments ? await this.getPrintableFiles(fields) : [];
 
     const mainDocStream = await this.printer.petitionExport(userId, {
       petitionId,
@@ -112,33 +88,30 @@ export class PetitionBinder implements IPetitionBinder {
           { fieldNumber: index + 1, fieldTitle: title },
           petition?.locale ?? "en"
         );
-        const pdfStream = file.content_type.startsWith("image/")
-          ? await this.printer.imageToPdf(userId, {
-              imageUrl: await this.aws.fileUploads.getSignedDownloadEndpoint(
+
+        if (file.content_type.startsWith("image/")) {
+          const filePath = ["image/png", "image/gif"].includes(file.content_type)
+            ? await this.flattenImage(file.path, file.content_type)
+            : await this.aws.fileUploads.getSignedDownloadEndpoint(
                 file.path,
                 title ?? `file_${index}`,
                 "inline"
-              ),
-            })
-          : file.content_type === "application/pdf"
-          ? await this.aws.fileUploads.downloadFile(file.path)
-          : null;
-        if (!pdfStream) {
-          throw new Error(`Unsupported format ${file.content_type}`);
+              );
+
+          const pdfStream = await this.printer.imageToPdf(userId, {
+            imageUrl: filePath,
+          });
+
+          return [coverPage, pdfStream];
+        } else if (file.content_type === "application/pdf") {
+          return [coverPage, await this.aws.fileUploads.downloadFile(file.path)];
+        } else {
+          throw new Error(`Cannot annex ${file.content_type} to pdf binder`);
         }
-        return [coverPage, pdfStream];
       })
     ).flat();
 
-    const tmpDocPaths = await pMap([mainDocStream, ...annexedDocumentStreams], async (stream) => {
-      return new Promise<string>((resolve, reject) => {
-        const tmpPath = path.resolve(tmpdir(), random(10));
-        const writeStream = createWriteStream(tmpPath);
-        writeStream.on("close", () => resolve(tmpPath));
-        writeStream.on("error", reject);
-        stream.pipe(writeStream);
-      });
-    });
+    const tmpDocPaths = await pMap([mainDocStream, ...annexedDocumentStreams], this.writeStream);
 
     return await this.merge(tmpDocPaths, { maxOutputSize, outputFileName });
   }
@@ -205,5 +178,66 @@ export class PetitionBinder implements IPetitionBinder {
     } else {
       throw new Error((stderr || "").toString());
     }
+  }
+
+  private async flattenImage(fileS3Path: string, contentType: string) {
+    const fileStream = await this.aws.fileUploads.downloadFile(fileS3Path);
+    const tmpPath = resolve(tmpdir(), random(10));
+    await writeFile(tmpPath, fileStream);
+
+    const output = resolve(tmpdir(), `${random(10)}.png`);
+    const { stderr, status } = spawnSync("convert", [
+      // for GIF images, we only need the first frame
+      contentType === "image/gif" ? `${tmpPath}[0]` : tmpPath,
+      "-background",
+      "white",
+      "-flatten",
+      output,
+    ]);
+
+    if (status === 0) {
+      return output;
+    } else {
+      throw new Error((stderr || "").toString());
+    }
+  }
+
+  private async getPrintableFiles(fields: PetitionField[]) {
+    const fieldIds = fields.map((f) => f.id);
+    const fieldReplies = await this.petitions.loadRepliesForField(fieldIds);
+    const repliesByFieldId = Object.fromEntries(
+      fieldIds.map((id, index) => [id, fieldReplies[index]])
+    );
+    const fieldsWithReplies = fields.map((f) => ({ ...f, replies: repliesByFieldId[f.id] }));
+
+    const visibleFieldIds = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies))
+      .filter(
+        ([field, isVisible]) =>
+          isVisible && field.type === "FILE_UPLOAD" && !!field.options.attachToPdf
+      )
+      .map(([field]) => field.id);
+
+    const visibleFileReplies = fieldReplies
+      .flat()
+      .filter((r) => visibleFieldIds.includes(r.petition_field_id));
+
+    return (
+      await this.files.loadFileUpload(visibleFileReplies.map((r) => r.content.file_upload_id))
+    )
+      .filter((f) => isPrintableContentType(f?.content_type))
+      .map((f) => ({
+        title: getFieldTitleByFileUploadId(f!.id, visibleFileReplies, fields),
+        file: pick(f!, ["path", "content_type"]),
+      }));
+  }
+
+  private async writeStream(stream: Readable | NodeJS.ReadableStream) {
+    return await new Promise<string>((res, rej) => {
+      const tmpPath = resolve(tmpdir(), random(10));
+      const writeStream = createWriteStream(tmpPath);
+      writeStream.on("close", () => res(tmpPath));
+      writeStream.on("error", rej);
+      stream.pipe(writeStream);
+    });
   }
 }
