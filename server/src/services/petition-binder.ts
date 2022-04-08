@@ -5,7 +5,7 @@ import { inject, injectable } from "inversify";
 import { tmpdir } from "os";
 import pMap from "p-map";
 import { resolve } from "path";
-import { pick, zip } from "remeda";
+import { groupBy, pick, zip } from "remeda";
 import { Readable } from "stream";
 import { FileRepository } from "../db/repositories/FileRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
@@ -15,15 +15,13 @@ import { random } from "../util/token";
 import { AWS_SERVICE, IAws } from "./aws";
 import { Printer, PRINTER } from "./printer";
 
-function getFieldTitleByFileUploadId(
+function getFieldByFileUploadId(
   fileUploadId: number,
   replies: PetitionFieldReply[],
   fields: PetitionField[]
 ) {
   const reply = replies.find((r) => r.content.file_upload_id === fileUploadId);
-  if (!reply) return null;
-  const field = fields.find((f) => f.id === reply.petition_field_id);
-  return field?.title ?? null;
+  return fields.find((f) => f.id === reply!.petition_field_id)!;
 }
 
 function isPrintableContentType(contentType?: string) {
@@ -81,42 +79,47 @@ export class PetitionBinder implements IPetitionBinder {
       this.petitions.loadFieldsForPetition(petitionId),
     ]);
 
-    const printableFiles = includeAnnexedDocuments ? await this.getPrintableFiles(fields) : [];
-
     const mainDocStream = await this.printer.petitionExport(userId, {
       petitionId,
       documentTitle,
       showSignatureBoxes,
     });
 
+    const printableFiles = includeAnnexedDocuments ? await this.getPrintableFiles(fields) : [];
+
+    const filesGroupedByFieldId = groupBy(printableFiles, (f) => f.fieldId);
     const annexedDocumentStreams = (
-      await pMap(printableFiles, async ({ file, title }, index) => {
+      await pMap(Object.keys(filesGroupedByFieldId), async (fieldId, fieldIndex) => {
+        const files = filesGroupedByFieldId[fieldId];
+
         const coverPage = await this.printer.annexCoverPage(
           userId,
-          { fieldNumber: index + 1, fieldTitle: title },
+          { fieldNumber: fieldIndex + 1, fieldTitle: files[0].fieldTitle },
           petition?.locale ?? "en"
         );
 
-        if (file.content_type.startsWith("image/")) {
-          const filePath =
-            file.content_type !== "image/jpeg"
-              ? await this.convertImage(file.path, file.content_type)
-              : await this.aws.fileUploads.getSignedDownloadEndpoint(
-                  file.path,
-                  title ?? `file_${index}`,
-                  "inline"
-                );
+        const fileStreams = await pMap(files, async ({ file, fieldTitle }, fileIndex) => {
+          if (file.content_type.startsWith("image/")) {
+            const filePath =
+              file.content_type !== "image/jpeg"
+                ? await this.convertImage(file.path, file.content_type)
+                : await this.aws.fileUploads.getSignedDownloadEndpoint(
+                    file.path,
+                    fieldTitle ?? `file_${fileIndex}`,
+                    "inline"
+                  );
 
-          const pdfStream = await this.printer.imageToPdf(userId, {
-            imageUrl: filePath,
-          });
+            return await this.printer.imageToPdf(userId, {
+              imageUrl: filePath,
+            });
+          } else if (file.content_type === "application/pdf") {
+            return await this.aws.fileUploads.downloadFile(file.path);
+          } else {
+            throw new Error(`Cannot annex ${file.content_type} to pdf binder`);
+          }
+        });
 
-          return [coverPage, pdfStream];
-        } else if (file.content_type === "application/pdf") {
-          return [coverPage, await this.aws.fileUploads.downloadFile(file.path)];
-        } else {
-          throw new Error(`Cannot annex ${file.content_type} to pdf binder`);
-        }
+        return [coverPage, ...fileStreams];
       })
     ).flat();
 
@@ -235,10 +238,14 @@ export class PetitionBinder implements IPetitionBinder {
       await this.files.loadFileUpload(visibleFileReplies.map((r) => r.content.file_upload_id))
     )
       .filter((f) => isPrintableContentType(f?.content_type))
-      .map((f) => ({
-        title: getFieldTitleByFileUploadId(f!.id, visibleFileReplies, fields),
-        file: pick(f!, ["path", "content_type"]),
-      }));
+      .map((f) => {
+        const field = getFieldByFileUploadId(f!.id, visibleFileReplies, fields);
+        return {
+          fieldId: field.id,
+          fieldTitle: field.title,
+          file: pick(f!, ["path", "content_type"]),
+        };
+      });
   }
 
   private async writeStream(stream: Readable | NodeJS.ReadableStream) {
