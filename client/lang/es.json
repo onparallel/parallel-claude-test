@@ -145,6 +145,26 @@
     "context": "Enter your API Key"
   },
   {
+    "term": "component.app-layout-navbar.contacts-link",
+    "definition": "Contactos",
+    "context": "Contacts"
+  },
+  {
+    "term": "component.app-layout-navbar.petitions-link",
+    "definition": "Peticiones",
+    "context": "Petitions"
+  },
+  {
+    "term": "component.app-layout-navbar.petitions-link.limit-reached-warning",
+    "definition": "Parece que has alcanzado el límite de {limit} peticiones, <a>contacta con nosotros para mejorar tu plan.</a>",
+    "context": "It seems that you have reached your limit of {limit} petitions, <a>reach out to us to upgrade your plan.</a>"
+  },
+  {
+    "term": "component.app-layout-navbar.reports-link",
+    "definition": "Informes",
+    "context": "Reports"
+  },
+  {
     "term": "component.app-layout.new-version-available",
     "definition": "Hay una nueva versión de Parallel disponible. Por favor, refresca tu navegador para actualizar.",
     "context": "There's a new release of Parallel available. Please refresh your browser for it to take effect."
@@ -2180,6 +2200,11 @@
     "context": "Signature completed: {signedAt}"
   },
   {
+    "term": "component.petition-signatures-card.add-signature-credits-message",
+    "definition": "Hola, me gustaría obtener más información sobre cómo conseguir más créditos de firma.",
+    "context": "Hi, I would like to get more information about how to get more signature credits."
+  },
+  {
     "term": "component.petition-signatures-card.add-signature.label",
     "definition": "Agregar firma",
     "context": "Add signature"
@@ -2513,6 +2538,11 @@
     "term": "component.public-signup-form-inbox.heading",
     "definition": "Revisa tu bandeja de entrada",
     "context": "Check your inbox"
+  },
+  {
+    "term": "component.public-signup-form-inbox.signup-email-issues-message",
+    "definition": "Hola, estoy teniendo problemas con el correo electrónico de verificación.",
+    "context": "Hi, I am having issues with the verification email."
   },
   {
     "term": "component.public-signup-form-name.description",
@@ -3290,6 +3320,11 @@
     "context": "Suggested:"
   },
   {
+    "term": "component.support-link.upgrade-plan",
+    "definition": "Hola, me gustaría obtener más información acerca de como actualizar mi plan.",
+    "context": "Hi, I would like to get more information about how to upgrade my plan."
+  },
+  {
     "term": "component.table.filter-header",
     "definition": "Filtro",
     "context": "Filter"
@@ -3430,6 +3465,11 @@
     "context": "Share template"
   },
   {
+    "term": "component.test-mode-signature-badge.activate-signature-message",
+    "definition": "Hola, me gustaría obtener más información sobre cómo activar la firma digital.",
+    "context": "Hi, I would like to get more information about how to activate eSignature."
+  },
+  {
     "term": "component.test-mode-signature-badge.popover-text",
     "definition": "Esta firma se ha configurado en modo de prueba. Podrás enviar firmas pero no tendrán ninguna validez legal.",
     "context": "This eSignature has been configured in test mode. You will be able to send signatures but they will not have any legal validity."
@@ -3533,6 +3573,11 @@
     "term": "component.user-group-select.search-hint-teams",
     "definition": "Busca equipos existentes",
     "context": "Search for existing teams"
+  },
+  {
+    "term": "component.user-limit-reached-alert.max-limit-reached",
+    "definition": "Has alcanzado la cantidad máxima de usuarios que puedes crear, <a>contacta con nosotros para mejorar tu plan.</a>",
+    "context": "You reached the maximum amount of users you can create, <a>reach out to us to upgrade your plan.</a>"
   },
   {
     "term": "component.user-menu.back-to-account",
@@ -3888,6 +3933,11 @@
     "term": "error.unknown-error.header",
     "definition": "Ocurrió un error y ya hemos notificado a nuestros desarrolladores.",
     "context": "An error happened and our developers have already been notified."
+  },
+  {
+    "term": "error.unknown-error.support-message",
+    "definition": "Hola, estoy teniendo problemas con la aplicación.",
+    "context": "Hi, I am having issues with the application."
   },
   {
     "term": "error.unknown-error.text",
@@ -4875,11 +4925,6 @@
     "context": "Coming soon"
   },
   {
-    "term": "navbar.contacts-link",
-    "definition": "Contactos",
-    "context": "Contacts"
-  },
-  {
     "term": "navbar.give-feedback",
     "definition": "Danos tu opinión",
     "context": "Give us your feedback"
@@ -4888,21 +4933,6 @@
     "term": "navbar.help-center",
     "definition": "Centro de ayuda",
     "context": "Help center"
-  },
-  {
-    "term": "navbar.petitions-link",
-    "definition": "Peticiones",
-    "context": "Petitions"
-  },
-  {
-    "term": "navbar.petitions-link.limit-reached.warning",
-    "definition": "Parece que has alcanzado el límite de {limit} peticiones, <a>contacta con nosotros para mejorar tu plan.</a>",
-    "context": "It seems that you have reached your limit of {limit} petitions, <a>reach out to us to upgrade your plan.</a>"
-  },
-  {
-    "term": "navbar.reports-link",
-    "definition": "Informes",
-    "context": "Reports"
   },
   {
     "term": "navbar.start-tour",
@@ -5048,11 +5078,6 @@
     "term": "organization-users.login-as",
     "definition": "Acceder como...",
     "context": "Login as..."
-  },
-  {
-    "term": "organization-users.max-limit-reached",
-    "definition": "Has alcanzado la cantidad máxima de usuarios que puedes crear, <a>contacta con nosotros para mejorar tu plan.</a>",
-    "context": "You reached the maximum amount of users you can create, <a>reach out to us to upgrade your plan.</a>"
   },
   {
     "term": "organization-users.update-user-status.error.deactivate-own-user",
@@ -5218,6 +5243,11 @@
     "term": "page.integrations.upgrade-plan-alert",
     "definition": "Amplia tu plan para acceder a las integraciones. Contacta con nuestro equipo de soporte para más información.",
     "context": "Upgrade your plan to access integrations. Contact our support team support team for more information."
+  },
+  {
+    "term": "page.integrations.upgrade-plan-message",
+    "definition": "Hola, me gustaría obtener más información acerca de como actualizar mi plan para acceder a las integraciones.",
+    "context": "Hi, I would like more information about upgrade my plan to access integrations."
   },
   {
     "term": "page.petition-replies.export-pdf",
@@ -5473,6 +5503,11 @@
     "term": "page.signature.upgrade-plan-alert-2",
     "definition": "<b>Amplia tu plan</b> para acceder a la integración de firma.",
     "context": "<b>Upgrade your plan</b> to access signature integration."
+  },
+  {
+    "term": "page.signature.upgrade-plan-support-message",
+    "definition": "Hola, me gustaría obtener más información acerca de como actualizar mi plan para acceder a la integración de firma.",
+    "context": "Hi, I would like more information about upgrade my plan to access signature integration."
   },
   {
     "term": "page.usage.petitions",
@@ -6913,6 +6948,11 @@
     "term": "public.contact-link",
     "definition": "Contacta",
     "context": "Contact"
+  },
+  {
+    "term": "public.contact-link.message",
+    "definition": "Hola, me gustaría obtener más información sobre Parallel.",
+    "context": "Hi, I would like to get more information about Parallel."
   },
   {
     "term": "public.cookies.title",

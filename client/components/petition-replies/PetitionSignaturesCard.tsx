@@ -12,8 +12,8 @@ import {
   PetitionSignaturesCard_UserFragment,
   SignatureConfigInput,
 } from "@parallel/graphql/__types";
-import { assertTypenameArray } from "@parallel/utils/apollo/typename";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { assertTypenameArray } from "@parallel/utils/apollo/typename";
 import { getPetitionSignatureEnvironment } from "@parallel/utils/getPetitionSignatureEnvironment";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
@@ -24,7 +24,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { Card, GenericCardHeader } from "../common/Card";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { NormalLink } from "../common/Link";
+import { SupportLink } from "../common/SupportLink";
 import {
   SignatureConfigDialog,
   useSignatureConfigDialog,
@@ -210,7 +210,15 @@ export const PetitionSignaturesCard = Object.assign(
                   },
                   {
                     a: (chunks: any) => (
-                      <NormalLink href="mailto:support@onparallel.com">{chunks}</NormalLink>
+                      <SupportLink
+                        message={intl.formatMessage({
+                          id: "component.petition-signatures-card.add-signature-credits-message",
+                          defaultMessage:
+                            "Hi, I would like to get more information about how to get more signature credits.",
+                        })}
+                      >
+                        {chunks}
+                      </SupportLink>
                     ),
                   }
                 ),

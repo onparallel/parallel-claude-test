@@ -1,5 +1,5 @@
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import { NormalLink } from "@parallel/components/common/Link";
+import { SupportLink } from "@parallel/components/common/SupportLink";
 import { useCallback } from "react";
 import { useIntl } from "react-intl";
 
@@ -21,9 +21,16 @@ export function usePetitionLimitReachedErrorDialog() {
           },
           {
             a: (chunks: any[]) => (
-              <NormalLink display="contents" href="mailto:support@onparallel.com">
+              <SupportLink
+                message={intl.formatMessage({
+                  id: "component.support-link.upgrade-plan",
+                  defaultMessage:
+                    "Hi, I would like to get more information about how to upgrade my plan.",
+                })}
+                display="contents"
+              >
                 {chunks}
-              </NormalLink>
+              </SupportLink>
             ),
           }
         ),

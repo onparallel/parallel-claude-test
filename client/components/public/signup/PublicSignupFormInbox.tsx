@@ -1,8 +1,9 @@
 import { Stack, Text } from "@chakra-ui/react";
-import { NormalLink } from "@parallel/components/common/Link";
-import { FormattedMessage } from "react-intl";
+import { SupportLink } from "@parallel/components/common/SupportLink";
+import { FormattedMessage, useIntl } from "react-intl";
 
 export function PublicSignupFormInbox({ email }: { email: string }) {
+  const intl = useIntl();
   return (
     <Stack spacing={6}>
       <Text as="h1" fontSize="2xl" fontWeight="bold" marginTop={0}>
@@ -27,7 +28,14 @@ export function PublicSignupFormInbox({ email }: { email: string }) {
           defaultMessage="Didn’t receive our email? Check your spam folder and if you don’t found it contact with our <Link>Support team</Link>."
           values={{
             Link: (chunks: any[]) => (
-              <NormalLink href={`mailto:support@onparallel.com`}>{chunks}</NormalLink>
+              <SupportLink
+                message={intl.formatMessage({
+                  id: "component.public-signup-form-inbox.signup-email-issues-message",
+                  defaultMessage: "Hi, I am having issues with the verification email.",
+                })}
+              >
+                {chunks}
+              </SupportLink>
             ),
           }}
         />

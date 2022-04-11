@@ -1,13 +1,14 @@
 import { gql } from "@apollo/client";
 import { Badge, Text } from "@chakra-ui/react";
 import { TestModeSignatureBadge_UserFragment } from "@parallel/graphql/__types";
-import { FormattedMessage } from "react-intl";
-import { NormalLink } from "../common/Link";
+import { FormattedMessage, useIntl } from "react-intl";
 import { SmallPopover } from "../common/SmallPopover";
+import { SupportLink } from "../common/SupportLink";
 
 export function TestModeSignatureBadge({
   hasPetitionSignature,
 }: TestModeSignatureBadge_UserFragment) {
+  const intl = useIntl();
   const popoverText = hasPetitionSignature ? (
     <FormattedMessage
       id="component.test-mode-signature-badge.popover-text"
@@ -18,7 +19,17 @@ export function TestModeSignatureBadge({
       id="component.test-mode-signature-badge.popover-text-demo"
       defaultMessage="Test mode allows you to send signatures but they will not have legal validity. To activate eSignature, <a>contact our support team.</a>"
       values={{
-        a: (chunks: any) => <NormalLink href="mailto:support@onparallel.com">{chunks}</NormalLink>,
+        a: (chunks: any) => (
+          <SupportLink
+            message={intl.formatMessage({
+              id: "component.test-mode-signature-badge.activate-signature-message",
+              defaultMessage:
+                "Hi, I would like to get more information about how to activate eSignature.",
+            })}
+          >
+            {chunks}
+          </SupportLink>
+        ),
       }}
     />
   );

@@ -1,12 +1,13 @@
 import { Alert, AlertIcon, AlertProps } from "@chakra-ui/react";
-import { FormattedMessage } from "react-intl";
-import { NormalLink } from "../common/Link";
+import { FormattedMessage, useIntl } from "react-intl";
+import { SupportLink } from "../common/SupportLink";
 
 interface PetitionLimitReachedAlertProps extends AlertProps {
   limit: number;
 }
 
 export function PetitionLimitReachedAlert({ limit, ...props }: PetitionLimitReachedAlertProps) {
+  const intl = useIntl();
   return (
     <Alert status="warning" {...props}>
       <AlertIcon color="yellow.500" />
@@ -15,10 +16,17 @@ export function PetitionLimitReachedAlert({ limit, ...props }: PetitionLimitReac
         defaultMessage="It seems that you have reached your limit of {limit} petitions, <a>reach out to us to upgrade your plan.</a>"
         values={{
           limit,
-          a: (chunks: any[]) => (
-            <NormalLink display="contents" href="mailto:support@onparallel.com">
+          a: (chunks: any) => (
+            <SupportLink
+              message={intl.formatMessage({
+                id: "component.support-link.upgrade-plan",
+                defaultMessage:
+                  "Hi, I would like to get more information about how to upgrade my plan.",
+              })}
+              display="contents"
+            >
               {chunks}
-            </NormalLink>
+            </SupportLink>
           ),
         }}
       />

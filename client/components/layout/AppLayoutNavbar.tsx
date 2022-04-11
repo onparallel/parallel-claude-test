@@ -13,9 +13,10 @@ import { useRouter } from "next/router";
 import { memo, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { NakedLink, NormalLink } from "../common/Link";
+import { NakedLink } from "../common/Link";
 import { Logo } from "../common/Logo";
 import { Spacer } from "../common/Spacer";
+import { SupportLink } from "../common/SupportLink";
 import { NotificationsButton } from "../notifications/NotificationsButton";
 import { AppLayoutNavbarLink } from "./AppLayoutNavbarLink";
 import { UserMenu } from "./UserMenu";
@@ -44,22 +45,29 @@ export const AppLayoutNavbar = Object.assign(
             isAvailable: true,
             isActive: pathname.startsWith("/app/petitions"),
             text: intl.formatMessage({
-              id: "navbar.petitions-link",
+              id: "component.app-layout-navbar.petitions-link",
               defaultMessage: "Petitions",
             }),
             warning: petitionLimitReached
               ? intl.formatMessage(
                   {
-                    id: "navbar.petitions-link.limit-reached.warning",
+                    id: "component.app-layout-navbar.petitions-link.limit-reached-warning",
                     defaultMessage:
                       "It seems that you have reached your limit of {limit} petitions, <a>reach out to us to upgrade your plan.</a>",
                   },
                   {
                     limit: me.organization.usageLimits.petitions.limit,
                     a: (chunks: any[]) => (
-                      <NormalLink display="contents" href="mailto:support@onparallel.com">
+                      <SupportLink
+                        message={intl.formatMessage({
+                          id: "component.support-link.upgrade-plan",
+                          defaultMessage:
+                            "Hi, I would like to get more information about how to upgrade my plan.",
+                        })}
+                        display="contents"
+                      >
                         {chunks}
-                      </NormalLink>
+                      </SupportLink>
                     ),
                   }
                 )
@@ -72,7 +80,7 @@ export const AppLayoutNavbar = Object.assign(
             isActive: pathname.startsWith("/app/contacts"),
             isAvailable: true,
             text: intl.formatMessage({
-              id: "navbar.contacts-link",
+              id: "component.app-layout-navbar.contacts-link",
               defaultMessage: "Contacts",
             }),
           },
@@ -81,7 +89,7 @@ export const AppLayoutNavbar = Object.assign(
             icon: <ReportsIcon />,
             isAvailable: false,
             text: intl.formatMessage({
-              id: "navbar.reports-link",
+              id: "component.app-layout-navbar.reports-link",
               defaultMessage: "Reports",
             }),
           },

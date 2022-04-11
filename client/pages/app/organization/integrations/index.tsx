@@ -21,6 +21,7 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { FormattedMessage, useIntl } from "react-intl";
+import { SupportLink } from "@parallel/components/common/SupportLink";
 
 function OrganizationIntegrations() {
   const intl = useIntl();
@@ -131,11 +132,15 @@ function OrganizationIntegrations() {
             </Text>
             <Center>
               <Button
-                as="a"
+                as={SupportLink}
                 variant="outline"
                 backgroundColor="white"
                 colorScheme="blue"
-                href="mailto:support@onparallel.com"
+                message={intl.formatMessage({
+                  id: "page.integrations.upgrade-plan-message",
+                  defaultMessage:
+                    "Hi, I would like more information about upgrade my plan to access integrations.",
+                })}
               >
                 <FormattedMessage id="generic.contact" defaultMessage="Contact" />
               </Button>

@@ -43,6 +43,7 @@ import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { SupportLink } from "@parallel/components/common/SupportLink";
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
@@ -238,11 +239,15 @@ function IntegrationsSignature() {
               </Box>
               <Center>
                 <Button
-                  as="a"
+                  as={SupportLink}
                   variant="outline"
                   backgroundColor="white"
                   colorScheme="blue"
-                  href="mailto:support@onparallel.com"
+                  message={intl.formatMessage({
+                    id: "page.signature.upgrade-plan-support-message",
+                    defaultMessage:
+                      "Hi, I would like more information about upgrade my plan to access signature integration.",
+                  })}
                 >
                   <FormattedMessage id="generic.contact" defaultMessage="Contact" />
                 </Button>

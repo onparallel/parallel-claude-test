@@ -1,10 +1,10 @@
 import { Text } from "@chakra-ui/react";
+import { SupportLink } from "@parallel/components/common/SupportLink";
 import { ErrorPage } from "@parallel/components/public/ErrorPage";
-import { NextPageContext } from "next";
-import { FormattedMessage } from "react-intl";
-import * as Sentry from "@sentry/node";
 import { UnwrapPromise } from "@parallel/utils/types";
-import { NormalLink } from "@parallel/components/common/Link";
+import * as Sentry from "@sentry/node";
+import { NextPageContext } from "next";
+import { FormattedMessage, useIntl } from "react-intl";
 
 const SENTRY_WHITELISTED_ERRORS = [
   "PUBLIC_PETITION_NOT_AVAILABLE",
@@ -17,6 +17,7 @@ export default function CustomError({
   errorCode,
   hasGetInitialPropsRun,
 }: UnwrapPromise<ReturnType<typeof CustomError.getInitialProps>>) {
+  const intl = useIntl();
   if (!hasGetInitialPropsRun && err && !SENTRY_WHITELISTED_ERRORS.includes(errorCode)) {
     Sentry.captureException(err);
   }
@@ -67,7 +68,14 @@ export default function CustomError({
           defaultMessage="Please try again later and if the error persists <a>reach out to support</a> for help."
           values={{
             a: (chunks: any) => (
-              <NormalLink href={`mailto:support@onparallel.com`}>{chunks}</NormalLink>
+              <SupportLink
+                message={intl.formatMessage({
+                  id: "error.unknown-error.support-message",
+                  defaultMessage: "Hi, I am having issues with the application.",
+                })}
+              >
+                {chunks}
+              </SupportLink>
             ),
           }}
         />
