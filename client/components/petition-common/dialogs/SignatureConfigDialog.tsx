@@ -20,8 +20,8 @@ import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
 import { ContactSelect, ContactSelectSelection } from "@parallel/components/common/ContactSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
-import { ExternalLink } from "@parallel/components/common/Link";
 import { Steps } from "@parallel/components/common/Steps";
 import {
   SignatureConfigDialog_PetitionBaseFragment,
@@ -341,12 +341,12 @@ function SignatureConfigDialogBodyStep1({
           />
         </Text>
         <Text>
-          <ExternalLink href={`https://help.onparallel.com/${intl.locale}/articles/6022979`}>
+          <HelpCenterLink articleId={6022979}>
             <FormattedMessage
               id="component.signature-config-dialog.header.help-link"
               defaultMessage="More about eSignature"
             />
-          </ExternalLink>
+          </HelpCenterLink>
         </Text>
       </Stack>
       <FormControl hidden={providers.length < 2}>

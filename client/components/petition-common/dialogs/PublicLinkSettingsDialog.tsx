@@ -18,8 +18,8 @@ import {
 import { CheckIcon, CloseIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
-import { ExternalLink } from "@parallel/components/common/Link";
 import {
   PublicLinkSettingsDialog_getSlugDocument,
   PublicLinkSettingsDialog_isValidSlugDocument,
@@ -162,15 +162,12 @@ export function PublicLinkSettingsDialog({
                 defaultMessage="Generates a link that allows third parties to start a petition. These petitions will be assigned by default to the template owner."
               />
             </Text>
-            <ExternalLink
-              fontWeight="bold"
-              href={`https://help.onparallel.com/${intl.locale}/articles/6050184`}
-            >
+            <HelpCenterLink articleId={6050184}>
               <FormattedMessage
                 id="component.settings-public-link-dialog.know-more"
                 defaultMessage="Learn more about sharing via link"
               />
-            </ExternalLink>
+            </HelpCenterLink>
           </Stack>
           <FormControl id="title" isInvalid={!!errors.title}>
             <FormLabel>

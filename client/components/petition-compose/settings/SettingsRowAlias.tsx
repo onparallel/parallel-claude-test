@@ -1,7 +1,7 @@
 import { FormErrorMessage, Input, Stack, Text } from "@chakra-ui/react";
-import { ExternalLink } from "@parallel/components/common/Link";
+import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { ChangeEvent } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage } from "react-intl";
 import { SettingsRow } from "./SettingsRow";
 
 type SettingsRowAliasProps = {
@@ -17,7 +17,6 @@ export function SettingsRowAlias({
   isReadOnly,
   isInvalid,
 }: SettingsRowAliasProps) {
-  const intl = useIntl();
   return (
     <SettingsRow
       isDisabled={isReadOnly}
@@ -28,12 +27,9 @@ export function SettingsRowAlias({
             id="field-settings.alias-description"
             defaultMessage="Allows to easily identify the field in API replies. In addition, it can be inserted into the field description to automatically replace the content."
           />
-          <ExternalLink
-            marginLeft={1}
-            href={`https://help.onparallel.com/${intl.locale}/articles/5998723`}
-          >
+          <HelpCenterLink marginLeft={1} articleId={5998723}>
             <FormattedMessage id="generic.learn-more" defaultMessage="Learn more" />
-          </ExternalLink>
+          </HelpCenterLink>
         </Text>
       }
       controlId="alias-field"
