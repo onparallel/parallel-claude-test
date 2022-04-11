@@ -326,6 +326,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                   currentPage={currentPage}
                   petition={petition}
                   maxHeight="calc(100vh - 10.5rem)"
+                  usePreviewReplies={!isPetition}
                 />
               </Stack>
             </Box>

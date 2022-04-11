@@ -39,15 +39,17 @@ type PetitionFieldSelection =
 interface RecipientViewContentsCardProps extends CardProps {
   currentPage: number;
   petition: PetitionSelection;
+  usePreviewReplies?: boolean;
 }
 
 export function RecipientViewContentsCard({
   currentPage,
   petition,
+  usePreviewReplies,
   ...props
 }: RecipientViewContentsCardProps) {
   const { query } = useRouter();
-  const { pages, fields } = useGetPagesAndFields(petition.fields, currentPage);
+  const { pages, fields } = useGetPagesAndFields(petition.fields, currentPage, usePreviewReplies);
 
   const handleFocusField = (field: PetitionFieldSelection) => {
     if (field.type === "SHORT_TEXT" || field.type === "TEXT") {
@@ -264,7 +266,8 @@ function RecipientViewContentsIndicators({
 
 function useGetPagesAndFields<T extends UnionToArrayUnion<PetitionFieldSelection>>(
   fields: T,
-  page: number
+  page: number,
+  usePreviewReplies?: boolean
 ) {
   const pages: {
     title: Maybe<string>;
@@ -274,7 +277,7 @@ function useGetPagesAndFields<T extends UnionToArrayUnion<PetitionFieldSelection
     currentFieldCommentCount: number;
     currentFieldHasUnreadComments: boolean;
   }[] = [];
-  const visibility = useFieldVisibility(fields);
+  const visibility = useFieldVisibility(fields, usePreviewReplies);
   const _fields: T = [] as any;
   for (const [field, isVisible] of zip<PetitionFieldSelection, boolean>(fields, visibility)) {
     const isHiddenToPublic = field.__typename === "PublicPetitionField" && field.isInternal;
