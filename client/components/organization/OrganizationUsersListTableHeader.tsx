@@ -1,7 +1,7 @@
 import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Portal, Stack } from "@chakra-ui/react";
 import {
   ChevronDownIcon,
-  LogOutIcon,
+  LogInIcon,
   RepeatIcon,
   UserCheckIcon,
   UserPlusIcon,
@@ -130,7 +130,7 @@ export function OrganizationUsersListTableHeader({
                 </MenuItem>
                 {hasGhostLogin ? (
                   <MenuItem
-                    icon={<LogOutIcon display="block" boxSize={4} />}
+                    icon={<LogInIcon display="block" boxSize={4} />}
                     isDisabled={selectedUsers.length !== 1}
                     onClick={onLoginAs}
                   >

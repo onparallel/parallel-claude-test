@@ -1,5 +1,5 @@
 import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Portal, Stack } from "@chakra-ui/react";
-import { ChevronDownIcon, LogOutIcon, RepeatIcon } from "@parallel/chakra/icons";
+import { ChevronDownIcon, LogInIcon, RepeatIcon } from "@parallel/chakra/icons";
 import { OrganizationMembers_OrganizationUserFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -53,7 +53,7 @@ export function OrganizationMembersListTableHeader({
             <Portal>
               <MenuList minWidth="160px">
                 <MenuItem
-                  icon={<LogOutIcon display="block" boxSize={4} />}
+                  icon={<LogInIcon display="block" boxSize={4} />}
                   isDisabled={selectedUsers.length !== 1}
                   onClick={onLoginAs}
                 >
