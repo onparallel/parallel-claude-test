@@ -112,7 +112,7 @@ export function PetitionFieldVisibilityEditor({
     setConditions((conditions) => {
       const last = conditions[conditions.length - 1];
 
-      if (last.operator === "NUMBER_OF_SUBREPLIES" || last.modifier !== "NUMBER_OF_REPLIES") {
+      if (last.operator === "NUMBER_OF_SUBREPLIES" || last.modifier === "NUMBER_OF_REPLIES") {
         return [...conditions, { ...last }];
       }
 
