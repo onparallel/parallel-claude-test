@@ -53,7 +53,6 @@ async function startSignatureProcess(
       petitionId: petition.id,
       documentTitle: title,
       showSignatureBoxes: true,
-      includeAnnexedDocuments: true,
       maxOutputSize: 13 * 1024 * 1024, // signaturit has a 15MB limit for emails
       outputFileName: title,
     });

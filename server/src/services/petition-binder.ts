@@ -1,42 +1,29 @@
-import { ChildProcessWithoutNullStreams, spawn } from "child_process";
-import { createWriteStream } from "fs";
-import { mkdir, rm, stat } from "fs/promises";
+import { spawn } from "child_process";
+import { mkdir, rm, stat, writeFile } from "fs/promises";
 import { inject, injectable } from "inversify";
 import { tmpdir } from "os";
 import pMap from "p-map";
 import { resolve } from "path";
-import { groupBy, pick, zip } from "remeda";
-import { Readable } from "stream";
+import { isDefined, zip } from "remeda";
 import { FileRepository } from "../db/repositories/FileRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
-import { PetitionField, PetitionFieldReply } from "../db/__types";
 import { evaluateFieldVisibility } from "../util/fieldVisibility";
+import { pFlatMap } from "../util/promises/pFlatMap";
 import { random } from "../util/token";
+import { MaybePromise } from "../util/types";
 import { AWS_SERVICE, IAws } from "./aws";
 import { Printer, PRINTER } from "./printer";
 
-function getFieldByFileUploadId(
-  fileUploadId: number,
-  replies: PetitionFieldReply[],
-  fields: PetitionField[]
-) {
-  const reply = replies.find((r) => r.content.file_upload_id === fileUploadId);
-  return fields.find((f) => f.id === reply!.petition_field_id)!;
-}
-
-function isPrintableContentType(contentType?: string) {
-  return (
-    contentType !== undefined &&
-    [
-      "application/pdf",
-      "image/png",
-      "image/jpeg",
-      "image/gif",
-      "image/heic",
-      "image/tiff",
-      "image/webp",
-    ].includes(contentType)
-  );
+function isPrintableContentType(contentType: string) {
+  return [
+    "application/pdf",
+    "image/png",
+    "image/jpeg",
+    "image/gif",
+    "image/heic",
+    "image/tiff",
+    "image/webp",
+  ].includes(contentType);
 }
 
 type PetitionBinderOptions = {
@@ -71,7 +58,6 @@ export class PetitionBinder implements IPetitionBinder {
       documentTitle,
       showSignatureBoxes,
       maxOutputSize,
-      includeAnnexedDocuments,
       outputFileName,
     }: PetitionBinderOptions
   ) {
@@ -79,66 +65,58 @@ export class PetitionBinder implements IPetitionBinder {
       // first of all, create temporary directory to store all tmp files and delete it when finished
       this.temporaryDirectory = await this.buildTmpDir();
 
-      const [petition, fields] = await Promise.all([
+      const [petition, fieldsWithFiles] = await Promise.all([
         this.petitions.loadPetition(petitionId),
-        this.petitions.loadFieldsForPetition(petitionId),
+        this.getPrintableFiles(petitionId),
       ]);
 
-      const mainDocPath = await this.writeStream(
-        await this.printer.petitionExport(userId, {
+      const mainDocPath = await this.writeTemporaryFile(
+        this.printer.petitionExport(userId, {
           petitionId,
           documentTitle,
           showSignatureBoxes,
         })
       );
 
-      const printableFiles = includeAnnexedDocuments ? await this.getPrintableFiles(fields) : [];
+      const annexedDocumentPaths = await pFlatMap(
+        fieldsWithFiles,
+        async ([field, files], fieldIndex) => {
+          const coverPagePath = await this.writeTemporaryFile(
+            this.printer.annexCoverPage(
+              userId,
+              { fieldNumber: fieldIndex + 1, fieldTitle: field.title },
+              petition?.locale ?? "en"
+            )
+          );
 
-      const filesGroupedByFieldId = groupBy(printableFiles, (f) => f.fieldId);
-      const annexedDocumentPaths = (
-        await pMap(
-          Object.keys(filesGroupedByFieldId),
-          async (fieldId, fieldIndex) => {
-            const files = filesGroupedByFieldId[fieldId];
+          const filePaths = await pMap(
+            files,
+            async (file) => {
+              if (file.content_type.startsWith("image/")) {
+                // jpeg can be used directly, other types need processing
+                const imageUrl =
+                  file.content_type === "image/jpeg"
+                    ? await this.aws.fileUploads.getSignedDownloadEndpoint(
+                        file.path,
+                        file.filename,
+                        "inline"
+                      )
+                    : await this.convertImage(file.path, file.content_type);
 
-            const coverPagePath = await this.writeStream(
-              await this.printer.annexCoverPage(
-                userId,
-                { fieldNumber: fieldIndex + 1, fieldTitle: files[0].fieldTitle },
-                petition?.locale ?? "en"
-              )
-            );
+                return await this.writeTemporaryFile(this.printer.imageToPdf(userId, { imageUrl }));
+              } else if (file.content_type === "application/pdf") {
+                return await this.writeTemporaryFile(this.aws.fileUploads.downloadFile(file.path));
+              } else {
+                throw new Error(`Cannot annex ${file.content_type} to pdf binder`);
+              }
+            },
+            { concurrency: 1 }
+          );
 
-            const filePaths = await pMap(
-              files,
-              async ({ file, fieldTitle }, fileIndex) => {
-                if (file.content_type.startsWith("image/")) {
-                  const imageUrl =
-                    file.content_type !== "image/jpeg"
-                      ? await this.convertImage(file.path, file.content_type)
-                      : await this.aws.fileUploads.getSignedDownloadEndpoint(
-                          file.path,
-                          fieldTitle ?? `file_${fileIndex}`,
-                          "inline"
-                        );
-
-                  return await this.writeStream(
-                    await this.printer.imageToPdf(userId, { imageUrl })
-                  );
-                } else if (file.content_type === "application/pdf") {
-                  return await this.writeStream(await this.aws.fileUploads.downloadFile(file.path));
-                } else {
-                  throw new Error(`Cannot annex ${file.content_type} to pdf binder`);
-                }
-              },
-              { concurrency: 2 }
-            );
-
-            return [coverPagePath, ...filePaths];
-          },
-          { concurrency: 1 }
-        )
-      ).flat();
+          return [coverPagePath, ...filePaths];
+        },
+        { concurrency: 2 }
+      );
 
       return await this.merge([mainDocPath, ...annexedDocumentPaths], {
         maxOutputSize,
@@ -178,118 +156,106 @@ export class PetitionBinder implements IPetitionBinder {
   }
 
   private async mergeFiles(paths: string[], output: string, dpi: number) {
-    await this.processFinished(
-      spawn("gs", [
-        "-sDEVICE=pdfwrite",
-        "-dBATCH",
-        "-dPDFSETTINGS=/screen",
-        "-dNOPAUSE",
-        "-dQUIET",
-        "-dCompatibilityLevel=1.5",
-        "-dSubsetFonts=true",
-        "-dCompressFonts=true",
-        "-dEmbedAllFonts=true",
-        "-sProcessColorModel=DeviceRGB",
-        "-sColorConversionStrategy=RGB",
-        "-sColorConversionStrategyForImages=RGB",
-        "-dConvertCMYKImagesToRGB=true",
-        "-dDetectDuplicateImages=true",
-        "-dColorImageDownsampleType=/Bicubic",
-        "-dGrayImageDownsampleType=/Bicubic",
-        "-dMonoImageDownsampleType=/Bicubic",
-        "-dDownsampleColorImages=true",
-        "-dDoThumbnails=false",
-        "-dCreateJobTicket=false",
-        "-dPreserveEPSInfo=false",
-        "-dPreserveOPIComments=false",
-        "-dPreserveOverprintSettings=false",
-        "-dUCRandBGInfo=/Remove",
-        `-dColorImageResolution=${dpi}`,
-        `-dGrayImageResolution=${dpi}`,
-        `-dMonoImageResolution=${dpi}`,
-        `-sOutputFile=${output}`,
-        ...paths,
-      ])
-    );
+    await this.execute("gs", [
+      "-sDEVICE=pdfwrite",
+      "-dBATCH",
+      "-dPDFSETTINGS=/screen",
+      "-dNOPAUSE",
+      "-dQUIET",
+      "-dCompatibilityLevel=1.5",
+      "-dSubsetFonts=true",
+      "-dCompressFonts=true",
+      "-dEmbedAllFonts=true",
+      "-sProcessColorModel=DeviceRGB",
+      "-sColorConversionStrategy=RGB",
+      "-sColorConversionStrategyForImages=RGB",
+      "-dConvertCMYKImagesToRGB=true",
+      "-dDetectDuplicateImages=true",
+      "-dColorImageDownsampleType=/Bicubic",
+      "-dGrayImageDownsampleType=/Bicubic",
+      "-dMonoImageDownsampleType=/Bicubic",
+      "-dDownsampleColorImages=true",
+      "-dDoThumbnails=false",
+      "-dCreateJobTicket=false",
+      "-dPreserveEPSInfo=false",
+      "-dPreserveOPIComments=false",
+      "-dPreserveOverprintSettings=false",
+      "-dUCRandBGInfo=/Remove",
+      `-dColorImageResolution=${dpi}`,
+      `-dGrayImageResolution=${dpi}`,
+      `-dMonoImageResolution=${dpi}`,
+      `-sOutputFile=${output}`,
+      ...paths,
+    ]);
     return output;
   }
 
   private async convertImage(fileS3Path: string, contentType: string) {
-    const tmpPath = await this.writeStream(await this.aws.fileUploads.downloadFile(fileS3Path));
+    const tmpPath = await this.writeTemporaryFile(this.aws.fileUploads.downloadFile(fileS3Path));
 
     const outputFormat = ["image/png", "image/gif"].includes(contentType) ? "png" : "jpeg";
     const output = resolve(this.temporaryDirectory, `${random(10)}.${outputFormat}`);
-    await this.processFinished(
-      spawn("convert", [
-        // for GIF images, we only need the first frame
-        contentType === "image/gif" ? `${tmpPath}[0]` : tmpPath,
-        "-background",
-        "white",
-        "-flatten",
-        output,
-      ])
-    );
-
+    await this.execute("convert", [
+      // for GIF images, we only need the first frame
+      contentType === "image/gif" ? `${tmpPath}[0]` : tmpPath,
+      "-background",
+      "white",
+      "-flatten",
+      output,
+    ]);
     return output;
   }
 
-  private async getPrintableFiles(fields: PetitionField[]) {
-    const fieldIds = fields.map((f) => f.id);
-    const fieldReplies = await this.petitions.loadRepliesForField(fieldIds);
-    const repliesByFieldId = Object.fromEntries(
-      fieldIds.map((id, index) => [id, fieldReplies[index]])
-    );
-    const fieldsWithReplies = fields.map((f) => ({ ...f, replies: repliesByFieldId[f.id] }));
+  private async getPrintableFiles(petitionId: number) {
+    const fields = await this.petitions.loadFieldsForPetition(petitionId);
+    const replies = await this.petitions.loadRepliesForField(fields.map((f) => f.id));
+    const fieldsWithReplies = zip(fields, replies).map(([field, replies]) => ({
+      ...field,
+      replies,
+    }));
 
-    const visibleFieldIds = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies))
+    const visibleFieldWithReplies = zip(
+      fieldsWithReplies,
+      evaluateFieldVisibility(fieldsWithReplies)
+    )
       .filter(
         ([field, isVisible]) =>
           isVisible && field.type === "FILE_UPLOAD" && !!field.options.attachToPdf
       )
-      .map(([field]) => field.id);
+      .map(([field]) => field);
 
-    const visibleFileReplies = fieldReplies
-      .flat()
-      .filter((r) => visibleFieldIds.includes(r.petition_field_id));
-
-    return (
-      await this.files.loadFileUpload(visibleFileReplies.map((r) => r.content.file_upload_id))
-    )
-      .filter((f) => isPrintableContentType(f?.content_type))
-      .map((f) => {
-        const field = getFieldByFileUploadId(f!.id, visibleFileReplies, fields);
-        return {
-          fieldId: field.id,
-          fieldTitle: field.title,
-          file: pick(f!, ["path", "content_type"]),
-        };
-      });
-  }
-
-  private async writeStream(stream: Readable | NodeJS.ReadableStream) {
-    return await new Promise<string>((res, rej) => {
-      const tmpPath = resolve(this.temporaryDirectory, random(10));
-      const writeStream = createWriteStream(tmpPath);
-      writeStream.on("close", () => res(tmpPath));
-      writeStream.on("error", rej);
-      stream.pipe(writeStream);
+    return pFlatMap(visibleFieldWithReplies, async ({ replies, ...field }) => {
+      const files = await this.files.loadFileUpload(replies.map((r) => r.content.file_upload_id));
+      const printable = files
+        .filter(isDefined)
+        .filter((f) => isPrintableContentType(f.content_type));
+      return printable.length > 0 ? [[field, printable] as const] : [];
     });
   }
 
-  private async processFinished(asyncProcess: ChildProcessWithoutNullStreams) {
+  private async writeTemporaryFile(stream: MaybePromise<NodeJS.ReadableStream>) {
+    const path = resolve(this.temporaryDirectory, random(10));
+    await writeFile(path, await stream);
+    return path;
+  }
+
+  private async execute(command: string, args?: ReadonlyArray<string>) {
     return await new Promise<void>((resolve, reject) => {
-      asyncProcess.on("error", reject);
-      asyncProcess.on("close", (code) => {
-        if (code === 0) {
-          resolve();
-        } else {
-          reject();
-        }
-      });
+      spawn(command, args)
+        .on("error", reject)
+        .on("close", (code) => {
+          if (code === 0) {
+            resolve();
+          } else {
+            reject();
+          }
+        });
     });
   }
 
   private async buildTmpDir() {
-    return (await mkdir(resolve(tmpdir(), random(10)), { recursive: true }))!;
+    const path = resolve(tmpdir(), random(10));
+    await mkdir(path, { recursive: true });
+    return path;
   }
 }

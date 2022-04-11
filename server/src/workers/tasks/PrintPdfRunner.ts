@@ -52,7 +52,6 @@ export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
       petitionId,
       documentTitle: documentTitle ?? "",
       showSignatureBoxes: false,
-      includeAnnexedDocuments: true,
     });
 
     await this.onProgress(75);
