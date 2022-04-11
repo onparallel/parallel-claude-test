@@ -1,6 +1,6 @@
-import { spawnSync } from "child_process";
+import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import { createWriteStream } from "fs";
-import { stat, writeFile } from "fs/promises";
+import { mkdir, rm, stat } from "fs/promises";
 import { inject, injectable } from "inversify";
 import { tmpdir } from "os";
 import pMap from "p-map";
@@ -63,6 +63,7 @@ export class PetitionBinder implements IPetitionBinder {
     @inject(PRINTER) private printer: Printer
   ) {}
 
+  private temporaryDirectory = "";
   async createBinder(
     userId: number,
     {
@@ -74,58 +75,80 @@ export class PetitionBinder implements IPetitionBinder {
       outputFileName,
     }: PetitionBinderOptions
   ) {
-    const [petition, fields] = await Promise.all([
-      this.petitions.loadPetition(petitionId),
-      this.petitions.loadFieldsForPetition(petitionId),
-    ]);
+    try {
+      // first of all, create temporary directory to store all tmp files and delete it when finished
+      this.temporaryDirectory = await this.buildTmpDir();
 
-    const mainDocStream = await this.printer.petitionExport(userId, {
-      petitionId,
-      documentTitle,
-      showSignatureBoxes,
-    });
+      const [petition, fields] = await Promise.all([
+        this.petitions.loadPetition(petitionId),
+        this.petitions.loadFieldsForPetition(petitionId),
+      ]);
 
-    const printableFiles = includeAnnexedDocuments ? await this.getPrintableFiles(fields) : [];
+      const mainDocPath = await this.writeStream(
+        await this.printer.petitionExport(userId, {
+          petitionId,
+          documentTitle,
+          showSignatureBoxes,
+        })
+      );
 
-    const filesGroupedByFieldId = groupBy(printableFiles, (f) => f.fieldId);
-    const annexedDocumentStreams = (
-      await pMap(Object.keys(filesGroupedByFieldId), async (fieldId, fieldIndex) => {
-        const files = filesGroupedByFieldId[fieldId];
+      const printableFiles = includeAnnexedDocuments ? await this.getPrintableFiles(fields) : [];
 
-        const coverPage = await this.printer.annexCoverPage(
-          userId,
-          { fieldNumber: fieldIndex + 1, fieldTitle: files[0].fieldTitle },
-          petition?.locale ?? "en"
-        );
+      const filesGroupedByFieldId = groupBy(printableFiles, (f) => f.fieldId);
+      const annexedDocumentPaths = (
+        await pMap(
+          Object.keys(filesGroupedByFieldId),
+          async (fieldId, fieldIndex) => {
+            const files = filesGroupedByFieldId[fieldId];
 
-        const fileStreams = await pMap(files, async ({ file, fieldTitle }, fileIndex) => {
-          if (file.content_type.startsWith("image/")) {
-            const filePath =
-              file.content_type !== "image/jpeg"
-                ? await this.convertImage(file.path, file.content_type)
-                : await this.aws.fileUploads.getSignedDownloadEndpoint(
-                    file.path,
-                    fieldTitle ?? `file_${fileIndex}`,
-                    "inline"
+            const coverPagePath = await this.writeStream(
+              await this.printer.annexCoverPage(
+                userId,
+                { fieldNumber: fieldIndex + 1, fieldTitle: files[0].fieldTitle },
+                petition?.locale ?? "en"
+              )
+            );
+
+            const filePaths = await pMap(
+              files,
+              async ({ file, fieldTitle }, fileIndex) => {
+                if (file.content_type.startsWith("image/")) {
+                  const imageUrl =
+                    file.content_type !== "image/jpeg"
+                      ? await this.convertImage(file.path, file.content_type)
+                      : await this.aws.fileUploads.getSignedDownloadEndpoint(
+                          file.path,
+                          fieldTitle ?? `file_${fileIndex}`,
+                          "inline"
+                        );
+
+                  return await this.writeStream(
+                    await this.printer.imageToPdf(userId, { imageUrl })
                   );
+                } else if (file.content_type === "application/pdf") {
+                  return await this.writeStream(await this.aws.fileUploads.downloadFile(file.path));
+                } else {
+                  throw new Error(`Cannot annex ${file.content_type} to pdf binder`);
+                }
+              },
+              { concurrency: 2 }
+            );
 
-            return await this.printer.imageToPdf(userId, {
-              imageUrl: filePath,
-            });
-          } else if (file.content_type === "application/pdf") {
-            return await this.aws.fileUploads.downloadFile(file.path);
-          } else {
-            throw new Error(`Cannot annex ${file.content_type} to pdf binder`);
-          }
-        });
+            return [coverPagePath, ...filePaths];
+          },
+          { concurrency: 1 }
+        )
+      ).flat();
 
-        return [coverPage, ...fileStreams];
-      })
-    ).flat();
-
-    const tmpDocPaths = await pMap([mainDocStream, ...annexedDocumentStreams], this.writeStream);
-
-    return await this.merge(tmpDocPaths, { maxOutputSize, outputFileName });
+      return await this.merge([mainDocPath, ...annexedDocumentPaths], {
+        maxOutputSize,
+        outputFileName,
+      });
+    } finally {
+      try {
+        await rm(this.temporaryDirectory, { recursive: true });
+      } catch {}
+    }
   }
 
   private async merge(paths: string[], opts?: { maxOutputSize?: number; outputFileName?: string }) {
@@ -135,8 +158,9 @@ export class PetitionBinder implements IPetitionBinder {
     let mergedFileSize = 0;
     do {
       iteration++;
-      mergedFilePath = this.mergeFiles(
+      mergedFilePath = await this.mergeFiles(
         paths,
+        // don't use temporaryDirectory here, as we dont want to delete the final result after the binder completed
         resolve(tmpdir(), opts?.outputFileName ?? `${random(10)}.pdf`),
         DPIValues[iteration]
       );
@@ -153,66 +177,60 @@ export class PetitionBinder implements IPetitionBinder {
     return mergedFilePath;
   }
 
-  private mergeFiles(paths: string[], output: string, dpi: number) {
-    const { stderr, status } = spawnSync("gs", [
-      "-sDEVICE=pdfwrite",
-      "-dBATCH",
-      "-dPDFSETTINGS=/screen",
-      "-dNOPAUSE",
-      "-dQUIET",
-      "-dCompatibilityLevel=1.5",
-      "-dSubsetFonts=true",
-      "-dCompressFonts=true",
-      "-dEmbedAllFonts=true",
-      "-sProcessColorModel=DeviceRGB",
-      "-sColorConversionStrategy=RGB",
-      "-sColorConversionStrategyForImages=RGB",
-      "-dConvertCMYKImagesToRGB=true",
-      "-dDetectDuplicateImages=true",
-      "-dColorImageDownsampleType=/Bicubic",
-      "-dGrayImageDownsampleType=/Bicubic",
-      "-dMonoImageDownsampleType=/Bicubic",
-      "-dDownsampleColorImages=true",
-      "-dDoThumbnails=false",
-      "-dCreateJobTicket=false",
-      "-dPreserveEPSInfo=false",
-      "-dPreserveOPIComments=false",
-      "-dPreserveOverprintSettings=false",
-      "-dUCRandBGInfo=/Remove",
-      `-dColorImageResolution=${dpi}`,
-      `-dGrayImageResolution=${dpi}`,
-      `-dMonoImageResolution=${dpi}`,
-      `-sOutputFile=${output}`,
-      ...paths,
-    ]);
-    if (status === 0) {
-      return output;
-    } else {
-      throw new Error((stderr || "").toString());
-    }
+  private async mergeFiles(paths: string[], output: string, dpi: number) {
+    await this.processFinished(
+      spawn("gs", [
+        "-sDEVICE=pdfwrite",
+        "-dBATCH",
+        "-dPDFSETTINGS=/screen",
+        "-dNOPAUSE",
+        "-dQUIET",
+        "-dCompatibilityLevel=1.5",
+        "-dSubsetFonts=true",
+        "-dCompressFonts=true",
+        "-dEmbedAllFonts=true",
+        "-sProcessColorModel=DeviceRGB",
+        "-sColorConversionStrategy=RGB",
+        "-sColorConversionStrategyForImages=RGB",
+        "-dConvertCMYKImagesToRGB=true",
+        "-dDetectDuplicateImages=true",
+        "-dColorImageDownsampleType=/Bicubic",
+        "-dGrayImageDownsampleType=/Bicubic",
+        "-dMonoImageDownsampleType=/Bicubic",
+        "-dDownsampleColorImages=true",
+        "-dDoThumbnails=false",
+        "-dCreateJobTicket=false",
+        "-dPreserveEPSInfo=false",
+        "-dPreserveOPIComments=false",
+        "-dPreserveOverprintSettings=false",
+        "-dUCRandBGInfo=/Remove",
+        `-dColorImageResolution=${dpi}`,
+        `-dGrayImageResolution=${dpi}`,
+        `-dMonoImageResolution=${dpi}`,
+        `-sOutputFile=${output}`,
+        ...paths,
+      ])
+    );
+    return output;
   }
 
   private async convertImage(fileS3Path: string, contentType: string) {
-    const fileStream = await this.aws.fileUploads.downloadFile(fileS3Path);
-    const tmpPath = resolve(tmpdir(), random(10));
-    await writeFile(tmpPath, fileStream);
+    const tmpPath = await this.writeStream(await this.aws.fileUploads.downloadFile(fileS3Path));
 
     const outputFormat = ["image/png", "image/gif"].includes(contentType) ? "png" : "jpeg";
-    const output = resolve(tmpdir(), `${random(10)}.${outputFormat}`);
-    const { stderr, status } = spawnSync("convert", [
-      // for GIF images, we only need the first frame
-      contentType === "image/gif" ? `${tmpPath}[0]` : tmpPath,
-      "-background",
-      "white",
-      "-flatten",
-      output,
-    ]);
+    const output = resolve(this.temporaryDirectory, `${random(10)}.${outputFormat}`);
+    await this.processFinished(
+      spawn("convert", [
+        // for GIF images, we only need the first frame
+        contentType === "image/gif" ? `${tmpPath}[0]` : tmpPath,
+        "-background",
+        "white",
+        "-flatten",
+        output,
+      ])
+    );
 
-    if (status === 0) {
-      return output;
-    } else {
-      throw new Error((stderr || "").toString());
-    }
+    return output;
   }
 
   private async getPrintableFiles(fields: PetitionField[]) {
@@ -250,11 +268,28 @@ export class PetitionBinder implements IPetitionBinder {
 
   private async writeStream(stream: Readable | NodeJS.ReadableStream) {
     return await new Promise<string>((res, rej) => {
-      const tmpPath = resolve(tmpdir(), random(10));
+      const tmpPath = resolve(this.temporaryDirectory, random(10));
       const writeStream = createWriteStream(tmpPath);
       writeStream.on("close", () => res(tmpPath));
       writeStream.on("error", rej);
       stream.pipe(writeStream);
     });
+  }
+
+  private async processFinished(asyncProcess: ChildProcessWithoutNullStreams) {
+    return await new Promise<void>((resolve, reject) => {
+      asyncProcess.on("error", reject);
+      asyncProcess.on("close", (code) => {
+        if (code === 0) {
+          resolve();
+        } else {
+          reject();
+        }
+      });
+    });
+  }
+
+  private async buildTmpDir() {
+    return (await mkdir(resolve(tmpdir(), random(10)), { recursive: true }))!;
   }
 }

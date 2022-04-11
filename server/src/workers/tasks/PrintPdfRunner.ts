@@ -1,4 +1,5 @@
 import { createReadStream } from "fs";
+import { unlink } from "fs/promises";
 import { isDefined } from "remeda";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
 import { random } from "../../util/token";
@@ -71,6 +72,10 @@ export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
       },
       `TaskWorker:${this.task.id}`
     );
+
+    try {
+      await unlink(tmpFilePath);
+    } catch {}
 
     return { temporary_file_id: tmpFile.id };
   }
