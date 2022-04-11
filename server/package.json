@@ -10,7 +10,7 @@
     "prebuild": "yarn generate-i18n-files",
     "migrate": "knex migrate:latest",
     "postmigrate": "yarn generate-db-types",
-    "migrate-make": "knex migrate:make",
+    "migrate-make": "knex migrate:make --client pg",
     "migrate-dryrun": "knex migrate:list",
     "migrate-down": "knex migrate:down",
     "postmigrate-down": "yarn generate-db-types",
