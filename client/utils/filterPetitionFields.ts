@@ -65,7 +65,7 @@ export function filterPetitionFields<T extends filterPetitionFields_PetitionFiel
       if (filter.SHOW_WITH_COMMENTS) {
         conditions.push(field.comments.length > 0);
       }
-      if (field.isReadOnly || conditions.every((x) => x)) {
+      if (conditions.every((x) => x)) {
         filtered.push({ type: "FIELD", field, fieldIndex });
       }
     }
