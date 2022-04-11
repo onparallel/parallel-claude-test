@@ -38,7 +38,12 @@ import { orgCanCreateNewUser, orgDoesNotHaveSsoProvider } from "../organization/
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { argUserHasActiveStatus, userHasAccessToUsers } from "../petition/mutations/authorizers";
 import { userHasAccessToUserGroups } from "../user-group/authorizers";
-import { contextUserHasRole, contextUserIsNotSso, userIsNotSSO } from "./authorizers";
+import {
+  contextUserHasRole,
+  contextUserIsNotSso,
+  userIsNotContextUser,
+  userIsNotSSO,
+} from "./authorizers";
 
 export const updateUser = mutationField("updateUser", {
   type: "User",
@@ -657,6 +662,7 @@ export const loginAs = mutationField("loginAs", {
     userId: nonNull(globalIdArg("User")),
   },
   authorize: authenticateAnd(
+    userIsNotContextUser("userId"),
     or(
       userIsSuperAdmin(),
       and(

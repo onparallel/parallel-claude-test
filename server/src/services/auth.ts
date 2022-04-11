@@ -591,7 +591,7 @@ export class Auth implements IAuth {
                 // who dis
                 return null;
               }
-              if (isDefined(asUserId)) {
+              if (isDefined(asUserId) && asUserId !== user.id) {
                 // make sure user can ghost login
                 if (!userHasRole(user, "ADMIN")) {
                   // can't ghost login if not admin
@@ -608,6 +608,8 @@ export class Auth implements IAuth {
                 } else {
                   return null;
                 }
+              } else {
+                return [user] as [User];
               }
             }
             return users.length > 0 ? ([users[0]] as [User]) : null;

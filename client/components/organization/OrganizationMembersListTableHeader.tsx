@@ -8,6 +8,7 @@ import { Spacer } from "../common/Spacer";
 import { WhenOrgRole } from "../common/WhenOrgRole";
 
 export interface OrganizationMembersListTableHeaderProps {
+  myId: string;
   search: string | null;
   selectedUsers: OrganizationMembers_OrganizationUserFragment[];
   onSearchChange(value: string | null): void;
@@ -16,6 +17,7 @@ export interface OrganizationMembersListTableHeaderProps {
 }
 
 export function OrganizationMembersListTableHeader({
+  myId,
   search,
   selectedUsers,
   onSearchChange,
@@ -54,7 +56,7 @@ export function OrganizationMembersListTableHeader({
               <MenuList minWidth="160px">
                 <MenuItem
                   icon={<LogInIcon display="block" boxSize={4} />}
-                  isDisabled={selectedUsers.length !== 1}
+                  isDisabled={selectedUsers.length !== 1 || selectedUsers[0].id === myId}
                   onClick={onLoginAs}
                 >
                   <FormattedMessage id="organization-users.login-as" defaultMessage="Login as..." />

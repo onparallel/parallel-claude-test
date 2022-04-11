@@ -131,7 +131,7 @@ export function OrganizationUsersListTableHeader({
                 {hasGhostLogin ? (
                   <MenuItem
                     icon={<LogInIcon display="block" boxSize={4} />}
-                    isDisabled={selectedUsers.length !== 1}
+                    isDisabled={selectedUsers.length !== 1 || selectedUsers[0].id === myId}
                     onClick={onLoginAs}
                   >
                     <FormattedMessage

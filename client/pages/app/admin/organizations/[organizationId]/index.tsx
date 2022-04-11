@@ -147,6 +147,7 @@ function OrganizationMembers({ organizationId }: OrganizationMembersProps) {
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
             <OrganizationMembersListTableHeader
+              myId={me.id}
               search={search}
               selectedUsers={selectedUsers}
               onReload={() => refetch()}
