@@ -969,7 +969,6 @@ export interface NexusGenFieldTypes {
     resetUserPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     restoreLogin: NexusGenEnums["Result"]; // Result!
     revokeUserAuthToken: NexusGenEnums["Result"]; // Result!
-    sendPetition: NexusGenRootTypes["SendPetitionResult"]; // SendPetitionResult!
     sendPetitionClosedNotification: NexusGenRootTypes["Petition"]; // Petition!
     sendReminders: NexusGenEnums["Result"]; // Result!
     sendSignatureRequestReminders: NexusGenEnums["Result"]; // Result!
@@ -2388,7 +2387,6 @@ export interface NexusGenFieldTypeNames {
     resetUserPassword: "SupportMethodResponse";
     restoreLogin: "Result";
     revokeUserAuthToken: "Result";
-    sendPetition: "SendPetitionResult";
     sendPetitionClosedNotification: "Petition";
     sendReminders: "Result";
     sendSignatureRequestReminders: "Result";
@@ -3988,15 +3986,6 @@ export interface NexusGenArgTypes {
     revokeUserAuthToken: {
       // args
       authTokenIds: NexusGenScalars["GID"][]; // [GID!]!
-    };
-    sendPetition: {
-      // args
-      body?: NexusGenScalars["JSON"] | null; // JSON
-      contactIds: NexusGenScalars["GID"][]; // [GID!]!
-      petitionId: NexusGenScalars["GID"]; // GID!
-      remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
-      scheduledAt?: NexusGenScalars["DateTime"] | null; // DateTime
-      subject?: string | null; // String
     };
     sendPetitionClosedNotification: {
       // args

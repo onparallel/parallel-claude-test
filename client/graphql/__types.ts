@@ -572,8 +572,6 @@ export interface Mutation {
   restoreLogin: Result;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
-  /** Sends the petition and creates the corresponding accesses and messages. */
-  sendPetition: SendPetitionResult;
   /** Sends an email to all contacts of the petition confirming the replies are ok */
   sendPetitionClosedNotification: Petition;
   /** Sends a reminder for the specified petition accesses. */
@@ -1174,15 +1172,6 @@ export interface MutationresetUserPasswordArgs {
 
 export interface MutationrevokeUserAuthTokenArgs {
   authTokenIds: Array<Scalars["GID"]>;
-}
-
-export interface MutationsendPetitionArgs {
-  body?: InputMaybe<Scalars["JSON"]>;
-  contactIds: Array<Scalars["GID"]>;
-  petitionId: Scalars["GID"];
-  remindersConfig?: InputMaybe<RemindersConfigInput>;
-  scheduledAt?: InputMaybe<Scalars["DateTime"]>;
-  subject?: InputMaybe<Scalars["String"]>;
 }
 
 export interface MutationsendPetitionClosedNotificationArgs {

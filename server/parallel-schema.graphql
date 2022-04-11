@@ -1157,18 +1157,6 @@ type Mutation {
   revokeUserAuthToken(authTokenIds: [GID!]!): Result!
 
   """
-  Sends the petition and creates the corresponding accesses and messages.
-  """
-  sendPetition(
-    body: JSON
-    contactIds: [GID!]!
-    petitionId: GID!
-    remindersConfig: RemindersConfigInput
-    scheduledAt: DateTime
-    subject: String
-  ): SendPetitionResult!
-
-  """
   Sends an email to all contacts of the petition confirming the replies are ok
   """
   sendPetitionClosedNotification(

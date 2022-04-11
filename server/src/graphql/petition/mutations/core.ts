@@ -28,7 +28,7 @@ import { fromGlobalId, toGlobalId } from "../../../util/globalId";
 import { getRequiredPetitionSendCredits } from "../../../util/organizationUsageLimits";
 import { withError } from "../../../util/promises/withError";
 import { hash, random } from "../../../util/token";
-import { userHasAccessToContactGroups, userHasAccessToContacts } from "../../contact/authorizers";
+import { userHasAccessToContactGroups } from "../../contact/authorizers";
 import {
   and,
   argIsDefined,
@@ -1180,13 +1180,27 @@ export const bulkSendPetition = mutationField("bulkSendPetition", {
     maxLength((args) => args.subject, "subject", 255),
     notEmptyString((args) => args.subject, "subject"),
     validRichTextContent((args) => args.body, "body"),
-    validRemindersConfig((args) => args.remindersConfig, "remindersConfig")
+    validRemindersConfig((args) => args.remindersConfig, "remindersConfig"),
+    (_, { contactIdGroups }, ctx, info) => {
+      // check that contactIds do not repeat inside each group
+      for (const group of contactIdGroups) {
+        const distinctIds = Array.from(new Set(group));
+        if (distinctIds.length !== group.length) {
+          throw new ArgValidationError(
+            info,
+            "contactIdGroups",
+            "There are repeated contactIds inside a group"
+          );
+        }
+      }
+    }
   ),
   resolve: async (_, args, ctx) => {
-    const [petition, owner, requiredCredits] = await Promise.all([
+    const [petition, owner, requiredCredits, currentAccesses] = await Promise.all([
       ctx.petitions.loadPetition(args.petitionId),
       ctx.petitions.loadPetitionOwner(args.petitionId),
       getRequiredPetitionSendCredits(args.petitionId, args.contactIdGroups.length, ctx),
+      ctx.petitions.loadAccessesForPetition(args.petitionId),
     ]);
 
     if (!petition) {
@@ -1194,6 +1208,13 @@ export const bulkSendPetition = mutationField("bulkSendPetition", {
     }
     if (!owner) {
       throw new Error(`Owner of Petition:${args.petitionId} not found`);
+    }
+
+    if (currentAccesses.some((access) => args.contactIdGroups.flat().includes(access.contact_id))) {
+      throw new ApolloError(
+        "This petition was already sent to some of the contacts",
+        "PETITION_ALREADY_SENT_ERROR"
+      );
     }
 
     const clonedPetitions = await pMap(
@@ -1266,95 +1287,6 @@ export const bulkSendPetition = mutationField("bulkSendPetition", {
     }
 
     return results.map((r) => omit(r, ["messages"]));
-  },
-});
-
-export const sendPetition = mutationField("sendPetition", {
-  description: "Sends the petition and creates the corresponding accesses and messages.",
-  type: "SendPetitionResult",
-  authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
-    userHasAccessToContacts("contactIds"),
-    petitionHasRepliableFields("petitionId"),
-    orgHasAvailablePetitionSendCredits(
-      (args) => args.petitionId,
-      () => 1
-    )
-  ),
-  args: {
-    petitionId: nonNull(globalIdArg("Petition")),
-    contactIds: nonNull(list(nonNull(globalIdArg("Contact")))),
-    subject: stringArg(),
-    body: jsonArg(),
-    scheduledAt: datetimeArg(),
-    remindersConfig: arg({ type: "RemindersConfigInput" }),
-  },
-  validateArgs: validateAnd(
-    notEmptyArray((args) => args.contactIds, "contactIds"),
-    maxLength((args) => args.subject, "subject", 255),
-    validateIfDefined(
-      (args) => args.subject,
-      notEmptyString((args) => args.subject, "subject")
-    ),
-    validRichTextContent((args) => args.body, "body"),
-    validRemindersConfig((args) => args.remindersConfig, "remindersConfig")
-  ),
-  resolve: async (_, args, ctx) => {
-    const [petition, requiredCredits] = await Promise.all([
-      ctx.petitions.loadPetition(args.petitionId),
-      getRequiredPetitionSendCredits(args.petitionId, 1, ctx),
-    ]);
-    if (!petition) {
-      throw new Error("Petition not available");
-    }
-    const subject = args.subject ?? petition.email_subject;
-    const body =
-      args.body ?? (isDefined(petition.email_body) ? JSON.parse(petition.email_body) : null);
-    if (!isDefined(subject) || !isDefined(body)) {
-      throw new WhitelistedError("Missing email subject or email body", "MISSING_SUBJECT_OR_BODY");
-    }
-
-    const [{ result, error, accesses, messages, petition: updatedPetition }] =
-      await presendPetition(
-        [[petition, args.contactIds]],
-        {
-          ...omit(args, ["subject", "body"]),
-          subject,
-          body,
-        },
-        ctx.user!,
-        null,
-        false,
-        ctx
-      );
-
-    if (result === "FAILURE" && error.constraint === "petition_access__petition_id_contact_id") {
-      throw new WhitelistedError(
-        "This petition was already sent to some of the contacts",
-        "PETITION_ALREADY_SENT_ERROR"
-      );
-    }
-
-    if (result === "SUCCESS") {
-      await sendPetitionMessageEmails(
-        messages?.filter((m) => !isDefined(m.scheduled_at)) ?? [],
-        ctx
-      );
-    }
-
-    if (requiredCredits > 0) {
-      await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
-        ctx.user!.org_id,
-        "PETITION_SEND",
-        requiredCredits
-      );
-    }
-
-    return {
-      petition: updatedPetition,
-      accesses,
-      result,
-    };
   },
 });
 

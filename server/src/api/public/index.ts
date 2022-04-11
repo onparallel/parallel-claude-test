@@ -91,7 +91,8 @@ import {
   CreatePetitionAttachment_petitionAttachmentUploadCompleteDocument,
   CreatePetitionRecipients_contactDocument,
   CreatePetitionRecipients_createContactDocument,
-  CreatePetitionRecipients_sendPetitionDocument,
+  CreatePetitionRecipients_bulkSendPetitionDocument,
+  CreatePetitionRecipients_petitionDocument,
   CreatePetitionRecipients_updateContactDocument,
   CreatePetition_petitionDocument,
   DeletePetitionAttachment_deletePetitionAttachmentDocument,
@@ -99,7 +100,6 @@ import {
   DeletePetition_deletePetitionsDocument,
   DeleteReply_deletePetitionReplyDocument,
   DeleteTemplate_deletePetitionsDocument,
-  DEPRECATED_CreatePetitionRecipients_sendPetitionDocument,
   DownloadFileReply_fileUploadReplyDownloadLinkDocument,
   DownloadPetitionAttachment_petitionAttachmentDownloadLinkDocument,
   DownloadSignedDocument_downloadAuditTrailDocument,
@@ -1021,32 +1021,42 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
       },
       { concurrency: 3 }
     );
-    const message = isDefined(body.message)
+    let message = isDefined(body.message)
       ? body.message.format === "PLAIN_TEXT"
         ? body.message.content.split("\n").map((line) => ({ children: [{ text: line }] }))
         : [{ children: [{ text: "" }] }]
       : null;
+    let subject = body.subject;
     try {
+      const _query = gql`
+        query CreatePetitionRecipients_petition($id: GID!) {
+          petition(id: $id) {
+            emailBody
+            emailSubject
+          }
+        }
+      `;
       const _mutation = gql`
-        mutation CreatePetitionRecipients_sendPetition(
+        mutation CreatePetitionRecipients_bulkSendPetition(
           $petitionId: GID!
           $contactIds: [GID!]!
-          $subject: String
-          $body: JSON
+          $subject: String!
+          $body: JSON!
           $scheduledAt: DateTime
           $remindersConfig: RemindersConfigInput
           $includeRecipients: Boolean!
           $includeFields: Boolean!
           $includeTags: Boolean!
         ) {
-          sendPetition(
+          bulkSendPetition(
             petitionId: $petitionId
-            contactIds: $contactIds
+            contactIdGroups: [$contactIds]
             subject: $subject
             body: $body
             scheduledAt: $scheduledAt
             remindersConfig: $remindersConfig
           ) {
+            result
             petition {
               ...Petition
             }
@@ -1054,206 +1064,82 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
         }
         ${PetitionFragment}
       `;
-      const result = await client.request(CreatePetitionRecipients_sendPetitionDocument, {
+
+      if (!isDefined(subject) || !isDefined(message)) {
+        /* 
+          email body and subject are required in the bulkSendPetition mutation, so if those are not defined on the request
+          we need to fetch it from the petition. If they are not defined in the petition either, an error will be thrown
+         */
+        const query = await client.request(CreatePetitionRecipients_petitionDocument, {
+          id: params.petitionId,
+        });
+
+        subject = subject ?? query.petition?.emailSubject ?? null;
+        message = message ?? query.petition?.emailBody ?? null;
+        if (!isDefined(subject) || !isDefined(message)) {
+          throw new BadRequestError(
+            "The subject or the message are missing and not defined on the petition"
+          );
+        }
+      }
+
+      const result = await client.request(CreatePetitionRecipients_bulkSendPetitionDocument, {
         petitionId: params.petitionId,
         contactIds,
         body: message,
-        ...pick(body, ["subject", "remindersConfig", "scheduledAt"]),
+        subject,
+        ...pick(body, ["remindersConfig", "scheduledAt"]),
         includeFields: query.include?.includes("fields") ?? false,
         includeRecipients: query.include?.includes("recipients") ?? false,
         includeTags: query.include?.includes("tags") ?? false,
       });
-      assert("id" in result.sendPetition.petition!);
-      return Ok(mapPetition(result.sendPetition.petition));
+
+      assert(result.bulkSendPetition[0].petition !== null);
+      assert("id" in result.bulkSendPetition[0].petition);
+
+      return Ok(mapPetition(result.bulkSendPetition[0].petition));
     } catch (error: any) {
       if (
         error instanceof ClientError &&
         containsGraphQLError(error, "PETITION_ALREADY_SENT_ERROR")
       ) {
         throw new ConflictError("The petition was already sent to some of the provided contacts");
-      } else if (
-        error instanceof ClientError &&
-        containsGraphQLError(error, "MISSING_SUBJECT_OR_BODY")
-      ) {
-        throw new BadRequestError(
-          "The subject or the message are missing and not defined on the petition"
-        );
       }
       throw error;
     }
   }
 );
 
-api
-  .path("/petitions/:petitionId/recipients", { params: { petitionId } })
-  .get(
-    {
-      operationId: "GetPetitionRecipients",
-      summary: "Get petition recipients",
-      description: outdent`
+api.path("/petitions/:petitionId/recipients", { params: { petitionId } }).get(
+  {
+    operationId: "GetPetitionRecipients",
+    summary: "Get petition recipients",
+    description: outdent`
         Returns the list of recipients this petition has been sent to.
       `,
-      responses: { 200: SuccessResponse(ListOfPetitionAccesses) },
-      tags: ["Petitions"],
-    },
-    async ({ client, params }) => {
-      const _query = gql`
-        query GetPetitionRecipients_petitionAccesses($petitionId: GID!) {
-          petition(id: $petitionId) {
-            ... on Petition {
-              accesses {
-                ...PetitionAccess
-              }
+    responses: { 200: SuccessResponse(ListOfPetitionAccesses) },
+    tags: ["Petitions"],
+  },
+  async ({ client, params }) => {
+    const _query = gql`
+      query GetPetitionRecipients_petitionAccesses($petitionId: GID!) {
+        petition(id: $petitionId) {
+          ... on Petition {
+            accesses {
+              ...PetitionAccess
             }
           }
         }
-        ${PetitionAccessFragment}
-      `;
-      const result = await client.request(GetPetitionRecipients_petitionAccessesDocument, {
-        petitionId: params.petitionId,
-      });
-      assert("accesses" in result.petition!);
-      return Ok(result.petition!.accesses);
-    }
-  )
-  .post(
-    {
-      deprecated: true,
-      operationId: "CreatePetitionRecipients",
-      summary: "Send petition",
-      description: outdent`
-        This method is deprecated and will stop working soon. Please, use
-        [SendPetition](#operation/SendPetition) instead.
-      `,
-      body: JsonBody(SendPetition),
-      responses: {
-        200: SuccessResponse(ListOfPetitionAccesses),
-        400: ErrorResponse({
-          description: "Invalid parameter",
-        }),
-        409: ErrorResponse({
-          description: "The petition was already sent to some of the provided contacts",
-        }),
-      },
-      tags: ["Petitions"],
-    },
-    async ({ client, params, body }) => {
-      const contactIds = await pMap(
-        body.contacts,
-        async (item) => {
-          if (typeof item === "string") {
-            return item;
-          } else {
-            const { email, ...data } = item;
-            const _query = gql`
-              query CreatePetitionRecipients_contact($email: String!) {
-                contacts: contactsByEmail(emails: [$email]) {
-                  id
-                  firstName
-                  lastName
-                }
-              }
-            `;
-            const result = await client.request(CreatePetitionRecipients_contactDocument, {
-              email,
-            });
-            const contact = result.contacts[0];
-            if (contact) {
-              if (
-                (contact.firstName !== data.firstName && isDefined(data.firstName)) ||
-                (contact.lastName !== data.lastName && isDefined(data.lastName))
-              ) {
-                const _mutation = gql`
-                  mutation CreatePetitionRecipients_updateContact(
-                    $contactId: GID!
-                    $data: UpdateContactInput!
-                  ) {
-                    updateContact(id: $contactId, data: $data) {
-                      id
-                    }
-                  }
-                `;
-                await client.request(CreatePetitionRecipients_updateContactDocument, {
-                  contactId: contact.id,
-                  data,
-                });
-              }
-              return contact.id;
-            } else {
-              const _mutation = gql`
-                mutation CreatePetitionRecipients_createContact($data: CreateContactInput!) {
-                  createContact(data: $data) {
-                    id
-                  }
-                }
-              `;
-              const result = await client.request(CreatePetitionRecipients_createContactDocument, {
-                data: item,
-              });
-              return result.createContact.id;
-            }
-          }
-        },
-        { concurrency: 3 }
-      );
-      const message = isDefined(body.message)
-        ? body.message.format === "PLAIN_TEXT"
-          ? body.message.content.split("\n").map((line) => ({ children: [{ text: line }] }))
-          : [{ children: [{ text: "" }] }]
-        : null;
-      try {
-        const _mutation = gql`
-          mutation DEPRECATED_CreatePetitionRecipients_sendPetition(
-            $petitionId: GID!
-            $contactIds: [GID!]!
-            $subject: String
-            $body: JSON
-            $scheduledAt: DateTime
-            $remindersConfig: RemindersConfigInput
-          ) {
-            sendPetition(
-              petitionId: $petitionId
-              contactIds: $contactIds
-              subject: $subject
-              body: $body
-              scheduledAt: $scheduledAt
-              remindersConfig: $remindersConfig
-            ) {
-              accesses {
-                ...PetitionAccess
-              }
-            }
-          }
-          ${PetitionAccessFragment}
-        `;
-        const result = await client.request(
-          DEPRECATED_CreatePetitionRecipients_sendPetitionDocument,
-          {
-            petitionId: params.petitionId,
-            contactIds,
-            body: message,
-            ...pick(body, ["subject", "remindersConfig", "scheduledAt"]),
-          }
-        );
-        return Ok(result.sendPetition.accesses!);
-      } catch (error: any) {
-        if (
-          error instanceof ClientError &&
-          containsGraphQLError(error, "PETITION_ALREADY_SENT_ERROR")
-        ) {
-          throw new ConflictError("The petition was already sent to some of the provided contacts");
-        } else if (
-          error instanceof ClientError &&
-          containsGraphQLError(error, "MISSING_SUBJECT_OR_BODY")
-        ) {
-          throw new BadRequestError(
-            "The subject or the message are missing and not defined on the petition"
-          );
-        }
-        throw error;
       }
-    }
-  );
+      ${PetitionAccessFragment}
+    `;
+    const result = await client.request(GetPetitionRecipients_petitionAccessesDocument, {
+      petitionId: params.petitionId,
+    });
+    assert("accesses" in result.petition!);
+    return Ok(result.petition!.accesses);
+  }
+);
 
 api.path("/petitions/:petitionId/fields", { params: { petitionId } }).get(
   {

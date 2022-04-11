@@ -541,8 +541,6 @@ export type Mutation = {
   restoreLogin: Result;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
-  /** Sends the petition and creates the corresponding accesses and messages. */
-  sendPetition: SendPetitionResult;
   /** Sends an email to all contacts of the petition confirming the replies are ok */
   sendPetitionClosedNotification: Petition;
   /** Sends a reminder for the specified petition accesses. */
@@ -1143,15 +1141,6 @@ export type MutationresetUserPasswordArgs = {
 
 export type MutationrevokeUserAuthTokenArgs = {
   authTokenIds: Array<Scalars["GID"]>;
-};
-
-export type MutationsendPetitionArgs = {
-  body?: InputMaybe<Scalars["JSON"]>;
-  contactIds: Array<Scalars["GID"]>;
-  petitionId: Scalars["GID"];
-  remindersConfig?: InputMaybe<RemindersConfigInput>;
-  scheduledAt?: InputMaybe<Scalars["DateTime"]>;
-  subject?: InputMaybe<Scalars["String"]>;
 };
 
 export type MutationsendPetitionClosedNotificationArgs = {
@@ -3924,11 +3913,22 @@ export type CreatePetitionRecipients_createContactMutationVariables = Exact<{
 
 export type CreatePetitionRecipients_createContactMutation = { createContact: { id: string } };
 
-export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
+export type CreatePetitionRecipients_petitionQueryVariables = Exact<{
+  id: Scalars["GID"];
+}>;
+
+export type CreatePetitionRecipients_petitionQuery = {
+  petition:
+    | { emailBody: any | null; emailSubject: string | null }
+    | { emailBody: any | null; emailSubject: string | null }
+    | null;
+};
+
+export type CreatePetitionRecipients_bulkSendPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   contactIds: Array<Scalars["GID"]> | Scalars["GID"];
-  subject?: InputMaybe<Scalars["String"]>;
-  body?: InputMaybe<Scalars["JSON"]>;
+  subject: Scalars["String"];
+  body: Scalars["JSON"];
   scheduledAt?: InputMaybe<Scalars["DateTime"]>;
   remindersConfig?: InputMaybe<RemindersConfigInput>;
   includeRecipients: Scalars["Boolean"];
@@ -3936,8 +3936,9 @@ export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
   includeTags: Scalars["Boolean"];
 }>;
 
-export type CreatePetitionRecipients_sendPetitionMutation = {
-  sendPetition: {
+export type CreatePetitionRecipients_bulkSendPetitionMutation = {
+  bulkSendPetition: Array<{
+    result: Result;
     petition: {
       id: string;
       name: string | null;
@@ -3991,7 +3992,7 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
       }>;
       tags?: Array<{ id: string; name: string }>;
     } | null;
-  };
+  }>;
 };
 
 export type GetPetitionRecipients_petitionAccessesQueryVariables = Exact<{
@@ -4029,45 +4030,6 @@ export type GetPetitionRecipients_petitionAccessesQuery = {
       }
     | {}
     | null;
-};
-
-export type DEPRECATED_CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  contactIds: Array<Scalars["GID"]> | Scalars["GID"];
-  subject?: InputMaybe<Scalars["String"]>;
-  body?: InputMaybe<Scalars["JSON"]>;
-  scheduledAt?: InputMaybe<Scalars["DateTime"]>;
-  remindersConfig?: InputMaybe<RemindersConfigInput>;
-}>;
-
-export type DEPRECATED_CreatePetitionRecipients_sendPetitionMutation = {
-  sendPetition: {
-    accesses: Array<{
-      id: string;
-      status: PetitionAccessStatus;
-      reminderCount: number;
-      remindersLeft: number;
-      remindersActive: boolean;
-      nextReminderAt: string | null;
-      createdAt: string;
-      contact: {
-        id: string;
-        email: string;
-        fullName: string;
-        firstName: string;
-        lastName: string | null;
-        createdAt: string;
-        updatedAt: string;
-      } | null;
-      granter: {
-        id: string;
-        email: string;
-        fullName: string | null;
-        firstName: string | null;
-        lastName: string | null;
-      } | null;
-    }> | null;
-  };
 };
 
 export type PetitionReplies_repliesQueryVariables = Exact<{
@@ -5459,26 +5421,38 @@ export const CreatePetitionRecipients_createContactDocument = gql`
   CreatePetitionRecipients_createContactMutation,
   CreatePetitionRecipients_createContactMutationVariables
 >;
-export const CreatePetitionRecipients_sendPetitionDocument = gql`
-  mutation CreatePetitionRecipients_sendPetition(
+export const CreatePetitionRecipients_petitionDocument = gql`
+  query CreatePetitionRecipients_petition($id: GID!) {
+    petition(id: $id) {
+      emailBody
+      emailSubject
+    }
+  }
+` as unknown as DocumentNode<
+  CreatePetitionRecipients_petitionQuery,
+  CreatePetitionRecipients_petitionQueryVariables
+>;
+export const CreatePetitionRecipients_bulkSendPetitionDocument = gql`
+  mutation CreatePetitionRecipients_bulkSendPetition(
     $petitionId: GID!
     $contactIds: [GID!]!
-    $subject: String
-    $body: JSON
+    $subject: String!
+    $body: JSON!
     $scheduledAt: DateTime
     $remindersConfig: RemindersConfigInput
     $includeRecipients: Boolean!
     $includeFields: Boolean!
     $includeTags: Boolean!
   ) {
-    sendPetition(
+    bulkSendPetition(
       petitionId: $petitionId
-      contactIds: $contactIds
+      contactIdGroups: [$contactIds]
       subject: $subject
       body: $body
       scheduledAt: $scheduledAt
       remindersConfig: $remindersConfig
     ) {
+      result
       petition {
         ...Petition
       }
@@ -5486,8 +5460,8 @@ export const CreatePetitionRecipients_sendPetitionDocument = gql`
   }
   ${PetitionFragmentDoc}
 ` as unknown as DocumentNode<
-  CreatePetitionRecipients_sendPetitionMutation,
-  CreatePetitionRecipients_sendPetitionMutationVariables
+  CreatePetitionRecipients_bulkSendPetitionMutation,
+  CreatePetitionRecipients_bulkSendPetitionMutationVariables
 >;
 export const GetPetitionRecipients_petitionAccessesDocument = gql`
   query GetPetitionRecipients_petitionAccesses($petitionId: GID!) {
@@ -5503,33 +5477,6 @@ export const GetPetitionRecipients_petitionAccessesDocument = gql`
 ` as unknown as DocumentNode<
   GetPetitionRecipients_petitionAccessesQuery,
   GetPetitionRecipients_petitionAccessesQueryVariables
->;
-export const DEPRECATED_CreatePetitionRecipients_sendPetitionDocument = gql`
-  mutation DEPRECATED_CreatePetitionRecipients_sendPetition(
-    $petitionId: GID!
-    $contactIds: [GID!]!
-    $subject: String
-    $body: JSON
-    $scheduledAt: DateTime
-    $remindersConfig: RemindersConfigInput
-  ) {
-    sendPetition(
-      petitionId: $petitionId
-      contactIds: $contactIds
-      subject: $subject
-      body: $body
-      scheduledAt: $scheduledAt
-      remindersConfig: $remindersConfig
-    ) {
-      accesses {
-        ...PetitionAccess
-      }
-    }
-  }
-  ${PetitionAccessFragmentDoc}
-` as unknown as DocumentNode<
-  DEPRECATED_CreatePetitionRecipients_sendPetitionMutation,
-  DEPRECATED_CreatePetitionRecipients_sendPetitionMutationVariables
 >;
 export const PetitionReplies_repliesDocument = gql`
   query PetitionReplies_replies($petitionId: GID!) {
