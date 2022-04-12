@@ -1,5 +1,7 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
+import { unMaybeArray } from "../../util/arrays";
+import { MaybeArray } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
 import {
@@ -57,16 +59,46 @@ export class FileRepository extends BaseRepository {
       .where({ id: id, upload_complete: false });
   }
 
-  async deleteFileUpload(id: number, deletedBy?: string, t?: Knex.Transaction) {
-    await this.from("file_upload", t)
-      .update(
-        {
-          deleted_at: this.now(),
-          deleted_by: deletedBy,
-        },
-        "*"
-      )
-      .where("id", id);
+  /** gets deleted file_upload's whose paths are not repeated on another not deleted file_upload */
+  async getFileUploadsToDelete() {
+    return await this.raw<FileUpload>(/* sql */ `
+      select fu.* from file_upload fu 
+        where fu.deleted_at is not null
+        and fu.file_deleted_at is null
+        and fu."path" not in (
+          select fu2."path" from file_upload fu2 where fu2.id != fu.id and fu2.deleted_at is null and fu2.file_deleted_at is null
+        );
+    `);
+  }
+
+  async updateFileUpload(id: MaybeArray<number>, data: Partial<FileUpload>, updatedBy: string) {
+    const ids = unMaybeArray(id);
+    if (ids.length === 0) {
+      return [];
+    }
+    return await this.from("file_upload")
+      .whereIn("id", ids)
+      .update({
+        ...data,
+        updated_at: this.now(),
+        updated_by: updatedBy,
+      })
+      .returning("*");
+  }
+
+  async deleteFileUpload(id: MaybeArray<number>, deletedBy?: string, t?: Knex.Transaction) {
+    const ids = unMaybeArray(id);
+    if (ids.length > 0) {
+      await this.from("file_upload", t)
+        .update(
+          {
+            deleted_at: this.now(),
+            deleted_by: deletedBy,
+          },
+          "*"
+        )
+        .whereIn("id", ids);
+    }
   }
 
   readonly loadTemporaryFile = this.buildLoadBy("temporary_file", "id");

@@ -73,7 +73,7 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
       (signer, i) =>
         ({
           wordAnchor: `3cb39pzCQA9wJ${i}`,
-          fullName: signer.fullName,
+          fullName: signer!.fullName,
           date,
         } as SignatureBoxProps)
     ),

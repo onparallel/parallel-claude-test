@@ -245,7 +245,7 @@ export const updateFileUploadReplyComplete = mutationField("updateFileUploadRepl
       ctx.aws.fileUploads.getFileMetadata(file!.path),
       ctx.files.markFileUploadComplete(file!.id, `User:${ctx.user!.id}`),
       reply.content["old_file_upload_id"]
-        ? ctx.petitions.safeDeleteFileUpload(
+        ? ctx.files.deleteFileUpload(
             reply.content["old_file_upload_id"] as number,
             `User:${ctx.user!.id}`
           )

@@ -1499,38 +1499,6 @@ export class PetitionRepository extends BaseRepository {
     return reply;
   }
 
-  /**
-   * deletes a file_upload.
-   * also deletes its entry in S3 if the same file_upload.path is not found in any other file_upload
-   */
-  async safeDeleteFileUpload(
-    fileUploadIds: MaybeArray<number>,
-    deletedBy: string,
-    t?: Knex.Transaction
-  ) {
-    const ids = unMaybeArray(fileUploadIds);
-    const files = await this.files.loadFileUpload(ids);
-    if (files.some((f) => !f)) {
-      return;
-    }
-
-    const filesByPath = (await this.files.loadFileUploadsByPath(files.map((f) => f!.path))).flat();
-    // there can be multiple file_uploads with same path (e.g. when doing massive sends of a petition with submitted file replies)
-    // so we need to make sure to only delete the entry in S3 if there are no other files referencing to that object
-    await pMap(files, async (f) => {
-      const samePathFiles = filesByPath.filter((file) => file.path === f!.path);
-      await Promise.all([
-        this.files.deleteFileUpload(f!.id, deletedBy, t),
-        samePathFiles.length === 1 ? this.aws.fileUploads.deleteFile(samePathFiles[0].path) : null,
-      ]);
-    });
-
-    files.forEach((f) => {
-      this.files.loadFileUpload.dataloader.clear(f!.id);
-      this.files.loadFileUploadsByPath.dataloader.clear(f!.path);
-    });
-  }
-
   async deletePetitionFieldReply(replyId: number, deleter: User | PetitionAccess) {
     const isContact = "keycode" in deleter;
     const deletedBy = isContact ? `Contact:${deleter.contact_id}` : `User:${deleter.id}`;
@@ -1545,7 +1513,7 @@ export class PetitionRepository extends BaseRepository {
     }
 
     if (reply.type === "FILE_UPLOAD") {
-      await this.safeDeleteFileUpload(reply.content["file_upload_id"], deletedBy);
+      await this.files.deleteFileUpload(reply.content["file_upload_id"], deletedBy);
     }
 
     await Promise.all([
@@ -4001,7 +3969,7 @@ export class PetitionRepository extends BaseRepository {
         })
         .returning("*");
 
-      return await this.safeDeleteFileUpload(row.file_upload_id, `User:${user.id}`, t);
+      return await this.files.deleteFileUpload(row.file_upload_id, `User:${user.id}`, t);
     });
   }
 
@@ -4015,7 +3983,7 @@ export class PetitionRepository extends BaseRepository {
         })
         .returning("*");
 
-      return await this.safeDeleteFileUpload(row.file_upload_id, `User:${user.id}`, t);
+      return await this.files.deleteFileUpload(row.file_upload_id, `User:${user.id}`, t);
     });
   }
 
@@ -4035,7 +4003,7 @@ export class PetitionRepository extends BaseRepository {
       })
       .returning("*");
 
-    await this.safeDeleteFileUpload(
+    await this.files.deleteFileUpload(
       deletedAttachments.map((a) => a.file_upload_id),
       `User:${user.id}`,
       t
@@ -4058,7 +4026,7 @@ export class PetitionRepository extends BaseRepository {
       })
       .returning("*");
 
-    await this.safeDeleteFileUpload(
+    await this.files.deleteFileUpload(
       deletedAttachments.map((a) => a.file_upload_id),
       `User:${user.id}`,
       t
@@ -4295,22 +4263,18 @@ export class PetitionRepository extends BaseRepository {
       );
 
       const [accesses, fields] = await Promise.all([
-        this.loadAccessesForPetition(petitionId, { cache: false }),
-        this.loadFieldsForPetition(petitionId, { cache: false }),
+        this.loadAccessesForPetition(petitionId),
+        this.loadFieldsForPetition(petitionId),
       ]);
 
       const [replies, comments] = await Promise.all([
-        this.loadRepliesForField(
-          fields.map((f) => f.id),
-          { cache: false }
-        ),
+        this.loadRepliesForField(fields.map((f) => f.id)),
         this.loadPetitionFieldCommentsForField(
           fields.map((f) => ({
             petitionFieldId: f.id,
             loadInternalComments: true,
             petitionId: petitionId,
-          })),
-          { cache: false }
+          }))
         ),
       ]);
 
@@ -4340,8 +4304,6 @@ export class PetitionRepository extends BaseRepository {
       );
 
       await this.anonymizePetitionSignatureRequests(petitionId, t);
-
-      await this.loadAccessesForPetition.dataloader.clear(petitionId);
     });
   }
 
@@ -4394,9 +4356,7 @@ export class PetitionRepository extends BaseRepository {
         `),
       });
 
-    await this.safeDeleteFileUpload(fileUploadIds, "Worker:Anonymizer", t);
-
-    repliesArray.forEach(({ id }) => this.loadRepliesForField.dataloader.clear(id));
+    await this.files.deleteFileUpload(fileUploadIds, "Worker:Anonymizer", t);
   }
 
   async anonymizePetitionFieldComments(
@@ -4491,6 +4451,6 @@ export class PetitionRepository extends BaseRepository {
       .filter((s) => isDefined(s.file_upload_id))
       .map((s) => s.file_upload_id!);
 
-    await this.safeDeleteFileUpload(fileUploadIds, "Worker:Anonymizer", t);
+    await this.files.deleteFileUpload(fileUploadIds, "Worker:Anonymizer", t);
   }
 }

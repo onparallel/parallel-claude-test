@@ -17,7 +17,6 @@ import {
   PetitionFieldType,
   User,
 } from "../../db/__types";
-import { AWS_SERVICE, IAws } from "../../services/aws";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
 
@@ -698,11 +697,6 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("deletes the linked attachments and uploaded files when deleting a field", async () => {
-      const awsDeleteFileSpy = jest.spyOn(
-        testClient.container.get<IAws>(AWS_SERVICE).publicFiles,
-        "deleteFile"
-      );
-
       const [newField] = await mocks.createRandomPetitionFields(userPetition.id, 1);
 
       const [attachment] = await mocks.createPetitionFieldAttachment(newField.id, 1);
@@ -736,17 +730,9 @@ describe("GraphQL/Petition Fields", () => {
 
       expect(attachments).toHaveLength(0);
       expect(attachedFiles).toHaveLength(0);
-      expect(awsDeleteFileSpy).toHaveBeenCalledTimes(1);
-
-      awsDeleteFileSpy.mockRestore();
     });
 
     it("don't delete the attached file on S3 if its being used as attachment in other field", async () => {
-      const awsDeleteFileSpy = jest.spyOn(
-        testClient.container.get<IAws>(AWS_SERVICE).publicFiles,
-        "deleteFile"
-      );
-
       const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
       const newFields = await mocks.createRandomPetitionFields(petition.id, 2);
 
@@ -794,8 +780,6 @@ describe("GraphQL/Petition Fields", () => {
         .select("*");
 
       expect(uploadedFiles).toHaveLength(1);
-      expect(awsDeleteFileSpy).toHaveBeenCalledTimes(0);
-      awsDeleteFileSpy.mockRestore();
     });
   });
 

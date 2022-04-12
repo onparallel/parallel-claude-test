@@ -565,6 +565,7 @@ export interface FileUpload {
   updated_by: Maybe<string>; // varchar
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
+  file_deleted_at: Maybe<Date>; // timestamptz
 }
 
 export type CreateFileUpload = PartialProps<
@@ -576,6 +577,7 @@ export type CreateFileUpload = PartialProps<
   | "updated_by"
   | "deleted_at"
   | "deleted_by"
+  | "file_deleted_at"
 >;
 
 export interface Organization {

@@ -3,9 +3,7 @@ import { Container } from "inversify";
 import { Knex } from "knex";
 import { isDefined, pick, range, sortBy } from "remeda";
 import { createTestContainer } from "../../../../test/testContainer";
-import { AWS_SERVICE, IAws } from "../../../services/aws";
 import { deleteAllData } from "../../../util/knexUtils";
-import { MaybeArray } from "../../../util/types";
 import { KNEX } from "../../knex";
 import {
   Contact,
@@ -872,7 +870,6 @@ describe("repositories/PetitionRepository", () => {
       let petition: Petition;
       let fields: PetitionField[] = [];
       let accesses: PetitionAccess[] = [];
-      let deleteFileUploadSpy: jest.SpyInstance<Promise<void>, [key: MaybeArray<string>]>;
 
       beforeEach(async () => {
         [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
@@ -891,15 +888,6 @@ describe("repositories/PetitionRepository", () => {
           contacts.map((c) => c.id),
           user.id
         );
-
-        deleteFileUploadSpy = jest.spyOn(
-          container.get<IAws>(AWS_SERVICE).fileUploads,
-          "deleteFile"
-        );
-      });
-
-      afterEach(() => {
-        deleteFileUploadSpy.mockReset();
       });
 
       it("marks petition as anonymized", async () => {
@@ -933,7 +921,12 @@ describe("repositories/PetitionRepository", () => {
 
         await petitions.anonymizePetition(petition.id);
 
-        const repliesAfter = (await petitions.loadRepliesForField(fields.map((f) => f.id))).flat();
+        const repliesAfter = (
+          await petitions.loadRepliesForField(
+            fields.map((f) => f.id),
+            { cache: false }
+          )
+        ).flat();
         expect(repliesAfter.length).toBeGreaterThan(0);
 
         for (const reply of repliesAfter) {
@@ -949,10 +942,8 @@ describe("repositories/PetitionRepository", () => {
           }
         }
         // deletes every file_upload on replies
-        const currentFiles = await filesRepo.loadFileUpload(fileUploadIds);
+        const currentFiles = await filesRepo.loadFileUpload(fileUploadIds, { cache: false });
         expect(currentFiles.filter(isDefined)).toHaveLength(0);
-
-        expect(deleteFileUploadSpy).toHaveBeenCalledTimes(fileUploadIds.length);
       });
 
       it("erases the content of every comment", async () => {
@@ -970,7 +961,8 @@ describe("repositories/PetitionRepository", () => {
               petitionFieldId: f.id,
               petitionId: petition.id,
               loadInternalComments: true,
-            }))
+            })),
+            { cache: false }
           )
         ).flat();
 
@@ -982,7 +974,7 @@ describe("repositories/PetitionRepository", () => {
       it("deactivates every access on the petition", async () => {
         await petitions.anonymizePetition(petition.id);
 
-        const accesses = await petitions.loadAccessesForPetition(petition.id);
+        const accesses = await petitions.loadAccessesForPetition(petition.id, { cache: false });
         expect(accesses.length).toBeGreaterThan(0);
         expect(accesses.every((a) => a.status === "INACTIVE")).toEqual(true);
       });
@@ -1086,8 +1078,6 @@ describe("repositories/PetitionRepository", () => {
         expect(signedFileIds.length).toBeGreaterThan(0);
         const fileUploads = (await filesRepo.loadFileUpload(signedFileIds)).filter(isDefined);
         expect(fileUploads).toHaveLength(0);
-
-        expect(deleteFileUploadSpy).toHaveBeenCalledTimes(1);
       });
     });
   });
