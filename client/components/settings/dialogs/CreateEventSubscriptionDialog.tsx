@@ -1,4 +1,4 @@
-import { ApolloError } from "@apollo/client";
+import { ApolloError, gql, useQuery } from "@apollo/client";
 import {
   Button,
   Collapse,
@@ -14,7 +14,10 @@ import {
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { PetitionEventType } from "@parallel/graphql/__types";
+import {
+  CreateEventSubscriptionDialog_templatesDocument,
+  PetitionEventType,
+} from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { Maybe, MaybePromise } from "@parallel/utils/types";
@@ -28,6 +31,7 @@ interface CreateEventSubscriptionDialogProps {
     eventsUrl: string;
     eventTypes: PetitionEventType[] | null;
     name: string | null;
+    fromTemplateId: string | null;
   }) => MaybePromise<void>;
 }
 
@@ -36,6 +40,7 @@ interface CreateEventSubscriptionDialogFormData {
   eventsUrl: string;
   eventsMode: "ALL" | "SPECIFIC";
   eventTypes: OptionTypeBase[];
+  fromTemplate: Maybe<OptionTypeBase>;
 }
 
 export function CreateEventSubscriptionDialog(
@@ -56,9 +61,15 @@ export function CreateEventSubscriptionDialog(
       eventsUrl: "",
       eventsMode: "ALL",
       eventTypes: [],
+      fromTemplate: null,
     },
   });
   const eventsMode = watch("eventsMode");
+
+  const { data } = useQuery(CreateEventSubscriptionDialog_templatesDocument, {
+    variables: { offset: 0, limit: 999 },
+    fetchPolicy: "cache-and-network",
+  });
 
   const eventsUrlInputRef = useRef<HTMLInputElement>(null);
   const eventsUrlInputProps = useRegisterWithRef(eventsUrlInputRef, register, "eventsUrl", {
@@ -73,10 +84,12 @@ export function CreateEventSubscriptionDialog(
     },
   });
   const reactSelectProps = useReactSelectProps<OptionTypeBase, true>();
+
+  const templateOptions = data?.templates.items.map((t) => ({ label: t.name, value: t.id })) ?? [];
   const options = useMemo(() => eventTypes.map((event) => ({ label: event, value: event })), []);
   return (
     <ConfirmDialog
-      size="lg"
+      size="xl"
       closeOnEsc={false}
       closeOnOverlayClick={false}
       initialFocusRef={eventsUrlInputRef}
@@ -89,6 +102,7 @@ export function CreateEventSubscriptionDialog(
               name: data.name,
               eventsUrl: data.eventsUrl,
               eventTypes: data.eventsMode === "ALL" ? null : data.eventTypes.map((x) => x.value),
+              fromTemplateId: data.fromTemplate?.value ?? null,
             });
             clearErrors("eventsUrl");
             props.onResolve();
@@ -147,6 +161,35 @@ export function CreateEventSubscriptionDialog(
               ) : null}
             </FormErrorMessage>
           </FormControl>
+          <FormControl>
+            <FormLabel>
+              <FormattedMessage
+                id="component.create-event-subscription-dialog.from-template"
+                defaultMessage="From the template..."
+              />
+            </FormLabel>
+            <Controller
+              name="fromTemplate"
+              control={control}
+              rules={{
+                required: false,
+              }}
+              render={({ field: { onChange, value } }) => (
+                <Select
+                  {...reactSelectProps}
+                  value={value}
+                  onChange={onChange}
+                  options={templateOptions}
+                  isSearchable
+                  isClearable
+                  placeholder={intl.formatMessage({
+                    id: "generic.any-template",
+                    defaultMessage: "Any template",
+                  })}
+                />
+              )}
+            />
+          </FormControl>
           <Text fontSize="sm">
             <FormattedMessage
               id="component.create-event-subscription-dialog.challenge-explanation"
@@ -197,7 +240,10 @@ export function CreateEventSubscriptionDialog(
                 <Controller
                   name="eventTypes"
                   control={control}
-                  rules={{ required: eventsMode === "SPECIFIC", validate: (v) => v.length > 0 }}
+                  rules={{
+                    required: eventsMode === "SPECIFIC",
+                    validate: (v) => (eventsMode === "SPECIFIC" ? v.length > 0 : true),
+                  }}
                   render={({ field: { onChange, value } }) => (
                     <>
                       <Select
@@ -230,6 +276,20 @@ export function CreateEventSubscriptionDialog(
     />
   );
 }
+
+CreateEventSubscriptionDialog.queries = [
+  gql`
+    query CreateEventSubscriptionDialog_templates($offset: Int!, $limit: Int!) {
+      templates(offset: $offset, limit: $limit, isPublic: false) {
+        items {
+          id
+          name
+        }
+        totalCount
+      }
+    }
+  `,
+];
 
 export function useCreateEventSubscriptionDialog() {
   return useDialog(CreateEventSubscriptionDialog);

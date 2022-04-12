@@ -1,8 +1,8 @@
 import fetch from "node-fetch";
 import { WorkerContext } from "../../context";
 import { PetitionEvent } from "../../db/events";
-import { EventListener } from "../event-processor";
 import { mapEvent } from "../../util/eventMapper";
+import { EventListener } from "../event-processor";
 
 export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (
   event: PetitionEvent,
@@ -22,7 +22,11 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (
   const userSubscriptions = (await ctx.subscriptions.loadSubscriptionsByUserId(userIds))
     .flat()
     .filter((s) => {
-      return s.is_enabled && (s.event_types === null || s.event_types.includes(event.type));
+      return (
+        s.is_enabled &&
+        (s.event_types === null || s.event_types.includes(event.type)) &&
+        (s.from_template_id === null || s.from_template_id === petition.from_template_id)
+      );
     });
 
   if (userSubscriptions.length === 0) {

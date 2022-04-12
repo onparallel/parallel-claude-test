@@ -763,6 +763,7 @@ export interface MutationcreateContactArgs {
 export interface MutationcreateEventSubscriptionArgs {
   eventTypes?: InputMaybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"];
+  fromTemplateId?: InputMaybe<Scalars["GID"]>;
   name?: InputMaybe<Scalars["String"]>;
 }
 
@@ -1876,6 +1877,7 @@ export interface PetitionEventSubscription {
   __typename?: "PetitionEventSubscription";
   eventTypes?: Maybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"];
+  fromTemplate?: Maybe<PetitionTemplate>;
   id: Scalars["GID"];
   isEnabled: Scalars["Boolean"];
   name?: Maybe<Scalars["String"]>;
@@ -9998,6 +10000,19 @@ export type AccountLocaleChange_UserFragment = {
   preferredLocale?: string | null;
 };
 
+export type CreateEventSubscriptionDialog_templatesQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+}>;
+
+export type CreateEventSubscriptionDialog_templatesQuery = {
+  templates: {
+    __typename?: "PetitionTemplatePagination";
+    totalCount: number;
+    items: Array<{ __typename?: "PetitionTemplate"; id: string; name?: string | null }>;
+  };
+};
+
 export type GenerateNewTokenDialog_generateUserAuthTokenMutationVariables = Exact<{
   tokenName: Scalars["String"];
 }>;
@@ -17421,6 +17436,7 @@ export type Developers_PetitionEventSubscriptionFragment = {
   eventTypes?: Array<PetitionEventType> | null;
   isEnabled: boolean;
   name?: string | null;
+  fromTemplate?: { __typename?: "PetitionTemplate"; id: string; name?: string | null } | null;
 };
 
 export type Developers_revokeUserAuthTokenMutationVariables = Exact<{
@@ -17433,6 +17449,7 @@ export type Developers_createEventSubscriptionMutationVariables = Exact<{
   eventsUrl: Scalars["String"];
   eventTypes?: InputMaybe<Array<PetitionEventType> | PetitionEventType>;
   name?: InputMaybe<Scalars["String"]>;
+  fromTemplateId?: InputMaybe<Scalars["GID"]>;
 }>;
 
 export type Developers_createEventSubscriptionMutation = {
@@ -17443,6 +17460,7 @@ export type Developers_createEventSubscriptionMutation = {
     eventTypes?: Array<PetitionEventType> | null;
     isEnabled: boolean;
     name?: string | null;
+    fromTemplate?: { __typename?: "PetitionTemplate"; id: string; name?: string | null } | null;
   };
 };
 
@@ -17459,6 +17477,7 @@ export type Developers_updateEventSubscriptionMutation = {
     eventTypes?: Array<PetitionEventType> | null;
     isEnabled: boolean;
     name?: string | null;
+    fromTemplate?: { __typename?: "PetitionTemplate"; id: string; name?: string | null } | null;
   };
 };
 
@@ -17495,6 +17514,7 @@ export type Developers_subscriptionsQuery = {
     eventTypes?: Array<PetitionEventType> | null;
     isEnabled: boolean;
     name?: string | null;
+    fromTemplate?: { __typename?: "PetitionTemplate"; id: string; name?: string | null } | null;
   }>;
 };
 
@@ -22216,6 +22236,10 @@ export const Developers_PetitionEventSubscriptionFragmentDoc = gql`
     eventTypes
     isEnabled
     name
+    fromTemplate {
+      id
+      name
+    }
   }
 ` as unknown as DocumentNode<Developers_PetitionEventSubscriptionFragment, unknown>;
 export const RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc = gql`
@@ -23972,6 +23996,20 @@ export const RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteDo
   RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation,
   RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutationVariables
 >;
+export const CreateEventSubscriptionDialog_templatesDocument = gql`
+  query CreateEventSubscriptionDialog_templates($offset: Int!, $limit: Int!) {
+    templates(offset: $offset, limit: $limit, isPublic: false) {
+      items {
+        id
+        name
+      }
+      totalCount
+    }
+  }
+` as unknown as DocumentNode<
+  CreateEventSubscriptionDialog_templatesQuery,
+  CreateEventSubscriptionDialog_templatesQueryVariables
+>;
 export const GenerateNewTokenDialog_generateUserAuthTokenDocument = gql`
   mutation GenerateNewTokenDialog_generateUserAuthToken($tokenName: String!) {
     generateUserAuthToken(tokenName: $tokenName) {
@@ -25047,8 +25085,14 @@ export const Developers_createEventSubscriptionDocument = gql`
     $eventsUrl: String!
     $eventTypes: [PetitionEventType!]
     $name: String
+    $fromTemplateId: GID
   ) {
-    createEventSubscription(eventsUrl: $eventsUrl, eventTypes: $eventTypes, name: $name) {
+    createEventSubscription(
+      eventsUrl: $eventsUrl
+      eventTypes: $eventTypes
+      name: $name
+      fromTemplateId: $fromTemplateId
+    ) {
       ...Developers_PetitionEventSubscription
     }
   }

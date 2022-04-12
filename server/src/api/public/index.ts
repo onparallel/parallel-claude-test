@@ -2610,8 +2610,12 @@ api
         ${SubscriptionFragment}
       `;
       const result = await client.request(EventSubscriptions_getSubscriptionsDocument);
+      const subscriptions = result.subscriptions.map((s) => {
+        const { fromTemplate, ...subscription } = s;
+        return { ...subscription, fromTemplateId: fromTemplate?.id ?? null };
+      });
 
-      return Ok(result.subscriptions);
+      return Ok(subscriptions);
     }
   )
   .post(
@@ -2633,8 +2637,14 @@ api
             $eventsUrl: String!
             $eventTypes: [PetitionEventType!]
             $name: String
+            $fromTemplateId: GID
           ) {
-            createEventSubscription(eventsUrl: $eventsUrl, eventTypes: $eventTypes, name: $name) {
+            createEventSubscription(
+              eventsUrl: $eventsUrl
+              eventTypes: $eventTypes
+              name: $name
+              fromTemplateId: $fromTemplateId
+            ) {
               ...Subscription
             }
           }
@@ -2644,10 +2654,13 @@ api
           eventsUrl: body.eventsUrl,
           eventTypes: body.eventTypes,
           name: body.name,
+          fromTemplateId: body.fromTemplateId,
         });
 
         assert("id" in result.createEventSubscription);
-        return Created(result.createEventSubscription);
+        const { fromTemplate, ...subscription } = result.createEventSubscription;
+
+        return Created({ ...subscription, fromTemplateId: fromTemplate?.id ?? null });
       } catch (error) {
         if (error instanceof ClientError) {
           if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {

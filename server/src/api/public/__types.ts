@@ -732,6 +732,7 @@ export type MutationcreateContactArgs = {
 export type MutationcreateEventSubscriptionArgs = {
   eventTypes?: InputMaybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"];
+  fromTemplateId?: InputMaybe<Scalars["GID"]>;
   name?: InputMaybe<Scalars["String"]>;
 };
 
@@ -1822,6 +1823,7 @@ export type PetitionEventPagination = {
 export type PetitionEventSubscription = {
   eventTypes: Maybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"];
+  fromTemplate: Maybe<PetitionTemplate>;
   id: Scalars["GID"];
   isEnabled: Scalars["Boolean"];
   name: Maybe<Scalars["String"]>;
@@ -3539,6 +3541,7 @@ export type SubscriptionFragment = {
   eventsUrl: string;
   isEnabled: boolean;
   eventTypes: Array<PetitionEventType> | null;
+  fromTemplate: { id: string } | null;
 };
 
 export type TaskFragment = { id: string; progress: number | null; status: TaskStatus };
@@ -4539,6 +4542,7 @@ export type EventSubscriptions_getSubscriptionsQuery = {
     eventsUrl: string;
     isEnabled: boolean;
     eventTypes: Array<PetitionEventType> | null;
+    fromTemplate: { id: string } | null;
   }>;
 };
 
@@ -4546,6 +4550,7 @@ export type EventSubscriptions_createSubscriptionMutationVariables = Exact<{
   eventsUrl: Scalars["String"];
   eventTypes?: InputMaybe<Array<PetitionEventType> | PetitionEventType>;
   name?: InputMaybe<Scalars["String"]>;
+  fromTemplateId?: InputMaybe<Scalars["GID"]>;
 }>;
 
 export type EventSubscriptions_createSubscriptionMutation = {
@@ -4555,6 +4560,7 @@ export type EventSubscriptions_createSubscriptionMutation = {
     eventsUrl: string;
     isEnabled: boolean;
     eventTypes: Array<PetitionEventType> | null;
+    fromTemplate: { id: string } | null;
   };
 };
 
@@ -5241,6 +5247,9 @@ export const SubscriptionFragmentDoc = gql`
     eventsUrl
     isEnabled
     eventTypes
+    fromTemplate {
+      id
+    }
   }
 ` as unknown as DocumentNode<SubscriptionFragment, unknown>;
 export const TaskFragmentDoc = gql`
@@ -5820,8 +5829,14 @@ export const EventSubscriptions_createSubscriptionDocument = gql`
     $eventsUrl: String!
     $eventTypes: [PetitionEventType!]
     $name: String
+    $fromTemplateId: GID
   ) {
-    createEventSubscription(eventsUrl: $eventsUrl, eventTypes: $eventTypes, name: $name) {
+    createEventSubscription(
+      eventsUrl: $eventsUrl
+      eventTypes: $eventTypes
+      name: $name
+      fromTemplateId: $fromTemplateId
+    ) {
       ...Subscription
     }
   }

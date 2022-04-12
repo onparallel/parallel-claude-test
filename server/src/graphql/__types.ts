@@ -1221,6 +1221,7 @@ export interface NexusGenFieldTypes {
     // field return type
     eventTypes: NexusGenEnums["PetitionEventType"][] | null; // [PetitionEventType!]
     eventsUrl: string; // String!
+    fromTemplate: NexusGenRootTypes["PetitionTemplate"] | null; // PetitionTemplate
     id: NexusGenScalars["GID"]; // GID!
     isEnabled: boolean; // Boolean!
     name: string | null; // String
@@ -2639,6 +2640,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     eventTypes: "PetitionEventType";
     eventsUrl: "String";
+    fromTemplate: "PetitionTemplate";
     id: "GID";
     isEnabled: "Boolean";
     name: "String";
@@ -3575,6 +3577,7 @@ export interface NexusGenArgTypes {
       // args
       eventTypes?: NexusGenEnums["PetitionEventType"][] | null; // [PetitionEventType!]
       eventsUrl: string; // String!
+      fromTemplateId?: NexusGenScalars["GID"] | null; // GID
       name?: string | null; // String
     };
     createExportRepliesTask: {

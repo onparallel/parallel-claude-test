@@ -14,12 +14,11 @@ import {
 } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
-import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
+import { CopyToClipboardText } from "@parallel/components/common/CopyToClipboardText";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { NormalLink } from "@parallel/components/common/Link";
-import { OverflownText } from "@parallel/components/common/OverflownText";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableColumn } from "@parallel/components/common/Table";
@@ -407,33 +406,44 @@ function useSubscriptionsColumns(): TableColumn<
           defaultMessage: "Events URL",
         }),
         cellProps: {
-          width: "50%",
+          width: "30%",
           userSelect: "auto",
           fontSize: "sm",
           paddingY: 0,
-          sx: {
-            "&:hover .copy-to-clipboard": {
-              display: "inline-block",
-            },
-          },
         },
         CellContent: ({ row }) => {
           return (
             <Box position="relative" height="40px">
-              <OverflownText paddingY={2} fontSize="sm" position="absolute" maxWidth="100%">
+              <CopyToClipboardText
+                position="absolute"
+                fontSize="sm"
+                paddingY={2}
+                isTruncated
+                w="100%"
+                text={row.eventsUrl}
+              >
                 {row.eventsUrl}
-                <CopyToClipboardButton
-                  position="relative"
-                  top="-2px"
-                  marginLeft={2}
-                  marginRight={1}
-                  display="none"
-                  className="copy-to-clipboard"
-                  size="xs"
-                  text={row.eventsUrl}
-                />
-              </OverflownText>
+              </CopyToClipboardText>
             </Box>
+          );
+        },
+      },
+      {
+        key: "fromTemplate",
+        header: intl.formatMessage({
+          id: "settings.developers.subscriptions.header.from-template",
+          defaultMessage: "From template",
+        }),
+
+        CellContent: ({ row }) => {
+          return (
+            <Text fontSize="sm">
+              {row.fromTemplate?.name ??
+                intl.formatMessage({
+                  id: "generic.any-template",
+                  defaultMessage: "Any template",
+                })}
+            </Text>
           );
         },
       },
@@ -523,6 +533,10 @@ Developers.fragments = {
       eventTypes
       isEnabled
       name
+      fromTemplate {
+        id
+        name
+      }
     }
   `,
 };
@@ -538,8 +552,14 @@ Developers.mutations = [
       $eventsUrl: String!
       $eventTypes: [PetitionEventType!]
       $name: String
+      $fromTemplateId: GID
     ) {
-      createEventSubscription(eventsUrl: $eventsUrl, eventTypes: $eventTypes, name: $name) {
+      createEventSubscription(
+        eventsUrl: $eventsUrl
+        eventTypes: $eventTypes
+        name: $name
+        fromTemplateId: $fromTemplateId
+      ) {
         ...Developers_PetitionEventSubscription
       }
     }

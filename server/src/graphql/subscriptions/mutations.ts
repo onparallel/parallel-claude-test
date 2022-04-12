@@ -2,10 +2,11 @@ import { booleanArg, list, mutationField, nonNull, stringArg } from "nexus";
 import { RESULT } from "..";
 import { FetchService } from "../../services/fetch";
 import { withError } from "../../util/promises/withError";
-import { authenticate, authenticateAnd } from "../helpers/authorize";
+import { authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { validUrl } from "../helpers/validators/validUrl";
+import { petitionsAreOfTypeTemplate } from "../petition/authorizers";
 import { userHasAccessToEventSubscription } from "./authorizers";
 
 async function challengeWebhookUrl(url: string, fetch: FetchService) {
@@ -18,11 +19,14 @@ async function challengeWebhookUrl(url: string, fetch: FetchService) {
 export const createEventSubscription = mutationField("createEventSubscription", {
   description: "Creates an event subscription for the user's petitions",
   type: "PetitionEventSubscription",
-  authorize: authenticate(),
+  authorize: authenticateAnd(
+    ifArgDefined("fromTemplateId", petitionsAreOfTypeTemplate("fromTemplateId" as never))
+  ),
   args: {
     eventsUrl: nonNull("String"),
     eventTypes: list(nonNull("PetitionEventType")),
     name: stringArg(),
+    fromTemplateId: globalIdArg("Petition"),
   },
   validateArgs: validUrl((args) => args.eventsUrl, "eventsUrl"),
   resolve: async (_, args, ctx) => {
@@ -40,6 +44,7 @@ export const createEventSubscription = mutationField("createEventSubscription", 
         is_enabled: true,
         endpoint: args.eventsUrl,
         event_types: args.eventTypes,
+        from_template_id: args.fromTemplateId,
       },
       `User:${ctx.user!.id}`
     );

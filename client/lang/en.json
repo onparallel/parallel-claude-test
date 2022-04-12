@@ -645,6 +645,11 @@
     "context": "Your URL does not seem to accept POST requests."
   },
   {
+    "term": "component.create-event-subscription-dialog.from-template",
+    "definition": "From the template...",
+    "context": "From the template..."
+  },
+  {
     "term": "component.create-event-subscription-dialog.invalid-event-types",
     "definition": "Please, select at least one event type.",
     "context": "Please, select at least one event type."
@@ -4108,6 +4113,11 @@
     "term": "generic.all-event-types",
     "definition": "All events",
     "context": "All events"
+  },
+  {
+    "term": "generic.any-template",
+    "definition": "Any template",
+    "context": "Any template"
   },
   {
     "term": "generic.attached-file",
@@ -8963,6 +8973,11 @@
     "term": "settings.developers.subscriptions.header.events-url",
     "definition": "Events URL",
     "context": "Events URL"
+  },
+  {
+    "term": "settings.developers.subscriptions.header.from-template",
+    "definition": "From template",
+    "context": "From template"
   },
   {
     "term": "settings.developers.subscriptions.header.is-enabled",

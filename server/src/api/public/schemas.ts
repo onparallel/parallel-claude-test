@@ -1708,6 +1708,12 @@ const _Subscription = {
       example: ["PETITION_COMPLETED", "MESSAGE_SENT"],
       items: { type: "string", enum: petitionEventTypes },
     },
+    fromTemplateId: {
+      type: ["string", "null"],
+      description:
+        "Optional template ID. If specified it will only apply to petitions created from that template.",
+      example: "4exV9AsWJrjj7pVHq",
+    },
   },
 } as const;
 export const ListOfSubscriptions = ListOf(_Subscription);
@@ -1737,6 +1743,12 @@ export const CreateSubscription = schema({
         type: "string",
         enum: petitionEventTypes,
       },
+    },
+    fromTemplateId: {
+      type: ["string", "null"],
+      description:
+        "Optional template ID. If specified it will only apply to petitions created from that template.",
+      example: "4exV9AsWJrjj7pVHq",
     },
   },
 } as const);

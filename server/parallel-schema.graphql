@@ -579,6 +579,7 @@ type Mutation {
   createEventSubscription(
     eventTypes: [PetitionEventType!]
     eventsUrl: String!
+    fromTemplateId: GID
     name: String
   ): PetitionEventSubscription!
 
@@ -2296,6 +2297,7 @@ type PetitionEventPagination {
 type PetitionEventSubscription {
   eventTypes: [PetitionEventType!]
   eventsUrl: String!
+  fromTemplate: PetitionTemplate
   id: GID!
   isEnabled: Boolean!
   name: String

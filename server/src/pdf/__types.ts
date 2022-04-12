@@ -732,6 +732,7 @@ export type MutationcreateContactArgs = {
 export type MutationcreateEventSubscriptionArgs = {
   eventTypes?: InputMaybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"];
+  fromTemplateId?: InputMaybe<Scalars["GID"]>;
   name?: InputMaybe<Scalars["String"]>;
 };
 
@@ -1822,6 +1823,7 @@ export type PetitionEventPagination = {
 export type PetitionEventSubscription = {
   eventTypes: Maybe<Array<PetitionEventType>>;
   eventsUrl: Scalars["String"];
+  fromTemplate: Maybe<PetitionTemplate>;
   id: Scalars["GID"];
   isEnabled: Scalars["Boolean"];
   name: Maybe<Scalars["String"]>;
