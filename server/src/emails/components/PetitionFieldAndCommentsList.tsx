@@ -70,20 +70,22 @@ export function PetitionFieldAndComments({ fields }: PetitionFieldAndCommentsPro
           </MjmlSection>
           {groupCommentsByAuthor(comments).map((commentGroup, i) => (
             <MjmlSection key={i} padding="8px 50px">
-              {commentGroup.map(({ id, content, author }, commentNumber) => (
-                <MjmlSection key={id} padding="2px 0">
-                  <MjmlColumn backgroundColor="#F4F7F9" borderRadius="4px" padding="8px 16px">
-                    {commentNumber === 0 && (
-                      <MjmlText fontSize="12px" padding="0">
-                        <b>{author.name}</b>
+              <MjmlColumn>
+                {commentGroup.map(({ id, content, author }, commentNumber) => (
+                  <MjmlSection key={id} padding="1px 0">
+                    <MjmlColumn backgroundColor="#F4F7F9" borderRadius="4px" padding="8px 16px">
+                      {commentNumber === 0 && (
+                        <MjmlText fontSize="12px" padding="0">
+                          <b>{author.name}</b>
+                        </MjmlText>
+                      )}
+                      <MjmlText padding="0" lineHeight="24px">
+                        <BreakLines>{content}</BreakLines>
                       </MjmlText>
-                    )}
-                    <MjmlText padding="0" lineHeight="24px">
-                      <BreakLines>{content}</BreakLines>
-                    </MjmlText>
-                  </MjmlColumn>
-                </MjmlSection>
-              ))}
+                    </MjmlColumn>
+                  </MjmlSection>
+                ))}
+              </MjmlColumn>
             </MjmlSection>
           ))}
         </MjmlWrapper>
