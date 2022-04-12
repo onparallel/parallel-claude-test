@@ -48,7 +48,7 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
           "EAwW2jXkP4C9LjU2b3",
           "EAwW2jXkP4C9LjU2fS",
           "EAwW2jXkP4C9Lf4DDK",
-          "zas25KHxAByKWUZSNMJ",
+          "zas25KHxAByKWUZSNGc",
         ].includes(templateId)
         ? [
             {
