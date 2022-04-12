@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from "@react-pdf/renderer";
 import { Style } from "@react-pdf/types";
 import { gql } from "apollo-server-core";
 import { FormattedMessage, useIntl } from "react-intl";
-import { chunk, times } from "remeda";
+import { chunk, isDefined, times } from "remeda";
 import { FORMATS } from "../../util/dates";
 import { useTheme } from "../utils/ThemeProvider";
 import { SignaturesBlock_SignatureConfigFragment } from "../__types";
@@ -43,8 +43,13 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
   });
 
   const signers = [
-    ...(process.env.NODE_ENV === "production"
-      ? templateId === "EAwW2jXkP4C9LjU2b3" || templateId === "EAwW2jXkP4C9LjU2fS"
+    ...(process.env.NODE_ENV === "production" && isDefined(templateId)
+      ? [
+          "EAwW2jXkP4C9LjU2b3",
+          "EAwW2jXkP4C9LjU2fS",
+          "EAwW2jXkP4C9Lf4DDK",
+          "zas25KHxAByKWUZSNMJ",
+        ].includes(templateId)
         ? [
             {
               fullName: "Guillermo Preckler",
