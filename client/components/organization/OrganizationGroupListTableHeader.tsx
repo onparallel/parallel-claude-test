@@ -69,7 +69,7 @@ export function OrganizationGroupListTableHeader({
           leftIcon={<UserPlusIcon fontSize="18px" />}
           onClick={onAddMember}
         >
-          <FormattedMessage id="organization-groups.add-member" defaultMessage="Add member" />
+          <FormattedMessage id="organization-groups.add-user" defaultMessage="Add user" />
         </Button>
       </WhenOrgRole>
     </Stack>

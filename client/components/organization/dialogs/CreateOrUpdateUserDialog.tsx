@@ -240,13 +240,13 @@ function CreateOrUpdateUserDialog({
             <FormLabel>
               {isUpdate ? (
                 <FormattedMessage
-                  id="components.create-or-update-user-dialog.member-of"
-                  defaultMessage="Member of (optional)"
+                  id="components.create-or-update-user-dialog.included-in"
+                  defaultMessage="Included in (optional)"
                 />
               ) : (
                 <FormattedMessage
-                  id="organization-users.invite-user.add-as-member-in"
-                  defaultMessage="Add as a member of (optional)"
+                  id="organization-users.invite-user.add-in"
+                  defaultMessage="Add to (optional)"
                 />
               )}
             </FormLabel>

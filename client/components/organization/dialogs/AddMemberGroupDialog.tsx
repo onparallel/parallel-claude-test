@@ -54,7 +54,7 @@ export function AddMemberGroupDialog({
           <Text>
             <FormattedMessage
               id="component.add-member-group-dialog.title"
-              defaultMessage="Add members to the team"
+              defaultMessage="Add users to the team"
             />
           </Text>
         </Stack>

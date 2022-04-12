@@ -46,8 +46,8 @@
   },
   {
     "term": "component.add-member-group-dialog.title",
-    "definition": "Add members to the team",
-    "context": "Add members to the team"
+    "definition": "Add users to the team",
+    "context": "Add users to the team"
   },
   {
     "term": "component.add-petition-access-dialog.add-signers",
@@ -3655,14 +3655,14 @@
     "context": "Enter the signer's information"
   },
   {
+    "term": "components.create-or-update-user-dialog.included-in",
+    "definition": "Included in (optional)",
+    "context": "Included in (optional)"
+  },
+  {
     "term": "components.create-or-update-user-dialog.invite-user",
     "definition": "Invite user",
     "context": "Invite user"
-  },
-  {
-    "term": "components.create-or-update-user-dialog.member-of",
-    "definition": "Member of (optional)",
-    "context": "Member of (optional)"
   },
   {
     "term": "components.create-or-update-user-dialog.update-user",
@@ -4980,9 +4980,9 @@
     "context": "New petition"
   },
   {
-    "term": "organization-groups.add-member",
-    "definition": "Add member",
-    "context": "Add member"
+    "term": "organization-groups.add-user",
+    "definition": "Add user",
+    "context": "Add user"
   },
   {
     "term": "organization-groups.clone-group",
@@ -5070,9 +5070,9 @@
     "context": "Email"
   },
   {
-    "term": "organization-users.invite-user.add-as-member-in",
-    "definition": "Add as a member of (optional)",
-    "context": "Add as a member of (optional)"
+    "term": "organization-users.invite-user.add-in",
+    "definition": "Add to (optional)",
+    "context": "Add to (optional)"
   },
   {
     "term": "organization-users.login-as",
