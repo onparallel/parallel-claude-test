@@ -198,7 +198,7 @@ async function trackPetitionCompletedEvent(event: PetitionCompletedEvent, ctx: W
 
   const completedByEmail =
     "user_data_id" in completedBy
-      ? (await loadUserDataByUserId(completedBy.user_data_id, ctx)).email
+      ? (await loadUserDataByUserId(completedBy.id, ctx)).email
       : completedBy.email;
 
   const ownerData = (await ctx.users.loadUserData(owner.user_data_id))!;
