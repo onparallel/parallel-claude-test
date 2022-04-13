@@ -1711,7 +1711,7 @@ const _Subscription = {
     fromTemplateId: {
       type: ["string", "null"],
       description:
-        "Optional template ID. If specified it will only apply to petitions created from that template.",
+        "Optional template ID. If specified, only events originating in petitions created from this template will be sent.",
       example: "4exV9AsWJrjj7pVHq",
     },
   },
@@ -1747,7 +1747,7 @@ export const CreateSubscription = schema({
     fromTemplateId: {
       type: ["string", "null"],
       description:
-        "Optional template ID. If specified it will only apply to petitions created from that template.",
+        "Optional template ID. If specified, only events originating in petitions created from this template will be sent.",
       example: "4exV9AsWJrjj7pVHq",
     },
   },

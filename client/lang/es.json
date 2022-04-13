@@ -645,9 +645,14 @@
     "context": "Your URL does not seem to accept POST requests."
   },
   {
-    "term": "component.create-event-subscription-dialog.from-template",
-    "definition": "Desde la plantilla...",
-    "context": "From the template..."
+    "term": "component.create-event-subscription-dialog.from-template-label",
+    "definition": "Filtrar eventos provinientes de peticiones creadas a partir de una plantilla específica (Opcional).",
+    "context": "Filter events from petitions created from a specific template (Optional)."
+  },
+  {
+    "term": "component.create-event-subscription-dialog.from-template-placeholder",
+    "definition": "Buscar plantillas...",
+    "context": "Search for templates..."
   },
   {
     "term": "component.create-event-subscription-dialog.invalid-event-types",
@@ -4113,11 +4118,6 @@
     "term": "generic.all-event-types",
     "definition": "Todos los eventos",
     "context": "All events"
-  },
-  {
-    "term": "generic.any-template",
-    "definition": "Cualquier plantilla",
-    "context": "Any template"
   },
   {
     "term": "generic.attached-file",
@@ -8973,6 +8973,11 @@
     "term": "settings.developers.subscriptions.header.events-url",
     "definition": "URL de eventos",
     "context": "Events URL"
+  },
+  {
+    "term": "settings.developers.subscriptions.header.from-any-petition",
+    "definition": "Cualquier petición",
+    "context": "Any petition"
   },
   {
     "term": "settings.developers.subscriptions.header.from-template",

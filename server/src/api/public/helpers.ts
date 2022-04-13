@@ -27,6 +27,7 @@ import {
   PetitionFieldReplyFragment,
   PetitionFieldType,
   PetitionFragment,
+  SubscriptionFragment,
   TagFragmentDoc,
   TaskFragment as TaskType,
   TemplateFragment,
@@ -246,5 +247,12 @@ export function mapReplyResponse(
   return {
     ...omit(reply, ["field"]),
     content: reply.content.value ?? reply.content,
+  };
+}
+
+export function mapSubscription(subscription: SubscriptionFragment) {
+  return {
+    ...omit(subscription, ["fromTemplate"]),
+    fromTemplateId: subscription.fromTemplate?.id,
   };
 }

@@ -3,7 +3,7 @@ import { ClientError, gql, GraphQLClient } from "graphql-request";
 import multer from "multer";
 import { outdent } from "outdent";
 import pMap from "p-map";
-import { isDefined, pick } from "remeda";
+import { isDefined, omit, pick } from "remeda";
 import { callbackify } from "util";
 import { toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
@@ -41,6 +41,7 @@ import {
   mapPetition,
   mapPetitionField,
   mapReplyResponse,
+  mapSubscription,
   mapTemplate,
   paginationParams,
   sortByParam,
@@ -2610,12 +2611,7 @@ api
         ${SubscriptionFragment}
       `;
       const result = await client.request(EventSubscriptions_getSubscriptionsDocument);
-      const subscriptions = result.subscriptions.map((s) => {
-        const { fromTemplate, ...subscription } = s;
-        return { ...subscription, fromTemplateId: fromTemplate?.id ?? null };
-      });
-
-      return Ok(subscriptions);
+      return Ok(result.subscriptions.map(mapSubscription));
     }
   )
   .post(
@@ -2657,10 +2653,7 @@ api
           fromTemplateId: body.fromTemplateId,
         });
 
-        assert("id" in result.createEventSubscription);
-        const { fromTemplate, ...subscription } = result.createEventSubscription;
-
-        return Created({ ...subscription, fromTemplateId: fromTemplate?.id ?? null });
+        return Created(mapSubscription(result.createEventSubscription));
       } catch (error) {
         if (error instanceof ClientError) {
           if (containsGraphQLError(error, "ARG_VALIDATION_ERROR")) {

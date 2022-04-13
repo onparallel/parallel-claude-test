@@ -14,11 +14,13 @@ import {
 } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
+import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
 import { CopyToClipboardText } from "@parallel/components/common/CopyToClipboardText";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { NormalLink } from "@parallel/components/common/Link";
+import { Link, NormalLink } from "@parallel/components/common/Link";
+import { OverflownText } from "@parallel/components/common/OverflownText";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableColumn } from "@parallel/components/common/Table";
@@ -407,25 +409,11 @@ function useSubscriptionsColumns(): TableColumn<
         }),
         cellProps: {
           width: "30%",
-          userSelect: "auto",
+          maxWidth: 0,
           fontSize: "sm",
-          paddingY: 0,
         },
         CellContent: ({ row }) => {
-          return (
-            <Box position="relative" height="40px">
-              <CopyToClipboardText
-                position="absolute"
-                fontSize="sm"
-                paddingY={2}
-                isTruncated
-                w="100%"
-                text={row.eventsUrl}
-              >
-                {row.eventsUrl}
-              </CopyToClipboardText>
-            </Box>
-          );
+          return <OverflownText>{row.eventsUrl}</OverflownText>;
         },
       },
       {
@@ -434,21 +422,33 @@ function useSubscriptionsColumns(): TableColumn<
           id: "settings.developers.subscriptions.header.from-template",
           defaultMessage: "From template",
         }),
-
+        cellProps: {
+          fontSize: "sm",
+          maxWidth: 0,
+        },
         CellContent: ({ row }) => {
           return (
-            <Text fontSize="sm" color={row.fromTemplate ? undefined : "gray.500"}>
-              {row.fromTemplate
-                ? row.fromTemplate.name ??
-                  intl.formatMessage({
-                    id: "generic.unnamed-template",
-                    defaultMessage: "Unnamed template",
-                  })
-                : intl.formatMessage({
-                    id: "generic.any-template",
-                    defaultMessage: "Any template",
-                  })}
-            </Text>
+            <OverflownText>
+              {row.fromTemplate ? (
+                <Link href={`/app/petitions/${row.fromTemplate.id}`}>
+                  {row.fromTemplate.name ?? (
+                    <Text as="span" fontStyle="italic">
+                      <FormattedMessage
+                        id="generic.unnamed-template"
+                        defaultMessage="Unnamed template"
+                      />
+                    </Text>
+                  )}
+                </Link>
+              ) : (
+                <Text textStyle="hint">
+                  <FormattedMessage
+                    id="settings.developers.subscriptions.header.from-any-petition"
+                    defaultMessage="Any petition"
+                  />
+                </Text>
+              )}
+            </OverflownText>
           );
         },
       },
