@@ -10000,16 +10000,21 @@ export type AccountLocaleChange_UserFragment = {
   preferredLocale?: string | null;
 };
 
-export type CreateEventSubscriptionDialog_templatesQueryVariables = Exact<{
+export type CreateEventSubscriptionDialog_petitionsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
+  search?: InputMaybe<Scalars["String"]>;
+  sortBy?: InputMaybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
+  filters?: InputMaybe<PetitionFilter>;
 }>;
 
-export type CreateEventSubscriptionDialog_templatesQuery = {
-  templates: {
-    __typename?: "PetitionTemplatePagination";
-    totalCount: number;
-    items: Array<{ __typename?: "PetitionTemplate"; id: string; name?: string | null }>;
+export type CreateEventSubscriptionDialog_petitionsQuery = {
+  petitions: {
+    __typename?: "PetitionBasePagination";
+    items: Array<
+      | { __typename?: "Petition"; id: string; name?: string | null }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null }
+    >;
   };
 };
 
@@ -23996,19 +24001,24 @@ export const RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteDo
   RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation,
   RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutationVariables
 >;
-export const CreateEventSubscriptionDialog_templatesDocument = gql`
-  query CreateEventSubscriptionDialog_templates($offset: Int!, $limit: Int!) {
-    templates(offset: $offset, limit: $limit, isPublic: false) {
+export const CreateEventSubscriptionDialog_petitionsDocument = gql`
+  query CreateEventSubscriptionDialog_petitions(
+    $offset: Int!
+    $limit: Int!
+    $search: String
+    $sortBy: [QueryPetitions_OrderBy!]
+    $filters: PetitionFilter
+  ) {
+    petitions(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy, filters: $filters) {
       items {
         id
         name
       }
-      totalCount
     }
   }
 ` as unknown as DocumentNode<
-  CreateEventSubscriptionDialog_templatesQuery,
-  CreateEventSubscriptionDialog_templatesQueryVariables
+  CreateEventSubscriptionDialog_petitionsQuery,
+  CreateEventSubscriptionDialog_petitionsQueryVariables
 >;
 export const GenerateNewTokenDialog_generateUserAuthTokenDocument = gql`
   mutation GenerateNewTokenDialog_generateUserAuthToken($tokenName: String!) {

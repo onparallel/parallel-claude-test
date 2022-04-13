@@ -1,4 +1,4 @@
-import { ApolloError, gql, useQuery } from "@apollo/client";
+import { ApolloError, gql, useApolloClient, useQuery } from "@apollo/client";
 import {
   Button,
   Collapse,
@@ -15,16 +15,17 @@ import {
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
-  CreateEventSubscriptionDialog_templatesDocument,
+  CreateEventSubscriptionDialog_petitionsDocument,
   PetitionEventType,
 } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { Maybe, MaybePromise } from "@parallel/utils/types";
-import { useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import Select, { components, OptionTypeBase } from "react-select";
+import Select from "react-select/async";
+import { components, OptionTypeBase } from "react-select";
 
 interface CreateEventSubscriptionDialogProps {
   onCreate: (props: {
@@ -66,10 +67,22 @@ export function CreateEventSubscriptionDialog(
   });
   const eventsMode = watch("eventsMode");
 
-  const { data } = useQuery(CreateEventSubscriptionDialog_templatesDocument, {
-    variables: { offset: 0, limit: 999 },
-    fetchPolicy: "cache-and-network",
-  });
+  const apollo = useApolloClient();
+  const loadTemplates = useCallback(async (search) => {
+    const result = await apollo.query({
+      query: CreateEventSubscriptionDialog_petitionsDocument,
+      variables: {
+        offset: 0,
+        limit: 100,
+        filters: {
+          type: "TEMPLATE",
+        },
+        search,
+        sortBy: "lastUsedAt_DESC",
+      },
+    });
+    return result.data.petitions.items;
+  }, []);
 
   const eventsUrlInputRef = useRef<HTMLInputElement>(null);
   const eventsUrlInputProps = useRegisterWithRef(eventsUrlInputRef, register, "eventsUrl", {
@@ -83,16 +96,9 @@ export function CreateEventSubscriptionDialog(
       }
     },
   });
-  const reactSelectProps = useReactSelectProps<OptionTypeBase, true>();
-  const components = useMemo(
-    () => ({
-      ...reactSelectProps.components,
-      Option,
-    }),
-    [reactSelectProps.components]
-  );
+  const components = useMemo(() => ({ Option, SingleValue }), []);
+  const reactSelectProps = useReactSelectProps<OptionTypeBase, true>({ components });
 
-  const templateOptions = data?.templates.items;
   const options = useMemo(() => eventTypes.map((event) => ({ label: event, value: event })), []);
   return (
     <ConfirmDialog
@@ -168,11 +174,11 @@ export function CreateEventSubscriptionDialog(
               ) : null}
             </FormErrorMessage>
           </FormControl>
-          <FormControl>
+          <FormControl id="from-template-id">
             <FormLabel>
               <FormattedMessage
-                id="component.create-event-subscription-dialog.from-template"
-                defaultMessage="From the template..."
+                id="component.create-event-subscription-dialog.from-template-label"
+                defaultMessage="Filter events from petitions created from a specific template (Optional)."
               />
             </FormLabel>
             <Controller
@@ -185,22 +191,18 @@ export function CreateEventSubscriptionDialog(
                 <Select
                   {...reactSelectProps}
                   value={value}
+                  inputId="from-template-id"
                   onChange={onChange}
-                  options={templateOptions}
+                  defaultOptions
+                  loadOptions={loadTemplates}
                   isSearchable
                   isClearable
                   placeholder={intl.formatMessage({
-                    id: "generic.any-template",
-                    defaultMessage: "Any template",
+                    id: "component.create-event-subscription-dialog.from-template-placeholder",
+                    defaultMessage: "Search for templates...",
                   })}
                   getOptionValue={(o) => o.id}
-                  getOptionLabel={(o) =>
-                    o.name ??
-                    intl.formatMessage({
-                      id: "generic.unnamed-template",
-                      defaultMessage: "Unnamed template",
-                    })
-                  }
+                  getOptionLabel={(o) => o.name}
                   components={components}
                 />
               )}
@@ -296,24 +298,47 @@ export function CreateEventSubscriptionDialog(
 const Option: typeof components.Option = function Option(props) {
   return (
     <components.Option {...props}>
-      <Text fontStyle={props.data.name ? undefined : "italic"} opacity={props.data.name ? 1 : 0.7}>
-        {props.data.name ?? (
+      {props.data.name ?? (
+        <Text as="span" textStyle="hint">
           <FormattedMessage id="generic.unnamed-template" defaultMessage="Unnamed template" />
-        )}
-      </Text>
+        </Text>
+      )}
     </components.Option>
+  );
+};
+
+const SingleValue: typeof components.SingleValue = function SingleValue(props) {
+  return (
+    <components.SingleValue {...props}>
+      {props.data.name ?? (
+        <Text as="span" textStyle="hint">
+          <FormattedMessage id="generic.unnamed-template" defaultMessage="Unnamed template" />
+        </Text>
+      )}
+    </components.SingleValue>
   );
 };
 
 CreateEventSubscriptionDialog.queries = [
   gql`
-    query CreateEventSubscriptionDialog_templates($offset: Int!, $limit: Int!) {
-      templates(offset: $offset, limit: $limit, isPublic: false) {
+    query CreateEventSubscriptionDialog_petitions(
+      $offset: Int!
+      $limit: Int!
+      $search: String
+      $sortBy: [QueryPetitions_OrderBy!]
+      $filters: PetitionFilter
+    ) {
+      petitions(
+        offset: $offset
+        limit: $limit
+        search: $search
+        sortBy: $sortBy
+        filters: $filters
+      ) {
         items {
           id
           name
         }
-        totalCount
       }
     }
   `,
