@@ -180,7 +180,7 @@ export default function PetitionExport({
                               ...(field.description ? [{ marginBottom: "2mm" }] : []),
                             ]}
                           >
-                            {field.title}
+                            {cleanup(field.title)}
                           </Text>
                         ) : null}
                         {field.description ? (
@@ -191,7 +191,11 @@ export default function PetitionExport({
                       </View>
                     ) : (
                       <View key={i} style={styles.field} wrap={false}>
-                        <Text style={[styles.text, styles.fieldTitle]}>{field.title}</Text>
+                        {field.title ? (
+                          <Text style={[styles.text, styles.fieldTitle]}>
+                            {cleanup(field.title)}
+                          </Text>
+                        ) : null}
                         {field.description ? (
                           <Text
                             style={[styles.text, styles.fieldDescription, { marginTop: "2mm" }]}
@@ -310,9 +314,12 @@ export default function PetitionExport({
 }
 
 function FieldDescription({ description }: { description: string }) {
-  let text = useLiquid(description);
-  text = text.replace(/\t/g, " ".repeat(4));
-  return <Text>{text}</Text>;
+  const text = useLiquid(description);
+  return <Text>{cleanup(text)}</Text>;
+}
+
+function cleanup(text: string) {
+  return text.replace(/\t/g, " ".repeat(4));
 }
 
 function groupFieldsByPages<T extends PetitionExport_PetitionFieldFragment>(
