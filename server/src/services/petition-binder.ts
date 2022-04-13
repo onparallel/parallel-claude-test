@@ -139,7 +139,7 @@ export class PetitionBinder implements IPetitionBinder {
       mergedFilePath = await this.mergeFiles(
         paths,
         // don't use temporaryDirectory here, as we dont want to delete the final result after the binder completed
-        resolve(tmpdir(), opts?.outputFileName ?? `${random(10)}.pdf`),
+        resolve(tmpdir(), opts?.outputFileName ?? random(10)),
         DPIValues[iteration]
       );
       mergedFileSize = (await stat(mergedFilePath)).size;
@@ -184,10 +184,10 @@ export class PetitionBinder implements IPetitionBinder {
       `-dColorImageResolution=${dpi}`,
       `-dGrayImageResolution=${dpi}`,
       `-dMonoImageResolution=${dpi}`,
-      `-sOutputFile=${output}`,
+      `-sOutputFile=${output}.pdf`,
       ...paths,
     ]);
-    return output;
+    return `${output}.pdf`;
   }
 
   private async convertImage(fileS3Path: string, contentType: string) {
