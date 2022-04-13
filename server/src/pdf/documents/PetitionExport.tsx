@@ -288,7 +288,8 @@ export default function PetitionExport({
                     )}
                   </View>
                 ))}
-                {showSignatureBoxes &&
+                {i === pages.length - 1 &&
+                showSignatureBoxes &&
                 petition.__typename === "Petition" &&
                 isDefined(petition.currentSignatureRequest) ? (
                   <SignaturesBlock
