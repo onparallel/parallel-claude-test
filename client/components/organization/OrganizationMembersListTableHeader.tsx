@@ -56,7 +56,11 @@ export function OrganizationMembersListTableHeader({
               <MenuList minWidth="160px">
                 <MenuItem
                   icon={<LogInIcon display="block" boxSize={4} />}
-                  isDisabled={selectedUsers.length !== 1 || selectedUsers[0].id === myId}
+                  isDisabled={
+                    selectedUsers.length !== 1 ||
+                    selectedUsers[0].id === myId ||
+                    selectedUsers[0].status === "INACTIVE"
+                  }
                   onClick={onLoginAs}
                 >
                   <FormattedMessage id="organization-users.login-as" defaultMessage="Login as..." />
