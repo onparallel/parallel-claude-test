@@ -197,7 +197,7 @@ export const Organization = objectType({
           marginLeft: 10,
           marginRight: 10,
           marginTop: 10,
-          marginBottom: 10,
+          marginBottom: 15,
           title1FontFamily: "IBM Plex Sans",
           title1Color: "#000000",
           title1FontSize: 16,
