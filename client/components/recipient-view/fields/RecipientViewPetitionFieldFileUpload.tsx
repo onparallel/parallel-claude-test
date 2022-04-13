@@ -66,6 +66,8 @@ export function RecipientViewPetitionFieldFileUpload({
     [onDeleteReply]
   );
 
+  console.log("replies: ", JSON.stringify(field.replies));
+
   return (
     <RecipientViewPetitionFieldCard
       field={field}
@@ -114,8 +116,8 @@ export function RecipientViewPetitionFieldFileUpload({
 interface RecipientViewPetitionFieldReplyFileUploadProps {
   reply: RecipientViewPetitionFieldCard_PetitionFieldReplySelection;
   isDisabled: boolean;
-  onRemove: () => void;
-  onDownload: (replyId: string) => void;
+  onRemove?: () => void;
+  onDownload?: (replyId: string) => void;
   isDownloadDisabled?: boolean;
 }
 
@@ -175,7 +177,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
         ) : (
           <Text fontSize="xs">
             {uploadHasFailed ? (
-              <Text color="red.500">
+              <Text color="red.600">
                 <FormattedMessage
                   id="component.recipient-view-petition-field-reply.file-incomplete"
                   defaultMessage="This file was not uploaded correctly. Please, delete it and try again."
@@ -210,30 +212,34 @@ export function RecipientViewPetitionFieldReplyFileUpload({
           )}
         </Center>
       ) : null}
-      <IconButtonWithTooltip
-        isDisabled={reply.content!.uploadComplete === false || isDownloadDisabled}
-        onClick={() => onDownload(reply.id)}
-        variant="ghost"
-        icon={<DownloadIcon />}
-        size="md"
-        placement="bottom"
-        label={intl.formatMessage({
-          id: "component.recipient-view-petition-field-reply.download-label",
-          defaultMessage: "Download file",
-        })}
-      />
-      <IconButtonWithTooltip
-        isDisabled={isDisabled || reply.status === "APPROVED"}
-        onClick={onRemove}
-        variant="ghost"
-        icon={<DeleteIcon />}
-        size="md"
-        placement="bottom"
-        label={intl.formatMessage({
-          id: "component.recipient-view-petition-field-reply.remove-reply-label",
-          defaultMessage: "Remove reply",
-        })}
-      />
+      {onDownload !== undefined ? (
+        <IconButtonWithTooltip
+          isDisabled={reply.content!.uploadComplete === false || isDownloadDisabled}
+          onClick={() => onDownload(reply.id)}
+          variant="ghost"
+          icon={<DownloadIcon />}
+          size="md"
+          placement="bottom"
+          label={intl.formatMessage({
+            id: "component.recipient-view-petition-field-reply.download-label",
+            defaultMessage: "Download file",
+          })}
+        />
+      ) : null}
+      {onRemove !== undefined ? (
+        <IconButtonWithTooltip
+          isDisabled={isDisabled || reply.status === "APPROVED"}
+          onClick={onRemove}
+          variant="ghost"
+          icon={<DeleteIcon />}
+          size="md"
+          placement="bottom"
+          label={intl.formatMessage({
+            id: "component.recipient-view-petition-field-reply.remove-reply-label",
+            defaultMessage: "Remove reply",
+          })}
+        />
+      ) : null}
     </Stack>
   );
 }
@@ -345,7 +351,7 @@ function PetitionFieldFileUploadDropzone({
         )}
       </Dropzone>
       {fileDropError === "file-too-large" ? (
-        <Text color="red.500" fontSize="sm">
+        <Text color="red.600" fontSize="sm">
           <FormattedMessage
             id="dropzone.error.file-too-large"
             defaultMessage="The file is too large. Maximum size allowed {size}"

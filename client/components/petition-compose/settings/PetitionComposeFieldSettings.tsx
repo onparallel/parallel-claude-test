@@ -252,6 +252,8 @@ export function PetitionComposeFieldSettings({
           <NumberSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
         ) : field.type === "PHONE" ? (
           <PhoneSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
+        ) : field.type === "TAX_DOCUMENTS" ? (
+          <FileUploadSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
         ) : null}
       </Stack>
       {field.type !== "HEADING" ? (

@@ -2734,6 +2734,11 @@ enum PetitionFieldType {
   SHORT_TEXT
 
   """
+  A tax documents/info field.
+  """
+  TAX_DOCUMENTS
+
+  """
   A text field.
   """
   TEXT

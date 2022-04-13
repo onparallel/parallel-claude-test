@@ -2135,6 +2135,8 @@ export type PetitionFieldType =
   | "SELECT"
   /** A short text field. */
   | "SHORT_TEXT"
+  /** A tax documents/info field. */
+  | "TAX_DOCUMENTS"
   /** A text field. */
   | "TEXT";
 

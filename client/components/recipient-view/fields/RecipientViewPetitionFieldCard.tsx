@@ -119,13 +119,31 @@ export function RecipientViewPetitionFieldCard({
       ) : null}
 
       {field.type !== "CHECKBOX" && field.type !== "NUMBER" ? (
-        <Text fontSize="sm" color="gray.500">
+        <Text fontSize="sm" color="gray.600">
           {field.type === "FILE_UPLOAD" ? (
             <FormattedMessage
               id="component.recipient-view-petition-field-card.files-uploaded"
               defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
               values={{ count: fieldReplies.length }}
             />
+          ) : field.type === "TAX_DOCUMENTS" ? (
+            <>
+              <FormattedMessage
+                id="component.recipient-view-petition-field-tax-documents.follow-steps-description"
+                defaultMessage="Follow the steps to upload the documentation you need."
+              />
+              {fieldReplies.length ? (
+                <>
+                  {" ("}
+                  <FormattedMessage
+                    id="component.recipient-view-petition-field-card.files-uploaded"
+                    defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
+                    values={{ count: fieldReplies.length }}
+                  />
+                  {")"}
+                </>
+              ) : null}
+            </>
           ) : fieldReplies.length ? (
             <FormattedMessage
               id="component.recipient-view-petition-field-card.replies-submitted"

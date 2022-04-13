@@ -116,6 +116,11 @@ export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
           id: "petition.field-type.date",
           defaultMessage: "Date",
         });
+      case "TAX_DOCUMENTS":
+        return intl.formatMessage({
+          id: "petition.field-type.tax-documents",
+          defaultMessage: "Tax documents",
+        });
       default:
         throw new Error(`Missing PetitionFieldType "${type}"`);
     }
@@ -136,6 +141,7 @@ export function usePetitionFieldTypeColor(type: PetitionFieldType) {
       NUMBER: theme.colors.orange[500],
       PHONE: theme.colors.orange[400],
       DATE: theme.colors.orange[300],
+      TAX_DOCUMENTS: theme.colors.teal[500],
     } as Record<PetitionFieldType, string>
   )[type];
 }

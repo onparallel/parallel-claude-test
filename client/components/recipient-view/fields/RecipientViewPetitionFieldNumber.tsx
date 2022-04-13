@@ -208,7 +208,7 @@ export function RecipientViewPetitionFieldNumber({
         <Text
           fontSize="sm"
           marginRight={2}
-          color={Object.keys(isInvalidReply).length ? "red.500" : "gray.500"}
+          color={Object.keys(isInvalidReply).length ? "red.600" : "gray.600"}
         >
           {hasRange ? (
             <>

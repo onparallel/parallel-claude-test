@@ -1252,6 +1252,26 @@ export const FieldFileUploadIcon = createIcon({
   ),
 });
 
+export const FieldTaxDocumentsIcon = createIcon({
+  displayName: "FieldTaxDocumentsIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m20.5 11.3v-4.25999c0-4.03-.94-5.04001-4.72-5.04001h-7.56c-3.78 0-4.72 1.01001-4.72 5.04001v11.25999c0 2.66 1.46001 3.29 3.23001 1.39l.00998-.01c.82-.87 2.07-.8 2.78.15l1.01001 1.35" />
+      <path d="m8 7h8" />
+      <path d="m9 11h6" />
+      <path d="m17.3999 20.3999v-6" />
+      <path d="m14.3999 17.3999 3-3 3 3" />
+    </g>
+  ),
+});
+
 export const UploadIcon = createIcon({
   displayName: "UploadIcon",
   viewBox: "0 0 24 24",

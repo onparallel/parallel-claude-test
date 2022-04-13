@@ -121,10 +121,10 @@ export function RecipientViewPetitionFieldCheckbox({
       onDownloadAttachment={onDownloadAttachment}
     >
       <Stack>
-        <HStack wrap="wrap" color="gray.500" fontSize="sm" gridGap={2} spacing={0}>
+        <HStack wrap="wrap" color="gray.600" fontSize="sm" gridGap={2} spacing={0}>
           <CheckboxTypeLabel as="span" options={field.options} />
           {!isSaving && checkedItems?.length ? (
-            <Box as="span" color={isInvalid ? "red.600" : "gray.500"}>
+            <Box as="span" color={isInvalid ? "red.600" : "gray.600"}>
               {showRadio ? null : "("}
               {type === "RADIO" || (max === 1 && type !== "UNLIMITED") ? (
                 <FormattedMessage

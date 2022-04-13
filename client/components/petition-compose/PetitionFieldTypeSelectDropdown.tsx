@@ -58,6 +58,7 @@ export const FIELD_TYPES: PetitionFieldType[] = [
   "PHONE",
   "NUMBER",
   "DYNAMIC_SELECT",
+  "TAX_DOCUMENTS",
 ];
 
 interface PetitionFieldTypeLabelProps {
@@ -301,6 +302,11 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
               <FormattedMessage
                 id="component.petition-field-type-select-dropdown.phone"
                 defaultMessage="This field ensures that a telephone number is entered."
+              />
+            ) : activeType === "TAX_DOCUMENTS" ? (
+              <FormattedMessage
+                id="component.petition-field-type-select-dropdown.tax-documents-description"
+                defaultMessage="Easily access and upload documents from the Spanish Tax Agency."
               />
             ) : null}
           </Box>

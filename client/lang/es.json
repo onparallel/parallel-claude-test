@@ -1600,6 +1600,11 @@
     "context": "Allow the recipient to reply briefly.<i>E.g., name, ID number...</i>"
   },
   {
+    "term": "component.petition-field-type-select-dropdown.tax-documents-description",
+    "definition": "Permite acceder y subir rápidamente documentos de la Agencia Tributaria (AEAT)",
+    "context": "Easily access and upload documents from the Spanish Tax Agency."
+  },
+  {
     "term": "component.petition-field-type-select-dropdown.text-description",
     "definition": "Permiten al destinatario escribir todo lo que necesite.<i>Ej: Descripciones, comentarios...</i>",
     "context": "Allow the recipient to write down everything they need.<i>E.g., descriptions, observations...</i>"
@@ -2908,6 +2913,31 @@
     "term": "component.recipient-view-petition-field-short-text.format-error",
     "definition": "Por favor, introduzca un {format} válido.",
     "context": "Please, enter a valid {format}."
+  },
+  {
+    "term": "component.recipient-view-petition-field-tax-documents.error-uploading",
+    "definition": "No hemos encontrado ningún archivo. Por favor, inténtalo de nuevo.",
+    "context": "We have not found any files. Please try again."
+  },
+  {
+    "term": "component.recipient-view-petition-field-tax-documents.follow-steps-description",
+    "definition": "Sigue los pasos para subir la documentación que necesitas.",
+    "context": "Follow the steps to upload the documentation you need."
+  },
+  {
+    "term": "component.recipient-view-petition-field-tax-documents.loading-documentation",
+    "definition": "Por favor, espera mientras cargamos la documentación...",
+    "context": "Please, wait while we upload the documentation..."
+  },
+  {
+    "term": "component.recipient-view-petition-field-tax-documents.start-again-button",
+    "definition": "",
+    "context": "Start again"
+  },
+  {
+    "term": "component.recipient-view-petition-field-tax-documents.start-button",
+    "definition": "Empezar",
+    "context": "Start"
   },
   {
     "term": "component.recipient-view.confirm-petition-signers-dialog.add-signer.button",
@@ -6148,6 +6178,11 @@
     "term": "petition.field-type.short-text",
     "definition": "Respuestas cortas",
     "context": "Short replies"
+  },
+  {
+    "term": "petition.field-type.tax-documents",
+    "definition": "Documentos fiscales",
+    "context": "Tax documents"
   },
   {
     "term": "petition.field-type.text",

@@ -33,6 +33,7 @@ import { RecipientViewPetitionFieldNumber } from "./RecipientViewPetitionFieldNu
 import { RecipientViewPetitionFieldPhone } from "./RecipientViewPetitionFieldPhone";
 import { RecipientViewPetitionFieldSelect } from "./RecipientViewPetitionFieldSelect";
 import { RecipientViewPetitionFieldShortText } from "./RecipientViewPetitionFieldShortText";
+import { RecipientViewPetitionFieldTaxDocuments } from "./RecipientViewPetitionFieldTaxDocuments";
 import { RecipientViewPetitionFieldText } from "./RecipientViewPetitionFieldText";
 
 export interface RecipientViewPetitionFieldProps
@@ -226,6 +227,13 @@ export function RecipientViewPetitionField({ tone, ...props }: RecipientViewPeti
     <RecipientViewPetitionFieldDate {...props} {...commonProps} />
   ) : props.field.type === "PHONE" ? (
     <RecipientViewPetitionFieldPhone {...props} {...commonProps} />
+  ) : props.field.type === "TAX_DOCUMENTS" ? (
+    <RecipientViewPetitionFieldTaxDocuments
+      {...props}
+      {...commonProps}
+      onCreateReply={handleCreateFileUploadReply}
+      onDownloadReply={handleDownloadFileUploadReply}
+    />
   ) : null;
 }
 

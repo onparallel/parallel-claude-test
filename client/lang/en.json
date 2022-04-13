@@ -1600,6 +1600,11 @@
     "context": "Allow the recipient to reply briefly.<i>E.g., name, ID number...</i>"
   },
   {
+    "term": "component.petition-field-type-select-dropdown.tax-documents-description",
+    "definition": "Easily access and upload documents from the Spanish Tax Agency.",
+    "context": "Easily access and upload documents from the Spanish Tax Agency."
+  },
+  {
     "term": "component.petition-field-type-select-dropdown.text-description",
     "definition": "Allow the recipient to write down everything they need.<i>E.g., descriptions, observations...</i>",
     "context": "Allow the recipient to write down everything they need.<i>E.g., descriptions, observations...</i>"
@@ -2908,6 +2913,31 @@
     "term": "component.recipient-view-petition-field-short-text.format-error",
     "definition": "Please, enter a valid {format}.",
     "context": "Please, enter a valid {format}."
+  },
+  {
+    "term": "component.recipient-view-petition-field-tax-documents.error-uploading",
+    "definition": "We have not found any files. Please try again.",
+    "context": "We have not found any files. Please try again."
+  },
+  {
+    "term": "component.recipient-view-petition-field-tax-documents.follow-steps-description",
+    "definition": "Follow the steps to upload the documentation you need.",
+    "context": "Follow the steps to upload the documentation you need."
+  },
+  {
+    "term": "component.recipient-view-petition-field-tax-documents.loading-documentation",
+    "definition": "Please, wait while we upload the documentation...",
+    "context": "Please, wait while we upload the documentation..."
+  },
+  {
+    "term": "component.recipient-view-petition-field-tax-documents.start-again-button",
+    "definition": "Start again",
+    "context": "Start again"
+  },
+  {
+    "term": "component.recipient-view-petition-field-tax-documents.start-button",
+    "definition": "Start",
+    "context": "Start"
   },
   {
     "term": "component.recipient-view.confirm-petition-signers-dialog.add-signer.button",
@@ -6148,6 +6178,11 @@
     "term": "petition.field-type.short-text",
     "definition": "Short replies",
     "context": "Short replies"
+  },
+  {
+    "term": "petition.field-type.tax-documents",
+    "definition": "Tax documents",
+    "context": "Tax documents"
   },
   {
     "term": "petition.field-type.text",

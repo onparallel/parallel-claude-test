@@ -24,6 +24,7 @@ import { RecipientViewPetitionFieldNumber } from "../recipient-view/fields/Recip
 import { RecipientViewPetitionFieldPhone } from "../recipient-view/fields/RecipientViewPetitionFieldPhone";
 import { RecipientViewPetitionFieldSelect } from "../recipient-view/fields/RecipientViewPetitionFieldSelect";
 import { RecipientViewPetitionFieldShortText } from "../recipient-view/fields/RecipientViewPetitionFieldShortText";
+import { RecipientViewPetitionFieldTaxDocuments } from "../recipient-view/fields/RecipientViewPetitionFieldTaxDocuments";
 import { RecipientViewPetitionFieldText } from "../recipient-view/fields/RecipientViewPetitionFieldText";
 import {
   useCreateFileUploadReply,
@@ -223,6 +224,14 @@ export function PreviewPetitionField({
     <RecipientViewPetitionFieldDate {...props} {...commonProps} />
   ) : field.type === "PHONE" ? (
     <RecipientViewPetitionFieldPhone {...props} {...commonProps} />
+  ) : field.type === "TAX_DOCUMENTS" ? (
+    <RecipientViewPetitionFieldTaxDocuments
+      {...props}
+      {...commonProps}
+      onCreateReply={handleCreateFileUploadReply}
+      onDownloadReply={handleDownloadFileUploadReply}
+      isCacheOnly={isCacheOnly}
+    />
   ) : null;
 }
 

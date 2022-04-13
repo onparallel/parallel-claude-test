@@ -162,7 +162,8 @@ export type PetitionFieldType =
   | "CHECKBOX"
   | "NUMBER"
   | "PHONE"
-  | "DATE";
+  | "DATE"
+  | "TAX_DOCUMENTS";
 
 export const PetitionFieldTypeValues = [
   "TEXT",
@@ -175,6 +176,7 @@ export const PetitionFieldTypeValues = [
   "NUMBER",
   "PHONE",
   "DATE",
+  "TAX_DOCUMENTS",
 ] as PetitionFieldType[];
 
 export type PetitionMessageStatus = "SCHEDULED" | "CANCELLED" | "PROCESSING" | "PROCESSED";

@@ -10,6 +10,7 @@ import {
   FieldNumberIcon,
   FieldDateIcon,
   FieldPhoneIcon,
+  FieldTaxDocumentsIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
@@ -33,6 +34,7 @@ export const PetitionFieldTypeIcon = chakraForwardRef<"svg", PetitionFieldTypeIc
         NUMBER: FieldNumberIcon,
         DATE: FieldDateIcon,
         PHONE: FieldPhoneIcon,
+        TAX_DOCUMENTS: FieldTaxDocumentsIcon,
       } as Record<PetitionFieldType, ElementType>
     )[type];
     return <Icon as={icon} {...props} ref={ref} />;

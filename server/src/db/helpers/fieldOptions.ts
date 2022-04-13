@@ -189,6 +189,23 @@ const SCHEMAS = {
       },
     },
   },
+  TAX_DOCUMENTS: {
+    type: "object",
+    required: ["accepts", "attachToPdf"],
+    additionalProperties: false,
+    properties: {
+      accepts: {
+        type: ["array", "null"],
+        items: {
+          type: "string",
+          enum: ["PDF", "IMAGE", "VIDEO", "DOCUMENT"],
+        },
+      },
+      attachToPdf: {
+        type: ["boolean", "null"],
+      },
+    },
+  },
 };
 
 export function validateFieldOptions(type: PetitionFieldType, options: any) {
@@ -289,6 +306,11 @@ export function defaultFieldOptions(
         };
       }
       case "FILE_UPLOAD":
+        return {
+          accepts: null,
+          attachToPdf: false,
+        };
+      case "TAX_DOCUMENTS":
         return {
           accepts: null,
           attachToPdf: false,
