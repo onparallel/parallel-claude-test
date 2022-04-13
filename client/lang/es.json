@@ -675,11 +675,6 @@
     "context": "Create team"
   },
   {
-    "term": "component.create-group-dialog.members-label",
-    "definition": "Miembros",
-    "context": "Members"
-  },
-  {
     "term": "component.create-group-dialog.name-label",
     "definition": "Nombre del equipo",
     "context": "Team name"
@@ -4560,11 +4555,6 @@
     "context": "Learn more"
   },
   {
-    "term": "generic.members",
-    "definition": "Miembros",
-    "context": "Members"
-  },
-  {
     "term": "generic.more-options",
     "definition": "Más opciones...",
     "context": "More options..."
@@ -4898,6 +4888,11 @@
     "term": "generic.use-template",
     "definition": "Utilizar plantilla",
     "context": "Use template"
+  },
+  {
+    "term": "generic.users",
+    "definition": "Usuarios",
+    "context": "Users"
   },
   {
     "term": "generic.you",
@@ -9385,14 +9380,14 @@
     "context": "Edit name"
   },
   {
-    "term": "view.group.no-members",
-    "definition": "Aún no se agregaron miembros a este equipo",
-    "context": "No members added to this team yet"
+    "term": "view.group.no-results",
+    "definition": "No hay usuarios que coincidan con su búsqueda",
+    "context": "There's no users matching your search"
   },
   {
-    "term": "view.group.no-results",
-    "definition": "No hay miembros que coincidan con su búsqueda",
-    "context": "There's no members matching your search"
+    "term": "view.group.no-users",
+    "definition": "Aún no se agregaron usuarios a este equipo",
+    "context": "No users added to this team yet"
   },
   {
     "term": "view.group.users-added-title",
@@ -9445,14 +9440,14 @@
     "context": "You have no teams yet"
   },
   {
-    "term": "view.groups.no-members-added",
-    "definition": "No hay miembros añadidos",
-    "context": "No members added"
-  },
-  {
     "term": "view.groups.no-results",
     "definition": "No hay equipos que coincidan con su búsqueda",
     "context": "There's no teams matching your search"
+  },
+  {
+    "term": "view.groups.no-users-added",
+    "definition": "No hay usuarios añadidos",
+    "context": "No users added"
   },
   {
     "term": "view.groups.title",

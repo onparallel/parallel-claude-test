@@ -337,8 +337,8 @@ function useOrganizationGroupsTableColumns(): TableColumn<OrganizationGroups_Use
       {
         key: "members",
         header: intl.formatMessage({
-          id: "generic.members",
-          defaultMessage: "Members",
+          id: "generic.users",
+          defaultMessage: "Users",
         }),
         align: "left",
         CellContent: ({ row: { members }, column }) => {
@@ -351,8 +351,8 @@ function useOrganizationGroupsTableColumns(): TableColumn<OrganizationGroups_Use
           ) : (
             <OverflownText textStyle={"hint"}>
               {intl.formatMessage({
-                id: "view.groups.no-members-added",
-                defaultMessage: "No members added",
+                id: "view.groups.no-users-added",
+                defaultMessage: "No users added",
               })}
             </OverflownText>
           );

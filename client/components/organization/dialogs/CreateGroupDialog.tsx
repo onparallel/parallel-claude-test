@@ -75,10 +75,7 @@ export function CreateGroupDialog({ ...props }: DialogProps<{}, CreateGroupDialo
           </FormControl>
           <FormControl id="create-group-members">
             <FormLabel>
-              <FormattedMessage
-                id="component.create-group-dialog.members-label"
-                defaultMessage="Members"
-              />
+              <FormattedMessage id="generic.users" defaultMessage="Users" />
             </FormLabel>
             <Controller
               name="users"

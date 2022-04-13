@@ -162,7 +162,7 @@ function OrganizationMembers({ organizationId }: OrganizationMembersProps) {
                   <Text color="gray.300" fontSize="lg">
                     <FormattedMessage
                       id="view.group.no-results"
-                      defaultMessage="There's no members matching your search"
+                      defaultMessage="There's no users matching your search"
                     />
                   </Text>
                 </Flex>
@@ -170,8 +170,8 @@ function OrganizationMembers({ organizationId }: OrganizationMembersProps) {
                 <Flex flex="1" alignItems="center" justifyContent="center">
                   <Text fontSize="lg">
                     <FormattedMessage
-                      id="view.group.no-members"
-                      defaultMessage="No members added to this team yet"
+                      id="view.group.no-users"
+                      defaultMessage="No users added to this team yet"
                     />
                   </Text>
                 </Flex>
