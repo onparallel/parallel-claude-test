@@ -40,7 +40,7 @@ export function PetitionTemplateComposeMessageEditor({
       setSubject(value);
       updatePetition({ emailSubject: value || null });
     },
-    [updatePetition]
+    [updatePetition, subject]
   );
 
   const handleBodyChange = useCallback(
