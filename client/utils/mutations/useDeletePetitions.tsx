@@ -11,13 +11,27 @@ import {
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isApolloError } from "../apollo/isApolloError";
+import { withError } from "../promises/withError";
 
 export function useDeletePetitions() {
   const intl = useIntl();
   const showErrorDialog = useErrorDialog();
   const confirmDelete = useDialog(ConfirmDeletePetitionsDialog);
+  const confirmDeleteSharedPetitions = useDialog(ConfirmDeleteSharedPetitionsDialog);
 
   const [deletePetitions] = useMutation(useDeletePetitions_deletePetitionsDocument);
+  const handleDeletePetitions = async (petitionIds: string[], force?: boolean) =>
+    await deletePetitions({
+      variables: { ids: petitionIds, force },
+      update(client, { data }) {
+        if (data?.deletePetitions === "SUCCESS") {
+          for (const petitionId of petitionIds) {
+            client.evict({ id: petitionId });
+          }
+          client.gc();
+        }
+      },
+    });
 
   const { cache } = useApolloClient();
 
@@ -41,28 +55,33 @@ export function useDeletePetitions() {
           fragment: ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc,
           id: petitionIds[0],
         });
+        const isTemplate = cachedPetition?.__typename === "PetitionTemplate";
+
+        const name =
+          cachedPetition!.name ||
+          (isTemplate
+            ? intl.formatMessage({
+                id: "generic.unnamed-template",
+                defaultMessage: "Unnamed template",
+              })
+            : intl.formatMessage({
+                id: "generic.unnamed-petition",
+                defaultMessage: "Unnamed petition",
+              }));
 
         await confirmDelete({
           petitionIds,
-          name:
-            cachedPetition!.name ||
-            intl.formatMessage({
-              id: "generic.unnamed-petition",
-              defaultMessage: "Unnamed petition",
-            }),
-          isTemplate: cachedPetition?.__typename === "PetitionTemplate",
+          name,
+          isTemplate,
         });
-        await deletePetitions({
-          variables: { ids: petitionIds! },
-          update(client, { data }) {
-            if (data?.deletePetitions === "SUCCESS") {
-              for (const petitionId of petitionIds) {
-                client.evict({ id: petitionId });
-              }
-              client.gc();
-            }
-          },
-        });
+        const [error] = await withError(handleDeletePetitions(petitionIds));
+
+        if (isApolloError(error, "DELETE_SHARED_PETITION_ERROR")) {
+          await confirmDeleteSharedPetitions({ petitionIds, name, isTemplate });
+          await handleDeletePetitions(petitionIds, true);
+        } else {
+          throw error;
+        }
       } catch (error) {
         if (isApolloError(error)) {
           const conflictingPetitionIds =
@@ -88,49 +107,7 @@ export function useDeletePetitions() {
           const type =
             cachedPetitions[0].__typename === "PetitionTemplate" ? "TEMPLATE" : "PETITION";
 
-          if (errorCode === "DELETE_SHARED_PETITION_ERROR") {
-            const singlePetitionMessage = (
-              <FormattedMessage
-                id="component.delete-petitions.shared-error-singular"
-                defaultMessage="The {name} {type, select, PETITION {petition} other{template}} could not be removed because it is being shared. Please transfer ownership or remove shared access first."
-                values={{ name: <b>{petitionName}</b>, type }}
-              />
-            );
-
-            const multiplePetitionMessage = (
-              <>
-                <FormattedMessage
-                  id="component.delete-petitions.shared-error-plural-1"
-                  defaultMessage="The following {type, select, PETITION {petitions} other{templates}} could not be removed because they are being shared:"
-                  values={{ type }}
-                />
-                <UnorderedList paddingLeft={2} py={2}>
-                  {cachedPetitions.map((petition) => (
-                    <ListItem key={petition.id} textStyle={petition!.name ? undefined : "hint"}>
-                      {petition.name
-                        ? petition.name
-                        : intl.formatMessage({
-                            id: "generic.unnamed-petition",
-                            defaultMessage: "Unnamed petition",
-                          })}
-                    </ListItem>
-                  ))}
-                </UnorderedList>
-                <FormattedMessage
-                  id="component.delete-petitions.shared-error-plural-2"
-                  defaultMessage="Please transfer ownership or remove shared access first."
-                />
-              </>
-            );
-
-            const errorMessage =
-              conflictingPetitionIds.length === 1 ? singlePetitionMessage : multiplePetitionMessage;
-
-            await showErrorDialog({
-              header: errorHeader,
-              message: errorMessage,
-            });
-          } else if (errorCode === "DELETE_GROUP_PETITION_ERROR") {
+          if (errorCode === "DELETE_GROUP_PETITION_ERROR") {
             const singlePetitionMessage = (
               <FormattedMessage
                 id="component.delete-petitions.group-error-singular"
@@ -212,7 +189,7 @@ export function useDeletePetitions() {
   );
 }
 
-export function ConfirmDeletePetitionsDialog({
+function ConfirmDeletePetitionsDialog({
   petitionIds,
   name,
   isTemplate,
@@ -283,8 +260,84 @@ ConfirmDeletePetitionsDialog.fragments = {
 
 ConfirmDeletePetitionsDialog.mutations = [
   gql`
-    mutation useDeletePetitions_deletePetitions($ids: [GID!]!) {
-      deletePetitions(ids: $ids)
+    mutation useDeletePetitions_deletePetitions($ids: [GID!]!, $force: Boolean) {
+      deletePetitions(ids: $ids, force: $force)
     }
   `,
 ];
+
+function ConfirmDeleteSharedPetitionsDialog({
+  petitionIds,
+  name,
+  isTemplate,
+  ...props
+}: DialogProps<{
+  petitionIds: string[];
+  name: string;
+  isTemplate: boolean;
+}>) {
+  const count = petitionIds.length;
+
+  const header = isTemplate ? (
+    <FormattedMessage
+      id="component.delete-shared-petitions-dialog.template-header"
+      defaultMessage="Delete shared {count, plural, =1 {template} other {templates}}"
+      values={{ count }}
+    />
+  ) : (
+    <FormattedMessage
+      id="component.delete-shared-petitions-dialog.petition-header"
+      defaultMessage="Delete shared {count, plural, =1 {petition} other {petitions}}"
+      values={{ count }}
+    />
+  );
+
+  const body = isTemplate ? (
+    <Stack>
+      <Text>
+        <FormattedMessage
+          id="component.delete-shared-petitions-dialog.template-body-1"
+          defaultMessage="{count, plural, =1{The selected template is shared with other users. If it is deleted, they will lose access.} other{Some of the selected templates are shared with other users. If they are deleted, the users will lose access.}}"
+          values={{ count }}
+        />
+      </Text>
+      <Text>
+        <FormattedMessage
+          id="component.delete-shared-petitions-dialog.template-body-2"
+          defaultMessage="Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the # selected templates}}?"
+          values={{ count, name }}
+        />
+      </Text>
+    </Stack>
+  ) : (
+    <Stack>
+      <Text>
+        <FormattedMessage
+          id="component.delete-shared-petitions-dialog.petition-body-1"
+          defaultMessage="{count, plural, =1{The selected petition is shared with other users. If it is deleted, they will lose access.} other{Some of the selected petitions are shared with other users. If they are deleted, the users will lose access.}}"
+          values={{ count }}
+        />
+      </Text>
+      <Text>
+        <FormattedMessage
+          id="component.delete-shared-petitions-dialog.petition-body-2"
+          defaultMessage="Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the <b>#</b> selected petitions}}?"
+          values={{ count, name }}
+        />
+      </Text>
+    </Stack>
+  );
+
+  return (
+    <ConfirmDialog
+      header={header}
+      body={body}
+      confirm={
+        <Button colorScheme="red" onClick={() => props.onResolve()}>
+          <FormattedMessage id="generic.confirm-delete-button" defaultMessage="Yes, delete" />
+        </Button>
+      }
+      {...props}
+    />
+  );
+}

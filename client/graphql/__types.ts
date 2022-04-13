@@ -3800,7 +3800,7 @@ export type UserSelect_UserGroupFragment = {
 export type UserSelect_canCreateUsersQueryVariables = Exact<{ [key: string]: never }>;
 
 export type UserSelect_canCreateUsersQuery = {
-  me: { __typename?: "User"; canCreateUsers: boolean };
+  me: { __typename?: "User"; id: string; canCreateUsers: boolean };
 };
 
 export type UserSelect_useGetUsersOrGroupsQueryVariables = Exact<{
@@ -18542,6 +18542,7 @@ export type ConfirmDeletePetitionsDialog_PetitionBaseFragment =
 
 export type useDeletePetitions_deletePetitionsMutationVariables = Exact<{
   ids: Array<Scalars["GID"]> | Scalars["GID"];
+  force?: InputMaybe<Scalars["Boolean"]>;
 }>;
 
 export type useDeletePetitions_deletePetitionsMutation = { deletePetitions: Result };
@@ -22683,6 +22684,7 @@ export const useSearchUserGroups_searchUserGroupsDocument = gql`
 export const UserSelect_canCreateUsersDocument = gql`
   query UserSelect_canCreateUsers {
     me {
+      id
       canCreateUsers
     }
   }
@@ -25484,8 +25486,8 @@ export const useDeleteContacts_deleteContactsDocument = gql`
   useDeleteContacts_deleteContactsMutationVariables
 >;
 export const useDeletePetitions_deletePetitionsDocument = gql`
-  mutation useDeletePetitions_deletePetitions($ids: [GID!]!) {
-    deletePetitions(ids: $ids)
+  mutation useDeletePetitions_deletePetitions($ids: [GID!]!, $force: Boolean) {
+    deletePetitions(ids: $ids, force: $force)
   }
 ` as unknown as DocumentNode<
   useDeletePetitions_deletePetitionsMutation,

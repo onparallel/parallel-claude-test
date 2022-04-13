@@ -775,19 +775,34 @@
     "context": "The {name} template cannot be deleted because it is public."
   },
   {
-    "term": "component.delete-petitions.shared-error-plural-1",
-    "definition": "The following {type, select, PETITION {petitions} other{templates}} could not be removed because they are being shared:",
-    "context": "The following {type, select, PETITION {petitions} other{templates}} could not be removed because they are being shared:"
+    "term": "component.delete-shared-petitions-dialog.petition-body-1",
+    "definition": "{count, plural, =1{The selected petition is shared with other users. If it is deleted, they will lose access.} other{Some of the selected petitions are shared with other users. If they are deleted, the users will lose access.}}",
+    "context": "{count, plural, =1{The selected petition is shared with other users. If it is deleted, they will lose access.} other{Some of the selected petitions are shared with other users. If they are deleted, the users will lose access.}}"
   },
   {
-    "term": "component.delete-petitions.shared-error-plural-2",
-    "definition": "Please transfer ownership or remove shared access first.",
-    "context": "Please transfer ownership or remove shared access first."
+    "term": "component.delete-shared-petitions-dialog.petition-body-2",
+    "definition": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the # selected petitions}}?",
+    "context": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the # selected petitions}}?"
   },
   {
-    "term": "component.delete-petitions.shared-error-singular",
-    "definition": "The {name} {type, select, PETITION {petition} other{template}} could not be removed because it is being shared. Please transfer ownership or remove shared access first.",
-    "context": "The {name} {type, select, PETITION {petition} other{template}} could not be removed because it is being shared. Please transfer ownership or remove shared access first."
+    "term": "component.delete-shared-petitions-dialog.petition-header",
+    "definition": "Delete shared {count, plural, =1 {petition} other {petitions}}",
+    "context": "Delete shared {count, plural, =1 {petition} other {petitions}}"
+  },
+  {
+    "term": "component.delete-shared-petitions-dialog.template-body-1",
+    "definition": "{count, plural, =1{The selected template is shared with other users. If it is deleted, they will lose access.} other{Some of the selected templates are shared with other users. If they are deleted, the users will lose access.}}",
+    "context": "{count, plural, =1{The selected template is shared with other users. If it is deleted, they will lose access.} other{Some of the selected templates are shared with other users. If they are deleted, the users will lose access.}}"
+  },
+  {
+    "term": "component.delete-shared-petitions-dialog.template-body-2",
+    "definition": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the # selected templates}}?",
+    "context": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the # selected templates}}?"
+  },
+  {
+    "term": "component.delete-shared-petitions-dialog.template-header",
+    "definition": "Delete shared {count, plural, =1 {template} other {templates}}",
+    "context": "Delete shared {count, plural, =1 {template} other {templates}}"
   },
   {
     "term": "component.delete-signature-error-confirmation.body",

@@ -69,6 +69,7 @@ const queries = [
   gql`
     query UserSelect_canCreateUsers {
       me {
+        id
         canCreateUsers
       }
     }
