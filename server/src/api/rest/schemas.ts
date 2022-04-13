@@ -17,7 +17,7 @@ export function buildValidateSchema<T>(schema: JsonSchemaFor<T>): ValidateFuncti
 export function buildValidateSchema<T = any>(schema: JsonSchema): ValidateFunction<T>;
 export function buildValidateSchema<T = any>(schema: JsonSchema) {
   const ajv = new Ajv({ strict: false });
-  addFormats(ajv, ["date-time", "email", "uri", "binary"]);
+  addFormats(ajv, ["date-time", "date", "email", "uri", "binary"]);
   ajv.addFormat("time-zone", isValidTimezone);
   ajv.addFormat("time", isValidTime);
   return ajv.compile<T>(schema);

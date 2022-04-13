@@ -689,14 +689,17 @@ export const UpdatePetitionField = schema({
     },
   },
 } as const);
+
+const _Tag = { type: "string", example: ["kyc", "priority"] } as const;
+
 export const PetitionField = schema(_PetitionField);
-export const PaginatedTags = PaginatedListOf({ type: "string", example: ["kyc", "priority"] });
-export const PaginatedPetitions = PaginatedListOf(_Petition);
-export const PaginatedUsers = PaginatedListOf(_User);
+export const PaginatedTags = schema(_PaginationOf(_Tag));
+export const PaginatedPetitions = schema(_PaginationOf(_Petition));
+export const PaginatedUsers = schema(_PaginationOf(_User));
 export const PetitionAccess = schema(_PetitionAccess);
 export const ListOfPetitionAccesses = ListOf(_PetitionAccess);
 export const Template = schema(_Template);
-export const PaginatedTemplates = PaginatedListOf(_Template);
+export const PaginatedTemplates = schema(_PaginationOf(_Template));
 export const Contact = schema(_Contact);
 export const User = schema(_User);
 export const UserWithOrg = schema(_UserWithOrg);
@@ -728,7 +731,7 @@ export const CreateContact = schema({
     lastName: "Lannister",
   },
 } as const);
-export const PaginatedContacts = PaginatedListOf(_Contact);
+export const PaginatedContacts = schema(_PaginationOf(_Contact));
 export const SendPetition = schema({
   title: "SendPetition",
   type: "object",
@@ -840,9 +843,10 @@ const _TextReplySubmitContent = {
 const _DateReplySubmitContent = {
   title: "DateReplySubmitContent",
   type: "string",
+  format: "date",
   description: "For fields of type `DATE`, with format YYYY-MM-DD.",
   example: "2022-02-15",
-};
+} as const;
 
 const _NumberReplySubmitContent = {
   title: "NumberReplyContent",
@@ -1737,8 +1741,8 @@ export const CreateSubscription = schema({
   },
 } as const);
 
-function PaginatedListOf<T extends Exclude<JsonSchema, boolean>>(item: T) {
-  return schema({
+function _PaginationOf<T extends Exclude<JsonSchema, boolean>>(item: T) {
+  return {
     title: `PaginatedList<${item.title ?? "*missing item title*"}>`,
     type: "object",
     description: "Paginated resource",
@@ -1757,7 +1761,7 @@ function PaginatedListOf<T extends Exclude<JsonSchema, boolean>>(item: T) {
         example: 42,
       },
     },
-  } as const);
+  } as const;
 }
 
 function ListOf<T extends JsonSchemaFor<any>>(

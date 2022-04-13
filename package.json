@@ -10,23 +10,23 @@
   "scripts": {
     "lint": "eslint --config .eslintrc.js .",
     "update-deps": "yarn ncux && yarn ncux --packageFile bin/package.json && yarn ncux --packageFile client/package.json && yarn ncux --packageFile server/package.json  && yarn ncux --packageFile e2e/package.json",
-    "ncux": "ncu -u -x 'chalk,escape-string-regexp,p-all,p-map,p-props,node-fetch,@types/node-fetch,file-type,react-select,@types/react-select,framer-motion'",
+    "ncux": "ncu -u -x 'chalk,escape-string-regexp,p-all,p-map,p-props,node-fetch,@types/node-fetch,file-type,react-select,@types/react-select,framer-motion,react,react-dom,@types/react,@types/react-dom,react-dnd,react-dnd-html5-backend'",
     "postinstall": "patch-package",
     "postpull": "yarn && cd server && yarn migrate"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.14.0",
-    "@typescript-eslint/parser": "^5.14.0",
-    "eslint": "^8.11.0",
+    "@typescript-eslint/eslint-plugin": "^5.19.0",
+    "@typescript-eslint/parser": "^5.19.0",
+    "eslint": "^8.13.0",
     "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-formatjs": "^3.0.0",
+    "eslint-plugin-formatjs": "^3.1.0",
     "eslint-plugin-graphql": "^4.0.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "7.29.4",
     "graphql": "^16.3.0",
-    "npm-check-updates": "^12.5.3",
+    "npm-check-updates": "^12.5.8",
     "postinstall-postinstall": "^2.1.0",
-    "prettier": "^2.5.1"
+    "prettier": "^2.6.2"
   },
   "dependencies": {
     "patch-package": "^6.4.7"
