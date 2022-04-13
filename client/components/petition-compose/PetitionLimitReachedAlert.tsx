@@ -1,4 +1,4 @@
-import { Alert, AlertIcon, AlertProps } from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertIcon, AlertProps } from "@chakra-ui/react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { SupportLink } from "../common/SupportLink";
 
@@ -11,25 +11,26 @@ export function PetitionLimitReachedAlert({ limit, ...props }: PetitionLimitReac
   return (
     <Alert status="warning" {...props}>
       <AlertIcon color="yellow.500" />
-      <FormattedMessage
-        id="component.petition-limit-reached-alert.title"
-        defaultMessage="It seems that you have reached your limit of {limit} petitions, <a>reach out to us to upgrade your plan.</a>"
-        values={{
-          limit,
-          a: (chunks: any) => (
-            <SupportLink
-              message={intl.formatMessage({
-                id: "component.support-link.upgrade-plan",
-                defaultMessage:
-                  "Hi, I would like to get more information about how to upgrade my plan.",
-              })}
-              display="contents"
-            >
-              {chunks}
-            </SupportLink>
-          ),
-        }}
-      />
+      <AlertDescription>
+        <FormattedMessage
+          id="component.petition-limit-reached-alert.title"
+          defaultMessage="It seems that you have reached your limit of {limit} petitions, <a>reach out to us to upgrade your plan.</a>"
+          values={{
+            limit,
+            a: (chunks: any) => (
+              <SupportLink
+                message={intl.formatMessage({
+                  id: "generic.upgrade-plan-support-message",
+                  defaultMessage:
+                    "Hi, I would like to get more information about how to upgrade my plan.",
+                })}
+              >
+                {chunks}
+              </SupportLink>
+            ),
+          }}
+        />
+      </AlertDescription>
     </Alert>
   );
 }

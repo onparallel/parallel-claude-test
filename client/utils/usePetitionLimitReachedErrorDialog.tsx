@@ -23,11 +23,10 @@ export function usePetitionLimitReachedErrorDialog() {
             a: (chunks: any[]) => (
               <SupportLink
                 message={intl.formatMessage({
-                  id: "component.support-link.upgrade-plan",
+                  id: "generic.upgrade-plan-support-message",
                   defaultMessage:
                     "Hi, I would like to get more information about how to upgrade my plan.",
                 })}
-                display="contents"
               >
                 {chunks}
               </SupportLink>

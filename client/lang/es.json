@@ -3320,11 +3320,6 @@
     "context": "Suggested:"
   },
   {
-    "term": "component.support-link.upgrade-plan",
-    "definition": "Hola, me gustaría obtener más información acerca de como actualizar mi plan.",
-    "context": "Hi, I would like to get more information about how to upgrade my plan."
-  },
-  {
     "term": "component.table.filter-header",
     "definition": "Filtro",
     "context": "Filter"
@@ -4888,6 +4883,11 @@
     "term": "generic.untitled-field",
     "definition": "Campo sin título",
     "context": "Untitled field"
+  },
+  {
+    "term": "generic.upgrade-plan-support-message",
+    "definition": "Hola, me gustaría obtener más información acerca de como actualizar mi plan.",
+    "context": "Hi, I would like to get more information about how to upgrade my plan."
   },
   {
     "term": "generic.upgrade-to-enable",
@@ -6948,11 +6948,6 @@
     "term": "public.contact-link",
     "definition": "Contacta",
     "context": "Contact"
-  },
-  {
-    "term": "public.contact-link.message",
-    "definition": "Hola, me gustaría obtener más información sobre Parallel.",
-    "context": "Hi, I would like to get more information about Parallel."
   },
   {
     "term": "public.cookies.title",
