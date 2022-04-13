@@ -1,5 +1,4 @@
 import { booleanArg, list, mutationField, nonNull, stringArg } from "nexus";
-import { isDefined } from "remeda";
 import { RESULT } from "..";
 import { FetchService } from "../../services/fetch";
 import { withError } from "../../util/promises/withError";

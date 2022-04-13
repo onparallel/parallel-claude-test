@@ -1,4 +1,4 @@
-import { ApolloError, gql, useApolloClient, useQuery } from "@apollo/client";
+import { ApolloError, gql, useApolloClient } from "@apollo/client";
 import {
   Button,
   Collapse,
@@ -24,8 +24,8 @@ import { Maybe, MaybePromise } from "@parallel/utils/types";
 import { useCallback, useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import Select from "react-select/async";
 import { components, OptionTypeBase } from "react-select";
+import Select from "react-select/async";
 
 interface CreateEventSubscriptionDialogProps {
   onCreate: (props: {

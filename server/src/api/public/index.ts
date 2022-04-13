@@ -3,7 +3,7 @@ import { ClientError, gql, GraphQLClient } from "graphql-request";
 import multer from "multer";
 import { outdent } from "outdent";
 import pMap from "p-map";
-import { isDefined, omit, pick } from "remeda";
+import { isDefined, pick } from "remeda";
 import { callbackify } from "util";
 import { toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";

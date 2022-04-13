@@ -1,7 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
 import {
   Badge,
-  Box,
   Button,
   Center,
   Divider,
@@ -14,8 +13,6 @@ import {
 } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
-import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
-import { CopyToClipboardText } from "@parallel/components/common/CopyToClipboardText";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
