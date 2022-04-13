@@ -24,7 +24,7 @@ import { Maybe, MaybePromise } from "@parallel/utils/types";
 import { useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import Select, { OptionTypeBase } from "react-select";
+import Select, { components, OptionTypeBase } from "react-select";
 
 interface CreateEventSubscriptionDialogProps {
   onCreate: (props: {
@@ -84,8 +84,15 @@ export function CreateEventSubscriptionDialog(
     },
   });
   const reactSelectProps = useReactSelectProps<OptionTypeBase, true>();
+  const components = useMemo(
+    () => ({
+      ...reactSelectProps.components,
+      Option,
+    }),
+    [reactSelectProps.components]
+  );
 
-  const templateOptions = data?.templates.items.map((t) => ({ label: t.name, value: t.id })) ?? [];
+  const templateOptions = data?.templates.items;
   const options = useMemo(() => eventTypes.map((event) => ({ label: event, value: event })), []);
   return (
     <ConfirmDialog
@@ -102,7 +109,7 @@ export function CreateEventSubscriptionDialog(
               name: data.name,
               eventsUrl: data.eventsUrl,
               eventTypes: data.eventsMode === "ALL" ? null : data.eventTypes.map((x) => x.value),
-              fromTemplateId: data.fromTemplate?.value ?? null,
+              fromTemplateId: data.fromTemplate?.id ?? null,
             });
             clearErrors("eventsUrl");
             props.onResolve();
@@ -186,6 +193,15 @@ export function CreateEventSubscriptionDialog(
                     id: "generic.any-template",
                     defaultMessage: "Any template",
                   })}
+                  getOptionValue={(o) => o.id}
+                  getOptionLabel={(o) =>
+                    o.name ??
+                    intl.formatMessage({
+                      id: "generic.unnamed-template",
+                      defaultMessage: "Unnamed template",
+                    })
+                  }
+                  components={components}
                 />
               )}
             />
@@ -276,6 +292,18 @@ export function CreateEventSubscriptionDialog(
     />
   );
 }
+
+const Option: typeof components.Option = function Option(props) {
+  return (
+    <components.Option {...props}>
+      <Text fontStyle={props.data.name ? undefined : "italic"} opacity={props.data.name ? 1 : 0.7}>
+        {props.data.name ?? (
+          <FormattedMessage id="generic.unnamed-template" defaultMessage="Unnamed template" />
+        )}
+      </Text>
+    </components.Option>
+  );
+};
 
 CreateEventSubscriptionDialog.queries = [
   gql`

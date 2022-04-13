@@ -437,12 +437,17 @@ function useSubscriptionsColumns(): TableColumn<
 
         CellContent: ({ row }) => {
           return (
-            <Text fontSize="sm">
-              {row.fromTemplate?.name ??
-                intl.formatMessage({
-                  id: "generic.any-template",
-                  defaultMessage: "Any template",
-                })}
+            <Text fontSize="sm" color={row.fromTemplate ? undefined : "gray.500"}>
+              {row.fromTemplate
+                ? row.fromTemplate.name ??
+                  intl.formatMessage({
+                    id: "generic.unnamed-template",
+                    defaultMessage: "Unnamed template",
+                  })
+                : intl.formatMessage({
+                    id: "generic.any-template",
+                    defaultMessage: "Any template",
+                  })}
             </Text>
           );
         },
