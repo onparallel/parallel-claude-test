@@ -11,6 +11,7 @@ import {
   RecipientViewPetitionFieldCard_PetitionFieldReplyFragment,
   RecipientViewPetitionFieldCard_PublicPetitionFieldFragment,
   RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment,
+  Tone,
 } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { ReactNode } from "react";
@@ -35,6 +36,7 @@ export interface RecipientViewPetitionFieldCardProps {
   onAddNewReply?: () => void;
   onDownloadAttachment: (attachmentId: string) => void;
   onCommentsButtonClick?: () => void;
+  tone?: Tone;
 }
 
 export function RecipientViewPetitionFieldCard({
@@ -46,6 +48,7 @@ export function RecipientViewPetitionFieldCard({
   onDownloadAttachment,
   children,
   onCommentsButtonClick,
+  tone = "INFORMAL",
 }: RecipientViewPetitionFieldCardProps) {
   const intl = useIntl();
   const isPetitionField = field.__typename === "PetitionField";
@@ -126,11 +129,12 @@ export function RecipientViewPetitionFieldCard({
               defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
               values={{ count: fieldReplies.length }}
             />
-          ) : field.type === "TAX_DOCUMENTS" ? (
+          ) : field.type === "ES_TAX_DOCUMENTS" ? (
             <>
               <FormattedMessage
                 id="component.recipient-view-petition-field-tax-documents.follow-steps-description"
                 defaultMessage="Follow the steps to upload the documentation you need."
+                values={{ tone }}
               />
               {fieldReplies.length ? (
                 <>

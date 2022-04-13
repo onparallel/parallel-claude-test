@@ -1,0 +1,50 @@
+import { Button } from "@chakra-ui/react";
+import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
+import { Tone } from "@parallel/graphql/__types";
+import { useRef } from "react";
+import { FormattedMessage } from "react-intl";
+import { DialogProps, useDialog } from "../../common/dialogs/DialogProvider";
+
+type NewSignerInfo = {
+  firstName: string;
+  lastName: string;
+  email: string;
+};
+function OverwriteDocumentationDialog({
+  tone,
+  ...props
+}: DialogProps<{ tone: Tone }, NewSignerInfo>) {
+  const focusRef = useRef(null);
+  return (
+    <ConfirmDialog
+      {...props}
+      closeOnOverlayClick={false}
+      initialFocusRef={focusRef}
+      header={
+        <FormattedMessage
+          id="components.overwrite-documentation-dialog.header"
+          defaultMessage="Overwrite documentation"
+        />
+      }
+      body={
+        <FormattedMessage
+          id="components.overwrite-documentation-dialog.body"
+          defaultMessage="An upload has already been completed. If you continue, you will return to the initial process and the current documentation will be overwritten. Are you sure you want to start over?"
+          values={{ tone }}
+        />
+      }
+      confirm={
+        <Button ref={focusRef} colorScheme="purple" onClick={() => props.onResolve()}>
+          <FormattedMessage
+            id="gcomponents.overwrite-documentation-dialog.confirm-button"
+            defaultMessage="Yes, start again"
+          />
+        </Button>
+      }
+    />
+  );
+}
+
+export function useOverwriteDocumentationDialog() {
+  return useDialog(OverwriteDocumentationDialog);
+}

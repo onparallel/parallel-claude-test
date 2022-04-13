@@ -227,11 +227,11 @@ export function RecipientViewPetitionField({ tone, ...props }: RecipientViewPeti
     <RecipientViewPetitionFieldDate {...props} {...commonProps} />
   ) : props.field.type === "PHONE" ? (
     <RecipientViewPetitionFieldPhone {...props} {...commonProps} />
-  ) : props.field.type === "TAX_DOCUMENTS" ? (
+  ) : props.field.type === "ES_TAX_DOCUMENTS" ? (
     <RecipientViewPetitionFieldTaxDocuments
       {...props}
       {...commonProps}
-      onCreateReply={handleCreateFileUploadReply}
+      tone={tone}
       onDownloadReply={handleDownloadFileUploadReply}
     />
   ) : null;

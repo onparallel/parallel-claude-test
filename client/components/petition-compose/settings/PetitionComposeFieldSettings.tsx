@@ -19,6 +19,7 @@ import { NumberSettings } from "./PetitionComposeNumberSettings";
 import { PhoneSettings } from "./PetitionComposePhoneSettings";
 import { SelectOptionSettings } from "./PetitionComposeSelectOptionSettings";
 import { ShortTextSettings } from "./PetitionComposeShortTextSettings";
+import { SpanishTaxDocumentsSettings } from "./PetitionComposeTaxDocumentsSettings";
 import { TextSettings } from "./PetitionComposeTextSettings";
 import { SettingsRow } from "./SettingsRow";
 import { SettingsRowAlias } from "./SettingsRowAlias";
@@ -164,7 +165,7 @@ export function PetitionComposeFieldSettings({
           isDisabled={isReadOnly}
         />
       </SettingsRow>
-      {!field.isReadOnly && field.type !== "CHECKBOX" && (
+      {!field.isReadOnly && !["CHECKBOX", "ES_TAX_DOCUMENTS"].includes(field.type) && (
         <SettingsRow
           isDisabled={isReadOnly}
           label={
@@ -252,8 +253,12 @@ export function PetitionComposeFieldSettings({
           <NumberSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
         ) : field.type === "PHONE" ? (
           <PhoneSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
-        ) : field.type === "TAX_DOCUMENTS" ? (
-          <FileUploadSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
+        ) : field.type === "ES_TAX_DOCUMENTS" ? (
+          <SpanishTaxDocumentsSettings
+            field={field}
+            onFieldEdit={onFieldEdit}
+            isReadOnly={isReadOnly}
+          />
         ) : null}
       </Stack>
       {field.type !== "HEADING" ? (

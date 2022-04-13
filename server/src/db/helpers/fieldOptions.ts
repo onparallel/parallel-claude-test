@@ -189,18 +189,11 @@ const SCHEMAS = {
       },
     },
   },
-  TAX_DOCUMENTS: {
+  ES_TAX_DOCUMENTS: {
     type: "object",
-    required: ["accepts", "attachToPdf"],
+    required: ["attachToPdf"],
     additionalProperties: false,
     properties: {
-      accepts: {
-        type: ["array", "null"],
-        items: {
-          type: "string",
-          enum: ["PDF", "IMAGE", "VIDEO", "DOCUMENT"],
-        },
-      },
       attachToPdf: {
         type: ["boolean", "null"],
       },
@@ -310,9 +303,8 @@ export function defaultFieldOptions(
           accepts: null,
           attachToPdf: false,
         };
-      case "TAX_DOCUMENTS":
+      case "ES_TAX_DOCUMENTS":
         return {
-          accepts: null,
           attachToPdf: false,
         };
       case "DYNAMIC_SELECT": {

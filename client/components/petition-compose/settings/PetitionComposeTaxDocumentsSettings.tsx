@@ -3,7 +3,7 @@ import { FormattedMessage } from "react-intl";
 import { PetitionComposeFieldSettingsProps } from "./PetitionComposeFieldSettings";
 import { SettingsRow } from "./SettingsRow";
 
-export function FileUploadSettings({
+export function SpanishTaxDocumentsSettings({
   field,
   onFieldEdit,
   isReadOnly,

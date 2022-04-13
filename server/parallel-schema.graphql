@@ -2704,6 +2704,11 @@ enum PetitionFieldType {
   DYNAMIC_SELECT
 
   """
+  A tax documents/info field.
+  """
+  ES_TAX_DOCUMENTS
+
+  """
   A file upload field.
   """
   FILE_UPLOAD
@@ -2732,11 +2737,6 @@ enum PetitionFieldType {
   A short text field.
   """
   SHORT_TEXT
-
-  """
-  A tax documents/info field.
-  """
-  TAX_DOCUMENTS
 
   """
   A text field.

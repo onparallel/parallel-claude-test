@@ -224,11 +224,11 @@ export function PreviewPetitionField({
     <RecipientViewPetitionFieldDate {...props} {...commonProps} />
   ) : field.type === "PHONE" ? (
     <RecipientViewPetitionFieldPhone {...props} {...commonProps} />
-  ) : field.type === "TAX_DOCUMENTS" ? (
+  ) : field.type === "ES_TAX_DOCUMENTS" ? (
     <RecipientViewPetitionFieldTaxDocuments
       {...props}
       {...commonProps}
-      onCreateReply={handleCreateFileUploadReply}
+      tone={tone}
       onDownloadReply={handleDownloadFileUploadReply}
       isCacheOnly={isCacheOnly}
     />

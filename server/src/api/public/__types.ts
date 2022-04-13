@@ -2057,6 +2057,8 @@ export type PetitionFieldType =
   | "DATE"
   /** A dynamic select field. */
   | "DYNAMIC_SELECT"
+  /** A tax documents/info field. */
+  | "ES_TAX_DOCUMENTS"
   /** A file upload field. */
   | "FILE_UPLOAD"
   /** A heading field. */
@@ -2069,8 +2071,6 @@ export type PetitionFieldType =
   | "SELECT"
   /** A short text field. */
   | "SHORT_TEXT"
-  /** A tax documents/info field. */
-  | "TAX_DOCUMENTS"
   /** A text field. */
   | "TEXT";
 

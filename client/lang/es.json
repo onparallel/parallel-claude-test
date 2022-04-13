@@ -2060,16 +2060,6 @@
     "context": "Communications language"
   },
   {
-    "term": "component.petition-settings.petition-attach-files-to-pdf",
-    "definition": "Adjuntar archivos al PDF",
-    "context": "Attach files to PDF"
-  },
-  {
-    "term": "component.petition-settings.petition-attach-files-to-pdf.description",
-    "definition": "Al activar esta opción, los archivos de imagen y pdf subidos a este campo se anexarán al final en la exportación de PDF y en el documento a firmar.",
-    "context": "When this option is enabled, the image and pdf files uploaded to this field will be appended to the end of the exported PDF and the document to be signed."
-  },
-  {
     "term": "component.petition-settings.petition-comments-enable",
     "definition": "Permitir comentarios",
     "context": "Allow comments"
@@ -2921,17 +2911,17 @@
   },
   {
     "term": "component.recipient-view-petition-field-tax-documents.follow-steps-description",
-    "definition": "Sigue los pasos para subir la documentación que necesitas.",
+    "definition": "{tone, select, INFORMAL {Sigue los pasos para subir la documentación que necesitas} other {Siga las instrucciones para subir la documentación que necesite}}.",
     "context": "Follow the steps to upload the documentation you need."
   },
   {
     "term": "component.recipient-view-petition-field-tax-documents.loading-documentation",
-    "definition": "Por favor, espera mientras cargamos la documentación...",
+    "definition": "Por favor, {tone, select, INFORMAL {espera} other {espere}} mientras cargamos la documentación...",
     "context": "Please, wait while we upload the documentation..."
   },
   {
     "term": "component.recipient-view-petition-field-tax-documents.start-again-button",
-    "definition": "",
+    "definition": "Empezar de nuevo",
     "context": "Start again"
   },
   {
@@ -3770,6 +3760,16 @@
     "context": "Add to separate groups"
   },
   {
+    "term": "components.overwrite-documentation-dialog.body",
+    "definition": "{tone, select, INFORMAL{Ya se ha completado una subida. Si continúas, volverás al proceso inicial y se sobrescribirá la documentación actual. ¿Estás seguro de querer empezar de nuevo?} other{El proceso de subida ha sido completado al menos una vez. Si continúa, volverá al proceso inicial y se sobrescribirá la documentación actual. ¿Está seguro de querer empezar de nuevo?}}",
+    "context": "An upload has already been completed. If you continue, you will return to the initial process and the current documentation will be overwritten. Are you sure you want to start over?"
+  },
+  {
+    "term": "components.overwrite-documentation-dialog.header",
+    "definition": "Sobrescribir documentación",
+    "context": "Overwrite documentation"
+  },
+  {
     "term": "components.petition-tag-list-cell-content.add-tags",
     "definition": "Añadir etiquetas",
     "context": "Add tags"
@@ -4130,6 +4130,11 @@
     "context": "Work better with"
   },
   {
+    "term": "gcomponents.overwrite-documentation-dialog.confirm-button",
+    "definition": "Sí, empezar de nuevo",
+    "context": "Yes, start again"
+  },
+  {
     "term": "generic.accept",
     "definition": "Aceptar",
     "context": "Accept"
@@ -4173,6 +4178,16 @@
     "term": "generic.all-event-types",
     "definition": "Todos los eventos",
     "context": "All events"
+  },
+  {
+    "term": "generic.attach-files-to-pdf",
+    "definition": "Adjuntar archivos al PDF",
+    "context": "Attach files to PDF"
+  },
+  {
+    "term": "generic.attach-files-to-pdf.description",
+    "definition": "Al activar esta opción, los archivos de imagen y pdf subidos a este campo se anexarán al final en la exportación de PDF y en el documento a firmar.",
+    "context": "When this option is enabled, the image and pdf files uploaded to this field will be appended to the end of the exported PDF and the document to be signed."
   },
   {
     "term": "generic.attached-file",
