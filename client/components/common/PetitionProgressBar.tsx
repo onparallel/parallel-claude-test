@@ -154,8 +154,8 @@ function ValidatedProgressText({ external, internal }: PetitionProgress) {
         id="component.petition-progress-bar.validated-with-internal"
         defaultMessage="{count} reviewed {count, plural, =1{field} other {fields}}{internalCount, plural,=0{} other { ({internalCount} internal)}}."
         values={{
-          count: external.replied + internal.replied,
-          internalCount: internal.replied,
+          count: external.validated + internal.validated,
+          internalCount: internal.validated,
         }}
       />
     </ProgressText>
