@@ -222,6 +222,40 @@ export class Mocks {
     return petitions;
   }
 
+  async createRandomTemplates(
+    orgId: number,
+    ownerId: number,
+    amount?: number,
+    builder?: (index: number) => Partial<Petition>,
+    permissionBuilder?: (index: number) => Partial<PetitionPermission>
+  ) {
+    const petitions = await this.knex<Petition>("petition")
+      .insert(
+        range(0, amount || 1).map<CreatePetition>((index) => {
+          return {
+            org_id: orgId,
+            is_template: true,
+            status: null,
+            name: faker.random.words(),
+            locale: randomSupportedLocale(),
+            ...builder?.(index),
+          };
+        })
+      )
+      .returning("*");
+
+    await this.knex<PetitionPermission>("petition_permission").insert(
+      petitions.map(({ id }, index) => ({
+        created_by: `User:${ownerId}`,
+        petition_id: id,
+        user_id: ownerId,
+        ...permissionBuilder?.(index),
+      }))
+    );
+
+    return petitions;
+  }
+
   async createRandomPetitionFields(
     petitionId: number,
     amount: number,

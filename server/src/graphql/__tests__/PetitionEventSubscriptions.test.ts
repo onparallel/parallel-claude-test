@@ -161,6 +161,73 @@ describe("GraphQL/PetitionEventSubscription", () => {
         expect.anything()
       );
     });
+
+    it("creates and returns a new subscription for the user's petitions created from some template", async () => {
+      const [template] = await mocks.createRandomTemplates(organization.id, sessionUser.id, 1);
+      const { data, errors } = await testClient.mutate({
+        mutation: gql`
+          mutation ($eventsUrl: String!, $name: String, $fromTemplateId: GID) {
+            createEventSubscription(
+              eventsUrl: $eventsUrl
+              name: $name
+              fromTemplateId: $fromTemplateId
+            ) {
+              id
+              name
+              eventsUrl
+              isEnabled
+              fromTemplate {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          eventsUrl: "https://www.example.com/api",
+          name: "example",
+          fromTemplateId: toGlobalId("Petition", template.id),
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data?.createEventSubscription).toMatchObject({
+        isEnabled: true,
+        name: "example",
+        eventsUrl: "https://www.example.com/api",
+        fromTemplate: {
+          id: toGlobalId("Petition", template.id),
+        },
+      });
+    });
+
+    it("throws an error if try to create a subscription with wrong fromTemplateId", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, sessionUser.id, 1);
+      const { data, errors } = await testClient.mutate({
+        mutation: gql`
+          mutation ($eventsUrl: String!, $name: String, $fromTemplateId: GID) {
+            createEventSubscription(
+              eventsUrl: $eventsUrl
+              name: $name
+              fromTemplateId: $fromTemplateId
+            ) {
+              id
+              name
+              eventsUrl
+              isEnabled
+              fromTemplate {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          eventsUrl: "https://www.example.com/api",
+          name: "example",
+          fromTemplateId: toGlobalId("Petition", petition.id),
+        },
+      });
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 
   describe("updateEventSubscription", () => {
