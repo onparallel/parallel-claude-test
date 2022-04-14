@@ -307,7 +307,7 @@ function useApiTokensColumns(): TableColumn<Developers_UserAuthenticationTokenFr
         key: "hint",
         header: intl.formatMessage({
           id: "settings.developers.api-tokens.header.hint",
-          defaultMessage: "Hint",
+          defaultMessage: "Token",
         }),
         CellContent: ({ row }) => {
           return (

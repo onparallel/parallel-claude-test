@@ -297,14 +297,14 @@ function ConfirmDeleteSharedPetitionsDialog({
       <Text>
         <FormattedMessage
           id="component.delete-shared-petitions-dialog.template-body-1"
-          defaultMessage="{count, plural, =1{The selected template is shared with other users. If it is deleted, they will lose access.} other{Some of the selected templates are shared with other users. If they are deleted, the users will lose access.}}"
+          defaultMessage="You shared {count, plural, =1{this template} other{these templates}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{template} other{templates}}."
           values={{ count }}
         />
       </Text>
       <Text>
         <FormattedMessage
           id="component.delete-shared-petitions-dialog.template-body-2"
-          defaultMessage="Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the # selected templates}}?"
+          defaultMessage="Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the <b>#</b> selected templates}}?"
           values={{ count, name }}
         />
       </Text>
@@ -314,7 +314,7 @@ function ConfirmDeleteSharedPetitionsDialog({
       <Text>
         <FormattedMessage
           id="component.delete-shared-petitions-dialog.petition-body-1"
-          defaultMessage="{count, plural, =1{The selected petition is shared with other users. If it is deleted, they will lose access.} other{Some of the selected petitions are shared with other users. If they are deleted, the users will lose access.}}"
+          defaultMessage="You shared {count, plural, =1{this petition} other{these petitions}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{petition} other{petitions}}."
           values={{ count }}
         />
       </Text>

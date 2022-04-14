@@ -786,13 +786,13 @@
   },
   {
     "term": "component.delete-shared-petitions-dialog.petition-body-1",
-    "definition": "{count, plural, =1{The selected petition is shared with other users. If it is deleted, they will lose access.} other{Some of the selected petitions are shared with other users. If they are deleted, the users will lose access.}}",
-    "context": "{count, plural, =1{The selected petition is shared with other users. If it is deleted, they will lose access.} other{Some of the selected petitions are shared with other users. If they are deleted, the users will lose access.}}"
+    "definition": "You shared {count, plural, =1{this petition} other{these petitions}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{petition} other{petitions}}.",
+    "context": "You shared {count, plural, =1{this petition} other{these petitions}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{petition} other{petitions}}."
   },
   {
     "term": "component.delete-shared-petitions-dialog.petition-body-2",
-    "definition": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the # selected petitions}}?",
-    "context": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the # selected petitions}}?"
+    "definition": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the <b>#</b> selected petitions}}?",
+    "context": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the <b>#</b> selected petitions}}?"
   },
   {
     "term": "component.delete-shared-petitions-dialog.petition-header",
@@ -801,13 +801,13 @@
   },
   {
     "term": "component.delete-shared-petitions-dialog.template-body-1",
-    "definition": "{count, plural, =1{The selected template is shared with other users. If it is deleted, they will lose access.} other{Some of the selected templates are shared with other users. If they are deleted, the users will lose access.}}",
-    "context": "{count, plural, =1{The selected template is shared with other users. If it is deleted, they will lose access.} other{Some of the selected templates are shared with other users. If they are deleted, the users will lose access.}}"
+    "definition": "You shared {count, plural, =1{this template} other{these templates}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{template} other{templates}}.",
+    "context": "You shared {count, plural, =1{this template} other{these templates}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{template} other{templates}}."
   },
   {
     "term": "component.delete-shared-petitions-dialog.template-body-2",
-    "definition": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the # selected templates}}?",
-    "context": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the # selected templates}}?"
+    "definition": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the <b>#</b> selected templates}}?",
+    "context": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the <b>#</b> selected templates}}?"
   },
   {
     "term": "component.delete-shared-petitions-dialog.template-header",
@@ -8926,8 +8926,8 @@
   },
   {
     "term": "settings.developers.api-tokens.header.hint",
-    "definition": "Hint",
-    "context": "Hint"
+    "definition": "Token",
+    "context": "Token"
   },
   {
     "term": "settings.developers.api-tokens.header.token-name",
