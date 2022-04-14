@@ -587,7 +587,16 @@ export const updatePetition = mutationField("updatePetition", {
     userHasAccessToPetitions("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     ifSomeDefined(
-      (args) => [args.data.locale, args.data.description],
+      (args) => [
+        args.data.locale,
+        args.data.description,
+        args.data.closingEmailBody,
+        args.data.isCompletingMessageEnabled,
+        args.data.completingMessageSubject,
+        args.data.completingMessageBody,
+        args.data.skipForwardSecurity,
+        args.data.isRecipientViewContentsHidden,
+      ],
       petitionsAreEditable("petitionId")
     ),
     ifSomeDefined(
@@ -614,6 +623,9 @@ export const updatePetition = mutationField("updatePetition", {
           t.nullable.boolean("isRecipientViewContentsHidden");
           t.nullable.field("signatureConfig", { type: "SignatureConfigInput" });
           t.nullable.json("description");
+          t.nullable.boolean("isCompletingMessageEnabled");
+          t.nullable.string("completingMessageSubject");
+          t.nullable.json("completingMessageBody");
         },
       }).asArg()
     ),
@@ -622,10 +634,12 @@ export const updatePetition = mutationField("updatePetition", {
     notEmptyObject((args) => args.data, "data"),
     maxLength((args) => args.data.name, "data.name", 255),
     maxLength((args) => args.data.emailSubject, "data.emailSubject", 255),
+    maxLength((args) => args.data.completingMessageSubject, "data.completingMessageSubject", 255),
     maxLength((args) => args.data.description, "data.description", 1000),
     validRichTextContent((args) => args.data.emailBody, "data.emailBody"),
     validRichTextContent((args) => args.data.closingEmailBody, "data.closingEmailBody"),
     validRichTextContent((args) => args.data.description, "data.description"),
+    validRichTextContent((args) => args.data.completingMessageBody, "data.completingMessageBody"),
     validRemindersConfig((args) => args.data.remindersConfig, "data.remindersConfig"),
     validSignatureConfig((args) => args.data.signatureConfig, "data.signatureConfig")
   ),
@@ -642,6 +656,9 @@ export const updatePetition = mutationField("updatePetition", {
       isRecipientViewContentsHidden,
       signatureConfig,
       description,
+      isCompletingMessageEnabled,
+      completingMessageSubject,
+      completingMessageBody,
     } = args.data;
     const data: Partial<CreatePetition> = {};
     if (name !== undefined) {
@@ -676,6 +693,17 @@ export const updatePetition = mutationField("updatePetition", {
     }
     if (description !== undefined) {
       data.template_description = description === null ? null : JSON.stringify(description);
+    }
+
+    if (isDefined(isCompletingMessageEnabled)) {
+      data.is_completing_message_enabled = isCompletingMessageEnabled;
+    }
+
+    if (completingMessageSubject !== undefined) {
+      data.completing_message_subject = completingMessageSubject?.trim() || null;
+    }
+    if (completingMessageBody !== undefined) {
+      data.completing_message_body = completingMessageBody && JSON.stringify(completingMessageBody);
     }
 
     const [petition] = await ctx.petitions.updatePetition(

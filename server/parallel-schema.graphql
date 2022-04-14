@@ -1850,6 +1850,16 @@ type Petition implements PetitionBase {
   closingEmailBody: JSON
 
   """
+  The body of the optional completing message to be show to recipients
+  """
+  completingMessageBody: JSON
+
+  """
+  The subject of the optional completing message to be show to recipients
+  """
+  completingMessageSubject: String
+
+  """
   Time when the resource was created.
   """
   createdAt: DateTime!
@@ -1918,6 +1928,11 @@ type Petition implements PetitionBase {
   The ID of the petition or template.
   """
   id: GID!
+
+  """
+  Wether the completion message will be shown to the recipients or not.
+  """
+  isCompletingMessageEnabled: Boolean!
 
   """
   Whether the contents card is hidden in the recipient view.
@@ -2133,6 +2148,16 @@ interface PetitionBase {
   closingEmailBody: JSON
 
   """
+  The body of the optional completing message to be show to recipients
+  """
+  completingMessageBody: JSON
+
+  """
+  The subject of the optional completing message to be show to recipients
+  """
+  completingMessageSubject: String
+
+  """
   Time when the resource was created.
   """
   createdAt: DateTime!
@@ -2171,6 +2196,11 @@ interface PetitionBase {
   The ID of the petition or template.
   """
   id: GID!
+
+  """
+  Wether the completion message will be shown to the recipients or not.
+  """
+  isCompletingMessageEnabled: Boolean!
 
   """
   Whether the contents card is hidden in the recipient view.
@@ -3059,6 +3089,16 @@ type PetitionTemplate implements PetitionBase {
   closingEmailBody: JSON
 
   """
+  The body of the optional completing message to be show to recipients
+  """
+  completingMessageBody: JSON
+
+  """
+  The subject of the optional completing message to be show to recipients
+  """
+  completingMessageSubject: String
+
+  """
   Time when the resource was created.
   """
   createdAt: DateTime!
@@ -3114,6 +3154,11 @@ type PetitionTemplate implements PetitionBase {
   """
   id: GID!
   imageUrl: String
+
+  """
+  Wether the completion message will be shown to the recipients or not.
+  """
+  isCompletingMessageEnabled: Boolean!
 
   """
   Whether the template is publicly available or not
@@ -4519,10 +4564,13 @@ input UpdatePetitionFieldInput {
 
 input UpdatePetitionInput {
   closingEmailBody: JSON
+  completingMessageBody: JSON
+  completingMessageSubject: String
   deadline: DateTime
   description: JSON
   emailBody: JSON
   emailSubject: String
+  isCompletingMessageEnabled: Boolean
   isRecipientViewContentsHidden: Boolean
   locale: PetitionLocale
   name: String

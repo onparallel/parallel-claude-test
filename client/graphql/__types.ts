@@ -1610,6 +1610,10 @@ export interface Petition extends PetitionBase {
   attachments: Array<PetitionAttachment>;
   /** The closing email body of the petition. */
   closingEmailBody?: Maybe<Scalars["JSON"]>;
+  /** The body of the optional completing message to be show to recipients */
+  completingMessageBody?: Maybe<Scalars["JSON"]>;
+  /** The subject of the optional completing message to be show to recipients */
+  completingMessageSubject?: Maybe<Scalars["String"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The current signature request. */
@@ -1634,6 +1638,8 @@ export interface Petition extends PetitionBase {
   fromTemplateId?: Maybe<Scalars["GID"]>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
+  /** Wether the completion message will be shown to the recipients or not. */
+  isCompletingMessageEnabled: Scalars["Boolean"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
@@ -1749,6 +1755,10 @@ export interface PetitionBase {
   attachments: Array<PetitionAttachment>;
   /** The closing email body of the petition. */
   closingEmailBody?: Maybe<Scalars["JSON"]>;
+  /** The body of the optional completing message to be show to recipients */
+  completingMessageBody?: Maybe<Scalars["JSON"]>;
+  /** The subject of the optional completing message to be show to recipients */
+  completingMessageSubject?: Maybe<Scalars["String"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom user properties */
@@ -1765,6 +1775,8 @@ export interface PetitionBase {
   fields: Array<PetitionField>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
+  /** Wether the completion message will be shown to the recipients or not. */
+  isCompletingMessageEnabled: Scalars["Boolean"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
@@ -2317,6 +2329,10 @@ export interface PetitionTemplate extends PetitionBase {
   categories?: Maybe<Array<Scalars["String"]>>;
   /** The closing email body of the petition. */
   closingEmailBody?: Maybe<Scalars["JSON"]>;
+  /** The body of the optional completing message to be show to recipients */
+  completingMessageBody?: Maybe<Scalars["JSON"]>;
+  /** The subject of the optional completing message to be show to recipients */
+  completingMessageSubject?: Maybe<Scalars["String"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom user properties */
@@ -2341,6 +2357,8 @@ export interface PetitionTemplate extends PetitionBase {
   /** The ID of the petition or template. */
   id: Scalars["GID"];
   imageUrl?: Maybe<Scalars["String"]>;
+  /** Wether the completion message will be shown to the recipients or not. */
+  isCompletingMessageEnabled: Scalars["Boolean"];
   /** Whether the template is publicly available or not */
   isPublic: Scalars["Boolean"];
   /**
@@ -3300,10 +3318,13 @@ export interface UpdatePetitionFieldInput {
 
 export interface UpdatePetitionInput {
   closingEmailBody?: InputMaybe<Scalars["JSON"]>;
+  completingMessageBody?: InputMaybe<Scalars["JSON"]>;
+  completingMessageSubject?: InputMaybe<Scalars["String"]>;
   deadline?: InputMaybe<Scalars["DateTime"]>;
   description?: InputMaybe<Scalars["JSON"]>;
   emailBody?: InputMaybe<Scalars["JSON"]>;
   emailSubject?: InputMaybe<Scalars["String"]>;
+  isCompletingMessageEnabled?: InputMaybe<Scalars["Boolean"]>;
   isRecipientViewContentsHidden?: InputMaybe<Scalars["Boolean"]>;
   locale?: InputMaybe<PetitionLocale>;
   name?: InputMaybe<Scalars["String"]>;
@@ -8320,17 +8341,6 @@ export type PetitionSettings_updateTemplateDefaultPermissionsMutation = {
   };
 };
 
-export type PetitionTemplateComposeMessageEditor_PetitionFragment = {
-  __typename?: "PetitionTemplate";
-  id: string;
-  emailSubject?: string | null;
-  emailBody?: any | null;
-  closingEmailBody?: any | null;
-  description?: any | null;
-  isRestricted: boolean;
-  isPublic: boolean;
-};
-
 export type CopySignatureConfigDialog_PetitionSignerFragment = {
   __typename?: "PetitionSigner";
   email: string;
@@ -8410,6 +8420,34 @@ export type PetitionListTagFilter_tagsQuery = {
     __typename?: "TagPagination";
     items: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   };
+};
+
+export type PetitionTemplateClosingMessageCard_PetitionTemplateFragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  closingEmailBody?: any | null;
+  isRestricted: boolean;
+  isPublic: boolean;
+};
+
+export type PetitionTemplateCompletingMessageCard_PetitionTemplateFragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  isCompletingMessageEnabled: boolean;
+  completingMessageSubject?: string | null;
+  completingMessageBody?: any | null;
+  isRestricted: boolean;
+  isPublic: boolean;
+  signatureConfig?: { __typename: "SignatureConfig" } | null;
+};
+
+export type PetitionTemplateRequestMessageCard_PetitionTemplateFragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  emailSubject?: string | null;
+  emailBody?: any | null;
+  isRestricted: boolean;
+  isPublic: boolean;
 };
 
 export type PublicTemplateCard_PetitionTemplateFragment = {
@@ -14222,14 +14260,11 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
 export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   isPublic: boolean;
+  description?: any | null;
   id: string;
   tone: Tone;
   isRestricted: boolean;
   name?: string | null;
-  emailSubject?: string | null;
-  emailBody?: any | null;
-  closingEmailBody?: any | null;
-  description?: any | null;
   locale: PetitionLocale;
   skipForwardSecurity: boolean;
   isRecipientViewContentsHidden: boolean;
@@ -14533,10 +14568,6 @@ export type PetitionCompose_updatePetitionMutation = {
         isRecipientViewContentsHidden: boolean;
         isRestricted: boolean;
         isRestrictedWithPassword: boolean;
-        emailSubject?: string | null;
-        emailBody?: any | null;
-        closingEmailBody?: any | null;
-        description?: any | null;
         updatedAt: string;
         remindersConfig?: {
           __typename?: "RemindersConfig";
@@ -15101,14 +15132,11 @@ export type PetitionCompose_petitionQuery = {
     | {
         __typename?: "PetitionTemplate";
         isPublic: boolean;
+        description?: any | null;
         id: string;
         tone: Tone;
         isRestricted: boolean;
         name?: string | null;
-        emailSubject?: string | null;
-        emailBody?: any | null;
-        closingEmailBody?: any | null;
-        description?: any | null;
         locale: PetitionLocale;
         skipForwardSecurity: boolean;
         isRecipientViewContentsHidden: boolean;
@@ -15236,6 +15264,192 @@ export type PetitionQuery = {
     | { __typename?: "Petition"; status: PetitionStatus; id: string }
     | { __typename?: "PetitionTemplate"; id: string }
     | null;
+};
+
+export type PetitionMessages_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+  id: string;
+  tone: Tone;
+  name?: string | null;
+  locale: PetitionLocale;
+  deadline?: string | null;
+  status: PetitionStatus;
+  isRestricted: boolean;
+  updatedAt: string;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    isSubscribed: boolean;
+  } | null;
+};
+
+export type PetitionMessages_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  tone: Tone;
+  emailSubject?: string | null;
+  emailBody?: any | null;
+  isRestricted: boolean;
+  isPublic: boolean;
+  isCompletingMessageEnabled: boolean;
+  completingMessageSubject?: string | null;
+  completingMessageBody?: any | null;
+  closingEmailBody?: any | null;
+  name?: string | null;
+  locale: PetitionLocale;
+  updatedAt: string;
+  signatureConfig?: { __typename: "SignatureConfig" } | null;
+};
+
+export type PetitionMessages_PetitionBaseFragment =
+  | PetitionMessages_PetitionBase_Petition_Fragment
+  | PetitionMessages_PetitionBase_PetitionTemplate_Fragment;
+
+export type PetitionMessages_QueryFragment = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasPetitionPdfExport: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
+    };
+  };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
+};
+
+export type PetitionMessages_userQueryVariables = Exact<{ [key: string]: never }>;
+
+export type PetitionMessages_userQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasPetitionPdfExport: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
+    };
+  };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
+};
+
+export type PetitionMessages_petitionQueryVariables = Exact<{
+  id: Scalars["GID"];
+}>;
+
+export type PetitionMessages_petitionQuery = {
+  petition?:
+    | {
+        __typename?: "Petition";
+        id: string;
+        tone: Tone;
+        name?: string | null;
+        locale: PetitionLocale;
+        deadline?: string | null;
+        status: PetitionStatus;
+        isRestricted: boolean;
+        updatedAt: string;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          isSubscribed: boolean;
+        } | null;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        tone: Tone;
+        emailSubject?: string | null;
+        emailBody?: any | null;
+        isRestricted: boolean;
+        isPublic: boolean;
+        isCompletingMessageEnabled: boolean;
+        completingMessageSubject?: string | null;
+        completingMessageBody?: any | null;
+        closingEmailBody?: any | null;
+        name?: string | null;
+        locale: PetitionLocale;
+        updatedAt: string;
+        signatureConfig?: { __typename: "SignatureConfig" } | null;
+      }
+    | null;
+};
+
+export type PetitionMessages_updatePetitionMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  data: UpdatePetitionInput;
+}>;
+
+export type PetitionMessages_updatePetitionMutation = {
+  updatePetition:
+    | {
+        __typename?: "Petition";
+        id: string;
+        tone: Tone;
+        name?: string | null;
+        locale: PetitionLocale;
+        deadline?: string | null;
+        status: PetitionStatus;
+        isRestricted: boolean;
+        updatedAt: string;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          isSubscribed: boolean;
+        } | null;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        tone: Tone;
+        emailSubject?: string | null;
+        emailBody?: any | null;
+        isRestricted: boolean;
+        isPublic: boolean;
+        isCompletingMessageEnabled: boolean;
+        completingMessageSubject?: string | null;
+        completingMessageBody?: any | null;
+        closingEmailBody?: any | null;
+        name?: string | null;
+        locale: PetitionLocale;
+        updatedAt: string;
+        signatureConfig?: { __typename: "SignatureConfig" } | null;
+      };
 };
 
 export type PetitionPreview_PetitionBase_Petition_Fragment = {
@@ -21879,17 +22093,6 @@ export const PetitionActivity_QueryFragmentDoc = gql`
   ${useUpdateIsReadNotification_UserFragmentDoc}
   ${useSendPetitionHandler_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionActivity_QueryFragment, unknown>;
-export const PetitionTemplateComposeMessageEditor_PetitionFragmentDoc = gql`
-  fragment PetitionTemplateComposeMessageEditor_Petition on PetitionTemplate {
-    id
-    emailSubject
-    emailBody
-    closingEmailBody
-    description
-    isRestricted
-    isPublic
-  }
-` as unknown as DocumentNode<PetitionTemplateComposeMessageEditor_PetitionFragment, unknown>;
 export const SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc = gql`
   fragment SignatureConfigDialog_SignatureOrgIntegration on SignatureOrgIntegration {
     id
@@ -22106,7 +22309,6 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
   fragment PetitionCompose_PetitionBase on PetitionBase {
     id
     ...PetitionLayout_PetitionBase
-    ...PetitionTemplateComposeMessageEditor_Petition
     ...PetitionSettings_PetitionBase
     tone
     isRestricted
@@ -22129,10 +22331,10 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
     }
     ... on PetitionTemplate {
       isPublic
+      description
     }
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
-  ${PetitionTemplateComposeMessageEditor_PetitionFragmentDoc}
   ${PetitionSettings_PetitionBaseFragmentDoc}
   ${PetitionCompose_PetitionFieldFragmentDoc}
   ${useSendPetitionHandler_PetitionFragmentDoc}
@@ -22190,6 +22392,61 @@ export const PetitionCompose_QueryFragmentDoc = gql`
   ${useSendPetitionHandler_UserFragmentDoc}
   ${isUsageLimitsReached_OrganizationFragmentDoc}
 ` as unknown as DocumentNode<PetitionCompose_QueryFragment, unknown>;
+export const PetitionTemplateRequestMessageCard_PetitionTemplateFragmentDoc = gql`
+  fragment PetitionTemplateRequestMessageCard_PetitionTemplate on PetitionTemplate {
+    id
+    emailSubject
+    emailBody
+    isRestricted
+    isPublic
+  }
+` as unknown as DocumentNode<PetitionTemplateRequestMessageCard_PetitionTemplateFragment, unknown>;
+export const PetitionTemplateCompletingMessageCard_PetitionTemplateFragmentDoc = gql`
+  fragment PetitionTemplateCompletingMessageCard_PetitionTemplate on PetitionTemplate {
+    id
+    isCompletingMessageEnabled
+    completingMessageSubject
+    completingMessageBody
+    isRestricted
+    isPublic
+    signatureConfig {
+      __typename
+    }
+  }
+` as unknown as DocumentNode<
+  PetitionTemplateCompletingMessageCard_PetitionTemplateFragment,
+  unknown
+>;
+export const PetitionTemplateClosingMessageCard_PetitionTemplateFragmentDoc = gql`
+  fragment PetitionTemplateClosingMessageCard_PetitionTemplate on PetitionTemplate {
+    id
+    closingEmailBody
+    isRestricted
+    isPublic
+  }
+` as unknown as DocumentNode<PetitionTemplateClosingMessageCard_PetitionTemplateFragment, unknown>;
+export const PetitionMessages_PetitionBaseFragmentDoc = gql`
+  fragment PetitionMessages_PetitionBase on PetitionBase {
+    id
+    tone
+    ...PetitionLayout_PetitionBase
+    ... on PetitionTemplate {
+      ...PetitionTemplateRequestMessageCard_PetitionTemplate
+      ...PetitionTemplateCompletingMessageCard_PetitionTemplate
+      ...PetitionTemplateClosingMessageCard_PetitionTemplate
+    }
+  }
+  ${PetitionLayout_PetitionBaseFragmentDoc}
+  ${PetitionTemplateRequestMessageCard_PetitionTemplateFragmentDoc}
+  ${PetitionTemplateCompletingMessageCard_PetitionTemplateFragmentDoc}
+  ${PetitionTemplateClosingMessageCard_PetitionTemplateFragmentDoc}
+` as unknown as DocumentNode<PetitionMessages_PetitionBaseFragment, unknown>;
+export const PetitionMessages_QueryFragmentDoc = gql`
+  fragment PetitionMessages_Query on Query {
+    ...PetitionLayout_Query
+  }
+  ${PetitionLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<PetitionMessages_QueryFragment, unknown>;
 export const useFieldVisibility_PetitionFieldFragmentDoc = gql`
   fragment useFieldVisibility_PetitionField on PetitionField {
     id
@@ -25370,13 +25627,11 @@ export const PetitionCompose_updatePetitionDocument = gql`
       ...PetitionLayout_PetitionBase
       ...PetitionSettings_PetitionBase
       ...AddPetitionAccessDialog_Petition
-      ...PetitionTemplateComposeMessageEditor_Petition
     }
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionSettings_PetitionBaseFragmentDoc}
   ${AddPetitionAccessDialog_PetitionFragmentDoc}
-  ${PetitionTemplateComposeMessageEditor_PetitionFragmentDoc}
 ` as unknown as DocumentNode<
   PetitionCompose_updatePetitionMutation,
   PetitionCompose_updatePetitionMutationVariables
@@ -25530,6 +25785,34 @@ export const PetitionDocument = gql`
     }
   }
 ` as unknown as DocumentNode<PetitionQuery, PetitionQueryVariables>;
+export const PetitionMessages_userDocument = gql`
+  query PetitionMessages_user {
+    ...PetitionMessages_Query
+  }
+  ${PetitionMessages_QueryFragmentDoc}
+` as unknown as DocumentNode<PetitionMessages_userQuery, PetitionMessages_userQueryVariables>;
+export const PetitionMessages_petitionDocument = gql`
+  query PetitionMessages_petition($id: GID!) {
+    petition(id: $id) {
+      ...PetitionMessages_PetitionBase
+    }
+  }
+  ${PetitionMessages_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<
+  PetitionMessages_petitionQuery,
+  PetitionMessages_petitionQueryVariables
+>;
+export const PetitionMessages_updatePetitionDocument = gql`
+  mutation PetitionMessages_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
+    updatePetition(petitionId: $petitionId, data: $data) {
+      ...PetitionMessages_PetitionBase
+    }
+  }
+  ${PetitionMessages_PetitionBaseFragmentDoc}
+` as unknown as DocumentNode<
+  PetitionMessages_updatePetitionMutation,
+  PetitionMessages_updatePetitionMutationVariables
+>;
 export const PetitionPreview_updatePetitionDocument = gql`
   mutation PetitionPreview_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
     updatePetition(petitionId: $petitionId, data: $data) {

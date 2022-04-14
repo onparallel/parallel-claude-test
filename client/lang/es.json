@@ -1131,8 +1131,8 @@
   },
   {
     "term": "component.message-closing-email-editor.body-label",
-    "definition": "Este mensaje solo se enviará si se selecciona la opción de <b>notificar al destinatario</b> al cerrarse la petición.",
-    "context": "This message will only be sent if the option to <b>notify the recipient</b> is selected when closing the petition."
+    "definition": "El asunto de este correo será el mismo que el del correo de la petición.",
+    "context": "The subject of this email will be the same as the subject of the request message."
   },
   {
     "term": "component.message-email-editor.body-placeholder",
@@ -2255,14 +2255,59 @@
     "context": "Status"
   },
   {
-    "term": "component.petition-template-compose-message-editor.closing-message",
-    "definition": "Mensaje al finalizar",
+    "term": "component.petition-template-closing-message.card-explainer",
+    "definition": "Este mensaje se utilizará al seleccionar la opción <b>notificar al destinatario</b> para notificar de la revisión y el cierre de la petición.",
+    "context": "This message will be used when selecting the option <b>notify recipients</b> to notify that it has been reviewed and closed."
+  },
+  {
+    "term": "component.petition-template-closing-message.card-header",
+    "definition": "Mensaje de cierre",
     "context": "Closing message"
   },
   {
-    "term": "component.petition-template-compose-message-editor.email-message",
-    "definition": "Mensaje de envío",
-    "context": "Email message"
+    "term": "component.petition-template-completing-message.body-placeholder",
+    "definition": "Escriba el mensaje que verán sus destinatarios al finalizar",
+    "context": "Write the message that your recipients will see when they finalize"
+  },
+  {
+    "term": "component.petition-template-completing-message.card-explainer",
+    "definition": "Este mensaje se mostrará cuando el destinatario <b>complete</b> la petición. Úsalo para agradecer su tiempo o incluir instrucciones acerca de los siguientes pasos.",
+    "context": "This message will be shown when the recipient <b>completes</b> the petition. Use it to thank them or to include further instructions."
+  },
+  {
+    "term": "component.petition-template-completing-message.card-header",
+    "definition": "Mensaje de agradecimiento",
+    "context": "Thank you message"
+  },
+  {
+    "term": "component.petition-template-completing-message.card-signature-alert",
+    "definition": "Hay una firma añadida en esta plantilla. Recomendamos tenerlo en cuenta en tu mensaje, ya que este aparecerá antes de que el destinatario reciba la firma.",
+    "context": "There is a signature added in this template. We recommend that you take this into account in your message, as it will appear before the recipient receives the signature."
+  },
+  {
+    "term": "component.petition-template-completing-message.popover",
+    "definition": "Tu mensaje se mostrará en una ventana emergente al finalizar.",
+    "context": "Your message will be displayed in a pop-up upon completion."
+  },
+  {
+    "term": "component.petition-template-completing-message.subject-label",
+    "definition": "Título de la ventana",
+    "context": "Title of the window"
+  },
+  {
+    "term": "component.petition-template-completing-message.subject-placeholder",
+    "definition": "Ingresa un título o asunto para tu mensaje",
+    "context": "Enter a title or subject for your message"
+  },
+  {
+    "term": "component.petition-template-request-message.card-explainer",
+    "definition": "Este mensaje se utilizará <b>cuando se envíe</b> la petición a los destinatarios.",
+    "context": "This message will be used <b>when sending</b> the petition to the recipients."
+  },
+  {
+    "term": "component.petition-template-request-message.card-header",
+    "definition": "Mensaje de la petición",
+    "context": "Request message"
   },
   {
     "term": "component.petition-template.delete-label",
@@ -6068,6 +6113,11 @@
     "term": "petition.header.last-saved-on",
     "definition": "Último guardado: {date}",
     "context": "Last saved on: {date}"
+  },
+  {
+    "term": "petition.header.messages-tab",
+    "definition": "Mensajes",
+    "context": "Messages"
   },
   {
     "term": "petition.header.preview-tab",

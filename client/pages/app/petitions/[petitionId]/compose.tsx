@@ -27,7 +27,6 @@ import { PetitionComposeField } from "@parallel/components/petition-compose/Peti
 import { PetitionComposeFieldList } from "@parallel/components/petition-compose/PetitionComposeFieldList";
 import { PetitionLimitReachedAlert } from "@parallel/components/petition-compose/PetitionLimitReachedAlert";
 import { PetitionSettings } from "@parallel/components/petition-compose/PetitionSettings";
-import { PetitionTemplateComposeMessageEditor } from "@parallel/components/petition-compose/PetitionTemplateComposeMessageEditor";
 import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
 import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/settings/PetitionComposeFieldSettings";
 import { cleanPreviewFieldReplies } from "@parallel/components/petition-preview/clientMutations";
@@ -406,7 +405,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         petition={petition}
         onUpdatePetition={handleUpdatePetition}
         section="compose"
-        scrollBody
         headerActions={
           petition?.__typename === "Petition" &&
           !petition.accesses?.find((a) => a.status === "ACTIVE") ? (
@@ -523,34 +521,26 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 isReadOnly={petition.isRestricted || isPublicTemplate}
               />
             ) : null}
-            {petition && petition.__typename === "Petition" ? (
-              petition.status !== "DRAFT" ? (
-                <Box color="gray.500" marginTop={12} paddingX={4} textAlign="center">
-                  <Text>
-                    <FormattedMessage
-                      id="petition.already-sent"
-                      defaultMessage="This petition has already been sent."
-                    />
-                  </Text>
-                  <Text>
-                    <FormattedMessage
-                      id="petition.send-from-activity"
-                      defaultMessage="If you want to send it to someone else you can do it from the <a>Activity</a> tab."
-                      values={{
-                        a: (chunks: any) => (
-                          <Link href={`/app/petitions/${petitionId}/activity`}>{chunks}</Link>
-                        ),
-                      }}
-                    />
-                  </Text>
-                </Box>
-              ) : null
-            ) : petition?.__typename === "PetitionTemplate" ? (
-              <PetitionTemplateComposeMessageEditor
-                marginTop={4}
-                petition={petition}
-                onUpdatePetition={handleUpdatePetition}
-              />
+            {petition && petition.__typename === "Petition" && petition.status !== "DRAFT" ? (
+              <Box color="gray.500" marginTop={12} paddingX={4} textAlign="center">
+                <Text>
+                  <FormattedMessage
+                    id="petition.already-sent"
+                    defaultMessage="This petition has already been sent."
+                  />
+                </Text>
+                <Text>
+                  <FormattedMessage
+                    id="petition.send-from-activity"
+                    defaultMessage="If you want to send it to someone else you can do it from the <a>Activity</a> tab."
+                    values={{
+                      a: (chunks: any) => (
+                        <Link href={`/app/petitions/${petitionId}/activity`}>{chunks}</Link>
+                      ),
+                    }}
+                  />
+                </Text>
+              </Box>
             ) : null}
           </Box>
         </PaneWithFlyout>
@@ -565,7 +555,6 @@ PetitionCompose.fragments = {
       fragment PetitionCompose_PetitionBase on PetitionBase {
         id
         ...PetitionLayout_PetitionBase
-        ...PetitionTemplateComposeMessageEditor_Petition
         ...PetitionSettings_PetitionBase
         tone
         isRestricted
@@ -588,12 +577,12 @@ PetitionCompose.fragments = {
         }
         ... on PetitionTemplate {
           isPublic
+          description
         }
       }
       ${useSendPetitionHandler.fragments.Petition}
       ${PetitionLayout.fragments.PetitionBase}
       ${PetitionSettings.fragments.PetitionBase}
-      ${PetitionTemplateComposeMessageEditor.fragments.Petition}
       ${this.PetitionField}
     `;
   },
@@ -643,13 +632,11 @@ PetitionCompose.mutations = [
         ...PetitionLayout_PetitionBase
         ...PetitionSettings_PetitionBase
         ...AddPetitionAccessDialog_Petition
-        ...PetitionTemplateComposeMessageEditor_Petition
       }
     }
     ${PetitionLayout.fragments.PetitionBase}
     ${PetitionSettings.fragments.PetitionBase}
     ${AddPetitionAccessDialog.fragments.Petition}
-    ${PetitionTemplateComposeMessageEditor.fragments.Petition}
   `,
   gql`
     mutation PetitionCompose_updateFieldPositions($petitionId: GID!, $fieldIds: [GID!]!) {

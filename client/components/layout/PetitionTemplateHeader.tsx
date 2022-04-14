@@ -45,11 +45,12 @@ import { usePetitionSharingDialog } from "../petition-common/dialogs/PetitionSha
 import { HeaderNameEditable } from "./HeaderNameEditable";
 import { PetitionHeaderTab } from "./PetitionHeaderTab";
 import { PetitionHeaderTabs } from "./PetitionHeaderTabs";
+import { PetitionSection } from "./PetitionLayout";
 
 export interface PetitionTemplateHeaderProps extends PetitionTemplateHeader_QueryFragment {
   petition: PetitionTemplateHeader_PetitionTemplateFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
-  section: "compose" | "preview" | "replies" | "activity";
+  section: PetitionSection;
 }
 
 export const PetitionTemplateHeader = Object.assign(
@@ -104,20 +105,7 @@ export const PetitionTemplateHeader = Object.assign(
     const sections = useMemo(
       () => [
         {
-          rightIcon: petition.isRestricted ? (
-            <SmallPopover
-              content={
-                <Text fontSize="sm">
-                  <FormattedMessage
-                    id="component.petition-header.compose-tab.readonly"
-                    defaultMessage="Edition restricted. To make changes, you can disable the protection on the Settings tab."
-                  />
-                </Text>
-              }
-            >
-              <LockClosedIcon color="gray.600" _hover={{ color: "gray.700" }} />
-            </SmallPopover>
-          ) : undefined,
+          rightIcon: petition.isRestricted ? <EditionRestrictedPopover /> : undefined,
           section: "compose",
           label: intl.formatMessage({
             id: "petition.header.compose-tab",
@@ -125,6 +113,17 @@ export const PetitionTemplateHeader = Object.assign(
           }),
           attributes: {
             "data-action": "template-compose",
+          },
+        },
+        {
+          rightIcon: petition.isRestricted ? <EditionRestrictedPopover /> : undefined,
+          section: "messages",
+          label: intl.formatMessage({
+            id: "petition.header.messages-tab",
+            defaultMessage: "Messages",
+          }),
+          attributes: {
+            "data-action": "template-messages",
           },
         },
         {
@@ -187,7 +186,7 @@ export const PetitionTemplateHeader = Object.assign(
                 16 /* heading padding right */
               }px)`,
               lg: `calc((100vw - ${
-                96 /* left navbar width */ + 350 /* petition navigation tabs width */
+                96 /* left navbar width */ + 470 /* petition navigation tabs width */
               }px)/2 - ${
                 32 /* heading padding l+r */ +
                 24 /* petition status icon width */ +
@@ -325,3 +324,20 @@ export const PetitionTemplateHeader = Object.assign(
     },
   }
 );
+
+function EditionRestrictedPopover() {
+  return (
+    <SmallPopover
+      content={
+        <Text fontSize="sm">
+          <FormattedMessage
+            id="component.petition-header.compose-tab.readonly"
+            defaultMessage="Edition restricted. To make changes, you can disable the protection on the Settings tab."
+          />
+        </Text>
+      }
+    >
+      <LockClosedIcon color="gray.600" _hover={{ color: "gray.700" }} />
+    </SmallPopover>
+  );
+}

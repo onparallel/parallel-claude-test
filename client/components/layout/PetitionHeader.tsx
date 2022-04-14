@@ -54,11 +54,12 @@ import { useConfirmReopenPetitionDialog } from "../petition-replies/dialogs/Conf
 import { HeaderNameEditable } from "./HeaderNameEditable";
 import { PetitionHeaderTab } from "./PetitionHeaderTab";
 import { PetitionHeaderTabs } from "./PetitionHeaderTabs";
+import { PetitionSection } from "./PetitionLayout";
 
 export interface PetitionHeaderProps extends PetitionHeader_QueryFragment {
   petition: PetitionHeader_PetitionFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
-  section: "compose" | "preview" | "replies" | "activity";
+  section: PetitionSection;
   actions?: ReactNode;
 }
 

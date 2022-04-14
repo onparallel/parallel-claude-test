@@ -1891,3 +1891,24 @@ export const StarIcon = createIcon({
     />
   ),
 });
+
+export const AppWindowIcon = createIcon({
+  displayName: "AppWindowIcon",
+  viewBox: "0 0 18 18",
+  path: (
+    <g fill="none">
+      <path
+        d="M3 3H15C15.825 3 16.5 3.675 16.5 4.5V13.5C16.5 14.325 15.825 15 15 15H3C2.175 15 1.5 14.325 1.5 13.5V4.5C1.5 3.675 2.175 3 3 3Z"
+        stroke="#1A202C"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M2.7 3.375H15.3C16.1663 3.375 16.875 3.56484 16.875 3.79688V6.32812C16.875 6.56016 16.1663 6.75 15.3 6.75H2.7C1.83375 6.75 1.125 6.56016 1.125 6.32812V3.79688C1.125 3.56484 1.83375 3.375 2.7 3.375Z"
+        fill="#1A202C"
+      />
+      <circle cx="13.5" cy="4.5" r="1.125" fill="white" />
+    </g>
+  ),
+});

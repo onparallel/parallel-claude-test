@@ -142,6 +142,18 @@ export const PetitionBase = interfaceType({
       description: "The closing email body of the petition.",
       resolve: (o) => safeJsonParse(o.closing_email_body),
     });
+    t.boolean("isCompletingMessageEnabled", {
+      description: "Wether the completion message will be shown to the recipients or not.",
+      resolve: (o) => o.is_completing_message_enabled,
+    });
+    t.nullable.string("completingMessageSubject", {
+      description: "The subject of the optional completing message to be show to recipients",
+      resolve: (o) => o.completing_message_subject,
+    });
+    t.nullable.json("completingMessageBody", {
+      description: "The body of the optional completing message to be show to recipients",
+      resolve: (o) => safeJsonParse(o.completing_message_body),
+    });
     t.nullable.field("remindersConfig", {
       type: "RemindersConfig",
       description: "The reminders configuration for the petition.",

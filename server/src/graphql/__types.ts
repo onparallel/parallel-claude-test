@@ -163,10 +163,13 @@ export interface NexusGenInputs {
   UpdatePetitionInput: {
     // input type
     closingEmailBody?: NexusGenScalars["JSON"] | null; // JSON
+    completingMessageBody?: NexusGenScalars["JSON"] | null; // JSON
+    completingMessageSubject?: string | null; // String
     deadline?: NexusGenScalars["DateTime"] | null; // DateTime
     description?: NexusGenScalars["JSON"] | null; // JSON
     emailBody?: NexusGenScalars["JSON"] | null; // JSON
     emailSubject?: string | null; // String
+    isCompletingMessageEnabled?: boolean | null; // Boolean
     isRecipientViewContentsHidden?: boolean | null; // Boolean
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
     name?: string | null; // String
@@ -1084,6 +1087,8 @@ export interface NexusGenFieldTypes {
     accesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     attachments: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
     closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
+    completingMessageBody: NexusGenScalars["JSON"] | null; // JSON
+    completingMessageSubject: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     currentSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"] | null; // PetitionSignatureRequest
     customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
@@ -1096,6 +1101,7 @@ export interface NexusGenFieldTypes {
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     fromTemplateId: NexusGenScalars["GID"] | null; // GID
     id: NexusGenScalars["GID"]; // GID!
+    isCompletingMessageEnabled: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     isRestricted: boolean; // Boolean!
     isRestrictedWithPassword: boolean; // Boolean!
@@ -1401,6 +1407,8 @@ export interface NexusGenFieldTypes {
     backgroundColor: string | null; // String
     categories: string[] | null; // [String!]
     closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
+    completingMessageBody: NexusGenScalars["JSON"] | null; // JSON
+    completingMessageSubject: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
     defaultPermissions: NexusGenRootTypes["TemplateDefaultPermission"][]; // [TemplateDefaultPermission!]!
@@ -1414,6 +1422,7 @@ export interface NexusGenFieldTypes {
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     id: NexusGenScalars["GID"]; // GID!
     imageUrl: string | null; // String
+    isCompletingMessageEnabled: boolean; // Boolean!
     isPublic: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     isRestricted: boolean; // Boolean!
@@ -1994,6 +2003,8 @@ export interface NexusGenFieldTypes {
     // field return type
     attachments: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
     closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
+    completingMessageBody: NexusGenScalars["JSON"] | null; // JSON
+    completingMessageSubject: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
     effectivePermissions: NexusGenRootTypes["EffectivePetitionUserPermission"][]; // [EffectivePetitionUserPermission!]!
@@ -2002,6 +2013,7 @@ export interface NexusGenFieldTypes {
     fieldCount: number; // Int!
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     id: NexusGenScalars["GID"]; // GID!
+    isCompletingMessageEnabled: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     isRestricted: boolean; // Boolean!
     isRestrictedWithPassword: boolean; // Boolean!
@@ -2513,6 +2525,8 @@ export interface NexusGenFieldTypeNames {
     accesses: "PetitionAccess";
     attachments: "PetitionAttachment";
     closingEmailBody: "JSON";
+    completingMessageBody: "JSON";
+    completingMessageSubject: "String";
     createdAt: "DateTime";
     currentSignatureRequest: "PetitionSignatureRequest";
     customProperties: "JSONObject";
@@ -2525,6 +2539,7 @@ export interface NexusGenFieldTypeNames {
     fields: "PetitionField";
     fromTemplateId: "GID";
     id: "GID";
+    isCompletingMessageEnabled: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
     isRestricted: "Boolean";
     isRestrictedWithPassword: "Boolean";
@@ -2830,6 +2845,8 @@ export interface NexusGenFieldTypeNames {
     backgroundColor: "String";
     categories: "String";
     closingEmailBody: "JSON";
+    completingMessageBody: "JSON";
+    completingMessageSubject: "String";
     createdAt: "DateTime";
     customProperties: "JSONObject";
     defaultPermissions: "TemplateDefaultPermission";
@@ -2843,6 +2860,7 @@ export interface NexusGenFieldTypeNames {
     fields: "PetitionField";
     id: "GID";
     imageUrl: "String";
+    isCompletingMessageEnabled: "Boolean";
     isPublic: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
     isRestricted: "Boolean";
@@ -3423,6 +3441,8 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     attachments: "PetitionAttachment";
     closingEmailBody: "JSON";
+    completingMessageBody: "JSON";
+    completingMessageSubject: "String";
     createdAt: "DateTime";
     customProperties: "JSONObject";
     effectivePermissions: "EffectivePetitionUserPermission";
@@ -3431,6 +3451,7 @@ export interface NexusGenFieldTypeNames {
     fieldCount: "Int";
     fields: "PetitionField";
     id: "GID";
+    isCompletingMessageEnabled: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
     isRestricted: "Boolean";
     isRestrictedWithPassword: "Boolean";

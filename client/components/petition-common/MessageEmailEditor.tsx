@@ -31,10 +31,12 @@ export function MessageEmailEditor({
     <>
       <FormControl isInvalid={showErrors && !subject} isDisabled={isReadOnly}>
         <FormLabel paddingBottom={0}>
-          <FormattedMessage
-            id="component.message-email-editor.subject-label"
-            defaultMessage="Subject"
-          />
+          {
+            <FormattedMessage
+              id="component.message-email-editor.subject-label"
+              defaultMessage="Subject"
+            />
+          }
         </FormLabel>
         <Input
           id="input-message-email-editor-subject"
@@ -67,7 +69,7 @@ export function MessageEmailEditor({
           value={body}
           onChange={onBodyChange}
           placeholder={intl.formatMessage({
-            id: "component.message-email-editor.body-placeholder",
+            id: "generic.email-message-placeholder",
             defaultMessage: "Write a message to include in the email",
           })}
           placeholderOptions={placeholderOptions}

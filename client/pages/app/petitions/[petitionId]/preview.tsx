@@ -263,7 +263,6 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         petition={petition}
         onUpdatePetition={handleUpdatePetition}
         section="preview"
-        scrollBody
         headerActions={
           isPetition && !petition.accesses?.find((a) => a.status === "ACTIVE") ? (
             <ResponsiveButtonIcon

@@ -12,12 +12,13 @@ import { ReactNode, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { PetitionTemplateHeader } from "./PetitionTemplateHeader";
 
+export type PetitionSection = "compose" | "preview" | "replies" | "activity" | "messages";
+
 export interface PetitionLayoutProps extends PetitionLayout_QueryFragment {
   petition: PetitionLayout_PetitionBaseFragment;
   onNextClick?: () => void;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
-  section: "compose" | "preview" | "replies" | "activity";
-  scrollBody: boolean;
+  section: PetitionSection;
   headerActions?: ReactNode;
   subHeader?: ReactNode;
 }
@@ -28,7 +29,6 @@ export const PetitionLayout = Object.assign(
       me,
       realMe,
       petition,
-      scrollBody,
       section,
       onUpdatePetition,
       headerActions,
@@ -47,6 +47,10 @@ export const PetitionLayout = Object.assign(
                 compose: intl.formatMessage({
                   id: "petition.header.compose-tab",
                   defaultMessage: "Compose",
+                }),
+                messages: intl.formatMessage({
+                  id: "petition.header.messages-tab",
+                  defaultMessage: "Messages",
                 }),
                 preview: intl.formatMessage({
                   id: "petition.header.preview-tab",

@@ -465,7 +465,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       petition={petition}
       onUpdatePetition={handleUpdatePetition}
       section="replies"
-      scrollBody
       headerActions={
         <Box display={{ base: "none", lg: "block" }}>
           <ShareButton petition={petition} userId={me.id} onClick={handlePetitionSharingClick} />

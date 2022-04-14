@@ -328,7 +328,6 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       petition={petition}
       onUpdatePetition={handleUpdatePetition}
       section="activity"
-      scrollBody
       headerActions={
         <Box display={{ base: "none", lg: "block" }}>
           <ShareButton petition={petition} userId={me.id} onClick={handlePetitionSharingClick} />

@@ -24,7 +24,7 @@ export function MessageClosingEmailEditor({
       <FormLabel marginBottom={3.5}>
         <FormattedMessage
           id="component.message-closing-email-editor.body-label"
-          defaultMessage="This message will only be sent if the option to <b>notify the recipient</b> is selected when closing the petition."
+          defaultMessage="The subject of this email will be the same as the subject of the request message."
         />
       </FormLabel>
       <RichTextEditor
