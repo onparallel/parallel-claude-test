@@ -56,7 +56,10 @@ export function RecipientViewContentsCard({
       const id = `reply-${field.id}-${field.replies[0]?.id ?? "new"}`;
       const element = document.getElementById(id) as HTMLInputElement;
       element?.focus();
-      element?.setSelectionRange(element.value.length, element.value.length);
+      if (element.type === "text") {
+        // setSelectionRange does not work on inputs that are not type="text" (e.g. email)
+        element?.setSelectionRange?.(element.value.length, element.value.length);
+      }
     }
   };
 
