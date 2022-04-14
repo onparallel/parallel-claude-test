@@ -8,10 +8,10 @@ import {
 import { useHandledTestSignatureDialog } from "@parallel/components/petition-compose/dialogs/TestSignatureDialog";
 import {
   UpdatePetitionInput,
-  useSendPetitionHandler_bulkSendPetitionDocument,
-  useSendPetitionHandler_PetitionFragment,
-  useSendPetitionHandler_UserFragment,
   useSendPetitionHandler_addPetitionPermissionDocument,
+  useSendPetitionHandler_PetitionFragment,
+  useSendPetitionHandler_sendPetitionDocument,
+  useSendPetitionHandler_UserFragment,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { FORMATS } from "@parallel/utils/dates";
@@ -35,7 +35,7 @@ export function useSendPetitionHandler(
   const router = useRouter();
   const toast = useToast();
 
-  const [bulkSendPetition] = useMutation(useSendPetitionHandler_bulkSendPetitionDocument);
+  const [sendPetition] = useMutation(useSendPetitionHandler_sendPetitionDocument);
   const [addPetitionPermission] = useMutation(useSendPetitionHandler_addPetitionPermissionDocument);
 
   const showAddPetitionAccessDialog = useAddPetitionAccessDialog();
@@ -74,7 +74,7 @@ export function useSendPetitionHandler(
         onSearchContacts: async (search: string, exclude: string[]) =>
           await handleSearchContacts(search, [...exclude, ...currentRecipientIds]),
       });
-      const task = bulkSendPetition({
+      const task = sendPetition({
         variables: {
           petitionId: petition.id,
           contactIdGroups: recipientIdGroups,
@@ -111,7 +111,7 @@ export function useSendPetitionHandler(
         );
       }
       const { data } = await task;
-      if (data?.bulkSendPetition.some((r) => r.result !== "SUCCESS")) {
+      if (data?.sendPetition.some((r) => r.result !== "SUCCESS")) {
         toast({
           isClosable: true,
           status: "error",
@@ -205,7 +205,6 @@ export function useSendPetitionHandler(
 useSendPetitionHandler.fragments = {
   User: gql`
     fragment useSendPetitionHandler_User on User {
-      ...ConfirmPetitionSignersDialog_User
       ...AddPetitionAccessDialog_User
     }
     ${AddPetitionAccessDialog.fragments.User}
@@ -233,7 +232,7 @@ useSendPetitionHandler.fragments = {
 
 useSendPetitionHandler.mutations = [
   gql`
-    mutation useSendPetitionHandler_bulkSendPetition(
+    mutation useSendPetitionHandler_sendPetition(
       $petitionId: GID!
       $contactIdGroups: [[GID!]!]!
       $subject: String!
@@ -243,7 +242,7 @@ useSendPetitionHandler.mutations = [
       $bulkSendSigningMode: BulkSendSigningMode
       $senderId: GID
     ) {
-      bulkSendPetition(
+      sendPetition(
         petitionId: $petitionId
         contactIdGroups: $contactIdGroups
         subject: $subject

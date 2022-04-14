@@ -883,7 +883,6 @@ export interface NexusGenFieldTypes {
     approveOrRejectPetitionFieldReplies: NexusGenRootTypes["Petition"]; // Petition!
     assignPetitionToUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     bulkCreateContacts: NexusGenRootTypes["Contact"][]; // [Contact!]!
-    bulkSendPetition: NexusGenRootTypes["SendPetitionResult"][]; // [SendPetitionResult!]!
     cancelScheduledMessage: NexusGenRootTypes["PetitionMessage"] | null; // PetitionMessage
     cancelSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     changePassword: NexusGenEnums["ChangePasswordResult"]; // ChangePasswordResult!
@@ -969,6 +968,7 @@ export interface NexusGenFieldTypes {
     resetUserPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     restoreLogin: NexusGenEnums["Result"]; // Result!
     revokeUserAuthToken: NexusGenEnums["Result"]; // Result!
+    sendPetition: NexusGenRootTypes["SendPetitionResult"][]; // [SendPetitionResult!]!
     sendPetitionClosedNotification: NexusGenRootTypes["Petition"]; // Petition!
     sendReminders: NexusGenEnums["Result"]; // Result!
     sendSignatureRequestReminders: NexusGenEnums["Result"]; // Result!
@@ -2301,7 +2301,6 @@ export interface NexusGenFieldTypeNames {
     approveOrRejectPetitionFieldReplies: "Petition";
     assignPetitionToUser: "SupportMethodResponse";
     bulkCreateContacts: "Contact";
-    bulkSendPetition: "SendPetitionResult";
     cancelScheduledMessage: "PetitionMessage";
     cancelSignatureRequest: "PetitionSignatureRequest";
     changePassword: "ChangePasswordResult";
@@ -2387,6 +2386,7 @@ export interface NexusGenFieldTypeNames {
     resetUserPassword: "SupportMethodResponse";
     restoreLogin: "Result";
     revokeUserAuthToken: "Result";
+    sendPetition: "SendPetitionResult";
     sendPetitionClosedNotification: "Petition";
     sendReminders: "Result";
     sendSignatureRequestReminders: "Result";
@@ -3511,17 +3511,6 @@ export interface NexusGenArgTypes {
       // args
       file: NexusGenScalars["Upload"]; // Upload!
     };
-    bulkSendPetition: {
-      // args
-      body: NexusGenScalars["JSON"]; // JSON!
-      bulkSendSigningMode?: NexusGenEnums["BulkSendSigningMode"] | null; // BulkSendSigningMode
-      contactIdGroups: NexusGenScalars["GID"][][]; // [[GID!]!]!
-      petitionId: NexusGenScalars["GID"]; // GID!
-      remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
-      scheduledAt?: NexusGenScalars["DateTime"] | null; // DateTime
-      senderId?: NexusGenScalars["GID"] | null; // GID
-      subject: string; // String!
-    };
     cancelScheduledMessage: {
       // args
       messageId: NexusGenScalars["GID"]; // GID!
@@ -3986,6 +3975,17 @@ export interface NexusGenArgTypes {
     revokeUserAuthToken: {
       // args
       authTokenIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    sendPetition: {
+      // args
+      body: NexusGenScalars["JSON"]; // JSON!
+      bulkSendSigningMode?: NexusGenEnums["BulkSendSigningMode"] | null; // BulkSendSigningMode
+      contactIdGroups: NexusGenScalars["GID"][][]; // [[GID!]!]!
+      petitionId: NexusGenScalars["GID"]; // GID!
+      remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
+      scheduledAt?: NexusGenScalars["DateTime"] | null; // DateTime
+      senderId?: NexusGenScalars["GID"] | null; // GID
+      subject: string; // String!
     };
     sendPetitionClosedNotification: {
       // args

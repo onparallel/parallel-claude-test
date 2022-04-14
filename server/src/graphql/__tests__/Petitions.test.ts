@@ -2888,7 +2888,7 @@ describe("GraphQL/Petitions", () => {
     });
   });
 
-  describe("bulkSendPetition", () => {
+  describe("sendPetition", () => {
     let petition: Petition;
     let field: PetitionField;
     let usageLimit: OrganizationUsageLimit;
@@ -2919,7 +2919,7 @@ describe("GraphQL/Petitions", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionId: GID!, $contactIds: [GID!]!, $subject: String!, $body: JSON!) {
-            bulkSendPetition(
+            sendPetition(
               petitionId: $petitionId
               contactIdGroups: [$contactIds]
               subject: $subject
@@ -2953,7 +2953,7 @@ describe("GraphQL/Petitions", () => {
             $subject: String!
             $body: JSON!
           ) {
-            bulkSendPetition(
+            sendPetition(
               petitionId: $petitionId
               contactIdGroups: $contactIdGroups
               subject: $subject
@@ -2981,7 +2981,7 @@ describe("GraphQL/Petitions", () => {
             $subject: String!
             $body: JSON!
           ) {
-            bulkSendPetition(
+            sendPetition(
               petitionId: $petitionId
               contactIdGroups: $contactIdGroups
               subject: $subject
@@ -3015,7 +3015,7 @@ describe("GraphQL/Petitions", () => {
             $subject: String!
             $body: JSON!
           ) {
-            bulkSendPetition(
+            sendPetition(
               petitionId: $petitionId
               contactIdGroups: $contactIdGroups
               subject: $subject
@@ -3043,7 +3043,7 @@ describe("GraphQL/Petitions", () => {
             $subject: String!
             $body: JSON!
           ) {
-            bulkSendPetition(
+            sendPetition(
               petitionId: $petitionId
               contactIdGroups: $contactIdGroups
               subject: $subject
@@ -3069,7 +3069,7 @@ describe("GraphQL/Petitions", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $contactIds: [GID!]!, $subject: String!, $body: JSON!) {
-            bulkSendPetition(
+            sendPetition(
               petitionId: $petitionId
               contactIdGroups: [$contactIds]
               subject: $subject
@@ -3088,7 +3088,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data?.bulkSendPetition[0]).toEqual({ result: "SUCCESS" });
+      expect(data?.sendPetition[0]).toEqual({ result: "SUCCESS" });
 
       const [orgUsageLimit] = await mocks.knex
         .from("organization_usage_limit")
@@ -3114,7 +3114,7 @@ describe("GraphQL/Petitions", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $contactIds: [GID!]!, $subject: String!, $body: JSON!) {
-            bulkSendPetition(
+            sendPetition(
               petitionId: $petitionId
               contactIdGroups: [$contactIds]
               subject: $subject
@@ -3150,7 +3150,7 @@ describe("GraphQL/Petitions", () => {
             $body: JSON!
             $senderId: GID
           ) {
-            bulkSendPetition(
+            sendPetition(
               petitionId: $petitionId
               contactIdGroups: $contactIdGroups
               subject: $subject
@@ -3191,7 +3191,7 @@ describe("GraphQL/Petitions", () => {
             $body: JSON!
             $senderId: GID
           ) {
-            bulkSendPetition(
+            sendPetition(
               petitionId: $petitionId
               contactIdGroups: $contactIdGroups
               subject: $subject
@@ -3212,7 +3212,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data?.bulkSendPetition).toEqual([{ result: "SUCCESS" }]);
+      expect(data?.sendPetition).toEqual([{ result: "SUCCESS" }]);
     });
 
     it("batch sends should be limited to the amount of remaining petition send credits", async () => {
@@ -3229,7 +3229,7 @@ describe("GraphQL/Petitions", () => {
             $subject: String!
             $body: JSON!
           ) {
-            bulkSendPetition(
+            sendPetition(
               petitionId: $petitionId
               contactIdGroups: $contactIdGroups
               subject: $subject
@@ -3268,7 +3268,7 @@ describe("GraphQL/Petitions", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $contactIds: [GID!]!, $subject: String!, $body: JSON!) {
-            bulkSendPetition(
+            sendPetition(
               petitionId: $petitionId
               contactIdGroups: [$contactIds]
               subject: $subject
@@ -3287,8 +3287,8 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data?.bulkSendPetition).toHaveLength(1);
-      expect(data?.bulkSendPetition[0]).toEqual({ result: "SUCCESS" });
+      expect(data?.sendPetition).toHaveLength(1);
+      expect(data?.sendPetition[0]).toEqual({ result: "SUCCESS" });
 
       const organizationCurrentUsageLimit = await mocks.knex
         .from("organization_usage_limit")
@@ -3307,7 +3307,7 @@ describe("GraphQL/Petitions", () => {
       const { errors: errors1, data: data1 } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $contactIds: [GID!]!, $subject: String!, $body: JSON!) {
-            bulkSendPetition(
+            sendPetition(
               petitionId: $petitionId
               contactIdGroups: [$contactIds]
               subject: $subject
@@ -3326,8 +3326,8 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors1).toBeUndefined();
-      expect(data1?.bulkSendPetition).toHaveLength(1);
-      expect(data1?.bulkSendPetition[0]).toEqual({ result: "SUCCESS" });
+      expect(data1?.sendPetition).toHaveLength(1);
+      expect(data1?.sendPetition[0]).toEqual({ result: "SUCCESS" });
 
       const firstSendUsageLimits = await mocks.knex
         .from("organization_usage_limit")
@@ -3339,7 +3339,7 @@ describe("GraphQL/Petitions", () => {
       const { errors: errors2, data: data2 } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $contactIds: [GID!]!, $subject: String!, $body: JSON!) {
-            bulkSendPetition(
+            sendPetition(
               petitionId: $petitionId
               contactIdGroups: [$contactIds]
               subject: $subject
@@ -3358,7 +3358,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors2).toBeUndefined();
-      expect(data2?.bulkSendPetition[0]).toEqual({ result: "SUCCESS" });
+      expect(data2?.sendPetition[0]).toEqual({ result: "SUCCESS" });
 
       const secondSendUsageLimits = await mocks.knex
         .from("organization_usage_limit")
@@ -3377,7 +3377,7 @@ describe("GraphQL/Petitions", () => {
       const { errors: errors1, data: data1 } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $contactIds: [GID!]!, $subject: String!, $body: JSON!) {
-            bulkSendPetition(
+            sendPetition(
               petitionId: $petitionId
               contactIdGroups: [$contactIds]
               subject: $subject
@@ -3396,7 +3396,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors1).toBeUndefined();
-      expect(data1?.bulkSendPetition[0]).toEqual({ result: "SUCCESS" });
+      expect(data1?.sendPetition[0]).toEqual({ result: "SUCCESS" });
 
       const firstSendUsageLimits = await mocks.knex
         .from("organization_usage_limit")
@@ -3408,7 +3408,7 @@ describe("GraphQL/Petitions", () => {
       const { errors: errors2, data: data2 } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $contactIds: [GID!]!, $subject: String!, $body: JSON!) {
-            bulkSendPetition(
+            sendPetition(
               petitionId: $petitionId
               contactIdGroups: [$contactIds]
               subject: $subject
@@ -3427,7 +3427,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors2).toBeUndefined();
-      expect(data2?.bulkSendPetition[0]).toEqual({ result: "SUCCESS" });
+      expect(data2?.sendPetition[0]).toEqual({ result: "SUCCESS" });
 
       const secondSendUsageLimits = await mocks.knex
         .from("organization_usage_limit")
@@ -3446,7 +3446,7 @@ describe("GraphQL/Petitions", () => {
             $subject: String!
             $body: JSON!
           ) {
-            bulkSendPetition(
+            sendPetition(
               petitionId: $petitionId
               contactIdGroups: $contactIdGroups
               subject: $subject
@@ -3468,7 +3468,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data?.bulkSendPetition).toEqual([{ result: "SUCCESS" }, { result: "SUCCESS" }]);
+      expect(data?.sendPetition).toEqual([{ result: "SUCCESS" }, { result: "SUCCESS" }]);
 
       const organizationCurrentUsageLimit = await mocks.knex
         .from("organization_usage_limit")
@@ -3509,7 +3509,7 @@ describe("GraphQL/Petitions", () => {
             $subject: String!
             $body: JSON!
           ) {
-            bulkSendPetition(
+            sendPetition(
               petitionId: $petitionId
               contactIdGroups: $contactIdGroups
               subject: $subject
@@ -3560,7 +3560,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data?.bulkSendPetition).toEqual([
+      expect(data?.sendPetition).toEqual([
         {
           petition: {
             events: {

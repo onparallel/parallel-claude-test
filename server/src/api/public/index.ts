@@ -91,7 +91,7 @@ import {
   CreatePetitionAttachment_petitionAttachmentUploadCompleteDocument,
   CreatePetitionRecipients_contactDocument,
   CreatePetitionRecipients_createContactDocument,
-  CreatePetitionRecipients_bulkSendPetitionDocument,
+  CreatePetitionRecipients_sendPetitionDocument,
   CreatePetitionRecipients_petitionDocument,
   CreatePetitionRecipients_updateContactDocument,
   CreatePetition_petitionDocument,
@@ -1037,7 +1037,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
         }
       `;
       const _mutation = gql`
-        mutation CreatePetitionRecipients_bulkSendPetition(
+        mutation CreatePetitionRecipients_sendPetition(
           $petitionId: GID!
           $contactIds: [GID!]!
           $subject: String!
@@ -1048,7 +1048,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
           $includeFields: Boolean!
           $includeTags: Boolean!
         ) {
-          bulkSendPetition(
+          sendPetition(
             petitionId: $petitionId
             contactIdGroups: [$contactIds]
             subject: $subject
@@ -1067,7 +1067,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
 
       if (!isDefined(subject) || !isDefined(message)) {
         /* 
-          email body and subject are required in the bulkSendPetition mutation, so if those are not defined on the request
+          email body and subject are required in the sendPetition mutation, so if those are not defined on the request
           we need to fetch it from the petition. If they are not defined in the petition either, an error will be thrown
          */
         const query = await client.request(CreatePetitionRecipients_petitionDocument, {
@@ -1083,7 +1083,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
         }
       }
 
-      const result = await client.request(CreatePetitionRecipients_bulkSendPetitionDocument, {
+      const result = await client.request(CreatePetitionRecipients_sendPetitionDocument, {
         petitionId: params.petitionId,
         contactIds,
         body: message,
@@ -1094,10 +1094,10 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
         includeTags: query.include?.includes("tags") ?? false,
       });
 
-      assert(result.bulkSendPetition[0].petition !== null);
-      assert("id" in result.bulkSendPetition[0].petition);
+      assert(result.sendPetition[0].petition !== null);
+      assert("id" in result.sendPetition[0].petition);
 
-      return Ok(mapPetition(result.bulkSendPetition[0].petition));
+      return Ok(mapPetition(result.sendPetition[0].petition));
     } catch (error: any) {
       if (
         error instanceof ClientError &&

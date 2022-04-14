@@ -1133,7 +1133,7 @@ export const fileUploadReplyDownloadLink = mutationField("fileUploadReplyDownloa
   },
 });
 
-export const bulkSendPetition = mutationField("bulkSendPetition", {
+export const sendPetition = mutationField("sendPetition", {
   description:
     "Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages",
   type: nonNull(list(nonNull("SendPetitionResult"))),

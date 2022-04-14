@@ -400,8 +400,6 @@ export interface Mutation {
   assignPetitionToUser: SupportMethodResponse;
   /** Load contacts from an excel file, creating the ones not found on database */
   bulkCreateContacts: Array<Contact>;
-  /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
-  bulkSendPetition: Array<SendPetitionResult>;
   /** Cancels a scheduled petition message. */
   cancelScheduledMessage?: Maybe<PetitionMessage>;
   cancelSignatureRequest: PetitionSignatureRequest;
@@ -572,6 +570,8 @@ export interface Mutation {
   restoreLogin: Result;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
+  /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
+  sendPetition: Array<SendPetitionResult>;
   /** Sends an email to all contacts of the petition confirming the replies are ok */
   sendPetitionClosedNotification: Petition;
   /** Sends a reminder for the specified petition accesses. */
@@ -696,17 +696,6 @@ export interface MutationassignPetitionToUserArgs {
 
 export interface MutationbulkCreateContactsArgs {
   file: Scalars["Upload"];
-}
-
-export interface MutationbulkSendPetitionArgs {
-  body: Scalars["JSON"];
-  bulkSendSigningMode?: InputMaybe<BulkSendSigningMode>;
-  contactIdGroups: Array<Array<Scalars["GID"]>>;
-  petitionId: Scalars["GID"];
-  remindersConfig?: InputMaybe<RemindersConfigInput>;
-  scheduledAt?: InputMaybe<Scalars["DateTime"]>;
-  senderId?: InputMaybe<Scalars["GID"]>;
-  subject: Scalars["String"];
 }
 
 export interface MutationcancelScheduledMessageArgs {
@@ -1172,6 +1161,17 @@ export interface MutationresetUserPasswordArgs {
 
 export interface MutationrevokeUserAuthTokenArgs {
   authTokenIds: Array<Scalars["GID"]>;
+}
+
+export interface MutationsendPetitionArgs {
+  body: Scalars["JSON"];
+  bulkSendSigningMode?: InputMaybe<BulkSendSigningMode>;
+  contactIdGroups: Array<Array<Scalars["GID"]>>;
+  petitionId: Scalars["GID"];
+  remindersConfig?: InputMaybe<RemindersConfigInput>;
+  scheduledAt?: InputMaybe<Scalars["DateTime"]>;
+  senderId?: InputMaybe<Scalars["GID"]>;
+  subject: Scalars["String"];
 }
 
 export interface MutationsendPetitionClosedNotificationArgs {
@@ -7516,10 +7516,10 @@ export type TemplateDetailsModal_PetitionTemplateFragment = {
 export type useSendPetitionHandler_UserFragment = {
   __typename?: "User";
   id: string;
+  fullName?: string | null;
   email: string;
   firstName?: string | null;
   lastName?: string | null;
-  fullName?: string | null;
   hasOnBehalfOf: boolean;
   delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
 };
@@ -7588,7 +7588,7 @@ export type useSendPetitionHandler_PetitionFragment = {
   };
 };
 
-export type useSendPetitionHandler_bulkSendPetitionMutationVariables = Exact<{
+export type useSendPetitionHandler_sendPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   contactIdGroups:
     | Array<Array<Scalars["GID"]> | Scalars["GID"]>
@@ -7602,8 +7602,8 @@ export type useSendPetitionHandler_bulkSendPetitionMutationVariables = Exact<{
   senderId?: InputMaybe<Scalars["GID"]>;
 }>;
 
-export type useSendPetitionHandler_bulkSendPetitionMutation = {
-  bulkSendPetition: Array<{
+export type useSendPetitionHandler_sendPetitionMutation = {
+  sendPetition: Array<{
     __typename?: "SendPetitionResult";
     result: Result;
     petition?: { __typename?: "Petition"; id: string; status: PetitionStatus } | null;
@@ -21510,10 +21510,8 @@ export const AddPetitionAccessDialog_UserFragmentDoc = gql`
 ` as unknown as DocumentNode<AddPetitionAccessDialog_UserFragment, unknown>;
 export const useSendPetitionHandler_UserFragmentDoc = gql`
   fragment useSendPetitionHandler_User on User {
-    ...ConfirmPetitionSignersDialog_User
     ...AddPetitionAccessDialog_User
   }
-  ${ConfirmPetitionSignersDialog_UserFragmentDoc}
   ${AddPetitionAccessDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<useSendPetitionHandler_UserFragment, unknown>;
 export const PetitionActivity_QueryFragmentDoc = gql`
@@ -23328,8 +23326,8 @@ export const PublicLinkSettingsDialog_isValidSlugDocument = gql`
   PublicLinkSettingsDialog_isValidSlugQuery,
   PublicLinkSettingsDialog_isValidSlugQueryVariables
 >;
-export const useSendPetitionHandler_bulkSendPetitionDocument = gql`
-  mutation useSendPetitionHandler_bulkSendPetition(
+export const useSendPetitionHandler_sendPetitionDocument = gql`
+  mutation useSendPetitionHandler_sendPetition(
     $petitionId: GID!
     $contactIdGroups: [[GID!]!]!
     $subject: String!
@@ -23339,7 +23337,7 @@ export const useSendPetitionHandler_bulkSendPetitionDocument = gql`
     $bulkSendSigningMode: BulkSendSigningMode
     $senderId: GID
   ) {
-    bulkSendPetition(
+    sendPetition(
       petitionId: $petitionId
       contactIdGroups: $contactIdGroups
       subject: $subject
@@ -23357,8 +23355,8 @@ export const useSendPetitionHandler_bulkSendPetitionDocument = gql`
     }
   }
 ` as unknown as DocumentNode<
-  useSendPetitionHandler_bulkSendPetitionMutation,
-  useSendPetitionHandler_bulkSendPetitionMutationVariables
+  useSendPetitionHandler_sendPetitionMutation,
+  useSendPetitionHandler_sendPetitionMutationVariables
 >;
 export const useSendPetitionHandler_addPetitionPermissionDocument = gql`
   mutation useSendPetitionHandler_addPetitionPermission(

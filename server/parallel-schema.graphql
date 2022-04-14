@@ -504,20 +504,6 @@ type Mutation {
   bulkCreateContacts(file: Upload!): [Contact!]!
 
   """
-  Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages
-  """
-  bulkSendPetition(
-    body: JSON!
-    bulkSendSigningMode: BulkSendSigningMode
-    contactIdGroups: [[GID!]!]!
-    petitionId: GID!
-    remindersConfig: RemindersConfigInput
-    scheduledAt: DateTime
-    senderId: GID
-    subject: String!
-  ): [SendPetitionResult!]!
-
-  """
   Cancels a scheduled petition message.
   """
   cancelScheduledMessage(messageId: GID!, petitionId: GID!): PetitionMessage
@@ -1155,6 +1141,20 @@ type Mutation {
   Soft-deletes a given auth token, making it permanently unusable.
   """
   revokeUserAuthToken(authTokenIds: [GID!]!): Result!
+
+  """
+  Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages
+  """
+  sendPetition(
+    body: JSON!
+    bulkSendSigningMode: BulkSendSigningMode
+    contactIdGroups: [[GID!]!]!
+    petitionId: GID!
+    remindersConfig: RemindersConfigInput
+    scheduledAt: DateTime
+    senderId: GID
+    subject: String!
+  ): [SendPetitionResult!]!
 
   """
   Sends an email to all contacts of the petition confirming the replies are ok

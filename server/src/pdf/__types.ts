@@ -369,8 +369,6 @@ export type Mutation = {
   assignPetitionToUser: SupportMethodResponse;
   /** Load contacts from an excel file, creating the ones not found on database */
   bulkCreateContacts: Array<Contact>;
-  /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
-  bulkSendPetition: Array<SendPetitionResult>;
   /** Cancels a scheduled petition message. */
   cancelScheduledMessage: Maybe<PetitionMessage>;
   cancelSignatureRequest: PetitionSignatureRequest;
@@ -541,6 +539,8 @@ export type Mutation = {
   restoreLogin: Result;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
+  /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
+  sendPetition: Array<SendPetitionResult>;
   /** Sends an email to all contacts of the petition confirming the replies are ok */
   sendPetitionClosedNotification: Petition;
   /** Sends a reminder for the specified petition accesses. */
@@ -665,17 +665,6 @@ export type MutationassignPetitionToUserArgs = {
 
 export type MutationbulkCreateContactsArgs = {
   file: Scalars["Upload"];
-};
-
-export type MutationbulkSendPetitionArgs = {
-  body: Scalars["JSON"];
-  bulkSendSigningMode?: InputMaybe<BulkSendSigningMode>;
-  contactIdGroups: Array<Array<Scalars["GID"]>>;
-  petitionId: Scalars["GID"];
-  remindersConfig?: InputMaybe<RemindersConfigInput>;
-  scheduledAt?: InputMaybe<Scalars["DateTime"]>;
-  senderId?: InputMaybe<Scalars["GID"]>;
-  subject: Scalars["String"];
 };
 
 export type MutationcancelScheduledMessageArgs = {
@@ -1141,6 +1130,17 @@ export type MutationresetUserPasswordArgs = {
 
 export type MutationrevokeUserAuthTokenArgs = {
   authTokenIds: Array<Scalars["GID"]>;
+};
+
+export type MutationsendPetitionArgs = {
+  body: Scalars["JSON"];
+  bulkSendSigningMode?: InputMaybe<BulkSendSigningMode>;
+  contactIdGroups: Array<Array<Scalars["GID"]>>;
+  petitionId: Scalars["GID"];
+  remindersConfig?: InputMaybe<RemindersConfigInput>;
+  scheduledAt?: InputMaybe<Scalars["DateTime"]>;
+  senderId?: InputMaybe<Scalars["GID"]>;
+  subject: Scalars["String"];
 };
 
 export type MutationsendPetitionClosedNotificationArgs = {
