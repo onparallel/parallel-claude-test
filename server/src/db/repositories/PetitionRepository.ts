@@ -4263,19 +4263,29 @@ export class PetitionRepository extends BaseRepository {
       );
 
       const [accesses, fields] = await Promise.all([
-        this.loadAccessesForPetition(petitionId),
-        this.loadFieldsForPetition(petitionId),
+        this.from("petition_access", t).where("petition_id", petitionId).select("*"),
+        this.from("petition_field", t)
+          .where("petition_id", petitionId)
+          .whereNull("deleted_at")
+          .select("*"),
       ]);
 
       const [replies, comments] = await Promise.all([
-        this.loadRepliesForField(fields.map((f) => f.id)),
-        this.loadPetitionFieldCommentsForField(
-          fields.map((f) => ({
-            petitionFieldId: f.id,
-            loadInternalComments: true,
-            petitionId: petitionId,
-          }))
-        ),
+        this.from("petition_field_reply", t)
+          .whereIn(
+            "petition_field_id",
+            fields.map((f) => f.id)
+          )
+          .whereNull("deleted_at")
+          .select("*"),
+        this.from("petition_field_comment", t)
+          .where("petition_id", petitionId)
+          .whereIn(
+            "petition_field_id",
+            fields.map((f) => f.id)
+          )
+          .whereNull("deleted_at")
+          .select("*"),
       ]);
 
       const [messages, reminders] = await Promise.all([
@@ -4284,8 +4294,8 @@ export class PetitionRepository extends BaseRepository {
           accesses.map((a) => a.id),
           t
         ),
-        this.anonymizePetitionFieldReplies(replies.flat(), t),
-        this.anonymizePetitionFieldComments(comments.flat(), t),
+        this.anonymizePetitionFieldReplies(replies, t),
+        this.anonymizePetitionFieldComments(comments, t),
         this.deactivateAccesses(
           petitionId,
           accesses.map((a) => a.id),
