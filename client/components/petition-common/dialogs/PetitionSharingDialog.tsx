@@ -38,7 +38,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { Maybe } from "@parallel/utils/types";
-import { KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { GrowingTextarea } from "../../common/GrowingTextarea";
@@ -252,7 +252,7 @@ export function PetitionSharingDialog({
                       includeGroups
                       ref={usersRef}
                       value={value}
-                      onKeyDown={(e: KeyboardEvent) => {
+                      onKeyDown={(e) => {
                         if (e.key === "Enter" && !(e.target as HTMLInputElement).value) {
                           e.preventDefault();
                         }

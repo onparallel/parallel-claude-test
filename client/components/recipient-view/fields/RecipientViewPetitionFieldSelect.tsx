@@ -1,15 +1,18 @@
 import { Box, Center, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import {
+  SimpleOption,
+  SimpleSelect,
+  toSimpleSelectOption,
+} from "@parallel/components/common/SimpleSelect";
 import { FieldOptions } from "@parallel/utils/petitionFields";
-import { useRecipientViewReactSelectProps } from "@parallel/utils/react-select/hooks";
-import { toSelectOption } from "@parallel/utils/react-select/toSelectOption";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
 import { forwardRef, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
-import Select from "react-select";
+import { SelectInstance as _SelectInstance } from "react-select";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
@@ -29,7 +32,7 @@ export interface RecipientViewPetitionFieldSelectProps
   onCreateReply: (value: string) => Promise<string | undefined>;
 }
 
-type SelectInstance = Select<{ label: string; value: string }, false, never>;
+type SelectInstance = _SelectInstance<SimpleOption, false>;
 
 export function RecipientViewPetitionFieldSelect({
   field,
@@ -44,7 +47,7 @@ export function RecipientViewPetitionFieldSelect({
   const intl = useIntl();
 
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
-  const [value, setValue] = useState(toSelectOption(null));
+  const [value, setValue] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   const newReplyRef = useRef<SelectInstance>(null);
@@ -52,6 +55,10 @@ export function RecipientViewPetitionFieldSelect({
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
 
   const options = field.options as FieldOptions["SELECT"];
+  const values = useMemo(
+    () => options.values.map((option) => toSimpleSelectOption(option)!),
+    [field.options]
+  );
 
   const handleUpdate = useMemoFactory(
     (replyId: string) => async (value: string) => {
@@ -72,33 +79,10 @@ export function RecipientViewPetitionFieldSelect({
     [field.replies, onDeleteReply]
   );
 
-  async function handleOnChange(value: any) {
-    setValue(value);
-    setIsSaving(true);
-    try {
-      const replyId = await onCreateReply(value.value);
-      if (replyId) {
-        setShowNewReply(false);
-        setValue(null);
-        setTimeout(() => {
-          replyRefs[replyId].current?.focus();
-        });
-      }
-    } catch {}
-    setIsSaving(false);
-  }
-
   function handleAddNewReply() {
     setShowNewReply(true);
     setTimeout(() => newReplyRef.current?.focus());
   }
-
-  const rsProps = useRecipientViewReactSelectProps({
-    id: `reply-${field.id}-new`,
-    isDisabled,
-  });
-
-  const values = useMemo(() => options.values.map(toSelectOption), [options.values]);
 
   return (
     <RecipientViewPetitionFieldCard
@@ -134,12 +118,27 @@ export function RecipientViewPetitionFieldSelect({
       ) : null}
       {(field.multiple && showNewReply) || field.replies.length === 0 ? (
         <Box flex="1" position="relative" marginTop={2}>
-          <Select
-            {...rsProps}
+          <SimpleSelect
             ref={newReplyRef as any}
+            id={`reply-${field.id}-new`}
+            isDisabled={isDisabled}
             value={value}
-            options={values as any}
-            onChange={handleOnChange}
+            options={values}
+            onChange={async (value) => {
+              setValue(value);
+              setIsSaving(true);
+              try {
+                const replyId = await onCreateReply(value!);
+                if (replyId) {
+                  setShowNewReply(false);
+                  setValue(null);
+                  setTimeout(() => {
+                    replyRefs[replyId].current?.focus();
+                  });
+                }
+              } catch {}
+              setIsSaving(false);
+            }}
             placeholder={
               options.placeholder ??
               intl.formatMessage({
@@ -147,6 +146,10 @@ export function RecipientViewPetitionFieldSelect({
                 defaultMessage: "Select an option",
               })
             }
+            styles={{
+              menu: (styles) => ({ ...styles, zIndex: 100 }),
+              valueContainer: (styles) => ({ ...styles, paddingRight: 32 }),
+            }}
           />
           <Center height="100%" position="absolute" right="42px" top={0}>
             <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
@@ -173,37 +176,35 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
   ref
 ) {
   const intl = useIntl();
-  const [value, setValue] = useState(toSelectOption(reply.content.value));
+  const [value, setValue] = useState(reply.content.value);
   const [isSaving, setIsSaving] = useState(false);
 
   const options = field.options as FieldOptions["SELECT"];
-  const rsProps = useRecipientViewReactSelectProps({
-    id: `reply-${field.id}-${reply.id}`,
-    isDisabled: isDisabled || reply.status === "APPROVED",
-    isInvalid: reply.status === "REJECTED",
-  });
 
-  const values = useMemo(() => options.values.map(toSelectOption), [options.values]);
-
-  async function handleOnChange(value: any) {
-    setValue(value);
-    setIsSaving(true);
-    try {
-      await onUpdate(value.value);
-    } catch {}
-    setIsSaving(false);
-  }
+  const values = useMemo(
+    () => options.values.map((option) => toSimpleSelectOption(option)!),
+    [options.values]
+  );
 
   return (
     <Stack direction="row">
       <Box flex="1" position="relative">
         <Box position="relative">
-          <Select<{ label: string; value: string }, false, never>
-            {...rsProps}
+          <SimpleSelect
             ref={ref}
+            id={`reply-${field.id}-${reply.id}`}
+            isDisabled={isDisabled || reply.status === "APPROVED"}
+            isInvalid={reply.status === "REJECTED"}
             value={value}
-            options={values as any}
-            onChange={handleOnChange}
+            options={values}
+            onChange={async (value) => {
+              setValue(value);
+              setIsSaving(true);
+              try {
+                await onUpdate(value);
+              } catch {}
+              setIsSaving(false);
+            }}
             placeholder={
               options.placeholder ??
               intl.formatMessage({
@@ -211,6 +212,10 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
                 defaultMessage: "Select an option",
               })
             }
+            styles={{
+              menu: (styles) => ({ ...styles, zIndex: 100 }),
+              valueContainer: (styles) => ({ ...styles, paddingRight: 32 }),
+            }}
           />
           <Center height="100%" position="absolute" right="42px" top={0}>
             <RecipientViewPetitionFieldReplyStatusIndicator reply={reply} isSaving={isSaving} />

@@ -1,4 +1,4 @@
-import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
+import { gql, useApolloClient, useMutation } from "@apollo/client";
 import { Box, Button, Circle, Flex, List, ListItem, Stack, Text } from "@chakra-ui/react";
 import { AddIcon, EditIcon } from "@parallel/chakra/icons";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
@@ -12,15 +12,17 @@ import {
   PetitionTagListCellContent_untagPetitionDocument,
 } from "@parallel/graphql/__types";
 import { withError } from "@parallel/utils/promises/withError";
-import { ExtendComponentProps, useReactSelectProps } from "@parallel/utils/react-select/hooks";
+import {
+  genericRsComponent,
+  rsStyles,
+  useReactSelectProps,
+} from "@parallel/utils/react-select/hooks";
+import { CustomAsyncCreatableSelectProps } from "@parallel/utils/react-select/types";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
-import useMergedRef from "@react-hook/merged-ref";
-import { forwardRef, MouseEvent, useEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, MouseEvent, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { ActionMeta, CommonProps, components, StylesConfig } from "react-select";
-import AsyncCreatableSelect, {
-  Props as AsyncCreatableSelectProps,
-} from "react-select/async-creatable";
+import { ActionMeta, components, SelectInstance } from "react-select";
+import AsyncCreatableSelect from "react-select/async-creatable";
 import { omit } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { useTagEditDialog } from "./dialogs/TagEditDialog";
@@ -36,7 +38,6 @@ export function PetitionTagListCellContent({
   const selectWrapperRef = useRef<HTMLDivElement>(null);
   const selectRef = useRef<TagSelectInstance>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const { data, refetch } = useQuery(PetitionTagListCellContent_tagsDocument);
   const intl = useIntl();
   const apollo = useApolloClient();
   const loadOptions = useDebouncedAsync(
@@ -92,7 +93,6 @@ export function PetitionTagListCellContent({
   const showTagEditDialog = useTagEditDialog();
   const handleEditTags = async () => {
     await withError(showTagEditDialog({}));
-    await refetch();
   };
 
   const [createTag] = useMutation(PetitionTagListCellContent_createTagDocument);
@@ -101,7 +101,6 @@ export function PetitionTagListCellContent({
     if (result) {
       await handleAddTag(result.data!.createTag);
     }
-    await refetch();
   };
 
   const tags = petition.tags;
@@ -126,7 +125,7 @@ export function PetitionTagListCellContent({
               id: "components.petition-tag-list-cell-content.add-tags",
               defaultMessage: "Add tags",
             })}
-            defaultOptions={data?.tags.items ?? []}
+            defaultOptions
             loadOptions={loadOptions}
             onBlur={() => setIsEditing(false)}
             onAddTag={handleAddTag}
@@ -282,9 +281,10 @@ PetitionTagListCellContent.mutations = [
   `,
 ];
 
-type TagSelectInstance = AsyncCreatableSelect<TagSelection, true, never>;
+type TagSelectInstance = SelectInstance<TagSelection, true, never>;
 
-interface TagSelectProps extends AsyncCreatableSelectProps<TagSelection, true, never> {
+interface TagSelectProps
+  extends Omit<CustomAsyncCreatableSelectProps<TagSelection, true, never>, "onChange"> {
   onAddTag: (tag: TagSelection) => void;
   onRemoveTag: (tag: TagSelection) => void;
   onEditTags: () => void;
@@ -301,31 +301,16 @@ const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(function TagSele
 ) {
   const intl = useIntl();
   const [newTagColor, setNewTagColor] = useState(randomColor());
-  const innerRef = useRef<TagSelectInstance>();
-  useEffect(() => {
-    // react-select is not updating defaultOptions
-    // https://github.com/JedWatson/react-select/issues/4012
-    innerRef.current?.setState({
-      defaultOptions: props.defaultOptions as any,
-    });
-  }, [innerRef.current, props.defaultOptions]);
-  const _ref = useMergedRef(ref, innerRef);
-  const rsProps = useReactSelectProps<TagSelection, true, never>();
-  const components = useMemo(
-    () => ({
-      ...rsProps.components,
+  const rsProps = useReactSelectProps<TagSelection, true, never>({
+    ...props,
+    components: {
       IndicatorsContainer,
       MultiValue,
       Option,
       NoOptionsMessage,
       MenuList,
-    }),
-    [rsProps.components]
-  );
-
-  const styles = useMemo<StylesConfig<TagSelection, true, never>>(
-    () => ({
-      ...rsProps.styles,
+    },
+    styles: rsStyles({
       container: (styles) => ({ ...styles, width: "100%" }),
       valueContainer: (styles) => ({
         ...omit(styles as any, ["padding"]),
@@ -353,8 +338,7 @@ const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(function TagSele
         paddingBottom: 0,
       }),
     }),
-    [rsProps.styles]
-  );
+  });
 
   const handleChange = function (_: any, action: ActionMeta<TagSelection>) {
     switch (action.action) {
@@ -369,19 +353,22 @@ const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(function TagSele
         break;
     }
   };
+
   return (
-    <AsyncCreatableSelect
-      ref={_ref}
+    <AsyncCreatableSelect<TagSelection, true, never>
+      ref={ref}
       {...props}
       {...rsProps}
       isMulti
       isClearable={false}
       defaultMenuIsOpen
       closeMenuOnSelect={false}
+      placeholder={intl.formatMessage({
+        id: "component.tag-select.placeholder",
+        defaultMessage: "Enter tags...",
+      })}
       value={value}
       onChange={handleChange}
-      components={components}
-      styles={styles}
       getOptionValue={(o) => o.id}
       getOptionLabel={(o) => o.name}
       isValidNewOption={(value, _, options) => {
@@ -393,31 +380,31 @@ const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(function TagSele
         onCreateTag({ name, color: newTagColor });
         setNewTagColor(randomColor());
       }}
-      newTagColor={newTagColor}
-      onEditTags={onEditTags}
-      placeholder={intl.formatMessage({
-        id: "component.tag-select.placeholder",
-        defaultMessage: "Enter tags...",
-      })}
+      {...({
+        newTagColor: newTagColor,
+        onEditTags: onEditTags,
+      } as any)}
     />
   );
 });
 
-export type PetitionTagListCellContentPropExtensions = {
-  newTagColor: string;
-  onEditTags: () => void;
-};
+const rsComponent = genericRsComponent<
+  TagSelection,
+  true,
+  never,
+  {
+    selectProps: {
+      newTagColor: string;
+      onEditTags: () => void;
+    };
+  }
+>();
 
-export type PetitionTagListCellContentProps<T = CommonProps<any, any, any>> = ExtendComponentProps<
-  T,
-  PetitionTagListCellContentPropExtensions
->;
-
-const IndicatorsContainer: typeof components.IndicatorsContainer = function IndicatorsContainer() {
+const IndicatorsContainer = rsComponent("IndicatorsContainer", function () {
   return <></>;
-};
+});
 
-const NoOptionsMessage: typeof components.NoOptionsMessage = function NoOptionsMessage(props) {
+const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
   return (
     <Stack
       direction="column"
@@ -453,30 +440,26 @@ const NoOptionsMessage: typeof components.NoOptionsMessage = function NoOptionsM
       )}
     </Stack>
   );
-};
+});
 
-const MultiValue: typeof components.MultiValue = function MultiValue({
-  data,
-  removeProps,
-  innerProps,
-}) {
+const MultiValue = rsComponent("MultiValue", function ({ data, removeProps, innerProps }) {
   return (
     <Tag
-      tag={data as unknown as TagSelection}
+      tag={data}
       margin="2px"
       isRemovable
       onRemove={removeProps.onClick}
       minWidth="0"
-      {...innerProps}
+      {...(innerProps as any)}
     />
   );
-};
+});
 
-const Option: typeof components.Option = function Option(props) {
+const Option = rsComponent("Option", function (props) {
   const {
     selectProps: { newTagColor },
-  } = props as unknown as PetitionTagListCellContentProps;
-  return props.data.__isNew__ ? (
+  } = props;
+  return (props.data as any).__isNew__ ? (
     <components.Option {...props}>
       <Flex alignItems="baseline">
         <FormattedMessage
@@ -489,7 +472,7 @@ const Option: typeof components.Option = function Option(props) {
                 flex="0 1 auto"
                 minWidth="0"
                 tag={{
-                  name: props.data.value.trim().replace(/\s+/g, " "),
+                  name: (props.data as any).value.trim().replace(/\s+/g, " "),
                   color: newTagColor,
                 }}
               />
@@ -503,17 +486,17 @@ const Option: typeof components.Option = function Option(props) {
       <Tag flex="0 1 auto" minWidth="0" tag={props.data as TagSelection} />
     </components.Option>
   );
-};
+});
 
-const MenuList: typeof components.MenuList = function MenuList(props) {
+const MenuList = rsComponent("MenuList", function (props) {
   const {
     selectProps: { onEditTags },
-  } = props as unknown as PetitionTagListCellContentProps;
+  } = props;
   return (
     <components.MenuList {...props}>
       {props.children}
-      {props.selectProps.defaultOptions?.length > 0 ? (
-        <Box position="sticky" bottom="0" padding={2} backgroundColor="white">
+      {props.options.length > 0 ? (
+        <Box position="sticky" bottom="0" padding={2} paddingBottom={0} backgroundColor="white">
           <Button
             width="100%"
             size="sm"
@@ -531,4 +514,4 @@ const MenuList: typeof components.MenuList = function MenuList(props) {
       ) : null}
     </components.MenuList>
   );
-};
+});

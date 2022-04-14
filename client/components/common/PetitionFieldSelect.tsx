@@ -1,29 +1,33 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Text } from "@chakra-ui/react";
+import { Box, Center, Flex, Text } from "@chakra-ui/react";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import { PetitionFieldSelect_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { FieldOptions, usePetitionFieldTypeColor } from "@parallel/utils/petitionFields";
-import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
+import {
+  genericRsComponent,
+  rsStyles,
+  useReactSelectProps,
+} from "@parallel/utils/react-select/hooks";
 import { CustomSelectProps } from "@parallel/utils/react-select/types";
 import { If } from "@parallel/utils/types";
 import { memo, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import Select, { components, StylesConfig } from "react-select";
+import Select, { components } from "react-select";
 import { zip } from "remeda";
 
 export interface PetitionFieldSelectProps<
   T extends PetitionFieldSelect_PetitionFieldFragment,
-  ExpandFields extends boolean
-> extends CustomSelectProps<If<ExpandFields, T | [T, number], T>> {
+  ExpandFields extends boolean = false
+> extends CustomSelectProps<If<ExpandFields, T | [T, number], T>, false, never> {
   fields: T[];
   indices: PetitionFieldIndex[];
   expandFields?: ExpandFields;
 }
 
 export function PetitionFieldSelect<
-  T extends PetitionFieldSelect_PetitionFieldFragment,
+  OptionType extends PetitionFieldSelect_PetitionFieldFragment,
   ExpandFields extends boolean
 >({
   value,
@@ -32,39 +36,29 @@ export function PetitionFieldSelect<
   indices,
   expandFields,
   ...props
-}: PetitionFieldSelectProps<T, ExpandFields>) {
+}: PetitionFieldSelectProps<OptionType, ExpandFields>) {
   const intl = useIntl();
-  const rsProps = useReactSelectProps<PetitionFieldSelectOption<T>, any, never>(props);
-
-  const components = useMemo(
-    () => ({
-      ...rsProps.components,
+  const rsProps = useReactSelectProps<PetitionFieldSelectOption<OptionType>, false, never>({
+    placeholder: intl.formatMessage({
+      id: "component.petition-field-select.placeholder",
+      defaultMessage: "Select a field",
+    }),
+    ...(props as any),
+    components: {
       SingleValue,
       Option,
-    }),
-    [rsProps.components]
-  );
-
-  const styles = useMemo<StylesConfig<PetitionFieldSelectOption<T>, false, never>>(
-    () => ({
-      ...rsProps.styles,
-      singleValue: () => ({
-        maxWidth: "calc(100% - 6px)",
-        display: "flex",
-        flex: "0 1 auto",
-        alignItems: "center",
-      }),
+    },
+    styles: rsStyles({
       option: (styles) => ({
         ...styles,
         display: "flex",
         padding: "6px 8px",
       }),
     }),
-    [rsProps.styles]
-  );
+  });
 
   const { options, _value } = useMemo(() => {
-    const options: PetitionFieldSelectOption<T>[] = zip(fields, indices).flatMap(
+    const options: PetitionFieldSelectOption<OptionType>[] = zip(fields, indices).flatMap(
       ([field, fieldIndex]) => {
         if (expandFields && field.type === "DYNAMIC_SELECT") {
           const { labels } = field.options as FieldOptions["DYNAMIC_SELECT"];
@@ -82,7 +76,7 @@ export function PetitionFieldSelect<
         }
       }
     );
-    const [field, column]: [T | null | undefined] | [T, number | undefined] = (
+    const [field, column]: [OptionType | null | undefined] | [OptionType, number | undefined] = (
       Array.isArray(value) ? value : [value]
     ) as any;
     const _value = !field
@@ -96,7 +90,7 @@ export function PetitionFieldSelect<
     return { options, _value };
   }, [fields, indices, expandFields, value]);
   const handleChange = useCallback(
-    (value: PetitionFieldSelectOption<T>) => {
+    (value: PetitionFieldSelectOption<OptionType>) => {
       if (value.type === "FIELD") {
         onChange(value.field as any);
       } else {
@@ -107,19 +101,12 @@ export function PetitionFieldSelect<
   );
   return (
     <Select
-      {...props}
-      {...rsProps}
       options={options}
       value={_value}
       onChange={handleChange as any}
-      placeholder={intl.formatMessage({
-        id: "component.petition-field-select.placeholder",
-        defaultMessage: "Select a field",
-      })}
-      components={components}
-      styles={styles}
       getOptionValue={getOptionValue}
       getOptionLabel={getOptionLabel}
+      {...rsProps}
     />
   );
 }
@@ -218,24 +205,26 @@ const getOptionLabel = (option: PetitionFieldSelectOption<any>) => {
   }
 };
 
-const SingleValue: typeof components.SingleValue = function SingleValue(props) {
+const rsComponent =
+  genericRsComponent<PetitionFieldSelectOption<PetitionFieldSelect_PetitionFieldFragment>>();
+
+const SingleValue = rsComponent("SingleValue", function (props) {
   return (
     <components.SingleValue {...props}>
-      <PetitionFieldSelectItem
-        option={props.data as unknown as PetitionFieldSelectOption<any>}
-        highlight={props.selectProps.inputValue ?? ""}
-      />
+      <Flex>
+        <PetitionFieldSelectItem
+          option={props.data}
+          highlight={props.selectProps.inputValue ?? ""}
+        />
+      </Flex>
     </components.SingleValue>
   );
-};
+});
 
-const Option: typeof components.Option = function Option(props) {
+const Option = rsComponent("Option", function (props) {
   return (
     <components.Option {...props}>
-      <PetitionFieldSelectItem
-        option={props.data as PetitionFieldSelectOption<any>}
-        highlight={props.selectProps.inputValue ?? ""}
-      />
+      <PetitionFieldSelectItem option={props.data} highlight={props.selectProps.inputValue ?? ""} />
     </components.Option>
   );
-};
+});

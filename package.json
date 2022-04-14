@@ -10,7 +10,7 @@
   "scripts": {
     "lint": "eslint --config .eslintrc.js .",
     "update-deps": "yarn ncux && yarn ncux --packageFile bin/package.json && yarn ncux --packageFile client/package.json && yarn ncux --packageFile server/package.json  && yarn ncux --packageFile e2e/package.json",
-    "ncux": "ncu -u -x 'chalk,escape-string-regexp,p-all,p-map,p-props,node-fetch,@types/node-fetch,file-type,react-select,@types/react-select,framer-motion,react,react-dom,@types/react,@types/react-dom,react-dnd,react-dnd-html5-backend'",
+    "ncux": "ncu -u -x 'chalk,escape-string-regexp,p-all,p-map,p-props,node-fetch,@types/node-fetch,file-type,framer-motion,react,react-dom,@types/react,@types/react-dom,react-dnd,react-dnd-html5-backend'",
     "postinstall": "patch-package",
     "postpull": "yarn && cd server && yarn migrate"
   },

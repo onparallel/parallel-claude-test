@@ -1,14 +1,14 @@
 import { Box, HStack, Stack, Text } from "@chakra-ui/react";
+import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { FieldOptions } from "@parallel/utils/petitionFields";
-import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import {
   ShortTextFormat,
   useShortTextFormatsSelectOptions,
 } from "@parallel/utils/useShortTextFormats";
-import { ChangeEvent, useMemo, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import Select, { GroupTypeBase, components } from "react-select";
+import { components } from "react-select";
 import { PetitionComposeFieldSettingsProps } from "./PetitionComposeFieldSettings";
 import { SettingsRowPlaceholder } from "./SettingsRowPlaceholder";
 
@@ -22,26 +22,9 @@ export function ShortTextSettings({
   const options = field.options as FieldOptions["SHORT_TEXT"];
   const [placeholder, setPlaceholder] = useState(options.placeholder ?? "");
 
-  const rsProps = useReactSelectProps<ShortTextFormat, false, GroupTypeBase<ShortTextFormat>>({
-    size: "sm",
-    components: {
-      SingleValue: FormatSingleValue,
-    },
-    styles: useMemo(
-      () => ({
-        option: (base) => ({ ...base, ":first-letter": { textTransform: "capitalize" } }),
-        singleValue: (base) => ({ ...base, ":first-letter": { textTransform: "capitalize" } }),
-      }),
-      []
-    ),
-  });
-
   const { grouped, allFormats } = useShortTextFormatsSelectOptions();
 
-  const _value = useMemo(
-    () => allFormats.find((o) => o.value === options.format),
-    [options.format, allFormats]
-  );
+  const selected = allFormats.find((o) => o.value === options.format);
 
   const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 300, [field.id]);
 
@@ -52,15 +35,6 @@ export function ShortTextSettings({
       options: {
         ...field.options,
         placeholder: value || null,
-      },
-    });
-  };
-
-  const handleFormatChange = (format: ShortTextFormat | null) => {
-    onFieldEdit(field.id, {
-      options: {
-        ...field.options,
-        format: format?.value ?? null,
       },
     });
   };
@@ -76,26 +50,41 @@ export function ShortTextSettings({
             />
           </Text>
           <Box flex="1">
-            <Select
+            <SimpleSelect
+              size="sm"
               options={grouped}
-              value={_value ?? null}
-              onChange={handleFormatChange}
-              {...rsProps}
+              value={options.format}
+              onChange={(format) => {
+                onFieldEdit(field.id, {
+                  options: {
+                    ...field.options,
+                    format: format,
+                  },
+                });
+              }}
               isSearchable
               isClearable
               placeholder={intl.formatMessage({
                 id: "component.petition-compose-text-settings.format-placeholder",
                 defaultMessage: "No format",
               })}
+              components={{ SingleValue: FormatSingleValue }}
+              styles={{
+                option: (base) => ({ ...base, ":first-letter": { textTransform: "capitalize" } }),
+                singleValue: (base) => ({
+                  ...base,
+                  ":first-letter": { textTransform: "capitalize" },
+                }),
+              }}
             />
           </Box>
         </HStack>
-        {_value ? (
+        {selected ? (
           <Text fontSize="sm" color="gray.500">
             <FormattedMessage
               id="generic.example"
               defaultMessage="Example: {example}"
-              values={{ example: _value.example }}
+              values={{ example: selected.example }}
             />
           </Text>
         ) : null}

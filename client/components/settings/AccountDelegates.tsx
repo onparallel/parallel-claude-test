@@ -125,7 +125,7 @@ export function AccountDelegates({ user, onSubmit, ...props }: AccountDelegatesP
                 ref={usersRef}
                 isMulti
                 value={value}
-                onKeyDown={(e: KeyboardEvent) => {
+                onKeyDown={(e) => {
                   if (e.key === "Enter" && !(e.target as HTMLInputElement).value) {
                     e.preventDefault();
                   }

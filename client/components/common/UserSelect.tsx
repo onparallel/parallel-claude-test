@@ -1,5 +1,5 @@
 import { gql, useApolloClient, useQuery } from "@apollo/client";
-import { Box, Button, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Stack, Text } from "@chakra-ui/react";
 import { UsersIcon } from "@parallel/chakra/icons";
 import {
   UserSelect_canCreateUsersDocument,
@@ -10,18 +10,14 @@ import {
   UserSelect_UserGroupFragmentDoc,
   useSearchUsers_searchUsersDocument,
 } from "@parallel/graphql/__types";
-import {
-  ExtendComponentProps,
-  useReactSelectProps,
-  UseReactSelectProps,
-} from "@parallel/utils/react-select/hooks";
+import { genericRsComponent, useReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { CustomSelectProps } from "@parallel/utils/react-select/types";
 import { If, MaybeArray, unMaybeArray } from "@parallel/utils/types";
 import { useAsyncMemo } from "@parallel/utils/useAsyncMemo";
 import { ForwardedRef, forwardRef, ReactElement, RefAttributes, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { CommonProps, components } from "react-select";
-import Select from "react-select";
-import AsyncSelect, { Props as AsyncSelectProps } from "react-select/async";
+import Select, { components, SelectComponentsConfig, SelectInstance } from "react-select";
+import AsyncSelect from "react-select/async";
 import { indexBy, zip } from "remeda";
 import { EmptySearchTemplatesIcon } from "../petition-new/icons/EmtpySearchTemplatesIcon";
 import { Link, NakedLink } from "./Link";
@@ -34,10 +30,8 @@ export type UserSelectSelection<IncludeGroups extends boolean = false> =
 export type UserSelectInstance<
   IsMulti extends boolean,
   IncludeGroups extends boolean = false,
-  IsAsync extends boolean = true
-> = IsAsync extends true
-  ? AsyncSelect<UserSelectSelection<IncludeGroups>, IsMulti, never>
-  : Select<UserSelectSelection<IncludeGroups>, IsMulti, never>;
+  OptionType extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>
+> = SelectInstance<OptionType, IsMulti, never>;
 
 const fragments = {
   get User() {
@@ -65,7 +59,7 @@ const fragments = {
   },
 };
 
-const queries = [
+const _queries = [
   gql`
     query UserSelect_canCreateUsers {
       me {
@@ -90,42 +84,43 @@ const queries = [
   `,
 ];
 
-export type UserSelectProps<
+export interface UserSelectProps<
   IsMulti extends boolean = false,
   IncludeGroups extends boolean = false,
-  IsAsync extends boolean = true,
-  T extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>
-> = UseReactSelectProps &
-  Omit<AsyncSelectProps<T, IsMulti, never>, "value" | "onChange" | "options"> & {
-    isMulti?: IsMulti;
-    value: If<IsMulti, T[] | string[], T | string | null>;
-    onChange: (value: If<IsMulti, T[], T | null>) => void;
-    includeGroups?: IncludeGroups;
-  } & (IsAsync extends true
-    ? {
-        onSearch: (
-          search: string,
-          excludeUsers: string[],
-          excludeUserGroups: string[]
-        ) => Promise<T[]>;
-      }
-    : {
-        options: IsAsync extends true ? never : T[];
-      });
+  IsSync extends boolean = false,
+  OptionType extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>
+> extends Omit<CustomSelectProps<OptionType, IsMulti, never>, "value"> {
+  value: If<IsMulti, OptionType[] | string[], OptionType | string | null>;
+  isSync?: IsSync;
+  includeGroups?: IncludeGroups;
+  onSearch: IsSync extends true
+    ? undefined
+    : (
+        search: string,
+        excludeUsers: string[],
+        excludeUserGroups: string[]
+      ) => Promise<OptionType[]>;
+}
 
 export const UserSelect = Object.assign(
-  forwardRef(function UserSelect(
+  forwardRef(function UserSelect<
+    IsMulti extends boolean = false,
+    IncludeGroups extends boolean = false,
+    IsSync extends boolean = false,
+    OptionType extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>
+  >(
     {
       value,
       onSearch,
+      isSync,
       onChange,
       options,
       isMulti,
       includeGroups,
       placeholder: _placeholder,
       ...props
-    }: UserSelectProps<boolean, boolean, boolean>,
-    ref: ForwardedRef<UserSelectInstance<boolean, boolean, boolean>>
+    }: UserSelectProps<IsMulti, IncludeGroups, IsSync, OptionType>,
+    ref: ForwardedRef<UserSelectInstance<IsMulti, IncludeGroups, OptionType>>
   ) {
     const needsLoading =
       typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
@@ -196,78 +191,60 @@ export const UserSelect = Object.assign(
 
     const { data } = useQuery(UserSelect_canCreateUsersDocument);
 
-    const reactSelectProps = useUserSelectReactSelectProps<boolean, boolean>({
-      placeholder,
+    const rsProps = useReactSelectProps<OptionType, IsMulti, never>({
       ...props,
-      canCreateUsers: data?.me.canCreateUsers ?? false,
+      components: {
+        NoOptionsMessage,
+        SingleValue,
+        MultiValueLabel,
+        Option,
+        ...props.components,
+      } as unknown as SelectComponentsConfig<OptionType, IsMulti, never>,
     });
 
-    return loadOptions ? (
-      <AsyncSelect<UserSelectSelection<boolean>, boolean, never>
-        ref={ref as any}
-        value={_value as any}
-        onChange={onChange as any}
-        isMulti={isMulti}
-        loadOptions={loadOptions}
-        {...reactSelectProps}
-      />
-    ) : (
-      <Select<UserSelectSelection<boolean>, boolean, never>
+    const extensions = {
+      canCreateUsers: data?.me.canCreateUsers ?? false,
+      includeGroups,
+    };
+
+    return isSync ? (
+      <Select<OptionType, IsMulti, never>
         ref={ref as any}
         value={_value as any}
         onChange={onChange as any}
         isMulti={isMulti}
         options={options}
-        {...reactSelectProps}
+        getOptionLabel={getOptionLabel}
+        getOptionValue={getOptionValue}
+        placeholder={placeholder}
+        {...rsProps}
+        {...(extensions as any)}
+      />
+    ) : (
+      <AsyncSelect<OptionType, IsMulti, never>
+        ref={ref as any}
+        value={_value as any}
+        onChange={onChange as any}
+        isMulti={isMulti}
+        loadOptions={loadOptions}
+        getOptionLabel={getOptionLabel}
+        getOptionValue={getOptionValue}
+        placeholder={placeholder}
+        {...rsProps}
+        {...(extensions as any)}
       />
     );
   }) as <
     IsMulti extends boolean = false,
     IncludeGroups extends boolean = false,
-    IsAsync extends boolean = true,
-    T extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>
+    IsSync extends boolean = false,
+    OptionType extends UserSelectSelection<IncludeGroups> = UserSelectSelection<IncludeGroups>
   >(
-    props: UserSelectProps<IsMulti, IncludeGroups, IsAsync, T> &
-      RefAttributes<UserSelectInstance<IsMulti, IncludeGroups, IsAsync>>
-  ) => ReactElement | null,
-  { fragments, queries }
+    props: UserSelectProps<IsMulti, IncludeGroups, IsSync, OptionType> &
+      RefAttributes<UserSelectInstance<IsMulti, IncludeGroups, OptionType>>
+  ) => ReactElement,
+  { fragments }
 );
-
-type AsyncUserSelectProps<
-  IsMulti extends boolean,
-  IncludeGroups extends boolean
-> = AsyncSelectProps<UserSelectSelection<IncludeGroups>, IsMulti, never>;
-
-function useUserSelectReactSelectProps<IsMulti extends boolean, IncludeGroups extends boolean>({
-  includeGroups,
-  canCreateUsers,
-  ...props
-}: UseReactSelectProps & {
-  includeGroups?: IncludeGroups;
-  canCreateUsers?: boolean;
-}): AsyncUserSelectProps<IsMulti, IncludeGroups> {
-  const rsProps = useReactSelectProps<UserSelectSelection<IncludeGroups>, IsMulti>(props);
-
-  const components = useMemo(
-    () => ({
-      NoOptionsMessage,
-      SingleValue,
-      MultiValueLabel,
-      Option,
-      ...rsProps.components,
-    }),
-    [rsProps.components]
-  );
-
-  return {
-    ...rsProps,
-    components,
-    getOptionLabel,
-    getOptionValue,
-    canCreateUsers,
-    includeGroups,
-  };
-}
 
 export function useSearchUsers() {
   const client = useApolloClient();
@@ -372,16 +349,6 @@ function useGetUsersOrGroups() {
   }, []);
 }
 
-export type UserSelectComponentPropExtensions = {
-  canCreateUsers: boolean;
-  includeGroups?: boolean;
-};
-
-export type UserSelectComponentProps<T = CommonProps<any, any, any>> = ExtendComponentProps<
-  T,
-  UserSelectComponentPropExtensions
->;
-
 const getOptionLabel = (option: UserSelectSelection<any>) => {
   if (option.__typename === "User") {
     return option.fullName ? `${option.fullName} <${option.email}>` : option.email;
@@ -394,10 +361,22 @@ const getOptionLabel = (option: UserSelectSelection<any>) => {
 
 const getOptionValue = (option: UserSelectSelection<any>) => option.id;
 
-const NoOptionsMessage: typeof components.NoOptionsMessage = function NoOptionsMessage(props) {
+const rsComponent = genericRsComponent<
+  UserSelectSelection<boolean>,
+  boolean,
+  never,
+  {
+    selectProps: {
+      canCreateUsers?: boolean;
+      includeGroups?: boolean;
+    };
+  }
+>();
+
+const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
   const {
     selectProps: { inputValue: search, canCreateUsers, includeGroups },
-  } = props as unknown as UserSelectComponentProps;
+  } = props;
   return (
     <Stack alignItems="center" textAlign="center" padding={4} spacing={4}>
       {search ? (
@@ -447,43 +426,17 @@ const NoOptionsMessage: typeof components.NoOptionsMessage = function NoOptionsM
       )}
     </Stack>
   );
-};
+});
 
-const SingleValue: typeof components.SingleValue = function SingleValue(props) {
-  const intl = useIntl();
-  const data = props.data as unknown as UserSelectSelection<any>;
+const SingleValue = rsComponent("SingleValue", function (props) {
   return (
     <components.SingleValue {...props}>
-      {data.__typename === "User" ? (
-        <Text as="span">{data.fullName ? `${data.fullName} <${data.email}>` : data.email}</Text>
-      ) : data.__typename === "UserGroup" ? (
-        <>
-          <UsersIcon
-            marginRight={2}
-            position="relative"
-            top={-0.5}
-            aria-label={intl.formatMessage({
-              id: "component.user-select.user-group-icon-alt",
-              defaultMessage: "Team",
-            })}
-          />
-          {data.name} (
-          <FormattedMessage
-            id="component.user-select.group-members"
-            defaultMessage="{count, plural, =1 {1 member} other {# members}}"
-            values={{ count: data.members.length }}
-          />
-          )
-        </>
-      ) : null}
+      <UserSelectOption data={props.data} />
     </components.SingleValue>
   );
-};
+});
 
-const MultiValueLabel: typeof components.MultiValueLabel = function MultiValueLabel({
-  children,
-  ...props
-}) {
+const MultiValueLabel = rsComponent("MultiValueLabel", function ({ children, ...props }) {
   const intl = useIntl();
   const data = props.data as unknown as UserSelectSelection<any>;
   return (
@@ -512,46 +465,53 @@ const MultiValueLabel: typeof components.MultiValueLabel = function MultiValueLa
       ) : null}
     </components.MultiValueLabel>
   );
-};
+});
 
-const Option: typeof components.Option = function Option({ children, ...props }) {
-  const intl = useIntl();
-  const data = props.data as unknown as UserSelectSelection<any>;
+const Option = rsComponent("Option", function ({ children, ...props }) {
   return (
     <components.Option {...props}>
-      {data.__typename === "User" ? (
+      <UserSelectOption data={props.data} />
+    </components.Option>
+  );
+});
+
+function UserSelectOption({ data }: { data: UserSelectSelection<any> }) {
+  const intl = useIntl();
+  return data.__typename === "User" ? (
+    <Box verticalAlign="baseline">
+      {data.fullName ? (
         <>
-          {data.fullName ? (
-            <Text as="span" verticalAlign="baseline">
-              <Text as="span">{data.fullName}</Text>
-              <Text as="span" display="inline-block" width={2} />
-              <Text as="span" fontSize="sm" opacity={0.7}>
-                {data.email}
-              </Text>
-            </Text>
-          ) : (
-            <Text as="span">{data.email}</Text>
-          )}
+          <Text as="span">{data.fullName}</Text>
+          <Text as="span" display="inline-block" width={2} />
+          <Text as="span" fontSize="85%" opacity={0.7}>
+            {data.email}
+          </Text>
         </>
-      ) : data.__typename === "UserGroup" ? (
-        <>
-          <UsersIcon
-            marginRight={2}
-            position="relative"
-            aria-label={intl.formatMessage({
-              id: "component.user-select.user-group-icon-alt",
-              defaultMessage: "Team",
-            })}
-          />
-          {data.name} (
+      ) : (
+        <Text as="span">{data.email}</Text>
+      )}
+    </Box>
+  ) : data.__typename === "UserGroup" ? (
+    <Flex alignItems="center">
+      <UsersIcon
+        marginRight={2}
+        position="relative"
+        aria-label={intl.formatMessage({
+          id: "component.user-select.user-group-icon-alt",
+          defaultMessage: "Team",
+        })}
+      />
+      <Box verticalAlign="baseline">
+        <Text as="span">{data.name}</Text>
+        <Text as="span" display="inline-block" width={2} />
+        <Text as="span" fontSize="85%" opacity={0.7}>
           <FormattedMessage
             id="component.user-select.group-members"
             defaultMessage="{count, plural, =1 {1 member} other {# members}}"
             values={{ count: data.members.length }}
           />
-          )
-        </>
-      ) : null}
-    </components.Option>
-  );
-};
+        </Text>
+      </Box>
+    </Flex>
+  ) : null;
+}

@@ -1,27 +1,19 @@
 import { PetitionPermissionType } from "@parallel/graphql/__types";
-import { UseReactSelectProps, useReactSelectProps } from "@parallel/utils/react-select/hooks";
-import { CustomSelectProps, OptionType } from "@parallel/utils/react-select/types";
 import { Focusable } from "@parallel/utils/types";
-import { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
-import { useIntl } from "react-intl";
-import Select from "react-select";
+import { forwardRef } from "react";
+import { SimpleSelect, SimpleSelectProps, useSimpleSelectOptions } from "../common/SimpleSelect";
 
 interface PetitionPermissionTypeSelectProps
-  extends UseReactSelectProps,
-    CustomSelectProps<PetitionPermissionType, false> {
+  extends Omit<SimpleSelectProps<PetitionPermissionType, false>, "options"> {
   disableOwner?: boolean;
 }
 
 export const PetitionPermissionTypeSelect = forwardRef<
   Focusable,
   PetitionPermissionTypeSelectProps
->(function PetitionPermissionTypeSelect({ value, onChange, disableOwner, ...props }, ref) {
-  const reactSelectProps = useReactSelectProps<OptionType<PetitionPermissionType>, false, never>(
-    props
-  );
-  const intl = useIntl();
-  const options: OptionType<PetitionPermissionType>[] = useMemo(
-    () => [
+>(function PetitionPermissionTypeSelect({ disableOwner, ...props }, ref) {
+  const options = useSimpleSelectOptions(
+    (intl) => [
       {
         label: intl.formatMessage({
           id: "petition-permission-type.write",
@@ -38,26 +30,8 @@ export const PetitionPermissionTypeSelect = forwardRef<
         isDisabled: disableOwner,
       },
     ],
-    [intl.locale, disableOwner]
+    [disableOwner]
   );
 
-  const _ref = useRef<Select<OptionType<PetitionPermissionType>, false, never>>(null);
-  useImperativeHandle(ref, () => ({
-    focus: () => {
-      setTimeout(() => _ref.current?.focus());
-    },
-  }));
-
-  const handleChange = (value: { label: string; value: PetitionPermissionType }) => {
-    onChange(value.value);
-  };
-  return (
-    <Select
-      ref={_ref}
-      value={options.find((o) => o.value === value)}
-      onChange={handleChange as any}
-      options={options}
-      {...reactSelectProps}
-    />
-  );
+  return <SimpleSelect ref={ref as any} options={options} {...props} />;
 });

@@ -14,10 +14,9 @@ export type ShortTextFormat = ShortTextFormatImplementation & {
   inputProps?: any;
   validate?: (value: string) => boolean;
 };
+
 type ShortTextFormatImplementation =
-  | {
-      type: "INPUT";
-    }
+  | { type: "INPUT" }
   | { type: "MASK"; maskProps: (value: string) => any };
 
 const prepare = (str: string) => str.toUpperCase();

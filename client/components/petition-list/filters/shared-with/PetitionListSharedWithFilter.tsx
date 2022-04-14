@@ -1,15 +1,13 @@
 import { Button, Grid, HStack, Stack, Text } from "@chakra-ui/react";
 import { PlusCircleFilledIcon } from "@parallel/chakra/icons";
+import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { TableColumnFilterProps } from "@parallel/components/common/Table";
 import {
   FilterSharedWithLogicalOperator,
   PetitionSharedWithFilter,
 } from "@parallel/graphql/__types";
-import { useInlineReactSelectProps } from "@parallel/utils/react-select/hooks";
-import { OptionType } from "@parallel/utils/react-select/types";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import Select from "react-select";
 import { PetitionListSharedWithFilterLine } from "./PetitionListSharedWithFilterLine";
 
 export function PetitionListSharedWithFilter({
@@ -18,7 +16,7 @@ export function PetitionListSharedWithFilter({
 }: TableColumnFilterProps<PetitionSharedWithFilter>) {
   const intl = useIntl();
 
-  const logicalOperators = useMemo<OptionType<FilterSharedWithLogicalOperator>[]>(() => {
+  const logicalOperators = useMemo<SimpleOption<FilterSharedWithLogicalOperator>[]>(() => {
     return [
       {
         label: intl.formatMessage({
@@ -36,11 +34,6 @@ export function PetitionListSharedWithFilter({
       },
     ];
   }, [intl.locale]);
-
-  const selectProps = useInlineReactSelectProps<any, false, never>({
-    size: "sm",
-    usePortal: false,
-  });
 
   const handleAddFilter = () => {
     onChange({
@@ -114,12 +107,13 @@ export function PetitionListSharedWithFilter({
           />
         </Button>
         {value && value.filters.length > 1 ? (
-          <Select
-            {...selectProps}
+          <SimpleSelect
+            size="sm"
+            usePortal={false}
             isSearchable={false}
             options={logicalOperators}
-            value={logicalOperators.find((o) => value!.operator === o.value)}
-            onChange={(option) => onChange({ ...value!, operator: option!.value })}
+            value={value.operator}
+            onChange={(operator) => onChange({ ...value!, operator: operator! })}
           />
         ) : null}
       </HStack>

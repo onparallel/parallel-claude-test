@@ -4,7 +4,7 @@ import { AlertCircleFilledIcon, UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import {
-  ExtendComponentProps,
+  genericRsComponent,
   useReactSelectProps,
   UseReactSelectProps,
 } from "@parallel/utils/react-select/hooks";
@@ -18,15 +18,14 @@ import {
   ForwardedRef,
   forwardRef,
   KeyboardEvent,
-  useMemo,
+  ReactElement,
+  RefAttributes,
   useRef,
   useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { CommonProps, components, InputActionMeta, InputProps } from "react-select";
-import AsyncCreatableSelect, {
-  Props as AsyncCreatableSelectProps,
-} from "react-select/async-creatable";
+import { components, InputActionMeta, SelectInstance } from "react-select";
+import AsyncCreatableSelect, { AsyncCreatableProps } from "react-select/async-creatable";
 import { isDefined, pick } from "remeda";
 import { DeletedContact } from "./DeletedContact";
 
@@ -36,19 +35,17 @@ export type ContactSelectSelection = ContactSelect_ContactFragment & {
 };
 
 export interface ContactSelectProps<IsMulti extends boolean = false>
-  extends UseReactSelectProps,
-    CustomAsyncCreatableSelectProps<ContactSelectSelection, IsMulti> {
-  placeholder?: string;
-  isMulti?: IsMulti;
+  extends CustomAsyncCreatableSelectProps<ContactSelectSelection, IsMulti, never> {
   onCreateContact: (data: { defaultEmail?: string }) => Promise<ContactSelectSelection>;
   onSearchContacts: (search: string, exclude: string[]) => Promise<ContactSelectSelection[]>;
   onPasteEmails?: (emails: string[]) => void;
   onFocus?: () => void;
 }
 
-export type ContactSelectInstance<IsMulti extends boolean = false> = AsyncCreatableSelect<
+export type ContactSelectInstance<IsMulti extends boolean = false> = SelectInstance<
   ContactSelectSelection,
-  IsMulti
+  IsMulti,
+  never
 >;
 
 export const ContactSelect = Object.assign(
@@ -165,10 +162,7 @@ export const ContactSelect = Object.assign(
     }
 
     function handleKeyDown(event: KeyboardEvent) {
-      const select = innerRef.current!.select.select.select;
-      if (!select) {
-        return;
-      }
+      const select = innerRef.current!;
       switch (event.key) {
         case ",":
         case ";":
@@ -195,10 +189,13 @@ export const ContactSelect = Object.assign(
         loadOptions={loadOptions}
         defaultOptions={options}
         {...{ onPasteEmails }}
+        {...props}
         {...rsProps}
       />
     );
-  }),
+  }) as <IsMulti extends boolean = false>(
+    props: ContactSelectProps<IsMulti> & RefAttributes<ContactSelectInstance<IsMulti>>
+  ) => ReactElement,
   {
     fragments: {
       // firstName and lastName are needed for converting from Contact to PetitionSigner in some dialogs
@@ -216,22 +213,19 @@ export const ContactSelect = Object.assign(
   }
 );
 
-function useContactSelectReactSelectProps<IsMulti extends boolean = false>(
-  props: UseReactSelectProps
-): AsyncCreatableSelectProps<ContactSelectSelection, IsMulti, never> {
+function useContactSelectReactSelectProps<IsMulti extends boolean>(
+  props: UseReactSelectProps<ContactSelectSelection, IsMulti, never>
+): AsyncCreatableProps<ContactSelectSelection, IsMulti, never> {
   const rsProps = useReactSelectProps<ContactSelectSelection, IsMulti, never>(props);
 
-  const components = useMemo(
-    () => ({
-      ...rsProps.components,
-      NoOptionsMessage,
-      MultiValueLabel,
-      SingleValue,
-      Option,
-      Input,
-    }),
-    [rsProps.components]
-  );
+  const components = {
+    ...rsProps.components,
+    NoOptionsMessage,
+    MultiValueLabel,
+    SingleValue,
+    Option,
+    Input,
+  };
 
   return {
     ...rsProps,
@@ -242,15 +236,6 @@ function useContactSelectReactSelectProps<IsMulti extends boolean = false>(
     components,
   };
 }
-
-export type ContactSelectComponentPropExtensions = {
-  onPasteEmails?: (emails: string[]) => void;
-};
-
-export type ContactSelectComponentProps<T = CommonProps<any, any, any>> = ExtendComponentProps<
-  T,
-  ContactSelectComponentPropExtensions
->;
 
 const getOptionLabel = (option: ContactSelectSelection) => {
   if ((option as any).__isNew__) {
@@ -278,7 +263,18 @@ const formatCreateLabel = (label: string) => {
   );
 };
 
-const NoOptionsMessage: typeof components.NoOptionsMessage = function NoOptionsMessage(props) {
+const rsComponent = genericRsComponent<
+  ContactSelectSelection,
+  any,
+  never,
+  {
+    selectProps: {
+      onPasteEmails?: (emails: string[]) => void;
+    };
+  }
+>();
+
+const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
   const search = props.selectProps.inputValue;
   return (
     <Box textAlign="center" color="gray.400" padding={4}>
@@ -312,14 +308,10 @@ const NoOptionsMessage: typeof components.NoOptionsMessage = function NoOptionsM
       )}
     </Box>
   );
-};
+});
 
-const MultiValueLabel: typeof components.MultiValueLabel = function MultiValueLabel({
-  children,
-  ...props
-}) {
-  const { fullName, email, isDeleted, hasBouncedEmail } =
-    props.data as unknown as ContactSelectSelection;
+const MultiValueLabel = rsComponent("MultiValueLabel", function ({ children, ...props }) {
+  const { fullName, email, isDeleted, hasBouncedEmail } = props.data;
   const intl = useIntl();
   return (
     <components.MultiValueLabel {...props}>
@@ -338,11 +330,10 @@ const MultiValueLabel: typeof components.MultiValueLabel = function MultiValueLa
       ) : null}
     </components.MultiValueLabel>
   );
-};
+});
 
-const SingleValue: typeof components.SingleValue = function SingleValue(props) {
-  const { fullName, email, isDeleted, hasBouncedEmail } =
-    props.data as unknown as ContactSelectSelection;
+const SingleValue = rsComponent("SingleValue", function (props) {
+  const { fullName, email, isDeleted, hasBouncedEmail } = props.data;
   const intl = useIntl();
   return (
     <components.SingleValue {...props}>
@@ -361,9 +352,9 @@ const SingleValue: typeof components.SingleValue = function SingleValue(props) {
       ) : null}
     </components.SingleValue>
   );
-};
+});
 
-const Option: typeof components.Option = function Option({ children, ...props }) {
+const Option = rsComponent("Option", function ({ children, ...props }) {
   if ((props.data as any).__isNew__) {
     return (
       <components.Option {...props}>
@@ -388,29 +379,26 @@ const Option: typeof components.Option = function Option({ children, ...props })
       </components.Option>
     );
   }
-};
+});
 
-const Input: typeof components.Input = function Input(props) {
-  const {
-    selectProps: { onPasteEmails },
-  } = props as ContactSelectComponentProps<InputProps>;
+const Input = rsComponent("Input", function (props) {
   return (
     <components.Input
       {...props}
       {...{
         onPaste:
-          onPasteEmails &&
+          props.selectProps.onPasteEmails &&
           ((e: ClipboardEvent<HTMLInputElement>) => {
             if (e.clipboardData.types.includes("text/plain")) {
               const text = e.clipboardData.getData("text/plain");
               const emails = text.split(/\s+/g).filter((part) => part.match(EMAIL_REGEX));
               if (emails.length > 1) {
                 e.preventDefault();
-                onPasteEmails(emails);
+                props.selectProps.onPasteEmails?.(emails);
               }
             }
           }),
       }}
     />
   );
-};
+});

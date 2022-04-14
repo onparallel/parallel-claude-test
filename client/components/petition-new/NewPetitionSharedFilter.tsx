@@ -10,8 +10,7 @@ import {
 import { ChevronDownIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { ValueProps } from "@parallel/utils/ValueProps";
-import { useMemo } from "react";
-import { useIntl } from "react-intl";
+import { useSimpleSelectOptions } from "../common/SimpleSelect";
 
 export type NewPetitionSharedFilterValues = "IS_OWNER" | "NOT_IS_OWNER";
 
@@ -19,32 +18,31 @@ interface NewPetitionSharedFilterProps extends ValueProps<NewPetitionSharedFilte
 
 export const NewPetitionSharedFilter = chakraForwardRef<"button", NewPetitionSharedFilterProps>(
   function NewPetitionSharedFilter({ value, onChange, ...props }, ref) {
-    const intl = useIntl();
-    const options = useMemo(
-      () => [
+    const options = useSimpleSelectOptions(
+      (intl) => [
         {
-          key: "ALL",
+          value: "ALL",
           label: intl.formatMessage({
             id: "component.new-petition-shared-filter.all",
             defaultMessage: "All templates",
           }),
         },
         {
-          key: "IS_OWNER",
+          value: "IS_OWNER",
           label: intl.formatMessage({
             id: "component.new-petition-shared-filter.created-by-me",
             defaultMessage: "Created by me",
           }),
         },
         {
-          key: "NOT_IS_OWNER",
+          value: "NOT_IS_OWNER",
           label: intl.formatMessage({
             id: "component.new-petition-shared-filter.shared-with-me",
             defaultMessage: "Shared with me",
           }),
         },
       ],
-      [intl.locale]
+      []
     );
 
     return (
@@ -56,7 +54,7 @@ export const NewPetitionSharedFilter = chakraForwardRef<"button", NewPetitionSha
           rightIcon={<ChevronDownIcon />}
           {...props}
         >
-          {options.find((opt) => opt.key === value)?.label ?? options[0].label}
+          {options.find((opt) => opt.value === value)?.label ?? options[0].label}
         </MenuButton>
         <Portal>
           <MenuList minWidth="154px">
@@ -67,7 +65,7 @@ export const NewPetitionSharedFilter = chakraForwardRef<"button", NewPetitionSha
               }
             >
               {options.map((option) => (
-                <MenuItemOption key={option.key} value={option.key}>
+                <MenuItemOption key={option.value} value={option.value}>
                   {option.label}
                 </MenuItemOption>
               ))}

@@ -1,7 +1,6 @@
 import { ApolloError, gql, useApolloClient } from "@apollo/client";
 import {
   Button,
-  Collapse,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -14,17 +13,20 @@ import {
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
+import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import {
+  CreateEventSubscriptionDialog_PetitionBaseFragment,
   CreateEventSubscriptionDialog_petitionsDocument,
   PetitionEventType,
 } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { genericRsComponent, useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { Maybe, MaybePromise } from "@parallel/utils/types";
 import { useCallback, useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { components, OptionTypeBase } from "react-select";
+import { components } from "react-select";
 import Select from "react-select/async";
 
 interface CreateEventSubscriptionDialogProps {
@@ -40,8 +42,8 @@ interface CreateEventSubscriptionDialogFormData {
   name: Maybe<string>;
   eventsUrl: string;
   eventsMode: "ALL" | "SPECIFIC";
-  eventTypes: OptionTypeBase[];
-  fromTemplate: Maybe<OptionTypeBase>;
+  eventTypes: PetitionEventType[];
+  fromTemplate: Maybe<CreateEventSubscriptionDialog_PetitionBaseFragment>;
 }
 
 export function CreateEventSubscriptionDialog(
@@ -96,10 +98,15 @@ export function CreateEventSubscriptionDialog(
       }
     },
   });
-  const components = useMemo(() => ({ Option, SingleValue }), []);
-  const reactSelectProps = useReactSelectProps<OptionTypeBase, true>({ components });
+  const reactSelectProps = useReactSelectProps<
+    CreateEventSubscriptionDialog_PetitionBaseFragment,
+    false
+  >({ components: { Option, SingleValue } });
 
-  const options = useMemo(() => eventTypes.map((event) => ({ label: event, value: event })), []);
+  const options = useMemo(
+    () => eventTypes.map((event) => ({ label: event as string, value: event })),
+    []
+  );
   return (
     <ConfirmDialog
       size="xl"
@@ -114,7 +121,7 @@ export function CreateEventSubscriptionDialog(
             await props.onCreate({
               name: data.name,
               eventsUrl: data.eventsUrl,
-              eventTypes: data.eventsMode === "ALL" ? null : data.eventTypes.map((x) => x.value),
+              eventTypes: data.eventsMode === "ALL" ? null : data.eventTypes,
               fromTemplateId: data.fromTemplate?.id ?? null,
             });
             clearErrors("eventsUrl");
@@ -188,7 +195,7 @@ export function CreateEventSubscriptionDialog(
                 required: false,
               }}
               render={({ field: { onChange, value } }) => (
-                <Select
+                <Select<CreateEventSubscriptionDialog_PetitionBaseFragment, false>
                   {...reactSelectProps}
                   value={value}
                   inputId="from-template-id"
@@ -202,8 +209,7 @@ export function CreateEventSubscriptionDialog(
                     defaultMessage: "Search for templates...",
                   })}
                   getOptionValue={(o) => o.id}
-                  getOptionLabel={(o) => o.name}
-                  components={components}
+                  getOptionLabel={(o) => o.name ?? ""}
                 />
               )}
             />
@@ -236,7 +242,7 @@ export function CreateEventSubscriptionDialog(
               )}
             />
           </FormControl>
-          <Collapse in={eventsMode === "SPECIFIC"}>
+          <PaddedCollapse in={eventsMode === "SPECIFIC"}>
             <Stack paddingLeft={6}>
               <Text fontSize="sm">
                 <FormattedMessage
@@ -264,13 +270,7 @@ export function CreateEventSubscriptionDialog(
                   }}
                   render={({ field: { onChange, value } }) => (
                     <>
-                      <Select
-                        value={value}
-                        onChange={onChange}
-                        isMulti
-                        options={options}
-                        {...reactSelectProps}
-                      />
+                      <SimpleSelect value={value} onChange={onChange} isMulti options={options} />
                       <FormErrorMessage>
                         <FormattedMessage
                           id="component.create-event-subscription-dialog.invalid-event-types"
@@ -282,7 +282,7 @@ export function CreateEventSubscriptionDialog(
                 />
               </FormControl>
             </Stack>
-          </Collapse>
+          </PaddedCollapse>
         </Stack>
       }
       confirm={
@@ -295,7 +295,9 @@ export function CreateEventSubscriptionDialog(
   );
 }
 
-const Option: typeof components.Option = function Option(props) {
+const rsComponent = genericRsComponent<CreateEventSubscriptionDialog_PetitionBaseFragment, false>();
+
+const Option = rsComponent("Option", function (props) {
   return (
     <components.Option {...props}>
       {props.data.name ?? (
@@ -305,9 +307,9 @@ const Option: typeof components.Option = function Option(props) {
       )}
     </components.Option>
   );
-};
+});
 
-const SingleValue: typeof components.SingleValue = function SingleValue(props) {
+const SingleValue = rsComponent("SingleValue", function (props) {
   return (
     <components.SingleValue {...props}>
       {props.data.name ?? (
@@ -317,6 +319,15 @@ const SingleValue: typeof components.SingleValue = function SingleValue(props) {
       )}
     </components.SingleValue>
   );
+});
+
+CreateEventSubscriptionDialog.fragments = {
+  PetitionBase: gql`
+    fragment CreateEventSubscriptionDialog_PetitionBase on PetitionBase {
+      id
+      name
+    }
+  `,
 };
 
 CreateEventSubscriptionDialog.queries = [
@@ -336,11 +347,11 @@ CreateEventSubscriptionDialog.queries = [
         filters: $filters
       ) {
         items {
-          id
-          name
+          ...CreateEventSubscriptionDialog_PetitionBase
         }
       }
     }
+    ${CreateEventSubscriptionDialog.fragments.PetitionBase}
   `,
 ];
 

@@ -1,9 +1,10 @@
 import { Box, Stack, Text } from "@chakra-ui/react";
-import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { genericRsComponent, rsStyles } from "@parallel/utils/react-select/hooks";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
-import Select, { components, Props as SelectProps, StylesConfig } from "react-select";
+import { components } from "react-select";
+import { SimpleOption, SimpleSelect } from "./SimpleSelect";
 
 export const DEFAULT_COLORS = [
   "#E2E8F0",
@@ -15,59 +16,54 @@ export const DEFAULT_COLORS = [
   "#D5E7DE",
 ];
 
-type TagColor = {
-  name: string;
-  value: string;
-};
-
 function useTagColors() {
   const intl = useIntl();
-  return useMemo(
+  return useMemo<SimpleOption[]>(
     () => [
       {
-        name: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.color.gray",
           defaultMessage: "gray",
         }),
         value: "#E2E8F0",
       },
       {
-        name: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.color.brown",
           defaultMessage: "brown",
         }),
         value: "#F5EFE8",
       },
       {
-        name: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.color.yellow",
           defaultMessage: "yellow",
         }),
         value: "#FEEBC8",
       },
       {
-        name: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.color.red",
           defaultMessage: "red",
         }),
         value: "#FED7D7",
       },
       {
-        name: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.color.purple",
           defaultMessage: "purple",
         }),
         value: "#DDDCF8",
       },
       {
-        name: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.color.blue",
           defaultMessage: "blue",
         }),
         value: "#CEEDFF",
       },
       {
-        name: intl.formatMessage({
+        label: intl.formatMessage({
           id: "generic.color.green",
           defaultMessage: "green",
         }),
@@ -78,80 +74,58 @@ function useTagColors() {
   );
 }
 
-export type TagColorSelectProps = Omit<
-  SelectProps<TagColor, false, never>,
-  "value" | "onChange" | "options"
-> &
-  ValueProps<string>;
+export type TagColorSelectProps = ValueProps<string>;
 
-export function TagColorSelect({ value, onChange, ...props }: TagColorSelectProps) {
+export function TagColorSelect({ value, onChange }: TagColorSelectProps) {
   const options = useTagColors();
-  const _value = options.find((o) => o.value === value) ?? null;
-  const rsProps = useReactSelectProps<TagColor, false, never>();
-
-  const components = useMemo(
-    () => ({
-      ...rsProps.components,
-      SingleValue,
-      Option,
+  const styles = rsStyles<SimpleOption, false>({
+    valueContainer: (styles) => ({
+      ...styles,
+      flexWrap: "nowrap",
     }),
-    [rsProps.components]
-  );
-
-  const styles = useMemo<StylesConfig<TagColor, false, never>>(
-    () => ({
-      ...rsProps.styles,
-      valueContainer: (styles) => ({
-        ...styles,
-        flexWrap: "nowrap",
-      }),
-      option: (styles) => ({
-        ...styles,
-        display: "flex",
-        padding: "0.25rem 1rem",
-      }),
+    option: (styles) => ({
+      ...styles,
+      display: "flex",
+      padding: "0.25rem 1rem",
     }),
-    [rsProps.styles]
-  );
-
-  function handleChange(color: TagColor | null) {
-    onChange(color?.value ?? null);
-  }
+  });
 
   return (
-    <Select
-      {...props}
-      {...rsProps}
+    <SimpleSelect
       options={options}
-      components={components}
+      components={{ SingleValue, Option }}
       styles={styles}
-      getOptionValue={(o) => o.value}
-      getOptionLabel={(o) => o.name}
-      value={_value}
-      onChange={handleChange}
+      value={value}
+      onChange={onChange}
     />
   );
 }
 
-function TagColorOption({ color }: { color: TagColor }) {
+function TagColorOption({ color }: { color: SimpleOption }) {
   return (
     <Stack direction="row" alignItems="center">
       <Box boxSize={4} backgroundColor={color.value} borderRadius="sm" />
       <Text as="div" textTransform="capitalize">
-        {color.name}
+        {color.label}
       </Text>
     </Stack>
   );
 }
 
-const SingleValue: typeof components.SingleValue = function SingleValue(props) {
-  return <TagColorOption color={props.data as unknown as TagColor} />;
-};
+const rsComponent = genericRsComponent<SimpleOption, false>();
 
-const Option: typeof components.Option = function Option(props) {
+const SingleValue = rsComponent("SingleValue", function (props) {
+  return (
+    <components.SingleValue {...props}>
+      <TagColorOption color={props.data} />
+    </components.SingleValue>
+  );
+});
+
+const Option = rsComponent("Option", function (props) {
   return (
     <components.Option {...props}>
-      <TagColorOption color={props.data as TagColor} />
+      <TagColorOption color={props.data} />
     </components.Option>
   );
-};
+});

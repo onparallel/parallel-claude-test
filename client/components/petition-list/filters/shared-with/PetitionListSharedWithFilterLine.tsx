@@ -1,11 +1,9 @@
 import { Box, CloseButton } from "@chakra-ui/react";
+import { SimpleOption, SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { FilterSharedWithOperator, PetitionSharedWithFilterLine } from "@parallel/graphql/__types";
-import { useInlineReactSelectProps } from "@parallel/utils/react-select/hooks";
-import { OptionType } from "@parallel/utils/react-select/types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { useCallback, useMemo } from "react";
 import { useIntl } from "react-intl";
-import Select from "react-select";
 import { UserSelect, useSearchUsers } from "../../../common/UserSelect";
 
 export interface PetitionListSharedWithFilterProps
@@ -20,11 +18,6 @@ export function PetitionListSharedWithFilterLine({
 }: PetitionListSharedWithFilterProps) {
   const intl = useIntl();
 
-  const selectProps = useInlineReactSelectProps<any, false, never>({
-    size: "sm",
-    usePortal: false,
-  });
-
   const _handleSearchUsers = useSearchUsers();
   const handleSearchUsers = useCallback(
     async (search: string, excludeUsers: string[], excludeUserGroups: string[]) => {
@@ -37,7 +30,7 @@ export function PetitionListSharedWithFilterLine({
     [_handleSearchUsers, value.operator]
   );
 
-  const operators = useMemo<OptionType<FilterSharedWithOperator>[]>(() => {
+  const operators = useMemo<SimpleOption<FilterSharedWithOperator>[]>(() => {
     return [
       {
         label: intl.formatMessage({
@@ -74,21 +67,22 @@ export function PetitionListSharedWithFilterLine({
         size="md"
         onClick={onRemove}
       />
-      <Select
+      <SimpleSelect
+        size="sm"
+        usePortal={false}
         isSearchable={false}
         options={operators}
-        value={operators.find((o) => o.value === value.operator)}
-        onChange={(option: OptionType<FilterSharedWithOperator>) => {
-          onChange({ ...value, operator: option.value });
+        value={value.operator}
+        onChange={(operator) => {
+          onChange({ ...value, operator: operator! });
         }}
-        {...selectProps}
       />
       <Box flex="1" minWidth="240px">
         <UserSelect
           size="sm"
           includeGroups={value.operator !== "IS_OWNER"}
           value={value.value}
-          onKeyDown={(e: KeyboardEvent) => {
+          onKeyDown={(e) => {
             if (e.key === "Enter" && !(e.target as HTMLInputElement).value) {
               e.preventDefault();
             }

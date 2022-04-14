@@ -107,14 +107,14 @@ export function ConfirmPetitionSignersDialog({
   const contactSelectRef = useRef<ContactSelectInstance<false>>(null);
 
   const handleContactSelectOnChange =
-    (onChange: (...events: any[]) => void) => async (contact: ContactSelectSelection) => {
+    (onChange: (...events: any[]) => void) => async (contact: ContactSelectSelection | null) => {
       try {
-        const repeatedSigners = signers.filter((s) => s.email === contact.email);
+        const repeatedSigners = signers.filter((s) => s.email === contact!.email);
         onChange([
           ...signers,
           repeatedSigners.length > 0
-            ? await showConfirmSignerInfo({ selection: contact, repeatedSigners })
-            : contact,
+            ? await showConfirmSignerInfo({ selection: contact!, repeatedSigners })
+            : contact!,
         ]);
       } catch {}
       setSelectedContact(null);

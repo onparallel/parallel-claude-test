@@ -2,6 +2,7 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   Box,
   Button,
+  Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -17,7 +18,7 @@ import {
   TagEditDialog_updateTagDocument,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
-import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { genericRsComponent, useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ReactNode, useEffect, useMemo, useState } from "react";
 import { FormattedMessage } from "react-intl";
@@ -233,14 +234,22 @@ function TagSelect({ value, onChange, ...props }: SelectProps<TagSelection, fals
   );
 }
 
-const SingleValue: typeof components.SingleValue = function SingleValue({ data, innerProps }) {
-  return <Tag tag={data as unknown as TagSelection} minWidth="0" {...innerProps} />;
-};
+const rsComponent = genericRsComponent<TagSelection, false, never>();
 
-const Option: typeof components.Option = function Option(props) {
+const SingleValue = rsComponent("SingleValue", function (props) {
+  return (
+    <components.SingleValue {...props}>
+      <Flex>
+        <Tag tag={props.data} />
+      </Flex>
+    </components.SingleValue>
+  );
+});
+
+const Option = rsComponent("Option", function (props) {
   return (
     <components.Option {...props}>
       <Tag flex="0 1 auto" minWidth="0" tag={props.data as TagSelection} />
     </components.Option>
   );
-};
+});

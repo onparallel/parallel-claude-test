@@ -2,29 +2,23 @@ import { HStack, Text } from "@chakra-ui/react";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { flags } from "@parallel/utils/flags";
 import { phoneCodes } from "@parallel/utils/phoneCodes";
-import { UseReactSelectProps, useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuList";
-import { OptionType } from "@parallel/utils/react-select/types";
 import { useLoadCountryNames } from "@parallel/utils/useCountryName";
 import { forwardRef, useMemo } from "react";
 import { useIntl } from "react-intl";
-import Select, { createFilter, Props as SelectProps } from "react-select";
+import { createFilter, Props as SelectProps, SelectInstance } from "react-select";
 import { isDefined } from "remeda";
+import { SimpleOption, SimpleSelect, SimpleSelectProps } from "./SimpleSelect";
 
-interface PhoneCodeSelectProps extends UseReactSelectProps {
-  value?: string | null;
-  onChange?: (value: string | null) => void;
-}
-
-interface PhoneCodeSelectOptionType extends OptionType {
+interface PhoneCodeSelectOptionType extends SimpleOption {
   flag: string;
   code: string;
 }
 
 export const PhoneCodeSelect = forwardRef<
-  Select<PhoneCodeSelectOptionType, false, never>,
-  PhoneCodeSelectProps
->(function PhoneCodeSelect({ value, onChange, placeholder, ...props }, ref) {
+  SelectInstance<PhoneCodeSelectOptionType, false>,
+  Omit<SimpleSelectProps<string, false, PhoneCodeSelectOptionType>, "options">
+>(function PhoneCodeSelect(props, ref) {
   const intl = useIntl();
   const { countries } = useLoadCountryNames(intl.locale);
   const options = useMemo<PhoneCodeSelectOptionType[] | undefined>(() => {
@@ -43,32 +37,21 @@ export const PhoneCodeSelect = forwardRef<
       };
     });
   }, [countries]);
-  const _value = useMemo(() => options?.find((o) => o.value === value), [options, value]);
-  const rsProps = useReactSelectProps<PhoneCodeSelectOptionType, false, never>({
-    components: {
-      MenuList: OptimizedMenuList,
-    },
-    ...props,
-  });
   return (
-    <Select
+    <SimpleSelect
       ref={ref}
-      {...rsProps}
-      filterOption={createFilter({ ignoreAccents: false })}
       options={options}
-      value={_value}
       isSearchable
       isClearable
-      placeholder={
-        placeholder ??
-        intl.formatMessage({
-          id: "component.phone-code-input.placeholder",
-          defaultMessage: "Select a country...",
-        })
-      }
+      placeholder={intl.formatMessage({
+        id: "component.phone-code-input.placeholder",
+        defaultMessage: "Select a country...",
+      })}
+      {...props}
       formatOptionLabel={formatOptionLabel}
       getOptionLabel={(o) => `${o.label} ${o.code}`}
-      onChange={(option) => onChange?.(option?.value ?? null)}
+      filterOption={createFilter({ ignoreAccents: false })}
+      components={{ MenuList: OptimizedMenuList as any }}
     />
   );
 });

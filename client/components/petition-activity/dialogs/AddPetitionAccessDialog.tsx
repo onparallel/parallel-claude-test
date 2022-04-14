@@ -19,7 +19,7 @@ import {
 } from "@parallel/components/common/ContactSelect";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { UserSelect, UserSelectSelection } from "@parallel/components/common/UserSelect";
+import { UserSelect } from "@parallel/components/common/UserSelect";
 import {
   ConfirmPetitionSignersDialog,
   useConfirmPetitionSignersDialog,
@@ -356,7 +356,9 @@ export function AddPetitionAccessDialog({
                   defaultMessage="Send as..."
                 />
               </Text>
-              <UserSelect<false, false, false, UserSelectSelection<false>>
+              <UserSelect
+                isSync
+                onSearch={undefined}
                 isSearchable
                 value={sendAsId}
                 onChange={(user) => setSendAsId(user!.id)}

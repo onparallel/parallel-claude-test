@@ -15,6 +15,10 @@ import {
 } from "@chakra-ui/react";
 import { DeleteIcon, PlusCircleIcon } from "@parallel/chakra/icons";
 import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
+import {
+  toSimpleSelectOption,
+  useSimpleSelectOptions,
+} from "@parallel/components/common/SimpleSelect";
 import { PetitionFieldVisibilityEditor_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import {
@@ -31,16 +35,14 @@ import {
   PseudoPetitionFieldVisibilityConditionOperator,
 } from "@parallel/utils/fieldVisibility/types";
 import { FieldOptions, getDynamicSelectValues } from "@parallel/utils/petitionFields";
-import { useInlineReactSelectProps, useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuList";
-import { toSelectOption } from "@parallel/utils/react-select/toSelectOption";
-import { CustomSelectProps, OptionType } from "@parallel/utils/react-select/types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { Fragment, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import Select, { createFilter } from "react-select";
+import { createFilter } from "react-select";
 import { pick, uniq, zip } from "remeda";
 import { NumeralInput } from "../common/NumeralInput";
+import { SimpleOption, SimpleSelect, SimpleSelectProps } from "../common/SimpleSelect";
 
 export interface PetitionFieldVisibilityProps {
   fieldId: string;
@@ -289,85 +291,91 @@ function ConditionMultipleFieldModifier({
   field: PetitionFieldVisibilityEditor_PetitionFieldFragment;
   isReadOnly?: boolean;
 }) {
-  const intl = useIntl();
-  const options = useMemo<OptionType<PetitionFieldVisibilityConditionModifier>[]>(() => {
-    if (
-      field.type === "FILE_UPLOAD" ||
-      (field.type === "DYNAMIC_SELECT" && condition.column === undefined)
-    ) {
-      return [
-        {
-          label:
-            field.type === "FILE_UPLOAD"
-              ? intl.formatMessage({
-                  id: "component.petition-field-visibility-editor.number-of-files",
-                  defaultMessage: "no. of files",
-                })
-              : intl.formatMessage({
-                  id: "component.petition-field-visibility-editor.number-of-replies",
-                  defaultMessage: "no. of replies",
-                }),
-          value: "NUMBER_OF_REPLIES",
-        },
-      ];
-    } else {
-      const options: any[] = [
-        {
-          label: intl.formatMessage({
-            id: "component.petition-field-visibility-editor.any",
-            defaultMessage: "any",
-          }),
-          value: "ANY",
-        },
-        {
-          label: intl.formatMessage({
-            id: "component.petition-field-visibility-editor.all",
-            defaultMessage: "all",
-          }),
-          value: "ALL",
-        },
-        {
-          label: intl.formatMessage({
-            id: "component.petition-field-visibility-editor.none",
-            defaultMessage: "none",
-          }),
-          value: "NONE",
-        },
-      ];
-      // do not show "number of replies" option for dynamic select sub-columns
-      if (field.type !== "DYNAMIC_SELECT") {
-        options.push({
-          label: intl.formatMessage({
-            id: "component.petition-field-visibility-editor.number-of-replies",
-            defaultMessage: "no. of replies",
-          }),
-          value: "NUMBER_OF_REPLIES",
-        });
+  const options = useSimpleSelectOptions<PetitionFieldVisibilityConditionModifier>(
+    (intl) => {
+      if (
+        field.type === "FILE_UPLOAD" ||
+        (field.type === "DYNAMIC_SELECT" && condition.column === undefined)
+      ) {
+        return [
+          {
+            label:
+              field.type === "FILE_UPLOAD"
+                ? intl.formatMessage({
+                    id: "component.petition-field-visibility-editor.number-of-files",
+                    defaultMessage: "no. of files",
+                  })
+                : intl.formatMessage({
+                    id: "component.petition-field-visibility-editor.number-of-replies",
+                    defaultMessage: "no. of replies",
+                  }),
+            value: "NUMBER_OF_REPLIES",
+          },
+        ];
+      } else {
+        const options: SimpleOption<PetitionFieldVisibilityConditionModifier>[] = [
+          {
+            label: intl.formatMessage({
+              id: "component.petition-field-visibility-editor.any",
+              defaultMessage: "any",
+            }),
+            value: "ANY",
+          },
+          {
+            label: intl.formatMessage({
+              id: "component.petition-field-visibility-editor.all",
+              defaultMessage: "all",
+            }),
+            value: "ALL",
+          },
+          {
+            label: intl.formatMessage({
+              id: "component.petition-field-visibility-editor.none",
+              defaultMessage: "none",
+            }),
+            value: "NONE",
+          },
+        ];
+        if (field.type !== "DYNAMIC_SELECT") {
+          // do not show "number of replies" option for dynamic select sub-columns
+          options.push({
+            label: intl.formatMessage({
+              id: "component.petition-field-visibility-editor.number-of-replies",
+              defaultMessage: "no. of replies",
+            }),
+            value: "NUMBER_OF_REPLIES",
+          });
+        }
+        return options;
       }
-      return options;
-    }
-  }, [field.type, condition.column, intl.locale]);
-  const _value = useMemo(
-    () => options.find((o) => o.value === condition.modifier),
-    [options, condition.modifier]
+    },
+    [field.type, condition.column]
   );
-  const rsProps = useInlineReactSelectProps<
-    OptionType<PetitionFieldVisibilityConditionModifier>,
-    false,
-    never
-  >({
-    size: "sm",
-    isDisabled: isReadOnly,
-  });
-
   const handleChange = useCallback(
-    (value: OptionType<PetitionFieldVisibilityConditionModifier> | null) => {
-      onChange(updateConditionModifier(condition, field, value!.value));
+    (value: PetitionFieldVisibilityConditionModifier | null) => {
+      onChange(updateConditionModifier(condition, field, value!));
     },
     [onChange, condition, field]
   );
 
-  return <Select options={options} value={_value} onChange={handleChange} {...rsProps} />;
+  return (
+    <SimpleSelect
+      size="sm"
+      isDisabled={isReadOnly}
+      options={options}
+      value={condition.modifier}
+      onChange={handleChange}
+      styles={{
+        menu: (styles) => ({
+          ...styles,
+          minWidth: "100%",
+          width: "unset",
+          left: "50%",
+          transform: "translateX(-50%)",
+        }),
+      }}
+    />
+  );
 }
 
 interface ConditionPredicateProps extends ValueProps<PetitionFieldVisibilityCondition, false> {
@@ -384,231 +392,244 @@ function ConditionPredicate({
   showError,
   isReadOnly,
 }: ConditionPredicateProps) {
-  const intl = useIntl();
-  const { modifier } = condition!;
-  const options = useMemo(() => {
-    const options: OptionType<PseudoPetitionFieldVisibilityConditionOperator>[] = [];
-    if ((field.multiple && modifier === "NUMBER_OF_REPLIES") || field.type === "NUMBER") {
-      options.push(
-        { label: "=", value: "EQUAL" },
-        { label: "≠", value: "NOT_EQUAL" },
-        { label: "<", value: "LESS_THAN" },
-        { label: ">", value: "GREATER_THAN" },
-        { label: "≤", value: "LESS_THAN_OR_EQUAL" },
-        { label: "≥", value: "GREATER_THAN_OR_EQUAL" }
-      );
-    } else if (field.type === "DATE") {
-      options.push(
-        {
-          label: intl.formatMessage({
-            id: "component.petition-field-visibility-editor.equal-date",
-            defaultMessage: "is the",
-          }),
-          value: "EQUAL",
-        },
-        {
-          label: intl.formatMessage({
-            id: "component.petition-field-visibility-editor.not-equal-date",
-            defaultMessage: "is not the",
-          }),
-          value: "NOT_EQUAL",
-        },
-        {
-          label: intl.formatMessage({
-            id: "component.petition-field-visibility-editor.less-than-date",
-            defaultMessage: "is before the",
-          }),
-          value: "LESS_THAN",
-        },
-        {
-          label: intl.formatMessage({
-            id: "component.petition-field-visibility-editor.greater-than-date",
-            defaultMessage: "is after the",
-          }),
-          value: "GREATER_THAN",
-        },
-        {
-          label: intl.formatMessage({
-            id: "component.petition-field-visibility-editor.less-or-equal-than-date",
-            defaultMessage: "is before the (incl.)",
-          }),
-          value: "LESS_THAN_OR_EQUAL",
-        },
-        {
-          label: intl.formatMessage({
-            id: "component.petition-field-visibility-editor.greater-or-equal-than-date",
-            defaultMessage: "is after the (incl.)",
-          }),
-          value: "GREATER_THAN_OR_EQUAL",
-        }
-      );
-    } else if (field.type === "CHECKBOX") {
-      options.push(
-        {
-          label: intl.formatMessage({
-            id: "component.petition-field-visibility-editor.contain-choice",
-            defaultMessage: "is selected",
-          }),
-          value: "CONTAIN",
-        },
-        {
-          label: intl.formatMessage({
-            id: "component.petition-field-visibility-editor.not-contain-choice",
-            defaultMessage: "is not selected",
-          }),
-          value: "NOT_CONTAIN",
-        },
-        {
-          label: intl.formatMessage({
-            id: "component.petition-field-visibility-editor.number-of-choices",
-            defaultMessage: "no. of selected",
-          }),
-          value: "NUMBER_OF_SUBREPLIES",
-        }
-      );
-    } else if (
-      field.type === "SELECT" ||
-      (field.type === "DYNAMIC_SELECT" && condition.column !== undefined)
-    ) {
-      options.push(
-        {
-          label: intl.formatMessage(
-            {
-              id: "component.petition-field-visibility-editor.equal-select",
-              defaultMessage: "{modifier, select, ALL {are} other {is}}",
-            },
-            { modifier }
-          ),
-          value: "EQUAL",
-        },
-        {
-          label: intl.formatMessage(
-            {
-              id: "component.petition-field-visibility-editor.not-equal-select",
-              defaultMessage: "{modifier, select, ALL {are not} other {is not}}",
-            },
-            { modifier }
-          ),
-          value: "NOT_EQUAL",
-        }
-      );
-    } else if (field.type !== "FILE_UPLOAD" && field.type !== "DYNAMIC_SELECT") {
-      options.push(
-        {
-          label: intl.formatMessage(
-            {
-              id: "component.petition-field-visibility-editor.equal-default",
-              defaultMessage: "{modifier, select, ALL {are equal to} other {is equal to}}",
-            },
-            { modifier }
-          ),
-          value: "EQUAL",
-        },
-        {
-          label: intl.formatMessage(
-            {
-              id: "component.petition-field-visibility-editor.not-equal-default",
-              defaultMessage: "{modifier, select, ALL {are not equal to} other {is not equal to}}",
-            },
-            { modifier }
-          ),
-          value: "NOT_EQUAL",
-        },
-        {
-          label: intl.formatMessage(
-            {
-              id: "component.petition-field-visibility-editor.start-with-default",
-              defaultMessage: "{modifier, select, ALL {start with} other {starts with}}",
-            },
-            { modifier }
-          ),
-          value: "START_WITH",
-        },
-        {
-          label: intl.formatMessage(
-            {
-              id: "component.petition-field-visibility-editor.end-with-default",
-              defaultMessage: "{modifier, select, ALL {end with} other {ends with}}",
-            },
-            { modifier }
-          ),
-          value: "END_WITH",
-        },
-        {
-          label: intl.formatMessage(
-            {
-              id: "component.petition-field-visibility-editor.contain-default",
-              defaultMessage: "{modifier, select, ALL {contain} other {contains}}",
-            },
-            { modifier }
-          ),
-          value: "CONTAIN",
-        },
-        {
-          label: intl.formatMessage(
-            {
-              id: "component.petition-field-visibility-editor.not-contain-default",
-              defaultMessage: "{modifier, select, ALL {do not contain} other {does not contain}}",
-            },
-            { modifier }
-          ),
-          value: "NOT_CONTAIN",
-        }
-      );
-    }
-    if (!field.multiple) {
-      options.push(
-        {
-          label: intl.formatMessage({
-            id: "component.petition-field-visibility-editor.have-reply",
-            defaultMessage: "has replies",
-          }),
-          value: "HAVE_REPLY",
-        },
-        {
-          label: intl.formatMessage({
-            id: "component.petition-field-visibility-editor.not-have-reply",
-            defaultMessage: "does not have replies",
-          }),
-          value: "NOT_HAVE_REPLY",
-        }
-      );
-    }
-    return options;
-  }, [field.type, field.multiple, intl.locale, modifier]);
-  const operator = useMemo(() => {
-    const operator =
-      !field.multiple && condition.modifier === "NUMBER_OF_REPLIES"
-        ? condition.operator === "GREATER_THAN"
-          ? "HAVE_REPLY"
-          : "NOT_HAVE_REPLY"
-        : condition.operator;
-    return options.find((o) => o.value === operator) ?? options[0];
-  }, [options, condition.operator, condition.modifier, field.multiple]);
-  const iprops = useInlineReactSelectProps<
-    OptionType<PseudoPetitionFieldVisibilityConditionOperator>,
-    false,
-    never
-  >({ size: "sm", isDisabled: isReadOnly });
-  const props = useReactSelectProps<
-    OptionType<PseudoPetitionFieldVisibilityConditionOperator>,
-    false,
-    never
-  >({ size: "sm", isDisabled: isReadOnly });
+  const options = useSimpleSelectOptions(
+    (intl) => {
+      const options: SimpleOption<PseudoPetitionFieldVisibilityConditionOperator>[] = [];
+      if (
+        (field.multiple && condition.modifier === "NUMBER_OF_REPLIES") ||
+        field.type === "NUMBER"
+      ) {
+        options.push(
+          { label: "=", value: "EQUAL" },
+          { label: "≠", value: "NOT_EQUAL" },
+          { label: "<", value: "LESS_THAN" },
+          { label: ">", value: "GREATER_THAN" },
+          { label: "≤", value: "LESS_THAN_OR_EQUAL" },
+          { label: "≥", value: "GREATER_THAN_OR_EQUAL" }
+        );
+      } else if (field.type === "DATE") {
+        options.push(
+          {
+            label: intl.formatMessage({
+              id: "component.petition-field-visibility-editor.equal-date",
+              defaultMessage: "is the",
+            }),
+            value: "EQUAL",
+          },
+          {
+            label: intl.formatMessage({
+              id: "component.petition-field-visibility-editor.not-equal-date",
+              defaultMessage: "is not the",
+            }),
+            value: "NOT_EQUAL",
+          },
+          {
+            label: intl.formatMessage({
+              id: "component.petition-field-visibility-editor.less-than-date",
+              defaultMessage: "is before the",
+            }),
+            value: "LESS_THAN",
+          },
+          {
+            label: intl.formatMessage({
+              id: "component.petition-field-visibility-editor.greater-than-date",
+              defaultMessage: "is after the",
+            }),
+            value: "GREATER_THAN",
+          },
+          {
+            label: intl.formatMessage({
+              id: "component.petition-field-visibility-editor.less-or-equal-than-date",
+              defaultMessage: "is before the (incl.)",
+            }),
+            value: "LESS_THAN_OR_EQUAL",
+          },
+          {
+            label: intl.formatMessage({
+              id: "component.petition-field-visibility-editor.greater-or-equal-than-date",
+              defaultMessage: "is after the (incl.)",
+            }),
+            value: "GREATER_THAN_OR_EQUAL",
+          }
+        );
+      } else if (field.type === "CHECKBOX") {
+        options.push(
+          {
+            label: intl.formatMessage({
+              id: "component.petition-field-visibility-editor.contain-choice",
+              defaultMessage: "is selected",
+            }),
+            value: "CONTAIN",
+          },
+          {
+            label: intl.formatMessage({
+              id: "component.petition-field-visibility-editor.not-contain-choice",
+              defaultMessage: "is not selected",
+            }),
+            value: "NOT_CONTAIN",
+          },
+          {
+            label: intl.formatMessage({
+              id: "component.petition-field-visibility-editor.number-of-choices",
+              defaultMessage: "no. of selected",
+            }),
+            value: "NUMBER_OF_SUBREPLIES",
+          }
+        );
+      } else if (
+        field.type === "SELECT" ||
+        (field.type === "DYNAMIC_SELECT" && condition.column !== undefined)
+      ) {
+        options.push(
+          {
+            label: intl.formatMessage(
+              {
+                id: "component.petition-field-visibility-editor.equal-select",
+                defaultMessage: "{modifier, select, ALL {are} other {is}}",
+              },
+              { modifier: condition.modifier }
+            ),
+            value: "EQUAL",
+          },
+          {
+            label: intl.formatMessage(
+              {
+                id: "component.petition-field-visibility-editor.not-equal-select",
+                defaultMessage: "{modifier, select, ALL {are not} other {is not}}",
+              },
+              { modifier: condition.modifier }
+            ),
+            value: "NOT_EQUAL",
+          }
+        );
+      } else if (field.type !== "FILE_UPLOAD" && field.type !== "DYNAMIC_SELECT") {
+        options.push(
+          {
+            label: intl.formatMessage(
+              {
+                id: "component.petition-field-visibility-editor.equal-default",
+                defaultMessage: "{modifier, select, ALL {are equal to} other {is equal to}}",
+              },
+              { modifier: condition.modifier }
+            ),
+            value: "EQUAL",
+          },
+          {
+            label: intl.formatMessage(
+              {
+                id: "component.petition-field-visibility-editor.not-equal-default",
+                defaultMessage:
+                  "{modifier, select, ALL {are not equal to} other {is not equal to}}",
+              },
+              { modifier: condition.modifier }
+            ),
+            value: "NOT_EQUAL",
+          },
+          {
+            label: intl.formatMessage(
+              {
+                id: "component.petition-field-visibility-editor.start-with-default",
+                defaultMessage: "{modifier, select, ALL {start with} other {starts with}}",
+              },
+              { modifier: condition.modifier }
+            ),
+            value: "START_WITH",
+          },
+          {
+            label: intl.formatMessage(
+              {
+                id: "component.petition-field-visibility-editor.end-with-default",
+                defaultMessage: "{modifier, select, ALL {end with} other {ends with}}",
+              },
+              { modifier: condition.modifier }
+            ),
+            value: "END_WITH",
+          },
+          {
+            label: intl.formatMessage(
+              {
+                id: "component.petition-field-visibility-editor.contain-default",
+                defaultMessage: "{modifier, select, ALL {contain} other {contains}}",
+              },
+              { modifier: condition.modifier }
+            ),
+            value: "CONTAIN",
+          },
+          {
+            label: intl.formatMessage(
+              {
+                id: "component.petition-field-visibility-editor.not-contain-default",
+                defaultMessage: "{modifier, select, ALL {do not contain} other {does not contain}}",
+              },
+              { modifier: condition.modifier }
+            ),
+            value: "NOT_CONTAIN",
+          }
+        );
+      }
+      if (!field.multiple) {
+        options.push(
+          {
+            label: intl.formatMessage({
+              id: "component.petition-field-visibility-editor.have-reply",
+              defaultMessage: "has replies",
+            }),
+            value: "HAVE_REPLY",
+          },
+          {
+            label: intl.formatMessage({
+              id: "component.petition-field-visibility-editor.not-have-reply",
+              defaultMessage: "does not have replies",
+            }),
+            value: "NOT_HAVE_REPLY",
+          }
+        );
+      }
+      return options;
+    },
+    [field.type, field.multiple, condition.modifier]
+  );
+  const operator =
+    !field.multiple && condition.modifier === "NUMBER_OF_REPLIES"
+      ? condition.operator === "GREATER_THAN"
+        ? "HAVE_REPLY"
+        : "NOT_HAVE_REPLY"
+      : condition.operator;
   const handleChange = useCallback(
-    function (value: OptionType<PseudoPetitionFieldVisibilityConditionOperator> | null) {
-      onChange(updateConditionOperator(condition, field, value!.value));
+    function (operator: PseudoPetitionFieldVisibilityConditionOperator | null) {
+      onChange(updateConditionOperator(condition, field, operator!));
     },
     [onChange, condition, field]
   );
 
   return !field.multiple && condition.modifier === "NUMBER_OF_REPLIES" ? (
     <Box flex="1">
-      <Select options={options} value={operator} onChange={handleChange} {...props} />
+      <SimpleSelect
+        size="sm"
+        isDisabled={isReadOnly}
+        options={options}
+        value={operator}
+        onChange={handleChange}
+      />
     </Box>
   ) : (
     <>
-      <Select options={options} value={operator} onChange={handleChange} {...iprops} />
+      <SimpleSelect
+        size="sm"
+        isDisabled={isReadOnly}
+        options={options}
+        value={operator}
+        onChange={handleChange}
+        styles={{
+          menu: (styles) => ({
+            ...styles,
+            minWidth: "100%",
+            width: "unset",
+            left: "50%",
+            transform: "translateX(-50%)",
+          }),
+        }}
+      />
       <Box flex="1" minWidth={20}>
         {condition.modifier === "NUMBER_OF_REPLIES" ||
         condition.operator === "NUMBER_OF_SUBREPLIES" ? (
@@ -762,20 +783,7 @@ function ConditionPredicateValueSelect({
   isReadOnly,
 }: ConditionPredicateProps) {
   const intl = useIntl();
-
-  const rsProps = useReactSelectProps<any, false, never>({
-    size: "sm",
-    isInvalid: showError && condition.value === null,
-    components: {
-      MenuList: OptimizedMenuList,
-    },
-    isDisabled: isReadOnly,
-    placeholder: intl.formatMessage({
-      id: "component.react-select.no-options",
-      defaultMessage: "No options",
-    }),
-  });
-  const _options = useMemo(() => {
+  const options = useMemo(() => {
     const values =
       field.type === "SELECT"
         ? (field.options as FieldOptions["SELECT"]).values
@@ -787,23 +795,26 @@ function ConditionPredicateValueSelect({
           );
     return uniq(values)
       .sort((a, b) => a.localeCompare(b))
-      .map((value) => toSelectOption(value));
+      .map((value) => toSimpleSelectOption(value)!);
   }, [field.type, field.options.values, condition.column]);
-  const _value = toSelectOption(condition.value as string | null);
   return (
-    <Select
-      options={_options}
-      value={_value}
-      onChange={(value) => onChange({ ...condition, value: value.value })}
+    <SimpleSelect
+      size="sm"
+      options={options}
+      isDisabled={isReadOnly}
+      isInvalid={showError && condition.value === null}
+      value={condition.value as string | null}
+      onChange={(value) => onChange({ ...condition, value: value })}
       filterOption={createFilter({
         // this improves search performance on long lists
-        ignoreAccents: _options.length > 1000 ? false : true,
+        ignoreAccents: options.length > 1000 ? false : true,
       })}
       placeholder={intl.formatMessage({
         id: "generic.select-an-option",
         defaultMessage: "Select an option",
       })}
-      {...rsProps}
+      components={{ MenuList: OptimizedMenuList as any }}
+      styles={{ valueContainer: (styles) => ({ ...styles, gridTemplateColumns: "1fr" }) }}
     />
   );
 }
@@ -833,19 +844,11 @@ function ConditionPredicateValueString({
   );
 }
 
-function VisibilityOperatorSelect({
-  value,
-  onChange,
-  ...props
-}: CustomSelectProps<PetitionFieldVisibilityOperator>) {
-  const intl = useIntl();
-
-  const rsProps = useReactSelectProps<any, false, never>({
-    size: "sm",
-    ...props,
-  });
-  const _options = useMemo<{ label: string; value: PetitionFieldVisibilityOperator }[]>(
-    () => [
+function VisibilityOperatorSelect(
+  props: Omit<SimpleSelectProps<PetitionFieldVisibilityOperator>, "options">
+) {
+  const options = useSimpleSelectOptions(
+    (intl) => [
       {
         value: "AND",
         label: intl.formatMessage({
@@ -861,32 +864,23 @@ function VisibilityOperatorSelect({
         }),
       },
     ],
-    [intl.locale]
+    []
   );
-  const _value = useMemo(() => _options.find((o) => o.value === value), [value, _options]);
-
   return (
-    <Select
-      options={_options}
-      value={_value}
-      onChange={(value) => onChange(value.value)}
-      {...rsProps}
+    <SimpleSelect
+      size="sm"
+      options={options}
+      styles={{ control: (styles) => ({ ...styles, flexWrap: "nowrap" }) }}
+      {...props}
     />
   );
 }
 
-function VisibilityTypeSelect({
-  value,
-  onChange,
-  ...props
-}: CustomSelectProps<PetitionFieldVisibilityType>) {
+function VisibilityTypeSelect(
+  props: Omit<SimpleSelectProps<PetitionFieldVisibilityType>, "options">
+) {
   const intl = useIntl();
-
-  const rsProps = useInlineReactSelectProps<any, false, never>({
-    size: "sm",
-    ...props,
-  });
-  const _options = useMemo<{ label: string; value: PetitionFieldVisibilityType }[]>(
+  const options = useSimpleSelectOptions(
     () => [
       {
         value: "SHOW",
@@ -903,16 +897,15 @@ function VisibilityTypeSelect({
         }),
       },
     ],
-    [intl.locale]
+    []
   );
-  const _value = useMemo(() => _options.find((o) => o.value === value), [value, _options]);
 
   return (
-    <Select
-      options={_options}
-      value={_value}
-      onChange={(value) => onChange(value.value)}
-      {...rsProps}
+    <SimpleSelect
+      size="sm"
+      options={options}
+      styles={{ control: (styles) => ({ ...styles, flexWrap: "nowrap" }) }}
+      {...props}
     />
   );
 }

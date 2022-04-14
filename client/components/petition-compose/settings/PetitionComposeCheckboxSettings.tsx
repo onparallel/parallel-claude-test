@@ -9,28 +9,27 @@ import {
   Switch,
   Text,
 } from "@chakra-ui/react";
+import { SimpleSelect, useSimpleSelectOptions } from "@parallel/components/common/SimpleSelect";
 import { getMinMaxCheckboxLimit } from "@parallel/utils/petitionFields";
-import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
-import { OptionType } from "@parallel/utils/react-select/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
-import Select from "react-select";
+import { useEffect, useRef, useState } from "react";
+import { FormattedMessage } from "react-intl";
 import { PetitionComposeFieldSettingsProps } from "./PetitionComposeFieldSettings";
 import { SettingsRow } from "./SettingsRow";
+
+type CheckboxLimitType = "UNLIMITED" | "EXACT" | "RANGE" | "RADIO";
 
 export function CheckboxSettings({
   field,
   onFieldEdit,
   isReadOnly,
 }: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">) {
-  const intl = useIntl();
-
   const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 400, [field.id]);
-  const rsProps = useReactSelectProps<OptionType, false, never>({ isDisabled: isReadOnly });
 
   const values = field.options?.values ?? [];
-  const [limitType, setLimitType] = useState(field.options?.limit?.type ?? "UNLIMITED");
+  const [limitType, setLimitType] = useState<CheckboxLimitType>(
+    field.options?.limit?.type ?? "UNLIMITED"
+  );
   const [min, setMin] = useState<number>(1);
   const [max, setMax] = useState<number>(1);
 
@@ -44,7 +43,7 @@ export function CheckboxSettings({
     }
   }, [field.options.limit]);
 
-  const options = useMemo(() => {
+  const options = useSimpleSelectOptions((intl) => {
     return [
       {
         label: intl.formatMessage({
@@ -68,9 +67,7 @@ export function CheckboxSettings({
         value: "RANGE",
       },
     ];
-  }, [intl.locale]);
-
-  const selected = options.find((o) => o.value === limitType);
+  }, []);
 
   const handleMinOnChange = (_: never, value: number) => {
     if (Number.isNaN(value)) {
@@ -127,21 +124,6 @@ export function CheckboxSettings({
     });
   };
 
-  const handleChangeSelect = (option: OptionType | null) => {
-    if (option && option.value !== selected?.value) {
-      setLimitType(option.value);
-      debouncedOnUpdate(field.id, {
-        options: {
-          ...field.options,
-          limit: {
-            ...field.options.limit,
-            type: option.value,
-          },
-        },
-      });
-    }
-  };
-
   return (
     <Stack spacing={4}>
       <SettingsRow
@@ -187,12 +169,25 @@ export function CheckboxSettings({
       {limitType !== "RADIO" ? (
         <Stack direction="row">
           <Box flex={1}>
-            <Select
+            <SimpleSelect
+              isDisabled={isReadOnly}
               options={options}
-              value={selected}
+              value={limitType}
               isSearchable={false}
-              onChange={handleChangeSelect}
-              {...rsProps}
+              onChange={(option) => {
+                if (option && option !== limitType) {
+                  setLimitType(option);
+                  debouncedOnUpdate(field.id, {
+                    options: {
+                      ...field.options,
+                      limit: {
+                        ...field.options.limit,
+                        type: option,
+                      },
+                    },
+                  });
+                }
+              }}
             />
           </Box>
 

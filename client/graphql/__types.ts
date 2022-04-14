@@ -10000,6 +10000,22 @@ export type AccountLocaleChange_UserFragment = {
   preferredLocale?: string | null;
 };
 
+export type CreateEventSubscriptionDialog_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+  id: string;
+  name?: string | null;
+};
+
+export type CreateEventSubscriptionDialog_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  name?: string | null;
+};
+
+export type CreateEventSubscriptionDialog_PetitionBaseFragment =
+  | CreateEventSubscriptionDialog_PetitionBase_Petition_Fragment
+  | CreateEventSubscriptionDialog_PetitionBase_PetitionTemplate_Fragment;
+
 export type CreateEventSubscriptionDialog_petitionsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
@@ -19767,6 +19783,12 @@ export const RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetiti
     RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment,
     unknown
   >;
+export const CreateEventSubscriptionDialog_PetitionBaseFragmentDoc = gql`
+  fragment CreateEventSubscriptionDialog_PetitionBase on PetitionBase {
+    id
+    name
+  }
+` as unknown as DocumentNode<CreateEventSubscriptionDialog_PetitionBaseFragment, unknown>;
 export const OrganizationMembers_OrganizationUserFragmentDoc = gql`
   fragment OrganizationMembers_OrganizationUser on User {
     id
@@ -24011,11 +24033,11 @@ export const CreateEventSubscriptionDialog_petitionsDocument = gql`
   ) {
     petitions(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy, filters: $filters) {
       items {
-        id
-        name
+        ...CreateEventSubscriptionDialog_PetitionBase
       }
     }
   }
+  ${CreateEventSubscriptionDialog_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<
   CreateEventSubscriptionDialog_petitionsQuery,
   CreateEventSubscriptionDialog_petitionsQueryVariables

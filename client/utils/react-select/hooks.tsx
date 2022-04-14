@@ -1,21 +1,20 @@
 import { CloseButton, Flex, Text, useFormControl, useTheme } from "@chakra-ui/react";
 import { ChevronDownIcon, CloseIcon } from "@parallel/chakra/icons";
 import { useRehydrated } from "@parallel/utils/useRehydrated";
-import { useCallback, useMemo } from "react";
+import { ComponentPropsWithRef, ComponentType, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
-  CommonProps,
   components,
-  GroupTypeBase,
-  IndicatorProps,
+  CSSObjectWithLabel,
+  GroupBase,
   mergeStyles,
-  OptionTypeBase,
   SelectComponentsConfig,
   StylesConfig,
   Theme,
+  Props as SelectProps,
 } from "react-select";
 import { isDefined, omit } from "remeda";
-import { OptionType, SelectProps } from "./types";
+import { OptionBase } from "./types";
 
 export const SIZES = {
   lg: {
@@ -50,31 +49,36 @@ export const SIZES = {
   },
 };
 
-export type UseReactSelectProps = {
+export interface UseReactSelectProps<
+  OptionType extends OptionBase = OptionBase,
+  IsMulti extends boolean = any,
+  GroupType extends GroupBase<OptionType> = GroupBase<OptionType>
+> extends Pick<
+    SelectProps<OptionType, IsMulti, GroupType>,
+    "id" | "isDisabled" | "styles" | "components"
+  > {
   size?: keyof typeof SIZES;
-  id?: string;
-  isDisabled?: boolean;
-  placeholder?: string;
   isInvalid?: boolean;
-  styles?: StylesConfig<any, any, any>;
-  components?: SelectComponentsConfig<any, any, any>;
   usePortal?: boolean;
-};
+}
 
 /**
  * Generates the props necessary for styling react-select as a chakra component
  */
 export function useReactSelectProps<
-  OptionType extends OptionTypeBase = { label: string; value: string },
+  OptionType extends OptionBase = OptionBase,
   IsMulti extends boolean = any,
-  GroupType extends GroupTypeBase<OptionType> = never
+  GroupType extends GroupBase<OptionType> = GroupBase<OptionType>
 >({
   size = "md",
-  placeholder,
   usePortal = true,
   styles: _styles,
   ...props
-}: UseReactSelectProps = {}): SelectProps<OptionType, IsMulti, GroupType> {
+}: UseReactSelectProps<OptionType, IsMulti, GroupType> = {}): SelectProps<
+  OptionType,
+  IsMulti,
+  GroupType
+> {
   const { colors, radii, fontSizes } = useTheme();
 
   const { id: inputId, "aria-invalid": isInvalid, disabled: isDisabled } = useFormControl(props);
@@ -111,7 +115,7 @@ export function useReactSelectProps<
   );
 
   const styles = useMemo(() => {
-    const styles: StylesConfig<OptionType, IsMulti, GroupType> = {
+    const styles = rsStyles<OptionType, IsMulti, GroupType>({
       menuPortal: (styles) => ({
         ...styles,
         zIndex: 40,
@@ -126,11 +130,11 @@ export function useReactSelectProps<
         margin: "0 2px",
       }),
       control: (styles, { isDisabled, isFocused, theme, selectProps }) => {
-        const isInvalid = selectProps.isInvalid as boolean;
+        const { isInvalid } = selectProps;
         const {
           colors: { error, primary: borderColor, neutral30: borderColorHover },
           fontSize,
-        } = theme as Theme & ThemeExtension;
+        } = theme;
         return {
           ...styles,
           alignItems: "stretch",
@@ -161,7 +165,7 @@ export function useReactSelectProps<
       valueContainer: (styles, { theme }) => {
         const {
           spacing: { padding },
-        } = theme as Theme & ThemeExtension;
+        } = theme;
         return {
           ...omit(styles, ["padding"]),
           paddingLeft: padding,
@@ -172,7 +176,7 @@ export function useReactSelectProps<
         const {
           fontSize,
           spacing: { padding },
-        } = theme as Theme & ThemeExtension;
+        } = theme;
         return {
           ...styles,
           cursor: "pointer",
@@ -195,8 +199,10 @@ export function useReactSelectProps<
           padding: "0.5rem 0",
         };
       },
-      singleValue: (styles) => {
-        return { ...omit(styles, ["color"]) };
+      singleValue: (styles, { selectProps }) => {
+        return {
+          ...omit(styles, ["color"]),
+        };
       },
       multiValue: (styles, { data, theme }) => {
         const {
@@ -204,7 +210,10 @@ export function useReactSelectProps<
         } = theme;
         return {
           ...styles,
-          backgroundColor: data.isInvalid ? backgroundColorError : backgroundColor,
+          backgroundColor:
+            typeof data === "object" && isDefined(data) && "isInvalid" in data
+              ? backgroundColorError
+              : backgroundColor,
           borderRadius: radii["sm"],
         };
       },
@@ -220,7 +229,10 @@ export function useReactSelectProps<
           ...styles,
           borderRadius: `0 ${radii["sm"]} ${radii["sm"]} 0`,
           ":hover": {
-            backgroundColor: data.isInvalid ? backgroundColorHoverError : backgroundColorHover,
+            backgroundColor:
+              typeof data === "object" && isDefined(data) && "isInvalid" in data
+                ? backgroundColorHoverError
+                : backgroundColorHover,
             color: fontColor,
           },
         };
@@ -232,26 +244,22 @@ export function useReactSelectProps<
           alignItems: "center",
         };
       },
-    };
+    });
     return isDefined(_styles) ? mergeStyles(styles, _styles) : styles;
   }, [_styles]);
 
-  const components = useMemo<SelectComponentsConfig<OptionType, IsMulti, GroupType>>(
-    () => ({
-      IndicatorSeparator,
-      ClearIndicator,
-      DropdownIndicator,
-      NoOptionsMessage,
-      MultiValueRemove,
-      LoadingMessage,
-      ...props.components,
-    }),
-    [props.components]
-  );
+  const components = {
+    IndicatorSeparator,
+    ClearIndicator,
+    DropdownIndicator,
+    NoOptionsMessage,
+    MultiValueRemove,
+    LoadingMessage,
+    ...props.components,
+  } as SelectComponentsConfig<OptionType, IsMulti, GroupType>;
 
   const rehydrated = useRehydrated();
   return {
-    placeholder,
     inputId,
     isDisabled,
     menuPortalTarget: usePortal && rehydrated ? document.body : undefined,
@@ -260,93 +268,76 @@ export function useReactSelectProps<
     components,
     styles,
     // Extension props
-    size,
-    isInvalid,
+    ...({ size, isInvalid } as any),
   };
 }
 
-export function useInlineReactSelectProps<
-  OptionType extends OptionTypeBase = { label: string; value: string },
-  IsMulti extends boolean = any,
-  GroupType extends GroupTypeBase<OptionType> = never
->(props: UseReactSelectProps): SelectProps<OptionType, IsMulti, GroupType> {
-  const rsProps = useReactSelectProps<OptionType, IsMulti, GroupType>(props);
-  const styles = useMemo<StylesConfig<OptionType, IsMulti, GroupType>>(
-    () => ({
-      ...rsProps.styles,
-      control: (styles, data) =>
-        omit(rsProps.styles?.control?.(styles, data) ?? styles, ["flexWrap"]),
-      valueContainer: (styles, data) =>
-        omit(rsProps.styles?.valueContainer?.(styles, data) ?? styles, ["flexWrap"]),
-      singleValue: (styles, data) =>
-        omit(rsProps.styles?.singleValue?.(styles, data) ?? styles, [
-          "position",
-          "maxWidth",
-          "transform",
-          "top",
-        ]),
-      menu: (styles, data) => ({
-        ...(rsProps.styles?.menu?.(styles, data) ?? styles),
-        minWidth: "100%",
-        width: "unset",
-        left: "50%",
-        transform: "translateX(-50%)",
-      }),
-    }),
-    [rsProps.styles]
-  );
+export type ExtendComponentProps = {
+  theme: {
+    spacing: {
+      padding: number;
+    };
+    fontSize: string;
+    colors: Record<`error${"" | 10 | 20 | 30}`, string>;
+  };
+  selectProps: {
+    isInvalid?: boolean;
+    size: "sm" | "md" | "lg";
+  };
+};
 
-  return {
-    ...rsProps,
-    styles,
+type SelectStyles = keyof StylesConfig;
+type _SelectStyleProps<
+  T extends SelectStyles,
+  Option = unknown,
+  IsMulti extends boolean = boolean,
+  Group extends GroupBase<Option> = GroupBase<Option>
+> = Parameters<Exclude<StylesConfig<Option, IsMulti, Group>[T], undefined>>[1];
+type _StylesConfigFunction<Props> = (base: CSSObjectWithLabel, props: Props) => CSSObjectWithLabel;
+
+export function rsStyles<
+  Option = unknown,
+  IsMulti extends boolean = boolean,
+  Group extends GroupBase<Option> = GroupBase<Option>
+>(styles: {
+  [K in SelectStyles]?: _StylesConfigFunction<
+    _SelectStyleProps<K, Option, IsMulti, Group> & ExtendComponentProps
+  >;
+}): StylesConfig<Option, IsMulti, Group> {
+  return styles as any;
+}
+
+export function genericRsComponent<
+  Option = unknown,
+  IsMulti extends boolean = boolean,
+  Group extends GroupBase<Option> = GroupBase<Option>,
+  TProps extends {} = {}
+>() {
+  return <TComponent extends keyof SelectComponentsConfig<Option, IsMulti, Group>>(
+    name: TComponent,
+    component: ComponentType<
+      ComponentPropsWithRef<
+        NonNullable<SelectComponentsConfig<Option, IsMulti, Group>[TComponent]>
+      > &
+        TProps &
+        ExtendComponentProps
+    >
+  ): NonNullable<SelectComponentsConfig<Option, IsMulti, Group>[TComponent]> => {
+    return (
+      process.env.NODE_ENV === "development"
+        ? Object.assign(component, { displayName: name })
+        : component
+    ) as any;
   };
 }
 
-export function useRecipientViewReactSelectProps(props: UseReactSelectProps) {
-  const rsProps = useReactSelectProps<OptionType, false, never>(props);
-  const styles = useMemo<StylesConfig<OptionType, false, never>>(
-    () => ({
-      ...rsProps.styles,
-      menu: (styles, props) => ({
-        ...(rsProps.styles!.menu?.(styles, props) ?? styles),
-        zIndex: 100,
-      }),
-      valueContainer: (styles, props) => ({
-        ...(rsProps.styles!.valueContainer?.(styles, props) ?? styles),
-        paddingRight: 32,
-      }),
-    }),
-    [rsProps.styles]
-  );
+export const rsComponent = genericRsComponent<any, any, any>();
 
-  return {
-    ...rsProps,
-    styles,
-  };
-}
-
-export type ExtendComponentProps<T = CommonProps<any, any, any>, TSelectProps = {}> = T & {
-  theme: Theme & ThemeExtension;
-  selectProps: TSelectProps & SelectComponentPropExtensions;
-};
-
-export type SelectComponentPropExtensions = {
-  isInvalid: boolean;
-  size: "sm" | "md" | "lg";
-};
-
-export type ThemeExtension = {
-  spacing: {
-    padding: number;
-  };
-  fontSize: string;
-};
-
-const IndicatorSeparator: typeof components.IndicatorSeparator = function IndicatorSeparator() {
+const IndicatorSeparator = rsComponent("IndicatorSeparator", function () {
   return <></>;
-};
+});
 
-const ClearIndicator: typeof components.ClearIndicator = function ClearIndicator({ innerProps }) {
+const ClearIndicator = rsComponent("ClearIndicator", function ({ innerProps }) {
   const intl = useIntl();
   return (
     <CloseButton
@@ -356,13 +347,13 @@ const ClearIndicator: typeof components.ClearIndicator = function ClearIndicator
         defaultMessage: "Clear",
       })}
       size="sm"
-      {...innerProps}
+      {...(innerProps as any)}
     />
   );
-};
+});
 
-const DropdownIndicator: typeof components.DropdownIndicator = function DropdownIndicator(props) {
-  const { theme } = props as ExtendComponentProps<IndicatorProps<any, any, any>>;
+const DropdownIndicator = rsComponent("DropdownIndicator", function (props) {
+  const { theme } = props;
   return (
     <Flex
       alignItems="center"
@@ -373,20 +364,17 @@ const DropdownIndicator: typeof components.DropdownIndicator = function Dropdown
       <ChevronDownIcon display="block" position="relative" top="1px" />
     </Flex>
   );
-};
+});
 
-const NoOptionsMessage: typeof components.NoOptionsMessage = function NoOptionsMessage() {
+const NoOptionsMessage = rsComponent("NoOptionsMessage", function () {
   return (
     <Text as="div" textStyle="hint" textAlign="center" paddingY={2}>
       <FormattedMessage id="component.react-select.no-options" defaultMessage="No options" />
     </Text>
   );
-};
+});
 
-const MultiValueRemove: typeof components.MultiValueRemove = function MultiValueRemove({
-  innerProps,
-  ...props
-}) {
+const MultiValueRemove = rsComponent("MultiValueRemove", function ({ innerProps, ...props }) {
   const intl = useIntl();
   return (
     <components.MultiValueRemove
@@ -405,12 +393,12 @@ const MultiValueRemove: typeof components.MultiValueRemove = function MultiValue
       <CloseIcon boxSize="10px" marginX={1} />
     </components.MultiValueRemove>
   );
-};
+});
 
-const LoadingMessage: typeof components.LoadingMessage = function LoadingMessage() {
+const LoadingMessage = rsComponent("LoadingMessage", function () {
   return (
     <Text as="div" color="gray.400" textAlign="center" paddingY={2}>
       <FormattedMessage id="component.react-select.loading" defaultMessage="Loading..." />
     </Text>
   );
-};
+});

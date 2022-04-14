@@ -1,18 +1,16 @@
 import { Box, Center, Flex, FormControl, FormLabel, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { SimpleSelect, toSimpleSelectOption } from "@parallel/components/common/SimpleSelect";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { DynamicSelectOption, FieldOptions } from "@parallel/utils/petitionFields";
-import { useRecipientViewReactSelectProps } from "@parallel/utils/react-select/hooks";
-import { toSelectOption } from "@parallel/utils/react-select/toSelectOption";
-import { OptionType } from "@parallel/utils/react-select/types";
 import { Maybe } from "@parallel/utils/types";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
-import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from "react";
+import { forwardRef, useImperativeHandle, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import Select from "react-select";
+import { SelectInstance as _SelectInstance } from "react-select";
 import { countBy } from "remeda";
 import {
   RecipientViewPetitionFieldCard,
@@ -35,7 +33,7 @@ export interface RecipientViewPetitionFieldDynamicSelectProps
   onCreateReply: (value: DynamicSelectValue) => Promise<string | undefined>;
 }
 
-type SelectInstance = Select<{ label: string; value: string }, false, never>;
+type SelectInstance = _SelectInstance<{ label: string; value: string }, false, never>;
 
 export function RecipientViewPetitionFieldDynamicSelect({
   field,
@@ -49,7 +47,6 @@ export function RecipientViewPetitionFieldDynamicSelect({
 }: RecipientViewPetitionFieldDynamicSelectProps) {
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
   const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
-  const newReplyRef = useRef<SelectInstance>(null);
   const replyRefs = useMultipleRefs<RecipientViewPetitionFieldReplyDynamicSelectInstance>();
 
   const fieldOptions = field.options as FieldOptions["DYNAMIC_SELECT"];
@@ -90,7 +87,6 @@ export function RecipientViewPetitionFieldDynamicSelect({
 
   function handleAddNewReply() {
     setShowNewReply(true);
-    setTimeout(() => newReplyRef.current?.focus());
   }
 
   const showAddNewReply = !isDisabled && field.multiple;
@@ -243,22 +239,9 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
   const fieldOptions = field.options as FieldOptions["DYNAMIC_SELECT"];
   const [optimistic, setOptimistic] = useState<string | null>(null);
 
-  const rsProps = useRecipientViewReactSelectProps({
-    id: `reply-${field.id}-${reply?.id ? `${reply.id}-${level}` : "new"}`,
-    isDisabled:
-      (isDisabled ||
-        reply?.status === "APPROVED" ||
-        // if the user modified the labels on the field settings
-        // and the recipient tries to update an option with outdated labels, backend will throw error.
-        // so we disable the outdated selectors to avoid throwing error
-        (reply && reply.content.value[level][0] !== field.options.labels[level])) ??
-      false,
-    isInvalid: reply?.status === "REJECTED",
-  });
-
   const [isSaving, setIsSaving] = useState(false);
 
-  const { options, value } = useMemo(() => {
+  const options = useMemo(() => {
     let values: string[] | DynamicSelectOption[] = fieldOptions.values;
 
     const replies = (reply?.content.value as [string, string][]) ?? [];
@@ -266,43 +249,57 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
       values =
         (values as DynamicSelectOption[]).find(([label]) => label === replies[i][1])?.[1] ?? [];
     }
-    return {
-      options: (Array.isArray(values[0])
+    return (
+      Array.isArray(values[0])
         ? (values as DynamicSelectOption[]).map(([label]) => label)
         : (values as string[])
-      ).map((value) => toSelectOption(value)!),
-      value: reply
-        ? toSelectOption((reply.content.value as [string, string | null][])[level][1] ?? null)
-        : toSelectOption(null),
-    };
+    ).map((value) => toSimpleSelectOption(value)!);
   }, [fieldOptions, reply?.content.value, level]);
 
-  async function handleOptionChange(option: OptionType | null) {
-    setIsSaving(true);
-    if (option) {
-      setOptimistic(option.value);
-      await onChange(option.value);
-      setOptimistic(null);
-    }
-    setIsSaving(false);
-  }
+  const id = `reply-${field.id}-${reply?.id ? `${reply.id}-${level}` : "new"}`;
 
   return (
-    <FormControl id={rsProps.inputId} isDisabled={isDisabled}>
+    <FormControl id={id} isDisabled={isDisabled}>
       <FormLabel>{label}</FormLabel>
       <Flex alignItems="center">
         <Box flex="1" position="relative">
-          <Select
-            {...rsProps}
-            ref={ref}
-            value={optimistic ? toSelectOption(optimistic) : value}
+          <SimpleSelect
+            ref={ref as any}
+            id={id}
+            isDisabled={
+              (isDisabled ||
+                reply?.status === "APPROVED" ||
+                // if the user modified the labels on the field settings
+                // and the recipient tries to update an option with outdated labels, backend will throw error.
+                // so we disable the outdated selectors to avoid throwing error
+                (reply && reply.content.value[level][0] !== field.options.labels[level])) ??
+              false
+            }
+            isInvalid={reply?.status === "REJECTED"}
+            value={
+              optimistic
+                ? toSimpleSelectOption(optimistic)
+                : (reply && reply.content.value[level][1]) ?? null
+            }
             options={options}
-            onChange={handleOptionChange}
+            onChange={async (option) => {
+              setIsSaving(true);
+              if (option) {
+                setOptimistic(option);
+                await onChange(option);
+                setOptimistic(null);
+              }
+              setIsSaving(false);
+            }}
             placeholder={
               <FormattedMessage id="generic.select-an-option" defaultMessage="Select an option" />
             }
+            styles={{
+              menu: (styles) => ({ ...styles, zIndex: 100 }),
+              valueContainer: (styles) => ({ ...styles, paddingRight: 32 }),
+            }}
           />
-          {reply && value && (
+          {reply && (
             <Center height="100%" position="absolute" right="42px" top={0}>
               <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
             </Center>

@@ -9,7 +9,7 @@ import { OverflownText } from "./OverflownText";
 export interface TagProps {
   tag: Tag_TagFragment;
   isRemovable?: boolean;
-  onRemove?: () => void;
+  onRemove?: (event: any) => void;
 }
 
 export const Tag = Object.assign(

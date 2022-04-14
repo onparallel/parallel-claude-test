@@ -1,15 +1,13 @@
 import { forwardRef } from "react";
-import { GroupTypeBase, MenuListComponentProps, OptionTypeBase } from "react-select";
 import { FixedSizeList } from "react-window";
+import { genericRsComponent } from "./hooks";
 
 const itemSize = 32;
 const padding = 8;
 
-export function OptimizedMenuList<
-  OptionType extends OptionTypeBase,
-  IsMulti extends boolean,
-  GroupType extends GroupTypeBase<OptionType> = GroupTypeBase<OptionType>
->(props: MenuListComponentProps<OptionType, IsMulti, GroupType>) {
+const rsComponent = genericRsComponent<unknown, any, any>();
+
+export const OptimizedMenuList = rsComponent("MenuList", function OptimizedMenuList(props) {
   const { options, children, getValue, getStyles } = props;
   const style = getStyles("menuList", props);
   const [value] = getValue();
@@ -33,7 +31,7 @@ export function OptimizedMenuList<
       )}
     </FixedSizeList>
   );
-}
+});
 
 const InnerElementType = forwardRef<HTMLDivElement, any>(function InnerElementType(
   { style, ...props },

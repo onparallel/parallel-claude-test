@@ -1,21 +1,21 @@
-import { PetitionUserNotificationFilter } from "@parallel/graphql/__types";
-import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
-import { OptionType } from "@parallel/utils/react-select/types";
 import { Focusable } from "@parallel/utils/types";
-import { ValueProps } from "@parallel/utils/ValueProps";
-import { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
-import { useIntl } from "react-intl";
-import Select from "react-select";
+import { forwardRef, useImperativeHandle, useRef } from "react";
+import { SelectInstance } from "react-select";
+import {
+  SimpleOption,
+  SimpleSelect,
+  SimpleSelectProps,
+  useSimpleSelectOptions,
+} from "../common/SimpleSelect";
+
+type NotificationsFilter = "ALL" | "UNREAD" | "COMMENTS" | "COMPLETED" | "SHARED" | "OTHER";
 
 export const NotificationsFilterSelect = forwardRef<
   Focusable,
-  ValueProps<PetitionUserNotificationFilter>
->(function NotificationsFilterSelect({ value, onChange }, ref) {
-  const rsProps = useReactSelectProps<OptionType, false, never>({});
-  const intl = useIntl();
-
-  const options = useMemo(
-    () => [
+  Omit<SimpleSelectProps<NotificationsFilter, false>, "options">
+>(function NotificationsFilterSelect(props, ref) {
+  const options = useSimpleSelectOptions(
+    (intl) => [
       {
         label: intl.formatMessage({
           id: "component.notifications-select.all-notifications",
@@ -59,28 +59,15 @@ export const NotificationsFilterSelect = forwardRef<
         value: "OTHER",
       },
     ],
-    [intl.locale]
+    []
   );
 
-  const _value = options.find((o) => o.value === value) ?? null;
-
-  const _ref = useRef<Select<OptionType, false, never>>(null);
+  const _ref = useRef<SelectInstance<SimpleOption<NotificationsFilter>, false>>(null);
   useImperativeHandle(ref, () => ({
     focus: () => {
-      setTimeout(() => _ref.current?.focus());
+      _ref.current?.focus();
     },
   }));
 
-  return (
-    <Select
-      ref={_ref}
-      options={options}
-      value={_value}
-      isSearchable={false}
-      onChange={(selected) =>
-        onChange((selected?.value as PetitionUserNotificationFilter) ?? "ALL")
-      }
-      {...rsProps}
-    />
-  );
+  return <SimpleSelect ref={_ref} options={options} isSearchable={false} {...props} />;
 });

@@ -4,27 +4,26 @@ import {
   UserSelect_UserGroupFragment,
   useSearchUserGroups_searchUserGroupsDocument,
 } from "@parallel/graphql/__types";
-import { useCallback, useMemo } from "react";
+import { genericRsComponent } from "@parallel/utils/react-select/hooks";
+import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { components } from "react-select";
 import { EmptySearchTemplatesIcon } from "../petition-new/icons/EmtpySearchTemplatesIcon";
-import { UserSelect, UserSelectComponentProps, UserSelectProps } from "./UserSelect";
+import { UserSelect, UserSelectProps } from "./UserSelect";
 
 interface UserGroupSelectProps<IsMulti extends boolean>
-  extends UserSelectProps<IsMulti, true, true, UserSelect_UserGroupFragment> {}
+  extends UserSelectProps<IsMulti, true, false, UserSelect_UserGroupFragment> {}
 
 export function UserGroupSelect<IsMulti extends boolean>({
   includeGroups,
   isMulti,
   ...props
 }: UserGroupSelectProps<IsMulti>) {
-  const components = useMemo(() => ({ NoOptionsMessage }), []);
   const intl = useIntl();
   return (
     <UserSelect
       isMulti={isMulti}
       includeGroups
-      components={components}
+      components={{ NoOptionsMessage }}
       placeholder={intl.formatMessage({
         id: "component.user-group-select.placeholder",
         defaultMessage: "Select teams from your organization",
@@ -34,10 +33,12 @@ export function UserGroupSelect<IsMulti extends boolean>({
   );
 }
 
-const NoOptionsMessage: typeof components.NoOptionsMessage = function NoOptionsMessage(props) {
+const rsComponent = genericRsComponent<UserSelect_UserGroupFragment, any, never>();
+
+const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
   const {
     selectProps: { inputValue: search },
-  } = props as unknown as UserSelectComponentProps;
+  } = props;
   return (
     <Stack alignItems="center" textAlign="center" padding={4} spacing={4}>
       {search ? (
@@ -60,7 +61,7 @@ const NoOptionsMessage: typeof components.NoOptionsMessage = function NoOptionsM
       )}
     </Stack>
   );
-};
+});
 
 export function useSearchUserGroups() {
   const client = useApolloClient();
