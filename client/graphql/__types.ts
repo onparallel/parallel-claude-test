@@ -7484,8 +7484,44 @@ export type TemplateDetailsModal_PetitionTemplateFragment = {
     slug: string;
     url: string;
   } | null;
-  signatureConfig?: { __typename?: "SignatureConfig"; title: string } | null;
-  remindersConfig?: { __typename?: "RemindersConfig"; time: string } | null;
+  signatureConfig?: {
+    __typename?: "SignatureConfig";
+    review: boolean;
+    allowAdditionalSigners: boolean;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      contactId?: string | null;
+      fullName: string;
+      email: string;
+    }>;
+  } | null;
+  remindersConfig?: {
+    __typename?: "RemindersConfig";
+    offset: number;
+    time: string;
+    timezone: string;
+    weekdaysOnly: boolean;
+  } | null;
+  defaultPermissions: Array<
+    | {
+        __typename?: "TemplateDefaultUserGroupPermission";
+        id: string;
+        permissionType: PetitionPermissionType;
+        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+      }
+    | {
+        __typename?: "TemplateDefaultUserPermission";
+        id: string;
+        permissionType: PetitionPermissionType;
+        user: {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null;
+          avatarUrl?: string | null;
+          initials?: string | null;
+        };
+      }
+  >;
 };
 
 export type useSendPetitionHandler_UserFragment = {
@@ -8251,8 +8287,44 @@ export type PublicTemplateCard_PetitionTemplateFragment = {
   locale: PetitionLocale;
   isRestricted: boolean;
   publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
-  signatureConfig?: { __typename?: "SignatureConfig"; title: string } | null;
-  remindersConfig?: { __typename?: "RemindersConfig"; time: string } | null;
+  signatureConfig?: {
+    __typename?: "SignatureConfig";
+    review: boolean;
+    allowAdditionalSigners: boolean;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      contactId?: string | null;
+      fullName: string;
+      email: string;
+    }>;
+  } | null;
+  remindersConfig?: {
+    __typename?: "RemindersConfig";
+    offset: number;
+    time: string;
+    timezone: string;
+    weekdaysOnly: boolean;
+  } | null;
+  defaultPermissions: Array<
+    | {
+        __typename?: "TemplateDefaultUserGroupPermission";
+        id: string;
+        permissionType: PetitionPermissionType;
+        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+      }
+    | {
+        __typename?: "TemplateDefaultUserPermission";
+        id: string;
+        permissionType: PetitionPermissionType;
+        user: {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null;
+          avatarUrl?: string | null;
+          initials?: string | null;
+        };
+      }
+  >;
 };
 
 export type TemplateActiveSettingsIcons_PetitionTemplateFragment = {
@@ -8261,8 +8333,44 @@ export type TemplateActiveSettingsIcons_PetitionTemplateFragment = {
   locale: PetitionLocale;
   isRestricted: boolean;
   publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
-  signatureConfig?: { __typename?: "SignatureConfig"; title: string } | null;
-  remindersConfig?: { __typename?: "RemindersConfig"; time: string } | null;
+  signatureConfig?: {
+    __typename?: "SignatureConfig";
+    review: boolean;
+    allowAdditionalSigners: boolean;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      contactId?: string | null;
+      fullName: string;
+      email: string;
+    }>;
+  } | null;
+  remindersConfig?: {
+    __typename?: "RemindersConfig";
+    offset: number;
+    time: string;
+    timezone: string;
+    weekdaysOnly: boolean;
+  } | null;
+  defaultPermissions: Array<
+    | {
+        __typename?: "TemplateDefaultUserGroupPermission";
+        id: string;
+        permissionType: PetitionPermissionType;
+        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+      }
+    | {
+        __typename?: "TemplateDefaultUserPermission";
+        id: string;
+        permissionType: PetitionPermissionType;
+        user: {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null;
+          avatarUrl?: string | null;
+          initials?: string | null;
+        };
+      }
+  >;
 };
 
 export type TemplateCard_PetitionTemplateFragment = {
@@ -8288,8 +8396,90 @@ export type TemplateCard_PetitionTemplateFragment = {
       }
   >;
   publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
-  signatureConfig?: { __typename?: "SignatureConfig"; title: string } | null;
-  remindersConfig?: { __typename?: "RemindersConfig"; time: string } | null;
+  signatureConfig?: {
+    __typename?: "SignatureConfig";
+    review: boolean;
+    allowAdditionalSigners: boolean;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      contactId?: string | null;
+      fullName: string;
+      email: string;
+    }>;
+  } | null;
+  remindersConfig?: {
+    __typename?: "RemindersConfig";
+    offset: number;
+    time: string;
+    timezone: string;
+    weekdaysOnly: boolean;
+  } | null;
+  defaultPermissions: Array<
+    | {
+        __typename?: "TemplateDefaultUserGroupPermission";
+        id: string;
+        permissionType: PetitionPermissionType;
+        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+      }
+    | {
+        __typename?: "TemplateDefaultUserPermission";
+        id: string;
+        permissionType: PetitionPermissionType;
+        user: {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null;
+          avatarUrl?: string | null;
+          initials?: string | null;
+        };
+      }
+  >;
+};
+
+export type TemplateIconDefaultPermissions_TemplateDefaultPermission_TemplateDefaultUserGroupPermission_Fragment =
+  {
+    __typename?: "TemplateDefaultUserGroupPermission";
+    id: string;
+    permissionType: PetitionPermissionType;
+    group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+  };
+
+export type TemplateIconDefaultPermissions_TemplateDefaultPermission_TemplateDefaultUserPermission_Fragment =
+  {
+    __typename?: "TemplateDefaultUserPermission";
+    id: string;
+    permissionType: PetitionPermissionType;
+    user: {
+      __typename?: "User";
+      id: string;
+      fullName?: string | null;
+      avatarUrl?: string | null;
+      initials?: string | null;
+    };
+  };
+
+export type TemplateIconDefaultPermissions_TemplateDefaultPermissionFragment =
+  | TemplateIconDefaultPermissions_TemplateDefaultPermission_TemplateDefaultUserGroupPermission_Fragment
+  | TemplateIconDefaultPermissions_TemplateDefaultPermission_TemplateDefaultUserPermission_Fragment;
+
+export type TemplateIconReminders_RemindersConfigFragment = {
+  __typename?: "RemindersConfig";
+  offset: number;
+  time: string;
+  timezone: string;
+  weekdaysOnly: boolean;
+};
+
+export type TemplateIconSignature_SignatureConfigFragment = {
+  __typename?: "SignatureConfig";
+  review: boolean;
+  allowAdditionalSigners: boolean;
+  signers: Array<{
+    __typename?: "PetitionSigner";
+    contactId?: string | null;
+    fullName: string;
+    email: string;
+  }>;
 };
 
 export type PreviewPetitionField_PetitionFieldFragment = {
@@ -17182,8 +17372,44 @@ export type NewPetition_PetitionTemplateFragment = {
       }
   >;
   publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
-  signatureConfig?: { __typename?: "SignatureConfig"; title: string } | null;
-  remindersConfig?: { __typename?: "RemindersConfig"; time: string } | null;
+  signatureConfig?: {
+    __typename?: "SignatureConfig";
+    review: boolean;
+    allowAdditionalSigners: boolean;
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      contactId?: string | null;
+      fullName: string;
+      email: string;
+    }>;
+  } | null;
+  remindersConfig?: {
+    __typename?: "RemindersConfig";
+    offset: number;
+    time: string;
+    timezone: string;
+    weekdaysOnly: boolean;
+  } | null;
+  defaultPermissions: Array<
+    | {
+        __typename?: "TemplateDefaultUserGroupPermission";
+        id: string;
+        permissionType: PetitionPermissionType;
+        group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+      }
+    | {
+        __typename?: "TemplateDefaultUserPermission";
+        id: string;
+        permissionType: PetitionPermissionType;
+        user: {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null;
+          avatarUrl?: string | null;
+          initials?: string | null;
+        };
+      }
+  >;
 };
 
 export type NewPetition_templatesQueryVariables = Exact<{
@@ -17227,8 +17453,44 @@ export type NewPetition_templatesQuery = {
           }
       >;
       publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
-      signatureConfig?: { __typename?: "SignatureConfig"; title: string } | null;
-      remindersConfig?: { __typename?: "RemindersConfig"; time: string } | null;
+      signatureConfig?: {
+        __typename?: "SignatureConfig";
+        review: boolean;
+        allowAdditionalSigners: boolean;
+        signers: Array<{
+          __typename?: "PetitionSigner";
+          contactId?: string | null;
+          fullName: string;
+          email: string;
+        }>;
+      } | null;
+      remindersConfig?: {
+        __typename?: "RemindersConfig";
+        offset: number;
+        time: string;
+        timezone: string;
+        weekdaysOnly: boolean;
+      } | null;
+      defaultPermissions: Array<
+        | {
+            __typename?: "TemplateDefaultUserGroupPermission";
+            id: string;
+            permissionType: PetitionPermissionType;
+            group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+          }
+        | {
+            __typename?: "TemplateDefaultUserPermission";
+            id: string;
+            permissionType: PetitionPermissionType;
+            user: {
+              __typename?: "User";
+              id: string;
+              fullName?: string | null;
+              avatarUrl?: string | null;
+              initials?: string | null;
+            };
+          }
+      >;
     }>;
   };
 };
@@ -17324,8 +17586,44 @@ export type NewPetition_templateQuery = {
           slug: string;
           url: string;
         } | null;
-        signatureConfig?: { __typename?: "SignatureConfig"; title: string } | null;
-        remindersConfig?: { __typename?: "RemindersConfig"; time: string } | null;
+        signatureConfig?: {
+          __typename?: "SignatureConfig";
+          review: boolean;
+          allowAdditionalSigners: boolean;
+          signers: Array<{
+            __typename?: "PetitionSigner";
+            contactId?: string | null;
+            fullName: string;
+            email: string;
+          }>;
+        } | null;
+        remindersConfig?: {
+          __typename?: "RemindersConfig";
+          offset: number;
+          time: string;
+          timezone: string;
+          weekdaysOnly: boolean;
+        } | null;
+        defaultPermissions: Array<
+          | {
+              __typename?: "TemplateDefaultUserGroupPermission";
+              id: string;
+              permissionType: PetitionPermissionType;
+              group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+            }
+          | {
+              __typename?: "TemplateDefaultUserPermission";
+              id: string;
+              permissionType: PetitionPermissionType;
+              user: {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null;
+                avatarUrl?: string | null;
+                initials?: string | null;
+              };
+            }
+        >;
       }
     | null;
 };
@@ -19510,6 +19808,46 @@ export const UserAvatarList_UserGroupFragmentDoc = gql`
     initials
   }
 ` as unknown as DocumentNode<UserAvatarList_UserGroupFragment, unknown>;
+export const TemplateIconSignature_SignatureConfigFragmentDoc = gql`
+  fragment TemplateIconSignature_SignatureConfig on SignatureConfig {
+    signers {
+      contactId
+      fullName
+      email
+    }
+    review
+    allowAdditionalSigners
+  }
+` as unknown as DocumentNode<TemplateIconSignature_SignatureConfigFragment, unknown>;
+export const TemplateIconReminders_RemindersConfigFragmentDoc = gql`
+  fragment TemplateIconReminders_RemindersConfig on RemindersConfig {
+    offset
+    time
+    timezone
+    weekdaysOnly
+  }
+` as unknown as DocumentNode<TemplateIconReminders_RemindersConfigFragment, unknown>;
+export const TemplateIconDefaultPermissions_TemplateDefaultPermissionFragmentDoc = gql`
+  fragment TemplateIconDefaultPermissions_TemplateDefaultPermission on TemplateDefaultPermission {
+    id
+    permissionType
+    ... on TemplateDefaultUserPermission {
+      user {
+        ...UserAvatarList_User
+      }
+    }
+    ... on TemplateDefaultUserGroupPermission {
+      group {
+        ...UserAvatarList_UserGroup
+      }
+    }
+  }
+  ${UserAvatarList_UserFragmentDoc}
+  ${UserAvatarList_UserGroupFragmentDoc}
+` as unknown as DocumentNode<
+  TemplateIconDefaultPermissions_TemplateDefaultPermissionFragment,
+  unknown
+>;
 export const TemplateActiveSettingsIcons_PetitionTemplateFragmentDoc = gql`
   fragment TemplateActiveSettingsIcons_PetitionTemplate on PetitionTemplate {
     id
@@ -19520,12 +19858,18 @@ export const TemplateActiveSettingsIcons_PetitionTemplateFragmentDoc = gql`
       isActive
     }
     signatureConfig {
-      title
+      ...TemplateIconSignature_SignatureConfig
     }
     remindersConfig {
-      time
+      ...TemplateIconReminders_RemindersConfig
+    }
+    defaultPermissions {
+      ...TemplateIconDefaultPermissions_TemplateDefaultPermission
     }
   }
+  ${TemplateIconSignature_SignatureConfigFragmentDoc}
+  ${TemplateIconReminders_RemindersConfigFragmentDoc}
+  ${TemplateIconDefaultPermissions_TemplateDefaultPermissionFragmentDoc}
 ` as unknown as DocumentNode<TemplateActiveSettingsIcons_PetitionTemplateFragment, unknown>;
 export const TemplateDetailsModal_PetitionTemplateFragmentDoc = gql`
   fragment TemplateDetailsModal_PetitionTemplate on PetitionTemplate {

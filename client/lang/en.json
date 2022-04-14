@@ -3395,16 +3395,6 @@
     "context": "Link activated"
   },
   {
-    "term": "component.template-card.automatic-reminders-active",
-    "definition": "Automatic reminders activated",
-    "context": "Automatic reminders activated"
-  },
-  {
-    "term": "component.template-card.esignature-active",
-    "definition": "eSignature activated",
-    "context": "eSignature activated"
-  },
-  {
     "term": "component.template-card.restricted-edition",
     "definition": "Restricted edition",
     "context": "Restricted edition"
@@ -3478,6 +3468,26 @@
     "term": "component.template-header.share-label",
     "definition": "Share template",
     "context": "Share template"
+  },
+  {
+    "term": "component.template-icon-default-permissions.text",
+    "definition": "Petitions will be assigned to:",
+    "context": "Petitions will be assigned to:"
+  },
+  {
+    "term": "component.template-icon-reminders.text",
+    "definition": "Automatic reminders set {days, plural, =1 {everyday} other {every # days}} at {time}",
+    "context": "Automatic reminders set {days, plural, =1 {everyday} other {every # days}} at {time}"
+  },
+  {
+    "term": "component.template-icon-signature.esignature-active-no-review",
+    "definition": "A eSignature will be initiated upon completion of the petition",
+    "context": "A eSignature will be initiated upon completion of the petition"
+  },
+  {
+    "term": "component.template-icon-signature.esignature-active-review",
+    "definition": "A eSignature will be initiated after reviewing the information",
+    "context": "A eSignature will be initiated after reviewing the information"
   },
   {
     "term": "component.test-mode-signature-badge.activate-signature-message",
