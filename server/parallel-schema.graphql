@@ -3406,6 +3406,16 @@ A public view of the petition
 """
 type PublicPetition implements Timestamps {
   """
+  The body of the optional completing message to be show to recipients.
+  """
+  completingMessageBody: String
+
+  """
+  The subject of the optional completing message to be show to recipients
+  """
+  completingMessageSubject: String
+
+  """
   Time when the resource was created.
   """
   createdAt: DateTime!
@@ -3424,6 +3434,11 @@ type PublicPetition implements Timestamps {
   The ID of the petition.
   """
   id: GID!
+
+  """
+  Wether the completion message will be shown to the recipients or not.
+  """
+  isCompletingMessageEnabled: Boolean!
 
   """
   Whether the contents card is hidden in the recipient view.

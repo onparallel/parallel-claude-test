@@ -25,6 +25,7 @@ import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
+import { useCompletingMessageDialog } from "@parallel/components/recipient-view/dialogs/CompletingMessageDialog";
 import {
   RecipientViewConfirmPetitionSignersDialogResult,
   useRecipientViewConfirmPetitionSignersDialog,
@@ -47,6 +48,7 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { compose } from "@parallel/utils/compose";
 import { resolveUrl } from "@parallel/utils/next";
+import { withError } from "@parallel/utils/promises/withError";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useGetPageFields } from "@parallel/utils/useGetPageFields";
 import { LiquidScopeProvider } from "@parallel/utils/useLiquid";
@@ -85,6 +87,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
   const [publicCompletePetition] = useMutation(RecipientView_publicCompletePetitionDocument);
   const showConfirmPetitionSignersDialog = useRecipientViewConfirmPetitionSignersDialog();
   const showReviewBeforeSigningDialog = useDialog(ReviewBeforeSignDialog);
+  const showCompletingMessageDialog = useCompletingMessageDialog();
   const handleFinalize = useCallback(
     async function () {
       try {
@@ -137,6 +140,17 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
               status: "success",
               isClosable: true,
             });
+          }
+          if (
+            petition.isCompletingMessageEnabled &&
+            (petition.completingMessageBody || petition.completingMessageSubject)
+          ) {
+            await withError(
+              showCompletingMessageDialog({
+                subject: petition.completingMessageSubject ?? null,
+                bodyHtml: petition.completingMessageBody ?? null,
+              })
+            );
           }
         } else {
           // go to first repliable field without replies
@@ -521,6 +535,9 @@ RecipientView.fragments = {
         ...RecipientViewContentsCard_PublicPetition
         ...RecipientViewProgressFooter_PublicPetition
         ...useLiquidScope_PublicPetition
+        isCompletingMessageEnabled
+        completingMessageBody
+        completingMessageSubject
       }
 
       ${this.PublicPetitionField}

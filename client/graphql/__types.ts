@@ -2500,6 +2500,10 @@ export interface PublicOrganization {
 /** A public view of the petition */
 export interface PublicPetition extends Timestamps {
   __typename?: "PublicPetition";
+  /** The body of the optional completing message to be show to recipients. */
+  completingMessageBody?: Maybe<Scalars["String"]>;
+  /** The subject of the optional completing message to be show to recipients */
+  completingMessageSubject?: Maybe<Scalars["String"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The deadline of the petition. */
@@ -2508,6 +2512,8 @@ export interface PublicPetition extends Timestamps {
   fields: Array<PublicPetitionField>;
   /** The ID of the petition. */
   id: Scalars["GID"];
+  /** Wether the completion message will be shown to the recipients or not. */
+  isCompletingMessageEnabled: Scalars["Boolean"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
@@ -18413,6 +18419,9 @@ export type RecipientView_PublicPetitionAccessFragment = {
     isRecipientViewContentsHidden: boolean;
     tone: Tone;
     signatureStatus?: PublicSignatureStatus | null;
+    isCompletingMessageEnabled: boolean;
+    completingMessageBody?: string | null;
+    completingMessageSubject?: string | null;
     recipients: Array<{
       __typename?: "PublicContact";
       firstName: string;
@@ -18510,6 +18519,9 @@ export type RecipientView_PublicPetitionFragment = {
   isRecipientViewContentsHidden: boolean;
   tone: Tone;
   signatureStatus?: PublicSignatureStatus | null;
+  isCompletingMessageEnabled: boolean;
+  completingMessageBody?: string | null;
+  completingMessageSubject?: string | null;
   fields: Array<{
     __typename?: "PublicPetitionField";
     type: PetitionFieldType;
@@ -18636,6 +18648,9 @@ export type RecipientView_publicCompletePetitionMutation = {
     isRecipientViewContentsHidden: boolean;
     tone: Tone;
     signatureStatus?: PublicSignatureStatus | null;
+    isCompletingMessageEnabled: boolean;
+    completingMessageBody?: string | null;
+    completingMessageSubject?: string | null;
     fields: Array<{
       __typename?: "PublicPetitionField";
       type: PetitionFieldType;
@@ -18716,6 +18731,9 @@ export type RecipientView_accessQuery = {
       isRecipientViewContentsHidden: boolean;
       tone: Tone;
       signatureStatus?: PublicSignatureStatus | null;
+      isCompletingMessageEnabled: boolean;
+      completingMessageBody?: string | null;
+      completingMessageSubject?: string | null;
       recipients: Array<{
         __typename?: "PublicContact";
         firstName: string;
@@ -23432,6 +23450,9 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
     ...RecipientViewContentsCard_PublicPetition
     ...RecipientViewProgressFooter_PublicPetition
     ...useLiquidScope_PublicPetition
+    isCompletingMessageEnabled
+    completingMessageBody
+    completingMessageSubject
   }
   ${RecipientView_PublicPetitionFieldFragmentDoc}
   ${useGetPageFields_PublicPetitionFieldFragmentDoc}

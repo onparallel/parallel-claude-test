@@ -3,6 +3,8 @@ import { core, enumType, inputObjectType, objectType, unionType } from "nexus";
 import { isDefined } from "remeda";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
+import { safeJsonParse } from "../../util/safeJsonParse";
+import { toHtml } from "../../util/slate";
 
 export const PublicPetitionAccess = objectType({
   name: "PublicPetitionAccess",
@@ -145,6 +147,34 @@ export const PublicPetition = objectType({
         const org = (await ctx.organizations.loadOrg(root.org_id))!;
 
         return org.preferred_tone;
+      },
+    });
+    t.boolean("isCompletingMessageEnabled", {
+      description: "Wether the completion message will be shown to the recipients or not.",
+      resolve: (o) => o.is_completing_message_enabled,
+    });
+    t.nullable.string("completingMessageSubject", {
+      description: "The subject of the optional completing message to be show to recipients",
+      resolve: (o) => o.completing_message_subject,
+    });
+    t.nullable.string("completingMessageBody", {
+      description: "The body of the optional completing message to be show to recipients.",
+      resolve: async (o, _, ctx) => {
+        if (o.completing_message_body) {
+          const [contact, user, [firstMessage]] = await Promise.all([
+            ctx.contacts.loadContactByAccessId(ctx.access!.id),
+            ctx.petitions.loadPetitionOwner(ctx.access!.petition_id),
+            ctx.petitions.loadMessagesByPetitionAccessId(ctx.access!.id),
+          ]);
+
+          return toHtml(safeJsonParse(o.completing_message_body), {
+            // in a public context, the petition title is instead the subject of the first message
+            petition: { ...o, name: firstMessage.email_subject },
+            contact,
+            user: await ctx.users.loadUserDataByUserId(user!.id),
+          });
+        }
+        return null;
       },
     });
   },

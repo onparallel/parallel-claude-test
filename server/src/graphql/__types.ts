@@ -1496,10 +1496,13 @@ export interface NexusGenFieldTypes {
   };
   PublicPetition: {
     // field return type
+    completingMessageBody: string | null; // String
+    completingMessageSubject: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     deadline: NexusGenScalars["DateTime"] | null; // DateTime
     fields: NexusGenRootTypes["PublicPetitionField"][]; // [PublicPetitionField!]!
     id: NexusGenScalars["GID"]; // GID!
+    isCompletingMessageEnabled: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     recipients: NexusGenRootTypes["PublicContact"][]; // [PublicContact!]!
@@ -2934,10 +2937,13 @@ export interface NexusGenFieldTypeNames {
   };
   PublicPetition: {
     // field return type name
+    completingMessageBody: "String";
+    completingMessageSubject: "String";
     createdAt: "DateTime";
     deadline: "DateTime";
     fields: "PublicPetitionField";
     id: "GID";
+    isCompletingMessageEnabled: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
     locale: "PetitionLocale";
     recipients: "PublicContact";

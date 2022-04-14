@@ -8415,6 +8415,11 @@
     "context": "Signup on Parallel"
   },
   {
+    "term": "public.slogan.alternative",
+    "definition": "Crea tu propio <b>Parallel</b>",
+    "context": "Create your own <b>Parallel</b>"
+  },
+  {
     "term": "public.solutions-link",
     "definition": "Soluciones",
     "context": "Solutions"
