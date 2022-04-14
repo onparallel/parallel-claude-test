@@ -129,6 +129,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
             tags: {
               merge: mergeArraysBy(["id"]),
             },
+            myEffectivePermission: { merge: true },
           },
         },
         PetitionTemplate: {
