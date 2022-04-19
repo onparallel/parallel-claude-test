@@ -77,8 +77,12 @@ export function RecipientViewPetitionFieldText({
         const index = field.replies.findIndex((r) => r.id === replyId);
         if (index > 0) {
           const prevId = field.replies[index - 1].id;
-          replyRefs[prevId].current!.selectionStart = replyRefs[prevId].current!.value.length;
-          replyRefs[prevId].current!.focus();
+          const element = replyRefs[prevId].current!;
+          if (element.type === "text") {
+            // selectionStart does not work on inputs that are not type="text" (e.g. email)
+            element.selectionStart = element.value.length;
+          }
+          element.focus();
         }
       }
       await onDeleteReply(replyId);
