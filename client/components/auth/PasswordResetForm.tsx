@@ -173,6 +173,7 @@ export function PasswordResetForm({
           </FormErrorMessage>
         </FormControl>
         <Button
+          className="notranslate"
           marginTop={6}
           width="100%"
           colorScheme="purple"

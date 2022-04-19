@@ -229,6 +229,7 @@ export function PublicPetitionInitialForm({
             </FormErrorMessage>
           </FormControl>
           <Button
+            className="notranslate"
             type="submit"
             colorScheme="purple"
             size="md"

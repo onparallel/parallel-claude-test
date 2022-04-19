@@ -388,7 +388,13 @@ export function PublicSignupFormExperience({
         <Button width="100%" variant="outline" onClick={onBack}>
           <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
         </Button>
-        <Button width="100%" colorScheme="purple" type="submit" isLoading={isLoading}>
+        <Button
+          className="notranslate"
+          width="100%"
+          colorScheme="purple"
+          type="submit"
+          isLoading={isLoading}
+        >
           <FormattedMessage
             id="component.public-signup-form-experience.complete-button"
             defaultMessage="Complete registration"

@@ -134,6 +134,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
         )}
         <Button
           ref={buttonRef}
+          className="notranslate"
           marginTop={6}
           width="100%"
           colorScheme="purple"
