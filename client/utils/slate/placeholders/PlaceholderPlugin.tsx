@@ -142,11 +142,13 @@ export function usePlaceholderPlugin(options: PlaceholderOption[]) {
             ) : null;
           },
           deserializeHtml: {
+            type: PLACEHOLDER_TYPE,
             validAttribute: "data-placeholder",
             getNode: (el) => ({
               type: PLACEHOLDER_TYPE,
               value: el.getAttribute("data-placeholder"),
             }),
+            rules: [{ validAttribute: "data-placeholder" }],
           },
         }),
       })()
