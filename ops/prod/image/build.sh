@@ -17,10 +17,13 @@ yum install -y \
     pcre-devel \
     zlib-devel \
     openssl-devel \
+    perl-devel \
+    perl-CPAN \
     perl-ExtUtils-Embed \
     ghostscript \
     ImageMagick \
     ImageMagick-devel \
+    qpdf \
     
 echo "Installing node.js"
 curl -sL https://rpm.nodesource.com/setup_${nodejs_version}.x | bash -
@@ -93,3 +96,11 @@ chgrp nginx /var/lib/nginx/tmp
 systemctl daemon-reload
 systemctl enable nginx.service 
 systemctl start nginx.service
+
+echo "Installing exiftool"
+curl -sLO https://exiftool.org/Image-ExifTool-12.41.tar.gz
+tar -vxf Image-ExifTool-12.41.tar.gz
+cd Image-ExifTool-12.41
+perl Makefile.PL
+make test
+make install
