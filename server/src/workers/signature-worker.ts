@@ -1,4 +1,5 @@
-import { promises as fs } from "fs";
+import { unlink } from "fs/promises";
+import { isDefined } from "remeda";
 import { WorkerContext } from "../context";
 import { IntegrationSettings } from "../db/repositories/IntegrationRepository";
 import {
@@ -114,8 +115,8 @@ async function startSignatureProcess(
     throw error;
   } finally {
     try {
-      if (documentTmpPath) {
-        await fs.unlink(documentTmpPath);
+      if (isDefined(documentTmpPath)) {
+        await unlink(documentTmpPath);
       }
     } catch {}
   }
