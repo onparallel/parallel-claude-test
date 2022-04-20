@@ -224,31 +224,23 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const showExportRepliesDialog = useExportRepliesDialog();
   const showExportRepliesProgressDialog = useExportRepliesProgressDialog();
   const handleExportRepliesTask = useExportRepliesTask();
+
   const handleDownloadAllClick = useCallback(async () => {
-    const hasFiles = petition.fields.some(
-      (field) => field.type === "FILE_UPLOAD" && field.replies.length > 0
-    );
-    const hasSignature = petition.currentSignatureRequest?.status === "COMPLETED";
-
     try {
-      if (hasFiles || hasSignature) {
-        const res = await showExportRepliesDialog({
-          user: me,
-          fields: petition.fields,
-        });
+      const res = await showExportRepliesDialog({
+        user: me,
+        fields: petition.fields,
+      });
 
-        if (res.type === "DOWNLOAD_ZIP") {
-          handleExportRepliesTask(petition.id, res.pattern);
-        } else {
-          const { pattern, externalClientId } = res;
-          await showExportRepliesProgressDialog({
-            petitionId: petition.id,
-            pattern,
-            externalClientId,
-          });
-        }
+      if (res.type === "DOWNLOAD_ZIP") {
+        handleExportRepliesTask(petition.id, res.pattern);
       } else {
-        handleExportRepliesTask(petition.id);
+        const { pattern, externalClientId } = res;
+        await showExportRepliesProgressDialog({
+          petitionId: petition.id,
+          pattern,
+          externalClientId,
+        });
       }
     } catch {}
   }, [petitionId, petition.fields]);

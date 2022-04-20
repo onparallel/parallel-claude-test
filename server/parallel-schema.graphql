@@ -4309,6 +4309,7 @@ type TagPagination {
 
 type Task {
   id: GID!
+  output: TemporaryFile
   progress: Int
   status: TaskStatus!
 }
@@ -4411,6 +4412,10 @@ type TemplateUsedEvent implements PetitionEvent {
   id: GID!
   petition: Petition
   type: PetitionEventType!
+}
+
+type TemporaryFile {
+  filename: String!
 }
 
 interface Timestamps {

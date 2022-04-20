@@ -26,10 +26,12 @@ import {
   ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataDocument,
   ExportRepliesProgressDialog_updateSignatureRequestMetadataDocument,
 } from "@parallel/graphql/__types";
+import { useExportExcelTask } from "@parallel/utils/useExportExcelTask";
 import { useFilenamePlaceholdersRename } from "@parallel/utils/useFilenamePlaceholders";
 import deepmerge from "deepmerge";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
+import { countBy } from "remeda";
 
 export interface ExportRepliesProgressDialogProps {
   externalClientId: string;
@@ -108,6 +110,9 @@ export function ExportRepliesProgressDialog({
   const [updateSignatureRequestMetadata] = useMutation(
     ExportRepliesProgressDialog_updateSignatureRequestMetadataDocument
   );
+
+  const exportExcelTask = useExportExcelTask();
+
   const { current: abort } = useRef(new AbortController());
   const showAlreadyExported = useDialog(AlreadyExportedDialog);
   const showErrorDialog = useErrorDialog();
@@ -118,9 +123,11 @@ export function ExportRepliesProgressDialog({
         return;
       }
       const rename = placeholdersRename(petition.fields);
-      const files = petition.fields.flatMap((field) =>
-        field.type === "FILE_UPLOAD" ? field.replies.map((reply) => ({ reply, field })) : []
+      const replies = petition.fields.flatMap((field) =>
+        field.type !== "HEADING" ? field.replies.map((reply) => ({ reply, field })) : []
       );
+
+      const hasTextReplies = !!replies.find((r) => r.field.type !== "FILE_UPLOAD");
 
       const signatureDocs = [];
       if (petition.currentSignatureRequest?.status === "COMPLETED") {
@@ -142,59 +149,97 @@ export function ExportRepliesProgressDialog({
         }
       }
 
-      const totalFiles = files.length + signatureDocs.length;
+      const totalFiles =
+        (hasTextReplies
+          ? 1 // exported excel with text replies
+          : 0) +
+        countBy(replies, (r) => r.field.type === "FILE_UPLOAD") + // every uploaded file reply
+        signatureDocs.length; // signed doc + audit trail
 
       setState("UPLOADING");
       let uploaded = 0;
       let dontAskAgain = false;
       let exportAgain = false;
-      for (const { reply, field } of files) {
-        if (reply.metadata.EXTERNAL_ID_CUATRECASAS) {
-          if (!dontAskAgain) {
-            const result = await showAlreadyExported({
-              filename: reply.content.filename,
-              externalId: reply.metadata.EXTERNAL_ID_CUATRECASAS,
-            });
-            dontAskAgain = result.dontAskAgain;
-            exportAgain = result.exportAgain;
-          }
-          if (!exportAgain) {
-            continue;
-          }
-        }
-        if (abort.signal.aborted) {
-          props.onReject("CANCEL");
-          return;
-        }
-        const res = await fileUploadReplyDownloadLink({
-          variables: {
-            petitionId: petition.id,
-            replyId: reply.id,
-          },
-        });
+
+      let excelExternalId: null | string = null;
+      if (hasTextReplies) {
         try {
-          const externalId = await exportFile(
-            res.data!.fileUploadReplyDownloadLink.url!,
-            rename(field, reply, pattern),
+          const exportedExcel = await exportExcelTask(petition.id);
+          excelExternalId = await exportFile(
+            exportedExcel.url!,
+            exportedExcel.task.output!.filename,
             externalClientId,
             abort.signal,
             ({ loaded, total }) => setProgress((uploaded + (loaded / total) * 0.5) / totalFiles)
           );
+          uploaded += 1;
+          setProgress(uploaded / totalFiles);
+        } catch (e) {
+          return await processError(e);
+        }
+      }
+
+      for (const { reply, field } of replies) {
+        if (field.type === "FILE_UPLOAD") {
+          if (reply.metadata.EXTERNAL_ID_CUATRECASAS) {
+            if (!dontAskAgain) {
+              const result = await showAlreadyExported({
+                filename: reply.content.filename,
+                externalId: reply.metadata.EXTERNAL_ID_CUATRECASAS,
+              });
+              dontAskAgain = result.dontAskAgain;
+              exportAgain = result.exportAgain;
+            }
+            if (!exportAgain) {
+              continue;
+            }
+          }
+          if (abort.signal.aborted) {
+            props.onReject("CANCEL");
+            return;
+          }
+          const res = await fileUploadReplyDownloadLink({
+            variables: {
+              petitionId: petition.id,
+              replyId: reply.id,
+            },
+          });
+          try {
+            const externalId = await exportFile(
+              res.data!.fileUploadReplyDownloadLink.url!,
+              rename(field, reply, pattern),
+              externalClientId,
+              abort.signal,
+              ({ loaded, total }) => setProgress((uploaded + (loaded / total) * 0.5) / totalFiles)
+            );
+            await updatePetitionFieldReplyMetadata({
+              variables: {
+                petitionId: petition.id,
+                replyId: reply.id,
+                metadata: {
+                  ...reply.metadata,
+                  EXTERNAL_ID_CUATRECASAS: externalId,
+                },
+              },
+            });
+          } catch (e: any) {
+            return await processError(e);
+          }
+          uploaded += 1;
+          setProgress(uploaded / totalFiles);
+        } else {
+          // for non FILE_UPLOAD replies, update reply metadata with externalId of excel file
           await updatePetitionFieldReplyMetadata({
             variables: {
               petitionId: petition.id,
               replyId: reply.id,
               metadata: {
                 ...reply.metadata,
-                EXTERNAL_ID_CUATRECASAS: externalId,
+                EXTERNAL_ID_CUATRECASAS: excelExternalId!,
               },
             },
           });
-        } catch (e: any) {
-          return await processError(e);
         }
-        uploaded += 1;
-        setProgress(uploaded / totalFiles);
       }
 
       for (const signatureDoc of signatureDocs) {
@@ -390,13 +435,6 @@ ExportRepliesProgressDialog.fragments = {
     ${useFilenamePlaceholdersRename.fragments.PetitionField}
     ${useFilenamePlaceholdersRename.fragments.PetitionFieldReply}
   `,
-  Task: gql`
-    fragment ExportRepliesProgressDialog_Task on Task {
-      id
-      status
-      progress
-    }
-  `,
 };
 
 ExportRepliesProgressDialog.queries = [
@@ -408,30 +446,9 @@ ExportRepliesProgressDialog.queries = [
     }
     ${ExportRepliesProgressDialog.fragments.Petition}
   `,
-  gql`
-    query ExportRepliesProgressDialog_task($id: GID!) {
-      task(id: $id) {
-        ...ExportRepliesProgressDialog_Task
-      }
-    }
-    ${ExportRepliesProgressDialog.fragments.Task}
-  `,
 ];
 
 ExportRepliesProgressDialog.mutations = [
-  gql`
-    mutation ExportRepliesProgressDialog_createExportExcelTask($petitionId: GID!) {
-      createExportExcelTask(petitionId: $petitionId) {
-        ...ExportRepliesProgressDialog_Task
-      }
-    }
-    ${ExportRepliesProgressDialog.fragments.Task}
-  `,
-  gql`
-    mutation ExportRepliesProgressDialog_getTaskResultFileUrl($taskId: GID!) {
-      getTaskResultFileUrl(taskId: $taskId, preview: false)
-    }
-  `,
   gql`
     mutation ExportRepliesProgressDialog_fileUploadReplyDownloadLink(
       $petitionId: GID!

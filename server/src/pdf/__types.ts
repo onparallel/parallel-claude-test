@@ -3063,6 +3063,7 @@ export type TagPagination = {
 
 export type Task = {
   id: Scalars["GID"];
+  output: Maybe<TemporaryFile>;
   progress: Maybe<Scalars["Int"]>;
   status: TaskStatus;
 };
@@ -3119,6 +3120,10 @@ export type TemplateUsedEvent = PetitionEvent & {
   id: Scalars["GID"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
+};
+
+export type TemporaryFile = {
+  filename: Scalars["String"];
 };
 
 export type Timestamps = {

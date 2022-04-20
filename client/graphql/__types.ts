@@ -3175,6 +3175,7 @@ export interface TagPagination {
 export interface Task {
   __typename?: "Task";
   id: Scalars["GID"];
+  output?: Maybe<TemporaryFile>;
   progress?: Maybe<Scalars["Int"]>;
   status: TaskStatus;
 }
@@ -3232,6 +3233,11 @@ export interface TemplateUsedEvent extends PetitionEvent {
   id: Scalars["GID"];
   petition?: Maybe<Petition>;
   type: PetitionEventType;
+}
+
+export interface TemporaryFile {
+  __typename?: "TemporaryFile";
+  filename: Scalars["String"];
 }
 
 export interface Timestamps {
@@ -9368,13 +9374,6 @@ export type ExportRepliesProgressDialog_PetitionFragment = {
   } | null;
 };
 
-export type ExportRepliesProgressDialog_TaskFragment = {
-  __typename?: "Task";
-  id: string;
-  status: TaskStatus;
-  progress?: number | null;
-};
-
 export type ExportRepliesProgressDialog_petitionQueryVariables = Exact<{
   petitionId: Scalars["GID"];
 }>;
@@ -9407,35 +9406,6 @@ export type ExportRepliesProgressDialog_petitionQuery = {
       }
     | { __typename?: "PetitionTemplate" }
     | null;
-};
-
-export type ExportRepliesProgressDialog_taskQueryVariables = Exact<{
-  id: Scalars["GID"];
-}>;
-
-export type ExportRepliesProgressDialog_taskQuery = {
-  task: { __typename?: "Task"; id: string; status: TaskStatus; progress?: number | null };
-};
-
-export type ExportRepliesProgressDialog_createExportExcelTaskMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-}>;
-
-export type ExportRepliesProgressDialog_createExportExcelTaskMutation = {
-  createExportExcelTask: {
-    __typename?: "Task";
-    id: string;
-    status: TaskStatus;
-    progress?: number | null;
-  };
-};
-
-export type ExportRepliesProgressDialog_getTaskResultFileUrlMutationVariables = Exact<{
-  taskId: Scalars["GID"];
-}>;
-
-export type ExportRepliesProgressDialog_getTaskResultFileUrlMutation = {
-  getTaskResultFileUrl: string;
 };
 
 export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationVariables = Exact<{
@@ -18963,6 +18933,45 @@ export type uploadFile_AWSPresignedPostDataFragment = {
   fields: { [key: string]: any };
 };
 
+export type useExportExcelTask_TaskFragment = {
+  __typename?: "Task";
+  id: string;
+  status: TaskStatus;
+  output?: { __typename?: "TemporaryFile"; filename: string } | null;
+};
+
+export type useExportExcelTask_createExportExcelTaskMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type useExportExcelTask_createExportExcelTaskMutation = {
+  createExportExcelTask: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    output?: { __typename?: "TemporaryFile"; filename: string } | null;
+  };
+};
+
+export type useExportExcelTask_getTaskResultFileUrlMutationVariables = Exact<{
+  taskId: Scalars["GID"];
+}>;
+
+export type useExportExcelTask_getTaskResultFileUrlMutation = { getTaskResultFileUrl: string };
+
+export type useExportExcelTask_taskQueryVariables = Exact<{
+  id: Scalars["GID"];
+}>;
+
+export type useExportExcelTask_taskQuery = {
+  task: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    output?: { __typename?: "TemporaryFile"; filename: string } | null;
+  };
+};
+
 export type useExportRepliesTask_taskQueryVariables = Exact<{
   id: Scalars["GID"];
 }>;
@@ -20126,13 +20135,6 @@ export const ExportRepliesProgressDialog_PetitionFragmentDoc = gql`
   ${useFilenamePlaceholdersRename_PetitionFieldFragmentDoc}
   ${useFilenamePlaceholdersRename_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<ExportRepliesProgressDialog_PetitionFragment, unknown>;
-export const ExportRepliesProgressDialog_TaskFragmentDoc = gql`
-  fragment ExportRepliesProgressDialog_Task on Task {
-    id
-    status
-    progress
-  }
-` as unknown as DocumentNode<ExportRepliesProgressDialog_TaskFragment, unknown>;
 export const LandingTemplateCard_LandingTemplateFragmentDoc = gql`
   fragment LandingTemplateCard_LandingTemplate on LandingTemplate {
     id
@@ -23043,6 +23045,15 @@ export const uploadFile_AWSPresignedPostDataFragmentDoc = gql`
     fields
   }
 ` as unknown as DocumentNode<uploadFile_AWSPresignedPostDataFragment, unknown>;
+export const useExportExcelTask_TaskFragmentDoc = gql`
+  fragment useExportExcelTask_Task on Task {
+    id
+    status
+    output {
+      filename
+    }
+  }
+` as unknown as DocumentNode<useExportExcelTask_TaskFragment, unknown>;
 export const PetitionTagListCellContent_tagsDocument = gql`
   query PetitionTagListCellContent_tags($search: String) {
     tags(search: $search) {
@@ -24025,36 +24036,6 @@ export const ExportRepliesProgressDialog_petitionDocument = gql`
 ` as unknown as DocumentNode<
   ExportRepliesProgressDialog_petitionQuery,
   ExportRepliesProgressDialog_petitionQueryVariables
->;
-export const ExportRepliesProgressDialog_taskDocument = gql`
-  query ExportRepliesProgressDialog_task($id: GID!) {
-    task(id: $id) {
-      ...ExportRepliesProgressDialog_Task
-    }
-  }
-  ${ExportRepliesProgressDialog_TaskFragmentDoc}
-` as unknown as DocumentNode<
-  ExportRepliesProgressDialog_taskQuery,
-  ExportRepliesProgressDialog_taskQueryVariables
->;
-export const ExportRepliesProgressDialog_createExportExcelTaskDocument = gql`
-  mutation ExportRepliesProgressDialog_createExportExcelTask($petitionId: GID!) {
-    createExportExcelTask(petitionId: $petitionId) {
-      ...ExportRepliesProgressDialog_Task
-    }
-  }
-  ${ExportRepliesProgressDialog_TaskFragmentDoc}
-` as unknown as DocumentNode<
-  ExportRepliesProgressDialog_createExportExcelTaskMutation,
-  ExportRepliesProgressDialog_createExportExcelTaskMutationVariables
->;
-export const ExportRepliesProgressDialog_getTaskResultFileUrlDocument = gql`
-  mutation ExportRepliesProgressDialog_getTaskResultFileUrl($taskId: GID!) {
-    getTaskResultFileUrl(taskId: $taskId, preview: false)
-  }
-` as unknown as DocumentNode<
-  ExportRepliesProgressDialog_getTaskResultFileUrlMutation,
-  ExportRepliesProgressDialog_getTaskResultFileUrlMutationVariables
 >;
 export const ExportRepliesProgressDialog_fileUploadReplyDownloadLinkDocument = gql`
   mutation ExportRepliesProgressDialog_fileUploadReplyDownloadLink(
@@ -26008,6 +25989,33 @@ export const useOrgRole_MeDocument = gql`
     }
   }
 ` as unknown as DocumentNode<useOrgRole_MeQuery, useOrgRole_MeQueryVariables>;
+export const useExportExcelTask_createExportExcelTaskDocument = gql`
+  mutation useExportExcelTask_createExportExcelTask($petitionId: GID!) {
+    createExportExcelTask(petitionId: $petitionId) {
+      ...useExportExcelTask_Task
+    }
+  }
+  ${useExportExcelTask_TaskFragmentDoc}
+` as unknown as DocumentNode<
+  useExportExcelTask_createExportExcelTaskMutation,
+  useExportExcelTask_createExportExcelTaskMutationVariables
+>;
+export const useExportExcelTask_getTaskResultFileUrlDocument = gql`
+  mutation useExportExcelTask_getTaskResultFileUrl($taskId: GID!) {
+    getTaskResultFileUrl(taskId: $taskId, preview: false)
+  }
+` as unknown as DocumentNode<
+  useExportExcelTask_getTaskResultFileUrlMutation,
+  useExportExcelTask_getTaskResultFileUrlMutationVariables
+>;
+export const useExportExcelTask_taskDocument = gql`
+  query useExportExcelTask_task($id: GID!) {
+    task(id: $id) {
+      ...useExportExcelTask_Task
+    }
+  }
+  ${useExportExcelTask_TaskFragmentDoc}
+` as unknown as DocumentNode<useExportExcelTask_taskQuery, useExportExcelTask_taskQueryVariables>;
 export const useExportRepliesTask_taskDocument = gql`
   query useExportRepliesTask_task($id: GID!) {
     task(id: $id) {

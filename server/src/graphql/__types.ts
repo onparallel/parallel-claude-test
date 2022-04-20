@@ -557,6 +557,7 @@ export interface NexusGenObjects {
   TemplateDefaultUserGroupPermission: db.TemplateDefaultPermission;
   TemplateDefaultUserPermission: db.TemplateDefaultPermission;
   TemplateUsedEvent: events.TemplateUsedEvent;
+  TemporaryFile: db.TemporaryFile;
   User: db.User;
   UserAuthenticationToken: db.UserAuthenticationToken;
   UserGroup: db.UserGroup;
@@ -1823,6 +1824,7 @@ export interface NexusGenFieldTypes {
   Task: {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
+    output: NexusGenRootTypes["TemporaryFile"] | null; // TemporaryFile
     progress: number | null; // Int
     status: NexusGenEnums["TaskStatus"]; // TaskStatus!
   };
@@ -1851,6 +1853,10 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
+  };
+  TemporaryFile: {
+    // field return type
+    filename: string; // String!
   };
   User: {
     // field return type
@@ -3242,6 +3248,7 @@ export interface NexusGenFieldTypeNames {
   Task: {
     // field return type name
     id: "GID";
+    output: "TemporaryFile";
     progress: "Int";
     status: "TaskStatus";
   };
@@ -3270,6 +3277,10 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     petition: "Petition";
     type: "PetitionEventType";
+  };
+  TemporaryFile: {
+    // field return type name
+    filename: "String";
   };
   User: {
     // field return type name

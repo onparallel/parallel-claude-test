@@ -49,7 +49,7 @@ export function PetitionRepliesFieldReply({
 
   return (
     <Flex>
-      <Box paddingRight={2} borderRight="2px solid" borderColor="gray.200">
+      <Box as={Stack} spacing={1} paddingRight={2} borderRight="2px solid" borderColor="gray.200">
         {isTextLikeType ? (
           <CopyToClipboardButton size="xs" text={reply.content.value} />
         ) : reply.field!.type === "NUMBER" ? (
@@ -71,27 +71,11 @@ export function PetitionRepliesFieldReply({
         ) : reply.field!.type === "PHONE" ? (
           <CopyToClipboardButton size="xs" text={reply.content.value} />
         ) : reply.field!.type === "FILE_UPLOAD" ? (
-          <Stack spacing={1}>
-            <ReplyDownloadButton
-              isDisabled={reply.content.uploadComplete === false}
-              contentType={reply.content.contentType}
-              onDownload={(preview) => onAction(preview ? "PREVIEW_FILE" : "DOWNLOAD_FILE")}
-            />
-            {reply.metadata.EXTERNAL_ID_CUATRECASAS ? (
-              <IconButtonWithTooltip
-                size="xs"
-                as="a"
-                href={`https://eu.netdocuments.com/neWeb2/goid.aspx?id=${reply.metadata.EXTERNAL_ID_CUATRECASAS}`}
-                target="_href"
-                icon={<NetDocumentsIcon fontSize="14px" />}
-                label={intl.formatMessage({
-                  id: "petition-replies.petition-field-reply.netdocuments-link",
-                  defaultMessage: "Access file in NetDocuments",
-                })}
-                placement="right"
-              />
-            ) : null}
-          </Stack>
+          <ReplyDownloadButton
+            isDisabled={reply.content.uploadComplete === false}
+            contentType={reply.content.contentType}
+            onDownload={(preview) => onAction(preview ? "PREVIEW_FILE" : "DOWNLOAD_FILE")}
+          />
         ) : reply.field!.type === "DYNAMIC_SELECT" ? (
           <Stack spacing={1}>
             {(reply.content.value as [string, string | null][]).map(([label, value], index) =>
@@ -117,6 +101,20 @@ export function PetitionRepliesFieldReply({
               <CopyToClipboardButton key={index} size="xs" text={value} />
             ))}
           </Stack>
+        ) : null}
+        {reply.metadata.EXTERNAL_ID_CUATRECASAS ? (
+          <IconButtonWithTooltip
+            size="xs"
+            as="a"
+            href={`https://eu.netdocuments.com/neWeb2/goid.aspx?id=${reply.metadata.EXTERNAL_ID_CUATRECASAS}`}
+            target="_href"
+            icon={<NetDocumentsIcon fontSize="14px" />}
+            label={intl.formatMessage({
+              id: "petition-replies.petition-field-reply.netdocuments-link",
+              defaultMessage: "Access file in NetDocuments",
+            })}
+            placement="right"
+          />
         ) : null}
       </Box>
       <Flex flexDirection="column" justifyContent="center" flex="1" marginLeft={2}>

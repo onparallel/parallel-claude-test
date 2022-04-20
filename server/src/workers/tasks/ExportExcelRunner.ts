@@ -36,11 +36,15 @@ export class ExportExcelRunner extends TaskRunner<"EXPORT_EXCEL"> {
       this.ctx
     ).next();
 
+    if (!exportExcel.value) {
+      throw new Error(`No replies to export to xlsx file on Petition:${petitionId}`);
+    }
+
     const path = random(16);
     const res = await this.ctx.aws.temporaryFiles.uploadFile(
       path,
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      exportExcel.value!.stream
+      exportExcel.value.stream
     );
 
     const tmpFile = await this.ctx.files.createTemporaryFile(
