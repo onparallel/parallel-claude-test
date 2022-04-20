@@ -5405,6 +5405,21 @@
     "context": "Upload a new logo"
   },
   {
+    "term": "organization.compliance.success-toast-description",
+    "definition": "Los cambios han sido guardados con éxito.",
+    "context": "Changes have been successfully saved."
+  },
+  {
+    "term": "organization.compliance.success-toast-title",
+    "definition": "Periodo de conservación actualizado.",
+    "context": "Updated conservation period."
+  },
+  {
+    "term": "organization.compliance.title",
+    "definition": "Compliance",
+    "context": "Compliance"
+  },
+  {
     "term": "organization.confirm-activate-user-dialog.body",
     "definition": "Estás seguro que quieres <b>activar</b> {count, plural, =1{el usuario seleccionado} other{los usuarios seleccionados}}?",
     "context": "Are you sure you want to <b>activate</b> the selected {count, plural, =1{user} other {users}}?"
@@ -5568,6 +5583,91 @@
     "term": "page.choose-org.title",
     "definition": "Elige la organización",
     "context": "Choose organization"
+  },
+  {
+    "term": "page.compliance.accounting-tax",
+    "definition": "Contables y fiscales",
+    "context": "Accounting and tax"
+  },
+  {
+    "term": "page.compliance.description-text-1",
+    "definition": "En cumplimiento de la normativa de protección de datos, los datos personales recopilados deben conservarse por el tiempo estrictamente necesario según su finalidad.",
+    "context": "In compliance with data protection regulations, the personal data collected must be kept for the time strictly necessary for their purpose."
+  },
+  {
+    "term": "page.compliance.description-text-2",
+    "definition": "Puedes configurar el periodo de conservación desde el <b>cierre</b> de las peticiones, tras el cuál, los datos serán anonimizados.",
+    "context": "You can set the retention period from the <b>closing</b> of the petitions, after which the data will be anonymized."
+  },
+  {
+    "term": "page.compliance.duration-period-error",
+    "definition": "La duración del periodo es obligatoria",
+    "context": "The duration of the period is required"
+  },
+  {
+    "term": "page.compliance.include-data-retention",
+    "definition": "Activar borrado de datos",
+    "context": "Include data retention period"
+  },
+  {
+    "term": "page.compliance.labor-social-security",
+    "definition": "Laborales o Seguridad Social",
+    "context": "Labor or Social Security"
+  },
+  {
+    "term": "page.compliance.months",
+    "definition": "meses",
+    "context": "months"
+  },
+  {
+    "term": "page.compliance.most-common-data",
+    "definition": "💡 Periodos de conservación de los datos más comunes:",
+    "context": "💡 Most common data retention periods:"
+  },
+  {
+    "term": "page.compliance.most-common-data-help",
+    "definition": "Consulta siempre con un asesor legal de tu jurisdicción. Estos plazos pueden estar sujetos a cambios legislativos. Parallel mantendrá los datos durante el plazo que indiques y no será responsable en caso de que los plazos que establezcas sean incorrectos.",
+    "context": "Always get advice from a legal advisor in your jurisdiction. These periods may be subject to legislative changes. Parallel will maintain the data for the period you indicate and will not be liable in the event that the time period you set is incorrect."
+  },
+  {
+    "term": "page.compliance.prevention-money-laundering",
+    "definition": "Prevención de Blanqueo de Capitales",
+    "context": "Prevention of Money Laundering"
+  },
+  {
+    "term": "page.compliance.table-period",
+    "definition": "periodo",
+    "context": "period"
+  },
+  {
+    "term": "page.compliance.table-purpose",
+    "definition": "finalidad",
+    "context": "purpose"
+  },
+  {
+    "term": "page.compliance.upgrade-plan-alert",
+    "definition": "Actualiza tu plan para acceder a las funcionalidades de Compliance.",
+    "context": "Upgrade your plan to access Compliance functionalities."
+  },
+  {
+    "term": "page.compliance.upgrade-plan-message",
+    "definition": "Hola, me gustaría obtener más información acerca de como actualizar mi plan para acceder a las funcionalidades de Compliance.",
+    "context": "Hi, I would like more information about upgrade my plan to access Compliance."
+  },
+  {
+    "term": "page.compliance.upload-period",
+    "definition": "Actualizar periodo",
+    "context": "Update period"
+  },
+  {
+    "term": "page.compliance.x-years",
+    "definition": "{amount} años",
+    "context": "{amount} years"
+  },
+  {
+    "term": "page.compliance.years",
+    "definition": "años",
+    "context": "years"
   },
   {
     "term": "page.petition-replies.export-pdf",
@@ -9456,7 +9556,7 @@
   },
   {
     "term": "timeline.access-deactivated-generic-description",
-    "definition": "El acceso a {contact} fue desactivado {timeAgo}",
+    "definition": "El acceso de {contact} fue eliminado {timeAgo}.",
     "context": "The access for {contact} was removed {timeAgo}"
   },
   {

@@ -5405,6 +5405,21 @@
     "context": "Upload a new logo"
   },
   {
+    "term": "organization.compliance.success-toast-description",
+    "definition": "Changes have been successfully saved.",
+    "context": "Changes have been successfully saved."
+  },
+  {
+    "term": "organization.compliance.success-toast-title",
+    "definition": "Updated conservation period.",
+    "context": "Updated conservation period."
+  },
+  {
+    "term": "organization.compliance.title",
+    "definition": "Compliance",
+    "context": "Compliance"
+  },
+  {
     "term": "organization.confirm-activate-user-dialog.body",
     "definition": "Are you sure you want to <b>activate</b> the selected {count, plural, =1{user} other {users}}?",
     "context": "Are you sure you want to <b>activate</b> the selected {count, plural, =1{user} other {users}}?"
@@ -5568,6 +5583,91 @@
     "term": "page.choose-org.title",
     "definition": "Choose organization",
     "context": "Choose organization"
+  },
+  {
+    "term": "page.compliance.accounting-tax",
+    "definition": "Accounting and tax",
+    "context": "Accounting and tax"
+  },
+  {
+    "term": "page.compliance.description-text-1",
+    "definition": "In compliance with data protection regulations, the personal data collected must be kept for the time strictly necessary for their purpose.",
+    "context": "In compliance with data protection regulations, the personal data collected must be kept for the time strictly necessary for their purpose."
+  },
+  {
+    "term": "page.compliance.description-text-2",
+    "definition": "You can set the retention period from the <b>closing</b> of the petitions, after which the data will be anonymized.",
+    "context": "You can set the retention period from the <b>closing</b> of the petitions, after which the data will be anonymized."
+  },
+  {
+    "term": "page.compliance.duration-period-error",
+    "definition": "The duration of the period is required",
+    "context": "The duration of the period is required"
+  },
+  {
+    "term": "page.compliance.include-data-retention",
+    "definition": "Include data retention period",
+    "context": "Include data retention period"
+  },
+  {
+    "term": "page.compliance.labor-social-security",
+    "definition": "Labor or Social Security",
+    "context": "Labor or Social Security"
+  },
+  {
+    "term": "page.compliance.months",
+    "definition": "months",
+    "context": "months"
+  },
+  {
+    "term": "page.compliance.most-common-data",
+    "definition": "💡 Most common data retention periods:",
+    "context": "💡 Most common data retention periods:"
+  },
+  {
+    "term": "page.compliance.most-common-data-help",
+    "definition": "Always get advice from a legal advisor in your jurisdiction. These periods may be subject to legislative changes. Parallel will maintain the data for the period you indicate and will not be liable in the event that the time period you set is incorrect.",
+    "context": "Always get advice from a legal advisor in your jurisdiction. These periods may be subject to legislative changes. Parallel will maintain the data for the period you indicate and will not be liable in the event that the time period you set is incorrect."
+  },
+  {
+    "term": "page.compliance.prevention-money-laundering",
+    "definition": "Prevention of Money Laundering",
+    "context": "Prevention of Money Laundering"
+  },
+  {
+    "term": "page.compliance.table-period",
+    "definition": "period",
+    "context": "period"
+  },
+  {
+    "term": "page.compliance.table-purpose",
+    "definition": "purpose",
+    "context": "purpose"
+  },
+  {
+    "term": "page.compliance.upgrade-plan-alert",
+    "definition": "Upgrade your plan to access Compliance functionalities.",
+    "context": "Upgrade your plan to access Compliance functionalities."
+  },
+  {
+    "term": "page.compliance.upgrade-plan-message",
+    "definition": "Hi, I would like more information about upgrade my plan to access Compliance.",
+    "context": "Hi, I would like more information about upgrade my plan to access Compliance."
+  },
+  {
+    "term": "page.compliance.upload-period",
+    "definition": "Update period",
+    "context": "Update period"
+  },
+  {
+    "term": "page.compliance.x-years",
+    "definition": "{amount} years",
+    "context": "{amount} years"
+  },
+  {
+    "term": "page.compliance.years",
+    "definition": "years",
+    "context": "years"
   },
   {
     "term": "page.petition-replies.export-pdf",

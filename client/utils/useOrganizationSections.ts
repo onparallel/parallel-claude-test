@@ -45,6 +45,13 @@ export function useOrganizationSections(user: Pick<User, "role">) {
               }),
               path: "/app/organization/usage",
             },
+            {
+              title: intl.formatMessage({
+                id: "organization.compliance.title",
+                defaultMessage: "Compliance",
+              }),
+              path: "/app/organization/compliance",
+            },
           ]
         : []),
       {
