@@ -390,6 +390,13 @@ ExportRepliesProgressDialog.fragments = {
     ${useFilenamePlaceholdersRename.fragments.PetitionField}
     ${useFilenamePlaceholdersRename.fragments.PetitionFieldReply}
   `,
+  Task: gql`
+    fragment ExportRepliesProgressDialog_Task on Task {
+      id
+      status
+      progress
+    }
+  `,
 };
 
 ExportRepliesProgressDialog.queries = [
@@ -401,9 +408,30 @@ ExportRepliesProgressDialog.queries = [
     }
     ${ExportRepliesProgressDialog.fragments.Petition}
   `,
+  gql`
+    query ExportRepliesProgressDialog_task($id: GID!) {
+      task(id: $id) {
+        ...ExportRepliesProgressDialog_Task
+      }
+    }
+    ${ExportRepliesProgressDialog.fragments.Task}
+  `,
 ];
 
 ExportRepliesProgressDialog.mutations = [
+  gql`
+    mutation ExportRepliesProgressDialog_createExportExcelTask($petitionId: GID!) {
+      createExportExcelTask(petitionId: $petitionId) {
+        ...ExportRepliesProgressDialog_Task
+      }
+    }
+    ${ExportRepliesProgressDialog.fragments.Task}
+  `,
+  gql`
+    mutation ExportRepliesProgressDialog_getTaskResultFileUrl($taskId: GID!) {
+      getTaskResultFileUrl(taskId: $taskId, preview: false)
+    }
+  `,
   gql`
     mutation ExportRepliesProgressDialog_fileUploadReplyDownloadLink(
       $petitionId: GID!

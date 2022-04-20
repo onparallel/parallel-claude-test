@@ -570,6 +570,11 @@ type Mutation {
   ): PetitionEventSubscription!
 
   """
+  Creates a task for exporting an xlsx file with petition text replies and sends it to the queue
+  """
+  createExportExcelTask(petitionId: GID!): Task!
+
+  """
   Creates a task for exporting a ZIP file with petition replies and sends it to the queue
   """
   createExportRepliesTask(pattern: String, petitionId: GID!): Task!

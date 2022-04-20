@@ -52,12 +52,34 @@ export const createExportRepliesTask = mutationField("createExportRepliesTask", 
   },
 });
 
+export const createExportExcelTask = mutationField("createExportExcelTask", {
+  description:
+    "Creates a task for exporting an xlsx file with petition text replies and sends it to the queue",
+  type: "Task",
+  authorize: authenticateAnd(userHasAccessToPetitions("petitionId")),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+  },
+  resolve: async (_, args, ctx) => {
+    return await ctx.tasks.createTask(
+      {
+        name: "EXPORT_EXCEL",
+        user_id: ctx.user!.id,
+        input: {
+          petition_id: args.petitionId,
+        },
+      },
+      `User:${ctx.user!.id}`
+    );
+  },
+});
+
 export const getTaskResultFileUrl = mutationField("getTaskResultFileUrl", {
   description: "Returns a signed download url for tasks with file output",
   type: "String",
   authorize: authenticateAnd(
     userHasAccessToTasks("taskId"),
-    tasksAreOfType("taskId", ["EXPORT_REPLIES", "PRINT_PDF"])
+    tasksAreOfType("taskId", ["EXPORT_REPLIES", "PRINT_PDF", "EXPORT_EXCEL"])
   ),
   args: {
     taskId: nonNull(globalIdArg("Task")),
@@ -66,7 +88,8 @@ export const getTaskResultFileUrl = mutationField("getTaskResultFileUrl", {
   resolve: async (_, args, ctx) => {
     const task = (await ctx.tasks.loadTask(args.taskId)) as
       | Task<"EXPORT_REPLIES">
-      | Task<"PRINT_PDF">;
+      | Task<"PRINT_PDF">
+      | Task<"EXPORT_EXCEL">;
 
     const file = isDefined(task.output)
       ? await ctx.files.loadTemporaryFile(task.output.temporary_file_id)

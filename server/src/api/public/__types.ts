@@ -393,6 +393,8 @@ export type Mutation = {
   createContact: Contact;
   /** Creates an event subscription for the user's petitions */
   createEventSubscription: PetitionEventSubscription;
+  /** Creates a task for exporting an xlsx file with petition text replies and sends it to the queue */
+  createExportExcelTask: Task;
   /** Creates a task for exporting a ZIP file with petition replies and sends it to the queue */
   createExportRepliesTask: Task;
   /** Creates a reply to a file upload field. */
@@ -721,6 +723,10 @@ export type MutationcreateEventSubscriptionArgs = {
   eventsUrl: Scalars["String"];
   fromTemplateId?: InputMaybe<Scalars["GID"]>;
   name?: InputMaybe<Scalars["String"]>;
+};
+
+export type MutationcreateExportExcelTaskArgs = {
+  petitionId: Scalars["GID"];
 };
 
 export type MutationcreateExportRepliesTaskArgs = {

@@ -10,11 +10,13 @@ import { Task as DbTask, TaskName } from "../__types";
 export type TaskInput<TName extends TaskName> = {
   EXPORT_REPLIES: { petition_id: number; pattern?: Maybe<string> };
   PRINT_PDF: { petition_id: number };
+  EXPORT_EXCEL: { petition_id: number };
 }[TName];
 
 export type TaskOutput<TName extends TaskName> = {
   EXPORT_REPLIES: { temporary_file_id: number };
   PRINT_PDF: { temporary_file_id: number };
+  EXPORT_EXCEL: { temporary_file_id: number };
 }[TName];
 
 export type Task<TName extends TaskName> = Replace<
