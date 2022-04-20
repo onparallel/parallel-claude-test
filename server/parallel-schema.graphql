@@ -248,6 +248,7 @@ enum EntityType {
 }
 
 enum FeatureFlag {
+  AUTO_ANONYMIZE
   CUSTOM_HOST_UI
   DEVELOPER_ACCESS
   ES_TAX_DOCUMENTS_FIELD

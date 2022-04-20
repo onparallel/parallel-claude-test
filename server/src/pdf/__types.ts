@@ -200,6 +200,7 @@ export type EffectivePetitionUserPermission = {
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
 export type FeatureFlag =
+  | "AUTO_ANONYMIZE"
   | "CUSTOM_HOST_UI"
   | "DEVELOPER_ACCESS"
   | "ES_TAX_DOCUMENTS_FIELD"

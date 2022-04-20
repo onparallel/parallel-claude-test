@@ -6,7 +6,6 @@ import {
   Button,
   Center,
   Checkbox,
-  Collapse,
   FormControl,
   FormErrorMessage,
   Heading,
@@ -16,7 +15,6 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  Select,
   Stack,
   Table,
   TableContainer,
@@ -30,6 +28,7 @@ import {
 } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
+import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import { SupportLink } from "@parallel/components/common/SupportLink";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withOrgRole } from "@parallel/components/common/withOrgRole";
@@ -42,8 +41,7 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
 interface ComplianceFormData {
-  amount: number;
-  period: "YEARS" | "MONTHS";
+  period: number;
   isActive: boolean;
 }
 
@@ -70,6 +68,8 @@ function OrganizationCompliance() {
     data: { me, realMe },
   } = useAssertQueryOrPreviousData(OrganizationCompliance_userDocument);
 
+  const defaultPeriod = 1;
+
   const {
     control,
     handleSubmit,
@@ -78,17 +78,17 @@ function OrganizationCompliance() {
     formState: { errors },
   } = useForm<ComplianceFormData>({
     defaultValues: {
-      amount: 1,
-      period: "MONTHS",
+      period: defaultPeriod,
       isActive: false,
     },
   });
 
   const isActive = watch("isActive");
+  const period = Number(watch("period"));
 
   const sections = useOrganizationSections(me);
 
-  const onPeriodChange = ({ amount, period, isActive }: ComplianceFormData) => {
+  const onPeriodChange = ({ period, isActive }: ComplianceFormData) => {
     try {
       updateSuccessToast();
     } catch {}
@@ -155,7 +155,7 @@ function OrganizationCompliance() {
             <Text>
               <FormattedMessage
                 id="page.compliance.description-text-2"
-                defaultMessage="You can set the retention period from the <b>closing</b> of the petitions, after which the data will be anonymized."
+                defaultMessage="You can set the <b>retention period</b> from the <b>closing</b> of the petitions, after which the data will be anonymized."
               />
             </Text>
           </Box>
@@ -167,18 +167,18 @@ function OrganizationCompliance() {
             >
               <FormattedMessage
                 id="page.compliance.include-data-retention"
-                defaultMessage="Include data retention period"
+                defaultMessage="Enable data erasure"
               />
             </Checkbox>
-            <Collapse in={isActive && me.hasAutoAnonymize}>
-              <FormControl marginBottom={4} isInvalid={!!errors.amount}>
+            <PaddedCollapse in={isActive && me.hasAutoAnonymize}>
+              <FormControl marginBottom={4} isInvalid={!!errors.period}>
                 <HStack>
                   <Controller
-                    name={"amount"}
+                    name={"period"}
                     control={control}
                     rules={{ required: isActive }}
                     render={({ field: { ref, ...restField } }) => (
-                      <NumberInput {...restField} min={1} clampValueOnBlur={true}>
+                      <NumberInput {...restField} min={1} clampValueOnBlur={true} maxWidth="100px">
                         <NumberInputField ref={ref} name={restField.name} />
                         <NumberInputStepper>
                           <NumberIncrementStepper />
@@ -187,20 +187,9 @@ function OrganizationCompliance() {
                       </NumberInput>
                     )}
                   />
-                  <Select width="auto" {...register("period")} isInvalid={false}>
-                    <option value="MONTHS">
-                      {intl.formatMessage({
-                        id: "page.compliance.months",
-                        defaultMessage: "months",
-                      })}
-                    </option>
-                    <option value="YEARS">
-                      {intl.formatMessage({
-                        id: "page.compliance.years",
-                        defaultMessage: "years",
-                      })}
-                    </option>
-                  </Select>
+                  <Text>
+                    <FormattedMessage id="page.compliance.months" defaultMessage="months" />
+                  </Text>
                 </HStack>
                 <FormErrorMessage>
                   <FormattedMessage
@@ -210,13 +199,18 @@ function OrganizationCompliance() {
                 </FormErrorMessage>
               </FormControl>
 
-              <Button colorScheme="purple" type="submit" width="fit-content">
+              <Button
+                colorScheme="purple"
+                type="submit"
+                width="fit-content"
+                isDisabled={defaultPeriod === period}
+              >
                 <FormattedMessage
                   id="page.compliance.upload-period"
                   defaultMessage="Update period"
                 />
               </Button>
-            </Collapse>
+            </PaddedCollapse>
           </Stack>
           <Box>
             <HStack marginY={4}>

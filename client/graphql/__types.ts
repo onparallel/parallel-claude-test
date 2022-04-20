@@ -217,6 +217,7 @@ export interface EffectivePetitionUserPermission {
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
 export type FeatureFlag =
+  | "AUTO_ANONYMIZE"
   | "CUSTOM_HOST_UI"
   | "DEVELOPER_ACCESS"
   | "ES_TAX_DOCUMENTS_FIELD"
@@ -11614,6 +11615,50 @@ export type OrganizationBranding_userQuery = {
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
+    };
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
+
+export type OrganizationCompliance_userQueryVariables = Exact<{ [key: string]: never }>;
+
+export type OrganizationCompliance_userQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasAutoAnonymize: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      activeUserCount: number;
+      name: string;
+      iconUrl92?: string | null;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
+        signatures: {
+          __typename?: "OrganizationUsageSignaturesLimit";
+          used: number;
+          limit: number;
+        };
       };
     };
   };
@@ -26518,6 +26563,35 @@ export const OrganizationBranding_userDocument = gql`
 ` as unknown as DocumentNode<
   OrganizationBranding_userQuery,
   OrganizationBranding_userQueryVariables
+>;
+export const OrganizationCompliance_userDocument = gql`
+  query OrganizationCompliance_user {
+    ...SettingsLayout_Query
+    me {
+      hasAutoAnonymize: hasFeatureFlag(featureFlag: AUTO_ANONYMIZE)
+      organization {
+        id
+        activeUserCount
+        usageLimits {
+          users {
+            limit
+          }
+          petitions {
+            used
+            limit
+          }
+          signatures {
+            used
+            limit
+          }
+        }
+      }
+    }
+  }
+  ${SettingsLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<
+  OrganizationCompliance_userQuery,
+  OrganizationCompliance_userQueryVariables
 >;
 export const OrganizationGeneral_updateOrgLogoDocument = gql`
   mutation OrganizationGeneral_updateOrgLogo($file: Upload!, $isIcon: Boolean) {

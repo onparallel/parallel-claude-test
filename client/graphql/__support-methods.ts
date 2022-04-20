@@ -1025,6 +1025,7 @@ export const schemaTypes: IntrospectionType[] = [
     inputFields: null,
     interfaces: null,
     enumValues: [
+      { name: "AUTO_ANONYMIZE", description: null, isDeprecated: false, deprecationReason: null },
       { name: "CUSTOM_HOST_UI", description: null, isDeprecated: false, deprecationReason: null },
       { name: "DEVELOPER_ACCESS", description: null, isDeprecated: false, deprecationReason: null },
       {

@@ -5596,8 +5596,8 @@
   },
   {
     "term": "page.compliance.description-text-2",
-    "definition": "Puedes configurar el periodo de conservación desde el <b>cierre</b> de las peticiones, tras el cuál, los datos serán anonimizados.",
-    "context": "You can set the retention period from the <b>closing</b> of the petitions, after which the data will be anonymized."
+    "definition": "Puedes configurar el <b>periodo de conservación</b> desde el <b>cierre</b> de las peticiones, tras el cuál, los datos serán anonimizados.",
+    "context": "You can set the <b>retention period</b> from the <b>closing</b> of the petitions, after which the data will be anonymized."
   },
   {
     "term": "page.compliance.duration-period-error",
@@ -5607,7 +5607,7 @@
   {
     "term": "page.compliance.include-data-retention",
     "definition": "Activar borrado de datos",
-    "context": "Include data retention period"
+    "context": "Enable data erasure"
   },
   {
     "term": "page.compliance.labor-social-security",
@@ -5663,11 +5663,6 @@
     "term": "page.compliance.x-years",
     "definition": "{amount} años",
     "context": "{amount} years"
-  },
-  {
-    "term": "page.compliance.years",
-    "definition": "años",
-    "context": "years"
   },
   {
     "term": "page.petition-replies.export-pdf",
