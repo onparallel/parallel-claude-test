@@ -3476,8 +3476,8 @@
   },
   {
     "term": "component.template-icon-reminders.text",
-    "definition": "Automatic reminders set {days, plural, =1 {everyday} other {every # days}} at {time}",
-    "context": "Automatic reminders set {days, plural, =1 {everyday} other {every # days}} at {time}"
+    "definition": "Automatic reminders set {days, plural, =1 {everyday} other {every # days}} at {time}{weekdays, select, true { on weekdays} other {}}",
+    "context": "Automatic reminders set {days, plural, =1 {everyday} other {every # days}} at {time}{weekdays, select, true { on weekdays} other {}}"
   },
   {
     "term": "component.template-icon-signature.esignature-active-no-review",

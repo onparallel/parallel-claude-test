@@ -16,10 +16,11 @@ export function TemplateIconReminders({ remindersConfig, ...props }: TemplateIco
         <Text fontSize="sm">
           <FormattedMessage
             id="component.template-icon-reminders.text"
-            defaultMessage="Automatic reminders set {days, plural, =1 {everyday} other {every # days}} at {time}"
+            defaultMessage="Automatic reminders set {days, plural, =1 {everyday} other {every # days}} at {time}{weekdays, select, true { on weekdays} other {}}"
             values={{
               days: remindersConfig.offset,
               time: remindersConfig.time,
+              weekdays: remindersConfig.weekdaysOnly,
             }}
           />
         </Text>
@@ -37,7 +38,6 @@ TemplateIconReminders.fragments = {
     fragment TemplateIconReminders_RemindersConfig on RemindersConfig {
       offset
       time
-      timezone
       weekdaysOnly
     }
   `,

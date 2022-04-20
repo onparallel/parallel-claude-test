@@ -50,14 +50,14 @@ export function TemplateActiveSettingsIcons({
           <LinkIcon color="gray.600" boxSize={4} />
         </SmallPopover>
       ) : null}
+      {template.defaultPermissions && template.defaultPermissions.length ? (
+        <TemplateIconDefaultPermissions defaultPermissions={template.defaultPermissions} />
+      ) : null}
       {template.signatureConfig ? (
         <TemplateIconSignature signatureConfig={template.signatureConfig} />
       ) : null}
       {template.remindersConfig ? (
         <TemplateIconReminders remindersConfig={template.remindersConfig} />
-      ) : null}
-      {template.defaultPermissions && template.defaultPermissions.length ? (
-        <TemplateIconDefaultPermissions defaultPermissions={template.defaultPermissions} />
       ) : null}
     </HStack>
   );

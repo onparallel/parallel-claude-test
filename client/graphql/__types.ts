@@ -7488,7 +7488,6 @@ export type TemplateDetailsModal_PetitionTemplateFragment = {
     __typename?: "RemindersConfig";
     offset: number;
     time: string;
-    timezone: string;
     weekdaysOnly: boolean;
   } | null;
   defaultPermissions: Array<
@@ -8291,7 +8290,6 @@ export type PublicTemplateCard_PetitionTemplateFragment = {
     __typename?: "RemindersConfig";
     offset: number;
     time: string;
-    timezone: string;
     weekdaysOnly: boolean;
   } | null;
   defaultPermissions: Array<
@@ -8337,7 +8335,6 @@ export type TemplateActiveSettingsIcons_PetitionTemplateFragment = {
     __typename?: "RemindersConfig";
     offset: number;
     time: string;
-    timezone: string;
     weekdaysOnly: boolean;
   } | null;
   defaultPermissions: Array<
@@ -8400,7 +8397,6 @@ export type TemplateCard_PetitionTemplateFragment = {
     __typename?: "RemindersConfig";
     offset: number;
     time: string;
-    timezone: string;
     weekdaysOnly: boolean;
   } | null;
   defaultPermissions: Array<
@@ -8455,7 +8451,6 @@ export type TemplateIconReminders_RemindersConfigFragment = {
   __typename?: "RemindersConfig";
   offset: number;
   time: string;
-  timezone: string;
   weekdaysOnly: boolean;
 };
 
@@ -17376,7 +17371,6 @@ export type NewPetition_PetitionTemplateFragment = {
     __typename?: "RemindersConfig";
     offset: number;
     time: string;
-    timezone: string;
     weekdaysOnly: boolean;
   } | null;
   defaultPermissions: Array<
@@ -17457,7 +17451,6 @@ export type NewPetition_templatesQuery = {
         __typename?: "RemindersConfig";
         offset: number;
         time: string;
-        timezone: string;
         weekdaysOnly: boolean;
       } | null;
       defaultPermissions: Array<
@@ -17590,7 +17583,6 @@ export type NewPetition_templateQuery = {
           __typename?: "RemindersConfig";
           offset: number;
           time: string;
-          timezone: string;
           weekdaysOnly: boolean;
         } | null;
         defaultPermissions: Array<
@@ -19812,7 +19804,6 @@ export const TemplateIconReminders_RemindersConfigFragmentDoc = gql`
   fragment TemplateIconReminders_RemindersConfig on RemindersConfig {
     offset
     time
-    timezone
     weekdaysOnly
   }
 ` as unknown as DocumentNode<TemplateIconReminders_RemindersConfigFragment, unknown>;
@@ -19822,17 +19813,20 @@ export const TemplateIconDefaultPermissions_TemplateDefaultPermissionFragmentDoc
     permissionType
     ... on TemplateDefaultUserPermission {
       user {
-        ...UserAvatarList_User
+        id
+        fullName
+        ...UserAvatar_User
       }
     }
     ... on TemplateDefaultUserGroupPermission {
       group {
-        ...UserAvatarList_UserGroup
+        id
+        name
+        initials
       }
     }
   }
-  ${UserAvatarList_UserFragmentDoc}
-  ${UserAvatarList_UserGroupFragmentDoc}
+  ${UserAvatar_UserFragmentDoc}
 ` as unknown as DocumentNode<
   TemplateIconDefaultPermissions_TemplateDefaultPermissionFragment,
   unknown
