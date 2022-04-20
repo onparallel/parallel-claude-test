@@ -24,6 +24,7 @@ export const StoryDecorator: DecoratorFunction<ReactFramework> = function StoryD
         defaultRichTextElements={{
           b: (chunks: any) => <strong>{chunks}</strong>,
         }}
+        onWarn={() => {}}
       >
         <ChakraProvider theme={theme} resetCSS portalZIndex={40}>
           <AnimateSharedLayout>{story()}</AnimateSharedLayout>

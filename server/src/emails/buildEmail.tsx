@@ -1,6 +1,6 @@
 import { render } from "mjml-react";
 import { ComponentType, createElement } from "react";
-import { IntlProvider, IntlShape, createIntl } from "react-intl";
+import { createIntl, IntlConfig, IntlProvider, IntlShape } from "react-intl";
 import { loadMessages } from "../util/loadMessages";
 
 export interface EmailOptions {
@@ -16,12 +16,13 @@ export interface Email<T> {
 
 export async function buildEmail<T>(email: Email<T>, props: T, { locale }: EmailOptions) {
   const messages = await loadMessages(locale);
-  const intlProps = {
+  const intlProps: IntlConfig = {
     messages,
     locale,
     defaultRichTextElements: {
       b: (chunks: any) => <strong>{chunks}</strong>,
     },
+    onWarn: () => {},
   };
   const { html } = render(
     <IntlProvider {...intlProps}>{createElement(email.html, props)}</IntlProvider>,

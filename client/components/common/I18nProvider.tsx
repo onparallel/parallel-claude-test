@@ -33,6 +33,7 @@ export function I18nProvider({ children, ...props }: I18nProps & { children: Rea
         defaultRichTextElements={{
           b: (chunks: any) => <strong>{chunks}</strong>,
         }}
+        onWarn={() => {}}
       >
         {children}
       </IntlProvider>

@@ -1,6 +1,6 @@
 import { renderToStream, Font } from "@react-pdf/renderer";
 import { createElement } from "react";
-import { IntlProvider } from "react-intl";
+import { IntlConfig, IntlProvider } from "react-intl";
 import { loadMessages } from "../util/loadMessages";
 import { PdfDocument, PdfDocumentGetPropsContext } from "./utils/pdf";
 import families from "./utils/fonts.json";
@@ -51,7 +51,12 @@ export async function buildPdf<ID, P>(
   }
   const messages = await loadMessages(context.locale);
   const props = document.getProps ? await document.getProps(initial, context) : initial;
-  const intlProps = { messages, locale: context.locale, defaultRichTextElements: {} };
+  const intlProps: IntlConfig = {
+    messages,
+    locale: context.locale,
+    defaultRichTextElements: {},
+    onWarn: () => {},
+  };
   return await renderToStream(
     <IntlProvider {...intlProps}>{createElement(document, props as any)}</IntlProvider>
   );
