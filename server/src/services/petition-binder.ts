@@ -1,4 +1,5 @@
 import { spawn } from "child_process";
+import { PathLike } from "fs";
 import { mkdir, rm, stat, writeFile } from "fs/promises";
 import { inject, injectable } from "inversify";
 import { tmpdir } from "os";
@@ -132,17 +133,12 @@ export class PetitionBinder implements IPetitionBinder {
   private async merge(paths: string[], opts?: { maxOutputSize?: number; outputFileName?: string }) {
     const DPIValues = [300, 144, 110, 96, 72];
     let iteration = -1;
-    let mergedFilePath = null;
     let mergedFileSize = 0;
+    const file = resolve(this.temporaryDirectory, `${random(10)}.pdf`);
     do {
       iteration++;
-      mergedFilePath = await this.mergeFiles(
-        paths,
-        // don't use temporaryDirectory here, as we dont want to delete the final result after the binder completed
-        resolve(tmpdir(), opts?.outputFileName ?? random(10)),
-        DPIValues[iteration]
-      );
-      mergedFileSize = (await stat(mergedFilePath)).size;
+      await this.mergeFiles(paths, file, DPIValues[iteration]);
+      mergedFileSize = await this.getFileSize(file);
     } while (
       mergedFileSize > (opts?.maxOutputSize ?? Infinity) &&
       iteration < DPIValues.length - 1
@@ -152,11 +148,17 @@ export class PetitionBinder implements IPetitionBinder {
       throw new Error("MAX_SIZE_EXCEEDED");
     }
 
-    return mergedFilePath;
+    // don't use temporaryDirectory here, as we dont want to delete the final result after the binder completed
+    const output = resolve(tmpdir(), `${opts?.outputFileName ?? random(10)}.pdf`);
+    await this.stripMetadata(file, output);
+    return output;
+  }
+
+  private async getFileSize(path: PathLike) {
+    return (await stat(path)).size;
   }
 
   private async mergeFiles(paths: string[], output: string, dpi: number) {
-    const outFile = `${output}.pdf`;
     await this.execute("gs", [
       "-sDEVICE=pdfwrite",
       "-dBATCH",
@@ -185,16 +187,14 @@ export class PetitionBinder implements IPetitionBinder {
       `-dColorImageResolution=${dpi}`,
       `-dGrayImageResolution=${dpi}`,
       `-dMonoImageResolution=${dpi}`,
-      `-sOutputFile=${outFile}`,
+      `-sOutputFile=${output}`,
       ...paths,
     ]);
+  }
 
-    // remove metadata from PDF
-    await this.execute("exiftool", ["-all=", "-overwrite_original", outFile]);
-    // optimize for faster loading and remove orphan data
-    await this.execute("qpdf", ["--linearize", "--replace-input", outFile]);
-
-    return outFile;
+  private async stripMetadata(path: string, output: string) {
+    await this.execute("exiftool", ["-all=", "-overwrite_original", path]);
+    await this.execute("qpdf", ["--linearize", path, output]);
   }
 
   private async convertImage(fileS3Path: string, contentType: string) {
