@@ -1,5 +1,5 @@
 import { core, enumType, interfaceType, nonNull, objectType } from "nexus";
-import { userOrPetitionAccessResolver } from "..";
+import { userOrPetitionAccessResolver } from "../helpers/userOrPetitionAccessResolver";
 
 export const PetitionUserNotificationFilter = enumType({
   name: "PetitionUserNotificationFilter",
