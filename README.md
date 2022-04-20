@@ -26,6 +26,16 @@ The backend uses the following libraries:
 - [Knex.js](https://knexjs.org/) for building and running SQL queries.
 - [Dataloader](https://github.com/graphql/dataloader) for avoiding the N + 1 query problem with GraphQL.
 
+As external dependencies, the backend uses:
+- [Ghostscript](https://ghostscript.com/)
+- [ImageMagick](https://imagemagick.org/)
+- [Exiftool](https://exiftool.org/)
+- [QPdf](https://qpdf.sourceforge.io/)
+
+This libraries are used to generate a PDF document binder containing the replies of a given petition.
+You can install this dependencies via brew:
+`brew install ghostscript imagemagick exiftool qpdf`
+
 ### Commands
 
 - `yarn dev`: Runs a local server with livereload.

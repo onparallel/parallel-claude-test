@@ -156,6 +156,7 @@ export class PetitionBinder implements IPetitionBinder {
   }
 
   private async mergeFiles(paths: string[], output: string, dpi: number) {
+    const outFile = `${output}.pdf`;
     await this.execute("gs", [
       "-sDEVICE=pdfwrite",
       "-dBATCH",
@@ -184,10 +185,16 @@ export class PetitionBinder implements IPetitionBinder {
       `-dColorImageResolution=${dpi}`,
       `-dGrayImageResolution=${dpi}`,
       `-dMonoImageResolution=${dpi}`,
-      `-sOutputFile=${output}.pdf`,
+      `-sOutputFile=${outFile}`,
       ...paths,
     ]);
-    return `${output}.pdf`;
+
+    // remove metadata from PDF
+    await this.execute("exiftool", ["-all=", "-overwrite_original", outFile]);
+    // optimize for faster loading and remove orphan data
+    await this.execute("qpdf", ["--linearize", "--replace-input", outFile]);
+
+    return outFile;
   }
 
   private async convertImage(fileS3Path: string, contentType: string) {
