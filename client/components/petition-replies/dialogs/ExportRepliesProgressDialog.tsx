@@ -26,7 +26,7 @@ import {
   ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataDocument,
   ExportRepliesProgressDialog_updateSignatureRequestMetadataDocument,
 } from "@parallel/graphql/__types";
-import { useExportExcelTask } from "@parallel/utils/useExportExcelTask";
+import { useBackgroundTask } from "@parallel/utils/useBackgroundTask";
 import { useFilenamePlaceholdersRename } from "@parallel/utils/useFilenamePlaceholders";
 import deepmerge from "deepmerge";
 import { useEffect, useRef, useState } from "react";
@@ -111,7 +111,7 @@ export function ExportRepliesProgressDialog({
     ExportRepliesProgressDialog_updateSignatureRequestMetadataDocument
   );
 
-  const exportExcelTask = useExportExcelTask();
+  const exportExcelTask = useBackgroundTask("EXPORT_EXCEL");
 
   const { current: abort } = useRef(new AbortController());
   const showAlreadyExported = useDialog(AlreadyExportedDialog);

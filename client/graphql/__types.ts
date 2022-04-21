@@ -18933,19 +18933,19 @@ export type uploadFile_AWSPresignedPostDataFragment = {
   fields: { [key: string]: any };
 };
 
-export type useExportExcelTask_TaskFragment = {
+export type useBackgroundTask_TaskFragment = {
   __typename?: "Task";
   id: string;
   status: TaskStatus;
   output?: { __typename?: "TemporaryFile"; filename: string } | null;
 };
 
-export type useExportExcelTask_createExportExcelTaskMutationVariables = Exact<{
+export type useBackgroundTask_createExportExcelTaskMutationVariables = Exact<{
   petitionId: Scalars["GID"];
 }>;
 
-export type useExportExcelTask_createExportExcelTaskMutation = {
-  createExportExcelTask: {
+export type useBackgroundTask_createExportExcelTaskMutation = {
+  createTask: {
     __typename?: "Task";
     id: string;
     status: TaskStatus;
@@ -18953,17 +18953,30 @@ export type useExportExcelTask_createExportExcelTaskMutation = {
   };
 };
 
-export type useExportExcelTask_getTaskResultFileUrlMutationVariables = Exact<{
+export type useBackgroundTask_createPrintPdfTaskMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type useBackgroundTask_createPrintPdfTaskMutation = {
+  createTask: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    output?: { __typename?: "TemporaryFile"; filename: string } | null;
+  };
+};
+
+export type useBackgroundTask_getTaskResultFileUrlMutationVariables = Exact<{
   taskId: Scalars["GID"];
 }>;
 
-export type useExportExcelTask_getTaskResultFileUrlMutation = { getTaskResultFileUrl: string };
+export type useBackgroundTask_getTaskResultFileUrlMutation = { getTaskResultFileUrl: string };
 
-export type useExportExcelTask_taskQueryVariables = Exact<{
+export type useBackgroundTask_taskQueryVariables = Exact<{
   id: Scalars["GID"];
 }>;
 
-export type useExportExcelTask_taskQuery = {
+export type useBackgroundTask_taskQuery = {
   task: {
     __typename?: "Task";
     id: string;
@@ -23045,15 +23058,15 @@ export const uploadFile_AWSPresignedPostDataFragmentDoc = gql`
     fields
   }
 ` as unknown as DocumentNode<uploadFile_AWSPresignedPostDataFragment, unknown>;
-export const useExportExcelTask_TaskFragmentDoc = gql`
-  fragment useExportExcelTask_Task on Task {
+export const useBackgroundTask_TaskFragmentDoc = gql`
+  fragment useBackgroundTask_Task on Task {
     id
     status
     output {
       filename
     }
   }
-` as unknown as DocumentNode<useExportExcelTask_TaskFragment, unknown>;
+` as unknown as DocumentNode<useBackgroundTask_TaskFragment, unknown>;
 export const PetitionTagListCellContent_tagsDocument = gql`
   query PetitionTagListCellContent_tags($search: String) {
     tags(search: $search) {
@@ -25989,33 +26002,44 @@ export const useOrgRole_MeDocument = gql`
     }
   }
 ` as unknown as DocumentNode<useOrgRole_MeQuery, useOrgRole_MeQueryVariables>;
-export const useExportExcelTask_createExportExcelTaskDocument = gql`
-  mutation useExportExcelTask_createExportExcelTask($petitionId: GID!) {
-    createExportExcelTask(petitionId: $petitionId) {
-      ...useExportExcelTask_Task
+export const useBackgroundTask_createExportExcelTaskDocument = gql`
+  mutation useBackgroundTask_createExportExcelTask($petitionId: GID!) {
+    createTask: createExportExcelTask(petitionId: $petitionId) {
+      ...useBackgroundTask_Task
     }
   }
-  ${useExportExcelTask_TaskFragmentDoc}
+  ${useBackgroundTask_TaskFragmentDoc}
 ` as unknown as DocumentNode<
-  useExportExcelTask_createExportExcelTaskMutation,
-  useExportExcelTask_createExportExcelTaskMutationVariables
+  useBackgroundTask_createExportExcelTaskMutation,
+  useBackgroundTask_createExportExcelTaskMutationVariables
 >;
-export const useExportExcelTask_getTaskResultFileUrlDocument = gql`
-  mutation useExportExcelTask_getTaskResultFileUrl($taskId: GID!) {
+export const useBackgroundTask_createPrintPdfTaskDocument = gql`
+  mutation useBackgroundTask_createPrintPdfTask($petitionId: GID!) {
+    createTask: createPrintPdfTask(petitionId: $petitionId) {
+      ...useBackgroundTask_Task
+    }
+  }
+  ${useBackgroundTask_TaskFragmentDoc}
+` as unknown as DocumentNode<
+  useBackgroundTask_createPrintPdfTaskMutation,
+  useBackgroundTask_createPrintPdfTaskMutationVariables
+>;
+export const useBackgroundTask_getTaskResultFileUrlDocument = gql`
+  mutation useBackgroundTask_getTaskResultFileUrl($taskId: GID!) {
     getTaskResultFileUrl(taskId: $taskId, preview: false)
   }
 ` as unknown as DocumentNode<
-  useExportExcelTask_getTaskResultFileUrlMutation,
-  useExportExcelTask_getTaskResultFileUrlMutationVariables
+  useBackgroundTask_getTaskResultFileUrlMutation,
+  useBackgroundTask_getTaskResultFileUrlMutationVariables
 >;
-export const useExportExcelTask_taskDocument = gql`
-  query useExportExcelTask_task($id: GID!) {
+export const useBackgroundTask_taskDocument = gql`
+  query useBackgroundTask_task($id: GID!) {
     task(id: $id) {
-      ...useExportExcelTask_Task
+      ...useBackgroundTask_Task
     }
   }
-  ${useExportExcelTask_TaskFragmentDoc}
-` as unknown as DocumentNode<useExportExcelTask_taskQuery, useExportExcelTask_taskQueryVariables>;
+  ${useBackgroundTask_TaskFragmentDoc}
+` as unknown as DocumentNode<useBackgroundTask_taskQuery, useBackgroundTask_taskQueryVariables>;
 export const useExportRepliesTask_taskDocument = gql`
   query useExportRepliesTask_task($id: GID!) {
     task(id: $id) {
