@@ -1570,6 +1570,10 @@ export type Petition = PetitionBase & {
   attachments: Array<PetitionAttachment>;
   /** The closing email body of the petition. */
   closingEmailBody: Maybe<Scalars["JSON"]>;
+  /** The body of the optional completing message to be show to recipients */
+  completingMessageBody: Maybe<Scalars["JSON"]>;
+  /** The subject of the optional completing message to be show to recipients */
+  completingMessageSubject: Maybe<Scalars["String"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The current signature request. */
@@ -1594,6 +1598,8 @@ export type Petition = PetitionBase & {
   fromTemplateId: Maybe<Scalars["GID"]>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
+  /** Wether the completion message will be shown to the recipients or not. */
+  isCompletingMessageEnabled: Scalars["Boolean"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
@@ -1705,6 +1711,10 @@ export type PetitionBase = {
   attachments: Array<PetitionAttachment>;
   /** The closing email body of the petition. */
   closingEmailBody: Maybe<Scalars["JSON"]>;
+  /** The body of the optional completing message to be show to recipients */
+  completingMessageBody: Maybe<Scalars["JSON"]>;
+  /** The subject of the optional completing message to be show to recipients */
+  completingMessageSubject: Maybe<Scalars["String"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom user properties */
@@ -1721,6 +1731,8 @@ export type PetitionBase = {
   fields: Array<PetitionField>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
+  /** Wether the completion message will be shown to the recipients or not. */
+  isCompletingMessageEnabled: Scalars["Boolean"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
@@ -2245,6 +2257,10 @@ export type PetitionTemplate = PetitionBase & {
   categories: Maybe<Array<Scalars["String"]>>;
   /** The closing email body of the petition. */
   closingEmailBody: Maybe<Scalars["JSON"]>;
+  /** The body of the optional completing message to be show to recipients */
+  completingMessageBody: Maybe<Scalars["JSON"]>;
+  /** The subject of the optional completing message to be show to recipients */
+  completingMessageSubject: Maybe<Scalars["String"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom user properties */
@@ -2269,6 +2285,8 @@ export type PetitionTemplate = PetitionBase & {
   /** The ID of the petition or template. */
   id: Scalars["GID"];
   imageUrl: Maybe<Scalars["String"]>;
+  /** Wether the completion message will be shown to the recipients or not. */
+  isCompletingMessageEnabled: Scalars["Boolean"];
   /** Whether the template is publicly available or not */
   isPublic: Scalars["Boolean"];
   /**
@@ -2404,6 +2422,10 @@ export type PublicOrganization = {
 
 /** A public view of the petition */
 export type PublicPetition = Timestamps & {
+  /** The body of the optional completing message to be show to recipients. */
+  completingMessageBody: Maybe<Scalars["String"]>;
+  /** The subject of the optional completing message to be show to recipients */
+  completingMessageSubject: Maybe<Scalars["String"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The deadline of the petition. */
@@ -2412,6 +2434,8 @@ export type PublicPetition = Timestamps & {
   fields: Array<PublicPetitionField>;
   /** The ID of the petition. */
   id: Scalars["GID"];
+  /** Wether the completion message will be shown to the recipients or not. */
+  isCompletingMessageEnabled: Scalars["Boolean"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
@@ -3186,10 +3210,13 @@ export type UpdatePetitionFieldInput = {
 
 export type UpdatePetitionInput = {
   closingEmailBody?: InputMaybe<Scalars["JSON"]>;
+  completingMessageBody?: InputMaybe<Scalars["JSON"]>;
+  completingMessageSubject?: InputMaybe<Scalars["String"]>;
   deadline?: InputMaybe<Scalars["DateTime"]>;
   description?: InputMaybe<Scalars["JSON"]>;
   emailBody?: InputMaybe<Scalars["JSON"]>;
   emailSubject?: InputMaybe<Scalars["String"]>;
+  isCompletingMessageEnabled?: InputMaybe<Scalars["Boolean"]>;
   isRecipientViewContentsHidden?: InputMaybe<Scalars["Boolean"]>;
   locale?: InputMaybe<PetitionLocale>;
   name?: InputMaybe<Scalars["String"]>;

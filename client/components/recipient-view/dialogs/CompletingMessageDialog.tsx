@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   HStack,
   ModalBody,
@@ -52,7 +53,10 @@ function CompletingMessageDialog({
             </Text>
           ) : null}
           {bodyHtml ? (
-            <Text
+            <Box
+              sx={{
+                a: { color: "purple.600", _hover: { color: "purple.800" } },
+              }}
               overflowY="auto"
               fontSize="16px"
               marginBottom={4}
