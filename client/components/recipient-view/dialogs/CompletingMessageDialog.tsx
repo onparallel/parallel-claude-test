@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   HStack,
   ModalBody,
@@ -13,6 +12,7 @@ import { CircleCheckFilledIcon } from "@parallel/chakra/icons";
 import { BaseDialog } from "@parallel/components/common/dialogs/BaseDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { Divider } from "@parallel/components/common/Divider";
+import { HtmlBlock } from "@parallel/components/common/HtmlBlock";
 import { Link, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { Maybe } from "@parallel/utils/types";
@@ -53,15 +53,7 @@ function CompletingMessageDialog({
             </Text>
           ) : null}
           {bodyHtml ? (
-            <Box
-              sx={{
-                a: { color: "purple.600", _hover: { color: "purple.800" } },
-              }}
-              overflowY="auto"
-              fontSize="16px"
-              marginBottom={4}
-              dangerouslySetInnerHTML={{ __html: bodyHtml }}
-            />
+            <HtmlBlock html={bodyHtml} overflowY="auto" fontSize="16px" marginBottom={4} />
           ) : null}
         </ModalBody>
 

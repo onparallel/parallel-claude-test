@@ -14,6 +14,7 @@ import {
   UnorderedList,
 } from "@chakra-ui/react";
 import { DateTime } from "@parallel/components/common/DateTime";
+import { HtmlBlock } from "@parallel/components/common/HtmlBlock";
 import { Link, NakedLink } from "@parallel/components/common/Link";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { UserAvatar } from "@parallel/components/common/UserAvatar";
@@ -252,12 +253,7 @@ function LandingTemplateDetails({
                 />
               </Text>
               {descriptionHtml ? (
-                <Box
-                  sx={{
-                    a: { color: "purple.600", _hover: { color: "purple.800" } },
-                  }}
-                  dangerouslySetInnerHTML={{ __html: descriptionHtml }}
-                />
+                <HtmlBlock html={descriptionHtml} />
               ) : (
                 <Text textStyle="hint">
                   <FormattedMessage

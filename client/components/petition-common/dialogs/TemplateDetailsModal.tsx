@@ -35,6 +35,7 @@ import {
   UserArrowIcon,
 } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
+import { HtmlBlock } from "@parallel/components/common/HtmlBlock";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { TemplateActiveSettingsIcons } from "@parallel/components/petition-new/TemplateActiveSettingsIcons";
 import {
@@ -316,12 +317,7 @@ export function TemplateDetailsModal({
 
                 <AccordionPanel paddingBottom={3}>
                   {template.descriptionHtml ? (
-                    <Box
-                      sx={{
-                        a: { color: "purple.600", _hover: { color: "purple.800" } },
-                      }}
-                      dangerouslySetInnerHTML={{ __html: template.descriptionHtml }}
-                    />
+                    <HtmlBlock html={template.descriptionHtml} />
                   ) : (
                     <Text textAlign="center" textStyle="hint">
                       <FormattedMessage
