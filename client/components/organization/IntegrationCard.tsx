@@ -11,6 +11,7 @@ interface IntegrationCardProps extends StackProps {
   isDisabled: boolean;
   showButton: boolean;
   route: string;
+  isExternal?: boolean;
 }
 
 export function IntegrationCard({
@@ -21,6 +22,7 @@ export function IntegrationCard({
   isDisabled,
   showButton,
   route,
+  isExternal,
   ...props
 }: IntegrationCardProps) {
   const titleElement = isDisabled ? (
@@ -29,7 +31,7 @@ export function IntegrationCard({
     </Text>
   ) : (
     <NakedLink passHref href={route}>
-      <LinkOverlay>
+      <LinkOverlay isExternal={isExternal}>
         <Text fontSize="xl" as="h3" fontWeight="bold">
           {title}
         </Text>

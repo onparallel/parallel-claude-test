@@ -58,7 +58,7 @@ function OrganizationIntegrations() {
       route: "/app/organization/integrations/signature",
     },
     {
-      isDisabled: true,
+      isDisabled: false,
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/zapier.png`}
@@ -72,8 +72,9 @@ function OrganizationIntegrations() {
         id: "organization.integrations.zapier-description",
         defaultMessage: "Automate your workflows using its +400 services.",
       }),
-      showButton: false,
-      route: "",
+      showButton: true,
+      route: "https://zapier.com/apps/parallel/integrations",
+      isExternal: true,
     },
     {
       isDisabled: !me.hasDeveloperAccess,
