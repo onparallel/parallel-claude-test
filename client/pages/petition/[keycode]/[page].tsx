@@ -82,6 +82,10 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
     hideInternalFields: true,
   });
 
+  const showFullScreenDialog =
+    petition.isCompletingMessageEnabled &&
+    (petition.completingMessageBody || petition.completingMessageSubject);
+
   const showErrorDialog = useErrorDialog();
   const [finalized, setFinalized] = useState(false);
   const [publicCompletePetition] = useMutation(RecipientView_publicCompletePetitionDocument);
@@ -123,7 +127,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
           if (petition.signatureConfig?.review) {
             await showReviewBeforeSigningDialog({ granter, tone });
           }
-          if (!toast.isActive("petition-completed-toast")) {
+          if (!toast.isActive("petition-completed-toast") && !showFullScreenDialog) {
             toast({
               id: "petition-completed-toast",
               title: intl.formatMessage({
@@ -141,10 +145,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
               isClosable: true,
             });
           }
-          if (
-            petition.isCompletingMessageEnabled &&
-            (petition.completingMessageBody || petition.completingMessageSubject)
-          ) {
+          if (showFullScreenDialog) {
             await withError(
               showCompletingMessageDialog({
                 subject: petition.completingMessageSubject ?? null,
