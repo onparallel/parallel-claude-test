@@ -2195,6 +2195,11 @@
     "context": "Add signature"
   },
   {
+    "term": "component.petition-signatures-card.access-file-nd",
+    "definition": "Acceder al archivo en NetDocuments",
+    "context": "Access file in NetDocuments"
+  },
+  {
     "term": "component.petition-signatures-card.edit-signers",
     "definition": "Editar firmantes",
     "context": "Edit signers"

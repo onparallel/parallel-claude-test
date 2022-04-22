@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Heading } from "@chakra-ui/react";
-import { BellIcon } from "@parallel/chakra/icons";
+import { Box, Button, Heading, HStack } from "@chakra-ui/react";
+import { BellIcon, NetDocumentsIcon } from "@parallel/chakra/icons";
 import { CurrentSignatureRequestRow_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { withError } from "@parallel/utils/promises/withError";
 import { Fragment } from "react";
@@ -102,9 +102,23 @@ export function CurrentSignatureRequestRow({
             </Button>
           </>
         ) : status === "COMPLETED" ? (
-          <Button width="24" colorScheme="purple" onClick={() => onDownload(signatureRequest.id)}>
-            <FormattedMessage id="generic.download" defaultMessage="Download" />
-          </Button>
+          <HStack>
+            {signatureRequest.metadata.SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS ? (
+              <IconButtonWithTooltip
+                as="a"
+                href={`https://eu.netdocuments.com/neWeb2/goid.aspx?id=${signatureRequest.metadata.SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS}`}
+                target="_href"
+                icon={<NetDocumentsIcon fontSize="xl" />}
+                label={intl.formatMessage({
+                  id: "component.petition-signatures-card.access-file-nd",
+                  defaultMessage: "Access file in NetDocuments",
+                })}
+              />
+            ) : null}
+            <Button width="24" colorScheme="purple" onClick={() => onDownload(signatureRequest.id)}>
+              <FormattedMessage id="generic.download" defaultMessage="Download" />
+            </Button>
+          </HStack>
         ) : null}
       </Box>
     </>
@@ -122,6 +136,7 @@ CurrentSignatureRequestRow.fragments = {
         }
         ...PetitionSignatureRequestSignerStatusIcon_SignerStatus
       }
+      metadata
     }
     ${SignerReference.fragments.PetitionSigner}
     ${PetitionSignatureRequestSignerStatusIcon.fragments.SignerStatus}

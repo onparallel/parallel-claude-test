@@ -1,9 +1,11 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, GridItem, Heading } from "@chakra-ui/react";
+import { Box, Button, Flex, GridItem, Heading, HStack } from "@chakra-ui/react";
+import { NetDocumentsIcon } from "@parallel/chakra/icons";
 import { OlderSignatureRequestRows_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { Fragment } from "react";
-import { FormattedList, FormattedMessage } from "react-intl";
+import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../common/Divider";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SignerReference } from "../common/SignerReference";
 import { PetitionSignatureRequestStatusText } from "./PetitionSignatureRequestStatusText";
 
@@ -14,6 +16,7 @@ export function OlderSignatureRequestRows({
   signatures: OlderSignatureRequestRows_PetitionSignatureRequestFragment[];
   onDownload: (petitionSignatureRequestId: string) => void;
 }) {
+  const intl = useIntl();
   return (
     <>
       <GridItem colSpan={3}>
@@ -42,9 +45,29 @@ export function OlderSignatureRequestRows({
           </GridItem>
           {signature.status === "COMPLETED" ? (
             <Flex justifyContent="flex-end" padding={2} paddingRight={4}>
-              <Button width="24" fontSize="sm" height={8} onClick={() => onDownload(signature.id)}>
-                <FormattedMessage id="generic.download" defaultMessage="Download" />
-              </Button>
+              <HStack>
+                {signature.metadata.SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS ? (
+                  <IconButtonWithTooltip
+                    size="sm"
+                    as="a"
+                    href={`https://eu.netdocuments.com/neWeb2/goid.aspx?id=${signature.metadata.SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS}`}
+                    target="_href"
+                    icon={<NetDocumentsIcon fontSize="md" />}
+                    label={intl.formatMessage({
+                      id: "component.petition-signatures-card.access-file-nd",
+                      defaultMessage: "Access file in NetDocuments",
+                    })}
+                  />
+                ) : null}
+                <Button
+                  width="24"
+                  fontSize="sm"
+                  height={8}
+                  onClick={() => onDownload(signature.id)}
+                >
+                  <FormattedMessage id="generic.download" defaultMessage="Download" />
+                </Button>
+              </HStack>
             </Flex>
           ) : null}
         </Fragment>
@@ -63,6 +86,7 @@ OlderSignatureRequestRows.fragments = {
           ...SignerReference_PetitionSigner
         }
       }
+      metadata
     }
     ${SignerReference.fragments.PetitionSigner}
   `,
