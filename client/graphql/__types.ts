@@ -635,6 +635,8 @@ export interface Mutation {
   updatePetitionFieldReply: PetitionFieldReply;
   /** Updates the metadata of the specified petition field reply */
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
+  /** Updates the metadata of the specified petition */
+  updatePetitionMetadata: Petition;
   /** Updates the subscription flag on a PetitionPermission */
   updatePetitionPermissionSubscription: Petition;
   /** Updates the restriction preferences */
@@ -1358,6 +1360,11 @@ export interface MutationupdatePetitionFieldReplyMetadataArgs {
   replyId: Scalars["GID"];
 }
 
+export interface MutationupdatePetitionMetadataArgs {
+  metadata: Scalars["JSONObject"];
+  petitionId: Scalars["GID"];
+}
+
 export interface MutationupdatePetitionPermissionSubscriptionArgs {
   isSubscribed: Scalars["Boolean"];
   petitionId: Scalars["GID"];
@@ -1634,6 +1641,8 @@ export interface Petition extends PetitionBase {
   isRestrictedWithPassword: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
+  /** Metadata for this petition. */
+  metadata: Scalars["JSONObject"];
   /** The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates). */
   myEffectivePermission?: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
@@ -1763,6 +1772,8 @@ export interface PetitionBase {
   isRestrictedWithPassword: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
+  /** Metadata for this petition. */
+  metadata: Scalars["JSONObject"];
   /** The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates). */
   myEffectivePermission?: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
@@ -2339,6 +2350,8 @@ export interface PetitionTemplate extends PetitionBase {
   isRestrictedWithPassword: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
+  /** Metadata for this petition. */
+  metadata: Scalars["JSONObject"];
   /** The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates). */
   myEffectivePermission?: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
@@ -7536,6 +7549,112 @@ export type TemplateDetailsModal_PetitionTemplateFragment = {
   >;
 };
 
+export type useNetDocumentsExport_PetitionFragment = {
+  __typename?: "Petition";
+  id: string;
+  name?: string | null;
+  metadata: { [key: string]: any };
+  fields: Array<{
+    __typename?: "PetitionField";
+    type: PetitionFieldType;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      metadata: { [key: string]: any };
+      content: { [key: string]: any };
+    }>;
+  }>;
+  currentSignatureRequest?: {
+    __typename?: "PetitionSignatureRequest";
+    id: string;
+    metadata: { [key: string]: any };
+    auditTrailFilename?: string | null;
+    signedDocumentFilename?: string | null;
+  } | null;
+};
+
+export type useNetDocumentsExport_PetitionSignatureRequestFragment = {
+  __typename?: "PetitionSignatureRequest";
+  id: string;
+  metadata: { [key: string]: any };
+  auditTrailFilename?: string | null;
+  signedDocumentFilename?: string | null;
+};
+
+export type useNetDocumentsExport_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  type: PetitionFieldType;
+};
+
+export type useNetDocumentsExport_PetitionFieldReplyFragment = {
+  __typename?: "PetitionFieldReply";
+  id: string;
+  metadata: { [key: string]: any };
+  content: { [key: string]: any };
+};
+
+export type useNetDocumentsExport_fileUploadReplyDownloadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+}>;
+
+export type useNetDocumentsExport_fileUploadReplyDownloadLinkMutation = {
+  fileUploadReplyDownloadLink: {
+    __typename?: "FileUploadDownloadLinkResult";
+    result: Result;
+    url?: string | null;
+  };
+};
+
+export type useNetDocumentsExport_signedPetitionDownloadLinkMutationVariables = Exact<{
+  petitionSignatureRequestId: Scalars["GID"];
+  downloadAuditTrail?: InputMaybe<Scalars["Boolean"]>;
+}>;
+
+export type useNetDocumentsExport_signedPetitionDownloadLinkMutation = {
+  signedPetitionDownloadLink: {
+    __typename?: "FileUploadDownloadLinkResult";
+    result: Result;
+    url?: string | null;
+  };
+};
+
+export type useNetDocumentsExport_updatePetitionMetadataMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  metadata: Scalars["JSONObject"];
+}>;
+
+export type useNetDocumentsExport_updatePetitionMetadataMutation = {
+  updatePetitionMetadata: { __typename?: "Petition"; id: string; metadata: { [key: string]: any } };
+};
+
+export type useNetDocumentsExport_updatePetitionFieldReplyMetadataMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+  metadata: Scalars["JSONObject"];
+}>;
+
+export type useNetDocumentsExport_updatePetitionFieldReplyMetadataMutation = {
+  updatePetitionFieldReplyMetadata: {
+    __typename?: "PetitionFieldReply";
+    id: string;
+    metadata: { [key: string]: any };
+  };
+};
+
+export type useNetDocumentsExport_updateSignatureRequestMetadataMutationVariables = Exact<{
+  petitionSignatureRequestId: Scalars["GID"];
+  metadata: Scalars["JSONObject"];
+}>;
+
+export type useNetDocumentsExport_updateSignatureRequestMetadataMutation = {
+  updateSignatureRequestMetadata: {
+    __typename?: "PetitionSignatureRequest";
+    id: string;
+    metadata: { [key: string]: any };
+  };
+};
+
 export type useSendPetitionHandler_UserFragment = {
   __typename?: "User";
   id: string;
@@ -8893,6 +9012,7 @@ export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
   __typename?: "PetitionSignatureRequest";
   id: string;
   status: PetitionSignatureRequestStatus;
+  metadata: { [key: string]: any };
   signerStatus: Array<{
     __typename?: "PetitionSignatureRequestSignerStatus";
     status: string;
@@ -8953,6 +9073,7 @@ export type OlderSignatureRequestRows_PetitionSignatureRequestFragment = {
   __typename?: "PetitionSignatureRequest";
   id: string;
   status: PetitionSignatureRequestStatus;
+  metadata: { [key: string]: any };
   signatureConfig: {
     __typename?: "SignatureConfig";
     signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string }>;
@@ -9168,6 +9289,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
     __typename?: "PetitionSignatureRequest";
     id: string;
     status: PetitionSignatureRequestStatus;
+    metadata: { [key: string]: any };
     signerStatus: Array<{
       __typename?: "PetitionSignatureRequestSignerStatus";
       status: string;
@@ -9239,6 +9361,7 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
           __typename?: "PetitionSignatureRequest";
           id: string;
           status: PetitionSignatureRequestStatus;
+          metadata: { [key: string]: any };
           signerStatus: Array<{
             __typename?: "PetitionSignatureRequestSignerStatus";
             status: string;
@@ -9364,6 +9487,16 @@ export type ExportRepliesDialog_PetitionFieldFragment = {
 export type ExportRepliesProgressDialog_PetitionFragment = {
   __typename?: "Petition";
   id: string;
+  name?: string | null;
+  metadata: { [key: string]: any };
+  currentSignatureRequest?: {
+    __typename?: "PetitionSignatureRequest";
+    signedDocumentFilename?: string | null;
+    auditTrailFilename?: string | null;
+    status: PetitionSignatureRequestStatus;
+    id: string;
+    metadata: { [key: string]: any };
+  } | null;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -9371,19 +9504,11 @@ export type ExportRepliesProgressDialog_PetitionFragment = {
     title?: string | null;
     replies: Array<{
       __typename?: "PetitionFieldReply";
+      content: { [key: string]: any };
       id: string;
       metadata: { [key: string]: any };
-      content: { [key: string]: any };
     }>;
   }>;
-  currentSignatureRequest?: {
-    __typename?: "PetitionSignatureRequest";
-    id: string;
-    status: PetitionSignatureRequestStatus;
-    signedDocumentFilename?: string | null;
-    auditTrailFilename?: string | null;
-    metadata: { [key: string]: any };
-  } | null;
 };
 
 export type ExportRepliesProgressDialog_petitionQueryVariables = Exact<{
@@ -9395,6 +9520,16 @@ export type ExportRepliesProgressDialog_petitionQuery = {
     | {
         __typename?: "Petition";
         id: string;
+        name?: string | null;
+        metadata: { [key: string]: any };
+        currentSignatureRequest?: {
+          __typename?: "PetitionSignatureRequest";
+          signedDocumentFilename?: string | null;
+          auditTrailFilename?: string | null;
+          status: PetitionSignatureRequestStatus;
+          id: string;
+          metadata: { [key: string]: any };
+        } | null;
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -9402,75 +9537,14 @@ export type ExportRepliesProgressDialog_petitionQuery = {
           title?: string | null;
           replies: Array<{
             __typename?: "PetitionFieldReply";
+            content: { [key: string]: any };
             id: string;
             metadata: { [key: string]: any };
-            content: { [key: string]: any };
           }>;
         }>;
-        currentSignatureRequest?: {
-          __typename?: "PetitionSignatureRequest";
-          id: string;
-          status: PetitionSignatureRequestStatus;
-          signedDocumentFilename?: string | null;
-          auditTrailFilename?: string | null;
-          metadata: { [key: string]: any };
-        } | null;
       }
     | { __typename?: "PetitionTemplate" }
     | null;
-};
-
-export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
-}>;
-
-export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation = {
-  fileUploadReplyDownloadLink: {
-    __typename?: "FileUploadDownloadLinkResult";
-    result: Result;
-    url?: string | null;
-  };
-};
-
-export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationVariables = Exact<{
-  petitionSignatureRequestId: Scalars["GID"];
-  downloadAuditTrail?: InputMaybe<Scalars["Boolean"]>;
-}>;
-
-export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutation = {
-  signedPetitionDownloadLink: {
-    __typename?: "FileUploadDownloadLinkResult";
-    result: Result;
-    url?: string | null;
-  };
-};
-
-export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
-  metadata: Scalars["JSONObject"];
-}>;
-
-export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation = {
-  updatePetitionFieldReplyMetadata: {
-    __typename?: "PetitionFieldReply";
-    id: string;
-    metadata: { [key: string]: any };
-  };
-};
-
-export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationVariables = Exact<{
-  petitionSignatureRequestId: Scalars["GID"];
-  metadata: Scalars["JSONObject"];
-}>;
-
-export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutation = {
-  updateSignatureRequestMetadata: {
-    __typename?: "PetitionSignatureRequest";
-    id: string;
-    metadata: { [key: string]: any };
-  };
 };
 
 export type PublicSignupForm_emailIsAvailableQueryVariables = Exact<{
@@ -16210,6 +16284,7 @@ export type PetitionReplies_PetitionFragment = {
     __typename?: "PetitionSignatureRequest";
     id: string;
     status: PetitionSignatureRequestStatus;
+    metadata: { [key: string]: any };
     signerStatus: Array<{
       __typename?: "PetitionSignatureRequestSignerStatus";
       status: string;
@@ -16514,6 +16589,7 @@ export type PetitionReplies_closePetitionMutation = {
       __typename?: "PetitionSignatureRequest";
       id: string;
       status: PetitionSignatureRequestStatus;
+      metadata: { [key: string]: any };
       signerStatus: Array<{
         __typename?: "PetitionSignatureRequestSignerStatus";
         status: string;
@@ -16681,6 +16757,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       __typename?: "PetitionSignatureRequest";
       id: string;
       status: PetitionSignatureRequestStatus;
+      metadata: { [key: string]: any };
       signerStatus: Array<{
         __typename?: "PetitionSignatureRequestSignerStatus";
         status: string;
@@ -16949,6 +17026,7 @@ export type PetitionReplies_petitionQuery = {
           __typename?: "PetitionSignatureRequest";
           id: string;
           status: PetitionSignatureRequestStatus;
+          metadata: { [key: string]: any };
           signerStatus: Array<{
             __typename?: "PetitionSignatureRequestSignerStatus";
             status: string;
@@ -19257,6 +19335,7 @@ export type PetitionSignaturesCardPolling_petitionQuery = {
           __typename?: "PetitionSignatureRequest";
           id: string;
           status: PetitionSignatureRequestStatus;
+          metadata: { [key: string]: any };
           signerStatus: Array<{
             __typename?: "PetitionSignatureRequestSignerStatus";
             status: string;
@@ -20282,6 +20361,45 @@ export const PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReply
   PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragment,
   unknown
 >;
+export const useNetDocumentsExport_PetitionFieldFragmentDoc = gql`
+  fragment useNetDocumentsExport_PetitionField on PetitionField {
+    type
+  }
+` as unknown as DocumentNode<useNetDocumentsExport_PetitionFieldFragment, unknown>;
+export const useNetDocumentsExport_PetitionFieldReplyFragmentDoc = gql`
+  fragment useNetDocumentsExport_PetitionFieldReply on PetitionFieldReply {
+    id
+    metadata
+    content
+  }
+` as unknown as DocumentNode<useNetDocumentsExport_PetitionFieldReplyFragment, unknown>;
+export const useNetDocumentsExport_PetitionSignatureRequestFragmentDoc = gql`
+  fragment useNetDocumentsExport_PetitionSignatureRequest on PetitionSignatureRequest {
+    id
+    metadata
+    auditTrailFilename
+    signedDocumentFilename
+  }
+` as unknown as DocumentNode<useNetDocumentsExport_PetitionSignatureRequestFragment, unknown>;
+export const useNetDocumentsExport_PetitionFragmentDoc = gql`
+  fragment useNetDocumentsExport_Petition on Petition {
+    id
+    name
+    metadata
+    fields {
+      ...useNetDocumentsExport_PetitionField
+      replies {
+        ...useNetDocumentsExport_PetitionFieldReply
+      }
+    }
+    currentSignatureRequest {
+      ...useNetDocumentsExport_PetitionSignatureRequest
+    }
+  }
+  ${useNetDocumentsExport_PetitionFieldFragmentDoc}
+  ${useNetDocumentsExport_PetitionFieldReplyFragmentDoc}
+  ${useNetDocumentsExport_PetitionSignatureRequestFragmentDoc}
+` as unknown as DocumentNode<useNetDocumentsExport_PetitionFragment, unknown>;
 export const useFilenamePlaceholdersRename_PetitionFieldFragmentDoc = gql`
   fragment useFilenamePlaceholdersRename_PetitionField on PetitionField {
     id
@@ -20297,24 +20415,20 @@ export const useFilenamePlaceholdersRename_PetitionFieldReplyFragmentDoc = gql`
 export const ExportRepliesProgressDialog_PetitionFragmentDoc = gql`
   fragment ExportRepliesProgressDialog_Petition on Petition {
     id
+    ...useNetDocumentsExport_Petition
+    currentSignatureRequest {
+      signedDocumentFilename
+      auditTrailFilename
+      status
+    }
     fields {
-      id
-      type
       ...useFilenamePlaceholdersRename_PetitionField
       replies {
-        id
-        metadata
         ...useFilenamePlaceholdersRename_PetitionFieldReply
       }
     }
-    currentSignatureRequest {
-      id
-      status
-      signedDocumentFilename
-      auditTrailFilename
-      metadata
-    }
   }
+  ${useNetDocumentsExport_PetitionFragmentDoc}
   ${useFilenamePlaceholdersRename_PetitionFieldFragmentDoc}
   ${useFilenamePlaceholdersRename_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<ExportRepliesProgressDialog_PetitionFragment, unknown>;
@@ -22490,6 +22604,7 @@ export const CurrentSignatureRequestRow_PetitionSignatureRequestFragmentDoc = gq
       }
       ...PetitionSignatureRequestSignerStatusIcon_SignerStatus
     }
+    metadata
   }
   ${SignerReference_PetitionSignerFragmentDoc}
   ${PetitionSignatureRequestSignerStatusIcon_SignerStatusFragmentDoc}
@@ -22503,6 +22618,7 @@ export const OlderSignatureRequestRows_PetitionSignatureRequestFragmentDoc = gql
         ...SignerReference_PetitionSigner
       }
     }
+    metadata
   }
   ${SignerReference_PetitionSignerFragmentDoc}
 ` as unknown as DocumentNode<OlderSignatureRequestRows_PetitionSignatureRequestFragment, unknown>;
@@ -23570,6 +23686,81 @@ export const PublicLinkSettingsDialog_isValidSlugDocument = gql`
   PublicLinkSettingsDialog_isValidSlugQuery,
   PublicLinkSettingsDialog_isValidSlugQueryVariables
 >;
+export const useNetDocumentsExport_fileUploadReplyDownloadLinkDocument = gql`
+  mutation useNetDocumentsExport_fileUploadReplyDownloadLink($petitionId: GID!, $replyId: GID!) {
+    fileUploadReplyDownloadLink(petitionId: $petitionId, replyId: $replyId) {
+      result
+      url
+    }
+  }
+` as unknown as DocumentNode<
+  useNetDocumentsExport_fileUploadReplyDownloadLinkMutation,
+  useNetDocumentsExport_fileUploadReplyDownloadLinkMutationVariables
+>;
+export const useNetDocumentsExport_signedPetitionDownloadLinkDocument = gql`
+  mutation useNetDocumentsExport_signedPetitionDownloadLink(
+    $petitionSignatureRequestId: GID!
+    $downloadAuditTrail: Boolean
+  ) {
+    signedPetitionDownloadLink(
+      petitionSignatureRequestId: $petitionSignatureRequestId
+      downloadAuditTrail: $downloadAuditTrail
+    ) {
+      result
+      url
+    }
+  }
+` as unknown as DocumentNode<
+  useNetDocumentsExport_signedPetitionDownloadLinkMutation,
+  useNetDocumentsExport_signedPetitionDownloadLinkMutationVariables
+>;
+export const useNetDocumentsExport_updatePetitionMetadataDocument = gql`
+  mutation useNetDocumentsExport_updatePetitionMetadata($petitionId: GID!, $metadata: JSONObject!) {
+    updatePetitionMetadata(petitionId: $petitionId, metadata: $metadata) {
+      id
+      metadata
+    }
+  }
+` as unknown as DocumentNode<
+  useNetDocumentsExport_updatePetitionMetadataMutation,
+  useNetDocumentsExport_updatePetitionMetadataMutationVariables
+>;
+export const useNetDocumentsExport_updatePetitionFieldReplyMetadataDocument = gql`
+  mutation useNetDocumentsExport_updatePetitionFieldReplyMetadata(
+    $petitionId: GID!
+    $replyId: GID!
+    $metadata: JSONObject!
+  ) {
+    updatePetitionFieldReplyMetadata(
+      petitionId: $petitionId
+      replyId: $replyId
+      metadata: $metadata
+    ) {
+      id
+      metadata
+    }
+  }
+` as unknown as DocumentNode<
+  useNetDocumentsExport_updatePetitionFieldReplyMetadataMutation,
+  useNetDocumentsExport_updatePetitionFieldReplyMetadataMutationVariables
+>;
+export const useNetDocumentsExport_updateSignatureRequestMetadataDocument = gql`
+  mutation useNetDocumentsExport_updateSignatureRequestMetadata(
+    $petitionSignatureRequestId: GID!
+    $metadata: JSONObject!
+  ) {
+    updateSignatureRequestMetadata(
+      petitionSignatureRequestId: $petitionSignatureRequestId
+      metadata: $metadata
+    ) {
+      id
+      metadata
+    }
+  }
+` as unknown as DocumentNode<
+  useNetDocumentsExport_updateSignatureRequestMetadataMutation,
+  useNetDocumentsExport_updateSignatureRequestMetadataMutationVariables
+>;
 export const useSendPetitionHandler_sendPetitionDocument = gql`
   mutation useSendPetitionHandler_sendPetition(
     $petitionId: GID!
@@ -24226,73 +24417,6 @@ export const ExportRepliesProgressDialog_petitionDocument = gql`
 ` as unknown as DocumentNode<
   ExportRepliesProgressDialog_petitionQuery,
   ExportRepliesProgressDialog_petitionQueryVariables
->;
-export const ExportRepliesProgressDialog_fileUploadReplyDownloadLinkDocument = gql`
-  mutation ExportRepliesProgressDialog_fileUploadReplyDownloadLink(
-    $petitionId: GID!
-    $replyId: GID!
-  ) {
-    fileUploadReplyDownloadLink(petitionId: $petitionId, replyId: $replyId) {
-      result
-      url
-    }
-  }
-` as unknown as DocumentNode<
-  ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation,
-  ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationVariables
->;
-export const ExportRepliesProgressDialog_signedPetitionDownloadLinkDocument = gql`
-  mutation ExportRepliesProgressDialog_signedPetitionDownloadLink(
-    $petitionSignatureRequestId: GID!
-    $downloadAuditTrail: Boolean
-  ) {
-    signedPetitionDownloadLink(
-      petitionSignatureRequestId: $petitionSignatureRequestId
-      downloadAuditTrail: $downloadAuditTrail
-    ) {
-      result
-      url
-    }
-  }
-` as unknown as DocumentNode<
-  ExportRepliesProgressDialog_signedPetitionDownloadLinkMutation,
-  ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationVariables
->;
-export const ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataDocument = gql`
-  mutation ExportRepliesProgressDialog_updatePetitionFieldReplyMetadata(
-    $petitionId: GID!
-    $replyId: GID!
-    $metadata: JSONObject!
-  ) {
-    updatePetitionFieldReplyMetadata(
-      petitionId: $petitionId
-      replyId: $replyId
-      metadata: $metadata
-    ) {
-      id
-      metadata
-    }
-  }
-` as unknown as DocumentNode<
-  ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation,
-  ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutationVariables
->;
-export const ExportRepliesProgressDialog_updateSignatureRequestMetadataDocument = gql`
-  mutation ExportRepliesProgressDialog_updateSignatureRequestMetadata(
-    $petitionSignatureRequestId: GID!
-    $metadata: JSONObject!
-  ) {
-    updateSignatureRequestMetadata(
-      petitionSignatureRequestId: $petitionSignatureRequestId
-      metadata: $metadata
-    ) {
-      id
-      metadata
-    }
-  }
-` as unknown as DocumentNode<
-  ExportRepliesProgressDialog_updateSignatureRequestMetadataMutation,
-  ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationVariables
 >;
 export const PublicSignupForm_emailIsAvailableDocument = gql`
   query PublicSignupForm_emailIsAvailable($email: String!) {

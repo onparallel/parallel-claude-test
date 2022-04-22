@@ -206,6 +206,10 @@ export const PetitionBase = interfaceType({
       description: "The attachments linked to this petition",
       resolve: async (o, _, ctx) => await ctx.petitions.loadPetitionAttachmentsByPetitionId(o.id),
     });
+    t.jsonObject("metadata", {
+      description: "Metadata for this petition.",
+      resolve: (o) => o.metadata,
+    });
   },
   resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),
   sourceType: "db.Petition",

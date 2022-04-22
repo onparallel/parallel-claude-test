@@ -1,9 +1,8 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import {
   Box,
   Button,
   Center,
-  Checkbox,
   ModalBody,
   ModalContent,
   ModalFooter,
@@ -15,20 +14,11 @@ import {
 } from "@chakra-ui/react";
 import { CheckIcon, CloudUploadIcon } from "@parallel/chakra/icons";
 import { BaseDialog } from "@parallel/components/common/dialogs/BaseDialog";
-import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import { NormalLink } from "@parallel/components/common/Link";
-import {
-  ExportRepliesProgressDialog_fileUploadReplyDownloadLinkDocument,
-  ExportRepliesProgressDialog_petitionDocument,
-  ExportRepliesProgressDialog_signedPetitionDownloadLinkDocument,
-  ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataDocument,
-  ExportRepliesProgressDialog_updateSignatureRequestMetadataDocument,
-} from "@parallel/graphql/__types";
-import { useBackgroundTask } from "@parallel/utils/useBackgroundTask";
+import { useNetDocumentsExport } from "@parallel/components/petition-common/useNetDocumentsExport";
+import { ExportRepliesProgressDialog_petitionDocument } from "@parallel/graphql/__types";
 import { useFilenamePlaceholdersRename } from "@parallel/utils/useFilenamePlaceholders";
-import deepmerge from "deepmerge";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { countBy } from "remeda";
@@ -37,51 +27,6 @@ export interface ExportRepliesProgressDialogProps {
   externalClientId: string;
   petitionId: string;
   pattern: string;
-}
-
-function exportFile(
-  url: string,
-  fileName: string,
-  externalClientId: string,
-  signal: AbortSignal,
-  onProgress: (event: ProgressEvent) => void
-) {
-  return new Promise<string>((resolve, reject) => {
-    const download = new XMLHttpRequest();
-    signal.addEventListener("abort", () => download.abort());
-    download.open("GET", url);
-    download.responseType = "blob";
-    download.onprogress = function (e) {
-      onProgress(e);
-    };
-    download.onload = async function () {
-      const body = new FormData();
-      body.append("IdClient", externalClientId);
-      body.append("IdMatter", "CLIENT_INFO");
-      body.append("IdArea", "");
-      body.append("IdAdminGroup", "");
-      body.append("Folder", "");
-      body.append("DocType", "41");
-      body.append("File", new File([this.response], fileName));
-      try {
-        const res = await fetch("https://localhost:50500/api/v1/netdocuments/uploaddocument", {
-          method: "POST",
-          body,
-          headers: new Headers({ AppName: "Parallel" }),
-          signal,
-        });
-        const result = await res.json();
-        if (res.ok) {
-          resolve(result.IdND);
-        } else {
-          reject(result);
-        }
-      } catch (e: any) {
-        reject(e);
-      }
-    };
-    download.send();
-  });
 }
 
 export function ExportRepliesProgressDialog({
@@ -93,29 +38,18 @@ export function ExportRepliesProgressDialog({
   const intl = useIntl();
   const [progress, setProgress] = useState(0);
   const [state, setState] = useState<"LOADING" | "UPLOADING" | "FINISHED">("LOADING");
-  const { data } = useQuery(ExportRepliesProgressDialog_petitionDocument, {
+  const { data, refetch } = useQuery(ExportRepliesProgressDialog_petitionDocument, {
     variables: { petitionId },
   });
   const isRunning = useRef(false);
   const placeholdersRename = useFilenamePlaceholdersRename();
-  const [fileUploadReplyDownloadLink] = useMutation(
-    ExportRepliesProgressDialog_fileUploadReplyDownloadLinkDocument
-  );
-  const [signedPetitionDownloadLink] = useMutation(
-    ExportRepliesProgressDialog_signedPetitionDownloadLinkDocument
-  );
-  const [updatePetitionFieldReplyMetadata] = useMutation(
-    ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataDocument
-  );
-  const [updateSignatureRequestMetadata] = useMutation(
-    ExportRepliesProgressDialog_updateSignatureRequestMetadataDocument
-  );
-
-  const exportExcelTask = useBackgroundTask("EXPORT_EXCEL");
 
   const { current: abort } = useRef(new AbortController());
-  const showAlreadyExported = useDialog(AlreadyExportedDialog);
+
   const showErrorDialog = useErrorDialog();
+
+  const netDocuments = useNetDocumentsExport(externalClientId);
+
   useEffect(() => {
     async function exportReplies() {
       const petition = data!.petition!;
@@ -129,174 +63,89 @@ export function ExportRepliesProgressDialog({
 
       const hasTextReplies = !!replies.find((r) => r.field.type !== "FILE_UPLOAD");
 
-      const signatureDocs = [];
-      if (petition.currentSignatureRequest?.status === "COMPLETED") {
-        signatureDocs.push({
-          type: "signed-document",
-          externalId:
-            petition.currentSignatureRequest.metadata.SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS,
-          filename: petition.currentSignatureRequest.signedDocumentFilename!,
-        });
+      const hasSignedDocument =
+        petition.currentSignatureRequest?.status === "COMPLETED" &&
+        !!petition.currentSignatureRequest.signedDocumentFilename;
 
-        // audit trail may not be able to export at the time
-        if (petition.currentSignatureRequest.auditTrailFilename) {
-          signatureDocs.push({
-            type: "audit-trail",
-            externalId:
-              petition.currentSignatureRequest.metadata.AUDIT_TRAIL_EXTERNAL_ID_CUATRECASAS,
-            filename: petition.currentSignatureRequest.auditTrailFilename,
-          });
-        }
-      }
+      const hasAuditTrail =
+        petition.currentSignatureRequest?.status === "COMPLETED" &&
+        !!petition.currentSignatureRequest.auditTrailFilename;
 
       const totalFiles =
-        (hasTextReplies
-          ? 1 // exported excel with text replies
-          : 0) +
+        (hasTextReplies ? 1 : 0) + // exported excel with text replies
         countBy(replies, (r) => r.field.type === "FILE_UPLOAD") + // every uploaded file reply
-        signatureDocs.length; // signed doc + audit trail
+        (hasSignedDocument ? 1 : 0) + // signed doc
+        (hasAuditTrail ? 1 : 0) + // audit trail
+        1; // PDF document;
 
       setState("UPLOADING");
       let uploaded = 0;
-      let dontAskAgain = false;
-      let exportAgain = false;
-
       let excelExternalId: null | string = null;
-      if (hasTextReplies) {
-        try {
-          const exportedExcel = await exportExcelTask(petition.id);
-          excelExternalId = await exportFile(
-            exportedExcel.url!,
-            exportedExcel.task.output!.filename,
-            externalClientId,
-            abort.signal,
-            ({ loaded, total }) => setProgress((uploaded + (loaded / total) * 0.5) / totalFiles)
+
+      try {
+        if (hasTextReplies) {
+          excelExternalId = await netDocuments.exportExcel(petition, {
+            signal: abort.signal,
+            onProgress: ({ loaded, total }) =>
+              setProgress((uploaded + (loaded / total) * 0.5) / totalFiles),
+          });
+          setProgress(++uploaded / totalFiles);
+        }
+
+        for (const { reply, field } of replies) {
+          const fieldType = await netDocuments.exportFieldReply(
+            {
+              petitionId: petition.id,
+              excelExternalId,
+              field,
+              reply,
+            },
+            {
+              filename: field.type === "FILE_UPLOAD" ? rename(field, reply, pattern) : "",
+              onProgress: ({ loaded, total }) =>
+                setProgress((uploaded + (loaded / total) * 0.5) / totalFiles),
+              signal: abort.signal,
+            }
           );
-          uploaded += 1;
-          setProgress(uploaded / totalFiles);
-        } catch (e) {
-          return await processError(e);
+          if (fieldType === "FILE_UPLOAD") {
+            setProgress(++uploaded / totalFiles);
+          }
         }
-      }
 
-      for (const { reply, field } of replies) {
-        if (field.type === "FILE_UPLOAD") {
-          if (reply.metadata.EXTERNAL_ID_CUATRECASAS) {
-            if (!dontAskAgain) {
-              const result = await showAlreadyExported({
-                filename: reply.content.filename,
-                externalId: reply.metadata.EXTERNAL_ID_CUATRECASAS,
-              });
-              dontAskAgain = result.dontAskAgain;
-              exportAgain = result.exportAgain;
-            }
-            if (!exportAgain) {
-              continue;
-            }
-          }
-          if (abort.signal.aborted) {
-            props.onReject("CANCEL");
-            return;
-          }
-          const res = await fileUploadReplyDownloadLink({
-            variables: {
-              petitionId: petition.id,
-              replyId: reply.id,
-            },
+        if (hasSignedDocument) {
+          await netDocuments.exportSignedDocument(petition.currentSignatureRequest!, {
+            signal: abort.signal,
+            onProgress: ({ loaded, total }) =>
+              setProgress((uploaded + (loaded / total) * 0.5) / totalFiles),
           });
-          try {
-            const externalId = await exportFile(
-              res.data!.fileUploadReplyDownloadLink.url!,
-              rename(field, reply, pattern),
-              externalClientId,
-              abort.signal,
-              ({ loaded, total }) => setProgress((uploaded + (loaded / total) * 0.5) / totalFiles)
-            );
-            await updatePetitionFieldReplyMetadata({
-              variables: {
-                petitionId: petition.id,
-                replyId: reply.id,
-                metadata: {
-                  ...reply.metadata,
-                  EXTERNAL_ID_CUATRECASAS: externalId,
-                },
-              },
-            });
-          } catch (e: any) {
-            return await processError(e);
-          }
-          uploaded += 1;
-          setProgress(uploaded / totalFiles);
-        } else {
-          // for non FILE_UPLOAD replies, update reply metadata with externalId of excel file
-          await updatePetitionFieldReplyMetadata({
-            variables: {
-              petitionId: petition.id,
-              replyId: reply.id,
-              metadata: {
-                ...reply.metadata,
-                EXTERNAL_ID_CUATRECASAS: excelExternalId!,
-              },
-            },
-          });
-        }
-      }
+          setProgress(++uploaded / totalFiles);
 
-      for (const signatureDoc of signatureDocs) {
-        if (signatureDoc.externalId) {
-          if (!dontAskAgain) {
-            const result = await showAlreadyExported({
-              filename: signatureDoc.filename!,
-              externalId: signatureDoc.externalId,
-            });
-            dontAskAgain = result.dontAskAgain;
-            exportAgain = result.exportAgain;
-          }
-          if (!exportAgain) {
-            continue;
-          }
+          // refetch petition to update signature request metadata and avoid overwriting it on the next step
+          await refetch({ petitionId });
         }
-        if (abort.signal.aborted) {
-          props.onReject("CANCEL");
-          return;
+
+        if (hasAuditTrail) {
+          await netDocuments.exportAuditTrail(petition.currentSignatureRequest!, {
+            signal: abort.signal,
+            onProgress: ({ loaded, total }) =>
+              setProgress((uploaded + (loaded / total) * 0.5) / totalFiles),
+          });
+          setProgress(++uploaded / totalFiles);
         }
-        const res = await signedPetitionDownloadLink({
-          variables: {
-            petitionSignatureRequestId: petition.currentSignatureRequest!.id,
-            downloadAuditTrail: signatureDoc.type === "audit-trail",
-          },
+
+        await netDocuments.exportPdfDocument(petition, {
+          signal: abort.signal,
+          onProgress: ({ loaded, total }) =>
+            setProgress((uploaded + (loaded / total) * 0.5) / totalFiles),
         });
-        try {
-          const externalId = await exportFile(
-            res.data!.signedPetitionDownloadLink.url!,
-            signatureDoc.filename!,
-            externalClientId,
-            abort.signal,
-            ({ loaded, total }) => setProgress((uploaded + (loaded / total) * 0.5) / totalFiles)
-          );
+        setProgress(++uploaded / totalFiles);
 
-          await updateSignatureRequestMetadata({
-            variables: {
-              petitionSignatureRequestId: petition.currentSignatureRequest!.id,
-              metadata: deepmerge(
-                petition.currentSignatureRequest!.metadata,
-                signatureDoc.type === "signed-document"
-                  ? {
-                      SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS: externalId,
-                    }
-                  : {
-                      AUDIT_TRAIL_EXTERNAL_ID_CUATRECASAS: externalId,
-                    }
-              ),
-            },
-          });
-        } catch (e: any) {
+        setState("FINISHED");
+      } catch (e: any) {
+        if (e.message !== "CANCEL") {
           return await processError(e);
         }
-        uploaded += 1;
-        setProgress(uploaded / totalFiles);
       }
-      setState("FINISHED");
     }
     if (data && !isRunning.current) {
       isRunning.current = true;
@@ -414,24 +263,20 @@ ExportRepliesProgressDialog.fragments = {
   Petition: gql`
     fragment ExportRepliesProgressDialog_Petition on Petition {
       id
+      ...useNetDocumentsExport_Petition
+      currentSignatureRequest {
+        signedDocumentFilename
+        auditTrailFilename
+        status
+      }
       fields {
-        id
-        type
         ...useFilenamePlaceholdersRename_PetitionField
         replies {
-          id
-          metadata
           ...useFilenamePlaceholdersRename_PetitionFieldReply
         }
       }
-      currentSignatureRequest {
-        id
-        status
-        signedDocumentFilename
-        auditTrailFilename
-        metadata
-      }
     }
+    ${useNetDocumentsExport.fragments.Petition}
     ${useFilenamePlaceholdersRename.fragments.PetitionField}
     ${useFilenamePlaceholdersRename.fragments.PetitionFieldReply}
   `,
@@ -448,137 +293,6 @@ ExportRepliesProgressDialog.queries = [
   `,
 ];
 
-ExportRepliesProgressDialog.mutations = [
-  gql`
-    mutation ExportRepliesProgressDialog_fileUploadReplyDownloadLink(
-      $petitionId: GID!
-      $replyId: GID!
-    ) {
-      fileUploadReplyDownloadLink(petitionId: $petitionId, replyId: $replyId) {
-        result
-        url
-      }
-    }
-  `,
-  gql`
-    mutation ExportRepliesProgressDialog_signedPetitionDownloadLink(
-      $petitionSignatureRequestId: GID!
-      $downloadAuditTrail: Boolean
-    ) {
-      signedPetitionDownloadLink(
-        petitionSignatureRequestId: $petitionSignatureRequestId
-        downloadAuditTrail: $downloadAuditTrail
-      ) {
-        result
-        url
-      }
-    }
-  `,
-  gql`
-    mutation ExportRepliesProgressDialog_updatePetitionFieldReplyMetadata(
-      $petitionId: GID!
-      $replyId: GID!
-      $metadata: JSONObject!
-    ) {
-      updatePetitionFieldReplyMetadata(
-        petitionId: $petitionId
-        replyId: $replyId
-        metadata: $metadata
-      ) {
-        id
-        metadata
-      }
-    }
-  `,
-  gql`
-    mutation ExportRepliesProgressDialog_updateSignatureRequestMetadata(
-      $petitionSignatureRequestId: GID!
-      $metadata: JSONObject!
-    ) {
-      updateSignatureRequestMetadata(
-        petitionSignatureRequestId: $petitionSignatureRequestId
-        metadata: $metadata
-      ) {
-        id
-        metadata
-      }
-    }
-  `,
-];
-
 export function useExportRepliesProgressDialog() {
   return useDialog(ExportRepliesProgressDialog);
-}
-
-interface AlreadyExportedDialogProps {
-  filename: string;
-  externalId: string;
-}
-
-function AlreadyExportedDialog({
-  externalId,
-  filename,
-  ...props
-}: DialogProps<AlreadyExportedDialogProps, { dontAskAgain: boolean; exportAgain: boolean }>) {
-  const [dontAskAgain, setDontAskAgain] = useState(false);
-  return (
-    <ConfirmDialog
-      closeOnEsc={false}
-      closeOnOverlayClick={false}
-      {...props}
-      header={
-        <FormattedMessage
-          id="component.export-replies-progress-dialog.header"
-          defaultMessage="This file has already been exported"
-        />
-      }
-      body={
-        <Stack>
-          <Text>
-            <FormattedMessage
-              id="component.export-replies-progress-dialog.body-1"
-              defaultMessage="The file {filename} has already been exported to NetDocuments"
-              values={{ filename: <Text as="strong">{filename}</Text> }}
-            />
-          </Text>
-          <Text textAlign="center">
-            <NormalLink
-              href={`https://eu.netdocuments.com/neWeb2/goid.aspx?id=${externalId}`}
-              isExternal
-            >
-              <FormattedMessage
-                id="component.export-replies-progress-dialog.open-file"
-                defaultMessage="Open file in NetDocuments"
-              />
-            </NormalLink>
-          </Text>
-          <Text>
-            <FormattedMessage
-              id="component.export-replies-progress-dialog.body2"
-              defaultMessage="Do you want to export it again?"
-            />
-          </Text>
-          <Checkbox isChecked={dontAskAgain} onChange={(e) => setDontAskAgain(e.target.checked)}>
-            <FormattedMessage id="generic.dont-ask-again" defaultMessage="Don't ask again" />
-          </Checkbox>
-        </Stack>
-      }
-      cancel={
-        <Button onClick={() => props.onResolve({ dontAskAgain, exportAgain: false })}>
-          <FormattedMessage id="generic.omit" defaultMessage="Omit" />
-        </Button>
-      }
-      confirm={
-        <Button
-          colorScheme="purple"
-          onClick={() => props.onResolve({ dontAskAgain, exportAgain: true })}
-        >
-          <FormattedMessage
-            id="component.export-replies-progress-dialog.export-again"
-            defaultMessage="Export again"
-          />
-        </Button>
-      }
-    />
-  );
 }

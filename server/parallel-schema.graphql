@@ -1448,6 +1448,11 @@ type Mutation {
   ): PetitionFieldReply!
 
   """
+  Updates the metadata of the specified petition
+  """
+  updatePetitionMetadata(metadata: JSONObject!, petitionId: GID!): Petition!
+
+  """
   Updates the subscription flag on a PetitionPermission
   """
   updatePetitionPermissionSubscription(isSubscribed: Boolean!, petitionId: GID!): Petition!
@@ -1920,6 +1925,11 @@ type Petition implements PetitionBase {
   locale: PetitionLocale!
 
   """
+  Metadata for this petition.
+  """
+  metadata: JSONObject!
+
+  """
   The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates).
   """
   myEffectivePermission: EffectivePetitionUserPermission
@@ -2166,6 +2176,11 @@ interface PetitionBase {
   The locale of the petition.
   """
   locale: PetitionLocale!
+
+  """
+  Metadata for this petition.
+  """
+  metadata: JSONObject!
 
   """
   The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates).
@@ -3109,6 +3124,11 @@ type PetitionTemplate implements PetitionBase {
   The locale of the petition.
   """
   locale: PetitionLocale!
+
+  """
+  Metadata for this petition.
+  """
+  metadata: JSONObject!
 
   """
   The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates).

@@ -1460,6 +1460,14 @@ export class PetitionRepository extends BaseRepository {
     return reply;
   }
 
+  async updatePetitionMetadata(petitionId: number, metadata: any) {
+    const [petition] = await this.from("petition")
+      .where("id", petitionId)
+      .update({ metadata }, "*");
+
+    return petition;
+  }
+
   async updatePetitionFieldReplyMetadata(replyId: number, metadata: any) {
     const field = await this.loadFieldForReply(replyId);
     if (!field) {

@@ -1003,6 +1003,7 @@ export interface NexusGenFieldTypes {
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionField"]; // PetitionField!
     updatePetitionFieldReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updatePetitionFieldReplyMetadata: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
+    updatePetitionMetadata: NexusGenRootTypes["Petition"]; // Petition!
     updatePetitionPermissionSubscription: NexusGenRootTypes["Petition"]; // Petition!
     updatePetitionRestriction: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionUserNotificationReadStatus: NexusGenRootTypes["PetitionUserNotification"][]; // [PetitionUserNotification!]!
@@ -1098,6 +1099,7 @@ export interface NexusGenFieldTypes {
     isRestricted: boolean; // Boolean!
     isRestrictedWithPassword: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
+    metadata: NexusGenScalars["JSONObject"]; // JSONObject!
     myEffectivePermission: NexusGenRootTypes["EffectivePetitionUserPermission"] | null; // EffectivePetitionUserPermission
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
@@ -1416,6 +1418,7 @@ export interface NexusGenFieldTypes {
     isRestricted: boolean; // Boolean!
     isRestrictedWithPassword: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
+    metadata: NexusGenScalars["JSONObject"]; // JSONObject!
     myEffectivePermission: NexusGenRootTypes["EffectivePetitionUserPermission"] | null; // EffectivePetitionUserPermission
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
@@ -2002,6 +2005,7 @@ export interface NexusGenFieldTypes {
     isRestricted: boolean; // Boolean!
     isRestrictedWithPassword: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
+    metadata: NexusGenScalars["JSONObject"]; // JSONObject!
     myEffectivePermission: NexusGenRootTypes["EffectivePetitionUserPermission"] | null; // EffectivePetitionUserPermission
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
@@ -2428,6 +2432,7 @@ export interface NexusGenFieldTypeNames {
     updatePetitionFieldRepliesStatus: "PetitionField";
     updatePetitionFieldReply: "PetitionFieldReply";
     updatePetitionFieldReplyMetadata: "PetitionFieldReply";
+    updatePetitionMetadata: "Petition";
     updatePetitionPermissionSubscription: "Petition";
     updatePetitionRestriction: "PetitionBase";
     updatePetitionUserNotificationReadStatus: "PetitionUserNotification";
@@ -2523,6 +2528,7 @@ export interface NexusGenFieldTypeNames {
     isRestricted: "Boolean";
     isRestrictedWithPassword: "Boolean";
     locale: "PetitionLocale";
+    metadata: "JSONObject";
     myEffectivePermission: "EffectivePetitionUserPermission";
     name: "String";
     organization: "Organization";
@@ -2841,6 +2847,7 @@ export interface NexusGenFieldTypeNames {
     isRestricted: "Boolean";
     isRestrictedWithPassword: "Boolean";
     locale: "PetitionLocale";
+    metadata: "JSONObject";
     myEffectivePermission: "EffectivePetitionUserPermission";
     name: "String";
     organization: "Organization";
@@ -3427,6 +3434,7 @@ export interface NexusGenFieldTypeNames {
     isRestricted: "Boolean";
     isRestrictedWithPassword: "Boolean";
     locale: "PetitionLocale";
+    metadata: "JSONObject";
     myEffectivePermission: "EffectivePetitionUserPermission";
     name: "String";
     organization: "Organization";
@@ -4182,6 +4190,11 @@ export interface NexusGenArgTypes {
       metadata: NexusGenScalars["JSONObject"]; // JSONObject!
       petitionId: NexusGenScalars["GID"]; // GID!
       replyId: NexusGenScalars["GID"]; // GID!
+    };
+    updatePetitionMetadata: {
+      // args
+      metadata: NexusGenScalars["JSONObject"]; // JSONObject!
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     updatePetitionPermissionSubscription: {
       // args

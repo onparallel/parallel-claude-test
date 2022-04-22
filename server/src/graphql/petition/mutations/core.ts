@@ -1559,6 +1559,23 @@ export const reopenPetition = mutationField("reopenPetition", {
   },
 });
 
+export const updatePetitionMetadata = mutationField("updatePetitionMetadata", {
+  description: "Updates the metadata of the specified petition",
+  type: "Petition",
+  authorize: authenticateAnd(userHasAccessToPetitions("petitionId")),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    metadata: nonNull(jsonObjectArg()),
+  },
+  validateArgs: jsonSchema({
+    type: "object",
+    additionalProperties: { type: ["string", "boolean", "number"] },
+  })((args) => args.metadata, "metadata"),
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.updatePetitionMetadata(args.petitionId, args.metadata);
+  },
+});
+
 export const updatePetitionFieldReplyMetadata = mutationField("updatePetitionFieldReplyMetadata", {
   description: "Updates the metadata of the specified petition field reply",
   type: "PetitionFieldReply",
