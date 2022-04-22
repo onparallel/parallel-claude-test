@@ -49,7 +49,7 @@ export function PetitionRepliesFieldReply({
 
   return (
     <Flex>
-      <Box as={Stack} spacing={1} paddingRight={2} borderRight="2px solid" borderColor="gray.200">
+      <Stack spacing={1} paddingRight={2} borderRight="2px solid" borderColor="gray.200">
         {isTextLikeType ? (
           <CopyToClipboardButton size="xs" text={reply.content.value} />
         ) : reply.field!.type === "NUMBER" ? (
@@ -116,7 +116,7 @@ export function PetitionRepliesFieldReply({
             placement="right"
           />
         ) : null}
-      </Box>
+      </Stack>
       <Flex flexDirection="column" justifyContent="center" flex="1" marginLeft={2}>
         {isTextLikeType ? (
           <BreakLines>{reply.content.value}</BreakLines>

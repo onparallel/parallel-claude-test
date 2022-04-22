@@ -4,7 +4,6 @@ import {
   useBackgroundTask_createPrintPdfTaskDocument,
   useBackgroundTask_getTaskResultFileUrlDocument,
   useBackgroundTask_taskDocument,
-  useBackgroundTask_taskQuery,
 } from "@parallel/graphql/__types";
 
 export function useBackgroundTask(task: "EXPORT_EXCEL" | "PRINT_PDF") {
@@ -23,39 +22,27 @@ export function useBackgroundTask(task: "EXPORT_EXCEL" | "PRINT_PDF") {
   return async (petitionId: string) => {
     const { data: initialData } = await createTask({ variables: { petitionId } });
 
-    const task = await new Promise<useBackgroundTask_taskQuery["task"]>((resolve, reject) => {
-      const interval = setInterval(() => {
-        try {
-          refetch({
-            id: initialData!.createTask.id,
-          }).then(({ data: { task } }) => {
-            if (task.status === "COMPLETED") {
-              clearInterval(interval);
-              resolve(task);
-            } else if (task.status === "FAILED") {
-              clearInterval(interval);
-              reject();
-            }
-          });
-        } catch {
-          clearInterval(interval);
-          reject();
+    const task = await (async function () {
+      while (true) {
+        const {
+          data: { task },
+        } = await refetch({
+          id: initialData!.createTask.id,
+        });
+        if (task.status === "COMPLETED") {
+          return task;
+        } else if (task.status === "FAILED") {
+          throw new Error("FAILED");
         }
-      }, 1000);
-    });
-
-    if (task?.status === "COMPLETED") {
-      const { data } = await generateDownloadUrl({
-        variables: { taskId: task!.id },
-      });
-      return { task, url: data!.getTaskResultFileUrl };
-    } else {
-      return { task };
-    }
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+    })();
+    const { data } = await generateDownloadUrl({ variables: { taskId: task!.id } });
+    return { task, url: data!.getTaskResultFileUrl };
   };
 }
 
-useBackgroundTask.fragments = {
+const fragments = {
   Task: gql`
     fragment useBackgroundTask_Task on Task {
       id
@@ -67,14 +54,14 @@ useBackgroundTask.fragments = {
   `,
 };
 
-useBackgroundTask.mutations = [
+const _mutations = [
   gql`
     mutation useBackgroundTask_createExportExcelTask($petitionId: GID!) {
       createTask: createExportExcelTask(petitionId: $petitionId) {
         ...useBackgroundTask_Task
       }
     }
-    ${useBackgroundTask.fragments.Task}
+    ${fragments.Task}
   `,
   gql`
     mutation useBackgroundTask_createPrintPdfTask($petitionId: GID!) {
@@ -82,7 +69,7 @@ useBackgroundTask.mutations = [
         ...useBackgroundTask_Task
       }
     }
-    ${useBackgroundTask.fragments.Task}
+    ${fragments.Task}
   `,
   gql`
     mutation useBackgroundTask_getTaskResultFileUrl($taskId: GID!) {
@@ -91,13 +78,13 @@ useBackgroundTask.mutations = [
   `,
 ];
 
-useBackgroundTask.queries = [
+const _queries = [
   gql`
     query useBackgroundTask_task($id: GID!) {
       task(id: $id) {
         ...useBackgroundTask_Task
       }
     }
-    ${useBackgroundTask.fragments.Task}
+    ${fragments.Task}
   `,
 ];
