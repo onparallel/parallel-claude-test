@@ -2,9 +2,9 @@ import { FocusLock } from "@chakra-ui/focus-lock";
 import {
   Box,
   BoxProps,
+  Center,
   Checkbox,
   Collapse,
-  Flex,
   Heading,
   HStack,
   HTMLChakraProps,
@@ -84,7 +84,7 @@ export interface TableHeaderProps<TRow, TContext = unknown, TFilter = unknown>
   allSelected: boolean;
   anySelected: boolean;
   onSortByClick?: (value: string, event: MouseEvent) => void;
-  onToggleAll: (event?: any) => void;
+  onToggleAll: () => void;
 }
 
 export interface TableCellProps<TRow, TContext = unknown, TFilter = unknown> {
@@ -231,40 +231,40 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
           <Box
             as="th"
             width="1px"
-            height="38px"
+            padding={0}
             userSelect="none"
-            paddingY={0}
-            paddingRight={0}
-            _first={{ paddingLeft: 3 }}
+            position="relative"
+            _after={{
+              position: "absolute",
+              right: 0,
+              top: 0,
+              content: "''",
+              display: "block",
+              width: "1px",
+              height: "41px",
+              backgroundColor: colors.border,
+            }}
           >
-            <Box height="16px">
+            <Center as="label" boxSize="40px" cursor="pointer" onClick={onToggleAll}>
               <Checkbox
                 isChecked={anySelected && allSelected}
                 isIndeterminate={anySelected && !allSelected}
+                onChange={function () {}}
                 colorScheme="purple"
-                onChange={onToggleAll}
               />
-            </Box>
+            </Center>
           </Box>
         ),
         cellProps: {
           paddingY: 0,
           paddingRight: 0,
-          _first: { paddingLeft: 3 },
+          _first: { paddingLeft: 0 },
         },
-        CellContent: ({ isSelected, onToggleSelection: toggle }) => {
+        CellContent: ({ isSelected, onToggleSelection }) => {
           return (
-            <Flex
-              as="label"
-              alignItems="center"
-              justifyContent="center"
-              height="32px"
-              borderRadius="32px"
-              cursor="pointer"
-              onClick={toggle}
-            >
+            <Center as="label" boxSize="40px" cursor="pointer" onClick={onToggleSelection}>
               <Checkbox isChecked={isSelected} colorScheme="purple" onChange={function () {}} />
-            </Flex>
+            </Center>
           );
         },
       });
@@ -284,6 +284,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         <Box
           as="tr"
           backgroundColor={colors.header}
+          height="41px"
           sx={{
             boxShadow: (theme) => {
               const color = getColor(theme, colors.border);

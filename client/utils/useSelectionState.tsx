@@ -1,4 +1,6 @@
-import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
+import { MouseEvent, useMemo, useState } from "react";
+import { debounce } from "./debounce";
+import { useEffectSkipFirst } from "./useEffectSkipFirst";
 
 export type Selection = Record<string, boolean>;
 
@@ -26,13 +28,7 @@ export function useSelectionState<T>(
     lastSelected: null,
   });
 
-  const initial = useRef(true);
-  useEffect(() => {
-    // skip first to avoid a re-render
-    if (initial.current) {
-      initial.current = false;
-      return;
-    }
+  useEffectSkipFirst(() => {
     // Reset selected state when rows change
     setState({
       lastSelected: null,
@@ -58,52 +54,50 @@ export function useSelectionState<T>(
 
     ...useMemo(() => {
       // click fires twice, once on the label and another one on the input
-      let timeout: any;
+      const toggle = debounce((key: string, shiftKey: boolean) => {
+        setState((previous) => {
+          const keys = [key];
+          if (previous.lastSelected && shiftKey) {
+            // range selection
+            const lastIndex = rows.findIndex(
+              (r) => (r[rowKeyProp] as any) === previous.lastSelected
+            );
+            const index = rows.findIndex((r) => (r[rowKeyProp] as any) === key);
+            if (lastIndex >= 0 && index >= 0) {
+              for (
+                let i = lastIndex;
+                index > lastIndex ? i < index : i > index;
+                index > lastIndex ? i++ : i--
+              ) {
+                keys.push(rows[i][rowKeyProp] as any);
+              }
+            }
+          }
+          return {
+            lastSelected: key,
+            selection: {
+              ...previous.selection,
+              ...Object.fromEntries(keys.map((k) => [k, !previous.selection[key]])),
+            },
+          };
+        });
+      });
+      const toggleAll = debounce(() => {
+        setState(({ selection }) => {
+          const _allSelected = rows.every((r) => selection[r[rowKeyProp] as any]);
+          return {
+            lastSelected: null,
+            selection: Object.fromEntries(rows.map((r) => [r[rowKeyProp], !_allSelected])),
+          };
+        });
+      });
       return {
         toggle: function (key: string, event: MouseEvent) {
           event.stopPropagation();
           event.persist();
-          if (timeout) {
-            clearTimeout(timeout);
-          }
-          timeout = setTimeout(() => {
-            setState((previous) => {
-              const keys = [key];
-              if (previous.lastSelected && event?.shiftKey) {
-                // range selection
-                const lastIndex = rows.findIndex(
-                  (r) => (r[rowKeyProp] as any) === previous.lastSelected
-                );
-                const index = rows.findIndex((r) => (r[rowKeyProp] as any) === key);
-                if (lastIndex >= 0 && index >= 0) {
-                  for (
-                    let i = lastIndex;
-                    index > lastIndex ? i < index : i > index;
-                    index > lastIndex ? i++ : i--
-                  ) {
-                    keys.push(rows[i][rowKeyProp] as any);
-                  }
-                }
-              }
-              return {
-                lastSelected: key,
-                selection: {
-                  ...previous.selection,
-                  ...Object.fromEntries(keys.map((k) => [k, !previous.selection[key]])),
-                },
-              };
-            });
-          });
+          toggle(key, event.shiftKey);
         },
-        toggleAll: function () {
-          setState(({ selection }) => {
-            const _allSelected = rows.every((r) => selection[r[rowKeyProp] as any]);
-            return {
-              lastSelected: null,
-              selection: Object.fromEntries(rows.map((r) => [r[rowKeyProp], !_allSelected])),
-            };
-          });
-        },
+        toggleAll,
         toggleBy: function (predicate: (row: T) => boolean) {
           setState({
             lastSelected: null,

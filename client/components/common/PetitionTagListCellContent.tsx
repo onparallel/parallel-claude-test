@@ -109,7 +109,7 @@ export function PetitionTagListCellContent({
   return (
     <Flex
       ref={selectWrapperRef}
-      height="45px"
+      height="40px"
       alignItems="center"
       sx={{ scrollMarginTop: "38px" }}
       position="relative"
@@ -120,6 +120,7 @@ export function PetitionTagListCellContent({
         <Box position="absolute" inset={0} zIndex="1">
           <TagSelect
             ref={selectRef}
+            size="sm"
             value={petition.tags}
             placeholder={intl.formatMessage({
               id: "components.petition-tag-list-cell-content.add-tags",
@@ -316,13 +317,13 @@ const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(function TagSele
         ...omit(styles as any, ["padding"]),
         paddingLeft: "0.375rem",
         paddingRight: "0.375rem",
-        paddingTop: "8.5px",
-        paddingBottom: "8.5px",
+        paddingTop: "6px",
+        paddingBottom: "6px",
         fontSize: "14px",
       }),
       control: (styles, { isFocused, theme }: any) => ({
         ...styles,
-        minHeight: "45px",
+        minHeight: "40px",
         borderRadius: 0,
         border: "none",
         boxShadow: isFocused ? `inset 0 0 0 2px ${theme.colors.primary}` : undefined,
