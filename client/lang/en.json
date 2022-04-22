@@ -6280,9 +6280,9 @@
     "context": "Template name"
   },
   {
-    "term": "petitions.header.description",
-    "definition": "Description",
-    "context": "Description"
+    "term": "petitions.header.configuration",
+    "definition": "Configuration",
+    "context": "Configuration"
   },
   {
     "term": "petitions.header.last-reminder",

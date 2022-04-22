@@ -15,6 +15,7 @@ import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { PetitionListSharedWithFilter } from "@parallel/components/petition-list/filters/shared-with/PetitionListSharedWithFilter";
 import { PetitionListStatusFilter } from "@parallel/components/petition-list/filters/status/PetitionListStatusFilter";
 import { PetitionListTagFilter } from "@parallel/components/petition-list/tags/PetitionListTagFilter";
+import { TemplateActiveSettingsIcons } from "@parallel/components/petition-new/TemplateActiveSettingsIcons";
 import {
   PetitionBaseType,
   usePetitionsTableColumns_PetitionBaseFragment,
@@ -164,10 +165,10 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
             ] as PetitionTableColumn[])
           : ([
               {
-                key: "description",
+                key: "configuration",
                 header: intl.formatMessage({
-                  id: "petitions.header.description",
-                  defaultMessage: "Description",
+                  id: "petitions.header.configuration",
+                  defaultMessage: "Configuration",
                 }),
                 align: "left",
                 cellProps: {
@@ -175,7 +176,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   maxWidth: 0,
                 },
                 CellContent: ({ row }) => {
-                  return <>{row.descriptionExcerpt}</>;
+                  return <TemplateActiveSettingsIcons template={row} spacing={4} />;
                 },
               },
             ] as PetitionTemplateTableColumn[])),
@@ -384,6 +385,7 @@ usePetitionsTableColumns.fragments = {
       }
       ... on PetitionTemplate {
         descriptionExcerpt
+        ...TemplateActiveSettingsIcons_PetitionTemplate
       }
     }
     ${UserAvatarList.fragments.User}
@@ -392,5 +394,6 @@ usePetitionsTableColumns.fragments = {
     ${ContactReference.fragments.Contact}
     ${PetitionStatusCellContent.fragments.Petition}
     ${PetitionSignatureCellContent.fragments.Petition}
+    ${TemplateActiveSettingsIcons.fragments.PetitionTemplate}
   `,
 };
