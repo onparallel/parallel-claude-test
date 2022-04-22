@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import {
   AlertIcon,
   Box,
-  Collapse,
   Flex,
   FormControl,
   FormLabel,
@@ -25,6 +24,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { Card, CardHeader, CardProps } from "../common/Card";
 import { CloseableAlert } from "../common/CloseableAlert";
 import { HelpPopover } from "../common/HelpPopover";
+import { PaddedCollapse } from "../common/PaddedCollapse";
 import { RichTextEditor } from "../common/slate/RichTextEditor";
 import { Spacer } from "../common/Spacer";
 
@@ -107,7 +107,7 @@ export function PetitionTemplateCompletingMessageCard({
             defaultMessage="This message will be shown when the recipient <b>completes</b> the petition. Use it to thank them or to include further instructions."
           />
         </Text>
-        <Collapse in={isEnabled}>
+        <PaddedCollapse in={isEnabled}>
           {petition.signatureConfig ? (
             <CloseableAlert status="info" mb={2} alignItems="start">
               <AlertIcon />
@@ -152,7 +152,7 @@ export function PetitionTemplateCompletingMessageCard({
               isDisabled={isReadOnly}
             />
           </FormControl>
-        </Collapse>
+        </PaddedCollapse>
       </Box>
     </Card>
   );
