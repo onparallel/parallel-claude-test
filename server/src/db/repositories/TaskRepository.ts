@@ -9,7 +9,7 @@ import { Task as DbTask, TaskName } from "../__types";
 
 export type TaskInput<TName extends TaskName> = {
   EXPORT_REPLIES: { petition_id: number; pattern?: Maybe<string> };
-  PRINT_PDF: { petition_id: number };
+  PRINT_PDF: { petition_id: number; skip_attachments?: boolean };
   EXPORT_EXCEL: { petition_id: number };
 }[TName];
 

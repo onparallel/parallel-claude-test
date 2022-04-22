@@ -60,6 +60,7 @@ export class PetitionBinder implements IPetitionBinder {
       showSignatureBoxes,
       maxOutputSize,
       outputFileName,
+      includeAnnexedDocuments,
     }: PetitionBinderOptions
   ) {
     try {
@@ -79,45 +80,51 @@ export class PetitionBinder implements IPetitionBinder {
         })
       );
 
-      const annexedDocumentPaths = await pFlatMap(
-        fieldsWithFiles,
-        async ([field, files], fieldIndex) => {
-          const coverPagePath = await this.writeTemporaryFile(
-            this.printer.annexCoverPage(
-              userId,
-              { fieldNumber: fieldIndex + 1, fieldTitle: field.title },
-              petition?.locale ?? "en"
-            )
-          );
+      const annexedDocumentPaths = includeAnnexedDocuments
+        ? await pFlatMap(
+            fieldsWithFiles,
+            async ([field, files], fieldIndex) => {
+              const coverPagePath = await this.writeTemporaryFile(
+                this.printer.annexCoverPage(
+                  userId,
+                  { fieldNumber: fieldIndex + 1, fieldTitle: field.title },
+                  petition?.locale ?? "en"
+                )
+              );
 
-          const filePaths = await pMap(
-            files,
-            async (file) => {
-              if (file.content_type.startsWith("image/")) {
-                // jpeg can be used directly, other types need processing
-                const imageUrl =
-                  file.content_type === "image/jpeg"
-                    ? await this.aws.fileUploads.getSignedDownloadEndpoint(
-                        file.path,
-                        file.filename,
-                        "inline"
-                      )
-                    : await this.convertImage(file.path, file.content_type);
+              const filePaths = await pMap(
+                files,
+                async (file) => {
+                  if (file.content_type.startsWith("image/")) {
+                    // jpeg can be used directly, other types need processing
+                    const imageUrl =
+                      file.content_type === "image/jpeg"
+                        ? await this.aws.fileUploads.getSignedDownloadEndpoint(
+                            file.path,
+                            file.filename,
+                            "inline"
+                          )
+                        : await this.convertImage(file.path, file.content_type);
 
-                return await this.writeTemporaryFile(this.printer.imageToPdf(userId, { imageUrl }));
-              } else if (file.content_type === "application/pdf") {
-                return await this.writeTemporaryFile(this.aws.fileUploads.downloadFile(file.path));
-              } else {
-                throw new Error(`Cannot annex ${file.content_type} to pdf binder`);
-              }
+                    return await this.writeTemporaryFile(
+                      this.printer.imageToPdf(userId, { imageUrl })
+                    );
+                  } else if (file.content_type === "application/pdf") {
+                    return await this.writeTemporaryFile(
+                      this.aws.fileUploads.downloadFile(file.path)
+                    );
+                  } else {
+                    throw new Error(`Cannot annex ${file.content_type} to pdf binder`);
+                  }
+                },
+                { concurrency: 1 }
+              );
+
+              return [coverPagePath, ...filePaths];
             },
-            { concurrency: 1 }
-          );
-
-          return [coverPagePath, ...filePaths];
-        },
-        { concurrency: 2 }
-      );
+            { concurrency: 2 }
+          )
+        : [];
 
       return await this.merge([mainDocPath, ...annexedDocumentPaths], {
         maxOutputSize,

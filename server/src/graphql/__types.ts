@@ -3670,6 +3670,7 @@ export interface NexusGenArgTypes {
     createPrintPdfTask: {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
+      skipAttachments?: boolean | null; // Boolean
     };
     createPublicPetitionLink: {
       // args

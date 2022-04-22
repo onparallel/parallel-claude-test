@@ -14,6 +14,7 @@ export const createPrintPdfTask = mutationField("createPrintPdfTask", {
   authorize: authenticateAnd(userHasAccessToPetitions("petitionId")),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
+    skipAttachments: nullable(booleanArg()),
   },
   resolve: async (_, args, ctx) =>
     await ctx.tasks.createTask(
@@ -22,6 +23,7 @@ export const createPrintPdfTask = mutationField("createPrintPdfTask", {
         user_id: ctx.user!.id,
         input: {
           petition_id: args.petitionId,
+          skip_attachments: args.skipAttachments ?? false,
         },
       },
       `User:${ctx.user!.id}`

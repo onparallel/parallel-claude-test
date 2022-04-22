@@ -10,7 +10,7 @@ export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
   async run() {
     let tmpFilePath: string | null = null;
     try {
-      const { petition_id: petitionId } = this.task.input;
+      const { petition_id: petitionId, skip_attachments: skipAttachments } = this.task.input;
 
       const hasAccess = isDefined(this.task.user_id)
         ? await this.ctx.petitions.userHasAccessToPetitions(this.task.user_id, [petitionId])
@@ -54,6 +54,7 @@ export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
         petitionId,
         documentTitle: documentTitle ?? "",
         showSignatureBoxes: false,
+        includeAnnexedDocuments: !skipAttachments,
       });
 
       await this.onProgress(75);

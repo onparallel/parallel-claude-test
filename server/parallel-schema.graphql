@@ -695,7 +695,7 @@ type Mutation {
   """
   Creates a task for printing a PDF of the petition and sends it to the queue
   """
-  createPrintPdfTask(petitionId: GID!): Task!
+  createPrintPdfTask(petitionId: GID!, skipAttachments: Boolean): Task!
 
   """
   Creates a public link from a user's template
