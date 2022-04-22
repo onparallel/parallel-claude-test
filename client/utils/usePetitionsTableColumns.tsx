@@ -60,12 +60,10 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   id: "petitions.header.template-name",
                   defaultMessage: "Template name",
                 }),
-          headerProps: {
-            width: "30%",
-            minWidth: "240px",
-          },
           cellProps: {
             maxWidth: 0,
+            width: "30%",
+            minWidth: "240px",
           },
           CellContent: ({ row }) => (
             <OverflownText textStyle={row.name ? undefined : "hint"}>
@@ -141,11 +139,9 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                 }),
                 isFilterable: true,
                 Filter: PetitionListStatusFilter,
-                headerProps: {
-                  minWidth: "180px",
-                },
                 align: "center",
                 cellProps: (row) => ({
+                  minWidth: "180px",
                   "data-section": "petition-progress",
                   "data-petition-status": row.status,
                 }),
@@ -154,8 +150,8 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
               {
                 key: "signature",
                 align: "center",
-                headerProps: { padding: 0, width: 8 },
-                cellProps: { padding: 0 },
+                headerProps: { padding: 0 },
+                cellProps: { padding: 0, width: 8 },
                 CellContent: ({ row, context }) => (
                   <Flex alignItems="center" paddingRight="2">
                     <PetitionSignatureCellContent petition={row} />
@@ -181,15 +177,15 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
               },
             ] as PetitionTemplateTableColumn[])),
         {
-          key: "sharedWith",
+          key: "shared",
           header: intl.formatMessage({
-            id: "petitions.header.shared-with",
-            defaultMessage: "Shared with",
+            id: "petitions.header.shared",
+            defaultMessage: "Shared",
           }),
           isFilterable: true,
           Filter: PetitionListSharedWithFilter,
           align: "left",
-          cellProps: { width: "1%" },
+          cellProps: { minWidth: "132px" },
           CellContent: ({ row: { permissions }, column }) => (
             <Flex justifyContent={column.align}>
               <UserAvatarList
@@ -229,11 +225,11 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   ),
               },
               {
-                key: "lastReminder",
+                key: "reminders",
                 isSortable: false,
                 header: intl.formatMessage({
-                  id: "petitions.header.last-reminder",
-                  defaultMessage: "Last reminder",
+                  id: "petitions.header.reminders",
+                  defaultMessage: "Reminders",
                 }),
 
                 CellContent: ({ row }) => {
@@ -256,6 +252,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                         e.stopPropagation();
                         redirect(row.id, row.status === "DRAFT" ? "compose" : "activity");
                       }}
+                      whiteSpace="nowrap"
                     >
                       {lastReminderDate ? (
                         <DateTime
@@ -329,13 +326,10 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
             defaultMessage: "Tags",
           }),
           cellProps: {
-            padding: 0,
-            minWidth: "min-content",
-            _last: { paddingRight: 0 },
-          },
-          headerProps: {
             width: "30%",
             minWidth: "300px",
+            padding: 0,
+            _last: { paddingRight: 0 },
           },
           isFilterable: true,
           Filter: PetitionListTagFilter,

@@ -27,21 +27,17 @@ import { Spacer } from "../common/Spacer";
 
 export interface ContactListHeaderProps {
   search: string | null;
-  selectionCount: number;
   onSearchChange: (value: string | null) => void;
   onReload: () => void;
-  onDeleteClick: () => void;
   onCreateClick: () => void;
   onImportClick: () => void;
 }
 
 export function ContactListHeader({
   search: _search,
-  selectionCount,
   onSearchChange,
   onReload,
   onCreateClick,
-  onDeleteClick,
   onImportClick,
 }: ContactListHeaderProps) {
   const intl = useIntl();
@@ -71,19 +67,6 @@ export function ContactListHeader({
           defaultMessage: "Reload",
         })}
       />
-      {selectionCount > 0 ? (
-        <ResponsiveButtonIcon
-          breakpoint="xl"
-          icon={<DeleteIcon />}
-          variant="outline"
-          colorScheme="red"
-          onClick={onDeleteClick}
-          label={intl.formatMessage({
-            id: "component.contact-list-header.delete-label",
-            defaultMessage: "Delete selected",
-          })}
-        />
-      ) : null}
       <Spacer />
       <Button display={{ base: "none", md: "block" }} variant="outline" onClick={onImportClick}>
         <FormattedMessage

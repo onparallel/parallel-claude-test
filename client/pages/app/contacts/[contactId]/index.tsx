@@ -288,10 +288,10 @@ function useContactPetitionAccessesColumns() {
           ),
         },
         {
-          key: "sharedWith",
+          key: "shared",
           header: intl.formatMessage({
-            id: "petitions.header.shared-with",
-            defaultMessage: "Shared with",
+            id: "petitions.header.shared",
+            defaultMessage: "Shared",
           }),
           align: "center",
           cellProps: { width: "1%" },

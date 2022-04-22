@@ -1815,41 +1815,6 @@
     "context": "You have reached your limit of petitions sent, <a>reach out to us to upgrade your plan.</a>"
   },
   {
-    "term": "component.petition-list-header.delete-petition-label",
-    "definition": "Delete {count, plural, =1{petition} other{petitions}}",
-    "context": "Delete {count, plural, =1{petition} other{petitions}}"
-  },
-  {
-    "term": "component.petition-list-header.delete-template-label",
-    "definition": "Delete {count, plural, =1{template} other{templates}}",
-    "context": "Delete {count, plural, =1{template} other{templates}}"
-  },
-  {
-    "term": "component.petition-list-header.duplicate-petition-label",
-    "definition": "Duplicate {count, plural, =1{petition} other{petitions}}",
-    "context": "Duplicate {count, plural, =1{petition} other{petitions}}"
-  },
-  {
-    "term": "component.petition-list-header.duplicate-template-label",
-    "definition": "Duplicate {count, plural, =1{template} other{templates}}",
-    "context": "Duplicate {count, plural, =1{template} other{templates}}"
-  },
-  {
-    "term": "component.petition-list-header.save-as-template-label",
-    "definition": "Save as template",
-    "context": "Save as template"
-  },
-  {
-    "term": "component.petition-list-header.share-petition-label",
-    "definition": "Share {count, plural, =1{petition} other{petitions}}",
-    "context": "Share {count, plural, =1{petition} other{petitions}}"
-  },
-  {
-    "term": "component.petition-list-header.share-template-label",
-    "definition": "Share {count, plural, =1{template} other{templates}}",
-    "context": "Share {count, plural, =1{template} other{templates}}"
-  },
-  {
     "term": "component.petition-list-shared-with-filter.add-filter",
     "definition": "Add filter",
     "context": "Add filter"
@@ -3338,6 +3303,11 @@
     "term": "component.suggested-signers.header",
     "definition": "Suggested:",
     "context": "Suggested:"
+  },
+  {
+    "term": "component.table-page.n-selected",
+    "definition": "{count} selected",
+    "context": "{count} selected"
   },
   {
     "term": "component.table.filter-header",
@@ -5285,6 +5255,21 @@
     "context": "Export to PDF"
   },
   {
+    "term": "page.petitions-list.actions-clone",
+    "definition": "Duplicate",
+    "context": "Duplicate"
+  },
+  {
+    "term": "page.petitions-list.actions-save-as-template",
+    "definition": "Save as template",
+    "context": "Save as template"
+  },
+  {
+    "term": "page.petitions-list.actions-share",
+    "definition": "Share",
+    "context": "Share"
+  },
+  {
     "term": "page.preview.template-only-cache-alert",
     "definition": "<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>{button}</b>.",
     "context": "<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>{button}</b>."
@@ -6285,11 +6270,6 @@
     "context": "Configuration"
   },
   {
-    "term": "petitions.header.last-reminder",
-    "definition": "Last reminder",
-    "context": "Last reminder"
-  },
-  {
     "term": "petitions.header.name",
     "definition": "Petition name",
     "context": "Petition name"
@@ -6298,6 +6278,11 @@
     "term": "petitions.header.recipient",
     "definition": "Recipient",
     "context": "Recipient"
+  },
+  {
+    "term": "petitions.header.reminders",
+    "definition": "Reminders",
+    "context": "Reminders"
   },
   {
     "term": "petitions.header.reminders-disabled",
@@ -6315,9 +6300,9 @@
     "context": "Next reminder configured for {date}"
   },
   {
-    "term": "petitions.header.shared-with",
-    "definition": "Shared with",
-    "context": "Shared with"
+    "term": "petitions.header.shared",
+    "definition": "Shared",
+    "context": "Shared"
   },
   {
     "term": "petitions.header.status",

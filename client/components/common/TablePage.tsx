@@ -1,11 +1,23 @@
-import { Box, Button, Center, Flex, IconButton, Select, Spinner, Stack } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  ButtonProps,
+  Center,
+  Flex,
+  HStack,
+  IconButton,
+  Select,
+  Spinner,
+  Stack,
+} from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@parallel/chakra/icons";
 import { WithChakraProps } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableProps, useTableColors } from "@parallel/components/common/Table";
-import { ComponentType, ReactNode, useMemo } from "react";
+import { ComponentType, Key, ReactNode, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { pick } from "remeda";
 
 export type TablePageProps<TRow, TContext = unknown, TImpl extends TRow = TRow> = TableProps<
   TRow,
@@ -13,6 +25,7 @@ export type TablePageProps<TRow, TContext = unknown, TImpl extends TRow = TRow> 
   TImpl
 > & {
   loading: boolean;
+  actions?: (ButtonProps & { key: Key })[];
   header?: ReactNode;
   body?: ReactNode;
   totalCount: number;
@@ -44,6 +57,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   onSortChange,
   loading,
   header,
+  actions,
   body,
   totalCount,
   page,
@@ -154,6 +168,46 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
       </Box>
     </>
   );
+  const [selectedCount, setSelectedCount] = useState(0);
+  const handleSelectionChange = useCallback(
+    (selected: string[]) => {
+      onSelectionChange?.(selected);
+      setSelectedCount(selected.length);
+    },
+    [onSelectionChange]
+  );
+  columns = useMemo(
+    () =>
+      (selectedCount > 0) & isDefined(actions)
+        ? [
+            {
+              ...pick(columns[0], ["key", "CellContent", "cellProps"]),
+              header: "",
+              Header: ({ context }) => (
+                <Box as="th" colSpan={columns.length} fontWeight="normal">
+                  <HStack height="38px" paddingX={3} position="relative" top="1px">
+                    <Box fontSize="sm">
+                      <FormattedMessage
+                        id="component.table-page.n-selected"
+                        defaultMessage="{count} selected"
+                        values={{ count: (context as any).selectedCount }}
+                      />
+                    </Box>
+                    {actions?.map(({ key, ...props }) => (
+                      <Button key={key} variant="ghost" size="sm" fontWeight="normal" {...props} />
+                    ))}
+                  </HStack>
+                </Box>
+              ),
+            },
+            ...columns.slice(1).map((column) => ({
+              ...column,
+              Header: () => null,
+            })),
+          ]
+        : columns,
+    [columns, selectedCount]
+  );
   return (
     <Card display="flex" flexDirection="column" {...props}>
       {header ? <Box flex="none">{header}</Box> : null}
@@ -185,7 +239,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         <Table
           columns={columns}
           rows={rows}
-          context={context}
+          context={{ ...context, selectedCount } as any}
           rowKeyProp={rowKeyProp}
           isExpandable={isExpandable}
           isSelectable={isSelectable}
@@ -193,7 +247,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
           sort={sort}
           filter={filter}
           onFilterChange={onFilterChange}
-          onSelectionChange={onSelectionChange}
+          onSelectionChange={handleSelectionChange}
           onRowClick={onRowClick}
           onSortChange={onSortChange}
         />

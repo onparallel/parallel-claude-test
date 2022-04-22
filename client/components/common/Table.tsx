@@ -241,11 +241,18 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
               content: "''",
               display: "block",
               width: "1px",
-              height: "41px",
+              height: "4  1px",
               backgroundColor: colors.border,
             }}
           >
-            <Center as="label" boxSize="40px" cursor="pointer" onClick={onToggleAll}>
+            <Center
+              as="label"
+              boxSize="40px"
+              cursor="pointer"
+              position="relative"
+              top="1px"
+              onClick={onToggleAll}
+            >
               <Checkbox
                 isChecked={anySelected && allSelected}
                 isIndeterminate={anySelected && !allSelected}

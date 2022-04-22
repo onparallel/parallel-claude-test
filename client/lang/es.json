@@ -1815,41 +1815,6 @@
     "context": "You have reached your limit of petitions sent, <a>reach out to us to upgrade your plan.</a>"
   },
   {
-    "term": "component.petition-list-header.delete-petition-label",
-    "definition": "Borrar {count, plural, =1{petición} other{peticiones}}",
-    "context": "Delete {count, plural, =1{petition} other{petitions}}"
-  },
-  {
-    "term": "component.petition-list-header.delete-template-label",
-    "definition": "Borrar {count, plural, =1{plantilla} other{plantillas}}",
-    "context": "Delete {count, plural, =1{template} other{templates}}"
-  },
-  {
-    "term": "component.petition-list-header.duplicate-petition-label",
-    "definition": "Duplicar {count, plural, =1{petición} other{peticiones}}",
-    "context": "Duplicate {count, plural, =1{petition} other{petitions}}"
-  },
-  {
-    "term": "component.petition-list-header.duplicate-template-label",
-    "definition": "Duplicar {count, plural, =1{plantilla} other{plantillas}}",
-    "context": "Duplicate {count, plural, =1{template} other{templates}}"
-  },
-  {
-    "term": "component.petition-list-header.save-as-template-label",
-    "definition": "Guardar como plantilla",
-    "context": "Save as template"
-  },
-  {
-    "term": "component.petition-list-header.share-petition-label",
-    "definition": "Compartir {count, plural, =1{petición} other{peticiones}}",
-    "context": "Share {count, plural, =1{petition} other{petitions}}"
-  },
-  {
-    "term": "component.petition-list-header.share-template-label",
-    "definition": "Compartir {count, plural, =1{plantilla} other{plantillas}}",
-    "context": "Share {count, plural, =1{template} other{templates}}"
-  },
-  {
     "term": "component.petition-list-shared-with-filter.add-filter",
     "definition": "Añadir filtro",
     "context": "Add filter"
@@ -3338,6 +3303,11 @@
     "term": "component.suggested-signers.header",
     "definition": "Sugerido:",
     "context": "Suggested:"
+  },
+  {
+    "term": "component.table-page.n-selected",
+    "definition": "{count, plural, =1 {1 seleccionado} other {# seleccionados}}",
+    "context": "{count} selected"
   },
   {
     "term": "component.table.filter-header",
@@ -5285,6 +5255,21 @@
     "context": "Export to PDF"
   },
   {
+    "term": "page.petitions-list.actions-clone",
+    "definition": "Duplicar",
+    "context": "Duplicate"
+  },
+  {
+    "term": "page.petitions-list.actions-save-as-template",
+    "definition": "Guardar como plantilla",
+    "context": "Save as template"
+  },
+  {
+    "term": "page.petitions-list.actions-share",
+    "definition": "Compartir",
+    "context": "Share"
+  },
+  {
     "term": "page.preview.template-only-cache-alert",
     "definition": "<b>Solo previsualización</b> - Los cambios que añadas como respuestas o comentarios no se guardarán. Para completar y enviar esta plantilla dale a <b>{button}</b>.",
     "context": "<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>{button}</b>."
@@ -6285,11 +6270,6 @@
     "context": "Configuration"
   },
   {
-    "term": "petitions.header.last-reminder",
-    "definition": "Último recordatorio",
-    "context": "Last reminder"
-  },
-  {
     "term": "petitions.header.name",
     "definition": "Nombre de la petición",
     "context": "Petition name"
@@ -6298,6 +6278,11 @@
     "term": "petitions.header.recipient",
     "definition": "Destinatario",
     "context": "Recipient"
+  },
+  {
+    "term": "petitions.header.reminders",
+    "definition": "Recordatorios",
+    "context": "Reminders"
   },
   {
     "term": "petitions.header.reminders-disabled",
@@ -6315,9 +6300,9 @@
     "context": "Next reminder configured for {date}"
   },
   {
-    "term": "petitions.header.shared-with",
-    "definition": "Compartida con",
-    "context": "Shared with"
+    "term": "petitions.header.shared",
+    "definition": "Compartida",
+    "context": "Shared"
   },
   {
     "term": "petitions.header.status",

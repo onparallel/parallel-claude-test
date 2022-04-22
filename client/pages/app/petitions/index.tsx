@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { Box, Flex, Select, Text } from "@chakra-ui/react";
+import { CopyIcon, DeleteIcon, PaperPlaneIcon, UserArrowIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
@@ -13,7 +14,6 @@ import {
 import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
 import {
   PetitionBaseType,
-  PetitionFilter,
   PetitionSharedWithFilter,
   PetitionStatus,
   Petitions_PetitionBaseFragment,
@@ -42,7 +42,7 @@ import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColum
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { MouseEvent, PropsWithChildren, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { omit, pick } from "remeda";
+import { pick } from "remeda";
 
 const SORTING = ["name", "createdAt", "sentAt"] as const;
 
@@ -104,18 +104,17 @@ function Petitions() {
     }));
   }
 
-  function handleFilterChange(filter: PetitionFilter) {
+  function handleTypeChange(type: PetitionBaseType) {
     setQueryState((current) => ({
       ...current,
-      status: filter.status,
-      type: filter.type ?? undefined,
-      tags: filter.tagIds,
+      status: null,
+      type,
       page: 1,
       // avoid invalid filter/sort combinations
       sort:
-        filter.type === "TEMPLATE" && current.sort?.field === "sentAt"
+        type === "TEMPLATE" && current.sort?.field === "sentAt"
           ? { ...current.sort, field: "createdAt" }
-          : filter.type !== "TEMPLATE" && current.sort?.field === "createdAt"
+          : type !== "TEMPLATE" && current.sort?.field === "createdAt"
           ? { ...current.sort, field: "sentAt" }
           : current.sort,
     }));
@@ -213,6 +212,17 @@ function Petitions() {
 
   const context = useMemo(() => ({ user: me! }), [me]);
 
+  const actions = usePetitionListActions({
+    user: me,
+    type: state.type,
+    selectedCount: selected.length,
+    onDeleteClick: handleDeleteClick,
+    onCloneAsTemplateClick: handleCloneAsTemplate,
+    onUseTemplateClick: handleUseTemplateClick,
+    onCloneClick: handleCloneClick,
+    onShareClick: handlePetitionSharingClick,
+  });
+
   return (
     <AppLayout
       title={
@@ -253,24 +263,12 @@ function Petitions() {
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
+          actions={actions}
           header={
             <PetitionListHeader
-              user={me}
-              filter={{
-                status: state.status,
-                type: state.type,
-                tagIds: state.tags,
-              }}
               search={state.search}
-              selectedCount={selected.length}
               onSearchChange={handleSearchChange}
-              onFilterChange={handleFilterChange}
-              onDeleteClick={handleDeleteClick}
-              onCloneAsTemplateClick={handleCloneAsTemplate}
-              onUseTemplateClick={handleUseTemplateClick}
               onReload={() => refetch()}
-              onCloneClick={handleCloneClick}
-              onShareClick={handlePetitionSharingClick}
             />
           }
           body={
@@ -306,8 +304,7 @@ function Petitions() {
           Footer={RenderFooter}
           footerProps={{
             value: state.type,
-            onChange: (type: PetitionBaseType) =>
-              setQueryState((s) => ({ ...omit(s, ["status"]), type })),
+            onChange: handleTypeChange,
           }}
         />
       </Flex>
@@ -354,6 +351,13 @@ function RenderFooter({
 export type PetitionSelection = Petitions_PetitionBaseFragment;
 
 Petitions.fragments = {
+  get User() {
+    return gql`
+      fragment Petitions_User on User {
+        role
+      }
+    `;
+  },
   get PetitionBasePagination() {
     return gql`
       fragment Petitions_PetitionBasePagination on PetitionBasePagination {
@@ -410,6 +414,74 @@ Petitions.queries = [
     ${Petitions.fragments.PetitionBasePagination}
   `,
 ];
+
+function usePetitionListActions({
+  user,
+  type,
+  selectedCount,
+  onShareClick,
+  onCloneClick,
+  onCloneAsTemplateClick,
+  onUseTemplateClick,
+  onDeleteClick,
+}: {
+  user: any;
+  type: PetitionBaseType;
+  selectedCount: number;
+  onShareClick: () => void;
+  onCloneClick: () => void;
+  onCloneAsTemplateClick: () => void;
+  onUseTemplateClick: () => void;
+  onDeleteClick: () => void;
+}) {
+  return [
+    {
+      key: "share",
+      onClick: onShareClick,
+      leftIcon: <UserArrowIcon />,
+      children: <FormattedMessage id="page.petitions-list.actions-share" defaultMessage="Share" />,
+    },
+    ...(user.role === "COLLABORATOR"
+      ? []
+      : [
+          {
+            key: "clone",
+            onClick: onCloneClick,
+            leftIcon: <CopyIcon />,
+            children: (
+              <FormattedMessage id="page.petitions-list.actions-clone" defaultMessage="Duplicate" />
+            ),
+          },
+        ]),
+    type === "PETITION"
+      ? {
+          key: "saveAsTemplate",
+          onClick: onCloneAsTemplateClick,
+          isDisabled: selectedCount !== 1,
+          leftIcon: <CopyIcon />,
+          children: (
+            <FormattedMessage
+              id="page.petitions-list.actions-save-as-template"
+              defaultMessage="Save as template"
+            />
+          ),
+        }
+      : {
+          key: "useTemplate",
+          onClick: onUseTemplateClick,
+          isDisabled: selectedCount !== 1,
+          leftIcon: <PaperPlaneIcon />,
+          children: <FormattedMessage id="generic.use-template" defaultMessage="Use template" />,
+        },
+    {
+      key: "delete",
+      onClick: onDeleteClick,
+      leftIcon: <DeleteIcon />,
+      children: <FormattedMessage id="generic.delete" defaultMessage="Delete" />,
+      colorScheme: "red",
+    },
+  ];
+}
 
 Petitions.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   await fetchQuery(Petitions_userDocument);

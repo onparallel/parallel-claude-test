@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { Flex, Text, useToast } from "@chakra-ui/react";
+import { DeleteIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { useDialog, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { TableColumn } from "@parallel/components/common/Table";
@@ -170,14 +171,21 @@ function Contacts() {
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
+          actions={[
+            {
+              key: "delete",
+              onClick: handleDeleteClick,
+              leftIcon: <DeleteIcon />,
+              colorScheme: "red",
+              children: <FormattedMessage id="generic.delete" defaultMessage="Delete" />,
+            },
+          ]}
           header={
             <ContactListHeader
               search={state.search}
-              selectionCount={selected.length}
               onSearchChange={handleSearchChange}
               onReload={() => refetch()}
               onCreateClick={handleCreateClick}
-              onDeleteClick={handleDeleteClick}
               onImportClick={handleImportClick}
             />
           }
@@ -223,6 +231,9 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
           id: "contacts.header.first-name",
           defaultMessage: "First name",
         }),
+        cellProps: {
+          minWidth: "30%",
+        },
         CellContent: ({ row }) => (
           <>
             {row.firstName || (
@@ -240,6 +251,9 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
           id: "contacts.header.last-name",
           defaultMessage: "Last name",
         }),
+        cellProps: {
+          minWidth: "30%",
+        },
         CellContent: ({ row }) => (
           <>
             {row.lastName || (
@@ -257,6 +271,9 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
           id: "contacts.header.email",
           defaultMessage: "Email",
         }),
+        cellProps: {
+          minWidth: "30%",
+        },
         CellContent: ({ row }) => <>{row.email}</>,
       },
       {
@@ -266,6 +283,9 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
           id: "generic.created-at",
           defaultMessage: "Created at",
         }),
+        cellProps: {
+          minWidth: "10%",
+        },
         CellContent: ({ row: { createdAt } }) => (
           <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime whiteSpace="nowrap" />
         ),
