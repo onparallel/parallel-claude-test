@@ -1,5 +1,6 @@
-import { Box, BoxProps, Flex, FlexProps, Square, Stack, Text } from "@chakra-ui/react";
+import { Box, BoxProps, HStack, Square, Stack, Text } from "@chakra-ui/react";
 import { CheckIcon, QuestionIcon } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionProgress, PetitionStatus } from "@parallel/graphql/__types";
 import { generateCssStripe } from "@parallel/utils/css";
 import { FormattedMessage } from "react-intl";
@@ -132,7 +133,7 @@ function EmptyProgressText({ external, internal }: PetitionProgress) {
     internal.total - (internal.validated + internal.replied + internal.optional);
 
   return (
-    <ProgressText as="li" type="EMPTY">
+    <ProgressText type="EMPTY">
       <FormattedMessage
         id="component.petition-progress-bar.not-replied-with-internal"
         defaultMessage="{count} {count, plural, =1{field} other {fields}} without replies{internalCount, plural,=0{} other { ({internalCount} internal)}}."
@@ -149,7 +150,7 @@ function ValidatedProgressText({ external, internal }: PetitionProgress) {
   if (!external.validated && !internal.validated) return null;
 
   return (
-    <ProgressText as="li" type="VALIDATED">
+    <ProgressText type="VALIDATED">
       <FormattedMessage
         id="component.petition-progress-bar.validated-with-internal"
         defaultMessage="{count} reviewed {count, plural, =1{field} other {fields}}{internalCount, plural,=0{} other { ({internalCount} internal)}}."
@@ -166,7 +167,7 @@ function RepliedProgressText({ external, internal }: PetitionProgress) {
   if (!external.replied && !internal.replied) return null;
 
   return (
-    <ProgressText as="li" type="REPLIED">
+    <ProgressText type="REPLIED">
       <FormattedMessage
         id="component.petition-progress-bar.replied-with-internal"
         defaultMessage="{count} replied {count, plural, =1{field} other {fields}}{internalCount, plural,=0{} other { ({internalCount} internal)}}."
@@ -183,7 +184,7 @@ function OptionalProgressText({ external, internal }: PetitionProgress) {
   if (!external.optional && !internal.optional) return null;
 
   return (
-    <ProgressText as="li" type="OPTIONAL">
+    <ProgressText type="OPTIONAL">
       <FormattedMessage
         id="component.petition-progress-bar.optional-with-internal"
         defaultMessage="{count} optional {count, plural, =1{field} other {fields}} without replies{internalCount, plural,=0{} other { ({internalCount} internal)}}."
@@ -196,20 +197,14 @@ function OptionalProgressText({ external, internal }: PetitionProgress) {
   );
 }
 
-function ProgressText({ children, type, ...props }: FlexProps & { type: keyof typeof STYLES }) {
+const ProgressText = chakraForwardRef<"li", { type: keyof typeof STYLES }>(function ProgressText(
+  { children, type, ...props },
+  ref
+) {
   return (
-    <Flex {...props} alignItems="baseline">
-      <Square
-        size="14px"
-        borderRadius="sm"
-        marginRight={2}
-        position="relative"
-        top="1px"
-        {...STYLES[type]}
-      />
-      <Text as="li" fontSize="sm">
-        {children}
-      </Text>
-    </Flex>
+    <HStack ref={ref as any} as="li" {...(props as any)}>
+      <Square size="14px" borderRadius="sm" position="relative" top="1px" {...STYLES[type]} />
+      <Box>{children}</Box>
+    </HStack>
   );
-}
+});
