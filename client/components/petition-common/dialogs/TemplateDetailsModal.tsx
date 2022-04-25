@@ -109,11 +109,14 @@ export function TemplateDetailsModal({
   const showPetitionSharingDialog = usePetitionSharingDialog();
   const handlePetitionSharingClick = async () => {
     try {
-      await showPetitionSharingDialog({
+      const res = await showPetitionSharingDialog({
         userId: me.id,
         petitionIds: [template.id],
         isTemplate: true,
       });
+      if (res?.close) {
+        props.onClose();
+      }
     } catch {}
   };
 

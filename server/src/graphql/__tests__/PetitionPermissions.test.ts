@@ -1804,25 +1804,6 @@ describe("GraphQL/Petition Permissions", () => {
       expect(data).toBeNull();
     });
 
-    it("sends error when trying to remove permissions for logged user", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($petitionIds: [GID!]!, $userIds: [GID!]!) {
-            removePetitionPermission(petitionIds: $petitionIds, userIds: $userIds) {
-              id
-            }
-          }
-        `,
-        variables: {
-          petitionIds: [toGlobalId("Petition", userPetition.id)],
-          userIds: [toGlobalId("User", loggedUser.id)],
-        },
-      });
-
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
-      expect(data).toBeNull();
-    });
-
     it("sends error if user is not owner of the petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`

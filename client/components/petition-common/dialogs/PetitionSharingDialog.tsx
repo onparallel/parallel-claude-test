@@ -26,6 +26,7 @@ import { ChevronDownIcon, DeleteIcon, UserArrowIcon, UsersIcon } from "@parallel
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import {
+  NewPetition_templatesDocument,
   PetitionActivity_petitionDocument,
   PetitionSharingModal_addPetitionPermissionDocument,
   PetitionSharingModal_petitionsDocument,
@@ -61,6 +62,10 @@ type PetitionSharingDialogData = {
   message: string;
 };
 
+type PetitionSharingDialogResult = {
+  close?: boolean;
+};
+
 export function usePetitionSharingDialog() {
   return useDialog(PetitionSharingDialog);
 }
@@ -70,11 +75,14 @@ export function PetitionSharingDialog({
   petitionIds,
   isTemplate,
   ...props
-}: DialogProps<{
-  userId: string;
-  petitionIds: string[];
-  isTemplate?: boolean;
-}>) {
+}: DialogProps<
+  {
+    userId: string;
+    petitionIds: string[];
+    isTemplate?: boolean;
+  },
+  PetitionSharingDialogResult
+>) {
   const intl = useIntl();
   const toast = useToast();
   const [hasUsers, setHasUsers] = useState(false);
@@ -120,11 +128,21 @@ export function PetitionSharingDialog({
           up.user.id === userId
       )
     ) ?? [];
-  const petitionsRW =
+  const petitionsOwnedWrite =
     petitionsById?.filter((petition) =>
       petition?.permissions.some(
         (up) =>
-          up.permissionType !== "OWNER" &&
+          up.permissionType !== "READ" &&
+          up.__typename === "PetitionUserPermission" &&
+          up?.user.id === userId
+      )
+    ) ?? [];
+
+  const petitionsRead =
+    petitionsById?.filter((petition) =>
+      petition?.permissions.some(
+        (up) =>
+          up.permissionType === "READ" &&
           up.__typename === "PetitionUserPermission" &&
           up?.user.id === userId
       )
@@ -151,7 +169,54 @@ export function PetitionSharingDialog({
     },
     [_handleSearchUsers, usersToExclude.join(","), groupsToExclude.join(",")]
   );
-  const handleRemovePetitionPermission = useRemovePetitionPermission();
+
+  interface RemovePetitionPermissionProps {
+    petitionId: string;
+    user?: PetitionSharingModal_UserFragment;
+    userGroup?: PetitionSharingModal_UserGroupFragment;
+  }
+
+  const confirmRemovePetitionPermission = useDialog(ConfirmRemovePetitionPermissionDialog);
+  const [removePetitionPermission] = useMutation(
+    PetitionSharingModal_removePetitionPermissionDocument
+  );
+
+  const handleRemovePetitionPermission = async ({
+    petitionId,
+    user,
+    userGroup,
+  }: RemovePetitionPermissionProps) => {
+    try {
+      const prop = user ? "userIds" : "userGroupIds";
+      const name = user ? user.fullName : userGroup?.name;
+      const id = user ? user.id : userGroup?.id;
+
+      await confirmRemovePetitionPermission({ name });
+      await removePetitionPermission({
+        variables: { petitionId, [prop]: [id] },
+        refetchQueries: [
+          getOperationName(
+            isTemplate ? NewPetition_templatesDocument : PetitionActivity_petitionDocument
+          )!,
+        ],
+        update(client, { data }) {
+          const hasPermissions = Boolean(
+            data?.removePetitionPermission[0].permissions
+              .filter((p) => p.permissionType === "OWNER" || p.permissionType === "WRITE")
+              .filter((p) =>
+                p.__typename === "PetitionUserPermission" ? p.user.id === userId : true
+              ).length
+          );
+          if (!hasPermissions) {
+            client.evict({ id: petitionId });
+            client.gc();
+            props.onResolve?.({ close: true });
+          }
+        },
+      });
+    } catch {}
+  };
+
   const handleTransferPetitionOwnership = useTransferPetitionOwnership();
 
   const [addPetitionPermission] = useMutation(PetitionSharingModal_addPetitionPermissionDocument);
@@ -164,7 +229,7 @@ export function PetitionSharingDialog({
       try {
         await addPetitionPermission({
           variables: {
-            petitionIds: petitionsOwned.map((p) => p!.id),
+            petitionIds: petitionsOwnedWrite.map((p) => p!.id),
             userIds: users.length ? users : null,
             userGroupIds: groups.length ? groups : null,
             permissionType: "WRITE",
@@ -172,7 +237,11 @@ export function PetitionSharingDialog({
             subscribe: isTemplate ? false : subscribe,
             message: message || null,
           },
-          refetchQueries: [getOperationName(PetitionActivity_petitionDocument)!],
+          refetchQueries: [
+            getOperationName(
+              isTemplate ? NewPetition_templatesDocument : PetitionActivity_petitionDocument
+            )!,
+          ],
         });
         toast({
           title: getSuccessTitle(),
@@ -192,7 +261,7 @@ export function PetitionSharingDialog({
         defaultMessage: "{count, plural, =1 {Template} other {Templates}} shared",
       },
       {
-        count: petitionsOwned.length,
+        count: petitionsOwnedWrite.length,
       }
     );
 
@@ -202,7 +271,7 @@ export function PetitionSharingDialog({
         defaultMessage: "{count, plural, =1 {Petition} other {Petitions}} shared",
       },
       {
-        count: petitionsOwned.length,
+        count: petitionsOwnedWrite.length,
       }
     );
 
@@ -263,9 +332,9 @@ export function PetitionSharingDialog({
                       }}
                       onBlur={onBlur}
                       onSearch={handleSearchUsers}
-                      isDisabled={!petitionsOwned.length}
+                      isDisabled={!petitionsOwnedWrite.length}
                       placeholder={
-                        petitionsOwned.length
+                        petitionsOwnedWrite.length
                           ? undefined
                           : intl.formatMessage({
                               id: "petition-sharing.input-placeholder-not-owner",
@@ -333,7 +402,7 @@ export function PetitionSharingDialog({
                       {user.email}
                     </Text>
                   </Box>
-                  {permissionType === "OWNER" || !petitionsOwned.length ? (
+                  {permissionType === "OWNER" ? (
                     <Box
                       paddingX={3}
                       fontWeight="bold"
@@ -358,6 +427,7 @@ export function PetitionSharingDialog({
                         <MenuItem
                           onClick={() => handleTransferPetitionOwnership(petitionId, user)}
                           icon={<UserArrowIcon display="block" boxSize={4} />}
+                          isDisabled={!petitionsOwned.length}
                         >
                           <FormattedMessage
                             id="generic.transfer-ownership"
@@ -366,7 +436,12 @@ export function PetitionSharingDialog({
                         </MenuItem>
                         <MenuItem
                           color="red.500"
-                          onClick={() => handleRemovePetitionPermission({ petitionId, user })}
+                          onClick={() =>
+                            handleRemovePetitionPermission({
+                              petitionId,
+                              user,
+                            })
+                          }
                           icon={<DeleteIcon display="block" boxSize={4} />}
                         >
                           <FormattedMessage id="generic.remove" defaultMessage="Remove" />
@@ -407,7 +482,7 @@ export function PetitionSharingDialog({
                         </UserListPopover>
                       </Flex>
                     </Box>
-                    {!petitionsOwned.length ? (
+                    {permissionType === "READ" ? (
                       <Box
                         paddingX={3}
                         fontWeight="bold"
@@ -448,30 +523,30 @@ export function PetitionSharingDialog({
                 );
               })}
             </Stack>
-            <Stack display={petitionsRW.length && petitionIds.length !== 1 ? "flex" : "none"}>
+            <Stack display={petitionsRead.length && petitionIds.length !== 1 ? "flex" : "none"}>
               <Alert status="warning" backgroundColor="orange.100" borderRadius="md">
                 <Flex alignItems="center" justifyContent="flex-start">
                   <AlertIcon color="yellow.500" />
                   <AlertDescription>
-                    {petitionsRW.length !== petitionIds.length ? (
+                    {petitionsRead.length !== petitionIds.length ? (
                       <>
                         <Text>
                           {isTemplate ? (
                             <FormattedMessage
                               id="template-sharing.insufficient-permissions-list"
                               defaultMessage="The following {count, plural, =1 {template has} other {templates have}} been ignored and cannot be shared due to lack of permissions:"
-                              values={{ count: petitionsRW.length }}
+                              values={{ count: petitionsRead.length }}
                             />
                           ) : (
                             <FormattedMessage
                               id="petition-sharing.insufficient-permissions-list"
                               defaultMessage="The following {count, plural, =1 {petition has} other {petitions have}} been ignored and cannot be shared due to lack of permissions:"
-                              values={{ count: petitionsRW.length }}
+                              values={{ count: petitionsRead.length }}
                             />
                           )}
                         </Text>
                         <UnorderedList paddingLeft={2}>
-                          {petitionsRW.map((petition) => (
+                          {petitionsRead.map((petition) => (
                             <ListItem key={petition!.id}>
                               <Text as="span" textStyle={petition!.name ? undefined : "hint"}>
                                 {petition?.name ??
@@ -663,35 +738,6 @@ PetitionSharingDialog.queries = [
     ${PetitionSharingDialog.fragments.Petition}
   `,
 ];
-
-interface RemovePetitionPermissionProps {
-  petitionId: string;
-  user?: PetitionSharingModal_UserFragment;
-  userGroup?: PetitionSharingModal_UserGroupFragment;
-}
-
-function useRemovePetitionPermission() {
-  const confirmRemovePetitionPermission = useDialog(ConfirmRemovePetitionPermissionDialog);
-  const [removePetitionPermission] = useMutation(
-    PetitionSharingModal_removePetitionPermissionDocument
-  );
-  return useCallback(
-    async ({ petitionId, user, userGroup }: RemovePetitionPermissionProps) => {
-      try {
-        const prop = user ? "userIds" : "userGroupIds";
-        const name = user ? user.fullName : userGroup?.name;
-        const id = user ? user.id : userGroup?.id;
-
-        await confirmRemovePetitionPermission({ name });
-        await removePetitionPermission({
-          variables: { petitionId, [prop]: [id] },
-          refetchQueries: [getOperationName(PetitionActivity_petitionDocument)!],
-        });
-      } catch {}
-    },
-    [confirmRemovePetitionPermission, removePetitionPermission]
-  );
-}
 
 function ConfirmRemovePetitionPermissionDialog({
   name = "",
