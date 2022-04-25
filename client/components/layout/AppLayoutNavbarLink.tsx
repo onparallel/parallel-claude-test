@@ -6,6 +6,7 @@ import { Link } from "../common/Link";
 import { SmallPopover } from "../common/SmallPopover";
 
 export interface AppLayoutNavbarLinkProps {
+  section: string;
   href?: string;
   isActive?: boolean;
   icon: ReactElement;
@@ -15,6 +16,7 @@ export interface AppLayoutNavbarLinkProps {
 }
 
 export function AppLayoutNavbarLink({
+  section,
   href,
   isActive,
   icon,
@@ -27,6 +29,7 @@ export function AppLayoutNavbarLink({
   return isAvailable ? (
     <Link
       href={href!}
+      data-link={`navbar-${section}`}
       position="relative"
       display="block"
       userSelect="none"

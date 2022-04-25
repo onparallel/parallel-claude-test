@@ -156,7 +156,7 @@ export const AppLayoutNavbar = Object.assign(
             {items.map(({ section, href, isActive, isAvailable, icon, text, warning }) => (
               <ListItem key={section}>
                 <AppLayoutNavbarLink
-                  data-link={`navbar-${section}`}
+                  section={section}
                   href={href}
                   isAvailable={isAvailable}
                   isActive={isActive}
