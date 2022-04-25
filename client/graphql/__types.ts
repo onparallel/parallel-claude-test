@@ -7550,7 +7550,7 @@ export type TemplateDetailsModal_PetitionTemplateFragment = {
   >;
 };
 
-export type useNetDocumentsExport_PetitionFragment = {
+export type useCuatrecasasExport_PetitionFragment = {
   __typename?: "Petition";
   id: string;
   name?: string | null;
@@ -7574,7 +7574,7 @@ export type useNetDocumentsExport_PetitionFragment = {
   } | null;
 };
 
-export type useNetDocumentsExport_PetitionSignatureRequestFragment = {
+export type useCuatrecasasExport_PetitionSignatureRequestFragment = {
   __typename?: "PetitionSignatureRequest";
   id: string;
   metadata: { [key: string]: any };
@@ -7582,24 +7582,24 @@ export type useNetDocumentsExport_PetitionSignatureRequestFragment = {
   signedDocumentFilename?: string | null;
 };
 
-export type useNetDocumentsExport_PetitionFieldFragment = {
+export type useCuatrecasasExport_PetitionFieldFragment = {
   __typename?: "PetitionField";
   type: PetitionFieldType;
 };
 
-export type useNetDocumentsExport_PetitionFieldReplyFragment = {
+export type useCuatrecasasExport_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
   id: string;
   metadata: { [key: string]: any };
   content: { [key: string]: any };
 };
 
-export type useNetDocumentsExport_fileUploadReplyDownloadLinkMutationVariables = Exact<{
+export type useCuatrecasasExport_fileUploadReplyDownloadLinkMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   replyId: Scalars["GID"];
 }>;
 
-export type useNetDocumentsExport_fileUploadReplyDownloadLinkMutation = {
+export type useCuatrecasasExport_fileUploadReplyDownloadLinkMutation = {
   fileUploadReplyDownloadLink: {
     __typename?: "FileUploadDownloadLinkResult";
     result: Result;
@@ -7607,12 +7607,12 @@ export type useNetDocumentsExport_fileUploadReplyDownloadLinkMutation = {
   };
 };
 
-export type useNetDocumentsExport_signedPetitionDownloadLinkMutationVariables = Exact<{
+export type useCuatrecasasExport_signedPetitionDownloadLinkMutationVariables = Exact<{
   petitionSignatureRequestId: Scalars["GID"];
   downloadAuditTrail?: InputMaybe<Scalars["Boolean"]>;
 }>;
 
-export type useNetDocumentsExport_signedPetitionDownloadLinkMutation = {
+export type useCuatrecasasExport_signedPetitionDownloadLinkMutation = {
   signedPetitionDownloadLink: {
     __typename?: "FileUploadDownloadLinkResult";
     result: Result;
@@ -7620,22 +7620,22 @@ export type useNetDocumentsExport_signedPetitionDownloadLinkMutation = {
   };
 };
 
-export type useNetDocumentsExport_updatePetitionMetadataMutationVariables = Exact<{
+export type useCuatrecasasExport_updatePetitionMetadataMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   metadata: Scalars["JSONObject"];
 }>;
 
-export type useNetDocumentsExport_updatePetitionMetadataMutation = {
+export type useCuatrecasasExport_updatePetitionMetadataMutation = {
   updatePetitionMetadata: { __typename?: "Petition"; id: string; metadata: { [key: string]: any } };
 };
 
-export type useNetDocumentsExport_updatePetitionFieldReplyMetadataMutationVariables = Exact<{
+export type useCuatrecasasExport_updatePetitionFieldReplyMetadataMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   replyId: Scalars["GID"];
   metadata: Scalars["JSONObject"];
 }>;
 
-export type useNetDocumentsExport_updatePetitionFieldReplyMetadataMutation = {
+export type useCuatrecasasExport_updatePetitionFieldReplyMetadataMutation = {
   updatePetitionFieldReplyMetadata: {
     __typename?: "PetitionFieldReply";
     id: string;
@@ -7643,12 +7643,12 @@ export type useNetDocumentsExport_updatePetitionFieldReplyMetadataMutation = {
   };
 };
 
-export type useNetDocumentsExport_updateSignatureRequestMetadataMutationVariables = Exact<{
+export type useCuatrecasasExport_updateSignatureRequestMetadataMutationVariables = Exact<{
   petitionSignatureRequestId: Scalars["GID"];
   metadata: Scalars["JSONObject"];
 }>;
 
-export type useNetDocumentsExport_updateSignatureRequestMetadataMutation = {
+export type useCuatrecasasExport_updateSignatureRequestMetadataMutation = {
   updateSignatureRequestMetadata: {
     __typename?: "PetitionSignatureRequest";
     id: string;
@@ -20362,45 +20362,45 @@ export const PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReply
   PreviewPetitionFieldMutations_updateReplyContent_PetitionFieldReplyFragment,
   unknown
 >;
-export const useNetDocumentsExport_PetitionFieldFragmentDoc = gql`
-  fragment useNetDocumentsExport_PetitionField on PetitionField {
+export const useCuatrecasasExport_PetitionFieldFragmentDoc = gql`
+  fragment useCuatrecasasExport_PetitionField on PetitionField {
     type
   }
-` as unknown as DocumentNode<useNetDocumentsExport_PetitionFieldFragment, unknown>;
-export const useNetDocumentsExport_PetitionFieldReplyFragmentDoc = gql`
-  fragment useNetDocumentsExport_PetitionFieldReply on PetitionFieldReply {
+` as unknown as DocumentNode<useCuatrecasasExport_PetitionFieldFragment, unknown>;
+export const useCuatrecasasExport_PetitionFieldReplyFragmentDoc = gql`
+  fragment useCuatrecasasExport_PetitionFieldReply on PetitionFieldReply {
     id
     metadata
     content
   }
-` as unknown as DocumentNode<useNetDocumentsExport_PetitionFieldReplyFragment, unknown>;
-export const useNetDocumentsExport_PetitionSignatureRequestFragmentDoc = gql`
-  fragment useNetDocumentsExport_PetitionSignatureRequest on PetitionSignatureRequest {
+` as unknown as DocumentNode<useCuatrecasasExport_PetitionFieldReplyFragment, unknown>;
+export const useCuatrecasasExport_PetitionSignatureRequestFragmentDoc = gql`
+  fragment useCuatrecasasExport_PetitionSignatureRequest on PetitionSignatureRequest {
     id
     metadata
     auditTrailFilename
     signedDocumentFilename
   }
-` as unknown as DocumentNode<useNetDocumentsExport_PetitionSignatureRequestFragment, unknown>;
-export const useNetDocumentsExport_PetitionFragmentDoc = gql`
-  fragment useNetDocumentsExport_Petition on Petition {
+` as unknown as DocumentNode<useCuatrecasasExport_PetitionSignatureRequestFragment, unknown>;
+export const useCuatrecasasExport_PetitionFragmentDoc = gql`
+  fragment useCuatrecasasExport_Petition on Petition {
     id
     name
     metadata
     fields {
-      ...useNetDocumentsExport_PetitionField
+      ...useCuatrecasasExport_PetitionField
       replies {
-        ...useNetDocumentsExport_PetitionFieldReply
+        ...useCuatrecasasExport_PetitionFieldReply
       }
     }
     currentSignatureRequest {
-      ...useNetDocumentsExport_PetitionSignatureRequest
+      ...useCuatrecasasExport_PetitionSignatureRequest
     }
   }
-  ${useNetDocumentsExport_PetitionFieldFragmentDoc}
-  ${useNetDocumentsExport_PetitionFieldReplyFragmentDoc}
-  ${useNetDocumentsExport_PetitionSignatureRequestFragmentDoc}
-` as unknown as DocumentNode<useNetDocumentsExport_PetitionFragment, unknown>;
+  ${useCuatrecasasExport_PetitionFieldFragmentDoc}
+  ${useCuatrecasasExport_PetitionFieldReplyFragmentDoc}
+  ${useCuatrecasasExport_PetitionSignatureRequestFragmentDoc}
+` as unknown as DocumentNode<useCuatrecasasExport_PetitionFragment, unknown>;
 export const useFilenamePlaceholdersRename_PetitionFieldFragmentDoc = gql`
   fragment useFilenamePlaceholdersRename_PetitionField on PetitionField {
     id
@@ -20416,7 +20416,7 @@ export const useFilenamePlaceholdersRename_PetitionFieldReplyFragmentDoc = gql`
 export const ExportRepliesProgressDialog_PetitionFragmentDoc = gql`
   fragment ExportRepliesProgressDialog_Petition on Petition {
     id
-    ...useNetDocumentsExport_Petition
+    ...useCuatrecasasExport_Petition
     currentSignatureRequest {
       signedDocumentFilename
       auditTrailFilename
@@ -20429,7 +20429,7 @@ export const ExportRepliesProgressDialog_PetitionFragmentDoc = gql`
       }
     }
   }
-  ${useNetDocumentsExport_PetitionFragmentDoc}
+  ${useCuatrecasasExport_PetitionFragmentDoc}
   ${useFilenamePlaceholdersRename_PetitionFieldFragmentDoc}
   ${useFilenamePlaceholdersRename_PetitionFieldReplyFragmentDoc}
 ` as unknown as DocumentNode<ExportRepliesProgressDialog_PetitionFragment, unknown>;
@@ -23687,19 +23687,19 @@ export const PublicLinkSettingsDialog_isValidSlugDocument = gql`
   PublicLinkSettingsDialog_isValidSlugQuery,
   PublicLinkSettingsDialog_isValidSlugQueryVariables
 >;
-export const useNetDocumentsExport_fileUploadReplyDownloadLinkDocument = gql`
-  mutation useNetDocumentsExport_fileUploadReplyDownloadLink($petitionId: GID!, $replyId: GID!) {
+export const useCuatrecasasExport_fileUploadReplyDownloadLinkDocument = gql`
+  mutation useCuatrecasasExport_fileUploadReplyDownloadLink($petitionId: GID!, $replyId: GID!) {
     fileUploadReplyDownloadLink(petitionId: $petitionId, replyId: $replyId) {
       result
       url
     }
   }
 ` as unknown as DocumentNode<
-  useNetDocumentsExport_fileUploadReplyDownloadLinkMutation,
-  useNetDocumentsExport_fileUploadReplyDownloadLinkMutationVariables
+  useCuatrecasasExport_fileUploadReplyDownloadLinkMutation,
+  useCuatrecasasExport_fileUploadReplyDownloadLinkMutationVariables
 >;
-export const useNetDocumentsExport_signedPetitionDownloadLinkDocument = gql`
-  mutation useNetDocumentsExport_signedPetitionDownloadLink(
+export const useCuatrecasasExport_signedPetitionDownloadLinkDocument = gql`
+  mutation useCuatrecasasExport_signedPetitionDownloadLink(
     $petitionSignatureRequestId: GID!
     $downloadAuditTrail: Boolean
   ) {
@@ -23712,22 +23712,22 @@ export const useNetDocumentsExport_signedPetitionDownloadLinkDocument = gql`
     }
   }
 ` as unknown as DocumentNode<
-  useNetDocumentsExport_signedPetitionDownloadLinkMutation,
-  useNetDocumentsExport_signedPetitionDownloadLinkMutationVariables
+  useCuatrecasasExport_signedPetitionDownloadLinkMutation,
+  useCuatrecasasExport_signedPetitionDownloadLinkMutationVariables
 >;
-export const useNetDocumentsExport_updatePetitionMetadataDocument = gql`
-  mutation useNetDocumentsExport_updatePetitionMetadata($petitionId: GID!, $metadata: JSONObject!) {
+export const useCuatrecasasExport_updatePetitionMetadataDocument = gql`
+  mutation useCuatrecasasExport_updatePetitionMetadata($petitionId: GID!, $metadata: JSONObject!) {
     updatePetitionMetadata(petitionId: $petitionId, metadata: $metadata) {
       id
       metadata
     }
   }
 ` as unknown as DocumentNode<
-  useNetDocumentsExport_updatePetitionMetadataMutation,
-  useNetDocumentsExport_updatePetitionMetadataMutationVariables
+  useCuatrecasasExport_updatePetitionMetadataMutation,
+  useCuatrecasasExport_updatePetitionMetadataMutationVariables
 >;
-export const useNetDocumentsExport_updatePetitionFieldReplyMetadataDocument = gql`
-  mutation useNetDocumentsExport_updatePetitionFieldReplyMetadata(
+export const useCuatrecasasExport_updatePetitionFieldReplyMetadataDocument = gql`
+  mutation useCuatrecasasExport_updatePetitionFieldReplyMetadata(
     $petitionId: GID!
     $replyId: GID!
     $metadata: JSONObject!
@@ -23742,11 +23742,11 @@ export const useNetDocumentsExport_updatePetitionFieldReplyMetadataDocument = gq
     }
   }
 ` as unknown as DocumentNode<
-  useNetDocumentsExport_updatePetitionFieldReplyMetadataMutation,
-  useNetDocumentsExport_updatePetitionFieldReplyMetadataMutationVariables
+  useCuatrecasasExport_updatePetitionFieldReplyMetadataMutation,
+  useCuatrecasasExport_updatePetitionFieldReplyMetadataMutationVariables
 >;
-export const useNetDocumentsExport_updateSignatureRequestMetadataDocument = gql`
-  mutation useNetDocumentsExport_updateSignatureRequestMetadata(
+export const useCuatrecasasExport_updateSignatureRequestMetadataDocument = gql`
+  mutation useCuatrecasasExport_updateSignatureRequestMetadata(
     $petitionSignatureRequestId: GID!
     $metadata: JSONObject!
   ) {
@@ -23759,8 +23759,8 @@ export const useNetDocumentsExport_updateSignatureRequestMetadataDocument = gql`
     }
   }
 ` as unknown as DocumentNode<
-  useNetDocumentsExport_updateSignatureRequestMetadataMutation,
-  useNetDocumentsExport_updateSignatureRequestMetadataMutationVariables
+  useCuatrecasasExport_updateSignatureRequestMetadataMutation,
+  useCuatrecasasExport_updateSignatureRequestMetadataMutationVariables
 >;
 export const useSendPetitionHandler_sendPetitionDocument = gql`
   mutation useSendPetitionHandler_sendPetition(

@@ -16,7 +16,7 @@ import { CheckIcon, CloudUploadIcon } from "@parallel/chakra/icons";
 import { BaseDialog } from "@parallel/components/common/dialogs/BaseDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import { useNetDocumentsExport } from "@parallel/components/petition-common/useNetDocumentsExport";
+import { useCuatrecasasExport } from "@parallel/components/petition-common/useCuatrecasasExport";
 import { ExportRepliesProgressDialog_petitionDocument } from "@parallel/graphql/__types";
 import { useFilenamePlaceholdersRename } from "@parallel/utils/useFilenamePlaceholders";
 import { useEffect, useRef, useState } from "react";
@@ -48,7 +48,7 @@ export function ExportRepliesProgressDialog({
 
   const showErrorDialog = useErrorDialog();
 
-  const netDocuments = useNetDocumentsExport(externalClientId);
+  const cuatrecasasExport = useCuatrecasasExport(externalClientId);
 
   useEffect(() => {
     async function exportReplies() {
@@ -84,7 +84,7 @@ export function ExportRepliesProgressDialog({
 
       try {
         if (hasTextReplies) {
-          excelExternalId = await netDocuments.exportExcel(petition, {
+          excelExternalId = await cuatrecasasExport.exportExcel(petition, {
             signal: abort.signal,
             onProgress: ({ loaded, total }) =>
               setProgress((uploaded + (loaded / total) * 0.5) / totalFiles),
@@ -93,7 +93,7 @@ export function ExportRepliesProgressDialog({
         }
 
         for (const { reply, field } of replies) {
-          const fieldType = await netDocuments.exportFieldReply(
+          const fieldType = await cuatrecasasExport.exportFieldReply(
             {
               petitionId: petition.id,
               excelExternalId,
@@ -113,7 +113,7 @@ export function ExportRepliesProgressDialog({
         }
 
         if (hasSignedDocument) {
-          await netDocuments.exportSignedDocument(petition.currentSignatureRequest!, {
+          await cuatrecasasExport.exportSignedDocument(petition.currentSignatureRequest!, {
             signal: abort.signal,
             onProgress: ({ loaded, total }) =>
               setProgress((uploaded + (loaded / total) * 0.5) / totalFiles),
@@ -125,7 +125,7 @@ export function ExportRepliesProgressDialog({
         }
 
         if (hasAuditTrail) {
-          await netDocuments.exportAuditTrail(petition.currentSignatureRequest!, {
+          await cuatrecasasExport.exportAuditTrail(petition.currentSignatureRequest!, {
             signal: abort.signal,
             onProgress: ({ loaded, total }) =>
               setProgress((uploaded + (loaded / total) * 0.5) / totalFiles),
@@ -133,7 +133,7 @@ export function ExportRepliesProgressDialog({
           setProgress(++uploaded / totalFiles);
         }
 
-        await netDocuments.exportPdfDocument(petition, {
+        await cuatrecasasExport.exportPdfDocument(petition, {
           signal: abort.signal,
           onProgress: ({ loaded, total }) =>
             setProgress((uploaded + (loaded / total) * 0.5) / totalFiles),
@@ -263,7 +263,7 @@ ExportRepliesProgressDialog.fragments = {
   Petition: gql`
     fragment ExportRepliesProgressDialog_Petition on Petition {
       id
-      ...useNetDocumentsExport_Petition
+      ...useCuatrecasasExport_Petition
       currentSignatureRequest {
         signedDocumentFilename
         auditTrailFilename
@@ -276,7 +276,7 @@ ExportRepliesProgressDialog.fragments = {
         }
       }
     }
-    ${useNetDocumentsExport.fragments.Petition}
+    ${useCuatrecasasExport.fragments.Petition}
     ${useFilenamePlaceholdersRename.fragments.PetitionField}
     ${useFilenamePlaceholdersRename.fragments.PetitionFieldReply}
   `,
