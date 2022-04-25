@@ -831,7 +831,14 @@ type Mutation {
   """
   Delete petitions.
   """
-  deletePetitions(force: Boolean = false, ids: [GID!]!): Result!
+  deletePetitions(
+    """
+    If true, this will do a dry-run of the mutation to throw possible errors but it will not perform any modification in DB
+    """
+    dry: Boolean = false
+    force: Boolean = false
+    ids: [GID!]!
+  ): Result!
 
   """
   Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests

@@ -265,6 +265,11 @@ export const deletePetitions = mutationField("deletePetitions", {
   args: {
     ids: nonNull(list(nonNull(globalIdArg("Petition")))),
     force: booleanArg({ default: false }),
+    dry: booleanArg({
+      default: false,
+      description:
+        "If true, this will do a dry-run of the mutation to throw possible errors but it will not perform any modification in DB",
+    }),
   },
   validateArgs: notEmptyArray((args) => args.ids, "ids"),
   resolve: async (_, args, ctx) => {
@@ -322,6 +327,10 @@ export const deletePetitions = mutationField("deletePetitions", {
       throw new WhitelistedError("Can't delete a public template", "DELETE_PUBLIC_TEMPLATE_ERROR", {
         petitionIds: publicTemplates.map((p) => toGlobalId("Petition", p!.id)),
       });
+    }
+
+    if (args.dry) {
+      return RESULT.SUCCESS;
     }
 
     await ctx.petitions.withTransaction(async (t) => {

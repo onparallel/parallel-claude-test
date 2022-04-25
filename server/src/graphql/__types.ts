@@ -3760,6 +3760,7 @@ export interface NexusGenArgTypes {
     };
     deletePetitions: {
       // args
+      dry?: boolean | null; // Boolean
       force?: boolean | null; // Boolean
       ids: NexusGenScalars["GID"][]; // [GID!]!
     };

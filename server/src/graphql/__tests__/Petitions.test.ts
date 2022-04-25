@@ -2134,6 +2134,27 @@ describe("GraphQL/Petitions", () => {
       expect(errors).toContainGraphQLError("DELETE_SHARED_PETITION_ERROR");
       expect(data).toBeNull();
     });
+
+    it("will not delete any petition if passing dry=true", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($ids: [GID!]!, $force: Boolean, $dry: Boolean) {
+            deletePetitions(ids: $ids, force: $force, dry: $dry)
+          }
+        `,
+        { ids: [toGlobalId("Petition", petitionsToDelete[1].id)], force: true, dry: true }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.deletePetitions).toEqual("SUCCESS");
+
+      const [petition] = await mocks.knex
+        .from("petition")
+        .where("id", petitionsToDelete[1].id)
+        .select("*");
+
+      expect(petition.deleted_at).toBeNull();
+    });
   });
 
   describe("deletePetitions shared with groups", () => {

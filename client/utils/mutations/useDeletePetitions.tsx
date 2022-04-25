@@ -20,11 +20,14 @@ export function useDeletePetitions() {
   const confirmDeleteSharedPetitions = useDialog(ConfirmDeleteSharedPetitionsDialog);
 
   const [deletePetitions] = useMutation(useDeletePetitions_deletePetitionsDocument);
-  const handleDeletePetitions = async (petitionIds: string[], force?: boolean) =>
+  const handleDeletePetitions = async (
+    petitionIds: string[],
+    { force, dry }: { force?: boolean; dry?: boolean }
+  ) =>
     await deletePetitions({
-      variables: { ids: petitionIds, force },
+      variables: { ids: petitionIds, force, dry },
       update(client, { data }) {
-        if (data?.deletePetitions === "SUCCESS") {
+        if (!dry && data?.deletePetitions === "SUCCESS") {
           for (const petitionId of petitionIds) {
             client.evict({ id: petitionId });
           }
@@ -69,20 +72,17 @@ export function useDeletePetitions() {
                 defaultMessage: "Unnamed petition",
               }));
 
-        await confirmDelete({
-          petitionIds,
-          name,
-          isTemplate,
-        });
-        const [error] = await withError(handleDeletePetitions(petitionIds));
-
-        if (isApolloError(error, "DELETE_SHARED_PETITION_ERROR")) {
+        // first do a dry-run to check if errors will happen when deleting the petition
+        const [error] = await withError(handleDeletePetitions(petitionIds, { dry: true }));
+        if (error && isApolloError(error, "DELETE_SHARED_PETITION_ERROR")) {
           await confirmDeleteSharedPetitions({ petitionIds, name, isTemplate });
-          await handleDeletePetitions(petitionIds, true);
+        } else if (!error) {
+          await confirmDelete({ petitionIds, name, isTemplate });
         } else {
           throw error;
         }
-      } catch (error) {
+        await handleDeletePetitions(petitionIds, { force: true });
+      } catch (error: any) {
         if (isApolloError(error)) {
           const conflictingPetitionIds =
             (error.graphQLErrors[0]?.extensions?.petitionIds as string[]) ?? [];
@@ -260,8 +260,8 @@ ConfirmDeletePetitionsDialog.fragments = {
 
 ConfirmDeletePetitionsDialog.mutations = [
   gql`
-    mutation useDeletePetitions_deletePetitions($ids: [GID!]!, $force: Boolean) {
-      deletePetitions(ids: $ids, force: $force)
+    mutation useDeletePetitions_deletePetitions($ids: [GID!]!, $force: Boolean, $dry: Boolean) {
+      deletePetitions(ids: $ids, force: $force, dry: $dry)
     }
   `,
 ];

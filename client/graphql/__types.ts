@@ -928,6 +928,7 @@ export interface MutationdeletePetitionReplyArgs {
 }
 
 export interface MutationdeletePetitionsArgs {
+  dry?: InputMaybe<Scalars["Boolean"]>;
   force?: InputMaybe<Scalars["Boolean"]>;
   ids: Array<Scalars["GID"]>;
 }
@@ -19085,6 +19086,7 @@ export type ConfirmDeletePetitionsDialog_PetitionBaseFragment =
 export type useDeletePetitions_deletePetitionsMutationVariables = Exact<{
   ids: Array<Scalars["GID"]> | Scalars["GID"];
   force?: InputMaybe<Scalars["Boolean"]>;
+  dry?: InputMaybe<Scalars["Boolean"]>;
 }>;
 
 export type useDeletePetitions_deletePetitionsMutation = { deletePetitions: Result };
@@ -26262,8 +26264,8 @@ export const useDeleteContacts_deleteContactsDocument = gql`
   useDeleteContacts_deleteContactsMutationVariables
 >;
 export const useDeletePetitions_deletePetitionsDocument = gql`
-  mutation useDeletePetitions_deletePetitions($ids: [GID!]!, $force: Boolean) {
-    deletePetitions(ids: $ids, force: $force)
+  mutation useDeletePetitions_deletePetitions($ids: [GID!]!, $force: Boolean, $dry: Boolean) {
+    deletePetitions(ids: $ids, force: $force, dry: $dry)
   }
 ` as unknown as DocumentNode<
   useDeletePetitions_deletePetitionsMutation,
