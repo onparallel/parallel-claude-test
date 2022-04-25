@@ -200,9 +200,9 @@ export interface NexusGenEnums {
   FilterSharedWithLogicalOperator: "AND" | "OR";
   FilterSharedWithOperator: "IS_OWNER" | "NOT_IS_OWNER" | "NOT_SHARED_WITH" | "SHARED_WITH";
   IntegrationType: db.IntegrationType;
-  OrganizationLimitType: "PETITIONS" | "SIGNATURES";
   OrganizationRole: "ADMIN" | "COLLABORATOR" | "NORMAL" | "OWNER";
   OrganizationStatus: db.OrganizationStatus;
+  OrganizationUsageLimitName: db.OrganizationUsageLimitName;
   OrganizationUsers_OrderBy:
     | "createdAt_ASC"
     | "createdAt_DESC"
@@ -4122,9 +4122,9 @@ export interface NexusGenArgTypes {
       // args
       amount: number; // Int!
       orgId: number; // Int!
-      period: string; // String!
-      type: NexusGenEnums["OrganizationLimitType"]; // OrganizationLimitType!
-      updateCurrentPeriod: boolean; // Boolean!
+      period?: string | null; // String
+      type: NexusGenEnums["OrganizationUsageLimitName"]; // OrganizationUsageLimitName!
+      updateOnlyCurrentPeriod: boolean; // Boolean!
     };
     updateOrganizationLogo: {
       // args

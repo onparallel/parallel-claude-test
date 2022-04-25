@@ -613,7 +613,7 @@ export interface Mutation {
   updateFileUploadReplyComplete: PetitionFieldReply;
   /** Updates the metadata of a public landing template. */
   updateLandingTemplateMetadata: SupportMethodResponse;
-  /** Updates the limits of a given org. If 'Update Current Period' is left unchecked, the changes will be reflected on the next period. */
+  /** Updates the limits of a given org. If 'Update Only Current Period' is left unchecked, the changes will be reflected on the next period. */
   updateOrganizationLimits: SupportMethodResponse;
   /** Updates the logo of an organization */
   updateOrganizationLogo: Organization;
@@ -1296,9 +1296,9 @@ export interface MutationupdateLandingTemplateMetadataArgs {
 export interface MutationupdateOrganizationLimitsArgs {
   amount: Scalars["Int"];
   orgId: Scalars["Int"];
-  period: Scalars["String"];
-  type: OrganizationLimitType;
-  updateCurrentPeriod: Scalars["Boolean"];
+  period?: InputMaybe<Scalars["String"]>;
+  type: OrganizationUsageLimitName;
+  updateOnlyCurrentPeriod: Scalars["Boolean"];
 }
 
 export interface MutationupdateOrganizationLogoArgs {
@@ -1515,8 +1515,6 @@ export interface OrganizationusersArgs {
   sortBy?: InputMaybe<Array<OrganizationUsers_OrderBy>>;
 }
 
-export type OrganizationLimitType = "PETITIONS" | "SIGNATURES";
-
 export interface OrganizationPagination {
   __typename?: "OrganizationPagination";
   /** The requested slice of items. */
@@ -1547,6 +1545,8 @@ export interface OrganizationUsageLimit {
   signatures: OrganizationUsageSignaturesLimit;
   users: OrganizationUsageUserLimit;
 }
+
+export type OrganizationUsageLimitName = "PETITION_SEND" | "SIGNATURIT_SHARED_APIKEY";
 
 export interface OrganizationUsagePetitionLimit {
   __typename?: "OrganizationUsagePetitionLimit";

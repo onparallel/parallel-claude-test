@@ -655,7 +655,7 @@ export const supportMethods: {
     field: {
       name: "updateOrganizationLimits",
       description:
-        "Updates the limits of a given org. If 'Update Current Period' is left unchecked, the changes will be reflected on the next period.",
+        "Updates the limits of a given org. If 'Update Only Current Period' is left unchecked, the changes will be reflected on the next period.",
       args: [
         {
           name: "amount",
@@ -683,12 +683,8 @@ export const supportMethods: {
         },
         {
           name: "period",
-          description: "Period of the usage limit. e.g.: 1 month, 1 year, 20 days, etc...",
-          type: {
-            kind: "NON_NULL",
-            name: null,
-            ofType: { kind: "SCALAR", name: "String", ofType: null },
-          },
+          description: "e.g.: 1 month, 1 year, 20 days, etc...",
+          type: { kind: "SCALAR", name: "String", ofType: null },
           defaultValue: null,
           isDeprecated: false,
           deprecationReason: null,
@@ -699,14 +695,14 @@ export const supportMethods: {
           type: {
             kind: "NON_NULL",
             name: null,
-            ofType: { kind: "ENUM", name: "OrganizationLimitType", ofType: null },
+            ofType: { kind: "ENUM", name: "OrganizationUsageLimitName", ofType: null },
           },
           defaultValue: null,
           isDeprecated: false,
           deprecationReason: null,
         },
         {
-          name: "updateCurrentPeriod",
+          name: "updateOnlyCurrentPeriod",
           description: null,
           type: {
             kind: "NON_NULL",
@@ -1039,15 +1035,20 @@ export const schemaTypes: IntrospectionType[] = [
   },
   {
     kind: "ENUM",
-    name: "OrganizationLimitType",
+    name: "OrganizationUsageLimitName",
     description: null,
     specifiedByURL: null,
     fields: null,
     inputFields: null,
     interfaces: null,
     enumValues: [
-      { name: "PETITIONS", description: null, isDeprecated: false, deprecationReason: null },
-      { name: "SIGNATURES", description: null, isDeprecated: false, deprecationReason: null },
+      { name: "PETITION_SEND", description: null, isDeprecated: false, deprecationReason: null },
+      {
+        name: "SIGNATURIT_SHARED_APIKEY",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
     ],
     possibleTypes: null,
   },

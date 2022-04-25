@@ -1,15 +1,5 @@
 import { Knex } from "knex";
-import {
-  arg,
-  booleanArg,
-  enumType,
-  idArg,
-  intArg,
-  mutationField,
-  nonNull,
-  nullable,
-  stringArg,
-} from "nexus";
+import { arg, booleanArg, idArg, intArg, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { isDefined, uniq } from "remeda";
 import { ApiContext } from "../../context";
 import { UserOrganizationRole } from "../../db/__types";
@@ -738,45 +728,47 @@ export const updatePublicTemplateVisibility = mutationField("updatePublicTemplat
 export const updateOrganizationLimits = mutationField("updateOrganizationLimits", {
   type: "SupportMethodResponse",
   description:
-    "Updates the limits of a given org. If 'Update Current Period' is left unchecked, the changes will be reflected on the next period.",
+    "Updates the limits of a given org. If 'Update Only Current Period' is left unchecked, the changes will be reflected on the next period.",
   authorize: supportMethodAccess(),
   args: {
     orgId: nonNull(intArg({ description: "Numeric ID of the Organization" })),
-    type: nonNull(
-      enumType({ name: "OrganizationLimitType", members: ["SIGNATURES", "PETITIONS"] })
-    ),
+    type: nonNull("OrganizationUsageLimitName"),
     amount: nonNull(
       intArg({ description: "How many credits allow the org to use in the given period" })
     ),
-    period: nonNull(
+    period: nullable(
       stringArg({
-        description: "Period of the usage limit. e.g.: 1 month, 1 year, 20 days, etc...",
+        description: "e.g.: 1 month, 1 year, 20 days, etc...",
       })
     ),
-    updateCurrentPeriod: nonNull(booleanArg()),
+    updateOnlyCurrentPeriod: nonNull(booleanArg()),
   },
   resolve: async (_, args, ctx) => {
     const org = await ctx.organizations.loadOrg(args.orgId);
+    if (!org) {
+      return { result: RESULT.FAILURE, message: `Organization:${args.orgId} not found` };
+    }
 
-    const limitName = args.type === "PETITIONS" ? "PETITION_SEND" : "SIGNATURIT_SHARED_APIKEY";
     // limit the input of period, as this has to be a valid postgres interval
-    if (!new RegExp(/^\d+ (day|month|year)s?$/).test(args.period)) {
+    if (isDefined(args.period) && !new RegExp(/^\d+ (day|month|year)s?$/).test(args.period)) {
       return {
         result: RESULT.FAILURE,
         message: `Period must match RegExp: ^\d+ (day|month|year)s?$`,
       };
     }
 
-    if (!args.updateCurrentPeriod) {
+    const period = args.period ?? ((org.usage_details[args.type] as any).period as string);
+
+    if (!args.updateOnlyCurrentPeriod) {
       await ctx.organizations.updateOrganization(
         args.orgId,
         {
           usage_details: {
-            ...org?.usage_details,
+            ...org.usage_details,
             ...{
-              [limitName]: {
+              [args.type]: {
                 limit: args.amount,
-                period: args.period,
+                period,
               },
             },
           },
@@ -790,9 +782,9 @@ export const updateOrganizationLimits = mutationField("updateOrganizationLimits"
     } else {
       await ctx.organizations.updateOrganizationCurrentUsageLimit(
         args.orgId,
-        limitName,
+        args.type,
         args.amount,
-        args.period
+        period
       );
 
       return {

@@ -1347,7 +1347,7 @@ type Mutation {
   ): SupportMethodResponse!
 
   """
-  Updates the limits of a given org. If 'Update Current Period' is left unchecked, the changes will be reflected on the next period.
+  Updates the limits of a given org. If 'Update Only Current Period' is left unchecked, the changes will be reflected on the next period.
   """
   updateOrganizationLimits(
     """
@@ -1361,11 +1361,11 @@ type Mutation {
     orgId: Int!
 
     """
-    Period of the usage limit. e.g.: 1 month, 1 year, 20 days, etc...
+    e.g.: 1 month, 1 year, 20 days, etc...
     """
-    period: String!
-    type: OrganizationLimitType!
-    updateCurrentPeriod: Boolean!
+    period: String
+    type: OrganizationUsageLimitName!
+    updateOnlyCurrentPeriod: Boolean!
   ): SupportMethodResponse!
 
   """
@@ -1712,11 +1712,6 @@ type Organization implements Timestamps {
   ): UserPagination!
 }
 
-enum OrganizationLimitType {
-  PETITIONS
-  SIGNATURES
-}
-
 type OrganizationPagination {
   """
   The requested slice of items.
@@ -1773,6 +1768,11 @@ type OrganizationUsageLimit {
   petitions: OrganizationUsagePetitionLimit!
   signatures: OrganizationUsageSignaturesLimit!
   users: OrganizationUsageUserLimit!
+}
+
+enum OrganizationUsageLimitName {
+  PETITION_SEND
+  SIGNATURIT_SHARED_APIKEY
 }
 
 type OrganizationUsagePetitionLimit {

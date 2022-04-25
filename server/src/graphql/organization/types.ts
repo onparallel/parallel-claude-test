@@ -22,6 +22,11 @@ export const Tone = enumType({
   description: "The preferred tone of organization",
 });
 
+export const OrganizationUsageLimitName = enumType({
+  name: "OrganizationUsageLimitName",
+  members: ["PETITION_SEND", "SIGNATURIT_SHARED_APIKEY"],
+});
+
 export const Organization = objectType({
   name: "Organization",
   description: "An organization in the system.",
