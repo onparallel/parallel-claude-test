@@ -17,7 +17,7 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableProps, useTableColors } from "@parallel/components/common/Table";
 import { ComponentType, Key, ReactNode, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { pick } from "remeda";
+import { isDefined, pick } from "remeda";
 
 export type TablePageProps<TRow, TContext = unknown, TImpl extends TRow = TRow> = TableProps<
   TRow,

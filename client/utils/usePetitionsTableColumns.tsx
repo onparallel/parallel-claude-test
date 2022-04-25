@@ -209,7 +209,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   id: "generic.sent-at",
                   defaultMessage: "Sent at",
                 }),
-                cellProps: { width: "1%" },
+                cellProps: { width: "1%", minWidth: "160px" },
                 CellContent: ({ row: { sentAt } }) =>
                   sentAt ? (
                     <DateTime
@@ -219,7 +219,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                       whiteSpace="nowrap"
                     />
                   ) : (
-                    <Text as="span" textStyle="hint">
+                    <Text as="span" textStyle="hint" whiteSpace="nowrap">
                       <FormattedMessage id="generic.not-sent" defaultMessage="Not sent" />
                     </Text>
                   ),
