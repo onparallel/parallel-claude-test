@@ -3697,6 +3697,7 @@ export interface NexusGenArgTypes {
     };
     createPrintPdfTask: {
       // args
+      includeNdLinks?: boolean | null; // Boolean
       petitionId: NexusGenScalars["GID"]; // GID!
       skipAttachments?: boolean | null; // Boolean
     };

@@ -1,7 +1,7 @@
 import { Button, Checkbox, Stack, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { NormalLink } from "@parallel/components/common/Link";
+import { NetDocumentsLink } from "@parallel/components/common/NetDocumentsLink";
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 
@@ -37,15 +37,7 @@ function AlreadyExportedDialog({
             />
           </Text>
           <Text textAlign="center">
-            <NormalLink
-              href={`https://eu.netdocuments.com/neWeb2/goid.aspx?id=${externalId}`}
-              isExternal
-            >
-              <FormattedMessage
-                id="component.export-replies-progress-dialog.open-file"
-                defaultMessage="Open file in NetDocuments"
-              />
-            </NormalLink>
+            <NetDocumentsLink externalId={externalId} />
           </Text>
           <Text>
             <FormattedMessage

@@ -10,12 +10,14 @@
       },
       "args": {
         "documentTitle": "Título del documento",
-        "showSignatureBoxes": true
+        "showSignatureBoxes": true,
+        "includeNetDocumentsLinks": false
       },
       "argTypes": {
         "petitionId": { "control": { "type": "text" } },
         "documentTitle": { "control": { "type": "text" } },
-        "showSignatureBoxes": { "control": { "type": "boolean" } }
+        "showSignatureBoxes": { "control": { "type": "boolean" } },
+        "includeNetDocumentsLinks": { "control": { "type": "boolean" } }
       }
     }
   ]

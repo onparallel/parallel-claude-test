@@ -806,6 +806,7 @@ export type MutationcreatePetitionFieldReplyArgs = {
 };
 
 export type MutationcreatePrintPdfTaskArgs = {
+  includeNdLinks?: InputMaybe<Scalars["Boolean"]>;
   petitionId: Scalars["GID"];
   skipAttachments?: InputMaybe<Scalars["Boolean"]>;
 };
@@ -3440,6 +3441,7 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
       content: { [key: string]: any };
       id: string;
       status: PetitionFieldReplyStatus;
+      metadata: { [key: string]: any };
     }>;
   }>;
   organization: { name: string; logoUrl: string | null; pdfDocumentTheme: { [key: string]: any } };
@@ -3463,6 +3465,7 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
       content: { [key: string]: any };
       id: string;
       status: PetitionFieldReplyStatus;
+      metadata: { [key: string]: any };
     }>;
   }>;
   organization: { name: string; logoUrl: string | null; pdfDocumentTheme: { [key: string]: any } };
@@ -3480,7 +3483,12 @@ export type PetitionExport_PetitionFieldFragment = {
   description: string | null;
   showInPdf: boolean;
   visibility: { [key: string]: any } | null;
-  replies: Array<{ id: string; status: PetitionFieldReplyStatus; content: { [key: string]: any } }>;
+  replies: Array<{
+    id: string;
+    status: PetitionFieldReplyStatus;
+    content: { [key: string]: any };
+    metadata: { [key: string]: any };
+  }>;
 };
 
 export type PetitionExport_petitionQueryVariables = Exact<{
@@ -3514,6 +3522,7 @@ export type PetitionExport_petitionQuery = {
             content: { [key: string]: any };
             id: string;
             status: PetitionFieldReplyStatus;
+            metadata: { [key: string]: any };
           }>;
         }>;
         organization: {
@@ -3540,6 +3549,7 @@ export type PetitionExport_petitionQuery = {
             content: { [key: string]: any };
             id: string;
             status: PetitionFieldReplyStatus;
+            metadata: { [key: string]: any };
           }>;
         }>;
         organization: {
@@ -3588,6 +3598,7 @@ export const PetitionExport_PetitionFieldFragmentDoc = gql`
       id
       status
       content
+      metadata
     }
   }
 ` as unknown as DocumentNode<PetitionExport_PetitionFieldFragment, unknown>;

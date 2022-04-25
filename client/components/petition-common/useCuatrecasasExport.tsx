@@ -60,6 +60,17 @@ function cuatrecasasExport(
   });
 }
 
+interface ExportOpts {
+  signal: AbortSignal;
+  onProgress: (event: ProgressEvent<EventTarget>) => void;
+  filename?: string;
+}
+
+interface ExportRefs {
+  exportAgain: MutableRefObject<boolean>;
+  dontAskAgain: MutableRefObject<boolean>;
+}
+
 function useExportExcel(clientId: string) {
   const exportExcelTask = useBackgroundTask("EXPORT_EXCEL");
   return async (petition: useCuatrecasasExport_PetitionFragment, opts: ExportOpts) => {
@@ -290,17 +301,6 @@ export function useCuatrecasasExport(clientId: string) {
     exportFieldReply: useExportFieldReply(clientId, refs),
     exportPdfDocument: useExportPdfDocument(clientId, refs),
   };
-}
-
-interface ExportOpts {
-  signal: AbortSignal;
-  onProgress: (event: ProgressEvent<EventTarget>) => void;
-  filename?: string;
-}
-
-interface ExportRefs {
-  exportAgain: MutableRefObject<boolean>;
-  dontAskAgain: MutableRefObject<boolean>;
 }
 
 useCuatrecasasExport.fragments = {

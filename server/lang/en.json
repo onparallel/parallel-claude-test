@@ -150,6 +150,11 @@
     "context": "I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current identification information."
   },
   {
+    "term": "document.petition-export.view-replies-in-nd",
+    "definition": "See answers in ND",
+    "context": "See answers in ND"
+  },
+  {
     "term": "footer.slogan",
     "definition": "Work better with",
     "context": "Work better with"

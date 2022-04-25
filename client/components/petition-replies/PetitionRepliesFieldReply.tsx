@@ -1,12 +1,6 @@
 import { gql, useApolloClient } from "@apollo/client";
 import { Box, Flex, List, ListItem, Stack, Text, VisuallyHidden } from "@chakra-ui/react";
-import {
-  CheckIcon,
-  CloseIcon,
-  DownloadIcon,
-  EyeIcon,
-  NetDocumentsIcon,
-} from "@parallel/chakra/icons";
+import { CheckIcon, CloseIcon, DownloadIcon, EyeIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   PetitionFieldReplyStatus,
@@ -26,6 +20,7 @@ import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { NetDocumentsIconButton } from "../common/NetDocumentsLink";
 import { UserOrContactReference } from "../petition-activity/UserOrContactReference";
 
 export interface PetitionRepliesFieldReplyProps {
@@ -103,16 +98,9 @@ export function PetitionRepliesFieldReply({
           </Stack>
         ) : null}
         {reply.metadata.EXTERNAL_ID_CUATRECASAS ? (
-          <IconButtonWithTooltip
+          <NetDocumentsIconButton
+            externalId={reply.metadata.EXTERNAL_ID_CUATRECASAS}
             size="xs"
-            as="a"
-            href={`https://eu.netdocuments.com/neWeb2/goid.aspx?id=${reply.metadata.EXTERNAL_ID_CUATRECASAS}`}
-            target="_href"
-            icon={<NetDocumentsIcon fontSize="14px" />}
-            label={intl.formatMessage({
-              id: "petition-replies.petition-field-reply.netdocuments-link",
-              defaultMessage: "Access file in NetDocuments",
-            })}
             placement="right"
           />
         ) : null}

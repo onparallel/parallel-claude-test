@@ -29,11 +29,12 @@ function isPrintableContentType(contentType: string) {
 
 type PetitionBinderOptions = {
   petitionId: number;
-  showSignatureBoxes: boolean;
   documentTitle: string;
   maxOutputSize?: number;
-  includeAnnexedDocuments?: boolean;
   outputFileName?: string;
+  showSignatureBoxes?: boolean;
+  includeAnnexedDocuments?: boolean;
+  includeNetDocumentsLinks?: boolean;
 };
 
 export interface IPetitionBinder {
@@ -61,6 +62,7 @@ export class PetitionBinder implements IPetitionBinder {
       maxOutputSize,
       outputFileName,
       includeAnnexedDocuments,
+      includeNetDocumentsLinks,
     }: PetitionBinderOptions
   ) {
     try {
@@ -77,6 +79,7 @@ export class PetitionBinder implements IPetitionBinder {
           petitionId,
           documentTitle,
           showSignatureBoxes,
+          includeNetDocumentsLinks,
         })
       );
 

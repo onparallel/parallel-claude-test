@@ -65,7 +65,11 @@ const _mutations = [
   `,
   gql`
     mutation useBackgroundTask_createPrintPdfTask($petitionId: GID!) {
-      createTask: createPrintPdfTask(petitionId: $petitionId, skipAttachments: true) {
+      createTask: createPrintPdfTask(
+        petitionId: $petitionId
+        skipAttachments: true
+        includeNdLinks: true
+      ) {
         ...useBackgroundTask_Task
       }
     }

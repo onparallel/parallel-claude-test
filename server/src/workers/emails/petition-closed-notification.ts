@@ -76,7 +76,6 @@ export async function petitionClosedNotification(
       const documentStream = await context.printer.petitionExport(owner!.id, {
         petitionId: petition.id,
         documentTitle: payload.pdf_export_title ?? "",
-        showSignatureBoxes: false,
       });
       const path = random(16);
 

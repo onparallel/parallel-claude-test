@@ -806,6 +806,7 @@ export type MutationcreatePetitionFieldReplyArgs = {
 };
 
 export type MutationcreatePrintPdfTaskArgs = {
+  includeNdLinks?: InputMaybe<Scalars["Boolean"]>;
   petitionId: Scalars["GID"];
   skipAttachments?: InputMaybe<Scalars["Boolean"]>;
 };

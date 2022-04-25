@@ -837,6 +837,7 @@ export interface MutationcreatePetitionFieldReplyArgs {
 }
 
 export interface MutationcreatePrintPdfTaskArgs {
+  includeNdLinks?: InputMaybe<Scalars["Boolean"]>;
   petitionId: Scalars["GID"];
   skipAttachments?: InputMaybe<Scalars["Boolean"]>;
 }
@@ -26633,7 +26634,11 @@ export const useBackgroundTask_createExportExcelTaskDocument = gql`
 >;
 export const useBackgroundTask_createPrintPdfTaskDocument = gql`
   mutation useBackgroundTask_createPrintPdfTask($petitionId: GID!) {
-    createTask: createPrintPdfTask(petitionId: $petitionId, skipAttachments: true) {
+    createTask: createPrintPdfTask(
+      petitionId: $petitionId
+      skipAttachments: true
+      includeNdLinks: true
+    ) {
       ...useBackgroundTask_Task
     }
   }

@@ -1,11 +1,10 @@
 import { gql } from "@apollo/client";
 import { Box, Button, Flex, GridItem, Heading, HStack } from "@chakra-ui/react";
-import { NetDocumentsIcon } from "@parallel/chakra/icons";
 import { OlderSignatureRequestRows_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { Fragment } from "react";
-import { FormattedList, FormattedMessage, useIntl } from "react-intl";
+import { FormattedList, FormattedMessage } from "react-intl";
 import { Divider } from "../common/Divider";
-import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { NetDocumentsIconButton } from "../common/NetDocumentsLink";
 import { SignerReference } from "../common/SignerReference";
 import { PetitionSignatureRequestStatusText } from "./PetitionSignatureRequestStatusText";
 
@@ -16,7 +15,6 @@ export function OlderSignatureRequestRows({
   signatures: OlderSignatureRequestRows_PetitionSignatureRequestFragment[];
   onDownload: (petitionSignatureRequestId: string) => void;
 }) {
-  const intl = useIntl();
   return (
     <>
       <GridItem colSpan={3}>
@@ -47,16 +45,9 @@ export function OlderSignatureRequestRows({
             <Flex justifyContent="flex-end" padding={2} paddingRight={4}>
               <HStack>
                 {signature.metadata.SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS ? (
-                  <IconButtonWithTooltip
+                  <NetDocumentsIconButton
+                    externalId={signature.metadata.SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS}
                     size="sm"
-                    as="a"
-                    href={`https://eu.netdocuments.com/neWeb2/goid.aspx?id=${signature.metadata.SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS}`}
-                    target="_href"
-                    icon={<NetDocumentsIcon fontSize="md" />}
-                    label={intl.formatMessage({
-                      id: "component.petition-signatures-card.access-file-nd",
-                      defaultMessage: "Access file in NetDocuments",
-                    })}
                   />
                 ) : null}
                 <Button

@@ -1,11 +1,12 @@
 import { gql } from "@apollo/client";
 import { Box, Button, Heading, HStack } from "@chakra-ui/react";
-import { BellIcon, NetDocumentsIcon } from "@parallel/chakra/icons";
+import { BellIcon } from "@parallel/chakra/icons";
 import { CurrentSignatureRequestRow_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { withError } from "@parallel/utils/promises/withError";
 import { Fragment } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { NetDocumentsIconButton } from "../common/NetDocumentsLink";
 import { SignerReference } from "../common/SignerReference";
 import { useConfirmSendSignatureReminderDialog } from "./dialogs/ConfirmSendSignatureReminderDialog";
 import { PetitionSignatureRequestSignerStatusIcon } from "./PetitionSignatureRequestSignerStatusIcon";
@@ -104,15 +105,8 @@ export function CurrentSignatureRequestRow({
         ) : status === "COMPLETED" ? (
           <HStack>
             {signatureRequest.metadata.SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS ? (
-              <IconButtonWithTooltip
-                as="a"
-                href={`https://eu.netdocuments.com/neWeb2/goid.aspx?id=${signatureRequest.metadata.SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS}`}
-                target="_href"
-                icon={<NetDocumentsIcon fontSize="xl" />}
-                label={intl.formatMessage({
-                  id: "component.petition-signatures-card.access-file-nd",
-                  defaultMessage: "Access file in NetDocuments",
-                })}
+              <NetDocumentsIconButton
+                externalId={signatureRequest.metadata.SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS}
               />
             ) : null}
             <Button width="24" colorScheme="purple" onClick={() => onDownload(signatureRequest.id)}>

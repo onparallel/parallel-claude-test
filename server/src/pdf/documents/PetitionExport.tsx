@@ -6,21 +6,23 @@ import { FORMATS } from "../../util/dates";
 import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { fileSize } from "../../util/fileSize";
 import { formatNumberWithPrefix } from "../../util/formatNumberWithPrefix";
+import { NetDocumentsExternalLink } from "../components/NetDocumentsExternalLink";
 import { SignaturesBlock } from "../components/SignaturesBlock";
 import { PdfDocumentGetProps } from "../utils/pdf";
 import { PdfDocumentTheme, ThemeProvider } from "../utils/ThemeProvider";
 import { LiquidProvider, LiquidScopeProvider, useLiquid } from "../utils/useLiquid";
 import { useLiquidScope } from "../utils/useLiquidScope";
 import {
+  PetitionExport_PetitionBaseFragment,
   PetitionExport_petitionDocument,
   PetitionExport_PetitionFieldFragment,
-  PetitionExport_PetitionBaseFragment,
 } from "../__types";
 
 export interface PetitionExportInitialData {
   petitionId: string;
   documentTitle: string;
-  showSignatureBoxes: boolean;
+  showSignatureBoxes?: boolean;
+  includeNetDocumentsLinks?: boolean;
 }
 
 export interface PetitionExportProps extends Omit<PetitionExportInitialData, "petitionId"> {
@@ -30,6 +32,7 @@ export interface PetitionExportProps extends Omit<PetitionExportInitialData, "pe
 export default function PetitionExport({
   documentTitle,
   showSignatureBoxes,
+  includeNetDocumentsLinks,
   petition,
 }: PetitionExportProps) {
   const intl = useIntl();
@@ -145,6 +148,15 @@ export default function PetitionExport({
   const pages = groupFieldsByPages(petition.fields as any, visibility);
   const scope = useLiquidScope(petition);
 
+  const simpleRepliesNetdocumentsExternalId = pages
+    .flat()
+    .find(
+      (field) =>
+        field.type !== "HEADING" &&
+        field.type !== "FILE_UPLOAD" &&
+        field.replies.some((r) => !!r.metadata.EXTERNAL_ID_CUATRECASAS)
+    )?.replies[0].metadata.EXTERNAL_ID_CUATRECASAS;
+
   return (
     <LiquidProvider>
       <LiquidScopeProvider scope={scope}>
@@ -165,6 +177,12 @@ export default function PetitionExport({
                       <View style={styles.documentTitle}>
                         <Text style={styles.title1}>{documentTitle}</Text>
                       </View>
+                    ) : null}
+                    {includeNetDocumentsLinks && simpleRepliesNetdocumentsExternalId ? (
+                      <NetDocumentsExternalLink
+                        externalId={simpleRepliesNetdocumentsExternalId}
+                        style={{ marginTop: "2mm" }}
+                      />
                     ) : null}
                   </View>
                 ) : null}
@@ -206,21 +224,40 @@ export default function PetitionExport({
                         <View style={styles.fieldReplies}>
                           {field.replies.map((reply) =>
                             field.type === "FILE_UPLOAD" ? (
-                              <Text style={[styles.text]} key={reply.id}>
-                                {`${reply.content.filename} - ${fileSize(
-                                  intl,
-                                  reply.content.size
-                                )}`}
-                                {reply.status === "APPROVED" ? null : (
-                                  <Text style={[styles.text]}>
-                                    {" "}
-                                    <FormattedMessage
-                                      id="document.petition-export.file-pending-review"
-                                      defaultMessage="(Pending review)"
-                                    />
-                                  </Text>
-                                )}
-                              </Text>
+                              <View
+                                key={reply.id}
+                                style={[
+                                  {
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                  },
+                                ]}
+                              >
+                                <Text style={[styles.text]}>
+                                  {`${reply.content.filename} - ${fileSize(
+                                    intl,
+                                    reply.content.size
+                                  )}`}
+                                  {reply.status === "APPROVED" ? null : (
+                                    <Text style={[styles.text]}>
+                                      {" "}
+                                      <FormattedMessage
+                                        id="document.petition-export.file-pending-review"
+                                        defaultMessage="(Pending review)"
+                                      />
+                                    </Text>
+                                  )}
+                                </Text>
+                                {includeNetDocumentsLinks &&
+                                reply.metadata.EXTERNAL_ID_CUATRECASAS ? (
+                                  <NetDocumentsExternalLink
+                                    variant="button"
+                                    style={{ marginLeft: "1mm" }}
+                                    externalId={reply.metadata.EXTERNAL_ID_CUATRECASAS}
+                                  />
+                                ) : null}
+                              </View>
                             ) : field.type === "DYNAMIC_SELECT" ? (
                               <View key={reply.id}>
                                 {(reply.content.value as [string, string | null][]).map(
@@ -391,6 +428,7 @@ PetitionExport.fragments = {
           id
           status
           content
+          metadata
         }
       }
     `;
