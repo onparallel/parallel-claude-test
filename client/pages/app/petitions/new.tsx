@@ -213,6 +213,7 @@ function NewPetition() {
           >
             <TabList flex="1">
               <Tab
+                data-link="my-templates"
                 borderTopRadius="md"
                 _selected={selectTabStyles}
                 whiteSpace="nowrap"
@@ -221,6 +222,7 @@ function NewPetition() {
                 <FormattedMessage id="new-petition.my-templates" defaultMessage="My templates" />
               </Tab>
               <Tab
+                data-link="public-templates"
                 borderTopRadius="md"
                 _selected={selectTabStyles}
                 whiteSpace="nowrap"
