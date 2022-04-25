@@ -613,6 +613,8 @@ export interface Mutation {
   updateFileUploadReplyComplete: PetitionFieldReply;
   /** Updates the metadata of a public landing template. */
   updateLandingTemplateMetadata: SupportMethodResponse;
+  /** Updates the limits of a given org. If 'Update Current Period' is left unchecked, the changes will be reflected on the next period. */
+  updateOrganizationLimits: SupportMethodResponse;
   /** Updates the logo of an organization */
   updateOrganizationLogo: Organization;
   /** Changes the organization preferred tone */
@@ -1291,6 +1293,14 @@ export interface MutationupdateLandingTemplateMetadataArgs {
   templateId: Scalars["ID"];
 }
 
+export interface MutationupdateOrganizationLimitsArgs {
+  amount: Scalars["Int"];
+  orgId: Scalars["Int"];
+  period: Scalars["String"];
+  type: OrganizationLimitType;
+  updateCurrentPeriod: Scalars["Boolean"];
+}
+
 export interface MutationupdateOrganizationLogoArgs {
   file: Scalars["Upload"];
 }
@@ -1504,6 +1514,8 @@ export interface OrganizationusersArgs {
   search?: InputMaybe<Scalars["String"]>;
   sortBy?: InputMaybe<Array<OrganizationUsers_OrderBy>>;
 }
+
+export type OrganizationLimitType = "PETITIONS" | "SIGNATURES";
 
 export interface OrganizationPagination {
   __typename?: "OrganizationPagination";

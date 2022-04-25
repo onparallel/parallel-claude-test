@@ -1347,6 +1347,28 @@ type Mutation {
   ): SupportMethodResponse!
 
   """
+  Updates the limits of a given org. If 'Update Current Period' is left unchecked, the changes will be reflected on the next period.
+  """
+  updateOrganizationLimits(
+    """
+    How many credits allow the org to use in the given period
+    """
+    amount: Int!
+
+    """
+    Numeric ID of the Organization
+    """
+    orgId: Int!
+
+    """
+    Period of the usage limit. e.g.: 1 month, 1 year, 20 days, etc...
+    """
+    period: String!
+    type: OrganizationLimitType!
+    updateCurrentPeriod: Boolean!
+  ): SupportMethodResponse!
+
+  """
   Updates the logo of an organization
   """
   updateOrganizationLogo(file: Upload!): Organization!
@@ -1688,6 +1710,11 @@ type Organization implements Timestamps {
     """
     sortBy: [OrganizationUsers_OrderBy!]
   ): UserPagination!
+}
+
+enum OrganizationLimitType {
+  PETITIONS
+  SIGNATURES
 }
 
 type OrganizationPagination {

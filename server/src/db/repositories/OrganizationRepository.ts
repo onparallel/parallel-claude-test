@@ -321,6 +321,22 @@ export class OrganizationRepository extends BaseRepository {
     return usage;
   }
 
+  async updateOrganizationCurrentUsageLimit(
+    orgId: number,
+    limitName: OrganizationUsageLimitName,
+    limit: number,
+    period: string
+  ) {
+    const [usage] = await this.from("organization_usage_limit")
+      .where({
+        period_end_date: null,
+        limit_name: limitName,
+        org_id: orgId,
+      })
+      .update({ limit, period }, "*");
+    return usage;
+  }
+
   async createSandboxSignatureIntegration(orgId: number, createdBy?: string, t?: Knex.Transaction) {
     return await this.from("org_integration", t).insert(
       {

@@ -200,6 +200,7 @@ export interface NexusGenEnums {
   FilterSharedWithLogicalOperator: "AND" | "OR";
   FilterSharedWithOperator: "IS_OWNER" | "NOT_IS_OWNER" | "NOT_SHARED_WITH" | "SHARED_WITH";
   IntegrationType: db.IntegrationType;
+  OrganizationLimitType: "PETITIONS" | "SIGNATURES";
   OrganizationRole: "ADMIN" | "COLLABORATOR" | "NORMAL" | "OWNER";
   OrganizationStatus: db.OrganizationStatus;
   OrganizationUsers_OrderBy:
@@ -991,6 +992,7 @@ export interface NexusGenFieldTypes {
     updateFileUploadReply: NexusGenRootTypes["FileUploadReplyResponse"]; // FileUploadReplyResponse!
     updateFileUploadReplyComplete: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updateLandingTemplateMetadata: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    updateOrganizationLimits: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateOrganizationLogo: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationPreferredTone: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationUser: NexusGenRootTypes["User"]; // User!
@@ -2415,6 +2417,7 @@ export interface NexusGenFieldTypeNames {
     updateFileUploadReply: "FileUploadReplyResponse";
     updateFileUploadReplyComplete: "PetitionFieldReply";
     updateLandingTemplateMetadata: "SupportMethodResponse";
+    updateOrganizationLimits: "SupportMethodResponse";
     updateOrganizationLogo: "Organization";
     updateOrganizationPreferredTone: "Organization";
     updateOrganizationUser: "User";
@@ -4114,6 +4117,14 @@ export interface NexusGenArgTypes {
       image?: NexusGenScalars["Upload"] | null; // Upload
       slug?: string | null; // String
       templateId: string; // ID!
+    };
+    updateOrganizationLimits: {
+      // args
+      amount: number; // Int!
+      orgId: number; // Int!
+      period: string; // String!
+      type: NexusGenEnums["OrganizationLimitType"]; // OrganizationLimitType!
+      updateCurrentPeriod: boolean; // Boolean!
     };
     updateOrganizationLogo: {
       // args
