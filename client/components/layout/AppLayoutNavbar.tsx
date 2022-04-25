@@ -130,7 +130,7 @@ export const AppLayoutNavbar = Object.assign(
           <Flex justifyContent="center" alignItems="center">
             <NakedLink href="/app/petitions/new">
               <IconButtonWithTooltip
-                id="create-petition"
+                data-link="create-petition"
                 as="a"
                 colorScheme="purple"
                 icon={<AddIcon />}
@@ -154,8 +154,9 @@ export const AppLayoutNavbar = Object.assign(
             marginY={{ base: 0, sm: 2 }}
           >
             {items.map(({ section, href, isActive, isAvailable, icon, text, warning }) => (
-              <ListItem key={section} id={`pw-section-${section}`}>
+              <ListItem key={section}>
                 <AppLayoutNavbarLink
+                  data-link={`navbar-${section}`}
                   href={href}
                   isAvailable={isAvailable}
                   isActive={isActive}
