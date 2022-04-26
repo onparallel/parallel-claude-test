@@ -2,6 +2,7 @@ import { Text, TextProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { DateTimeFormatOptions } from "@parallel/utils/dates";
 import { useForceUpdate } from "@parallel/utils/useForceUpdate";
+import classNames from "classnames";
 import { useEffect } from "react";
 import { FormattedDate, FormattedMessage, FormattedRelativeTime, useIntl } from "react-intl";
 
@@ -46,33 +47,31 @@ export const DateTime = chakraForwardRef<"time", DateTimeProps>(function DateTim
   const date = new Date(value);
   const { value: _value, unit } = selectUnit(date, Date.now());
   const forceUpdate = useForceUpdate();
+
+  const _useRelativeTime =
+    useRelativeTime === "always" || (useRelativeTime && isSmallRelativeTime(unit));
   useEffect(() => {
-    if (useRelativeTime && isSmallRelativeTime(unit)) {
+    if (_useRelativeTime) {
       const intervalId = setInterval(forceUpdate, 60 * 1000);
       return () => clearInterval(intervalId);
     }
-  }, [useRelativeTime, unit]);
-  if (useRelativeTime === "always" || (useRelativeTime && isSmallRelativeTime(unit))) {
-    return (
-      <Text
-        ref={ref as any}
-        as="time"
-        title={intl.formatDate(date, format)}
-        {...props}
-        {...{ dateTime: date.toISOString() }}
-      >
-        {unit === "second" ? (
-          <FormattedMessage id="component.date-time.a-moment-ago" defaultMessage="a moment ago" />
-        ) : (
-          <FormattedRelativeTime value={_value} unit={unit} />
-        )}
-      </Text>
-    );
-  } else {
-    return (
-      <Text ref={ref as any} as="time" {...props} {...{ dateTime: date.toISOString() }}>
+  }, [_useRelativeTime]);
+  return (
+    <Text
+      ref={ref as any}
+      as="time"
+      title={_useRelativeTime ? intl.formatDate(date, format) : undefined}
+      {...props}
+      {...{ dateTime: date.toISOString() }}
+      className={classNames(props.className, "notranslate")}
+    >
+      {!_useRelativeTime ? (
         <FormattedDate value={date} {...format} />
-      </Text>
-    );
-  }
+      ) : unit === "second" ? (
+        <FormattedMessage id="component.date-time.a-moment-ago" defaultMessage="a moment ago" />
+      ) : (
+        <FormattedRelativeTime value={_value} unit={unit} />
+      )}
+    </Text>
+  );
 });
