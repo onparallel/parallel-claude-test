@@ -1682,7 +1682,7 @@ describe("GraphQL/Petition Permissions", () => {
       });
 
       expect(deleteErrors).toBeUndefined();
-      expect(deleteData!.deletePetitions).toBeNull();
+      expect(deleteData!.deletePetitions).toEqual("SUCCESS");
     });
 
     it("creates events when removing permissions on multiple groups and users", async () => {
