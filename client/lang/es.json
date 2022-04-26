@@ -625,6 +625,11 @@
     "context": "When you click continue an HTTP POST request will be sent to this URL which must respond with status code 200."
   },
   {
+    "term": "component.create-event-subscription-dialog.event-select.placeholder",
+    "definition": "Buscar eventos...",
+    "context": "Search events..."
+  },
+  {
     "term": "component.create-event-subscription-dialog.events-documentation",
     "definition": "Para una lista completa de eventos, visita <a>la documentación de nuestra API</a>",
     "context": "For a complete list of events visit our <a>API documentation</a>"

@@ -270,7 +270,16 @@ export function CreateEventSubscriptionDialog(
                   }}
                   render={({ field: { onChange, value } }) => (
                     <>
-                      <SimpleSelect value={value} onChange={onChange} isMulti options={options} />
+                      <SimpleSelect
+                        value={value}
+                        onChange={onChange}
+                        isMulti
+                        options={options}
+                        placeholder={intl.formatMessage({
+                          id: "component.create-event-subscription-dialog.event-select.placeholder",
+                          defaultMessage: "Search events...",
+                        })}
+                      />
                       <FormErrorMessage>
                         <FormattedMessage
                           id="component.create-event-subscription-dialog.invalid-event-types"
