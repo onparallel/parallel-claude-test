@@ -835,10 +835,10 @@ type Mutation {
     """
     If true, this will do a dry-run of the mutation to throw possible errors but it will not perform any modification in DB
     """
-    dry: Boolean = false
+    dryrun: Boolean = false
     force: Boolean = false
     ids: [GID!]!
-  ): Result!
+  ): Success!
 
   """
   Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests
@@ -4325,6 +4325,13 @@ type SsoOrgIntegration implements OrgIntegration {
   The type of the integration.
   """
   type: IntegrationType!
+}
+
+"""
+Represents a successful execution.
+"""
+enum Success {
+  SUCCESS
 }
 
 """

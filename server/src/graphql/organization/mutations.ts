@@ -1,7 +1,7 @@
 import { arg, mutationField, nonNull } from "nexus";
 import { random } from "../../util/token";
 import { authenticateAnd } from "../helpers/authorize";
-import { uploadArg } from "../helpers/upload";
+import { uploadArg } from "../helpers/scalars";
 import { validateAnd } from "../helpers/validateArgs";
 import { contentType } from "../helpers/validators/contentType";
 import { maxFileSize } from "../helpers/validators/maxFileSize";

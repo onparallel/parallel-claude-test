@@ -16,6 +16,7 @@ generates:
         JSONObject: "{ [key: string]: any }"
         Upload: any
         GID: string
+        Void: void
       skipTypename: true
       avoidOptionals:
         field: true
@@ -44,6 +45,7 @@ generates:
         JSONObject: "{ [key: string]: any }"
         Upload: any
         GID: string
+        Void: void
       skipTypename: true
       avoidOptionals:
         field: true

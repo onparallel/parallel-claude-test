@@ -9,7 +9,7 @@ import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { getInitials } from "../../util/initials";
 import { userHasRole } from "../../util/userHasRole";
-import { datetimeArg } from "../helpers/date";
+import { datetimeArg } from "../helpers/scalars";
 import { rootIsContextUser } from "./authorizers";
 
 export const OrganizationRole = enumType({

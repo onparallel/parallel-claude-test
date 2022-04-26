@@ -2010,7 +2010,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.deletePetitions).toBe("SUCCESS");
+      expect(data!.deletePetitions).toBeNull();
     });
 
     it("deletes an owned shared petition when passing the force flag", async () => {
@@ -2027,7 +2027,7 @@ describe("GraphQL/Petitions", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data!.deletePetitions).toBe("SUCCESS");
+      expect(data!.deletePetitions).toBeNull();
     });
 
     it("removes the petition and every permission when deleting an owned shared petition", async () => {
@@ -2044,7 +2044,7 @@ describe("GraphQL/Petitions", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data!.deletePetitions).toBe("SUCCESS");
+      expect(data!.deletePetitions).toBeNull();
 
       // make sure that nobody has access to a force-deleted petition owned by me
       const permissions = await mocks.loadUserPermissionsByPetitionId(sharedByMe.id);
@@ -2077,7 +2077,7 @@ describe("GraphQL/Petitions", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data!.deletePetitions).toBe("SUCCESS");
+      expect(data!.deletePetitions).toBeNull();
 
       const userPermissions = await mocks.loadUserPermissionsByPetitionId(sharedToMe.id);
       expect(userPermissions).toEqual([
@@ -2105,7 +2105,7 @@ describe("GraphQL/Petitions", () => {
         },
       });
       expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
+      expect(data?.deletePetitions).toBeNull();
     });
 
     it("sends error if passing an empty array of ids", async () => {
@@ -2118,7 +2118,7 @@ describe("GraphQL/Petitions", () => {
         variables: { ids: [] },
       });
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
-      expect(data).toBeNull();
+      expect(data?.deletePetitions).toBeNull();
     });
 
     it("sends error when trying to delete an owned shared petition without force flag", async () => {
@@ -2132,21 +2132,21 @@ describe("GraphQL/Petitions", () => {
         variables: { ids: [toGlobalId("Petition", shared.id)] },
       });
       expect(errors).toContainGraphQLError("DELETE_SHARED_PETITION_ERROR");
-      expect(data).toBeNull();
+      expect(data?.deletePetitions).toBeNull();
     });
 
-    it("will not delete any petition if passing dry=true", async () => {
+    it("will not delete any petition if passing dryrun=true", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($ids: [GID!]!, $force: Boolean, $dry: Boolean) {
-            deletePetitions(ids: $ids, force: $force, dry: $dry)
+          mutation ($ids: [GID!]!, $force: Boolean, $dryrun: Boolean) {
+            deletePetitions(ids: $ids, force: $force, dryrun: $dryrun)
           }
         `,
-        { ids: [toGlobalId("Petition", petitionsToDelete[1].id)], force: true, dry: true }
+        { ids: [toGlobalId("Petition", petitionsToDelete[1].id)], force: true, dryrun: true }
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.deletePetitions).toEqual("SUCCESS");
+      expect(data?.deletePetitions).toBeNull();
 
       const [petition] = await mocks.knex
         .from("petition")
@@ -2193,7 +2193,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toContainGraphQLError("DELETE_GROUP_PETITION_ERROR");
-      expect(data).toBeNull();
+      expect(data?.deletePetitions).toBeNull();
     });
 
     it("R/W user with directly assigned and group permissions should not be able to delete", async () => {
@@ -2210,7 +2210,7 @@ describe("GraphQL/Petitions", () => {
         variables: { ids: [toGlobalId("Petition", petition.id)] },
       });
       expect(errors).toContainGraphQLError("DELETE_GROUP_PETITION_ERROR");
-      expect(data).toBeNull();
+      expect(data?.deletePetitions).toBeNull();
     });
 
     it("petition owner with group access should be able to delete it", async () => {
@@ -2223,7 +2223,7 @@ describe("GraphQL/Petitions", () => {
         variables: { ids: [toGlobalId("Petition", petition.id)] },
       });
       expect(errors).toBeUndefined();
-      expect(data?.deletePetitions).toBe("SUCCESS");
+      expect(data?.deletePetitions).toBeNull();
 
       const petitionPermissions = await mocks.knex
         .from("petition_permission")

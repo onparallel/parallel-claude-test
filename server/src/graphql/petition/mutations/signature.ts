@@ -3,7 +3,7 @@ import { booleanArg, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { toGlobalId } from "../../../util/globalId";
 import { authenticateAnd } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
-import { jsonObjectArg } from "../../helpers/json";
+import { jsonObjectArg } from "../../helpers/scalars";
 import { RESULT } from "../../helpers/result";
 import {
   userHasAccessToPetitions,

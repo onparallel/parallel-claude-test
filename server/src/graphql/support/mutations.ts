@@ -9,7 +9,7 @@ import { hash, random } from "../../util/token";
 import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
-import { uploadArg } from "../helpers/upload";
+import { uploadArg } from "../helpers/scalars";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { emailIsAvailable } from "../helpers/validators/emailIsAvailable";
 import { validateFile } from "../helpers/validators/validateFile";

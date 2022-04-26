@@ -19,7 +19,7 @@ import { stallFor } from "../../util/promises/stallFor";
 import { and, chain, checkClientServerToken } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { jsonArg } from "../helpers/json";
+import { jsonArg } from "../helpers/scalars";
 import { presendPetition } from "../helpers/presendPetition";
 import { RESULT } from "../helpers/result";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";

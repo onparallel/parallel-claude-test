@@ -22,12 +22,12 @@ export function useDeletePetitions() {
   const [deletePetitions] = useMutation(useDeletePetitions_deletePetitionsDocument);
   const handleDeletePetitions = async (
     petitionIds: string[],
-    { force, dry }: { force?: boolean; dry?: boolean }
+    { force, dryrun }: { force?: boolean; dryrun?: boolean }
   ) =>
     await deletePetitions({
-      variables: { ids: petitionIds, force, dry },
-      update(client, { data }) {
-        if (!dry && data?.deletePetitions === "SUCCESS") {
+      variables: { ids: petitionIds, force, dryrun },
+      update(client) {
+        if (!dryrun) {
           for (const petitionId of petitionIds) {
             client.evict({ id: petitionId });
           }
@@ -73,7 +73,7 @@ export function useDeletePetitions() {
               }));
 
         // first do a dry-run to check if errors will happen when deleting the petition
-        const [error] = await withError(handleDeletePetitions(petitionIds, { dry: true }));
+        const [error] = await withError(handleDeletePetitions(petitionIds, { dryrun: true }));
         if (error && isApolloError(error, "DELETE_SHARED_PETITION_ERROR")) {
           await confirmDeleteSharedPetitions({ petitionIds, name, isTemplate });
         } else if (!error) {
@@ -260,8 +260,8 @@ ConfirmDeletePetitionsDialog.fragments = {
 
 ConfirmDeletePetitionsDialog.mutations = [
   gql`
-    mutation useDeletePetitions_deletePetitions($ids: [GID!]!, $force: Boolean, $dry: Boolean) {
-      deletePetitions(ids: $ids, force: $force, dry: $dry)
+    mutation useDeletePetitions_deletePetitions($ids: [GID!]!, $force: Boolean, $dryrun: Boolean) {
+      deletePetitions(ids: $ids, force: $force, dryrun: $dryrun)
     }
   `,
 ];

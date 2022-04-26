@@ -450,7 +450,7 @@ export type Mutation = {
   /** Deletes a reply to a petition field. */
   deletePetitionReply: PetitionField;
   /** Delete petitions. */
-  deletePetitions: Result;
+  deletePetitions: Success;
   /** Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests */
   deleteSignatureIntegration: Result;
   /** Removes the tag from every petition and soft-deletes it */
@@ -582,6 +582,8 @@ export type Mutation = {
   updateFileUploadReplyComplete: PetitionFieldReply;
   /** Updates the metadata of a public landing template. */
   updateLandingTemplateMetadata: SupportMethodResponse;
+  /** Updates the limits of a given org. If 'Update Only Current Period' is left unchecked, the changes will be reflected on the next period. */
+  updateOrganizationLimits: SupportMethodResponse;
   /** Updates the logo of an organization */
   updateOrganizationLogo: Organization;
   /** Changes the organization preferred tone */
@@ -602,6 +604,8 @@ export type Mutation = {
   updatePetitionFieldReply: PetitionFieldReply;
   /** Updates the metadata of the specified petition field reply */
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
+  /** Updates the metadata of the specified petition */
+  updatePetitionMetadata: Petition;
   /** Updates the subscription flag on a PetitionPermission */
   updatePetitionPermissionSubscription: Petition;
   /** Updates the restriction preferences */
@@ -803,6 +807,7 @@ export type MutationcreatePetitionFieldReplyArgs = {
 
 export type MutationcreatePrintPdfTaskArgs = {
   petitionId: Scalars["GID"];
+  skipAttachments?: InputMaybe<Scalars["Boolean"]>;
 };
 
 export type MutationcreatePublicPetitionLinkArgs = {
@@ -892,6 +897,7 @@ export type MutationdeletePetitionReplyArgs = {
 };
 
 export type MutationdeletePetitionsArgs = {
+  dryrun?: InputMaybe<Scalars["Boolean"]>;
   force?: InputMaybe<Scalars["Boolean"]>;
   ids: Array<Scalars["GID"]>;
 };
@@ -1260,6 +1266,14 @@ export type MutationupdateLandingTemplateMetadataArgs = {
   templateId: Scalars["ID"];
 };
 
+export type MutationupdateOrganizationLimitsArgs = {
+  amount: Scalars["Int"];
+  orgId: Scalars["Int"];
+  period?: InputMaybe<Scalars["String"]>;
+  type: OrganizationUsageLimitName;
+  updateOnlyCurrentPeriod: Scalars["Boolean"];
+};
+
 export type MutationupdateOrganizationLogoArgs = {
   file: Scalars["Upload"];
 };
@@ -1315,6 +1329,11 @@ export type MutationupdatePetitionFieldReplyMetadataArgs = {
   metadata: Scalars["JSONObject"];
   petitionId: Scalars["GID"];
   replyId: Scalars["GID"];
+};
+
+export type MutationupdatePetitionMetadataArgs = {
+  metadata: Scalars["JSONObject"];
+  petitionId: Scalars["GID"];
 };
 
 export type MutationupdatePetitionPermissionSubscriptionArgs = {
@@ -1501,6 +1520,8 @@ export type OrganizationUsageLimit = {
   users: OrganizationUsageUserLimit;
 };
 
+export type OrganizationUsageLimitName = "PETITION_SEND" | "SIGNATURIT_SHARED_APIKEY";
+
 export type OrganizationUsagePetitionLimit = {
   limit: Scalars["Int"];
   used: Scalars["Int"];
@@ -1582,6 +1603,8 @@ export type Petition = PetitionBase & {
   isRestrictedWithPassword: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
+  /** Metadata for this petition. */
+  metadata: Scalars["JSONObject"];
   /** The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates). */
   myEffectivePermission: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
@@ -1707,6 +1730,8 @@ export type PetitionBase = {
   isRestrictedWithPassword: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
+  /** Metadata for this petition. */
+  metadata: Scalars["JSONObject"];
   /** The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates). */
   myEffectivePermission: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
@@ -2255,6 +2280,8 @@ export type PetitionTemplate = PetitionBase & {
   isRestrictedWithPassword: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
+  /** Metadata for this petition. */
+  metadata: Scalars["JSONObject"];
   /** The effective permission of the logged user. Will return null if the user doesn't have access to the petition (e.g. on public templates). */
   myEffectivePermission: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
@@ -3038,6 +3065,9 @@ export type SsoOrgIntegration = OrgIntegration & {
   /** The type of the integration. */
   type: IntegrationType;
 };
+
+/** Represents a successful execution. */
+export type Success = "SUCCESS";
 
 /** Return type for all support methods */
 export type SupportMethodResponse = {

@@ -14,13 +14,6 @@ import type { PaginationFieldConfig } from "./helpers/paginationPlugin";
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
     /**
-     * A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
-     */
-    datetime<FieldName extends string>(
-      fieldName: FieldName,
-      opts?: core.CommonInputFieldConfig<TypeName, FieldName>
-    ): void; // "DateTime";
-    /**
      * The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
      */
     jsonObject<FieldName extends string>(
@@ -34,6 +27,13 @@ declare global {
       fieldName: FieldName,
       opts?: core.CommonInputFieldConfig<TypeName, FieldName>
     ): void; // "JSON";
+    /**
+     * A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+     */
+    datetime<FieldName extends string>(
+      fieldName: FieldName,
+      opts?: core.CommonInputFieldConfig<TypeName, FieldName>
+    ): void; // "DateTime";
     globalId<FieldName extends string>(
       fieldName: FieldName,
       opts: GlobalIdInputFieldConfig<TypeName, FieldName>
@@ -43,13 +43,6 @@ declare global {
 declare global {
   interface NexusGenCustomOutputMethods<TypeName extends string> {
     /**
-     * A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
-     */
-    datetime<FieldName extends string>(
-      fieldName: FieldName,
-      ...opts: core.ScalarOutSpread<TypeName, FieldName>
-    ): void; // "DateTime";
-    /**
      * The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
      */
     jsonObject<FieldName extends string>(
@@ -63,6 +56,13 @@ declare global {
       fieldName: FieldName,
       ...opts: core.ScalarOutSpread<TypeName, FieldName>
     ): void; // "JSON";
+    /**
+     * A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+     */
+    datetime<FieldName extends string>(
+      fieldName: FieldName,
+      ...opts: core.ScalarOutSpread<TypeName, FieldName>
+    ): void; // "DateTime";
     globalId<FieldName extends string>(
       fieldName: FieldName,
       ...opts: GlobalIdOutputFieldConfigSpread<TypeName, FieldName>
@@ -261,6 +261,7 @@ export interface NexusGenEnums {
   Result: "FAILURE" | "SUCCESS";
   SignatureOrgIntegrationEnvironment: "DEMO" | "PRODUCTION";
   SignatureOrgIntegrationProvider: "SIGNATURIT";
+  Success: "SUCCESS";
   TaskStatus: db.TaskStatus;
   Tone: db.Tone;
   UserStatus: db.UserStatus;
@@ -924,7 +925,7 @@ export interface NexusGenFieldTypes {
     deletePetitionFieldAttachment: NexusGenRootTypes["PetitionField"]; // PetitionField!
     deletePetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
     deletePetitionReply: NexusGenRootTypes["PetitionField"]; // PetitionField!
-    deletePetitions: NexusGenEnums["Result"]; // Result!
+    deletePetitions: NexusGenEnums["Success"]; // Success!
     deleteSignatureIntegration: NexusGenEnums["Result"]; // Result!
     deleteTag: NexusGenEnums["Result"]; // Result!
     deleteUserGroup: NexusGenEnums["Result"]; // Result!
@@ -2353,7 +2354,7 @@ export interface NexusGenFieldTypeNames {
     deletePetitionFieldAttachment: "PetitionField";
     deletePetitionFieldComment: "PetitionField";
     deletePetitionReply: "PetitionField";
-    deletePetitions: "Result";
+    deletePetitions: "Success";
     deleteSignatureIntegration: "Result";
     deleteTag: "Result";
     deleteUserGroup: "Result";
@@ -3760,7 +3761,7 @@ export interface NexusGenArgTypes {
     };
     deletePetitions: {
       // args
-      dry?: boolean | null; // Boolean
+      dryrun?: boolean | null; // Boolean
       force?: boolean | null; // Boolean
       ids: NexusGenScalars["GID"][]; // [GID!]!
     };

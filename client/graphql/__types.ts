@@ -481,7 +481,7 @@ export interface Mutation {
   /** Deletes a reply to a petition field. */
   deletePetitionReply: PetitionField;
   /** Delete petitions. */
-  deletePetitions: Result;
+  deletePetitions: Success;
   /** Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests */
   deleteSignatureIntegration: Result;
   /** Removes the tag from every petition and soft-deletes it */
@@ -928,7 +928,7 @@ export interface MutationdeletePetitionReplyArgs {
 }
 
 export interface MutationdeletePetitionsArgs {
-  dry?: InputMaybe<Scalars["Boolean"]>;
+  dryrun?: InputMaybe<Scalars["Boolean"]>;
   force?: InputMaybe<Scalars["Boolean"]>;
   ids: Array<Scalars["GID"]>;
 }
@@ -3173,6 +3173,9 @@ export interface SsoOrgIntegration extends OrgIntegration {
   /** The type of the integration. */
   type: IntegrationType;
 }
+
+/** Represents a successful execution. */
+export type Success = "SUCCESS";
 
 /** Return type for all support methods */
 export interface SupportMethodResponse {
@@ -19086,10 +19089,10 @@ export type ConfirmDeletePetitionsDialog_PetitionBaseFragment =
 export type useDeletePetitions_deletePetitionsMutationVariables = Exact<{
   ids: Array<Scalars["GID"]> | Scalars["GID"];
   force?: InputMaybe<Scalars["Boolean"]>;
-  dry?: InputMaybe<Scalars["Boolean"]>;
+  dryrun?: InputMaybe<Scalars["Boolean"]>;
 }>;
 
-export type useDeletePetitions_deletePetitionsMutation = { deletePetitions: Result };
+export type useDeletePetitions_deletePetitionsMutation = { deletePetitions: Success };
 
 export type useUpdateIsReadNotification_UserFragment = {
   __typename?: "User";
@@ -26264,8 +26267,8 @@ export const useDeleteContacts_deleteContactsDocument = gql`
   useDeleteContacts_deleteContactsMutationVariables
 >;
 export const useDeletePetitions_deletePetitionsDocument = gql`
-  mutation useDeletePetitions_deletePetitions($ids: [GID!]!, $force: Boolean, $dry: Boolean) {
-    deletePetitions(ids: $ids, force: $force, dry: $dry)
+  mutation useDeletePetitions_deletePetitions($ids: [GID!]!, $force: Boolean, $dryrun: Boolean) {
+    deletePetitions(ids: $ids, force: $force, dryrun: $dryrun)
   }
 ` as unknown as DocumentNode<
   useDeletePetitions_deletePetitionsMutation,

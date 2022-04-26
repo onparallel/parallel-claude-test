@@ -11,7 +11,7 @@ import { globalIdArg } from "../helpers/globalIdPlugin";
 import { importFromExcel } from "../helpers/importDataFromExcel";
 import { parseContactList } from "../helpers/parseContactList";
 import { RESULT } from "../helpers/result";
-import { uploadArg } from "../helpers/upload";
+import { uploadArg } from "../helpers/scalars";
 import { notEmptyObject } from "../helpers/validators/notEmptyObject";
 import { validateFile } from "../helpers/validators/validateFile";
 import { validEmail } from "../helpers/validators/validEmail";

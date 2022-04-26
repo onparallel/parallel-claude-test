@@ -39,14 +39,12 @@ import {
   ifSomeDefined,
   or,
 } from "../../helpers/authorize";
-import { datetimeArg } from "../../helpers/date";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { importFromExcel } from "../../helpers/importDataFromExcel";
-import { jsonArg, jsonObjectArg } from "../../helpers/json";
 import { parseDynamicSelectValues } from "../../helpers/parseDynamicSelectValues";
 import { presendPetition, sendPetitionMessageEmails } from "../../helpers/presendPetition";
 import { RESULT } from "../../helpers/result";
-import { uploadArg } from "../../helpers/upload";
+import { datetimeArg, jsonArg, jsonObjectArg, SUCCESS, uploadArg } from "../../helpers/scalars";
 import { validateAnd, validateIf, validateIfDefined, validateOr } from "../../helpers/validateArgs";
 import { inRange } from "../../helpers/validators/inRange";
 import { jsonSchema } from "../../helpers/validators/jsonSchema";
@@ -260,12 +258,12 @@ export const clonePetitions = mutationField("clonePetitions", {
 
 export const deletePetitions = mutationField("deletePetitions", {
   description: "Delete petitions.",
-  type: "Result",
+  type: "Success",
   authorize: chain(authenticate(), userHasAccessToPetitions("ids")),
   args: {
     ids: nonNull(list(nonNull(globalIdArg("Petition")))),
     force: booleanArg({ default: false }),
-    dry: booleanArg({
+    dryrun: booleanArg({
       default: false,
       description:
         "If true, this will do a dry-run of the mutation to throw possible errors but it will not perform any modification in DB",
@@ -329,8 +327,8 @@ export const deletePetitions = mutationField("deletePetitions", {
       });
     }
 
-    if (args.dry) {
-      return RESULT.SUCCESS;
+    if (args.dryrun) {
+      return SUCCESS;
     }
 
     await ctx.petitions.withTransaction(async (t) => {
@@ -408,8 +406,7 @@ export const deletePetitions = mutationField("deletePetitions", {
         ]);
       }
     });
-
-    return RESULT.SUCCESS;
+    return SUCCESS;
   },
 });
 
