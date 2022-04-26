@@ -253,7 +253,7 @@ function LandingTemplateDetails({
                 />
               </Text>
               {descriptionHtml ? (
-                <HtmlBlock html={descriptionHtml} />
+                <HtmlBlock dangerousInnerHtml={descriptionHtml} />
               ) : (
                 <Text textStyle="hint">
                   <FormattedMessage

@@ -73,7 +73,7 @@ function CompletingMessageDialog({
           ) : null}
           {bodyHtml ? (
             <HtmlBlock
-              html={bodyHtml}
+              dangerousInnerHtml={bodyHtml}
               overflowY="auto"
               fontSize="16px"
               marginBottom={4}

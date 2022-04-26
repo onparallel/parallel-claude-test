@@ -317,7 +317,7 @@ export function TemplateDetailsModal({
 
                 <AccordionPanel paddingBottom={3}>
                   {template.descriptionHtml ? (
-                    <HtmlBlock html={template.descriptionHtml} />
+                    <HtmlBlock dangerousInnerHtml={template.descriptionHtml} />
                   ) : (
                     <Text textAlign="center" textStyle="hint">
                       <FormattedMessage

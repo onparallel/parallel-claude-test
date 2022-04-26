@@ -1,8 +1,8 @@
 import { Box } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 
-export const HtmlBlock = chakraForwardRef<"div", { html: string }>(function HtmlBlock(
-  { children, html, ...props },
+export const HtmlBlock = chakraForwardRef<"div", { dangerousInnerHtml: string }>(function HtmlBlock(
+  { children, dangerousInnerHtml: html, ...props },
   ref
 ) {
   return (
