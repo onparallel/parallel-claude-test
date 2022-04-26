@@ -933,10 +933,6 @@ describe("repositories/PetitionRepository", () => {
           expect(reply.anonymized_at).not.toBeNull();
           if (reply.type === "FILE_UPLOAD") {
             expect(reply.content.file_upload_id).toBeNull();
-          } else if (reply.type === "CHECKBOX") {
-            expect(Array.isArray(reply.content.value)).toEqual(true);
-            expect((reply.content.value as any[]).length).toBeGreaterThan(0);
-            expect((reply.content.value as any[]).every((v) => v === null)).toEqual(true);
           } else {
             expect(reply.content.value).toBeNull();
           }

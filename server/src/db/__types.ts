@@ -524,11 +524,18 @@ export interface EmailLog {
   response: Maybe<string>; // text
   external_id: Maybe<string>; // varchar
   reply_to: Maybe<string>; // text
+  anonymized_at: Maybe<Date>; // timestamptz
 }
 
 export type CreateEmailLog = PartialProps<
   Omit<EmailLog, "id">,
-  "track_opens" | "created_at" | "sent_at" | "response" | "external_id" | "reply_to"
+  | "track_opens"
+  | "created_at"
+  | "sent_at"
+  | "response"
+  | "external_id"
+  | "reply_to"
+  | "anonymized_at"
 >;
 
 export interface FeatureFlag {
@@ -695,6 +702,7 @@ export interface Petition {
   completing_message_subject: Maybe<string>; // text
   completing_message_body: Maybe<string>; // text
   metadata: any; // jsonb
+  anonymized_at: Maybe<Date>; // timestamptz
 }
 
 export type CreatePetition = PartialProps<
@@ -732,6 +740,7 @@ export type CreatePetition = PartialProps<
   | "completing_message_subject"
   | "completing_message_body"
   | "metadata"
+  | "anonymized_at"
 >;
 
 export interface PetitionAccess {
@@ -916,6 +925,7 @@ export interface PetitionFieldComment {
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
   is_internal: boolean; // bool
+  anonymized_at: Maybe<Date>; // timestamptz
 }
 
 export type CreatePetitionFieldComment = PartialProps<
@@ -929,6 +939,7 @@ export type CreatePetitionFieldComment = PartialProps<
   | "deleted_at"
   | "deleted_by"
   | "is_internal"
+  | "anonymized_at"
 >;
 
 export interface PetitionFieldReply {
@@ -946,6 +957,7 @@ export interface PetitionFieldReply {
   status: PetitionFieldReplyStatus; // petition_field_reply_status
   metadata: any; // jsonb
   user_id: Maybe<number>; // int4
+  anonymized_at: Maybe<Date>; // timestamptz
 }
 
 export type CreatePetitionFieldReply = PartialProps<
@@ -960,6 +972,7 @@ export type CreatePetitionFieldReply = PartialProps<
   | "status"
   | "metadata"
   | "user_id"
+  | "anonymized_at"
 >;
 
 export interface PetitionMessage {
@@ -974,11 +987,18 @@ export interface PetitionMessage {
   email_log_id: Maybe<number>; // int4
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
+  anonymized_at: Maybe<Date>; // timestamptz
 }
 
 export type CreatePetitionMessage = PartialProps<
   Omit<PetitionMessage, "id">,
-  "email_subject" | "email_body" | "scheduled_at" | "email_log_id" | "created_at" | "created_by"
+  | "email_subject"
+  | "email_body"
+  | "scheduled_at"
+  | "email_log_id"
+  | "created_at"
+  | "created_by"
+  | "anonymized_at"
 >;
 
 export interface PetitionPermission {
@@ -1022,11 +1042,12 @@ export interface PetitionReminder {
   sender_id: Maybe<number>; // int4
   petition_access_id: number; // int4
   email_body: Maybe<string>; // text
+  anonymized_at: Maybe<Date>; // timestamptz
 }
 
 export type CreatePetitionReminder = PartialProps<
   Omit<PetitionReminder, "id">,
-  "email_log_id" | "created_at" | "created_by" | "sender_id" | "email_body"
+  "email_log_id" | "created_at" | "created_by" | "sender_id" | "email_body" | "anonymized_at"
 >;
 
 export interface PetitionSignatureRequest {
@@ -1045,6 +1066,7 @@ export interface PetitionSignatureRequest {
   file_upload_audit_trail_id: Maybe<number>; // int4
   metadata: any; // jsonb
   signer_status: any; // jsonb
+  anonymized_at: Maybe<Date>; // timestamptz
 }
 
 export type CreatePetitionSignatureRequest = PartialProps<
@@ -1061,6 +1083,7 @@ export type CreatePetitionSignatureRequest = PartialProps<
   | "file_upload_audit_trail_id"
   | "metadata"
   | "signer_status"
+  | "anonymized_at"
 >;
 
 export interface PetitionTag {
