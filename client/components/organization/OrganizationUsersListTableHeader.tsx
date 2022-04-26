@@ -3,6 +3,7 @@ import { RepeatIcon, UserPlusIcon } from "@parallel/chakra/icons";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
+import { Spacer } from "../common/Spacer";
 import { WhenOrgRole } from "../common/WhenOrgRole";
 
 export interface OrganizationUsersListTableHeaderProps {
@@ -42,6 +43,7 @@ export function OrganizationUsersListTableHeader({
         })}
       />
       <WhenOrgRole role="ADMIN">
+        <Spacer />
         {hasSsoProvider ? null : (
           <Button
             isDisabled={isCreateUserButtonDisabled}
