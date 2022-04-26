@@ -17006,6 +17006,8 @@ export type PetitionReplies_petitionQuery = {
     | null;
 };
 
+export type Petitions_UserFragment = { __typename?: "User"; role: OrganizationRole };
+
 export type Petitions_PetitionBasePaginationFragment = {
   __typename?: "PetitionBasePagination";
   totalCount: number;
@@ -22633,6 +22635,11 @@ export const PetitionReplies_QueryFragmentDoc = gql`
   ${PetitionSignaturesCard_UserFragmentDoc}
   ${useUpdateIsReadNotification_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionReplies_QueryFragment, unknown>;
+export const Petitions_UserFragmentDoc = gql`
+  fragment Petitions_User on User {
+    role
+  }
+` as unknown as DocumentNode<Petitions_UserFragment, unknown>;
 export const PetitionTagListCellContent_TagFragmentDoc = gql`
   fragment PetitionTagListCellContent_Tag on Tag {
     id

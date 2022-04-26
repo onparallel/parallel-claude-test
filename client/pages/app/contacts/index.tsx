@@ -232,7 +232,8 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
           defaultMessage: "First name",
         }),
         cellProps: {
-          minWidth: "30%",
+          width: "30%",
+          minWidth: "240px",
         },
         CellContent: ({ row }) => (
           <>
@@ -252,7 +253,8 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
           defaultMessage: "Last name",
         }),
         cellProps: {
-          minWidth: "30%",
+          width: "30%",
+          minWidth: "240px",
         },
         CellContent: ({ row }) => (
           <>
@@ -272,7 +274,8 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
           defaultMessage: "Email",
         }),
         cellProps: {
-          minWidth: "30%",
+          width: "30%",
+          minWidth: "240px",
         },
         CellContent: ({ row }) => <>{row.email}</>,
       },
@@ -284,7 +287,8 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
           defaultMessage: "Created at",
         }),
         cellProps: {
-          minWidth: "10%",
+          width: "10%",
+          minWidth: "220px",
         },
         CellContent: ({ row: { createdAt } }) => (
           <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime whiteSpace="nowrap" />

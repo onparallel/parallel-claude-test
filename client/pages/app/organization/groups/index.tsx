@@ -45,6 +45,7 @@ import { useOrganizationSections } from "@parallel/utils/useOrganizationSections
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isAdmin } from "@parallel/utils/roles";
+import { CopyIcon, DeleteIcon } from "@parallel/chakra/icons";
 
 const SORTING = ["name", "members", "createdAt"] as const;
 
@@ -272,15 +273,39 @@ function OrganizationGroups() {
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
+          actions={[
+            {
+              key: "clone",
+              onClick: handleCloneClick,
+              leftIcon: <CopyIcon />,
+              children: (
+                <FormattedMessage
+                  id="organization-groups.clone-group"
+                  defaultMessage="Clone {count, plural, =1{team} other {teams}}"
+                  values={{ count: selectedGroups.length }}
+                />
+              ),
+            },
+            {
+              key: "remove",
+              onClick: handleDeleteClick,
+              colorScheme: "red",
+              leftIcon: <DeleteIcon />,
+              children: (
+                <FormattedMessage
+                  id="organization-groups.delete-group"
+                  defaultMessage="Delete {count, plural, =1{team} other {teams}}"
+                  values={{ count: selectedGroups.length }}
+                />
+              ),
+            },
+          ]}
           header={
             <OrganizationGroupsListTableHeader
               search={search}
-              selectedGroups={selectedGroups}
               onReload={() => refetch()}
               onSearchChange={handleSearchChange}
               onCreateGroup={handleCreateGroup}
-              onCloneGroup={handleCloneClick}
-              onRemoveGroup={handleDeleteClick}
             />
           }
           body={
@@ -323,12 +348,9 @@ function useOrganizationGroupsTableColumns(): TableColumn<OrganizationGroups_Use
           id: "generic.name",
           defaultMessage: "Name",
         }),
-        headerProps: {
+        cellProps: {
           width: "30%",
           minWidth: "240px",
-        },
-        cellProps: {
-          maxWidth: 0,
         },
         CellContent: ({ row }) => {
           return <OverflownText>{row.name}</OverflownText>;
@@ -340,6 +362,10 @@ function useOrganizationGroupsTableColumns(): TableColumn<OrganizationGroups_Use
           id: "generic.users",
           defaultMessage: "Users",
         }),
+        cellProps: {
+          width: "55%",
+          minWidth: "240px",
+        },
         align: "left",
         CellContent: ({ row: { members }, column }) => {
           const users = members.map((m) => m.user);
@@ -366,7 +392,8 @@ function useOrganizationGroupsTableColumns(): TableColumn<OrganizationGroups_Use
           defaultMessage: "Created at",
         }),
         cellProps: {
-          width: "1px",
+          width: "15%",
+          minWidth: "200px",
         },
         CellContent: ({ row }) => (
           <DateTime

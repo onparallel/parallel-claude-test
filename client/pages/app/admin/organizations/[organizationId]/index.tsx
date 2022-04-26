@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { Badge, Flex, Heading, Text, Tooltip } from "@chakra-ui/react";
-import { ForbiddenIcon } from "@parallel/chakra/icons";
+import { ForbiddenIcon, LogInIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { TableColumn } from "@parallel/components/common/Table";
@@ -145,14 +145,25 @@ function OrganizationMembers({ organizationId }: OrganizationMembersProps) {
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
+          actions={[
+            {
+              key: "login-as",
+              onClick: handleLoginAs,
+              isDisabled:
+                selectedUsers.length !== 1 ||
+                selectedUsers[0].id === me.id ||
+                selectedUsers[0].status === "INACTIVE",
+              leftIcon: <LogInIcon />,
+              children: (
+                <FormattedMessage id="organization-users.login-as" defaultMessage="Login as..." />
+              ),
+            },
+          ]}
           header={
             <OrganizationMembersListTableHeader
-              myId={me.id}
               search={search}
-              selectedUsers={selectedUsers}
               onReload={() => refetch()}
               onSearchChange={handleSearchChange}
-              onLoginAs={handleLoginAs}
             />
           }
           body={
@@ -195,6 +206,10 @@ function useOrganizationMembersTableColumns() {
           id: "organization-users.header.id",
           defaultMessage: "ID",
         }),
+        cellProps: {
+          width: "10%",
+          minWidth: "140px",
+        },
         CellContent: ({ row }) => {
           const copyToClipboard = useClipboardWithToast({
             text: intl.formatMessage({
@@ -216,6 +231,10 @@ function useOrganizationMembersTableColumns() {
           id: "organization-users.header.name",
           defaultMessage: "Name",
         }),
+        cellProps: {
+          width: "30%",
+          minWidth: "200px",
+        },
         CellContent: ({ row }) => {
           return (
             <Text as="span" display="inline-flex" whiteSpace="nowrap" alignItems="center">
@@ -250,6 +269,10 @@ function useOrganizationMembersTableColumns() {
           id: "organization-users.header.user-email",
           defaultMessage: "Email",
         }),
+        cellProps: {
+          width: "30%",
+          minWidth: "200px",
+        },
         CellContent: ({ row }) => <>{row.email}</>,
       },
       {
@@ -259,8 +282,8 @@ function useOrganizationMembersTableColumns() {
           defaultMessage: "Role",
         }),
         cellProps: {
-          width: "1px",
-          textAlign: "center",
+          width: "10%",
+          minWidth: "130px",
         },
         CellContent: ({ row }) => (
           <Badge
@@ -284,6 +307,10 @@ function useOrganizationMembersTableColumns() {
           defaultMessage: "Last active at",
         }),
         isSortable: true,
+        cellProps: {
+          width: "10%",
+          minWidth: "210px",
+        },
         CellContent: ({ row }) =>
           row.lastActiveAt ? (
             <DateTime
@@ -306,7 +333,8 @@ function useOrganizationMembersTableColumns() {
           defaultMessage: "Created at",
         }),
         cellProps: {
-          width: "1px",
+          width: "10%",
+          minWidth: "195px",
         },
         CellContent: ({ row }) => (
           <DateTime

@@ -178,7 +178,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   );
   columns = useMemo(
     () =>
-      (selectedCount > 0) & isDefined(actions)
+      selectedCount > 0 && isDefined(actions)
         ? [
             {
               ...pick(columns[0], ["key", "CellContent", "cellProps"]),

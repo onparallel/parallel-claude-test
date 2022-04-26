@@ -241,7 +241,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
               content: "''",
               display: "block",
               width: "1px",
-              height: "4  1px",
+              height: "41px",
               backgroundColor: colors.border,
             }}
           >

@@ -17,7 +17,13 @@ import {
   useEditableControls,
   useToast,
 } from "@chakra-ui/react";
-import { CopyIcon, DeleteIcon, EditSimpleIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
+import {
+  CopyIcon,
+  DeleteIcon,
+  EditSimpleIcon,
+  MoreVerticalIcon,
+  UserXIcon,
+} from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -319,14 +325,26 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
+          actions={[
+            {
+              key: "remove",
+              onClick: handleRemoveMember,
+              colorScheme: "red",
+              leftIcon: <UserXIcon />,
+              children: (
+                <FormattedMessage
+                  id="organization-groups.remove-from-group"
+                  defaultMessage="Remove from team"
+                />
+              ),
+            },
+          ]}
           header={
             <OrganizationGroupListTableHeader
               search={search}
-              selectedMembers={selectedMembers}
               onReload={() => refetch()}
               onSearchChange={handleSearchChange}
               onAddMember={handleAddMember}
-              onRemoveMember={handleRemoveMember}
             />
           }
           body={
@@ -369,6 +387,10 @@ function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_UserG
           id: "generic.name",
           defaultMessage: "Name",
         }),
+        cellProps: {
+          width: "43%",
+          minWidth: "240px",
+        },
         CellContent: ({ row }) => {
           return <Text as="span">{row.user.fullName}</Text>;
         },
@@ -380,6 +402,10 @@ function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_UserG
           id: "generic.email",
           defaultMessage: "Email",
         }),
+        cellProps: {
+          width: "42%",
+          minWidth: "240px",
+        },
         CellContent: ({ row }) => <>{row.user.email}</>,
       },
       {
@@ -390,7 +416,8 @@ function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_UserG
           defaultMessage: "Added at",
         }),
         cellProps: {
-          width: "1px",
+          width: "15%",
+          minWidth: "140px",
         },
         CellContent: ({ row }) => (
           <DateTime value={row.addedAt} format={FORMATS.LLL} useRelativeTime whiteSpace="nowrap" />

@@ -10,13 +10,7 @@ import {
   Stack,
   Tooltip,
 } from "@chakra-ui/react";
-import {
-  DeleteIcon,
-  MoreVerticalIcon,
-  RepeatIcon,
-  UploadIcon,
-  UserPlusIcon,
-} from "@parallel/chakra/icons";
+import { MoreVerticalIcon, RepeatIcon, UploadIcon, UserPlusIcon } from "@parallel/chakra/icons";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";

@@ -1,8 +1,9 @@
 import { gql, useMutation } from "@apollo/client";
 import { Badge, Flex, Heading, Text, Tooltip, useToast } from "@chakra-ui/react";
-import { ForbiddenIcon } from "@parallel/chakra/icons";
+import { ForbiddenIcon, LogInIcon, UserCheckIcon, UserXIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { UserSelectSelection } from "@parallel/components/common/UserSelect";
@@ -28,6 +29,7 @@ import {
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
+import { withError } from "@parallel/utils/promises/withError";
 import {
   boolean,
   integer,
@@ -238,6 +240,36 @@ function OrganizationUsers() {
     await loginAs(selected[0]);
   };
 
+  const showErrorDialog = useErrorDialog();
+  const handleUpdateSelectedUsersStatus = async (newStatus: UserStatus) => {
+    if (selectedUsers.some((u) => u.id === me.id)) {
+      await withError(
+        showErrorDialog({
+          message: intl.formatMessage({
+            id: "organization-users.update-user-status.error.deactivate-own-user",
+            defaultMessage:
+              "You can't deactivate your own user. Please, remove it from the selection and try again.",
+          }),
+        })
+      );
+    } else if (selectedUsers.some((u) => u.isSsoUser)) {
+      await withError(
+        showErrorDialog({
+          message: intl.formatMessage(
+            {
+              id: "organization-users.update-user-status.error.update-sso-user",
+              defaultMessage:
+                "{count, plural, =1{The user you selected is} other{Some of the users you selected are}} managed by a SSO provider. Please, update its status directly on the provider.",
+            },
+            { count: selectedUsers.length }
+          ),
+        })
+      );
+    } else {
+      handleUpdateUserStatus(newStatus);
+    }
+  };
+
   const isUserLimitReached =
     me.organization.activeUserCount >= me.organization.usageLimits.users.limit;
 
@@ -284,20 +316,63 @@ function OrganizationUsers() {
           onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           onRowClick={canEdit ? (user) => handleUpdateUser(user) : undefined}
+          actions={[
+            {
+              key: "activate",
+              onClick: () => handleUpdateSelectedUsersStatus("ACTIVE"),
+              isDisabled:
+                selectedUsers.every((u) => u.status === "ACTIVE") || isActivateUserButtonDisabled,
+              leftIcon: <UserCheckIcon />,
+              children: (
+                <FormattedMessage
+                  id="organization-users.activate"
+                  defaultMessage="Activate {count, plural, =1{user} other {users}}"
+                  values={{ count: selectedUsers.length }}
+                />
+              ),
+            },
+            {
+              key: "deactivate",
+              onClick: () => handleUpdateSelectedUsersStatus("INACTIVE"),
+              isDisabled: selectedUsers.every((u) => u.status === "INACTIVE"),
+              leftIcon: <UserXIcon />,
+              children: (
+                <FormattedMessage
+                  id="organization-users.deactivate"
+                  defaultMessage="Deactivate {count, plural, =1{user} other {users}}"
+                  values={{ count: selectedUsers.length }}
+                />
+              ),
+            },
+            ...(me.hasGhostLogin
+              ? [
+                  {
+                    key: "login-as",
+                    onClick: handleLoginAs,
+                    isDisabled:
+                      selectedUsers.length !== 1 ||
+                      selectedUsers[0].id === me.id ||
+                      selectedUsers[0].status === "INACTIVE",
+                    leftIcon: <LogInIcon />,
+                    children: (
+                      <FormattedMessage
+                        id="organization-users.login-as"
+                        defaultMessage="Login as..."
+                      />
+                    ),
+                  },
+                ]
+              : []),
+          ]}
           header={
             <OrganizationUsersListTableHeader
-              myId={me.id}
               search={search}
-              selectedUsers={selectedUsers}
               hasSsoProvider={hasSsoProvider}
-              hasGhostLogin={me.hasGhostLogin}
               isCreateUserButtonDisabled={isUserLimitReached}
               isActivateUserButtonDisabled={isActivateUserButtonDisabled}
               onCreateUser={handleCreateUser}
               onReload={() => refetch()}
               onSearchChange={handleSearchChange}
-              onUpdateUserStatus={handleUpdateUserStatus}
-              onLoginAs={handleLoginAs}
             />
           }
         />
@@ -319,6 +394,10 @@ function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
           id: "organization-users.header.name",
           defaultMessage: "Name",
         }),
+        cellProps: {
+          width: userIsAdmin ? "30%" : "46%",
+          minWidth: "220px",
+        },
         CellContent: ({ row }) => {
           return (
             <Text as="span" display="inline-flex" whiteSpace="nowrap" alignItems="center">
@@ -353,6 +432,10 @@ function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
           id: "organization-users.header.user-email",
           defaultMessage: "Email",
         }),
+        cellProps: {
+          width: "30%",
+          minWidth: "220px",
+        },
         CellContent: ({ row }) => <>{row.email}</>,
       },
       {
@@ -362,8 +445,8 @@ function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
           defaultMessage: "Role",
         }),
         cellProps: {
-          width: "1px",
-          textAlign: "center",
+          width: "10%",
+          minWidth: "200px",
         },
         CellContent: ({ row }) => (
           <Badge
@@ -389,6 +472,10 @@ function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
                 defaultMessage: "Last active at",
               }),
               isSortable: true,
+              cellProps: {
+                width: "16%",
+                minWidth: "220px",
+              },
               CellContent: ({ row }) =>
                 row.lastActiveAt ? (
                   <DateTime
@@ -413,7 +500,8 @@ function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
           defaultMessage: "Created at",
         }),
         cellProps: {
-          width: "1px",
+          width: "14%",
+          minWidth: "220px",
         },
         CellContent: ({ row }) => (
           <DateTime
