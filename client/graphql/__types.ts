@@ -8466,6 +8466,7 @@ export type PublicTemplateCard_PetitionTemplateFragment = {
   imageUrl?: string | null;
   locale: PetitionLocale;
   isRestricted: boolean;
+  isPublic: boolean;
   publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
   signatureConfig?: {
     __typename?: "SignatureConfig";
@@ -8511,6 +8512,7 @@ export type TemplateActiveSettingsIcons_PetitionTemplateFragment = {
   id: string;
   locale: PetitionLocale;
   isRestricted: boolean;
+  isPublic: boolean;
   publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
   signatureConfig?: {
     __typename?: "SignatureConfig";
@@ -8557,6 +8559,7 @@ export type TemplateCard_PetitionTemplateFragment = {
   name?: string | null;
   locale: PetitionLocale;
   isRestricted: boolean;
+  isPublic: boolean;
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
@@ -17785,6 +17788,7 @@ export type NewPetition_PetitionTemplateFragment = {
   imageUrl?: string | null;
   locale: PetitionLocale;
   isRestricted: boolean;
+  isPublic: boolean;
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
@@ -17865,6 +17869,7 @@ export type NewPetition_templatesQuery = {
       imageUrl?: string | null;
       locale: PetitionLocale;
       isRestricted: boolean;
+      isPublic: boolean;
       permissions: Array<
         | {
             __typename?: "PetitionUserGroupPermission";
@@ -19706,6 +19711,7 @@ export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
   createdAt: string;
   locale: PetitionLocale;
   isRestricted: boolean;
+  isPublic: boolean;
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
@@ -20387,6 +20393,7 @@ export const TemplateActiveSettingsIcons_PetitionTemplateFragmentDoc = gql`
     id
     locale
     isRestricted
+    isPublic
     publicLink {
       id
       isActive

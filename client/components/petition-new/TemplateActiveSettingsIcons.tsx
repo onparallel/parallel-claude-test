@@ -50,7 +50,7 @@ export function TemplateActiveSettingsIcons({
           <LinkIcon color="gray.600" boxSize={4} />
         </SmallPopover>
       ) : null}
-      {template.defaultPermissions && template.defaultPermissions.length ? (
+      {!template.isPublic && template.defaultPermissions && template.defaultPermissions.length ? (
         <TemplateIconDefaultPermissions defaultPermissions={template.defaultPermissions} />
       ) : null}
       {template.signatureConfig ? (
@@ -69,6 +69,7 @@ TemplateActiveSettingsIcons.fragments = {
       id
       locale
       isRestricted
+      isPublic
       publicLink {
         id
         isActive
