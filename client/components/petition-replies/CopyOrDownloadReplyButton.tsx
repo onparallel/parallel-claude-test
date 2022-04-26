@@ -64,8 +64,10 @@ export function CopyOrDownloadReplyButton({ reply, onAction }: CopyOrDownloadRep
         />
       ) : reply.field!.type === "DYNAMIC_SELECT" ? (
         <Stack spacing={1}>
-          {(reply.content.value as [string, string | null][]).map(([label, value], index) =>
-            value ? (
+          {reply.isAnonymized ? (
+            <CopyToClipboardButton size="xs" text={""} isDisabled />
+          ) : (
+            (reply.content.value as [string, string | null][]).map(([label, value], index) => (
               <CopyToClipboardButton
                 isDisabled={reply.isAnonymized}
                 key={index}
@@ -77,21 +79,25 @@ export function CopyOrDownloadReplyButton({ reply, onAction }: CopyOrDownloadRep
                   { label }
                 )}
                 size="xs"
-                text={value}
+                text={value ?? ""}
               />
-            ) : null
+            ))
           )}
         </Stack>
       ) : reply.field!.type === "CHECKBOX" ? (
         <Stack spacing={1}>
-          {(reply.content.value as string[]).map((value, index) => (
-            <CopyToClipboardButton
-              key={index}
-              size="xs"
-              text={value}
-              isDisabled={reply.isAnonymized}
-            />
-          ))}
+          {reply.isAnonymized ? (
+            <CopyToClipboardButton size="xs" text={""} isDisabled />
+          ) : (
+            (reply.content.value as string[])?.map((value, index) => (
+              <CopyToClipboardButton
+                key={index}
+                size="xs"
+                text={value}
+                isDisabled={reply.isAnonymized}
+              />
+            ))
+          )}
         </Stack>
       ) : null}
       {reply.metadata.EXTERNAL_ID_CUATRECASAS ? (

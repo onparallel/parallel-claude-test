@@ -42,34 +42,24 @@ export function PetitionRepliesFieldReply({
     <Flex>
       <CopyOrDownloadReplyButton reply={reply} onAction={onAction} />
       <Flex flexDirection="column" justifyContent="center" flex="1" marginLeft={2}>
-        {isTextLikeType ? (
-          reply.isAnonymized ? (
-            <ReplyNotAvailable />
-          ) : (
-            <BreakLines>{reply.content.value}</BreakLines>
-          )
+        {reply.isAnonymized ? (
+          <ReplyNotAvailable type={reply.field?.type} />
+        ) : isTextLikeType ? (
+          <BreakLines>{reply.content.value}</BreakLines>
         ) : reply.field!.type === "NUMBER" ? (
-          reply.isAnonymized ? (
-            <ReplyNotAvailable />
-          ) : (
-            <Text wordBreak="break-all" whiteSpace="pre">
-              {formatNumberWithPrefix(
-                reply.content.value,
-                reply.field!.options as FieldOptions["NUMBER"]
-              )}
-            </Text>
-          )
+          <Text wordBreak="break-all" whiteSpace="pre">
+            {formatNumberWithPrefix(
+              reply.content.value,
+              reply.field!.options as FieldOptions["NUMBER"]
+            )}
+          </Text>
         ) : reply.field!.type === "DATE" ? (
-          reply.isAnonymized ? (
-            <ReplyNotAvailable />
-          ) : (
-            <Text>
-              {intl.formatDate(reply.content.value, {
-                ...FORMATS.L,
-                timeZone: "UTC",
-              })}
-            </Text>
-          )
+          <Text>
+            {intl.formatDate(reply.content.value, {
+              ...FORMATS.L,
+              timeZone: "UTC",
+            })}
+          </Text>
         ) : reply.field!.type === "PHONE" ? (
           reply.isAnonymized ? (
             <ReplyNotAvailable />
@@ -106,15 +96,15 @@ export function PetitionRepliesFieldReply({
           )
         ) : reply.field!.type === "DYNAMIC_SELECT" ? (
           <List spacing={1}>
-            {(reply.content.value as [string, string][]).map(([, value], index) =>
-              reply.isAnonymized ? <ReplyNotAvailable /> : <ListItem key={index}>{value}</ListItem>
-            )}
+            {(reply.content.value as [string, string][]).map(([, value], index) => (
+              <ListItem key={index}>{value}</ListItem>
+            ))}
           </List>
         ) : reply.field!.type === "CHECKBOX" ? (
           <List spacing={1}>
-            {(reply.content.value as string[]).map((value, index) =>
-              reply.isAnonymized ? <ReplyNotAvailable /> : <ListItem key={index}>{value}</ListItem>
-            )}
+            {(reply.content.value as string[]).map((value, index) => (
+              <ListItem key={index}>{value}</ListItem>
+            ))}
           </List>
         ) : null}
         <Box fontSize="sm">

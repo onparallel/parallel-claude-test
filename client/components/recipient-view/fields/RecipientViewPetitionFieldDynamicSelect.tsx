@@ -283,7 +283,7 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
             value={
               optimistic
                 ? toSimpleSelectOption(optimistic)
-                : (reply && reply.content.value[level][1]) ?? null
+                : (reply && !reply.isAnonymized && reply.content.value[level][1]) ?? null
             }
             options={options}
             onChange={async (option) => {
