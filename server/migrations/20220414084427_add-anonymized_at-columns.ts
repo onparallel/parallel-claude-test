@@ -44,13 +44,6 @@ export async function up(knex: Knex): Promise<void> {
     create index "petition_field_comment__deleted_at__anonymized_at" on petition_field_comment (id) where deleted_at is not null and anonymized_at is null;
     create index "contact__deleted_at__anonymized_at" on contact (id) where deleted_at is not null and anonymized_at is null;
     create index "file_upload__deleted_at__file_deleted_at" on file_upload ("path") where deleted_at is not null and file_deleted_at is null;
-
-    create index "petition_message__petition_id__anonymized_at" on petition_message (petition_id) where anonymized_at is null;
-    create index "petition_reminder__petition_access_id__anonymized_at" on petition_reminder (petition_access_id) where anonymized_at is null;
-    create index "petition_field_reply__anonymized_at" on petition_field_reply (id) where anonymized_at is null;
-    create index "petition_field_comment__anonymized_at" on petition_field_comment (id) where anonymized_at is null;
-    create index "email_log__anonymized_at" on email_log (id) where anonymized_at is null;
-    create index "petition_signature_request__anonymized_at" on petition_signature_request (petition_id) where anonymized_at is null;
   `);
 }
 
@@ -61,12 +54,6 @@ export async function down(knex: Knex): Promise<void> {
     drop index "petition_field_comment__deleted_at__anonymized_at";
     drop index "contact__deleted_at__anonymized_at";
     drop index "file_upload__deleted_at__file_deleted_at";
-    drop index "petition_message__petition_id__anonymized_at";
-    drop index "petition_reminder__petition_access_id__anonymized_at";
-    drop index "petition_field_reply__anonymized_at";
-    drop index "petition_field_comment__anonymized_at";
-    drop index "email_log__anonymized_at";
-    drop index "petition_signature_request__anonymized_at";
   `);
 
   await knex.from("contact").whereNotNull("anonymized_at").delete();
