@@ -550,11 +550,6 @@
     "context": "Create contact"
   },
   {
-    "term": "component.contact-list-header.delete-label",
-    "definition": "Eliminar seleccionados",
-    "context": "Delete selected"
-  },
-  {
     "term": "component.contact-list-header.import-contacts-button",
     "definition": "Importar contactos",
     "context": "Import contacts"
@@ -1132,12 +1127,7 @@
   {
     "term": "component.message-closing-email-editor.body-label",
     "definition": "El asunto de este correo será el mismo que el del correo de la petición.",
-    "context": "The subject of this email will be the same as the subject of the request message."
-  },
-  {
-    "term": "component.message-email-editor.body-placeholder",
-    "definition": "Escribe un mensaje para incluir en el correo electrónico",
-    "context": "Write a message to include in the email"
+    "context": "The subject of this email will be the same as the subject of the petition message."
   },
   {
     "term": "component.message-email-editor.body-required-error",
@@ -2185,6 +2175,11 @@
     "context": "Signature completed: {signedAt}"
   },
   {
+    "term": "component.petition-signatures-card.access-file-nd",
+    "definition": "Acceder al archivo en NetDocuments",
+    "context": "Access file in NetDocuments"
+  },
+  {
     "term": "component.petition-signatures-card.add-signature-credits-message",
     "definition": "Hola, me gustaría obtener más información sobre cómo conseguir más créditos de firma.",
     "context": "Hi, I would like to get more information about how to get more signature credits."
@@ -2193,11 +2188,6 @@
     "term": "component.petition-signatures-card.add-signature.label",
     "definition": "Agregar firma",
     "context": "Add signature"
-  },
-  {
-    "term": "component.petition-signatures-card.access-file-nd",
-    "definition": "Acceder al archivo en NetDocuments",
-    "context": "Access file in NetDocuments"
   },
   {
     "term": "component.petition-signatures-card.edit-signers",
@@ -2282,7 +2272,7 @@
   {
     "term": "component.petition-template-completing-message.card-signature-alert",
     "definition": "Hay una firma añadida en esta plantilla. Recomendamos tenerlo en cuenta en tu mensaje, ya que este aparecerá antes de que el destinatario reciba la firma.",
-    "context": "There is a signature added in this template. We recommend that you take this into account in your message, as it will appear before the recipient receives the signature."
+    "context": "There is a signature added in this template. We recommend that you take this into account in your message, as it will appear before the recipient receives the signature email."
   },
   {
     "term": "component.petition-template-completing-message.popover",
@@ -2307,7 +2297,7 @@
   {
     "term": "component.petition-template-request-message.card-header",
     "definition": "Mensaje de la petición",
-    "context": "Request message"
+    "context": "Petition message"
   },
   {
     "term": "component.petition-template.delete-label",
@@ -4340,6 +4330,11 @@
     "context": "email@example.com"
   },
   {
+    "term": "generic.email-message-placeholder",
+    "definition": "Escribe un mensaje para incluir en el correo electrónico",
+    "context": "Write a message to include in the email"
+  },
+  {
     "term": "generic.empty-heading",
     "definition": "Encabezado vacío",
     "context": "Untitled heading"
@@ -5222,7 +5217,7 @@
   {
     "term": "organization.integrations.signaturit-description",
     "definition": "Añade firma digital a tus peticiones.",
-    "context": "Add digital signature to your requests."
+    "context": "Add digital signature to your petitions."
   },
   {
     "term": "organization.integrations.title",

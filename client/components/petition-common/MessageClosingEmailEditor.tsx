@@ -24,7 +24,7 @@ export function MessageClosingEmailEditor({
       <FormLabel marginBottom={3.5}>
         <FormattedMessage
           id="component.message-closing-email-editor.body-label"
-          defaultMessage="The subject of this email will be the same as the subject of the request message."
+          defaultMessage="The subject of this email will be the same as the subject of the petition message."
         />
       </FormLabel>
       <RichTextEditor
@@ -32,7 +32,7 @@ export function MessageClosingEmailEditor({
         value={body}
         onChange={onBodyChange}
         placeholder={intl.formatMessage({
-          id: "component.message-email-editor.body-placeholder",
+          id: "generic.email-message-placeholder",
           defaultMessage: "Write a message to include in the email",
         })}
         placeholderOptions={placeholderOptions}

@@ -687,10 +687,10 @@ export interface Petition {
   restricted_password_salt: Maybe<string>; // varchar
   credits_used: number; // int4
   closing_email_body: Maybe<string>; // text
-  metadata: any; // jsonb
   is_completing_message_enabled: boolean; // bool
   completing_message_subject: Maybe<string>; // text
   completing_message_body: Maybe<string>; // text
+  metadata: any; // jsonb
 }
 
 export type CreatePetition = PartialProps<
@@ -724,10 +724,10 @@ export type CreatePetition = PartialProps<
   | "restricted_password_salt"
   | "credits_used"
   | "closing_email_body"
-  | "metadata"
   | "is_completing_message_enabled"
   | "completing_message_subject"
   | "completing_message_body"
+  | "metadata"
 >;
 
 export interface PetitionAccess {

@@ -45,7 +45,7 @@ export function PetitionTemplateRequestMessageCard({
         <EmailIcon marginRight={2} />
         <FormattedMessage
           id="component.petition-template-request-message.card-header"
-          defaultMessage="Request message"
+          defaultMessage="Petition message"
         />
       </CardHeader>
       <Box padding={4}>

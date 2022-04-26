@@ -550,11 +550,6 @@
     "context": "Create contact"
   },
   {
-    "term": "component.contact-list-header.delete-label",
-    "definition": "Delete selected",
-    "context": "Delete selected"
-  },
-  {
     "term": "component.contact-list-header.import-contacts-button",
     "definition": "Import contacts",
     "context": "Import contacts"
@@ -1131,13 +1126,8 @@
   },
   {
     "term": "component.message-closing-email-editor.body-label",
-    "definition": "The subject of this email will be the same as the subject of the request message.",
-    "context": "The subject of this email will be the same as the subject of the request message."
-  },
-  {
-    "term": "component.message-email-editor.body-placeholder",
-    "definition": "Write a message to include in the email",
-    "context": "Write a message to include in the email"
+    "definition": "The subject of this email will be the same as the subject of the petition message.",
+    "context": "The subject of this email will be the same as the subject of the petition message."
   },
   {
     "term": "component.message-email-editor.body-required-error",
@@ -2185,6 +2175,11 @@
     "context": "Signature completed: {signedAt}"
   },
   {
+    "term": "component.petition-signatures-card.access-file-nd",
+    "definition": "Access file in NetDocuments",
+    "context": "Access file in NetDocuments"
+  },
+  {
     "term": "component.petition-signatures-card.add-signature-credits-message",
     "definition": "Hi, I would like to get more information about how to get more signature credits.",
     "context": "Hi, I would like to get more information about how to get more signature credits."
@@ -2193,11 +2188,6 @@
     "term": "component.petition-signatures-card.add-signature.label",
     "definition": "Add signature",
     "context": "Add signature"
-  },
-  {
-    "term": "component.petition-signatures-card.access-file-nd",
-    "definition": "Access file in NetDocuments",
-    "context": "Access file in NetDocuments"
   },
   {
     "term": "component.petition-signatures-card.edit-signers",
@@ -2281,8 +2271,8 @@
   },
   {
     "term": "component.petition-template-completing-message.card-signature-alert",
-    "definition": "There is a signature added in this template. We recommend that you take this into account in your message, as it will appear before the recipient receives the signature.",
-    "context": "There is a signature added in this template. We recommend that you take this into account in your message, as it will appear before the recipient receives the signature."
+    "definition": "There is a signature added in this template. We recommend that you take this into account in your message, as it will appear before the recipient receives the signature email.",
+    "context": "There is a signature added in this template. We recommend that you take this into account in your message, as it will appear before the recipient receives the signature email."
   },
   {
     "term": "component.petition-template-completing-message.popover",
@@ -2306,8 +2296,8 @@
   },
   {
     "term": "component.petition-template-request-message.card-header",
-    "definition": "Request message",
-    "context": "Request message"
+    "definition": "Petition message",
+    "context": "Petition message"
   },
   {
     "term": "component.petition-template.delete-label",
@@ -4340,6 +4330,11 @@
     "context": "email@example.com"
   },
   {
+    "term": "generic.email-message-placeholder",
+    "definition": "Write a message to include in the email",
+    "context": "Write a message to include in the email"
+  },
+  {
     "term": "generic.empty-heading",
     "definition": "Untitled heading",
     "context": "Untitled heading"
@@ -5221,8 +5216,8 @@
   },
   {
     "term": "organization.integrations.signaturit-description",
-    "definition": "Add digital signature to your requests.",
-    "context": "Add digital signature to your requests."
+    "definition": "Add digital signature to your petitions.",
+    "context": "Add digital signature to your petitions."
   },
   {
     "term": "organization.integrations.title",

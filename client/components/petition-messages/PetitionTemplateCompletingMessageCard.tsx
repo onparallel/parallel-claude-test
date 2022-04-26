@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import {
+  AlertDescription,
   AlertIcon,
   Box,
   Flex,
@@ -111,10 +112,12 @@ export function PetitionTemplateCompletingMessageCard({
           {petition.signatureConfig ? (
             <CloseableAlert status="info" mb={2} alignItems="start">
               <AlertIcon />
-              <FormattedMessage
-                id="component.petition-template-completing-message.card-signature-alert"
-                defaultMessage="There is a signature added in this template. We recommend that you take this into account in your message, as it will appear before the recipient receives the signature."
-              />
+              <AlertDescription>
+                <FormattedMessage
+                  id="component.petition-template-completing-message.card-signature-alert"
+                  defaultMessage="There is a signature added in this template. We recommend that you take this into account in your message, as it will appear before the recipient receives the signature email."
+                />
+              </AlertDescription>
             </CloseableAlert>
           ) : null}
           <FormControl>

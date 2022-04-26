@@ -197,7 +197,7 @@ function DelegateAccessDialog({
                   value={value}
                   onChange={onChange}
                   placeholder={intl.formatMessage({
-                    id: "component.message-email-editor.body-placeholder",
+                    id: "generic.email-message-placeholder",
                     defaultMessage: "Write a message to include in the email",
                   })}
                 />
