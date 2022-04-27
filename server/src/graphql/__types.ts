@@ -975,6 +975,7 @@ export interface NexusGenFieldTypes {
     publicPetitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     publicSendReminder: NexusGenEnums["Result"]; // Result!
     publicSendVerificationCode: NexusGenRootTypes["VerificationCodeRequest"]; // VerificationCodeRequest!
+    publicStartAsyncFieldCompletion: NexusGenScalars["JSONObject"]; // JSONObject!
     publicUpdatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
     publicUpdatePetitionFieldReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
@@ -2419,6 +2420,7 @@ export interface NexusGenFieldTypeNames {
     publicPetitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     publicSendReminder: "Result";
     publicSendVerificationCode: "VerificationCodeRequest";
+    publicStartAsyncFieldCompletion: "JSONObject";
     publicUpdatePetitionFieldComment: "PublicPetitionFieldComment";
     publicUpdatePetitionFieldReply: "PublicPetitionFieldReply";
     reactivateAccesses: "PetitionAccess";
@@ -4003,6 +4005,11 @@ export interface NexusGenArgTypes {
     };
     publicSendVerificationCode: {
       // args
+      keycode: string; // ID!
+    };
+    publicStartAsyncFieldCompletion: {
+      // args
+      fieldId: NexusGenScalars["GID"]; // GID!
       keycode: string; // ID!
     };
     publicUpdatePetitionFieldComment: {

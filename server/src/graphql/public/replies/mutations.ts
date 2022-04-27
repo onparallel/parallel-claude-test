@@ -239,3 +239,37 @@ export const publicFileUploadReplyDownloadLink = mutationField(
     },
   }
 );
+
+export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFieldCompletion", {
+  description: "Starts the completion of an async field",
+  type: "JSONObject",
+  args: { keycode: nonNull(idArg()), fieldId: nonNull(globalIdArg("PetitionField")) },
+  authorize: chain(
+    authenticatePublicAccess("keycode"),
+    and(
+      fieldBelongsToAccess("fieldId"),
+      fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
+      fieldCanBeReplied("fieldId")
+    )
+  ),
+  resolve: async (_, { keycode, fieldId }, ctx) => {
+    // create jwt with keycode,fieldId
+    const token = ``;
+    // POST en
+    `${bankFlipApiUrl}/request`;
+    // con body
+    const payload = {
+      userId: keycode,
+      webhookUrl: `https://webhook.site/06d79831-9c75-486d-8171-9e1eebc425a9?token=${token}`,
+    };
+    const result = { id: "" };
+
+    return {
+      type: "WINDOW",
+      url: `https://app.bankflip.io?${new URLSearchParams({
+        userId: keycode,
+        requestId: result.id,
+      })}`,
+    };
+  },
+});

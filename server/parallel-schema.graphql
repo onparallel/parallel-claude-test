@@ -1100,6 +1100,11 @@ type Mutation {
   publicSendVerificationCode(keycode: ID!): VerificationCodeRequest!
 
   """
+  Starts the completion of an async field
+  """
+  publicStartAsyncFieldCompletion(fieldId: GID!, keycode: ID!): JSONObject!
+
+  """
   Update a petition field comment.
   """
   publicUpdatePetitionFieldComment(

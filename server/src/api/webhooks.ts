@@ -1,4 +1,4 @@
-import { Router, urlencoded } from "express";
+import { Router, json, urlencoded } from "express";
 import { fromGlobalId } from "../util/globalId";
 import { scim } from "./scim";
 import {
@@ -31,5 +31,15 @@ export const webhooks = Router()
       }
     }
   )
+  .post("/bankflip", json(), async (req, res, next) => {
+    // validate jwt from query
+    // get reuslt from
+    const result = body.payload.request.results.aeat_datos_fiscales.find(
+      (doc) => doc.content_type === "application/pdf"
+    );
+    // get file from
+    `${bankflipApiUrl}/file/${result.id}.pdf`;
+    // create reply to field with keycode /fieldId from jwt
+  })
   // SCIM endpoints for User Provisioning
   .use("/scim", scim);
