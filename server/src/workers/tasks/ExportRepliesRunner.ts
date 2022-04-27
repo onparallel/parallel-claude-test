@@ -1,6 +1,5 @@
 import { createZipFile } from "../../util/createZipFile";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
-import { random } from "../../util/token";
 import { getPetitionFiles } from "../helpers/getPetitionFiles";
 import { TaskRunner } from "../helpers/TaskRunner";
 
@@ -40,17 +39,11 @@ export class ExportRepliesRunner extends TaskRunner<"EXPORT_REPLIES"> {
       )
     );
 
-    const path = random(16);
-    const res = await this.ctx.aws.temporaryFiles.uploadFile(path, "application/zip", zipFile);
-    const tmpFile = await this.ctx.files.createTemporaryFile(
-      {
-        path,
-        content_type: "application/zip",
-        filename: sanitizeFilenameWithSuffix(name, ".zip"),
-        size: res["ContentLength"]!.toString(),
-      },
-      `TaskWorker:${this.task.id}`
-    );
+    const tmpFile = await this.uploadTemporaryFile({
+      stream: zipFile,
+      filename: sanitizeFilenameWithSuffix(name, ".zip"),
+      contentType: "application/zip",
+    });
 
     return { temporary_file_id: tmpFile.id };
   }

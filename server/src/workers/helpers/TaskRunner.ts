@@ -1,6 +1,8 @@
+import { Readable } from "stream";
 import { WorkerContext } from "../../context";
 import { Task, TaskOutput } from "../../db/repositories/TaskRepository";
 import { TaskName } from "../../db/__types";
+import { random } from "../../util/token";
 
 export abstract class TaskRunner<T extends TaskName> {
   constructor(protected ctx: WorkerContext, protected task: Task<T>) {}
@@ -18,6 +20,29 @@ export abstract class TaskRunner<T extends TaskName> {
         progress: Math.round(value),
       },
       `Task:${this.task.id}`
+    );
+  }
+
+  protected async uploadTemporaryFile({
+    stream,
+    filename,
+    contentType,
+  }: {
+    stream: Readable;
+    filename: string;
+    contentType: string;
+  }) {
+    const path = random(16);
+    const res = await this.ctx.aws.temporaryFiles.uploadFile(path, contentType, stream);
+
+    return await this.ctx.files.createTemporaryFile(
+      {
+        path,
+        content_type: contentType,
+        filename,
+        size: res["ContentLength"]!.toString(),
+      },
+      `TaskWorker:${this.task.id}`
     );
   }
 }

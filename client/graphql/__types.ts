@@ -455,6 +455,8 @@ export interface Mutation {
   createExportExcelTask: Task;
   /** Creates a task for exporting a ZIP file with petition replies and sends it to the queue */
   createExportRepliesTask: Task;
+  /** Creates a task for exporting a report grouping the replies of every petition coming from the same template */
+  createExportReportTask: Task;
   /** Creates a reply to a file upload field. */
   createFileUploadReply: FileUploadReplyResponse;
   /** Notifies the backend that the upload is complete. */
@@ -803,6 +805,10 @@ export interface MutationcreateExportExcelTaskArgs {
 
 export interface MutationcreateExportRepliesTaskArgs {
   pattern?: InputMaybe<Scalars["String"]>;
+  petitionId: Scalars["GID"];
+}
+
+export interface MutationcreateExportReportTaskArgs {
   petitionId: Scalars["GID"];
 }
 
@@ -20208,6 +20214,33 @@ export type useExportRepliesTask_getTaskResultFileUrlMutationVariables = Exact<{
 
 export type useExportRepliesTask_getTaskResultFileUrlMutation = { getTaskResultFileUrl: string };
 
+export type useExportReportTask_createExportReportTaskMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type useExportReportTask_createExportReportTaskMutation = {
+  createExportReportTask: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    progress?: number | null;
+  };
+};
+
+export type useExportReportTask_getTaskResultFileUrlMutationVariables = Exact<{
+  taskId: Scalars["GID"];
+}>;
+
+export type useExportReportTask_getTaskResultFileUrlMutation = { getTaskResultFileUrl: string };
+
+export type useExportReportTask_taskQueryVariables = Exact<{
+  id: Scalars["GID"];
+}>;
+
+export type useExportReportTask_taskQuery = {
+  task: { __typename?: "Task"; id: string; status: TaskStatus; progress?: number | null };
+};
+
 export type useFilenamePlaceholdersRename_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -27663,6 +27696,33 @@ export const useExportRepliesTask_getTaskResultFileUrlDocument = gql`
   useExportRepliesTask_getTaskResultFileUrlMutation,
   useExportRepliesTask_getTaskResultFileUrlMutationVariables
 >;
+export const useExportReportTask_createExportReportTaskDocument = gql`
+  mutation useExportReportTask_createExportReportTask($petitionId: GID!) {
+    createExportReportTask(petitionId: $petitionId) {
+      ...TaskProgressDialog_Task
+    }
+  }
+  ${TaskProgressDialog_TaskFragmentDoc}
+` as unknown as DocumentNode<
+  useExportReportTask_createExportReportTaskMutation,
+  useExportReportTask_createExportReportTaskMutationVariables
+>;
+export const useExportReportTask_getTaskResultFileUrlDocument = gql`
+  mutation useExportReportTask_getTaskResultFileUrl($taskId: GID!) {
+    getTaskResultFileUrl(taskId: $taskId, preview: true)
+  }
+` as unknown as DocumentNode<
+  useExportReportTask_getTaskResultFileUrlMutation,
+  useExportReportTask_getTaskResultFileUrlMutationVariables
+>;
+export const useExportReportTask_taskDocument = gql`
+  query useExportReportTask_task($id: GID!) {
+    task(id: $id) {
+      ...TaskProgressDialog_Task
+    }
+  }
+  ${TaskProgressDialog_TaskFragmentDoc}
+` as unknown as DocumentNode<useExportReportTask_taskQuery, useExportReportTask_taskQueryVariables>;
 export const useLoginAs_loginAsDocument = gql`
   mutation useLoginAs_loginAs($userId: GID!) {
     loginAs(userId: $userId)

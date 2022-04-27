@@ -143,6 +143,12 @@ export class PetitionRepository extends BaseRepository {
 
   readonly loadPetition = this.buildLoadBy("petition", "id", (q) => q.whereNull("deleted_at"));
 
+  readonly loadPetitionsByFromTemplateId = this.buildLoadMultipleBy(
+    "petition",
+    "from_template_id",
+    (q) => q.whereNull("deleted_at")
+  );
+
   readonly loadField = this.buildLoadBy("petition_field", "id", (q) => q.whereNull("deleted_at"));
 
   readonly loadFieldReply = this.buildLoadBy("petition_field_reply", "id", (q) =>

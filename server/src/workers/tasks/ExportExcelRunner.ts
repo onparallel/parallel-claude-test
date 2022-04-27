@@ -1,5 +1,4 @@
 import sanitizeFilename from "sanitize-filename";
-import { random } from "../../util/token";
 import { getPetitionFiles } from "../helpers/getPetitionFiles";
 import { TaskRunner } from "../helpers/TaskRunner";
 
@@ -40,22 +39,11 @@ export class ExportExcelRunner extends TaskRunner<"EXPORT_EXCEL"> {
       throw new Error(`No replies to export to xlsx file on Petition:${petitionId}`);
     }
 
-    const path = random(16);
-    const res = await this.ctx.aws.temporaryFiles.uploadFile(
-      path,
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      exportExcel.value.stream
-    );
-
-    const tmpFile = await this.ctx.files.createTemporaryFile(
-      {
-        path,
-        content_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        filename: sanitizeFilename(exportExcel.value!.filename),
-        size: res["ContentLength"]!.toString(),
-      },
-      `TaskWorker:${this.task.id}`
-    );
+    const tmpFile = await this.uploadTemporaryFile({
+      stream: exportExcel.value.stream,
+      filename: sanitizeFilename(exportExcel.value!.filename),
+      contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
 
     return { temporary_file_id: tmpFile.id };
   }

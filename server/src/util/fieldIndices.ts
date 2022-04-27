@@ -1,5 +1,4 @@
-import { PetitionField } from "../__types";
-import { useMemo } from "react";
+import { PetitionField } from "../db/__types";
 
 export type PetitionFieldIndex = number | string;
 
@@ -39,11 +38,4 @@ export function getFieldIndices(fields: Pick<PetitionField, "type">[]): Petition
   return fields.map((f) =>
     f.type === "HEADING" ? (letter.next().value as string) : (number.next().value as number)
   );
-}
-/**
- * iterates every field and returns an array representing the index of each one in the same order
- * @param fields fields to iterate.
- */
-export function useFieldIndices(fields: Pick<PetitionField, "type">[]): PetitionFieldIndex[] {
-  return useMemo(() => getFieldIndices(fields), [fields.map((f) => f.type).join(",")]);
 }

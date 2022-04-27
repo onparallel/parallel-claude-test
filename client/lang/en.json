@@ -990,6 +990,11 @@
     "context": "Exporting replies..."
   },
   {
+    "term": "component.export-report-task.header",
+    "definition": "Generating report...",
+    "context": "Generating report..."
+  },
+  {
     "term": "component.field-error-dialog.header",
     "definition": "Validation errors",
     "context": "Validation errors"
@@ -1788,6 +1793,11 @@
     "term": "component.petition-header.delete-label",
     "definition": "Delete petition",
     "context": "Delete petition"
+  },
+  {
+    "term": "component.petition-header.download-results",
+    "definition": "Download results",
+    "context": "Download results"
   },
   {
     "term": "component.petition-header.duplicate-label",

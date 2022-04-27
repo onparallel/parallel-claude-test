@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { isDefined, zip } from "remeda";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { useLiquidScope_PetitionBaseFragment } from "../__types";
-import { getFieldIndices } from "./fieldIndices";
+import { getFieldIndices } from "../../util/fieldIndices";
 
 export function useLiquidScope(petition: useLiquidScope_PetitionBaseFragment) {
   return useMemo(() => {

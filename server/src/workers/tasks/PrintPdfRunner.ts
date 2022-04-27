@@ -2,7 +2,6 @@ import { createReadStream } from "fs";
 import { unlink } from "fs/promises";
 import { isDefined } from "remeda";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
-import { random } from "../../util/token";
 import { Maybe } from "../../util/types";
 import { TaskRunner } from "../helpers/TaskRunner";
 
@@ -63,21 +62,11 @@ export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
 
       await this.onProgress(75);
 
-      const path = random(16);
-      const res = await this.ctx.aws.temporaryFiles.uploadFile(
-        path,
-        "application/pdf",
-        createReadStream(tmpFilePath)
-      );
-      const tmpFile = await this.ctx.files.createTemporaryFile(
-        {
-          path,
-          content_type: "application/pdf",
-          filename: sanitizeFilenameWithSuffix(documentTitle ?? "parallel", ".pdf"),
-          size: res["ContentLength"]!.toString(),
-        },
-        `TaskWorker:${this.task.id}`
-      );
+      const tmpFile = await this.uploadTemporaryFile({
+        stream: createReadStream(tmpFilePath),
+        filename: sanitizeFilenameWithSuffix(documentTitle ?? "parallel", ".pdf"),
+        contentType: "application/pdf",
+      });
 
       return { temporary_file_id: tmpFile.id };
     } finally {

@@ -932,6 +932,7 @@ export interface NexusGenFieldTypes {
     createEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     createExportExcelTask: NexusGenRootTypes["Task"]; // Task!
     createExportRepliesTask: NexusGenRootTypes["Task"]; // Task!
+    createExportReportTask: NexusGenRootTypes["Task"]; // Task!
     createFileUploadReply: NexusGenRootTypes["FileUploadReplyResponse"]; // FileUploadReplyResponse!
     createFileUploadReplyComplete: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createOrganization: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -2399,6 +2400,7 @@ export interface NexusGenFieldTypeNames {
     createEventSubscription: "PetitionEventSubscription";
     createExportExcelTask: "Task";
     createExportRepliesTask: "Task";
+    createExportReportTask: "Task";
     createFileUploadReply: "FileUploadReplyResponse";
     createFileUploadReplyComplete: "PetitionFieldReply";
     createOrganization: "SupportMethodResponse";
@@ -3712,6 +3714,10 @@ export interface NexusGenArgTypes {
     createExportRepliesTask: {
       // args
       pattern?: string | null; // String
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    createExportReportTask: {
+      // args
       petitionId: NexusGenScalars["GID"]; // GID!
     };
     createFileUploadReply: {

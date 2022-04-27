@@ -20,6 +20,7 @@ import {
   DownloadIcon,
   LockClosedIcon,
   MoreVerticalIcon,
+  TableIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -32,6 +33,7 @@ import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
+import { useExportReportTask } from "@parallel/utils/useExportReportTask";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { usePrintPdfTask } from "@parallel/utils/usePrintPdfTask";
 import { useRouter } from "next/router";
@@ -146,6 +148,8 @@ export const PetitionTemplateHeader = Object.assign(
 
     const handlePrintPdfTask = usePrintPdfTask();
 
+    const handleExportReportTask = useExportReportTask();
+
     return (
       <Box
         ref={ref}
@@ -257,6 +261,15 @@ export const PetitionTemplateHeader = Object.assign(
                     />
                   </MenuItem>
                 ) : null}
+                <MenuItem
+                  onClick={() => handleExportReportTask(petition.id)}
+                  icon={<TableIcon display="block" boxSize={4} />}
+                >
+                  <FormattedMessage
+                    id="component.petition-header.download-results"
+                    defaultMessage="Download results"
+                  />
+                </MenuItem>
                 <MenuItem
                   onClick={handleCloneClick}
                   icon={<CopyIcon display="block" boxSize={4} />}
