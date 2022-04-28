@@ -326,6 +326,10 @@ function renderEditable(editable: ReactNode) {
         "> div": {
           minHeight: "120px !important",
         },
+        "[data-slate-placeholder]": {
+          opacity: "1 !important",
+          color: "gray.400",
+        },
       }}
     >
       {editable}
