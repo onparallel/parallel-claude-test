@@ -1,4 +1,5 @@
 import { ChakraProvider } from "@chakra-ui/react";
+import { Fonts } from "@parallel/chakra/fonts";
 import { theme } from "@parallel/chakra/theme";
 import { LiquidProvider } from "@parallel/utils/useLiquid";
 import { DecoratorFunction } from "@storybook/csf";
@@ -27,6 +28,7 @@ export const StoryDecorator: DecoratorFunction<ReactFramework> = function StoryD
         onWarn={() => {}}
       >
         <ChakraProvider theme={theme} resetCSS portalZIndex={40}>
+          <Fonts />
           <AnimateSharedLayout>{story()}</AnimateSharedLayout>
         </ChakraProvider>
       </IntlProvider>

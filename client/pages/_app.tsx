@@ -1,4 +1,5 @@
 import { ChakraProvider } from "@chakra-ui/react";
+import { Fonts } from "@parallel/chakra/fonts";
 import { theme } from "@parallel/chakra/theme";
 import { I18nProps, I18nProvider } from "@parallel/components/common/I18nProvider";
 import { initSentry } from "@parallel/utils/sentry";
@@ -30,6 +31,7 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
     <LiquidProvider>
       <I18nProvider {...props}>
         <ChakraProvider theme={theme} resetCSS portalZIndex={40}>
+          <Fonts />
           <AnimateSharedLayout>
             <Component {...pageProps} />
           </AnimateSharedLayout>
