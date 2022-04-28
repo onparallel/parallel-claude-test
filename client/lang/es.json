@@ -1126,7 +1126,7 @@
   },
   {
     "term": "component.message-closing-email-editor.body-label",
-    "definition": "El asunto de este correo será el mismo que el del correo de la petición.",
+    "definition": "El asunto de este correo será el mismo que el del mensaje de la petición.",
     "context": "The subject of this email will be the same as the subject of the petition message."
   },
   {
