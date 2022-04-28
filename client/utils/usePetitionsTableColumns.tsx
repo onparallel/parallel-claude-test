@@ -168,8 +168,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                 }),
                 align: "left",
                 cellProps: {
-                  isTruncated: true,
-                  maxWidth: 0,
+                  minWidth: "205px",
                 },
                 CellContent: ({ row }) => {
                   return <TemplateActiveSettingsIcons template={row} spacing={4} />;
