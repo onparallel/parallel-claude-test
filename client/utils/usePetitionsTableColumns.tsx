@@ -161,10 +161,10 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
             ] as PetitionTableColumn[])
           : ([
               {
-                key: "configuration",
+                key: "settings",
                 header: intl.formatMessage({
-                  id: "petitions.header.configuration",
-                  defaultMessage: "Configuration",
+                  id: "petitions.header.settings",
+                  defaultMessage: "Settings",
                 }),
                 align: "left",
                 cellProps: {

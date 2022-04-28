@@ -2185,11 +2185,6 @@
     "context": "Signature completed: {signedAt}"
   },
   {
-    "term": "component.petition-signatures-card.access-file-nd",
-    "definition": "Access file in NetDocuments",
-    "context": "Access file in NetDocuments"
-  },
-  {
     "term": "component.petition-signatures-card.add-signature-credits-message",
     "definition": "Hi, I would like to get more information about how to get more signature credits.",
     "context": "Hi, I would like to get more information about how to get more signature credits."
@@ -6320,11 +6315,6 @@
     "context": "Template name"
   },
   {
-    "term": "petitions.header.configuration",
-    "definition": "Configuration",
-    "context": "Configuration"
-  },
-  {
     "term": "petitions.header.name",
     "definition": "Petition name",
     "context": "Petition name"
@@ -6353,6 +6343,11 @@
     "term": "petitions.header.reminders-next-reminder-at.popover",
     "definition": "Next reminder configured for {date}",
     "context": "Next reminder configured for {date}"
+  },
+  {
+    "term": "petitions.header.settings",
+    "definition": "Settings",
+    "context": "Settings"
   },
   {
     "term": "petitions.header.shared",
