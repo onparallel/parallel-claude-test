@@ -108,6 +108,7 @@ import { useLiquidScope } from "@parallel/utils/useLiquidScope";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { usePrintPdfTask } from "@parallel/utils/usePrintPdfTask";
+import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
@@ -120,7 +121,7 @@ const QUERY_STATE = {
 
 function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const intl = useIntl();
-
+  const router = useRouter();
   const {
     data: { me, realMe },
   } = useAssertQuery(PetitionReplies_userDocument);
@@ -438,10 +439,13 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const showPetitionSharingDialog = usePetitionSharingDialog();
   const handlePetitionSharingClick = async function () {
     try {
-      await showPetitionSharingDialog({
+      const res = await showPetitionSharingDialog({
         userId: me.id,
         petitionIds: [petition.id],
       });
+      if (res?.close) {
+        router.push("/app/petitions");
+      }
     } catch {}
   };
 

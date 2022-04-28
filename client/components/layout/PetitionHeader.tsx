@@ -119,10 +119,13 @@ export const PetitionHeader = Object.assign(
     const showPetitionSharingDialog = usePetitionSharingDialog();
     const handlePetitionSharingClick = async function () {
       try {
-        await showPetitionSharingDialog({
+        const res = await showPetitionSharingDialog({
           userId: me.id,
           petitionIds: [petition.id],
         });
+        if (res?.close) {
+          router.push("/app/petitions");
+        }
       } catch {}
     };
 

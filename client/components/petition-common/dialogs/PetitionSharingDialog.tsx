@@ -191,7 +191,7 @@ export function PetitionSharingDialog({
       const name = user ? user.fullName : userGroup?.name;
       const id = user ? user.id : userGroup?.id;
 
-      await confirmRemovePetitionPermission({ name });
+      await confirmRemovePetitionPermission({ name: id === userId ? undefined : name });
       await removePetitionPermission({
         variables: { petitionId, [prop]: [id] },
         refetchQueries: [
@@ -756,13 +756,20 @@ function ConfirmRemovePetitionPermissionDialog({
         />
       }
       body={
-        <FormattedMessage
-          id="petition-sharing.confirm-remove.message"
-          defaultMessage="Are you sure you want to stop sharing this petition with {name}?"
-          values={{
-            name: <Text as="strong">{name}</Text>,
-          }}
-        />
+        name ? (
+          <FormattedMessage
+            id="petition-sharing.confirm-remove.message"
+            defaultMessage="Are you sure you want to stop sharing this petition with {name}?"
+            values={{
+              name: <Text as="strong">{name}</Text>,
+            }}
+          />
+        ) : (
+          <FormattedMessage
+            id="petition-sharing.confirm-remove.message-2"
+            defaultMessage="Are you sure you want to remove your permissions? Doing so will cause you to lose access."
+          />
+        )
       }
       confirm={
         <Button colorScheme="red" onClick={() => props.onResolve()}>

@@ -5820,6 +5820,11 @@
     "context": "Are you sure you want to stop sharing this petition with {name}?"
   },
   {
+    "term": "petition-sharing.confirm-remove.message-2",
+    "definition": "Are you sure you want to remove your permissions? Doing so will cause you to lose access.",
+    "context": "Are you sure you want to remove your permissions? Doing so will cause you to lose access."
+  },
+  {
     "term": "petition-sharing.confirm-transfer-ownership.confirm-button",
     "definition": "Yes, transfer",
     "context": "Yes, transfer"
