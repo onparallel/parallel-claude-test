@@ -2,12 +2,15 @@ import { gql } from "@apollo/client";
 import { Box, Text } from "@chakra-ui/react";
 import { EmailIcon } from "@parallel/chakra/icons";
 import {
+  PetitionLocale,
   PetitionTemplateClosingMessageCard_PetitionTemplateFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
-import { emptyRTEValue } from "@parallel/utils/slate/RichTextEditor/emptyRTEValue";
+import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/placeholders/textWithPlaceholderToSlateNodes";
+import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/slate/placeholders/usePetitionMessagePlaceholderOptions";
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
+import { outdent } from "outdent";
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { Card, CardHeader, CardProps } from "../common/Card";
@@ -18,13 +21,36 @@ interface PetitionTemplateClosingMessageCardProps extends CardProps {
   onUpdatePetition: (data: UpdatePetitionInput) => void;
 }
 
+const messages: Record<PetitionLocale, string> = {
+  en: outdent`
+    Dear #contact-first-name#,
+
+    We have reviewed all the information that we requested, and we can confirm that everything is correct.
+
+    Let us know if you have any questions or comments.
+    
+    Best regards.
+  `,
+  es: outdent`
+    Apreciado/a #contact-first-name#,
+
+    Le comunicamos que hemos revisado toda la información que le requerimos y le confirmamos que está todo correcto.
+    
+    Quedamos a su entera disposición para aclarar o comentar cualquier aspecto que considere oportuno.
+    
+    Reciba un cordial saludo.
+  `,
+};
+
 export function PetitionTemplateClosingMessageCard({
   petition,
   onUpdatePetition,
   ...props
 }: PetitionTemplateClosingMessageCardProps) {
+  const placeholders = usePetitionMessagePlaceholderOptions();
   const [closingEmailBody, setClosingEmailBody] = useState<RichTextEditorValue>(
-    petition.closingEmailBody ?? emptyRTEValue()
+    petition.closingEmailBody ??
+      textWithPlaceholderToSlateNodes(messages[petition.locale], placeholders)
   );
 
   const handleclosingEmailBodyChange = (value: RichTextEditorValue) => {
@@ -67,6 +93,7 @@ PetitionTemplateClosingMessageCard.fragments = {
       closingEmailBody
       isRestricted
       isPublic
+      locale
     }
   `,
 };

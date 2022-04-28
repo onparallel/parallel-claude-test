@@ -13,15 +13,18 @@ import {
 } from "@chakra-ui/react";
 import { AppWindowIcon } from "@parallel/chakra/icons";
 import {
+  PetitionLocale,
   PetitionTemplateCompletingMessageCard_PetitionTemplateFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
+import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/placeholders/textWithPlaceholderToSlateNodes";
 import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/slate/placeholders/usePetitionMessagePlaceholderOptions";
-import { emptyRTEValue } from "@parallel/utils/slate/RichTextEditor/emptyRTEValue";
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types";
 import { ChangeEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { outdent } from "outdent";
+
 import { Card, CardHeader, CardProps } from "../common/Card";
 import { CloseableAlert } from "../common/CloseableAlert";
 import { HelpPopover } from "../common/HelpPopover";
@@ -34,21 +37,43 @@ interface PetitionTemplateCompletingMessageCardProps extends CardProps {
   onUpdatePetition: (data: UpdatePetitionInput) => void;
 }
 
+const messagesSubject: Record<PetitionLocale, string> = {
+  en: outdent`
+    Thank you for completing
+  `,
+  es: outdent`
+    Gracias por completar
+  `,
+};
+
+const messagesBody: Record<PetitionLocale, string> = {
+  en: outdent`
+    We have notified #user-first-name# that he will receive the information in order to continue with the process.
+  `,
+  es: outdent`
+    Hemos notificado a #user-first-name# que recibirá la información para poder continuar con el proceso.
+  `,
+};
+
 export function PetitionTemplateCompletingMessageCard({
   petition,
   onUpdatePetition,
   ...props
 }: PetitionTemplateCompletingMessageCardProps) {
   const intl = useIntl();
-
+  const placeholders = usePetitionMessagePlaceholderOptions();
   const [isEnabled, setIsEnabled] = useState(petition.isCompletingMessageEnabled);
-  const [subject, setSubject] = useState(petition.completingMessageSubject ?? "");
-  const [body, setBody] = useState(petition.completingMessageBody ?? emptyRTEValue());
+  const [subject, setSubject] = useState(
+    petition.completingMessageSubject ?? messagesSubject[petition.locale]
+  );
+  const [body, setBody] = useState(
+    petition.completingMessageBody ??
+      textWithPlaceholderToSlateNodes(messagesBody[petition.locale], placeholders)
+  );
 
   const handleSubjectChange = (completingMessageSubject: string) => {
     if (completingMessageSubject === subject) return;
     setSubject(completingMessageSubject);
-    setIsEnabled(!!completingMessageSubject || !isEmptyRTEValue(body));
     onUpdatePetition({
       completingMessageSubject,
       isCompletingMessageEnabled: !!completingMessageSubject || !isEmptyRTEValue(body),
@@ -57,7 +82,6 @@ export function PetitionTemplateCompletingMessageCard({
 
   const handleBodyChange = (completingMessageBody: RichTextEditorValue) => {
     setBody(completingMessageBody);
-    setIsEnabled(!!subject || !isEmptyRTEValue(completingMessageBody));
     onUpdatePetition({
       completingMessageBody: isEmptyRTEValue(completingMessageBody) ? null : completingMessageBody,
       isCompletingMessageEnabled: !!subject || !isEmptyRTEValue(completingMessageBody),
@@ -170,6 +194,7 @@ PetitionTemplateCompletingMessageCard.fragments = {
       completingMessageBody
       isRestricted
       isPublic
+      locale
       signatureConfig {
         __typename
       }

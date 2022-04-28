@@ -8435,6 +8435,7 @@ export type PetitionTemplateClosingMessageCard_PetitionTemplateFragment = {
   closingEmailBody?: any | null;
   isRestricted: boolean;
   isPublic: boolean;
+  locale: PetitionLocale;
 };
 
 export type PetitionTemplateCompletingMessageCard_PetitionTemplateFragment = {
@@ -8445,6 +8446,7 @@ export type PetitionTemplateCompletingMessageCard_PetitionTemplateFragment = {
   completingMessageBody?: any | null;
   isRestricted: boolean;
   isPublic: boolean;
+  locale: PetitionLocale;
   signatureConfig?: { __typename: "SignatureConfig" } | null;
 };
 
@@ -15303,9 +15305,9 @@ export type PetitionMessages_PetitionBase_PetitionTemplate_Fragment = {
   isCompletingMessageEnabled: boolean;
   completingMessageSubject?: string | null;
   completingMessageBody?: any | null;
+  locale: PetitionLocale;
   closingEmailBody?: any | null;
   name?: string | null;
-  locale: PetitionLocale;
   updatedAt: string;
   signatureConfig?: { __typename: "SignatureConfig" } | null;
 };
@@ -15412,9 +15414,9 @@ export type PetitionMessages_petitionQuery = {
         isCompletingMessageEnabled: boolean;
         completingMessageSubject?: string | null;
         completingMessageBody?: any | null;
+        locale: PetitionLocale;
         closingEmailBody?: any | null;
         name?: string | null;
-        locale: PetitionLocale;
         updatedAt: string;
         signatureConfig?: { __typename: "SignatureConfig" } | null;
       }
@@ -15454,9 +15456,9 @@ export type PetitionMessages_updatePetitionMutation = {
         isCompletingMessageEnabled: boolean;
         completingMessageSubject?: string | null;
         completingMessageBody?: any | null;
+        locale: PetitionLocale;
         closingEmailBody?: any | null;
         name?: string | null;
-        locale: PetitionLocale;
         updatedAt: string;
         signatureConfig?: { __typename: "SignatureConfig" } | null;
       };
@@ -22435,6 +22437,7 @@ export const PetitionTemplateCompletingMessageCard_PetitionTemplateFragmentDoc =
     completingMessageBody
     isRestricted
     isPublic
+    locale
     signatureConfig {
       __typename
     }
@@ -22449,6 +22452,7 @@ export const PetitionTemplateClosingMessageCard_PetitionTemplateFragmentDoc = gq
     closingEmailBody
     isRestricted
     isPublic
+    locale
   }
 ` as unknown as DocumentNode<PetitionTemplateClosingMessageCard_PetitionTemplateFragment, unknown>;
 export const PetitionMessages_PetitionBaseFragmentDoc = gql`
