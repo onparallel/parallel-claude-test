@@ -11,7 +11,6 @@ import {
   useCuatrecasasExport_updateSignatureRequestMetadataDocument,
 } from "@parallel/graphql/__types";
 import { useBackgroundTask } from "@parallel/utils/useBackgroundTask";
-import deepmerge from "deepmerge";
 import { MutableRefObject, useRef } from "react";
 import { useAlreadyExportedDialog } from "./dialogs/AlreadyExportedDialog";
 
@@ -149,11 +148,14 @@ function useExportSignatureDocument(
     await updateSignatureRequestMetadata({
       variables: {
         petitionSignatureRequestId: signatureRequest.id,
-        metadata: deepmerge(signatureRequest.metadata, {
-          [type === "signed-document"
-            ? "SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS"
-            : "AUDIT_TRAIL_EXTERNAL_ID_CUATRECASAS"]: externalId,
-        }),
+        metadata: {
+          ...signatureRequest.metadata,
+          ...{
+            [type === "signed-document"
+              ? "SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS"
+              : "AUDIT_TRAIL_EXTERNAL_ID_CUATRECASAS"]: externalId,
+          },
+        },
       },
     });
   };

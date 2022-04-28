@@ -107,6 +107,7 @@ export function CurrentSignatureRequestRow({
             {signatureRequest.metadata.SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS ? (
               <NetDocumentsIconButton
                 externalId={signatureRequest.metadata.SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS}
+                fontSize="xl"
               />
             ) : null}
             <Button width="24" colorScheme="purple" onClick={() => onDownload(signatureRequest.id)}>
