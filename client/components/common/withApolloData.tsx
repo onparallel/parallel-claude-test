@@ -35,7 +35,7 @@ export function redirect(context: NextPageContext, location: string, reload = fa
     if (reload) {
       window.location.href = locationWithLocale;
     } else {
-      Router.push(location);
+      Router.push(location, undefined, { locale: context.locale });
     }
   } else {
     context.res!.writeHead(302, { Location: locationWithLocale }).end();
