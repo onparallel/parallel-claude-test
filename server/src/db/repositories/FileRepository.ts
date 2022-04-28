@@ -62,12 +62,10 @@ export class FileRepository extends BaseRepository {
   /** gets deleted file_upload's whose paths are not repeated on another not deleted file_upload */
   async getFileUploadsToDelete() {
     return await this.raw<FileUpload>(/* sql */ `
-      select fu.* from file_upload fu 
-        where fu.deleted_at is not null
-        and fu.file_deleted_at is null
-        and fu."path" not in (
-          select fu2."path" from file_upload fu2 where fu2.id != fu.id and fu2.deleted_at is null and fu2.file_deleted_at is null
-        );
+      select fu.* from file_upload fu
+      left join file_upload fu2 on fu.path = fu2.path and fu2.deleted_at is null and fu2.file_deleted_at is null
+      where fu.deleted_at is not null and fu.file_deleted_at is null
+        and fu2.id is null
     `);
   }
 
