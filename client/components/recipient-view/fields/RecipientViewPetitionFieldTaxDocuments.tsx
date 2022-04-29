@@ -65,6 +65,10 @@ export function RecipientViewPetitionFieldTaxDocuments({
 
   const handleStart = async () => {
     try {
+      // just to make sure there is always only 1 reply
+      for (const reply of field.replies) {
+        await handleDeletePetitionReply({ replyId: reply.id });
+      }
       setState("FETCHING");
       const popup = await openNewWindow(async () => {
         const data = await onStartAsyncFieldCompletion();
@@ -85,9 +89,6 @@ export function RecipientViewPetitionFieldTaxDocuments({
   const handleStartAgain = async () => {
     try {
       await showOverwriteDocumentationDialog({ tone });
-      for (const reply of field.replies) {
-        await handleDeletePetitionReply({ replyId: reply.id });
-      }
       await handleStart();
     } catch {}
   };

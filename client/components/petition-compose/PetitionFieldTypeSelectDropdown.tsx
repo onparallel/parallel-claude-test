@@ -57,8 +57,8 @@ export const FIELD_TYPES: PetitionFieldType[] = [
   "DATE",
   "PHONE",
   "NUMBER",
-  "DYNAMIC_SELECT",
   "ES_TAX_DOCUMENTS",
+  "DYNAMIC_SELECT",
 ];
 
 interface PetitionFieldTypeLabelProps {

@@ -725,6 +725,7 @@ export const PetitionFieldReply = objectType({
       description: "The content of the reply.",
       resolve: async (root, _, ctx) => {
         switch (root.type) {
+          case "ES_TAX_DOCUMENTS":
           case "FILE_UPLOAD": {
             const file = await ctx.files.loadFileUpload(root.content["file_upload_id"]);
             return file

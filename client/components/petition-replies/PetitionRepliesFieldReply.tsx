@@ -65,7 +65,7 @@ export function PetitionRepliesFieldReply({
           />
         ) : reply.field!.type === "PHONE" ? (
           <CopyToClipboardButton size="xs" text={reply.content.value} />
-        ) : reply.field!.type === "FILE_UPLOAD" ? (
+        ) : reply.field!.type === "FILE_UPLOAD" || reply.field!.type === "ES_TAX_DOCUMENTS" ? (
           <ReplyDownloadButton
             isDisabled={reply.content.uploadComplete === false}
             contentType={reply.content.contentType}
@@ -124,7 +124,7 @@ export function PetitionRepliesFieldReply({
           </Text>
         ) : reply.field!.type === "PHONE" ? (
           <BreakLines>{reply.content.value}</BreakLines>
-        ) : reply.field!.type === "FILE_UPLOAD" ? (
+        ) : reply.field!.type === "FILE_UPLOAD" || reply.field!.type === "ES_TAX_DOCUMENTS" ? (
           <Box>
             <VisuallyHidden>
               {intl.formatMessage({

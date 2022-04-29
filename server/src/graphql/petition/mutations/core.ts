@@ -1131,9 +1131,9 @@ export const fileUploadReplyDownloadLink = mutationField("fileUploadReplyDownloa
   resolve: async (_, args, ctx) => {
     try {
       const reply = await ctx.petitions.loadFieldReply(args.replyId);
-      if (reply!.type !== "FILE_UPLOAD") {
+      if (!["FILE_UPLOAD", "ES_TAX_DOCUMENTS"].includes(reply!.type)) {
         throw new WhitelistedError(
-          "Only FILE_UPLOAD replies can be downloaded",
+          `${reply!.type} replies can not be downloaded`,
           "INVALID_FIELD_TYPE"
         );
       }
