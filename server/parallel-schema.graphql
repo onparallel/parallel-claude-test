@@ -66,6 +66,11 @@ type AccessOpenedEvent implements PetitionEvent {
   type: PetitionEventType!
 }
 
+type AsyncFieldCompletionResponse {
+  type: String!
+  url: String!
+}
+
 enum BulkSendSigningMode {
   """
   Allow configured signer(s) to sign every petition on the batch
@@ -1102,7 +1107,7 @@ type Mutation {
   """
   Starts the completion of an async field
   """
-  publicStartAsyncFieldCompletion(fieldId: GID!, keycode: ID!): JSONObject!
+  publicStartAsyncFieldCompletion(fieldId: GID!, keycode: ID!): AsyncFieldCompletionResponse!
 
   """
   Update a petition field comment.

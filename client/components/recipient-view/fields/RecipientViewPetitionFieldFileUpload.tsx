@@ -66,8 +66,6 @@ export function RecipientViewPetitionFieldFileUpload({
     [onDeleteReply]
   );
 
-  console.log("replies: ", JSON.stringify(field.replies));
-
   return (
     <RecipientViewPetitionFieldCard
       field={field}

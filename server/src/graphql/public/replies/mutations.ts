@@ -1,5 +1,11 @@
+import { ApolloError } from "apollo-server-core";
+import { Secret, sign, SignOptions } from "jsonwebtoken";
 import { booleanArg, idArg, mutationField, nonNull, objectType } from "nexus";
+import { isDefined } from "remeda";
+import { promisify } from "util";
 import { RESULT } from "../..";
+import { getBaseWebhookUrl } from "../../../util/getBaseWebhookUrl";
+import { toGlobalId } from "../../../util/globalId";
 import { random } from "../../../util/token";
 import { and, chain } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
@@ -209,7 +215,7 @@ export const publicFileUploadReplyDownloadLink = mutationField(
     resolve: async (_, args, ctx) => {
       try {
         const reply = await ctx.petitions.loadFieldReply(args.replyId);
-        if (reply!.type !== "FILE_UPLOAD") {
+        if (!["FILE_UPLOAD", "ES_TAX_DOCUMENTS"].includes(reply!.type)) {
           throw new Error("Invalid field type");
         }
         const file = await ctx.files.loadFileUpload(reply!.content["file_upload_id"]);
@@ -242,8 +248,17 @@ export const publicFileUploadReplyDownloadLink = mutationField(
 
 export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFieldCompletion", {
   description: "Starts the completion of an async field",
-  type: "JSONObject",
-  args: { keycode: nonNull(idArg()), fieldId: nonNull(globalIdArg("PetitionField")) },
+  type: objectType({
+    name: "AsyncFieldCompletionResponse",
+    definition(t) {
+      t.string("type");
+      t.string("url");
+    },
+  }),
+  args: {
+    keycode: nonNull(idArg()),
+    fieldId: nonNull(globalIdArg("PetitionField")),
+  },
   authorize: chain(
     authenticatePublicAccess("keycode"),
     and(
@@ -253,22 +268,43 @@ export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFi
     )
   ),
   resolve: async (_, { keycode, fieldId }, ctx) => {
-    // create jwt with keycode,fieldId
-    const token = ``;
-    // POST en
-    `${bankFlipApiUrl}/request`;
-    // con body
-    const payload = {
-      userId: keycode,
-      webhookUrl: `https://webhook.site/06d79831-9c75-486d-8171-9e1eebc425a9?token=${token}`,
-    };
-    const result = { id: "" };
+    const token = await promisify<
+      { keycode: string; fieldId: string },
+      Secret,
+      SignOptions,
+      string
+    >(sign)(
+      { keycode, fieldId: toGlobalId("PetitionField", fieldId) },
+      ctx.config.security.jwtSecret,
+      {
+        expiresIn: "1d",
+        issuer: "parallel-server",
+        algorithm: "HS256",
+      }
+    );
+
+    const baseWebhookUrl = await getBaseWebhookUrl(ctx.config.misc.parallelUrl);
+
+    const res = await ctx.fetch.fetch(`https://api.bankflip.io/request`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip?token=${token}`,
+        userId: keycode,
+      }),
+    });
+    const result = await res.json();
+
+    if (!isDefined(result.id)) {
+      throw new ApolloError("BAD_REQUEST", "BAD_REQUEST");
+    }
 
     return {
       type: "WINDOW",
       url: `https://app.bankflip.io?${new URLSearchParams({
         userId: keycode,
         requestId: result.id,
+        companyName: "Parallel",
       })}`,
     };
   },

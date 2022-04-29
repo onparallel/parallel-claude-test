@@ -33,6 +33,7 @@ export async function openNewWindow(
   try {
     const url = typeof value === "function" ? await value() : await value;
     _window.location.href = url!;
+    return _window;
   } catch (e) {
     _window?.close();
   }

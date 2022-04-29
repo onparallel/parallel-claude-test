@@ -306,6 +306,11 @@ export interface NexusGenObjects {
   AccessDeactivatedEvent: events.AccessDeactivatedEvent;
   AccessDelegatedEvent: events.AccessDelegatedEvent;
   AccessOpenedEvent: events.AccessOpenedEvent;
+  AsyncFieldCompletionResponse: {
+    // root type
+    type: string; // String!
+    url: string; // String!
+  };
   CommentCreatedUserNotification: notifications.CommentCreatedUserNotification;
   CommentDeletedEvent: events.CommentDeletedEvent;
   CommentPublishedEvent: events.CommentPublishedEvent;
@@ -705,6 +710,11 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
+  AsyncFieldCompletionResponse: {
+    // field return type
+    type: string; // String!
+    url: string; // String!
+  };
   CommentCreatedUserNotification: {
     // field return type
     comment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
@@ -975,7 +985,7 @@ export interface NexusGenFieldTypes {
     publicPetitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     publicSendReminder: NexusGenEnums["Result"]; // Result!
     publicSendVerificationCode: NexusGenRootTypes["VerificationCodeRequest"]; // VerificationCodeRequest!
-    publicStartAsyncFieldCompletion: NexusGenScalars["JSONObject"]; // JSONObject!
+    publicStartAsyncFieldCompletion: NexusGenRootTypes["AsyncFieldCompletionResponse"]; // AsyncFieldCompletionResponse!
     publicUpdatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
     publicUpdatePetitionFieldReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
@@ -2150,6 +2160,11 @@ export interface NexusGenFieldTypeNames {
     petition: "Petition";
     type: "PetitionEventType";
   };
+  AsyncFieldCompletionResponse: {
+    // field return type name
+    type: "String";
+    url: "String";
+  };
   CommentCreatedUserNotification: {
     // field return type name
     comment: "PetitionFieldComment";
@@ -2420,7 +2435,7 @@ export interface NexusGenFieldTypeNames {
     publicPetitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     publicSendReminder: "Result";
     publicSendVerificationCode: "VerificationCodeRequest";
-    publicStartAsyncFieldCompletion: "JSONObject";
+    publicStartAsyncFieldCompletion: "AsyncFieldCompletionResponse";
     publicUpdatePetitionFieldComment: "PublicPetitionFieldComment";
     publicUpdatePetitionFieldReply: "PublicPetitionFieldReply";
     reactivateAccesses: "PetitionAccess";

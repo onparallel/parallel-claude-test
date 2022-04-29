@@ -20,7 +20,7 @@ import SignatureReminderEmail from "../emails/emails/SignatureReminderEmail";
 import SignatureRequestedEmail from "../emails/emails/SignatureRequestedEmail";
 import { toGlobalId } from "../util/globalId";
 import { downloadImageBase64 } from "../util/images";
-import { getBaseWebhookUrl } from "../workers/helpers/getBaseWebhookUrl";
+import { getBaseWebhookUrl } from "../util/getBaseWebhookUrl";
 import { CONFIG, Config } from "./../config";
 import { AWS_SERVICE, IAws } from "./aws";
 import { FetchService, FETCH_SERVICE } from "./fetch";

@@ -1,8 +1,10 @@
 import { Box, Button, HStack, List, Progress, Stack, Text } from "@chakra-ui/react";
 import { ExclamationOutlineIcon } from "@parallel/chakra/icons";
 import { Tone } from "@parallel/graphql/__types";
+import { centeredPopup, openNewWindow } from "@parallel/utils/openNewWindow";
+import { useInterval } from "@parallel/utils/useInterval";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { useOverwriteDocumentationDialog } from "../dialogs/OverwriteDocumentationDialog";
 import {
@@ -18,8 +20,11 @@ export interface RecipientViewPetitionFieldTaxDocumentsProps
   > {
   isDisabled: boolean;
   tone: Tone;
+  onDeleteReply: (replyId: string) => void;
   onDownloadReply: (replyId: string) => void;
   isCacheOnly?: boolean;
+  onStartAsyncFieldCompletion: () => Promise<{ type: string; url: string }>;
+  onRefreshField: () => void;
 }
 
 export function RecipientViewPetitionFieldTaxDocuments({
@@ -27,40 +32,52 @@ export function RecipientViewPetitionFieldTaxDocuments({
   isDisabled,
   isInvalid,
   tone,
+  onDeleteReply,
   onDownloadAttachment,
   onDownloadReply,
   onCommentsButtonClick,
+  onStartAsyncFieldCompletion,
+  onRefreshField,
   isCacheOnly,
 }: RecipientViewPetitionFieldTaxDocumentsProps) {
-  const [state, setState] = useState<"IDLE" | "ERROR" | "FETCHING">("IDLE");
-  const [replies, setReplies] = useState(field.replies);
+  const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
 
-  const getData = () => {
-    return new Promise((resolve, reject) => {
-      const data = JSON.parse(
-        `[{"__typename":"PetitionFieldReply","id":"6vyn9tAvuTWyY2CxMHHmmEh5cqqfwaC2","status":"APPROVED","content":{"filename":"import_model_es (1).xlsx","size":"9322","contentType":"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","extension":"xlsx","uploadComplete":true},"createdAt":"2022-04-12T15:16:00.134Z","updatedAt":"2022-04-12T15:16:07.275Z"},{"__typename":"PetitionFieldReply","id":"6vyn9tAvuTWyY2CxMHHmmEh5cqqfwaC3","status":"REJECTED","content":{"filename":"Frame.svg","size":"637","contentType":"image/svg+xml","extension":"svg","uploadComplete":true},"createdAt":"2022-04-12T15:16:13.255Z","updatedAt":"2022-04-12T15:16:18.378Z"}]`
-      );
-      setTimeout(() => {
-        const random = Math.floor(Math.random() * 10) + 1;
-        if (random > 4) {
-          resolve(data);
-        }
-        reject();
-      }, 2000);
-    });
-  };
+  const handleDeletePetitionReply = useCallback(
+    async function handleDeletePetitionReply({ replyId }: { replyId: string }) {
+      setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
+      await onDeleteReply(replyId);
+      setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
+    },
+    [onDeleteReply]
+  );
+
+  const [state, setState] = useState<"IDLE" | "ERROR" | "FETCHING">("IDLE");
 
   const showOverwriteDocumentationDialog = useOverwriteDocumentationDialog();
 
+  useInterval(async (done) => {
+    if (field.replies.length === 0) {
+      onRefreshField();
+    } else {
+      done();
+    }
+  }, 10000);
+
   const handleStart = async () => {
     try {
-      // do something
       setState("FETCHING");
-      const data = await getData();
-      setReplies(data);
+      const popup = await openNewWindow(async () => {
+        const data = await onStartAsyncFieldCompletion();
+        return data!.url;
+      }, centeredPopup({ height: 800, width: 700 }));
+      window.addEventListener("message", (e) => {
+        if (e.data.name === "success") {
+          onRefreshField();
+          popup?.close();
+        }
+      });
       setState("IDLE");
     } catch {
-      setReplies([]);
       setState("ERROR");
     }
   };
@@ -68,6 +85,9 @@ export function RecipientViewPetitionFieldTaxDocuments({
   const handleStartAgain = async () => {
     try {
       await showOverwriteDocumentationDialog({ tone });
+      for (const reply of field.replies) {
+        await handleDeletePetitionReply({ replyId: reply.id });
+      }
       await handleStart();
     } catch {}
   };
@@ -80,10 +100,10 @@ export function RecipientViewPetitionFieldTaxDocuments({
       onDownloadAttachment={onDownloadAttachment}
       tone={tone}
     >
-      {replies.length ? (
+      {field.replies.length ? (
         <List as={Stack} paddingY={1}>
           <AnimatePresence initial={false}>
-            {replies.map((reply) => (
+            {field.replies.map((reply) => (
               <motion.li
                 key={reply.id}
                 layout
@@ -93,7 +113,12 @@ export function RecipientViewPetitionFieldTaxDocuments({
               >
                 <RecipientViewPetitionFieldReplyFileUpload
                   reply={reply}
-                  isDisabled={isDisabled}
+                  isDisabled={isDisabled || isDeletingReply[reply.id]}
+                  onRemove={() =>
+                    handleDeletePetitionReply({
+                      replyId: reply.id,
+                    })
+                  }
                   onDownload={onDownloadReply}
                   isDownloadDisabled={isCacheOnly}
                 />
@@ -103,12 +128,12 @@ export function RecipientViewPetitionFieldTaxDocuments({
         </List>
       ) : null}
       <Box marginTop={2}>
-        {replies.length ? (
+        {field.replies.length ? (
           <Button
             variant="outline"
             width="min-content"
             onClick={handleStartAgain}
-            isDisabled={state === "FETCHING"}
+            isDisabled={state === "FETCHING" || field.replies.some((r) => r.status === "APPROVED")}
           >
             <FormattedMessage
               id="component.recipient-view-petition-field-tax-documents.start-again-button"

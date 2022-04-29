@@ -1,4 +1,4 @@
-import { gql, useApolloClient, useMutation } from "@apollo/client";
+import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/dialogs/FailureGeneratingLinkDialog";
 import {
   RecipientViewPetitionFieldCard_PublicPetitionFieldFragment,
@@ -7,7 +7,9 @@ import {
   RecipientViewPetitionField_publicCreatePetitionFieldReplyDocument,
   RecipientViewPetitionField_publicDeletePetitionFieldReplyDocument,
   RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument,
+  RecipientViewPetitionField_PublicPetitionFieldDocument,
   RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc,
+  RecipientViewPetitionField_publicStartAsyncFieldCompletionDocument,
   RecipientViewPetitionField_publicUpdatePetitionFieldReplyDocument,
   Tone,
 } from "@parallel/graphql/__types";
@@ -194,6 +196,28 @@ export function RecipientViewPetitionField({ tone, ...props }: RecipientViewPeti
     [downloadFileUploadReply]
   );
 
+  const [publicStartAsyncFieldCompletion] = useMutation(
+    RecipientViewPetitionField_publicStartAsyncFieldCompletionDocument
+  );
+
+  const handleStartAsyncFieldCompletion = async () => {
+    const { data } = await publicStartAsyncFieldCompletion({
+      variables: {
+        fieldId: props.field.id,
+        keycode: props.keycode,
+      },
+    });
+    return data!.publicStartAsyncFieldCompletion;
+  };
+
+  const { refetch } = useQuery(RecipientViewPetitionField_PublicPetitionFieldDocument, {
+    skip: true,
+  });
+
+  async function handleRefreshField() {
+    await refetch({ fieldId: props.field.id, keycode: props.keycode });
+  }
+
   const commonProps = {
     onCommentsButtonClick: handleCommentsButtonClick,
     onDownloadAttachment: handleDownloadAttachment,
@@ -233,9 +257,22 @@ export function RecipientViewPetitionField({ tone, ...props }: RecipientViewPeti
       {...commonProps}
       tone={tone}
       onDownloadReply={handleDownloadFileUploadReply}
+      onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
+      onRefreshField={handleRefreshField}
     />
   ) : null;
 }
+
+const _queries = [
+  gql`
+    query RecipientViewPetitionField_PublicPetitionField($keycode: ID!, $fieldId: GID!) {
+      publicPetitionField(keycode: $keycode, petitionFieldId: $fieldId) {
+        ...RecipientViewPetitionFieldCard_PublicPetitionField
+      }
+    }
+    ${RecipientViewPetitionFieldCard.fragments.PublicPetitionField}
+  `,
+];
 
 RecipientViewPetitionField.fragments = {
   PublicPetitionAccess: gql`
@@ -330,5 +367,16 @@ RecipientViewPetitionField.mutations = [
       }
     }
     ${RecipientViewPetitionFieldCard.fragments.PublicPetitionFieldReply}
+  `,
+  gql`
+    mutation RecipientViewPetitionField_publicStartAsyncFieldCompletion(
+      $keycode: ID!
+      $fieldId: GID!
+    ) {
+      publicStartAsyncFieldCompletion(keycode: $keycode, fieldId: $fieldId) {
+        type
+        url
+      }
+    }
   `,
 ];

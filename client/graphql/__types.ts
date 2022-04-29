@@ -94,6 +94,12 @@ export interface AccessOpenedEvent extends PetitionEvent {
   type: PetitionEventType;
 }
 
+export interface AsyncFieldCompletionResponse {
+  __typename?: "AsyncFieldCompletionResponse";
+  type: Scalars["String"];
+  url: Scalars["String"];
+}
+
 export type BulkSendSigningMode =
   /** Allow configured signer(s) to sign every petition on the batch */
   | "COPY_SIGNATURE_SETTINGS"
@@ -567,6 +573,8 @@ export interface Mutation {
   publicPetitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   publicSendReminder: Result;
   publicSendVerificationCode: VerificationCodeRequest;
+  /** Starts the completion of an async field */
+  publicStartAsyncFieldCompletion: AsyncFieldCompletionResponse;
   /** Update a petition field comment. */
   publicUpdatePetitionFieldComment: PublicPetitionFieldComment;
   /** Creates a reply on a petition field as recipient. */
@@ -1138,6 +1146,11 @@ export interface MutationpublicSendReminderArgs {
 }
 
 export interface MutationpublicSendVerificationCodeArgs {
+  keycode: Scalars["ID"];
+}
+
+export interface MutationpublicStartAsyncFieldCompletionArgs {
+  fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
 }
 
@@ -10206,6 +10219,47 @@ export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentM
   };
 };
 
+export type RecipientViewPetitionField_PublicPetitionFieldQueryVariables = Exact<{
+  keycode: Scalars["ID"];
+  fieldId: Scalars["GID"];
+}>;
+
+export type RecipientViewPetitionField_PublicPetitionFieldQuery = {
+  publicPetitionField: {
+    __typename?: "PublicPetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    description?: string | null;
+    options: { [key: string]: any };
+    optional: boolean;
+    multiple: boolean;
+    isInternal: boolean;
+    commentCount: number;
+    unreadCommentCount: number;
+    hasCommentsEnabled: boolean;
+    replies: Array<{
+      __typename?: "PublicPetitionFieldReply";
+      id: string;
+      status: PetitionFieldReplyStatus;
+      content: { [key: string]: any };
+      createdAt: string;
+      updatedAt: string;
+    }>;
+    attachments: Array<{
+      __typename?: "PetitionFieldAttachment";
+      id: string;
+      file: {
+        __typename?: "FileUpload";
+        filename: string;
+        contentType: string;
+        size: number;
+        isComplete: boolean;
+      };
+    }>;
+  };
+};
+
 export type RecipientViewPetitionField_PublicPetitionAccessFragment = {
   __typename?: "PublicPetitionAccess";
   granter?: { __typename?: "PublicUser"; fullName: string } | null;
@@ -10321,6 +10375,19 @@ export type RecipientViewPetitionField_publicUpdatePetitionFieldReplyMutation = 
       id: string;
       petition: { __typename?: "PublicPetition"; id: string; status: PetitionStatus };
     };
+  };
+};
+
+export type RecipientViewPetitionField_publicStartAsyncFieldCompletionMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  fieldId: Scalars["GID"];
+}>;
+
+export type RecipientViewPetitionField_publicStartAsyncFieldCompletionMutation = {
+  publicStartAsyncFieldCompletion: {
+    __typename?: "AsyncFieldCompletionResponse";
+    type: string;
+    url: string;
   };
 };
 
@@ -25403,6 +25470,17 @@ export const RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldComment
   RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation,
   RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutationVariables
 >;
+export const RecipientViewPetitionField_PublicPetitionFieldDocument = gql`
+  query RecipientViewPetitionField_PublicPetitionField($keycode: ID!, $fieldId: GID!) {
+    publicPetitionField(keycode: $keycode, petitionFieldId: $fieldId) {
+      ...RecipientViewPetitionFieldCard_PublicPetitionField
+    }
+  }
+  ${RecipientViewPetitionFieldCard_PublicPetitionFieldFragmentDoc}
+` as unknown as DocumentNode<
+  RecipientViewPetitionField_PublicPetitionFieldQuery,
+  RecipientViewPetitionField_PublicPetitionFieldQueryVariables
+>;
 export const RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument = gql`
   mutation RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLink(
     $keycode: ID!
@@ -25487,6 +25565,20 @@ export const RecipientViewPetitionField_publicUpdatePetitionFieldReplyDocument =
 ` as unknown as DocumentNode<
   RecipientViewPetitionField_publicUpdatePetitionFieldReplyMutation,
   RecipientViewPetitionField_publicUpdatePetitionFieldReplyMutationVariables
+>;
+export const RecipientViewPetitionField_publicStartAsyncFieldCompletionDocument = gql`
+  mutation RecipientViewPetitionField_publicStartAsyncFieldCompletion(
+    $keycode: ID!
+    $fieldId: GID!
+  ) {
+    publicStartAsyncFieldCompletion(keycode: $keycode, fieldId: $fieldId) {
+      type
+      url
+    }
+  }
+` as unknown as DocumentNode<
+  RecipientViewPetitionField_publicStartAsyncFieldCompletionMutation,
+  RecipientViewPetitionField_publicStartAsyncFieldCompletionMutationVariables
 >;
 export const RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument = gql`
   mutation RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLink(
