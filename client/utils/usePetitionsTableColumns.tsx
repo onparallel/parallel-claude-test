@@ -176,7 +176,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
               },
             ] as PetitionTemplateTableColumn[])),
         {
-          key: "shared",
+          key: "sharedWith",
           header: intl.formatMessage({
             id: "petitions.header.shared",
             defaultMessage: "Shared",
