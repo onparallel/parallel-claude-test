@@ -1,7 +1,6 @@
 import { TableSorting, TableSortingDirection } from "@parallel/components/common/Table";
+import type Router from "next/router";
 import { NextRouter, useRouter } from "next/router";
-import * as qs from "querystring";
-import { ParsedUrlQuery } from "querystring";
 import { Dispatch, SetStateAction, useCallback, useMemo } from "react";
 import { equals, pick } from "remeda";
 import { fromBase64, toBase64 } from "./base64";
@@ -139,7 +138,7 @@ export interface ParseQueryOptions {
 }
 
 export function parseQuery<T extends {}>(
-  query: ParsedUrlQuery,
+  query: typeof Router["query"],
   shape: QueryStateOf<T>,
   { prefix }: ParseQueryOptions = {}
 ): T {
@@ -179,29 +178,27 @@ export function useQueryState<T extends {}>(
       }
       const fromPath = pathParams(pathname);
       const fromState = Object.keys(shape).map((key) => (prefix ? prefix + key : key));
-      const newQuery = qs.stringify(
-        Object.fromEntries([
-          ...Object.entries(newState)
-            .filter(
-              ([key, value]) =>
-                value !== null &&
-                value !== undefined &&
-                !shape[key as keyof T].isDefault(value as any)
-            )
-            .map(([key, value]) => [
-              prefix ? prefix + key : key,
-              shape[key as keyof T].serialize(value as any),
-            ]),
-          // keep other params
-          ...Object.entries(query).filter(
-            ([key]) => !fromState.includes(key) && !fromPath.includes(key)
-          ),
-        ])
-      );
+      const newQuery = [
+        ...(Object.entries(newState)
+          .filter(
+            ([key, value]) =>
+              value !== null &&
+              value !== undefined &&
+              !shape[key as keyof T].isDefault(value as any)
+          )
+          .map(([key, value]) => [
+            prefix ? prefix + key : key,
+            shape[key as keyof T].serialize(value as any),
+          ]) as [string, string][]),
+        // keep other params
+        ...(Object.entries(query).filter(
+          ([key]) => !fromState.includes(key) && !fromPath.includes(key)
+        ) as [string, string][]),
+      ];
       const route = resolveUrl(pathname, query);
       await router.replace(
-        `${pathname}${newQuery ? "?" + newQuery : ""}`,
-        `${route}${newQuery ? "?" + newQuery : ""}`,
+        newQuery.length > 0 ? `${route}?${new URLSearchParams(newQuery)}` : route,
+        undefined,
         { shallow: true }
       );
     }, []),
