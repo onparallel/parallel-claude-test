@@ -58,10 +58,12 @@ export function ExportRepliesProgressDialog({
       }
       const rename = placeholdersRename(petition.fields);
       const replies = petition.fields.flatMap((field) =>
-        field.type !== "HEADING" ? field.replies.map((reply) => ({ reply, field })) : []
+        field.replies.map((reply) => ({ reply, field }))
       );
 
-      const hasTextReplies = !!replies.find((r) => r.field.type !== "FILE_UPLOAD");
+      const hasTextReplies = !!replies.find(
+        (r) => r.field.type !== "FILE_UPLOAD" && r.field.type !== "ES_TAX_DOCUMENTS"
+      );
 
       const hasSignedDocument =
         petition.currentSignatureRequest?.status === "COMPLETED" &&
@@ -73,7 +75,10 @@ export function ExportRepliesProgressDialog({
 
       const totalFiles =
         (hasTextReplies ? 1 : 0) + // exported excel with text replies
-        countBy(replies, (r) => r.field.type === "FILE_UPLOAD") + // every uploaded file reply
+        countBy(
+          replies,
+          (r) => r.field.type === "FILE_UPLOAD" || r.field.type === "ES_TAX_DOCUMENTS"
+        ) + // every uploaded file reply
         (hasSignedDocument ? 1 : 0) + // signed doc
         (hasAuditTrail ? 1 : 0) + // audit trail
         1; // PDF document;
@@ -101,13 +106,16 @@ export function ExportRepliesProgressDialog({
               reply,
             },
             {
-              filename: field.type === "FILE_UPLOAD" ? rename(field, reply, pattern) : "",
+              filename:
+                field.type === "FILE_UPLOAD" || field.type === "ES_TAX_DOCUMENTS"
+                  ? rename(field, reply, pattern)
+                  : "",
               onProgress: ({ loaded, total }) =>
                 setProgress((uploaded + (loaded / total) * 0.5) / totalFiles),
               signal: abort.signal,
             }
           );
-          if (fieldType === "FILE_UPLOAD") {
+          if (fieldType === "FILE_UPLOAD" || field.type === "ES_TAX_DOCUMENTS") {
             setProgress(++uploaded / totalFiles);
           }
         }

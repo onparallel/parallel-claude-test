@@ -5,7 +5,7 @@
 
 import { indexBy } from "remeda";
 import { assert } from "ts-essentials";
-import { PetitionFieldType } from "../api/public/__types";
+import { PetitionFieldType } from "../db/__types";
 import { completedFieldReplies } from "./completedFieldReplies";
 
 export interface PetitionFieldVisibility {

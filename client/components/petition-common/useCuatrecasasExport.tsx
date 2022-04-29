@@ -187,7 +187,7 @@ function useExportFieldReply(clientId: string, refs: ExportRefs) {
     },
     opts: Omit<ExportOpts, "filename"> & { filename: string }
   ) => {
-    if (field.type === "FILE_UPLOAD") {
+    if (field.type === "FILE_UPLOAD" || field.type === "ES_TAX_DOCUMENTS") {
       if (reply.metadata.EXTERNAL_ID_CUATRECASAS) {
         if (!refs.dontAskAgain.current) {
           const result = await showAlreadyExported({

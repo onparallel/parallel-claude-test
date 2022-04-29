@@ -237,7 +237,9 @@ export class PetitionBinder implements IPetitionBinder {
     )
       .filter(
         ([field, isVisible]) =>
-          isVisible && field.type === "FILE_UPLOAD" && !!field.options.attachToPdf
+          isVisible &&
+          (field.type === "FILE_UPLOAD" || field.type === "ES_TAX_DOCUMENTS") &&
+          !!field.options.attachToPdf
       )
       .map(([field]) => field);
 

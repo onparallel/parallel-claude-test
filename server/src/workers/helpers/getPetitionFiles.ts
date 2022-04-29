@@ -33,11 +33,12 @@ export async function* getPetitionFiles(
     .filter(([, isVisible]) => isVisible)
     .map(([field]) => field);
 
+  const fileReplies = fieldReplies
+    .flat()
+    .filter((r) => r.type === "FILE_UPLOAD" || r.type === "ES_TAX_DOCUMENTS");
+
   const files = await ctx.files.loadFileUpload(
-    fieldReplies
-      .flat()
-      .filter((r) => r.type === "FILE_UPLOAD")
-      .map((reply) => reply.content["file_upload_id"])
+    fileReplies.map((reply) => reply.content["file_upload_id"])
   );
   const filesById = indexBy(
     files.filter((f) => f !== null),
@@ -51,8 +52,13 @@ export async function* getPetitionFiles(
   const totalFiles = options.xlsxOnly
     ? 1
     : Math.max(
-        Number(fieldReplies.flat().some((r) => r.type !== "HEADING" && r.type !== "FILE_UPLOAD")) +
-          files.length +
+        Math.min(
+          visibleFields.filter(
+            (f) => f.type !== "HEADING" && f.type !== "FILE_UPLOAD" && f.type !== "ES_TAX_DOCUMENTS"
+          ).length,
+          1
+        ) +
+          fileReplies.length +
           Number(isDefined(latestPetitionSignature?.file_upload_id)) +
           Number(isDefined(latestPetitionSignature?.file_upload_audit_trail_id)),
         1
@@ -66,7 +72,10 @@ export async function* getPetitionFiles(
   for (const field of visibleFields) {
     if (field.type === "HEADING") {
       headingCount++;
-    } else if (field.type === "FILE_UPLOAD" && !options.xlsxOnly) {
+    } else if (
+      (field.type === "FILE_UPLOAD" || field.type === "ES_TAX_DOCUMENTS") &&
+      !options.xlsxOnly
+    ) {
       for (const reply of field.replies) {
         const file = filesById[reply.content["file_upload_id"]];
         if (file?.upload_complete) {
@@ -95,7 +104,7 @@ export async function* getPetitionFiles(
           await options.onProgress?.(++processedFiles / totalFiles);
         }
       }
-    } else if (field.type !== "FILE_UPLOAD") {
+    } else if (field.type !== "FILE_UPLOAD" && field.type !== "ES_TAX_DOCUMENTS") {
       excelWorkbook.addPetitionFieldReply(field, field.replies);
     }
 
