@@ -18,6 +18,7 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { useCuatrecasasExport } from "@parallel/components/petition-common/useCuatrecasasExport";
 import { ExportRepliesProgressDialog_petitionDocument } from "@parallel/graphql/__types";
+import { isDownloadableReply } from "@parallel/utils/isDownloadableReply";
 import { useFilenamePlaceholdersRename } from "@parallel/utils/useFilenamePlaceholders";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
@@ -61,9 +62,7 @@ export function ExportRepliesProgressDialog({
         field.replies.map((reply) => ({ reply, field }))
       );
 
-      const hasTextReplies = !!replies.find(
-        (r) => r.field.type !== "FILE_UPLOAD" && r.field.type !== "ES_TAX_DOCUMENTS"
-      );
+      const hasTextReplies = !!replies.find((r) => !isDownloadableReply(r.field.type));
 
       const hasSignedDocument =
         petition.currentSignatureRequest?.status === "COMPLETED" &&
@@ -75,10 +74,7 @@ export function ExportRepliesProgressDialog({
 
       const totalFiles =
         (hasTextReplies ? 1 : 0) + // exported excel with text replies
-        countBy(
-          replies,
-          (r) => r.field.type === "FILE_UPLOAD" || r.field.type === "ES_TAX_DOCUMENTS"
-        ) + // every uploaded file reply
+        countBy(replies, (r) => isDownloadableReply(r.field.type)) + // every uploaded file reply
         (hasSignedDocument ? 1 : 0) + // signed doc
         (hasAuditTrail ? 1 : 0) + // audit trail
         1; // PDF document;
@@ -98,7 +94,7 @@ export function ExportRepliesProgressDialog({
         }
 
         for (const { reply, field } of replies) {
-          const fieldType = await cuatrecasasExport.exportFieldReply(
+          await cuatrecasasExport.exportFieldReply(
             {
               petitionId: petition.id,
               excelExternalId,
@@ -106,16 +102,13 @@ export function ExportRepliesProgressDialog({
               reply,
             },
             {
-              filename:
-                field.type === "FILE_UPLOAD" || field.type === "ES_TAX_DOCUMENTS"
-                  ? rename(field, reply, pattern)
-                  : "",
+              filename: isDownloadableReply(field.type) ? rename(field, reply, pattern) : "",
               onProgress: ({ loaded, total }) =>
                 setProgress((uploaded + (loaded / total) * 0.5) / totalFiles),
               signal: abort.signal,
             }
           );
-          if (fieldType === "FILE_UPLOAD" || field.type === "ES_TAX_DOCUMENTS") {
+          if (isDownloadableReply(field.type)) {
             setProgress(++uploaded / totalFiles);
           }
         }

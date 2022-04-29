@@ -23,6 +23,7 @@ export function completedFieldReplies<T extends PartialField>(field: T) {
         }
       });
     case "FILE_UPLOAD":
+    case "ES_TAX_DOCUMENTS":
       return field.replies.filter((reply) => reply.content.uploadComplete);
 
     default:

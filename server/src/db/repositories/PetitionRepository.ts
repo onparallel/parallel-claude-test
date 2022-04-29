@@ -10,6 +10,7 @@ import { completedFieldReplies } from "../../util/completedFieldReplies";
 import { evaluateFieldVisibility, PetitionFieldVisibility } from "../../util/fieldVisibility";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { fromGlobalId } from "../../util/globalId";
+import { isDownloadableReply } from "../../util/isDownloadableReply";
 import { keyBuilder } from "../../util/keyBuilder";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import { calculateNextReminder, PetitionAccessReminderConfig } from "../../util/reminderUtils";
@@ -537,8 +538,8 @@ export class PetitionRepository extends BaseRepository {
 
       const fileUploadIds = uniq(
         fieldReplies
-          .filter((f) => f.type === "FILE_UPLOAD" && f.content?.file_upload_id)
-          .map((f) => f.content.file_upload_id as number)
+          .filter((r) => isDownloadableReply(r.type) && r.content?.file_upload_id)
+          .map((r) => r.content.file_upload_id as number)
       );
 
       const uploadedFiles = await this.knex
@@ -555,7 +556,7 @@ export class PetitionRepository extends BaseRepository {
             .map((reply) => {
               // for FILE_UPLOADs, we need to make sure the file was correctly uploaded before counting it as a submitted reply
               const file =
-                reply.type === "FILE_UPLOAD" && isDefined(reply.content?.file_upload_id)
+                isDownloadableReply(reply.type) && isDefined(reply.content?.file_upload_id)
                   ? uploadedFiles.find((f) => f.id === reply.content!.file_upload_id)
                   : undefined;
 
@@ -1526,8 +1527,8 @@ export class PetitionRepository extends BaseRepository {
       throw new Error("Petition field reply not found");
     }
 
-    if (reply.type === "FILE_UPLOAD") {
-      await this.files.deleteFileUpload(reply.content["file_upload_id"], deletedBy);
+    if (isDownloadableReply(reply.type)) {
+      await this.safeDeleteFileUpload(reply.content["file_upload_id"], deletedBy);
     }
 
     await Promise.all([
@@ -1905,8 +1906,8 @@ export class PetitionRepository extends BaseRepository {
       await this.loadRepliesForField(Object.keys(newFieldsMap).map((v) => parseInt(v)))
     ).flat();
     if (replies.length > 0) {
-      const [fileReplies, otherReplies] = partition(replies, (r) => r.type === "FILE_UPLOAD");
-      // for FILE_UPLOAD replies, we have to make a copy of the file_upload entry
+      const [fileReplies, otherReplies] = partition(replies, (r) => isDownloadableReply(r.type));
+      // for downloadable replies, we have to make a copy of the file_upload entry
       const newFileReplies = await pMap(fileReplies, async (r) => ({
         ...r,
         content: {

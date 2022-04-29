@@ -6,6 +6,7 @@ import { FORMATS } from "../../util/dates";
 import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { fileSize } from "../../util/fileSize";
 import { formatNumberWithPrefix } from "../../util/formatNumberWithPrefix";
+import { isDownloadableReply } from "../../util/isDownloadableReply";
 import { NetDocumentsExternalLink } from "../components/NetDocumentsExternalLink";
 import { SignaturesBlock } from "../components/SignaturesBlock";
 import { PdfDocumentGetProps } from "../utils/pdf";
@@ -153,8 +154,7 @@ export default function PetitionExport({
     .find(
       (field) =>
         field.type !== "HEADING" &&
-        field.type !== "FILE_UPLOAD" &&
-        field.type !== "ES_TAX_DOCUMENTS" &&
+        !isDownloadableReply(field.type) &&
         field.replies.some((r) => !!r.metadata.EXTERNAL_ID_CUATRECASAS)
     )?.replies[0].metadata.EXTERNAL_ID_CUATRECASAS;
 
@@ -224,7 +224,7 @@ export default function PetitionExport({
                         ) : null}
                         <View style={styles.fieldReplies}>
                           {field.replies.map((reply) =>
-                            field.type === "FILE_UPLOAD" || field.type === "ES_TAX_DOCUMENTS" ? (
+                            isDownloadableReply(field.type) ? (
                               <View
                                 key={reply.id}
                                 style={[
@@ -308,7 +308,7 @@ export default function PetitionExport({
                           )}
                           {field.replies.length === 0 ? (
                             <Text style={[styles.text, styles.noReplies]}>
-                              {field.type === "FILE_UPLOAD" || field.type === "ES_TAX_DOCUMENTS" ? (
+                              {isDownloadableReply(field.type) ? (
                                 <FormattedMessage
                                   id="document.petition-export.no-files"
                                   defaultMessage="No files have been submitted."

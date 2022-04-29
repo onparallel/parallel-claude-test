@@ -6,6 +6,7 @@ import {
 import { useMemo } from "react";
 import { isDefined, zip } from "remeda";
 import { getFieldIndices, PetitionFieldIndex } from "./fieldIndices";
+import { isDownloadableReply } from "./isDownloadableReply";
 import { UnwrapArray } from "./types";
 
 export function useLiquidScope(
@@ -29,7 +30,7 @@ export function useLiquidScope(
         : replies.length > 0
         ? replies.at(-1)!.content.value
         : undefined;
-      if (field.type !== "HEADING" && field.type !== "FILE_UPLOAD") {
+      if (field.type !== "HEADING" && !isDownloadableReply(field.type)) {
         scope._[fieldIndex] = value;
         if (isDefined(field.alias)) {
           scope[field.alias] = value;

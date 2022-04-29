@@ -6,6 +6,7 @@ import { promisify } from "util";
 import { RESULT } from "../..";
 import { getBaseWebhookUrl } from "../../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../../util/globalId";
+import { isDownloadableReply } from "../../../util/isDownloadableReply";
 import { random } from "../../../util/token";
 import { and, chain } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
@@ -215,7 +216,7 @@ export const publicFileUploadReplyDownloadLink = mutationField(
     resolve: async (_, args, ctx) => {
       try {
         const reply = await ctx.petitions.loadFieldReply(args.replyId);
-        if (!["FILE_UPLOAD", "ES_TAX_DOCUMENTS"].includes(reply!.type)) {
+        if (!isDownloadableReply(reply!.type)) {
           throw new Error("Invalid field type");
         }
         const file = await ctx.files.loadFileUpload(reply!.content["file_upload_id"]);

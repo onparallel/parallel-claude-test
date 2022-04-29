@@ -24,6 +24,7 @@ import {
   ExportRepliesDialog_PetitionFieldFragment,
   ExportRepliesDialog_UserFragment,
 } from "@parallel/graphql/__types";
+import { isDownloadableReply } from "@parallel/utils/isDownloadableReply";
 import {
   useFilenamePlaceholders,
   useFilenamePlaceholdersRename,
@@ -110,7 +111,7 @@ export function ExportRepliesDialog({
   const clientIdRef = useRef<HTMLInputElement>(null);
   const placeholdersRename = useFilenamePlaceholdersRename();
   const example = useMemo(() => {
-    const field = fields.find((f) => f.type === "FILE_UPLOAD" && f.replies.length > 0)!;
+    const field = fields.find((f) => isDownloadableReply(f.type) && f.replies.length > 0)!;
     if (!field) return [null];
     const reply = field.replies[0];
     return [reply.content.filename, placeholdersRename(fields)(field, reply, pattern)];

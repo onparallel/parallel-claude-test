@@ -3,6 +3,7 @@ import { arg, core, enumType, inputObjectType, objectType, unionType } from "nex
 import { isDefined } from "remeda";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
+import { isDownloadableReply } from "../../util/isDownloadableReply";
 import { safeJsonParse } from "../../util/safeJsonParse";
 import { toHtml } from "../../util/slate";
 
@@ -406,22 +407,19 @@ export const PublicPetitionFieldReply = objectType({
     t.jsonObject("content", {
       description: "The public content of the reply",
       resolve: async (root, _, ctx) => {
-        switch (root.type) {
-          case "ES_TAX_DOCUMENTS":
-          case "FILE_UPLOAD": {
-            const file = await ctx.files.loadFileUpload(root.content["file_upload_id"]);
-            return file
-              ? {
-                  filename: file.filename,
-                  size: file.size,
-                  contentType: file.content_type,
-                  extension: extension(file.content_type) || null,
-                  uploadComplete: file.upload_complete,
-                }
-              : {};
-          }
-          default:
-            return root.content ?? {};
+        if (isDownloadableReply(root.type)) {
+          const file = await ctx.files.loadFileUpload(root.content["file_upload_id"]);
+          return file
+            ? {
+                filename: file.filename,
+                size: file.size,
+                contentType: file.content_type,
+                extension: extension(file.content_type) || null,
+                uploadComplete: file.upload_complete,
+              }
+            : {};
+        } else {
+          return root.content ?? {};
         }
       },
     });
