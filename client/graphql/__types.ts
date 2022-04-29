@@ -9883,6 +9883,17 @@ export type RecipientViewProgressFooter_PublicPetitionFieldFragment = {
   }>;
 };
 
+export type useCompletingMessageDialog_PublicPetitionFragment = {
+  __typename?: "PublicPetition";
+  completingMessageBody?: string | null;
+  completingMessageSubject?: string | null;
+};
+
+export type useCompletingMessageDialog_PublicUserFragment = {
+  __typename?: "PublicUser";
+  organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
+};
+
 export type useRecipientViewConfirmPetitionSignersDialog_PetitionSignerFragment = {
   __typename?: "PetitionSigner";
   firstName: string;
@@ -23433,6 +23444,12 @@ export const useLiquidScope_PublicPetitionFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<useLiquidScope_PublicPetitionFragment, unknown>;
+export const useCompletingMessageDialog_PublicPetitionFragmentDoc = gql`
+  fragment useCompletingMessageDialog_PublicPetition on PublicPetition {
+    completingMessageBody
+    completingMessageSubject
+  }
+` as unknown as DocumentNode<useCompletingMessageDialog_PublicPetitionFragment, unknown>;
 export const RecipientView_PublicPetitionFragmentDoc = gql`
   fragment RecipientView_PublicPetition on PublicPetition {
     id
@@ -23463,8 +23480,7 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
     ...RecipientViewProgressFooter_PublicPetition
     ...useLiquidScope_PublicPetition
     isCompletingMessageEnabled
-    completingMessageBody
-    completingMessageSubject
+    ...useCompletingMessageDialog_PublicPetition
   }
   ${RecipientView_PublicPetitionFieldFragmentDoc}
   ${useGetPageFields_PublicPetitionFieldFragmentDoc}
@@ -23473,6 +23489,7 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
   ${RecipientViewContentsCard_PublicPetitionFragmentDoc}
   ${RecipientViewProgressFooter_PublicPetitionFragmentDoc}
   ${useLiquidScope_PublicPetitionFragmentDoc}
+  ${useCompletingMessageDialog_PublicPetitionFragmentDoc}
 ` as unknown as DocumentNode<RecipientView_PublicPetitionFragment, unknown>;
 export const useRecipientViewConfirmPetitionSignersDialog_PublicContactFragmentDoc = gql`
   fragment useRecipientViewConfirmPetitionSignersDialog_PublicContact on PublicContact {
@@ -23501,13 +23518,23 @@ export const RecipientViewContentsCard_PublicUserFragmentDoc = gql`
     firstName
   }
 ` as unknown as DocumentNode<RecipientViewContentsCard_PublicUserFragment, unknown>;
+export const useCompletingMessageDialog_PublicUserFragmentDoc = gql`
+  fragment useCompletingMessageDialog_PublicUser on PublicUser {
+    organization {
+      name
+      logoUrl
+    }
+  }
+` as unknown as DocumentNode<useCompletingMessageDialog_PublicUserFragment, unknown>;
 export const RecipientView_PublicUserFragmentDoc = gql`
   fragment RecipientView_PublicUser on PublicUser {
     ...RecipientViewHeader_PublicUser
     ...RecipientViewContentsCard_PublicUser
+    ...useCompletingMessageDialog_PublicUser
   }
   ${RecipientViewHeader_PublicUserFragmentDoc}
   ${RecipientViewContentsCard_PublicUserFragmentDoc}
+  ${useCompletingMessageDialog_PublicUserFragmentDoc}
 ` as unknown as DocumentNode<RecipientView_PublicUserFragment, unknown>;
 export const RecipientView_PublicPetitionMessageFragmentDoc = gql`
   fragment RecipientView_PublicPetitionMessage on PublicPetitionMessage {

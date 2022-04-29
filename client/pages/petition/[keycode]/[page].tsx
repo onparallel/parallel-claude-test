@@ -148,8 +148,8 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
           if (showFullScreenDialog) {
             await withError(
               showCompletingMessageDialog({
-                subject: petition.completingMessageSubject ?? null,
-                bodyHtml: petition.completingMessageBody ?? null,
+                petition,
+                granter,
               })
             );
           }
@@ -537,8 +537,7 @@ RecipientView.fragments = {
         ...RecipientViewProgressFooter_PublicPetition
         ...useLiquidScope_PublicPetition
         isCompletingMessageEnabled
-        completingMessageBody
-        completingMessageSubject
+        ...useCompletingMessageDialog_PublicPetition
       }
 
       ${this.PublicPetitionField}
@@ -548,6 +547,7 @@ RecipientView.fragments = {
       ${RecipientViewHeader.fragments.PublicContact}
       ${useGetPageFields.fragments.PublicPetitionField}
       ${useLiquidScope.fragments.PublicPetition}
+      ${useCompletingMessageDialog.fragments.PublicPetition}
     `;
   },
   get PublicPetitionField() {
@@ -568,9 +568,11 @@ RecipientView.fragments = {
       fragment RecipientView_PublicUser on PublicUser {
         ...RecipientViewHeader_PublicUser
         ...RecipientViewContentsCard_PublicUser
+        ...useCompletingMessageDialog_PublicUser
       }
       ${RecipientViewHeader.fragments.PublicUser}
       ${RecipientViewContentsCard.fragments.PublicUser}
+      ${useCompletingMessageDialog.fragments.PublicUser}
     `;
   },
 };

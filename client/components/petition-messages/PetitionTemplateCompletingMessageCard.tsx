@@ -24,7 +24,6 @@ import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types"
 import { ChangeEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { outdent } from "outdent";
-
 import { Card, CardHeader, CardProps } from "../common/Card";
 import { CloseableAlert } from "../common/CloseableAlert";
 import { HelpPopover } from "../common/HelpPopover";
@@ -90,7 +89,10 @@ export function PetitionTemplateCompletingMessageCard({
 
   const handleSwitchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setIsEnabled(event.target.checked);
+
     onUpdatePetition({
+      completingMessageSubject: subject,
+      completingMessageBody: isEmptyRTEValue(body) ? null : body,
       isCompletingMessageEnabled: event.target.checked,
     });
   };

@@ -1,7 +1,9 @@
+import { gql } from "@apollo/client";
 import {
   Button,
   Flex,
   HStack,
+  Img,
   List,
   ListItem,
   ModalBody,
@@ -17,19 +19,27 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import { HtmlBlock } from "@parallel/components/common/HtmlBlock";
 import { Link, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
-import { Maybe } from "@parallel/utils/types";
+import {
+  useCompletingMessageDialog_PublicPetitionFragment,
+  useCompletingMessageDialog_PublicUserFragment,
+} from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 
 function CompletingMessageDialog({
-  bodyHtml,
-  subject,
+  petition,
+  granter,
   ...props
-}: DialogProps<{ subject: Maybe<string>; bodyHtml: Maybe<string> }, void>) {
+}: DialogProps<
+  {
+    petition: useCompletingMessageDialog_PublicPetitionFragment;
+    granter: useCompletingMessageDialog_PublicUserFragment;
+  },
+  void
+>) {
   const intl = useIntl();
-
   return (
     <BaseDialog {...props} size="full" isCentered>
-      <ModalContent alignItems="center" height="100%">
+      <ModalContent alignItems="center" height="100%" overflow="auto">
         <ModalHeader
           width="100%"
           paddingX={0}
@@ -44,7 +54,16 @@ function CompletingMessageDialog({
             paddingX={4}
             margin="0 auto"
           >
-            <Logo width="152px" />
+            {granter.organization.logoUrl ? (
+              <Img
+                src={granter.organization.logoUrl}
+                aria-label={granter.organization.name}
+                width="auto"
+                height="40px"
+              />
+            ) : (
+              <Logo width="152px" height="40px" />
+            )}
             <ModalCloseButton
               top={0}
               right={0}
@@ -57,27 +76,28 @@ function CompletingMessageDialog({
             />
           </HStack>
         </ModalHeader>
-
         <ModalBody
           display="flex"
           alignItems="center"
           justifyContent="center"
           flexDirection="column"
-          overflow="auto"
+          width="100%"
+          maxWidth="container.lg"
+          paddingTop={4}
         >
           <CircleCheckFilledIcon color="green.500" fontSize="64px" marginBottom={4} />
-          {subject ? (
+          {petition.completingMessageSubject ? (
             <Text fontWeight="bold" fontSize="24px" marginBottom={4} textAlign="center">
-              {subject}
+              {petition.completingMessageSubject}
             </Text>
           ) : null}
-          {bodyHtml ? (
+          {petition.completingMessageBody ? (
             <HtmlBlock
-              dangerousInnerHtml={bodyHtml}
-              overflowY="auto"
+              dangerousInnerHtml={petition.completingMessageBody}
               fontSize="16px"
               marginBottom={4}
               textAlign="center"
+              minHeight="200px"
             />
           ) : null}
         </ModalBody>
@@ -155,6 +175,25 @@ function CompletingMessageDialog({
     </BaseDialog>
   );
 }
+
+useCompletingMessageDialog.fragments = {
+  get PublicPetition() {
+    return gql`
+      fragment useCompletingMessageDialog_PublicPetition on PublicPetition {
+        completingMessageBody
+        completingMessageSubject
+      }
+    `;
+  },
+  PublicUser: gql`
+    fragment useCompletingMessageDialog_PublicUser on PublicUser {
+      organization {
+        name
+        logoUrl
+      }
+    }
+  `,
+};
 
 export function useCompletingMessageDialog() {
   return useDialog(CompletingMessageDialog);
