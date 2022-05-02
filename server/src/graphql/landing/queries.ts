@@ -48,7 +48,8 @@ export const LandingTemplate = objectType({
     t.string("ownerFullName", {
       resolve: async (root, _, ctx) => {
         const owner = (await ctx.petitions.loadPetitionOwner(root.id))!;
-        return fullName(owner.first_name, owner.last_name);
+        const data = (await ctx.users.loadUserData(owner.user_data_id))!;
+        return fullName(data.first_name, data.last_name);
       },
     });
     t.nullable.string("ownerAvatarUrl", {
