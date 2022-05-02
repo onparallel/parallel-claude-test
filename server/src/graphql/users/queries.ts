@@ -11,11 +11,11 @@ import { userHasAccessToUsers } from "../petition/mutations/authorizers";
 import { userHasAccessToUserGroups } from "../user-group/authorizers";
 
 export const userQueries = queryField((t) => {
-  t.nullable.field("realMe", {
+  t.field("realMe", {
     type: "User",
     authorize: authenticate(),
     resolve: (_, args, ctx) => {
-      return ctx.realUser;
+      return ctx.realUser!;
     },
   });
 

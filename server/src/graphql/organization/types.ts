@@ -1,6 +1,6 @@
 import { arg, booleanArg, enumType, list, nonNull, nullable, objectType } from "nexus";
 import { isDefined } from "remeda";
-import { userIsSuperAdmin } from "../helpers/authorize";
+import { or, userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { isOwnOrgOrSuperAdmin } from "./authorizers";
@@ -82,7 +82,11 @@ export const Organization = objectType({
     });
     t.int("activeUserCount", {
       description: "The total number of active users",
-      authorize: isOwnOrgOrSuperAdmin(),
+      authorize: or(isOwnOrgOrSuperAdmin(), async (root, _, ctx) => {
+        // let users who also have a user in the org to check the userCount
+        const users = await ctx.users.loadUsersByUserDataId(ctx.realUser!.user_data_id);
+        return users.some((u) => u.org_id === root.id);
+      }),
       resolve: async (root, _, ctx) => await ctx.organizations.loadActiveUserCount(root.id),
     });
     t.paginationField("users", {

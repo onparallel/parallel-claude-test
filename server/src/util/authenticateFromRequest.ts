@@ -12,7 +12,7 @@ export async function authenticateFromRequest(req: IncomingMessage, ctx: ApiCont
     return false;
   } else {
     ctx.user = user;
-    ctx.realUser = realUser ?? null;
+    ctx.realUser = realUser ?? user;
     return true;
   }
 }

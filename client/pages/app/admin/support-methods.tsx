@@ -72,21 +72,7 @@ function AdminSupportMethods({ supportMethods, schemaTypes }: AdminSupportMethod
               paddingX={4}
               paddingY={2}
               outline="none"
-              _hover={{
-                borderColor: "gray.300",
-                boxShadow: "lg",
-              }}
-              _focus={{
-                boxShadow: "outline",
-                borderColor: "gray.200",
-              }}
-              sx={{
-                ":hover": {
-                  svg: {
-                    color: "gray.700",
-                  },
-                },
-              }}
+              isInteractive
               role="button"
               tabIndex={1}
               onClick={() => setSelected(method)}
@@ -96,7 +82,7 @@ function AdminSupportMethods({ supportMethods, schemaTypes }: AdminSupportMethod
                 <Text fontSize="sm">{method.field.description}</Text>
               </Box>
               <Flex justifyContent="center" alignItems="center">
-                <ChevronRightIcon boxSize="24px" color="gray.500" />
+                <ChevronRightIcon boxSize="24px" />
               </Flex>
             </Card>
           ))}

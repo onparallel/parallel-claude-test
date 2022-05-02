@@ -5330,6 +5330,16 @@
     "context": "Users"
   },
   {
+    "term": "page.choose-org.header",
+    "definition": "Elige en qué organización quieres entrar",
+    "context": "Choose which organization you want to access"
+  },
+  {
+    "term": "page.choose-org.org-users",
+    "definition": "{count, plural, =1 {1 usuario} other {# usuarios}}",
+    "context": "{count} users"
+  },
+  {
     "term": "page.integrations.upgrade-plan-alert",
     "definition": "Amplia tu plan para acceder a las integraciones. Contacta con nuestro equipo de soporte para más información.",
     "context": "Upgrade your plan to access integrations. Contact our support team support team for more information."

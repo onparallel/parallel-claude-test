@@ -50,16 +50,7 @@ export const PublicTemplateCard = Object.assign(
         as={Stack}
         minHeight="160px"
         outline="none"
-        transition="all 150ms ease"
-        _hover={{
-          borderColor: "gray.300",
-          boxShadow: "long",
-          transform: "scale(1.025)",
-        }}
-        _focus={{
-          boxShadow: "outline",
-          borderColor: "gray.200",
-        }}
+        isInteractive
         overflow="hidden"
         minWidth={0}
         {...buttonProps}

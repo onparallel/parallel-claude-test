@@ -526,6 +526,7 @@ type Mutation {
   """
   cancelScheduledMessage(messageId: GID!, petitionId: GID!): PetitionMessage
   cancelSignatureRequest(petitionSignatureRequestId: GID!): PetitionSignatureRequest!
+  changeOrganization(orgId: GID): Result!
 
   """
   Changes the password for the current logged in user.
@@ -3930,7 +3931,7 @@ type Query {
   publicPetitionLinkBySlug(slug: ID!): PublicPublicPetitionLink
   publicTask(keycode: ID!, taskId: GID!): Task!
   publicTemplateCategories: [String!]!
-  realMe: User
+  realMe: User!
 
   """
   Search user groups
@@ -4706,6 +4707,11 @@ type User implements Timestamps {
     limit: Int
   ): UserNotifications_Pagination!
   organization: Organization!
+
+  """
+  Organizations this user belongs to
+  """
+  organizations: [Organization!]!
   preferredLocale: String
   role: OrganizationRole!
   status: UserStatus!

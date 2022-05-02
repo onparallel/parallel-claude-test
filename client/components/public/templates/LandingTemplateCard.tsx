@@ -16,22 +16,7 @@ export function LandingTemplateCard({ template }: LandingTemplateCardProps) {
     template;
 
   return (
-    <LinkBox
-      as={Card}
-      outline="none"
-      transition="all 150ms ease"
-      _hover={{
-        borderColor: "gray.300",
-        boxShadow: "lg",
-        transform: "scale(1.025)",
-      }}
-      _active={{
-        transform: "scale(1.01)",
-      }}
-      _focus={{ boxShadow: "var(--chakra-shadows-outline)" }}
-      cursor="pointer"
-      overflow="hidden"
-    >
+    <LinkBox as={Card} outline="none" isInteractive cursor="pointer" overflow="hidden">
       <Stack spacing={0}>
         <Center height="130px" padding={5} backgroundColor={backgroundColor ?? "gray.200"}>
           <Image

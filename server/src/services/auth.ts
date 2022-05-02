@@ -702,19 +702,21 @@ export class Auth implements IAuth {
 
   async updateSessionLogin(req: Request, userId: number, asUserId: number) {
     const token = this.getSessionToken(req);
-    if (!token) {
+    if (!isDefined(token)) {
       throw new Error("Missing session token");
     }
-    const prefix = `session:${token}`;
-    await this.redis.set(`${prefix}:meta`, JSON.stringify({ userId, asUserId }), this.EXPIRY);
+    await this.redis.set(
+      `session:${token}:meta`,
+      JSON.stringify({ userId, asUserId }),
+      this.EXPIRY
+    );
   }
 
   async restoreSessionLogin(req: Request, userId: number) {
     const token = this.getSessionToken(req);
-    if (!token) {
+    if (!isDefined(token)) {
       throw new Error("Missing session token");
     }
-    const prefix = `session:${token}`;
-    await this.redis.set(`${prefix}:meta`, JSON.stringify({ userId }), this.EXPIRY);
+    await this.redis.set(`session:${token}:meta`, JSON.stringify({ userId }), this.EXPIRY);
   }
 }

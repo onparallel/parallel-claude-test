@@ -1,18 +1,22 @@
 import { Center, Heading, Stack, Text } from "@chakra-ui/layout";
 import { Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/table";
 import { CircleCheckFilledIcon, CircleCrossFilledIcon } from "@parallel/chakra/icons";
-import { Card, CardProps } from "@parallel/components/common/Card";
+import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Card } from "@parallel/components/common/Card";
 import { Fragment } from "react";
 import { FormattedMessage } from "react-intl";
 import { usePricingList } from "../../../utils/usePricingList";
 
-export function PublicPricingTable(props: CardProps) {
+export const PublicPricingTable = chakraForwardRef<"section">(function PublicPricingTable(
+  props,
+  ref
+) {
   const list = usePricingList();
 
   const plans = ["FREE", "BASIC", "PROFESSIONAL", "ENTERPRISE"];
 
   return (
-    <Card {...props} padding={8} paddingTop={6}>
+    <Card ref={ref} {...props} padding={8} paddingTop={6}>
       <Stack spacing={6}>
         <Heading as="h2" fontSize="2xl">
           <FormattedMessage
@@ -148,4 +152,4 @@ export function PublicPricingTable(props: CardProps) {
       </Stack>
     </Card>
   );
-}
+});

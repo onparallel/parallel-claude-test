@@ -11,6 +11,7 @@ import {
   VisuallyHidden,
 } from "@chakra-ui/react";
 import { ChevronFilledIcon, CommentIcon } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   RecipientViewContentsCard_PetitionBaseFragment,
   RecipientViewContentsCard_PetitionFieldFragment,
@@ -23,7 +24,7 @@ import { Maybe, UnionToArrayUnion } from "@parallel/utils/types";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
 import { zip } from "remeda";
-import { Card, CardHeader, CardProps } from "../common/Card";
+import { Card, CardHeader } from "../common/Card";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { NakedLink } from "../common/Link";
 import { RecipientViewCommentsBadge } from "./RecipientViewCommentsBadge";
@@ -36,18 +37,16 @@ type PetitionFieldSelection =
   | RecipientViewContentsCard_PublicPetitionFieldFragment
   | RecipientViewContentsCard_PetitionFieldFragment;
 
-interface RecipientViewContentsCardProps extends CardProps {
+interface RecipientViewContentsCardProps {
   currentPage: number;
   petition: PetitionSelection;
   usePreviewReplies?: boolean;
 }
 
-export function RecipientViewContentsCard({
-  currentPage,
-  petition,
-  usePreviewReplies,
-  ...props
-}: RecipientViewContentsCardProps) {
+export const RecipientViewContentsCard = chakraForwardRef<
+  "section",
+  RecipientViewContentsCardProps
+>(function RecipientViewContentsCard({ currentPage, petition, usePreviewReplies, ...props }, ref) {
   const { query } = useRouter();
   const { pages, fields } = useGetPagesAndFields(petition.fields, currentPage, usePreviewReplies);
 
@@ -80,7 +79,7 @@ export function RecipientViewContentsCard({
   };
 
   return (
-    <Card display="flex" flexDirection="column" {...props}>
+    <Card ref={ref} display="flex" flexDirection="column" {...props}>
       <CardHeader as="h3" size="sm">
         <FormattedMessage id="recipient-view.contents-header" defaultMessage="Contents" />
       </CardHeader>
@@ -231,7 +230,7 @@ export function RecipientViewContentsCard({
       </Stack>
     </Card>
   );
-}
+});
 
 function RecipientViewContentsIndicators({
   hasUnreadComments,

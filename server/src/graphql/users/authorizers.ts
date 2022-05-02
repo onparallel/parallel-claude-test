@@ -14,6 +14,15 @@ export function rootIsContextUser<FieldName extends string>(): FieldAuthorizeRes
   };
 }
 
+export function rootIsContextRealUser<FieldName extends string>(): FieldAuthorizeResolver<
+  "User",
+  FieldName
+> {
+  return (root, _, ctx) => {
+    return ctx.realUser!.id === root.id;
+  };
+}
+
 export function contextUserHasRole<TypeName extends string, FieldName extends string>(
   minRole: UserOrganizationRole
 ): FieldAuthorizeResolver<TypeName, FieldName> {

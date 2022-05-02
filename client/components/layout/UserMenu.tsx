@@ -87,7 +87,7 @@ export function UserMenu({ placement, me, realMe, onHelpCenterClick }: UserMenuP
           transition="all 200ms"
         >
           <UserAvatar user={me} size="md">
-            {realMe ? (
+            {realMe && realMe.id !== me.id ? (
               <AvatarBadge bgColor="white">
                 <UserAvatar user={realMe} size="xs" />
               </AvatarBadge>
@@ -110,7 +110,7 @@ export function UserMenu({ placement, me, realMe, onHelpCenterClick }: UserMenuP
           </HStack>
 
           <MenuDivider />
-          {realMe ? (
+          {realMe && realMe.id !== me.id ? (
             <>
               <MenuItem
                 icon={<ArrowBackIcon display="block" boxSize={4} />}
@@ -207,6 +207,7 @@ UserMenu.fragments = {
   Query: gql`
     fragment UserMenu_Query on Query {
       me {
+        id
         isSuperAdmin
         role
         email

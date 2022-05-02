@@ -1,5 +1,5 @@
 import { arg, enumType, list, nonNull, objectType, unionType } from "nexus";
-import { isDefined, omit } from "remeda";
+import { indexBy, isDefined, omit, sortBy, uniq } from "remeda";
 import {
   FeatureFlagNameValues,
   UserOrganizationRoleValues,
@@ -10,7 +10,7 @@ import { toGlobalId } from "../../util/globalId";
 import { getInitials } from "../../util/initials";
 import { userHasRole } from "../../util/userHasRole";
 import { datetimeArg } from "../helpers/scalars";
-import { rootIsContextUser } from "./authorizers";
+import { rootIsContextRealUser, rootIsContextUser } from "./authorizers";
 
 export const OrganizationRole = enumType({
   name: "OrganizationRole",
@@ -198,6 +198,17 @@ export const User = objectType({
       description: "Users that the user can send on behalf of",
       resolve: async (root, _, ctx) => {
         return await ctx.users.loadReverseUserDelegatesByUserId(root.id);
+      },
+    });
+    t.list.field("organizations", {
+      type: "Organization",
+      description: "Organizations this user belongs to",
+      authorize: rootIsContextRealUser(),
+      resolve: async (root, _, ctx) => {
+        const users = await ctx.users.loadUsersByUserDataId(root.user_data_id);
+        const usersByOrgId = indexBy(users, (u) => u.org_id);
+        const orgs = await ctx.organizations.loadOrg(uniq(users.map((u) => u.org_id)));
+        return sortBy(orgs.filter(isDefined), (o) => usersByOrgId[o.id].created_at);
       },
     });
   },

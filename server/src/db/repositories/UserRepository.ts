@@ -151,6 +151,8 @@ export class UserRepository extends BaseRepository {
     })
   );
 
+  readonly loadUsersByUserDataId = this.buildLoadMultipleBy("user", "user_data_id");
+
   async updateUserData(
     id: MaybeArray<number>,
     data: Partial<CreateUserData>,

@@ -1,13 +1,17 @@
-import { Box, CloseButton, Heading, HeadingProps, HTMLChakraProps, Stack } from "@chakra-ui/react";
+import { Box, CloseButton, Heading, HeadingProps, Stack } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { ReactNode } from "react";
 import { useIntl } from "react-intl";
 import { Divider } from "./Divider";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface CardProps extends HTMLChakraProps<"section"> {}
+export interface CardProps {
+  isInteractive?: boolean;
+}
 
-export const Card = chakraForwardRef<"section", {}>(function Card({ children, ...props }, ref) {
+export const Card = chakraForwardRef<"section", CardProps>(function Card(
+  { children, isInteractive, ...props },
+  ref
+) {
   return (
     <Box
       ref={ref as any}
@@ -17,6 +21,23 @@ export const Card = chakraForwardRef<"section", {}>(function Card({ children, ..
       backgroundColor="white"
       boxShadow="short"
       borderRadius="md"
+      transition="all 150ms ease"
+      sx={{
+        ...(isInteractive
+          ? {
+              _hover: {
+                transform: "scale(1.025)",
+                borderColor: "gray.300",
+                boxShadow: "long",
+              },
+              _focus: {
+                boxShadow: "outline",
+                borderColor: "gray.200",
+                outline: "none",
+              },
+            }
+          : {}),
+      }}
       {...props}
     >
       {children}

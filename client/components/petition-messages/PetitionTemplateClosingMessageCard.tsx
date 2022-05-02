@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, Text } from "@chakra-ui/react";
 import { EmailIcon } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   PetitionLocale,
   PetitionTemplateClosingMessageCard_PetitionTemplateFragment,
@@ -13,10 +14,10 @@ import { RichTextEditorValue } from "@parallel/utils/slate/RichTextEditor/types"
 import { outdent } from "outdent";
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { Card, CardHeader, CardProps } from "../common/Card";
+import { Card, CardHeader } from "../common/Card";
 import { MessageClosingEmailEditor } from "../petition-common/MessageClosingEmailEditor";
 
-interface PetitionTemplateClosingMessageCardProps extends CardProps {
+interface PetitionTemplateClosingMessageCardProps {
   petition: PetitionTemplateClosingMessageCard_PetitionTemplateFragment;
   onUpdatePetition: (data: UpdatePetitionInput) => void;
 }
@@ -42,58 +43,59 @@ const messages: Record<PetitionLocale, string> = {
   `,
 };
 
-export function PetitionTemplateClosingMessageCard({
-  petition,
-  onUpdatePetition,
-  ...props
-}: PetitionTemplateClosingMessageCardProps) {
-  const placeholders = usePetitionMessagePlaceholderOptions();
-  const [closingEmailBody, setClosingEmailBody] = useState<RichTextEditorValue>(
-    petition.closingEmailBody ??
-      textWithPlaceholderToSlateNodes(messages[petition.locale], placeholders)
-  );
+export const PetitionTemplateClosingMessageCard = Object.assign(
+  chakraForwardRef<"section", PetitionTemplateClosingMessageCardProps>(
+    function PetitionTemplateClosingMessageCard({ petition, onUpdatePetition, ...props }, ref) {
+      const placeholders = usePetitionMessagePlaceholderOptions();
+      const [closingEmailBody, setClosingEmailBody] = useState<RichTextEditorValue>(
+        petition.closingEmailBody ??
+          textWithPlaceholderToSlateNodes(messages[petition.locale], placeholders)
+      );
 
-  const handleclosingEmailBodyChange = (value: RichTextEditorValue) => {
-    setClosingEmailBody(value);
-    onUpdatePetition({ closingEmailBody: isEmptyRTEValue(value) ? null : value });
-  };
+      const handleclosingEmailBodyChange = (value: RichTextEditorValue) => {
+        setClosingEmailBody(value);
+        onUpdatePetition({ closingEmailBody: isEmptyRTEValue(value) ? null : value });
+      };
 
-  return (
-    <Card {...props}>
-      <CardHeader>
-        <EmailIcon marginRight={2} />
-        <FormattedMessage
-          id="component.petition-template-closing-message.card-header"
-          defaultMessage="Closing message"
-        />
-      </CardHeader>
-      <Box padding={4}>
-        <Text marginBottom={2}>
-          <FormattedMessage
-            id="component.petition-template-closing-message.card-explainer"
-            defaultMessage="This message will be used when selecting the option <b>notify recipients</b> to notify that it has been reviewed and closed."
-          />
-        </Text>
-        <MessageClosingEmailEditor
-          id={`completing-message-${petition.id}`}
-          showErrors={false}
-          body={closingEmailBody}
-          onBodyChange={handleclosingEmailBodyChange}
-          isReadOnly={petition.isRestricted || petition.isPublic}
-        />
-      </Box>
-    </Card>
-  );
-}
-
-PetitionTemplateClosingMessageCard.fragments = {
-  PetitionTemplate: gql`
-    fragment PetitionTemplateClosingMessageCard_PetitionTemplate on PetitionTemplate {
-      id
-      closingEmailBody
-      isRestricted
-      isPublic
-      locale
+      return (
+        <Card ref={ref} {...props}>
+          <CardHeader>
+            <EmailIcon marginRight={2} />
+            <FormattedMessage
+              id="component.petition-template-closing-message.card-header"
+              defaultMessage="Closing message"
+            />
+          </CardHeader>
+          <Box padding={4}>
+            <Text marginBottom={2}>
+              <FormattedMessage
+                id="component.petition-template-closing-message.card-explainer"
+                defaultMessage="This message will be used when selecting the option <b>notify recipients</b> to notify that it has been reviewed and closed."
+              />
+            </Text>
+            <MessageClosingEmailEditor
+              id={`completing-message-${petition.id}`}
+              showErrors={false}
+              body={closingEmailBody}
+              onBodyChange={handleclosingEmailBodyChange}
+              isReadOnly={petition.isRestricted || petition.isPublic}
+            />
+          </Box>
+        </Card>
+      );
     }
-  `,
-};
+  ),
+  {
+    fragments: {
+      PetitionTemplate: gql`
+        fragment PetitionTemplateClosingMessageCard_PetitionTemplate on PetitionTemplate {
+          id
+          closingEmailBody
+          isRestricted
+          isPublic
+          locale
+        }
+      `,
+    },
+  }
+);

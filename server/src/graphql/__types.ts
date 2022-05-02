@@ -902,6 +902,7 @@ export interface NexusGenFieldTypes {
     bulkCreateContacts: NexusGenRootTypes["Contact"][]; // [Contact!]!
     cancelScheduledMessage: NexusGenRootTypes["PetitionMessage"] | null; // PetitionMessage
     cancelSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
+    changeOrganization: NexusGenEnums["Result"]; // Result!
     changePassword: NexusGenEnums["ChangePasswordResult"]; // ChangePasswordResult!
     changePetitionFieldType: NexusGenRootTypes["PetitionField"]; // PetitionField!
     clonePetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
@@ -1640,7 +1641,7 @@ export interface NexusGenFieldTypes {
     publicPetitionLinkBySlug: NexusGenRootTypes["PublicPublicPetitionLink"] | null; // PublicPublicPetitionLink
     publicTask: NexusGenRootTypes["Task"]; // Task!
     publicTemplateCategories: string[]; // [String!]!
-    realMe: NexusGenRootTypes["User"] | null; // User
+    realMe: NexusGenRootTypes["User"]; // User!
     searchUserGroups: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     searchUsers: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
     subscriptions: NexusGenRootTypes["PetitionEventSubscription"][]; // [PetitionEventSubscription!]!
@@ -1907,6 +1908,7 @@ export interface NexusGenFieldTypes {
     lastName: string | null; // String
     notifications: NexusGenRootTypes["UserNotifications_Pagination"]; // UserNotifications_Pagination!
     organization: NexusGenRootTypes["Organization"]; // Organization!
+    organizations: NexusGenRootTypes["Organization"][]; // [Organization!]!
     preferredLocale: string | null; // String
     role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
     status: NexusGenEnums["UserStatus"]; // UserStatus!
@@ -2344,6 +2346,7 @@ export interface NexusGenFieldTypeNames {
     bulkCreateContacts: "Contact";
     cancelScheduledMessage: "PetitionMessage";
     cancelSignatureRequest: "PetitionSignatureRequest";
+    changeOrganization: "Result";
     changePassword: "ChangePasswordResult";
     changePetitionFieldType: "PetitionField";
     clonePetitionField: "PetitionField";
@@ -3349,6 +3352,7 @@ export interface NexusGenFieldTypeNames {
     lastName: "String";
     notifications: "UserNotifications_Pagination";
     organization: "Organization";
+    organizations: "Organization";
     preferredLocale: "String";
     role: "OrganizationRole";
     status: "UserStatus";
@@ -3590,6 +3594,10 @@ export interface NexusGenArgTypes {
     cancelSignatureRequest: {
       // args
       petitionSignatureRequestId: NexusGenScalars["GID"]; // GID!
+    };
+    changeOrganization: {
+      // args
+      orgId?: NexusGenScalars["GID"] | null; // GID
     };
     changePassword: {
       // args

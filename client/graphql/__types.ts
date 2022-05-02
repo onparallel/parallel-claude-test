@@ -420,6 +420,7 @@ export interface Mutation {
   /** Cancels a scheduled petition message. */
   cancelScheduledMessage?: Maybe<PetitionMessage>;
   cancelSignatureRequest: PetitionSignatureRequest;
+  changeOrganization: Result;
   /** Changes the password for the current logged in user. */
   changePassword: ChangePasswordResult;
   /** Changes the type of a petition Field */
@@ -728,6 +729,10 @@ export interface MutationcancelScheduledMessageArgs {
 
 export interface MutationcancelSignatureRequestArgs {
   petitionSignatureRequestId: Scalars["GID"];
+}
+
+export interface MutationchangeOrganizationArgs {
+  orgId?: InputMaybe<Scalars["GID"]>;
 }
 
 export interface MutationchangePasswordArgs {
@@ -2764,7 +2769,7 @@ export interface Query {
   publicPetitionLinkBySlug?: Maybe<PublicPublicPetitionLink>;
   publicTask: Task;
   publicTemplateCategories: Array<Scalars["String"]>;
-  realMe?: Maybe<User>;
+  realMe: User;
   /** Search user groups */
   searchUserGroups: Array<UserGroup>;
   /** Search users and user groups */
@@ -3420,6 +3425,8 @@ export interface User extends Timestamps {
   /** Read and unread user notifications about events on their petitions */
   notifications: UserNotifications_Pagination;
   organization: Organization;
+  /** Organizations this user belongs to */
+  organizations: Array<Organization>;
   preferredLocale?: Maybe<Scalars["String"]>;
   role: OrganizationRole;
   status: UserStatus;
@@ -4051,13 +4058,13 @@ export type AppLayout_QueryFragment = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type AppLayoutNavbar_QueryFragment = {
@@ -4081,13 +4088,13 @@ export type AppLayoutNavbar_QueryFragment = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type HeaderNameEditable_PetitionBase_Petition_Fragment = {
@@ -4209,13 +4216,13 @@ export type PetitionLayout_QueryFragment = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type PetitionTemplateHeader_PetitionTemplateFragment = {
@@ -4256,18 +4263,19 @@ export type SettingsLayout_QueryFragment = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type UserMenu_QueryFragment = {
   me: {
     __typename?: "User";
+    id: string;
     isSuperAdmin: boolean;
     role: OrganizationRole;
     email: string;
@@ -4275,13 +4283,13 @@ export type UserMenu_QueryFragment = {
     avatarUrl?: string | null;
     initials?: string | null;
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type Notifications_UnreadPetitionUserNotificationIdsQueryVariables = Exact<{
@@ -10576,13 +10584,13 @@ export type Admin_userQuery = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type OrganizationMembers_OrganizationUserFragment = {
@@ -10628,13 +10636,13 @@ export type OrganizationMembers_userQuery = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type OrganizationMembers_organizationQueryVariables = Exact<{
@@ -10737,13 +10745,13 @@ export type AdminOrganizations_userQuery = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type AdminSupportMethods_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -10772,13 +10780,13 @@ export type AdminSupportMethods_userQuery = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type Contact_ContactFragment = {
@@ -11019,13 +11027,13 @@ export type Contact_userQuery = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type Contact_contactQueryVariables = Exact<{
@@ -11168,20 +11176,49 @@ export type Contacts_userQuery = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
-export type AppRedirect_petitionsQueryVariables = Exact<{ [key: string]: never }>;
+export type ChooseOrg_OrganizationFragment = {
+  __typename?: "Organization";
+  name: string;
+  activeUserCount: number;
+  iconUrl200?: string | null;
+};
 
-export type AppRedirect_petitionsQuery = {
+export type ChooseOrg_organizationsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type ChooseOrg_organizationsQuery = {
+  realMe: {
+    __typename?: "User";
+    id: string;
+    organizations: Array<{
+      __typename?: "Organization";
+      id: string;
+      name: string;
+      activeUserCount: number;
+      iconUrl200?: string | null;
+    }>;
+  };
+};
+
+export type ChooseOrg_petitionsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type ChooseOrg_petitionsQuery = {
   petitions: { __typename?: "PetitionBasePagination"; totalCount: number };
 };
+
+export type ChooseOrg_changeOrganizationMutationVariables = Exact<{
+  orgId?: InputMaybe<Scalars["GID"]>;
+}>;
+
+export type ChooseOrg_changeOrganizationMutation = { changeOrganization: Result };
 
 export type OrganizationBranding_updateOrgLogoMutationVariables = Exact<{
   file: Scalars["Upload"];
@@ -11227,13 +11264,13 @@ export type OrganizationBranding_userQuery = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type OrganizationGeneral_updateOrgLogoMutationVariables = Exact<{
@@ -11278,13 +11315,13 @@ export type OrganizationGeneral_userQuery = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type OrganizationGroup_UserGroupFragment = {
@@ -11438,13 +11475,13 @@ export type OrganizationGroup_userQuery = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type OrganizationGroups_UserGroupPaginationFragment = {
@@ -11595,13 +11632,13 @@ export type OrganizationGroups_userQuery = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type OrganizationSettings_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -11630,13 +11667,13 @@ export type OrganizationSettings_userQuery = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type OrganizationIntegrations_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -11667,13 +11704,13 @@ export type OrganizationIntegrations_userQuery = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type IntegrationsSignature_SignatureOrgIntegrationFragment = {
@@ -11776,13 +11813,13 @@ export type IntegrationsSignature_userQuery = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type OrganizationUsage_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -11818,13 +11855,13 @@ export type OrganizationUsage_userQuery = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type OrganizationUsers_UserFragment = {
@@ -11994,13 +12031,13 @@ export type OrganizationUsers_userQuery = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type PetitionActivity_PetitionFragment = {
@@ -12765,13 +12802,13 @@ export type PetitionActivity_QueryFragment = {
     };
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type PetitionActivity_updatePetitionMutationVariables = Exact<{
@@ -14434,13 +14471,13 @@ export type PetitionActivity_userQuery = {
     };
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type PetitionCompose_PetitionBase_Petition_Fragment = {
@@ -14776,13 +14813,13 @@ export type PetitionCompose_QueryFragment = {
     };
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type PetitionCompose_updatePetitionMutationVariables = Exact<{
@@ -15327,13 +15364,13 @@ export type PetitionCompose_userQuery = {
     };
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type PetitionCompose_petitionQueryVariables = Exact<{
@@ -15674,13 +15711,13 @@ export type PetitionMessages_QueryFragment = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type PetitionMessages_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -15710,13 +15747,13 @@ export type PetitionMessages_userQuery = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type PetitionMessages_petitionQueryVariables = Exact<{
@@ -16076,13 +16113,13 @@ export type PetitionPreview_QueryFragment = {
     };
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type PetitionPreview_updatePetitionMutationVariables = Exact<{
@@ -16791,13 +16828,13 @@ export type PetitionPreview_userQuery = {
     };
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type PetitionReplies_PetitionFragment = {
@@ -17067,13 +17104,13 @@ export type PetitionReplies_QueryFragment = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type PetitionReplies_updatePetitionMutationVariables = Exact<{
@@ -17550,13 +17587,13 @@ export type PetitionReplies_userQuery = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type PetitionReplies_petitionQueryVariables = Exact<{
@@ -18041,13 +18078,13 @@ export type Petitions_userQuery = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type Petitions_petitionsQueryVariables = Exact<{
@@ -18382,13 +18419,13 @@ export type NewPetition_userQuery = {
     };
   };
   hasTemplates: { __typename?: "PetitionBasePagination"; totalCount: number };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type NewPetition_templateQueryVariables = Exact<{
@@ -18517,13 +18554,13 @@ export type Account_QueryFragment = {
     };
     delegates: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type Account_updateAccountMutationVariables = Exact<{
@@ -18594,13 +18631,13 @@ export type Account_userQuery = {
     };
     delegates: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type Developers_UserAuthenticationTokenFragment = {
@@ -18728,13 +18765,13 @@ export type Developers_userQuery = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type Settings_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -18764,13 +18801,13 @@ export type Settings_userQuery = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type Security_updatePasswordMutationVariables = Exact<{
@@ -18808,13 +18845,13 @@ export type Security_userQuery = {
       };
     };
   };
-  realMe?: {
+  realMe: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
-  } | null;
+  };
 };
 
 export type Forgot_resendVerificationCodeMutationVariables = Exact<{
@@ -21329,6 +21366,13 @@ export const Contacts_ContactsListFragmentDoc = gql`
   }
   ${useDeleteContacts_ContactFragmentDoc}
 ` as unknown as DocumentNode<Contacts_ContactsListFragment, unknown>;
+export const ChooseOrg_OrganizationFragmentDoc = gql`
+  fragment ChooseOrg_Organization on Organization {
+    name
+    activeUserCount
+    iconUrl200: iconUrl(options: { resize: { width: 200 } })
+  }
+` as unknown as DocumentNode<ChooseOrg_OrganizationFragment, unknown>;
 export const OrganizationGroup_UserGroupMemberFragmentDoc = gql`
   fragment OrganizationGroup_UserGroupMember on UserGroupMember {
     id
@@ -22458,6 +22502,7 @@ export const PetitionActivity_PetitionFragmentDoc = gql`
 export const UserMenu_QueryFragmentDoc = gql`
   fragment UserMenu_Query on Query {
     me {
+      id
       isSuperAdmin
       role
       email
@@ -25672,13 +25717,33 @@ export const Contacts_userDocument = gql`
   }
   ${AppLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<Contacts_userQuery, Contacts_userQueryVariables>;
-export const AppRedirect_petitionsDocument = gql`
-  query AppRedirect_petitions {
+export const ChooseOrg_organizationsDocument = gql`
+  query ChooseOrg_organizations {
+    realMe {
+      id
+      organizations {
+        id
+        ...ChooseOrg_Organization
+      }
+    }
+  }
+  ${ChooseOrg_OrganizationFragmentDoc}
+` as unknown as DocumentNode<ChooseOrg_organizationsQuery, ChooseOrg_organizationsQueryVariables>;
+export const ChooseOrg_petitionsDocument = gql`
+  query ChooseOrg_petitions {
     petitions {
       totalCount
     }
   }
-` as unknown as DocumentNode<AppRedirect_petitionsQuery, AppRedirect_petitionsQueryVariables>;
+` as unknown as DocumentNode<ChooseOrg_petitionsQuery, ChooseOrg_petitionsQueryVariables>;
+export const ChooseOrg_changeOrganizationDocument = gql`
+  mutation ChooseOrg_changeOrganization($orgId: GID) {
+    changeOrganization(orgId: $orgId)
+  }
+` as unknown as DocumentNode<
+  ChooseOrg_changeOrganizationMutation,
+  ChooseOrg_changeOrganizationMutationVariables
+>;
 export const OrganizationBranding_updateOrgLogoDocument = gql`
   mutation OrganizationBranding_updateOrgLogo($file: Upload!) {
     updateOrganizationLogo(file: $file) {

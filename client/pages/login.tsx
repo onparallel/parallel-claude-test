@@ -44,11 +44,11 @@ function Login() {
 
   const toast = useToast();
 
-  function redirectToApp(locale?: string) {
+  function redirectToApp(locale?: string, continueToApp?: boolean) {
     router.push(
       typeof router.query.redirect === "string" && router.query.redirect.startsWith("/")
         ? router.query.redirect
-        : "/app",
+        : "/app" + (continueToApp ? "?continue" : ""),
       undefined,
       { locale }
     );
@@ -217,7 +217,7 @@ function Login() {
                 <AlreadyLoggedIn
                   me={data!.me}
                   onRelogin={() => setShowContinueAs(false)}
-                  onContinueAs={() => redirectToApp(data!.me.preferredLocale ?? undefined)}
+                  onContinueAs={() => redirectToApp(data!.me.preferredLocale ?? undefined, true)}
                 />
               ) : passwordChange?.type === "CHANGE" ? (
                 <PasswordChangeForm

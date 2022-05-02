@@ -11,7 +11,8 @@ import {
   Text,
 } from "@chakra-ui/layout";
 import { CheckIcon } from "@parallel/chakra/icons";
-import { Card, CardProps } from "@parallel/components/common/Card";
+import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Card } from "@parallel/components/common/Card";
 import { Divider } from "@parallel/components/common/Divider";
 import { useRouter } from "next/router";
 import { FormattedMessage } from "react-intl";
@@ -28,13 +29,21 @@ const HUBSPOT_FORM = {
   en: "https://share.hsforms.com/1EOhegQqeTq2qGlQPdVbxEg3zfl0",
 };
 
-interface PricingCardProps extends CardProps {}
-
-const PricingCard = ({ children, ...props }: PricingCardProps) => (
-  <Card flex="1" p={6} display="flex" flexDirection="column" alignItems="center" {...props}>
-    {children}
-  </Card>
-);
+const PricingCard = chakraForwardRef<"section">(function PricingCard({ children, ...props }, ref) {
+  return (
+    <Card
+      ref={ref}
+      flex="1"
+      padding={6}
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      {...props}
+    >
+      {children}
+    </Card>
+  );
+});
 
 interface DetailsStackProps extends StackProps {}
 
