@@ -72,6 +72,11 @@ export function PublicFooter(props: BoxProps) {
                 <FormattedMessage id="public.api-docs-link" defaultMessage="API Documentation" />
               </Link>
             </ListItem>
+            <ListItem>
+              <NormalLink href={`https://status.onparallel.com/`} isExternal>
+                <FormattedMessage id="public.status" defaultMessage="Status" />
+              </NormalLink>
+            </ListItem>
           </List>
         </PublicFooterBox>
         <PublicFooterBox

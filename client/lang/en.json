@@ -8475,6 +8475,11 @@
     "context": "Two-factor authentication"
   },
   {
+    "term": "public.status",
+    "definition": "Status",
+    "context": "Status"
+  },
+  {
     "term": "public.support.faq",
     "definition": "FAQ",
     "context": "FAQ"
