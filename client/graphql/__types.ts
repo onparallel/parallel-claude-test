@@ -11207,6 +11207,42 @@ export type OrganizationBranding_userQuery = {
   } | null;
 };
 
+export type OrganizationGeneral_userQueryVariables = Exact<{ [key: string]: never }>;
+
+export type OrganizationGeneral_userQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      logoUrl?: string | null;
+      name: string;
+      customHost?: string | null;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
+    };
+  };
+  realMe?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+  } | null;
+};
+
 export type OrganizationGroup_UserGroupFragment = {
   __typename?: "UserGroup";
   id: string;
@@ -25595,6 +25631,21 @@ export const OrganizationBranding_userDocument = gql`
   OrganizationBranding_userQuery,
   OrganizationBranding_userQueryVariables
 >;
+export const OrganizationGeneral_userDocument = gql`
+  query OrganizationGeneral_user {
+    ...SettingsLayout_Query
+    me {
+      id
+      organization {
+        id
+        logoUrl
+        name
+        customHost
+      }
+    }
+  }
+  ${SettingsLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<OrganizationGeneral_userQuery, OrganizationGeneral_userQueryVariables>;
 export const OrganizationGroup_updateUserGroupDocument = gql`
   mutation OrganizationGroup_updateUserGroup($id: GID!, $data: UpdateUserGroupInput!) {
     updateUserGroup(id: $id, data: $data) {

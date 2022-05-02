@@ -5160,6 +5160,11 @@
     "context": "Organization logo"
   },
   {
+    "term": "organization.branding.square-logo-description",
+    "definition": "Se mostrará internamente para diferenciar tus organizaciones.",
+    "context": "This logo will be displayed internally to differentiate your organizations."
+  },
+  {
     "term": "organization.branding.title",
     "definition": "Branding",
     "context": "Branding"
@@ -5198,6 +5203,61 @@
     "term": "organization.confirm-deactivate.user-select.input-error",
     "definition": "Por favor, selecciona un usuario",
     "context": "Please, select a user"
+  },
+  {
+    "term": "organization.general.change-organization-name-message",
+    "definition": "Hola, me gustaría cambiar el nombre de mi organización.",
+    "context": "Hi, I would like to change my organization name."
+  },
+  {
+    "term": "organization.general.change-subdomain-message",
+    "definition": "Hola, me gustaría cambiar el subdominio de mi organización.",
+    "context": "Hi, I would like to change the subdomain of my organization."
+  },
+  {
+    "term": "organization.general.icon-attach-requirements-help",
+    "definition": "Requisitos: Imagen cuadrada en PNG, máx. {size}",
+    "context": "Requirements: Square image in PNG, max. {size}"
+  },
+  {
+    "term": "organization.general.icon-header",
+    "definition": "Icono de la organización",
+    "context": "Organization icon"
+  },
+  {
+    "term": "organization.general.organization-name",
+    "definition": "Nombre de la organización",
+    "context": "Organization name"
+  },
+  {
+    "term": "organization.general.request-change",
+    "definition": "Solicitar cambio",
+    "context": "Request change"
+  },
+  {
+    "term": "organization.general.subdomain",
+    "definition": "Subdominio",
+    "context": "Subdomain"
+  },
+  {
+    "term": "organization.general.square-logo-header",
+    "definition": "Logo cuadrado",
+    "context": "Square logo"
+  },
+  {
+    "term": "organization.general.title",
+    "definition": "General",
+    "context": "General"
+  },
+  {
+    "term": "organization.general.upgrade-subdomain",
+    "definition": "Esta es una funcionalidad enterprise. Contacta para más información.",
+    "context": "This is an Enterprise feature. Contact us for more information."
+  },
+  {
+    "term": "organization.general.upgrade-subdomain-message",
+    "definition": "Hola, me gustaría tener más información sobre la configuración de un subdominio.",
+    "context": "Hi, I would like more information about setting a subdomain."
   },
   {
     "term": "organization.integrations.parallel-api-description",
