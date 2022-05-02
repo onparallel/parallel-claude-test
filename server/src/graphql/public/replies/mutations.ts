@@ -1,12 +1,11 @@
 import { ApolloError } from "apollo-server-core";
-import { Secret, sign, SignOptions } from "jsonwebtoken";
 import { booleanArg, idArg, mutationField, nonNull, objectType } from "nexus";
 import { isDefined } from "remeda";
-import { promisify } from "util";
 import { RESULT } from "../..";
 import { getBaseWebhookUrl } from "../../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../../util/globalId";
 import { isDownloadableReply } from "../../../util/isDownloadableReply";
+import { sign } from "../../../util/jwt";
 import { random } from "../../../util/token";
 import { and, chain } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
@@ -269,18 +268,11 @@ export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFi
     )
   ),
   resolve: async (_, { keycode, fieldId }, ctx) => {
-    const token = await promisify<
-      { keycode: string; fieldId: string },
-      Secret,
-      SignOptions,
-      string
-    >(sign)(
+    const token = await sign(
       { keycode, fieldId: toGlobalId("PetitionField", fieldId) },
       ctx.config.security.jwtSecret,
       {
         expiresIn: "1d",
-        issuer: "parallel-server",
-        algorithm: "HS256",
       }
     );
 

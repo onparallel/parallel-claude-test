@@ -8,13 +8,12 @@ import DataLoader from "dataloader";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { IncomingMessage } from "http";
 import { inject, injectable } from "inversify";
-import { decode, sign, verify, VerifyOptions, JwtPayload, Secret, SignOptions } from "jsonwebtoken";
+import { decode } from "jsonwebtoken";
 import fetch from "node-fetch";
 import { isDefined, pick } from "remeda";
 import { getClientIp } from "request-ip";
 import { Memoize } from "typescript-memoize";
 import { URL, URLSearchParams } from "url";
-import { promisify } from "util";
 import { CONFIG, Config } from "../config";
 import {
   IntegrationRepository,
@@ -26,6 +25,7 @@ import { UserAuthenticationRepository } from "../db/repositories/UserAuthenticat
 import { UserRepository } from "../db/repositories/UserRepository";
 import { User } from "../db/__types";
 import { fromDataLoader } from "../util/fromDataLoader";
+import { sign, verify } from "../util/jwt";
 import { withError } from "../util/promises/withError";
 import { random } from "../util/token";
 import { MaybePromise } from "../util/types";
@@ -638,14 +638,7 @@ export class Auth implements IAuth {
       return null;
     }
     try {
-      const { userId } = await promisify<string, string, VerifyOptions, JwtPayload>(verify)(
-        token,
-        this.config.security.jwtSecret,
-        {
-          algorithms: ["HS256"],
-          issuer: "parallel-server",
-        }
-      );
+      const { userId } = await verify(token, this.config.security.jwtSecret);
       const user = await this.users.loadUser(userId);
       return user && [user];
     } catch {
@@ -654,15 +647,7 @@ export class Auth implements IAuth {
   }
 
   async generateTempAuthToken(userId: number) {
-    return await promisify<{ userId: number }, Secret, SignOptions, string>(sign)(
-      { userId },
-      this.config.security.jwtSecret,
-      {
-        expiresIn: 30,
-        issuer: "parallel-server",
-        algorithm: "HS256",
-      }
-    );
+    return await sign({ userId }, this.config.security.jwtSecret, { expiresIn: 30 });
   }
 
   async changePassword(req: IncomingMessage, password: string, newPassword: string) {

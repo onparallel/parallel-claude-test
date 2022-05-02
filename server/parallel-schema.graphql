@@ -1263,6 +1263,11 @@ type Mutation {
     """
     preview: Boolean
   ): FileUploadDownloadLinkResult!
+
+  """
+  Starts the completion of an async field
+  """
+  startAsyncFieldCompletion(fieldId: GID!, petitionId: GID!): AsyncFieldCompletionResponse!
   startSignatureRequest(message: String, petitionId: GID!): PetitionSignatureRequest!
 
   """

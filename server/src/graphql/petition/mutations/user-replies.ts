@@ -1,4 +1,9 @@
+import { ApolloError } from "apollo-server-core";
 import { mutationField, nonNull, objectType } from "nexus";
+import { isDefined } from "remeda";
+import { getBaseWebhookUrl } from "../../../util/getBaseWebhookUrl";
+import { toGlobalId } from "../../../util/globalId";
+import { sign } from "../../../util/jwt";
 import { random } from "../../../util/token";
 import { authenticateAnd } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
@@ -279,5 +284,56 @@ export const deletePetitionReply = mutationField("deletePetitionReply", {
   ),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.deletePetitionFieldReply(args.replyId, ctx.user!);
+  },
+});
+
+export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletion", {
+  description: "Starts the completion of an async field",
+  type: "AsyncFieldCompletionResponse",
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    fieldId: nonNull(globalIdArg("PetitionField")),
+  },
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    fieldsBelongsToPetition("petitionId", "fieldId"),
+    fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
+    fieldCanBeReplied("fieldId")
+  ),
+  resolve: async (_, { fieldId }, ctx) => {
+    const token = await sign(
+      {
+        fieldId: toGlobalId("PetitionField", fieldId),
+        userId: toGlobalId("User", ctx.user!.id),
+      },
+      ctx.config.security.jwtSecret,
+      { expiresIn: "1d" }
+    );
+
+    const baseWebhookUrl = await getBaseWebhookUrl(ctx.config.misc.parallelUrl);
+
+    const userId = toGlobalId("User", ctx.user!.id);
+    const res = await ctx.fetch.fetch(`https://api.bankflip.io/request`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip?token=${token}`,
+        userId,
+      }),
+    });
+    const result = await res.json();
+
+    if (!isDefined(result.id)) {
+      throw new ApolloError("BAD_REQUEST", "BAD_REQUEST");
+    }
+
+    return {
+      type: "WINDOW",
+      url: `https://app.bankflip.io?${new URLSearchParams({
+        userId,
+        requestId: result.id,
+        companyName: "Parallel",
+      })}`,
+    };
   },
 });

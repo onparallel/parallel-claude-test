@@ -1006,6 +1006,7 @@ export interface NexusGenFieldTypes {
     setUserPreferredLocale: NexusGenRootTypes["User"]; // User!
     shareSignaturitApiKey: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     signedPetitionDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
+    startAsyncFieldCompletion: NexusGenRootTypes["AsyncFieldCompletionResponse"]; // AsyncFieldCompletionResponse!
     startSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     switchAutomaticReminders: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     tagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
@@ -2456,6 +2457,7 @@ export interface NexusGenFieldTypeNames {
     setUserPreferredLocale: "User";
     shareSignaturitApiKey: "SupportMethodResponse";
     signedPetitionDownloadLink: "FileUploadDownloadLinkResult";
+    startAsyncFieldCompletion: "AsyncFieldCompletionResponse";
     startSignatureRequest: "PetitionSignatureRequest";
     switchAutomaticReminders: "PetitionAccess";
     tagPetition: "PetitionBase";
@@ -4132,6 +4134,11 @@ export interface NexusGenArgTypes {
       downloadAuditTrail?: boolean | null; // Boolean
       petitionSignatureRequestId: NexusGenScalars["GID"]; // GID!
       preview?: boolean | null; // Boolean
+    };
+    startAsyncFieldCompletion: {
+      // args
+      fieldId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     startSignatureRequest: {
       // args
