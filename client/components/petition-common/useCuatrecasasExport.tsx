@@ -158,6 +158,8 @@ function useExportSignatureDocument(
         },
       },
     });
+
+    return externalId;
   };
 }
 

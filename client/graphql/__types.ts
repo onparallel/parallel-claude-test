@@ -9546,11 +9546,11 @@ export type ExportRepliesProgressDialog_PetitionFragment = {
   metadata: { [key: string]: any };
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
+    id: string;
+    metadata: { [key: string]: any };
     signedDocumentFilename?: string | null;
     auditTrailFilename?: string | null;
     status: PetitionSignatureRequestStatus;
-    id: string;
-    metadata: { [key: string]: any };
   } | null;
   fields: Array<{
     __typename?: "PetitionField";
@@ -9579,11 +9579,11 @@ export type ExportRepliesProgressDialog_petitionQuery = {
         metadata: { [key: string]: any };
         currentSignatureRequest?: {
           __typename?: "PetitionSignatureRequest";
+          id: string;
+          metadata: { [key: string]: any };
           signedDocumentFilename?: string | null;
           auditTrailFilename?: string | null;
           status: PetitionSignatureRequestStatus;
-          id: string;
-          metadata: { [key: string]: any };
         } | null;
         fields: Array<{
           __typename?: "PetitionField";
@@ -20676,6 +20676,8 @@ export const ExportRepliesProgressDialog_PetitionFragmentDoc = gql`
     id
     ...useCuatrecasasExport_Petition
     currentSignatureRequest {
+      id
+      metadata
       signedDocumentFilename
       auditTrailFilename
       status

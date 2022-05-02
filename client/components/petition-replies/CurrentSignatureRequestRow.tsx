@@ -103,7 +103,7 @@ export function CurrentSignatureRequestRow({
             </Button>
           </>
         ) : status === "COMPLETED" ? (
-          <HStack>
+          <HStack justifyContent="flex-end">
             {signatureRequest.metadata.SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS ? (
               <NetDocumentsIconButton
                 externalId={signatureRequest.metadata.SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS}

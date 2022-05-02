@@ -38,7 +38,7 @@ export function ExportRepliesProgressDialog({
   const intl = useIntl();
   const [progress, setProgress] = useState(0);
   const [state, setState] = useState<"LOADING" | "UPLOADING" | "FINISHED">("LOADING");
-  const { data, refetch } = useQuery(ExportRepliesProgressDialog_petitionDocument, {
+  const { data } = useQuery(ExportRepliesProgressDialog_petitionDocument, {
     variables: { petitionId },
   });
   const isRunning = useRef(false);
@@ -112,24 +112,31 @@ export function ExportRepliesProgressDialog({
           }
         }
 
+        let signedDocExternalId: string | undefined = undefined;
         if (hasSignedDocument) {
-          await cuatrecasasExport.exportSignedDocument(petition.currentSignatureRequest!, {
-            signal: abort.signal,
-            onProgress: ({ loaded, total }) =>
-              setProgress((uploaded + (loaded / total) * 0.5) / totalFiles),
-          });
+          signedDocExternalId = await cuatrecasasExport.exportSignedDocument(
+            petition.currentSignatureRequest!,
+            {
+              signal: abort.signal,
+              onProgress: ({ loaded, total }) =>
+                setProgress((uploaded + (loaded / total) * 0.5) / totalFiles),
+            }
+          );
           setProgress(++uploaded / totalFiles);
-
-          // refetch petition to update signature request metadata and avoid overwriting it on the next step
-          await refetch({ petitionId });
         }
 
         if (hasAuditTrail) {
-          await cuatrecasasExport.exportAuditTrail(petition.currentSignatureRequest!, {
-            signal: abort.signal,
-            onProgress: ({ loaded, total }) =>
-              setProgress((uploaded + (loaded / total) * 0.5) / totalFiles),
-          });
+          await cuatrecasasExport.exportAuditTrail(
+            {
+              ...petition.currentSignatureRequest!,
+              metadata: { SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS: signedDocExternalId },
+            },
+            {
+              signal: abort.signal,
+              onProgress: ({ loaded, total }) =>
+                setProgress((uploaded + (loaded / total) * 0.5) / totalFiles),
+            }
+          );
           setProgress(++uploaded / totalFiles);
         }
 
@@ -265,6 +272,8 @@ ExportRepliesProgressDialog.fragments = {
       id
       ...useCuatrecasasExport_Petition
       currentSignatureRequest {
+        id
+        metadata
         signedDocumentFilename
         auditTrailFilename
         status
