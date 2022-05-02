@@ -41,7 +41,10 @@ import Select from "react-select";
 import { isDefined, noop, pick } from "remeda";
 import { SelectedSignerRow } from "../SelectedSignerRow";
 import { SuggestedSigners } from "../SuggestedSigners";
-import { SignerSelectSelection } from "./ConfirmPetitionSignersDialog";
+import {
+  ConfirmPetitionSignersDialog,
+  SignerSelectSelection,
+} from "./ConfirmPetitionSignersDialog";
 import { useConfirmSignerInfoDialog } from "./ConfirmSignerInfoDialog";
 
 export type SignatureConfigDialogProps = {
@@ -226,9 +229,18 @@ SignatureConfigDialog.fragments = {
               email
             }
           }
+          signatureRequests {
+            status
+            signatureConfig {
+              signers {
+                ...ConfirmPetitionSignersDialog_PetitionSigner
+              }
+            }
+          }
         }
       }
       ${this.SignatureOrgIntegration}
+      ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
     `;
   },
   get SignatureOrgIntegration() {
@@ -452,10 +464,18 @@ function useSignatureConfigDialogBodyStep2Props({
   const petitionIsCompleted =
     petition.__typename === "Petition" && ["COMPLETED", "CLOSED"].includes(petition.status);
 
+  const signatureRequests =
+    petition.__typename === "Petition"
+      ? petition.signatureRequests.filter((sr) => sr.status === "CANCELLED")
+      : [];
+  const previousSigners =
+    signatureRequests[signatureRequests.length - 1]?.signatureConfig.signers ?? [];
+
   return {
     user,
     accesses: petition.__typename === "Petition" ? petition.accesses : [],
     petitionIsCompleted,
+    previousSigners,
     isTemplate: petition.__typename === "PetitionTemplate",
     form: useForm<{
       signers: SignerSelectSelection[];
@@ -481,6 +501,7 @@ export function SignatureConfigDialogBodyStep2({
   },
   isTemplate,
   petitionIsCompleted,
+  previousSigners,
   user,
   accesses,
 }: ReturnType<typeof useSignatureConfigDialogBodyStep2Props>) {
@@ -508,6 +529,10 @@ export function SignatureConfigDialogBodyStep2({
             isSuggested: true,
             ...pick(a.contact!, ["email", "firstName", "lastName"]),
           })),
+        ...previousSigners.map((signer) => ({
+          isSuggested: true,
+          ...pick(signer!, ["contactId", "email", "firstName", "lastName"]),
+        })),
       ].filter((suggestion) => !signers.some((s) => s.email === suggestion.email))
     : [];
 

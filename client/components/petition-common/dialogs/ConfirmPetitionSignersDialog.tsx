@@ -33,6 +33,7 @@ interface ConfirmPetitionSignersDialogProps {
   presetSigners: ConfirmPetitionSignersDialog_PetitionSignerFragment[];
   allowAdditionalSigners: boolean;
   isUpdate?: boolean;
+  previousSigners?: ConfirmPetitionSignersDialog_PetitionSignerFragment[];
 }
 
 export interface ConfirmPetitionSignersDialogResult {
@@ -55,6 +56,7 @@ export function ConfirmPetitionSignersDialog({
   presetSigners,
   allowAdditionalSigners,
   isUpdate,
+  previousSigners,
   ...props
 }: DialogProps<ConfirmPetitionSignersDialogProps, ConfirmPetitionSignersDialogResult>) {
   const {
@@ -80,6 +82,13 @@ export function ConfirmPetitionSignersDialog({
 
   const signers = watch("signers");
 
+  const previous = previousSigners
+    ? previousSigners.map((signer) => ({
+        isSuggested: true,
+        ...pick(signer!, ["contactId", "email", "firstName", "lastName"]),
+      }))
+    : [];
+
   const suggestions: SignerSelectSelection[] = [
     {
       email: user.email,
@@ -96,6 +105,7 @@ export function ConfirmPetitionSignersDialog({
         isSuggested: true,
         ...pick(a.contact!, ["email", "firstName", "lastName"]),
       })),
+    ...previous,
   ].filter((suggestion) => !signers.some((s) => s.email === suggestion.email));
 
   const handleSearchContacts = useSearchContacts();

@@ -137,6 +137,12 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         );
         if (canFinalize && isPetition) {
           const presetSigners = petition!.signatureConfig?.signers ?? [];
+          const signatureRequests = petition!.signatureRequests.filter(
+            (sr) => sr.status === "CANCELLED"
+          );
+          const previousSigners =
+            signatureRequests[signatureRequests.length - 1]?.signatureConfig.signers;
+
           const allowAdditionalSigners = petition.signatureConfig?.allowAdditionalSigners ?? false;
           let completeSignerInfoData: ConfirmPetitionSignersDialogResult | null = null;
           if (petition.signatureConfig?.review === false) {
@@ -145,6 +151,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               presetSigners,
               user: me,
               allowAdditionalSigners,
+              previousSigners,
             });
           }
 
@@ -385,6 +392,14 @@ PetitionPreview.fragments = {
         }
         ...RecipientViewProgressFooter_Petition
         ...useSendPetitionHandler_Petition
+        signatureRequests {
+          status
+          signatureConfig {
+            signers {
+              ...ConfirmPetitionSignersDialog_PetitionSigner
+            }
+          }
+        }
       }
       fields {
         ...PreviewPetitionField_PetitionField
