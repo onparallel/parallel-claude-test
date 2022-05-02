@@ -95,6 +95,16 @@ export interface NexusGenInputs {
     filename: string; // String!
     size: number; // Int!
   };
+  ImageOptions: {
+    // input type
+    resize?: NexusGenInputs["ImageOptionsResize"] | null; // ImageOptionsResize
+  };
+  ImageOptionsResize: {
+    // input type
+    fit?: NexusGenEnums["ImageOptionsResizeFit"] | null; // ImageOptionsResizeFit
+    height?: number | null; // Int
+    width?: number | null; // Int
+  };
   PetitionFilter: {
     // input type
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
@@ -202,6 +212,7 @@ export interface NexusGenEnums {
   FeatureFlag: db.FeatureFlagName;
   FilterSharedWithLogicalOperator: "AND" | "OR";
   FilterSharedWithOperator: "IS_OWNER" | "NOT_IS_OWNER" | "NOT_SHARED_WITH" | "SHARED_WITH";
+  ImageOptionsResizeFit: "contain" | "cover" | "fill" | "inside" | "outside";
   IntegrationType: db.IntegrationType;
   OrganizationRole: "ADMIN" | "COLLABORATOR" | "NORMAL" | "OWNER";
   OrganizationStatus: db.OrganizationStatus;
@@ -3521,6 +3532,12 @@ export interface NexusGenArgTypes {
       offset?: number | null; // Int
     };
   };
+  LandingTemplate: {
+    imageUrl: {
+      // args
+      small?: boolean | null; // Boolean
+    };
+  };
   LandingTemplateCategorySample: {
     templates: {
       // args
@@ -4324,6 +4341,10 @@ export interface NexusGenArgTypes {
       offset?: number | null; // Int
       type?: NexusGenEnums["IntegrationType"] | null; // IntegrationType
     };
+    logoUrl: {
+      // args
+      options?: NexusGenInputs["ImageOptions"] | null; // ImageOptions
+    };
     users: {
       // args
       exclude?: NexusGenScalars["GID"][] | null; // [GID!]
@@ -4339,6 +4360,18 @@ export interface NexusGenArgTypes {
       // args
       limit?: number | null; // Int
       offset?: number | null; // Int
+    };
+  };
+  PetitionTemplate: {
+    imageUrl: {
+      // args
+      options?: NexusGenInputs["ImageOptions"] | null; // ImageOptions
+    };
+  };
+  PublicOrganization: {
+    logoUrl: {
+      // args
+      options?: NexusGenInputs["ImageOptions"] | null; // ImageOptions
     };
   };
   Query: {
@@ -4504,6 +4537,10 @@ export interface NexusGenArgTypes {
     };
   };
   User: {
+    avatarUrl: {
+      // args
+      options?: NexusGenInputs["ImageOptions"] | null; // ImageOptions
+    };
     hasFeatureFlag: {
       // args
       featureFlag: NexusGenEnums["FeatureFlag"]; // FeatureFlag!

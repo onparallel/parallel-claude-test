@@ -386,13 +386,13 @@ RecipientViewHeader.fragments = {
       email
       organization {
         name
-        logoUrl
+        logoUrl(options: { resize: { height: 80 } })
       }
     }
   `,
 };
 
-RecipientViewHeader.mutations = [
+const _mutations = [
   gql`
     mutation RecipientViewHeader_publicDelegateAccessToContact(
       $keycode: ID!

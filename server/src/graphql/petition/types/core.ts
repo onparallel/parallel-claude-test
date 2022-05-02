@@ -1,5 +1,5 @@
 import { extension } from "mime-types";
-import { enumType, inputObjectType, interfaceType, objectType } from "nexus";
+import { arg, enumType, inputObjectType, interfaceType, objectType } from "nexus";
 import { minBy } from "remeda";
 import { fullName } from "../../../util/fullName";
 import { toGlobalId } from "../../../util/globalId";
@@ -346,10 +346,13 @@ export const PetitionTemplate = objectType({
       resolve: (o) => o.public_metadata?.categories,
     });
     t.nullable.string("imageUrl", {
-      resolve: async (o, _, ctx) => {
-        if (o.public_metadata?.image_public_file_id) {
-          const file = await ctx.files.loadPublicFile(o.public_metadata.image_public_file_id);
-          return `${ctx.config.misc.uploadsUrl}/${file!.path}`;
+      args: {
+        options: arg({ type: "ImageOptions" }),
+      },
+      resolve: async (root, args, ctx) => {
+        if (root.public_metadata?.image_public_file_id) {
+          const file = await ctx.files.loadPublicFile(root.public_metadata.image_public_file_id);
+          return await ctx.images.getImageUrl(file!.path, args.options as any);
         }
         return null;
       },

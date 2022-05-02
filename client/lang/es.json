@@ -2656,8 +2656,8 @@
   },
   {
     "term": "component.public-signup-form-organization.upload-organization-logo-text",
-    "definition": "(Archivo PNG de hasta {size})",
-    "context": "(PNG file of size up {size})"
+    "definition": "Tamaño máximo de imagen: {size}",
+    "context": "Maximum image size: {size}"
   },
   {
     "term": "component.public-signup-form-organization.upload-other-organization-logo-button",
@@ -5140,29 +5140,14 @@
     "context": "{count, plural, =1{The user you selected is} other{Some of the users you selected are}} managed by a SSO provider. Please, update its status directly on the provider."
   },
   {
-    "term": "organization.branding.image-error",
-    "definition": "Error cargando imagen. Porfavor, cargar de nuevo.",
-    "context": "Error loading image. Please upload again."
-  },
-  {
     "term": "organization.branding.logo-attach-help",
     "definition": "Adjunta una imagen que quieras que mostremos en tus correos.",
     "context": "Attach an image that you would like us to display in your emails."
   },
   {
-    "term": "organization.branding.logo-attach-requirements-dropbox",
-    "definition": "(Imagen PNG, máx. {size})",
-    "context": "(PNG image, max. {size})"
-  },
-  {
-    "term": "organization.branding.logo-attach-requirements-help",
-    "definition": "Requisitos: Imagen PNG, máx. {size}",
-    "context": "Requirements: PNG image, max. {size}"
-  },
-  {
     "term": "organization.branding.logo-error",
-    "definition": "El logo debe ser una imagen PNG de hasta {size} de tamaño.",
-    "context": "The logo must be a PNG file of size up to {size}."
+    "definition": "El logo debe ser una imagen de hasta {size} de tamaño.",
+    "context": "The logo must be an image file of size up to {size}."
   },
   {
     "term": "organization.branding.logo-header",

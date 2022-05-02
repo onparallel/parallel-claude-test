@@ -2,9 +2,7 @@ import { arg, mutationField, nonNull } from "nexus";
 import { random } from "../../util/token";
 import { authenticateAnd } from "../helpers/authorize";
 import { uploadArg } from "../helpers/scalars";
-import { validateAnd } from "../helpers/validateArgs";
-import { contentType } from "../helpers/validators/contentType";
-import { maxFileSize } from "../helpers/validators/maxFileSize";
+import { validateFile } from "../helpers/validators/validateFile";
 import { contextUserHasRole } from "../users/authorizers";
 
 export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
@@ -14,9 +12,10 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
     file: nonNull(uploadArg()),
   },
   authorize: authenticateAnd(contextUserHasRole("ADMIN")),
-  validateArgs: validateAnd(
-    contentType((args) => args.file, "image/png", "file"),
-    maxFileSize((args) => args.file, 50 * 1024, "file")
+  validateArgs: validateFile(
+    (args) => args.file,
+    { contentType: ["image/gif", "image/png", "image/jpeg"], maxSize: 1024 * 1024 },
+    "file"
   ),
   resolve: async (root, args, ctx) => {
     const { mimetype, createReadStream } = await args.file;

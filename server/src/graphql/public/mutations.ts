@@ -105,10 +105,15 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
         await ctx.contacts.addContactAuthenticationLogAccessEntry(authenticationId, logEntry);
         return { isAllowed: true };
       } else {
-        const [org, logoUrl] = await Promise.all([
+        const [org, logoPath] = await Promise.all([
           ctx.organizations.loadOrg(ctx.contact!.org_id),
-          ctx.organizations.getOrgLogoUrl(ctx.contact!.org_id),
+          ctx.organizations.loadOrgLogoPath(ctx.contact!.org_id),
         ]);
+        const logoUrl = isDefined(logoPath)
+          ? await ctx.images.getImageUrl(logoPath, {
+              resize: { width: 400, height: 120, fit: "inside" },
+            })
+          : null;
         return {
           isAllowed: false,
           email: anonymizeEmail(ctx.contact!.email),

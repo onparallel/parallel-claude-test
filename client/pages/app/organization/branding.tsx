@@ -33,7 +33,7 @@ import { useOrganizationSections } from "@parallel/utils/useOrganizationSections
 import { useRef } from "react";
 import { DropzoneRef, FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
-const MAX_FILE_SIZE = 50 * 1024;
+const MAX_FILE_SIZE = 1024 * 1024;
 
 function OrganizationBranding() {
   const intl = useIntl();
@@ -58,7 +58,7 @@ function OrganizationBranding() {
         message: intl.formatMessage(
           {
             id: "organization.branding.logo-error",
-            defaultMessage: "The logo must be a PNG file of size up to {size}.",
+            defaultMessage: "The logo must be an image file of size up to {size}.",
           },
           { size: <FileSize value={MAX_FILE_SIZE} /> }
         ),
@@ -118,18 +118,6 @@ function OrganizationBranding() {
                 <FormattedMessage
                   id="organization.branding.logo-attach-help"
                   defaultMessage="Attach an image that you would like us to display in your emails."
-                  values={{
-                    size: <FileSize value={MAX_FILE_SIZE} />,
-                  }}
-                />
-              </Text>
-              <Text fontSize="sm">
-                <FormattedMessage
-                  id="organization.branding.logo-attach-requirements-help"
-                  defaultMessage="Requirements: PNG image, max. {size}"
-                  values={{
-                    size: <FileSize value={MAX_FILE_SIZE} />,
-                  }}
                 />
               </Text>
             </Stack>
@@ -138,7 +126,7 @@ function OrganizationBranding() {
                 ref={dropzoneRef}
                 as={Center}
                 onDrop={handleLogoUpload}
-                accept={["image/png"]}
+                accept={["image/gif", "image/png", "image/jpeg"]}
                 maxSize={MAX_FILE_SIZE}
                 multiple={false}
                 maxHeight="200px"
@@ -161,15 +149,17 @@ function OrganizationBranding() {
                     alt={me.organization.name}
                     src={logoSrc}
                     fallback={
-                      <FormattedMessage
-                        id="organization.branding.image-error"
-                        defaultMessage="Error loading image. Please upload again."
+                      <Spinner
+                        thickness="4px"
+                        speed="0.65s"
+                        emptyColor="gray.200"
+                        color="purple.500"
+                        size="xl"
                       />
                     }
                   />
                 )}
               </Dropzone>
-
               <Flex marginTop={4}>
                 <Button flex="1" colorScheme="purple" onClick={() => dropzoneRef.current?.open()}>
                   <FormattedMessage
@@ -178,17 +168,6 @@ function OrganizationBranding() {
                   />
                 </Button>
               </Flex>
-              <Center marginTop={2}>
-                <Text fontSize="sm" color="gray.600">
-                  <FormattedMessage
-                    id="organization.branding.logo-attach-requirements-dropbox"
-                    defaultMessage="(PNG image, max. {size})"
-                    values={{
-                      size: <FileSize value={MAX_FILE_SIZE} />,
-                    }}
-                  />
-                </Text>
-              </Center>
             </Card>
           </Stack>
           <Divider borderColor="gray.300" />
@@ -232,7 +211,7 @@ OrganizationBranding.mutations = [
     mutation OrganizationBranding_updateOrgLogo($file: Upload!) {
       updateOrganizationLogo(file: $file) {
         id
-        logoUrl
+        logoUrl(options: { resize: { width: 600 } })
       }
     }
   `,
@@ -254,7 +233,7 @@ OrganizationBranding.queries = [
         fullName
         organization {
           id
-          logoUrl
+          logoUrl(options: { resize: { width: 600 } })
           name
           preferredTone
         }

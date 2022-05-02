@@ -20,8 +20,9 @@ import { ANALYTICS, AnalyticsService } from "./services/analytics";
 import { AUTH, Auth } from "./services/auth";
 import { Aws, AWS_SERVICE } from "./services/aws";
 import { EMAILS, EmailsService } from "./services/emails";
-import { FetchService, FETCH_SERVICE } from "./services/fetch";
-import { LOGGER, ILogger } from "./services/logger";
+import { FETCH_SERVICE, IFetchService } from "./services/fetch";
+import { IImageService, IMAGE_SERVICE } from "./services/image";
+import { ILogger, LOGGER } from "./services/logger";
 import { PetitionBinder, PETITION_BINDER } from "./services/petition-binder";
 import { PRINTER, Printer } from "./services/printer";
 import { SIGNATURE, SignatureService } from "./services/signature";
@@ -44,7 +45,8 @@ export class ApiContext {
     @inject(SIGNATURE) public readonly signature: SignatureService,
     @inject(PRINTER) public readonly printer: Printer,
     @inject(AWS_SERVICE) public readonly aws: Aws,
-    @inject(FETCH_SERVICE) public readonly fetch: FetchService,
+    @inject(FETCH_SERVICE) public readonly fetch: IFetchService,
+    @inject(IMAGE_SERVICE) public readonly images: IImageService,
 
     // Repositories
     public readonly contacts: ContactRepository,
@@ -77,6 +79,8 @@ export class WorkerContext {
     @inject(PRINTER) public readonly printer: Printer,
     @inject(SIGNATURE) public readonly signature: SignatureService,
     @inject(PETITION_BINDER) public readonly petitionBinder: PetitionBinder,
+    @inject(IMAGE_SERVICE) public readonly images: IImageService,
+
     // Repositories
     public readonly contacts: ContactRepository,
     public readonly emailLogs: EmailLogRepository,

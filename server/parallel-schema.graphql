@@ -325,6 +325,24 @@ type GroupPermissionRemovedEvent implements PetitionEvent {
   user: User
 }
 
+input ImageOptions {
+  resize: ImageOptionsResize
+}
+
+input ImageOptionsResize {
+  fit: ImageOptionsResizeFit
+  height: Int
+  width: Int
+}
+
+enum ImageOptionsResizeFit {
+  contain
+  cover
+  fill
+  inside
+  outside
+}
+
 """
 The types of integrations available.
 """
@@ -357,7 +375,7 @@ type LandingTemplate {
   fields: [LandingTemplateField!]!
   hasConditionals: Boolean!
   id: GID!
-  imageUrl: String
+  imageUrl(small: Boolean): String
   locale: PetitionLocale!
   name: String
   organizationName: String!
@@ -1671,7 +1689,7 @@ type Organization implements Timestamps {
   """
   URL of the organization logo
   """
-  logoUrl: String
+  logoUrl(options: ImageOptions): String
 
   """
   The name of the organization.
@@ -3153,7 +3171,7 @@ type PetitionTemplate implements PetitionBase {
   The ID of the petition or template.
   """
   id: GID!
-  imageUrl: String
+  imageUrl(options: ImageOptions): String
 
   """
   Wether the completion message will be shown to the recipients or not.
@@ -3393,7 +3411,7 @@ type PublicOrganization {
   """
   The logo of the organization.
   """
-  logoUrl: String
+  logoUrl(options: ImageOptions): String
 
   """
   The name of the organization.
@@ -4615,7 +4633,7 @@ type User implements Timestamps {
   """
   URL to the user avatar
   """
-  avatarUrl: String
+  avatarUrl(options: ImageOptions): String
   canCreateUsers: Boolean!
 
   """

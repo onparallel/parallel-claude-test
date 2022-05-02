@@ -1,6 +1,6 @@
 import { booleanArg, list, mutationField, nonNull, stringArg } from "nexus";
 import { RESULT } from "..";
-import { FetchService } from "../../services/fetch";
+import { IFetchService } from "../../services/fetch";
 import { withError } from "../../util/promises/withError";
 import { and, authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
@@ -9,7 +9,7 @@ import { validUrl } from "../helpers/validators/validUrl";
 import { petitionsAreOfTypeTemplate, userHasAccessToPetitions } from "../petition/authorizers";
 import { userHasAccessToEventSubscription } from "./authorizers";
 
-async function challengeWebhookUrl(url: string, fetch: FetchService) {
+async function challengeWebhookUrl(url: string, fetch: IFetchService) {
   const [, response] = await withError(
     fetch.fetchWithTimeout(url, { method: "POST", body: JSON.stringify({}) }, 5000)
   );

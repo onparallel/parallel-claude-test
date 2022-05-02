@@ -415,7 +415,7 @@ export const userSignUp = mutationField("userSignUp", {
       (args) => isDefined(args.organizationLogo),
       validateFile(
         (args) => args.organizationLogo!,
-        { contentType: "image/png", maxSize: 1024 * 150 },
+        { contentType: ["image/gif", "image/png", "image/jpeg"], maxSize: 1024 * 1024 },
         "organizationLogo"
       )
     )

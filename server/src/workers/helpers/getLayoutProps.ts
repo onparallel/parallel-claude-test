@@ -1,17 +1,14 @@
-import { Config } from "../../config";
-import { OrganizationRepository } from "../../db/repositories/OrganizationRepository";
+import { isDefined } from "remeda";
+import { WorkerContext } from "../../context";
 
-export async function getLayoutProps(
-  orgId: number,
-  ctx: {
-    organizations: OrganizationRepository;
-    config: Config;
-  }
-) {
-  const [org, logoUrl] = await Promise.all([
+export async function getLayoutProps(orgId: number, ctx: WorkerContext) {
+  const [org, logoPath] = await Promise.all([
     ctx.organizations.loadOrg(orgId),
-    ctx.organizations.getOrgLogoUrl(orgId),
+    ctx.organizations.loadOrgLogoPath(orgId),
   ]);
+  const logoUrl = isDefined(logoPath)
+    ? await ctx.images.getImageUrl(logoPath, { resize: { width: 400 } })
+    : null;
   if (!org) {
     throw new Error(`Org not found for org_id ${orgId}`);
   }

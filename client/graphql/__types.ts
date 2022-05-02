@@ -292,6 +292,18 @@ export interface GroupPermissionRemovedEvent extends PetitionEvent {
   user?: Maybe<User>;
 }
 
+export interface ImageOptions {
+  resize?: InputMaybe<ImageOptionsResize>;
+}
+
+export interface ImageOptionsResize {
+  fit?: InputMaybe<ImageOptionsResizeFit>;
+  height?: InputMaybe<Scalars["Int"]>;
+  width?: InputMaybe<Scalars["Int"]>;
+}
+
+export type ImageOptionsResizeFit = "contain" | "cover" | "fill" | "inside" | "outside";
+
 /** The types of integrations available. */
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
 
@@ -315,6 +327,11 @@ export interface LandingTemplate {
   shortDescription?: Maybe<Scalars["String"]>;
   slug: Scalars["String"];
   updatedAt: Scalars["DateTime"];
+}
+
+/** A public template on landing page */
+export interface LandingTemplateimageUrlArgs {
+  small?: InputMaybe<Scalars["Boolean"]>;
 }
 
 export interface LandingTemplateCategorySample {
@@ -1516,6 +1533,11 @@ export interface OrganizationintegrationsArgs {
 }
 
 /** An organization in the system. */
+export interface OrganizationlogoUrlArgs {
+  options?: InputMaybe<ImageOptions>;
+}
+
+/** An organization in the system. */
 export interface OrganizationusersArgs {
   exclude?: InputMaybe<Array<Scalars["GID"]>>;
   includeInactive?: InputMaybe<Scalars["Boolean"]>;
@@ -2397,6 +2419,11 @@ export interface PetitionTemplate extends PetitionBase {
   updatedAt: Scalars["DateTime"];
 }
 
+/** A petition template */
+export interface PetitionTemplateimageUrlArgs {
+  options?: InputMaybe<ImageOptions>;
+}
+
 export interface PetitionTemplatePagination {
   __typename?: "PetitionTemplatePagination";
   /** The requested slice of items. */
@@ -2496,6 +2523,11 @@ export interface PublicOrganization {
   logoUrl?: Maybe<Scalars["String"]>;
   /** The name of the organization. */
   name: Scalars["String"];
+}
+
+/** A public view of an organization */
+export interface PublicOrganizationlogoUrlArgs {
+  options?: InputMaybe<ImageOptions>;
 }
 
 /** A public view of the petition */
@@ -3389,6 +3421,11 @@ export interface User extends Timestamps {
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
   userGroups: Array<UserGroup>;
+}
+
+/** A user in the system. */
+export interface UseravatarUrlArgs {
+  options?: InputMaybe<ImageOptions>;
 }
 
 /** A user in the system. */
@@ -20699,7 +20736,7 @@ export const LandingTemplateCard_LandingTemplateFragmentDoc = gql`
     locale
     name
     slug
-    imageUrl
+    imageUrl(small: true)
     backgroundColor
     ownerFullName
     organizationName
@@ -23173,7 +23210,7 @@ export const PublicTemplateCard_PetitionTemplateFragmentDoc = gql`
     descriptionExcerpt
     backgroundColor
     categories
-    imageUrl
+    imageUrl(options: { resize: { height: 212 } })
     ...TemplateActiveSettingsIcons_PetitionTemplate
   }
   ${TemplateActiveSettingsIcons_PetitionTemplateFragmentDoc}
@@ -23511,7 +23548,7 @@ export const RecipientViewHeader_PublicUserFragmentDoc = gql`
     email
     organization {
       name
-      logoUrl
+      logoUrl(options: { resize: { height: 80 } })
     }
   }
 ` as unknown as DocumentNode<RecipientViewHeader_PublicUserFragment, unknown>;
@@ -23524,7 +23561,7 @@ export const useCompletingMessageDialog_PublicUserFragmentDoc = gql`
   fragment useCompletingMessageDialog_PublicUser on PublicUser {
     organization {
       name
-      logoUrl
+      logoUrl(options: { resize: { height: 80 } })
     }
   }
 ` as unknown as DocumentNode<useCompletingMessageDialog_PublicUserFragment, unknown>;
@@ -25214,7 +25251,7 @@ export const OrganizationBranding_updateOrgLogoDocument = gql`
   mutation OrganizationBranding_updateOrgLogo($file: Upload!) {
     updateOrganizationLogo(file: $file) {
       id
-      logoUrl
+      logoUrl(options: { resize: { width: 600 } })
     }
   }
 ` as unknown as DocumentNode<
@@ -25239,7 +25276,7 @@ export const OrganizationBranding_userDocument = gql`
       fullName
       organization {
         id
-        logoUrl
+        logoUrl(options: { resize: { width: 600 } })
         name
         preferredTone
       }

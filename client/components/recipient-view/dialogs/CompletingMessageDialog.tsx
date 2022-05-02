@@ -189,7 +189,7 @@ useCompletingMessageDialog.fragments = {
     fragment useCompletingMessageDialog_PublicUser on PublicUser {
       organization {
         name
-        logoUrl
+        logoUrl(options: { resize: { height: 80 } })
       }
     }
   `,

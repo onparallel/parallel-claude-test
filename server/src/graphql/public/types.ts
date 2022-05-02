@@ -1,5 +1,5 @@
 import { extension } from "mime-types";
-import { core, enumType, inputObjectType, objectType, unionType } from "nexus";
+import { arg, core, enumType, inputObjectType, objectType, unionType } from "nexus";
 import { isDefined } from "remeda";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
@@ -378,8 +378,12 @@ export const PublicOrganization = objectType({
     });
     t.nullable.string("logoUrl", {
       description: "The logo of the organization.",
-      resolve: async (root, _, ctx) => {
-        return await ctx.organizations.getOrgLogoUrl(root.id);
+      args: {
+        options: arg({ type: "ImageOptions" }),
+      },
+      resolve: async (root, args, ctx) => {
+        const path = await ctx.organizations.loadOrgLogoPath(root.id);
+        return isDefined(path) ? await ctx.images.getImageUrl(path, args.options as any) : null;
       },
     });
   },

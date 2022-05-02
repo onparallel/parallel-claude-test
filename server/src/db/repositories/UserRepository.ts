@@ -354,7 +354,7 @@ export class UserRepository extends BaseRepository {
     return [...(userGroups ?? []), ...users];
   }
 
-  readonly loadAvatarUrlByUserDataId = fromDataLoader(
+  readonly loadAvatarPathByUserDataId = fromDataLoader(
     new DataLoader<number, Maybe<string>>(async (userDataIds) => {
       const results = await this.raw<{ id: number; path: string }>(
         /* sql */ `
@@ -365,9 +365,7 @@ export class UserRepository extends BaseRepository {
         [this.sqlIn(userDataIds)]
       );
       const resultsById = indexBy(results, (x) => x.id);
-      return userDataIds.map((id) =>
-        resultsById[id] ? `${this.config.misc.uploadsUrl}/${resultsById[id].path}` : null
-      );
+      return userDataIds.map((id) => resultsById[id]?.path ?? null);
     })
   );
 }

@@ -1,6 +1,7 @@
 export * from "./helpers/scalars";
 export * from "./helpers/result";
 export * from "./helpers/timestamps";
+export * from "./helpers/image";
 
 export * from "./contact/types";
 export * from "./contact/queries";

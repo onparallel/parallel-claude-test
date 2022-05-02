@@ -78,7 +78,7 @@ LandingTemplateCard.fragments = {
       locale
       name
       slug
-      imageUrl
+      imageUrl(small: true)
       backgroundColor
       ownerFullName
       organizationName

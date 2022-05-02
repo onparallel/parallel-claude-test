@@ -60,6 +60,7 @@ export const PublicTemplateCard = Object.assign(
           boxShadow: "outline",
           borderColor: "gray.200",
         }}
+        overflow="hidden"
         minWidth={0}
         {...buttonProps}
         {...props}
@@ -131,7 +132,7 @@ export const PublicTemplateCard = Object.assign(
           descriptionExcerpt
           backgroundColor
           categories
-          imageUrl
+          imageUrl(options: { resize: { height: 212 } })
           ...TemplateActiveSettingsIcons_PetitionTemplate
         }
         ${TemplateActiveSettingsIcons.fragments.PetitionTemplate}

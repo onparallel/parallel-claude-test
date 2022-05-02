@@ -119,7 +119,7 @@ function SelectLogoInput({
 }) {
   const intl = useIntl();
 
-  const maxSize = 1024 * 150; //150 kB
+  const maxSize = 1024 * 1024;
 
   const [isMaxSizeExceeded, setIsMaxSizeExceeded] = useState(false);
   const organizationLogoInputRef = useRef<HTMLInputElement>(null);
@@ -191,7 +191,7 @@ function SelectLogoInput({
           ) : (
             <FormattedMessage
               id="component.public-signup-form-organization.upload-organization-logo-text"
-              defaultMessage="(PNG file of size up {size})"
+              defaultMessage="Maximum image size: {size}"
               values={{
                 size: fileSize(intl, maxSize),
               }}

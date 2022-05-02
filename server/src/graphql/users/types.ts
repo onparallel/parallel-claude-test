@@ -1,5 +1,5 @@
 import { arg, enumType, list, nonNull, objectType, unionType } from "nexus";
-import { omit } from "remeda";
+import { isDefined, omit } from "remeda";
 import {
   FeatureFlagNameValues,
   UserOrganizationRoleValues,
@@ -166,8 +166,12 @@ export const User = objectType({
     });
     t.nullable.string("avatarUrl", {
       description: "URL to the user avatar",
-      resolve: async (o, _, ctx) => {
-        return await ctx.users.loadAvatarUrlByUserDataId(o.user_data_id);
+      args: {
+        options: arg({ type: "ImageOptions" }),
+      },
+      resolve: async (root, args, ctx) => {
+        const path = await ctx.users.loadAvatarPathByUserDataId(root.user_data_id);
+        return isDefined(path) ? await ctx.images.getImageUrl(path, args.options as any) : null;
       },
     });
     t.nullable.string("preferredLocale", {

@@ -4,6 +4,7 @@ import { AUTH, Auth, IAuth } from "./auth";
 import { Aws, AWS_SERVICE, IAws } from "./aws";
 import { EMAILS, EmailsService, IEmailsService } from "./emails";
 import { FetchService, FETCH_SERVICE, IFetchService } from "./fetch";
+import { IImageService, ImageService, IMAGE_SERVICE } from "./image";
 import { createLogger, ILogger, LOGGER } from "./logger";
 import { IPetitionBinder, PetitionBinder, PETITION_BINDER } from "./petition-binder";
 import { IPrinter, Printer, PRINTER } from "./printer";
@@ -26,5 +27,6 @@ export const servicesModule = new ContainerModule((bind) => {
     return ((...args) => new Storage(...args)) as StorageFactory;
   });
   bind<IFetchService>(FETCH_SERVICE).to(FetchService).inSingletonScope();
+  bind<IImageService>(IMAGE_SERVICE).to(ImageService).inSingletonScope();
   bind<IPetitionBinder>(PETITION_BINDER).to(PetitionBinder);
 });

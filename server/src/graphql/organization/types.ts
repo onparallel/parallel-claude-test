@@ -1,4 +1,5 @@
 import { arg, booleanArg, enumType, list, nonNull, nullable, objectType } from "nexus";
+import { isDefined } from "remeda";
 import { userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
@@ -49,8 +50,12 @@ export const Organization = objectType({
     });
     t.nullable.string("logoUrl", {
       description: "URL of the organization logo",
+      args: {
+        options: arg({ type: "ImageOptions" }),
+      },
       resolve: async (root, args, ctx) => {
-        return ctx.organizations.getOrgLogoUrl(root.id);
+        const path = await ctx.organizations.loadOrgLogoPath(root.id);
+        return isDefined(path) ? await ctx.images.getImageUrl(path, args.options as any) : null;
       },
     });
     t.field("status", {

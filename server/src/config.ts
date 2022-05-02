@@ -99,13 +99,16 @@ export function buildConfig() {
         anonymizeAfterDays: parseInt(process.env.WORKERS_ANONYMIZER_AFTER_DAYS!),
       },
     },
+    imageProxy: {
+      secret: process.env.IMAGE_PROXY_SIGNATURE_SECRET!,
+    },
     logs: {
       groupName: process.env.LOGS_GROUP_NAME!,
       streamName: process.env.LOGS_STREAM_NAME!,
     },
     misc: {
-      uploadsUrl: process.env.PUBLIC_UPLOADS_URL!,
       assetsUrl: process.env.ASSETS_URL!,
+      imagesUrl: process.env.IMAGES_URL!,
       parallelUrl: process.env.PARALLEL_URL!,
       emailFrom: process.env.EMAIL_FROM!,
       clientServerToken: process.env.CLIENT_SERVER_TOKEN!,

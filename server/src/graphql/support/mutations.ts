@@ -413,7 +413,7 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
       (args) => isDefined(args.image),
       validateFile(
         (args) => args.image!,
-        { contentType: "image/*", maxSize: 1024 * 1024 * 10 },
+        { contentType: ["image/gif", "image/png", "image/jpeg"], maxSize: 1024 * 1024 },
         "image"
       )
     )
@@ -499,7 +499,7 @@ export const uploadUserAvatar = mutationField("uploadUserAvatar", {
   },
   validateArgs: validateFile(
     (args) => args.image,
-    { contentType: "image/*", maxSize: 10 * 1024 * 1024 },
+    { contentType: ["image/gif", "image/png", "image/jpeg"], maxSize: 1024 * 1024 },
     "image"
   ),
   resolve: async (_, { userId, image }, ctx) => {

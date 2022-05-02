@@ -1,4 +1,4 @@
-import { arg, list, nonNull, objectType, queryField, stringArg } from "nexus";
+import { arg, booleanArg, list, nonNull, objectType, queryField, stringArg } from "nexus";
 import { isDefined } from "remeda";
 import { PetitionLocale } from "../../api/public/__types";
 import { fullName } from "../../util/fullName";
@@ -55,7 +55,10 @@ export const LandingTemplate = objectType({
     t.nullable.string("ownerAvatarUrl", {
       resolve: async (o, _, ctx) => {
         const owner = (await ctx.petitions.loadPetitionOwner(o.id))!;
-        return ctx.users.loadAvatarUrlByUserDataId(owner.user_data_id);
+        const path = await ctx.users.loadAvatarPathByUserDataId(owner.user_data_id);
+        return isDefined(path)
+          ? await ctx.images.getImageUrl(path, { resize: { width: 80, height: 80, fit: "cover" } })
+          : null;
       },
     });
     t.string("organizationName", {
@@ -77,10 +80,17 @@ export const LandingTemplate = objectType({
     });
     t.datetime("updatedAt", { resolve: (o) => o.updated_at });
     t.nullable.string("imageUrl", {
-      resolve: async (o, _, ctx) => {
+      args: {
+        small: booleanArg(),
+      },
+      resolve: async (o, args, ctx) => {
         if (o.public_metadata.image_public_file_id) {
           const file = await ctx.files.loadPublicFile(o.public_metadata.image_public_file_id);
-          return `${ctx.config.misc.uploadsUrl}/${file!.path}`;
+          return await ctx.images.getImageUrl(file!.path, {
+            resize: args.small
+              ? { width: 540, options: { withoutEnlargement: true } }
+              : { width: 1168, options: { withoutEnlargement: true } },
+          });
         }
         return null;
       },

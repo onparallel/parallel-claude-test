@@ -212,7 +212,7 @@ export class OrganizationRepository extends BaseRepository {
     );
   }
 
-  readonly getOrgLogoUrl = fromDataLoader(
+  readonly loadOrgLogoPath = fromDataLoader(
     new DataLoader<number, Maybe<string>>(async (orgIds) => {
       const results = await this.raw<{ id: number; path: string }>(
         /* sql */ `
@@ -223,9 +223,7 @@ export class OrganizationRepository extends BaseRepository {
         [this.sqlIn(orgIds)]
       );
       const resultsById = indexBy(results, (x) => x.id);
-      return orgIds.map((id) =>
-        resultsById[id] ? `${this.config.misc.uploadsUrl}/${resultsById[id].path}` : null
-      );
+      return orgIds.map((id) => resultsById[id]?.path ?? null);
     })
   );
 
