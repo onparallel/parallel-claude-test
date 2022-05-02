@@ -38,7 +38,7 @@ import { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm, UseFormHandleSubmit } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
-import { isDefined, noop, pick } from "remeda";
+import { isDefined, noop, omit, uniqBy } from "remeda";
 import { SelectedSignerRow } from "../SelectedSignerRow";
 import { SuggestedSigners } from "../SuggestedSigners";
 import {
@@ -230,7 +230,6 @@ SignatureConfigDialog.fragments = {
             }
           }
           signatureRequests {
-            status
             signatureConfig {
               signers {
                 ...ConfirmPetitionSignersDialog_PetitionSigner
@@ -461,21 +460,13 @@ function useSignatureConfigDialogBodyStep2Props({
 }) {
   const signers = petition.signatureConfig?.signers ?? [];
   const allowAdditionalSigners = petition.signatureConfig?.allowAdditionalSigners ?? false;
-  const petitionIsCompleted =
-    petition.__typename === "Petition" && ["COMPLETED", "CLOSED"].includes(petition.status);
-
-  const signatureRequests =
-    petition.__typename === "Petition"
-      ? petition.signatureRequests.filter((sr) => sr.status === "CANCELLED")
-      : [];
-  const previousSigners =
-    signatureRequests[signatureRequests.length - 1]?.signatureConfig.signers ?? [];
+  const isPetition = petition.__typename === "Petition";
 
   return {
     user,
-    accesses: petition.__typename === "Petition" ? petition.accesses : [],
-    petitionIsCompleted,
-    previousSigners,
+    accesses: isPetition ? petition.accesses : [],
+    petitionIsCompleted: isPetition && ["COMPLETED", "CLOSED"].includes(petition.status),
+    previousSignatures: isPetition ? petition.signatureRequests : [],
     isTemplate: petition.__typename === "PetitionTemplate",
     form: useForm<{
       signers: SignerSelectSelection[];
@@ -501,7 +492,7 @@ export function SignatureConfigDialogBodyStep2({
   },
   isTemplate,
   petitionIsCompleted,
-  previousSigners,
+  previousSignatures,
   user,
   accesses,
 }: ReturnType<typeof useSignatureConfigDialogBodyStep2Props>) {
@@ -512,29 +503,38 @@ export function SignatureConfigDialogBodyStep2({
   const handleCreateContact = useCreateContact();
   const showConfirmSignerInfo = useConfirmSignerInfoDialog();
 
-  const suggestions: SignerSelectSelection[] = petitionIsCompleted
-    ? [
-        {
-          email: user.email,
-          firstName: user.firstName ?? "",
-          lastName: user.lastName,
-          isSuggested: true,
-        },
-        ...accesses
-          .filter(
-            (a) => a.status === "ACTIVE" && isDefined(a.contact) && a.contact.email !== user.email
-          )
-          .map((a) => ({
-            contactId: a.contact!.id,
-            isSuggested: true,
-            ...pick(a.contact!, ["email", "firstName", "lastName"]),
-          })),
-        ...previousSigners.map((signer) => ({
-          isSuggested: true,
-          ...pick(signer!, ["contactId", "email", "firstName", "lastName"]),
+  const suggestions: SignerSelectSelection[] = uniqBy(
+    [
+      ...(previousSignatures?.flatMap((s) => s.signatureConfig.signers) ?? []).map((signer) =>
+        omit(signer, ["__typename"])
+      ),
+      {
+        email: user.email,
+        firstName: user.firstName ?? "",
+        lastName: user.lastName,
+      },
+      ...accesses
+        .filter((a) => a.status === "ACTIVE" && isDefined(a.contact))
+        .map((a) => ({
+          contactId: a.contact!.id,
+          email: a.contact!.email,
+          firstName: a.contact!.firstName,
+          lastName: a.contact!.lastName ?? "",
         })),
-      ].filter((suggestion) => !signers.some((s) => s.email === suggestion.email))
-    : [];
+    ]
+      .map((s) => ({ ...s, isSuggested: true }))
+      // remove already added signers
+      .filter(
+        (suggestion) =>
+          !signers.some(
+            (s) =>
+              s.email === suggestion.email &&
+              s.firstName === suggestion.firstName &&
+              s.lastName === suggestion.lastName
+          )
+      ),
+    (s) => [s.email, s.firstName, s.lastName].join("|")
+  );
 
   const [selectedContact, setSelectedContact] = useState<ContactSelectSelection | null>(null);
 

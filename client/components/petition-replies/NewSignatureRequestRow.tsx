@@ -34,12 +34,6 @@ export function NewSignatureRequestRow({
   const showConfirmPetitionSignersDialog = useConfirmPetitionSignersDialog();
   const handleStartSignature = async () => {
     try {
-      const signatureRequests = petition.signatureRequests.filter(
-        (sr) => sr.status === "CANCELLED"
-      );
-      const previousSigners =
-        signatureRequests[signatureRequests.length - 1]?.signatureConfig.signers;
-
       const {
         signers: signersInfo,
         message,
@@ -50,7 +44,7 @@ export function NewSignatureRequestRow({
         presetSigners: signers,
         allowAdditionalSigners,
         isUpdate: !petition.signatureConfig?.review,
-        previousSigners,
+        previousSignatures: petition.signatureRequests,
       });
 
       await onUpdateConfig({
@@ -154,16 +148,12 @@ NewSignatureRequestRow.fragments = {
         ...ConfirmPetitionSignersDialog_PetitionAccess
       }
       signatureRequests {
-        status
-        signatureConfig {
-          signers {
-            ...ConfirmPetitionSignersDialog_PetitionSigner
-          }
-        }
+        ...ConfirmPetitionSignersDialog_PetitionSignatureRequest
       }
     }
     ${SignerReference.fragments.PetitionSigner}
     ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
     ${ConfirmPetitionSignersDialog.fragments.PetitionAccess}
+    ${ConfirmPetitionSignersDialog.fragments.PetitionSignatureRequest}
   `,
 };

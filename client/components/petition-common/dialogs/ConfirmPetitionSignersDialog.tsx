@@ -12,6 +12,7 @@ import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import {
   ConfirmPetitionSignersDialog_PetitionAccessFragment,
+  ConfirmPetitionSignersDialog_PetitionSignatureRequestFragment,
   ConfirmPetitionSignersDialog_PetitionSignerFragment,
   ConfirmPetitionSignersDialog_UserFragment,
   Maybe,
@@ -22,7 +23,7 @@ import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, pick } from "remeda";
+import { isDefined, omit, uniqBy } from "remeda";
 import { SelectedSignerRow } from "../SelectedSignerRow";
 import { SuggestedSigners } from "../SuggestedSigners";
 import { useConfirmSignerInfoDialog } from "./ConfirmSignerInfoDialog";
@@ -33,7 +34,7 @@ interface ConfirmPetitionSignersDialogProps {
   presetSigners: ConfirmPetitionSignersDialog_PetitionSignerFragment[];
   allowAdditionalSigners: boolean;
   isUpdate?: boolean;
-  previousSigners?: ConfirmPetitionSignersDialog_PetitionSignerFragment[];
+  previousSignatures?: ConfirmPetitionSignersDialog_PetitionSignatureRequestFragment[];
 }
 
 export interface ConfirmPetitionSignersDialogResult {
@@ -56,7 +57,7 @@ export function ConfirmPetitionSignersDialog({
   presetSigners,
   allowAdditionalSigners,
   isUpdate,
-  previousSigners,
+  previousSignatures,
   ...props
 }: DialogProps<ConfirmPetitionSignersDialogProps, ConfirmPetitionSignersDialogResult>) {
   const {
@@ -82,31 +83,38 @@ export function ConfirmPetitionSignersDialog({
 
   const signers = watch("signers");
 
-  const previous = previousSigners
-    ? previousSigners.map((signer) => ({
-        isSuggested: true,
-        ...pick(signer!, ["contactId", "email", "firstName", "lastName"]),
-      }))
-    : [];
-
-  const suggestions: SignerSelectSelection[] = [
-    {
-      email: user.email,
-      firstName: user.firstName ?? "",
-      lastName: user.lastName,
-      isSuggested: true,
-    },
-    ...accesses
+  const suggestions: SignerSelectSelection[] = uniqBy(
+    [
+      ...(previousSignatures?.flatMap((s) => s.signatureConfig.signers) ?? []).map((signer) =>
+        omit(signer, ["__typename"])
+      ),
+      {
+        email: user.email,
+        firstName: user.firstName ?? "",
+        lastName: user.lastName,
+      },
+      ...accesses
+        .filter((a) => a.status === "ACTIVE" && isDefined(a.contact))
+        .map((a) => ({
+          contactId: a.contact!.id,
+          email: a.contact!.email,
+          firstName: a.contact!.firstName,
+          lastName: a.contact!.lastName ?? "",
+        })),
+    ]
+      .map((s) => ({ ...s, isSuggested: true }))
+      // remove already added signers
       .filter(
-        (a) => a.status === "ACTIVE" && isDefined(a.contact) && a.contact.email !== user.email
-      )
-      .map((a) => ({
-        contactId: a.contact!.id,
-        isSuggested: true,
-        ...pick(a.contact!, ["email", "firstName", "lastName"]),
-      })),
-    ...previous,
-  ].filter((suggestion) => !signers.some((s) => s.email === suggestion.email));
+        (suggestion) =>
+          !signers.some(
+            (s) =>
+              s.email === suggestion.email &&
+              s.firstName === suggestion.firstName &&
+              s.lastName === suggestion.lastName
+          )
+      ),
+    (s) => [s.email, s.firstName, s.lastName].join("|")
+  );
 
   const handleSearchContacts = useSearchContacts();
   const handleCreateContact = useCreateContact();
@@ -327,6 +335,15 @@ ConfirmPetitionSignersDialog.fragments = {
     }
     ${SelectedSignerRow.fragments.PetitionSigner}
     ${SuggestedSigners.fragments.PetitionSigner}
+  `,
+  PetitionSignatureRequest: gql`
+    fragment ConfirmPetitionSignersDialog_PetitionSignatureRequest on PetitionSignatureRequest {
+      signatureConfig {
+        signers {
+          ...ConfirmPetitionSignersDialog_PetitionSigner
+        }
+      }
+    }
   `,
 };
 

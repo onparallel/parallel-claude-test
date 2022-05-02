@@ -198,19 +198,13 @@ export function AddPetitionAccessDialog({
 
   const handleEditPetitionSigners = async () => {
     try {
-      const signatureRequests = petition.signatureRequests.filter(
-        (sr) => sr.status === "CANCELLED"
-      );
-      const previousSigners =
-        signatureRequests[signatureRequests.length - 1]?.signatureConfig.signers;
-
       const { signers, allowAdditionalSigners } = await showConfirmPetitionSignersDialog({
         user,
         accesses: petition.accesses,
         presetSigners: signatureConfig?.signers ?? [],
         allowAdditionalSigners: signatureConfig?.allowAdditionalSigners ?? false,
         isUpdate: true,
-        previousSigners,
+        previousSignatures: petition.signatureRequests,
       });
 
       setSignatureConfig({
@@ -473,12 +467,7 @@ AddPetitionAccessDialog.fragments = {
         }
       }
       signatureRequests {
-        status
-        signatureConfig {
-          signers {
-            ...ConfirmPetitionSignersDialog_PetitionSigner
-          }
-        }
+        ...ConfirmPetitionSignersDialog_PetitionSignatureRequest
       }
       signatureConfig {
         review
@@ -515,6 +504,7 @@ AddPetitionAccessDialog.fragments = {
     ${CopySignatureConfigDialog.fragments.PetitionSigner}
     ${ConfirmPetitionSignersDialog.fragments.PetitionSigner}
     ${ConfirmPetitionSignersDialog.fragments.PetitionAccess}
+    ${ConfirmPetitionSignersDialog.fragments.PetitionSignatureRequest}
   `,
 };
 

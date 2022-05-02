@@ -6287,7 +6287,6 @@ export type AddPetitionAccessDialog_PetitionFragment = {
   }>;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
-    status: PetitionSignatureRequestStatus;
     signatureConfig: {
       __typename?: "SignatureConfig";
       signers: Array<{
@@ -6842,6 +6841,20 @@ export type ConfirmPetitionSignersDialog_PetitionSignerFragment = {
   email: string;
   firstName: string;
   lastName?: string | null;
+};
+
+export type ConfirmPetitionSignersDialog_PetitionSignatureRequestFragment = {
+  __typename?: "PetitionSignatureRequest";
+  signatureConfig: {
+    __typename?: "SignatureConfig";
+    signers: Array<{
+      __typename?: "PetitionSigner";
+      contactId?: string | null;
+      email: string;
+      firstName: string;
+      lastName?: string | null;
+    }>;
+  };
 };
 
 export type PetitionSharingModal_Petition_Petition_Fragment = {
@@ -7404,7 +7417,6 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
   }>;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
-    status: PetitionSignatureRequestStatus;
     signatureConfig: {
       __typename?: "SignatureConfig";
       signers: Array<{
@@ -7813,7 +7825,6 @@ export type useSendPetitionHandler_PetitionFragment = {
   }>;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
-    status: PetitionSignatureRequestStatus;
     signatureConfig: {
       __typename?: "SignatureConfig";
       signers: Array<{
@@ -7925,7 +7936,6 @@ export type useSendPetitionHandler_addPetitionPermissionMutation = {
         }>;
         signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
-          status: PetitionSignatureRequestStatus;
           signatureConfig: {
             __typename?: "SignatureConfig";
             signers: Array<{
@@ -8196,7 +8206,6 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
   }>;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
-    status: PetitionSignatureRequestStatus;
     signatureConfig: {
       __typename?: "SignatureConfig";
       signers: Array<{
@@ -9231,7 +9240,6 @@ export type NewSignatureRequestRow_PetitionFragment = {
   }>;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
-    status: PetitionSignatureRequestStatus;
     signatureConfig: {
       __typename?: "SignatureConfig";
       signers: Array<{
@@ -9463,8 +9471,8 @@ export type PetitionSignaturesCard_PetitionFragment = {
   name?: string | null;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
-    status: PetitionSignatureRequestStatus;
     id: string;
+    status: PetitionSignatureRequestStatus;
     metadata: { [key: string]: any };
     signatureConfig: {
       __typename?: "SignatureConfig";
@@ -9542,8 +9550,8 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
         name?: string | null;
         signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
-          status: PetitionSignatureRequestStatus;
           id: string;
+          status: PetitionSignatureRequestStatus;
           metadata: { [key: string]: any };
           signatureConfig: {
             __typename?: "SignatureConfig";
@@ -12585,7 +12593,6 @@ export type PetitionActivity_PetitionFragment = {
   }>;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
-    status: PetitionSignatureRequestStatus;
     signatureConfig: {
       __typename?: "SignatureConfig";
       signers: Array<{
@@ -13402,7 +13409,6 @@ export type PetitionActivity_updatePetitionMutation = {
         }>;
         signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
-          status: PetitionSignatureRequestStatus;
           signatureConfig: {
             __typename?: "SignatureConfig";
             signers: Array<{
@@ -14246,7 +14252,6 @@ export type PetitionActivity_petitionQuery = {
         }>;
         signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
-          status: PetitionSignatureRequestStatus;
           signatureConfig: {
             __typename?: "SignatureConfig";
             signers: Array<{
@@ -14442,7 +14447,6 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   }>;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
-    status: PetitionSignatureRequestStatus;
     signatureConfig: {
       __typename?: "SignatureConfig";
       signers: Array<{
@@ -14720,7 +14724,6 @@ export type PetitionCompose_updatePetitionMutation = {
         }>;
         signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
-          status: PetitionSignatureRequestStatus;
           signatureConfig: {
             __typename?: "SignatureConfig";
             signers: Array<{
@@ -15339,7 +15342,6 @@ export type PetitionCompose_petitionQuery = {
         }>;
         signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
-          status: PetitionSignatureRequestStatus;
           signatureConfig: {
             __typename?: "SignatureConfig";
             signers: Array<{
@@ -15720,7 +15722,6 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
   }>;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
-    status: PetitionSignatureRequestStatus;
     signatureConfig: {
       __typename?: "SignatureConfig";
       signers: Array<{
@@ -16011,7 +16012,6 @@ export type PetitionPreview_updatePetitionMutation = {
         }>;
         signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
-          status: PetitionSignatureRequestStatus;
           signatureConfig: {
             __typename?: "SignatureConfig";
             signers: Array<{
@@ -16269,7 +16269,6 @@ export type PetitionPreview_completePetitionMutation = {
     }>;
     signatureRequests: Array<{
       __typename?: "PetitionSignatureRequest";
-      status: PetitionSignatureRequestStatus;
       signatureConfig: {
         __typename?: "SignatureConfig";
         signers: Array<{
@@ -16429,7 +16428,6 @@ export type PetitionPreview_petitionQuery = {
         }>;
         signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
-          status: PetitionSignatureRequestStatus;
           signatureConfig: {
             __typename?: "SignatureConfig";
             signers: Array<{
@@ -16799,8 +16797,8 @@ export type PetitionReplies_PetitionFragment = {
   >;
   signatureRequests: Array<{
     __typename?: "PetitionSignatureRequest";
-    status: PetitionSignatureRequestStatus;
     id: string;
+    status: PetitionSignatureRequestStatus;
     metadata: { [key: string]: any };
     signatureConfig: {
       __typename?: "SignatureConfig";
@@ -17111,8 +17109,8 @@ export type PetitionReplies_closePetitionMutation = {
     >;
     signatureRequests: Array<{
       __typename?: "PetitionSignatureRequest";
-      status: PetitionSignatureRequestStatus;
       id: string;
+      status: PetitionSignatureRequestStatus;
       metadata: { [key: string]: any };
       signatureConfig: {
         __typename?: "SignatureConfig";
@@ -17286,8 +17284,8 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
     >;
     signatureRequests: Array<{
       __typename?: "PetitionSignatureRequest";
-      status: PetitionSignatureRequestStatus;
       id: string;
+      status: PetitionSignatureRequestStatus;
       metadata: { [key: string]: any };
       signatureConfig: {
         __typename?: "SignatureConfig";
@@ -17562,8 +17560,8 @@ export type PetitionReplies_petitionQuery = {
         >;
         signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
-          status: PetitionSignatureRequestStatus;
           id: string;
+          status: PetitionSignatureRequestStatus;
           metadata: { [key: string]: any };
           signatureConfig: {
             __typename?: "SignatureConfig";
@@ -19893,8 +19891,8 @@ export type PetitionSignaturesCardPolling_petitionQuery = {
         name?: string | null;
         signatureRequests: Array<{
           __typename?: "PetitionSignatureRequest";
-          status: PetitionSignatureRequestStatus;
           id: string;
+          status: PetitionSignatureRequestStatus;
           metadata: { [key: string]: any };
           signatureConfig: {
             __typename?: "SignatureConfig";
@@ -22195,6 +22193,19 @@ export const ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc = gql`
   ${SelectedSignerRow_PetitionSignerFragmentDoc}
   ${SuggestedSigners_PetitionSignerFragmentDoc}
 ` as unknown as DocumentNode<ConfirmPetitionSignersDialog_PetitionSignerFragment, unknown>;
+export const ConfirmPetitionSignersDialog_PetitionSignatureRequestFragmentDoc = gql`
+  fragment ConfirmPetitionSignersDialog_PetitionSignatureRequest on PetitionSignatureRequest {
+    signatureConfig {
+      signers {
+        ...ConfirmPetitionSignersDialog_PetitionSigner
+      }
+    }
+  }
+  ${ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
+` as unknown as DocumentNode<
+  ConfirmPetitionSignersDialog_PetitionSignatureRequestFragment,
+  unknown
+>;
 export const CopySignatureConfigDialog_PetitionSignerFragmentDoc = gql`
   fragment CopySignatureConfigDialog_PetitionSigner on PetitionSigner {
     email
@@ -22228,12 +22239,7 @@ export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
       }
     }
     signatureRequests {
-      status
-      signatureConfig {
-        signers {
-          ...ConfirmPetitionSignersDialog_PetitionSigner
-        }
-      }
+      ...ConfirmPetitionSignersDialog_PetitionSignatureRequest
     }
     signatureConfig {
       review
@@ -22267,8 +22273,9 @@ export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
       ...ConfirmPetitionSignersDialog_PetitionAccess
     }
   }
-  ${ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
+  ${ConfirmPetitionSignersDialog_PetitionSignatureRequestFragmentDoc}
   ${CopySignatureConfigDialog_PetitionSignerFragmentDoc}
+  ${ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
   ${ConfirmPetitionSignersDialog_PetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<AddPetitionAccessDialog_PetitionFragment, unknown>;
 export const useSendPetitionHandler_PetitionFragmentDoc = gql`
@@ -22489,7 +22496,6 @@ export const SignatureConfigDialog_PetitionBaseFragmentDoc = gql`
         }
       }
       signatureRequests {
-        status
         signatureConfig {
           signers {
             ...ConfirmPetitionSignersDialog_PetitionSigner
@@ -23039,7 +23045,6 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
       ...RecipientViewProgressFooter_Petition
       ...useSendPetitionHandler_Petition
       signatureRequests {
-        status
         signatureConfig {
           signers {
             ...ConfirmPetitionSignersDialog_PetitionSigner
@@ -23213,17 +23218,13 @@ export const NewSignatureRequestRow_PetitionFragmentDoc = gql`
       ...ConfirmPetitionSignersDialog_PetitionAccess
     }
     signatureRequests {
-      status
-      signatureConfig {
-        signers {
-          ...ConfirmPetitionSignersDialog_PetitionSigner
-        }
-      }
+      ...ConfirmPetitionSignersDialog_PetitionSignatureRequest
     }
   }
   ${SignerReference_PetitionSignerFragmentDoc}
   ${ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
   ${ConfirmPetitionSignersDialog_PetitionAccessFragmentDoc}
+  ${ConfirmPetitionSignersDialog_PetitionSignatureRequestFragmentDoc}
 ` as unknown as DocumentNode<NewSignatureRequestRow_PetitionFragment, unknown>;
 export const DatesList_SignerStatusFragmentDoc = gql`
   fragment DatesList_SignerStatus on PetitionSignatureRequestSignerStatus {
