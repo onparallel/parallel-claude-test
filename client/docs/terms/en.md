@@ -28,11 +28,11 @@ _Last modified: November, 2019._
 
 ## 3. ACCESS TO THE WEBSITE AND TO THE SERVICES
 
-- Access to the Website is free, except for the cost of connection through the telecommunications network supplied by the User’s provider. Access to the Services may be subject to remuneration in the conditions stated below and in the Website from time to time.
+- Access to the Website is free, except for the cost of connection through the telecommunications network supplied by the User's provider. Access to the Services may be subject to remuneration in the conditions stated below and in the Website from time to time.
   The access and use of the Website and the Services requires a computer or computer equipment as well as internet connection. Any expense in connection with such items is not included in the Services described herein in the Terms and shall be borne exclusively by the User.
 - In order to use the Services, the User must register and sign in to his account by using a supported browser.
 - The User undertakes to use the Services in good faith and not to use it negligently, for fraudulent purposes or in an unlawful manner. In addition, the User agrees not to take part in any conduct or action that could damage the image, interests or rights of the Services, other Users or of third parties.
-- It is the User’s responsibility to ensure prior to using the Services that the features of the Services meet the User’s needs.
+- It is the User's responsibility to ensure prior to using the Services that the features of the Services meet the User's needs.
 
 ## 4. WEBSITE AND PARALLEL SERVICES CODE OF CONDUCT
 
@@ -48,7 +48,7 @@ _Last modified: November, 2019._
   8. Disseminate, transmit or provide third parties with any type of information, element or content that may constitute a breach of intellectual property rights, patents, brands or copyright held by the owners of the Website and the Services or third parties.
   9. Disseminate, transmit or provide third parties with any type of information, element or content deemed to be a violation of privacy or data protection laws.
 
-- The User agrees to indemnify and hold harmless PARALLEL against any claim, fine, penalty or sanction arising from the User’s failure to comply with the aforementioned conditions of use. PARALLEL reserves the right to claim compensation for damages incurred.
+- The User agrees to indemnify and hold harmless PARALLEL against any claim, fine, penalty or sanction arising from the User's failure to comply with the aforementioned conditions of use. PARALLEL reserves the right to claim compensation for damages incurred.
 
 ## 2. EXTERNAL CONTENT AND SERVICES ACCESSIBLE THROUGH THE WEBSITE
 
@@ -69,7 +69,7 @@ _Last modified: November, 2019._
 - Parallel is aimed to companies and/or professionals who are not regarded as consumers or users within the meaning of consumer regulations. In event that the User is regarded as consumer or user as stated before, such User should refrain from purchasing the Services.
 - In order to use the Service for Purchase, the User must previously be registered.
 - Additionally, the purchase process of Parallel requires the User to introduce its payment data and any other information necessary to effect payment.
-- PARALLEL shall keep an electronic receipt of the User’s purchase. Such receipt will not be available for the User.
+- PARALLEL shall keep an electronic receipt of the User's purchase. Such receipt will not be available for the User.
 
 ## 8. CORRECTION AND IDENTIFICATION OF ERRORS WHEN ENTERING DATA
 
@@ -94,31 +94,31 @@ _Last modified: November, 2019._
 ## 12. LIMITATION OF LIABILITY
 
 - The Services are one of the most effective information gathering solutions in the market, and we keep improving it, however, the automation solutions have some limitations.
-  We work hardly to improve our system’s email deliverability for our customers, but there are certain causes that fall outside our scope of control.
+  We work hardly to improve our system's email deliverability for our customers, but there are certain causes that fall outside our scope of control.
   These are the main causes of response or deliverability failure:
 - Recipients are ignoring our or your emails:
   If your recipient ignores completely our and/or your emails, it goes beyond our possibilities. We do not and never will contact your recipients except via email.
   Although improbable, if this is the case, it looks something personal. We suggest you calling your recipients to solve the situation.
 - Emails sent to your recipients being tagged as spam:
-  If your recipient’s email server or client are tagging our system’s emails as spam, your recipients may not see the message unless they access their spam folder.
+  If your recipient's email server or client are tagging our system's emails as spam, your recipients may not see the message unless they access their spam folder.
   We are continuously improving our deliverability to avoid this from happening, however we cannot grant a perfect deliverability.
 - Emails sent to your recipients blocking our domain account emails:
-  If your recipient’s email server or client block emails from our domain, your recipient may not see our email. We are constantly monitoring the deliverability of our emails and, if we detect this situation, we try to contact recipient’s email administrators to unblock our emails.
-- The User acknowledges and accepts that the use of the Website and the Service is at the User’s own risk and under the User’s responsibility and therefore PARALLEL does not accept any responsibility for misuse or use in breach of these Terms.
-  The User will be responsible for any damages to PARALLEL resulting from the User’s use of the Website and the Service in breach of the Terms.
+  If your recipient's email server or client block emails from our domain, your recipient may not see our email. We are constantly monitoring the deliverability of our emails and, if we detect this situation, we try to contact recipient's email administrators to unblock our emails.
+- The User acknowledges and accepts that the use of the Website and the Service is at the User's own risk and under the User's responsibility and therefore PARALLEL does not accept any responsibility for misuse or use in breach of these Terms.
+  The User will be responsible for any damages to PARALLEL resulting from the User's use of the Website and the Service in breach of the Terms.
 - PARALLEL does not warrant the availability or continuity of the Website or the Service, its accuracy, reliability or completeness, or whether they are fit for a particular purpose. To the maximum extent permitted by applicable law, PARALLEL will not have any liability in this regard.
   As way of example and without limitation, PARALLEL shall not be liable for any damages that may result from:
-  _ Interruptions, viruses, technical problems, interferences, omissions, unavailability, power cuts, failure of the telecommunication networks or the User’s equipment which are not PARALLEL’s responsibility.
+  _ Interruptions, viruses, technical problems, interferences, omissions, unavailability, power cuts, failure of the telecommunication networks or the User's equipment which are not PARALLEL's responsibility.
   _ Delays or unavailability of the Website and the Service due to deficiencies or traffic overload on the Internet, in the communication network or the electricity grid.
   _ Third party actions.
-  _ Unavailability of the Website and the Service due to maintenance or software updates. \* Anything which is beyond PARALLEL’s direct control.
-- SAVE FOR PARALLEL’S WILFUL MISCONDUCT, AND THOSE CASES IN WHICH DUE TO THE SPECIFIC CIRCUMSTANCES OF THE USER INVOLVED OR THE NATURE OF THE MATTER, APPLICABLE LAW PROVIDES THAT LIABILITY CANNOT BE LIMITED BY AGREEMENT, USE OF THE WEBSITE AND THE SERVICE IS AT THE USER’S SOLE RISK AND PARALLEL SHALL NOT BE LIABLE FOR ANY DAMAGE OF ANY KIND CAUSED TO THE USER AS A RESULT OF USING THE WEBSITE OR THE SERVICES.
+  _ Unavailability of the Website and the Service due to maintenance or software updates. \* Anything which is beyond PARALLEL's direct control.
+- SAVE FOR PARALLEL'S WILFUL MISCONDUCT, AND THOSE CASES IN WHICH DUE TO THE SPECIFIC CIRCUMSTANCES OF THE USER INVOLVED OR THE NATURE OF THE MATTER, APPLICABLE LAW PROVIDES THAT LIABILITY CANNOT BE LIMITED BY AGREEMENT, USE OF THE WEBSITE AND THE SERVICE IS AT THE USER'S SOLE RISK AND PARALLEL SHALL NOT BE LIABLE FOR ANY DAMAGE OF ANY KIND CAUSED TO THE USER AS A RESULT OF USING THE WEBSITE OR THE SERVICES.
 
 ## 13. NOTICES
 
 - All notices, requests, demands, and other communications between PARALLEL and the User in connection with the Service or the access to the Website shall be in writing and shall be deemed to have been duly delivered if sent by certified mail or certified fax (burofax) to the address which the parties have indicated to the other to that effect.
 - Notwithstanding the foregoing, notices sent to PARALLEL shall be deemed to have been duly made when sent by means of email at hello@onparallel.com.
-- On the other hand, notices sent to the User shall be deemed to have been duly made when sent by means of email at the address associated with the User’s email account as of the start of the Service use or, if required, the one that the User had provided PARALLEL with to that effect.
+- On the other hand, notices sent to the User shall be deemed to have been duly made when sent by means of email at the address associated with the User's email account as of the start of the Service use or, if required, the one that the User had provided PARALLEL with to that effect.
 
 ## 14. SEVERABILITY
 

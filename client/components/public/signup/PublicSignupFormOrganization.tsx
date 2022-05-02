@@ -66,7 +66,7 @@ export function PublicSignupFormOrganization({
         <Text marginBottom={2}>
           <FormattedMessage
             id="component.public-signup-form-organization.description"
-            defaultMessage="Fill out your organization’s profile that your customers will see in your communications."
+            defaultMessage="Fill out your organization's profile that your customers will see in your communications."
           />
         </Text>
         <FormControl id="company-name" isInvalid={isInvalid}>
@@ -144,12 +144,12 @@ function SelectLogoInput({
     <FormControl id="organizationLogo">
       <FormLabel marginBottom={3}>
         <FormattedMessage
-          id="component.public-signup-form-organization.organizationLogo-label"
+          id="component.public-signup-form-organization.organization-logo-label"
           defaultMessage="Logo"
         />
         <Text fontSize="sm" color="gray.600" fontWeight="normal">
           <FormattedMessage
-            id="component.public-signup-form-organization.organizationLogo-label-help"
+            id="component.public-signup-form-organization.organization-logo-label-help"
             defaultMessage="Attach an image you want to show in your emails."
           />
         </Text>
@@ -175,12 +175,12 @@ function SelectLogoInput({
         >
           {logo ? (
             <FormattedMessage
-              id="component.public-signup-form-organization.upload-other-organizationLogo-button"
+              id="component.public-signup-form-organization.upload-other-organization-logo-button"
               defaultMessage="Upload another logo"
             />
           ) : (
             <FormattedMessage
-              id="component.public-signup-form-organization.upload-organizationLogo-button"
+              id="component.public-signup-form-organization.upload-organization-logo-button"
               defaultMessage="Upload logo"
             />
           )}
@@ -190,7 +190,7 @@ function SelectLogoInput({
             logo.name
           ) : (
             <FormattedMessage
-              id="component.public-signup-form-organization.upload-organizationLogo-text"
+              id="component.public-signup-form-organization.upload-organization-logo-text"
               defaultMessage="(PNG file of size up {size})"
               values={{
                 size: fileSize(intl, maxSize),
@@ -202,7 +202,7 @@ function SelectLogoInput({
       {isMaxSizeExceeded && (
         <Text fontSize="sm" color="red.600" paddingTop={4}>
           <FormattedMessage
-            id="component.public-signup-form-organization.upload-organizationLogo-size-error"
+            id="component.public-signup-form-organization.upload-organization-logo-size-error"
             defaultMessage="File too heavy. Attach a file up to {size}"
             values={{
               size: fileSize(intl, maxSize),

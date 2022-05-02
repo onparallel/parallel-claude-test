@@ -23,7 +23,7 @@ Below, PARALLEL SOLUTIONS, S.L lists the types of cookies used on the website, a
 
 ## Uninstalling Cookies
 
-On occasions, your browser may generate an instant message offering you the possibility of not installing these cookies. If your browser does not provide you with this possibility automatically, you can stop the installation of these cookies by following your browser’s instructions.
+On occasions, your browser may generate an instant message offering you the possibility of not installing these cookies. If your browser does not provide you with this possibility automatically, you can stop the installation of these cookies by following your browser's instructions.
 
 You can allow, discover, block or remove the cookies installed on your PC/device by configuring the options of the browser installed on your PC.
 

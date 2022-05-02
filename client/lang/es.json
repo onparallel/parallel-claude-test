@@ -1282,7 +1282,7 @@
   {
     "term": "component.notification-signature-cancelled.no-credits-left.body",
     "definition": "No se ha podido iniciar el proceso de firma digital por haber alcanzado el límite de firmas.",
-    "context": "The eSignature could not be started because you reached your plan’s limit."
+    "context": "The eSignature could not be started because you reached your plan's limit."
   },
   {
     "term": "component.notification-signature-completed.body",
@@ -1340,7 +1340,7 @@
     "context": "Others"
   },
   {
-    "term": "component.notifications-select.SHARED",
+    "term": "component.notifications-select.shared",
     "definition": "Compartidos",
     "context": "Shared"
   },
@@ -2557,12 +2557,12 @@
   {
     "term": "component.public-signup-form-inbox.description-one",
     "definition": "Hemos mandado un correo de verificación a <b>{email}</b>. Esto nos ayudará a que tu cuenta sea lo más segura posible.",
-    "context": "We’ve sent a verification email to <b>{email}</b>. This will help to make your account as secure as possible."
+    "context": "We've sent a verification email to <b>{email}</b>. This will help to make your account as secure as possible."
   },
   {
     "term": "component.public-signup-form-inbox.description-two",
     "definition": "¿No encuentras nuestro mail? Revisa la bandeja de spam y si no está ponte en contacto con nuestro <Link>Equipo de soporte</Link>.",
-    "context": "Didn’t receive our email? Check your spam folder and if you don’t found it contact with our <Link>Support team</Link>."
+    "context": "Didn't receive our email? Check your spam folder and if you don't found it contact with our <Link>Support team</Link>."
   },
   {
     "term": "component.public-signup-form-inbox.heading",
@@ -2587,7 +2587,7 @@
   {
     "term": "component.public-signup-form-name.heading",
     "definition": "¿Cómo te llamas?",
-    "context": "What’s your name?"
+    "context": "What's your name?"
   },
   {
     "term": "component.public-signup-form-name.invalid-first-name-error",
@@ -2617,7 +2617,7 @@
   {
     "term": "component.public-signup-form-organization.description",
     "definition": "Completa el perfil de tu organización que verán tus clientes en tus comunicaciones.",
-    "context": "Fill out your organization’s profile that your customers will see in your communications."
+    "context": "Fill out your organization's profile that your customers will see in your communications."
   },
   {
     "term": "component.public-signup-form-organization.heading",
@@ -2630,12 +2630,12 @@
     "context": "Please, enter a company name"
   },
   {
-    "term": "component.public-signup-form-organization.organizationLogo-label",
+    "term": "component.public-signup-form-organization.organization-logo-label",
     "definition": "Logotipo",
     "context": "Logo"
   },
   {
-    "term": "component.public-signup-form-organization.organizationLogo-label-help",
+    "term": "component.public-signup-form-organization.organization-logo-label-help",
     "definition": "Adjunta una imagen que quieras que mostremos en tus correos.",
     "context": "Attach an image you want to show in your emails."
   },
@@ -2645,22 +2645,22 @@
     "context": "Remove image"
   },
   {
-    "term": "component.public-signup-form-organization.upload-organizationLogo-button",
+    "term": "component.public-signup-form-organization.upload-organization-logo-button",
     "definition": "Subir logotipo",
     "context": "Upload logo"
   },
   {
-    "term": "component.public-signup-form-organization.upload-organizationLogo-size-error",
+    "term": "component.public-signup-form-organization.upload-organization-logo-size-error",
     "definition": "Archivo demasiado pesado. Adjunte un archivo de hasta {size}",
     "context": "File too heavy. Attach a file up to {size}"
   },
   {
-    "term": "component.public-signup-form-organization.upload-organizationLogo-text",
+    "term": "component.public-signup-form-organization.upload-organization-logo-text",
     "definition": "(Archivo PNG de hasta {size})",
     "context": "(PNG file of size up {size})"
   },
   {
-    "term": "component.public-signup-form-organization.upload-other-organizationLogo-button",
+    "term": "component.public-signup-form-organization.upload-other-organization-logo-button",
     "definition": "Subir otro logotipo",
     "context": "Upload another logo"
   },
@@ -5410,7 +5410,7 @@
     "context": "Customization"
   },
   {
-    "term": "page.pricing.Encrypted storage",
+    "term": "page.pricing.encrypted-storage",
     "definition": "Encriptación de archivos",
     "context": "Encrypted storage"
   },
@@ -6432,7 +6432,7 @@
   {
     "term": "public-petition-email-sent.body.explanation-2",
     "definition": "¿No encuentras nuestro correo? Revisa la bandeja de spam y si no está ponte en contacto con la persona que te haya compartido el enlace.",
-    "context": "Can’t find our email? Check your spam folder and if you don’t find it contact with the person who shared you the link."
+    "context": "Can't find our email? Check your spam folder and if you don't find it contact with the person who shared you the link."
   },
   {
     "term": "public-petition-email-sent.title",
@@ -6447,7 +6447,7 @@
   {
     "term": "public-petition-reminder.body.explanation-2",
     "definition": "¿No encuentras nuestro correo? Revisa la bandeja de spam y si no está ponte en contacto con la persona que te haya compartido el enlace.",
-    "context": "Can’t find our email? Check your spam folder and if you still can't find it contact with the person who shared you the link."
+    "context": "Can't find our email? Check your spam folder and if you still can't find it contact with the person who shared you the link."
   },
   {
     "term": "public-petition-reminder.title",
@@ -7372,12 +7372,12 @@
   {
     "term": "public.law-firms.hero-subtitle",
     "definition": "Aumenta las horas facturables de tu equipo, ofreciéndoles una herramienta que se encargue de los procesos repetitivos y acelere el cierre de los asuntos.",
-    "context": "Increase your team’s billable hours providing them with a tool that takes care of repetitive processes and accelerates their project completion."
+    "context": "Increase your team's billable hours providing them with a tool that takes care of repetitive processes and accelerates their project completion."
   },
   {
     "term": "public.law-firms.hero-title",
     "definition": "Aumenta la facturación y el retorno de tu equipo",
-    "context": "Increase your team’s billing and return"
+    "context": "Increase your team's billing and return"
   },
   {
     "term": "public.law-firms.meta-description",
@@ -7827,7 +7827,7 @@
   {
     "term": "public.product.request-information.create",
     "definition": "Es muy sencillo, utiliza diferentes tipos de campos para preparar el listado de información que necesitas.",
-    "context": "It’s very simple, you can use different types of fields to prepare the list of information that you need."
+    "context": "It's very simple, you can use different types of fields to prepare the list of information that you need."
   },
   {
     "term": "public.product.request-information.create-templates",
@@ -8132,7 +8132,7 @@
   {
     "term": "public.real-estate.hero-subtitle",
     "definition": "Parallel es el software que acelera los procesos de inicio a fin, desde el mandato del propietario, pasando por las visitas de los compradores, hasta la firma del contrato de compraventa, de forma fácil, totalmente segura e instantánea.",
-    "context": "Parallel is the software that accelerates the processes from end to end, including the owner’s mandate, buyers visit sheets, and the signature of the purchase agreement. Everything in an easy, totally secure and instant way."
+    "context": "Parallel is the software that accelerates the processes from end to end, including the owner's mandate, buyers visit sheets, and the signature of the purchase agreement. Everything in an easy, totally secure and instant way."
   },
   {
     "term": "public.real-estate.hero-title",

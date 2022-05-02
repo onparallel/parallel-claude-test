@@ -51,7 +51,7 @@ export function PublicPetitionEmailSent({
           <Text>
             <FormattedMessage
               id="public-petition-email-sent.body.explanation-2"
-              defaultMessage="Can’t find our email? Check your spam folder and if you don’t find it contact with the person who shared you the link."
+              defaultMessage="Can't find our email? Check your spam folder and if you don't find it contact with the person who shared you the link."
             />
           </Text>
         </Stack>

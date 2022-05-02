@@ -15,7 +15,7 @@ export function PublicSignupFormInbox({ email }: { email: string }) {
       <Text>
         <FormattedMessage
           id="component.public-signup-form-inbox.description-one"
-          defaultMessage="We’ve sent a verification email to <b>{email}</b>. This will help to make your account as secure as possible."
+          defaultMessage="We've sent a verification email to <b>{email}</b>. This will help to make your account as secure as possible."
           values={{
             email,
             b: (chunks: any[]) => <Text as="b">{chunks}</Text>,
@@ -25,7 +25,7 @@ export function PublicSignupFormInbox({ email }: { email: string }) {
       <Text>
         <FormattedMessage
           id="component.public-signup-form-inbox.description-two"
-          defaultMessage="Didn’t receive our email? Check your spam folder and if you don’t found it contact with our <Link>Support team</Link>."
+          defaultMessage="Didn't receive our email? Check your spam folder and if you don't found it contact with our <Link>Support team</Link>."
           values={{
             Link: (chunks: any[]) => (
               <SupportLink

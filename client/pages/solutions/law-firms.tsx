@@ -25,12 +25,12 @@ export default function LawFirms() {
     ratio: 1394 / 976,
     title: intl.formatMessage({
       id: "public.law-firms.hero-title",
-      defaultMessage: "Increase your team’s billing and return",
+      defaultMessage: "Increase your team's billing and return",
     }),
     subtitle: intl.formatMessage({
       id: "public.law-firms.hero-subtitle",
       defaultMessage:
-        "Increase your team’s billable hours providing them with a tool that takes care of repetitive processes and accelerates their project completion.",
+        "Increase your team's billable hours providing them with a tool that takes care of repetitive processes and accelerates their project completion.",
     }),
     buttonText: intl.formatMessage({
       id: "public.book-demo-button",

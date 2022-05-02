@@ -30,7 +30,7 @@ export default function RealEstate() {
     subtitle: intl.formatMessage({
       id: "public.real-estate.hero-subtitle",
       defaultMessage:
-        "Parallel is the software that accelerates the processes from end to end, including the owner’s mandate, buyers visit sheets, and the signature of the purchase agreement. Everything in an easy, totally secure and instant way.",
+        "Parallel is the software that accelerates the processes from end to end, including the owner's mandate, buyers visit sheets, and the signature of the purchase agreement. Everything in an easy, totally secure and instant way.",
     }),
     buttonText: intl.formatMessage({
       id: "public.book-demo-button",

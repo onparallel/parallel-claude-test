@@ -29,7 +29,7 @@ export const SignatureCancelledUserNotification = Object.assign(
           {notification.errorCode === "INSUFFICIENT_SIGNATURE_CREDITS" ? (
             <FormattedMessage
               id="component.notification-signature-cancelled.no-credits-left.body"
-              defaultMessage="The eSignature could not be started because you reached your plan’s limit."
+              defaultMessage="The eSignature could not be started because you reached your plan's limit."
             />
           ) : notification.errorCode === "EMAIL_BOUNCED" ? (
             <FormattedMessage

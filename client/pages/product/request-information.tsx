@@ -54,7 +54,7 @@ export default function Request() {
           <Text marginBottom={2}>
             <FormattedMessage
               id="public.product.request-information.create"
-              defaultMessage="It’s very simple, you can use different types of fields to prepare the list of information that you need."
+              defaultMessage="It's very simple, you can use different types of fields to prepare the list of information that you need."
             />
           </Text>
         </PublicVideoShowcase>

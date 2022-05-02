@@ -6,12 +6,12 @@ export function WhatsParallel() {
     <MjmlSection>
       <MjmlColumn>
         <MjmlText fontSize="16px" fontWeight={600} paddingTop="20px" paddingBottom={0}>
-          <FormattedMessage id="component.whats-parallel.title" defaultMessage="What’s Parallel?" />
+          <FormattedMessage id="component.whats-parallel.title" defaultMessage="What's Parallel?" />
         </MjmlText>
         <MjmlText fontSize="14px" paddingBottom="14px">
           <FormattedMessage
             id="component.whats-parallel.body"
-            defaultMessage="Parallel is a platform that will help you manage your client’s documentation and information in an agile and secure way."
+            defaultMessage="Parallel is a platform that will help you manage your client's documentation and information in an agile and secure way."
           />
         </MjmlText>
         <MjmlText fontSize="14px">

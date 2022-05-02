@@ -46,7 +46,7 @@ export const NotificationsFilterSelect = forwardRef<
       },
       {
         label: intl.formatMessage({
-          id: "component.notifications-select.SHARED",
+          id: "component.notifications-select.shared",
           defaultMessage: "Shared",
         }),
         value: "SHARED",

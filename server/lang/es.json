@@ -57,7 +57,7 @@
   {
     "term": "component.whats-parallel.body",
     "definition": "Parallel es una plataforma que te ayudará a gestionar la documentación e información de tus clientes de forma ágil y segura.",
-    "context": "Parallel is a platform that will help you manage your client’s documentation and information in an agile and secure way."
+    "context": "Parallel is a platform that will help you manage your client's documentation and information in an agile and secure way."
   },
   {
     "term": "component.whats-parallel.contact",
@@ -67,7 +67,7 @@
   {
     "term": "component.whats-parallel.title",
     "definition": "¿Qué es Parallel?",
-    "context": "What’s Parallel?"
+    "context": "What's Parallel?"
   },
   {
     "term": "component.why-we-use-parallel.autosave-body",
@@ -562,7 +562,7 @@
   {
     "term": "signature-cancelled-no-credits-left.subject",
     "definition": "Firma no iniciada por haber alcanzado el límite de firmas",
-    "context": "eSignature couldn’t be started"
+    "context": "eSignature couldn't be started"
   },
   {
     "term": "signature-cancelled.subject",

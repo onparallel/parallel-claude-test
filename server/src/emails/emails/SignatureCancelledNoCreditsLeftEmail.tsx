@@ -25,7 +25,7 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
   subject(_, intl: IntlShape) {
     return intl.formatMessage({
       id: "signature-cancelled-no-credits-left.subject",
-      defaultMessage: "eSignature couldn’t be started",
+      defaultMessage: "eSignature couldn't be started",
     });
   },
   text(

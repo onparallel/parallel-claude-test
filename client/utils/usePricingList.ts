@@ -129,7 +129,7 @@ export function usePricingList(): PricingListCategory[] {
           },
           {
             label: intl.formatMessage({
-              id: "page.pricing.Encrypted storage",
+              id: "page.pricing.encrypted-storage",
               defaultMessage: "Encrypted storage",
             }),
             plan: "FREE",

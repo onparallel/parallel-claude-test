@@ -48,7 +48,7 @@ export function PublicPetitionReminder({
           <Text>
             <FormattedMessage
               id="public-petition-reminder.body.explanation-2"
-              defaultMessage="Can’t find our email? Check your spam folder and if you still can't find it contact with the person who shared you the link."
+              defaultMessage="Can't find our email? Check your spam folder and if you still can't find it contact with the person who shared you the link."
             />
           </Text>
         </Stack>

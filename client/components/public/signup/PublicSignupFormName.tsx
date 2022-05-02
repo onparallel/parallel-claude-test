@@ -46,7 +46,7 @@ export function PublicSignupFormName({ onNext }: PublicSignupFormNameProps) {
         <Text as="h1" fontSize="2xl" fontWeight="bold" marginTop={0}>
           <FormattedMessage
             id="component.public-signup-form-name.heading"
-            defaultMessage="What’s your name?"
+            defaultMessage="What's your name?"
           />
         </Text>
         <Text marginBottom={2}>
