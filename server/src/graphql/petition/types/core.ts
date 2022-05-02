@@ -3,7 +3,7 @@ import { arg, enumType, inputObjectType, interfaceType, objectType } from "nexus
 import { minBy } from "remeda";
 import { fullName } from "../../../util/fullName";
 import { toGlobalId } from "../../../util/globalId";
-import { isDownloadableReply } from "../../../util/isDownloadableReply";
+import { isFileTypeField } from "../../../util/isFileTypeField";
 import { safeJsonParse } from "../../../util/safeJsonParse";
 import { toHtml, toPlainText } from "../../../util/slate";
 
@@ -725,7 +725,7 @@ export const PetitionFieldReply = objectType({
     t.jsonObject("content", {
       description: "The content of the reply.",
       resolve: async (root, _, ctx) => {
-        if (isDownloadableReply(root.type)) {
+        if (isFileTypeField(root.type)) {
           const file = await ctx.files.loadFileUpload(root.content["file_upload_id"]);
           return file
             ? {

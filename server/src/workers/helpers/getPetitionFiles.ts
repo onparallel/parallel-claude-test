@@ -4,7 +4,7 @@ import { PetitionExcelExport } from "../../api/helpers/PetitionExcelExport";
 import { WorkerContext } from "../../context";
 import { ZipFileInput } from "../../util/createZipFile";
 import { evaluateFieldVisibility } from "../../util/fieldVisibility";
-import { isDownloadableReply } from "../../util/isDownloadableReply";
+import { isFileTypeField } from "../../util/isFileTypeField";
 import { sanitizeFilenameWithSuffix } from "../../util/sanitizeFilenameWithSuffix";
 
 const placeholders = ["field-number", "field-title", "file-name"] as const;
@@ -34,7 +34,7 @@ export async function* getPetitionFiles(
     .filter(([, isVisible]) => isVisible)
     .map(([field]) => field);
 
-  const fileReplies = fieldReplies.flat().filter((r) => isDownloadableReply(r.type));
+  const fileReplies = fieldReplies.flat().filter((r) => isFileTypeField(r.type));
 
   const files = await ctx.files.loadFileUpload(
     fileReplies.map((reply) => reply.content["file_upload_id"])
@@ -52,7 +52,7 @@ export async function* getPetitionFiles(
     ? 1
     : Math.max(
         Math.min(
-          visibleFields.filter((f) => f.type !== "HEADING" && !isDownloadableReply(f.type)).length,
+          visibleFields.filter((f) => f.type !== "HEADING" && !isFileTypeField(f.type)).length,
           1
         ) +
           fileReplies.length +
@@ -69,7 +69,7 @@ export async function* getPetitionFiles(
   for (const field of visibleFields) {
     if (field.type === "HEADING") {
       headingCount++;
-    } else if (isDownloadableReply(field.type) && !options.xlsxOnly) {
+    } else if (isFileTypeField(field.type) && !options.xlsxOnly) {
       for (const reply of field.replies) {
         const file = filesById[reply.content["file_upload_id"]];
         if (file?.upload_complete) {
@@ -98,7 +98,7 @@ export async function* getPetitionFiles(
           await options.onProgress?.(++processedFiles / totalFiles);
         }
       }
-    } else if (!isDownloadableReply(field.type)) {
+    } else if (!isFileTypeField(field.type)) {
       excelWorkbook.addPetitionFieldReply(field, field.replies);
     }
 

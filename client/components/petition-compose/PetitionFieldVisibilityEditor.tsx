@@ -34,6 +34,7 @@ import {
   PetitionFieldVisibilityType,
   PseudoPetitionFieldVisibilityConditionOperator,
 } from "@parallel/utils/fieldVisibility/types";
+import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { FieldOptions, getDynamicSelectValues } from "@parallel/utils/petitionFields";
 import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuList";
 import { ValueProps } from "@parallel/utils/ValueProps";
@@ -294,21 +295,20 @@ function ConditionMultipleFieldModifier({
   const options = useSimpleSelectOptions<PetitionFieldVisibilityConditionModifier>(
     (intl) => {
       if (
-        field.type === "FILE_UPLOAD" ||
+        isFileTypeField(field.type) ||
         (field.type === "DYNAMIC_SELECT" && condition.column === undefined)
       ) {
         return [
           {
-            label:
-              field.type === "FILE_UPLOAD"
-                ? intl.formatMessage({
-                    id: "component.petition-field-visibility-editor.number-of-files",
-                    defaultMessage: "no. of files",
-                  })
-                : intl.formatMessage({
-                    id: "component.petition-field-visibility-editor.number-of-replies",
-                    defaultMessage: "no. of replies",
-                  }),
+            label: isFileTypeField(field.type)
+              ? intl.formatMessage({
+                  id: "component.petition-field-visibility-editor.number-of-files",
+                  defaultMessage: "no. of files",
+                })
+              : intl.formatMessage({
+                  id: "component.petition-field-visibility-editor.number-of-replies",
+                  defaultMessage: "no. of replies",
+                }),
             value: "NUMBER_OF_REPLIES",
           },
         ];
@@ -502,7 +502,7 @@ function ConditionPredicate({
             value: "NOT_EQUAL",
           }
         );
-      } else if (field.type !== "FILE_UPLOAD" && field.type !== "DYNAMIC_SELECT") {
+      } else if (!isFileTypeField(field.type) && field.type !== "DYNAMIC_SELECT") {
         options.push(
           {
             label: intl.formatMessage(

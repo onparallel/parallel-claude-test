@@ -25,7 +25,7 @@ import {
 } from "../../../db/__types";
 import { unMaybeArray } from "../../../util/arrays";
 import { fromGlobalId, toGlobalId } from "../../../util/globalId";
-import { isDownloadableReply } from "../../../util/isDownloadableReply";
+import { isFileTypeField } from "../../../util/isFileTypeField";
 import { getRequiredPetitionSendCredits } from "../../../util/organizationUsageLimits";
 import { withError } from "../../../util/promises/withError";
 import { hash, random } from "../../../util/token";
@@ -1132,7 +1132,7 @@ export const fileUploadReplyDownloadLink = mutationField("fileUploadReplyDownloa
   resolve: async (_, args, ctx) => {
     try {
       const reply = await ctx.petitions.loadFieldReply(args.replyId);
-      if (!isDownloadableReply(reply!.type)) {
+      if (!isFileTypeField(reply!.type)) {
         throw new WhitelistedError(
           `${reply!.type} replies can not be downloaded`,
           "INVALID_FIELD_TYPE"

@@ -10,7 +10,7 @@ import { completedFieldReplies } from "../../util/completedFieldReplies";
 import { evaluateFieldVisibility, PetitionFieldVisibility } from "../../util/fieldVisibility";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { fromGlobalId } from "../../util/globalId";
-import { isDownloadableReply } from "../../util/isDownloadableReply";
+import { isFileTypeField } from "../../util/isFileTypeField";
 import { keyBuilder } from "../../util/keyBuilder";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import { calculateNextReminder, PetitionAccessReminderConfig } from "../../util/reminderUtils";
@@ -538,7 +538,7 @@ export class PetitionRepository extends BaseRepository {
 
       const fileUploadIds = uniq(
         fieldReplies
-          .filter((r) => isDownloadableReply(r.type) && r.content?.file_upload_id)
+          .filter((r) => isFileTypeField(r.type) && r.content?.file_upload_id)
           .map((r) => r.content.file_upload_id as number)
       );
 
@@ -556,7 +556,7 @@ export class PetitionRepository extends BaseRepository {
             .map((reply) => {
               // for FILE_UPLOADs, we need to make sure the file was correctly uploaded before counting it as a submitted reply
               const file =
-                isDownloadableReply(reply.type) && isDefined(reply.content?.file_upload_id)
+                isFileTypeField(reply.type) && isDefined(reply.content?.file_upload_id)
                   ? uploadedFiles.find((f) => f.id === reply.content!.file_upload_id)
                   : undefined;
 
@@ -1527,7 +1527,7 @@ export class PetitionRepository extends BaseRepository {
       throw new Error("Petition field reply not found");
     }
 
-    if (isDownloadableReply(reply.type)) {
+    if (isFileTypeField(reply.type)) {
       await this.safeDeleteFileUpload(reply.content["file_upload_id"], deletedBy);
     }
 
@@ -1906,7 +1906,7 @@ export class PetitionRepository extends BaseRepository {
       await this.loadRepliesForField(Object.keys(newFieldsMap).map((v) => parseInt(v)))
     ).flat();
     if (replies.length > 0) {
-      const [fileReplies, otherReplies] = partition(replies, (r) => isDownloadableReply(r.type));
+      const [fileReplies, otherReplies] = partition(replies, (r) => isFileTypeField(r.type));
       // for downloadable replies, we have to make a copy of the file_upload entry
       const newFileReplies = await pMap(fileReplies, async (r) => ({
         ...r,

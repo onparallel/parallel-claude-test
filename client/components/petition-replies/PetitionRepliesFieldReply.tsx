@@ -9,7 +9,7 @@ import {
 import { getMyId } from "@parallel/utils/apollo/getMyId";
 import { FORMATS } from "@parallel/utils/dates";
 import { formatNumberWithPrefix } from "@parallel/utils/formatNumberWithPrefix";
-import { isDownloadableReply } from "@parallel/utils/isDownloadableReply";
+import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useIsGlobalKeyDown } from "@parallel/utils/useIsGlobalKeyDown";
 import { useIsMouseOver } from "@parallel/utils/useIsMouseOver";
@@ -66,7 +66,7 @@ export function PetitionRepliesFieldReply({
           />
         ) : reply.field!.type === "PHONE" ? (
           <CopyToClipboardButton size="xs" text={reply.content.value} />
-        ) : isDownloadableReply(reply.field!.type) ? (
+        ) : isFileTypeField(reply.field!.type) ? (
           <ReplyDownloadButton
             isDisabled={reply.content.uploadComplete === false}
             contentType={reply.content.contentType}
@@ -125,7 +125,7 @@ export function PetitionRepliesFieldReply({
           </Text>
         ) : reply.field!.type === "PHONE" ? (
           <BreakLines>{reply.content.value}</BreakLines>
-        ) : isDownloadableReply(reply.field!.type) ? (
+        ) : isFileTypeField(reply.field!.type) ? (
           <Box>
             <VisuallyHidden>
               {intl.formatMessage({

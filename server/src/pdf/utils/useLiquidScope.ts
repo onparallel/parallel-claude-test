@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { useMemo } from "react";
 import { isDefined, zip } from "remeda";
-import { isDownloadableReply } from "../../util/isDownloadableReply";
+import { isFileTypeField } from "../../util/isFileTypeField";
 import { useLiquidScope_PetitionBaseFragment } from "../__types";
 import { getFieldIndices } from "./fieldIndices";
 
@@ -16,7 +16,7 @@ export function useLiquidScope(petition: useLiquidScope_PetitionBaseFragment) {
         : replies.length > 0
         ? replies.at(-1)!.content.value
         : undefined;
-      if (field.type !== "HEADING" && !isDownloadableReply(field.type)) {
+      if (field.type !== "HEADING" && !isFileTypeField(field.type)) {
         scope._[fieldIndex] = value;
         if (isDefined(field.alias)) {
           scope[field.alias] = value;

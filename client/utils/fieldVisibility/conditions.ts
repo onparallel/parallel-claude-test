@@ -1,5 +1,6 @@
 import { PetitionField } from "@parallel/graphql/__types";
 import { format } from "date-fns";
+import { isFileTypeField } from "../isFileTypeField";
 import { FieldOptions, getFirstDynamicSelectValue } from "../petitionFields";
 import {
   PetitionFieldVisibilityCondition,
@@ -15,7 +16,7 @@ export function defaultCondition<T extends Pick<PetitionField, "id" | "type" | "
 ): PetitionFieldVisibilityCondition {
   const [field, column] = Array.isArray(value) ? value : [value];
   const isOnlyHasReplies =
-    field.type === "FILE_UPLOAD" || (field.type === "DYNAMIC_SELECT" && column === undefined);
+    isFileTypeField(field.type) || (field.type === "DYNAMIC_SELECT" && column === undefined);
   return {
     fieldId: field.id,
     modifier: isOnlyHasReplies ? "NUMBER_OF_REPLIES" : "ANY",
@@ -37,7 +38,7 @@ function defaultConditionFieldValue<T extends Pick<PetitionField, "id" | "type" 
   field: T,
   column?: number
 ): number | string | null {
-  if (field.type === "FILE_UPLOAD" || (field.type === "DYNAMIC_SELECT" && column === undefined)) {
+  if (isFileTypeField(field.type) || (field.type === "DYNAMIC_SELECT" && column === undefined)) {
     return 0;
   } else if (field.type === "SELECT") {
     return (field.options as FieldOptions["SELECT"]).values[0] ?? null;

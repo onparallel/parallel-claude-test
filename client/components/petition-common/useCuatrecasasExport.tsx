@@ -10,7 +10,7 @@ import {
   useCuatrecasasExport_updatePetitionMetadataDocument,
   useCuatrecasasExport_updateSignatureRequestMetadataDocument,
 } from "@parallel/graphql/__types";
-import { isDownloadableReply } from "@parallel/utils/isDownloadableReply";
+import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { useBackgroundTask } from "@parallel/utils/useBackgroundTask";
 import { MutableRefObject, useRef } from "react";
 import { useAlreadyExportedDialog } from "./dialogs/AlreadyExportedDialog";
@@ -188,7 +188,7 @@ function useExportFieldReply(clientId: string, refs: ExportRefs) {
     },
     opts: Omit<ExportOpts, "filename"> & { filename: string }
   ) => {
-    if (isDownloadableReply(field.type)) {
+    if (isFileTypeField(field.type)) {
       if (reply.metadata.EXTERNAL_ID_CUATRECASAS) {
         if (!refs.dontAskAgain.current) {
           const result = await showAlreadyExported({

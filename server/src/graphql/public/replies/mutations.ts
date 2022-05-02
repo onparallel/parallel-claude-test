@@ -4,7 +4,7 @@ import { isDefined } from "remeda";
 import { RESULT } from "../..";
 import { getBaseWebhookUrl } from "../../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../../util/globalId";
-import { isDownloadableReply } from "../../../util/isDownloadableReply";
+import { isFileTypeField } from "../../../util/isFileTypeField";
 import { sign } from "../../../util/jwt";
 import { random } from "../../../util/token";
 import { and, chain } from "../../helpers/authorize";
@@ -215,7 +215,7 @@ export const publicFileUploadReplyDownloadLink = mutationField(
     resolve: async (_, args, ctx) => {
       try {
         const reply = await ctx.petitions.loadFieldReply(args.replyId);
-        if (!isDownloadableReply(reply!.type)) {
+        if (!isFileTypeField(reply!.type)) {
           throw new Error("Invalid field type");
         }
         const file = await ctx.files.loadFileUpload(reply!.content["file_upload_id"]);

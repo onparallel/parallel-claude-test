@@ -3,7 +3,7 @@ import { arg, core, enumType, inputObjectType, objectType, unionType } from "nex
 import { isDefined } from "remeda";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
-import { isDownloadableReply } from "../../util/isDownloadableReply";
+import { isFileTypeField } from "../../util/isFileTypeField";
 import { safeJsonParse } from "../../util/safeJsonParse";
 import { toHtml } from "../../util/slate";
 
@@ -407,7 +407,7 @@ export const PublicPetitionFieldReply = objectType({
     t.jsonObject("content", {
       description: "The public content of the reply",
       resolve: async (root, _, ctx) => {
-        if (isDownloadableReply(root.type)) {
+        if (isFileTypeField(root.type)) {
           const file = await ctx.files.loadFileUpload(root.content["file_upload_id"]);
           return file
             ? {

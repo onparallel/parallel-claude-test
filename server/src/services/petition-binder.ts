@@ -9,7 +9,7 @@ import { isDefined, zip } from "remeda";
 import { FileRepository } from "../db/repositories/FileRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { evaluateFieldVisibility } from "../util/fieldVisibility";
-import { isDownloadableReply } from "../util/isDownloadableReply";
+import { isFileTypeField } from "../util/isFileTypeField";
 import { pFlatMap } from "../util/promises/pFlatMap";
 import { random } from "../util/token";
 import { MaybePromise } from "../util/types";
@@ -238,7 +238,7 @@ export class PetitionBinder implements IPetitionBinder {
     )
       .filter(
         ([field, isVisible]) =>
-          isVisible && isDownloadableReply(field.type) && !!field.options.attachToPdf
+          isVisible && isFileTypeField(field.type) && !!field.options.attachToPdf
       )
       .map(([field]) => field);
 
