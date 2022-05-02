@@ -1528,7 +1528,7 @@ export class PetitionRepository extends BaseRepository {
     }
 
     if (isFileTypeField(reply.type)) {
-      await this.safeDeleteFileUpload(reply.content["file_upload_id"], deletedBy);
+      await this.files.deleteFileUpload(reply.content["file_upload_id"], deletedBy);
     }
 
     await Promise.all([

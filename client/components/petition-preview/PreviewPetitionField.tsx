@@ -249,6 +249,7 @@ export function PreviewPetitionField({
       onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
       onRefreshField={() => refetch({ fieldId: field.id, petitionId })}
       isCacheOnly={isCacheOnly}
+      view="preview"
     />
   ) : null;
 }

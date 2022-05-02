@@ -255,6 +255,7 @@ export function RecipientViewPetitionField({ tone, ...props }: RecipientViewPeti
       onDownloadReply={handleDownloadFileUploadReply}
       onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
       onRefreshField={() => refetch({ fieldId: props.field.id, keycode: props.keycode })}
+      view="recipient"
     />
   ) : null;
 }

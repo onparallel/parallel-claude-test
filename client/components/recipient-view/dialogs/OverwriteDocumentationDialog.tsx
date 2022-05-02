@@ -5,15 +5,7 @@ import { useRef } from "react";
 import { FormattedMessage } from "react-intl";
 import { DialogProps, useDialog } from "../../common/dialogs/DialogProvider";
 
-type NewSignerInfo = {
-  firstName: string;
-  lastName: string;
-  email: string;
-};
-function OverwriteDocumentationDialog({
-  tone,
-  ...props
-}: DialogProps<{ tone: Tone }, NewSignerInfo>) {
+function OverwriteDocumentationDialog({ tone, ...props }: DialogProps<{ tone: Tone }>) {
   const focusRef = useRef(null);
   return (
     <ConfirmDialog
@@ -36,7 +28,7 @@ function OverwriteDocumentationDialog({
       confirm={
         <Button ref={focusRef} colorScheme="purple" onClick={() => props.onResolve()}>
           <FormattedMessage
-            id="gcomponents.overwrite-documentation-dialog.confirm-button"
+            id="components.overwrite-documentation-dialog.confirm-button"
             defaultMessage="Yes, start again"
           />
         </Button>

@@ -3765,6 +3765,11 @@
     "context": "An upload has already been completed. If you continue, you will return to the initial process and the current documentation will be overwritten. Are you sure you want to start over?"
   },
   {
+    "term": "components.overwrite-documentation-dialog.confirm-button",
+    "definition": "Yes, start again",
+    "context": "Yes, start again"
+  },
+  {
     "term": "components.overwrite-documentation-dialog.header",
     "definition": "Overwrite documentation",
     "context": "Overwrite documentation"
@@ -4128,11 +4133,6 @@
     "term": "footer.slogan",
     "definition": "Work better with",
     "context": "Work better with"
-  },
-  {
-    "term": "gcomponents.overwrite-documentation-dialog.confirm-button",
-    "definition": "Yes, start again",
-    "context": "Yes, start again"
   },
   {
     "term": "generic.accept",
