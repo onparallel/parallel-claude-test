@@ -263,6 +263,7 @@ const _PetitionField = {
         "NUMBER",
         "DATE",
         "PHONE",
+        "ES_TAX_DOCUMENTS",
       ],
       description: "The type of the field",
       example: "TEXT",

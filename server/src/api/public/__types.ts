@@ -86,6 +86,11 @@ export type AccessOpenedEvent = PetitionEvent & {
   type: PetitionEventType;
 };
 
+export type AsyncFieldCompletionResponse = {
+  type: Scalars["String"];
+  url: Scalars["String"];
+};
+
 export type BulkSendSigningMode =
   /** Allow configured signer(s) to sign every petition on the batch */
   | "COPY_SIGNATURE_SETTINGS"
@@ -535,6 +540,8 @@ export type Mutation = {
   publicPetitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   publicSendReminder: Result;
   publicSendVerificationCode: VerificationCodeRequest;
+  /** Starts the completion of an async field */
+  publicStartAsyncFieldCompletion: AsyncFieldCompletionResponse;
   /** Update a petition field comment. */
   publicUpdatePetitionFieldComment: PublicPetitionFieldComment;
   /** Creates a reply on a petition field as recipient. */
@@ -574,6 +581,8 @@ export type Mutation = {
   shareSignaturitApiKey: SupportMethodResponse;
   /** Generates a download link for the signed PDF petition. */
   signedPetitionDownloadLink: FileUploadDownloadLinkResult;
+  /** Starts the completion of an async field */
+  startAsyncFieldCompletion: AsyncFieldCompletionResponse;
   startSignatureRequest: PetitionSignatureRequest;
   /** Switches automatic reminders for the specified petition accesses. */
   switchAutomaticReminders: Array<PetitionAccess>;
@@ -1105,6 +1114,11 @@ export type MutationpublicSendVerificationCodeArgs = {
   keycode: Scalars["ID"];
 };
 
+export type MutationpublicStartAsyncFieldCompletionArgs = {
+  fieldId: Scalars["GID"];
+  keycode: Scalars["ID"];
+};
+
 export type MutationpublicUpdatePetitionFieldCommentArgs = {
   content: Scalars["String"];
   keycode: Scalars["ID"];
@@ -1209,6 +1223,11 @@ export type MutationsignedPetitionDownloadLinkArgs = {
   downloadAuditTrail?: InputMaybe<Scalars["Boolean"]>;
   petitionSignatureRequestId: Scalars["GID"];
   preview?: InputMaybe<Scalars["Boolean"]>;
+};
+
+export type MutationstartAsyncFieldCompletionArgs = {
+  fieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
 };
 
 export type MutationstartSignatureRequestArgs = {

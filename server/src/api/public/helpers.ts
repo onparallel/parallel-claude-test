@@ -100,6 +100,7 @@ export function containsGraphQLError(error: ClientError, errorCode: string) {
 
 function mapFieldReplyContent(fieldType: PetitionFieldType, content: any) {
   switch (fieldType) {
+    case "ES_TAX_DOCUMENTS":
     case "FILE_UPLOAD":
       return content as {
         filename: string;
