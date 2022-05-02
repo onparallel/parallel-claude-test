@@ -317,7 +317,7 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip?token=${token}`,
+        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip/private?token=${token}`,
         userId,
       }),
     });

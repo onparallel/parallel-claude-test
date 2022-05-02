@@ -214,10 +214,6 @@ export function RecipientViewPetitionField({ tone, ...props }: RecipientViewPeti
     skip: true,
   });
 
-  async function handleRefreshField() {
-    await refetch({ fieldId: props.field.id, keycode: props.keycode });
-  }
-
   const commonProps = {
     onCommentsButtonClick: handleCommentsButtonClick,
     onDownloadAttachment: handleDownloadAttachment,
@@ -258,21 +254,10 @@ export function RecipientViewPetitionField({ tone, ...props }: RecipientViewPeti
       tone={tone}
       onDownloadReply={handleDownloadFileUploadReply}
       onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
-      onRefreshField={handleRefreshField}
+      onRefreshField={() => refetch({ fieldId: props.field.id, keycode: props.keycode })}
     />
   ) : null;
 }
-
-const _queries = [
-  gql`
-    query RecipientViewPetitionField_PublicPetitionField($keycode: ID!, $fieldId: GID!) {
-      publicPetitionField(keycode: $keycode, petitionFieldId: $fieldId) {
-        ...RecipientViewPetitionFieldCard_PublicPetitionField
-      }
-    }
-    ${RecipientViewPetitionFieldCard.fragments.PublicPetitionField}
-  `,
-];
 
 RecipientViewPetitionField.fragments = {
   PublicPetitionAccess: gql`
@@ -293,6 +278,17 @@ RecipientViewPetitionField.fragments = {
     }
   `,
 };
+
+const _queries = [
+  gql`
+    query RecipientViewPetitionField_PublicPetitionField($keycode: ID!, $fieldId: GID!) {
+      publicPetitionField(keycode: $keycode, petitionFieldId: $fieldId) {
+        ...RecipientViewPetitionFieldCard_PublicPetitionField
+      }
+    }
+    ${RecipientViewPetitionFieldCard.fragments.PublicPetitionField}
+  `,
+];
 
 RecipientViewPetitionField.mutations = [
   gql`

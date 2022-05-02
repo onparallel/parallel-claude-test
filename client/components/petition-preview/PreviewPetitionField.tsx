@@ -1,6 +1,7 @@
-import { gql, useApolloClient, useMutation } from "@apollo/client";
+import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
 import {
   PreviewPetitionField_petitionFieldAttachmentDownloadLinkDocument,
+  PreviewPetitionField_PetitionFieldDocument,
   PreviewPetitionField_PetitionFieldFragment,
   PreviewPetitionField_PetitionFieldReplyFragmentDoc,
   RecipientViewPetitionFieldFileUpload_fileUploadReplyDownloadLinkDocument,
@@ -30,6 +31,7 @@ import {
   useCreateFileUploadReply,
   useCreatePetitionFieldReply,
   useDeletePetitionReply,
+  useStartAsyncFieldCompletion,
   useUpdatePetitionFieldReply,
 } from "./clientMutations";
 import {
@@ -188,6 +190,20 @@ export function PreviewPetitionField({
     [downloadFileUploadReply]
   );
 
+  const startAsyncFieldCompletion = useStartAsyncFieldCompletion();
+
+  const handleStartAsyncFieldCompletion = async () => {
+    return await startAsyncFieldCompletion({
+      fieldId: field.id,
+      petitionId,
+      isCacheOnly,
+    });
+  };
+
+  const { refetch } = useQuery(PreviewPetitionField_PetitionFieldDocument, {
+    skip: true,
+  });
+
   const commonProps = {
     field: { ...field, replies: isCacheOnly ? field.previewReplies : field.replies },
     petitionId,
@@ -230,6 +246,8 @@ export function PreviewPetitionField({
       {...commonProps}
       tone={tone}
       onDownloadReply={handleDownloadFileUploadReply}
+      onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
+      onRefreshField={() => refetch({ fieldId: field.id, petitionId })}
       isCacheOnly={isCacheOnly}
     />
   ) : null;
@@ -254,6 +272,17 @@ PreviewPetitionField.fragments = {
     }
   `,
 };
+
+const _queries = [
+  gql`
+    query PreviewPetitionField_PetitionField($petitionId: GID!, $fieldId: GID!) {
+      petitionField(petitionId: $petitionId, petitionFieldId: $fieldId) {
+        ...PreviewPetitionField_PetitionField
+      }
+    }
+    ${PreviewPetitionField.fragments.PetitionField}
+  `,
+];
 
 PreviewPetitionField.mutations = [
   gql`

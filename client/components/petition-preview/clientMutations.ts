@@ -4,6 +4,7 @@ import {
   PreviewPetitionFieldMutations_createFileUploadReplyDocument,
   PreviewPetitionFieldMutations_createPetitionFieldReplyDocument,
   PreviewPetitionFieldMutations_deletePetitionReplyDocument,
+  PreviewPetitionFieldMutations_startAsyncFieldCompletionDocument,
   PreviewPetitionFieldMutations_updatePetitionFieldReplyDocument,
   PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragment,
   PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFieldFragmentDoc,
@@ -327,6 +328,64 @@ export function useCreateFileUploadReply() {
       }
     },
     [createFileUploadReply, createFileUploadReplyComplete]
+  );
+}
+
+const _startAsyncFieldCompletion = gql`
+  mutation PreviewPetitionFieldMutations_startAsyncFieldCompletion(
+    $petitionId: GID!
+    $fieldId: GID!
+  ) {
+    startAsyncFieldCompletion(petitionId: $petitionId, fieldId: $fieldId) {
+      type
+      url
+    }
+  }
+`;
+
+export function useStartAsyncFieldCompletion() {
+  const [startAsyncFieldCompletion] = useMutation(
+    PreviewPetitionFieldMutations_startAsyncFieldCompletionDocument
+  );
+
+  const apollo = useApolloClient();
+
+  return useCallback(
+    async function _startAsyncFieldCompletion({
+      petitionId,
+      fieldId,
+      isCacheOnly,
+    }: {
+      petitionId: string;
+      fieldId: string;
+      isCacheOnly?: boolean;
+    }) {
+      if (isCacheOnly) {
+        const id = `${fieldId}-${getRandomId()}`;
+        updatePreviewFieldReplies(apollo, fieldId, () => [
+          {
+            id,
+            __typename: "PetitionFieldReply",
+            status: "PENDING",
+            content: {
+              filename: "DatosFiscales.pdf",
+              size: 25000,
+              contentType: "application/pdf",
+              uploadComplete: true,
+            },
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        ]);
+        return { type: "CACHE", url: "" };
+      } else {
+        const { data } = await startAsyncFieldCompletion({
+          variables: { petitionId, fieldId: fieldId },
+        });
+        return data!.startAsyncFieldCompletion;
+      }
+    },
+    [startAsyncFieldCompletion]
   );
 }
 

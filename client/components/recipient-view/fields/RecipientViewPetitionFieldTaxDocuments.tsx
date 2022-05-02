@@ -72,7 +72,11 @@ export function RecipientViewPetitionFieldTaxDocuments({
       setState("FETCHING");
       const popup = await openNewWindow(async () => {
         const data = await onStartAsyncFieldCompletion();
-        return data!.url;
+        if (data.type === "CACHE") {
+          throw new Error("CLOSE");
+        } else {
+          return data!.url;
+        }
       }, centeredPopup({ height: 800, width: 700 }));
       window.addEventListener("message", (e) => {
         if (e.data.name === "success") {

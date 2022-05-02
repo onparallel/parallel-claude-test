@@ -614,6 +614,8 @@ export interface Mutation {
   shareSignaturitApiKey: SupportMethodResponse;
   /** Generates a download link for the signed PDF petition. */
   signedPetitionDownloadLink: FileUploadDownloadLinkResult;
+  /** Starts the completion of an async field */
+  startAsyncFieldCompletion: AsyncFieldCompletionResponse;
   startSignatureRequest: PetitionSignatureRequest;
   /** Switches automatic reminders for the specified petition accesses. */
   switchAutomaticReminders: Array<PetitionAccess>;
@@ -1258,6 +1260,11 @@ export interface MutationsignedPetitionDownloadLinkArgs {
   downloadAuditTrail?: InputMaybe<Scalars["Boolean"]>;
   petitionSignatureRequestId: Scalars["GID"];
   preview?: InputMaybe<Scalars["Boolean"]>;
+}
+
+export interface MutationstartAsyncFieldCompletionArgs {
+  fieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
 }
 
 export interface MutationstartSignatureRequestArgs {
@@ -8884,6 +8891,77 @@ export type PreviewPetitionField_PetitionFieldReplyFragment = {
   content: { [key: string]: any };
 };
 
+export type PreviewPetitionField_PetitionFieldQueryVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+}>;
+
+export type PreviewPetitionField_PetitionFieldQuery = {
+  petitionField: {
+    __typename?: "PetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    description?: string | null;
+    options: { [key: string]: any };
+    optional: boolean;
+    multiple: boolean;
+    isInternal: boolean;
+    commentCount: number;
+    unreadCommentCount: number;
+    hasCommentsEnabled: boolean;
+    previewReplies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      status: PetitionFieldReplyStatus;
+      content: { [key: string]: any };
+      createdAt: string;
+      updatedAt: string;
+    }>;
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      status: PetitionFieldReplyStatus;
+      content: { [key: string]: any };
+      createdAt: string;
+      updatedAt: string;
+    }>;
+    attachments: Array<{
+      __typename?: "PetitionFieldAttachment";
+      id: string;
+      file: {
+        __typename?: "FileUpload";
+        filename: string;
+        contentType: string;
+        size: number;
+        isComplete: boolean;
+      };
+    }>;
+    comments: Array<{
+      __typename?: "PetitionFieldComment";
+      id: string;
+      createdAt: string;
+      content: string;
+      isUnread: boolean;
+      isInternal: boolean;
+      isEdited: boolean;
+      author?:
+        | {
+            __typename?: "PetitionAccess";
+            id: string;
+            contact?: {
+              __typename?: "Contact";
+              id: string;
+              fullName: string;
+              email: string;
+            } | null;
+          }
+        | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+        | null;
+    }>;
+  };
+};
+
 export type PreviewPetitionField_petitionFieldAttachmentDownloadLinkMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   fieldId: Scalars["GID"];
@@ -9004,6 +9082,19 @@ export type PreviewPetitionFieldMutations_createFileUploadReplyCompleteMutation 
     __typename?: "PetitionFieldReply";
     id: string;
     content: { [key: string]: any };
+  };
+};
+
+export type PreviewPetitionFieldMutations_startAsyncFieldCompletionMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+}>;
+
+export type PreviewPetitionFieldMutations_startAsyncFieldCompletionMutation = {
+  startAsyncFieldCompletion: {
+    __typename?: "AsyncFieldCompletionResponse";
+    type: string;
+    url: string;
   };
 };
 
@@ -10219,47 +10310,6 @@ export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentM
   };
 };
 
-export type RecipientViewPetitionField_PublicPetitionFieldQueryVariables = Exact<{
-  keycode: Scalars["ID"];
-  fieldId: Scalars["GID"];
-}>;
-
-export type RecipientViewPetitionField_PublicPetitionFieldQuery = {
-  publicPetitionField: {
-    __typename?: "PublicPetitionField";
-    id: string;
-    type: PetitionFieldType;
-    title?: string | null;
-    description?: string | null;
-    options: { [key: string]: any };
-    optional: boolean;
-    multiple: boolean;
-    isInternal: boolean;
-    commentCount: number;
-    unreadCommentCount: number;
-    hasCommentsEnabled: boolean;
-    replies: Array<{
-      __typename?: "PublicPetitionFieldReply";
-      id: string;
-      status: PetitionFieldReplyStatus;
-      content: { [key: string]: any };
-      createdAt: string;
-      updatedAt: string;
-    }>;
-    attachments: Array<{
-      __typename?: "PetitionFieldAttachment";
-      id: string;
-      file: {
-        __typename?: "FileUpload";
-        filename: string;
-        contentType: string;
-        size: number;
-        isComplete: boolean;
-      };
-    }>;
-  };
-};
-
 export type RecipientViewPetitionField_PublicPetitionAccessFragment = {
   __typename?: "PublicPetitionAccess";
   granter?: { __typename?: "PublicUser"; fullName: string } | null;
@@ -10303,6 +10353,47 @@ export type RecipientViewPetitionField_PublicPetitionFieldFragment = {
 export type RecipientViewPetitionField_PublicPetitionFieldReplyFragment = {
   __typename?: "PublicPetitionFieldReply";
   content: { [key: string]: any };
+};
+
+export type RecipientViewPetitionField_PublicPetitionFieldQueryVariables = Exact<{
+  keycode: Scalars["ID"];
+  fieldId: Scalars["GID"];
+}>;
+
+export type RecipientViewPetitionField_PublicPetitionFieldQuery = {
+  publicPetitionField: {
+    __typename?: "PublicPetitionField";
+    id: string;
+    type: PetitionFieldType;
+    title?: string | null;
+    description?: string | null;
+    options: { [key: string]: any };
+    optional: boolean;
+    multiple: boolean;
+    isInternal: boolean;
+    commentCount: number;
+    unreadCommentCount: number;
+    hasCommentsEnabled: boolean;
+    replies: Array<{
+      __typename?: "PublicPetitionFieldReply";
+      id: string;
+      status: PetitionFieldReplyStatus;
+      content: { [key: string]: any };
+      createdAt: string;
+      updatedAt: string;
+    }>;
+    attachments: Array<{
+      __typename?: "PetitionFieldAttachment";
+      id: string;
+      file: {
+        __typename?: "FileUpload";
+        filename: string;
+        contentType: string;
+        size: number;
+        isComplete: boolean;
+      };
+    }>;
+  };
 };
 
 export type RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkMutationVariables =
@@ -24978,6 +25069,17 @@ export const PetitionListTagFilter_tagsDocument = gql`
   PetitionListTagFilter_tagsQuery,
   PetitionListTagFilter_tagsQueryVariables
 >;
+export const PreviewPetitionField_PetitionFieldDocument = gql`
+  query PreviewPetitionField_PetitionField($petitionId: GID!, $fieldId: GID!) {
+    petitionField(petitionId: $petitionId, petitionFieldId: $fieldId) {
+      ...PreviewPetitionField_PetitionField
+    }
+  }
+  ${PreviewPetitionField_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<
+  PreviewPetitionField_PetitionFieldQuery,
+  PreviewPetitionField_PetitionFieldQueryVariables
+>;
 export const PreviewPetitionField_petitionFieldAttachmentDownloadLinkDocument = gql`
   mutation PreviewPetitionField_petitionFieldAttachmentDownloadLink(
     $petitionId: GID!
@@ -25114,6 +25216,20 @@ export const PreviewPetitionFieldMutations_createFileUploadReplyCompleteDocument
 ` as unknown as DocumentNode<
   PreviewPetitionFieldMutations_createFileUploadReplyCompleteMutation,
   PreviewPetitionFieldMutations_createFileUploadReplyCompleteMutationVariables
+>;
+export const PreviewPetitionFieldMutations_startAsyncFieldCompletionDocument = gql`
+  mutation PreviewPetitionFieldMutations_startAsyncFieldCompletion(
+    $petitionId: GID!
+    $fieldId: GID!
+  ) {
+    startAsyncFieldCompletion(petitionId: $petitionId, fieldId: $fieldId) {
+      type
+      url
+    }
+  }
+` as unknown as DocumentNode<
+  PreviewPetitionFieldMutations_startAsyncFieldCompletionMutation,
+  PreviewPetitionFieldMutations_startAsyncFieldCompletionMutationVariables
 >;
 export const PreviewPetitionFieldCommentsDialog_userDocument = gql`
   query PreviewPetitionFieldCommentsDialog_user {
