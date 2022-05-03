@@ -602,6 +602,7 @@ export interface Organization {
   logo_public_file_id: Maybe<number>; // int4
   usage_details: Maybe<any>; // jsonb
   preferred_tone: Tone; // tone
+  icon_public_file_id: Maybe<number>; // int4
 }
 
 export type CreateOrganization = PartialProps<
@@ -617,6 +618,7 @@ export type CreateOrganization = PartialProps<
   | "logo_public_file_id"
   | "usage_details"
   | "preferred_tone"
+  | "icon_public_file_id"
 >;
 
 export interface OrganizationUsageLimit {

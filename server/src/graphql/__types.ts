@@ -1046,6 +1046,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customHost: string | null; // String
     hasSsoProvider: boolean; // Boolean!
+    iconUrl: string | null; // String
     id: NexusGenScalars["GID"]; // GID!
     integrations: NexusGenRootTypes["OrgIntegrationPagination"]; // OrgIntegrationPagination!
     logoUrl: string | null; // String
@@ -2487,6 +2488,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     customHost: "String";
     hasSsoProvider: "Boolean";
+    iconUrl: "String";
     id: "GID";
     integrations: "OrgIntegrationPagination";
     logoUrl: "String";
@@ -4185,6 +4187,7 @@ export interface NexusGenArgTypes {
     updateOrganizationLogo: {
       // args
       file: NexusGenScalars["Upload"]; // Upload!
+      isIcon?: boolean | null; // Boolean
     };
     updateOrganizationPreferredTone: {
       // args
@@ -4335,6 +4338,10 @@ export interface NexusGenArgTypes {
     };
   };
   Organization: {
+    iconUrl: {
+      // args
+      options?: NexusGenInputs["ImageOptions"] | null; // ImageOptions
+    };
     integrations: {
       // args
       limit?: number | null; // Int

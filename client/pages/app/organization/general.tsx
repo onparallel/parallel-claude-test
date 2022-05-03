@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Alert,
   AlertIcon,
@@ -17,18 +17,23 @@ import {
 } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileSize } from "@parallel/components/common/FileSize";
+import { Logo } from "@parallel/components/common/Logo";
 import { SupportButton } from "@parallel/components/common/SupportButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { OrganizationGeneral_userDocument } from "@parallel/graphql/__types";
+import {
+  OrganizationGeneral_updateOrgLogoDocument,
+  OrganizationGeneral_userDocument,
+} from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { useRef } from "react";
-import { DropzoneRef } from "react-dropzone";
+import { DropzoneRef, FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
 const MAX_FILE_SIZE = 1025 * 1024;
 
@@ -42,13 +47,26 @@ function OrganizationGeneral() {
   const sections = useOrganizationSections(me);
   const dropzoneRef = useRef<DropzoneRef>(null);
 
-  const iconSrc =
-    me.organization.logoUrl ?? `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/emails/logo.png`;
-
-  const handleIconUpload = () => {};
-  const loading = false;
-
+  const iconSrc = me.organization.iconUrl240;
   const subdomain = me.organization.customHost;
+
+  const showErrorDialog = useErrorDialog();
+  const [updateIcon, { loading }] = useMutation(OrganizationGeneral_updateOrgLogoDocument);
+  const handleIconUpload = async (files: File[], rejected: FileRejection[]) => {
+    if (rejected.length > 0) {
+      await showErrorDialog({
+        message: intl.formatMessage(
+          {
+            id: "organization.branding.logo-error",
+            defaultMessage: "The logo must be an image file of size up to {size}.",
+          },
+          { size: <FileSize value={MAX_FILE_SIZE} /> }
+        ),
+      });
+    } else {
+      await updateIcon({ variables: { file: files[0], isIcon: true } });
+    }
+  };
 
   return (
     <SettingsLayout
@@ -109,9 +127,11 @@ function OrganizationGeneral() {
                     defaultMessage="Subdomain"
                   />
                 </Text>
-                <Badge colorScheme="purple">
-                  <FormattedMessage id="generic.plans.enterprise" defaultMessage="Enterprise" />
-                </Badge>
+                {subdomain ? null : (
+                  <Badge colorScheme="purple">
+                    <FormattedMessage id="generic.plans.enterprise" defaultMessage="Enterprise" />
+                  </Badge>
+                )}
               </HStack>
 
               <HStack>
@@ -176,26 +196,18 @@ function OrganizationGeneral() {
                 defaultMessage="Organization icon"
               />
             </Heading>
-            <Text fontSize="sm">
-              <FormattedMessage
-                id="organization.general.icon-attach-requirements-help"
-                defaultMessage="Requirements: Square image in PNG, max. {size}"
-                values={{
-                  size: <FileSize value={MAX_FILE_SIZE} />,
-                }}
-              />
-            </Text>
             <Card padding={4}>
               <HStack spacing={4}>
                 <Dropzone
                   ref={dropzoneRef}
                   as={Center}
                   onDrop={handleIconUpload}
-                  accept={["image/png"]}
+                  accept={["image/gif", "image/png", "image/jpeg"]}
                   maxSize={MAX_FILE_SIZE}
                   multiple={false}
-                  maxHeight="120px"
+                  height="120px"
                   maxWidth="120px"
+                  width="100%"
                   textAlign="center"
                 >
                   {loading ? (
@@ -206,20 +218,25 @@ function OrganizationGeneral() {
                       color="purple.500"
                       size="xl"
                     />
-                  ) : (
+                  ) : iconSrc ? (
                     <Image
-                      boxSize="300px"
-                      height="150px"
+                      boxSize="120px"
+                      height="120px"
                       objectFit="contain"
                       alt={me.organization.name}
                       src={iconSrc}
                       fallback={
-                        <FormattedMessage
-                          id="organization.branding.image-error"
-                          defaultMessage="Error loading image. Please upload again."
+                        <Spinner
+                          thickness="4px"
+                          speed="0.65s"
+                          emptyColor="gray.200"
+                          color="purple.500"
+                          size="xl"
                         />
                       }
                     />
+                  ) : (
+                    <Logo width="74px" hideText={true} color="gray.800" />
                   )}
                 </Dropzone>
                 <Stack>
@@ -251,6 +268,18 @@ function OrganizationGeneral() {
   );
 }
 
+OrganizationGeneral.mutations = [
+  gql`
+    mutation OrganizationGeneral_updateOrgLogo($file: Upload!, $isIcon: Boolean) {
+      updateOrganizationLogo(file: $file, isIcon: $isIcon) {
+        id
+        iconUrl80: iconUrl(options: { resize: { width: 80 } })
+        iconUrl240: iconUrl(options: { resize: { width: 240 } })
+      }
+    }
+  `,
+];
+
 OrganizationGeneral.queries = [
   gql`
     query OrganizationGeneral_user {
@@ -259,7 +288,7 @@ OrganizationGeneral.queries = [
         id
         organization {
           id
-          logoUrl
+          iconUrl240: iconUrl(options: { resize: { width: 240 } })
           name
           customHost
         }

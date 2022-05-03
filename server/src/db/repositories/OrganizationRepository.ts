@@ -227,6 +227,21 @@ export class OrganizationRepository extends BaseRepository {
     })
   );
 
+  readonly loadOrgIconPath = fromDataLoader(
+    new DataLoader<number, Maybe<string>>(async (orgIds) => {
+      const results = await this.raw<{ id: number; path: string }>(
+        /* sql */ `
+        select o.id, pfu.path from organization o
+          join public_file_upload pfu on o.icon_public_file_id = pfu.id
+          where o.id in ?
+      `,
+        [this.sqlIn(orgIds)]
+      );
+      const resultsById = indexBy(results, (x) => x.id);
+      return orgIds.map((id) => resultsById[id]?.path ?? null);
+    })
+  );
+
   async getOrganizationOwner(orgId: number) {
     const [owner] = await this.from("user")
       .where({

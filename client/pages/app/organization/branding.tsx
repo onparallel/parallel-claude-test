@@ -129,7 +129,7 @@ function OrganizationBranding() {
                 accept={["image/gif", "image/png", "image/jpeg"]}
                 maxSize={MAX_FILE_SIZE}
                 multiple={false}
-                maxHeight="200px"
+                height="200px"
                 maxWidth="100%"
                 textAlign="center"
               >
@@ -144,7 +144,7 @@ function OrganizationBranding() {
                 ) : (
                   <Image
                     boxSize="300px"
-                    height="150px"
+                    height="200px"
                     objectFit="contain"
                     alt={me.organization.name}
                     src={logoSrc}

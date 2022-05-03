@@ -58,6 +58,16 @@ export const Organization = objectType({
         return isDefined(path) ? await ctx.images.getImageUrl(path, args.options as any) : null;
       },
     });
+    t.nullable.string("iconUrl", {
+      description: "URL of the organization logo",
+      args: {
+        options: arg({ type: "ImageOptions" }),
+      },
+      resolve: async (root, args, ctx) => {
+        const path = await ctx.organizations.loadOrgIconPath(root.id);
+        return isDefined(path) ? await ctx.images.getImageUrl(path, args.options as any) : null;
+      },
+    });
     t.field("status", {
       type: "OrganizationStatus",
       description: "The status of the organization.",

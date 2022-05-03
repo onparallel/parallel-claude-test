@@ -1294,6 +1294,7 @@ export type MutationupdateOrganizationLimitsArgs = {
 
 export type MutationupdateOrganizationLogoArgs = {
   file: Scalars["Upload"];
+  isIcon?: InputMaybe<Scalars["Boolean"]>;
 };
 
 export type MutationupdateOrganizationPreferredToneArgs = {
@@ -1472,6 +1473,8 @@ export type Organization = Timestamps & {
   customHost: Maybe<Scalars["String"]>;
   /** Whether the organization has an SSO provider configured. */
   hasSsoProvider: Scalars["Boolean"];
+  /** URL of the organization logo */
+  iconUrl: Maybe<Scalars["String"]>;
   /** The ID of the organization. */
   id: Scalars["GID"];
   /** A paginated list with enabled integrations for the organization */
@@ -1490,6 +1493,11 @@ export type Organization = Timestamps & {
   usageLimits: OrganizationUsageLimit;
   /** The users in the organization. */
   users: UserPagination;
+};
+
+/** An organization in the system. */
+export type OrganizationiconUrlArgs = {
+  options?: InputMaybe<ImageOptions>;
 };
 
 /** An organization in the system. */

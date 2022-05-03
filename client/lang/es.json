@@ -5215,11 +5215,6 @@
     "context": "Hi, I would like to change the subdomain of my organization."
   },
   {
-    "term": "organization.general.icon-attach-requirements-help",
-    "definition": "Requisitos: Imagen cuadrada en PNG, máx. {size}",
-    "context": "Requirements: Square image in PNG, max. {size}"
-  },
-  {
     "term": "organization.general.icon-header",
     "definition": "Icono de la organización",
     "context": "Organization icon"

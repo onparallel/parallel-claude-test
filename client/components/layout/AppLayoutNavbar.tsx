@@ -1,5 +1,14 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Flex, List, ListItem, Stack, useBreakpointValue } from "@chakra-ui/react";
+import {
+  Box,
+  Center,
+  Flex,
+  Image,
+  List,
+  ListItem,
+  Stack,
+  useBreakpointValue,
+} from "@chakra-ui/react";
 import {
   AddIcon,
   HelpOutlineIcon,
@@ -122,7 +131,16 @@ export const AppLayoutNavbar = Object.assign(
                     transform: "scale(1.1)",
                   }}
                 >
-                  <Logo width="40px" hideText={true} color="gray.800" />
+                  {me.organization.iconUrl80 ? (
+                    <Image
+                      boxSize="40px"
+                      objectFit="contain"
+                      alt={me.organization.name}
+                      src={me.organization.iconUrl80}
+                    />
+                  ) : (
+                    <Logo width="40px" hideText={true} color="gray.800" />
+                  )}
                 </Box>
               </Box>
             </NakedLink>
@@ -211,6 +229,8 @@ export const AppLayoutNavbar = Object.assign(
               id
               organization {
                 id
+                name
+                iconUrl80: iconUrl(options: { resize: { width: 80 } })
                 usageLimits {
                   petitions {
                     limit

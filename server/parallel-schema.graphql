@@ -1396,7 +1396,7 @@ type Mutation {
   """
   Updates the logo of an organization
   """
-  updateOrganizationLogo(file: Upload!): Organization!
+  updateOrganizationLogo(file: Upload!, isIcon: Boolean): Organization!
 
   """
   Changes the organization preferred tone
@@ -1660,6 +1660,11 @@ type Organization implements Timestamps {
   Whether the organization has an SSO provider configured.
   """
   hasSsoProvider: Boolean!
+
+  """
+  URL of the organization logo
+  """
+  iconUrl(options: ImageOptions): String
 
   """
   The ID of the organization.

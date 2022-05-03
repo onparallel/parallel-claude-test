@@ -1,4 +1,4 @@
-import { arg, mutationField, nonNull } from "nexus";
+import { arg, booleanArg, mutationField, nonNull } from "nexus";
 import { random } from "../../util/token";
 import { authenticateAnd } from "../helpers/authorize";
 import { uploadArg } from "../helpers/scalars";
@@ -10,6 +10,7 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
   type: "Organization",
   args: {
     file: nonNull(uploadArg()),
+    isIcon: booleanArg(),
   },
   authorize: authenticateAnd(contextUserHasRole("ADMIN")),
   validateArgs: validateFile(
@@ -37,10 +38,12 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
     const [org] = await Promise.all([
       ctx.organizations.updateOrganization(
         ctx.user!.org_id,
-        { logo_public_file_id: logoFile.id },
+        { [args.isIcon ? "icon_public_file_id" : "logo_public_file_id"]: logoFile.id },
         `User:${ctx.user!.id}`
       ),
-      ctx.integrations.removeSignaturitBrandingIds(ctx.user!.org_id, `User:${ctx.user!.id}`),
+      args.isIcon
+        ? null
+        : ctx.integrations.removeSignaturitBrandingIds(ctx.user!.org_id, `User:${ctx.user!.id}`),
     ]);
 
     return org;
