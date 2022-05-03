@@ -17,7 +17,8 @@ export type FeatureFlagName =
   | "DEVELOPER_ACCESS"
   | "REMOVE_WHY_WE_USE_PARALLEL"
   | "ON_BEHALF_OF"
-  | "GHOST_LOGIN";
+  | "GHOST_LOGIN"
+  | "ES_TAX_DOCUMENTS_FIELD";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -30,6 +31,7 @@ export const FeatureFlagNameValues = [
   "REMOVE_WHY_WE_USE_PARALLEL",
   "ON_BEHALF_OF",
   "GHOST_LOGIN",
+  "ES_TAX_DOCUMENTS_FIELD",
 ] as FeatureFlagName[];
 
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";

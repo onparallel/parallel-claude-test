@@ -212,6 +212,7 @@ export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
 export type FeatureFlag =
   | "DEVELOPER_ACCESS"
+  | "ES_TAX_DOCUMENTS_FIELD"
   | "EXPORT_CUATRECASAS"
   | "GHOST_LOGIN"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
@@ -8185,6 +8186,11 @@ export type PetitionFieldOptionsListEditor_PetitionFieldFragment = {
   options: { [key: string]: any };
 };
 
+export type PetitionFieldTypeSelectDropdown_UserFragment = {
+  __typename?: "User";
+  hasEsTaxDocumentsField: boolean;
+};
+
 export type PetitionFieldVisibilityEditor_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -14945,6 +14951,7 @@ export type PetitionCompose_QueryFragment = {
     hasPetitionPdfExport: boolean;
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
+    hasEsTaxDocumentsField: boolean;
     hasPetitionSignature: boolean;
     hasOnBehalfOf: boolean;
     organization: {
@@ -15496,6 +15503,7 @@ export type PetitionCompose_userQuery = {
     hasPetitionPdfExport: boolean;
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
+    hasEsTaxDocumentsField: boolean;
     hasPetitionSignature: boolean;
     hasOnBehalfOf: boolean;
     organization: {
@@ -23077,6 +23085,11 @@ export const PetitionSettings_UserFragmentDoc = gql`
   ${SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc}
   ${SignatureConfigDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionSettings_UserFragment, unknown>;
+export const PetitionFieldTypeSelectDropdown_UserFragmentDoc = gql`
+  fragment PetitionFieldTypeSelectDropdown_User on User {
+    hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
+  }
+` as unknown as DocumentNode<PetitionFieldTypeSelectDropdown_UserFragment, unknown>;
 export const PetitionCompose_QueryFragmentDoc = gql`
   fragment PetitionCompose_Query on Query {
     ...PetitionLayout_Query
@@ -23088,6 +23101,7 @@ export const PetitionCompose_QueryFragmentDoc = gql`
       organization {
         ...isUsageLimitsReached_Organization
       }
+      ...PetitionFieldTypeSelectDropdown_User
     }
   }
   ${PetitionLayout_QueryFragmentDoc}
@@ -23095,6 +23109,7 @@ export const PetitionCompose_QueryFragmentDoc = gql`
   ${useUpdateIsReadNotification_UserFragmentDoc}
   ${useSendPetitionHandler_UserFragmentDoc}
   ${isUsageLimitsReached_OrganizationFragmentDoc}
+  ${PetitionFieldTypeSelectDropdown_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionCompose_QueryFragment, unknown>;
 export const PetitionTemplateRequestMessageCard_PetitionTemplateFragmentDoc = gql`
   fragment PetitionTemplateRequestMessageCard_PetitionTemplate on PetitionTemplate {

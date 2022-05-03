@@ -37,6 +37,7 @@ import {
   authenticateAnd,
   chain,
   ifArgDefined,
+  ifArgEquals,
   ifSomeDefined,
   or,
 } from "../../helpers/authorize";
@@ -79,6 +80,7 @@ import {
   repliesBelongsToPetition,
   templateDoesNotHavePublicPetitionLink,
   userHasAccessToPetitions,
+  userHasFeatureFlag,
 } from "../authorizers";
 import {
   petitionAccessesNotOptedOut,
@@ -722,7 +724,8 @@ export const createPetitionField = mutationField("createPetitionField", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     petitionsAreEditable("petitionId"),
-    petitionsAreNotPublicTemplates("petitionId")
+    petitionsAreNotPublicTemplates("petitionId"),
+    ifArgEquals("type", "ES_TAX_DOCUMENTS", userHasFeatureFlag("ES_TAX_DOCUMENTS_FIELD"))
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1484,7 +1487,8 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     petitionsAreEditable("petitionId"),
-    petitionsAreNotPublicTemplates("petitionId")
+    petitionsAreNotPublicTemplates("petitionId"),
+    ifArgEquals("type", "ES_TAX_DOCUMENTS", userHasFeatureFlag("ES_TAX_DOCUMENTS_FIELD"))
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),

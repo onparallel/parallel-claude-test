@@ -987,6 +987,12 @@ export const schemaTypes: IntrospectionType[] = [
     enumValues: [
       { name: "DEVELOPER_ACCESS", description: null, isDeprecated: false, deprecationReason: null },
       {
+        name: "ES_TAX_DOCUMENTS_FIELD",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
+      {
         name: "EXPORT_CUATRECASAS",
         description: null,
         isDeprecated: false,
