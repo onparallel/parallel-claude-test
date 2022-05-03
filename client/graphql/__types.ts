@@ -573,7 +573,7 @@ export interface Mutation {
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
   /** Removes permissions on given petitions and users */
-  removePetitionPermission: Array<PetitionBase>;
+  removePetitionPermission: Array<Maybe<PetitionBase>>;
   /** Removes users from a user group */
   removeUsersFromGroup: UserGroup;
   /** Reopens the petition */
@@ -7188,6 +7188,7 @@ export type PetitionSharingModal_removePetitionPermissionMutation = {
             }
         >;
       }
+    | null
   >;
 };
 

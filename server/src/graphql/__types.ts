@@ -977,7 +977,7 @@ export interface NexusGenFieldTypes {
     publicUpdatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
     publicUpdatePetitionFieldReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
-    removePetitionPermission: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
+    removePetitionPermission: Array<NexusGenRootTypes["PetitionBase"] | null>; // [PetitionBase]!
     removeUsersFromGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
     resendVerificationCode: NexusGenEnums["Result"]; // Result!

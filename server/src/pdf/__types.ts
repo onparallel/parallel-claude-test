@@ -270,6 +270,18 @@ export type GroupPermissionRemovedEvent = PetitionEvent & {
   user: Maybe<User>;
 };
 
+export type ImageOptions = {
+  resize?: InputMaybe<ImageOptionsResize>;
+};
+
+export type ImageOptionsResize = {
+  fit?: InputMaybe<ImageOptionsResizeFit>;
+  height?: InputMaybe<Scalars["Int"]>;
+  width?: InputMaybe<Scalars["Int"]>;
+};
+
+export type ImageOptionsResizeFit = "contain" | "cover" | "fill" | "inside" | "outside";
+
 /** The types of integrations available. */
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
 
@@ -292,6 +304,11 @@ export type LandingTemplate = {
   shortDescription: Maybe<Scalars["String"]>;
   slug: Scalars["String"];
   updatedAt: Scalars["DateTime"];
+};
+
+/** A public template on landing page */
+export type LandingTemplateimageUrlArgs = {
+  small?: InputMaybe<Scalars["Boolean"]>;
 };
 
 export type LandingTemplateCategorySample = {
@@ -525,7 +542,7 @@ export type Mutation = {
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
   /** Removes permissions on given petitions and users */
-  removePetitionPermission: Array<PetitionBase>;
+  removePetitionPermission: Array<Maybe<PetitionBase>>;
   /** Removes users from a user group */
   removeUsersFromGroup: UserGroup;
   /** Reopens the petition */
@@ -1483,6 +1500,11 @@ export type OrganizationintegrationsArgs = {
 };
 
 /** An organization in the system. */
+export type OrganizationlogoUrlArgs = {
+  options?: InputMaybe<ImageOptions>;
+};
+
+/** An organization in the system. */
 export type OrganizationusersArgs = {
   exclude?: InputMaybe<Array<Scalars["GID"]>>;
   includeInactive?: InputMaybe<Scalars["Boolean"]>;
@@ -2325,6 +2347,11 @@ export type PetitionTemplate = PetitionBase & {
   updatedAt: Scalars["DateTime"];
 };
 
+/** A petition template */
+export type PetitionTemplateimageUrlArgs = {
+  options?: InputMaybe<ImageOptions>;
+};
+
 export type PetitionTemplatePagination = {
   /** The requested slice of items. */
   items: Array<PetitionTemplate>;
@@ -2419,6 +2446,11 @@ export type PublicOrganization = {
   logoUrl: Maybe<Scalars["String"]>;
   /** The name of the organization. */
   name: Scalars["String"];
+};
+
+/** A public view of an organization */
+export type PublicOrganizationlogoUrlArgs = {
+  options?: InputMaybe<ImageOptions>;
 };
 
 /** A public view of the petition */
@@ -3274,6 +3306,11 @@ export type User = Timestamps & {
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
   userGroups: Array<UserGroup>;
+};
+
+/** A user in the system. */
+export type UseravatarUrlArgs = {
+  options?: InputMaybe<ImageOptions>;
 };
 
 /** A user in the system. */

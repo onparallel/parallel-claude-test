@@ -1,7 +1,6 @@
-import { arg, booleanArg, list, mutationField, nonNull, stringArg } from "nexus";
+import { arg, booleanArg, list, mutationField, nonNull, nullable, stringArg } from "nexus";
 import pMap from "p-map";
 import { groupBy, isDefined, uniq, zip } from "remeda";
-import { Petition } from "../../../db/__types";
 import { partition } from "../../../util/arrays";
 import { and, authenticate, authenticateAnd, chain, ifArgDefined } from "../../helpers/authorize";
 import { ArgValidationError, WhitelistedError } from "../../helpers/errors";
@@ -211,7 +210,7 @@ export const editPetitionPermission = mutationField("editPetitionPermission", {
 
 export const removePetitionPermission = mutationField("removePetitionPermission", {
   description: "Removes permissions on given petitions and users",
-  type: list(nonNull("PetitionBase")),
+  type: nonNull(list(nullable("PetitionBase"))),
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
     ifArgDefined("userIds", userHasAccessToUsers("userIds" as never)),
@@ -273,7 +272,16 @@ export const removePetitionPermission = mutationField("removePetitionPermission"
       { concurrency: 20 }
     );
 
-    return (await ctx.petitions.loadPetition(args.petitionIds)) as Petition[];
+    const accesses = await ctx.petitions.userHasAccessToPetitionsRaw(
+      ctx.user!.id,
+      args.petitionIds
+    );
+
+    return Promise.all(
+      zip(args.petitionIds, accesses).map(async ([petitionId, hasAccess]) =>
+        hasAccess ? await ctx.petitions.loadPetition(petitionId) : null
+      )
+    );
   },
 });
 

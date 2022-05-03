@@ -1134,7 +1134,7 @@ type Mutation {
     removeAll: Boolean
     userGroupIds: [GID!]
     userIds: [GID!]
-  ): [PetitionBase!]!
+  ): [PetitionBase]!
 
   """
   Removes users from a user group

@@ -200,14 +200,7 @@ export function PetitionSharingDialog({
           )!,
         ],
         update(client, { data }) {
-          const hasPermissions = Boolean(
-            data?.removePetitionPermission[0].permissions
-              .filter((p) => p.permissionType === "OWNER" || p.permissionType === "WRITE")
-              .filter((p) =>
-                p.__typename === "PetitionUserPermission" ? p.user.id === userId : true
-              ).length
-          );
-          if (!hasPermissions) {
+          if (!data?.removePetitionPermission[0]) {
             client.evict({ id: petitionId });
             client.gc();
             props.onResolve?.({ close: true });
