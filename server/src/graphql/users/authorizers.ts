@@ -42,6 +42,18 @@ export function userIsNotSSO<
   };
 }
 
+export function userIsNotOrgOwner<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const userIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+    const users = await ctx.users.loadUser(userIds);
+    return users.every((u) => u && u.organization_role !== "OWNER");
+  };
+}
+
 export function userIsNotContextUser<
   TypeName extends string,
   FieldName extends string,

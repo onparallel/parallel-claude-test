@@ -42,6 +42,7 @@ import {
   contextUserHasRole,
   contextUserIsNotSso,
   userIsNotContextUser,
+  userIsNotOrgOwner,
   userIsNotSSO,
 } from "./authorizers";
 
@@ -211,6 +212,7 @@ export const deactivateUser = mutationField("deactivateUser", {
     contextUserHasRole("ADMIN"),
     userHasAccessToUsers("userIds"),
     userIsNotSSO("userIds"),
+    userIsNotOrgOwner("userIds"),
     ifArgDefined(
       "transferToUserId",
       and(
