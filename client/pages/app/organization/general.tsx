@@ -239,13 +239,7 @@ function OrganizationGeneral() {
                     <Logo width="74px" hideText={true} color="gray.800" />
                   )}
                 </Dropzone>
-                <Stack>
-                  <Heading as="h5" size="sm" fontWeight="semibold">
-                    <FormattedMessage
-                      id="organization.general.square-logo-header"
-                      defaultMessage="Square logo"
-                    />
-                  </Heading>
+                <Stack spacing={4}>
                   <Text fontSize="sm">
                     <FormattedMessage
                       id="organization.branding.square-logo-description"

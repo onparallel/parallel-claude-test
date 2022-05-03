@@ -5235,11 +5235,6 @@
     "context": "Subdomain"
   },
   {
-    "term": "organization.general.square-logo-header",
-    "definition": "Logo cuadrado",
-    "context": "Square logo"
-  },
-  {
     "term": "organization.general.title",
     "definition": "General",
     "context": "General"
