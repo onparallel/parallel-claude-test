@@ -5135,6 +5135,11 @@
     "context": "You can't deactivate your own user. Please, remove it from the selection and try again."
   },
   {
+    "term": "organization-users.update-user-status.error.deactivate-owner-user",
+    "definition": "No puedes desactivar al propietario. Por favor, quítalo de la selección e inténtalo nuevamente.",
+    "context": "You can't deactivate the owner. Please, remove it from the selection and try again."
+  },
+  {
     "term": "organization-users.update-user-status.error.update-sso-user",
     "definition": "{count, plural, =1{El usuario seleccionado es administrado} other{Algunos de los usuarios seleccionados son administrados}} por un proveedor de SSO. Por favor, actualiza el estado directamente en el proveedor.",
     "context": "{count, plural, =1{The user you selected is} other{Some of the users you selected are}} managed by a SSO provider. Please, update its status directly on the provider."

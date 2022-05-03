@@ -242,7 +242,17 @@ function OrganizationUsers() {
 
   const showErrorDialog = useErrorDialog();
   const handleUpdateSelectedUsersStatus = async (newStatus: UserStatus) => {
-    if (selectedUsers.some((u) => u.id === me.id)) {
+    if (selectedUsers.some((u) => u.role === "OWNER")) {
+      await withError(
+        showErrorDialog({
+          message: intl.formatMessage({
+            id: "organization-users.update-user-status.error.deactivate-owner-user",
+            defaultMessage:
+              "You can't deactivate the owner. Please, remove it from the selection and try again.",
+          }),
+        })
+      );
+    } else if (selectedUsers.some((u) => u.id === me.id)) {
       await withError(
         showErrorDialog({
           message: intl.formatMessage({
