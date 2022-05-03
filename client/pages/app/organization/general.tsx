@@ -48,7 +48,10 @@ function OrganizationGeneral() {
   const dropzoneRef = useRef<DropzoneRef>(null);
 
   const iconSrc = me.organization.iconUrl240;
-  const subdomain = me.organization.customHost;
+  const { customHost } = me.organization;
+  const parallelUrl = customHost
+    ? `${process.env.NODE_ENV === "production" ? "https" : "http"}://${customHost}`
+    : process.env.NEXT_PUBLIC_PARALLEL_URL;
 
   const showErrorDialog = useErrorDialog();
   const [updateIcon, { loading }] = useMutation(OrganizationGeneral_updateOrgLogoDocument);
@@ -127,7 +130,7 @@ function OrganizationGeneral() {
                     defaultMessage="Subdomain"
                   />
                 </Text>
-                {subdomain ? null : (
+                {customHost ? null : (
                   <Badge colorScheme="purple">
                     <FormattedMessage id="generic.plans.enterprise" defaultMessage="Enterprise" />
                   </Badge>
@@ -135,19 +138,10 @@ function OrganizationGeneral() {
               </HStack>
 
               <HStack>
-                <Input
-                  value={
-                    subdomain
-                      ? `https://www.${subdomain}.onparallel.com`
-                      : "https://www.onparallel.com"
-                  }
-                  isReadOnly
-                  isDisabled
-                  backgroundColor="white"
-                />
+                <Input value={parallelUrl} isReadOnly isDisabled backgroundColor="white" />
                 <Box>
                   <SupportButton
-                    isDisabled={!subdomain}
+                    isDisabled={!customHost}
                     message={intl.formatMessage({
                       id: "organization.general.change-subdomain-message",
                       defaultMessage:
@@ -162,7 +156,7 @@ function OrganizationGeneral() {
                 </Box>
               </HStack>
             </Stack>
-            {subdomain ? null : (
+            {customHost ? null : (
               <Alert status="info" rounded="md">
                 <AlertIcon />
                 <HStack spacing={3}>
