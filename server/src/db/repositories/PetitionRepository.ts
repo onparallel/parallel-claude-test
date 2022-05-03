@@ -170,7 +170,20 @@ export class PetitionRepository extends BaseRepository {
     petitionIds: number[],
     permissionTypes?: PetitionPermissionType[]
   ) {
-    const [{ count }] = await this.from("petition_permission")
+    const permissions = await this.userHasAccessToPetitionsRaw(
+      userId,
+      petitionIds,
+      permissionTypes
+    );
+    return permissions.every((p) => p);
+  }
+
+  async userHasAccessToPetitionsRaw(
+    userId: number,
+    petitionIds: number[],
+    permissionTypes?: PetitionPermissionType[]
+  ) {
+    const rows = await this.from("petition_permission")
       .where({ user_id: userId })
       .whereIn("petition_id", petitionIds)
       .whereNull("deleted_at")
@@ -180,8 +193,9 @@ export class PetitionRepository extends BaseRepository {
           q.whereIn("type", permissionTypes);
         }
       })
-      .select(this.knex.raw(`count(distinct(petition_id))::int as "count"`));
-    return count === new Set(petitionIds).size;
+      .select<{ petition_id: number }[]>(this.knex.raw(`distinct(petition_id)`));
+    const ids = new Set(rows.map((r) => r.petition_id));
+    return petitionIds.map((id) => ids.has(id));
   }
 
   async recipientHasAccessToPetition(petitionAccessId: number, petitionId: number) {
