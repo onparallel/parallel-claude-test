@@ -8019,6 +8019,8 @@ export type useSendPetitionHandler_addPetitionPermissionMutation = {
   >;
 };
 
+export type AddFieldPopover_UserFragment = { __typename?: "User"; hasEsTaxDocumentsField: boolean };
+
 export type PetitionComposeField_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -8149,33 +8151,9 @@ export type PetitionComposeFieldAttachment_PetitionFieldAttachmentFragment = {
   };
 };
 
-export type PetitionComposeFieldList_PetitionFragment = {
-  __typename?: "Petition";
-  fields: Array<{
-    __typename?: "PetitionField";
-    isFixed: boolean;
-    id: string;
-    type: PetitionFieldType;
-    title?: string | null;
-    description?: string | null;
-    optional: boolean;
-    multiple: boolean;
-    isInternal: boolean;
-    isReadOnly: boolean;
-    visibility?: { [key: string]: any } | null;
-    options: { [key: string]: any };
-    attachments: Array<{
-      __typename?: "PetitionFieldAttachment";
-      id: string;
-      file: {
-        __typename?: "FileUpload";
-        filename: string;
-        contentType: string;
-        size: number;
-        isComplete: boolean;
-      };
-    }>;
-  }>;
+export type PetitionComposeFieldList_UserFragment = {
+  __typename?: "User";
+  hasEsTaxDocumentsField: boolean;
 };
 
 export type PetitionFieldOptionsListEditor_PetitionFieldFragment = {
@@ -8184,6 +8162,11 @@ export type PetitionFieldOptionsListEditor_PetitionFieldFragment = {
   type: PetitionFieldType;
   optional: boolean;
   options: { [key: string]: any };
+};
+
+export type PetitionFieldTypeSelect_UserFragment = {
+  __typename?: "User";
+  hasEsTaxDocumentsField: boolean;
 };
 
 export type PetitionFieldTypeSelectDropdown_UserFragment = {
@@ -8555,6 +8538,11 @@ export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation = {
     result: Result;
     url?: string | null;
   };
+};
+
+export type PetitionComposeFieldSettings_UserFragment = {
+  __typename?: "User";
+  hasEsTaxDocumentsField: boolean;
 };
 
 export type PetitionComposeFieldSettings_PetitionFieldFragment = {
@@ -14951,9 +14939,9 @@ export type PetitionCompose_QueryFragment = {
     hasPetitionPdfExport: boolean;
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
-    hasEsTaxDocumentsField: boolean;
     hasPetitionSignature: boolean;
     hasOnBehalfOf: boolean;
+    hasEsTaxDocumentsField: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -15503,9 +15491,9 @@ export type PetitionCompose_userQuery = {
     hasPetitionPdfExport: boolean;
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
-    hasEsTaxDocumentsField: boolean;
     hasPetitionSignature: boolean;
     hasOnBehalfOf: boolean;
+    hasEsTaxDocumentsField: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -21110,75 +21098,23 @@ export const TemplateDetailsModal_PetitionTemplateFragmentDoc = gql`
   ${UserAvatarList_UserGroupFragmentDoc}
   ${TemplateActiveSettingsIcons_PetitionTemplateFragmentDoc}
 ` as unknown as DocumentNode<TemplateDetailsModal_PetitionTemplateFragment, unknown>;
-export const PetitionComposeFieldAttachment_PetitionFieldAttachmentFragmentDoc = gql`
-  fragment PetitionComposeFieldAttachment_PetitionFieldAttachment on PetitionFieldAttachment {
-    id
-    file {
-      filename
-      contentType
-      size
-      isComplete
-    }
+export const PetitionFieldTypeSelectDropdown_UserFragmentDoc = gql`
+  fragment PetitionFieldTypeSelectDropdown_User on User {
+    hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
   }
-` as unknown as DocumentNode<
-  PetitionComposeFieldAttachment_PetitionFieldAttachmentFragment,
-  unknown
->;
-export const PetitionComposeField_PetitionFieldAttachmentFragmentDoc = gql`
-  fragment PetitionComposeField_PetitionFieldAttachment on PetitionFieldAttachment {
-    ...PetitionComposeFieldAttachment_PetitionFieldAttachment
+` as unknown as DocumentNode<PetitionFieldTypeSelectDropdown_UserFragment, unknown>;
+export const AddFieldPopover_UserFragmentDoc = gql`
+  fragment AddFieldPopover_User on User {
+    ...PetitionFieldTypeSelectDropdown_User
   }
-  ${PetitionComposeFieldAttachment_PetitionFieldAttachmentFragmentDoc}
-` as unknown as DocumentNode<PetitionComposeField_PetitionFieldAttachmentFragment, unknown>;
-export const PetitionFieldOptionsListEditor_PetitionFieldFragmentDoc = gql`
-  fragment PetitionFieldOptionsListEditor_PetitionField on PetitionField {
-    id
-    type
-    optional
-    options
+  ${PetitionFieldTypeSelectDropdown_UserFragmentDoc}
+` as unknown as DocumentNode<AddFieldPopover_UserFragment, unknown>;
+export const PetitionComposeFieldList_UserFragmentDoc = gql`
+  fragment PetitionComposeFieldList_User on User {
+    ...AddFieldPopover_User
   }
-` as unknown as DocumentNode<PetitionFieldOptionsListEditor_PetitionFieldFragment, unknown>;
-export const PetitionFieldSelect_PetitionFieldFragmentDoc = gql`
-  fragment PetitionFieldSelect_PetitionField on PetitionField {
-    id
-    type
-    title
-    options
-  }
-` as unknown as DocumentNode<PetitionFieldSelect_PetitionFieldFragment, unknown>;
-export const PetitionFieldVisibilityEditor_PetitionFieldFragmentDoc = gql`
-  fragment PetitionFieldVisibilityEditor_PetitionField on PetitionField {
-    id
-    type
-    multiple
-    options
-    isReadOnly
-    ...PetitionFieldSelect_PetitionField
-  }
-  ${PetitionFieldSelect_PetitionFieldFragmentDoc}
-` as unknown as DocumentNode<PetitionFieldVisibilityEditor_PetitionFieldFragment, unknown>;
-export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
-  fragment PetitionComposeField_PetitionField on PetitionField {
-    id
-    type
-    title
-    description
-    optional
-    multiple
-    isFixed
-    isInternal
-    isReadOnly
-    visibility
-    attachments {
-      ...PetitionComposeField_PetitionFieldAttachment
-    }
-    ...PetitionFieldOptionsListEditor_PetitionField
-    ...PetitionFieldVisibilityEditor_PetitionField
-  }
-  ${PetitionComposeField_PetitionFieldAttachmentFragmentDoc}
-  ${PetitionFieldOptionsListEditor_PetitionFieldFragmentDoc}
-  ${PetitionFieldVisibilityEditor_PetitionFieldFragmentDoc}
-` as unknown as DocumentNode<PetitionComposeField_PetitionFieldFragment, unknown>;
+  ${AddFieldPopover_UserFragmentDoc}
+` as unknown as DocumentNode<PetitionComposeFieldList_UserFragment, unknown>;
 export const FieldErrorDialog_PetitionFieldFragmentDoc = gql`
   fragment FieldErrorDialog_PetitionField on PetitionField {
     id
@@ -21192,17 +21128,6 @@ export const ReferencedFieldDialog_PetitionFieldFragmentDoc = gql`
   }
   ${FieldErrorDialog_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<ReferencedFieldDialog_PetitionFieldFragment, unknown>;
-export const PetitionComposeFieldList_PetitionFragmentDoc = gql`
-  fragment PetitionComposeFieldList_Petition on Petition {
-    fields {
-      isFixed
-      ...PetitionComposeField_PetitionField
-      ...ReferencedFieldDialog_PetitionField
-    }
-  }
-  ${PetitionComposeField_PetitionFieldFragmentDoc}
-  ${ReferencedFieldDialog_PetitionFieldFragmentDoc}
-` as unknown as DocumentNode<PetitionComposeFieldList_PetitionFragment, unknown>;
 export const PetitionListHeader_UserFragmentDoc = gql`
   fragment PetitionListHeader_User on User {
     id
@@ -22962,6 +22887,75 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
   ${TemplateDefaultPermissionsDialog_PublicPetitionLinkFragmentDoc}
   ${TemplateDefaultPermissionsDialog_TemplateDefaultPermissionFragmentDoc}
 ` as unknown as DocumentNode<PetitionSettings_PetitionBaseFragment, unknown>;
+export const PetitionComposeFieldAttachment_PetitionFieldAttachmentFragmentDoc = gql`
+  fragment PetitionComposeFieldAttachment_PetitionFieldAttachment on PetitionFieldAttachment {
+    id
+    file {
+      filename
+      contentType
+      size
+      isComplete
+    }
+  }
+` as unknown as DocumentNode<
+  PetitionComposeFieldAttachment_PetitionFieldAttachmentFragment,
+  unknown
+>;
+export const PetitionComposeField_PetitionFieldAttachmentFragmentDoc = gql`
+  fragment PetitionComposeField_PetitionFieldAttachment on PetitionFieldAttachment {
+    ...PetitionComposeFieldAttachment_PetitionFieldAttachment
+  }
+  ${PetitionComposeFieldAttachment_PetitionFieldAttachmentFragmentDoc}
+` as unknown as DocumentNode<PetitionComposeField_PetitionFieldAttachmentFragment, unknown>;
+export const PetitionFieldOptionsListEditor_PetitionFieldFragmentDoc = gql`
+  fragment PetitionFieldOptionsListEditor_PetitionField on PetitionField {
+    id
+    type
+    optional
+    options
+  }
+` as unknown as DocumentNode<PetitionFieldOptionsListEditor_PetitionFieldFragment, unknown>;
+export const PetitionFieldSelect_PetitionFieldFragmentDoc = gql`
+  fragment PetitionFieldSelect_PetitionField on PetitionField {
+    id
+    type
+    title
+    options
+  }
+` as unknown as DocumentNode<PetitionFieldSelect_PetitionFieldFragment, unknown>;
+export const PetitionFieldVisibilityEditor_PetitionFieldFragmentDoc = gql`
+  fragment PetitionFieldVisibilityEditor_PetitionField on PetitionField {
+    id
+    type
+    multiple
+    options
+    isReadOnly
+    ...PetitionFieldSelect_PetitionField
+  }
+  ${PetitionFieldSelect_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<PetitionFieldVisibilityEditor_PetitionFieldFragment, unknown>;
+export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
+  fragment PetitionComposeField_PetitionField on PetitionField {
+    id
+    type
+    title
+    description
+    optional
+    multiple
+    isFixed
+    isInternal
+    isReadOnly
+    visibility
+    attachments {
+      ...PetitionComposeField_PetitionFieldAttachment
+    }
+    ...PetitionFieldOptionsListEditor_PetitionField
+    ...PetitionFieldVisibilityEditor_PetitionField
+  }
+  ${PetitionComposeField_PetitionFieldAttachmentFragmentDoc}
+  ${PetitionFieldOptionsListEditor_PetitionFieldFragmentDoc}
+  ${PetitionFieldVisibilityEditor_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<PetitionComposeField_PetitionFieldFragment, unknown>;
 export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
   fragment PetitionComposeFieldSettings_PetitionField on PetitionField {
     id
@@ -23085,11 +23079,18 @@ export const PetitionSettings_UserFragmentDoc = gql`
   ${SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc}
   ${SignatureConfigDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionSettings_UserFragment, unknown>;
-export const PetitionFieldTypeSelectDropdown_UserFragmentDoc = gql`
-  fragment PetitionFieldTypeSelectDropdown_User on User {
-    hasEsTaxDocumentsField: hasFeatureFlag(featureFlag: ES_TAX_DOCUMENTS_FIELD)
+export const PetitionFieldTypeSelect_UserFragmentDoc = gql`
+  fragment PetitionFieldTypeSelect_User on User {
+    ...PetitionFieldTypeSelectDropdown_User
   }
-` as unknown as DocumentNode<PetitionFieldTypeSelectDropdown_UserFragment, unknown>;
+  ${PetitionFieldTypeSelectDropdown_UserFragmentDoc}
+` as unknown as DocumentNode<PetitionFieldTypeSelect_UserFragment, unknown>;
+export const PetitionComposeFieldSettings_UserFragmentDoc = gql`
+  fragment PetitionComposeFieldSettings_User on User {
+    ...PetitionFieldTypeSelect_User
+  }
+  ${PetitionFieldTypeSelect_UserFragmentDoc}
+` as unknown as DocumentNode<PetitionComposeFieldSettings_UserFragment, unknown>;
 export const PetitionCompose_QueryFragmentDoc = gql`
   fragment PetitionCompose_Query on Query {
     ...PetitionLayout_Query
@@ -23101,7 +23102,7 @@ export const PetitionCompose_QueryFragmentDoc = gql`
       organization {
         ...isUsageLimitsReached_Organization
       }
-      ...PetitionFieldTypeSelectDropdown_User
+      ...PetitionComposeFieldSettings_User
     }
   }
   ${PetitionLayout_QueryFragmentDoc}
@@ -23109,7 +23110,7 @@ export const PetitionCompose_QueryFragmentDoc = gql`
   ${useUpdateIsReadNotification_UserFragmentDoc}
   ${useSendPetitionHandler_UserFragmentDoc}
   ${isUsageLimitsReached_OrganizationFragmentDoc}
-  ${PetitionFieldTypeSelectDropdown_UserFragmentDoc}
+  ${PetitionComposeFieldSettings_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionCompose_QueryFragment, unknown>;
 export const PetitionTemplateRequestMessageCard_PetitionTemplateFragmentDoc = gql`
   fragment PetitionTemplateRequestMessageCard_PetitionTemplate on PetitionTemplate {

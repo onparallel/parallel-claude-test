@@ -21,6 +21,7 @@ import {
   PetitionComposeFieldRef,
 } from "@parallel/components/petition-compose/PetitionComposeField";
 import {
+  PetitionComposeFieldList_UserFragment,
   PetitionComposeField_PetitionFieldFragment,
   PetitionFieldType,
   UpdatePetitionFieldInput,
@@ -39,7 +40,7 @@ import { Fragment, memo, useCallback, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { indexBy, pick, zip } from "remeda";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
-import { ReferencedFieldDialog, useReferencedFieldDialog } from "./dialogs/ReferencedFieldDialog";
+import { useReferencedFieldDialog } from "./dialogs/ReferencedFieldDialog";
 
 type FieldSelection = PetitionComposeField_PetitionFieldFragment;
 
@@ -56,6 +57,7 @@ function reset(fields: FieldSelection[]): () => FieldsState {
 }
 
 export interface PetitionComposeFieldListProps extends BoxProps {
+  user: PetitionComposeFieldList_UserFragment;
   petitionId: string;
   active: Maybe<string>;
   fields: FieldSelection[];
@@ -74,6 +76,7 @@ export interface PetitionComposeFieldListProps extends BoxProps {
 
 export const PetitionComposeFieldList = Object.assign(
   memo(function PetitionComposeFieldList({
+    user,
     petitionId,
     active,
     fields,
@@ -420,6 +423,7 @@ export const PetitionComposeFieldList = Object.assign(
               setHoveredFieldId(hoveredFieldIdWhileMenuOpenedRef.current);
             }
           },
+          user,
         } as ButtonProps & AddFieldPopoverProps),
       []
     );
@@ -492,6 +496,7 @@ export const PetitionComposeFieldList = Object.assign(
               id="big-add-field-button"
               onSelectFieldType={onAddField}
               colorScheme={isTemplate ? "purple" : undefined}
+              user={user}
             />
           </Flex>
         ) : null}
@@ -500,16 +505,11 @@ export const PetitionComposeFieldList = Object.assign(
   }),
   {
     fragments: {
-      petition: gql`
-        fragment PetitionComposeFieldList_Petition on Petition {
-          fields {
-            isFixed
-            ...PetitionComposeField_PetitionField
-            ...ReferencedFieldDialog_PetitionField
-          }
+      User: gql`
+        fragment PetitionComposeFieldList_User on User {
+          ...AddFieldPopover_User
         }
-        ${PetitionComposeField.fragments.PetitionField}
-        ${ReferencedFieldDialog.fragments.PetitionField}
+        ${AddFieldPopover.fragments.User}
       `,
     },
   }

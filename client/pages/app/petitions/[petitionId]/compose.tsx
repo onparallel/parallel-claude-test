@@ -448,6 +448,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   onFieldTypeChange={handleFieldTypeChange}
                   onClose={handleSettingsClose}
                   isReadOnly={petition.isRestricted || isPublicTemplate}
+                  user={me}
                 />
               ) : (
                 <Card display="flex" flexDirection="column" maxHeight={`calc(100vh - 6rem)`}>
@@ -498,6 +499,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           <Box padding={4}>
             <PetitionComposeFieldList
               petitionId={petition.id}
+              user={me}
               showErrors={showErrors}
               fields={petition.fields}
               active={activeFieldId}
@@ -614,6 +616,7 @@ PetitionCompose.fragments = {
           organization {
             ...isUsageLimitsReached_Organization
           }
+          ...PetitionComposeFieldSettings_User
         }
       }
       ${PetitionLayout.fragments.Query}
@@ -621,6 +624,7 @@ PetitionCompose.fragments = {
       ${useSendPetitionHandler.fragments.User}
       ${useUpdateIsReadNotification.fragments.User}
       ${isUsageLimitsReached.fragments.Organization}
+      ${PetitionComposeFieldSettings.fragments.User}
     `;
   },
 };

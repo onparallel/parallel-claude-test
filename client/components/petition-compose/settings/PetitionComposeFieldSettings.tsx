@@ -3,6 +3,7 @@ import { Box, Heading, Image, Stack, Switch } from "@chakra-ui/react";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import {
   PetitionComposeFieldSettings_PetitionFieldFragment,
+  PetitionComposeFieldSettings_UserFragment,
   PetitionFieldType,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
@@ -10,7 +11,7 @@ import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, ReactNode, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { PetitionFieldTypeSelect } from "../PetitionFieldTypeSelectDropdown";
+import { PetitionFieldTypeSelect } from "../PetitionFieldTypeSelect";
 import { CheckboxSettings } from "./PetitionComposeCheckboxSettings";
 import { DynamicSelectSettings } from "./PetitionComposeDynamicSelectFieldSettings";
 import { FileUploadSettings } from "./PetitionComposeFileUploadSettings";
@@ -26,6 +27,7 @@ import { SettingsRowAlias } from "./SettingsRowAlias";
 
 export type PetitionComposeFieldSettingsProps = {
   petitionId: string;
+  user: PetitionComposeFieldSettings_UserFragment;
   field: PetitionComposeFieldSettings_PetitionFieldFragment;
   onFieldTypeChange: (fieldId: string, type: PetitionFieldType) => void;
   onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => void;
@@ -36,6 +38,7 @@ export type PetitionComposeFieldSettingsProps = {
 
 export function PetitionComposeFieldSettings({
   petitionId,
+  user,
   field,
   onFieldEdit,
   onFieldTypeChange,
@@ -225,6 +228,7 @@ export function PetitionComposeFieldSettings({
               }
             }}
             isDisabled={isReadOnly || field.isFixed}
+            user={user}
           />
         </Box>
         {field.type !== "SHORT_TEXT" ? commonSettings : null}
@@ -279,6 +283,12 @@ export function PetitionComposeFieldSettings({
 }
 
 PetitionComposeFieldSettings.fragments = {
+  User: gql`
+    fragment PetitionComposeFieldSettings_User on User {
+      ...PetitionFieldTypeSelect_User
+    }
+    ${PetitionFieldTypeSelect.fragments.User}
+  `,
   PetitionField: gql`
     fragment PetitionComposeFieldSettings_PetitionField on PetitionField {
       id
