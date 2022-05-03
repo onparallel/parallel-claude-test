@@ -22,20 +22,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { PetitionFieldTypeLabel } from "./PetitionFieldTypeLabel";
 import { PetitionFieldTypeText } from "./PetitionFieldTypeText";
 
-const FIELD_TYPES: PetitionFieldType[] = [
-  "HEADING",
-  "SHORT_TEXT",
-  "TEXT",
-  "FILE_UPLOAD",
-  "CHECKBOX",
-  "SELECT",
-  "DATE",
-  "PHONE",
-  "NUMBER",
-  "ES_TAX_DOCUMENTS",
-  "DYNAMIC_SELECT",
-];
-
 export interface PetitionFieldTypeSelectDropdownProps extends MenuListProps {
   showHeader?: boolean;
   showDescription?: boolean;
@@ -83,8 +69,21 @@ export const PetitionFieldTypeSelectDropdown = Object.assign(
       const descriptionWidth = 270;
 
       const fieldTypes = useMemo(
-        () => FIELD_TYPES.filter((t) => t !== "ES_TAX_DOCUMENTS" || user.hasEsTaxDocumentsField),
-        []
+        () =>
+          [
+            "HEADING",
+            "SHORT_TEXT",
+            "TEXT",
+            "FILE_UPLOAD",
+            "CHECKBOX",
+            "SELECT",
+            "DATE",
+            "PHONE",
+            "NUMBER",
+            ...(user.hasEsTaxDocumentsField ? ["ES_TAX_DOCUMENTS"] : []),
+            "DYNAMIC_SELECT",
+          ] as PetitionFieldType[],
+        [user.hasEsTaxDocumentsField]
       );
 
       const { locale } = useIntl();

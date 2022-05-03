@@ -6,7 +6,7 @@ import { FormattedMessage } from "react-intl";
 import { DialogProps, useDialog } from "../../common/dialogs/DialogProvider";
 
 function OverwriteDocumentationDialog({ tone, ...props }: DialogProps<{ tone: Tone }>) {
-  const focusRef = useRef(null);
+  const focusRef = useRef<HTMLButtonElement>(null);
   return (
     <ConfirmDialog
       {...props}

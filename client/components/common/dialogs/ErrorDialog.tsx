@@ -11,7 +11,7 @@ export type ErrorDialogProps = {
 };
 
 export function ErrorDialog({ message, header, ...props }: DialogProps<ErrorDialogProps>) {
-  const focusRef = useRef(null);
+  const focusRef = useRef<HTMLButtonElement>(null);
   return (
     <ConfirmDialog
       initialFocusRef={focusRef}
