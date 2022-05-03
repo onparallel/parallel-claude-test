@@ -196,6 +196,7 @@ export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
 export type FeatureFlag =
   | "DEVELOPER_ACCESS"
+  | "ES_TAX_DOCUMENTS_FIELD"
   | "EXPORT_CUATRECASAS"
   | "GHOST_LOGIN"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"

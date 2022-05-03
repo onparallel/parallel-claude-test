@@ -1,6 +1,5 @@
 import { arg, booleanArg, list, nonNull, objectType, queryField, stringArg } from "nexus";
 import { isDefined } from "remeda";
-import { PetitionLocale } from "../../api/public/__types";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { safeJsonParse } from "../../util/safeJsonParse";
@@ -34,7 +33,7 @@ export const LandingTemplate = objectType({
     });
     t.field("locale", {
       type: "PetitionLocale",
-      resolve: (o) => o.locale as PetitionLocale,
+      resolve: (o) => o.locale as any,
     });
     t.nullable.string("shortDescription", {
       resolve: (o) => o.public_metadata.description,

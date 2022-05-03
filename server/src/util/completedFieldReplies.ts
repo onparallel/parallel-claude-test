@@ -1,4 +1,4 @@
-import { PetitionFieldType } from "../api/public/__types";
+import { PetitionFieldType } from "../db/__types";
 
 type PartialField = {
   type: PetitionFieldType;

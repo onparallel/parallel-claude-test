@@ -1,5 +1,6 @@
 import { FormattedMessage } from "react-intl";
-import { Tone } from "../../api/public/__types";
+import { Tone } from "../../db/__types";
+
 import { Button } from "./Button";
 
 export function CompleteInfoButton({ href, tone }: { href: string; tone: Tone }) {
