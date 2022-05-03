@@ -659,7 +659,10 @@ export function SignatureConfigDialogBodyStep2({
                 />
                 <SuggestedSigners
                   suggestions={suggestions}
-                  onAddSigner={(s) => onChange([...signers, s])}
+                  onAddSigner={(s) => {
+                    setRadioSelection("choose-now");
+                    onChange([...signers, s]);
+                  }}
                 />
               </Box>
             </>
