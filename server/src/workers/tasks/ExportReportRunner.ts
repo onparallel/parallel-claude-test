@@ -1,5 +1,5 @@
 import Excel from "exceljs";
-import { isDefined, zip } from "remeda";
+import { isDefined, uniq, zip } from "remeda";
 import { Readable } from "stream";
 import { PetitionFieldReply } from "../../db/__types";
 import { getFieldIndices as getFieldIndexes } from "../../util/fieldIndices";
@@ -60,7 +60,7 @@ export class ExportReportRunner extends TaskRunner<"EXPORT_REPORT"> {
         if (field.type !== "HEADING") {
           const replies = petitionFieldsReplies[i];
           row[`${fieldIndex}: ${field.title}`] =
-            field.type !== "FILE_UPLOAD"
+            field.type !== "FILE_UPLOAD" // TODO: replace with `!isFileTypeField(field.type)` when [feat/ch2444] is merged
               ? replies.map(this.replyContent).join("; ")
               : replies.length > 0
               ? `${replies.length} ${i18n("file(s)")}`
@@ -111,11 +111,8 @@ export class ExportReportRunner extends TaskRunner<"EXPORT_REPORT"> {
     const wb = new Excel.Workbook();
 
     const page = wb.addWorksheet();
-    page.columns = Object.entries(rows[0] ?? []).map(([key]) => ({ key, header: key }));
-
-    rows.forEach((row) => {
-      page.addRow(Object.entries(row).map(([, value]) => value));
-    });
+    page.columns = uniq(rows.flatMap(Object.keys)).map((key) => ({ key, header: key }));
+    page.addRows(rows);
 
     const stream = new Readable();
     stream.push(await wb.xlsx.writeBuffer());
