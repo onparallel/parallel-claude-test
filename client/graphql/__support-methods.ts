@@ -441,7 +441,7 @@ export const supportMethods: {
     field: {
       name: "shareSignaturitApiKey",
       description:
-        "Shares our SignaturIt production APIKEY with the passed Org, and creates corresponding usage limits.",
+        "Shares our SignaturIt production APIKEY with the passed Org, creates corresponding usage limits and activates PETITION_SIGNATURE feature flag.",
       args: [
         {
           name: "limit",

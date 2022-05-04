@@ -546,7 +546,7 @@ export const uploadUserAvatar = mutationField("uploadUserAvatar", {
 });
 
 export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
-  description: `Shares our SignaturIt production APIKEY with the passed Org, and creates corresponding usage limits.`,
+  description: `Shares our SignaturIt production APIKEY with the passed Org, creates corresponding usage limits and activates PETITION_SIGNATURE feature flag.`,
   type: "SupportMethodResponse",
   args: {
     orgId: nonNull(intArg({ description: "Numeric ID of the Organization" })),
@@ -606,6 +606,7 @@ export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
             },
             t
           ),
+          ctx.featureFlags.addOrUpdateFeatureFlagOverride("PETITION_SIGNATURE", orgId, true, t),
           ctx.organizations.updateOrganization(
             orgId,
             {

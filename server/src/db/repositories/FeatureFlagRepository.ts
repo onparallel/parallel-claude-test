@@ -134,7 +134,8 @@ export class FeatureFlagRepository extends BaseRepository {
   async addOrUpdateFeatureFlagOverride(
     featureFlag: FeatureFlagName,
     orgId: number,
-    value: boolean
+    value: boolean,
+    t?: Knex.Transaction
   ) {
     return await this.raw(
       /* sql */ `
@@ -144,7 +145,8 @@ export class FeatureFlagRepository extends BaseRepository {
           value = EXCLUDED.value
         returning *;
       `,
-      [featureFlag, orgId, value]
+      [featureFlag, orgId, value],
+      t
     );
   }
 }
