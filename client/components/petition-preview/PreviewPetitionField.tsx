@@ -203,6 +203,10 @@ export function PreviewPetitionField({
   const { refetch } = useQuery(PreviewPetitionField_PetitionFieldDocument, {
     skip: true,
   });
+  const handleRefreshAsyncField = useCallback(
+    async () => await refetch({ fieldId: field.id, petitionId }),
+    [refetch, field.id, petitionId]
+  );
 
   const commonProps = {
     field: { ...field, replies: isCacheOnly ? field.previewReplies : field.replies },
@@ -247,7 +251,7 @@ export function PreviewPetitionField({
       tone={tone}
       onDownloadReply={handleDownloadFileUploadReply}
       onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
-      onRefreshField={() => refetch({ fieldId: field.id, petitionId })}
+      onRefreshField={handleRefreshAsyncField}
       isCacheOnly={isCacheOnly}
       view="preview"
     />

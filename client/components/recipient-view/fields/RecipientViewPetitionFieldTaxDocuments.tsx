@@ -3,8 +3,10 @@ import { ExclamationOutlineIcon } from "@parallel/chakra/icons";
 import { Tone } from "@parallel/graphql/__types";
 import { centeredPopup, openNewWindow } from "@parallel/utils/openNewWindow";
 import { useInterval } from "@parallel/utils/useInterval";
+import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
+import { isDefined } from "@udecode/plate-core";
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { useOverwriteDocumentationDialog } from "../dialogs/OverwriteDocumentationDialog";
 import {
@@ -54,16 +56,34 @@ export function RecipientViewPetitionFieldTaxDocuments({
   );
 
   const [state, setState] = useState<"IDLE" | "ERROR" | "FETCHING">("IDLE");
+  const stateRef = useUpdatingRef(state);
 
   const showOverwriteDocumentationDialog = useOverwriteDocumentationDialog();
 
-  useInterval(async (done) => {
-    if (field.replies.length === 0) {
+  useInterval(
+    async (done) => {
+      if (stateRef.current === "FETCHING") {
       onRefreshField();
     } else {
       done();
     }
-  }, 10000);
+    },
+    10000,
+    [onRefreshField]
+  );
+
+  const popupRef = useRef<Window>();
+  useEffect(() => {
+    const handler = function (e: MessageEvent) {
+      const popup = popupRef.current;
+      if (isDefined(popup) && e.source === popup && e.data.name === "success") {
+        onRefreshField();
+        popup.close();
+      }
+    };
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, [onRefreshField]);
 
   const handleStart = async () => {
     try {
@@ -72,7 +92,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
         await handleDeletePetitionReply({ replyId: reply.id });
       }
       setState("FETCHING");
-      const popup = await openNewWindow(async () => {
+      popupRef.current = await openNewWindow(async () => {
         const data = await onStartAsyncFieldCompletion();
         if (data.type === "CACHE") {
           throw new Error("CLOSE");
@@ -80,12 +100,6 @@ export function RecipientViewPetitionFieldTaxDocuments({
           return data!.url;
         }
       }, centeredPopup({ height: 800, width: 700 }));
-      window.addEventListener("message", (e) => {
-        if (e.data.name === "success") {
-          onRefreshField();
-          popup?.close();
-        }
-      });
       setState("IDLE");
     } catch {
       setState("ERROR");

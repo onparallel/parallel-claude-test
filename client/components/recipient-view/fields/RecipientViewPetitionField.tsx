@@ -213,6 +213,10 @@ export function RecipientViewPetitionField({ tone, ...props }: RecipientViewPeti
   const { refetch } = useQuery(RecipientViewPetitionField_PublicPetitionFieldDocument, {
     skip: true,
   });
+  const handleRefreshAsyncField = useCallback(
+    () => refetch({ fieldId: props.field.id, keycode: props.keycode }),
+    [refetch, props.field.id, props.keycode]
+  );
 
   const commonProps = {
     onCommentsButtonClick: handleCommentsButtonClick,
@@ -254,7 +258,7 @@ export function RecipientViewPetitionField({ tone, ...props }: RecipientViewPeti
       tone={tone}
       onDownloadReply={handleDownloadFileUploadReply}
       onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
-      onRefreshField={() => refetch({ fieldId: props.field.id, keycode: props.keycode })}
+      onRefreshField={handleRefreshAsyncField}
       view="recipient"
     />
   ) : null;
