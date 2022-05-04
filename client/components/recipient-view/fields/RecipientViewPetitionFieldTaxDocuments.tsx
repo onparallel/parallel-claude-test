@@ -3,7 +3,6 @@ import { ExclamationOutlineIcon } from "@parallel/chakra/icons";
 import { Tone } from "@parallel/graphql/__types";
 import { centeredPopup, openNewWindow } from "@parallel/utils/openNewWindow";
 import { useInterval } from "@parallel/utils/useInterval";
-import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { isDefined } from "@udecode/plate-core";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -60,7 +59,10 @@ export function RecipientViewPetitionFieldTaxDocuments({
   const popupRef = useRef<Window>();
   useInterval(
     async (done) => {
-      if (state === "FETCHING") {
+      if (field.replies.length > 0) {
+        setState("IDLE");
+        done();
+      } else if (state === "FETCHING") {
         if (isDefined(popupRef.current) && popupRef.current.closed) {
           setState("IDLE");
           done();
@@ -72,7 +74,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
       }
     },
     10000,
-    [onRefreshField, state]
+    [onRefreshField, state, field.replies.length]
   );
 
   useEffect(() => {
