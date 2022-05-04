@@ -1,4 +1,4 @@
-import { ForbiddenError } from "apollo-server-core";
+import { ApolloError, ForbiddenError } from "apollo-server-core";
 import { differenceInMinutes } from "date-fns";
 import { arg, booleanArg, enumType, list, mutationField, nonNull, stringArg } from "nexus";
 import pMap from "p-map";
@@ -20,7 +20,7 @@ import {
   userIsSuperAdmin,
   verifyCaptcha,
 } from "../helpers/authorize";
-import { ArgValidationError, WhitelistedError } from "../helpers/errors";
+import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { uploadArg } from "../helpers/scalars";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
@@ -679,7 +679,7 @@ export const loginAs = mutationField("loginAs", {
     try {
       await ctx.auth.updateSessionLogin(ctx.req, (ctx.realUser ?? ctx.user!).id, userId);
     } catch {
-      throw new WhitelistedError("Mutation requires session login", "SESSION_REQUIRED");
+      throw new ApolloError("Mutation requires session login", "SESSION_REQUIRED");
     }
     return RESULT.SUCCESS;
   },
@@ -692,7 +692,7 @@ export const restoreLogin = mutationField("restoreLogin", {
     try {
       await ctx.auth.restoreSessionLogin(ctx.req, (ctx.realUser ?? ctx.user!).id);
     } catch {
-      throw new WhitelistedError("Mutation requires session login", "SESSION_REQUIRED");
+      throw new ApolloError("Mutation requires session login", "SESSION_REQUIRED");
     }
     return RESULT.SUCCESS;
   },
@@ -713,7 +713,7 @@ export const changeOrganization = mutationField("changeOrganization", {
     try {
       await ctx.auth.restoreSessionLogin(ctx.req, user.id);
     } catch {
-      throw new WhitelistedError("Mutation requires session login", "SESSION_REQUIRED");
+      throw new ApolloError("Mutation requires session login", "SESSION_REQUIRED");
     }
     return RESULT.SUCCESS;
   },
