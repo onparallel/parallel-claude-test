@@ -1198,6 +1198,8 @@ export interface Task {
   updated_at: Date; // timestamptz
   updated_by: Maybe<string>; // varchar
   petition_access_id: Maybe<number>; // int4
+  started_at: Maybe<Date>; // timestamptz
+  finished_at: Maybe<Date>; // timestamptz
 }
 
 export type CreateTask = PartialProps<
@@ -1213,6 +1215,8 @@ export type CreateTask = PartialProps<
   | "updated_at"
   | "updated_by"
   | "petition_access_id"
+  | "started_at"
+  | "finished_at"
 >;
 
 export interface TemplateDefaultPermission {

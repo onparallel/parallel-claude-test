@@ -40,6 +40,39 @@ export class TaskRepository extends BaseRepository {
 
   readonly loadTask: Loader<number, Task<any> | null> = this.buildLoadBy("task", "id");
 
+  async pickupTask(taskId: number, updatedBy: string) {
+    return await this.updateTask(
+      taskId,
+      { status: "PROCESSING", progress: 0, started_at: this.now() },
+      updatedBy
+    );
+  }
+
+  async taskCompleted(taskId: number, output: any, updatedBy: string) {
+    return await this.updateTask(
+      taskId,
+      {
+        status: "COMPLETED",
+        progress: 100,
+        output,
+        finished_at: this.now(),
+      },
+      updatedBy
+    );
+  }
+
+  async taskFailed(taskId: number, errorData: any, updatedBy: string) {
+    return await this.updateTask(
+      taskId,
+      {
+        status: "FAILED",
+        error_data: errorData,
+        finished_at: this.now(),
+      },
+      updatedBy
+    );
+  }
+
   async createTask<TName extends TaskName>(data: Partial<Task<TName>>, createdBy: string) {
     const [task] = await this.from("task").insert(
       {

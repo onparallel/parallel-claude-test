@@ -14,30 +14,22 @@ const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => Tas
   EXPORT_EXCEL: ExportExcelRunner,
 };
 
-createQueueWorker("task-worker", async (payload: { taskId: number }, ctx) => {
-  const task = await ctx.tasks.loadTask(payload.taskId);
-  if (!isDefined(task)) {
-    return;
-  }
+createQueueWorker("task-worker", async ({ taskId }: { taskId: number }, ctx) => {
   try {
-    await ctx.tasks.updateTask(
-      task.id,
-      { status: "PROCESSING", progress: 0 },
-      `TaskWorker:${task.id}`
-    );
+    const task = await ctx.tasks.pickupTask(taskId, `TaskWorker:${taskId}`);
+    if (!isDefined(task)) {
+      return;
+    }
     const Runner = RUNNERS[task.name as TaskName];
     const output = await new Runner(ctx, task).run();
-    await ctx.tasks.updateTask(
-      task.id,
-      { status: "COMPLETED", progress: 100, output },
-      `TaskWorker:${task.id}`
-    );
+
+    await ctx.tasks.taskCompleted(taskId, output, `TaskWorker:${taskId}`);
   } catch (error: any) {
     ctx.logger.error(error.message, { stack: error.stack });
-    await ctx.tasks.updateTask(
-      task.id,
-      { status: "FAILED", error_data: { message: error.message, stack: error.stack } },
-      `TaskWorker:${task.id}`
+    await ctx.tasks.taskFailed(
+      taskId,
+      { message: error.message, stack: error.stack },
+      `TaskWorker:${taskId}`
     );
   }
 });
