@@ -10,6 +10,7 @@ import {
   UserData,
 } from "../db/__types";
 import { unMaybeArray } from "../util/arrays";
+import { fullName } from "../util/fullName";
 import { toGlobalId } from "../util/globalId";
 import { titleize } from "../util/strings";
 import { Maybe, MaybeArray } from "../util/types";
@@ -249,6 +250,7 @@ export class AnalyticsService implements IAnalyticsService {
         email: userData.email,
         firstName: userData.first_name,
         lastName: userData.last_name,
+        name: fullName(userData.first_name, userData.last_name),
         createdAt: user.created_at.toISOString(),
         lastActiveAt: user.last_active_at?.toISOString(),
         industry: userData.details?.industry,

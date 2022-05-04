@@ -54,7 +54,7 @@ function Account() {
 
   async function onSaveName({ firstName, lastName }: AccountChangeNameData) {
     try {
-      window.analytics?.identify(me.id, { firstName, lastName });
+      window.analytics?.identify(me.id, { firstName, lastName, name: me.fullName! });
       await updateAccount({ variables: { firstName, lastName } });
       updateSuccessToast();
     } catch {
@@ -74,7 +74,7 @@ function Account() {
   async function handleLocaleChange(locale: string) {
     try {
       await setUserLocale({ variables: { locale } });
-      window.analytics?.identify(me.id, { locale });
+      window.analytics?.identify(me.id, { locale, name: me.fullName! });
       router.push(router.asPath, undefined, { locale });
     } catch {
       genericErrorToast();

@@ -68,6 +68,8 @@ export const AppLayout = Object.assign(
       }
     }, []);
 
+    const isMobile = useBreakpointValue({ base: true, sm: false });
+
     // Load Segment analytics and identify user
     useEffect(() => {
       if (window.analytics && !(window.analytics as any).initialized) {
@@ -80,6 +82,7 @@ export const AppLayout = Object.assign(
         lastName: me.lastName,
         createdAt: me.createdAt,
         orgRole: me.role,
+        name: me.fullName!,
       });
     }, [me.id]);
 
@@ -91,6 +94,7 @@ export const AppLayout = Object.assign(
           name: me.fullName,
           email: me.email,
           signed_up_at: me.createdAt,
+          device_type: isMobile ? "mobile" : "desktop",
         });
       }
     }, [me.id]);
@@ -102,8 +106,6 @@ export const AppLayout = Object.assign(
         Sentry.setUser(null);
       };
     }, [me.id]);
-
-    const isMobile = useBreakpointValue({ base: true, sm: false });
 
     function handleHelpCenterClick() {
       window.analytics?.track("Help Center Clicked", {
