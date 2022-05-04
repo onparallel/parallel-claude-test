@@ -54,29 +54,34 @@ export function RecipientViewPetitionFieldTaxDocuments({
   );
 
   const [state, setState] = useState<"IDLE" | "ERROR" | "FETCHING">("IDLE");
-  const stateRef = useUpdatingRef(state);
 
   const showOverwriteDocumentationDialog = useOverwriteDocumentationDialog();
 
+  const popupRef = useRef<Window>();
   useInterval(
     async (done) => {
-      if (stateRef.current === "FETCHING") {
-        onRefreshField();
+      if (state === "FETCHING") {
+        if (isDefined(popupRef.current) && popupRef.current.closed) {
+          setState("IDLE");
+          done();
+        } else {
+          onRefreshField();
+        }
       } else {
         done();
       }
     },
     10000,
-    [onRefreshField]
+    [onRefreshField, state]
   );
 
-  const popupRef = useRef<Window>();
   useEffect(() => {
     const handler = function (e: MessageEvent) {
       const popup = popupRef.current;
       if (isDefined(popup) && e.source === popup && e.data.name === "success") {
         onRefreshField();
         popup.close();
+        setState("IDLE");
       }
     };
     window.addEventListener("message", handler);
@@ -98,7 +103,6 @@ export function RecipientViewPetitionFieldTaxDocuments({
           return data!.url;
         }
       }, centeredPopup({ height: 800, width: 700 }));
-      setState("IDLE");
     } catch {
       setState("ERROR");
     }
