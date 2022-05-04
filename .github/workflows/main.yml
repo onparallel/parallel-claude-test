@@ -84,3 +84,7 @@ jobs:
       - name: Run server test suite
         timeout-minutes: 10
         run: yarn --cwd server/ test --silent --coverage
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
