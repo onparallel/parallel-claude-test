@@ -4,7 +4,7 @@ import fetch, { RequestInfo, RequestInit, Response } from "node-fetch";
 export const FETCH_SERVICE = Symbol.for("FETCH_SERVICE");
 
 export interface IFetchService {
-  fetch(url: RequestInfo, init: RequestInit): Promise<Response>;
+  fetch(url: RequestInfo, init?: RequestInit): Promise<Response>;
   fetchWithTimeout(url: RequestInfo, init: RequestInit, timeout: number): Promise<Response>;
 }
 

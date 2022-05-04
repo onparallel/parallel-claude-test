@@ -300,15 +300,13 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
     fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
     fieldCanBeReplied("fieldId")
   ),
-  resolve: async (_, { fieldId }, ctx) => {
-    const token = await sign(
-      {
-        fieldId: toGlobalId("PetitionField", fieldId),
-        userId: toGlobalId("User", ctx.user!.id),
-      },
-      ctx.config.security.jwtSecret,
-      { expiresIn: "1d" }
-    );
+  resolve: async (_, { petitionId, fieldId }, ctx) => {
+    const payload = {
+      fieldId: toGlobalId("PetitionField", fieldId),
+      userId: toGlobalId("User", ctx.user!.id),
+    };
+
+    const token = await sign(payload, ctx.config.security.jwtSecret, { expiresIn: "1d" });
 
     const baseWebhookUrl = await getBaseWebhookUrl(ctx.config.misc.parallelUrl);
 
@@ -317,8 +315,12 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip/private?token=${token}`,
+        webhookUrl: `${baseWebhookUrl}/api/webhooks/bankflip?token=${token}`,
         userId,
+        metadata: {
+          ...payload,
+          petitionId: toGlobalId("Petition", petitionId),
+        },
       }),
     });
     const result = await res.json();

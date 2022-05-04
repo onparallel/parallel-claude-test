@@ -1,8 +1,10 @@
 import { json, Router } from "express";
 import { ApiContext } from "../context";
+import { Contact, User } from "../db/__types";
 import { fromGlobalId } from "../util/globalId";
 import { verify } from "../util/jwt";
 import { random } from "../util/token";
+import { Maybe } from "../util/types";
 
 type BankflipDocument = {
   id: string;
@@ -27,21 +29,30 @@ type BankflipWebhookBody = {
   };
 };
 
+type TokenPayload = { userId: string; fieldId: string } | { accessId: string; fieldId: string };
+
 export const bankflip = Router()
   .use(json())
-  // for public context. token contains keycode and fieldId
-  .post("/public", async (req, res, next) => {
+  .post("/", async (req, res, next) => {
     try {
-      const { keycode, fieldId: fieldGID } = await verify(
+      const payload = await verify<TokenPayload>(
         req.query.token as string,
         req.context.config.security.jwtSecret
       );
 
-      const fieldId = fromGlobalId(fieldGID, "PetitionField").id;
-
-      const access = (await req.context.petitions.loadAccessByKeycode(keycode))!;
-      const contact = (await req.context.contacts.loadContact(access.contact_id))!;
-
+      const fieldId = fromGlobalId(payload.fieldId, "PetitionField").id;
+      let user: Maybe<User> = null;
+      let contact: Maybe<Contact> = null;
+      if ("userId" in payload) {
+        const userId = fromGlobalId(payload.userId, "User").id;
+        user = await req.context.users.loadUser(userId);
+      } else {
+        const accessId = fromGlobalId(payload.accessId, "PetitionAccess").id;
+        contact = await req.context.contacts.loadContactByAccessId(accessId);
+      }
+      if (!user && !contact) {
+        throw new Error(`User or Contact not found on payload: ${JSON.stringify(payload)}`);
+      }
       const body = req.body as BankflipWebhookBody;
       if (body.type === "request_succeeded") {
         const pdfDocument = body.payload.request.results.aeat_datos_fiscales.find(
@@ -51,20 +62,22 @@ export const bankflip = Router()
           throw new Error(`Document not found`);
         }
 
-        const fileUpload = await uploadEsTaxDocumentsFile(
-          pdfDocument,
-          `Contact:${contact.id}`,
-          req.context
-        );
+        const createdBy = user ? `User:${user.id}` : `Contact:${contact!.id}`;
+        const fileUpload = await uploadEsTaxDocumentsFile(pdfDocument, createdBy, req.context);
+
+        const data =
+          "userId" in payload
+            ? { user_id: fromGlobalId(payload.userId, "User").id }
+            : { petition_access_id: fromGlobalId(payload.accessId, "PetitionAccess").id };
 
         await req.context.petitions.createPetitionFieldReply(
           {
             petition_field_id: fieldId,
-            petition_access_id: access.id,
             type: "ES_TAX_DOCUMENTS",
             content: { file_upload_id: fileUpload.id },
+            ...data,
           },
-          contact
+          user ?? contact!
         );
       }
       res.sendStatus(200).end();
@@ -72,50 +85,6 @@ export const bankflip = Router()
       req.context.logger.error(error.message, { stack: error.stack });
       next(error);
     }
-  })
-  // for private context. token contains userId and fieldId
-  .post("/private", async (req, res, next) => {
-    try {
-      const { userId: userGID, fieldId: fieldGID } = await verify(
-        req.query.token as string,
-        req.context.config.security.jwtSecret
-      );
-
-      const fieldId = fromGlobalId(fieldGID, "PetitionField").id;
-      const userId = fromGlobalId(userGID, "User").id;
-      const user = (await req.context.users.loadUser(userId))!;
-
-      const body = req.body as BankflipWebhookBody;
-      if (body.type === "request_succeeded") {
-        const pdfDocument = body.payload.request.results.aeat_datos_fiscales.find(
-          (d) => d.extension === "pdf"
-        );
-        if (!pdfDocument) {
-          throw new Error(`Document not found`);
-        }
-
-        const fileUpload = await uploadEsTaxDocumentsFile(
-          pdfDocument,
-          `User:${userId}`,
-          req.context
-        );
-
-        await req.context.petitions.createPetitionFieldReply(
-          {
-            petition_field_id: fieldId,
-            user_id: userId,
-            type: "ES_TAX_DOCUMENTS",
-            content: { file_upload_id: fileUpload.id },
-          },
-          user
-        );
-      }
-    } catch (error: any) {
-      req.context.logger.error(error.message, { stack: error.stack });
-      next(error);
-    }
-
-    res.sendStatus(200).end();
   });
 
 async function uploadEsTaxDocumentsFile(
