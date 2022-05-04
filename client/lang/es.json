@@ -5337,7 +5337,12 @@
   {
     "term": "page.choose-org.org-users",
     "definition": "{count, plural, =1 {1 usuario} other {# usuarios}}",
-    "context": "{count} users"
+    "context": "{count, plural, =1 {1 user} other {# users}}"
+  },
+  {
+    "term": "page.choose-org.title",
+    "definition": "Elige la organización",
+    "context": "Choose organization"
   },
   {
     "term": "page.integrations.upgrade-plan-alert",

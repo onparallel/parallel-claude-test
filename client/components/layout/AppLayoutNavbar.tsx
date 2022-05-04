@@ -121,25 +121,29 @@ export const AppLayoutNavbar = Object.assign(
         >
           <Center display={{ base: "none", sm: "flex" }} marginBottom={6} marginTop={2}>
             <NakedLink href="/app">
-              <Box as="a" width="40px" height="40px" position="relative">
+              <Box as="a" width="46px" height="46px" position="relative">
                 <Box
                   position="absolute"
                   cursor="pointer"
                   transition="transform 150ms"
+                  width="46px"
+                  height="46px"
+                  borderRadius="full"
                   _hover={{
                     color: "gray.900",
+                    shadow: "lg",
                     transform: "scale(1.1)",
                   }}
                 >
-                  {me.organization.iconUrl80 ? (
+                  {me.organization.iconUrl92 ? (
                     <Image
-                      boxSize="40px"
+                      boxSize="46px"
                       objectFit="contain"
                       alt={me.organization.name}
-                      src={me.organization.iconUrl80}
+                      src={me.organization.iconUrl92}
                     />
                   ) : (
-                    <Logo width="40px" hideText={true} color="gray.800" />
+                    <Logo width="46px" hideText={true} color="gray.800" />
                   )}
                 </Box>
               </Box>
@@ -230,7 +234,7 @@ export const AppLayoutNavbar = Object.assign(
               organization {
                 id
                 name
-                iconUrl80: iconUrl(options: { resize: { width: 80 } })
+                iconUrl92: iconUrl(options: { resize: { width: 92 } })
                 usageLimits {
                   petitions {
                     limit

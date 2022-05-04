@@ -17,14 +17,16 @@ import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useRoleButton } from "@parallel/utils/useRoleButton";
+import Head from "next/head";
 import Router from "next/router";
 import { MouseEvent, MouseEventHandler } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 
 type ChooseOrgProps = UnwrapPromise<ReturnType<typeof ChooseOrg.getInitialProps>>;
 
 function ChooseOrg({ organizations }: ChooseOrgProps) {
+  const intl = useIntl();
   const apollo = useApolloClient();
   const handleCardPress = useMemoFactory(
     (orgId: string) => async (event: MouseEvent) => {
@@ -39,50 +41,61 @@ function ChooseOrg({ organizations }: ChooseOrgProps) {
     []
   );
   return (
-    <Flex direction="column" minHeight="100vh">
-      <Box paddingX={{ base: 6, md: 8, lg: 10 }} paddingY={{ base: 6, md: 8 }}>
-        <Logo width="152px" />
-      </Box>
-      <Stack
-        spacing={{ base: 6, md: 8, lg: 10 }}
-        flex="1"
-        justifyContent="center"
-        marginBottom="120px"
-      >
-        <Flex justifyContent="center" paddingX={4}>
-          <Heading as="h1" size="xl">
-            <FormattedMessage
-              id="page.choose-org.header"
-              defaultMessage="Choose which organization you want to access"
-            />
-          </Heading>
-        </Flex>
-        <Grid
-          as="ul"
-          alignSelf="center"
-          gridTemplateColumns={{
-            base: `repeat(${Math.min(2, organizations.length)}, minmax(150px, 195px))`,
-            sm: `repeat(${Math.min(3, organizations.length)}, minmax(150px, 195px))`,
-            md: `repeat(${Math.min(4, organizations.length)}, minmax(150px, 195px))`,
-            lg: `repeat(${Math.min(5, organizations.length)}, minmax(150px, 195px))`,
-          }}
+    <>
+      <Head>
+        <title>
+          {intl.formatMessage({
+            id: "page.choose-org.title",
+            defaultMessage: "Choose organization",
+          })}
+          {" | Parallel"}
+        </title>
+      </Head>
+      <Flex direction="column" minHeight="100vh">
+        <Box paddingX={{ base: 6, md: 8, lg: 10 }} paddingY={{ base: 6, md: 8 }}>
+          <Logo width="152px" />
+        </Box>
+        <Stack
+          spacing={{ base: 6, md: 8, lg: 10 }}
+          flex="1"
           justifyContent="center"
-          paddingX={{ base: 4, md: 6, lg: 8 }}
-          gridGap={4}
-          maxWidth="100%"
-          width="1024px"
+          marginBottom="120px"
         >
-          {organizations.map((organization) => (
-            <Flex as="li" key={organization.id}>
-              <OrganizationCard
-                organization={organization}
-                onPressed={handleCardPress(organization.id)}
+          <Flex justifyContent="center" paddingX={4}>
+            <Heading as="h1" size="xl">
+              <FormattedMessage
+                id="page.choose-org.header"
+                defaultMessage="Choose which organization you want to access"
               />
-            </Flex>
-          ))}
-        </Grid>
-      </Stack>
-    </Flex>
+            </Heading>
+          </Flex>
+          <Grid
+            as="ul"
+            alignSelf="center"
+            gridTemplateColumns={{
+              base: `repeat(${Math.min(2, organizations.length)}, minmax(150px, 195px))`,
+              sm: `repeat(${Math.min(3, organizations.length)}, minmax(150px, 195px))`,
+              md: `repeat(${Math.min(4, organizations.length)}, minmax(150px, 195px))`,
+              lg: `repeat(${Math.min(5, organizations.length)}, minmax(150px, 195px))`,
+            }}
+            justifyContent="center"
+            paddingX={{ base: 4, md: 6, lg: 8 }}
+            gridGap={4}
+            maxWidth="100%"
+            width="1024px"
+          >
+            {organizations.map((organization) => (
+              <Flex as="li" key={organization.id}>
+                <OrganizationCard
+                  organization={organization}
+                  onPressed={handleCardPress(organization.id)}
+                />
+              </Flex>
+            ))}
+          </Grid>
+        </Stack>
+      </Flex>
+    </>
   );
 }
 
@@ -125,7 +138,7 @@ function OrganizationCard({
       <Box marginTop={1}>
         <FormattedMessage
           id="page.choose-org.org-users"
-          defaultMessage="{count} users"
+          defaultMessage="{count, plural, =1 {1 user} other {# users}}"
           values={{ count: organization.activeUserCount }}
         />
       </Box>

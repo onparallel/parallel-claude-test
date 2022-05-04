@@ -4051,7 +4051,7 @@ export type AppLayout_QueryFragment = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -4081,7 +4081,7 @@ export type AppLayoutNavbar_QueryFragment = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -4209,7 +4209,7 @@ export type PetitionLayout_QueryFragment = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -4256,7 +4256,7 @@ export type SettingsLayout_QueryFragment = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -10577,7 +10577,7 @@ export type Admin_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -10629,7 +10629,7 @@ export type OrganizationMembers_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -10738,7 +10738,7 @@ export type AdminOrganizations_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -10773,7 +10773,7 @@ export type AdminSupportMethods_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -11020,7 +11020,7 @@ export type Contact_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -11169,7 +11169,7 @@ export type Contacts_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -11257,7 +11257,7 @@ export type OrganizationBranding_userQuery = {
       logoUrl?: string | null;
       name: string;
       preferredTone: Tone;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -11308,7 +11308,7 @@ export type OrganizationGeneral_userQuery = {
       name: string;
       customHost?: string | null;
       iconUrl240?: string | null;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -11468,7 +11468,7 @@ export type OrganizationGroup_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -11625,7 +11625,7 @@ export type OrganizationGroups_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -11660,7 +11660,7 @@ export type OrganizationSettings_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -11697,7 +11697,7 @@ export type OrganizationIntegrations_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -11790,7 +11790,7 @@ export type IntegrationsSignature_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       signatureIntegrations: {
         __typename?: "OrgIntegrationPagination";
         totalCount: number;
@@ -11842,7 +11842,7 @@ export type OrganizationUsage_userQuery = {
       id: string;
       activeUserCount: number;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
@@ -11997,7 +11997,7 @@ export type OrganizationUsers_userQuery = {
       hasSsoProvider: boolean;
       activeUserCount: number;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       users: {
         __typename?: "UserPagination";
         totalCount: number;
@@ -12794,7 +12794,7 @@ export type PetitionActivity_QueryFragment = {
       __typename?: "Organization";
       name: string;
       id: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -14463,7 +14463,7 @@ export type PetitionActivity_userQuery = {
       __typename?: "Organization";
       name: string;
       id: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -14791,7 +14791,7 @@ export type PetitionCompose_QueryFragment = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -15342,7 +15342,7 @@ export type PetitionCompose_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -15704,7 +15704,7 @@ export type PetitionMessages_QueryFragment = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -15740,7 +15740,7 @@ export type PetitionMessages_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -16105,7 +16105,7 @@ export type PetitionPreview_QueryFragment = {
       __typename?: "Organization";
       name: string;
       id: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -16820,7 +16820,7 @@ export type PetitionPreview_userQuery = {
       __typename?: "Organization";
       name: string;
       id: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -17083,7 +17083,7 @@ export type PetitionReplies_QueryFragment = {
       __typename?: "Organization";
       name: string;
       id: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -17566,7 +17566,7 @@ export type PetitionReplies_userQuery = {
       __typename?: "Organization";
       name: string;
       id: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -18071,7 +18071,7 @@ export type Petitions_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -18411,7 +18411,7 @@ export type NewPetition_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -18546,7 +18546,7 @@ export type Account_QueryFragment = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -18623,7 +18623,7 @@ export type Account_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -18758,7 +18758,7 @@ export type Developers_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -18794,7 +18794,7 @@ export type Settings_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -18838,7 +18838,7 @@ export type Security_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
-      iconUrl80?: string | null;
+      iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
@@ -22523,7 +22523,7 @@ export const AppLayoutNavbar_QueryFragmentDoc = gql`
       organization {
         id
         name
-        iconUrl80: iconUrl(options: { resize: { width: 80 } })
+        iconUrl92: iconUrl(options: { resize: { width: 92 } })
         usageLimits {
           petitions {
             limit

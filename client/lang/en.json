@@ -5336,8 +5336,13 @@
   },
   {
     "term": "page.choose-org.org-users",
-    "definition": "{count} users",
-    "context": "{count} users"
+    "definition": "{count, plural, =1 {1 user} other {# users}}",
+    "context": "{count, plural, =1 {1 user} other {# users}}"
+  },
+  {
+    "term": "page.choose-org.title",
+    "definition": "Choose organization",
+    "context": "Choose organization"
   },
   {
     "term": "page.integrations.upgrade-plan-alert",
