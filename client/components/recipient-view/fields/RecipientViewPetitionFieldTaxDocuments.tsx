@@ -105,6 +105,9 @@ export function RecipientViewPetitionFieldTaxDocuments({
           return data!.url;
         }
       }, centeredPopup({ height: 800, width: 700 }));
+      if (isCacheOnly) {
+        setState("IDLE");
+      }
     } catch {
       setState("ERROR");
     }
