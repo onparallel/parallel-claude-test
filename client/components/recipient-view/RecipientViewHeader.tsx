@@ -83,8 +83,8 @@ interface RecipientViewHeaderProps {
   isClosed: boolean;
 }
 
-export const RecipientViewHeader = chakraForwardRef<"setction", RecipientViewHeaderProps>(
-  function RecipientViewHeader(
+export const RecipientViewHeader = Object.assign(
+  chakraForwardRef<"section", RecipientViewHeaderProps>(function RecipientViewHeader(
     { sender, contact, message, recipients, keycode, isClosed, ...props },
     ref
   ) {
@@ -141,7 +141,14 @@ export const RecipientViewHeader = chakraForwardRef<"setction", RecipientViewHea
     const publicPrintPdfTask = usePublicPrintPdfTask();
 
     return (
-      <Box ref={ref} position="relative" width="100%" zIndex={3} backgroundColor="white" {...props}>
+      <Box
+        ref={ref as any}
+        position="relative"
+        width="100%"
+        zIndex={3}
+        backgroundColor="white"
+        {...props}
+      >
         <Flex flexDirection="column" alignItems="center">
           <Flex
             maxWidth="container.lg"
@@ -364,31 +371,32 @@ export const RecipientViewHeader = chakraForwardRef<"setction", RecipientViewHea
         </Flex>
       </Box>
     );
+  }),
+  {
+    fragments: {
+      PublicContact: gql`
+        fragment RecipientViewHeader_PublicContact on PublicContact {
+          id
+          fullName
+          firstName
+          email
+        }
+      `,
+      PublicUser: gql`
+        fragment RecipientViewHeader_PublicUser on PublicUser {
+          id
+          firstName
+          fullName
+          email
+          organization {
+            name
+            logoUrl(options: { resize: { height: 80 } })
+          }
+        }
+      `,
+    },
   }
 );
-
-RecipientViewHeader.fragments = {
-  PublicContact: gql`
-    fragment RecipientViewHeader_PublicContact on PublicContact {
-      id
-      fullName
-      firstName
-      email
-    }
-  `,
-  PublicUser: gql`
-    fragment RecipientViewHeader_PublicUser on PublicUser {
-      id
-      firstName
-      fullName
-      email
-      organization {
-        name
-        logoUrl(options: { resize: { height: 80 } })
-      }
-    }
-  `,
-};
 
 const _mutations = [
   gql`

@@ -259,7 +259,6 @@ export function RecipientViewPetitionField({ tone, ...props }: RecipientViewPeti
       onDownloadReply={handleDownloadFileUploadReply}
       onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
       onRefreshField={handleRefreshAsyncField}
-      view="recipient"
     />
   ) : null;
 }

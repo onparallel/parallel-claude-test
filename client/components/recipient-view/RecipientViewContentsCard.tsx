@@ -43,194 +43,271 @@ interface RecipientViewContentsCardProps {
   usePreviewReplies?: boolean;
 }
 
-export const RecipientViewContentsCard = chakraForwardRef<
-  "section",
-  RecipientViewContentsCardProps
->(function RecipientViewContentsCard({ currentPage, petition, usePreviewReplies, ...props }, ref) {
-  const { query } = useRouter();
-  const { pages, fields } = useGetPagesAndFields(petition.fields, currentPage, usePreviewReplies);
+export const RecipientViewContentsCard = Object.assign(
+  chakraForwardRef<"section", RecipientViewContentsCardProps>(function RecipientViewContentsCard(
+    { currentPage, petition, usePreviewReplies, ...props },
+    ref
+  ) {
+    const { query } = useRouter();
+    const { pages, fields } = useGetPagesAndFields(petition.fields, currentPage, usePreviewReplies);
 
-  const handleFocusField = (field: PetitionFieldSelection) => {
-    if (field.type === "SHORT_TEXT" || field.type === "TEXT") {
-      const id = `reply-${field.id}-${field.replies[0]?.id ?? "new"}`;
-      const element = document.getElementById(id) as HTMLInputElement;
-      element?.focus();
-      if (element.type === "text") {
-        // setSelectionRange does not work on inputs that are not type="text" (e.g. email)
-        element?.setSelectionRange?.(element.value.length, element.value.length);
+    const handleFocusField = (field: PetitionFieldSelection) => {
+      if (field.type === "SHORT_TEXT" || field.type === "TEXT") {
+        const id = `reply-${field.id}-${field.replies[0]?.id ?? "new"}`;
+        const element = document.getElementById(id) as HTMLInputElement;
+        element?.focus();
+        if (element.type === "text") {
+          // setSelectionRange does not work on inputs that are not type="text" (e.g. email)
+          element?.setSelectionRange?.(element.value.length, element.value.length);
+        }
       }
-    }
-  };
+    };
 
-  const filteredFields = (fields as PetitionFieldSelection[])
-    .filter((field) =>
-      (field.__typename === "PublicPetitionField" && field.isInternal) ||
-      (field.type === "HEADING" && !field.title)
-        ? false
-        : true
-    )
-    // skip first one as long it has a title otherwise skip nothing as it's been filtered our before
-    .slice(fields[0].title ? 1 : 0) as typeof fields;
+    const filteredFields = (fields as PetitionFieldSelection[])
+      .filter((field) =>
+        (field.__typename === "PublicPetitionField" && field.isInternal) ||
+        (field.type === "HEADING" && !field.title)
+          ? false
+          : true
+      )
+      // skip first one as long it has a title otherwise skip nothing as it's been filtered our before
+      .slice(fields[0].title ? 1 : 0) as typeof fields;
 
-  const showCommentsCount = (field: PetitionFieldSelection) => {
+    const showCommentsCount = (field: PetitionFieldSelection) => {
+      return (
+        field.commentCount > 0 && (field.__typename === "PetitionField" || field.hasCommentsEnabled)
+      );
+    };
+
     return (
-      field.commentCount > 0 && (field.__typename === "PetitionField" || field.hasCommentsEnabled)
-    );
-  };
+      <Card ref={ref} display="flex" flexDirection="column" {...props}>
+        <CardHeader as="h3" size="sm">
+          <FormattedMessage id="recipient-view.contents-header" defaultMessage="Contents" />
+        </CardHeader>
+        <Stack as={List} spacing={1} paddingY={2} paddingX={1.5} minHeight="10rem" overflow="auto">
+          {pages.map(
+            (
+              {
+                title,
+                commentCount,
+                hasUnreadComments,
+                isInternal,
+                currentFieldCommentCount,
+                currentFieldHasUnreadComments,
+              },
+              index
+            ) => {
+              const url = query.petitionId
+                ? `/app/petitions/${query.petitionId}/preview?page=${index + 1}`
+                : `/petition/${query.keycode}/${index + 1}`;
 
-  return (
-    <Card ref={ref} display="flex" flexDirection="column" {...props}>
-      <CardHeader as="h3" size="sm">
-        <FormattedMessage id="recipient-view.contents-header" defaultMessage="Contents" />
-      </CardHeader>
-      <Stack as={List} spacing={1} paddingY={2} paddingX={1.5} minHeight="10rem" overflow="auto">
-        {pages.map(
-          (
-            {
-              title,
-              commentCount,
-              hasUnreadComments,
-              isInternal,
-              currentFieldCommentCount,
-              currentFieldHasUnreadComments,
-            },
-            index
-          ) => {
-            const url = query.petitionId
-              ? `/app/petitions/${query.petitionId}/preview?page=${index + 1}`
-              : `/petition/${query.keycode}/${index + 1}`;
+              const showPageCommentsCount = index + 1 !== currentPage;
 
-            const showPageCommentsCount = index + 1 !== currentPage;
+              const showCommentsNumber = showPageCommentsCount
+                ? commentCount > 0
+                : currentFieldCommentCount > 0;
+              const _commentCount = showPageCommentsCount ? commentCount : currentFieldCommentCount;
+              const _hasUnreadComments = showPageCommentsCount
+                ? hasUnreadComments
+                : currentFieldHasUnreadComments;
 
-            const showCommentsNumber = showPageCommentsCount
-              ? commentCount > 0
-              : currentFieldCommentCount > 0;
-            const _commentCount = showPageCommentsCount ? commentCount : currentFieldCommentCount;
-            const _hasUnreadComments = showPageCommentsCount
-              ? hasUnreadComments
-              : currentFieldHasUnreadComments;
-
-            return (
-              <ListItem key={index}>
-                <Text as="h2">
-                  <NakedLink href={url}>
-                    <Button
-                      variant="ghost"
-                      as="a"
-                      size="sm"
-                      fontSize="md"
-                      display="flex"
-                      width="100%"
-                      paddingStart={7}
-                      _focus={{ outline: "none" }}
-                      aria-current={index + 1 !== currentPage ? "page" : undefined}
-                    >
-                      <ChevronFilledIcon
-                        color="gray.500"
-                        position="absolute"
-                        left={2}
-                        top={2.5}
-                        fontSize="sm"
-                        transform={index + 1 === currentPage ? "rotate(90deg)" : undefined}
-                      />
-                      <Box
-                        flex="1"
-                        isTruncated
-                        {...(title ? {} : { textStyle: "hint", fontWeight: "normal" })}
+              return (
+                <ListItem key={index}>
+                  <Text as="h2">
+                    <NakedLink href={url}>
+                      <Button
+                        variant="ghost"
+                        as="a"
+                        size="sm"
+                        fontSize="md"
+                        display="flex"
+                        width="100%"
+                        paddingStart={7}
+                        _focus={{ outline: "none" }}
+                        aria-current={index + 1 !== currentPage ? "page" : undefined}
                       >
-                        {title || (
-                          <FormattedMessage
-                            id="generic.empty-heading"
-                            defaultMessage="Untitled heading"
-                          />
-                        )}
-                      </Box>
-                      {showCommentsNumber ? (
-                        <RecipientViewContentsIndicators
-                          hasUnreadComments={_hasUnreadComments}
-                          commentCount={_commentCount}
+                        <ChevronFilledIcon
+                          color="gray.500"
+                          position="absolute"
+                          left={2}
+                          top={2.5}
+                          fontSize="sm"
+                          transform={index + 1 === currentPage ? "rotate(90deg)" : undefined}
                         />
-                      ) : null}
-                      {isInternal ? (
-                        <Center>
-                          <InternalFieldBadge marginLeft={2} />
-                        </Center>
-                      ) : null}
-                    </Button>
-                  </NakedLink>
-                </Text>
-                {index + 1 === currentPage ? (
-                  <Stack as={List} spacing={1}>
-                    {filteredFields.map((field) => {
-                      return (
-                        <ListItem key={field.id} position="relative">
-                          <Text
-                            as={field.type === "HEADING" ? "h3" : "div"}
-                            display="flex"
-                            position="relative"
-                          >
-                            <NakedLink href={`${url}#field-${field.id}`}>
-                              <Button
-                                variant="ghost"
-                                as="a"
-                                size="sm"
-                                fontSize="md"
-                                display="flex"
-                                width="100%"
-                                paddingStart={7}
-                                fontWeight={field.type === "HEADING" ? "bold" : "normal"}
-                                _focus={{ outline: "none" }}
-                                onClick={() => handleFocusField(field)}
-                              >
-                                <Box
-                                  flex="1"
-                                  isTruncated
-                                  {...(field.title
-                                    ? {
-                                        color: field.replies.some((r) => r.status === "REJECTED")
-                                          ? "red.600"
-                                          : completedFieldReplies(field).length !== 0
-                                          ? "gray.400"
-                                          : "inherit",
-                                      }
-                                    : {
-                                        color: field.replies.some((r) => r.status === "REJECTED")
-                                          ? "red.600"
-                                          : "gray.500",
-                                        fontWeight: "normal",
-                                        fontStyle: "italic",
-                                      })}
+                        <Box
+                          flex="1"
+                          isTruncated
+                          {...(title ? {} : { textStyle: "hint", fontWeight: "normal" })}
+                        >
+                          {title || (
+                            <FormattedMessage
+                              id="generic.empty-heading"
+                              defaultMessage="Untitled heading"
+                            />
+                          )}
+                        </Box>
+                        {showCommentsNumber ? (
+                          <RecipientViewContentsIndicators
+                            hasUnreadComments={_hasUnreadComments}
+                            commentCount={_commentCount}
+                          />
+                        ) : null}
+                        {isInternal ? (
+                          <Center>
+                            <InternalFieldBadge marginLeft={2} />
+                          </Center>
+                        ) : null}
+                      </Button>
+                    </NakedLink>
+                  </Text>
+                  {index + 1 === currentPage ? (
+                    <Stack as={List} spacing={1}>
+                      {filteredFields.map((field) => {
+                        return (
+                          <ListItem key={field.id} position="relative">
+                            <Text
+                              as={field.type === "HEADING" ? "h3" : "div"}
+                              display="flex"
+                              position="relative"
+                            >
+                              <NakedLink href={`${url}#field-${field.id}`}>
+                                <Button
+                                  variant="ghost"
+                                  as="a"
+                                  size="sm"
+                                  fontSize="md"
+                                  display="flex"
+                                  width="100%"
+                                  paddingStart={7}
+                                  fontWeight={field.type === "HEADING" ? "bold" : "normal"}
+                                  _focus={{ outline: "none" }}
+                                  onClick={() => handleFocusField(field)}
                                 >
-                                  {field.title || (
-                                    <FormattedMessage
-                                      id="generic.untitled-field"
-                                      defaultMessage="Untitled field"
+                                  <Box
+                                    flex="1"
+                                    isTruncated
+                                    {...(field.title
+                                      ? {
+                                          color: field.replies.some((r) => r.status === "REJECTED")
+                                            ? "red.600"
+                                            : completedFieldReplies(field).length !== 0
+                                            ? "gray.400"
+                                            : "inherit",
+                                        }
+                                      : {
+                                          color: field.replies.some((r) => r.status === "REJECTED")
+                                            ? "red.600"
+                                            : "gray.500",
+                                          fontWeight: "normal",
+                                          fontStyle: "italic",
+                                        })}
+                                  >
+                                    {field.title || (
+                                      <FormattedMessage
+                                        id="generic.untitled-field"
+                                        defaultMessage="Untitled field"
+                                      />
+                                    )}
+                                  </Box>
+                                  {showCommentsCount(field) ? (
+                                    <RecipientViewContentsIndicators
+                                      hasUnreadComments={field.unreadCommentCount > 0}
+                                      commentCount={field.commentCount}
                                     />
-                                  )}
-                                </Box>
-                                {showCommentsCount(field) ? (
-                                  <RecipientViewContentsIndicators
-                                    hasUnreadComments={field.unreadCommentCount > 0}
-                                    commentCount={field.commentCount}
-                                  />
-                                ) : null}
-                                {field.isInternal ? <InternalFieldBadge marginLeft={2} /> : null}
-                              </Button>
-                            </NakedLink>
-                          </Text>
-                        </ListItem>
-                      );
-                    })}
-                  </Stack>
-                ) : null}
-              </ListItem>
-            );
+                                  ) : null}
+                                  {field.isInternal ? <InternalFieldBadge marginLeft={2} /> : null}
+                                </Button>
+                              </NakedLink>
+                            </Text>
+                          </ListItem>
+                        );
+                      })}
+                    </Stack>
+                  ) : null}
+                </ListItem>
+              );
+            }
+          )}
+        </Stack>
+      </Card>
+    );
+  }),
+  {
+    fragments: {
+      get PublicUser() {
+        return gql`
+          fragment RecipientViewContentsCard_PublicUser on PublicUser {
+            firstName
           }
-        )}
-      </Stack>
-    </Card>
-  );
-});
+        `;
+      },
+      get PublicPetition() {
+        return gql`
+          fragment RecipientViewContentsCard_PublicPetition on PublicPetition {
+            fields {
+              ...RecipientViewContentsCard_PublicPetitionField
+            }
+          }
+          ${this.PublicPetitionField}
+        `;
+      },
+      get PublicPetitionField() {
+        return gql`
+          fragment RecipientViewContentsCard_PublicPetitionField on PublicPetitionField {
+            id
+            type
+            title
+            options
+            optional
+            isInternal
+            isReadOnly
+            replies {
+              id
+              status
+            }
+            commentCount
+            unreadCommentCount
+            hasCommentsEnabled
+            ...useFieldVisibility_PublicPetitionField
+          }
+          ${useFieldVisibility.fragments.PublicPetitionField}
+        `;
+      },
+      get PetitionBase() {
+        return gql`
+          fragment RecipientViewContentsCard_PetitionBase on PetitionBase {
+            fields {
+              ...RecipientViewContentsCard_PetitionField
+            }
+          }
+          ${this.PetitionField}
+        `;
+      },
+      get PetitionField() {
+        return gql`
+          fragment RecipientViewContentsCard_PetitionField on PetitionField {
+            id
+            type
+            title
+            options
+            optional
+            isInternal
+            isReadOnly
+            replies {
+              id
+              status
+            }
+            commentCount
+            unreadCommentCount
+            hasCommentsEnabled
+            ...useFieldVisibility_PetitionField
+          }
+          ${useFieldVisibility.fragments.PetitionField}
+        `;
+      },
+    },
+  }
+);
 
 function RecipientViewContentsIndicators({
   hasUnreadComments,
@@ -311,77 +388,3 @@ function useGetPagesAndFields<T extends UnionToArrayUnion<PetitionFieldSelection
   }
   return { fields: _fields, pages };
 }
-
-RecipientViewContentsCard.fragments = {
-  get PublicUser() {
-    return gql`
-      fragment RecipientViewContentsCard_PublicUser on PublicUser {
-        firstName
-      }
-    `;
-  },
-  get PublicPetition() {
-    return gql`
-      fragment RecipientViewContentsCard_PublicPetition on PublicPetition {
-        fields {
-          ...RecipientViewContentsCard_PublicPetitionField
-        }
-      }
-      ${this.PublicPetitionField}
-    `;
-  },
-  get PublicPetitionField() {
-    return gql`
-      fragment RecipientViewContentsCard_PublicPetitionField on PublicPetitionField {
-        id
-        type
-        title
-        options
-        optional
-        isInternal
-        isReadOnly
-        replies {
-          id
-          status
-        }
-        commentCount
-        unreadCommentCount
-        hasCommentsEnabled
-        ...useFieldVisibility_PublicPetitionField
-      }
-      ${useFieldVisibility.fragments.PublicPetitionField}
-    `;
-  },
-  get PetitionBase() {
-    return gql`
-      fragment RecipientViewContentsCard_PetitionBase on PetitionBase {
-        fields {
-          ...RecipientViewContentsCard_PetitionField
-        }
-      }
-      ${this.PetitionField}
-    `;
-  },
-  get PetitionField() {
-    return gql`
-      fragment RecipientViewContentsCard_PetitionField on PetitionField {
-        id
-        type
-        title
-        options
-        optional
-        isInternal
-        isReadOnly
-        replies {
-          id
-          status
-        }
-        commentCount
-        unreadCommentCount
-        hasCommentsEnabled
-        ...useFieldVisibility_PetitionField
-      }
-      ${useFieldVisibility.fragments.PetitionField}
-    `;
-  },
-};
