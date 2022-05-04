@@ -87,11 +87,7 @@ export function RecipientViewPetitionFieldFileUpload({
                 <RecipientViewPetitionFieldReplyFileUpload
                   reply={reply}
                   isDisabled={isDisabled || isDeletingReply[reply.id]}
-                  onRemove={() =>
-                    handleDeletePetitionReply({
-                      replyId: reply.id,
-                    })
-                  }
+                  onRemove={() => handleDeletePetitionReply({ replyId: reply.id })}
                   onDownload={onDownloadReply}
                   isDownloadDisabled={isCacheOnly}
                 />

@@ -27,7 +27,6 @@ export interface RecipientViewPetitionFieldTaxDocumentsProps
   isCacheOnly?: boolean;
   onStartAsyncFieldCompletion: () => Promise<{ type: string; url: string }>;
   onRefreshField: () => void;
-  view: "preview" | "recipient";
 }
 
 export function RecipientViewPetitionFieldTaxDocuments({
@@ -35,7 +34,6 @@ export function RecipientViewPetitionFieldTaxDocuments({
   isDisabled,
   isInvalid,
   tone,
-  view,
   onDeleteReply,
   onDownloadAttachment,
   onDownloadReply,
@@ -63,10 +61,10 @@ export function RecipientViewPetitionFieldTaxDocuments({
   useInterval(
     async (done) => {
       if (stateRef.current === "FETCHING") {
-      onRefreshField();
-    } else {
-      done();
-    }
+        onRefreshField();
+      } else {
+        done();
+      }
     },
     10000,
     [onRefreshField]
@@ -135,14 +133,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
                 <RecipientViewPetitionFieldReplyFileUpload
                   reply={reply}
                   isDisabled={isDisabled || isDeletingReply[reply.id]}
-                  onRemove={
-                    view === "preview"
-                      ? () =>
-                          handleDeletePetitionReply({
-                            replyId: reply.id,
-                          })
-                      : undefined
-                  }
+                  onRemove={() => handleDeletePetitionReply({ replyId: reply.id })}
                   onDownload={onDownloadReply}
                   isDownloadDisabled={isCacheOnly}
                 />

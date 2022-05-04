@@ -253,7 +253,6 @@ export function PreviewPetitionField({
       onStartAsyncFieldCompletion={handleStartAsyncFieldCompletion}
       onRefreshField={handleRefreshAsyncField}
       isCacheOnly={isCacheOnly}
-      view="preview"
     />
   ) : null;
 }
