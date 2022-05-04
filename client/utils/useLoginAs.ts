@@ -30,6 +30,7 @@ export function useLoginAs() {
     }
     await apollo.clearStore();
     // reload removing anything after /app
-    window.location.href = window.location.pathname.replace(/^(\/(?:[^\/]+\/)?app).*$/, "$1");
+    window.location.href =
+      window.location.pathname.replace(/^(\/(?:[^\/]+\/)?app).*$/, "$1") + "?continue";
   };
 }
