@@ -258,6 +258,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           variables: { petitionId, fieldId, data },
         });
       } catch (e) {
+        if (isApolloError(e, "ALIAS_ALREADY_EXISTS")) {
+          throw e;
+        }
         try {
           if (isApolloError(e, "FIELD_HAS_REPLIES_ERROR")) {
             await confirmChangeFormat({});

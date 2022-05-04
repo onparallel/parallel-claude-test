@@ -224,6 +224,7 @@ export function defaultFieldOptions(
 ): Partial<CreatePetitionField> {
   // Always inherit optional
   const optional = field?.optional ?? false;
+
   const multiple =
     type === "FILE_UPLOAD" // FILE_UPLOAD always true
       ? true
@@ -234,6 +235,8 @@ export function defaultFieldOptions(
       : field?.type === "FILE_UPLOAD" // Inherit if not coming from a FILE_UPLOAD
       ? false
       : field?.multiple ?? false;
+
+  const alias = type === "HEADING" ? null : field?.alias ?? null;
 
   const options = ((): any => {
     switch (type) {
@@ -337,7 +340,7 @@ export function defaultFieldOptions(
     multiple,
     is_internal: field?.is_internal ?? false,
     show_in_pdf: field?.show_in_pdf ?? true,
-    alias: field?.alias ?? null,
+    alias,
     has_comments_enabled: type === "HEADING" ? false : true,
     options,
   };
