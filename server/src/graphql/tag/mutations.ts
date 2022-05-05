@@ -1,7 +1,7 @@
+import { ApolloError } from "apollo-server-core";
 import { inputObjectType, mutationField, nonNull, stringArg } from "nexus";
 import { CreateTag } from "../../db/__types";
 import { authenticate, authenticateAnd } from "../helpers/authorize";
-import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
 import { validateAnd } from "../helpers/validateArgs";
@@ -39,7 +39,7 @@ export const createTag = mutationField("createTag", {
       );
     } catch (error: any) {
       if (error.constraint === "tag__organization_id__name__unique") {
-        throw new WhitelistedError(
+        throw new ApolloError(
           "The organization already has a tag with this name",
           "TAG_ALREADY_EXISTS"
         );
@@ -84,7 +84,7 @@ export const updateTag = mutationField("updateTag", {
       return await ctx.tags.updateTag(args.id, data, ctx.user!);
     } catch (error: any) {
       if (error.constraint === "tag__organization_id__name__unique") {
-        throw new WhitelistedError(
+        throw new ApolloError(
           "The organization already has a tag with this name",
           "TAG_ALREADY_EXISTS"
         );
@@ -134,7 +134,7 @@ export const tagPetition = mutationField("tagPetition", {
       return (await ctx.petitions.loadPetition(args.petitionId))!;
     } catch (error: any) {
       if (error.constraint === "petition_tag__petition_id__tag_id__unique") {
-        throw new WhitelistedError(
+        throw new ApolloError(
           `Petition ${args.petitionId} is already tagged with tag ${args.tagId}`,
           "PETITION_ALREADY_TAGGED"
         );

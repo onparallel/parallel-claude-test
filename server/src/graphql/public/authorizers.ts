@@ -1,3 +1,4 @@
+import { ApolloError } from "apollo-server-core";
 import { parse as parseCookie } from "cookie";
 import { IncomingMessage } from "http";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
@@ -6,7 +7,7 @@ import { unMaybeArray } from "../../util/arrays";
 import { toGlobalId } from "../../util/globalId";
 import { MaybeArray } from "../../util/types";
 import { Arg, chain } from "../helpers/authorize";
-import { PublicPetitionNotAvailableError, WhitelistedError } from "../helpers/errors";
+import { PublicPetitionNotAvailableError } from "../helpers/errors";
 
 export function authenticatePublicAccess<
   TypeName extends string,
@@ -23,7 +24,7 @@ export function authenticatePublicAccess<
     if (cookieValue && (await ctx.contacts.verifyContact(contactId, cookieValue))) {
       return true;
     } else {
-      throw new WhitelistedError("Contact is not verified", "CONTACT_NOT_VERIFIED");
+      throw new ApolloError("Contact is not verified", "CONTACT_NOT_VERIFIED");
     }
   });
 }

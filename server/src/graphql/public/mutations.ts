@@ -17,7 +17,6 @@ import { Task } from "../../db/repositories/TaskRepository";
 import { toGlobalId } from "../../util/globalId";
 import { stallFor } from "../../util/promises/stallFor";
 import { and, chain, checkClientServerToken } from "../helpers/authorize";
-import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { presendPetition } from "../helpers/presendPetition";
 import { RESULT } from "../helpers/result";
@@ -219,7 +218,7 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
           remainingAttempts: result.remainingAttempts,
         };
       } catch (e: any) {
-        throw new WhitelistedError("INVALID_TOKEN", "The token is no longer valid");
+        throw new ApolloError("INVALID_TOKEN", "The token is no longer valid");
       }
     }, 2000);
   },
@@ -620,7 +619,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
         !args.force &&
         (await ctx.petitions.contactHasAccessFromPublicPetitionLink(args.contactEmail, link.id))
       ) {
-        throw new WhitelistedError(
+        throw new ApolloError(
           "Contact already has access on this link.",
           "PUBLIC_LINK_ACCESS_ALREADY_CREATED_ERROR"
         );
@@ -730,12 +729,12 @@ export const publicSendReminder = mutationField("publicSendReminder", {
     }
 
     if (access.reminders_opt_out) {
-      throw new WhitelistedError(`Contact has opted-out of reminders`, "REMINDER_OPTED_OUT_ERROR");
+      throw new ApolloError(`Contact has opted-out of reminders`, "REMINDER_OPTED_OUT_ERROR");
     }
 
     const [latestReminder] = await ctx.petitions.loadRemindersByAccessId(access.id);
     if (latestReminder && differenceInDays(latestReminder.created_at, new Date()) < 1) {
-      throw new WhitelistedError(
+      throw new ApolloError(
         `You can only send one reminder each 24 hours`,
         "REMINDER_ALREADY_SENT_ERROR"
       );

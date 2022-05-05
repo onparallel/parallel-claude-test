@@ -1,8 +1,8 @@
+import { ApolloError } from "apollo-server-core";
 import { arg, booleanArg, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { toGlobalId } from "../../util/globalId";
 import { withError } from "../../util/promises/withError";
 import { authenticateAnd } from "../helpers/authorize";
-import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
 import { userHasFeatureFlag } from "../petition/authorizers";
@@ -41,7 +41,7 @@ export const createSignatureIntegration = mutationField("createSignatureIntegrat
   resolve: async (_, args, ctx) => {
     const [error, environment] = await withError(ctx.signature.checkSignaturitApiKey(args.apiKey));
     if (error) {
-      throw new WhitelistedError(
+      throw new ApolloError(
         `Unable to check Signaturit APIKEY environment`,
         "INVALID_APIKEY_ERROR"
       );
@@ -94,7 +94,7 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
     );
 
     if (currentSignatureIntegrations.length < 2) {
-      throw new WhitelistedError(
+      throw new ApolloError(
         "There are not enough integrations to be able to delete the requested integration.",
         "INSUFFICIENT_SIGNATURE_INTEGRATIONS_ERROR"
       );
@@ -111,7 +111,7 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
       (pendingSignatures.length > 0 || pendingPetitionsWithSignatures.length > 0) &&
       !args.force
     ) {
-      throw new WhitelistedError(
+      throw new ApolloError(
         "There are pending signature requests using this integration. Pass `force` argument to cancel this requests and delete the integration.",
         "SIGNATURE_INTEGRATION_IN_USE_ERROR",
         {

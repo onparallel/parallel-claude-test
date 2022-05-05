@@ -1,6 +1,6 @@
+import { ApolloError } from "apollo-server-core";
 import { list, mutationField, nonNull, objectType, stringArg } from "nexus";
 import { authenticateAnd } from "../helpers/authorize";
-import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
 import { userHasFeatureFlag } from "../petition/authorizers";
@@ -26,7 +26,7 @@ export const generateUserAuthToken = mutationField("generateUserAuthToken", {
       return await ctx.userAuthentication.createUserAuthenticationToken(tokenName, ctx.user!);
     } catch (e: any) {
       if (e.constraint === "user_authentication_token__token_name_user_id") {
-        throw new WhitelistedError("Token name must be unique", "UNIQUE_TOKEN_NAME_ERROR");
+        throw new ApolloError("Token name must be unique", "UNIQUE_TOKEN_NAME_ERROR");
       } else {
         throw e;
       }

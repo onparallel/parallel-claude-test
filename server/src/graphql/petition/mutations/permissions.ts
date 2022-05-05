@@ -1,9 +1,10 @@
+import { ApolloError } from "apollo-server-core";
 import { arg, booleanArg, list, mutationField, nonNull, nullable, stringArg } from "nexus";
 import pMap from "p-map";
 import { groupBy, isDefined, uniq, zip } from "remeda";
 import { partition } from "../../../util/arrays";
 import { and, authenticate, authenticateAnd, chain, ifArgDefined } from "../../helpers/authorize";
-import { ArgValidationError, WhitelistedError } from "../../helpers/errors";
+import { ArgValidationError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { validateAnd, validateIf } from "../../helpers/validateArgs";
 import { maxLength } from "../../helpers/validators/maxLength";
@@ -197,7 +198,7 @@ export const editPetitionPermission = mutationField("editPetitionPermission", {
       );
     } catch (e: any) {
       if (e.constraint === "petition_permission__owner") {
-        throw new WhitelistedError(
+        throw new ApolloError(
           "A petition can't have more than one owner.",
           "PETITION_OWNER_CONSTRAINT_ERROR"
         );

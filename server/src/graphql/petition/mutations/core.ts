@@ -89,7 +89,7 @@ import {
   validatePetitionStatus,
   validatePublicPetitionLinkSlug,
 } from "../validations";
-import { ArgValidationError, WhitelistedError } from "./../../helpers/errors";
+import { ArgValidationError } from "./../../helpers/errors";
 import {
   userCanSendAs,
   userHasAccessToPublicPetitionLink,
@@ -299,7 +299,7 @@ export const deletePetitions = mutationField("deletePetitions", {
     const userPermissions = await ctx.petitions.loadUserPermissionsByPetitionId(args.ids);
 
     if (userPermissions.some(userHasAccessViaGroup)) {
-      throw new WhitelistedError(
+      throw new ApolloError(
         "Can't delete a petition shared with a group",
         "DELETE_GROUP_PETITION_ERROR",
         {
@@ -311,7 +311,7 @@ export const deletePetitions = mutationField("deletePetitions", {
     }
 
     if (userPermissions.some(petitionIsSharedByOwner) && !args.force) {
-      throw new WhitelistedError(
+      throw new ApolloError(
         "Petition to delete is shared to another user",
         "DELETE_SHARED_PETITION_ERROR",
         {
@@ -325,7 +325,7 @@ export const deletePetitions = mutationField("deletePetitions", {
     const petitions = await ctx.petitions.loadPetition(args.ids);
     const publicTemplates = petitions.filter((p) => p && p.is_template && p.template_public);
     if (publicTemplates.length > 0) {
-      throw new WhitelistedError("Can't delete a public template", "DELETE_PUBLIC_TEMPLATE_ERROR", {
+      throw new ApolloError("Can't delete a public template", "DELETE_PUBLIC_TEMPLATE_ERROR", {
         petitionIds: publicTemplates.map((p) => toGlobalId("Petition", p!.id)),
       });
     }
@@ -430,12 +430,9 @@ export const updateFieldPositions = mutationField("updateFieldPositions", {
       return await ctx.petitions.updateFieldPositions(args.petitionId, args.fieldIds, ctx.user!);
     } catch (e: any) {
       if (e.message === "INVALID_PETITION_FIELD_IDS") {
-        throw new WhitelistedError("Invalid petition field ids", "INVALID_PETITION_FIELD_IDS");
+        throw new ApolloError("Invalid petition field ids", "INVALID_PETITION_FIELD_IDS");
       } else if (e.message === "INVALID_FIELD_CONDITIONS_ORDER") {
-        throw new WhitelistedError(
-          "Invalid field conditions order",
-          "INVALID_FIELD_CONDITIONS_ORDER"
-        );
+        throw new ApolloError("Invalid field conditions order", "INVALID_FIELD_CONDITIONS_ORDER");
       } else {
         throw e;
       }
@@ -519,7 +516,7 @@ export const updatePetitionRestriction = mutationField("updatePetitionRestrictio
       isDefined(passwordHash) &&
       (!isDefined(password) || passwordHash !== (await hash(password, passwordSalt!)))
     ) {
-      throw new WhitelistedError(
+      throw new ApolloError(
         "The petition is restricted with a password.",
         "INVALID_PETITION_RESTRICTION_PASSWORD"
       );
@@ -783,7 +780,7 @@ export const deletePetitionField = mutationField("deletePetitionField", {
   resolve: async (_, args, ctx) => {
     const replies = await ctx.petitions.loadRepliesForField(args.fieldId);
     if (!args.force && replies.length > 0) {
-      throw new WhitelistedError("The petition field has replies.", "FIELD_HAS_REPLIES_ERROR");
+      throw new ApolloError("The petition field has replies.", "FIELD_HAS_REPLIES_ERROR");
     }
 
     const petitionFields = await ctx.petitions.loadFieldsForPetition(args.petitionId, {
@@ -794,7 +791,7 @@ export const deletePetitionField = mutationField("deletePetitionField", {
         f.visibility?.conditions.some((c: any) => c.fieldId === args.fieldId)
       )
     ) {
-      throw new WhitelistedError(
+      throw new ApolloError(
         "The petition field is being referenced in another field.",
         "FIELD_IS_REFERENCED_ERROR"
       );
@@ -904,10 +901,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           });
 
           if (!args.force && replies.length > 0) {
-            throw new WhitelistedError(
-              "The petition field has replies.",
-              "FIELD_HAS_REPLIES_ERROR"
-            );
+            throw new ApolloError("The petition field has replies.", "FIELD_HAS_REPLIES_ERROR");
           }
 
           if (replies.length > 0) {
@@ -915,7 +909,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           }
         }
       } catch (e: any) {
-        if (e.name === "WhitelistedError") {
+        if (e.name === "ApolloError") {
           throw e;
         } else {
           throw new ArgValidationError(info, "data.options", e.toString());
@@ -950,7 +944,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       );
     } catch (error: any) {
       if (error.constraint === "petition_field__petition_id__alias__unique") {
-        throw new WhitelistedError(
+        throw new ApolloError(
           "The alias for this field already exists in this petition",
           "ALIAS_ALREADY_EXISTS"
         );
@@ -989,13 +983,13 @@ export const uploadDynamicSelectFile = mutationField("uploadDynamicSelectFieldFi
 
     const [importError, importResult] = await withError(importFromExcel(file.createReadStream()));
     if (importError) {
-      throw new WhitelistedError("Invalid file", "INVALID_FORMAT_ERROR");
+      throw new ApolloError("Invalid file", "INVALID_FORMAT_ERROR");
     }
     const [parseError, parseResult] = await withError(() =>
       parseDynamicSelectValues(importResult!)
     );
     if (parseError) {
-      throw new WhitelistedError(parseError.message, "INVALID_FORMAT_ERROR");
+      throw new ApolloError(parseError.message, "INVALID_FORMAT_ERROR");
     }
     const { labels, values } = parseResult!;
 
@@ -1136,10 +1130,7 @@ export const fileUploadReplyDownloadLink = mutationField("fileUploadReplyDownloa
     try {
       const reply = await ctx.petitions.loadFieldReply(args.replyId);
       if (!isFileTypeField(reply!.type)) {
-        throw new WhitelistedError(
-          `${reply!.type} replies can not be downloaded`,
-          "INVALID_FIELD_TYPE"
-        );
+        throw new ApolloError(`${reply!.type} replies can not be downloaded`, "INVALID_FIELD_TYPE");
       }
       const file = await ctx.files.loadFileUpload(reply!.content["file_upload_id"]);
       if (!file) {
@@ -1161,7 +1152,7 @@ export const fileUploadReplyDownloadLink = mutationField("fileUploadReplyDownloa
         ),
       };
     } catch (error: any) {
-      if (error instanceof WhitelistedError) {
+      if (error instanceof ApolloError) {
         throw error;
       }
       return {
@@ -1538,7 +1529,7 @@ export const sendPetitionClosedNotification = mutationField("sendPetitionClosedN
   resolve: async (_, args, ctx) => {
     const shouldSendNotification = await ctx.petitions.shouldNotifyPetitionClosed(args.petitionId);
     if (!shouldSendNotification && !args.force) {
-      throw new WhitelistedError(
+      throw new ApolloError(
         "You already notified the contacts",
         "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR"
       );
@@ -1766,10 +1757,7 @@ export const modifyPetitionCustomProperty = mutationField("modifyPetitionCustomP
       Object.keys(petition.custom_properties).length >= 20 &&
       !isDefined(petition.custom_properties[key])
     ) {
-      throw new WhitelistedError(
-        "Max limit of properties reached",
-        "CUSTOM_PROPERTIES_LIMIT_ERROR"
-      );
+      throw new ApolloError("Max limit of properties reached", "CUSTOM_PROPERTIES_LIMIT_ERROR");
     }
     return await ctx.petitions.modifyPetitionCustomProperty(
       petitionId,

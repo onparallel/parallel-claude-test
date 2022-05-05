@@ -1,14 +1,12 @@
-import faker from "@faker-js/faker";
+import { ApolloError } from "apollo-server-core";
 import { Knex } from "knex";
 import { createTestContainer } from "../../../test/testContainer";
 import { ApiContext } from "../../context";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Contact, Organization, OrgIntegration, User } from "../../db/__types";
-import { toGlobalId } from "../../util/globalId";
 import { deleteAllData } from "../../util/knexUtils";
 import { random } from "../../util/token";
-import { WhitelistedError } from "../helpers/errors";
 import { emailDomainIsNotSSO } from "../helpers/validators/emailDomainIsNotSSO";
 import { validPassword } from "../helpers/validators/validPassword";
 import { validRemindersConfig } from "../helpers/validators/validRemindersConfig";
@@ -105,7 +103,7 @@ describe("GraphQL custom validators", () => {
           {} as any
         )
       ).rejects.toThrowError(
-        new WhitelistedError("Email domain has a SSO provider enabled.", "SSO_DOMAIN_ENABLED_ERROR")
+        new ApolloError("Email domain has a SSO provider enabled.", "SSO_DOMAIN_ENABLED_ERROR")
       );
     });
 

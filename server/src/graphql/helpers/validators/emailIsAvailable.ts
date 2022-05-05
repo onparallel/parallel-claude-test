@@ -1,5 +1,5 @@
+import { ApolloError } from "apollo-server-core";
 import { core } from "nexus";
-import { WhitelistedError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function emailIsAvailable<TypeName extends string, FieldName extends string>(
@@ -9,7 +9,7 @@ export function emailIsAvailable<TypeName extends string, FieldName extends stri
     const email = prop(args);
     const users = await ctx.users.loadUsersByEmail(email.trim().toLowerCase());
     if (users.length > 0) {
-      throw new WhitelistedError("Email is already registered.", "EMAIL_ALREADY_REGISTERED_ERROR");
+      throw new ApolloError("Email is already registered.", "EMAIL_ALREADY_REGISTERED_ERROR");
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }

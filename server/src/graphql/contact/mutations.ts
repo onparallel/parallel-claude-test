@@ -6,7 +6,7 @@ import { chunk, countBy, isDefined, uniqBy } from "remeda";
 import { CreateContact } from "../../db/__types";
 import { withError } from "../../util/promises/withError";
 import { authenticate, authenticateAnd } from "../helpers/authorize";
-import { ExcelParsingError, WhitelistedError } from "../helpers/errors";
+import { ExcelParsingError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { importFromExcel } from "../helpers/importDataFromExcel";
 import { parseContactList } from "../helpers/parseContactList";
@@ -49,7 +49,7 @@ export const createContact = mutationField("createContact", {
       );
     } catch (error: any) {
       if (error?.constraint === "contact__org_id__email") {
-        throw new WhitelistedError("Contact already exists.", "EXISTING_CONTACT");
+        throw new ApolloError("Contact already exists.", "EXISTING_CONTACT");
       } else {
         throw new Error("INTERNAL_ERROR");
       }
@@ -107,7 +107,7 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
 
     const [importError, importResult] = await withError(importFromExcel(file.createReadStream()));
     if (importError) {
-      throw new WhitelistedError("Invalid file", "INVALID_FORMAT_ERROR");
+      throw new ApolloError("Invalid file", "INVALID_FORMAT_ERROR");
     }
 
     const [parsedErrors, parsedContacts] = await withError(
@@ -120,13 +120,13 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
     if (parsedErrors && parsedErrors instanceof AggregateError) {
       const rows = parsedErrors.errors.map((e: ExcelParsingError) => e.row);
 
-      throw new WhitelistedError(parsedErrors.message, "INVALID_FORMAT_ERROR", {
+      throw new ApolloError(parsedErrors.message, "INVALID_FORMAT_ERROR", {
         rows,
       });
     }
 
     if (!parsedContacts || parsedContacts.length === 0) {
-      throw new WhitelistedError("No contacts found on file", "NO_CONTACTS_FOUND_ERROR");
+      throw new ApolloError("No contacts found on file", "NO_CONTACTS_FOUND_ERROR");
     }
 
     const contacts = (

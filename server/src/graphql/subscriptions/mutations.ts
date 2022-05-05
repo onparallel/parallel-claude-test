@@ -1,9 +1,9 @@
+import { ApolloError } from "apollo-server-core";
 import { booleanArg, list, mutationField, nonNull, stringArg } from "nexus";
 import { RESULT } from "..";
 import { IFetchService } from "../../services/fetch";
 import { withError } from "../../util/promises/withError";
 import { and, authenticateAnd, ifArgDefined } from "../helpers/authorize";
-import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { validUrl } from "../helpers/validators/validUrl";
 import { petitionsAreOfTypeTemplate, userHasAccessToPetitions } from "../petition/authorizers";
@@ -38,7 +38,7 @@ export const createEventSubscription = mutationField("createEventSubscription", 
   resolve: async (_, args, ctx) => {
     const challengePassed = await challengeWebhookUrl(args.eventsUrl, ctx.fetch);
     if (!challengePassed) {
-      throw new WhitelistedError(
+      throw new ApolloError(
         "Your URL does not seem to accept POST requests.",
         "WEBHOOK_CHALLENGE_FAILED"
       );

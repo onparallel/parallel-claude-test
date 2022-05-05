@@ -1,5 +1,5 @@
+import { ApolloError } from "apollo-server-core";
 import { core } from "nexus";
-import { WhitelistedError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function emailDomainIsNotSSO<TypeName extends string, FieldName extends string>(
@@ -10,10 +10,7 @@ export function emailDomainIsNotSSO<TypeName extends string, FieldName extends s
     const [, domain] = email.split("@");
     const ssoIntegration = await ctx.integrations.loadSSOIntegrationByDomain(domain);
     if (ssoIntegration) {
-      throw new WhitelistedError(
-        "Email domain has a SSO provider enabled.",
-        "SSO_DOMAIN_ENABLED_ERROR"
-      );
+      throw new ApolloError("Email domain has a SSO provider enabled.", "SSO_DOMAIN_ENABLED_ERROR");
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }

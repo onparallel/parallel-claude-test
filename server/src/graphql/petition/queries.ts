@@ -1,3 +1,4 @@
+import { ApolloError } from "apollo-server-core";
 import ASCIIFolder from "fold-to-ascii";
 import {
   arg,
@@ -13,7 +14,6 @@ import {
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
 import { authenticate, authenticateAnd, or } from "../helpers/authorize";
-import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import {
@@ -78,11 +78,11 @@ export const petitionsQuery = queryField((t) => {
       // move this to validator if it grows in complexity
       if (filters?.tagIds) {
         if (filters.tagIds.length > 10) {
-          throw new WhitelistedError("Invalid filter", "INVALID_FILTER");
+          throw new ApolloError("Invalid filter", "INVALID_FILTER");
         }
         const tags = await ctx.tags.loadTag(filters.tagIds);
         if (!tags.every((tag) => tag?.organization_id === ctx.user!.org_id)) {
-          throw new WhitelistedError("Invalid filter", "INVALID_FILTER");
+          throw new ApolloError("Invalid filter", "INVALID_FILTER");
         }
       }
 
@@ -93,7 +93,7 @@ export const petitionsQuery = queryField((t) => {
           return type !== "User" && type !== "UserGroup";
         })
       ) {
-        throw new WhitelistedError("Invalid filter", "INVALID_FILTER");
+        throw new ApolloError("Invalid filter", "INVALID_FILTER");
       }
 
       const columnMap = {

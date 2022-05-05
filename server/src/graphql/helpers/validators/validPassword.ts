@@ -1,5 +1,5 @@
+import { ApolloError } from "apollo-server-core";
 import { core } from "nexus";
-import { WhitelistedError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
 export function validPassword<TypeName extends string, FieldName extends string>(
@@ -8,7 +8,7 @@ export function validPassword<TypeName extends string, FieldName extends string>
   return ((_, args, ctx, info) => {
     const password = prop(args);
     if (!password || !password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/)) {
-      throw new WhitelistedError(
+      throw new ApolloError(
         "Provided password cannot be used for security reasons.",
         "INVALID_PASSWORD_ERROR"
       );

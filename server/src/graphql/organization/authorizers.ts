@@ -1,8 +1,9 @@
+import { ApolloError } from "apollo-server-core";
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { getRequiredPetitionSendCredits } from "../../util/organizationUsageLimits";
 import { Arg, or, userIsSuperAdmin } from "../helpers/authorize";
-import { WhitelistedError } from "../helpers/errors";
+
 export function isOwnOrg<FieldName extends string>(): FieldAuthorizeResolver<
   "Organization",
   FieldName
@@ -39,7 +40,7 @@ export function orgDoesNotHaveSsoProvider<
   return async (root, args, ctx) => {
     const ssoIntegrations = await ctx.integrations.loadIntegrationsByOrgId(ctx.user!.org_id, "SSO");
     if (ssoIntegrations.length > 0) {
-      throw new WhitelistedError(
+      throw new ApolloError(
         "Can't create users on organizations with a SSO provider",
         "SSO_PROVIDER_ENABLED"
       );
@@ -59,7 +60,7 @@ export function orgCanCreateNewUser<
     ]);
 
     if (org!.usage_details.USER_LIMIT <= activeUserCount) {
-      throw new WhitelistedError(`User limit reached for this organization`, "USER_LIMIT_ERROR", {
+      throw new ApolloError(`User limit reached for this organization`, "USER_LIMIT_ERROR", {
         userLimit: org!.usage_details.USER_LIMIT,
       });
     }
@@ -90,7 +91,7 @@ export function orgHasAvailablePetitionSendCredits<
       !petitionSendUsageLimit ||
       petitionSendUsageLimit.used + needed > petitionSendUsageLimit.limit
     ) {
-      throw new WhitelistedError(
+      throw new ApolloError(
         `Not enough credits to send the petition`,
         "PETITION_SEND_CREDITS_ERROR",
         {
