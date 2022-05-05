@@ -120,6 +120,11 @@ export function RecipientViewPetitionFieldTaxDocuments({
     } catch {}
   };
 
+  const handleCancelClick = () => {
+    setState("IDLE");
+    popupRef.current?.close();
+  };
+
   return (
     <RecipientViewPetitionFieldCard
       field={field}
@@ -198,7 +203,18 @@ export function RecipientViewPetitionFieldTaxDocuments({
               values={{ tone }}
             />
           </Text>
-          <Progress size="md" isIndeterminate colorScheme="green" borderRadius="full" />
+          <HStack>
+            <Progress
+              size="md"
+              isIndeterminate
+              colorScheme="green"
+              borderRadius="full"
+              width="100%"
+            />
+            <Button size="sm" fontWeight="normal" onClick={handleCancelClick}>
+              <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
+            </Button>
+          </HStack>
         </Stack>
       ) : null}
     </RecipientViewPetitionFieldCard>
