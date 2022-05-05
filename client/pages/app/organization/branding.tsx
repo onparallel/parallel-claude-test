@@ -39,7 +39,7 @@ import { useOrganizationSections } from "@parallel/utils/useOrganizationSections
 import { useRef } from "react";
 import { DropzoneRef, FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
-const MAX_FILE_SIZE = 1024 * 1024;
+const MAX_FILE_SIZE = 1025 * 1024;
 
 function OrganizationBranding() {
   const intl = useIntl();
