@@ -82,6 +82,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
     logoAlt,
     emailSubject,
     tone,
+    removeParallelBranding,
   }: PetitionCommentsContactNotificationProps) {
     const { locale } = useIntl();
     const commentCount = fields.reduce((acc, f) => acc + f.comments.length, 0);
@@ -95,6 +96,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
         logoAlt={logoAlt}
         utmCampaign="recipients"
         tone={tone}
+        removeParallelBranding={removeParallelBranding}
       >
         <MjmlSection padding="0">
           <MjmlColumn>

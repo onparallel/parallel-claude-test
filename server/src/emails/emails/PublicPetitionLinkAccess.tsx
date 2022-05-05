@@ -19,6 +19,7 @@ export type PublicPetitionLinkAccessProps = {
   keycode: string;
   tone: Tone;
   removeWhyWeUseParallel: boolean;
+  removeParallelBranding: boolean;
 } & LayoutProps;
 
 const email: Email<PublicPetitionLinkAccessProps> = {
@@ -83,6 +84,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
     logoAlt,
     tone,
     removeWhyWeUseParallel,
+    removeParallelBranding,
   }: PublicPetitionLinkAccessProps) {
     const { locale } = useIntl();
     return (
@@ -94,6 +96,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
         logoAlt={logoAlt}
         utmCampaign="recipients"
         tone={tone}
+        removeParallelBranding={removeParallelBranding}
       >
         <MjmlSection padding="0">
           <MjmlColumn>
@@ -127,7 +130,9 @@ const email: Email<PublicPetitionLinkAccessProps> = {
             <CompleteInfoButton tone={tone} href={`${parallelUrl}/${locale}/petition/${keycode}`} />
           </MjmlColumn>
         </MjmlSection>
-        {removeWhyWeUseParallel ? null : <WhyWeUseParallel assetsUrl={assetsUrl} tone={tone} />}
+        {removeWhyWeUseParallel || removeParallelBranding ? null : (
+          <WhyWeUseParallel assetsUrl={assetsUrl} tone={tone} />
+        )}
       </Layout>
     );
   },

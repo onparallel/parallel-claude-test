@@ -221,6 +221,7 @@ export type FeatureFlag =
   | "ON_BEHALF_OF"
   | "PETITION_PDF_EXPORT"
   | "PETITION_SIGNATURE"
+  | "REMOVE_PARALLEL_BRANDING"
   | "REMOVE_WHY_WE_USE_PARALLEL"
   | "SKIP_FORWARD_SECURITY";
 
@@ -2587,6 +2588,8 @@ export interface PublicPetition extends Timestamps {
   deadline?: Maybe<Scalars["DateTime"]>;
   /** The field definition of the petition. */
   fields: Array<PublicPetitionField>;
+  /** Wether the has activated REMOVE_PARALLEL_BRANDING or not. */
+  hasRemoveParallelBranding: Scalars["Boolean"];
   /** The ID of the petition. */
   id: Scalars["GID"];
   /** Wether the completion message will be shown to the recipients or not. */
@@ -10038,6 +10041,12 @@ export type RecipientViewContentsCard_PetitionFieldFragment = {
   }>;
 };
 
+export type RecipientViewFooter_PublicPetitionFragment = {
+  __typename?: "PublicPetition";
+  id: string;
+  hasRemoveParallelBranding: boolean;
+};
+
 export type RecipientViewHeader_PublicContactFragment = {
   __typename?: "PublicContact";
   id: string;
@@ -11423,6 +11432,7 @@ export type OrganizationBranding_userQuery = {
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
+    hasRemovedParallelBranding: boolean;
     organization: {
       __typename?: "Organization";
       id: string;
@@ -19103,6 +19113,7 @@ export type RecipientView_PublicPetitionAccessFragment = {
     isCompletingMessageEnabled: boolean;
     completingMessageBody?: string | null;
     completingMessageSubject?: string | null;
+    hasRemoveParallelBranding: boolean;
     recipients: Array<{
       __typename?: "PublicContact";
       firstName: string;
@@ -19203,6 +19214,7 @@ export type RecipientView_PublicPetitionFragment = {
   isCompletingMessageEnabled: boolean;
   completingMessageBody?: string | null;
   completingMessageSubject?: string | null;
+  hasRemoveParallelBranding: boolean;
   fields: Array<{
     __typename?: "PublicPetitionField";
     type: PetitionFieldType;
@@ -19332,6 +19344,7 @@ export type RecipientView_publicCompletePetitionMutation = {
     isCompletingMessageEnabled: boolean;
     completingMessageBody?: string | null;
     completingMessageSubject?: string | null;
+    hasRemoveParallelBranding: boolean;
     fields: Array<{
       __typename?: "PublicPetitionField";
       type: PetitionFieldType;
@@ -19415,6 +19428,7 @@ export type RecipientView_accessQuery = {
       isCompletingMessageEnabled: boolean;
       completingMessageBody?: string | null;
       completingMessageSubject?: string | null;
+      hasRemoveParallelBranding: boolean;
       recipients: Array<{
         __typename?: "PublicContact";
         firstName: string;
@@ -24193,6 +24207,12 @@ export const useCompletingMessageDialog_PublicPetitionFragmentDoc = gql`
     completingMessageSubject
   }
 ` as unknown as DocumentNode<useCompletingMessageDialog_PublicPetitionFragment, unknown>;
+export const RecipientViewFooter_PublicPetitionFragmentDoc = gql`
+  fragment RecipientViewFooter_PublicPetition on PublicPetition {
+    id
+    hasRemoveParallelBranding
+  }
+` as unknown as DocumentNode<RecipientViewFooter_PublicPetitionFragment, unknown>;
 export const RecipientView_PublicPetitionFragmentDoc = gql`
   fragment RecipientView_PublicPetition on PublicPetition {
     id
@@ -24224,6 +24244,7 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
     ...useLiquidScope_PublicPetition
     isCompletingMessageEnabled
     ...useCompletingMessageDialog_PublicPetition
+    ...RecipientViewFooter_PublicPetition
   }
   ${RecipientView_PublicPetitionFieldFragmentDoc}
   ${useGetPageFields_PublicPetitionFieldFragmentDoc}
@@ -24233,6 +24254,7 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
   ${RecipientViewProgressFooter_PublicPetitionFragmentDoc}
   ${useLiquidScope_PublicPetitionFragmentDoc}
   ${useCompletingMessageDialog_PublicPetitionFragmentDoc}
+  ${RecipientViewFooter_PublicPetitionFragmentDoc}
 ` as unknown as DocumentNode<RecipientView_PublicPetitionFragment, unknown>;
 export const useRecipientViewConfirmPetitionSignersDialog_PublicContactFragmentDoc = gql`
   fragment useRecipientViewConfirmPetitionSignersDialog_PublicContact on PublicContact {
@@ -26048,6 +26070,7 @@ export const OrganizationBranding_userDocument = gql`
     ...SettingsLayout_Query
     me {
       fullName
+      hasRemovedParallelBranding: hasFeatureFlag(featureFlag: REMOVE_PARALLEL_BRANDING)
       organization {
         id
         logoUrl(options: { resize: { width: 600 } })

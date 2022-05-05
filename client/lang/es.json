@@ -5215,6 +5215,21 @@
     "context": "Organization logo"
   },
   {
+    "term": "organization.branding.parallel-branding-description",
+    "definition": "Muestra la marca de Parallel en todos los correos y peticiones que se envíen.",
+    "context": "Displays the Parallel branding on all emails and requests that are sent."
+  },
+  {
+    "term": "organization.branding.parallel-branding-header",
+    "definition": "Branding de Parallel",
+    "context": "Parallel Branding"
+  },
+  {
+    "term": "organization.branding.parallel-branding-message",
+    "definition": "Hola, me gustaría obtener más información acerca de cómo actualizar mi plan para ocultar el branding de Parallel",
+    "context": "Hi, I would like to get more information about how to upgrade my plan to hide Parallel branding."
+  },
+  {
     "term": "organization.branding.square-logo-description",
     "definition": "Se mostrará internamente para diferenciar tus organizaciones.",
     "context": "This logo will be displayed internally to differentiate your organizations."

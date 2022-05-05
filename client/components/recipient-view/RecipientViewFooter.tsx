@@ -1,32 +1,38 @@
+import { gql } from "@apollo/client";
 import { Flex, FlexProps, List, ListItem, Stack } from "@chakra-ui/react";
 import { Link, NakedLink, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
+import { RecipientViewFooter_PublicPetitionFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 
-export type RecipientViewFooterProps = FlexProps;
+export interface RecipientViewFooterProps extends FlexProps {
+  petition: RecipientViewFooter_PublicPetitionFragment;
+}
 
 export function RecipientViewFooter(props: RecipientViewFooterProps) {
   const intl = useIntl();
   return (
     <Flex flexDirection="column" marginTop={12} as="footer" alignItems="center" {...props}>
-      <Flex fontSize="sm" alignItems="center">
-        <FormattedMessage
-          id="recipient-view.created-with"
-          defaultMessage="Created with {parallel}"
-          values={{
-            parallel: (
-              <NakedLink
-                href="/?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients"
-                passHref
-              >
-                <Flex as="a" marginLeft={2.5}>
-                  <Logo display="inline-block" width="100px" />
-                </Flex>
-              </NakedLink>
-            ),
-          }}
-        />
-      </Flex>
+      {props.petition.hasRemoveParallelBranding ? null : (
+        <Flex fontSize="sm" alignItems="center">
+          <FormattedMessage
+            id="recipient-view.created-with"
+            defaultMessage="Created with {parallel}"
+            values={{
+              parallel: (
+                <NakedLink
+                  href="/?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients"
+                  passHref
+                >
+                  <Flex as="a" marginLeft={2.5}>
+                    <Logo display="inline-block" width="100px" />
+                  </Flex>
+                </NakedLink>
+              ),
+            }}
+          />
+        </Flex>
+      )}
       <Stack
         as={List}
         textAlign="center"
@@ -63,3 +69,14 @@ export function RecipientViewFooter(props: RecipientViewFooterProps) {
     </Flex>
   );
 }
+
+RecipientViewFooter.fragments = {
+  get PublicPetition() {
+    return gql`
+      fragment RecipientViewFooter_PublicPetition on PublicPetition {
+        id
+        hasRemoveParallelBranding
+      }
+    `;
+  },
+};

@@ -35,6 +35,7 @@ export type LayoutProps = {
   omitGdprDisclaimer?: boolean;
   tone?: string;
   utmCampaign?: string;
+  removeParallelBranding?: boolean;
 };
 
 export const Layout: FC<LayoutProps> = function Layout({
@@ -50,6 +51,7 @@ export const Layout: FC<LayoutProps> = function Layout({
   omitGdprDisclaimer,
   utmCampaign,
   tone,
+  removeParallelBranding,
 }) {
   const { locale } = useIntl();
   const utm = new URLSearchParams({
@@ -103,94 +105,98 @@ export const Layout: FC<LayoutProps> = function Layout({
         <MjmlSection>
           <MjmlDivider borderWidth="1px" borderColor="#CBD5E0" width="80%" />
         </MjmlSection>
+
         <MjmlSection padding="0">
           <MjmlColumn width="100%">
-            {useAlternativeSlogan ? (
-              <MjmlButton
-                href={`https://www.onparallel.com/${locale}?${utm}`}
-                innerPadding="6px 25px"
-                backgroundColor="white"
-                color="black"
-                border="1px solid #A0AEC0"
-                borderRadius="5px"
-              >
-                <FormattedMessage
-                  id="footer.slogan.alternative"
-                  defaultMessage="Create your own <b>parallel</b>"
-                  values={{ tone }}
-                />
-              </MjmlButton>
-            ) : (
+            {removeParallelBranding ? null : (
               <>
-                <MjmlText color="#2D3748" align="center">
-                  <FormattedMessage id="footer.slogan" defaultMessage="Work better with" />
+                {useAlternativeSlogan ? (
+                  <MjmlButton
+                    href={`https://www.onparallel.com/${locale}?${utm}`}
+                    innerPadding="6px 25px"
+                    backgroundColor="white"
+                    color="black"
+                    border="1px solid #A0AEC0"
+                    borderRadius="5px"
+                  >
+                    <FormattedMessage
+                      id="footer.slogan.alternative"
+                      defaultMessage="Create your own <b>parallel</b>"
+                      values={{ tone }}
+                    />
+                  </MjmlButton>
+                ) : (
+                  <>
+                    <MjmlText color="#2D3748" align="center">
+                      <FormattedMessage id="footer.slogan" defaultMessage="Work better with" />
+                    </MjmlText>
+                    <MjmlImage
+                      padding="0"
+                      width="120px"
+                      alt="Parallel"
+                      src={`${assetsUrl}/static/emails/logo.png`}
+                      href={`https://www.onparallel.com/${locale}?${utm}`}
+                    />
+                  </>
+                )}
+                {useAlternativeSlogan ? null : (
+                  <MjmlSocial align="center" icon-padding="1px">
+                    <MjmlSocialElement
+                      alt="LinkedIn"
+                      name="linkedin-noshare"
+                      href="https://www.linkedin.com/company/onparallel"
+                      backgroundColor="#6059f7"
+                    />
+                    <MjmlSocialElement
+                      alt="Slack"
+                      src={`${assetsUrl}/static/emails/slack.png`}
+                      href="https://joinparallel.slack.com/join/shared_invite/zt-sda28ew5-tCZBQzZpPupCIsd85RgwGA#/shared-invite/email"
+                      backgroundColor="#6059f7"
+                    />
+                    <MjmlSocialElement
+                      alt="Facebook"
+                      name="facebook-noshare"
+                      href="https://www.facebook.com/parallel.so"
+                      backgroundColor="#6059f7"
+                    />
+                    <MjmlSocialElement
+                      alt="Twitter"
+                      name="twitter-noshare"
+                      href="https://twitter.com/Parallel_SO"
+                      backgroundColor="#6059f7"
+                    />
+                  </MjmlSocial>
+                )}
+                <MjmlText align="center" color="#1A202C" lineHeight="20px">
+                  <FormattedMessage
+                    id="layout.email-sent-by"
+                    defaultMessage="Sent by Parallel Solutions, S.L."
+                  />
+                  <br />
+                  C/Almogàvers 165, 59.203, 08018 | Barcelona, Spain
                 </MjmlText>
-                <MjmlImage
-                  padding="0"
-                  width="120px"
-                  alt="Parallel"
-                  src={`${assetsUrl}/static/emails/logo.png`}
-                  href={`https://www.onparallel.com/${locale}?${utm}`}
-                />
+                {useAlternativeSlogan ? null : (
+                  <MjmlText align="center">
+                    <a
+                      className="link"
+                      href={`https://www.onparallel.com/${locale}/legal/terms?${utm}`}
+                    >
+                      <FormattedMessage
+                        id="layout.terms-and-conditions-link"
+                        defaultMessage="Terms and conditions"
+                      />
+                    </a>
+                    <span> | </span>
+                    <a
+                      className="link"
+                      href={`https://www.onparallel.com/${locale}/legal/privacy?${utm}`}
+                    >
+                      <FormattedMessage id="layout.privacy-link" defaultMessage="Privacy" />
+                    </a>
+                  </MjmlText>
+                )}
               </>
             )}
-            {useAlternativeSlogan ? null : (
-              <MjmlSocial align="center" icon-padding="1px">
-                <MjmlSocialElement
-                  alt="LinkedIn"
-                  name="linkedin-noshare"
-                  href="https://www.linkedin.com/company/onparallel"
-                  backgroundColor="#6059f7"
-                />
-                <MjmlSocialElement
-                  alt="Slack"
-                  src={`${assetsUrl}/static/emails/slack.png`}
-                  href="https://joinparallel.slack.com/join/shared_invite/zt-sda28ew5-tCZBQzZpPupCIsd85RgwGA#/shared-invite/email"
-                  backgroundColor="#6059f7"
-                />
-                <MjmlSocialElement
-                  alt="Facebook"
-                  name="facebook-noshare"
-                  href="https://www.facebook.com/parallel.so"
-                  backgroundColor="#6059f7"
-                />
-                <MjmlSocialElement
-                  alt="Twitter"
-                  name="twitter-noshare"
-                  href="https://twitter.com/Parallel_SO"
-                  backgroundColor="#6059f7"
-                />
-              </MjmlSocial>
-            )}
-            <MjmlText align="center" color="#1A202C" lineHeight="20px">
-              <FormattedMessage
-                id="layout.email-sent-by"
-                defaultMessage="Sent by Parallel Solutions, S.L."
-              />
-              <br />
-              C/Almogàvers 165, 59.203, 08018 | Barcelona, Spain
-            </MjmlText>
-            {useAlternativeSlogan ? null : (
-              <MjmlText align="center">
-                <a
-                  className="link"
-                  href={`https://www.onparallel.com/${locale}/legal/terms?${utm}`}
-                >
-                  <FormattedMessage
-                    id="layout.terms-and-conditions-link"
-                    defaultMessage="Terms and conditions"
-                  />
-                </a>
-                <span> | </span>
-                <a
-                  className="link"
-                  href={`https://www.onparallel.com/${locale}/legal/privacy?${utm}`}
-                >
-                  <FormattedMessage id="layout.privacy-link" defaultMessage="Privacy" />
-                </a>
-              </MjmlText>
-            )}
-
             {optOutUrl ? (
               <MjmlText align="center" fontSize="14px">
                 <a className="link" href={optOutUrl}>
@@ -200,6 +206,7 @@ export const Layout: FC<LayoutProps> = function Layout({
             ) : null}
           </MjmlColumn>
         </MjmlSection>
+
         {omitGdprDisclaimer ? null : (
           <MjmlSection>
             <MjmlColumn>

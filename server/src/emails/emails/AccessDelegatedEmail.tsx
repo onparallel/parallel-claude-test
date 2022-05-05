@@ -24,6 +24,7 @@ export type AccessDelegatedEmailProps = {
   keycode: string;
   tone: Tone;
   removeWhyWeUseParallel: boolean;
+  removeParallelBranding: boolean;
 } & LayoutProps;
 
 const email: Email<AccessDelegatedEmailProps> = {
@@ -114,6 +115,7 @@ const email: Email<AccessDelegatedEmailProps> = {
     logoAlt,
     tone,
     removeWhyWeUseParallel,
+    removeParallelBranding,
   }: AccessDelegatedEmailProps) {
     const { locale } = useIntl();
     return (
@@ -125,6 +127,7 @@ const email: Email<AccessDelegatedEmailProps> = {
         logoAlt={logoAlt}
         utmCampaign="recipients"
         tone={tone}
+        removeParallelBranding={removeParallelBranding}
       >
         <MjmlSection padding="0">
           <MjmlColumn>
@@ -169,7 +172,9 @@ const email: Email<AccessDelegatedEmailProps> = {
             <Disclaimer email={senderEmail} />
           </MjmlColumn>
         </MjmlSection>
-        {removeWhyWeUseParallel ? null : <WhyWeUseParallel assetsUrl={assetsUrl} tone={tone} />}
+        {removeWhyWeUseParallel || removeParallelBranding ? null : (
+          <WhyWeUseParallel assetsUrl={assetsUrl} tone={tone} />
+        )}
       </Layout>
     );
   },

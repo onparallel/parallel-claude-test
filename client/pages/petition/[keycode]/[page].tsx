@@ -411,7 +411,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                   pageCount={pageCount}
                 />
               ) : null}
-              <RecipientViewFooter marginTop={12} />
+              <RecipientViewFooter marginTop={12} petition={petition} />
             </Flex>
           </Flex>
 
@@ -538,6 +538,7 @@ RecipientView.fragments = {
         ...useLiquidScope_PublicPetition
         isCompletingMessageEnabled
         ...useCompletingMessageDialog_PublicPetition
+        ...RecipientViewFooter_PublicPetition
       }
 
       ${this.PublicPetitionField}
@@ -545,6 +546,7 @@ RecipientView.fragments = {
       ${RecipientViewContentsCard.fragments.PublicPetition}
       ${RecipientViewProgressFooter.fragments.PublicPetition}
       ${RecipientViewHeader.fragments.PublicContact}
+      ${RecipientViewFooter.fragments.PublicPetition}
       ${useGetPageFields.fragments.PublicPetitionField}
       ${useLiquidScope.fragments.PublicPetition}
       ${useCompletingMessageDialog.fragments.PublicPetition}

@@ -52,6 +52,10 @@ export async function publicPetitionLinkAccess(
     organization!.id,
     "REMOVE_WHY_WE_USE_PARALLEL"
   );
+  const hasRemoveParallelBranding = await context.featureFlags.orgHasFeatureFlag(
+    organization!.id,
+    "REMOVE_PARALLEL_BRANDING"
+  );
 
   const { emailFrom, ...layoutProps } = await getLayoutProps(sender.org_id, context);
   const { html, text, subject, from } = await buildEmail(
@@ -65,6 +69,7 @@ export async function publicPetitionLinkAccess(
       keycode: access.keycode,
       tone: organization!.preferred_tone,
       removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
+      removeParallelBranding: hasRemoveParallelBranding,
       ...layoutProps,
     },
     { locale: petition.locale }

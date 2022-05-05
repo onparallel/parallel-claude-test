@@ -22,6 +22,7 @@ export type PetitionMessageProps = {
   keycode: string;
   tone: Tone;
   removeWhyWeUseParallel: boolean;
+  removeParallelBranding: boolean;
 } & LayoutProps;
 
 const email: Email<PetitionMessageProps> = {
@@ -93,6 +94,7 @@ const email: Email<PetitionMessageProps> = {
     logoAlt,
     tone,
     removeWhyWeUseParallel,
+    removeParallelBranding,
   }: PetitionMessageProps) {
     const intl = useIntl();
 
@@ -110,6 +112,7 @@ const email: Email<PetitionMessageProps> = {
         })}
         utmCampaign="recipients"
         tone={tone}
+        removeParallelBranding={removeParallelBranding}
       >
         <MjmlSection padding="0">
           <MjmlColumn>
@@ -155,7 +158,9 @@ const email: Email<PetitionMessageProps> = {
             <Disclaimer email={senderEmail} />
           </MjmlColumn>
         </MjmlSection>
-        {removeWhyWeUseParallel ? null : <WhyWeUseParallel assetsUrl={assetsUrl} tone={tone} />}
+        {removeWhyWeUseParallel || removeParallelBranding ? null : (
+          <WhyWeUseParallel assetsUrl={assetsUrl} tone={tone} />
+        )}
       </Layout>
     );
   },

@@ -150,6 +150,17 @@ export const PublicPetition = objectType({
         return org.preferred_tone;
       },
     });
+    t.boolean("hasRemoveParallelBranding", {
+      description: "Wether the has activated REMOVE_PARALLEL_BRANDING or not.",
+      resolve: async (root, _, ctx) => {
+        const hasRemoveParallelBranding = await ctx.featureFlags.orgHasFeatureFlag(
+          root.org_id,
+          "REMOVE_PARALLEL_BRANDING"
+        );
+
+        return hasRemoveParallelBranding;
+      },
+    });
     t.boolean("isCompletingMessageEnabled", {
       description: "Wether the completion message will be shown to the recipients or not.",
       resolve: (o) => o.is_completing_message_enabled,

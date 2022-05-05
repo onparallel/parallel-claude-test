@@ -47,6 +47,11 @@ export async function petitionClosedNotification(
       continue;
     }
 
+    const hasRemoveParallelBranding = await context.featureFlags.orgHasFeatureFlag(
+      petition.org_id,
+      "REMOVE_PARALLEL_BRANDING"
+    );
+
     const renderContext = { contact, user: senderData, petition };
     const { html, text, subject, from } = await buildEmail(
       PetitionClosedNotification,
@@ -56,6 +61,7 @@ export async function petitionClosedNotification(
         senderEmail: senderData.email,
         bodyHtml: toHtml(payload.message, renderContext),
         bodyPlainText: toPlainText(payload.message, renderContext),
+        removeParallelBranding: hasRemoveParallelBranding,
         ...layoutProps,
       },
       { locale: petition.locale }

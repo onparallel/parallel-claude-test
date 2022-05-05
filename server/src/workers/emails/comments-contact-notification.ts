@@ -44,6 +44,11 @@ export async function commentsContactNotification(
   );
   const organization = await context.organizations.loadOrg(petition.org_id);
 
+  const hasRemoveParallelBranding = await context.featureFlags.orgHasFeatureFlag(
+    organization!.id,
+    "REMOVE_PARALLEL_BRANDING"
+  );
+
   const { html, text, subject, from } = await buildEmail(
     PetitionCommentsContactNotification,
     {
@@ -53,6 +58,7 @@ export async function commentsContactNotification(
       keycode: access.keycode,
       tone: organization!.preferred_tone,
       fields,
+      removeParallelBranding: hasRemoveParallelBranding,
       ...layoutProps,
     },
     { locale: petition.locale }

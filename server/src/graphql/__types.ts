@@ -1527,6 +1527,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     deadline: NexusGenScalars["DateTime"] | null; // DateTime
     fields: NexusGenRootTypes["PublicPetitionField"][]; // [PublicPetitionField!]!
+    hasRemoveParallelBranding: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     isCompletingMessageEnabled: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
@@ -2979,6 +2980,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     deadline: "DateTime";
     fields: "PublicPetitionField";
+    hasRemoveParallelBranding: "Boolean";
     id: "GID";
     isCompletingMessageEnabled: "Boolean";
     isRecipientViewContentsHidden: "Boolean";

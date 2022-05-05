@@ -9,10 +9,14 @@ export type IntegrationSettings<K extends IntegrationType> = {
   SIGNATURE: {
     API_KEY: string;
     ENVIRONMENT?: "production" | "sandbox";
-    EN_FORMAL_BRANDING_ID?: string;
-    ES_FORMAL_BRANDING_ID?: string;
-    EN_INFORMAL_BRANDING_ID?: string;
-    ES_INFORMAL_BRANDING_ID?: string;
+    EN_FORMAL_BRANDED_BRANDING_ID?: string;
+    EN_FORMAL_UNBRANDED_BRANDING_ID?: string;
+    ES_FORMAL_BRANDED_BRANDING_ID?: string;
+    ES_FORMAL_UNBRANDED_BRANDING_ID?: string;
+    EN_INFORMAL_BRANDED_BRANDING_ID?: string;
+    EN_INFORMAL_UNBRANDED_BRANDING_ID?: string;
+    ES_INFORMAL_BRANDED_BRANDING_ID?: string;
+    ES_INFORMAL_UNBRANDED_BRANDING_ID?: string;
   };
   SSO: {
     EMAIL_DOMAINS: string[];

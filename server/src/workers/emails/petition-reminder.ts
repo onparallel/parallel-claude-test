@@ -79,6 +79,10 @@ export async function petitionReminder(
       organization!.id,
       "REMOVE_WHY_WE_USE_PARALLEL"
     );
+    const hasRemoveParallelBranding = await context.featureFlags.orgHasFeatureFlag(
+      organization!.id,
+      "REMOVE_PARALLEL_BRANDING"
+    );
 
     const { html, text, subject, from } = await buildEmail(
       PetitionReminder,
@@ -96,6 +100,7 @@ export async function petitionReminder(
         keycode: access.keycode,
         tone: organization!.preferred_tone,
         removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
+        removeParallelBranding: hasRemoveParallelBranding,
         ...layoutProps,
       },
       { locale: petition.locale }

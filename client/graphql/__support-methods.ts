@@ -1066,6 +1066,12 @@ export const schemaTypes: IntrospectionType[] = [
         deprecationReason: null,
       },
       {
+        name: "REMOVE_PARALLEL_BRANDING",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
+      {
         name: "REMOVE_WHY_WE_USE_PARALLEL",
         description: null,
         isDeprecated: false,

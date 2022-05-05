@@ -40,6 +40,11 @@ export async function contactAuthenticationRequest(
 
   const organization = await context.organizations.loadOrg(petition.org_id);
 
+  const hasRemoveParallelBranding = await context.featureFlags.orgHasFeatureFlag(
+    organization!.id,
+    "REMOVE_PARALLEL_BRANDING"
+  );
+
   const { html, text, subject, from } = await buildEmail(
     ContactAuthenticationRequest,
     {
@@ -49,6 +54,7 @@ export async function contactAuthenticationRequest(
       browserName: ua?.getBrowser()?.name ?? "Unknown",
       osName: ua?.getOS()?.name ?? "Unknown",
       tone: organization!.preferred_tone,
+      removeParallelBranding: hasRemoveParallelBranding,
       ...layoutProps,
     },
     { locale: petition.locale }

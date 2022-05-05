@@ -253,6 +253,7 @@ enum FeatureFlag {
   ON_BEHALF_OF
   PETITION_PDF_EXPORT
   PETITION_SIGNATURE
+  REMOVE_PARALLEL_BRANDING
   REMOVE_WHY_WE_USE_PARALLEL
   SKIP_FORWARD_SECURITY
 }
@@ -3490,6 +3491,11 @@ type PublicPetition implements Timestamps {
   The field definition of the petition.
   """
   fields: [PublicPetitionField!]!
+
+  """
+  Wether the has activated REMOVE_PARALLEL_BRANDING or not.
+  """
+  hasRemoveParallelBranding: Boolean!
 
   """
   The ID of the petition.

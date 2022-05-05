@@ -159,7 +159,7 @@ function OrganizationGeneral() {
             {me.hasCustomHost ? null : (
               <Alert status="info" rounded="md">
                 <AlertIcon />
-                <HStack spacing={3}>
+                <HStack spacing={3} width="100%">
                   <Text flex="1">
                     <FormattedMessage
                       id="organization.general.upgrade-subdomain"

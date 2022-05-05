@@ -60,6 +60,11 @@ async function startSignatureProcess(
 
     const signatureClient = ctx.signature.getClient(signatureIntegration);
 
+    const hasRemoveParallelBranding = await ctx.featureFlags.orgHasFeatureFlag(
+      org!.id,
+      "REMOVE_PARALLEL_BRANDING"
+    );
+
     // send request to signature client
     const data = await signatureClient.startSignatureRequest(
       toGlobalId("Petition", petition.id),
@@ -70,6 +75,7 @@ async function startSignatureProcess(
         templateData: {
           ...(await getLayoutProps(petition.org_id, ctx)),
           tone: org.preferred_tone,
+          removeParallelBranding: hasRemoveParallelBranding,
         },
         signingMode: "parallel",
         initialMessage: message,

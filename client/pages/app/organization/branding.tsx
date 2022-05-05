@@ -1,15 +1,20 @@
 import { gql, useMutation } from "@apollo/client";
 import {
+  Alert,
+  AlertIcon,
+  Badge,
   Button,
   Center,
   Divider,
   Flex,
   Heading,
+  HStack,
   Image,
   Radio,
   RadioGroup,
   Spinner,
   Stack,
+  Switch,
   Text,
 } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
@@ -17,8 +22,9 @@ import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider"
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileSize } from "@parallel/components/common/FileSize";
-import { withOrgRole } from "@parallel/components/common/withOrgRole";
+import { SupportButton } from "@parallel/components/common/SupportButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { BrandingPreview } from "@parallel/components/organization/BrandingPreview";
 import {
@@ -194,6 +200,57 @@ function OrganizationBranding() {
             </RadioGroup>
           </Stack>
           <Divider borderColor="gray.300" />
+          <Stack spacing={4}>
+            <HStack spacing={3}>
+              <Stack flex="1" spacing={2}>
+                <HStack alignItems="center">
+                  <Heading as="h4" size="md" fontWeight="semibold">
+                    <FormattedMessage
+                      id="organization.branding.parallel-branding-header"
+                      defaultMessage="Parallel Branding"
+                    />
+                  </Heading>
+                  {me.hasRemovedParallelBranding ? null : (
+                    <Badge colorScheme="purple">
+                      <FormattedMessage id="generic.plans.enterprise" defaultMessage="Enterprise" />
+                    </Badge>
+                  )}
+                </HStack>
+                <Text>
+                  <FormattedMessage
+                    id="organization.branding.parallel-branding-description"
+                    defaultMessage="Displays the Parallel branding on all emails and requests that are sent."
+                  />
+                </Text>
+              </Stack>
+              <Switch size="md" isChecked={!me.hasRemovedParallelBranding} isDisabled={true} />
+            </HStack>
+            {me.hasRemovedParallelBranding ? null : (
+              <Alert status="info" rounded="md">
+                <AlertIcon />
+                <HStack spacing={3} width="100%">
+                  <Text flex="1">
+                    <FormattedMessage
+                      id="generic.upgrade-to-enable"
+                      defaultMessage="Upgrade to enable this feature."
+                    />
+                  </Text>
+                  <SupportButton
+                    variant="outline"
+                    colorScheme="blue"
+                    backgroundColor="white"
+                    message={intl.formatMessage({
+                      id: "organization.branding.parallel-branding-message",
+                      defaultMessage:
+                        "Hi, I would like to get more information about how to upgrade my plan to hide Parallel branding.",
+                    })}
+                  >
+                    <FormattedMessage id="generic.contact" defaultMessage="Contact" />
+                  </SupportButton>
+                </HStack>
+              </Alert>
+            )}
+          </Stack>
         </Stack>
         <BrandingPreview
           tone={tone}
@@ -231,6 +288,7 @@ OrganizationBranding.queries = [
       ...SettingsLayout_Query
       me {
         fullName
+        hasRemovedParallelBranding: hasFeatureFlag(featureFlag: REMOVE_PARALLEL_BRANDING)
         organization {
           id
           logoUrl(options: { resize: { width: 600 } })
