@@ -80,6 +80,7 @@ class MyDocument extends Document<MyDocumentProps> {
     return (
       <Html>
         <Head>
+          <link href={process.env.NEXT_PUBLIC_IMAGES_URL} rel="preconnect" />
           <link href={process.env.NEXT_PUBLIC_ASSETS_URL} rel="preconnect" />
           <link href={polyfillsUrl} rel="preload" as="script" crossOrigin="anonymous" />
           {process.env.NODE_ENV === "production" ? (
