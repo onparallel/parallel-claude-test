@@ -261,7 +261,7 @@ OrganizationGeneral.mutations = [
     mutation OrganizationGeneral_updateOrgLogo($file: Upload!, $isIcon: Boolean) {
       updateOrganizationLogo(file: $file, isIcon: $isIcon) {
         id
-        iconUrl80: iconUrl(options: { resize: { width: 80 } })
+        iconUrl92: iconUrl(options: { resize: { width: 92 } })
         iconUrl240: iconUrl(options: { resize: { width: 240 } })
       }
     }

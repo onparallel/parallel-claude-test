@@ -134,6 +134,7 @@ export const AppLayoutNavbar = Object.assign(
                     shadow: "lg",
                     transform: "scale(1.1)",
                   }}
+                  overflow="hidden"
                 >
                   {me.organization.iconUrl92 ? (
                     <Image
@@ -143,7 +144,7 @@ export const AppLayoutNavbar = Object.assign(
                       src={me.organization.iconUrl92}
                     />
                   ) : (
-                    <Logo width="46px" hideText={true} color="gray.800" />
+                    <Logo width="46px" hideText={true} color="gray.800" padding={1.5} />
                   )}
                 </Box>
               </Box>
