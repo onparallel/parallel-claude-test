@@ -728,6 +728,12 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.orderBy("created_at", "asc")
   );
 
+  readonly loadMessagesByPetitionId = this.buildLoadMultipleBy(
+    "petition_message",
+    "petition_id",
+    (q) => q.orderBy("created_at", "asc")
+  );
+
   async createMessages(
     petitionId: number,
     scheduledAt: Date | null,

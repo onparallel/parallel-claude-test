@@ -252,8 +252,13 @@ export const Petition = objectType({
     t.nullable.datetime("sentAt", {
       description: "Date when the petition was first sent",
       resolve: async (root, _, ctx) => {
-        const accesses = await ctx.petitions.loadAccessesForPetition(root.id);
-        return minBy(accesses, (a) => a.created_at.valueOf())?.created_at ?? null;
+        const messages = await ctx.petitions.loadMessagesByPetitionId(root.id);
+        const firstMessage = minBy(
+          messages,
+          (m) => m.scheduled_at?.valueOf() ?? m.created_at.valueOf()
+        );
+
+        return firstMessage?.scheduled_at ?? firstMessage?.created_at ?? null;
       },
     });
     t.list.nonNull.field("accesses", {
