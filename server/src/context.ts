@@ -27,6 +27,7 @@ import { PetitionBinder, PETITION_BINDER } from "./services/petition-binder";
 import { PRINTER, Printer } from "./services/printer";
 import { SIGNATURE, SignatureService } from "./services/signature";
 import { Smtp } from "./services/smtp";
+import { ITiersService, TIERS_SERVICE } from "./services/tiers";
 
 @injectable()
 export class ApiContext {
@@ -47,6 +48,7 @@ export class ApiContext {
     @inject(AWS_SERVICE) public readonly aws: Aws,
     @inject(FETCH_SERVICE) public readonly fetch: IFetchService,
     @inject(IMAGE_SERVICE) public readonly images: IImageService,
+    @inject(TIERS_SERVICE) public readonly tiers: ITiersService,
 
     // Repositories
     public readonly contacts: ContactRepository,

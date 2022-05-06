@@ -2,12 +2,13 @@ import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { indexBy, uniq } from "remeda";
+import { unMaybeArray } from "../../util/arrays";
 import { fromDataLoader, FromDataLoaderOptions } from "../../util/fromDataLoader";
 import { keyBuilder } from "../../util/keyBuilder";
 import { MaybeArray } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { FeatureFlagName } from "../__types";
+import { FeatureFlagName, FeatureFlagOverride } from "../__types";
 
 @injectable()
 export class FeatureFlagRepository extends BaseRepository {
@@ -132,21 +133,25 @@ export class FeatureFlagRepository extends BaseRepository {
   );
 
   async addOrUpdateFeatureFlagOverride(
-    featureFlag: FeatureFlagName,
     orgId: number,
-    value: boolean,
+    featureFlag: MaybeArray<{ name: FeatureFlagName; value: boolean }>,
     t?: Knex.Transaction
   ) {
-    return await this.raw(
+    const featureFlags = unMaybeArray(featureFlag);
+    return await this.raw<FeatureFlagOverride>(
       /* sql */ `
-        insert into feature_flag_override (feature_flag_name, org_id, "value") values (?, ?, ?) 
+        insert into feature_flag_override (feature_flag_name, org_id, "value") ? 
           on conflict (org_id, feature_flag_name) where user_id is null do update
         set
           value = EXCLUDED.value
         returning *;
       `,
-      [featureFlag, orgId, value],
+      [this.sqlValues(featureFlags.map(({ name, value }) => [name, orgId, value]))],
       t
     );
+  }
+
+  async removeFeatureFlagOverrides(orgId: number, t?: Knex.Transaction) {
+    await this.from("feature_flag_override", t).where("org_id", orgId).delete();
   }
 }

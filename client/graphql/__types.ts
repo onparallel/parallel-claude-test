@@ -648,6 +648,8 @@ export interface Mutation {
   updateOrganizationLogo: Organization;
   /** Changes the organization preferred tone */
   updateOrganizationPreferredTone: Organization;
+  /** Applies a given tier to the organization */
+  updateOrganizationTier: SupportMethodResponse;
   /** Updates the role of another user in the organization. */
   updateOrganizationUser: User;
   /** Updates the user limit for a organization */
@@ -1356,6 +1358,11 @@ export interface MutationupdateOrganizationLogoArgs {
 
 export interface MutationupdateOrganizationPreferredToneArgs {
   tone: Tone;
+}
+
+export interface MutationupdateOrganizationTierArgs {
+  orgId: Scalars["Int"];
+  tier: Scalars["String"];
 }
 
 export interface MutationupdateOrganizationUserArgs {

@@ -12,6 +12,7 @@ import { IRedis, REDIS, Redis } from "./redis";
 import { SIGNATURE, SignatureService } from "./signature";
 import { Smtp } from "./smtp";
 import { IStorage, Storage, StorageFactory, STORAGE_FACTORY } from "./storage";
+import { ITiersService, TiersService, TIERS_SERVICE } from "./tiers";
 
 export const servicesModule = new ContainerModule((bind) => {
   bind<ILogger>(LOGGER).toDynamicValue(createLogger).inSingletonScope();
@@ -29,4 +30,5 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IFetchService>(FETCH_SERVICE).to(FetchService).inSingletonScope();
   bind<IImageService>(IMAGE_SERVICE).to(ImageService).inSingletonScope();
   bind<IPetitionBinder>(PETITION_BINDER).to(PetitionBinder);
+  bind<ITiersService>(TIERS_SERVICE).to(TiersService);
 });

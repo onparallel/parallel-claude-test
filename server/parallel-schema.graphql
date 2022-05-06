@@ -1421,6 +1421,21 @@ type Mutation {
   updateOrganizationPreferredTone(tone: Tone!): Organization!
 
   """
+  Applies a given tier to the organization
+  """
+  updateOrganizationTier(
+    """
+    Numeric ID of the Organization
+    """
+    orgId: Int!
+
+    """
+    e.g.: FREE, APPSUMO1, APPSUMO2, APPSUMO3...
+    """
+    tier: String!
+  ): SupportMethodResponse!
+
+  """
   Updates the role of another user in the organization.
   """
   updateOrganizationUser(role: OrganizationRole!, userGroupIds: [GID!], userId: GID!): User!

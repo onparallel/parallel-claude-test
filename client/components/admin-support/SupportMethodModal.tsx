@@ -15,8 +15,9 @@ import { Maybe, SupportMethodResponse } from "@parallel/graphql/__types";
 import { unCamelCase } from "@parallel/utils/strings";
 import { IntrospectionField, IntrospectionInputTypeRef, IntrospectionType } from "graphql";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { SupportMethodArgumentInput } from "./SupportMethodArgumentInput";
+import { HtmlBlock } from "../common/HtmlBlock";
 import { getDefaultInputTypeValue } from "./helpers";
+import { SupportMethodArgumentInput } from "./SupportMethodArgumentInput";
 
 type MethodModalProps = {
   field: IntrospectionField;
@@ -188,7 +189,10 @@ function StatusTag({
         color: status.data.result === "SUCCESS" ? "green.500" : "red.500",
       }}
     >
-      {status.data.result} {status.data.message}
+      {status.data.result}
+      {status.data.message ? (
+        <HtmlBlock dangerousInnerHtml={status.data.message.split("\n").join("<br/>")} />
+      ) : null}
     </Text>
   );
 }

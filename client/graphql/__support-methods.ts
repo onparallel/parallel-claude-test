@@ -726,6 +726,46 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "updateOrganizationTier",
+      description: "Applies a given tier to the organization",
+      args: [
+        {
+          name: "orgId",
+          description: "Numeric ID of the Organization",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "Int", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "tier",
+          description: "e.g.: FREE, APPSUMO1, APPSUMO2, APPSUMO3...",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "String", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "updateOrganizationUserLimit",
       description: "Updates the user limit for a organization",
       args: [

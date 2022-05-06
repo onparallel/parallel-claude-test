@@ -606,7 +606,11 @@ export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
             },
             t
           ),
-          ctx.featureFlags.addOrUpdateFeatureFlagOverride("PETITION_SIGNATURE", orgId, true, t),
+          ctx.featureFlags.addOrUpdateFeatureFlagOverride(
+            orgId,
+            { name: "PETITION_SIGNATURE", value: true },
+            t
+          ),
           ctx.organizations.updateOrganization(
             orgId,
             {
@@ -645,7 +649,7 @@ export const updateFeatureFlag = mutationField("updateFeatureFlag", {
   authorize: supportMethodAccess(),
   resolve: async (_, { featureFlag, value, orgId }, ctx) => {
     try {
-      await ctx.featureFlags.addOrUpdateFeatureFlagOverride(featureFlag, orgId, value);
+      await ctx.featureFlags.addOrUpdateFeatureFlagOverride(orgId, { name: featureFlag, value });
       return {
         result: RESULT.SUCCESS,
         message: `Organization with ID: ${orgId} now has ${featureFlag} set to ${String(
@@ -791,6 +795,40 @@ export const updateOrganizationLimits = mutationField("updateOrganizationLimits"
       return {
         result: RESULT.SUCCESS,
       };
+    }
+  },
+});
+
+export const updateOrganizationTier = mutationField("updateOrganizationTier", {
+  description: "Applies a given tier to the organization",
+  type: "SupportMethodResponse",
+  authorize: supportMethodAccess(),
+  args: {
+    orgId: nonNull(intArg({ description: "Numeric ID of the Organization" })),
+    tier: nonNull(stringArg({ description: "e.g.: FREE, APPSUMO1, APPSUMO2, APPSUMO3..." })),
+  },
+  resolve: async (_, args, ctx) => {
+    try {
+      const [org, tier] = await Promise.all([
+        ctx.organizations.loadOrg(args.orgId),
+        ctx.tiers.updateOrganizationTier(args.orgId, args.tier),
+      ]);
+
+      return {
+        result: RESULT.SUCCESS,
+        message: `Tier ${args.tier} applied to org ${org!.name}.
+        New Usage Limits: 
+        USER_LIMIT: ${tier.USER_LIMIT}
+        PETITION_SEND: ${tier.PETITION_SEND.limit} in ${tier.PETITION_SEND.period} 
+        SIGNATURIT_SHARED_APIKEY: ${tier.SIGNATURIT_SHARED_APIKEY.limit} in ${
+          tier.SIGNATURIT_SHARED_APIKEY.period
+        }
+
+        Feature Flags: 
+        ${tier.FEATURE_FLAGS.map((ff) => `${ff.name}: ${ff.value}`).join("\n")}`,
+      };
+    } catch (e: any) {
+      return { result: RESULT.FAILURE, message: e.message };
     }
   },
 });

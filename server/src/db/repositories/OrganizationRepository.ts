@@ -4,6 +4,7 @@ import { Knex } from "knex";
 import { indexBy } from "remeda";
 import { Config, CONFIG } from "../../config";
 import { EMAILS, EmailsService } from "../../services/emails";
+import { TIERS } from "../../services/tiers";
 import { unMaybeArray } from "../../util/arrays";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { Maybe, MaybeArray } from "../../util/types";
@@ -19,6 +20,7 @@ import {
   OrganizationUsageLimitName,
   User,
 } from "../__types";
+import { FeatureFlagRepository } from "./FeatureFlagRepository";
 import { SystemRepository } from "./SystemRepository";
 
 export type OrganizationUsageDetails = {
@@ -27,7 +29,7 @@ export type OrganizationUsageDetails = {
     limit: number;
     period: string; //pg interval
   };
-  // limits the number of uses of the signature sandbox service with our shared API_KEY
+  // limits the number of uses of the signature production service with our shared API_KEY
   SIGNATURIT_SHARED_APIKEY: {
     limit: number;
     period: string;
@@ -40,22 +42,11 @@ export class OrganizationRepository extends BaseRepository {
     @inject(CONFIG) private config: Config,
     @inject(KNEX) knex: Knex,
     @inject(EMAILS) private readonly emails: EmailsService,
-    @inject(SystemRepository) private system: SystemRepository
+    @inject(SystemRepository) private system: SystemRepository,
+    @inject(FeatureFlagRepository) private featureFlags: FeatureFlagRepository
   ) {
     super(knex);
   }
-
-  readonly defaultOrganizationUsageDetails: OrganizationUsageDetails = {
-    USER_LIMIT: 2,
-    PETITION_SEND: {
-      limit: 20,
-      period: "1 month",
-    },
-    SIGNATURIT_SHARED_APIKEY: {
-      limit: 0,
-      period: "1 month",
-    },
-  };
 
   readonly loadOrg = this.buildLoadBy("organization", "id", (q) => q.whereNull("deleted_at"));
 
@@ -154,13 +145,14 @@ export class OrganizationRepository extends BaseRepository {
   }
 
   async createOrganization(data: CreateOrganization, createdBy?: string, t?: Knex.Transaction) {
+    const { FEATURE_FLAGS: featureFlags, ...usageDetails } = TIERS["FREE"];
     const [org] = await this.insert(
       "organization",
       {
         ...data,
         created_by: createdBy,
         updated_by: createdBy,
-        usage_details: data.usage_details || this.defaultOrganizationUsageDetails,
+        usage_details: data.usage_details || usageDetails,
       },
       t
     );
@@ -172,13 +164,14 @@ export class OrganizationRepository extends BaseRepository {
         [
           {
             limit_name: "PETITION_SEND",
-            ...this.defaultOrganizationUsageDetails["PETITION_SEND"],
+            ...TIERS.FREE.PETITION_SEND,
           },
         ],
 
         t
       ),
       this.createSandboxSignatureIntegration(org.id, createdBy, t),
+      this.featureFlags.addOrUpdateFeatureFlagOverride(org.id, featureFlags, t),
     ]);
 
     return org;
@@ -338,9 +331,10 @@ export class OrganizationRepository extends BaseRepository {
     orgId: number,
     limitName: OrganizationUsageLimitName,
     limit: number,
-    period: string
+    period: string,
+    t?: Knex.Transaction
   ) {
-    const [usage] = await this.from("organization_usage_limit")
+    const [usage] = await this.from("organization_usage_limit", t)
       .where({
         period_end_date: null,
         limit_name: limitName,
