@@ -182,14 +182,14 @@ export function UserMenu({ placement, me, realMe, onHelpCenterClick }: UserMenuP
             <FormattedMessage id="navbar.start-tour" defaultMessage="Guide me around" />
           </MenuItem>
           <NormalLink
-            href="https://airtable.com/shre0IJzqOWlZCrkf"
-            aria-label="Feedback"
+            href="https://roadmap.onparallel.com/"
+            aria-label="Feature requests"
             isExternal
             color="inherit"
             _hover={{ color: "inherit" }}
           >
             <MenuItem icon={<CommentIcon display="block" boxSize={4} />}>
-              <FormattedMessage id="navbar.give-feedback" defaultMessage="Give us your feedback" />
+              <FormattedMessage id="navbar.feature-requests" defaultMessage="Feature requests" />
             </MenuItem>
           </NormalLink>
           <MenuDivider />

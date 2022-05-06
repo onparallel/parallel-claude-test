@@ -5025,14 +5025,19 @@
     "context": "Coming soon"
   },
   {
-    "term": "navbar.give-feedback",
-    "definition": "Give us your feedback",
-    "context": "Give us your feedback"
+    "term": "navbar.feature-requests",
+    "definition": "Feature requests",
+    "context": "Feature requests"
   },
   {
     "term": "navbar.help-center",
     "definition": "Help center",
     "context": "Help center"
+  },
+  {
+    "term": "navbar.new-in-parallel",
+    "definition": "New in Parallel",
+    "context": "New in Parallel"
   },
   {
     "term": "navbar.start-tour",

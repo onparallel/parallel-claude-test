@@ -13,6 +13,7 @@ import {
 import {
   AddIcon,
   HelpOutlineIcon,
+  NewsIcon,
   PaperPlaneIcon,
   ReportsIcon,
   UsersIcon,
@@ -204,6 +205,23 @@ export const AppLayoutNavbar = Object.assign(
           <Spacer display={{ base: "none", sm: "block" }} />
           <Stack spacing={2} alignItems="center" display={{ base: "none", sm: "flex" }}>
             <NotificationsButton />
+            <IconButtonWithTooltip
+              label={intl.formatMessage({
+                id: "navbar.new-in-parallel",
+                defaultMessage: "New in Parallel",
+              })}
+              as="a"
+              rel="noopener"
+              target="_blank"
+              placement="right"
+              size="md"
+              variant="ghost"
+              backgroundColor="white"
+              isRound
+              onClick={onHelpCenterClick}
+              icon={<NewsIcon fontSize="22px" />}
+              data-canny-changelog
+            />
             <IconButtonWithTooltip
               label={intl.formatMessage({
                 id: "navbar.help-center",
