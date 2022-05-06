@@ -1,7 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
 import {
-  Alert,
-  AlertIcon,
   Badge,
   Box,
   Button,
@@ -16,6 +14,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
+import { ContactAlert } from "@parallel/components/common/ContactAlert";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { Dropzone } from "@parallel/components/common/Dropzone";
@@ -35,7 +34,7 @@ import { useOrganizationSections } from "@parallel/utils/useOrganizationSections
 import { useRef } from "react";
 import { DropzoneRef, FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
-const MAX_FILE_SIZE = 1025 * 1024;
+const MAX_FILE_SIZE = 1024 * 1024;
 
 function OrganizationGeneral() {
   const intl = useIntl();
@@ -173,13 +172,15 @@ function OrganizationGeneral() {
                     message={intl.formatMessage({
                       id: "organization.general.upgrade-subdomain-message",
                       defaultMessage:
-                        "Hi, I would like more information about setting a subdomain.",
+                        "This is an Enterprise feature. Contact us for more information.",
                     })}
-                  >
-                    <FormattedMessage id="generic.contact" defaultMessage="Contact" />
-                  </SupportButton>
-                </HStack>
-              </Alert>
+                  </Text>
+                }
+                contactMessage={intl.formatMessage({
+                  id: "organization.general.upgrade-subdomain-message",
+                  defaultMessage: "Hi, I would like more information about setting a subdomain.",
+                })}
+              />
             )}
           </Stack>
           <Divider borderColor="gray.300" />

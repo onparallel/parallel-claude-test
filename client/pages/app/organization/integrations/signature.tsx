@@ -1,11 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
 import {
-  Alert,
-  AlertIcon,
   Badge,
-  Box,
   Button,
-  Center,
   Heading,
   HStack,
   IconButton,
@@ -17,6 +13,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { DeleteIcon, RepeatIcon, StarIcon } from "@parallel/chakra/icons";
+import { ContactAlert } from "@parallel/components/common/ContactAlert";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
@@ -34,16 +31,15 @@ import {
   IntegrationsSignature_SignatureOrgIntegrationFragment,
   IntegrationsSignature_userDocument,
 } from "@parallel/graphql/__types";
-import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
-import { assertTypenameArray } from "@parallel/utils/apollo/typename";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { assertTypenameArray } from "@parallel/utils/apollo/typename";
+import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { integer, parseQuery, useQueryState, values } from "@parallel/utils/queryState";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { SupportLink } from "@parallel/components/common/SupportLink";
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
@@ -220,10 +216,9 @@ function IntegrationsSignature() {
           }
         />
         {!me.hasPetitionSignature ? (
-          <Alert status="info" rounded="md">
-            <AlertIcon />
-            <HStack spacing={8} flex="1">
-              <Box flex="1">
+          <ContactAlert
+            body={
+              <>
                 <Text>
                   <FormattedMessage
                     id="page.signature.upgrade-plan-alert-1"
@@ -236,24 +231,14 @@ function IntegrationsSignature() {
                     defaultMessage="<b>Upgrade your plan</b> to access signature integration."
                   />
                 </Text>
-              </Box>
-              <Center>
-                <Button
-                  as={SupportLink}
-                  variant="outline"
-                  backgroundColor="white"
-                  colorScheme="blue"
-                  message={intl.formatMessage({
-                    id: "page.signature.upgrade-plan-support-message",
-                    defaultMessage:
-                      "Hi, I would like more information about upgrade my plan to access signature integration.",
-                  })}
-                >
-                  <FormattedMessage id="generic.contact" defaultMessage="Contact" />
-                </Button>
-              </Center>
-            </HStack>
-          </Alert>
+              </>
+            }
+            contactMessage={intl.formatMessage({
+              id: "page.signature.upgrade-plan-support-message",
+              defaultMessage:
+                "Hi, I would like more information about upgrade my plan to access signature integration.",
+            })}
+          />
         ) : null}
       </Stack>
     </SettingsLayout>

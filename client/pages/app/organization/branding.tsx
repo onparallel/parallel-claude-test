@@ -1,7 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
 import {
-  Alert,
-  AlertIcon,
   Badge,
   Button,
   Center,
@@ -18,11 +16,11 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
+import { ContactAlert } from "@parallel/components/common/ContactAlert";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileSize } from "@parallel/components/common/FileSize";
-import { SupportButton } from "@parallel/components/common/SupportButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
@@ -39,7 +37,7 @@ import { useOrganizationSections } from "@parallel/utils/useOrganizationSections
 import { useRef } from "react";
 import { DropzoneRef, FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
-const MAX_FILE_SIZE = 1025 * 1024;
+const MAX_FILE_SIZE = 1024 * 1024;
 
 function OrganizationBranding() {
   const intl = useIntl();
@@ -226,29 +224,21 @@ function OrganizationBranding() {
               <Switch size="md" isChecked={!me.hasRemovedParallelBranding} isDisabled={true} />
             </HStack>
             {me.hasRemovedParallelBranding ? null : (
-              <Alert status="info" rounded="md">
-                <AlertIcon />
-                <HStack spacing={3} width="100%">
-                  <Text flex="1">
-                    <FormattedMessage
-                      id="generic.upgrade-to-enable"
-                      defaultMessage="Upgrade to enable this feature."
-                    />
-                  </Text>
-                  <SupportButton
-                    variant="outline"
-                    colorScheme="blue"
-                    backgroundColor="white"
-                    message={intl.formatMessage({
-                      id: "organization.branding.parallel-branding-message",
-                      defaultMessage:
-                        "Hi, I would like to get more information about how to upgrade my plan to hide Parallel branding.",
+              <ContactAlert
+                body={
+                  <Text>
+                    {intl.formatMessage({
+                      id: "generic.upgrade-to-enable",
+                      defaultMessage: "Upgrade to enable this feature.",
                     })}
-                  >
-                    <FormattedMessage id="generic.contact" defaultMessage="Contact" />
-                  </SupportButton>
-                </HStack>
-              </Alert>
+                  </Text>
+                }
+                contactMessage={intl.formatMessage({
+                  id: "organization.branding.parallel-branding-message",
+                  defaultMessage:
+                    "Hi, I would like to get more information about how to upgrade my plan to hide Parallel branding.",
+                })}
+              />
             )}
           </Stack>
         </Stack>

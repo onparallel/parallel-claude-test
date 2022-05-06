@@ -13,7 +13,7 @@ export function fileSize(
 ) {
   let unit = 0;
   let _value = value;
-  while (_value > 1024 && unit < UNITS.length - 1) {
+  while (_value >= 1024 && unit < UNITS.length - 1) {
     _value /= 1024;
     unit += 1;
   }
