@@ -1,4 +1,4 @@
-import { inject, injectable, LazyServiceIdentifer } from "inversify";
+import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { pick } from "remeda";
 import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
@@ -14,53 +14,63 @@ type Tier = OrganizationUsageDetails & {
   FEATURE_FLAGS: { name: FeatureFlagName; value: boolean }[];
 };
 
-export const TIERS: Record<string, Tier> = {
-  FREE: {
-    USER_LIMIT: 2,
-    PETITION_SEND: { limit: 20, period: "1 month" },
-    SIGNATURIT_SHARED_APIKEY: { limit: 0, period: "1 month" },
-    FEATURE_FLAGS: [],
-  },
-  APPSUMO1: {
-    USER_LIMIT: 5,
-    PETITION_SEND: { limit: 40, period: "1 month" },
-    SIGNATURIT_SHARED_APIKEY: { limit: 0, period: "1 month" },
-    FEATURE_FLAGS: [],
-  },
-  APPSUMO2: {
-    USER_LIMIT: 20,
-    PETITION_SEND: { limit: 80, period: "1 month" },
-    SIGNATURIT_SHARED_APIKEY: { limit: 0, period: "1 month" },
-    FEATURE_FLAGS: [],
-  },
-  APPSUMO3: {
-    USER_LIMIT: 50,
-    PETITION_SEND: { limit: 150, period: "1 month" },
-    SIGNATURIT_SHARED_APIKEY: { limit: 0, period: "1 month" },
-    FEATURE_FLAGS: [],
-  },
-  APPSUMO4: {
-    USER_LIMIT: 1000,
-    PETITION_SEND: { limit: 300, period: "1 month" },
-    SIGNATURIT_SHARED_APIKEY: { limit: 0, period: "1 month" },
-    FEATURE_FLAGS: [],
-  },
-};
 export interface ITiersService {
-  updateOrganizationTier(orgId: number, tier: string): Promise<Tier>;
+  updateOrganizationTier(
+    orgId: number,
+    tierKey: string,
+    updatedBy?: string,
+    t?: Knex.Transaction
+  ): Promise<Tier>;
 }
 
 @injectable()
 export class TiersService implements ITiersService {
   constructor(
-    @inject(new LazyServiceIdentifer(() => OrganizationRepository))
-    private organizations: OrganizationRepository,
-    @inject(new LazyServiceIdentifer(() => FeatureFlagRepository))
+    @inject(OrganizationRepository) private organizations: OrganizationRepository,
+    @inject(FeatureFlagRepository)
     private featureFlags: FeatureFlagRepository
   ) {}
 
-  async updateOrganizationTier(orgId: number, tierKey: string, t?: Knex.Transaction) {
-    const tiers = Object.keys(TIERS);
+  readonly TIERS: Record<string, Tier> = {
+    FREE: {
+      USER_LIMIT: 2,
+      PETITION_SEND: { limit: 20, period: "1 month" },
+      SIGNATURIT_SHARED_APIKEY: { limit: 0, period: "1 month" },
+      FEATURE_FLAGS: [],
+    },
+    APPSUMO1: {
+      USER_LIMIT: 5,
+      PETITION_SEND: { limit: 40, period: "1 month" },
+      SIGNATURIT_SHARED_APIKEY: { limit: 0, period: "1 month" },
+      FEATURE_FLAGS: [],
+    },
+    APPSUMO2: {
+      USER_LIMIT: 20,
+      PETITION_SEND: { limit: 80, period: "1 month" },
+      SIGNATURIT_SHARED_APIKEY: { limit: 0, period: "1 month" },
+      FEATURE_FLAGS: [],
+    },
+    APPSUMO3: {
+      USER_LIMIT: 50,
+      PETITION_SEND: { limit: 150, period: "1 month" },
+      SIGNATURIT_SHARED_APIKEY: { limit: 0, period: "1 month" },
+      FEATURE_FLAGS: [],
+    },
+    APPSUMO4: {
+      USER_LIMIT: 1000,
+      PETITION_SEND: { limit: 300, period: "1 month" },
+      SIGNATURIT_SHARED_APIKEY: { limit: 0, period: "1 month" },
+      FEATURE_FLAGS: [],
+    },
+  };
+
+  async updateOrganizationTier(
+    orgId: number,
+    tierKey: string,
+    updatedBy?: string,
+    t?: Knex.Transaction
+  ) {
+    const tiers = Object.keys(this.TIERS);
     if (!tiers.includes(tierKey)) {
       throw new Error(`Invalid tier ${tierKey}. Expected one of: ${tiers.join(", ")}`);
     }
@@ -70,7 +80,7 @@ export class TiersService implements ITiersService {
       throw new Error(`Organization:${orgId} not found`);
     }
 
-    const tier = TIERS[tierKey];
+    const tier = this.TIERS[tierKey];
 
     const newUsageDetails = {
       ...organization.usage_details,
@@ -83,18 +93,18 @@ export class TiersService implements ITiersService {
         this.organizations.updateOrganization(
           orgId,
           { usage_details: newUsageDetails },
-          "TiersService",
+          updatedBy ?? "TiersService",
           t
         ),
         this.featureFlags.addOrUpdateFeatureFlagOverride(orgId, tier.FEATURE_FLAGS, t),
-        this.organizations.updateOrganizationCurrentUsageLimit(
+        this.organizations.upsertOrganizationUsageLimit(
           orgId,
           "PETITION_SEND",
           tier.PETITION_SEND.limit,
           tier.PETITION_SEND.period,
           t
         ),
-        this.organizations.updateOrganizationCurrentUsageLimit(
+        this.organizations.upsertOrganizationUsageLimit(
           orgId,
           "SIGNATURIT_SHARED_APIKEY",
           tier.SIGNATURIT_SHARED_APIKEY.limit,

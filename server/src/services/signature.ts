@@ -5,7 +5,6 @@ import "reflect-metadata";
 import { countBy, isDefined, omit } from "remeda";
 import SignaturitSDK, { BrandingParams, BrandingResponse, Document } from "signaturit-sdk";
 import { URLSearchParams } from "url";
-
 import {
   IntegrationRepository,
   IntegrationSettings,
@@ -18,9 +17,9 @@ import SignatureCancelledEmail from "../emails/emails/SignatureCancelledEmail";
 import SignatureCompletedEmail from "../emails/emails/SignatureCompletedEmail";
 import SignatureReminderEmail from "../emails/emails/SignatureReminderEmail";
 import SignatureRequestedEmail from "../emails/emails/SignatureRequestedEmail";
+import { getBaseWebhookUrl } from "../util/getBaseWebhookUrl";
 import { toGlobalId } from "../util/globalId";
 import { downloadImageBase64 } from "../util/images";
-import { getBaseWebhookUrl } from "../util/getBaseWebhookUrl";
 import { CONFIG, Config } from "./../config";
 import { AWS_SERVICE, IAws } from "./aws";
 import { FetchService, FETCH_SERVICE } from "./fetch";

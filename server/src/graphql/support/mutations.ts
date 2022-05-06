@@ -176,6 +176,7 @@ export const createOrganization = mutationField("createOrganization", {
           ctx,
           t
         );
+        await ctx.tiers.updateOrganizationTier(org.id, "FREE", `User:${ctx.user!.id}`, t);
         return {
           result: RESULT.SUCCESS,
           message: `Organization:${org.id} created successfully with owner ${args.email}.`,
@@ -785,7 +786,7 @@ export const updateOrganizationLimits = mutationField("updateOrganizationLimits"
         message: "Limit updated successfully. Will be applied in the next period",
       };
     } else {
-      await ctx.organizations.updateOrganizationCurrentUsageLimit(
+      await ctx.organizations.upsertOrganizationUsageLimit(
         args.orgId,
         args.type,
         args.amount,
@@ -811,7 +812,7 @@ export const updateOrganizationTier = mutationField("updateOrganizationTier", {
     try {
       const [org, tier] = await Promise.all([
         ctx.organizations.loadOrg(args.orgId),
-        ctx.tiers.updateOrganizationTier(args.orgId, args.tier),
+        ctx.tiers.updateOrganizationTier(args.orgId, args.tier, `User:${ctx.user!.id}`),
       ]);
 
       return {

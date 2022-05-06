@@ -4,7 +4,6 @@ import { Knex } from "knex";
 import { indexBy } from "remeda";
 import { Config, CONFIG } from "../../config";
 import { EMAILS, EmailsService } from "../../services/emails";
-import { TIERS } from "../../services/tiers";
 import { unMaybeArray } from "../../util/arrays";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { Maybe, MaybeArray } from "../../util/types";
@@ -20,7 +19,6 @@ import {
   OrganizationUsageLimitName,
   User,
 } from "../__types";
-import { FeatureFlagRepository } from "./FeatureFlagRepository";
 import { SystemRepository } from "./SystemRepository";
 
 export type OrganizationUsageDetails = {
@@ -42,8 +40,7 @@ export class OrganizationRepository extends BaseRepository {
     @inject(CONFIG) private config: Config,
     @inject(KNEX) knex: Knex,
     @inject(EMAILS) private readonly emails: EmailsService,
-    @inject(SystemRepository) private system: SystemRepository,
-    @inject(FeatureFlagRepository) private featureFlags: FeatureFlagRepository
+    @inject(SystemRepository) private system: SystemRepository
   ) {
     super(knex);
   }
@@ -145,34 +142,17 @@ export class OrganizationRepository extends BaseRepository {
   }
 
   async createOrganization(data: CreateOrganization, createdBy?: string, t?: Knex.Transaction) {
-    const { FEATURE_FLAGS: featureFlags, ...usageDetails } = TIERS["FREE"];
     const [org] = await this.insert(
       "organization",
       {
         ...data,
         created_by: createdBy,
         updated_by: createdBy,
-        usage_details: data.usage_details || usageDetails,
       },
       t
     );
 
-    await Promise.all([
-      // set default usage limits for new organizations
-      this.createOrganizationUsageLimit(
-        org.id,
-        [
-          {
-            limit_name: "PETITION_SEND",
-            ...TIERS.FREE.PETITION_SEND,
-          },
-        ],
-
-        t
-      ),
-      this.createSandboxSignatureIntegration(org.id, createdBy, t),
-      this.featureFlags.addOrUpdateFeatureFlagOverride(org.id, featureFlags, t),
-    ]);
+    await this.createSandboxSignatureIntegration(org.id, createdBy, t);
 
     return org;
   }
@@ -280,6 +260,33 @@ export class OrganizationRepository extends BaseRepository {
     return await this.insert("organization_usage_limit", dataArr, t);
   }
 
+  async upsertOrganizationUsageLimit(
+    orgId: number,
+    limitName: OrganizationUsageLimitName,
+    limit: number,
+    period: string,
+    t?: Knex.Transaction
+  ) {
+    return await this.raw(
+      /* sql */ `
+      ? 
+      ON CONFLICT (org_id, limit_name) WHERE period_end_date is NULL
+      DO UPDATE SET
+        "limit"=EXCLUDED.limit
+        "period"=EXCLUDED.period
+      RETURNING *;`,
+      [
+        this.from("organization_usage_limit").insert({
+          org_id: orgId,
+          limit_name: limitName,
+          period,
+          limit,
+        }),
+      ],
+      t
+    );
+  }
+
   async updateUsageLimitAsExpired(orgUsageLimitId: number) {
     return await this.raw<OrganizationUsageLimit>(
       /* sql */ `UPDATE organization_usage_limit SET "period_end_date" = "period_start_date" + "period" WHERE "id" = ? RETURNING *`,
@@ -324,23 +331,6 @@ export class OrganizationRepository extends BaseRepository {
         break;
       }
     }
-    return usage;
-  }
-
-  async updateOrganizationCurrentUsageLimit(
-    orgId: number,
-    limitName: OrganizationUsageLimitName,
-    limit: number,
-    period: string,
-    t?: Knex.Transaction
-  ) {
-    const [usage] = await this.from("organization_usage_limit", t)
-      .where({
-        period_end_date: null,
-        limit_name: limitName,
-        org_id: orgId,
-      })
-      .update({ limit, period }, "*");
     return usage;
   }
 

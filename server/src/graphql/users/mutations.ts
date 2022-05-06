@@ -460,6 +460,8 @@ export const userSignUp = mutationField("userSignUp", {
         t
       );
 
+      await ctx.tiers.updateOrganizationTier(org.id, "FREE", undefined, t);
+
       const user = await ctx.users.createUser(
         {
           organization_role: "OWNER",
