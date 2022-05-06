@@ -26,17 +26,17 @@ export function useOrganizationSections(user: Pick<User, "role">) {
         ? [
             {
               title: intl.formatMessage({
-                id: "organization.branding.title",
-                defaultMessage: "Branding",
-              }),
-              path: "/app/organization/branding",
-            },
-            {
-              title: intl.formatMessage({
                 id: "organization.general.title",
                 defaultMessage: "General",
               }),
               path: "/app/organization/general",
+            },
+            {
+              title: intl.formatMessage({
+                id: "organization.branding.title",
+                defaultMessage: "Branding",
+              }),
+              path: "/app/organization/branding",
             },
             {
               title: intl.formatMessage({
