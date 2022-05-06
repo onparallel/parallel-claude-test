@@ -165,6 +165,11 @@
     "context": "Reports"
   },
   {
+    "term": "component.app-layout-navbar.switch-organization",
+    "definition": "Switch organization",
+    "context": "Switch organization"
+  },
+  {
     "term": "component.app-layout.new-version-available",
     "definition": "There's a new release of Parallel available. Please refresh your browser for it to take effect.",
     "context": "There's a new release of Parallel available. Please refresh your browser for it to take effect."

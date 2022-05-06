@@ -7,6 +7,7 @@ import {
   List,
   ListItem,
   Stack,
+  Tooltip,
   useBreakpointValue,
 } from "@chakra-ui/react";
 import {
@@ -122,31 +123,40 @@ export const AppLayoutNavbar = Object.assign(
           <Center display={{ base: "none", sm: "flex" }} marginBottom={6} marginTop={2}>
             <NakedLink href="/app">
               <Box as="a" width="46px" height="46px" position="relative">
-                <Box
-                  position="absolute"
-                  cursor="pointer"
-                  transition="transform 150ms"
-                  width="46px"
-                  height="46px"
-                  borderRadius="full"
-                  _hover={{
-                    color: "gray.900",
-                    shadow: "lg",
-                    transform: "scale(1.1)",
-                  }}
-                  overflow="hidden"
+                <Tooltip
+                  label={intl.formatMessage({
+                    id: "component.app-layout-navbar.switch-organization",
+                    defaultMessage: "Switch organization",
+                  })}
+                  placement="right"
+                  isDisabled={realMe.organizations.length === 1}
                 >
-                  {me.organization.iconUrl92 ? (
-                    <Image
-                      boxSize="46px"
-                      objectFit="contain"
-                      alt={me.organization.name}
-                      src={me.organization.iconUrl92}
-                    />
-                  ) : (
-                    <Logo width="46px" hideText={true} color="gray.800" padding={1.5} />
-                  )}
-                </Box>
+                  <Box
+                    position="absolute"
+                    cursor="pointer"
+                    transition="transform 150ms"
+                    width="46px"
+                    height="46px"
+                    borderRadius="full"
+                    _hover={{
+                      color: "gray.900",
+                      shadow: "lg",
+                      transform: "scale(1.1)",
+                    }}
+                    overflow="hidden"
+                  >
+                    {me.organization.iconUrl92 ? (
+                      <Image
+                        boxSize="46px"
+                        objectFit="contain"
+                        alt={me.organization.name}
+                        src={me.organization.iconUrl92}
+                      />
+                    ) : (
+                      <Logo width="46px" hideText={true} color="gray.800" padding={1.5} />
+                    )}
+                  </Box>
+                </Tooltip>
               </Box>
             </NakedLink>
           </Center>
@@ -230,6 +240,12 @@ export const AppLayoutNavbar = Object.assign(
         return gql`
           fragment AppLayoutNavbar_Query on Query {
             ...UserMenu_Query
+            realMe {
+              id
+              organizations {
+                id
+              }
+            }
             me {
               id
               organization {

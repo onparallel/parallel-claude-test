@@ -204,6 +204,7 @@ Tooltip.defaultProps = {
   openDelay: 250,
   closeDelay: 150,
   arrowSize: 8,
+  borderRadius: 4,
 } as any;
 
 Menu.defaultProps = {

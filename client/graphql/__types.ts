@@ -4087,10 +4087,19 @@ export type AppLayout_QueryFragment = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
 export type AppLayoutNavbar_QueryFragment = {
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
   me: {
     __typename?: "User";
     id: string;
@@ -4110,13 +4119,6 @@ export type AppLayoutNavbar_QueryFragment = {
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
       };
     };
-  };
-  realMe: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    avatarUrl?: string | null;
-    initials?: string | null;
   };
 };
 
@@ -4245,6 +4247,7 @@ export type PetitionLayout_QueryFragment = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -4292,6 +4295,7 @@ export type SettingsLayout_QueryFragment = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -10744,6 +10748,7 @@ export type Admin_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -10796,6 +10801,7 @@ export type OrganizationMembers_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -10905,6 +10911,7 @@ export type AdminOrganizations_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -10940,6 +10947,7 @@ export type AdminSupportMethods_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -11187,6 +11195,7 @@ export type Contact_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -11336,6 +11345,7 @@ export type Contacts_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -11424,6 +11434,7 @@ export type OrganizationBranding_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -11475,6 +11486,7 @@ export type OrganizationGeneral_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -11635,6 +11647,7 @@ export type OrganizationGroup_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -11792,6 +11805,7 @@ export type OrganizationGroups_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -11827,6 +11841,7 @@ export type OrganizationSettings_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -11864,6 +11879,7 @@ export type OrganizationIntegrations_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -11973,6 +11989,7 @@ export type IntegrationsSignature_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -12015,6 +12032,7 @@ export type OrganizationUsage_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -12191,6 +12209,7 @@ export type OrganizationUsers_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -12962,6 +12981,7 @@ export type PetitionActivity_QueryFragment = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -14631,6 +14651,7 @@ export type PetitionActivity_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -14974,6 +14995,7 @@ export type PetitionCompose_QueryFragment = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -15526,6 +15548,7 @@ export type PetitionCompose_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -15873,6 +15896,7 @@ export type PetitionMessages_QueryFragment = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -15909,6 +15933,7 @@ export type PetitionMessages_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -16275,6 +16300,7 @@ export type PetitionPreview_QueryFragment = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -16990,6 +17016,7 @@ export type PetitionPreview_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -17266,6 +17293,7 @@ export type PetitionReplies_QueryFragment = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -17749,6 +17777,7 @@ export type PetitionReplies_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -18240,6 +18269,7 @@ export type Petitions_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -18581,6 +18611,7 @@ export type NewPetition_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -18716,6 +18747,7 @@ export type Account_QueryFragment = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -18793,6 +18825,7 @@ export type Account_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -18927,6 +18960,7 @@ export type Developers_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -18963,6 +18997,7 @@ export type Settings_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -19007,6 +19042,7 @@ export type Security_userQuery = {
     fullName?: string | null;
     avatarUrl?: string | null;
     initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -22611,6 +22647,12 @@ export const UserMenu_QueryFragmentDoc = gql`
 export const AppLayoutNavbar_QueryFragmentDoc = gql`
   fragment AppLayoutNavbar_Query on Query {
     ...UserMenu_Query
+    realMe {
+      id
+      organizations {
+        id
+      }
+    }
     me {
       id
       organization {
