@@ -2,6 +2,7 @@ import AWS from "aws-sdk";
 import { HeadObjectOutput, PresignedPost } from "aws-sdk/clients/s3";
 import contentDisposition from "content-disposition";
 import { injectable } from "inversify";
+import { chunk } from "remeda";
 import { Readable } from "stream";
 import { unMaybeArray } from "../util/arrays";
 import { MaybeArray } from "../util/types";
@@ -84,14 +85,16 @@ export class Storage implements IStorage {
   }
 
   async deleteFile(keys: MaybeArray<string>) {
-    const Objects = unMaybeArray(keys).map((key) => ({ Key: key }));
-    if (Objects.length > 0) {
-      await this.s3
-        .deleteObjects({
-          Bucket: this.bucketName,
-          Delete: { Objects },
-        })
-        .promise();
+    const objects = unMaybeArray(keys).map((key) => ({ Key: key }));
+    if (objects.length > 0) {
+      // there's a limit of 1000 items per API call
+      for (const objectsChunk of chunk(objects, 1000))
+        await this.s3
+          .deleteObjects({
+            Bucket: this.bucketName,
+            Delete: { Objects: objectsChunk },
+          })
+          .promise();
     }
   }
 
