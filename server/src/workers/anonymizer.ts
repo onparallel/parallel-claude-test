@@ -2,22 +2,25 @@ import { uniq } from "remeda";
 import { createCronWorker } from "./helpers/createCronWorker";
 
 createCronWorker("anonymizer", async (ctx, config) => {
-  const [petitions, replies, comments] = await Promise.all([
-    ctx.petitions.getPetitionsToAnonymize(config.anonymizeAfterDays),
-    ctx.petitions.getPetitionFieldRepliesToAnonymize(config.anonymizeAfterDays),
-    ctx.petitions.getPetitionFieldCommentsToAnonymize(config.anonymizeAfterDays),
-  ]);
+  const DAYS = config.anonymizeAfterDays;
 
+  const petitions = await ctx.petitions.getPetitionsToAnonymize(DAYS);
   for (const petition of petitions) {
     await ctx.petitions.anonymizePetition(petition.id);
   }
-  await Promise.all([
-    replies.length ? ctx.petitions.anonymizePetitionFieldReplies(replies) : null,
-    comments.length ? ctx.petitions.anonymizePetitionFieldComments(comments) : null,
-  ]);
+
+  const replies = await ctx.petitions.getPetitionFieldRepliesToAnonymize(DAYS);
+  if (replies.length > 0) {
+    await ctx.petitions.anonymizePetitionFieldReplies(replies);
+  }
+
+  const comments = await ctx.petitions.getPetitionFieldCommentsToAnonymize(DAYS);
+  if (comments.length > 0) {
+    await ctx.petitions.anonymizePetitionFieldComments(comments);
+  }
 
   // anonymizes contacts deleted more than `anonymizeAfterDays` days ago
-  await ctx.contacts.anonymizeDeletedContacts(config.anonymizeAfterDays);
+  await ctx.contacts.anonymizeDeletedContacts(DAYS);
 
   // there can be multiple file_uploads with same path (e.g. when doing massive sends of a petition with submitted file replies)
   // so we need to make sure to only delete the entry in S3 if there are no other files referencing to that object
