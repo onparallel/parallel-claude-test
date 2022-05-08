@@ -97,8 +97,7 @@ export class Aws implements IAws {
     AWS.config.update({
       ...config.aws,
       signatureVersion: "v4",
-      logger:
-        process.env.NODE_ENV === "production" ? undefined : { log: logger.debug.bind(logger) },
+      logger: { log: logger.debug.bind(logger) },
     });
   }
 

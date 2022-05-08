@@ -60,8 +60,7 @@ export function createQueueWorker<P, Q extends keyof Config["queueWorkers"]>(
         AWS.config.update({
           ...config.aws,
           signatureVersion: "v4",
-          logger:
-            process.env.NODE_ENV === "production" ? undefined : { log: logger.debug.bind(logger) },
+          logger: { log: logger.debug.bind(logger) },
         });
         const consumer = Consumer.create({
           queueUrl: config.queueWorkers[name].endpoint,
