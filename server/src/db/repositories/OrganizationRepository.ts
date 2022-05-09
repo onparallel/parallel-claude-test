@@ -58,6 +58,17 @@ export class OrganizationRepository extends BaseRepository {
       .where("status", "ACTIVE")
   );
 
+  async getOrganizationsByUserEmail(email: string) {
+    return await this.raw<Organization>(
+      /* sql */ `
+      select * from organization where id in (
+	      select u.org_id from "user" u left join "user_data" ud on ud.id = u.user_data_id 
+	      where u.deleted_at is null and u.status = 'ACTIVE' and ud.email = ?
+      )`,
+      [email]
+    );
+  }
+
   async loadRootOrganization() {
     const [org] = await this.from("organization").where("status", "ROOT").select("*");
     return org;
@@ -279,7 +290,7 @@ export class OrganizationRepository extends BaseRepository {
       ? 
       ON CONFLICT (org_id, limit_name) WHERE period_end_date is NULL
       DO UPDATE SET
-        "limit"=EXCLUDED.limit
+        "limit"=EXCLUDED.limit,
         "period"=EXCLUDED.period
       RETURNING *;`,
       [

@@ -116,6 +116,10 @@ export function buildConfig() {
     development: {
       whitelistedEmails: (process.env.EMAILS_WHITELIST ?? "").split(","),
     },
+    appsumo: {
+      username: process.env.APPSUMO_USERNAME!,
+      password: process.env.APPSUMO_PASSWORD!,
+    },
   });
 }
 

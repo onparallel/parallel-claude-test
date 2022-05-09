@@ -1,5 +1,6 @@
 import { Router, urlencoded } from "express";
 import { fromGlobalId } from "../util/globalId";
+import { appsumo } from "./appsumo";
 import { bankflip } from "./bankflip";
 import { scim } from "./scim";
 import {
@@ -32,6 +33,9 @@ export const webhooks = Router()
       }
     }
   )
+  // bankflip webhook for ES_TAX_DOCUMENTS field completion
   .use("/bankflip", bankflip)
   // SCIM endpoints for User Provisioning
-  .use("/scim", scim);
+  .use("/scim", scim)
+  // AppSumo endpoints for product tiers purchase/upgrade/downgrade/refund
+  .use("/appsumo", appsumo);

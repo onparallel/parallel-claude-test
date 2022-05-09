@@ -138,6 +138,9 @@ export class FeatureFlagRepository extends BaseRepository {
     t?: Knex.Transaction
   ) {
     const featureFlags = unMaybeArray(featureFlag);
+    if (featureFlags.length === 0) {
+      return [];
+    }
     return await this.raw<FeatureFlagOverride>(
       /* sql */ `
         insert into feature_flag_override (feature_flag_name, org_id, "value") ? 

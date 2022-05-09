@@ -33,7 +33,7 @@ export class TiersService implements ITiersService {
     private featureFlags: FeatureFlagRepository
   ) {}
 
-  readonly TIERS: Record<string, Tier> = {
+  private readonly TIERS: Record<string, Tier> = {
     FREE: {
       USER_LIMIT: 2,
       PETITION_SEND: { limit: 20, period: "1 month" },
