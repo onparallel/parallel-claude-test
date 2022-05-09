@@ -18,7 +18,7 @@ export interface ITiersService {
   updateOrganizationTier(
     orgId: number,
     tierKey: string,
-    updatedBy?: string,
+    updatedBy: string,
     t?: Knex.Transaction
   ): Promise<Tier>;
 }
@@ -67,7 +67,7 @@ export class TiersService implements ITiersService {
   async updateOrganizationTier(
     orgId: number,
     tierKey: string,
-    updatedBy?: string,
+    updatedBy: string,
     t?: Knex.Transaction
   ) {
     const tiers = Object.keys(this.TIERS);
@@ -93,7 +93,7 @@ export class TiersService implements ITiersService {
         this.organizations.updateOrganization(
           orgId,
           { usage_details: newUsageDetails },
-          updatedBy ?? "TiersService",
+          updatedBy,
           t
         ),
         this.featureFlags.addOrUpdateFeatureFlagOverride(orgId, tier.FEATURE_FLAGS, t),
