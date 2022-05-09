@@ -4374,6 +4374,7 @@ export interface NexusGenArgTypes {
       password: string; // String!
       position?: string | null; // String
       role?: string | null; // String
+      token?: string | null; // String
     };
     verifyPublicAccess: {
       // args

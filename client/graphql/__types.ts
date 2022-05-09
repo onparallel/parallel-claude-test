@@ -1501,6 +1501,7 @@ export interface MutationuserSignUpArgs {
   password: Scalars["String"];
   position?: InputMaybe<Scalars["String"]>;
   role?: InputMaybe<Scalars["String"]>;
+  token?: InputMaybe<Scalars["String"]>;
 }
 
 export interface MutationverifyPublicAccessArgs {
@@ -19672,6 +19673,7 @@ export type Signup_userSignUpMutationVariables = Exact<{
   role?: InputMaybe<Scalars["String"]>;
   position?: InputMaybe<Scalars["String"]>;
   captcha: Scalars["String"];
+  token?: InputMaybe<Scalars["String"]>;
 }>;
 
 export type Signup_userSignUpMutation = {
@@ -27315,6 +27317,7 @@ export const Signup_userSignUpDocument = gql`
     $role: String
     $position: String
     $captcha: String!
+    $token: String
   ) {
     userSignUp(
       email: $email
@@ -27328,6 +27331,7 @@ export const Signup_userSignUpDocument = gql`
       role: $role
       position: $position
       captcha: $captcha
+      token: $token
     ) {
       id
       email

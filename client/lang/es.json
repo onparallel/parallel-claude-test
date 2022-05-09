@@ -2670,6 +2670,11 @@
     "context": "Create your free account now and automate your workflow agilely and safely."
   },
   {
+    "term": "component.public-signup-form.description-plan",
+    "definition": "Crea ya tu cuenta y automatiza tus procesos de una forma ágil y segura.",
+    "context": "Create your account now and automate your workflow agilely and safely."
+  },
+  {
     "term": "component.public-signup-form.experience.position-placeholder",
     "definition": "Ej: Analista financiero",
     "context": "E.g., Financial Analyst"
@@ -2678,6 +2683,11 @@
     "term": "component.public-signup-form.heading",
     "definition": "Empieza a acelerar tu trabajo",
     "context": "Start to speed up your work"
+  },
+  {
+    "term": "component.public-signup-form.heading-app-sumo",
+    "definition": "¡Bienvenido Sumo-ling!",
+    "context": "Welcome Sumo-ling!"
   },
   {
     "term": "component.public-signup-form.legal-text",

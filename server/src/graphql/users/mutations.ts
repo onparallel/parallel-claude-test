@@ -7,6 +7,7 @@ import { RESULT } from "..";
 import { PublicFileUpload } from "../../db/__types";
 import { partition } from "../../util/arrays";
 import { fullName } from "../../util/fullName";
+import { verify } from "../../util/jwt";
 import { withError } from "../../util/promises/withError";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import { random } from "../../util/token";
@@ -406,6 +407,7 @@ export const userSignUp = mutationField("userSignUp", {
     role: stringArg(),
     position: stringArg(),
     captcha: nonNull(stringArg()),
+    token: stringArg(),
   },
   authorize: verifyCaptcha("captcha"),
   validateArgs: validateAnd(
@@ -424,6 +426,18 @@ export const userSignUp = mutationField("userSignUp", {
     )
   ),
   resolve: async (_, args, ctx) => {
+    let decodedToken = {} as any;
+    if (isDefined(args.token)) {
+      try {
+        decodedToken = await verify(args.token, ctx.config.security.jwtSecret);
+      } catch {
+        throw new ApolloError("Invalid token", "INVALID_TOKEN");
+      }
+    }
+
+    const source = decodedToken?.source ?? "self-service";
+    const tierKey = decodedToken?.plan_id ?? "FREE";
+
     const email = args.email.trim().toLowerCase();
     const [error, cognitoId] = await withError(
       ctx.aws.signUpUser(email, args.password, args.firstName, args.lastName, {
@@ -453,8 +467,12 @@ export const userSignUp = mutationField("userSignUp", {
       const org = await ctx.organizations.createOrganization(
         {
           name: args.organizationName,
-          status: "DEMO",
+          status: source !== "self-service" ? "ACTIVE" : "DEMO",
           logo_public_file_id: logoFile?.id ?? null,
+          metadata: {
+            ...decodedToken,
+            events: [decodedToken],
+          },
         },
         undefined,
         t
@@ -472,7 +490,7 @@ export const userSignUp = mutationField("userSignUp", {
           first_name: args.firstName,
           last_name: args.lastName,
           details: {
-            source: "self-service",
+            source,
             industry: args.industry,
             role: args.role,
             position: args.position,
@@ -482,6 +500,8 @@ export const userSignUp = mutationField("userSignUp", {
         undefined,
         t
       );
+
+      await ctx.tiers.updateOrganizationTier(org.id, tierKey, `User:${user.id}`, t);
 
       // once the user is created, we need to update the created_by column on the different entries
       const [[newUser]] = await Promise.all([

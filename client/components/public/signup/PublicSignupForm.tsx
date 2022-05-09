@@ -19,6 +19,7 @@ import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { EMAIL_REGEX, PASSWORD_REGEX } from "@parallel/utils/validation";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 
 type PublicSignupFormData = {
   email: string;
@@ -27,14 +28,16 @@ type PublicSignupFormData = {
 
 type PublicSignupFormProps = {
   onNext: (data: PublicSignupFormData) => void;
+  email?: string;
+  source?: string;
 };
-export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
+export function PublicSignupForm({ onNext, email, source }: PublicSignupFormProps) {
   const intl = useIntl();
 
   const { handleSubmit, register, formState, watch } = useForm<PublicSignupFormData>({
     mode: "onSubmit",
     defaultValues: {
-      email: "",
+      email: email ?? "",
       password: "",
     },
   });
@@ -81,16 +84,30 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
     >
       <Stack spacing={4}>
         <Text as="h1" fontSize="2xl" fontWeight="bold" marginTop={0}>
-          <FormattedMessage
-            id="component.public-signup-form.heading"
-            defaultMessage="Start to speed up your work"
-          />
+          {source && source === "AppSumo" ? (
+            <FormattedMessage
+              id="component.public-signup-form.heading-app-sumo"
+              defaultMessage="Welcome Sumo-ling!"
+            />
+          ) : (
+            <FormattedMessage
+              id="component.public-signup-form.heading"
+              defaultMessage="Start to speed up your work"
+            />
+          )}
         </Text>
         <Text marginBottom={2}>
-          <FormattedMessage
-            id="component.public-signup-form.description"
-            defaultMessage="Create your free account now and automate your workflow agilely and safely."
-          />
+          {isDefined(email) ? (
+            <FormattedMessage
+              id="component.public-signup-form.description-plan"
+              defaultMessage="Create your account now and automate your workflow agilely and safely."
+            />
+          ) : (
+            <FormattedMessage
+              id="component.public-signup-form.description"
+              defaultMessage="Create your free account now and automate your workflow agilely and safely."
+            />
+          )}
         </Text>
         <FormControl id="email" isInvalid={!!errors.email}>
           <FormLabel>
@@ -111,6 +128,7 @@ export function PublicSignupForm({ onNext }: PublicSignupFormProps) {
                 id: "generic.forms.company-email-placeholder",
                 defaultMessage: "example@company.com",
               })}
+              isDisabled={email !== undefined}
             />
           </InputGroup>
           {errors.email?.message !== "DEBOUNCED" ? (

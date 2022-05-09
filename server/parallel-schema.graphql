@@ -1629,6 +1629,7 @@ type Mutation {
     password: String!
     position: String
     role: String
+    token: String
   ): User!
   verifyPublicAccess(
     ip: String

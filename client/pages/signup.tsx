@@ -3,7 +3,7 @@ import { Box, Center, Flex, Image, keyframes, Stack, useCounter } from "@chakra-
 import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { Steps } from "@parallel/components/common/Steps";
-import { withApolloData } from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicSignupForm } from "@parallel/components/public/signup/PublicSignupForm";
 import { PublicSignupFormExperience } from "@parallel/components/public/signup/PublicSignupFormExperience";
@@ -14,8 +14,10 @@ import { PublicSignupRightHeading } from "@parallel/components/public/signup/Pub
 import { Signup_userSignUpDocument } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import jwt from "jwt-decode";
 import { useEffect, useRef } from "react";
 import { useIntl } from "react-intl";
+import { isDefined } from "remeda";
 
 type SignupFormData = {
   email: string;
@@ -30,7 +32,9 @@ type SignupFormData = {
   captcha: string;
 };
 
-function Signup() {
+type SignupProps = ReturnType<typeof Signup.getInitialProps>;
+
+function Signup({ token, source, activationEmail }: SignupProps) {
   const intl = useIntl();
 
   const genericErrorToast = useGenericErrorToast();
@@ -48,12 +52,14 @@ function Signup() {
   const SUBMIT_STEP = 3;
   const handleNextPage = async (data: Partial<SignupFormData>) => {
     formData.current = { ...formData.current, ...data };
+
     if (currentStep === SUBMIT_STEP) {
       try {
         await userSignUp({
           variables: {
             ...(formData.current as SignupFormData),
             locale: intl.locale,
+            token: isDefined(activationEmail) && typeof token === "string" ? token : undefined,
           },
         });
       } catch (error) {
@@ -72,6 +78,17 @@ function Signup() {
       lastName: formData.current.lastName,
     });
   }, [currentStep]);
+
+  const imageKeyFrames = keyframes`
+    from {
+      opacity: 0;
+      transform: translateX(60px);
+    }
+    to {
+      transform: translateX(0px);
+      opacity: 1;
+    }
+  `;
 
   return (
     <PublicLayout
@@ -110,7 +127,7 @@ function Signup() {
             }}
           >
             <Steps currentStep={currentStep}>
-              <PublicSignupForm onNext={handleNextPage} />
+              <PublicSignupForm onNext={handleNextPage} email={activationEmail} source={source} />
               <PublicSignupFormName onNext={handleNextPage} />
               <PublicSignupFormOrganization onBack={prevStep} onNext={handleNextPage} />
               <PublicSignupFormExperience
@@ -149,16 +166,7 @@ function Signup() {
                         }.svg`;
                         const animation =
                           currentStep === 0
-                            ? `${keyframes`
-                            from {
-                              opacity: 0;
-                              transform: translateX(60px);
-                            }
-                            to {
-                              transform: translateX(0px);
-                              opacity: 1;
-                            }
-                          `} ${1.2 + 0.2 * i}s ease ${0.2 + 0.2 * i}s forwards`
+                            ? `${imageKeyFrames} ${1.2 + 0.2 * i}s ease ${0.2 + 0.2 * i}s forwards`
                             : undefined;
                         return (
                           <Box key={i}>
@@ -216,6 +224,7 @@ Signup.mutations = [
       $role: String
       $position: String
       $captcha: String!
+      $token: String
     ) {
       userSignUp(
         email: $email
@@ -229,6 +238,7 @@ Signup.mutations = [
         role: $role
         position: $position
         captcha: $captcha
+        token: $token
       ) {
         id
         email
@@ -243,6 +253,21 @@ Signup.mutations = [
   not including this empty function will trigger two Router.routeChangeComplete events,
   causing analytics to track the pageview twice
  */
-Signup.getInitialProps = () => ({});
+Signup.getInitialProps = ({ query }: WithApolloDataContext) => {
+  let email = "";
+  let source = "";
+  if (isDefined(query.token) && typeof query.token === "string") {
+    try {
+      const decodedToken = jwt(query.token) as any;
+      email = decodedToken?.activation_email;
+      source = decodedToken?.source;
+    } catch {}
+  }
+  return {
+    token: query.token,
+    source: source || undefined,
+    activationEmail: email || undefined,
+  };
+};
 
 export default withApolloData(Signup);
