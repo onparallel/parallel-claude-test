@@ -14,6 +14,7 @@ import { developerWebhookFailed } from "./emails/developer-webhook-failed";
 import { publicPetitionLinkAccess } from "./emails/public-petition-link-access";
 import { signatureCancelledNoCreditsLeft } from "./emails/signature-cancelled-no-credits-left";
 import { organizationLimitsReached } from "./emails/organization-limits-reached";
+import { appSumoActivateAccount } from "./emails/appsumo-activate-account";
 
 const builders = {
   "petition-completed": petitionCompleted,
@@ -30,6 +31,7 @@ const builders = {
   "public-petition-link-access": publicPetitionLinkAccess,
   "signature-cancelled-no-credits-left": signatureCancelledNoCreditsLeft,
   "organization-limits-reached": organizationLimitsReached,
+  "appsumo-activate-account": appSumoActivateAccount,
 };
 
 export type EmailType = keyof typeof builders;

@@ -95,7 +95,7 @@ export class EmailsService implements IEmailsService {
     );
   }
 
-  private buildQueueId(prefix: string, ids: MaybeArray<number>) {
+  private buildQueueId(prefix: string, ids: MaybeArray<number | string>) {
     return `${prefix}-${unMaybeArray(ids).join(",")}`;
   }
 
@@ -282,6 +282,14 @@ export class EmailsService implements IEmailsService {
     return await this.enqueueEmail("signature-cancelled-no-credits-left", {
       id: this.buildQueueId("Petition", petitionId),
       petition_id: petitionId,
+    });
+  }
+
+  async sendAppSumoActivateAccountEmail(redirectUrl: string, email: string) {
+    return await this.enqueueEmail("appsumo-activate-account", {
+      id: this.buildQueueId("AppSumoActivation", email),
+      email,
+      redirectUrl,
     });
   }
 

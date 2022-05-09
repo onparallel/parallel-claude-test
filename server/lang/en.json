@@ -30,6 +30,31 @@
     "context": "Activate your Parallel account"
   },
   {
+    "term": "appsumo-activate-account.activate-button",
+    "definition": "Activate my account",
+    "context": "Activate my account"
+  },
+  {
+    "term": "appsumo-activate-account.intro-text",
+    "definition": "You are just a few clicks away from using Parallel.",
+    "context": "You are just a few clicks away from using Parallel."
+  },
+  {
+    "term": "appsumo-activate-account.intro-text-2",
+    "definition": "Please, click the link below to sign-up and activate your account.",
+    "context": "Please, click the link below to sign-up and activate your account."
+  },
+  {
+    "term": "appsumo-activate-account.intro-text-3",
+    "definition": "If you already activated it via AppSumo, then you're all set. No need to do anything.",
+    "context": "If you already activated it via AppSumo, then you're all set. No need to do anything."
+  },
+  {
+    "term": "appsumo-activate-account.subject",
+    "definition": "Activate your Parallel account",
+    "context": "Activate your Parallel account"
+  },
+  {
     "term": "closing-thanks.regards",
     "definition": "{tone, select, INFORMAL{Regards.} other{Best regards.}}",
     "context": "{tone, select, INFORMAL{Regards.} other{Best regards.}}"

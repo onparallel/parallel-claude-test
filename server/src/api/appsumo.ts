@@ -132,9 +132,14 @@ export const appsumo = Router()
           // user does not have a Parallel account.
           // Redirect to signup page with special JWT to apply purchased license after user creates an account
           const token = await sign(payload, req.context.config.security.jwtSecret);
+          const redirectUrl = `${req.context.config.misc.parallelUrl}/signup?token=${token}`;
+          await req.context.emails.sendAppSumoActivateAccountEmail(
+            redirectUrl,
+            payload.activation_email
+          );
           return res.status(201).json({
             message: "product activated",
-            redirect_url: `${req.context.config.misc.parallelUrl}/signup?token=${token}`,
+            redirect_url: redirectUrl,
           });
         }
       } else if (payload.action === "refund") {
