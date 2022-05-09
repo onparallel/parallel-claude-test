@@ -19,7 +19,7 @@ export type FeatureFlagName =
   | "ON_BEHALF_OF"
   | "GHOST_LOGIN"
   | "ES_TAX_DOCUMENTS_FIELD"
-  | "CUSTOM_HOST_UI";
+  | "CUSTOM_HOST_UI"
   | "REMOVE_PARALLEL_BRANDING";
 
 export const FeatureFlagNameValues = [

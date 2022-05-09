@@ -2509,6 +2509,8 @@ export type PublicPetition = Timestamps & {
   deadline: Maybe<Scalars["DateTime"]>;
   /** The field definition of the petition. */
   fields: Array<PublicPetitionField>;
+  /** Wether the has activated REMOVE_PARALLEL_BRANDING or not. */
+  hasRemoveParallelBranding: Scalars["Boolean"];
   /** The ID of the petition. */
   id: Scalars["GID"];
   /** Wether the completion message will be shown to the recipients or not. */
