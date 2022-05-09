@@ -11456,6 +11456,59 @@ export type OrganizationBranding_userQuery = {
   };
 };
 
+export type OrganizationGeneral_updateOrgLogoMutationVariables = Exact<{
+  file: Scalars["Upload"];
+  isIcon?: InputMaybe<Scalars["Boolean"]>;
+}>;
+
+export type OrganizationGeneral_updateOrgLogoMutation = {
+  updateOrganizationLogo: {
+    __typename?: "Organization";
+    id: string;
+    iconUrl92?: string | null;
+    iconUrl240?: string | null;
+  };
+};
+
+export type OrganizationGeneral_userQueryVariables = Exact<{ [key: string]: never }>;
+
+export type OrganizationGeneral_userQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    hasCustomHost: boolean;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      name: string;
+      customHost?: string | null;
+      iconUrl240?: string | null;
+      iconUrl92?: string | null;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
+    };
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
+
 export type OrganizationGroup_UserGroupFragment = {
   __typename?: "UserGroup";
   id: string;
@@ -26031,6 +26084,34 @@ export const OrganizationBranding_userDocument = gql`
   OrganizationBranding_userQuery,
   OrganizationBranding_userQueryVariables
 >;
+export const OrganizationGeneral_updateOrgLogoDocument = gql`
+  mutation OrganizationGeneral_updateOrgLogo($file: Upload!, $isIcon: Boolean) {
+    updateOrganizationLogo(file: $file, isIcon: $isIcon) {
+      id
+      iconUrl92: iconUrl(options: { resize: { width: 92 } })
+      iconUrl240: iconUrl(options: { resize: { width: 240 } })
+    }
+  }
+` as unknown as DocumentNode<
+  OrganizationGeneral_updateOrgLogoMutation,
+  OrganizationGeneral_updateOrgLogoMutationVariables
+>;
+export const OrganizationGeneral_userDocument = gql`
+  query OrganizationGeneral_user {
+    ...SettingsLayout_Query
+    me {
+      id
+      hasCustomHost: hasFeatureFlag(featureFlag: CUSTOM_HOST_UI)
+      organization {
+        id
+        iconUrl240: iconUrl(options: { resize: { width: 240 } })
+        name
+        customHost
+      }
+    }
+  }
+  ${SettingsLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<OrganizationGeneral_userQuery, OrganizationGeneral_userQueryVariables>;
 export const OrganizationGroup_updateUserGroupDocument = gql`
   mutation OrganizationGroup_updateUserGroup($id: GID!, $data: UpdateUserGroupInput!) {
     updateUserGroup(id: $id, data: $data) {

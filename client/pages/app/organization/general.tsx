@@ -156,20 +156,10 @@ function OrganizationGeneral() {
               </HStack>
             </Stack>
             {me.hasCustomHost ? null : (
-              <Alert status="info" rounded="md">
-                <AlertIcon />
-                <HStack spacing={3} width="100%">
-                  <Text flex="1">
-                    <FormattedMessage
-                      id="organization.general.upgrade-subdomain"
-                      defaultMessage="This is an Enterprise feature. Contact us for more information."
-                    />
-                  </Text>
-                  <SupportButton
-                    variant="outline"
-                    colorScheme="blue"
-                    backgroundColor="white"
-                    message={intl.formatMessage({
+              <ContactAlert
+                body={
+                  <Text>
+                    {intl.formatMessage({
                       id: "organization.general.upgrade-subdomain-message",
                       defaultMessage:
                         "This is an Enterprise feature. Contact us for more information.",
