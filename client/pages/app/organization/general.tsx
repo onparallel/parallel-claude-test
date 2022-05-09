@@ -160,7 +160,7 @@ function OrganizationGeneral() {
                 body={
                   <Text>
                     {intl.formatMessage({
-                      id: "organization.general.upgrade-subdomain-message",
+                      id: "organization.general.upgrade-subdomain",
                       defaultMessage:
                         "This is an Enterprise feature. Contact us for more information.",
                     })}
