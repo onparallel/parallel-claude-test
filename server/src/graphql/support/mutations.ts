@@ -176,7 +176,7 @@ export const createOrganization = mutationField("createOrganization", {
           ctx,
           t
         );
-        await ctx.tiers.updateOrganizationTier(org.id, "FREE", `User:${ctx.user!.id}`, t);
+        await ctx.tiers.updateOrganizationTier(org, "FREE", `User:${ctx.user!.id}`, t);
         return {
           result: RESULT.SUCCESS,
           message: `Organization:${org.id} created successfully with owner ${args.email}.`,
@@ -813,10 +813,8 @@ export const updateOrganizationTier = mutationField("updateOrganizationTier", {
   },
   resolve: async (_, args, ctx) => {
     try {
-      const [org, tier] = await Promise.all([
-        ctx.organizations.loadOrg(args.orgId),
-        ctx.tiers.updateOrganizationTier(args.orgId, args.tier, `User:${ctx.user!.id}`),
-      ]);
+      const org = await ctx.organizations.loadOrg(args.orgId);
+      const tier = await ctx.tiers.updateOrganizationTier(org!, args.tier, `User:${ctx.user!.id}`);
 
       return {
         result: RESULT.SUCCESS,

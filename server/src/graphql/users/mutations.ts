@@ -436,7 +436,7 @@ export const userSignUp = mutationField("userSignUp", {
     }
 
     const source = decodedToken?.source ?? "self-service";
-    const tierKey = decodedToken?.plan_id ?? "FREE";
+    const tierKey = decodedToken?.parallel_tier ?? "FREE";
 
     const email = args.email.trim().toLowerCase();
     const [error, cognitoId] = await withError(
@@ -501,8 +501,6 @@ export const userSignUp = mutationField("userSignUp", {
         t
       );
 
-      await ctx.tiers.updateOrganizationTier(org.id, tierKey, `User:${user.id}`, t);
-
       // once the user is created, we need to update the created_by column on the different entries
       const [[newUser]] = await Promise.all([
         ctx.users.updateUserById(user.id, { created_by: `User:${user.id}` }, `User:${user.id}`, t),
@@ -528,7 +526,7 @@ export const userSignUp = mutationField("userSignUp", {
           `User:${user.id}`,
           t
         ),
-        ctx.tiers.updateOrganizationTier(org.id, "FREE", `User:${user.id}`, t),
+        ctx.tiers.updateOrganizationTier(org, tierKey, `User:${user.id}`, t),
       ]);
       return newUser;
     });

@@ -7,7 +7,7 @@ import {
   OrganizationRepository,
   OrganizationUsageDetails,
 } from "../db/repositories/OrganizationRepository";
-import { FeatureFlagName } from "../db/__types";
+import { FeatureFlagName, Organization } from "../db/__types";
 
 export const TIERS_SERVICE = Symbol.for("TIERS_SERVICE");
 
@@ -17,7 +17,7 @@ type Tier = OrganizationUsageDetails & {
 
 export interface ITiersService {
   updateOrganizationTier(
-    orgId: number,
+    organization: Organization,
     tierKey: string,
     updatedBy: string,
     t?: Knex.Transaction
@@ -67,7 +67,7 @@ export class TiersService implements ITiersService {
   };
 
   async updateOrganizationTier(
-    orgId: number,
+    org: Organization,
     tierKey: string,
     updatedBy: string,
     t?: Knex.Transaction
@@ -77,37 +77,32 @@ export class TiersService implements ITiersService {
       throw new Error(`Invalid tier ${tierKey}. Expected one of: ${tiers.join(", ")}`);
     }
 
-    const organization = await this.organizations.loadOrg(orgId);
-    if (!organization) {
-      throw new Error(`Organization:${orgId} not found`);
-    }
-
     const tier = this.TIERS[tierKey];
 
     const newUsageDetails = {
-      ...organization.usage_details,
+      ...org.usage_details,
       ...pick(tier, ["USER_LIMIT", "PETITION_SEND", "SIGNATURIT_SHARED_APIKEY"]),
     };
 
     await this.organizations.withTransaction(async (t) => {
-      await this.featureFlags.removeFeatureFlagOverrides(orgId, t);
+      await this.featureFlags.removeFeatureFlagOverrides(org.id, t);
       await Promise.all([
         this.organizations.updateOrganization(
-          orgId,
+          org.id,
           { usage_details: newUsageDetails },
           updatedBy,
           t
         ),
-        this.featureFlags.addOrUpdateFeatureFlagOverride(orgId, tier.FEATURE_FLAGS, t),
+        this.featureFlags.addOrUpdateFeatureFlagOverride(org.id, tier.FEATURE_FLAGS, t),
         this.organizations.upsertOrganizationUsageLimit(
-          orgId,
+          org.id,
           "PETITION_SEND",
           tier.PETITION_SEND.limit,
           tier.PETITION_SEND.period,
           t
         ),
         this.organizations.upsertOrganizationUsageLimit(
-          orgId,
+          org.id,
           "SIGNATURIT_SHARED_APIKEY",
           tier.SIGNATURIT_SHARED_APIKEY.limit,
           tier.SIGNATURIT_SHARED_APIKEY.period,

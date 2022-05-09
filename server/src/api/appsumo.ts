@@ -91,7 +91,8 @@ export const appsumo = Router()
       }
     },
     async (req, res) => {
-      const payload = { source: "AppSumo", ...(req.body as AppSumoPayload) };
+      const body = req.body as AppSumoPayload;
+      const payload = { source: "AppSumo", parallel_tier: mapTier(body.plan_id), ...body };
       const org = req.context.organization;
 
       if (payload.action === "activate") {
@@ -118,8 +119,8 @@ export const appsumo = Router()
             `AppSumo:${payload.uuid}`
           );
           await req.context.tiers.updateOrganizationTier(
-            org.id,
-            mapTier(payload.plan_id),
+            org,
+            payload.parallel_tier,
             `AppSumo:${payload.uuid}`
           );
 
@@ -151,7 +152,7 @@ export const appsumo = Router()
             `AppSumo:${payload.uuid}`
           );
 
-          await req.context.tiers.updateOrganizationTier(org.id, "FREE", `AppSumo:${payload.uuid}`);
+          await req.context.tiers.updateOrganizationTier(org, "FREE", `AppSumo:${payload.uuid}`);
         }
         return res.status(200).json({ message: "license refunded" });
       } else {
@@ -168,8 +169,8 @@ export const appsumo = Router()
         );
 
         await req.context.tiers.updateOrganizationTier(
-          org!.id,
-          mapTier(payload.plan_id),
+          org!,
+          payload.parallel_tier,
           `AppSumo:${payload.uuid}`
         );
 
