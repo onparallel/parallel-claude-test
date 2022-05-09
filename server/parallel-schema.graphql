@@ -243,6 +243,7 @@ enum EntityType {
 }
 
 enum FeatureFlag {
+  CUSTOM_HOST
   DEVELOPER_ACCESS
   ES_TAX_DOCUMENTS_FIELD
   EXPORT_CUATRECASAS

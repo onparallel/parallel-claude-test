@@ -130,7 +130,7 @@ function OrganizationGeneral() {
                     defaultMessage="Subdomain"
                   />
                 </Text>
-                {customHost ? null : (
+                {me.hasCustomHost ? null : (
                   <Badge colorScheme="purple">
                     <FormattedMessage id="generic.plans.enterprise" defaultMessage="Enterprise" />
                   </Badge>
@@ -141,7 +141,7 @@ function OrganizationGeneral() {
                 <Input value={parallelUrl} isReadOnly isDisabled backgroundColor="white" />
                 <Box>
                   <SupportButton
-                    isDisabled={!customHost}
+                    isDisabled={!me.hasCustomHost}
                     message={intl.formatMessage({
                       id: "organization.general.change-subdomain-message",
                       defaultMessage:
@@ -156,7 +156,7 @@ function OrganizationGeneral() {
                 </Box>
               </HStack>
             </Stack>
-            {customHost ? null : (
+            {me.hasCustomHost ? null : (
               <Alert status="info" rounded="md">
                 <AlertIcon />
                 <HStack spacing={3}>
@@ -274,6 +274,7 @@ OrganizationGeneral.queries = [
       ...SettingsLayout_Query
       me {
         id
+        hasCustomHost: hasFeatureFlag(featureFlag: CUSTOM_HOST)
         organization {
           id
           iconUrl240: iconUrl(options: { resize: { width: 240 } })

@@ -1025,6 +1025,7 @@ export const schemaTypes: IntrospectionType[] = [
     inputFields: null,
     interfaces: null,
     enumValues: [
+      { name: "CUSTOM_HOST", description: null, isDeprecated: false, deprecationReason: null },
       { name: "DEVELOPER_ACCESS", description: null, isDeprecated: false, deprecationReason: null },
       {
         name: "ES_TAX_DOCUMENTS_FIELD",
