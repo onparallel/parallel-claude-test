@@ -195,6 +195,7 @@ export type EffectivePetitionUserPermission = {
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
 export type FeatureFlag =
+  | "CUSTOM_HOST"
   | "DEVELOPER_ACCESS"
   | "ES_TAX_DOCUMENTS_FIELD"
   | "EXPORT_CUATRECASAS"
@@ -395,6 +396,7 @@ export type Mutation = {
   /** Cancels a scheduled petition message. */
   cancelScheduledMessage: Maybe<PetitionMessage>;
   cancelSignatureRequest: PetitionSignatureRequest;
+  changeOrganization: Result;
   /** Changes the password for the current logged in user. */
   changePassword: ChangePasswordResult;
   /** Changes the type of a petition Field */
@@ -578,7 +580,7 @@ export type Mutation = {
   setUserDelegates: User;
   /** Sets the locale passed as arg as the preferred language of the user to see the page */
   setUserPreferredLocale: User;
-  /** Shares our SignaturIt production APIKEY with the passed Org, and creates corresponding usage limits. */
+  /** Shares our SignaturIt production APIKEY with the passed Org, creates corresponding usage limits and activates PETITION_SIGNATURE feature flag. */
   shareSignaturitApiKey: SupportMethodResponse;
   /** Generates a download link for the signed PDF petition. */
   signedPetitionDownloadLink: FileUploadDownloadLinkResult;
@@ -707,6 +709,10 @@ export type MutationcancelScheduledMessageArgs = {
 
 export type MutationcancelSignatureRequestArgs = {
   petitionSignatureRequestId: Scalars["GID"];
+};
+
+export type MutationchangeOrganizationArgs = {
+  orgId?: InputMaybe<Scalars["GID"]>;
 };
 
 export type MutationchangePasswordArgs = {
@@ -2698,7 +2704,7 @@ export type Query = {
   publicPetitionLinkBySlug: Maybe<PublicPublicPetitionLink>;
   publicTask: Task;
   publicTemplateCategories: Array<Scalars["String"]>;
-  realMe: Maybe<User>;
+  realMe: User;
   /** Search user groups */
   searchUserGroups: Array<UserGroup>;
   /** Search users and user groups */
@@ -3327,6 +3333,8 @@ export type User = Timestamps & {
   /** Read and unread user notifications about events on their petitions */
   notifications: UserNotifications_Pagination;
   organization: Organization;
+  /** Organizations this user belongs to */
+  organizations: Array<Organization>;
   preferredLocale: Maybe<Scalars["String"]>;
   role: OrganizationRole;
   status: UserStatus;

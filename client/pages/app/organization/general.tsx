@@ -274,7 +274,7 @@ OrganizationGeneral.queries = [
       ...SettingsLayout_Query
       me {
         id
-        hasCustomHost: hasFeatureFlag(featureFlag: CUSTOM_HOST)
+        hasCustomHost: hasFeatureFlag(featureFlag: CUSTOM_HOST_UI)
         organization {
           id
           iconUrl240: iconUrl(options: { resize: { width: 240 } })

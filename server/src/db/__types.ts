@@ -19,7 +19,7 @@ export type FeatureFlagName =
   | "ON_BEHALF_OF"
   | "GHOST_LOGIN"
   | "ES_TAX_DOCUMENTS_FIELD"
-  | "CUSTOM_HOST";
+  | "CUSTOM_HOST_UI";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -33,7 +33,7 @@ export const FeatureFlagNameValues = [
   "ON_BEHALF_OF",
   "GHOST_LOGIN",
   "ES_TAX_DOCUMENTS_FIELD",
-  "CUSTOM_HOST",
+  "CUSTOM_HOST_UI",
 ] as FeatureFlagName[];
 
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";

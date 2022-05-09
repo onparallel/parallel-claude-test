@@ -211,7 +211,7 @@ export interface EffectivePetitionUserPermission {
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
 export type FeatureFlag =
-  | "CUSTOM_HOST"
+  | "CUSTOM_HOST_UI"
   | "DEVELOPER_ACCESS"
   | "ES_TAX_DOCUMENTS_FIELD"
   | "EXPORT_CUATRECASAS"
@@ -26078,7 +26078,7 @@ export const OrganizationGeneral_userDocument = gql`
     ...SettingsLayout_Query
     me {
       id
-      hasCustomHost: hasFeatureFlag(featureFlag: CUSTOM_HOST)
+      hasCustomHost: hasFeatureFlag(featureFlag: CUSTOM_HOST_UI)
       organization {
         id
         iconUrl240: iconUrl(options: { resize: { width: 240 } })
