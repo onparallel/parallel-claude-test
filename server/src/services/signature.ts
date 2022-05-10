@@ -22,7 +22,7 @@ import { toGlobalId } from "../util/globalId";
 import { downloadImageBase64 } from "../util/images";
 import { CONFIG, Config } from "./../config";
 import { AWS_SERVICE, IAws } from "./aws";
-import { FetchService, FETCH_SERVICE } from "./fetch";
+import { FETCH_SERVICE, IFetchService } from "./fetch";
 
 type SignatureOptions = {
   locale: string;
@@ -69,6 +69,7 @@ export interface ISignatureClient {
 }
 
 export interface ISignatureService {
+  getClient(integration: OrgIntegration): ISignatureClient;
   checkSignaturitApiKey(apiKey: string): Promise<"sandbox" | "production">;
   createSignatureRequest(
     petitionId: number,
@@ -88,7 +89,7 @@ export class SignatureService implements ISignatureService {
     @inject(PetitionRepository) private petitionsRepository: PetitionRepository,
     @inject(OrganizationRepository) private organizationsRepository: OrganizationRepository,
     @inject(AWS_SERVICE) private aws: IAws,
-    @inject(FETCH_SERVICE) private fetch: FetchService
+    @inject(FETCH_SERVICE) private fetch: IFetchService
   ) {}
   public getClient(integration: OrgIntegration): ISignatureClient {
     switch (integration.provider.toUpperCase()) {

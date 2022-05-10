@@ -7,8 +7,14 @@ type MailOptions = Pick<
   "from" | "to" | "subject" | "html" | "text" | "headers" | "attachments" | "replyTo"
 >;
 
+export interface ISmtp {
+  sendEmail(mailOptions: MailOptions): Promise<any>;
+}
+
+export const SMTP = Symbol.for("SMTP");
+
 @injectable()
-export class Smtp {
+export class Smtp implements ISmtp {
   private readonly transport: Transporter<SentMessageInfo>;
 
   constructor(@inject(CONFIG) config: Config) {

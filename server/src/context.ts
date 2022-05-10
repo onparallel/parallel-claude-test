@@ -16,17 +16,17 @@ import { UserAuthenticationRepository } from "./db/repositories/UserAuthenticati
 import { UserGroupRepository } from "./db/repositories/UserGroupRepository";
 import { UserRepository } from "./db/repositories/UserRepository";
 import { Contact, Organization, PetitionAccess, User } from "./db/__types";
-import { ANALYTICS, AnalyticsService } from "./services/analytics";
-import { AUTH, Auth } from "./services/auth";
-import { Aws, AWS_SERVICE } from "./services/aws";
-import { EMAILS, EmailsService } from "./services/emails";
+import { ANALYTICS, IAnalyticsService } from "./services/analytics";
+import { AUTH, IAuth } from "./services/auth";
+import { AWS_SERVICE, IAws } from "./services/aws";
+import { EMAILS, IEmailsService } from "./services/emails";
 import { FETCH_SERVICE, IFetchService } from "./services/fetch";
 import { IImageService, IMAGE_SERVICE } from "./services/image";
 import { ILogger, LOGGER } from "./services/logger";
-import { PetitionBinder, PETITION_BINDER } from "./services/petition-binder";
-import { PRINTER, Printer } from "./services/printer";
-import { SIGNATURE, SignatureService } from "./services/signature";
-import { Smtp } from "./services/smtp";
+import { IPetitionBinder, PETITION_BINDER } from "./services/petition-binder";
+import { IPrinter, PRINTER } from "./services/printer";
+import { ISignatureService, SIGNATURE } from "./services/signature";
+import { ISmtp, SMTP } from "./services/smtp";
 import { ITiersService, TIERS_SERVICE } from "./services/tiers";
 
 @injectable()
@@ -41,11 +41,11 @@ export class ApiContext {
     @inject(CONFIG) public config: Config,
     @inject(LOGGER) public logger: ILogger,
     // Services
-    @inject(AUTH) public readonly auth: Auth,
-    @inject(EMAILS) public readonly emails: EmailsService,
-    @inject(SIGNATURE) public readonly signature: SignatureService,
-    @inject(PRINTER) public readonly printer: Printer,
-    @inject(AWS_SERVICE) public readonly aws: Aws,
+    @inject(AUTH) public readonly auth: IAuth,
+    @inject(EMAILS) public readonly emails: IEmailsService,
+    @inject(SIGNATURE) public readonly signature: ISignatureService,
+    @inject(PRINTER) public readonly printer: IPrinter,
+    @inject(AWS_SERVICE) public readonly aws: IAws,
     @inject(FETCH_SERVICE) public readonly fetch: IFetchService,
     @inject(IMAGE_SERVICE) public readonly images: IImageService,
     @inject(TIERS_SERVICE) public readonly tiers: ITiersService,
@@ -74,13 +74,13 @@ export class WorkerContext {
     @inject(CONFIG) public config: Config,
     @inject(LOGGER) public logger: ILogger,
     // Services
-    @inject(AWS_SERVICE) public readonly aws: Aws,
-    public readonly smtp: Smtp,
-    @inject(EMAILS) public readonly emails: EmailsService,
-    @inject(ANALYTICS) public readonly analytics: AnalyticsService,
-    @inject(PRINTER) public readonly printer: Printer,
-    @inject(SIGNATURE) public readonly signature: SignatureService,
-    @inject(PETITION_BINDER) public readonly petitionBinder: PetitionBinder,
+    @inject(AWS_SERVICE) public readonly aws: IAws,
+    @inject(SMTP) public readonly smtp: ISmtp,
+    @inject(EMAILS) public readonly emails: IEmailsService,
+    @inject(ANALYTICS) public readonly analytics: IAnalyticsService,
+    @inject(PRINTER) public readonly printer: IPrinter,
+    @inject(SIGNATURE) public readonly signature: ISignatureService,
+    @inject(PETITION_BINDER) public readonly petitionBinder: IPetitionBinder,
     @inject(IMAGE_SERVICE) public readonly images: IImageService,
 
     // Repositories

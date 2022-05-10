@@ -18,10 +18,10 @@ export interface IEmailsService {
   sendPetitionCompletedEmail(
     petitionId: number,
     {
-      accessIds,
+      accessId,
       signer,
     }: {
-      accessIds?: MaybeArray<number>;
+      accessId?: number;
       signer?: PetitionSignatureConfigSigner;
     }
   ): Promise<void>;
@@ -50,6 +50,18 @@ export interface IEmailsService {
   ): Promise<void>;
   sendPetitionMessageBouncedEmail(emailLogId: number): Promise<void>;
   sendContactAuthenticationRequestEmail(requestId: number): Promise<void>;
+  sendAccessDelegatedEmail(
+    petitionId: number,
+    originalAccessId: number,
+    newAccessId: number,
+    messageBody: any
+  ): Promise<void>;
+  sendDeveloperWebhookFailedEmail(
+    petitionEventSubscriptionId: number,
+    petitionId: number,
+    errorMessage: string,
+    postBody: any
+  ): Promise<void>;
   sendPublicPetitionLinkAccessEmail(messageIds: MaybeArray<number>): Promise<void>;
   sendOrganizationLimitsReachedEmail(
     orgId: number,

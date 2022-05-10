@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { Aws, AWS_SERVICE } from "../../services/aws";
+import { AWS_SERVICE, IAws } from "../../services/aws";
 import { Loader } from "../../util/fromDataLoader";
 import { Maybe, Replace } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
@@ -34,7 +34,7 @@ export type Task<TName extends TaskName> = Replace<
 
 @injectable()
 export class TaskRepository extends BaseRepository {
-  constructor(@inject(KNEX) knex: Knex, @inject(AWS_SERVICE) private aws: Aws) {
+  constructor(@inject(KNEX) knex: Knex, @inject(AWS_SERVICE) private aws: IAws) {
     super(knex);
   }
 

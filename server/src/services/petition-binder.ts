@@ -14,7 +14,7 @@ import { pFlatMap } from "../util/promises/pFlatMap";
 import { random } from "../util/token";
 import { MaybePromise } from "../util/types";
 import { AWS_SERVICE, IAws } from "./aws";
-import { Printer, PRINTER } from "./printer";
+import { IPrinter, PRINTER } from "./printer";
 
 function isPrintableContentType(contentType: string) {
   return [
@@ -50,7 +50,7 @@ export class PetitionBinder implements IPetitionBinder {
     @inject(PetitionRepository) private petitions: PetitionRepository,
     @inject(FileRepository) private files: FileRepository,
     @inject(AWS_SERVICE) private aws: IAws,
-    @inject(PRINTER) private printer: Printer
+    @inject(PRINTER) private printer: IPrinter
   ) {}
 
   private temporaryDirectory = "";

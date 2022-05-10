@@ -9,8 +9,8 @@ import { createLogger, ILogger, LOGGER } from "./logger";
 import { IPetitionBinder, PetitionBinder, PETITION_BINDER } from "./petition-binder";
 import { IPrinter, Printer, PRINTER } from "./printer";
 import { IRedis, REDIS, Redis } from "./redis";
-import { SIGNATURE, SignatureService } from "./signature";
-import { Smtp } from "./smtp";
+import { ISignatureService, SIGNATURE, SignatureService } from "./signature";
+import { ISmtp, Smtp, SMTP } from "./smtp";
 import { IStorage, Storage, StorageFactory, STORAGE_FACTORY } from "./storage";
 import { ITiersService, TiersService, TIERS_SERVICE } from "./tiers";
 
@@ -21,9 +21,9 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IEmailsService>(EMAILS).to(EmailsService);
   bind<IAnalyticsService>(ANALYTICS).to(AnalyticsService).inSingletonScope();
   bind<IRedis>(REDIS).to(Redis).inSingletonScope();
-  bind<Smtp>(Smtp).toSelf().inSingletonScope();
+  bind<ISmtp>(SMTP).to(Smtp).inSingletonScope();
   bind<IPrinter>(PRINTER).to(Printer);
-  bind<SignatureService>(SIGNATURE).to(SignatureService);
+  bind<ISignatureService>(SIGNATURE).to(SignatureService);
   bind<IStorage>(STORAGE_FACTORY).toFactory(() => {
     return ((...args) => new Storage(...args)) as StorageFactory;
   });

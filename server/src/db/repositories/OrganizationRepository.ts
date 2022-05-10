@@ -3,7 +3,7 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { indexBy } from "remeda";
 import { Config, CONFIG } from "../../config";
-import { EMAILS, EmailsService } from "../../services/emails";
+import { EMAILS, IEmailsService } from "../../services/emails";
 import { unMaybeArray } from "../../util/arrays";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { Maybe, MaybeArray } from "../../util/types";
@@ -39,7 +39,7 @@ export class OrganizationRepository extends BaseRepository {
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(KNEX) knex: Knex,
-    @inject(EMAILS) private readonly emails: EmailsService,
+    @inject(EMAILS) private readonly emails: IEmailsService,
     @inject(SystemRepository) private system: SystemRepository
   ) {
     super(knex);

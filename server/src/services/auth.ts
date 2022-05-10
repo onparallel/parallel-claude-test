@@ -30,7 +30,7 @@ import { withError } from "../util/promises/withError";
 import { random } from "../util/token";
 import { MaybePromise } from "../util/types";
 import { userHasRole } from "../util/userHasRole";
-import { Aws, AWS_SERVICE } from "./aws";
+import { AWS_SERVICE, IAws } from "./aws";
 import { IRedis, REDIS } from "./redis";
 
 export interface IAuth {
@@ -38,11 +38,16 @@ export interface IAuth {
   callback: RequestHandler;
   login: RequestHandler;
   logout: RequestHandler;
+  logoutCallback: RequestHandler;
   newPassword: RequestHandler;
   forgotPassword: RequestHandler;
   confirmForgotPassword: RequestHandler;
+  verifyEmail: RequestHandler;
   validateRequestAuthentication(req: IncomingMessage): Promise<[User] | [User, User] | null>;
   generateTempAuthToken(userId: number): MaybePromise<string>;
+  changePassword(req: IncomingMessage, password: string, newPassword: string): Promise<void>;
+  updateSessionLogin(req: Request, userId: number, asUserId: number): Promise<void>;
+  restoreSessionLogin(req: Request, userId: number): Promise<void>;
 }
 
 export const AUTH = Symbol.for("AUTH");
@@ -64,7 +69,7 @@ export class Auth implements IAuth {
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(REDIS) private redis: IRedis,
-    @inject(AWS_SERVICE) public readonly aws: Aws,
+    @inject(AWS_SERVICE) public readonly aws: IAws,
     private orgs: OrganizationRepository,
     private integrations: IntegrationRepository,
     private users: UserRepository,

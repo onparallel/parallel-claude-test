@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { Aws, AWS_SERVICE } from "../../services/aws";
+import { AWS_SERVICE, IAws } from "../../services/aws";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { CreateSystemEvent } from "../events";
@@ -9,7 +9,7 @@ import { KNEX } from "../knex";
 
 @injectable()
 export class SystemRepository extends BaseRepository {
-  constructor(@inject(KNEX) knex: Knex, @inject(AWS_SERVICE) private aws: Aws) {
+  constructor(@inject(KNEX) knex: Knex, @inject(AWS_SERVICE) private aws: IAws) {
     super(knex);
   }
 

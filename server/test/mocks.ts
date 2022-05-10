@@ -22,9 +22,6 @@ export class MockAuth implements IAuth {
     private users: UserRepository,
     private userAuthentication: UserAuthenticationRepository
   ) {}
-  generateTempAuthToken(userId: number) {
-    return `userId:${userId}`;
-  }
   async validateRequestAuthentication(req: IncomingMessage) {
     if (req.headers.authorization?.startsWith("Bearer ")) {
       const token = req.headers.authorization.replace(/^Bearer /, "");
@@ -41,6 +38,14 @@ export class MockAuth implements IAuth {
   async newPassword() {}
   async forgotPassword() {}
   async confirmForgotPassword() {}
+  async logoutCallback() {}
+  async verifyEmail() {}
+  async changePassword() {}
+  async updateSessionLogin() {}
+  async restoreSessionLogin() {}
+  generateTempAuthToken(userId: number) {
+    return `userId:${userId}`;
+  }
 }
 
 @injectable()
@@ -73,6 +78,8 @@ export class MockEmailsService implements IEmailsService {
   async sendPetitionSharedEmail() {}
   async sendPetitionClosedEmail() {}
   async sendPetitionMessageBouncedEmail() {}
+  async sendAccessDelegatedEmail() {}
+  async sendDeveloperWebhookFailedEmail() {}
   async sendContactAuthenticationRequestEmail() {}
   async sendPublicPetitionLinkAccessEmail() {}
   async sendOrganizationLimitsReachedEmail() {}

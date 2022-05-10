@@ -15,6 +15,7 @@ import { IStorage, Storage, STORAGE_FACTORY } from "./storage";
 export interface IAws {
   publicFiles: IStorage;
   fileUploads: IStorage;
+  temporaryFiles: IStorage;
   enqueueMessages(
     queue: keyof Config["queueWorkers"],
     messages: { id: string; body: any; groupId: string }[] | { body: any; groupId: string },
