@@ -2,7 +2,7 @@ import DataLoader from "dataloader";
 import { injectable } from "inversify";
 import { Knex } from "knex";
 import { groupBy, indexBy, isDefined, times } from "remeda";
-import { fromDataLoader } from "../../util/fromDataLoader";
+import { unMaybeArray } from "../../util/arrays";
 import { KeysOfType, MaybeArray, Replace, UnwrapPromise } from "../../util/types";
 import { CreatePetitionEvent, CreateSystemEvent, PetitionEvent, SystemEvent } from "../events";
 import { CreatePetitionUserNotification, PetitionUserNotification } from "../notifications";
@@ -56,6 +56,7 @@ export interface TableCreateTypes
       >;
     }
   > {}
+
 export interface PageOpts {
   offset?: number | null;
   limit?: number | null;
@@ -66,6 +67,20 @@ type TableNames = keyof TableTypes;
 type QueryBuilderFunction<TRecord, TResult = TRecord> = (
   q: Knex.QueryBuilder<TRecord, TResult>
 ) => void;
+
+interface LoaderOptions {
+  refresh?: boolean;
+}
+
+interface Loader<K, V, C = K> {
+  (key: K, options?: LoaderOptions): Promise<V>;
+  (keys: ReadonlyArray<K>, options?: LoaderOptions): Promise<V[]>;
+  dataloader: DataLoader<K, V, C>;
+  raw: {
+    (key: K, t?: Knex.Transaction): Promise<V>;
+    (keys: ReadonlyArray<K>, t?: Knex.Transaction): Promise<V[]>;
+  };
+}
 
 @injectable()
 export class BaseRepository {
@@ -110,20 +125,46 @@ export class BaseRepository {
     ).insert(data as any, "*");
   }
 
+  protected buildLoader<K, V, C = K>(
+    loadFn: (keys: ReadonlyArray<K>, t?: Knex.Transaction) => Promise<V[]>,
+    options?: DataLoader.Options<K, V, C>
+  ): Loader<K, V, C> {
+    const dataloader = new DataLoader(loadFn, options);
+    return Object.assign(
+      async function (keys: MaybeArray<K>, options?: LoaderOptions) {
+        const { refresh = false } = options ?? {};
+        const arrayKeys = unMaybeArray(keys);
+        if (refresh) {
+          for (const key of arrayKeys) {
+            dataloader.clear(key);
+          }
+        }
+        const result = await dataloader.loadMany(arrayKeys);
+        return Array.isArray(keys) ? result : result[0];
+      },
+      {
+        dataloader,
+        raw: async function raw(keys: MaybeArray<K>, t?: Knex.Transaction) {
+          const result = await loadFn(unMaybeArray(keys), t);
+          return Array.isArray(keys) ? result : result[0];
+        },
+      }
+    ) as any;
+  }
+
   protected buildLoadBy<
     TName extends TableNames,
     TColumn extends KeysOfType<TableTypes[TName], number | string | null>
   >(tableName: TName, column: TColumn, builder?: QueryBuilderFunction<TableTypes[TName]>) {
-    return fromDataLoader(
-      new DataLoader<TableTypes[TName][TColumn], TableTypes[TName] | null>(async (values) => {
-        const rows = (await this.knex
-          .from<TableTypes[TName]>(tableName)
+    return this.buildLoader<TableTypes[TName][TColumn], TableTypes[TName] | null>(
+      async (values, t) => {
+        const rows: TableTypes[TName][] = await this.from(tableName, t)
           .whereIn(column as any, values)
           .modify((q) => builder?.(q))
-          .select("*")) as TableTypes[TName][];
+          .select("*");
         const byValue = indexBy(rows, (r) => r[column]);
-        return values.map((value) => byValue[value as any]);
-      })
+        return values.map((value) => byValue[value as any] ?? null);
+      }
     );
   }
 
@@ -131,42 +172,32 @@ export class BaseRepository {
     TName extends TableNames,
     TColumn extends KeysOfType<TableTypes[TName], number | string | null>
   >(tableName: TName, column: TColumn, builder?: QueryBuilderFunction<TableTypes[TName]>) {
-    return fromDataLoader(
-      new DataLoader<TableTypes[TName][TColumn], TableTypes[TName][]>(async (values) => {
-        const rows = (await this.knex
-          .from<TableTypes[TName]>(tableName)
-          .whereIn(column as any, values)
-          .modify((q) => builder?.(q))
-          .select("*")) as TableTypes[TName][];
-        const byValue = groupBy(rows, (r) => (r as any)[column as string]);
-        return values.map((value) => byValue[value as any] ?? []);
-      })
-    );
+    return this.buildLoader<TableTypes[TName][TColumn], TableTypes[TName][]>(async (values, t) => {
+      const rows: TableTypes[TName][] = await this.from(tableName, t)
+        .whereIn(column as any, values)
+        .modify((q) => builder?.(q))
+        .select("*");
+      const byValue = groupBy(rows, (r) => r[column] as any);
+      return values.map((value) => byValue[value as any] ?? []);
+    });
   }
 
   protected buildLoadCountBy<
     TName extends TableNames,
     TColumn extends KeysOfType<TableTypes[TName], number | string | null>
-  >(
-    tableName: TName,
-    column: TColumn,
-    builder?: (builder: Knex.QueryBuilder<TableTypes[TName], TableTypes[TName]>) => void
-  ) {
-    return fromDataLoader(
-      new DataLoader<TableTypes[TName][TColumn], number>(async (values) => {
-        const rows = (await this.knex
-          .from<TableTypes[TName]>(tableName)
-          .whereIn(column as any, values)
-          .modify((q) => builder?.(q))
-          .groupBy(column)
-          .select(this.knex.raw(`?? as aggr`, [column as string]), this.count())) as {
-          aggr: any;
-          count: number;
-        }[];
-        const byValue = indexBy(rows, (r) => r.aggr);
-        return values.map((value) => byValue[value as any]?.count ?? 0);
-      })
-    );
+  >(tableName: TName, column: TColumn, builder?: QueryBuilderFunction<TableTypes[TName]>) {
+    return this.buildLoader<TableTypes[TName][TColumn], number>(async (values, t) => {
+      const rows: {
+        aggr: any;
+        count: number;
+      }[] = await this.from(tableName, t)
+        .whereIn(column as any, values)
+        .modify((q) => builder?.(q))
+        .groupBy(column)
+        .select(this.knex.raw(`?? as aggr`, [column as string]), this.count());
+      const byValue = indexBy(rows, (r) => r.aggr);
+      return values.map((value) => byValue[value as any]?.count ?? 0);
+    });
   }
 
   protected async loadPageAndCount<TRecord, TResult>(

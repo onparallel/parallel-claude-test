@@ -307,9 +307,7 @@ async function fetchOrganization(id: number, ctx: WorkerContext) {
 }
 
 async function fetchPetitionSignature(petitionSignatureRequestId: number, ctx: WorkerContext) {
-  const signature = await ctx.petitions.loadPetitionSignatureById(petitionSignatureRequestId, {
-    cache: false,
-  });
+  const signature = await ctx.petitions.loadPetitionSignatureById.raw(petitionSignatureRequestId);
   if (!signature) {
     throw new Error(`Petition Signature Request with id ${petitionSignatureRequestId} not found`);
   }

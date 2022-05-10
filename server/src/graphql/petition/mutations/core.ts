@@ -783,9 +783,7 @@ export const deletePetitionField = mutationField("deletePetitionField", {
       throw new ApolloError("The petition field has replies.", "FIELD_HAS_REPLIES_ERROR");
     }
 
-    const petitionFields = await ctx.petitions.loadFieldsForPetition(args.petitionId, {
-      cache: false,
-    });
+    const petitionFields = await ctx.petitions.loadFieldsForPetition.raw(args.petitionId);
     if (
       petitionFields.some((f) =>
         f.visibility?.conditions.some((c: any) => c.fieldId === args.fieldId)

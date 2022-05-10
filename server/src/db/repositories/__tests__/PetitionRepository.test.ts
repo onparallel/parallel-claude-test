@@ -627,9 +627,7 @@ describe("repositories/PetitionRepository", () => {
       test("should not edit for user without permissions", async () => {
         const permissions = await petitions.loadUserPermissionsByPetitionId(petitionId);
         await petitions.editPetitionPermissions([petitionId], [users[3].id], [], "READ", users[0]);
-        const newPermissions = await petitions.loadUserPermissionsByPetitionId(petitionId, {
-          cache: false,
-        });
+        const newPermissions = await petitions.loadUserPermissionsByPetitionId.raw(petitionId);
         expect(permissions).toMatchObject(newPermissions);
       });
     });
@@ -938,7 +936,7 @@ describe("repositories/PetitionRepository", () => {
           }
         }
         // deletes every file_upload on replies
-        const currentFiles = await filesRepo.loadFileUpload(fileUploadIds, { cache: false });
+        const currentFiles = await filesRepo.loadFileUpload.raw(fileUploadIds);
         expect(currentFiles.filter(isDefined)).toHaveLength(0);
       });
 
@@ -970,7 +968,7 @@ describe("repositories/PetitionRepository", () => {
       it("deactivates every access on the petition", async () => {
         await petitions.anonymizePetition(petition.id);
 
-        const accesses = await petitions.loadAccessesForPetition(petition.id, { cache: false });
+        const accesses = await petitions.loadAccessesForPetition.raw(petition.id);
         expect(accesses.length).toBeGreaterThan(0);
         expect(accesses.every((a) => a.status === "INACTIVE")).toEqual(true);
       });

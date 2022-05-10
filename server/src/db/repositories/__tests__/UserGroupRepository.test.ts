@@ -113,9 +113,7 @@ describe("repositories/UserGroupRepository", () => {
       await mocks.sharePetitionWithGroups(petition.id, [userGroups[0].id]);
       await userGroupsRepo.removeUsersFromGroups([users[3].id], [userGroups[0].id], "test");
 
-      const permissions = await petitionsRepo.loadPetitionPermissionsByUserId(users[3].id, {
-        cache: false,
-      });
+      const permissions = await petitionsRepo.loadPetitionPermissionsByUserId.raw(users[3].id);
 
       expect(permissions).toHaveLength(0);
     });
@@ -166,10 +164,10 @@ describe("repositories/UserGroupRepository", () => {
         "test"
       );
 
-      const permissionsByPetition = await petitionsRepo.loadUserPermissionsByPetitionId(
-        [petitions[0].id, petitions[1].id],
-        { cache: false }
-      );
+      const permissionsByPetition = await petitionsRepo.loadUserPermissionsByPetitionId.raw([
+        petitions[0].id,
+        petitions[1].id,
+      ]);
 
       expect(permissionsByPetition).toMatchObject([
         [
@@ -233,9 +231,7 @@ describe("repositories/UserGroupRepository", () => {
 
       await userGroupsRepo.removeUsersFromAllGroups([users[0].id], "test");
 
-      const permissions = await petitionsRepo.loadUserPermissionsByPetitionId(petition.id, {
-        cache: false,
-      });
+      const permissions = await petitionsRepo.loadUserPermissionsByPetitionId.raw(petition.id);
 
       expect(permissions).toMatchObject([
         {
