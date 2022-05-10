@@ -2,6 +2,7 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { pick } from "remeda";
 import { FeatureFlagRepository } from "../db/repositories/FeatureFlagRepository";
+import { IntegrationRepository } from "../db/repositories/IntegrationRepository";
 import {
   OrganizationRepository,
   OrganizationUsageDetails,
@@ -26,6 +27,7 @@ export interface ITiersService {
 @injectable()
 export class TiersService implements ITiersService {
   constructor(
+    @inject(IntegrationRepository) private integrations: IntegrationRepository,
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
     @inject(FeatureFlagRepository)
     private featureFlags: FeatureFlagRepository
@@ -111,6 +113,7 @@ export class TiersService implements ITiersService {
           tier.SIGNATURIT_SHARED_APIKEY.period,
           t
         ),
+        this.integrations.removeSignaturitBrandingIds(orgId, updatedBy, t),
       ]);
     }, t);
 

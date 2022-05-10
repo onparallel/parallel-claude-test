@@ -104,20 +104,10 @@ export class SignatureService implements ISignatureService {
     const client = new SignaturItClient(settings, this.config, integration.org_id);
     client.on(
       "branding_updated",
-      ({
-        locale,
-        brandingId,
-        tone,
-        removeParallelBranding,
-      }: {
-        locale: string;
-        brandingId: string;
-        tone: Tone;
-        removeParallelBranding: boolean;
-      }) => {
-        const key = `${locale.toUpperCase()}_${tone.toUpperCase()}_${
-          removeParallelBranding ? "UNBRANDED" : "BRANDED"
-        }_BRANDING_ID` as `${"EN" | "ES"}_${Tone}_${"UNBRANDED" | "BRANDED"}_BRANDING_ID`;
+      ({ locale, brandingId, tone }: { locale: string; brandingId: string; tone: Tone }) => {
+        const key = `${locale.toUpperCase()}_${tone.toUpperCase()}_BRANDING_ID` as `${
+          | "EN"
+          | "ES"}_${Tone}_BRANDING_ID`;
 
         settings[key] = brandingId;
 
@@ -329,17 +319,16 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
   ) {
     const locale = opts.locale;
     const tone = opts.templateData.tone;
-    const removeParallelBranding = opts.templateData.removeParallelBranding;
 
-    const key = `${locale.toUpperCase()}_${tone}__${
-      removeParallelBranding ? "UNBRANDED" : "BRANDED"
-    }_BRANDING_ID` as `${"EN" | "ES"}_${Tone}_${"UNBRANDED" | "BRANDED"}_BRANDING_ID`;
+    const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as `${
+      | "EN"
+      | "ES"}_${Tone}_BRANDING_ID`;
 
     let brandingId = this.settings[key];
 
     if (!brandingId) {
       brandingId = (await this.createOrgBranding(opts)).id;
-      this.emit("branding_updated", { locale, brandingId, tone, removeParallelBranding });
+      this.emit("branding_updated", { locale, brandingId, tone });
     }
 
     const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.parallelUrl);

@@ -651,6 +651,9 @@ export const updateFeatureFlag = mutationField("updateFeatureFlag", {
   resolve: async (_, { featureFlag, value, orgId }, ctx) => {
     try {
       await ctx.featureFlags.addOrUpdateFeatureFlagOverride(orgId, { name: featureFlag, value });
+      if (["REMOVE_PARALLEL_BRANDING"].includes(featureFlag)) {
+        await ctx.integrations.removeSignaturitBrandingIds(orgId, `User:${ctx.user!.id}`);
+      }
       return {
         result: RESULT.SUCCESS,
         message: `Organization with ID: ${orgId} now has ${featureFlag} set to ${String(

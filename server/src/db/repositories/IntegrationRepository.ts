@@ -9,14 +9,10 @@ export type IntegrationSettings<K extends IntegrationType> = {
   SIGNATURE: {
     API_KEY: string;
     ENVIRONMENT?: "production" | "sandbox";
-    EN_FORMAL_BRANDED_BRANDING_ID?: string;
-    EN_FORMAL_UNBRANDED_BRANDING_ID?: string;
-    ES_FORMAL_BRANDED_BRANDING_ID?: string;
-    ES_FORMAL_UNBRANDED_BRANDING_ID?: string;
-    EN_INFORMAL_BRANDED_BRANDING_ID?: string;
-    EN_INFORMAL_UNBRANDED_BRANDING_ID?: string;
-    ES_INFORMAL_BRANDED_BRANDING_ID?: string;
-    ES_INFORMAL_UNBRANDED_BRANDING_ID?: string;
+    EN_FORMAL_BRANDING_ID?: string;
+    ES_FORMAL_BRANDING_ID?: string;
+    EN_INFORMAL_BRANDING_ID?: string;
+    ES_INFORMAL_BRANDING_ID?: string;
   };
   SSO: {
     EMAIL_DOMAINS: string[];
@@ -128,8 +124,8 @@ export class IntegrationRepository extends BaseRepository {
       );
   }
 
-  async removeSignaturitBrandingIds(orgId: number, updatedBy: string) {
-    await this.knex.raw(
+  async removeSignaturitBrandingIds(orgId: number, updatedBy: string, t?: Knex.Transaction) {
+    await this.raw(
       /* sql */ `
       update org_integration 
       set 
@@ -137,7 +133,8 @@ export class IntegrationRepository extends BaseRepository {
         updated_by = ?,
         updated_at = NOW()
       where org_id = ? and provider = 'SIGNATURIT' and deleted_at is null`,
-      [updatedBy, orgId]
+      [updatedBy, orgId],
+      t
     );
   }
 
