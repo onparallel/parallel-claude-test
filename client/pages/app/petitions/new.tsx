@@ -23,6 +23,7 @@ import { SearchInput } from "@parallel/components/common/SearchInput";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { TemplateDetailsModal } from "@parallel/components/petition-common/dialogs/TemplateDetailsModal";
+import { GridInfiniteScrollList } from "@parallel/components/petition-new/GridInfiniteScrollList";
 import { NewPetitionCategoryFilter } from "@parallel/components/petition-new/NewPetitionCategoryFilter";
 import { NewPetitionCategoryMenuFilter } from "@parallel/components/petition-new/NewPetitionCategoryMenuFilter";
 import { NewPetitionEmptySearch } from "@parallel/components/petition-new/NewPetitionEmptySearch";
@@ -32,7 +33,6 @@ import {
   NewPetitionSharedFilter,
   NewPetitionSharedFilterValues,
 } from "@parallel/components/petition-new/NewPetitionSharedFilter";
-import { GridInfiniteScrollList } from "@parallel/components/petition-new/GridInfiniteScrollList";
 import { PublicTemplateCard } from "@parallel/components/petition-new/PublicTemplateCard";
 import { TemplateCard } from "@parallel/components/petition-new/TemplateCard";
 import {
@@ -176,7 +176,7 @@ function NewPetition() {
   );
 
   useEffect(() => {
-    if (!hasTemplates) {
+    if (!hasTemplates && !state.public) {
       handleTabChange(1);
     }
   }, []);
@@ -533,7 +533,7 @@ NewPetition.getInitialProps = async ({
         limit: PAGE_SIZE,
         search: state.search,
         isPublic: state.public,
-        locale,
+        locale: locale,
         isOwner: state.owner,
         category: state.category,
       },
