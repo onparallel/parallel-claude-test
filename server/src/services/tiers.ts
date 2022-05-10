@@ -108,7 +108,7 @@ export class TiersService implements ITiersService {
           tier.SIGNATURIT_SHARED_APIKEY.period,
           t
         ),
-        this.integrations.removeSignaturitBrandingIds(orgId, updatedBy, t),
+        this.integrations.removeSignaturitBrandingIds(org.id, updatedBy, t),
       ]);
     }, t);
 
