@@ -75,6 +75,7 @@ function Account() {
     try {
       await setUserLocale({ variables: { locale } });
       window.analytics?.identify(me.id, { locale, name: me.fullName! });
+      window.Intercom?.("boot", { language_override: locale });
       router.push(router.asPath, undefined, { locale });
     } catch {
       genericErrorToast();
