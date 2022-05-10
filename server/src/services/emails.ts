@@ -71,6 +71,7 @@ export interface IEmailsService {
   ): Promise<void>;
   sendSignatureCancelledNoCreditsLeftEmail(petitionId: number): Promise<void>;
   validateEmail(email: string): Promise<boolean>;
+  sendAppSumoActivateAccountEmail(redirectUrl: string, email: string): Promise<void>;
 }
 export const EMAILS = Symbol.for("EMAILS");
 
