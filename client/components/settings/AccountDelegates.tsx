@@ -9,7 +9,7 @@ import { AccountDelegates_UserFragment, UserSelect_UserFragment } from "@paralle
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { ContactAlert } from "../common/ContactAlert";
+import { ContactSupportAlert } from "../common/ContactSupportAlert";
 
 export interface AccountDelegatesData {
   delegates: UserSelect_UserFragment[];
@@ -73,7 +73,7 @@ export function AccountDelegates({ user, onSubmit, ...props }: AccountDelegatesP
               />
             </Text>
             {user.hasOnBehalfOf ? null : (
-              <ContactAlert
+              <ContactSupportAlert
                 body={
                   <Text>
                     <FormattedMessage

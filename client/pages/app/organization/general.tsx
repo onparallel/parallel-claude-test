@@ -14,7 +14,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
-import { ContactAlert } from "@parallel/components/common/ContactAlert";
+import { ContactSupportAlert } from "@parallel/components/common/ContactSupportAlert";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { Dropzone } from "@parallel/components/common/Dropzone";
@@ -156,7 +156,7 @@ function OrganizationGeneral() {
               </HStack>
             </Stack>
             {me.hasCustomHost ? null : (
-              <ContactAlert
+              <ContactSupportAlert
                 body={
                   <Text>
                     {intl.formatMessage({

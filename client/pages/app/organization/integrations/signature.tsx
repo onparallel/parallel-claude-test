@@ -13,7 +13,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { DeleteIcon, RepeatIcon, StarIcon } from "@parallel/chakra/icons";
-import { ContactAlert } from "@parallel/components/common/ContactAlert";
+import { ContactSupportAlert } from "@parallel/components/common/ContactSupportAlert";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
@@ -216,7 +216,7 @@ function IntegrationsSignature() {
           }
         />
         {!me.hasPetitionSignature ? (
-          <ContactAlert
+          <ContactSupportAlert
             body={
               <>
                 <Text>

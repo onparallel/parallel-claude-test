@@ -3,12 +3,12 @@ import { SupportButton } from "@parallel/components/common/SupportButton";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 
-interface ContactAlertProps {
+interface ContactSupportAlertProps {
   body: ReactNode;
   contactMessage: string;
 }
 
-export function ContactAlert({ body, contactMessage }: ContactAlertProps) {
+export function ContactSupportAlert({ body, contactMessage }: ContactSupportAlertProps) {
   return (
     <Alert status="info" rounded="md">
       <AlertIcon />
