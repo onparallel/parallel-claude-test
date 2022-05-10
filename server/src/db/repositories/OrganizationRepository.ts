@@ -159,6 +159,26 @@ export class OrganizationRepository extends BaseRepository {
     return org;
   }
 
+  async updateOrganizationMetadata(
+    orgId: number,
+    payload: any,
+    updatedBy: string,
+    t?: Knex.Transaction
+  ) {
+    const [org] = await this.from("organization", t)
+      .where("id", orgId)
+      .update({
+        metadata: this.knex.raw(
+          /* sql */ `"metadata" || ?::jsonb || jsonb_build_object('events', coalesce("metadata"->'events','[]'::jsonb) || ?::jsonb)`,
+          [payload, payload]
+        ),
+        updated_at: this.now(),
+        updated_by: updatedBy,
+      })
+      .returning("*");
+    return org;
+  }
+
   async createOrganization(data: CreateOrganization, createdBy?: string, t?: Knex.Transaction) {
     const [org] = await this.insert(
       "organization",

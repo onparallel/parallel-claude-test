@@ -107,15 +107,9 @@ export const appsumo = Router()
 
           // user with activation_email already has an account created on Parallel.
           // so we just need to set the purchased license and redirect to login page
-          await req.context.organizations.updateOrganization(
+          await req.context.organizations.updateOrganizationMetadata(
             org.id,
-            {
-              metadata: {
-                ...org.metadata,
-                ...payload,
-                events: [...(org.metadata.events ?? []), payload],
-              },
-            },
+            payload,
             `AppSumo:${payload.uuid}`
           );
           await req.context.tiers.updateOrganizationTier(
@@ -145,15 +139,9 @@ export const appsumo = Router()
       } else if (payload.action === "refund") {
         // if doing a refund and the organization does not exist, do nothing and return success
         if (isDefined(org)) {
-          await req.context.organizations.updateOrganization(
+          await req.context.organizations.updateOrganizationMetadata(
             org.id,
-            {
-              metadata: {
-                ...org.metadata,
-                ...payload,
-                events: [...(org.metadata.events ?? []), payload],
-              },
-            },
+            payload,
             `AppSumo:${payload.uuid}`
           );
 
@@ -161,15 +149,9 @@ export const appsumo = Router()
         }
         return res.status(200).json({ message: "license refunded" });
       } else {
-        await req.context.organizations.updateOrganization(
+        await req.context.organizations.updateOrganizationMetadata(
           org!.id,
-          {
-            metadata: {
-              ...org!.metadata,
-              ...payload,
-              events: [...(org!.metadata.events ?? []), payload],
-            },
-          },
+          payload,
           `AppSumo:${payload.uuid}`
         );
 
