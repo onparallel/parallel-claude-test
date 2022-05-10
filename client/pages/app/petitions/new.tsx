@@ -54,11 +54,11 @@ import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { omit, pick } from "remeda";
+import { omit } from "remeda";
 
 const QUERY_STATE = {
   search: string(),
-  lang: values<PetitionLocale>(["en", "es"]),
+  lang: values<PetitionLocale | "ALL">(["en", "es", "ALL"]),
   public: boolean().orDefault(false),
   owner: boolean(),
   category: string(),
@@ -82,6 +82,15 @@ function NewPetition() {
     fetchPolicy: "cache-and-network",
   });
 
+  let locale: PetitionLocale | null = null;
+  if (state.lang === "ALL") {
+    locale = null;
+  } else if (state.public && state.lang === null) {
+    locale = intl.locale as PetitionLocale;
+  } else {
+    locale = state.lang;
+  }
+
   const {
     data: {
       templates: { items: templates, totalCount },
@@ -94,7 +103,7 @@ function NewPetition() {
       limit: PAGE_SIZE,
       search: state.search,
       isPublic: state.public,
-      locale: state.lang,
+      locale: locale,
       isOwner: state.owner,
       category: state.category,
     },
@@ -121,7 +130,7 @@ function NewPetition() {
 
   const handleLocaleChange = (lang: Maybe<PetitionLocale>) => {
     mainRef.current!.scrollTo(0, 0);
-    setQueryState((state) => ({ ...state, lang }));
+    setQueryState((state) => ({ ...state, lang: state.public && lang === null ? "ALL" : lang }));
   };
 
   const handleSharedFilterChange = (shared: Maybe<NewPetitionSharedFilterValues>) => {
@@ -138,8 +147,7 @@ function NewPetition() {
 
   const handleTabChange = (index: number) => {
     setSearch("");
-    setQueryState((state) => ({
-      ...pick(state, ["lang"]),
+    setQueryState(() => ({
       public: index === 1 ? true : false,
     }));
   };
@@ -316,7 +324,7 @@ function NewPetition() {
                     flex="1 0 auto"
                   />
                   <NewPetitionLanguageFilter
-                    value={state.lang}
+                    value={locale}
                     onChange={handleLocaleChange}
                     backgroundColor="white"
                     flex="1 0 auto"
@@ -379,7 +387,7 @@ function NewPetition() {
                   gridColumn="1"
                 />
                 <NewPetitionLanguageFilter
-                  value={state.lang}
+                  value={locale}
                   onChange={handleLocaleChange}
                   backgroundColor="white"
                   flex="1 0 auto"
@@ -504,8 +512,20 @@ NewPetition.queries = [
   `,
 ];
 
-NewPetition.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
+NewPetition.getInitialProps = async ({
+  query,
+  fetchQuery,
+  locale: _locale,
+}: WithApolloDataContext) => {
   const state = parseQuery(query, QUERY_STATE);
+  let locale: PetitionLocale | null = null;
+  if (state.lang === "ALL") {
+    locale = null;
+  } else if (state.public && state.lang === null) {
+    locale = _locale as PetitionLocale;
+  } else {
+    locale = state.lang;
+  }
   await Promise.all([
     fetchQuery(NewPetition_templatesDocument, {
       variables: {
@@ -513,7 +533,7 @@ NewPetition.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContex
         limit: PAGE_SIZE,
         search: state.search,
         isPublic: state.public,
-        locale: state.lang,
+        locale,
         isOwner: state.owner,
         category: state.category,
       },
