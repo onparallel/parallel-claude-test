@@ -159,17 +159,12 @@ export class OrganizationRepository extends BaseRepository {
     return org;
   }
 
-  async updateOrganizationMetadata(
-    orgId: number,
-    payload: any,
-    updatedBy: string,
-    t?: Knex.Transaction
-  ) {
+  async updateAppSumoLicense(orgId: number, payload: any, updatedBy: string, t?: Knex.Transaction) {
     const [org] = await this.from("organization", t)
       .where("id", orgId)
       .update({
-        metadata: this.knex.raw(
-          /* sql */ `"metadata" || ?::jsonb || jsonb_build_object('events', coalesce("metadata"->'events','[]'::jsonb) || ?::jsonb)`,
+        appsumo_license: this.knex.raw(
+          /* sql */ `"appsumo_license" || ?::jsonb || jsonb_build_object('events', coalesce("appsumo_license"->'events','[]'::jsonb) || ?::jsonb)`,
           [payload, payload]
         ),
         updated_at: this.now(),

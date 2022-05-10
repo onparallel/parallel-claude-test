@@ -469,7 +469,7 @@ export const userSignUp = mutationField("userSignUp", {
           name: args.organizationName,
           status: source !== "self-service" ? "ACTIVE" : "DEMO",
           logo_public_file_id: logoFile?.id ?? null,
-          metadata: {
+          appsumo_license: {
             ...decodedToken,
             events: [decodedToken],
           },

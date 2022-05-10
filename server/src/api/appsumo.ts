@@ -37,18 +37,12 @@ export const appsumo = Router()
     "/notification",
     (req, res, next) => {
       try {
-        req.context.logger.debug(
-          JSON.stringify(
-            {
-              url: req.url,
-              method: req.method,
-              body: JSON.stringify(req.body),
-              authorization: req.header("authorization"),
-            },
-            null,
-            2
-          )
-        );
+        req.context.logger.debug("AppSumo request:", {
+          url: req.url,
+          method: req.method,
+          body: req.body,
+          authorization: req.header("authorization"),
+        });
       } catch {}
       next();
     },
@@ -99,7 +93,7 @@ export const appsumo = Router()
         if (isDefined(org)) {
           // first we need to make sure this organization was not created previously with another AppSumo purchase UNLESS the last action was a refund
           // "Sumo-lings SHOULD NOT be able to activate multiple AppSumo licenses with the same email."
-          if (org.metadata.source === "AppSumo" && org.metadata.action !== "refund") {
+          if (isDefined(org.appsumo_license.uuid) && org.appsumo_license.action !== "refund") {
             return res.status(401).json({
               message: "The email is already registered in Parallel with an active license",
             });
@@ -107,7 +101,7 @@ export const appsumo = Router()
 
           // user with activation_email already has an account created on Parallel.
           // so we just need to set the purchased license and redirect to login page
-          await req.context.organizations.updateOrganizationMetadata(
+          await req.context.organizations.updateAppSumoLicense(
             org.id,
             payload,
             `AppSumo:${payload.uuid}`
@@ -126,7 +120,9 @@ export const appsumo = Router()
           // user does not have a Parallel account.
           // Redirect to signup page with special JWT to apply purchased license after user creates an account
           const token = await sign(payload, req.context.config.security.jwtSecret);
-          const redirectUrl = `${req.context.config.misc.parallelUrl}/signup?token=${token}`;
+          const redirectUrl = `${req.context.config.misc.parallelUrl}/signup?${new URLSearchParams({
+            token,
+          })}`;
           await req.context.emails.sendAppSumoActivateAccountEmail(
             redirectUrl,
             payload.activation_email
@@ -139,7 +135,7 @@ export const appsumo = Router()
       } else if (payload.action === "refund") {
         // if doing a refund and the organization does not exist, do nothing and return success
         if (isDefined(org)) {
-          await req.context.organizations.updateOrganizationMetadata(
+          await req.context.organizations.updateAppSumoLicense(
             org.id,
             payload,
             `AppSumo:${payload.uuid}`
@@ -149,7 +145,7 @@ export const appsumo = Router()
         }
         return res.status(200).json({ message: "license refunded" });
       } else {
-        await req.context.organizations.updateOrganizationMetadata(
+        await req.context.organizations.updateAppSumoLicense(
           org!.id,
           payload,
           `AppSumo:${payload.uuid}`
