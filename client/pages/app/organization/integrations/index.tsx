@@ -1,19 +1,8 @@
 import { gql } from "@apollo/client";
-import {
-  Alert,
-  AlertIcon,
-  Badge,
-  Button,
-  Center,
-  Heading,
-  HStack,
-  Image,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Badge, Heading, Image, Stack } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
-import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { IntegrationCard } from "@parallel/components/organization/IntegrationCard";
 import { OrganizationIntegrations_userDocument } from "@parallel/graphql/__types";
@@ -21,7 +10,6 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { FormattedMessage, useIntl } from "react-intl";
-import { SupportLink } from "@parallel/components/common/SupportLink";
 
 function OrganizationIntegrations() {
   const intl = useIntl();
@@ -122,32 +110,6 @@ function OrganizationIntegrations() {
         {integrations.map((integration, index) => (
           <IntegrationCard key={index} {...integration} />
         ))}
-        <Alert status="info" rounded="md">
-          <AlertIcon />
-          <HStack spacing={8}>
-            <Text flex="1">
-              <FormattedMessage
-                id="page.integrations.upgrade-plan-alert"
-                defaultMessage="Upgrade your plan to access integrations. Contact our support team support team for more information."
-              />
-            </Text>
-            <Center>
-              <Button
-                as={SupportLink}
-                variant="outline"
-                backgroundColor="white"
-                colorScheme="blue"
-                message={intl.formatMessage({
-                  id: "page.integrations.upgrade-plan-message",
-                  defaultMessage:
-                    "Hi, I would like more information about upgrade my plan to access integrations.",
-                })}
-              >
-                <FormattedMessage id="generic.contact" defaultMessage="Contact" />
-              </Button>
-            </Center>
-          </HStack>
-        </Alert>
       </Stack>
     </SettingsLayout>
   );
