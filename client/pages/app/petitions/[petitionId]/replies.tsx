@@ -386,7 +386,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     try {
       const hasPendingSignature =
         (petition.currentSignatureRequest &&
-          ["ENQUEUED", "PROCESSING"].includes(petition.currentSignatureRequest.status)) ??
+          ["ENQUEUED", "PROCESSING", "PROCESSED"].includes(
+            petition.currentSignatureRequest.status
+          )) ??
         false;
       if (hasPendingSignature || petition.signatureConfig) {
         await showConfirmCancelOngoingSignature({});
