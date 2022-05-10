@@ -1264,12 +1264,8 @@ export type CreateTemporaryFile = PartialProps<
 
 export interface User {
   id: number; // int4
-  cognito_id: Maybe<string>; // varchar
   org_id: number; // int4
   organization_role: UserOrganizationRole; // user_organization_role
-  email: Maybe<string>; // varchar
-  first_name: Maybe<string>; // varchar
-  last_name: Maybe<string>; // varchar
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
   updated_at: Date; // timestamptz
@@ -1278,20 +1274,13 @@ export interface User {
   deleted_by: Maybe<string>; // varchar
   last_active_at: Maybe<Date>; // timestamptz
   status: UserStatus; // user_status
-  is_sso_user: Maybe<boolean>; // bool
   external_id: Maybe<string>; // varchar
-  avatar_public_file_id: Maybe<number>; // int4
-  details: Maybe<any>; // jsonb
   user_data_id: number; // int4
 }
 
 export type CreateUser = PartialProps<
   Omit<User, "id">,
-  | "cognito_id"
   | "organization_role"
-  | "email"
-  | "first_name"
-  | "last_name"
   | "created_at"
   | "created_by"
   | "updated_at"
@@ -1300,10 +1289,7 @@ export type CreateUser = PartialProps<
   | "deleted_by"
   | "last_active_at"
   | "status"
-  | "is_sso_user"
   | "external_id"
-  | "avatar_public_file_id"
-  | "details"
 >;
 
 export interface UserAuthenticationToken {

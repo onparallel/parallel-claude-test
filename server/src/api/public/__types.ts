@@ -195,7 +195,7 @@ export type EffectivePetitionUserPermission = {
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
 export type FeatureFlag =
-  | "CUSTOM_HOST"
+  | "CUSTOM_HOST_UI"
   | "DEVELOPER_ACCESS"
   | "ES_TAX_DOCUMENTS_FIELD"
   | "EXPORT_CUATRECASAS"
@@ -617,6 +617,8 @@ export type Mutation = {
   updateOrganizationLogo: Organization;
   /** Changes the organization preferred tone */
   updateOrganizationPreferredTone: Organization;
+  /** Applies a given tier to the organization */
+  updateOrganizationTier: SupportMethodResponse;
   /** Updates the role of another user in the organization. */
   updateOrganizationUser: User;
   /** Updates the user limit for a organization */
@@ -1325,6 +1327,11 @@ export type MutationupdateOrganizationLogoArgs = {
 
 export type MutationupdateOrganizationPreferredToneArgs = {
   tone: Tone;
+};
+
+export type MutationupdateOrganizationTierArgs = {
+  orgId: Scalars["Int"];
+  tier: Scalars["String"];
 };
 
 export type MutationupdateOrganizationUserArgs = {
