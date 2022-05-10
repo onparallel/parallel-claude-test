@@ -358,6 +358,7 @@ export class PetitionRepository extends BaseRepository {
         /* sql */ `
         join petition_permission pp on petition.id = pp.petition_id and pp.user_id = ? and pp.deleted_at is null
         left join petition_access pa on petition.id = pa.petition_id
+        left join petition_message pm on petition.id = pm.petition_id
         left join contact c on pa.contact_id = c.id and c.deleted_at is null
       `,
         [userId]
@@ -475,7 +476,7 @@ export class PetitionRepository extends BaseRepository {
           .limit(opts.limit ?? 0)
           .select(
             "petition.*",
-            this.knex.raw("min(pa.created_at) as sent_at"),
+            this.knex.raw("min(coalesce(pm.scheduled_at, pm.created_at)) as sent_at"),
             ...(opts.sortBy?.some((s) => s.column === "last_used_at")
               ? [
                   this.knex.raw(
