@@ -24,6 +24,7 @@ import { isDefined } from "remeda";
 import userflow from "userflow.js";
 import { CloseableAlert } from "../common/CloseableAlert";
 import { NotificationsDrawer } from "../notifications/NotificationsDrawer";
+import { Canny } from "../scripts/Canny";
 import { Segment } from "../scripts/Segment";
 import { AppLayoutNavbar } from "./AppLayoutNavbar";
 
@@ -66,6 +67,14 @@ export const AppLayout = Object.assign(
           setIsLoading(false);
         }
       }
+    }, []);
+
+    useEffect(() => {
+      window.Canny?.("initChangelog", {
+        appID: process.env.NEXT_PUBLIC_CANNY_APPID,
+        position: "right",
+        align: "bottom",
+      });
     }, []);
 
     const isMobile = useBreakpointValue({ base: true, sm: false });
@@ -126,6 +135,7 @@ export const AppLayout = Object.assign(
         {process.env.NODE_ENV !== "development" ? (
           <>
             <Segment />
+            <Canny />
           </>
         ) : null}
         <DndProvider backend={HTML5Backend}>

@@ -206,13 +206,18 @@ export const AppLayoutNavbar = Object.assign(
           <Stack spacing={2} alignItems="center" display={{ base: "none", sm: "flex" }}>
             <NotificationsButton />
             <IconButtonWithTooltip
+              sx={{
+                ".Canny_BadgeContainer .Canny_Badge": {
+                  backgroundColor: "purple.500",
+                  border: "2px solid white",
+                  top: "5px",
+                  right: "6px",
+                },
+              }}
               label={intl.formatMessage({
                 id: "navbar.new-in-parallel",
                 defaultMessage: "New in Parallel",
               })}
-              as="a"
-              rel="noopener"
-              target="_blank"
               placement="right"
               size="md"
               variant="ghost"
