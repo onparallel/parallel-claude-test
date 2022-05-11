@@ -9,6 +9,12 @@ export function useAssertQuery<TData = any, TVariables = OperationVariables>(
 ): QueryResult<TData, TVariables> & { data: TData } {
   const { data, ...rest } = useQuery(query, options);
   if (!data) {
+    if (
+      process.env.NEXT_PUBLIC_ENVIRONMENT === "staging" ||
+      process.env.NEXT_PUBLIC_ENVIRONMENT === "development"
+    ) {
+      console.log((rest as any).diff);
+    }
     throw new Error("Expected data to be present on the Apollo cache");
   }
   return {
@@ -25,6 +31,12 @@ export function useAssertQueryOrPreviousData<TData = any, TVariables = Operation
   const { data, ...rest } = useQuery(query, options);
   if (!data) {
     if (!previous.current) {
+      if (
+        process.env.NEXT_PUBLIC_ENVIRONMENT === "staging" ||
+        process.env.NEXT_PUBLIC_ENVIRONMENT === "development"
+      ) {
+        console.log((rest as any).diff);
+      }
       throw new Error("Expected data to be present on the Apollo cache");
     } else {
       return {
