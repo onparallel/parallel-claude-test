@@ -19,8 +19,8 @@ export type FeatureFlagName =
   | "ON_BEHALF_OF"
   | "GHOST_LOGIN"
   | "ES_TAX_DOCUMENTS_FIELD"
-  | "REMOVE_PARALLEL_BRANDING"
-  | "CUSTOM_HOST_UI";
+  | "CUSTOM_HOST_UI"
+  | "REMOVE_PARALLEL_BRANDING";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -34,13 +34,17 @@ export const FeatureFlagNameValues = [
   "ON_BEHALF_OF",
   "GHOST_LOGIN",
   "ES_TAX_DOCUMENTS_FIELD",
-  "REMOVE_PARALLEL_BRANDING",
   "CUSTOM_HOST_UI",
+  "REMOVE_PARALLEL_BRANDING",
 ] as FeatureFlagName[];
 
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
 
 export const IntegrationTypeValues = ["SIGNATURE", "SSO", "USER_PROVISIONING"] as IntegrationType[];
+
+export type LicenseCodeStatus = "PENDING" | "REDEEMED" | "EXPIRED";
+
+export const LicenseCodeStatusValues = ["PENDING", "REDEEMED", "EXPIRED"] as LicenseCodeStatus[];
 
 export type OrganizationStatus = "DEV" | "DEMO" | "ACTIVE" | "CHURNED" | "ROOT";
 
@@ -317,6 +321,7 @@ export interface TableTypes {
   feature_flag: FeatureFlag;
   feature_flag_override: FeatureFlagOverride;
   file_upload: FileUpload;
+  license_code: LicenseCode;
   organization: Organization;
   organization_usage_limit: OrganizationUsageLimit;
   org_integration: OrgIntegration;
@@ -362,6 +367,7 @@ export interface TableCreateTypes {
   feature_flag: CreateFeatureFlag;
   feature_flag_override: CreateFeatureFlagOverride;
   file_upload: CreateFileUpload;
+  license_code: CreateLicenseCode;
   organization: CreateOrganization;
   organization_usage_limit: CreateOrganizationUsageLimit;
   org_integration: CreateOrgIntegration;
@@ -407,6 +413,7 @@ export interface TablePrimaryKeys {
   feature_flag: "id";
   feature_flag_override: "id";
   file_upload: "id";
+  license_code: "id";
   organization: "id";
   organization_usage_limit: "id";
   org_integration: "id";
@@ -595,6 +602,23 @@ export type CreateFileUpload = PartialProps<
   | "file_deleted_at"
 >;
 
+export interface LicenseCode {
+  id: number; // int4
+  source: string; // varchar
+  code: string; // varchar
+  details: any; // jsonb
+  status: LicenseCodeStatus; // license_code_status
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+}
+
+export type CreateLicenseCode = PartialProps<
+  Omit<LicenseCode, "id">,
+  "details" | "status" | "created_at" | "created_by" | "updated_at" | "updated_by"
+>;
+
 export interface Organization {
   id: number; // int4
   name: string; // varchar
@@ -713,8 +737,8 @@ export interface Petition {
   is_completing_message_enabled: boolean; // bool
   completing_message_subject: Maybe<string>; // text
   completing_message_body: Maybe<string>; // text
-  anonymized_at: Maybe<Date>; // timestamptz
   metadata: any; // jsonb
+  anonymized_at: Maybe<Date>; // timestamptz
 }
 
 export type CreatePetition = PartialProps<
@@ -751,8 +775,8 @@ export type CreatePetition = PartialProps<
   | "is_completing_message_enabled"
   | "completing_message_subject"
   | "completing_message_body"
-  | "anonymized_at"
   | "metadata"
+  | "anonymized_at"
 >;
 
 export interface PetitionAccess {

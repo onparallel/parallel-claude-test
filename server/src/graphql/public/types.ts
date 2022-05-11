@@ -570,3 +570,13 @@ export const PublicPublicPetitionLink = objectType({
     });
   },
 });
+
+export const PublicLicenseCode = objectType({
+  name: "PublicLicenseCode",
+  sourceType: "db.LicenseCode",
+  definition(t) {
+    t.nonNull.string("code");
+    t.nonNull.string("source");
+    t.nonNull.jsonObject("details", { resolve: (o) => o.details });
+  },
+});

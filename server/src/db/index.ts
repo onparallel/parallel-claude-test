@@ -6,6 +6,7 @@ import { EmailLogRepository } from "./repositories/EmailLogRepository";
 import { FeatureFlagRepository } from "./repositories/FeatureFlagRepository";
 import { FileRepository } from "./repositories/FileRepository";
 import { IntegrationRepository } from "./repositories/IntegrationRepository";
+import { LicenseCodeRepository } from "./repositories/LicenseCodeRepository";
 import { OrganizationRepository } from "./repositories/OrganizationRepository";
 import { PetitionRepository } from "./repositories/PetitionRepository";
 import { SubscriptionRepository } from "./repositories/SubscriptionRepository";
@@ -34,4 +35,5 @@ export const dbModule = new ContainerModule((bind) => {
   bind<SystemRepository>(SystemRepository).toSelf();
   bind<SubscriptionRepository>(SubscriptionRepository).toSelf();
   bind<TaskRepository>(TaskRepository).toSelf();
+  bind<LicenseCodeRepository>(LicenseCodeRepository).toSelf();
 });

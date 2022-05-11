@@ -6,6 +6,7 @@ import { EmailLogRepository } from "./db/repositories/EmailLogRepository";
 import { FeatureFlagRepository } from "./db/repositories/FeatureFlagRepository";
 import { FileRepository } from "./db/repositories/FileRepository";
 import { IntegrationRepository } from "./db/repositories/IntegrationRepository";
+import { LicenseCodeRepository } from "./db/repositories/LicenseCodeRepository";
 import { OrganizationRepository } from "./db/repositories/OrganizationRepository";
 import { PetitionRepository } from "./db/repositories/PetitionRepository";
 import { SubscriptionRepository } from "./db/repositories/SubscriptionRepository";
@@ -64,7 +65,8 @@ export class ApiContext {
     public readonly tags: TagRepository,
     public readonly system: SystemRepository,
     public readonly subscriptions: SubscriptionRepository,
-    public readonly tasks: TaskRepository
+    public readonly tasks: TaskRepository,
+    public readonly licenseCodes: LicenseCodeRepository
   ) {}
 }
 

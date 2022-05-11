@@ -1,5 +1,5 @@
 import { lookup } from "geoip-country";
-import { idArg, nonNull, nullable, objectType, queryField } from "nexus";
+import { idArg, nonNull, nullable, objectType, queryField, stringArg } from "nexus";
 import { isDefined } from "remeda";
 import { getClientIp } from "request-ip";
 import { UAParser } from "ua-parser-js";
@@ -101,5 +101,15 @@ export const publicTask = queryField("publicTask", {
   authorize: chain(authenticatePublicAccess("keycode"), taskBelongsToAccess("taskId")),
   resolve: async (_, { taskId }, ctx) => {
     return (await ctx.tasks.loadTask(taskId))!;
+  },
+});
+
+export const publicLicenseCode = queryField("publicLicenseCode", {
+  type: nullable("PublicLicenseCode"),
+  args: {
+    code: nonNull(stringArg()),
+  },
+  resolve: async (_, { code }, ctx) => {
+    return await ctx.licenseCodes.loadLicenseCode(code);
   },
 });

@@ -1619,6 +1619,7 @@ type Mutation {
     firstName: String!
     industry: String
     lastName: String!
+    licenseCode: String
 
     """
     Preferred locale for AWS Cognito CustomMessages.
@@ -1629,7 +1630,6 @@ type Mutation {
     password: String!
     position: String
     role: String
-    token: String
   ): User!
   verifyPublicAccess(
     ip: String
@@ -3444,6 +3444,12 @@ type PublicCreateFileUploadReply {
   reply: PublicPetitionFieldReply!
 }
 
+type PublicLicenseCode {
+  code: String!
+  details: JSONObject!
+  source: String!
+}
+
 """
 A public view of an organization
 """
@@ -3966,6 +3972,7 @@ type Query {
     sortBy: [QueryPetitions_OrderBy!]
   ): PetitionBasePagination!
   petitionsById(ids: [GID!]!): [PetitionBase]!
+  publicLicenseCode(code: String!): PublicLicenseCode
   publicOrgLogoUrl(id: GID!): String
 
   """

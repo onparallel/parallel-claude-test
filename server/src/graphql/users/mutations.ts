@@ -4,10 +4,9 @@ import { arg, booleanArg, enumType, list, mutationField, nonNull, stringArg } fr
 import pMap from "p-map";
 import { difference, isDefined, zip } from "remeda";
 import { RESULT } from "..";
-import { PublicFileUpload } from "../../db/__types";
+import { LicenseCode, PublicFileUpload } from "../../db/__types";
 import { partition } from "../../util/arrays";
 import { fullName } from "../../util/fullName";
-import { verify } from "../../util/jwt";
 import { withError } from "../../util/promises/withError";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import { random } from "../../util/token";
@@ -407,7 +406,7 @@ export const userSignUp = mutationField("userSignUp", {
     role: stringArg(),
     position: stringArg(),
     captcha: nonNull(stringArg()),
-    token: stringArg(),
+    licenseCode: stringArg(),
   },
   authorize: verifyCaptcha("captcha"),
   validateArgs: validateAnd(
@@ -426,17 +425,19 @@ export const userSignUp = mutationField("userSignUp", {
     )
   ),
   resolve: async (_, args, ctx) => {
-    let decodedToken = {} as any;
-    if (isDefined(args.token)) {
-      try {
-        decodedToken = await verify(args.token, ctx.config.security.jwtSecret);
-      } catch {
-        throw new ApolloError("Invalid token", "INVALID_TOKEN");
+    let licenseCode: LicenseCode | null = null;
+    if (isDefined(args.licenseCode)) {
+      licenseCode = await ctx.licenseCodes.loadLicenseCode(args.licenseCode);
+      if (licenseCode?.status !== "PENDING") {
+        throw new ApolloError(
+          `Provided license code is ${licenseCode?.status} and can't be used`,
+          "INVALID_LICENSE_CODE"
+        );
       }
     }
 
-    const source = decodedToken?.source ?? "self-service";
-    const tierKey = decodedToken?.parallel_tier ?? "FREE";
+    const source = licenseCode?.source ?? "self-service";
+    const tierKey = licenseCode?.details.parallel_tier ?? "FREE";
 
     const email = args.email.trim().toLowerCase();
     const [error, cognitoId] = await withError(
@@ -469,10 +470,13 @@ export const userSignUp = mutationField("userSignUp", {
           name: args.organizationName,
           status: source !== "self-service" ? "ACTIVE" : "DEMO",
           logo_public_file_id: logoFile?.id ?? null,
-          appsumo_license: {
-            ...decodedToken,
-            events: [decodedToken],
-          },
+          appsumo_license:
+            licenseCode && licenseCode.source === "AppSumo"
+              ? {
+                  ...licenseCode.details,
+                  events: [licenseCode.details],
+                }
+              : {},
         },
         undefined,
         t
@@ -527,6 +531,14 @@ export const userSignUp = mutationField("userSignUp", {
           t
         ),
         ctx.tiers.updateOrganizationTier(org, tierKey, `User:${user.id}`, t),
+        licenseCode
+          ? ctx.licenseCodes.updateLicenseCode(
+              licenseCode.id,
+              { status: "REDEEMED" },
+              `User:${user.id}`,
+              t
+            )
+          : null,
       ]);
       return newUser;
     });

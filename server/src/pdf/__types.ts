@@ -1463,6 +1463,7 @@ export type MutationuserSignUpArgs = {
   firstName: Scalars["String"];
   industry?: InputMaybe<Scalars["String"]>;
   lastName: Scalars["String"];
+  licenseCode?: InputMaybe<Scalars["String"]>;
   locale?: InputMaybe<Scalars["String"]>;
   organizationLogo?: InputMaybe<Scalars["Upload"]>;
   organizationName: Scalars["String"];
@@ -2482,6 +2483,12 @@ export type PublicCreateFileUploadReply = {
   reply: PublicPetitionFieldReply;
 };
 
+export type PublicLicenseCode = {
+  code: Scalars["String"];
+  details: Scalars["JSONObject"];
+  source: Scalars["String"];
+};
+
 /** A public view of an organization */
 export type PublicOrganization = {
   /** The ID of the organization. */
@@ -2708,6 +2715,7 @@ export type Query = {
   /** The petitions of the user */
   petitions: PetitionBasePagination;
   petitionsById: Array<Maybe<PetitionBase>>;
+  publicLicenseCode: Maybe<PublicLicenseCode>;
   publicOrgLogoUrl: Maybe<Scalars["String"]>;
   /** The comments for this field. */
   publicPetitionField: PublicPetitionField;
@@ -2826,6 +2834,10 @@ export type QuerypetitionsArgs = {
 
 export type QuerypetitionsByIdArgs = {
   ids: Array<Scalars["GID"]>;
+};
+
+export type QuerypublicLicenseCodeArgs = {
+  code: Scalars["String"];
 };
 
 export type QuerypublicOrgLogoUrlArgs = {

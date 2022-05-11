@@ -11,10 +11,12 @@ import { PublicSignupFormInbox } from "@parallel/components/public/signup/Public
 import { PublicSignupFormName } from "@parallel/components/public/signup/PublicSignupFormName";
 import { PublicSignupFormOrganization } from "@parallel/components/public/signup/PublicSignupFormOrganization";
 import { PublicSignupRightHeading } from "@parallel/components/public/signup/PublicSignupRightHeading";
-import { Signup_userSignUpDocument } from "@parallel/graphql/__types";
-import { Maybe } from "@parallel/utils/types";
+import {
+  Signup_publicLicenseCodeDocument,
+  Signup_userSignUpDocument,
+} from "@parallel/graphql/__types";
+import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
-import jwt from "jwt-decode";
 import { useEffect, useRef } from "react";
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
@@ -32,9 +34,9 @@ type SignupFormData = {
   captcha: string;
 };
 
-type SignupProps = ReturnType<typeof Signup.getInitialProps>;
+type SignupProps = UnwrapPromise<ReturnType<typeof Signup.getInitialProps>>;
 
-function Signup({ token, source, activationEmail }: SignupProps) {
+function Signup({ code, source, activationEmail }: SignupProps) {
   const intl = useIntl();
 
   const genericErrorToast = useGenericErrorToast();
@@ -59,7 +61,7 @@ function Signup({ token, source, activationEmail }: SignupProps) {
           variables: {
             ...(formData.current as SignupFormData),
             locale: intl.locale,
-            token: isDefined(activationEmail) && typeof token === "string" ? token : undefined,
+            licenseCode: code,
           },
         });
       } catch (error) {
@@ -224,7 +226,7 @@ Signup.mutations = [
       $role: String
       $position: String
       $captcha: String!
-      $token: String
+      $licenseCode: String
     ) {
       userSignUp(
         email: $email
@@ -238,7 +240,7 @@ Signup.mutations = [
         role: $role
         position: $position
         captcha: $captcha
-        token: $token
+        licenseCode: $licenseCode
       ) {
         id
         email
@@ -249,25 +251,37 @@ Signup.mutations = [
   `,
 ];
 
+Signup.queries = [
+  gql`
+    query Signup_publicLicenseCode($code: String!) {
+      publicLicenseCode(code: $code) {
+        code
+        source
+        details
+      }
+    }
+  `,
+];
+
 /* 
   not including this empty function will trigger two Router.routeChangeComplete events,
   causing analytics to track the pageview twice
  */
-Signup.getInitialProps = ({ query }: WithApolloDataContext) => {
-  let email = "";
-  let source = "";
-  if (isDefined(query.token) && typeof query.token === "string") {
+Signup.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
+  if (isDefined(query.code) && typeof query.code === "string") {
     try {
-      const decodedToken = jwt(query.token) as any;
-      email = decodedToken?.activation_email;
-      source = decodedToken?.source;
+      const { data } = await fetchQuery(Signup_publicLicenseCodeDocument, {
+        variables: { code: query.code },
+        ignoreCache: true,
+      });
+      return {
+        code: data.publicLicenseCode?.code,
+        source: data.publicLicenseCode?.source,
+        activationEmail: data.publicLicenseCode?.details.activation_email as string | undefined,
+      };
     } catch {}
   }
-  return {
-    token: query.token,
-    source: source || undefined,
-    activationEmail: email || undefined,
-  };
+  return {};
 };
 
 export default withApolloData(Signup);

@@ -505,6 +505,7 @@ export interface NexusGenObjects {
     presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
     reply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
   };
+  PublicLicenseCode: db.LicenseCode;
   PublicOrganization: db.Organization;
   PublicPetition: db.Petition;
   PublicPetitionAccess: db.PetitionAccess;
@@ -1514,6 +1515,12 @@ export interface NexusGenFieldTypes {
     presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
     reply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
   };
+  PublicLicenseCode: {
+    // field return type
+    code: string; // String!
+    details: NexusGenScalars["JSONObject"]; // JSONObject!
+    source: string; // String!
+  };
   PublicOrganization: {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
@@ -1650,6 +1657,7 @@ export interface NexusGenFieldTypes {
     petitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
     petitionsById: Array<NexusGenRootTypes["PetitionBase"] | null>; // [PetitionBase]!
+    publicLicenseCode: NexusGenRootTypes["PublicLicenseCode"] | null; // PublicLicenseCode
     publicOrgLogoUrl: string | null; // String
     publicPetitionField: NexusGenRootTypes["PublicPetitionField"]; // PublicPetitionField!
     publicPetitionLinkBySlug: NexusGenRootTypes["PublicPublicPetitionLink"] | null; // PublicPublicPetitionLink
@@ -2967,6 +2975,12 @@ export interface NexusGenFieldTypeNames {
     presignedPostData: "AWSPresignedPostData";
     reply: "PublicPetitionFieldReply";
   };
+  PublicLicenseCode: {
+    // field return type name
+    code: "String";
+    details: "JSONObject";
+    source: "String";
+  };
   PublicOrganization: {
     // field return type name
     id: "GID";
@@ -3103,6 +3117,7 @@ export interface NexusGenFieldTypeNames {
     petitionField: "PetitionField";
     petitions: "PetitionBasePagination";
     petitionsById: "PetitionBase";
+    publicLicenseCode: "PublicLicenseCode";
     publicOrgLogoUrl: "String";
     publicPetitionField: "PublicPetitionField";
     publicPetitionLinkBySlug: "PublicPublicPetitionLink";
@@ -4368,13 +4383,13 @@ export interface NexusGenArgTypes {
       firstName: string; // String!
       industry?: string | null; // String
       lastName: string; // String!
+      licenseCode?: string | null; // String
       locale?: string | null; // String
       organizationLogo?: NexusGenScalars["Upload"] | null; // Upload
       organizationName: string; // String!
       password: string; // String!
       position?: string | null; // String
       role?: string | null; // String
-      token?: string | null; // String
     };
     verifyPublicAccess: {
       // args
@@ -4526,6 +4541,10 @@ export interface NexusGenArgTypes {
     petitionsById: {
       // args
       ids: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    publicLicenseCode: {
+      // args
+      code: string; // String!
     };
     publicOrgLogoUrl: {
       // args

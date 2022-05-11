@@ -1495,13 +1495,13 @@ export interface MutationuserSignUpArgs {
   firstName: Scalars["String"];
   industry?: InputMaybe<Scalars["String"]>;
   lastName: Scalars["String"];
+  licenseCode?: InputMaybe<Scalars["String"]>;
   locale?: InputMaybe<Scalars["String"]>;
   organizationLogo?: InputMaybe<Scalars["Upload"]>;
   organizationName: Scalars["String"];
   password: Scalars["String"];
   position?: InputMaybe<Scalars["String"]>;
   role?: InputMaybe<Scalars["String"]>;
-  token?: InputMaybe<Scalars["String"]>;
 }
 
 export interface MutationverifyPublicAccessArgs {
@@ -2560,6 +2560,13 @@ export interface PublicCreateFileUploadReply {
   reply: PublicPetitionFieldReply;
 }
 
+export interface PublicLicenseCode {
+  __typename?: "PublicLicenseCode";
+  code: Scalars["String"];
+  details: Scalars["JSONObject"];
+  source: Scalars["String"];
+}
+
 /** A public view of an organization */
 export interface PublicOrganization {
   __typename?: "PublicOrganization";
@@ -2798,6 +2805,7 @@ export interface Query {
   /** The petitions of the user */
   petitions: PetitionBasePagination;
   petitionsById: Array<Maybe<PetitionBase>>;
+  publicLicenseCode?: Maybe<PublicLicenseCode>;
   publicOrgLogoUrl?: Maybe<Scalars["String"]>;
   /** The comments for this field. */
   publicPetitionField: PublicPetitionField;
@@ -2916,6 +2924,10 @@ export interface QuerypetitionsArgs {
 
 export interface QuerypetitionsByIdArgs {
   ids: Array<Scalars["GID"]>;
+}
+
+export interface QuerypublicLicenseCodeArgs {
+  code: Scalars["String"];
 }
 
 export interface QuerypublicOrgLogoUrlArgs {
@@ -19673,7 +19685,7 @@ export type Signup_userSignUpMutationVariables = Exact<{
   role?: InputMaybe<Scalars["String"]>;
   position?: InputMaybe<Scalars["String"]>;
   captcha: Scalars["String"];
-  token?: InputMaybe<Scalars["String"]>;
+  licenseCode?: InputMaybe<Scalars["String"]>;
 }>;
 
 export type Signup_userSignUpMutation = {
@@ -19684,6 +19696,19 @@ export type Signup_userSignUpMutation = {
     firstName?: string | null;
     lastName?: string | null;
   };
+};
+
+export type Signup_publicLicenseCodeQueryVariables = Exact<{
+  code: Scalars["String"];
+}>;
+
+export type Signup_publicLicenseCodeQuery = {
+  publicLicenseCode?: {
+    __typename?: "PublicLicenseCode";
+    code: string;
+    source: string;
+    details: { [key: string]: any };
+  } | null;
 };
 
 export type LandingTemplateDetails_LandingTemplateFragment = {
@@ -27317,7 +27342,7 @@ export const Signup_userSignUpDocument = gql`
     $role: String
     $position: String
     $captcha: String!
-    $token: String
+    $licenseCode: String
   ) {
     userSignUp(
       email: $email
@@ -27331,7 +27356,7 @@ export const Signup_userSignUpDocument = gql`
       role: $role
       position: $position
       captcha: $captcha
-      token: $token
+      licenseCode: $licenseCode
     ) {
       id
       email
@@ -27340,6 +27365,15 @@ export const Signup_userSignUpDocument = gql`
     }
   }
 ` as unknown as DocumentNode<Signup_userSignUpMutation, Signup_userSignUpMutationVariables>;
+export const Signup_publicLicenseCodeDocument = gql`
+  query Signup_publicLicenseCode($code: String!) {
+    publicLicenseCode(code: $code) {
+      code
+      source
+      details
+    }
+  }
+` as unknown as DocumentNode<Signup_publicLicenseCodeQuery, Signup_publicLicenseCodeQueryVariables>;
 export const LandingTemplateDetails_landingTemplateBySlugDocument = gql`
   query LandingTemplateDetails_landingTemplateBySlug($slug: String!) {
     landingTemplateBySlug(slug: $slug) {

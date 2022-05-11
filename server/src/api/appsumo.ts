@@ -86,7 +86,7 @@ export const appsumo = Router()
     },
     async (req, res) => {
       const body = req.body as AppSumoPayload;
-      const payload = { source: "AppSumo", parallel_tier: mapTier(body.plan_id), ...body };
+      const payload = { parallel_tier: mapTier(body.plan_id), ...body };
       const org = req.context.organization;
 
       if (payload.action === "activate") {
@@ -118,10 +118,14 @@ export const appsumo = Router()
           });
         } else {
           // user does not have a Parallel account.
-          // Redirect to signup page with special JWT to apply purchased license after user creates an account
-          const token = await sign(payload, req.context.config.security.jwtSecret);
+          // Redirect to signup page with special code to apply purchased license after user creates an account
+          const license = await req.context.licenseCodes.createLicenseCode(
+            "AppSumo",
+            payload,
+            `AppSumo:${payload.uuid}`
+          );
           const redirectUrl = `${req.context.config.misc.parallelUrl}/signup?${new URLSearchParams({
-            token,
+            code: license.code,
           })}`;
           await req.context.emails.sendAppSumoActivateAccountEmail(
             redirectUrl,
