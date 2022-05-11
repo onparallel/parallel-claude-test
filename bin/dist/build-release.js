@@ -59,7 +59,15 @@ async function main() {
     // Generate tokens
     const CLIENT_SERVER_TOKEN = (0, token_1.token)(32);
     const SECURITY_SERVICE_JWT_SECRET = (0, token_1.token)(32);
+    (0, child_process_1.execSync)(`echo "" >> ${buildDir}/client/.env.local`, {
+        cwd: WORK_DIR,
+        encoding: "utf-8",
+    });
     (0, child_process_1.execSync)(`echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/client/.env.local`, {
+        cwd: WORK_DIR,
+        encoding: "utf-8",
+    });
+    (0, child_process_1.execSync)(`echo "" >> ${buildDir}/server/.env`, {
         cwd: WORK_DIR,
         encoding: "utf-8",
     });

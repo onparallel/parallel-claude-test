@@ -64,7 +64,15 @@ async function main() {
   // Generate tokens
   const CLIENT_SERVER_TOKEN = token(32);
   const SECURITY_SERVICE_JWT_SECRET = token(32);
+  execSync(`echo "" >> ${buildDir}/client/.env.local`, {
+    cwd: WORK_DIR,
+    encoding: "utf-8",
+  });
   execSync(`echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/client/.env.local`, {
+    cwd: WORK_DIR,
+    encoding: "utf-8",
+  });
+  execSync(`echo "" >> ${buildDir}/server/.env`, {
     cwd: WORK_DIR,
     encoding: "utf-8",
   });
