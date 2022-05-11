@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
-import { Box, Grid, Heading } from "@chakra-ui/react";
+import { Box, Grid, Heading, Stack, Text } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { UpgradeAppSumoAlert } from "@parallel/components/common/UpgradeAppSumoAlert";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
@@ -8,8 +9,16 @@ import { UsageCard } from "@parallel/components/organization/UsageCard";
 import { OrganizationUsage_userDocument } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
+import { getAppSumoTierFromPlanId } from "@parallel/utils/getAppSumoTierFromPlanId";
+
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { FormattedMessage, useIntl } from "react-intl";
+
+type AppSumoLicenseType = {
+  plan_id: string;
+  activation_email: string;
+  invoice_item_uuid: string;
+};
 
 function OrganizationUsage() {
   const intl = useIntl();
@@ -24,12 +33,16 @@ function OrganizationUsage() {
 
   const {
     activeUserCount,
+    appSumoLicense,
     usageLimits: {
       petitions,
       users,
       // signatures
     },
   } = organization;
+
+  const appSumoPlanId = (appSumoLicense as AppSumoLicenseType).plan_id;
+  const invoiceItemUuid = (appSumoLicense as AppSumoLicenseType).invoice_item_uuid;
 
   return (
     <SettingsLayout
@@ -50,7 +63,44 @@ function OrganizationUsage() {
         </Heading>
       }
     >
-      <Box padding={8} width="100%">
+      <Stack padding={8} width="100%" spacing={8}>
+        {appSumoPlanId ? (
+          <Box maxWidth="container.lg">
+            <UpgradeAppSumoAlert
+              body={
+                <Stack spacing={1.5}>
+                  <Text fontWeight="bold">
+                    <FormattedMessage
+                      id="view.organization.current-appsumo-plan"
+                      defaultMessage="Your current plan is {plan}"
+                      values={{ plan: getAppSumoTierFromPlanId(appSumoPlanId) }}
+                    />
+                  </Text>
+                  <Text>
+                    {appSumoPlanId !== "parallel_tier4" ? (
+                      <FormattedMessage
+                        id="view.organization.upgrade-increase-limits"
+                        defaultMessage="Upgrade your plan to increase your user and petition limits."
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id="view.organization.contact-increate-limits"
+                        defaultMessage="Contact with us to increase your user and petition limits."
+                      />
+                    )}
+                  </Text>
+                </Stack>
+              }
+              contactMessage={intl.formatMessage({
+                id: "generic.upgrade-plan-support-message",
+                defaultMessage:
+                  "Hi, I would like to get more information about how to upgrade my plan.",
+              })}
+              isContactSupport={appSumoPlanId === "parallel_tier4"}
+              invoiceItemUuid={invoiceItemUuid}
+            />
+          </Box>
+        ) : null}
         <Grid
           templateColumns={{
             lg: "repeat(3, 1fr)",
@@ -83,7 +133,7 @@ function OrganizationUsage() {
             limit={signatures.limit}
           /> */}
         </Grid>
-      </Box>
+      </Stack>
     </SettingsLayout>
   );
 }
@@ -96,6 +146,7 @@ OrganizationUsage.queries = [
         organization {
           id
           activeUserCount
+          appSumoLicense
           usageLimits {
             users {
               limit

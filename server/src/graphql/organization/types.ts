@@ -236,5 +236,11 @@ export const Organization = objectType({
         };
       },
     });
+    t.nonNull.jsonObject("appSumoLicense", {
+      description: "Current appsumo license",
+      resolve: (o) => {
+        return o.appsumo_license;
+      },
+    });
   },
 });

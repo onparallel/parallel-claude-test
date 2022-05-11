@@ -1682,6 +1682,11 @@ type Organization implements Timestamps {
   activeUserCount: Int!
 
   """
+  Current appsumo license
+  """
+  appSumoLicense: JSONObject!
+
+  """
   Time when the resource was created.
   """
   createdAt: DateTime!

@@ -4990,6 +4990,11 @@
     "context": "Untitled field"
   },
   {
+    "term": "generic.upgrade",
+    "definition": "Upgrade",
+    "context": "Upgrade"
+  },
+  {
     "term": "generic.upgrade-plan-support-message",
     "definition": "Hi, I would like to get more information about how to upgrade my plan.",
     "context": "Hi, I would like to get more information about how to upgrade my plan."
@@ -9680,9 +9685,24 @@
     "context": "Teams"
   },
   {
+    "term": "view.organization.contact-increate-limits",
+    "definition": "Contact with us to increase your user and petition limits.",
+    "context": "Contact with us to increase your user and petition limits."
+  },
+  {
+    "term": "view.organization.current-appsumo-plan",
+    "definition": "Your current plan is {plan}",
+    "context": "Your current plan is {plan}"
+  },
+  {
     "term": "view.organization.title",
     "definition": "Organization",
     "context": "Organization"
+  },
+  {
+    "term": "view.organization.upgrade-increase-limits",
+    "definition": "Upgrade your plan to increase your user and petition limits.",
+    "context": "Upgrade your plan to increase your user and petition limits."
   },
   {
     "term": "view.update-browser.header",

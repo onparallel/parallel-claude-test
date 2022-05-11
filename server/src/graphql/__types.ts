@@ -1058,6 +1058,7 @@ export interface NexusGenFieldTypes {
     // field return type
     _id: number; // Int!
     activeUserCount: number; // Int!
+    appSumoLicense: NexusGenScalars["JSONObject"]; // JSONObject!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customHost: string | null; // String
     hasSsoProvider: boolean; // Boolean!
@@ -2518,6 +2519,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     _id: "Int";
     activeUserCount: "Int";
+    appSumoLicense: "JSONObject";
     createdAt: "DateTime";
     customHost: "String";
     hasSsoProvider: "Boolean";

@@ -1536,6 +1536,8 @@ export interface Organization extends Timestamps {
   _id: Scalars["Int"];
   /** The total number of active users */
   activeUserCount: Scalars["Int"];
+  /** Current appsumo license */
+  appSumoLicense: Scalars["JSONObject"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom host used in petition links and public links. */
@@ -12045,6 +12047,7 @@ export type OrganizationUsage_userQuery = {
       __typename?: "Organization";
       id: string;
       activeUserCount: number;
+      appSumoLicense: { [key: string]: any };
       name: string;
       iconUrl92?: string | null;
       usageLimits: {
@@ -26360,6 +26363,7 @@ export const OrganizationUsage_userDocument = gql`
       organization {
         id
         activeUserCount
+        appSumoLicense
         usageLimits {
           users {
             limit

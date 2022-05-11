@@ -1470,6 +1470,7 @@ export type MutationuserSignUpArgs = {
   password: Scalars["String"];
   position?: InputMaybe<Scalars["String"]>;
   role?: InputMaybe<Scalars["String"]>;
+  token?: InputMaybe<Scalars["String"]>;
 };
 
 export type MutationverifyPublicAccessArgs = {
@@ -1502,6 +1503,8 @@ export type Organization = Timestamps & {
   _id: Scalars["Int"];
   /** The total number of active users */
   activeUserCount: Scalars["Int"];
+  /** Current appsumo license */
+  appSumoLicense: Scalars["JSONObject"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom host used in petition links and public links. */
