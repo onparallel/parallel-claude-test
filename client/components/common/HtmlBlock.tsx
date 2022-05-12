@@ -1,8 +1,13 @@
 import { Box, Link } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import DOMPurify from "dompurify";
+import createDOMPurify from "dompurify";
 import parse, { domToReact, Element, HTMLReactParserOptions } from "html-react-parser";
 import { useMemo } from "react";
+
+const DOMPurify = createDOMPurify(
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  typeof window === "undefined" ? (new (require("jsdom").JSDOM)("").window as any) : window
+);
 
 export const HtmlBlock = chakraForwardRef<"div", { dangerousInnerHtml: string }>(function HtmlBlock(
   { children, dangerousInnerHtml: html, ...props },
