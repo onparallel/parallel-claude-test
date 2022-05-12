@@ -30,6 +30,7 @@ import {
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { isInsecureBrowser } from "@parallel/utils/isInsecureBrowser";
+import jwtDecode from "jwt-decode";
 import {
   GetServerSidePropsContext,
   GetServerSidePropsResult,
@@ -49,6 +50,7 @@ export type HandleNewPublicPetitionProps = {
 function PublicPetitionLink({
   slug,
   publicPetitionLink,
+  prefill,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
 
@@ -57,6 +59,8 @@ function PublicPetitionLink({
   const [step, setStep] = useState<PublicPetitionLinkSteps>("INITIAL");
 
   const [submittedData, setSubmittedData] = useState<PublicPetitionInitialFormInputs>();
+
+  const defaultValues = prefill ? jwtDecode<PublicPetitionInitialFormInputs>(prefill) : undefined;
 
   const {
     description,
@@ -104,6 +108,7 @@ function PublicPetitionLink({
           contactLastName: _data?.lastName ?? "",
           contactEmail: _data?.email ?? "",
           force,
+          prefill,
         },
       });
 
@@ -252,6 +257,7 @@ function PublicPetitionLink({
                 onSubmit={onSubmit}
                 isLoading={loading}
                 isDisabled={!publicPetitionLink.isAvailable}
+                defaultValues={defaultValues}
               />
             )}
           </SimpleGrid>
@@ -308,6 +314,7 @@ PublicPetitionLink.mutations = [
       $contactLastName: String!
       $contactEmail: String!
       $force: Boolean
+      $prefill: String
     ) {
       publicCreateAndSendPetitionFromPublicLink(
         slug: $slug
@@ -315,6 +322,7 @@ PublicPetitionLink.mutations = [
         contactLastName: $contactLastName
         contactEmail: $contactEmail
         force: $force
+        prefill: $prefill
       )
     }
   `,
@@ -327,8 +335,8 @@ PublicPetitionLink.mutations = [
 
 PublicPetitionLink.queries = [
   gql`
-    query PublicPetitionLink_publicPetitionLinkBySlug($slug: ID!) {
-      publicPetitionLinkBySlug(slug: $slug) {
+    query PublicPetitionLink_publicPetitionLinkBySlug($slug: ID!, $prefill: String) {
+      publicPetitionLinkBySlug(slug: $slug, prefill: $prefill) {
         ...PublicPetitionLink_PublicPublicPetitionLink
       }
     }
@@ -338,10 +346,11 @@ PublicPetitionLink.queries = [
 
 export async function getServerSideProps({
   req,
-  query: { slug },
+  query: { slug, prefill },
   locale,
 }: GetServerSidePropsContext): Promise<
   GetServerSidePropsResult<{
+    prefill: string | null;
     slug: string;
     publicPetitionLink: PublicPetitionLink_PublicPublicPetitionLinkFragment;
   }>
@@ -361,11 +370,18 @@ export async function getServerSideProps({
       query: PublicPetitionLink_publicPetitionLinkBySlugDocument,
       variables: {
         slug: slug as string,
+        prefill: (prefill ?? null) as string | null,
       },
     });
 
     return data?.publicPetitionLinkBySlug
-      ? { props: { slug: slug as string, publicPetitionLink: data.publicPetitionLinkBySlug } }
+      ? {
+          props: {
+            slug: slug as string,
+            publicPetitionLink: data.publicPetitionLinkBySlug,
+            prefill: (prefill ?? null) as string | null,
+          },
+        }
       : { notFound: true };
   } catch (err) {
     return {

@@ -42,6 +42,7 @@ interface PublicPetitionInitialFormProps {
   onSubmit: SubmitHandler<PublicPetitionInitialFormInputs>;
   isLoading: boolean;
   isDisabled: boolean;
+  defaultValues?: PublicPetitionInitialFormInputs;
 }
 
 export function PublicPetitionInitialForm({
@@ -52,6 +53,7 @@ export function PublicPetitionInitialForm({
   onSubmit,
   isLoading,
   isDisabled,
+  defaultValues,
 }: PublicPetitionInitialFormProps) {
   const intl = useIntl();
 
@@ -81,7 +83,7 @@ export function PublicPetitionInitialForm({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<PublicPetitionInitialFormInputs>();
+  } = useForm<PublicPetitionInitialFormInputs>({ defaultValues });
 
   return (
     <>

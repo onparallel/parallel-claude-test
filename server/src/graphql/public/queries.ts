@@ -81,6 +81,7 @@ export const publicPetitionLinkBySlug = queryField("publicPetitionLinkBySlug", {
   type: nullable("PublicPublicPetitionLink"),
   args: {
     slug: nonNull(idArg()),
+    prefill: nullable(stringArg()),
   },
   resolve: async (_, { slug }, ctx) => {
     const publicLink = await ctx.petitions.loadPublicPetitionLinkBySlug(slug);

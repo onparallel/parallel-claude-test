@@ -3983,6 +3983,7 @@ export interface NexusGenArgTypes {
       contactFirstName: string; // String!
       contactLastName: string; // String!
       force?: boolean | null; // Boolean
+      prefill?: string | null; // String
       slug: string; // ID!
     };
     publicCreateFileUploadReply: {
@@ -4585,6 +4586,7 @@ export interface NexusGenArgTypes {
     };
     publicPetitionLinkBySlug: {
       // args
+      prefill?: string | null; // String
       slug: string; // ID!
     };
     publicTask: {

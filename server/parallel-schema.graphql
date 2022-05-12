@@ -995,6 +995,7 @@ type Mutation {
     Set to true to force the creation + send of a new petition if the contact already has an active access on this public link
     """
     force: Boolean
+    prefill: String
     slug: ID!
   ): Result!
 
@@ -4002,7 +4003,7 @@ type Query {
   The comments for this field.
   """
   publicPetitionField(keycode: ID!, petitionFieldId: GID!): PublicPetitionField!
-  publicPetitionLinkBySlug(slug: ID!): PublicPublicPetitionLink
+  publicPetitionLinkBySlug(prefill: String, slug: ID!): PublicPublicPetitionLink
   publicTask(keycode: ID!, taskId: GID!): Task!
   publicTemplateCategories: [String!]!
   realMe: User!

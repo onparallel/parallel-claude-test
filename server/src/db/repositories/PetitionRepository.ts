@@ -1448,7 +1448,7 @@ export class PetitionRepository extends BaseRepository {
 
     const field = await this.loadField(data.petition_field_id);
     if (!field) {
-      throw new Error("Petition field not found");
+      throw new Error(`PetitionField:${data.petition_field_id} not found`);
     }
     this.loadRepliesForField.dataloader.clear(data.petition_field_id);
     const [[reply]] = await Promise.all([

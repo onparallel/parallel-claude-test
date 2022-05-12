@@ -19,6 +19,7 @@ import { stallFor } from "../../util/promises/stallFor";
 import { and, chain, checkClientServerToken } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { presendPetition } from "../helpers/presendPetition";
+import { prefillPetition } from "../helpers/prefillPetition";
 import { RESULT } from "../helpers/result";
 import { jsonArg } from "../helpers/scalars";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
@@ -26,6 +27,7 @@ import { validEmail } from "../helpers/validators/validEmail";
 import { validRichTextContent } from "../helpers/validators/validRichTextContent";
 import { fieldAttachmentBelongsToField, fieldsHaveCommentsEnabled } from "../petition/authorizers";
 import { tasksAreOfType } from "../task/authorizers";
+import { decode, JwtPayload } from "jsonwebtoken";
 import {
   authenticatePublicAccess,
   commentsBelongsToAccess,
@@ -591,6 +593,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
             "Set to true to force the creation + send of a new petition if the contact already has an active access on this public link",
         })
       ),
+      prefill: nullable(stringArg()),
     },
     authorize: chain(
       validPublicPetitionLinkSlug("slug"),
@@ -683,6 +686,13 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
 
         return { messages: messages ?? [], result, petition };
       });
+
+      if (isDefined(args.prefill)) {
+        const payload = decode(args.prefill) as JwtPayload;
+        if ("replies" in payload) {
+          await prefillPetition(petition.id, payload.replies, owner.user, ctx);
+        }
+      }
 
       // trigger emails and events
       // in this case the messages array should always have one unscheduled message, so there is no need to check what to send

@@ -1074,6 +1074,7 @@ export interface MutationpublicCreateAndSendPetitionFromPublicLinkArgs {
   contactFirstName: Scalars["String"];
   contactLastName: Scalars["String"];
   force?: InputMaybe<Scalars["Boolean"]>;
+  prefill?: InputMaybe<Scalars["String"]>;
   slug: Scalars["ID"];
 }
 
@@ -2959,6 +2960,7 @@ export interface QuerypublicPetitionFieldArgs {
 }
 
 export interface QuerypublicPetitionLinkBySlugArgs {
+  prefill?: InputMaybe<Scalars["String"]>;
   slug: Scalars["ID"];
 }
 
@@ -19672,6 +19674,7 @@ export type PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation
   contactLastName: Scalars["String"];
   contactEmail: Scalars["String"];
   force?: InputMaybe<Scalars["Boolean"]>;
+  prefill?: InputMaybe<Scalars["String"]>;
 }>;
 
 export type PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation = {
@@ -19687,6 +19690,7 @@ export type PublicPetitionLink_publicSendReminderMutation = { publicSendReminder
 
 export type PublicPetitionLink_publicPetitionLinkBySlugQueryVariables = Exact<{
   slug: Scalars["ID"];
+  prefill?: InputMaybe<Scalars["String"]>;
 }>;
 
 export type PublicPetitionLink_publicPetitionLinkBySlugQuery = {
@@ -27371,6 +27375,7 @@ export const PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkDocumen
     $contactLastName: String!
     $contactEmail: String!
     $force: Boolean
+    $prefill: String
   ) {
     publicCreateAndSendPetitionFromPublicLink(
       slug: $slug
@@ -27378,6 +27383,7 @@ export const PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkDocumen
       contactLastName: $contactLastName
       contactEmail: $contactEmail
       force: $force
+      prefill: $prefill
     )
   }
 ` as unknown as DocumentNode<
@@ -27393,8 +27399,8 @@ export const PublicPetitionLink_publicSendReminderDocument = gql`
   PublicPetitionLink_publicSendReminderMutationVariables
 >;
 export const PublicPetitionLink_publicPetitionLinkBySlugDocument = gql`
-  query PublicPetitionLink_publicPetitionLinkBySlug($slug: ID!) {
-    publicPetitionLinkBySlug(slug: $slug) {
+  query PublicPetitionLink_publicPetitionLinkBySlug($slug: ID!, $prefill: String) {
+    publicPetitionLinkBySlug(slug: $slug, prefill: $prefill) {
       ...PublicPetitionLink_PublicPublicPetitionLink
     }
   }
