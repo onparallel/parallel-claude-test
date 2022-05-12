@@ -255,7 +255,7 @@ export const Organization = objectType({
       type: "OrgLicense",
       description: "Current license for the organization",
       resolve: (o) => {
-        return o.appsumo_license
+        return o.appsumo_license && o.appsumo_license.action !== "refund"
           ? {
               source: "APPSUMO",
               name: o.appsumo_license.parallel_tier,
