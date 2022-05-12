@@ -1,6 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
 import {
-  Box,
   Button,
   CloseButton,
   Heading,
@@ -388,7 +387,7 @@ function _PetitionSettings({
     <Stack padding={4} spacing={2}>
       {petition.__typename === "PetitionTemplate" ? (
         <>
-          <Heading as="h5" size="sm">
+          <Heading as="h5" size="sm" marginY={1.5}>
             <FormattedMessage
               id="component.petition-settings.adjustments-template"
               defaultMessage="Template settings"
@@ -436,14 +435,21 @@ function _PetitionSettings({
             </InputGroup>
           </SettingsRowButton>
           <Divider paddingTop={2} />
-          <Heading as="h5" size="sm" paddingTop={2}>
+          <Heading as="h5" size="sm" paddingTop={2.5} paddingBottom={1.5}>
             <FormattedMessage
-              id="component.petition-settings.adjustments-petitions"
+              id="component.petition-settings.adjustments-for-petitions"
               defaultMessage="Petition settings"
             />
           </Heading>
         </>
-      ) : null}
+      ) : (
+        <Heading as="h5" size="sm" marginY={1.5}>
+          <FormattedMessage
+            id="component.petition-settings.adjustments-petitions"
+            defaultMessage="Petition settings"
+          />
+        </Heading>
+      )}
       <SettingsRow
         controlId="petition-locale"
         isDisabled={petition.isRestricted}
@@ -610,6 +616,36 @@ function _PetitionSettings({
           controlId="hide-recipient-view-contents"
         />
       ) : null}
+      {petition.__typename === "Petition" && petition.fromTemplateId ? (
+        <Alert status="info" background="transparent">
+          <AlertIcon />
+          <AlertDescription fontStyle="italic">
+            <FormattedMessage
+              id="component.petition-settings.from-template-information"
+              defaultMessage="Petition created from the {name}."
+              values={{
+                name:
+                  petition.fromTemplateId && !petition.fromTemplate ? (
+                    <Text textStyle="hint" as="span">
+                      <FormattedMessage
+                        id="component.petition-settings.template-not-available"
+                        defaultMessage="Template not available"
+                      />
+                    </Text>
+                  ) : (
+                    <Text textStyle={petition.fromTemplate?.name ? undefined : "hint"} as="span">
+                      {petition.fromTemplate?.name ??
+                        intl.formatMessage({
+                          id: "generic.unnamed-template",
+                          defaultMessage: "Unnamed template",
+                        })}
+                    </Text>
+                  ),
+              }}
+            />
+          </AlertDescription>
+        </Alert>
+      ) : null}
     </Stack>
   );
 }
@@ -654,6 +690,11 @@ const fragments = {
         currentSignatureRequest {
           id
           status
+        }
+        fromTemplateId
+        fromTemplate {
+          id
+          name
         }
       }
       ... on PetitionTemplate {

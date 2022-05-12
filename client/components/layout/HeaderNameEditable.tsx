@@ -40,7 +40,18 @@ export const HeaderNameEditable = Object.assign(
     useEffect(() => {
       if (router.query.new === "true") {
         setTimeout(() => editablePreviewRef.current?.focus());
-        router.replace(router.asPath.split("?")[0]);
+
+        const query = router.query;
+        delete query.new;
+
+        router.replace(
+          {
+            pathname: router.pathname,
+            query,
+          },
+          undefined,
+          { shallow: true }
+        );
       }
     }, []);
 

@@ -1681,6 +1681,8 @@ export type Petition = PetitionBase & {
   fieldCount: Scalars["Int"];
   /** The definition of the petition fields. */
   fields: Array<PetitionField>;
+  /** The template used for this petition */
+  fromTemplate: Maybe<PetitionTemplate>;
   /** The template GID used for this petition */
   fromTemplateId: Maybe<Scalars["GID"]>;
   /** The ID of the petition or template. */

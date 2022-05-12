@@ -1795,6 +1795,21 @@
     "context": "{modifier, select, ALL {start with} other {starts with}}"
   },
   {
+    "term": "component.petition-from-template-dialog.body",
+    "definition": "Esta petición se ha creado a partir de una plantilla. Los cambios sobre campos o ajustes, afectarán <b>sólamente a esta petición</b>.",
+    "context": "This petition has been created from a template. Changes to fields or settings will <b>only affect this petition</b>."
+  },
+  {
+    "term": "component.petition-from-template-dialog.body-2",
+    "definition": "Si quieres que tus cambios se mantengan en todas las peticiones, hazlos desde la plantilla.",
+    "context": "If you want your changes to be maintained in all petitions, make them from the template."
+  },
+  {
+    "term": "component.petition-from-template-dialog.title",
+    "definition": "Editar petición",
+    "context": "Edit petition"
+  },
+  {
     "term": "component.petition-header.compose-tab.readonly",
     "definition": "Edición restringida. Para realizar cambios, puede desactivar la protección en la pestaña Ajustes.",
     "context": "Edition restricted. To make changes, you can disable the protection on the Settings tab."
@@ -2060,8 +2075,13 @@
     "context": "Fields not shown to the recipient because the visibility conditions are not met."
   },
   {
-    "term": "component.petition-settings.adjustments-petitions",
+    "term": "component.petition-settings.adjustments-for-petitions",
     "definition": "Ajustes para las peticiones",
+    "context": "Petition settings"
+  },
+  {
+    "term": "component.petition-settings.adjustments-petitions",
+    "definition": "Ajustes de la petición",
     "context": "Petition settings"
   },
   {
@@ -2083,6 +2103,11 @@
     "term": "component.petition-settings.forward-security-description",
     "definition": "La protección de reenvío es una medida de seguridad que protege la privacidad de los datos subidos por el destinatario en el caso que compartan por error su enlace personal.",
     "context": "Forward security is a security measure that protects the privacy of the data uploaded by the recipient in case they share their personal link by mistake."
+  },
+  {
+    "term": "component.petition-settings.from-template-information",
+    "definition": "Petición creada a partir de {name}.",
+    "context": "Petition created from the {name}."
   },
   {
     "term": "component.petition-settings.hide-recipient-view-contents",
@@ -2168,6 +2193,11 @@
     "term": "component.petition-settings.skip-forward-security-warning",
     "definition": "Si deshabilitas la protección de reenvío los destinatarios podrán compartir sus enlaces y otras personas podrían acceder a los datos envíados hasta la fecha.",
     "context": "If you disable Forward Security recipients will be able to share their links and other people might be able to access the data submitted so far."
+  },
+  {
+    "term": "component.petition-settings.template-not-available",
+    "definition": "Plantilla no disponible",
+    "context": "Template not available"
   },
   {
     "term": "component.petition-sharing-dialog.subscribe",
@@ -3610,11 +3640,6 @@
     "context": "If you continue, the signature will be sent using the <b>{name}</b> test environment and will have no legal validity."
   },
   {
-    "term": "component.test-signature-dialog.dont-show-again",
-    "definition": "No volver a mostrar este mensaje",
-    "context": "Do not show this message again"
-  },
-  {
     "term": "component.test-signature-dialog.title",
     "definition": "Firma de prueba",
     "context": "Test signature"
@@ -4370,6 +4395,11 @@
     "context": "Copy link"
   },
   {
+    "term": "generic.create-petition",
+    "definition": "Crear petición",
+    "context": "Create petition"
+  },
+  {
     "term": "generic.created-at",
     "definition": "Fecha de creación",
     "context": "Created at"
@@ -4408,6 +4438,11 @@
     "term": "generic.dont-ask-again",
     "definition": "No preguntar más",
     "context": "Don't ask again"
+  },
+  {
+    "term": "generic.dont-show-message-again",
+    "definition": "No volver a mostrar este mensaje",
+    "context": "Do not show this message again"
   },
   {
     "term": "generic.download",
@@ -5060,11 +5095,6 @@
     "context": "Upgrade to enable this feature."
   },
   {
-    "term": "generic.use-template",
-    "definition": "Utilizar plantilla",
-    "context": "Use template"
-  },
-  {
     "term": "generic.users",
     "definition": "Usuarios",
     "context": "Users"
@@ -5503,6 +5533,11 @@
     "term": "page.petitions-list.actions-share",
     "definition": "Compartir",
     "context": "Share"
+  },
+  {
+    "term": "page.preview.petition-created-toast",
+    "definition": "Petición creada a partir de una plantilla.",
+    "context": "Petition created from a template."
   },
   {
     "term": "page.preview.template-only-cache-alert",

@@ -21,6 +21,7 @@ import { useSendPetitionHandler } from "@parallel/components/petition-common/use
 import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeFieldTypeDialog";
 import { useConfirmChangeShortTextFormatDialog } from "@parallel/components/petition-compose/dialogs/ConfirmChangeShortTextFormatDialog";
 import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/dialogs/ConfirmDeleteFieldDialog";
+import { useHandledPetitionFromTemplateDialog } from "@parallel/components/petition-compose/dialogs/PetitionFromTemplateDialog";
 import { usePublicTemplateDialog } from "@parallel/components/petition-compose/dialogs/PublicTemplateDialog";
 import { useReferencedFieldDialog } from "@parallel/components/petition-compose/dialogs/ReferencedFieldDialog";
 import { PetitionComposeField } from "@parallel/components/petition-compose/PetitionComposeField";
@@ -60,6 +61,7 @@ import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionStateWrapper, withPetitionState } from "@parallel/utils/usePetitionState";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
+import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { zip } from "remeda";
@@ -71,6 +73,8 @@ type FieldSelection = PetitionCompose_PetitionFieldFragment;
 
 function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const intl = useIntl();
+  const router = useRouter();
+  const { query } = router;
 
   const {
     data: { me, realMe },
@@ -110,6 +114,28 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   useEffect(() => {
     if (isPublicTemplate) {
       showPublicTemplateDialog({});
+    }
+  }, []);
+
+  const showPetitionFromTemplateDialog = useHandledPetitionFromTemplateDialog();
+
+  useEffect(() => {
+    if (query.fromTemplateId) {
+      try {
+        showPetitionFromTemplateDialog();
+      } catch {}
+
+      const query = router.query;
+      delete query.fromTemplateId;
+
+      router.replace(
+        {
+          pathname: router.pathname,
+          query,
+        },
+        undefined,
+        { shallow: true }
+      );
     }
   }, []);
 

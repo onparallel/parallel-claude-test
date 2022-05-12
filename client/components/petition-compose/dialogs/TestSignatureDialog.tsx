@@ -48,7 +48,7 @@ function TestSignatureDialog({
           </Text>
           <Checkbox {...register("dontShow")}>
             <FormattedMessage
-              id="component.test-signature-dialog.dont-show-again"
+              id="generic.dont-show-message-again"
               defaultMessage="Do not show this message again"
             />
           </Checkbox>

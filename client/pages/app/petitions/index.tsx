@@ -151,7 +151,9 @@ function Petitions() {
         const petitionId = await createPetition({
           petitionId: selected[0],
         });
-        goToPetition(petitionId, "preview", { query: { new: "true" } });
+        goToPetition(petitionId, "preview", {
+          query: { new: "true", fromTemplateId: selected[0] },
+        });
       } catch {}
     },
     [petitions, selected]
@@ -471,7 +473,9 @@ function usePetitionListActions({
           onClick: onUseTemplateClick,
           isDisabled: selectedCount !== 1,
           leftIcon: <PaperPlaneIcon />,
-          children: <FormattedMessage id="generic.use-template" defaultMessage="Use template" />,
+          children: (
+            <FormattedMessage id="generic.create-petition" defaultMessage="Create petition" />
+          ),
         },
     {
       key: "delete",

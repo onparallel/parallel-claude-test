@@ -10,7 +10,9 @@ export function PetitionPreviewOnlyAlert(props: AlertProps) {
           id="page.preview.template-only-cache-alert"
           defaultMessage="<b>Preview only</b> - Changes you add as replies or comments will not be saved. To complete and submit this template click on <b>{button}</b>."
           values={{
-            button: <FormattedMessage id="generic.use-template" defaultMessage="Use template" />,
+            button: (
+              <FormattedMessage id="generic.create-petition" defaultMessage="Create petition" />
+            ),
           }}
         />
       </Text>

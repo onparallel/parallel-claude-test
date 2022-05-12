@@ -92,7 +92,7 @@ export function TemplateDetailsModal({
     const petitionId = await createPetition({
       petitionId: template.id,
     });
-    goToPetition(petitionId, "preview", { query: { new: "true" } });
+    goToPetition(petitionId, "preview", { query: { new: "true", fromTemplateId: template.id } });
   };
 
   const handleCloneTemplate = async () => {
@@ -119,6 +119,41 @@ export function TemplateDetailsModal({
       }
     } catch {}
   };
+
+  const createPetitionButton = (
+    <Button
+      width="100%"
+      data-action="use-template"
+      colorScheme={template.isPublic ? undefined : "purple"}
+      leftIcon={<PaperPlaneIcon />}
+      onClick={handleCreatePetition}
+    >
+      <FormattedMessage id="generic.create-petition" defaultMessage="Create petition" />
+    </Button>
+  );
+
+  const sharePetitionButton = (
+    <Button width="100%" onClick={handlePetitionSharingClick} leftIcon={<UserArrowIcon />}>
+      <FormattedMessage
+        id="component.template-header.share-label"
+        defaultMessage="Share template"
+      />
+    </Button>
+  );
+
+  const saveToEditButton = (
+    <Button
+      width="100%"
+      colorScheme={template.isPublic ? "purple" : undefined}
+      onClick={handleCloneTemplate}
+      leftIcon={<CopyIcon />}
+    >
+      <FormattedMessage
+        id="component.template-details-modal.save-to-edit"
+        defaultMessage="Save to edit"
+      />
+    </Button>
+  );
 
   return (
     <Modal size="4xl" {...props}>
@@ -189,12 +224,7 @@ export function TemplateDetailsModal({
             <Flex marginY={6} flexDirection={{ base: "column-reverse", md: "row" }} gridGap={3}>
               <Box flex="1">
                 {template.isPublic ? (
-                  <Button width="100%" onClick={handleCloneTemplate} leftIcon={<CopyIcon />}>
-                    <FormattedMessage
-                      id="component.template-details-modal.save-to-edit"
-                      defaultMessage="Save to edit"
-                    />
-                  </Button>
+                  createPetitionButton
                 ) : template.publicLink?.isActive ? (
                   <Button
                     width="100%"
@@ -204,28 +234,11 @@ export function TemplateDetailsModal({
                     <FormattedMessage id="generic.copy-link" defaultMessage="Copy link" />
                   </Button>
                 ) : (
-                  <Button
-                    width="100%"
-                    onClick={handlePetitionSharingClick}
-                    leftIcon={<UserArrowIcon />}
-                  >
-                    <FormattedMessage
-                      id="component.template-header.share-label"
-                      defaultMessage="Share template"
-                    />
-                  </Button>
+                  sharePetitionButton
                 )}
               </Box>
               <HStack flex="1" spacing={3}>
-                <Button
-                  width="100%"
-                  data-action="use-template"
-                  colorScheme="purple"
-                  leftIcon={<PaperPlaneIcon />}
-                  onClick={handleCreatePetition}
-                >
-                  <FormattedMessage id="generic.use-template" defaultMessage="Use template" />
-                </Button>
+                {template.isPublic ? saveToEditButton : createPetitionButton}
                 {isFromPublicTemplates && !template.publicLink?.isActive ? null : (
                   <Menu placement="bottom-end">
                     <Tooltip

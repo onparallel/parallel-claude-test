@@ -296,6 +296,14 @@ export const Petition = objectType({
       description: "The template GID used for this petition",
       resolve: (root) => root.from_template_id,
     });
+    t.nullable.field("fromTemplate", {
+      type: "PetitionTemplate",
+      description: "The template used for this petition",
+      resolve: async (root, _, ctx) => {
+        const templateId = root.from_template_id;
+        return templateId ? await ctx.petitions.loadPetition(templateId) : null;
+      },
+    });
   },
 });
 

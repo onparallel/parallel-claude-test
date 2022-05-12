@@ -79,6 +79,20 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
     [petitionId]
   );
 
+  useEffect(() => {
+    if (query.fromTemplateId) {
+      toast({
+        id: "petition-created-toast",
+        title: intl.formatMessage({
+          id: "page.preview.petition-created-toast",
+          defaultMessage: "Petition created from a template.",
+        }),
+        status: "success",
+        isClosable: true,
+      });
+    }
+  }, []);
+
   const petition = data!.petition as PetitionPreview_PetitionBaseFragment;
   const isPetition = petition.__typename === "Petition";
 

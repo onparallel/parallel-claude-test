@@ -44,10 +44,6 @@ export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
 
 export const IntegrationTypeValues = ["SIGNATURE", "SSO", "USER_PROVISIONING"] as IntegrationType[];
 
-export type LicenseCodeStatus = "PENDING" | "REDEEMED" | "EXPIRED";
-
-export const LicenseCodeStatusValues = ["PENDING", "REDEEMED", "EXPIRED"] as LicenseCodeStatus[];
-
 export type OrganizationStatus = "DEV" | "DEMO" | "ACTIVE" | "CHURNED" | "ROOT";
 
 export const OrganizationStatusValues = [
@@ -328,7 +324,6 @@ export interface TableTypes {
   feature_flag: FeatureFlag;
   feature_flag_override: FeatureFlagOverride;
   file_upload: FileUpload;
-  license_code: LicenseCode;
   organization: Organization;
   organization_usage_limit: OrganizationUsageLimit;
   org_integration: OrgIntegration;
@@ -374,7 +369,6 @@ export interface TableCreateTypes {
   feature_flag: CreateFeatureFlag;
   feature_flag_override: CreateFeatureFlagOverride;
   file_upload: CreateFileUpload;
-  license_code: CreateLicenseCode;
   organization: CreateOrganization;
   organization_usage_limit: CreateOrganizationUsageLimit;
   org_integration: CreateOrgIntegration;
@@ -420,7 +414,6 @@ export interface TablePrimaryKeys {
   feature_flag: "id";
   feature_flag_override: "id";
   file_upload: "id";
-  license_code: "id";
   organization: "id";
   organization_usage_limit: "id";
   org_integration: "id";
@@ -609,23 +602,6 @@ export type CreateFileUpload = PartialProps<
   | "file_deleted_at"
 >;
 
-export interface LicenseCode {
-  id: number; // int4
-  source: string; // varchar
-  code: string; // varchar
-  details: any; // jsonb
-  status: LicenseCodeStatus; // license_code_status
-  created_at: Date; // timestamptz
-  created_by: Maybe<string>; // varchar
-  updated_at: Date; // timestamptz
-  updated_by: Maybe<string>; // varchar
-}
-
-export type CreateLicenseCode = PartialProps<
-  Omit<LicenseCode, "id">,
-  "details" | "status" | "created_at" | "created_by" | "updated_at" | "updated_by"
->;
-
 export interface Organization {
   id: number; // int4
   name: string; // varchar
@@ -642,7 +618,7 @@ export interface Organization {
   usage_details: Maybe<any>; // jsonb
   preferred_tone: Tone; // tone
   icon_public_file_id: Maybe<number>; // int4
-  appsumo_license: Maybe<any>; // jsonb
+  appsumo_license: any; // jsonb
 }
 
 export type CreateOrganization = PartialProps<

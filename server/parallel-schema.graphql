@@ -2005,6 +2005,11 @@ type Petition implements PetitionBase {
   fields: [PetitionField!]!
 
   """
+  The template used for this petition
+  """
+  fromTemplate: PetitionTemplate
+
+  """
   The template GID used for this petition
   """
   fromTemplateId: GID

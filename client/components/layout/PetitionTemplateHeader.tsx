@@ -89,7 +89,9 @@ export const PetitionTemplateHeader = Object.assign(
         const petitionId = await createPetition({
           petitionId: petition.id,
         });
-        goToPetition(petitionId, "preview", { query: { new: "true" } });
+        goToPetition(petitionId, "preview", {
+          query: { new: "true", fromTemplateId: petition.id },
+        });
       } catch {}
     };
 
@@ -217,7 +219,7 @@ export const PetitionTemplateHeader = Object.assign(
           />
           <Spacer minWidth={4} />
           <Button flexShrink={0} onClick={handleUseTemplate} data-action="use-template">
-            <FormattedMessage id="generic.use-template" defaultMessage="Use template" />
+            <FormattedMessage id="generic.create-petition" defaultMessage="Create petition" />
           </Button>
           <Menu>
             <Tooltip

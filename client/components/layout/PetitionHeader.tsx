@@ -415,7 +415,14 @@ export const PetitionHeader = Object.assign(
         <PetitionHeaderTabs>
           {sections.map(({ section, label, rightIcon, attributes }) => {
             return (
-              <NakedLink key={section} href={`/app/petitions/${petition.id}/${section}`}>
+              <NakedLink
+                key={section}
+                href={`/app/petitions/${petition.id}/${section}${
+                  router.query.fromTemplateId
+                    ? `?fromTemplateId=${router.query.fromTemplateId}`
+                    : ""
+                }`}
+              >
                 <PetitionHeaderTab
                   isActive={current === section}
                   rightIcon={rightIcon}

@@ -1723,6 +1723,8 @@ export interface Petition extends PetitionBase {
   fieldCount: Scalars["Int"];
   /** The definition of the petition fields. */
   fields: Array<PetitionField>;
+  /** The template used for this petition */
+  fromTemplate?: Maybe<PetitionTemplate>;
   /** The template GID used for this petition */
   fromTemplateId?: Maybe<Scalars["GID"]>;
   /** The ID of the petition or template. */
@@ -8283,6 +8285,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   status: PetitionStatus;
   deadline?: string | null;
+  fromTemplateId?: string | null;
   id: string;
   locale: PetitionLocale;
   skipForwardSecurity: boolean;
@@ -8295,6 +8298,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
     id: string;
     status: PetitionSignatureRequestStatus;
   } | null;
+  fromTemplate?: { __typename?: "PetitionTemplate"; id: string; name?: string | null } | null;
   accesses: Array<{
     __typename?: "PetitionAccess";
     status: PetitionAccessStatus;
@@ -14743,6 +14747,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   isRestricted: boolean;
   name?: string | null;
   deadline?: string | null;
+  fromTemplateId?: string | null;
   locale: PetitionLocale;
   skipForwardSecurity: boolean;
   isRecipientViewContentsHidden: boolean;
@@ -14824,6 +14829,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     id: string;
     status: PetitionSignatureRequestStatus;
   } | null;
+  fromTemplate?: { __typename?: "PetitionTemplate"; id: string; name?: string | null } | null;
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -15094,6 +15100,7 @@ export type PetitionCompose_updatePetitionMutation = {
         name?: string | null;
         status: PetitionStatus;
         deadline?: string | null;
+        fromTemplateId?: string | null;
         locale: PetitionLocale;
         skipForwardSecurity: boolean;
         isRecipientViewContentsHidden: boolean;
@@ -15107,6 +15114,7 @@ export type PetitionCompose_updatePetitionMutation = {
           id: string;
           status: PetitionSignatureRequestStatus;
         } | null;
+        fromTemplate?: { __typename?: "PetitionTemplate"; id: string; name?: string | null } | null;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
@@ -15650,6 +15658,7 @@ export type PetitionCompose_petitionQuery = {
         isRestricted: boolean;
         name?: string | null;
         deadline?: string | null;
+        fromTemplateId?: string | null;
         locale: PetitionLocale;
         skipForwardSecurity: boolean;
         isRecipientViewContentsHidden: boolean;
@@ -15731,6 +15740,7 @@ export type PetitionCompose_petitionQuery = {
           id: string;
           status: PetitionSignatureRequestStatus;
         } | null;
+        fromTemplate?: { __typename?: "PetitionTemplate"; id: string; name?: string | null } | null;
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
@@ -23040,6 +23050,11 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
       currentSignatureRequest {
         id
         status
+      }
+      fromTemplateId
+      fromTemplate {
+        id
+        name
       }
     }
     ... on PetitionTemplate {
