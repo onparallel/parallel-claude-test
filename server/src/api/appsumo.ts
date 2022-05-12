@@ -93,7 +93,7 @@ export const appsumo = Router()
         if (isDefined(org)) {
           // first we need to make sure this organization was not created previously with another AppSumo purchase UNLESS the last action was a refund
           // "Sumo-lings SHOULD NOT be able to activate multiple AppSumo licenses with the same email."
-          if (isDefined(org.appsumo_license.uuid) && org.appsumo_license.action !== "refund") {
+          if (isDefined(org.appsumo_license) && org.appsumo_license.action !== "refund") {
             return res.status(401).json({
               message: "The email is already registered in Parallel with an active license",
             });
@@ -147,6 +147,11 @@ export const appsumo = Router()
 
           await req.context.tiers.updateOrganizationTier(org, "FREE", `AppSumo:${payload.uuid}`);
         }
+        await req.context.licenseCodes.updateAppSumoLicenseCodeByUUID(
+          payload.uuid,
+          "EXPIRED",
+          `AppSumo:${payload.uuid}`
+        );
         return res.status(200).json({ message: "license refunded" });
       } else {
         await req.context.organizations.updateAppSumoLicense(

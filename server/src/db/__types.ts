@@ -635,7 +635,7 @@ export interface Organization {
   usage_details: Maybe<any>; // jsonb
   preferred_tone: Tone; // tone
   icon_public_file_id: Maybe<number>; // int4
-  appsumo_license: any; // jsonb
+  appsumo_license: Maybe<any>; // jsonb
 }
 
 export type CreateOrganization = PartialProps<

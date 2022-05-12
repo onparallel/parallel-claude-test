@@ -164,7 +164,7 @@ export class OrganizationRepository extends BaseRepository {
       .where("id", orgId)
       .update({
         appsumo_license: this.knex.raw(
-          /* sql */ `"appsumo_license" || ?::jsonb || jsonb_build_object('events', coalesce("appsumo_license"->'events','[]'::jsonb) || ?::jsonb)`,
+          /* sql */ `coalesce("appsumo_license", '{}'::jsonb) || ?::jsonb || jsonb_build_object('events', coalesce("appsumo_license"->'events','[]'::jsonb) || ?::jsonb)`,
           [payload, payload]
         ),
         updated_at: this.now(),

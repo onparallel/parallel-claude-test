@@ -17,6 +17,10 @@ export async function up(knex: Knex): Promise<void> {
 
     t.unique(["code"], { indexName: "license_code__code_unique" });
   });
+
+  await knex.raw(/* sql */ `
+    create index license_code__appsumo_uuid__index on license_code ((details ->> 'uuid'::text)) where source = 'AppSumo';
+  `);
 }
 
 export async function down(knex: Knex): Promise<void> {
