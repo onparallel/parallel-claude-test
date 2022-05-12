@@ -114,7 +114,9 @@ export const appsumo = Router()
 
           return res.status(201).json({
             message: "license activated",
-            redirect_url: `${req.context.config.misc.parallelUrl}/login`,
+            redirect_url: `${req.context.config.misc.parallelUrl}/login?${new URLSearchParams({
+              redirect: "/app/organization/usage",
+            })}`,
           });
         } else {
           // user does not have a Parallel account.
