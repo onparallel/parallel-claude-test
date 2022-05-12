@@ -3,7 +3,7 @@ import { Box, Center, Flex, Image, keyframes, Stack, useCounter } from "@chakra-
 import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { Steps } from "@parallel/components/common/Steps";
-import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { withApolloData } from "@parallel/components/common/withApolloData";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicSignupForm } from "@parallel/components/public/signup/PublicSignupForm";
 import { PublicSignupFormExperience } from "@parallel/components/public/signup/PublicSignupFormExperience";
@@ -15,8 +15,10 @@ import {
   Signup_publicLicenseCodeDocument,
   Signup_userSignUpDocument,
 } from "@parallel/graphql/__types";
-import { Maybe, UnwrapPromise } from "@parallel/utils/types";
+import { createApolloClient } from "@parallel/utils/apollo/client";
+import { Maybe } from "@parallel/utils/types";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import { GetServerSidePropsContext, GetServerSidePropsResult } from "next";
 import { useEffect, useRef } from "react";
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
@@ -34,7 +36,11 @@ type SignupFormData = {
   captcha: string;
 };
 
-type SignupProps = UnwrapPromise<ReturnType<typeof Signup.getInitialProps>>;
+interface SignupProps {
+  code?: string;
+  source?: string;
+  activationEmail?: string;
+}
 
 function Signup({ code, source, activationEmail }: SignupProps) {
   const intl = useIntl();
@@ -253,8 +259,8 @@ Signup.mutations = [
 
 Signup.queries = [
   gql`
-    query Signup_publicLicenseCode($code: String!) {
-      publicLicenseCode(code: $code) {
+    query Signup_publicLicenseCode($code: String!, $token: ID!) {
+      publicLicenseCode(code: $code, token: $token) {
         code
         source
         details
@@ -263,25 +269,31 @@ Signup.queries = [
   `,
 ];
 
-/* 
-  not including this empty function will trigger two Router.routeChangeComplete events,
-  causing analytics to track the pageview twice
- */
-Signup.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
-  if (isDefined(query.code) && typeof query.code === "string") {
+export async function getServerSideProps({
+  query: { code },
+  req,
+}: GetServerSidePropsContext): Promise<GetServerSidePropsResult<SignupProps>> {
+  const client = createApolloClient({}, { req });
+  if (isDefined(code) && typeof code === "string") {
     try {
-      const { data } = await fetchQuery(Signup_publicLicenseCodeDocument, {
-        variables: { code: query.code },
-        ignoreCache: true,
+      const { data } = await client.query({
+        query: Signup_publicLicenseCodeDocument,
+        variables: { code, token: process.env.CLIENT_SERVER_TOKEN },
       });
-      return {
-        code: data.publicLicenseCode?.code,
-        source: data.publicLicenseCode?.source,
-        activationEmail: data.publicLicenseCode?.details.activation_email as string | undefined,
-      };
+      if (!data.publicLicenseCode) {
+        return { props: {} };
+      } else {
+        return {
+          props: {
+            code: data.publicLicenseCode.code,
+            source: data.publicLicenseCode.source,
+            activationEmail: data.publicLicenseCode.details.activation_email as string,
+          },
+        };
+      }
     } catch {}
   }
-  return {};
-};
+  return { props: {} };
+}
 
 export default withApolloData(Signup);

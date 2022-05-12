@@ -2928,6 +2928,7 @@ export interface QuerypetitionsByIdArgs {
 
 export interface QuerypublicLicenseCodeArgs {
   code: Scalars["String"];
+  token: Scalars["ID"];
 }
 
 export interface QuerypublicOrgLogoUrlArgs {
@@ -19700,6 +19701,7 @@ export type Signup_userSignUpMutation = {
 
 export type Signup_publicLicenseCodeQueryVariables = Exact<{
   code: Scalars["String"];
+  token: Scalars["ID"];
 }>;
 
 export type Signup_publicLicenseCodeQuery = {
@@ -27366,8 +27368,8 @@ export const Signup_userSignUpDocument = gql`
   }
 ` as unknown as DocumentNode<Signup_userSignUpMutation, Signup_userSignUpMutationVariables>;
 export const Signup_publicLicenseCodeDocument = gql`
-  query Signup_publicLicenseCode($code: String!) {
-    publicLicenseCode(code: $code) {
+  query Signup_publicLicenseCode($code: String!, $token: ID!) {
+    publicLicenseCode(code: $code, token: $token) {
       code
       source
       details

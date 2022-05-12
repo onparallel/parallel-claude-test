@@ -4545,6 +4545,7 @@ export interface NexusGenArgTypes {
     publicLicenseCode: {
       // args
       code: string; // String!
+      token: string; // ID!
     };
     publicOrgLogoUrl: {
       // args

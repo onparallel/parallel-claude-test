@@ -3,7 +3,7 @@ import { idArg, nonNull, nullable, objectType, queryField, stringArg } from "nex
 import { isDefined } from "remeda";
 import { getClientIp } from "request-ip";
 import { UAParser } from "ua-parser-js";
-import { authenticate, chain, ifArgDefined } from "../helpers/authorize";
+import { authenticate, chain, checkClientServerToken, ifArgDefined } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { NexusGenObjects } from "../__types";
 import { authenticatePublicAccess, fieldBelongsToAccess, taskBelongsToAccess } from "./authorizers";
@@ -108,7 +108,9 @@ export const publicLicenseCode = queryField("publicLicenseCode", {
   type: nullable("PublicLicenseCode"),
   args: {
     code: nonNull(stringArg()),
+    token: nonNull(idArg()),
   },
+  authorize: checkClientServerToken("token"),
   resolve: async (_, { code }, ctx) => {
     return await ctx.licenseCodes.loadLicenseCode(code);
   },

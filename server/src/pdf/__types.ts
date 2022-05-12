@@ -2838,6 +2838,7 @@ export type QuerypetitionsByIdArgs = {
 
 export type QuerypublicLicenseCodeArgs = {
   code: Scalars["String"];
+  token: Scalars["ID"];
 };
 
 export type QuerypublicOrgLogoUrlArgs = {

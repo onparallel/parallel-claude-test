@@ -3972,7 +3972,7 @@ type Query {
     sortBy: [QueryPetitions_OrderBy!]
   ): PetitionBasePagination!
   petitionsById(ids: [GID!]!): [PetitionBase]!
-  publicLicenseCode(code: String!): PublicLicenseCode
+  publicLicenseCode(code: String!, token: ID!): PublicLicenseCode
   publicOrgLogoUrl(id: GID!): String
 
   """
