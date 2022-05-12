@@ -70,6 +70,7 @@ export class MockAnalyticsService implements IAnalyticsService {
 
 @injectable()
 export class MockEmailsService implements IEmailsService {
+  async sendAppSumoActivateAccountEmail() {}
   async sendPetitionMessageEmail() {}
   async sendPetitionReminderEmail() {}
   async sendPetitionCompletedEmail() {}
