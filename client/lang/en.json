@@ -180,6 +180,21 @@
     "context": "Refresh"
   },
   {
+    "term": "component.appsumo-license-alert.contact-text-max-license",
+    "definition": "Contact with us to increase your user and petition limits.",
+    "context": "Contact with us to increase your user and petition limits."
+  },
+  {
+    "term": "component.appsumo-license-alert.current-plan",
+    "definition": "Your current plan is {plan}",
+    "context": "Your current plan is {plan}"
+  },
+  {
+    "term": "component.appsumo-license-alert.upgrade-text",
+    "definition": "Upgrade your plan to increase your user and petition limits.",
+    "context": "Upgrade your plan to increase your user and petition limits."
+  },
+  {
     "term": "component.branding-preview.body",
     "definition": "We remind you that <b>{name}</b> sent you a petition and some of the requested information has not yet been submitted.",
     "context": "We remind you that <b>{name}</b> sent you a petition and some of the requested information has not yet been submitted."
@@ -9685,24 +9700,9 @@
     "context": "Teams"
   },
   {
-    "term": "view.organization.contact-increate-limits",
-    "definition": "Contact with us to increase your user and petition limits.",
-    "context": "Contact with us to increase your user and petition limits."
-  },
-  {
-    "term": "view.organization.current-appsumo-plan",
-    "definition": "Your current plan is {plan}",
-    "context": "Your current plan is {plan}"
-  },
-  {
     "term": "view.organization.title",
     "definition": "Organization",
     "context": "Organization"
-  },
-  {
-    "term": "view.organization.upgrade-increase-limits",
-    "definition": "Upgrade your plan to increase your user and petition limits.",
-    "context": "Upgrade your plan to increase your user and petition limits."
   },
   {
     "term": "view.update-browser.header",

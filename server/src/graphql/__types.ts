@@ -214,6 +214,7 @@ export interface NexusGenEnums {
   FilterSharedWithOperator: "IS_OWNER" | "NOT_IS_OWNER" | "NOT_SHARED_WITH" | "SHARED_WITH";
   ImageOptionsResizeFit: "contain" | "cover" | "fill" | "inside" | "outside";
   IntegrationType: db.IntegrationType;
+  OrgLicenseSource: "APPSUMO";
   OrganizationRole: "ADMIN" | "COLLABORATOR" | "NORMAL" | "OWNER";
   OrganizationStatus: db.OrganizationStatus;
   OrganizationUsageLimitName: db.OrganizationUsageLimitName;
@@ -368,6 +369,12 @@ export interface NexusGenObjects {
     // root type
     items: NexusGenRootTypes["OrgIntegration"][]; // [OrgIntegration!]!
     totalCount: number; // Int!
+  };
+  OrgLicense: {
+    // root type
+    externalId: string; // String!
+    name: string; // String!
+    source: NexusGenEnums["OrgLicenseSource"]; // OrgLicenseSource!
   };
   Organization: db.Organization;
   OrganizationPagination: {
@@ -1054,17 +1061,23 @@ export interface NexusGenFieldTypes {
     items: NexusGenRootTypes["OrgIntegration"][]; // [OrgIntegration!]!
     totalCount: number; // Int!
   };
+  OrgLicense: {
+    // field return type
+    externalId: string; // String!
+    name: string; // String!
+    source: NexusGenEnums["OrgLicenseSource"]; // OrgLicenseSource!
+  };
   Organization: {
     // field return type
     _id: number; // Int!
     activeUserCount: number; // Int!
-    appSumoLicense: NexusGenScalars["JSONObject"]; // JSONObject!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customHost: string | null; // String
     hasSsoProvider: boolean; // Boolean!
     iconUrl: string | null; // String
     id: NexusGenScalars["GID"]; // GID!
     integrations: NexusGenRootTypes["OrgIntegrationPagination"]; // OrgIntegrationPagination!
+    license: NexusGenRootTypes["OrgLicense"] | null; // OrgLicense
     logoUrl: string | null; // String
     name: string; // String!
     pdfDocumentTheme: NexusGenScalars["JSONObject"]; // JSONObject!
@@ -2515,17 +2528,23 @@ export interface NexusGenFieldTypeNames {
     items: "OrgIntegration";
     totalCount: "Int";
   };
+  OrgLicense: {
+    // field return type name
+    externalId: "String";
+    name: "String";
+    source: "OrgLicenseSource";
+  };
   Organization: {
     // field return type name
     _id: "Int";
     activeUserCount: "Int";
-    appSumoLicense: "JSONObject";
     createdAt: "DateTime";
     customHost: "String";
     hasSsoProvider: "Boolean";
     iconUrl: "String";
     id: "GID";
     integrations: "OrgIntegrationPagination";
+    license: "OrgLicense";
     logoUrl: "String";
     name: "String";
     pdfDocumentTheme: "JSONObject";

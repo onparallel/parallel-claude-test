@@ -28,6 +28,21 @@ export const OrganizationUsageLimitName = enumType({
   members: ["PETITION_SEND", "SIGNATURIT_SHARED_APIKEY"],
 });
 
+export const OrgLicenseSource = enumType({
+  name: "OrgLicenseSource",
+  members: ["APPSUMO"],
+});
+
+export const OrgLicense = objectType({
+  name: "OrgLicense",
+  description: "An object describing the license of an organization",
+  definition(t) {
+    t.field("source", { type: "OrgLicenseSource" });
+    t.string("name");
+    t.string("externalId");
+  },
+});
+
 export const Organization = objectType({
   name: "Organization",
   description: "An organization in the system.",
@@ -236,10 +251,17 @@ export const Organization = objectType({
         };
       },
     });
-    t.nonNull.jsonObject("appSumoLicense", {
-      description: "Current appsumo license",
+    t.nullable.field("license", {
+      type: "OrgLicense",
+      description: "Current license for the organization",
       resolve: (o) => {
-        return o.appsumo_license;
+        return o.appsumo_license
+          ? {
+              source: "APPSUMO",
+              name: o.appsumo_license.parallel_tier,
+              externalId: o.appsumo_license.invoice_item_uuid,
+            }
+          : null;
       },
     });
   },

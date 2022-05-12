@@ -1671,6 +1671,19 @@ type OrgIntegrationPagination {
 }
 
 """
+An object describing the license of an organization
+"""
+type OrgLicense {
+  externalId: String!
+  name: String!
+  source: OrgLicenseSource!
+}
+
+enum OrgLicenseSource {
+  APPSUMO
+}
+
+"""
 An organization in the system.
 """
 type Organization implements Timestamps {
@@ -1680,11 +1693,6 @@ type Organization implements Timestamps {
   The total number of active users
   """
   activeUserCount: Int!
-
-  """
-  Current appsumo license
-  """
-  appSumoLicense: JSONObject!
 
   """
   Time when the resource was created.
@@ -1730,6 +1738,11 @@ type Organization implements Timestamps {
     """
     type: IntegrationType
   ): OrgIntegrationPagination!
+
+  """
+  Current license for the organization
+  """
+  license: OrgLicense
 
   """
   URL of the organization logo

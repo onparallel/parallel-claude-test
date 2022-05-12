@@ -180,6 +180,21 @@
     "context": "Refresh"
   },
   {
+    "term": "component.appsumo-license-alert.contact-text-max-license",
+    "definition": "Contacta con nosotros para aumentar tus límites de usuarios y peticiones.",
+    "context": "Contact with us to increase your user and petition limits."
+  },
+  {
+    "term": "component.appsumo-license-alert.current-plan",
+    "definition": "Tu plan actual es {plan}",
+    "context": "Your current plan is {plan}"
+  },
+  {
+    "term": "component.appsumo-license-alert.upgrade-text",
+    "definition": "Actualiza tu plan para aumentar tus límites de usuarios y peticiones.",
+    "context": "Upgrade your plan to increase your user and petition limits."
+  },
+  {
     "term": "component.branding-preview.body",
     "definition": "{tone, select, INFORMAL{Te recordamos que <b>{name}</b> te compartió un acceso a Parallel en el que queda información pendiente de completar.} other{Le recordamos que <b>[Tu nombre]</b> le envió una petición de la que queda información pendiente de completar.}}",
     "context": "We remind you that <b>{name}</b> sent you a petition and some of the requested information has not yet been submitted."
@@ -9685,24 +9700,9 @@
     "context": "Teams"
   },
   {
-    "term": "view.organization.contact-increate-limits",
-    "definition": "Contacta con nosotros para aumentar tus límites de usuarios y peticiones.",
-    "context": "Contact with us to increase your user and petition limits."
-  },
-  {
-    "term": "view.organization.current-appsumo-plan",
-    "definition": "Tu plan actual es {plan}",
-    "context": "Your current plan is {plan}"
-  },
-  {
     "term": "view.organization.title",
     "definition": "Organización",
     "context": "Organization"
-  },
-  {
-    "term": "view.organization.upgrade-increase-limits",
-    "definition": "Actualiza tu plan para aumentar tus límites de usuarios y peticiones.",
-    "context": "Upgrade your plan to increase your user and petition limits."
   },
   {
     "term": "view.update-browser.header",

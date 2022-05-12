@@ -1529,6 +1529,16 @@ export interface OrgIntegrationPagination {
   totalCount: Scalars["Int"];
 }
 
+/** An object describing the license of an organization */
+export interface OrgLicense {
+  __typename?: "OrgLicense";
+  externalId: Scalars["String"];
+  name: Scalars["String"];
+  source: OrgLicenseSource;
+}
+
+export type OrgLicenseSource = "APPSUMO";
+
 /** An organization in the system. */
 export interface Organization extends Timestamps {
   __typename?: "Organization";
@@ -1536,8 +1546,6 @@ export interface Organization extends Timestamps {
   _id: Scalars["Int"];
   /** The total number of active users */
   activeUserCount: Scalars["Int"];
-  /** Current appsumo license */
-  appSumoLicense: Scalars["JSONObject"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom host used in petition links and public links. */
@@ -1550,6 +1558,8 @@ export interface Organization extends Timestamps {
   id: Scalars["GID"];
   /** A paginated list with enabled integrations for the organization */
   integrations: OrgIntegrationPagination;
+  /** Current license for the organization */
+  license?: Maybe<OrgLicense>;
   /** URL of the organization logo */
   logoUrl?: Maybe<Scalars["String"]>;
   /** The name of the organization. */
@@ -3637,6 +3647,12 @@ export type AlreadyLoggedIn_UserFragment = {
   fullName?: string | null;
   avatarUrl?: string | null;
   initials?: string | null;
+};
+
+export type AppSumoLicenseAlert_OrgLicenseFragment = {
+  __typename?: "OrgLicense";
+  name: string;
+  externalId: string;
 };
 
 export type ContactListPopover_ContactFragment = {
@@ -12047,9 +12063,14 @@ export type OrganizationUsage_userQuery = {
       __typename?: "Organization";
       id: string;
       activeUserCount: number;
-      appSumoLicense: { [key: string]: any };
       name: string;
       iconUrl92?: string | null;
+      license?: {
+        __typename?: "OrgLicense";
+        source: OrgLicenseSource;
+        name: string;
+        externalId: string;
+      } | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
@@ -20623,6 +20644,12 @@ export const AlreadyLoggedIn_UserFragmentDoc = gql`
   }
   ${UserAvatar_UserFragmentDoc}
 ` as unknown as DocumentNode<AlreadyLoggedIn_UserFragment, unknown>;
+export const AppSumoLicenseAlert_OrgLicenseFragmentDoc = gql`
+  fragment AppSumoLicenseAlert_OrgLicense on OrgLicense {
+    name
+    externalId
+  }
+` as unknown as DocumentNode<AppSumoLicenseAlert_OrgLicenseFragment, unknown>;
 export const ContactListPopover_ContactFragmentDoc = gql`
   fragment ContactListPopover_Contact on Contact {
     id
@@ -26363,7 +26390,10 @@ export const OrganizationUsage_userDocument = gql`
       organization {
         id
         activeUserCount
-        appSumoLicense
+        license {
+          source
+          ...AppSumoLicenseAlert_OrgLicense
+        }
         usageLimits {
           users {
             limit
@@ -26381,6 +26411,7 @@ export const OrganizationUsage_userDocument = gql`
     }
   }
   ${SettingsLayout_QueryFragmentDoc}
+  ${AppSumoLicenseAlert_OrgLicenseFragmentDoc}
 ` as unknown as DocumentNode<OrganizationUsage_userQuery, OrganizationUsage_userQueryVariables>;
 export const OrganizationUsers_createOrganizationUserDocument = gql`
   mutation OrganizationUsers_createOrganizationUser(
