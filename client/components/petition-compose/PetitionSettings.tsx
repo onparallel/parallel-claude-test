@@ -1,5 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
 import {
+  Box,
   Button,
   CloseButton,
   Heading,
@@ -453,21 +454,23 @@ function _PetitionSettings({
           />
         }
       >
-        <Select
-          size="sm"
-          borderRadius="md"
-          name="petition-locale"
-          minWidth="120px"
-          value={petition.locale}
-          onChange={(event) => onUpdatePetition({ locale: event.target.value as any })}
-          isDisabled={petition.isRestricted || isPublicTemplate}
-        >
-          {locales.map((locale) => (
-            <option key={locale.key} value={locale.key}>
-              {locale.localizedLabel}
-            </option>
-          ))}
-        </Select>
+        <Box>
+          <Select
+            size="sm"
+            borderRadius="md"
+            name="petition-locale"
+            minWidth="120px"
+            value={petition.locale}
+            onChange={(event) => onUpdatePetition({ locale: event.target.value as any })}
+            isDisabled={petition.isRestricted || isPublicTemplate}
+          >
+            {locales.map((locale) => (
+              <option key={locale.key} value={locale.key}>
+                {locale.localizedLabel}
+              </option>
+            ))}
+          </Select>
+        </Box>
       </SettingsRow>
       {petition.__typename === "Petition" ? (
         <SettingsRow

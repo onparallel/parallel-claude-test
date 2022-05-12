@@ -1,12 +1,4 @@
-import {
-  Box,
-  Center,
-  FormControl,
-  FormControlProps,
-  FormLabel,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Center, FormControl, FormControlProps, FormLabel, Stack, Text } from "@chakra-ui/react";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { ReactNode } from "react";
 
@@ -49,7 +41,7 @@ export function SettingsRow({
           {description ? <HelpPopover>{description}</HelpPopover> : null}
         </Stack>
       </FormLabel>
-      <Box>{children}</Box>
+      {children}
     </FormControl>
   );
 }
