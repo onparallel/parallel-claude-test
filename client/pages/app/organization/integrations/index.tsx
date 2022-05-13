@@ -1,13 +1,14 @@
 import { gql } from "@apollo/client";
 import { Badge, Heading, Image, Stack } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { IntegrationCard } from "@parallel/components/organization/IntegrationCard";
 import { OrganizationIntegrations_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
+import { isAtLeast } from "@parallel/utils/roles";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -18,9 +19,11 @@ function OrganizationIntegrations() {
   } = useAssertQuery(OrganizationIntegrations_userDocument);
   const sections = useOrganizationSections(me);
 
+  const hasAdminRole = isAtLeast("ADMIN", me.role);
+
   const integrations = [
     {
-      isDisabled: false,
+      isDisabled: !hasAdminRole || false,
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/signaturit.png`}
@@ -46,7 +49,7 @@ function OrganizationIntegrations() {
       route: "/app/organization/integrations/signature",
     },
     {
-      isDisabled: false,
+      isDisabled: !hasAdminRole || false,
       logo: (
         <Image
           src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/zapier.png`}
@@ -110,6 +113,7 @@ function OrganizationIntegrations() {
         {integrations.map((integration, index) => (
           <IntegrationCard key={index} {...integration} />
         ))}
+        {!hasAdminRole ? <OnlyAdminsAlert /> : null}
       </Stack>
     </SettingsLayout>
   );
@@ -121,6 +125,7 @@ OrganizationIntegrations.queries = [
       ...SettingsLayout_Query
       me {
         id
+        role
         hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
         hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
       }
@@ -133,4 +138,4 @@ OrganizationIntegrations.getInitialProps = async ({ fetchQuery }: WithApolloData
   await fetchQuery(OrganizationIntegrations_userDocument);
 };
 
-export default compose(withDialogs, withOrgRole("ADMIN"), withApolloData)(OrganizationIntegrations);
+export default compose(withDialogs, withApolloData)(OrganizationIntegrations);

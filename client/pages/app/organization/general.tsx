@@ -20,9 +20,9 @@ import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog"
 import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { Logo } from "@parallel/components/common/Logo";
+import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
 import { SupportButton } from "@parallel/components/common/SupportButton";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
   OrganizationGeneral_updateOrgLogoDocument,
@@ -30,6 +30,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
+import { isAtLeast } from "@parallel/utils/roles";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { useRef } from "react";
 import { DropzoneRef, FileRejection } from "react-dropzone";
@@ -42,6 +43,8 @@ function OrganizationGeneral() {
   const {
     data: { me, realMe },
   } = useAssertQueryOrPreviousData(OrganizationGeneral_userDocument);
+
+  const hasAdminRole = isAtLeast("ADMIN", me.role);
 
   const sections = useOrganizationSections(me);
   const dropzoneRef = useRef<DropzoneRef>(null);
@@ -96,6 +99,7 @@ function OrganizationGeneral() {
         paddingBottom={16}
       >
         <Stack spacing={8} maxWidth={{ base: "100%", xl: "container.xs" }} width="100%">
+          {!hasAdminRole ? <OnlyAdminsAlert /> : null}
           <Stack spacing={4}>
             <Stack>
               <Text>
@@ -194,6 +198,7 @@ function OrganizationGeneral() {
                   maxWidth="120px"
                   width="100%"
                   textAlign="center"
+                  disabled={!hasAdminRole}
                 >
                   {loading ? (
                     <Spinner
@@ -231,7 +236,11 @@ function OrganizationGeneral() {
                       defaultMessage="This logo will be displayed internally to differentiate your organizations."
                     />
                   </Text>
-                  <Button colorScheme="purple" onClick={() => dropzoneRef.current?.open()}>
+                  <Button
+                    colorScheme="purple"
+                    onClick={() => dropzoneRef.current?.open()}
+                    isDisabled={!hasAdminRole}
+                  >
                     <FormattedMessage
                       id="organization.branding.upload-logo"
                       defaultMessage="Upload a new logo"
@@ -265,6 +274,7 @@ OrganizationGeneral.queries = [
       ...SettingsLayout_Query
       me {
         id
+        role
         hasCustomHost: hasFeatureFlag(featureFlag: CUSTOM_HOST_UI)
         organization {
           id
@@ -282,4 +292,4 @@ OrganizationGeneral.getInitialProps = async ({ fetchQuery }: WithApolloDataConte
   await fetchQuery(OrganizationGeneral_userDocument);
 };
 
-export default compose(withDialogs, withOrgRole("ADMIN"), withApolloData)(OrganizationGeneral);
+export default compose(withDialogs, withApolloData)(OrganizationGeneral);

@@ -21,8 +21,8 @@ import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider"
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileSize } from "@parallel/components/common/FileSize";
+import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
-import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { BrandingPreview } from "@parallel/components/organization/BrandingPreview";
 import {
@@ -33,6 +33,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
+import { isAtLeast } from "@parallel/utils/roles";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { useRef } from "react";
 import { DropzoneRef, FileRejection } from "react-dropzone";
@@ -53,6 +54,8 @@ function OrganizationBranding() {
     me.organization.logoUrl ?? `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/emails/logo.png`;
 
   const tone = me.organization.preferredTone;
+
+  const hasAdminRole = isAtLeast("ADMIN", me.role);
 
   const showErrorDialog = useErrorDialog();
   const [updateLogo, { loading }] = useMutation(OrganizationBranding_updateOrgLogoDocument);
@@ -110,6 +113,7 @@ function OrganizationBranding() {
         paddingBottom={16}
       >
         <Stack spacing={8} maxWidth={{ base: "100%", xl: "container.2xs" }} width="100%">
+          {!hasAdminRole ? <OnlyAdminsAlert /> : null}
           <Stack spacing={4}>
             <Heading as="h4" size="md" fontWeight="semibold">
               <FormattedMessage
@@ -136,6 +140,7 @@ function OrganizationBranding() {
                 height="200px"
                 maxWidth="100%"
                 textAlign="center"
+                disabled={!hasAdminRole}
               >
                 {loading ? (
                   <Spinner
@@ -165,7 +170,12 @@ function OrganizationBranding() {
                 )}
               </Dropzone>
               <Flex marginTop={4}>
-                <Button flex="1" colorScheme="purple" onClick={() => dropzoneRef.current?.open()}>
+                <Button
+                  flex="1"
+                  colorScheme="purple"
+                  onClick={() => dropzoneRef.current?.open()}
+                  isDisabled={!hasAdminRole}
+                >
                   <FormattedMessage
                     id="organization.branding.upload-logo"
                     defaultMessage="Upload a new logo"
@@ -182,7 +192,7 @@ function OrganizationBranding() {
                 defaultMessage="Tone of the messages"
               />
             </Heading>
-            <RadioGroup onChange={handleToneChange} value={tone}>
+            <RadioGroup onChange={handleToneChange} value={tone} isDisabled={!hasAdminRole}>
               <Stack spacing={4}>
                 <Radio backgroundColor="white" value="INFORMAL">
                   <Text fontWeight="semibold">
@@ -277,6 +287,8 @@ OrganizationBranding.queries = [
     query OrganizationBranding_user {
       ...SettingsLayout_Query
       me {
+        id
+        role
         fullName
         hasRemovedParallelBranding: hasFeatureFlag(featureFlag: REMOVE_PARALLEL_BRANDING)
         organization {
@@ -295,4 +307,4 @@ OrganizationBranding.getInitialProps = async ({ fetchQuery }: WithApolloDataCont
   await fetchQuery(OrganizationBranding_userDocument);
 };
 
-export default compose(withDialogs, withOrgRole("ADMIN"), withApolloData)(OrganizationBranding);
+export default compose(withDialogs, withApolloData)(OrganizationBranding);

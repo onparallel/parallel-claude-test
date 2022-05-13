@@ -11460,13 +11460,13 @@ export type OrganizationBranding_userQueryVariables = Exact<{ [key: string]: nev
 export type OrganizationBranding_userQuery = {
   me: {
     __typename?: "User";
-    fullName?: string | null;
     id: string;
+    role: OrganizationRole;
+    fullName?: string | null;
     firstName?: string | null;
     lastName?: string | null;
     email: string;
     createdAt: string;
-    role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -11514,12 +11514,12 @@ export type OrganizationGeneral_userQuery = {
   me: {
     __typename?: "User";
     id: string;
+    role: OrganizationRole;
     fullName?: string | null;
     firstName?: string | null;
     lastName?: string | null;
     email: string;
     createdAt: string;
-    role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -11908,12 +11908,12 @@ export type OrganizationIntegrations_userQuery = {
   me: {
     __typename?: "User";
     id: string;
+    role: OrganizationRole;
     fullName?: string | null;
     firstName?: string | null;
     lastName?: string | null;
     email: string;
     createdAt: string;
-    role: OrganizationRole;
     isSuperAdmin: boolean;
     avatarUrl?: string | null;
     initials?: string | null;
@@ -26161,6 +26161,8 @@ export const OrganizationBranding_userDocument = gql`
   query OrganizationBranding_user {
     ...SettingsLayout_Query
     me {
+      id
+      role
       fullName
       hasRemovedParallelBranding: hasFeatureFlag(featureFlag: REMOVE_PARALLEL_BRANDING)
       organization {
@@ -26193,6 +26195,7 @@ export const OrganizationGeneral_userDocument = gql`
     ...SettingsLayout_Query
     me {
       id
+      role
       hasCustomHost: hasFeatureFlag(featureFlag: CUSTOM_HOST_UI)
       organization {
         id
@@ -26339,6 +26342,7 @@ export const OrganizationIntegrations_userDocument = gql`
     ...SettingsLayout_Query
     me {
       id
+      role
       hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
       hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
     }

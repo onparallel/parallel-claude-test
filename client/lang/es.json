@@ -1375,6 +1375,11 @@
     "context": "Unread"
   },
   {
+    "term": "component.only-admins-alert.body",
+    "definition": "Solo los administradores pueden modificar estos ajustes. Por favor, pregúntales a ellos para cualquier cambio que necesites.",
+    "context": "Only admins can edit these settings. Please ask them if you need any changes on this page."
+  },
+  {
     "term": "component.password-input.hide",
     "definition": "Ocultar contraseña",
     "context": "Hide"

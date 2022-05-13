@@ -20,6 +20,7 @@ import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { useAddSignatureApiKeyDialog } from "@parallel/components/organization/dialogs/AddSignatureApiKeyDialog";
 import { useDeleteSignatureErrorConfirmationDialog } from "@parallel/components/organization/dialogs/DeleteSignatureErrorConfirmationDialog";
@@ -470,4 +471,4 @@ IntegrationsSignature.getInitialProps = async ({
   });
 };
 
-export default compose(withDialogs, withApolloData)(IntegrationsSignature);
+export default compose(withDialogs, withOrgRole("ADMIN"), withApolloData)(IntegrationsSignature);
