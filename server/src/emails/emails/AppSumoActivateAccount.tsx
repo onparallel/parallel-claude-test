@@ -37,13 +37,13 @@ const email: Email<AppsumoActivateAccountProps> = {
         defaultMessage: "Please, click the link below to sign-up and activate your account.",
       })}
 
+      ${redirectUrl}
+
       ${intl.formatMessage({
         id: "appsumo-activate-account.intro-text-3",
         defaultMessage:
           "If you already activated it via AppSumo, then you're all set. No need to do anything.",
       })}
-
-      ${redirectUrl}
 
       ${closing({}, intl)}
     `;
@@ -66,22 +66,18 @@ const email: Email<AppsumoActivateAccountProps> = {
                 defaultMessage="Please, click the link below to sign-up and activate your account."
               />
             </MjmlText>
-            <MjmlText>
-              <FormattedMessage
-                id="appsumo-activate-account.intro-text-3"
-                defaultMessage="If you already activated it via AppSumo, then you're all set. No need to do anything."
-              />
-            </MjmlText>
-          </MjmlColumn>
-        </MjmlSection>
-        <MjmlSection>
-          <MjmlColumn>
             <Button href={`${redirectUrl}`}>
               <FormattedMessage
                 id="appsumo-activate-account.activate-button"
                 defaultMessage="Activate my account"
               />
             </Button>
+            <MjmlText>
+              <FormattedMessage
+                id="appsumo-activate-account.intro-text-3"
+                defaultMessage="If you already activated it via AppSumo, then you're all set. No need to do anything."
+              />
+            </MjmlText>
           </MjmlColumn>
         </MjmlSection>
       </Layout>
