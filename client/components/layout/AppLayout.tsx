@@ -7,7 +7,6 @@ import {
   Circle,
   Flex,
   Spinner,
-  useBreakpointValue,
 } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { AppLayout_QueryFragment } from "@parallel/graphql/__types";
@@ -77,8 +76,6 @@ export const AppLayout = Object.assign(
       });
     }, []);
 
-    const isMobile = useBreakpointValue({ base: true, sm: false });
-
     // Load Segment analytics and identify user
     useEffect(() => {
       if (window.analytics && !(window.analytics as any).initialized) {
@@ -103,7 +100,7 @@ export const AppLayout = Object.assign(
           name: me.fullName,
           email: me.email,
           signed_up_at: me.createdAt,
-          device_type: isMobile ? "mobile" : "desktop",
+          device_type: window.innerWidth < 480 ? "mobile" : "desktop",
         });
       }
     }, [me.id]);
@@ -119,7 +116,7 @@ export const AppLayout = Object.assign(
     function handleHelpCenterClick() {
       window.analytics?.track("Help Center Clicked", {
         userId: me.id,
-        from: isMobile ? "mobile" : "desktop",
+        from: window.innerWidth < 480 ? "mobile" : "desktop",
       });
     }
 
