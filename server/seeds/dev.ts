@@ -392,7 +392,7 @@ export async function seed(knex: Knex): Promise<any> {
       description: "Permite al destinatario adjuntar todo tipo de archivos.",
       optional: false,
       multiple: true,
-      options: '{"accepts":null}',
+      options: '{"accepts":null, "attachToPdf": false}',
       created_by: `User:${userIds[2]}`,
       updated_by: `User:${userIds[2]}`,
       is_fixed: false,

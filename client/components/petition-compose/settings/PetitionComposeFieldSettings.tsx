@@ -1,6 +1,17 @@
 import { gql } from "@apollo/client";
-import { Box, Heading, Image, Stack, Switch } from "@chakra-ui/react";
+import {
+  AlertDescription,
+  AlertIcon,
+  Box,
+  Heading,
+  Image,
+  Stack,
+  Switch,
+  Text,
+} from "@chakra-ui/react";
 import { Card, CardHeader } from "@parallel/components/common/Card";
+import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
+import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import {
   PetitionComposeFieldSettings_PetitionFieldFragment,
   PetitionComposeFieldSettings_UserFragment,
@@ -9,7 +20,7 @@ import {
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { ChangeEvent, ReactNode, useState } from "react";
+import { ChangeEvent, ReactNode, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { PetitionFieldTypeSelect } from "../PetitionFieldTypeSelect";
 import { CheckboxSettings } from "./PetitionComposeCheckboxSettings";
@@ -23,7 +34,7 @@ import { ShortTextSettings } from "./PetitionComposeShortTextSettings";
 import { SpanishTaxDocumentsSettings } from "./PetitionComposeTaxDocumentsSettings";
 import { TextSettings } from "./PetitionComposeTextSettings";
 import { SettingsRow } from "./SettingsRow";
-import { SettingsRowAlias } from "./SettingsRowAlias";
+import { AliasErrorType, SettingsRowAlias } from "./SettingsRowAlias";
 
 export type PetitionComposeFieldSettingsProps = {
   petitionId: string;
@@ -48,6 +59,8 @@ export function PetitionComposeFieldSettings({
   const intl = useIntl();
   const [alias, setAlias] = useState(field.alias ?? "");
   const [aliasIsInvalid, setAliasIsInvalid] = useState(false);
+  const showDocumentReferenceAlert = useRef(false);
+  const aliasErrorType = useRef<AliasErrorType>("UNIQUE");
 
   const debouncedOnUpdate = useDebouncedCallback(
     async (fieldId, data) => {
@@ -56,6 +69,7 @@ export function PetitionComposeFieldSettings({
         if (aliasIsInvalid) setAliasIsInvalid(false);
       } catch (error) {
         if (isApolloError(error, "ALIAS_ALREADY_EXISTS")) {
+          aliasErrorType.current = "UNIQUE";
           setAliasIsInvalid(true);
         }
       }
@@ -65,13 +79,22 @@ export function PetitionComposeFieldSettings({
   );
   const handleAliasChange = function (event: ChangeEvent<HTMLInputElement>) {
     const value = event.target.value;
+    if (value && field.type === "FILE_UPLOAD") {
+      showDocumentReferenceAlert.current = true;
+    }
     setAlias(value);
-    debouncedOnUpdate(field.id, {
-      options: {
-        ...field.options,
-      },
-      alias: value || null,
-    });
+
+    if (!value || /^[A-Za-z0-9_]+$/.test(value)) {
+      debouncedOnUpdate(field.id, {
+        options: {
+          ...field.options,
+        },
+        alias: value || null,
+      });
+    } else {
+      aliasErrorType.current = "INVALID";
+      setAliasIsInvalid(true);
+    }
   };
 
   const commonSettings = (
@@ -275,7 +298,21 @@ export function PetitionComposeFieldSettings({
             onChange={handleAliasChange}
             isReadOnly={isReadOnly}
             isInvalid={aliasIsInvalid}
+            errorType={aliasErrorType.current}
           />
+          <PaddedCollapse in={field.type === "FILE_UPLOAD" && showDocumentReferenceAlert.current}>
+            <CloseableAlert status="warning" rounded="md">
+              <AlertIcon color="yellow.500" />
+              <AlertDescription>
+                <Text>
+                  <FormattedMessage
+                    id="component.petition-compose-field-settings.alias-warning"
+                    defaultMessage="<b>Note:</b> Document fields cannot be used to replace content in descriptions."
+                  />
+                </Text>
+              </AlertDescription>
+            </CloseableAlert>
+          </PaddedCollapse>
         </Stack>
       ) : null}
     </Card>

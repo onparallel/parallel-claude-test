@@ -1430,6 +1430,11 @@
     "context": "You can only move fields so that visibility conditions refer only to previous fields."
   },
   {
+    "term": "component.petition-compose-field-settings.alias-warning",
+    "definition": "<b>Aviso:</b> Los campos de documentos no pueden utilizarse para reemplazar contenido en las descripciones.",
+    "context": "<b>Note:</b> Document fields cannot be used to replace content in descriptions."
+  },
+  {
     "term": "component.petition-compose-field.add-attachment",
     "definition": "Añadir adjunto",
     "context": "Add attachment"
@@ -4085,11 +4090,6 @@
     "context": "Allows to easily identify the field in API replies. In addition, it can be inserted into the field description to automatically replace the content."
   },
   {
-    "term": "field-settings.alias-exists-error",
-    "definition": "Este alias ya existe, por favor, escoja otro",
-    "context": "This alias already exists, please choose another one"
-  },
-  {
     "term": "field-settings.alias-label",
     "definition": "Referencias",
     "context": "References"
@@ -4173,6 +4173,16 @@
     "term": "field-settings.multiple-label",
     "definition": "Permitir más de una respuesta",
     "context": "Allow more than one reply"
+  },
+  {
+    "term": "field-settings.reference-exists-error",
+    "definition": "Esta referencia ya está siendo utilizada.",
+    "context": "This reference is already in use."
+  },
+  {
+    "term": "field-settings.reference-invalid-error",
+    "definition": "Utiliza solo letras, números o _",
+    "context": "Use only letters, numbers or _"
   },
   {
     "term": "field-settings.show-in-pdf-description",

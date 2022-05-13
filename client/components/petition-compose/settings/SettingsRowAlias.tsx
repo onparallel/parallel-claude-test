@@ -4,11 +4,14 @@ import { ChangeEvent } from "react";
 import { FormattedMessage } from "react-intl";
 import { SettingsRow } from "./SettingsRow";
 
+export type AliasErrorType = "UNIQUE" | "INVALID";
+
 type SettingsRowAliasProps = {
   alias: string;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   isReadOnly?: boolean;
   isInvalid?: boolean;
+  errorType?: AliasErrorType;
 };
 
 export function SettingsRowAlias({
@@ -16,6 +19,7 @@ export function SettingsRowAlias({
   onChange,
   isReadOnly,
   isInvalid,
+  errorType,
 }: SettingsRowAliasProps) {
   return (
     <SettingsRow
@@ -38,10 +42,17 @@ export function SettingsRowAlias({
       <Stack width="100%">
         <Input value={alias} size="sm" onChange={onChange} maxLength={100} />
         <FormErrorMessage>
-          <FormattedMessage
-            id="field-settings.alias-exists-error"
-            defaultMessage="This alias already exists, please choose another one"
-          />
+          {errorType === "INVALID" ? (
+            <FormattedMessage
+              id="field-settings.reference-invalid-error"
+              defaultMessage="Use only letters, numbers or _"
+            />
+          ) : (
+            <FormattedMessage
+              id="field-settings.reference-exists-error"
+              defaultMessage="This reference is already in use."
+            />
+          )}
         </FormErrorMessage>
       </Stack>
     </SettingsRow>

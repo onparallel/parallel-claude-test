@@ -55,6 +55,7 @@ import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { notEmptyObject } from "../../helpers/validators/notEmptyObject";
 import { notEmptyString } from "../../helpers/validators/notEmptyString";
 import { validateFile } from "../../helpers/validators/validateFile";
+import { validateRegex } from "../../helpers/validators/validateRegex";
 import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
 import { validFieldVisibilityJson } from "../../helpers/validators/validFieldVisibility";
 import { validIsDefined } from "../../helpers/validators/validIsDefined";
@@ -834,6 +835,10 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     notEmptyObject((args) => args.data, "data"),
     maxLength((args) => args.data.title, "data.title", 500),
     maxLength((args) => args.data.alias, "data.alias", 100),
+    validateIf(
+      (args) => isDefined(args.data.alias),
+      validateRegex((args) => args.data.alias, "data.alias", /^[A-Za-z0-9_]+$/)
+    ),
     validateIf(
       (args) => isDefined(args.data.visibility),
       validFieldVisibilityJson(
