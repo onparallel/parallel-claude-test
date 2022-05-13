@@ -2020,6 +2020,11 @@
     "context": "With replies"
   },
   {
+    "term": "component.petition-replies-filter-button.show-without-replies",
+    "definition": "Without replies",
+    "context": "Without replies"
+  },
+  {
     "term": "component.petition-replies-filter-button.text",
     "definition": "Filter",
     "context": "Filter"

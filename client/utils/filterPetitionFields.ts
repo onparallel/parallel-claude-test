@@ -4,6 +4,7 @@ import { PetitionFieldIndex } from "./fieldIndices";
 import { zipX } from "./zipX";
 
 export type PetitionFieldFilterType =
+  | "SHOW_NOT_REPLIED"
   | "SHOW_REPLIED"
   | "SHOW_REVIEWED"
   | "SHOW_NOT_REVIEWED"
@@ -20,6 +21,7 @@ type FilterPetitionFieldResult<T extends filterPetitionFields_PetitionFieldFragm
   | { type: "HIDDEN"; count: number };
 
 export const defaultFieldsFilter = {
+  SHOW_NOT_REPLIED: false,
   SHOW_REPLIED: false,
   SHOW_REVIEWED: false,
   SHOW_NOT_REVIEWED: false,
@@ -47,8 +49,12 @@ export function filterPetitionFields<T extends filterPetitionFields_PetitionFiel
       }
     } else {
       const conditions: boolean[] = [];
-      if (filter.SHOW_REPLIED) {
+      if (filter.SHOW_REPLIED && !filter.SHOW_NOT_REPLIED) {
         conditions.push(field.replies.length > 0);
+      }
+
+      if (!filter.SHOW_REPLIED && filter.SHOW_NOT_REPLIED) {
+        conditions.push(field.replies.length === 0);
       }
 
       if (filter.SHOW_REVIEWED && !filter.SHOW_NOT_REVIEWED) {
