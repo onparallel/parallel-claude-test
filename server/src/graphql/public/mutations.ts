@@ -16,7 +16,7 @@ import { getClientIp } from "request-ip";
 import { Task } from "../../db/repositories/TaskRepository";
 import { toGlobalId } from "../../util/globalId";
 import { stallFor } from "../../util/promises/stallFor";
-import { and, chain, checkClientServerToken } from "../helpers/authorize";
+import { and, chain, checkClientServerToken, ifArgDefined } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { presendPetition } from "../helpers/presendPetition";
 import { prefillPetition } from "../helpers/prefillPetition";
@@ -35,6 +35,7 @@ import {
   fieldBelongsToAccess,
   getContactAuthCookieValue,
   taskBelongsToAccess,
+  validPublicPetitionLinkPrefill,
   validPublicPetitionLinkSlug,
 } from "./authorizers";
 
@@ -597,6 +598,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
     },
     authorize: chain(
       validPublicPetitionLinkSlug("slug"),
+      ifArgDefined("prefill", validPublicPetitionLinkPrefill("prefill" as never, "slug")),
       // check if the organization has PETITION_SEND credits for this
       async (_, { slug }, ctx) => {
         const publicLink = (await ctx.petitions.loadPublicPetitionLinkBySlug(slug))!;

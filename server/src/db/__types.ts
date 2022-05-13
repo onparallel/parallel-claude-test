@@ -19,8 +19,9 @@ export type FeatureFlagName =
   | "ON_BEHALF_OF"
   | "GHOST_LOGIN"
   | "ES_TAX_DOCUMENTS_FIELD"
+  | "CUSTOM_HOST_UI"
   | "REMOVE_PARALLEL_BRANDING"
-  | "CUSTOM_HOST_UI";
+  | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -36,6 +37,7 @@ export const FeatureFlagNameValues = [
   "ES_TAX_DOCUMENTS_FIELD",
   "REMOVE_PARALLEL_BRANDING",
   "CUSTOM_HOST_UI",
+  "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI",
 ] as FeatureFlagName[];
 
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
@@ -1183,11 +1185,12 @@ export interface PublicPetitionLink {
   created_by: Maybe<string>; // varchar
   updated_at: Date; // timestamptz
   updated_by: Maybe<string>; // varchar
+  prefill_secret: Maybe<string>; // varchar
 }
 
 export type CreatePublicPetitionLink = PartialProps<
   Omit<PublicPetitionLink, "id">,
-  "is_active" | "created_at" | "created_by" | "updated_at" | "updated_by"
+  "is_active" | "created_at" | "created_by" | "updated_at" | "updated_by" | "prefill_secret"
 >;
 
 export interface SystemEvent {

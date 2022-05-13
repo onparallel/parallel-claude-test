@@ -169,6 +169,46 @@ describe("GraphQL/PublicPetitionLink", () => {
       expect(errors).toBeUndefined();
       expect(data?.publicPetitionLinkBySlug).toEqual({ isAvailable: false });
     });
+
+    it("sends error when fetching a public link with prefill argument and secret is null", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($slug: ID!, $prefill: String) {
+            publicPetitionLinkBySlug(slug: $slug, prefill: $prefill) {
+              isAvailable
+            }
+          }
+        `,
+        { slug: publicPetitionLink.slug, prefill: "<jwt>" }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data?.publicPetitionLinkBySlug).toBeNull();
+    });
+
+    it("sends error when fetching a public link with prefill argument and secret is invalid", async () => {
+      await mocks.knex
+        .from("public_petition_link")
+        .where("id", publicPetitionLink.id)
+        .update({ prefill_secret: "invalid secret" });
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($slug: ID!, $prefill: String) {
+            publicPetitionLinkBySlug(slug: $slug, prefill: $prefill) {
+              isAvailable
+            }
+          }
+        `,
+        {
+          slug: publicPetitionLink.slug,
+          prefill:
+            "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmaXJzdE5hbWUiOiJBYmMiLCJsYXN0TmFtZSI6IkRlZiIsImVtYWlsIjoiYWJjQGRlZi5jb20iLCJyZXBsaWVzIjp7InRlc3QiOiJ0ZXN0In19.IqeO7MhKSIVvW15Gj2ZDlul-W_Q4fdBR-qF-OHcrQ7M",
+        }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data?.publicPetitionLinkBySlug).toBeNull();
+    });
   });
 
   describe("getSlugForPublicPetitionLink", () => {
@@ -319,6 +359,39 @@ describe("GraphQL/PublicPetitionLink", () => {
         100
       );
     });
+
+    it("sends error when passing prefill argument but public link has no secret", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $slug: ID!
+            $contactFirstName: String!
+            $contactLastName: String!
+            $contactEmail: String!
+            $prefill: String
+          ) {
+            publicCreateAndSendPetitionFromPublicLink(
+              slug: $slug
+              contactFirstName: $contactFirstName
+              contactLastName: $contactLastName
+              contactEmail: $contactEmail
+              prefill: $prefill
+            )
+          }
+        `,
+        {
+          slug: publicPetitionLink.slug,
+          contactFirstName: "Roger",
+          contactLastName: "Waters",
+          contactEmail: "rogerwaters@rogerwaters.com",
+          prefill: "<jwt>",
+        }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
     it("creates a petition via a public link and sends it to the provided email", async () => {
       const emailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),

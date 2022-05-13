@@ -868,5 +868,8 @@ export const PublicPetitionLink = objectType({
       type: "PetitionTemplate",
       resolve: async (o, _, ctx) => (await ctx.petitions.loadPetition(o.template_id))!,
     });
+    t.nullable.string("prefillSecret", {
+      resolve: (o) => o.prefill_secret,
+    });
   },
 });

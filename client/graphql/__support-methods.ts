@@ -1066,6 +1066,12 @@ export const schemaTypes: IntrospectionType[] = [
         deprecationReason: null,
       },
       {
+        name: "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
+      {
         name: "REMOVE_PARALLEL_BRANDING",
         description: null,
         isDeprecated: false,

@@ -3240,6 +3240,16 @@
     "context": "Title of the page"
   },
   {
+    "term": "component.settings-public-link-dialog.prefill-secret-label",
+    "definition": "Prefill secret",
+    "context": "Prefill secret"
+  },
+  {
+    "term": "component.settings-public-link-dialog.prefill-secret-popover",
+    "definition": "JWT secret used to verify the integrity of the parameter passed to prefill the petition. This must be set in case you use the <b>prefill</b> query parameter in your link.",
+    "context": "JWT secret used to verify the integrity of the parameter passed to prefill the petition. This must be set in case you use the <b>prefill</b> query parameter in your link."
+  },
+  {
     "term": "component.settings-public-link-dialog.title",
     "definition": "Public link configuration",
     "context": "Public link configuration"

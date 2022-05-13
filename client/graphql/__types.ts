@@ -221,6 +221,7 @@ export type FeatureFlag =
   | "ON_BEHALF_OF"
   | "PETITION_PDF_EXPORT"
   | "PETITION_SIGNATURE"
+  | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
   | "REMOVE_PARALLEL_BRANDING"
   | "REMOVE_WHY_WE_USE_PARALLEL"
   | "SKIP_FORWARD_SECURITY";
@@ -887,6 +888,7 @@ export interface MutationcreatePrintPdfTaskArgs {
 
 export interface MutationcreatePublicPetitionLinkArgs {
   description: Scalars["String"];
+  prefillSecret?: InputMaybe<Scalars["String"]>;
   slug?: InputMaybe<Scalars["String"]>;
   templateId: Scalars["GID"];
   title: Scalars["String"];
@@ -1450,6 +1452,7 @@ export interface MutationupdatePetitionUserNotificationReadStatusArgs {
 export interface MutationupdatePublicPetitionLinkArgs {
   description?: InputMaybe<Scalars["String"]>;
   isActive?: InputMaybe<Scalars["Boolean"]>;
+  prefillSecret?: InputMaybe<Scalars["String"]>;
   publicPetitionLinkId: Scalars["GID"];
   slug?: InputMaybe<Scalars["String"]>;
   title?: InputMaybe<Scalars["String"]>;
@@ -2725,6 +2728,7 @@ export interface PublicPetitionLink {
   id: Scalars["GID"];
   isActive: Scalars["Boolean"];
   owner: User;
+  prefillSecret?: Maybe<Scalars["String"]>;
   slug: Scalars["String"];
   template: PetitionTemplate;
   title: Scalars["String"];
@@ -7486,6 +7490,11 @@ export type PublicLinkSettingsDialog_isValidSlugQueryVariables = Exact<{
 
 export type PublicLinkSettingsDialog_isValidSlugQuery = { isValidPublicPetitionLinkSlug: boolean };
 
+export type PublicLinkSettingsDialog_UserFragment = {
+  __typename?: "User";
+  hasPrefillSecret: boolean;
+};
+
 export type PublicLinkSettingsDialog_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   name?: string | null;
@@ -7501,6 +7510,7 @@ export type PublicLinkSettingsDialog_PublicPetitionLinkFragment = {
   description: string;
   slug: string;
   url: string;
+  prefillSecret?: string | null;
 };
 
 export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
@@ -8248,6 +8258,7 @@ export type PetitionSettings_UserFragment = {
   hasSkipForwardSecurity: boolean;
   hasHideRecipientViewContents: boolean;
   hasPetitionSignature: boolean;
+  hasPrefillSecret: boolean;
   organization: {
     __typename?: "Organization";
     id: string;
@@ -8355,6 +8366,7 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
     title: string;
     description: string;
     slug: string;
+    prefillSecret?: string | null;
   } | null;
   defaultPermissions: Array<
     | {
@@ -8477,6 +8489,7 @@ export type PetitionSettings_createPublicPetitionLinkMutation = {
     description: string;
     slug: string;
     url: string;
+    prefillSecret?: string | null;
     template: {
       __typename?: "PetitionTemplate";
       id: string;
@@ -8491,6 +8504,7 @@ export type PetitionSettings_updatePublicPetitionLinkMutationVariables = Exact<{
   title?: InputMaybe<Scalars["String"]>;
   description?: InputMaybe<Scalars["String"]>;
   slug?: InputMaybe<Scalars["String"]>;
+  prefillSecret?: InputMaybe<Scalars["String"]>;
 }>;
 
 export type PetitionSettings_updatePublicPetitionLinkMutation = {
@@ -8502,6 +8516,7 @@ export type PetitionSettings_updatePublicPetitionLinkMutation = {
     description: string;
     slug: string;
     url: string;
+    prefillSecret?: string | null;
     template: {
       __typename?: "PetitionTemplate";
       id: string;
@@ -14912,6 +14927,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     title: string;
     description: string;
     slug: string;
+    prefillSecret?: string | null;
   } | null;
   defaultPermissions: Array<
     | {
@@ -15026,6 +15042,7 @@ export type PetitionCompose_QueryFragment = {
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
     hasPetitionSignature: boolean;
+    hasPrefillSecret: boolean;
     hasOnBehalfOf: boolean;
     hasEsTaxDocumentsField: boolean;
     organization: {
@@ -15193,6 +15210,7 @@ export type PetitionCompose_updatePetitionMutation = {
           title: string;
           description: string;
           slug: string;
+          prefillSecret?: string | null;
         } | null;
         defaultPermissions: Array<
           | {
@@ -15579,6 +15597,7 @@ export type PetitionCompose_userQuery = {
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
     hasPetitionSignature: boolean;
+    hasPrefillSecret: boolean;
     hasOnBehalfOf: boolean;
     hasEsTaxDocumentsField: boolean;
     organization: {
@@ -15818,6 +15837,7 @@ export type PetitionCompose_petitionQuery = {
           title: string;
           description: string;
           slug: string;
+          prefillSecret?: string | null;
         } | null;
         defaultPermissions: Array<
           | {
@@ -22948,6 +22968,7 @@ export const PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc = gql`
     description
     slug
     url
+    prefillSecret
   }
 ` as unknown as DocumentNode<PublicLinkSettingsDialog_PublicPetitionLinkFragment, unknown>;
 export const TemplateDefaultPermissionsDialog_PublicPetitionLinkFragmentDoc = gql`
@@ -23211,6 +23232,11 @@ export const TestModeSignatureBadge_UserFragmentDoc = gql`
     hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
   }
 ` as unknown as DocumentNode<TestModeSignatureBadge_UserFragment, unknown>;
+export const PublicLinkSettingsDialog_UserFragmentDoc = gql`
+  fragment PublicLinkSettingsDialog_User on User {
+    hasPrefillSecret: hasFeatureFlag(featureFlag: PUBLIC_PETITION_LINK_PREFILL_SECRET_UI)
+  }
+` as unknown as DocumentNode<PublicLinkSettingsDialog_UserFragment, unknown>;
 export const SignatureConfigDialog_UserFragmentDoc = gql`
   fragment SignatureConfigDialog_User on User {
     firstName
@@ -23224,6 +23250,7 @@ export const PetitionSettings_UserFragmentDoc = gql`
     hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
     hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
     ...TestModeSignatureBadge_User
+    ...PublicLinkSettingsDialog_User
     organization {
       id
       signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
@@ -23237,6 +23264,7 @@ export const PetitionSettings_UserFragmentDoc = gql`
     ...SignatureConfigDialog_User
   }
   ${TestModeSignatureBadge_UserFragmentDoc}
+  ${PublicLinkSettingsDialog_UserFragmentDoc}
   ${SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc}
   ${SignatureConfigDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionSettings_UserFragment, unknown>;
@@ -25169,6 +25197,7 @@ export const PetitionSettings_updatePublicPetitionLinkDocument = gql`
     $title: String
     $description: String
     $slug: String
+    $prefillSecret: String
   ) {
     updatePublicPetitionLink(
       publicPetitionLinkId: $publicPetitionLinkId
@@ -25176,6 +25205,7 @@ export const PetitionSettings_updatePublicPetitionLinkDocument = gql`
       title: $title
       description: $description
       slug: $slug
+      prefillSecret: $prefillSecret
     ) {
       ...PublicLinkSettingsDialog_PublicPetitionLink
       template {

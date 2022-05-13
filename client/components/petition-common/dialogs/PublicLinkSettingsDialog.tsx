@@ -25,9 +25,11 @@ import {
   PublicLinkSettingsDialog_isValidSlugDocument,
   PublicLinkSettingsDialog_PetitionTemplateFragment,
   PublicLinkSettingsDialog_PublicPetitionLinkFragment,
+  PublicLinkSettingsDialog_UserFragment,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
+import { Maybe } from "@parallel/utils/types";
 import { useAsyncEffect } from "@parallel/utils/useAsyncEffect";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useRef } from "react";
@@ -39,15 +41,18 @@ interface PublicLinkSettingsData {
   title: string;
   description: string;
   slug: string;
+  prefillSecret: Maybe<string>;
 }
 
 interface PublicLinkSettingsDialogProps {
   publicLink?: PublicLinkSettingsDialog_PublicPetitionLinkFragment;
   template: PublicLinkSettingsDialog_PetitionTemplateFragment;
+  user: PublicLinkSettingsDialog_UserFragment;
 }
 export function PublicLinkSettingsDialog({
   publicLink,
   template,
+  user,
   ...props
 }: DialogProps<PublicLinkSettingsDialogProps, PublicLinkSettingsData>) {
   const apollo = useApolloClient();
@@ -60,6 +65,7 @@ export function PublicLinkSettingsDialog({
         title: publicLink?.title ?? "",
         description: publicLink?.description ?? "",
         slug: publicLink?.slug ?? "",
+        prefillSecret: publicLink?.prefillSecret ?? "",
       },
     });
   const { errors, dirtyFields, isValidating } = formState;
@@ -127,7 +133,10 @@ export function PublicLinkSettingsDialog({
       content={{
         as: "form",
         onSubmit: handleSubmit((data) => {
-          props.onResolve(pick(data, ["title", "description", "slug"]));
+          props.onResolve({
+            ...pick(data, ["title", "description", "slug"]),
+            prefillSecret: data.prefillSecret || null,
+          });
         }),
       }}
       initialFocusRef={titleRef}
@@ -286,6 +295,25 @@ export function PublicLinkSettingsDialog({
               </Stack>
             </FormErrorMessage>
           </FormControl>
+          {user.hasPrefillSecret ? (
+            <FormControl id="prefillSecret">
+              <FormLabel>
+                <Text as="span">
+                  <FormattedMessage
+                    id="component.settings-public-link-dialog.prefill-secret-label"
+                    defaultMessage="Prefill secret"
+                  />
+                </Text>
+                <HelpPopover>
+                  <FormattedMessage
+                    id="component.settings-public-link-dialog.prefill-secret-popover"
+                    defaultMessage="JWT secret used to verify the integrity of the parameter passed to prefill the petition. This must be set in case you use the <b>prefill</b> query parameter in your link."
+                  />
+                </HelpPopover>
+              </FormLabel>
+              <Input {...register("prefillSecret")} />
+            </FormControl>
+          ) : null}
         </Stack>
       }
       confirm={
@@ -319,6 +347,11 @@ PublicLinkSettingsDialog.queries = [
 ];
 
 PublicLinkSettingsDialog.fragments = {
+  User: gql`
+    fragment PublicLinkSettingsDialog_User on User {
+      hasPrefillSecret: hasFeatureFlag(featureFlag: PUBLIC_PETITION_LINK_PREFILL_SECRET_UI)
+    }
+  `,
   PetitionTemplate: gql`
     fragment PublicLinkSettingsDialog_PetitionTemplate on PetitionTemplate {
       name
@@ -336,6 +369,7 @@ PublicLinkSettingsDialog.fragments = {
       description
       slug
       url
+      prefillSecret
     }
   `,
 };

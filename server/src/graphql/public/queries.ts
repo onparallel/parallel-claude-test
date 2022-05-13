@@ -6,7 +6,12 @@ import { UAParser } from "ua-parser-js";
 import { authenticate, chain, checkClientServerToken, ifArgDefined } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { NexusGenObjects } from "../__types";
-import { authenticatePublicAccess, fieldBelongsToAccess, taskBelongsToAccess } from "./authorizers";
+import {
+  authenticatePublicAccess,
+  fieldBelongsToAccess,
+  taskBelongsToAccess,
+  validPublicPetitionLinkPrefill,
+} from "./authorizers";
 
 export const accessQuery = queryField("access", {
   type: nullable("PublicPetitionAccess"),
@@ -83,6 +88,7 @@ export const publicPetitionLinkBySlug = queryField("publicPetitionLinkBySlug", {
     slug: nonNull(idArg()),
     prefill: nullable(stringArg()),
   },
+  authorize: ifArgDefined("prefill", validPublicPetitionLinkPrefill("prefill" as never, "slug")),
   resolve: async (_, { slug }, ctx) => {
     const publicLink = await ctx.petitions.loadPublicPetitionLinkBySlug(slug);
     const petition = publicLink

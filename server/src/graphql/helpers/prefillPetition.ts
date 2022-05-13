@@ -53,27 +53,27 @@ async function parsePrefillReplies(prefill: Record<string, any>, fields: Petitio
       continue;
     }
 
-    const replies = unMaybeArray(value);
+    const fieldReplies = unMaybeArray(value);
     const singleReplies = [];
 
     if (field.type === "CHECKBOX") {
-      if (replies.every((r) => typeof r === "string")) {
-        singleReplies.push(uniq(replies));
-      } else if (replies.every((r) => Array.isArray(r))) {
-        singleReplies.push(...replies.map((r) => uniq(r)));
+      if (fieldReplies.every((r) => typeof r === "string")) {
+        singleReplies.push(uniq(fieldReplies));
+      } else if (fieldReplies.every((r) => Array.isArray(r))) {
+        singleReplies.push(...fieldReplies.map((r) => uniq(r)));
       }
     } else if (field.type === "DYNAMIC_SELECT") {
-      if (replies.every((r) => typeof r === "string")) {
-        singleReplies.push(replies.map((value, i) => [field.options.labels[i], value]));
-      } else if (replies.every((r) => Array.isArray(r))) {
+      if (fieldReplies.every((r) => typeof r === "string")) {
+        singleReplies.push(fieldReplies.map((value, i) => [field.options.labels[i], value]));
+      } else if (fieldReplies.every((r) => Array.isArray(r))) {
         singleReplies.push(
-          ...replies.map((reply: string[]) =>
+          ...fieldReplies.map((reply: string[]) =>
             reply.map((value, i) => [field.options.labels[i], value])
           )
         );
       }
     } else {
-      singleReplies.push(...replies);
+      singleReplies.push(...fieldReplies);
     }
 
     for (const reply of singleReplies) {

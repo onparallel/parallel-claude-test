@@ -253,6 +253,7 @@ enum FeatureFlag {
   ON_BEHALF_OF
   PETITION_PDF_EXPORT
   PETITION_SIGNATURE
+  PUBLIC_PETITION_LINK_PREFILL_SECRET_UI
   REMOVE_PARALLEL_BRANDING
   REMOVE_WHY_WE_USE_PARALLEL
   SKIP_FORWARD_SECURITY
@@ -734,6 +735,7 @@ type Mutation {
   """
   createPublicPetitionLink(
     description: String!
+    prefillSecret: String
     slug: String
     templateId: GID!
     title: String!
@@ -1552,6 +1554,7 @@ type Mutation {
   updatePublicPetitionLink(
     description: String
     isActive: Boolean
+    prefillSecret: String
     publicPetitionLinkId: GID!
     slug: String
     title: String
@@ -3731,6 +3734,7 @@ type PublicPetitionLink {
   id: GID!
   isActive: Boolean!
   owner: User!
+  prefillSecret: String
   slug: String!
   template: PetitionTemplate!
   title: String!

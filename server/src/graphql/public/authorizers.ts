@@ -5,6 +5,7 @@ import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin"
 import { countBy, isDefined } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { toGlobalId } from "../../util/globalId";
+import { verify } from "../../util/jwt";
 import { MaybeArray } from "../../util/types";
 import { Arg, chain } from "../helpers/authorize";
 import { PublicPetitionNotAvailableError } from "../helpers/errors";
@@ -135,6 +136,26 @@ export function validPublicPetitionLinkSlug<
       return false;
     }
     return true;
+  };
+}
+
+export function validPublicPetitionLinkPrefill<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends Arg<TypeName, FieldName, string>,
+  TArg2 extends Arg<TypeName, FieldName, string>
+>(argPrefill: TArg1, argSlug: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const slug = args[argSlug] as unknown as string;
+      const prefill = args[argPrefill] as unknown as string;
+      const publicLink = await ctx.petitions.loadPublicPetitionLinkBySlug(slug);
+      if (isDefined(publicLink?.prefill_secret)) {
+        await verify(prefill!, publicLink!.prefill_secret, {});
+        return true;
+      }
+    } catch {}
+    return false;
   };
 }
 

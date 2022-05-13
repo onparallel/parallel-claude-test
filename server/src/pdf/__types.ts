@@ -1036,6 +1036,7 @@ export type MutationpublicCreateAndSendPetitionFromPublicLinkArgs = {
   contactFirstName: Scalars["String"];
   contactLastName: Scalars["String"];
   force?: InputMaybe<Scalars["Boolean"]>;
+  prefill?: InputMaybe<Scalars["String"]>;
   slug: Scalars["ID"];
 };
 
@@ -2862,6 +2863,7 @@ export type QuerypublicPetitionFieldArgs = {
 };
 
 export type QuerypublicPetitionLinkBySlugArgs = {
+  prefill?: InputMaybe<Scalars["String"]>;
   slug: Scalars["ID"];
 };
 

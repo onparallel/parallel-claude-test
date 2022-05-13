@@ -3240,6 +3240,16 @@
     "context": "Title of the page"
   },
   {
+    "term": "component.settings-public-link-dialog.prefill-secret-label",
+    "definition": "Secreto de precarga",
+    "context": "Prefill secret"
+  },
+  {
+    "term": "component.settings-public-link-dialog.prefill-secret-popover",
+    "definition": "Secreto del JWT usado para verificar la integridad del parametro usado para precargar la petición. Debe estar definido en caso de que uses el parámetro <b>prefill</b> en el enlace.",
+    "context": "JWT secret used to verify the integrity of the parameter passed to prefill the petition. This must be set in case you use the <b>prefill</b> query parameter in your link."
+  },
+  {
     "term": "component.settings-public-link-dialog.title",
     "definition": "Ajustes del enlace público",
     "context": "Public link configuration"

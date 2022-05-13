@@ -223,7 +223,7 @@ function _PetitionSettings({
           },
         });
       } else {
-        const publicLinkSettings = await showPublicLinkSettingDialog({ template: petition });
+        const publicLinkSettings = await showPublicLinkSettingDialog({ template: petition, user });
         const { data } = await createPublicPetitionLink({
           variables: {
             templateId: petition.id,
@@ -246,6 +246,7 @@ function _PetitionSettings({
       const publicLinkSettings = await showPublicLinkSettingDialog({
         publicLink: publicLink,
         template: petition,
+        user,
       });
 
       await updatePublicPetitionLink({
@@ -620,6 +621,7 @@ const fragments = {
       hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
       hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
       ...TestModeSignatureBadge_User
+      ...PublicLinkSettingsDialog_User
       organization {
         id
         signatureIntegrations: integrations(type: SIGNATURE, limit: 100) {
@@ -633,6 +635,7 @@ const fragments = {
       ...SignatureConfigDialog_User
     }
     ${TestModeSignatureBadge.fragments.User}
+    ${PublicLinkSettingsDialog.fragments.User}
     ${SignatureConfigDialog.fragments.SignatureOrgIntegration}
     ${SignatureConfigDialog.fragments.User}
   `,
@@ -746,6 +749,7 @@ const mutations = [
       $title: String
       $description: String
       $slug: String
+      $prefillSecret: String
     ) {
       updatePublicPetitionLink(
         publicPetitionLinkId: $publicPetitionLinkId
@@ -753,6 +757,7 @@ const mutations = [
         title: $title
         description: $description
         slug: $slug
+        prefillSecret: $prefillSecret
       ) {
         ...PublicLinkSettingsDialog_PublicPetitionLink
         template {

@@ -20,9 +20,13 @@ export async function sign<T extends string | object | Buffer>(
   });
 }
 
-export async function verify<TPayload = JwtPayload>(token: string, secret: string) {
-  return await promisify<string, string, VerifyOptions, TPayload>(_verify)(token, secret, {
+export async function verify<TPayload = JwtPayload>(
+  token: string,
+  secret: string,
+  options: VerifyOptions = {
     algorithms: ["HS256"],
     issuer: "parallel-server",
-  });
+  }
+) {
+  return await promisify<string, string, VerifyOptions, TPayload>(_verify)(token, secret, options);
 }
