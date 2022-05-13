@@ -72,6 +72,7 @@ export function UserMenu({ placement, me, realMe, onHelpCenterClick }: UserMenuP
             id: "header.user-menu-button",
             defaultMessage: "User menu",
           })}
+          data-action="open-user-menu"
           _hover={{
             shadow: "long",
             transform: "scale(1.1)",
