@@ -4,6 +4,7 @@ import { Readable } from "stream";
 import { PetitionFieldReply } from "../../db/__types";
 import { getFieldIndices as getFieldIndexes } from "../../util/fieldIndices";
 import { fullName } from "../../util/fullName";
+import { isFileTypeField } from "../../util/isFileTypeField";
 import { TaskRunner } from "../helpers/TaskRunner";
 
 export class ExportReportRunner extends TaskRunner<"EXPORT_REPORT"> {
@@ -59,12 +60,11 @@ export class ExportReportRunner extends TaskRunner<"EXPORT_REPORT"> {
       zip(petitionFields, fieldIndexes).forEach(([field, fieldIndex], i) => {
         if (field.type !== "HEADING") {
           const replies = petitionFieldsReplies[i];
-          row[`${fieldIndex}: ${field.title}`] =
-            field.type !== "FILE_UPLOAD" // TODO: replace with `!isFileTypeField(field.type)` when [feat/ch2444] is merged
-              ? replies.map(this.replyContent).join("; ")
-              : replies.length > 0
-              ? `${replies.length} ${i18n("file(s)")}`
-              : "";
+          row[`${fieldIndex}:${field.title}`] = !isFileTypeField(field.type)
+            ? replies.map(this.replyContent).join("; ")
+            : replies.length > 0
+            ? `${replies.length} ${i18n("file(s)")}`
+            : "";
         }
       });
 
@@ -111,7 +111,21 @@ export class ExportReportRunner extends TaskRunner<"EXPORT_REPORT"> {
     const wb = new Excel.Workbook();
 
     const page = wb.addWorksheet();
-    page.columns = uniq(rows.flatMap(Object.keys)).map((key) => ({ key, header: key }));
+    const headers = uniq(rows.flatMap(Object.keys));
+    // first 3 headers are common for every row and we don't want to include those when sorting
+    const sortedHeaders = headers.slice(0, 3).concat(
+      headers.slice(3).sort((a, b) => {
+        const aPosition = parseInt(a.split(":")[0]);
+        const bPosition = parseInt(b.split(":")[0]);
+        return aPosition - bPosition;
+      })
+    );
+
+    page.columns = sortedHeaders.map((key) => ({
+      key, // keep position on key so fields with same title in different positions are treated as different columns
+      header: key.split(":").slice(1).join(":") || key,
+    }));
+
     page.addRows(rows);
 
     const stream = new Readable();
