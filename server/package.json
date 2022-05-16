@@ -17,7 +17,7 @@
     "seed": "knex seed:run",
     "generate-db-types": "ts-node ./bin/generate-db-types.ts",
     "test": "jest --runInBand",
-    "extract-i18n-terms": "yarn workspace @parallel/bin extract-i18n-terms --locales en es --input '../server/src/{emails,pdf}/**/*.{ts,tsx}' --output '../server/lang'",
+    "extract-i18n-terms": "yarn workspace @parallel/bin extract-i18n-terms --locales en es --input '../server/src/**/*.{ts,tsx}' --output '../server/lang'",
     "generate-i18n-files": "yarn workspace @parallel/bin generate-i18n-files --locales en es --input '../server/lang' --output-compiled '../server/lang/compiled'",
     "download-pdf-fonts": "yarn workspace @parallel/bin download-fonts --output '../client/public/static/fonts/pdf'",
     "dev-workers": "yarn concurrently \"yarn:worker:* start\"",

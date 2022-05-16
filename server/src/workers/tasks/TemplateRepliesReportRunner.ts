@@ -4,10 +4,11 @@ import { Readable } from "stream";
 import { PetitionFieldReply } from "../../db/__types";
 import { getFieldIndices as getFieldIndexes } from "../../util/fieldIndices";
 import { fullName } from "../../util/fullName";
+import { toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { TaskRunner } from "../helpers/TaskRunner";
 
-export class ExportReportRunner extends TaskRunner<"EXPORT_REPORT"> {
+export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_REPORT"> {
   async run() {
     const { petition_id: templateId } = this.task.input;
 
@@ -25,7 +26,7 @@ export class ExportReportRunner extends TaskRunner<"EXPORT_REPORT"> {
       this.ctx.petitions.loadPetitionsByFromTemplateId(templateId),
     ]);
 
-    const i18n = this.i18n(template!.locale);
+    const intl = await this.ctx.i18n.getIntl(template!.locale);
 
     const [petitionsAccesses, petitionsFields] = await Promise.all([
       this.ctx.petitions.loadAccessesForPetition(petitions.map((p) => p.id)),
@@ -51,9 +52,18 @@ export class ExportReportRunner extends TaskRunner<"EXPORT_REPORT"> {
       const contactEmails = contacts.map((c) => c.email);
 
       const row: Record<string, string> = {
-        [i18n("Petition name")]: petition.name || "",
-        [i18n("Recipient names")]: contactNames.join(", ") || "",
-        [i18n("Recipient emails")]: contactEmails.join(", ") || "",
+        [intl.formatMessage({
+          id: "export-template-report.column-header.petition-name",
+          defaultMessage: "Petition name",
+        })]: petition.name || "",
+        [intl.formatMessage({
+          id: "export-template-report.column-header.recipient-names",
+          defaultMessage: "Recipient names",
+        })]: contactNames.join(", ") || "",
+        [intl.formatMessage({
+          id: "export-template-report.column-header.recipient-emails",
+          defaultMessage: "Recipient emails",
+        })]: contactEmails.join(", ") || "",
       };
 
       const fieldIndexes = getFieldIndexes(petitionFields);
@@ -63,7 +73,13 @@ export class ExportReportRunner extends TaskRunner<"EXPORT_REPORT"> {
           row[`${fieldIndex}:${field.title}`] = !isFileTypeField(field.type)
             ? replies.map(this.replyContent).join("; ")
             : replies.length > 0
-            ? `${replies.length} ${i18n("file(s)")}`
+            ? intl.formatMessage(
+                {
+                  id: "export-template-report.file-cell-content",
+                  defaultMessage: "{count, plural, =1{1 file} other {# files}}",
+                },
+                { count: replies.length }
+              )
             : "";
         }
       });
@@ -75,7 +91,13 @@ export class ExportReportRunner extends TaskRunner<"EXPORT_REPORT"> {
 
     const tmpFile = await this.uploadTemporaryFile({
       stream,
-      filename: (template?.name ?? i18n("Report")).concat(".xlsx"),
+      filename: intl.formatMessage(
+        {
+          id: "export-template-report.file-name",
+          defaultMessage: "template-report-{id}.xlsx",
+        },
+        { id: toGlobalId("Petition", template!.id) }
+      ),
       contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
 
@@ -94,17 +116,6 @@ export class ExportReportRunner extends TaskRunner<"EXPORT_REPORT"> {
       default:
         return r.content.value as string;
     }
-  }
-
-  private i18n(locale: string) {
-    const es = {
-      "Petition name": "Nombre de la petición",
-      "Recipient names": "Nombre de los destinatarios",
-      "Recipient emails": "Email de los destinatarios",
-      Report: "Reporte",
-      "file(s)": "archivo(s)",
-    };
-    return (text: keyof typeof es) => (locale === "es" ? es[text] : text);
   }
 
   private async exportToExcel(rows: Record<string, string>[]) {

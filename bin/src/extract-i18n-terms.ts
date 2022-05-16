@@ -45,6 +45,7 @@ async function extractTerms(input: string) {
     const tmpFileName = "lang_tmp.json";
     execSync(
       `formatjs extract \
+       --ignore='../**/*.d.ts' \
        --extract-source-location \
        --throws \
        --out-file ${tmpFileName} \

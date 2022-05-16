@@ -19,8 +19,8 @@ export type FeatureFlagName =
   | "ON_BEHALF_OF"
   | "GHOST_LOGIN"
   | "ES_TAX_DOCUMENTS_FIELD"
-  | "CUSTOM_HOST_UI"
-  | "REMOVE_PARALLEL_BRANDING";
+  | "REMOVE_PARALLEL_BRANDING"
+  | "CUSTOM_HOST_UI";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -34,8 +34,8 @@ export const FeatureFlagNameValues = [
   "ON_BEHALF_OF",
   "GHOST_LOGIN",
   "ES_TAX_DOCUMENTS_FIELD",
-  "CUSTOM_HOST_UI",
   "REMOVE_PARALLEL_BRANDING",
+  "CUSTOM_HOST_UI",
 ] as FeatureFlagName[];
 
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
@@ -286,13 +286,13 @@ export const SystemEventTypeValues = [
   "ORGANIZATION_LIMIT_REACHED",
 ] as SystemEventType[];
 
-export type TaskName = "PRINT_PDF" | "EXPORT_REPLIES" | "EXPORT_EXCEL" | "EXPORT_REPORT";
+export type TaskName = "PRINT_PDF" | "EXPORT_REPLIES" | "EXPORT_EXCEL" | "TEMPLATE_REPLIES_REPORT";
 
 export const TaskNameValues = [
   "PRINT_PDF",
   "EXPORT_REPLIES",
   "EXPORT_EXCEL",
-  "EXPORT_REPORT",
+  "TEMPLATE_REPLIES_REPORT",
 ] as TaskName[];
 
 export type TaskStatus = "ENQUEUED" | "PROCESSING" | "COMPLETED" | "FAILED";
@@ -742,8 +742,8 @@ export interface Petition {
   is_completing_message_enabled: boolean; // bool
   completing_message_subject: Maybe<string>; // text
   completing_message_body: Maybe<string>; // text
-  anonymized_at: Maybe<Date>; // timestamptz
   metadata: any; // jsonb
+  anonymized_at: Maybe<Date>; // timestamptz
 }
 
 export type CreatePetition = PartialProps<
@@ -780,8 +780,8 @@ export type CreatePetition = PartialProps<
   | "is_completing_message_enabled"
   | "completing_message_subject"
   | "completing_message_body"
-  | "anonymized_at"
   | "metadata"
+  | "anonymized_at"
 >;
 
 export interface PetitionAccess {

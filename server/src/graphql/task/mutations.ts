@@ -89,7 +89,7 @@ export const createExportReportTask = mutationField("createExportReportTask", {
   resolve: async (_, args, ctx) => {
     return await ctx.tasks.createTask(
       {
-        name: "EXPORT_REPORT",
+        name: "TEMPLATE_REPLIES_REPORT",
         user_id: ctx.user!.id,
         input: {
           petition_id: args.petitionId,
@@ -105,7 +105,12 @@ export const getTaskResultFileUrl = mutationField("getTaskResultFileUrl", {
   type: "String",
   authorize: authenticateAnd(
     userHasAccessToTasks("taskId"),
-    tasksAreOfType("taskId", ["EXPORT_REPLIES", "PRINT_PDF", "EXPORT_EXCEL", "EXPORT_REPORT"])
+    tasksAreOfType("taskId", [
+      "EXPORT_REPLIES",
+      "PRINT_PDF",
+      "EXPORT_EXCEL",
+      "TEMPLATE_REPLIES_REPORT",
+    ])
   ),
   args: {
     taskId: nonNull(globalIdArg("Task")),
@@ -116,7 +121,7 @@ export const getTaskResultFileUrl = mutationField("getTaskResultFileUrl", {
       | Task<"EXPORT_REPLIES">
       | Task<"PRINT_PDF">
       | Task<"EXPORT_EXCEL">
-      | Task<"EXPORT_REPORT">;
+      | Task<"TEMPLATE_REPLIES_REPORT">;
 
     const file = isDefined(task.output)
       ? await ctx.files.loadTemporaryFile(task.output.temporary_file_id)

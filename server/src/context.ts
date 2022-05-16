@@ -22,6 +22,7 @@ import { AUTH, IAuth } from "./services/auth";
 import { AWS_SERVICE, IAws } from "./services/aws";
 import { EMAILS, IEmailsService } from "./services/emails";
 import { FETCH_SERVICE, IFetchService } from "./services/fetch";
+import { I18N_SERVICE, II18nService } from "./services/i18n";
 import { IImageService, IMAGE_SERVICE } from "./services/image";
 import { ILogger, LOGGER } from "./services/logger";
 import { IPetitionBinder, PETITION_BINDER } from "./services/petition-binder";
@@ -50,6 +51,7 @@ export class ApiContext {
     @inject(FETCH_SERVICE) public readonly fetch: IFetchService,
     @inject(IMAGE_SERVICE) public readonly images: IImageService,
     @inject(TIERS_SERVICE) public readonly tiers: ITiersService,
+    @inject(I18N_SERVICE) public readonly i18n: II18nService,
 
     // Repositories
     public readonly contacts: ContactRepository,
@@ -84,6 +86,7 @@ export class WorkerContext {
     @inject(SIGNATURE) public readonly signature: ISignatureService,
     @inject(PETITION_BINDER) public readonly petitionBinder: IPetitionBinder,
     @inject(IMAGE_SERVICE) public readonly images: IImageService,
+    @inject(I18N_SERVICE) public readonly i18n: II18nService,
 
     // Repositories
     public readonly contacts: ContactRepository,

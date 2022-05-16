@@ -180,6 +180,31 @@
     "context": "See answers in ND"
   },
   {
+    "term": "export-template-report.column-header.petition-name",
+    "definition": "Nombre de la petición",
+    "context": "Petition name"
+  },
+  {
+    "term": "export-template-report.column-header.recipient-emails",
+    "definition": "Email de los destinatarios",
+    "context": "Recipient emails"
+  },
+  {
+    "term": "export-template-report.column-header.recipient-names",
+    "definition": "Nombre de los destinatarios",
+    "context": "Recipient names"
+  },
+  {
+    "term": "export-template-report.file-cell-content",
+    "definition": "{count, plural, =1{1 archivo} other {# archivos}}",
+    "context": "{count, plural, =1{1 file} other {# files}}"
+  },
+  {
+    "term": "export-template-report.file-name",
+    "definition": "reporte-plantilla-{id}.xlsx",
+    "context": "template-report-{id}.xlsx"
+  },
+  {
     "term": "footer.slogan",
     "definition": "Trabaja mejor con",
     "context": "Work better with"

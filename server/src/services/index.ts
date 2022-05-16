@@ -4,6 +4,7 @@ import { AUTH, Auth, IAuth } from "./auth";
 import { Aws, AWS_SERVICE, IAws } from "./aws";
 import { EMAILS, EmailsService, IEmailsService } from "./emails";
 import { FetchService, FETCH_SERVICE, IFetchService } from "./fetch";
+import { I18nService, I18N_SERVICE, II18nService } from "./i18n";
 import { IImageService, ImageService, IMAGE_SERVICE } from "./image";
 import { createLogger, ILogger, LOGGER } from "./logger";
 import { IPetitionBinder, PetitionBinder, PETITION_BINDER } from "./petition-binder";
@@ -31,4 +32,5 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IImageService>(IMAGE_SERVICE).to(ImageService).inSingletonScope();
   bind<IPetitionBinder>(PETITION_BINDER).to(PetitionBinder);
   bind<ITiersService>(TIERS_SERVICE).to(TiersService);
+  bind<II18nService>(I18N_SERVICE).to(I18nService).inSingletonScope();
 });

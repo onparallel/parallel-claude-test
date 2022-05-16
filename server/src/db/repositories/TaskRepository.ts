@@ -15,14 +15,14 @@ export type TaskInput<TName extends TaskName> = {
     include_netdocuments_links?: boolean;
   };
   EXPORT_EXCEL: { petition_id: number };
-  EXPORT_REPORT: { petition_id: number };
+  TEMPLATE_REPLIES_REPORT: { petition_id: number };
 }[TName];
 
 export type TaskOutput<TName extends TaskName> = {
   EXPORT_REPLIES: { temporary_file_id: number };
   PRINT_PDF: { temporary_file_id: number };
   EXPORT_EXCEL: { temporary_file_id: number };
-  EXPORT_REPORT: { temporary_file_id: number };
+  TEMPLATE_REPLIES_REPORT: { temporary_file_id: number };
 }[TName];
 
 export type Task<TName extends TaskName> = Replace<
