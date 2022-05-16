@@ -9,12 +9,14 @@
     "build": "next build",
     "start": "next start",
     "prebuild": "yarn generate-i18n-files",
+    "postbuild": "yarn _strip-js --input ../client/.next/server/pages/es/update.html && yarn _strip-js --input ../client/.next/server/pages/en/update.html",
     "generate-graphql-types": "graphql-codegen",
     "extract-i18n-terms": "yarn workspace @parallel/bin extract-i18n-terms --locales en es --input '../client/{components,pages,utils}/**/*.{ts,tsx}' --output '../client/lang'",
     "generate-i18n-files": "yarn workspace @parallel/bin generate-i18n-files --locales en es --input '../client/lang' --output-raw '../client/public/static/lang' --output-compiled '../client/public/static/lang/compiled'",
     "download-flag-emojis": "yarn workspace @parallel/bin download-flag-emojis --output '../client/public/static/countries/flags'",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "_strip-js": "yarn workspace @parallel/bin strip-js"
   },
   "dependencies": {
     "@apollo/client": "^3.5.10",

@@ -14,13 +14,15 @@
     "switch-release": "node dist/switch-release.js",
     "list-instances": "node dist/list-instances.js",
     "prune-instances": "node dist/prune-instances.js",
-    "full-release": "node dist/full-release.js"
+    "full-release": "node dist/full-release.js",
+    "strip-js": "node dist/strip-js.js"
   },
   "dependencies": {
     "@formatjs/cli": "^4.8.3",
     "@formatjs/icu-messageformat-parser": "^2.0.19",
     "aws-sdk": "^2.1117.0",
     "chalk": "^4.1.2",
+    "cheerio": "^1.0.0-rc.10",
     "cli-progress": "^3.10.0",
     "cli-table3": "^0.6.2",
     "outdent": "^0.8.0",
