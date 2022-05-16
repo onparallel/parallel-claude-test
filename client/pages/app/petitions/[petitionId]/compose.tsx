@@ -161,6 +161,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         variables: { petitionId, fieldId },
       });
       const field = data!.clonePetitionField;
+      setActiveFieldId(field.id);
       focusFieldTitle(field.id);
     }),
     [petitionId]
@@ -334,6 +335,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         variables: { petitionId, type, position },
       });
 
+      setActiveFieldId(data!.createPetitionField.id);
       focusFieldTitle(data!.createPetitionField.id);
     }),
     [petitionId]
