@@ -19,6 +19,7 @@ import {
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, ReactNode, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -58,28 +59,26 @@ export function PetitionComposeFieldSettings({
 }: PetitionComposeFieldSettingsProps) {
   const intl = useIntl();
   const [alias, setAlias] = useState(field.alias ?? "");
-  const [aliasIsInvalid, setAliasIsInvalid] = useState(false);
+  const [aliasError, setAliasError] = useState<AliasErrorType>(undefined);
   const showDocumentReferenceAlert = useRef(false);
-  const aliasErrorType = useRef<AliasErrorType>("UNIQUE");
 
   const debouncedOnUpdate = useDebouncedCallback(
     async (fieldId, data) => {
       try {
         await onFieldEdit(fieldId, data);
-        if (aliasIsInvalid) setAliasIsInvalid(false);
+        if (aliasError !== undefined) setAliasError(undefined);
       } catch (error) {
         if (isApolloError(error, "ALIAS_ALREADY_EXISTS")) {
-          aliasErrorType.current = "UNIQUE";
-          setAliasIsInvalid(true);
+          setAliasError("UNIQUE");
         }
       }
     },
     300,
-    [field.id, aliasIsInvalid]
+    [field.id, aliasError]
   );
   const handleAliasChange = function (event: ChangeEvent<HTMLInputElement>) {
     const value = event.target.value;
-    if (value && field.type === "FILE_UPLOAD") {
+    if (value && isFileTypeField(field.type)) {
       showDocumentReferenceAlert.current = true;
     }
     setAlias(value);
@@ -92,8 +91,7 @@ export function PetitionComposeFieldSettings({
         alias: value || null,
       });
     } else {
-      aliasErrorType.current = "INVALID";
-      setAliasIsInvalid(true);
+      setAliasError("INVALID");
     }
   };
 
@@ -297,10 +295,9 @@ export function PetitionComposeFieldSettings({
             alias={alias}
             onChange={handleAliasChange}
             isReadOnly={isReadOnly}
-            isInvalid={aliasIsInvalid}
-            errorType={aliasErrorType.current}
+            errorType={aliasError}
           />
-          <PaddedCollapse in={field.type === "FILE_UPLOAD" && showDocumentReferenceAlert.current}>
+          <PaddedCollapse in={isFileTypeField(field.type) && showDocumentReferenceAlert.current}>
             <CloseableAlert status="warning" rounded="md">
               <AlertIcon color="yellow.500" />
               <AlertDescription>

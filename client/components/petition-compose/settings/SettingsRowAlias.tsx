@@ -4,13 +4,12 @@ import { ChangeEvent } from "react";
 import { FormattedMessage } from "react-intl";
 import { SettingsRow } from "./SettingsRow";
 
-export type AliasErrorType = "UNIQUE" | "INVALID";
+export type AliasErrorType = "UNIQUE" | "INVALID" | undefined;
 
 type SettingsRowAliasProps = {
   alias: string;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   isReadOnly?: boolean;
-  isInvalid?: boolean;
   errorType?: AliasErrorType;
 };
 
@@ -18,7 +17,6 @@ export function SettingsRowAlias({
   alias,
   onChange,
   isReadOnly,
-  isInvalid,
   errorType,
 }: SettingsRowAliasProps) {
   return (
@@ -37,7 +35,7 @@ export function SettingsRowAlias({
         </Text>
       }
       controlId="alias-field"
-      isInvalid={isInvalid}
+      isInvalid={errorType !== undefined}
     >
       <Stack width="100%">
         <Input value={alias} size="sm" onChange={onChange} maxLength={100} />
