@@ -152,7 +152,7 @@ function Petitions() {
           petitionId: selected[0],
         });
         goToPetition(petitionId, "preview", {
-          query: { new: "true", fromTemplateId: selected[0] },
+          query: { new: "true", fromTemplateId: "true" },
         });
       } catch {}
     },

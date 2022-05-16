@@ -90,7 +90,7 @@ export const PetitionTemplateHeader = Object.assign(
           petitionId: petition.id,
         });
         goToPetition(petitionId, "preview", {
-          query: { new: "true", fromTemplateId: petition.id },
+          query: { new: "true", fromTemplate: "true" },
         });
       } catch {}
     };

@@ -80,7 +80,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   );
 
   useEffect(() => {
-    if (query.fromTemplateId) {
+    if (query.fromTemplate) {
       toast({
         id: "petition-created-toast",
         title: intl.formatMessage({

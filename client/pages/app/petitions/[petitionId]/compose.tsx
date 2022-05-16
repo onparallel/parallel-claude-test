@@ -64,7 +64,7 @@ import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { zip } from "remeda";
+import { omit, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
 type PetitionComposeProps = UnwrapPromise<ReturnType<typeof PetitionCompose.getInitialProps>>;
@@ -120,18 +120,15 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const showPetitionFromTemplateDialog = useHandledPetitionFromTemplateDialog();
 
   useEffect(() => {
-    if (query.fromTemplateId) {
+    if (query.fromTemplate) {
       try {
         showPetitionFromTemplateDialog();
       } catch {}
 
-      const query = router.query;
-      delete query.fromTemplateId;
-
       router.replace(
         {
           pathname: router.pathname,
-          query,
+          query: omit(router.query, ["fromTemplate"]),
         },
         undefined,
         { shallow: true }

@@ -17,6 +17,7 @@ import { PetitionState } from "@parallel/utils/usePetitionState";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { omit } from "remeda";
 
 export interface HeaderNameEditableProps extends EditableProps {
   petition: HeaderNameEditable_PetitionBaseFragment;
@@ -41,13 +42,10 @@ export const HeaderNameEditable = Object.assign(
       if (router.query.new === "true") {
         setTimeout(() => editablePreviewRef.current?.focus());
 
-        const query = router.query;
-        delete query.new;
-
         router.replace(
           {
             pathname: router.pathname,
-            query,
+            query: omit(router.query, ["new"]),
           },
           undefined,
           { shallow: true }

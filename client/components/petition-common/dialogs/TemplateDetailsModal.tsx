@@ -92,7 +92,7 @@ export function TemplateDetailsModal({
     const petitionId = await createPetition({
       petitionId: template.id,
     });
-    goToPetition(petitionId, "preview", { query: { new: "true", fromTemplateId: template.id } });
+    goToPetition(petitionId, "preview", { query: { new: "true", fromTemplate: "true" } });
   };
 
   const handleCloneTemplate = async () => {

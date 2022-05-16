@@ -418,9 +418,7 @@ export const PetitionHeader = Object.assign(
               <NakedLink
                 key={section}
                 href={`/app/petitions/${petition.id}/${section}${
-                  router.query.fromTemplateId
-                    ? `?fromTemplateId=${router.query.fromTemplateId}`
-                    : ""
+                  router.query.fromTemplate ? `?fromTemplate=true` : ""
                 }`}
               >
                 <PetitionHeaderTab
