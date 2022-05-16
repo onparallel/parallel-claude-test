@@ -1470,7 +1470,6 @@ export type MutationuserSignUpArgs = {
   password: Scalars["String"];
   position?: InputMaybe<Scalars["String"]>;
   role?: InputMaybe<Scalars["String"]>;
-  token?: InputMaybe<Scalars["String"]>;
 };
 
 export type MutationverifyPublicAccessArgs = {
@@ -1497,14 +1496,21 @@ export type OrgIntegrationPagination = {
   totalCount: Scalars["Int"];
 };
 
+/** An object describing the license of an organization */
+export type OrgLicense = {
+  externalId: Scalars["String"];
+  name: Scalars["String"];
+  source: OrgLicenseSource;
+};
+
+export type OrgLicenseSource = "APPSUMO";
+
 /** An organization in the system. */
 export type Organization = Timestamps & {
   /** @deprecated Temporal solution for support methods, don't use */
   _id: Scalars["Int"];
   /** The total number of active users */
   activeUserCount: Scalars["Int"];
-  /** Current appsumo license */
-  appSumoLicense: Scalars["JSONObject"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom host used in petition links and public links. */
@@ -1517,6 +1523,8 @@ export type Organization = Timestamps & {
   id: Scalars["GID"];
   /** A paginated list with enabled integrations for the organization */
   integrations: OrgIntegrationPagination;
+  /** Current license for the organization */
+  license: Maybe<OrgLicense>;
   /** URL of the organization logo */
   logoUrl: Maybe<Scalars["String"]>;
   /** The name of the organization. */
