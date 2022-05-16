@@ -79,10 +79,9 @@ export async function presendPetition(
                   t
                 );
 
-                const name =
-                  currentChunk.length > 1
-                    ? `${petition.name ?? args.subject} (${index * CHUNK_SIZE + (_index + 1)})`
-                    : petition.name ?? args.subject;
+                const name = _index
+                  ? `${petition.name ?? args.subject} (${_index})`
+                  : petition.name ?? args.subject;
 
                 const [updatedPetition] = await ctx.petitions.updatePetition(
                   petition.id,
