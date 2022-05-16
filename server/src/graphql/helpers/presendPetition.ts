@@ -43,7 +43,7 @@ export async function presendPetition(
         async (currentChunk, index) => {
           return await pMap(
             currentChunk,
-            async ([petition, contactIds]) => {
+            async ([petition, contactIds], _index) => {
               try {
                 const scheduledAt =
                   index === 0
@@ -78,9 +78,14 @@ export async function presendPetition(
                   userDelegate ? userDelegate : user,
                   t
                 );
+
+                const name = _index
+                  ? `${petition.name ?? args.subject} (${_index})`
+                  : petition.name ?? args.subject;
+
                 const [updatedPetition] = await ctx.petitions.updatePetition(
                   petition.id,
-                  { name: petition.name ?? args.subject, status: "PENDING", credits_used: 1 },
+                  { name, status: "PENDING", credits_used: 1 },
                   `User:${user.id}`,
                   t
                 );
