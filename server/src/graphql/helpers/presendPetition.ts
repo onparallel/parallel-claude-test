@@ -80,7 +80,7 @@ export async function presendPetition(
                 );
 
                 const name =
-                  currentChunk.length > 1
+                  currentChunk.length > 1 || index
                     ? `${petition.name ?? args.subject} (${index * CHUNK_SIZE + (_index + 1)})`
                     : petition.name ?? args.subject;
 
