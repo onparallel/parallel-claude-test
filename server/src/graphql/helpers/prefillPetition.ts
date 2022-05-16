@@ -3,6 +3,7 @@ import { uniq } from "remeda";
 import { ApiContext } from "../../context";
 import { PetitionField, PetitionFieldType, User } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
+import { isFileTypeField } from "../../util/isFileTypeField";
 import { validateReplyValue } from "../../util/validateReplyValue";
 
 type ParsedReply = {
@@ -49,7 +50,7 @@ async function parsePrefillReplies(prefill: Record<string, any>, fields: Petitio
   for (let i = 0; i < entries.length; i++) {
     const [alias, value] = entries[i];
     const field = fields.find((f) => f.alias === alias);
-    if (!field || ["HEADING", "FILE_UPLOAD", "ES_TAX_DOCUMENTS"].includes(field.type)) {
+    if (!field || isFileTypeField(field.type) || field.type === "HEADING") {
       continue;
     }
 
@@ -57,12 +58,15 @@ async function parsePrefillReplies(prefill: Record<string, any>, fields: Petitio
     const singleReplies = [];
 
     if (field.type === "CHECKBOX") {
+      // for CHECKBOX fields, a single reply can contain more than 1 option, so each reply is a string[]
       if (fieldReplies.every((r) => typeof r === "string")) {
         singleReplies.push(uniq(fieldReplies));
       } else if (fieldReplies.every((r) => Array.isArray(r))) {
         singleReplies.push(...fieldReplies.map((r) => uniq(r)));
       }
     } else if (field.type === "DYNAMIC_SELECT") {
+      // for DYNAMIC_SELECT field, a single reply is like ["Cataluña", "Barcelona"]. each element on the array is a selection of that level.
+      // here we need to add the label for sending it to the backend with correct format. e.g.: [["Comunidad Autónoma", "Cataluña"], ["Provincia", "Barcelona"]]
       if (fieldReplies.every((r) => typeof r === "string")) {
         singleReplies.push(fieldReplies.map((value, i) => [field.options.labels[i], value]));
       } else if (fieldReplies.every((r) => Array.isArray(r))) {

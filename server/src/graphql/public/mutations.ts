@@ -691,7 +691,7 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
 
       if (isDefined(args.prefill)) {
         const payload = decode(args.prefill) as JwtPayload;
-        if ("replies" in payload) {
+        if ("replies" in payload && typeof payload.replies === "object") {
           await prefillPetition(petition.id, payload.replies, owner.user, ctx);
         }
       }
