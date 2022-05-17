@@ -380,7 +380,7 @@ export async function getServerSideProps({
             slug: slug as string,
             publicPetitionLink: data.publicPetitionLinkBySlug,
             prefill: (prefill ?? null) as string | null,
-            defaultValues: prefill ? jwtDecode(prefill) : undefined,
+            defaultValues: prefill ? jwtDecode(prefill as string) : undefined,
           },
         }
       : { notFound: true };
