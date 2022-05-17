@@ -51,6 +51,7 @@ function PublicPetitionLink({
   slug,
   publicPetitionLink,
   prefill,
+  defaultValues,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
 
@@ -59,8 +60,6 @@ function PublicPetitionLink({
   const [step, setStep] = useState<PublicPetitionLinkSteps>("INITIAL");
 
   const [submittedData, setSubmittedData] = useState<PublicPetitionInitialFormInputs>();
-
-  const defaultValues = prefill ? jwtDecode<PublicPetitionInitialFormInputs>(prefill) : undefined;
 
   const {
     description,
@@ -353,6 +352,7 @@ export async function getServerSideProps({
     prefill: string | null;
     slug: string;
     publicPetitionLink: PublicPetitionLink_PublicPublicPetitionLinkFragment;
+    defaultValues?: PublicPetitionInitialFormInputs;
   }>
 > {
   if (isInsecureBrowser(req.headers["user-agent"])) {
@@ -380,6 +380,7 @@ export async function getServerSideProps({
             slug: slug as string,
             publicPetitionLink: data.publicPetitionLinkBySlug,
             prefill: (prefill ?? null) as string | null,
+            defaultValues: prefill ? jwtDecode(prefill) : undefined,
           },
         }
       : { notFound: true };
