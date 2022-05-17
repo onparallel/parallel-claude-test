@@ -30,21 +30,19 @@ export async function presendPetition(
   // this helps us distribute massive sends in time and avoid getting flagged as spam.
   const CHUNK_SIZE = 20;
   return ctx.petitions.withTransaction(async (t) => {
-    let processedPetitions = 0;
-    let prevChunkLength = 0;
+    const chunks = chunkWhile(
+      petitionSendGroups,
+      (chunk, [_, current]) =>
+        // current chunk is empty, or
+        chunk.length === 0 ||
+        // (number of contactIds in the accumulated chunk) + (number of contactIds in the current sendGroup) <= CHUNK_SIZE
+        sumBy(chunk, ([_, curr]) => curr.length) + current.length <= CHUNK_SIZE
+    );
     return (
       await pMap(
-        chunkWhile(
-          petitionSendGroups,
-          (chunk, [_, current]) =>
-            // current chunk is empty, or
-            chunk.length === 0 ||
-            // (number of contactIds in the accumulated chunk) + (number of contactIds in the current sendGroup) <= CHUNK_SIZE
-            sumBy(chunk, ([_, curr]) => curr.length) + current.length <= CHUNK_SIZE
-        ),
+        chunks,
         async (currentChunk, index) => {
-          if (index) processedPetitions += prevChunkLength;
-          prevChunkLength = currentChunk.length;
+          const previousPetitions = sumBy(chunks.slice(0, index), (c) => c.length);
           return await pMap(
             currentChunk,
             async ([petition, contactIds], chunkIndex) => {
@@ -85,7 +83,7 @@ export async function presendPetition(
 
                 const name =
                   petitionSendGroups.length > 1
-                    ? `${petition.name ?? args.subject} (${processedPetitions + (chunkIndex + 1)})`
+                    ? `${petition.name ?? args.subject} (${previousPetitions + (chunkIndex + 1)})`
                     : petition.name ?? args.subject;
 
                 const [updatedPetition] = await ctx.petitions.updatePetition(
@@ -108,7 +106,7 @@ export async function presendPetition(
             { concurrency: 5 }
           );
         },
-        { concurrency: 1 } // keep concurrency at 1 so the schedule time for massive sends can be properly calculated
+        { concurrency: 5 }
       )
     ).flat();
   }, t);
