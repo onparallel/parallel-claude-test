@@ -1852,6 +1852,15 @@ export type PetitionAccessStatus =
   /** The petition is not accessible by the contact. */
   | "INACTIVE";
 
+export interface PetitionAnonymizedEvent extends PetitionEvent {
+  __typename?: "PetitionAnonymizedEvent";
+  createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
+  id: Scalars["GID"];
+  petition?: Maybe<Petition>;
+  type: PetitionEventType;
+}
+
 export interface PetitionAttachment extends CreatedAt {
   __typename?: "PetitionAttachment";
   /** Time when the resource was created. */
@@ -5583,6 +5592,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
             status: UserStatus;
           } | null;
         }
+      | { __typename?: "PetitionAnonymizedEvent"; id: string; createdAt: string }
       | {
           __typename?: "PetitionClonedEvent";
           id: string;
@@ -6111,6 +6121,12 @@ export type PetitionActivityTimeline_PetitionEvent_OwnershipTransferredEvent_Fra
   } | null;
 };
 
+export type PetitionActivityTimeline_PetitionEvent_PetitionAnonymizedEvent_Fragment = {
+  __typename?: "PetitionAnonymizedEvent";
+  id: string;
+  createdAt: string;
+};
+
 export type PetitionActivityTimeline_PetitionEvent_PetitionClonedEvent_Fragment = {
   __typename?: "PetitionClonedEvent";
   id: string;
@@ -6385,6 +6401,7 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_MessageSentEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_OwnershipTransferredEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_PetitionAnonymizedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionClonedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionClosedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionClosedNotifiedEvent_Fragment
@@ -6732,6 +6749,11 @@ export type TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment 
     fullName?: string | null;
     status: UserStatus;
   } | null;
+};
+
+export type TimelinePetitionAnonymizedEvent_PetitionAnonymizedEventFragment = {
+  __typename?: "PetitionAnonymizedEvent";
+  createdAt: string;
 };
 
 export type TimelinePetitionClonedEvent_PetitionClonedEventFragment = {
@@ -12855,6 +12877,7 @@ export type PetitionActivity_PetitionFragment = {
             status: UserStatus;
           } | null;
         }
+      | { __typename?: "PetitionAnonymizedEvent"; id: string; createdAt: string }
       | {
           __typename?: "PetitionClonedEvent";
           id: string;
@@ -13647,6 +13670,7 @@ export type PetitionActivity_updatePetitionMutation = {
                   status: UserStatus;
                 } | null;
               }
+            | { __typename?: "PetitionAnonymizedEvent"; id: string; createdAt: string }
             | {
                 __typename?: "PetitionClonedEvent";
                 id: string;
@@ -14493,6 +14517,7 @@ export type PetitionActivity_petitionQuery = {
                   status: UserStatus;
                 } | null;
               }
+            | { __typename?: "PetitionAnonymizedEvent"; id: string; createdAt: string }
             | {
                 __typename?: "PetitionClonedEvent";
                 id: string;
@@ -22760,6 +22785,14 @@ export const TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEventFr
   TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEventFragment,
   unknown
 >;
+export const TimelinePetitionAnonymizedEvent_PetitionAnonymizedEventFragmentDoc = gql`
+  fragment TimelinePetitionAnonymizedEvent_PetitionAnonymizedEvent on PetitionAnonymizedEvent {
+    createdAt
+  }
+` as unknown as DocumentNode<
+  TimelinePetitionAnonymizedEvent_PetitionAnonymizedEventFragment,
+  unknown
+>;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
     id
@@ -22874,6 +22907,9 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on PetitionReminderBouncedEvent {
       ...TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEvent
     }
+    ... on PetitionAnonymizedEvent {
+      ...TimelinePetitionAnonymizedEvent_PetitionAnonymizedEvent
+    }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
   ${TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc}
@@ -22911,6 +22947,7 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelineRecipientSignedEvent_RecipientSignedEventFragmentDoc}
   ${TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEventFragmentDoc}
   ${TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEventFragmentDoc}
+  ${TimelinePetitionAnonymizedEvent_PetitionAnonymizedEventFragmentDoc}
 ` as unknown as DocumentNode<PetitionActivityTimeline_PetitionEventFragment, unknown>;
 export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
   fragment PetitionActivityTimeline_Petition on Petition {

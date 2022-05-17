@@ -422,6 +422,7 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     totalCount: number; // Int!
   };
+  PetitionAnonymizedEvent: events.PetitionAnonymizedEvent;
   PetitionAttachment: db.PetitionAttachment;
   PetitionAttachmentUploadData: {
     // root type
@@ -1209,6 +1210,14 @@ export interface NexusGenFieldTypes {
     // field return type
     items: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     totalCount: number; // Int!
+  };
+  PetitionAnonymizedEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
+    id: NexusGenScalars["GID"]; // GID!
+    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
   PetitionAttachment: {
     // field return type
@@ -2704,6 +2713,14 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     items: "PetitionAccess";
     totalCount: "Int";
+  };
+  PetitionAnonymizedEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    data: "JSONObject";
+    id: "GID";
+    petition: "Petition";
+    type: "PetitionEventType";
   };
   PetitionAttachment: {
     // field return type name
@@ -4764,6 +4781,7 @@ export interface NexusGenAbstractTypeMembers {
     | "MessageScheduledEvent"
     | "MessageSentEvent"
     | "OwnershipTransferredEvent"
+    | "PetitionAnonymizedEvent"
     | "PetitionClonedEvent"
     | "PetitionClosedEvent"
     | "PetitionClosedNotifiedEvent"
@@ -4838,6 +4856,7 @@ export interface NexusGenTypeInterfaces {
   OwnershipTransferredEvent: "PetitionEvent";
   Petition: "PetitionBase";
   PetitionAccess: "Timestamps";
+  PetitionAnonymizedEvent: "PetitionEvent";
   PetitionAttachment: "CreatedAt";
   PetitionClonedEvent: "PetitionEvent";
   PetitionClosedEvent: "PetitionEvent";

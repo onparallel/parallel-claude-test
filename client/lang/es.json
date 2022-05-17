@@ -9670,6 +9670,11 @@
     "context": "{userIsYou, select, true {You} other {{user}}} transferred the ownership of this petition {previousOwner, select, null {} other {from {previousOwner} }}to {owner} {timeAgo}"
   },
   {
+    "term": "timeline.petition-anonymized-description",
+    "definition": "La petición ha sido anonimizada {timeAgo}",
+    "context": "The petition has been anonymized {timeAgo}"
+  },
+  {
     "term": "timeline.petition-cloned-description",
     "definition": "{userIsYou, select, true {Clonaste} other {{user} clonó}} esta petición {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{user}}} cloned this petition {timeAgo}"

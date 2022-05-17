@@ -33,6 +33,7 @@ const result: PossibleTypesResultData = {
       "MessageScheduledEvent",
       "MessageSentEvent",
       "OwnershipTransferredEvent",
+      "PetitionAnonymizedEvent",
       "PetitionClonedEvent",
       "PetitionClosedEvent",
       "PetitionClosedNotifiedEvent",

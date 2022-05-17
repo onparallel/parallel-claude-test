@@ -1630,6 +1630,10 @@ const PetitionEventSchemas = {
       },
     },
   },
+  PETITION_ANONYMIZED: {
+    description: "The petition has been anonymized.",
+    properties: {},
+  },
 } as Record<PetitionEventType, JsonSchema>;
 
 export const petitionEventTypes = Object.keys(PetitionEventSchemas) as PetitionEventType[];

@@ -2232,6 +2232,14 @@ enum PetitionAccessStatus {
   INACTIVE
 }
 
+type PetitionAnonymizedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  data: JSONObject!
+  id: GID!
+  petition: Petition
+  type: PetitionEventType!
+}
+
 type PetitionAttachment implements CreatedAt {
   """
   Time when the resource was created.

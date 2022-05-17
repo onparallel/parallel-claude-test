@@ -4367,6 +4367,15 @@ export class PetitionRepository extends BaseRepository {
       );
 
       await this.anonymizePetitionSignatureRequests(petitionId, t);
+
+      await this.createEvent(
+        {
+          type: "PETITION_ANONYMIZED",
+          petition_id: petitionId,
+          data: {},
+        },
+        t
+      );
     });
   }
 

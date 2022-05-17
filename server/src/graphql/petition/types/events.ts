@@ -101,6 +101,8 @@ export const PetitionEvent = interfaceType({
         return "PetitionMessageBouncedEvent";
       case "PETITION_REMINDER_BOUNCED":
         return "PetitionReminderBouncedEvent";
+      case "PETITION_ANONYMIZED":
+        return "PetitionAnonymizedEvent";
     }
   },
   sourceType: "events.PetitionEvent",
@@ -652,3 +654,5 @@ export const PetitionReminderBouncedEvent = createPetitionEvent(
     });
   }
 );
+
+export const PetitionAnonymizedEvent = createPetitionEvent("PetitionAnonymizedEvent", (t) => {});

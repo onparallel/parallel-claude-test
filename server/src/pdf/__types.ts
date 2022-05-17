@@ -624,6 +624,8 @@ export type Mutation = {
   updateFileUploadReplyComplete: PetitionFieldReply;
   /** Updates the metadata of a public landing template. */
   updateLandingTemplateMetadata: SupportMethodResponse;
+  /** Updates the period after closed petitions of this organization are automatically anonymized. */
+  updateOrganizationAutoAnonymizePeriod: Organization;
   /** Updates the limits of a given org. If 'Update Only Current Period' is left unchecked, the changes will be reflected on the next period. */
   updateOrganizationLimits: SupportMethodResponse;
   /** Updates the logo of an organization */
@@ -1337,6 +1339,10 @@ export type MutationupdateLandingTemplateMetadataArgs = {
   templateId: Scalars["ID"];
 };
 
+export type MutationupdateOrganizationAutoAnonymizePeriodArgs = {
+  months?: InputMaybe<Scalars["Int"]>;
+};
+
 export type MutationupdateOrganizationLimitsArgs = {
   amount: Scalars["Int"];
   orgId: Scalars["Int"];
@@ -1536,6 +1542,7 @@ export type Organization = Timestamps & {
   _id: Scalars["Int"];
   /** The total number of active users */
   activeUserCount: Scalars["Int"];
+  anonymizePetitionsAfter: Maybe<TimeInterval>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom host used in petition links and public links. */
@@ -1799,6 +1806,14 @@ export type PetitionAccessStatus =
   | "ACTIVE"
   /** The petition is not accessible by the contact. */
   | "INACTIVE";
+
+export type PetitionAnonymizedEvent = PetitionEvent & {
+  createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
+  id: Scalars["GID"];
+  petition: Maybe<Petition>;
+  type: PetitionEventType;
+};
 
 export type PetitionAttachment = CreatedAt & {
   /** Time when the resource was created. */
@@ -3322,6 +3337,12 @@ export type TemplateUsedEvent = PetitionEvent & {
 
 export type TemporaryFile = {
   filename: Scalars["String"];
+};
+
+export type TimeInterval = {
+  days: Maybe<Scalars["Int"]>;
+  months: Maybe<Scalars["Int"]>;
+  years: Maybe<Scalars["Int"]>;
 };
 
 export type Timestamps = {
