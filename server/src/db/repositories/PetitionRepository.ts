@@ -4274,6 +4274,14 @@ export class PetitionRepository extends BaseRepository {
     return petition;
   }
 
+  async getClosedPetitionsToAnonymize() {
+    return await this.from("petition")
+      .whereNull("deleted_at")
+      .whereNull("anonymized_at")
+      .where("status", "CLOSED")
+      .select("*");
+  }
+
   async getPetitionsToAnonymize(daysAfterDeletion: number) {
     return await this.from("petition")
       .whereNotNull("deleted_at")
