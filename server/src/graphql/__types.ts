@@ -4334,7 +4334,7 @@ export interface NexusGenArgTypes {
     };
     updateOrganizationAutoAnonymizePeriod: {
       // args
-      period?: string | null; // String
+      months?: number | null; // Int
     };
     updateOrganizationLimits: {
       // args

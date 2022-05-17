@@ -1413,7 +1413,7 @@ type Mutation {
   """
   Updates the period after closed petitions of this organization are automatically anonymized.
   """
-  updateOrganizationAutoAnonymizePeriod(period: String): Organization!
+  updateOrganizationAutoAnonymizePeriod(months: Int): Organization!
 
   """
   Updates the limits of a given org. If 'Update Only Current Period' is left unchecked, the changes will be reflected on the next period.

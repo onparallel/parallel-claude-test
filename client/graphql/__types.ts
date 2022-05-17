@@ -1373,7 +1373,7 @@ export interface MutationupdateLandingTemplateMetadataArgs {
 }
 
 export interface MutationupdateOrganizationAutoAnonymizePeriodArgs {
-  period?: InputMaybe<Scalars["String"]>;
+  months?: InputMaybe<Scalars["Int"]>;
 }
 
 export interface MutationupdateOrganizationLimitsArgs {
@@ -11660,7 +11660,7 @@ export type OrganizationCompliance_OrganizationFragment = {
 };
 
 export type OrganizationCompliance_updateOrganizationAutoAnonymizePeriodMutationVariables = Exact<{
-  period?: InputMaybe<Scalars["String"]>;
+  months?: InputMaybe<Scalars["Int"]>;
 }>;
 
 export type OrganizationCompliance_updateOrganizationAutoAnonymizePeriodMutation = {
@@ -26647,8 +26647,8 @@ export const OrganizationBranding_userDocument = gql`
   OrganizationBranding_userQueryVariables
 >;
 export const OrganizationCompliance_updateOrganizationAutoAnonymizePeriodDocument = gql`
-  mutation OrganizationCompliance_updateOrganizationAutoAnonymizePeriod($period: String) {
-    updateOrganizationAutoAnonymizePeriod(period: $period) {
+  mutation OrganizationCompliance_updateOrganizationAutoAnonymizePeriod($months: Int) {
+    updateOrganizationAutoAnonymizePeriod(months: $months) {
       ...OrganizationCompliance_Organization
     }
   }

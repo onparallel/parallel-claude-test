@@ -1,8 +1,8 @@
-import { ApolloError } from "apollo-server-core";
-import { arg, booleanArg, mutationField, nonNull, nullable, stringArg } from "nexus";
+import { arg, booleanArg, intArg, mutationField, nonNull, nullable } from "nexus";
 import { random } from "../../util/token";
 import { authenticateAnd } from "../helpers/authorize";
 import { uploadArg } from "../helpers/scalars";
+import { inRange } from "../helpers/validators/inRange";
 import { validateFile } from "../helpers/validators/validateFile";
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { contextUserHasRole } from "../users/authorizers";
@@ -75,23 +75,16 @@ export const updateOrganizationAutoAnonymizePeriod = mutationField(
       "Updates the period after closed petitions of this organization are automatically anonymized.",
     type: "Organization",
     args: {
-      period: nullable(stringArg()),
+      months: nullable(intArg()),
     },
     authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("AUTO_ANONYMIZE")),
-    resolve: async (_, args, ctx) => {
-      try {
-        return await ctx.organizations.updateOrganization(
-          ctx.user!.org_id,
-          { anonymize_petitions_after: args.period },
-          `User:${ctx.user!.id}`
-        );
-      } catch (error: any) {
-        if ((error.message as string).includes("invalid input syntax for type interval")) {
-          throw new ApolloError(`Invalid period ${args.period}`, "INVALID_PERIOD_ERROR");
-        } else {
-          throw error;
-        }
-      }
+    validateArgs: inRange((args) => args.months, "months", 1),
+    resolve: async (_, { months }, ctx) => {
+      return await ctx.organizations.updateOrganization(
+        ctx.user!.org_id,
+        { anonymize_petitions_after: months ? `${months} months` : null },
+        `User:${ctx.user!.id}`
+      );
     },
   }
 );

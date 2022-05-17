@@ -105,7 +105,7 @@ function OrganizationCompliance() {
   const onPeriodChange = async ({ period, isActive }: ComplianceFormData) => {
     try {
       await updateOrganizationAutoAnonymizePeriod({
-        variables: { period: period && isActive ? `${period} months` : null },
+        variables: { months: period && isActive ? period : null },
       });
       updateSuccessToast();
     } catch {}
@@ -176,7 +176,13 @@ function OrganizationCompliance() {
               />
             </Text>
           </Box>
-          <Stack as="form" spacing={4} onSubmit={handleSubmit(onPeriodChange)}>
+          <Stack
+            as="form"
+            spacing={4}
+            onSubmit={handleSubmit(({ period, isActive }) => {
+              onPeriodChange({ isActive, period: Number(period) });
+            })}
+          >
             <Checkbox
               colorScheme="purple"
               {...register("isActive", {
@@ -196,13 +202,13 @@ function OrganizationCompliance() {
               <FormControl marginBottom={4} isInvalid={!!errors.period}>
                 <HStack>
                   <Controller
-                    name={"period"}
+                    name="period"
                     control={control}
                     rules={{ required: isActive, min: 1 }}
-                    render={({ field: { ref, ...restField } }) => (
+                    render={({ field: { ref, value, ...restField } }) => (
                       <NumberInput
                         {...restField}
-                        value={restField.value ?? 1}
+                        value={value ?? 1}
                         min={1}
                         clampValueOnBlur={true}
                         maxWidth="100px"
@@ -390,8 +396,8 @@ const _fragments = {
 
 const _mutations = [
   gql`
-    mutation OrganizationCompliance_updateOrganizationAutoAnonymizePeriod($period: String) {
-      updateOrganizationAutoAnonymizePeriod(period: $period) {
+    mutation OrganizationCompliance_updateOrganizationAutoAnonymizePeriod($months: Int) {
+      updateOrganizationAutoAnonymizePeriod(months: $months) {
         ...OrganizationCompliance_Organization
       }
     }
