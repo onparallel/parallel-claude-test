@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Alert,
   AlertIcon,
@@ -33,16 +33,25 @@ import { SupportLink } from "@parallel/components/common/SupportLink";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { OrganizationCompliance_userDocument } from "@parallel/graphql/__types";
+import {
+  OrganizationCompliance_updateOrganizationAutoAnonymizePeriodDocument,
+  OrganizationCompliance_userDocument,
+} from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
+import { Maybe } from "@parallel/utils/types";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 
 interface ComplianceFormData {
-  period: number;
+  period: number | null;
   isActive: boolean;
+}
+
+function periodToMonths(period?: Maybe<{ years?: Maybe<number>; months?: Maybe<number> }>) {
+  return isDefined(period) ? (period.years ?? 0) * 12 + (period.months ?? 0) : null;
 }
 
 function OrganizationCompliance() {
@@ -68,18 +77,19 @@ function OrganizationCompliance() {
     data: { me, realMe },
   } = useAssertQueryOrPreviousData(OrganizationCompliance_userDocument);
 
-  const defaultPeriod = 1;
+  const defaultPeriod = periodToMonths(me.organization.anonymizePetitionsAfter);
 
   const {
     control,
     handleSubmit,
     register,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<ComplianceFormData>({
     defaultValues: {
       period: defaultPeriod,
-      isActive: false,
+      isActive: isDefined(defaultPeriod),
     },
   });
 
@@ -88,8 +98,15 @@ function OrganizationCompliance() {
 
   const sections = useOrganizationSections(me);
 
-  const onPeriodChange = ({ period, isActive }: ComplianceFormData) => {
+  const [updateOrganizationAutoAnonymizePeriod] = useMutation(
+    OrganizationCompliance_updateOrganizationAutoAnonymizePeriodDocument
+  );
+
+  const onPeriodChange = async ({ period, isActive }: ComplianceFormData) => {
     try {
+      await updateOrganizationAutoAnonymizePeriod({
+        variables: { period: period && isActive ? `${period} months` : null },
+      });
       updateSuccessToast();
     } catch {}
   };
@@ -162,7 +179,12 @@ function OrganizationCompliance() {
           <Stack as="form" spacing={4} onSubmit={handleSubmit(onPeriodChange)}>
             <Checkbox
               colorScheme="purple"
-              {...register("isActive")}
+              {...register("isActive", {
+                onChange: (event) => {
+                  onPeriodChange({ period: 1, isActive: event.target.checked });
+                  setValue("period", 1);
+                },
+              })}
               isDisabled={!me.hasAutoAnonymize}
             >
               <FormattedMessage
@@ -176,9 +198,15 @@ function OrganizationCompliance() {
                   <Controller
                     name={"period"}
                     control={control}
-                    rules={{ required: isActive }}
+                    rules={{ required: isActive, min: 1 }}
                     render={({ field: { ref, ...restField } }) => (
-                      <NumberInput {...restField} min={1} clampValueOnBlur={true} maxWidth="100px">
+                      <NumberInput
+                        {...restField}
+                        value={restField.value ?? 1}
+                        min={1}
+                        clampValueOnBlur={true}
+                        maxWidth="100px"
+                      >
                         <NumberInputField ref={ref} name={restField.name} />
                         <NumberInputStepper>
                           <NumberIncrementStepper />
@@ -334,6 +362,43 @@ function OrganizationCompliance() {
   );
 }
 
+const _fragments = {
+  Organization: gql`
+    fragment OrganizationCompliance_Organization on Organization {
+      id
+      activeUserCount
+      usageLimits {
+        users {
+          limit
+        }
+        petitions {
+          used
+          limit
+        }
+        signatures {
+          used
+          limit
+        }
+      }
+      anonymizePetitionsAfter {
+        years
+        months
+      }
+    }
+  `,
+};
+
+const _mutations = [
+  gql`
+    mutation OrganizationCompliance_updateOrganizationAutoAnonymizePeriod($period: String) {
+      updateOrganizationAutoAnonymizePeriod(period: $period) {
+        ...OrganizationCompliance_Organization
+      }
+    }
+    ${_fragments.Organization}
+  `,
+];
+
 OrganizationCompliance.queries = [
   gql`
     query OrganizationCompliance_user {
@@ -341,25 +406,12 @@ OrganizationCompliance.queries = [
       me {
         hasAutoAnonymize: hasFeatureFlag(featureFlag: AUTO_ANONYMIZE)
         organization {
-          id
-          activeUserCount
-          usageLimits {
-            users {
-              limit
-            }
-            petitions {
-              used
-              limit
-            }
-            signatures {
-              used
-              limit
-            }
-          }
+          ...OrganizationCompliance_Organization
         }
       }
     }
     ${SettingsLayout.fragments.Query}
+    ${_fragments.Organization}
   `,
 ];
 

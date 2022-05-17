@@ -84,4 +84,109 @@ describe("GraphQL/Organization", () => {
       });
     });
   });
+
+  describe("updateOrganizationAutoAnonymizePeriod", () => {
+    let normalUser: User;
+    let normalUserApiKey: string;
+    beforeAll(async () => {
+      [normalUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
+        organization_role: "NORMAL",
+      }));
+      ({ apiKey: normalUserApiKey } = await mocks.createUserAuthToken(
+        "normal-token",
+        normalUser.id
+      ));
+    });
+
+    it("sends error if user doesn't have enabled feature_flag", async () => {
+      await mocks.updateFeatureFlag("AUTO_ANONYMIZE", false);
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($period: String) {
+            updateOrganizationAutoAnonymizePeriod(period: $period) {
+              id
+              anonymizePetitionsAfter {
+                months
+              }
+            }
+          }
+        `,
+        {
+          period: "1 month",
+        }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+
+      await mocks.updateFeatureFlag("AUTO_ANONYMIZE", true);
+    });
+
+    it("sends error if user is not admin", async () => {
+      const { errors, data } = await testClient.withApiKey(normalUserApiKey).execute(
+        gql`
+          mutation ($period: String) {
+            updateOrganizationAutoAnonymizePeriod(period: $period) {
+              id
+              anonymizePetitionsAfter {
+                months
+              }
+            }
+          }
+        `,
+        {
+          period: "1 month",
+        }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if period is invalid", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($period: String) {
+            updateOrganizationAutoAnonymizePeriod(period: $period) {
+              id
+              anonymizePetitionsAfter {
+                months
+              }
+            }
+          }
+        `,
+        {
+          period: "1 apples",
+        }
+      );
+
+      expect(errors).toContainGraphQLError("INVALID_PERIOD_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("updates auto-anonymize period of the user's organization", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($period: String) {
+            updateOrganizationAutoAnonymizePeriod(period: $period) {
+              id
+              anonymizePetitionsAfter {
+                years
+                months
+              }
+            }
+          }
+        `,
+        {
+          period: "24 months",
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateOrganizationAutoAnonymizePeriod).toEqual({
+        id: toGlobalId("Organization", organization.id),
+        anonymizePetitionsAfter: { years: 2, months: null },
+      });
+    });
+  });
 });

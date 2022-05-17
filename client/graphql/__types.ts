@@ -657,6 +657,8 @@ export interface Mutation {
   updateFileUploadReplyComplete: PetitionFieldReply;
   /** Updates the metadata of a public landing template. */
   updateLandingTemplateMetadata: SupportMethodResponse;
+  /** Updates the period after closed petitions of this organization are automatically anonymized. */
+  updateOrganizationAutoAnonymizePeriod: Organization;
   /** Updates the limits of a given org. If 'Update Only Current Period' is left unchecked, the changes will be reflected on the next period. */
   updateOrganizationLimits: SupportMethodResponse;
   /** Updates the logo of an organization */
@@ -1370,6 +1372,10 @@ export interface MutationupdateLandingTemplateMetadataArgs {
   templateId: Scalars["ID"];
 }
 
+export interface MutationupdateOrganizationAutoAnonymizePeriodArgs {
+  period?: InputMaybe<Scalars["String"]>;
+}
+
 export interface MutationupdateOrganizationLimitsArgs {
   amount: Scalars["Int"];
   orgId: Scalars["Int"];
@@ -1572,6 +1578,7 @@ export interface Organization extends Timestamps {
   _id: Scalars["Int"];
   /** The total number of active users */
   activeUserCount: Scalars["Int"];
+  anonymizePetitionsAfter?: Maybe<TimeInterval>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom host used in petition links and public links. */
@@ -3440,6 +3447,13 @@ export interface TemplateUsedEvent extends PetitionEvent {
 export interface TemporaryFile {
   __typename?: "TemporaryFile";
   filename: Scalars["String"];
+}
+
+export interface TimeInterval {
+  __typename?: "TimeInterval";
+  days?: Maybe<Scalars["Int"]>;
+  months?: Maybe<Scalars["Int"]>;
+  years?: Maybe<Scalars["Int"]>;
 }
 
 export interface Timestamps {
@@ -11628,6 +11642,46 @@ export type OrganizationBranding_userQuery = {
   };
 };
 
+export type OrganizationCompliance_OrganizationFragment = {
+  __typename?: "Organization";
+  id: string;
+  activeUserCount: number;
+  usageLimits: {
+    __typename?: "OrganizationUsageLimit";
+    users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
+    petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
+    signatures: { __typename?: "OrganizationUsageSignaturesLimit"; used: number; limit: number };
+  };
+  anonymizePetitionsAfter?: {
+    __typename?: "TimeInterval";
+    years?: number | null;
+    months?: number | null;
+  } | null;
+};
+
+export type OrganizationCompliance_updateOrganizationAutoAnonymizePeriodMutationVariables = Exact<{
+  period?: InputMaybe<Scalars["String"]>;
+}>;
+
+export type OrganizationCompliance_updateOrganizationAutoAnonymizePeriodMutation = {
+  updateOrganizationAutoAnonymizePeriod: {
+    __typename?: "Organization";
+    id: string;
+    activeUserCount: number;
+    usageLimits: {
+      __typename?: "OrganizationUsageLimit";
+      users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
+      petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
+      signatures: { __typename?: "OrganizationUsageSignaturesLimit"; used: number; limit: number };
+    };
+    anonymizePetitionsAfter?: {
+      __typename?: "TimeInterval";
+      years?: number | null;
+      months?: number | null;
+    } | null;
+  };
+};
+
 export type OrganizationCompliance_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type OrganizationCompliance_userQuery = {
@@ -11647,19 +11701,24 @@ export type OrganizationCompliance_userQuery = {
     organization: {
       __typename?: "Organization";
       id: string;
-      activeUserCount: number;
       name: string;
+      activeUserCount: number;
       iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
         users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
         signatures: {
           __typename?: "OrganizationUsageSignaturesLimit";
           used: number;
           limit: number;
         };
       };
+      anonymizePetitionsAfter?: {
+        __typename?: "TimeInterval";
+        years?: number | null;
+        months?: number | null;
+      } | null;
     };
   };
   realMe: {
@@ -21894,6 +21953,29 @@ export const ChooseOrg_OrganizationFragmentDoc = gql`
     iconUrl200: iconUrl(options: { resize: { width: 200 } })
   }
 ` as unknown as DocumentNode<ChooseOrg_OrganizationFragment, unknown>;
+export const OrganizationCompliance_OrganizationFragmentDoc = gql`
+  fragment OrganizationCompliance_Organization on Organization {
+    id
+    activeUserCount
+    usageLimits {
+      users {
+        limit
+      }
+      petitions {
+        used
+        limit
+      }
+      signatures {
+        used
+        limit
+      }
+    }
+    anonymizePetitionsAfter {
+      years
+      months
+    }
+  }
+` as unknown as DocumentNode<OrganizationCompliance_OrganizationFragment, unknown>;
 export const OrganizationGroup_UserGroupMemberFragmentDoc = gql`
   fragment OrganizationGroup_UserGroupMember on UserGroupMember {
     id
@@ -26564,31 +26646,29 @@ export const OrganizationBranding_userDocument = gql`
   OrganizationBranding_userQuery,
   OrganizationBranding_userQueryVariables
 >;
+export const OrganizationCompliance_updateOrganizationAutoAnonymizePeriodDocument = gql`
+  mutation OrganizationCompliance_updateOrganizationAutoAnonymizePeriod($period: String) {
+    updateOrganizationAutoAnonymizePeriod(period: $period) {
+      ...OrganizationCompliance_Organization
+    }
+  }
+  ${OrganizationCompliance_OrganizationFragmentDoc}
+` as unknown as DocumentNode<
+  OrganizationCompliance_updateOrganizationAutoAnonymizePeriodMutation,
+  OrganizationCompliance_updateOrganizationAutoAnonymizePeriodMutationVariables
+>;
 export const OrganizationCompliance_userDocument = gql`
   query OrganizationCompliance_user {
     ...SettingsLayout_Query
     me {
       hasAutoAnonymize: hasFeatureFlag(featureFlag: AUTO_ANONYMIZE)
       organization {
-        id
-        activeUserCount
-        usageLimits {
-          users {
-            limit
-          }
-          petitions {
-            used
-            limit
-          }
-          signatures {
-            used
-            limit
-          }
-        }
+        ...OrganizationCompliance_Organization
       }
     }
   }
   ${SettingsLayout_QueryFragmentDoc}
+  ${OrganizationCompliance_OrganizationFragmentDoc}
 ` as unknown as DocumentNode<
   OrganizationCompliance_userQuery,
   OrganizationCompliance_userQueryVariables

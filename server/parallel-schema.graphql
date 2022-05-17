@@ -1411,6 +1411,11 @@ type Mutation {
   ): SupportMethodResponse!
 
   """
+  Updates the period after closed petitions of this organization are automatically anonymized.
+  """
+  updateOrganizationAutoAnonymizePeriod(period: String): Organization!
+
+  """
   Updates the limits of a given org. If 'Update Only Current Period' is left unchecked, the changes will be reflected on the next period.
   """
   updateOrganizationLimits(
@@ -1714,6 +1719,7 @@ type Organization implements Timestamps {
   The total number of active users
   """
   activeUserCount: Int!
+  anonymizePetitionsAfter: TimeInterval
 
   """
   Time when the resource was created.
@@ -4672,6 +4678,12 @@ type TemplateUsedEvent implements PetitionEvent {
 
 type TemporaryFile {
   filename: String!
+}
+
+type TimeInterval {
+  days: Int
+  months: Int
+  years: Int
 }
 
 interface Timestamps {

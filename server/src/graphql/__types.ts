@@ -592,6 +592,12 @@ export interface NexusGenObjects {
   TemplateDefaultUserPermission: db.TemplateDefaultPermission;
   TemplateUsedEvent: events.TemplateUsedEvent;
   TemporaryFile: db.TemporaryFile;
+  TimeInterval: {
+    // root type
+    days?: number | null; // Int
+    months?: number | null; // Int
+    years?: number | null; // Int
+  };
   User: db.User;
   UserAuthenticationToken: db.UserAuthenticationToken;
   UserGroup: db.UserGroup;
@@ -1040,6 +1046,7 @@ export interface NexusGenFieldTypes {
     updateFileUploadReply: NexusGenRootTypes["FileUploadReplyResponse"]; // FileUploadReplyResponse!
     updateFileUploadReplyComplete: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updateLandingTemplateMetadata: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    updateOrganizationAutoAnonymizePeriod: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationLimits: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateOrganizationLogo: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationPreferredTone: NexusGenRootTypes["Organization"]; // Organization!
@@ -1083,6 +1090,7 @@ export interface NexusGenFieldTypes {
     // field return type
     _id: number; // Int!
     activeUserCount: number; // Int!
+    anonymizePetitionsAfter: NexusGenRootTypes["TimeInterval"] | null; // TimeInterval
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customHost: string | null; // String
     hasSsoProvider: boolean; // Boolean!
@@ -1949,6 +1957,12 @@ export interface NexusGenFieldTypes {
     // field return type
     filename: string; // String!
   };
+  TimeInterval: {
+    // field return type
+    days: number | null; // Int
+    months: number | null; // Int
+    years: number | null; // Int
+  };
   User: {
     // field return type
     avatarUrl: string | null; // String
@@ -2527,6 +2541,7 @@ export interface NexusGenFieldTypeNames {
     updateFileUploadReply: "FileUploadReplyResponse";
     updateFileUploadReplyComplete: "PetitionFieldReply";
     updateLandingTemplateMetadata: "SupportMethodResponse";
+    updateOrganizationAutoAnonymizePeriod: "Organization";
     updateOrganizationLimits: "SupportMethodResponse";
     updateOrganizationLogo: "Organization";
     updateOrganizationPreferredTone: "Organization";
@@ -2570,6 +2585,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     _id: "Int";
     activeUserCount: "Int";
+    anonymizePetitionsAfter: "TimeInterval";
     createdAt: "DateTime";
     customHost: "String";
     hasSsoProvider: "Boolean";
@@ -3435,6 +3451,12 @@ export interface NexusGenFieldTypeNames {
   TemporaryFile: {
     // field return type name
     filename: "String";
+  };
+  TimeInterval: {
+    // field return type name
+    days: "Int";
+    months: "Int";
+    years: "Int";
   };
   User: {
     // field return type name
@@ -4309,6 +4331,10 @@ export interface NexusGenArgTypes {
       image?: NexusGenScalars["Upload"] | null; // Upload
       slug?: string | null; // String
       templateId: string; // ID!
+    };
+    updateOrganizationAutoAnonymizePeriod: {
+      // args
+      period?: string | null; // String
     };
     updateOrganizationLimits: {
       // args

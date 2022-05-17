@@ -26,6 +26,7 @@ import {
   CreateUserData,
   CreateUserGroup,
   EmailLog,
+  FeatureFlagName,
   FileUpload,
   Organization,
   OrganizationUsageLimit,
@@ -167,6 +168,10 @@ export class Mocks {
 
   async createFeatureFlags(featureFlags: CreateFeatureFlag[]) {
     await this.knex.into("feature_flag").insert(featureFlags);
+  }
+
+  async updateFeatureFlag(name: FeatureFlagName, value: boolean) {
+    await this.knex.from("feature_flag").where({ name }).update({ default_value: value });
   }
 
   async createRandomContacts(
