@@ -744,8 +744,8 @@ export interface Petition {
   is_completing_message_enabled: boolean; // bool
   completing_message_subject: Maybe<string>; // text
   completing_message_body: Maybe<string>; // text
-  metadata: any; // jsonb
   anonymized_at: Maybe<Date>; // timestamptz
+  metadata: any; // jsonb
 }
 
 export type CreatePetition = PartialProps<
@@ -782,8 +782,8 @@ export type CreatePetition = PartialProps<
   | "is_completing_message_enabled"
   | "completing_message_subject"
   | "completing_message_body"
-  | "metadata"
   | "anonymized_at"
+  | "metadata"
 >;
 
 export interface PetitionAccess {

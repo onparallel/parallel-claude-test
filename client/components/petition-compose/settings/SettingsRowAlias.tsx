@@ -2,15 +2,16 @@ import { FormErrorMessage, Input, Stack, Text } from "@chakra-ui/react";
 import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { ChangeEvent } from "react";
 import { FormattedMessage } from "react-intl";
+import { isDefined } from "remeda";
 import { SettingsRow } from "./SettingsRow";
 
-export type AliasErrorType = "UNIQUE" | "INVALID" | undefined;
+export type AliasErrorType = "UNIQUE" | "INVALID";
 
 type SettingsRowAliasProps = {
   alias: string;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   isReadOnly?: boolean;
-  errorType?: AliasErrorType;
+  errorType?: AliasErrorType | null;
 };
 
 export function SettingsRowAlias({
@@ -35,7 +36,7 @@ export function SettingsRowAlias({
         </Text>
       }
       controlId="alias-field"
-      isInvalid={errorType !== undefined}
+      isInvalid={isDefined(errorType)}
     >
       <Stack width="100%">
         <Input value={alias} size="sm" onChange={onChange} maxLength={100} />

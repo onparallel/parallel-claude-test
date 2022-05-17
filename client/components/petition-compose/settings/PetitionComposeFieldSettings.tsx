@@ -21,8 +21,9 @@ import {
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { ChangeEvent, ReactNode, useRef, useState } from "react";
+import { ChangeEvent, ReactNode, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 import { PetitionFieldTypeSelect } from "../PetitionFieldTypeSelect";
 import { CheckboxSettings } from "./PetitionComposeCheckboxSettings";
 import { DynamicSelectSettings } from "./PetitionComposeDynamicSelectFieldSettings";
@@ -59,14 +60,14 @@ export function PetitionComposeFieldSettings({
 }: PetitionComposeFieldSettingsProps) {
   const intl = useIntl();
   const [alias, setAlias] = useState(field.alias ?? "");
-  const [aliasError, setAliasError] = useState<AliasErrorType>(undefined);
-  const showDocumentReferenceAlert = useRef(false);
+  const [aliasError, setAliasError] = useState<AliasErrorType | null>(null);
+  const [showDocumentReferenceAlert, setShowDocumentReferenceAlert] = useState(false);
 
   const debouncedOnUpdate = useDebouncedCallback(
     async (fieldId, data) => {
       try {
         await onFieldEdit(fieldId, data);
-        if (aliasError !== undefined) setAliasError(undefined);
+        if (isDefined(aliasError)) setAliasError(null);
       } catch (error) {
         if (isApolloError(error, "ALIAS_ALREADY_EXISTS")) {
           setAliasError("UNIQUE");
@@ -79,7 +80,7 @@ export function PetitionComposeFieldSettings({
   const handleAliasChange = function (event: ChangeEvent<HTMLInputElement>) {
     const value = event.target.value;
     if (value && isFileTypeField(field.type)) {
-      showDocumentReferenceAlert.current = true;
+      setShowDocumentReferenceAlert(true);
     }
     setAlias(value);
 
@@ -297,7 +298,7 @@ export function PetitionComposeFieldSettings({
             isReadOnly={isReadOnly}
             errorType={aliasError}
           />
-          <PaddedCollapse in={isFileTypeField(field.type) && showDocumentReferenceAlert.current}>
+          <PaddedCollapse in={isFileTypeField(field.type) && showDocumentReferenceAlert}>
             <CloseableAlert status="warning" rounded="md">
               <AlertIcon color="yellow.500" />
               <AlertDescription>

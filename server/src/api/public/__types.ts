@@ -205,6 +205,7 @@ export type FeatureFlag =
   | "ON_BEHALF_OF"
   | "PETITION_PDF_EXPORT"
   | "PETITION_SIGNATURE"
+  | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
   | "REMOVE_PARALLEL_BRANDING"
   | "REMOVE_WHY_WE_USE_PARALLEL"
   | "SKIP_FORWARD_SECURITY";
@@ -423,6 +424,8 @@ export type Mutation = {
   createExportExcelTask: Task;
   /** Creates a task for exporting a ZIP file with petition replies and sends it to the queue */
   createExportRepliesTask: Task;
+  /** Creates a task for exporting a report grouping the replies of every petition coming from the same template */
+  createExportReportTask: Task;
   /** Creates a reply to a file upload field. */
   createFileUploadReply: FileUploadReplyResponse;
   /** Notifies the backend that the upload is complete. */
@@ -774,6 +777,10 @@ export type MutationcreateExportRepliesTaskArgs = {
   petitionId: Scalars["GID"];
 };
 
+export type MutationcreateExportReportTaskArgs = {
+  petitionId: Scalars["GID"];
+};
+
 export type MutationcreateFileUploadReplyArgs = {
   fieldId: Scalars["GID"];
   file: FileUploadInput;
@@ -849,6 +856,7 @@ export type MutationcreatePrintPdfTaskArgs = {
 
 export type MutationcreatePublicPetitionLinkArgs = {
   description: Scalars["String"];
+  prefillSecret?: InputMaybe<Scalars["String"]>;
   slug?: InputMaybe<Scalars["String"]>;
   templateId: Scalars["GID"];
   title: Scalars["String"];
@@ -1412,6 +1420,7 @@ export type MutationupdatePetitionUserNotificationReadStatusArgs = {
 export type MutationupdatePublicPetitionLinkArgs = {
   description?: InputMaybe<Scalars["String"]>;
   isActive?: InputMaybe<Scalars["Boolean"]>;
+  prefillSecret?: InputMaybe<Scalars["String"]>;
   publicPetitionLinkId: Scalars["GID"];
   slug?: InputMaybe<Scalars["String"]>;
   title?: InputMaybe<Scalars["String"]>;
@@ -2633,6 +2642,7 @@ export type PublicPetitionLink = {
   id: Scalars["GID"];
   isActive: Scalars["Boolean"];
   owner: User;
+  prefillSecret: Maybe<Scalars["String"]>;
   slug: Scalars["String"];
   template: PetitionTemplate;
   title: Scalars["String"];
