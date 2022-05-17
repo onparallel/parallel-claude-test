@@ -30,6 +30,8 @@ export async function presendPetition(
   // this helps us distribute massive sends in time and avoid getting flagged as spam.
   const CHUNK_SIZE = 20;
   return ctx.petitions.withTransaction(async (t) => {
+    let processedPetitions = 0;
+    let prevChunkLength = 0;
     return (
       await pMap(
         chunkWhile(
@@ -41,9 +43,11 @@ export async function presendPetition(
             sumBy(chunk, ([_, curr]) => curr.length) + current.length <= CHUNK_SIZE
         ),
         async (currentChunk, index) => {
+          if (index) processedPetitions += prevChunkLength;
+          prevChunkLength = currentChunk.length;
           return await pMap(
             currentChunk,
-            async ([petition, contactIds], _index) => {
+            async ([petition, contactIds], chunkIndex) => {
               try {
                 const scheduledAt =
                   index === 0
@@ -80,8 +84,8 @@ export async function presendPetition(
                 );
 
                 const name =
-                  currentChunk.length > 1 || index
-                    ? `${petition.name ?? args.subject} (${index * CHUNK_SIZE + (_index + 1)})`
+                  petitionSendGroups.length > 1
+                    ? `${petition.name ?? args.subject} (${processedPetitions + (chunkIndex + 1)})`
                     : petition.name ?? args.subject;
 
                 const [updatedPetition] = await ctx.petitions.updatePetition(

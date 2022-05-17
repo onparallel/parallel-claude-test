@@ -34,7 +34,9 @@ describe("presendPetition", () => {
     contacts = await mocks.createRandomContacts(organization.id, 21);
     contactIds = contacts.map((c) => c.id);
 
-    petitions = await mocks.createRandomPetitions(organization.id, user.id, 21);
+    petitions = await mocks.createRandomPetitions(organization.id, user.id, 21, () => ({
+      name: "Test petition",
+    }));
   });
 
   afterAll(async () => {
@@ -229,6 +231,7 @@ describe("presendPetition", () => {
     );
 
     expect(results).toHaveLength(1);
+    expect(results[0].petition?.name).toEqual(petitions[0].name);
     const [{ error, result, messages, accesses }] = results;
 
     expect(error).toBeUndefined();
@@ -318,7 +321,9 @@ describe("presendPetition", () => {
     expect(results.every((r) => r.result === "SUCCESS")).toEqual(true);
     expect(results.flatMap((r) => r.messages)).toHaveLength(petitions.length * contactIds.length);
     expect(results.flatMap((r) => r.accesses)).toHaveLength(petitions.length * contactIds.length);
-
+    expect(results.map((r) => r.petition?.name)).toEqual(
+      petitions.map((p, i) => `${p.name} (${i + 1})`)
+    );
     expect(results.map((r) => r.messages)).toMatchObject(
       petitions.map((p, i) =>
         contactIds.map(() => ({
