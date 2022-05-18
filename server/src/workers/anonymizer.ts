@@ -1,7 +1,11 @@
 import { addMonths } from "date-fns";
 import { isDefined, uniq } from "remeda";
-import { PostgresInterval } from "../db/helpers/BaseRepository";
 import { createCronWorker } from "./helpers/createCronWorker";
+
+type PostgresInterval = {
+  years?: number;
+  months?: number;
+};
 
 createCronWorker("anonymizer", async (ctx, config) => {
   const DAYS = config.anonymizeAfterDays;
@@ -48,12 +52,13 @@ createCronWorker("anonymizer", async (ctx, config) => {
   const closedPetitions = await ctx.petitions.getClosedPetitionsToAnonymize();
   const organizations = await ctx.organizations.loadOrg(uniq(closedPetitions.map((p) => p.org_id)));
   for (const petition of closedPetitions) {
-    const org = organizations.find((o) => o!.id === petition.org_id);
+    const org = organizations.find((o) => o!.id === petition.org_id)!;
     if (
-      org &&
       isDefined(org.anonymize_petitions_after) &&
-      addMonths(petition.updated_at, pgIntervalToMonths(org.anonymize_petitions_after)) <=
-        new Date()
+      addMonths(
+        petition.updated_at,
+        pgIntervalToMonths(org.anonymize_petitions_after as PostgresInterval)
+      ) <= new Date()
     ) {
       ctx.logger.debug(`Anonymizing closed petition ${petition.id}`);
       await ctx.petitions.anonymizePetition(petition.id);

@@ -188,7 +188,7 @@ PetitionRepliesFieldReply.fragments = {
 function ReplyNotAvailable({ type }: { type?: PetitionFieldType }) {
   return (
     <Text textStyle="hint">
-      {type === "FILE_UPLOAD" ? (
+      {type && isFileTypeField(type) ? (
         <FormattedMessage
           id="generic.document-not-available"
           defaultMessage="Document not available"

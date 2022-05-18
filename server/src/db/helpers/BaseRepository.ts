@@ -21,12 +21,6 @@ import {
   TableTypes as _TableTypes,
 } from "../__types";
 
-export type PostgresInterval = {
-  years?: number;
-  months?: number;
-  days?: number;
-};
-
 export interface TableTypes
   extends Replace<
     _TableTypes,
@@ -34,13 +28,7 @@ export interface TableTypes
       petition_event: PetitionEvent;
       petition_user_notification: PetitionUserNotification;
       system_event: SystemEvent;
-      organization: Replace<
-        Organization,
-        {
-          usage_details: OrganizationUsageDetails;
-          anonymize_petitions_after: PostgresInterval | null;
-        }
-      >;
+      organization: Replace<Organization, { usage_details: OrganizationUsageDetails }>;
       petition: Replace<Petition, { signature_config: PetitionSignatureConfig | null }>;
       petition_signature_request: Replace<
         PetitionSignatureRequest,

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { EmailXIcon } from "@parallel/chakra/icons";
+import { CircleCrossFilledIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelinePetitionAnonymizedEvent_PetitionAnonymizedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -13,7 +13,9 @@ type TimelinePetitionAnonymizedEventProps = {
 export function TimelinePetitionAnonymizedEvent({ event }: TimelinePetitionAnonymizedEventProps) {
   return (
     <TimelineItem
-      icon={<TimelineIcon icon={<EmailXIcon />} color="white" backgroundColor="red.500" />}
+      icon={
+        <TimelineIcon icon={<CircleCrossFilledIcon />} color="white" backgroundColor="red.500" />
+      }
     >
       <FormattedMessage
         id="timeline.petition-anonymized-description"
