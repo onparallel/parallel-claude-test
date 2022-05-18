@@ -685,6 +685,7 @@ export function DefaultHeader({
                       onCloseFilter();
                     }
                   }}
+                  transition="none"
                 >
                   <Heading as="h4" size="xs" textTransform="uppercase" paddingX={2} paddingY={2}>
                     <FormattedMessage id="component.table.filter-header" defaultMessage="Filter" />
