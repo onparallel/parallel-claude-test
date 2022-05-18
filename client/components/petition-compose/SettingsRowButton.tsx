@@ -1,8 +1,9 @@
-import { Box, Button, Collapse, HStack } from "@chakra-ui/react";
+import { Box, Button, HStack } from "@chakra-ui/react";
 import { DeleteIcon, SettingsIcon } from "@parallel/chakra/icons";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { PaddedCollapse } from "../common/PaddedCollapse";
 import { SettingsRow, SettingsRowProps } from "./settings/SettingsRow";
 
 interface SettingsRowButtonProps extends Omit<SettingsRowProps, "children" | "onChange"> {
@@ -66,9 +67,9 @@ export function SettingsRowButton({
         )}
       </SettingsRow>
       {children ? (
-        <Collapse in={isActive}>
+        <PaddedCollapse in={isActive}>
           <Box marginTop={2}>{children}</Box>
-        </Collapse>
+        </PaddedCollapse>
       ) : null}
     </Box>
   );
