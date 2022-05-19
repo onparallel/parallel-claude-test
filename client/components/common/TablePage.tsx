@@ -206,7 +206,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
             })),
           ]
         : columns,
-    [columns, selectedCount]
+    [columns, actions, selectedCount]
   );
   return (
     <Card display="flex" flexDirection="column" {...props}>

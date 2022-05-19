@@ -3085,6 +3085,26 @@
     "context": "Delete token"
   },
   {
+    "term": "component.rename-dialog.change-name",
+    "definition": "Cambiar nombre",
+    "context": "Change name"
+  },
+  {
+    "term": "component.rename-dialog.change-name-error",
+    "definition": "El nombre no puede superar los {max} caracteres",
+    "context": "Name cannot exceed {max} characters"
+  },
+  {
+    "term": "component.rename-dialog.header-petition",
+    "definition": "Renombrar petición",
+    "context": "Rename petition"
+  },
+  {
+    "term": "component.rename-dialog.header-template",
+    "definition": "Renombrar plantilla",
+    "context": "Rename template"
+  },
+  {
     "term": "component.replies-field-comment.mark-as-unread",
     "definition": "Marcar como no leído",
     "context": "Mark as unread"
@@ -4830,6 +4850,11 @@
     "context": "Page break"
   },
   {
+    "term": "generic.petition-name",
+    "definition": "Nombre de la petición",
+    "context": "Petition name"
+  },
+  {
     "term": "generic.petition-status.closed",
     "definition": "Cerrada",
     "context": "Closed"
@@ -4998,6 +5023,11 @@
     "term": "generic.template",
     "definition": "Plantilla",
     "context": "Template"
+  },
+  {
+    "term": "generic.template-name",
+    "definition": "Nombre de la plantilla",
+    "context": "Template name"
   },
   {
     "term": "generic.template-type-plural",
@@ -5528,6 +5558,11 @@
     "term": "page.petitions-list.actions-clone",
     "definition": "Duplicar",
     "context": "Duplicate"
+  },
+  {
+    "term": "page.petitions-list.actions-rename",
+    "definition": "Renombrar",
+    "context": "Rename"
   },
   {
     "term": "page.petitions-list.actions-save-as-template",
@@ -6380,11 +6415,6 @@
     "context": "Message sent"
   },
   {
-    "term": "petition.name-label",
-    "definition": "Nombre de la petición",
-    "context": "Petition name"
-  },
-  {
     "term": "petition.no-reminders-left-generic.toast-description",
     "definition": "Has enviado el máximo número de recordatorios a alguno de los contactos seleccionados",
     "context": "You have sent the maximum number of reminders to some of the selected contacts"
@@ -6545,16 +6575,6 @@
     "context": "Error"
   },
   {
-    "term": "petition.template-name-label",
-    "definition": "Nombre de la plantilla",
-    "context": "Template name"
-  },
-  {
-    "term": "petitions.header.name",
-    "definition": "Nombre de la petición",
-    "context": "Petition name"
-  },
-  {
     "term": "petitions.header.recipient",
     "definition": "Destinatario",
     "context": "Recipient"
@@ -6598,11 +6618,6 @@
     "term": "petitions.header.tags",
     "definition": "Etiquetas",
     "context": "Tags"
-  },
-  {
-    "term": "petitions.header.template-name",
-    "definition": "Nombre de la plantilla",
-    "context": "Template name"
   },
   {
     "term": "petitions.no-petitions",

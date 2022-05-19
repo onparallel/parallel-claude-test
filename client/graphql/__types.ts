@@ -18551,6 +18551,17 @@ export type Petitions_petitionsQuery = {
   };
 };
 
+export type Petitions_updatePetitionMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  data: UpdatePetitionInput;
+}>;
+
+export type Petitions_updatePetitionMutation = {
+  updatePetition:
+    | { __typename?: "Petition"; id: string; name?: string | null }
+    | { __typename?: "PetitionTemplate"; id: string; name?: string | null };
+};
+
 export type NewPetition_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
@@ -27105,6 +27116,17 @@ export const Petitions_petitionsDocument = gql`
   }
   ${Petitions_PetitionBasePaginationFragmentDoc}
 ` as unknown as DocumentNode<Petitions_petitionsQuery, Petitions_petitionsQueryVariables>;
+export const Petitions_updatePetitionDocument = gql`
+  mutation Petitions_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
+    updatePetition(petitionId: $petitionId, data: $data) {
+      id
+      name
+    }
+  }
+` as unknown as DocumentNode<
+  Petitions_updatePetitionMutation,
+  Petitions_updatePetitionMutationVariables
+>;
 export const NewPetition_templatesDocument = gql`
   query NewPetition_templates(
     $offset: Int!

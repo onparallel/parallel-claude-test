@@ -53,11 +53,11 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
           header:
             type === "PETITION"
               ? intl.formatMessage({
-                  id: "petitions.header.name",
+                  id: "generic.petition-name",
                   defaultMessage: "Petition name",
                 })
               : intl.formatMessage({
-                  id: "petitions.header.template-name",
+                  id: "generic.template-name",
                   defaultMessage: "Template name",
                 }),
           cellProps: {

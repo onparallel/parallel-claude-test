@@ -273,7 +273,7 @@ export const PetitionHeader = Object.assign(
                     })
               }
               aria-label={intl.formatMessage({
-                id: "petition.name-label",
+                id: "generic.petition-name",
                 defaultMessage: "Petition name",
               })}
             />

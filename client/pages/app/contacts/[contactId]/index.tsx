@@ -244,7 +244,7 @@ function useContactPetitionAccessesColumns() {
         {
           key: "name",
           header: intl.formatMessage({
-            id: "petitions.header.name",
+            id: "generic.petition-name",
             defaultMessage: "Petition name",
           }),
           headerProps: {

@@ -1,11 +1,18 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { Box, Flex, Select, Text } from "@chakra-ui/react";
-import { CopyIcon, DeleteIcon, PaperPlaneIcon, UserArrowIcon } from "@parallel/chakra/icons";
+import {
+  CopyIcon,
+  DeleteIcon,
+  EditSimpleIcon,
+  PaperPlaneIcon,
+  UserArrowIcon,
+} from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
+import { useRenameDialog } from "@parallel/components/petition-common/dialogs/RenameDialog";
 import {
   flatShared,
   removeInvalidLines,
@@ -18,6 +25,7 @@ import {
   PetitionStatus,
   Petitions_PetitionBaseFragment,
   Petitions_petitionsDocument,
+  Petitions_updatePetitionDocument,
   Petitions_userDocument,
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
@@ -204,6 +212,27 @@ function Petitions() {
     );
   }, []);
 
+  const [updatePetition] = useMutation(Petitions_updatePetitionDocument);
+  const showRenameDialog = useRenameDialog();
+
+  const handleRenameClick = useCallback(async () => {
+    try {
+      const petition = petitions.items.find((p) => p.id === selected[0]);
+      if (petition) {
+        const { newName } = await showRenameDialog({
+          name: petition.name,
+          isTemplate: petition.__typename === "PetitionTemplate",
+        });
+        await updatePetition({
+          variables: {
+            petitionId: petition.id,
+            data: { name: newName },
+          },
+        });
+      }
+    } catch {}
+  }, [petitions, selected]);
+
   const columns = usePetitionsTableColumns(
     petitions.items.length > 0
       ? petitions.items[0].__typename === "Petition"
@@ -218,6 +247,7 @@ function Petitions() {
     user: me,
     type: state.type,
     selectedCount: selected.length,
+    onRenameClick: handleRenameClick,
     onDeleteClick: handleDeleteClick,
     onCloneAsTemplateClick: handleCloneAsTemplate,
     onUseTemplateClick: handleUseTemplateClick,
@@ -384,7 +414,7 @@ Petitions.fragments = {
   },
 };
 
-Petitions.queries = [
+const _queries = [
   gql`
     query Petitions_user {
       ...AppLayout_Query
@@ -417,10 +447,22 @@ Petitions.queries = [
   `,
 ];
 
+const _mutations = [
+  gql`
+    mutation Petitions_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
+      updatePetition(petitionId: $petitionId, data: $data) {
+        id
+        name
+      }
+    }
+  `,
+];
+
 function usePetitionListActions({
   user,
   type,
   selectedCount,
+  onRenameClick,
   onShareClick,
   onCloneClick,
   onCloneAsTemplateClick,
@@ -430,6 +472,7 @@ function usePetitionListActions({
   user: any;
   type: PetitionBaseType;
   selectedCount: number;
+  onRenameClick: () => void;
   onShareClick: () => void;
   onCloneClick: () => void;
   onCloneAsTemplateClick: () => void;
@@ -437,6 +480,15 @@ function usePetitionListActions({
   onDeleteClick: () => void;
 }) {
   return [
+    {
+      key: "rename",
+      onClick: onRenameClick,
+      isDisabled: selectedCount !== 1,
+      leftIcon: <EditSimpleIcon />,
+      children: (
+        <FormattedMessage id="page.petitions-list.actions-rename" defaultMessage="Rename" />
+      ),
+    },
     {
       key: "share",
       onClick: onShareClick,

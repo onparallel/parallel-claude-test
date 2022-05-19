@@ -3085,6 +3085,26 @@
     "context": "Delete token"
   },
   {
+    "term": "component.rename-dialog.change-name",
+    "definition": "Change name",
+    "context": "Change name"
+  },
+  {
+    "term": "component.rename-dialog.change-name-error",
+    "definition": "Name cannot exceed {max} characters",
+    "context": "Name cannot exceed {max} characters"
+  },
+  {
+    "term": "component.rename-dialog.header-petition",
+    "definition": "Rename petition",
+    "context": "Rename petition"
+  },
+  {
+    "term": "component.rename-dialog.header-template",
+    "definition": "Rename template",
+    "context": "Rename template"
+  },
+  {
     "term": "component.replies-field-comment.mark-as-unread",
     "definition": "Mark as unread",
     "context": "Mark as unread"
@@ -4830,6 +4850,11 @@
     "context": "Page break"
   },
   {
+    "term": "generic.petition-name",
+    "definition": "Petition name",
+    "context": "Petition name"
+  },
+  {
     "term": "generic.petition-status.closed",
     "definition": "Closed",
     "context": "Closed"
@@ -4998,6 +5023,11 @@
     "term": "generic.template",
     "definition": "Template",
     "context": "Template"
+  },
+  {
+    "term": "generic.template-name",
+    "definition": "Template name",
+    "context": "Template name"
   },
   {
     "term": "generic.template-type-plural",
@@ -5528,6 +5558,11 @@
     "term": "page.petitions-list.actions-clone",
     "definition": "Duplicate",
     "context": "Duplicate"
+  },
+  {
+    "term": "page.petitions-list.actions-rename",
+    "definition": "Rename",
+    "context": "Rename"
   },
   {
     "term": "page.petitions-list.actions-save-as-template",
@@ -6380,11 +6415,6 @@
     "context": "Message sent"
   },
   {
-    "term": "petition.name-label",
-    "definition": "Petition name",
-    "context": "Petition name"
-  },
-  {
     "term": "petition.no-reminders-left-generic.toast-description",
     "definition": "You have sent the maximum number of reminders to some of the selected contacts",
     "context": "You have sent the maximum number of reminders to some of the selected contacts"
@@ -6545,16 +6575,6 @@
     "context": "Error"
   },
   {
-    "term": "petition.template-name-label",
-    "definition": "Template name",
-    "context": "Template name"
-  },
-  {
-    "term": "petitions.header.name",
-    "definition": "Petition name",
-    "context": "Petition name"
-  },
-  {
     "term": "petitions.header.recipient",
     "definition": "Recipient",
     "context": "Recipient"
@@ -6598,11 +6618,6 @@
     "term": "petitions.header.tags",
     "definition": "Tags",
     "context": "Tags"
-  },
-  {
-    "term": "petitions.header.template-name",
-    "definition": "Template name",
-    "context": "Template name"
   },
   {
     "term": "petitions.no-petitions",
