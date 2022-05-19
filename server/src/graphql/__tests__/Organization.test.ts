@@ -96,6 +96,12 @@ describe("GraphQL/Organization", () => {
         "normal-token",
         normalUser.id
       ));
+
+      await mocks.createFeatureFlags([{ name: "AUTO_ANONYMIZE", default_value: true }]);
+    });
+
+    beforeEach(async () => {
+      await mocks.updateFeatureFlag("AUTO_ANONYMIZE", true);
     });
 
     it("sends error if user doesn't have enabled feature_flag", async () => {
@@ -116,8 +122,6 @@ describe("GraphQL/Organization", () => {
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
-
-      await mocks.updateFeatureFlag("AUTO_ANONYMIZE", true);
     });
 
     it("sends error if user is not admin", async () => {
