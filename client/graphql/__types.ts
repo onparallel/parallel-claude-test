@@ -100,6 +100,12 @@ export interface AsyncFieldCompletionResponse {
   url: Scalars["String"];
 }
 
+export interface BulkCreateContactsReturnType {
+  __typename?: "BulkCreateContactsReturnType";
+  contacts: Array<Contact>;
+  errors?: Maybe<Array<Scalars["JSON"]>>;
+}
+
 export type BulkSendSigningMode =
   /** Allow configured signer(s) to sign every petition on the batch */
   | "COPY_SIGNATURE_SETTINGS"
@@ -427,7 +433,7 @@ export interface Mutation {
   /** Clones the petition and assigns the given user as owner and creator. */
   assignPetitionToUser: SupportMethodResponse;
   /** Load contacts from an excel file, creating the ones not found on database */
-  bulkCreateContacts: Array<Contact>;
+  bulkCreateContacts: BulkCreateContactsReturnType;
   /** Submits multiple replies on a petition at once given a JSON input where the keys are field aliases and values are the replie(s) for that field. */
   bulkCreatePetitionReplies: Petition;
   /** Cancels a scheduled petition message. */
@@ -4140,7 +4146,11 @@ export type ImportContactsDialog_bulkCreateContactsMutationVariables = Exact<{
 }>;
 
 export type ImportContactsDialog_bulkCreateContactsMutation = {
-  bulkCreateContacts: Array<{ __typename?: "Contact"; id: string }>;
+  bulkCreateContacts: {
+    __typename?: "BulkCreateContactsReturnType";
+    errors?: Array<any> | null;
+    contacts: Array<{ __typename?: "Contact"; id: string }>;
+  };
 };
 
 export type AppLayout_QueryFragment = {
@@ -24793,7 +24803,10 @@ export const WithSuperAdminAccessDocument = gql`
 export const ImportContactsDialog_bulkCreateContactsDocument = gql`
   mutation ImportContactsDialog_bulkCreateContacts($file: Upload!) {
     bulkCreateContacts(file: $file) {
-      id
+      errors
+      contacts {
+        id
+      }
     }
   }
 ` as unknown as DocumentNode<

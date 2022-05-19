@@ -71,6 +71,11 @@ type AsyncFieldCompletionResponse {
   url: String!
 }
 
+type BulkCreateContactsReturnType {
+  contacts: [Contact!]!
+  errors: [JSON!]
+}
+
 enum BulkSendSigningMode {
   """
   Allow configured signer(s) to sign every petition on the batch
@@ -529,7 +534,7 @@ type Mutation {
   """
   Load contacts from an excel file, creating the ones not found on database
   """
-  bulkCreateContacts(file: Upload!): [Contact!]!
+  bulkCreateContacts(file: Upload!): BulkCreateContactsReturnType!
 
   """
   Submits multiple replies on a petition at once given a JSON input where the keys are field aliases and values are the replie(s) for that field.

@@ -1,4 +1,8 @@
-import { ExcelParsingError } from "./errors";
+export type ExcelParsingError = {
+  message: string;
+  row: number;
+  column: number;
+};
 
 type ParsedContact = {
   firstName: string;
@@ -11,7 +15,7 @@ export async function parseContactList(
   options: {
     validateEmail: (email: string) => Promise<boolean>;
   }
-): Promise<ParsedContact[]> {
+): Promise<[ExcelParsingError[] | undefined, ParsedContact[]]> {
   const errors = [] as ExcelParsingError[];
 
   // first row is column headers
@@ -20,6 +24,7 @@ export async function parseContactList(
   const parsedContacts = [] as ParsedContact[];
 
   for (let index = 0; index < dataSliced.length; index++) {
+    let rowHasError = false;
     const row = dataSliced[index];
     // empty rows are ignored
     if (!row.some((c) => !!c)) continue;
@@ -27,21 +32,21 @@ export async function parseContactList(
     // the columns are parsed to ParsedContact and the possible errors are stored with their row and column
     const firstName = row[0]?.trim();
     if (!firstName) {
-      errors.push(new ExcelParsingError("First name is required", index + 2, 1));
+      rowHasError = true;
+      errors.push({ message: "First name is required", row: index + 2, column: 1 });
     }
     const lastName = row[1]?.trim();
     const email = row[2]?.trim().toLowerCase();
     if (!(await options.validateEmail(email))) {
-      errors.push(new ExcelParsingError(`${email} is not a valid email`, index + 2, 3));
+      rowHasError = true;
+      errors.push({ message: `${email} is not a valid email`, row: index + 2, column: 3 });
     }
 
     // we add the new contact to the cumulative array
-    parsedContacts.push({ firstName, lastName, email });
+    if (!rowHasError) {
+      parsedContacts.push({ firstName, lastName, email });
+    }
   }
 
-  if (errors.length) {
-    throw new AggregateError(errors, errors[0].message);
-  }
-
-  return parsedContacts;
+  return [errors.length ? errors : undefined, parsedContacts];
 }

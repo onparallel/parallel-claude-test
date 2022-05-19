@@ -2,12 +2,12 @@ import { gql } from "@apollo/client";
 import { Flex, Text, useToast } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { useDialog, withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { ContactListHeader } from "@parallel/components/contact-list/ContactListHeader";
-import { ImportContactsDialog } from "@parallel/components/contact-list/dialogs/ImportContactsDialog";
+import { useImportContactsDialog } from "@parallel/components/contact-list/dialogs/ImportContactsDialog";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
   Contacts_contactsDocument,
@@ -121,7 +121,7 @@ function Contacts() {
     } catch {}
   }
 
-  const showImportContactsDialog = useDialog(ImportContactsDialog);
+  const showImportContactsDialog = useImportContactsDialog();
 
   async function handleImportClick() {
     const [error, data] = await withError(showImportContactsDialog({}));

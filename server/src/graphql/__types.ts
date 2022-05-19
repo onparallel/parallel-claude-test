@@ -312,6 +312,11 @@ export interface NexusGenObjects {
     type: string; // String!
     url: string; // String!
   };
+  BulkCreateContactsReturnType: {
+    // root type
+    contacts: NexusGenRootTypes["Contact"][]; // [Contact!]!
+    errors?: NexusGenScalars["JSON"][] | null; // [JSON!]
+  };
   CommentCreatedUserNotification: notifications.CommentCreatedUserNotification;
   CommentDeletedEvent: events.CommentDeletedEvent;
   CommentPublishedEvent: events.CommentPublishedEvent;
@@ -723,6 +728,11 @@ export interface NexusGenFieldTypes {
     type: string; // String!
     url: string; // String!
   };
+  BulkCreateContactsReturnType: {
+    // field return type
+    contacts: NexusGenRootTypes["Contact"][]; // [Contact!]!
+    errors: NexusGenScalars["JSON"][] | null; // [JSON!]
+  };
   CommentCreatedUserNotification: {
     // field return type
     comment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
@@ -917,7 +927,7 @@ export interface NexusGenFieldTypes {
     addUsersToUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     approveOrRejectPetitionFieldReplies: NexusGenRootTypes["Petition"]; // Petition!
     assignPetitionToUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
-    bulkCreateContacts: NexusGenRootTypes["Contact"][]; // [Contact!]!
+    bulkCreateContacts: NexusGenRootTypes["BulkCreateContactsReturnType"]; // BulkCreateContactsReturnType!
     bulkCreatePetitionReplies: NexusGenRootTypes["Petition"]; // Petition!
     cancelScheduledMessage: NexusGenRootTypes["PetitionMessage"] | null; // PetitionMessage
     cancelSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
@@ -2196,6 +2206,11 @@ export interface NexusGenFieldTypeNames {
     type: "String";
     url: "String";
   };
+  BulkCreateContactsReturnType: {
+    // field return type name
+    contacts: "Contact";
+    errors: "JSON";
+  };
   CommentCreatedUserNotification: {
     // field return type name
     comment: "PetitionFieldComment";
@@ -2390,7 +2405,7 @@ export interface NexusGenFieldTypeNames {
     addUsersToUserGroup: "UserGroup";
     approveOrRejectPetitionFieldReplies: "Petition";
     assignPetitionToUser: "SupportMethodResponse";
-    bulkCreateContacts: "Contact";
+    bulkCreateContacts: "BulkCreateContactsReturnType";
     bulkCreatePetitionReplies: "Petition";
     cancelScheduledMessage: "PetitionMessage";
     cancelSignatureRequest: "PetitionSignatureRequest";

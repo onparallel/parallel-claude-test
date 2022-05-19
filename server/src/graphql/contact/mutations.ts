@@ -1,12 +1,19 @@
 import { nameCase } from "@foundernest/namecase";
 import { ApolloError } from "apollo-server-core";
-import { booleanArg, inputObjectType, list, mutationField, nonNull, nullable } from "nexus";
+import {
+  booleanArg,
+  inputObjectType,
+  list,
+  mutationField,
+  nonNull,
+  nullable,
+  objectType,
+} from "nexus";
 import pMap from "p-map";
 import { chunk, countBy, isDefined, uniqBy } from "remeda";
 import { CreateContact } from "../../db/__types";
 import { withError } from "../../util/promises/withError";
 import { authenticate, authenticateAnd } from "../helpers/authorize";
-import { ExcelParsingError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { importFromExcel } from "../helpers/importDataFromExcel";
 import { parseContactList } from "../helpers/parseContactList";
@@ -89,7 +96,15 @@ export const updateContact = mutationField("updateContact", {
 
 export const bulkCreateContacts = mutationField("bulkCreateContacts", {
   description: "Load contacts from an excel file, creating the ones not found on database",
-  type: list("Contact"),
+  type: objectType({
+    name: "BulkCreateContactsReturnType",
+    definition(t) {
+      t.nullable.list.json("errors");
+      t.nonNull.list.nonNull.field("contacts", {
+        type: "Contact",
+      });
+    },
+  }),
   authorize: authenticate(),
   args: {
     file: nonNull(uploadArg()),
@@ -110,22 +125,11 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
       throw new ApolloError("Invalid file", "INVALID_FORMAT_ERROR");
     }
 
-    const [parsedErrors, parsedContacts] = await withError(
-      async () =>
-        await parseContactList(importResult!, {
-          validateEmail: (email: string) => ctx.emails.validateEmail(email),
-        })
-    );
+    const [parsedErrors, parsedContacts] = await parseContactList(importResult!, {
+      validateEmail: (email: string) => ctx.emails.validateEmail(email),
+    });
 
-    if (parsedErrors && parsedErrors instanceof AggregateError) {
-      const rows = parsedErrors.errors.map((e: ExcelParsingError) => e.row);
-
-      throw new ApolloError(parsedErrors.message, "INVALID_FORMAT_ERROR", {
-        rows,
-      });
-    }
-
-    if (!parsedContacts || parsedContacts.length === 0) {
+    if (parsedContacts.length === 0) {
       throw new ApolloError("No contacts found on file", "NO_CONTACTS_FOUND_ERROR");
     }
 
@@ -149,7 +153,10 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
       )
     ).flat();
 
-    return uniqBy(contacts, (c) => c.email);
+    return {
+      contacts: uniqBy(contacts, (c) => c.email),
+      errors: parsedErrors,
+    };
   },
 });
 

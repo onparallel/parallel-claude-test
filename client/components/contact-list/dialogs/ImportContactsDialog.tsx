@@ -18,7 +18,7 @@ import { useState } from "react";
 import { FileRejection } from "react-dropzone";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { BaseDialog } from "../../common/dialogs/BaseDialog";
-import { DialogProps } from "../../common/dialogs/DialogProvider";
+import { DialogProps, useDialog } from "../../common/dialogs/DialogProvider";
 import { Dropzone } from "../../common/Dropzone";
 import { FileSize } from "../../common/FileSize";
 import { NormalLink } from "../../common/Link";
@@ -32,6 +32,35 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
 
   const showErrorDialog = useErrorDialog();
 
+  async function showImportErrorDialog(rows: number[]) {
+    return await withError(
+      showErrorDialog({
+        header: <FormattedMessage id="generic.import-error" defaultMessage="Import error" />,
+        message: (
+          <>
+            {rows.length && rows.length < 16 ? (
+              <Text marginBottom={2}>
+                <FormattedMessage
+                  id="contacts.import-from-excel.import-error.details"
+                  defaultMessage="We have detected an error in the following file rows:"
+                />
+                <Text as="b" marginLeft={1.5}>
+                  <FormattedList value={rows} />
+                </Text>
+              </Text>
+            ) : null}
+            <Text>
+              <FormattedMessage
+                id="contacts.import-from-excel.import-error.body"
+                defaultMessage="Please, review your file and make sure it matches the format on the loading model."
+              />
+            </Text>
+          </>
+        ),
+      })
+    );
+  }
+
   const [bulkCreateContacts, { loading: isUploading }] = useMutation(
     ImportContactsDialog_bulkCreateContactsDocument
   );
@@ -40,43 +69,23 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
       setFileDropError(rejected[0].errors[0].code);
     } else {
       try {
-        const result = await bulkCreateContacts({
+        const { data } = await bulkCreateContacts({
           variables: { file },
         });
-        props.onResolve({ count: result!.data!.bulkCreateContacts.length });
+        const contacts = data!.bulkCreateContacts.contacts;
+        const errors = data!.bulkCreateContacts.errors;
+
+        if (errors && errors.length > 0) {
+          await showImportErrorDialog(errors.map((e: any) => e.row));
+        }
+        props.onResolve({ count: contacts.length });
       } catch (error: any) {
         if (
           isApolloError(error) &&
           (error.graphQLErrors[0]?.extensions?.code === "INVALID_FORMAT_ERROR" ||
             error.graphQLErrors[0]?.extensions?.code === "NO_CONTACTS_FOUND_ERROR")
         ) {
-          const rows = (error.graphQLErrors[0]?.extensions?.rows ?? []) as number[];
-          await withError(
-            showErrorDialog({
-              header: <FormattedMessage id="generic.import-error" defaultMessage="Import error" />,
-              message: (
-                <>
-                  {rows.length && rows.length < 16 ? (
-                    <Text marginBottom={2}>
-                      <FormattedMessage
-                        id="contacts.import-from-excel.import-error.details"
-                        defaultMessage="We have detected an error in the following file rows:"
-                      />
-                      <Text as="b" marginLeft={1.5}>
-                        <FormattedList value={rows} />
-                      </Text>
-                    </Text>
-                  ) : null}
-                  <Text>
-                    <FormattedMessage
-                      id="contacts.import-from-excel.import-error.body"
-                      defaultMessage="Please, review your file and make sure it matches the format on the loading model."
-                    />
-                  </Text>
-                </>
-              ),
-            })
-          );
+          await showImportErrorDialog((error.graphQLErrors[0]?.extensions?.rows ?? []) as number[]);
         }
       }
     }
@@ -167,8 +176,15 @@ ImportContactsDialog.mutations = [
   gql`
     mutation ImportContactsDialog_bulkCreateContacts($file: Upload!) {
       bulkCreateContacts(file: $file) {
-        id
+        errors
+        contacts {
+          id
+        }
       }
     }
   `,
 ];
+
+export function useImportContactsDialog() {
+  return useDialog(ImportContactsDialog);
+}
