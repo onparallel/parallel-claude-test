@@ -3723,6 +3723,7 @@ export interface NexusGenArgTypes {
     createExportReportTask: {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
+      timezone: string; // String!
     };
     createFileUploadReply: {
       // args

@@ -811,6 +811,7 @@ export interface MutationcreateExportRepliesTaskArgs {
 
 export interface MutationcreateExportReportTaskArgs {
   petitionId: Scalars["GID"];
+  timezone: Scalars["String"];
 }
 
 export interface MutationcreateFileUploadReplyArgs {
@@ -20250,6 +20251,7 @@ export type useExportRepliesTask_getTaskResultFileUrlMutation = { getTaskResultF
 
 export type useExportReportTask_createExportReportTaskMutationVariables = Exact<{
   petitionId: Scalars["GID"];
+  timezone: Scalars["String"];
 }>;
 
 export type useExportReportTask_createExportReportTaskMutation = {
@@ -27752,8 +27754,8 @@ export const useExportRepliesTask_getTaskResultFileUrlDocument = gql`
   useExportRepliesTask_getTaskResultFileUrlMutationVariables
 >;
 export const useExportReportTask_createExportReportTaskDocument = gql`
-  mutation useExportReportTask_createExportReportTask($petitionId: GID!) {
-    createExportReportTask(petitionId: $petitionId) {
+  mutation useExportReportTask_createExportReportTask($petitionId: GID!, $timezone: String!) {
+    createExportReportTask(petitionId: $petitionId, timezone: $timezone) {
       ...TaskProgressDialog_Task
     }
   }

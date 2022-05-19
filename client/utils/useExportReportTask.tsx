@@ -25,7 +25,9 @@ export function useExportReportTask() {
 
   return async (petitionId: string) => {
     const [error, finishedTask] = await withError(async () => {
-      const { data } = await createTask({ variables: { petitionId } });
+      const { data } = await createTask({
+        variables: { petitionId, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+      });
       return await showTaskProgressDialog({
         task: data!.createExportReportTask,
         refetch: async () => {
@@ -81,8 +83,8 @@ export function useExportReportTask() {
 
 useExportReportTask.mutations = [
   gql`
-    mutation useExportReportTask_createExportReportTask($petitionId: GID!) {
-      createExportReportTask(petitionId: $petitionId) {
+    mutation useExportReportTask_createExportReportTask($petitionId: GID!, $timezone: String!) {
+      createExportReportTask(petitionId: $petitionId, timezone: $timezone) {
         ...TaskProgressDialog_Task
       }
     }

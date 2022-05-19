@@ -991,7 +991,7 @@
   },
   {
     "term": "component.export-report-task.header",
-    "definition": "Generando reporte...",
+    "definition": "Generando informe...",
     "context": "Generating report..."
   },
   {

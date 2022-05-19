@@ -1,5 +1,5 @@
 import Excel from "exceljs";
-import { isDefined, uniq, zip } from "remeda";
+import { isDefined, minBy, uniq, zip } from "remeda";
 import { Readable } from "stream";
 import { PetitionFieldReply } from "../../db/__types";
 import { getFieldIndices as getFieldIndexes } from "../../util/fieldIndices";
@@ -10,7 +10,7 @@ import { TaskRunner } from "../helpers/TaskRunner";
 
 export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_REPORT"> {
   async run() {
-    const { petition_id: templateId } = this.task.input;
+    const { petition_id: templateId, timezone } = this.task.input;
 
     if (!this.task.user_id) {
       throw new Error(`Task ${this.task.id} is missing user_id`);
@@ -28,8 +28,9 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
 
     const intl = await this.ctx.i18n.getIntl(template!.locale);
 
-    const [petitionsAccesses, petitionsFields] = await Promise.all([
+    const [petitionsAccesses, petitionsMessages, petitionsFields] = await Promise.all([
       this.ctx.petitions.loadAccessesForPetition(petitions.map((p) => p.id)),
+      this.ctx.petitions.loadMessagesByPetitionId(petitions.map((p) => p.id)),
       this.ctx.petitions.loadFieldsForPetition(petitions.map((p) => p.id)),
     ]);
 
@@ -48,10 +49,29 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
       const petitionFields = petitionsFields[petitionIndex];
       const petitionFieldsReplies = petitionsFieldsReplies[petitionIndex];
       const contacts = petitionsAccessesContacts[petitionIndex].filter(isDefined);
+      const messages = petitionsMessages[petitionIndex];
+      const firstMessage = minBy(
+        messages,
+        (m) => m.scheduled_at?.valueOf() ?? m.created_at.valueOf()
+      );
+      const firstSendDate = firstMessage?.scheduled_at ?? firstMessage?.created_at ?? null;
+
       const contactNames = contacts.map((c) => fullName(c.first_name, c.last_name));
       const contactEmails = contacts.map((c) => c.email);
 
-      const row: Record<string, string> = {
+      const [day, , month, , year, , hour, , minute] = firstSendDate
+        ? intl.formatDateToParts(firstSendDate, {
+            timeZone: timezone,
+            day: "numeric",
+            month: "numeric",
+            year: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            hour12: false,
+          })
+        : [];
+
+      const row: Record<string, any> = {
         [intl.formatMessage({
           id: "export-template-report.column-header.petition-name",
           defaultMessage: "Petition name",
@@ -64,6 +84,20 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
           id: "export-template-report.column-header.recipient-emails",
           defaultMessage: "Recipient emails",
         })]: contactEmails.join(", ") || "",
+        [intl.formatMessage({
+          id: "export-template-report.column-header.send-date",
+          defaultMessage: "Send date",
+        })]: firstSendDate
+          ? new Date(
+              Date.UTC(
+                parseInt(year.value),
+                parseInt(month.value) - 1, // months go from 0 (Jan) to 11 (Dec)
+                parseInt(day.value),
+                parseInt(hour.value),
+                parseInt(minute.value)
+              )
+            )
+          : null,
       };
 
       const fieldIndexes = getFieldIndexes(petitionFields);
@@ -123,9 +157,9 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
 
     const page = wb.addWorksheet();
     const headers = uniq(rows.flatMap(Object.keys));
-    // first 3 headers are common for every row and we don't want to include those when sorting
-    const sortedHeaders = headers.slice(0, 3).concat(
-      headers.slice(3).sort((a, b) => {
+    // first 4 headers are common for every row and we don't want to include those when sorting
+    const sortedHeaders = headers.slice(0, 4).concat(
+      headers.slice(4).sort((a, b) => {
         const aPosition = parseInt(a.split(":")[0]);
         const bPosition = parseInt(b.split(":")[0]);
         return aPosition - bPosition;

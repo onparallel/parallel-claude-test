@@ -195,6 +195,11 @@
     "context": "Recipient names"
   },
   {
+    "term": "export-template-report.column-header.send-date",
+    "definition": "Fecha de envío",
+    "context": "Send date"
+  },
+  {
     "term": "export-template-report.file-cell-content",
     "definition": "{count, plural, =1{1 archivo} other {# archivos}}",
     "context": "{count, plural, =1{1 file} other {# files}}"

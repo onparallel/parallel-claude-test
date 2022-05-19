@@ -15,7 +15,7 @@ export type TaskInput<TName extends TaskName> = {
     include_netdocuments_links?: boolean;
   };
   EXPORT_EXCEL: { petition_id: number };
-  TEMPLATE_REPLIES_REPORT: { petition_id: number };
+  TEMPLATE_REPLIES_REPORT: { petition_id: number; timezone: string };
 }[TName];
 
 export type TaskOutput<TName extends TaskName> = {

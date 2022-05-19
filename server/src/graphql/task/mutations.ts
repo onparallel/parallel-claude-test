@@ -1,9 +1,11 @@
 import { ApolloError } from "apollo-server-core";
 import { differenceInDays } from "date-fns";
-import { booleanArg, mutationField, nonNull, nullable } from "nexus";
+import { booleanArg, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { isDefined } from "remeda";
 import { Task } from "../../db/repositories/TaskRepository";
+import { isValidTimezone } from "../../util/validators";
 import { authenticateAnd } from "../helpers/authorize";
+import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { userHasAccessToPetitions } from "../petition/authorizers";
 import { tasksAreOfType, userHasAccessToTasks } from "./authorizers";
@@ -85,6 +87,17 @@ export const createExportReportTask = mutationField("createExportReportTask", {
   authorize: authenticateAnd(userHasAccessToPetitions("petitionId")),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
+    timezone: nonNull(stringArg()),
+  },
+  validateArgs: (_, { timezone }, ctx, info) => {
+    if (!isValidTimezone(timezone)) {
+      throw new ArgValidationError(
+        info,
+        "timezone",
+        `Invalid timezone ${timezone}`,
+        "INVALID_TIMEZONE_ERROR"
+      );
+    }
   },
   resolve: async (_, args, ctx) => {
     return await ctx.tasks.createTask(
@@ -93,6 +106,7 @@ export const createExportReportTask = mutationField("createExportReportTask", {
         user_id: ctx.user!.id,
         input: {
           petition_id: args.petitionId,
+          timezone: args.timezone,
         },
       },
       `User:${ctx.user!.id}`
