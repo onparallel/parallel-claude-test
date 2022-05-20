@@ -33,6 +33,14 @@ export class TiersService implements ITiersService {
     private featureFlags: FeatureFlagRepository
   ) {}
 
+  private readonly defaultAppSumoFFs: FeatureFlagName[] = [
+    "CUSTOM_HOST_UI",
+    "DEVELOPER_ACCESS",
+    "INTERNAL_COMMENTS",
+    "PETITION_PDF_EXPORT",
+    "REMOVE_PARALLEL_BRANDING",
+  ];
+
   private readonly TIERS: Record<string, Tier> = {
     FREE: {
       USER_LIMIT: 2,
@@ -44,25 +52,25 @@ export class TiersService implements ITiersService {
       USER_LIMIT: 5,
       PETITION_SEND: { limit: 40, period: "1 month" },
       SIGNATURIT_SHARED_APIKEY: { limit: 0, period: "1 month" },
-      FEATURE_FLAGS: [],
+      FEATURE_FLAGS: this.defaultAppSumoFFs.map((name) => ({ name, value: true })),
     },
     APPSUMO2: {
       USER_LIMIT: 20,
       PETITION_SEND: { limit: 80, period: "1 month" },
       SIGNATURIT_SHARED_APIKEY: { limit: 0, period: "1 month" },
-      FEATURE_FLAGS: [],
+      FEATURE_FLAGS: this.defaultAppSumoFFs.map((name) => ({ name, value: true })),
     },
     APPSUMO3: {
       USER_LIMIT: 50,
       PETITION_SEND: { limit: 150, period: "1 month" },
       SIGNATURIT_SHARED_APIKEY: { limit: 0, period: "1 month" },
-      FEATURE_FLAGS: [],
+      FEATURE_FLAGS: this.defaultAppSumoFFs.map((name) => ({ name, value: true })),
     },
     APPSUMO4: {
       USER_LIMIT: 1000,
       PETITION_SEND: { limit: 300, period: "1 month" },
       SIGNATURIT_SHARED_APIKEY: { limit: 0, period: "1 month" },
-      FEATURE_FLAGS: [],
+      FEATURE_FLAGS: this.defaultAppSumoFFs.map((name) => ({ name, value: true })),
     },
   };
 
