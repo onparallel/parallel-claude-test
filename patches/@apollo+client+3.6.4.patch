@@ -1,8 +1,8 @@
 diff --git a/node_modules/@apollo/client/core/ObservableQuery.js b/node_modules/@apollo/client/core/ObservableQuery.js
-index a7395a4..edede0d 100644
+index 627daf6..baa37f7 100644
 --- a/node_modules/@apollo/client/core/ObservableQuery.js
 +++ b/node_modules/@apollo/client/core/ObservableQuery.js
-@@ -88,6 +88,7 @@ var ObservableQuery = (function (_super) {
+@@ -95,6 +95,7 @@ var ObservableQuery = (function (_super) {
          }
          else {
              var diff = this.queryInfo.getDiff();

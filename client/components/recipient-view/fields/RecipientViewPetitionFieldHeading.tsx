@@ -43,8 +43,7 @@ export function RecipientViewPetitionFieldHeading({
       {field.description ? (
         <FieldDescription
           description={field.description}
-          linkify
-          color="gray.600"
+          color="gray.800"
           fontSize="sm"
           overflowWrap="anywhere"
         />

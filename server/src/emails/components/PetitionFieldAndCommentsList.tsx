@@ -1,7 +1,7 @@
 import { MjmlColumn, MjmlSection, MjmlText, MjmlWrapper } from "mjml-react";
 import { FormattedMessage } from "react-intl";
 import { Maybe } from "../../util/types";
-import { BreakLines } from "./BreakLines";
+import { BreakLines } from "../../util/BreakLines";
 
 type FieldComment = {
   id: number;

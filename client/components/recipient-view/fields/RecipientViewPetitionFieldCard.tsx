@@ -101,7 +101,6 @@ export function RecipientViewPetitionFieldCard({
       {field.description ? (
         <FieldDescription
           description={field.description}
-          linkify
           color="gray.800"
           fontSize="sm"
           overflowWrap="anywhere"

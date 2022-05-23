@@ -13,7 +13,7 @@ import { useConstant } from "@parallel/utils/useConstant";
 import { useLoadCountryNames } from "@parallel/utils/useCountryName";
 import { useMetadata } from "@parallel/utils/withMetadata";
 import useMergedRef from "@react-hook/merged-ref";
-import { AsYouType } from "libphonenumber-js/min/index";
+import { AsYouType } from "libphonenumber-js";
 import { ChangeEvent, FocusEvent, Ref, useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";

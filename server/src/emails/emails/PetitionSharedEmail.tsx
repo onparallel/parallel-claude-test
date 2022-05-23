@@ -2,7 +2,7 @@ import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
-import { BreakLines } from "../components/BreakLines";
+import { BreakLines } from "../../util/BreakLines";
 import { Button } from "../components/Button";
 import { ClosingParallelTeam } from "../components/ClosingParallelTeam";
 import { GreetingUser } from "../components/Greeting";

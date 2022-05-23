@@ -7,11 +7,13 @@ import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { fileSize } from "../../util/fileSize";
 import { formatNumberWithPrefix } from "../../util/formatNumberWithPrefix";
 import { isFileTypeField } from "../../util/isFileTypeField";
+import { FieldDescription } from "../components/FieldDescription";
 import { NetDocumentsExternalLink } from "../components/NetDocumentsExternalLink";
 import { SignaturesBlock } from "../components/SignaturesBlock";
+import { cleanupText } from "../utils/cleanupText";
 import { PdfDocumentGetProps } from "../utils/pdf";
 import { PdfDocumentTheme, ThemeProvider } from "../utils/ThemeProvider";
-import { LiquidProvider, LiquidScopeProvider, useLiquid } from "../utils/useLiquid";
+import { LiquidProvider, LiquidScopeProvider } from "../utils/useLiquid";
 import { useLiquidScope } from "../utils/useLiquidScope";
 import {
   PetitionExport_PetitionBaseFragment,
@@ -199,28 +201,28 @@ export default function PetitionExport({
                               ...(field.description ? [{ marginBottom: "2mm" }] : []),
                             ]}
                           >
-                            {cleanup(field.title)}
+                            {cleanupText(field.title)}
                           </Text>
                         ) : null}
                         {field.description ? (
-                          <Text style={[styles.text, styles.headerDescription]}>
+                          <View style={[styles.text, styles.headerDescription]}>
                             <FieldDescription description={field.description} />
-                          </Text>
+                          </View>
                         ) : null}
                       </View>
                     ) : (
                       <View key={i} style={styles.field} wrap={false}>
                         {field.title ? (
                           <Text style={[styles.text, styles.fieldTitle]}>
-                            {cleanup(field.title)}
+                            {cleanupText(field.title)}
                           </Text>
                         ) : null}
                         {field.description ? (
-                          <Text
+                          <View
                             style={[styles.text, styles.fieldDescription, { marginTop: "2mm" }]}
                           >
                             <FieldDescription description={field.description} />
-                          </Text>
+                          </View>
                         ) : null}
                         <View style={styles.fieldReplies}>
                           {field.replies.map((reply) =>
@@ -350,15 +352,6 @@ export default function PetitionExport({
       </LiquidScopeProvider>
     </LiquidProvider>
   );
-}
-
-function FieldDescription({ description }: { description: string }) {
-  const text = useLiquid(description);
-  return <Text>{cleanup(text)}</Text>;
-}
-
-function cleanup(text: string) {
-  return text.replace(/\t/g, " ".repeat(4));
 }
 
 function groupFieldsByPages<T extends PetitionExport_PetitionFieldFragment>(
