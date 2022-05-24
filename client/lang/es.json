@@ -195,27 +195,27 @@
     "context": "Upgrade your plan to increase your user and petition limits."
   },
   {
-    "term": "component.branding-preview.body",
+    "term": "component.branding-general-preview.body",
     "definition": "{tone, select, INFORMAL{Te recordamos que <b>{name}</b> te compartió un acceso a Parallel en el que queda información pendiente de completar.} other{Le recordamos que <b>[Tu nombre]</b> le envió una petición de la que queda información pendiente de completar.}}",
     "context": "We remind you that <b>{name}</b> sent you a petition and some of the requested information has not yet been submitted."
   },
   {
-    "term": "component.branding-preview.footer",
+    "term": "component.branding-general-preview.footer",
     "definition": "Previsualización de los correos que recibirán tus clientes.",
     "context": "An example of the emails your customers will receive."
   },
   {
-    "term": "component.branding-preview.greetings",
+    "term": "component.branding-general-preview.greetings",
     "definition": "{tone, select, INFORMAL{🔔 ¡Hola <b>[Nombre destinatario]</b>!} other{Estimado/a <b>[Nombre destinatario],</b>}}",
     "context": "{tone, select, INFORMAL{🔔 Hello <b>[Recipient Name]</b>!} other{Dear <b>[Recipient Name]</b>,}}"
   },
   {
-    "term": "component.branding-preview.label",
+    "term": "component.branding-general-preview.label",
     "definition": "Ejemplo",
     "context": "Preview"
   },
   {
-    "term": "component.branding-preview.pending-fields",
+    "term": "component.branding-general-preview.pending-fields",
     "definition": "{tone, select, INFORMAL{En este momento hay 12/40 campos pendientes} other{Tiene 12/40 campos pendientes}}",
     "context": "{tone, select, INFORMAL{You have 12/40 fields pending} other{There are currently 12/40 fields pending}}"
   },
@@ -5553,6 +5553,16 @@
     "term": "organization-users.update-user-status.error.update-sso-user",
     "definition": "{count, plural, =1{El usuario seleccionado es administrado} other{Algunos de los usuarios seleccionados son administrados}} por un proveedor de SSO. Por favor, actualiza el estado directamente en el proveedor.",
     "context": "{count, plural, =1{The user you selected is} other{Some of the users you selected are}} managed by a SSO provider. Please, update its status directly on the provider."
+  },
+  {
+    "term": "organization.branding.documents.tab",
+    "definition": "Documentos",
+    "context": "Documents"
+  },
+  {
+    "term": "organization.branding.general.tab",
+    "definition": "General",
+    "context": "General"
   },
   {
     "term": "organization.branding.logo-attach-help",

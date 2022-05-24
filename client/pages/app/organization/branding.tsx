@@ -1,44 +1,17 @@
-import { gql, useMutation } from "@apollo/client";
-import {
-  Badge,
-  Button,
-  Center,
-  Divider,
-  Flex,
-  Heading,
-  HStack,
-  Image,
-  Radio,
-  RadioGroup,
-  Spinner,
-  Stack,
-  Switch,
-  Text,
-} from "@chakra-ui/react";
-import { Card } from "@parallel/components/common/Card";
-import { ContactSupportAlert } from "@parallel/components/common/ContactSupportAlert";
+import { gql } from "@apollo/client";
+import { Heading, Stack, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
-import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
-import { Dropzone } from "@parallel/components/common/Dropzone";
-import { FileSize } from "@parallel/components/common/FileSize";
-import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { BrandingPreview } from "@parallel/components/organization/BrandingPreview";
-import {
-  OrganizationBranding_updateOrganizationPreferredToneDocument,
-  OrganizationBranding_updateOrgLogoDocument,
-  OrganizationBranding_userDocument,
-  Tone,
-} from "@parallel/graphql/__types";
+import { BrandingDocumentForm } from "@parallel/components/organization/branding/BrandingDocumentForm";
+import { BrandingDocumentPreview } from "@parallel/components/organization/branding/BrandingDocumentPreview";
+import { BrandingGeneralForm } from "@parallel/components/organization/branding/BrandingGeneralForm";
+import { BrandingGeneralPreview } from "@parallel/components/organization/branding/BrandingGeneralPreview";
+import { OrganizationBranding_userDocument } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { isAtLeast } from "@parallel/utils/roles";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
-import { useRef } from "react";
-import { DropzoneRef, FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
-const MAX_FILE_SIZE = 1024 * 1024;
 
 function OrganizationBranding() {
   const intl = useIntl();
@@ -48,44 +21,9 @@ function OrganizationBranding() {
   } = useAssertQueryOrPreviousData(OrganizationBranding_userDocument);
 
   const sections = useOrganizationSections(me);
-  const dropzoneRef = useRef<DropzoneRef>(null);
 
   const logoSrc =
     me.organization.logoUrl ?? `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/emails/logo.png`;
-
-  const tone = me.organization.preferredTone;
-
-  const hasAdminRole = isAtLeast("ADMIN", me.role);
-
-  const showErrorDialog = useErrorDialog();
-  const [updateLogo, { loading }] = useMutation(OrganizationBranding_updateOrgLogoDocument);
-  const handleLogoUpload = async (files: File[], rejected: FileRejection[]) => {
-    if (rejected.length > 0) {
-      await showErrorDialog({
-        message: intl.formatMessage(
-          {
-            id: "organization.branding.logo-error",
-            defaultMessage: "The logo must be an image file of size up to {size}.",
-          },
-          { size: <FileSize value={MAX_FILE_SIZE} /> }
-        ),
-      });
-    } else {
-      await updateLogo({ variables: { file: files[0] } });
-    }
-  };
-
-  const [changePreferredTone] = useMutation(
-    OrganizationBranding_updateOrganizationPreferredToneDocument
-  );
-
-  const handleToneChange = async (tone: Tone) => {
-    changePreferredTone({
-      variables: {
-        tone,
-      },
-    });
-  };
 
   return (
     <SettingsLayout
@@ -106,181 +44,72 @@ function OrganizationBranding() {
         </Heading>
       }
     >
-      <Stack
-        padding={6}
-        flexDirection={{ base: "column", xl: "row" }}
-        gridGap={{ base: 8, xl: 16 }}
-        paddingBottom={16}
-      >
-        <Stack spacing={8} maxWidth={{ base: "100%", xl: "container.2xs" }} width="100%">
-          {!hasAdminRole ? <OnlyAdminsAlert /> : null}
-          <Stack spacing={4}>
-            <Heading as="h4" size="md" fontWeight="semibold">
-              <FormattedMessage
-                id="organization.branding.logo-header"
-                defaultMessage="Organization logo"
-              />
-            </Heading>
-            <Stack spacing={1}>
-              <Text fontSize="sm">
-                <FormattedMessage
-                  id="organization.branding.logo-attach-help"
-                  defaultMessage="Attach an image that you would like us to display in your emails."
-                />
-              </Text>
+      <Tabs defaultIndex={1} isLazy variant="enclosed">
+        <TabList paddingLeft={6} background="white" paddingTop={2}>
+          <Tab
+            fontWeight="bold"
+            _selected={{
+              backgroundColor: "gray.50",
+              borderColor: "gray.200",
+              borderBottom: "transparent",
+            }}
+          >
+            <FormattedMessage id="organization.branding.general.tab" defaultMessage="General" />
+          </Tab>
+          <Tab
+            fontWeight="bold"
+            _selected={{
+              backgroundColor: "gray.50",
+              borderColor: "gray.200",
+              borderBottom: "transparent",
+            }}
+          >
+            <FormattedMessage id="organization.branding.documents.tab" defaultMessage="Documents" />
+          </Tab>
+        </TabList>
+
+        <TabPanels>
+          <TabPanel>
+            <Stack
+              padding={6}
+              flexDirection={{ base: "column", xl: "row" }}
+              gridGap={{ base: 8, xl: 16 }}
+              paddingBottom={16}
+            >
+              <BrandingGeneralForm user={me} />
+              <BrandingGeneralPreview user={me} />
             </Stack>
-            <Card padding={4}>
-              <Dropzone
-                ref={dropzoneRef}
-                as={Center}
-                onDrop={handleLogoUpload}
-                accept={["image/gif", "image/png", "image/jpeg"]}
-                maxSize={MAX_FILE_SIZE}
-                multiple={false}
-                height="200px"
-                maxWidth="100%"
-                textAlign="center"
-                disabled={!hasAdminRole}
-              >
-                {loading ? (
-                  <Spinner
-                    thickness="4px"
-                    speed="0.65s"
-                    emptyColor="gray.200"
-                    color="purple.500"
-                    size="xl"
-                  />
-                ) : (
-                  <Image
-                    boxSize="300px"
-                    height="200px"
-                    objectFit="contain"
-                    alt={me.organization.name}
-                    src={logoSrc}
-                    fallback={
-                      <Spinner
-                        thickness="4px"
-                        speed="0.65s"
-                        emptyColor="gray.200"
-                        color="purple.500"
-                        size="xl"
-                      />
-                    }
-                  />
-                )}
-              </Dropzone>
-              <Flex marginTop={4}>
-                <Button
-                  flex="1"
-                  colorScheme="purple"
-                  onClick={() => dropzoneRef.current?.open()}
-                  isDisabled={!hasAdminRole}
-                >
-                  <FormattedMessage
-                    id="organization.branding.upload-logo"
-                    defaultMessage="Upload a new logo"
-                  />
-                </Button>
-              </Flex>
-            </Card>
-          </Stack>
-          <Divider borderColor="gray.300" />
-          <Stack spacing={4}>
-            <Heading as="h4" size="md" fontWeight="semibold">
-              <FormattedMessage
-                id="organization.branding.tone-header"
-                defaultMessage="Tone of the messages"
+          </TabPanel>
+          <TabPanel>
+            <Stack
+              padding={6}
+              flexDirection={{ base: "column", xl: "row" }}
+              gridGap={{ base: 8, xl: 16 }}
+              paddingBottom={16}
+            >
+              <BrandingDocumentForm />
+              <BrandingDocumentPreview
+                logoSrc={logoSrc}
+                organizationName={me.organization.name}
+                showLogo
+                marginTop="12mm"
+                marginRight="12mm"
+                marginBottom="12mm"
+                marginLeft="12mm"
+                title1Size="20pt"
+                title1Color="blue"
+                title2Size="12pt"
+                title2Color="green"
+                textSize="10pt"
+                textColor="red"
               />
-            </Heading>
-            <RadioGroup onChange={handleToneChange} value={tone} isDisabled={!hasAdminRole}>
-              <Stack spacing={4}>
-                <Radio backgroundColor="white" value="INFORMAL">
-                  <Text fontWeight="semibold">
-                    <FormattedMessage id="generic.tone-informal" defaultMessage="Informal" />
-                  </Text>
-                </Radio>
-                <Radio backgroundColor="white" value="FORMAL">
-                  <Text fontWeight="semibold">
-                    <FormattedMessage id="generic.tone-formal" defaultMessage="Formal" />
-                  </Text>
-                </Radio>
-              </Stack>
-            </RadioGroup>
-          </Stack>
-          <Divider borderColor="gray.300" />
-          <Stack spacing={4}>
-            <HStack spacing={3}>
-              <Stack flex="1" spacing={2}>
-                <HStack alignItems="center">
-                  <Heading as="h4" size="md" fontWeight="semibold">
-                    <FormattedMessage
-                      id="organization.branding.parallel-branding-header"
-                      defaultMessage="Parallel Branding"
-                    />
-                  </Heading>
-                  {me.hasRemovedParallelBranding ? null : (
-                    <Badge colorScheme="purple">
-                      <FormattedMessage id="generic.plans.enterprise" defaultMessage="Enterprise" />
-                    </Badge>
-                  )}
-                </HStack>
-                <Text>
-                  <FormattedMessage
-                    id="organization.branding.parallel-branding-description"
-                    defaultMessage="Displays the Parallel branding on all emails and requests that are sent."
-                  />
-                </Text>
-              </Stack>
-              <Switch size="md" isChecked={!me.hasRemovedParallelBranding} isDisabled={true} />
-            </HStack>
-            {me.hasRemovedParallelBranding ? null : (
-              <ContactSupportAlert
-                body={
-                  <Text>
-                    {intl.formatMessage({
-                      id: "generic.upgrade-to-enable",
-                      defaultMessage: "Upgrade to enable this feature.",
-                    })}
-                  </Text>
-                }
-                contactMessage={intl.formatMessage({
-                  id: "organization.branding.parallel-branding-message",
-                  defaultMessage:
-                    "Hi, I would like to get more information about how to upgrade my plan to hide Parallel branding.",
-                })}
-              />
-            )}
-          </Stack>
-        </Stack>
-        <BrandingPreview
-          tone={tone}
-          logoSrc={logoSrc}
-          organizationName={me.organization.name}
-          userFullName={me.fullName!}
-        />
-      </Stack>
+            </Stack>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
     </SettingsLayout>
   );
 }
-
-OrganizationBranding.mutations = [
-  gql`
-    mutation OrganizationBranding_updateOrgLogo($file: Upload!) {
-      updateOrganizationLogo(file: $file) {
-        id
-        logoUrl(options: { resize: { width: 600 } })
-      }
-    }
-  `,
-  gql`
-    mutation OrganizationBranding_updateOrganizationPreferredTone($tone: Tone!) {
-      updateOrganizationPreferredTone(tone: $tone) {
-        id
-        preferredTone
-      }
-    }
-  `,
-];
 
 OrganizationBranding.queries = [
   gql`
@@ -288,18 +117,18 @@ OrganizationBranding.queries = [
       ...SettingsLayout_Query
       me {
         id
-        role
         fullName
-        hasRemovedParallelBranding: hasFeatureFlag(featureFlag: REMOVE_PARALLEL_BRANDING)
+        role
         organization {
-          id
           logoUrl(options: { resize: { width: 600 } })
-          name
-          preferredTone
         }
+        ...BrandingGeneralForm_User
+        ...BrandingGeneralPreview_User
       }
     }
     ${SettingsLayout.fragments.Query}
+    ${BrandingGeneralForm.fragments.User}
+    ${BrandingGeneralPreview.fragments.User}
   `,
 ];
 
