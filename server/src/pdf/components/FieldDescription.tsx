@@ -55,15 +55,15 @@ export function FieldDescription({ description }: FieldDescriptionProps) {
         ) : t.type === "list" ? (
           <MdList key={i} token={t} />
         ) : t.type === "table" ? (
-          <>
+          <Fragment key={i}>
             <MdTable token={t} />
             <TrailingNewLines raw={t.raw} />
-          </>
+          </Fragment>
         ) : t.type === "hr" ? (
-          <>
+          <Fragment key={i}>
             <View style={{ borderBottom: "1px solid #e2e8f0" }} />
             <TrailingNewLines raw={t.raw} />
-          </>
+          </Fragment>
         ) : t.type === "space" ? (
           <Text key={i}>{"\n".repeat((t.raw.match(/\n/g)?.length ?? 1) - 1)}</Text>
         ) : process.env.NODE_ENV === "production" ? null : (
@@ -230,19 +230,10 @@ function MdInline({ token }: { token: InlineToken }) {
       token.tokens.map((t, i) => <MdInline key={i} token={t as any} />)
     ) : (
       <Text>
-        {unescape(token.text)
-          .split(/( +)/)
-          .map((t, i) =>
-            t.match(/^ +$/) ? (
-              <Text key={i}>
-                {times(t.match(/ /g)!.length, (i) => (
-                  <Fragment key={i}>&nbsp;</Fragment>
-                ))}
-              </Text>
-            ) : (
-              <Text key={i}>{t}</Text>
-            )
-          )}
+        {unescape(token.text).replaceAll(/^ +/gm, (match) => {
+          // replace leading spaces with &nbsp; to preserve whitespace
+          return match.replace(" ", "\xa0");
+        })}
       </Text>
     );
   return token.type === "strong" ? (

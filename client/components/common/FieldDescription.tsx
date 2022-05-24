@@ -15,7 +15,7 @@ import type { marked } from "@onparallel/marked-do-not-use";
 import { Lexer } from "@onparallel/marked-do-not-use";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { useLiquid } from "@parallel/utils/useLiquid";
-import { useMemo } from "react";
+import { Fragment, useMemo } from "react";
 import { times, zip } from "remeda";
 import { BreakLines } from "./BreakLines";
 import { Divider } from "./Divider";
@@ -32,7 +32,7 @@ export const FieldDescription = chakraForwardRef<"div", { description?: string }
       <Box ref={ref} whiteSpace="pre-wrap" {...props}>
         {tokens.map((t, i) =>
           t.type === "heading" ? (
-            <Heading size={t.depth === 1 ? "md" : "sm"} key={i} marginBottom={2}>
+            <Heading key={i} size={t.depth === 1 ? "md" : "sm"} marginBottom={2}>
               <MdInlineContent tokens={t.tokens as any} />
             </Heading>
           ) : t.type === "paragraph" ? (
@@ -48,15 +48,15 @@ export const FieldDescription = chakraForwardRef<"div", { description?: string }
           ) : t.type === "list" ? (
             <MdList key={i} token={t} />
           ) : t.type === "hr" ? (
-            <>
+            <Fragment key={i}>
               <Divider />
               <TrailingNewLines raw={t.raw} />
-            </>
+            </Fragment>
           ) : t.type === "table" ? (
-            <>
+            <Fragment key={i}>
               <MdTable token={t} />
               <TrailingNewLines raw={t.raw} />
-            </>
+            </Fragment>
           ) : t.type === "space" ? (
             <chakra.p key={i}>
               {times((t.raw.match(/\n/g)?.length ?? 1) - 1, (i) => (
