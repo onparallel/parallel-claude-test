@@ -14,9 +14,31 @@ export interface PdfDocumentTheme {
   textFontFamily: string;
   textColor: string;
   textFontSize: number;
+  showLogo: boolean;
   logoPosition: "center" | "left" | "right";
   paginationPosition: "center" | "left" | "right";
+  legalRichText: any;
 }
+
+export const defaultDocumentTheme: PdfDocumentTheme = {
+  marginLeft: 10,
+  marginRight: 10,
+  marginTop: 10,
+  marginBottom: 15,
+  showLogo: true,
+  title1FontFamily: "IBM Plex Sans",
+  title1Color: "#000000",
+  title1FontSize: 16,
+  title2FontFamily: "IBM Plex Sans",
+  title2Color: "#000000",
+  title2FontSize: 14,
+  textFontFamily: "IBM Plex Sans",
+  textColor: "#000000",
+  textFontSize: 12,
+  logoPosition: "center",
+  paginationPosition: "right",
+  legalRichText: [],
+};
 
 const ThemeContext = createContext<PdfDocumentTheme | undefined>(undefined);
 

@@ -105,6 +105,24 @@ export interface NexusGenInputs {
     height?: number | null; // Int
     width?: number | null; // Int
   };
+  OrganizationDocumentThemeInput: {
+    // input type
+    legalRichText?: NexusGenScalars["JSON"] | null; // JSON
+    marginBottom?: number | null; // Int
+    marginLeft?: number | null; // Int
+    marginRight?: number | null; // Int
+    marginTop?: number | null; // Int
+    showLogo?: boolean | null; // Boolean
+    textColor?: string | null; // String
+    textFontFamily?: string | null; // String
+    textFontSize?: number | null; // Int
+    title1Color?: string | null; // String
+    title1FontFamily?: string | null; // String
+    title1FontSize?: number | null; // Int
+    title2Color?: string | null; // String
+    title2FontFamily?: string | null; // String
+    title2FontSize?: number | null; // Int
+  };
   PetitionFilter: {
     // input type
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
@@ -1043,6 +1061,7 @@ export interface NexusGenFieldTypes {
     updateFileUploadReplyComplete: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updateLandingTemplateMetadata: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateOrganizationAutoAnonymizePeriod: NexusGenRootTypes["Organization"]; // Organization!
+    updateOrganizationDocumentTheme: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationLimits: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateOrganizationLogo: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationPreferredTone: NexusGenRootTypes["Organization"]; // Organization!
@@ -2541,6 +2560,7 @@ export interface NexusGenFieldTypeNames {
     updateFileUploadReplyComplete: "PetitionFieldReply";
     updateLandingTemplateMetadata: "SupportMethodResponse";
     updateOrganizationAutoAnonymizePeriod: "Organization";
+    updateOrganizationDocumentTheme: "Organization";
     updateOrganizationLimits: "SupportMethodResponse";
     updateOrganizationLogo: "Organization";
     updateOrganizationPreferredTone: "Organization";
@@ -4341,6 +4361,10 @@ export interface NexusGenArgTypes {
     updateOrganizationAutoAnonymizePeriod: {
       // args
       months?: number | null; // Int
+    };
+    updateOrganizationDocumentTheme: {
+      // args
+      data: NexusGenInputs["OrganizationDocumentThemeInput"]; // OrganizationDocumentThemeInput!
     };
     updateOrganizationLimits: {
       // args

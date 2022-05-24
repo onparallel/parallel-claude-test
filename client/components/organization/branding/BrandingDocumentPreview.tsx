@@ -1,44 +1,29 @@
+import { gql } from "@apollo/client";
 import { Box, Center, Image, Stack, Text } from "@chakra-ui/react";
+import { BrandingDocumentPreview_OrganizationFragment } from "@parallel/graphql/__types";
 import { CSSProperties } from "react";
 import { FormattedMessage } from "react-intl";
 
 interface BrandingDocumentPreviewProps {
-  marginTop?: string;
-  marginBottom?: string;
-  marginLeft?: string;
-  marginRight?: string;
-
-  showLogo: boolean;
-  logoSrc?: string;
-  organizationName?: string;
-
-  title1Font?: string;
-  title1Size?: string;
-  title1Color?: string;
-
-  title2Font?: string;
-  title2Size?: string;
-  title2Color?: string;
-
-  textFont?: string;
-  textSize?: string;
-  textColor?: string;
-
-  legalText?: string;
+  organization: BrandingDocumentPreview_OrganizationFragment;
 }
 
-export function BrandingDocumentPreview(props: BrandingDocumentPreviewProps) {
+export function BrandingDocumentPreview({ organization }: BrandingDocumentPreviewProps) {
+  const theme = organization.pdfDocumentTheme;
   const styles: Record<string, CSSProperties> = {
     page: {
-      paddingTop: props.marginTop,
-      paddingRight: props.marginRight,
-      paddingBottom: props.marginBottom,
-      paddingLeft: props.marginLeft,
+      paddingTop: `${theme.marginTop}mm`,
+      paddingRight: `${theme.marginRight}mm`,
+      paddingBottom: `${theme.marginBottom}mm`,
+      paddingLeft: `${theme.marginLeft}mm`,
     },
-    title1: { fontSize: props.title1Size, color: props.title1Color },
-    title2: { fontSize: props.title2Size, color: props.title2Color },
-    text: { fontSize: props.textSize, color: props.textColor },
+    title1: { fontSize: theme.title1FontSize, color: theme.title1Color },
+    title2: { fontSize: theme.title2FontSize, color: theme.title2Color },
+    text: { fontSize: theme.textFontSize, color: theme.textColor },
   };
+
+  const logoSrc =
+    organization.logoUrl ?? `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/emails/logo.png`;
 
   return (
     <Box width="100%" paddingBottom={8}>
@@ -72,14 +57,14 @@ export function BrandingDocumentPreview(props: BrandingDocumentPreviewProps) {
         </Box>
         <Stack style={styles.page} spacing={5}>
           <Stack>
-            {props.showLogo ? (
+            {theme.showLogo ? (
               <Center minHeight="100px">
                 <Image
                   boxSize="200px"
                   height="100px"
                   objectFit="contain"
-                  alt={props.organizationName}
-                  src={props.logoSrc}
+                  alt={organization.name}
+                  src={logoSrc}
                 />
               </Center>
             ) : null}
@@ -133,3 +118,14 @@ export function BrandingDocumentPreview(props: BrandingDocumentPreviewProps) {
     </Box>
   );
 }
+
+BrandingDocumentPreview.fragments = {
+  Organization: gql`
+    fragment BrandingDocumentPreview_Organization on Organization {
+      id
+      name
+      logoUrl(options: { resize: { width: 600 } })
+      pdfDocumentTheme
+    }
+  `,
+};

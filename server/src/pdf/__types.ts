@@ -628,6 +628,8 @@ export type Mutation = {
   updateLandingTemplateMetadata: SupportMethodResponse;
   /** Updates the period after closed petitions of this organization are automatically anonymized. */
   updateOrganizationAutoAnonymizePeriod: Organization;
+  /** updates the theme of the PDF documents of the organization */
+  updateOrganizationDocumentTheme: Organization;
   /** Updates the limits of a given org. If 'Update Only Current Period' is left unchecked, the changes will be reflected on the next period. */
   updateOrganizationLimits: SupportMethodResponse;
   /** Updates the logo of an organization */
@@ -1350,6 +1352,10 @@ export type MutationupdateOrganizationAutoAnonymizePeriodArgs = {
   months?: InputMaybe<Scalars["Int"]>;
 };
 
+export type MutationupdateOrganizationDocumentThemeArgs = {
+  data: OrganizationDocumentThemeInput;
+};
+
 export type MutationupdateOrganizationLimitsArgs = {
   amount: Scalars["Int"];
   orgId: Scalars["Int"];
@@ -1605,6 +1611,24 @@ export type OrganizationusersArgs = {
   offset?: InputMaybe<Scalars["Int"]>;
   search?: InputMaybe<Scalars["String"]>;
   sortBy?: InputMaybe<Array<OrganizationUsers_OrderBy>>;
+};
+
+export type OrganizationDocumentThemeInput = {
+  legalRichText?: InputMaybe<Scalars["JSON"]>;
+  marginBottom?: InputMaybe<Scalars["Int"]>;
+  marginLeft?: InputMaybe<Scalars["Int"]>;
+  marginRight?: InputMaybe<Scalars["Int"]>;
+  marginTop?: InputMaybe<Scalars["Int"]>;
+  showLogo?: InputMaybe<Scalars["Boolean"]>;
+  textColor?: InputMaybe<Scalars["String"]>;
+  textFontFamily?: InputMaybe<Scalars["String"]>;
+  textFontSize?: InputMaybe<Scalars["Int"]>;
+  title1Color?: InputMaybe<Scalars["String"]>;
+  title1FontFamily?: InputMaybe<Scalars["String"]>;
+  title1FontSize?: InputMaybe<Scalars["Int"]>;
+  title2Color?: InputMaybe<Scalars["String"]>;
+  title2FontFamily?: InputMaybe<Scalars["String"]>;
+  title2FontSize?: InputMaybe<Scalars["Int"]>;
 };
 
 export type OrganizationPagination = {

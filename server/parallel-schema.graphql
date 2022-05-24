@@ -1421,6 +1421,11 @@ type Mutation {
   updateOrganizationAutoAnonymizePeriod(months: Int): Organization!
 
   """
+  updates the theme of the PDF documents of the organization
+  """
+  updateOrganizationDocumentTheme(data: OrganizationDocumentThemeInput!): Organization!
+
+  """
   Updates the limits of a given org. If 'Update Only Current Period' is left unchecked, the changes will be reflected on the next period.
   """
   updateOrganizationLimits(
@@ -1830,6 +1835,24 @@ type Organization implements Timestamps {
     """
     sortBy: [OrganizationUsers_OrderBy!]
   ): UserPagination!
+}
+
+input OrganizationDocumentThemeInput {
+  legalRichText: JSON
+  marginBottom: Int
+  marginLeft: Int
+  marginRight: Int
+  marginTop: Int
+  showLogo: Boolean
+  textColor: String
+  textFontFamily: String
+  textFontSize: Int
+  title1Color: String
+  title1FontFamily: String
+  title1FontSize: Int
+  title2Color: String
+  title2FontFamily: String
+  title2FontSize: Int
 }
 
 type OrganizationPagination {

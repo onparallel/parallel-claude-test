@@ -22,9 +22,6 @@ function OrganizationBranding() {
 
   const sections = useOrganizationSections(me);
 
-  const logoSrc =
-    me.organization.logoUrl ?? `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/emails/logo.png`;
-
   return (
     <SettingsLayout
       title={intl.formatMessage({
@@ -87,22 +84,8 @@ function OrganizationBranding() {
               gridGap={{ base: 8, xl: 16 }}
               paddingBottom={16}
             >
-              <BrandingDocumentForm />
-              <BrandingDocumentPreview
-                logoSrc={logoSrc}
-                organizationName={me.organization.name}
-                showLogo
-                marginTop="12mm"
-                marginRight="12mm"
-                marginBottom="12mm"
-                marginLeft="12mm"
-                title1Size="20pt"
-                title1Color="blue"
-                title2Size="12pt"
-                title2Color="green"
-                textSize="10pt"
-                textColor="red"
-              />
+              <BrandingDocumentForm organization={me.organization} />
+              <BrandingDocumentPreview organization={me.organization} />
             </Stack>
           </TabPanel>
         </TabPanels>
@@ -121,12 +104,16 @@ OrganizationBranding.queries = [
         role
         organization {
           logoUrl(options: { resize: { width: 600 } })
+          ...BrandingDocumentForm_Organization
+          ...BrandingDocumentPreview_Organization
         }
         ...BrandingGeneralForm_User
         ...BrandingGeneralPreview_User
       }
     }
     ${SettingsLayout.fragments.Query}
+    ${BrandingDocumentForm.fragments.Organization}
+    ${BrandingDocumentPreview.fragments.Organization}
     ${BrandingGeneralForm.fragments.User}
     ${BrandingGeneralPreview.fragments.User}
   `,

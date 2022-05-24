@@ -1,4 +1,7 @@
 import { arg, booleanArg, intArg, mutationField, nonNull, nullable } from "nexus";
+import { arg, booleanArg, inputObjectType, mutationField, nonNull } from "nexus";
+import { isDefined } from "remeda";
+import { defaultDocumentTheme } from "../../pdf/utils/ThemeProvider";
 import { random } from "../../util/token";
 import { authenticateAnd } from "../helpers/authorize";
 import { uploadArg } from "../helpers/scalars";
@@ -88,3 +91,91 @@ export const updateOrganizationAutoAnonymizePeriod = mutationField(
     },
   }
 );
+
+export const updateOrganizationDocumentTheme = mutationField("updateOrganizationDocumentTheme", {
+  description: "updates the theme of the PDF documents of the organization",
+  type: "Organization",
+  authorize: authenticateAnd(contextUserHasRole("ADMIN")),
+  args: {
+    data: nonNull(
+      inputObjectType({
+        name: "OrganizationDocumentThemeInput",
+        definition(t) {
+          t.nullable.int("marginTop");
+          t.nullable.int("marginRight");
+          t.nullable.int("marginBottom");
+          t.nullable.int("marginLeft");
+          t.nullable.boolean("showLogo");
+          t.nullable.string("title1FontFamily");
+          t.nullable.string("title1Color");
+          t.nullable.int("title1FontSize");
+          t.nullable.string("title2FontFamily");
+          t.nullable.string("title2Color");
+          t.nullable.int("title2FontSize");
+          t.nullable.string("textFontFamily");
+          t.nullable.string("textColor");
+          t.nullable.int("textFontSize");
+          t.nullable.json("legalRichText");
+        },
+      }).asArg()
+    ),
+  },
+  resolve: async (root, args, ctx) => {
+    const organization = await ctx.organizations.loadOrg(ctx.user!.org_id);
+    const theme: Record<string, any> = organization?.pdf_document_theme ?? defaultDocumentTheme;
+    if (isDefined(args.data.marginTop)) {
+      theme["marginTop"] = args.data.marginTop;
+    }
+    if (isDefined(args.data.marginRight)) {
+      theme["marginRight"] = args.data.marginRight;
+    }
+    if (isDefined(args.data.marginBottom)) {
+      theme["marginBottom"] = args.data.marginBottom;
+    }
+    if (isDefined(args.data.marginLeft)) {
+      theme["marginLeft"] = args.data.marginLeft;
+    }
+    if (isDefined(args.data.showLogo)) {
+      theme["showLogo"] = args.data.showLogo;
+    }
+
+    if (isDefined(args.data.title1FontFamily)) {
+      theme["title1FontFamily"] = args.data.title1FontFamily;
+    }
+    if (isDefined(args.data.title1Color)) {
+      theme["title1Color"] = args.data.title1Color;
+    }
+    if (isDefined(args.data.title1FontSize)) {
+      theme["title1FontSize"] = args.data.title1FontSize;
+    }
+
+    if (isDefined(args.data.title2FontFamily)) {
+      theme["title2FontFamily"] = args.data.title2FontFamily;
+    }
+    if (isDefined(args.data.title2Color)) {
+      theme["title2Color"] = args.data.title2Color;
+    }
+    if (isDefined(args.data.title2FontSize)) {
+      theme["title2FontSize"] = args.data.title2FontSize;
+    }
+
+    if (isDefined(args.data.textFontFamily)) {
+      theme["textFontFamily"] = args.data.textFontFamily;
+    }
+    if (isDefined(args.data.textColor)) {
+      theme["textColor"] = args.data.textColor;
+    }
+    if (isDefined(args.data.textFontSize)) {
+      theme["textFontSize"] = args.data.textFontSize;
+    }
+    if (isDefined(args.data.legalRichText)) {
+      theme["legalRichText"] = args.data.legalRichText;
+    }
+
+    return await ctx.organizations.updateOrganization(
+      ctx.user!.org_id,
+      { pdf_document_theme: theme },
+      `User:${ctx.user!.id}`
+    );
+  },
+});

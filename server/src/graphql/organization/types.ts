@@ -1,5 +1,6 @@
 import { arg, booleanArg, enumType, list, nonNull, nullable, objectType } from "nexus";
 import { isDefined } from "remeda";
+import { defaultDocumentTheme } from "../../pdf/utils/ThemeProvider";
 import { or, userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
@@ -231,24 +232,8 @@ export const Organization = objectType({
       },
     });
     t.nonNull.jsonObject("pdfDocumentTheme", {
-      resolve: () => {
-        return {
-          marginLeft: 10,
-          marginRight: 10,
-          marginTop: 10,
-          marginBottom: 15,
-          title1FontFamily: "IBM Plex Sans",
-          title1Color: "#000000",
-          title1FontSize: 16,
-          title2FontFamily: "IBM Plex Sans",
-          title2Color: "#000000",
-          title2FontSize: 14,
-          textFontFamily: "IBM Plex Sans",
-          textColor: "#000000",
-          textFontSize: 12,
-          logoPosition: "center",
-          paginationPosition: "right",
-        };
+      resolve: (o) => {
+        return o.pdf_document_theme ?? defaultDocumentTheme;
       },
     });
     t.nullable.field("license", {

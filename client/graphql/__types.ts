@@ -661,6 +661,8 @@ export interface Mutation {
   updateLandingTemplateMetadata: SupportMethodResponse;
   /** Updates the period after closed petitions of this organization are automatically anonymized. */
   updateOrganizationAutoAnonymizePeriod: Organization;
+  /** updates the theme of the PDF documents of the organization */
+  updateOrganizationDocumentTheme: Organization;
   /** Updates the limits of a given org. If 'Update Only Current Period' is left unchecked, the changes will be reflected on the next period. */
   updateOrganizationLimits: SupportMethodResponse;
   /** Updates the logo of an organization */
@@ -1383,6 +1385,10 @@ export interface MutationupdateOrganizationAutoAnonymizePeriodArgs {
   months?: InputMaybe<Scalars["Int"]>;
 }
 
+export interface MutationupdateOrganizationDocumentThemeArgs {
+  data: OrganizationDocumentThemeInput;
+}
+
 export interface MutationupdateOrganizationLimitsArgs {
   amount: Scalars["Int"];
   orgId: Scalars["Int"];
@@ -1641,6 +1647,24 @@ export interface OrganizationusersArgs {
   offset?: InputMaybe<Scalars["Int"]>;
   search?: InputMaybe<Scalars["String"]>;
   sortBy?: InputMaybe<Array<OrganizationUsers_OrderBy>>;
+}
+
+export interface OrganizationDocumentThemeInput {
+  legalRichText?: InputMaybe<Scalars["JSON"]>;
+  marginBottom?: InputMaybe<Scalars["Int"]>;
+  marginLeft?: InputMaybe<Scalars["Int"]>;
+  marginRight?: InputMaybe<Scalars["Int"]>;
+  marginTop?: InputMaybe<Scalars["Int"]>;
+  showLogo?: InputMaybe<Scalars["Boolean"]>;
+  textColor?: InputMaybe<Scalars["String"]>;
+  textFontFamily?: InputMaybe<Scalars["String"]>;
+  textFontSize?: InputMaybe<Scalars["Int"]>;
+  title1Color?: InputMaybe<Scalars["String"]>;
+  title1FontFamily?: InputMaybe<Scalars["String"]>;
+  title1FontSize?: InputMaybe<Scalars["Int"]>;
+  title2Color?: InputMaybe<Scalars["String"]>;
+  title2FontFamily?: InputMaybe<Scalars["String"]>;
+  title2FontSize?: InputMaybe<Scalars["Int"]>;
 }
 
 export interface OrganizationPagination {
@@ -5192,6 +5216,31 @@ export type SignatureCompletedUserNotification_SignatureCompletedUserNotificatio
     | { __typename?: "PetitionTemplate"; id: string; name?: string | null };
 };
 
+export type BrandingDocumentForm_OrganizationFragment = {
+  __typename?: "Organization";
+  pdfDocumentTheme: { [key: string]: any };
+};
+
+export type BrandingDocumentForm_updateOrganizationDocumentThemeMutationVariables = Exact<{
+  data: OrganizationDocumentThemeInput;
+}>;
+
+export type BrandingDocumentForm_updateOrganizationDocumentThemeMutation = {
+  updateOrganizationDocumentTheme: {
+    __typename?: "Organization";
+    id: string;
+    pdfDocumentTheme: { [key: string]: any };
+  };
+};
+
+export type BrandingDocumentPreview_OrganizationFragment = {
+  __typename?: "Organization";
+  id: string;
+  name: string;
+  logoUrl?: string | null;
+  pdfDocumentTheme: { [key: string]: any };
+};
+
 export type BrandingGeneralForm_updateOrgLogoMutationVariables = Exact<{
   file: Scalars["Upload"];
 }>;
@@ -7025,6 +7074,15 @@ export type TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragmen
   } | null;
 };
 
+export type AliasOptionsMenu_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  alias?: string | null;
+  type: PetitionFieldType;
+  multiple: boolean;
+  options: { [key: string]: any };
+};
+
 export type PetitionContents_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -7041,15 +7099,6 @@ export type PetitionContents_PetitionFieldFragment = {
     id: string;
     status: PetitionFieldReplyStatus;
   }>;
-};
-
-export type AliasOptionsMenu_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  alias?: string | null;
-  type: PetitionFieldType;
-  multiple: boolean;
-  options: { [key: string]: any };
 };
 
 export type SelectedSignerRow_PetitionSignerFragment = {
@@ -11693,6 +11742,7 @@ export type OrganizationBranding_userQuery = {
       id: string;
       name: string;
       preferredTone: Tone;
+      pdfDocumentTheme: { [key: string]: any };
       iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
@@ -21410,6 +21460,19 @@ export const NotificationsDrawer_PetitionUserNotificationFragmentDoc = gql`
   }
   ${NotificationsList_PetitionUserNotificationFragmentDoc}
 ` as unknown as DocumentNode<NotificationsDrawer_PetitionUserNotificationFragment, unknown>;
+export const BrandingDocumentForm_OrganizationFragmentDoc = gql`
+  fragment BrandingDocumentForm_Organization on Organization {
+    pdfDocumentTheme
+  }
+` as unknown as DocumentNode<BrandingDocumentForm_OrganizationFragment, unknown>;
+export const BrandingDocumentPreview_OrganizationFragmentDoc = gql`
+  fragment BrandingDocumentPreview_Organization on Organization {
+    id
+    name
+    logoUrl(options: { resize: { width: 600 } })
+    pdfDocumentTheme
+  }
+` as unknown as DocumentNode<BrandingDocumentPreview_OrganizationFragment, unknown>;
 export const BrandingGeneralForm_UserFragmentDoc = gql`
   fragment BrandingGeneralForm_User on User {
     id
@@ -25361,6 +25424,19 @@ export const NotificationsDrawer_notificationsDocument = gql`
   NotificationsDrawer_notificationsQuery,
   NotificationsDrawer_notificationsQueryVariables
 >;
+export const BrandingDocumentForm_updateOrganizationDocumentThemeDocument = gql`
+  mutation BrandingDocumentForm_updateOrganizationDocumentTheme(
+    $data: OrganizationDocumentThemeInput!
+  ) {
+    updateOrganizationDocumentTheme(data: $data) {
+      id
+      pdfDocumentTheme
+    }
+  }
+` as unknown as DocumentNode<
+  BrandingDocumentForm_updateOrganizationDocumentThemeMutation,
+  BrandingDocumentForm_updateOrganizationDocumentThemeMutationVariables
+>;
 export const BrandingGeneralForm_updateOrgLogoDocument = gql`
   mutation BrandingGeneralForm_updateOrgLogo($file: Upload!) {
     updateOrganizationLogo(file: $file) {
@@ -26755,12 +26831,16 @@ export const OrganizationBranding_userDocument = gql`
       role
       organization {
         logoUrl(options: { resize: { width: 600 } })
+        ...BrandingDocumentForm_Organization
+        ...BrandingDocumentPreview_Organization
       }
       ...BrandingGeneralForm_User
       ...BrandingGeneralPreview_User
     }
   }
   ${SettingsLayout_QueryFragmentDoc}
+  ${BrandingDocumentForm_OrganizationFragmentDoc}
+  ${BrandingDocumentPreview_OrganizationFragmentDoc}
   ${BrandingGeneralForm_UserFragmentDoc}
   ${BrandingGeneralPreview_UserFragmentDoc}
 ` as unknown as DocumentNode<
