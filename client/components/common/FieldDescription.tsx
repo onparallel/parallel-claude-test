@@ -32,9 +32,12 @@ export const FieldDescription = chakraForwardRef<"div", { description?: string }
       <Box ref={ref} whiteSpace="pre-wrap" {...props}>
         {tokens.map((t, i) =>
           t.type === "heading" ? (
-            <Heading key={i} size={t.depth === 1 ? "md" : "sm"} marginBottom={2}>
-              <MdInlineContent tokens={t.tokens as any} />
-            </Heading>
+            <Fragment key={i}>
+              <Heading size={t.depth === 1 ? "md" : "sm"} marginBottom={2}>
+                <MdInlineContent tokens={t.tokens as any} />
+              </Heading>
+              <TrailingNewLines raw={t.raw} />
+            </Fragment>
           ) : t.type === "paragraph" ? (
             t.tokens.length === 1 && t.tokens[0].type === "image" ? (
               <Center key={i}>

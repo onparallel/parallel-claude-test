@@ -36,9 +36,12 @@ export function FieldDescription({ description }: FieldDescriptionProps) {
     <View>
       {tokens.map((t, i) =>
         t.type === "heading" ? (
-          <Text key={i} style={t.depth === 1 ? styles.title1 : styles.title2}>
-            <MdInlineContent tokens={t.tokens as any} />
-          </Text>
+          <Fragment key={i}>
+            <Text key={i} style={t.depth === 1 ? styles.title1 : styles.title2}>
+              <MdInlineContent tokens={t.tokens as any} />
+            </Text>
+            <TrailingNewLines raw={t.raw} />
+          </Fragment>
         ) : t.type === "paragraph" ? (
           t.tokens.length === 1 && t.tokens[0].type === "image" ? (
             <View
