@@ -621,7 +621,7 @@ function _PetitionSettings({
         />
       ) : null}
       {petition.__typename === "Petition" && petition.fromTemplateId ? (
-        <Alert status="info" background="transparent">
+        <Alert status="info" background="transparent" padding={0}>
           <AlertIcon />
           <AlertDescription fontStyle="italic">
             <FormattedMessage
