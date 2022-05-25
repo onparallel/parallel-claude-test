@@ -225,7 +225,7 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
               <Text>
                 <FormattedMessage id="generic.color" defaultMessage="Color" />
               </Text>
-              <HStack>
+              <HStack spacing={2}>
                 <Input
                   as={IMaskInput}
                   {...{

@@ -8,20 +8,23 @@ interface ColorInputProps extends Omit<InputProps, "value" | "onChange"> {
 }
 
 export const ColorInput = chakraForwardRef<"input", ColorInputProps, HTMLInputElement>(
-  function ColorInput({ value, onChange, ...props }, ref) {
-    const handleChange = onChange ? useDebouncedCallback(onChange, 100, []) : undefined;
+  function ColorInput({ value, onChange, ...props }) {
+    const handleChange = onChange
+      ? useDebouncedCallback(onChange, 100, [value, onChange])
+      : undefined;
     return (
       <Box>
         <Input
-          position="absolute"
-          ref={ref}
           type="color"
-          opacity={0}
+          backgroundColor={value}
           value={value}
           onChange={(e) => handleChange?.(e.target.value)}
           {...props}
+          sx={{
+            "::-webkit-color-swatch": { opacity: 0 },
+            "::-moz-color-swatch": { opacity: 0 },
+          }}
         />
-        <Box backgroundColor={value} boxSize={props.boxSize} borderRadius={props.borderRadius} />
       </Box>
     );
   }
