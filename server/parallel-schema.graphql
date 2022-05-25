@@ -1838,7 +1838,8 @@ type Organization implements Timestamps {
 }
 
 input OrganizationDocumentThemeInput {
-  legalRichText: JSON
+  legalRichTextEn: JSON
+  legalRichTextEs: JSON
   marginBottom: Int
   marginLeft: Int
   marginRight: Int

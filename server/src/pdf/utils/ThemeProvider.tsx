@@ -17,7 +17,8 @@ export interface PdfDocumentTheme {
   showLogo: boolean;
   logoPosition: "center" | "left" | "right";
   paginationPosition: "center" | "left" | "right";
-  legalRichText: any;
+  legalRichTextEs: any;
+  legalRichTextEn: any;
 }
 
 export const defaultDocumentTheme: PdfDocumentTheme = {
@@ -37,7 +38,26 @@ export const defaultDocumentTheme: PdfDocumentTheme = {
   textFontSize: 12,
   logoPosition: "center",
   paginationPosition: "right",
-  legalRichText: [],
+  legalRichTextEs: [
+    {
+      type: "p",
+      children: [
+        {
+          text: "Declaro que los datos y la documentación facilitados, así como las copias o fotocopias enviadas, reproducen fielmente los documentos originales y la información actual de identificación.",
+        },
+      ],
+    },
+  ],
+  legalRichTextEn: [
+    {
+      type: "p",
+      children: [
+        {
+          text: "I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and current identification information.",
+        },
+      ],
+    },
+  ],
 };
 
 const ThemeContext = createContext<PdfDocumentTheme | undefined>(undefined);

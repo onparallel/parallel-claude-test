@@ -1650,7 +1650,8 @@ export interface OrganizationusersArgs {
 }
 
 export interface OrganizationDocumentThemeInput {
-  legalRichText?: InputMaybe<Scalars["JSON"]>;
+  legalRichTextEn?: InputMaybe<Scalars["JSON"]>;
+  legalRichTextEs?: InputMaybe<Scalars["JSON"]>;
   marginBottom?: InputMaybe<Scalars["Int"]>;
   marginLeft?: InputMaybe<Scalars["Int"]>;
   marginRight?: InputMaybe<Scalars["Int"]>;

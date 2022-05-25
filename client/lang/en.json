@@ -4730,6 +4730,11 @@
     "context": "Untitled heading"
   },
   {
+    "term": "generic.english",
+    "definition": "English",
+    "context": "English"
+  },
+  {
     "term": "generic.enter-a-value",
     "definition": "Enter a value",
     "context": "Enter a value"
@@ -5235,6 +5240,11 @@
     "context": "Something went wrong"
   },
   {
+    "term": "generic.spanish",
+    "definition": "Spanish",
+    "context": "Spanish"
+  },
+  {
     "term": "generic.submit",
     "definition": "Submit",
     "context": "Submit"
@@ -5586,8 +5596,8 @@
   },
   {
     "term": "organization.branding.legal-description",
-    "definition": "This text will be displayed at the end of documents that include a signature process.",
-    "context": "This text will be displayed at the end of documents that include a signature process."
+    "definition": "This text will be displayed at the end of documents that include a signature process. The language will be adapted to the language of the petition.",
+    "context": "This text will be displayed at the end of documents that include a signature process. The language will be adapted to the language of the petition."
   },
   {
     "term": "organization.branding.legal-header",

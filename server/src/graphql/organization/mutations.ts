@@ -115,7 +115,8 @@ export const updateOrganizationDocumentTheme = mutationField("updateOrganization
           t.nullable.string("textFontFamily");
           t.nullable.string("textColor");
           t.nullable.int("textFontSize");
-          t.nullable.json("legalRichText");
+          t.nullable.json("legalRichTextEs");
+          t.nullable.json("legalRichTextEn");
         },
       }).asArg()
     ),
@@ -168,8 +169,11 @@ export const updateOrganizationDocumentTheme = mutationField("updateOrganization
     if (isDefined(args.data.textFontSize)) {
       theme["textFontSize"] = args.data.textFontSize;
     }
-    if (isDefined(args.data.legalRichText)) {
-      theme["legalRichText"] = args.data.legalRichText;
+    if (isDefined(args.data.legalRichTextEs)) {
+      theme["legalRichTextEs"] = args.data.legalRichTextEs;
+    }
+    if (isDefined(args.data.legalRichTextEn)) {
+      theme["legalRichTextEn"] = args.data.legalRichTextEn;
     }
 
     return await ctx.organizations.updateOrganization(

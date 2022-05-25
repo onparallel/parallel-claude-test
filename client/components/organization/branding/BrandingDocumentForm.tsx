@@ -1,6 +1,5 @@
 import { gql, useApolloClient, useMutation } from "@apollo/client";
 import {
-  Box,
   Heading,
   HStack,
   Input,
@@ -12,8 +11,14 @@ import {
   Select,
   Stack,
   Switch,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   Text,
 } from "@chakra-ui/react";
+import { Card } from "@parallel/components/common/Card";
 import { ColorInput } from "@parallel/components/common/ColorInput";
 import { Divider } from "@parallel/components/common/Divider";
 import { RichTextEditor } from "@parallel/components/common/slate/RichTextEditor";
@@ -257,18 +262,44 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
         <Text>
           <FormattedMessage
             id="organization.branding.legal-description"
-            defaultMessage="This text will be displayed at the end of documents that include a signature process."
+            defaultMessage="This text will be displayed at the end of documents that include a signature process. The language will be adapted to the language of the petition."
           />
         </Text>
-        <Box backgroundColor="white">
-          <RichTextEditor
-            id="legal-text-editor"
-            value={isEmptyRTEValue(theme.legalRichText) ? null : theme.legalRichText}
-            onChange={(value) => {
-              handleThemeChange({ legalRichText: value });
-            }}
-          />
-        </Box>
+
+        <Tabs as={Card} variant="enclosed">
+          <TabList>
+            <Tab>
+              <Text fontWeight="500">
+                <FormattedMessage id="generic.english" defaultMessage="English" />
+              </Text>
+            </Tab>
+            <Tab>
+              <Text fontWeight="500">
+                <FormattedMessage id="generic.spanish" defaultMessage="Spanish" />
+              </Text>
+            </Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <RichTextEditor
+                id="legal-text-editor-en"
+                value={isEmptyRTEValue(theme.legalRichTextEn) ? null : theme.legalRichTextEn}
+                onChange={(value) => {
+                  handleThemeChange({ legalRichTextEn: value });
+                }}
+              />
+            </TabPanel>
+            <TabPanel>
+              <RichTextEditor
+                id="legal-text-editor-es"
+                value={isEmptyRTEValue(theme.legalRichTextEs) ? null : theme.legalRichTextEs}
+                onChange={(value) => {
+                  handleThemeChange({ legalRichTextEs: value });
+                }}
+              />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </Stack>
     </Stack>
   );

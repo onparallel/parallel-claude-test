@@ -107,7 +107,8 @@ export interface NexusGenInputs {
   };
   OrganizationDocumentThemeInput: {
     // input type
-    legalRichText?: NexusGenScalars["JSON"] | null; // JSON
+    legalRichTextEn?: NexusGenScalars["JSON"] | null; // JSON
+    legalRichTextEs?: NexusGenScalars["JSON"] | null; // JSON
     marginBottom?: number | null; // Int
     marginLeft?: number | null; // Int
     marginRight?: number | null; // Int
