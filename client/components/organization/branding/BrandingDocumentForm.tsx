@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql, useApolloClient, useMutation } from "@apollo/client";
 import {
   Box,
   Heading,
@@ -19,6 +19,7 @@ import { Divider } from "@parallel/components/common/Divider";
 import { RichTextEditor } from "@parallel/components/common/slate/RichTextEditor";
 import {
   BrandingDocumentForm_OrganizationFragment,
+  BrandingDocumentForm_OrganizationFragmentDoc,
   BrandingDocumentForm_updateOrganizationDocumentThemeDocument,
   BrandingDocumentForm_updateOrganizationDocumentThemeMutationVariables,
 } from "@parallel/graphql/__types";
@@ -26,44 +27,20 @@ import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTE
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useState } from "react";
 import { IMaskInput } from "react-imask";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
+import families from "../../../chakra/pdfDocumentFonts.json";
 
 interface BrandingDocumentFormProps {
   organization: BrandingDocumentForm_OrganizationFragment;
 }
 
 export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps) {
+  const intl = useIntl();
   const [theme, setTheme] = useState(organization.pdfDocumentTheme);
 
-  const FONTS = [
-    "Roboto Slab",
-    "Merriweather",
-    "Playfair Display",
-    "Lora",
-    "Pt Serif",
-    "Source Serif Pro",
-    "IBM Plex Serif",
-    "Cormorand Garamond",
-    "Alegreya",
-    "Tinos",
-    "Libre Baskerville",
-    "Noto Serif Japanese",
-    "Roboto",
-    "Open Sans",
-    "Lato",
-    "Montserrat",
-    "Poppins",
-    "Source Sans Pro",
-    "Noto Sans",
-    "Raleway",
-    "Nunito",
-    "Rubik",
-    "Parisienne",
-    "Rubik Wet Paint",
-    "Inconsolata",
-  ].sort();
-
-  const FONT_SIZES_PT = [20, 18, 16, 14, 12, 10, 8, 6, 4];
+  const FONT_SIZES_PT = [
+    5, 5.5, 6.5, 7.5, 8, 9, 10, 10.5, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,
+  ];
 
   const [updateOrganizationDocumentTheme] = useMutation(
     BrandingDocumentForm_updateOrganizationDocumentThemeDocument
@@ -79,7 +56,18 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
     []
   );
 
+  const apollo = useApolloClient();
   function handleThemeChange(data: Record<string, any>) {
+    // immediately write cache fragment with expected result.
+    // this allows us to not wait for the server response in order to update the BrandingDocumentPreview
+    apollo.cache.writeFragment({
+      fragment: BrandingDocumentForm_OrganizationFragmentDoc,
+      data: {
+        id: organization.id,
+        pdfDocumentTheme: { ...organization.pdfDocumentTheme, ...data },
+        __typename: "Organization",
+      },
+    });
     setTheme({ ...theme, ...data });
     updateOrganizationTheme(data);
   }
@@ -92,7 +80,9 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
         </Heading>
         <HStack spacing={4}>
           <Stack>
-            <Text>Parte superior</Text>
+            <Text>
+              <FormattedMessage id="organization.branding.margins.top" defaultMessage="Top" />
+            </Text>
             <NumberInput
               min={0}
               background="white"
@@ -107,7 +97,9 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
             </NumberInput>
           </Stack>
           <Stack>
-            <Text>Parte inferior</Text>
+            <Text>
+              <FormattedMessage id="organization.branding.margins.bottom" defaultMessage="Bottom" />
+            </Text>
             <NumberInput
               min={0}
               background="white"
@@ -122,7 +114,9 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
             </NumberInput>
           </Stack>
           <Stack>
-            <Text>Laterales</Text>
+            <Text>
+              <FormattedMessage id="organization.branding.margins.sides" defaultMessage="Sides" />
+            </Text>
             <NumberInput
               min={0}
               background="white"
@@ -144,7 +138,12 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
             <Heading as="h4" size="md" fontWeight="semibold">
               <FormattedMessage id="organization.branding.show-logo-header" defaultMessage="Logo" />
             </Heading>
-            <Text>Muestra el logotipo de la organización en tus documentos.</Text>
+            <Text>
+              <FormattedMessage
+                id="organization.branding.show-logo-description"
+                defaultMessage="Display the organization's logo on your documents."
+              />
+            </Text>
           </Stack>
           <Switch
             isChecked={theme.showLogo}
@@ -159,19 +158,28 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
         </Heading>
         {[
           {
-            title: "Título 1",
+            title: intl.formatMessage({
+              id: "organization.branding.title1",
+              defaultMessage: "Title 1",
+            }),
             fontKey: "title1FontFamily",
             colorKey: "title1Color",
             sizeKey: "title1FontSize",
           },
           {
-            title: "Título 2",
+            title: intl.formatMessage({
+              id: "organization.branding.title2",
+              defaultMessage: "Title 2",
+            }),
             fontKey: "title2FontFamily",
             colorKey: "title2Color",
             sizeKey: "title2FontSize",
           },
           {
-            title: "Textos",
+            title: intl.formatMessage({
+              id: "organization.branding.text",
+              defaultMessage: "Texts",
+            }),
             fontKey: "textFontFamily",
             colorKey: "textColor",
             sizeKey: "textFontSize",
@@ -187,15 +195,17 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
                   handleThemeChange({ [key.fontKey]: e.target.value });
                 }}
               >
-                {FONTS.map((v) => (
-                  <option key={v} value={v}>
-                    {v}
+                {families.map(({ family }) => (
+                  <option key={family} value={family}>
+                    {family}
                   </option>
                 ))}
               </Select>
             </Stack>
             <Stack>
-              <Text>Tamaño</Text>
+              <Text>
+                <FormattedMessage id="generic.size" defaultMessage="Size" />
+              </Text>
               <Select
                 backgroundColor="white"
                 width="100px"
@@ -212,7 +222,9 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
               </Select>
             </Stack>
             <Stack>
-              <Text>Color</Text>
+              <Text>
+                <FormattedMessage id="generic.color" defaultMessage="Color" />
+              </Text>
               <HStack>
                 <Input
                   as={IMaskInput}
@@ -228,7 +240,9 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
                   boxSize="40px"
                   borderRadius="100%"
                   value={theme[key.colorKey]}
-                  onChange={(value) => handleThemeChange({ [key.colorKey]: value })}
+                  onChange={(color) => {
+                    handleThemeChange({ [key.colorKey]: color });
+                  }}
                 />
               </HStack>
             </Stack>
@@ -241,7 +255,10 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
           <FormattedMessage id="organization.branding.legal-header" defaultMessage="Legal text" />
         </Heading>
         <Text>
-          Este texto se mostrará al final de los documentos que incluyan un proceso de firma.
+          <FormattedMessage
+            id="organization.branding.legal-description"
+            defaultMessage="This text will be displayed at the end of documents that include a signature process."
+          />
         </Text>
         <Box backgroundColor="white">
           <RichTextEditor
@@ -260,6 +277,7 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
 BrandingDocumentForm.fragments = {
   Organization: gql`
     fragment BrandingDocumentForm_Organization on Organization {
+      id
       pdfDocumentTheme
     }
   `,

@@ -17,9 +17,21 @@ export function BrandingDocumentPreview({ organization }: BrandingDocumentPrevie
       paddingBottom: `${theme.marginBottom}mm`,
       paddingLeft: `${theme.marginLeft}mm`,
     },
-    title1: { fontSize: theme.title1FontSize, color: theme.title1Color },
-    title2: { fontSize: theme.title2FontSize, color: theme.title2Color },
-    text: { fontSize: theme.textFontSize, color: theme.textColor },
+    title1: {
+      fontFamily: theme.title1FontFamily,
+      fontSize: theme.title1FontSize,
+      color: theme.title1Color,
+    },
+    title2: {
+      fontFamily: theme.title2FontFamily,
+      fontSize: theme.title2FontSize,
+      color: theme.title2Color,
+    },
+    text: {
+      fontFamily: theme.textFontFamily,
+      fontSize: theme.textFontSize,
+      color: theme.textColor,
+    },
   };
 
   const logoSrc =

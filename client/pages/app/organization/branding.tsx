@@ -41,7 +41,7 @@ function OrganizationBranding() {
         </Heading>
       }
     >
-      <Tabs defaultIndex={1} isLazy variant="enclosed">
+      <Tabs isLazy variant="enclosed">
         <TabList paddingLeft={6} background="white" paddingTop={2}>
           <Tab
             fontWeight="bold"

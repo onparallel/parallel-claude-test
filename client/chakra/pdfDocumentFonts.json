@@ -1,0 +1,394 @@
+[
+  {
+    "family": "IBM Plex Sans",
+    "fonts": [
+      { "src": "/IBM%20Plex%20Sans/100.ttf", "fontWeight": 100 },
+      { "src": "/IBM%20Plex%20Sans/200.ttf", "fontWeight": 200 },
+      { "src": "/IBM%20Plex%20Sans/300.ttf", "fontWeight": 300 },
+      { "src": "/IBM%20Plex%20Sans/500.ttf", "fontWeight": 500 },
+      { "src": "/IBM%20Plex%20Sans/600.ttf", "fontWeight": 600 },
+      { "src": "/IBM%20Plex%20Sans/700.ttf", "fontWeight": 700 },
+      { "src": "/IBM%20Plex%20Sans/100italic.ttf", "fontStyle": "italic", "fontWeight": 100 },
+      { "src": "/IBM%20Plex%20Sans/200italic.ttf", "fontStyle": "italic", "fontWeight": 200 },
+      { "src": "/IBM%20Plex%20Sans/300italic.ttf", "fontStyle": "italic", "fontWeight": 300 },
+      { "src": "/IBM%20Plex%20Sans/regular.ttf" },
+      { "src": "/IBM%20Plex%20Sans/italic.ttf", "fontStyle": "italic" },
+      { "src": "/IBM%20Plex%20Sans/500italic.ttf", "fontStyle": "italic", "fontWeight": 500 },
+      { "src": "/IBM%20Plex%20Sans/600italic.ttf", "fontStyle": "italic", "fontWeight": 600 },
+      { "src": "/IBM%20Plex%20Sans/700italic.ttf", "fontStyle": "italic", "fontWeight": 700 }
+    ]
+  },
+  {
+    "family": "Roboto Slab",
+    "fonts": [
+      { "src": "/Roboto%20Slab/100.ttf", "fontWeight": 100 },
+      { "src": "/Roboto%20Slab/200.ttf", "fontWeight": 200 },
+      { "src": "/Roboto%20Slab/300.ttf", "fontWeight": 300 },
+      { "src": "/Roboto%20Slab/500.ttf", "fontWeight": 500 },
+      { "src": "/Roboto%20Slab/600.ttf", "fontWeight": 600 },
+      { "src": "/Roboto%20Slab/700.ttf", "fontWeight": 700 },
+      { "src": "/Roboto%20Slab/800.ttf", "fontWeight": 800 },
+      { "src": "/Roboto%20Slab/900.ttf", "fontWeight": 900 },
+      { "src": "/Roboto%20Slab/regular.ttf" }
+    ]
+  },
+  {
+    "family": "Merriweather",
+    "fonts": [
+      { "src": "/Merriweather/300.ttf", "fontWeight": 300 },
+      { "src": "/Merriweather/700.ttf", "fontWeight": 700 },
+      { "src": "/Merriweather/900.ttf", "fontWeight": 900 },
+      { "src": "/Merriweather/300italic.ttf", "fontStyle": "italic", "fontWeight": 300 },
+      { "src": "/Merriweather/regular.ttf" },
+      { "src": "/Merriweather/italic.ttf", "fontStyle": "italic" },
+      { "src": "/Merriweather/700italic.ttf", "fontStyle": "italic", "fontWeight": 700 },
+      { "src": "/Merriweather/900italic.ttf", "fontStyle": "italic", "fontWeight": 900 }
+    ]
+  },
+  {
+    "family": "Playfair Display",
+    "fonts": [
+      { "src": "/Playfair%20Display/500.ttf", "fontWeight": 500 },
+      { "src": "/Playfair%20Display/600.ttf", "fontWeight": 600 },
+      { "src": "/Playfair%20Display/700.ttf", "fontWeight": 700 },
+      { "src": "/Playfair%20Display/800.ttf", "fontWeight": 800 },
+      { "src": "/Playfair%20Display/900.ttf", "fontWeight": 900 },
+      { "src": "/Playfair%20Display/regular.ttf" },
+      { "src": "/Playfair%20Display/italic.ttf", "fontStyle": "italic" },
+      { "src": "/Playfair%20Display/500italic.ttf", "fontStyle": "italic", "fontWeight": 500 },
+      { "src": "/Playfair%20Display/600italic.ttf", "fontStyle": "italic", "fontWeight": 600 },
+      { "src": "/Playfair%20Display/700italic.ttf", "fontStyle": "italic", "fontWeight": 700 },
+      { "src": "/Playfair%20Display/800italic.ttf", "fontStyle": "italic", "fontWeight": 800 },
+      { "src": "/Playfair%20Display/900italic.ttf", "fontStyle": "italic", "fontWeight": 900 }
+    ]
+  },
+  {
+    "family": "Lora",
+    "fonts": [
+      { "src": "/Lora/500.ttf", "fontWeight": 500 },
+      { "src": "/Lora/600.ttf", "fontWeight": 600 },
+      { "src": "/Lora/700.ttf", "fontWeight": 700 },
+      { "src": "/Lora/regular.ttf" },
+      { "src": "/Lora/italic.ttf", "fontStyle": "italic" },
+      { "src": "/Lora/500italic.ttf", "fontStyle": "italic", "fontWeight": 500 },
+      { "src": "/Lora/600italic.ttf", "fontStyle": "italic", "fontWeight": 600 },
+      { "src": "/Lora/700italic.ttf", "fontStyle": "italic", "fontWeight": 700 }
+    ]
+  },
+  {
+    "family": "PT Serif",
+    "fonts": [
+      { "src": "/PT%20Serif/700.ttf", "fontWeight": 700 },
+      { "src": "/PT%20Serif/regular.ttf" },
+      { "src": "/PT%20Serif/italic.ttf", "fontStyle": "italic" },
+      { "src": "/PT%20Serif/700italic.ttf", "fontStyle": "italic", "fontWeight": 700 }
+    ]
+  },
+  {
+    "family": "Source Serif Pro",
+    "fonts": [
+      { "src": "/Source%20Serif%20Pro/200.ttf", "fontWeight": 200 },
+      { "src": "/Source%20Serif%20Pro/300.ttf", "fontWeight": 300 },
+      { "src": "/Source%20Serif%20Pro/600.ttf", "fontWeight": 600 },
+      { "src": "/Source%20Serif%20Pro/700.ttf", "fontWeight": 700 },
+      { "src": "/Source%20Serif%20Pro/900.ttf", "fontWeight": 900 },
+      { "src": "/Source%20Serif%20Pro/200italic.ttf", "fontStyle": "italic", "fontWeight": 200 },
+      { "src": "/Source%20Serif%20Pro/300italic.ttf", "fontStyle": "italic", "fontWeight": 300 },
+      { "src": "/Source%20Serif%20Pro/regular.ttf" },
+      { "src": "/Source%20Serif%20Pro/italic.ttf", "fontStyle": "italic" },
+      { "src": "/Source%20Serif%20Pro/600italic.ttf", "fontStyle": "italic", "fontWeight": 600 },
+      { "src": "/Source%20Serif%20Pro/700italic.ttf", "fontStyle": "italic", "fontWeight": 700 },
+      { "src": "/Source%20Serif%20Pro/900italic.ttf", "fontStyle": "italic", "fontWeight": 900 }
+    ]
+  },
+  {
+    "family": "IBM Plex Serif",
+    "fonts": [
+      { "src": "/IBM%20Plex%20Serif/100.ttf", "fontWeight": 100 },
+      { "src": "/IBM%20Plex%20Serif/200.ttf", "fontWeight": 200 },
+      { "src": "/IBM%20Plex%20Serif/300.ttf", "fontWeight": 300 },
+      { "src": "/IBM%20Plex%20Serif/500.ttf", "fontWeight": 500 },
+      { "src": "/IBM%20Plex%20Serif/600.ttf", "fontWeight": 600 },
+      { "src": "/IBM%20Plex%20Serif/700.ttf", "fontWeight": 700 },
+      { "src": "/IBM%20Plex%20Serif/100italic.ttf", "fontStyle": "italic", "fontWeight": 100 },
+      { "src": "/IBM%20Plex%20Serif/200italic.ttf", "fontStyle": "italic", "fontWeight": 200 },
+      { "src": "/IBM%20Plex%20Serif/300italic.ttf", "fontStyle": "italic", "fontWeight": 300 },
+      { "src": "/IBM%20Plex%20Serif/regular.ttf" },
+      { "src": "/IBM%20Plex%20Serif/italic.ttf", "fontStyle": "italic" },
+      { "src": "/IBM%20Plex%20Serif/500italic.ttf", "fontStyle": "italic", "fontWeight": 500 },
+      { "src": "/IBM%20Plex%20Serif/600italic.ttf", "fontStyle": "italic", "fontWeight": 600 },
+      { "src": "/IBM%20Plex%20Serif/700italic.ttf", "fontStyle": "italic", "fontWeight": 700 }
+    ]
+  },
+  {
+    "family": "Cormorant Garamond",
+    "fonts": [
+      { "src": "/Cormorant%20Garamond/300.ttf", "fontWeight": 300 },
+      { "src": "/Cormorant%20Garamond/500.ttf", "fontWeight": 500 },
+      { "src": "/Cormorant%20Garamond/600.ttf", "fontWeight": 600 },
+      { "src": "/Cormorant%20Garamond/700.ttf", "fontWeight": 700 },
+      { "src": "/Cormorant%20Garamond/300italic.ttf", "fontStyle": "italic", "fontWeight": 300 },
+      { "src": "/Cormorant%20Garamond/regular.ttf" },
+      { "src": "/Cormorant%20Garamond/italic.ttf", "fontStyle": "italic" },
+      { "src": "/Cormorant%20Garamond/500italic.ttf", "fontStyle": "italic", "fontWeight": 500 },
+      { "src": "/Cormorant%20Garamond/600italic.ttf", "fontStyle": "italic", "fontWeight": 600 },
+      { "src": "/Cormorant%20Garamond/700italic.ttf", "fontStyle": "italic", "fontWeight": 700 }
+    ]
+  },
+  {
+    "family": "Alegreya",
+    "fonts": [
+      { "src": "/Alegreya/500.ttf", "fontWeight": 500 },
+      { "src": "/Alegreya/600.ttf", "fontWeight": 600 },
+      { "src": "/Alegreya/700.ttf", "fontWeight": 700 },
+      { "src": "/Alegreya/800.ttf", "fontWeight": 800 },
+      { "src": "/Alegreya/900.ttf", "fontWeight": 900 },
+      { "src": "/Alegreya/regular.ttf" },
+      { "src": "/Alegreya/italic.ttf", "fontStyle": "italic" },
+      { "src": "/Alegreya/500italic.ttf", "fontStyle": "italic", "fontWeight": 500 },
+      { "src": "/Alegreya/600italic.ttf", "fontStyle": "italic", "fontWeight": 600 },
+      { "src": "/Alegreya/700italic.ttf", "fontStyle": "italic", "fontWeight": 700 },
+      { "src": "/Alegreya/800italic.ttf", "fontStyle": "italic", "fontWeight": 800 },
+      { "src": "/Alegreya/900italic.ttf", "fontStyle": "italic", "fontWeight": 900 }
+    ]
+  },
+  {
+    "family": "Tinos",
+    "fonts": [
+      { "src": "/Tinos/700.ttf", "fontWeight": 700 },
+      { "src": "/Tinos/regular.ttf" },
+      { "src": "/Tinos/italic.ttf", "fontStyle": "italic" },
+      { "src": "/Tinos/700italic.ttf", "fontStyle": "italic", "fontWeight": 700 }
+    ]
+  },
+  {
+    "family": "Libre Baskerville",
+    "fonts": [
+      { "src": "/Libre%20Baskerville/700.ttf", "fontWeight": 700 },
+      { "src": "/Libre%20Baskerville/regular.ttf" },
+      { "src": "/Libre%20Baskerville/italic.ttf", "fontStyle": "italic" }
+    ]
+  },
+  {
+    "family": "Noto Serif",
+    "fonts": [
+      { "src": "/Noto%20Serif/700.ttf", "fontWeight": 700 },
+      { "src": "/Noto%20Serif/regular.ttf" },
+      { "src": "/Noto%20Serif/italic.ttf", "fontStyle": "italic" },
+      { "src": "/Noto%20Serif/700italic.ttf", "fontStyle": "italic", "fontWeight": 700 }
+    ]
+  },
+  {
+    "family": "Roboto",
+    "fonts": [
+      { "src": "/Roboto/100.ttf", "fontWeight": 100 },
+      { "src": "/Roboto/300.ttf", "fontWeight": 300 },
+      { "src": "/Roboto/500.ttf", "fontWeight": 500 },
+      { "src": "/Roboto/700.ttf", "fontWeight": 700 },
+      { "src": "/Roboto/900.ttf", "fontWeight": 900 },
+      { "src": "/Roboto/100italic.ttf", "fontStyle": "italic", "fontWeight": 100 },
+      { "src": "/Roboto/300italic.ttf", "fontStyle": "italic", "fontWeight": 300 },
+      { "src": "/Roboto/regular.ttf" },
+      { "src": "/Roboto/italic.ttf", "fontStyle": "italic" },
+      { "src": "/Roboto/500italic.ttf", "fontStyle": "italic", "fontWeight": 500 },
+      { "src": "/Roboto/700italic.ttf", "fontStyle": "italic", "fontWeight": 700 },
+      { "src": "/Roboto/900italic.ttf", "fontStyle": "italic", "fontWeight": 900 }
+    ]
+  },
+  {
+    "family": "Open Sans",
+    "fonts": [
+      { "src": "/Open%20Sans/300.ttf", "fontWeight": 300 },
+      { "src": "/Open%20Sans/500.ttf", "fontWeight": 500 },
+      { "src": "/Open%20Sans/600.ttf", "fontWeight": 600 },
+      { "src": "/Open%20Sans/700.ttf", "fontWeight": 700 },
+      { "src": "/Open%20Sans/800.ttf", "fontWeight": 800 },
+      { "src": "/Open%20Sans/regular.ttf" },
+      { "src": "/Open%20Sans/300italic.ttf", "fontStyle": "italic", "fontWeight": 300 },
+      { "src": "/Open%20Sans/italic.ttf", "fontStyle": "italic" },
+      { "src": "/Open%20Sans/500italic.ttf", "fontStyle": "italic", "fontWeight": 500 },
+      { "src": "/Open%20Sans/600italic.ttf", "fontStyle": "italic", "fontWeight": 600 },
+      { "src": "/Open%20Sans/700italic.ttf", "fontStyle": "italic", "fontWeight": 700 },
+      { "src": "/Open%20Sans/800italic.ttf", "fontStyle": "italic", "fontWeight": 800 }
+    ]
+  },
+  {
+    "family": "Lato",
+    "fonts": [
+      { "src": "/Lato/100.ttf", "fontWeight": 100 },
+      { "src": "/Lato/300.ttf", "fontWeight": 300 },
+      { "src": "/Lato/700.ttf", "fontWeight": 700 },
+      { "src": "/Lato/900.ttf", "fontWeight": 900 },
+      { "src": "/Lato/100italic.ttf", "fontStyle": "italic", "fontWeight": 100 },
+      { "src": "/Lato/300italic.ttf", "fontStyle": "italic", "fontWeight": 300 },
+      { "src": "/Lato/regular.ttf" },
+      { "src": "/Lato/italic.ttf", "fontStyle": "italic" },
+      { "src": "/Lato/700italic.ttf", "fontStyle": "italic", "fontWeight": 700 },
+      { "src": "/Lato/900italic.ttf", "fontStyle": "italic", "fontWeight": 900 }
+    ]
+  },
+  {
+    "family": "Montserrat",
+    "fonts": [
+      { "src": "/Montserrat/100.ttf", "fontWeight": 100 },
+      { "src": "/Montserrat/200.ttf", "fontWeight": 200 },
+      { "src": "/Montserrat/300.ttf", "fontWeight": 300 },
+      { "src": "/Montserrat/500.ttf", "fontWeight": 500 },
+      { "src": "/Montserrat/600.ttf", "fontWeight": 600 },
+      { "src": "/Montserrat/700.ttf", "fontWeight": 700 },
+      { "src": "/Montserrat/800.ttf", "fontWeight": 800 },
+      { "src": "/Montserrat/900.ttf", "fontWeight": 900 },
+      { "src": "/Montserrat/regular.ttf" },
+      { "src": "/Montserrat/100italic.ttf", "fontStyle": "italic", "fontWeight": 100 },
+      { "src": "/Montserrat/200italic.ttf", "fontStyle": "italic", "fontWeight": 200 },
+      { "src": "/Montserrat/300italic.ttf", "fontStyle": "italic", "fontWeight": 300 },
+      { "src": "/Montserrat/italic.ttf", "fontStyle": "italic" },
+      { "src": "/Montserrat/500italic.ttf", "fontStyle": "italic", "fontWeight": 500 },
+      { "src": "/Montserrat/600italic.ttf", "fontStyle": "italic", "fontWeight": 600 },
+      { "src": "/Montserrat/700italic.ttf", "fontStyle": "italic", "fontWeight": 700 },
+      { "src": "/Montserrat/800italic.ttf", "fontStyle": "italic", "fontWeight": 800 },
+      { "src": "/Montserrat/900italic.ttf", "fontStyle": "italic", "fontWeight": 900 }
+    ]
+  },
+  {
+    "family": "Poppins",
+    "fonts": [
+      { "src": "/Poppins/100.ttf", "fontWeight": 100 },
+      { "src": "/Poppins/200.ttf", "fontWeight": 200 },
+      { "src": "/Poppins/300.ttf", "fontWeight": 300 },
+      { "src": "/Poppins/500.ttf", "fontWeight": 500 },
+      { "src": "/Poppins/600.ttf", "fontWeight": 600 },
+      { "src": "/Poppins/700.ttf", "fontWeight": 700 },
+      { "src": "/Poppins/800.ttf", "fontWeight": 800 },
+      { "src": "/Poppins/900.ttf", "fontWeight": 900 },
+      { "src": "/Poppins/100italic.ttf", "fontStyle": "italic", "fontWeight": 100 },
+      { "src": "/Poppins/200italic.ttf", "fontStyle": "italic", "fontWeight": 200 },
+      { "src": "/Poppins/300italic.ttf", "fontStyle": "italic", "fontWeight": 300 },
+      { "src": "/Poppins/regular.ttf" },
+      { "src": "/Poppins/italic.ttf", "fontStyle": "italic" },
+      { "src": "/Poppins/500italic.ttf", "fontStyle": "italic", "fontWeight": 500 },
+      { "src": "/Poppins/600italic.ttf", "fontStyle": "italic", "fontWeight": 600 },
+      { "src": "/Poppins/700italic.ttf", "fontStyle": "italic", "fontWeight": 700 },
+      { "src": "/Poppins/800italic.ttf", "fontStyle": "italic", "fontWeight": 800 },
+      { "src": "/Poppins/900italic.ttf", "fontStyle": "italic", "fontWeight": 900 }
+    ]
+  },
+  {
+    "family": "Source Sans Pro",
+    "fonts": [
+      { "src": "/Source%20Sans%20Pro/200.ttf", "fontWeight": 200 },
+      { "src": "/Source%20Sans%20Pro/300.ttf", "fontWeight": 300 },
+      { "src": "/Source%20Sans%20Pro/600.ttf", "fontWeight": 600 },
+      { "src": "/Source%20Sans%20Pro/700.ttf", "fontWeight": 700 },
+      { "src": "/Source%20Sans%20Pro/900.ttf", "fontWeight": 900 },
+      { "src": "/Source%20Sans%20Pro/200italic.ttf", "fontStyle": "italic", "fontWeight": 200 },
+      { "src": "/Source%20Sans%20Pro/300italic.ttf", "fontStyle": "italic", "fontWeight": 300 },
+      { "src": "/Source%20Sans%20Pro/regular.ttf" },
+      { "src": "/Source%20Sans%20Pro/italic.ttf", "fontStyle": "italic" },
+      { "src": "/Source%20Sans%20Pro/600italic.ttf", "fontStyle": "italic", "fontWeight": 600 },
+      { "src": "/Source%20Sans%20Pro/700italic.ttf", "fontStyle": "italic", "fontWeight": 700 },
+      { "src": "/Source%20Sans%20Pro/900italic.ttf", "fontStyle": "italic", "fontWeight": 900 }
+    ]
+  },
+  {
+    "family": "Noto Sans",
+    "fonts": [
+      { "src": "/Noto%20Sans/100.ttf", "fontWeight": 100 },
+      { "src": "/Noto%20Sans/200.ttf", "fontWeight": 200 },
+      { "src": "/Noto%20Sans/300.ttf", "fontWeight": 300 },
+      { "src": "/Noto%20Sans/500.ttf", "fontWeight": 500 },
+      { "src": "/Noto%20Sans/600.ttf", "fontWeight": 600 },
+      { "src": "/Noto%20Sans/700.ttf", "fontWeight": 700 },
+      { "src": "/Noto%20Sans/800.ttf", "fontWeight": 800 },
+      { "src": "/Noto%20Sans/900.ttf", "fontWeight": 900 },
+      { "src": "/Noto%20Sans/100italic.ttf", "fontStyle": "italic", "fontWeight": 100 },
+      { "src": "/Noto%20Sans/200italic.ttf", "fontStyle": "italic", "fontWeight": 200 },
+      { "src": "/Noto%20Sans/300italic.ttf", "fontStyle": "italic", "fontWeight": 300 },
+      { "src": "/Noto%20Sans/regular.ttf" },
+      { "src": "/Noto%20Sans/italic.ttf", "fontStyle": "italic" },
+      { "src": "/Noto%20Sans/500italic.ttf", "fontStyle": "italic", "fontWeight": 500 },
+      { "src": "/Noto%20Sans/600italic.ttf", "fontStyle": "italic", "fontWeight": 600 },
+      { "src": "/Noto%20Sans/700italic.ttf", "fontStyle": "italic", "fontWeight": 700 },
+      { "src": "/Noto%20Sans/800italic.ttf", "fontStyle": "italic", "fontWeight": 800 },
+      { "src": "/Noto%20Sans/900italic.ttf", "fontStyle": "italic", "fontWeight": 900 }
+    ]
+  },
+  {
+    "family": "Raleway",
+    "fonts": [
+      { "src": "/Raleway/100.ttf", "fontWeight": 100 },
+      { "src": "/Raleway/200.ttf", "fontWeight": 200 },
+      { "src": "/Raleway/300.ttf", "fontWeight": 300 },
+      { "src": "/Raleway/500.ttf", "fontWeight": 500 },
+      { "src": "/Raleway/600.ttf", "fontWeight": 600 },
+      { "src": "/Raleway/700.ttf", "fontWeight": 700 },
+      { "src": "/Raleway/800.ttf", "fontWeight": 800 },
+      { "src": "/Raleway/900.ttf", "fontWeight": 900 },
+      { "src": "/Raleway/regular.ttf" },
+      { "src": "/Raleway/100italic.ttf", "fontStyle": "italic", "fontWeight": 100 },
+      { "src": "/Raleway/200italic.ttf", "fontStyle": "italic", "fontWeight": 200 },
+      { "src": "/Raleway/300italic.ttf", "fontStyle": "italic", "fontWeight": 300 },
+      { "src": "/Raleway/italic.ttf", "fontStyle": "italic" },
+      { "src": "/Raleway/500italic.ttf", "fontStyle": "italic", "fontWeight": 500 },
+      { "src": "/Raleway/600italic.ttf", "fontStyle": "italic", "fontWeight": 600 },
+      { "src": "/Raleway/700italic.ttf", "fontStyle": "italic", "fontWeight": 700 },
+      { "src": "/Raleway/800italic.ttf", "fontStyle": "italic", "fontWeight": 800 },
+      { "src": "/Raleway/900italic.ttf", "fontStyle": "italic", "fontWeight": 900 }
+    ]
+  },
+  {
+    "family": "Nunito",
+    "fonts": [
+      { "src": "/Nunito/200.ttf", "fontWeight": 200 },
+      { "src": "/Nunito/300.ttf", "fontWeight": 300 },
+      { "src": "/Nunito/500.ttf", "fontWeight": 500 },
+      { "src": "/Nunito/600.ttf", "fontWeight": 600 },
+      { "src": "/Nunito/700.ttf", "fontWeight": 700 },
+      { "src": "/Nunito/800.ttf", "fontWeight": 800 },
+      { "src": "/Nunito/900.ttf", "fontWeight": 900 },
+      { "src": "/Nunito/regular.ttf" },
+      { "src": "/Nunito/200italic.ttf", "fontStyle": "italic", "fontWeight": 200 },
+      { "src": "/Nunito/300italic.ttf", "fontStyle": "italic", "fontWeight": 300 },
+      { "src": "/Nunito/italic.ttf", "fontStyle": "italic" },
+      { "src": "/Nunito/500italic.ttf", "fontStyle": "italic", "fontWeight": 500 },
+      { "src": "/Nunito/600italic.ttf", "fontStyle": "italic", "fontWeight": 600 },
+      { "src": "/Nunito/700italic.ttf", "fontStyle": "italic", "fontWeight": 700 },
+      { "src": "/Nunito/800italic.ttf", "fontStyle": "italic", "fontWeight": 800 },
+      { "src": "/Nunito/900italic.ttf", "fontStyle": "italic", "fontWeight": 900 }
+    ]
+  },
+  {
+    "family": "Rubik",
+    "fonts": [
+      { "src": "/Rubik/300.ttf", "fontWeight": 300 },
+      { "src": "/Rubik/500.ttf", "fontWeight": 500 },
+      { "src": "/Rubik/600.ttf", "fontWeight": 600 },
+      { "src": "/Rubik/700.ttf", "fontWeight": 700 },
+      { "src": "/Rubik/800.ttf", "fontWeight": 800 },
+      { "src": "/Rubik/900.ttf", "fontWeight": 900 },
+      { "src": "/Rubik/regular.ttf" },
+      { "src": "/Rubik/300italic.ttf", "fontStyle": "italic", "fontWeight": 300 },
+      { "src": "/Rubik/italic.ttf", "fontStyle": "italic" },
+      { "src": "/Rubik/500italic.ttf", "fontStyle": "italic", "fontWeight": 500 },
+      { "src": "/Rubik/600italic.ttf", "fontStyle": "italic", "fontWeight": 600 },
+      { "src": "/Rubik/700italic.ttf", "fontStyle": "italic", "fontWeight": 700 },
+      { "src": "/Rubik/800italic.ttf", "fontStyle": "italic", "fontWeight": 800 },
+      { "src": "/Rubik/900italic.ttf", "fontStyle": "italic", "fontWeight": 900 }
+    ]
+  },
+  { "family": "Parisienne", "fonts": [{ "src": "/Parisienne/regular.ttf" }] },
+  { "family": "Rubik Wet Paint", "fonts": [{ "src": "/Rubik%20Wet%20Paint/regular.ttf" }] },
+  {
+    "family": "Inconsolata",
+    "fonts": [
+      { "src": "/Inconsolata/200.ttf", "fontWeight": 200 },
+      { "src": "/Inconsolata/300.ttf", "fontWeight": 300 },
+      { "src": "/Inconsolata/500.ttf", "fontWeight": 500 },
+      { "src": "/Inconsolata/600.ttf", "fontWeight": 600 },
+      { "src": "/Inconsolata/700.ttf", "fontWeight": 700 },
+      { "src": "/Inconsolata/800.ttf", "fontWeight": 800 },
+      { "src": "/Inconsolata/900.ttf", "fontWeight": 900 },
+      { "src": "/Inconsolata/regular.ttf" }
+    ]
+  }
+]

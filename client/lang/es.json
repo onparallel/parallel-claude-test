@@ -195,6 +195,11 @@
     "context": "Upgrade your plan to increase your user and petition limits."
   },
   {
+    "term": "component.branding-document-preview.footer",
+    "definition": "Ejemplo de un documento.",
+    "context": "An example of a document."
+  },
+  {
     "term": "component.branding-general-preview.body",
     "definition": "{tone, select, INFORMAL{Te recordamos que <b>{name}</b> te compartió un acceso a Parallel en el que queda información pendiente de completar.} other{Le recordamos que <b>[Tu nombre]</b> le envió una petición de la que queda información pendiente de completar.}}",
     "context": "We remind you that <b>{name}</b> sent you a petition and some of the requested information has not yet been submitted."
@@ -4545,6 +4550,11 @@
     "context": "Collapse"
   },
   {
+    "term": "generic.color",
+    "definition": "Color",
+    "context": "Color"
+  },
+  {
     "term": "generic.color.blue",
     "definition": "azul",
     "context": "blue"
@@ -5215,6 +5225,11 @@
     "context": "Production"
   },
   {
+    "term": "generic.size",
+    "definition": "Tamaño",
+    "context": "Size"
+  },
+  {
     "term": "generic.something-went-wrong",
     "definition": "Algo ha fallado",
     "context": "Something went wrong"
@@ -5560,9 +5575,24 @@
     "context": "Documents"
   },
   {
+    "term": "organization.branding.fonts-header",
+    "definition": "Fuentes",
+    "context": "Fonts"
+  },
+  {
     "term": "organization.branding.general.tab",
     "definition": "General",
     "context": "General"
+  },
+  {
+    "term": "organization.branding.legal-description",
+    "definition": "Este texto se mostrará al final de los documentos que incluyan un proceso de firma.",
+    "context": "This text will be displayed at the end of documents that include a signature process."
+  },
+  {
+    "term": "organization.branding.legal-header",
+    "definition": "Texto legal",
+    "context": "Legal text"
   },
   {
     "term": "organization.branding.logo-attach-help",
@@ -5580,6 +5610,26 @@
     "context": "Organization logo"
   },
   {
+    "term": "organization.branding.margins-header",
+    "definition": "Márgenes",
+    "context": "Margins"
+  },
+  {
+    "term": "organization.branding.margins.bottom",
+    "definition": "Parte inferior",
+    "context": "Bottom"
+  },
+  {
+    "term": "organization.branding.margins.sides",
+    "definition": "Laterales",
+    "context": "Sides"
+  },
+  {
+    "term": "organization.branding.margins.top",
+    "definition": "Parte superior",
+    "context": "Top"
+  },
+  {
     "term": "organization.branding.parallel-branding-description",
     "definition": "Muestra la marca de Parallel en todos los correos y peticiones que se envíen.",
     "context": "Displays the Parallel branding on all emails and requests that are sent."
@@ -5595,14 +5645,39 @@
     "context": "Hi, I would like to get more information about how to upgrade my plan to hide Parallel branding."
   },
   {
+    "term": "organization.branding.show-logo-description",
+    "definition": "Muestra el logotipo de la organización en tus documentos.",
+    "context": "Display the organization's logo on your documents."
+  },
+  {
+    "term": "organization.branding.show-logo-header",
+    "definition": "Logotipo",
+    "context": "Logo"
+  },
+  {
     "term": "organization.branding.square-logo-description",
     "definition": "Se mostrará internamente para diferenciar tus organizaciones.",
     "context": "This logo will be displayed internally to differentiate your organizations."
   },
   {
+    "term": "organization.branding.text",
+    "definition": "Textos",
+    "context": "Texts"
+  },
+  {
     "term": "organization.branding.title",
     "definition": "Branding",
     "context": "Branding"
+  },
+  {
+    "term": "organization.branding.title1",
+    "definition": "Título 1",
+    "context": "Title 1"
+  },
+  {
+    "term": "organization.branding.title2",
+    "definition": "Título 2",
+    "context": "Title 2"
   },
   {
     "term": "organization.branding.tone-header",

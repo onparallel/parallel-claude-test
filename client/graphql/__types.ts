@@ -5218,6 +5218,7 @@ export type SignatureCompletedUserNotification_SignatureCompletedUserNotificatio
 
 export type BrandingDocumentForm_OrganizationFragment = {
   __typename?: "Organization";
+  id: string;
   pdfDocumentTheme: { [key: string]: any };
 };
 
@@ -21462,6 +21463,7 @@ export const NotificationsDrawer_PetitionUserNotificationFragmentDoc = gql`
 ` as unknown as DocumentNode<NotificationsDrawer_PetitionUserNotificationFragment, unknown>;
 export const BrandingDocumentForm_OrganizationFragmentDoc = gql`
   fragment BrandingDocumentForm_Organization on Organization {
+    id
     pdfDocumentTheme
   }
 ` as unknown as DocumentNode<BrandingDocumentForm_OrganizationFragment, unknown>;
