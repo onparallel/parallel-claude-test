@@ -19,8 +19,8 @@ export type FeatureFlagName =
   | "ON_BEHALF_OF"
   | "GHOST_LOGIN"
   | "ES_TAX_DOCUMENTS_FIELD"
-  | "CUSTOM_HOST_UI"
   | "REMOVE_PARALLEL_BRANDING"
+  | "CUSTOM_HOST_UI"
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI";
 
 export const FeatureFlagNameValues = [
@@ -35,8 +35,8 @@ export const FeatureFlagNameValues = [
   "ON_BEHALF_OF",
   "GHOST_LOGIN",
   "ES_TAX_DOCUMENTS_FIELD",
-  "CUSTOM_HOST_UI",
   "REMOVE_PARALLEL_BRANDING",
+  "CUSTOM_HOST_UI",
   "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI",
 ] as FeatureFlagName[];
 

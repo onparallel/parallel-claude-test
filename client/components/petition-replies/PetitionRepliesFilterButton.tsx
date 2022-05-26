@@ -37,21 +37,21 @@ export function PetitionRepliesFilterButton({ value, onChange }: PetitionReplies
       <Portal>
         <MenuList minWidth="160px">
           <CheckboxMenuItemOption
-            value={value.SHOW_NOT_REPLIED}
-            onChange={handleChange("SHOW_NOT_REPLIED")}
-          >
-            <FormattedMessage
-              id="component.petition-replies-filter-button.show-without-replies"
-              defaultMessage="Without replies"
-            />
-          </CheckboxMenuItemOption>
-          <CheckboxMenuItemOption
             value={value.SHOW_REPLIED}
             onChange={handleChange("SHOW_REPLIED")}
           >
             <FormattedMessage
               id="component.petition-replies-filter-button.show-with-replies"
               defaultMessage="With replies"
+            />
+          </CheckboxMenuItemOption>
+          <CheckboxMenuItemOption
+            value={value.SHOW_NOT_REPLIED}
+            onChange={handleChange("SHOW_NOT_REPLIED")}
+          >
+            <FormattedMessage
+              id="component.petition-replies-filter-button.show-without-replies"
+              defaultMessage="Without replies"
             />
           </CheckboxMenuItemOption>
           <CheckboxMenuItemOption
