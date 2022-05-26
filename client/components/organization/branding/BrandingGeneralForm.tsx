@@ -82,14 +82,14 @@ export function BrandingGeneralForm({ user }: BrandingGeneralFormProps) {
     <Stack spacing={8} maxWidth={{ base: "100%", xl: "container.2xs" }} width="100%">
       {!hasAdminRole ? <OnlyAdminsAlert /> : null}
       <Stack spacing={4}>
-        <Heading as="h4" size="md" fontWeight="semibold">
-          <FormattedMessage
-            id="organization.branding.logo-header"
-            defaultMessage="Organization logo"
-          />
-        </Heading>
-        <Stack spacing={1}>
-          <Text fontSize="sm">
+        <Stack>
+          <Heading as="h4" size="md" fontWeight="semibold">
+            <FormattedMessage
+              id="organization.branding.logo-header"
+              defaultMessage="Organization logo"
+            />
+          </Heading>
+          <Text>
             <FormattedMessage
               id="organization.branding.logo-attach-help"
               defaultMessage="Attach an image that you would like us to display in your emails."

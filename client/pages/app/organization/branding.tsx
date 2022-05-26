@@ -43,28 +43,13 @@ function OrganizationBranding() {
     >
       <Tabs variant="enclosed">
         <TabList paddingLeft={6} background="white" paddingTop={2}>
-          <Tab
-            fontWeight="bold"
-            _selected={{
-              backgroundColor: "gray.50",
-              borderColor: "gray.200",
-              borderBottom: "transparent",
-            }}
-          >
+          <Tab fontWeight="500">
             <FormattedMessage id="organization.branding.general.tab" defaultMessage="General" />
           </Tab>
-          <Tab
-            fontWeight="bold"
-            _selected={{
-              backgroundColor: "gray.50",
-              borderColor: "gray.200",
-              borderBottom: "transparent",
-            }}
-          >
+          <Tab fontWeight="500">
             <FormattedMessage id="organization.branding.documents.tab" defaultMessage="Documents" />
           </Tab>
         </TabList>
-
         <TabPanels>
           <TabPanel>
             <Stack
@@ -84,7 +69,7 @@ function OrganizationBranding() {
               gridGap={{ base: 8, xl: 16 }}
               paddingBottom={16}
             >
-              <BrandingDocumentForm organization={me.organization} />
+              <BrandingDocumentForm user={me} />
               <BrandingDocumentPreview organization={me.organization} />
             </Stack>
           </TabPanel>
@@ -104,15 +89,15 @@ OrganizationBranding.queries = [
         role
         organization {
           logoUrl(options: { resize: { width: 600 } })
-          ...BrandingDocumentForm_Organization
           ...BrandingDocumentPreview_Organization
         }
         ...BrandingGeneralForm_User
         ...BrandingGeneralPreview_User
+        ...BrandingDocumentForm_User
       }
     }
     ${SettingsLayout.fragments.Query}
-    ${BrandingDocumentForm.fragments.Organization}
+    ${BrandingDocumentForm.fragments.User}
     ${BrandingDocumentPreview.fragments.Organization}
     ${BrandingGeneralForm.fragments.User}
     ${BrandingGeneralPreview.fragments.User}

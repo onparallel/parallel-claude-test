@@ -259,7 +259,7 @@ const _RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorProps>(
           id={id}
           plugins={plugins}
           initialValue={initialValue}
-          onChange={onChange}
+          onChange={!isDisabled ? onChange : undefined}
           editableProps={editableProps}
           renderEditable={renderEditable}
         >

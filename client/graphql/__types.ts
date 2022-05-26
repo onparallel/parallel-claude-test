@@ -5217,10 +5217,15 @@ export type SignatureCompletedUserNotification_SignatureCompletedUserNotificatio
     | { __typename?: "PetitionTemplate"; id: string; name?: string | null };
 };
 
-export type BrandingDocumentForm_OrganizationFragment = {
-  __typename?: "Organization";
+export type BrandingDocumentForm_UserFragment = {
+  __typename?: "User";
   id: string;
-  pdfDocumentTheme: { [key: string]: any };
+  role: OrganizationRole;
+  organization: {
+    __typename?: "Organization";
+    id: string;
+    pdfDocumentTheme: { [key: string]: any };
+  };
 };
 
 export type BrandingDocumentForm_updateOrganizationDocumentThemeMutationVariables = Exact<{
@@ -21462,12 +21467,16 @@ export const NotificationsDrawer_PetitionUserNotificationFragmentDoc = gql`
   }
   ${NotificationsList_PetitionUserNotificationFragmentDoc}
 ` as unknown as DocumentNode<NotificationsDrawer_PetitionUserNotificationFragment, unknown>;
-export const BrandingDocumentForm_OrganizationFragmentDoc = gql`
-  fragment BrandingDocumentForm_Organization on Organization {
+export const BrandingDocumentForm_UserFragmentDoc = gql`
+  fragment BrandingDocumentForm_User on User {
     id
-    pdfDocumentTheme
+    role
+    organization {
+      id
+      pdfDocumentTheme
+    }
   }
-` as unknown as DocumentNode<BrandingDocumentForm_OrganizationFragment, unknown>;
+` as unknown as DocumentNode<BrandingDocumentForm_UserFragment, unknown>;
 export const BrandingDocumentPreview_OrganizationFragmentDoc = gql`
   fragment BrandingDocumentPreview_Organization on Organization {
     id
@@ -26834,18 +26843,18 @@ export const OrganizationBranding_userDocument = gql`
       role
       organization {
         logoUrl(options: { resize: { width: 600 } })
-        ...BrandingDocumentForm_Organization
         ...BrandingDocumentPreview_Organization
       }
       ...BrandingGeneralForm_User
       ...BrandingGeneralPreview_User
+      ...BrandingDocumentForm_User
     }
   }
   ${SettingsLayout_QueryFragmentDoc}
-  ${BrandingDocumentForm_OrganizationFragmentDoc}
   ${BrandingDocumentPreview_OrganizationFragmentDoc}
   ${BrandingGeneralForm_UserFragmentDoc}
   ${BrandingGeneralPreview_UserFragmentDoc}
+  ${BrandingDocumentForm_UserFragmentDoc}
 ` as unknown as DocumentNode<
   OrganizationBranding_userQuery,
   OrganizationBranding_userQueryVariables

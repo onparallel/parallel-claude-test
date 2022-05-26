@@ -21,13 +21,15 @@ import {
 import { Card } from "@parallel/components/common/Card";
 import { ColorInput } from "@parallel/components/common/ColorInput";
 import { Divider } from "@parallel/components/common/Divider";
+import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
 import { RichTextEditor } from "@parallel/components/common/slate/RichTextEditor";
 import {
-  BrandingDocumentForm_OrganizationFragment,
-  BrandingDocumentForm_OrganizationFragmentDoc,
+  BrandingDocumentForm_UserFragmentDoc,
   BrandingDocumentForm_updateOrganizationDocumentThemeDocument,
   BrandingDocumentForm_updateOrganizationDocumentThemeMutationVariables,
+  BrandingDocumentForm_UserFragment,
 } from "@parallel/graphql/__types";
+import { isAdmin } from "@parallel/utils/roles";
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useState } from "react";
@@ -36,12 +38,14 @@ import { FormattedMessage, useIntl } from "react-intl";
 import families from "../../../chakra/pdfDocumentFonts.json";
 
 interface BrandingDocumentFormProps {
-  organization: BrandingDocumentForm_OrganizationFragment;
+  user: BrandingDocumentForm_UserFragment;
 }
 
-export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps) {
+export function BrandingDocumentForm({ user }: BrandingDocumentFormProps) {
   const intl = useIntl();
-  const [theme, setTheme] = useState(organization.pdfDocumentTheme);
+  const [theme, setTheme] = useState(user.organization.pdfDocumentTheme);
+
+  const hasAdminRole = isAdmin(user.role);
 
   const FONT_SIZES_PT = [
     5, 5.5, 6.5, 7.5, 8, 9, 10, 10.5, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,
@@ -66,11 +70,15 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
     // immediately write cache fragment with expected result.
     // this allows us to not wait for the server response in order to update the BrandingDocumentPreview
     apollo.cache.writeFragment({
-      fragment: BrandingDocumentForm_OrganizationFragmentDoc,
+      fragment: BrandingDocumentForm_UserFragmentDoc,
       data: {
-        id: organization.id,
-        pdfDocumentTheme: { ...organization.pdfDocumentTheme, ...data },
-        __typename: "Organization",
+        id: user.id,
+        role: user.role,
+        organization: {
+          id: user.organization.id,
+          pdfDocumentTheme: { ...theme, ...data },
+          __typename: "Organization",
+        },
       },
     });
     setTheme({ ...theme, ...data });
@@ -79,6 +87,7 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
 
   return (
     <Stack spacing={8} maxWidth={{ base: "100%", xl: "container.2xs" }} width="100%">
+      {!hasAdminRole ? <OnlyAdminsAlert /> : null}
       <Stack spacing={4}>
         <Heading as="h4" size="md" fontWeight="semibold">
           <FormattedMessage id="organization.branding.margins-header" defaultMessage="Margins" />
@@ -93,6 +102,7 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
               background="white"
               value={`${theme.marginTop} mm`}
               onChange={(value) => handleThemeChange({ marginTop: parseInt(value) })}
+              isDisabled={!hasAdminRole}
             >
               <NumberInputField />
               <NumberInputStepper>
@@ -110,6 +120,7 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
               background="white"
               value={`${theme.marginBottom} mm`}
               onChange={(value) => handleThemeChange({ marginBottom: parseInt(value) })}
+              isDisabled={!hasAdminRole}
             >
               <NumberInputField />
               <NumberInputStepper>
@@ -129,6 +140,7 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
               onChange={(value) =>
                 handleThemeChange({ marginLeft: parseInt(value), marginRight: parseInt(value) })
               }
+              isDisabled={!hasAdminRole}
             >
               <NumberInputField />
               <NumberInputStepper>
@@ -153,6 +165,7 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
           <Switch
             isChecked={theme.showLogo}
             onChange={(e) => handleThemeChange({ showLogo: e.target.checked })}
+            isDisabled={!hasAdminRole}
           />
         </HStack>
       </Stack>
@@ -199,6 +212,7 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
                 onChange={(e) => {
                   handleThemeChange({ [key.fontKey]: e.target.value });
                 }}
+                isDisabled={!hasAdminRole}
               >
                 {families.map(({ family }) => (
                   <option key={family} value={family}>
@@ -218,6 +232,7 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
                 onChange={(e) => {
                   handleThemeChange({ [key.sizeKey]: parseInt(e.target.value) });
                 }}
+                isDisabled={!hasAdminRole}
               >
                 {FONT_SIZES_PT.map((v) => (
                   <option key={v} value={v}>
@@ -240,6 +255,7 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
                   backgroundColor="white"
                   value={theme[key.colorKey]}
                   onChange={(e) => handleThemeChange({ [key.colorKey]: e.target.value })}
+                  isDisabled={!hasAdminRole}
                 />
                 <ColorInput
                   boxSize="40px"
@@ -248,6 +264,7 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
                   onChange={(color) => {
                     handleThemeChange({ [key.colorKey]: color });
                   }}
+                  isDisabled={!hasAdminRole}
                 />
               </HStack>
             </Stack>
@@ -287,6 +304,7 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
                 onChange={(value) => {
                   handleThemeChange({ legalRichTextEn: value });
                 }}
+                isDisabled={!hasAdminRole}
               />
             </TabPanel>
             <TabPanel>
@@ -296,6 +314,7 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
                 onChange={(value) => {
                   handleThemeChange({ legalRichTextEs: value });
                 }}
+                isDisabled={!hasAdminRole}
               />
             </TabPanel>
           </TabPanels>
@@ -306,10 +325,14 @@ export function BrandingDocumentForm({ organization }: BrandingDocumentFormProps
 }
 
 BrandingDocumentForm.fragments = {
-  Organization: gql`
-    fragment BrandingDocumentForm_Organization on Organization {
+  User: gql`
+    fragment BrandingDocumentForm_User on User {
       id
-      pdfDocumentTheme
+      role
+      organization {
+        id
+        pdfDocumentTheme
+      }
     }
   `,
 };
