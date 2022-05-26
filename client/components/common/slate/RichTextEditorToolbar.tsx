@@ -18,10 +18,14 @@ import { ToolbarPlaceholderButton } from "./ToolbarPlaceholderButton";
 interface RichTextEditorToolbarProps {
   isDisabled?: boolean;
   hasPlaceholders?: boolean;
+  hasHeadingButton?: boolean;
 }
 
 export const RichTextEditorToolbar = chakraForwardRef<"div", RichTextEditorToolbarProps>(
-  function RichTextEditorToolbar({ isDisabled, hasPlaceholders, ...props }, ref) {
+  function RichTextEditorToolbar(
+    { isDisabled, hasPlaceholders, hasHeadingButton = true, ...props },
+    ref
+  ) {
     const intl = useIntl();
     const editor = useSlate();
     return (
@@ -33,7 +37,7 @@ export const RichTextEditorToolbar = chakraForwardRef<"div", RichTextEditorToolb
         padding={1}
         {...props}
       >
-        <ToolbarHeadingButton editor={editor} />
+        {hasHeadingButton ? <ToolbarHeadingButton editor={editor} disabled={isDisabled} /> : null}
         <ToolbarMarkButton
           editor={editor}
           type="bold"

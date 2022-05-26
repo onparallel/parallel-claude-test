@@ -81,6 +81,9 @@ export interface RichTextEditorProps
   isRequired?: boolean;
   isReadOnly?: boolean;
   placeholderOptions?: PlaceholderOption[];
+  toolbarOpts?: {
+    headingButton?: boolean;
+  };
 }
 
 export interface RichTextEditorInstance {
@@ -99,6 +102,7 @@ const _RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorProps>(
       isReadOnly,
       placeholder,
       placeholderOptions = [],
+      toolbarOpts,
       onFocus,
       onBlur,
       ...props
@@ -119,7 +123,7 @@ const _RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorProps>(
         [
           createReactPlugin(),
           createHistoryPlugin(),
-          createParagraphPlugin(),
+          createParagraphPlugin({ key: "paragraph" }),
           createBoldPlugin(),
           createItalicPlugin(),
           createUnderlinePlugin(),
@@ -267,6 +271,7 @@ const _RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorProps>(
             height="40px"
             isDisabled={formControl.disabled || formControl.readOnly}
             hasPlaceholders={placeholderOptions.length > 0}
+            hasHeadingButton={toolbarOpts?.headingButton}
           />
         </Plate>
         <Portal>

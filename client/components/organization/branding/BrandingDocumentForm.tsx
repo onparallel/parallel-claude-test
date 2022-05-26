@@ -31,7 +31,6 @@ import {
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { isAdmin } from "@parallel/utils/roles";
-import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { ChangeEvent, useState } from "react";
 import { IMaskInput } from "react-imask";
@@ -328,21 +327,23 @@ export function BrandingDocumentForm({ user }: BrandingDocumentFormProps) {
             <TabPanel>
               <RichTextEditor
                 id="legal-text-editor-en"
-                value={isEmptyRTEValue(theme.legalRichTextEn) ? null : theme.legalRichTextEn}
+                value={theme.legalRichTextEn}
                 onChange={(value) => {
                   handleThemeChange({ legalRichTextEn: value });
                 }}
                 isDisabled={!hasAdminRole}
+                toolbarOpts={{ headingButton: false }}
               />
             </TabPanel>
             <TabPanel>
               <RichTextEditor
                 id="legal-text-editor-es"
-                value={isEmptyRTEValue(theme.legalRichTextEs) ? null : theme.legalRichTextEs}
+                value={theme.legalRichTextEs}
                 onChange={(value) => {
                   handleThemeChange({ legalRichTextEs: value });
                 }}
                 isDisabled={!hasAdminRole}
+                toolbarOpts={{ headingButton: false }}
               />
             </TabPanel>
           </TabPanels>

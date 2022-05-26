@@ -8,13 +8,14 @@ interface ColorInputProps extends Omit<InputProps, "value" | "onChange"> {
 }
 
 export const ColorInput = chakraForwardRef<"input", ColorInputProps, HTMLInputElement>(
-  function ColorInput({ value, onChange, ...props }) {
+  function ColorInput({ value, onChange, ...props }, ref) {
     const handleChange = onChange
       ? useDebouncedCallback(onChange, 100, [value, onChange])
       : undefined;
     return (
       <Box>
         <Input
+          ref={ref}
           type="color"
           backgroundColor={value}
           value={value}

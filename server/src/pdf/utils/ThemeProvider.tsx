@@ -40,20 +40,22 @@ export const defaultDocumentTheme: PdfDocumentTheme = {
   paginationPosition: "right",
   legalRichTextEs: [
     {
-      type: "p",
+      type: "paragraph",
       children: [
         {
           text: "Declaro que los datos y la documentación facilitados, así como las copias o fotocopias enviadas, reproducen fielmente los documentos originales y la información actual de identificación.",
+          italic: true,
         },
       ],
     },
   ],
   legalRichTextEn: [
     {
-      type: "p",
+      type: "paragraph",
       children: [
         {
           text: "I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and current identification information.",
+          italic: true,
         },
       ],
     },
