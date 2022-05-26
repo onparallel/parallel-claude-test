@@ -24,15 +24,16 @@ import { Divider } from "@parallel/components/common/Divider";
 import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
 import { RichTextEditor } from "@parallel/components/common/slate/RichTextEditor";
 import {
-  BrandingDocumentForm_UserFragmentDoc,
   BrandingDocumentForm_updateOrganizationDocumentThemeDocument,
   BrandingDocumentForm_updateOrganizationDocumentThemeMutationVariables,
   BrandingDocumentForm_UserFragment,
+  BrandingDocumentPreview_OrganizationFragmentDoc,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { isAdmin } from "@parallel/utils/roles";
 import { isEmptyRTEValue } from "@parallel/utils/slate/RichTextEditor/isEmptyRTEValue";
-import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { useState } from "react";
+import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
+import { ChangeEvent, useState } from "react";
 import { IMaskInput } from "react-imask";
 import { FormattedMessage, useIntl } from "react-intl";
 import families from "../../../chakra/pdfDocumentFonts.json";
@@ -55,9 +56,11 @@ export function BrandingDocumentForm({ user }: BrandingDocumentFormProps) {
     BrandingDocumentForm_updateOrganizationDocumentThemeDocument
   );
 
-  const updateOrganizationTheme = useDebouncedCallback(
-    function (data: BrandingDocumentForm_updateOrganizationDocumentThemeMutationVariables["data"]) {
-      updateOrganizationDocumentTheme({
+  const updateOrganizationTheme = useDebouncedAsync(
+    async function (
+      data: BrandingDocumentForm_updateOrganizationDocumentThemeMutationVariables["data"]
+    ) {
+      await updateOrganizationDocumentTheme({
         variables: { data },
       });
     },
@@ -66,23 +69,45 @@ export function BrandingDocumentForm({ user }: BrandingDocumentFormProps) {
   );
 
   const apollo = useApolloClient();
-  function handleThemeChange(data: Record<string, any>) {
+  async function handleThemeChange(data: Record<string, any>) {
     // immediately write cache fragment with expected result.
     // this allows us to not wait for the server response in order to update the BrandingDocumentPreview
+    const cache = apollo.cache.readFragment({
+      fragment: BrandingDocumentPreview_OrganizationFragmentDoc,
+      id: user.organization.id,
+    });
     apollo.cache.writeFragment({
-      fragment: BrandingDocumentForm_UserFragmentDoc,
+      fragment: BrandingDocumentPreview_OrganizationFragmentDoc,
       data: {
-        id: user.id,
-        role: user.role,
-        organization: {
-          id: user.organization.id,
-          pdfDocumentTheme: { ...theme, ...data },
-          __typename: "Organization",
-        },
+        ...cache!,
+        pdfDocumentTheme: { ...user.organization.pdfDocumentTheme, ...data },
       },
     });
     setTheme({ ...theme, ...data });
-    updateOrganizationTheme(data);
+    try {
+      await updateOrganizationTheme(data);
+    } catch (error) {
+      if (error !== "DEBOUNCED") {
+        throw error;
+      }
+    }
+  }
+
+  const [colorError, setColorError] = useState<Record<string, boolean>>({});
+  function handleColorInputChange(colorKey: string) {
+    return async (event: ChangeEvent<HTMLInputElement>) => {
+      const color = event.target.value;
+      try {
+        setColorError({ ...colorError, [colorKey]: false });
+        await handleThemeChange({ [colorKey]: color });
+      } catch (error) {
+        if (isApolloError(error, "ARG_VALIDATION_ERROR")) {
+          if ((error.graphQLErrors[0].extensions.extra as any).code === "INVALID_HEX_VALUE_ERROR") {
+            setColorError({ ...colorError, [colorKey]: true });
+          }
+        }
+      }
+    };
   }
 
   return (
@@ -254,17 +279,20 @@ export function BrandingDocumentForm({ user }: BrandingDocumentFormProps) {
                   }}
                   backgroundColor="white"
                   value={theme[key.colorKey]}
-                  onChange={(e) => handleThemeChange({ [key.colorKey]: e.target.value })}
+                  onChange={handleColorInputChange(key.colorKey)}
                   isDisabled={!hasAdminRole}
+                  isInvalid={colorError[key.colorKey]}
                 />
                 <ColorInput
                   boxSize="40px"
                   borderRadius="100%"
-                  value={theme[key.colorKey]}
+                  value={theme[key.colorKey].length === 7 ? theme[key.colorKey] : "#ffffff"}
                   onChange={(color) => {
+                    setColorError({ ...colorError, [key.colorKey]: false });
                     handleThemeChange({ [key.colorKey]: color });
                   }}
                   isDisabled={!hasAdminRole}
+                  isInvalid={colorError[key.colorKey]}
                 />
               </HStack>
             </Stack>

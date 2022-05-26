@@ -9,7 +9,9 @@ export function validateHexColor<TypeName extends string, FieldName extends stri
   return ((_, args, ctx, info) => {
     const color = prop(args);
     if (color && !color.match(/^#[a-fA-F0-9]{6}$/)) {
-      throw new ArgValidationError(info, argName, `Argument must represent a HEX color value.`);
+      throw new ArgValidationError(info, argName, `Argument must represent a HEX color value.`, {
+        code: "INVALID_HEX_VALUE_ERROR",
+      });
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }

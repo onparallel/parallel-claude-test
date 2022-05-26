@@ -43,10 +43,26 @@ function OrganizationBranding() {
     >
       <Tabs variant="enclosed">
         <TabList paddingLeft={6} background="white" paddingTop={2}>
-          <Tab fontWeight="500">
+          <Tab
+            fontWeight="500"
+            _selected={{
+              backgroundColor: "gray.50",
+              borderColor: "gray.200",
+              borderBottom: "transparent",
+              color: "blue.600",
+            }}
+          >
             <FormattedMessage id="organization.branding.general.tab" defaultMessage="General" />
           </Tab>
-          <Tab fontWeight="500">
+          <Tab
+            fontWeight="500"
+            _selected={{
+              backgroundColor: "gray.50",
+              borderColor: "gray.200",
+              borderBottom: "transparent",
+              color: "blue.600",
+            }}
+          >
             <FormattedMessage id="organization.branding.documents.tab" defaultMessage="Documents" />
           </Tab>
         </TabList>

@@ -1,13 +1,16 @@
-import { arg, booleanArg, intArg, mutationField, nonNull, nullable } from "nexus";
-import { arg, booleanArg, inputObjectType, mutationField, nonNull } from "nexus";
+import { arg, booleanArg, inputObjectType, intArg, mutationField, nonNull, nullable } from "nexus";
 import { isDefined } from "remeda";
 import { defaultDocumentTheme } from "../../pdf/utils/ThemeProvider";
 import { random } from "../../util/token";
 import { authenticateAnd } from "../helpers/authorize";
 import { uploadArg } from "../helpers/scalars";
+import { validateAnd } from "../helpers/validateArgs";
 import { inRange } from "../helpers/validators/inRange";
 import { validateFile } from "../helpers/validators/validateFile";
+import { validFontFamily } from "../helpers/validators/validFontFamily";
+import { validRichTextContent } from "../helpers/validators/validRichTextContent";
 import { userHasFeatureFlag } from "../petition/authorizers";
+import { validateHexColor } from "../tag/validators";
 import { contextUserHasRole } from "../users/authorizers";
 
 export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
@@ -121,6 +124,23 @@ export const updateOrganizationDocumentTheme = mutationField("updateOrganization
       }).asArg()
     ),
   },
+  validateArgs: validateAnd(
+    inRange((args) => args.data.marginTop, "data.marginTop", 0),
+    inRange((args) => args.data.marginLeft, "data.marginLeft", 0),
+    inRange((args) => args.data.marginBottom, "data.marginBottom", 0),
+    inRange((args) => args.data.marginRight, "data.marginRight", 0),
+    validFontFamily((args) => args.data.title1FontFamily, "data.title1FontFamily"),
+    validFontFamily((args) => args.data.title2FontFamily, "data.title2FontFamily"),
+    validFontFamily((args) => args.data.textFontFamily, "data.textFontFamily"),
+    validateHexColor((args) => args.data.title1Color, "data.title1Color"),
+    validateHexColor((args) => args.data.title2Color, "data.title2Color"),
+    validateHexColor((args) => args.data.textColor, "data.textColor"),
+    inRange((args) => args.data.title1FontSize, "data.title1FontSize", 5, 72),
+    inRange((args) => args.data.title2FontSize, "data.title2FontSize", 5, 72),
+    inRange((args) => args.data.textFontSize, "data.textFontSize", 5, 72),
+    validRichTextContent((args) => args.data.legalRichTextEs, "data.legalRichTextEs"),
+    validRichTextContent((args) => args.data.legalRichTextEn, "data.legalRichTextEn")
+  ),
   resolve: async (root, args, ctx) => {
     const organization = await ctx.organizations.loadOrg(ctx.user!.org_id);
     const theme: Record<string, any> = organization?.pdf_document_theme ?? defaultDocumentTheme;
