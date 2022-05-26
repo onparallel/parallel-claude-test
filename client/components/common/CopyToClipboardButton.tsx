@@ -13,7 +13,7 @@ export interface CopyToClipboardButtonProps extends Omit<IconButtonProps, "icon"
 
 export const CopyToClipboardButton = chakraForwardRef<"button", CopyToClipboardButtonProps>(
   function CopyToClipboardButton(
-    { "aria-label": ariaLabel, text, placement, onClick, onMouseOut, ...props },
+    { "aria-label": ariaLabel, text, placement, onClick, onMouseEnter, ...props },
     ref
   ) {
     const intl = useIntl();
@@ -30,16 +30,15 @@ export const CopyToClipboardButton = chakraForwardRef<"button", CopyToClipboardB
     const [copied, setState] = useState(false);
 
     function handleClick(event: MouseEvent<HTMLButtonElement>) {
+      event.preventDefault();
       copy(text);
       setState(true);
       onClick?.(event);
     }
 
-    function handleMouseOut(event: MouseEvent<HTMLButtonElement>) {
-      onMouseOut?.(event);
-      setTimeout(() => {
-        setState(false);
-      });
+    function handleMouseEnter(event: MouseEvent<HTMLButtonElement>) {
+      if (copied) setState(false);
+      onMouseEnter?.(event);
     }
 
     return (
@@ -49,7 +48,7 @@ export const CopyToClipboardButton = chakraForwardRef<"button", CopyToClipboardB
           aria-label={ariaLabel ?? labels.copy}
           icon={<ClipboardIcon />}
           onClick={handleClick}
-          onMouseOut={handleMouseOut}
+          onMouseEnter={handleMouseEnter}
           {...props}
         />
       </Tooltip>

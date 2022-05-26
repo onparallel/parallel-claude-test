@@ -21,6 +21,7 @@ import {
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { REFERENCE_REGEX } from "@parallel/utils/validation";
 import { ChangeEvent, ReactNode, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
@@ -84,7 +85,7 @@ export function PetitionComposeFieldSettings({
     }
     setAlias(value);
 
-    if (!value || /^[A-Za-z0-9_]+$/.test(value)) {
+    if (!value || REFERENCE_REGEX.test(value)) {
       debouncedOnUpdate(field.id, {
         options: {
           ...field.options,

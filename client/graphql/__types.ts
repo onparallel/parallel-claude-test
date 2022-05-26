@@ -6984,13 +6984,24 @@ export type PetitionContents_PetitionFieldFragment = {
   type: PetitionFieldType;
   options: { [key: string]: any };
   isInternal: boolean;
+  alias?: string | null;
   isReadOnly: boolean;
+  multiple: boolean;
   comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
   replies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
     status: PetitionFieldReplyStatus;
   }>;
+};
+
+export type ReferenceOptionsMenu_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  alias?: string | null;
+  type: PetitionFieldType;
+  multiple: boolean;
+  options: { [key: string]: any };
 };
 
 export type SelectedSignerRow_PetitionSignerFragment = {
@@ -7053,6 +7064,15 @@ export type ConfirmPetitionSignersDialog_PetitionSignatureRequestFragment = {
       lastName?: string | null;
     } | null>;
   };
+};
+
+export type CreateReferenceDialog_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  title?: string | null;
+  type: PetitionFieldType;
+  alias?: string | null;
+  options: { [key: string]: any };
 };
 
 export type PetitionSharingModal_Petition_Petition_Fragment = {
@@ -17569,8 +17589,10 @@ export type PetitionReplies_PetitionFieldFragment = {
   optional: boolean;
   options: { [key: string]: any };
   isInternal: boolean;
+  alias?: string | null;
   hasCommentsEnabled: boolean;
   visibility?: { [key: string]: any } | null;
+  multiple: boolean;
   replies: Array<{
     __typename?: "PetitionFieldReply";
     id: string;
@@ -21389,6 +21411,15 @@ export const useCreateOrUpdateUserDialog_UserFragmentDoc = gql`
   }
   ${useCreateOrUpdateUserDialog_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<useCreateOrUpdateUserDialog_UserFragment, unknown>;
+export const CreateReferenceDialog_PetitionFieldFragmentDoc = gql`
+  fragment CreateReferenceDialog_PetitionField on PetitionField {
+    id
+    title
+    type
+    alias
+    options
+  }
+` as unknown as DocumentNode<CreateReferenceDialog_PetitionFieldFragment, unknown>;
 export const PetitionSharingModal_UserFragmentDoc = gql`
   fragment PetitionSharingModal_User on User {
     id
@@ -23529,6 +23560,15 @@ export const filterPetitionFields_PetitionFieldFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<filterPetitionFields_PetitionFieldFragment, unknown>;
+export const ReferenceOptionsMenu_PetitionFieldFragmentDoc = gql`
+  fragment ReferenceOptionsMenu_PetitionField on PetitionField {
+    id
+    alias
+    type
+    multiple
+    options
+  }
+` as unknown as DocumentNode<ReferenceOptionsMenu_PetitionFieldFragment, unknown>;
 export const PetitionContents_PetitionFieldFragmentDoc = gql`
   fragment PetitionContents_PetitionField on PetitionField {
     id
@@ -23536,9 +23576,12 @@ export const PetitionContents_PetitionFieldFragmentDoc = gql`
     type
     options
     isInternal
+    alias
     ...filterPetitionFields_PetitionField
+    ...ReferenceOptionsMenu_PetitionField
   }
   ${filterPetitionFields_PetitionFieldFragmentDoc}
+  ${ReferenceOptionsMenu_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionContents_PetitionFieldFragment, unknown>;
 export const PetitionCompose_PetitionFieldFragmentDoc = gql`
   fragment PetitionCompose_PetitionField on PetitionField {

@@ -1,20 +1,26 @@
 import { gql } from "@apollo/client";
-import { Box, BoxProps, Button, Center, Flex, Stack, Text } from "@chakra-ui/react";
-import { EyeOffIcon } from "@parallel/chakra/icons";
+import { Box, BoxProps, Button, Center, Flex, LinkBox, Stack, Text } from "@chakra-ui/react";
+import { EyeOffIcon, NewPropertyIcon } from "@parallel/chakra/icons";
 import {
   PetitionContents_PetitionFieldFragment,
   PetitionSignatureRequestStatus,
   SignatureOrgIntegrationEnvironment,
+  UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { filterPetitionFields, PetitionFieldFilter } from "@parallel/utils/filterPetitionFields";
+import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
-import { ComponentType, createElement, memo, ReactNode } from "react";
-import { FormattedMessage } from "react-intl";
+import { ComponentType, createElement, memo, MouseEvent, ReactNode } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../common/Divider";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { PetitionSignatureStatusIcon } from "../common/PetitionSignatureStatusIcon";
+import { CopyReferenceIconButton } from "./CopyReferenceIconButton";
+import { useCreateReferenceDialog } from "./dialogs/CreateReferenceDialog";
+import { ReferenceOptionsMenu } from "./ReferenceOptionsMenu";
 
 interface PetitionContentsFieldIndicatorsProps<T extends PetitionContents_PetitionFieldFragment> {
   field: T;
@@ -25,8 +31,10 @@ type PetitionContentsSignatureStatus = "START" | PetitionSignatureRequestStatus;
 export interface PetitionContentsProps<T extends PetitionContents_PetitionFieldFragment> {
   fields: T[];
   fieldIndices: PetitionFieldIndex[];
+  showReferences: boolean;
   fieldVisibility?: boolean[];
   onFieldClick: (fieldId: string) => void;
+  onFieldEdit?: (fieldId: string, data: UpdatePetitionFieldInput) => void;
   filter?: PetitionFieldFilter;
   fieldIndicators?: ComponentType<PetitionContentsFieldIndicatorsProps<T>>;
   signatureStatus?: PetitionContentsSignatureStatus | null;
@@ -38,8 +46,10 @@ export function PetitionContents<T extends PetitionContents_PetitionFieldFragmen
   fields,
   filter,
   fieldIndices,
+  showReferences,
   fieldVisibility,
   onFieldClick,
+  onFieldEdit,
   fieldIndicators,
   signatureStatus,
   signatureEnvironment,
@@ -59,7 +69,15 @@ export function PetitionContents<T extends PetitionContents_PetitionFieldFragmen
             isVisible={true}
             fieldIndex={x.fieldIndex}
             onFieldClick={handleFieldClick(x.field.id)}
+            onFieldEdit={onFieldEdit}
             fieldIndicators={fieldIndicators}
+            showReferences={
+              x.field.type === "HEADING" ||
+              x.field.type === "DYNAMIC_SELECT" ||
+              isFileTypeField(x.field.type)
+                ? false
+                : showReferences
+            }
           />
         ) : (
           <PetitionContentsDivider key={index} isDashed>
@@ -128,9 +146,12 @@ PetitionContents.fragments = {
       type
       options
       isInternal
+      alias
       ...filterPetitionFields_PetitionField
+      ...ReferenceOptionsMenu_PetitionField
     }
     ${filterPetitionFields.fragments.PetitionField}
+    ${ReferenceOptionsMenu.fragments.PetitionField}
   `,
 };
 
@@ -139,6 +160,8 @@ interface PetitionContentsItemProps<T extends PetitionContents_PetitionFieldFrag
   fieldIndex: PetitionFieldIndex;
   isVisible: boolean;
   onFieldClick: () => void;
+  onFieldEdit?: (fieldId: string, data: UpdatePetitionFieldInput) => void;
+  showReferences: boolean;
   fieldIndicators?: ComponentType<PetitionContentsFieldIndicatorsProps<T>>;
 }
 
@@ -147,8 +170,27 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
   isVisible,
   fieldIndex,
   onFieldClick,
+  onFieldEdit,
+  showReferences,
   fieldIndicators,
 }: PetitionContentsItemProps<T>) {
+  const intl = useIntl();
+
+  const showCreateReferenceDialog = useCreateReferenceDialog();
+  const handleAddReferenceClick = async (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    try {
+      await showCreateReferenceDialog({ field, fieldIndex, onFieldEdit });
+    } catch {}
+  };
+
+  const defaultStyles = { background: "gray.100" };
+  const withReferenceStyles = {
+    ".references": { display: "flex" },
+    ".internal-badge": { display: "none" },
+    background: "gray.100",
+  };
+
   return (
     <>
       {field.type === "HEADING" && field.options.hasPageBreak ? (
@@ -156,21 +198,37 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
           <FormattedMessage id="generic.page-break" defaultMessage="Page break" />
         </PetitionContentsDivider>
       ) : null}
-      <Box as="li" listStyleType="none" display="flex" flex="none">
-        <Stack
-          as={Button}
+      <Box as="li" listStyleType="none" display="flex" position="relative" flex="none">
+        <LinkBox
+          tabIndex={1}
+          as={Stack}
           direction="row"
           flex="1"
-          variant="ghost"
           alignItems="center"
           height="auto"
-          padding={2}
+          paddingX={2}
+          paddingY={1}
           paddingLeft={field.type === "HEADING" ? 2 : 4}
           fontWeight={field.type === "HEADING" ? "medium" : "normal"}
           textAlign="left"
-          onClick={onFieldClick}
+          onClick={(e) => {
+            console.log("e:", e);
+            onFieldClick();
+          }}
+          borderRadius="md"
+          cursor="pointer"
+          _hover={!showReferences ? defaultStyles : withReferenceStyles}
+          _focus={!showReferences ? defaultStyles : withReferenceStyles}
+          _focusWithin={!showReferences ? defaultStyles : withReferenceStyles}
         >
-          <Text as="div" flex="1" minWidth={0} isTruncated opacity={isVisible ? 1 : 0.6}>
+          <Text
+            as="div"
+            flex="1"
+            minWidth={0}
+            isTruncated
+            opacity={isVisible ? 1 : 0.6}
+            paddingY={1}
+          >
             <Text as="span">{fieldIndex}. </Text>
             {field.title ? (
               field.title
@@ -185,8 +243,41 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
             )}
           </Text>
           {fieldIndicators ? createElement(fieldIndicators, { field }) : null}
-          {field.isInternal ? <InternalFieldBadge /> : null}
-        </Stack>
+          {field.isInternal ? <InternalFieldBadge className="internal-badge" /> : null}
+          {showReferences ? (
+            field.alias ? (
+              <>
+                <CopyReferenceIconButton
+                  display="none"
+                  className="references"
+                  alias={
+                    field.type === "DATE" ? `{{ ${field.alias} | date }}` : `{{ ${field.alias} }}`
+                  }
+                />
+                <ReferenceOptionsMenu field={field} />
+              </>
+            ) : (
+              <IconButtonWithTooltip
+                tabIndex={1}
+                display="none"
+                className="references"
+                label={intl.formatMessage({
+                  id: "component.petition-contents-item.create-reference",
+                  defaultMessage: "Create reference",
+                })}
+                icon={<NewPropertyIcon />}
+                fontSize="16px"
+                onClick={handleAddReferenceClick}
+                size="xs"
+                background="white"
+                boxShadow="md"
+                _hover={{
+                  boxShadow: "lg",
+                }}
+              />
+            )
+          ) : null}
+        </LinkBox>
       </Box>
     </>
   );

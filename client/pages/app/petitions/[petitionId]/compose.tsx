@@ -505,6 +505,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                           fields={petition.fields}
                           fieldIndices={indices}
                           onFieldClick={handleIndexFieldClick}
+                          showReferences={true}
+                          onFieldEdit={handleFieldEdit}
                         />
                       </TabPanel>
                       <TabPanel {...extendFlexColumn} padding={0} overflow="auto">

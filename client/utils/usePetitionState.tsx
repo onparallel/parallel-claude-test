@@ -52,7 +52,6 @@ export function usePetitionStateWrapper() {
         return result;
       } catch (error: any) {
         setState("ERROR");
-        console.error(error);
         if (isApolloError(error, "ALIAS_ALREADY_EXISTS")) {
           // If the error is and duplicated alias we handled the error in PetitionComposeFieldSettings
           throw error;
