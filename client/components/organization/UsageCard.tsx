@@ -5,10 +5,12 @@ export function UsageCard({
   title,
   limit,
   usage,
+  isUnlimited,
 }: {
   title: string;
   limit: number;
   usage: number;
+  isUnlimited?: boolean;
 }) {
   return (
     <Flex direction="column" shadow="md" rounded="md" overflow="hidden" background="white">
@@ -31,12 +33,16 @@ export function UsageCard({
               />
             </VisuallyHidden>
             <Text as="span">
-              <FormattedNumber value={limit} />
+              {isUnlimited ? (
+                <FormattedMessage id="generic.unlimited" defaultMessage="unlimited" />
+              ) : (
+                <FormattedNumber value={limit} />
+              )}
             </Text>
           </HStack>
         </HStack>
       </Stack>
-      <Progress height="0.3rem" value={(usage / limit) * 100} />
+      <Progress height="0.3rem" value={isUnlimited ? 100 : (usage / limit) * 100} />
     </Flex>
   );
 }

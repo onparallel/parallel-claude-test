@@ -68,6 +68,7 @@ function OrganizationUsage() {
             })}
             usage={activeUserCount}
             limit={users.limit}
+            isUnlimited={license?.name === "APPSUMO4"}
           />
           <UsageCard
             title={intl.formatMessage({

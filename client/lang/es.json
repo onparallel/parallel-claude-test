@@ -5060,6 +5060,11 @@
     "context": "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help."
   },
   {
+    "term": "generic.unlimited",
+    "definition": "ilimitado",
+    "context": "unlimited"
+  },
+  {
     "term": "generic.unnamed-petition",
     "definition": "Petición sin nombre",
     "context": "Unnamed petition"
