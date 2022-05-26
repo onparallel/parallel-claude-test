@@ -332,7 +332,7 @@ export function BrandingDocumentForm({ user }: BrandingDocumentFormProps) {
                   handleThemeChange({ legalRichTextEn: value });
                 }}
                 isDisabled={!hasAdminRole}
-                toolbarOpts={{ headingButton: false }}
+                toolbarOpts={{ headingButton: false, listButtons: false }}
               />
             </TabPanel>
             <TabPanel>
@@ -343,7 +343,7 @@ export function BrandingDocumentForm({ user }: BrandingDocumentFormProps) {
                   handleThemeChange({ legalRichTextEs: value });
                 }}
                 isDisabled={!hasAdminRole}
-                toolbarOpts={{ headingButton: false }}
+                toolbarOpts={{ headingButton: false, listButtons: false }}
               />
             </TabPanel>
           </TabPanels>

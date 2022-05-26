@@ -169,13 +169,15 @@ export default function PetitionExport({
               <Page key={i} style={styles.page} wrap>
                 {i === 0 ? (
                   <View style={styles.documentStart}>
-                    <Image
-                      src={
-                        petition.organization.logoUrl ??
-                        "http://static.onparallel.com/static/emails/logo.png"
-                      }
-                      style={styles.documentLogo}
-                    />
+                    {theme.showLogo ? (
+                      <Image
+                        src={
+                          petition.organization.logoUrl ??
+                          "http://static.onparallel.com/static/emails/logo.png"
+                        }
+                        style={styles.documentLogo}
+                      />
+                    ) : null}
                     {documentTitle ? (
                       <View style={styles.documentTitle}>
                         <Text style={styles.title1}>{documentTitle}</Text>

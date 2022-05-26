@@ -1,9 +1,11 @@
 import { StyleSheet, Text, View } from "@react-pdf/renderer";
 import { Style } from "@react-pdf/types";
 import { gql } from "apollo-server-core";
-import { FormattedMessage, useIntl } from "react-intl";
+import { useIntl } from "react-intl";
+import { Html } from "react-pdf-html";
 import { chunk, isDefined, times } from "remeda";
 import { FORMATS } from "../../util/dates";
+import { toHtml } from "../../util/slate";
 import { useTheme } from "../utils/ThemeProvider";
 import { SignaturesBlock_SignatureConfigFragment } from "../__types";
 import { SignatureBox, SignatureBoxProps } from "./SignatureBox";
@@ -21,12 +23,8 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
   const styles = StyleSheet.create({
     text: {
       fontFamily: theme.textFontFamily,
-      fontSize: theme.textFontSize,
+      fontSize: `${(theme.textFontSize * 11) / 12}pt`,
       color: theme.textColor,
-    },
-    disclaimer: {
-      fontStyle: "italic",
-      fontSize: (theme.textFontSize * 11) / 12,
     },
     signerFirst: {
       flex: 1,
@@ -78,13 +76,13 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
         } as SignatureBoxProps)
     ),
   ];
+
+  const html = intl.locale === "es" ? toHtml(theme.legalRichTextEs) : toHtml(theme.legalRichTextEn);
+
   return (
     <View style={style} wrap={false}>
-      <Text style={[styles.text, styles.disclaimer]}>
-        <FormattedMessage
-          id="document.petition-export.signatures-disclaimer"
-          defaultMessage="I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current identification information."
-        />
+      <Text style={[styles.text]}>
+        <Html stylesheet={{ p: { fontSize: styles.text.fontSize } }}>{html}</Html>
       </Text>
       {chunk(signers, 3).map((row, i) => (
         <View key={i} style={{ flexDirection: "row", marginTop: "5mm" }}>

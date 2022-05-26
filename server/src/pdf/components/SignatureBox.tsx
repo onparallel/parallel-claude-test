@@ -23,8 +23,9 @@ export function SignatureBox({
   const styles = StyleSheet.create({
     text: {
       fontFamily: theme.textFontFamily,
-      fontSize: theme.textFontSize,
+      fontSize: 12,
       color: theme.textColor,
+      opacity: 0.7,
     },
     box: {
       height: "36mm",
@@ -48,7 +49,7 @@ export function SignatureBox({
     },
     date: {
       opacity: 0.7,
-      fontSize: (theme.textFontSize * 11) / 12,
+      fontSize: 12,
     },
   });
   return (

@@ -19,11 +19,12 @@ interface RichTextEditorToolbarProps {
   isDisabled?: boolean;
   hasPlaceholders?: boolean;
   hasHeadingButton?: boolean;
+  hasListButtons?: boolean;
 }
 
 export const RichTextEditorToolbar = chakraForwardRef<"div", RichTextEditorToolbarProps>(
   function RichTextEditorToolbar(
-    { isDisabled, hasPlaceholders, hasHeadingButton = true, ...props },
+    { isDisabled, hasPlaceholders, hasHeadingButton = true, hasListButtons = true, ...props },
     ref
   ) {
     const intl = useIntl();
@@ -68,26 +69,30 @@ export const RichTextEditorToolbar = chakraForwardRef<"div", RichTextEditorToolb
             defaultMessage: "Underline",
           })}
         />
-        <ToolbarListButton
-          editor={editor}
-          type="bulleted-list"
-          icon={<ListIcon fontSize="16px" />}
-          isDisabled={isDisabled}
-          label={intl.formatMessage({
-            id: "component.rich-text-editor.list",
-            defaultMessage: "Bullet list",
-          })}
-        />
-        <ToolbarListButton
-          editor={editor}
-          type="numbered-list"
-          icon={<OrderedListIcon fontSize="16px" />}
-          isDisabled={isDisabled}
-          label={intl.formatMessage({
-            id: "component.rich-text-editor.ordered-list",
-            defaultMessage: "Numbered list",
-          })}
-        />
+        {hasListButtons ? (
+          <>
+            <ToolbarListButton
+              editor={editor}
+              type="bulleted-list"
+              icon={<ListIcon fontSize="16px" />}
+              isDisabled={isDisabled}
+              label={intl.formatMessage({
+                id: "component.rich-text-editor.list",
+                defaultMessage: "Bullet list",
+              })}
+            />
+            <ToolbarListButton
+              editor={editor}
+              type="numbered-list"
+              icon={<OrderedListIcon fontSize="16px" />}
+              isDisabled={isDisabled}
+              label={intl.formatMessage({
+                id: "component.rich-text-editor.ordered-list",
+                defaultMessage: "Numbered list",
+              })}
+            />
+          </>
+        ) : null}
         {hasPlaceholders ? (
           <ToolbarPlaceholderButton editor={editor} isDisabled={isDisabled} />
         ) : null}

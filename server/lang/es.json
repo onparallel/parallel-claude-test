@@ -170,11 +170,6 @@
     "context": "No replies have been submitted."
   },
   {
-    "term": "document.petition-export.signatures-disclaimer",
-    "definition": "Declaro que los datos y la documentación facilitados, así como las copias o fotocopias enviadas, reproducen fielmente los documentos originales y la información actual de identificación.",
-    "context": "I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current identification information."
-  },
-  {
     "term": "document.petition-export.view-replies-in-nd",
     "definition": "Ver respuestas en ND",
     "context": "See answers in ND"
