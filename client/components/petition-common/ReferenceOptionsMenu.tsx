@@ -61,7 +61,7 @@ export const ReferenceOptionsMenu = Object.assign(
           _hover={{
             boxShadow: "lg",
           }}
-          tabIndex={1}
+          tabIndex={0}
         />
         <Portal>
           <MenuList width="min-content" minWidth="20rem">
@@ -91,15 +91,14 @@ export const ReferenceOptionsMenu = Object.assign(
             ))}
             <MenuDivider />
             <MenuItem
-              icon={<HelpOutlineIcon />}
+              icon={<HelpOutlineIcon display="block" boxSize={4} />}
               as="a"
               href={`https://help.onparallel.com/es/articles/5998723-como-generar-textos-dinamicos`}
               rel="noopener"
               target="_blank"
+              alignItems="center"
             >
-              <Text fontSize="sm">
-                <FormattedMessage id="generic.help" defaultMessage="Help" />
-              </Text>
+              <FormattedMessage id="generic.learn-more" defaultMessage="Learn more" />
             </MenuItem>
           </MenuList>
         </Portal>

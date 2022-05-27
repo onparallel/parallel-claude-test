@@ -200,7 +200,7 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
       ) : null}
       <Box as="li" listStyleType="none" display="flex" position="relative" flex="none">
         <LinkBox
-          tabIndex={1}
+          tabIndex={0}
           as={Stack}
           direction="row"
           flex="1"
@@ -258,7 +258,7 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
               </>
             ) : (
               <IconButtonWithTooltip
-                tabIndex={1}
+                tabIndex={0}
                 display="none"
                 className="references"
                 label={intl.formatMessage({

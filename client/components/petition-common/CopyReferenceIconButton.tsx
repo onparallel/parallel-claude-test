@@ -45,7 +45,6 @@ export const CopyReferenceIconButton = chakraForwardRef<"button", CopyReferenceI
 
     return (
       <IconButtonWithTooltip
-        tabIndex={1}
         label={copied ? labels.copied : labels.copy}
         icon={<CopyPropertyIcon />}
         fontSize="16px"
@@ -58,6 +57,7 @@ export const CopyReferenceIconButton = chakraForwardRef<"button", CopyReferenceI
           boxShadow: "lg",
         }}
         ref={ref}
+        tabIndex={0}
         {...props}
       />
     );
