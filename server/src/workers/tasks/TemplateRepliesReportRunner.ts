@@ -15,33 +15,33 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
     if (!this.task.user_id) {
       throw new Error(`Task ${this.task.id} is missing user_id`);
     }
-    const hasAccess = await this.ctx.petitions.userHasAccessToPetitions(this.task.user_id, [
+    const hasAccess = await this.ctx.readonlyPetitions.userHasAccessToPetitions(this.task.user_id, [
       templateId,
     ]);
     if (!hasAccess) {
       throw new Error(`User ${this.task.user_id} has no access to petition ${templateId}`);
     }
     const [template, petitions] = await Promise.all([
-      this.ctx.petitions.loadPetition(templateId),
-      this.ctx.petitions.loadPetitionsByFromTemplateId(templateId),
+      this.ctx.readonlyPetitions.loadPetition(templateId),
+      this.ctx.readonlyPetitions.loadPetitionsByFromTemplateId(templateId),
     ]);
 
     const intl = await this.ctx.i18n.getIntl(template!.locale);
 
     const [petitionsAccesses, petitionsMessages, petitionsFields] = await Promise.all([
-      this.ctx.petitions.loadAccessesForPetition(petitions.map((p) => p.id)),
-      this.ctx.petitions.loadMessagesByPetitionId(petitions.map((p) => p.id)),
-      this.ctx.petitions.loadFieldsForPetition(petitions.map((p) => p.id)),
+      this.ctx.readonlyPetitions.loadAccessesForPetition(petitions.map((p) => p.id)),
+      this.ctx.readonlyPetitions.loadMessagesByPetitionId(petitions.map((p) => p.id)),
+      this.ctx.readonlyPetitions.loadFieldsForPetition(petitions.map((p) => p.id)),
     ]);
 
     const petitionsAccessesContacts = await Promise.all(
       petitionsAccesses.map((accesses) =>
-        this.ctx.contacts.loadContactByAccessId(accesses.map((a) => a.id))
+        this.ctx.readonlyContacts.loadContactByAccessId(accesses.map((a) => a.id))
       )
     );
     const petitionsFieldsReplies = await Promise.all(
       petitionsFields.map((fields) =>
-        this.ctx.petitions.loadRepliesForField(fields.map((f) => f.id))
+        this.ctx.readonlyPetitions.loadRepliesForField(fields.map((f) => f.id))
       )
     );
 

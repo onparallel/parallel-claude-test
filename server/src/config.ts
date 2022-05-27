@@ -7,12 +7,22 @@ export type Config = ReturnType<typeof buildConfig>;
 export function buildConfig() {
   return deepFreeze({
     db: {
-      host: process.env.DB_HOST!,
-      database: process.env.DB_DATABASE!,
-      user: process.env.DB_USER!,
-      password: process.env.DB_PASSWORD!,
-      port: parseInt(process.env.DB_PORT!),
-      maxConnections: parseInt(process.env.DB_MAX_CONNECTIONS!),
+      "read-write": {
+        host: process.env.DB_HOST!,
+        database: process.env.DB_DATABASE!,
+        user: process.env.DB_USER!,
+        password: process.env.DB_PASSWORD!,
+        port: parseInt(process.env.DB_PORT!),
+        maxConnections: parseInt(process.env.DB_MAX_CONNECTIONS!),
+      },
+      "read-only": {
+        host: process.env.READONLY_DB_HOST!,
+        database: process.env.READONLY_DB_DATABASE!,
+        user: process.env.READONLY_DB_USER!,
+        password: process.env.READONLY_DB_PASSWORD!,
+        port: parseInt(process.env.READONLY_DB_PORT!),
+        maxConnections: parseInt(process.env.READONLY_DB_MAX_CONNECTIONS!),
+      },
     },
     cognito: {
       domain: process.env.COGNITO_DOMAIN!,

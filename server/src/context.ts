@@ -1,14 +1,17 @@
 import express from "express";
 import { inject, injectable } from "inversify";
 import { CONFIG, Config } from "./config";
-import { ContactRepository } from "./db/repositories/ContactRepository";
+import { ContactRepository, ReadonlyContactRepository } from "./db/repositories/ContactRepository";
 import { EmailLogRepository } from "./db/repositories/EmailLogRepository";
 import { FeatureFlagRepository } from "./db/repositories/FeatureFlagRepository";
 import { FileRepository } from "./db/repositories/FileRepository";
 import { IntegrationRepository } from "./db/repositories/IntegrationRepository";
 import { LicenseCodeRepository } from "./db/repositories/LicenseCodeRepository";
 import { OrganizationRepository } from "./db/repositories/OrganizationRepository";
-import { PetitionRepository } from "./db/repositories/PetitionRepository";
+import {
+  PetitionRepository,
+  ReadonlyPetitionRepository,
+} from "./db/repositories/PetitionRepository";
 import { SubscriptionRepository } from "./db/repositories/SubscriptionRepository";
 import { SystemRepository } from "./db/repositories/SystemRepository";
 import { TagRepository } from "./db/repositories/TagRepository";
@@ -100,6 +103,9 @@ export class WorkerContext {
     public readonly system: SystemRepository,
     public readonly userGroups: UserGroupRepository,
     public readonly subscriptions: SubscriptionRepository,
-    public readonly tasks: TaskRepository
+    public readonly tasks: TaskRepository,
+
+    public readonly readonlyContacts: ReadonlyContactRepository,
+    public readonly readonlyPetitions: ReadonlyPetitionRepository
   ) {}
 }
