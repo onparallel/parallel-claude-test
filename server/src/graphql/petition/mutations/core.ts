@@ -236,7 +236,11 @@ export const clonePetitions = mutationField("clonePetitions", {
       unMaybeArray(args.petitionIds),
       async (petitionId) => {
         const { name, locale } = (await ctx.petitions.loadPetition(petitionId))!;
-        const mark = `(${locale === "es" ? "copia" : "copy"})`;
+        const intl = await ctx.i18n.getIntl(locale);
+        const mark = `(${intl.formatMessage({
+          id: "generic.copy",
+          defaultMessage: "copy",
+        })})`;
 
         const cloned = await ctx.petitions.clonePetition(petitionId, ctx.user!, {
           name: `${name ? `${name} ` : ""}${mark}`.slice(0, 255),

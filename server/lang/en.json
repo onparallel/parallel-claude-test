@@ -270,6 +270,11 @@
     "context": "Please click the link below to complete the information."
   },
   {
+    "term": "generic.copy",
+    "definition": "copy",
+    "context": "copy"
+  },
+  {
     "term": "generic.submit-text.with-deadline",
     "definition": "This information has been requested to be submitted before {deadline}.",
     "context": "This information has been requested to be submitted before {deadline}."
@@ -520,6 +525,11 @@
     "context": "{recipient} completed {signed, select, true{and signed } other{}}the petition you sent to him."
   },
   {
+    "term": "petition-excel-export.replies",
+    "definition": "Replies",
+    "context": "Replies"
+  },
+  {
     "term": "petition-message-bounced.access-click-link",
     "definition": "Follow the link below to access the petition.",
     "context": "Follow the link below to access the petition."
@@ -630,6 +640,11 @@
     "context": "The signing process sent through {signatureProvider} has been cancelled by the sender."
   },
   {
+    "term": "signature-client.open-document",
+    "definition": "Open document",
+    "context": "Open document"
+  },
+  {
     "term": "signature-completed.subject",
     "definition": "Signature request completed",
     "context": "Signature request completed"
@@ -668,6 +683,11 @@
     "term": "signature-requested.text",
     "definition": "You have received a signature request to sign a document titled {documentName}.",
     "context": "You have received a signature request to sign a document titled {documentName}."
+  },
+  {
+    "term": "signature-worker.signed",
+    "definition": "signed",
+    "context": "signed"
   },
   {
     "term": "verification-code-request.code-label",

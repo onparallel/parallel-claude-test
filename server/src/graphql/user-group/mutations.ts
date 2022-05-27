@@ -143,11 +143,16 @@ export const cloneUserGroup = mutationField("cloneUserGroup", {
   ),
   resolve: async (_, args, ctx) => {
     const groups = (await ctx.userGroups.loadUserGroup(args.userGroupIds)) as UserGroup[];
-
+    const intl = await ctx.i18n.getIntl(args.locale as any);
     return await pMap(groups, (group) =>
       ctx.userGroups.cloneUserGroup(
         group.id,
-        group.name.concat(args.locale === "es" ? " (copia)" : " (copy)"),
+        group.name.concat(
+          ` (${intl.formatMessage({
+            id: "generic.copy",
+            defaultMessage: "copy",
+          })}})`
+        ),
         ctx.user!
       )
     );

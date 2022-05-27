@@ -200,9 +200,17 @@ async function storeSignedDocument(
 
   const client = ctx.signature.getClient(signaturitIntegration);
 
+  const intl = await ctx.i18n.getIntl(petition.locale);
+
   const signedDocument = await storeDocument(
     await client.downloadSignedDocument(payload.signedDocumentExternalId),
-    sanitizeFilenameWithSuffix(title, `_${petition.locale === "es" ? "firmado" : "signed"}.pdf`),
+    sanitizeFilenameWithSuffix(
+      title,
+      `_${intl.formatMessage({
+        id: "signature-worker.signed",
+        defaultMessage: "signed",
+      })}.pdf`
+    ),
     signaturitIntegration.id,
     ctx
   );

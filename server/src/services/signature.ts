@@ -23,6 +23,7 @@ import { downloadImageBase64 } from "../util/images";
 import { CONFIG, Config } from "./../config";
 import { AWS_SERVICE, IAws } from "./aws";
 import { FETCH_SERVICE, IFetchService } from "./fetch";
+import { I18N_SERVICE, II18nService } from "./i18n";
 
 type SignatureOptions = {
   locale: string;
@@ -89,7 +90,8 @@ export class SignatureService implements ISignatureService {
     @inject(PetitionRepository) private petitionsRepository: PetitionRepository,
     @inject(OrganizationRepository) private organizationsRepository: OrganizationRepository,
     @inject(AWS_SERVICE) private aws: IAws,
-    @inject(FETCH_SERVICE) private fetch: IFetchService
+    @inject(FETCH_SERVICE) private fetch: IFetchService,
+    @inject(I18N_SERVICE) public readonly i18n: II18nService
   ) {}
   public getClient(integration: OrgIntegration): ISignatureClient {
     switch (integration.provider.toUpperCase()) {
@@ -102,7 +104,7 @@ export class SignatureService implements ISignatureService {
 
   private buildSignaturItClient(integration: OrgIntegration): SignaturItClient {
     const settings = integration.settings as SignaturitIntegrationSettings;
-    const client = new SignaturItClient(settings, this.config, integration.org_id);
+    const client = new SignaturItClient(settings, this.config, integration.org_id, this.i18n);
     client.on(
       "branding_updated",
       ({ locale, brandingId, tone }: { locale: string; brandingId: string; tone: Tone }) => {
@@ -302,7 +304,8 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
   constructor(
     private settings: SignaturitIntegrationSettings,
     private config: Config,
-    private orgId: number
+    private orgId: number,
+    private i18n: II18nService
   ) {
     super();
     if (!this.settings.API_KEY) {
@@ -380,13 +383,18 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
   }
 
   private async createOrgBranding(opts: SignatureOptions): Promise<BrandingResponse> {
+    const intl = await this.i18n.getIntl(opts.locale);
+
     return await this.sdk.createBranding({
       show_welcome_page: false,
       layout_color: "#6059F7",
       text_color: "#F6F6F6",
       logo: await downloadImageBase64(opts.templateData.logoUrl),
       application_texts: {
-        open_sign_button: opts.locale === "es" ? "Abrir documento" : "Open document",
+        open_sign_button: intl.formatMessage({
+          id: "signature-client.open-document",
+          defaultMessage: "Open document",
+        }),
       },
       templates: await this.buildSignaturItBrandingTemplates(opts),
     });

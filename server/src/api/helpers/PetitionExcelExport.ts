@@ -11,12 +11,14 @@ export class PetitionExcelExport {
   private textRepliesTab: TextRepliesExcelWorksheet;
   private fieldCommentsTab: FieldCommentsExcelWorksheet;
   private locale: string;
+  private context: ApiContext | WorkerContext;
 
   constructor(locale: string, context: ApiContext | WorkerContext) {
     this.wb = new Excel.Workbook();
     this.textRepliesTab = new TextRepliesExcelWorksheet(locale, this.wb);
     this.fieldCommentsTab = new FieldCommentsExcelWorksheet(locale, this.wb, context);
     this.locale = locale;
+    this.context = context;
   }
 
   public addPetitionFieldReply(field: PetitionField, replies: PetitionFieldReply[]) {
@@ -49,8 +51,13 @@ export class PetitionExcelExport {
     stream.push(await this.wb.xlsx.writeBuffer());
     stream.push(null); // end of stream
 
+    const intl = await this.context.i18n.getIntl(this.locale);
+
     return {
-      filename: this.locale === "en" ? "Replies.xlsx" : "Respuestas.xlsx",
+      filename: `${intl.formatMessage({
+        id: "petition-excel-export.replies",
+        defaultMessage: "Replies",
+      })}.xlsx`,
       stream,
     };
   }
