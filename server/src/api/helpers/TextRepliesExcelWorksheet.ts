@@ -1,4 +1,5 @@
 import Excel from "exceljs";
+import { ApiContext, WorkerContext } from "../../context";
 import { PetitionField, PetitionFieldReply } from "../../db/__types";
 import { Maybe } from "../../util/types";
 import { ExcelWorksheet } from "./ExcelWorksheet";
@@ -9,11 +10,34 @@ export type TextReplyRow = {
 };
 
 export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
-  constructor(locale: string, wb: Excel.Workbook) {
-    super(locale === "en" ? "Replies" : "Respuestas", locale, wb);
+  constructor(
+    worksheetName: string,
+    locale: string,
+    wb: Excel.Workbook,
+    private context: ApiContext | WorkerContext
+  ) {
+    super(worksheetName, locale, wb);
+    this.locale = locale;
+  }
+
+  public async init() {
+    const intl = await this.context.i18n.getIntl(this.locale);
+
     this.page.columns = [
-      { key: "title", header: locale === "en" ? "Field" : "Campo" },
-      { key: "answer", header: locale === "en" ? "Reply" : "Respuesta" },
+      {
+        key: "title",
+        header: intl.formatMessage({
+          id: "text-replies-excel-worksheet.field",
+          defaultMessage: "Field",
+        }),
+      },
+      {
+        key: "answer",
+        header: intl.formatMessage({
+          id: "text-replies-excel-worksheet.reply",
+          defaultMessage: "Reply",
+        }),
+      },
     ];
   }
 

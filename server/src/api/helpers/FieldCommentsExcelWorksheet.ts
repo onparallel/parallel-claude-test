@@ -15,26 +15,61 @@ export type FieldCommentRow = {
 };
 
 export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow> {
-  constructor(locale: string, wb: Excel.Workbook, private context: ApiContext | WorkerContext) {
-    super(locale === "en" ? "Comments" : "Comentarios", locale, wb);
+  constructor(
+    worksheetName: string,
+    locale: string,
+    wb: Excel.Workbook,
+    private context: ApiContext | WorkerContext
+  ) {
+    super(worksheetName, locale, wb);
+    this.locale = locale;
+  }
+
+  public async init() {
+    const intl = await this.context.i18n.getIntl(this.locale);
+
     this.page.columns = [
       {
         key: "content",
-        header: this.locale === "en" ? "Message" : "Mensaje",
+        header: intl.formatMessage({
+          id: "field-comments-excel-worksheet.message",
+          defaultMessage: "Message",
+        }),
       },
-      { key: "fieldName", header: this.locale === "en" ? "Field" : "Campo" },
+      {
+        key: "fieldName",
+        header: intl.formatMessage({
+          id: "field-comments-excel-worksheet.field",
+          defaultMessage: "Field",
+        }),
+      },
       {
         key: "authorFullName",
-        header: this.locale === "en" ? "Full name" : "Nombre completo",
+        header: intl.formatMessage({
+          id: "field-comments-excel-worksheet.full-name",
+          defaultMessage: "Full name",
+        }),
       },
-      { key: "authorEmail", header: "Email" },
+      {
+        key: "authorEmail",
+        header: intl.formatMessage({
+          id: "field-comments-excel-worksheet.email",
+          defaultMessage: "Email",
+        }),
+      },
       {
         key: "createdAt",
-        header: this.locale === "en" ? "Message sent at" : "Hora de envío del mensaje",
+        header: intl.formatMessage({
+          id: "field-comments-excel-worksheet.message-sent-at",
+          defaultMessage: "Message sent at",
+        }),
       },
       {
         key: "isInternal",
-        header: this.locale === "en" ? "Internal comment?" : "¿Comentario interno?",
+        header: intl.formatMessage({
+          id: "field-comments-excel-worksheet.internal-comment",
+          defaultMessage: "Internal comment?",
+        }),
       },
     ];
   }
@@ -53,13 +88,22 @@ export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow>
 
   private async addCommentRow(comment: PetitionFieldComment, fieldTitle: Maybe<string>) {
     const author = await this.loadCommentAuthor(comment);
+    const intl = await this.context.i18n.getIntl(this.locale);
     this.addRows({
       authorEmail: author.email,
       authorFullName: fullName(author.first_name, author.last_name),
       content: comment.content,
       createdAt: comment.created_at.toISOString(),
       fieldName: fieldTitle,
-      isInternal: this.boolToLocaleString(comment.is_internal, this.locale),
+      isInternal: comment.is_internal
+        ? intl.formatMessage({
+            id: "generic.yes",
+            defaultMessage: "Yes",
+          })
+        : intl.formatMessage({
+            id: "generic.no",
+            defaultMessage: "No",
+          }),
     });
   }
 
@@ -87,12 +131,5 @@ export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow>
     throw new Error(
       `expected user_id or petition_access_id to be defined in PetitionFieldComment with id ${comment.id}`
     );
-  }
-
-  private boolToLocaleString(value: boolean, locale: string) {
-    if (value) {
-      return locale === "en" ? "Yes" : "Si";
-    }
-    return locale === "en" ? "No" : "No";
   }
 }

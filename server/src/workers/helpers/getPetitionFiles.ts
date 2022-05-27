@@ -63,6 +63,7 @@ export async function* getPetitionFiles(
   let processedFiles = 0;
 
   const excelWorkbook = new PetitionExcelExport(options.locale, ctx);
+  await excelWorkbook.init();
   const seen = new Set<string>();
   let headingCount = 0;
 

@@ -210,6 +210,36 @@
     "context": "template-report-{id}.xlsx"
   },
   {
+    "term": "field-comments-excel-worksheet.email",
+    "definition": "Email",
+    "context": "Email"
+  },
+  {
+    "term": "field-comments-excel-worksheet.field",
+    "definition": "Campo",
+    "context": "Field"
+  },
+  {
+    "term": "field-comments-excel-worksheet.full-name",
+    "definition": "Nombre completo",
+    "context": "Full name"
+  },
+  {
+    "term": "field-comments-excel-worksheet.internal-comment",
+    "definition": "¿Comentario interno?",
+    "context": "Internal comment?"
+  },
+  {
+    "term": "field-comments-excel-worksheet.message",
+    "definition": "Mensaje",
+    "context": "Message"
+  },
+  {
+    "term": "field-comments-excel-worksheet.message-sent-at",
+    "definition": "Hora de envío del mensaje",
+    "context": "Message sent at"
+  },
+  {
     "term": "footer.slogan",
     "definition": "Trabaja mejor con",
     "context": "Work better with"
@@ -275,6 +305,11 @@
     "context": "copy"
   },
   {
+    "term": "generic.no",
+    "definition": "No",
+    "context": "No"
+  },
+  {
     "term": "generic.submit-text.with-deadline",
     "definition": "Esta información ha sido solicitada para antes del {deadline}.",
     "context": "This information has been requested to be submitted before {deadline}."
@@ -288,6 +323,11 @@
     "term": "generic.untitled-field",
     "definition": "Campo sin nombre",
     "context": "Untitled field"
+  },
+  {
+    "term": "generic.yes",
+    "definition": "Si",
+    "context": "Yes"
   },
   {
     "term": "greeting-contact",
@@ -525,6 +565,11 @@
     "context": "{recipient} completed {signed, select, true{and signed } other{}}the petition you sent to him."
   },
   {
+    "term": "petition-excel-export.comments",
+    "definition": "Comentarios",
+    "context": "Comments"
+  },
+  {
     "term": "petition-excel-export.replies",
     "definition": "Respuestas",
     "context": "Replies"
@@ -688,6 +733,16 @@
     "term": "signature-worker.signed",
     "definition": "firmado",
     "context": "signed"
+  },
+  {
+    "term": "text-replies-excel-worksheet.field",
+    "definition": "Campo",
+    "context": "Field"
+  },
+  {
+    "term": "text-replies-excel-worksheet.reply",
+    "definition": "Respuesta",
+    "context": "Reply"
   },
   {
     "term": "verification-code-request.code-label",

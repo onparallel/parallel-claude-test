@@ -8,17 +8,41 @@ import { TextRepliesExcelWorksheet } from "./TextRepliesExcelWorksheet";
 
 export class PetitionExcelExport {
   private wb: Excel.Workbook;
-  private textRepliesTab: TextRepliesExcelWorksheet;
-  private fieldCommentsTab: FieldCommentsExcelWorksheet;
+  private textRepliesTab!: TextRepliesExcelWorksheet;
+  private fieldCommentsTab!: FieldCommentsExcelWorksheet;
   private locale: string;
   private context: ApiContext | WorkerContext;
 
   constructor(locale: string, context: ApiContext | WorkerContext) {
     this.wb = new Excel.Workbook();
-    this.textRepliesTab = new TextRepliesExcelWorksheet(locale, this.wb);
-    this.fieldCommentsTab = new FieldCommentsExcelWorksheet(locale, this.wb, context);
     this.locale = locale;
     this.context = context;
+  }
+
+  public async init() {
+    const intl = await this.context.i18n.getIntl(this.locale);
+
+    this.textRepliesTab = new TextRepliesExcelWorksheet(
+      intl.formatMessage({
+        id: "petition-excel-export.replies",
+        defaultMessage: "Replies",
+      }),
+      this.locale,
+      this.wb,
+      this.context
+    );
+    await this.textRepliesTab.init();
+
+    this.fieldCommentsTab = new FieldCommentsExcelWorksheet(
+      intl.formatMessage({
+        id: "petition-excel-export.comments",
+        defaultMessage: "Comments",
+      }),
+      this.locale,
+      this.wb,
+      this.context
+    );
+    await this.fieldCommentsTab.init();
   }
 
   public addPetitionFieldReply(field: PetitionField, replies: PetitionFieldReply[]) {
