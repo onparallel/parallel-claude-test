@@ -159,19 +159,23 @@ export function BrandingGeneralForm({ user }: BrandingGeneralFormProps) {
             defaultMessage="Tone of the messages"
           />
         </Heading>
-        <RadioGroup onChange={handleToneChange} value={tone} isDisabled={!hasAdminRole}>
-          <Stack spacing={4}>
-            <Radio backgroundColor="white" value="INFORMAL">
-              <Text fontWeight="semibold">
-                <FormattedMessage id="generic.tone-informal" defaultMessage="Informal" />
-              </Text>
-            </Radio>
-            <Radio backgroundColor="white" value="FORMAL">
-              <Text fontWeight="semibold">
-                <FormattedMessage id="generic.tone-formal" defaultMessage="Formal" />
-              </Text>
-            </Radio>
-          </Stack>
+        <RadioGroup
+          as={Stack}
+          spacing={4}
+          onChange={handleToneChange}
+          value={tone}
+          isDisabled={!hasAdminRole}
+        >
+          <Radio backgroundColor="white" value="INFORMAL">
+            <Text fontWeight="semibold">
+              <FormattedMessage id="generic.tone-informal" defaultMessage="Informal" />
+            </Text>
+          </Radio>
+          <Radio backgroundColor="white" value="FORMAL">
+            <Text fontWeight="semibold">
+              <FormattedMessage id="generic.tone-formal" defaultMessage="Formal" />
+            </Text>
+          </Radio>
         </RadioGroup>
       </Stack>
       <Divider borderColor="gray.300" />
