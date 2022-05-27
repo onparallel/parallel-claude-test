@@ -870,22 +870,22 @@ export class Mocks {
 }
 
 function randomPetitionStatus() {
-  return faker.random.arrayElement<PetitionStatus>(["DRAFT", "PENDING", "COMPLETED"]);
+  return faker.helpers.arrayElement<PetitionStatus>(["DRAFT", "PENDING", "COMPLETED"]);
 }
 
 function randomPetitionFieldType() {
-  return faker.random.arrayElement<PetitionFieldType>(["FILE_UPLOAD", "TEXT", "SELECT"]);
+  return faker.helpers.arrayElement<PetitionFieldType>(["FILE_UPLOAD", "TEXT", "SELECT"]);
 }
 
 function randomSupportedLocale() {
-  return faker.random.arrayElement(["en", "es"]);
+  return faker.helpers.arrayElement(["en", "es"]);
 }
 
 function randomPetitionFieldOptions(type: PetitionFieldType) {
   switch (type) {
     case "FILE_UPLOAD": {
       return {
-        accepts: [faker.random.arrayElement(["PDF", "IMAGE", "VIDEO"])],
+        accepts: [faker.helpers.arrayElement(["PDF", "IMAGE", "VIDEO"])],
         multiple: faker.datatype.boolean(),
       };
     }
