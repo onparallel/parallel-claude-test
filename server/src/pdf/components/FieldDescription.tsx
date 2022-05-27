@@ -1,7 +1,7 @@
 import { marked } from "@onparallel/marked-do-not-use";
 import { Image, Link, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { Fragment, useMemo } from "react";
-import { times, zip } from "remeda";
+import { zip } from "remeda";
 import { useTheme } from "../utils/ThemeProvider";
 import { useLiquid } from "../utils/useLiquid";
 
