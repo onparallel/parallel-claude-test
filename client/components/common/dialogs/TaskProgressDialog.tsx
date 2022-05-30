@@ -1,36 +1,75 @@
-import { gql } from "@apollo/client";
+import { gql, useApolloClient } from "@apollo/client";
 import { Button, Progress } from "@chakra-ui/react";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { TaskProgressDialog_TaskFragment } from "@parallel/graphql/__types";
+import {
+  TaskProgressDialog_publicTaskDocument,
+  TaskProgressDialog_taskDocument,
+  TaskProgressDialog_TaskFragment,
+} from "@parallel/graphql/__types";
+import { useAsyncEffect } from "@parallel/utils/useAsyncEffect";
 import { useInterval } from "@parallel/utils/useInterval";
+import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { ReactNode, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
+import { isDefined } from "remeda";
 import { ConfirmDialog } from "./ConfirmDialog";
 
 interface TaskProgressDialogProps {
+  keycode?: string;
   confirmText?: ReactNode;
   dialogHeader?: ReactNode;
-  pollInterval?: number;
-  task: TaskProgressDialog_TaskFragment;
-  refetch: () => Promise<TaskProgressDialog_TaskFragment>;
+  initTask: () => Promise<TaskProgressDialog_TaskFragment>;
 }
 export function TaskProgressDialog({
+  keycode,
   confirmText,
   dialogHeader,
-  pollInterval,
-  task,
-  refetch,
+  initTask,
   ...props
 }: DialogProps<TaskProgressDialogProps, TaskProgressDialog_TaskFragment>) {
-  const [processingTask, setProcessingTask] = useState(task);
+  const apollo = useApolloClient();
+
+  const [task, setTask] = useState<null | TaskProgressDialog_TaskFragment>(null);
+  const taskRef = useUpdatingRef(task);
+
+  useAsyncEffect(async (isMounted) => {
+    try {
+      const task = await initTask();
+      if (isMounted()) {
+        setTask(task);
+      }
+    } catch {
+      props.onReject("SERVER_ERROR");
+    }
+  }, []);
+
   useInterval(
     async (done) => {
+      const task = taskRef.current;
+      if (!isDefined(task)) {
+        return;
+      }
       try {
-        const task = await refetch();
-        setProcessingTask(task);
-        if (task.status === "COMPLETED") {
+        let updatedTask: TaskProgressDialog_TaskFragment;
+        if (isDefined(keycode)) {
+          const { data } = await apollo.query({
+            query: TaskProgressDialog_publicTaskDocument,
+            variables: { taskId: task.id, keycode },
+            fetchPolicy: "network-only",
+          });
+          updatedTask = data.publicTask;
+        } else {
+          const { data } = await apollo.query({
+            query: TaskProgressDialog_taskDocument,
+            variables: { id: task.id },
+            fetchPolicy: "network-only",
+          });
+          updatedTask = data.task;
+        }
+        setTask(updatedTask);
+        if (updatedTask.status === "COMPLETED") {
           done();
-        } else if (task.status === "FAILED") {
+        } else if (updatedTask.status === "FAILED") {
           done();
           props.onReject("SERVER_ERROR");
         }
@@ -39,7 +78,7 @@ export function TaskProgressDialog({
         props.onReject("SERVER_ERROR");
       }
     },
-    pollInterval || 1000,
+    1_500,
     []
   );
   const confirmRef = useRef<HTMLButtonElement>(null);
@@ -61,18 +100,20 @@ export function TaskProgressDialog({
       body={
         <Progress
           size="md"
-          value={processingTask.progress ?? 0}
+          hasStripe
+          isAnimated={isDefined(task) && (task.progress ?? 0) < 100}
+          value={task?.progress ?? 0}
           colorScheme="green"
           borderRadius="full"
-          isIndeterminate={processingTask.status === "ENQUEUED"}
+          isIndeterminate={!isDefined(task) || task.status === "ENQUEUED"}
         />
       }
       confirm={
         <Button
           ref={confirmRef}
           colorScheme="purple"
-          isDisabled={processingTask.status !== "COMPLETED"}
-          onClick={() => props.onResolve(processingTask)}
+          isDisabled={task?.status !== "COMPLETED"}
+          onClick={() => props.onResolve(task!)}
         >
           {confirmText ?? (
             <FormattedMessage
@@ -95,6 +136,25 @@ TaskProgressDialog.fragments = {
     }
   `,
 };
+
+const _queries = [
+  gql`
+    query TaskProgressDialog_task($id: GID!) {
+      task(id: $id) {
+        ...TaskProgressDialog_Task
+      }
+    }
+    ${TaskProgressDialog.fragments.Task}
+  `,
+  gql`
+    query TaskProgressDialog_publicTask($taskId: GID!, $keycode: ID!) {
+      publicTask(taskId: $taskId, keycode: $keycode) {
+        ...TaskProgressDialog_Task
+      }
+    }
+    ${TaskProgressDialog.fragments.Task}
+  `,
+];
 
 export function useTaskProgressDialog() {
   return useDialog(TaskProgressDialog);

@@ -552,7 +552,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                     <MenuItem
                       icon={<FilePdfIcon boxSize={5} />}
                       isDisabled={!me.hasPetitionPdfExport}
-                      onClick={() => handlePrintPdfTask(petition.id)}
+                      onClick={() => setTimeout(() => handlePrintPdfTask(petition.id), 100)}
                       maxWidth={"260px"}
                     >
                       <Text>

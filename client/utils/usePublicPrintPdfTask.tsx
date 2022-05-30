@@ -1,4 +1,4 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useApolloClient, useMutation } from "@apollo/client";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import {
   TaskProgressDialog,
@@ -7,38 +7,35 @@ import {
 import {
   usePublicPrintPdfTask_publicCreatePrintPdfTaskDocument,
   usePublicPrintPdfTask_publicGetTaskResultFileUrlDocument,
-  usePublicPrintPdfTask_publicTaskDocument,
 } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
+import { isDefined } from "remeda";
 import { openNewWindow } from "./openNewWindow";
 import { withError } from "./promises/withError";
 
 export function usePublicPrintPdfTask() {
   const intl = useIntl();
+  const apollo = useApolloClient();
   const showError = useErrorDialog();
   const showTaskProgressDialog = useTaskProgressDialog();
 
-  const [publicCreatePrintPdfTask] = useMutation(
-    usePublicPrintPdfTask_publicCreatePrintPdfTaskDocument
-  );
   const [publicGetTaskResultFileUrl] = useMutation(
     usePublicPrintPdfTask_publicGetTaskResultFileUrlDocument
   );
-  const { refetch } = useQuery(usePublicPrintPdfTask_publicTaskDocument, { skip: true });
 
   return async (keycode: string) => {
     const [error, finishedTask] = await withError(async () => {
-      const { data } = await publicCreatePrintPdfTask({
-        variables: { keycode },
-      });
       return await showTaskProgressDialog({
-        task: data!.publicCreatePrintPdfTask,
-        refetch: async () => {
-          const { data: refetchData } = await refetch({
-            keycode,
-            taskId: data!.publicCreatePrintPdfTask.id,
+        keycode,
+        initTask: async () => {
+          const { data } = await apollo.mutate({
+            mutation: usePublicPrintPdfTask_publicCreatePrintPdfTaskDocument,
+            variables: { keycode },
           });
-          return refetchData.task;
+          if (!isDefined(data)) {
+            throw new Error();
+          }
+          return data.publicCreatePrintPdfTask;
         },
         dialogHeader: intl.formatMessage({
           id: "component.print-pdf-task.header",
@@ -98,16 +95,5 @@ usePublicPrintPdfTask.mutations = [
     mutation usePublicPrintPdfTask_publicGetTaskResultFileUrl($taskId: GID!, $keycode: ID!) {
       publicGetTaskResultFileUrl(taskId: $taskId, keycode: $keycode)
     }
-  `,
-];
-
-usePublicPrintPdfTask.queries = [
-  gql`
-    query usePublicPrintPdfTask_publicTask($taskId: GID!, $keycode: ID!) {
-      task: publicTask(taskId: $taskId, keycode: $keycode) {
-        ...TaskProgressDialog_Task
-      }
-    }
-    ${TaskProgressDialog.fragments.Task}
   `,
 ];
