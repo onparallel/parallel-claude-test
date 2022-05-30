@@ -151,7 +151,7 @@ export const cloneUserGroup = mutationField("cloneUserGroup", {
           ` (${intl.formatMessage({
             id: "generic.copy",
             defaultMessage: "copy",
-          })}})`
+          })})`
         ),
         ctx.user!
       )
