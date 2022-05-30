@@ -740,6 +740,11 @@
     "context": "Field"
   },
   {
+    "term": "text-replies-excel-worksheet.no-answer",
+    "definition": "Not replied",
+    "context": "Not replied"
+  },
+  {
     "term": "text-replies-excel-worksheet.reply",
     "definition": "Reply",
     "context": "Reply"

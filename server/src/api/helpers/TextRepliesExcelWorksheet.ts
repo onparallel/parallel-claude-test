@@ -1,3 +1,4 @@
+import { IntlShape } from "@formatjs/intl";
 import Excel from "exceljs";
 import { ApiContext, WorkerContext } from "../../context";
 import { PetitionField, PetitionFieldReply } from "../../db/__types";
@@ -20,20 +21,21 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
     this.locale = locale;
   }
 
+  private intl!: IntlShape;
   public async init() {
-    const intl = await this.context.i18n.getIntl(this.locale);
+    this.intl = await this.context.i18n.getIntl(this.locale);
 
     this.page.columns = [
       {
         key: "title",
-        header: intl.formatMessage({
+        header: this.intl.formatMessage({
           id: "text-replies-excel-worksheet.field",
           defaultMessage: "Field",
         }),
       },
       {
         key: "answer",
-        header: intl.formatMessage({
+        header: this.intl.formatMessage({
           id: "text-replies-excel-worksheet.reply",
           defaultMessage: "Reply",
         }),
@@ -86,7 +88,12 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
         replies.flatMap((r, i) =>
           (r.content.value as [string, string | null][]).map(([label, value]) => ({
             title: field.title?.concat(` (${label})`, field.multiple ? ` [${i + 1}]` : "") || "",
-            answer: value ?? this.noAnswerLabel,
+            answer:
+              value ??
+              `[${this.intl.formatMessage({
+                id: "text-replies-excel-worksheet.no-answer",
+                defaultMessage: "Not replied",
+              })}]`,
           }))
         )
       );
@@ -115,16 +122,15 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
       [
         {
           title: data.title || "",
-          answer: this.noAnswerLabel,
+          answer: `[${this.intl.formatMessage({
+            id: "text-replies-excel-worksheet.no-answer",
+            defaultMessage: "Not replied",
+          })}]`,
         },
       ],
       {
         color: { argb: "FFA6A6A6" },
       }
     );
-  }
-
-  private get noAnswerLabel() {
-    return this.locale === "en" ? "[Not replied]" : "[No cumplimentado]";
   }
 }

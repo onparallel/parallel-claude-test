@@ -740,6 +740,11 @@
     "context": "Field"
   },
   {
+    "term": "text-replies-excel-worksheet.no-answer",
+    "definition": "No cumplimentado",
+    "context": "Not replied"
+  },
+  {
     "term": "text-replies-excel-worksheet.reply",
     "definition": "Respuesta",
     "context": "Reply"
