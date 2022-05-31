@@ -14,8 +14,8 @@ aws_sdk_1.default.config.credentials = new aws_sdk_1.default.SharedIniFileCreden
 });
 aws_sdk_1.default.config.region = "eu-central-1";
 const INSTANCE_TYPES = {
-    production: "t2.medium",
-    staging: "t2.small",
+    production: "t2.large",
+    staging: "t2.medium",
 };
 const KEY_NAME = "ops";
 const IMAGE_ID = "ami-05946a099e1661d2d";
