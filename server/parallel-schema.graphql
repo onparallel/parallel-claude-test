@@ -769,6 +769,11 @@ type Mutation {
   createTemplateRepliesReportTask(petitionId: GID!, timezone: String!): Task!
 
   """
+  Creates a task for generating a JSON report of the template usage
+  """
+  createTemplateStatsReportTask(templateId: GID!): Task!
+
+  """
   Creates a new user in the specified organization.
   """
   createUser(
@@ -4613,7 +4618,7 @@ type TagPagination {
 
 type Task {
   id: GID!
-  output: TemporaryFile
+  output: JSONObject
   progress: Int
   status: TaskStatus!
 }
@@ -4716,10 +4721,6 @@ type TemplateUsedEvent implements PetitionEvent {
   id: GID!
   petition: Petition
   type: PetitionEventType!
-}
-
-type TemporaryFile {
-  filename: String!
 }
 
 interface Timestamps {

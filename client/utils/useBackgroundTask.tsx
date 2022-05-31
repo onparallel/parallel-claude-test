@@ -47,9 +47,6 @@ const fragments = {
     fragment useBackgroundTask_Task on Task {
       id
       status
-      output {
-        filename
-      }
     }
   `,
 };

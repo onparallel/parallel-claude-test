@@ -16,6 +16,7 @@ export type TaskInput<TName extends TaskName> = {
   };
   EXPORT_EXCEL: { petition_id: number };
   TEMPLATE_REPLIES_REPORT: { petition_id: number; timezone: string };
+  TEMPLATE_STATS_REPORT: { template_id: number };
 }[TName];
 
 export type TaskOutput<TName extends TaskName> = {
@@ -23,6 +24,14 @@ export type TaskOutput<TName extends TaskName> = {
   PRINT_PDF: { temporary_file_id: number };
   EXPORT_EXCEL: { temporary_file_id: number };
   TEMPLATE_REPLIES_REPORT: { temporary_file_id: number };
+  TEMPLATE_STATS_REPORT: {
+    pending: number;
+    completed: number;
+    closed: number;
+    pending_to_complete: number;
+    complete_to_close: number;
+    signatures: { completed: number; time_to_complete: number };
+  };
 }[TName];
 
 export type Task<TName extends TaskName> = Replace<

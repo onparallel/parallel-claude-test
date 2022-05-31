@@ -1,4 +1,5 @@
 import { enumType, objectType } from "nexus";
+import { isDefined } from "remeda";
 
 export const Task = objectType({
   name: "Task",
@@ -6,17 +7,9 @@ export const Task = objectType({
     t.globalId("id");
     t.nonNull.field("status", { type: "TaskStatus" });
     t.nullable.int("progress");
-    t.nullable.field("output", {
-      type: objectType({
-        name: "TemporaryFile",
-        definition(t) {
-          t.string("filename");
-        },
-      }),
-      resolve: async (t, _, ctx) => {
-        return t.output?.temporary_file_id
-          ? await ctx.files.loadTemporaryFile(t.output.temporary_file_id)
-          : null;
+    t.nullable.jsonObject("output", {
+      resolve: (t, _, ctx) => {
+        return isDefined(t.output?.temporary_file_id) ? {} : t.output;
       },
     });
   },

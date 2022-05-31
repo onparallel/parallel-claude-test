@@ -8,12 +8,14 @@ import { ExportExcelRunner } from "./tasks/ExportExcelRunner";
 import { ExportRepliesRunner } from "./tasks/ExportRepliesRunner";
 import { TemplateRepliesReportRunner } from "./tasks/TemplateRepliesReportRunner";
 import { PrintPdfRunner } from "./tasks/PrintPdfRunner";
+import { TemplateStatsReportRunner } from "./tasks/TemplateStatsReportRunner";
 
 const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => TaskRunner<any>> = {
   PRINT_PDF: PrintPdfRunner,
   EXPORT_REPLIES: ExportRepliesRunner,
   EXPORT_EXCEL: ExportExcelRunner,
   TEMPLATE_REPLIES_REPORT: TemplateRepliesReportRunner,
+  TEMPLATE_STATS_REPORT: TemplateStatsReportRunner,
 };
 
 createQueueWorker("task-worker", async ({ taskId }: { taskId: number }, ctx) => {

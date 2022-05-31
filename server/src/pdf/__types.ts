@@ -463,6 +463,8 @@ export type Mutation = {
   createTag: Tag;
   /** Creates a task for exporting a report grouping the replies of every petition coming from the same template */
   createTemplateRepliesReportTask: Task;
+  /** Creates a task for generating a JSON report of the template usage */
+  createTemplateStatsReportTask: Task;
   /** Creates a new user in the specified organization. */
   createUser: SupportMethodResponse;
   /** Creates a group in the user's organization */
@@ -898,6 +900,10 @@ export type MutationcreateTagArgs = {
 export type MutationcreateTemplateRepliesReportTaskArgs = {
   petitionId: Scalars["GID"];
   timezone: Scalars["String"];
+};
+
+export type MutationcreateTemplateStatsReportTaskArgs = {
+  templateId: Scalars["GID"];
 };
 
 export type MutationcreateUserArgs = {
@@ -3318,7 +3324,7 @@ export type TagPagination = {
 
 export type Task = {
   id: Scalars["GID"];
-  output: Maybe<TemporaryFile>;
+  output: Maybe<Scalars["JSONObject"]>;
   progress: Maybe<Scalars["Int"]>;
   status: TaskStatus;
 };
@@ -3375,10 +3381,6 @@ export type TemplateUsedEvent = PetitionEvent & {
   id: Scalars["GID"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
-};
-
-export type TemporaryFile = {
-  filename: Scalars["String"];
 };
 
 export type Timestamps = {

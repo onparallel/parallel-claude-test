@@ -496,6 +496,8 @@ export interface Mutation {
   createTag: Tag;
   /** Creates a task for exporting a report grouping the replies of every petition coming from the same template */
   createTemplateRepliesReportTask: Task;
+  /** Creates a task for generating a JSON report of the template usage */
+  createTemplateStatsReportTask: Task;
   /** Creates a new user in the specified organization. */
   createUser: SupportMethodResponse;
   /** Creates a group in the user's organization */
@@ -926,6 +928,10 @@ export interface MutationcreateTagArgs {
 export interface MutationcreateTemplateRepliesReportTaskArgs {
   petitionId: Scalars["GID"];
   timezone: Scalars["String"];
+}
+
+export interface MutationcreateTemplateStatsReportTaskArgs {
+  templateId: Scalars["GID"];
 }
 
 export interface MutationcreateUserArgs {
@@ -3430,7 +3436,7 @@ export interface TagPagination {
 export interface Task {
   __typename?: "Task";
   id: Scalars["GID"];
-  output?: Maybe<TemporaryFile>;
+  output?: Maybe<Scalars["JSONObject"]>;
   progress?: Maybe<Scalars["Int"]>;
   status: TaskStatus;
 }
@@ -3488,11 +3494,6 @@ export interface TemplateUsedEvent extends PetitionEvent {
   id: Scalars["GID"];
   petition?: Maybe<Petition>;
   type: PetitionEventType;
-}
-
-export interface TemporaryFile {
-  __typename?: "TemporaryFile";
-  filename: Scalars["String"];
 }
 
 export interface Timestamps {
@@ -20687,7 +20688,6 @@ export type useBackgroundTask_TaskFragment = {
   __typename?: "Task";
   id: string;
   status: TaskStatus;
-  output?: { __typename?: "TemporaryFile"; filename: string } | null;
 };
 
 export type useBackgroundTask_createExportExcelTaskMutationVariables = Exact<{
@@ -20695,12 +20695,7 @@ export type useBackgroundTask_createExportExcelTaskMutationVariables = Exact<{
 }>;
 
 export type useBackgroundTask_createExportExcelTaskMutation = {
-  createTask: {
-    __typename?: "Task";
-    id: string;
-    status: TaskStatus;
-    output?: { __typename?: "TemporaryFile"; filename: string } | null;
-  };
+  createTask: { __typename?: "Task"; id: string; status: TaskStatus };
 };
 
 export type useBackgroundTask_createPrintPdfTaskMutationVariables = Exact<{
@@ -20708,12 +20703,7 @@ export type useBackgroundTask_createPrintPdfTaskMutationVariables = Exact<{
 }>;
 
 export type useBackgroundTask_createPrintPdfTaskMutation = {
-  createTask: {
-    __typename?: "Task";
-    id: string;
-    status: TaskStatus;
-    output?: { __typename?: "TemporaryFile"; filename: string } | null;
-  };
+  createTask: { __typename?: "Task"; id: string; status: TaskStatus };
 };
 
 export type useBackgroundTask_getTaskResultFileUrlMutationVariables = Exact<{
@@ -20727,12 +20717,7 @@ export type useBackgroundTask_taskQueryVariables = Exact<{
 }>;
 
 export type useBackgroundTask_taskQuery = {
-  task: {
-    __typename?: "Task";
-    id: string;
-    status: TaskStatus;
-    output?: { __typename?: "TemporaryFile"; filename: string } | null;
-  };
+  task: { __typename?: "Task"; id: string; status: TaskStatus };
 };
 
 export type useExportRepliesTask_createExportRepliesTaskMutationVariables = Exact<{
@@ -25271,9 +25256,6 @@ export const useBackgroundTask_TaskFragmentDoc = gql`
   fragment useBackgroundTask_Task on Task {
     id
     status
-    output {
-      filename
-    }
   }
 ` as unknown as DocumentNode<useBackgroundTask_TaskFragment, unknown>;
 export const PetitionTagListCellContent_tagsDocument = gql`

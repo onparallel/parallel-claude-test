@@ -294,13 +294,19 @@ export const SystemEventTypeValues = [
   "ORGANIZATION_LIMIT_REACHED",
 ] as SystemEventType[];
 
-export type TaskName = "PRINT_PDF" | "EXPORT_REPLIES" | "EXPORT_EXCEL" | "TEMPLATE_REPLIES_REPORT";
+export type TaskName =
+  | "PRINT_PDF"
+  | "EXPORT_REPLIES"
+  | "EXPORT_EXCEL"
+  | "TEMPLATE_REPLIES_REPORT"
+  | "TEMPLATE_STATS_REPORT";
 
 export const TaskNameValues = [
   "PRINT_PDF",
   "EXPORT_REPLIES",
   "EXPORT_EXCEL",
   "TEMPLATE_REPLIES_REPORT",
+  "TEMPLATE_STATS_REPORT",
 ] as TaskName[];
 
 export type TaskStatus = "ENQUEUED" | "PROCESSING" | "COMPLETED" | "FAILED";

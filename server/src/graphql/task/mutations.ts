@@ -7,7 +7,11 @@ import { isValidTimezone } from "../../util/validators";
 import { authenticateAnd } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { petitionIsNotAnonymized, userHasAccessToPetitions } from "../petition/authorizers";
+import {
+  petitionIsNotAnonymized,
+  petitionsAreOfTypeTemplate,
+  userHasAccessToPetitions,
+} from "../petition/authorizers";
 import { contextUserHasRole } from "../users/authorizers";
 import { tasksAreOfType, userHasAccessToTasks } from "./authorizers";
 
@@ -114,6 +118,30 @@ export const createTemplateRepliesReportTask = mutationField("createTemplateRepl
         input: {
           petition_id: args.petitionId,
           timezone: args.timezone,
+        },
+      },
+      `User:${ctx.user!.id}`
+    );
+  },
+});
+
+export const createTemplateStatsReportTask = mutationField("createTemplateStatsReportTask", {
+  description: "Creates a task for generating a JSON report of the template usage",
+  type: "Task",
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("templateId"),
+    petitionsAreOfTypeTemplate("templateId")
+  ),
+  args: {
+    templateId: nonNull(globalIdArg("Petition")),
+  },
+  resolve: async (_, args, ctx) => {
+    return await ctx.tasks.createTask(
+      {
+        name: "TEMPLATE_STATS_REPORT",
+        user_id: ctx.user!.id,
+        input: {
+          template_id: args.templateId,
         },
       },
       `User:${ctx.user!.id}`

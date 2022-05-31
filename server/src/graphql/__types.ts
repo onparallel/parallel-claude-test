@@ -615,7 +615,6 @@ export interface NexusGenObjects {
   TemplateDefaultUserGroupPermission: db.TemplateDefaultPermission;
   TemplateDefaultUserPermission: db.TemplateDefaultPermission;
   TemplateUsedEvent: events.TemplateUsedEvent;
-  TemporaryFile: db.TemporaryFile;
   User: db.User;
   UserAuthenticationToken: db.UserAuthenticationToken;
   UserGroup: db.UserGroup;
@@ -982,6 +981,7 @@ export interface NexusGenFieldTypes {
     createSignatureIntegration: NexusGenRootTypes["SignatureOrgIntegration"]; // SignatureOrgIntegration!
     createTag: NexusGenRootTypes["Tag"]; // Tag!
     createTemplateRepliesReportTask: NexusGenRootTypes["Task"]; // Task!
+    createTemplateStatsReportTask: NexusGenRootTypes["Task"]; // Task!
     createUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     deactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
@@ -1951,7 +1951,7 @@ export interface NexusGenFieldTypes {
   Task: {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
-    output: NexusGenRootTypes["TemporaryFile"] | null; // TemporaryFile
+    output: NexusGenScalars["JSONObject"] | null; // JSONObject
     progress: number | null; // Int
     status: NexusGenEnums["TaskStatus"]; // TaskStatus!
   };
@@ -1980,10 +1980,6 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
-  };
-  TemporaryFile: {
-    // field return type
-    filename: string; // String!
   };
   User: {
     // field return type
@@ -2481,6 +2477,7 @@ export interface NexusGenFieldTypeNames {
     createSignatureIntegration: "SignatureOrgIntegration";
     createTag: "Tag";
     createTemplateRepliesReportTask: "Task";
+    createTemplateStatsReportTask: "Task";
     createUser: "SupportMethodResponse";
     createUserGroup: "UserGroup";
     deactivateAccesses: "PetitionAccess";
@@ -3450,7 +3447,7 @@ export interface NexusGenFieldTypeNames {
   Task: {
     // field return type name
     id: "GID";
-    output: "TemporaryFile";
+    output: "JSONObject";
     progress: "Int";
     status: "TaskStatus";
   };
@@ -3479,10 +3476,6 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     petition: "Petition";
     type: "PetitionEventType";
-  };
-  TemporaryFile: {
-    // field return type name
-    filename: "String";
   };
   User: {
     // field return type name
@@ -3909,6 +3902,10 @@ export interface NexusGenArgTypes {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
       timezone: string; // String!
+    };
+    createTemplateStatsReportTask: {
+      // args
+      templateId: NexusGenScalars["GID"]; // GID!
     };
     createUser: {
       // args
