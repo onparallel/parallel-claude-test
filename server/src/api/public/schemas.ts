@@ -227,6 +227,10 @@ const _PetitionAccess = {
       format: "date-time",
       example: new Date(2020, 2, 15).toISOString(),
     },
+    recipientUrl: {
+      description: "URL of the recipient portal for this petition access",
+      type: "string",
+    },
   },
 } as const;
 

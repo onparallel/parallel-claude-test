@@ -1318,6 +1318,7 @@ export const sendPetition = mutationField("sendPetition", {
       );
     }
 
+    ctx.petitions.loadAccessesForPetition.dataloader.clear(args.petitionId);
     return results.map((r) => omit(r, ["messages"]));
   },
 });

@@ -130,6 +130,9 @@ export const PetitionFragment = gql`
     recipients: accesses @include(if: $includeRecipients) {
       ...PetitionAccess
     }
+    recipients: accesses @include(if: $includeRecipientUrl) {
+      recipientUrl
+    }
     fields @include(if: $includeFields) {
       ...PetitionFieldWithReplies
     }

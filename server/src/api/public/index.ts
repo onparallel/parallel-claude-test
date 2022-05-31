@@ -471,6 +471,7 @@ api
           $includeRecipients: Boolean!
           $includeFields: Boolean!
           $includeTags: Boolean!
+          $includeRecipientUrl: Boolean!
         ) {
           petitions(
             offset: $offset
@@ -492,6 +493,7 @@ api
         includeFields: query.include?.includes("fields") ?? false,
         includeRecipients: query.include?.includes("recipients") ?? false,
         includeTags: query.include?.includes("tags") ?? false,
+        includeRecipientUrl: false,
       });
       const { items, totalCount } = result.petitions;
       assertType<PetitionFragmentType[]>(items);
@@ -518,6 +520,7 @@ api
           $includeRecipients: Boolean!
           $includeFields: Boolean!
           $includeTags: Boolean!
+          $includeRecipientUrl: Boolean!
         ) {
           createPetition(name: $name, petitionId: $templateId) {
             ...Petition
@@ -530,6 +533,7 @@ api
         includeFields: query.include?.includes("fields") ?? false,
         includeRecipients: query.include?.includes("recipients") ?? false,
         includeTags: query.include?.includes("tags") ?? false,
+        includeRecipientUrl: false,
       });
       assert("id" in result.createPetition);
       return Created(mapPetition(result.createPetition));
@@ -558,6 +562,7 @@ api
           $includeRecipients: Boolean!
           $includeFields: Boolean!
           $includeTags: Boolean!
+          $includeRecipientUrl: Boolean!
         ) {
           petition(id: $petitionId) {
             ...Petition
@@ -570,6 +575,7 @@ api
         includeFields: query.include?.includes("fields") ?? false,
         includeRecipients: query.include?.includes("recipients") ?? false,
         includeTags: query.include?.includes("tags") ?? false,
+        includeRecipientUrl: false,
       });
       assert("id" in result.petition!);
       return Ok(mapPetition(result.petition!));
@@ -597,6 +603,7 @@ api
           $includeRecipients: Boolean!
           $includeFields: Boolean!
           $includeTags: Boolean!
+          $includeRecipientUrl: Boolean!
         ) {
           updatePetition(petitionId: $petitionId, data: $data) {
             ...Petition
@@ -610,6 +617,7 @@ api
         includeFields: query.include?.includes("fields") ?? false,
         includeRecipients: query.include?.includes("recipients") ?? false,
         includeTags: query.include?.includes("tags") ?? false,
+        includeRecipientUrl: false,
       });
       assert("id" in result.updatePetition!);
       return Ok(mapPetition(result.updatePetition!));
@@ -951,7 +959,12 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
     `,
     body: JsonBody(SendPetition),
     query: {
-      ...petitionIncludeParam,
+      include: enumParam({
+        description: "Include optional fields in the response",
+        array: true,
+        required: false,
+        values: ["recipients", "fields", "tags", "recipients.recipientUrl"],
+      }),
     },
     responses: {
       200: SuccessResponse(Petition),
@@ -1049,6 +1062,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
           $includeRecipients: Boolean!
           $includeFields: Boolean!
           $includeTags: Boolean!
+          $includeRecipientUrl: Boolean!
         ) {
           sendPetition(
             petitionId: $petitionId
@@ -1094,6 +1108,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
         includeFields: query.include?.includes("fields") ?? false,
         includeRecipients: query.include?.includes("recipients") ?? false,
         includeTags: query.include?.includes("tags") ?? false,
+        includeRecipientUrl: query.include?.includes("recipients.recipientUrl") ?? false,
       });
 
       assert(result.sendPetition[0].petition !== null);
@@ -1137,6 +1152,7 @@ api.path("/petitions/:petitionId/recipients", { params: { petitionId } }).get(
     `;
     const result = await client.request(GetPetitionRecipients_petitionAccessesDocument, {
       petitionId: params.petitionId,
+      includeRecipientUrl: false,
     });
     assert("accesses" in result.petition!);
     return Ok(result.petition!.accesses);
@@ -1627,6 +1643,7 @@ api
         includeFields: true,
         includeRecipients: false,
         includeTags: false,
+        includeRecipientUrl: false,
       });
 
       return Ok(mapPetition(res.bulkCreatePetitionReplies));

@@ -203,6 +203,7 @@ export type FeatureFlag =
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "INTERNAL_COMMENTS"
   | "ON_BEHALF_OF"
+  | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
   | "PETITION_PDF_EXPORT"
   | "PETITION_SIGNATURE"
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
@@ -1760,6 +1761,7 @@ export type PetitionAccess = Timestamps & {
   nextReminderAt: Maybe<Scalars["DateTime"]>;
   /** The petition for this message access. */
   petition: Maybe<Petition>;
+  recipientUrl: Scalars["String"];
   /** Number of reminders sent. */
   reminderCount: Scalars["Int"];
   reminders: Array<PetitionReminder>;
@@ -3638,6 +3640,7 @@ export type PetitionFragment = {
   fromTemplateId: string | null;
   customProperties: { [key: string]: any };
   recipients: Array<{
+    recipientUrl: string;
     id: string;
     status: PetitionAccessStatus;
     reminderCount: number;
@@ -3790,6 +3793,7 @@ export type GetPetitions_petitionsQueryVariables = Exact<{
   includeRecipients: Scalars["Boolean"];
   includeFields: Scalars["Boolean"];
   includeTags: Scalars["Boolean"];
+  includeRecipientUrl: Scalars["Boolean"];
 }>;
 
 export type GetPetitions_petitionsQuery = {
@@ -3806,6 +3810,7 @@ export type GetPetitions_petitionsQuery = {
           fromTemplateId: string | null;
           customProperties: { [key: string]: any };
           recipients: Array<{
+            recipientUrl: string;
             id: string;
             status: PetitionAccessStatus;
             reminderCount: number;
@@ -3860,6 +3865,7 @@ export type CreatePetition_petitionMutationVariables = Exact<{
   includeRecipients: Scalars["Boolean"];
   includeFields: Scalars["Boolean"];
   includeTags: Scalars["Boolean"];
+  includeRecipientUrl: Scalars["Boolean"];
 }>;
 
 export type CreatePetition_petitionMutation = {
@@ -3874,6 +3880,7 @@ export type CreatePetition_petitionMutation = {
         fromTemplateId: string | null;
         customProperties: { [key: string]: any };
         recipients: Array<{
+          recipientUrl: string;
           id: string;
           status: PetitionAccessStatus;
           reminderCount: number;
@@ -3925,6 +3932,7 @@ export type GetPetition_petitionQueryVariables = Exact<{
   includeRecipients: Scalars["Boolean"];
   includeFields: Scalars["Boolean"];
   includeTags: Scalars["Boolean"];
+  includeRecipientUrl: Scalars["Boolean"];
 }>;
 
 export type GetPetition_petitionQuery = {
@@ -3939,6 +3947,7 @@ export type GetPetition_petitionQuery = {
         fromTemplateId: string | null;
         customProperties: { [key: string]: any };
         recipients: Array<{
+          recipientUrl: string;
           id: string;
           status: PetitionAccessStatus;
           reminderCount: number;
@@ -3992,6 +4001,7 @@ export type UpdatePetition_updatePetitionMutationVariables = Exact<{
   includeRecipients: Scalars["Boolean"];
   includeFields: Scalars["Boolean"];
   includeTags: Scalars["Boolean"];
+  includeRecipientUrl: Scalars["Boolean"];
 }>;
 
 export type UpdatePetition_updatePetitionMutation = {
@@ -4006,6 +4016,7 @@ export type UpdatePetition_updatePetitionMutation = {
         fromTemplateId: string | null;
         customProperties: { [key: string]: any };
         recipients: Array<{
+          recipientUrl: string;
           id: string;
           status: PetitionAccessStatus;
           reminderCount: number;
@@ -4134,6 +4145,7 @@ export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
   includeRecipients: Scalars["Boolean"];
   includeFields: Scalars["Boolean"];
   includeTags: Scalars["Boolean"];
+  includeRecipientUrl: Scalars["Boolean"];
 }>;
 
 export type CreatePetitionRecipients_sendPetitionMutation = {
@@ -4149,6 +4161,7 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
       fromTemplateId: string | null;
       customProperties: { [key: string]: any };
       recipients: Array<{
+        recipientUrl: string;
         id: string;
         status: PetitionAccessStatus;
         reminderCount: number;
@@ -4197,6 +4210,7 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
 
 export type GetPetitionRecipients_petitionAccessesQueryVariables = Exact<{
   petitionId: Scalars["GID"];
+  includeRecipientUrl: Scalars["Boolean"];
 }>;
 
 export type GetPetitionRecipients_petitionAccessesQuery = {
@@ -5183,6 +5197,7 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutationVariables = Exact<{
   includeFields: Scalars["Boolean"];
   includeTags: Scalars["Boolean"];
   includeRecipients: Scalars["Boolean"];
+  includeRecipientUrl: Scalars["Boolean"];
 }>;
 
 export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
@@ -5196,6 +5211,7 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
     fromTemplateId: string | null;
     customProperties: { [key: string]: any };
     recipients: Array<{
+      recipientUrl: string;
       id: string;
       status: PetitionAccessStatus;
       reminderCount: number;
@@ -5413,6 +5429,9 @@ export const PetitionFragmentDoc = gql`
     recipients: accesses @include(if: $includeRecipients) {
       ...PetitionAccess
     }
+    recipients: accesses @include(if: $includeRecipientUrl) {
+      recipientUrl
+    }
     fields @include(if: $includeFields) {
       ...PetitionFieldWithReplies
     }
@@ -5545,6 +5564,7 @@ export const GetPetitions_petitionsDocument = gql`
     $includeRecipients: Boolean!
     $includeFields: Boolean!
     $includeTags: Boolean!
+    $includeRecipientUrl: Boolean!
   ) {
     petitions(
       offset: $offset
@@ -5567,6 +5587,7 @@ export const CreatePetition_petitionDocument = gql`
     $includeRecipients: Boolean!
     $includeFields: Boolean!
     $includeTags: Boolean!
+    $includeRecipientUrl: Boolean!
   ) {
     createPetition(name: $name, petitionId: $templateId) {
       ...Petition
@@ -5583,6 +5604,7 @@ export const GetPetition_petitionDocument = gql`
     $includeRecipients: Boolean!
     $includeFields: Boolean!
     $includeTags: Boolean!
+    $includeRecipientUrl: Boolean!
   ) {
     petition(id: $petitionId) {
       ...Petition
@@ -5597,6 +5619,7 @@ export const UpdatePetition_updatePetitionDocument = gql`
     $includeRecipients: Boolean!
     $includeFields: Boolean!
     $includeTags: Boolean!
+    $includeRecipientUrl: Boolean!
   ) {
     updatePetition(petitionId: $petitionId, data: $data) {
       ...Petition
@@ -5707,6 +5730,7 @@ export const CreatePetitionRecipients_sendPetitionDocument = gql`
     $includeRecipients: Boolean!
     $includeFields: Boolean!
     $includeTags: Boolean!
+    $includeRecipientUrl: Boolean!
   ) {
     sendPetition(
       petitionId: $petitionId
@@ -5728,7 +5752,7 @@ export const CreatePetitionRecipients_sendPetitionDocument = gql`
   CreatePetitionRecipients_sendPetitionMutationVariables
 >;
 export const GetPetitionRecipients_petitionAccessesDocument = gql`
-  query GetPetitionRecipients_petitionAccesses($petitionId: GID!) {
+  query GetPetitionRecipients_petitionAccesses($petitionId: GID!, $includeRecipientUrl: Boolean!) {
     petition(id: $petitionId) {
       ... on Petition {
         accesses {
@@ -6263,6 +6287,7 @@ export const SubmitReplies_bulkCreatePetitionRepliesDocument = gql`
     $includeFields: Boolean!
     $includeTags: Boolean!
     $includeRecipients: Boolean!
+    $includeRecipientUrl: Boolean!
   ) {
     bulkCreatePetitionReplies(petitionId: $petitionId, replies: $replies) {
       ...Petition

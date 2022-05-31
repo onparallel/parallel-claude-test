@@ -219,6 +219,7 @@ export type FeatureFlag =
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "INTERNAL_COMMENTS"
   | "ON_BEHALF_OF"
+  | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
   | "PETITION_PDF_EXPORT"
   | "PETITION_SIGNATURE"
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
@@ -427,6 +428,8 @@ export interface Mutation {
   assignPetitionToUser: SupportMethodResponse;
   /** Load contacts from an excel file, creating the ones not found on database */
   bulkCreateContacts: Array<Contact>;
+  /** Submits multiple replies on a petition at once given a JSON input where the keys are field aliases and values are the replie(s) for that field. */
+  bulkCreatePetitionReplies: Petition;
   /** Cancels a scheduled petition message. */
   cancelScheduledMessage?: Maybe<PetitionMessage>;
   cancelSignatureRequest: PetitionSignatureRequest;
@@ -738,6 +741,11 @@ export interface MutationassignPetitionToUserArgs {
 
 export interface MutationbulkCreateContactsArgs {
   file: Scalars["Upload"];
+}
+
+export interface MutationbulkCreatePetitionRepliesArgs {
+  petitionId: Scalars["GID"];
+  replies: Scalars["JSONObject"];
 }
 
 export interface MutationcancelScheduledMessageArgs {
@@ -1796,6 +1804,7 @@ export interface PetitionAccess extends Timestamps {
   nextReminderAt?: Maybe<Scalars["DateTime"]>;
   /** The petition for this message access. */
   petition?: Maybe<Petition>;
+  recipientUrl: Scalars["String"];
   /** Number of reminders sent. */
   reminderCount: Scalars["Int"];
   reminders: Array<PetitionReminder>;

@@ -1176,6 +1176,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     nextReminderAt: NexusGenScalars["DateTime"] | null; // DateTime
     petition: NexusGenRootTypes["Petition"] | null; // Petition
+    recipientUrl: string; // String!
     reminderCount: number; // Int!
     reminders: NexusGenRootTypes["PetitionReminder"][]; // [PetitionReminder!]!
     remindersActive: boolean; // Boolean!
@@ -2647,6 +2648,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     nextReminderAt: "DateTime";
     petition: "Petition";
+    recipientUrl: "String";
     reminderCount: "Int";
     reminders: "PetitionReminder";
     remindersActive: "Boolean";

@@ -19,9 +19,10 @@ export type FeatureFlagName =
   | "ON_BEHALF_OF"
   | "GHOST_LOGIN"
   | "ES_TAX_DOCUMENTS_FIELD"
-  | "REMOVE_PARALLEL_BRANDING"
   | "CUSTOM_HOST_UI"
-  | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI";
+  | "REMOVE_PARALLEL_BRANDING"
+  | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
+  | "PETITION_ACCESS_RECIPIENT_URL_FIELD";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -35,9 +36,10 @@ export const FeatureFlagNameValues = [
   "ON_BEHALF_OF",
   "GHOST_LOGIN",
   "ES_TAX_DOCUMENTS_FIELD",
-  "REMOVE_PARALLEL_BRANDING",
   "CUSTOM_HOST_UI",
+  "REMOVE_PARALLEL_BRANDING",
   "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI",
+  "PETITION_ACCESS_RECIPIENT_URL_FIELD",
 ] as FeatureFlagName[];
 
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
@@ -744,8 +746,8 @@ export interface Petition {
   is_completing_message_enabled: boolean; // bool
   completing_message_subject: Maybe<string>; // text
   completing_message_body: Maybe<string>; // text
-  anonymized_at: Maybe<Date>; // timestamptz
   metadata: any; // jsonb
+  anonymized_at: Maybe<Date>; // timestamptz
 }
 
 export type CreatePetition = PartialProps<
@@ -782,8 +784,8 @@ export type CreatePetition = PartialProps<
   | "is_completing_message_enabled"
   | "completing_message_subject"
   | "completing_message_body"
-  | "anonymized_at"
   | "metadata"
+  | "anonymized_at"
 >;
 
 export interface PetitionAccess {

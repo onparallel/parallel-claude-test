@@ -6,6 +6,7 @@ import { toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { safeJsonParse } from "../../../util/safeJsonParse";
 import { toHtml, toPlainText } from "../../../util/slate";
+import { userHasFeatureFlag } from "../authorizers";
 
 export const PetitionLocale = enumType({
   name: "PetitionLocale",
@@ -265,7 +266,7 @@ export const Petition = objectType({
       type: "PetitionAccess",
       description: "The accesses for this petition",
       resolve: async (root, _, ctx) => {
-        return ctx.petitions.loadAccessesForPetition(root.id);
+        return await ctx.petitions.loadAccessesForPetition(root.id);
       },
     });
     t.nullable.field("currentSignatureRequest", {
@@ -706,6 +707,13 @@ export const PetitionAccess = objectType({
     t.nonNull.list.nonNull.field("reminders", {
       type: "PetitionReminder",
       resolve: async (root, _, ctx) => ctx.petitions.loadRemindersByAccessId(root.id),
+    });
+    t.nonNull.string("recipientUrl", {
+      authorize: userHasFeatureFlag("PETITION_ACCESS_RECIPIENT_URL_FIELD"),
+      resolve: async (root, _, ctx) => {
+        const { locale } = (await ctx.petitions.loadPetition(root.petition_id))!;
+        return `${ctx.config.misc.parallelUrl}/${locale}/petition/${root.keycode}`;
+      },
     });
   },
 });

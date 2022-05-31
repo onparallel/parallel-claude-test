@@ -1054,6 +1054,12 @@ export const schemaTypes: IntrospectionType[] = [
       },
       { name: "ON_BEHALF_OF", description: null, isDeprecated: false, deprecationReason: null },
       {
+        name: "PETITION_ACCESS_RECIPIENT_URL_FIELD",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
+      {
         name: "PETITION_PDF_EXPORT",
         description: null,
         isDeprecated: false,

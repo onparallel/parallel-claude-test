@@ -203,6 +203,7 @@ export type FeatureFlag =
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "INTERNAL_COMMENTS"
   | "ON_BEHALF_OF"
+  | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
   | "PETITION_PDF_EXPORT"
   | "PETITION_SIGNATURE"
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
@@ -1760,6 +1761,7 @@ export type PetitionAccess = Timestamps & {
   nextReminderAt: Maybe<Scalars["DateTime"]>;
   /** The petition for this message access. */
   petition: Maybe<Petition>;
+  recipientUrl: Scalars["String"];
   /** Number of reminders sent. */
   reminderCount: Scalars["Int"];
   reminders: Array<PetitionReminder>;
