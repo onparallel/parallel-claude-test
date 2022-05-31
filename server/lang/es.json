@@ -206,7 +206,7 @@
   },
   {
     "term": "export-template-report.file-name",
-    "definition": "reporte-plantilla-{id}.xlsx",
+    "definition": "informe-plantilla-{id}.xlsx",
     "context": "template-report-{id}.xlsx"
   },
   {

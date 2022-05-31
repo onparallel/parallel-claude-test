@@ -100,7 +100,7 @@ export function TaskProgressDialog({
       body={
         <Progress
           size="md"
-          hasStripe
+          hasStripe={task?.status === "PROCESSING"}
           isAnimated={isDefined(task) && (task.progress ?? 0) < 100}
           value={task?.progress ?? 0}
           colorScheme="green"
