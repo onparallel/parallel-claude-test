@@ -1210,6 +1210,31 @@
     "context": "Int"
   },
   {
+    "term": "component.loading-dynamic-text.calculating-average-times",
+    "definition": "Calculando tiempos medios con la calculadora...",
+    "context": "Calculating average times with the calculator..."
+  },
+  {
+    "term": "component.loading-dynamic-text.checking-all-commas",
+    "definition": "Revisando todas las comas y puntos...",
+    "context": "Checking all commas and periods..."
+  },
+  {
+    "term": "component.loading-dynamic-text.dusting-off",
+    "definition": "Desempolvando peticiones cerradas...",
+    "context": "Dusting off closed petitions..."
+  },
+  {
+    "term": "component.loading-dynamic-text.giving-color",
+    "definition": "Dándole color a los gráficos...",
+    "context": "Giving color to the charts..."
+  },
+  {
+    "term": "component.loading-dynamic-text.searching-petitions",
+    "definition": "Buscando peticiones en cada rincón...",
+    "context": "Searching for petitions in every corner..."
+  },
+  {
     "term": "component.message-closing-email-editor.body-label",
     "definition": "El asunto de este correo será el mismo que el del mensaje de la petición.",
     "context": "The subject of this email will be the same as the subject of the petition message."

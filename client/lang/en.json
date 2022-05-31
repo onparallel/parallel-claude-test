@@ -1210,6 +1210,31 @@
     "context": "Int"
   },
   {
+    "term": "component.loading-dynamic-text.calculating-average-times",
+    "definition": "Calculating average times with the calculator...",
+    "context": "Calculating average times with the calculator..."
+  },
+  {
+    "term": "component.loading-dynamic-text.checking-all-commas",
+    "definition": "Checking all commas and periods...",
+    "context": "Checking all commas and periods..."
+  },
+  {
+    "term": "component.loading-dynamic-text.dusting-off",
+    "definition": "Dusting off closed petitions...",
+    "context": "Dusting off closed petitions..."
+  },
+  {
+    "term": "component.loading-dynamic-text.giving-color",
+    "definition": "Giving color to the charts...",
+    "context": "Giving color to the charts..."
+  },
+  {
+    "term": "component.loading-dynamic-text.searching-petitions",
+    "definition": "Searching for petitions in every corner...",
+    "context": "Searching for petitions in every corner..."
+  },
+  {
     "term": "component.message-closing-email-editor.body-label",
     "definition": "The subject of this email will be the same as the subject of the petition message.",
     "context": "The subject of this email will be the same as the subject of the petition message."

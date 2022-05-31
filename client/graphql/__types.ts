@@ -19227,6 +19227,62 @@ export type NewPetition_templateQuery = {
     | null;
 };
 
+export type Reports_PetitionTemplateFragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  name?: string | null;
+};
+
+export type Reports_templatesQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+  isPublic: Scalars["Boolean"];
+}>;
+
+export type Reports_templatesQuery = {
+  templates: {
+    __typename?: "PetitionTemplatePagination";
+    totalCount: number;
+    items: Array<{ __typename?: "PetitionTemplate"; id: string; name?: string | null }>;
+  };
+};
+
+export type Reports_userQueryVariables = Exact<{ [key: string]: never }>;
+
+export type Reports_userQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      name: string;
+      iconUrl92?: string | null;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
+    };
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
+
 export type Account_QueryFragment = {
   me: {
     __typename?: "User";
@@ -24653,6 +24709,12 @@ export const NewPetition_PetitionTemplateFragmentDoc = gql`
   ${TemplateCard_PetitionTemplateFragmentDoc}
   ${PublicTemplateCard_PetitionTemplateFragmentDoc}
 ` as unknown as DocumentNode<NewPetition_PetitionTemplateFragment, unknown>;
+export const Reports_PetitionTemplateFragmentDoc = gql`
+  fragment Reports_PetitionTemplate on PetitionTemplate {
+    id
+    name
+  }
+` as unknown as DocumentNode<Reports_PetitionTemplateFragment, unknown>;
 export const SettingsLayout_QueryFragmentDoc = gql`
   fragment SettingsLayout_Query on Query {
     ...AppLayout_Query
@@ -27807,6 +27869,23 @@ export const NewPetition_templateDocument = gql`
   }
   ${TemplateDetailsModal_PetitionTemplateFragmentDoc}
 ` as unknown as DocumentNode<NewPetition_templateQuery, NewPetition_templateQueryVariables>;
+export const Reports_templatesDocument = gql`
+  query Reports_templates($offset: Int!, $limit: Int!, $isPublic: Boolean!) {
+    templates(offset: $offset, limit: $limit, isPublic: $isPublic) {
+      items {
+        ...Reports_PetitionTemplate
+      }
+      totalCount
+    }
+  }
+  ${Reports_PetitionTemplateFragmentDoc}
+` as unknown as DocumentNode<Reports_templatesQuery, Reports_templatesQueryVariables>;
+export const Reports_userDocument = gql`
+  query Reports_user {
+    ...AppLayout_Query
+  }
+  ${AppLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<Reports_userQuery, Reports_userQueryVariables>;
 export const Account_updateAccountDocument = gql`
   mutation Account_updateAccount($firstName: String, $lastName: String) {
     updateUser(firstName: $firstName, lastName: $lastName) {

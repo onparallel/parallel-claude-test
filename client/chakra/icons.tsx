@@ -1933,14 +1933,14 @@ export const AppWindowIcon = createIcon({
     <g fill="none">
       <path
         d="M3 3H15C15.825 3 16.5 3.675 16.5 4.5V13.5C16.5 14.325 15.825 15 15 15H3C2.175 15 1.5 14.325 1.5 13.5V4.5C1.5 3.675 2.175 3 3 3Z"
-        stroke="#1A202C"
+        stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M2.7 3.375H15.3C16.1663 3.375 16.875 3.56484 16.875 3.79688V6.32812C16.875 6.56016 16.1663 6.75 15.3 6.75H2.7C1.83375 6.75 1.125 6.56016 1.125 6.32812V3.79688C1.125 3.56484 1.83375 3.375 2.7 3.375Z"
-        fill="#1A202C"
+        fill="currentColor"
       />
       <circle cx="13.5" cy="4.5" r="1.125" fill="white" />
     </g>
@@ -1965,14 +1965,17 @@ export const TableIcon = createIcon({
   displayName: "TableIcon",
   viewBox: "0 0 22 18",
   path: (
-    <g strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none">
-      <path
-        d="M3 1H19C20.1 1 21 1.9 21 3V15C21 16.1 20.1 17 19 17H3C1.9 17 1 16.1 1 15V3C1 1.9 1.9 1 3 1Z"
-        stroke="#1A202C"
-      />
-      <path d="M7.66675 17L7.66675 2.33334" stroke="#1A202C" />
-      <path d="M1.66658 6.33334L20.3333 6.33334" stroke="#1A202C" />
-      <path d="M1.66658 11.6667H20.3333" stroke="#1A202C" />
+    <g
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="M3 1H19C20.1 1 21 1.9 21 3V15C21 16.1 20.1 17 19 17H3C1.9 17 1 16.1 1 15V3C1 1.9 1.9 1 3 1Z" />
+      <path d="M7.66675 17L7.66675 2.33334" />
+      <path d="M1.66658 6.33334L20.3333 6.33334" />
+      <path d="M1.66658 11.6667H20.3333" />
     </g>
   ),
 });

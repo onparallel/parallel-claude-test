@@ -97,7 +97,9 @@ export const AppLayoutNavbar = Object.assign(
           {
             section: "reports",
             icon: <ReportsIcon />,
-            isAvailable: false,
+            href: "/app/reports",
+            isActive: pathname.startsWith("/app/reports"),
+            isAvailable: true,
             text: intl.formatMessage({
               id: "component.app-layout-navbar.reports-link",
               defaultMessage: "Reports",
