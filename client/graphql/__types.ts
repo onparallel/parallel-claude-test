@@ -466,8 +466,6 @@ export interface Mutation {
   createExportExcelTask: Task;
   /** Creates a task for exporting a ZIP file with petition replies and sends it to the queue */
   createExportRepliesTask: Task;
-  /** Creates a task for exporting a report grouping the replies of every petition coming from the same template */
-  createExportReportTask: Task;
   /** Creates a reply to a file upload field. */
   createFileUploadReply: FileUploadReplyResponse;
   /** Notifies the backend that the upload is complete. */
@@ -496,6 +494,8 @@ export interface Mutation {
   createSignatureIntegration: SignatureOrgIntegration;
   /** Creates a tag in the user's organization */
   createTag: Tag;
+  /** Creates a task for exporting a report grouping the replies of every petition coming from the same template */
+  createTemplateRepliesReportTask: Task;
   /** Creates a new user in the specified organization. */
   createUser: SupportMethodResponse;
   /** Creates a group in the user's organization */
@@ -830,11 +830,6 @@ export interface MutationcreateExportRepliesTaskArgs {
   petitionId: Scalars["GID"];
 }
 
-export interface MutationcreateExportReportTaskArgs {
-  petitionId: Scalars["GID"];
-  timezone: Scalars["String"];
-}
-
 export interface MutationcreateFileUploadReplyArgs {
   fieldId: Scalars["GID"];
   file: FileUploadInput;
@@ -926,6 +921,11 @@ export interface MutationcreateSignatureIntegrationArgs {
 export interface MutationcreateTagArgs {
   color: Scalars["String"];
   name: Scalars["String"];
+}
+
+export interface MutationcreateTemplateRepliesReportTaskArgs {
+  petitionId: Scalars["GID"];
+  timezone: Scalars["String"];
 }
 
 export interface MutationcreateUserArgs {
@@ -21174,6 +21174,36 @@ export type useSearchContactsByEmail_contactsByEmailQuery = {
 
 export type useSettingsSections_UserFragment = { __typename?: "User"; hasDeveloperAccess: boolean };
 
+export type useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  timezone: Scalars["String"];
+}>;
+
+export type useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutation = {
+  createTemplateRepliesReportTask: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    progress?: number | null;
+  };
+};
+
+export type useTemplateRepliesReportTask_getTaskResultFileUrlMutationVariables = Exact<{
+  taskId: Scalars["GID"];
+}>;
+
+export type useTemplateRepliesReportTask_getTaskResultFileUrlMutation = {
+  getTaskResultFileUrl: string;
+};
+
+export type useTemplateRepliesReportTask_taskQueryVariables = Exact<{
+  id: Scalars["GID"];
+}>;
+
+export type useTemplateRepliesReportTask_taskQuery = {
+  task: { __typename?: "Task"; id: string; status: TaskStatus; progress?: number | null };
+};
+
 export type validatePetitionFields_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -28605,4 +28635,37 @@ export const useSearchContactsByEmail_contactsByEmailDocument = gql`
 ` as unknown as DocumentNode<
   useSearchContactsByEmail_contactsByEmailQuery,
   useSearchContactsByEmail_contactsByEmailQueryVariables
+>;
+export const useTemplateRepliesReportTask_createTemplateRepliesReportTaskDocument = gql`
+  mutation useTemplateRepliesReportTask_createTemplateRepliesReportTask(
+    $petitionId: GID!
+    $timezone: String!
+  ) {
+    createTemplateRepliesReportTask(petitionId: $petitionId, timezone: $timezone) {
+      ...TaskProgressDialog_Task
+    }
+  }
+  ${TaskProgressDialog_TaskFragmentDoc}
+` as unknown as DocumentNode<
+  useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutation,
+  useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutationVariables
+>;
+export const useTemplateRepliesReportTask_getTaskResultFileUrlDocument = gql`
+  mutation useTemplateRepliesReportTask_getTaskResultFileUrl($taskId: GID!) {
+    getTaskResultFileUrl(taskId: $taskId, preview: true)
+  }
+` as unknown as DocumentNode<
+  useTemplateRepliesReportTask_getTaskResultFileUrlMutation,
+  useTemplateRepliesReportTask_getTaskResultFileUrlMutationVariables
+>;
+export const useTemplateRepliesReportTask_taskDocument = gql`
+  query useTemplateRepliesReportTask_task($id: GID!) {
+    task(id: $id) {
+      ...TaskProgressDialog_Task
+    }
+  }
+  ${TaskProgressDialog_TaskFragmentDoc}
+` as unknown as DocumentNode<
+  useTemplateRepliesReportTask_taskQuery,
+  useTemplateRepliesReportTask_taskQueryVariables
 >;

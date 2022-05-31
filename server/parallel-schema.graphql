@@ -620,11 +620,6 @@ type Mutation {
   createExportRepliesTask(pattern: String, petitionId: GID!): Task!
 
   """
-  Creates a task for exporting a report grouping the replies of every petition coming from the same template
-  """
-  createExportReportTask(petitionId: GID!, timezone: String!): Task!
-
-  """
   Creates a reply to a file upload field.
   """
   createFileUploadReply(
@@ -767,6 +762,11 @@ type Mutation {
   Creates a tag in the user's organization
   """
   createTag(color: String!, name: String!): Tag!
+
+  """
+  Creates a task for exporting a report grouping the replies of every petition coming from the same template
+  """
+  createTemplateRepliesReportTask(petitionId: GID!, timezone: String!): Task!
 
   """
   Creates a new user in the specified organization.

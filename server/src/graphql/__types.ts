@@ -967,7 +967,6 @@ export interface NexusGenFieldTypes {
     createEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     createExportExcelTask: NexusGenRootTypes["Task"]; // Task!
     createExportRepliesTask: NexusGenRootTypes["Task"]; // Task!
-    createExportReportTask: NexusGenRootTypes["Task"]; // Task!
     createFileUploadReply: NexusGenRootTypes["FileUploadReplyResponse"]; // FileUploadReplyResponse!
     createFileUploadReplyComplete: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createOrganization: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -982,6 +981,7 @@ export interface NexusGenFieldTypes {
     createPublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
     createSignatureIntegration: NexusGenRootTypes["SignatureOrgIntegration"]; // SignatureOrgIntegration!
     createTag: NexusGenRootTypes["Tag"]; // Tag!
+    createTemplateRepliesReportTask: NexusGenRootTypes["Task"]; // Task!
     createUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     deactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
@@ -2466,7 +2466,6 @@ export interface NexusGenFieldTypeNames {
     createEventSubscription: "PetitionEventSubscription";
     createExportExcelTask: "Task";
     createExportRepliesTask: "Task";
-    createExportReportTask: "Task";
     createFileUploadReply: "FileUploadReplyResponse";
     createFileUploadReplyComplete: "PetitionFieldReply";
     createOrganization: "SupportMethodResponse";
@@ -2481,6 +2480,7 @@ export interface NexusGenFieldTypeNames {
     createPublicPetitionLink: "PublicPetitionLink";
     createSignatureIntegration: "SignatureOrgIntegration";
     createTag: "Tag";
+    createTemplateRepliesReportTask: "Task";
     createUser: "SupportMethodResponse";
     createUserGroup: "UserGroup";
     deactivateAccesses: "PetitionAccess";
@@ -3812,11 +3812,6 @@ export interface NexusGenArgTypes {
       pattern?: string | null; // String
       petitionId: NexusGenScalars["GID"]; // GID!
     };
-    createExportReportTask: {
-      // args
-      petitionId: NexusGenScalars["GID"]; // GID!
-      timezone: string; // String!
-    };
     createFileUploadReply: {
       // args
       fieldId: NexusGenScalars["GID"]; // GID!
@@ -3909,6 +3904,11 @@ export interface NexusGenArgTypes {
       // args
       color: string; // String!
       name: string; // String!
+    };
+    createTemplateRepliesReportTask: {
+      // args
+      petitionId: NexusGenScalars["GID"]; // GID!
+      timezone: string; // String!
     };
     createUser: {
       // args

@@ -433,8 +433,6 @@ export type Mutation = {
   createExportExcelTask: Task;
   /** Creates a task for exporting a ZIP file with petition replies and sends it to the queue */
   createExportRepliesTask: Task;
-  /** Creates a task for exporting a report grouping the replies of every petition coming from the same template */
-  createExportReportTask: Task;
   /** Creates a reply to a file upload field. */
   createFileUploadReply: FileUploadReplyResponse;
   /** Notifies the backend that the upload is complete. */
@@ -463,6 +461,8 @@ export type Mutation = {
   createSignatureIntegration: SignatureOrgIntegration;
   /** Creates a tag in the user's organization */
   createTag: Tag;
+  /** Creates a task for exporting a report grouping the replies of every petition coming from the same template */
+  createTemplateRepliesReportTask: Task;
   /** Creates a new user in the specified organization. */
   createUser: SupportMethodResponse;
   /** Creates a group in the user's organization */
@@ -893,6 +893,11 @@ export type MutationcreateSignatureIntegrationArgs = {
 export type MutationcreateTagArgs = {
   color: Scalars["String"];
   name: Scalars["String"];
+};
+
+export type MutationcreateTemplateRepliesReportTaskArgs = {
+  petitionId: Scalars["GID"];
+  timezone: Scalars["String"];
 };
 
 export type MutationcreateUserArgs = {

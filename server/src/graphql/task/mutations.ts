@@ -87,7 +87,7 @@ export const createExportExcelTask = mutationField("createExportExcelTask", {
   },
 });
 
-export const createExportReportTask = mutationField("createExportReportTask", {
+export const createTemplateRepliesReportTask = mutationField("createTemplateRepliesReportTask", {
   description:
     "Creates a task for exporting a report grouping the replies of every petition coming from the same template",
   type: "Task",

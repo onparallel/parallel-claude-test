@@ -34,7 +34,7 @@ import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import { isAtLeast } from "@parallel/utils/roles";
-import { useExportReportTask } from "@parallel/utils/useExportReportTask";
+import { useTemplateRepliesReportTask } from "@parallel/utils/useTemplateRepliesReportTask";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { usePrintPdfTask } from "@parallel/utils/usePrintPdfTask";
 import { useRouter } from "next/router";
@@ -153,7 +153,7 @@ export const PetitionTemplateHeader = Object.assign(
 
     const handlePrintPdfTask = usePrintPdfTask();
 
-    const handleExportReportTask = useExportReportTask();
+    const handleTemplateRepliesReportTask = useTemplateRepliesReportTask();
 
     return (
       <Box
@@ -268,7 +268,7 @@ export const PetitionTemplateHeader = Object.assign(
                 ) : null}
                 {hasAdminRole ? (
                   <MenuItem
-                    onClick={() => handleExportReportTask(petition.id)}
+                    onClick={() => handleTemplateRepliesReportTask(petition.id)}
                     icon={<TableIcon display="block" boxSize={4} />}
                   >
                     <FormattedMessage
