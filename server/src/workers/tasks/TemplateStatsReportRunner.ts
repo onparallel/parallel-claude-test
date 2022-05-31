@@ -2,16 +2,9 @@ import { TaskRunner } from "../helpers/TaskRunner";
 
 export class TemplateStatsReportRunner extends TaskRunner<"TEMPLATE_STATS_REPORT"> {
   async run() {
-    return {
-      pending: 60,
-      completed: 40,
-      closed: 50,
-      pending_to_complete: 3321312,
-      complete_to_close: 3123213213,
-      signatures: {
-        completed: 100,
-        time_to_complete: 123123,
-      },
-    };
+    const { template_id: templateId } = this.task.input;
+
+    const user = await this.ctx.users.loadUser(this.task.user_id!);
+    return await this.ctx.petitions.getPetitionStatsByFromTemplateId(templateId, user!.org_id);
   }
 }

@@ -43,3 +43,11 @@ export function chunkWhile<T>(array: T[], predicate: (current: T[], value: T) =>
 export function sumBy<T>(array: T[], fn: PredIndexed<T, number>) {
   return array.reduce((acc, curr, index) => acc + fn(curr, index, array), 0);
 }
+
+/**
+ * @returns last element in array that matches the predicate function
+ * @example findLast([1, 2, 3, 4, 5, 6], (e) => e < 5) // 4
+ */
+export function findLast<T>(array: T[], predicate: (element: T) => boolean): T | undefined {
+  return array.filter(predicate).slice(-1)[0];
+}

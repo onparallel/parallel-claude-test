@@ -5,7 +5,7 @@ import { Knex } from "knex";
 import pMap from "p-map";
 import { countBy, groupBy, indexBy, isDefined, maxBy, omit, sortBy, uniq, zip } from "remeda";
 import { Aws, AWS_SERVICE } from "../../services/aws";
-import { partition, unMaybeArray } from "../../util/arrays";
+import { findLast, partition, unMaybeArray } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
 import { evaluateFieldVisibility, PetitionFieldVisibility } from "../../util/fieldVisibility";
 import { fromDataLoader } from "../../util/fromDataLoader";
@@ -4530,5 +4530,86 @@ export class PetitionRepository extends BaseRepository {
     ];
 
     await this.files.deleteFileUpload(fileUploadIds, "Worker:Anonymizer", t);
+  }
+
+  async getPetitionStatsByFromTemplateId(fromTemplateId: number, orgId: number) {
+    const petitionStatus = await this.raw<{ id: number; status: PetitionStatus }>(
+      /* sql */ `
+      select id, "status" from petition p
+      where p.from_template_id = ? and p.org_id = ? and p.deleted_at is null 
+      and (
+        exists (select * from petition_access pa where pa.petition_id = p.id) 
+        or 
+        exists(select * from petition_event pe where pe.petition_id = p.id and pe."type" = 'REPLY_CREATED')
+      );
+    `,
+      [fromTemplateId, orgId]
+    );
+
+    const petitionIds = petitionStatus.map((s) => s.id);
+
+    const eventsByPetitionId = groupBy(
+      await this.from("petition_event")
+        .whereIn("petition_id", petitionIds)
+        .orderBy([{ column: "petition_id" }, { column: "created_at", order: "asc" }])
+        .select("*"),
+      (e) => e.petition_id
+    );
+
+    const petitionTimes = Object.values(eventsByPetitionId)
+      .map((events) => ({
+        pendingAt: events
+          .find((e) => e.type === "ACCESS_ACTIVATED" || e.type === "REPLY_CREATED") // first ACCESS_ACTIVATED or REPLY_CREATED event marks the first time the petition moved to PENDING status
+          ?.created_at.getTime(),
+        completedAt: findLast(events, (e) => e.type === "PETITION_COMPLETED")?.created_at.getTime(),
+        closedAt: findLast(events, (e) => e.type === "PETITION_CLOSED")?.created_at.getTime(),
+      }))
+      .map(({ pendingAt, completedAt, closedAt }) => ({
+        pendingToComplete:
+          isDefined(completedAt) && isDefined(pendingAt) && completedAt > pendingAt
+            ? (completedAt - pendingAt) / 1000
+            : null,
+        completeToClose:
+          isDefined(closedAt) && isDefined(completedAt) && closedAt > completedAt
+            ? (closedAt - completedAt) / 1000
+            : null,
+      }));
+
+    const signatures = await this.loadLatestPetitionSignatureByPetitionId(petitionIds);
+    const signatureTimes = Object.values(eventsByPetitionId)
+      .map((events) => ({
+        startedAt: findLast(events, (e) => e.type === "SIGNATURE_STARTED")?.created_at.getTime(),
+        completedAt: findLast(
+          events,
+          (e) => e.type === "SIGNATURE_COMPLETED"
+        )?.created_at.getTime(),
+      }))
+      .map(({ startedAt, completedAt }) => ({
+        timeToComplete:
+          isDefined(startedAt) && isDefined(completedAt) && completedAt > startedAt
+            ? (completedAt - startedAt) / 1000
+            : null,
+      }));
+
+    return {
+      pending: countBy(petitionStatus, (r) => r.status === "PENDING"),
+      completed: countBy(petitionStatus, (r) => r.status === "COMPLETED"),
+      closed: countBy(petitionStatus, (r) => r.status === "CLOSED"),
+      pending_to_complete: petitionTimes
+        .filter(({ pendingToComplete }) => isDefined(pendingToComplete))
+        .reduce(
+          (acc, { pendingToComplete }, _, values) => acc + pendingToComplete! / values.length,
+          0
+        ),
+      complete_to_close: petitionTimes
+        .filter(({ completeToClose }) => isDefined(completeToClose))
+        .reduce((acc, { completeToClose }, _, values) => acc + completeToClose! / values.length, 0),
+      signatures: {
+        completed: countBy(signatures, (s) => !!s && s.status === "COMPLETED"),
+        time_to_complete: signatureTimes
+          .filter(({ timeToComplete }) => isDefined(timeToComplete))
+          .reduce((acc, { timeToComplete }, _, values) => acc + timeToComplete! / values.length, 0),
+      },
+    };
   }
 }
