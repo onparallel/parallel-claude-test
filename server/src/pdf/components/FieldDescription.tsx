@@ -2,6 +2,7 @@ import { marked } from "@onparallel/marked-do-not-use";
 import { Image, Link, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { Fragment, useMemo } from "react";
 import { zip } from "remeda";
+import { cleanupText } from "../utils/cleanupText";
 import { useTheme } from "../utils/ThemeProvider";
 import { useLiquid } from "../utils/useLiquid";
 
@@ -9,12 +10,32 @@ interface FieldDescriptionProps {
   description: string;
 }
 
+const tests: ((text: string) => boolean)[] = [
+  (text) => /^ {0,3}([*+-]|\d{1,9}[.)])/g.test(text),
+  (text) => text.includes("http"),
+  (text) => text.includes("*"),
+  (text) => text.includes("]("),
+  (text) => /^ {0,3}#{1,6} /g.test(text),
+  (text) => /\| ?:-/.test(text),
+  (text) => text.includes("--"),
+  (text) => text.includes("=="),
+  (text) => text.includes("~"),
+];
+
+function detectMarkdown(text: string) {
+  return tests.some((test) => test(text));
+}
+
 export function FieldDescription({ description }: FieldDescriptionProps) {
   const interpolated = useLiquid(description);
   /**
    * We use a heavily customized version of markedjs where we have removed features like code, blocks, html, etc.
    */
-  const tokens = useMemo(() => marked.lexer(interpolated), [interpolated]);
+  const { tokens, hasMarkdown } = useMemo(() => {
+    const hasMarkdown = detectMarkdown(interpolated);
+    const tokens = hasMarkdown ? marked.lexer(interpolated) : null;
+    return { hasMarkdown, tokens };
+  }, [interpolated]);
   const theme = useTheme();
   const styles = StyleSheet.create({
     title1: {
@@ -32,9 +53,9 @@ export function FieldDescription({ description }: FieldDescriptionProps) {
       marginBottom: "2mm",
     },
   });
-  return (
+  return hasMarkdown ? (
     <View>
-      {tokens.map((t, i) =>
+      {tokens!.map((t, i) =>
         t.type === "heading" ? (
           <Fragment key={i}>
             <Text key={i} style={t.depth === 1 ? styles.title1 : styles.title2}>
@@ -76,6 +97,8 @@ export function FieldDescription({ description }: FieldDescriptionProps) {
         )
       )}
     </View>
+  ) : (
+    <Text>{cleanupText(description)}</Text>
   );
 }
 
