@@ -395,6 +395,8 @@ export type Mutation = {
   assignPetitionToUser: SupportMethodResponse;
   /** Load contacts from an excel file, creating the ones not found on database */
   bulkCreateContacts: Array<Contact>;
+  /** Submits multiple replies on a petition at once given a JSON input where the keys are field aliases and values are the replie(s) for that field. */
+  bulkCreatePetitionReplies: Petition;
   /** Cancels a scheduled petition message. */
   cancelScheduledMessage: Maybe<PetitionMessage>;
   cancelSignatureRequest: PetitionSignatureRequest;
@@ -708,6 +710,11 @@ export type MutationbulkCreateContactsArgs = {
   file: Scalars["Upload"];
 };
 
+export type MutationbulkCreatePetitionRepliesArgs = {
+  petitionId: Scalars["GID"];
+  replies: Scalars["JSONObject"];
+};
+
 export type MutationcancelScheduledMessageArgs = {
   messageId: Scalars["GID"];
   petitionId: Scalars["GID"];
@@ -779,6 +786,7 @@ export type MutationcreateExportRepliesTaskArgs = {
 
 export type MutationcreateExportReportTaskArgs = {
   petitionId: Scalars["GID"];
+  timezone: Scalars["String"];
 };
 
 export type MutationcreateFileUploadReplyArgs = {

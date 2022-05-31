@@ -531,6 +531,11 @@ type Mutation {
   bulkCreateContacts(file: Upload!): [Contact!]!
 
   """
+  Submits multiple replies on a petition at once given a JSON input where the keys are field aliases and values are the replie(s) for that field.
+  """
+  bulkCreatePetitionReplies(petitionId: GID!, replies: JSONObject!): Petition!
+
+  """
   Cancels a scheduled petition message.
   """
   cancelScheduledMessage(messageId: GID!, petitionId: GID!): PetitionMessage

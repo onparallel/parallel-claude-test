@@ -918,6 +918,7 @@ export interface NexusGenFieldTypes {
     approveOrRejectPetitionFieldReplies: NexusGenRootTypes["Petition"]; // Petition!
     assignPetitionToUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     bulkCreateContacts: NexusGenRootTypes["Contact"][]; // [Contact!]!
+    bulkCreatePetitionReplies: NexusGenRootTypes["Petition"]; // Petition!
     cancelScheduledMessage: NexusGenRootTypes["PetitionMessage"] | null; // PetitionMessage
     cancelSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     changeOrganization: NexusGenEnums["Result"]; // Result!
@@ -2388,6 +2389,7 @@ export interface NexusGenFieldTypeNames {
     approveOrRejectPetitionFieldReplies: "Petition";
     assignPetitionToUser: "SupportMethodResponse";
     bulkCreateContacts: "Contact";
+    bulkCreatePetitionReplies: "Petition";
     cancelScheduledMessage: "PetitionMessage";
     cancelSignatureRequest: "PetitionSignatureRequest";
     changeOrganization: "Result";
@@ -3650,6 +3652,11 @@ export interface NexusGenArgTypes {
     bulkCreateContacts: {
       // args
       file: NexusGenScalars["Upload"]; // Upload!
+    };
+    bulkCreatePetitionReplies: {
+      // args
+      petitionId: NexusGenScalars["GID"]; // GID!
+      replies: NexusGenScalars["JSONObject"]; // JSONObject!
     };
     cancelScheduledMessage: {
       // args

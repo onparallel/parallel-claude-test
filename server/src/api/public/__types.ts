@@ -395,6 +395,8 @@ export type Mutation = {
   assignPetitionToUser: SupportMethodResponse;
   /** Load contacts from an excel file, creating the ones not found on database */
   bulkCreateContacts: Array<Contact>;
+  /** Submits multiple replies on a petition at once given a JSON input where the keys are field aliases and values are the replie(s) for that field. */
+  bulkCreatePetitionReplies: Petition;
   /** Cancels a scheduled petition message. */
   cancelScheduledMessage: Maybe<PetitionMessage>;
   cancelSignatureRequest: PetitionSignatureRequest;
@@ -708,6 +710,11 @@ export type MutationbulkCreateContactsArgs = {
   file: Scalars["Upload"];
 };
 
+export type MutationbulkCreatePetitionRepliesArgs = {
+  petitionId: Scalars["GID"];
+  replies: Scalars["JSONObject"];
+};
+
 export type MutationcancelScheduledMessageArgs = {
   messageId: Scalars["GID"];
   petitionId: Scalars["GID"];
@@ -779,6 +786,7 @@ export type MutationcreateExportRepliesTaskArgs = {
 
 export type MutationcreateExportReportTaskArgs = {
   petitionId: Scalars["GID"];
+  timezone: Scalars["String"];
 };
 
 export type MutationcreateFileUploadReplyArgs = {
@@ -5169,6 +5177,70 @@ export type DownloadPetitionAttachment_petitionAttachmentDownloadLinkMutation = 
   petitionAttachmentDownloadLink: { url: string | null };
 };
 
+export type SubmitReplies_bulkCreatePetitionRepliesMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replies: Scalars["JSONObject"];
+  includeFields: Scalars["Boolean"];
+  includeTags: Scalars["Boolean"];
+  includeRecipients: Scalars["Boolean"];
+}>;
+
+export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
+  bulkCreatePetitionReplies: {
+    id: string;
+    name: string | null;
+    status: PetitionStatus;
+    deadline: string | null;
+    locale: PetitionLocale;
+    createdAt: string;
+    fromTemplateId: string | null;
+    customProperties: { [key: string]: any };
+    recipients: Array<{
+      id: string;
+      status: PetitionAccessStatus;
+      reminderCount: number;
+      remindersLeft: number;
+      remindersActive: boolean;
+      nextReminderAt: string | null;
+      createdAt: string;
+      contact: {
+        id: string;
+        email: string;
+        fullName: string;
+        firstName: string;
+        lastName: string | null;
+        createdAt: string;
+        updatedAt: string;
+      } | null;
+      granter: {
+        id: string;
+        email: string;
+        fullName: string | null;
+        firstName: string | null;
+        lastName: string | null;
+      } | null;
+    }>;
+    fields?: Array<{
+      id: string;
+      title: string | null;
+      description: string | null;
+      type: PetitionFieldType;
+      fromPetitionFieldId: string | null;
+      alias: string | null;
+      options: { [key: string]: any };
+      multiple: boolean;
+      replies: Array<{
+        id: string;
+        content: { [key: string]: any };
+        status: PetitionFieldReplyStatus;
+        createdAt: string;
+        updatedAt: string;
+      }>;
+    }>;
+    tags?: Array<{ id: string; name: string }>;
+  };
+};
+
 export type UpdateReply_petitionQueryVariables = Exact<{
   petitionId: Scalars["GID"];
 }>;
@@ -6183,6 +6255,23 @@ export const DownloadPetitionAttachment_petitionAttachmentDownloadLinkDocument =
 ` as unknown as DocumentNode<
   DownloadPetitionAttachment_petitionAttachmentDownloadLinkMutation,
   DownloadPetitionAttachment_petitionAttachmentDownloadLinkMutationVariables
+>;
+export const SubmitReplies_bulkCreatePetitionRepliesDocument = gql`
+  mutation SubmitReplies_bulkCreatePetitionReplies(
+    $petitionId: GID!
+    $replies: JSONObject!
+    $includeFields: Boolean!
+    $includeTags: Boolean!
+    $includeRecipients: Boolean!
+  ) {
+    bulkCreatePetitionReplies(petitionId: $petitionId, replies: $replies) {
+      ...Petition
+    }
+  }
+  ${PetitionFragmentDoc}
+` as unknown as DocumentNode<
+  SubmitReplies_bulkCreatePetitionRepliesMutation,
+  SubmitReplies_bulkCreatePetitionRepliesMutationVariables
 >;
 export const UpdateReply_petitionDocument = gql`
   query UpdateReply_petition($petitionId: GID!) {

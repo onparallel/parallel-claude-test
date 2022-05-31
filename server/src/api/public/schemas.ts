@@ -1913,3 +1913,13 @@ const _SignatureRequest = {
   },
 } as const;
 export const ListOfSignatureRequests = ListOf(_SignatureRequest);
+
+export const SubmitPetitionReplies = schema({
+  title: "SubmitPetitionReplies",
+  type: "object",
+  example: {
+    text: "My text reply",
+    options: ["Option 1", "Option 3"],
+    date: "2022-05-31",
+  },
+} as const);

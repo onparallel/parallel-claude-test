@@ -76,6 +76,7 @@ import {
   SendPetition,
   SharePetition,
   SubmitFileReply,
+  SubmitPetitionReplies,
   SubmitReply,
   Subscription,
   Template,
@@ -91,8 +92,8 @@ import {
   CreatePetitionAttachment_petitionAttachmentUploadCompleteDocument,
   CreatePetitionRecipients_contactDocument,
   CreatePetitionRecipients_createContactDocument,
-  CreatePetitionRecipients_sendPetitionDocument,
   CreatePetitionRecipients_petitionDocument,
+  CreatePetitionRecipients_sendPetitionDocument,
   CreatePetitionRecipients_updateContactDocument,
   CreatePetition_petitionDocument,
   DeletePetitionAttachment_deletePetitionAttachmentDocument,
@@ -132,6 +133,7 @@ import {
   RemoveUserPermission_removePetitionPermissionDocument,
   SharePetition_addPetitionPermissionDocument,
   StopSharing_removePetitionPermissionDocument,
+  SubmitReplies_bulkCreatePetitionRepliesDocument,
   SubmitReply_createFileUploadReplyCompleteDocument,
   SubmitReply_createFileUploadReplyDocument,
   SubmitReply_createPetitionFieldReplyDocument,
@@ -1598,6 +1600,36 @@ api
         (r) => r.id === params.replyId
       )!;
       return Ok(mapReplyResponse(updatedReply));
+    }
+  );
+
+api
+  .path("/petitions/:petitionId/replies", {
+    params: { petitionId },
+  })
+  .post(
+    {
+      operationId: "SubmitReplies",
+      summary: "Submit replies by field alias",
+      description: outdent`
+      Submits replies on a petition given a JSON object where each key is a field alias and each value is one or more replies on that field.
+    `,
+      responses: {
+        200: SuccessResponse(Petition),
+      },
+      body: JsonBody(SubmitPetitionReplies),
+      tags: ["Petition replies"],
+    },
+    async ({ client, params, body }) => {
+      const res = await client.request(SubmitReplies_bulkCreatePetitionRepliesDocument, {
+        petitionId: params.petitionId,
+        replies: body,
+        includeFields: true,
+        includeRecipients: false,
+        includeTags: false,
+      });
+
+      return Ok(mapPetition(res.bulkCreatePetitionReplies));
     }
   );
 

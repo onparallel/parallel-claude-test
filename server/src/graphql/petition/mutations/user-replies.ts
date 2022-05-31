@@ -7,6 +7,8 @@ import { sign } from "../../../util/jwt";
 import { random } from "../../../util/token";
 import { authenticateAnd } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
+import { prefillPetition } from "../../helpers/prefillPetition";
+import { jsonObjectArg } from "../../helpers/scalars";
 import { fileUploadInputMaxSize } from "../../helpers/validators/maxFileSize";
 import {
   fieldCanBeReplied,
@@ -337,5 +339,20 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
         companyName: "Parallel",
       })}`,
     };
+  },
+});
+
+export const bulkCreatePetitionReplies = mutationField("bulkCreatePetitionReplies", {
+  type: "Petition",
+  description:
+    "Submits multiple replies on a petition at once given a JSON input where the keys are field aliases and values are the replie(s) for that field.",
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    replies: nonNull(jsonObjectArg()),
+  },
+  authorize: authenticateAnd(userHasAccessToPetitions("petitionId")),
+  resolve: async (_, args, ctx) => {
+    await prefillPetition(args.petitionId, args.replies, ctx.user!, ctx);
+    return (await ctx.petitions.loadPetition(args.petitionId))!;
   },
 });

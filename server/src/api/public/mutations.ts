@@ -3,6 +3,7 @@ import {
   AWSPresignedPostDataFragment,
   PetitionFieldReplyFragment,
   PetitionAttachmentFragment,
+  PetitionFragment,
 } from "./fragments";
 
 gql`
@@ -148,4 +149,19 @@ gql`
       url
     }
   }
+`;
+
+gql`
+  mutation SubmitReplies_bulkCreatePetitionReplies(
+    $petitionId: GID!
+    $replies: JSONObject!
+    $includeFields: Boolean!
+    $includeTags: Boolean!
+    $includeRecipients: Boolean!
+  ) {
+    bulkCreatePetitionReplies(petitionId: $petitionId, replies: $replies) {
+      ...Petition
+    }
+  }
+  ${PetitionFragment}
 `;
