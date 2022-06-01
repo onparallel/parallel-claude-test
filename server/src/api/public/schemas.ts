@@ -1921,6 +1921,42 @@ export const ListOfSignatureRequests = ListOf(_SignatureRequest);
 export const SubmitPetitionReplies = schema({
   title: "SubmitPetitionReplies",
   type: "object",
+  description: outdent`
+    Based on the type of the field you want to submit a reply to, the values on this JSON object will vary:
+    
+    e.g.: 
+
+    For \`TEXT\` and \`SHORT_TEXT\` fields:
+    \`{ "name": "James" }\` where "name" is the alias of the field, and "James" is the reply.
+    or: \`{ "name": ["James", "Mike"]}\` for submitting two different replies on the same field at once.
+
+    For \`CHECKBOX\` and \`SELECT\` fields:
+      \`{ "options": ["A", "B"] }\` will submit a **SINGLE** reply on the field with alias "options", selecting options "A" and "B".
+    or: \`{ "options": [["A", "B"], ["C"]] }\` will submit two replies, the first selecting options "A" and "B" and the second selecting option "C".
+    The provided values here must match with the preconfigured options on the field, otherwise the entry will be ignored.
+
+    For \`DATE\` fields:
+    \`{ "date": "2022-05-31" }\` will submit a single reply on the date field with the provided date.
+    or: \`{ "date": ["2022-05-31", "2022-01-10"] }\` will submit two replies on the field.
+    The date must be passed in format \`YYYY-MM-DD\`.
+
+    For \`PHONE\` fields:
+    \`{ "phone": "+3400000000" }\` will submit a single reply on the phone field with the provided value.
+    or: \`{ "phone": ["+3400000000", "+3400000001"] }\` will submit two replies on the field.
+    The phone must be valid and start with the country code number.
+
+    For \`NUMBER\` fields:
+    \`{ "number": 100 }\` will submit a single reply on the number field with value 100.
+    or: \`{ "number": [2000, 50] }\` will submit two replies on the field.
+
+    For \`DYNAMIC_SELECT\` fields:
+    \`{ "select": ["Spain", "Barcelona"] }\` will submit a single reply on the field where the first level of options of a list of countries and the second level is a list of cities within the selected country.
+    or: \`{ "select": [["Spain", "Barcelona"], ["Argentina", "Buenos Aires"]] }\` will submit two replies on the field with same options as the previous.
+
+    If no field is found with the provided alias or the reply is invalid given the field type and options, that entry will be ignored.
+
+    \`HEADING\`, \`FILE_UPLOAD\` and \`ES_TAX_DOCUMENTS\` fields do not accept reply submission via this endpoint.
+  `,
   example: {
     text: "My text reply",
     options: ["Option 1", "Option 3"],
