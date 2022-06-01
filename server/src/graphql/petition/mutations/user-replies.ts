@@ -49,6 +49,11 @@ export const createPetitionFieldReply = mutationField("createPetitionFieldReply"
   validateArgs: validateFieldReply("fieldId", "reply", "reply"),
   resolve: async (_, args, ctx) => {
     const { type } = (await ctx.petitions.loadField(args.fieldId))!;
+    await ctx.petitions.updatePetition(
+      args.petitionId,
+      { status: "PENDING" },
+      `User:${ctx.user!.id}`
+    );
     return await ctx.petitions.createPetitionFieldReply(
       {
         petition_field_id: args.fieldId,
