@@ -50,7 +50,7 @@ export function createCronWorker<Q extends keyof Config["cronWorkers"]>(
                 config["cronWorkers"][name]
               );
             });
-            const nextExecution = job.nextDate().toDate().toISOString();
+            const nextExecution = job.nextDate().toISO();
             logger.info(
               `Successful execution in ${duration}ms. Next execution on ${nextExecution}`,
               { duration }
