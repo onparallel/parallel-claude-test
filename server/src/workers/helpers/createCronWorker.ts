@@ -84,7 +84,7 @@ export function createCronWorker<Q extends keyof Config["cronWorkers"]>(
           }
         }
         job.start();
-        const nextExecution = job.nextDate().toDate().toISOString();
+        const nextExecution = job.nextDate().toISO();
         logger.info(`Cron worker running. Next execution on ${nextExecution}`);
       }
     ).argv;

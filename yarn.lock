@@ -5244,13 +5244,13 @@
   resolved "https://registry.yarnpkg.com/@types/cors/-/cors-2.8.12.tgz#6b2c510a7ad7039e98e7b8d3d6598f4359e5c080"
   integrity sha512-vt+kDhq/M2ayberEtJcIN/hxXy1Pk+59g2FV/ZQceeaTyCtCucjL2Q7FXlFjtWn4n15KCr1NE2lNNFhp0lEThw==
 
-"@types/cron@^1.7.3":
-  version "1.7.3"
-  resolved "https://registry.yarnpkg.com/@types/cron/-/cron-1.7.3.tgz#993db7d54646f61128c851607b64ba4495deae93"
-  integrity sha512-iPmUXyIJG1Js+ldPYhOQcYU3kCAQ2FWrSkm1FJPoii2eYSn6wEW6onPukNTT0bfiflexNSRPl6KWmAIqS+36YA==
+"@types/cron@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@types/cron/-/cron-2.0.0.tgz#4fe75f2720a3b69a1f7b80e656749f4c2c96d727"
+  integrity sha512-xZM08fqvwIXgghtPVkSPKNgC+JoMQ2OHazEvyTKnNf7aWu1aB6/4lBbQFrb03Td2cUGG7ITzMv3mFYnMu6xRaQ==
   dependencies:
+    "@types/luxon" "*"
     "@types/node" "*"
-    moment ">=2.14.0"
 
 "@types/dompurify@^2.3.3":
   version "2.3.3"
@@ -5525,6 +5525,11 @@
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/@types/long/-/long-4.0.2.tgz#b74129719fc8d11c01868010082d483b7545591a"
   integrity sha512-MqTGEo5bj5t157U6fA/BiDynNkn0YknVdh48CMPkTSpFTVmvao5UQmm7uEF6xBEo7qIMAlY/JSleYaE6VOdpaA==
+
+"@types/luxon@*":
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/@types/luxon/-/luxon-2.3.2.tgz#8a3f2cdd4858ce698b56cd8597d9243b8e9d3c65"
+  integrity sha512-WOehptuhKIXukSUUkRgGbj2c997Uv/iUgYgII8U7XLJqq9W2oF0kQ6frEznRQbdurioz+L/cdaIm4GutTQfgmA==
 
 "@types/mdast@^3.0.0":
   version "3.0.10"
@@ -9037,10 +9042,10 @@ create-require@^1.1.0:
   resolved "https://registry.yarnpkg.com/create-require/-/create-require-1.1.1.tgz#c1d7e8f1e5f6cfc9ff65f9cd352d37348756c333"
   integrity sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==
 
-cron@^1.8.2:
-  version "1.8.3"
-  resolved "https://registry.yarnpkg.com/cron/-/cron-1.8.3.tgz#2a61d7b15848716885834ec56ac072f4b9744ebd"
-  integrity sha512-JYR/QZFklJCIPndBLfd/2nU1nSlCMrUdtQ2mGLXSVM/qqqEK7DOrFR0gsEiyeqs0PdWrs0ve1ggH4V7XksDwXg==
+cron@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/cron/-/cron-2.0.0.tgz#15c6bf37c1cebf6da1d7a688b9ba1c68338bfe6b"
+  integrity sha512-RPeRunBCFr/WEo7WLp8Jnm45F/ziGJiHVvVQEBSDTSGu6uHW49b2FOP2O14DcXlGJRLhwE7TIoDzHHK4KmlL6g==
   dependencies:
     luxon "^1.23.x"
 
@@ -15361,11 +15366,6 @@ mobx@^6.5.0:
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/mobx/-/mobx-6.5.0.tgz#dc2d028b1882737f6e813fc92454381e438b7ad3"
   integrity sha512-pHZ/cySF00FVENDWIDzJyoObFahK6Eg4d0papqm6d7yMkxWTZ/S/csqJX1A3PsYy4t5k3z2QnlwuCfMW5lSEwA==
-
-moment@>=2.14.0:
-  version "2.29.3"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.3.tgz#edd47411c322413999f7a5940d526de183c031f3"
-  integrity sha512-c6YRvhEo//6T2Jz/vVtYzqBzwvPT95JBQ+smCytzf7c50oMZRsR/a4w88aD34I+/QVSfnoAnSBFPJHItlOMJVw==
 
 morgan@^1.10.0:
   version "1.10.0"
