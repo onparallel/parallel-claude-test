@@ -11,11 +11,11 @@ interface FieldDescriptionProps {
 }
 
 const tests: ((text: string) => boolean)[] = [
-  (text) => /^ {0,3}([*+-]|\d{1,9}[.)])/g.test(text),
+  (text) => /^ {0,3}([*+-]|\d{1,9}[.)])/m.test(text),
   (text) => text.includes("http"),
   (text) => text.includes("*"),
   (text) => text.includes("]("),
-  (text) => /^ {0,3}#{1,6} /g.test(text),
+  (text) => /^ {0,3}#{1,6} /m.test(text),
   (text) => /\| ?:-/.test(text),
   (text) => text.includes("--"),
   (text) => text.includes("=="),
