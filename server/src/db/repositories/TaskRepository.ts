@@ -28,9 +28,9 @@ export type TaskOutput<TName extends TaskName> = {
     pending: number;
     completed: number;
     closed: number;
-    pending_to_complete: number;
-    complete_to_close: number;
-    signatures: { completed: number; time_to_complete: number };
+    pending_to_complete: number | null;
+    complete_to_close: number | null;
+    signatures: { completed: number; time_to_complete: number | null };
   };
 }[TName];
 

@@ -95,7 +95,11 @@ export const createTemplateRepliesReportTask = mutationField("createTemplateRepl
   description:
     "Creates a task for exporting a report grouping the replies of every petition coming from the same template",
   type: "Task",
-  authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasAccessToPetitions("petitionId")),
+  authorize: authenticateAnd(
+    contextUserHasRole("ADMIN"),
+    userHasAccessToPetitions("petitionId"),
+    petitionsAreOfTypeTemplate("petitionId")
+  ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     timezone: nonNull(stringArg()),
@@ -129,6 +133,7 @@ export const createTemplateStatsReportTask = mutationField("createTemplateStatsR
   description: "Creates a task for generating a JSON report of the template usage",
   type: "Task",
   authorize: authenticateAnd(
+    contextUserHasRole("ADMIN"),
     userHasAccessToPetitions("templateId"),
     petitionsAreOfTypeTemplate("templateId")
   ),

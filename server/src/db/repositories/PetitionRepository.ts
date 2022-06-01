@@ -5,7 +5,7 @@ import { Knex } from "knex";
 import pMap from "p-map";
 import { countBy, groupBy, indexBy, isDefined, maxBy, omit, sortBy, uniq, zip } from "remeda";
 import { Aws, AWS_SERVICE } from "../../services/aws";
-import { findLast, partition, unMaybeArray } from "../../util/arrays";
+import { average, findLast, partition, unMaybeArray } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
 import { evaluateFieldVisibility, PetitionFieldVisibility } from "../../util/fieldVisibility";
 import { fromDataLoader } from "../../util/fromDataLoader";
@@ -4538,23 +4538,24 @@ export class PetitionRepository extends BaseRepository {
       select id, "status" from petition p
       where p.from_template_id = ? and p.org_id = ? and p.deleted_at is null 
       and (
-        exists (select * from petition_access pa where pa.petition_id = p.id) 
+        exists (select * from petition_access pa where pa.petition_id = p.id)  -- petition has been sent
         or 
-        exists(select * from petition_event pe where pe.petition_id = p.id and pe."type" = 'REPLY_CREATED')
+        exists(select * from petition_event pe where pe.petition_id = p.id and pe."type" = 'REPLY_CREATED') -- petition has at least one submitted reply
       );
     `,
       [fromTemplateId, orgId]
     );
 
     const petitionIds = petitionStatus.map((s) => s.id);
-
-    const eventsByPetitionId = groupBy(
-      await this.from("petition_event")
+    const [petitionEvents, signatures] = await Promise.all([
+      this.from("petition_event")
         .whereIn("petition_id", petitionIds)
         .orderBy([{ column: "petition_id" }, { column: "created_at", order: "asc" }])
         .select("*"),
-      (e) => e.petition_id
-    );
+      this.loadLatestPetitionSignatureByPetitionId(petitionIds),
+    ]);
+
+    const eventsByPetitionId = groupBy(petitionEvents, (e) => e.petition_id);
 
     const petitionTimes = Object.values(eventsByPetitionId)
       .map((events) => ({
@@ -4575,8 +4576,15 @@ export class PetitionRepository extends BaseRepository {
             : null,
       }));
 
-    const signatures = await this.loadLatestPetitionSignatureByPetitionId(petitionIds);
-    const signatureTimes = Object.values(eventsByPetitionId)
+    const pendingToCompletePetitionTimes = petitionTimes
+      .filter((t) => isDefined(t.pendingToComplete))
+      .map((t) => t.pendingToComplete!);
+
+    const completeToClosePetitionTimes = petitionTimes
+      .filter((t) => isDefined(t.completeToClose))
+      .map((t) => t.completeToClose!);
+
+    const timeToCompleteSignatureTimes = Object.values(eventsByPetitionId)
       .map((events) => ({
         startedAt: findLast(events, (e) => e.type === "SIGNATURE_STARTED")?.created_at.getTime(),
         completedAt: findLast(
@@ -4584,31 +4592,25 @@ export class PetitionRepository extends BaseRepository {
           (e) => e.type === "SIGNATURE_COMPLETED"
         )?.created_at.getTime(),
       }))
-      .map(({ startedAt, completedAt }) => ({
-        timeToComplete:
-          isDefined(startedAt) && isDefined(completedAt) && completedAt > startedAt
-            ? (completedAt - startedAt) / 1000
-            : null,
-      }));
+      .map(({ startedAt, completedAt }) =>
+        isDefined(startedAt) && isDefined(completedAt) && completedAt > startedAt
+          ? (completedAt - startedAt) / 1000
+          : null
+      )
+      .filter(isDefined);
 
     return {
       pending: countBy(petitionStatus, (r) => r.status === "PENDING"),
       completed: countBy(petitionStatus, (r) => r.status === "COMPLETED"),
       closed: countBy(petitionStatus, (r) => r.status === "CLOSED"),
-      pending_to_complete: petitionTimes
-        .filter(({ pendingToComplete }) => isDefined(pendingToComplete))
-        .reduce(
-          (acc, { pendingToComplete }, _, values) => acc + pendingToComplete! / values.length,
-          0
-        ),
-      complete_to_close: petitionTimes
-        .filter(({ completeToClose }) => isDefined(completeToClose))
-        .reduce((acc, { completeToClose }, _, values) => acc + completeToClose! / values.length, 0),
+      pending_to_complete:
+        pendingToCompletePetitionTimes.length > 0 ? average(pendingToCompletePetitionTimes) : null,
+      complete_to_close:
+        completeToClosePetitionTimes.length > 0 ? average(completeToClosePetitionTimes) : null,
       signatures: {
-        completed: countBy(signatures, (s) => !!s && s.status === "COMPLETED"),
-        time_to_complete: signatureTimes
-          .filter(({ timeToComplete }) => isDefined(timeToComplete))
-          .reduce((acc, { timeToComplete }, _, values) => acc + timeToComplete! / values.length, 0),
+        completed: countBy(signatures, (s) => s?.status === "COMPLETED"),
+        time_to_complete:
+          timeToCompleteSignatureTimes.length > 0 ? average(timeToCompleteSignatureTimes) : null,
       },
     };
   }

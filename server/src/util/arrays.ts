@@ -51,3 +51,7 @@ export function sumBy<T>(array: T[], fn: PredIndexed<T, number>) {
 export function findLast<T>(array: T[], predicate: (element: T) => boolean): T | undefined {
   return array.filter(predicate).slice(-1)[0];
 }
+
+export function average(array: number[]): number {
+  return array.reduce((acc, value) => acc + value / array.length, 0);
+}
