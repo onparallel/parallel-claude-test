@@ -72,6 +72,11 @@ export interface IEmailsService {
   sendSignatureCancelledNoCreditsLeftEmail(petitionId: number): Promise<void>;
   validateEmail(email: string): Promise<boolean>;
   sendAppSumoActivateAccountEmail(redirectUrl: string, email: string): Promise<void>;
+  sendInternalSignaturitAccountDepletedCreditsEmail(
+    orgId: number,
+    petitionId: number,
+    apiKeyHint: string
+  ): Promise<void>;
 }
 export const EMAILS = Symbol.for("EMAILS");
 
@@ -291,6 +296,19 @@ export class EmailsService implements IEmailsService {
       id: this.buildQueueId("AppSumoActivation", email),
       email,
       redirectUrl,
+    });
+  }
+
+  async sendInternalSignaturitAccountDepletedCreditsEmail(
+    orgId: number,
+    petitionId: number,
+    apiKeyHint: string
+  ) {
+    return await this.enqueueEmail("internal-signaturit-account-depleted-credits", {
+      id: this.buildQueueId("InternalSignaturitAccountDepletedCredits", [orgId, apiKeyHint]),
+      orgId,
+      petitionId,
+      apiKeyHint,
     });
   }
 

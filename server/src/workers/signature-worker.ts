@@ -41,10 +41,10 @@ async function startSignatureProcess(
   const { title, orgIntegrationId, signersInfo, message } = signature.signature_config;
 
   let documentTmpPath: string | null = null;
+  const signatureIntegration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
+  const settings = signatureIntegration.settings as IntegrationSettings<"SIGNATURE">;
   try {
     const owner = await ctx.petitions.loadPetitionOwner(petition.id);
-    const signatureIntegration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
-    const settings = signatureIntegration.settings as IntegrationSettings<"SIGNATURE">;
     const recipients = signersInfo.map((signer) => ({
       name: fullName(signer.firstName, signer.lastName),
       email: signer.email,
@@ -118,6 +118,15 @@ async function startSignatureProcess(
     } as PetitionSignatureRequestCancelData<"REQUEST_ERROR">;
 
     await ctx.petitions.cancelPetitionSignatureRequest(signature, "REQUEST_ERROR", cancelData);
+
+    if (error.message === "Account depleted all it's advanced signature requests") {
+      await ctx.emails.sendInternalSignaturitAccountDepletedCreditsEmail(
+        org.id,
+        petition.id,
+        settings.API_KEY.slice(0, 10)
+      );
+    }
+
     throw error;
   } finally {
     try {

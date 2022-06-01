@@ -1,0 +1,31 @@
+{
+  "title": "Emails",
+  "stories": [
+    {
+      "name": "Internal - Signaturit Account depleted credits",
+      "parameters": {
+        "server": {
+          "id": "emails/InternalSignaturitAccountDepletedCredits"
+        }
+      },
+      "args": {
+        "organizationName": "Organization",
+        "apiKeyHint": "aBcDeFg",
+        "petitionGID": "4exV9AsWJrjj7p8EL",
+        "parallelUrl": "https://staging.onparallel.com",
+        "assetsUrl": "https://static-staging.onparallel.com",
+        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
+        "logoAlt": "Parallel"
+      },
+      "argTypes": {
+        "organizationName": { "control": { "type": "text" } },
+        "petitionGID": { "control": { "type": "text" } },
+        "apiKeyHint": { "control": { "type": "text" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}

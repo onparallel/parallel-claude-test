@@ -15,6 +15,7 @@ import { publicPetitionLinkAccess } from "./emails/public-petition-link-access";
 import { signatureCancelledNoCreditsLeft } from "./emails/signature-cancelled-no-credits-left";
 import { organizationLimitsReached } from "./emails/organization-limits-reached";
 import { appSumoActivateAccount } from "./emails/appsumo-activate-account";
+import { internalSignaturitAccountDepletedCredits } from "./emails/internal-signaturit-account-depleted-credits";
 
 const builders = {
   "petition-completed": petitionCompleted,
@@ -32,6 +33,7 @@ const builders = {
   "signature-cancelled-no-credits-left": signatureCancelledNoCreditsLeft,
   "organization-limits-reached": organizationLimitsReached,
   "appsumo-activate-account": appSumoActivateAccount,
+  "internal-signaturit-account-depleted-credits": internalSignaturitAccountDepletedCredits,
 };
 
 export type EmailType = keyof typeof builders;
