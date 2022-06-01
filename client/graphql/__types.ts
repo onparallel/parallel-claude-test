@@ -2604,6 +2604,8 @@ export interface PublicLicenseCode {
 /** A public view of an organization */
 export interface PublicOrganization {
   __typename?: "PublicOrganization";
+  /** If this organization has the REMOVE_PARALLEL_BRANDING feature flag enabled */
+  hasRemoveParallelBranding: Scalars["Boolean"];
   /** The ID of the organization. */
   id: Scalars["GID"];
   /** The logo of the organization. */
@@ -19287,7 +19289,12 @@ export type RecipientView_PublicPetitionAccessFragment = {
     id: string;
     firstName?: string | null;
     email: string;
-    organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
+    organization: {
+      __typename?: "PublicOrganization";
+      hasRemoveParallelBranding: boolean;
+      name: string;
+      logoUrl?: string | null;
+    };
   } | null;
   contact?: {
     __typename?: "PublicContact";
@@ -19602,7 +19609,12 @@ export type RecipientView_accessQuery = {
       id: string;
       firstName?: string | null;
       email: string;
-      organization: { __typename?: "PublicOrganization"; name: string; logoUrl?: string | null };
+      organization: {
+        __typename?: "PublicOrganization";
+        hasRemoveParallelBranding: boolean;
+        name: string;
+        logoUrl?: string | null;
+      };
     } | null;
     contact?: {
       __typename?: "PublicContact";
@@ -20286,14 +20298,6 @@ export type useExportReportTask_getTaskResultFileUrlMutationVariables = Exact<{
 }>;
 
 export type useExportReportTask_getTaskResultFileUrlMutation = { getTaskResultFileUrl: string };
-
-export type useExportReportTask_taskQueryVariables = Exact<{
-  id: Scalars["GID"];
-}>;
-
-export type useExportReportTask_taskQuery = {
-  task: { __typename?: "Task"; id: string; status: TaskStatus; progress?: number | null };
-};
 
 export type useFilenamePlaceholdersRename_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -24478,6 +24482,9 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
     }
     granter {
       ...RecipientView_PublicUser
+      organization {
+        hasRemoveParallelBranding
+      }
     }
     contact {
       ...RecipientViewHeader_PublicContact
@@ -27781,14 +27788,6 @@ export const useExportReportTask_getTaskResultFileUrlDocument = gql`
   useExportReportTask_getTaskResultFileUrlMutation,
   useExportReportTask_getTaskResultFileUrlMutationVariables
 >;
-export const useExportReportTask_taskDocument = gql`
-  query useExportReportTask_task($id: GID!) {
-    task(id: $id) {
-      ...TaskProgressDialog_Task
-    }
-  }
-  ${TaskProgressDialog_TaskFragmentDoc}
-` as unknown as DocumentNode<useExportReportTask_taskQuery, useExportReportTask_taskQueryVariables>;
 export const useLoginAs_loginAsDocument = gql`
   mutation useLoginAs_loginAs($userId: GID!) {
     loginAs(userId: $userId)

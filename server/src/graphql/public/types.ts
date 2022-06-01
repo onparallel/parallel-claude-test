@@ -398,6 +398,12 @@ export const PublicOrganization = objectType({
         return isDefined(path) ? await ctx.images.getImageUrl(path, args.options as any) : null;
       },
     });
+    t.boolean("hasRemoveParallelBranding", {
+      description: "If this organization has the REMOVE_PARALLEL_BRANDING feature flag enabled",
+      resolve: async (root, _, ctx) => {
+        return await ctx.featureFlags.orgHasFeatureFlag(root.id, "REMOVE_PARALLEL_BRANDING");
+      },
+    });
   },
 });
 

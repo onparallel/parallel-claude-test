@@ -3494,6 +3494,11 @@ A public view of an organization
 """
 type PublicOrganization {
   """
+  If this organization has the REMOVE_PARALLEL_BRANDING feature flag enabled
+  """
+  hasRemoveParallelBranding: Boolean!
+
+  """
   The ID of the organization.
   """
   id: GID!

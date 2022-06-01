@@ -1541,6 +1541,7 @@ export interface NexusGenFieldTypes {
   };
   PublicOrganization: {
     // field return type
+    hasRemoveParallelBranding: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     logoUrl: string | null; // String
     name: string; // String!
@@ -3013,6 +3014,7 @@ export interface NexusGenFieldTypeNames {
   };
   PublicOrganization: {
     // field return type name
+    hasRemoveParallelBranding: "Boolean";
     id: "GID";
     logoUrl: "String";
     name: "String";

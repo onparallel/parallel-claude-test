@@ -201,7 +201,10 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
       <ToneProvider value={tone}>
         <Head>
           {fields[0]?.type === "HEADING" && fields[0].title ? (
-            <title>{fields[0].title} | Parallel</title>
+            <title>
+              {fields[0].title}
+              {granter.organization.hasRemoveParallelBranding ? "" : " | Parallel"}
+            </title>
           ) : (
             <title>Parallel</title>
           )}
@@ -480,6 +483,9 @@ RecipientView.fragments = {
         }
         granter {
           ...RecipientView_PublicUser
+          organization {
+            hasRemoveParallelBranding
+          }
         }
         contact {
           ...RecipientViewHeader_PublicContact

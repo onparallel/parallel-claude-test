@@ -2524,6 +2524,8 @@ export type PublicLicenseCode = {
 
 /** A public view of an organization */
 export type PublicOrganization = {
+  /** If this organization has the REMOVE_PARALLEL_BRANDING feature flag enabled */
+  hasRemoveParallelBranding: Scalars["Boolean"];
   /** The ID of the organization. */
   id: Scalars["GID"];
   /** The logo of the organization. */
@@ -4210,7 +4212,6 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
 
 export type GetPetitionRecipients_petitionAccessesQueryVariables = Exact<{
   petitionId: Scalars["GID"];
-  includeRecipientUrl: Scalars["Boolean"];
 }>;
 
 export type GetPetitionRecipients_petitionAccessesQuery = {
@@ -5752,7 +5753,7 @@ export const CreatePetitionRecipients_sendPetitionDocument = gql`
   CreatePetitionRecipients_sendPetitionMutationVariables
 >;
 export const GetPetitionRecipients_petitionAccessesDocument = gql`
-  query GetPetitionRecipients_petitionAccesses($petitionId: GID!, $includeRecipientUrl: Boolean!) {
+  query GetPetitionRecipients_petitionAccesses($petitionId: GID!) {
     petition(id: $petitionId) {
       ... on Petition {
         accesses {

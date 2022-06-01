@@ -2524,6 +2524,8 @@ export type PublicLicenseCode = {
 
 /** A public view of an organization */
 export type PublicOrganization = {
+  /** If this organization has the REMOVE_PARALLEL_BRANDING feature flag enabled */
+  hasRemoveParallelBranding: Scalars["Boolean"];
   /** The ID of the organization. */
   id: Scalars["GID"];
   /** The logo of the organization. */
