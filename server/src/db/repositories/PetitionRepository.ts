@@ -370,6 +370,7 @@ export class PetitionRepository extends BaseRepository {
         [userId]
       )
       .where("is_template", type === "TEMPLATE")
+      .where("petition.deleted_at", null)
       .mmodify((q) => {
         const { search, filters } = opts;
         if (filters?.locale) {
@@ -379,9 +380,13 @@ export class PetitionRepository extends BaseRepository {
           q.andWhereRaw(
             type === "PETITION"
               ? /* sql */ ` 
-                (petition.name ilike :search escape '\\'
-                or concat(c.first_name, ' ', c.last_name) ilike :search escape '\\'
-                or c.email ilike :search escape '\\')
+                (
+                  (petition.name ilike :search escape '\\')
+                or 
+                  (concat(c.first_name, ' ', c.last_name) ilike :search escape '\\' and c.deleted_at is null)
+                or 
+                  (c.email ilike :search escape '\\' and c.deleted_at is null)
+                )
               `
               : /* sql */ ` 
                 (petition.name ilike :search escape '\\'
@@ -3783,9 +3788,11 @@ export class PetitionRepository extends BaseRepository {
           select *, rank() over (partition by petition_id order by created_at desc) _rank
           from petition_signature_request
           where petition_id in ?
-        ) select * from cte where _rank = 1
+        ) 
+        select * from cte where _rank = 1 
+        and petition_id in ? -- filter again so index can be used on this main select
       `,
-        [this.sqlIn(keys)]
+        [this.sqlIn(keys), this.sqlIn(keys)]
       );
       const byPetitionId = indexBy(signatures, (r) => r.petition_id);
       return keys.map((key) => (byPetitionId[key] ? omit(byPetitionId[key], ["_rank"]) : null));
