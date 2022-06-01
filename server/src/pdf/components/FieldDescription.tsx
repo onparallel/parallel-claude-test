@@ -205,7 +205,7 @@ function MdList({ token: token, level = 0 }: { token: marked.Tokens.List; level?
               />
             )}
           </View>
-          <View key={i}>
+          <View key={i} style={{ flex: 1 }}>
             {t.tokens.map((t, i) =>
               t.type === "list" ? (
                 <MdList key={i} token={t} level={level + 1} />
