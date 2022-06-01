@@ -98,7 +98,7 @@ export function FieldDescription({ description }: FieldDescriptionProps) {
       )}
     </View>
   ) : (
-    <Text>{cleanupText(description)}</Text>
+    <Text>{cleanupText(interpolated)}</Text>
   );
 }
 
