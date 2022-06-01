@@ -113,7 +113,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const showPublicTemplateDialog = usePublicTemplateDialog();
   useEffect(() => {
     if (isPublicTemplate) {
-      showPublicTemplateDialog({});
+      withError(showPublicTemplateDialog({}));
     }
   }, []);
 
@@ -121,10 +121,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   useEffect(() => {
     if (query.fromTemplate) {
-      try {
-        showPetitionFromTemplateDialog();
-      } catch {}
-
+      withError(showPetitionFromTemplateDialog());
       router.replace(
         {
           pathname: router.pathname,
