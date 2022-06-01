@@ -256,10 +256,12 @@ function MdInline({ token }: { token: InlineToken }) {
       token.tokens.map((t, i) => <MdInline key={i} token={t as any} />)
     ) : (
       <Text>
-        {unescape(token.text).replaceAll(/^ +/gm, (match) => {
-          // replace leading spaces with &nbsp; to preserve whitespace
-          return match.replace(" ", "\xa0");
-        })}
+        {unescape(token.text)
+          .replaceAll(/\t/g, " ".repeat(4))
+          .replaceAll(/^ +/gm, (match) => {
+            // replace leading spaces with &nbsp; to preserve whitespace
+            return match.replace(" ", "\xa0");
+          })}
       </Text>
     );
   return token.type === "strong" ? (
