@@ -20688,6 +20688,7 @@ export type useBackgroundTask_TaskFragment = {
   __typename?: "Task";
   id: string;
   status: TaskStatus;
+  output?: { [key: string]: any } | null;
 };
 
 export type useBackgroundTask_createExportExcelTaskMutationVariables = Exact<{
@@ -20695,7 +20696,12 @@ export type useBackgroundTask_createExportExcelTaskMutationVariables = Exact<{
 }>;
 
 export type useBackgroundTask_createExportExcelTaskMutation = {
-  createTask: { __typename?: "Task"; id: string; status: TaskStatus };
+  createTask: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    output?: { [key: string]: any } | null;
+  };
 };
 
 export type useBackgroundTask_createPrintPdfTaskMutationVariables = Exact<{
@@ -20703,7 +20709,12 @@ export type useBackgroundTask_createPrintPdfTaskMutationVariables = Exact<{
 }>;
 
 export type useBackgroundTask_createPrintPdfTaskMutation = {
-  createTask: { __typename?: "Task"; id: string; status: TaskStatus };
+  createTask: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    output?: { [key: string]: any } | null;
+  };
 };
 
 export type useBackgroundTask_getTaskResultFileUrlMutationVariables = Exact<{
@@ -20712,12 +20723,30 @@ export type useBackgroundTask_getTaskResultFileUrlMutationVariables = Exact<{
 
 export type useBackgroundTask_getTaskResultFileUrlMutation = { getTaskResultFileUrl: string };
 
+export type useBackgroundTask_createTemplateStatsReportTaskMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type useBackgroundTask_createTemplateStatsReportTaskMutation = {
+  createTask: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    output?: { [key: string]: any } | null;
+  };
+};
+
 export type useBackgroundTask_taskQueryVariables = Exact<{
   id: Scalars["GID"];
 }>;
 
 export type useBackgroundTask_taskQuery = {
-  task: { __typename?: "Task"; id: string; status: TaskStatus };
+  task: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    output?: { [key: string]: any } | null;
+  };
 };
 
 export type useExportRepliesTask_createExportRepliesTaskMutationVariables = Exact<{
@@ -25256,6 +25285,7 @@ export const useBackgroundTask_TaskFragmentDoc = gql`
   fragment useBackgroundTask_Task on Task {
     id
     status
+    output
   }
 ` as unknown as DocumentNode<useBackgroundTask_TaskFragment, unknown>;
 export const PetitionTagListCellContent_tagsDocument = gql`
@@ -28485,6 +28515,17 @@ export const useBackgroundTask_getTaskResultFileUrlDocument = gql`
 ` as unknown as DocumentNode<
   useBackgroundTask_getTaskResultFileUrlMutation,
   useBackgroundTask_getTaskResultFileUrlMutationVariables
+>;
+export const useBackgroundTask_createTemplateStatsReportTaskDocument = gql`
+  mutation useBackgroundTask_createTemplateStatsReportTask($petitionId: GID!) {
+    createTask: createTemplateStatsReportTask(templateId: $petitionId) {
+      ...useBackgroundTask_Task
+    }
+  }
+  ${useBackgroundTask_TaskFragmentDoc}
+` as unknown as DocumentNode<
+  useBackgroundTask_createTemplateStatsReportTaskMutation,
+  useBackgroundTask_createTemplateStatsReportTaskMutationVariables
 >;
 export const useBackgroundTask_taskDocument = gql`
   query useBackgroundTask_task($id: GID!) {

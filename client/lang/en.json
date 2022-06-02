@@ -4990,6 +4990,11 @@
     "context": "Help"
   },
   {
+    "term": "generic.help-question",
+    "definition": "Help?",
+    "context": "Help?"
+  },
+  {
     "term": "generic.i-understand",
     "definition": "I understand",
     "context": "I understand"
@@ -6268,6 +6273,141 @@
     "term": "page.pricing.zapier-integration",
     "definition": "Zapier integration",
     "context": "Zapier integration"
+  },
+  {
+    "term": "page.reports.average-duration",
+    "definition": "Average duration",
+    "context": "Average duration"
+  },
+  {
+    "term": "page.reports.average-duration-help-1",
+    "definition": "Duration is divided into two parts.",
+    "context": "Duration is divided into two parts."
+  },
+  {
+    "term": "page.reports.average-duration-help-2",
+    "definition": "The sum of the two is the average duration of the petitions.",
+    "context": "The sum of the two is the average duration of the petitions."
+  },
+  {
+    "term": "page.reports.average-duration-help-list-1",
+    "definition": "Average time from the start of the petition until it is completed.",
+    "context": "Average time from the start of the petition until it is completed."
+  },
+  {
+    "term": "page.reports.average-duration-help-list-2",
+    "definition": "Average time from completion to closure.",
+    "context": "Average time from completion to closure."
+  },
+  {
+    "term": "page.reports.average-signing-time",
+    "definition": "Average signing time",
+    "context": "Average signing time"
+  },
+  {
+    "term": "page.reports.average-signing-time-help-1",
+    "definition": "This is the average time for documents to be signed since they were sent.",
+    "context": "This is the average time for documents to be signed since they were sent."
+  },
+  {
+    "term": "page.reports.average-signing-time-help-2",
+    "definition": "The bar represents the percentage of the time from the time the petition is completed until it is closed.",
+    "context": "The bar represents the percentage of the time from the time the petition is completed until it is closed."
+  },
+  {
+    "term": "page.reports.choose-template",
+    "definition": "Choose a template to view its statistics and results",
+    "context": "Choose a template to view its statistics and results"
+  },
+  {
+    "term": "page.reports.closed",
+    "definition": "Closed",
+    "context": "Closed"
+  },
+  {
+    "term": "page.reports.completed",
+    "definition": "Completed",
+    "context": "Completed"
+  },
+  {
+    "term": "page.reports.days",
+    "definition": "{days, plural, =1 {# day} other {# days}}",
+    "context": "{days, plural, =1 {# day} other {# days}}"
+  },
+  {
+    "term": "page.reports.download-results",
+    "definition": "Download results",
+    "context": "Download results"
+  },
+  {
+    "term": "page.reports.esignature-sent",
+    "definition": "eSignature sent",
+    "context": "eSignature sent"
+  },
+  {
+    "term": "page.reports.esignature-sent-help-1",
+    "definition": "This is the total completed eSignature processes.",
+    "context": "This is the total completed eSignature processes."
+  },
+  {
+    "term": "page.reports.esignature-sent-help-2",
+    "definition": "eSignatures processes in which a signer hasn't yet signed. aren't included.",
+    "context": "eSignatures processes in which a signer hasn't yet signed. aren't included."
+  },
+  {
+    "term": "page.reports.generate-report",
+    "definition": "Generate report",
+    "context": "Generate report"
+  },
+  {
+    "term": "page.reports.pending",
+    "definition": "Pending",
+    "context": "Pending"
+  },
+  {
+    "term": "page.reports.ready-to-generate-reports",
+    "definition": "We are ready to generate your reports!",
+    "context": "We are ready to generate your reports!"
+  },
+  {
+    "term": "page.reports.started-petitions",
+    "definition": "Started petitions",
+    "context": "Started petitions"
+  },
+  {
+    "term": "page.reports.started-petitions-help-1",
+    "definition": "This is the total petitions sent or started, i.e. drafts with at least one response.",
+    "context": "This is the total petitions sent or started, i.e. drafts with at least one response."
+  },
+  {
+    "term": "page.reports.started-petitions-help-2",
+    "definition": "This number doesn't include deleted petitions or unanswered drafts.",
+    "context": "This number doesn't include deleted petitions or unanswered drafts."
+  },
+  {
+    "term": "page.reports.status-of-petitions",
+    "definition": "Status of the petitions",
+    "context": "Status of the petitions"
+  },
+  {
+    "term": "page.reports.status-of-petitions-help-1",
+    "definition": "This shows the current number of petitions in each state.",
+    "context": "This shows the current number of petitions in each state."
+  },
+  {
+    "term": "page.reports.status-of-petitions-help-2",
+    "definition": "The sum of all is the total number of petitions created.",
+    "context": "The sum of all is the total number of petitions created."
+  },
+  {
+    "term": "page.reports.title",
+    "definition": "Reports",
+    "context": "Reports"
+  },
+  {
+    "term": "page.reports.wait-loading-reports",
+    "definition": "Wait while we load your reports...",
+    "context": "Wait while we load your reports..."
   },
   {
     "term": "page.signature.invalid-apikey-toast-description",

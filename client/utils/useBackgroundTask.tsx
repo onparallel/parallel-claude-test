@@ -2,16 +2,19 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   useBackgroundTask_createExportExcelTaskDocument,
   useBackgroundTask_createPrintPdfTaskDocument,
+  useBackgroundTask_createTemplateStatsReportTaskDocument,
   useBackgroundTask_getTaskResultFileUrlDocument,
   useBackgroundTask_taskDocument,
 } from "@parallel/graphql/__types";
 
-export function useBackgroundTask(task: "EXPORT_EXCEL" | "PRINT_PDF") {
+export function useBackgroundTask(taskName: "EXPORT_EXCEL" | "PRINT_PDF" | "STATS_REPORT") {
   const [createTask] = useMutation(
-    task === "EXPORT_EXCEL"
+    taskName === "EXPORT_EXCEL"
       ? useBackgroundTask_createExportExcelTaskDocument
-      : task === "PRINT_PDF"
+      : taskName === "PRINT_PDF"
       ? useBackgroundTask_createPrintPdfTaskDocument
+      : taskName === "STATS_REPORT"
+      ? useBackgroundTask_createTemplateStatsReportTaskDocument
       : (null as never)
   );
   const [generateDownloadUrl] = useMutation(useBackgroundTask_getTaskResultFileUrlDocument);
@@ -37,8 +40,13 @@ export function useBackgroundTask(task: "EXPORT_EXCEL" | "PRINT_PDF") {
         await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     })();
-    const { data } = await generateDownloadUrl({ variables: { taskId: task!.id } });
-    return { task, url: data!.getTaskResultFileUrl };
+
+    if (taskName === "STATS_REPORT") {
+      return { task };
+    } else {
+      const { data } = await generateDownloadUrl({ variables: { taskId: task!.id } });
+      return { task, url: data!.getTaskResultFileUrl };
+    }
   };
 }
 
@@ -47,6 +55,7 @@ const fragments = {
     fragment useBackgroundTask_Task on Task {
       id
       status
+      output
     }
   `,
 };
@@ -76,6 +85,14 @@ const _mutations = [
     mutation useBackgroundTask_getTaskResultFileUrl($taskId: GID!) {
       getTaskResultFileUrl(taskId: $taskId, preview: false)
     }
+  `,
+  gql`
+    mutation useBackgroundTask_createTemplateStatsReportTask($petitionId: GID!) {
+      createTask: createTemplateStatsReportTask(templateId: $petitionId) {
+        ...useBackgroundTask_Task
+      }
+    }
+    ${fragments.Task}
   `,
 ];
 

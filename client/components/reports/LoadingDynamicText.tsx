@@ -2,6 +2,8 @@ import { Text } from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 
+const SHOW_TIME = 2200;
+
 export function LoadingDynamicText() {
   const intl = useIntl();
 
@@ -44,7 +46,7 @@ export function LoadingDynamicText() {
         texts.current = [...defaultTexts];
         setText(texts.current.pop()!);
       }
-    }, 3200);
+    }, SHOW_TIME);
 
     return () => {
       clearTimeout(timer);

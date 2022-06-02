@@ -4990,6 +4990,11 @@
     "context": "Help"
   },
   {
+    "term": "generic.help-question",
+    "definition": "¿Ayuda?",
+    "context": "Help?"
+  },
+  {
     "term": "generic.i-understand",
     "definition": "Ok, entiendo",
     "context": "I understand"
@@ -6268,6 +6273,141 @@
     "term": "page.pricing.zapier-integration",
     "definition": "Integración con Zapier",
     "context": "Zapier integration"
+  },
+  {
+    "term": "page.reports.average-duration",
+    "definition": "Duración media",
+    "context": "Average duration"
+  },
+  {
+    "term": "page.reports.average-duration-help-1",
+    "definition": "La duración se divide en dos partes.",
+    "context": "Duration is divided into two parts."
+  },
+  {
+    "term": "page.reports.average-duration-help-2",
+    "definition": "La suma de ambas es la duración media del total de peticiones.",
+    "context": "The sum of the two is the average duration of the petitions."
+  },
+  {
+    "term": "page.reports.average-duration-help-list-1",
+    "definition": "El tiempo medio desde que se comienza la petición hasta que se completa.",
+    "context": "Average time from the start of the petition until it is completed."
+  },
+  {
+    "term": "page.reports.average-duration-help-list-2",
+    "definition": "El tiempo medio desde que se completa hasta que se cierra.",
+    "context": "Average time from completion to closure."
+  },
+  {
+    "term": "page.reports.average-signing-time",
+    "definition": "Tiempo medio en firmarse",
+    "context": "Average signing time"
+  },
+  {
+    "term": "page.reports.average-signing-time-help-1",
+    "definition": "Este es el tiempo medio en que tardaron en firmarse los documentos una vez enviados.",
+    "context": "This is the average time for documents to be signed since they were sent."
+  },
+  {
+    "term": "page.reports.average-signing-time-help-2",
+    "definition": "La barra representa el porcentaje respecto al tiempo transcurrido desde que se completa la petición hasta que se cierra.",
+    "context": "The bar represents the percentage of the time from the time the petition is completed until it is closed."
+  },
+  {
+    "term": "page.reports.choose-template",
+    "definition": "Elige una plantilla para ver sus estadísticas y resultados",
+    "context": "Choose a template to view its statistics and results"
+  },
+  {
+    "term": "page.reports.closed",
+    "definition": "Cerradas",
+    "context": "Closed"
+  },
+  {
+    "term": "page.reports.completed",
+    "definition": "Completadas",
+    "context": "Completed"
+  },
+  {
+    "term": "page.reports.days",
+    "definition": "{days, plural, =1 {# día} other {# días}}",
+    "context": "{days, plural, =1 {# day} other {# days}}"
+  },
+  {
+    "term": "page.reports.download-results",
+    "definition": "Descargar resultados",
+    "context": "Download results"
+  },
+  {
+    "term": "page.reports.esignature-sent",
+    "definition": "Firmas enviadas",
+    "context": "eSignature sent"
+  },
+  {
+    "term": "page.reports.esignature-sent-help-1",
+    "definition": "Este es el número total de procesos de firma completados.",
+    "context": "This is the total completed eSignature processes."
+  },
+  {
+    "term": "page.reports.esignature-sent-help-2",
+    "definition": "No entran en esta cifra procesos de firma en los que falte algún firmante por firmar.",
+    "context": "eSignatures processes in which a signer hasn't yet signed. aren't included."
+  },
+  {
+    "term": "page.reports.generate-report",
+    "definition": "Generar informe",
+    "context": "Generate report"
+  },
+  {
+    "term": "page.reports.pending",
+    "definition": "Pendientes",
+    "context": "Pending"
+  },
+  {
+    "term": "page.reports.ready-to-generate-reports",
+    "definition": "¡Estamos listos para generar tus informes!",
+    "context": "We are ready to generate your reports!"
+  },
+  {
+    "term": "page.reports.started-petitions",
+    "definition": "Peticiones",
+    "context": "Started petitions"
+  },
+  {
+    "term": "page.reports.started-petitions-help-1",
+    "definition": "Este es el número total de peticiones enviadas o comenzadas, es decir, con al menos una respuesta.",
+    "context": "This is the total petitions sent or started, i.e. drafts with at least one response."
+  },
+  {
+    "term": "page.reports.started-petitions-help-2",
+    "definition": "No entran en esta cifra las peticiones eliminadas, ni los borradores sin respuestas.",
+    "context": "This number doesn't include deleted petitions or unanswered drafts."
+  },
+  {
+    "term": "page.reports.status-of-petitions",
+    "definition": "Estado de las peticiones",
+    "context": "Status of the petitions"
+  },
+  {
+    "term": "page.reports.status-of-petitions-help-1",
+    "definition": "Este es el número de peticiones actual en cada estado.",
+    "context": "This shows the current number of petitions in each state."
+  },
+  {
+    "term": "page.reports.status-of-petitions-help-2",
+    "definition": "La suma de todos es el total de peticiones creadas.",
+    "context": "The sum of all is the total number of petitions created."
+  },
+  {
+    "term": "page.reports.title",
+    "definition": "Informes",
+    "context": "Reports"
+  },
+  {
+    "term": "page.reports.wait-loading-reports",
+    "definition": "Espera mientras cargamos tus informes...",
+    "context": "Wait while we load your reports..."
   },
   {
     "term": "page.signature.invalid-apikey-toast-description",
