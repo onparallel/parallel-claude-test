@@ -1456,14 +1456,16 @@ export class PetitionRepository extends BaseRepository {
       throw new Error(`PetitionField:${data.petition_field_id} not found`);
     }
     this.loadRepliesForField.dataloader.clear(data.petition_field_id);
-    const [[reply]] = await Promise.all([
-      this.insert("petition_field_reply", {
-        ...data,
-        updated_by: `${createdBy}:${creator.id}`,
-        created_by: `${createdBy}:${creator.id}`,
-      }),
-      this.reopenPetition(field.petition_id, `${createdBy}:${creator.id}`),
-    ]);
+    const [reply] = await this.insert("petition_field_reply", {
+      ...data,
+      updated_by: `${createdBy}:${creator.id}`,
+      created_by: `${createdBy}:${creator.id}`,
+    });
+
+    if (!field.is_internal) {
+      await this.reopenPetition(field.petition_id, `${createdBy}:${creator.id}`);
+    }
+
     await this.createEvent({
       type: "REPLY_CREATED",
       petition_id: field.petition_id,
@@ -1491,19 +1493,20 @@ export class PetitionRepository extends BaseRepository {
     const isContact = "keycode" in updater;
     const updatedBy = isContact ? `Contact:${updater.contact_id}` : `User:${updater.id}`;
 
-    const [[reply]] = await Promise.all([
-      this.from("petition_field_reply")
-        .where("id", replyId)
-        .update(
-          {
-            ...data,
-            updated_at: this.now(),
-            updated_by: updatedBy,
-          },
-          "*"
-        ),
-      this.reopenPetition(field.petition_id, updatedBy),
-    ]);
+    const [reply] = await this.from("petition_field_reply")
+      .where("id", replyId)
+      .update(
+        {
+          ...data,
+          updated_at: this.now(),
+          updated_by: updatedBy,
+        },
+        "*"
+      );
+
+    if (!field.is_internal) {
+      await this.reopenPetition(field.petition_id, updatedBy);
+    }
 
     await this.createOrUpdateReplyEvent(
       field.petition_id,
@@ -1549,6 +1552,10 @@ export class PetitionRepository extends BaseRepository {
       await this.files.deleteFileUpload(reply.content["file_upload_id"], deletedBy);
     }
 
+    if (!field.is_internal) {
+      await this.reopenPetition(field.petition_id, deletedBy);
+    }
+
     await Promise.all([
       this.from("petition_field_reply")
         .update({
@@ -1556,7 +1563,6 @@ export class PetitionRepository extends BaseRepository {
           deleted_by: deletedBy,
         })
         .where("id", replyId),
-      this.reopenPetition(field.petition_id, deletedBy),
       this.createEvent({
         type: "REPLY_DELETED",
         petition_id: field!.petition_id,

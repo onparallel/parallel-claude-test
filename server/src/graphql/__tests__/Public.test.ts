@@ -369,6 +369,7 @@ describe("GraphQL/Public", () => {
       describe("TEXT, SHORT_TEXT", () => {
         let textField: PetitionField;
         let shortTextField: PetitionField;
+        let internalField: PetitionField;
 
         beforeAll(async () => {
           [textField] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
@@ -380,6 +381,35 @@ describe("GraphQL/Public", () => {
             options: { maxLength: 10 },
             multiple: false,
           }));
+          [internalField] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
+            type: "TEXT",
+            is_internal: true,
+            optional: true,
+          }));
+        });
+
+        it("sends error when trying to create a reply on an internal field", async () => {
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!, $fieldId: GID!, $reply: JSON!) {
+                publicCreatePetitionFieldReply(
+                  keycode: $keycode
+                  fieldId: $fieldId
+                  reply: $reply
+                ) {
+                  status
+                  content
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+              fieldId: toGlobalId("PetitionField", internalField.id),
+              reply: "my text reply",
+            }
+          );
+          expect(errors).toContainGraphQLError("FORBIDDEN");
+          expect(data).toBeNull();
         });
 
         it("petition status should change to PENDING when creating a reply on a already completed petition", async () => {
@@ -1216,9 +1246,11 @@ describe("GraphQL/Public", () => {
     describe("publicUpdatePetitionFieldReply", () => {
       let textField: PetitionField;
       let shortTextField: PetitionField;
+      let internalField: PetitionField;
 
       let textReply: PetitionFieldReply;
       let approvedReply: PetitionFieldReply;
+      let internalFieldReply: PetitionFieldReply;
       describe("TEXT, SHORT_TEXT", () => {
         beforeAll(async () => {
           [textField, shortTextField] = await mocks.createRandomPetitionFields(
@@ -1231,6 +1263,11 @@ describe("GraphQL/Public", () => {
               multiple: true,
             })
           );
+          [internalField] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
+            type: "TEXT",
+            is_internal: true,
+          }));
+
           [textReply] = await mocks.createRandomTextReply(textField.id, access.id, 1);
 
           [approvedReply] = await mocks.createRandomTextReply(
@@ -1239,6 +1276,37 @@ describe("GraphQL/Public", () => {
             1,
             () => ({ status: "APPROVED", type: "SHORT_TEXT", content: { value: "short reply" } })
           );
+
+          [internalFieldReply] = await mocks.createRandomTextReply(
+            internalField.id,
+            access.id,
+            1,
+            () => ({ status: "PENDING", type: "TEXT", content: { value: "my reply" } })
+          );
+        });
+
+        it("sends error when trying to update a reply on an internal field", async () => {
+          const { errors, data } = await testClient.execute(
+            gql`
+              mutation ($keycode: ID!, $replyId: GID!, $reply: JSON!) {
+                publicUpdatePetitionFieldReply(
+                  keycode: $keycode
+                  replyId: $replyId
+                  reply: $reply
+                ) {
+                  status
+                  content
+                }
+              }
+            `,
+            {
+              keycode: access.keycode,
+              replyId: toGlobalId("PetitionFieldReply", internalFieldReply.id),
+              reply: "updated reply",
+            }
+          );
+          expect(errors).toContainGraphQLError("FORBIDDEN");
+          expect(data).toBeNull();
         });
 
         it("petition status should change to PENDING when updating a reply on a already completed petition", async () => {
@@ -1948,6 +2016,7 @@ describe("GraphQL/Public", () => {
       let simpleReply: PetitionFieldReply;
       let fileUploadReply: PetitionFieldReply;
       let approvedReply: PetitionFieldReply;
+      let internalReply: PetitionFieldReply;
       beforeAll(async () => {
         const [simpleField] = await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
           type: "TEXT",
@@ -1958,13 +2027,10 @@ describe("GraphQL/Public", () => {
           () => ({ type: "FILE_UPLOAD", optional: true })
         );
 
-        const [validatedField] = await mocks.createRandomPetitionFields(
+        const [internalField] = await mocks.createRandomPetitionFields(
           access.petition_id,
           1,
-          () => ({
-            type: "TEXT",
-            optional: true,
-          })
+          () => ({ type: "TEXT", optional: true, is_internal: true })
         );
 
         [simpleReply] = await mocks.createRandomTextReply(simpleField.id, access.id, 1);
@@ -1974,6 +2040,27 @@ describe("GraphQL/Public", () => {
         [approvedReply] = await mocks.createRandomTextReply(simpleField.id, access.id, 1, () => ({
           status: "APPROVED",
         }));
+        [internalReply] = await mocks.createRandomTextReply(internalField.id, access.id, 1, () => ({
+          status: "PENDING",
+        }));
+      });
+
+      it("sends error when trying to delete a reply on an internal field", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($keycode: ID!, $replyId: GID!) {
+              publicDeletePetitionFieldReply(keycode: $keycode, replyId: $replyId) {
+                id
+              }
+            }
+          `,
+          {
+            keycode: access.keycode,
+            replyId: toGlobalId("PetitionFieldReply", internalReply.id),
+          }
+        );
+        expect(errors).toContainGraphQLError("FORBIDDEN");
+        expect(data).toBeNull();
       });
 
       it("petition status should change to PENDING when deleting a reply on a already completed petition", async () => {

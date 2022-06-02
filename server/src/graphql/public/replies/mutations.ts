@@ -20,7 +20,9 @@ import { validateFieldReply, validateReplyUpdate } from "../../petition/validati
 import {
   authenticatePublicAccess,
   fieldBelongsToAccess,
+  fieldIsExternal,
   replyBelongsToAccess,
+  replyBelongsToExternalField,
 } from "../authorizers";
 
 export const publicCreatePetitionFieldReply = mutationField("publicCreatePetitionFieldReply", {
@@ -35,6 +37,7 @@ export const publicCreatePetitionFieldReply = mutationField("publicCreatePetitio
     authenticatePublicAccess("keycode"),
     and(
       fieldBelongsToAccess("fieldId"),
+      fieldIsExternal("fieldId"),
       fieldHasType("fieldId", [
         "TEXT",
         "SHORT_TEXT",
@@ -75,6 +78,7 @@ export const publicUpdatePetitionFieldReply = mutationField("publicUpdatePetitio
     authenticatePublicAccess("keycode"),
     and(
       replyBelongsToAccess("replyId"),
+      replyBelongsToExternalField("replyId"),
       replyIsForFieldOfType("replyId", [
         "TEXT",
         "SHORT_TEXT",
@@ -109,6 +113,7 @@ export const publicDeletePetitionFieldReply = mutationField("publicDeletePetitio
   authorize: chain(
     authenticatePublicAccess("keycode"),
     replyBelongsToAccess("replyId"),
+    replyBelongsToExternalField("replyId"),
     replyCanBeUpdated("replyId")
   ),
   args: {
@@ -130,6 +135,7 @@ export const publicFileUploadReplyComplete = mutationField("publicFileUploadRepl
   authorize: chain(
     authenticatePublicAccess("keycode"),
     replyBelongsToAccess("replyId"),
+    replyBelongsToExternalField("replyId"),
     replyIsForFieldOfType("replyId", "FILE_UPLOAD")
   ),
   resolve: async (_, args, ctx) => {
@@ -166,6 +172,7 @@ export const publicCreateFileUploadReply = mutationField("publicCreateFileUpload
     authenticatePublicAccess("keycode"),
     and(
       fieldBelongsToAccess("fieldId"),
+      fieldIsExternal("fieldId"),
       fieldHasType("fieldId", "FILE_UPLOAD"),
       fieldCanBeReplied("fieldId")
     )
@@ -204,7 +211,10 @@ export const publicFileUploadReplyDownloadLink = mutationField(
   {
     description: "Generates a download link for a file reply on a public context.",
     type: "FileUploadDownloadLinkResult",
-    authorize: chain(authenticatePublicAccess("keycode"), replyBelongsToAccess("replyId")),
+    authorize: chain(
+      authenticatePublicAccess("keycode"),
+      and(replyBelongsToAccess("replyId"), replyBelongsToExternalField("replyId"))
+    ),
     args: {
       keycode: nonNull(idArg()),
       replyId: nonNull(globalIdArg("PetitionFieldReply")),
@@ -263,6 +273,7 @@ export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFi
     authenticatePublicAccess("keycode"),
     and(
       fieldBelongsToAccess("fieldId"),
+      fieldIsExternal("fieldId"),
       fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
       fieldCanBeReplied("fieldId")
     )

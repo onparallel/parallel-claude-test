@@ -93,6 +93,21 @@ export function fieldBelongsToAccess<
   };
 }
 
+export function fieldIsExternal<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends Arg<TypeName, FieldName, number>
+>(argFieldId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const fieldId = args[argFieldId] as unknown as number;
+      const field = await ctx.petitions.loadField(fieldId);
+      return field?.is_internal === false;
+    } catch {}
+    return false;
+  };
+}
+
 export function replyBelongsToAccess<
   TypeName extends string,
   FieldName extends string,
@@ -103,6 +118,21 @@ export function replyBelongsToAccess<
       return await ctx.petitions.repliesBelongsToPetition(ctx.access!.petition_id, [
         args[argReplyId] as unknown as number,
       ]);
+    } catch {}
+    return false;
+  };
+}
+
+export function replyBelongsToExternalField<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends Arg<TypeName, FieldName, number>
+>(argReplyId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const replyId = args[argReplyId] as unknown as number;
+      const field = await ctx.petitions.loadFieldForReply(replyId);
+      return field?.is_internal === false;
     } catch {}
     return false;
   };
