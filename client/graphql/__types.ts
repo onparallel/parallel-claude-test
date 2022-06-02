@@ -21168,6 +21168,28 @@ export type useSearchContactsByEmail_contactsByEmailQuery = {
 
 export type useSettingsSections_UserFragment = { __typename?: "User"; hasDeveloperAccess: boolean };
 
+export type useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  timezone: Scalars["String"];
+}>;
+
+export type useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutation = {
+  createTemplateRepliesReportTask: {
+    __typename?: "Task";
+    id: string;
+    status: TaskStatus;
+    progress?: number | null;
+  };
+};
+
+export type useTemplateRepliesReportTask_getTaskResultFileUrlMutationVariables = Exact<{
+  taskId: Scalars["GID"];
+}>;
+
+export type useTemplateRepliesReportTask_getTaskResultFileUrlMutation = {
+  getTaskResultFileUrl: string;
+};
+
 export type validatePetitionFields_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -28589,4 +28611,26 @@ export const useSearchContactsByEmail_contactsByEmailDocument = gql`
 ` as unknown as DocumentNode<
   useSearchContactsByEmail_contactsByEmailQuery,
   useSearchContactsByEmail_contactsByEmailQueryVariables
+>;
+export const useTemplateRepliesReportTask_createTemplateRepliesReportTaskDocument = gql`
+  mutation useTemplateRepliesReportTask_createTemplateRepliesReportTask(
+    $petitionId: GID!
+    $timezone: String!
+  ) {
+    createTemplateRepliesReportTask(petitionId: $petitionId, timezone: $timezone) {
+      ...TaskProgressDialog_Task
+    }
+  }
+  ${TaskProgressDialog_TaskFragmentDoc}
+` as unknown as DocumentNode<
+  useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutation,
+  useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutationVariables
+>;
+export const useTemplateRepliesReportTask_getTaskResultFileUrlDocument = gql`
+  mutation useTemplateRepliesReportTask_getTaskResultFileUrl($taskId: GID!) {
+    getTaskResultFileUrl(taskId: $taskId, preview: true)
+  }
+` as unknown as DocumentNode<
+  useTemplateRepliesReportTask_getTaskResultFileUrlMutation,
+  useTemplateRepliesReportTask_getTaskResultFileUrlMutationVariables
 >;
