@@ -11,10 +11,8 @@ import {
   HStack,
   ListItem,
   OrderedList,
-  Spinner,
   Stack,
   Text,
-  useTheme,
 } from "@chakra-ui/react";
 import {
   CheckIcon,
@@ -31,9 +29,10 @@ import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { EmptyDoughnutChartIlustration } from "@parallel/components/reports/EmptyDoughnutChartIlustration";
-import { EmptyReportsIlustration } from "@parallel/components/reports/EmptyReportsIlustration";
-import { LoadingDynamicText } from "@parallel/components/reports/LoadingDynamicText";
+import { ReportsDoughnutChart } from "@parallel/components/reports/ReportsDoughnutChart";
+import { ReportsErrorMessage } from "@parallel/components/reports/ReportsErrorMessage";
+import { ReportsLoadingMessage } from "@parallel/components/reports/ReportsLoadingMessage";
+import { ReportsReadyMessage } from "@parallel/components/reports/ReportsReadyMessage";
 import { Reports_templatesDocument, Reports_userDocument } from "@parallel/graphql/__types";
 import {
   useAssertQuery,
@@ -42,13 +41,9 @@ import {
 import { compose } from "@parallel/utils/compose";
 import { useBackgroundTask } from "@parallel/utils/useBackgroundTask";
 import { useTemplateRepliesReportTask } from "@parallel/utils/useTemplateRepliesReportTask";
-import { ArcElement, Chart as ChartJS, Legend, Tooltip } from "chart.js";
 import { useEffect, useRef, useState } from "react";
-import { Doughnut } from "react-chartjs-2";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
-
-ChartJS.register(ArcElement, Tooltip, Legend);
 
 const MAX_FORCED_LOADING_TIME = 3000;
 const MIN_FORCED_LOADING_TIME = 2000;
@@ -72,7 +67,6 @@ export function Reports() {
     data: { me, realMe },
   } = useAssertQuery(Reports_userDocument);
 
-  const theme = useTheme();
   const [state, setState] = useState<"IDLE" | "LOADING" | "FAKE_LOADING" | "ERROR">("IDLE");
   const [templateId, setTemplateId] = useState<string | null>(null);
   const [report, setReport] = useState<ReportType | null>(null);
@@ -143,8 +137,8 @@ export function Reports() {
     if (hours) {
       formatted += ` ${hours}h`;
     }
-    if (minutes) {
-      formatted += ` ${minutes}'`;
+    if (minutes || seconds) {
+      formatted += ` ${minutes || 1}'`;
     }
 
     return seconds ? formatted : "0'";
@@ -158,45 +152,15 @@ export function Reports() {
 
   const pendingToCompletePercent =
     (pendingToComplete / (pendingToComplete + completeToClose)) * 100;
-
   const completeToClosePercent = (completeToClose / (pendingToComplete + completeToClose)) * 100;
-
   const signaturesTimeToComplete = (timeToComplete / completeToClose) * 100;
 
   const pendingPetitions = report?.pending ?? 0;
   const completedPetitions = report?.completed ?? 0;
   const closedPetitions = report?.closed ?? 0;
 
-  const petitionsCompleted = closedPetitions + completedPetitions + pendingPetitions;
-
+  const petitionsTotal = closedPetitions + completedPetitions + pendingPetitions;
   const signaturesCompleted = report?.signatures.completed ?? 0;
-
-  const data = {
-    labels: [
-      intl.formatMessage({
-        id: "page.reports.pending",
-        defaultMessage: "Pending",
-      }),
-      intl.formatMessage({
-        id: "page.reports.completed",
-        defaultMessage: "Completed",
-      }),
-      intl.formatMessage({
-        id: "page.reports.closed",
-        defaultMessage: "Closed",
-      }),
-    ],
-    datasets: [
-      {
-        data: [pendingPetitions, completedPetitions, closedPetitions],
-        backgroundColor: [
-          theme.colors.yellow[500],
-          theme.colors.green[400],
-          theme.colors.green[600],
-        ],
-      },
-    ],
-  };
 
   return (
     <AppLayout
@@ -244,6 +208,10 @@ export function Reports() {
                       }),
                     value: t.id,
                   }))}
+                  placeholder={intl.formatMessage({
+                    id: "page.reports.select-a-template",
+                    defaultMessage: "Select a template...",
+                  })}
                   isSearchable={true}
                   value={templateId}
                   onChange={(select) => {
@@ -333,7 +301,7 @@ export function Reports() {
                   </HelpPopover>
                 </HStack>
                 <Text fontWeight="600" fontSize="4xl">
-                  {petitionsCompleted}
+                  {petitionsTotal}
                 </Text>
               </Card>
             </GridItem>
@@ -366,9 +334,18 @@ export function Reports() {
                     </Stack>
                   </HelpPopover>
                 </HStack>
-                <Text fontWeight="600" fontSize="4xl">
-                  {signaturesCompleted}
-                </Text>
+                {signaturesCompleted || !petitionsTotal ? (
+                  <Text fontWeight="600" fontSize="4xl">
+                    {signaturesCompleted}
+                  </Text>
+                ) : (
+                  <Text fontSize="xl" textStyle="hint">
+                    <FormattedMessage
+                      id="page.reports.no-esignatures-sent"
+                      defaultMessage="No eSignatures sent"
+                    />
+                  </Text>
+                )}
               </Card>
             </GridItem>
             <GridItem gridArea="petitions-time">
@@ -448,6 +425,14 @@ export function Reports() {
                         background="green.600"
                       />
                       <DoubleCheckIcon color="green.500" />
+                      {pendingToComplete && !completeToClose ? (
+                        <Text textStyle="hint">
+                          <FormattedMessage
+                            id="page.reports.no-petitions-closed"
+                            defaultMessage="No petitions closed"
+                          />
+                        </Text>
+                      ) : null}
                     </HStack>
                   </GridItem>
                 </Grid>
@@ -484,195 +469,60 @@ export function Reports() {
                   gap={3}
                   alignItems="center"
                 >
-                  <GridItem colSpan={{ base: 4, md: 1 }} textAlign={{ base: "left", md: "right" }}>
-                    <Text whiteSpace="nowrap">{getDaysHoursAndMinutes(timeToComplete)}</Text>
-                  </GridItem>
-                  <GridItem colSpan={4}>
-                    <HStack>
-                      <Flex alignItems="center" gridGap={0} position="relative" paddingX={1}>
-                        <SignatureIcon color="gray.300" boxSize={4} />
-                        <TimeIcon
-                          color="yellow.600"
-                          fontSize="10px"
-                          position="absolute"
-                          top={"-4px"}
-                          right={"1px"}
-                        />
-                      </Flex>
-                      <Box
-                        width={`${signaturesTimeToComplete}%`}
-                        minWidth="5px"
-                        height="12px"
-                        borderRadius="full"
-                        background="yellow.400"
-                      />
-                      <SignatureIcon />
-                    </HStack>
-                  </GridItem>
+                  {signaturesCompleted || !petitionsTotal ? (
+                    <>
+                      <GridItem
+                        colSpan={{ base: 4, md: 1 }}
+                        textAlign={{ base: "left", md: "right" }}
+                      >
+                        <Text whiteSpace="nowrap">{getDaysHoursAndMinutes(timeToComplete)}</Text>
+                      </GridItem>
+                      <GridItem colSpan={4}>
+                        <HStack>
+                          <Flex alignItems="center" gridGap={0} position="relative" paddingX={1}>
+                            <SignatureIcon color="gray.300" boxSize={4} />
+                            <TimeIcon
+                              color="yellow.600"
+                              fontSize="10px"
+                              position="absolute"
+                              top={"-4px"}
+                              right={"1px"}
+                            />
+                          </Flex>
+                          <Box
+                            width={`${signaturesTimeToComplete}%`}
+                            minWidth="5px"
+                            height="12px"
+                            borderRadius="full"
+                            background="yellow.400"
+                          />
+                          <SignatureIcon />
+                        </HStack>
+                      </GridItem>
+                    </>
+                  ) : (
+                    <Text fontSize="xl">-</Text>
+                  )}
                 </Grid>
               </Card>
             </GridItem>
             <GridItem gridArea="chart">
-              <Card
-                height="100%"
-                padding={6}
-                as={Stack}
-                spacing={3}
-                alignItems="center"
-                justifyContent="center"
-                maxWidth={{ base: "full", xl: "360px" }}
-              >
-                <HStack>
-                  <Text>
-                    <FormattedMessage
-                      id="page.reports.status-of-petitions"
-                      defaultMessage="Status of the petitions"
-                    />
-                  </Text>
-                  <HelpPopover>
-                    <Stack>
-                      <Text>
-                        <FormattedMessage
-                          id="page.reports.status-of-petitions-help-1"
-                          defaultMessage="This shows the current number of petitions in each state."
-                        />
-                      </Text>
-                      <Text>
-                        <FormattedMessage
-                          id="page.reports.status-of-petitions-help-2"
-                          defaultMessage="The sum of all is the total number of petitions created."
-                        />
-                      </Text>
-                    </Stack>
-                  </HelpPopover>
-                </HStack>
-                <Center maxWidth="150px" position="relative">
-                  {petitionsCompleted ? (
-                    <Doughnut
-                      data={data}
-                      options={{
-                        plugins: {
-                          legend: {
-                            display: false,
-                          },
-                          tooltip: {
-                            enabled: true,
-                            backgroundColor: theme.colors.white,
-                            bodyColor: theme.colors.gray[800],
-                            borderColor: theme.colors.gray[300],
-                            borderWidth: 1,
-                            padding: 8,
-                            boxPadding: 4,
-                            usePointStyle: true,
-                            callbacks: {
-                              labelPointStyle: function () {
-                                return {
-                                  pointStyle: "rectRounded",
-                                  rotation: 0,
-                                };
-                              },
-                            },
-                          },
-                        },
-                      }}
-                    />
-                  ) : (
-                    <EmptyDoughnutChartIlustration
-                      color="gray.300"
-                      maxWidth="150px"
-                      maxHeight="150px"
-                      width="100%"
-                      height="100%"
-                    />
-                  )}
-                </Center>
-                <HStack
-                  wrap="wrap"
-                  alignItems="center"
-                  justifyContent="center"
-                  fontSize="sm"
-                  spacing={2}
-                  gridGap={2}
-                >
-                  <HStack>
-                    <Box w={4} h={4} bg="yellow.500" borderRadius="4px"></Box>
-                    <Text>{`${pendingPetitions} ${intl.formatMessage({
-                      id: "page.reports.pending",
-                      defaultMessage: "Pending",
-                    })}`}</Text>
-                  </HStack>
-                  <HStack>
-                    <Box w={4} h={4} bg="green.400" borderRadius="4px"></Box>
-                    <Text>{`${completedPetitions} ${intl.formatMessage({
-                      id: "page.reports.completed",
-                      defaultMessage: "Completed",
-                    })}`}</Text>
-                  </HStack>
-                  <HStack>
-                    <Box w={4} h={4} bg="green.600" borderRadius="4px"></Box>
-                    <Text>{`${closedPetitions} ${intl.formatMessage({
-                      id: "page.reports.closed",
-                      defaultMessage: "Closed",
-                    })}`}</Text>
-                  </HStack>
-                </HStack>
-              </Card>
+              <ReportsDoughnutChart
+                petitionsTotal={petitionsTotal}
+                pendingPetitions={pendingPetitions}
+                closedPetitions={closedPetitions}
+                completedPetitions={completedPetitions}
+              />
             </GridItem>
           </Grid>
         ) : (
-          <Stack minHeight="340px" alignItems="center" justifyContent="center">
+          <Stack minHeight="340px" alignItems="center" justifyContent="center" textAlign="center">
             {state === "LOADING" || state === "FAKE_LOADING" ? (
-              <>
-                <Center h="100px" marginBottom={6}>
-                  <Spinner
-                    thickness="4px"
-                    speed="0.65s"
-                    emptyColor="gray.200"
-                    color="purple.600"
-                    size="xl"
-                  />
-                </Center>
-
-                <Text fontWeight="bold">
-                  <FormattedMessage
-                    id="page.reports.wait-loading-reports"
-                    defaultMessage="Wait while we load your reports..."
-                  />
-                </Text>
-                <LoadingDynamicText />
-              </>
+              <ReportsLoadingMessage />
             ) : state === "ERROR" ? (
-              <>
-                <EmptyReportsIlustration
-                  maxWidth="225px"
-                  height="100px"
-                  width="100%"
-                  marginBottom={6}
-                />
-                <Text fontWeight="bold">ERROR!</Text>
-                <Text>ERRROR!</Text>
-              </>
+              <ReportsErrorMessage />
             ) : (
-              <>
-                <EmptyReportsIlustration
-                  maxWidth="225px"
-                  height="100px"
-                  width="100%"
-                  marginBottom={6}
-                />
-                <Text fontWeight="bold">
-                  <FormattedMessage
-                    id="page.reports.ready-to-generate-reports"
-                    defaultMessage="We are ready to generate your reports!"
-                  />
-                </Text>
-                <Text>
-                  <FormattedMessage
-                    id="page.reports.choose-template"
-                    defaultMessage="Choose a template to view its statistics and results"
-                  />
-                </Text>
-              </>
+              <ReportsReadyMessage />
             )}
           </Stack>
         )}

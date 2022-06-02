@@ -3345,6 +3345,66 @@
     "context": "Mark as unread"
   },
   {
+    "term": "component.reports-doughnut-chart.closed",
+    "definition": "Cerradas",
+    "context": "Closed"
+  },
+  {
+    "term": "component.reports-doughnut-chart.completed",
+    "definition": "Completadas",
+    "context": "Completed"
+  },
+  {
+    "term": "component.reports-doughnut-chart.pending",
+    "definition": "Pendientes",
+    "context": "Pending"
+  },
+  {
+    "term": "component.reports-doughnut-chart.status-of-petitions",
+    "definition": "Estado de las peticiones",
+    "context": "Status of the petitions"
+  },
+  {
+    "term": "component.reports-doughnut-chart.status-of-petitions-help-1",
+    "definition": "Este es el número de peticiones actual en cada estado.",
+    "context": "This shows the current number of petitions in each state."
+  },
+  {
+    "term": "component.reports-doughnut-chart.status-of-petitions-help-2",
+    "definition": "La suma de todos es el total de peticiones creadas.",
+    "context": "The sum of all is the total number of petitions created."
+  },
+  {
+    "term": "component.reports-error-message.contact-support",
+    "definition": "Si el problema continúa, <a>contacta con soporte</a> a través del chat.",
+    "context": "If the problem persists, please <a>contact support</a> vía chat."
+  },
+  {
+    "term": "component.reports-error-message.title",
+    "definition": "Vaya, parece que algo fue mal",
+    "context": "Oops, looks like something went wrong"
+  },
+  {
+    "term": "component.reports-error-message.try-again",
+    "definition": "Inténtalo de nuevo o prueba con otra plantilla.",
+    "context": "Try again or select another template."
+  },
+  {
+    "term": "component.reports-loading-message.wait-while-load",
+    "definition": "Espera mientras cargamos tus informes...",
+    "context": "Wait while we load your reports..."
+  },
+  {
+    "term": "component.reports-ready-message.choose-template",
+    "definition": "Elige una plantilla para ver sus estadísticas y resultados",
+    "context": "Choose a template to view its statistics and results"
+  },
+  {
+    "term": "component.reports-ready-message.ready-to-generate-reports",
+    "definition": "¡Estamos listos para generar tus informes!",
+    "context": "We are ready to generate your reports!"
+  },
+  {
     "term": "component.restrict-petition.optional-password-label",
     "definition": "Contraseña (Opcional)",
     "context": "Password (Optional)"
@@ -6315,21 +6375,6 @@
     "context": "The bar represents the percentage of the time from the time the petition is completed until it is closed."
   },
   {
-    "term": "page.reports.choose-template",
-    "definition": "Elige una plantilla para ver sus estadísticas y resultados",
-    "context": "Choose a template to view its statistics and results"
-  },
-  {
-    "term": "page.reports.closed",
-    "definition": "Cerradas",
-    "context": "Closed"
-  },
-  {
-    "term": "page.reports.completed",
-    "definition": "Completadas",
-    "context": "Completed"
-  },
-  {
     "term": "page.reports.days",
     "definition": "{days, plural, =1 {# día} other {# días}}",
     "context": "{days, plural, =1 {# day} other {# days}}"
@@ -6338,6 +6383,11 @@
     "term": "page.reports.download-results",
     "definition": "Descargar resultados",
     "context": "Download results"
+  },
+  {
+    "term": "page.reports.error-support-message",
+    "definition": "Hola, estoy teniendo problemas para generar informes.",
+    "context": "Hi, I'm having issues to generate reports."
   },
   {
     "term": "page.reports.esignature-sent",
@@ -6360,14 +6410,19 @@
     "context": "Generate report"
   },
   {
-    "term": "page.reports.pending",
-    "definition": "Pendientes",
-    "context": "Pending"
+    "term": "page.reports.no-esignatures-sent",
+    "definition": "Firmas no enviadas",
+    "context": "No eSignatures sent"
   },
   {
-    "term": "page.reports.ready-to-generate-reports",
-    "definition": "¡Estamos listos para generar tus informes!",
-    "context": "We are ready to generate your reports!"
+    "term": "page.reports.no-petitions-closed",
+    "definition": "No hay peticiones cerradas",
+    "context": "No petitions closed"
+  },
+  {
+    "term": "page.reports.select-a-template",
+    "definition": "Selecciona una plantilla...",
+    "context": "Select a template..."
   },
   {
     "term": "page.reports.started-petitions",
@@ -6385,29 +6440,9 @@
     "context": "This number doesn't include deleted petitions or unanswered drafts."
   },
   {
-    "term": "page.reports.status-of-petitions",
-    "definition": "Estado de las peticiones",
-    "context": "Status of the petitions"
-  },
-  {
-    "term": "page.reports.status-of-petitions-help-1",
-    "definition": "Este es el número de peticiones actual en cada estado.",
-    "context": "This shows the current number of petitions in each state."
-  },
-  {
-    "term": "page.reports.status-of-petitions-help-2",
-    "definition": "La suma de todos es el total de peticiones creadas.",
-    "context": "The sum of all is the total number of petitions created."
-  },
-  {
     "term": "page.reports.title",
     "definition": "Informes",
     "context": "Reports"
-  },
-  {
-    "term": "page.reports.wait-loading-reports",
-    "definition": "Espera mientras cargamos tus informes...",
-    "context": "Wait while we load your reports..."
   },
   {
     "term": "page.signature.invalid-apikey-toast-description",
