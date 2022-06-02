@@ -799,11 +799,6 @@ export type MutationcreateExportRepliesTaskArgs = {
   petitionId: Scalars["GID"];
 };
 
-export type MutationcreateExportReportTaskArgs = {
-  petitionId: Scalars["GID"];
-  timezone: Scalars["String"];
-};
-
 export type MutationcreateFileUploadReplyArgs = {
   fieldId: Scalars["GID"];
   file: FileUploadInput;

@@ -20769,26 +20769,6 @@ export type useExportRepliesTask_getTaskResultFileUrlMutationVariables = Exact<{
 
 export type useExportRepliesTask_getTaskResultFileUrlMutation = { getTaskResultFileUrl: string };
 
-export type useExportReportTask_createExportReportTaskMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  timezone: Scalars["String"];
-}>;
-
-export type useExportReportTask_createExportReportTaskMutation = {
-  createExportReportTask: {
-    __typename?: "Task";
-    id: string;
-    status: TaskStatus;
-    progress?: number | null;
-  };
-};
-
-export type useExportReportTask_getTaskResultFileUrlMutationVariables = Exact<{
-  taskId: Scalars["GID"];
-}>;
-
-export type useExportReportTask_getTaskResultFileUrlMutation = { getTaskResultFileUrl: string };
-
 export type useFilenamePlaceholdersRename_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -21187,36 +21167,6 @@ export type useSearchContactsByEmail_contactsByEmailQuery = {
 };
 
 export type useSettingsSections_UserFragment = { __typename?: "User"; hasDeveloperAccess: boolean };
-
-export type useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  timezone: Scalars["String"];
-}>;
-
-export type useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutation = {
-  createTemplateRepliesReportTask: {
-    __typename?: "Task";
-    id: string;
-    status: TaskStatus;
-    progress?: number | null;
-  };
-};
-
-export type useTemplateRepliesReportTask_getTaskResultFileUrlMutationVariables = Exact<{
-  taskId: Scalars["GID"];
-}>;
-
-export type useTemplateRepliesReportTask_getTaskResultFileUrlMutation = {
-  getTaskResultFileUrl: string;
-};
-
-export type useTemplateRepliesReportTask_taskQueryVariables = Exact<{
-  id: Scalars["GID"];
-}>;
-
-export type useTemplateRepliesReportTask_taskQuery = {
-  task: { __typename?: "Task"; id: string; status: TaskStatus; progress?: number | null };
-};
 
 export type validatePetitionFields_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -28554,25 +28504,6 @@ export const useExportRepliesTask_getTaskResultFileUrlDocument = gql`
   useExportRepliesTask_getTaskResultFileUrlMutation,
   useExportRepliesTask_getTaskResultFileUrlMutationVariables
 >;
-export const useExportReportTask_createExportReportTaskDocument = gql`
-  mutation useExportReportTask_createExportReportTask($petitionId: GID!, $timezone: String!) {
-    createExportReportTask(petitionId: $petitionId, timezone: $timezone) {
-      ...TaskProgressDialog_Task
-    }
-  }
-  ${TaskProgressDialog_TaskFragmentDoc}
-` as unknown as DocumentNode<
-  useExportReportTask_createExportReportTaskMutation,
-  useExportReportTask_createExportReportTaskMutationVariables
->;
-export const useExportReportTask_getTaskResultFileUrlDocument = gql`
-  mutation useExportReportTask_getTaskResultFileUrl($taskId: GID!) {
-    getTaskResultFileUrl(taskId: $taskId, preview: true)
-  }
-` as unknown as DocumentNode<
-  useExportReportTask_getTaskResultFileUrlMutation,
-  useExportReportTask_getTaskResultFileUrlMutationVariables
->;
 export const useLoginAs_loginAsDocument = gql`
   mutation useLoginAs_loginAs($userId: GID!) {
     loginAs(userId: $userId)
@@ -28658,37 +28589,4 @@ export const useSearchContactsByEmail_contactsByEmailDocument = gql`
 ` as unknown as DocumentNode<
   useSearchContactsByEmail_contactsByEmailQuery,
   useSearchContactsByEmail_contactsByEmailQueryVariables
->;
-export const useTemplateRepliesReportTask_createTemplateRepliesReportTaskDocument = gql`
-  mutation useTemplateRepliesReportTask_createTemplateRepliesReportTask(
-    $petitionId: GID!
-    $timezone: String!
-  ) {
-    createTemplateRepliesReportTask(petitionId: $petitionId, timezone: $timezone) {
-      ...TaskProgressDialog_Task
-    }
-  }
-  ${TaskProgressDialog_TaskFragmentDoc}
-` as unknown as DocumentNode<
-  useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutation,
-  useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutationVariables
->;
-export const useTemplateRepliesReportTask_getTaskResultFileUrlDocument = gql`
-  mutation useTemplateRepliesReportTask_getTaskResultFileUrl($taskId: GID!) {
-    getTaskResultFileUrl(taskId: $taskId, preview: true)
-  }
-` as unknown as DocumentNode<
-  useTemplateRepliesReportTask_getTaskResultFileUrlMutation,
-  useTemplateRepliesReportTask_getTaskResultFileUrlMutationVariables
->;
-export const useTemplateRepliesReportTask_taskDocument = gql`
-  query useTemplateRepliesReportTask_task($id: GID!) {
-    task(id: $id) {
-      ...TaskProgressDialog_Task
-    }
-  }
-  ${TaskProgressDialog_TaskFragmentDoc}
-` as unknown as DocumentNode<
-  useTemplateRepliesReportTask_taskQuery,
-  useTemplateRepliesReportTask_taskQueryVariables
 >;
