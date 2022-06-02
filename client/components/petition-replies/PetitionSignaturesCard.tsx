@@ -18,6 +18,7 @@ import { getPetitionSignatureEnvironment } from "@parallel/utils/getPetitionSign
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapArray } from "@parallel/utils/types";
+import { usePetitionLimitReachedErrorDialog } from "@parallel/utils/usePetitionLimitReachedErrorDialog";
 import { usePetitionSignaturesCardPolling } from "@parallel/utils/usePetitionSignaturesCardPolling";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -190,6 +191,7 @@ export const PetitionSignaturesCard = Object.assign(
     );
 
     const showErrorDialog = useErrorDialog();
+    const showPetitionLimitReachedErrorDialog = usePetitionLimitReachedErrorDialog();
 
     const handleStartSignatureProcess = useCallback(
       async (message?: Maybe<string>) => {
@@ -224,6 +226,8 @@ export const PetitionSignaturesCard = Object.assign(
                 ),
               })
             );
+          } else if (isApolloError(error, "PETITION_SEND_CREDITS_ERROR")) {
+            await withError(showPetitionLimitReachedErrorDialog());
           }
         }
       },

@@ -16,5 +16,5 @@ export async function getRequiredPetitionSendCredits(
     throw new Error("UNSUPPORTED_USE_CASE");
   }
 
-  return groups - petition!.credits_used;
+  return Math.max(0, groups - petition!.credits_used);
 }

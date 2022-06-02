@@ -47,6 +47,7 @@ import { withError } from "@parallel/utils/promises/withError";
 import { Maybe } from "@parallel/utils/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
+import { usePetitionLimitReachedErrorDialog } from "@parallel/utils/usePetitionLimitReachedErrorDialog";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { memo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -128,6 +129,7 @@ function _PetitionSettings({
     PetitionSettings_updatePetitionRestrictionDocument
   );
 
+  const showPetitionLimitReachedErrorDialog = usePetitionLimitReachedErrorDialog();
   async function handleConfigureSignatureClick() {
     try {
       if (ongoingSignatureRequest) {
@@ -161,7 +163,13 @@ function _PetitionSettings({
       await onUpdatePetition({ signatureConfig });
 
       if (petition.__typename === "Petition" && ["COMPLETED", "CLOSED"].includes(petition.status)) {
-        await startSignatureRequest({ variables: { petitionId: petition.id } });
+        try {
+          await startSignatureRequest({ variables: { petitionId: petition.id } });
+        } catch (error) {
+          if (isApolloError(error, "PETITION_SEND_CREDITS_ERROR")) {
+            await withError(showPetitionLimitReachedErrorDialog());
+          }
+        }
       }
     } catch {}
   }

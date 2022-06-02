@@ -3,8 +3,8 @@ import { booleanArg, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { toGlobalId } from "../../../util/globalId";
 import { authenticateAnd } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
-import { jsonObjectArg } from "../../helpers/scalars";
 import { RESULT } from "../../helpers/result";
+import { jsonObjectArg } from "../../helpers/scalars";
 import {
   userHasAccessToPetitions,
   userHasAccessToSignatureRequest,
@@ -38,12 +38,51 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
           throw new Error(`Petition:${petition.id} was expected to have signature_config set`);
         }
 
+        if (petition.credits_used === 0) {
+          const petitionSendUsageLimit = await ctx.organizations.getOrganizationCurrentUsageLimit(
+            ctx.user!.org_id,
+            "PETITION_SEND"
+          );
+
+          if (
+            !petitionSendUsageLimit ||
+            petitionSendUsageLimit.used + 1 > petitionSendUsageLimit.limit
+          ) {
+            throw new ApolloError(
+              `Not enough credits to send the petition`,
+              "PETITION_SEND_CREDITS_ERROR",
+              {
+                needed: 1,
+                used: petitionSendUsageLimit?.used || 0,
+                limit: petitionSendUsageLimit?.limit || 0,
+              }
+            );
+          }
+        }
+
         const { signatureRequest } = await ctx.signature.createSignatureRequest(
           petition.id,
           { ...petition.signature_config, message: message ?? undefined },
           ctx.user!,
           t
         );
+
+        // consume PETITION_SEND credits if up to this point the petition hasn't consumed any
+        if (petition.credits_used === 0) {
+          await ctx.petitions.updatePetition(
+            petitionId,
+            { credits_used: 1 },
+            `User:${ctx.user!.id}`,
+            t
+          );
+          await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
+            ctx.user!.org_id,
+            "PETITION_SEND",
+            1,
+            t
+          );
+        }
+
         return signatureRequest;
       });
     } catch (error: any) {
