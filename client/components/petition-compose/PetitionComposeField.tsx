@@ -262,6 +262,7 @@ const _PetitionComposeField = chakraForwardRef<
     "onKeyDown",
     "ref",
     "tabIndex",
+    "role",
   ]);
   const rootRef = useMergedRef(_rootProps.ref, elementRef);
 
