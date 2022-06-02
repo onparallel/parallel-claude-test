@@ -10,7 +10,7 @@ import { hash, random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { escapeLike, SortBy } from "../helpers/utils";
-import { KNEX, KNEX_READONLY } from "../knex";
+import { KNEX } from "../knex";
 import {
   Contact,
   CreateContact,
@@ -366,12 +366,5 @@ export class ContactRepository extends BaseRepository {
         first_name: "",
         last_name: "",
       });
-  }
-}
-
-@injectable()
-export class ReadonlyContactRepository extends ContactRepository {
-  constructor(@inject(KNEX_READONLY) knex: Knex) {
-    super(knex);
   }
 }

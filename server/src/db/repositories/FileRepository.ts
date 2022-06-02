@@ -3,7 +3,7 @@ import { Knex } from "knex";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
-import { KNEX, KNEX_READONLY } from "../knex";
+import { KNEX } from "../knex";
 import {
   CreateFileUpload,
   CreatePublicFileUpload,
@@ -143,12 +143,5 @@ export class FileRepository extends BaseRepository {
       .returning("*");
 
     return row;
-  }
-}
-
-@injectable()
-export class ReadonlyFileRepository extends FileRepository {
-  constructor(@inject(KNEX_READONLY) knex: Knex) {
-    super(knex);
   }
 }

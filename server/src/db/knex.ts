@@ -1,12 +1,13 @@
-import { interfaces } from "inversify";
+import { createTaggedDecorator, interfaces } from "inversify";
 import { Knex, knex } from "knex";
 import { CONFIG, Config } from "../config";
-import { LOGGER, ILogger } from "../services/logger";
+import { ILogger, LOGGER } from "../services/logger";
 import "./helpers/knexExtensions";
 import { TableTypes } from "./__types";
 
 export const KNEX = Symbol.for("KNEX");
-export const KNEX_READONLY = Symbol.for("KNEX_READONLY");
+
+export const readOnly = createTaggedDecorator({ key: "db", value: "read-only" });
 
 declare module "knex/types/tables" {
   interface Tables extends TableTypes {}

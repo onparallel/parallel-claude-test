@@ -25,7 +25,7 @@ import {
 import { BaseRepository, PageOpts, TableCreateTypes, TableTypes } from "../helpers/BaseRepository";
 import { defaultFieldOptions, validateFieldOptions } from "../helpers/fieldOptions";
 import { escapeLike, isValueCompatible, SortBy } from "../helpers/utils";
-import { KNEX, KNEX_READONLY } from "../knex";
+import { KNEX } from "../knex";
 import {
   CommentCreatedUserNotification,
   CreatePetitionUserNotification,
@@ -65,7 +65,7 @@ import {
   TemplateDefaultPermission,
   User,
 } from "../__types";
-import { FileRepository, ReadonlyFileRepository } from "./FileRepository";
+import { FileRepository } from "./FileRepository";
 type PetitionType = "PETITION" | "TEMPLATE";
 type PetitionLocale = "en" | "es";
 
@@ -4481,16 +4481,5 @@ export class PetitionRepository extends BaseRepository {
       .map((s) => s.file_upload_id!);
 
     await this.files.deleteFileUpload(fileUploadIds, "Worker:Anonymizer", t);
-  }
-}
-
-@injectable()
-export class ReadonlyPetitionRepository extends PetitionRepository {
-  constructor(
-    @inject(KNEX_READONLY) knex: Knex,
-    @inject(AWS_SERVICE) aws: Aws,
-    @inject(ReadonlyFileRepository) files: FileRepository
-  ) {
-    super(knex, aws, files);
   }
 }
