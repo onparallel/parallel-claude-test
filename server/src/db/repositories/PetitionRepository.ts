@@ -3789,10 +3789,9 @@ export class PetitionRepository extends BaseRepository {
           from petition_signature_request
           where petition_id in ?
         ) 
-        select * from cte where _rank = 1 
-        and petition_id in ? -- filter again so index can be used on this main select
+        select * from cte where _rank = 1
       `,
-        [this.sqlIn(keys), this.sqlIn(keys)]
+        [this.sqlIn(keys)]
       );
       const byPetitionId = indexBy(signatures, (r) => r.petition_id);
       return keys.map((key) => (byPetitionId[key] ? omit(byPetitionId[key], ["_rank"]) : null));

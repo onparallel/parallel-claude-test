@@ -3,7 +3,7 @@ import { Knex } from "knex";
 export async function up(knex: Knex): Promise<void> {
   await knex.raw(/* sql */ `
     drop index "pun__unprocessed_comment_notifications";
-    CREATE INDEX pun__unprocessed_notifications ON public.petition_user_notification USING btree (id, type) WHERE ((is_read = false) AND (processed_at IS NULL));
+    CREATE INDEX pun__unprocessed_notifications ON public.petition_user_notification ("type") WHERE ((is_read = false) AND (processed_at IS NULL));
 `);
 }
 
