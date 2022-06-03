@@ -67,7 +67,7 @@ describe("GraphQL/Petition Field Replies", () => {
         );
       });
 
-      it("petition status should change to DRAFT when creating a reply on a already completed petition without recipients", async () => {
+      it("petition status should change to PENDING when creating a reply on a already completed petition without recipients", async () => {
         const [completedPetition] = await mocks.createRandomPetitions(
           organization.id,
           user.id,
@@ -118,7 +118,7 @@ describe("GraphQL/Petition Field Replies", () => {
             replies: [{ id: data!.createPetitionFieldReply.id }],
             petition: {
               id: toGlobalId("Petition", completedPetition.id),
-              status: "DRAFT",
+              status: "PENDING",
             },
           },
         });
@@ -2706,7 +2706,7 @@ describe("GraphQL/Petition Field Replies", () => {
       });
     });
 
-    it("petition status should change to DRAFT when deleting a reply on a already completed petition without accesses", async () => {
+    it("petition status should change to PENDING when deleting a reply on a already completed petition without accesses", async () => {
       const [completedPetition] = await mocks.createRandomPetitions(
         organization.id,
         user.id,
@@ -2749,7 +2749,7 @@ describe("GraphQL/Petition Field Replies", () => {
         id: toGlobalId("PetitionField", field.id),
         petition: {
           id: toGlobalId("Petition", completedPetition.id),
-          status: "DRAFT",
+          status: "PENDING",
         },
       });
     });

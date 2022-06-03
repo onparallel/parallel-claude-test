@@ -4296,7 +4296,7 @@ describe("GraphQL/Petitions", () => {
       );
     });
 
-    it("reopening a petition without recipients should set it in DRAFT", async () => {
+    it("reopening a petition without recipients should set it in PENDING", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!) {
@@ -4313,7 +4313,7 @@ describe("GraphQL/Petitions", () => {
       expect(errors).toBeUndefined();
       expect(data?.reopenPetition).toEqual({
         id: toGlobalId("Petition", petitions[0].id),
-        status: "DRAFT",
+        status: "PENDING",
       });
     });
 

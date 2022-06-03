@@ -1593,17 +1593,13 @@ export class PetitionRepository extends BaseRepository {
   public async reopenPetition(petitionId: number, updatedBy: string, t?: Knex.Transaction) {
     await this.raw(
       /* sql */ `
-      update petition set "status" = (
-        case when exists(select * from petition_access pa where pa.petition_id = ?)
-          then 'PENDING'::petition_status
-          else 'DRAFT'::petition_status
-        end),
+      update petition set "status" = 'PENDING'::petition_status,
         updated_at = NOW(),
         updated_by = ?,
         closed_at = null
       where id = ? and status in ('COMPLETED', 'CLOSED')
     `,
-      [petitionId, updatedBy, petitionId],
+      [updatedBy, petitionId],
       t
     );
 

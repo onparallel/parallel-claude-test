@@ -28,6 +28,7 @@ import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider"
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { ReportsDoughnutChart } from "@parallel/components/reports/ReportsDoughnutChart";
 import { ReportsErrorMessage } from "@parallel/components/reports/ReportsErrorMessage";
@@ -573,4 +574,4 @@ Reports.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
   ]);
 };
 
-export default compose(withDialogs, withApolloData)(Reports);
+export default compose(withDialogs, withOrgRole("ADMIN"), withApolloData)(Reports);

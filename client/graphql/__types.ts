@@ -4265,8 +4265,8 @@ export type AppLayoutNavbar_QueryFragment = {
   me: {
     __typename?: "User";
     id: string;
-    isSuperAdmin: boolean;
     role: OrganizationRole;
+    isSuperAdmin: boolean;
     email: string;
     fullName?: string | null;
     avatarUrl?: string | null;
@@ -23393,6 +23393,7 @@ export const AppLayoutNavbar_QueryFragmentDoc = gql`
     }
     me {
       id
+      role
       organization {
         id
         name

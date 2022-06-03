@@ -20,6 +20,7 @@ import {
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { AppLayoutNavbar_QueryFragment } from "@parallel/graphql/__types";
+import { isAtLeast } from "@parallel/utils/roles";
 import { useRouter } from "next/router";
 import { memo, useMemo } from "react";
 import { useIntl } from "react-intl";
@@ -47,6 +48,8 @@ export const AppLayoutNavbar = Object.assign(
       const { pathname, query } = router;
       const petitionLimitReached =
         me.organization.usageLimits.petitions.used >= me.organization.usageLimits.petitions.limit;
+
+      const hasAdminRole = isAtLeast("ADMIN", me.role);
       const items = useMemo(
         () => [
           {
@@ -94,17 +97,21 @@ export const AppLayoutNavbar = Object.assign(
               defaultMessage: "Contacts",
             }),
           },
-          {
-            section: "reports",
-            icon: <ReportsIcon />,
-            href: "/app/reports",
-            isActive: pathname.startsWith("/app/reports"),
-            isAvailable: true,
-            text: intl.formatMessage({
-              id: "component.app-layout-navbar.reports-link",
-              defaultMessage: "Reports",
-            }),
-          },
+          ...(hasAdminRole
+            ? [
+                {
+                  section: "reports",
+                  icon: <ReportsIcon />,
+                  href: "/app/reports",
+                  isActive: pathname.startsWith("/app/reports"),
+                  isAvailable: true,
+                  text: intl.formatMessage({
+                    id: "component.app-layout-navbar.reports-link",
+                    defaultMessage: "Reports",
+                  }),
+                },
+              ]
+            : []),
         ],
         [intl.locale, pathname, query]
       );
@@ -273,6 +280,7 @@ export const AppLayoutNavbar = Object.assign(
             }
             me {
               id
+              role
               organization {
                 id
                 name
