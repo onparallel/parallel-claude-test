@@ -461,11 +461,20 @@ const _Petition = {
     },
     tags: {
       type: "array",
-      description: "List of tags of the petition",
+      description:
+        "If parameter `include` contains `tags`, this will be the list of tags of the petition.",
       items: {
         type: "string",
       },
       example: ["priority", "kyc"],
+    },
+    repliesByAlias: {
+      type: "object",
+      description: outdent`
+      If parameter \`include\` contains \`replies\`, this will be a key-value object where each key is a field alias and the value is the submitted replies on the field.
+      For FILE_UPLOAD and ES_TAX_DOCUMENTS fields, the value will contain the \`replyId\`, with which you can use the [/download](#operation/DownloadFileReply) endpoint to download the file.
+      `,
+      example: { "first-name": "Robert Baratheon" },
     },
   },
 } as const;
@@ -1926,11 +1935,11 @@ export const SubmitPetitionReplies = schema({
     
     e.g.: 
 
-    For \`TEXT\` and \`SHORT_TEXT\` fields:
+    For \`TEXT\`, \`SHORT_TEXT\` and \`SELECT\` fields:
     \`{ "name": "James" }\` where "name" is the alias of the field, and "James" is the reply.
     or: \`{ "name": ["James", "Mike"]}\` for submitting two different replies on the same field at once.
 
-    For \`CHECKBOX\` and \`SELECT\` fields:
+    For \`CHECKBOX\` fields:
       \`{ "options": ["A", "B"] }\` will submit a **SINGLE** reply on the field with alias "options", selecting options "A" and "B".
     or: \`{ "options": [["A", "B"], ["C"]] }\` will submit two replies, the first selecting options "A" and "B" and the second selecting option "C".
     The provided values here must match with the preconfigured options on the field, otherwise the entry will be ignored.

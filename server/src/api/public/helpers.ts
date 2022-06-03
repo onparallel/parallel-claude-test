@@ -3,8 +3,9 @@ import { createReadStream } from "fs";
 import { ClientError, gql, GraphQLClient } from "graphql-request";
 import fetch from "node-fetch";
 import { performance } from "perf_hooks";
-import { omit, pipe } from "remeda";
+import { isDefined, omit, pipe, zip } from "remeda";
 import { promisify } from "util";
+import { getFieldIndices } from "../../util/fieldIndices";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { Maybe } from "../../util/types";
 import { File, RestParameter } from "../rest/core";
@@ -118,7 +119,9 @@ function mapFieldReplyContent(fieldType: PetitionFieldType, content: any) {
   }
 }
 
-function mapPetitionFieldRepliesContent<T extends Pick<PetitionFragment, "fields">>(petition: T) {
+export function mapPetitionFieldRepliesContent<T extends Pick<PetitionFragment, "fields">>(
+  petition: T
+) {
   return {
     ...petition,
     fields: petition.fields?.map((field) => ({
@@ -156,8 +159,66 @@ function mapPetitionTags<T extends Pick<PetitionFragment, "tags">>(petition: T) 
   };
 }
 
-export function mapPetition<T extends Pick<PetitionFragment, "tags" | "fields">>(petition: T) {
-  return pipe(petition, mapPetitionFieldRepliesContent, mapPetitionTags);
+function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petition: T) {
+  function mapReplyContentsForAlias(
+    replies: { content: any; id: string }[],
+    type: PetitionFieldType
+  ) {
+    switch (type) {
+      case "TEXT":
+      case "SHORT_TEXT":
+      case "DATE":
+      case "NUMBER":
+      case "PHONE":
+      case "SELECT":
+      case "CHECKBOX":
+        if (replies.length > 1) {
+          return replies.map((r) => r.content.value);
+        } else {
+          return replies[0].content.value ?? null;
+        }
+      case "FILE_UPLOAD":
+      case "ES_TAX_DOCUMENTS":
+        if (replies.length > 1) {
+          return replies.map((r) => ({ ...r.content, replyId: r.id }));
+        } else {
+          return { ...replies[0].content, replyId: replies[0].id } ?? null;
+        }
+      case "DYNAMIC_SELECT":
+        if (replies.length > 1) {
+          return replies.map((c) => c.content.value.map((v: string[]) => v[1] ?? null));
+        } else {
+          return replies[0].content.value.map((v: string[]) => v[1] ?? null) ?? null;
+        }
+      default:
+        return null;
+    }
+  }
+
+  const repliesByAlias: Record<string, any> = {};
+
+  if (isDefined(petition.replies)) {
+    zip(petition.replies, getFieldIndices(petition.replies)).forEach(([field, index]) => {
+      if (field.replies.length > 0) {
+        repliesByAlias[field.alias ?? `_.${index}`] = mapReplyContentsForAlias(
+          field.replies,
+          field.type
+        );
+      }
+    });
+  }
+  return {
+    ...petition,
+    repliesByAlias: petition.replies ? repliesByAlias : undefined,
+  };
+}
+
+export function mapPetition<T extends Pick<PetitionFragment, "tags" | "fields" | "replies">>(
+  petition: T
+) {
+  return omit(pipe(petition, mapPetitionFieldRepliesContent, mapPetitionTags, mapPetitionReplies), [
+    "replies",
+  ]);
 }
 
 export function mapTemplate<T extends Pick<TemplateFragment, "tags" | "fields">>(petition: T) {

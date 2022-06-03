@@ -40,6 +40,7 @@ import {
   idParam,
   mapPetition,
   mapPetitionField,
+  mapPetitionFieldRepliesContent,
   mapReplyResponse,
   mapSubscription,
   mapTemplate,
@@ -302,7 +303,7 @@ const petitionIncludeParam = {
     description: "Include optional fields in the response",
     array: true,
     required: false,
-    values: ["recipients", "fields", "tags"],
+    values: ["recipients", "fields", "tags", "replies"],
   }),
 };
 
@@ -472,6 +473,7 @@ api
           $includeFields: Boolean!
           $includeTags: Boolean!
           $includeRecipientUrl: Boolean!
+          $includeReplies: Boolean!
         ) {
           petitions(
             offset: $offset
@@ -491,13 +493,14 @@ api
         ...pick(query, ["offset", "limit", "status", "sortBy"]),
         tagIds,
         includeFields: query.include?.includes("fields") ?? false,
+        includeReplies: query.include?.includes("replies") ?? false,
         includeRecipients: query.include?.includes("recipients") ?? false,
         includeTags: query.include?.includes("tags") ?? false,
         includeRecipientUrl: false,
       });
       const { items, totalCount } = result.petitions;
       assertType<PetitionFragmentType[]>(items);
-      return Ok({ items: items.map((p) => mapPetition(p)), totalCount });
+      return Ok({ items: items.map(mapPetition), totalCount });
     }
   )
   .post(
@@ -521,6 +524,7 @@ api
           $includeFields: Boolean!
           $includeTags: Boolean!
           $includeRecipientUrl: Boolean!
+          $includeReplies: Boolean!
         ) {
           createPetition(name: $name, petitionId: $templateId) {
             ...Petition
@@ -531,6 +535,7 @@ api
       const result = await client.request(CreatePetition_petitionDocument, {
         ...body,
         includeFields: query.include?.includes("fields") ?? false,
+        includeReplies: query.include?.includes("replies") ?? false,
         includeRecipients: query.include?.includes("recipients") ?? false,
         includeTags: query.include?.includes("tags") ?? false,
         includeRecipientUrl: false,
@@ -563,6 +568,7 @@ api
           $includeFields: Boolean!
           $includeTags: Boolean!
           $includeRecipientUrl: Boolean!
+          $includeReplies: Boolean!
         ) {
           petition(id: $petitionId) {
             ...Petition
@@ -573,6 +579,7 @@ api
       const result = await client.request(GetPetition_petitionDocument, {
         petitionId: params.petitionId,
         includeFields: query.include?.includes("fields") ?? false,
+        includeReplies: query.include?.includes("replies") ?? false,
         includeRecipients: query.include?.includes("recipients") ?? false,
         includeTags: query.include?.includes("tags") ?? false,
         includeRecipientUrl: false,
@@ -604,6 +611,7 @@ api
           $includeFields: Boolean!
           $includeTags: Boolean!
           $includeRecipientUrl: Boolean!
+          $includeReplies: Boolean!
         ) {
           updatePetition(petitionId: $petitionId, data: $data) {
             ...Petition
@@ -615,6 +623,7 @@ api
         petitionId: params.petitionId,
         data: body,
         includeFields: query.include?.includes("fields") ?? false,
+        includeReplies: query.include?.includes("replies") ?? false,
         includeRecipients: query.include?.includes("recipients") ?? false,
         includeTags: query.include?.includes("tags") ?? false,
         includeRecipientUrl: false,
@@ -804,6 +813,7 @@ api
 api
   .path("/petitions/:petitionId/properties", {
     params: { petitionId },
+    excludeFromSpec: true,
   })
   .get(
     {
@@ -887,6 +897,7 @@ api
 api
   .path("/petitions/:petitionId/properties/:key", {
     params: { petitionId, key: stringParam({ required: true, maxLength: 100 }) },
+    excludeFromSpec: true,
   })
   .delete(
     {
@@ -1063,6 +1074,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
           $includeFields: Boolean!
           $includeTags: Boolean!
           $includeRecipientUrl: Boolean!
+          $includeReplies: Boolean!
         ) {
           sendPetition(
             petitionId: $petitionId
@@ -1106,6 +1118,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
         subject,
         ...pick(body, ["remindersConfig", "scheduledAt"]),
         includeFields: query.include?.includes("fields") ?? false,
+        includeReplies: false,
         includeRecipients: query.include?.includes("recipients") ?? false,
         includeTags: query.include?.includes("tags") ?? false,
         includeRecipientUrl: query.include?.includes("recipients.recipientUrl") ?? false,
@@ -1186,7 +1199,7 @@ api.path("/petitions/:petitionId/fields", { params: { petitionId } }).get(
       petitionId: params.petitionId,
     });
 
-    return Ok(mapPetition(result.petition!).fields);
+    return Ok(mapPetitionFieldRepliesContent(result.petition!).fields);
   }
 );
 
@@ -1644,6 +1657,7 @@ api
         includeRecipients: false,
         includeTags: false,
         includeRecipientUrl: false,
+        includeReplies: false,
       });
 
       return Ok(mapPetition(res.bulkCreatePetitionReplies));
@@ -2292,94 +2306,6 @@ api
         }
         throw error;
       }
-    }
-  );
-
-api
-  .path("/templates/:templateId/properties", {
-    params: { templateId },
-  })
-  .get(
-    {
-      operationId: "ReadTemplateCustomProperties",
-      summary: "Get template custom properties",
-      description: "Returns a key-value object with the custom properties of the template",
-      responses: {
-        200: SuccessResponse(PetitionCustomProperties),
-      },
-      tags: ["Templates"],
-    },
-    async ({ client, params }) => {
-      const result = await client.request(ReadPetitionCustomPropertiesDocument, {
-        petitionId: params.templateId,
-      });
-
-      return Ok(result.petition!.customProperties);
-    }
-  )
-  .post(
-    {
-      operationId: "CreateOrUpdateTemplateCustomProperty",
-      summary: "Create or update template custom property",
-      description: outdent`
-        Creates or updates a custom property on the template.
-
-        If the provided key already exists as a property, its value is overwritten.
-        If the provided key doesn't exist, it's added.
-
-        The petition can have up to 20 different properties.
-      `,
-      body: JsonBody(CreateOrUpdatePetitionCustomProperty),
-      responses: {
-        200: SuccessResponse(PetitionCustomProperties),
-        409: ErrorResponse({
-          description: "You reached the maximum limit of custom properties on the template",
-        }),
-      },
-      tags: ["Templates"],
-    },
-    async ({ client, body, params }) => {
-      try {
-        const result = await client.request(
-          CreateOrUpdatePetitionCustomProperty_modifyPetitionCustomPropertyDocument,
-          { petitionId: params.templateId, key: body.key, value: body.value }
-        );
-        return Ok(result.modifyPetitionCustomProperty.customProperties);
-      } catch (error: any) {
-        if (
-          error instanceof ClientError &&
-          containsGraphQLError(error, "CUSTOM_PROPERTIES_LIMIT_ERROR")
-        ) {
-          throw new ConflictError(
-            "You reached the maximum limit of custom properties on the template."
-          );
-        }
-        throw error;
-      }
-    }
-  );
-
-api
-  .path("/templates/:templateId/properties/:key", {
-    params: { templateId, key: stringParam({ required: true, maxLength: 100 }) },
-  })
-  .delete(
-    {
-      operationId: "DeleteTemplateCustomProperty",
-      summary: "Delete template custom property",
-      description: outdent`
-        Removes the provided key from the custom properties of the template.
-    `,
-      responses: { 204: SuccessResponse() },
-      tags: ["Templates"],
-    },
-    async ({ client, params }) => {
-      await client.request(DeletePetitionCustomProperty_modifyPetitionCustomPropertyDocument, {
-        petitionId: params.templateId,
-        key: params.key,
-      });
-
-      return NoContent();
     }
   );
 

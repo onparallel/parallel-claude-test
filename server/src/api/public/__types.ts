@@ -3684,6 +3684,11 @@ export type PetitionFragment = {
       updatedAt: string;
     }>;
   }>;
+  replies: Array<{
+    alias: string | null;
+    type: PetitionFieldType;
+    replies: Array<{ id: string; content: { [key: string]: any } }>;
+  }>;
   tags?: Array<{ id: string; name: string }>;
 };
 
@@ -3796,6 +3801,7 @@ export type GetPetitions_petitionsQueryVariables = Exact<{
   includeFields: Scalars["Boolean"];
   includeTags: Scalars["Boolean"];
   includeRecipientUrl: Scalars["Boolean"];
+  includeReplies: Scalars["Boolean"];
 }>;
 
 export type GetPetitions_petitionsQuery = {
@@ -3854,6 +3860,11 @@ export type GetPetitions_petitionsQuery = {
               updatedAt: string;
             }>;
           }>;
+          replies: Array<{
+            alias: string | null;
+            type: PetitionFieldType;
+            replies: Array<{ id: string; content: { [key: string]: any } }>;
+          }>;
           tags?: Array<{ id: string; name: string }>;
         }
       | {}
@@ -3868,6 +3879,7 @@ export type CreatePetition_petitionMutationVariables = Exact<{
   includeFields: Scalars["Boolean"];
   includeTags: Scalars["Boolean"];
   includeRecipientUrl: Scalars["Boolean"];
+  includeReplies: Scalars["Boolean"];
 }>;
 
 export type CreatePetition_petitionMutation = {
@@ -3924,6 +3936,11 @@ export type CreatePetition_petitionMutation = {
             updatedAt: string;
           }>;
         }>;
+        replies: Array<{
+          alias: string | null;
+          type: PetitionFieldType;
+          replies: Array<{ id: string; content: { [key: string]: any } }>;
+        }>;
         tags?: Array<{ id: string; name: string }>;
       }
     | {};
@@ -3935,6 +3952,7 @@ export type GetPetition_petitionQueryVariables = Exact<{
   includeFields: Scalars["Boolean"];
   includeTags: Scalars["Boolean"];
   includeRecipientUrl: Scalars["Boolean"];
+  includeReplies: Scalars["Boolean"];
 }>;
 
 export type GetPetition_petitionQuery = {
@@ -3991,6 +4009,11 @@ export type GetPetition_petitionQuery = {
             updatedAt: string;
           }>;
         }>;
+        replies: Array<{
+          alias: string | null;
+          type: PetitionFieldType;
+          replies: Array<{ id: string; content: { [key: string]: any } }>;
+        }>;
         tags?: Array<{ id: string; name: string }>;
       }
     | {}
@@ -4004,6 +4027,7 @@ export type UpdatePetition_updatePetitionMutationVariables = Exact<{
   includeFields: Scalars["Boolean"];
   includeTags: Scalars["Boolean"];
   includeRecipientUrl: Scalars["Boolean"];
+  includeReplies: Scalars["Boolean"];
 }>;
 
 export type UpdatePetition_updatePetitionMutation = {
@@ -4059,6 +4083,11 @@ export type UpdatePetition_updatePetitionMutation = {
             createdAt: string;
             updatedAt: string;
           }>;
+        }>;
+        replies: Array<{
+          alias: string | null;
+          type: PetitionFieldType;
+          replies: Array<{ id: string; content: { [key: string]: any } }>;
         }>;
         tags?: Array<{ id: string; name: string }>;
       }
@@ -4148,6 +4177,7 @@ export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
   includeFields: Scalars["Boolean"];
   includeTags: Scalars["Boolean"];
   includeRecipientUrl: Scalars["Boolean"];
+  includeReplies: Scalars["Boolean"];
 }>;
 
 export type CreatePetitionRecipients_sendPetitionMutation = {
@@ -4204,6 +4234,11 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
           createdAt: string;
           updatedAt: string;
         }>;
+      }>;
+      replies: Array<{
+        alias: string | null;
+        type: PetitionFieldType;
+        replies: Array<{ id: string; content: { [key: string]: any } }>;
       }>;
       tags?: Array<{ id: string; name: string }>;
     } | null;
@@ -5199,6 +5234,7 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutationVariables = Exact<{
   includeTags: Scalars["Boolean"];
   includeRecipients: Scalars["Boolean"];
   includeRecipientUrl: Scalars["Boolean"];
+  includeReplies: Scalars["Boolean"];
 }>;
 
 export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
@@ -5253,6 +5289,11 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
         createdAt: string;
         updatedAt: string;
       }>;
+    }>;
+    replies: Array<{
+      alias: string | null;
+      type: PetitionFieldType;
+      replies: Array<{ id: string; content: { [key: string]: any } }>;
     }>;
     tags?: Array<{ id: string; name: string }>;
   };
@@ -5436,6 +5477,14 @@ export const PetitionFragmentDoc = gql`
     fields @include(if: $includeFields) {
       ...PetitionFieldWithReplies
     }
+    replies: fields @include(if: $includeReplies) {
+      alias
+      type
+      replies {
+        id
+        content
+      }
+    }
     tags @include(if: $includeTags) {
       ...Tag
     }
@@ -5566,6 +5615,7 @@ export const GetPetitions_petitionsDocument = gql`
     $includeFields: Boolean!
     $includeTags: Boolean!
     $includeRecipientUrl: Boolean!
+    $includeReplies: Boolean!
   ) {
     petitions(
       offset: $offset
@@ -5589,6 +5639,7 @@ export const CreatePetition_petitionDocument = gql`
     $includeFields: Boolean!
     $includeTags: Boolean!
     $includeRecipientUrl: Boolean!
+    $includeReplies: Boolean!
   ) {
     createPetition(name: $name, petitionId: $templateId) {
       ...Petition
@@ -5606,6 +5657,7 @@ export const GetPetition_petitionDocument = gql`
     $includeFields: Boolean!
     $includeTags: Boolean!
     $includeRecipientUrl: Boolean!
+    $includeReplies: Boolean!
   ) {
     petition(id: $petitionId) {
       ...Petition
@@ -5621,6 +5673,7 @@ export const UpdatePetition_updatePetitionDocument = gql`
     $includeFields: Boolean!
     $includeTags: Boolean!
     $includeRecipientUrl: Boolean!
+    $includeReplies: Boolean!
   ) {
     updatePetition(petitionId: $petitionId, data: $data) {
       ...Petition
@@ -5732,6 +5785,7 @@ export const CreatePetitionRecipients_sendPetitionDocument = gql`
     $includeFields: Boolean!
     $includeTags: Boolean!
     $includeRecipientUrl: Boolean!
+    $includeReplies: Boolean!
   ) {
     sendPetition(
       petitionId: $petitionId
@@ -6289,6 +6343,7 @@ export const SubmitReplies_bulkCreatePetitionRepliesDocument = gql`
     $includeTags: Boolean!
     $includeRecipients: Boolean!
     $includeRecipientUrl: Boolean!
+    $includeReplies: Boolean!
   ) {
     bulkCreatePetitionReplies(petitionId: $petitionId, replies: $replies) {
       ...Petition

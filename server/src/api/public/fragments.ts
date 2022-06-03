@@ -136,6 +136,14 @@ export const PetitionFragment = gql`
     fields @include(if: $includeFields) {
       ...PetitionFieldWithReplies
     }
+    replies: fields @include(if: $includeReplies) {
+      alias
+      type
+      replies {
+        id
+        content
+      }
+    }
     tags @include(if: $includeTags) {
       ...Tag
     }
