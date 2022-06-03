@@ -56,6 +56,7 @@ async function startSignatureProcess(
       showSignatureBoxes: true,
       maxOutputSize: 13 * 1024 * 1024, // signaturit has a 15MB limit for emails
       outputFileName: title,
+      includeAnnexedDocuments: true,
     });
 
     const signatureClient = ctx.signature.getClient(signatureIntegration);
