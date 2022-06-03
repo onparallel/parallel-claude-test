@@ -33,6 +33,7 @@ import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
+import { isAtLeast } from "@parallel/utils/roles";
 import { useExportReportTask } from "@parallel/utils/useExportReportTask";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { usePrintPdfTask } from "@parallel/utils/usePrintPdfTask";
@@ -63,6 +64,8 @@ export const PetitionTemplateHeader = Object.assign(
     const intl = useIntl();
     const router = useRouter();
     const state = usePetitionState();
+
+    const hasAdminRole = isAtLeast("ADMIN", me.role);
 
     const deletePetitions = useDeletePetitions();
     const handleDeleteClick = async function () {
@@ -263,15 +266,17 @@ export const PetitionTemplateHeader = Object.assign(
                     />
                   </MenuItem>
                 ) : null}
-                <MenuItem
-                  onClick={() => handleExportReportTask(petition.id)}
-                  icon={<TableIcon display="block" boxSize={4} />}
-                >
-                  <FormattedMessage
-                    id="component.petition-header.download-results"
-                    defaultMessage="Download results"
-                  />
-                </MenuItem>
+                {hasAdminRole ? (
+                  <MenuItem
+                    onClick={() => handleExportReportTask(petition.id)}
+                    icon={<TableIcon display="block" boxSize={4} />}
+                  >
+                    <FormattedMessage
+                      id="component.petition-header.download-results"
+                      defaultMessage="Download results"
+                    />
+                  </MenuItem>
+                ) : null}
                 <MenuItem
                   onClick={handleCloneClick}
                   icon={<CopyIcon display="block" boxSize={4} />}

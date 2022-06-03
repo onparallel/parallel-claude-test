@@ -8,6 +8,7 @@ import { authenticateAnd } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { userHasAccessToPetitions } from "../petition/authorizers";
+import { contextUserHasRole } from "../users/authorizers";
 import { tasksAreOfType, userHasAccessToTasks } from "./authorizers";
 
 export const createPrintPdfTask = mutationField("createPrintPdfTask", {
@@ -84,7 +85,7 @@ export const createExportReportTask = mutationField("createExportReportTask", {
   description:
     "Creates a task for exporting a report grouping the replies of every petition coming from the same template",
   type: "Task",
-  authorize: authenticateAnd(userHasAccessToPetitions("petitionId")),
+  authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasAccessToPetitions("petitionId")),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     timezone: nonNull(stringArg()),
