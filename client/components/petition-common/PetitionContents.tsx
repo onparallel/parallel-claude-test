@@ -211,15 +211,13 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
           paddingLeft={field.type === "HEADING" ? 2 : 4}
           fontWeight={field.type === "HEADING" ? "medium" : "normal"}
           textAlign="left"
-          onClick={(e) => {
-            console.log("e:", e);
-            onFieldClick();
-          }}
+          onClick={onFieldClick}
           borderRadius="md"
           cursor="pointer"
           _hover={!showReferences ? defaultStyles : withReferenceStyles}
           _focus={!showReferences ? defaultStyles : withReferenceStyles}
           _focusWithin={!showReferences ? defaultStyles : withReferenceStyles}
+          overflow="hidden"
         >
           <Text
             as="div"

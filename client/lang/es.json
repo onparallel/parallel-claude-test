@@ -716,7 +716,7 @@
   },
   {
     "term": "component.create-reference-dialog.body",
-    "definition": "Las referencias, pueden insertarse en una descripción para reemplazar el contenido.",
+    "definition": "Las referencias pueden insertarse en una descripción para reemplazar el contenido.",
     "context": "References can be inserted in a description to replace the content."
   },
   {
@@ -3121,7 +3121,7 @@
   },
   {
     "term": "component.reference-options-menu.dollars",
-    "definition": "Dolares",
+    "definition": "Dólares",
     "context": "Dollars"
   },
   {

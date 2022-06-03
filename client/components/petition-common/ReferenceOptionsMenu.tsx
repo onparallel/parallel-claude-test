@@ -131,6 +131,16 @@ function getFormulasByTypeField(field: ReferenceOptionsMenu_PetitionFieldFragmen
 
   const { type, alias, options, multiple } = field;
 
+  const aliasSimpleOrMultiple = multiple ? alias + "[0]" : alias;
+
+  const endIfPart = `${intl.formatMessage({
+    id: "component.reference-options-menu.sentence-with-reply",
+    defaultMessage: "This is the sentence that will be displayed with that reply.",
+  })}\n{% else %}\n${intl.formatMessage({
+    id: "component.reference-options-menu.sentence-no-reply",
+    defaultMessage: "This sentence will be displayed if there are no added replies.",
+  })}\n{% endif %}\n`;
+
   const conditionalFormula = useMemo(() => {
     switch (type) {
       case "CHECKBOX":
@@ -193,22 +203,19 @@ function getFormulasByTypeField(field: ReferenceOptionsMenu_PetitionFieldFragmen
 
         return conditional;
 
+      case "NUMBER":
+        return `{% if ${aliasSimpleOrMultiple} == 123 %}\n${endIfPart}`;
+      case "PHONE":
+        return `{% if ${aliasSimpleOrMultiple} == "+34666554433" %}\n${endIfPart}`;
+      case "DATE":
+        return `{% if ${aliasSimpleOrMultiple} == "2022-05-29" %}\n${endIfPart}`;
       case "SHORT_TEXT":
       case "TEXT":
-      case "NUMBER":
-      case "PHONE":
-      case "DATE":
       default:
-        return `{% if ${multiple ? alias + "[0]" : alias} == "${intl.formatMessage({
+        return `{% if ${aliasSimpleOrMultiple} == "${intl.formatMessage({
           id: "component.reference-options-menu.reply",
           defaultMessage: "reply",
-        })}" %}\n${intl.formatMessage({
-          id: "component.reference-options-menu.sentence-with-reply",
-          defaultMessage: "This is the sentence that will be displayed with that reply.",
-        })}\n{% else %}\n${intl.formatMessage({
-          id: "component.reference-options-menu.sentence-no-reply",
-          defaultMessage: "This sentence will be displayed if there are no added replies.",
-        })}\n{% endif %}\n`;
+        })}" %}\n${endIfPart}`;
     }
   }, [field]);
 
@@ -292,7 +299,7 @@ function getFormulasByTypeField(field: ReferenceOptionsMenu_PetitionFieldFragmen
               id: "component.reference-options-menu.quantities-description",
               defaultMessage: "Displays the reply as quantity.",
             }),
-            formula: `{{ ${alias} | number }}`,
+            formula: `{{ ${alias} }}`,
           },
           {
             title: intl.formatMessage({
@@ -303,7 +310,7 @@ function getFormulasByTypeField(field: ReferenceOptionsMenu_PetitionFieldFragmen
               id: "component.reference-options-menu.percentage-description",
               defaultMessage: "Displays the reply as a percentage.",
             }),
-            formula: `{{ ${alias} | percent }}`,
+            formula: `{{ ${alias} | percent: 2 }}`,
           },
           {
             title: intl.formatMessage({
