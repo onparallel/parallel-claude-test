@@ -8966,8 +8966,8 @@
   },
   {
     "term": "recipient-view.first-time.intro",
-    "definition": "¿Es la primera vez que usa Parallel?",
-    "context": "Is this the first time you use Parallel?"
+    "definition": "{tone, select, INFORMAL{Cómo completar tu información} other{Complete su información}}",
+    "context": "How to fill in your information"
   },
   {
     "term": "recipient-view.first-time.replies-saved-body",
@@ -8982,12 +8982,12 @@
   {
     "term": "recipient-view.first-time.send-doubts-body",
     "definition": "{tone, select, INFORMAL{Puedes dejar tus dudas y comentarios sobre el propio campo y tu remitente lo responderá.} other{Puede dejar sus dudas y comentarios sobre el propio campo y su remitente lo responderá.}}",
-    "context": "You can add any doubts and questions you have on the corresponding field and your sender will respond them."
+    "context": "You can add any questions you have on the corresponding field and your sender will respond them."
   },
   {
     "term": "recipient-view.first-time.send-doubts-title",
     "definition": "{tone, select, INFORMAL{No te quedes con dudas} other{Envíe sus dudas}}",
-    "context": "Send your doubts"
+    "context": "Send your questions"
   },
   {
     "term": "recipient-view.guide-me",

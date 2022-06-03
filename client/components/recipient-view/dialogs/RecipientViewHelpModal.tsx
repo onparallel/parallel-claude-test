@@ -89,14 +89,14 @@ export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: 
       <Text fontSize="xl" fontWeight="600">
         <FormattedMessage
           id="recipient-view.first-time.send-doubts-title"
-          defaultMessage="Send your doubts"
+          defaultMessage="Send your questions"
           values={{ tone }}
         />
       </Text>
       <Text>
         <FormattedMessage
           id="recipient-view.first-time.send-doubts-body"
-          defaultMessage="You can add any doubts and questions you have on the corresponding field and your sender will respond them."
+          defaultMessage="You can add any questions you have on the corresponding field and your sender will respond them."
           values={{ tone }}
         />
       </Text>
@@ -115,7 +115,8 @@ export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: 
         <ModalHeader paddingBottom={6}>
           <FormattedMessage
             id="recipient-view.first-time.intro"
-            defaultMessage="Is this the first time you use Parallel?"
+            defaultMessage="How to fill in your information"
+            values={{ tone }}
           />
         </ModalHeader>
         <ModalBody padding={0} position="relative" aria-live="polite">

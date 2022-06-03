@@ -8966,8 +8966,8 @@
   },
   {
     "term": "recipient-view.first-time.intro",
-    "definition": "Is this the first time you use Parallel?",
-    "context": "Is this the first time you use Parallel?"
+    "definition": "How to fill in your information",
+    "context": "How to fill in your information"
   },
   {
     "term": "recipient-view.first-time.replies-saved-body",
@@ -8981,13 +8981,13 @@
   },
   {
     "term": "recipient-view.first-time.send-doubts-body",
-    "definition": "You can add any doubts and questions you have on the corresponding field and your sender will respond them.",
-    "context": "You can add any doubts and questions you have on the corresponding field and your sender will respond them."
+    "definition": "You can add any questions you have on the corresponding field and your sender will respond them.",
+    "context": "You can add any questions you have on the corresponding field and your sender will respond them."
   },
   {
     "term": "recipient-view.first-time.send-doubts-title",
-    "definition": "Send your doubts",
-    "context": "Send your doubts"
+    "definition": "Send your questions",
+    "context": "Send your questions"
   },
   {
     "term": "recipient-view.guide-me",

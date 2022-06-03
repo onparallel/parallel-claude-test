@@ -385,11 +385,6 @@
     "context": "You can login through our website."
   },
   {
-    "term": "layout.email-sent-by",
-    "definition": "Enviado por Parallel Solutions, S.L.",
-    "context": "Sent by Parallel Solutions, S.L."
-  },
-  {
     "term": "layout.privacy-link",
     "definition": "Privacidad",
     "context": "Privacy"

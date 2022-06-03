@@ -167,14 +167,6 @@ export const Layout: FC<LayoutProps> = function Layout({
                     />
                   </MjmlSocial>
                 )}
-                <MjmlText align="center" color="#1A202C" lineHeight="20px">
-                  <FormattedMessage
-                    id="layout.email-sent-by"
-                    defaultMessage="Sent by Parallel Solutions, S.L."
-                  />
-                  <br />
-                  C/Almogàvers 165, 59.203, 08018 | Barcelona, Spain
-                </MjmlText>
                 {useAlternativeSlogan ? null : (
                   <MjmlText align="center">
                     <a
