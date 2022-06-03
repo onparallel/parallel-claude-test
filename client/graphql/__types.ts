@@ -9443,6 +9443,7 @@ export type NewSignatureRequestRow_UserFragment = {
 
 export type NewSignatureRequestRow_PetitionFragment = {
   __typename?: "Petition";
+  status: PetitionStatus;
   signatureConfig?: {
     __typename?: "SignatureConfig";
     allowAdditionalSigners: boolean;
@@ -23777,6 +23778,7 @@ export const PetitionReplies_PetitionFieldFragmentDoc = gql`
 ` as unknown as DocumentNode<PetitionReplies_PetitionFieldFragment, unknown>;
 export const NewSignatureRequestRow_PetitionFragmentDoc = gql`
   fragment NewSignatureRequestRow_Petition on Petition {
+    status
     signatureConfig {
       signers {
         ...SignerReference_PetitionSigner

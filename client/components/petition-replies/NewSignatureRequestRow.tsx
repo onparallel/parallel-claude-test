@@ -32,6 +32,9 @@ export function NewSignatureRequestRow({
   const allowAdditionalSigners = petition.signatureConfig?.allowAdditionalSigners ?? false;
   const reviewBeforeSigning = petition.signatureConfig?.review ?? false;
   const showConfirmPetitionSignersDialog = useConfirmPetitionSignersDialog();
+
+  const startSignature = reviewBeforeSigning || petition.status === "COMPLETED";
+
   const handleStartSignature = async () => {
     try {
       const {
@@ -43,7 +46,7 @@ export function NewSignatureRequestRow({
         accesses: petition.accesses,
         presetSigners: signers,
         allowAdditionalSigners,
-        isUpdate: !petition.signatureConfig?.review,
+        isUpdate: !startSignature,
         previousSignatures: petition.signatureRequests,
       });
 
@@ -54,7 +57,7 @@ export function NewSignatureRequestRow({
         signersInfo,
       });
 
-      if (reviewBeforeSigning) onStart(message);
+      if (startSignature) onStart(message);
     } catch {}
   };
 
@@ -102,7 +105,7 @@ export function NewSignatureRequestRow({
             <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
           </Button>
           <Button colorScheme="purple" marginLeft={2} onClick={handleStartSignature}>
-            {reviewBeforeSigning ? (
+            {startSignature ? (
               <FormattedMessage
                 id="component.petition-signatures-card.start"
                 defaultMessage="Start..."
@@ -129,6 +132,7 @@ NewSignatureRequestRow.fragments = {
   `,
   Petition: gql`
     fragment NewSignatureRequestRow_Petition on Petition {
+      status
       signatureConfig {
         signers {
           ...SignerReference_PetitionSigner
