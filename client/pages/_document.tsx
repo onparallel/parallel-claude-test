@@ -32,6 +32,7 @@ const POLYFILLS = [
   "Array.prototype.flat",
   "Array.prototype.flatMap",
   "Object.fromEntries",
+  "String.prototype.replaceAll",
 ];
 
 const POLYFILLS_INTL = [
