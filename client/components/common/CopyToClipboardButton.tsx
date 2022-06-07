@@ -1,19 +1,21 @@
-import { IconButton, IconButtonProps, Tooltip, TooltipProps } from "@chakra-ui/react";
+import { IconButtonProps, PlacementWithLogical } from "@chakra-ui/react";
 import { ClipboardIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import copy from "clipboard-copy";
-import { MouseEvent, useState } from "react";
+import { MouseEvent, ReactElement, useState } from "react";
 import { useIntl } from "react-intl";
+import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
 
 export interface CopyToClipboardButtonProps extends Omit<IconButtonProps, "icon" | "aria-label"> {
   text: string;
-  placement?: TooltipProps["placement"];
+  placement?: PlacementWithLogical;
   "aria-label"?: string;
+  icon?: ReactElement;
 }
 
 export const CopyToClipboardButton = chakraForwardRef<"button", CopyToClipboardButtonProps>(
   function CopyToClipboardButton(
-    { "aria-label": ariaLabel, text, placement, onClick, onMouseEnter, ...props },
+    { "aria-label": ariaLabel, text, placement, icon, onClick, onMouseEnter, ...props },
     ref
   ) {
     const intl = useIntl();
@@ -37,21 +39,23 @@ export const CopyToClipboardButton = chakraForwardRef<"button", CopyToClipboardB
     }
 
     function handleMouseEnter(event: MouseEvent<HTMLButtonElement>) {
-      if (copied) setState(false);
+      if (copied) {
+        setState(false);
+      }
       onMouseEnter?.(event);
     }
 
     return (
-      <Tooltip label={copied ? labels.copied : labels.copy} placement={placement}>
-        <IconButton
-          ref={ref}
-          aria-label={ariaLabel ?? labels.copy}
-          icon={<ClipboardIcon />}
-          onClick={handleClick}
-          onMouseEnter={handleMouseEnter}
-          {...props}
-        />
-      </Tooltip>
+      <IconButtonWithTooltip
+        label={copied ? labels.copied : labels.copy}
+        placement={placement}
+        ref={ref}
+        aria-label={ariaLabel ?? labels.copy}
+        icon={icon ?? <ClipboardIcon />}
+        onClick={handleClick}
+        onMouseEnter={handleMouseEnter}
+        {...props}
+      />
     );
   }
 );

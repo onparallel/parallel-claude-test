@@ -6995,7 +6995,7 @@ export type PetitionContents_PetitionFieldFragment = {
   }>;
 };
 
-export type ReferenceOptionsMenu_PetitionFieldFragment = {
+export type AliasOptionsMenu_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   alias?: string | null;
@@ -23560,15 +23560,15 @@ export const filterPetitionFields_PetitionFieldFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<filterPetitionFields_PetitionFieldFragment, unknown>;
-export const ReferenceOptionsMenu_PetitionFieldFragmentDoc = gql`
-  fragment ReferenceOptionsMenu_PetitionField on PetitionField {
+export const AliasOptionsMenu_PetitionFieldFragmentDoc = gql`
+  fragment AliasOptionsMenu_PetitionField on PetitionField {
     id
     alias
     type
     multiple
     options
   }
-` as unknown as DocumentNode<ReferenceOptionsMenu_PetitionFieldFragment, unknown>;
+` as unknown as DocumentNode<AliasOptionsMenu_PetitionFieldFragment, unknown>;
 export const PetitionContents_PetitionFieldFragmentDoc = gql`
   fragment PetitionContents_PetitionField on PetitionField {
     id
@@ -23578,10 +23578,10 @@ export const PetitionContents_PetitionFieldFragmentDoc = gql`
     isInternal
     alias
     ...filterPetitionFields_PetitionField
-    ...ReferenceOptionsMenu_PetitionField
+    ...AliasOptionsMenu_PetitionField
   }
   ${filterPetitionFields_PetitionFieldFragmentDoc}
-  ${ReferenceOptionsMenu_PetitionFieldFragmentDoc}
+  ${AliasOptionsMenu_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionContents_PetitionFieldFragment, unknown>;
 export const PetitionCompose_PetitionFieldFragmentDoc = gql`
   fragment PetitionCompose_PetitionField on PetitionField {

@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import {
+  ButtonProps,
   HStack,
   Menu,
   MenuButton,
@@ -10,22 +11,23 @@ import {
   Portal,
   Stack,
   Text,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { HelpOutlineIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { ReferenceOptionsMenu_PetitionFieldFragment } from "@parallel/graphql/__types";
+import { AliasOptionsMenu_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 
-export interface ReferenceOptionsMenuProps extends Omit<MenuProps, "children"> {
-  field: ReferenceOptionsMenu_PetitionFieldFragment;
+export interface AliasOptionsMenuProps extends Omit<ButtonProps, "children"> {
+  field: AliasOptionsMenu_PetitionFieldFragment;
 }
 
-export const ReferenceOptionsMenu = Object.assign(
-  chakraForwardRef<"button", ReferenceOptionsMenuProps>(function ReferenceOptionsMenu(
+export const AliasOptionsMenu = Object.assign(
+  chakraForwardRef<"button", AliasOptionsMenuProps>(function AliasOptionsMenu(
     { field, ...props },
     ref
   ) {
@@ -36,19 +38,18 @@ export const ReferenceOptionsMenu = Object.assign(
         defaultMessage: "Formula copied to clipboard",
       }),
     });
-    const [isOpen, setIsOpen] = useState(false);
+    const { isOpen, onClose, onOpen } = useDisclosure();
 
     const formulas = getFormulasByTypeField(field);
 
     return (
-      <Menu onOpen={() => setIsOpen(true)} onClose={() => setIsOpen(false)} {...props}>
+      <Menu onOpen={onOpen} onClose={onClose}>
         <MenuButton
           onClick={(event) => {
             event.stopPropagation();
           }}
           ref={ref}
           display={isOpen ? undefined : "none"}
-          className="references"
           as={IconButtonWithTooltip}
           label={intl.formatMessage({
             id: "component.reference-options-menu.other-options",
@@ -61,7 +62,7 @@ export const ReferenceOptionsMenu = Object.assign(
           _hover={{
             boxShadow: "lg",
           }}
-          tabIndex={0}
+          {...props}
         />
         <Portal>
           <MenuList width="min-content" minWidth="20rem">
@@ -108,7 +109,7 @@ export const ReferenceOptionsMenu = Object.assign(
   {
     fragments: {
       PetitionField: gql`
-        fragment ReferenceOptionsMenu_PetitionField on PetitionField {
+        fragment AliasOptionsMenu_PetitionField on PetitionField {
           id
           alias
           type
@@ -126,7 +127,7 @@ type FormulasType = {
   formula: string;
 }[];
 
-function getFormulasByTypeField(field: ReferenceOptionsMenu_PetitionFieldFragment): FormulasType {
+function getFormulasByTypeField(field: AliasOptionsMenu_PetitionFieldFragment): FormulasType {
   const intl = useIntl();
 
   const { type, alias, options, multiple } = field;

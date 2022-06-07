@@ -623,7 +623,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                     signatureStatus={petitionSignatureStatus}
                     signatureEnvironment={petitionSignatureEnvironment}
                     onSignatureStatusClick={handlePetitionContentsSignatureClick}
-                    showReferences={false}
+                    showAliasButtons={false}
                   />
                 </Box>
               </Card>

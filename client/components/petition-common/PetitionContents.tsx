@@ -1,5 +1,15 @@
 import { gql } from "@apollo/client";
-import { Box, BoxProps, Button, Center, Flex, LinkBox, Stack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  BoxProps,
+  Button,
+  Center,
+  Flex,
+  LinkBox,
+  LinkOverlay,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { EyeOffIcon, NewPropertyIcon } from "@parallel/chakra/icons";
 import {
   PetitionContents_PetitionFieldFragment,
@@ -18,9 +28,9 @@ import { Divider } from "../common/Divider";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { PetitionSignatureStatusIcon } from "../common/PetitionSignatureStatusIcon";
-import { CopyReferenceIconButton } from "./CopyReferenceIconButton";
+import { CopyAliasIconButton } from "./CopyAliasIconButton";
 import { useCreateReferenceDialog } from "./dialogs/CreateReferenceDialog";
-import { ReferenceOptionsMenu } from "./ReferenceOptionsMenu";
+import { AliasOptionsMenu as AliasOptionsMenu } from "./AliasOptionsMenu";
 
 interface PetitionContentsFieldIndicatorsProps<T extends PetitionContents_PetitionFieldFragment> {
   field: T;
@@ -31,7 +41,7 @@ type PetitionContentsSignatureStatus = "START" | PetitionSignatureRequestStatus;
 export interface PetitionContentsProps<T extends PetitionContents_PetitionFieldFragment> {
   fields: T[];
   fieldIndices: PetitionFieldIndex[];
-  showReferences: boolean;
+  showAliasButtons: boolean;
   fieldVisibility?: boolean[];
   onFieldClick: (fieldId: string) => void;
   onFieldEdit?: (fieldId: string, data: UpdatePetitionFieldInput) => void;
@@ -46,7 +56,7 @@ export function PetitionContents<T extends PetitionContents_PetitionFieldFragmen
   fields,
   filter,
   fieldIndices,
-  showReferences,
+  showAliasButtons,
   fieldVisibility,
   onFieldClick,
   onFieldEdit,
@@ -71,12 +81,12 @@ export function PetitionContents<T extends PetitionContents_PetitionFieldFragmen
             onFieldClick={handleFieldClick(x.field.id)}
             onFieldEdit={onFieldEdit}
             fieldIndicators={fieldIndicators}
-            showReferences={
+            showAliasButtons={
               x.field.type === "HEADING" ||
               x.field.type === "DYNAMIC_SELECT" ||
               isFileTypeField(x.field.type)
                 ? false
-                : showReferences
+                : showAliasButtons
             }
           />
         ) : (
@@ -148,10 +158,10 @@ PetitionContents.fragments = {
       isInternal
       alias
       ...filterPetitionFields_PetitionField
-      ...ReferenceOptionsMenu_PetitionField
+      ...AliasOptionsMenu_PetitionField
     }
     ${filterPetitionFields.fragments.PetitionField}
-    ${ReferenceOptionsMenu.fragments.PetitionField}
+    ${AliasOptionsMenu.fragments.PetitionField}
   `,
 };
 
@@ -161,7 +171,7 @@ interface PetitionContentsItemProps<T extends PetitionContents_PetitionFieldFrag
   isVisible: boolean;
   onFieldClick: () => void;
   onFieldEdit?: (fieldId: string, data: UpdatePetitionFieldInput) => void;
-  showReferences: boolean;
+  showAliasButtons: boolean;
   fieldIndicators?: ComponentType<PetitionContentsFieldIndicatorsProps<T>>;
 }
 
@@ -171,7 +181,7 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
   fieldIndex,
   onFieldClick,
   onFieldEdit,
-  showReferences,
+  showAliasButtons,
   fieldIndicators,
 }: PetitionContentsItemProps<T>) {
   const intl = useIntl();
@@ -185,8 +195,8 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
   };
 
   const defaultStyles = { background: "gray.100" };
-  const withReferenceStyles = {
-    ".references": { display: "flex" },
+  const withAliasButtonsStyles = {
+    ".alias-button": { display: "flex" },
     ".internal-badge": { display: "none" },
     background: "gray.100",
   };
@@ -214,12 +224,12 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
           onClick={onFieldClick}
           borderRadius="md"
           cursor="pointer"
-          _hover={!showReferences ? defaultStyles : withReferenceStyles}
-          _focus={!showReferences ? defaultStyles : withReferenceStyles}
-          _focusWithin={!showReferences ? defaultStyles : withReferenceStyles}
+          _hover={!showAliasButtons ? defaultStyles : withAliasButtonsStyles}
+          _focus={!showAliasButtons ? defaultStyles : withAliasButtonsStyles}
+          _focusWithin={!showAliasButtons ? defaultStyles : withAliasButtonsStyles}
           overflow="hidden"
         >
-          <Text
+          <LinkOverlay
             as="div"
             flex="1"
             minWidth={0}
@@ -239,26 +249,20 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
                 )}
               </Text>
             )}
-          </Text>
+          </LinkOverlay>
           {fieldIndicators ? createElement(fieldIndicators, { field }) : null}
           {field.isInternal ? <InternalFieldBadge className="internal-badge" /> : null}
-          {showReferences ? (
+          {showAliasButtons ? (
             field.alias ? (
               <>
-                <CopyReferenceIconButton
-                  display="none"
-                  className="references"
-                  alias={
-                    field.type === "DATE" ? `{{ ${field.alias} | date }}` : `{{ ${field.alias} }}`
-                  }
-                />
-                <ReferenceOptionsMenu field={field} />
+                <CopyAliasIconButton display="none" className="alias-button" field={field} />
+                <AliasOptionsMenu className="alias-button" field={field} />
               </>
             ) : (
               <IconButtonWithTooltip
                 tabIndex={0}
                 display="none"
-                className="references"
+                className="alias-button"
                 label={intl.formatMessage({
                   id: "component.petition-contents-item.create-reference",
                   defaultMessage: "Create reference",
