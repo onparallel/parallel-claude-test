@@ -88,7 +88,7 @@ export async function presendPetition(
 
                 const [updatedPetition] = await ctx.petitions.updatePetition(
                   petition.id,
-                  { name, status: "PENDING", credits_used: 1 },
+                  { name, status: "PENDING", credits_used: 1, closed_at: null },
                   `User:${user.id}`,
                   t
                 );

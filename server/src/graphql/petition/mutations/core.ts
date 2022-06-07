@@ -575,9 +575,8 @@ export const closePetition = mutationField("closePetition", {
   },
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.withTransaction(async (t) => {
-      const [petition] = await ctx.petitions.updatePetition(
+      const [petition] = await ctx.petitions.closePetition(
         args.petitionId,
-        { status: "CLOSED" },
         `User:${ctx.user!.id}`,
         t
       );

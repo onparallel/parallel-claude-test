@@ -1097,6 +1097,18 @@ export class PetitionRepository extends BaseRepository {
       );
   }
 
+  async closePetition(petitionId: number, updatedBy: string, t?: Knex.Transaction) {
+    return await this.from("petition", t).where("id", petitionId).update(
+      {
+        status: "CLOSED",
+        closed_at: this.now(),
+        updated_at: this.now(),
+        updated_by: updatedBy,
+      },
+      "*"
+    );
+  }
+
   async updateFieldPositions(petitionId: number, fieldIds: number[], user: User) {
     return await this.withTransaction(async (t) => {
       const fields = await this.from("petition_field", t)
@@ -1250,6 +1262,7 @@ export class PetitionRepository extends BaseRepository {
                   when 'CLOSED' then 'PENDING'
                   else status
                 end`) as any,
+              closed_at: null,
               updated_at: this.now(),
               updated_by: `User:${user.id}`,
             },
@@ -1391,6 +1404,7 @@ export class PetitionRepository extends BaseRepository {
                   NULL
                 end
               `) as any,
+              closed_at: null,
               updated_at: this.now(),
               updated_by: `User:${user.id}`,
             },
@@ -1590,7 +1604,8 @@ export class PetitionRepository extends BaseRepository {
           else 'DRAFT'::petition_status
         end),
         updated_at = NOW(),
-        updated_by = ?
+        updated_by = ?,
+        closed_at = null
       where id = ? and status in ('COMPLETED', 'CLOSED')
     `,
       [petitionId, updatedBy, petitionId],
@@ -4275,11 +4290,15 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async getClosedPetitionsToAnonymize() {
-    return await this.from("petition")
-      .whereNull("deleted_at")
-      .whereNull("anonymized_at")
-      .where("status", "CLOSED")
-      .select("*");
+    return await this.raw<Petition>(/* sql */ `
+      select p.* from petition p join organization o on o.id = p.org_id
+      where p.deleted_at is null 
+      and p.anonymized_at is null 
+      and p.status = 'CLOSED' 
+      and p.closed_at is not null
+      and o.anonymize_petitions_after_days is not null
+      and p.closed_at + make_interval(days => o.anonymize_petitions_after_days) <= NOW()
+    `);
   }
 
   async getPetitionsToAnonymize(daysAfterDeletion: number) {

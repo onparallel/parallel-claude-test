@@ -754,6 +754,7 @@ export interface Petition {
   completing_message_body: Maybe<string>; // text
   metadata: any; // jsonb
   anonymized_at: Maybe<Date>; // timestamptz
+  closed_at: Maybe<Date>; // timestamptz
 }
 
 export type CreatePetition = PartialProps<
@@ -792,6 +793,7 @@ export type CreatePetition = PartialProps<
   | "completing_message_body"
   | "metadata"
   | "anonymized_at"
+  | "closed_at"
 >;
 
 export interface PetitionAccess {

@@ -1,5 +1,4 @@
-import { addDays } from "date-fns";
-import { isDefined, uniq } from "remeda";
+import { uniq } from "remeda";
 import { createCronWorker } from "./helpers/createCronWorker";
 
 createCronWorker("anonymizer", async (ctx, config) => {
@@ -45,15 +44,12 @@ createCronWorker("anonymizer", async (ctx, config) => {
 
   // search for closed petitions that are configured to be anonymized after a certain time
   const closedPetitions = await ctx.petitions.getClosedPetitionsToAnonymize();
-  const organizations = await ctx.organizations.loadOrg(uniq(closedPetitions.map((p) => p.org_id)));
+  count = 0;
+  ctx.logger.debug(`Anonymizing ${closedPetitions.length} closed petitions:`);
   for (const petition of closedPetitions) {
-    const org = organizations.find((o) => o!.id === petition.org_id)!;
-    if (
-      isDefined(org.anonymize_petitions_after_days) &&
-      addDays(petition.updated_at, org.anonymize_petitions_after_days) <= new Date()
-    ) {
-      ctx.logger.debug(`Anonymizing closed petition ${petition.id}`);
-      await ctx.petitions.anonymizePetition(petition.id);
-    }
+    ctx.logger.debug(
+      `Anonymizing closed petition ${petition.id} (${++count}/${closedPetitions.length})`
+    );
+    await ctx.petitions.anonymizePetition(petition.id);
   }
 });
