@@ -468,7 +468,7 @@ const _Petition = {
       },
       example: ["priority", "kyc"],
     },
-    repliesByAlias: {
+    replies: {
       type: "object",
       description: outdent`
       If parameter \`include\` contains \`replies\`, this will be a key-value object where each key is a field alias and the value is the submitted replies on the field.

@@ -500,7 +500,7 @@ api
       });
       const { items, totalCount } = result.petitions;
       assertType<PetitionFragmentType[]>(items);
-      return Ok({ items: items.map(mapPetition), totalCount });
+      return Ok({ items: items.map((p) => mapPetition(p)), totalCount });
     }
   )
   .post(

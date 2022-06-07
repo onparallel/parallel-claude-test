@@ -3,9 +3,8 @@ import { createReadStream } from "fs";
 import { ClientError, gql, GraphQLClient } from "graphql-request";
 import fetch from "node-fetch";
 import { performance } from "perf_hooks";
-import { isDefined, omit, pipe, zip } from "remeda";
+import { isDefined, omit, pipe } from "remeda";
 import { promisify } from "util";
-import { getFieldIndices } from "../../util/fieldIndices";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { Maybe } from "../../util/types";
 import { File, RestParameter } from "../rest/core";
@@ -195,30 +194,23 @@ function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petitio
     }
   }
 
-  const repliesByAlias: Record<string, any> = {};
+  const replies: Record<string, any> = {};
+  petition.replies?.forEach((field) => {
+    if (isDefined(field.alias) && field.replies.length > 0) {
+      replies[field.alias] = mapReplyContentsForAlias(field.replies, field.type);
+    }
+  });
 
-  if (isDefined(petition.replies)) {
-    zip(petition.replies, getFieldIndices(petition.replies)).forEach(([field, index]) => {
-      if (field.replies.length > 0) {
-        repliesByAlias[field.alias ?? `_.${index}`] = mapReplyContentsForAlias(
-          field.replies,
-          field.type
-        );
-      }
-    });
-  }
   return {
     ...petition,
-    repliesByAlias: petition.replies ? repliesByAlias : undefined,
+    replies: petition.replies ? replies : undefined,
   };
 }
 
 export function mapPetition<T extends Pick<PetitionFragment, "tags" | "fields" | "replies">>(
   petition: T
 ) {
-  return omit(pipe(petition, mapPetitionFieldRepliesContent, mapPetitionTags, mapPetitionReplies), [
-    "replies",
-  ]);
+  return pipe(petition, mapPetitionFieldRepliesContent, mapPetitionTags, mapPetitionReplies);
 }
 
 export function mapTemplate<T extends Pick<TemplateFragment, "tags" | "fields">>(petition: T) {
