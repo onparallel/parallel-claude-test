@@ -7,7 +7,6 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
-  MenuProps,
   Portal,
   Stack,
   Text,
@@ -40,7 +39,7 @@ export const AliasOptionsMenu = Object.assign(
     });
     const { isOpen, onClose, onOpen } = useDisclosure();
 
-    const formulas = getFormulasByTypeField(field);
+    const formulas = useFormulasByTypeField(field);
 
     return (
       <Menu onOpen={onOpen} onClose={onClose}>
@@ -127,277 +126,239 @@ type FormulasType = {
   formula: string;
 }[];
 
-function getFormulasByTypeField(field: AliasOptionsMenu_PetitionFieldFragment): FormulasType {
+function useFormulasByTypeField({
+  type,
+  alias,
+  options,
+  multiple,
+}: AliasOptionsMenu_PetitionFieldFragment): FormulasType {
   const intl = useIntl();
-
-  const { type, alias, options, multiple } = field;
-
-  const aliasSimpleOrMultiple = multiple ? alias + "[0]" : alias;
-
-  const endIfPart = `${intl.formatMessage({
-    id: "component.reference-options-menu.sentence-with-reply",
-    defaultMessage: "This is the sentence that will be displayed with that reply.",
-  })}\n{% else %}\n${intl.formatMessage({
-    id: "component.reference-options-menu.sentence-no-reply",
-    defaultMessage: "This sentence will be displayed if there are no added replies.",
-  })}\n{% endif %}\n`;
-
-  const conditionalFormula = useMemo(() => {
-    switch (type) {
-      case "CHECKBOX":
-      case "SELECT":
-        const fieldOptions = options as FieldOptions["CHECKBOX"];
-        let conditional = `${intl.formatMessage(
-          {
-            id: "component.reference-options-menu.if-option-with-sentence",
-            defaultMessage: `'{'% if {alias} == "{option}" %'}{br}This is the sentence that will be displayed when {option} is chosen.{br}`,
-          },
-          {
-            alias: type === "CHECKBOX" ? alias + "[0]" : alias,
-            option: "A",
-            br: `\n`,
-          }
-        )}${intl.formatMessage(
-          {
-            id: "component.reference-options-menu.elsif-with-sentence",
-            defaultMessage: `'{'% elsif {alias} == "{option}" %'}{br}This is the sentence that will be displayed when {option} is chosen.{br}`,
-          },
-          {
-            alias: type === "CHECKBOX" ? alias + "[0]" : alias,
-            option: "B",
-            br: `\n`,
-          }
-        )}`;
-
-        fieldOptions.values.forEach((option, index) => {
-          if (index === 0) {
-            conditional = intl.formatMessage(
-              {
-                id: "component.reference-options-menu.if-option-with-sentence",
-                defaultMessage: `'{'% if {alias} == "{option}" %'}{br}This is the sentence that will be displayed when {option} is chosen.{br}`,
-              },
-              {
-                alias: type === "CHECKBOX" ? alias + "[0]" : alias,
-                option,
-                br: `\n`,
-              }
-            );
-          } else {
-            conditional += intl.formatMessage(
-              {
-                id: "component.reference-options-menu.elsif-with-sentence",
-                defaultMessage: `'{'% elsif {alias} == "{option}" %'}{br}This is the sentence that will be displayed when {option} is chosen.{br}`,
-              },
-              {
-                alias: type === "CHECKBOX" ? alias + "[0]" : alias,
-                option,
-                br: `\n`,
-              }
-            );
-          }
-        });
-
-        conditional += `{% else %}\n${intl.formatMessage({
-          id: "component.reference-options-menu.no-options-chosen",
-          defaultMessage: "You have not chosen any known option.",
-        })}\n{% endif %}`;
-
-        return conditional;
-
-      case "NUMBER":
-        return `{% if ${aliasSimpleOrMultiple} == 123 %}\n${endIfPart}`;
-      case "PHONE":
-        return `{% if ${aliasSimpleOrMultiple} == "+34666554433" %}\n${endIfPart}`;
-      case "DATE":
-        return `{% if ${aliasSimpleOrMultiple} == "2022-05-29" %}\n${endIfPart}`;
-      case "SHORT_TEXT":
-      case "TEXT":
-      default:
-        return `{% if ${aliasSimpleOrMultiple} == "${intl.formatMessage({
-          id: "component.reference-options-menu.reply",
-          defaultMessage: "reply",
-        })}" %}\n${endIfPart}`;
-    }
-  }, [field]);
-
-  const multipleFieldFormulas = field.multiple
-    ? [
-        {
-          title: intl.formatMessage({
-            id: "component.reference-options-menu.list-of-replies",
-            defaultMessage: "List of replies",
-          }),
-          description: intl.formatMessage({
-            id: "component.reference-options-menu.list-of-replies-description",
-            defaultMessage: "Creates a list with each reply added.",
-          }),
-          formula: intl.formatMessage(
-            {
-              id: "component.reference-options-menu.list-of-replies-formula",
-              defaultMessage:
-                "'{'%- for reply in {alias} %'}'{br}- '{{' reply '}}'{br}'{'%- endfor %'}'",
-            },
-            {
-              alias,
-              br: `\n`,
-            }
-          ),
-        },
-        {
-          title: intl.formatMessage({
-            id: "component.reference-options-menu.one-line-replies",
-            defaultMessage: "One-line replies",
-          }),
-          description: intl.formatMessage({
-            id: "component.reference-options-menu.one-line-replies-description",
-            defaultMessage: "Displays all replies on one line.",
-          }),
-          formula: intl.formatMessage(
-            {
-              id: "component.reference-options-menu.one-line-replies-formula",
-              defaultMessage:
-                "'{'% for reply in {alias} -%'}'{br}'{'% if forloop.first == true %'}{'% elsif forloop.last == true %'} and {'% else %'}, {'% endif %'}{{' reply '}}'{br}'{'%- endfor %'}'",
-            },
-            {
-              alias,
-              br: `\n`,
-            }
-          ),
-        },
-      ]
-    : [];
-
-  const commonFormulas = [
-    {
-      title: intl.formatMessage({
-        id: "component.reference-options-menu.conditional-text",
-        defaultMessage: "Conditional text",
-      }),
-      description: intl.formatMessage({
-        id: "component.reference-options-menu.conditional-text-description",
-        defaultMessage: "Displays a sentence when an option is chosen.",
-      }),
-      formula: conditionalFormula,
-    },
-    ...multipleFieldFormulas,
-  ];
-
   return useMemo(() => {
-    switch (type) {
-      case "CHECKBOX":
-      case "SELECT":
-      case "PHONE":
-      case "DATE":
-        return commonFormulas;
-      case "NUMBER":
-        return [
+    const _alias = multiple ? alias + "[0]" : alias;
+
+    const conditionalFormula = (() => {
+      switch (type) {
+        case "CHECKBOX": {
+          const fieldOptions = options as FieldOptions["CHECKBOX"];
+          const values = fieldOptions.values.length > 0 ? fieldOptions.values : ["A"];
+          return [
+            ...values.slice(0, 3).flatMap((value, index) => [
+              `{% ${index === 0 ? "if" : "elsif"} ${alias} contains ${JSON.stringify(value)} %}`,
+              intl.formatMessage(
+                {
+                  id: "component.reference-options-menu.sentence-for-option",
+                  defaultMessage: `This sentence will be displayed when "{option}" is selected.`,
+                },
+                { option: value }
+              ),
+            ]),
+            "{% else %}",
+            intl.formatMessage({
+              id: "component.reference-options-menu.sentence-for-other",
+              defaultMessage:
+                "This sentence will be displayed if none of the previous options is selected.",
+            }),
+            "{% endif %}",
+          ].join("\n");
+        }
+        case "SELECT": {
+          const fieldOptions = options as FieldOptions["SELECT"];
+          const values = fieldOptions.values.length > 0 ? fieldOptions.values : ["A"];
+          return [
+            ...values.slice(0, 3).flatMap((value, index) => [
+              `{% ${index === 0 ? "if" : "elsif"} ${_alias} == ${JSON.stringify(value)} %}`,
+              intl.formatMessage(
+                {
+                  id: "component.reference-options-menu.if-option-with-sentence",
+                  defaultMessage: `This sentence will be displayed when "{option}" is selected.`,
+                },
+                { option: value }
+              ),
+            ]),
+            "{% else %}",
+            intl.formatMessage({
+              id: "component.reference-options-menu.sentence-for-other",
+              defaultMessage:
+                "This sentence will be displayed if none of the previous options is selected.",
+            }),
+            "{% endif %}",
+          ].join("\n");
+        }
+        default: {
+          const value =
+            type === "NUMBER"
+              ? 123
+              : type === "PHONE"
+              ? "+34612312312"
+              : type === "DATE"
+              ? "2022-05-29"
+              : intl.formatMessage({
+                  id: "component.reference-options-menu.example-reply",
+                  defaultMessage: "Example reply",
+                });
+          return [
+            `{% if ${_alias} == ${JSON.stringify(value)} %}`,
+            intl.formatMessage(
+              {
+                id: "component.reference-options-menu.sentence-with-reply",
+                defaultMessage: `This sentence will be displayed when the reply is "{value}".`,
+              },
+              { value }
+            ),
+            "{% else %}",
+            intl.formatMessage({
+              id: "component.reference-options-menu.sentence-no-reply",
+              defaultMessage: "This sentence will be displayed if there are no added replies.",
+            }),
+            "{% endif %}",
+          ].join("\n");
+        }
+      }
+    })();
+
+    const loopVariable = intl.formatMessage({
+      id: "component.reference-options-menu.loop-variable",
+      defaultMessage: "reply",
+    });
+    const and = intl.formatMessage({
+      id: "component.reference-options-menu.and",
+      defaultMessage: "and",
+    });
+    const multipleFieldFormulas = multiple
+      ? [
           {
             title: intl.formatMessage({
-              id: "component.reference-options-menu.quantities",
-              defaultMessage: "Quantities",
+              id: "component.reference-options-menu.list-of-replies",
+              defaultMessage: "List of replies",
             }),
             description: intl.formatMessage({
-              id: "component.reference-options-menu.quantities-description",
-              defaultMessage: "Displays the reply as quantity.",
+              id: "component.reference-options-menu.list-of-replies-description",
+              defaultMessage: "Creates a list with each reply added.",
             }),
-            formula: `{{ ${alias} }}`,
+            formula: [
+              `{% for ${loopVariable} in ${alias} -%}`,
+              `- {{ ${loopVariable} }}`,
+              `{% endfor %}`,
+            ].join("\n"),
           },
           {
             title: intl.formatMessage({
-              id: "component.reference-options-menu.percentage",
-              defaultMessage: "Percentage",
+              id: "component.reference-options-menu.one-line-replies",
+              defaultMessage: "One-line replies",
             }),
             description: intl.formatMessage({
-              id: "component.reference-options-menu.percentage-description",
-              defaultMessage: "Displays the reply as a percentage.",
+              id: "component.reference-options-menu.one-line-replies-description",
+              defaultMessage: "Displays all replies in one line.",
             }),
-            formula: `{{ ${alias} | percent: 2 }}`,
+            formula: [
+              `{% for ${loopVariable} in ${alias} -%}`,
+              `{% if forloop.first == true %}{% elsif forloop.last == true %} ${and} {% else %}, {% endif %}{{ ${loopVariable} }}`,
+              `{%- endfor %}`,
+            ].join("\n"),
           },
-          {
-            title: intl.formatMessage({
-              id: "component.reference-options-menu.euros",
-              defaultMessage: "Euros",
-            }),
-            description: intl.formatMessage({
-              id: "component.reference-options-menu.euros-description",
-              defaultMessage: "Displays the reply with the symbol €",
-            }),
-            formula: `{{ ${alias} | currency: "EUR" }}`,
-          },
-          {
-            title: intl.formatMessage({
-              id: "component.reference-options-menu.dollars",
-              defaultMessage: "Dollars",
-            }),
-            description: intl.formatMessage({
-              id: "component.reference-options-menu.dollars-description",
-              defaultMessage: "Displays the reply with the symbol $",
-            }),
-            formula: `{{ ${alias} | currency: "USD" }}`,
-          },
-          {
-            title: intl.formatMessage({
-              id: "component.reference-options-menu.round-up",
-              defaultMessage: "Round up",
-            }),
-            description: intl.formatMessage({
-              id: "component.reference-options-menu.round-up-description",
-              defaultMessage: "Rounds the amount of a field.",
-            }),
-            formula: `{{ ${alias} | round }}`,
-          },
-          ...commonFormulas,
-        ];
-      case "SHORT_TEXT":
-      case "TEXT":
-        return [
-          {
-            title: intl.formatMessage({
-              id: "component.reference-options-menu.capitalization",
-              defaultMessage: "Capitalization",
-            }),
-            description: intl.formatMessage({
-              id: "component.reference-options-menu.capitalization-description",
-              defaultMessage: "Displays the reply in capital letters.",
-            }),
-            formula: `{{ ${alias} | upcase }}`,
-          },
-          {
-            title: intl.formatMessage({
-              id: "component.reference-options-menu.lowercase",
-              defaultMessage: "Lowercase",
-            }),
-            description: intl.formatMessage({
-              id: "component.reference-options-menu.lowercase-description",
-              defaultMessage: "Displays a lowercase reply.",
-            }),
-            formula: `{{ ${alias} | downcase }}`,
-          },
-          {
-            title: intl.formatMessage({
-              id: "component.reference-options-menu.capitalize-first-letter",
-              defaultMessage: "Capitalize first letter",
-            }),
-            description: intl.formatMessage({
-              id: "component.reference-options-menu.capitalize-first-letter-description",
-              defaultMessage: "Displays the reply with the first letter capitalized.",
-            }),
-            formula: `{{ ${alias} | capitalize }}`,
-          },
-          ...commonFormulas,
-        ];
-      case "DYNAMIC_SELECT":
-      case "ES_TAX_DOCUMENTS":
-      case "FILE_UPLOAD":
-      case "HEADING":
-      default:
-        return [
-          {
-            title: "",
-            description: "",
-            formula: "",
-          },
-        ];
-    }
-  }, [type, alias, options]);
+        ]
+      : [];
+
+    const commonFormulas = [
+      {
+        title: intl.formatMessage({
+          id: "component.reference-options-menu.conditional-text",
+          defaultMessage: "Conditional text",
+        }),
+        description: intl.formatMessage({
+          id: "component.reference-options-menu.conditional-text-description",
+          defaultMessage: "Displays a sentence when an option is chosen.",
+        }),
+        formula: conditionalFormula,
+      },
+      ...multipleFieldFormulas,
+    ];
+
+    return (() => {
+      switch (type) {
+        case "CHECKBOX":
+        case "SELECT":
+        case "PHONE":
+        case "DATE":
+          return commonFormulas;
+        case "NUMBER":
+          return [
+            {
+              title: intl.formatMessage({
+                id: "component.reference-options-menu.quantities",
+                defaultMessage: "Quantities",
+              }),
+              description: intl.formatMessage({
+                id: "component.reference-options-menu.quantities-description",
+                defaultMessage: "Displays the reply as quantity.",
+              }),
+              formula: `{{ ${_alias} | number }}`,
+            },
+            {
+              title: intl.formatMessage({
+                id: "component.reference-options-menu.percentage",
+                defaultMessage: "Percentage",
+              }),
+              description: intl.formatMessage({
+                id: "component.reference-options-menu.percentage-description",
+                defaultMessage: "Displays the reply as a percentage.",
+              }),
+              formula: `{{ ${_alias} | percent: 2 }}`,
+            },
+            {
+              title: intl.formatMessage({
+                id: "component.reference-options-menu.round-up",
+                defaultMessage: "Round up",
+              }),
+              description: intl.formatMessage({
+                id: "component.reference-options-menu.round-up-description",
+                defaultMessage: "Rounds the amount of a field.",
+              }),
+              formula: `{{ ${_alias} | round }}`,
+            },
+            ...commonFormulas,
+          ];
+        case "SHORT_TEXT":
+        case "TEXT":
+          return [
+            {
+              title: intl.formatMessage({
+                id: "component.reference-options-menu.uppercase",
+                defaultMessage: "Uppercase",
+              }),
+              description: intl.formatMessage({
+                id: "component.reference-options-menu.uppercase-description",
+                defaultMessage: "Displays the reply in capital letters.",
+              }),
+              formula: `{{ ${_alias} | upcase }}`,
+            },
+            {
+              title: intl.formatMessage({
+                id: "component.reference-options-menu.lowercase",
+                defaultMessage: "Lowercase",
+              }),
+              description: intl.formatMessage({
+                id: "component.reference-options-menu.lowercase-description",
+                defaultMessage: "Displays a lowercase reply.",
+              }),
+              formula: `{{ ${_alias} | downcase }}`,
+            },
+            {
+              title: intl.formatMessage({
+                id: "component.reference-options-menu.capitalize-first-letter",
+                defaultMessage: "Capitalize first letter",
+              }),
+              description: intl.formatMessage({
+                id: "component.reference-options-menu.capitalize-first-letter-description",
+                defaultMessage: "Displays the reply with the first letter capitalized.",
+              }),
+              formula: `{{ ${_alias} | capitalize }}`,
+            },
+            ...commonFormulas,
+          ];
+        default:
+          return [];
+      }
+    })();
+  }, [type, alias, options, multiple]);
 }

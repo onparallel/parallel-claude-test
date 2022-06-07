@@ -3090,14 +3090,9 @@
     "context": "Remember to click Finalize when you finish entering all the information."
   },
   {
-    "term": "component.reference-options-menu.capitalization",
-    "definition": "Mayúsculas",
-    "context": "Capitalization"
-  },
-  {
-    "term": "component.reference-options-menu.capitalization-description",
-    "definition": "Muestra la respuesta en mayúscula.",
-    "context": "Displays the reply in capital letters."
+    "term": "component.reference-options-menu.and",
+    "definition": "y",
+    "context": "and"
   },
   {
     "term": "component.reference-options-menu.capitalize-first-letter",
@@ -3120,29 +3115,9 @@
     "context": "Displays a sentence when an option is chosen."
   },
   {
-    "term": "component.reference-options-menu.dollars",
-    "definition": "Dólares",
-    "context": "Dollars"
-  },
-  {
-    "term": "component.reference-options-menu.dollars-description",
-    "definition": "Muestra la respuesta con el símbolo $",
-    "context": "Displays the reply with the symbol $"
-  },
-  {
-    "term": "component.reference-options-menu.elsif-with-sentence",
-    "definition": "'{'% elsif {alias} == \"{option}\" %'}'{br}Esta es la frase que se mostrará cuando se escoja {option}.{br}",
-    "context": "'{'% elsif {alias} == \"{option}\" %'}{br}This is the sentence that will be displayed when {option} is chosen.{br}"
-  },
-  {
-    "term": "component.reference-options-menu.euros",
-    "definition": "Euros",
-    "context": "Euros"
-  },
-  {
-    "term": "component.reference-options-menu.euros-description",
-    "definition": "Muestra la respuesta con el símbolo €",
-    "context": "Displays the reply with the symbol €"
+    "term": "component.reference-options-menu.example-reply",
+    "definition": "Ejemplo de respuesta",
+    "context": "Example reply"
   },
   {
     "term": "component.reference-options-menu.formula-copied-alert",
@@ -3157,7 +3132,7 @@
   {
     "term": "component.reference-options-menu.if-option-with-sentence",
     "definition": "'{'% if {alias} == \"{option}\" %'}'{br}Esta es la frase que se mostrará cuando se escoja {option}.{br}",
-    "context": "'{'% if {alias} == \"{option}\" %'}{br}This is the sentence that will be displayed when {option} is chosen.{br}"
+    "context": "This sentence will be displayed when \"{option}\" is selected."
   },
   {
     "term": "component.reference-options-menu.list-of-replies",
@@ -3170,9 +3145,9 @@
     "context": "Creates a list with each reply added."
   },
   {
-    "term": "component.reference-options-menu.list-of-replies-formula",
-    "definition": "'{'%- for respuesta in {alias} %'}'{br}- '{{' respuesta '}}'{br}'{'%- endfor %'}'",
-    "context": "'{'%- for reply in {alias} %'}'{br}- '{{' reply '}}'{br}'{'%- endfor %'}'"
+    "term": "component.reference-options-menu.loop-variable",
+    "definition": "respuesta",
+    "context": "reply"
   },
   {
     "term": "component.reference-options-menu.lowercase",
@@ -3185,11 +3160,6 @@
     "context": "Displays a lowercase reply."
   },
   {
-    "term": "component.reference-options-menu.no-options-chosen",
-    "definition": "No has escogido ninguna opción conocida.",
-    "context": "You have not chosen any known option."
-  },
-  {
     "term": "component.reference-options-menu.one-line-replies",
     "definition": "Respuestas en una línea",
     "context": "One-line replies"
@@ -3197,12 +3167,7 @@
   {
     "term": "component.reference-options-menu.one-line-replies-description",
     "definition": "Muestra todas las respuestas en una línea.",
-    "context": "Displays all replies on one line."
-  },
-  {
-    "term": "component.reference-options-menu.one-line-replies-formula",
-    "definition": "'{'% for respuesta in {alias} -%'}'{br}'{'% if forloop.first == true %'}{'% elsif forloop.last == true %'} y {'% else %'}, {'% endif %'}{{' respuesta '}}'{br}'{'%- endfor %'}'",
-    "context": "'{'% for reply in {alias} -%'}'{br}'{'% if forloop.first == true %'}{'% elsif forloop.last == true %'} and {'% else %'}, {'% endif %'}{{' reply '}}'{br}'{'%- endfor %'}'"
+    "context": "Displays all replies in one line."
   },
   {
     "term": "component.reference-options-menu.other-options",
@@ -3230,11 +3195,6 @@
     "context": "Displays the reply as quantity."
   },
   {
-    "term": "component.reference-options-menu.reply",
-    "definition": "respuesta",
-    "context": "reply"
-  },
-  {
     "term": "component.reference-options-menu.round-up",
     "definition": "Redondear",
     "context": "Round up"
@@ -3245,6 +3205,16 @@
     "context": "Rounds the amount of a field."
   },
   {
+    "term": "component.reference-options-menu.sentence-for-option",
+    "definition": "Esta frase se mostrará cuando se seleccione  \"{option}\".",
+    "context": "This sentence will be displayed when \"{option}\" is selected."
+  },
+  {
+    "term": "component.reference-options-menu.sentence-for-other",
+    "definition": "Esta frase se mostrará si no se selecciona ninguna de las opciones anteriores.",
+    "context": "This sentence will be displayed if none of the previous options is selected."
+  },
+  {
     "term": "component.reference-options-menu.sentence-no-reply",
     "definition": "Esta frase se mostrará si no hay respuestas añadidas.",
     "context": "This sentence will be displayed if there are no added replies."
@@ -3252,7 +3222,17 @@
   {
     "term": "component.reference-options-menu.sentence-with-reply",
     "definition": "Esta es la frase que se mostrará con esa respuesta.",
-    "context": "This is the sentence that will be displayed with that reply."
+    "context": "This sentence will be displayed when the reply is \"{value}\"."
+  },
+  {
+    "term": "component.reference-options-menu.uppercase",
+    "definition": "Mayúsculas",
+    "context": "Uppercase"
+  },
+  {
+    "term": "component.reference-options-menu.uppercase-description",
+    "definition": "Muestra la respuesta en mayúscula.",
+    "context": "Displays the reply in capital letters."
   },
   {
     "term": "component.referenced-field-dialog.confirm",
