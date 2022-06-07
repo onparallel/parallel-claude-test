@@ -22,6 +22,7 @@ import {
 } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
+import { resetTempPassword } from "../helpers/resetTempPassword";
 import { uploadArg } from "../helpers/scalars";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { emailDomainIsNotSSO } from "../helpers/validators/emailDomainIsNotSSO";
@@ -591,7 +592,7 @@ export const resendVerificationCode = mutationField("resendVerificationCode", {
   },
 });
 
-export const resetTemporaryPassword = mutationField("resetTemporaryPassword", {
+export const publicResetTemporaryPassword = mutationField("publicResetTemporaryPassword", {
   description:
     "Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD",
   type: "Result",
@@ -604,48 +605,26 @@ export const resetTemporaryPassword = mutationField("resetTemporaryPassword", {
     validLocale((args) => args.locale, "locale")
   ),
   resolve: async (_, { email, locale }, ctx) => {
-    try {
-      const [users, cognitoUser] = await Promise.all([
-        ctx.users.loadUsersByEmail(email),
-        ctx.aws.getUser(email),
-      ]);
-      const definedUsers = users.filter(isDefined);
-      if (definedUsers.length === 0) {
-        return RESULT.SUCCESS;
-      }
-
-      // TODO which org to use??
-      const user = definedUsers[0];
-      const [organization, userData] = await Promise.all([
-        user ? await ctx.organizations.loadOrg(user.org_id) : null,
-        user ? await ctx.users.loadUserData(user.user_data_id) : null,
-      ]);
-
-      if (
-        user &&
-        organization &&
-        userData &&
-        !userData.is_sso_user &&
-        cognitoUser.UserStatus === "FORCE_CHANGE_PASSWORD" &&
-        cognitoUser.UserLastModifiedDate &&
-        // allow 1 reset every hour
-        differenceInMinutes(new Date(), cognitoUser.UserLastModifiedDate) >= 60
-      ) {
-        const orgOwner = await ctx.organizations.getOrganizationOwner(organization.id);
-        const orgOwnerData = await ctx.users.loadUserData(orgOwner.user_data_id);
-        if (!orgOwnerData) {
-          return RESULT.SUCCESS;
-        }
-        await ctx.aws.resetUserPassword(email, {
-          locale: locale ?? "en",
-          organizationName: organization.name,
-          organizationUser: fullName(orgOwnerData.first_name, orgOwnerData.last_name),
-        });
-      }
-    } catch {}
-
     // always return SUCCESS to avoid leaking errors and user statuses
-    return RESULT.SUCCESS;
+    return await resetTempPassword({ email, locale, ctx });
+  },
+});
+
+export const resetTemporaryPassword = mutationField("resetTemporaryPassword", {
+  description:
+    "Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD",
+  type: "Result",
+  args: {
+    email: nonNull(stringArg()),
+    locale: stringArg(),
+  },
+  authorize: authenticateAnd(contextUserHasRole("ADMIN")),
+  validateArgs: validateAnd(
+    validEmail((args) => args.email, "email"),
+    validLocale((args) => args.locale, "locale")
+  ),
+  resolve: async (_, { email, locale }, ctx) => {
+    return await resetTempPassword({ email, locale, ctx, throwErrors: true });
   },
 });
 

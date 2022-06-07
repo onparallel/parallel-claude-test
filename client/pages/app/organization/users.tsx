@@ -1,6 +1,12 @@
 import { gql, useMutation } from "@apollo/client";
 import { Badge, Flex, Heading, Text, Tooltip, useToast } from "@chakra-ui/react";
-import { ForbiddenIcon, LogInIcon, UserCheckIcon, UserXIcon } from "@parallel/chakra/icons";
+import {
+  ArrowUpRightIcon,
+  ForbiddenIcon,
+  LogInIcon,
+  UserCheckIcon,
+  UserXIcon,
+} from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
@@ -11,6 +17,7 @@ import { withApolloData, WithApolloDataContext } from "@parallel/components/comm
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { useConfirmActivateUsersDialog } from "@parallel/components/organization/dialogs/ConfirmActivateUsersDialog";
 import { useConfirmDeactivateUserDialog } from "@parallel/components/organization/dialogs/ConfirmDeactivateUserDialog";
+import { useConfirmResendInvitationDialog } from "@parallel/components/organization/dialogs/ConfirmResendInvitationDialog";
 import { useCreateOrUpdateUserDialog } from "@parallel/components/organization/dialogs/CreateOrUpdateUserDialog";
 import { OrganizationUsersListTableHeader } from "@parallel/components/organization/OrganizationUsersListTableHeader";
 import { UserLimitReachedAlert } from "@parallel/components/organization/UserLimitReachedAlert";
@@ -20,6 +27,7 @@ import {
   OrganizationUsers_createOrganizationUserDocument,
   OrganizationUsers_deactivateUserDocument,
   OrganizationUsers_OrderBy,
+  OrganizationUsers_resetTemporaryPasswordDocument,
   OrganizationUsers_updateOrganizationUserDocument,
   OrganizationUsers_userDocument,
   OrganizationUsers_UserFragment,
@@ -43,6 +51,7 @@ import {
 import { isAdmin } from "@parallel/utils/roles";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useLoginAs } from "@parallel/utils/useLoginAs";
 import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
@@ -79,7 +88,7 @@ function OrganizationUsers() {
     },
   });
 
-  const canEdit = isAdmin(me.role);
+  const userIsAdmin = isAdmin(me.role);
 
   const [showDialog, setShowDialog] = useQueryStateSlice(state, setQueryState, "dialog");
 
@@ -235,6 +244,38 @@ function OrganizationUsers() {
     } catch {}
   };
 
+  const showConfirmResendInvitationDialog = useConfirmResendInvitationDialog();
+  const [resetTemporaryPassword] = useMutation(OrganizationUsers_resetTemporaryPasswordDocument);
+  const genericErrorToast = useGenericErrorToast();
+  async function handleResendInvitation() {
+    try {
+      await showConfirmResendInvitationDialog({ fullName: selectedUsers[0].fullName ?? "" });
+      await resetTemporaryPassword({
+        variables: { email: selectedUsers[0].email, locale: intl.locale },
+      });
+
+      toast({
+        title: intl.formatMessage({
+          id: "organization.user-invitation-sent.toast-title",
+          defaultMessage: "Invitation sent",
+        }),
+        description: intl.formatMessage(
+          {
+            id: "organization.user-created-success.toast-description",
+            defaultMessage:
+              "We have sent an email to {email} with instructions to register in Parallel.",
+          },
+          { email: selectedUsers[0].email }
+        ),
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch {
+      genericErrorToast();
+    }
+  }
+
   const loginAs = useLoginAs();
   const handleLoginAs = async () => {
     await loginAs(selected[0]);
@@ -311,7 +352,7 @@ function OrganizationUsers() {
         <TablePage
           flex="0 1 auto"
           minHeight={0}
-          isSelectable={canEdit}
+          isSelectable={userIsAdmin}
           isHighlightable
           columns={columns}
           rows={userList.items}
@@ -325,7 +366,7 @@ function OrganizationUsers() {
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
-          onRowClick={canEdit ? (user) => handleUpdateUser(user) : undefined}
+          onRowClick={userIsAdmin ? (user) => handleUpdateUser(user) : undefined}
           actions={[
             {
               key: "activate",
@@ -368,6 +409,23 @@ function OrganizationUsers() {
                       <FormattedMessage
                         id="organization-users.login-as"
                         defaultMessage="Login as..."
+                      />
+                    ),
+                  },
+                ]
+              : []),
+            ...(userIsAdmin
+              ? [
+                  {
+                    key: "reset-password",
+                    onClick: handleResendInvitation,
+                    isDisabled:
+                      selectedUsers.some((u) => u.lastActiveAt) || selectedUsers.length !== 1,
+                    leftIcon: <ArrowUpRightIcon />,
+                    children: (
+                      <FormattedMessage
+                        id="organization-users.resend-invitation"
+                        defaultMessage="Resend invitation"
                       />
                     ),
                   },
@@ -608,6 +666,11 @@ const _mutations = [
         id
         status
       }
+    }
+  `,
+  gql`
+    mutation OrganizationUsers_resetTemporaryPassword($email: String!, $locale: String) {
+      resetTemporaryPassword(email: $email, locale: $locale)
     }
   `,
 ];

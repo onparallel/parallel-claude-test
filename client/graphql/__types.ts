@@ -587,6 +587,8 @@ export interface Mutation {
   publicOptOutReminders: PublicPetitionAccess;
   /** Generates a download link for a field attachment on a public context. */
   publicPetitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
+  /** Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD */
+  publicResetTemporaryPassword: Result;
   publicSendReminder: Result;
   publicSendVerificationCode: VerificationCodeRequest;
   /** Starts the completion of an async field */
@@ -1172,6 +1174,11 @@ export interface MutationpublicPetitionFieldAttachmentDownloadLinkArgs {
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
   preview?: InputMaybe<Scalars["Boolean"]>;
+}
+
+export interface MutationpublicResetTemporaryPasswordArgs {
+  email: Scalars["String"];
+  locale?: InputMaybe<Scalars["String"]>;
 }
 
 export interface MutationpublicSendReminderArgs {
@@ -12466,6 +12473,13 @@ export type OrganizationUsers_deactivateUserMutation = {
   deactivateUser: Array<{ __typename?: "User"; id: string; status: UserStatus }>;
 };
 
+export type OrganizationUsers_resetTemporaryPasswordMutationVariables = Exact<{
+  email: Scalars["String"];
+  locale?: InputMaybe<Scalars["String"]>;
+}>;
+
+export type OrganizationUsers_resetTemporaryPasswordMutation = { resetTemporaryPassword: Result };
+
 export type OrganizationUsers_userQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
@@ -19468,12 +19482,12 @@ export type Forgot_resendVerificationCodeMutationVariables = Exact<{
 
 export type Forgot_resendVerificationCodeMutation = { resendVerificationCode: Result };
 
-export type Forgot_resetTemporaryPasswordMutationVariables = Exact<{
+export type Forgot_publicResetTemporaryPasswordMutationVariables = Exact<{
   email: Scalars["String"];
   locale?: InputMaybe<Scalars["String"]>;
 }>;
 
-export type Forgot_resetTemporaryPasswordMutation = { resetTemporaryPassword: Result };
+export type Forgot_publicResetTemporaryPasswordMutation = { publicResetTemporaryPassword: Result };
 
 export type Login_resendVerificationCodeMutationVariables = Exact<{
   email: Scalars["String"];
@@ -27074,6 +27088,14 @@ export const OrganizationUsers_deactivateUserDocument = gql`
   OrganizationUsers_deactivateUserMutation,
   OrganizationUsers_deactivateUserMutationVariables
 >;
+export const OrganizationUsers_resetTemporaryPasswordDocument = gql`
+  mutation OrganizationUsers_resetTemporaryPassword($email: String!, $locale: String) {
+    resetTemporaryPassword(email: $email, locale: $locale)
+  }
+` as unknown as DocumentNode<
+  OrganizationUsers_resetTemporaryPasswordMutation,
+  OrganizationUsers_resetTemporaryPasswordMutationVariables
+>;
 export const OrganizationUsers_userDocument = gql`
   query OrganizationUsers_user(
     $offset: Int!
@@ -27798,13 +27820,13 @@ export const Forgot_resendVerificationCodeDocument = gql`
   Forgot_resendVerificationCodeMutation,
   Forgot_resendVerificationCodeMutationVariables
 >;
-export const Forgot_resetTemporaryPasswordDocument = gql`
-  mutation Forgot_resetTemporaryPassword($email: String!, $locale: String) {
-    resetTemporaryPassword(email: $email, locale: $locale)
+export const Forgot_publicResetTemporaryPasswordDocument = gql`
+  mutation Forgot_publicResetTemporaryPassword($email: String!, $locale: String) {
+    publicResetTemporaryPassword(email: $email, locale: $locale)
   }
 ` as unknown as DocumentNode<
-  Forgot_resetTemporaryPasswordMutation,
-  Forgot_resetTemporaryPasswordMutationVariables
+  Forgot_publicResetTemporaryPasswordMutation,
+  Forgot_publicResetTemporaryPasswordMutationVariables
 >;
 export const Login_resendVerificationCodeDocument = gql`
   mutation Login_resendVerificationCode($email: String!, $locale: String) {

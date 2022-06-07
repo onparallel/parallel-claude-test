@@ -13,8 +13,8 @@ import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicUserFormContainer } from "@parallel/components/public/PublicUserContainer";
 import { PublicSignupRightHeading } from "@parallel/components/public/signup/PublicSignupRightHeading";
 import {
+  Forgot_publicResetTemporaryPasswordDocument,
   Forgot_resendVerificationCodeDocument,
-  Forgot_resetTemporaryPasswordDocument,
 } from "@parallel/graphql/__types";
 import { postJSON } from "@parallel/utils/rest";
 import { useRouter } from "next/router";
@@ -107,7 +107,7 @@ function Forgot() {
   }
 
   const [resendVerificationCode] = useMutation(Forgot_resendVerificationCodeDocument);
-  const [resetTemporaryPassword] = useMutation(Forgot_resetTemporaryPasswordDocument);
+  const [resetTemporaryPassword] = useMutation(Forgot_publicResetTemporaryPasswordDocument);
   async function handleResendEmail() {
     try {
       if (verification.email) {
@@ -235,8 +235,8 @@ Forgot.mutations = [
     }
   `,
   gql`
-    mutation Forgot_resetTemporaryPassword($email: String!, $locale: String) {
-      resetTemporaryPassword(email: $email, locale: $locale)
+    mutation Forgot_publicResetTemporaryPassword($email: String!, $locale: String) {
+      publicResetTemporaryPassword(email: $email, locale: $locale)
     }
   `,
 ];

@@ -1124,6 +1124,11 @@ type Mutation {
     """
     preview: Boolean
   ): FileUploadDownloadLinkResult!
+
+  """
+  Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD
+  """
+  publicResetTemporaryPassword(email: String!, locale: String): Result!
   publicSendReminder(contactEmail: String!, slug: ID!): Result!
   publicSendVerificationCode(keycode: ID!): VerificationCodeRequest!
 

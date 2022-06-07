@@ -554,6 +554,8 @@ export type Mutation = {
   publicOptOutReminders: PublicPetitionAccess;
   /** Generates a download link for a field attachment on a public context. */
   publicPetitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
+  /** Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD */
+  publicResetTemporaryPassword: Result;
   publicSendReminder: Result;
   publicSendVerificationCode: VerificationCodeRequest;
   /** Starts the completion of an async field */
@@ -1139,6 +1141,11 @@ export type MutationpublicPetitionFieldAttachmentDownloadLinkArgs = {
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
   preview?: InputMaybe<Scalars["Boolean"]>;
+};
+
+export type MutationpublicResetTemporaryPasswordArgs = {
+  email: Scalars["String"];
+  locale?: InputMaybe<Scalars["String"]>;
 };
 
 export type MutationpublicSendReminderArgs = {

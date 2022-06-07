@@ -1702,6 +1702,23 @@ export const ArrowRightUpIcon = createIcon({
   ),
 });
 
+export const ArrowUpRightIcon = createIcon({
+  displayName: "ArrowUpRightIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2.5"
+    >
+      <path d="m15.375 14.25 5.625-5.625-5.625-5.625" />
+      <path d="m3 21v-7.875c0-1.1935.47411-2.3381 1.31802-3.18198.84391-.84391 1.98851-1.31802 3.18198-1.31802h13.5" />
+    </g>
+  ),
+});
+
 export const CircleCrossFilledIcon = createIcon({
   displayName: "CircleCrossFilledIcon",
   viewBox: "0 0 21 20",

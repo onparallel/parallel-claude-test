@@ -475,6 +475,21 @@
     "context": "Resend confirmation email"
   },
   {
+    "term": "component.confirm-resend-invitation-dialog.resend-invitation-question",
+    "definition": "¿Quieres reenviarle la invitación para acceder?",
+    "context": "Do you want to resend the invitation to log in?"
+  },
+  {
+    "term": "component.confirm-resend-invitation-dialog.title",
+    "definition": "Reenviar invitación",
+    "context": "Resend invitation"
+  },
+  {
+    "term": "component.confirm-resend-invitation-dialog.user-not-yet-activated",
+    "definition": "{fullName} aún no ha activado su cuenta.",
+    "context": "{fullName} not yet activated his account."
+  },
+  {
     "term": "component.confirm-restart-signature-request.description",
     "definition": "Ya tienes una petición firmada. Si continúas, gastarás un crédito de firma adicional.",
     "context": "You already have a signed petition. If you continue you will spend an additional eSignature credit."
@@ -4580,6 +4595,11 @@
     "context": "Yes, delete"
   },
   {
+    "term": "generic.confirm-send",
+    "definition": "Si, enviar",
+    "context": "Yes, send"
+  },
+  {
     "term": "generic.contact",
     "definition": "Contactar",
     "context": "Contact"
@@ -5515,6 +5535,11 @@
     "context": "Login as..."
   },
   {
+    "term": "organization-users.resend-invitation",
+    "definition": "Reenviar invitación",
+    "context": "Resend invitation"
+  },
+  {
     "term": "organization-users.update-user-status.error.deactivate-own-user",
     "definition": "No puedes desactivar a tu propio usuario. Por favor, quítalo de la selección e inténtalo nuevamente.",
     "context": "You can't deactivate your own user. Please, remove it from the selection and try again."
@@ -5713,6 +5738,11 @@
     "term": "organization.user-created-success.toast-title",
     "definition": "Usuario creado con éxito.",
     "context": "User created successfully."
+  },
+  {
+    "term": "organization.user-invitation-sent.toast-title",
+    "definition": "Invitación enviada",
+    "context": "Invitation sent"
   },
   {
     "term": "organization.user-updated-success.toast-title",

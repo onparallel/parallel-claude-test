@@ -1004,6 +1004,7 @@ export interface NexusGenFieldTypes {
     publicMarkPetitionFieldCommentsAsRead: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     publicOptOutReminders: NexusGenRootTypes["PublicPetitionAccess"]; // PublicPetitionAccess!
     publicPetitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
+    publicResetTemporaryPassword: NexusGenEnums["Result"]; // Result!
     publicSendReminder: NexusGenEnums["Result"]; // Result!
     publicSendVerificationCode: NexusGenRootTypes["VerificationCodeRequest"]; // VerificationCodeRequest!
     publicStartAsyncFieldCompletion: NexusGenRootTypes["AsyncFieldCompletionResponse"]; // AsyncFieldCompletionResponse!
@@ -2501,6 +2502,7 @@ export interface NexusGenFieldTypeNames {
     publicMarkPetitionFieldCommentsAsRead: "PublicPetitionFieldComment";
     publicOptOutReminders: "PublicPetitionAccess";
     publicPetitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
+    publicResetTemporaryPassword: "Result";
     publicSendReminder: "Result";
     publicSendVerificationCode: "VerificationCodeRequest";
     publicStartAsyncFieldCompletion: "AsyncFieldCompletionResponse";
@@ -4132,6 +4134,11 @@ export interface NexusGenArgTypes {
       fieldId: NexusGenScalars["GID"]; // GID!
       keycode: string; // ID!
       preview?: boolean | null; // Boolean
+    };
+    publicResetTemporaryPassword: {
+      // args
+      email: string; // String!
+      locale?: string | null; // String
     };
     publicSendReminder: {
       // args
