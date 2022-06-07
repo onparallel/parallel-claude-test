@@ -74,7 +74,7 @@ interface ExportRefs {
 function useExportExcel(clientId: string) {
   const exportExcelTask = useBackgroundTask("EXPORT_EXCEL");
   return async (petition: useCuatrecasasExport_PetitionFragment, opts: ExportOpts) => {
-    const result = await exportExcelTask(petition.id);
+    const result = await exportExcelTask.start(petition.id);
     return await cuatrecasasExport(
       result.url!,
       result.task.output!.filename,
@@ -270,7 +270,7 @@ function useExportPdfDocument(clientId: string, refs: ExportRefs) {
       throw new Error("CANCEL");
     }
 
-    const exportedDocument = await printPdfTask(petition.id);
+    const exportedDocument = await printPdfTask.start(petition.id);
 
     const pdfExternalId = await cuatrecasasExport(
       exportedDocument.url!,

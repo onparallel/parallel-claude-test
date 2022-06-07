@@ -6387,7 +6387,7 @@
   {
     "term": "page.reports.error-support-message",
     "definition": "Hola, estoy teniendo problemas para generar informes.",
-    "context": "Hi, I'm having issues to generate reports."
+    "context": "Hi, I'm having issues generating reports."
   },
   {
     "term": "page.reports.esignature-sent",
@@ -6402,7 +6402,7 @@
   {
     "term": "page.reports.esignature-sent-help-2",
     "definition": "No entran en esta cifra procesos de firma en los que falte algún firmante por firmar.",
-    "context": "eSignatures processes in which a signer hasn't yet signed. aren't included."
+    "context": "eSignatures processes in which a signer hasn't yet signed aren't included."
   },
   {
     "term": "page.reports.generate-report",

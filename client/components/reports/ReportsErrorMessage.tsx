@@ -29,7 +29,7 @@ export function ReportsErrorMessage() {
               <SupportLink
                 message={intl.formatMessage({
                   id: "page.reports.error-support-message",
-                  defaultMessage: "Hi, I'm having issues to generate reports.",
+                  defaultMessage: "Hi, I'm having issues generating reports.",
                 })}
               >
                 {chunks}

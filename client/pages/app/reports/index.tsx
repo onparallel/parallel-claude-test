@@ -40,7 +40,7 @@ import {
   useAssertQueryOrPreviousData,
 } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { useBackgroundTask } from "@parallel/utils/useBackgroundTask";
+import { IBackgroundTask, useBackgroundTask } from "@parallel/utils/useBackgroundTask";
 import { useTemplateRepliesReportTask } from "@parallel/utils/useTemplateRepliesReportTask";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -72,6 +72,7 @@ export function Reports() {
   const [templateId, setTemplateId] = useState<string | null>(null);
   const [report, setReport] = useState<ReportType | null>(null);
   const prevTemplateId = useRef<string | null>(null);
+  const prevTask = useRef<IBackgroundTask | null>(null);
 
   const {
     data: {
@@ -111,9 +112,11 @@ export function Reports() {
     try {
       setReport(null);
       setState("FAKE_LOADING");
+      prevTask.current?.stop();
       prevTemplateId.current = templateId;
+      prevTask.current = templateStatsTask;
       if (isDefined(templateId)) {
-        const { task } = await templateStatsTask(templateId);
+        const { task } = await templateStatsTask.start(templateId);
         setReport(task.output as ReportType);
       }
     } catch (e) {
@@ -188,7 +191,19 @@ export function Reports() {
               <FormattedMessage id="page.reports.title" defaultMessage="Reports" />
             </Heading>
           </HStack>
-          <Button variant="ghost" fontWeight="normal" color="purple.600">
+          <Button
+            variant="ghost"
+            fontWeight="normal"
+            color="purple.600"
+            as="a"
+            href={
+              intl.locale === "es"
+                ? "https://help.onparallel.com/es/articles/6272487-que-son-los-informes-y-como-funcionan"
+                : "https://help.onparallel.com/en/articles/6272487-what-are-reports-and-how-they-work"
+            }
+            rel="noopener"
+            target="_blank"
+          >
             <FormattedMessage id="generic.help-question" defaultMessage="Help?" />
           </Button>
         </HStack>
@@ -329,7 +344,7 @@ export function Reports() {
                       <Text>
                         <FormattedMessage
                           id="page.reports.esignature-sent-help-2"
-                          defaultMessage="eSignatures processes in which a signer hasn't yet signed. aren't included."
+                          defaultMessage="eSignatures processes in which a signer hasn't yet signed aren't included."
                         />
                       </Text>
                     </Stack>

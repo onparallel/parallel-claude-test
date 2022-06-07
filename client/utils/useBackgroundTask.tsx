@@ -7,7 +7,16 @@ import {
   useBackgroundTask_taskDocument,
 } from "@parallel/graphql/__types";
 
-export function useBackgroundTask(taskName: "EXPORT_EXCEL" | "PRINT_PDF" | "STATS_REPORT") {
+const POLLING_TIMEOUT = 60000;
+
+export interface IBackgroundTask {
+  stop: () => void;
+  start: (id: string) => Promise<any>;
+}
+
+export function useBackgroundTask(
+  taskName: "EXPORT_EXCEL" | "PRINT_PDF" | "STATS_REPORT"
+): IBackgroundTask {
   const [createTask] = useMutation(
     taskName === "EXPORT_EXCEL"
       ? useBackgroundTask_createExportExcelTaskDocument
@@ -21,32 +30,49 @@ export function useBackgroundTask(taskName: "EXPORT_EXCEL" | "PRINT_PDF" | "STAT
   const { refetch } = useQuery(useBackgroundTask_taskDocument, {
     skip: true,
   });
+  let status = "IDLE";
 
-  return async (petitionId: string) => {
-    const { data: initialData } = await createTask({ variables: { petitionId } });
-
-    const task = await (async function () {
-      while (true) {
-        const {
-          data: { task },
-        } = await refetch({
-          id: initialData!.createTask.id,
-        });
-        if (task.status === "COMPLETED") {
-          return task;
-        } else if (task.status === "FAILED") {
-          throw new Error("FAILED");
-        }
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+  return {
+    stop: () => {
+      if (status === "POLLING") {
+        status = "ABORTED";
       }
-    })();
+    },
+    start: async (petitionId: string) => {
+      const { data: initialData } = await createTask({ variables: { petitionId } });
 
-    if (taskName === "STATS_REPORT") {
-      return { task };
-    } else {
-      const { data } = await generateDownloadUrl({ variables: { taskId: task!.id } });
-      return { task, url: data!.getTaskResultFileUrl };
-    }
+      const task = await (async function () {
+        const startTimer = performance.now();
+        while (true) {
+          const {
+            data: { task },
+          } = await refetch({
+            id: initialData!.createTask.id,
+          });
+
+          if (status === "IDLE") status = "POLLING";
+
+          const updatedTimer = performance.now();
+
+          if (task.status === "COMPLETED" || status === "ABORTED") {
+            return task;
+          } else if (task.status === "FAILED") {
+            throw new Error("FAILED");
+          } else if (updatedTimer - startTimer > POLLING_TIMEOUT) {
+            throw new Error("TIMEOUT");
+          }
+
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+      })();
+
+      if (taskName === "STATS_REPORT") {
+        return { task };
+      } else {
+        const { data } = await generateDownloadUrl({ variables: { taskId: task!.id } });
+        return { task, url: data!.getTaskResultFileUrl };
+      }
+    },
   };
 }
 
