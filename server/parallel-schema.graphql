@@ -1719,7 +1719,7 @@ type Organization implements Timestamps {
   The total number of active users
   """
   activeUserCount: Int!
-  anonymizePetitionsAfter: TimeInterval
+  anonymizePetitionsAfterMonths: Int
 
   """
   Time when the resource was created.
@@ -4687,12 +4687,6 @@ type TemplateUsedEvent implements PetitionEvent {
 
 type TemporaryFile {
   filename: String!
-}
-
-type TimeInterval {
-  days: Int
-  months: Int
-  years: Int
 }
 
 interface Timestamps {

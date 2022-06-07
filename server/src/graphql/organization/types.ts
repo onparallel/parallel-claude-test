@@ -264,18 +264,9 @@ export const Organization = objectType({
           : null;
       },
     });
-    t.nullable.field("anonymizePetitionsAfter", {
-      type: objectType({
-        name: "TimeInterval",
-        definition(t) {
-          t.nullable.int("years");
-          t.nullable.int("months");
-          t.nullable.int("days");
-        },
-      }),
-      resolve: (o) => {
-        return o.anonymize_petitions_after as any;
-      },
+    t.nullable.int("anonymizePetitionsAfterMonths", {
+      resolve: (o) =>
+        isDefined(o.anonymize_petitions_after_days) ? o.anonymize_petitions_after_days / 30 : null,
     });
   },
 });

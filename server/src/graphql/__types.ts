@@ -593,12 +593,6 @@ export interface NexusGenObjects {
   TemplateDefaultUserPermission: db.TemplateDefaultPermission;
   TemplateUsedEvent: events.TemplateUsedEvent;
   TemporaryFile: db.TemporaryFile;
-  TimeInterval: {
-    // root type
-    days?: number | null; // Int
-    months?: number | null; // Int
-    years?: number | null; // Int
-  };
   User: db.User;
   UserAuthenticationToken: db.UserAuthenticationToken;
   UserGroup: db.UserGroup;
@@ -1091,7 +1085,7 @@ export interface NexusGenFieldTypes {
     // field return type
     _id: number; // Int!
     activeUserCount: number; // Int!
-    anonymizePetitionsAfter: NexusGenRootTypes["TimeInterval"] | null; // TimeInterval
+    anonymizePetitionsAfterMonths: number | null; // Int
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customHost: string | null; // String
     hasSsoProvider: boolean; // Boolean!
@@ -1966,12 +1960,6 @@ export interface NexusGenFieldTypes {
     // field return type
     filename: string; // String!
   };
-  TimeInterval: {
-    // field return type
-    days: number | null; // Int
-    months: number | null; // Int
-    years: number | null; // Int
-  };
   User: {
     // field return type
     avatarUrl: string | null; // String
@@ -2594,7 +2582,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     _id: "Int";
     activeUserCount: "Int";
-    anonymizePetitionsAfter: "TimeInterval";
+    anonymizePetitionsAfterMonths: "Int";
     createdAt: "DateTime";
     customHost: "String";
     hasSsoProvider: "Boolean";
@@ -3468,12 +3456,6 @@ export interface NexusGenFieldTypeNames {
   TemporaryFile: {
     // field return type name
     filename: "String";
-  };
-  TimeInterval: {
-    // field return type name
-    days: "Int";
-    months: "Int";
-    years: "Int";
   };
   User: {
     // field return type name

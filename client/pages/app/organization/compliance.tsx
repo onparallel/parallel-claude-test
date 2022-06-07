@@ -39,7 +39,6 @@ import {
 } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { Maybe } from "@parallel/utils/types";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -48,10 +47,6 @@ import { isDefined } from "remeda";
 interface ComplianceFormData {
   period: number | null;
   isActive: boolean;
-}
-
-function periodToMonths(period?: Maybe<{ years?: Maybe<number>; months?: Maybe<number> }>) {
-  return isDefined(period) ? (period.years ?? 0) * 12 + (period.months ?? 0) : null;
 }
 
 function OrganizationCompliance() {
@@ -77,7 +72,7 @@ function OrganizationCompliance() {
     data: { me, realMe },
   } = useAssertQueryOrPreviousData(OrganizationCompliance_userDocument);
 
-  const defaultPeriod = periodToMonths(me.organization.anonymizePetitionsAfter);
+  const defaultPeriod = me.organization.anonymizePetitionsAfterMonths;
 
   const {
     control,
@@ -386,10 +381,7 @@ const _fragments = {
           limit
         }
       }
-      anonymizePetitionsAfter {
-        years
-        months
-      }
+      anonymizePetitionsAfterMonths
     }
   `,
 };

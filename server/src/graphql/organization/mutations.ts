@@ -82,7 +82,7 @@ export const updateOrganizationAutoAnonymizePeriod = mutationField(
     resolve: async (_, { months }, ctx) => {
       return await ctx.organizations.updateOrganization(
         ctx.user!.org_id,
-        { anonymize_petitions_after: months ? `${months} months` : null },
+        { anonymize_petitions_after_days: months ? months * 30 : null },
         `User:${ctx.user!.id}`
       );
     },

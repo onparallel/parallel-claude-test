@@ -1542,7 +1542,7 @@ export type Organization = Timestamps & {
   _id: Scalars["Int"];
   /** The total number of active users */
   activeUserCount: Scalars["Int"];
-  anonymizePetitionsAfter: Maybe<TimeInterval>;
+  anonymizePetitionsAfterMonths: Maybe<Scalars["Int"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom host used in petition links and public links. */
@@ -3338,12 +3338,6 @@ export type TemplateUsedEvent = PetitionEvent & {
 
 export type TemporaryFile = {
   filename: Scalars["String"];
-};
-
-export type TimeInterval = {
-  days: Maybe<Scalars["Int"]>;
-  months: Maybe<Scalars["Int"]>;
-  years: Maybe<Scalars["Int"]>;
 };
 
 export type Timestamps = {

@@ -1578,7 +1578,7 @@ export interface Organization extends Timestamps {
   _id: Scalars["Int"];
   /** The total number of active users */
   activeUserCount: Scalars["Int"];
-  anonymizePetitionsAfter?: Maybe<TimeInterval>;
+  anonymizePetitionsAfterMonths?: Maybe<Scalars["Int"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom host used in petition links and public links. */
@@ -3457,13 +3457,6 @@ export interface TemplateUsedEvent extends PetitionEvent {
 export interface TemporaryFile {
   __typename?: "TemporaryFile";
   filename: Scalars["String"];
-}
-
-export interface TimeInterval {
-  __typename?: "TimeInterval";
-  days?: Maybe<Scalars["Int"]>;
-  months?: Maybe<Scalars["Int"]>;
-  years?: Maybe<Scalars["Int"]>;
 }
 
 export interface Timestamps {
@@ -11669,17 +11662,13 @@ export type OrganizationCompliance_OrganizationFragment = {
   __typename?: "Organization";
   id: string;
   activeUserCount: number;
+  anonymizePetitionsAfterMonths?: number | null;
   usageLimits: {
     __typename?: "OrganizationUsageLimit";
     users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
     petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
     signatures: { __typename?: "OrganizationUsageSignaturesLimit"; used: number; limit: number };
   };
-  anonymizePetitionsAfter?: {
-    __typename?: "TimeInterval";
-    years?: number | null;
-    months?: number | null;
-  } | null;
 };
 
 export type OrganizationCompliance_updateOrganizationAutoAnonymizePeriodMutationVariables = Exact<{
@@ -11691,17 +11680,13 @@ export type OrganizationCompliance_updateOrganizationAutoAnonymizePeriodMutation
     __typename?: "Organization";
     id: string;
     activeUserCount: number;
+    anonymizePetitionsAfterMonths?: number | null;
     usageLimits: {
       __typename?: "OrganizationUsageLimit";
       users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
       petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
       signatures: { __typename?: "OrganizationUsageSignaturesLimit"; used: number; limit: number };
     };
-    anonymizePetitionsAfter?: {
-      __typename?: "TimeInterval";
-      years?: number | null;
-      months?: number | null;
-    } | null;
   };
 };
 
@@ -11726,6 +11711,7 @@ export type OrganizationCompliance_userQuery = {
       id: string;
       name: string;
       activeUserCount: number;
+      anonymizePetitionsAfterMonths?: number | null;
       iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
@@ -11737,11 +11723,6 @@ export type OrganizationCompliance_userQuery = {
           limit: number;
         };
       };
-      anonymizePetitionsAfter?: {
-        __typename?: "TimeInterval";
-        years?: number | null;
-        months?: number | null;
-      } | null;
     };
   };
   realMe: {
@@ -21996,10 +21977,7 @@ export const OrganizationCompliance_OrganizationFragmentDoc = gql`
         limit
       }
     }
-    anonymizePetitionsAfter {
-      years
-      months
-    }
+    anonymizePetitionsAfterMonths
   }
 ` as unknown as DocumentNode<OrganizationCompliance_OrganizationFragment, unknown>;
 export const OrganizationGroup_UserGroupMemberFragmentDoc = gql`

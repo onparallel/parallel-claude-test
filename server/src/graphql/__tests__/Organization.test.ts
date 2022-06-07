@@ -111,9 +111,7 @@ describe("GraphQL/Organization", () => {
           mutation ($months: Int) {
             updateOrganizationAutoAnonymizePeriod(months: $months) {
               id
-              anonymizePetitionsAfter {
-                months
-              }
+              anonymizePetitionsAfterMonths
             }
           }
         `,
@@ -130,9 +128,7 @@ describe("GraphQL/Organization", () => {
           mutation ($months: Int) {
             updateOrganizationAutoAnonymizePeriod(months: $months) {
               id
-              anonymizePetitionsAfter {
-                months
-              }
+              anonymizePetitionsAfterMonths
             }
           }
         `,
@@ -149,9 +145,7 @@ describe("GraphQL/Organization", () => {
           mutation ($months: Int) {
             updateOrganizationAutoAnonymizePeriod(months: $months) {
               id
-              anonymizePetitionsAfter {
-                months
-              }
+              anonymizePetitionsAfterMonths
             }
           }
         `,
@@ -168,10 +162,7 @@ describe("GraphQL/Organization", () => {
           mutation ($months: Int) {
             updateOrganizationAutoAnonymizePeriod(months: $months) {
               id
-              anonymizePetitionsAfter {
-                years
-                months
-              }
+              anonymizePetitionsAfterMonths
             }
           }
         `,
@@ -181,7 +172,7 @@ describe("GraphQL/Organization", () => {
       expect(errors).toBeUndefined();
       expect(data?.updateOrganizationAutoAnonymizePeriod).toEqual({
         id: toGlobalId("Organization", organization.id),
-        anonymizePetitionsAfter: { years: 2, months: 1 },
+        anonymizePetitionsAfterMonths: 25,
       });
     });
   });
