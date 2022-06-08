@@ -310,11 +310,6 @@
     "context": "When finishing, the petition will remain closed. You can come back anytime to review the information."
   },
   {
-    "term": "component.configure-reminder-settings-dialog.confirm",
-    "definition": "Aplicar cambios",
-    "context": "Apply changes"
-  },
-  {
     "term": "component.configure-reminder-settings-dialog.header",
     "definition": "Configurar recordatorios automáticos",
     "context": "Configure automatic reminders"
@@ -1500,6 +1495,31 @@
     "context": "<b>Petition completed</b>, if you make any changes, the petition must be <b>finalized again</b>."
   },
   {
+    "term": "component.petition-compliance-period-dialog.delete-after",
+    "definition": "Borrar datos tras",
+    "context": "Delete data after"
+  },
+  {
+    "term": "component.petition-compliance-period-dialog.explainer",
+    "definition": "Este plazo comenzará tas cerrarse {type, select, PETITION{esta petición} other{una petición creada desde esta plantilla}}, tras el cuál, los datos que contenga serán anonimizados.",
+    "context": "This period will start from the closing of {type, select, PETITION{this petition} other{a petition created from this template}}, once completed, the data contained will be anonymized."
+  },
+  {
+    "term": "component.petition-compliance-period-dialog.header",
+    "definition": "Periodo de conservación de datos",
+    "context": "Data retention period"
+  },
+  {
+    "term": "component.petition-compliance-period-dialog.purpose-of-treatment",
+    "definition": "Finalidad del tratamiento",
+    "context": "Purpose of treatment"
+  },
+  {
+    "term": "component.petition-compliance-period-dialog.purpose-of-treatment.placeholder",
+    "definition": "Describe brevemente la finalidad del tratamiento de datos.",
+    "context": "Briefly describe the purpose of the data processing."
+  },
+  {
     "term": "component.petition-compose-field-attachment.label",
     "definition": "Archivo adjunto: {filename}. Para ver el archivo, pulsa la tecla Intro. Para eliminarlo, pulsa Suprimir.",
     "context": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete."
@@ -2183,6 +2203,26 @@
     "term": "component.petition-settings.automatic-reminders",
     "definition": "Recordatorios automáticos",
     "context": "Automatic reminders"
+  },
+  {
+    "term": "component.petition-settings.compliance-period",
+    "definition": "Conservación de datos",
+    "context": "Compliance period"
+  },
+  {
+    "term": "component.petition-settings.compliance-period-description",
+    "definition": "Establece el plazo de conservación de los datos recogidos con esta {type, select, PETITION {petición} other{plantilla}} según su finalidad. El plazo comenzará desde el cierre de la misma, tras el cuál, los datos serán anonimizados.",
+    "context": "Set the retention period of the data collected with this {type, select, PETITION {petition} other{template}} according to its purpose. The period will start from the closing of the petition, after which the data will be anonymized."
+  },
+  {
+    "term": "component.petition-settings.compliance-updated.toast-description",
+    "definition": "Periodo de conservación de datos actualizado con éxito.",
+    "context": "Compliance period successfully updated."
+  },
+  {
+    "term": "component.petition-settings.compliance-updated.toast-title",
+    "definition": "Cambios guardados correctamente",
+    "context": "Changes saved correctly"
   },
   {
     "term": "component.petition-settings.deadline-description",
@@ -4595,6 +4635,11 @@
     "context": "All events"
   },
   {
+    "term": "generic.apply-changes",
+    "definition": "Aplicar cambios",
+    "context": "Apply changes"
+  },
+  {
     "term": "generic.attach-files-to-pdf",
     "definition": "Adjuntar archivos al PDF",
     "context": "Attach files to PDF"
@@ -5103,6 +5148,11 @@
     "term": "generic.learn-more",
     "definition": "Saber más",
     "context": "Learn more"
+  },
+  {
+    "term": "generic.months",
+    "definition": "{count, plural, =1{mes} other{meses}}",
+    "context": "{count, plural, =1{month} other{months}}"
   },
   {
     "term": "generic.more-options",

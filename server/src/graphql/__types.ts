@@ -195,6 +195,8 @@ export interface NexusGenInputs {
   };
   UpdatePetitionInput: {
     // input type
+    anonymizeAfterMonths?: number | null; // Int
+    anonymizePurpose?: string | null; // String
     closingEmailBody?: NexusGenScalars["JSON"] | null; // JSON
     completingMessageBody?: NexusGenScalars["JSON"] | null; // JSON
     completingMessageSubject?: string | null; // String
@@ -1167,6 +1169,8 @@ export interface NexusGenFieldTypes {
   Petition: {
     // field return type
     accesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
+    anonymizeAfterMonths: number | null; // Int
+    anonymizePurpose: string | null; // String
     attachments: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
     closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
     completingMessageBody: NexusGenScalars["JSON"] | null; // JSON
@@ -1500,6 +1504,8 @@ export interface NexusGenFieldTypes {
   };
   PetitionTemplate: {
     // field return type
+    anonymizeAfterMonths: number | null; // Int
+    anonymizePurpose: string | null; // String
     attachments: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
     backgroundColor: string | null; // String
     categories: string[] | null; // [String!]
@@ -2112,6 +2118,8 @@ export interface NexusGenFieldTypes {
   };
   PetitionBase: {
     // field return type
+    anonymizeAfterMonths: number | null; // Int
+    anonymizePurpose: string | null; // String
     attachments: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
     closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
     completingMessageBody: NexusGenScalars["JSON"] | null; // JSON
@@ -2664,6 +2672,8 @@ export interface NexusGenFieldTypeNames {
   Petition: {
     // field return type name
     accesses: "PetitionAccess";
+    anonymizeAfterMonths: "Int";
+    anonymizePurpose: "String";
     attachments: "PetitionAttachment";
     closingEmailBody: "JSON";
     completingMessageBody: "JSON";
@@ -2997,6 +3007,8 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionTemplate: {
     // field return type name
+    anonymizeAfterMonths: "Int";
+    anonymizePurpose: "String";
     attachments: "PetitionAttachment";
     backgroundColor: "String";
     categories: "String";
@@ -3609,6 +3621,8 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionBase: {
     // field return type name
+    anonymizeAfterMonths: "Int";
+    anonymizePurpose: "String";
     attachments: "PetitionAttachment";
     closingEmailBody: "JSON";
     completingMessageBody: "JSON";

@@ -1760,6 +1760,10 @@ export interface Petition extends PetitionBase {
   __typename?: "Petition";
   /** The accesses for this petition */
   accesses: Array<PetitionAccess>;
+  /** How many months to wait since the petition is closed to anonymize. */
+  anonymizeAfterMonths?: Maybe<Scalars["Int"]>;
+  /** Purpose of the anonymization */
+  anonymizePurpose?: Maybe<Scalars["String"]>;
   /** The attachments linked to this petition */
   attachments: Array<PetitionAttachment>;
   /** The closing email body of the petition. */
@@ -1918,6 +1922,10 @@ export interface PetitionAttachmentUploadData {
 }
 
 export interface PetitionBase {
+  /** How many months to wait since the petition is closed to anonymize. */
+  anonymizeAfterMonths?: Maybe<Scalars["Int"]>;
+  /** Purpose of the anonymization */
+  anonymizePurpose?: Maybe<Scalars["String"]>;
   /** The attachments linked to this petition */
   attachments: Array<PetitionAttachment>;
   /** The closing email body of the petition. */
@@ -2498,6 +2506,10 @@ export type PetitionStatus =
 /** A petition template */
 export interface PetitionTemplate extends PetitionBase {
   __typename?: "PetitionTemplate";
+  /** How many months to wait since the petition is closed to anonymize. */
+  anonymizeAfterMonths?: Maybe<Scalars["Int"]>;
+  /** Purpose of the anonymization */
+  anonymizePurpose?: Maybe<Scalars["String"]>;
   /** The attachments linked to this petition */
   attachments: Array<PetitionAttachment>;
   backgroundColor?: Maybe<Scalars["String"]>;
@@ -3533,6 +3545,8 @@ export interface UpdatePetitionFieldInput {
 }
 
 export interface UpdatePetitionInput {
+  anonymizeAfterMonths?: InputMaybe<Scalars["Int"]>;
+  anonymizePurpose?: InputMaybe<Scalars["String"]>;
   closingEmailBody?: InputMaybe<Scalars["JSON"]>;
   completingMessageBody?: InputMaybe<Scalars["JSON"]>;
   completingMessageSubject?: InputMaybe<Scalars["String"]>;
@@ -8486,6 +8500,7 @@ export type PetitionSettings_UserFragment = {
   email: string;
   hasSkipForwardSecurity: boolean;
   hasHideRecipientViewContents: boolean;
+  hasAutoAnonymize: boolean;
   hasPetitionSignature: boolean;
   hasPrefillSecret: boolean;
   organization: {
@@ -8509,7 +8524,7 @@ export type PetitionSettings_UserFragment = {
 };
 
 export type PetitionSettings_PetitionBase_Petition_Fragment = {
-  __typename?: "Petition";
+  __typename: "Petition";
   status: PetitionStatus;
   deadline?: string | null;
   fromTemplateId?: string | null;
@@ -8521,6 +8536,8 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
   isRestrictedWithPassword: boolean;
   isAnonymized: boolean;
   name?: string | null;
+  anonymizeAfterMonths?: number | null;
+  anonymizePurpose?: string | null;
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
     id: string;
@@ -8574,7 +8591,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
 };
 
 export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
-  __typename?: "PetitionTemplate";
+  __typename: "PetitionTemplate";
   isPublic: boolean;
   id: string;
   locale: PetitionLocale;
@@ -8584,6 +8601,8 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   isRestrictedWithPassword: boolean;
   isAnonymized: boolean;
   name?: string | null;
+  anonymizeAfterMonths?: number | null;
+  anonymizePurpose?: string | null;
   remindersConfig?: {
     __typename?: "RemindersConfig";
     offset: number;
@@ -8802,6 +8821,24 @@ export type PetitionSettings_updateTemplateDefaultPermissionsMutation = {
     publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
   };
 };
+
+export type CompliancePeriodDialog_PetitionBase_Petition_Fragment = {
+  __typename: "Petition";
+  id: string;
+  anonymizeAfterMonths?: number | null;
+  anonymizePurpose?: string | null;
+};
+
+export type CompliancePeriodDialog_PetitionBase_PetitionTemplate_Fragment = {
+  __typename: "PetitionTemplate";
+  id: string;
+  anonymizeAfterMonths?: number | null;
+  anonymizePurpose?: string | null;
+};
+
+export type CompliancePeriodDialog_PetitionBaseFragment =
+  | CompliancePeriodDialog_PetitionBase_Petition_Fragment
+  | CompliancePeriodDialog_PetitionBase_PetitionTemplate_Fragment;
 
 export type CopySignatureConfigDialog_PetitionSignerFragment = {
   __typename?: "PetitionSigner";
@@ -15101,7 +15138,7 @@ export type PetitionActivity_userQuery = {
 };
 
 export type PetitionCompose_PetitionBase_Petition_Fragment = {
-  __typename?: "Petition";
+  __typename: "Petition";
   status: PetitionStatus;
   id: string;
   tone: Tone;
@@ -15116,6 +15153,8 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   isRestrictedWithPassword: boolean;
   emailSubject?: string | null;
   emailBody?: any | null;
+  anonymizeAfterMonths?: number | null;
+  anonymizePurpose?: string | null;
   updatedAt: string;
   accesses: Array<{
     __typename?: "PetitionAccess";
@@ -15233,7 +15272,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
 };
 
 export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
-  __typename?: "PetitionTemplate";
+  __typename: "PetitionTemplate";
   isPublic: boolean;
   description?: any | null;
   id: string;
@@ -15245,6 +15284,8 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   skipForwardSecurity: boolean;
   isRecipientViewContentsHidden: boolean;
   isRestrictedWithPassword: boolean;
+  anonymizeAfterMonths?: number | null;
+  anonymizePurpose?: string | null;
   updatedAt: string;
   fields: Array<{
     __typename?: "PetitionField";
@@ -15410,6 +15451,7 @@ export type PetitionCompose_QueryFragment = {
     hasPetitionPdfExport: boolean;
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
+    hasAutoAnonymize: boolean;
     hasPetitionSignature: boolean;
     hasPrefillSecret: boolean;
     hasOnBehalfOf: boolean;
@@ -15458,7 +15500,7 @@ export type PetitionCompose_updatePetitionMutationVariables = Exact<{
 export type PetitionCompose_updatePetitionMutation = {
   updatePetition:
     | {
-        __typename?: "Petition";
+        __typename: "Petition";
         id: string;
         name?: string | null;
         status: PetitionStatus;
@@ -15472,6 +15514,8 @@ export type PetitionCompose_updatePetitionMutation = {
         isAnonymized: boolean;
         emailSubject?: string | null;
         emailBody?: any | null;
+        anonymizeAfterMonths?: number | null;
+        anonymizePurpose?: string | null;
         updatedAt: string;
         currentSignatureRequest?: {
           __typename?: "PetitionSignatureRequest";
@@ -15557,7 +15601,7 @@ export type PetitionCompose_updatePetitionMutation = {
         }>;
       }
     | {
-        __typename?: "PetitionTemplate";
+        __typename: "PetitionTemplate";
         id: string;
         name?: string | null;
         isPublic: boolean;
@@ -15567,6 +15611,8 @@ export type PetitionCompose_updatePetitionMutation = {
         isRestricted: boolean;
         isRestrictedWithPassword: boolean;
         isAnonymized: boolean;
+        anonymizeAfterMonths?: number | null;
+        anonymizePurpose?: string | null;
         updatedAt: string;
         remindersConfig?: {
           __typename?: "RemindersConfig";
@@ -15973,6 +16019,7 @@ export type PetitionCompose_userQuery = {
     hasPetitionPdfExport: boolean;
     hasSkipForwardSecurity: boolean;
     hasHideRecipientViewContents: boolean;
+    hasAutoAnonymize: boolean;
     hasPetitionSignature: boolean;
     hasPrefillSecret: boolean;
     hasOnBehalfOf: boolean;
@@ -16020,7 +16067,7 @@ export type PetitionCompose_petitionQueryVariables = Exact<{
 export type PetitionCompose_petitionQuery = {
   petition?:
     | {
-        __typename?: "Petition";
+        __typename: "Petition";
         status: PetitionStatus;
         id: string;
         tone: Tone;
@@ -16035,6 +16082,8 @@ export type PetitionCompose_petitionQuery = {
         isRestrictedWithPassword: boolean;
         emailSubject?: string | null;
         emailBody?: any | null;
+        anonymizeAfterMonths?: number | null;
+        anonymizePurpose?: string | null;
         updatedAt: string;
         accesses: Array<{
           __typename?: "PetitionAccess";
@@ -16155,7 +16204,7 @@ export type PetitionCompose_petitionQuery = {
         };
       }
     | {
-        __typename?: "PetitionTemplate";
+        __typename: "PetitionTemplate";
         isPublic: boolean;
         description?: any | null;
         id: string;
@@ -16167,6 +16216,8 @@ export type PetitionCompose_petitionQuery = {
         skipForwardSecurity: boolean;
         isRecipientViewContentsHidden: boolean;
         isRestrictedWithPassword: boolean;
+        anonymizeAfterMonths?: number | null;
+        anonymizePurpose?: string | null;
         updatedAt: string;
         fields: Array<{
           __typename?: "PetitionField";
@@ -23559,6 +23610,14 @@ export const SignatureConfigDialog_PetitionBaseFragmentDoc = gql`
   ${SignatureConfigDialog_SignatureOrgIntegrationFragmentDoc}
   ${ConfirmPetitionSignersDialog_PetitionSignerFragmentDoc}
 ` as unknown as DocumentNode<SignatureConfigDialog_PetitionBaseFragment, unknown>;
+export const CompliancePeriodDialog_PetitionBaseFragmentDoc = gql`
+  fragment CompliancePeriodDialog_PetitionBase on PetitionBase {
+    id
+    anonymizeAfterMonths
+    anonymizePurpose
+    __typename
+  }
+` as unknown as DocumentNode<CompliancePeriodDialog_PetitionBaseFragment, unknown>;
 export const PublicLinkSettingsDialog_PetitionTemplateFragmentDoc = gql`
   fragment PublicLinkSettingsDialog_PetitionTemplate on PetitionTemplate {
     name
@@ -23642,6 +23701,7 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     isRestricted
     isRestrictedWithPassword
     ...SignatureConfigDialog_PetitionBase
+    ...CompliancePeriodDialog_PetitionBase
     ... on Petition {
       status
       deadline
@@ -23678,6 +23738,7 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     isAnonymized
   }
   ${SignatureConfigDialog_PetitionBaseFragmentDoc}
+  ${CompliancePeriodDialog_PetitionBaseFragmentDoc}
   ${PublicLinkSettingsDialog_PetitionTemplateFragmentDoc}
   ${PublicLinkSettingsDialog_PublicPetitionLinkFragmentDoc}
   ${TemplateDefaultPermissionsDialog_PublicPetitionLinkFragmentDoc}
@@ -23876,6 +23937,7 @@ export const PetitionSettings_UserFragmentDoc = gql`
     id
     hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
     hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
+    hasAutoAnonymize: hasFeatureFlag(featureFlag: AUTO_ANONYMIZE)
     ...TestModeSignatureBadge_User
     ...PublicLinkSettingsDialog_User
     organization {

@@ -15,6 +15,7 @@ import {
   Select,
   Stack,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import {
   ArrowShortRightIcon,
@@ -27,6 +28,7 @@ import {
   LockOpenIcon,
   ShieldIcon,
   SignatureIcon,
+  TimeIcon,
 } from "@parallel/chakra/icons";
 import {
   PetitionSettings_cancelPetitionSignatureRequestDocument,
@@ -51,7 +53,7 @@ import { usePetitionLimitReachedErrorDialog } from "@parallel/utils/usePetitionL
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { memo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { noop, pick } from "remeda";
+import { isDefined, noop, pick } from "remeda";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { ConfirmDialog } from "../common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/dialogs/DialogProvider";
@@ -71,6 +73,10 @@ import {
   useTemplateDefaultPermissionsDialog,
 } from "../petition-common/dialogs/TemplateDefaultPermissionsDialog";
 import { TestModeSignatureBadge } from "../petition-common/TestModeSignatureBadge";
+import {
+  CompliancePeriodDialog,
+  useCompliancePeriodDialog,
+} from "./dialogs/CompliancePeriodDialog";
 import { usePetitionDeadlineDialog } from "./dialogs/PetitionDeadlineDialog";
 import { useRestrictPetitionDialog } from "./dialogs/RestrictPetitionDialog";
 import { usePasswordRestrictPetitionDialog } from "./dialogs/UnrestrictPetitionDialog";
@@ -395,6 +401,38 @@ function _PetitionSettings({
     />
   );
 
+  const toast = useToast();
+  const showConfigCompliancePeriodDialog = useCompliancePeriodDialog();
+  const handleConfigCompliancePeriod = async (showDialog: boolean) => {
+    try {
+      if (showDialog) {
+        const data = await showConfigCompliancePeriodDialog(petition);
+        await onUpdatePetition({
+          anonymizeAfterMonths: data.months,
+          anonymizePurpose: data.purpose,
+        });
+      } else {
+        await onUpdatePetition({
+          anonymizeAfterMonths: null,
+          anonymizePurpose: null,
+        });
+      }
+      toast({
+        status: "success",
+        isClosable: true,
+        title: intl.formatMessage({
+          id: "component.petition-settings.compliance-updated.toast-title",
+          defaultMessage: "Changes saved correctly",
+        }),
+        description: intl.formatMessage({
+          id: "component.petition-settings.compliance-updated.toast-description",
+          defaultMessage: "Compliance period successfully updated.",
+        }),
+        duration: 5000,
+      });
+    } catch {}
+  };
+
   return (
     <Stack padding={4} spacing={2}>
       {petition.__typename === "PetitionTemplate" ? (
@@ -585,6 +623,29 @@ function _PetitionSettings({
           controlId="automatic-reminders"
         />
       ) : null}
+      {user.hasAutoAnonymize ? (
+        <SettingsRowButton
+          icon={<TimeIcon />}
+          label={
+            <FormattedMessage
+              id="component.petition-settings.compliance-period"
+              defaultMessage="Compliance period"
+            />
+          }
+          description={
+            <FormattedMessage
+              id="component.petition-settings.compliance-period-description"
+              defaultMessage="Set the retention period of the data collected with this {type, select, PETITION {petition} other{template}} according to its purpose. The period will start from the closing of the petition, after which the data will be anonymized."
+              values={{ type: petition.__typename === "Petition" ? "PETITION" : "TEMPLATE" }}
+            />
+          }
+          controlId="auto-anonymize"
+          isActive={isDefined(petition.anonymizeAfterMonths)}
+          onAdd={() => handleConfigCompliancePeriod(true)}
+          onConfig={() => handleConfigCompliancePeriod(true)}
+          onRemove={() => handleConfigCompliancePeriod(false)}
+        />
+      ) : null}
       {user.hasSkipForwardSecurity ? (
         <SettingsRowSwitch
           isDisabled={isPublicTemplate || petition.isAnonymized}
@@ -669,6 +730,7 @@ const fragments = {
       id
       hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
       hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
+      hasAutoAnonymize: hasFeatureFlag(featureFlag: AUTO_ANONYMIZE)
       ...TestModeSignatureBadge_User
       ...PublicLinkSettingsDialog_User
       organization {
@@ -697,6 +759,7 @@ const fragments = {
       isRestricted
       isRestrictedWithPassword
       ...SignatureConfigDialog_PetitionBase
+      ...CompliancePeriodDialog_PetitionBase
       ... on Petition {
         status
         deadline
@@ -733,6 +796,7 @@ const fragments = {
       isAnonymized
     }
     ${SignatureConfigDialog.fragments.PetitionBase}
+    ${CompliancePeriodDialog.fragments.PetitionBase}
     ${PublicLinkSettingsDialog.fragments.PetitionTemplate}
     ${PublicLinkSettingsDialog.fragments.PublicPetitionLink}
     ${TemplateDefaultPermissionsDialog.fragments.PublicPetitionLink}

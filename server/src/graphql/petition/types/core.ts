@@ -225,6 +225,14 @@ export const PetitionBase = interfaceType({
       resolve: (o) => o.metadata,
     });
     t.boolean("isAnonymized", { resolve: (o) => o.anonymized_at !== null });
+    t.nullable.int("anonymizeAfterMonths", {
+      description: "How many months to wait since the petition is closed to anonymize.",
+      resolve: (o) => (isDefined(o.anonymize_after_days) ? o.anonymize_after_days / 30 : null),
+    });
+    t.nullable.string("anonymizePurpose", {
+      description: "Purpose of the anonymization",
+      resolve: (o) => o.anonymize_purpose,
+    });
   },
   resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),
   sourceType: "db.Petition",

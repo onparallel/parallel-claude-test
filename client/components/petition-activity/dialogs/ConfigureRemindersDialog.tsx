@@ -86,10 +86,7 @@ export function ConfigureRemindersDialog({
       }
       confirm={
         <Button colorScheme="purple" onClick={() => props.onResolve(remindersConfig)}>
-          <FormattedMessage
-            id="component.configure-reminder-settings-dialog.confirm"
-            defaultMessage="Apply changes"
-          />
+          <FormattedMessage id="generic.apply-changes" defaultMessage="Apply changes" />
         </Button>
       }
       {...props}

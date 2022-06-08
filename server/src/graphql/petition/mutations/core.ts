@@ -614,6 +614,8 @@ export const updatePetition = mutationField("updatePetition", {
         args.data.completingMessageBody,
         args.data.skipForwardSecurity,
         args.data.isRecipientViewContentsHidden,
+        args.data.anonymizeAfterMonths,
+        args.data.anonymizePurpose,
       ],
       petitionsAreEditable("petitionId")
     ),
@@ -634,8 +636,15 @@ export const updatePetition = mutationField("updatePetition", {
         args.data.remindersConfig,
         args.data.signatureConfig,
         args.data.skipForwardSecurity,
+        args.data.anonymizeAfterMonths,
+        args.data.anonymizePurpose,
       ],
       petitionIsNotAnonymized("petitionId")
+    ),
+    // only petition owners can edit compliance props
+    ifSomeDefined(
+      (args) => [args.data.anonymizeAfterMonths, args.data.anonymizePurpose],
+      userHasAccessToPetitions("petitionId", ["OWNER"])
     )
   ),
   args: {
@@ -660,6 +669,8 @@ export const updatePetition = mutationField("updatePetition", {
           t.nullable.boolean("isCompletingMessageEnabled");
           t.nullable.string("completingMessageSubject");
           t.nullable.json("completingMessageBody");
+          t.nullable.string("anonymizePurpose");
+          t.nullable.int("anonymizeAfterMonths");
         },
       }).asArg()
     ),
@@ -675,7 +686,8 @@ export const updatePetition = mutationField("updatePetition", {
     validRichTextContent((args) => args.data.description, "data.description"),
     validRichTextContent((args) => args.data.completingMessageBody, "data.completingMessageBody"),
     validRemindersConfig((args) => args.data.remindersConfig, "data.remindersConfig"),
-    validSignatureConfig((args) => args.data.signatureConfig, "data.signatureConfig")
+    validSignatureConfig((args) => args.data.signatureConfig, "data.signatureConfig"),
+    inRange((args) => args.data.anonymizeAfterMonths, "data.anonymizeAfterMonths", 1)
   ),
   resolve: async (_, args, ctx) => {
     const {
@@ -693,6 +705,8 @@ export const updatePetition = mutationField("updatePetition", {
       isCompletingMessageEnabled,
       completingMessageSubject,
       completingMessageBody,
+      anonymizeAfterMonths,
+      anonymizePurpose,
     } = args.data;
     const data: Partial<CreatePetition> = {};
     if (name !== undefined) {
@@ -738,6 +752,13 @@ export const updatePetition = mutationField("updatePetition", {
     }
     if (completingMessageBody !== undefined) {
       data.completing_message_body = completingMessageBody && JSON.stringify(completingMessageBody);
+    }
+
+    if (anonymizeAfterMonths !== undefined) {
+      data.anonymize_after_days = anonymizeAfterMonths === null ? null : anonymizeAfterMonths * 30;
+    }
+    if (anonymizePurpose !== undefined) {
+      data.anonymize_purpose = anonymizePurpose;
     }
 
     const [petition] = await ctx.petitions.updatePetition(

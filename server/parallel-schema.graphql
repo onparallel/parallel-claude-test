@@ -1981,6 +1981,16 @@ type Petition implements PetitionBase {
   accesses: [PetitionAccess!]!
 
   """
+  How many months to wait since the petition is closed to anonymize.
+  """
+  anonymizeAfterMonths: Int
+
+  """
+  Purpose of the anonymization
+  """
+  anonymizePurpose: String
+
+  """
   The attachments linked to this petition
   """
   attachments: [PetitionAttachment!]!
@@ -2293,6 +2303,16 @@ type PetitionAttachmentUploadData {
 }
 
 interface PetitionBase {
+  """
+  How many months to wait since the petition is closed to anonymize.
+  """
+  anonymizeAfterMonths: Int
+
+  """
+  Purpose of the anonymization
+  """
+  anonymizePurpose: String
+
   """
   The attachments linked to this petition
   """
@@ -3243,6 +3263,16 @@ enum PetitionStatus {
 A petition template
 """
 type PetitionTemplate implements PetitionBase {
+  """
+  How many months to wait since the petition is closed to anonymize.
+  """
+  anonymizeAfterMonths: Int
+
+  """
+  Purpose of the anonymization
+  """
+  anonymizePurpose: String
+
   """
   The attachments linked to this petition
   """
@@ -4771,6 +4801,8 @@ input UpdatePetitionFieldInput {
 }
 
 input UpdatePetitionInput {
+  anonymizeAfterMonths: Int
+  anonymizePurpose: String
   closingEmailBody: JSON
   completingMessageBody: JSON
   completingMessageSubject: String
