@@ -116,13 +116,13 @@ export interface NexusGenInputs {
     showLogo?: boolean | null; // Boolean
     textColor?: string | null; // String
     textFontFamily?: string | null; // String
-    textFontSize?: number | null; // Int
+    textFontSize?: number | null; // Float
     title1Color?: string | null; // String
     title1FontFamily?: string | null; // String
-    title1FontSize?: number | null; // Int
+    title1FontSize?: number | null; // Float
     title2Color?: string | null; // String
     title2FontFamily?: string | null; // String
-    title2FontSize?: number | null; // Int
+    title2FontSize?: number | null; // Float
   };
   PetitionFilter: {
     // input type

@@ -254,7 +254,7 @@ export function BrandingDocumentForm({ user }: BrandingDocumentFormProps) {
                 width="100px"
                 value={theme[key.sizeKey]}
                 onChange={(e) => {
-                  handleThemeChange({ [key.sizeKey]: parseInt(e.target.value) });
+                  handleThemeChange({ [key.sizeKey]: parseFloat(e.target.value) });
                 }}
                 isDisabled={!hasAdminRole}
               >

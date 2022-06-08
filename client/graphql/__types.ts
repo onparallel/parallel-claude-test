@@ -1659,13 +1659,13 @@ export interface OrganizationDocumentThemeInput {
   showLogo?: InputMaybe<Scalars["Boolean"]>;
   textColor?: InputMaybe<Scalars["String"]>;
   textFontFamily?: InputMaybe<Scalars["String"]>;
-  textFontSize?: InputMaybe<Scalars["Int"]>;
+  textFontSize?: InputMaybe<Scalars["Float"]>;
   title1Color?: InputMaybe<Scalars["String"]>;
   title1FontFamily?: InputMaybe<Scalars["String"]>;
-  title1FontSize?: InputMaybe<Scalars["Int"]>;
+  title1FontSize?: InputMaybe<Scalars["Float"]>;
   title2Color?: InputMaybe<Scalars["String"]>;
   title2FontFamily?: InputMaybe<Scalars["String"]>;
-  title2FontSize?: InputMaybe<Scalars["Int"]>;
+  title2FontSize?: InputMaybe<Scalars["Float"]>;
 }
 
 export interface OrganizationPagination {

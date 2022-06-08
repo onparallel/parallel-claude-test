@@ -1847,13 +1847,13 @@ input OrganizationDocumentThemeInput {
   showLogo: Boolean
   textColor: String
   textFontFamily: String
-  textFontSize: Int
+  textFontSize: Float
   title1Color: String
   title1FontFamily: String
-  title1FontSize: Int
+  title1FontSize: Float
   title2Color: String
   title2FontFamily: String
-  title2FontSize: Int
+  title2FontSize: Float
 }
 
 type OrganizationPagination {

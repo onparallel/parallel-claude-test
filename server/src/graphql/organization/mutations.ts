@@ -111,13 +111,13 @@ export const updateOrganizationDocumentTheme = mutationField("updateOrganization
           t.nullable.boolean("showLogo");
           t.nullable.string("title1FontFamily");
           t.nullable.string("title1Color");
-          t.nullable.int("title1FontSize");
+          t.nullable.float("title1FontSize");
           t.nullable.string("title2FontFamily");
           t.nullable.string("title2Color");
-          t.nullable.int("title2FontSize");
+          t.nullable.float("title2FontSize");
           t.nullable.string("textFontFamily");
           t.nullable.string("textColor");
-          t.nullable.int("textFontSize");
+          t.nullable.float("textFontSize");
           t.nullable.json("legalRichTextEs");
           t.nullable.json("legalRichTextEn");
         },
