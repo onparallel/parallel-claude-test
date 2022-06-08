@@ -311,7 +311,7 @@ export function BrandingDocumentForm({ user }: BrandingDocumentFormProps) {
         </Text>
 
         <Tabs as={Card} variant="enclosed">
-          <TabList>
+          <TabList margin={"-1px"}>
             <Tab>
               <Text fontWeight="500">
                 <FormattedMessage id="generic.english" defaultMessage="English" />
