@@ -644,7 +644,7 @@ export const updatePetition = mutationField("updatePetition", {
     // only petition owners can edit compliance props
     ifSomeDefined(
       (args) => [args.data.anonymizeAfterMonths, args.data.anonymizePurpose],
-      userHasAccessToPetitions("petitionId", ["OWNER"])
+      and(userHasFeatureFlag("AUTO_ANONYMIZE"), userHasAccessToPetitions("petitionId", ["OWNER"]))
     )
   ),
   args: {

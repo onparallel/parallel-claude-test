@@ -7938,6 +7938,7 @@ export type TemplateDetailsModal_PetitionTemplateFragment = {
   updatedAt: string;
   locale: PetitionLocale;
   isRestricted: boolean;
+  anonymizeAfterMonths?: number | null;
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
@@ -8547,6 +8548,10 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
     status: PetitionSignatureRequestStatus;
   } | null;
   fromTemplate?: { __typename?: "PetitionTemplate"; id: string; name?: string | null } | null;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+  } | null;
   accesses: Array<{
     __typename?: "PetitionAccess";
     status: PetitionAccessStatus;
@@ -8655,6 +8660,10 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
         };
       }
   >;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+  } | null;
   organization: { __typename?: "Organization"; customHost?: string | null };
   signatureConfig?: {
     __typename?: "SignatureConfig";
@@ -8971,6 +8980,7 @@ export type PublicTemplateCard_PetitionTemplateFragment = {
   locale: PetitionLocale;
   isRestricted: boolean;
   isPublic: boolean;
+  anonymizeAfterMonths?: number | null;
   publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
   signatureConfig?: {
     __typename?: "SignatureConfig";
@@ -9017,6 +9027,7 @@ export type TemplateActiveSettingsIcons_PetitionTemplateFragment = {
   locale: PetitionLocale;
   isRestricted: boolean;
   isPublic: boolean;
+  anonymizeAfterMonths?: number | null;
   publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
   signatureConfig?: {
     __typename?: "SignatureConfig";
@@ -9064,6 +9075,7 @@ export type TemplateCard_PetitionTemplateFragment = {
   locale: PetitionLocale;
   isRestricted: boolean;
   isPublic: boolean;
+  anonymizeAfterMonths?: number | null;
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
@@ -15376,6 +15388,10 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
         };
       }
   >;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+  } | null;
   organization: { __typename?: "Organization"; customHost?: string | null };
   signatureConfig?: {
     __typename?: "SignatureConfig";
@@ -15674,6 +15690,10 @@ export type PetitionCompose_updatePetitionMutation = {
               };
             }
         >;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+        } | null;
         organization: { __typename?: "Organization"; customHost?: string | null };
         signatureConfig?: {
           __typename?: "SignatureConfig";
@@ -16315,6 +16335,10 @@ export type PetitionCompose_petitionQuery = {
               };
             }
         >;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+        } | null;
         organization: { __typename?: "Organization"; customHost?: string | null };
         signatureConfig?: {
           __typename?: "SignatureConfig";
@@ -18609,6 +18633,7 @@ export type Petitions_PetitionBasePaginationFragment = {
         createdAt: string;
         locale: PetitionLocale;
         isRestricted: boolean;
+        anonymizeAfterMonths?: number | null;
         permissions: Array<
           | {
               __typename?: "PetitionUserGroupPermission";
@@ -18745,6 +18770,7 @@ export type Petitions_PetitionBase_PetitionTemplate_Fragment = {
   createdAt: string;
   locale: PetitionLocale;
   isRestricted: boolean;
+  anonymizeAfterMonths?: number | null;
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
@@ -18936,6 +18962,7 @@ export type Petitions_petitionsQuery = {
           createdAt: string;
           locale: PetitionLocale;
           isRestricted: boolean;
+          anonymizeAfterMonths?: number | null;
           permissions: Array<
             | {
                 __typename?: "PetitionUserGroupPermission";
@@ -19020,6 +19047,7 @@ export type NewPetition_PetitionTemplateFragment = {
   locale: PetitionLocale;
   isRestricted: boolean;
   isPublic: boolean;
+  anonymizeAfterMonths?: number | null;
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
@@ -19101,6 +19129,7 @@ export type NewPetition_templatesQuery = {
       locale: PetitionLocale;
       isRestricted: boolean;
       isPublic: boolean;
+      anonymizeAfterMonths?: number | null;
       permissions: Array<
         | {
             __typename?: "PetitionUserGroupPermission";
@@ -19213,6 +19242,7 @@ export type NewPetition_templateQuery = {
         updatedAt: string;
         locale: PetitionLocale;
         isRestricted: boolean;
+        anonymizeAfterMonths?: number | null;
         permissions: Array<
           | {
               __typename?: "PetitionUserGroupPermission";
@@ -21092,6 +21122,7 @@ export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
   locale: PetitionLocale;
   isRestricted: boolean;
   isPublic: boolean;
+  anonymizeAfterMonths?: number | null;
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
@@ -21849,6 +21880,7 @@ export const TemplateActiveSettingsIcons_PetitionTemplateFragmentDoc = gql`
     defaultPermissions {
       ...TemplateIconDefaultPermissions_TemplateDefaultPermission
     }
+    anonymizeAfterMonths
   }
   ${TemplateIconSignature_SignatureConfigFragmentDoc}
   ${TemplateIconReminders_RemindersConfigFragmentDoc}
@@ -23710,6 +23742,9 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     isRecipientViewContentsHidden
     isRestricted
     isRestrictedWithPassword
+    myEffectivePermission {
+      permissionType
+    }
     ...SignatureConfigDialog_PetitionBase
     ...CompliancePeriodDialog_PetitionBase
     ... on Petition {

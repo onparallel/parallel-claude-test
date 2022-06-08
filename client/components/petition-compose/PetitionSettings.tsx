@@ -578,7 +578,9 @@ function _PetitionSettings({
       {petition.signatureConfig || hasSignature ? (
         <SettingsRowButton
           data-section="esignature-settings"
-          isDisabled={!hasSignature || isPublicTemplate || petition.isAnonymized}
+          isDisabled={
+            !hasSignature || isPublicTemplate || petition.isAnonymized || petition.isRestricted
+          }
           icon={<SignatureIcon />}
           label={
             <HStack>
@@ -608,7 +610,7 @@ function _PetitionSettings({
       ) : null}
       {petition.__typename === "PetitionTemplate" ? (
         <SettingsRowButton
-          isDisabled={isPublicTemplate}
+          isDisabled={isPublicTemplate || petition.isAnonymized || petition.isRestricted}
           icon={<BellSettingsIcon />}
           label={
             <FormattedMessage
@@ -625,6 +627,12 @@ function _PetitionSettings({
       ) : null}
       {user.hasAutoAnonymize ? (
         <SettingsRowButton
+          isDisabled={
+            isPublicTemplate ||
+            petition.isAnonymized ||
+            petition.isRestricted ||
+            petition.myEffectivePermission?.permissionType !== "OWNER"
+          }
           icon={<TimeIcon />}
           label={
             <FormattedMessage
@@ -648,7 +656,7 @@ function _PetitionSettings({
       ) : null}
       {user.hasSkipForwardSecurity ? (
         <SettingsRowSwitch
-          isDisabled={isPublicTemplate || petition.isAnonymized}
+          isDisabled={isPublicTemplate || petition.isAnonymized || petition.isRestricted}
           icon={<ShieldIcon />}
           label={
             <FormattedMessage
@@ -669,7 +677,7 @@ function _PetitionSettings({
       ) : null}
       {user.hasHideRecipientViewContents ? (
         <SettingsRowSwitch
-          isDisabled={isPublicTemplate || petition.isAnonymized}
+          isDisabled={isPublicTemplate || petition.isAnonymized || petition.isRestricted}
           icon={<ListIcon />}
           label={
             <FormattedMessage
@@ -758,6 +766,9 @@ const fragments = {
       isRecipientViewContentsHidden
       isRestricted
       isRestrictedWithPassword
+      myEffectivePermission {
+        permissionType
+      }
       ...SignatureConfigDialog_PetitionBase
       ...CompliancePeriodDialog_PetitionBase
       ... on Petition {
