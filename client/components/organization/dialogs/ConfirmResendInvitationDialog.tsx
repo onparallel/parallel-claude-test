@@ -27,7 +27,7 @@ function ConfirmResendInvitationDialog({ fullName, ...props }: DialogProps<{ ful
           <Text>
             <FormattedMessage
               id="component.confirm-resend-invitation-dialog.user-not-yet-activated"
-              defaultMessage="{fullName} not yet activated his account."
+              defaultMessage="{fullName} has not yet activated his account."
               values={{
                 fullName,
               }}

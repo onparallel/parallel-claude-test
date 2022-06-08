@@ -486,8 +486,8 @@
   },
   {
     "term": "component.confirm-resend-invitation-dialog.user-not-yet-activated",
-    "definition": "{fullName} not yet activated his account.",
-    "context": "{fullName} not yet activated his account."
+    "definition": "{fullName} has not yet activated his account.",
+    "context": "{fullName} has not yet activated his account."
   },
   {
     "term": "component.confirm-restart-signature-request.description",

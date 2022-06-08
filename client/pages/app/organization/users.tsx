@@ -271,8 +271,10 @@ function OrganizationUsers() {
         duration: 5000,
         isClosable: true,
       });
-    } catch {
-      genericErrorToast();
+    } catch (e: any) {
+      if (e.message !== "CANCEL" && e.message !== "CLOSE") {
+        genericErrorToast();
+      }
     }
   }
 
