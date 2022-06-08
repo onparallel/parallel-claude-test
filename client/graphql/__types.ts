@@ -1766,6 +1766,8 @@ export interface Petition extends PetitionBase {
   anonymizePurpose?: Maybe<Scalars["String"]>;
   /** The attachments linked to this petition */
   attachments: Array<PetitionAttachment>;
+  /** Time when the petition was closed. */
+  closedAt?: Maybe<Scalars["DateTime"]>;
   /** The closing email body of the petition. */
   closingEmailBody?: Maybe<Scalars["JSON"]>;
   /** The body of the optional completing message to be show to recipients */
@@ -8536,6 +8538,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
   isRestrictedWithPassword: boolean;
   isAnonymized: boolean;
   name?: string | null;
+  closedAt?: string | null;
   anonymizeAfterMonths?: number | null;
   anonymizePurpose?: string | null;
   currentSignatureRequest?: {
@@ -8824,6 +8827,7 @@ export type PetitionSettings_updateTemplateDefaultPermissionsMutation = {
 
 export type CompliancePeriodDialog_PetitionBase_Petition_Fragment = {
   __typename: "Petition";
+  closedAt?: string | null;
   id: string;
   anonymizeAfterMonths?: number | null;
   anonymizePurpose?: string | null;
@@ -15153,6 +15157,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
   isRestrictedWithPassword: boolean;
   emailSubject?: string | null;
   emailBody?: any | null;
+  closedAt?: string | null;
   anonymizeAfterMonths?: number | null;
   anonymizePurpose?: string | null;
   updatedAt: string;
@@ -15514,6 +15519,7 @@ export type PetitionCompose_updatePetitionMutation = {
         isAnonymized: boolean;
         emailSubject?: string | null;
         emailBody?: any | null;
+        closedAt?: string | null;
         anonymizeAfterMonths?: number | null;
         anonymizePurpose?: string | null;
         updatedAt: string;
@@ -16082,6 +16088,7 @@ export type PetitionCompose_petitionQuery = {
         isRestrictedWithPassword: boolean;
         emailSubject?: string | null;
         emailBody?: any | null;
+        closedAt?: string | null;
         anonymizeAfterMonths?: number | null;
         anonymizePurpose?: string | null;
         updatedAt: string;
@@ -23615,6 +23622,9 @@ export const CompliancePeriodDialog_PetitionBaseFragmentDoc = gql`
     id
     anonymizeAfterMonths
     anonymizePurpose
+    ... on Petition {
+      closedAt
+    }
     __typename
   }
 ` as unknown as DocumentNode<CompliancePeriodDialog_PetitionBaseFragment, unknown>;

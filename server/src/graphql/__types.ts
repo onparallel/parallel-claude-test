@@ -1172,6 +1172,7 @@ export interface NexusGenFieldTypes {
     anonymizeAfterMonths: number | null; // Int
     anonymizePurpose: string | null; // String
     attachments: NexusGenRootTypes["PetitionAttachment"][]; // [PetitionAttachment!]!
+    closedAt: NexusGenScalars["DateTime"] | null; // DateTime
     closingEmailBody: NexusGenScalars["JSON"] | null; // JSON
     completingMessageBody: NexusGenScalars["JSON"] | null; // JSON
     completingMessageSubject: string | null; // String
@@ -2675,6 +2676,7 @@ export interface NexusGenFieldTypeNames {
     anonymizeAfterMonths: "Int";
     anonymizePurpose: "String";
     attachments: "PetitionAttachment";
+    closedAt: "DateTime";
     closingEmailBody: "JSON";
     completingMessageBody: "JSON";
     completingMessageSubject: "String";

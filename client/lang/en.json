@@ -320,6 +320,16 @@
     "context": "The following contacts opted out from receiving reminders and any changes will not apply to them:"
   },
   {
+    "term": "component.confirm-compliance-period-dialog.body",
+    "definition": "This petition has been closed more than <b>{months, plural, =1{# month} other{# months}} ago</b>. If you confirm this changes, the petition will be anonymized in the next 24 hours and all sensitive information will be deleted. You will not lose access to the petition.",
+    "context": "This petition has been closed more than <b>{months, plural, =1{# month} other{# months}} ago</b>. If you confirm this changes, the petition will be anonymized in the next 24 hours and all sensitive information will be deleted. You will not lose access to the petition."
+  },
+  {
+    "term": "component.confirm-compliance-period-dialog.header",
+    "definition": "Confirm data retention period",
+    "context": "Confirm data retention period"
+  },
+  {
     "term": "component.confirm-configure-ongoing-signature.body",
     "definition": "There is an ongoing eSignature process. If you make any changes the ongoing process will be cancelled.",
     "context": "There is an ongoing eSignature process. If you make any changes the ongoing process will be cancelled."
@@ -5528,6 +5538,11 @@
     "term": "generic.users",
     "definition": "Users",
     "context": "Users"
+  },
+  {
+    "term": "generic.yes-continue",
+    "definition": "Yes, continue",
+    "context": "Yes, continue"
   },
   {
     "term": "generic.you",

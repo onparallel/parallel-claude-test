@@ -1996,6 +1996,11 @@ type Petition implements PetitionBase {
   attachments: [PetitionAttachment!]!
 
   """
+  Time when the petition was closed.
+  """
+  closedAt: DateTime
+
+  """
   The closing email body of the petition.
   """
   closingEmailBody: JSON

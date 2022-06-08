@@ -314,6 +314,10 @@ export const Petition = objectType({
         return templateId ? await ctx.petitions.loadPetition(templateId) : null;
       },
     });
+    t.nullable.datetime("closedAt", {
+      description: "Time when the petition was closed.",
+      resolve: (o) => o.closed_at,
+    });
   },
 });
 

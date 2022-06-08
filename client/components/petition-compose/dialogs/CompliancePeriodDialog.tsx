@@ -1,57 +1,73 @@
 import { gql } from "@apollo/client";
 import {
   Button,
-  Stack,
-  Text,
+  FormControl,
+  FormLabel,
+  HStack,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
-  FormControl,
-  HStack,
-  FormLabel,
+  Stack,
+  Text,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
 import { CompliancePeriodDialog_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
+import { addMonths } from "date-fns";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
+import { useConfirmCompliancePeriodDialog } from "./ConfirmCompliancePeriodDialog";
+
+interface CompliancePeriodDialogInput {
+  petition: CompliancePeriodDialog_PetitionBaseFragment;
+}
 
 interface CompliancePeriodDialogData {
-  months: Maybe<number>;
-  purpose?: Maybe<string>;
+  anonymizeAfterMonths: number;
+  anonymizePurpose?: Maybe<string>;
 }
 export function CompliancePeriodDialog({
-  __typename: type,
-  anonymizeAfterMonths,
-  anonymizePurpose,
+  petition,
   ...props
-}: DialogProps<CompliancePeriodDialog_PetitionBaseFragment, CompliancePeriodDialogData>) {
+}: DialogProps<CompliancePeriodDialogInput, CompliancePeriodDialogData>) {
   const intl = useIntl();
   const { handleSubmit, control, watch, register } = useForm<CompliancePeriodDialogData>({
     mode: "onSubmit",
     defaultValues: {
-      purpose: anonymizePurpose,
-      months: anonymizeAfterMonths,
+      anonymizePurpose: petition.anonymizePurpose,
+      anonymizeAfterMonths: petition.anonymizeAfterMonths || 1,
     },
   });
 
-  const selectedMonths = watch("months");
+  const selectedMonths = watch("anonymizeAfterMonths");
+
+  const showConfirmCompliancePeriodDialog = useConfirmCompliancePeriodDialog();
+  async function handleFormSubmit(data: CompliancePeriodDialogData) {
+    try {
+      if (petition.__typename === "Petition" && isDefined(petition.closedAt)) {
+        const anonymizeAt = addMonths(new Date(petition.closedAt), data.anonymizeAfterMonths);
+        if (new Date() >= anonymizeAt) {
+          await showConfirmCompliancePeriodDialog({ months: data.anonymizeAfterMonths });
+        }
+      }
+      props.onResolve({
+        anonymizeAfterMonths: Number(data.anonymizeAfterMonths), // otherwise this is resolved as a string
+        anonymizePurpose: data.anonymizePurpose,
+      });
+    } catch {}
+  }
 
   return (
     <ConfirmDialog
       size="xl"
       content={{
         as: "form",
-        onSubmit: handleSubmit((data) =>
-          props.onResolve({
-            months: Number(data.months), // otherwise this is resolved as a string
-            purpose: data.purpose,
-          })
-        ),
+        onSubmit: handleSubmit(handleFormSubmit),
       }}
       header={
         <FormattedMessage
@@ -63,7 +79,7 @@ export function CompliancePeriodDialog({
         <Stack>
           <FormControl>
             <Controller
-              name="months"
+              name="anonymizeAfterMonths"
               control={control}
               rules={{ required: true, min: 1 }}
               render={({ field: { ref, value, ...restField } }) => (
@@ -99,7 +115,7 @@ export function CompliancePeriodDialog({
             <FormattedMessage
               id="component.petition-compliance-period-dialog.explainer"
               defaultMessage="This period will start from the closing of {type, select, PETITION{this petition} other{a petition created from this template}}, once completed, the data contained will be anonymized."
-              values={{ type }}
+              values={{ type: petition.__typename === "Petition" ? "PETITION" : "TEMPLATE" }}
             />
           </Text>
           <FormControl>
@@ -110,7 +126,7 @@ export function CompliancePeriodDialog({
               />
             </FormLabel>
             <GrowingTextarea
-              {...register("purpose")}
+              {...register("anonymizePurpose")}
               placeholder={intl.formatMessage({
                 id: "component.petition-compliance-period-dialog.purpose-of-treatment.placeholder",
                 defaultMessage: "Briefly describe the purpose of the data processing.",
@@ -139,6 +155,9 @@ CompliancePeriodDialog.fragments = {
       id
       anonymizeAfterMonths
       anonymizePurpose
+      ... on Petition {
+        closedAt
+      }
       __typename
     }
   `,

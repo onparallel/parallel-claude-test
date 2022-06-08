@@ -406,10 +406,10 @@ function _PetitionSettings({
   const handleConfigCompliancePeriod = async (showDialog: boolean) => {
     try {
       if (showDialog) {
-        const data = await showConfigCompliancePeriodDialog(petition);
+        const data = await showConfigCompliancePeriodDialog({ petition });
         await onUpdatePetition({
-          anonymizeAfterMonths: data.months,
-          anonymizePurpose: data.purpose,
+          anonymizeAfterMonths: data.anonymizeAfterMonths,
+          anonymizePurpose: data.anonymizePurpose,
         });
       } else {
         await onUpdatePetition({
