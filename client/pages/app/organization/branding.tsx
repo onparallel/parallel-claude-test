@@ -10,8 +10,14 @@ import { BrandingGeneralPreview } from "@parallel/components/organization/brandi
 import { OrganizationBranding_userDocument } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
+import { useQueryState, useQueryStateSlice, values } from "@parallel/utils/queryState";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { FormattedMessage, useIntl } from "react-intl";
+
+const styles = ["general", "document"] as ("general" | "document")[];
+const QUERY_STATE = {
+  style: values(styles).orDefault("general"),
+};
 
 function OrganizationBranding() {
   const intl = useIntl();
@@ -21,6 +27,8 @@ function OrganizationBranding() {
   } = useAssertQueryOrPreviousData(OrganizationBranding_userDocument);
 
   const sections = useOrganizationSections(me);
+  const [state, setQueryState] = useQueryState(QUERY_STATE);
+  const [style, setStyle] = useQueryStateSlice(state, setQueryState, "style");
 
   return (
     <SettingsLayout
@@ -41,7 +49,12 @@ function OrganizationBranding() {
         </Heading>
       }
     >
-      <Tabs variant="enclosed">
+      <Tabs
+        variant="enclosed"
+        tabIndex={styles.indexOf(style)}
+        defaultIndex={styles.indexOf(style)}
+        onChange={(index) => setStyle(styles[index])}
+      >
         <TabList paddingLeft={6} background="white" paddingTop={2}>
           <Tab
             fontWeight="500"
