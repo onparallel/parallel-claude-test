@@ -1,7 +1,7 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { indexBy } from "remeda";
+import { indexBy, zip } from "remeda";
 import { Config, CONFIG } from "../../config";
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { unMaybeArray } from "../../util/arrays";
@@ -13,12 +13,14 @@ import { KNEX } from "../knex";
 import {
   CreateOrganization,
   CreateOrganizationUsageLimit,
+  FeatureFlagName,
   Organization,
   OrganizationStatus,
   OrganizationUsageLimit,
   OrganizationUsageLimitName,
   User,
 } from "../__types";
+import { FeatureFlagRepository } from "./FeatureFlagRepository";
 import { SystemRepository } from "./SystemRepository";
 
 export type OrganizationUsageDetails = {
@@ -40,7 +42,8 @@ export class OrganizationRepository extends BaseRepository {
     @inject(CONFIG) private config: Config,
     @inject(KNEX) knex: Knex,
     @inject(EMAILS) private readonly emails: IEmailsService,
-    @inject(SystemRepository) private system: SystemRepository
+    @inject(SystemRepository) private system: SystemRepository,
+    @inject(FeatureFlagRepository) private featureFlags: FeatureFlagRepository
   ) {
     super(knex);
   }
@@ -385,5 +388,16 @@ export class OrganizationRepository extends BaseRepository {
       },
       "*"
     );
+  }
+
+  async getOrganizationsWithFeatureFlag(name: FeatureFlagName) {
+    const orgs = await this.from("organization").whereNull("deleted_at").select("*");
+    const hasFeatureFlag = await Promise.all(
+      orgs.map((org) => this.featureFlags.orgHasFeatureFlag(org.id, name))
+    );
+
+    return zip(orgs, hasFeatureFlag)
+      .filter(([, hasFF]) => hasFF)
+      .map(([org]) => org);
   }
 }

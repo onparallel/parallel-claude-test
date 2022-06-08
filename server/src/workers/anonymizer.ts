@@ -4,7 +4,7 @@ import { createCronWorker } from "./helpers/createCronWorker";
 createCronWorker("anonymizer", async (ctx, config) => {
   const DAYS = config.anonymizeAfterDays;
 
-  const petitions = await ctx.petitions.getPetitionsToAnonymize(DAYS);
+  const petitions = await ctx.petitions.getDeletedPetitionsToAnonymize(DAYS);
   let count = 0;
   ctx.logger.debug(`Anonymizing ${petitions.length} deleted petitions`);
   for (const petition of petitions) {
@@ -14,13 +14,13 @@ createCronWorker("anonymizer", async (ctx, config) => {
     await ctx.petitions.anonymizePetition(petition.id);
   }
 
-  const replies = await ctx.petitions.getPetitionFieldRepliesToAnonymize(DAYS);
+  const replies = await ctx.petitions.getDeletedPetitionFieldRepliesToAnonymize(DAYS);
   ctx.logger.debug(`Anonymizing ${replies.length} deleted replies`);
   if (replies.length > 0) {
     await ctx.petitions.anonymizePetitionFieldReplies(replies);
   }
 
-  const comments = await ctx.petitions.getPetitionFieldCommentsToAnonymize(DAYS);
+  const comments = await ctx.petitions.getDeletedPetitionFieldCommentsToAnonymize(DAYS);
   ctx.logger.debug(`Anonymizing ${comments.length} deleted comments`);
   if (comments.length > 0) {
     await ctx.petitions.anonymizePetitionFieldComments(comments);
@@ -43,13 +43,17 @@ createCronWorker("anonymizer", async (ctx, config) => {
   );
 
   // search for closed petitions that are configured to be anonymized after a certain time
-  const closedPetitions = await ctx.petitions.getClosedPetitionsToAnonymize();
-  count = 0;
-  ctx.logger.debug(`Anonymizing ${closedPetitions.length} closed petitions:`);
-  for (const petition of closedPetitions) {
-    ctx.logger.debug(
-      `Anonymizing closed petition ${petition.id} (${++count}/${closedPetitions.length})`
-    );
-    await ctx.petitions.anonymizePetition(petition.id);
+  const organizations = await ctx.organizations.getOrganizationsWithFeatureFlag("AUTO_ANONYMIZE");
+  for (const org of organizations) {
+    ctx.logger.debug(`Anonymizing closed petitions of Organization:${org.id}: ${org.name}`);
+    const closedPetitions = await ctx.petitions.getClosedPetitionsToAnonymize(org.id);
+    count = 0;
+    ctx.logger.debug(`Anonymizing ${closedPetitions.length} closed petitions`);
+    for (const petition of closedPetitions) {
+      ctx.logger.debug(
+        `Anonymizing closed petition ${petition.id} (${++count}/${closedPetitions.length})`
+      );
+      await ctx.petitions.anonymizePetition(petition.id);
+    }
   }
 });

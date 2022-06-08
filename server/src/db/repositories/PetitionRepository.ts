@@ -4289,19 +4289,23 @@ export class PetitionRepository extends BaseRepository {
     return petition;
   }
 
-  async getClosedPetitionsToAnonymize() {
-    return await this.raw<Petition>(/* sql */ `
+  async getClosedPetitionsToAnonymize(orgId: number) {
+    return await this.raw<Petition>(
+      /* sql */ `
       select p.* from petition p join organization o on o.id = p.org_id
       where p.deleted_at is null 
       and p.anonymized_at is null 
+      and p.org_id = ?
       and p.status = 'CLOSED' 
       and p.closed_at is not null
       and o.anonymize_petitions_after_days is not null
-      and p.closed_at + make_interval(days => o.anonymize_petitions_after_days) <= NOW()
-    `);
+      and p.closed_at < NOW() - make_interval(days => o.anonymize_petitions_after_days)
+    `,
+      [orgId]
+    );
   }
 
-  async getPetitionsToAnonymize(daysAfterDeletion: number) {
+  async getDeletedPetitionsToAnonymize(daysAfterDeletion: number) {
     return await this.from("petition")
       .whereNotNull("deleted_at")
       .whereNull("anonymized_at")
@@ -4309,7 +4313,7 @@ export class PetitionRepository extends BaseRepository {
       .select("*");
   }
 
-  async getPetitionFieldRepliesToAnonymize(daysAfterDeletion: number) {
+  async getDeletedPetitionFieldRepliesToAnonymize(daysAfterDeletion: number) {
     return await this.from("petition_field_reply")
       .whereNotNull("deleted_at")
       .whereNull("anonymized_at")
@@ -4317,7 +4321,7 @@ export class PetitionRepository extends BaseRepository {
       .select("*");
   }
 
-  async getPetitionFieldCommentsToAnonymize(daysAfterDeletion: number) {
+  async getDeletedPetitionFieldCommentsToAnonymize(daysAfterDeletion: number) {
     return await this.from("petition_field_comment")
       .whereNotNull("deleted_at")
       .whereNull("anonymized_at")
@@ -4523,9 +4527,12 @@ export class PetitionRepository extends BaseRepository {
         "*"
       );
 
-    const fileUploadIds = signatures
-      .filter((s) => isDefined(s.file_upload_id))
-      .map((s) => s.file_upload_id!);
+    const fileUploadIds = [
+      ...signatures.filter((s) => isDefined(s.file_upload_id)).map((s) => s.file_upload_id!),
+      ...signatures
+        .filter((s) => isDefined(s.file_upload_audit_trail_id))
+        .map((s) => s.file_upload_audit_trail_id!),
+    ];
 
     await this.files.deleteFileUpload(fileUploadIds, "Worker:Anonymizer", t);
   }

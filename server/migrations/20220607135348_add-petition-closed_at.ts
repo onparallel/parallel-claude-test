@@ -6,11 +6,15 @@ export async function up(knex: Knex): Promise<void> {
   });
 
   await knex.raw(/* sql */ `
-    update petition p
-    set closed_at = pe.created_at
-    from petition_event pe 
-    where p.id = pe.petition_id 
-    and pe.type = 'PETITION_CLOSED' and p.status = 'CLOSED';
+    with events_ranked as (
+      select *, rank() over (partition by petition_id order by created_at desc) as _rank
+      from petition_event where type = 'PETITION_CLOSED'
+    ) update petition p 
+    set closed_at = er.created_at
+    from events_ranked er 
+    where er._rank = 1
+    and p.status = 'CLOSED'
+    and er.petition_id = p.id;
   `);
 }
 
