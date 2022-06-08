@@ -65,7 +65,7 @@ export function ConfirmPetitionSignersDialog({
     handleSubmit,
     watch,
     register,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<{
     signers: SignerSelectSelection[];
     message: Maybe<string>;
@@ -157,6 +157,8 @@ export function ConfirmPetitionSignersDialog({
     <ConfirmDialog
       size="xl"
       initialFocusRef={contactSelectRef}
+      closeOnOverlayClick={!isDirty}
+      hasCloseButton
       content={{
         as: "form",
         onSubmit: handleSubmit(({ signers, message, allowAdditionalSigners }) => {

@@ -56,7 +56,7 @@ function RecipientViewConfirmPetitionSignersDialog({
     handleSubmit,
     watch,
     register,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<{ signers: SignerSelectSelection[]; message: Maybe<string> }>({
     mode: "onChange",
     defaultValues: {
@@ -111,6 +111,7 @@ function RecipientViewConfirmPetitionSignersDialog({
       {...props}
       size="xl"
       hasCloseButton
+      closeOnOverlayClick={!isDirty}
       content={{
         as: "form",
         onSubmit: handleSubmit(({ signers, message }) => {

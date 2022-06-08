@@ -150,6 +150,7 @@ export function SignatureConfigDialog({
     <ConfirmDialog
       hasCloseButton
       initialFocusRef={titleRef}
+      closeOnOverlayClick={currentStep === 0 && !step1Props.form.formState.isDirty}
       size="xl"
       content={{ as: "form" }}
       header={
