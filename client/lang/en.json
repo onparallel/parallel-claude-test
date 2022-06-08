@@ -3965,6 +3965,11 @@
     "context": "Share template"
   },
   {
+    "term": "component.template-icon-compliance.text",
+    "definition": "Data of closed petitions will be anonymized after {months, plural, =1 {# month} other {# months}}.",
+    "context": "Data of closed petitions will be anonymized after {months, plural, =1 {# month} other {# months}}."
+  },
+  {
     "term": "component.template-icon-default-permissions.text",
     "definition": "Petitions will be assigned to:",
     "context": "Petitions will be assigned to:"

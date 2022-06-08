@@ -5,6 +5,7 @@ import { LocaleBadge } from "@parallel/components/common/LocaleBadge";
 import { TemplateActiveSettingsIcons_PetitionTemplateFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { SmallPopover } from "../common/SmallPopover";
+import { TemplateIconCompliance } from "./TemplateIconCompliance";
 import { TemplateIconDefaultPermissions } from "./TemplateIconDefaultPermissions";
 import { TemplateIconReminders } from "./TemplateIconReminders";
 import { TemplateIconSignature } from "./TemplateIconSignature";
@@ -59,6 +60,9 @@ export function TemplateActiveSettingsIcons({
       {template.remindersConfig ? (
         <TemplateIconReminders remindersConfig={template.remindersConfig} />
       ) : null}
+      {template.anonymizeAfterMonths ? (
+        <TemplateIconCompliance anonymizeAfterMonths={template.anonymizeAfterMonths} />
+      ) : null}
     </HStack>
   );
 }
@@ -83,6 +87,7 @@ TemplateActiveSettingsIcons.fragments = {
       defaultPermissions {
         ...TemplateIconDefaultPermissions_TemplateDefaultPermission
       }
+      anonymizeAfterMonths
     }
     ${TemplateIconSignature.fragments.SignatureConfig}
     ${TemplateIconReminders.fragments.RemindersConfig}
