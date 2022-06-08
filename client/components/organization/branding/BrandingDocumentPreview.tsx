@@ -1,8 +1,10 @@
 import { gql } from "@apollo/client";
 import { AspectRatio, Box, Center, Flex, Image, Stack, Text } from "@chakra-ui/react";
+import { Fonts } from "@parallel/components/organization/branding/DocumentFont";
 import { BrandingDocumentPreview_OrganizationFragment } from "@parallel/graphql/__types";
 import { CSSProperties } from "react";
 import { FormattedMessage } from "react-intl";
+import { uniq } from "remeda";
 
 interface BrandingDocumentPreviewProps {
   organization: BrandingDocumentPreview_OrganizationFragment;
@@ -51,6 +53,13 @@ export function BrandingDocumentPreview({ organization }: BrandingDocumentPrevie
 
   return (
     <Box width="100%" paddingBottom={8}>
+      <>
+        {uniq([theme.title1FontFamily, theme.title2FontFamily, theme.textFontFamily]).map(
+          (font) => (
+            <Fonts key={font} family={font} />
+          )
+        )}
+      </>
       <Box
         backgroundColor="white"
         rounded="md"

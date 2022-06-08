@@ -36,7 +36,7 @@ import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { ChangeEvent, useState } from "react";
 import { IMaskInput } from "react-imask";
 import { FormattedMessage, useIntl } from "react-intl";
-import families from "../../../chakra/pdfDocumentFonts.json";
+import fonts from "../../../utils/fonts.json";
 
 interface BrandingDocumentFormProps {
   user: BrandingDocumentForm_UserFragment;
@@ -219,7 +219,7 @@ export function BrandingDocumentForm({ user }: BrandingDocumentFormProps) {
                 }}
                 isDisabled={!hasAdminRole}
               >
-                {families.map(({ family }) => (
+                {fonts.map(({ family }) => (
                   <option key={family} value={family}>
                     {family}
                   </option>

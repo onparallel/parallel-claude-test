@@ -8,13 +8,15 @@ import families from "./utils/fonts.json";
 let hasInit = false;
 
 function init() {
-  for (const family of families) {
-    const fonts = family.fonts.map((font) => ({
+  for (const f of families) {
+    const fonts = f.fonts.map((font) => ({
       ...font,
-      src: `${process.env.ASSETS_URL!}/static/fonts/pdf` + font.src,
+      src: `${process.env.ASSETS_URL!}/static/fonts/pdf/${encodeURIComponent(f.family)}/${
+        font.src
+      }`,
     }));
     Font.register({
-      family: family.family,
+      family: f.family,
       fonts: [
         ...fonts,
         // Add fallback for fonts with missing italic style

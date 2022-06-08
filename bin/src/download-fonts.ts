@@ -77,7 +77,7 @@ async function main() {
       const { files } = fonts.find((f) => f.family === family)!;
       console.log(`Transforming ${family}`);
       for (const [descriptor, url] of Object.entries(files)) {
-        const sourceUrl = `URL/${encodeURIComponent(family)}/${descriptor}.ttf`;
+        const sourceUrl = `${descriptor}.ttf`;
         if (descriptor === "regular") {
           result.fonts.push({ src: sourceUrl });
         } else if (descriptor === "italic") {
