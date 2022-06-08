@@ -29,7 +29,7 @@ export function ConfirmDialog<TResult = void>({
   cancel,
   content,
   initialFocusRef,
-  hasCloseButton = true,
+  hasCloseButton,
   ...props
 }: ConfirmDialogProps<TResult>) {
   const intl = useIntl();
