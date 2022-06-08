@@ -1,7 +1,7 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { indexBy, zip } from "remeda";
+import { indexBy } from "remeda";
 import { Config, CONFIG } from "../../config";
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { unMaybeArray } from "../../util/arrays";
@@ -20,7 +20,6 @@ import {
   OrganizationUsageLimitName,
   User,
 } from "../__types";
-import { FeatureFlagRepository } from "./FeatureFlagRepository";
 import { SystemRepository } from "./SystemRepository";
 
 export type OrganizationUsageDetails = {
@@ -42,8 +41,7 @@ export class OrganizationRepository extends BaseRepository {
     @inject(CONFIG) private config: Config,
     @inject(KNEX) knex: Knex,
     @inject(EMAILS) private readonly emails: IEmailsService,
-    @inject(SystemRepository) private system: SystemRepository,
-    @inject(FeatureFlagRepository) private featureFlags: FeatureFlagRepository
+    @inject(SystemRepository) private system: SystemRepository
   ) {
     super(knex);
   }
@@ -391,13 +389,14 @@ export class OrganizationRepository extends BaseRepository {
   }
 
   async getOrganizationsWithFeatureFlag(name: FeatureFlagName) {
-    const orgs = await this.from("organization").whereNull("deleted_at").select("*");
-    const hasFeatureFlag = await Promise.all(
-      orgs.map((org) => this.featureFlags.orgHasFeatureFlag(org.id, name))
+    return await this.raw<Organization>(
+      /* sql */ `
+      select * from organization o
+      join feature_flag ff on ff.name = ?
+      left join feature_flag_override ffoo on ffoo.feature_flag_name = ff.name and ffoo.org_id = o.id
+      where coalesce(ffoo.value, ff.default_value) = true
+    `,
+      [name]
     );
-
-    return zip(orgs, hasFeatureFlag)
-      .filter(([, hasFF]) => hasFF)
-      .map(([org]) => org);
   }
 }
