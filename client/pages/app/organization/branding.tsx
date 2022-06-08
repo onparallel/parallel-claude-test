@@ -80,7 +80,7 @@ function OrganizationBranding() {
           </Tab>
         </TabList>
         <TabPanels>
-          <TabPanel>
+          <TabPanel padding={0}>
             <Stack
               padding={6}
               flexDirection={{ base: "column", xl: "row" }}
@@ -91,7 +91,7 @@ function OrganizationBranding() {
               <BrandingGeneralPreview user={me} />
             </Stack>
           </TabPanel>
-          <TabPanel>
+          <TabPanel padding={0}>
             <Stack
               padding={6}
               flexDirection={{ base: "column", xl: "row" }}

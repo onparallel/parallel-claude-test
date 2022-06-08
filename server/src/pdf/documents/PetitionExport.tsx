@@ -108,7 +108,7 @@ export default function PetitionExport({
     },
     field: {
       border: "1px solid #CBD5E0",
-      borderRadius: "5px",
+      borderRadius: "1.5mm",
       padding: "4.2mm",
     },
     headerTitle: {
