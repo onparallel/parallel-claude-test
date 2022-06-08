@@ -21,6 +21,7 @@ import {
 import { Card } from "@parallel/components/common/Card";
 import { ColorInput } from "@parallel/components/common/ColorInput";
 import { Divider } from "@parallel/components/common/Divider";
+import { NumeralInput } from "@parallel/components/common/NumeralInput";
 import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
 import { RichTextEditor } from "@parallel/components/common/slate/RichTextEditor";
 import {
@@ -121,57 +122,37 @@ export function BrandingDocumentForm({ user }: BrandingDocumentFormProps) {
             <Text>
               <FormattedMessage id="organization.branding.margins.top" defaultMessage="Top" />
             </Text>
-            <NumberInput
-              min={0}
+            <NumeralInput
               background="white"
-              value={`${theme.marginTop} mm`}
-              onChange={(value) => handleThemeChange({ marginTop: parseInt(value) })}
-              isDisabled={!hasAdminRole}
-            >
-              <NumberInputField />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
+              decimals={1}
+              suffix=" mm"
+              value={theme.marginTop}
+              onChange={(value) => handleThemeChange({ marginTop: value })}
+            />
           </Stack>
           <Stack>
             <Text>
               <FormattedMessage id="organization.branding.margins.bottom" defaultMessage="Bottom" />
             </Text>
-            <NumberInput
-              min={0}
+            <NumeralInput
               background="white"
-              value={`${theme.marginBottom} mm`}
-              onChange={(value) => handleThemeChange({ marginBottom: parseInt(value) })}
-              isDisabled={!hasAdminRole}
-            >
-              <NumberInputField />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
+              decimals={1}
+              suffix=" mm"
+              value={theme.marginBottom}
+              onChange={(value) => handleThemeChange({ marginBottom: value })}
+            />
           </Stack>
           <Stack>
             <Text>
               <FormattedMessage id="organization.branding.margins.sides" defaultMessage="Sides" />
             </Text>
-            <NumberInput
-              min={0}
+            <NumeralInput
               background="white"
-              value={`${theme.marginLeft} mm`}
-              onChange={(value) =>
-                handleThemeChange({ marginLeft: parseInt(value), marginRight: parseInt(value) })
-              }
-              isDisabled={!hasAdminRole}
-            >
-              <NumberInputField />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
+              decimals={1}
+              suffix=" mm"
+              value={theme.marginLeft}
+              onChange={(value) => handleThemeChange({ marginLeft: value, marginRight: value })}
+            />
           </Stack>
         </HStack>
         <HStack justifyContent="space-between" alignItems="center">

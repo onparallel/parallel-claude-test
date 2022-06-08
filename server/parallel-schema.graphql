@@ -1840,10 +1840,10 @@ type Organization implements Timestamps {
 input OrganizationDocumentThemeInput {
   legalRichTextEn: JSON
   legalRichTextEs: JSON
-  marginBottom: Int
-  marginLeft: Int
-  marginRight: Int
-  marginTop: Int
+  marginBottom: Float
+  marginLeft: Float
+  marginRight: Float
+  marginTop: Float
   showLogo: Boolean
   textColor: String
   textFontFamily: String

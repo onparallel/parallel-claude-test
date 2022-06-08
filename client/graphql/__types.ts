@@ -1652,10 +1652,10 @@ export interface OrganizationusersArgs {
 export interface OrganizationDocumentThemeInput {
   legalRichTextEn?: InputMaybe<Scalars["JSON"]>;
   legalRichTextEs?: InputMaybe<Scalars["JSON"]>;
-  marginBottom?: InputMaybe<Scalars["Int"]>;
-  marginLeft?: InputMaybe<Scalars["Int"]>;
-  marginRight?: InputMaybe<Scalars["Int"]>;
-  marginTop?: InputMaybe<Scalars["Int"]>;
+  marginBottom?: InputMaybe<Scalars["Float"]>;
+  marginLeft?: InputMaybe<Scalars["Float"]>;
+  marginRight?: InputMaybe<Scalars["Float"]>;
+  marginTop?: InputMaybe<Scalars["Float"]>;
   showLogo?: InputMaybe<Scalars["Boolean"]>;
   textColor?: InputMaybe<Scalars["String"]>;
   textFontFamily?: InputMaybe<Scalars["String"]>;

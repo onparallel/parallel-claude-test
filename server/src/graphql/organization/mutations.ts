@@ -104,10 +104,10 @@ export const updateOrganizationDocumentTheme = mutationField("updateOrganization
       inputObjectType({
         name: "OrganizationDocumentThemeInput",
         definition(t) {
-          t.nullable.int("marginTop");
-          t.nullable.int("marginRight");
-          t.nullable.int("marginBottom");
-          t.nullable.int("marginLeft");
+          t.nullable.float("marginTop");
+          t.nullable.float("marginRight");
+          t.nullable.float("marginBottom");
+          t.nullable.float("marginLeft");
           t.nullable.boolean("showLogo");
           t.nullable.string("title1FontFamily");
           t.nullable.string("title1Color");

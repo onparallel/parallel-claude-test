@@ -109,10 +109,10 @@ export interface NexusGenInputs {
     // input type
     legalRichTextEn?: NexusGenScalars["JSON"] | null; // JSON
     legalRichTextEs?: NexusGenScalars["JSON"] | null; // JSON
-    marginBottom?: number | null; // Int
-    marginLeft?: number | null; // Int
-    marginRight?: number | null; // Int
-    marginTop?: number | null; // Int
+    marginBottom?: number | null; // Float
+    marginLeft?: number | null; // Float
+    marginRight?: number | null; // Float
+    marginTop?: number | null; // Float
     showLogo?: boolean | null; // Boolean
     textColor?: string | null; // String
     textFontFamily?: string | null; // String
