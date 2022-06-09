@@ -25,10 +25,10 @@ export interface PdfDocumentTheme {
 }
 
 export const defaultDocumentTheme: PdfDocumentTheme = {
-  marginLeft: 10,
-  marginRight: 10,
-  marginTop: 10,
-  marginBottom: 15,
+  marginLeft: 25.4,
+  marginRight: 25.4,
+  marginTop: 25.4,
+  marginBottom: 25.4,
   showLogo: true,
   title1FontFamily: "IBM Plex Sans",
   title1Color: "#000000",
