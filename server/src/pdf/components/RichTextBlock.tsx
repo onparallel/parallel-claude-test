@@ -1,13 +1,12 @@
 import { Link, Text, View } from "@react-pdf/renderer";
-import { Fragment } from "react";
+import { Fragment, ReactNode } from "react";
 import { paragraphIsEmpty, renderWhiteSpace, SlateNode } from "../../util/slate";
-import { MaybeArray } from "../../util/types";
 
 interface RichTextBlockProps {
   children: SlateNode[];
 }
 
-function renderSlateToReactPdf(node: SlateNode | SlateNode[]): MaybeArray<JSX.Element> {
+function renderSlateToReactPdf(node: SlateNode | SlateNode[]): ReactNode {
   if (Array.isArray(node)) {
     return node.map((child, index) => (
       <Fragment key={index}>{renderSlateToReactPdf(child)}</Fragment>
@@ -20,10 +19,7 @@ function renderSlateToReactPdf(node: SlateNode | SlateNode[]): MaybeArray<JSX.El
         return paragraphIsEmpty(node) ? (
           <Text>{"\n"}</Text>
         ) : (
-          <Text>
-            {renderSlateToReactPdf(node.children)}
-            {"\n"}
-          </Text>
+          <Text>{renderSlateToReactPdf(node.children)}</Text>
         );
       }
       case "link": {
@@ -43,7 +39,7 @@ function renderSlateToReactPdf(node: SlateNode | SlateNode[]): MaybeArray<JSX.El
       </Text>
     );
   }
-  return null as never;
+  return null;
 }
 
 export function RichTextBlock({ children }: RichTextBlockProps) {

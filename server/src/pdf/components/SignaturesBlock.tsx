@@ -78,11 +78,11 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
 
   return (
     <View style={style} wrap={false}>
-      <Text style={[styles.text]}>
+      <View style={[styles.text]}>
         <RichTextBlock>
           {intl.locale === "es" ? theme.legalRichTextEs : theme.legalRichTextEn}
         </RichTextBlock>
-      </Text>
+      </View>
       {chunk(signers, 3).map((row, i) => (
         <View key={i} style={{ flexDirection: "row", marginTop: "5mm" }}>
           {row.map((signer, i) => (
