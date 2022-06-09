@@ -195,9 +195,19 @@
     "context": "Upgrade your plan to increase your user and petition limits."
   },
   {
+    "term": "component.branding-document-preview.document-title",
+    "definition": "Título del documento",
+    "context": "Document title"
+  },
+  {
     "term": "component.branding-document-preview.footer",
     "definition": "Ejemplo de un documento.",
     "context": "An example of a document."
+  },
+  {
+    "term": "component.branding-document-preview.preview-label",
+    "definition": "Ejemplo",
+    "context": "Preview"
   },
   {
     "term": "component.branding-general-preview.body",

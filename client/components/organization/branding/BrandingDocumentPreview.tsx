@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { AspectRatio, Box, Center, Flex, Image, Stack, Text } from "@chakra-ui/react";
+import { Box, Center, Flex, Image, Stack, Text } from "@chakra-ui/react";
 import { Fonts } from "@parallel/components/organization/branding/DocumentFont";
 import { BrandingDocumentPreview_OrganizationFragment } from "@parallel/graphql/__types";
 import { CSSProperties } from "react";
