@@ -2,12 +2,11 @@ import { StyleSheet, Text, View } from "@react-pdf/renderer";
 import { Style } from "@react-pdf/types";
 import { gql } from "apollo-server-core";
 import { useIntl } from "react-intl";
-import { Html } from "react-pdf-html";
 import { chunk, isDefined, times } from "remeda";
 import { FORMATS } from "../../util/dates";
-import { toHtml } from "../../util/slate";
 import { useTheme } from "../utils/ThemeProvider";
 import { SignaturesBlock_SignatureConfigFragment } from "../__types";
+import { RichTextBlock } from "./RichTextBlock";
 import { SignatureBox, SignatureBoxProps } from "./SignatureBox";
 
 interface SignaturesBlockProps {
@@ -77,12 +76,12 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
     ),
   ];
 
-  const html = intl.locale === "es" ? toHtml(theme.legalRichTextEs) : toHtml(theme.legalRichTextEn);
-
   return (
     <View style={style} wrap={false}>
       <Text style={[styles.text]}>
-        <Html stylesheet={{ p: { fontSize: styles.text.fontSize } }}>{html}</Html>
+        <RichTextBlock>
+          {intl.locale === "es" ? theme.legalRichTextEs : theme.legalRichTextEn}
+        </RichTextBlock>
       </Text>
       {chunk(signers, 3).map((row, i) => (
         <View key={i} style={{ flexDirection: "row", marginTop: "5mm" }}>

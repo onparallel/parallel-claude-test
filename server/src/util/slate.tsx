@@ -9,7 +9,7 @@ interface SlateContext {
   contact?: Partial<Contact> | null;
 }
 
-type SlateNode = {
+export type SlateNode = {
   children?: SlateNode[];
   type?:
     | "paragraph"
@@ -126,11 +126,11 @@ function renderSlate(
   return null;
 }
 
-function paragraphIsEmpty(node: SlateNode) {
+export function paragraphIsEmpty(node: SlateNode) {
   return node?.children?.length === 1 && node.children[0]?.text === "";
 }
 
-function renderWhiteSpace(text: string) {
+export function renderWhiteSpace(text: string) {
   return text.split(/ ( +)/).map((part, index) => (
     <Fragment key={index}>
       {part.match(/^ +$/) ? (
