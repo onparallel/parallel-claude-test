@@ -4,7 +4,6 @@ import { Response } from "node-fetch";
 import { UserAuthenticationRepository } from "../src/db/repositories/UserAuthenticationRepository";
 import { UserRepository } from "../src/db/repositories/UserRepository";
 import { User } from "../src/db/__types";
-import { RESULT } from "../src/graphql";
 import { EMAIL_REGEX } from "../src/graphql/helpers/validators/validEmail";
 import { IAnalyticsService } from "../src/services/analytics";
 import { IAuth } from "../src/services/auth";
@@ -47,9 +46,7 @@ export class MockAuth implements IAuth {
   generateTempAuthToken(userId: number) {
     return `userId:${userId}`;
   }
-  async resetTempPassword() {
-    return RESULT.SUCCESS;
-  }
+  async resetTempPassword() {}
 }
 
 @injectable()

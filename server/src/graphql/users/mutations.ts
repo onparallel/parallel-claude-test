@@ -627,7 +627,9 @@ export const resetTemporaryPassword = mutationField("resetTemporaryPassword", {
     validLocale((args) => args.locale, "locale")
   ),
   resolve: async (_, { email, locale }, ctx) => {
-    return await ctx.auth.resetTempPassword(email, locale);
+    await ctx.auth.resetTempPassword(email, locale);
+
+    return RESULT.SUCCESS;
   },
 });
 

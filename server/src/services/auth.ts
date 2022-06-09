@@ -26,7 +26,6 @@ import { SystemRepository } from "../db/repositories/SystemRepository";
 import { UserAuthenticationRepository } from "../db/repositories/UserAuthenticationRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
 import { User } from "../db/__types";
-import { RESULT } from "../graphql";
 import { fromDataLoader } from "../util/fromDataLoader";
 import { fullName } from "../util/fullName";
 import { sign, verify } from "../util/jwt";
@@ -52,7 +51,7 @@ export interface IAuth {
   changePassword(req: IncomingMessage, password: string, newPassword: string): Promise<void>;
   updateSessionLogin(req: Request, userId: number, asUserId: number): Promise<void>;
   restoreSessionLogin(req: Request, userId: number): Promise<void>;
-  resetTempPassword(email: string, locale: string | null | undefined): Promise<"SUCCESS">;
+  resetTempPassword(email: string, locale: string | null | undefined): Promise<void>;
 }
 
 export const AUTH = Symbol.for("AUTH");
@@ -751,10 +750,7 @@ export class Auth implements IAuth {
       const orgOwner = await this.orgs.getOrganizationOwner(organization.id);
       const orgOwnerData = await this.users.loadUserData(orgOwner.user_data_id);
       if (!orgOwnerData) {
-        throw new ApolloError(
-          `UserData:${orgOwner.user_data_id} not found for User:${orgOwner.id}`,
-          "USER_DATA_NOT_FOUND"
-        );
+        throw new ApolloError(`UserData not found`, "USER_DATA_NOT_FOUND");
       }
       await this.aws.resetUserPassword(email, {
         locale: locale ?? "en",
@@ -764,7 +760,5 @@ export class Auth implements IAuth {
     } else {
       throw new ApolloError(`User has SSO configured`, "RESET_USER_PASSWORD_SSO_ERROR");
     }
-
-    return RESULT.SUCCESS;
   }
 }
