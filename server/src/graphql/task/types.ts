@@ -1,11 +1,23 @@
 import { enumType, objectType } from "nexus";
 import { isDefined } from "remeda";
+import { TaskNameValues, TaskStatusValues } from "../../db/__types";
 
 export const Task = objectType({
   name: "Task",
   definition(t) {
     t.globalId("id");
-    t.nonNull.field("status", { type: "TaskStatus" });
+    t.nonNull.field("name", {
+      type: enumType({
+        name: "TaskName",
+        members: TaskNameValues,
+      }),
+    });
+    t.nonNull.field("status", {
+      type: enumType({
+        name: "TaskStatus",
+        members: TaskStatusValues,
+      }),
+    });
     t.nullable.int("progress");
     t.nullable.jsonObject("output", {
       resolve: (t, _, ctx) => {
@@ -13,9 +25,4 @@ export const Task = objectType({
       },
     });
   },
-});
-
-export const TaskStatus = enumType({
-  name: "TaskStatus",
-  members: ["ENQUEUED", "PROCESSING", "COMPLETED", "FAILED"],
 });

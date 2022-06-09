@@ -300,6 +300,7 @@ export interface NexusGenEnums {
   SignatureOrgIntegrationEnvironment: "DEMO" | "PRODUCTION";
   SignatureOrgIntegrationProvider: "SIGNATURIT";
   Success: "SUCCESS";
+  TaskName: db.TaskName;
   TaskStatus: db.TaskStatus;
   Tone: db.Tone;
   UserStatus: db.UserStatus;
@@ -1951,6 +1952,7 @@ export interface NexusGenFieldTypes {
   Task: {
     // field return type
     id: NexusGenScalars["GID"]; // GID!
+    name: NexusGenEnums["TaskName"]; // TaskName!
     output: NexusGenScalars["JSONObject"] | null; // JSONObject
     progress: number | null; // Int
     status: NexusGenEnums["TaskStatus"]; // TaskStatus!
@@ -3447,6 +3449,7 @@ export interface NexusGenFieldTypeNames {
   Task: {
     // field return type name
     id: "GID";
+    name: "TaskName";
     output: "JSONObject";
     progress: "Int";
     status: "TaskStatus";

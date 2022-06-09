@@ -4618,9 +4618,18 @@ type TagPagination {
 
 type Task {
   id: GID!
+  name: TaskName!
   output: JSONObject
   progress: Int
   status: TaskStatus!
+}
+
+enum TaskName {
+  EXPORT_EXCEL
+  EXPORT_REPLIES
+  PRINT_PDF
+  TEMPLATE_REPLIES_REPORT
+  TEMPLATE_STATS_REPORT
 }
 
 enum TaskStatus {

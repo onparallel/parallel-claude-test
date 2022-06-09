@@ -1,79 +1,83 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useApolloClient, useMutation } from "@apollo/client";
+import { VariablesOf } from "@graphql-typed-document-node/core";
 import {
   useBackgroundTask_createExportExcelTaskDocument,
   useBackgroundTask_createPrintPdfTaskDocument,
   useBackgroundTask_createTemplateStatsReportTaskDocument,
   useBackgroundTask_getTaskResultFileUrlDocument,
   useBackgroundTask_taskDocument,
+  useBackgroundTask_TaskFragment,
 } from "@parallel/graphql/__types";
+import { useCallback } from "react";
 
-const POLLING_TIMEOUT = 60000;
+const TASK_DOCUMENTS = {
+  PRINT_PDF: useBackgroundTask_createPrintPdfTaskDocument,
+  EXPORT_EXCEL: useBackgroundTask_createExportExcelTaskDocument,
+  TEMPLATE_STATS_REPORT: useBackgroundTask_createTemplateStatsReportTaskDocument,
+} as const;
 
-export interface IBackgroundTask {
-  stop: () => void;
-  start: (id: string) => Promise<any>;
+interface BackgroundTaskOptions {
+  signal?: AbortSignal;
+  timeout?: number;
+  pollingInterval?: number;
 }
 
-export function useBackgroundTask(
-  taskName: "EXPORT_EXCEL" | "PRINT_PDF" | "STATS_REPORT"
-): IBackgroundTask {
-  const [createTask] = useMutation(
-    taskName === "EXPORT_EXCEL"
-      ? useBackgroundTask_createExportExcelTaskDocument
-      : taskName === "PRINT_PDF"
-      ? useBackgroundTask_createPrintPdfTaskDocument
-      : taskName === "STATS_REPORT"
-      ? useBackgroundTask_createTemplateStatsReportTaskDocument
-      : (null as never)
-  );
-  const [generateDownloadUrl] = useMutation(useBackgroundTask_getTaskResultFileUrlDocument);
-  const { refetch } = useQuery(useBackgroundTask_taskDocument, {
-    skip: true,
-  });
-  let status = "IDLE";
+export interface BackgroundTask<Task extends keyof typeof TASK_DOCUMENTS> {
+  (variables: VariablesOf<typeof TASK_DOCUMENTS[Task]>, options?: BackgroundTaskOptions): Promise<{
+    task: useBackgroundTask_TaskFragment;
+    url?: string;
+  }>;
+}
 
-  return {
-    stop: () => {
-      if (status === "POLLING") {
-        status = "ABORTED";
-      }
-    },
-    start: async (petitionId: string) => {
-      const { data: initialData } = await createTask({ variables: { petitionId } });
+export function useBackgroundTask<Task extends keyof typeof TASK_DOCUMENTS>(
+  taskName: Task
+): BackgroundTask<Task> {
+  const apollo = useApolloClient();
+  const [createTask] = useMutation(TASK_DOCUMENTS[taskName]);
+  const [generateDownloadUrl] = useMutation(useBackgroundTask_getTaskResultFileUrlDocument);
+
+  return useCallback(
+    (async (
+      variables: any,
+      { signal, timeout = 60_00, pollingInterval = 3_000 }: BackgroundTaskOptions = {}
+    ) => {
+      const { data: initialData } = await createTask({ variables });
 
       const task = await (async function () {
-        const startTimer = performance.now();
+        const startTime = performance.now();
         while (true) {
+          if (signal?.aborted) {
+            throw new Error("ABORTED");
+          }
+          if (performance.now() - startTime > timeout) {
+            throw new Error("TIMEOUT");
+          }
           const {
             data: { task },
-          } = await refetch({
-            id: initialData!.createTask.id,
+          } = await apollo.query({
+            query: useBackgroundTask_taskDocument,
+            variables: { id: initialData!.createTask.id },
+            fetchPolicy: "network-only",
           });
-
-          if (status === "IDLE") status = "POLLING";
-
-          const updatedTimer = performance.now();
-
-          if (task.status === "COMPLETED" || status === "ABORTED") {
+          if (task.status === "COMPLETED") {
             return task;
           } else if (task.status === "FAILED") {
             throw new Error("FAILED");
-          } else if (updatedTimer - startTimer > POLLING_TIMEOUT) {
-            throw new Error("TIMEOUT");
           }
 
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          await new Promise((resolve) => setTimeout(resolve, pollingInterval));
         }
       })();
 
-      if (taskName === "STATS_REPORT") {
+      if (taskName === "TEMPLATE_STATS_REPORT") {
         return { task };
       } else {
         const { data } = await generateDownloadUrl({ variables: { taskId: task!.id } });
         return { task, url: data!.getTaskResultFileUrl };
       }
-    },
-  };
+    }) as any,
+    []
+  );
 }
 
 const fragments = {
@@ -108,17 +112,17 @@ const _mutations = [
     ${fragments.Task}
   `,
   gql`
-    mutation useBackgroundTask_getTaskResultFileUrl($taskId: GID!) {
-      getTaskResultFileUrl(taskId: $taskId, preview: false)
-    }
-  `,
-  gql`
-    mutation useBackgroundTask_createTemplateStatsReportTask($petitionId: GID!) {
-      createTask: createTemplateStatsReportTask(templateId: $petitionId) {
+    mutation useBackgroundTask_createTemplateStatsReportTask($templateId: GID!) {
+      createTask: createTemplateStatsReportTask(templateId: $templateId) {
         ...useBackgroundTask_Task
       }
     }
     ${fragments.Task}
+  `,
+  gql`
+    mutation useBackgroundTask_getTaskResultFileUrl($taskId: GID!) {
+      getTaskResultFileUrl(taskId: $taskId, preview: false)
+    }
   `,
 ];
 

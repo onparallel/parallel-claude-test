@@ -3436,10 +3436,18 @@ export interface TagPagination {
 export interface Task {
   __typename?: "Task";
   id: Scalars["GID"];
+  name: TaskName;
   output?: Maybe<Scalars["JSONObject"]>;
   progress?: Maybe<Scalars["Int"]>;
   status: TaskStatus;
 }
+
+export type TaskName =
+  | "EXPORT_EXCEL"
+  | "EXPORT_REPLIES"
+  | "PRINT_PDF"
+  | "TEMPLATE_REPLIES_REPORT"
+  | "TEMPLATE_STATS_REPORT";
 
 export type TaskStatus = "COMPLETED" | "ENQUEUED" | "FAILED" | "PROCESSING";
 
@@ -20717,14 +20725,8 @@ export type useBackgroundTask_createPrintPdfTaskMutation = {
   };
 };
 
-export type useBackgroundTask_getTaskResultFileUrlMutationVariables = Exact<{
-  taskId: Scalars["GID"];
-}>;
-
-export type useBackgroundTask_getTaskResultFileUrlMutation = { getTaskResultFileUrl: string };
-
 export type useBackgroundTask_createTemplateStatsReportTaskMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
+  templateId: Scalars["GID"];
 }>;
 
 export type useBackgroundTask_createTemplateStatsReportTaskMutation = {
@@ -20735,6 +20737,12 @@ export type useBackgroundTask_createTemplateStatsReportTaskMutation = {
     output?: { [key: string]: any } | null;
   };
 };
+
+export type useBackgroundTask_getTaskResultFileUrlMutationVariables = Exact<{
+  taskId: Scalars["GID"];
+}>;
+
+export type useBackgroundTask_getTaskResultFileUrlMutation = { getTaskResultFileUrl: string };
 
 export type useBackgroundTask_taskQueryVariables = Exact<{
   id: Scalars["GID"];
@@ -28481,17 +28489,9 @@ export const useBackgroundTask_createPrintPdfTaskDocument = gql`
   useBackgroundTask_createPrintPdfTaskMutation,
   useBackgroundTask_createPrintPdfTaskMutationVariables
 >;
-export const useBackgroundTask_getTaskResultFileUrlDocument = gql`
-  mutation useBackgroundTask_getTaskResultFileUrl($taskId: GID!) {
-    getTaskResultFileUrl(taskId: $taskId, preview: false)
-  }
-` as unknown as DocumentNode<
-  useBackgroundTask_getTaskResultFileUrlMutation,
-  useBackgroundTask_getTaskResultFileUrlMutationVariables
->;
 export const useBackgroundTask_createTemplateStatsReportTaskDocument = gql`
-  mutation useBackgroundTask_createTemplateStatsReportTask($petitionId: GID!) {
-    createTask: createTemplateStatsReportTask(templateId: $petitionId) {
+  mutation useBackgroundTask_createTemplateStatsReportTask($templateId: GID!) {
+    createTask: createTemplateStatsReportTask(templateId: $templateId) {
       ...useBackgroundTask_Task
     }
   }
@@ -28499,6 +28499,14 @@ export const useBackgroundTask_createTemplateStatsReportTaskDocument = gql`
 ` as unknown as DocumentNode<
   useBackgroundTask_createTemplateStatsReportTaskMutation,
   useBackgroundTask_createTemplateStatsReportTaskMutationVariables
+>;
+export const useBackgroundTask_getTaskResultFileUrlDocument = gql`
+  mutation useBackgroundTask_getTaskResultFileUrl($taskId: GID!) {
+    getTaskResultFileUrl(taskId: $taskId, preview: false)
+  }
+` as unknown as DocumentNode<
+  useBackgroundTask_getTaskResultFileUrlMutation,
+  useBackgroundTask_getTaskResultFileUrlMutationVariables
 >;
 export const useBackgroundTask_taskDocument = gql`
   query useBackgroundTask_task($id: GID!) {

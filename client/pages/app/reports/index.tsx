@@ -41,7 +41,7 @@ import {
   useAssertQueryOrPreviousData,
 } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { IBackgroundTask, useBackgroundTask } from "@parallel/utils/useBackgroundTask";
+import { useBackgroundTask } from "@parallel/utils/useBackgroundTask";
 import { useTemplateRepliesReportTask } from "@parallel/utils/useTemplateRepliesReportTask";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -73,7 +73,7 @@ export function Reports() {
   const [templateId, setTemplateId] = useState<string | null>(null);
   const [report, setReport] = useState<ReportType | null>(null);
   const prevTemplateId = useRef<string | null>(null);
-  const prevTask = useRef<IBackgroundTask | null>(null);
+  const taskAbortController = useRef<AbortController | null>(null);
 
   const {
     data: {
@@ -107,17 +107,20 @@ export function Reports() {
     }
   }, [state, report]);
 
-  const templateStatsTask = useBackgroundTask("STATS_REPORT");
+  const templateStatsTask = useBackgroundTask("TEMPLATE_STATS_REPORT");
 
   const handleGenerateReportClick = async () => {
     try {
       setReport(null);
       setState("FAKE_LOADING");
-      prevTask.current?.stop();
       prevTemplateId.current = templateId;
-      prevTask.current = templateStatsTask;
+      taskAbortController.current?.abort();
       if (isDefined(templateId)) {
-        const { task } = await templateStatsTask.start(templateId);
+        taskAbortController.current = new AbortController();
+        const { task } = await templateStatsTask(
+          { templateId: templateId },
+          { signal: taskAbortController.current.signal }
+        );
         setReport(task.output as ReportType);
       }
     } catch (e) {
