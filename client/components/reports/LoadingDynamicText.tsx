@@ -1,13 +1,14 @@
 import { Text } from "@chakra-ui/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useInterval } from "@parallel/utils/useInterval";
+import { useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 
-const SHOW_TIME = 2200;
+const SHOW_TIME = 4_000;
 
 export function LoadingDynamicText() {
   const intl = useIntl();
 
-  const defaultTexts = useMemo(
+  const loadingTexts = useMemo(
     () => [
       intl.formatMessage({
         id: "component.loading-dynamic-text.checking-all-commas",
@@ -27,31 +28,15 @@ export function LoadingDynamicText() {
       }),
       intl.formatMessage({
         id: "component.loading-dynamic-text.calculating-average-times",
-        defaultMessage: "Calculating average times with the calculator...",
+        defaultMessage: "Calculating average times with a calculator...",
       }),
     ],
     [intl.locale]
   );
+  const [index, setIndex] = useState(0);
+  useInterval(() => setIndex((curr) => (curr + 1) % loadingTexts.length), SHOW_TIME, [
+    loadingTexts,
+  ]);
 
-  const texts = useRef([...defaultTexts]);
-
-  const [text, setText] = useState(defaultTexts[0]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const one = texts.current.pop();
-      if (one) {
-        setText(one);
-      } else {
-        texts.current = [...defaultTexts];
-        setText(texts.current.pop()!);
-      }
-    }, SHOW_TIME);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [text]);
-
-  return <Text>{text}</Text>;
+  return <Text>{loadingTexts[index]}</Text>;
 }

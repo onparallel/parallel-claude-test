@@ -392,7 +392,7 @@ export function Reports() {
                           <ListItem>
                             <FormattedMessage
                               id="page.reports.average-duration-help-list-2"
-                              defaultMessage=" Average time from completion to closure. "
+                              defaultMessage="Average time from completion to closure. "
                             />
                           </ListItem>
                         </OrderedList>
