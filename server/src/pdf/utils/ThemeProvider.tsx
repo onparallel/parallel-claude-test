@@ -1,4 +1,5 @@
 import { createContext, PropsWithChildren, useContext } from "react";
+import { SlateNode } from "../../util/slate";
 
 export interface PdfDocumentTheme {
   marginLeft: number;
@@ -17,8 +18,10 @@ export interface PdfDocumentTheme {
   showLogo: boolean;
   logoPosition: "center" | "left" | "right";
   paginationPosition: "center" | "left" | "right";
-  legalRichTextEs: any;
-  legalRichTextEn: any;
+  legalText: {
+    es: SlateNode[];
+    en: SlateNode[];
+  };
 }
 
 export const defaultDocumentTheme: PdfDocumentTheme = {
@@ -38,28 +41,30 @@ export const defaultDocumentTheme: PdfDocumentTheme = {
   textFontSize: 12,
   logoPosition: "center",
   paginationPosition: "right",
-  legalRichTextEs: [
-    {
-      type: "paragraph",
-      children: [
-        {
-          text: "Declaro que los datos y la documentación facilitados, así como las copias o fotocopias enviadas, reproducen fielmente los documentos originales y la información actual de identificación.",
-          italic: true,
-        },
-      ],
-    },
-  ],
-  legalRichTextEn: [
-    {
-      type: "paragraph",
-      children: [
-        {
-          text: "I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and current identification information.",
-          italic: true,
-        },
-      ],
-    },
-  ],
+  legalText: {
+    es: [
+      {
+        type: "paragraph",
+        children: [
+          {
+            text: "Declaro que los datos y la documentación facilitados, así como las copias o fotocopias enviadas, reproducen fielmente los documentos originales y la información actual de identificación.",
+            italic: true,
+          },
+        ],
+      },
+    ],
+    en: [
+      {
+        type: "paragraph",
+        children: [
+          {
+            text: "I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and current identification information.",
+            italic: true,
+          },
+        ],
+      },
+    ],
+  },
 };
 
 const ThemeContext = createContext<PdfDocumentTheme | undefined>(undefined);

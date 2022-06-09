@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "@react-pdf/renderer";
+import { StyleSheet, View } from "@react-pdf/renderer";
 import { Style } from "@react-pdf/types";
 import { gql } from "apollo-server-core";
 import { useIntl } from "react-intl";
@@ -79,9 +79,7 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
   return (
     <View style={style} wrap={false}>
       <View style={[styles.text]}>
-        <RichTextBlock>
-          {intl.locale === "es" ? theme.legalRichTextEs : theme.legalRichTextEn}
-        </RichTextBlock>
+        <RichTextBlock>{theme.legalText[intl.locale as "es" | "en"]}</RichTextBlock>
       </View>
       {chunk(signers, 3).map((row, i) => (
         <View key={i} style={{ flexDirection: "row", marginTop: "5mm" }}>

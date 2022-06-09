@@ -1,4 +1,5 @@
 import { gql, useApolloClient, useMutation } from "@apollo/client";
+import { mergeDeep } from "@apollo/client/utilities";
 import {
   Heading,
   HStack,
@@ -75,10 +76,10 @@ export function BrandingDocumentForm({ user }: BrandingDocumentFormProps) {
       fragment: BrandingDocumentPreview_OrganizationFragmentDoc,
       data: {
         ...cache!,
-        pdfDocumentTheme: { ...user.organization.pdfDocumentTheme, ...data },
+        pdfDocumentTheme: mergeDeep(cache!.pdfDocumentTheme, data),
       },
     });
-    setTheme({ ...theme, ...data });
+    setTheme(mergeDeep(theme, data));
     try {
       await updateOrganizationTheme(data);
     } catch (error) {
@@ -303,9 +304,9 @@ export function BrandingDocumentForm({ user }: BrandingDocumentFormProps) {
             <TabPanel>
               <RichTextEditor
                 id="legal-text-editor-en"
-                value={theme.legalRichTextEn}
+                value={theme.legalText.en}
                 onChange={(value) => {
-                  handleThemeChange({ legalRichTextEn: value });
+                  handleThemeChange({ legalText: { en: value } });
                 }}
                 isDisabled={!hasAdminRole}
                 toolbarOpts={{ headingButton: false, listButtons: false }}
@@ -314,9 +315,9 @@ export function BrandingDocumentForm({ user }: BrandingDocumentFormProps) {
             <TabPanel>
               <RichTextEditor
                 id="legal-text-editor-es"
-                value={theme.legalRichTextEs}
+                value={theme.legalText.es}
                 onChange={(value) => {
-                  handleThemeChange({ legalRichTextEs: value });
+                  handleThemeChange({ legalText: { es: value } });
                 }}
                 isDisabled={!hasAdminRole}
                 toolbarOpts={{ headingButton: false, listButtons: false }}

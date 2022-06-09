@@ -1614,8 +1614,7 @@ export type OrganizationusersArgs = {
 };
 
 export type OrganizationDocumentThemeInput = {
-  legalRichTextEn?: InputMaybe<Scalars["JSON"]>;
-  legalRichTextEs?: InputMaybe<Scalars["JSON"]>;
+  legalText?: InputMaybe<OrganizationDocumentThemeInputLegalText>;
   marginBottom?: InputMaybe<Scalars["Float"]>;
   marginLeft?: InputMaybe<Scalars["Float"]>;
   marginRight?: InputMaybe<Scalars["Float"]>;
@@ -1630,6 +1629,11 @@ export type OrganizationDocumentThemeInput = {
   title2Color?: InputMaybe<Scalars["String"]>;
   title2FontFamily?: InputMaybe<Scalars["String"]>;
   title2FontSize?: InputMaybe<Scalars["Float"]>;
+};
+
+export type OrganizationDocumentThemeInputLegalText = {
+  en?: InputMaybe<Scalars["JSON"]>;
+  es?: InputMaybe<Scalars["JSON"]>;
 };
 
 export type OrganizationPagination = {

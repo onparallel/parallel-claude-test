@@ -107,8 +107,7 @@ export interface NexusGenInputs {
   };
   OrganizationDocumentThemeInput: {
     // input type
-    legalRichTextEn?: NexusGenScalars["JSON"] | null; // JSON
-    legalRichTextEs?: NexusGenScalars["JSON"] | null; // JSON
+    legalText?: NexusGenInputs["OrganizationDocumentThemeInputLegalText"] | null; // OrganizationDocumentThemeInputLegalText
     marginBottom?: number | null; // Float
     marginLeft?: number | null; // Float
     marginRight?: number | null; // Float
@@ -123,6 +122,11 @@ export interface NexusGenInputs {
     title2Color?: string | null; // String
     title2FontFamily?: string | null; // String
     title2FontSize?: number | null; // Float
+  };
+  OrganizationDocumentThemeInputLegalText: {
+    // input type
+    en?: NexusGenScalars["JSON"] | null; // JSON
+    es?: NexusGenScalars["JSON"] | null; // JSON
   };
   PetitionFilter: {
     // input type

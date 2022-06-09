@@ -1,5 +1,5 @@
+import deepmerge from "deepmerge";
 import { arg, booleanArg, inputObjectType, intArg, mutationField, nonNull, nullable } from "nexus";
-import { isDefined } from "remeda";
 import { defaultDocumentTheme } from "../../pdf/utils/ThemeProvider";
 import { random } from "../../util/token";
 import { authenticateAnd } from "../helpers/authorize";
@@ -118,8 +118,15 @@ export const updateOrganizationDocumentTheme = mutationField("updateOrganization
           t.nullable.string("textFontFamily");
           t.nullable.string("textColor");
           t.nullable.float("textFontSize");
-          t.nullable.json("legalRichTextEs");
-          t.nullable.json("legalRichTextEn");
+          t.nullable.field("legalText", {
+            type: inputObjectType({
+              name: "OrganizationDocumentThemeInputLegalText",
+              definition(t) {
+                t.nullable.json("es");
+                t.nullable.json("en");
+              },
+            }),
+          });
         },
       }).asArg()
     ),
@@ -138,64 +145,19 @@ export const updateOrganizationDocumentTheme = mutationField("updateOrganization
     inRange((args) => args.data.title1FontSize, "data.title1FontSize", 5, 72),
     inRange((args) => args.data.title2FontSize, "data.title2FontSize", 5, 72),
     inRange((args) => args.data.textFontSize, "data.textFontSize", 5, 72),
-    validRichTextContent((args) => args.data.legalRichTextEs, "data.legalRichTextEs"),
-    validRichTextContent((args) => args.data.legalRichTextEn, "data.legalRichTextEn")
+    validRichTextContent((args) => args.data.legalText?.es, "data.legalText.es"),
+    validRichTextContent((args) => args.data.legalText?.en, "data.legalText.en")
   ),
-  resolve: async (root, args, ctx) => {
+  resolve: async (_, args, ctx) => {
     const organization = await ctx.organizations.loadOrg(ctx.user!.org_id);
-    const theme: Record<string, any> = organization?.pdf_document_theme ?? defaultDocumentTheme;
-    if (isDefined(args.data.marginTop)) {
-      theme["marginTop"] = args.data.marginTop;
-    }
-    if (isDefined(args.data.marginRight)) {
-      theme["marginRight"] = args.data.marginRight;
-    }
-    if (isDefined(args.data.marginBottom)) {
-      theme["marginBottom"] = args.data.marginBottom;
-    }
-    if (isDefined(args.data.marginLeft)) {
-      theme["marginLeft"] = args.data.marginLeft;
-    }
-    if (isDefined(args.data.showLogo)) {
-      theme["showLogo"] = args.data.showLogo;
-    }
-
-    if (isDefined(args.data.title1FontFamily)) {
-      theme["title1FontFamily"] = args.data.title1FontFamily;
-    }
-    if (isDefined(args.data.title1Color)) {
-      theme["title1Color"] = args.data.title1Color;
-    }
-    if (isDefined(args.data.title1FontSize)) {
-      theme["title1FontSize"] = args.data.title1FontSize;
-    }
-
-    if (isDefined(args.data.title2FontFamily)) {
-      theme["title2FontFamily"] = args.data.title2FontFamily;
-    }
-    if (isDefined(args.data.title2Color)) {
-      theme["title2Color"] = args.data.title2Color;
-    }
-    if (isDefined(args.data.title2FontSize)) {
-      theme["title2FontSize"] = args.data.title2FontSize;
-    }
-
-    if (isDefined(args.data.textFontFamily)) {
-      theme["textFontFamily"] = args.data.textFontFamily;
-    }
-    if (isDefined(args.data.textColor)) {
-      theme["textColor"] = args.data.textColor;
-    }
-    if (isDefined(args.data.textFontSize)) {
-      theme["textFontSize"] = args.data.textFontSize;
-    }
-    if (isDefined(args.data.legalRichTextEs)) {
-      theme["legalRichTextEs"] = args.data.legalRichTextEs;
-    }
-    if (isDefined(args.data.legalRichTextEn)) {
-      theme["legalRichTextEn"] = args.data.legalRichTextEn;
-    }
-
+    const theme = deepmerge(organization?.pdf_document_theme ?? defaultDocumentTheme, args.data, {
+      // avoid deepmerge on legalText
+      customMerge: (key) => (from: any, to: any) => {
+        if (key === "legalText") {
+          return Object.assign(from, to);
+        }
+      },
+    });
     return await ctx.organizations.updateOrganization(
       ctx.user!.org_id,
       { pdf_document_theme: theme },

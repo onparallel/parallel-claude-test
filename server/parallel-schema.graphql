@@ -1838,8 +1838,7 @@ type Organization implements Timestamps {
 }
 
 input OrganizationDocumentThemeInput {
-  legalRichTextEn: JSON
-  legalRichTextEs: JSON
+  legalText: OrganizationDocumentThemeInputLegalText
   marginBottom: Float
   marginLeft: Float
   marginRight: Float
@@ -1854,6 +1853,11 @@ input OrganizationDocumentThemeInput {
   title2Color: String
   title2FontFamily: String
   title2FontSize: Float
+}
+
+input OrganizationDocumentThemeInputLegalText {
+  en: JSON
+  es: JSON
 }
 
 type OrganizationPagination {
