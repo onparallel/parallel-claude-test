@@ -27,6 +27,7 @@ import {
   BrandingDocumentPreview_OrganizationFragmentDoc,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { isAdmin } from "@parallel/utils/roles";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { ChangeEvent, useState } from "react";
@@ -68,16 +69,13 @@ export function BrandingDocumentForm({ user }: BrandingDocumentFormProps) {
   async function handleThemeChange(data: Record<string, any>) {
     // immediately write cache fragment with expected result.
     // this allows us to not wait for the server response in order to update the BrandingDocumentPreview
-    const cache = apollo.cache.readFragment({
+    updateFragment(apollo.cache, {
       fragment: BrandingDocumentPreview_OrganizationFragmentDoc,
       id: user.organization.id,
-    });
-    apollo.cache.writeFragment({
-      fragment: BrandingDocumentPreview_OrganizationFragmentDoc,
-      data: {
-        ...cache!,
-        pdfDocumentTheme: mergeDeep(cache!.pdfDocumentTheme, data),
-      },
+      data: (cached) => ({
+        ...cached!,
+        pdfDocumentTheme: mergeDeep(cached!.pdfDocumentTheme, data),
+      }),
     });
     setTheme(mergeDeep(theme, data));
     try {
