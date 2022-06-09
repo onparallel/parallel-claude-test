@@ -6,10 +6,11 @@ import { NormalLink } from "./Link";
 
 interface HelpCenterLink {
   articleId: number;
+  hideIcon?: boolean;
 }
 
 export const HelpCenterLink = chakraForwardRef<"a", HelpCenterLink>(function HelpCenterLink(
-  { articleId, children, onClick, ...props },
+  { articleId, hideIcon, children, onClick, ...props },
   ref
 ) {
   const intl = useIntl();
@@ -28,7 +29,7 @@ export const HelpCenterLink = chakraForwardRef<"a", HelpCenterLink>(function Hel
       }}
     >
       {children}
-      <ExternalLinkIcon verticalAlign="sub" marginLeft={1} />
+      {hideIcon ? null : <ExternalLinkIcon verticalAlign="sub" marginLeft={1} />}
     </NormalLink>
   );
 });

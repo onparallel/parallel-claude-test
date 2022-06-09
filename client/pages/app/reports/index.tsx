@@ -25,6 +25,7 @@ import {
 } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
@@ -192,17 +193,12 @@ export function Reports() {
             </Heading>
           </HStack>
           <Button
+            as={HelpCenterLink}
             variant="ghost"
             fontWeight="normal"
-            color="purple.600"
-            as="a"
-            href={
-              intl.locale === "es"
-                ? "https://help.onparallel.com/es/articles/6272487-que-son-los-informes-y-como-funcionan"
-                : "https://help.onparallel.com/en/articles/6272487-what-are-reports-and-how-they-work"
-            }
-            rel="noopener"
-            target="_blank"
+            colorScheme="purple.600"
+            articleId={6272487}
+            hideIcon
           >
             <FormattedMessage id="generic.help-question" defaultMessage="Help?" />
           </Button>
