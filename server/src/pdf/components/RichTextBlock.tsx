@@ -1,6 +1,7 @@
 import { Link, Text, View } from "@react-pdf/renderer";
 import { Fragment, ReactNode } from "react";
 import { paragraphIsEmpty, renderWhiteSpace, SlateNode } from "../../util/slate";
+import { useTheme } from "../utils/ThemeProvider";
 
 interface RichTextBlockProps {
   children: SlateNode[];
@@ -23,7 +24,11 @@ function renderSlateToReactPdf(node: SlateNode | SlateNode[]): ReactNode {
         );
       }
       case "link": {
-        return <Link src={node.url!}>{renderSlateToReactPdf(node.children)}</Link>;
+        return (
+          <Link style={{ color: "#5650de" }} src={node.url!}>
+            {renderSlateToReactPdf(node.children)}
+          </Link>
+        );
       }
     }
   } else if (typeof node.text === "string") {
