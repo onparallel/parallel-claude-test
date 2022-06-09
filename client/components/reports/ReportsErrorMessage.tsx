@@ -23,7 +23,7 @@ export function ReportsErrorMessage() {
       <Text>
         <FormattedMessage
           id="component.reports-error-message.contact-support"
-          defaultMessage="If the problem persists, please <a>contact support</a> vía chat."
+          defaultMessage="If the problem persists, please <a>contact support</a> via chat."
           values={{
             a: (chunks: any) => (
               <SupportLink

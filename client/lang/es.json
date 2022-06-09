@@ -3377,7 +3377,7 @@
   {
     "term": "component.reports-error-message.contact-support",
     "definition": "Si el problema continúa, <a>contacta con soporte</a> a través del chat.",
-    "context": "If the problem persists, please <a>contact support</a> vía chat."
+    "context": "If the problem persists, please <a>contact support</a> via chat."
   },
   {
     "term": "component.reports-error-message.title",
