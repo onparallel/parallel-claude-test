@@ -5740,6 +5740,16 @@
     "context": "User created successfully."
   },
   {
+    "term": "organization.user-invitation-sent-error.toast-description",
+    "definition": "Se ha enviado una invitación a {email} recientemente, prueba más tarde.",
+    "context": "An invitation has been sent to {email} recently, try again later."
+  },
+  {
+    "term": "organization.user-invitation-sent-error.toast-title",
+    "definition": "Invitación ya enviada",
+    "context": "Invitation already sent"
+  },
+  {
     "term": "organization.user-invitation-sent.toast-title",
     "definition": "Invitación enviada",
     "context": "Invitation sent"

@@ -1,3 +1,4 @@
+import { ApolloError, ForbiddenError } from "apollo-server-core";
 import AWS from "aws-sdk";
 import {
   AuthenticationResultType,
@@ -5,6 +6,7 @@ import {
 } from "aws-sdk/clients/cognitoidentityserviceprovider";
 import { parse as parseCookie } from "cookie";
 import DataLoader from "dataloader";
+import { differenceInMinutes } from "date-fns";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { IncomingMessage } from "http";
 import { inject, injectable } from "inversify";
@@ -24,7 +26,9 @@ import { SystemRepository } from "../db/repositories/SystemRepository";
 import { UserAuthenticationRepository } from "../db/repositories/UserAuthenticationRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
 import { User } from "../db/__types";
+import { RESULT } from "../graphql";
 import { fromDataLoader } from "../util/fromDataLoader";
+import { fullName } from "../util/fullName";
 import { sign, verify } from "../util/jwt";
 import { withError } from "../util/promises/withError";
 import { random } from "../util/token";
@@ -48,6 +52,7 @@ export interface IAuth {
   changePassword(req: IncomingMessage, password: string, newPassword: string): Promise<void>;
   updateSessionLogin(req: Request, userId: number, asUserId: number): Promise<void>;
   restoreSessionLogin(req: Request, userId: number): Promise<void>;
+  resetTempPassword(email: string, locale: string | null | undefined): Promise<"SUCCESS">;
 }
 
 export const AUTH = Symbol.for("AUTH");
@@ -708,5 +713,58 @@ export class Auth implements IAuth {
       throw new Error("Missing session token");
     }
     await this.redis.set(`session:${token}:meta`, JSON.stringify({ userId }), this.EXPIRY);
+  }
+
+  async resetTempPassword(email: string, locale: string | null | undefined) {
+    const [users, cognitoUser] = await Promise.all([
+      this.users.loadUsersByEmail(email),
+      this.aws.getUser(email),
+    ]);
+    const definedUsers = users.filter(isDefined);
+    if (definedUsers.length === 0) {
+      throw new ForbiddenError("Not authorized");
+    }
+
+    // TODO which org to use??
+    const user = definedUsers[0];
+    const [organization, userData] = await Promise.all([
+      user ? await this.orgs.loadOrg(user.org_id) : null,
+      user ? await this.users.loadUserData(user.user_data_id) : null,
+    ]);
+
+    if (
+      cognitoUser.UserLastModifiedDate &&
+      // allow 1 reset every hour
+      differenceInMinutes(new Date(), cognitoUser.UserLastModifiedDate) < 60
+    ) {
+      throw new ApolloError(
+        `An invitation has been sent to this user in the last hour`,
+        "RESET_USER_PASSWORD_TIME_RESTRICTION"
+      );
+    }
+
+    if (cognitoUser.UserStatus !== "FORCE_CHANGE_PASSWORD") {
+      throw new ApolloError(`Wrong user status`, "RESET_USER_PASSWORD_STATUS_ERROR");
+    }
+
+    if (user && organization && userData && !userData.is_sso_user) {
+      const orgOwner = await this.orgs.getOrganizationOwner(organization.id);
+      const orgOwnerData = await this.users.loadUserData(orgOwner.user_data_id);
+      if (!orgOwnerData) {
+        throw new ApolloError(
+          `UserData:${orgOwner.user_data_id} not found for User:${orgOwner.id}`,
+          "USER_DATA_NOT_FOUND"
+        );
+      }
+      await this.aws.resetUserPassword(email, {
+        locale: locale ?? "en",
+        organizationName: organization.name,
+        organizationUser: fullName(orgOwnerData.first_name, orgOwnerData.last_name),
+      });
+    } else {
+      throw new ApolloError(`User has SSO configured`, "RESET_USER_PASSWORD_SSO_ERROR");
+    }
+
+    return RESULT.SUCCESS;
   }
 }

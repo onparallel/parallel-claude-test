@@ -34,6 +34,7 @@ import {
   User,
   UserStatus,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
@@ -272,7 +273,24 @@ function OrganizationUsers() {
         isClosable: true,
       });
     } catch (e: any) {
-      if (e.message !== "CANCEL" && e.message !== "CLOSE") {
+      if (isApolloError(e, "RESET_USER_PASSWORD_TIME_RESTRICTION")) {
+        toast({
+          title: intl.formatMessage({
+            id: "organization.user-invitation-sent-error.toast-title",
+            defaultMessage: "Invitation already sent",
+          }),
+          description: intl.formatMessage(
+            {
+              id: "organization.user-invitation-sent-error.toast-description",
+              defaultMessage: "An invitation has been sent to {email} recently, try again later.",
+            },
+            { email: selectedUsers[0].email }
+          ),
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      } else if (e.message !== "CANCEL" && e.message !== "CLOSE") {
         genericErrorToast();
       }
     }

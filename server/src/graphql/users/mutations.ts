@@ -22,7 +22,6 @@ import {
 } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { resetTempPassword } from "../helpers/resetTempPassword";
 import { uploadArg } from "../helpers/scalars";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { emailDomainIsNotSSO } from "../helpers/validators/emailDomainIsNotSSO";
@@ -605,8 +604,12 @@ export const publicResetTemporaryPassword = mutationField("publicResetTemporaryP
     validLocale((args) => args.locale, "locale")
   ),
   resolve: async (_, { email, locale }, ctx) => {
+    try {
+      await ctx.auth.resetTempPassword(email, locale);
+    } catch {}
+
     // always return SUCCESS to avoid leaking errors and user statuses
-    return await resetTempPassword({ email, locale, ctx });
+    return RESULT.SUCCESS;
   },
 });
 
@@ -624,7 +627,7 @@ export const resetTemporaryPassword = mutationField("resetTemporaryPassword", {
     validLocale((args) => args.locale, "locale")
   ),
   resolve: async (_, { email, locale }, ctx) => {
-    return await resetTempPassword({ email, locale, ctx, throwErrors: true });
+    return await ctx.auth.resetTempPassword(email, locale);
   },
 });
 
