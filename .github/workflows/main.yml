@@ -82,7 +82,7 @@ jobs:
             ${{ runner.os }}-yarn-cache-
 
       - name: Run server test suite
-        timeout-minutes: 10
+        timeout-minutes: 15
         run: yarn --cwd server/ test --silent --coverage
 
 concurrency:
