@@ -794,6 +794,7 @@ export interface MutationclonePetitionFieldArgs {
 }
 
 export interface MutationclonePetitionsArgs {
+  keepTitle?: InputMaybe<Scalars["Boolean"]>;
   petitionIds: Array<Scalars["GID"]>;
 }
 
@@ -20649,6 +20650,7 @@ export type isUsageLimitsReached_OrganizationFragment = {
 
 export type useClonePetitions_clonePetitionsMutationVariables = Exact<{
   petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
+  keepTitle?: InputMaybe<Scalars["Boolean"]>;
 }>;
 
 export type useClonePetitions_clonePetitionsMutation = {
@@ -28474,8 +28476,8 @@ export const GetMyIdDocument = gql`
   }
 ` as unknown as DocumentNode<GetMyIdQuery, GetMyIdQueryVariables>;
 export const useClonePetitions_clonePetitionsDocument = gql`
-  mutation useClonePetitions_clonePetitions($petitionIds: [GID!]!) {
-    clonePetitions(petitionIds: $petitionIds) {
+  mutation useClonePetitions_clonePetitions($petitionIds: [GID!]!, $keepTitle: Boolean) {
+    clonePetitions(petitionIds: $petitionIds, keepTitle: $keepTitle) {
       id
     }
   }

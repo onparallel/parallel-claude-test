@@ -1410,6 +1410,61 @@
     "context": "Shared with me"
   },
   {
+    "term": "component.new-template-dialog.authorization-template",
+    "definition": "Plantilla de autorización",
+    "context": "Authorization template"
+  },
+  {
+    "term": "component.new-template-dialog.authorization-template-description",
+    "definition": "Mandato SEPA, delegación de voto en reunión/junta, etc.",
+    "context": "SEPA mandate, proxy voting at meetings, etc."
+  },
+  {
+    "term": "component.new-template-dialog.contract-template",
+    "definition": "Plantilla de contrato",
+    "context": "Contract Template"
+  },
+  {
+    "term": "component.new-template-dialog.contract-template-description",
+    "definition": "Contratos de servicios, compraventa, NDAs, etc.",
+    "context": "Service contracts, rental and sale contracts, NDAs, etc."
+  },
+  {
+    "term": "component.new-template-dialog.default-template",
+    "definition": "Plantilla desde cero",
+    "context": "Template from scratch"
+  },
+  {
+    "term": "component.new-template-dialog.default-template-description",
+    "definition": "Crea una plantilla tan única como tu proceso.",
+    "context": "Create a template as unique as your process."
+  },
+  {
+    "term": "component.new-template-dialog.information-template",
+    "definition": "Checklist de información",
+    "context": "Information checklist"
+  },
+  {
+    "term": "component.new-template-dialog.information-template-description",
+    "definition": "Alta de clientes (KYC), declaración de impuestos, etc.",
+    "context": "Customer onboarding (KYC), tax declaration, etc."
+  },
+  {
+    "term": "component.new-template-dialog.select-or-create",
+    "definition": "Selecciona la plantilla que más se ajuste a lo que necesites.",
+    "context": "Select the template that best fits your needs."
+  },
+  {
+    "term": "component.new-template-dialog.thumbnail-alt",
+    "definition": "Imagen en miniatura para el ejemplo de plantilla \"{type}\"",
+    "context": "Thumbnail for template example \"{type}\""
+  },
+  {
+    "term": "component.new-template-dialog.title",
+    "definition": "¿Qué vas a crear?",
+    "context": "What do you want to create?"
+  },
+  {
     "term": "component.notification-access-activated-link.body",
     "definition": "{name} creó la petición desde un enlace público.",
     "context": "{name} created the petition from a public link."
@@ -5575,11 +5630,6 @@
     "context": "Guide me around"
   },
   {
-    "term": "new-petition.blank-petition",
-    "definition": "Petición en blanco",
-    "context": "Blank petition"
-  },
-  {
     "term": "new-petition.create",
     "definition": "Crear",
     "context": "Create"
@@ -5588,11 +5638,6 @@
     "term": "new-petition.my-templates",
     "definition": "Mis plantillas",
     "context": "My templates"
-  },
-  {
-    "term": "new-petition.new-template",
-    "definition": "Nueva plantilla",
-    "context": "New template"
   },
   {
     "term": "new-petition.no-templates",

@@ -30,8 +30,8 @@ export function useClonePetitions() {
 
 useClonePetitions.mutations = [
   gql`
-    mutation useClonePetitions_clonePetitions($petitionIds: [GID!]!) {
-      clonePetitions(petitionIds: $petitionIds) {
+    mutation useClonePetitions_clonePetitions($petitionIds: [GID!]!, $keepTitle: Boolean) {
+      clonePetitions(petitionIds: $petitionIds, keepTitle: $keepTitle) {
         id
       }
     }

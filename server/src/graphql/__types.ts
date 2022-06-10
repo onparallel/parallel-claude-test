@@ -3787,6 +3787,7 @@ export interface NexusGenArgTypes {
     };
     clonePetitions: {
       // args
+      keepTitle?: boolean | null; // Boolean
       petitionIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     cloneUserGroup: {

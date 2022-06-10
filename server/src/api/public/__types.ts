@@ -761,6 +761,7 @@ export type MutationclonePetitionFieldArgs = {
 };
 
 export type MutationclonePetitionsArgs = {
+  keepTitle?: InputMaybe<Scalars["Boolean"]>;
   petitionIds: Array<Scalars["GID"]>;
 };
 

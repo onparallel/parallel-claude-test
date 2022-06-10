@@ -4,11 +4,6 @@ import {
   Container,
   Flex,
   Grid,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Portal,
   Stack,
   Tab,
   TabList,
@@ -17,12 +12,13 @@ import {
   Tabs,
   Text,
 } from "@chakra-ui/react";
-import { AddIcon, ChevronDownIcon, FileNewIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
+import { AddIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { TemplateDetailsModal } from "@parallel/components/petition-common/dialogs/TemplateDetailsModal";
+import { useNewTemplateDialog } from "@parallel/components/petition-new/dialogs/NewTemplateDialog";
 import { GridInfiniteScrollList } from "@parallel/components/petition-new/GridInfiniteScrollList";
 import { NewPetitionCategoryFilter } from "@parallel/components/petition-new/NewPetitionCategoryFilter";
 import { NewPetitionCategoryMenuFilter } from "@parallel/components/petition-new/NewPetitionCategoryMenuFilter";
@@ -39,7 +35,6 @@ import {
   NewPetition_templateDocument,
   NewPetition_templatesDocument,
   NewPetition_userDocument,
-  PetitionBaseType,
   PetitionLocale,
 } from "@parallel/graphql/__types";
 import {
@@ -48,6 +43,7 @@ import {
 } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
+import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { boolean, parseQuery, string, useQueryState, values } from "@parallel/utils/queryState";
 import { Maybe } from "@parallel/utils/types";
@@ -165,21 +161,35 @@ function NewPetition() {
     [setQueryState]
   );
 
-  const handleCreatePetitionTemplate = useCallback(
-    async (type: PetitionBaseType) => {
-      try {
-        const id = await createPetition({ type });
-        goToPetition(id, "compose", { query: { new: "true" } });
-      } catch {}
-    },
-    [goToPetition, createPetition]
-  );
+  const handleCreateTemplate = useCallback(async () => {
+    try {
+      const id = await createPetition({ type: "TEMPLATE" });
+      goToPetition(id, "compose", { query: { new: "true" } });
+    } catch {}
+  }, [goToPetition, createPetition]);
 
   useEffect(() => {
     if (!hasTemplates && !state.public) {
       handleTabChange(1);
     }
   }, []);
+
+  const clonePetitions = useClonePetitions();
+  const showNewTemplateDialog = useNewTemplateDialog();
+  const handleCreateTemplateClick = async () => {
+    try {
+      const templateId = await showNewTemplateDialog({});
+      if (!templateId) {
+        handleCreateTemplate();
+      } else {
+        const petitionIds = await clonePetitions({
+          petitionIds: [templateId],
+          keepTitle: true,
+        });
+        goToPetition(petitionIds[0], "compose", { query: { new: "true" } });
+      }
+    } catch {}
+  };
 
   const selectTabStyles = {
     color: "blue.600",
@@ -242,52 +252,27 @@ function NewPetition() {
                 />
               </Tab>
             </TabList>
-            <Menu placement="bottom-end">
-              <MenuButton
-                as={Button}
-                data-action="create-template"
-                aria-label={intl.formatMessage({
-                  id: "new-petition.create",
-                  defaultMessage: "Create",
-                })}
-                padding={{ base: 0, md: 4 }}
-                alignSelf="flex-end"
-                colorScheme="purple"
-                isDisabled={me.role === "COLLABORATOR"}
-              >
-                <Flex alignItems="center" justifyContent="center">
-                  <AddIcon fontSize={{ base: "16px", md: "12px" }} />
-                  <Flex alignItems="center" marginLeft={2} display={{ base: "none", md: "flex" }}>
-                    <Text as="span">
-                      <FormattedMessage id="new-petition.create" defaultMessage="Create" />
-                    </Text>
-                    <ChevronDownIcon marginLeft={2} />
-                  </Flex>
+            <Button
+              data-action="create-template"
+              aria-label={intl.formatMessage({
+                id: "new-petition.create",
+                defaultMessage: "Create",
+              })}
+              padding={{ base: 0, md: 4 }}
+              alignSelf="flex-end"
+              colorScheme="purple"
+              isDisabled={me.role === "COLLABORATOR"}
+              onClick={handleCreateTemplateClick}
+            >
+              <Flex alignItems="center" justifyContent="center">
+                <AddIcon fontSize={{ base: "16px", md: "12px" }} />
+                <Flex alignItems="center" marginLeft={2} display={{ base: "none", md: "flex" }}>
+                  <Text as="span">
+                    <FormattedMessage id="new-petition.create" defaultMessage="Create" />
+                  </Text>
                 </Flex>
-              </MenuButton>
-              <Portal>
-                <MenuList width="min-content" minWidth="154px" whiteSpace="nowrap">
-                  <MenuItem
-                    onClick={() => handleCreatePetitionTemplate("TEMPLATE")}
-                    icon={<FileNewIcon display="block" boxSize={4} />}
-                  >
-                    <FormattedMessage
-                      id="new-petition.new-template"
-                      defaultMessage="New template"
-                    />
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => handleCreatePetitionTemplate("PETITION")}
-                    icon={<PaperPlaneIcon display="block" boxSize={4} />}
-                  >
-                    <FormattedMessage
-                      id="new-petition.blank-petition"
-                      defaultMessage="Blank petition"
-                    />
-                  </MenuItem>
-                </MenuList>
-              </Portal>
-            </Menu>
+              </Flex>
+            </Button>
           </Stack>
           <TabPanels flex="1" display="flex" flexDirection="column">
             <TabPanel padding={0} flex="1" display="flex" flexDirection="column">
@@ -353,14 +338,14 @@ function NewPetition() {
                 <NewPetitionEmptySearch
                   flex="1"
                   marginBottom={16}
-                  onClickNewTemplate={() => handleCreatePetitionTemplate("TEMPLATE")}
+                  onClickNewTemplate={() => handleCreateTemplate()}
                   onClickPublicTemplates={() => handleTabChange(1)}
                 />
               ) : (
                 <NewPetitionEmptyTemplates
                   flex="1"
                   marginBottom={16}
-                  onClickNewTemplate={() => handleCreatePetitionTemplate("TEMPLATE")}
+                  onClickNewTemplate={() => handleCreateTemplate()}
                   onClickPublicTemplates={() => handleTabChange(1)}
                 />
               )}
@@ -429,7 +414,7 @@ function NewPetition() {
                 <NewPetitionEmptySearch
                   flex="1"
                   marginBottom={16}
-                  onClickNewTemplate={() => handleCreatePetitionTemplate("TEMPLATE")}
+                  onClickNewTemplate={() => handleCreateTemplate()}
                 />
               )}
             </TabPanel>

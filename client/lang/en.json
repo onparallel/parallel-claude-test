@@ -1410,6 +1410,61 @@
     "context": "Shared with me"
   },
   {
+    "term": "component.new-template-dialog.authorization-template",
+    "definition": "Authorization template",
+    "context": "Authorization template"
+  },
+  {
+    "term": "component.new-template-dialog.authorization-template-description",
+    "definition": "SEPA mandate, proxy voting at meetings, etc.",
+    "context": "SEPA mandate, proxy voting at meetings, etc."
+  },
+  {
+    "term": "component.new-template-dialog.contract-template",
+    "definition": "Contract Template",
+    "context": "Contract Template"
+  },
+  {
+    "term": "component.new-template-dialog.contract-template-description",
+    "definition": "Service contracts, rental and sale contracts, NDAs, etc.",
+    "context": "Service contracts, rental and sale contracts, NDAs, etc."
+  },
+  {
+    "term": "component.new-template-dialog.default-template",
+    "definition": "Template from scratch",
+    "context": "Template from scratch"
+  },
+  {
+    "term": "component.new-template-dialog.default-template-description",
+    "definition": "Create a template as unique as your process.",
+    "context": "Create a template as unique as your process."
+  },
+  {
+    "term": "component.new-template-dialog.information-template",
+    "definition": "Information checklist",
+    "context": "Information checklist"
+  },
+  {
+    "term": "component.new-template-dialog.information-template-description",
+    "definition": "Customer onboarding (KYC), tax declaration, etc.",
+    "context": "Customer onboarding (KYC), tax declaration, etc."
+  },
+  {
+    "term": "component.new-template-dialog.select-or-create",
+    "definition": "Select the template that best fits your needs.",
+    "context": "Select the template that best fits your needs."
+  },
+  {
+    "term": "component.new-template-dialog.thumbnail-alt",
+    "definition": "Thumbnail for template example \"{type}\"",
+    "context": "Thumbnail for template example \"{type}\""
+  },
+  {
+    "term": "component.new-template-dialog.title",
+    "definition": "What do you want to create?",
+    "context": "What do you want to create?"
+  },
+  {
     "term": "component.notification-access-activated-link.body",
     "definition": "{name} created the petition from a public link.",
     "context": "{name} created the petition from a public link."
@@ -5575,11 +5630,6 @@
     "context": "Guide me around"
   },
   {
-    "term": "new-petition.blank-petition",
-    "definition": "Blank petition",
-    "context": "Blank petition"
-  },
-  {
     "term": "new-petition.create",
     "definition": "Create",
     "context": "Create"
@@ -5588,11 +5638,6 @@
     "term": "new-petition.my-templates",
     "definition": "My templates",
     "context": "My templates"
-  },
-  {
-    "term": "new-petition.new-template",
-    "definition": "New template",
-    "context": "New template"
   },
   {
     "term": "new-petition.no-templates",

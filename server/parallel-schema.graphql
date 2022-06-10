@@ -572,7 +572,7 @@ type Mutation {
   """
   Clone petition.
   """
-  clonePetitions(petitionIds: [GID!]!): [PetitionBase!]!
+  clonePetitions(keepTitle: Boolean = false, petitionIds: [GID!]!): [PetitionBase!]!
 
   """
   Clones the user group with all its members

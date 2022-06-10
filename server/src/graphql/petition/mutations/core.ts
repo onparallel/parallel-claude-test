@@ -230,6 +230,7 @@ export const clonePetitions = mutationField("clonePetitions", {
   ),
   args: {
     petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
+    keepTitle: booleanArg({ default: false }),
   },
   validateArgs: notEmptyArray((args) => args.petitionIds, "petitionIds"),
   resolve: async (_, args, ctx) => {
@@ -244,7 +245,11 @@ export const clonePetitions = mutationField("clonePetitions", {
         })})`;
 
         const cloned = await ctx.petitions.clonePetition(petitionId, ctx.user!, {
-          name: `${name ? `${name} ` : ""}${mark}`.slice(0, 255),
+          name: args.keepTitle
+            ? name
+              ? name.slice(0, 255)
+              : ""
+            : `${name ? `${name} ` : ""}${mark}`.slice(0, 255),
         });
 
         await ctx.petitions.createEvent({
