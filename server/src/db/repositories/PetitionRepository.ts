@@ -1151,25 +1151,19 @@ export class PetitionRepository extends BaseRepository {
         /* sql */ `
       update petition_field as pf set
         position = t.position,
-        deleted_at = NOW() -- temporarily delete to avoid unique index constraint
+        updated_at = NOW(),
+        updated_by = ?
       from (?) as t (id, position)
       where t.id = pf.id;
     `,
         [
+          `User:${user.id}`,
           this.sqlValues(
             fieldIds.map((id, i) => [id, i]),
             ["int", "int"]
           ),
         ]
       );
-
-      await this.from("petition_field", t)
-        .whereIn("id", fieldIds)
-        .update({
-          deleted_at: null,
-          updated_at: this.now(),
-          updated_by: `User:${user.id}`,
-        });
 
       const [petition] = await this.from("petition", t)
         .where("id", petitionId)
@@ -1203,7 +1197,7 @@ export class PetitionRepository extends BaseRepository {
         "from_petition_field_id",
         "alias",
       ]),
-      field.position + 1,
+      field.position! + 1,
       user
     );
   }
@@ -1227,18 +1221,19 @@ export class PetitionRepository extends BaseRepository {
       } else {
         position = position === -1 ? max + 1 : Math.min(max + 1, position);
       }
-      const fields = await this.from("petition_field", t)
+
+      await this.from("petition_field", t)
         .where("petition_id", petitionId)
         .whereNull("deleted_at")
         .where("position", ">=", position)
         .update(
           {
-            deleted_at: this.now(), // temporarily delete to avoid unique index constraint
             position: this.knex.raw(`position + 1`),
+            updated_at: this.now(),
+            updated_by: `User:${user.id}`,
           },
           "id"
         );
-      const fieldIds = fields.map((f) => f.id);
 
       const [[field]] = await Promise.all([
         this.insert(
@@ -1270,10 +1265,6 @@ export class PetitionRepository extends BaseRepository {
           ),
       ]);
 
-      if (fields.length > 0) {
-        await this.from("petition_field", t).whereIn("id", fieldIds).update({ deleted_at: null });
-      }
-
       return field;
     }, t);
   }
@@ -1293,23 +1284,24 @@ export class PetitionRepository extends BaseRepository {
   async deletePetitionField(petitionId: number, fieldId: number, user: User) {
     return await this.withTransaction(async (t) => {
       const [field] = await this.from("petition_field", t)
-        .update(
-          {
-            deleted_at: this.now(),
-            deleted_by: `User:${user.id}`,
-          },
-          ["id", "position"]
-        )
+        .where({ id: fieldId, deleted_at: null, petition_id: petitionId, is_fixed: false })
+        .select("*");
+      if (!field) {
+        throw new Error("Invalid petition field id");
+      }
+
+      await this.from("petition_field", t)
+        .update({
+          position: null,
+          deleted_at: this.now(),
+          deleted_by: `User:${user.id}`,
+        })
         .where({
           petition_id: petitionId,
           id: fieldId,
           deleted_at: null,
           is_fixed: false,
         });
-
-      if (!field) {
-        throw new Error("Invalid petition field id");
-      }
 
       await Promise.all([
         this.from("petition_field_reply", t)
@@ -1344,7 +1336,7 @@ export class PetitionRepository extends BaseRepository {
             petition_id: petitionId,
             deleted_at: null,
           })
-          .where("position", ">", field.position),
+          .where("position", ">", field.position!),
         // safe-delete attachments on this field (same attachment can be linked to another field)
         this.deletePetitionFieldAttachmentByFieldId(fieldId, user, t),
         // delete user notifications related to this petition field
@@ -1886,7 +1878,7 @@ export class PetitionRepository extends BaseRepository {
       const newIds = Object.fromEntries(
         zip(
           fields.map((f) => f.id),
-          sortBy(clonedFields, (f) => f.position).map((f) => f.id)
+          sortBy(clonedFields, (f) => f.position!).map((f) => f.id)
         )
       );
 

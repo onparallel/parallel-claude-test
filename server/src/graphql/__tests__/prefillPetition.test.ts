@@ -48,7 +48,7 @@ describe("prefillPetition", () => {
     await mocks.knex
       .from("petition_field")
       .where("petition_id", petition.id)
-      .update({ deleted_at: new Date() });
+      .update({ deleted_at: new Date(), position: null });
     fields = await mocks.createRandomPetitionFields(
       petition.id,
       PetitionFieldTypeValues.length,

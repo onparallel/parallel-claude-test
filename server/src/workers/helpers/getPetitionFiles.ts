@@ -78,7 +78,7 @@ export async function* getPetitionFiles(
           const name = rename(options.pattern ?? "#file-name#", placeholders, (placeholder) => {
             switch (placeholder) {
               case "field-number":
-                return `${field.position + 1 - headingCount}`;
+                return `${field.position! + 1 - headingCount}`;
               case "field-title":
                 return field.title ?? "";
               case "file-name":

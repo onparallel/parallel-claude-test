@@ -152,8 +152,7 @@ describe("repositories/PetitionRepository", () => {
       [petition1, petition2] = await mocks.createRandomPetitions(organization.id, user.id, 2);
       fields = await mocks.createRandomPetitionFields(petition1.id, 6);
       // add some random deleted fields
-      deleted = await mocks.createRandomPetitionFields(petition1.id, 10, (index) => ({
-        position: faker.datatype.number(10),
+      deleted = await mocks.createRandomPetitionFields(petition1.id, 10, () => ({
         deleted_at: new Date(),
       }));
       [foreignField] = await mocks.createRandomPetitionFields(petition2.id, 1);
@@ -197,7 +196,7 @@ describe("repositories/PetitionRepository", () => {
       const result1 = await petitions.loadFieldsForPetition(petition1.id, {
         refresh: true,
       });
-      expect(sortBy(result1, (f) => f.position)).toMatchObject(
+      expect(sortBy(result1, (f) => f.position!)).toMatchObject(
         [id2, id5, id6, id3, id1, id4].map((id, index) => ({
           id,
           position: index,
@@ -208,7 +207,7 @@ describe("repositories/PetitionRepository", () => {
       const result2 = await petitions.loadFieldsForPetition(petition1.id, {
         refresh: true,
       });
-      expect(sortBy(result2, (f) => f.position)).toMatchObject(
+      expect(sortBy(result2, (f) => f.position!)).toMatchObject(
         [id6, id5, id4, id3, id2, id1].map((id, index) => ({
           id,
           position: index,
@@ -226,8 +225,7 @@ describe("repositories/PetitionRepository", () => {
       [petition1, petition2] = await mocks.createRandomPetitions(organization.id, user.id, 2);
       fields = await mocks.createRandomPetitionFields(petition1.id, 6);
       // add some random deleted fields
-      deleted = await mocks.createRandomPetitionFields(petition1.id, 10, (index) => ({
-        position: faker.datatype.number(10),
+      deleted = await mocks.createRandomPetitionFields(petition1.id, 10, () => ({
         deleted_at: new Date(),
       }));
       [foreignField] = await mocks.createRandomPetitionFields(petition2.id, 1);

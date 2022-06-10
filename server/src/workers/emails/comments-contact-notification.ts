@@ -39,7 +39,7 @@ export async function commentsContactNotification(
   const _fields = (await context.petitions.loadField(fieldIds)).filter(isDefined);
   const commentsByField = groupBy(comments, (c) => c.petition_field_id);
   const fields = await pMap(
-    sortBy(_fields, (f) => f.position),
+    sortBy(_fields, (f) => f.position!),
     (f) => buildFieldWithComments(f, commentsByField, context)
   );
   const organization = await context.organizations.loadOrg(petition.org_id);
