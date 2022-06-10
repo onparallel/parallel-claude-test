@@ -38,7 +38,7 @@ import { TimelineRecipientSignedEvent } from "./timeline/TimelineRecipientSigned
 import { TimelinePetitionMessageBouncedEvent } from "./timeline/TimelinePetitionMessageBouncedEvent";
 import { TimelinePetitionReminderBouncedEvent } from "./timeline/TimelinePetitionReminderBouncedEvent";
 import { TimelineSignatureOpenedEvent } from "./timeline/TimelineSignatureOpenedEvent";
-import { TimelinePetitionAnonymizedEvent } from "./timeline/TimelinePetitionanonymizedEvent";
+import { TimelinePetitionAnonymizedEvent } from "./timeline/TimelinePetitionAnonymizedEvent";
 
 export type PetitionActivityTimelineProps = {
   userId: string;
