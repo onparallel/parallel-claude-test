@@ -1,3 +1,5 @@
+import { waitFor } from "./waitFor";
+
 /**
  * Execute the provided async function making sure it takes at least the
  * specified amount of time
@@ -8,7 +10,7 @@ export async function stallFor<T>(func: () => Promise<T>, millis: number): Promi
     func().catch((e) => {
       error = e;
     }),
-    new Promise<void>((resolve) => setTimeout(resolve, millis)),
+    waitFor(millis),
   ]);
   if (error) {
     throw error;

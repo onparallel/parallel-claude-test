@@ -9,6 +9,7 @@ import {
   useBackgroundTask_TaskFragment,
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
+import { waitFor } from "./promises/waitFor";
 
 const TASK_DOCUMENTS = {
   PRINT_PDF: useBackgroundTask_createPrintPdfTaskDocument,
@@ -65,7 +66,7 @@ export function useBackgroundTask<Task extends keyof typeof TASK_DOCUMENTS>(
             throw new Error("FAILED");
           }
 
-          await new Promise((resolve) => setTimeout(resolve, pollingInterval));
+          await waitFor(pollingInterval);
         }
       })();
 

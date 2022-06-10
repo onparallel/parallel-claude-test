@@ -6,6 +6,7 @@ import { performance } from "perf_hooks";
 import { isDefined, omit, pipe } from "remeda";
 import { promisify } from "util";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
+import { waitFor } from "../../util/promises/waitFor";
 import { Maybe } from "../../util/types";
 import { File, RestParameter } from "../rest/core";
 import { InternalError } from "../rest/errors";
@@ -251,7 +252,7 @@ export async function waitForTask(client: GraphQLClient, task: TaskType) {
     switch (result.task.status) {
       case "ENQUEUED":
       case "PROCESSING":
-        await new Promise((resolve) => setTimeout(resolve, interval));
+        await waitFor(interval);
         break;
       case "FAILED":
         throw new InternalError("Failed generating file");
