@@ -227,7 +227,7 @@ export const PetitionBase = interfaceType({
     t.boolean("isAnonymized", { resolve: (o) => o.anonymized_at !== null });
     t.nullable.int("anonymizeAfterMonths", {
       description: "How many months to wait since the petition is closed to anonymize.",
-      resolve: (o) => (isDefined(o.anonymize_after_days) ? o.anonymize_after_days / 30 : null),
+      resolve: (o) => o.anonymize_after_months,
     });
     t.nullable.string("anonymizePurpose", {
       description: "Purpose of the anonymization",

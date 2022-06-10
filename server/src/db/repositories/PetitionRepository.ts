@@ -4315,12 +4315,12 @@ export class PetitionRepository extends BaseRepository {
       and p.status = 'CLOSED' 
       and p.closed_at is not null
       and ((
-          p.anonymize_after_days is not null
-          and p.closed_at < NOW() - make_interval(days => p.anonymize_after_days)
+          p.anonymize_after_months is not null
+          and p.closed_at < NOW() - make_interval(months => p.anonymize_after_months)
         ) or (
-          p.anonymize_after_days is null 
-          and o.anonymize_petitions_after_days is not null 
-          and p.closed_at < NOW() - make_interval(days => o.anonymize_petitions_after_days)
+          p.anonymize_after_months is null 
+          and o.anonymize_petitions_after_months is not null 
+          and p.closed_at < NOW() - make_interval(months => o.anonymize_petitions_after_months)
         ))
     `,
       [orgId]

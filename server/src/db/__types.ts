@@ -656,7 +656,7 @@ export interface Organization {
   icon_public_file_id: Maybe<number>; // int4
   appsumo_license: Maybe<any>; // jsonb
   pdf_document_theme: Maybe<any>; // jsonb
-  anonymize_petitions_after_days: Maybe<number>; // int4
+  anonymize_petitions_after_months: Maybe<number>; // int4
 }
 
 export type CreateOrganization = PartialProps<
@@ -675,7 +675,7 @@ export type CreateOrganization = PartialProps<
   | "icon_public_file_id"
   | "appsumo_license"
   | "pdf_document_theme"
-  | "anonymize_petitions_after_days"
+  | "anonymize_petitions_after_months"
 >;
 
 export interface OrganizationUsageLimit {
@@ -763,7 +763,7 @@ export interface Petition {
   anonymized_at: Maybe<Date>; // timestamptz
   metadata: any; // jsonb
   closed_at: Maybe<Date>; // timestamptz
-  anonymize_after_days: Maybe<number>; // int4
+  anonymize_after_months: Maybe<number>; // int4
   anonymize_purpose: Maybe<string>; // text
 }
 
@@ -804,7 +804,7 @@ export type CreatePetition = PartialProps<
   | "anonymized_at"
   | "metadata"
   | "closed_at"
-  | "anonymize_after_days"
+  | "anonymize_after_months"
   | "anonymize_purpose"
 >;
 

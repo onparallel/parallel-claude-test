@@ -755,7 +755,7 @@ export const updatePetition = mutationField("updatePetition", {
     }
 
     if (anonymizeAfterMonths !== undefined) {
-      data.anonymize_after_days = anonymizeAfterMonths === null ? null : anonymizeAfterMonths * 30;
+      data.anonymize_after_months = anonymizeAfterMonths;
     }
     if (anonymizePurpose !== undefined) {
       data.anonymize_purpose = anonymizePurpose;

@@ -250,8 +250,7 @@ export const Organization = objectType({
       },
     });
     t.nullable.int("anonymizePetitionsAfterMonths", {
-      resolve: (o) =>
-        isDefined(o.anonymize_petitions_after_days) ? o.anonymize_petitions_after_days / 30 : null,
+      resolve: (o) => o.anonymize_petitions_after_months,
     });
   },
 });
