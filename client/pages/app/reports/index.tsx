@@ -41,14 +41,12 @@ import {
   useAssertQueryOrPreviousData,
 } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
+import { stallFor } from "@parallel/utils/promises/stallFor";
 import { useBackgroundTask } from "@parallel/utils/useBackgroundTask";
 import { useTemplateRepliesReportTask } from "@parallel/utils/useTemplateRepliesReportTask";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
-
-const MAX_FORCED_LOADING_TIME = 3000;
-const MIN_FORCED_LOADING_TIME = 2000;
 
 type ReportType = {
   pending: number;
@@ -69,10 +67,17 @@ export function Reports() {
     data: { me, realMe },
   } = useAssertQuery(Reports_userDocument);
 
-  const [state, setState] = useState<"IDLE" | "LOADING" | "FAKE_LOADING" | "ERROR">("IDLE");
-  const [templateId, setTemplateId] = useState<string | null>(null);
-  const [report, setReport] = useState<ReportType | null>(null);
-  const prevTemplateId = useRef<string | null>(null);
+  const [{ status, templateId, prevTemplateId, report }, setState] = useState<{
+    status: "IDLE" | "LOADING" | "ERROR";
+    templateId: string | null;
+    prevTemplateId: string | null;
+    report: ReportType | null;
+  }>({
+    status: "IDLE",
+    templateId: null,
+    prevTemplateId: null,
+    report: null,
+  });
   const taskAbortController = useRef<AbortController | null>(null);
 
   const {
@@ -87,44 +92,31 @@ export function Reports() {
     },
   });
 
-  useEffect(() => {
-    if (state !== "FAKE_LOADING" && isDefined(report)) {
-      setState("IDLE");
-    }
-
-    if (state === "FAKE_LOADING") {
-      const timer = setTimeout(() => {
-        if (isDefined(report)) {
-          setState("IDLE");
-        } else {
-          setState("LOADING");
-        }
-      }, Math.floor(Math.random() * (MAX_FORCED_LOADING_TIME - MIN_FORCED_LOADING_TIME + 1) + MIN_FORCED_LOADING_TIME));
-
-      return () => {
-        clearTimeout(timer);
-      };
-    }
-  }, [state, report]);
-
   const templateStatsTask = useBackgroundTask("TEMPLATE_STATS_REPORT");
 
   const handleGenerateReportClick = async () => {
     try {
-      setReport(null);
-      setState("FAKE_LOADING");
-      prevTemplateId.current = templateId;
+      setState((state) => ({ ...state, status: "LOADING", prevTemplateId: state.templateId }));
       taskAbortController.current?.abort();
       if (isDefined(templateId)) {
         taskAbortController.current = new AbortController();
-        const { task } = await templateStatsTask(
-          { templateId: templateId },
-          { signal: taskAbortController.current.signal }
+        // add a fake delay
+        const { task } = await stallFor(
+          () =>
+            templateStatsTask(
+              { templateId: templateId },
+              { signal: taskAbortController.current!.signal }
+            ),
+          2_000 + 1_000 * Math.random()
         );
-        setReport(task.output as ReportType);
+        setState((state) => ({ ...state, report: task.output as any, status: "IDLE" }));
       }
-    } catch (e) {
-      setState("ERROR");
+    } catch (e: any) {
+      if (e.message === "ABORTED") {
+        // nothing
+      } else {
+        setState((state) => ({ ...state, status: "ERROR" }));
+      }
     }
   };
 
@@ -229,9 +221,7 @@ export function Reports() {
                   })}
                   isSearchable={true}
                   value={templateId}
-                  onChange={(select) => {
-                    setTemplateId(select);
-                  }}
+                  onChange={(templateId) => setState((state) => ({ ...state, templateId }))}
                 />
               </Box>
             </HStack>
@@ -246,11 +236,11 @@ export function Reports() {
               />
             </Button>
           </Stack>
-          {isDefined(report) && state === "IDLE" ? (
+          {isDefined(report) && status === "IDLE" ? (
             <Button
               leftIcon={<TableIcon />}
               colorScheme="purple"
-              onClick={() => handleTemplateRepliesReportTask(prevTemplateId.current!)}
+              onClick={() => handleTemplateRepliesReportTask(prevTemplateId!)}
             >
               <FormattedMessage
                 id="page.reports.download-results"
@@ -259,7 +249,7 @@ export function Reports() {
             </Button>
           ) : null}
         </Stack>
-        {isDefined(report) && state === "IDLE" ? (
+        {isDefined(report) && status === "IDLE" ? (
           <Grid
             gridTemplateColumns={{
               base: "repeat(1,1fr)",
@@ -532,9 +522,9 @@ export function Reports() {
           </Grid>
         ) : (
           <Stack minHeight="340px" alignItems="center" justifyContent="center" textAlign="center">
-            {state === "LOADING" || state === "FAKE_LOADING" ? (
+            {status === "LOADING" ? (
               <ReportsLoadingMessage />
-            ) : state === "ERROR" ? (
+            ) : status === "ERROR" ? (
               <ReportsErrorMessage />
             ) : (
               <ReportsReadyMessage />
