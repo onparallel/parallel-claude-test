@@ -1147,14 +1147,14 @@ export class PetitionRepository extends BaseRepository {
         }
       }
 
-      await t.raw(
+      await this.raw(
         /* sql */ `
       update petition_field as pf set
         position = t.position,
         updated_at = NOW(),
         updated_by = ?
       from (?) as t (id, position)
-      where t.id = pf.id;
+      where t.id = pf.id and pf.position != t.position;
     `,
         [
           `User:${user.id}`,
@@ -1162,7 +1162,8 @@ export class PetitionRepository extends BaseRepository {
             fieldIds.map((id, i) => [id, i]),
             ["int", "int"]
           ),
-        ]
+        ],
+        t
       );
 
       const [petition] = await this.from("petition", t)
@@ -1283,25 +1284,27 @@ export class PetitionRepository extends BaseRepository {
 
   async deletePetitionField(petitionId: number, fieldId: number, user: User) {
     return await this.withTransaction(async (t) => {
-      const [field] = await this.from("petition_field", t)
-        .where({ id: fieldId, deleted_at: null, petition_id: petitionId, is_fixed: false })
-        .select("*");
+      const [field] = await this.raw<PetitionField & { old_position: number }>(
+        /* sql */ `
+        update petition_field f
+          set position = null,
+          deleted_at = NOW(),
+          deleted_by = ?
+        from petition_field f2 
+          where f.id = f2.id 
+          and f.petition_id = ?
+          and f.deleted_at is null
+          and f.is_fixed = false
+          and f.id = ?
+        returning f.*, f2.position as old_position;
+      `,
+        [`User:${user.id}`, petitionId, fieldId],
+        t
+      );
+
       if (!field) {
         throw new Error("Invalid petition field id");
       }
-
-      await this.from("petition_field", t)
-        .update({
-          position: null,
-          deleted_at: this.now(),
-          deleted_by: `User:${user.id}`,
-        })
-        .where({
-          petition_id: petitionId,
-          id: fieldId,
-          deleted_at: null,
-          is_fixed: false,
-        });
 
       await Promise.all([
         this.from("petition_field_reply", t)
@@ -1336,7 +1339,7 @@ export class PetitionRepository extends BaseRepository {
             petition_id: petitionId,
             deleted_at: null,
           })
-          .where("position", ">", field.position!),
+          .where("position", ">", field.old_position),
         // safe-delete attachments on this field (same attachment can be linked to another field)
         this.deletePetitionFieldAttachmentByFieldId(fieldId, user, t),
         // delete user notifications related to this petition field
