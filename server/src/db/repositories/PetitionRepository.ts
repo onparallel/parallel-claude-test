@@ -1476,7 +1476,16 @@ export class PetitionRepository extends BaseRepository {
     });
 
     if (!field.is_internal) {
-      await this.reopenPetition(field.petition_id, `${createdBy}:${creator.id}`);
+      await this.updatePetition(
+        field.petition_id,
+        {
+          status: "PENDING",
+          closed_at: null,
+        },
+        `${createdBy}:${creator.id}`
+      );
+      // clear cache to make sure petition status is updated in next graphql calls
+      this.loadPetition.dataloader.clear(field.petition_id);
     }
 
     await this.createEvent({
@@ -1518,7 +1527,16 @@ export class PetitionRepository extends BaseRepository {
       );
 
     if (!field.is_internal) {
-      await this.reopenPetition(field.petition_id, updatedBy);
+      await this.updatePetition(
+        field.petition_id,
+        {
+          status: "PENDING",
+          closed_at: null,
+        },
+        updatedBy
+      );
+      // clear cache to make sure petition status is updated in next graphql calls
+      this.loadPetition.dataloader.clear(field.petition_id);
     }
 
     await this.createOrUpdateReplyEvent(
@@ -1566,7 +1584,16 @@ export class PetitionRepository extends BaseRepository {
     }
 
     if (!field.is_internal) {
-      await this.reopenPetition(field.petition_id, deletedBy);
+      await this.updatePetition(
+        field.petition_id,
+        {
+          status: "PENDING",
+          closed_at: null,
+        },
+        deletedBy
+      );
+      // clear cache to make sure petition status is updated in next graphql calls
+      this.loadPetition.dataloader.clear(field.petition_id);
     }
 
     await Promise.all([
@@ -1591,17 +1618,15 @@ export class PetitionRepository extends BaseRepository {
   }
 
   public async reopenPetition(petitionId: number, updatedBy: string, t?: Knex.Transaction) {
-    await this.raw(
-      /* sql */ `
-      update petition set "status" = 'PENDING'::petition_status,
-        updated_at = NOW(),
-        updated_by = ?,
-        closed_at = null
-      where id = ? and status in ('COMPLETED', 'CLOSED')
-    `,
-      [updatedBy, petitionId],
-      t
-    );
+    await this.from("petition", t)
+      .where({ id: petitionId, deleted_at: null })
+      .whereIn("status", ["COMPLETED", "CLOSED"])
+      .update({
+        status: "PENDING",
+        closed_at: null,
+        updated_at: this.now(),
+        updated_by: updatedBy,
+      });
 
     // clear cache to make sure petition status is updated in next graphql calls
     this.loadPetition.dataloader.clear(petitionId);
@@ -4531,25 +4556,32 @@ export class PetitionRepository extends BaseRepository {
   async getPetitionStatsByFromTemplateId(fromTemplateId: number, orgId: number) {
     const petitionStatus = await this.raw<{ id: number; status: PetitionStatus }>(
       /* sql */ `
-      select id, "status" from petition p
-      where p.from_template_id = ? and p.org_id = ? and p.deleted_at is null 
-      and (
-        exists (select * from petition_access pa where pa.petition_id = p.id)  -- petition has been sent
-        or 
-        exists(select * from petition_event pe where pe.petition_id = p.id and pe."type" = 'REPLY_CREATED') -- petition has at least one submitted reply
-      );
+        with ps as (
+          select id, status from petition p  where p.from_template_id = ? and p.org_id = ? and p.deleted_at is null
+        ),
+        pas as (
+          select distinct(pa.petition_id), true as has_been_sent from petition_access pa where pa.petition_id in (select id from ps)
+        ),
+        pfrs as (
+          select distinct(pf.petition_id), true as has_reply from petition_field pf
+            join petition_field_reply pfr on pfr.petition_field_id = pf.id
+          where pf.petition_id in (select id from ps) and pf.deleted_at is null and pfr.deleted_at is null
+        )
+        select distinct ps.id, ps.status from ps
+          left join pas on pas.petition_id = ps.id
+          left join pfrs on pfrs.petition_id = ps.id
+        where pas.has_been_sent or pfrs.has_reply;
     `,
       [fromTemplateId, orgId]
     );
 
     const petitionIds = petitionStatus.map((s) => s.id);
-    const [petitionEvents, signatures] = await Promise.all([
-      this.from("petition_event")
-        .whereIn("petition_id", petitionIds)
-        .orderBy([{ column: "petition_id" }, { column: "created_at", order: "asc" }])
-        .select("*"),
-      this.loadLatestPetitionSignatureByPetitionId(petitionIds),
-    ]);
+
+    const petitionEvents = await this.from("petition_event")
+      .whereIn("petition_id", petitionIds)
+      .orderBy([{ column: "petition_id" }, { column: "created_at", order: "asc" }])
+      .select("*");
+    const signatures = await this.loadLatestPetitionSignatureByPetitionId(petitionIds);
 
     const eventsByPetitionId = groupBy(petitionEvents, (e) => e.petition_id);
 
