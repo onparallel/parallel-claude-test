@@ -19,8 +19,8 @@ export type FeatureFlagName =
   | "ON_BEHALF_OF"
   | "GHOST_LOGIN"
   | "ES_TAX_DOCUMENTS_FIELD"
-  | "CUSTOM_HOST_UI"
   | "REMOVE_PARALLEL_BRANDING"
+  | "CUSTOM_HOST_UI"
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
   | "AUTO_ANONYMIZE";
@@ -37,8 +37,8 @@ export const FeatureFlagNameValues = [
   "ON_BEHALF_OF",
   "GHOST_LOGIN",
   "ES_TAX_DOCUMENTS_FIELD",
-  "CUSTOM_HOST_UI",
   "REMOVE_PARALLEL_BRANDING",
+  "CUSTOM_HOST_UI",
   "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI",
   "PETITION_ACCESS_RECIPIENT_URL_FIELD",
   "AUTO_ANONYMIZE",
@@ -655,8 +655,8 @@ export interface Organization {
   preferred_tone: Tone; // tone
   icon_public_file_id: Maybe<number>; // int4
   appsumo_license: Maybe<any>; // jsonb
-  anonymize_petitions_after_days: Maybe<number>; // int4
   pdf_document_theme: Maybe<any>; // jsonb
+  anonymize_petitions_after_days: Maybe<number>; // int4
 }
 
 export type CreateOrganization = PartialProps<
@@ -674,8 +674,8 @@ export type CreateOrganization = PartialProps<
   | "preferred_tone"
   | "icon_public_file_id"
   | "appsumo_license"
-  | "anonymize_petitions_after_days"
   | "pdf_document_theme"
+  | "anonymize_petitions_after_days"
 >;
 
 export interface OrganizationUsageLimit {
@@ -760,8 +760,8 @@ export interface Petition {
   is_completing_message_enabled: boolean; // bool
   completing_message_subject: Maybe<string>; // text
   completing_message_body: Maybe<string>; // text
-  metadata: any; // jsonb
   anonymized_at: Maybe<Date>; // timestamptz
+  metadata: any; // jsonb
   closed_at: Maybe<Date>; // timestamptz
   anonymize_after_days: Maybe<number>; // int4
   anonymize_purpose: Maybe<string>; // text
@@ -801,8 +801,8 @@ export type CreatePetition = PartialProps<
   | "is_completing_message_enabled"
   | "completing_message_subject"
   | "completing_message_body"
-  | "metadata"
   | "anonymized_at"
+  | "metadata"
   | "closed_at"
   | "anonymize_after_days"
   | "anonymize_purpose"

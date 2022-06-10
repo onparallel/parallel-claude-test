@@ -77,35 +77,35 @@ export function CompliancePeriodDialog({
       }
       body={
         <Stack>
-          <FormControl>
+          <FormControl id="anonymize-after">
             <Controller
               name="anonymizeAfterMonths"
               control={control}
               rules={{ required: true, min: 1 }}
               render={({ field: { ref, value, ...restField } }) => (
-                <HStack>
+                <HStack as={FormLabel} margin={0}>
                   <FormattedMessage
-                    id="component.petition-compliance-period-dialog.delete-after"
-                    defaultMessage="Delete data after"
-                  />
-                  <NumberInput
-                    marginX={2}
-                    {...restField}
-                    value={value ?? 1}
-                    min={1}
-                    clampValueOnBlur={true}
-                    maxWidth="100px"
-                  >
-                    <NumberInputField ref={ref} name={restField.name} type="number" />
-                    <NumberInputStepper>
-                      <NumberIncrementStepper />
-                      <NumberDecrementStepper />
-                    </NumberInputStepper>
-                  </NumberInput>
-                  <FormattedMessage
-                    id="generic.months"
-                    defaultMessage="{count, plural, =1{month} other{months}}"
-                    values={{ count: selectedMonths }}
+                    id="component.petition-compliance-period-dialog.anonymize-after-label"
+                    defaultMessage="Anonymize data after {input} {count, plural, =1{month} other{months}}"
+                    values={{
+                      count: selectedMonths,
+                      input: (
+                        <NumberInput
+                          marginX={2}
+                          {...restField}
+                          value={value ?? 1}
+                          min={1}
+                          clampValueOnBlur={true}
+                          maxWidth="100px"
+                        >
+                          <NumberInputField ref={ref} name={restField.name} type="number" />
+                          <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                          </NumberInputStepper>
+                        </NumberInput>
+                      ),
+                    }}
                   />
                 </HStack>
               )}
@@ -122,7 +122,7 @@ export function CompliancePeriodDialog({
             <FormLabel>
               <FormattedMessage
                 id="component.petition-compliance-period-dialog.purpose-of-treatment"
-                defaultMessage="Purpose of treatment"
+                defaultMessage="Purpose of the treatment"
               />
             </FormLabel>
             <GrowingTextarea

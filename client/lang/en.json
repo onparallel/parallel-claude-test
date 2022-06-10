@@ -1505,9 +1505,9 @@
     "context": "<b>Petition completed</b>, if you make any changes, the petition must be <b>finalized again</b>."
   },
   {
-    "term": "component.petition-compliance-period-dialog.delete-after",
-    "definition": "Delete data after",
-    "context": "Delete data after"
+    "term": "component.petition-compliance-period-dialog.anonymize-after-label",
+    "definition": "Anonymize data after {input} {count, plural, =1{month} other{months}}",
+    "context": "Anonymize data after {input} {count, plural, =1{month} other{months}}"
   },
   {
     "term": "component.petition-compliance-period-dialog.explainer",
@@ -1521,8 +1521,8 @@
   },
   {
     "term": "component.petition-compliance-period-dialog.purpose-of-treatment",
-    "definition": "Purpose of treatment",
-    "context": "Purpose of treatment"
+    "definition": "Purpose of the treatment",
+    "context": "Purpose of the treatment"
   },
   {
     "term": "component.petition-compliance-period-dialog.purpose-of-treatment.placeholder",
@@ -5163,11 +5163,6 @@
     "term": "generic.learn-more",
     "definition": "Learn more",
     "context": "Learn more"
-  },
-  {
-    "term": "generic.months",
-    "definition": "{count, plural, =1{month} other{months}}",
-    "context": "{count, plural, =1{month} other{months}}"
   },
   {
     "term": "generic.more-options",
