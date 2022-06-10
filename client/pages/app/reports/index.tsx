@@ -162,6 +162,8 @@ export function Reports() {
   const petitionsTotal = closedPetitions + completedPetitions + pendingPetitions;
   const signaturesCompleted = report?.signatures.completed ?? 0;
 
+  const canGenerateReport = !templateId || (prevTemplateId === templateId && status === "LOADING");
+
   return (
     <AppLayout
       id="main-container"
@@ -227,7 +229,7 @@ export function Reports() {
             </HStack>
             <Button
               colorScheme="purple"
-              isDisabled={!templateId || prevTemplateId.current === templateId}
+              isDisabled={canGenerateReport}
               onClick={handleGenerateReportClick}
             >
               <FormattedMessage
