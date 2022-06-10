@@ -201,7 +201,7 @@ export function PetitionRepliesFieldComments({
             id: "petition-replies.field-comments.placeholder",
             defaultMessage: "Type a new comment",
           })}
-          isDisabled={isDisabled || (!hasCommentsEnabled && !user.hasInternalComments)}
+          isDisabled={isDisabled || (!hasCommentsEnabled && !hasInternalComments)}
           value={draft}
           onKeyDown={handleKeyDown as any}
           onChange={handleDraftChange as any}

@@ -48,7 +48,7 @@ import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useSearchContactsByEmail } from "@parallel/utils/useSearchContactsByEmail";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { noop, omit, pick } from "remeda";
+import { isDefined, noop, omit, pick } from "remeda";
 import { HelpPopover } from "../../common/HelpPopover";
 import { RecipientSelectGroups } from "../../common/RecipientSelectGroups";
 import { MessageEmailEditor } from "../../petition-common/MessageEmailEditor";
@@ -173,7 +173,7 @@ export function AddPetitionAccessDialog({
         recipientGroups.length > 1
       ) {
         const option = await showCopySignatureConfigDialog({
-          signers: petition.signatureConfig.signers,
+          signers: petition.signatureConfig.signers.filter(isDefined),
         });
 
         bulkSendSigningMode = option;

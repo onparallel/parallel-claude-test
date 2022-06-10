@@ -8,7 +8,7 @@ import {
   SignatureConfigInput,
 } from "@parallel/graphql/__types";
 import { FormattedList, FormattedMessage } from "react-intl";
-import { omit } from "remeda";
+import { isDefined, omit } from "remeda";
 import { SignerReference } from "../common/SignerReference";
 import {
   ConfirmPetitionSignersDialog,
@@ -28,7 +28,7 @@ export function NewSignatureRequestRow({
   onUpdateConfig,
   onStart,
 }: NewSignatureRequestRowProps) {
-  const signers = petition.signatureConfig?.signers ?? [];
+  const signers = petition.signatureConfig?.signers.filter(isDefined) ?? [];
   const allowAdditionalSigners = petition.signatureConfig?.allowAdditionalSigners ?? false;
   const reviewBeforeSigning = petition.signatureConfig?.review ?? false;
   const showConfirmPetitionSignersDialog = useConfirmPetitionSignersDialog();

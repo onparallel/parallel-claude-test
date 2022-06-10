@@ -459,7 +459,7 @@ function useSignatureConfigDialogBodyStep2Props({
   petition: SignatureConfigDialog_PetitionBaseFragment;
   user: SignatureConfigDialog_UserFragment;
 }) {
-  const signers = petition.signatureConfig?.signers ?? [];
+  const signers = petition.signatureConfig?.signers.filter(isDefined) ?? [];
   const allowAdditionalSigners = petition.signatureConfig?.allowAdditionalSigners ?? false;
   const isPetition = petition.__typename === "Petition";
 
@@ -506,9 +506,9 @@ export function SignatureConfigDialogBodyStep2({
 
   const suggestions: SignerSelectSelection[] = uniqBy(
     [
-      ...(previousSignatures?.flatMap((s) => s.signatureConfig.signers) ?? []).map((signer) =>
-        omit(signer, ["__typename"])
-      ),
+      ...(previousSignatures?.flatMap((s) => s.signatureConfig.signers) ?? [])
+        .filter(isDefined)
+        .map((signer) => omit(signer, ["__typename"])),
       {
         email: user.email,
         firstName: user.firstName ?? "",

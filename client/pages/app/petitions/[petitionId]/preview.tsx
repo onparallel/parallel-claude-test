@@ -50,7 +50,7 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
-import { omit } from "remeda";
+import { isDefined, omit } from "remeda";
 import { withMetadata } from "@parallel/utils/withMetadata";
 
 type PetitionPreviewProps = UnwrapPromise<ReturnType<typeof PetitionPreview.getInitialProps>>;
@@ -150,7 +150,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             !visibility[index] || f.optional || completedFieldReplies(f).length > 0 || f.isReadOnly
         );
         if (canFinalize && isPetition) {
-          const presetSigners = petition!.signatureConfig?.signers ?? [];
+          const presetSigners = petition!.signatureConfig?.signers.filter(isDefined) ?? [];
 
           const allowAdditionalSigners = petition.signatureConfig?.allowAdditionalSigners ?? false;
           let completeSignerInfoData: ConfirmPetitionSignersDialogResult | null = null;

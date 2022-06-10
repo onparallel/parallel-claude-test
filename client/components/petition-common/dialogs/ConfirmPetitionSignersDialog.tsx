@@ -85,9 +85,9 @@ export function ConfirmPetitionSignersDialog({
 
   const suggestions: SignerSelectSelection[] = uniqBy(
     [
-      ...(previousSignatures?.flatMap((s) => s.signatureConfig.signers) ?? []).map((signer) =>
-        omit(signer, ["__typename"])
-      ),
+      ...(previousSignatures?.flatMap((s) => s.signatureConfig.signers) ?? [])
+        .filter(isDefined)
+        .map((signer) => omit(signer, ["__typename"])),
       {
         email: user.email,
         firstName: user.firstName ?? "",

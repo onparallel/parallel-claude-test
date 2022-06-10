@@ -156,6 +156,7 @@ function _PetitionSettings({
             .map((s) => JSON.stringify(pick(s, ["email", "firstName", "lastName"])))
             .join(","),
           previous?.signers
+            .filter(isDefined)
             .map((s) => JSON.stringify(pick(s, ["email", "firstName", "lastName"])))
             .join(","),
         ],
