@@ -206,8 +206,8 @@ export function Reports() {
               onClick={() => handleTemplateRepliesReportTask(prevTemplateId!)}
             >
               <FormattedMessage
-                id="page.reports.download-results"
-                defaultMessage="Download results"
+                id="page.reports.download-replies"
+                defaultMessage="Download replies"
               />
             </Button>
           ) : null}

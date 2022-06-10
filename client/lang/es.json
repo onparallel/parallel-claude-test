@@ -6380,9 +6380,9 @@
     "context": "The bar represents the percentage of the time from the time the petition is completed until it is closed."
   },
   {
-    "term": "page.reports.download-results",
-    "definition": "Descargar resultados",
-    "context": "Download results"
+    "term": "page.reports.download-replies",
+    "definition": "Descargar respuestas",
+    "context": "Download replies"
   },
   {
     "term": "page.reports.error-support-message",
