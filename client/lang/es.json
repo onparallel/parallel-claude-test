@@ -3236,7 +3236,7 @@
   },
   {
     "term": "component.reference-options-menu.if-option-with-sentence",
-    "definition": "'{'% if {alias} == \"{option}\" %'}'{br}Esta es la frase que se mostrará cuando se escoja {option}.{br}",
+    "definition": "Esta es la frase que se mostrará cuando se escoja {option}.",
     "context": "This sentence will be displayed when \"{option}\" is selected."
   },
   {
@@ -3326,7 +3326,7 @@
   },
   {
     "term": "component.reference-options-menu.sentence-with-reply",
-    "definition": "Esta es la frase que se mostrará con esa respuesta.",
+    "definition": "Esta es la frase que se mostrará cuando la respuesta respuesta sea \"{value}\".",
     "context": "This sentence will be displayed when the reply is \"{value}\"."
   },
   {
