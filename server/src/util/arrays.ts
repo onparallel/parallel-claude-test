@@ -1,3 +1,4 @@
+import { identity, reverse } from "remeda";
 import { PredIndexed } from "remeda/dist/commonjs/_types";
 import { MaybeArray } from "./types";
 
@@ -49,9 +50,9 @@ export function sumBy<T>(array: T[], fn: PredIndexed<T, number>) {
  * @example findLast([1, 2, 3, 4, 5, 6], (e) => e < 5) // 4
  */
 export function findLast<T>(array: T[], predicate: (element: T) => boolean): T | undefined {
-  return array.filter(predicate).slice(-1)[0];
+  return reverse(array).find(predicate);
 }
 
 export function average(array: number[]): number {
-  return array.reduce((acc, value) => acc + value / array.length, 0);
+  return array.length === 0 ? NaN : sumBy(array, identity) / array.length;
 }
