@@ -47,6 +47,7 @@ import { useTemplateRepliesReportTask } from "@parallel/utils/useTemplateReplies
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
+import { TimeSpan } from "../../../components/reports/TimeSpan";
 
 type ReportType = {
   pending: number;
@@ -120,47 +121,7 @@ export function Reports() {
     }
   };
 
-  function getDaysHoursAndMinutes(seconds: number) {
-    const days = Math.floor(seconds / (3600 * 24));
-    seconds -= days * 3600 * 24;
-    const hours = Math.floor(seconds / 3600);
-    seconds -= hours * 3600;
-    const minutes = Math.floor(seconds / 60);
-
-    let formatted = "";
-    if (days) {
-      formatted = intl.formatMessage(
-        { id: "page.reports.days", defaultMessage: "{days, plural, =1 {# day} other {# days}}" },
-        { days }
-      );
-    }
-    if (hours) {
-      formatted += ` ${hours}h`;
-    }
-    if (minutes || seconds) {
-      formatted += ` ${minutes || 1}'`;
-    }
-
-    return seconds ? formatted : "0'";
-  }
-
   const handleTemplateRepliesReportTask = useTemplateRepliesReportTask();
-
-  const pendingToComplete = report?.pending_to_complete ?? 0;
-  const completeToClose = report?.complete_to_close ?? 0;
-  const timeToComplete = report?.signatures.time_to_complete ?? 0;
-
-  const pendingToCompletePercent =
-    (pendingToComplete / (pendingToComplete + completeToClose)) * 100;
-  const completeToClosePercent = (completeToClose / (pendingToComplete + completeToClose)) * 100;
-  const signaturesTimeToComplete = (timeToComplete / completeToClose) * 100;
-
-  const pendingPetitions = report?.pending ?? 0;
-  const completedPetitions = report?.completed ?? 0;
-  const closedPetitions = report?.closed ?? 0;
-
-  const petitionsTotal = closedPetitions + completedPetitions + pendingPetitions;
-  const signaturesCompleted = report?.signatures.completed ?? 0;
 
   const canGenerateReport = !templateId || (prevTemplateId === templateId && status === "LOADING");
 
@@ -252,276 +213,7 @@ export function Reports() {
           ) : null}
         </Stack>
         {isDefined(report) && status === "IDLE" ? (
-          <Grid
-            gridTemplateColumns={{
-              base: "repeat(1,1fr)",
-              lg: "repeat(3,1fr)",
-              xl: "repeat(4,1fr)",
-            }}
-            gridTemplateAreas={{
-              base: `
-              "petitions"
-              "petitions-time"
-              "signatures"
-              "signatures-time"
-              "chart"
-               `,
-              lg: `
-              "petitions petitions-time petitions-time"
-              "signatures signatures-time signatures-time"
-              "chart chart chart"
-               `,
-              xl: `
-                "petitions petitions-time petitions-time chart chart"
-                "signatures signatures-time signatures-time chart chart"
-                 `,
-            }}
-            gridGap={4}
-          >
-            <GridItem gridArea="petitions">
-              <Card height="100%" padding={6} as={Stack} spacing={3}>
-                <HStack>
-                  <Center>
-                    <PaperPlaneIcon />
-                  </Center>
-                  <Text>
-                    <FormattedMessage
-                      id="page.reports.started-petitions"
-                      defaultMessage="Started petitions"
-                    />
-                  </Text>
-                  <HelpPopover>
-                    <Stack>
-                      <Text>
-                        <FormattedMessage
-                          id="page.reports.started-petitions-help-1"
-                          defaultMessage="This is the total petitions sent or started, i.e. drafts with at least one response."
-                        />
-                      </Text>
-                      <Text>
-                        <FormattedMessage
-                          id="page.reports.started-petitions-help-2"
-                          defaultMessage="This number doesn't include deleted petitions or unanswered drafts."
-                        />
-                      </Text>
-                    </Stack>
-                  </HelpPopover>
-                </HStack>
-                <Text fontWeight="600" fontSize="4xl">
-                  {petitionsTotal}
-                </Text>
-              </Card>
-            </GridItem>
-            <GridItem gridArea="signatures">
-              <Card height="100%" padding={6} as={Stack} spacing={3}>
-                <HStack>
-                  <Center>
-                    <SignatureIcon />
-                  </Center>
-                  <Text>
-                    <FormattedMessage
-                      id="page.reports.esignature-sent"
-                      defaultMessage="eSignature sent"
-                    />
-                  </Text>
-                  <HelpPopover>
-                    <Stack>
-                      <Text>
-                        <FormattedMessage
-                          id="page.reports.esignature-sent-help-1"
-                          defaultMessage="This is the total completed eSignature processes."
-                        />
-                      </Text>
-                      <Text>
-                        <FormattedMessage
-                          id="page.reports.esignature-sent-help-2"
-                          defaultMessage="eSignatures processes in which a signer hasn't yet signed aren't included."
-                        />
-                      </Text>
-                    </Stack>
-                  </HelpPopover>
-                </HStack>
-                {signaturesCompleted || !petitionsTotal ? (
-                  <Text fontWeight="600" fontSize="4xl">
-                    {signaturesCompleted}
-                  </Text>
-                ) : (
-                  <Text fontSize="xl" textStyle="hint">
-                    <FormattedMessage
-                      id="page.reports.no-esignatures-sent"
-                      defaultMessage="No eSignatures sent"
-                    />
-                  </Text>
-                )}
-              </Card>
-            </GridItem>
-            <GridItem gridArea="petitions-time">
-              <Card height="100%" padding={6} as={Stack} spacing={3}>
-                <HStack>
-                  <Text>
-                    <FormattedMessage
-                      id="page.reports.average-duration"
-                      defaultMessage="Average duration"
-                    />
-                  </Text>
-                  <HelpPopover>
-                    <Stack>
-                      <Text>
-                        <FormattedMessage
-                          id="page.reports.average-duration-help-1"
-                          defaultMessage="Duration is divided into two parts."
-                        />
-                      </Text>
-                      <Box>
-                        <OrderedList>
-                          <ListItem>
-                            <FormattedMessage
-                              id="page.reports.average-duration-help-list-1"
-                              defaultMessage="Average time from the start of the petition until it is completed."
-                            />
-                          </ListItem>
-                          <ListItem>
-                            <FormattedMessage
-                              id="page.reports.average-duration-help-list-2"
-                              defaultMessage="Average time from completion to closure. "
-                            />
-                          </ListItem>
-                        </OrderedList>
-                      </Box>
-                      <Text>
-                        <FormattedMessage
-                          id="page.reports.average-duration-help-2"
-                          defaultMessage="The sum of the two is the average duration of the petitions."
-                        />
-                      </Text>
-                    </Stack>
-                  </HelpPopover>
-                </HStack>
-                <Grid
-                  templateColumns={{ base: "repeat(4, 1fr)", md: "repeat(5, 1fr)" }}
-                  gap={3}
-                  alignItems="center"
-                >
-                  <GridItem colSpan={{ base: 4, md: 1 }} textAlign={{ base: "left", md: "right" }}>
-                    <Text whiteSpace="nowrap">{getDaysHoursAndMinutes(pendingToComplete)}</Text>
-                  </GridItem>
-                  <GridItem colSpan={4}>
-                    <HStack>
-                      <TimeIcon color="yellow.500" />
-                      <Box
-                        width={`${pendingToCompletePercent}%`}
-                        minWidth="5px"
-                        height="12px"
-                        borderRadius="full"
-                        background="yellow.400"
-                      />
-                      <CheckIcon color="green.400" />
-                    </HStack>
-                  </GridItem>
-                  <GridItem colSpan={{ base: 4, md: 1 }} textAlign={{ base: "left", md: "right" }}>
-                    <Text whiteSpace="nowrap">{getDaysHoursAndMinutes(completeToClose)}</Text>
-                  </GridItem>
-                  <GridItem colSpan={4}>
-                    <HStack>
-                      <CheckIcon color="green.400" />
-                      <Box
-                        width={`${completeToClosePercent}%`}
-                        minWidth="5px"
-                        height="12px"
-                        borderRadius="full"
-                        background="green.600"
-                      />
-                      <DoubleCheckIcon color="green.500" />
-                      {pendingToComplete && !completeToClose ? (
-                        <Text textStyle="hint">
-                          <FormattedMessage
-                            id="page.reports.no-petitions-closed"
-                            defaultMessage="No petitions closed"
-                          />
-                        </Text>
-                      ) : null}
-                    </HStack>
-                  </GridItem>
-                </Grid>
-              </Card>
-            </GridItem>
-            <GridItem gridArea="signatures-time">
-              <Card height="100%" padding={6} as={Stack} spacing={3}>
-                <HStack>
-                  <Text>
-                    <FormattedMessage
-                      id="page.reports.average-signing-time"
-                      defaultMessage="Average signing time"
-                    />
-                  </Text>
-                  <HelpPopover>
-                    <Stack>
-                      <Text>
-                        <FormattedMessage
-                          id="page.reports.average-signing-time-help-1"
-                          defaultMessage="This is the average time for documents to be signed since they were sent."
-                        />
-                      </Text>
-                      <Text>
-                        <FormattedMessage
-                          id="page.reports.average-signing-time-help-2"
-                          defaultMessage="The bar represents the percentage of the time from the time the petition is completed until it is closed."
-                        />
-                      </Text>
-                    </Stack>
-                  </HelpPopover>
-                </HStack>
-                <Grid
-                  templateColumns={{ base: "repeat(4, 1fr)", md: "repeat(5, 1fr)" }}
-                  gap={3}
-                  alignItems="center"
-                >
-                  {signaturesCompleted || !petitionsTotal ? (
-                    <>
-                      <GridItem
-                        colSpan={{ base: 4, md: 1 }}
-                        textAlign={{ base: "left", md: "right" }}
-                      >
-                        <Text whiteSpace="nowrap">{getDaysHoursAndMinutes(timeToComplete)}</Text>
-                      </GridItem>
-                      <GridItem colSpan={4}>
-                        <HStack>
-                          <Flex alignItems="center" gridGap={0} position="relative" paddingX={1}>
-                            <SignatureIcon color="gray.300" boxSize={4} />
-                            <TimeIcon
-                              color="yellow.600"
-                              fontSize="10px"
-                              position="absolute"
-                              top={"-4px"}
-                              right={"1px"}
-                            />
-                          </Flex>
-                          <Box
-                            width={`${signaturesTimeToComplete}%`}
-                            minWidth="5px"
-                            height="12px"
-                            borderRadius="full"
-                            background="yellow.400"
-                          />
-                          <SignatureIcon />
-                        </HStack>
-                      </GridItem>
-                    </>
-                  ) : (
-                    <Text fontSize="xl">-</Text>
-                  )}
-                </Grid>
-              </Card>
-            </GridItem>
-            <GridItem gridArea="chart">
-              <ReportsDoughnutChart
-                petitionsTotal={petitionsTotal}
-                pendingPetitions={pendingPetitions}
-                closedPetitions={closedPetitions}
-                completedPetitions={completedPetitions}
-              />
-            </GridItem>
-          </Grid>
+          <TemplateStatsReport report={report} />
         ) : (
           <Stack minHeight="340px" alignItems="center" justifyContent="center" textAlign="center">
             {status === "LOADING" ? (
@@ -581,3 +273,295 @@ Reports.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
 };
 
 export default compose(withDialogs, withOrgRole("ADMIN"), withApolloData)(Reports);
+function TemplateStatsReport({ report }: { report: ReportType }) {
+  const pendingToComplete = report.pending_to_complete;
+  const completeToClose = report.complete_to_close;
+  const timeToComplete = report.signatures.time_to_complete;
+
+  const pendingToCompletePercent =
+    (pendingToComplete / (pendingToComplete + completeToClose)) * 100;
+  const completeToClosePercent = (completeToClose / (pendingToComplete + completeToClose)) * 100;
+  const signaturesTimeToComplete = (timeToComplete / completeToClose) * 100;
+
+  const pendingPetitions = report.pending;
+  const completedPetitions = report.completed;
+  const closedPetitions = report.closed;
+
+  const petitionsTotal = closedPetitions + completedPetitions + pendingPetitions;
+  const signaturesCompleted = report.signatures.completed;
+  return (
+    <Grid
+      gridTemplateColumns={{
+        base: "repeat(1,1fr)",
+        lg: "repeat(3,1fr)",
+        xl: "repeat(4,1fr)",
+      }}
+      gridTemplateAreas={{
+        base: `
+          "petitions"
+          "petitions-time"
+          "signatures"
+          "signatures-time"
+          "chart"
+        `,
+        lg: `
+          "petitions petitions-time petitions-time"
+          "signatures signatures-time signatures-time"
+          "chart chart chart"
+        `,
+        xl: `
+          "petitions petitions-time petitions-time chart chart"
+          "signatures signatures-time signatures-time chart chart"
+        `,
+      }}
+      gridGap={4}
+    >
+      <GridItem gridArea="petitions">
+        <Card height="100%" padding={6} as={Stack} spacing={3}>
+          <HStack>
+            <Center>
+              <PaperPlaneIcon />
+            </Center>
+            <Text>
+              <FormattedMessage
+                id="page.reports.started-petitions"
+                defaultMessage="Started petitions"
+              />
+            </Text>
+            <HelpPopover>
+              <Stack>
+                <Text>
+                  <FormattedMessage
+                    id="page.reports.started-petitions-help-1"
+                    defaultMessage="This is the total petitions sent or started, i.e. drafts with at least one response."
+                  />
+                </Text>
+                <Text>
+                  <FormattedMessage
+                    id="page.reports.started-petitions-help-2"
+                    defaultMessage="This number doesn't include deleted petitions or unanswered drafts."
+                  />
+                </Text>
+              </Stack>
+            </HelpPopover>
+          </HStack>
+          <Text fontWeight="600" fontSize="4xl">
+            {petitionsTotal}
+          </Text>
+        </Card>
+      </GridItem>
+      <GridItem gridArea="signatures">
+        <Card height="100%" padding={6} as={Stack} spacing={3}>
+          <HStack>
+            <Center>
+              <SignatureIcon />
+            </Center>
+            <Text>
+              <FormattedMessage
+                id="page.reports.esignature-sent"
+                defaultMessage="eSignature sent"
+              />
+            </Text>
+            <HelpPopover>
+              <Stack>
+                <Text>
+                  <FormattedMessage
+                    id="page.reports.esignature-sent-help-1"
+                    defaultMessage="This is the total completed eSignature processes."
+                  />
+                </Text>
+                <Text>
+                  <FormattedMessage
+                    id="page.reports.esignature-sent-help-2"
+                    defaultMessage="eSignatures processes in which a signer hasn't yet signed aren't included."
+                  />
+                </Text>
+              </Stack>
+            </HelpPopover>
+          </HStack>
+          {signaturesCompleted || !petitionsTotal ? (
+            <Text fontWeight="600" fontSize="4xl">
+              {signaturesCompleted}
+            </Text>
+          ) : (
+            <Text fontSize="xl" textStyle="hint">
+              <FormattedMessage
+                id="page.reports.no-esignatures-sent"
+                defaultMessage="No eSignatures sent"
+              />
+            </Text>
+          )}
+        </Card>
+      </GridItem>
+      <GridItem gridArea="petitions-time">
+        <Card height="100%" padding={6} as={Stack} spacing={3}>
+          <HStack>
+            <Text>
+              <FormattedMessage
+                id="page.reports.average-duration"
+                defaultMessage="Average duration"
+              />
+            </Text>
+            <HelpPopover>
+              <Stack>
+                <Text>
+                  <FormattedMessage
+                    id="page.reports.average-duration-help-1"
+                    defaultMessage="Duration is divided into two parts."
+                  />
+                </Text>
+                <Box>
+                  <OrderedList>
+                    <ListItem>
+                      <FormattedMessage
+                        id="page.reports.average-duration-help-list-1"
+                        defaultMessage="Average time from the start of the petition until it is completed."
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <FormattedMessage
+                        id="page.reports.average-duration-help-list-2"
+                        defaultMessage="Average time from completion to closure. "
+                      />
+                    </ListItem>
+                  </OrderedList>
+                </Box>
+                <Text>
+                  <FormattedMessage
+                    id="page.reports.average-duration-help-2"
+                    defaultMessage="The sum of the two is the average duration of the petitions."
+                  />
+                </Text>
+              </Stack>
+            </HelpPopover>
+          </HStack>
+          <Grid
+            templateColumns={{ base: "repeat(4, 1fr)", md: "repeat(5, 1fr)" }}
+            gap={3}
+            alignItems="center"
+          >
+            <GridItem colSpan={{ base: 4, md: 1 }} textAlign={{ base: "left", md: "right" }}>
+              <Text whiteSpace="nowrap">
+                <TimeSpan seconds={pendingToComplete} />
+              </Text>
+            </GridItem>
+            <GridItem colSpan={4}>
+              <HStack>
+                <TimeIcon color="yellow.500" />
+                <Box
+                  width={`${pendingToCompletePercent}%`}
+                  minWidth="5px"
+                  height="12px"
+                  borderRadius="full"
+                  background="yellow.400"
+                />
+                <CheckIcon color="green.400" />
+              </HStack>
+            </GridItem>
+            <GridItem colSpan={{ base: 4, md: 1 }} textAlign={{ base: "left", md: "right" }}>
+              <Text whiteSpace="nowrap">
+                <TimeSpan seconds={completeToClose} />
+              </Text>
+            </GridItem>
+            <GridItem colSpan={4}>
+              <HStack>
+                <CheckIcon color="green.400" />
+                <Box
+                  width={`${completeToClosePercent}%`}
+                  minWidth="5px"
+                  height="12px"
+                  borderRadius="full"
+                  background="green.600"
+                />
+                <DoubleCheckIcon color="green.500" />
+                {pendingToComplete && !completeToClose ? (
+                  <Text textStyle="hint">
+                    <FormattedMessage
+                      id="page.reports.no-petitions-closed"
+                      defaultMessage="No petitions closed"
+                    />
+                  </Text>
+                ) : null}
+              </HStack>
+            </GridItem>
+          </Grid>
+        </Card>
+      </GridItem>
+      <GridItem gridArea="signatures-time">
+        <Card height="100%" padding={6} as={Stack} spacing={3}>
+          <HStack>
+            <Text>
+              <FormattedMessage
+                id="page.reports.average-signing-time"
+                defaultMessage="Average signing time"
+              />
+            </Text>
+            <HelpPopover>
+              <Stack>
+                <Text>
+                  <FormattedMessage
+                    id="page.reports.average-signing-time-help-1"
+                    defaultMessage="This is the average time for documents to be signed since they were sent."
+                  />
+                </Text>
+                <Text>
+                  <FormattedMessage
+                    id="page.reports.average-signing-time-help-2"
+                    defaultMessage="The bar represents the percentage of the time from the time the petition is completed until it is closed."
+                  />
+                </Text>
+              </Stack>
+            </HelpPopover>
+          </HStack>
+          <Grid
+            templateColumns={{ base: "repeat(4, 1fr)", md: "repeat(5, 1fr)" }}
+            gap={3}
+            alignItems="center"
+          >
+            {signaturesCompleted || !petitionsTotal ? (
+              <>
+                <GridItem colSpan={{ base: 4, md: 1 }} textAlign={{ base: "left", md: "right" }}>
+                  <Text whiteSpace="nowrap">
+                    <TimeSpan seconds={timeToComplete} />
+                  </Text>
+                </GridItem>
+                <GridItem colSpan={4}>
+                  <HStack>
+                    <Flex alignItems="center" gridGap={0} position="relative" paddingX={1}>
+                      <SignatureIcon color="gray.300" boxSize={4} />
+                      <TimeIcon
+                        color="yellow.600"
+                        fontSize="10px"
+                        position="absolute"
+                        top={"-4px"}
+                        right={"1px"}
+                      />
+                    </Flex>
+                    <Box
+                      width={`${signaturesTimeToComplete}%`}
+                      minWidth="5px"
+                      height="12px"
+                      borderRadius="full"
+                      background="yellow.400"
+                    />
+                    <SignatureIcon />
+                  </HStack>
+                </GridItem>
+              </>
+            ) : (
+              <Text fontSize="xl">-</Text>
+            )}
+          </Grid>
+        </Card>
+      </GridItem>
+      <GridItem gridArea="chart">
+        <ReportsDoughnutChart
+          petitionsTotal={petitionsTotal}
+          pendingPetitions={pendingPetitions}
+          closedPetitions={closedPetitions}
+          completedPetitions={completedPetitions}
+        />
+      </GridItem>
+    </Grid>
+  );
+}

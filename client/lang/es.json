@@ -4025,6 +4025,11 @@
     "context": "Save preferences"
   },
   {
+    "term": "component.timespan.value",
+    "definition": "{days, plural, =0 {} =1 {# día } other {# días }} {hours}h {minutes}'",
+    "context": "{days, plural, =0 {} =1 {# day } other {# days }} {hours}h {minutes}'"
+  },
+  {
     "term": "component.user-group-select.no-options",
     "definition": "No se han encontrado equipos",
     "context": "No teams have been found"
@@ -6373,11 +6378,6 @@
     "term": "page.reports.average-signing-time-help-2",
     "definition": "La barra representa el porcentaje respecto al tiempo transcurrido desde que se completa la petición hasta que se cierra.",
     "context": "The bar represents the percentage of the time from the time the petition is completed until it is closed."
-  },
-  {
-    "term": "page.reports.days",
-    "definition": "{days, plural, =1 {# día} other {# días}}",
-    "context": "{days, plural, =1 {# day} other {# days}}"
   },
   {
     "term": "page.reports.download-results",
