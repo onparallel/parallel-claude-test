@@ -21,7 +21,7 @@ export function buildConfig() {
         user: process.env.READONLY_DB_USER!,
         password: process.env.READONLY_DB_PASSWORD!,
         port: parseInt(process.env.READONLY_DB_PORT!),
-        maxConnections: parseInt(process.env.READONLY_DB_MAX_CONNECTIONS!),
+        maxConnections: parseInt(process.env.DB_MAX_CONNECTIONS!),
       },
     },
     cognito: {
