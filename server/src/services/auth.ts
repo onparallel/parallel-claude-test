@@ -726,6 +726,10 @@ export class Auth implements IAuth {
 
     // TODO which org to use??
     const user = definedUsers[0];
+    if (user.status === "INACTIVE") {
+      throw new ForbiddenError("Not authorized");
+    }
+
     const [organization, userData] = await Promise.all([
       user ? await this.orgs.loadOrg(user.org_id) : null,
       user ? await this.users.loadUserData(user.user_data_id) : null,
