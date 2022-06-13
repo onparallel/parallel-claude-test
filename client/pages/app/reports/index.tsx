@@ -357,8 +357,8 @@ function TemplateStatsReport({ report }: { report: ReportType }) {
             </Center>
             <Text>
               <FormattedMessage
-                id="page.reports.esignature-sent"
-                defaultMessage="eSignature sent"
+                id="page.reports.esignature-completed"
+                defaultMessage="eSignatures completed"
               />
             </Text>
             <HelpPopover>

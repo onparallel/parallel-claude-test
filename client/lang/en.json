@@ -6455,9 +6455,9 @@
     "context": "Hi, I'm having issues generating reports."
   },
   {
-    "term": "page.reports.esignature-sent",
-    "definition": "eSignature sent",
-    "context": "eSignature sent"
+    "term": "page.reports.esignature-completed",
+    "definition": "eSignatures completed",
+    "context": "eSignatures completed"
   },
   {
     "term": "page.reports.esignature-sent-help-1",
