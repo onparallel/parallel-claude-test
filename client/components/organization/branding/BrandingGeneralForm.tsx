@@ -101,7 +101,11 @@ export function BrandingGeneralForm({ user }: BrandingGeneralFormProps) {
             ref={dropzoneRef}
             as={Center}
             onDrop={handleLogoUpload}
-            accept={["image/gif", "image/png", "image/jpeg"]}
+            accept={{
+              "image/gif": [".gif"],
+              "image/png": [".png"],
+              "image/jpeg": [".jpeg", ".jpg"],
+            }}
             maxSize={MAX_FILE_SIZE}
             multiple={false}
             height="200px"

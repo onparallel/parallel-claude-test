@@ -3,7 +3,7 @@ import { BurgerButton } from "@parallel/components/common/BurgerButton";
 import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { useWindowScroll } from "beautiful-react-hooks";
+import useWindowScroll from "beautiful-react-hooks/useWindowScroll";
 import { useEffect, useState } from "react";
 import { PublicContainer } from "./PublicContainer";
 import { PublicHeaderAccordionMenu } from "./PublicHeaderAccordionMenu";
@@ -11,8 +11,7 @@ import { PublicHeaderMenu } from "./PublicHeaderMenu";
 
 export function PublicHeader(props: BoxProps) {
   const [isThin, setIsThin] = useState(false);
-  useWindowScroll(checkWindowScroll);
-  useEffect(checkWindowScroll, []);
+  const onWindowScroll = useWindowScroll();
 
   const { isOpen, onToggle } = useDisclosure();
   const bp = "lg" as const;
@@ -20,6 +19,8 @@ export function PublicHeader(props: BoxProps) {
   function checkWindowScroll() {
     setIsThin(window.scrollY > 20);
   }
+  useEffect(checkWindowScroll, []);
+  onWindowScroll(checkWindowScroll);
   return (
     <PublicContainer
       wrapper={{

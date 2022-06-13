@@ -7,6 +7,7 @@ import {
   UnderlineIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { CustomEditor } from "@parallel/utils/slate/types";
 import { useIntl } from "react-intl";
 import { useSlate } from "slate-react";
 import { ToolbarHeadingButton } from "./ToolbarHeadingButton";
@@ -28,7 +29,7 @@ export const RichTextEditorToolbar = chakraForwardRef<"div", RichTextEditorToolb
     ref
   ) {
     const intl = useIntl();
-    const editor = useSlate();
+    const editor = useSlate() as CustomEditor;
     return (
       <Stack
         ref={ref}

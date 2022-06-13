@@ -11,7 +11,7 @@ export interface ToolbarListButtonProps extends Omit<ToolbarButtonProps, "isTogg
 
 export const ToolbarListButton = chakraForwardRef<"button", ToolbarListButtonProps>(
   function ToolbarListButton({ type, editor, ...props }, ref) {
-    const isActive = someNode(editor, { match: { type } });
+    const isActive = someNode(editor as any, { match: { type } });
     return (
       <ToolbarButton
         ref={ref}

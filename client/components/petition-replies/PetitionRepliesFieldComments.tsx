@@ -9,7 +9,7 @@ import {
 import { isMetaReturn } from "@parallel/utils/keys";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
-import { usePreviousValue } from "beautiful-react-hooks";
+import usePreviousValue from "beautiful-react-hooks/usePreviousValue";
 import { ChangeEvent, Fragment, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../common/Divider";

@@ -86,7 +86,7 @@ export const Dropzone = chakraForwardRef<"div", DropzoneProps, DropzoneRef>(func
           : {}
       }
       {...other}
-      {...getRootProps()}
+      {...(getRootProps() as any)}
     >
       <input {...inputProps} {...getInputProps()} />
       {typeof children === "function" ? (children as any)(state) : children}

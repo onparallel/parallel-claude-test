@@ -5,7 +5,7 @@ import { CustomEditor } from "./types";
 
 export function formatList(editor: CustomEditor, elementType: string) {
   if (editor.selection) {
-    const parentEntry = getParent(editor, editor.selection);
+    const parentEntry = getParent(editor as any, editor.selection);
     if (!parentEntry) return;
     const [node] = parentEntry;
     if (isElement(node)) {

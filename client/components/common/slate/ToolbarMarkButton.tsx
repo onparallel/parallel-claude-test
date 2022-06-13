@@ -10,11 +10,11 @@ export interface ToolbarMarkButtonProps extends Omit<ToolbarButtonProps, "isTogg
 
 export const ToolbarMarkButton = chakraForwardRef<"button", ToolbarMarkButtonProps>(
   function ToolbarMarkButton({ type, editor, ...props }, ref) {
-    const isActive = isMarkActive(editor, type);
+    const isActive = isMarkActive(editor as any, type);
     return (
       <ToolbarButton
         ref={ref}
-        onMouseDown={getPreventDefaultHandler(toggleMark, editor, type)}
+        onMouseDown={getPreventDefaultHandler(toggleMark, editor as any, type)}
         isToggleable
         isActive={isActive}
         {...props}

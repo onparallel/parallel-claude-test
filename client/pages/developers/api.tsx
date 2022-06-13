@@ -15,7 +15,6 @@ function DeveloperApi({ spec }: InferGetServerSidePropsType<typeof getServerSide
       <RedocStandalone
         spec={spec}
         options={{
-          noAutoAuth: true,
           expandResponses: "all",
           pathInMiddlePanel: true,
           jsonSampleExpandLevel: 3,

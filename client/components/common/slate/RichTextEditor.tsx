@@ -27,6 +27,7 @@ import {
   createHistoryPlugin,
   createPlugins,
   createReactPlugin,
+  focusEditor,
   Plate,
   PlateProvider,
   usePlateEditorState,
@@ -44,7 +45,6 @@ import {
 import { createParagraphPlugin, ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
 import { CSSProperties, forwardRef, ReactNode, useImperativeHandle, useMemo } from "react";
 import { omit, pick } from "remeda";
-import { ReactEditor } from "slate-react";
 import { EditableProps } from "slate-react/dist/components/editable";
 import { RichTextEditorToolbar } from "./RichTextEditorToolbar";
 
@@ -69,6 +69,8 @@ const components = {
   [MARK_ITALIC]: withProps(RenderElement, { as: "em" }),
   [MARK_UNDERLINE]: withProps(RenderElement, { as: "u" }),
 };
+
+type RichTextPEditor = CustomEditor<RichTextEditorValue>;
 
 export interface RichTextEditorProps
   extends ValueProps<RichTextEditorValue, false>,
@@ -120,7 +122,7 @@ const _RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorProps>(
       values,
     } = usePlaceholderPlugin(placeholderOptions);
     const plugins = useConstant(() =>
-      createPlugins(
+      createPlugins<RichTextEditorValue, RichTextPEditor>(
         [
           createReactPlugin(),
           createHistoryPlugin(),
@@ -137,19 +139,19 @@ const _RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorProps>(
                   type: "list-item",
                   match: ["* ", "- "],
                   preFormat: (editor: CustomEditor) => unwrapList(editor),
-                  format: (editor) => formatList(editor, "bulleted-list"),
+                  format: (editor: CustomEditor) => formatList(editor, "bulleted-list"),
                 },
                 {
                   mode: "block",
                   type: "list-item",
                   match: ["1. ", "1) "],
                   preFormat: (editor: CustomEditor) => unwrapList(editor),
-                  format: (editor) => formatList(editor, "numbered-list"),
+                  format: (editor: CustomEditor) => formatList(editor, "numbered-list"),
                 },
               ],
             },
           }),
-          placholderPlugin,
+          placholderPlugin as any,
           createHeadingPlugin({ options: { levels: 2 } }),
           createLinkPlugin(),
           createExitBreakPlugin({
@@ -189,7 +191,7 @@ const _RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorProps>(
 
     useImperativeHandle(ref, () => ({
       focus: () => {
-        ReactEditor.focus(editorRef.current!);
+        focusEditor(editorRef.current!);
       },
     }));
 
@@ -246,21 +248,23 @@ const _RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorProps>(
     // for some reason frozen objects from the apollo cache cause issues when typing
     const initialValue = useConstant(() => JSON.parse(JSON.stringify(value)));
 
+    const formControlProps = pick(formControl, [
+      "id",
+      "aria-invalid",
+      "aria-required",
+      "aria-readonly",
+      "aria-describedby",
+    ]);
+
     return (
       <Box
         role="application"
-        {...pick(formControl, [
-          "id",
-          "aria-invalid",
-          "aria-required",
-          "aria-readonly",
-          "aria-describedby",
-        ])}
         overflow="hidden"
         aria-disabled={formControl.disabled}
+        {...formControlProps}
         {...inputStyles}
       >
-        <Plate
+        <Plate<RichTextEditorValue, RichTextPEditor>
           id={id}
           plugins={plugins}
           initialValue={initialValue}

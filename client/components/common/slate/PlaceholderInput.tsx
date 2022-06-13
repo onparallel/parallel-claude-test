@@ -21,15 +21,18 @@ import { CustomEditor, SlateElement, SlateText } from "@parallel/utils/slate/typ
 import { useConstant } from "@parallel/utils/useConstant";
 import {
   createHistoryPlugin,
+  createPlateEditor,
   createPlugins,
   createReactPlugin,
+  focusEditor,
+  getEndPoint,
+  insertText,
   Plate,
-  withPlate,
+  select,
 } from "@udecode/plate-core";
 import { createParagraphPlugin } from "@udecode/plate-paragraph";
 import { CSSProperties, MouseEvent, useImperativeHandle, useMemo } from "react";
 import { useIntl } from "react-intl";
-import { createEditor, Editor, Transforms } from "slate";
 import { ReactEditor } from "slate-react";
 
 type PlaceholderInputValue = [PlaceholderInputBlock];
@@ -37,6 +40,8 @@ type PlaceholderInputValue = [PlaceholderInputBlock];
 interface PlaceholderInputBlock extends SlateElement<"paragraph", PlaceholderInputBlockContent> {}
 
 type PlaceholderInputBlockContent = SlateText | PlaceholderElement;
+
+type PlaceholderInputEditor = CustomEditor<PlaceholderInputValue>;
 
 export type PlaceholderInputProps = {
   placeholders: PlaceholderOption[];
@@ -59,22 +64,26 @@ export const PlaceholderInput = chakraForwardRef<"div", PlaceholderInputProps, P
     const { plugin, onAddPlaceholder, onHighlightOption, index, search, target, values } =
       usePlaceholderPlugin(placeholders);
     const plugins = useConstant(() =>
-      createPlugins([
+      createPlugins<PlaceholderInputValue, PlaceholderInputEditor>([
         createReactPlugin(),
         createHistoryPlugin(),
         createParagraphPlugin({ type: "paragraph", component: RenderElement }),
         createSingleLinePlugin(),
-        plugin,
+        plugin as any,
       ])
     );
-    const editor = useMemo<CustomEditor>(() => withPlate(createEditor(), { id, plugins }), []);
+    const editor = useMemo<PlaceholderInputEditor>(
+      () => createPlateEditor<PlaceholderInputValue, PlaceholderInputEditor>({ id, plugins }),
+      []
+    );
 
     useImperativeHandle(
       ref,
       () => ({
         focus: () => {
-          ReactEditor.focus(editor);
-          Transforms.select(editor, Editor.end(editor, []));
+          focusEditor(editor);
+          ReactEditor.focus(editor as any);
+          select(editor, getEndPoint(editor, []));
         },
       }),
       [editor]
@@ -98,8 +107,8 @@ export const PlaceholderInput = chakraForwardRef<"div", PlaceholderInputProps, P
 
     function onPlaceholderButtonClick(event: MouseEvent) {
       event.stopPropagation();
-      Transforms.insertText(editor, "#", { at: editor.selection?.anchor });
-      ReactEditor.focus(editor);
+      insertText(editor, "#", { at: editor.selection?.anchor });
+      focusEditor(editor);
     }
 
     const { referenceRef, popperRef } = usePopper({
@@ -134,7 +143,7 @@ export const PlaceholderInput = chakraForwardRef<"div", PlaceholderInputProps, P
           {...inputStyles}
           {...props}
         >
-          <Plate
+          <Plate<PlaceholderInputValue, PlaceholderInputEditor>
             id={id}
             editor={editor}
             plugins={plugins}
@@ -196,7 +205,7 @@ export const PlaceholderInput = chakraForwardRef<"div", PlaceholderInputProps, P
             search={search}
             values={values}
             highlightedIndex={index}
-            onAddPlaceholder={(placeholder) => onAddPlaceholder(editor, placeholder)}
+            onAddPlaceholder={(placeholder) => onAddPlaceholder(editor as any, placeholder)}
             onHighlightOption={onHighlightOption}
           />
         </Portal>

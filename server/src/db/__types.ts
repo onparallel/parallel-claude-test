@@ -763,7 +763,7 @@ export interface Petition {
   anonymized_at: Maybe<Date>; // timestamptz
   metadata: any; // jsonb
   closed_at: Maybe<Date>; // timestamptz
-  anonymize_after_months: Maybe<number>; // int4
+  anonymize_after_days: Maybe<number>; // int4
   anonymize_purpose: Maybe<string>; // text
 }
 
@@ -804,7 +804,7 @@ export type CreatePetition = PartialProps<
   | "anonymized_at"
   | "metadata"
   | "closed_at"
-  | "anonymize_after_months"
+  | "anonymize_after_days"
   | "anonymize_purpose"
 >;
 

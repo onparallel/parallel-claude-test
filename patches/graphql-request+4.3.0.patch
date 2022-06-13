@@ -1,13 +1,15 @@
 diff --git a/node_modules/graphql-request/dist/index.d.ts b/node_modules/graphql-request/dist/index.d.ts
-index 265ae30..d1de660 100644
+index 71e7018..bfd704c 100644
 --- a/node_modules/graphql-request/dist/index.d.ts
 +++ b/node_modules/graphql-request/dist/index.d.ts
-@@ -1,3 +1,4 @@
-+import { TypedDocumentNode } from '@graphql-typed-document-node/core';
- import { BatchRequestDocument, BatchRequestsOptions, ClientError, RawRequestOptions, RequestDocument, RequestOptions, BatchRequestsExtendedOptions, RawRequestExtendedOptions, RequestExtendedOptions, Variables } from './types';
+@@ -1,5 +1,6 @@
+ import { BatchRequestDocument, BatchRequestsOptions, ClientError, RawRequestOptions, RequestDocument, RequestOptions, BatchRequestsExtendedOptions, RawRequestExtendedOptions, RequestExtendedOptions, Variables, PatchedRequestInit, GraphQLError } from './types';
  import * as Dom from './types.dom';
++import { TypedDocumentNode } from '@graphql-typed-document-node/core';
  export { BatchRequestDocument, BatchRequestsOptions, BatchRequestsExtendedOptions, ClientError, RawRequestOptions, RawRequestExtendedOptions, RequestDocument, RequestOptions, RequestExtendedOptions, Variables, };
-@@ -26,7 +27,7 @@ export declare class GraphQLClient {
+ /**
+  * GraphQL Client.
+@@ -28,7 +29,7 @@ export declare class GraphQLClient {
      /**
       * Send a GraphQL document to the server.
       */

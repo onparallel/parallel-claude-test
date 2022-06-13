@@ -1,6 +1,6 @@
 import { FormControl, FormControlProps, FormLabel, Input, Text } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { usePreviousValue } from "beautiful-react-hooks";
+import usePreviousValue from "beautiful-react-hooks/usePreviousValue";
 import { ChangeEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 

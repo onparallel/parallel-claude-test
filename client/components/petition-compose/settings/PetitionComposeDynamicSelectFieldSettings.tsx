@@ -203,7 +203,16 @@ function DynamicSelectLoadedOptions({
   onDownloadOptions,
   isReadOnly,
 }: DynamicSelectLoadedOptionsProps) {
-  const firstRowFlattened = useMemo(() => options.values[0].flat(options.labels.length), [options]);
+  const firstRowFlattened = useMemo(() => {
+    let [item, child] = options.values[0];
+    const row = [item];
+    while (Array.isArray(child[0])) {
+      [item, child] = child[0];
+      row.push(item);
+    }
+    row.push(child[0]);
+    return row;
+  }, [options]);
 
   return (
     <>
@@ -287,7 +296,7 @@ function DynamicSelectOptionsDropzone({
       <Dropzone
         height="100px"
         as={Center}
-        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        accept={{ "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".docx"] }}
         maxSize={MAX_FILESIZE}
         multiple={false}
         onDrop={handleFileDrop}

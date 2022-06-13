@@ -118,7 +118,9 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
             as={Center}
             marginY={2}
             height="100px"
-            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            accept={{
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
+            }}
             maxSize={MAX_FILESIZE}
             multiple={false}
             onDrop={handleFileDrop}

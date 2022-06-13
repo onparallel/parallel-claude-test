@@ -19,6 +19,7 @@ const config = {
   poweredByHeader: false,
   webpack(config, options) {
     config.resolve.alias["@parallel"] = __dirname;
+    config.resolve.alias["react/jsx-runtime"] = "react/jsx-runtime.js";
     config.plugins.push(
       new options.webpack.DefinePlugin({
         "process.env.BUILD_ID": JSON.stringify(options.buildId),

@@ -14,6 +14,7 @@ import {
   Text,
   Tooltip,
 } from "@chakra-ui/react";
+import { fromEvent } from "file-selector";
 import { getColor } from "@chakra-ui/theme-tools";
 import {
   ConditionIcon,
@@ -171,7 +172,8 @@ const _PetitionComposeField = chakraForwardRef<
 
   const showErrorDialog = useErrorDialog();
   const maxAttachmentSize = 100 * 1024 * 1024;
-  const { getRootProps, getInputProps, isDragActive, open, draggedFiles } = useDropzone({
+  const [draggedFiles, setDraggedFiles] = useState<(File | DataTransferItem)[]>([]);
+  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     maxSize: maxAttachmentSize,
     onDropRejected: async () => {
       await withError(
@@ -251,6 +253,13 @@ const _PetitionComposeField = chakraForwardRef<
           });
         })
       );
+    },
+    onDragEnter: async (e) => {
+      const files = await fromEvent(e);
+      setDraggedFiles(files);
+    },
+    onDragLeave: async (e) => {
+      setDraggedFiles([]);
     },
   });
 
@@ -1062,7 +1071,7 @@ export const PetitionComposeField = Object.assign(
 
 interface PetitionComposeFieldDragActiveIndicatorProps {
   field: PetitionComposeField_PetitionFieldFragment;
-  draggedFiles: File[];
+  draggedFiles: (File | DataTransferItem)[];
 }
 
 function PetitionComposeFieldDragActiveIndicator({

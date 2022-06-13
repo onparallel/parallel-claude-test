@@ -4,10 +4,10 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { assignRef } from "@parallel/utils/assignRef";
 import { CustomEditor } from "@parallel/utils/slate/types";
 import { getPreventDefaultHandler, someNode, toggleNodeType } from "@udecode/plate-common";
+import { focusEditor, select } from "@udecode/plate-core";
 import { useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Selection, Transforms } from "slate";
-import { ReactEditor } from "slate-react";
+import { Selection } from "slate";
 import { ToolbarButton } from "./ToolbarButton";
 
 export interface ToolbarHeadingButtonProps {
@@ -19,7 +19,7 @@ export const ToolbarHeadingButton = chakraForwardRef<"button", ToolbarHeadingBut
     const intl = useIntl();
     const type =
       ["heading", "subheading", "paragraph"].find((type) =>
-        someNode(editor, { match: { type } })
+        someNode(editor as any, { match: { type } })
       ) ?? "paragraph";
     const selectionRef = useRef<Selection>();
     return (
@@ -42,14 +42,14 @@ export const ToolbarHeadingButton = chakraForwardRef<"button", ToolbarHeadingBut
             <MenuOptionGroup
               value={type}
               onChange={(value) => {
-                toggleNodeType(editor, {
+                toggleNodeType(editor as any, {
                   activeType: value as string,
                   inactiveType: "paragraph",
                 });
                 requestAnimationFrame(() => {
                   if (selectionRef.current) {
-                    Transforms.select(editor, selectionRef.current);
-                    ReactEditor.focus(editor as any);
+                    select(editor, selectionRef.current);
+                    focusEditor(editor as any);
                   }
                 });
               }}

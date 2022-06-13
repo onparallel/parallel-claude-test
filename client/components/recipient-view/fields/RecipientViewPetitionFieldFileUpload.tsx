@@ -264,26 +264,6 @@ function PetitionFieldFileUploadDropzone({
   ...props
 }: PetitionFieldFileUploadDropzoneProps) {
   const { accepts } = field.options as FieldOptions["FILE_UPLOAD"];
-  const accept = accepts
-    ? accepts.flatMap((type) => {
-        switch (type) {
-          case "IMAGE":
-            return ["image/*"];
-          case "DOCUMENT":
-            return [
-              "application/pdf",
-              "application/msword",
-              "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            ];
-          case "VIDEO":
-            return ["video/*"];
-          case "PDF":
-            return ["application/pdf"];
-          default:
-            return [];
-        }
-      })
-    : undefined;
   const _isDisabled = isDisabled || (!field.multiple && field.replies.length > 0);
 
   const MAX_FILE_SIZE = 50 * 1024 * 1024;
@@ -303,10 +283,9 @@ function PetitionFieldFileUploadDropzone({
     <>
       <Dropzone
         as={Center}
-        {...props}
+        {...(props as any)}
         minHeight="100px"
         textAlign="center"
-        accept={accept}
         onDrop={handleFileDrop}
         multiple={field.multiple}
         disabled={_isDisabled}
@@ -314,46 +293,10 @@ function PetitionFieldFileUploadDropzone({
       >
         {({ isDragActive, isDragReject }) => (
           <Box pointerEvents="none">
-            {isDragActive && isDragReject ? (
-              <>
-                <FormattedMessage
-                  id="generic.dropzone-allowed-types"
-                  defaultMessage="Only the following file types are allowed:"
-                />
-                <List paddingLeft={4}>
-                  {accepts!.map((type) => (
-                    <ListItem listStyleType="disc" key={type}>
-                      {type === "DOCUMENT" ? (
-                        <FormattedMessage
-                          id="generic.file-types.document"
-                          defaultMessage="Documents (.pdf, .doc, .docx)"
-                        />
-                      ) : type === "IMAGE" ? (
-                        <FormattedMessage
-                          id="generic.file-types.image"
-                          defaultMessage="Images (.jpeg, .png, etc.)"
-                        />
-                      ) : type === "VIDEO" ? (
-                        <FormattedMessage
-                          id="generic.file-types.video"
-                          defaultMessage="Videos (.mp4, .avi, etc.)"
-                        />
-                      ) : type === "PDF" ? (
-                        <FormattedMessage
-                          id="generic.file-types.pdf"
-                          defaultMessage="PDF Documents"
-                        />
-                      ) : null}
-                    </ListItem>
-                  ))}
-                </List>
-              </>
-            ) : (
-              <FormattedMessage
-                id="generic.dropzone-default"
-                defaultMessage="Drag files here, or click to select them"
-              />
-            )}
+            <FormattedMessage
+              id="generic.dropzone-default"
+              defaultMessage="Drag files here, or click to select them"
+            />
           </Box>
         )}
       </Dropzone>

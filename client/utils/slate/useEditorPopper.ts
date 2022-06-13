@@ -1,10 +1,10 @@
 import { usePopper, UsePopperProps } from "@chakra-ui/react";
 import { VirtualElement } from "@popperjs/core";
 import { getNode } from "@udecode/plate-common";
-import { useWindowScroll } from "beautiful-react-hooks";
+import { toDOMNode } from "@udecode/plate-core";
+import useWindowScroll from "beautiful-react-hooks/useWindowScroll";
 import { useEffect } from "react";
 import { Range } from "slate";
-import { ReactEditor } from "slate-react";
 import { Maybe } from "../types";
 import { useUpdatingRef } from "../useUpdatingRef";
 import { CustomEditor } from "./types";
@@ -28,7 +28,8 @@ export function useEditorPopper(
       popper.forceUpdate();
     }
   }
-  useWindowScroll(reposition);
+  const onWindowScroll = useWindowScroll();
+  onWindowScroll(reposition);
   useEffect(reposition, [
     editor?.id,
     props?.enabled,
@@ -51,7 +52,7 @@ function getVirtualElement(editor: CustomEditor, range: Range): VirtualElement {
    * children which we will use to create a popper virtual element.
    */
   const { path, offset } = range.anchor;
-  const node = ReactEditor.toDOMNode(editor, getNode(editor, path)!);
+  const node = toDOMNode(editor, getNode(editor as any, path)!)!;
   const parentRect = (node.parentNode! as HTMLElement).getBoundingClientRect();
   const fake = document.createElement("div");
   fake.style.visibility = "hidden";

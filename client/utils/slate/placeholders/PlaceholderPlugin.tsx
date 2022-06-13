@@ -3,12 +3,19 @@ import { normalizeEventKey } from "@parallel/utils/keys";
 import { useConstant } from "@parallel/utils/useConstant";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { getText } from "@udecode/plate-common";
-import { createPluginFactory, PlatePlugin, TRenderElementProps } from "@udecode/plate-core";
+import {
+  createPluginFactory,
+  insertNodes,
+  moveSelection,
+  PlatePlugin,
+  select,
+  TRenderElementProps,
+} from "@udecode/plate-core";
 import { ReactNode, useCallback, useState } from "react";
 import { clamp, isDefined } from "remeda";
-import { Editor, Range, Transforms } from "slate";
+import { Editor, Range } from "slate";
 import { useFocused, useSelected } from "slate-react";
-import { SlateElement, SlateText } from "../types";
+import { CustomEditor, SlateElement, SlateText } from "../types";
 
 export type PlaceholderOption = {
   value: string;
@@ -37,10 +44,10 @@ export function usePlaceholderPlugin(options: PlaceholderOption[]) {
       ? options.filter((c) => c.label.toLowerCase().includes(state.search!.toLowerCase()))
       : options
   );
-  const onAddPlaceholder = useCallback((editor: Editor, placeholder: PlaceholderOption) => {
+  const onAddPlaceholder = useCallback((editor: CustomEditor, placeholder: PlaceholderOption) => {
     const { target } = stateRef.current;
     if (target !== null) {
-      Transforms.select(editor, target);
+      select(editor, target);
       insertPlaceholder(editor, placeholder);
       setState((state) => ({ ...state, index: 0, target: null }));
     }
@@ -99,20 +106,20 @@ export function usePlaceholderPlugin(options: PlaceholderOption[]) {
 
             if (selection && Range.isCollapsed(selection)) {
               const cursor = Range.start(selection);
-              const before = Editor.before(editor, cursor, { unit: "block" });
-              const beforeRange = before && Editor.range(editor, before, cursor);
-              const beforeText = beforeRange && Editor.string(editor, beforeRange);
+              const before = Editor.before(editor as any, cursor, { unit: "block" });
+              const beforeRange = before && Editor.range(editor as any, before, cursor);
+              const beforeText = beforeRange && Editor.string(editor as any, beforeRange);
               const match = !!beforeText && beforeText.match(/#([a-z-]*)$/);
-              const after = Editor.after(editor, cursor);
-              const afterRange = Editor.range(editor, cursor, after);
-              const afterText = getText(editor, afterRange);
+              const after = Editor.after(editor as any, cursor);
+              const afterRange = Editor.range(editor as any, cursor, after);
+              const afterText = getText(editor as any, afterRange);
               if (match && afterText.match(/^([^a-z]|$)/)) {
                 // Get the range for the #xxx
-                const beforeHash = Editor.before(editor, cursor, {
+                const beforeHash = Editor.before(editor as any, cursor, {
                   unit: "character",
                   distance: match ? match[0].length : 0,
                 });
-                const target = beforeHash && Editor.range(editor, beforeHash, cursor);
+                const target = beforeHash && Editor.range(editor as any, beforeHash, cursor);
                 const [, search] = match;
                 setState(() => ({ target: target ?? null, search, index: 0 }));
                 return;
@@ -200,12 +207,12 @@ const PlaceholderToken = function ({
   );
 };
 
-function insertPlaceholder(editor: Editor, placeholder: PlaceholderOption) {
-  Transforms.insertNodes(editor, {
+function insertPlaceholder(editor: CustomEditor, placeholder: PlaceholderOption) {
+  insertNodes(editor, {
     type: PLACEHOLDER_TYPE,
     placeholder: placeholder.value,
     children: [{ text: "" }],
   });
 
-  Transforms.move(editor);
+  moveSelection(editor);
 }

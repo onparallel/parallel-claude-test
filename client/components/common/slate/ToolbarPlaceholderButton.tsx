@@ -3,10 +3,9 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { CustomEditor } from "@parallel/utils/slate/types";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { getPreventDefaultHandler } from "@udecode/plate-common";
+import { focusEditor, insertText } from "@udecode/plate-core";
 import { useCallback } from "react";
 import { useIntl } from "react-intl";
-import { Transforms } from "slate";
-import { ReactEditor } from "slate-react";
 import { ToolbarButton, ToolbarButtonProps } from "./ToolbarButton";
 
 export interface ToolbarPlaceholderButtonProps
@@ -21,10 +20,10 @@ export const ToolbarPlaceholderButton = chakraForwardRef<"button", ToolbarPlaceh
     const handleMouseDown = useCallback(
       getPreventDefaultHandler(() => {
         if (!editorRef.current.selection) {
-          ReactEditor.focus(editorRef.current as any);
+          focusEditor(editorRef.current as any);
         }
         requestAnimationFrame(() => {
-          Transforms.insertText(editorRef.current, "#", {
+          insertText(editorRef.current, "#", {
             at: editorRef.current.selection?.anchor,
           });
         });

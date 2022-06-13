@@ -11,12 +11,12 @@ import {
   insertNodes,
   isCollapsed,
 } from "@udecode/plate-common";
+import { focusEditor, moveSelection, select } from "@udecode/plate-core";
 import { upsertLinkAtSelection } from "@udecode/plate-link";
 import { useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Editor, Transforms } from "slate";
-import { ReactEditor } from "slate-react";
+import { Editor } from "slate";
 import { ConfirmDialog } from "../dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "../dialogs/DialogProvider";
 import { ToolbarButton, ToolbarButtonProps } from "./ToolbarButton";
@@ -38,9 +38,9 @@ export const ToolbarLinkButton = chakraForwardRef<"button", ToolbarLinkButtonPro
     const handleMouseDown = useCallback(
       getPreventDefaultHandler(async () => {
         const selection = editorRef.current.selection;
-        const endOfEditor = Editor.range(editorRef.current, Editor.end(editor, []));
+        const endOfEditor = Editor.range(editorRef.current as any, Editor.end(editor as any, []));
         const linkNode = editorRef.current.selection
-          ? getAbove<LinkNode>(editorRef.current, { match: { type: "link" } })
+          ? getAbove<LinkNode>(editorRef.current as any, { match: { type: "link" } })
           : undefined;
         const [_, link] = await withError(
           showAddLinkDialog({
@@ -51,8 +51,8 @@ export const ToolbarLinkButton = chakraForwardRef<"button", ToolbarLinkButtonPro
             showTextInput: !linkNode && (!selection || isCollapsed(selection)),
           })
         );
-        ReactEditor.focus(editorRef.current as any);
-        Transforms.select(editorRef.current, selection ?? endOfEditor);
+        focusEditor(editorRef.current);
+        select(editorRef.current, selection ?? endOfEditor);
         if (!link) {
           return;
         }
@@ -61,7 +61,7 @@ export const ToolbarLinkButton = chakraForwardRef<"button", ToolbarLinkButtonPro
         } else {
           const text = link.text || link.url;
           insertNodes(
-            editorRef.current,
+            editorRef.current as any,
             {
               type: "link",
               url: link.url,
@@ -69,7 +69,7 @@ export const ToolbarLinkButton = chakraForwardRef<"button", ToolbarLinkButtonPro
             },
             { at: selection ?? endOfEditor }
           );
-          Transforms.move(editorRef.current, { distance: text.length });
+          moveSelection(editorRef.current, { distance: text.length });
         }
       }),
       []
