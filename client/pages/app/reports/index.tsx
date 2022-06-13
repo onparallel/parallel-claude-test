@@ -25,7 +25,7 @@ import {
 } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
-import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
+import { NakedHelpCenterLink } from "@parallel/components/common/HelpCenterLink";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { SimpleSelect } from "@parallel/components/common/SimpleSelect";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
@@ -151,12 +151,11 @@ export function Reports() {
             </Heading>
           </HStack>
           <Button
-            as={HelpCenterLink}
+            as={NakedHelpCenterLink}
             variant="ghost"
             fontWeight="normal"
-            colorScheme="purple.600"
+            colorScheme="purple"
             articleId={6272487}
-            hideIcon
           >
             <FormattedMessage id="generic.help-question" defaultMessage="Help?" />
           </Button>

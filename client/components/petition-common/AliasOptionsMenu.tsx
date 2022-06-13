@@ -19,6 +19,7 @@ import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { NakedHelpCenterLink } from "../common/HelpCenterLink";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 
 export interface AliasOptionsMenuProps extends Omit<ButtonProps, "children"> {
@@ -92,11 +93,8 @@ export const AliasOptionsMenu = Object.assign(
             <MenuDivider />
             <MenuItem
               icon={<HelpOutlineIcon display="block" boxSize={4} />}
-              as="a"
-              href={`https://help.onparallel.com/es/articles/5998723-como-generar-textos-dinamicos`}
-              rel="noopener"
-              target="_blank"
-              alignItems="center"
+              as={NakedHelpCenterLink}
+              articleId={5998723}
             >
               <FormattedMessage id="generic.learn-more" defaultMessage="Learn more" />
             </MenuItem>

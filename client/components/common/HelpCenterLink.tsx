@@ -1,35 +1,49 @@
+import { Box } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { NormalLink } from "./Link";
 
-interface HelpCenterLink {
+interface HelpCenterLinkProps {
   articleId: number;
-  hideIcon?: boolean;
 }
 
-export const HelpCenterLink = chakraForwardRef<"a", HelpCenterLink>(function HelpCenterLink(
-  { articleId, hideIcon, children, onClick, ...props },
+export const HelpCenterLink = chakraForwardRef<"a", HelpCenterLinkProps>(function HelpCenterLink(
+  { children, ...props },
   ref
 ) {
-  const intl = useIntl();
   return (
-    <NormalLink
-      ref={ref}
-      href={`https://help.onparallel.com/${intl.locale}/articles/${articleId}`}
-      isExternal
-      {...props}
-      onClick={(event) => {
-        if (isDefined(window.Intercom)) {
-          event.preventDefault();
-          window.Intercom("showArticle", articleId);
-        }
-        onClick?.(event);
-      }}
-    >
+    <NakedHelpCenterLink as={NormalLink} ref={ref} {...props}>
       {children}
-      {hideIcon ? null : <ExternalLinkIcon verticalAlign="sub" marginLeft={1} />}
-    </NormalLink>
+      <ExternalLinkIcon verticalAlign="sub" marginLeft={1} />
+    </NakedHelpCenterLink>
   );
 });
+
+interface NakedHelpCenterLinkProps {
+  articleId: number;
+}
+
+export const NakedHelpCenterLink = chakraForwardRef<"a", NakedHelpCenterLinkProps>(
+  function HelpCenterLink({ articleId, onClick, ...props }, ref) {
+    const intl = useIntl();
+    return (
+      <Box
+        ref={ref as any}
+        {...(props as any)}
+        as="a"
+        href={`https://help.onparallel.com/${intl.locale}/articles/${articleId}`}
+        target="_blank"
+        rel="noopener"
+        onClick={(event) => {
+          if (isDefined(window.Intercom)) {
+            event.preventDefault();
+            window.Intercom("showArticle", articleId);
+          }
+          onClick?.(event as any);
+        }}
+      />
+    );
+  }
+);
