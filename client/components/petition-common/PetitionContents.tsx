@@ -50,6 +50,7 @@ export interface PetitionContentsProps<T extends PetitionContents_PetitionFieldF
   signatureStatus?: PetitionContentsSignatureStatus | null;
   signatureEnvironment?: SignatureOrgIntegrationEnvironment | null;
   onSignatureStatusClick?: () => void;
+  isReadOnly?: boolean;
 }
 
 export function PetitionContents<T extends PetitionContents_PetitionFieldFragment>({
@@ -64,6 +65,7 @@ export function PetitionContents<T extends PetitionContents_PetitionFieldFragmen
   signatureStatus,
   signatureEnvironment,
   onSignatureStatusClick,
+  isReadOnly,
 }: PetitionContentsProps<T>) {
   const handleFieldClick = useMemoFactory(
     (fieldId: string) => () => onFieldClick(fieldId),
@@ -77,6 +79,7 @@ export function PetitionContents<T extends PetitionContents_PetitionFieldFragmen
             key={x.field.id}
             field={x.field}
             isVisible={true}
+            isDisabled={isReadOnly}
             fieldIndex={x.fieldIndex}
             onFieldClick={handleFieldClick(x.field.id)}
             onFieldEdit={onFieldEdit}
@@ -173,11 +176,13 @@ interface PetitionContentsItemProps<T extends PetitionContents_PetitionFieldFrag
   onFieldEdit?: (fieldId: string, data: UpdatePetitionFieldInput) => void;
   showAliasButtons: boolean;
   fieldIndicators?: ComponentType<PetitionContentsFieldIndicatorsProps<T>>;
+  isDisabled?: boolean;
 }
 
 function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>({
   field,
   isVisible,
+  isDisabled,
   fieldIndex,
   onFieldClick,
   onFieldEdit,
@@ -260,6 +265,7 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
               </>
             ) : (
               <IconButtonWithTooltip
+                isDisabled={isDisabled}
                 tabIndex={0}
                 display="none"
                 className="alias-button"

@@ -507,6 +507,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                           onFieldClick={handleIndexFieldClick}
                           showAliasButtons={true}
                           onFieldEdit={handleFieldEdit}
+                          isReadOnly={
+                            petition.isRestricted || isPublicTemplate || petition.isAnonymized
+                          }
                         />
                       </TabPanel>
                       <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
