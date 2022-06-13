@@ -72,12 +72,15 @@ export function BrandingDocumentForm({ user }: BrandingDocumentFormProps) {
     updateFragment(apollo.cache, {
       fragment: BrandingDocumentPreview_OrganizationFragmentDoc,
       id: user.organization.id,
-      data: (cached) => ({
-        ...cached!,
-        pdfDocumentTheme: mergeDeep(cached!.pdfDocumentTheme, data),
-      }),
+      data: (cached) => {
+        const pdfDocumentTheme = mergeDeep(cached!.pdfDocumentTheme, data);
+        setTheme(pdfDocumentTheme);
+        return {
+          ...cached!,
+          pdfDocumentTheme,
+        };
+      },
     });
-    setTheme(mergeDeep(theme, data));
     try {
       await updateOrganizationTheme(data);
     } catch (error) {
