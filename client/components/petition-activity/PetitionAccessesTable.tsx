@@ -77,6 +77,8 @@ export function PetitionAccessesTable({
   const showActions =
     !petition.isAnonymized && selection.length > 0 && selected.every((a) => a.status === "ACTIVE");
 
+  const permissionType = petition.myEffectivePermission?.permissionType ?? "READ";
+
   const columns = usePetitionAccessesColumns();
   const context = useMemo(
     () => ({
@@ -140,7 +142,7 @@ export function PetitionAccessesTable({
             <Button
               leftIcon={<UserPlusIcon fontSize="18px" />}
               onClick={onAddPetitionAccess}
-              isDisabled={petition.isAnonymized}
+              isDisabled={petition.isAnonymized || permissionType === "READ"}
             >
               {intl.formatMessage({
                 id: "petition.add-recipient-button",
@@ -174,7 +176,7 @@ export function PetitionAccessesTable({
                     defaultMessage="You haven't sent this petition yet."
                   />
                 </Text>
-                {!petition.isAnonymized ? (
+                {!petition.isAnonymized && permissionType !== "READ" ? (
                   <Text>
                     <FormattedMessage
                       id="petition-access.click-here-to-send"
@@ -399,6 +401,9 @@ PetitionAccessesTable.fragments = {
         ...PetitionAccessTable_PetitionAccess
       }
       isAnonymized
+      myEffectivePermission {
+        permissionType
+      }
     }
     fragment PetitionAccessTable_PetitionAccessRemindersConfig on RemindersConfig {
       offset

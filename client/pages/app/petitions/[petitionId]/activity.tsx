@@ -69,6 +69,8 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
 
   const petition = data!.petition as PetitionActivity_PetitionFragment;
 
+  const permissionType = petition.myEffectivePermission?.permissionType ?? "READ";
+
   const wrapper = usePetitionStateWrapper();
 
   const [updatePetition] = useMutation(PetitionActivity_updatePetitionDocument);
@@ -372,6 +374,9 @@ PetitionActivity.fragments = {
       accesses {
         id
         status
+      }
+      myEffectivePermission {
+        permissionType
       }
       ...PetitionLayout_PetitionBase
       ...PetitionAccessTable_Petition

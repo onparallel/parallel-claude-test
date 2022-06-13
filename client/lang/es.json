@@ -6535,6 +6535,11 @@
     "context": "Reader"
   },
   {
+    "term": "petition-permission-type.reader",
+    "definition": "Lector",
+    "context": "Reader"
+  },
+  {
     "term": "petition-permission-type.write",
     "definition": "Editor",
     "context": "Editor"

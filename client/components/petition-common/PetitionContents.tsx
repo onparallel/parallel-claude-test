@@ -91,6 +91,7 @@ export function PetitionContents<T extends PetitionContents_PetitionFieldFragmen
                 ? false
                 : showAliasButtons
             }
+            isReadOnly={isReadOnly}
           />
         ) : (
           <PetitionContentsDivider key={index} isDashed>
@@ -176,7 +177,7 @@ interface PetitionContentsItemProps<T extends PetitionContents_PetitionFieldFrag
   onFieldEdit?: (fieldId: string, data: UpdatePetitionFieldInput) => void;
   showAliasButtons: boolean;
   fieldIndicators?: ComponentType<PetitionContentsFieldIndicatorsProps<T>>;
-  isDisabled?: boolean;
+  isReadOnly: boolean;
 }
 
 function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>({
@@ -188,6 +189,7 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
   onFieldEdit,
   showAliasButtons,
   fieldIndicators,
+  isReadOnly,
 }: PetitionContentsItemProps<T>) {
   const intl = useIntl();
 
@@ -265,7 +267,7 @@ function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>
               </>
             ) : (
               <IconButtonWithTooltip
-                isDisabled={isDisabled}
+                isDisabled={isReadOnly}
                 tabIndex={0}
                 display="none"
                 className="alias-button"

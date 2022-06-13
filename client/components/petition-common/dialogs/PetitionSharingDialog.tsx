@@ -11,9 +11,11 @@ import {
   Checkbox,
   Circle,
   Flex,
+  FormControl,
   ListItem,
   Menu,
   MenuButton,
+  MenuDivider,
   MenuItem,
   MenuList,
   Spinner,
@@ -28,6 +30,7 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import {
   NewPetition_templatesDocument,
   PetitionActivity_petitionDocument,
+  PetitionPermissionTypeRW,
   PetitionSharingModal_addPetitionPermissionDocument,
   PetitionSharingModal_petitionsDocument,
   PetitionSharingModal_PetitionUserGroupPermissionFragment,
@@ -54,9 +57,11 @@ import {
   useSearchUsers,
 } from "../../common/UserSelect";
 import { PetitionPermissionTypeText } from "../PetitionPermissionType";
+import { PetitionPermissionTypeSelect } from "../PetitionPermissionTypeSelect";
 
 type PetitionSharingDialogData = {
   selection: UserSelectSelection<true>[];
+  permissionType: PetitionPermissionTypeRW;
   notify: boolean;
   subscribe: boolean;
   message: string;
@@ -113,11 +118,14 @@ export function PetitionSharingDialog({
     mode: "onChange",
     defaultValues: {
       selection: [],
+      permissionType: "WRITE",
       notify: true,
       subscribe: true,
       message: "",
     },
   });
+
+  const permissionType = watch("permissionType");
 
   const petitionsOwned =
     petitionsById?.filter((petition) =>
@@ -225,7 +233,7 @@ export function PetitionSharingDialog({
             petitionIds: petitionsOwnedWrite.map((p) => p!.id),
             userIds: users.length ? users : null,
             userGroupIds: groups.length ? groups : null,
-            permissionType: "WRITE",
+            permissionType,
             notify,
             subscribe: isTemplate ? false : subscribe,
             message: message || null,
@@ -302,8 +310,8 @@ export function PetitionSharingDialog({
       body={
         petitionsById ? (
           <Stack>
-            <Stack direction="row">
-              <Box flex="1">
+            <Flex>
+              <FormControl id="selection">
                 <Controller
                   name="selection"
                   control={control}
@@ -337,9 +345,21 @@ export function PetitionSharingDialog({
                     />
                   )}
                 />
-              </Box>
-              {/* PermissionTypeSelect */}
-            </Stack>
+              </FormControl>
+              <FormControl id="permissionType" width="180px" marginLeft={2}>
+                <Controller
+                  name="permissionType"
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <PetitionPermissionTypeSelect
+                      value={value}
+                      onChange={onChange}
+                      hideOwner={true}
+                    />
+                  )}
+                />
+              </FormControl>
+            </Flex>
             <Stack display={hasUsers ? "flex" : "none"}>
               <Checkbox {...register("notify")} colorScheme="primary" defaultIsChecked>
                 <FormattedMessage
@@ -414,12 +434,18 @@ export function PetitionSharingDialog({
                         size="sm"
                         rightIcon={<ChevronDownIcon />}
                       >
-                        <PetitionPermissionTypeText type="WRITE" />
+                        <PetitionPermissionTypeText type={permissionType} />
                       </MenuButton>
                       <MenuList minWidth={40}>
+                        <MenuItem onClick={() => {}} isDisabled={!petitionsOwned.length}>
+                          <PetitionPermissionTypeText type="WRITE" />
+                        </MenuItem>
+                        <MenuItem onClick={() => {}} isDisabled={!petitionsOwned.length}>
+                          <PetitionPermissionTypeText type="READ" />
+                        </MenuItem>
+                        <MenuDivider />
                         <MenuItem
                           onClick={() => handleTransferPetitionOwnership(petitionId, user)}
-                          icon={<UserArrowIcon display="block" boxSize={4} />}
                           isDisabled={!petitionsOwned.length}
                         >
                           <FormattedMessage
@@ -435,7 +461,6 @@ export function PetitionSharingDialog({
                               user,
                             })
                           }
-                          icon={<DeleteIcon display="block" boxSize={4} />}
                         >
                           <FormattedMessage id="generic.remove" defaultMessage="Remove" />
                         </MenuItem>

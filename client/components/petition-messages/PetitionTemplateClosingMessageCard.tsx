@@ -57,6 +57,8 @@ export const PetitionTemplateClosingMessageCard = Object.assign(
         onUpdatePetition({ closingEmailBody: isEmptyRTEValue(value) ? null : value });
       };
 
+      const permissionType = petition.myEffectivePermission?.permissionType ?? "READ";
+
       return (
         <Card ref={ref} {...props}>
           <CardHeader>
@@ -78,7 +80,7 @@ export const PetitionTemplateClosingMessageCard = Object.assign(
               showErrors={false}
               body={closingEmailBody}
               onBodyChange={handleclosingEmailBodyChange}
-              isReadOnly={petition.isRestricted || petition.isPublic}
+              isReadOnly={petition.isRestricted || petition.isPublic || permissionType === "READ"}
             />
           </Box>
         </Card>
@@ -94,6 +96,9 @@ export const PetitionTemplateClosingMessageCard = Object.assign(
           isRestricted
           isPublic
           locale
+          myEffectivePermission {
+            permissionType
+          }
         }
       `,
     },

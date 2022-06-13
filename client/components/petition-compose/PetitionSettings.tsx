@@ -116,6 +116,8 @@ function _PetitionSettings({
       ? petition.currentSignatureRequest
       : null;
 
+  const permissionType = petition.myEffectivePermission?.permissionType ?? "READ";
+
   const publicLink = petition.__typename === "PetitionTemplate" ? petition.publicLink : null;
 
   const isPublicTemplate = petition?.__typename === "PetitionTemplate" && petition.isPublic;
@@ -382,7 +384,7 @@ function _PetitionSettings({
 
   const restrictEditingSwitch = (
     <SettingsRowSwitch
-      isDisabled={isPublicTemplate || petition.isAnonymized}
+      isDisabled={isPublicTemplate || petition.isAnonymized || permissionType === "READ"}
       icon={petition.isRestricted ? <LockClosedIcon /> : <LockOpenIcon />}
       label={
         <FormattedMessage
@@ -447,7 +449,7 @@ function _PetitionSettings({
           {restrictEditingSwitch}
           <SettingsRowButton
             data-section="share-by-link"
-            isDisabled={isPublicTemplate || petition.isRestricted}
+            isDisabled={isPublicTemplate || petition.isRestricted || permissionType === "READ"}
             icon={<LinkIcon />}
             label={
               <FormattedMessage
@@ -504,7 +506,7 @@ function _PetitionSettings({
       )}
       <SettingsRow
         controlId="petition-locale"
-        isDisabled={petition.isRestricted || petition.isAnonymized}
+        isDisabled={petition.isRestricted || petition.isAnonymized || permissionType === "READ"}
         icon={<EmailIcon />}
         label={
           <FormattedMessage
@@ -521,7 +523,12 @@ function _PetitionSettings({
             minWidth="120px"
             value={petition.locale}
             onChange={(event) => onUpdatePetition({ locale: event.target.value as any })}
-            isDisabled={petition.isRestricted || isPublicTemplate || petition.isAnonymized}
+            isDisabled={
+              petition.isRestricted ||
+              isPublicTemplate ||
+              petition.isAnonymized ||
+              permissionType === "READ"
+            }
           >
             {locales.map((locale) => (
               <option key={locale.key} value={locale.key}>
@@ -536,7 +543,7 @@ function _PetitionSettings({
           controlId="petition-deadline"
           isActive={Boolean(petition.deadline)}
           icon={<FieldDateIcon />}
-          isDisabled={petition.isAnonymized}
+          isDisabled={petition.isAnonymized || permissionType === "READ"}
           label={<FormattedMessage id="petition.deadline-label" defaultMessage="Deadline" />}
           description={
             <FormattedMessage
@@ -554,7 +561,7 @@ function _PetitionSettings({
       {petition.__typename === "PetitionTemplate" ? (
         <SettingsRowButton
           data-section="share-automatically"
-          isDisabled={isPublicTemplate || petition.isRestricted}
+          isDisabled={isPublicTemplate || petition.isRestricted || permissionType === "READ"}
           icon={<ArrowShortRightIcon />}
           label={
             <FormattedMessage
@@ -580,6 +587,7 @@ function _PetitionSettings({
       {petition.signatureConfig || hasSignature ? (
         <SettingsRowButton
           data-section="esignature-settings"
+            !hasSignature || isPublicTemplate || petition.isAnonymized || petition.isRestricted || permissionType === "READ"
           isDisabled={
             !hasSignature || isPublicTemplate || petition.isAnonymized || petition.isRestricted
           }
@@ -612,6 +620,7 @@ function _PetitionSettings({
       ) : null}
       {petition.__typename === "PetitionTemplate" ? (
         <SettingsRowButton
+          isDisabled={isPublicTemplate || petition.isAnonymized || petition.isRestricted || permissionType === "READ"}
           isDisabled={isPublicTemplate || petition.isAnonymized || petition.isRestricted}
           icon={<BellSettingsIcon />}
           label={
@@ -658,6 +667,7 @@ function _PetitionSettings({
       ) : null}
       {user.hasSkipForwardSecurity ? (
         <SettingsRowSwitch
+          isDisabled={isPublicTemplate || petition.isAnonymized || petition.isRestricted || permissionType === "READ"}
           isDisabled={isPublicTemplate || petition.isAnonymized || petition.isRestricted}
           icon={<ShieldIcon />}
           label={
@@ -679,6 +689,7 @@ function _PetitionSettings({
       ) : null}
       {user.hasHideRecipientViewContents ? (
         <SettingsRowSwitch
+          isDisabled={isPublicTemplate || petition.isAnonymized || petition.isRestricted || permissionType === "READ"}
           isDisabled={isPublicTemplate || petition.isAnonymized || petition.isRestricted}
           icon={<ListIcon />}
           label={

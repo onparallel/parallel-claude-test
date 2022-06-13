@@ -38,6 +38,8 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
         onUpdatePetition({ emailBody: isEmptyRTEValue(emailBody) ? null : emailBody });
       };
 
+      const permissionType = petition.myEffectivePermission?.permissionType ?? "READ";
+
       return (
         <Card ref={ref} {...props}>
           <CardHeader>
@@ -61,7 +63,7 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
               body={messages.emailBody}
               onSubjectChange={handleMessagesEmailSubjectChange}
               onBodyChange={handleMessagesEmailBodyChange}
-              isReadOnly={petition.isRestricted || petition.isPublic}
+              isReadOnly={petition.isRestricted || petition.isPublic || permissionType === "READ"}
             />
           </Box>
         </Card>
@@ -77,6 +79,9 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
           emailBody
           isRestricted
           isPublic
+          myEffectivePermission {
+            permissionType
+          }
         }
       `,
     },

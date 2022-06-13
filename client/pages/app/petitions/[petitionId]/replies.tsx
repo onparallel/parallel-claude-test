@@ -138,6 +138,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const petition = data!.petition as PetitionReplies_PetitionFragment;
 
+  const permissionType = petition.myEffectivePermission?.permissionType ?? "READ";
+
   const fieldVisibility = useFieldVisibility(petition.fields);
   const toast = useToast();
 
@@ -494,7 +496,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             />
             <Button
               data-action="close-petition"
-              hidden={petition.status === "CLOSED" || petition.isAnonymized}
+              hidden={
+                petition.status === "CLOSED" || petition.isAnonymized || permissionType === "READ"
+              }
               colorScheme="green"
               leftIcon={<CheckIcon />}
               onClick={handleClosePetition}
@@ -508,7 +512,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               hidden={
                 petition.status !== "CLOSED" ||
                 petition.accesses.length === 0 ||
-                petition.isAnonymized
+                petition.isAnonymized ||
+                permissionType === "READ"
               }
               colorScheme="blue"
               leftIcon={<ThumbUpIcon fontSize="lg" display="block" />}
@@ -595,7 +600,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 field={activeField}
                 myId={me.id}
                 hasInternalComments={me.hasInternalComments}
-                isDisabled={petition.isAnonymized}
+                isDisabled={petition.isAnonymized || permissionType === "READ"}
                 onClose={() => setActiveFieldId(null)}
                 onAddComment={handleAddComment}
                 onUpdateComment={handleUpdateComment}
@@ -680,7 +685,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             layerStyle="highlightable"
             marginTop={8}
             onRefetchPetition={refetch}
-            isDisabled={petition.isAnonymized}
+            isDisabled={petition.isAnonymized || permissionType === "READ"}
           />
         </Box>
       </PaneWithFlyout>
@@ -705,6 +710,9 @@ PetitionReplies.fragments = {
         currentSignatureRequest {
           id
           status
+        }
+        myEffectivePermission {
+          permissionType
         }
         isAnonymized
         ...PetitionSignaturesCard_Petition

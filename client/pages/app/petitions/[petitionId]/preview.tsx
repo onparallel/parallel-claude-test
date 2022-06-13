@@ -96,6 +96,8 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const petition = data!.petition as PetitionPreview_PetitionBaseFragment;
   const isPetition = petition.__typename === "Petition";
 
+  const permissionType = petition.myEffectivePermission?.permissionType ?? "READ";
+
   const pageCount =
     petition.fields.filter((f) => f.type === "HEADING" && f.options!.hasPageBreak).length + 1;
 
@@ -358,7 +360,9 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                         petitionId={petition.id}
                         field={field}
                         isDisabled={
-                          (isPetition && petition.status === "CLOSED") || petition.isAnonymized
+                          (isPetition && petition.status === "CLOSED") ||
+                          petition.isAnonymized ||
+                          permissionType === "READ"
                         }
                         isInvalid={
                           finalized && completedFieldReplies(field).length === 0 && !field.optional
@@ -383,7 +387,11 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             <RecipientViewProgressFooter
               petition={petition}
               onFinalize={handleFinalize}
-              isDisabled={displayPetitionLimitReachedAlert || petition.isAnonymized}
+              isDisabled={
+                displayPetitionLimitReachedAlert ||
+                petition.isAnonymized ||
+                permissionType === "READ"
+              }
             />
           )}
         </Flex>
@@ -398,6 +406,9 @@ PetitionPreview.fragments = {
       id
       tone
       isAnonymized
+      myEffectivePermission {
+        permissionType
+      }
       ... on Petition {
         accesses {
           id
