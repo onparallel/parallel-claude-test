@@ -82,7 +82,7 @@ export interface PetitionComposeFieldProps {
   onFocusPrevField: () => void;
   onAddField: () => void;
   isReadOnly?: boolean;
-  isPublicTemplate?: boolean;
+  isAttachDisabled?: boolean;
 }
 
 export type PetitionComposeFieldRef = {
@@ -115,7 +115,7 @@ const _PetitionComposeField = chakraForwardRef<
     onFocusPrevField,
     onAddField,
     isReadOnly,
-    isPublicTemplate,
+    isAttachDisabled,
     ...props
   },
   ref
@@ -396,7 +396,7 @@ const _PetitionComposeField = chakraForwardRef<
           onRemoveAttachment={handleRemoveAttachment}
           onDownloadAttachment={handleDownloadAttachment}
           isReadOnly={isReadOnly}
-          isPublicTemplate={isPublicTemplate}
+          isAttachDisabled={isAttachDisabled}
         />
         <PetitionComposeFieldActions
           field={field}
@@ -411,7 +411,7 @@ const _PetitionComposeField = chakraForwardRef<
           bottom={0}
           right={2}
           isReadOnly={isReadOnly}
-          isPublicTemplate={isPublicTemplate}
+          isAttachDisabled={isAttachDisabled}
         />
       </Box>
     </Box>
@@ -434,7 +434,7 @@ interface PetitionComposeFieldInnerProps
   onRemoveAttachment: (attachmentId: string) => void;
   onDownloadAttachment: (attachmentId: string) => void;
   isReadOnly?: boolean;
-  isPublicTemplate?: boolean;
+  isAttachDisabled?: boolean;
 }
 
 // This component was extracted so the whole PetitionComposeField doesn't rerender
@@ -457,7 +457,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
     onDownloadAttachment,
     onRemoveAttachment,
     isReadOnly,
-    isPublicTemplate,
+    isAttachDisabled,
     ...props
   },
   ref
@@ -702,7 +702,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
               <PetitionComposeFieldAttachment
                 key={attachment.id}
                 attachment={attachment}
-                isDisabled={isPublicTemplate}
+                isDisabled={isAttachDisabled}
                 progress={attachmentUploadProgress[attachment.id]}
                 onDownload={() => onDownloadAttachment(attachment.id)}
                 onRemove={() => onRemoveAttachment(attachment.id)}
@@ -800,7 +800,7 @@ interface PetitionComposeFieldActionsProps
   onVisibilityClick: () => void;
   onAttachmentClick: () => void;
   isReadOnly?: boolean;
-  isPublicTemplate?: boolean;
+  isAttachDisabled?: boolean;
 }
 
 const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFieldActionsProps>(
@@ -814,7 +814,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
       onSettingsClick,
       onDeleteClick,
       isReadOnly,
-      isPublicTemplate,
+      isAttachDisabled,
       ...props
     },
     ref
@@ -878,7 +878,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
           </SmallPopover>
         )}
         <IconButtonWithTooltip
-          isDisabled={isPublicTemplate}
+          isDisabled={isAttachDisabled}
           icon={<PaperclipIcon />}
           size="sm"
           variant="ghost"

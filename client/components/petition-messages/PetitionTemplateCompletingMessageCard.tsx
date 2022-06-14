@@ -69,7 +69,7 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
           textWithPlaceholderToSlateNodes(messagesBody[petition.locale], placeholders)
       );
 
-      const permissionType = petition.myEffectivePermission?.permissionType ?? "READ";
+      const myEffectivePermission = petition.myEffectivePermission?.permissionType ?? "READ";
 
       const handleSubjectChange = (completingMessageSubject: string) => {
         if (completingMessageSubject === subject) return;
@@ -100,7 +100,8 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
         });
       };
 
-      const isReadOnly = petition.isRestricted || petition.isPublic || permissionType === "READ";
+      const isReadOnly =
+        petition.isRestricted || petition.isPublic || myEffectivePermission === "READ";
       const placeholderOptions = usePetitionMessagePlaceholderOptions();
 
       return (

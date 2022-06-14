@@ -219,9 +219,11 @@ function Petitions() {
     try {
       const petition = petitions.items.find((p) => p.id === selected[0]);
       if (petition) {
+        const isPublic = petition.__typename === "PetitionTemplate" && petition.isPublic;
         const { newName } = await showRenameDialog({
           name: petition.name,
           isTemplate: petition.__typename === "PetitionTemplate",
+          isDisabled: isPublic || petition.myEffectivePermission?.permissionType === "READ",
         });
         await updatePetition({
           variables: {
@@ -407,6 +409,9 @@ Petitions.fragments = {
         ...usePetitionsTableColumns_PetitionBase
         ... on PetitionTemplate {
           isPublic
+        }
+        myEffectivePermission {
+          permissionType
         }
       }
       ${usePetitionsTableColumns.fragments.PetitionBase}

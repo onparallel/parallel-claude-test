@@ -79,7 +79,6 @@ export function PetitionContents<T extends PetitionContents_PetitionFieldFragmen
             key={x.field.id}
             field={x.field}
             isVisible={true}
-            isDisabled={isReadOnly}
             fieldIndex={x.fieldIndex}
             onFieldClick={handleFieldClick(x.field.id)}
             onFieldEdit={onFieldEdit}
@@ -177,13 +176,12 @@ interface PetitionContentsItemProps<T extends PetitionContents_PetitionFieldFrag
   onFieldEdit?: (fieldId: string, data: UpdatePetitionFieldInput) => void;
   showAliasButtons: boolean;
   fieldIndicators?: ComponentType<PetitionContentsFieldIndicatorsProps<T>>;
-  isReadOnly: boolean;
+  isReadOnly?: boolean;
 }
 
 function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>({
   field,
   isVisible,
-  isDisabled,
   fieldIndex,
   onFieldClick,
   onFieldEdit,

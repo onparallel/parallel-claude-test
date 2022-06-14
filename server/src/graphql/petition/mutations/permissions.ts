@@ -162,7 +162,7 @@ export const editPetitionPermission = mutationField("editPetitionPermission", {
   description: "Edits permissions on given petitions and users",
   type: list(nonNull("Petition")),
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionIds", ["OWNER"]),
+    userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
     ifArgDefined("userIds", userHasAccessToUsers("userIds" as never)),
     ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never))
   ),
@@ -175,7 +175,6 @@ export const editPetitionPermission = mutationField("editPetitionPermission", {
   validateArgs: validateAnd(
     notEmptyArray((args) => args.petitionIds, "petitionIds"),
     notEmptyArray((args) => args.userIds, "userIds"),
-    userIdNotIncludedInArray((args) => args.userIds, "userIds"),
     notEmptyArray((args) => args.userGroupIds, "userGroupId"),
     (_, args, ctx, info) => {
       if (!isDefined(args.userIds) && !isDefined(args.userGroupIds)) {
@@ -213,7 +212,7 @@ export const removePetitionPermission = mutationField("removePetitionPermission"
   description: "Removes permissions on given petitions and users",
   type: nonNull(list(nullable("PetitionBase"))),
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
+    userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE", "READ"]),
     ifArgDefined("userIds", userHasAccessToUsers("userIds" as never)),
     ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never))
   ),

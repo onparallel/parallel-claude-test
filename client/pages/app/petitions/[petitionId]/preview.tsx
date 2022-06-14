@@ -96,7 +96,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const petition = data!.petition as PetitionPreview_PetitionBaseFragment;
   const isPetition = petition.__typename === "Petition";
 
-  const permissionType = petition.myEffectivePermission?.permissionType ?? "READ";
+  const myEffectivePermission = petition.myEffectivePermission?.permissionType ?? "READ";
 
   const pageCount =
     petition.fields.filter((f) => f.type === "HEADING" && f.options!.hasPageBreak).length + 1;
@@ -288,7 +288,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               id="petition-next"
               colorScheme="primary"
               icon={<PaperPlaneIcon fontSize="18px" />}
-              isDisabled={petition.isAnonymized}
+              isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
               label={intl.formatMessage({
                 id: "generic.send-to",
                 defaultMessage: "Send to...",
@@ -362,7 +362,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                         isDisabled={
                           (isPetition && petition.status === "CLOSED") ||
                           petition.isAnonymized ||
-                          permissionType === "READ"
+                          myEffectivePermission === "READ"
                         }
                         isInvalid={
                           finalized && completedFieldReplies(field).length === 0 && !field.optional
@@ -390,7 +390,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
               isDisabled={
                 displayPetitionLimitReachedAlert ||
                 petition.isAnonymized ||
-                permissionType === "READ"
+                myEffectivePermission === "READ"
               }
             />
           )}

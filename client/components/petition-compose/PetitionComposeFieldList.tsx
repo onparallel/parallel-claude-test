@@ -70,7 +70,7 @@ export interface PetitionComposeFieldListProps extends BoxProps {
   onAddField: (type: PetitionFieldType, position?: number) => void;
   onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => Promise<void>;
   isReadOnly?: boolean;
-  isPublicTemplate?: boolean;
+  isAttachDisabled?: boolean;
   isTemplate?: boolean;
 }
 
@@ -89,7 +89,7 @@ export const PetitionComposeFieldList = Object.assign(
     onAddField,
     onFieldEdit,
     isReadOnly,
-    isPublicTemplate,
+    isAttachDisabled,
     isTemplate,
     ...props
   }: PetitionComposeFieldListProps) {
@@ -463,7 +463,7 @@ export const PetitionComposeFieldList = Object.assign(
                   isActive={isActive}
                   showError={showErrors}
                   isReadOnly={isReadOnly}
-                  isPublicTemplate={isPublicTemplate}
+                  isAttachDisabled={isAttachDisabled}
                   {...fieldProps(fieldId)}
                   {...fieldMouseHandlers(fieldId)}
                 />

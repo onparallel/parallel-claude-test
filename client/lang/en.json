@@ -6640,6 +6640,16 @@
     "context": "Reject"
   },
   {
+    "term": "petition-sharing.confirm-edit.header",
+    "definition": "Edit permissions",
+    "context": "Edit permissions"
+  },
+  {
+    "term": "petition-sharing.confirm-edit.message-2",
+    "definition": "Are you sure you want to modify your permissions? If you do you will lose the ability to edit.",
+    "context": "Are you sure you want to modify your permissions? If you do you will lose the ability to edit."
+  },
+  {
     "term": "petition-sharing.confirm-remove.confirm-button",
     "definition": "Yes, remove",
     "context": "Yes, remove"

@@ -138,7 +138,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const petition = data!.petition as PetitionReplies_PetitionFragment;
 
-  const permissionType = petition.myEffectivePermission?.permissionType ?? "READ";
+  const myEffectivePermission = petition.myEffectivePermission?.permissionType ?? "READ";
 
   const fieldVisibility = useFieldVisibility(petition.fields);
   const toast = useToast();
@@ -497,7 +497,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             <Button
               data-action="close-petition"
               hidden={
-                petition.status === "CLOSED" || petition.isAnonymized || permissionType === "READ"
+                petition.status === "CLOSED" ||
+                petition.isAnonymized ||
+                myEffectivePermission === "READ"
               }
               colorScheme="green"
               leftIcon={<CheckIcon />}
@@ -513,7 +515,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 petition.status !== "CLOSED" ||
                 petition.accesses.length === 0 ||
                 petition.isAnonymized ||
-                permissionType === "READ"
+                myEffectivePermission === "READ"
               }
               colorScheme="blue"
               leftIcon={<ThumbUpIcon fontSize="lg" display="block" />}
@@ -600,7 +602,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 field={activeField}
                 myId={me.id}
                 hasInternalComments={me.hasInternalComments}
-                isDisabled={petition.isAnonymized || permissionType === "READ"}
+                isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
                 onClose={() => setActiveFieldId(null)}
                 onAddComment={handleAddComment}
                 onUpdateComment={handleUpdateComment}
@@ -685,7 +687,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             layerStyle="highlightable"
             marginTop={8}
             onRefetchPetition={refetch}
-            isDisabled={petition.isAnonymized || permissionType === "READ"}
+            isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
           />
         </Box>
       </PaneWithFlyout>

@@ -9,6 +9,7 @@ import { FormattedMessage } from "react-intl";
 interface RenameDialogProps {
   name: string | null | undefined;
   isTemplate: boolean;
+  isDisabled: boolean;
 }
 
 interface RenameDialogData {
@@ -18,6 +19,7 @@ interface RenameDialogData {
 function RenameDialog({
   name,
   isTemplate,
+  isDisabled,
   ...props
 }: DialogProps<RenameDialogProps, RenameDialogData>) {
   const {
@@ -59,7 +61,7 @@ function RenameDialog({
       }
       body={
         <Stack>
-          <FormControl id="newName" isInvalid={!!errors.newName}>
+          <FormControl id="newName" isInvalid={!!errors.newName} isDisabled={isDisabled}>
             <FormLabel>
               {isTemplate ? (
                 <FormattedMessage id="generic.template-name" defaultMessage="Template name" />

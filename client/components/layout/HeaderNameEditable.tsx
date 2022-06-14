@@ -36,6 +36,8 @@ export const HeaderNameEditable = Object.assign(
 
     const isPublic = petition.__typename === "PetitionTemplate" && petition.isPublic;
 
+    const myEffectivePermission = petition.myEffectivePermission?.permissionType ?? "READ";
+
     const editablePreviewRef = useRef<HTMLSpanElement | null>(null);
 
     useEffect(() => {
@@ -52,6 +54,8 @@ export const HeaderNameEditable = Object.assign(
         );
       }
     }, []);
+
+    const isReadOnly = isPublic || myEffectivePermission === "READ";
 
     return (
       <Editable
@@ -73,7 +77,7 @@ export const HeaderNameEditable = Object.assign(
         {({ isEditing }: { isEditing: boolean }) => (
           <>
             <Flex flex="1 1 auto" minWidth={0} padding={1}>
-              {isPublic ? (
+              {isReadOnly ? (
                 <Text color={name ? "default" : "gray.400"} paddingX={2} isTruncated>
                   {name || props.placeholder}
                 </Text>
@@ -179,6 +183,9 @@ export const HeaderNameEditable = Object.assign(
         fragment HeaderNameEditable_PetitionBase on PetitionBase {
           name
           updatedAt
+          myEffectivePermission {
+            permissionType
+          }
           ... on PetitionTemplate {
             isPublic
           }

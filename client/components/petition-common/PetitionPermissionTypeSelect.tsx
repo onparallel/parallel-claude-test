@@ -30,7 +30,7 @@ export const PetitionPermissionTypeSelect = forwardRef<
               }),
               value: "OWNER",
               isDisabled: disableOwner,
-            } as SimpleOption<string>,
+            } as SimpleOption<PetitionPermissionType>,
           ]),
       {
         label: intl.formatMessage({

@@ -4317,6 +4317,10 @@ export type HeaderNameEditable_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   name?: string | null;
   updatedAt: string;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+  } | null;
 };
 
 export type HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment = {
@@ -4324,6 +4328,10 @@ export type HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment = {
   isPublic: boolean;
   name?: string | null;
   updatedAt: string;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+  } | null;
 };
 
 export type HeaderNameEditable_PetitionBaseFragment =
@@ -4343,6 +4351,7 @@ export type PetitionHeader_PetitionFragment = {
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
+    permissionType: PetitionPermissionType;
   } | null;
 };
 
@@ -4392,6 +4401,7 @@ export type PetitionLayout_PetitionBase_Petition_Fragment = {
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
+    permissionType: PetitionPermissionType;
   } | null;
 };
 
@@ -4403,6 +4413,10 @@ export type PetitionLayout_PetitionBase_PetitionTemplate_Fragment = {
   isPublic: boolean;
   isRestricted: boolean;
   updatedAt: string;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+  } | null;
 };
 
 export type PetitionLayout_PetitionBaseFragment =
@@ -4452,6 +4466,10 @@ export type PetitionTemplateHeader_PetitionTemplateFragment = {
   isRestricted: boolean;
   name?: string | null;
   updatedAt: string;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+  } | null;
 };
 
 export type PetitionTemplateHeader_QueryFragment = {
@@ -7269,6 +7287,10 @@ export type PetitionSharingModal_Petition_Petition_Fragment = {
         };
       }
   >;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+  } | null;
 };
 
 export type PetitionSharingModal_Petition_PetitionTemplate_Fragment = {
@@ -7310,6 +7332,10 @@ export type PetitionSharingModal_Petition_PetitionTemplate_Fragment = {
         };
       }
   >;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+  } | null;
 };
 
 export type PetitionSharingModal_PetitionFragment =
@@ -7429,6 +7455,10 @@ export type PetitionSharingModal_addPetitionPermissionMutation = {
               };
             }
         >;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+        } | null;
       }
     | {
         __typename?: "PetitionTemplate";
@@ -7469,6 +7499,10 @@ export type PetitionSharingModal_addPetitionPermissionMutation = {
               };
             }
         >;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+        } | null;
       }
   >;
 };
@@ -7520,6 +7554,10 @@ export type PetitionSharingModal_removePetitionPermissionMutation = {
               };
             }
         >;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+        } | null;
       }
     | {
         __typename?: "PetitionTemplate";
@@ -7560,9 +7598,67 @@ export type PetitionSharingModal_removePetitionPermissionMutation = {
               };
             }
         >;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+        } | null;
       }
     | null
   >;
+};
+
+export type PetitionSharingModal_editPetitionPermissionMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  userIds?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  userGroupIds?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  permissionType: PetitionPermissionType;
+}>;
+
+export type PetitionSharingModal_editPetitionPermissionMutation = {
+  editPetitionPermission: Array<{
+    __typename?: "Petition";
+    id: string;
+    name?: string | null;
+    permissions: Array<
+      | {
+          __typename?: "PetitionUserGroupPermission";
+          permissionType: PetitionPermissionType;
+          group: {
+            __typename?: "UserGroup";
+            id: string;
+            name: string;
+            initials: string;
+            members: Array<{
+              __typename?: "UserGroupMember";
+              user: {
+                __typename?: "User";
+                id: string;
+                email: string;
+                fullName?: string | null;
+                avatarUrl?: string | null;
+                initials?: string | null;
+              };
+            }>;
+          };
+        }
+      | {
+          __typename?: "PetitionUserPermission";
+          permissionType: PetitionPermissionType;
+          user: {
+            __typename?: "User";
+            id: string;
+            email: string;
+            fullName?: string | null;
+            avatarUrl?: string | null;
+            initials?: string | null;
+          };
+        }
+    >;
+    myEffectivePermission?: {
+      __typename?: "EffectivePetitionUserPermission";
+      permissionType: PetitionPermissionType;
+    } | null;
+  }>;
 };
 
 export type PetitionSharingModal_transferPetitionOwnershipMutationVariables = Exact<{
@@ -7611,6 +7707,10 @@ export type PetitionSharingModal_transferPetitionOwnershipMutation = {
               };
             }
         >;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+        } | null;
       }
     | {
         __typename?: "PetitionTemplate";
@@ -7651,6 +7751,10 @@ export type PetitionSharingModal_transferPetitionOwnershipMutation = {
               };
             }
         >;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+        } | null;
       }
   >;
 };
@@ -7700,6 +7804,10 @@ export type PetitionSharingModal_petitionsQuery = {
               };
             }
         >;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+        } | null;
       }
     | {
         __typename?: "PetitionTemplate";
@@ -7740,6 +7848,10 @@ export type PetitionSharingModal_petitionsQuery = {
               };
             }
         >;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+        } | null;
       }
     | null
   >;
@@ -12775,11 +12887,6 @@ export type PetitionActivity_PetitionFragment = {
       weekdaysOnly: boolean;
     } | null;
   }>;
-  myEffectivePermission?: {
-    __typename?: "EffectivePetitionUserPermission";
-    permissionType: PetitionPermissionType;
-    isSubscribed: boolean;
-  } | null;
   fields: Array<{
     __typename?: "PetitionField";
     id: string;
@@ -12787,6 +12894,11 @@ export type PetitionActivity_PetitionFragment = {
     type: PetitionFieldType;
     options: { [key: string]: any };
   }>;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+    isSubscribed: boolean;
+  } | null;
   events: {
     __typename?: "PetitionEventPagination";
     items: Array<
@@ -13558,11 +13670,6 @@ export type PetitionActivity_updatePetitionMutation = {
             weekdaysOnly: boolean;
           } | null;
         }>;
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          permissionType: PetitionPermissionType;
-          isSubscribed: boolean;
-        } | null;
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -13570,6 +13677,11 @@ export type PetitionActivity_updatePetitionMutation = {
           type: PetitionFieldType;
           options: { [key: string]: any };
         }>;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+          isSubscribed: boolean;
+        } | null;
         events: {
           __typename?: "PetitionEventPagination";
           items: Array<
@@ -14405,11 +14517,6 @@ export type PetitionActivity_petitionQuery = {
             weekdaysOnly: boolean;
           } | null;
         }>;
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          permissionType: PetitionPermissionType;
-          isSubscribed: boolean;
-        } | null;
         fields: Array<{
           __typename?: "PetitionField";
           id: string;
@@ -14417,6 +14524,11 @@ export type PetitionActivity_petitionQuery = {
           type: PetitionFieldType;
           options: { [key: string]: any };
         }>;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+          isSubscribed: boolean;
+        } | null;
         events: {
           __typename?: "PetitionEventPagination";
           items: Array<
@@ -15430,10 +15542,6 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
         };
       }
   >;
-  myEffectivePermission?: {
-    __typename?: "EffectivePetitionUserPermission";
-    permissionType: PetitionPermissionType;
-  } | null;
   organization: { __typename?: "Organization"; customHost?: string | null };
   signatureConfig?: {
     __typename?: "SignatureConfig";
@@ -15781,6 +15889,7 @@ export type PetitionCompose_updateFieldPositionsMutation = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
+          permissionType: PetitionPermissionType;
         } | null;
       }
     | {
@@ -15792,6 +15901,10 @@ export type PetitionCompose_updateFieldPositionsMutation = {
         isRestricted: boolean;
         updatedAt: string;
         fields: Array<{ __typename?: "PetitionField"; id: string }>;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+        } | null;
       };
 };
 
@@ -15834,6 +15947,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
             isSubscribed: boolean;
+            permissionType: PetitionPermissionType;
           } | null;
         }
       | {
@@ -15845,6 +15959,10 @@ export type PetitionCompose_createPetitionFieldMutation = {
           isRestricted: boolean;
           updatedAt: string;
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
+          myEffectivePermission?: {
+            __typename?: "EffectivePetitionUserPermission";
+            permissionType: PetitionPermissionType;
+          } | null;
         };
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -15904,6 +16022,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           myEffectivePermission?: {
             __typename?: "EffectivePetitionUserPermission";
             isSubscribed: boolean;
+            permissionType: PetitionPermissionType;
           } | null;
         }
       | {
@@ -15915,6 +16034,10 @@ export type PetitionCompose_clonePetitionFieldMutation = {
           isRestricted: boolean;
           updatedAt: string;
           fields: Array<{ __typename?: "PetitionField"; id: string }>;
+          myEffectivePermission?: {
+            __typename?: "EffectivePetitionUserPermission";
+            permissionType: PetitionPermissionType;
+          } | null;
         };
     attachments: Array<{
       __typename?: "PetitionFieldAttachment";
@@ -15958,6 +16081,7 @@ export type PetitionCompose_deletePetitionFieldMutation = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
+          permissionType: PetitionPermissionType;
         } | null;
       }
     | {
@@ -15969,6 +16093,10 @@ export type PetitionCompose_deletePetitionFieldMutation = {
         isRestricted: boolean;
         updatedAt: string;
         fields: Array<{ __typename?: "PetitionField"; id: string }>;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+        } | null;
       };
 };
 
@@ -16381,10 +16509,6 @@ export type PetitionCompose_petitionQuery = {
               };
             }
         >;
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          permissionType: PetitionPermissionType;
-        } | null;
         organization: { __typename?: "Organization"; customHost?: string | null };
         signatureConfig?: {
           __typename?: "SignatureConfig";
@@ -16435,6 +16559,7 @@ export type PetitionMessages_PetitionBase_Petition_Fragment = {
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
+    permissionType: PetitionPermissionType;
   } | null;
 };
 
@@ -16556,6 +16681,7 @@ export type PetitionMessages_petitionQuery = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
+          permissionType: PetitionPermissionType;
         } | null;
       }
     | {
@@ -16603,6 +16729,7 @@ export type PetitionMessages_updatePetitionMutation = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
+          permissionType: PetitionPermissionType;
         } | null;
       }
     | {
@@ -17973,6 +18100,7 @@ export type PetitionReplies_updatePetitionMutation = {
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
+          permissionType: PetitionPermissionType;
         } | null;
       }
     | {
@@ -17983,6 +18111,10 @@ export type PetitionReplies_updatePetitionMutation = {
         isPublic: boolean;
         isRestricted: boolean;
         updatedAt: string;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+        } | null;
       };
 };
 
@@ -18641,6 +18773,10 @@ export type Petitions_PetitionBasePaginationFragment = {
         createdAt: string;
         status: PetitionStatus;
         isRestricted: boolean;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+        } | null;
         accesses: Array<{
           __typename?: "PetitionAccess";
           status: PetitionAccessStatus;
@@ -18708,6 +18844,10 @@ export type Petitions_PetitionBasePaginationFragment = {
         locale: PetitionLocale;
         isRestricted: boolean;
         anonymizeAfterMonths?: number | null;
+        myEffectivePermission?: {
+          __typename?: "EffectivePetitionUserPermission";
+          permissionType: PetitionPermissionType;
+        } | null;
         permissions: Array<
           | {
               __typename?: "PetitionUserGroupPermission";
@@ -18777,6 +18917,10 @@ export type Petitions_PetitionBase_Petition_Fragment = {
   createdAt: string;
   status: PetitionStatus;
   isRestricted: boolean;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+  } | null;
   accesses: Array<{
     __typename?: "PetitionAccess";
     status: PetitionAccessStatus;
@@ -18845,6 +18989,10 @@ export type Petitions_PetitionBase_PetitionTemplate_Fragment = {
   locale: PetitionLocale;
   isRestricted: boolean;
   anonymizeAfterMonths?: number | null;
+  myEffectivePermission?: {
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionPermissionType;
+  } | null;
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
@@ -18965,6 +19113,10 @@ export type Petitions_petitionsQuery = {
           createdAt: string;
           status: PetitionStatus;
           isRestricted: boolean;
+          myEffectivePermission?: {
+            __typename?: "EffectivePetitionUserPermission";
+            permissionType: PetitionPermissionType;
+          } | null;
           accesses: Array<{
             __typename?: "PetitionAccess";
             status: PetitionAccessStatus;
@@ -19037,6 +19189,10 @@ export type Petitions_petitionsQuery = {
           locale: PetitionLocale;
           isRestricted: boolean;
           anonymizeAfterMonths?: number | null;
+          myEffectivePermission?: {
+            __typename?: "EffectivePetitionUserPermission";
+            permissionType: PetitionPermissionType;
+          } | null;
           permissions: Array<
             | {
                 __typename?: "PetitionUserGroupPermission";
@@ -21856,6 +22012,9 @@ export const PetitionSharingModal_PetitionFragmentDoc = gql`
         ...PetitionSharingModal_PetitionUserGroupPermission
       }
     }
+    myEffectivePermission {
+      permissionType
+    }
   }
   ${PetitionSharingModal_PetitionUserPermissionFragmentDoc}
   ${PetitionSharingModal_PetitionUserGroupPermissionFragmentDoc}
@@ -22471,6 +22630,9 @@ export const HeaderNameEditable_PetitionBaseFragmentDoc = gql`
   fragment HeaderNameEditable_PetitionBase on PetitionBase {
     name
     updatedAt
+    myEffectivePermission {
+      permissionType
+    }
     ... on PetitionTemplate {
       isPublic
     }
@@ -23519,9 +23681,6 @@ export const PetitionActivity_PetitionFragmentDoc = gql`
     accesses {
       id
       status
-    }
-    myEffectivePermission {
-      permissionType
     }
     ...PetitionLayout_PetitionBase
     ...PetitionAccessTable_Petition
@@ -24884,6 +25043,9 @@ export const Petitions_PetitionBaseFragmentDoc = gql`
     ... on PetitionTemplate {
       isPublic
     }
+    myEffectivePermission {
+      permissionType
+    }
   }
   ${usePetitionsTableColumns_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<Petitions_PetitionBaseFragment, unknown>;
@@ -25828,6 +25990,27 @@ export const PetitionSharingModal_removePetitionPermissionDocument = gql`
 ` as unknown as DocumentNode<
   PetitionSharingModal_removePetitionPermissionMutation,
   PetitionSharingModal_removePetitionPermissionMutationVariables
+>;
+export const PetitionSharingModal_editPetitionPermissionDocument = gql`
+  mutation PetitionSharingModal_editPetitionPermission(
+    $petitionId: GID!
+    $userIds: [GID!]
+    $userGroupIds: [GID!]
+    $permissionType: PetitionPermissionType!
+  ) {
+    editPetitionPermission(
+      petitionIds: [$petitionId]
+      userIds: $userIds
+      userGroupIds: $userGroupIds
+      permissionType: $permissionType
+    ) {
+      ...PetitionSharingModal_Petition
+    }
+  }
+  ${PetitionSharingModal_PetitionFragmentDoc}
+` as unknown as DocumentNode<
+  PetitionSharingModal_editPetitionPermissionMutation,
+  PetitionSharingModal_editPetitionPermissionMutationVariables
 >;
 export const PetitionSharingModal_transferPetitionOwnershipDocument = gql`
   mutation PetitionSharingModal_transferPetitionOwnership($petitionId: GID!, $userId: GID!) {
