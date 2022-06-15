@@ -183,6 +183,7 @@ export function useCreatePetitionFieldReply() {
             __typename: "PetitionFieldReply",
             status: "PENDING",
             content: { value: reply },
+            isAnonymized: false,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           },
@@ -283,6 +284,7 @@ export function useCreateFileUploadReply() {
                 contentType: file.type,
                 uploadComplete: true,
               },
+              isAnonymized: false,
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
             },
@@ -373,6 +375,7 @@ export function useStartAsyncFieldCompletion() {
               contentType: "application/pdf",
               uploadComplete: true,
             },
+            isAnonymized: false,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           },
@@ -430,6 +433,7 @@ updatePreviewFieldReplies.fragments = {
         id
         content
         status
+        isAnonymized
         createdAt
         updatedAt
       }

@@ -9461,6 +9461,7 @@ export type PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFiel
   id: string;
   content: { [key: string]: any };
   status: PetitionFieldReplyStatus;
+  isAnonymized: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -9472,6 +9473,7 @@ export type PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFiel
     id: string;
     content: { [key: string]: any };
     status: PetitionFieldReplyStatus;
+    isAnonymized: boolean;
     createdAt: string;
     updatedAt: string;
   }>;
@@ -9480,6 +9482,7 @@ export type PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFiel
     id: string;
     content: { [key: string]: any };
     status: PetitionFieldReplyStatus;
+    isAnonymized: boolean;
     createdAt: string;
     updatedAt: string;
   }>;
@@ -21988,6 +21991,7 @@ export const PreviewPetitionFieldMutations_updatePreviewFieldReplies_PetitionFie
       id
       content
       status
+      isAnonymized
       createdAt
       updatedAt
     }
