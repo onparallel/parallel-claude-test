@@ -2,7 +2,7 @@ import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { gql } from "apollo-server-core";
 import { FormattedMessage } from "react-intl";
 import { PdfDocumentGetProps } from "../utils/pdf";
-import { PdfDocumentTheme } from "../utils/ThemeProvider";
+import { PdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { AnnexCoverPage_meDocument } from "../__types";
 
 export interface AnnexCoverPageInitialData {

@@ -9,6 +9,7 @@ import {
 import { SignatureResponse } from "../services/signature";
 import { fullName } from "../util/fullName";
 import { toGlobalId } from "../util/globalId";
+import { defaultPdfDocumentTheme } from "../util/PdfDocumentTheme";
 import { removeKeys } from "../util/remedaExtensions";
 import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
 import { random } from "../util/token";
@@ -80,6 +81,7 @@ async function startSignatureProcess(
         },
         signingMode: "parallel",
         initialMessage: message,
+        pdfDocumentTheme: org.pdf_document_theme ?? defaultPdfDocumentTheme,
       }
     );
 

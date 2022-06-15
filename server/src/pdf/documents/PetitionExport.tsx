@@ -12,7 +12,8 @@ import { NetDocumentsExternalLink } from "../components/NetDocumentsExternalLink
 import { SignaturesBlock } from "../components/SignaturesBlock";
 import { cleanupText } from "../utils/cleanupText";
 import { PdfDocumentGetProps } from "../utils/pdf";
-import { PdfDocumentTheme, ThemeProvider } from "../utils/ThemeProvider";
+import { ThemeProvider } from "../utils/ThemeProvider";
+import { PdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { LiquidProvider, LiquidScopeProvider } from "../utils/useLiquid";
 import { useLiquidScope } from "../utils/useLiquidScope";
 import {

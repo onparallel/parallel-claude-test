@@ -1,7 +1,7 @@
 import { Document, Image, Page, StyleSheet, View } from "@react-pdf/renderer";
 import { gql } from "apollo-server-core";
 import { PdfDocumentGetProps } from "../utils/pdf";
-import { PdfDocumentTheme } from "../utils/ThemeProvider";
+import { PdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { ImageToPdf_meDocument } from "../__types";
 
 export interface ImageToPdfInitialData extends Omit<ImageToPdfProps, "theme"> {}

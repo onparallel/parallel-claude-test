@@ -1,6 +1,6 @@
 import deepmerge from "deepmerge";
 import { arg, booleanArg, inputObjectType, intArg, mutationField, nonNull, nullable } from "nexus";
-import { defaultDocumentTheme } from "../../pdf/utils/ThemeProvider";
+import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { random } from "../../util/token";
 import { authenticateAnd } from "../helpers/authorize";
 import { uploadArg } from "../helpers/scalars";
@@ -150,14 +150,18 @@ export const updateOrganizationDocumentTheme = mutationField("updateOrganization
   ),
   resolve: async (_, args, ctx) => {
     const organization = await ctx.organizations.loadOrg(ctx.user!.org_id);
-    const theme = deepmerge(organization?.pdf_document_theme ?? defaultDocumentTheme, args.data, {
-      // avoid deepmerge on legalText
-      customMerge: (key) => (from: any, to: any) => {
-        if (key === "legalText") {
-          return Object.assign(from, to);
-        }
-      },
-    });
+    const theme = deepmerge(
+      organization?.pdf_document_theme ?? defaultPdfDocumentTheme,
+      args.data,
+      {
+        // avoid deepmerge on legalText
+        customMerge: (key) => (from: any, to: any) => {
+          if (key === "legalText") {
+            return Object.assign(from, to);
+          }
+        },
+      }
+    );
     return await ctx.organizations.updateOrganization(
       ctx.user!.org_id,
       { pdf_document_theme: theme },

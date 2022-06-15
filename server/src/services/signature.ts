@@ -20,6 +20,7 @@ import SignatureRequestedEmail from "../emails/emails/SignatureRequestedEmail";
 import { getBaseWebhookUrl } from "../util/getBaseWebhookUrl";
 import { toGlobalId } from "../util/globalId";
 import { downloadImageBase64 } from "../util/images";
+import { PdfDocumentTheme } from "../util/PdfDocumentTheme";
 import { CONFIG, Config } from "./../config";
 import { AWS_SERVICE, IAws } from "./aws";
 import { FETCH_SERVICE, IFetchService } from "./fetch";
@@ -37,6 +38,7 @@ type SignatureOptions = {
   };
   events_url?: string;
   signingMode?: "parallel" | "sequential";
+  pdfDocumentTheme: PdfDocumentTheme;
   /**
    * Optional plain-text custom message to include in the "signature requested" emails
    */
@@ -354,7 +356,14 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
             type: "signature",
             word_anchor: `3cb39pzCQA9wJ${recipientIndex}`,
             height: 7.5, // 7.5% of page height
-            width: ((210 - 10 /* doc margin */ * 2 - 5 /* grid gap */ * 2) / 3 / 210) * 100,
+            width:
+              ((210 -
+                opts.pdfDocumentTheme.marginLeft -
+                opts.pdfDocumentTheme.marginRight -
+                5 /* grid gap */ * 2) /
+                3 /
+                210) *
+              100,
           },
         ],
       })),

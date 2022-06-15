@@ -1,6 +1,6 @@
 import { arg, booleanArg, enumType, list, nonNull, nullable, objectType } from "nexus";
 import { isDefined } from "remeda";
-import { defaultDocumentTheme } from "../../pdf/utils/ThemeProvider";
+import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { or, userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
@@ -233,7 +233,7 @@ export const Organization = objectType({
     });
     t.nonNull.jsonObject("pdfDocumentTheme", {
       resolve: (o) => {
-        return o.pdf_document_theme ?? defaultDocumentTheme;
+        return o.pdf_document_theme ?? defaultPdfDocumentTheme;
       },
     });
     t.nullable.field("license", {
