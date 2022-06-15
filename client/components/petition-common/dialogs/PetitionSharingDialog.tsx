@@ -130,7 +130,10 @@ export function PetitionSharingDialog({
 
   const permissionType = watch("permissionType");
 
-  const myEffectivePermission = petitionsById?.[0]?.myEffectivePermission?.permissionType ?? "READ";
+  const petitionsOwned =
+    petitionsById?.filter(
+      (petition) => petition?.myEffectivePermission?.permissionType === "OWNER"
+    ) ?? [];
 
   const petitionsOwnedWrite =
     petitionsById?.filter(
@@ -345,7 +348,7 @@ export function PetitionSharingDialog({
                       }}
                       onBlur={onBlur}
                       onSearch={handleSearchUsers}
-                      isDisabled={myEffectivePermission === "READ"}
+                      isDisabled={petitionsOwnedWrite.length === 0}
                       placeholder={
                         petitionsOwnedWrite.length
                           ? undefined
@@ -367,7 +370,7 @@ export function PetitionSharingDialog({
                       value={value}
                       onChange={onChange}
                       hideOwner={true}
-                      isDisabled={myEffectivePermission === "READ"}
+                      isDisabled={petitionsOwnedWrite.length === 0}
                     />
                   )}
                 />
@@ -429,7 +432,7 @@ export function PetitionSharingDialog({
                     </Text>
                   </Box>
                   {permissionType === "OWNER" ||
-                  (myEffectivePermission === "READ" && userId !== user.id) ? (
+                  (petitionsOwnedWrite.length === 0 && userId !== user.id) ? (
                     <Box
                       paddingX={3}
                       fontWeight="bold"
@@ -459,7 +462,7 @@ export function PetitionSharingDialog({
                               permissionType: "WRITE",
                             })
                           }
-                          isDisabled={myEffectivePermission === "READ"}
+                          isDisabled={petitionsOwnedWrite.length === 0}
                         >
                           <PetitionPermissionTypeText type="WRITE" />
                         </MenuItem>
@@ -471,14 +474,14 @@ export function PetitionSharingDialog({
                               permissionType: "READ",
                             })
                           }
-                          isDisabled={myEffectivePermission === "READ"}
+                          isDisabled={petitionsOwnedWrite.length === 0}
                         >
                           <PetitionPermissionTypeText type="READ" />
                         </MenuItem>
                         <MenuDivider />
                         <MenuItem
                           onClick={() => handleTransferPetitionOwnership(petitionId, user)}
-                          isDisabled={myEffectivePermission !== "OWNER"}
+                          isDisabled={petitionsOwned.length === 0}
                         >
                           <FormattedMessage
                             id="generic.transfer-ownership"
@@ -532,7 +535,7 @@ export function PetitionSharingDialog({
                         </UserListPopover>
                       </Flex>
                     </Box>
-                    {myEffectivePermission === "READ" ? (
+                    {petitionsOwnedWrite.length === 0 ? (
                       <Box
                         paddingX={3}
                         fontWeight="bold"
