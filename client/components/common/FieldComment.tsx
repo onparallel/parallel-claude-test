@@ -169,19 +169,20 @@ export function FieldComment({
                     <FormattedMessage id="generic.edit" defaultMessage="Edit" />
                   </MenuItem>
                 ) : null}
-                {!comment.isUnread &&
-                ((comment.author?.__typename === "User" && !isAuthor) ||
-                  comment.author?.__typename === "PetitionAccess") ? (
-                  <MenuItem onClick={onMarkAsUnread}>
+                {(comment.author?.__typename === "User" && !isAuthor) ||
+                comment.author?.__typename === "PetitionAccess" ? (
+                  <MenuItem onClick={onMarkAsUnread} isDisabled={comment.isUnread}>
                     <FormattedMessage
                       id="component.replies-field-comment.mark-as-unread"
                       defaultMessage="Mark as unread"
                     />
                   </MenuItem>
                 ) : null}
-                <MenuItem onClick={onDelete}>
-                  <FormattedMessage id="generic.delete" defaultMessage="Delete" />
-                </MenuItem>
+                {isAuthor ? (
+                  <MenuItem onClick={onDelete}>
+                    <FormattedMessage id="generic.delete" defaultMessage="Delete" />
+                  </MenuItem>
+                ) : null}
               </MenuList>
             </Portal>
           </Menu>

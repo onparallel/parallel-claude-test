@@ -353,6 +353,7 @@ export const PetitionSignaturesCard = Object.assign(
                 petition={petition}
                 onStart={handleStartSignatureProcess}
                 onUpdateConfig={handleUpdateSignatureConfig}
+                isDisabled={isDisabled}
               />
             ) : current ? (
               <CurrentSignatureRequestRow
@@ -360,6 +361,7 @@ export const PetitionSignaturesCard = Object.assign(
                 onCancel={handleCancelSignatureProcess}
                 onDownload={handleDownloadSignedDoc}
                 onSendReminder={handleSendSignatureReminder}
+                isDisabled={isDisabled}
               />
             ) : null}
             {older.length ? (

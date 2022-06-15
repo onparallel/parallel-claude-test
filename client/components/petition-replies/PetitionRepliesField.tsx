@@ -50,6 +50,7 @@ export interface PetitionRepliesFieldProps extends BoxProps {
   ) => void;
   onToggleComments: () => void;
   onUpdateReplyStatus: (replyId: string, status: PetitionFieldReplyStatus) => void;
+  isDisabled?: boolean;
 }
 
 export const PetitionRepliesField = Object.assign(
@@ -63,6 +64,7 @@ export const PetitionRepliesField = Object.assign(
       onAction,
       onToggleComments,
       onUpdateReplyStatus,
+      isDisabled,
       ...props
     },
     ref
@@ -264,6 +266,7 @@ export const PetitionRepliesField = Object.assign(
                   reply={reply}
                   onAction={(action) => onAction(action, reply)}
                   onUpdateStatus={(status) => onUpdateReplyStatus(reply.id, status)}
+                  isDisabled={isDisabled}
                 />
               ))}
             </Stack>

@@ -132,6 +132,7 @@ export function RecipientViewPetitionFieldDynamicSelect({
             field={field}
             level={0}
             onChange={handleCreateReply}
+            isDisabled={isDisabled}
           />
         </Box>
       ) : null}

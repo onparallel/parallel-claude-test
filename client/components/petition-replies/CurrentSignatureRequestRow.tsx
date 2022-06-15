@@ -17,6 +17,7 @@ interface CurrentSignatureRequestRowProps {
   onCancel: (petitionSignatureRequestId: string) => void;
   onDownload: (petitionSignatureRequestId: string) => void;
   onSendReminder: (petitionSignatureRequestId: string) => void;
+  isDisabled?: boolean;
 }
 
 export function CurrentSignatureRequestRow({
@@ -24,6 +25,7 @@ export function CurrentSignatureRequestRow({
   onCancel,
   onDownload,
   onSendReminder,
+  isDisabled,
 }: CurrentSignatureRequestRowProps) {
   const intl = useIntl();
   const status = signatureRequest.status;
@@ -103,8 +105,14 @@ export function CurrentSignatureRequestRow({
                 defaultMessage: "Send reminder",
               })}
               onClick={handleConfirmSendSignatureReminders}
+              isDisabled={isDisabled}
             />
-            <Button width="24" colorScheme="red" onClick={() => onCancel(signatureRequest.id)}>
+            <Button
+              width="24"
+              colorScheme="red"
+              onClick={() => onCancel(signatureRequest.id)}
+              isDisabled={isDisabled}
+            >
               <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
             </Button>
           </>

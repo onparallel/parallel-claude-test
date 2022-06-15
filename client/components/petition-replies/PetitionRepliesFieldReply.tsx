@@ -23,6 +23,7 @@ export interface PetitionRepliesFieldReplyProps {
   reply: PetitionRepliesFieldReply_PetitionFieldReplyFragment;
   onUpdateStatus: (status: PetitionFieldReplyStatus) => void;
   onAction: (action: PetitionRepliesFieldAction) => void;
+  isDisabled?: boolean;
 }
 
 export type PetitionRepliesFieldAction = "DOWNLOAD_FILE" | "PREVIEW_FILE";
@@ -31,6 +32,7 @@ export function PetitionRepliesFieldReply({
   reply,
   onUpdateStatus,
   onAction,
+  isDisabled,
 }: PetitionRepliesFieldReplyProps) {
   const intl = useIntl();
   const isTextLikeType = ["TEXT", "SHORT_TEXT", "SELECT"].includes(reply.field!.type);
@@ -142,7 +144,7 @@ export function PetitionRepliesFieldReply({
           role="switch"
           aria-checked={reply.status === "APPROVED"}
           onClick={() => onUpdateStatus(reply.status === "APPROVED" ? "PENDING" : "APPROVED")}
-          isDisabled={reply.isAnonymized}
+          isDisabled={isDisabled || reply.isAnonymized}
         />
         <IconButtonWithTooltip
           data-action="reject-reply"
@@ -157,7 +159,7 @@ export function PetitionRepliesFieldReply({
           colorScheme={reply.status === "REJECTED" ? "red" : "gray"}
           aria-checked={reply.status === "REJECTED"}
           onClick={() => onUpdateStatus(reply.status === "REJECTED" ? "PENDING" : "REJECTED")}
-          isDisabled={reply.isAnonymized}
+          isDisabled={isDisabled || reply.isAnonymized}
         />
       </Stack>
     </Flex>

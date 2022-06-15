@@ -602,12 +602,13 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 field={activeField}
                 myId={me.id}
                 hasInternalComments={me.hasInternalComments}
-                isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
+                isDisabled={petition.isAnonymized}
                 onClose={() => setActiveFieldId(null)}
                 onAddComment={handleAddComment}
                 onUpdateComment={handleUpdateComment}
                 onDeleteComment={handleDeleteComment}
                 onMarkAsUnread={handleMarkAsUnread}
+                onlyInternalComments={myEffectivePermission === "READ"}
               />
             ) : (
               <Card display="flex" flexDirection="column" maxHeight={`calc(100vh - 153px)`}>
@@ -662,6 +663,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                       onUpdateReplyStatus={(replyId, status) =>
                         handleUpdateRepliesStatus(x.field.id, [replyId], status)
                       }
+                      isDisabled={myEffectivePermission === "READ"}
                     />
                   ) : (
                     <PetitionRepliesFilteredFields key={index} count={x.count} />

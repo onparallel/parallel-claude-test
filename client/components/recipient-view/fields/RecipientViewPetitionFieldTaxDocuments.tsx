@@ -174,7 +174,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
             variant="outline"
             width="min-content"
             onClick={handleStart}
-            isDisabled={state === "FETCHING"}
+            isDisabled={state === "FETCHING" || isDisabled}
           >
             <FormattedMessage
               id="component.recipient-view-petition-field-tax-documents.start-button"

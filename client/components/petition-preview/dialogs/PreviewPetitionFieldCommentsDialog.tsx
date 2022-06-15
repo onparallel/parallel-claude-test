@@ -48,6 +48,7 @@ interface PreviewPetitionFieldCommentsDialogProps {
   isTemplate?: boolean;
   tone: Tone;
   isDisabled: boolean;
+  onlyInternalComments: boolean;
 }
 
 export function PreviewPetitionFieldCommentsDialog({
@@ -56,6 +57,7 @@ export function PreviewPetitionFieldCommentsDialog({
   isTemplate,
   tone,
   isDisabled,
+  onlyInternalComments,
   ...props
 }: DialogProps<PreviewPetitionFieldCommentsDialogProps>) {
   const intl = useIntl();
@@ -82,7 +84,9 @@ export function PreviewPetitionFieldCommentsDialog({
 
   const hasCommentsEnabled = field.isInternal ? false : field.hasCommentsEnabled;
 
-  const [isInternalComment, setInternalComment] = useState(!hasCommentsEnabled);
+  const [isInternalComment, setInternalComment] = useState(
+    !hasCommentsEnabled || onlyInternalComments
+  );
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -238,25 +242,27 @@ export function PreviewPetitionFieldCommentsDialog({
                       />
                     </Text>
                   ) : null}
-                  <Text color="gray.400">
-                    <FormattedMessage
-                      id="petition-replies.field-comments.disabled-comments-2"
-                      defaultMessage="You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
-                      values={{
-                        composeTab: intl.formatMessage({
-                          id: "petition.header.compose-tab",
-                          defaultMessage: "Compose",
-                        }),
-                        a: (chunks: any) => (
-                          <Link
-                            href={`/app/petitions/${petitionId}/compose#field-settings-${field.id}`}
-                          >
-                            {chunks}
-                          </Link>
-                        ),
-                      }}
-                    />
-                  </Text>
+                  {!onlyInternalComments ? (
+                    <Text color="gray.400">
+                      <FormattedMessage
+                        id="petition-replies.field-comments.disabled-comments-2"
+                        defaultMessage="You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
+                        values={{
+                          composeTab: intl.formatMessage({
+                            id: "petition.header.compose-tab",
+                            defaultMessage: "Compose",
+                          }),
+                          a: (chunks: any) => (
+                            <Link
+                              href={`/app/petitions/${petitionId}/compose#field-settings-${field.id}`}
+                            >
+                              {chunks}
+                            </Link>
+                          ),
+                        }}
+                      />
+                    </Text>
+                  ) : null}
                 </Stack>
               )}
             </Flex>
@@ -323,7 +329,7 @@ export function PreviewPetitionFieldCommentsDialog({
                     marginLeft={1}
                     colorScheme="primary"
                     isChecked={isInternalComment}
-                    isDisabled={!hasCommentsEnabled || field.isInternal}
+                    isDisabled={!hasCommentsEnabled || field.isInternal || onlyInternalComments}
                     onChange={() => setInternalComment(!isInternalComment)}
                   >
                     <FormattedMessage

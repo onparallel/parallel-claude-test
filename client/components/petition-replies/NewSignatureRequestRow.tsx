@@ -20,6 +20,7 @@ interface NewSignatureRequestRowProps {
   user: NewSignatureRequestRow_UserFragment;
   onUpdateConfig: (data: SignatureConfigInput | null) => Promise<void>;
   onStart: (message?: Maybe<string>) => void;
+  isDisabled?: boolean;
 }
 
 export function NewSignatureRequestRow({
@@ -27,6 +28,7 @@ export function NewSignatureRequestRow({
   user,
   onUpdateConfig,
   onStart,
+  isDisabled,
 }: NewSignatureRequestRowProps) {
   const signers = petition.signatureConfig?.signers.filter(isDefined) ?? [];
   const allowAdditionalSigners = petition.signatureConfig?.allowAdditionalSigners ?? false;
@@ -101,10 +103,15 @@ export function NewSignatureRequestRow({
       </Box>
       <Box padding={2} paddingRight={4}>
         <Flex alignItems="center">
-          <Button width="24" onClick={() => onUpdateConfig(null)}>
+          <Button width="24" onClick={() => onUpdateConfig(null)} isDisabled={isDisabled}>
             <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
           </Button>
-          <Button colorScheme="primary" marginLeft={2} onClick={handleStartSignature}>
+          <Button
+            colorScheme="primary"
+            marginLeft={2}
+            onClick={handleStartSignature}
+            isDisabled={isDisabled}
+          >
             {startSignature ? (
               <FormattedMessage
                 id="component.petition-signatures-card.start"

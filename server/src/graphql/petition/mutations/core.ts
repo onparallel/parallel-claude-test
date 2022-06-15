@@ -428,7 +428,7 @@ export const updateFieldPositions = mutationField("updateFieldPositions", {
   description: "Updates the positions of the petition fields",
   type: "PetitionBase",
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId")
@@ -512,7 +512,7 @@ export const updatePetitionRestriction = mutationField("updatePetitionRestrictio
   description: "Updates the restriction preferences",
   type: "PetitionBase",
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId")
   ),
@@ -561,7 +561,7 @@ export const closePetition = mutationField("closePetition", {
   description: "Closes an open petition.",
   type: "Petition",
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionsAreNotPublicTemplates("petitionId"),
     petitionIsNotAnonymized("petitionId"),
     async (_, args, ctx) => {
@@ -607,7 +607,7 @@ export const updatePetition = mutationField("updatePetition", {
   description: "Updates a petition.",
   type: "PetitionBase",
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionsAreNotPublicTemplates("petitionId"),
     ifSomeDefined(
       (args) => [
@@ -779,7 +779,7 @@ export const createPetitionField = mutationField("createPetitionField", {
   description: "Creates a petition field",
   type: "PetitionField",
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
     ifArgEquals("type", "ES_TAX_DOCUMENTS", userHasFeatureFlag("ES_TAX_DOCUMENTS_FIELD")),
@@ -809,7 +809,7 @@ export const clonePetitionField = mutationField("clonePetitionField", {
   description: "Clones a petition field",
   type: "PetitionField",
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
@@ -828,7 +828,7 @@ export const deletePetitionField = mutationField("deletePetitionField", {
   description: "Deletes a petition field.",
   type: "PetitionBase",
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldIsNotFixed("fieldId"),
     petitionsAreEditable("petitionId"),
@@ -866,7 +866,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
   description: "Updates a petition field.",
   type: "PetitionField",
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
@@ -1026,7 +1026,7 @@ export const uploadDynamicSelectFile = mutationField("uploadDynamicSelectFieldFi
     "Uploads the xlsx file used to parse the options of a dynamic select field, and sets the field options",
   type: "PetitionField",
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["DYNAMIC_SELECT"]),
     petitionsAreNotPublicTemplates("petitionId"),
@@ -1137,7 +1137,7 @@ export const approveOrRejectPetitionFieldReplies = mutationField(
   {
     description: "Updates the status of a PENDING petition field replies to APPROVED or REJECTED",
     type: "Petition",
-    authorize: authenticateAnd(userHasAccessToPetitions("petitionId")),
+    authorize: authenticateAnd(userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"])),
     args: {
       petitionId: nonNull(globalIdArg("Petition")),
       status: nonNull(arg({ type: "PetitionFieldReplyStatus" })),
@@ -1158,7 +1158,7 @@ export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFie
   description: "Updates the status of a petition field reply.",
   type: "PetitionField",
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
     repliesBelongsToField("petitionFieldId", "petitionFieldReplyIds")
   ),
@@ -1235,7 +1235,7 @@ export const sendPetition = mutationField("sendPetition", {
     "Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages",
   type: nonNull(list(nonNull("SendPetitionResult"))),
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionHasRepliableFields("petitionId"),
     userHasAccessToContactGroups("contactIdGroups"),
     orgHasAvailablePetitionSendCredits(
@@ -1393,7 +1393,7 @@ export const sendReminders = mutationField("sendReminders", {
   description: "Sends a reminder for the specified petition accesses.",
   type: "Result",
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     accessesBelongToPetition("petitionId", "accessIds"),
     petitionIsNotAnonymized("petitionId")
   ),
@@ -1448,7 +1448,7 @@ export const switchAutomaticReminders = mutationField("switchAutomaticReminders"
   description: "Switches automatic reminders for the specified petition accesses.",
   type: list(nonNull("PetitionAccess")),
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     accessesBelongToPetition("petitionId", "accessIds"),
     petitionIsNotAnonymized("petitionId")
   ),
@@ -1490,7 +1490,7 @@ export const deactivateAccesses = mutationField("deactivateAccesses", {
   description: "Deactivates the specified active petition accesses.",
   type: list(nonNull("PetitionAccess")),
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     accessesBelongToPetition("petitionId", "accessIds"),
     petitionIsNotAnonymized("petitionId")
   ),
@@ -1512,7 +1512,7 @@ export const reactivateAccesses = mutationField("reactivateAccesses", {
   description: "Reactivates the specified inactive petition accesses.",
   type: list(nonNull("PetitionAccess")),
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     accessesBelongToPetition("petitionId", "accessIds"),
     accessesBelongToValidContacts("accessIds"),
     petitionIsNotAnonymized("petitionId")
@@ -1530,7 +1530,7 @@ export const cancelScheduledMessage = mutationField("cancelScheduledMessage", {
   description: "Cancels a scheduled petition message.",
   type: nullable("PetitionMessage"),
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     messageBelongToPetition("petitionId", "messageId"),
     petitionIsNotAnonymized("petitionId")
   ),
@@ -1547,7 +1547,7 @@ export const changePetitionFieldType = mutationField("changePetitionFieldType", 
   description: "Changes the type of a petition Field",
   type: "PetitionField",
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     petitionsAreEditable("petitionId"),
     petitionsAreNotPublicTemplates("petitionId"),
@@ -1598,7 +1598,7 @@ export const sendPetitionClosedNotification = mutationField("sendPetitionClosedN
     force: booleanArg({ default: false }),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionIsNotAnonymized("petitionId")
   ),
   validateArgs: validRichTextContent((args) => args.emailBody, "emailBody"),
@@ -1644,7 +1644,7 @@ export const reopenPetition = mutationField("reopenPetition", {
   description: "Reopens the petition",
   type: "Petition",
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionIsNotAnonymized("petitionId")
   ),
   args: {
@@ -1671,7 +1671,7 @@ export const reopenPetition = mutationField("reopenPetition", {
 export const updatePetitionMetadata = mutationField("updatePetitionMetadata", {
   description: "Updates the metadata of the specified petition",
   type: "Petition",
-  authorize: authenticateAnd(userHasAccessToPetitions("petitionId")),
+  authorize: authenticateAnd(userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"])),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     metadata: nonNull(jsonObjectArg()),
@@ -1689,7 +1689,7 @@ export const updatePetitionFieldReplyMetadata = mutationField("updatePetitionFie
   description: "Updates the metadata of the specified petition field reply",
   type: "PetitionFieldReply",
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     repliesBelongsToPetition("petitionId", "replyId"),
     petitionIsNotAnonymized("petitionId")
   ),
@@ -1711,7 +1711,7 @@ export const updateTemplateDefaultPermissions = mutationField("updateTemplateDef
   description: "Updates the template default permissions",
   type: "PetitionTemplate",
   authorize: authenticateAnd(
-    userHasAccessToPetitions("templateId"),
+    userHasAccessToPetitions("templateId", ["OWNER", "WRITE"]),
     petitionsAreOfTypeTemplate("templateId"),
     userHasAccessToUserOrUserGroupPermissions("permissions")
   ),
@@ -1744,7 +1744,7 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
   description: "Creates a public link from a user's template",
   type: "PublicPetitionLink",
   authorize: authenticateAnd(
-    userHasAccessToPetitions("templateId"),
+    userHasAccessToPetitions("templateId", ["OWNER", "WRITE"]),
     petitionsAreOfTypeTemplate("templateId"),
     templateDoesNotHavePublicPetitionLink("templateId")
   ),
@@ -1825,7 +1825,7 @@ export const modifyPetitionCustomProperty = mutationField("modifyPetitionCustomP
   description: "Adds, edits or deletes a custom property on the petition",
   type: "PetitionBase",
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionIsNotAnonymized("petitionId")
   ),
   args: {
@@ -1869,7 +1869,7 @@ export const completePetition = mutationField("completePetition", {
     message: nullable("String"),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     orgHasAvailablePetitionSendCredits(
       (args) => args.petitionId,
       () => 1

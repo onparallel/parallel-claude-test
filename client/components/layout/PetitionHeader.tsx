@@ -103,6 +103,7 @@ export const PetitionHeader = Object.assign(
     };
 
     const isSubscribed = petition.myEffectivePermission!.isSubscribed;
+    const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
     const [updatePetitionPermissionSubscription] = useMutation(
       PetitionHeader_updatePetitionPermissionSubscriptionDocument
@@ -343,18 +344,18 @@ export const PetitionHeader = Object.assign(
                         defaultMessage="Save as template"
                       />
                     </MenuItem>
-                    <MenuItem
-                      onClick={handleReopenPetition}
-                      isDisabled={petition.isAnonymized}
-                      hidden={petition.status !== "CLOSED"}
-                      icon={<EditIcon display="block" boxSize={4} />}
-                    >
-                      <FormattedMessage
-                        id="component.petition-header.reopen-button"
-                        defaultMessage="Reopen petition"
-                      />
-                    </MenuItem>
-
+                    {myEffectivePermission !== "READ" && petition.status === "CLOSED" ? (
+                      <MenuItem
+                        onClick={handleReopenPetition}
+                        isDisabled={petition.isAnonymized}
+                        icon={<EditIcon display="block" boxSize={4} />}
+                      >
+                        <FormattedMessage
+                          id="component.petition-header.reopen-button"
+                          defaultMessage="Reopen petition"
+                        />
+                      </MenuItem>
+                    ) : null}
                     <MenuDivider />
                     <MenuOptionGroup
                       type="radio"
@@ -449,6 +450,7 @@ export const PetitionHeader = Object.assign(
           isAnonymized
           myEffectivePermission {
             isSubscribed
+            permissionType
           }
           ...HeaderNameEditable_PetitionBase
         }

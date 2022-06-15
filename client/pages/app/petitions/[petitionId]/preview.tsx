@@ -360,14 +360,13 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                         petitionId={petition.id}
                         field={field}
                         isDisabled={
-                          (isPetition && petition.status === "CLOSED") ||
-                          petition.isAnonymized ||
-                          myEffectivePermission === "READ"
+                          (isPetition && petition.status === "CLOSED") || petition.isAnonymized
                         }
                         isInvalid={
                           finalized && completedFieldReplies(field).length === 0 && !field.optional
                         }
                         isCacheOnly={!isPetition}
+                        myEffectivePermission={myEffectivePermission}
                       />
                     </motion.div>
                   ))}

@@ -3,7 +3,6 @@ import { authenticateAnd, ifArgEquals } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import {
   commentsBelongsToPetition,
-  fieldsAreNotInternal,
   fieldsBelongsToPetition,
   fieldsHaveCommentsEnabled,
   petitionIsNotAnonymized,
@@ -24,7 +23,7 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
       userHasFeatureFlag("INTERNAL_COMMENTS"),
       fieldsHaveCommentsEnabled("petitionFieldId")
     ),
-    ifArgEquals("isInternal", false, fieldsAreNotInternal("petitionFieldId")),
+    ifArgEquals("isInternal", false, userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"])),
     petitionIsNotAnonymized("petitionId")
   ),
   args: {
@@ -62,7 +61,8 @@ export const deletePetitionFieldComment = mutationField("deletePetitionFieldComm
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
     commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
+    userIsCommentAuthor("petitionFieldCommentId")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),

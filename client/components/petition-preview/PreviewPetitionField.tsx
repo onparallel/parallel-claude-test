@@ -1,5 +1,6 @@
 import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
 import {
+  PetitionPermissionType,
   PreviewPetitionField_petitionFieldAttachmentDownloadLinkDocument,
   PreviewPetitionField_PetitionFieldDocument,
   PreviewPetitionField_PetitionFieldFragment,
@@ -49,13 +50,16 @@ export interface PreviewPetitionFieldProps
   isDisabled: boolean;
   isCacheOnly: boolean;
   tone: Tone;
+  myEffectivePermission: PetitionPermissionType;
 }
 
 export function PreviewPetitionField({
   field,
   petitionId,
   isCacheOnly,
+  isDisabled,
   tone,
+  myEffectivePermission,
   ...props
 }: PreviewPetitionFieldProps) {
   const uploads = useRef<UploadCache>({});
@@ -85,8 +89,9 @@ export function PreviewPetitionField({
         petitionId,
         field,
         isTemplate: isCacheOnly,
-        isDisabled: props.isDisabled,
+        isDisabled,
         tone,
+        onlyInternalComments: myEffectivePermission === "READ",
       });
     } catch {}
   }
@@ -209,6 +214,8 @@ export function PreviewPetitionField({
     [refetch, field.id, petitionId]
   );
 
+  const fieldIsDisabled = isDisabled || myEffectivePermission === "READ";
+
   const commonProps = {
     field: { ...field, replies: isCacheOnly ? field.previewReplies : field.replies },
     petitionId,
@@ -217,6 +224,7 @@ export function PreviewPetitionField({
     onDeleteReply: handleDeletePetitionReply,
     onUpdateReply: handleUpdatePetitionFieldReply,
     onCreateReply: handleCreatePetitionFieldReply,
+    isDisabled: fieldIsDisabled,
   };
 
   return field.type === "HEADING" ? (

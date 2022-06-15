@@ -22648,6 +22648,7 @@ export const PetitionHeader_PetitionFragmentDoc = gql`
     isAnonymized
     myEffectivePermission {
       isSubscribed
+      permissionType
     }
     ...HeaderNameEditable_PetitionBase
   }
