@@ -1,4 +1,4 @@
-import { Box, Input, InputProps } from "@chakra-ui/react";
+import { Input, InputProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 
@@ -11,20 +11,19 @@ export const ColorInput = chakraForwardRef<"input", ColorInputProps, HTMLInputEl
   function ColorInput({ value, onChange, ...props }, ref) {
     const handleChange = onChange ? useDebouncedCallback(onChange, 100, []) : undefined;
     return (
-      <Box>
-        <Input
-          ref={ref}
-          type="color"
-          backgroundColor={value}
-          value={value}
-          onChange={(e) => handleChange?.(e.target.value)}
-          sx={{
-            "::-webkit-color-swatch": { opacity: 0 },
-            "::-moz-color-swatch": { opacity: 0 },
-          }}
-          {...props}
-        />
-      </Box>
+      <Input
+        ref={ref}
+        type="color"
+        backgroundColor={value}
+        value={value}
+        onChange={(e) => handleChange?.(e.target.value)}
+        sx={{
+          padding: 0,
+          "::-webkit-color-swatch": { opacity: 0 },
+          "::-moz-color-swatch": { opacity: 0 },
+        }}
+        {...props}
+      />
     );
   }
 );

@@ -3,8 +3,8 @@ import { Heading, Stack, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { BrandingDocumentForm } from "@parallel/components/organization/branding/BrandingDocumentForm";
-import { BrandingDocumentPreview } from "@parallel/components/organization/branding/BrandingDocumentPreview";
+import { DocumentThemeEditor } from "@parallel/components/organization/branding/DocumentThemeEditor";
+import { DocumentThemePreview } from "@parallel/components/organization/branding/DocumentThemePreview";
 import { BrandingGeneralForm } from "@parallel/components/organization/branding/BrandingGeneralForm";
 import { BrandingGeneralPreview } from "@parallel/components/organization/branding/BrandingGeneralPreview";
 import { OrganizationBranding_userDocument } from "@parallel/graphql/__types";
@@ -13,6 +13,8 @@ import { compose } from "@parallel/utils/compose";
 import { useQueryState, useQueryStateSlice, values } from "@parallel/utils/queryState";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isAdmin } from "@parallel/utils/roles";
+import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
 
 const styles = ["general", "document"] as ("general" | "document")[];
 const QUERY_STATE = {
@@ -25,6 +27,7 @@ function OrganizationBranding() {
   const {
     data: { me, realMe },
   } = useAssertQueryOrPreviousData(OrganizationBranding_userDocument);
+  const hasAdminRole = isAdmin(me.role);
 
   const sections = useOrganizationSections(me);
   const [state, setQueryState] = useQueryState(QUERY_STATE);
@@ -98,8 +101,15 @@ function OrganizationBranding() {
               gridGap={{ base: 8, xl: 16 }}
               paddingBottom={16}
             >
-              <BrandingDocumentForm user={me} />
-              <BrandingDocumentPreview organization={me.organization} />
+              <Stack spacing={8} maxWidth={{ base: "100%", xl: "container.2xs" }} width="100%">
+                {!hasAdminRole ? <OnlyAdminsAlert /> : null}
+                <DocumentThemeEditor
+                  orgId={me.organization.id}
+                  theme={me.organization.pdfDocumentTheme}
+                  isDisabled={!hasAdminRole}
+                />
+              </Stack>
+              <DocumentThemePreview organization={me.organization} />
             </Stack>
           </TabPanel>
         </TabPanels>
@@ -118,16 +128,15 @@ OrganizationBranding.queries = [
         role
         organization {
           logoUrl(options: { resize: { width: 600 } })
-          ...BrandingDocumentPreview_Organization
+          pdfDocumentTheme
+          ...DocumentThemePreview_Organization
         }
         ...BrandingGeneralForm_User
         ...BrandingGeneralPreview_User
-        ...BrandingDocumentForm_User
       }
     }
     ${SettingsLayout.fragments.Query}
-    ${BrandingDocumentForm.fragments.User}
-    ${BrandingDocumentPreview.fragments.Organization}
+    ${DocumentThemePreview.fragments.Organization}
     ${BrandingGeneralForm.fragments.User}
     ${BrandingGeneralPreview.fragments.User}
   `,

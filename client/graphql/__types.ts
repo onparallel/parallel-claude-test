@@ -5246,37 +5246,6 @@ export type SignatureCompletedUserNotification_SignatureCompletedUserNotificatio
     | { __typename?: "PetitionTemplate"; id: string; name?: string | null };
 };
 
-export type BrandingDocumentForm_UserFragment = {
-  __typename?: "User";
-  id: string;
-  role: OrganizationRole;
-  organization: {
-    __typename?: "Organization";
-    id: string;
-    pdfDocumentTheme: { [key: string]: any };
-  };
-};
-
-export type BrandingDocumentForm_updateOrganizationDocumentThemeMutationVariables = Exact<{
-  data: OrganizationDocumentThemeInput;
-}>;
-
-export type BrandingDocumentForm_updateOrganizationDocumentThemeMutation = {
-  updateOrganizationDocumentTheme: {
-    __typename?: "Organization";
-    id: string;
-    pdfDocumentTheme: { [key: string]: any };
-  };
-};
-
-export type BrandingDocumentPreview_OrganizationFragment = {
-  __typename?: "Organization";
-  id: string;
-  name: string;
-  logoUrl?: string | null;
-  pdfDocumentTheme: { [key: string]: any };
-};
-
 export type BrandingGeneralForm_updateOrgLogoMutationVariables = Exact<{
   file: Scalars["Upload"];
 }>;
@@ -5316,6 +5285,32 @@ export type BrandingGeneralPreview_UserFragment = {
     preferredTone: Tone;
     logoUrl?: string | null;
   };
+};
+
+export type DocumentThemeEditor_OrganizationFragment = {
+  __typename?: "Organization";
+  id: string;
+  pdfDocumentTheme: { [key: string]: any };
+};
+
+export type DocumentThemeEditor_updateOrganizationDocumentThemeMutationVariables = Exact<{
+  data: OrganizationDocumentThemeInput;
+}>;
+
+export type DocumentThemeEditor_updateOrganizationDocumentThemeMutation = {
+  updateOrganizationDocumentTheme: {
+    __typename?: "Organization";
+    id: string;
+    pdfDocumentTheme: { [key: string]: any };
+  };
+};
+
+export type DocumentThemePreview_OrganizationFragment = {
+  __typename?: "Organization";
+  id: string;
+  name: string;
+  logoUrl?: string | null;
+  pdfDocumentTheme: { [key: string]: any };
 };
 
 export type useCreateOrUpdateUserDialog_UserFragment = {
@@ -11815,10 +11810,10 @@ export type OrganizationBranding_userQuery = {
     organization: {
       __typename?: "Organization";
       logoUrl?: string | null;
+      pdfDocumentTheme: { [key: string]: any };
       id: string;
       name: string;
       preferredTone: Tone;
-      pdfDocumentTheme: { [key: string]: any };
       iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
@@ -21643,24 +21638,6 @@ export const NotificationsDrawer_PetitionUserNotificationFragmentDoc = gql`
   }
   ${NotificationsList_PetitionUserNotificationFragmentDoc}
 ` as unknown as DocumentNode<NotificationsDrawer_PetitionUserNotificationFragment, unknown>;
-export const BrandingDocumentForm_UserFragmentDoc = gql`
-  fragment BrandingDocumentForm_User on User {
-    id
-    role
-    organization {
-      id
-      pdfDocumentTheme
-    }
-  }
-` as unknown as DocumentNode<BrandingDocumentForm_UserFragment, unknown>;
-export const BrandingDocumentPreview_OrganizationFragmentDoc = gql`
-  fragment BrandingDocumentPreview_Organization on Organization {
-    id
-    name
-    logoUrl(options: { resize: { width: 600 } })
-    pdfDocumentTheme
-  }
-` as unknown as DocumentNode<BrandingDocumentPreview_OrganizationFragment, unknown>;
 export const BrandingGeneralForm_UserFragmentDoc = gql`
   fragment BrandingGeneralForm_User on User {
     id
@@ -21684,6 +21661,20 @@ export const BrandingGeneralPreview_UserFragmentDoc = gql`
     }
   }
 ` as unknown as DocumentNode<BrandingGeneralPreview_UserFragment, unknown>;
+export const DocumentThemeEditor_OrganizationFragmentDoc = gql`
+  fragment DocumentThemeEditor_Organization on Organization {
+    id
+    pdfDocumentTheme
+  }
+` as unknown as DocumentNode<DocumentThemeEditor_OrganizationFragment, unknown>;
+export const DocumentThemePreview_OrganizationFragmentDoc = gql`
+  fragment DocumentThemePreview_Organization on Organization {
+    id
+    name
+    logoUrl(options: { resize: { width: 600 } })
+    pdfDocumentTheme
+  }
+` as unknown as DocumentNode<DocumentThemePreview_OrganizationFragment, unknown>;
 export const UserSelect_UserFragmentDoc = gql`
   fragment UserSelect_User on User {
     id
@@ -25636,19 +25627,6 @@ export const NotificationsDrawer_notificationsDocument = gql`
   NotificationsDrawer_notificationsQuery,
   NotificationsDrawer_notificationsQueryVariables
 >;
-export const BrandingDocumentForm_updateOrganizationDocumentThemeDocument = gql`
-  mutation BrandingDocumentForm_updateOrganizationDocumentTheme(
-    $data: OrganizationDocumentThemeInput!
-  ) {
-    updateOrganizationDocumentTheme(data: $data) {
-      id
-      pdfDocumentTheme
-    }
-  }
-` as unknown as DocumentNode<
-  BrandingDocumentForm_updateOrganizationDocumentThemeMutation,
-  BrandingDocumentForm_updateOrganizationDocumentThemeMutationVariables
->;
 export const BrandingGeneralForm_updateOrgLogoDocument = gql`
   mutation BrandingGeneralForm_updateOrgLogo($file: Upload!) {
     updateOrganizationLogo(file: $file) {
@@ -25670,6 +25648,19 @@ export const BrandingGeneralForm_updateOrganizationPreferredToneDocument = gql`
 ` as unknown as DocumentNode<
   BrandingGeneralForm_updateOrganizationPreferredToneMutation,
   BrandingGeneralForm_updateOrganizationPreferredToneMutationVariables
+>;
+export const DocumentThemeEditor_updateOrganizationDocumentThemeDocument = gql`
+  mutation DocumentThemeEditor_updateOrganizationDocumentTheme(
+    $data: OrganizationDocumentThemeInput!
+  ) {
+    updateOrganizationDocumentTheme(data: $data) {
+      id
+      pdfDocumentTheme
+    }
+  }
+` as unknown as DocumentNode<
+  DocumentThemeEditor_updateOrganizationDocumentThemeMutation,
+  DocumentThemeEditor_updateOrganizationDocumentThemeMutationVariables
 >;
 export const CreateUserDialog_emailIsAvailableDocument = gql`
   query CreateUserDialog_emailIsAvailable($email: String!) {
@@ -27043,18 +27034,17 @@ export const OrganizationBranding_userDocument = gql`
       role
       organization {
         logoUrl(options: { resize: { width: 600 } })
-        ...BrandingDocumentPreview_Organization
+        pdfDocumentTheme
+        ...DocumentThemePreview_Organization
       }
       ...BrandingGeneralForm_User
       ...BrandingGeneralPreview_User
-      ...BrandingDocumentForm_User
     }
   }
   ${SettingsLayout_QueryFragmentDoc}
-  ${BrandingDocumentPreview_OrganizationFragmentDoc}
+  ${DocumentThemePreview_OrganizationFragmentDoc}
   ${BrandingGeneralForm_UserFragmentDoc}
   ${BrandingGeneralPreview_UserFragmentDoc}
-  ${BrandingDocumentForm_UserFragmentDoc}
 ` as unknown as DocumentNode<
   OrganizationBranding_userQuery,
   OrganizationBranding_userQueryVariables

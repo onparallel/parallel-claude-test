@@ -905,6 +905,76 @@
     "context": "Pending signatures"
   },
   {
+    "term": "component.document-theme-editor.font-color",
+    "definition": "Color",
+    "context": "Color"
+  },
+  {
+    "term": "component.document-theme-editor.font-size",
+    "definition": "Size",
+    "context": "Size"
+  },
+  {
+    "term": "component.document-theme-editor.fonts-header",
+    "definition": "Fonts",
+    "context": "Fonts"
+  },
+  {
+    "term": "component.document-theme-editor.legal-disclaimer",
+    "definition": "Legal disclaimer",
+    "context": "Legal disclaimer"
+  },
+  {
+    "term": "component.document-theme-editor.legal-disclaimer-description",
+    "definition": "This text will be displayed at the end of documents that include a signature process. The language will be adapted to the language of the petition.",
+    "context": "This text will be displayed at the end of documents that include a signature process. The language will be adapted to the language of the petition."
+  },
+  {
+    "term": "component.document-theme-editor.margin-bottom",
+    "definition": "Bottom",
+    "context": "Bottom"
+  },
+  {
+    "term": "component.document-theme-editor.margin-sides",
+    "definition": "Sides",
+    "context": "Sides"
+  },
+  {
+    "term": "component.document-theme-editor.margin-top",
+    "definition": "Top",
+    "context": "Top"
+  },
+  {
+    "term": "component.document-theme-editor.margins-header",
+    "definition": "Margins",
+    "context": "Margins"
+  },
+  {
+    "term": "component.document-theme-editor.show-logo-description",
+    "definition": "Display the organization's logo on your documents.",
+    "context": "Display the organization's logo on your documents."
+  },
+  {
+    "term": "component.document-theme-editor.show-logo-header",
+    "definition": "Logo",
+    "context": "Logo"
+  },
+  {
+    "term": "component.document-theme-editor.typography-text",
+    "definition": "Texts",
+    "context": "Texts"
+  },
+  {
+    "term": "component.document-theme-editor.typography-title1",
+    "definition": "Title 1",
+    "context": "Title 1"
+  },
+  {
+    "term": "component.document-theme-editor.typography-title2",
+    "definition": "Title 2",
+    "context": "Title 2"
+  },
+  {
     "term": "component.download-dialog.placeholder-field-number",
     "definition": "Field number",
     "context": "Field number"
@@ -4710,11 +4780,6 @@
     "context": "Collapse"
   },
   {
-    "term": "generic.color",
-    "definition": "Color",
-    "context": "Color"
-  },
-  {
     "term": "generic.color.blue",
     "definition": "blue",
     "context": "blue"
@@ -4888,11 +4953,6 @@
     "term": "generic.empty-heading",
     "definition": "Untitled heading",
     "context": "Untitled heading"
-  },
-  {
-    "term": "generic.english",
-    "definition": "English",
-    "context": "English"
   },
   {
     "term": "generic.enter-a-value",
@@ -5395,19 +5455,9 @@
     "context": "Production"
   },
   {
-    "term": "generic.size",
-    "definition": "Size",
-    "context": "Size"
-  },
-  {
     "term": "generic.something-went-wrong",
     "definition": "Something went wrong",
     "context": "Something went wrong"
-  },
-  {
-    "term": "generic.spanish",
-    "definition": "Spanish",
-    "context": "Spanish"
   },
   {
     "term": "generic.submit",
@@ -5755,24 +5805,9 @@
     "context": "Documents"
   },
   {
-    "term": "organization.branding.fonts-header",
-    "definition": "Fonts",
-    "context": "Fonts"
-  },
-  {
     "term": "organization.branding.general.tab",
     "definition": "General",
     "context": "General"
-  },
-  {
-    "term": "organization.branding.legal-description",
-    "definition": "This text will be displayed at the end of documents that include a signature process. The language will be adapted to the language of the petition.",
-    "context": "This text will be displayed at the end of documents that include a signature process. The language will be adapted to the language of the petition."
-  },
-  {
-    "term": "organization.branding.legal-header",
-    "definition": "Legal text",
-    "context": "Legal text"
   },
   {
     "term": "organization.branding.logo-attach-help",
@@ -5790,26 +5825,6 @@
     "context": "Organization logo"
   },
   {
-    "term": "organization.branding.margins-header",
-    "definition": "Margins",
-    "context": "Margins"
-  },
-  {
-    "term": "organization.branding.margins.bottom",
-    "definition": "Bottom",
-    "context": "Bottom"
-  },
-  {
-    "term": "organization.branding.margins.sides",
-    "definition": "Sides",
-    "context": "Sides"
-  },
-  {
-    "term": "organization.branding.margins.top",
-    "definition": "Top",
-    "context": "Top"
-  },
-  {
     "term": "organization.branding.parallel-branding-description",
     "definition": "Displays the Parallel branding on all emails and requests that are sent.",
     "context": "Displays the Parallel branding on all emails and requests that are sent."
@@ -5825,39 +5840,14 @@
     "context": "Hi, I would like to get more information about how to upgrade my plan to hide Parallel branding."
   },
   {
-    "term": "organization.branding.show-logo-description",
-    "definition": "Display the organization's logo on your documents.",
-    "context": "Display the organization's logo on your documents."
-  },
-  {
-    "term": "organization.branding.show-logo-header",
-    "definition": "Logo",
-    "context": "Logo"
-  },
-  {
     "term": "organization.branding.square-logo-description",
     "definition": "This logo will be displayed internally to differentiate your organizations.",
     "context": "This logo will be displayed internally to differentiate your organizations."
   },
   {
-    "term": "organization.branding.text",
-    "definition": "Texts",
-    "context": "Texts"
-  },
-  {
     "term": "organization.branding.title",
     "definition": "Branding",
     "context": "Branding"
-  },
-  {
-    "term": "organization.branding.title1",
-    "definition": "Title 1",
-    "context": "Title 1"
-  },
-  {
-    "term": "organization.branding.title2",
-    "definition": "Title 2",
-    "context": "Title 2"
   },
   {
     "term": "organization.branding.tone-header",
