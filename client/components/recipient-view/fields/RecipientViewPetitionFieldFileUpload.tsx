@@ -5,7 +5,6 @@ import {
   Center,
   Flex,
   List,
-  ListItem,
   Progress,
   Stack,
   Text,
@@ -19,7 +18,6 @@ import { FileName } from "@parallel/components/common/FileName";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { FORMATS } from "@parallel/utils/dates";
-import { FieldOptions } from "@parallel/utils/petitionFields";
 import { MaybePromise } from "@parallel/utils/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useState } from "react";
@@ -263,7 +261,6 @@ function PetitionFieldFileUploadDropzone({
   onCreateReply,
   ...props
 }: PetitionFieldFileUploadDropzoneProps) {
-  const { accepts } = field.options as FieldOptions["FILE_UPLOAD"];
   const _isDisabled = isDisabled || (!field.multiple && field.replies.length > 0);
 
   const MAX_FILE_SIZE = 50 * 1024 * 1024;
