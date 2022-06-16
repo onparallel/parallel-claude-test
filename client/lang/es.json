@@ -1581,7 +1581,7 @@
   },
   {
     "term": "component.petition-compliance-period-dialog.explainer",
-    "definition": "Este plazo comenzará tas cerrarse {type, select, PETITION{esta petición} other{una petición creada desde esta plantilla}}, tras el cuál, los datos que contenga serán anonimizados.",
+    "definition": "Este plazo comenzará al cerrarse {type, select, PETITION{esta petición} other{una petición creada desde esta plantilla}}, tras el cuál, los datos que contenga serán anonimizados.",
     "context": "This period will start from the closing of {type, select, PETITION{this petition} other{a petition created from this template}}, once completed, the data contained will be anonymized."
   },
   {
