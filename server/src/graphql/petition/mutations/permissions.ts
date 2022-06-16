@@ -184,6 +184,11 @@ export const editPetitionPermission = mutationField("editPetitionPermission", {
           "Either userIds or userGroupIds must be defined"
         );
       }
+    },
+    (_, args, ctx, info) => {
+      if (args.permissionType === "OWNER") {
+        throw new ArgValidationError(info, "permissionType", "Invalid permissionType");
+      }
     }
   ),
   resolve: async (_, args, ctx) => {

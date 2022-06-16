@@ -431,6 +431,189 @@ describe("GraphQL/Petition Permissions", () => {
       ]);
     });
 
+    it("upgrades permissions from READ to WRITE adding permissions", async () => {
+      await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
+            addPetitionPermission(
+              petitionIds: $petitionIds
+              userIds: $userIds
+              permissionType: $type
+              notify: true
+              message: "hello!"
+            ) {
+              id
+              permissions {
+                permissionType
+                ... on PetitionUserPermission {
+                  user {
+                    id
+                  }
+                }
+                ... on PetitionUserGroupPermission {
+                  group {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", userPetition.id)],
+          userIds: [toGlobalId("User", orgUsers[0].id)],
+          type: "READ",
+        },
+      });
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
+            addPetitionPermission(
+              petitionIds: $petitionIds
+              userIds: $userIds
+              permissionType: $type
+              notify: true
+              message: "hello!"
+            ) {
+              id
+
+              permissions {
+                permissionType
+                ... on PetitionUserPermission {
+                  user {
+                    id
+                  }
+                }
+                ... on PetitionUserGroupPermission {
+                  group {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", userPetition.id)],
+          userIds: [toGlobalId("User", orgUsers[0].id)],
+          type: "WRITE",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.addPetitionPermission).toEqual([
+        {
+          id: toGlobalId("Petition", userPetition.id),
+          permissions: [
+            {
+              permissionType: "OWNER",
+              user: { id: toGlobalId("User", loggedUser.id) },
+            },
+            {
+              permissionType: "WRITE",
+              user: { id: toGlobalId("User", orgUsers[0].id) },
+            },
+            {
+              permissionType: "WRITE",
+              group: { id: toGlobalId("UserGroup", userGroup.id) },
+            },
+          ],
+        },
+      ]);
+    });
+
+    it("try to downgrade from WRITE to READ adding permissions", async () => {
+      await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
+            addPetitionPermission(
+              petitionIds: $petitionIds
+              userIds: $userIds
+              permissionType: $type
+              notify: true
+              message: "hello!"
+            ) {
+              id
+              permissions {
+                permissionType
+                ... on PetitionUserPermission {
+                  user {
+                    id
+                  }
+                }
+                ... on PetitionUserGroupPermission {
+                  group {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", userPetition.id)],
+          userIds: [toGlobalId("User", orgUsers[0].id)],
+          type: "WRITE",
+        },
+      });
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionTypeRW!) {
+            addPetitionPermission(
+              petitionIds: $petitionIds
+              userIds: $userIds
+              permissionType: $type
+              notify: true
+              message: "hello!"
+            ) {
+              id
+              permissions {
+                permissionType
+                ... on PetitionUserPermission {
+                  user {
+                    id
+                  }
+                }
+                ... on PetitionUserGroupPermission {
+                  group {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", userPetition.id)],
+          userIds: [toGlobalId("User", orgUsers[0].id)],
+          type: "READ",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.addPetitionPermission).toEqual([
+        {
+          id: toGlobalId("Petition", userPetition.id),
+          permissions: [
+            {
+              permissionType: "OWNER",
+              user: { id: toGlobalId("User", loggedUser.id) },
+            },
+            {
+              permissionType: "WRITE",
+              user: { id: toGlobalId("User", orgUsers[0].id) },
+            },
+            {
+              permissionType: "WRITE",
+              group: { id: toGlobalId("UserGroup", userGroup.id) },
+            },
+          ],
+        },
+      ]);
+    });
+
     it("sends notification email to users after adding permissions", async () => {
       const sendPetitionSharedEmailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
@@ -1376,7 +1559,7 @@ describe("GraphQL/Petition Permissions", () => {
         },
       });
 
-      expect(errors).toContainGraphQLError("PETITION_OWNER_CONSTRAINT_ERROR");
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
 
@@ -1471,39 +1654,6 @@ describe("GraphQL/Petition Permissions", () => {
         variables: {
           petitionIds: [],
           userIds: [],
-          type: "READ",
-        },
-      });
-
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
-      expect(data).toBeNull();
-    });
-
-    it("sends error when trying to edit permissions for logged user", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionType!) {
-            editPetitionPermission(
-              petitionIds: $petitionIds
-              userIds: $userIds
-              permissionType: $type
-            ) {
-              id
-
-              permissions {
-                ... on PetitionUserPermission {
-                  permissionType
-                  user {
-                    id
-                  }
-                }
-              }
-            }
-          }
-        `,
-        variables: {
-          petitionIds: [toGlobalId("Petition", userPetition.id)],
-          userIds: [toGlobalId("User", loggedUser.id)],
           type: "READ",
         },
       });
