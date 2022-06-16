@@ -22,7 +22,7 @@ export const createPetitionFieldAttachmentUploadLink = mutationField(
     description: "Generates and returns a signed url to upload a field attachment to AWS S3",
     type: "PetitionFieldAttachmentUploadData",
     authorize: authenticateAnd(
-      userHasAccessToPetitions("petitionId"),
+      userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
       fieldsBelongsToPetition("petitionId", "fieldId"),
       petitionsAreNotPublicTemplates("petitionId")
     ),
@@ -76,7 +76,7 @@ export const petitionFieldAttachmentUploadComplete = mutationField(
       attachmentId: nonNull(globalIdArg("PetitionFieldAttachment")),
     },
     authorize: authenticateAnd(
-      userHasAccessToPetitions("petitionId"),
+      userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
       fieldsBelongsToPetition("petitionId", "fieldId"),
       fieldAttachmentBelongsToField("fieldId", "attachmentId")
     ),
@@ -102,7 +102,7 @@ export const deletePetitionFieldAttachment = mutationField("deletePetitionFieldA
     attachmentId: nonNull(globalIdArg("PetitionFieldAttachment")),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldAttachmentBelongsToField("fieldId", "attachmentId"),
     petitionsAreNotPublicTemplates("petitionId")
@@ -166,7 +166,7 @@ export const createPetitionAttachmentUploadLink = mutationField(
     description: "Generates and returns a signed url to upload a petition attachment to AWS S3",
     type: "PetitionAttachmentUploadData",
     authorize: authenticateAnd(
-      userHasAccessToPetitions("petitionId"),
+      userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
       petitionsAreNotPublicTemplates("petitionId")
     ),
     args: {
@@ -218,7 +218,7 @@ export const petitionAttachmentUploadComplete = mutationField("petitionAttachmen
     attachmentId: nonNull(globalIdArg("PetitionAttachment")),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionAttachmentBelongsToPetition("petitionId", "attachmentId")
   ),
   resolve: async (_, args, ctx) => {
@@ -241,7 +241,7 @@ export const deletePetitionAttachment = mutationField("deletePetitionAttachment"
     attachmentId: nonNull(globalIdArg("PetitionAttachment")),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionAttachmentBelongsToPetition("petitionId", "attachmentId"),
     petitionsAreNotPublicTemplates("petitionId")
   ),

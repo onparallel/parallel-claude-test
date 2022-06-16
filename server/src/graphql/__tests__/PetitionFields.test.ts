@@ -29,6 +29,9 @@ describe("GraphQL/Petition Fields", () => {
   let privatePetition: Petition;
   let privateField: PetitionField;
 
+  let readPetition: Petition;
+  let readPetitionField: PetitionField;
+
   beforeAll(async () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
@@ -40,6 +43,16 @@ describe("GraphQL/Petition Fields", () => {
     const [otherUser] = await mocks.createRandomUsers(otherOrg.id, 1);
     [privatePetition] = await mocks.createRandomPetitions(otherOrg.id, otherUser.id, 1);
     [privateField] = await mocks.createRandomPetitionFields(privatePetition.id, 1);
+    [readPetition] = await mocks.createRandomPetitions(
+      organization.id,
+      user.id,
+      1,
+      undefined,
+      () => ({ type: "READ" })
+    );
+    [readPetitionField] = await mocks.createRandomPetitionFields(readPetition.id, 1, () => ({
+      type: "TEXT",
+    }));
   });
 
   afterAll(async () => {
@@ -53,6 +66,24 @@ describe("GraphQL/Petition Fields", () => {
       [userPetition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
         status: "DRAFT",
       }));
+    });
+
+    it("sends error when trying to create a field with READ access", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $type: PetitionFieldType!) {
+            createPetitionField(petitionId: $petitionId, type: $type) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", readPetition.id),
+          type: "TEXT",
+        }
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
 
     it("creates an empty Text field with default options", async () => {
@@ -374,6 +405,24 @@ describe("GraphQL/Petition Fields", () => {
       fields = await mocks.createRandomPetitionFields(userPetition.id, 5);
     });
 
+    it("sends error when trying to clone a field with READ access", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!) {
+            clonePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", readPetition.id),
+          fieldId: toGlobalId("PetitionField", readPetitionField.id),
+        }
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
     it("clones a field and sets the new one after it", async () => {
       const fieldToClone = fields[3];
       const { errors, data } = await testClient.mutate({
@@ -499,6 +548,24 @@ describe("GraphQL/Petition Fields", () => {
       );
 
       await mocks.createRandomTextReply(fields[1].id, contactAccess.id);
+    });
+
+    it("sends error when trying to delete a field with READ access", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!) {
+            deletePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", readPetition.id),
+          fieldId: toGlobalId("PetitionField", readPetitionField.id),
+        }
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
 
     it("deletes a field and updates the position of the remaining fields", async () => {
@@ -820,6 +887,33 @@ describe("GraphQL/Petition Fields", () => {
       fieldGIDs = fields.map((f) => toGlobalId("PetitionField", f.id));
     });
 
+    it("sends error when trying to reorder fields with READ access", async () => {
+      const readFields = await mocks.createRandomPetitionFields(readPetition.id, 4, () => ({
+        type: "TEXT",
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldIds: [GID!]!) {
+            updateFieldPositions(petitionId: $petitionId, fieldIds: $fieldIds) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", readPetition.id),
+          fieldIds: [
+            toGlobalId("PetitionField", readFields[2].id),
+            toGlobalId("PetitionField", readFields[0].id),
+            toGlobalId("PetitionField", readFields[1].id),
+            toGlobalId("PetitionField", readFields[3].id),
+          ],
+        }
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
     it("updates the position of the fields", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
@@ -953,6 +1047,27 @@ describe("GraphQL/Petition Fields", () => {
       });
 
       fieldGIDs = fields.map((f) => toGlobalId("PetitionField", f.id));
+    });
+
+    it("should send error when trying to update with READ access", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $data: UpdatePetitionFieldInput!) {
+            updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", readPetition.id),
+          fieldId: toGlobalId("PetitionField", readPetitionField.id),
+          data: {
+            optional: false,
+          },
+        }
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
 
     it("updates the petition field with given values", async () => {
@@ -1434,6 +1549,25 @@ describe("GraphQL/Petition Fields", () => {
       await mocks.createRandomTextReply(fieldWithReply.id, access.id);
     });
 
+    it("sends error when trying to change a field type with READ access", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $type: PetitionFieldType!) {
+            changePetitionFieldType(petitionId: $petitionId, fieldId: $fieldId, type: $type) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", readPetition.id),
+          fieldId: toGlobalId("PetitionField", readPetitionField.id),
+          type: "HEADING",
+        }
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
     it("changes field type to SHORT_TEXT and sets its default options merging with existents", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
@@ -1725,6 +1859,46 @@ describe("GraphQL/Petition Fields", () => {
       }));
     });
 
+    it("should send error when trying to update reply status with READ access", async () => {
+      const [readPetitionReply] = await mocks.createRandomTextReply(
+        readPetitionField.id,
+        undefined,
+        1,
+        () => ({ user_id: user.id })
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $petitionFieldReplyIds: [GID!]!
+            $status: PetitionFieldReplyStatus!
+          ) {
+            updatePetitionFieldRepliesStatus(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              petitionFieldReplyIds: $petitionFieldReplyIds
+              status: $status
+            ) {
+              replies {
+                id
+                status
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", readPetition.id),
+          petitionFieldId: toGlobalId("PetitionField", readPetitionField.id),
+          petitionFieldReplyIds: [toGlobalId("PetitionFieldReply", readPetitionReply.id)],
+          status: "REJECTED",
+        }
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
     it("updates status of a petition field reply", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
@@ -1861,6 +2035,33 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+  });
+
+  describe("approveOrRejectPetitionFieldReplies", () => {
+    it("should send error when trying to update reply status with READ access", async () => {
+      const [readPetitionReply] = await mocks.createRandomTextReply(
+        readPetitionField.id,
+        undefined,
+        1,
+        () => ({ user_id: user.id })
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $status: PetitionFieldReplyStatus!) {
+            approveOrRejectPetitionFieldReplies(petitionId: $petitionId, status: $status) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", readPetition.id),
+          status: "REJECTED",
+        }
+      );
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });

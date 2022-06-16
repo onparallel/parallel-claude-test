@@ -11,6 +11,7 @@ describe("GraphQL/PetitionAttachments", () => {
   let mocks: Mocks;
 
   let petition: Petition;
+  let readPetition: Petition;
   let user: User;
 
   beforeAll(async () => {
@@ -21,7 +22,15 @@ describe("GraphQL/PetitionAttachments", () => {
     let organization: Organization;
     ({ organization, user } = await mocks.createSessionUserAndOrganization());
 
-    [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+    [petition, readPetition] = await mocks.createRandomPetitions(
+      organization.id,
+      user.id,
+      2,
+      undefined,
+      (i) => ({
+        type: i === 0 ? "OWNER" : "READ",
+      })
+    );
   });
 
   afterAll(async () => {
@@ -85,6 +94,30 @@ describe("GraphQL/PetitionAttachments", () => {
   });
 
   describe("createPetitionAttachmentUploadLink", () => {
+    it("sends error when trying to create attachment with read access", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $data: FileUploadInput!) {
+            createPetitionAttachmentUploadLink(petitionId: $petitionId, data: $data) {
+              attachment {
+                id
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", readPetition.id),
+          data: {
+            contentType: "application/pdf",
+            filename: "nomina.pdf",
+            size: 1024,
+          },
+        }
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
     it("creates a new attachment on a petition and returns the file information", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
@@ -204,11 +237,38 @@ describe("GraphQL/PetitionAttachments", () => {
   });
 
   describe("petitionAttachmentUploadComplete", () => {
-    it("marks file attachment upload as completed", async () => {
+    let attachment: PetitionAttachment;
+    let readAttachment: PetitionAttachment;
+    beforeAll(async () => {
       const [file] = await mocks.createRandomFileUpload(1, () => ({
         upload_complete: false,
       }));
-      const [attachment] = await mocks.createPetitionAttachment(petition.id, 1, [file]);
+      [attachment] = await mocks.createPetitionAttachment(petition.id, 1, [file]);
+      [readAttachment] = await mocks.createPetitionAttachment(readPetition.id, 1, [file]);
+    });
+
+    it("sends error when trying to mark attachment as completed with read access", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $attachmentId: GID!) {
+            petitionAttachmentUploadComplete(petitionId: $petitionId, attachmentId: $attachmentId) {
+              id
+              file {
+                isComplete
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", readPetition.id),
+          attachmentId: toGlobalId("PetitionAttachment", readAttachment.id),
+        }
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("marks file attachment upload as completed", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $attachmentId: GID!) {
@@ -338,14 +398,33 @@ describe("GraphQL/PetitionAttachments", () => {
   });
 
   describe("deletePetitionAttachment", () => {
-    it("deletes the petition attachment and its corresponding file", async () => {
+    let attachment: PetitionAttachment;
+    let readAttachment: PetitionAttachment;
+    beforeAll(async () => {
       const [file] = await mocks.createRandomFileUpload(1, () => ({
-        filename: "image.png",
-        content_type: "image/png",
-        size: "2048",
         upload_complete: false,
       }));
-      const [attachment] = await mocks.createPetitionAttachment(petition.id, 1, [file]);
+      [attachment] = await mocks.createPetitionAttachment(petition.id, 1, [file]);
+      [readAttachment] = await mocks.createPetitionAttachment(readPetition.id, 1, [file]);
+    });
+
+    it("sends error when trying to delete attachment with read access", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $attachmentId: GID!) {
+            deletePetitionAttachment(petitionId: $petitionId, attachmentId: $attachmentId)
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", readPetition.id),
+          attachmentId: toGlobalId("PetitionAttachment", readAttachment.id),
+        },
+      });
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("deletes the petition attachment and its corresponding file", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionId: GID!, $attachmentId: GID!) {

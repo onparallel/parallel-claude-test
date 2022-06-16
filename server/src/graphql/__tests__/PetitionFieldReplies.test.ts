@@ -22,6 +22,7 @@ describe("GraphQL/Petition Field Replies", () => {
   let user: User;
   let organization: Organization;
   let petition: Petition;
+  let readPetition: Petition;
   let contact: Contact;
   let petitionAccess: PetitionAccess;
 
@@ -32,7 +33,15 @@ describe("GraphQL/Petition Field Replies", () => {
 
     ({ organization, user } = await mocks.createSessionUserAndOrganization());
 
-    [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+    [petition, readPetition] = await mocks.createRandomPetitions(
+      organization.id,
+      user.id,
+      2,
+      undefined,
+      (i) => ({
+        type: i === 0 ? "OWNER" : "READ",
+      })
+    );
 
     [contact] = await mocks.createRandomContacts(organization.id, 1);
     [petitionAccess] = await mocks.createPetitionAccess(
@@ -56,6 +65,8 @@ describe("GraphQL/Petition Field Replies", () => {
     describe("TEXT, SHORT_TEXT", () => {
       let textField: PetitionField;
       let shortTextField: PetitionField;
+      let readPetitionField: PetitionField;
+
       beforeAll(async () => {
         [textField, shortTextField] = await mocks.createRandomPetitionFields(
           petition.id,
@@ -65,6 +76,29 @@ describe("GraphQL/Petition Field Replies", () => {
             options: i === 1 ? { maxLength: 15 } : {},
           })
         );
+        [readPetitionField] = await mocks.createRandomPetitionFields(readPetition.id, 1, () => ({
+          type: "TEXT",
+        }));
+      });
+
+      it("should send error when trying to submit a reply with READ access", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $fieldId: GID!, $reply: JSON!) {
+              createPetitionFieldReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+                id
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", readPetition.id),
+            fieldId: toGlobalId("PetitionField", readPetitionField.id),
+            reply: "my reply",
+          }
+        );
+
+        expect(errors).toContainGraphQLError("FORBIDDEN");
+        expect(data).toBeNull();
       });
 
       it("petition status should change to PENDING when creating a reply on a already completed petition without recipients", async () => {
@@ -1309,6 +1343,7 @@ describe("GraphQL/Petition Field Replies", () => {
       let textField: PetitionField;
       let rejectedReply: PetitionFieldReply;
       let approvedReply: PetitionFieldReply;
+      let readPetitionReply: PetitionFieldReply;
 
       let recipientTextReply: PetitionFieldReply;
 
@@ -1336,12 +1371,46 @@ describe("GraphQL/Petition Field Replies", () => {
           status: "APPROVED",
         }));
 
+        const [readPetitionField] = await mocks.createRandomPetitionFields(
+          readPetition.id,
+          1,
+          () => ({
+            type: "TEXT",
+          })
+        );
+        [readPetitionReply] = await mocks.createRandomTextReply(
+          readPetitionField.id,
+          undefined,
+          1,
+          () => ({ user_id: user.id })
+        );
+
         [recipientTextReply] = await mocks.createRandomTextReply(
           textField.id,
           petitionAccess.id,
           1,
           () => ({ created_by: `Contact:${contact.id}` })
         );
+      });
+
+      it("should send error when trying to update a reply with READ access", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $replyId: GID!, $reply: JSON!) {
+              updatePetitionFieldReply(petitionId: $petitionId, replyId: $replyId, reply: $reply) {
+                id
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", readPetition.id),
+            replyId: toGlobalId("PetitionFieldReply", readPetitionReply.id),
+            reply: "my new reply",
+          }
+        );
+
+        expect(errors).toContainGraphQLError("FORBIDDEN");
+        expect(data).toBeNull();
       });
 
       it("petition status should change to PENDING when updating a reply on a already completed petition with active accesses", async () => {
@@ -2270,12 +2339,42 @@ describe("GraphQL/Petition Field Replies", () => {
 
   describe("createFileUploadReply", () => {
     let fileUploadField: PetitionField;
+    let readPetitionField: PetitionField;
     let fileUploadReplyGID: string;
 
     beforeAll(async () => {
       [fileUploadField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
         type: "FILE_UPLOAD",
       }));
+
+      [readPetitionField] = await mocks.createRandomPetitionFields(readPetition.id, 1, () => ({
+        type: "FILE_UPLOAD",
+      }));
+    });
+
+    it("should send error when trying to create a file reply with read access", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $file: FileUploadInput!) {
+            createFileUploadReply(petitionId: $petitionId, fieldId: $fieldId, file: $file) {
+              reply {
+                id
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", readPetition.id),
+          fieldId: toGlobalId("PetitionField", readPetitionField.id),
+          file: {
+            contentType: "text/plain",
+            filename: "my_file.txt",
+            size: 50,
+          },
+        }
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
 
     it("sends error when trying to create a file reply of more than 50MB", async () => {
@@ -2462,8 +2561,57 @@ describe("GraphQL/Petition Field Replies", () => {
     });
   });
 
+  describe("createFileUploadReplyComplete", () => {
+    it("sends error when trying to mark a file reply upload as completed with read access", async () => {
+      const [field] = await mocks.createRandomPetitionFields(readPetition.id, 1, () => ({
+        type: "FILE_UPLOAD",
+      }));
+      const [reply] = await mocks.createRandomFileReply(field.id, 1, () => ({ user_id: user.id }));
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $replyId: GID!) {
+            createFileUploadReplyComplete(petitionId: $petitionId, replyId: $replyId) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", readPetition.id),
+          replyId: toGlobalId("PetitionFieldReply", reply.id),
+        }
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+  });
+
+  describe("updateFileUploadReplyComplete", () => {
+    it("sends error when trying to mark an updated file reply upload as completed with read access", async () => {
+      const [field] = await mocks.createRandomPetitionFields(readPetition.id, 1, () => ({
+        type: "FILE_UPLOAD",
+      }));
+      const [reply] = await mocks.createRandomFileReply(field.id, 1, () => ({ user_id: user.id }));
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $replyId: GID!) {
+            updateFileUploadReplyComplete(petitionId: $petitionId, replyId: $replyId) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", readPetition.id),
+          replyId: toGlobalId("PetitionFieldReply", reply.id),
+        }
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+  });
+
   describe("updateFileUploadReply", () => {
     let fileUploadReply: PetitionFieldReply;
+    let readPetitionReply: PetitionFieldReply;
 
     beforeAll(async () => {
       const [fileUploadField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
@@ -2472,6 +2620,42 @@ describe("GraphQL/Petition Field Replies", () => {
       [fileUploadReply] = await mocks.createRandomFileReply(fileUploadField.id, 1, () => ({
         user_id: user.id,
       }));
+
+      const [readPetitionField] = await mocks.createRandomPetitionFields(
+        readPetition.id,
+        1,
+        () => ({ type: "FILE_UPLOAD" })
+      );
+
+      [readPetitionReply] = await mocks.createRandomFileReply(readPetitionField.id, 1, () => ({
+        user_id: user.id,
+      }));
+    });
+
+    it("should send error when trying to update a file reply with read access", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $replyId: GID!, $file: FileUploadInput!) {
+            updateFileUploadReply(petitionId: $petitionId, replyId: $replyId, file: $file) {
+              reply {
+                id
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", readPetition.id),
+          replyId: toGlobalId("PetitionFieldReply", readPetitionReply.id),
+          file: {
+            contentType: "text/plain",
+            filename: "my_file.txt",
+            size: 500,
+          },
+        }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
 
     it("updates the reply of a file_upload to an incomplete file and returns an upload endpoint for the new file", async () => {
@@ -2570,6 +2754,7 @@ describe("GraphQL/Petition Field Replies", () => {
     let userFileReply: PetitionFieldReply;
     let approvedReply: PetitionFieldReply;
     let rejectedReply: PetitionFieldReply;
+    let readPetitionReply: PetitionFieldReply;
     beforeAll(async () => {
       [textField] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
         type: "TEXT",
@@ -2600,6 +2785,45 @@ describe("GraphQL/Petition Field Replies", () => {
         user_id: user.id,
         status: "REJECTED",
       }));
+
+      const [readPetitionField] = await mocks.createRandomPetitionFields(
+        readPetition.id,
+        1,
+        () => ({ type: "TEXT" })
+      );
+
+      [readPetitionReply] = await mocks.createRandomTextReply(
+        readPetitionField.id,
+        undefined,
+        1,
+        () => ({
+          user_id: user.id,
+        })
+      );
+    });
+
+    it("should send error when trying to delete a reply with read access", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $replyId: GID!) {
+            deletePetitionReply(petitionId: $petitionId, replyId: $replyId) {
+              id
+              petition {
+                id
+                ... on Petition {
+                  status
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", readPetition.id),
+          replyId: toGlobalId("PetitionFieldReply", readPetitionReply.id),
+        }
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
 
     it("petition status should change to PENDING when deleting a reply on a already completed petition with accesses", async () => {
@@ -2851,6 +3075,26 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(data?.deletePetitionReply).toEqual({
         id: toGlobalId("PetitionField", textField.id),
       });
+    });
+  });
+
+  describe("bulkCreatePetitionReplies", () => {
+    it("sends error when trying to bulk create replies with read access", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $replies: JSONObject!) {
+            bulkCreatePetitionReplies(petitionId: $petitionId, replies: $replies) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", readPetition.id),
+          replies: {},
+        }
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
   });
 });

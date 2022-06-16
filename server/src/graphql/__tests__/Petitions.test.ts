@@ -11,6 +11,7 @@ import {
   OrganizationUsageLimit,
   OrgIntegration,
   Petition,
+  PetitionAccess,
   PetitionField,
   PetitionFieldType,
   PetitionPermission,
@@ -4335,6 +4336,363 @@ describe("GraphQL/Petitions", () => {
       expect(data?.reopenPetition).toEqual({
         id: toGlobalId("Petition", petitions[1].id),
         status: "PENDING",
+      });
+    });
+
+    it("should not allow to reopen an anonymized petition", async () => {
+      const [anonymized] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({
+          status: "CLOSED",
+          closed_at: new Date(),
+          anonymized_at: new Date(),
+        })
+      );
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!) {
+            reopenPetition(petitionId: $petitionId) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", anonymized.id),
+        }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+  });
+
+  describe("READ permission", () => {
+    let readPetition: Petition;
+    let access: PetitionAccess;
+    let contact: Contact;
+    beforeAll(async () => {
+      [readPetition] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ is_template: false }),
+        () => ({ type: "READ" })
+      );
+
+      [contact] = await mocks.createRandomContacts(organization.id, 1, () => ({
+        email: faker.internet.email(),
+      }));
+
+      [access] = await mocks.createPetitionAccess(
+        readPetition.id,
+        sessionUser.id,
+        [contact.id],
+        sessionUser.id
+      );
+    });
+
+    describe("sendPetition", () => {
+      it("should send error when trying to send a petition with READ access", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $contactIds: [GID!]!, $subject: String!, $body: JSON!) {
+              sendPetition(
+                petitionId: $petitionId
+                contactIdGroups: [$contactIds]
+                subject: $subject
+                body: $body
+              ) {
+                result
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", readPetition.id),
+            contactIds: [toGlobalId("Contact", contact.id)],
+            subject: "petition send subject",
+            body: [],
+          }
+        );
+
+        expect(errors).toContainGraphQLError("FORBIDDEN");
+        expect(data).toBeNull();
+      });
+    });
+
+    describe("updatePetition", () => {
+      it("should send error when trying to update petition with READ access", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $data: UpdatePetitionInput!) {
+              updatePetition(petitionId: $petitionId, data: $data) {
+                id
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", readPetition.id),
+            data: {
+              name: "my petition",
+              locale: "es",
+            },
+          }
+        );
+
+        expect(errors).toContainGraphQLError("FORBIDDEN");
+        expect(data).toBeNull();
+      });
+    });
+
+    describe("closePetition", () => {
+      it("sends error when trying to close a petition with read access", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!) {
+              closePetition(petitionId: $petitionId) {
+                id
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", readPetition.id),
+          }
+        );
+
+        expect(errors).toContainGraphQLError("FORBIDDEN");
+        expect(data).toBeNull();
+      });
+    });
+
+    describe("sendPetitionClosedNotification", () => {
+      it("sends error when trying to send a petition closed notification with read access", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!) {
+              sendPetitionClosedNotification(
+                petitionId: $petitionId
+                attachPdfExport: false
+                emailBody: []
+              ) {
+                id
+              }
+            }
+          `,
+          { petitionId: toGlobalId("Petition", readPetition.id) }
+        );
+
+        expect(errors).toContainGraphQLError("FORBIDDEN");
+        expect(data).toBeNull();
+      });
+    });
+
+    describe("sendReminders", () => {
+      it("sends error when trying to send a petition reminder with read access", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $accessIds: [GID!]!) {
+              sendReminders(petitionId: $petitionId, accessIds: $accessIds)
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", readPetition.id),
+            accessIds: [toGlobalId("PetitionAccess", access.id)],
+          }
+        );
+        expect(errors).toContainGraphQLError("FORBIDDEN");
+        expect(data).toBeNull();
+      });
+    });
+
+    describe("switchAutomaticReminders", () => {
+      it("sends error when trying to switch automatic reminders on a petition with read access", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $accessIds: [GID!]!) {
+              switchAutomaticReminders(
+                petitionId: $petitionId
+                accessIds: $accessIds
+                start: false
+              ) {
+                id
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", readPetition.id),
+            accessIds: [toGlobalId("PetitionAccess", access.id)],
+          }
+        );
+        expect(errors).toContainGraphQLError("FORBIDDEN");
+        expect(data).toBeNull();
+      });
+    });
+
+    describe("deactivateAccesses", () => {
+      it("sends error when trying to deactivate accesses on a petition with read access", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $accessIds: [GID!]!) {
+              deactivateAccesses(petitionId: $petitionId, accessIds: $accessIds) {
+                id
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", readPetition.id),
+            accessIds: [toGlobalId("PetitionAccess", access.id)],
+          }
+        );
+        expect(errors).toContainGraphQLError("FORBIDDEN");
+        expect(data).toBeNull();
+      });
+    });
+
+    describe("reactivateAccesses", () => {
+      it("sends error when trying to reactivate accesses on a petition with read access", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $accessIds: [GID!]!) {
+              reactivateAccesses(petitionId: $petitionId, accessIds: $accessIds) {
+                id
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", readPetition.id),
+            accessIds: [toGlobalId("PetitionAccess", access.id)],
+          }
+        );
+        expect(errors).toContainGraphQLError("FORBIDDEN");
+        expect(data).toBeNull();
+      });
+    });
+
+    describe("cancelScheduledMessage", () => {
+      it("sends error when trying to cancel a scheduled message on a petition with read access", async () => {
+        const [message] = await mocks.createRandomPetitionMessage(
+          readPetition.id,
+          access.id,
+          sessionUser.user_data_id
+        );
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $messageId: GID!) {
+              cancelScheduledMessage(petitionId: $petitionId, messageId: $messageId) {
+                id
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", readPetition.id),
+            messageId: [toGlobalId("PetitionMessage", message.id)],
+          }
+        );
+        expect(errors).toContainGraphQLError("FORBIDDEN");
+        expect(data?.cancelScheduledMessage).toBeNull();
+      });
+    });
+
+    describe("updatePetitionRestriction", () => {
+      it("should not allow to restrict with READ access", async () => {
+        const [readPetition] = await mocks.createRandomPetitions(
+          organization.id,
+          sessionUser.id,
+          1,
+          () => ({ is_template: false }),
+          () => ({ type: "READ" })
+        );
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $isRestricted: Boolean!, $password: String) {
+              updatePetitionRestriction(
+                petitionId: $petitionId
+                isRestricted: $isRestricted
+                password: $password
+              ) {
+                id
+                isRestricted
+                isRestrictedWithPassword
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", readPetition.id),
+            isRestricted: true,
+            password: "password",
+          }
+        );
+
+        expect(errors).toContainGraphQLError("FORBIDDEN");
+        expect(data).toBeNull();
+      });
+    });
+
+    describe("updatePetitionMetadata", () => {
+      it("should not be able to update metadata with READ access", async () => {
+        const [readPetition] = await mocks.createRandomPetitions(
+          organization.id,
+          sessionUser.id,
+          1,
+          () => ({ is_template: false }),
+          () => ({ type: "READ" })
+        );
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $metadata: JSONObject!) {
+              updatePetitionMetadata(petitionId: $petitionId, metadata: $metadata) {
+                id
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", readPetition.id),
+            metadata: { key: "value" },
+          }
+        );
+
+        expect(errors).toContainGraphQLError("FORBIDDEN");
+        expect(data).toBeNull();
+      });
+    });
+
+    describe("modifyPetitionCustomProperty", () => {
+      it("should not be able to update custom properties with READ access", async () => {
+        const [readPetition] = await mocks.createRandomPetitions(
+          organization.id,
+          sessionUser.id,
+          1,
+          () => ({
+            custom_properties: {
+              "my-property": "12345",
+            },
+          }),
+          () => ({
+            type: "READ",
+          })
+        );
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $key: String!, $value: String) {
+              modifyPetitionCustomProperty(petitionId: $petitionId, key: $key, value: $value) {
+                id
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", readPetition.id),
+            key: "key",
+            value: "abcd",
+          }
+        );
+
+        expect(errors).toContainGraphQLError("FORBIDDEN");
+        expect(data).toBeNull();
       });
     });
   });

@@ -172,7 +172,7 @@ export const signedPetitionDownloadLink = mutationField("signedPetitionDownloadL
   type: "FileUploadDownloadLinkResult",
   authorize: authenticateAnd(
     userHasEnabledIntegration("SIGNATURE"),
-    userHasAccessToSignatureRequest("petitionSignatureRequestId", ["OWNER", "WRITE"]),
+    userHasAccessToSignatureRequest("petitionSignatureRequestId"),
     signatureRequestIsNotAnonymized("petitionSignatureRequestId")
   ),
   args: {

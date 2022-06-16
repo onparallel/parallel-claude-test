@@ -1777,7 +1777,9 @@ export const createPublicPetitionLink = mutationField("createPublicPetitionLink"
 export const updatePublicPetitionLink = mutationField("updatePublicPetitionLink", {
   description: "Updates the info and permissions of a public link",
   type: "PublicPetitionLink",
-  authorize: authenticateAnd(userHasAccessToPublicPetitionLink("publicPetitionLinkId")),
+  authorize: authenticateAnd(
+    userHasAccessToPublicPetitionLink("publicPetitionLinkId", ["OWNER", "WRITE"])
+  ),
   args: {
     publicPetitionLinkId: nonNull(globalIdArg("PublicPetitionLink")),
     isActive: booleanArg(),

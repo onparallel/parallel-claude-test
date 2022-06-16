@@ -966,6 +966,7 @@ describe("GraphQL/PublicPetitionLink", () => {
   describe("createPublicPetitionLink", () => {
     let otherUsers: User[];
     let privateTemplate: Petition;
+    let readTemplate: Petition;
     let petition: Petition;
 
     let userGroup: UserGroup;
@@ -988,9 +989,41 @@ describe("GraphQL/PublicPetitionLink", () => {
           status: null,
         })
       );
-      [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      [petition, readTemplate] = await mocks.createRandomPetitions(
+        organization.id,
+        user.id,
+        2,
+        (i) => ({
+          is_template: i === 1,
+        }),
+        (i) => ({ type: i === 0 ? "OWNER" : "READ" })
+      );
       [userGroup] = await mocks.createUserGroups(1, organization.id);
       await mocks.insertUserGroupMembers(userGroup.id, [otherUsers[0].id, otherUsers[1].id]);
+    });
+
+    it("should send error when creating a public link with READ access", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($templateId: GID!, $title: String!, $description: String!) {
+            createPublicPetitionLink(
+              templateId: $templateId
+              title: $title
+              description: $description
+            ) {
+              id
+            }
+          }
+        `,
+        variables: {
+          templateId: toGlobalId("Petition", readTemplate.id),
+          title: "link title",
+          description: "link description",
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
 
     it("sends error if user does not have access to the template", async () => {
@@ -1185,6 +1218,8 @@ describe("GraphQL/PublicPetitionLink", () => {
     let privatePublicPetitionLink: PublicPetitionLink;
     let template: Petition;
     let publicPetitionLink: PublicPetitionLink;
+    let readTemplate: Petition;
+    let readPublicPetitionLink: PublicPetitionLink;
 
     beforeAll(async () => {
       [otherUser] = await mocks.createRandomUsers(organization.id, 1);
@@ -1199,13 +1234,46 @@ describe("GraphQL/PublicPetitionLink", () => {
         () => ({ slug: "aaaaa" })
       );
 
-      [template] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
-        is_template: true,
-        status: null,
-      }));
+      [template, readTemplate] = await mocks.createRandomPetitions(
+        organization.id,
+        user.id,
+        2,
+        () => ({
+          is_template: true,
+          status: null,
+        }),
+        (i) => ({
+          type: i === 0 ? "OWNER" : "READ",
+        })
+      );
       publicPetitionLink = await mocks.createRandomPublicPetitionLink(template.id, () => ({
         slug: "bbbb",
       }));
+
+      readPublicPetitionLink = await mocks.createRandomPublicPetitionLink(readTemplate.id, () => ({
+        slug: "cccc",
+      }));
+    });
+
+    it("should send error if trying to update a public link with READ access", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($publicPetitionLinkId: GID!, $isActive: Boolean) {
+            updatePublicPetitionLink(
+              publicPetitionLinkId: $publicPetitionLinkId
+              isActive: $isActive
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          publicPetitionLinkId: toGlobalId("PublicPetitionLink", readPublicPetitionLink.id),
+          isActive: false,
+        }
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
 
     it("sends error if user does not have access to the template with the public link", async () => {

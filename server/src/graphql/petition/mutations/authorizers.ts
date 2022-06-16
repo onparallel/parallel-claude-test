@@ -1,6 +1,7 @@
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { isDefined } from "remeda";
 import { ApiContext } from "../../../context";
+import { PetitionPermissionType } from "../../../db/__types";
 import { partition, unMaybeArray } from "../../../util/arrays";
 import { Maybe, MaybeArray } from "../../../util/types";
 import { Arg } from "../../helpers/authorize";
@@ -106,7 +107,10 @@ export function userHasAccessToPublicPetitionLink<
   TypeName extends string,
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
->(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+>(
+  argName: TArg,
+  permissionTypes?: PetitionPermissionType[]
+): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       const publicPetitionLinkIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
@@ -116,7 +120,8 @@ export function userHasAccessToPublicPetitionLink<
 
       return await ctx.petitions.userHasAccessToPetitions(
         ctx.user!.id,
-        publicPetitionLinks.map((ppl) => ppl.template_id)
+        publicPetitionLinks.map((ppl) => ppl.template_id),
+        permissionTypes
       );
     } catch {}
     return false;

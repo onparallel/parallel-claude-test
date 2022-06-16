@@ -31,7 +31,7 @@ export const createPetitionFieldReply = mutationField("createPetitionFieldReply"
     reply: nonNull("JSON"),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", [
       "TEXT",
@@ -71,7 +71,7 @@ export const updatePetitionFieldReply = mutationField("updatePetitionFieldReply"
     reply: nonNull("JSON"),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", [
       "TEXT",
@@ -120,7 +120,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
     file: nonNull("FileUploadInput"),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["FILE_UPLOAD"]),
     fieldCanBeReplied("fieldId"),
@@ -166,7 +166,7 @@ export const createFileUploadReplyComplete = mutationField("createFileUploadRepl
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["FILE_UPLOAD"]),
     petitionIsNotAnonymized("petitionId")
@@ -192,7 +192,7 @@ export const updateFileUploadReply = mutationField("updateFileUploadReply", {
     file: nonNull("FileUploadInput"),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["FILE_UPLOAD"]),
     replyCanBeUpdated("replyId"),
@@ -246,7 +246,7 @@ export const updateFileUploadReplyComplete = mutationField("updateFileUploadRepl
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyIsForFieldOfType("replyId", ["FILE_UPLOAD"]),
     petitionIsNotAnonymized("petitionId")
@@ -287,7 +287,7 @@ export const deletePetitionReply = mutationField("deletePetitionReply", {
     replyId: nonNull(globalIdArg("PetitionFieldReply")),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     repliesBelongsToPetition("petitionId", "replyId"),
     replyCanBeUpdated("replyId"),
     petitionIsNotAnonymized("petitionId")
@@ -305,7 +305,7 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
     fieldId: nonNull(globalIdArg("PetitionField")),
   },
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["ES_TAX_DOCUMENTS"]),
     fieldCanBeReplied("fieldId")
@@ -358,7 +358,7 @@ export const bulkCreatePetitionReplies = mutationField("bulkCreatePetitionReplie
     petitionId: nonNull(globalIdArg("Petition")),
     replies: nonNull(jsonObjectArg()),
   },
-  authorize: authenticateAnd(userHasAccessToPetitions("petitionId")),
+  authorize: authenticateAnd(userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"])),
   resolve: async (_, args, ctx) => {
     await prefillPetition(args.petitionId, args.replies, ctx.user!, ctx);
     return (await ctx.petitions.loadPetition(args.petitionId))!;

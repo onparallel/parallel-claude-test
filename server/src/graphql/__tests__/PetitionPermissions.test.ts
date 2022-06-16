@@ -2,7 +2,14 @@ import { gql } from "@apollo/client";
 import { Knex } from "knex";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Organization, Petition, PetitionPermission, User, UserGroup } from "../../db/__types";
+import {
+  Organization,
+  Petition,
+  PetitionPermission,
+  PetitionPermissionTypeValues,
+  User,
+  UserGroup,
+} from "../../db/__types";
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { toGlobalId } from "../../util/globalId";
 import { Maybe, MaybeArray } from "../../util/types";
@@ -17,6 +24,7 @@ describe("GraphQL/Petition Permissions", () => {
   let mocks: Mocks;
 
   let userPetition: Petition;
+  let readPetition: Petition;
   let otherPetition: Petition;
   let userGroup: UserGroup;
   let userGroupMembers: User[];
@@ -35,7 +43,15 @@ describe("GraphQL/Petition Permissions", () => {
   });
 
   beforeEach(async () => {
-    [userPetition] = await mocks.createRandomPetitions(organization.id, loggedUser.id, 1);
+    [userPetition, readPetition] = await mocks.createRandomPetitions(
+      organization.id,
+      loggedUser.id,
+      2,
+      undefined,
+      (i) => ({
+        type: i === 0 ? "OWNER" : "READ",
+      })
+    );
     [otherPetition] = await mocks.createRandomPetitions(organization.id, orgUsers[1].id, 1);
 
     [userGroup] = await mocks.createUserGroups(1, organization.id);
@@ -55,6 +71,21 @@ describe("GraphQL/Petition Permissions", () => {
 
   afterAll(async () => {
     await testClient.stop();
+  });
+
+  describe("PetitionPermissionType", () => {
+    it("ensures correct order of types", () => {
+      // PetitionPermissionType enum in db must be in the right order
+      // (OWNER > WRITE > READ)
+      expect(PetitionPermissionTypeValues).toHaveLength(3);
+      const ownerIndex = PetitionPermissionTypeValues.indexOf("OWNER");
+      const writeIndex = PetitionPermissionTypeValues.indexOf("WRITE");
+      const readIndex = PetitionPermissionTypeValues.indexOf("READ");
+
+      expect(ownerIndex < writeIndex && ownerIndex < readIndex);
+      expect(writeIndex > ownerIndex && writeIndex < readIndex);
+      expect(readIndex > ownerIndex && readIndex > writeIndex);
+    });
   });
 
   describe("queries", () => {
@@ -314,6 +345,29 @@ describe("GraphQL/Petition Permissions", () => {
   });
 
   describe("addPetitionPermission", () => {
+    it("sends error when trying to share petition with READ access", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionIds: [GID!]!, $userIds: [GID!]!) {
+            addPetitionPermission(
+              petitionIds: $petitionIds
+              userIds: $userIds
+              permissionType: WRITE
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionIds: [toGlobalId("Petition", readPetition.id)],
+          userIds: [toGlobalId("User", orgUsers[1].id)],
+        }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
     it("creates an event when sharing petition with new group", async () => {
       const [group] = await mocks.createUserGroups(1, organization.id);
       const { errors, data } = await testClient.mutate({
@@ -1289,10 +1343,35 @@ describe("GraphQL/Petition Permissions", () => {
     beforeEach(async () => {
       await mocks.sharePetitions([userPetition.id], orgUsers[1].id, "WRITE");
       await mocks.sharePetitions([userPetition.id], orgUsers[2].id, "WRITE");
+      await mocks.sharePetitions([readPetition.id], orgUsers[2].id, "WRITE");
     });
 
     afterEach(async () => {
       await mocks.clearSharedPetitions();
+    });
+
+    it("sends error when trying to edit permissions with READ access", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionIds: [GID!]!, $userIds: [GID!]!, $type: PetitionPermissionType!) {
+            editPetitionPermission(
+              petitionIds: $petitionIds
+              userIds: $userIds
+              permissionType: $type
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionIds: [toGlobalId("Petition", readPetition.id)],
+          userIds: [toGlobalId("UserGroup", orgUsers[2].id)],
+          type: "READ",
+        }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
 
     it("changes petition permissions on a group", async () => {
@@ -1667,10 +1746,30 @@ describe("GraphQL/Petition Permissions", () => {
     beforeEach(async () => {
       await mocks.sharePetitions([userPetition.id], orgUsers[1].id, "READ");
       await mocks.sharePetitions([userPetition.id], orgUsers[2].id, "READ");
+      await mocks.sharePetitions([readPetition.id], orgUsers[2].id, "WRITE");
     });
 
     afterEach(async () => {
       await mocks.clearSharedPetitions();
+    });
+
+    it("sends error when trying to remove permissions with READ access", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionIds: [GID!]!, $userIds: [GID!]!) {
+            removePetitionPermission(petitionIds: $petitionIds, userIds: $userIds) {
+              id
+            }
+          }
+        `,
+        {
+          petitionIds: [toGlobalId("Petition", readPetition.id)],
+          userIds: [toGlobalId("User", orgUsers[2].id)],
+        }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
 
     it("removes permissions for given set of petitions and users", async () => {
