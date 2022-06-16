@@ -222,6 +222,8 @@ function useFormulasByTypeField({
       id: "component.reference-options-menu.and",
       defaultMessage: "and",
     });
+    const defaultFilter = type === "DATE" ? " | date" : type === "NUMBER" ? " | number" : "";
+    const interpolation = `{{ ${loopVariable}${defaultFilter} }}`;
     const multipleFieldFormulas = multiple
       ? [
           {
@@ -235,7 +237,7 @@ function useFormulasByTypeField({
             }),
             formula: [
               `{% for ${loopVariable} in ${alias} -%}`,
-              `- {{ ${loopVariable} }}`,
+              `- ${interpolation}`,
               `{% endfor %}`,
             ].join("\n"),
           },
@@ -250,7 +252,7 @@ function useFormulasByTypeField({
             }),
             formula: [
               `{% for ${loopVariable} in ${alias} -%}`,
-              `{% if forloop.first == true %}{% elsif forloop.last == true %} ${and} {% else %}, {% endif %}{{ ${loopVariable} }}`,
+              `{% if forloop.first == true %}{% elsif forloop.last == true %} ${and} {% else %}, {% endif %}${interpolation}`,
               `{%- endfor %}`,
             ].join("\n"),
           },
