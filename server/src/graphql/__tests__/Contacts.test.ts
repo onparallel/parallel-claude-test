@@ -136,7 +136,11 @@ describe("GraphQL/Contacts", () => {
       (a, b) =>
         a.first_name!.localeCompare(b.first_name!, "en-us", {
           ignorePunctuation: true,
-        }) || a.id - b.id // sort by id ascending if names are the same
+        }) ||
+        a.last_name!.localeCompare(b.last_name!, "en-us", {
+          ignorePunctuation: true,
+        }) ||
+        a.id - b.id
     );
 
     expect(errors).toBeUndefined();
