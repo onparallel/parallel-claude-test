@@ -155,6 +155,8 @@ export const PetitionTemplateHeader = Object.assign(
 
     const handleTemplateRepliesReportTask = useTemplateRepliesReportTask();
 
+    const myEffectivePermission = petition.myEffectivePermission?.permissionType ?? "READ";
+
     return (
       <Box
         ref={ref}
@@ -270,6 +272,7 @@ export const PetitionTemplateHeader = Object.assign(
                   <MenuItem
                     onClick={() => handleTemplateRepliesReportTask(petition.id)}
                     icon={<TableIcon display="block" boxSize={4} />}
+                    isDisabled={myEffectivePermission === "READ"}
                   >
                     <FormattedMessage
                       id="component.petition-header.download-results"

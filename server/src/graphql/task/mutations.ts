@@ -97,7 +97,7 @@ export const createTemplateRepliesReportTask = mutationField("createTemplateRepl
   type: "Task",
   authorize: authenticateAnd(
     contextUserHasRole("ADMIN"),
-    userHasAccessToPetitions("petitionId"),
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     petitionsAreOfTypeTemplate("petitionId")
   ),
   args: {
