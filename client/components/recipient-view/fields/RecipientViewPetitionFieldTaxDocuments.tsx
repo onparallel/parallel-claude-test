@@ -149,7 +149,7 @@ export function RecipientViewPetitionFieldTaxDocuments({
                   isDisabled={isDisabled || isDeletingReply[reply.id]}
                   onRemove={() => handleDeletePetitionReply({ replyId: reply.id })}
                   onDownload={onDownloadReply}
-                  isDownloadDisabled={isCacheOnly}
+                  isDownloadDisabled={isCacheOnly || reply.isAnonymized}
                 />
               </motion.li>
             ))}

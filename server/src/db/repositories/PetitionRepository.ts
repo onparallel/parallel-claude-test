@@ -4362,10 +4362,7 @@ export class PetitionRepository extends BaseRepository {
 
       const [accesses, fields] = await Promise.all([
         this.from("petition_access", t).where("petition_id", petitionId).select("*"),
-        this.from("petition_field", t)
-          .where("petition_id", petitionId)
-          .whereNull("deleted_at")
-          .select("*"),
+        this.from("petition_field", t).where("petition_id", petitionId).select("*"),
       ]);
 
       const [replies, comments] = await Promise.all([
@@ -4374,7 +4371,7 @@ export class PetitionRepository extends BaseRepository {
             "petition_field_id",
             fields.map((f) => f.id)
           )
-          .whereNull("deleted_at")
+          .whereNull("anonymized_at")
           .select("*"),
         this.from("petition_field_comment", t)
           .where("petition_id", petitionId)
@@ -4382,7 +4379,7 @@ export class PetitionRepository extends BaseRepository {
             "petition_field_id",
             fields.map((f) => f.id)
           )
-          .whereNull("deleted_at")
+          .whereNull("anonymized_at")
           .select("*"),
       ]);
 
@@ -4434,9 +4431,7 @@ export class PetitionRepository extends BaseRepository {
     const fileUploadIds = repliesArray
       .filter(
         (r) =>
-          r.type === "FILE_UPLOAD" &&
-          isDefined(r.content.file_upload_id) &&
-          r.anonymized_at === null
+          isFileTypeField(r.type) && isDefined(r.content.file_upload_id) && r.anonymized_at === null
       )
       .map((r) => r.content.file_upload_id as number);
 
@@ -4451,6 +4446,8 @@ export class PetitionRepository extends BaseRepository {
         content: this.knex.raw(/* sql */ `
           case "type"
             when 'FILE_UPLOAD' then
+              content || jsonb_build_object('file_upload_id', null)
+            when 'ES_TAX_DOCUMENTS' then
               content || jsonb_build_object('file_upload_id', null)
             else 
               content || jsonb_build_object('value', null)
