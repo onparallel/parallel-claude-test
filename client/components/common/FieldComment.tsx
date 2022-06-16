@@ -36,6 +36,7 @@ export function FieldComment({
   onDelete,
   onEdit,
   onMarkAsUnread,
+  isDisabled,
 }: {
   comment:
     | FieldComment_PublicPetitionFieldCommentFragment
@@ -44,6 +45,7 @@ export function FieldComment({
   onDelete: () => void;
   onEdit: (content: string) => void;
   onMarkAsUnread?: () => void;
+  isDisabled?: boolean;
 }) {
   const intl = useIntl();
   const [isEditing, setIsEditing] = useState(false);
@@ -165,7 +167,7 @@ export function FieldComment({
             <Portal>
               <MenuList minWidth="160px">
                 {isAuthor ? (
-                  <MenuItem onClick={handleEditClick}>
+                  <MenuItem onClick={handleEditClick} isDisabled={isDisabled}>
                     <FormattedMessage id="generic.edit" defaultMessage="Edit" />
                   </MenuItem>
                 ) : null}
@@ -179,7 +181,7 @@ export function FieldComment({
                   </MenuItem>
                 ) : null}
                 {isAuthor ? (
-                  <MenuItem onClick={onDelete}>
+                  <MenuItem onClick={onDelete} isDisabled={isDisabled}>
                     <FormattedMessage id="generic.delete" defaultMessage="Delete" />
                   </MenuItem>
                 ) : null}

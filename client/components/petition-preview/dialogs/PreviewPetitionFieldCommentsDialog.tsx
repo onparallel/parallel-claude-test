@@ -276,6 +276,7 @@ export function PreviewPetitionFieldCommentsDialog({
                   onEdit={(content) => handleEditCommentContent(comment.id, content)}
                   onDelete={() => handleDeleteClick(comment.id)}
                   onMarkAsUnread={() => handleMarkAsUnread(comment.id)}
+                  isDisabled={onlyInternalComments && !comment.isInternal}
                 />
               ))}
             </Stack>

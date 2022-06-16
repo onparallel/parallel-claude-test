@@ -141,6 +141,7 @@ export function PetitionRepliesFieldComments({
                 onEdit={(content) => onUpdateComment(comment.id, content)}
                 onDelete={() => onDeleteComment(comment.id)}
                 onMarkAsUnread={() => onMarkAsUnread(comment.id)}
+                isDisabled={onlyInternalComments && !comment.isInternal}
               />
               {index === comments.length - 1 ? null : <Divider />}
             </Fragment>
