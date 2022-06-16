@@ -337,7 +337,7 @@ export function DocumentThemeEditor({
               <TabPanel key={key}>
                 <RichTextEditor
                   id={`legal-text-editor-${key}`}
-                  value={theme.legalText.en}
+                  value={theme.legalText[key]}
                   onChange={(value) => {
                     handleThemeChange({ legalText: { [key]: value } });
                   }}
