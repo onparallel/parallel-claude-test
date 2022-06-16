@@ -3118,6 +3118,8 @@ export class PetitionRepository extends BaseRepository {
   ) {
     const [newUsers, newUserGroups] = partition(data, (d) => d.type === "User");
     return await this.withTransaction(async (t) => {
+      const permissionType =
+        newUsers.length > 0 ? newUsers[0].permissionType : newUserGroups[0].permissionType;
       const [
         directlyAssignedNewUserPermissions,
         userGroupNewPermissions,
@@ -3126,7 +3128,15 @@ export class PetitionRepository extends BaseRepository {
         newUsers.length > 0
           ? this.raw<PetitionPermission>(
               /* sql */ `
-                ? on conflict do nothing returning *;
+               ? on conflict (petition_id, user_id)
+               where deleted_at is null and from_user_group_id is null and user_group_id is null 
+                  do update set
+                  type = ?,
+                  updated_by = ?,
+                  updated_at = ?,
+                  deleted_by = null,
+                  deleted_at = null where petition_permission.type > ?
+                returning *;
               `,
               [
                 // directly-assigned user permissions
@@ -3142,6 +3152,10 @@ export class PetitionRepository extends BaseRepository {
                     }))
                   )
                 ),
+                permissionType,
+                createdBy,
+                this.now(),
+                permissionType,
               ],
               t
             )
@@ -3149,7 +3163,15 @@ export class PetitionRepository extends BaseRepository {
         newUserGroups.length > 0
           ? this.raw<PetitionPermission>(
               /* sql */ `
-                ? on conflict do nothing returning *;
+                ? on conflict (petition_id, user_group_id)
+                where deleted_at is null and user_group_id is not null
+                  do update set
+                  type = ?,
+                  updated_by = ?,
+                  updated_at = ?,
+                  deleted_by = null,
+                  deleted_at = null  where petition_permission.type > ?
+                returning *;
               `,
               [
                 // group permissions
@@ -3165,6 +3187,10 @@ export class PetitionRepository extends BaseRepository {
                     }))
                   )
                 ),
+                permissionType,
+                createdBy,
+                this.now(),
+                permissionType,
               ],
               t
             )
