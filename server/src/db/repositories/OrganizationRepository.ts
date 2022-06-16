@@ -391,7 +391,7 @@ export class OrganizationRepository extends BaseRepository {
   async getOrganizationsWithFeatureFlag(name: FeatureFlagName) {
     return await this.raw<Organization>(
       /* sql */ `
-      select * from organization o
+      select distinct(o.*) from organization o
       join feature_flag ff on ff.name = ?
       left join feature_flag_override ffoo on ffoo.feature_flag_name = ff.name and ffoo.org_id = o.id
       where coalesce(ffoo.value, ff.default_value) = true
