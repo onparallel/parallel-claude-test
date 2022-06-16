@@ -400,6 +400,11 @@
     "context": "Terms and conditions"
   },
   {
+    "term": "new-petition.next-button",
+    "definition": "Siguiente",
+    "context": "Complete the information"
+  },
+  {
     "term": "new-petition.text",
     "definition": "{tone, select, INFORMAL{{senderName} ({senderEmail}) te ha compartido un acceso a Parallel:} other{{senderName} ({senderEmail}) le ha compartido un acceso a Parallel:}}",
     "context": "{senderName} ({senderEmail}) has sent you the following petition:"

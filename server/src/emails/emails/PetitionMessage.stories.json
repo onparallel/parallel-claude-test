@@ -22,7 +22,8 @@
         "logoAlt": "Parallel",
         "tone": "FORMAL",
         "removeWhyWeUseParallel": false,
-        "removeParallelBranding": false
+        "removeParallelBranding": false,
+        "showNextButton": false
       },
       "argTypes": {
         "senderName": { "control": { "type": "text" } },
@@ -41,7 +42,8 @@
         "logoAlt": { "control": { "type": "text" } },
         "tone": { "control": { "type": "text" } },
         "removeWhyWeUseParallel": { "control": { "type": "boolean" } },
-        "removeParallelBranding": { "control": { "type": "boolean" } }
+        "removeParallelBranding": { "control": { "type": "boolean" } },
+        "showNextButton": { "control": { "type": "boolean" } }
       }
     }
   ]

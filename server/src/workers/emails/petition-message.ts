@@ -1,8 +1,10 @@
+import { isDefined } from "remeda";
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionMessage from "../../emails/emails/PetitionMessage";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
+import { toGlobalId } from "../../util/globalId";
 import { toHtml, toPlainText } from "../../util/slate";
 import { getLayoutProps } from "../helpers/getLayoutProps";
 
@@ -53,6 +55,22 @@ export async function petitionMessage(
     "REMOVE_PARALLEL_BRANDING"
   );
 
+  const showNextButton = isDefined(petition.from_template_id)
+    ? [
+        "EAwW2jXkP4C9LYESGd",
+        "zas25KHxAByKWUeXTpW",
+        "zas25KHxAByKWUgEGU6",
+        "zas25KHxAByKWUgEGU9",
+        "zas25KHxAByKWUgEcdC",
+        "zas25KHxAByKWUgEchk",
+        "zas25KHxAByKWUgEcoS",
+        "zas25KHxAByKWUgEd43",
+        "zas25KHxAByKWUgEcxY",
+        "zas25KHxAByKWUgEcht",
+        "zas25KHxAByKWUgEd44",
+      ].includes(toGlobalId("Petition", petition.from_template_id))
+    : false;
+
   const { html, text, subject, from } = await buildEmail(
     PetitionMessage,
     {
@@ -66,6 +84,7 @@ export async function petitionMessage(
       tone: organization!.preferred_tone,
       removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
       removeParallelBranding: hasRemoveParallelBranding,
+      showNextButton,
       ...layoutProps,
     },
     { locale: petition.locale }

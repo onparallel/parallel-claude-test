@@ -11,6 +11,7 @@ import { UserMessageBox } from "../components/UserMessageBox";
 import { WhyWeUseParallel } from "../components/WhyWeUseParallel";
 import { FORMATS } from "../../util/dates";
 import { Tone } from "../utils/types";
+import { Button } from "../components/Button";
 
 export type PetitionMessageProps = {
   senderName: string;
@@ -23,6 +24,7 @@ export type PetitionMessageProps = {
   tone: Tone;
   removeWhyWeUseParallel: boolean;
   removeParallelBranding: boolean;
+  showNextButton: boolean;
 } & LayoutProps;
 
 const email: Email<PetitionMessageProps> = {
@@ -95,6 +97,7 @@ const email: Email<PetitionMessageProps> = {
     tone,
     removeWhyWeUseParallel,
     removeParallelBranding,
+    showNextButton,
   }: PetitionMessageProps) {
     const intl = useIntl();
 
@@ -150,10 +153,19 @@ const email: Email<PetitionMessageProps> = {
               </MjmlText>
             ) : null}
             <MjmlSpacer height="10px" />
-            <CompleteInfoButton
-              tone={tone}
-              href={`${parallelUrl}/${intl.locale}/petition/${keycode}`}
-            />
+            {showNextButton ? (
+              <Button href={`${parallelUrl}/${intl.locale}/petition/${keycode}`} fontWeight={500}>
+                <FormattedMessage
+                  id="new-petition.next-button"
+                  defaultMessage="Complete the information"
+                />
+              </Button>
+            ) : (
+              <CompleteInfoButton
+                tone={tone}
+                href={`${parallelUrl}/${intl.locale}/petition/${keycode}`}
+              />
+            )}
             <MjmlSpacer height="10px" />
             <Disclaimer email={senderEmail} />
           </MjmlColumn>

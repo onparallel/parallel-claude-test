@@ -400,6 +400,11 @@
     "context": "Terms and conditions"
   },
   {
+    "term": "new-petition.next-button",
+    "definition": "Complete the information",
+    "context": "Complete the information"
+  },
+  {
     "term": "new-petition.text",
     "definition": "{senderName} ({senderEmail}) has sent you the following petition:",
     "context": "{senderName} ({senderEmail}) has sent you the following petition:"
