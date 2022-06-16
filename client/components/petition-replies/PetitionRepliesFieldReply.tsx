@@ -142,6 +142,7 @@ export function PetitionRepliesFieldReply({
           role="switch"
           aria-checked={reply.status === "APPROVED"}
           onClick={() => onUpdateStatus(reply.status === "APPROVED" ? "PENDING" : "APPROVED")}
+          isDisabled={reply.isAnonymized}
         />
         <IconButtonWithTooltip
           data-action="reject-reply"
@@ -156,6 +157,7 @@ export function PetitionRepliesFieldReply({
           colorScheme={reply.status === "REJECTED" ? "red" : "gray"}
           aria-checked={reply.status === "REJECTED"}
           onClick={() => onUpdateStatus(reply.status === "REJECTED" ? "PENDING" : "REJECTED")}
+          isDisabled={reply.isAnonymized}
         />
       </Stack>
     </Flex>
