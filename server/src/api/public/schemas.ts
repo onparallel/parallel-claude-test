@@ -56,6 +56,7 @@ const _User = {
   },
   example: {
     id: toGlobalId("User", 42),
+    email: "michael.scofield@yahoo.com",
     firstName: "Michael",
     lastName: "Scofield",
     fullName: "Michael Scofield",
@@ -280,7 +281,7 @@ const _PetitionField = {
     alias: {
       type: ["string", "null"],
       description: "The field alias specified within the request / template",
-      example: "first-name",
+      example: "firstName",
     },
     options: {
       type: ["array", "null"],
@@ -474,7 +475,7 @@ const _Petition = {
       If parameter \`include\` contains \`replies\`, this will be a key-value object where each key is a field alias and the value is the submitted replies on the field.
       For FILE_UPLOAD and ES_TAX_DOCUMENTS fields, the value will contain the \`replyId\`, with which you can use the [/download](#operation/DownloadFileReply) endpoint to download the file.
       `,
-      example: { "first-name": "Robert Baratheon" },
+      example: { firstName: "Robert Baratheon" },
     },
   },
 } as const;
@@ -1971,8 +1972,210 @@ export const SubmitPetitionReplies = schema({
     \`HEADING\`, \`FILE_UPLOAD\` and \`ES_TAX_DOCUMENTS\` fields do not accept reply submission via this endpoint.
   `,
   example: {
-    text: "My text reply",
-    options: ["Option 1", "Option 3"],
-    date: "2022-05-31",
+    fullName: "Robert Baratheon",
+    dateOfBirth: "1200-10-29",
+    position: "King",
+    location: ["Westeros", "King's Landing"],
+    hobbies: ["Wild Boar Hunting", "Wine drinking"],
+    siblings: ["Renly Baratheon", "Stannis Baratheon"],
+    numberOfChildren: 20,
+  },
+} as const);
+
+export const SubmitPetitionRepliesResponse = schema({
+  ..._Petition,
+  example: {
+    id: toGlobalId("Petition", 10),
+    name: "Robert Baratheon KYC",
+    status: "PENDING",
+    deadline: new Date(2020, 2, 15).toISOString(),
+    locale: "en",
+    createdAt: new Date(2020, 1, 1).toISOString(),
+    fromTemplateId: null,
+    customProperties: {
+      clientId: "1234",
+    },
+    recipients: [
+      {
+        id: toGlobalId("PetitionAccess", 42),
+        contact: {
+          id: toGlobalId("Contact", 42),
+          email: "tyrion@casterlyrock.wes",
+          firstName: "Tyrion",
+          lastName: "Lannister",
+          fullName: "Tyrion Lannister",
+          createdAt: new Date(2020, 2, 15).toISOString(),
+          updatedAt: new Date(2020, 2, 15).toISOString(),
+        },
+        granter: {
+          id: toGlobalId("User", 42),
+          email: "michael.scofield@yahoo.com",
+          firstName: "Michael",
+          lastName: "Scofield",
+          fullName: "Michael Scofield",
+        },
+        status: "ACTIVE",
+        reminderCount: 2,
+        remindersLeft: 8,
+        remindersActive: true,
+        nextReminderAt: new Date(2020, 2, 17, 8, 0, 0).toISOString(),
+        createdAt: new Date(2020, 2, 15).toISOString(),
+      },
+    ],
+    fields: [
+      {
+        id: toGlobalId("PetitionField", 1),
+        title: "Full name",
+        description: "Please, enter your full name",
+        type: "SHORT_TEXT",
+        alias: "fullName",
+        options: null,
+        multiple: false,
+        replies: [
+          {
+            id: toGlobalId("PetitionFieldReply", 1),
+            status: "APPROVED",
+            content: "Robert Baratheon",
+            createdAt: new Date(2020, 1, 2).toISOString(),
+            updatedAt: new Date(2020, 1, 2).toISOString(),
+          },
+        ],
+      },
+      {
+        id: toGlobalId("PetitionField", 2),
+        title: "Date of birth",
+        description: "Please, enter your date of birth",
+        type: "DATE",
+        alias: "dateOfBirth",
+        options: null,
+        multiple: false,
+        replies: [
+          {
+            id: toGlobalId("PetitionFieldReply", 2),
+            status: "PENDING",
+            content: "1200-10-29",
+            createdAt: new Date(2020, 1, 2).toISOString(),
+            updatedAt: new Date(2020, 1, 2).toISOString(),
+          },
+        ],
+      },
+      {
+        id: toGlobalId("PetitionField", 3),
+        title: "Position",
+        description: "What do you do for a living?",
+        type: "SELECT",
+        alias: "position",
+        options: ["Hand of the King", "King", "Jester"],
+        multiple: false,
+        replies: [
+          {
+            id: toGlobalId("PetitionFieldReply", 3),
+            status: "APPROVED",
+            content: "King",
+            createdAt: new Date(2020, 1, 2).toISOString(),
+            updatedAt: new Date(2020, 1, 2).toISOString(),
+          },
+        ],
+      },
+      {
+        id: toGlobalId("PetitionField", 4),
+        title: "Location",
+        description: "Where do you usually work?",
+        type: "DYNAMIC_SELECT",
+        alias: "location",
+        options: [
+          ["Westeros", ["King's Landing", "The Wall", "Winterfell", "Dorne"]],
+          ["Essos", ["Pentos", "Volantis", "Mereen"]],
+        ],
+        multiple: false,
+        replies: [
+          {
+            id: toGlobalId("PetitionFieldReply", 4),
+            status: "APPROVED",
+            content: ["Westeros", "King's Landing"],
+            createdAt: new Date(2020, 1, 2).toISOString(),
+            updatedAt: new Date(2020, 1, 2).toISOString(),
+          },
+        ],
+      },
+      {
+        id: toGlobalId("PetitionField", 5),
+        title: "Hobbies",
+        description: "What do you like to do in your free time?",
+        type: "TEXT",
+        alias: "hobbies",
+        options: null,
+        multiple: true,
+        replies: [
+          {
+            id: toGlobalId("PetitionFieldReply", 5),
+            status: "APPROVED",
+            content: "Wild Boar Hunting",
+            createdAt: new Date(2020, 1, 2).toISOString(),
+            updatedAt: new Date(2020, 1, 2).toISOString(),
+          },
+          {
+            id: toGlobalId("PetitionFieldReply", 6),
+            status: "PENDING",
+            content: "Wine drinking",
+            createdAt: new Date(2020, 1, 2).toISOString(),
+            updatedAt: new Date(2020, 1, 2).toISOString(),
+          },
+        ],
+      },
+      {
+        id: toGlobalId("PetitionField", 6),
+        title: "Siblings",
+        description: "Please, enter the full name of all your siblings",
+        type: "TEXT",
+        alias: "siblings",
+        options: null,
+        multiple: true,
+        replies: [
+          {
+            id: toGlobalId("PetitionFieldReply", 7),
+            status: "APPROVED",
+            content: "Renly Baratheon",
+            createdAt: new Date(2020, 1, 2).toISOString(),
+            updatedAt: new Date(2020, 1, 2).toISOString(),
+          },
+          {
+            id: toGlobalId("PetitionFieldReply", 8),
+            status: "APPROVED",
+            content: "Stannis Baratheon",
+            createdAt: new Date(2020, 1, 2).toISOString(),
+            updatedAt: new Date(2020, 1, 2).toISOString(),
+          },
+        ],
+      },
+      {
+        id: toGlobalId("PetitionField", 7),
+        title: "Children",
+        description: "How many children do you have?",
+        type: "NUMBER",
+        alias: "numberOfChildren",
+        options: null,
+        multiple: false,
+        replies: [
+          {
+            id: toGlobalId("PetitionFieldReply", 9),
+            status: "APPROVED",
+            content: 20,
+            createdAt: new Date(2020, 1, 2).toISOString(),
+            updatedAt: new Date(2020, 1, 2).toISOString(),
+          },
+        ],
+      },
+    ],
+    tags: ["kyc", "priority"],
+    replies: {
+      fullName: "Robert Baratheon",
+      dateOfBirth: "1200-10-29",
+      position: "King",
+      location: ["Westeros", "King's Landing"],
+      hobbies: ["Wild Boar Hunting", "Wine drinking"],
+      siblings: ["Renly Baratheon", "Stannis Baratheon"],
+      numberOfChildren: 20,
+    },
   },
 } as const);

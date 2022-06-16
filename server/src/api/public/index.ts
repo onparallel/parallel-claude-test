@@ -78,6 +78,7 @@ import {
   SharePetition,
   SubmitFileReply,
   SubmitPetitionReplies,
+  SubmitPetitionRepliesResponse,
   SubmitReply,
   Subscription,
   Template,
@@ -1644,7 +1645,7 @@ api
       Submits replies on a petition given a JSON object where each key is a field alias and each value is one or more replies on that field.
     `,
       responses: {
-        200: SuccessResponse(Petition),
+        200: SuccessResponse(SubmitPetitionRepliesResponse),
       },
       body: JsonBody(SubmitPetitionReplies),
       tags: ["Petition replies"],
