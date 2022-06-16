@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import faker from "@faker-js/faker";
+import { faker } from "@faker-js/faker";
 import { Knex } from "knex";
 import { sortBy } from "remeda";
 import { PetitionEvent } from "../../db/events";

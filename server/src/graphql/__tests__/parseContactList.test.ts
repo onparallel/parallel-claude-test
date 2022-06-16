@@ -1,5 +1,5 @@
 import { parseContactList } from "../helpers/parseContactList";
-import faker from "@faker-js/faker";
+import { faker } from "@faker-js/faker";
 import { range } from "remeda";
 describe("parseContactList", () => {
   it("parses a list of contacts", async () => {

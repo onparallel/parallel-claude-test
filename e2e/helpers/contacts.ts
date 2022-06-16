@@ -2,7 +2,7 @@ import { Page } from "playwright";
 import { generateEmail } from "./emails";
 import { goTo } from "./goTo";
 import { skipOnboarding } from "./skipOnboarding";
-import faker from "@faker-js/faker";
+import { faker } from "@faker-js/faker";
 
 export interface CreateContact {
   email: string;

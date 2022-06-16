@@ -1,4 +1,4 @@
-import faker from "@faker-js/faker";
+import { faker } from "@faker-js/faker";
 import { Knex } from "knex";
 import { isDefined, range } from "remeda";
 import { USER_COGNITO_ID } from "../../../../test/mocks";

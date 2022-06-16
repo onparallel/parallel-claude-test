@@ -15,7 +15,7 @@ import {
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
-import faker from "@faker-js/faker";
+import { faker } from "@faker-js/faker";
 
 describe("GraphQL/PublicPetitionLink", () => {
   let testClient: TestClient;

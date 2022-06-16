@@ -1,4 +1,4 @@
-import faker from "@faker-js/faker";
+import { faker } from "@faker-js/faker";
 import { Container } from "inversify";
 import { Knex } from "knex";
 import { isDefined, pick, range, sortBy } from "remeda";
