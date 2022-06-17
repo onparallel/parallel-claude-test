@@ -1,61 +1,55 @@
-import {
-  Button,
-  ButtonProps,
-  Flex,
-  Menu,
-  MenuButton,
-  MenuButtonProps,
-  MenuItem,
-  MenuItemProps,
-  MenuList,
-  Portal,
-  Stack,
-  StackProps,
-} from "@chakra-ui/react";
-import { ChevronDownIcon } from "@parallel/chakra/icons";
+import { Button, ButtonProps, Select, Stack, StackProps } from "@chakra-ui/react";
+import { ArrowShortRightIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { NakedLink } from "@parallel/components/common/Link";
-import { usePublicMenu } from "@parallel/utils/usePublicMenu";
+import { resolveUrl } from "@parallel/utils/next";
+import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { useRouter } from "next/router";
-import { FormattedMessage } from "react-intl";
+import { ChangeEvent } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
 
 export function PublicHeaderMenu(props: StackProps) {
+  const router = useRouter();
+  const intl = useIntl();
   function trackCTAClick() {
     window.analytics?.track("Register CTA Clicked", { from: "public-header" });
   }
 
-  const menu = usePublicMenu();
+  function handleLangChange(event: ChangeEvent<HTMLSelectElement>) {
+    const locale = event.target.value;
+    router.push(resolveUrl(router.pathname, { ...router.query }), undefined, { locale });
+  }
+
+  const locales = useSupportedLocales();
 
   return (
     <Stack {...props}>
-      {menu.map((parent) => {
-        if (parent.children !== null) {
-          return (
-            <Flex key={parent.path}>
-              <Menu placement="bottom" matchWidth={true}>
-                <PublicHeaderMenuButton flex="1" variant="ghost" urlPrefix={parent.path}>
-                  {parent.title}
-                </PublicHeaderMenuButton>
-                <Portal>
-                  <MenuList>
-                    {parent.children.map((children) => (
-                      <PublicHeaderMenuItemLink key={children.path} href={children.path}>
-                        {children.title}
-                      </PublicHeaderMenuItemLink>
-                    ))}
-                  </MenuList>
-                </Portal>
-              </Menu>
-            </Flex>
-          );
-        } else {
-          return (
-            <PublicHeaderLink key={parent.path} href={parent.path} variant="ghost">
-              {parent.title}
-            </PublicHeaderLink>
-          );
-        }
-      })}
+      <Select
+        size="md"
+        width="auto"
+        minWidth="120px"
+        onChange={handleLangChange}
+        value={router.locale}
+        aria-label={intl.formatMessage({
+          id: "public.footer.language-select-label",
+          defaultMessage: "Change language",
+        })}
+      >
+        {locales.map(({ label, key }) => (
+          <option key={key} value={key}>
+            {label}
+          </option>
+        ))}
+      </Select>
+
+      <PublicHeaderLink
+        fontWeight="normal"
+        id="pw-public-login"
+        rightIcon={<ArrowShortRightIcon />}
+        href="/"
+      >
+        <FormattedMessage id="public.go-to-parallel" defaultMessage="Go to Parallel" />
+      </PublicHeaderLink>
       <PublicHeaderLink href="/login" variant="outline" id="pw-public-login">
         <FormattedMessage id="public.login-button" defaultMessage="Login" />
       </PublicHeaderLink>
@@ -65,7 +59,7 @@ export function PublicHeaderMenu(props: StackProps) {
         _activeLink={{}}
         onClick={trackCTAClick}
       >
-        <FormattedMessage id="public.try-for-free-button" defaultMessage="Try for free" />
+        <FormattedMessage id="public.sign-up-button" defaultMessage="Sign up" />
       </PublicHeaderLink>
     </Stack>
   );
@@ -95,56 +89,3 @@ export const PublicHeaderLink = chakraForwardRef<"a", PublicHeaderLink>(function
     </NakedLink>
   );
 });
-
-interface PublicHeaderMenuItemLinkProps extends MenuItemProps {
-  href: string;
-}
-
-export const PublicHeaderMenuItemLink = chakraForwardRef<"a", PublicHeaderMenuItemLinkProps>(
-  function MenuItemLink({ href, ...props }, ref) {
-    const router = useRouter();
-    const isCurrent = router.pathname === href || router.pathname.startsWith(`${href}/`);
-    return (
-      <NakedLink href={href}>
-        <MenuItem
-          as="a"
-          ref={ref as any}
-          aria-current={isCurrent ? "page" : undefined}
-          _activeLink={{
-            fontWeight: "bold",
-            color: "purple.600",
-          }}
-          {...props}
-        />
-      </NakedLink>
-    );
-  }
-);
-interface PublicHeaderMenuButton extends MenuButtonProps, ButtonProps {
-  urlPrefix: string;
-}
-
-export const PublicHeaderMenuButton = chakraForwardRef<"button", PublicHeaderMenuButton>(
-  function MenuButtonHighlight({ urlPrefix, children, ...props }, ref) {
-    const router = useRouter();
-    const isCurrent = router.pathname === urlPrefix || router.pathname.startsWith(`${urlPrefix}/`);
-    return (
-      <MenuButton
-        ref={ref as any}
-        as={Button}
-        rightIcon={
-          <ChevronDownIcon
-            sx={{
-              g: { strokeWidth: "3.2" },
-            }}
-          />
-        }
-        aria-current={isCurrent ? "page" : undefined}
-        _activeLink={{ color: "purple.600" }}
-        {...props}
-      >
-        {children}
-      </MenuButton>
-    );
-  }
-);

@@ -1717,8 +1717,14 @@ export type OwnershipTransferredEvent = PetitionEvent & {
 export type Petition = PetitionBase & {
   /** The accesses for this petition */
   accesses: Array<PetitionAccess>;
+  /** How many months to wait since the petition is closed to anonymize. */
+  anonymizeAfterMonths: Maybe<Scalars["Int"]>;
+  /** Purpose of the anonymization */
+  anonymizePurpose: Maybe<Scalars["String"]>;
   /** The attachments linked to this petition */
   attachments: Array<PetitionAttachment>;
+  /** Time when the petition was closed. */
+  closedAt: Maybe<Scalars["DateTime"]>;
   /** The closing email body of the petition. */
   closingEmailBody: Maybe<Scalars["JSON"]>;
   /** The body of the optional completing message to be show to recipients */
@@ -1870,6 +1876,10 @@ export type PetitionAttachmentUploadData = {
 };
 
 export type PetitionBase = {
+  /** How many months to wait since the petition is closed to anonymize. */
+  anonymizeAfterMonths: Maybe<Scalars["Int"]>;
+  /** Purpose of the anonymization */
+  anonymizePurpose: Maybe<Scalars["String"]>;
   /** The attachments linked to this petition */
   attachments: Array<PetitionAttachment>;
   /** The closing email body of the petition. */
@@ -2422,6 +2432,10 @@ export type PetitionStatus =
 
 /** A petition template */
 export type PetitionTemplate = PetitionBase & {
+  /** How many months to wait since the petition is closed to anonymize. */
+  anonymizeAfterMonths: Maybe<Scalars["Int"]>;
+  /** Purpose of the anonymization */
+  anonymizePurpose: Maybe<Scalars["String"]>;
   /** The attachments linked to this petition */
   attachments: Array<PetitionAttachment>;
   backgroundColor: Maybe<Scalars["String"]>;
@@ -3319,10 +3333,18 @@ export type TagPagination = {
 
 export type Task = {
   id: Scalars["GID"];
+  name: TaskName;
   output: Maybe<Scalars["JSONObject"]>;
   progress: Maybe<Scalars["Int"]>;
   status: TaskStatus;
 };
+
+export type TaskName =
+  | "EXPORT_EXCEL"
+  | "EXPORT_REPLIES"
+  | "PRINT_PDF"
+  | "TEMPLATE_REPLIES_REPORT"
+  | "TEMPLATE_STATS_REPORT";
 
 export type TaskStatus = "COMPLETED" | "ENQUEUED" | "FAILED" | "PROCESSING";
 
@@ -3407,6 +3429,8 @@ export type UpdatePetitionFieldInput = {
 };
 
 export type UpdatePetitionInput = {
+  anonymizeAfterMonths?: InputMaybe<Scalars["Int"]>;
+  anonymizePurpose?: InputMaybe<Scalars["String"]>;
   closingEmailBody?: InputMaybe<Scalars["JSON"]>;
   completingMessageBody?: InputMaybe<Scalars["JSON"]>;
   completingMessageSubject?: InputMaybe<Scalars["String"]>;

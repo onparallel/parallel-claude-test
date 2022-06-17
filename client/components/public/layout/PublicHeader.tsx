@@ -1,12 +1,10 @@
 import { Box, BoxProps, Flex, useDisclosure } from "@chakra-ui/react";
 import { BurgerButton } from "@parallel/components/common/BurgerButton";
-import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { Spacer } from "@parallel/components/common/Spacer";
 import useWindowScroll from "beautiful-react-hooks/useWindowScroll";
 import { useEffect, useState } from "react";
 import { PublicContainer } from "./PublicContainer";
-import { PublicHeaderAccordionMenu } from "./PublicHeaderAccordionMenu";
 import { PublicHeaderMenu } from "./PublicHeaderMenu";
 
 export function PublicHeader(props: BoxProps) {
@@ -25,8 +23,8 @@ export function PublicHeader(props: BoxProps) {
     <PublicContainer
       wrapper={{
         as: "header",
-        backgroundColor: "white",
-        boxShadow: "short",
+        backgroundColor: "gray.50",
+        boxShadow: isThin ? "short" : undefined,
         ...props,
       }}
     >
@@ -41,11 +39,9 @@ export function PublicHeader(props: BoxProps) {
           minHeight={{ base: 16, [bp]: isThin ? 16 : 20 }}
           transition="min-height 300ms"
         >
-          <NakedLink href="/">
-            <Box as="a">
-              <Logo width="152px" />
-            </Box>
-          </NakedLink>
+          <Box as="a" href="/">
+            <Logo width="152px" />
+          </Box>
           <Spacer />
           <BurgerButton
             isOpen={isOpen}
@@ -63,11 +59,10 @@ export function PublicHeader(props: BoxProps) {
           paddingBottom={{ base: isOpen ? 4 : 2, [bp]: 2 }}
         >
           <PublicHeaderMenu
-            display={{ base: "none", [bp]: "flex" }}
-            direction="row"
+            direction={{ base: "column", [bp]: "row" }}
             spacing={{ base: 2, xl: 4 }}
+            alignItems={{ base: undefined, [bp]: "center" }}
           />
-          <PublicHeaderAccordionMenu display={{ base: "flex", [bp]: "none" }} spacing={2} />
         </Box>
       </Flex>
     </PublicContainer>

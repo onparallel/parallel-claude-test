@@ -1,7 +1,4 @@
 import { gql } from "@apollo/client";
-import { Button, Flex, Heading } from "@chakra-ui/react";
-import { NakedLink } from "@parallel/components/common/Link";
-import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { LandingTemplateCard } from "@parallel/components/public/templates/LandingTemplateCard";
 import { PublicTemplateCategoryPreview } from "@parallel/components/public/templates/PublicTemplateCategoryPreview";
@@ -14,8 +11,9 @@ import {
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
-import { FormattedMessage, useIntl } from "react-intl";
+import { useIntl } from "react-intl";
 import { indexBy } from "remeda";
+import { PublicFooterCTA } from "../../components/public/layout/PublicFooterCTA";
 
 function Templates({ samples }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
@@ -49,37 +47,7 @@ function Templates({ samples }: InferGetServerSidePropsType<typeof getServerSide
           );
         })}
       </PublicTemplatesContainer>
-      <PublicContainer
-        paddingY={20}
-        maxWidth="container.sm"
-        textAlign="center"
-        wrapper={{
-          backgroundColor: "purple.50",
-        }}
-      >
-        <Heading
-          as="h2"
-          color="gray.900"
-          size="lg"
-          fontFamily="hero"
-          fontWeight="600"
-          lineHeight={1.5}
-        >
-          <FormattedMessage
-            id="public.templates.know-more-about"
-            defaultMessage="Do you want to know more about our templates?"
-          />
-          <br />
-          <FormattedMessage id="public.templates.we-show-you" defaultMessage="Let us show you!" />
-        </Heading>
-        <Flex marginTop={10} justifyContent="center">
-          <NakedLink href="/signup">
-            <Button as="a" colorScheme="purple" size="lg">
-              <FormattedMessage id="public.try-for-free-button" defaultMessage="Try for free" />
-            </Button>
-          </NakedLink>
-        </Flex>
-      </PublicContainer>
+      <PublicFooterCTA />
     </PublicLayout>
   );
 }

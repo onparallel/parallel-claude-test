@@ -9,9 +9,10 @@ export function PublicTemplatesHero() {
       wrapper={{
         textAlign: "center",
         paddingY: 16,
+        backgroundColor: "gray.50",
       }}
     >
-      <Heading mb={6}>
+      <Heading mb={6} size="3xl">
         <FormattedMessage
           id="public.templates-hero.template-library"
           defaultMessage="Template library"
@@ -20,7 +21,7 @@ export function PublicTemplatesHero() {
       <Text fontSize="xl">
         <FormattedMessage
           id="public.templates-hero.template-library-desc"
-          defaultMessage="Discover some of the public templates that we offer on Parallel to improve your experience."
+          defaultMessage="Choose one of our public templates to copy it, customize it and start speeding up your processes."
         />
       </Text>
     </PublicContainer>

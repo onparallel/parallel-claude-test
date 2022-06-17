@@ -1,23 +1,22 @@
 import { gql } from "@apollo/client";
-import { Button, Flex, Grid, Heading, Stack } from "@chakra-ui/react";
-import { NakedLink } from "@parallel/components/common/Link";
-import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
+import { Flex, Grid, Heading, Stack } from "@chakra-ui/react";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { LandingTemplateCard } from "@parallel/components/public/templates/LandingTemplateCard";
 import { PublicTemplatesContainer } from "@parallel/components/public/templates/PublicTemplatesContainer";
 import { PublicTemplatesHero } from "@parallel/components/public/templates/PublicTemplatesHero";
 import {
+  LandingTemplateCard_LandingTemplateFragment,
   LandingTemplatesCategory_categorySamplesDocument,
   LandingTemplatesCategory_landingTemplatesDocument,
   LandintTemplatesCategory_LandingTemplateCategorySampleFragment,
   PetitionLocale,
-  LandingTemplateCard_LandingTemplateFragment,
 } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { FormattedMessage, useIntl } from "react-intl";
 import { indexBy } from "remeda";
+import { PublicFooterCTA } from "../../../components/public/layout/PublicFooterCTA";
 
 function LandingTemplatesCategory({
   samples,
@@ -79,37 +78,7 @@ function LandingTemplatesCategory({
           </Grid>
         </Stack>
       </PublicTemplatesContainer>
-      <PublicContainer
-        paddingY={20}
-        maxWidth="container.sm"
-        textAlign="center"
-        wrapper={{
-          backgroundColor: "purple.50",
-        }}
-      >
-        <Heading
-          as="h2"
-          color="gray.900"
-          size="lg"
-          fontFamily="hero"
-          fontWeight="600"
-          lineHeight={1.5}
-        >
-          <FormattedMessage
-            id="public.templates.know-more-about"
-            defaultMessage="Do you want to know more about our templates?"
-          />
-          <br />
-          <FormattedMessage id="public.templates.we-show-you" defaultMessage="Let us show you!" />
-        </Heading>
-        <Flex marginTop={10} justifyContent="center">
-          <NakedLink href="/book-demo">
-            <Button as="a" colorScheme="purple" size="lg">
-              <FormattedMessage id="public.book-demo-button" defaultMessage="Book a demo" />
-            </Button>
-          </NakedLink>
-        </Flex>
-      </PublicContainer>
+      <PublicFooterCTA />
     </PublicLayout>
   );
 }
