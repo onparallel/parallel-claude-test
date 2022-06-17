@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { Circle, Text } from "@chakra-ui/react";
-import { CommentIcon } from "@parallel/chakra/icons";
+import { CommentIcon, NoteIcon } from "@parallel/chakra/icons";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { UserReference } from "@parallel/components/petition-activity/UserReference";
 import { CommentCreatedUserNotification_CommentCreatedUserNotificationFragment } from "@parallel/graphql/__types";
@@ -16,7 +16,7 @@ export interface CommentCreatedUserNotificationProps {
 export const CommentCreatedUserNotification = Object.assign(
   forwardRef<HTMLElement, CommentCreatedUserNotificationProps>(
     function CommentCreatedUserNotification({ isFirst, notification }, ref) {
-      const { author, isInternal } = notification.comment;
+      const { author, isInternal: isNote } = notification.comment;
       const name =
         author?.__typename === "PetitionAccess" ? (
           <ContactReference draggable="false" tabIndex={-1} contact={author.contact} />
@@ -41,15 +41,15 @@ export const CommentCreatedUserNotification = Object.assign(
           notification={notification}
           icon={
             <Circle size="36px" background="gray.200">
-              <CommentIcon fontSize="16px" />
+              {isNote ? <NoteIcon fontSize="16px" /> : <CommentIcon fontSize="16px" />}
             </Circle>
           }
           path={`/replies?comments=${notification.field.id}`}
         >
-          {isInternal ? (
+          {isNote ? (
             <FormattedMessage
               id="component.notification-internal-comment.body"
-              defaultMessage="{name} has written an internal comment in the field {field}."
+              defaultMessage="{name} has added a note in the field {field}."
               values={{ name, field }}
             />
           ) : (

@@ -1486,8 +1486,8 @@
   },
   {
     "term": "component.notification-internal-comment.body",
-    "definition": "{name} has written an internal comment in the field {field}.",
-    "context": "{name} has written an internal comment in the field {field}."
+    "definition": "{name} has added a note in the field {field}.",
+    "context": "{name} has added a note in the field {field}."
   },
   {
     "term": "component.notification-petition-completed.body",

@@ -2078,3 +2078,20 @@ export const CheckedBoxIcon = createIcon({
     </g>
   ),
 });
+
+export const NoteIcon = createIcon({
+  displayName: "NoteIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="m15.5573 21.9896h-7.30733c-5.625.1249-6.24997-.8121-6.24997-6.2468v-7.49607c0-4.49766 1.37497-6.24673 5.87497-6.24673h7.87503c4.5 0 6.25 2.49868 6.25 6.24673v7.87617" />
+      <path d="m15.7396 21.9375v-3.3802c0-2.1523-.0938-2.4255.7552-2.4322.3344-.0027.815-.0001 1.5052-.0001h4z" />
+    </g>
+  ),
+});
