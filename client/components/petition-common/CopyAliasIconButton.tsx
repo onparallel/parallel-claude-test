@@ -25,13 +25,14 @@ export const CopyAliasIconButton = chakraForwardRef<"button", CopyAliasIconButto
       id: "component.reference-options-menu.loop-variable",
       defaultMessage: "reply",
     });
-    const interpolation = field.multiple
-      ? [
-          `{% for ${loopVariable} in ${field.alias} -%}`,
-          `- {{ ${loopVariable}${defaultFilter} }}`,
-          `{% endfor %}`,
-        ].join("\n")
-      : `{{ ${field.alias}${defaultFilter} }}`;
+    const interpolation =
+      field.type === "CHECKBOX" || field.multiple
+        ? [
+            `{% for ${loopVariable} in ${field.alias} -%}`,
+            `- {{ ${loopVariable}${defaultFilter} }}`,
+            `{% endfor %}`,
+          ].join("\n")
+        : `{{ ${field.alias}${defaultFilter} }}`;
 
     return (
       <CopyToClipboardButton
