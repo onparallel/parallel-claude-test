@@ -35,6 +35,7 @@ yum -y install yarn
 echo "Installing nginx"
 curl -O https://nginx.org/download/nginx-${nginx_version}.tar.gz
 tar -xvf nginx-${nginx_version}.tar.gz 
+git clone https://github.com/giom/nginx_accept_language_module
 pushd nginx-${nginx_version}
 ./configure \
     --prefix=/usr/share/nginx \
@@ -80,6 +81,7 @@ pushd nginx-${nginx_version}
     --with-debug \
     --with-cc-opt='-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic' \
     --with-ld-opt=' -Wl,-E'
+    --add-module=../nginx_accept_language_module
 make
 make install
 popd > /dev/null
