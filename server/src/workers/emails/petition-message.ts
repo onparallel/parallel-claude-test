@@ -57,7 +57,6 @@ export async function petitionMessage(
 
   const showNextButton = isDefined(petition.from_template_id)
     ? [
-        "EAwW2jXkP4C9LYESGd",
         "zas25KHxAByKWUeXTpW",
         "zas25KHxAByKWUgEGU6",
         "zas25KHxAByKWUgEGU9",
