@@ -1,6 +1,7 @@
 import { gql, useApolloClient, useMutation } from "@apollo/client";
 import { mergeDeep } from "@apollo/client/utilities";
 import {
+  Button,
   FormControl,
   FormLabel,
   Heading,
@@ -23,6 +24,7 @@ import { NumeralInput } from "@parallel/components/common/NumeralInput";
 import { RichTextEditor } from "@parallel/components/common/slate/RichTextEditor";
 import {
   DocumentThemeEditor_OrganizationFragmentDoc,
+  DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeDocument,
   DocumentThemeEditor_updateOrganizationDocumentThemeDocument,
   DocumentThemeEditor_updateOrganizationDocumentThemeMutationVariables,
 } from "@parallel/graphql/__types";
@@ -113,6 +115,18 @@ export function DocumentThemeEditor({
         }
       }
     }
+  }
+
+  const [restoreDefaultOrganizationDocumentTheme] = useMutation(
+    DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeDocument
+  );
+
+  async function handleRestoreDefaults() {
+    await restoreDefaultOrganizationDocumentTheme({
+      update: (_, { data }) => {
+        setTheme(data!.restoreDefaultOrganizationDocumentTheme.pdfDocumentTheme);
+      },
+    });
   }
 
   const locales = useSupportedLocales();
@@ -320,6 +334,14 @@ export function DocumentThemeEditor({
           </HStack>
         ))}
       </Stack>
+      <HStack justifyContent="flex-end">
+        <Button variant="link" onClick={handleRestoreDefaults}>
+          <FormattedMessage
+            id="component.document-theme-editor.restore-defaults"
+            defaultMessage="Restore defaults"
+          />
+        </Button>
+      </HStack>
       <Divider borderColor="gray.300" />
       <Stack spacing={4}>
         <Heading as="h4" size="md" fontWeight="semibold">
@@ -379,6 +401,14 @@ const _mutations = [
       $data: OrganizationDocumentThemeInput!
     ) {
       updateOrganizationDocumentTheme(data: $data) {
+        id
+        pdfDocumentTheme
+      }
+    }
+  `,
+  gql`
+    mutation DocumentThemeEditor_restoreDefaultOrganizationDocumentTheme {
+      restoreDefaultOrganizationDocumentTheme {
         id
         pdfDocumentTheme
       }

@@ -950,6 +950,11 @@
     "context": "Margins"
   },
   {
+    "term": "component.document-theme-editor.restore-defaults",
+    "definition": "Restore defaults",
+    "context": "Restore defaults"
+  },
+  {
     "term": "component.document-theme-editor.show-logo-description",
     "definition": "Display the organization's logo on your documents.",
     "context": "Display the organization's logo on your documents."

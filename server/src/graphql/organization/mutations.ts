@@ -169,3 +169,19 @@ export const updateOrganizationDocumentTheme = mutationField("updateOrganization
     );
   },
 });
+
+export const restoreDefaultOrganizationDocumentTheme = mutationField(
+  "restoreDefaultOrganizationDocumentTheme",
+  {
+    description: "Restores the organization document theme to the default values",
+    type: "Organization",
+    authorize: authenticateAnd(contextUserHasRole("ADMIN")),
+    resolve: async (_, args, ctx) => {
+      return await ctx.organizations.updateOrganization(
+        ctx.user!.org_id,
+        { pdf_document_theme: defaultPdfDocumentTheme },
+        `User:${ctx.user!.id}`
+      );
+    },
+  }
+);

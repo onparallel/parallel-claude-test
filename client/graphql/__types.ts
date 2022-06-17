@@ -615,6 +615,8 @@ export interface Mutation {
   resetTemporaryPassword: Result;
   /** Resets the given user password on AWS Cognito and sends an email with new temporary. */
   resetUserPassword: SupportMethodResponse;
+  /** Restores the organization document theme to the default values */
+  restoreDefaultOrganizationDocumentTheme: Organization;
   restoreLogin: Result;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
@@ -5300,6 +5302,18 @@ export type DocumentThemeEditor_updateOrganizationDocumentThemeMutationVariables
 
 export type DocumentThemeEditor_updateOrganizationDocumentThemeMutation = {
   updateOrganizationDocumentTheme: {
+    __typename?: "Organization";
+    id: string;
+    pdfDocumentTheme: { [key: string]: any };
+  };
+};
+
+export type DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeMutationVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeMutation = {
+  restoreDefaultOrganizationDocumentTheme: {
     __typename?: "Organization";
     id: string;
     pdfDocumentTheme: { [key: string]: any };
@@ -25663,6 +25677,17 @@ export const DocumentThemeEditor_updateOrganizationDocumentThemeDocument = gql`
 ` as unknown as DocumentNode<
   DocumentThemeEditor_updateOrganizationDocumentThemeMutation,
   DocumentThemeEditor_updateOrganizationDocumentThemeMutationVariables
+>;
+export const DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeDocument = gql`
+  mutation DocumentThemeEditor_restoreDefaultOrganizationDocumentTheme {
+    restoreDefaultOrganizationDocumentTheme {
+      id
+      pdfDocumentTheme
+    }
+  }
+` as unknown as DocumentNode<
+  DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeMutation,
+  DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeMutationVariables
 >;
 export const CreateUserDialog_emailIsAvailableDocument = gql`
   query CreateUserDialog_emailIsAvailable($email: String!) {

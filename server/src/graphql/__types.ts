@@ -1044,6 +1044,7 @@ export interface NexusGenFieldTypes {
     resetSignaturitOrganizationBranding: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     resetTemporaryPassword: NexusGenEnums["Result"]; // Result!
     resetUserPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    restoreDefaultOrganizationDocumentTheme: NexusGenRootTypes["Organization"]; // Organization!
     restoreLogin: NexusGenEnums["Result"]; // Result!
     revokeUserAuthToken: NexusGenEnums["Result"]; // Result!
     sendPetition: NexusGenRootTypes["SendPetitionResult"][]; // [SendPetitionResult!]!
@@ -2548,6 +2549,7 @@ export interface NexusGenFieldTypeNames {
     resetSignaturitOrganizationBranding: "SupportMethodResponse";
     resetTemporaryPassword: "Result";
     resetUserPassword: "SupportMethodResponse";
+    restoreDefaultOrganizationDocumentTheme: "Organization";
     restoreLogin: "Result";
     revokeUserAuthToken: "Result";
     sendPetition: "SendPetitionResult";

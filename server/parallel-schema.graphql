@@ -1209,6 +1209,11 @@ type Mutation {
   Resets the given user password on AWS Cognito and sends an email with new temporary.
   """
   resetUserPassword(email: String!, locale: PetitionLocale!): SupportMethodResponse!
+
+  """
+  Restores the organization document theme to the default values
+  """
+  restoreDefaultOrganizationDocumentTheme: Organization!
   restoreLogin: Result!
 
   """
