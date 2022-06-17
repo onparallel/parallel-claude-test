@@ -1,10 +1,10 @@
 import { ApolloError } from "apollo-server-core";
 import { booleanArg, list, mutationField, nonNull, stringArg } from "nexus";
-import { RESULT } from "..";
 import { IFetchService } from "../../services/fetch";
 import { withError } from "../../util/promises/withError";
 import { and, authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
+import { RESULT } from "../helpers/result";
 import { validUrl } from "../helpers/validators/validUrl";
 import { petitionsAreOfTypeTemplate, userHasAccessToPetitions } from "../petition/authorizers";
 import { userHasAccessToEventSubscription } from "./authorizers";

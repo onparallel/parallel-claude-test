@@ -1,7 +1,6 @@
 import { ApolloError } from "apollo-server-core";
 import { booleanArg, idArg, mutationField, nonNull, objectType } from "nexus";
 import { isDefined } from "remeda";
-import { RESULT } from "../..";
 import { getBaseWebhookUrl } from "../../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
@@ -9,6 +8,7 @@ import { sign } from "../../../util/jwt";
 import { random } from "../../../util/token";
 import { and, chain } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
+import { RESULT } from "../../helpers/result";
 import { fileUploadInputMaxSize } from "../../helpers/validators/maxFileSize";
 import {
   fieldCanBeReplied,

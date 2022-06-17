@@ -3,7 +3,6 @@ import { differenceInMinutes } from "date-fns";
 import { arg, booleanArg, enumType, list, mutationField, nonNull, stringArg } from "nexus";
 import pMap from "p-map";
 import { difference, isDefined, zip } from "remeda";
-import { RESULT } from "..";
 import { LicenseCode, PublicFileUpload } from "../../db/__types";
 import { partition } from "../../util/arrays";
 import { fullName } from "../../util/fullName";
@@ -22,6 +21,7 @@ import {
 } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
+import { RESULT } from "../helpers/result";
 import { uploadArg } from "../helpers/scalars";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { emailDomainIsNotSSO } from "../helpers/validators/emailDomainIsNotSSO";
