@@ -1121,6 +1121,7 @@ export interface NexusGenFieldTypes {
     iconUrl: string | null; // String
     id: NexusGenScalars["GID"]; // GID!
     integrations: NexusGenRootTypes["OrgIntegrationPagination"]; // OrgIntegrationPagination!
+    isPdfDocumentThemeDirty: boolean; // Boolean!
     license: NexusGenRootTypes["OrgLicense"] | null; // OrgLicense
     logoUrl: string | null; // String
     name: string; // String!
@@ -2626,6 +2627,7 @@ export interface NexusGenFieldTypeNames {
     iconUrl: "String";
     id: "GID";
     integrations: "OrgIntegrationPagination";
+    isPdfDocumentThemeDirty: "Boolean";
     license: "OrgLicense";
     logoUrl: "String";
     name: "String";

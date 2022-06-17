@@ -1785,6 +1785,7 @@ type Organization implements Timestamps {
     """
     type: IntegrationType
   ): OrgIntegrationPagination!
+  isPdfDocumentThemeDirty: Boolean!
 
   """
   Current license for the organization

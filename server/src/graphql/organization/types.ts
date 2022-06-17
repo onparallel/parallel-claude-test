@@ -1,5 +1,5 @@
 import { arg, booleanArg, enumType, list, nonNull, nullable, objectType } from "nexus";
-import { isDefined } from "remeda";
+import { isDefined, equals } from "remeda";
 import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { or, userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -234,6 +234,11 @@ export const Organization = objectType({
     t.nonNull.jsonObject("pdfDocumentTheme", {
       resolve: (o) => {
         return o.pdf_document_theme ?? defaultPdfDocumentTheme;
+      },
+    });
+    t.nonNull.boolean("isPdfDocumentThemeDirty", {
+      resolve: (o) => {
+        return !equals(o.pdf_document_theme ?? defaultPdfDocumentTheme, defaultPdfDocumentTheme);
       },
     });
     t.nullable.field("license", {

@@ -1613,6 +1613,7 @@ export interface Organization extends Timestamps {
   id: Scalars["GID"];
   /** A paginated list with enabled integrations for the organization */
   integrations: OrgIntegrationPagination;
+  isPdfDocumentThemeDirty: Scalars["Boolean"];
   /** Current license for the organization */
   license?: Maybe<OrgLicense>;
   /** URL of the organization logo */
@@ -5294,6 +5295,7 @@ export type DocumentThemeEditor_OrganizationFragment = {
   __typename?: "Organization";
   id: string;
   pdfDocumentTheme: { [key: string]: any };
+  isPdfDocumentThemeDirty: boolean;
 };
 
 export type DocumentThemeEditor_updateOrganizationDocumentThemeMutationVariables = Exact<{
@@ -5305,6 +5307,7 @@ export type DocumentThemeEditor_updateOrganizationDocumentThemeMutation = {
     __typename?: "Organization";
     id: string;
     pdfDocumentTheme: { [key: string]: any };
+    isPdfDocumentThemeDirty: boolean;
   };
 };
 
@@ -5317,6 +5320,7 @@ export type DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeMutation 
     __typename?: "Organization";
     id: string;
     pdfDocumentTheme: { [key: string]: any };
+    isPdfDocumentThemeDirty: boolean;
   };
 };
 
@@ -11824,11 +11828,12 @@ export type OrganizationBranding_userQuery = {
     hasRemovedParallelBranding: boolean;
     organization: {
       __typename?: "Organization";
-      logoUrl?: string | null;
-      pdfDocumentTheme: { [key: string]: any };
       id: string;
+      logoUrl?: string | null;
       name: string;
       preferredTone: Tone;
+      pdfDocumentTheme: { [key: string]: any };
+      isPdfDocumentThemeDirty: boolean;
       iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
@@ -21681,6 +21686,7 @@ export const DocumentThemeEditor_OrganizationFragmentDoc = gql`
   fragment DocumentThemeEditor_Organization on Organization {
     id
     pdfDocumentTheme
+    isPdfDocumentThemeDirty
   }
 ` as unknown as DocumentNode<DocumentThemeEditor_OrganizationFragment, unknown>;
 export const DocumentThemePreview_OrganizationFragmentDoc = gql`
@@ -25670,10 +25676,10 @@ export const DocumentThemeEditor_updateOrganizationDocumentThemeDocument = gql`
     $data: OrganizationDocumentThemeInput!
   ) {
     updateOrganizationDocumentTheme(data: $data) {
-      id
-      pdfDocumentTheme
+      ...DocumentThemeEditor_Organization
     }
   }
+  ${DocumentThemeEditor_OrganizationFragmentDoc}
 ` as unknown as DocumentNode<
   DocumentThemeEditor_updateOrganizationDocumentThemeMutation,
   DocumentThemeEditor_updateOrganizationDocumentThemeMutationVariables
@@ -25681,10 +25687,10 @@ export const DocumentThemeEditor_updateOrganizationDocumentThemeDocument = gql`
 export const DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeDocument = gql`
   mutation DocumentThemeEditor_restoreDefaultOrganizationDocumentTheme {
     restoreDefaultOrganizationDocumentTheme {
-      id
-      pdfDocumentTheme
+      ...DocumentThemeEditor_Organization
     }
   }
+  ${DocumentThemeEditor_OrganizationFragmentDoc}
 ` as unknown as DocumentNode<
   DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeMutation,
   DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeMutationVariables
@@ -27060,9 +27066,10 @@ export const OrganizationBranding_userDocument = gql`
       fullName
       role
       organization {
+        id
         logoUrl(options: { resize: { width: 600 } })
-        pdfDocumentTheme
         ...DocumentThemePreview_Organization
+        ...DocumentThemeEditor_Organization
       }
       ...BrandingGeneralForm_User
       ...BrandingGeneralPreview_User
@@ -27070,6 +27077,7 @@ export const OrganizationBranding_userDocument = gql`
   }
   ${SettingsLayout_QueryFragmentDoc}
   ${DocumentThemePreview_OrganizationFragmentDoc}
+  ${DocumentThemeEditor_OrganizationFragmentDoc}
   ${BrandingGeneralForm_UserFragmentDoc}
   ${BrandingGeneralPreview_UserFragmentDoc}
 ` as unknown as DocumentNode<

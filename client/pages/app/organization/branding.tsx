@@ -103,11 +103,7 @@ function OrganizationBranding() {
             >
               <Stack spacing={8} maxWidth={{ base: "100%", xl: "container.2xs" }} width="100%">
                 {!hasAdminRole ? <OnlyAdminsAlert /> : null}
-                <DocumentThemeEditor
-                  orgId={me.organization.id}
-                  theme={me.organization.pdfDocumentTheme}
-                  isDisabled={!hasAdminRole}
-                />
+                <DocumentThemeEditor organization={me.organization} isDisabled={!hasAdminRole} />
               </Stack>
               <DocumentThemePreview organization={me.organization} />
             </Stack>
@@ -127,9 +123,10 @@ OrganizationBranding.queries = [
         fullName
         role
         organization {
+          id
           logoUrl(options: { resize: { width: 600 } })
-          pdfDocumentTheme
           ...DocumentThemePreview_Organization
+          ...DocumentThemeEditor_Organization
         }
         ...BrandingGeneralForm_User
         ...BrandingGeneralPreview_User
@@ -137,6 +134,7 @@ OrganizationBranding.queries = [
     }
     ${SettingsLayout.fragments.Query}
     ${DocumentThemePreview.fragments.Organization}
+    ${DocumentThemeEditor.fragments.Organization}
     ${BrandingGeneralForm.fragments.User}
     ${BrandingGeneralPreview.fragments.User}
   `,

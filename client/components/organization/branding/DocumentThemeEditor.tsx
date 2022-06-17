@@ -23,6 +23,7 @@ import { Divider } from "@parallel/components/common/Divider";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
 import { RichTextEditor } from "@parallel/components/common/slate/RichTextEditor";
 import {
+  DocumentThemeEditor_OrganizationFragment,
   DocumentThemeEditor_OrganizationFragmentDoc,
   DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeDocument,
   DocumentThemeEditor_updateOrganizationDocumentThemeDocument,
@@ -38,18 +39,13 @@ import { FormattedMessage, useIntl } from "react-intl";
 import fonts from "../../../utils/fonts.json";
 
 interface DocumentThemeEditorProps {
-  orgId: string;
-  theme: any;
+  organization: DocumentThemeEditor_OrganizationFragment;
   isDisabled?: boolean;
 }
 
-export function DocumentThemeEditor({
-  orgId,
-  theme: _theme,
-  isDisabled,
-}: DocumentThemeEditorProps) {
+export function DocumentThemeEditor({ organization, isDisabled }: DocumentThemeEditorProps) {
   const intl = useIntl();
-  const [theme, setTheme] = useState(_theme);
+  const [theme, setTheme] = useState(organization.pdfDocumentTheme);
   function updateTheme(partial: any) {
     setTheme((current: any) => mergeDeep(current, partial));
   }
@@ -80,7 +76,7 @@ export function DocumentThemeEditor({
     updateTheme(data);
     updateFragment(apollo.cache, {
       fragment: DocumentThemeEditor_OrganizationFragmentDoc,
-      id: orgId,
+      id: organization.id,
       data: (cached) => {
         const pdfDocumentTheme = mergeDeep(cached!.pdfDocumentTheme, data);
         return {
@@ -335,7 +331,11 @@ export function DocumentThemeEditor({
         ))}
       </Stack>
       <HStack justifyContent="flex-end">
-        <Button variant="link" onClick={handleRestoreDefaults}>
+        <Button
+          variant="link"
+          onClick={handleRestoreDefaults}
+          isDisabled={!organization.isPdfDocumentThemeDirty}
+        >
           <FormattedMessage
             id="component.document-theme-editor.restore-defaults"
             defaultMessage="Restore defaults"
@@ -391,6 +391,7 @@ DocumentThemeEditor.fragments = {
     fragment DocumentThemeEditor_Organization on Organization {
       id
       pdfDocumentTheme
+      isPdfDocumentThemeDirty
     }
   `,
 };
@@ -401,17 +402,17 @@ const _mutations = [
       $data: OrganizationDocumentThemeInput!
     ) {
       updateOrganizationDocumentTheme(data: $data) {
-        id
-        pdfDocumentTheme
+        ...DocumentThemeEditor_Organization
       }
     }
+    ${DocumentThemeEditor.fragments.Organization}
   `,
   gql`
     mutation DocumentThemeEditor_restoreDefaultOrganizationDocumentTheme {
       restoreDefaultOrganizationDocumentTheme {
-        id
-        pdfDocumentTheme
+        ...DocumentThemeEditor_Organization
       }
     }
+    ${DocumentThemeEditor.fragments.Organization}
   `,
 ];
