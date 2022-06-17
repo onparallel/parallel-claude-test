@@ -476,7 +476,7 @@ export const userSignUp = mutationField("userSignUp", {
                   ...licenseCode.details,
                   events: [licenseCode.details],
                 }
-              : {},
+              : null,
         },
         undefined,
         t
