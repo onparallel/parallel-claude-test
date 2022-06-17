@@ -5,7 +5,7 @@ import { ApiContext } from "../context";
 import { ILogger, LOGGER } from "../services/logger";
 import { auth } from "./auth";
 import { lambdas } from "./lambdas";
-import { api as publicApi } from "./public";
+import { api as publicApi } from "./public/index";
 import { webhooks } from "./webhooks";
 
 export function api(container: Container) {

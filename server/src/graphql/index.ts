@@ -11,9 +11,9 @@ export * from "./organization/types";
 export * from "./organization/queries";
 export * from "./organization/mutations";
 
-export * from "./petition/types";
+export * from "./petition/types/index";
 export * from "./petition/queries";
-export * from "./petition/mutations";
+export * from "./petition/mutations/index";
 
 export * from "./users/types";
 export * from "./users/queries";
