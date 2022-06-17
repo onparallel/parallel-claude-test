@@ -78,9 +78,11 @@ export function PetitionTagListCellContent({
 
   const [tagPetition] = useMutation(PetitionTagListCellContent_tagPetitionDocument);
   async function handleAddTag(tag: TagSelection) {
-    await tagPetition({
-      variables: { tagId: tag.id, petitionId: petition.id },
-    });
+    await withError(
+      tagPetition({
+        variables: { tagId: tag.id, petitionId: petition.id },
+      })
+    );
   }
 
   const [untagPetition] = useMutation(PetitionTagListCellContent_untagPetitionDocument);
