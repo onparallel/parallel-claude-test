@@ -3876,8 +3876,8 @@
   },
   {
     "term": "component.signature-config-dialog.title-help",
-    "definition": "We will use this as the title of the signing document",
-    "context": "We will use this as the title of the signing document"
+    "definition": "Include a title on the signing document. It will also be used as the name of the file once signed.",
+    "context": "Include a title on the signing document. It will also be used as the name of the file once signed."
   },
   {
     "term": "component.signature-config-dialog.title-label",
@@ -5233,6 +5233,11 @@
     "term": "generic.omit",
     "definition": "Omit",
     "context": "Omit"
+  },
+  {
+    "term": "generic.optional",
+    "definition": "Optional",
+    "context": "Optional"
   },
   {
     "term": "generic.options",

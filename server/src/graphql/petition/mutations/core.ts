@@ -494,7 +494,7 @@ export const SignatureConfigInput = inputObjectType({
     t.nonNull.string("timezone", {
       description: "The timezone used to generate the document.",
     });
-    t.nonNull.string("title", {
+    t.nullable.string("title", {
       description: "The title of the signing document",
     });
     t.nonNull.boolean("review", {

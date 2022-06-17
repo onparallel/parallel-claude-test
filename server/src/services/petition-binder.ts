@@ -30,7 +30,7 @@ function isPrintableContentType(contentType: string) {
 
 type PetitionBinderOptions = {
   petitionId: number;
-  documentTitle: string;
+  documentTitle: string | null;
   maxOutputSize?: number;
   outputFileName?: string;
   showSignatureBoxes?: boolean;

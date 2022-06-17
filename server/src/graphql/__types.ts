@@ -166,7 +166,7 @@ export interface NexusGenInputs {
     review: boolean; // Boolean!
     signersInfo: NexusGenInputs["SignatureConfigInputSigner"][]; // [SignatureConfigInputSigner!]!
     timezone: string; // String!
-    title: string; // String!
+    title?: string | null; // String
   };
   SignatureConfigInputSigner: {
     // input type
@@ -594,7 +594,7 @@ export interface NexusGenObjects {
       email: string;
     }[];
     timezone: string;
-    title: string;
+    title: string | null;
     review?: boolean;
     allowAdditionalSigners?: boolean;
   };
@@ -1892,7 +1892,7 @@ export interface NexusGenFieldTypes {
     review: boolean; // Boolean!
     signers: Array<NexusGenRootTypes["PetitionSigner"] | null>; // [PetitionSigner]!
     timezone: string; // String!
-    title: string; // String!
+    title: string | null; // String
   };
   SignatureOpenedEvent: {
     // field return type

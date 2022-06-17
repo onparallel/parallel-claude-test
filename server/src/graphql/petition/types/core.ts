@@ -601,7 +601,7 @@ export const SignatureConfig = objectType({
     t.string("timezone", {
       description: "The timezone used to generate the document.",
     });
-    t.string("title", {
+    t.nullable.string("title", {
       description: "Title of the signature document",
     });
     t.boolean("review", {
@@ -623,7 +623,7 @@ export const SignatureConfig = objectType({
       email: string;
     }[];
     timezone: string;
-    title: string;
+    title: string | null;
     review?: boolean;
     allowAdditionalSigners?: boolean;
   }`,

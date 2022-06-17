@@ -3333,7 +3333,7 @@ export interface SignatureConfig {
   /** The timezone used to generate the document. */
   timezone: Scalars["String"];
   /** Title of the signature document */
-  title: Scalars["String"];
+  title?: Maybe<Scalars["String"]>;
 }
 
 /** The signature settings for the petition */
@@ -3348,7 +3348,7 @@ export interface SignatureConfigInput {
   /** The timezone used to generate the document. */
   timezone: Scalars["String"];
   /** The title of the signing document */
-  title: Scalars["String"];
+  title?: InputMaybe<Scalars["String"]>;
 }
 
 /** The signer that need to sign the generated document. */
@@ -6622,7 +6622,7 @@ export type AddPetitionAccessDialog_PetitionFragment = {
     __typename?: "SignatureConfig";
     review: boolean;
     timezone: string;
-    title: string;
+    title?: string | null;
     allowAdditionalSigners: boolean;
     integration?: { __typename?: "SignatureOrgIntegration"; id: string } | null;
     signers: Array<{
@@ -7784,7 +7784,7 @@ export type SignatureConfigDialog_PetitionBase_Petition_Fragment = {
   }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
-    title: string;
+    title?: string | null;
     review: boolean;
     allowAdditionalSigners: boolean;
     integration?: {
@@ -7809,7 +7809,7 @@ export type SignatureConfigDialog_PetitionBase_PetitionTemplate_Fragment = {
   name?: string | null;
   signatureConfig?: {
     __typename?: "SignatureConfig";
-    title: string;
+    title?: string | null;
     review: boolean;
     allowAdditionalSigners: boolean;
     integration?: {
@@ -8152,7 +8152,7 @@ export type useSendPetitionHandler_PetitionFragment = {
     __typename?: "SignatureConfig";
     review: boolean;
     timezone: string;
-    title: string;
+    title?: string | null;
     allowAdditionalSigners: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -8263,7 +8263,7 @@ export type useSendPetitionHandler_addPetitionPermissionMutation = {
           __typename?: "SignatureConfig";
           review: boolean;
           timezone: string;
-          title: string;
+          title?: string | null;
           allowAdditionalSigners: boolean;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -8574,7 +8574,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
   }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
-    title: string;
+    title?: string | null;
     review: boolean;
     allowAdditionalSigners: boolean;
     integration?: {
@@ -8663,7 +8663,7 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   organization: { __typename?: "Organization"; customHost?: string | null };
   signatureConfig?: {
     __typename?: "SignatureConfig";
-    title: string;
+    title?: string | null;
     review: boolean;
     allowAdditionalSigners: boolean;
     integration?: {
@@ -9713,7 +9713,7 @@ export type NewSignatureRequestRow_PetitionFragment = {
     allowAdditionalSigners: boolean;
     review: boolean;
     timezone: string;
-    title: string;
+    title?: string | null;
     signers: Array<{
       __typename?: "PetitionSigner";
       email: string;
@@ -10018,7 +10018,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
   }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
-    title: string;
+    title?: string | null;
     review: boolean;
     allowAdditionalSigners: boolean;
     timezone: string;
@@ -10098,7 +10098,7 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          title: string;
+          title?: string | null;
           review: boolean;
           allowAdditionalSigners: boolean;
           timezone: string;
@@ -13402,7 +13402,7 @@ export type PetitionActivity_PetitionFragment = {
     __typename?: "SignatureConfig";
     review: boolean;
     timezone: string;
-    title: string;
+    title?: string | null;
     allowAdditionalSigners: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -14224,7 +14224,7 @@ export type PetitionActivity_updatePetitionMutation = {
           __typename?: "SignatureConfig";
           review: boolean;
           timezone: string;
-          title: string;
+          title?: string | null;
           allowAdditionalSigners: boolean;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -15071,7 +15071,7 @@ export type PetitionActivity_petitionQuery = {
           __typename?: "SignatureConfig";
           review: boolean;
           timezone: string;
-          title: string;
+          title?: string | null;
           allowAdditionalSigners: boolean;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -15188,7 +15188,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     __typename?: "SignatureConfig";
     review: boolean;
     timezone: string;
-    title: string;
+    title?: string | null;
     allowAdditionalSigners: boolean;
     integration?: {
       __typename?: "SignatureOrgIntegration";
@@ -15394,7 +15394,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   organization: { __typename?: "Organization"; customHost?: string | null };
   signatureConfig?: {
     __typename?: "SignatureConfig";
-    title: string;
+    title?: string | null;
     review: boolean;
     allowAdditionalSigners: boolean;
     integration?: {
@@ -15571,7 +15571,7 @@ export type PetitionCompose_updatePetitionMutation = {
           __typename?: "SignatureConfig";
           review: boolean;
           timezone: string;
-          title: string;
+          title?: string | null;
           allowAdditionalSigners: boolean;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -15696,7 +15696,7 @@ export type PetitionCompose_updatePetitionMutation = {
         organization: { __typename?: "Organization"; customHost?: string | null };
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          title: string;
+          title?: string | null;
           review: boolean;
           allowAdditionalSigners: boolean;
           integration?: {
@@ -16127,7 +16127,7 @@ export type PetitionCompose_petitionQuery = {
           __typename?: "SignatureConfig";
           review: boolean;
           timezone: string;
-          title: string;
+          title?: string | null;
           allowAdditionalSigners: boolean;
           integration?: {
             __typename?: "SignatureOrgIntegration";
@@ -16341,7 +16341,7 @@ export type PetitionCompose_petitionQuery = {
         organization: { __typename?: "Organization"; customHost?: string | null };
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          title: string;
+          title?: string | null;
           review: boolean;
           allowAdditionalSigners: boolean;
           integration?: {
@@ -16682,7 +16682,7 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
     allowAdditionalSigners: boolean;
     review: boolean;
     timezone: string;
-    title: string;
+    title?: string | null;
     signers: Array<{
       __typename?: "PetitionSigner";
       contactId?: string | null;
@@ -16810,7 +16810,7 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
     allowAdditionalSigners: boolean;
     review: boolean;
     timezone: string;
-    title: string;
+    title?: string | null;
     signers: Array<{
       __typename?: "PetitionSigner";
       contactId?: string | null;
@@ -16982,7 +16982,7 @@ export type PetitionPreview_updatePetitionMutation = {
           allowAdditionalSigners: boolean;
           review: boolean;
           timezone: string;
-          title: string;
+          title?: string | null;
           signers: Array<{
             __typename?: "PetitionSigner";
             contactId?: string | null;
@@ -17113,7 +17113,7 @@ export type PetitionPreview_updatePetitionMutation = {
           allowAdditionalSigners: boolean;
           review: boolean;
           timezone: string;
-          title: string;
+          title?: string | null;
           signers: Array<{
             __typename?: "PetitionSigner";
             contactId?: string | null;
@@ -17247,7 +17247,7 @@ export type PetitionPreview_completePetitionMutation = {
       allowAdditionalSigners: boolean;
       review: boolean;
       timezone: string;
-      title: string;
+      title?: string | null;
       signers: Array<{
         __typename?: "PetitionSigner";
         contactId?: string | null;
@@ -17410,7 +17410,7 @@ export type PetitionPreview_petitionQuery = {
           allowAdditionalSigners: boolean;
           review: boolean;
           timezone: string;
-          title: string;
+          title?: string | null;
           signers: Array<{
             __typename?: "PetitionSigner";
             contactId?: string | null;
@@ -17541,7 +17541,7 @@ export type PetitionPreview_petitionQuery = {
           allowAdditionalSigners: boolean;
           review: boolean;
           timezone: string;
-          title: string;
+          title?: string | null;
           signers: Array<{
             __typename?: "PetitionSigner";
             contactId?: string | null;
@@ -17732,7 +17732,7 @@ export type PetitionReplies_PetitionFragment = {
   signatureConfig?: {
     __typename?: "SignatureConfig";
     review: boolean;
-    title: string;
+    title?: string | null;
     allowAdditionalSigners: boolean;
     timezone: string;
     integration?: {
@@ -18053,7 +18053,7 @@ export type PetitionReplies_closePetitionMutation = {
     signatureConfig?: {
       __typename?: "SignatureConfig";
       review: boolean;
-      title: string;
+      title?: string | null;
       allowAdditionalSigners: boolean;
       timezone: string;
       integration?: {
@@ -18231,7 +18231,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
     signatureConfig?: {
       __typename?: "SignatureConfig";
       review: boolean;
-      title: string;
+      title?: string | null;
       allowAdditionalSigners: boolean;
       timezone: string;
       integration?: {
@@ -18512,7 +18512,7 @@ export type PetitionReplies_petitionQuery = {
         signatureConfig?: {
           __typename?: "SignatureConfig";
           review: boolean;
-          title: string;
+          title?: string | null;
           allowAdditionalSigners: boolean;
           timezone: string;
           integration?: {
@@ -21017,7 +21017,7 @@ export type PetitionSignaturesCardPolling_petitionQuery = {
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
-          title: string;
+          title?: string | null;
           review: boolean;
           allowAdditionalSigners: boolean;
           timezone: string;

@@ -315,6 +315,11 @@
     "context": "Unnamed petition"
   },
   {
+    "term": "generic.untitled",
+    "definition": "Sin título",
+    "context": "Untitled"
+  },
+  {
     "term": "generic.untitled-field",
     "definition": "Campo sin nombre",
     "context": "Untitled field"

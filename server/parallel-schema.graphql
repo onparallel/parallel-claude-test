@@ -4485,7 +4485,7 @@ type SignatureConfig {
   """
   Title of the signature document
   """
-  title: String!
+  title: String
 }
 
 """
@@ -4516,7 +4516,7 @@ input SignatureConfigInput {
   """
   The title of the signing document
   """
-  title: String!
+  title: String
 }
 
 """

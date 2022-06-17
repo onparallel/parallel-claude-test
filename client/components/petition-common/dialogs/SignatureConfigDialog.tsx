@@ -33,6 +33,7 @@ import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { withError } from "@parallel/utils/promises/withError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { Maybe } from "@parallel/utils/types";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm, UseFormHandleSubmit } from "react-hook-form";
@@ -115,7 +116,7 @@ export function SignatureConfigDialog({
     } else {
       const data = { ...step1Values(), ...step2Values() };
       props.onResolve({
-        title: data.title,
+        title: data.title || null,
         orgIntegrationId: data.provider.id,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         signersInfo: review
@@ -281,7 +282,7 @@ function useSignatureConfigDialogBodyStep1Props({
     form: useForm<{
       provider: SignatureConfigDialog_SignatureOrgIntegrationFragment;
       review: boolean;
-      title: string;
+      title: Maybe<string>;
     }>({
       mode: "onSubmit",
       defaultValues: {
@@ -290,7 +291,7 @@ function useSignatureConfigDialogBodyStep1Props({
           providers.find((p) => p.isDefault) ??
           providers[0],
         review: petition.signatureConfig?.review ?? false,
-        title: petition.signatureConfig?.title ?? petition.name ?? "",
+        title: petition.signatureConfig?.title ?? null,
       },
     }),
     petitionIsCompleted:
@@ -301,11 +302,7 @@ function useSignatureConfigDialogBodyStep1Props({
 }
 
 function SignatureConfigDialogBodyStep1({
-  form: {
-    control,
-    formState: { errors },
-    register,
-  },
+  form: { control, register },
   petitionIsCompleted,
   providers,
   titleRef,
@@ -317,9 +314,7 @@ function SignatureConfigDialogBodyStep1({
     false
   >();
 
-  const titleRegisterProps = useRegisterWithRef(titleRef, register, "title", {
-    required: true,
-  });
+  const titleRegisterProps = useRegisterWithRef(titleRef, register, "title");
 
   const reactSelectProps = useReactSelectProps();
 
@@ -391,16 +386,20 @@ function SignatureConfigDialogBodyStep1({
           )}
         />
       </FormControl>
-      <FormControl isInvalid={!!errors.title}>
+      <FormControl>
         <FormLabel display="flex" alignItems="center">
           <FormattedMessage
             id="component.signature-config-dialog.title-label"
             defaultMessage="Title of the document"
           />
+          <Text color="gray.500" marginLeft={1}>
+            (<FormattedMessage id="generic.optional" defaultMessage="Optional" />)
+          </Text>
+
           <HelpPopover>
             <FormattedMessage
               id="component.signature-config-dialog.title-help"
-              defaultMessage="We will use this as the title of the signing document"
+              defaultMessage="Include a title on the signing document. It will also be used as the name of the file once signed."
             />
           </HelpPopover>
         </FormLabel>

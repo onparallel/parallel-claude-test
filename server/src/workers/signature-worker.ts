@@ -51,12 +51,14 @@ async function startSignatureProcess(
       email: signer.email,
     }));
 
+    const outputFileName = title || (await getDefaultFileName(petition.id, petition.locale, ctx));
+
     documentTmpPath = await ctx.petitionBinder.createBinder(owner!.id, {
       petitionId: petition.id,
       documentTitle: title,
       showSignatureBoxes: true,
       maxOutputSize: 13 * 1024 * 1024, // signaturit has a 15MB limit for emails
-      outputFileName: title,
+      outputFileName,
       includeAnnexedDocuments: true,
     });
 
@@ -217,7 +219,7 @@ async function storeSignedDocument(
   const signedDocument = await storeDocument(
     await client.downloadSignedDocument(payload.signedDocumentExternalId),
     sanitizeFilenameWithSuffix(
-      title,
+      title || (await getDefaultFileName(petition.id, petition.locale, ctx)),
       `_${intl.formatMessage({
         id: "signature-worker.signed",
         defaultMessage: "signed",
@@ -256,14 +258,17 @@ async function storeAuditTrail(
   ctx: WorkerContext
 ) {
   const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
-
+  const petition = await fetchPetition(signature.petition_id, ctx);
   const { orgIntegrationId, title } = signature.signature_config;
   const signatureIntegration = await fetchOrgSignatureIntegration(orgIntegrationId, ctx);
   const client = ctx.signature.getClient(signatureIntegration);
 
   const auditTrail = await storeDocument(
     await client.downloadAuditTrail(payload.signedDocumentExternalId),
-    sanitizeFilenameWithSuffix(title, "_audit_trail.pdf"),
+    sanitizeFilenameWithSuffix(
+      title || (await getDefaultFileName(petition.id, petition.locale, ctx)),
+      "_audit_trail.pdf"
+    ),
     signatureIntegration.id,
     ctx
   );
@@ -384,5 +389,15 @@ async function storeDocument(
       upload_complete: true,
     },
     `OrgIntegration:${integrationId}`
+  );
+}
+
+async function getDefaultFileName(petitionId: number, locale: string, ctx: WorkerContext) {
+  return (
+    (await ctx.petitions.getFirstDefinedTitleFromHeadings(petitionId)) ||
+    (await ctx.i18n.getIntl(locale)).formatMessage({
+      id: "generic.untitled",
+      defaultMessage: "Untitled",
+    })
   );
 }

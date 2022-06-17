@@ -120,7 +120,7 @@ export type PetitionSignatureConfig = {
   orgIntegrationId: number;
   signersInfo: PetitionSignatureConfigSigner[];
   timezone: string;
-  title: string;
+  title: string | null;
   review?: boolean;
   allowAdditionalSigners?: boolean;
   message?: string;
@@ -4669,5 +4669,16 @@ export class PetitionRepository extends BaseRepository {
           timeToCompleteSignatureTimes.length > 0 ? average(timeToCompleteSignatureTimes) : null,
       },
     };
+  }
+
+  async getFirstDefinedTitleFromHeadings(petitionId: number) {
+    const fields = await this.from("petition_field")
+      .where({ deleted_at: null, petition_id: petitionId, type: "HEADING" })
+      .whereNotNull("title")
+      .orderBy("position", "asc")
+      .limit(1)
+      .select("title");
+
+    return fields[0]?.title ?? null;
   }
 }

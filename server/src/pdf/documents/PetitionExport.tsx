@@ -24,7 +24,7 @@ import {
 
 export interface PetitionExportInitialData {
   petitionId: string;
-  documentTitle: string;
+  documentTitle: string | null;
   showSignatureBoxes?: boolean;
   includeNetDocumentsLinks?: boolean;
 }

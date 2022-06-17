@@ -40,13 +40,13 @@ export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
         throw new Error(`Owner of petition Petition:${petitionId} not found`);
       }
 
-      let documentTitle: Maybe<string> | undefined;
+      let documentTitle: Maybe<string> = null;
       // if the task was started by a recipient, the title of the PDF should be the message subject instead of the petition name
       if (isDefined(this.task.petition_access_id)) {
         const [firstMessage] = await this.ctx.petitions.loadMessagesByPetitionAccessId(
           this.task.petition_access_id
         );
-        documentTitle = firstMessage?.email_subject ?? undefined;
+        documentTitle = firstMessage?.email_subject ?? null;
       } else {
         documentTitle = petition.name;
       }
@@ -55,7 +55,7 @@ export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
 
       tmpFilePath = await this.ctx.petitionBinder.createBinder(owner.id, {
         petitionId,
-        documentTitle: documentTitle ?? "",
+        documentTitle,
         includeAnnexedDocuments: !skipAttachments,
         includeNetDocumentsLinks,
       });

@@ -14,7 +14,7 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
   return (async (_, args, ctx, info) => {
     const signatureConfig = prop(args);
     if (signatureConfig) {
-      const { orgIntegrationId, signersInfo, timezone, title, allowAdditionalSigners, review } =
+      const { orgIntegrationId, signersInfo, timezone, allowAdditionalSigners, review } =
         signatureConfig;
 
       const integration = await ctx.integrations.loadIntegration(orgIntegrationId);
@@ -36,10 +36,6 @@ export function validSignatureConfig<TypeName extends string, FieldName extends 
           `${argName}.timezone`,
           `Value must be a valid timezone.`
         );
-      }
-
-      if (!isDefined(title)) {
-        throw new ArgValidationError(info, `${argName}.title`, "Value must be defined");
       }
 
       if (!allowAdditionalSigners && signersInfo.length === 0 && !review) {
