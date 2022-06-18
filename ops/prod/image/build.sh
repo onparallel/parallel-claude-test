@@ -1,7 +1,7 @@
 #! /bin/bash
 
 nodejs_version="16"
-nginx_version="1.20.1"
+nginx_version="1.22.0"
 
 echo "Adding public keys"
 cat authorized_keys >> .ssh/authorized_keys
@@ -80,7 +80,7 @@ pushd nginx-${nginx_version}
     --with-stream_ssl_module \
     --with-debug \
     --with-cc-opt='-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic' \
-    --with-ld-opt=' -Wl,-E'
+    --with-ld-opt=' -Wl,-E' \
     --add-module=../nginx_accept_language_module
 make
 make install
