@@ -1,6 +1,5 @@
-import { Button, ButtonProps, Select, Stack, StackProps } from "@chakra-ui/react";
+import { Button, Select, Stack, StackProps } from "@chakra-ui/react";
 import { ArrowShortRightIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
 import { NakedLink } from "@parallel/components/common/Link";
 import { resolveUrl } from "@parallel/utils/next";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
@@ -42,50 +41,25 @@ export function PublicHeaderMenu(props: StackProps) {
         ))}
       </Select>
 
-      <PublicHeaderLink
+      <Button
+        as="a"
         fontWeight="normal"
         id="pw-public-login"
         rightIcon={<ArrowShortRightIcon />}
         href="/"
       >
         <FormattedMessage id="public.go-to-parallel" defaultMessage="Go to Parallel" />
-      </PublicHeaderLink>
-      <PublicHeaderLink href="/login" variant="outline" id="pw-public-login">
-        <FormattedMessage id="public.login-button" defaultMessage="Login" />
-      </PublicHeaderLink>
-      <PublicHeaderLink
-        href="/signup"
-        colorScheme="purple"
-        _activeLink={{}}
-        onClick={trackCTAClick}
-      >
-        <FormattedMessage id="public.sign-up-button" defaultMessage="Sign up" />
-      </PublicHeaderLink>
+      </Button>
+      <NakedLink href="/login">
+        <Button as="a" variant="outline" id="pw-public-login">
+          <FormattedMessage id="public.login-button" defaultMessage="Login" />
+        </Button>
+      </NakedLink>
+      <NakedLink href="/signup">
+        <Button as="a" colorScheme="purple" onClick={trackCTAClick}>
+          <FormattedMessage id="public.sign-up-button" defaultMessage="Sign up" />
+        </Button>
+      </NakedLink>
     </Stack>
   );
 }
-
-interface PublicHeaderLink extends ButtonProps {
-  href: string;
-}
-
-export const PublicHeaderLink = chakraForwardRef<"a", PublicHeaderLink>(function PublicHeaderLink(
-  { href, children, ...props },
-  ref
-) {
-  const router = useRouter();
-  const isCurrent = router.pathname === href || router.pathname.startsWith(`${href}/`);
-  return (
-    <NakedLink href={href}>
-      <Button
-        ref={ref as any}
-        as="a"
-        aria-current={isCurrent ? "page" : undefined}
-        _activeLink={{ color: "purple.500" }}
-        {...props}
-      >
-        {children}
-      </Button>
-    </NakedLink>
-  );
-});

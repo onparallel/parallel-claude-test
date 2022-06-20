@@ -1,6 +1,6 @@
 import { Box, BoxProps, HStack } from "@chakra-ui/react";
 import { FacebookIcon, LinkedInIcon, TwitterIcon, YoutubeIcon } from "@parallel/chakra/icons";
-import { NakedLink, NormalLink } from "@parallel/components/common/Link";
+import { NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { PublicContainer } from "./PublicContainer";
 
@@ -16,11 +16,9 @@ export function PublicFooter(props: BoxProps) {
       }}
     >
       <HStack justifyContent="space-between" paddingX={{ base: 2, md: 4 }}>
-        <NakedLink href="/">
-          <Box as="a">
-            <Logo width="152px" />
-          </Box>
-        </NakedLink>
+        <Box as="a" href="/">
+          <Logo width="152px" />
+        </Box>
         <HStack spacing={6}>
           <NormalLink
             href="https://www.facebook.com/parallel.so/"
