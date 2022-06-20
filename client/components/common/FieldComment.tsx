@@ -200,7 +200,7 @@ export function FieldComment({
         ) : null}
       </Box>
       {comment.isAnonymized ? (
-        <Box fontSize="sm" textStyle="hint">
+        <Box fontSize="md" textStyle="hint">
           <FormattedMessage
             id="component.field-comment.message-not-available"
             defaultMessage="Message not available"
@@ -211,7 +211,7 @@ export function FieldComment({
           <GrowingTextarea
             ref={textareaRef}
             height="20px"
-            size="sm"
+            size="md"
             borderRadius="md"
             paddingX={2}
             minHeight={0}
@@ -231,7 +231,7 @@ export function FieldComment({
           </Stack>
         </Box>
       ) : (
-        <Box fontSize="sm">
+        <Box fontSize="md">
           <BreakLines>{content}</BreakLines>
         </Box>
       )}

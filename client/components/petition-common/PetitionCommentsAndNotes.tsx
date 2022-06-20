@@ -139,7 +139,7 @@ export function PetitionCommentsAndNotes({
             >
               <GrowingTextarea
                 ref={textareaCommentRef}
-                size="sm"
+                size="md"
                 borderRadius="md"
                 paddingX={2}
                 minHeight={0}
@@ -175,7 +175,7 @@ export function PetitionCommentsAndNotes({
                 <>
                   <GrowingTextarea
                     ref={textareaNoteRef}
-                    size="sm"
+                    size="md"
                     borderRadius="md"
                     paddingX={2}
                     minHeight={0}
