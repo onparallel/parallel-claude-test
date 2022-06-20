@@ -5925,6 +5925,21 @@
     "context": "Hi, I would like more information about setting a subdomain."
   },
   {
+    "term": "organization.integrations.alert-button",
+    "definition": "Suggest integration",
+    "context": "Suggest integration"
+  },
+  {
+    "term": "organization.integrations.alert-description",
+    "definition": "Let us know! Tell us which applications you would like to connect Parallel with so we can consider them.",
+    "context": "Let us know! Tell us which applications you would like to connect Parallel with so we can consider them."
+  },
+  {
+    "term": "organization.integrations.alert-title",
+    "definition": "Can't find the integration you need?",
+    "context": "Can't find the integration you need?"
+  },
+  {
     "term": "organization.integrations.parallel-api-description",
     "definition": "Access our API to automate all your flows.",
     "context": "Access our API to automate all your flows."

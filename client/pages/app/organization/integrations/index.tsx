@@ -1,5 +1,16 @@
 import { gql } from "@apollo/client";
-import { Badge, Heading, Image, Stack } from "@chakra-ui/react";
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
+  Badge,
+  Box,
+  Button,
+  Heading,
+  Image,
+  Stack,
+} from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
@@ -8,6 +19,7 @@ import { IntegrationCard } from "@parallel/components/organization/IntegrationCa
 import { OrganizationIntegrations_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
+import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { isAtLeast } from "@parallel/utils/roles";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -109,6 +121,35 @@ function OrganizationIntegrations() {
         </Heading>
       }
     >
+      <Alert status="info">
+        <AlertIcon />
+        <Box flex="1">
+          <AlertTitle>
+            <FormattedMessage
+              id="organization.integrations.alert-title"
+              defaultMessage="Can't find the integration you need?"
+            />
+          </AlertTitle>
+          <AlertDescription>
+            <FormattedMessage
+              id="organization.integrations.alert-description"
+              defaultMessage="Let us know! Tell us which applications you would like to connect Parallel with so we can consider them."
+            />
+          </AlertDescription>
+        </Box>
+        <Button
+          aria-label={intl.formatMessage({
+            id: "organization.integrations.alert-button",
+            defaultMessage: "Suggest integration",
+          })}
+          onClick={() => openNewWindow("https://parallel.canny.io/integrations")}
+        >
+          <FormattedMessage
+            id="organization.integrations.alert-button"
+            defaultMessage="Suggest integration"
+          />
+        </Button>
+      </Alert>
       <Stack padding={4} spacing={5} maxWidth="container.sm" paddingBottom={16}>
         {integrations.map((integration, index) => (
           <IntegrationCard key={index} {...integration} />
