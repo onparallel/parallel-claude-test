@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_ENV=development ts-node-dev --ignore-watch \"(graphql/__types.ts|src/(emails|pdf))\" --no-notify --transpile-only --respawn ./src",
-    "debug": "cross-env NODE_ENV=development ts-node-dev --inspect --ignore-watch graphql/__types.ts --no-notify --transpile-only --respawn ./src",
+    "debug": "cross-env NODE_ENV=development ts-node-dev --inspect --ignore-watch \"(graphql/__types.ts|src/(emails|pdf))\" --no-notify --transpile-only --respawn ./src",
     "build": "tsc --project tsconfig.prod.json",
     "prebuild": "yarn generate-i18n-files",
     "migrate": "knex migrate:latest",

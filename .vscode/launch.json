@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Next.js: debug server-side",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "yarn workspace @parallel/client dev"
+    },
+    {
+      "name": "Sever",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "yarn workspace @parallel/server debug"
+    },
+    {
+      "name": "Storybook",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "yarn workspace @parallel/server _stories"
+    }
+  ]
+}
