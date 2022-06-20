@@ -25,7 +25,7 @@ import { RichTextEditor } from "@parallel/components/common/slate/RichTextEditor
 import {
   DocumentThemeEditor_OrganizationFragment,
   DocumentThemeEditor_OrganizationFragmentDoc,
-  DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeDocument,
+  DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeFontsDocument,
   DocumentThemeEditor_updateOrganizationDocumentThemeDocument,
   DocumentThemeEditor_updateOrganizationDocumentThemeMutationVariables,
 } from "@parallel/graphql/__types";
@@ -113,14 +113,14 @@ export function DocumentThemeEditor({ organization, isDisabled }: DocumentThemeE
     }
   }
 
-  const [restoreDefaultOrganizationDocumentTheme] = useMutation(
-    DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeDocument
+  const [restoreDefaultOrganizationDocumentThemeFonts] = useMutation(
+    DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeFontsDocument
   );
 
-  async function handleRestoreDefaults() {
-    await restoreDefaultOrganizationDocumentTheme({
+  async function handleRestoreDefaultFonts() {
+    await restoreDefaultOrganizationDocumentThemeFonts({
       update: (_, { data }) => {
-        setTheme(data!.restoreDefaultOrganizationDocumentTheme.pdfDocumentTheme);
+        setTheme(data!.restoreDefaultOrganizationDocumentThemeFonts.pdfDocumentTheme);
       },
     });
   }
@@ -333,8 +333,8 @@ export function DocumentThemeEditor({ organization, isDisabled }: DocumentThemeE
       <HStack justifyContent="flex-end">
         <Button
           variant="link"
-          onClick={handleRestoreDefaults}
-          isDisabled={!organization.isPdfDocumentThemeDirty}
+          onClick={handleRestoreDefaultFonts}
+          isDisabled={!organization.isPdfDocumentThemeFontsDirty}
         >
           <FormattedMessage
             id="component.document-theme-editor.restore-defaults"
@@ -391,7 +391,7 @@ DocumentThemeEditor.fragments = {
     fragment DocumentThemeEditor_Organization on Organization {
       id
       pdfDocumentTheme
-      isPdfDocumentThemeDirty
+      isPdfDocumentThemeFontsDirty
     }
   `,
 };
@@ -408,8 +408,8 @@ const _mutations = [
     ${DocumentThemeEditor.fragments.Organization}
   `,
   gql`
-    mutation DocumentThemeEditor_restoreDefaultOrganizationDocumentTheme {
-      restoreDefaultOrganizationDocumentTheme {
+    mutation DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeFonts {
+      restoreDefaultOrganizationDocumentThemeFonts {
         ...DocumentThemeEditor_Organization
       }
     }

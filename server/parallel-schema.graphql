@@ -1211,9 +1211,9 @@ type Mutation {
   resetUserPassword(email: String!, locale: PetitionLocale!): SupportMethodResponse!
 
   """
-  Restores the organization document theme to the default values
+  Restores the 'fonts' section of the organization document theme to its default values
   """
-  restoreDefaultOrganizationDocumentTheme: Organization!
+  restoreDefaultOrganizationDocumentThemeFonts: Organization!
   restoreLogin: Result!
 
   """
@@ -1785,7 +1785,11 @@ type Organization implements Timestamps {
     """
     type: IntegrationType
   ): OrgIntegrationPagination!
-  isPdfDocumentThemeDirty: Boolean!
+
+  """
+  Wether the 'fonts' section of the document theme has been changed from its default values or not
+  """
+  isPdfDocumentThemeFontsDirty: Boolean!
 
   """
   Current license for the organization

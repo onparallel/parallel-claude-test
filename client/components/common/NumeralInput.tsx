@@ -1,6 +1,6 @@
 import { FormControlOptions, Input, ThemingProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 import NumberFormat, { NumberFormatValues, SourceInfo } from "react-number-format";
 import { isDefined } from "remeda";
@@ -19,15 +19,13 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
   ref
 ) {
   const intl = useIntl();
-  let _value = useMemo(
-    () =>
-      isDefined(value)
-        ? intl.formatNumber(value, {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: decimals ?? 5,
-          })
-        : "",
-    [value]
+  const [_value, setValue] = useState(
+    isDefined(value)
+      ? intl.formatNumber(value, {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: decimals ?? 5,
+        })
+      : ""
   );
 
   const { decimalSeparator, thousandSeparator } = useMemo<{
@@ -43,7 +41,7 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
 
   const handleOnValueChange = (values: NumberFormatValues, sourceInfo: SourceInfo) => {
     const { formattedValue, floatValue } = values;
-    _value = formattedValue;
+    setValue(formattedValue);
 
     // Event is a Synthetic Event wrapper which holds target and other information.
     // Source tells whether the reason for this function being triggered was an 'event' or due to a 'prop' change

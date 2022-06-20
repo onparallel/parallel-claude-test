@@ -1,5 +1,6 @@
 import deepmerge from "deepmerge";
 import { arg, booleanArg, inputObjectType, intArg, mutationField, nonNull, nullable } from "nexus";
+import { pick } from "remeda";
 import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { random } from "../../util/token";
 import { authenticateAnd } from "../helpers/authorize";
@@ -170,16 +171,33 @@ export const updateOrganizationDocumentTheme = mutationField("updateOrganization
   },
 });
 
-export const restoreDefaultOrganizationDocumentTheme = mutationField(
-  "restoreDefaultOrganizationDocumentTheme",
+export const restoreDefaultOrganizationDocumentThemeFonts = mutationField(
+  "restoreDefaultOrganizationDocumentThemeFonts",
   {
-    description: "Restores the organization document theme to the default values",
+    description:
+      "Restores the 'fonts' section of the organization document theme to its default values",
     type: "Organization",
     authorize: authenticateAnd(contextUserHasRole("ADMIN")),
     resolve: async (_, args, ctx) => {
+      const organization = await ctx.organizations.loadOrg(ctx.user!.org_id);
+
+      const theme = Object.assign(
+        organization?.pdf_document_theme ?? defaultPdfDocumentTheme,
+        pick(defaultPdfDocumentTheme, [
+          "title1FontFamily",
+          "title1Color",
+          "title1FontSize",
+          "title2FontFamily",
+          "title2Color",
+          "title2FontSize",
+          "textFontFamily",
+          "textColor",
+          "textFontSize",
+        ])
+      );
       return await ctx.organizations.updateOrganization(
         ctx.user!.org_id,
-        { pdf_document_theme: defaultPdfDocumentTheme },
+        { pdf_document_theme: theme },
         `User:${ctx.user!.id}`
       );
     },

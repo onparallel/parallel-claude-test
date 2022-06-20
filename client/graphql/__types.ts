@@ -615,8 +615,8 @@ export interface Mutation {
   resetTemporaryPassword: Result;
   /** Resets the given user password on AWS Cognito and sends an email with new temporary. */
   resetUserPassword: SupportMethodResponse;
-  /** Restores the organization document theme to the default values */
-  restoreDefaultOrganizationDocumentTheme: Organization;
+  /** Restores the 'fonts' section of the organization document theme to its default values */
+  restoreDefaultOrganizationDocumentThemeFonts: Organization;
   restoreLogin: Result;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
@@ -1613,7 +1613,8 @@ export interface Organization extends Timestamps {
   id: Scalars["GID"];
   /** A paginated list with enabled integrations for the organization */
   integrations: OrgIntegrationPagination;
-  isPdfDocumentThemeDirty: Scalars["Boolean"];
+  /** Wether the 'fonts' section of the document theme has been changed from its default values or not */
+  isPdfDocumentThemeFontsDirty: Scalars["Boolean"];
   /** Current license for the organization */
   license?: Maybe<OrgLicense>;
   /** URL of the organization logo */
@@ -5295,7 +5296,7 @@ export type DocumentThemeEditor_OrganizationFragment = {
   __typename?: "Organization";
   id: string;
   pdfDocumentTheme: { [key: string]: any };
-  isPdfDocumentThemeDirty: boolean;
+  isPdfDocumentThemeFontsDirty: boolean;
 };
 
 export type DocumentThemeEditor_updateOrganizationDocumentThemeMutationVariables = Exact<{
@@ -5307,20 +5308,19 @@ export type DocumentThemeEditor_updateOrganizationDocumentThemeMutation = {
     __typename?: "Organization";
     id: string;
     pdfDocumentTheme: { [key: string]: any };
-    isPdfDocumentThemeDirty: boolean;
+    isPdfDocumentThemeFontsDirty: boolean;
   };
 };
 
-export type DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeMutationVariables = Exact<{
-  [key: string]: never;
-}>;
+export type DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeFontsMutationVariables =
+  Exact<{ [key: string]: never }>;
 
-export type DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeMutation = {
-  restoreDefaultOrganizationDocumentTheme: {
+export type DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeFontsMutation = {
+  restoreDefaultOrganizationDocumentThemeFonts: {
     __typename?: "Organization";
     id: string;
     pdfDocumentTheme: { [key: string]: any };
-    isPdfDocumentThemeDirty: boolean;
+    isPdfDocumentThemeFontsDirty: boolean;
   };
 };
 
@@ -11833,7 +11833,7 @@ export type OrganizationBranding_userQuery = {
       name: string;
       preferredTone: Tone;
       pdfDocumentTheme: { [key: string]: any };
-      isPdfDocumentThemeDirty: boolean;
+      isPdfDocumentThemeFontsDirty: boolean;
       iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
@@ -21686,7 +21686,7 @@ export const DocumentThemeEditor_OrganizationFragmentDoc = gql`
   fragment DocumentThemeEditor_Organization on Organization {
     id
     pdfDocumentTheme
-    isPdfDocumentThemeDirty
+    isPdfDocumentThemeFontsDirty
   }
 ` as unknown as DocumentNode<DocumentThemeEditor_OrganizationFragment, unknown>;
 export const DocumentThemePreview_OrganizationFragmentDoc = gql`
@@ -25684,16 +25684,16 @@ export const DocumentThemeEditor_updateOrganizationDocumentThemeDocument = gql`
   DocumentThemeEditor_updateOrganizationDocumentThemeMutation,
   DocumentThemeEditor_updateOrganizationDocumentThemeMutationVariables
 >;
-export const DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeDocument = gql`
-  mutation DocumentThemeEditor_restoreDefaultOrganizationDocumentTheme {
-    restoreDefaultOrganizationDocumentTheme {
+export const DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeFontsDocument = gql`
+  mutation DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeFonts {
+    restoreDefaultOrganizationDocumentThemeFonts {
       ...DocumentThemeEditor_Organization
     }
   }
   ${DocumentThemeEditor_OrganizationFragmentDoc}
 ` as unknown as DocumentNode<
-  DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeMutation,
-  DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeMutationVariables
+  DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeFontsMutation,
+  DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeFontsMutationVariables
 >;
 export const CreateUserDialog_emailIsAvailableDocument = gql`
   query CreateUserDialog_emailIsAvailable($email: String!) {

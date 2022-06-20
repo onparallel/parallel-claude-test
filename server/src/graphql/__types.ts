@@ -1044,7 +1044,7 @@ export interface NexusGenFieldTypes {
     resetSignaturitOrganizationBranding: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     resetTemporaryPassword: NexusGenEnums["Result"]; // Result!
     resetUserPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
-    restoreDefaultOrganizationDocumentTheme: NexusGenRootTypes["Organization"]; // Organization!
+    restoreDefaultOrganizationDocumentThemeFonts: NexusGenRootTypes["Organization"]; // Organization!
     restoreLogin: NexusGenEnums["Result"]; // Result!
     revokeUserAuthToken: NexusGenEnums["Result"]; // Result!
     sendPetition: NexusGenRootTypes["SendPetitionResult"][]; // [SendPetitionResult!]!
@@ -1121,7 +1121,7 @@ export interface NexusGenFieldTypes {
     iconUrl: string | null; // String
     id: NexusGenScalars["GID"]; // GID!
     integrations: NexusGenRootTypes["OrgIntegrationPagination"]; // OrgIntegrationPagination!
-    isPdfDocumentThemeDirty: boolean; // Boolean!
+    isPdfDocumentThemeFontsDirty: boolean; // Boolean!
     license: NexusGenRootTypes["OrgLicense"] | null; // OrgLicense
     logoUrl: string | null; // String
     name: string; // String!
@@ -2550,7 +2550,7 @@ export interface NexusGenFieldTypeNames {
     resetSignaturitOrganizationBranding: "SupportMethodResponse";
     resetTemporaryPassword: "Result";
     resetUserPassword: "SupportMethodResponse";
-    restoreDefaultOrganizationDocumentTheme: "Organization";
+    restoreDefaultOrganizationDocumentThemeFonts: "Organization";
     restoreLogin: "Result";
     revokeUserAuthToken: "Result";
     sendPetition: "SendPetitionResult";
@@ -2627,7 +2627,7 @@ export interface NexusGenFieldTypeNames {
     iconUrl: "String";
     id: "GID";
     integrations: "OrgIntegrationPagination";
-    isPdfDocumentThemeDirty: "Boolean";
+    isPdfDocumentThemeFontsDirty: "Boolean";
     license: "OrgLicense";
     logoUrl: "String";
     name: "String";

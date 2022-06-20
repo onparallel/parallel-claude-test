@@ -1,6 +1,6 @@
 import { arg, booleanArg, enumType, list, nonNull, nullable, objectType } from "nexus";
-import { isDefined, equals } from "remeda";
-import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
+import { isDefined, equals, pick } from "remeda";
+import { defaultPdfDocumentTheme, PdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { or, userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
@@ -236,9 +236,24 @@ export const Organization = objectType({
         return o.pdf_document_theme ?? defaultPdfDocumentTheme;
       },
     });
-    t.nonNull.boolean("isPdfDocumentThemeDirty", {
+    t.nonNull.boolean("isPdfDocumentThemeFontsDirty", {
+      description:
+        "Wether the 'fonts' section of the document theme has been changed from its default values or not",
       resolve: (o) => {
-        return !equals(o.pdf_document_theme ?? defaultPdfDocumentTheme, defaultPdfDocumentTheme);
+        const fontKeys = [
+          "title1FontFamily",
+          "title1Color",
+          "title1FontSize",
+          "title2FontFamily",
+          "title2Color",
+          "title2FontSize",
+          "textFontFamily",
+          "textColor",
+          "textFontSize",
+        ] as (keyof PdfDocumentTheme)[];
+        const currentThemeFonts = pick(o.pdf_document_theme ?? defaultPdfDocumentTheme, fontKeys);
+        const defaultThemeFonts = pick(defaultPdfDocumentTheme, fontKeys);
+        return !equals(currentThemeFonts, defaultThemeFonts);
       },
     });
     t.nullable.field("license", {
