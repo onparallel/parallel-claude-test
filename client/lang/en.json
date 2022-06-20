@@ -1630,6 +1630,26 @@
     "context": "No files have been attached to this petition."
   },
   {
+    "term": "component.petition-comments-and-notes.comments",
+    "definition": "Comments",
+    "context": "Comments"
+  },
+  {
+    "term": "component.petition-comments-and-notes.notes",
+    "definition": "Notes",
+    "context": "Notes"
+  },
+  {
+    "term": "component.petition-comments-and-notes.write-a-comment",
+    "definition": "Write a comment",
+    "context": "Write a comment"
+  },
+  {
+    "term": "component.petition-comments-and-notes.write-a-note",
+    "definition": "Write a note. It will only be visible in your organization.",
+    "context": "Write a note. It will only be visible in your organization."
+  },
+  {
     "term": "component.petition-completed-alert.description",
     "definition": "<b>Petition completed</b>, if you make any changes, the petition must be <b>finalized again</b>.",
     "context": "<b>Petition completed</b>, if you make any changes, the petition must be <b>finalized again</b>."
@@ -2698,6 +2718,16 @@
     "term": "component.preview-petition-field-comments-dialog.comments-cta",
     "definition": "Have any questions? Ask here",
     "context": "Have any questions? Ask here"
+  },
+  {
+    "term": "component.pricing-table.compare-plans",
+    "definition": "Compare plans",
+    "context": "Compare plans"
+  },
+  {
+    "term": "component.pricing-table.on-demand",
+    "definition": "On demand",
+    "context": "On demand"
   },
   {
     "term": "component.print-pdf-task.confirm",
@@ -5235,6 +5265,11 @@
     "context": "Not specified"
   },
   {
+    "term": "generic.note",
+    "definition": "Note",
+    "context": "Note"
+  },
+  {
     "term": "generic.notifications",
     "definition": "Notifications",
     "context": "Notifications"
@@ -6625,14 +6660,9 @@
     "context": "Internal comment"
   },
   {
-    "term": "petition-replies.internal-comment-popover",
+    "term": "petition-replies.note-popover",
     "definition": "This comment is only visible for people in your organization.",
     "context": "This comment is only visible for people in your organization."
-  },
-  {
-    "term": "petition-replies.internal-comment.badge",
-    "definition": "Internal",
-    "context": "Internal"
   },
   {
     "term": "petition-replies.notify-petition-reviewed.button",

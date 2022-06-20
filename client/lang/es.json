@@ -1630,6 +1630,26 @@
     "context": "No files have been attached to this petition."
   },
   {
+    "term": "component.petition-comments-and-notes.comments",
+    "definition": "Comentarios",
+    "context": "Comments"
+  },
+  {
+    "term": "component.petition-comments-and-notes.notes",
+    "definition": "Notas",
+    "context": "Notes"
+  },
+  {
+    "term": "component.petition-comments-and-notes.write-a-comment",
+    "definition": "Escribe un comentario",
+    "context": "Write a comment"
+  },
+  {
+    "term": "component.petition-comments-and-notes.write-a-note",
+    "definition": "Escribe una nota. Solo será visible en tu organización.",
+    "context": "Write a note. It will only be visible in your organization."
+  },
+  {
     "term": "component.petition-completed-alert.description",
     "definition": "<b>Petición completada,</b> si realizas cualquier cambio, se deberá <b>finalizar la petición</b> de nuevo.",
     "context": "<b>Petition completed</b>, if you make any changes, the petition must be <b>finalized again</b>."
@@ -2693,6 +2713,16 @@
     "term": "component.preview-comments-dialog.template-no-comments-added",
     "definition": "<b>Solo previsualización</b> - los comentarios están desactivados.",
     "context": "<b>Preview only</b> - comments are disabled."
+  },
+  {
+    "term": "component.pricing-table.compare-plans",
+    "definition": "Comparativa de planes",
+    "context": "Compare plans"
+  },
+  {
+    "term": "component.pricing-table.on-demand",
+    "definition": "Bajo demanda",
+    "context": "On demand"
   },
   {
     "term": "component.preview-petition-field-comments-dialog.comments-cta",
@@ -5235,6 +5265,11 @@
     "context": "Not specified"
   },
   {
+    "term": "generic.note",
+    "definition": "Nota",
+    "context": "Note"
+  },
+  {
     "term": "generic.notifications",
     "definition": "Notificaciones",
     "context": "Notifications"
@@ -6625,14 +6660,9 @@
     "context": "Internal comment"
   },
   {
-    "term": "petition-replies.internal-comment-popover",
+    "term": "petition-replies.note-popover",
     "definition": "Este comentario es visible solamente para personas dentro de tu organización.",
     "context": "This comment is only visible for people in your organization."
-  },
-  {
-    "term": "petition-replies.internal-comment.badge",
-    "definition": "Interno",
-    "context": "Internal"
   },
   {
     "term": "petition-replies.notify-petition-reviewed.button",

@@ -3,27 +3,23 @@ import {
   Alert,
   AlertIcon,
   Box,
-  Button,
   Center,
-  Checkbox,
   Flex,
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
   ModalHeader,
   Spinner,
   Stack,
   Text,
 } from "@chakra-ui/react";
 import { VariablesOf } from "@graphql-typed-document-node/core";
-import { AlertCircleIcon, CommentIcon } from "@parallel/chakra/icons";
+import { CommentIcon, NoteIcon } from "@parallel/chakra/icons";
 import { BaseDialog } from "@parallel/components/common/dialogs/BaseDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { FieldComment } from "@parallel/components/common/FieldComment";
-import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { Link } from "@parallel/components/common/Link";
-import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
+import { PetitionCommentsAndNotes } from "@parallel/components/petition-common/PetitionCommentsAndNotes";
 import {
   PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument,
   PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument,
@@ -35,12 +31,9 @@ import {
 } from "@parallel/graphql/__types";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
-import { setNativeValue } from "@parallel/utils/setNativeValue";
-import { useFocus } from "@parallel/utils/useFocus";
-import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
+import { KeyboardEvent, useCallback, useEffect, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../../common/Divider";
-import { GrowingTextarea } from "../../common/GrowingTextarea";
 
 interface PreviewPetitionFieldCommentsDialogProps {
   petitionId: string;
@@ -76,20 +69,7 @@ export function PreviewPetitionFieldCommentsDialog({
   );
 
   const comments = data?.petitionField.comments ?? [];
-
-  const [draft, setDraft] = useState("");
-  const [inputFocused, inputFocusBind] = useFocus({
-    onBlurDelay: 300,
-  });
-
   const hasCommentsEnabled = field.isInternal ? false : field.hasCommentsEnabled;
-
-  const [isInternalComment, setInternalComment] = useState(
-    !hasCommentsEnabled || onlyInternalComments
-  );
-
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
   const closeRef = useRef<HTMLButtonElement>(null);
 
   const updateIsReadNotification = useUpdateIsReadNotification();
@@ -116,9 +96,17 @@ export function PreviewPetitionFieldCommentsDialog({
   }, [field.id, comments.length]);
 
   const createPetitionFieldComment = useCreatePetitionFieldComment();
-  async function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if (isTemplate) return;
-    const content = draft.trim();
+  async function handleKeyDown({
+    event,
+    content,
+    isInternal,
+  }: {
+    event: KeyboardEvent<HTMLTextAreaElement>;
+    content: string;
+    isInternal: boolean;
+  }) {
+    let cleanTextarea = false;
+    if (isTemplate) return cleanTextarea;
     if (isMetaReturn(event) && content) {
       event.preventDefault();
       try {
@@ -126,33 +114,30 @@ export function PreviewPetitionFieldCommentsDialog({
           petitionId,
           petitionFieldId: field.id,
           content,
-          isInternal: isInternalComment,
+          isInternal,
         });
+        cleanTextarea = true;
       } catch {}
-      setNativeValue(textareaRef.current!, "");
     }
+    return cleanTextarea;
   }
 
-  function handleDraftChange(event: ChangeEvent<HTMLTextAreaElement>) {
-    setDraft(event.target.value);
-  }
-
-  async function handleSubmitClick() {
+  async function handleSubmitClick({
+    content,
+    isInternal,
+  }: {
+    content: string;
+    isInternal: boolean;
+  }) {
     if (isTemplate) return;
     try {
       await createPetitionFieldComment({
         petitionId,
         petitionFieldId: field.id,
-        content: draft.trim(),
-        isInternal: isInternalComment,
+        content,
+        isInternal,
       });
     } catch {}
-    setNativeValue(textareaRef.current!, "");
-    closeRef.current!.focus();
-  }
-
-  function handleCancelClick() {
-    setNativeValue(textareaRef.current!, "");
     closeRef.current!.focus();
   }
 
@@ -181,8 +166,6 @@ export function PreviewPetitionFieldCommentsDialog({
     } catch {}
   }
 
-  const isExpanded = Boolean(inputFocused || draft);
-
   return (
     <BaseDialog closeOnOverlayClick={false} {...props}>
       <ModalContent maxHeight="calc(100vh - 7.5rem)">
@@ -201,167 +184,116 @@ export function PreviewPetitionFieldCommentsDialog({
           )}
         </ModalHeader>
         <Divider />
-        <ModalBody padding={0} display="flex" flexDirection="column-reverse" minHeight="0">
-          {loading && !comments.length ? (
-            <Center minHeight={44}>
-              <Spinner
-                thickness="4px"
-                speed="0.65s"
-                emptyColor="gray.200"
-                color="primary.500"
-                size="xl"
-              />
-            </Center>
-          ) : comments.length === 0 ? (
-            <Flex
-              overflow="auto"
-              flexDirection="column"
-              paddingX={4}
-              paddingY={8}
-              justifyContent="center"
-              alignItems="center"
-            >
-              {hasCommentsEnabled ? (
-                <>
-                  <CommentIcon color="gray.300" boxSize="64px" />
-                  <Text color="gray.500">
-                    <FormattedMessage
-                      id="component.preview-petition-field-comments-dialog.comments-cta"
-                      defaultMessage="Have any questions? Ask here"
+        <ModalBody padding={0} minHeight="0">
+          <PetitionCommentsAndNotes
+            body={
+              <>
+                {loading && !comments.length ? (
+                  <Center minHeight={44}>
+                    <Spinner
+                      thickness="4px"
+                      speed="0.65s"
+                      emptyColor="gray.200"
+                      color="primary.500"
+                      size="xl"
                     />
-                  </Text>
-                </>
-              ) : (
-                <Stack alignItems="center" textAlign="center">
-                  <AlertCircleIcon boxSize="64px" color="gray.200" />
-                  {hasInternalComments ? (
-                    <Text color="gray.400">
-                      <FormattedMessage
-                        id="petition-replies.field-comments.disabled-comments-1"
-                        defaultMessage="This field only accepts internal comments."
-                      />
-                    </Text>
-                  ) : null}
-                  {!onlyInternalComments ? (
-                    <Text color="gray.400">
-                      <FormattedMessage
-                        id="petition-replies.field-comments.disabled-comments-2"
-                        defaultMessage="You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
-                        values={{
-                          composeTab: intl.formatMessage({
-                            id: "petition.header.compose-tab",
-                            defaultMessage: "Compose",
-                          }),
-                          a: (chunks: any) => (
-                            <Link
-                              href={`/app/petitions/${petitionId}/compose#field-settings-${field.id}`}
-                            >
-                              {chunks}
-                            </Link>
-                          ),
-                        }}
-                      />
-                    </Text>
-                  ) : null}
-                </Stack>
-              )}
-            </Flex>
-          ) : (
-            <Stack spacing={0} divider={<Divider />} overflow="auto">
-              {comments.map((comment) => (
-                <FieldComment
-                  key={comment.id}
-                  comment={comment}
-                  isAuthor={myId === comment.author?.id}
-                  onEdit={(content) => handleEditCommentContent(comment.id, content)}
-                  onDelete={() => handleDeleteClick(comment.id)}
-                  onMarkAsUnread={() => handleMarkAsUnread(comment.id)}
-                  isDisabled={onlyInternalComments && !comment.isInternal}
-                />
-              ))}
-            </Stack>
-          )}
-          {isTemplate ? (
-            <Box padding={2}>
-              <Alert status="info" borderRadius="md">
-                <AlertIcon />
-                <Text>
-                  <FormattedMessage
-                    id="component.preview-comments-dialog.template-no-comments-added"
-                    defaultMessage="<b>Preview only</b> - comments are disabled."
-                  />
-                </Text>
-              </Alert>
-            </Box>
-          ) : null}
-        </ModalBody>
-        <Divider />
-        <ModalFooter display="block">
-          <GrowingTextarea
-            ref={textareaRef}
-            size="sm"
-            borderRadius="md"
-            paddingX={2}
-            minHeight={0}
-            maxHeight={20}
-            rows={1}
-            placeholder={intl.formatMessage(
-              {
-                id: "recipient-view.field-comments.placeholder",
-                defaultMessage: "Ask here your questions and doubts",
-              },
-              { tone }
-            )}
-            value={draft}
-            onKeyDown={handleKeyDown as any}
-            onChange={handleDraftChange as any}
-            isDisabled={isDisabled || (!hasCommentsEnabled && !hasInternalComments)}
-            {...inputFocusBind}
-          />
-          <PaddedCollapse in={isExpanded}>
-            <Stack
-              direction="row"
-              justifyContent={hasInternalComments ? "space-between" : "flex-end"}
-              paddingTop={2}
-            >
-              {hasInternalComments && (
-                <Stack display="flex" alignItems="center" direction="row">
-                  <Checkbox
-                    marginLeft={1}
-                    colorScheme="primary"
-                    isChecked={isInternalComment}
-                    isDisabled={!hasCommentsEnabled || field.isInternal || onlyInternalComments}
-                    onChange={() => setInternalComment(!isInternalComment)}
+                  </Center>
+                ) : comments.length === 0 ? (
+                  <Flex
+                    overflow="auto"
+                    flexDirection="column"
+                    paddingX={4}
+                    paddingY={8}
+                    justifyContent="center"
+                    alignItems="center"
                   >
-                    <FormattedMessage
-                      id="petition-replies.internal-comment-check.label"
-                      defaultMessage="Internal comment"
-                    />
-                  </Checkbox>
-                  <HelpPopover>
-                    <FormattedMessage
-                      id="petition-replies.internal-comment-check.help"
-                      defaultMessage="By checking this field, the comment will be visible only to users in your organization."
-                    />
-                  </HelpPopover>
-                </Stack>
-              )}
-              <Stack direction="row">
-                <Button size="sm" onClick={handleCancelClick}>
-                  <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
-                </Button>
-                <Button
-                  size="sm"
-                  colorScheme="primary"
-                  isDisabled={draft.trim().length === 0 || isTemplate}
-                  onClick={handleSubmitClick}
-                >
-                  <FormattedMessage id="generic.submit" defaultMessage="Submit" />
-                </Button>
-              </Stack>
-            </Stack>
-          </PaddedCollapse>
-        </ModalFooter>
+                    {hasCommentsEnabled ? (
+                      <>
+                        <CommentIcon color="gray.300" boxSize="64px" />
+                      </>
+                    ) : (
+                      <Stack alignItems="center" textAlign="center">
+                        <NoteIcon boxSize="64px" color="gray.200" />
+                        {hasInternalComments ? (
+                          <Text color="gray.400">
+                            <FormattedMessage
+                              id="petition-replies.field-comments.disabled-comments-1"
+                              defaultMessage="This field only accepts internal comments."
+                            />
+                          </Text>
+                        ) : null}
+                        <Text color="gray.400">
+                          <FormattedMessage
+                            id="petition-replies.field-comments.disabled-comments-2"
+                            defaultMessage="You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
+                            values={{
+                              composeTab: intl.formatMessage({
+                                id: "petition.header.compose-tab",
+                                defaultMessage: "Compose",
+                              }),
+                              a: (chunks: any) => (
+                                <Link
+                                  href={`/app/petitions/${petitionId}/compose#field-settings-${field.id}`}
+                                >
+                                  {chunks}
+                                </Link>
+                              ),
+                            }}
+                          />
+                        </Text>
+                      </Stack>
+                    )}
+                  </Flex>
+                ) : (
+                  <Stack
+                    spacing={0}
+                    divider={<Divider />}
+                    overflow="auto"
+                    maxHeight="calc(100vh - 20rem)"
+                  >
+                    {comments.map((comment) => (
+                      <FieldComment
+                        key={comment.id}
+                        comment={comment}
+                        isAuthor={myId === comment.author?.id}
+                        onEdit={(content) => handleEditCommentContent(comment.id, content)}
+                        onDelete={() => handleDeleteClick(comment.id)}
+                        onMarkAsUnread={() => handleMarkAsUnread(comment.id)}
+                      />
+                    ))}
+                  </Stack>
+                )}
+                {isTemplate ? (
+                  <Box padding={2}>
+                    <Alert status="info" borderRadius="md">
+                      <AlertIcon />
+                      <Text>
+                        <FormattedMessage
+                          id="component.preview-comments-dialog.template-no-comments-added"
+                          defaultMessage="<b>Preview only</b> - comments are disabled."
+                        />
+                      </Text>
+                    </Alert>
+                  </Box>
+                ) : null}
+              </>
+            }
+            isDisabled={isDisabled}
+            isTemplate={isTemplate ?? false}
+            hasInternalComments={hasInternalComments}
+            hasCommentsEnabled={hasCommentsEnabled}
+            onCommentKeyDown={async (event, content) =>
+              await handleKeyDown({ event, content, isInternal: false })
+            }
+            onCommentSubmit={async (content) =>
+              await handleSubmitClick({ content, isInternal: false })
+            }
+            onNotetKeyDown={async (event, content) =>
+              await handleKeyDown({ event, content, isInternal: true })
+            }
+            onNoteSubmit={async (content) => await handleSubmitClick({ content, isInternal: true })}
+          />
+        </ModalBody>
       </ModalContent>
     </BaseDialog>
   );

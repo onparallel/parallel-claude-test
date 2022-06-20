@@ -3,6 +3,7 @@ import {
   Badge,
   Box,
   Button,
+  Circle,
   IconButton,
   Menu,
   MenuButton,
@@ -98,8 +99,19 @@ export function FieldComment({
     <Box
       paddingX={6}
       paddingY={2}
+      position="relative"
       backgroundColor={comment.isUnread ? "primary.50" : isInternal ? "gray.50" : "white"}
     >
+      {comment.isUnread ? (
+        <Circle
+          size={2}
+          backgroundColor="purple.400"
+          position="absolute"
+          top="50%"
+          transform="translateY(-50%)"
+          left={2}
+        />
+      ) : null}
       <Box fontSize="sm" display="flex" alignItems="center">
         <Box paddingRight={2}>
           {isAuthor ? (
@@ -123,17 +135,14 @@ export function FieldComment({
             content={
               <Text fontSize="sm">
                 <FormattedMessage
-                  id="petition-replies.internal-comment-popover"
+                  id="petition-replies.note-popover"
                   defaultMessage="This comment is only visible for people in your organization."
                 />
               </Text>
             }
           >
-            <Badge colorScheme="gray" variant="outline" cursor="default" marginRight={2}>
-              <FormattedMessage
-                id="petition-replies.internal-comment.badge"
-                defaultMessage="Internal"
-              />
+            <Badge color="gray.600" variant="outline" cursor="default" marginRight={2}>
+              <FormattedMessage id="generic.note" defaultMessage="Note" />
             </Badge>
           </SmallPopover>
         )}
@@ -210,6 +219,7 @@ export function FieldComment({
             value={content}
             onKeyDown={handleKeyDown as any}
             onChange={handleContentChange as any}
+            backgroundColor="white"
           />
           <Stack direction="row" justifyContent="flex-end" marginTop={2}>
             <Button size="sm" onClick={handleCancelClick}>
