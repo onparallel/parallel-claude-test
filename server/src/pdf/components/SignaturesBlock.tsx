@@ -64,6 +64,15 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
               date,
             } as SignatureBoxProps,
           ]
+        : templateId === "zas25KHxAByKWUgG8U2"
+        ? [
+            {
+              fullName: "Marta Blanco Maseda",
+              signatureImageUrl:
+                "https://www.onparallel.com/static/images/signatures/marta-blanco-maseda-imasd.png",
+              date,
+            } as SignatureBoxProps,
+          ]
         : []
       : []),
     ...signatureConfig.signers!.map(
