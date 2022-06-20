@@ -21,6 +21,7 @@ services:
   nginx:
     image: nginx:latest
     volumes:
+      - $HOME/docker/volumes/parallel/nginx:/var/cache/nginx
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ./nginx.maintenance.conf:/etc/nginx/nginx.maintenance.conf
     ports:

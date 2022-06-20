@@ -9,10 +9,22 @@ tar -zxpf ${BUILD_ID}.tar.gz
 ln -s ${BUILD_ID} main
 
 sed -i "s/#ENV#/${ENV}/g" workers.sh main/ops/prod/systemd/parallel-client.service main/ops/prod/systemd/parallel-server.service
-sudo sed -i "s/#COMMIT_SHA#/${COMMIT_SHA}/g" /etc/nginx/nginx.common.conf
+sudo sed -i "s/#COMMIT_SHA#/${COMMIT_SHA}/g" main/ops/prod/nginx/nginx.common.conf
 sudo cp main/ops/prod/systemd/* /lib/systemd/system
+sudo cp main/ops/prod/nginx/* /etc/nginx/
+
+echo 'parallel:$apr1$wY1qv83a$ErfofKvlFLeIZ4r4ijEDw/' >>.htpasswd
+sudo mv .htpasswd /etc/nginx/.htpasswd
+sudo adduser --system --no-create-home --user-group --shell /sbin/nologin nginx
+sudo mkdir -p /var/lib/nginx/tmp
+sudo mkdir -p /var/cache/nginx
+sudo chown nginx /var/lib/nginx/tmp
+sudo chgrp nginx /var/lib/nginx/tmp
+sudo chown nginx /var/cache/nginx
+sudo chgrp nginx /var/cache/nginx
 
 sudo systemctl daemon-reload
+sudo systemctl enable nginx.service 
 sudo systemctl enable parallel-server.service
 sudo systemctl enable parallel-client.service
 sudo systemctl enable parallel-email-events-queue.service
@@ -28,4 +40,4 @@ sudo systemctl enable parallel-anonymizer-cron.service
 
 sudo systemctl start parallel-server
 sudo systemctl start parallel-client
-sudo systemctl restart nginx
+sudo systemctl start nginx
