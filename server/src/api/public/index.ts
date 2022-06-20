@@ -814,7 +814,6 @@ api
 api
   .path("/petitions/:petitionId/properties", {
     params: { petitionId },
-    excludeFromSpec: true,
   })
   .get(
     {
@@ -898,7 +897,6 @@ api
 api
   .path("/petitions/:petitionId/properties/:key", {
     params: { petitionId, key: stringParam({ required: true, maxLength: 100 }) },
-    excludeFromSpec: true,
   })
   .delete(
     {
