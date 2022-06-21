@@ -6,6 +6,7 @@ import { performance } from "perf_hooks";
 import { isDefined, omit, pipe } from "remeda";
 import { promisify } from "util";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
+import { isFileTypeField } from "../../util/isFileTypeField";
 import { waitFor } from "../../util/promises/waitFor";
 import { Maybe } from "../../util/types";
 import { File, RestParameter } from "../rest/core";
@@ -128,7 +129,8 @@ export function mapPetitionFieldRepliesContent<T extends Pick<PetitionFragment, 
       ...omit(field, ["options"]),
       options: field.options.values ?? undefined,
       replies: field.replies.map((reply) => ({
-        ...reply,
+        // show metadata info only on FILE fields
+        ...omit(reply, isFileTypeField(field.type) ? [] : ["metadata"]),
         content: mapFieldReplyContent(field.type, reply.content),
       })),
     })),
@@ -161,7 +163,7 @@ function mapPetitionTags<T extends Pick<PetitionFragment, "tags">>(petition: T) 
 
 function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petition: T) {
   function mapReplyContentsForAlias(
-    replies: { content: any; id: string }[],
+    replies: { content: any; metadata: any; id: string }[],
     type: PetitionFieldType
   ) {
     switch (type) {
@@ -180,9 +182,11 @@ function mapPetitionReplies<T extends Pick<PetitionFragment, "replies">>(petitio
       case "FILE_UPLOAD":
       case "ES_TAX_DOCUMENTS":
         if (replies.length > 1) {
-          return replies.map((r) => ({ ...r.content, replyId: r.id }));
+          return replies.map((r) => ({ ...r.content, replyId: r.id, metadata: r.metadata }));
         } else {
-          return { ...replies[0].content, replyId: replies[0].id } ?? null;
+          return (
+            { ...replies[0].content, replyId: replies[0].id, metadata: replies[0].metadata } ?? null
+          );
         }
       case "DYNAMIC_SELECT":
         if (replies.length > 1) {

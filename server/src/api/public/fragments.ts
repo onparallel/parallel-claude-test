@@ -94,6 +94,7 @@ export const PetitionFieldReplyFragment = gql`
     id
     content
     status
+    metadata
     createdAt
     updatedAt
   }
@@ -142,6 +143,7 @@ export const PetitionFragment = gql`
       replies {
         id
         content
+        metadata
       }
     }
     tags @include(if: $includeTags) {

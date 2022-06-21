@@ -3702,6 +3702,7 @@ export type PetitionFieldReplyFragment = {
   id: string;
   content: { [key: string]: any };
   status: PetitionFieldReplyStatus;
+  metadata: { [key: string]: any };
   createdAt: string;
   updatedAt: string;
 };
@@ -3719,6 +3720,7 @@ export type PetitionFieldWithRepliesFragment = {
     id: string;
     content: { [key: string]: any };
     status: PetitionFieldReplyStatus;
+    metadata: { [key: string]: any };
     createdAt: string;
     updatedAt: string;
   }>;
@@ -3774,6 +3776,7 @@ export type PetitionFragment = {
       id: string;
       content: { [key: string]: any };
       status: PetitionFieldReplyStatus;
+      metadata: { [key: string]: any };
       createdAt: string;
       updatedAt: string;
     }>;
@@ -3781,7 +3784,11 @@ export type PetitionFragment = {
   replies: Array<{
     alias: string | null;
     type: PetitionFieldType;
-    replies: Array<{ id: string; content: { [key: string]: any } }>;
+    replies: Array<{
+      id: string;
+      content: { [key: string]: any };
+      metadata: { [key: string]: any };
+    }>;
   }>;
   tags?: Array<{ id: string; name: string }>;
 };
@@ -3950,6 +3957,7 @@ export type GetPetitions_petitionsQuery = {
               id: string;
               content: { [key: string]: any };
               status: PetitionFieldReplyStatus;
+              metadata: { [key: string]: any };
               createdAt: string;
               updatedAt: string;
             }>;
@@ -3957,7 +3965,11 @@ export type GetPetitions_petitionsQuery = {
           replies: Array<{
             alias: string | null;
             type: PetitionFieldType;
-            replies: Array<{ id: string; content: { [key: string]: any } }>;
+            replies: Array<{
+              id: string;
+              content: { [key: string]: any };
+              metadata: { [key: string]: any };
+            }>;
           }>;
           tags?: Array<{ id: string; name: string }>;
         }
@@ -4026,6 +4038,7 @@ export type CreatePetition_petitionMutation = {
             id: string;
             content: { [key: string]: any };
             status: PetitionFieldReplyStatus;
+            metadata: { [key: string]: any };
             createdAt: string;
             updatedAt: string;
           }>;
@@ -4033,7 +4046,11 @@ export type CreatePetition_petitionMutation = {
         replies: Array<{
           alias: string | null;
           type: PetitionFieldType;
-          replies: Array<{ id: string; content: { [key: string]: any } }>;
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            metadata: { [key: string]: any };
+          }>;
         }>;
         tags?: Array<{ id: string; name: string }>;
       }
@@ -4099,6 +4116,7 @@ export type GetPetition_petitionQuery = {
             id: string;
             content: { [key: string]: any };
             status: PetitionFieldReplyStatus;
+            metadata: { [key: string]: any };
             createdAt: string;
             updatedAt: string;
           }>;
@@ -4106,7 +4124,11 @@ export type GetPetition_petitionQuery = {
         replies: Array<{
           alias: string | null;
           type: PetitionFieldType;
-          replies: Array<{ id: string; content: { [key: string]: any } }>;
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            metadata: { [key: string]: any };
+          }>;
         }>;
         tags?: Array<{ id: string; name: string }>;
       }
@@ -4174,6 +4196,7 @@ export type UpdatePetition_updatePetitionMutation = {
             id: string;
             content: { [key: string]: any };
             status: PetitionFieldReplyStatus;
+            metadata: { [key: string]: any };
             createdAt: string;
             updatedAt: string;
           }>;
@@ -4181,7 +4204,11 @@ export type UpdatePetition_updatePetitionMutation = {
         replies: Array<{
           alias: string | null;
           type: PetitionFieldType;
-          replies: Array<{ id: string; content: { [key: string]: any } }>;
+          replies: Array<{
+            id: string;
+            content: { [key: string]: any };
+            metadata: { [key: string]: any };
+          }>;
         }>;
         tags?: Array<{ id: string; name: string }>;
       }
@@ -4325,6 +4352,7 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
           id: string;
           content: { [key: string]: any };
           status: PetitionFieldReplyStatus;
+          metadata: { [key: string]: any };
           createdAt: string;
           updatedAt: string;
         }>;
@@ -4332,7 +4360,11 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
       replies: Array<{
         alias: string | null;
         type: PetitionFieldType;
-        replies: Array<{ id: string; content: { [key: string]: any } }>;
+        replies: Array<{
+          id: string;
+          content: { [key: string]: any };
+          metadata: { [key: string]: any };
+        }>;
       }>;
       tags?: Array<{ id: string; name: string }>;
     } | null;
@@ -4396,6 +4428,7 @@ export type PetitionReplies_repliesQuery = {
             id: string;
             content: { [key: string]: any };
             status: PetitionFieldReplyStatus;
+            metadata: { [key: string]: any };
             createdAt: string;
             updatedAt: string;
           }>;
@@ -4415,6 +4448,7 @@ export type PetitionReplies_repliesQuery = {
             id: string;
             content: { [key: string]: any };
             status: PetitionFieldReplyStatus;
+            metadata: { [key: string]: any };
             createdAt: string;
             updatedAt: string;
           }>;
@@ -5170,6 +5204,7 @@ export type SubmitReply_createPetitionFieldReplyMutation = {
     id: string;
     content: { [key: string]: any };
     status: PetitionFieldReplyStatus;
+    metadata: { [key: string]: any };
     createdAt: string;
     updatedAt: string;
   };
@@ -5188,6 +5223,7 @@ export type SubmitReply_createFileUploadReplyMutation = {
       id: string;
       content: { [key: string]: any };
       status: PetitionFieldReplyStatus;
+      metadata: { [key: string]: any };
       createdAt: string;
       updatedAt: string;
     };
@@ -5204,6 +5240,7 @@ export type SubmitReply_createFileUploadReplyCompleteMutation = {
     id: string;
     content: { [key: string]: any };
     status: PetitionFieldReplyStatus;
+    metadata: { [key: string]: any };
     createdAt: string;
     updatedAt: string;
   };
@@ -5222,6 +5259,7 @@ export type UpdateReplyStatus_updatePetitionFieldRepliesStatusMutation = {
       id: string;
       content: { [key: string]: any };
       status: PetitionFieldReplyStatus;
+      metadata: { [key: string]: any };
       createdAt: string;
       updatedAt: string;
       field: { id: string } | null;
@@ -5240,6 +5278,7 @@ export type UpdateReply_updatePetitionFieldReplyMutation = {
     id: string;
     content: { [key: string]: any };
     status: PetitionFieldReplyStatus;
+    metadata: { [key: string]: any };
     createdAt: string;
     updatedAt: string;
     field: { id: string } | null;
@@ -5259,6 +5298,7 @@ export type UpdateReply_updateFileUploadReplyMutation = {
       id: string;
       content: { [key: string]: any };
       status: PetitionFieldReplyStatus;
+      metadata: { [key: string]: any };
       createdAt: string;
       updatedAt: string;
     };
@@ -5275,6 +5315,7 @@ export type UpdateReply_updateFileUploadReplyCompleteMutation = {
     id: string;
     content: { [key: string]: any };
     status: PetitionFieldReplyStatus;
+    metadata: { [key: string]: any };
     createdAt: string;
     updatedAt: string;
     field: { id: string } | null;
@@ -5387,6 +5428,7 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
         id: string;
         content: { [key: string]: any };
         status: PetitionFieldReplyStatus;
+        metadata: { [key: string]: any };
         createdAt: string;
         updatedAt: string;
       }>;
@@ -5394,7 +5436,11 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
     replies: Array<{
       alias: string | null;
       type: PetitionFieldType;
-      replies: Array<{ id: string; content: { [key: string]: any } }>;
+      replies: Array<{
+        id: string;
+        content: { [key: string]: any };
+        metadata: { [key: string]: any };
+      }>;
     }>;
     tags?: Array<{ id: string; name: string }>;
   };
@@ -5539,6 +5585,7 @@ export const PetitionFieldReplyFragmentDoc = gql`
     id
     content
     status
+    metadata
     createdAt
     updatedAt
   }
@@ -5584,6 +5631,7 @@ export const PetitionFragmentDoc = gql`
       replies {
         id
         content
+        metadata
       }
     }
     tags @include(if: $includeTags) {

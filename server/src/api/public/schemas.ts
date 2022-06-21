@@ -311,6 +311,11 @@ const _PetitionFieldReply = {
       enum: ["PENDING", "APPROVED", "REJECTED"],
       example: "PENDING",
     },
+    metadata: {
+      type: "object",
+      description:
+        "Only for fields of type `FILE_UPLOAD` and `ES_TAX_DOCUMENTS`. Contains extra information on the uploaded file",
+    },
     content: {
       anyOf: [
         {
@@ -475,7 +480,18 @@ const _Petition = {
       If parameter \`include\` contains \`replies\`, this will be a key-value object where each key is a field alias and the value is the submitted replies on the field.
       For FILE_UPLOAD and ES_TAX_DOCUMENTS fields, the value will contain the \`replyId\`, with which you can use the [/download](#operation/DownloadFileReply) endpoint to download the file.
       `,
-      example: { firstName: "Robert Baratheon" },
+      example: {
+        firstName: "Robert Baratheon",
+        certificateOfBirth: {
+          filename: "robert_baratheon_cob.pdf",
+          size: 10344,
+          contentType: "application/pdf",
+          extension: "pdf",
+          uploadComplete: true,
+          replyId: toGlobalId("PetitionFieldReply", 21),
+          metadata: { external_id: 123 },
+        },
+      },
     },
   },
 } as const;
