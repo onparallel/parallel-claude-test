@@ -30,7 +30,7 @@ import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { IMaskInput } from "react-imask";
 import { FormattedMessage, useIntl } from "react-intl";
 import fonts from "../../../utils/fonts.json";
@@ -116,6 +116,14 @@ export function DocumentThemeEditor({
   }
 
   const locales = useSupportedLocales();
+
+  const sortedFonts = useMemo(
+    () =>
+      fonts.sort(function (a, b) {
+        return a.family.localeCompare(b.family);
+      }),
+    [fonts]
+  );
 
   return (
     <Stack spacing={8}>
@@ -243,7 +251,7 @@ export function DocumentThemeEditor({
                 }}
                 isDisabled={isDisabled}
               >
-                {fonts.map(({ family }) => (
+                {sortedFonts.map(({ family }) => (
                   <option key={family} value={family}>
                     {family}
                   </option>
