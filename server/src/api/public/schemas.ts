@@ -839,6 +839,14 @@ export const SharePetition = schema({
   additionalProperties: false,
   required: [],
   properties: {
+    emails: {
+      description: "List with emails of the users you want to share the petition with",
+      type: "array",
+      items: {
+        type: "string",
+        example: "user@domain.com",
+      },
+    },
     userIds: {
       description: "IDs of the users you want to share the petition with",
       type: "array",

@@ -4559,6 +4559,12 @@ export type GetPermissions_permissionsQuery = {
     | null;
 };
 
+export type SharePetition_usersQueryVariables = Exact<{ [key: string]: never }>;
+
+export type SharePetition_usersQuery = {
+  me: { organization: { users: { items: Array<{ id: string; email: string }> } } };
+};
+
 export type SharePetition_addPetitionPermissionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   userIds?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
@@ -4634,6 +4640,14 @@ export type RemoveUserGroupPermission_removePetitionPermissionMutationVariables 
 
 export type RemoveUserGroupPermission_removePetitionPermissionMutation = {
   removePetitionPermission: Array<{ id: string } | { id: string } | null>;
+};
+
+export type TransferPetition_searchUserByEmailQueryVariables = Exact<{
+  search?: InputMaybe<Scalars["String"]>;
+}>;
+
+export type TransferPetition_searchUserByEmailQuery = {
+  me: { organization: { users: { items: Array<{ id: string; email: string }> } } };
 };
 
 export type TransferPetition_transferPetitionOwnershipMutationVariables = Exact<{
@@ -6055,6 +6069,20 @@ export const GetPermissions_permissionsDocument = gql`
   GetPermissions_permissionsQuery,
   GetPermissions_permissionsQueryVariables
 >;
+export const SharePetition_usersDocument = gql`
+  query SharePetition_users {
+    me {
+      organization {
+        users(limit: 1000, offset: 0) {
+          items {
+            id
+            email
+          }
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<SharePetition_usersQuery, SharePetition_usersQueryVariables>;
 export const SharePetition_addPetitionPermissionDocument = gql`
   mutation SharePetition_addPetitionPermission(
     $petitionId: GID!
@@ -6109,6 +6137,23 @@ export const RemoveUserGroupPermission_removePetitionPermissionDocument = gql`
 ` as unknown as DocumentNode<
   RemoveUserGroupPermission_removePetitionPermissionMutation,
   RemoveUserGroupPermission_removePetitionPermissionMutationVariables
+>;
+export const TransferPetition_searchUserByEmailDocument = gql`
+  query TransferPetition_searchUserByEmail($search: String) {
+    me {
+      organization {
+        users(limit: 1, offset: 0, search: $search) {
+          items {
+            id
+            email
+          }
+        }
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  TransferPetition_searchUserByEmailQuery,
+  TransferPetition_searchUserByEmailQueryVariables
 >;
 export const TransferPetition_transferPetitionOwnershipDocument = gql`
   mutation TransferPetition_transferPetitionOwnership($userId: GID!, $petitionId: GID!) {

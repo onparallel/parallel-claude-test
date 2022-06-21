@@ -3,8 +3,9 @@ import { ClientError, gql, GraphQLClient } from "graphql-request";
 import multer from "multer";
 import { outdent } from "outdent";
 import pMap from "p-map";
-import { isDefined, pick } from "remeda";
+import { isDefined, pick, uniq } from "remeda";
 import { callbackify } from "util";
+import { EMAIL_REGEX } from "../../graphql/helpers/validators/validEmail";
 import { toGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
 import { Body, FormDataBody, FormDataBodyContent, JsonBody, JsonBodyContent } from "../rest/body";
@@ -134,6 +135,7 @@ import {
   RemoveUserGroupPermission_removePetitionPermissionDocument,
   RemoveUserPermission_removePetitionPermissionDocument,
   SharePetition_addPetitionPermissionDocument,
+  SharePetition_usersDocument,
   StopSharing_removePetitionPermissionDocument,
   SubmitReplies_bulkCreatePetitionRepliesDocument,
   SubmitReply_createFileUploadReplyCompleteDocument,
@@ -142,6 +144,7 @@ import {
   SubmitReply_petitionDocument,
   TagFragmentDoc,
   TemplateFragment as TemplateFragmentType,
+  TransferPetition_searchUserByEmailDocument,
   TransferPetition_transferPetitionOwnershipDocument,
   UpdatePetitionField_updatePetitionFieldDocument,
   UpdatePetition_updatePetitionDocument,
@@ -1845,10 +1848,25 @@ api
       body: JsonBody(SharePetition),
       responses: {
         201: SuccessResponse(ListOfPermissions),
+        400: ErrorResponse({ description: "Invalid user input" }),
       },
       tags: ["Petition Sharing"],
     },
     async ({ client, params, body }) => {
+      const _usersQuery = gql`
+        query SharePetition_users {
+          me {
+            organization {
+              users(limit: 1000, offset: 0) {
+                items {
+                  id
+                  email
+                }
+              }
+            }
+          }
+        }
+      `;
       const _mutation = gql`
         mutation SharePetition_addPetitionPermission(
           $petitionId: GID!
@@ -1868,9 +1886,24 @@ api
         }
         ${PermissionFragment}
       `;
+      const userIds = body.userIds ?? [];
+      if (isDefined(body.emails)) {
+        if (!body.emails.every((email) => email.match(EMAIL_REGEX))) {
+          throw new BadRequestError("Some of the provided emails are invalid");
+        }
+
+        const usersResponse = await client.request(SharePetition_usersDocument);
+        const ids = usersResponse.me.organization.users.items
+          .filter((u) => body.emails!.includes(u.email))
+          .map((u) => u.id);
+        if (body.emails.length !== ids.length) {
+          throw new BadRequestError("Some of the provided emails are invalid");
+        }
+        userIds.push(...ids);
+      }
       const result = await client.request(SharePetition_addPetitionPermissionDocument, {
         petitionId: params.petitionId,
-        userIds: body.userIds,
+        userIds: userIds.length > 0 ? uniq(userIds) : undefined,
         userGroupIds: body.userGroupIds,
       });
 
@@ -1974,17 +2007,38 @@ api
       operationId: "TransferPetition",
       summary: "Transfer the petition",
       query: {
-        userId: idParam({ type: "User" }),
+        userId: idParam({ type: "User", required: false }),
+        email: stringParam({ required: false }),
       },
       description: outdent`
         Transfer the petition ownership to another user from your organization.
 
         Note that you will still have \`WRITE\` access to the petition.
+
+        You must specify in the query params either \`userId\` or \`email\` argument, but not both.
+        If the provided ID or email does not correspond with an active user in your organization, this method will return error.
     `,
-      responses: { 201: SuccessResponse(ListOfPermissions) },
+      responses: {
+        201: SuccessResponse(ListOfPermissions),
+        400: ErrorResponse({ description: "Bad user input" }),
+      },
       tags: ["Petition Sharing"],
     },
     async ({ client, params, query }) => {
+      const _usersQuery = gql`
+        query TransferPetition_searchUserByEmail($search: String) {
+          me {
+            organization {
+              users(limit: 1, offset: 0, search: $search) {
+                items {
+                  id
+                  email
+                }
+              }
+            }
+          }
+        }
+      `;
       const _mutation = gql`
         mutation TransferPetition_transferPetitionOwnership($userId: GID!, $petitionId: GID!) {
           transferPetitionOwnership(petitionIds: [$petitionId], userId: $userId) {
@@ -1995,9 +2049,35 @@ api
         }
         ${PermissionFragment}
       `;
+      if (
+        (!isDefined(query.userId) && !isDefined(query.email)) ||
+        (isDefined(query.userId) && isDefined(query.email))
+      ) {
+        throw new BadRequestError("Bad user input. You must specify an userId or an email");
+      }
+
+      if (isDefined(query.email) && !query.email.match(EMAIL_REGEX)) {
+        throw new BadRequestError("Invalid email");
+      }
+
+      let userId = query.userId;
+      if (isDefined(query.email)) {
+        const queryResponse = await client.request(TransferPetition_searchUserByEmailDocument, {
+          search: query.email,
+        });
+        const user = queryResponse.me.organization.users.items[0];
+        // email must fully match
+        if (user && user.email === query.email) {
+          userId = user.id;
+        }
+        if (!isDefined(userId)) {
+          throw new BadRequestError("User not found");
+        }
+      }
+
       const result = await client.request(TransferPetition_transferPetitionOwnershipDocument, {
         petitionId: params.petitionId,
-        userId: query.userId,
+        userId: userId!,
       });
 
       return Ok(result.transferPetitionOwnership[0].permissions);
