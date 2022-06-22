@@ -1,6 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
 import { Box, Center, Flex, Image, keyframes, Stack, useCounter } from "@chakra-ui/react";
-import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { Steps } from "@parallel/components/common/Steps";
 import { withApolloData } from "@parallel/components/common/withApolloData";
@@ -114,11 +113,9 @@ function Signup({ code, source, activationEmail }: SignupProps) {
       <Flex minHeight="100vh">
         <Flex direction="column" paddingX={{ base: 6, md: 20 }} flex="1">
           <Box paddingTop={5} marginLeft={-1}>
-            <NakedLink href="/">
-              <Box as="a">
-                <Logo width="152px" />
-              </Box>
-            </NakedLink>
+            <Box as="a" href="/">
+              <Logo width="152px" />
+            </Box>
           </Box>
           <Center
             flex="1"

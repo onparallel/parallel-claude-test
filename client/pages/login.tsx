@@ -8,7 +8,7 @@ import {
   PasswordChangeForm,
 } from "@parallel/components/auth/PasswordChangeForm";
 import { PasswordResetData, PasswordResetForm } from "@parallel/components/auth/PasswordResetForm";
-import { NakedLink, NormalLink } from "@parallel/components/common/Link";
+import { NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
@@ -185,13 +185,10 @@ function Login() {
       <Flex minHeight="100vh">
         <Flex direction="column" paddingX={{ base: 6, md: 20 }} flex="1">
           <Box paddingTop={5} marginLeft={-1}>
-            <NakedLink href="/">
-              <Box as="a">
-                <Logo width="152px" />
-              </Box>
-            </NakedLink>
+            <Box as="a" href="/">
+              <Logo width="152px" />
+            </Box>
           </Box>
-
           <Center
             flex="1"
             maxWidth="md"

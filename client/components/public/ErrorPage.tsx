@@ -1,7 +1,6 @@
 import { Box, Flex, Heading, Image } from "@chakra-ui/react";
 import { Logo } from "@parallel/components/common/Logo";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
-import NextLink from "next/link";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { Spacer } from "../common/Spacer";
@@ -18,11 +17,9 @@ export function ErrorPage({
   return (
     <Flex minHeight="100vh" flexDirection="column">
       <PublicContainer minHeight={20} display="flex" alignItems="center">
-        <NextLink href="/" passHref>
-          <Box as="a">
-            <Logo width="152px" />
-          </Box>
-        </NextLink>
+        <Box as="a" href="/">
+          <Logo width="152px" />
+        </Box>
       </PublicContainer>
       <PublicContainer display="flex" wrapper={{ flex: 1 }}>
         <Flex flex="1" justifyContent="center" flexDirection="column">

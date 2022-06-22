@@ -2,7 +2,7 @@ import { gql, useQuery } from "@apollo/client";
 import { Box, Center, Divider, Flex, Heading, Image, Stack, Text } from "@chakra-ui/react";
 import { CheckIcon, LinkedInSimpleIcon, TwitterIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
-import { Link, NakedLink, NormalLink } from "@parallel/components/common/Link";
+import { Link, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { Thanks_petitionLogoDocument } from "@parallel/graphql/__types";
@@ -77,11 +77,9 @@ function ThanksFooter() {
       <Text align="center" marginTop={5}>
         <FormattedMessage id="footer.slogan" defaultMessage="Work better with" />
       </Text>
-      <NakedLink href="/">
-        <Box as="a">
-          <Logo width="120px" marginTop={1} />
-        </Box>
-      </NakedLink>
+      <Box as="a" href="/">
+        <Logo width="120px" marginTop={1} />
+      </Box>
       <Stack direction="row" marginTop={2}>
         <NormalLink
           href="https://www.linkedin.com/company/onparallel"
