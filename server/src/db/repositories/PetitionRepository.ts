@@ -1812,14 +1812,15 @@ export class PetitionRepository extends BaseRepository {
             sourcePetition?.is_template &&
             sourcePetition.template_public &&
             sourcePetition.signature_config &&
-            sourcePetition.org_id !== owner.org_id &&
-            defaultSignatureOrgIntegration
-              ? {
-                  ...sourcePetition.signature_config,
-                  signersInfo: [],
-                  allowAdditionalSigners: true,
-                  orgIntegrationId: defaultSignatureOrgIntegration.id,
-                }
+            sourcePetition.org_id !== owner.org_id
+              ? defaultSignatureOrgIntegration
+                ? {
+                    ...sourcePetition.signature_config,
+                    signersInfo: [],
+                    allowAdditionalSigners: true,
+                    orgIntegrationId: defaultSignatureOrgIntegration.id,
+                  }
+                : null // if new owner does not have a default signature integration, remove the signature config on the cloned petition
               : sourcePetition?.signature_config,
           ...data,
         },

@@ -282,12 +282,22 @@ export class SignatureService implements ISignatureService {
     if (orgIntegrationId === undefined) {
       throw new Error(`undefined orgIntegrationId on signature_config. Petition:${petitionId}`);
     }
+    const petition = await this.petitionsRepository.loadPetition(petitionId);
+    if (!petition) {
+      throw new Error(`Petition:${petitionId} not found`);
+    }
+
     const integration = await this.integrationRepository.loadIntegration(orgIntegrationId);
     if (!integration || integration.type !== "SIGNATURE") {
       throw new Error(
         `Couldn't find an enabled signature integration for OrgIntegration:${orgIntegrationId}`
       );
     }
+
+    if (petition.org_id !== integration.org_id) {
+      throw new Error(`Invalid OrgIntegration:${integration.id} on Petition:${petitionId}`);
+    }
+
     const settings = integration.settings as IntegrationSettings<"SIGNATURE">;
     if (settings.API_KEY === this.config.signature.signaturitSharedProductionApiKey) {
       const sharedKeyUsage = await this.organizationsRepository.getOrganizationCurrentUsageLimit(
