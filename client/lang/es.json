@@ -3886,7 +3886,7 @@
   },
   {
     "term": "component.signature-tokens-table.default-description",
-    "definition": "El token predeterminado és el que aparecerá seleccionado por defecto al activar la firma.",
+    "definition": "El token predeterminado es el que aparecerá seleccionado por defecto al activar la firma.",
     "context": "The default token is the one that will be selected by default when the signature is activated."
   },
   {
