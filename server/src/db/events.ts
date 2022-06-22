@@ -53,6 +53,7 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   COMMENT_PUBLISHED: {
     petition_field_id: number;
     petition_field_comment_id: number;
+    is_internal?: boolean;
   };
   COMMENT_DELETED: {
     petition_field_id: number;

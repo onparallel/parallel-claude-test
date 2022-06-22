@@ -6,6 +6,7 @@ import { TimelineCommentDeletedEvent_CommentDeletedEventFragment } from "@parall
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { PetitionFieldReference } from "../PetitionFieldReference";
+import { UserOrContactReference } from "../UserOrContactReference";
 import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
@@ -16,28 +17,36 @@ export type TimelineCommentDeletedEventProps = {
 
 export function TimelineCommentDeletedEvent({
   userId,
-  event: { deletedBy, field, createdAt },
+  event: { deletedBy, field, createdAt, isInternal },
 }: TimelineCommentDeletedEventProps) {
   return (
     <TimelineItem
       icon={<TimelineIcon icon={<CommentXIcon />} color="gray.700" backgroundColor="gray.200" />}
       paddingY={2}
     >
-      <FormattedMessage
-        id="timeline.comment-deleted"
-        defaultMessage="{userIsYou, select, true {You} other {{someone}}} deleted a comment on field {field} {timeAgo}"
-        values={{
-          userIsYou: deletedBy?.__typename === "User" && deletedBy?.id === userId,
-          someone:
-            deletedBy?.__typename === "PetitionAccess" ? (
-              <ContactReference contact={deletedBy.contact} />
-            ) : deletedBy?.__typename === "User" ? (
-              <UserReference user={deletedBy} />
-            ) : null,
-          field: <PetitionFieldReference field={field} />,
-          timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
-        }}
-      />
+      {isInternal ? (
+        <FormattedMessage
+          id="timeline.note-deleted"
+          defaultMessage="{userIsYou, select, true {You} other {{someone}}} deleted a note on field {field} {timeAgo}"
+          values={{
+            userIsYou: deletedBy?.__typename === "User" && deletedBy?.id === userId,
+            someone: <UserOrContactReference userOrAccess={deletedBy} />,
+            field: <PetitionFieldReference field={field} />,
+            timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
+          }}
+        />
+      ) : (
+        <FormattedMessage
+          id="timeline.comment-deleted"
+          defaultMessage="{userIsYou, select, true {You} other {{someone}}} deleted a comment on field {field} {timeAgo}"
+          values={{
+            userIsYou: deletedBy?.__typename === "User" && deletedBy?.id === userId,
+            someone: <UserOrContactReference userOrAccess={deletedBy} />,
+            field: <PetitionFieldReference field={field} />,
+            timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
+          }}
+        />
+      )}
     </TimelineItem>
   );
 }
@@ -49,18 +58,13 @@ TimelineCommentDeletedEvent.fragments = {
         ...PetitionFieldReference_PetitionField
       }
       deletedBy {
-        ... on User {
-          ...UserReference_User
-        }
-        ... on PetitionAccess {
-          contact {
-            ...ContactReference_Contact
-          }
-        }
+        ...UserOrContactReference_UserOrPetitionAccess
       }
+      isInternal
       createdAt
     }
     ${PetitionFieldReference.fragments.PetitionField}
+    ${UserOrContactReference.fragments.UserOrPetitionAccess}
     ${UserReference.fragments.User}
     ${ContactReference.fragments.Contact}
   `,

@@ -8540,6 +8540,16 @@
     "context": "See message"
   },
   {
+    "term": "timeline.note-deleted",
+    "definition": "{userIsYou, select, true {Eliminaste} other {{someone} eliminó}} una nota en el campo {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{someone}}} deleted a note on field {field} {timeAgo}"
+  },
+  {
+    "term": "timeline.note-published-deleted",
+    "definition": "Alguien escribió una nota (ahora eliminada) en el campo {field} {timeAgo}",
+    "context": "Someone wrote a (now deleted) note on field {field} {timeAgo}"
+  },
+  {
     "term": "timeline.note-published-description",
     "definition": "{userIsYou, select, true {Añadiste} other {{author} ha añadido}} una nota en el campo {field} {timeAgo}",
     "context": "{userIsYou, select, true {You have} other {{author} has}} added a note in the field {field} {timeAgo}"

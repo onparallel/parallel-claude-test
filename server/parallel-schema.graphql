@@ -114,6 +114,7 @@ type CommentDeletedEvent implements PetitionEvent {
   deletedBy: UserOrPetitionAccess
   field: PetitionField
   id: GID!
+  isInternal: Boolean!
   petition: Petition
   type: PetitionEventType!
 }
@@ -124,6 +125,7 @@ type CommentPublishedEvent implements PetitionEvent {
   data: JSONObject!
   field: PetitionField
   id: GID!
+  isInternal: Boolean!
   petition: Petition
   type: PetitionEventType!
 }

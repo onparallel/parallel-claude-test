@@ -2758,6 +2758,7 @@ export class PetitionRepository extends BaseRepository {
           data: {
             petition_field_id: comment.petition_field_id,
             petition_field_comment_id: comment.id,
+            is_internal: comment.is_internal,
           },
         },
         t
@@ -2810,18 +2811,20 @@ export class PetitionRepository extends BaseRepository {
     petitionFieldCommentId: number,
     user: User
   ) {
-    await Promise.all([
-      this.deletePetitionFieldComment(petitionFieldCommentId, `User:${user.id}`),
-      this.createEvent({
-        type: "COMMENT_DELETED",
-        petition_id: petitionId,
-        data: {
-          petition_field_id: petitionFieldId,
-          petition_field_comment_id: petitionFieldCommentId,
-          user_id: user.id,
-        },
-      }),
-    ]);
+    const comment = await this.deletePetitionFieldComment(
+      petitionFieldCommentId,
+      `User:${user.id}`
+    );
+    await this.createEvent({
+      type: "COMMENT_DELETED",
+      petition_id: petitionId,
+      data: {
+        petition_field_id: petitionFieldId,
+        petition_field_comment_id: petitionFieldCommentId,
+        user_id: user.id,
+        is_internal: comment.is_internal,
+      },
+    });
   }
 
   async deletePetitionFieldCommentFromAccess(
@@ -2868,6 +2871,8 @@ export class PetitionRepository extends BaseRepository {
         .whereRaw("data ->> 'petition_field_comment_id' = ?", comment.id)
         .delete(),
     ]);
+
+    return comment;
   }
 
   async updatePetitionFieldCommentFromUser(

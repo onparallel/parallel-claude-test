@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import { Circle, Text } from "@chakra-ui/react";
 import { CommentIcon, NoteIcon } from "@parallel/chakra/icons";
 import { ContactReference } from "@parallel/components/common/ContactReference";
+import { UserOrContactReference } from "@parallel/components/petition-activity/UserOrContactReference";
 import { UserReference } from "@parallel/components/petition-activity/UserReference";
 import { CommentCreatedUserNotification_CommentCreatedUserNotificationFragment } from "@parallel/graphql/__types";
 import { forwardRef } from "react";
@@ -17,12 +18,6 @@ export const CommentCreatedUserNotification = Object.assign(
   forwardRef<HTMLElement, CommentCreatedUserNotificationProps>(
     function CommentCreatedUserNotification({ isFirst, notification }, ref) {
       const { author, isInternal: isNote } = notification.comment;
-      const name =
-        author?.__typename === "PetitionAccess" ? (
-          <ContactReference draggable="false" tabIndex={-1} contact={author.contact} />
-        ) : (
-          <UserReference user={author as any} />
-        );
       const field = notification.field.title ? (
         <Text as="span">
           {'"'}
@@ -50,13 +45,13 @@ export const CommentCreatedUserNotification = Object.assign(
             <FormattedMessage
               id="component.notification-internal-comment.body"
               defaultMessage="{name} has added a note in the field {field}."
-              values={{ name, field }}
+              values={{ name: <UserOrContactReference userOrAccess={author} />, field }}
             />
           ) : (
             <FormattedMessage
               id="component.notification-comment.body"
               defaultMessage="{name} has written a comment in the field {field}."
-              values={{ name, field }}
+              values={{ name: <UserOrContactReference userOrAccess={author} />, field }}
             />
           )}
         </PetitionUserNotification>
@@ -76,18 +71,12 @@ export const CommentCreatedUserNotification = Object.assign(
             id
             isInternal
             author {
-              ... on User {
-                ...UserReference_User
-              }
-              ... on PetitionAccess {
-                contact {
-                  ...ContactReference_Contact
-                }
-              }
+              ...UserOrContactReference_UserOrPetitionAccess
             }
           }
         }
         ${PetitionUserNotification.fragments.PetitionUserNotification}
+        ${UserOrContactReference.fragments.UserOrPetitionAccess}
         ${UserReference.fragments.User}
         ${ContactReference.fragments.Contact}
       `,

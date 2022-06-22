@@ -780,6 +780,7 @@ export interface NexusGenFieldTypes {
     deletedBy: NexusGenRootTypes["UserOrPetitionAccess"] | null; // UserOrPetitionAccess
     field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
     id: NexusGenScalars["GID"]; // GID!
+    isInternal: boolean; // Boolean!
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
@@ -790,6 +791,7 @@ export interface NexusGenFieldTypes {
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
     id: NexusGenScalars["GID"]; // GID!
+    isInternal: boolean; // Boolean!
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
   };
@@ -2292,6 +2294,7 @@ export interface NexusGenFieldTypeNames {
     deletedBy: "UserOrPetitionAccess";
     field: "PetitionField";
     id: "GID";
+    isInternal: "Boolean";
     petition: "Petition";
     type: "PetitionEventType";
   };
@@ -2302,6 +2305,7 @@ export interface NexusGenFieldTypeNames {
     data: "JSONObject";
     field: "PetitionField";
     id: "GID";
+    isInternal: "Boolean";
     petition: "Petition";
     type: "PetitionEventType";
   };

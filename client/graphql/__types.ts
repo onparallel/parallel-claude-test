@@ -133,6 +133,7 @@ export interface CommentDeletedEvent extends PetitionEvent {
   deletedBy?: Maybe<UserOrPetitionAccess>;
   field?: Maybe<PetitionField>;
   id: Scalars["GID"];
+  isInternal: Scalars["Boolean"];
   petition?: Maybe<Petition>;
   type: PetitionEventType;
 }
@@ -144,6 +145,7 @@ export interface CommentPublishedEvent extends PetitionEvent {
   data: Scalars["JSONObject"];
   field?: Maybe<PetitionField>;
   id: Scalars["GID"];
+  isInternal: Scalars["Boolean"];
   petition?: Maybe<Petition>;
   type: PetitionEventType;
 }
@@ -5576,6 +5578,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
       | {
           __typename?: "CommentDeletedEvent";
           id: string;
+          isInternal: boolean;
           createdAt: string;
           field?: { __typename?: "PetitionField"; title?: string | null } | null;
           deletedBy?:
@@ -5594,6 +5597,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
       | {
           __typename?: "CommentPublishedEvent";
           id: string;
+          isInternal: boolean;
           createdAt: string;
           field?: { __typename?: "PetitionField"; title?: string | null } | null;
           comment?: {
@@ -5601,7 +5605,6 @@ export type PetitionActivityTimeline_PetitionFragment = {
             isEdited: boolean;
             content: string;
             isAnonymized: boolean;
-            isInternal: boolean;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -6162,6 +6165,7 @@ export type PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment = 
 export type PetitionActivityTimeline_PetitionEvent_CommentDeletedEvent_Fragment = {
   __typename?: "CommentDeletedEvent";
   id: string;
+  isInternal: boolean;
   createdAt: string;
   field?: { __typename?: "PetitionField"; title?: string | null } | null;
   deletedBy?:
@@ -6176,6 +6180,7 @@ export type PetitionActivityTimeline_PetitionEvent_CommentDeletedEvent_Fragment 
 export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragment = {
   __typename?: "CommentPublishedEvent";
   id: string;
+  isInternal: boolean;
   createdAt: string;
   field?: { __typename?: "PetitionField"; title?: string | null } | null;
   comment?: {
@@ -6183,7 +6188,6 @@ export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragmen
     isEdited: boolean;
     content: string;
     isAnonymized: boolean;
-    isInternal: boolean;
     author?:
       | {
           __typename?: "PetitionAccess";
@@ -6802,6 +6806,7 @@ export type TimelineAccessOpenedEvent_AccessOpenedEventFragment = {
 
 export type TimelineCommentDeletedEvent_CommentDeletedEventFragment = {
   __typename?: "CommentDeletedEvent";
+  isInternal: boolean;
   createdAt: string;
   field?: { __typename?: "PetitionField"; title?: string | null } | null;
   deletedBy?:
@@ -6815,6 +6820,7 @@ export type TimelineCommentDeletedEvent_CommentDeletedEventFragment = {
 
 export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
   __typename?: "CommentPublishedEvent";
+  isInternal: boolean;
   createdAt: string;
   field?: { __typename?: "PetitionField"; title?: string | null } | null;
   comment?: {
@@ -6822,7 +6828,6 @@ export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
     isEdited: boolean;
     content: string;
     isAnonymized: boolean;
-    isInternal: boolean;
     author?:
       | {
           __typename?: "PetitionAccess";
@@ -13012,6 +13017,7 @@ export type PetitionActivity_PetitionFragment = {
       | {
           __typename?: "CommentDeletedEvent";
           id: string;
+          isInternal: boolean;
           createdAt: string;
           field?: { __typename?: "PetitionField"; title?: string | null } | null;
           deletedBy?:
@@ -13030,6 +13036,7 @@ export type PetitionActivity_PetitionFragment = {
       | {
           __typename?: "CommentPublishedEvent";
           id: string;
+          isInternal: boolean;
           createdAt: string;
           field?: { __typename?: "PetitionField"; title?: string | null } | null;
           comment?: {
@@ -13037,7 +13044,6 @@ export type PetitionActivity_PetitionFragment = {
             isEdited: boolean;
             content: string;
             isAnonymized: boolean;
-            isInternal: boolean;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -13796,6 +13802,7 @@ export type PetitionActivity_updatePetitionMutation = {
             | {
                 __typename?: "CommentDeletedEvent";
                 id: string;
+                isInternal: boolean;
                 createdAt: string;
                 field?: { __typename?: "PetitionField"; title?: string | null } | null;
                 deletedBy?:
@@ -13819,6 +13826,7 @@ export type PetitionActivity_updatePetitionMutation = {
             | {
                 __typename?: "CommentPublishedEvent";
                 id: string;
+                isInternal: boolean;
                 createdAt: string;
                 field?: { __typename?: "PetitionField"; title?: string | null } | null;
                 comment?: {
@@ -13826,7 +13834,6 @@ export type PetitionActivity_updatePetitionMutation = {
                   isEdited: boolean;
                   content: string;
                   isAnonymized: boolean;
-                  isInternal: boolean;
                   author?:
                     | {
                         __typename?: "PetitionAccess";
@@ -14644,6 +14651,7 @@ export type PetitionActivity_petitionQuery = {
             | {
                 __typename?: "CommentDeletedEvent";
                 id: string;
+                isInternal: boolean;
                 createdAt: string;
                 field?: { __typename?: "PetitionField"; title?: string | null } | null;
                 deletedBy?:
@@ -14667,6 +14675,7 @@ export type PetitionActivity_petitionQuery = {
             | {
                 __typename?: "CommentPublishedEvent";
                 id: string;
+                isInternal: boolean;
                 createdAt: string;
                 field?: { __typename?: "PetitionField"; title?: string | null } | null;
                 comment?: {
@@ -14674,7 +14683,6 @@ export type PetitionActivity_petitionQuery = {
                   isEdited: boolean;
                   content: string;
                   isAnonymized: boolean;
-                  isInternal: boolean;
                   author?:
                     | {
                         __typename?: "PetitionAccess";
@@ -21680,6 +21688,20 @@ export const ContactReference_ContactFragmentDoc = gql`
     email
   }
 ` as unknown as DocumentNode<ContactReference_ContactFragment, unknown>;
+export const UserOrContactReference_UserOrPetitionAccessFragmentDoc = gql`
+  fragment UserOrContactReference_UserOrPetitionAccess on UserOrPetitionAccess {
+    ... on User {
+      ...UserReference_User
+    }
+    ... on PetitionAccess {
+      contact {
+        ...ContactReference_Contact
+      }
+    }
+  }
+  ${UserReference_UserFragmentDoc}
+  ${ContactReference_ContactFragmentDoc}
+` as unknown as DocumentNode<UserOrContactReference_UserOrPetitionAccessFragment, unknown>;
 export const CommentCreatedUserNotification_CommentCreatedUserNotificationFragmentDoc = gql`
   fragment CommentCreatedUserNotification_CommentCreatedUserNotification on CommentCreatedUserNotification {
     ...PetitionUserNotification_PetitionUserNotification
@@ -21691,20 +21713,12 @@ export const CommentCreatedUserNotification_CommentCreatedUserNotificationFragme
       id
       isInternal
       author {
-        ... on User {
-          ...UserReference_User
-        }
-        ... on PetitionAccess {
-          contact {
-            ...ContactReference_Contact
-          }
-        }
+        ...UserOrContactReference_UserOrPetitionAccess
       }
     }
   }
   ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
-  ${UserReference_UserFragmentDoc}
-  ${ContactReference_ContactFragmentDoc}
+  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<
   CommentCreatedUserNotification_CommentCreatedUserNotificationFragment,
   unknown
@@ -21741,20 +21755,6 @@ export const ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotifi
     ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotificationFragment,
     unknown
   >;
-export const UserOrContactReference_UserOrPetitionAccessFragmentDoc = gql`
-  fragment UserOrContactReference_UserOrPetitionAccess on UserOrPetitionAccess {
-    ... on User {
-      ...UserReference_User
-    }
-    ... on PetitionAccess {
-      contact {
-        ...ContactReference_Contact
-      }
-    }
-  }
-  ${UserReference_UserFragmentDoc}
-  ${ContactReference_ContactFragmentDoc}
-` as unknown as DocumentNode<UserOrContactReference_UserOrPetitionAccessFragment, unknown>;
 export const PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragmentDoc = gql`
   fragment PetitionCompletedUserNotification_PetitionCompletedUserNotification on PetitionCompletedUserNotification {
     ...PetitionUserNotification_PetitionUserNotification
@@ -23008,25 +23008,17 @@ export const TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc = gq
     }
     comment {
       author {
-        ... on User {
-          ...UserReference_User
-        }
-        ... on PetitionAccess {
-          contact {
-            ...ContactReference_Contact
-          }
-        }
+        ...UserOrContactReference_UserOrPetitionAccess
       }
       isEdited
       content
       isAnonymized
-      isInternal
     }
+    isInternal
     createdAt
   }
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
-  ${UserReference_UserFragmentDoc}
-  ${ContactReference_ContactFragmentDoc}
+  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<TimelineCommentPublishedEvent_CommentPublishedEventFragment, unknown>;
 export const TimelineCommentDeletedEvent_CommentDeletedEventFragmentDoc = gql`
   fragment TimelineCommentDeletedEvent_CommentDeletedEvent on CommentDeletedEvent {
@@ -23034,20 +23026,13 @@ export const TimelineCommentDeletedEvent_CommentDeletedEventFragmentDoc = gql`
       ...PetitionFieldReference_PetitionField
     }
     deletedBy {
-      ... on User {
-        ...UserReference_User
-      }
-      ... on PetitionAccess {
-        contact {
-          ...ContactReference_Contact
-        }
-      }
+      ...UserOrContactReference_UserOrPetitionAccess
     }
+    isInternal
     createdAt
   }
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
-  ${UserReference_UserFragmentDoc}
-  ${ContactReference_ContactFragmentDoc}
+  ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
 ` as unknown as DocumentNode<TimelineCommentDeletedEvent_CommentDeletedEventFragment, unknown>;
 export const TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragmentDoc = gql`
   fragment TimelineUserPermissionAddedEvent_UserPermissionAddedEvent on UserPermissionAddedEvent {

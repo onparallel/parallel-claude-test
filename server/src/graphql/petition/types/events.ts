@@ -304,6 +304,9 @@ export const CommentPublishedEvent = createPetitionEvent("CommentPublishedEvent"
       return await ctx.petitions.loadPetitionFieldComment(root.data.petition_field_comment_id);
     },
   });
+  t.boolean("isInternal", {
+    resolve: (root) => root.data.is_internal ?? false,
+  });
 });
 
 export const CommentDeletedEvent = createPetitionEvent("CommentDeletedEvent", (t) => {
@@ -316,6 +319,9 @@ export const CommentDeletedEvent = createPetitionEvent("CommentDeletedEvent", (t
   t.nullable.field("deletedBy", {
     type: "UserOrPetitionAccess",
     resolve: userOrPetitionAccessResolver,
+  });
+  t.boolean("isInternal", {
+    resolve: (root) => root.data.is_internal ?? false,
   });
 });
 

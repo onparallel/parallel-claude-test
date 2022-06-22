@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { Box, Text, useTheme } from "@chakra-ui/react";
-import { CommentIcon } from "@parallel/chakra/icons";
+import { CommentIcon, NoteIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -9,6 +9,7 @@ import { TimelineCommentPublishedEvent_CommentPublishedEventFragment } from "@pa
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { PetitionFieldReference } from "../PetitionFieldReference";
+import { UserOrContactReference } from "../UserOrContactReference";
 import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
@@ -19,7 +20,7 @@ export type TimelineCommentPublishedEventProps = {
 
 export function TimelineCommentPublishedEvent({
   userId,
-  event: { comment, field, createdAt },
+  event: { comment, field, createdAt, isInternal },
 }: TimelineCommentPublishedEventProps) {
   const { colors } = useTheme();
   const values = {
@@ -27,7 +28,7 @@ export function TimelineCommentPublishedEvent({
     timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
   };
   if (comment) {
-    const { author, content, isEdited, isInternal } = comment;
+    const { author, content, isEdited } = comment;
     return (
       <Box
         background={`${colors.transparent} linear-gradient(${colors.gray[300]}, ${colors.gray[300]}) no-repeat 17px / 2px 100%`}
@@ -44,12 +45,7 @@ export function TimelineCommentPublishedEvent({
                 values={{
                   ...values,
                   userIsYou: author?.__typename === "User" && author?.id === userId,
-                  author:
-                    author?.__typename === "PetitionAccess" ? (
-                      <ContactReference contact={author.contact} />
-                    ) : (
-                      <UserReference user={author as any} />
-                    ),
+                  author: <UserOrContactReference userOrAccess={author} />,
                 }}
               />
             ) : (
@@ -59,12 +55,7 @@ export function TimelineCommentPublishedEvent({
                 values={{
                   ...values,
                   userIsYou: author?.__typename === "User" && author?.id === userId,
-                  author:
-                    author?.__typename === "PetitionAccess" ? (
-                      <ContactReference contact={author.contact} />
-                    ) : (
-                      <UserReference user={author as any} />
-                    ),
+                  author: <UserOrContactReference userOrAccess={author} />,
                 }}
               />
             )}
@@ -92,16 +83,32 @@ export function TimelineCommentPublishedEvent({
   } else {
     return (
       <TimelineItem
-        icon={<TimelineIcon icon={<CommentIcon />} color="black" backgroundColor="gray.200" />}
+        icon={
+          <TimelineIcon
+            icon={isInternal ? <NoteIcon /> : <CommentIcon />}
+            color="black"
+            backgroundColor="gray.200"
+          />
+        }
         paddingY={2}
       >
-        <FormattedMessage
-          id="timeline.comment-published-deleted"
-          defaultMessage="Someone wrote a (now deleted) comment on field {field} {timeAgo}"
-          values={{
-            ...values,
-          }}
-        />
+        {isInternal ? (
+          <FormattedMessage
+            id="timeline.note-published-deleted"
+            defaultMessage="Someone wrote a (now deleted) note on field {field} {timeAgo}"
+            values={{
+              ...values,
+            }}
+          />
+        ) : (
+          <FormattedMessage
+            id="timeline.comment-published-deleted"
+            defaultMessage="Someone wrote a (now deleted) comment on field {field} {timeAgo}"
+            values={{
+              ...values,
+            }}
+          />
+        )}
       </TimelineItem>
     );
   }
@@ -115,23 +122,17 @@ TimelineCommentPublishedEvent.fragments = {
       }
       comment {
         author {
-          ... on User {
-            ...UserReference_User
-          }
-          ... on PetitionAccess {
-            contact {
-              ...ContactReference_Contact
-            }
-          }
+          ...UserOrContactReference_UserOrPetitionAccess
         }
         isEdited
         content
         isAnonymized
-        isInternal
       }
+      isInternal
       createdAt
     }
     ${PetitionFieldReference.fragments.PetitionField}
+    ${UserOrContactReference.fragments.UserOrPetitionAccess}
     ${UserReference.fragments.User}
     ${ContactReference.fragments.Contact}
   `,

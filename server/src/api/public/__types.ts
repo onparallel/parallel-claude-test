@@ -121,6 +121,7 @@ export type CommentDeletedEvent = PetitionEvent & {
   deletedBy: Maybe<UserOrPetitionAccess>;
   field: Maybe<PetitionField>;
   id: Scalars["GID"];
+  isInternal: Scalars["Boolean"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
 };
@@ -131,6 +132,7 @@ export type CommentPublishedEvent = PetitionEvent & {
   data: Scalars["JSONObject"];
   field: Maybe<PetitionField>;
   id: Scalars["GID"];
+  isInternal: Scalars["Boolean"];
   petition: Maybe<Petition>;
   type: PetitionEventType;
 };
