@@ -9,7 +9,7 @@ tar -zxpf ${BUILD_ID}.tar.gz
 ln -s ${BUILD_ID} main
 
 sed -i "s/#ENV#/${ENV}/g" workers.sh main/ops/prod/systemd/parallel-client.service main/ops/prod/systemd/parallel-server.service
-sudo sed -i "s/#COMMIT_SHA#/${COMMIT_SHA}/g" main/ops/prod/nginx/nginx.common.conf
+sudo sed -i "s/#COMMIT_SHA#/${COMMIT_SHA}/g" main/ops/prod/nginx/helpers/common.conf
 sudo cp main/ops/prod/systemd/* /lib/systemd/system
 sudo cp main/ops/prod/nginx/* /etc/nginx/
 
