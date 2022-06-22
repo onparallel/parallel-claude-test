@@ -316,7 +316,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                                     <Text
                                       display="initial"
                                       textDecoration="underline"
-                                      color="purple.600"
+                                      color="primary.600"
                                       cursor="pointer"
                                     >
                                       {chunks}
@@ -462,7 +462,7 @@ function ReviewBeforeSignDialog({
         </>
       }
       confirm={
-        <Button colorScheme="purple" onClick={() => props.onResolve()}>
+        <Button colorScheme="primary" onClick={() => props.onResolve()}>
           <FormattedMessage id="generic.accept" defaultMessage="Accept" />
         </Button>
       }

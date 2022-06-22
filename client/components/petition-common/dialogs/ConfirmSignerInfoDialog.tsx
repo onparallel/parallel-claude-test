@@ -127,7 +127,7 @@ function ConfirmSignerInfoDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="purple" type="submit">
+        <Button colorScheme="primary" type="submit">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }

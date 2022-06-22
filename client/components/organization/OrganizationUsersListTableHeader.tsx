@@ -47,7 +47,7 @@ export function OrganizationUsersListTableHeader({
         {hasSsoProvider ? null : (
           <Button
             isDisabled={isCreateUserButtonDisabled}
-            colorScheme="purple"
+            colorScheme="primary"
             leftIcon={<UserPlusIcon fontSize="18px" />}
             onClick={onCreateUser}
           >

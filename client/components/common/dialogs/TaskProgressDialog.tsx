@@ -111,7 +111,7 @@ export function TaskProgressDialog({
       confirm={
         <Button
           ref={confirmRef}
-          colorScheme="purple"
+          colorScheme="primary"
           isDisabled={task?.status !== "COMPLETED"}
           onClick={() => props.onResolve(task!)}
         >

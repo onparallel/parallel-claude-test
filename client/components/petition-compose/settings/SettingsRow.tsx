@@ -34,7 +34,7 @@ export function SettingsRow({
         minHeight={8}
       >
         <Stack direction="row" alignItems="center">
-          {icon ? <Center color={isActive ? "purple.600" : undefined}>{icon}</Center> : null}
+          {icon ? <Center color={isActive ? "primary.600" : undefined}>{icon}</Center> : null}
           <Text as="span" whiteSpace="break-spaces">
             {label}
           </Text>

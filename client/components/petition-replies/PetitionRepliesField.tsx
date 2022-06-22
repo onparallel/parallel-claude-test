@@ -409,7 +409,7 @@ const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(function 
     "aria-pressed": isActive,
     size: "sm",
     variant: isActive ? "solid" : "ghost",
-    colorScheme: isActive ? "purple" : "gray",
+    colorScheme: isActive ? "primary" : "gray",
     padding: 2,
     ...props,
   } as const;

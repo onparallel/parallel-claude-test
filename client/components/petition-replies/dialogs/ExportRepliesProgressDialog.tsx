@@ -175,7 +175,7 @@ export function ExportRepliesProgressDialog({
                 thickness="4px"
                 speed="0.65s"
                 emptyColor="gray.200"
-                color="purple.500"
+                color="primary.500"
                 size="xl"
               />
             </Center>
@@ -202,7 +202,7 @@ export function ExportRepliesProgressDialog({
                   defaultMessage="Your files have been exported successfully."
                 />
               </Text>
-              <Button colorScheme="purple" onClick={() => props.onResolve()}>
+              <Button colorScheme="primary" onClick={() => props.onResolve()}>
                 <FormattedMessage id="generic.continue" defaultMessage="Continue" />
               </Button>
             </Stack>

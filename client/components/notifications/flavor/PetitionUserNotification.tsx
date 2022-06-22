@@ -65,7 +65,7 @@ export const PetitionUserNotification = Object.assign(
         data-notification-id={notification.id}
         ref={ref as any}
         direction="row"
-        background={isRead ? "white" : "purple.50"}
+        background={isRead ? "white" : "primary.50"}
         spacing={0}
         paddingY={2}
         _hover={{
@@ -76,7 +76,7 @@ export const PetitionUserNotification = Object.assign(
         borderColor="gray.200"
       >
         <Flex minWidth={16} paddingLeft={4} alignItems="center" justifyContent="flex-end">
-          {isRead ? null : <Circle size={2} backgroundColor="purple.400" marginRight={1} />}
+          {isRead ? null : <Circle size={2} backgroundColor="primary.400" marginRight={1} />}
           {icon}
         </Flex>
         <Stack flex="1 1 auto" minWidth="0" spacing={0} ref={bodyRef}>

@@ -284,7 +284,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
             <ResponsiveButtonIcon
               data-action="preview-next"
               id="petition-next"
-              colorScheme="purple"
+              colorScheme="primary"
               icon={<PaperPlaneIcon fontSize="18px" />}
               isDisabled={petition.isAnonymized}
               label={intl.formatMessage({
@@ -314,7 +314,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         }
       >
         <Flex
-          backgroundColor={isPetition ? "gray.50" : "purple.50"}
+          backgroundColor={isPetition ? "gray.50" : "primary.50"}
           minHeight="100%"
           flexDirection="column"
           alignItems="center"

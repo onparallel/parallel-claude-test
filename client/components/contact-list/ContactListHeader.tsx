@@ -73,7 +73,7 @@ export function ContactListHeader({
         breakpoint="lg"
         icon={<UserPlusIcon />}
         hideIconOnDesktop
-        colorScheme="purple"
+        colorScheme="primary"
         onClick={onCreateClick}
         label={intl.formatMessage({
           id: "component.contact-list-header.create-contact-button",

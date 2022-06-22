@@ -169,7 +169,7 @@ function RecipientViewConfirmPetitionSignersDialog({
                   {signers.length === 0 || allowAdditionalSigners ? (
                     <Box marginTop={2}>
                       <Button variant="outline" paddingX={3} onClick={handleAddNewSigner(onChange)}>
-                        <PlusCircleFilledIcon color="purple.500" fontSize="xl" marginRight={2} />
+                        <PlusCircleFilledIcon color="primary.500" fontSize="xl" marginRight={2} />
                         <FormattedMessage
                           id="component.recipient-view.confirm-petition-signers-dialog.add-signer.button"
                           defaultMessage="Add signers"
@@ -189,7 +189,7 @@ function RecipientViewConfirmPetitionSignersDialog({
             <FormControl isInvalid={!!errors.message}>
               <Checkbox
                 marginY={4}
-                colorScheme="purple"
+                colorScheme="primary"
                 isChecked={showMessage}
                 onChange={(e) => setShowMessage(e.target.checked)}
               >
@@ -225,7 +225,7 @@ function RecipientViewConfirmPetitionSignersDialog({
       confirm={
         <Button
           data-action="start-signature"
-          colorScheme="purple"
+          colorScheme="primary"
           type="submit"
           isDisabled={signers.length === 0}
         >

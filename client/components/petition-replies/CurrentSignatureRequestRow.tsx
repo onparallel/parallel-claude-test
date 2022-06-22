@@ -118,7 +118,7 @@ export function CurrentSignatureRequestRow({
             ) : null}
             <Button
               width="24"
-              colorScheme="purple"
+              colorScheme="primary"
               onClick={() => onDownload(signatureRequest.id)}
               isDisabled={signatureRequest.isAnonymized}
             >

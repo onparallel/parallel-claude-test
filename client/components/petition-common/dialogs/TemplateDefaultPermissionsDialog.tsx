@@ -261,7 +261,7 @@ export function TemplateDefaultPermissionsDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="purple" variant="solid" isLoading={isSubmitting}>
+        <Button type="submit" colorScheme="primary" variant="solid" isLoading={isSubmitting}>
           {editors.length > 0 ? (
             <FormattedMessage id="generic.add" defaultMessage="Add" />
           ) : (

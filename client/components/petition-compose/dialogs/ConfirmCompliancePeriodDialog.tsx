@@ -34,7 +34,7 @@ export function ConfirmCompliancePeriodDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="purple" type="submit" onClick={() => props.onResolve()}>
+        <Button colorScheme="primary" type="submit" onClick={() => props.onResolve()}>
           <FormattedMessage id="generic.yes-continue" defaultMessage="Yes, continue" />
         </Button>
       }

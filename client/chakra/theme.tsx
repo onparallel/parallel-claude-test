@@ -47,6 +47,18 @@ export const theme = extendTheme({
       800: "#332f80",
       900: "#282666",
     },
+    primary: {
+      50: "#f8f8ff",
+      100: "#dddbff",
+      200: "#b0acfb",
+      300: "#938eff",
+      400: "#746eff",
+      500: "#6059f7",
+      600: "#5650de",
+      700: "#433ead",
+      800: "#332f80",
+      900: "#282666",
+    },
   },
   layerStyles: {
     highlightable: {
@@ -118,13 +130,13 @@ export const theme = extendTheme({
             padding: 0,
             height: "auto",
             lineHeight: "normal",
-            color: mode(`purple.600`, `purple.200`)(props),
+            color: mode(`primary.600`, `primary.200`)(props),
             _hover: {
-              color: mode(`purple.800`, `purple.200`)(props),
+              color: mode(`primary.800`, `primary.200`)(props),
               textDecoration: "none",
             },
             _active: {
-              color: mode(`purple.800`, `purple.500`)(props),
+              color: mode(`primary.800`, `primary.500`)(props),
             },
           };
         },
@@ -167,13 +179,13 @@ export const theme = extendTheme({
         transition: `all 0.15s ease-out`,
         borderRadius: "sm",
         cursor: "pointer",
-        color: "purple.600",
+        color: "primary.600",
         _hover: {
-          color: "purple.800",
+          color: "primary.800",
           textDecoration: "none",
         },
         _active: {
-          color: "purple.800",
+          color: "primary.800",
         },
         _focus: {
           boxShadow: "outline",
@@ -183,7 +195,7 @@ export const theme = extendTheme({
     Switch: {
       defaultProps: {
         size: "md",
-        colorScheme: "purple",
+        colorScheme: "primary",
       },
     },
     Modal: {

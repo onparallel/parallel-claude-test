@@ -90,7 +90,7 @@ export const NotificationsButton = chakraForwardRef<"button", {}>(function Notif
                 right="6px"
                 top="6px"
               >
-                <Circle size="10px" background="purple.500" />
+                <Circle size="10px" background="primary.500" />
               </MotionBox>
             ) : null}
           </AnimatePresence>

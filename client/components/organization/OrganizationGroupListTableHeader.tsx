@@ -36,7 +36,7 @@ export function OrganizationGroupListTableHeader({
       />
       <WhenOrgRole role="ADMIN">
         <Button
-          colorScheme="purple"
+          colorScheme="primary"
           leftIcon={<UserPlusIcon fontSize="18px" />}
           onClick={onAddMember}
         >

@@ -84,7 +84,7 @@ export function CopySignatureConfigDialog({
       confirm={
         <Button
           isDisabled={option === undefined}
-          colorScheme="purple"
+          colorScheme="primary"
           onClick={() => props.onResolve(option)}
         >
           <FormattedMessage id="generic.send" defaultMessage="Send" />

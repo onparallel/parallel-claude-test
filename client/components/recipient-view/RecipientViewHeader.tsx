@@ -46,7 +46,7 @@ import { HelpPopover } from "../common/HelpPopover";
 import { SmallPopover } from "../common/SmallPopover";
 import { useTone } from "../common/ToneProvider";
 import { useDelegateAccessDialog } from "./dialogs/DelegateAccessDialog";
-import { useRecipientViewHelpDialog } from "./dialogs/RecipientViewHelpModal";
+import { useRecipientViewHelpDialog } from "./dialogs/RecipientViewHelpDialog";
 import { useLastSaved } from "./LastSavedProvider";
 
 function Contact({
@@ -62,8 +62,8 @@ function Contact({
       <Text
         as="span"
         whiteSpace="nowrap"
-        color="purple.600"
-        _hover={{ color: "purple.800" }}
+        color="primary.600"
+        _hover={{ color: "primary.800" }}
         {...props}
         tabIndex={0}
       >
@@ -336,8 +336,8 @@ export const RecipientViewHeader = Object.assign(
                             <ContactListPopover key="other" contacts={remaining}>
                               <Text
                                 display="initial"
-                                color="purple.600"
-                                _hover={{ color: "purple.800" }}
+                                color="primary.600"
+                                _hover={{ color: "primary.800" }}
                               >
                                 {children}
                               </Text>

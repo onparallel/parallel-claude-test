@@ -260,7 +260,7 @@ function NewPetition() {
               })}
               padding={{ base: 0, md: 4 }}
               alignSelf="flex-end"
-              colorScheme="purple"
+              colorScheme="primary"
               isDisabled={me.role === "COLLABORATOR"}
               onClick={handleCreateTemplateClick}
             >

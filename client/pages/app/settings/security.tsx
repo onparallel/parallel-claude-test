@@ -200,7 +200,7 @@ function Security() {
                 />
               </FormErrorMessage>
             </FormControl>
-            <Button type="submit" colorScheme="purple" isDisabled={me.isSsoUser}>
+            <Button type="submit" colorScheme="primary" isDisabled={me.isSsoUser}>
               <FormattedMessage
                 id="settings.account.change-password-button"
                 defaultMessage="Change password"

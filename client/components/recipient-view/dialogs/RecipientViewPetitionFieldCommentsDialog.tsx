@@ -189,7 +189,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
                 thickness="4px"
                 speed="0.65s"
                 emptyColor="gray.200"
-                color="purple.500"
+                color="primary.500"
                 size="xl"
               />
             </Center>
@@ -262,7 +262,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
               </Button>
               <Button
                 size="sm"
-                colorScheme="purple"
+                colorScheme="primary"
                 isDisabled={draft.trim().length === 0}
                 onClick={handleSubmitClick}
               >

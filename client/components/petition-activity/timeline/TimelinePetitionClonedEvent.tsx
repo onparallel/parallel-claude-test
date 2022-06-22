@@ -15,7 +15,7 @@ export type TimelinePetitionClonedEventProps = {
 export function TimelinePetitionClonedEvent({ event, userId }: TimelinePetitionClonedEventProps) {
   return (
     <TimelineItem
-      icon={<TimelineIcon icon={<PlusCircleIcon />} color="white" backgroundColor="purple.500" />}
+      icon={<TimelineIcon icon={<PlusCircleIcon />} color="white" backgroundColor="primary.500" />}
     >
       <FormattedMessage
         id="timeline.petition-cloned-description"

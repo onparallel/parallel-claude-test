@@ -103,7 +103,7 @@ export function BrandingGeneralPreview({ user }: BrandingGeneralPreviewProps) {
 
           <Stack width="100%" justifyContent="center" align="center" spacing={2.5}>
             <Box
-              backgroundColor="purple.500"
+              backgroundColor="primary.500"
               paddingX={5}
               paddingY={3}
               maxWidth="140px"

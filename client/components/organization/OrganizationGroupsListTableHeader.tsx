@@ -37,7 +37,7 @@ export function OrganizationGroupsListTableHeader({
       />
       <WhenOrgRole role="ADMIN">
         <Spacer />
-        <Button colorScheme="purple" onClick={onCreateGroup}>
+        <Button colorScheme="primary" onClick={onCreateGroup}>
           <FormattedMessage id="organization-groups.create-group" defaultMessage="Create team" />
         </Button>
       </WhenOrgRole>

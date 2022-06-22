@@ -61,7 +61,7 @@ function PetitionMessages({ petitionId }: PetitionMessagesProps) {
       petition={petition}
       onUpdatePetition={updatePetition}
       section="messages"
-      backgroundColor="purple.50"
+      backgroundColor="primary.50"
     >
       <Stack spacing={4} padding={4} maxWidth="container.md" margin="auto">
         <PetitionTemplateRequestMessageCard {...cardCommonProps} />

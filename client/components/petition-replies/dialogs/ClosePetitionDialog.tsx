@@ -153,7 +153,7 @@ export function ClosePetitionDialog({
                   {hasPetitionPdfExport ? (
                     <>
                       <Checkbox
-                        colorScheme="purple"
+                        colorScheme="primary"
                         onChange={(e) => {
                           setAttachPdfExport(e.target.checked);
                           if (e.target.checked) {
@@ -202,7 +202,7 @@ export function ClosePetitionDialog({
       confirm={
         <Button
           leftIcon={sendMessage ? <PaperPlaneIcon /> : undefined}
-          colorScheme="purple"
+          colorScheme="primary"
           onClick={() => {
             if (sendMessage && (isEmptyRTEValue(message) || (attachPdfExport && !pdfExportTitle))) {
               if (isEmptyRTEValue(message)) setIsInvalid(true);

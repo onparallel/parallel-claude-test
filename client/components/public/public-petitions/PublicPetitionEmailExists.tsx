@@ -69,7 +69,7 @@ export function PublicPetitionEmailExists({
           </Button>
           <Button
             width="100%"
-            colorScheme="purple"
+            colorScheme="primary"
             size="md"
             fontSize="md"
             onClick={onContinue}

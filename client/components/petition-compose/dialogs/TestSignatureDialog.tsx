@@ -55,7 +55,7 @@ function TestSignatureDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="purple" variant="solid">
+        <Button type="submit" colorScheme="primary" variant="solid">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }

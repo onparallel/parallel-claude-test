@@ -104,7 +104,7 @@ export function NewSignatureRequestRow({
           <Button width="24" onClick={() => onUpdateConfig(null)}>
             <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
           </Button>
-          <Button colorScheme="purple" marginLeft={2} onClick={handleStartSignature}>
+          <Button colorScheme="primary" marginLeft={2} onClick={handleStartSignature}>
             {startSignature ? (
               <FormattedMessage
                 id="component.petition-signatures-card.start"

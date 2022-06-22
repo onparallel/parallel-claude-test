@@ -165,7 +165,7 @@ export const PetitionTemplateHeader = Object.assign(
         {...props}
       >
         <Flex height={16} alignItems="center" paddingX={4}>
-          <Badge colorScheme="purple">
+          <Badge colorScheme="primary">
             <FormattedMessage id="generic.template" defaultMessage="Template" />
           </Badge>
           <LocaleBadge locale={petition.locale} marginLeft={2} />

@@ -143,7 +143,7 @@ export function PublicTemplatesContainer({
                         aria-current={currentCategory === undefined ? "page" : undefined}
                         _activeLink={{
                           fontWeight: "bold",
-                          color: "purple.600",
+                          color: "primary.600",
                         }}
                       >
                         <FormattedMessage
@@ -160,7 +160,7 @@ export function PublicTemplatesContainer({
                             aria-current={currentCategory?.slug === c.slug ? "page" : undefined}
                             _activeLink={{
                               fontWeight: "bold",
-                              color: "purple.600",
+                              color: "primary.600",
                             }}
                           >
                             {c.label}

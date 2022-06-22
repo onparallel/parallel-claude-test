@@ -136,7 +136,7 @@ export function TagEditDialog({ ...props }: DialogProps) {
         </Box>
       }
       confirm={
-        <Button colorScheme="purple" onClick={() => props.onResolve()}>
+        <Button colorScheme="primary" onClick={() => props.onResolve()}>
           <FormattedMessage id="generic.done" defaultMessage="Done" />
         </Button>
       }

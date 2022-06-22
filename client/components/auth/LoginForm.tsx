@@ -137,7 +137,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
           className="notranslate"
           marginTop={6}
           width="100%"
-          colorScheme="purple"
+          colorScheme="primary"
           isLoading={isSubmitting}
           type="submit"
           id="pw-login-submit"

@@ -53,7 +53,7 @@ export function ScheduleMessageDialog({ ...props }: DialogProps<{}, Date>) {
       body={<DateTimePicker value={date} onChange={setDate} suggestions={suggestions} />}
       confirm={
         <Button
-          colorScheme="purple"
+          colorScheme="primary"
           isDisabled={!date || isPast(date)}
           onClick={() => props.onResolve(date)}
         >

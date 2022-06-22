@@ -368,7 +368,7 @@ export function AddPetitionAccessDialog({
               {senderHasPermission ? null : (
                 <Checkbox
                   isChecked={subscribeSender}
-                  colorScheme="purple"
+                  colorScheme="primary"
                   onChange={(event) => setSubscribeSender(event.target.checked)}
                 >
                   <Flex alignItems="center">

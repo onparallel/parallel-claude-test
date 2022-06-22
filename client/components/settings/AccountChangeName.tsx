@@ -97,7 +97,7 @@ export function AccountChangeName({ user, onSubmit, ...props }: AccountChangeNam
         </FormControl>
         <Button
           type="submit"
-          colorScheme="purple"
+          colorScheme="primary"
           isDisabled={user.isSsoUser || !isDirty}
           width="min-content"
         >

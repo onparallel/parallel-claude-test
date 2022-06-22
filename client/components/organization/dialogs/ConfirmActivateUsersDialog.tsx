@@ -21,7 +21,7 @@ function ConfirmActivateUsersDialog({ count, ...props }: DialogProps<{ count: nu
         />
       }
       confirm={
-        <Button colorScheme="purple" onClick={() => props.onResolve()}>
+        <Button colorScheme="primary" onClick={() => props.onResolve()}>
           <FormattedMessage
             id="organization-users.activate"
             defaultMessage="Activate {count, plural, =1{user} other {users}}"

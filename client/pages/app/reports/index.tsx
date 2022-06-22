@@ -154,7 +154,7 @@ export function Reports() {
             as={NakedHelpCenterLink}
             variant="ghost"
             fontWeight="normal"
-            colorScheme="purple"
+            colorScheme="primary"
             articleId={6272487}
           >
             <FormattedMessage id="generic.help-question" defaultMessage="Help?" />
@@ -188,7 +188,7 @@ export function Reports() {
               </Box>
             </HStack>
             <Button
-              colorScheme="purple"
+              colorScheme="primary"
               isDisabled={canGenerateReport}
               onClick={handleGenerateReportClick}
             >
@@ -201,7 +201,7 @@ export function Reports() {
           {isDefined(report) && status === "IDLE" ? (
             <Button
               leftIcon={<TableIcon />}
-              colorScheme="purple"
+              colorScheme="primary"
               onClick={() => handleTemplateRepliesReportTask(prevTemplateId!)}
             >
               <FormattedMessage

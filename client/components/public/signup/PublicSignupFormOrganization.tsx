@@ -102,7 +102,7 @@ export function PublicSignupFormOrganization({
         <Button width="100%" variant="outline" onClick={onBack}>
           <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
         </Button>
-        <Button width="100%" colorScheme="purple" onClick={handleNext}>
+        <Button width="100%" colorScheme="primary" onClick={handleNext}>
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       </Stack>

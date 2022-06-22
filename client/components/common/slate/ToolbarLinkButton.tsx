@@ -165,7 +165,7 @@ function AddLinkDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="purple">
+        <Button type="submit" colorScheme="primary">
           <FormattedMessage id="generic.done" defaultMessage="Done" />
         </Button>
       }

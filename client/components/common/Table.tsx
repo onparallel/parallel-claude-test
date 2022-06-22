@@ -257,7 +257,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
                 isChecked={anySelected && allSelected}
                 isIndeterminate={anySelected && !allSelected}
                 onChange={function () {}}
-                colorScheme="purple"
+                colorScheme="primary"
               />
             </Center>
           </Box>
@@ -270,7 +270,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         CellContent: ({ isSelected, onToggleSelection }) => {
           return (
             <Center as="label" boxSize="40px" cursor="pointer" onClick={onToggleSelection}>
-              <Checkbox isChecked={isSelected} colorScheme="purple" onChange={function () {}} />
+              <Checkbox isChecked={isSelected} colorScheme="primary" onChange={function () {}} />
             </Center>
           );
         },
@@ -375,7 +375,7 @@ export function useTableColors() {
       header: "gray.50",
       row: "white",
       rowHover: "gray.50",
-      rowSelected: "purple.50",
+      rowSelected: "primary.50",
     };
   }, []);
 }
@@ -600,7 +600,7 @@ export function DefaultHeader({
             })}
             size="xs"
             variant={isFilterOpen ? "solid" : filter ? "outline" : "ghost"}
-            colorScheme={isFilterOpen ? "gray" : filter ? "purple" : "gray"}
+            colorScheme={isFilterOpen ? "gray" : filter ? "primary" : "gray"}
             aria-label={intl.formatMessage(
               {
                 id: "components.table.filter",

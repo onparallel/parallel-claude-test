@@ -124,7 +124,7 @@ export function TemplateDetailsModal({
     <Button
       width="100%"
       data-action="use-template"
-      colorScheme={template.isPublic ? undefined : "purple"}
+      colorScheme={template.isPublic ? undefined : "primary"}
       leftIcon={<PaperPlaneIcon />}
       onClick={handleCreatePetition}
     >
@@ -144,7 +144,7 @@ export function TemplateDetailsModal({
   const saveToEditButton = (
     <Button
       width="100%"
-      colorScheme={template.isPublic ? "purple" : undefined}
+      colorScheme={template.isPublic ? "primary" : undefined}
       onClick={handleCloneTemplate}
       leftIcon={<CopyIcon />}
     >

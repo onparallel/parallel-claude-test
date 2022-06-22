@@ -391,7 +391,7 @@ export function PublicSignupFormExperience({
         <Button
           className="notranslate"
           width="100%"
-          colorScheme="purple"
+          colorScheme="primary"
           type="submit"
           isLoading={isLoading}
         >

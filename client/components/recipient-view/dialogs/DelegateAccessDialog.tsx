@@ -102,7 +102,7 @@ function DelegateAccessDialog({
       }}
       header={
         <Stack direction="row">
-          <Circle role="presentation" size="32px" backgroundColor="purple.500" color="white">
+          <Circle role="presentation" size="32px" backgroundColor="primary.500" color="white">
             <UserArrowIcon />
           </Circle>
           <Text as="div" flex="1">
@@ -213,7 +213,7 @@ function DelegateAccessDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="purple" variant="solid">
+        <Button type="submit" colorScheme="primary" variant="solid">
           <FormattedMessage id="generic.send" defaultMessage="Send" />
         </Button>
       }

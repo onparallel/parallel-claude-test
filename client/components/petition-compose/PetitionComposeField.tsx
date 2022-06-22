@@ -299,7 +299,7 @@ const _PetitionComposeField = chakraForwardRef<
         display="flex"
         flexDirection="row"
         opacity={isDragging ? 0 : 1}
-        backgroundColor={isActive ? "purple.50" : "white"}
+        backgroundColor={isActive ? "primary.50" : "white"}
         sx={{
           "[draggable]": {
             opacity: 0,
@@ -312,7 +312,7 @@ const _PetitionComposeField = chakraForwardRef<
             opacity: 1,
           },
           "&:hover, &:focus-within": {
-            backgroundColor: isActive ? "purple.50" : "gray.50",
+            backgroundColor: isActive ? "primary.50" : "gray.50",
             ".field-actions": {
               display: "flex",
             },
@@ -833,7 +833,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
             size="sm"
             variant="ghost"
             placement="bottom"
-            color={hasCondition ? "purple.500" : "gray.600"}
+            color={hasCondition ? "primary.500" : "gray.600"}
             label={
               hasCondition
                 ? intl.formatMessage({

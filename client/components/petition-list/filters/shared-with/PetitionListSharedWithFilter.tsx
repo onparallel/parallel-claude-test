@@ -97,7 +97,9 @@ export function PetitionListSharedWithFilter({
         <Button
           variant="ghost"
           size="sm"
-          leftIcon={<PlusCircleFilledIcon color="purple.500" position="relative" fontSize="18px" />}
+          leftIcon={
+            <PlusCircleFilledIcon color="primary.500" position="relative" fontSize="18px" />
+          }
           onClick={handleAddFilter}
           isDisabled={value?.filters && value.filters.length > 4}
         >

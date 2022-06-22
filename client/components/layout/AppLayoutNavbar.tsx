@@ -175,7 +175,7 @@ export const AppLayoutNavbar = Object.assign(
               <IconButtonWithTooltip
                 data-link="create-petition"
                 as="a"
-                colorScheme="purple"
+                colorScheme="primary"
                 icon={<AddIcon />}
                 size="lg"
                 isRound
@@ -217,7 +217,7 @@ export const AppLayoutNavbar = Object.assign(
             <IconButtonWithTooltip
               sx={{
                 ".Canny_BadgeContainer .Canny_Badge": {
-                  backgroundColor: "purple.500",
+                  backgroundColor: "primary.500",
                   border: "2px solid white",
                   top: "5px",
                   right: "6px",

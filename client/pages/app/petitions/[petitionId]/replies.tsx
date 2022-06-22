@@ -524,7 +524,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               />
             </Button>
             {showDownloadAll && !petition.isAnonymized ? (
-              <ButtonGroup isAttached colorScheme="purple">
+              <ButtonGroup isAttached colorScheme="primary">
                 <Button
                   leftIcon={<DownloadIcon fontSize="lg" display="block" />}
                   onClick={handleDownloadAllClick}
@@ -534,7 +534,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                     defaultMessage="Export replies"
                   />
                 </Button>
-                <Divider isVertical color="purple.600" />
+                <Divider isVertical color="primary.600" />
                 <Menu placement="bottom-end">
                   <Tooltip
                     label={intl.formatMessage({

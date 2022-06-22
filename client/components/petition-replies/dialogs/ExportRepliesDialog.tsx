@@ -262,7 +262,7 @@ export function ExportRepliesDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="purple" onClick={handleConfirmClick} isDisabled={rename && !pattern}>
+        <Button colorScheme="primary" onClick={handleConfirmClick} isDisabled={rename && !pattern}>
           {selectedOption.startsWith("DOWNLOAD") ? (
             <FormattedMessage id="generic.download" defaultMessage="Download" />
           ) : (

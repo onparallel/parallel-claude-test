@@ -22,7 +22,7 @@ export function ConfirmReopenPetitionDialog(props: DialogProps) {
         </Stack>
       }
       confirm={
-        <Button colorScheme="purple" onClick={() => props.onResolve()}>
+        <Button colorScheme="primary" onClick={() => props.onResolve()}>
           <FormattedMessage id="petition.reopen.confirm" defaultMessage="Yes, reopen" />
         </Button>
       }

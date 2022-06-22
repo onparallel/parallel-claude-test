@@ -61,7 +61,7 @@ function PetitionFromTemplateDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="purple" variant="solid">
+        <Button type="submit" colorScheme="primary" variant="solid">
           <FormattedMessage id="generic.accept" defaultMessage="Accept" />
         </Button>
       }

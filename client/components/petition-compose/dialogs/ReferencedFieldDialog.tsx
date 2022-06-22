@@ -50,7 +50,7 @@ export function ReferencedFieldDialog({
         ) : null
       }
       confirm={
-        <Button colorScheme="purple" ref={focusRef} onClick={() => props.onResolve()}>
+        <Button colorScheme="primary" ref={focusRef} onClick={() => props.onResolve()}>
           <FormattedMessage
             id="component.referenced-field-dialog.confirm"
             defaultMessage="Remove conditions"

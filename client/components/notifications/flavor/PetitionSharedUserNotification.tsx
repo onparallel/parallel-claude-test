@@ -23,7 +23,7 @@ export const PetitionSharedUserNotification = Object.assign(
           isFirst={isFirst}
           notification={notification}
           icon={
-            <Circle size="36px" background="purple.500">
+            <Circle size="36px" background="primary.500">
               {sharedWith.__typename === "UserGroup" ? (
                 <UserGroupArrowIcon color="white" fontSize="1rem" />
               ) : (

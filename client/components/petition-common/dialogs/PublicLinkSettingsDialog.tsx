@@ -317,7 +317,7 @@ export function PublicLinkSettingsDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="purple" variant="solid">
+        <Button type="submit" colorScheme="primary" variant="solid">
           {publicLink ? (
             <FormattedMessage id="generic.save" defaultMessage="Save" />
           ) : (

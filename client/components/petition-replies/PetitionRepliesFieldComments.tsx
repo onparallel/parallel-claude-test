@@ -124,7 +124,7 @@ export function PetitionRepliesFieldComments({
               thickness="4px"
               speed="0.65s"
               emptyColor="gray.200"
-              color="purple.500"
+              color="primary.500"
               size="xl"
             />
           </Center>
@@ -218,7 +218,7 @@ export function PetitionRepliesFieldComments({
                 <Stack display="flex" alignItems="center" direction="row">
                   <Checkbox
                     marginLeft={1}
-                    colorScheme="purple"
+                    colorScheme="primary"
                     isChecked={isInternalComment}
                     isDisabled={hasCommentsEnabled && !field.isInternal ? false : true}
                     onChange={() => setInternalComment(!isInternalComment)}
@@ -243,7 +243,7 @@ export function PetitionRepliesFieldComments({
                 <Button
                   marginLeft={2}
                   size="sm"
-                  colorScheme="purple"
+                  colorScheme="primary"
                   isDisabled={draft.trim().length === 0}
                   onClick={handleSubmitClick}
                 >

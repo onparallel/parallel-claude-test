@@ -20,7 +20,7 @@ export function ConfirmResendCompletedNotificationDialog(props: DialogProps) {
         />
       }
       confirm={
-        <Button colorScheme="purple" onClick={() => props.onResolve()}>
+        <Button colorScheme="primary" onClick={() => props.onResolve()}>
           <FormattedMessage
             id="component.confirm-resend-completed-notification.confirm-button"
             defaultMessage="Yes, resend the notification"

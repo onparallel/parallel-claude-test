@@ -134,7 +134,7 @@ function OrganizationGeneral() {
                   />
                 </Text>
                 {me.hasCustomHost ? null : (
-                  <Badge colorScheme="purple">
+                  <Badge colorScheme="primary">
                     <FormattedMessage id="generic.plans.enterprise" defaultMessage="Enterprise" />
                   </Badge>
                 )}
@@ -209,7 +209,7 @@ function OrganizationGeneral() {
                       thickness="4px"
                       speed="0.65s"
                       emptyColor="gray.200"
-                      color="purple.500"
+                      color="primary.500"
                       size="xl"
                     />
                   ) : iconSrc ? (
@@ -224,7 +224,7 @@ function OrganizationGeneral() {
                           thickness="4px"
                           speed="0.65s"
                           emptyColor="gray.200"
-                          color="purple.500"
+                          color="primary.500"
                           size="xl"
                         />
                       }
@@ -241,7 +241,7 @@ function OrganizationGeneral() {
                     />
                   </Text>
                   <Button
-                    colorScheme="purple"
+                    colorScheme="primary"
                     onClick={() => dropzoneRef.current?.open()}
                     isDisabled={!hasAdminRole}
                   >

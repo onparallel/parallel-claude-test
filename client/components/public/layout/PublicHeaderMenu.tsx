@@ -56,7 +56,7 @@ export function PublicHeaderMenu(props: StackProps) {
         </Button>
       </NakedLink>
       <NakedLink href="/signup">
-        <Button as="a" colorScheme="purple" onClick={trackCTAClick}>
+        <Button as="a" colorScheme="primary" onClick={trackCTAClick}>
           <FormattedMessage id="public.sign-up-button" defaultMessage="Sign up" />
         </Button>
       </NakedLink>

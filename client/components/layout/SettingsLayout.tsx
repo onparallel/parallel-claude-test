@@ -162,7 +162,7 @@ function SettingsLayoutMenuItem({ path, children }: SettingsLayoutMenuItemProps)
         aria-current={active ? "page" : undefined}
         _activeLink={{
           backgroundColor: "gray.75",
-          borderRightColor: "purple.500",
+          borderRightColor: "primary.500",
         }}
         _hover={{
           backgroundColor: "gray.50",

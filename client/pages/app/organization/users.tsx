@@ -541,7 +541,7 @@ function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
             colorScheme={
               (
                 {
-                  OWNER: "purple",
+                  OWNER: "primary",
                   ADMIN: "green",
                 } as Record<OrganizationRole, string>
               )[row.role] ?? "gray"

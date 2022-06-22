@@ -9,7 +9,6 @@ type PartialProps<T, K extends keyof T = never> = Omit<T, K> & Partial<Pick<T, K
 
 export type FeatureFlagName =
   | "PETITION_SIGNATURE"
-  | "INTERNAL_COMMENTS"
   | "PETITION_PDF_EXPORT"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "SKIP_FORWARD_SECURITY"
@@ -23,11 +22,11 @@ export type FeatureFlagName =
   | "CUSTOM_HOST_UI"
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
-  | "AUTO_ANONYMIZE";
+  | "AUTO_ANONYMIZE"
+  | "INTERNAL_COMMENTS";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
-  "INTERNAL_COMMENTS",
   "PETITION_PDF_EXPORT",
   "HIDE_RECIPIENT_VIEW_CONTENTS",
   "SKIP_FORWARD_SECURITY",
@@ -42,6 +41,7 @@ export const FeatureFlagNameValues = [
   "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI",
   "PETITION_ACCESS_RECIPIENT_URL_FIELD",
   "AUTO_ANONYMIZE",
+  "INTERNAL_COMMENTS",
 ] as FeatureFlagName[];
 
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
@@ -655,8 +655,8 @@ export interface Organization {
   preferred_tone: Tone; // tone
   icon_public_file_id: Maybe<number>; // int4
   appsumo_license: Maybe<any>; // jsonb
-  anonymize_petitions_after_months: Maybe<number>; // int4
   pdf_document_theme: Maybe<any>; // jsonb
+  anonymize_petitions_after_months: Maybe<number>; // int4
 }
 
 export type CreateOrganization = PartialProps<
@@ -674,8 +674,8 @@ export type CreateOrganization = PartialProps<
   | "preferred_tone"
   | "icon_public_file_id"
   | "appsumo_license"
-  | "anonymize_petitions_after_months"
   | "pdf_document_theme"
+  | "anonymize_petitions_after_months"
 >;
 
 export interface OrganizationUsageLimit {

@@ -76,7 +76,7 @@ export function UnrestrictPetitionDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="purple">
+        <Button type="submit" colorScheme="primary">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }

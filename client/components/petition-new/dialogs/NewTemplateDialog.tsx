@@ -43,8 +43,8 @@ export function NewTemplateDialog({ ...props }: DialogProps<{}, NewTemplateDialo
         },
         {
           key: "CHECKLIST",
-          icon: <PaperPlaneIcon color="purple.800" boxSize={6} />,
-          background: "purple.100",
+          icon: <PaperPlaneIcon color="primary.800" boxSize={6} />,
+          background: "primary.100",
           title: intl.formatMessage({
             id: "component.new-template-dialog.information-template",
             defaultMessage: "Information checklist",

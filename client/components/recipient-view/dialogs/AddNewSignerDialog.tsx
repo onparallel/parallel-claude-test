@@ -100,7 +100,7 @@ function AddNewSignerDialog({ tone, ...props }: DialogProps<{ tone: Tone }, NewS
         </Stack>
       }
       confirm={
-        <Button colorScheme="purple" type="submit">
+        <Button colorScheme="primary" type="submit">
           <FormattedMessage id="generic.add" defaultMessage="Add" />
         </Button>
       }

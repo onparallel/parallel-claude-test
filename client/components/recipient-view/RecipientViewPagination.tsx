@@ -97,7 +97,7 @@ function PageLink({
       as="a"
       ref={ref}
       variant={isActive ? "solid" : "outline"}
-      colorScheme={isActive ? "purple" : "gray"}
+      colorScheme={isActive ? "primary" : "gray"}
       aria-current={isActive}
       onClick={() => ref.current!.blur()}
       {...props}

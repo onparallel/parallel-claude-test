@@ -170,7 +170,7 @@ export function SignatureConfigDialog({
         </Steps>
       }
       confirm={
-        <Button colorScheme="purple" onClick={handleClickNextStep}>
+        <Button colorScheme="primary" onClick={handleClickNextStep}>
           {isLastStep || review ? (
             petitionIsCompleted ? (
               <FormattedMessage
@@ -672,7 +672,7 @@ export function SignatureConfigDialogBodyStep2({
       </FormControl>
       <FormControl hidden={signers.length === 0 || petitionIsCompleted}>
         <FormLabel>
-          <Checkbox marginTop={4} colorScheme="purple" {...register("allowAdditionalSigners")}>
+          <Checkbox marginTop={4} colorScheme="primary" {...register("allowAdditionalSigners")}>
             <HStack alignContent="center">
               <FormattedMessage
                 id="component.signature-config-dialog.allow-additional-signers.label"

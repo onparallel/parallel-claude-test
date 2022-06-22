@@ -46,7 +46,7 @@ function ThanksForSigning() {
           </Center>
           <Card paddingY={8} paddingX={10} textAlign="center">
             <Stack spacing={4}>
-              <Center margin="auto" borderRadius="full" background="purple.500" boxSize={10}>
+              <Center margin="auto" borderRadius="full" background="primary.500" boxSize={10}>
                 <CheckIcon color="white" role="presentation" boxSize={6} />
               </Center>
               <Heading size="md">
@@ -86,12 +86,12 @@ function ThanksFooter() {
           aria-label="LinkedIn"
           isExternal
         >
-          <Center boxSize="24px" backgroundColor="purple.500" borderRadius="md">
+          <Center boxSize="24px" backgroundColor="primary.500" borderRadius="md">
             <LinkedInSimpleIcon color="white" role="presentation" />
           </Center>
         </NormalLink>
         <NormalLink href="https://twitter.com/Parallel_SO" aria-label="Twitter" isExternal>
-          <Center boxSize="24px" backgroundColor="purple.500" borderRadius="md">
+          <Center boxSize="24px" backgroundColor="primary.500" borderRadius="md">
             <TwitterIcon color="white" role="presentation" />
           </Center>
         </NormalLink>

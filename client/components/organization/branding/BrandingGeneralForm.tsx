@@ -118,7 +118,7 @@ export function BrandingGeneralForm({ user }: BrandingGeneralFormProps) {
                 thickness="4px"
                 speed="0.65s"
                 emptyColor="gray.200"
-                color="purple.500"
+                color="primary.500"
                 size="xl"
               />
             ) : (
@@ -133,7 +133,7 @@ export function BrandingGeneralForm({ user }: BrandingGeneralFormProps) {
                     thickness="4px"
                     speed="0.65s"
                     emptyColor="gray.200"
-                    color="purple.500"
+                    color="primary.500"
                     size="xl"
                   />
                 }
@@ -143,7 +143,7 @@ export function BrandingGeneralForm({ user }: BrandingGeneralFormProps) {
           <Flex marginTop={4}>
             <Button
               flex="1"
-              colorScheme="purple"
+              colorScheme="primary"
               onClick={() => dropzoneRef.current?.open()}
               isDisabled={!hasAdminRole}
             >
@@ -194,7 +194,7 @@ export function BrandingGeneralForm({ user }: BrandingGeneralFormProps) {
                 />
               </Heading>
               {user.hasRemovedParallelBranding ? null : (
-                <Badge colorScheme="purple">
+                <Badge colorScheme="primary">
                   <FormattedMessage id="generic.plans.enterprise" defaultMessage="Enterprise" />
                 </Badge>
               )}

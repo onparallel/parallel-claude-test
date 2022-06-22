@@ -127,7 +127,7 @@ export function ImportContactsDialog(props: DialogProps<{}, { count: number }>) 
             disabled={isUploading}
           >
             {isUploading ? (
-              <Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="purple.500" />
+              <Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="primary.500" />
             ) : (
               <Text pointerEvents="none" fontSize="sm">
                 <FormattedMessage

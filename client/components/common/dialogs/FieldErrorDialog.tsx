@@ -94,7 +94,7 @@ export function FieldErrorDialog({
         confirm ?? (
           <Button
             ref={focusRef}
-            colorScheme="purple"
+            colorScheme="primary"
             minWidth={24}
             onClick={() => props.onResolve()}
           >

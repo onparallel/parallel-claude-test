@@ -237,7 +237,7 @@ export function ConfirmPetitionSignersDialog({
           </FormControl>
           {signers.length > 0 ? (
             isUpdate ? (
-              <Checkbox marginTop={4} colorScheme="purple" {...register("allowAdditionalSigners")}>
+              <Checkbox marginTop={4} colorScheme="primary" {...register("allowAdditionalSigners")}>
                 <HStack alignContent="center">
                   <FormattedMessage
                     id="component.signature-config-dialog.allow-additional-signers.label"
@@ -255,7 +255,7 @@ export function ConfirmPetitionSignersDialog({
               <FormControl isInvalid={!!errors.message}>
                 <Checkbox
                   marginY={4}
-                  colorScheme="purple"
+                  colorScheme="primary"
                   isChecked={showMessage}
                   onChange={(e) => setShowMessage(e.target.checked)}
                 >
@@ -286,7 +286,7 @@ export function ConfirmPetitionSignersDialog({
       confirm={
         <Button
           data-action="start-signature"
-          colorScheme="purple"
+          colorScheme="primary"
           type="submit"
           isDisabled={isUpdate ? false : signers.length === 0}
         >

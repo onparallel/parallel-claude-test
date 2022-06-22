@@ -96,7 +96,7 @@ export function FieldComment({
     <Box
       paddingX={6}
       paddingY={2}
-      backgroundColor={comment.isUnread ? "purple.50" : isInternal ? "gray.50" : "white"}
+      backgroundColor={comment.isUnread ? "primary.50" : isInternal ? "gray.50" : "white"}
     >
       <Box fontSize="sm" display="flex" alignItems="center">
         <Box paddingRight={2}>
@@ -212,7 +212,7 @@ export function FieldComment({
             <Button size="sm" onClick={handleCancelClick}>
               <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
             </Button>
-            <Button size="sm" colorScheme="purple" onClick={handleSaveClick}>
+            <Button size="sm" colorScheme="primary" onClick={handleSaveClick}>
               <FormattedMessage id="generic.save" defaultMessage="Save" />
             </Button>
           </Stack>

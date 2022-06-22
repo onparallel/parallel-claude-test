@@ -149,7 +149,7 @@ function LandingTemplateDetails({
                 </Text>
                 <HStack paddingTop={4}>
                   <NakedLink href="/signup">
-                    <Button as="a" colorScheme="purple">
+                    <Button as="a" colorScheme="primary">
                       <FormattedMessage
                         id="public.try-for-free-button"
                         defaultMessage="Try for free"

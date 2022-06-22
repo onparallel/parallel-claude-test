@@ -16,7 +16,7 @@ export function TimelineAccessActivatedFromLinkEvent({
 }: TimelineAccessActivatedFromLinkEventProps) {
   return (
     <TimelineItem
-      icon={<TimelineIcon icon={<LinkIcon />} color="white" backgroundColor="purple.500" />}
+      icon={<TimelineIcon icon={<LinkIcon />} color="white" backgroundColor="primary.500" />}
       paddingBottom={0}
     >
       <FormattedMessage

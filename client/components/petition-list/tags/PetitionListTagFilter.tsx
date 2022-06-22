@@ -186,7 +186,7 @@ export function PetitionListTagFilter({
           id={`${id}-1`}
         >
           <Checkbox
-            colorScheme="purple"
+            colorScheme="primary"
             pointerEvents="none"
             role="presentation"
             isChecked={value?.length === 0}
@@ -209,7 +209,7 @@ export function PetitionListTagFilter({
             id={`${id}-${i + 2}`}
           >
             <Checkbox
-              colorScheme="purple"
+              colorScheme="primary"
               pointerEvents="none"
               role="presentation"
               isChecked={value?.includes(tag.id) ?? false}

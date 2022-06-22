@@ -231,7 +231,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
               thickness="4px"
               speed="0.65s"
               emptyColor="gray.200"
-              color="purple.500"
+              color="primary.500"
               size="xl"
             />
           </Flex>

@@ -176,7 +176,7 @@ export function PublicSignupForm({ onNext, email, source }: PublicSignupFormProp
         </FormControl>
       </Stack>
       <Box marginTop={8}>
-        <Button width="100%" colorScheme="purple" size="md" fontSize="md" type="submit">
+        <Button width="100%" colorScheme="primary" size="md" fontSize="md" type="submit">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       </Box>

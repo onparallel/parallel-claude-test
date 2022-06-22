@@ -122,7 +122,7 @@ export function AccountDelegates({ user, onSubmit, ...props }: AccountDelegatesP
 
         <Button
           type="submit"
-          colorScheme="purple"
+          colorScheme="primary"
           width="min-content"
           isDisabled={!user.hasOnBehalfOf || !isDirty}
         >

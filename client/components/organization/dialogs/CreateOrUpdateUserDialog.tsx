@@ -277,7 +277,7 @@ function CreateOrUpdateUserDialog({
       confirm={
         <Button
           type="submit"
-          colorScheme="purple"
+          colorScheme="primary"
           variant="solid"
           isDisabled={user?.status === "INACTIVE"}
         >

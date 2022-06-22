@@ -51,7 +51,7 @@ function useTagColors() {
       {
         label: intl.formatMessage({
           id: "generic.color.purple",
-          defaultMessage: "purple",
+          defaultMessage: "primary",
         }),
         value: "#DDDCF8",
       },

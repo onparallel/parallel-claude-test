@@ -26,7 +26,7 @@ export function PetitionRepliesFilterButton({ value, onChange }: PetitionReplies
         as={Button}
         size="sm"
         variant="outline"
-        colorScheme={isActive ? "purple" : undefined}
+        colorScheme={isActive ? "primary" : undefined}
         leftIcon={<FilterIcon />}
       >
         <FormattedMessage

@@ -127,7 +127,7 @@ export function ConfirmSendReminderDialog({
       }
       confirm={
         <Button
-          colorScheme="purple"
+          colorScheme="primary"
           onClick={() => {
             if (hasMessage && isEmptyRTEValue(message)) {
               setIsInvalid(true);

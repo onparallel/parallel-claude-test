@@ -63,7 +63,7 @@ export function ContactListPopover<T extends ContactSelection>({
                   _hover={isClickable ? { backgroundColor: "gray.75" } : {}}
                   cursor={isClickable ? "pointer" : "unset"}
                 >
-                  <Box whiteSpace="nowrap" color={isClickable ? "purple.600" : "gray.800"}>
+                  <Box whiteSpace="nowrap" color={isClickable ? "primary.600" : "gray.800"}>
                     {c.fullName}
                   </Box>
                   <Box whiteSpace="nowrap" color="gray.600" fontSize="xs">

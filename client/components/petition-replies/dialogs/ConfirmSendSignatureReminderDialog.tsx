@@ -35,7 +35,7 @@ function ConfirmSendSignatureReminderDialog({
         />
       }
       confirm={
-        <Button colorScheme="purple" onClick={() => props.onResolve(true)}>
+        <Button colorScheme="primary" onClick={() => props.onResolve(true)}>
           <FormattedMessage
             id="component.confirm-send-signature-reminder.confirm"
             defaultMessage="Yes, send"

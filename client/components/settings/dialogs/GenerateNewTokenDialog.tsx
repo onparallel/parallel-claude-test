@@ -132,11 +132,11 @@ export function GenerateNewTokenDialog(props: DialogProps) {
       }
       confirm={
         apiKey ? (
-          <Button colorScheme="purple" onClick={() => props.onResolve()}>
+          <Button colorScheme="primary" onClick={() => props.onResolve()}>
             <FormattedMessage id="generic.continue" defaultMessage="Continue" />
           </Button>
         ) : (
-          <Button colorScheme="purple" type="submit" isLoading={loading}>
+          <Button colorScheme="primary" type="submit" isLoading={loading}>
             <FormattedMessage
               id="settings.api-tokens.generate-new-token"
               defaultMessage="Create token"

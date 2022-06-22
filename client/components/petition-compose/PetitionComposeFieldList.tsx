@@ -480,7 +480,7 @@ export const PetitionComposeFieldList = Object.assign(
                       left="50%"
                       transform="translate(-50%, 50%)"
                       className="add-field-after-button"
-                      colorScheme={isTemplate ? "purple" : undefined}
+                      colorScheme={isTemplate ? "primary" : undefined}
                       {...addButtonMouseHandlers(fieldId)}
                     />
                   </Box>
@@ -495,7 +495,7 @@ export const PetitionComposeFieldList = Object.assign(
               data-action="big-add-field"
               id="big-add-field-button"
               onSelectFieldType={onAddField}
-              colorScheme={isTemplate ? "purple" : undefined}
+              colorScheme={isTemplate ? "primary" : undefined}
               user={user}
             />
           </Flex>

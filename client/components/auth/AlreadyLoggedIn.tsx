@@ -24,7 +24,7 @@ export function AlreadyLoggedIn({ me, onRelogin, onContinueAs }: AlreadyLoggedIn
         </Text>
         {me.fullName ? <Text>({me.email})</Text> : null}
       </Box>
-      <Button marginTop={6} width="100%" colorScheme="purple" type="submit" onClick={onContinueAs}>
+      <Button marginTop={6} width="100%" colorScheme="primary" type="submit" onClick={onContinueAs}>
         <FormattedMessage
           id="public.login.already-logged-in.continue-button"
           defaultMessage="Continue as {name}"

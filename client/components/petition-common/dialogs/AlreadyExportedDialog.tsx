@@ -57,7 +57,7 @@ function AlreadyExportedDialog({
       }
       confirm={
         <Button
-          colorScheme="purple"
+          colorScheme="primary"
           onClick={() => props.onResolve({ dontAskAgain, exportAgain: true })}
         >
           <FormattedMessage

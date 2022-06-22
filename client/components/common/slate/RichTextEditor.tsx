@@ -319,7 +319,7 @@ function RenderLink({ attributes, nodeProps, styles, element, editor, ...props }
       cursor="text"
       target="_blank"
       href={element.url}
-      color="purple.600"
+      color="primary.600"
       rel="noopener noreferrer"
       {...attributes}
       {...props}

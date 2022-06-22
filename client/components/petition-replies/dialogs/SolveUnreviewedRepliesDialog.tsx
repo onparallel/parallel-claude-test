@@ -104,7 +104,7 @@ export function SolveUnreviewedRepliesDialog(
         </Box>
       }
       confirm={
-        <Button colorScheme="purple" isDisabled={!value} onClick={() => props.onResolve(value)}>
+        <Button colorScheme="primary" isDisabled={!value} onClick={() => props.onResolve(value)}>
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }

@@ -42,7 +42,7 @@ function ConfirmResendInvitationDialog({ fullName, ...props }: DialogProps<{ ful
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="purple">
+        <Button type="submit" colorScheme="primary">
           <FormattedMessage id="generic.confirm-send" defaultMessage="Yes, send" />
         </Button>
       }

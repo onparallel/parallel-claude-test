@@ -103,7 +103,7 @@ export function CreateGroupDialog({ ...props }: DialogProps<{}, CreateGroupDialo
         </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="purple" variant="solid">
+        <Button type="submit" colorScheme="primary" variant="solid">
           <FormattedMessage
             id="component.create-group-dialog.confirm-button"
             defaultMessage="Create team"

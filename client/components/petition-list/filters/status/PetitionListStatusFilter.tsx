@@ -164,7 +164,7 @@ export function PetitionListStatusFilter({
           tabIndex={activeIndex === i + 1 ? 0 : -1}
         >
           <Checkbox
-            colorScheme="purple"
+            colorScheme="primary"
             pointerEvents="none"
             role="presentation"
             isChecked={value?.includes(option.value) ?? false}

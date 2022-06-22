@@ -29,7 +29,7 @@ export const NewPetitionEmptySearch = chakraForwardRef<"div", NewPetitionEmptySe
                   LinkTemplate: (chunks: any) => (
                     <Text
                       as="strong"
-                      color="purple.500"
+                      color="primary.500"
                       onClick={onClickNewTemplate}
                       _hover={{ cursor: "pointer", textDecoration: "underline" }}
                     >
@@ -39,7 +39,7 @@ export const NewPetitionEmptySearch = chakraForwardRef<"div", NewPetitionEmptySe
                   LinkPublic: (chunks: any) => (
                     <Text
                       as="strong"
-                      color="purple.500"
+                      color="primary.500"
                       onClick={onClickPublicTemplates}
                       _hover={{ cursor: "pointer", textDecoration: "underline" }}
                     >
@@ -56,7 +56,7 @@ export const NewPetitionEmptySearch = chakraForwardRef<"div", NewPetitionEmptySe
                   LinkTemplate: (chunks: any) => (
                     <Text
                       as="strong"
-                      color="purple.500"
+                      color="primary.500"
                       onClick={onClickNewTemplate}
                       _hover={{ cursor: "pointer", textDecoration: "underline" }}
                     >

@@ -189,7 +189,7 @@ function Developers() {
                   <FormattedMessage id="generic.delete" defaultMessage="Delete" />
                 </Button>
               ) : null}
-              <Button colorScheme="purple" onClick={handleGenerateNewToken}>
+              <Button colorScheme="primary" onClick={handleGenerateNewToken}>
                 <FormattedMessage
                   id="settings.developers.create-token"
                   defaultMessage="Create token"
@@ -252,7 +252,7 @@ function Developers() {
                   <FormattedMessage id="generic.delete" defaultMessage="Delete" />
                 </Button>
               ) : null}
-              <Button colorScheme="purple" onClick={handleCreateEventSubscription}>
+              <Button colorScheme="primary" onClick={handleCreateEventSubscription}>
                 <FormattedMessage
                   id="settings.developers.create-subscription"
                   defaultMessage="Create subscription"
@@ -478,7 +478,7 @@ function useSubscriptionsColumns(): TableColumn<
                 </Stack>
               }
             >
-              <Text color="purple.500" fontSize="sm">
+              <Text color="primary.500" fontSize="sm">
                 <FormattedMessage
                   id="settings.developers.subscriptions.n-events"
                   defaultMessage="{count} events"

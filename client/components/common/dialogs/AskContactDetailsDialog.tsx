@@ -105,7 +105,7 @@ export function AskContactDetailsDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="purple" type="submit" id="create-contact-submit">
+        <Button colorScheme="primary" type="submit" id="create-contact-submit">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }

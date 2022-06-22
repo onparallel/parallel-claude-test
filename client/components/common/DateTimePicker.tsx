@@ -67,7 +67,7 @@ export function DateTimePicker({
           <Button
             marginTop={2}
             key={date.valueOf()}
-            colorScheme={isEqual(date, value) ? "purple" : "gray"}
+            colorScheme={isEqual(date, value) ? "primary" : "gray"}
             onClick={() => onChange(date)}
           >
             {isToday(date) ? (

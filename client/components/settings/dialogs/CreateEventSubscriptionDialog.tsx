@@ -295,7 +295,7 @@ export function CreateEventSubscriptionDialog(
         </Stack>
       }
       confirm={
-        <Button colorScheme="purple" type="submit" isLoading={isSubmitting}>
+        <Button colorScheme="primary" type="submit" isLoading={isSubmitting}>
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }

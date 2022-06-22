@@ -25,7 +25,7 @@ export function PublicTemplateDialog({ ...props }: DialogProps) {
         />
       }
       confirm={
-        <Button colorScheme="purple" onClick={() => props.onResolve()}>
+        <Button colorScheme="primary" onClick={() => props.onResolve()}>
           <FormattedMessage id="generic.i-understand" defaultMessage="I understand" />
         </Button>
       }

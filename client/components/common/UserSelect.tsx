@@ -390,7 +390,7 @@ const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
           </Text>
           {canCreateUsers ? (
             <NakedLink href="/app/organization/users?dialog=true">
-              <Button colorScheme="purple">
+              <Button colorScheme="primary">
                 <FormattedMessage
                   id="component.user-select.invite-button"
                   defaultMessage="Invite people"

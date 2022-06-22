@@ -184,7 +184,7 @@ const PlaceholderToken = function ({
       {...attributes}
       as="span"
       display="inline-block"
-      backgroundColor="purple.500"
+      backgroundColor="primary.500"
       color="white"
       borderRadius="sm"
       fontSize="80%"

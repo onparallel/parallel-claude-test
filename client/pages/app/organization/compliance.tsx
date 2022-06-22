@@ -179,7 +179,7 @@ function OrganizationCompliance() {
             })}
           >
             <Checkbox
-              colorScheme="purple"
+              colorScheme="primary"
               {...register("isActive", {
                 onChange: (event) => {
                   onPeriodChange({ period: 1, isActive: event.target.checked });
@@ -229,7 +229,7 @@ function OrganizationCompliance() {
               </FormControl>
 
               <Button
-                colorScheme="purple"
+                colorScheme="primary"
                 type="submit"
                 width="fit-content"
                 isDisabled={defaultPeriod === period}

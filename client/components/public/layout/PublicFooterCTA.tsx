@@ -19,7 +19,7 @@ export function PublicFooterCTA() {
       transform="translateY(68px)"
       borderRadius="lg"
       overflow="hidden"
-      backgroundColor="purple.600"
+      backgroundColor="primary.600"
       backgroundImage={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/bg/book-footer-bg.png`}
       backgroundSize="cover"
       backgroundRepeat="no-repeat"

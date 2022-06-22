@@ -30,7 +30,7 @@ function ConfirmRestartSignatureRequestDialog(props: DialogProps) {
         </Stack>
       }
       confirm={
-        <Button colorScheme="purple" onClick={() => props.onResolve()}>
+        <Button colorScheme="primary" onClick={() => props.onResolve()}>
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }

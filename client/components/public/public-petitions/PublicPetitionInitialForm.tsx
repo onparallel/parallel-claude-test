@@ -233,7 +233,7 @@ export function PublicPetitionInitialForm({
           <Button
             className="notranslate"
             type="submit"
-            colorScheme="purple"
+            colorScheme="primary"
             size="md"
             isLoading={isLoading}
             isDisabled={isDisabled}
@@ -297,7 +297,7 @@ export function PublicPetitionInitialForm({
               <Button
                 marginLeft={4}
                 ref={closeDialogRef}
-                colorScheme="purple"
+                colorScheme="primary"
                 onClick={onCloseDialog}
               >
                 <FormattedMessage id="generic.close" defaultMessage="Close" />

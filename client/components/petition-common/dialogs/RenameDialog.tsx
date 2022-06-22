@@ -79,7 +79,7 @@ function RenameDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="purple" isDisabled={!isDirty} type="submit">
+        <Button colorScheme="primary" isDisabled={!isDirty} type="submit">
           <FormattedMessage id="component.rename-dialog.change-name" defaultMessage="Change name" />
         </Button>
       }

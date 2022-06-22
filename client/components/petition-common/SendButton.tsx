@@ -32,14 +32,14 @@ export const SendButton = chakraForwardRef<"div", SendButtonProps>(function Send
   return (
     <ButtonGroup ref={ref} isAttached {...layoutProps}>
       <Button
-        colorScheme="purple"
+        colorScheme="primary"
         leftIcon={<PaperPlaneIcon fontSize="18px" />}
         onClick={onSendClick}
         {...(otherProps as any)}
       >
         <FormattedMessage id="generic.send" defaultMessage="Send" />
       </Button>
-      <Divider isVertical color="purple.600" />
+      <Divider isVertical color="primary.600" />
       <Menu placement="bottom-end">
         <Tooltip
           label={intl.formatMessage({
@@ -49,7 +49,7 @@ export const SendButton = chakraForwardRef<"div", SendButtonProps>(function Send
         >
           <MenuButton
             as={IconButton}
-            colorScheme="purple"
+            colorScheme="primary"
             icon={<ChevronDownIcon />}
             aria-label={intl.formatMessage({
               id: "generic.more-options",

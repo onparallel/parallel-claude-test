@@ -26,7 +26,7 @@ function OverwriteDocumentationDialog({ tone, ...props }: DialogProps<{ tone: To
         />
       }
       confirm={
-        <Button ref={focusRef} colorScheme="purple" onClick={() => props.onResolve()}>
+        <Button ref={focusRef} colorScheme="primary" onClick={() => props.onResolve()}>
           <FormattedMessage
             id="components.overwrite-documentation-dialog.confirm-button"
             defaultMessage="Yes, start again"

@@ -175,7 +175,7 @@ function Contact({ contactId }: ContactProps) {
                     <FormattedMessage id="generic.cancel-save-changes" defaultMessage="Cancel" />
                   </Button>
                   <Button
-                    colorScheme="purple"
+                    colorScheme="primary"
                     type="submit"
                     isLoading={loading}
                     loadingText={intl.formatMessage({

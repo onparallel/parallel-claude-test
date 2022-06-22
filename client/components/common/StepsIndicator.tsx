@@ -14,7 +14,7 @@ export function StepsIndicator({ numberOfSteps, currentStep, ...props }: StepsIn
       {[...Array(numberOfSteps)].map((_, index) => (
         <Circle size={2} backgroundColor="gray.200" key={index}>
           {currentStep === index && (
-            <MotionCircle size={2} backgroundColor="purple.600" layoutId="highlight-indicator" />
+            <MotionCircle size={2} backgroundColor="primary.600" layoutId="highlight-indicator" />
           )}
         </Circle>
       ))}

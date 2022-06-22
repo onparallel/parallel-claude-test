@@ -205,7 +205,7 @@ function IntegrationsSignature() {
               <Spacer />
               <Button
                 isDisabled={!me.hasPetitionSignature}
-                colorScheme="purple"
+                colorScheme="primary"
                 onClick={handleAddSignatureToken}
               >
                 <FormattedMessage
@@ -332,8 +332,8 @@ function useSignatureTokensTableColumns() {
                       id: "component.signature-tokens-table.default-token",
                       defaultMessage: "Default token",
                     })}
-                    color="purple.600"
-                    fill="purple.600"
+                    color="primary.600"
+                    fill="primary.600"
                     _hover={{}}
                     _active={{}}
                     icon={<StarIcon fontSize="16px" />}

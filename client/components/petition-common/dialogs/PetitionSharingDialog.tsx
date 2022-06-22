@@ -288,7 +288,7 @@ export function PetitionSharingDialog({
       content={{ as: "form", onSubmit: handleAddPetitionPermissions }}
       header={
         <Stack direction="row">
-          <Circle role="presentation" size="32px" backgroundColor="purple.500" color="white">
+          <Circle role="presentation" size="32px" backgroundColor="primary.500" color="white">
             <UserArrowIcon />
           </Circle>
           <Text as="div" flex="1">
@@ -341,7 +341,7 @@ export function PetitionSharingDialog({
               {/* PermissionTypeSelect */}
             </Stack>
             <Stack display={hasUsers ? "flex" : "none"}>
-              <Checkbox {...register("notify")} colorScheme="purple" defaultIsChecked>
+              <Checkbox {...register("notify")} colorScheme="primary" defaultIsChecked>
                 <FormattedMessage
                   id="petition-sharing.notify-checkbox"
                   defaultMessage="Notify users"
@@ -362,7 +362,7 @@ export function PetitionSharingDialog({
                 />
               </PaddedCollapse>
               {!isTemplate ? (
-                <Checkbox {...register("subscribe")} colorScheme="purple" defaultIsChecked>
+                <Checkbox {...register("subscribe")} colorScheme="primary" defaultIsChecked>
                   <FormattedMessage
                     id="component.petition-sharing-dialog.subscribe"
                     defaultMessage="Subscribe to notifications"
@@ -578,7 +578,7 @@ export function PetitionSharingDialog({
               thickness="4px"
               speed="0.65s"
               emptyColor="gray.200"
-              color="purple.500"
+              color="primary.500"
               size="xl"
             />
           </Center>
@@ -586,11 +586,11 @@ export function PetitionSharingDialog({
       }
       confirm={
         hasUsers ? (
-          <Button type="submit" colorScheme="purple" variant="solid">
+          <Button type="submit" colorScheme="primary" variant="solid">
             <FormattedMessage id="generic.send" defaultMessage="Send" />
           </Button>
         ) : (
-          <Button colorScheme="purple" variant="solid" onClick={() => props.onReject()}>
+          <Button colorScheme="primary" variant="solid" onClick={() => props.onReject()}>
             <FormattedMessage id="generic.done" defaultMessage="Done" />
           </Button>
         )

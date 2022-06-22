@@ -158,7 +158,7 @@ function OptOut({ keycode, access }: OptOutProps) {
                 <Button
                   fontWeight="500"
                   width="min-content"
-                  colorScheme="purple"
+                  colorScheme="primary"
                   variant="solid"
                   type="submit"
                 >

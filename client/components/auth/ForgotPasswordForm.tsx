@@ -79,7 +79,7 @@ export function ForgotPasswordForm({
           className="notranslate"
           marginTop={6}
           width="100%"
-          colorScheme="purple"
+          colorScheme="primary"
           isLoading={isSubmitting}
           type="submit"
         >

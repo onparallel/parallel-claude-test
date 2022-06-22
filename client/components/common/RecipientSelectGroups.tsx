@@ -294,7 +294,7 @@ export function RecipientSelectGroups({
             color="gray.900"
             fontWeight="normal"
             leftIcon={
-              <Circle backgroundColor="purple.500" size={5}>
+              <Circle backgroundColor="primary.500" size={5}>
                 <AddIcon color="white" fontSize="xs" />
               </Circle>
             }
@@ -409,7 +409,7 @@ function MultipleEmailsPastedDialog(props: DialogProps<{}, MultipleEmailsPastedA
         </>
       }
       confirm={
-        <Button colorScheme="purple" type="submit">
+        <Button colorScheme="primary" type="submit">
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }

@@ -203,7 +203,7 @@ function RecipientViewVerify({ email, orgName, orgLogoUrl, tone }: RecipientView
               {state.step === "REQUEST" ? (
                 <Center>
                   <Button
-                    colorScheme="purple"
+                    colorScheme="primary"
                     isLoading={isSendingCode}
                     onClick={handleSendVerificationCode}
                   >
@@ -247,7 +247,7 @@ function RecipientViewVerify({ email, orgName, orgLogoUrl, tone }: RecipientView
                   ) : null}
                   <Button
                     type="submit"
-                    colorScheme="purple"
+                    colorScheme="primary"
                     isLoading={isVerifyingCode}
                     isDisabled={code.length < 6}
                     marginTop={4}

@@ -177,7 +177,7 @@ export function NotificationsDrawer() {
             >
               <Button
                 variant="outline"
-                colorScheme="purple"
+                colorScheme="primary"
                 border="none"
                 width="100%"
                 height="48px"

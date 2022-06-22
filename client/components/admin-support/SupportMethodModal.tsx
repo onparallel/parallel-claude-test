@@ -164,7 +164,7 @@ export function SupportMethodModal({ field, queryType, schemaTypes, onClose }: M
             <StatusTag status={status} />
             <Stack direction="row">
               <Button onClick={() => onClose()}>Cancel</Button>
-              <Button colorScheme="purple" onClick={handleExecute}>
+              <Button colorScheme="primary" onClick={handleExecute}>
                 Execute
               </Button>
             </Stack>

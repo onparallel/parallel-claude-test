@@ -436,7 +436,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             <ResponsiveButtonIcon
               data-action="compose-next"
               id="petition-next"
-              colorScheme="purple"
+              colorScheme="primary"
               icon={<PaperPlaneIcon fontSize="18px" />}
               isDisabled={petition.isAnonymized}
               label={intl.formatMessage({
@@ -461,7 +461,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         }
       >
         <PaneWithFlyout
-          backgroundColor={petition?.__typename === "PetitionTemplate" ? "purple.50" : undefined}
+          backgroundColor={petition?.__typename === "PetitionTemplate" ? "primary.50" : undefined}
           isFlyoutActive={Boolean(activeField)}
           alignWith={activeField ? activeFieldElement : null}
           flyout={

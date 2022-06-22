@@ -13,7 +13,7 @@ export function SignerReference({
 } & TextProps) {
   return signer ? (
     <Tooltip isDisabled={!signer.fullName && !isFull} label={signer.email}>
-      <Text as="span" color="purple.600" {...props}>
+      <Text as="span" color="primary.600" {...props}>
         {signer.fullName || signer.email}
         {isFull && signer.fullName ? `<${signer.email}>` : null}
       </Text>

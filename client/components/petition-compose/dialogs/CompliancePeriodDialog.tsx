@@ -136,7 +136,7 @@ export function CompliancePeriodDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="purple" type="submit">
+        <Button colorScheme="primary" type="submit">
           <FormattedMessage id="generic.apply-changes" defaultMessage="Apply changes" />
         </Button>
       }

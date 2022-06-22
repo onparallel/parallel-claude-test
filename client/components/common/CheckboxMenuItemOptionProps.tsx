@@ -18,7 +18,7 @@ export function CheckboxMenuItemOption({ children, value, onChange }: CheckboxMe
         <Checkbox
           role="presentation"
           pointerEvents="none"
-          colorScheme="purple"
+          colorScheme="primary"
           isChecked={value}
           marginRight={2}
         />
