@@ -65,8 +65,6 @@ describe("GraphQL/Petition Fields Comments", () => {
       is_internal: true,
       has_comments_enabled: true,
     }));
-
-    await mocks.createFeatureFlags([{ name: "INTERNAL_COMMENTS", default_value: true }]);
   });
 
   afterAll(async () => {
@@ -220,39 +218,6 @@ describe("GraphQL/Petition Fields Comments", () => {
           comments: [{ id: data!.createPetitionFieldComment.id }],
         },
       });
-    });
-
-    it("throws error if user wants to submit an internal comment without feature flag", async () => {
-      await mocks.knex.from("feature_flag").delete();
-
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $petitionFieldId: GID!
-            $content: String!
-            $isInternal: Boolean
-          ) {
-            createPetitionFieldComment(
-              petitionId: $petitionId
-              petitionFieldId: $petitionFieldId
-              content: $content
-              isInternal: $isInternal
-            ) {
-              id
-            }
-          }
-        `,
-        variables: {
-          petitionId: toGlobalId("Petition", petition.id),
-          petitionFieldId: toGlobalId("PetitionField", headingField.id),
-          content: "Hello this is my comment",
-          isInternal: true,
-        },
-      });
-
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
     });
 
     it("throws error if user wants to submit a comment on a field with comments disabled", async () => {

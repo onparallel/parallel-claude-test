@@ -2715,21 +2715,6 @@
     "context": "<b>Preview only</b> - comments are disabled."
   },
   {
-    "term": "component.pricing-table.compare-plans",
-    "definition": "Comparativa de planes",
-    "context": "Compare plans"
-  },
-  {
-    "term": "component.pricing-table.on-demand",
-    "definition": "Bajo demanda",
-    "context": "On demand"
-  },
-  {
-    "term": "component.preview-petition-field-comments-dialog.comments-cta",
-    "definition": "¿Alguna duda? Pregunta por aquí",
-    "context": "Have any questions? Ask here"
-  },
-  {
     "term": "component.print-pdf-task.confirm",
     "definition": "Descargar PDF",
     "context": "Download PDF"
@@ -6630,34 +6615,14 @@
     "context": "Export replies"
   },
   {
-    "term": "petition-replies.field-comments.disabled-comments-1",
-    "definition": "Este campo solo admite comentarios internos.",
-    "context": "This field only accepts internal comments."
-  },
-  {
     "term": "petition-replies.field-comments.disabled-comments-2",
     "definition": "Puedes habilitar los comentarios desde los <a>Ajustes del campo</a> en la pestaña de {composeTab}.",
     "context": "You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
   },
   {
-    "term": "petition-replies.field-comments.placeholder",
-    "definition": "Escribe un comentario",
-    "context": "Type a new comment"
-  },
-  {
     "term": "petition-replies.finalize-petition.button",
     "definition": "Finalizar petición",
     "context": "Finish petition"
-  },
-  {
-    "term": "petition-replies.internal-comment-check.help",
-    "definition": "Al marcar este campo, el comentario será visible solamente para personas dentro de tu organización.",
-    "context": "By checking this field, the comment will be visible only to users in your organization."
-  },
-  {
-    "term": "petition-replies.internal-comment-check.label",
-    "definition": "Comentario interno",
-    "context": "Internal comment"
   },
   {
     "term": "petition-replies.note-popover",
@@ -8573,6 +8538,11 @@
     "term": "timeline.message-sent-see-message",
     "definition": "Ver mensaje",
     "context": "See message"
+  },
+  {
+    "term": "timeline.note-published-description",
+    "definition": "{userIsYou, select, true {Añadiste} other {{author} ha añadido}} una nota en el campo {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You have} other {{author} has}} added a note in the field {field} {timeAgo}"
   },
   {
     "term": "timeline.ownership-transferred-description",

@@ -9,9 +9,9 @@ import {
   TabPanels,
   Tabs,
 } from "@chakra-ui/react";
+import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { ChangeEvent, KeyboardEvent, ReactNode, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { Divider } from "../common/Divider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 
@@ -25,7 +25,6 @@ interface PetitionCommentsAndNotesProps {
   onNotetKeyDown: (event: KeyboardEvent<HTMLTextAreaElement>, content: string) => Promise<boolean>;
   onNoteSubmit: (note: string) => Promise<void>;
   hasCommentsEnabled: boolean;
-  hasInternalComments: boolean;
   isDisabled: boolean;
   isTemplate: boolean;
 }
@@ -37,7 +36,6 @@ export function PetitionCommentsAndNotes({
   onNotetKeyDown,
   onNoteSubmit,
   hasCommentsEnabled,
-  hasInternalComments,
   isDisabled,
   isTemplate,
 }: PetitionCommentsAndNotesProps) {
@@ -188,7 +186,7 @@ export function PetitionCommentsAndNotes({
                     value={noteDraft}
                     onKeyDown={handleNoteKeyDown as any}
                     onChange={handleNoteDraftChange as any}
-                    isDisabled={isDisabled || !hasInternalComments}
+                    isDisabled={isDisabled}
                     backgroundColor="white"
                   />
                   <Button

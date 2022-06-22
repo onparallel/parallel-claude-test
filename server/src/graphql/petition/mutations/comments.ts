@@ -8,7 +8,6 @@ import {
   fieldsHaveCommentsEnabled,
   petitionIsNotAnonymized,
   userHasAccessToPetitions,
-  userHasFeatureFlag,
 } from "../authorizers";
 import { userIsCommentAuthor } from "./authorizers";
 
@@ -16,17 +15,10 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
   description: "Create a petition field comment.",
   type: "PetitionFieldComment",
   authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
-    ifArgEquals(
-      "isInternal",
-      true,
-      and(userHasAccessToPetitions("petitionId"), userHasFeatureFlag("INTERNAL_COMMENTS")),
-      and(
-        userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
-        fieldsHaveCommentsEnabled("petitionFieldId"),
-        fieldsAreNotInternal("petitionFieldId")
-      )
-    ),
+    ifArgEquals("isInternal", false, userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]), fieldsHaveCommentsEnabled("petitionFieldId")),
+    ifArgEquals("isInternal", false, fieldsAreNotInternal("petitionFieldId")),
     petitionIsNotAnonymized("petitionId")
   ),
   args: {
@@ -36,12 +28,8 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
     isInternal: booleanArg(),
   },
   resolve: async (_, args, ctx) => {
-    const loadInternalComments = await ctx.featureFlags.userHasFeatureFlag(
-      ctx.user!.id,
-      "INTERNAL_COMMENTS"
-    );
     ctx.petitions.loadPetitionFieldCommentsForField.dataloader.clear({
-      loadInternalComments,
+      loadInternalComments: true,
       petitionFieldId: args.petitionFieldId,
       petitionId: args.petitionId,
     });

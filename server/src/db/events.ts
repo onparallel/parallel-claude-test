@@ -59,6 +59,7 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     user_id?: number;
     petition_access_id?: number;
     petition_field_comment_id: number;
+    is_internal?: boolean;
   };
   USER_PERMISSION_ADDED: {
     user_id: number;

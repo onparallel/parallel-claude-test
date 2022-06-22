@@ -463,12 +463,8 @@ export const PetitionField = objectType({
       type: "PetitionFieldComment",
       description: "The comments for this field.",
       resolve: async (root, _, ctx) => {
-        const loadInternalComments = await ctx.featureFlags.userHasFeatureFlag(
-          ctx.user!.id,
-          "INTERNAL_COMMENTS"
-        );
         return await ctx.petitions.loadPetitionFieldCommentsForField({
-          loadInternalComments,
+          loadInternalComments: true,
           petitionId: root.petition_id,
           petitionFieldId: root.id,
         });
@@ -476,13 +472,9 @@ export const PetitionField = objectType({
     });
     t.nonNull.int("commentCount", {
       resolve: async (root, _, ctx) => {
-        const loadInternalComments = await ctx.featureFlags.userHasFeatureFlag(
-          ctx.user!.id,
-          "INTERNAL_COMMENTS"
-        );
         return (
           await ctx.petitions.loadPetitionFieldCommentsForField({
-            loadInternalComments,
+            loadInternalComments: true,
             petitionId: root.petition_id,
             petitionFieldId: root.id,
           })

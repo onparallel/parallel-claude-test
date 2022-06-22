@@ -27,7 +27,7 @@ export function TimelineCommentPublishedEvent({
     timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
   };
   if (comment) {
-    const { author, content, isEdited } = comment;
+    const { author, content, isEdited, isInternal } = comment;
     return (
       <Box
         background={`${colors.transparent} linear-gradient(${colors.gray[300]}, ${colors.gray[300]}) no-repeat 17px / 2px 100%`}
@@ -37,20 +37,38 @@ export function TimelineCommentPublishedEvent({
       >
         <Card overflow="hidden">
           <Box paddingX={4} paddingY={2} backgroundColor="gray.50">
-            <FormattedMessage
-              id="timeline.comment-published-description"
-              defaultMessage="{userIsYou, select, true {You} other {{author}}} commented on field {field} {timeAgo}"
-              values={{
-                ...values,
-                userIsYou: author?.__typename === "User" && author?.id === userId,
-                author:
-                  author?.__typename === "PetitionAccess" ? (
-                    <ContactReference contact={author.contact} />
-                  ) : (
-                    <UserReference user={author as any} />
-                  ),
-              }}
-            />
+            {isInternal ? (
+              <FormattedMessage
+                id="timeline.note-published-description"
+                defaultMessage="{userIsYou, select, true {You have} other {{author} has}} added a note in the field {field} {timeAgo}"
+                values={{
+                  ...values,
+                  userIsYou: author?.__typename === "User" && author?.id === userId,
+                  author:
+                    author?.__typename === "PetitionAccess" ? (
+                      <ContactReference contact={author.contact} />
+                    ) : (
+                      <UserReference user={author as any} />
+                    ),
+                }}
+              />
+            ) : (
+              <FormattedMessage
+                id="timeline.comment-published-description"
+                defaultMessage="{userIsYou, select, true {You} other {{author}}} commented on field {field} {timeAgo}"
+                values={{
+                  ...values,
+                  userIsYou: author?.__typename === "User" && author?.id === userId,
+                  author:
+                    author?.__typename === "PetitionAccess" ? (
+                      <ContactReference contact={author.contact} />
+                    ) : (
+                      <UserReference user={author as any} />
+                    ),
+                }}
+              />
+            )}
+
             {isEdited ? (
               <Text as="span" textStyle="hint" marginLeft={2} fontSize="sm">
                 <FormattedMessage id="generic.edited-comment-indicator" defaultMessage="Edited" />
@@ -109,6 +127,7 @@ TimelineCommentPublishedEvent.fragments = {
         isEdited
         content
         isAnonymized
+        isInternal
       }
       createdAt
     }

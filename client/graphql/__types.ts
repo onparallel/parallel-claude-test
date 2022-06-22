@@ -224,7 +224,6 @@ export type FeatureFlag =
   | "EXPORT_CUATRECASAS"
   | "GHOST_LOGIN"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
-  | "INTERNAL_COMMENTS"
   | "ON_BEHALF_OF"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
   | "PETITION_PDF_EXPORT"
@@ -5602,6 +5601,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
             isEdited: boolean;
             content: string;
             isAnonymized: boolean;
+            isInternal: boolean;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -6183,6 +6183,7 @@ export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragmen
     isEdited: boolean;
     content: string;
     isAnonymized: boolean;
+    isInternal: boolean;
     author?:
       | {
           __typename?: "PetitionAccess";
@@ -6821,6 +6822,7 @@ export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
     isEdited: boolean;
     content: string;
     isAnonymized: boolean;
+    isInternal: boolean;
     author?:
       | {
           __typename?: "PetitionAccess";
@@ -9687,7 +9689,7 @@ export type PreviewPetitionFieldCommentsDialog_PetitionFieldFragment = {
 export type PreviewPetitionFieldCommentsDialog_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type PreviewPetitionFieldCommentsDialog_userQuery = {
-  me: { __typename?: "User"; id: string; hasInternalComments: boolean };
+  me: { __typename?: "User"; id: string };
 };
 
 export type PreviewPetitionFieldCommentsDialog_petitionFieldQueryQueryVariables = Exact<{
@@ -10048,11 +10050,7 @@ export type PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutation = {
   };
 };
 
-export type PetitionRepliesFieldComments_UserFragment = {
-  __typename?: "User";
-  id: string;
-  hasInternalComments: boolean;
-};
+export type PetitionRepliesFieldComments_UserFragment = { __typename?: "User"; id: string };
 
 export type PetitionRepliesFieldComments_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -13039,6 +13037,7 @@ export type PetitionActivity_PetitionFragment = {
             isEdited: boolean;
             content: string;
             isAnonymized: boolean;
+            isInternal: boolean;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -13827,6 +13826,7 @@ export type PetitionActivity_updatePetitionMutation = {
                   isEdited: boolean;
                   content: string;
                   isAnonymized: boolean;
+                  isInternal: boolean;
                   author?:
                     | {
                         __typename?: "PetitionAccess";
@@ -14674,6 +14674,7 @@ export type PetitionActivity_petitionQuery = {
                   isEdited: boolean;
                   content: string;
                   isAnonymized: boolean;
+                  isInternal: boolean;
                   author?:
                     | {
                         __typename?: "PetitionAccess";
@@ -18060,7 +18061,6 @@ export type PetitionReplies_QueryFragment = {
     initials?: string | null;
     hasPetitionSignature: boolean;
     hasPetitionPdfExport: boolean;
-    hasInternalComments: boolean;
     hasExportCuatrecasas: boolean;
     organization: {
       __typename?: "Organization";
@@ -18558,7 +18558,6 @@ export type PetitionReplies_userQuery = {
     initials?: string | null;
     hasPetitionSignature: boolean;
     hasPetitionPdfExport: boolean;
-    hasInternalComments: boolean;
     hasExportCuatrecasas: boolean;
     organization: {
       __typename?: "Organization";
@@ -23021,6 +23020,7 @@ export const TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc = gq
       isEdited
       content
       isAnonymized
+      isInternal
     }
     createdAt
   }
@@ -24935,7 +24935,6 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
 export const PetitionRepliesFieldComments_UserFragmentDoc = gql`
   fragment PetitionRepliesFieldComments_User on User {
     id
-    hasInternalComments: hasFeatureFlag(featureFlag: INTERNAL_COMMENTS)
   }
 ` as unknown as DocumentNode<PetitionRepliesFieldComments_UserFragment, unknown>;
 export const ExportRepliesDialog_UserFragmentDoc = gql`
@@ -26626,7 +26625,6 @@ export const PreviewPetitionFieldCommentsDialog_userDocument = gql`
   query PreviewPetitionFieldCommentsDialog_user {
     me {
       id
-      hasInternalComments: hasFeatureFlag(featureFlag: INTERNAL_COMMENTS)
     }
   }
 ` as unknown as DocumentNode<

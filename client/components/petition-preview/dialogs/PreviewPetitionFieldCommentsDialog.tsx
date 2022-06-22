@@ -58,8 +58,6 @@ export function PreviewPetitionFieldCommentsDialog({
   const { data: userData } = useQuery(PreviewPetitionFieldCommentsDialog_userDocument);
 
   const myId = userData?.me.id;
-  const hasInternalComments = userData?.me.hasInternalComments ?? false;
-
   const { data, loading } = useQuery(
     PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument,
     {
@@ -214,14 +212,6 @@ export function PreviewPetitionFieldCommentsDialog({
                     ) : (
                       <Stack alignItems="center" textAlign="center">
                         <NoteIcon boxSize="64px" color="gray.200" />
-                        {hasInternalComments ? (
-                          <Text color="gray.400">
-                            <FormattedMessage
-                              id="petition-replies.field-comments.disabled-comments-1"
-                              defaultMessage="This field only accepts internal comments."
-                            />
-                          </Text>
-                        ) : null}
                         <Text color="gray.400">
                           <FormattedMessage
                             id="petition-replies.field-comments.disabled-comments-2"
@@ -280,7 +270,6 @@ export function PreviewPetitionFieldCommentsDialog({
             }
             isDisabled={isDisabled}
             isTemplate={isTemplate ?? false}
-            hasInternalComments={hasInternalComments}
             hasCommentsEnabled={hasCommentsEnabled}
             onCommentKeyDown={async (event, content) =>
               await handleKeyDown({ event, content, isInternal: false })
@@ -327,7 +316,6 @@ PreviewPetitionFieldCommentsDialog.queries = [
     query PreviewPetitionFieldCommentsDialog_user {
       me {
         id
-        hasInternalComments: hasFeatureFlag(featureFlag: INTERNAL_COMMENTS)
       }
     }
   `,

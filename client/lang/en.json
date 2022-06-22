@@ -2715,21 +2715,6 @@
     "context": "<b>Preview only</b> - comments are disabled."
   },
   {
-    "term": "component.preview-petition-field-comments-dialog.comments-cta",
-    "definition": "Have any questions? Ask here",
-    "context": "Have any questions? Ask here"
-  },
-  {
-    "term": "component.pricing-table.compare-plans",
-    "definition": "Compare plans",
-    "context": "Compare plans"
-  },
-  {
-    "term": "component.pricing-table.on-demand",
-    "definition": "On demand",
-    "context": "On demand"
-  },
-  {
     "term": "component.print-pdf-task.confirm",
     "definition": "Download PDF",
     "context": "Download PDF"
@@ -6630,34 +6615,14 @@
     "context": "Export replies"
   },
   {
-    "term": "petition-replies.field-comments.disabled-comments-1",
-    "definition": "This field only accepts internal comments.",
-    "context": "This field only accepts internal comments."
-  },
-  {
     "term": "petition-replies.field-comments.disabled-comments-2",
     "definition": "You can enable comments from the <a>Field settings</a> in the {composeTab} tab.",
     "context": "You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
   },
   {
-    "term": "petition-replies.field-comments.placeholder",
-    "definition": "Type a new comment",
-    "context": "Type a new comment"
-  },
-  {
     "term": "petition-replies.finalize-petition.button",
     "definition": "Finish petition",
     "context": "Finish petition"
-  },
-  {
-    "term": "petition-replies.internal-comment-check.help",
-    "definition": "By checking this field, the comment will be visible only to users in your organization.",
-    "context": "By checking this field, the comment will be visible only to users in your organization."
-  },
-  {
-    "term": "petition-replies.internal-comment-check.label",
-    "definition": "Internal comment",
-    "context": "Internal comment"
   },
   {
     "term": "petition-replies.note-popover",
@@ -8573,6 +8538,11 @@
     "term": "timeline.message-sent-see-message",
     "definition": "See message",
     "context": "See message"
+  },
+  {
+    "term": "timeline.note-published-description",
+    "definition": "{userIsYou, select, true {You have} other {{author} has}} added a note in the field {field} {timeAgo}",
+    "context": "{userIsYou, select, true {You have} other {{author} has}} added a note in the field {field} {timeAgo}"
   },
   {
     "term": "timeline.ownership-transferred-description",

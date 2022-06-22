@@ -599,7 +599,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 petitionId={petition.id}
                 field={activeField}
                 myId={me.id}
-                hasInternalComments={me.hasInternalComments}
                 isDisabled={petition.isAnonymized}
                 onClose={() => setActiveFieldId(null)}
                 onAddComment={handleAddComment}

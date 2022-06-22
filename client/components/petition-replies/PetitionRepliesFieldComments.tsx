@@ -19,7 +19,6 @@ export interface PetitionRepliesFieldCommentsProps {
   petitionId: string;
   field: PetitionRepliesFieldComments_PetitionFieldFragment;
   myId: string;
-  hasInternalComments: boolean;
   onAddComment: (value: string, internal?: boolean) => Promise<void>;
   onDeleteComment: (petitionFieldCommentId: string) => void;
   onUpdateComment: (petitionFieldCommentId: string, content: string) => void;
@@ -33,7 +32,6 @@ export function PetitionRepliesFieldComments({
   petitionId,
   field,
   myId,
-  hasInternalComments,
   onAddComment,
   onDeleteComment,
   onUpdateComment,
@@ -139,14 +137,6 @@ export function PetitionRepliesFieldComments({
                 ) : (
                   <Stack alignItems="center" textAlign="center">
                     <AlertCircleIcon boxSize="64px" color="gray.200" />
-                    {hasInternalComments ? (
-                      <Text color="gray.400">
-                        <FormattedMessage
-                          id="petition-replies.field-comments.disabled-comments-1"
-                          defaultMessage="This field only accepts internal comments."
-                        />
-                      </Text>
-                    ) : null}
                     <Text color="gray.400">
                       <FormattedMessage
                         id="petition-replies.field-comments.disabled-comments-2"
@@ -187,7 +177,6 @@ export function PetitionRepliesFieldComments({
         }
         isDisabled={isDisabled}
         isTemplate={false}
-        hasInternalComments={hasInternalComments}
         hasCommentsEnabled={hasCommentsEnabled}
         onCommentKeyDown={async (event, content) =>
           await handleKeyDown({ event, content, isInternal: false })
@@ -206,7 +195,6 @@ PetitionRepliesFieldComments.fragments = {
   User: gql`
     fragment PetitionRepliesFieldComments_User on User {
       id
-      hasInternalComments: hasFeatureFlag(featureFlag: INTERNAL_COMMENTS)
     }
   `,
   get PetitionField() {
