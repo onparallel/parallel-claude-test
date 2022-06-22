@@ -98,6 +98,7 @@ function LandingTemplateDetails({
         maxWidth="container.xl"
         wrapper={{
           paddingY: 16,
+          backgroundColor: "gray.50",
         }}
       >
         <Stack spacing={{ base: 20, md: 28 }}>
