@@ -1,4 +1,4 @@
-import { Button, Flex, Heading } from "@chakra-ui/react";
+import { Button, Heading, Stack } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { FormattedMessage } from "react-intl";
@@ -6,11 +6,16 @@ import { FormattedMessage } from "react-intl";
 export function PublicFooterCTA() {
   return (
     <PublicContainer
+      as={Stack}
+      spacing={8}
       paddingY={20}
       maxWidth="container.xl"
       textAlign="center"
+      justifyContent="center"
+      alignItems="center"
       height="300px"
       width="100%"
+      padding={6}
       transform="translateY(68px)"
       borderRadius="lg"
       overflow="hidden"
@@ -30,16 +35,11 @@ export function PublicFooterCTA() {
           defaultMessage="Do you want to use our templates?"
         />
       </Heading>
-      <Flex marginTop={8} justifyContent="center">
-        <NakedLink href="/signup">
-          <Button as="a" size="lg" backgroundColor="white" height="3.5rem">
-            <FormattedMessage
-              id="public.sign-up-for-free-button"
-              defaultMessage="Sign up for free"
-            />
-          </Button>
-        </NakedLink>
-      </Flex>
+      <NakedLink href="/signup">
+        <Button as="a" size="lg" backgroundColor="white" height="3.5rem" width="auto">
+          <FormattedMessage id="public.sign-up-for-free-button" defaultMessage="Sign up for free" />
+        </Button>
+      </NakedLink>
     </PublicContainer>
   );
 }
