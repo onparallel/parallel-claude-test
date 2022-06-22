@@ -19,7 +19,6 @@ import { IntegrationCard } from "@parallel/components/organization/IntegrationCa
 import { OrganizationIntegrations_userDocument } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
-import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { isAtLeast } from "@parallel/utils/roles";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -149,11 +148,14 @@ function OrganizationIntegrations() {
               variant="outline"
               colorScheme="blue"
               backgroundColor="white"
+              as="a"
+              target="_blank"
+              rel="noopener"
+              href="https://parallel.canny.io/integrations"
               aria-label={intl.formatMessage({
                 id: "organization.integrations.alert-button",
                 defaultMessage: "Suggest integration",
               })}
-              onClick={() => openNewWindow("https://parallel.canny.io/integrations")}
             >
               <FormattedMessage
                 id="organization.integrations.alert-button"
