@@ -121,34 +121,47 @@ function OrganizationIntegrations() {
         </Heading>
       }
     >
-      <Alert status="info">
+      <Alert status="info" paddingX={6}>
         <AlertIcon />
-        <Box flex="1">
-          <AlertTitle>
-            <FormattedMessage
-              id="organization.integrations.alert-title"
-              defaultMessage="Can't find the integration you need?"
-            />
-          </AlertTitle>
-          <AlertDescription>
-            <FormattedMessage
-              id="organization.integrations.alert-description"
-              defaultMessage="Let us know! Tell us which applications you would like to connect Parallel with so we can consider them."
-            />
-          </AlertDescription>
-        </Box>
-        <Button
-          aria-label={intl.formatMessage({
-            id: "organization.integrations.alert-button",
-            defaultMessage: "Suggest integration",
-          })}
-          onClick={() => openNewWindow("https://parallel.canny.io/integrations")}
+        <Stack
+          direction={{ base: "column", md: "row" }}
+          justifyContent="space-between"
+          alignItems={{ base: "flex-start", md: "center" }}
+          flex="1"
+          spacing={4}
         >
-          <FormattedMessage
-            id="organization.integrations.alert-button"
-            defaultMessage="Suggest integration"
-          />
-        </Button>
+          <Box>
+            <AlertTitle>
+              <FormattedMessage
+                id="organization.integrations.alert-title"
+                defaultMessage="Can't find the integration you need?"
+              />
+            </AlertTitle>
+            <AlertDescription>
+              <FormattedMessage
+                id="organization.integrations.alert-description"
+                defaultMessage="Let us know! Tell us which applications you would like to connect Parallel with so we can consider them."
+              />
+            </AlertDescription>
+          </Box>
+          <Box>
+            <Button
+              variant="outline"
+              colorScheme="blue"
+              backgroundColor="white"
+              aria-label={intl.formatMessage({
+                id: "organization.integrations.alert-button",
+                defaultMessage: "Suggest integration",
+              })}
+              onClick={() => openNewWindow("https://parallel.canny.io/integrations")}
+            >
+              <FormattedMessage
+                id="organization.integrations.alert-button"
+                defaultMessage="Suggest integration"
+              />
+            </Button>
+          </Box>
+        </Stack>
       </Alert>
       <Stack padding={4} spacing={5} maxWidth="container.sm" paddingBottom={16}>
         {integrations.map((integration, index) => (
