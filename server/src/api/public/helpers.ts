@@ -24,7 +24,7 @@ import { TaskFragment } from "./fragments";
 import {
   AWSPresignedPostDataFragment,
   getTags_tagsDocument,
-  getTaskResultFileUrl_getTaskResultFileUrlDocument,
+  getTaskResultFileUrl_getTaskResultFileDocument,
   PetitionFieldFragment,
   PetitionFieldReplyFragment,
   PetitionFieldType,
@@ -269,17 +269,17 @@ export async function waitForTask(client: GraphQLClient, task: TaskType) {
 
 export async function getTaskResultFileUrl(client: GraphQLClient, task: TaskType) {
   const _mutation = gql`
-    mutation getTaskResultFileUrl_getTaskResultFileUrl($taskId: GID!) {
-      getTaskResultFileUrl(taskId: $taskId)
+    mutation getTaskResultFileUrl_getTaskResultFile($taskId: GID!) {
+      getTaskResultFile(taskId: $taskId)
     }
   `;
-  const result = await client.request(getTaskResultFileUrl_getTaskResultFileUrlDocument, {
+  const result = await client.request(getTaskResultFileUrl_getTaskResultFileDocument, {
     taskId: task.id,
   });
-  if (!result?.getTaskResultFileUrl) {
+  if (!result?.getTaskResultFile?.url) {
     throw new Error();
   } else {
-    return result.getTaskResultFileUrl;
+    return result.getTaskResultFile.url as string;
   }
 }
 

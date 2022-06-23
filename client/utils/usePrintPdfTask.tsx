@@ -6,7 +6,7 @@ import {
 } from "@parallel/components/common/dialogs/TaskProgressDialog";
 import {
   usePrintPdfTask_createPrintPdfTaskDocument,
-  usePrintPdfTask_getTaskResultFileUrlDocument,
+  usePrintPdfTask_getTaskResultFileDocument,
 } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
@@ -16,7 +16,7 @@ import { withError } from "./promises/withError";
 export function usePrintPdfTask() {
   const apollo = useApolloClient();
   const showError = useErrorDialog();
-  const [generateDownloadUrl] = useMutation(usePrintPdfTask_getTaskResultFileUrlDocument);
+  const [getTaskResultFile] = useMutation(usePrintPdfTask_getTaskResultFileDocument);
 
   const showTaskProgressDialog = useTaskProgressDialog();
   const intl = useIntl();
@@ -56,13 +56,13 @@ export function usePrintPdfTask() {
     } else if (!error) {
       openNewWindow(async () => {
         try {
-          const { data } = await generateDownloadUrl({
+          const { data } = await getTaskResultFile({
             variables: { taskId: finishedTask!.id },
           });
-          if (!data?.getTaskResultFileUrl) {
+          if (!data?.getTaskResultFile?.url) {
             throw new Error();
           }
-          return data.getTaskResultFileUrl;
+          return data.getTaskResultFile.url;
         } catch (error) {
           // don't await this. we want to immediately rethrow the error so the new window is closed
           showError({
@@ -89,8 +89,8 @@ usePrintPdfTask.mutations = [
     ${TaskProgressDialog.fragments.Task}
   `,
   gql`
-    mutation usePrintPdfTask_getTaskResultFileUrl($taskId: GID!) {
-      getTaskResultFileUrl(taskId: $taskId, preview: true)
+    mutation usePrintPdfTask_getTaskResultFile($taskId: GID!) {
+      getTaskResultFile(taskId: $taskId, preview: true)
     }
   `,
 ];

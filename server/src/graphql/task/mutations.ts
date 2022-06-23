@@ -154,7 +154,58 @@ export const createTemplateStatsReportTask = mutationField("createTemplateStatsR
   },
 });
 
+export const getTaskResultFile = mutationField("getTaskResultFile", {
+  description: "Returns an object with signed download url and filename for tasks with file output",
+  type: "JSONObject",
+  authorize: authenticateAnd(
+    userHasAccessToTasks("taskId"),
+    tasksAreOfType("taskId", [
+      "EXPORT_REPLIES",
+      "PRINT_PDF",
+      "EXPORT_EXCEL",
+      "TEMPLATE_REPLIES_REPORT",
+    ])
+  ),
+  args: {
+    taskId: nonNull(globalIdArg("Task")),
+    preview: nullable(booleanArg()),
+  },
+  resolve: async (_, args, ctx) => {
+    const task = (await ctx.tasks.loadTask(args.taskId)) as
+      | Task<"EXPORT_REPLIES">
+      | Task<"PRINT_PDF">
+      | Task<"EXPORT_EXCEL">
+      | Task<"TEMPLATE_REPLIES_REPORT">;
+
+    const file = isDefined(task.output)
+      ? await ctx.files.loadTemporaryFile(task.output.temporary_file_id)
+      : null;
+
+    if (
+      !file ||
+      // temporary files are deleted after 30 days on S3 bucket
+      differenceInDays(new Date(), file.created_at) >= 30
+    ) {
+      throw new ApolloError(
+        `Temporary file not found for Task:${task.id} output`,
+        "FILE_NOT_FOUND_ERROR"
+      );
+    }
+
+    return {
+      url: await ctx.aws.temporaryFiles.getSignedDownloadEndpoint(
+        file.path,
+        file.filename,
+        args.preview ? "inline" : "attachment"
+      ),
+      filename: file.filename,
+    };
+  },
+});
+
+/** @deprecated use getTaskResultFile instead */
 export const getTaskResultFileUrl = mutationField("getTaskResultFileUrl", {
+  deprecation: "use getTaskResultFile instead",
   description: "Returns a signed download url for tasks with file output",
   type: "String",
   authorize: authenticateAnd(

@@ -6,7 +6,7 @@ import {
 } from "@parallel/components/common/dialogs/TaskProgressDialog";
 import {
   useExportRepliesTask_createExportRepliesTaskDocument,
-  useExportRepliesTask_getTaskResultFileUrlDocument,
+  useExportRepliesTask_getTaskResultFileDocument,
 } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
@@ -17,7 +17,7 @@ import { Maybe } from "./types";
 export function useExportRepliesTask() {
   const apollo = useApolloClient();
   const showError = useErrorDialog();
-  const [generateDownloadURL] = useMutation(useExportRepliesTask_getTaskResultFileUrlDocument);
+  const [getTaskResultFile] = useMutation(useExportRepliesTask_getTaskResultFileDocument);
   const showTaskProgressDialog = useTaskProgressDialog();
   const intl = useIntl();
 
@@ -55,11 +55,11 @@ export function useExportRepliesTask() {
       });
     } else if (!error) {
       openNewWindow(async () => {
-        const { data } = await generateDownloadURL({ variables: { taskId: finishedTask!.id } });
-        if (!data?.getTaskResultFileUrl) {
+        const { data } = await getTaskResultFile({ variables: { taskId: finishedTask!.id } });
+        if (!data?.getTaskResultFile?.url) {
           throw new Error();
         }
-        return data.getTaskResultFileUrl;
+        return data.getTaskResultFile.url;
       });
     }
   };
@@ -75,8 +75,8 @@ useExportRepliesTask.mutations = [
     ${TaskProgressDialog.fragments.Task}
   `,
   gql`
-    mutation useExportRepliesTask_getTaskResultFileUrl($taskId: GID!) {
-      getTaskResultFileUrl(taskId: $taskId, preview: false)
+    mutation useExportRepliesTask_getTaskResultFile($taskId: GID!) {
+      getTaskResultFile(taskId: $taskId, preview: false)
     }
   `,
 ];

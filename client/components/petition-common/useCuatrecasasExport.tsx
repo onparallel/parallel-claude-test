@@ -76,8 +76,8 @@ function useExportExcel(clientId: string) {
   return async (petition: useCuatrecasasExport_PetitionFragment, opts: ExportOpts) => {
     const result = await exportExcelTask({ petitionId: petition.id });
     return await cuatrecasasExport(
-      result.url!,
-      result.task.output!.filename,
+      result.url,
+      result.filename,
       clientId,
       opts.signal,
       opts.onProgress
@@ -273,8 +273,8 @@ function useExportPdfDocument(clientId: string, refs: ExportRefs) {
     const exportedDocument = await printPdfTask({ petitionId: petition.id });
 
     const pdfExternalId = await cuatrecasasExport(
-      exportedDocument.url!,
-      exportedDocument.task.output!.filename,
+      exportedDocument.url,
+      exportedDocument.filename,
       clientId,
       opts.signal,
       opts.onProgress

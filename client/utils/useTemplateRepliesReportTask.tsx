@@ -6,7 +6,7 @@ import {
 } from "@parallel/components/common/dialogs/TaskProgressDialog";
 import {
   useTemplateRepliesReportTask_createTemplateRepliesReportTaskDocument,
-  useTemplateRepliesReportTask_getTaskResultFileUrlDocument,
+  useTemplateRepliesReportTask_getTaskResultFileDocument,
 } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { isDefined } from "remeda";
@@ -16,9 +16,7 @@ import { withError } from "./promises/withError";
 export function useTemplateRepliesReportTask() {
   const apollo = useApolloClient();
   const showError = useErrorDialog();
-  const [generateDownloadUrl] = useMutation(
-    useTemplateRepliesReportTask_getTaskResultFileUrlDocument
-  );
+  const [getTaskResultFile] = useMutation(useTemplateRepliesReportTask_getTaskResultFileDocument);
 
   const showTaskProgressDialog = useTaskProgressDialog();
   const intl = useIntl();
@@ -58,13 +56,13 @@ export function useTemplateRepliesReportTask() {
     } else if (!error) {
       openNewWindow(async () => {
         try {
-          const { data } = await generateDownloadUrl({
+          const { data } = await getTaskResultFile({
             variables: { taskId: finishedTask!.id },
           });
-          if (!data?.getTaskResultFileUrl) {
+          if (!data?.getTaskResultFile?.url) {
             throw new Error();
           }
-          return data.getTaskResultFileUrl;
+          return data.getTaskResultFile.url;
         } catch (error) {
           // don't await this. we want to immediately rethrow the error so the new window is closed
           showError({
@@ -94,8 +92,8 @@ useTemplateRepliesReportTask.mutations = [
     ${TaskProgressDialog.fragments.Task}
   `,
   gql`
-    mutation useTemplateRepliesReportTask_getTaskResultFileUrl($taskId: GID!) {
-      getTaskResultFileUrl(taskId: $taskId, preview: true)
+    mutation useTemplateRepliesReportTask_getTaskResultFile($taskId: GID!) {
+      getTaskResultFile(taskId: $taskId, preview: true)
     }
   `,
 ];

@@ -945,9 +945,15 @@ type Mutation {
   getApiTokenOwner(token: String!): SupportMethodResponse!
 
   """
+  Returns an object with signed download url and filename for tasks with file output
+  """
+  getTaskResultFile(preview: Boolean, taskId: GID!): JSONObject!
+
+  """
   Returns a signed download url for tasks with file output
   """
   getTaskResultFileUrl(preview: Boolean, taskId: GID!): String!
+    @deprecated(reason: "use getTaskResultFile instead")
   loginAs(userId: GID!): Result!
 
   """

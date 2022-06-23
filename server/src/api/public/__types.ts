@@ -507,7 +507,12 @@ export type Mutation = {
   generateUserAuthToken: GenerateUserAuthTokenResponse;
   /** Get the user who owns an API Token */
   getApiTokenOwner: SupportMethodResponse;
-  /** Returns a signed download url for tasks with file output */
+  /** Returns an object with signed download url and filename for tasks with file output */
+  getTaskResultFile: Scalars["JSONObject"];
+  /**
+   * Returns a signed download url for tasks with file output
+   * @deprecated use getTaskResultFile instead
+   */
   getTaskResultFileUrl: Scalars["String"];
   loginAs: Result;
   /** marks a Signature integration as default */
@@ -1014,6 +1019,11 @@ export type MutationgenerateUserAuthTokenArgs = {
 
 export type MutationgetApiTokenOwnerArgs = {
   token: Scalars["String"];
+};
+
+export type MutationgetTaskResultFileArgs = {
+  preview?: InputMaybe<Scalars["Boolean"]>;
+  taskId: Scalars["GID"];
 };
 
 export type MutationgetTaskResultFileUrlArgs = {
@@ -3867,11 +3877,13 @@ export type waitForTask_TaskQuery = {
   task: { id: string; progress: number | null; status: TaskStatus };
 };
 
-export type getTaskResultFileUrl_getTaskResultFileUrlMutationVariables = Exact<{
+export type getTaskResultFileUrl_getTaskResultFileMutationVariables = Exact<{
   taskId: Scalars["GID"];
 }>;
 
-export type getTaskResultFileUrl_getTaskResultFileUrlMutation = { getTaskResultFileUrl: string };
+export type getTaskResultFileUrl_getTaskResultFileMutation = {
+  getTaskResultFile: { [key: string]: any };
+};
 
 export type GetMe_userQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -5740,13 +5752,13 @@ export const waitForTask_TaskDocument = gql`
   }
   ${TaskFragmentDoc}
 ` as unknown as DocumentNode<waitForTask_TaskQuery, waitForTask_TaskQueryVariables>;
-export const getTaskResultFileUrl_getTaskResultFileUrlDocument = gql`
-  mutation getTaskResultFileUrl_getTaskResultFileUrl($taskId: GID!) {
-    getTaskResultFileUrl(taskId: $taskId)
+export const getTaskResultFileUrl_getTaskResultFileDocument = gql`
+  mutation getTaskResultFileUrl_getTaskResultFile($taskId: GID!) {
+    getTaskResultFile(taskId: $taskId)
   }
 ` as unknown as DocumentNode<
-  getTaskResultFileUrl_getTaskResultFileUrlMutation,
-  getTaskResultFileUrl_getTaskResultFileUrlMutationVariables
+  getTaskResultFileUrl_getTaskResultFileMutation,
+  getTaskResultFileUrl_getTaskResultFileMutationVariables
 >;
 export const GetMe_userDocument = gql`
   query GetMe_user {

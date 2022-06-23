@@ -1006,6 +1006,7 @@ export interface NexusGenFieldTypes {
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
     getApiTokenOwner: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    getTaskResultFile: NexusGenScalars["JSONObject"]; // JSONObject!
     getTaskResultFileUrl: string; // String!
     loginAs: NexusGenEnums["Result"]; // Result!
     markSignatureIntegrationAsDefault: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
@@ -2512,6 +2513,7 @@ export interface NexusGenFieldTypeNames {
     fileUploadReplyDownloadLink: "FileUploadDownloadLinkResult";
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
     getApiTokenOwner: "SupportMethodResponse";
+    getTaskResultFile: "JSONObject";
     getTaskResultFileUrl: "String";
     loginAs: "Result";
     markSignatureIntegrationAsDefault: "OrgIntegration";
@@ -4042,6 +4044,11 @@ export interface NexusGenArgTypes {
     getApiTokenOwner: {
       // args
       token: string; // String!
+    };
+    getTaskResultFile: {
+      // args
+      preview?: boolean | null; // Boolean
+      taskId: NexusGenScalars["GID"]; // GID!
     };
     getTaskResultFileUrl: {
       // args

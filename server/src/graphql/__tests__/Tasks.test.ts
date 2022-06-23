@@ -133,7 +133,7 @@ describe("GraphQL/Tasks", () => {
     });
   });
 
-  describe("getTaskResultFileUrl", () => {
+  describe("getTaskResultFile", () => {
     let completedTask: Task;
     let privateTask: Task;
     let incompleteTask: Task;
@@ -169,21 +169,21 @@ describe("GraphQL/Tasks", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($taskId: GID!) {
-            getTaskResultFileUrl(taskId: $taskId)
+            getTaskResultFile(taskId: $taskId)
           }
         `,
         { taskId: toGlobalId("Task", completedTask.id) }
       );
 
       expect(errors).toBeUndefined();
-      expect(data?.getTaskResultFileUrl).toEqual("");
+      expect(data?.getTaskResultFile).toEqual({ url: "", filename: "file.pdf" });
     });
 
     it("sends error if trying to get the result of a private task", async () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($taskId: GID!) {
-            getTaskResultFileUrl(taskId: $taskId)
+            getTaskResultFile(taskId: $taskId)
           }
         `,
         { taskId: toGlobalId("Task", privateTask.id) }
@@ -197,7 +197,7 @@ describe("GraphQL/Tasks", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($taskId: GID!) {
-            getTaskResultFileUrl(taskId: $taskId)
+            getTaskResultFile(taskId: $taskId)
           }
         `,
         { taskId: toGlobalId("Task", incompleteTask.id) }

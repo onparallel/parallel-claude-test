@@ -507,7 +507,12 @@ export type Mutation = {
   generateUserAuthToken: GenerateUserAuthTokenResponse;
   /** Get the user who owns an API Token */
   getApiTokenOwner: SupportMethodResponse;
-  /** Returns a signed download url for tasks with file output */
+  /** Returns an object with signed download url and filename for tasks with file output */
+  getTaskResultFile: Scalars["JSONObject"];
+  /**
+   * Returns a signed download url for tasks with file output
+   * @deprecated use getTaskResultFile instead
+   */
   getTaskResultFileUrl: Scalars["String"];
   loginAs: Result;
   /** marks a Signature integration as default */
@@ -1014,6 +1019,11 @@ export type MutationgenerateUserAuthTokenArgs = {
 
 export type MutationgetApiTokenOwnerArgs = {
   token: Scalars["String"];
+};
+
+export type MutationgetTaskResultFileArgs = {
+  preview?: InputMaybe<Scalars["Boolean"]>;
+  taskId: Scalars["GID"];
 };
 
 export type MutationgetTaskResultFileUrlArgs = {

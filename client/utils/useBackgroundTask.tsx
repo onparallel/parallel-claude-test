@@ -4,7 +4,7 @@ import {
   useBackgroundTask_createExportExcelTaskDocument,
   useBackgroundTask_createPrintPdfTaskDocument,
   useBackgroundTask_createTemplateStatsReportTaskDocument,
-  useBackgroundTask_getTaskResultFileUrlDocument,
+  useBackgroundTask_getTaskResultFileDocument,
   useBackgroundTask_taskDocument,
   useBackgroundTask_TaskFragment,
 } from "@parallel/graphql/__types";
@@ -24,10 +24,13 @@ interface BackgroundTaskOptions {
 }
 
 export interface BackgroundTask<Task extends keyof typeof TASK_DOCUMENTS> {
-  (variables: VariablesOf<typeof TASK_DOCUMENTS[Task]>, options?: BackgroundTaskOptions): Promise<{
-    task: useBackgroundTask_TaskFragment;
-    url?: string;
-  }>;
+  (variables: VariablesOf<typeof TASK_DOCUMENTS[Task]>, options?: BackgroundTaskOptions): Promise<
+    Task extends "TEMPLATE_STATS_REPORT"
+      ? {
+          task: useBackgroundTask_TaskFragment;
+        }
+      : { url: string; filename: string }
+  >;
 }
 
 export function useBackgroundTask<Task extends keyof typeof TASK_DOCUMENTS>(
@@ -35,7 +38,7 @@ export function useBackgroundTask<Task extends keyof typeof TASK_DOCUMENTS>(
 ): BackgroundTask<Task> {
   const apollo = useApolloClient();
   const [createTask] = useMutation(TASK_DOCUMENTS[taskName]);
-  const [generateDownloadUrl] = useMutation(useBackgroundTask_getTaskResultFileUrlDocument);
+  const [getTaskResultFile] = useMutation(useBackgroundTask_getTaskResultFileDocument);
 
   return useCallback(
     (async (
@@ -73,8 +76,11 @@ export function useBackgroundTask<Task extends keyof typeof TASK_DOCUMENTS>(
       if (taskName === "TEMPLATE_STATS_REPORT") {
         return { task };
       } else {
-        const { data } = await generateDownloadUrl({ variables: { taskId: task!.id } });
-        return { task, url: data!.getTaskResultFileUrl };
+        const { data } = await getTaskResultFile({ variables: { taskId: task!.id } });
+        return {
+          url: data!.getTaskResultFile.url,
+          filename: data!.getTaskResultFile.filename,
+        };
       }
     }) as any,
     []
@@ -121,8 +127,8 @@ const _mutations = [
     ${fragments.Task}
   `,
   gql`
-    mutation useBackgroundTask_getTaskResultFileUrl($taskId: GID!) {
-      getTaskResultFileUrl(taskId: $taskId, preview: false)
+    mutation useBackgroundTask_getTaskResultFile($taskId: GID!) {
+      getTaskResultFile(taskId: $taskId, preview: false)
     }
   `,
 ];

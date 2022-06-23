@@ -540,7 +540,12 @@ export interface Mutation {
   generateUserAuthToken: GenerateUserAuthTokenResponse;
   /** Get the user who owns an API Token */
   getApiTokenOwner: SupportMethodResponse;
-  /** Returns a signed download url for tasks with file output */
+  /** Returns an object with signed download url and filename for tasks with file output */
+  getTaskResultFile: Scalars["JSONObject"];
+  /**
+   * Returns a signed download url for tasks with file output
+   * @deprecated use getTaskResultFile instead
+   */
   getTaskResultFileUrl: Scalars["String"];
   loginAs: Result;
   /** marks a Signature integration as default */
@@ -1047,6 +1052,11 @@ export interface MutationgenerateUserAuthTokenArgs {
 
 export interface MutationgetApiTokenOwnerArgs {
   token: Scalars["String"];
+}
+
+export interface MutationgetTaskResultFileArgs {
+  preview?: InputMaybe<Scalars["Boolean"]>;
+  taskId: Scalars["GID"];
 }
 
 export interface MutationgetTaskResultFileUrlArgs {
@@ -21058,11 +21068,13 @@ export type useBackgroundTask_createTemplateStatsReportTaskMutation = {
   };
 };
 
-export type useBackgroundTask_getTaskResultFileUrlMutationVariables = Exact<{
+export type useBackgroundTask_getTaskResultFileMutationVariables = Exact<{
   taskId: Scalars["GID"];
 }>;
 
-export type useBackgroundTask_getTaskResultFileUrlMutation = { getTaskResultFileUrl: string };
+export type useBackgroundTask_getTaskResultFileMutation = {
+  getTaskResultFile: { [key: string]: any };
+};
 
 export type useBackgroundTask_taskQueryVariables = Exact<{
   id: Scalars["GID"];
@@ -21091,11 +21103,13 @@ export type useExportRepliesTask_createExportRepliesTaskMutation = {
   };
 };
 
-export type useExportRepliesTask_getTaskResultFileUrlMutationVariables = Exact<{
+export type useExportRepliesTask_getTaskResultFileMutationVariables = Exact<{
   taskId: Scalars["GID"];
 }>;
 
-export type useExportRepliesTask_getTaskResultFileUrlMutation = { getTaskResultFileUrl: string };
+export type useExportRepliesTask_getTaskResultFileMutation = {
+  getTaskResultFile: { [key: string]: any };
+};
 
 export type useFilenamePlaceholdersRename_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -21431,11 +21445,13 @@ export type usePrintPdfTask_createPrintPdfTaskMutation = {
   };
 };
 
-export type usePrintPdfTask_getTaskResultFileUrlMutationVariables = Exact<{
+export type usePrintPdfTask_getTaskResultFileMutationVariables = Exact<{
   taskId: Scalars["GID"];
 }>;
 
-export type usePrintPdfTask_getTaskResultFileUrlMutation = { getTaskResultFileUrl: string };
+export type usePrintPdfTask_getTaskResultFileMutation = {
+  getTaskResultFile: { [key: string]: any };
+};
 
 export type usePublicPrintPdfTask_publicCreatePrintPdfTaskMutationVariables = Exact<{
   keycode: Scalars["ID"];
@@ -21511,12 +21527,12 @@ export type useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutation
   };
 };
 
-export type useTemplateRepliesReportTask_getTaskResultFileUrlMutationVariables = Exact<{
+export type useTemplateRepliesReportTask_getTaskResultFileMutationVariables = Exact<{
   taskId: Scalars["GID"];
 }>;
 
-export type useTemplateRepliesReportTask_getTaskResultFileUrlMutation = {
-  getTaskResultFileUrl: string;
+export type useTemplateRepliesReportTask_getTaskResultFileMutation = {
+  getTaskResultFile: { [key: string]: any };
 };
 
 export type validatePetitionFields_PetitionFieldFragment = {
@@ -28901,13 +28917,13 @@ export const useBackgroundTask_createTemplateStatsReportTaskDocument = gql`
   useBackgroundTask_createTemplateStatsReportTaskMutation,
   useBackgroundTask_createTemplateStatsReportTaskMutationVariables
 >;
-export const useBackgroundTask_getTaskResultFileUrlDocument = gql`
-  mutation useBackgroundTask_getTaskResultFileUrl($taskId: GID!) {
-    getTaskResultFileUrl(taskId: $taskId, preview: false)
+export const useBackgroundTask_getTaskResultFileDocument = gql`
+  mutation useBackgroundTask_getTaskResultFile($taskId: GID!) {
+    getTaskResultFile(taskId: $taskId, preview: false)
   }
 ` as unknown as DocumentNode<
-  useBackgroundTask_getTaskResultFileUrlMutation,
-  useBackgroundTask_getTaskResultFileUrlMutationVariables
+  useBackgroundTask_getTaskResultFileMutation,
+  useBackgroundTask_getTaskResultFileMutationVariables
 >;
 export const useBackgroundTask_taskDocument = gql`
   query useBackgroundTask_task($id: GID!) {
@@ -28928,13 +28944,13 @@ export const useExportRepliesTask_createExportRepliesTaskDocument = gql`
   useExportRepliesTask_createExportRepliesTaskMutation,
   useExportRepliesTask_createExportRepliesTaskMutationVariables
 >;
-export const useExportRepliesTask_getTaskResultFileUrlDocument = gql`
-  mutation useExportRepliesTask_getTaskResultFileUrl($taskId: GID!) {
-    getTaskResultFileUrl(taskId: $taskId, preview: false)
+export const useExportRepliesTask_getTaskResultFileDocument = gql`
+  mutation useExportRepliesTask_getTaskResultFile($taskId: GID!) {
+    getTaskResultFile(taskId: $taskId, preview: false)
   }
 ` as unknown as DocumentNode<
-  useExportRepliesTask_getTaskResultFileUrlMutation,
-  useExportRepliesTask_getTaskResultFileUrlMutationVariables
+  useExportRepliesTask_getTaskResultFileMutation,
+  useExportRepliesTask_getTaskResultFileMutationVariables
 >;
 export const useLoginAs_loginAsDocument = gql`
   mutation useLoginAs_loginAs($userId: GID!) {
@@ -28971,13 +28987,13 @@ export const usePrintPdfTask_createPrintPdfTaskDocument = gql`
   usePrintPdfTask_createPrintPdfTaskMutation,
   usePrintPdfTask_createPrintPdfTaskMutationVariables
 >;
-export const usePrintPdfTask_getTaskResultFileUrlDocument = gql`
-  mutation usePrintPdfTask_getTaskResultFileUrl($taskId: GID!) {
-    getTaskResultFileUrl(taskId: $taskId, preview: true)
+export const usePrintPdfTask_getTaskResultFileDocument = gql`
+  mutation usePrintPdfTask_getTaskResultFile($taskId: GID!) {
+    getTaskResultFile(taskId: $taskId, preview: true)
   }
 ` as unknown as DocumentNode<
-  usePrintPdfTask_getTaskResultFileUrlMutation,
-  usePrintPdfTask_getTaskResultFileUrlMutationVariables
+  usePrintPdfTask_getTaskResultFileMutation,
+  usePrintPdfTask_getTaskResultFileMutationVariables
 >;
 export const usePublicPrintPdfTask_publicCreatePrintPdfTaskDocument = gql`
   mutation usePublicPrintPdfTask_publicCreatePrintPdfTask($keycode: ID!) {
@@ -29036,11 +29052,11 @@ export const useTemplateRepliesReportTask_createTemplateRepliesReportTaskDocumen
   useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutation,
   useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutationVariables
 >;
-export const useTemplateRepliesReportTask_getTaskResultFileUrlDocument = gql`
-  mutation useTemplateRepliesReportTask_getTaskResultFileUrl($taskId: GID!) {
-    getTaskResultFileUrl(taskId: $taskId, preview: true)
+export const useTemplateRepliesReportTask_getTaskResultFileDocument = gql`
+  mutation useTemplateRepliesReportTask_getTaskResultFile($taskId: GID!) {
+    getTaskResultFile(taskId: $taskId, preview: true)
   }
 ` as unknown as DocumentNode<
-  useTemplateRepliesReportTask_getTaskResultFileUrlMutation,
-  useTemplateRepliesReportTask_getTaskResultFileUrlMutationVariables
+  useTemplateRepliesReportTask_getTaskResultFileMutation,
+  useTemplateRepliesReportTask_getTaskResultFileMutationVariables
 >;
