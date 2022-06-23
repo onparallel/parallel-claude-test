@@ -20,8 +20,13 @@ export const Task = objectType({
     });
     t.nullable.int("progress");
     t.nullable.jsonObject("output", {
-      resolve: (t, _, ctx) => {
-        return isDefined(t.output?.temporary_file_id) ? {} : t.output;
+      resolve: async (t, _, ctx) => {
+        if (isDefined(t.output?.temporary_file_id)) {
+          const tmpFile = await ctx.files.loadTemporaryFile(t.output!.temporary_file_id);
+          return { filename: tmpFile!.filename };
+        } else {
+          return t.output;
+        }
       },
     });
   },
