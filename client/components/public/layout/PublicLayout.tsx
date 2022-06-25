@@ -1,4 +1,4 @@
-import { Flex } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import languages from "@parallel/lang/languages.json";
 import { resolveUrl } from "@parallel/utils/next";
 import { Maybe } from "@parallel/utils/types";
@@ -110,6 +110,19 @@ export function PublicLayout({
         </Flex>
         {hideFooter ? null : <PublicFooter />}
       </Flex>
+      <Box
+        id="target-container"
+        position="fixed"
+        left="200px"
+        right="200px"
+        bottom="20px"
+        sx={{
+          "@media screen and (max-width: 991px)": {
+            left: "12px",
+            right: "12px",
+          },
+        }}
+      />
     </>
   );
 }
