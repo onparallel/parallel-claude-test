@@ -8,7 +8,6 @@ import { ReactNode } from "react";
 import { useIntl } from "react-intl";
 import { PublicFooter } from "./PublicFooter";
 import { PublicHeader } from "./PublicHeader";
-import { ThirdParty } from "./ThirdParty";
 
 export interface PublicLayoutProps {
   title: string;
@@ -67,6 +66,11 @@ export function PublicLayout({
             pathname === "/" ? "" : resolveUrl(pathname, query)
           }`}
         />
+        <script src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/js/consent.js`} defer />
+        <script
+          src="https://unpkg.com/@segment/consent-manager@5.5.0/standalone/consent-manager.js"
+          defer
+        />
       </Head>
       {(canonicalLocale ? [canonicalLocale] : languages.map((lang) => lang.locale)).map(
         (locale) => (
@@ -105,7 +109,6 @@ export function PublicLayout({
           {children}
         </Flex>
         {hideFooter ? null : <PublicFooter />}
-        <ThirdParty />
       </Flex>
     </>
   );
