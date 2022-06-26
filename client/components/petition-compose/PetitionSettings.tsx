@@ -446,6 +446,7 @@ function _PetitionSettings({
           </Heading>
           {restrictEditingSwitch}
           <SettingsRowButton
+            data-section="share-by-link"
             isDisabled={isPublicTemplate || petition.isRestricted}
             icon={<LinkIcon />}
             label={
