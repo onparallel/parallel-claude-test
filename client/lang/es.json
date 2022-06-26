@@ -1422,7 +1422,7 @@
   {
     "term": "component.new-template-dialog.contract-template",
     "definition": "Plantilla de contrato",
-    "context": "Contract Template"
+    "context": "Contract template"
   },
   {
     "term": "component.new-template-dialog.contract-template-description",

@@ -29,7 +29,7 @@ export function NewTemplateDialog({ ...props }: DialogProps<{}, NewTemplateDialo
           background: "blue.100",
           title: intl.formatMessage({
             id: "component.new-template-dialog.contract-template",
-            defaultMessage: "Contract Template",
+            defaultMessage: "Contract template",
           }),
           description: intl.formatMessage({
             id: "component.new-template-dialog.contract-template-description",

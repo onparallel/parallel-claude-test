@@ -1421,8 +1421,8 @@
   },
   {
     "term": "component.new-template-dialog.contract-template",
-    "definition": "Contract Template",
-    "context": "Contract Template"
+    "definition": "Contract template",
+    "context": "Contract template"
   },
   {
     "term": "component.new-template-dialog.contract-template-description",
