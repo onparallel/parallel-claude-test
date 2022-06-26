@@ -10,7 +10,10 @@ function DeveloperApi({ spec }: InferGetServerSidePropsType<typeof getServerSide
         <title>Parallel API | Parallel for developers</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="description" content="Integrate Parallel into your workflow" />
-        <link rel="stylesheet" href="/static/styles/api.css" />
+        <link
+          rel="stylesheet"
+          href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/styles/api.css`}
+        />
       </Head>
       <RedocStandalone
         spec={spec}

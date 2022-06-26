@@ -184,9 +184,9 @@ export const api = new RestApi({
       url: "https://www.onparallel.com/developers/api",
     },
     "x-logo": {
-      url: "https://www.onparallel.com/static/emails/logo.png",
+      url: `${process.env.ASSETS_URL}/static/emails/logo.png`,
       altText: "Parallel",
-      href: "https://www.onparallel.com",
+      href: process.env.PARALLEL_URL,
     },
   },
   servers: [
