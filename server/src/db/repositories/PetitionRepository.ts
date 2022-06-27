@@ -3720,7 +3720,6 @@ export class PetitionRepository extends BaseRepository {
         .where({
           template_public: true,
           deleted_at: null,
-          is_template: true,
         })
         .mmodify((q) => {
           const { search, locale, categories } = opts;
@@ -3753,7 +3752,6 @@ export class PetitionRepository extends BaseRepository {
                   .where({
                     template_public: true,
                     deleted_at: null,
-                    is_template: true,
                   })
                   .select("id")
               )
@@ -4583,6 +4581,14 @@ export class PetitionRepository extends BaseRepository {
 
     const petitionEvents = await this.from("petition_event")
       .whereIn("petition_id", petitionIds)
+      .whereIn("type", [
+        "ACCESS_ACTIVATED",
+        "REPLY_CREATED",
+        "PETITION_COMPLETED",
+        "PETITION_CLOSED",
+        "SIGNATURE_STARTED",
+        "SIGNATURE_COMPLETED",
+      ])
       .orderBy([{ column: "petition_id" }, { column: "created_at", order: "asc" }])
       .select("*");
     const signatures = await this.loadLatestPetitionSignatureByPetitionId(petitionIds);
