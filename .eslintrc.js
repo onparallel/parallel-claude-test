@@ -81,6 +81,7 @@ module.exports = {
     "*/node_modules",
     "client/out",
     "client/.next",
+    "client/public",
     "server/dist",
     "bin/dist",
     "**/__*",
