@@ -2446,8 +2446,8 @@
   },
   {
     "term": "component.petition-settings.signature-description",
-    "definition": "Genera un documento e inicia un proceso de firma digital al completar la petición.",
-    "context": "Generates a document and initiates an eSignature process upon completion of the petition."
+    "definition": "Genera un documento e inicia un proceso de firma digital al completar la petición, a través de uno de nuestros proveedores integrados.",
+    "context": "Generates a document and iniciates an eSignature process upon completion of the petition, through one of our integrated providers."
   },
   {
     "term": "component.petition-settings.skip-forward-security",
@@ -2568,6 +2568,11 @@
     "term": "component.petition-signatures-card.send-reminder",
     "definition": "Enviar recordatorio",
     "context": "Send reminder"
+  },
+  {
+    "term": "component.petition-signatures-card.signature-description",
+    "definition": "Genera un documento e inicia un proceso de firma digital a través de uno de nuestros proveedores integrados.",
+    "context": "Generates a document and iniciates an eSignature process, through one of our integrated providers."
   },
   {
     "term": "component.petition-signatures-card.signers",
@@ -3811,8 +3816,8 @@
   },
   {
     "term": "component.signature-config-dialog.header.subtitle",
-    "definition": "Firma un documento PDF con todas las respuestas.",
-    "context": "Sign a PDF document with all the replies."
+    "definition": "Firma un documento pdf con todas las repuestas utilizando uno de nuestros proveedores de firma digital.",
+    "context": "Sign a PDF document with all the replies using one of our eSignature providers."
   },
   {
     "term": "component.signature-config-dialog.provider-label",
@@ -6306,8 +6311,8 @@
   },
   {
     "term": "page.reports.esignature-sent-help-1",
-    "definition": "Este es el número total de procesos de firma completados.",
-    "context": "This is the total completed eSignature processes."
+    "definition": "Este es el número total de procesos de firma completados. Incluye las firmas enviadas a través de alguno de nuestros proveedores de firma.",
+    "context": "This is the total completed eSignature processes. Includes all signatures sent through one of our eSignature providers."
   },
   {
     "term": "page.reports.esignature-sent-help-2",

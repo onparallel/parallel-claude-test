@@ -1,7 +1,6 @@
-import { Box, Center, HStack, Stack, Text, useTheme } from "@chakra-ui/react";
+import { Box, Center, HStack, Image, Stack, Text, useTheme } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
-import { EmptyDoughnutChartIlustration } from "@parallel/components/reports/EmptyDoughnutChartIlustration";
 import { ArcElement, Chart as ChartJS, Legend, Tooltip } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -116,12 +115,12 @@ export function ReportsDoughnutChart({
             }}
           />
         ) : (
-          <EmptyDoughnutChartIlustration
-            color="gray.300"
+          <Image
             maxWidth="150px"
             maxHeight="150px"
             width="100%"
             height="100%"
+            src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/reports/empty-doughnut.svg`}
           />
         )}
       </Center>

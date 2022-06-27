@@ -24,6 +24,7 @@ import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Card, GenericCardHeader } from "../common/Card";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
+import { HelpPopover } from "../common/HelpPopover";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SupportLink } from "../common/SupportLink";
 import {
@@ -333,6 +334,12 @@ export const PetitionSignaturesCard = Object.assign(
                 defaultMessage="Petition eSignature"
               />
             </Text>
+            <HelpPopover popoverWidth="2xs">
+              <FormattedMessage
+                id="component.petition-signatures-card.signature-description"
+                defaultMessage="Generates a document and iniciates an eSignature process, through one of our integrated providers."
+              />
+            </HelpPopover>
             {signatureEnvironment === "DEMO" ? (
               <TestModeSignatureBadge hasPetitionSignature={user.hasPetitionSignature} />
             ) : null}

@@ -349,17 +349,18 @@ function SignatureConfigDialogBodyStep1({
         <Text>
           <FormattedMessage
             id="component.signature-config-dialog.header.subtitle"
-            defaultMessage="Sign a PDF document with all the replies."
+            defaultMessage="Sign a PDF document with all the replies using one of our eSignature providers."
           />
         </Text>
-        <Text>
-          <HelpCenterLink articleId={6022979}>
+
+        <HelpCenterLink articleId={6022979} display="flex" alignItems="center">
+          <Text fontSize="sm">
             <FormattedMessage
               id="component.signature-config-dialog.header.help-link"
               defaultMessage="More about eSignature"
             />
-          </HelpCenterLink>
-        </Text>
+          </Text>
+        </HelpCenterLink>
       </Stack>
       <FormControl hidden={providers.length < 2}>
         <FormLabel>

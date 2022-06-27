@@ -2446,8 +2446,8 @@
   },
   {
     "term": "component.petition-settings.signature-description",
-    "definition": "Generates a document and initiates an eSignature process upon completion of the petition.",
-    "context": "Generates a document and initiates an eSignature process upon completion of the petition."
+    "definition": "Generates a document and iniciates an eSignature process upon completion of the petition, through one of our integrated providers.",
+    "context": "Generates a document and iniciates an eSignature process upon completion of the petition, through one of our integrated providers."
   },
   {
     "term": "component.petition-settings.skip-forward-security",
@@ -2568,6 +2568,11 @@
     "term": "component.petition-signatures-card.send-reminder",
     "definition": "Send reminder",
     "context": "Send reminder"
+  },
+  {
+    "term": "component.petition-signatures-card.signature-description",
+    "definition": "Generates a document and iniciates an eSignature process, through one of our integrated providers.",
+    "context": "Generates a document and iniciates an eSignature process, through one of our integrated providers."
   },
   {
     "term": "component.petition-signatures-card.signers",
@@ -3811,8 +3816,8 @@
   },
   {
     "term": "component.signature-config-dialog.header.subtitle",
-    "definition": "Sign a PDF document with all the replies.",
-    "context": "Sign a PDF document with all the replies."
+    "definition": "Sign a PDF document with all the replies using one of our eSignature providers.",
+    "context": "Sign a PDF document with all the replies using one of our eSignature providers."
   },
   {
     "term": "component.signature-config-dialog.provider-label",
@@ -6306,8 +6311,8 @@
   },
   {
     "term": "page.reports.esignature-sent-help-1",
-    "definition": "This is the total completed eSignature processes.",
-    "context": "This is the total completed eSignature processes."
+    "definition": "This is the total completed eSignature processes. Includes all signatures sent through one of our eSignature providers.",
+    "context": "This is the total completed eSignature processes. Includes all signatures sent through one of our eSignature providers."
   },
   {
     "term": "page.reports.esignature-sent-help-2",

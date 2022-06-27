@@ -366,7 +366,7 @@ function TemplateStatsReport({ report }: { report: ReportType }) {
                 <Text>
                   <FormattedMessage
                     id="page.reports.esignature-sent-help-1"
-                    defaultMessage="This is the total completed eSignature processes."
+                    defaultMessage="This is the total completed eSignature processes. Includes all signatures sent through one of our eSignature providers."
                   />
                 </Text>
                 <Text>
