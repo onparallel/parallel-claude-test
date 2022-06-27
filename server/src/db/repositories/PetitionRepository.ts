@@ -3,7 +3,18 @@ import { differenceInSeconds, isSameMonth, isThisMonth, subMonths } from "date-f
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import pMap from "p-map";
-import { countBy, groupBy, indexBy, isDefined, maxBy, omit, sortBy, uniq, zip } from "remeda";
+import {
+  chunk,
+  countBy,
+  groupBy,
+  indexBy,
+  isDefined,
+  maxBy,
+  omit,
+  sortBy,
+  uniq,
+  zip,
+} from "remeda";
 import { Aws, AWS_SERVICE } from "../../services/aws";
 import { average, findLast, partition, unMaybeArray } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
@@ -12,6 +23,7 @@ import { fromDataLoader } from "../../util/fromDataLoader";
 import { fromGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { keyBuilder } from "../../util/keyBuilder";
+import { pFlatMap } from "../../util/promises/pFlatMap";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import { calculateNextReminder, PetitionAccessReminderConfig } from "../../util/reminderUtils";
 import { random } from "../../util/token";
@@ -4579,21 +4591,27 @@ export class PetitionRepository extends BaseRepository {
 
     const petitionIds = petitionStatus.map((s) => s.id);
 
-    const petitionEvents = await this.from("petition_event")
-      .whereIn("petition_id", petitionIds)
-      .whereIn("type", [
-        "ACCESS_ACTIVATED",
-        "REPLY_CREATED",
-        "PETITION_COMPLETED",
-        "PETITION_CLOSED",
-        "SIGNATURE_STARTED",
-        "SIGNATURE_COMPLETED",
-      ])
-      .orderBy([{ column: "petition_id" }, { column: "created_at", order: "asc" }])
-      .select("*");
+    const petitionEvents = await pFlatMap(chunk(petitionIds, 100), async (idsChunk) => {
+      return await this.from("petition_event")
+        .whereIn("petition_id", idsChunk)
+        .whereIn("type", [
+          "ACCESS_ACTIVATED",
+          "REPLY_CREATED",
+          "PETITION_COMPLETED",
+          "PETITION_CLOSED",
+          "SIGNATURE_STARTED",
+          "SIGNATURE_COMPLETED",
+        ])
+        .select("*");
+    });
+
+    const sortedPetitionEvents = sortBy(petitionEvents, (e) => e.petition_id, [
+      (e) => e.created_at,
+      "asc",
+    ]);
     const signatures = await this.loadLatestPetitionSignatureByPetitionId(petitionIds);
 
-    const eventsByPetitionId = groupBy(petitionEvents, (e) => e.petition_id);
+    const eventsByPetitionId = groupBy(sortedPetitionEvents, (e) => e.petition_id);
 
     const petitionTimes = Object.values(eventsByPetitionId)
       .map((events) => ({
