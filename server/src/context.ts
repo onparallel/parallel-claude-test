@@ -104,6 +104,7 @@ export class WorkerContext {
     public readonly tasks: TaskRepository,
 
     @readOnly public readonly readonlyContacts: ContactRepository,
-    @readOnly public readonly readonlyPetitions: PetitionRepository
+    @readOnly public readonly readonlyPetitions: PetitionRepository,
+    @readOnly public readonly readonlyUsers: UserRepository
   ) {}
 }
