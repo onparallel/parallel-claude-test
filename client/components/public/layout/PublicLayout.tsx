@@ -19,6 +19,11 @@ export interface PublicLayoutProps {
   canonicalLocale?: string;
 }
 
+function buildUrl(pathname: string, query: any, locale: string) {
+  const path = pathname === "/" ? "" : resolveUrl(pathname, query);
+  return `${process.env.NEXT_PUBLIC_PARALLEL_URL}${locale === "en" ? "" : `/${locale}`}${path}`;
+}
+
 export function PublicLayout({
   title,
   description,
@@ -30,7 +35,6 @@ export function PublicLayout({
 }: PublicLayoutProps) {
   const { locale, query, pathname, asPath } = useRouter();
   const intl = useIntl();
-  const url = process.env.NEXT_PUBLIC_PARALLEL_URL;
   return (
     <>
       <Head>
@@ -60,12 +64,7 @@ export function PublicLayout({
             })
           }
         />
-        <link
-          rel="canonical"
-          href={`${url}/${canonicalLocale ?? locale}${
-            pathname === "/" ? "" : resolveUrl(pathname, query)
-          }`}
-        />
+        <link rel="canonical" href={buildUrl(pathname, query, canonicalLocale ?? locale!)} />
         <script src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/js/consent.js`} defer />
         <script
           src="https://unpkg.com/@segment/consent-manager@5.5.0/standalone/consent-manager.js"
@@ -75,11 +74,7 @@ export function PublicLayout({
       {(canonicalLocale ? [canonicalLocale] : languages.map((lang) => lang.locale)).map(
         (locale) => (
           <Head key={locale}>
-            <link
-              rel="alternate"
-              hrefLang={locale}
-              href={`${url}/${locale}${resolveUrl(pathname, query)}`}
-            />
+            <link rel="alternate" hrefLang={locale} href={buildUrl(pathname, query, locale)} />
           </Head>
         )
       )}
