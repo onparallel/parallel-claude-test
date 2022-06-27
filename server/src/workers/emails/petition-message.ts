@@ -67,6 +67,10 @@ export async function petitionMessage(
         "zas25KHxAByKWUgEcxY",
         "zas25KHxAByKWUgEcht",
         "zas25KHxAByKWUgEd44",
+        "zas25KHxAByKWUhv4PT",
+        "zas25KHxAByKWUb99wL",
+        "zas25KHxAByKWUgGsWN",
+        "zas25KHxAByKWUhv4Yb",
       ].includes(toGlobalId("Petition", petition.from_template_id))
     : false;
 
