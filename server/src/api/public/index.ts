@@ -1,13 +1,10 @@
-import { mkdir, unlink } from "fs/promises";
+import { unlink } from "fs/promises";
 import { ClientError, gql, GraphQLClient } from "graphql-request";
-import multer from "multer";
 import { outdent } from "outdent";
 import pMap from "p-map";
 import { isDefined, pick, uniq } from "remeda";
-import { callbackify } from "util";
 import { EMAIL_REGEX } from "../../graphql/helpers/validators/validEmail";
 import { toGlobalId } from "../../util/globalId";
-import { random } from "../../util/token";
 import { Body, FormDataBody, FormDataBodyContent, JsonBody, JsonBodyContent } from "../rest/body";
 import { RestApi } from "../rest/core";
 import { BadRequestError, ConflictError, UnauthorizedError } from "../rest/errors";
@@ -50,6 +47,7 @@ import {
   uploadFile,
   waitForTask,
 } from "./helpers";
+import { singleFileUploadMiddleware } from "./middleware";
 import {
   Contact,
   CreateContact,
@@ -155,19 +153,6 @@ import {
   UpdateReply_updatePetitionFieldReplyDocument,
   UserFragmentDoc,
 } from "./__types";
-
-const uploadFileMiddleware = multer({
-  storage: multer.diskStorage({
-    destination: callbackify(async function (req: any, file: any) {
-      const path = `/tmp/${random(16)}`;
-      await mkdir(path);
-      return path;
-    }),
-    filename: function (req, file, cb) {
-      cb(null, file.originalname);
-    },
-  }),
-});
 
 function assert(condition: any): asserts condition {}
 function assertType<T>(value: any): asserts value is T {}
@@ -713,7 +698,7 @@ api
   )
   .post(
     {
-      middleware: uploadFileMiddleware.single("file"),
+      middleware: singleFileUploadMiddleware("file"),
       operationId: "CreatePetitionAttachment",
       summary: "Attach a file to the petition",
       description: "Attaches the provided file to the petition.",
@@ -1266,7 +1251,7 @@ api
   })
   .post(
     {
-      middleware: uploadFileMiddleware.single("reply"),
+      middleware: singleFileUploadMiddleware("reply"),
       operationId: "SubmitReply",
       summary: "Submit a reply",
       description: outdent`
@@ -1389,7 +1374,7 @@ api
   })
   .put(
     {
-      middleware: uploadFileMiddleware.single("reply"),
+      middleware: singleFileUploadMiddleware("reply"),
       operationId: "UpdateReply",
       summary: "Update a reply",
       description: outdent`
