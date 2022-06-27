@@ -3816,8 +3816,8 @@
   },
   {
     "term": "component.signature-config-dialog.header.subtitle",
-    "definition": "Firma un documento pdf con todas las repuestas utilizando uno de nuestros proveedores de firma digital.",
-    "context": "Sign a PDF document with all the replies using one of our eSignature providers."
+    "definition": "Firma un documento pdf con todas las repuestas utilizando uno de nuestros proveedores de firma digital integrados.",
+    "context": "Sign a PDF document with all the replies using one of our integrated eSignature providers."
   },
   {
     "term": "component.signature-config-dialog.provider-label",
@@ -6311,8 +6311,8 @@
   },
   {
     "term": "page.reports.esignature-sent-help-1",
-    "definition": "Este es el número total de procesos de firma completados. Incluye las firmas enviadas a través de alguno de nuestros proveedores de firma.",
-    "context": "This is the total completed eSignature processes. Includes all signatures sent through one of our eSignature providers."
+    "definition": "Este es el número total de procesos de firma completados. Incluye las firmas enviadas a través de alguno de nuestros proveedores de firma integrados.",
+    "context": "This is the total completed eSignature processes. Includes all signatures sent through one of our integrated eSignature providers."
   },
   {
     "term": "page.reports.esignature-sent-help-2",

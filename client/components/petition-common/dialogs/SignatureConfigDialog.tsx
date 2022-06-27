@@ -349,7 +349,7 @@ function SignatureConfigDialogBodyStep1({
         <Text>
           <FormattedMessage
             id="component.signature-config-dialog.header.subtitle"
-            defaultMessage="Sign a PDF document with all the replies using one of our eSignature providers."
+            defaultMessage="Sign a PDF document with all the replies using one of our integrated eSignature providers."
           />
         </Text>
         <Text>
