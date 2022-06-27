@@ -6,16 +6,19 @@ import { Config, CONFIG } from "../../config";
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { unMaybeArray } from "../../util/arrays";
 import { fromDataLoader } from "../../util/fromDataLoader";
+import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { Maybe, MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { escapeLike, SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 import {
   CreateOrganization,
+  CreateOrganizationTheme,
   CreateOrganizationUsageLimit,
   FeatureFlagName,
   Organization,
   OrganizationStatus,
+  OrganizationThemeType,
   OrganizationUsageLimit,
   OrganizationUsageLimitName,
   User,
@@ -187,6 +190,7 @@ export class OrganizationRepository extends BaseRepository {
     );
 
     await this.createSandboxSignatureIntegration(org.id, createdBy, t);
+    await this.createDefaultOrganizationThemes(org.id, createdBy, t);
 
     return org;
   }
@@ -397,6 +401,88 @@ export class OrganizationRepository extends BaseRepository {
       where coalesce(ffoo.value, ff.default_value) = true
     `,
       [name]
+    );
+  }
+
+  readonly loadOrganizationTheme = this.buildLoadBy("organization_theme", "id", (q) =>
+    q.whereNull("deleted_at")
+  );
+
+  readonly loadOrganizationThemesByOrgId = this.buildLoadMultipleBy(
+    "organization_theme",
+    "org_id",
+    (q) => q.whereNull("deleted_at").orderBy("created_at", "desc")
+  );
+
+  async createDefaultOrganizationThemes(orgId: number, createdBy?: string, t?: Knex.Transaction) {
+    await this.from("organization_theme", t).insert({
+      org_id: orgId,
+      type: "PDF_DOCUMENT",
+      name: "Default",
+      is_default: true,
+      data: JSON.stringify(defaultPdfDocumentTheme),
+      created_by: createdBy,
+    });
+  }
+
+  async createOrganizationTheme(
+    orgId: number,
+    name: string,
+    type: OrganizationThemeType,
+    createdBy: string
+  ) {
+    const [theme] = await this.from("organization_theme").insert(
+      {
+        org_id: orgId,
+        name,
+        type,
+        created_at: this.now(),
+        created_by: createdBy,
+        updated_at: this.now(),
+        updated_by: createdBy,
+        data: defaultPdfDocumentTheme,
+        is_default: false,
+      },
+      "*"
+    );
+
+    return theme;
+  }
+
+  async updateOrganizationTheme(
+    id: number,
+    data: Partial<CreateOrganizationTheme>,
+    updatedBy: string,
+    t?: Knex.Transaction
+  ) {
+    await this.from("organization_theme", t)
+      .where("id", id)
+      .whereNull("deleted_at")
+      .update({
+        ...data,
+        updated_at: this.now(),
+        updated_by: updatedBy,
+      });
+  }
+
+  async deleteOrganizationTheme(id: number, deletedBy: string) {
+    await this.from("organization_theme").where("id", id).whereNull("deleted_at").update({
+      deleted_at: this.now(),
+      deleted_by: deletedBy,
+    });
+  }
+
+  async setOrganizationThemeAsDefault(orgThemeId: number) {
+    await this.raw(
+      /* sql */ `
+      with selected_theme as (select * from organization_theme where id = ?)
+      update organization_theme ot 
+      set is_default = (case ot.id when ? then true else false end) 
+      from selected_theme st
+      where ot.org_id = st.org_id and ot.type = st.type and ot.deleted_at is null
+      returning ot.*;
+  `,
+      [orgThemeId, orgThemeId]
     );
   }
 }

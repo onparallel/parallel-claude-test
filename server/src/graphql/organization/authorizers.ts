@@ -1,6 +1,8 @@
 import { ApolloError } from "apollo-server-core";
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
+import { isDefined } from "remeda";
+import { OrganizationThemeType } from "../../db/__types";
 import { getRequiredPetitionSendCredits } from "../../util/organizationUsageLimits";
 import { Arg, or, userIsSuperAdmin } from "../helpers/authorize";
 
@@ -102,5 +104,40 @@ export function orgHasAvailablePetitionSendCredits<
       );
     }
     return true;
+  };
+}
+
+export function userHasAccessToOrganizationTheme<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number>
+>(argName: TArg, themeType?: OrganizationThemeType): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const theme = await ctx.organizations.loadOrganizationTheme(
+        args[argName] as unknown as number
+      );
+      return (
+        theme?.org_id === ctx.user!.org_id &&
+        ((isDefined(themeType) && theme.type === themeType) || !isDefined(themeType))
+      );
+    } catch {}
+    return false;
+  };
+}
+
+export function organizationThemeIsNotDefault<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number>
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const theme = await ctx.organizations.loadOrganizationTheme(
+        args[argName] as unknown as number
+      );
+      return theme?.is_default === false;
+    } catch {}
+    return false;
   };
 }

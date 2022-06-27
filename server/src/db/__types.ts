@@ -60,6 +60,10 @@ export const OrganizationStatusValues = [
   "ROOT",
 ] as OrganizationStatus[];
 
+export type OrganizationThemeType = "PDF_DOCUMENT";
+
+export const OrganizationThemeTypeValues = ["PDF_DOCUMENT"] as OrganizationThemeType[];
+
 export type OrganizationUsageLimitName = "PETITION_SEND" | "SIGNATURIT_SHARED_APIKEY";
 
 export const OrganizationUsageLimitNameValues = [
@@ -340,6 +344,7 @@ export interface TableTypes {
   file_upload: FileUpload;
   license_code: LicenseCode;
   organization: Organization;
+  organization_theme: OrganizationTheme;
   organization_usage_limit: OrganizationUsageLimit;
   org_integration: OrgIntegration;
   petition: Petition;
@@ -386,6 +391,7 @@ export interface TableCreateTypes {
   file_upload: CreateFileUpload;
   license_code: CreateLicenseCode;
   organization: CreateOrganization;
+  organization_theme: CreateOrganizationTheme;
   organization_usage_limit: CreateOrganizationUsageLimit;
   org_integration: CreateOrgIntegration;
   petition: CreatePetition;
@@ -432,6 +438,7 @@ export interface TablePrimaryKeys {
   file_upload: "id";
   license_code: "id";
   organization: "id";
+  organization_theme: "id";
   organization_usage_limit: "id";
   org_integration: "id";
   petition: "id";
@@ -676,6 +683,32 @@ export type CreateOrganization = PartialProps<
   | "pdf_document_theme"
   | "anonymize_petitions_after_months"
   | "brand_theme"
+>;
+
+export interface OrganizationTheme {
+  id: number; // int4
+  org_id: number; // int4
+  name: string; // varchar
+  type: OrganizationThemeType; // organization_theme_type
+  is_default: Maybe<boolean>; // bool
+  data: any; // jsonb
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateOrganizationTheme = PartialProps<
+  Omit<OrganizationTheme, "id">,
+  | "is_default"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
 >;
 
 export interface OrganizationUsageLimit {

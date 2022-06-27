@@ -52,6 +52,7 @@ export interface IAuth {
   updateSessionLogin(req: Request, userId: number, asUserId: number): Promise<void>;
   restoreSessionLogin(req: Request, userId: number): Promise<void>;
   resetTempPassword(email: string, locale: string | null | undefined): Promise<void>;
+  verifyCaptcha(captcha: string, ip: string): Promise<boolean>;
 }
 
 export const AUTH = Symbol.for("AUTH");
@@ -80,6 +81,17 @@ export class Auth implements IAuth {
     private userAuthentication: UserAuthenticationRepository,
     private system: SystemRepository
   ) {}
+
+  async verifyCaptcha(captcha: string, ip: string) {
+    const url = `https://google.com/recaptcha/api/siteverify?${new URLSearchParams({
+      secret: this.config.recaptcha.secretKey,
+      response: captcha,
+      remoteip: ip,
+    })}`;
+    const response = await fetch(url);
+    const body = await response.json();
+    return body.success ?? false;
+  }
 
   async guessLogin(req: Request, res: Response, next: NextFunction) {
     const { email, locale, redirect } = req.body;

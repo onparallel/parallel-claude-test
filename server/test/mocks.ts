@@ -13,6 +13,7 @@ import { IFetchService } from "../src/services/fetch";
 import { IRedis } from "../src/services/redis";
 import { ISignatureService, SignatureService } from "../src/services/signature";
 import { IStorage } from "../src/services/storage";
+import { random } from "../src/util/token";
 
 export const USER_COGNITO_ID = "test-cognito-id";
 
@@ -30,6 +31,9 @@ export class MockAuth implements IAuth {
     // TODO manage users.length >1
     const [user] = await this.users.loadUsersByCognitoId(USER_COGNITO_ID);
     return [user] as [User];
+  }
+  async verifyCaptcha() {
+    return true;
   }
   async guessLogin() {}
   async callback() {}
@@ -101,7 +105,7 @@ export class MockAwsService implements IAws {
   async forgotPassword() {}
   async resetUserPassword() {}
   async signUpUser() {
-    return "";
+    return random(10);
   }
   async deleteUser() {}
   async resendVerificationCode() {}

@@ -1,11 +1,9 @@
 import { AuthenticationError } from "apollo-server-express";
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import fetch from "node-fetch";
 import pAll from "p-all";
 import { isDefined } from "remeda";
 import { getClientIp } from "request-ip";
-import { URLSearchParams } from "url";
 import { authenticateFromRequest } from "../../util/authenticateFromRequest";
 import { KeysOfType } from "../../util/types";
 import { userHasRole } from "../../util/userHasRole";
@@ -191,14 +189,10 @@ export function verifyCaptcha<
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, string>
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (root, args, ctx, info) => {
-    const url = `https://google.com/recaptcha/api/siteverify?${new URLSearchParams({
-      secret: ctx.config.recaptcha.secretKey,
-      response: args[argName] as unknown as string,
-      remoteip: getClientIp(ctx.req) ?? "",
-    })}`;
-    const response = await fetch(url);
-    const body = await response.json();
-    return body.success ?? false;
+  return async (root, args, ctx) => {
+    return await ctx.auth.verifyCaptcha(
+      args[argName] as unknown as string,
+      getClientIp(ctx.req) ?? ""
+    );
   };
 }

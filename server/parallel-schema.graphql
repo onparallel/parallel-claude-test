@@ -667,6 +667,11 @@ type Mutation {
   ): SupportMethodResponse!
 
   """
+  Creates a new PDF_DOCUMENT theme on the user's organization
+  """
+  createOrganizationPdfDocumentTheme(isDefault: Boolean!, name: String!): Organization!
+
+  """
   Creates a new user in the same organization as the context user
   """
   createOrganizationUser(
@@ -840,6 +845,7 @@ type Mutation {
   Deletes event subscriptions
   """
   deleteEventSubscriptions(ids: [GID!]!): Result!
+  deleteOrganizationPdfDocumentTheme(orgThemeId: GID!): Organization!
 
   """
   Soft-deletes any given petition on the database.
@@ -1446,6 +1452,7 @@ type Mutation {
   updates the theme of the PDF documents of the organization
   """
   updateOrganizationDocumentTheme(data: OrganizationDocumentThemeInput!): Organization!
+    @deprecated(reason: "use updateOrganizationPdfDocumentTheme")
 
   """
   Updates the limits of a given org. If 'Update Only Current Period' is left unchecked, the changes will be reflected on the next period.
@@ -1478,6 +1485,14 @@ type Mutation {
   Updates the logo of an organization
   """
   updateOrganizationLogo(file: Upload!, isIcon: Boolean): Organization!
+
+  """
+  updates the PDF_DOCUMENT theme of the organization
+  """
+  updateOrganizationPdfDocumentTheme(
+    data: UpdateOrganizationPdfDocumentThemeInput!
+    orgThemeId: GID!
+  ): Organization!
 
   """
   Changes the organization preferred tone
@@ -1824,6 +1839,7 @@ type Organization implements Timestamps {
   """
   name: String!
   pdfDocumentTheme: JSONObject!
+    @deprecated(reason: "Not used anymore. Use themes.pdfDocument[0].data")
 
   """
   The preferred tone of organization.
@@ -1834,6 +1850,7 @@ type Organization implements Timestamps {
   The status of the organization.
   """
   status: OrganizationStatus!
+  themes: OrganizationThemeList!
 
   """
   Time when the resource was last updated.
@@ -1910,6 +1927,29 @@ type OrganizationPagination {
   totalCount: Int!
 }
 
+input OrganizationPdfDocumentThemeInput {
+  legalText: OrganizationPdfDocumentThemeInputLegalText
+  marginBottom: Float
+  marginLeft: Float
+  marginRight: Float
+  marginTop: Float
+  showLogo: Boolean
+  textColor: String
+  textFontFamily: String
+  textFontSize: Float
+  title1Color: String
+  title1FontFamily: String
+  title1FontSize: Float
+  title2Color: String
+  title2FontFamily: String
+  title2FontSize: Float
+}
+
+input OrganizationPdfDocumentThemeInputLegalText {
+  en: JSON
+  es: JSON
+}
+
 """
 The roles of a user within an organization.
 """
@@ -1948,6 +1988,17 @@ enum OrganizationStatus {
   Root client
   """
   ROOT
+}
+
+type OrganizationTheme {
+  data: JSONObject!
+  id: GID!
+  isDefault: Boolean!
+  name: String!
+}
+
+type OrganizationThemeList {
+  pdfDocument: [OrganizationTheme!]!
 }
 
 type OrganizationUsageLimit {
@@ -4842,6 +4893,12 @@ enum Tone {
 input UpdateContactInput {
   firstName: String
   lastName: String
+}
+
+input UpdateOrganizationPdfDocumentThemeInput {
+  isDefault: Boolean
+  name: String
+  theme: OrganizationPdfDocumentThemeInput
 }
 
 input UpdatePetitionFieldInput {

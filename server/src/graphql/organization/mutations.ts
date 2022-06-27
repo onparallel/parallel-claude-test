@@ -1,19 +1,33 @@
 import deepmerge from "deepmerge";
-import { arg, booleanArg, inputObjectType, intArg, mutationField, nonNull, nullable } from "nexus";
+import {
+  arg,
+  booleanArg,
+  inputObjectType,
+  intArg,
+  mutationField,
+  nonNull,
+  nullable,
+  stringArg,
+} from "nexus";
 import { isDefined, pick } from "remeda";
+import { OrganizationTheme } from "../../db/__types";
 import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { random } from "../../util/token";
 import { authenticateAnd } from "../helpers/authorize";
+import { globalIdArg } from "../helpers/globalIdPlugin";
 import { uploadArg } from "../helpers/scalars";
 import { validateAnd } from "../helpers/validateArgs";
 import { inRange } from "../helpers/validators/inRange";
+import { maxLength } from "../helpers/validators/maxLength";
 import { validateFile } from "../helpers/validators/validateFile";
+import { validBooleanValue } from "../helpers/validators/validBooleanValue";
 import { validFontFamily } from "../helpers/validators/validFontFamily";
 import { validRichTextContent } from "../helpers/validators/validRichTextContent";
 import { validWebSafeFontFamily } from "../helpers/validators/validWebSafeFontFamily";
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { validateHexColor } from "../tag/validators";
 import { contextUserHasRole } from "../users/authorizers";
+import { organizationThemeIsNotDefault, userHasAccessToOrganizationTheme } from "./authorizers";
 
 export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
   description: "Updates the logo of an organization",
@@ -130,41 +144,134 @@ export const updateOrganizationBrandTheme = mutationField("updateOrganizationBra
   },
 });
 
+export const updateOrganizationPdfDocumentTheme = mutationField(
+  "updateOrganizationPdfDocumentTheme",
+  {
+    description: "updates the PDF_DOCUMENT theme of the organization",
+    type: "Organization",
+    authorize: authenticateAnd(
+      contextUserHasRole("ADMIN"),
+      userHasAccessToOrganizationTheme("orgThemeId", "PDF_DOCUMENT")
+    ),
+    args: {
+      orgThemeId: nonNull(globalIdArg("OrganizationTheme")),
+      data: nonNull(
+        inputObjectType({
+          name: "UpdateOrganizationPdfDocumentThemeInput",
+          definition(t) {
+            t.nullable.string("name");
+            t.nullable.boolean("isDefault");
+            t.nullable.field({ name: "theme", type: "OrganizationPdfDocumentThemeInput" });
+          },
+        }).asArg()
+      ),
+    },
+    validateArgs: validateAnd(
+      inRange((args) => args.data.theme?.marginTop, "data.theme.marginTop", 0),
+      inRange((args) => args.data.theme?.marginLeft, "data.theme.marginLeft", 0),
+      inRange((args) => args.data.theme?.marginBottom, "data.theme.marginBottom", 0),
+      inRange((args) => args.data.theme?.marginRight, "data.theme.marginRight", 0),
+      validFontFamily((args) => args.data.theme?.title1FontFamily, "data.theme.title1FontFamily"),
+      validFontFamily((args) => args.data.theme?.title2FontFamily, "data.theme.title2FontFamily"),
+      validFontFamily((args) => args.data.theme?.textFontFamily, "data.theme.textFontFamily"),
+      validateHexColor((args) => args.data.theme?.title1Color, "data.theme.title1Color"),
+      validateHexColor((args) => args.data.theme?.title2Color, "data.theme.title2Color"),
+      validateHexColor((args) => args.data.theme?.textColor, "data.theme.textColor"),
+      inRange((args) => args.data.theme?.title1FontSize, "data.theme.title1FontSize", 5, 72),
+      inRange((args) => args.data.theme?.title2FontSize, "data.theme.title2FontSize", 5, 72),
+      inRange((args) => args.data.theme?.textFontSize, "data.theme.textFontSize", 5, 72),
+      validRichTextContent((args) => args.data.theme?.legalText?.es, "data.theme.legalText.es"),
+      validRichTextContent((args) => args.data.theme?.legalText?.en, "data.theme.legalText.en"),
+      validBooleanValue((args) => args.data.isDefault, "data.isDefault", true),
+      maxLength((args) => args.data.name, "data.name", 255)
+    ),
+    resolve: async (_, args, ctx) => {
+      if (args.data.isDefault) {
+        await ctx.organizations.setOrganizationThemeAsDefault(args.orgThemeId);
+      }
+      const updateData: Partial<OrganizationTheme> = {};
+      if (isDefined(args.data.name)) {
+        updateData.name = args.data.name;
+      }
+      if (isDefined(args.data.theme)) {
+        const pdfDocumentTheme = (await ctx.organizations.loadOrganizationTheme(args.orgThemeId))!;
+        updateData.data = deepmerge(pdfDocumentTheme.data, args.data.theme, {
+          // avoid deepmerge on legalText
+          customMerge: (key) => (from: any, to: any) => {
+            if (key === "legalText") {
+              return Object.assign(from, to);
+            }
+          },
+        });
+      }
+
+      if (Object.keys(updateData).length > 0) {
+        await ctx.organizations.updateOrganizationTheme(
+          args.orgThemeId,
+          updateData,
+          `User:${ctx.user!.id}`
+        );
+      }
+
+      return (await ctx.organizations.loadOrg(ctx.user!.org_id))!;
+    },
+  }
+);
+
+export const createOrganizationPdfDocumentTheme = mutationField(
+  "createOrganizationPdfDocumentTheme",
+  {
+    type: "Organization",
+    description: "Creates a new PDF_DOCUMENT theme on the user's organization",
+    authorize: authenticateAnd(contextUserHasRole("ADMIN")),
+    args: {
+      name: nonNull(stringArg()),
+      isDefault: nonNull(booleanArg()),
+    },
+    validateArgs: maxLength((args) => args.name, "name", 255),
+    resolve: async (_, { name, isDefault }, ctx) => {
+      const theme = await ctx.organizations.createOrganizationTheme(
+        ctx.user!.org_id,
+        name,
+        "PDF_DOCUMENT",
+        `User:${ctx.user!.id}`
+      );
+      if (isDefault) {
+        await ctx.organizations.setOrganizationThemeAsDefault(theme.id);
+      }
+
+      return (await ctx.organizations.loadOrg(ctx.user!.org_id))!;
+    },
+  }
+);
+
+export const deleteOrganizationPdfDocumentTheme = mutationField(
+  "deleteOrganizationPdfDocumentTheme",
+  {
+    type: "Organization",
+    authorize: authenticateAnd(
+      contextUserHasRole("ADMIN"),
+      userHasAccessToOrganizationTheme("orgThemeId", "PDF_DOCUMENT"),
+      organizationThemeIsNotDefault("orgThemeId")
+    ),
+    args: {
+      orgThemeId: nonNull(globalIdArg("OrganizationTheme")),
+    },
+    resolve: async (_, { orgThemeId }, ctx) => {
+      await ctx.organizations.deleteOrganizationTheme(orgThemeId, `User:${ctx.user!.id}`);
+      return (await ctx.organizations.loadOrg(ctx.user!.org_id))!;
+    },
+  }
+);
+
+/** @deprecated */
 export const updateOrganizationDocumentTheme = mutationField("updateOrganizationDocumentTheme", {
+  deprecation: "use updateOrganizationPdfDocumentTheme",
   description: "updates the theme of the PDF documents of the organization",
   type: "Organization",
   authorize: authenticateAnd(contextUserHasRole("ADMIN")),
   args: {
-    data: nonNull(
-      inputObjectType({
-        name: "OrganizationDocumentThemeInput",
-        definition(t) {
-          t.nullable.float("marginTop");
-          t.nullable.float("marginRight");
-          t.nullable.float("marginBottom");
-          t.nullable.float("marginLeft");
-          t.nullable.boolean("showLogo");
-          t.nullable.string("title1FontFamily");
-          t.nullable.string("title1Color");
-          t.nullable.float("title1FontSize");
-          t.nullable.string("title2FontFamily");
-          t.nullable.string("title2Color");
-          t.nullable.float("title2FontSize");
-          t.nullable.string("textFontFamily");
-          t.nullable.string("textColor");
-          t.nullable.float("textFontSize");
-          t.nullable.field("legalText", {
-            type: inputObjectType({
-              name: "OrganizationDocumentThemeInputLegalText",
-              definition(t) {
-                t.nullable.json("es");
-                t.nullable.json("en");
-              },
-            }),
-          });
-        },
-      }).asArg()
-    ),
+    data: nonNull("OrganizationDocumentThemeInput"),
   },
   validateArgs: validateAnd(
     inRange((args) => args.data.marginTop, "data.marginTop", 0),

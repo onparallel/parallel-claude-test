@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { faker } from "@faker-js/faker";
 import { Knex } from "knex";
+import { omit } from "remeda";
 import { KNEX } from "../../db/knex";
 import { UserRepository } from "../../db/repositories/UserRepository";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
@@ -13,7 +14,8 @@ import {
   UserData,
   UserGroup,
 } from "../../db/__types";
-import { toGlobalId } from "../../util/globalId";
+import { fromGlobalId, toGlobalId } from "../../util/globalId";
+import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { initServer, TestClient } from "./server";
 
 describe("GraphQL/Users", () => {
@@ -1129,6 +1131,120 @@ describe("GraphQL/Users", () => {
       });
       expect(errors).toContainGraphQLError("USER_LIMIT_ERROR", { userLimit: 3 });
       expect(data).toBeNull();
+    });
+  });
+
+  describe("userSignUp", () => {
+    it("user signup creates organization and default entries", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $captcha: String!
+            $email: String!
+            $firstName: String!
+            $lastName: String!
+            $organizationName: String!
+            $password: String!
+          ) {
+            userSignUp(
+              captcha: $captcha
+              email: $email
+              firstName: $firstName
+              lastName: $lastName
+              organizationName: $organizationName
+              password: $password
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          captcha: "xxx",
+          email: "test@onparallel.com",
+          firstName: "Test",
+          lastName: "User",
+          organizationName: "MyOrganization",
+          password: "sup€rs@f3P4ssw0rd",
+        }
+      );
+
+      expect(errors).toBeUndefined();
+
+      const { apiKey } = await mocks.createUserAuthToken(
+        "api-token",
+        fromGlobalId(data!.userSignUp.id, "User").id
+      );
+      const { errors: queryErrors, data: queryData } = await testClient.withApiKey(apiKey)
+        .execute(gql`
+        query me {
+          me {
+            id
+            fullName
+            organization {
+              name
+              integrations(limit: 10, offset: 0) {
+                totalCount
+                items {
+                  type
+                  name
+                  isDefault
+                }
+              }
+              themes {
+                pdfDocument {
+                  name
+                  isDefault
+                  data
+                }
+              }
+              usageLimits {
+                petitions {
+                  limit
+                  used
+                }
+                signatures {
+                  limit
+                  used
+                }
+                users {
+                  limit
+                }
+              }
+            }
+          }
+        }
+      `);
+
+      expect(queryErrors).toBeUndefined();
+      expect(queryData).toEqual({
+        me: {
+          id: data!.userSignUp.id,
+          fullName: "Test User",
+          organization: {
+            name: "MyOrganization",
+            integrations: {
+              totalCount: 1,
+              items: [{ type: "SIGNATURE", name: "Signaturit Sandbox", isDefault: true }],
+            },
+            themes: {
+              pdfDocument: [{ name: "Default", isDefault: true, data: defaultPdfDocumentTheme }],
+            },
+            usageLimits: {
+              petitions: {
+                limit: 20,
+                used: 0,
+              },
+              signatures: {
+                limit: 0,
+                used: 0,
+              },
+              users: {
+                limit: 2,
+              },
+            },
+          },
+        },
+      });
     });
   });
 });
