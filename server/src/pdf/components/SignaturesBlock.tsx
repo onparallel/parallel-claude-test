@@ -51,7 +51,7 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
             {
               fullName: "Guillermo Preckler",
               signatureImageUrl:
-                "https://www.onparallel.com/static/images/signatures/guillermo-preckler-brickbro.png",
+                "https://static.onparallel.com/static/images/signatures/guillermo-preckler-brickbro.png",
               date,
             } as SignatureBoxProps,
           ]
@@ -60,7 +60,7 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
             {
               fullName: "TIKO",
               signatureImageUrl:
-                "https://www.onparallel.com/static/images/signatures/sello-tiko.png",
+                "https://static.onparallel.com/static/images/signatures/sello-tiko.png",
               date,
             } as SignatureBoxProps,
           ]
@@ -69,7 +69,7 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
             {
               fullName: "Marta Blanco Maseda",
               signatureImageUrl:
-                "https://www.onparallel.com/static/images/signatures/marta-blanco-maseda-imasd.png",
+                "https://static.onparallel.com/static/images/signatures/marta-blanco-maseda-imasd.png",
               date,
             } as SignatureBoxProps,
           ]
