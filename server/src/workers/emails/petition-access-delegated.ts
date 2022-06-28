@@ -77,6 +77,7 @@ export async function petitionAccessDelegated(
       emailSubject: originalMessage?.email_subject ?? null,
       keycode: newAccess.keycode,
       tone: organization!.preferred_tone,
+      theme: organization!.brand_theme,
       removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
       removeParallelBranding: hasRemoveParallelBranding,
       ...layoutProps,

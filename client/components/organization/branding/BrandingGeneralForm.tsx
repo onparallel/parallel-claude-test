@@ -1,36 +1,53 @@
 import { gql, useMutation } from "@apollo/client";
 import {
+  AlertDescription,
+  AlertIcon,
   Badge,
   Button,
   Center,
   Flex,
+  FormControl,
+  FormLabel,
   Heading,
   HStack,
   Image,
+  Input,
   Radio,
   RadioGroup,
+  Select,
   Spinner,
   Stack,
   Switch,
   Text,
+  useTheme,
 } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
+import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
+import { ColorInput } from "@parallel/components/common/ColorInput";
 import { ContactSupportAlert } from "@parallel/components/common/ContactSupportAlert";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
 import { Divider } from "@parallel/components/common/Divider";
 import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileSize } from "@parallel/components/common/FileSize";
+import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
 import {
+  BrandingGeneralForm_updateOrganizationBrandThemeDocument,
+  BrandingGeneralForm_updateOrganizationBrandThemeMutationVariables,
   BrandingGeneralForm_updateOrganizationPreferredToneDocument,
   BrandingGeneralForm_updateOrgLogoDocument,
   BrandingGeneralForm_UserFragment,
   Tone,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { isAtLeast } from "@parallel/utils/roles";
-import { useRef } from "react";
+import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
+import Color from "color";
+import { useMemo, useRef, useState } from "react";
 import { DropzoneRef, FileRejection } from "react-dropzone";
+import { IMaskInput } from "react-imask";
 import { FormattedMessage, useIntl } from "react-intl";
+import fonts from "../../../utils/webSafeFonts.json";
 
 interface BrandingGeneralFormProps {
   user: BrandingGeneralForm_UserFragment;
@@ -47,6 +64,14 @@ export function BrandingGeneralForm({ user }: BrandingGeneralFormProps) {
     user.organization.logoUrl ?? `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/emails/logo.png`;
 
   const tone = user.organization.preferredTone;
+  const theme = user.organization.brandTheme;
+
+  const parallelTheme = useTheme();
+
+  const [color, setColor] = useState(theme?.color ?? parallelTheme.colors.primary[500]);
+  const [invalidColor, setInvalidColor] = useState(false);
+  const [isLight, setIsLight] = useState(false);
+  const [fontFamily, setFontFamily] = useState(theme?.fontFamily ?? "DEFAULT");
 
   const showErrorDialog = useErrorDialog();
   const [updateLogo, { loading }] = useMutation(BrandingGeneralForm_updateOrgLogoDocument);
@@ -78,21 +103,75 @@ export function BrandingGeneralForm({ user }: BrandingGeneralFormProps) {
     });
   };
 
+  const [updateOrganizationBrandTheme] = useMutation(
+    BrandingGeneralForm_updateOrganizationBrandThemeDocument
+  );
+
+  const debouncedUpdateOrganizationBrandTheme = useDebouncedAsync(
+    async function (
+      data: BrandingGeneralForm_updateOrganizationBrandThemeMutationVariables["data"]
+    ) {
+      await updateOrganizationBrandTheme({
+        variables: { data },
+      });
+    },
+    500,
+    []
+  );
+
+  const handleColorChange = async (color: string) => {
+    try {
+      setColor(color);
+      const isError = !/^#[a-f\d]{6}$/i.test(color);
+      if (isError) {
+        setInvalidColor(true);
+      } else {
+        setIsLight(new Color(color).isLight());
+        setInvalidColor(false);
+        await debouncedUpdateOrganizationBrandTheme({
+          color,
+        });
+      }
+    } catch (error) {
+      if (isApolloError(error, "ARG_VALIDATION_ERROR")) {
+        if ((error.graphQLErrors[0].extensions.extra as any).code === "INVALID_HEX_VALUE_ERROR") {
+          setInvalidColor(true);
+        }
+      }
+    }
+  };
+
+  const handleFontFamilyChange = async (fontFamily: string) => {
+    setFontFamily(fontFamily);
+    updateOrganizationBrandTheme({
+      variables: {
+        data: {
+          fontFamily: fontFamily === "DEFAULT" ? null : fontFamily,
+        },
+      },
+    });
+  };
+
+  const sortedFonts = useMemo(
+    () =>
+      fonts.sort(function (a, b) {
+        return a[0].localeCompare(b[0]);
+      }),
+    [fonts]
+  );
+
   return (
     <Stack spacing={8} maxWidth={{ base: "100%", xl: "container.2xs" }} width="100%">
       {!hasAdminRole ? <OnlyAdminsAlert /> : null}
       <Stack spacing={4}>
         <Stack>
           <Heading as="h4" size="md" fontWeight="semibold">
-            <FormattedMessage
-              id="organization.branding.logo-header"
-              defaultMessage="Organization logo"
-            />
+            <FormattedMessage id="organization.branding.brand" defaultMessage="Brand" />
           </Heading>
           <Text>
             <FormattedMessage
-              id="organization.branding.logo-attach-help"
-              defaultMessage="Attach an image that you would like us to display in your emails."
+              id="organization.branding.brand-description"
+              defaultMessage="Your brand will be used in the messages and petitions you send."
             />
           </Text>
         </Stack>
@@ -155,32 +234,117 @@ export function BrandingGeneralForm({ user }: BrandingGeneralFormProps) {
           </Flex>
         </Card>
       </Stack>
-      <Divider borderColor="gray.300" />
-      <Stack spacing={4}>
-        <Heading as="h4" size="md" fontWeight="semibold">
-          <FormattedMessage
-            id="organization.branding.tone-header"
-            defaultMessage="Tone of the messages"
-          />
-        </Heading>
-        <RadioGroup
-          as={Stack}
-          spacing={4}
-          onChange={handleToneChange}
-          value={tone}
-          isDisabled={!hasAdminRole}
-        >
-          <Radio backgroundColor="white" value="INFORMAL">
-            <Text fontWeight="semibold">
-              <FormattedMessage id="generic.tone-informal" defaultMessage="Informal" />
-            </Text>
-          </Radio>
-          <Radio backgroundColor="white" value="FORMAL">
-            <Text fontWeight="semibold">
-              <FormattedMessage id="generic.tone-formal" defaultMessage="Formal" />
-            </Text>
-          </Radio>
-        </RadioGroup>
+      <Stack spacing={6}>
+        <FormControl>
+          <HStack>
+            <FormLabel display="flex" marginY={0} alignItems="center" fontWeight="normal">
+              <FormattedMessage
+                id="component.branding-general-form.primary-color"
+                defaultMessage="Primary color"
+              />
+              <HelpPopover>
+                <FormattedMessage
+                  id="component.branding-general-form.primary-color-help"
+                  defaultMessage="This color will be used in the buttons and links of your messages and petitions with recipient."
+                />
+              </HelpPopover>
+            </FormLabel>
+
+            <HStack>
+              <Input
+                as={IMaskInput}
+                {...({
+                  mask: "#AAAAAA",
+                  definitions: { A: /[0-9A-Fa-f]/ },
+                  onAccept: (value: string) => handleColorChange(value),
+                } as any)}
+                minWidth="102px"
+                backgroundColor="white"
+                value={color}
+                isInvalid={invalidColor}
+              />
+              <FormControl height="40px">
+                <ColorInput
+                  width="40px"
+                  minWidth="40px"
+                  borderRadius="100%"
+                  value={color}
+                  onChange={(value) => handleColorChange(value)}
+                  isInvalid={invalidColor}
+                />
+              </FormControl>
+            </HStack>
+          </HStack>
+          {isLight ? (
+            <CloseableAlert status="warning" backgroundColor="orange.100" marginTop={4}>
+              <AlertIcon color="yellow.500" />
+              <AlertDescription>
+                <FormattedMessage
+                  id="component.branding-general-form.primary-color-warning"
+                  defaultMessage="The color you have entered is too light. We recommend using a darker color to improve readability."
+                />
+              </AlertDescription>
+            </CloseableAlert>
+          ) : null}
+        </FormControl>
+        <FormControl>
+          <HStack align="center">
+            <FormLabel display="flex" alignItems="center" fontWeight="normal" whiteSpace="nowrap">
+              <FormattedMessage
+                id="component.branding-general-form.main-font"
+                defaultMessage="Main font"
+              />
+              <HelpPopover>
+                <FormattedMessage
+                  id="component.branding-general-form.main-font-help"
+                  defaultMessage="This font will be used in your emails and petitions. The list includes only secure fonts for all email clients."
+                />
+              </HelpPopover>
+            </FormLabel>
+            <Select
+              backgroundColor="white"
+              value={fontFamily}
+              onChange={(e) => {
+                handleFontFamilyChange(e.target.value);
+              }}
+            >
+              <option key="Default" value="DEFAULT">
+                {intl.formatMessage({ id: "generic.by-default", defaultMessage: "By default" })}
+              </option>
+              {sortedFonts.map((font, index) => (
+                <option key={index} value={font[1]}>
+                  {font[0]}
+                </option>
+              ))}
+            </Select>
+          </HStack>
+        </FormControl>
+        <FormControl>
+          <FormLabel fontWeight="normal">
+            <FormattedMessage
+              id="organization.branding.tone-header"
+              defaultMessage="Tone of the messages"
+            />
+          </FormLabel>
+          <RadioGroup
+            as={Stack}
+            spacing={2}
+            onChange={handleToneChange}
+            value={tone}
+            isDisabled={!hasAdminRole}
+          >
+            <Radio backgroundColor="white" value="INFORMAL">
+              <Text>
+                <FormattedMessage id="generic.tone-informal" defaultMessage="Informal" />
+              </Text>
+            </Radio>
+            <Radio backgroundColor="white" value="FORMAL">
+              <Text>
+                <FormattedMessage id="generic.tone-formal" defaultMessage="Formal" />
+              </Text>
+            </Radio>
+          </RadioGroup>
+        </FormControl>
       </Stack>
       <Divider borderColor="gray.300" />
       <Stack spacing={4}>
@@ -247,6 +411,14 @@ BrandingGeneralForm.mutations = [
       }
     }
   `,
+  gql`
+    mutation BrandingGeneralForm_updateOrganizationBrandTheme($data: OrganizationBrandThemeInput!) {
+      updateOrganizationBrandTheme(data: $data) {
+        id
+        brandTheme
+      }
+    }
+  `,
 ];
 
 BrandingGeneralForm.fragments = {
@@ -259,6 +431,7 @@ BrandingGeneralForm.fragments = {
         id
         name
         preferredTone
+        brandTheme
         logoUrl(options: { resize: { width: 600 } })
       }
     }

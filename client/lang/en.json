@@ -210,9 +210,39 @@
     "context": "Preview"
   },
   {
+    "term": "component.branding-general-form.main-font",
+    "definition": "Main font",
+    "context": "Main font"
+  },
+  {
+    "term": "component.branding-general-form.main-font-help",
+    "definition": "This font will be used in your emails and petitions. The list includes only secure fonts for all email clients.",
+    "context": "This font will be used in your emails and petitions. The list includes only secure fonts for all email clients."
+  },
+  {
+    "term": "component.branding-general-form.primary-color",
+    "definition": "Primary color",
+    "context": "Primary color"
+  },
+  {
+    "term": "component.branding-general-form.primary-color-help",
+    "definition": "This color will be used in the buttons and links of your messages and petitions with recipient.",
+    "context": "This color will be used in the buttons and links of your messages and petitions with recipient."
+  },
+  {
+    "term": "component.branding-general-form.primary-color-warning",
+    "definition": "The color you have entered is too light. We recommend using a darker color to improve readability.",
+    "context": "The color you have entered is too light. We recommend using a darker color to improve readability."
+  },
+  {
     "term": "component.branding-general-preview.body",
     "definition": "We remind you that <b>{name}</b> sent you a parallel and some of the requested information has not yet been submitted.",
     "context": "We remind you that <b>{name}</b> sent you a parallel and some of the requested information has not yet been submitted."
+  },
+  {
+    "term": "component.branding-general-preview.complete-information",
+    "definition": "Complete the information",
+    "context": "Complete the information"
   },
   {
     "term": "component.branding-general-preview.footer",
@@ -4730,6 +4760,11 @@
     "context": "Before"
   },
   {
+    "term": "generic.by-default",
+    "definition": "By default",
+    "context": "By default"
+  },
+  {
     "term": "generic.cancel",
     "definition": "Cancel",
     "context": "Cancel"
@@ -4786,8 +4821,8 @@
   },
   {
     "term": "generic.color.purple",
-    "definition": "purple",
-    "context": "purple"
+    "definition": "primary",
+    "context": "primary"
   },
   {
     "term": "generic.color.red",
@@ -5750,6 +5785,16 @@
     "context": "{count, plural, =1{The user you selected is} other{Some of the users you selected are}} managed by a SSO provider. Please, update its status directly on the provider."
   },
   {
+    "term": "organization.branding.brand",
+    "definition": "Brand",
+    "context": "Brand"
+  },
+  {
+    "term": "organization.branding.brand-description",
+    "definition": "Your brand will be used in the messages and petitions you send.",
+    "context": "Your brand will be used in the messages and petitions you send."
+  },
+  {
     "term": "organization.branding.documents.tab",
     "definition": "Documents",
     "context": "Documents"
@@ -5760,19 +5805,9 @@
     "context": "General"
   },
   {
-    "term": "organization.branding.logo-attach-help",
-    "definition": "Attach an image that you would like us to display in your emails.",
-    "context": "Attach an image that you would like us to display in your emails."
-  },
-  {
     "term": "organization.branding.logo-error",
     "definition": "The logo must be an image file of size up to {size}.",
     "context": "The logo must be an image file of size up to {size}."
-  },
-  {
-    "term": "organization.branding.logo-header",
-    "definition": "Organization logo",
-    "context": "Organization logo"
   },
   {
     "term": "organization.branding.parallel-branding-description",

@@ -17,6 +17,10 @@ import {
 import { CheckIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
+import {
+  OrganizationBrand,
+  OverrideWithOrganizationTheme,
+} from "@parallel/components/common/OverrideWithOrganizationTheme";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { withApolloData } from "@parallel/components/common/withApolloData";
 import {
@@ -42,6 +46,7 @@ interface RecipientViewVerifyProps {
   orgName: string;
   orgLogoUrl: string;
   tone: Tone;
+  brandTheme: null | undefined | OrganizationBrand;
 }
 
 type RecipientViewVerifyState =
@@ -55,7 +60,13 @@ type RecipientViewVerifyState =
     }
   | { step: "VERIFIED" };
 
-function RecipientViewVerify({ email, orgName, orgLogoUrl, tone }: RecipientViewVerifyProps) {
+function RecipientViewVerify({
+  email,
+  orgName,
+  orgLogoUrl,
+  tone,
+  brandTheme,
+}: RecipientViewVerifyProps) {
   const { query } = useRouter();
   const toast = useToast();
   const intl = useIntl();
@@ -148,128 +159,140 @@ function RecipientViewVerify({ email, orgName, orgLogoUrl, tone }: RecipientView
 
   return (
     <ToneProvider value={tone}>
-      <Head>
-        <title>Parallel</title>
-      </Head>
-      <Box backgroundColor="gray.50" minHeight="100vh">
-        <Container display="flex" flexDirection="column" justifyContent="center" minHeight="100vh">
-          <Card padding={{ base: 4, sm: 8 }} marginY={4}>
-            <Stack spacing={8}>
-              <Center>
-                {orgLogoUrl ? (
-                  <Box
-                    role="img"
-                    aria-label={orgName}
-                    width="200px"
-                    margin="auto"
-                    height="60px"
-                    backgroundImage={`url("${orgLogoUrl}")`}
-                    backgroundSize="contain"
-                    backgroundPosition="center"
-                    backgroundRepeat="no-repeat"
-                  />
-                ) : (
-                  <Logo width="200px" />
-                )}
-              </Center>
-              <Center>
-                <Image
-                  maxWidth="320px"
-                  role="presentation"
-                  src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_mobile_devices.svg`}
-                />
-              </Center>
-              <Text>
-                <FormattedMessage
-                  id="recipient-view.verify-1"
-                  defaultMessage="It looks like you are trying to access this page from a new device."
-                  values={{ tone }}
-                />
-              </Text>
-              <Text>
-                <FormattedMessage
-                  id="recipient-view.verify-2"
-                  defaultMessage="To ensure the privacy of your data, we need to verify your identity with a code you will receive on your email {email}."
-                  values={{
-                    email: (
-                      <Text as="span" fontWeight="bold">
-                        {email.replace(/\*/g, "\u25CF")}
-                      </Text>
-                    ),
-                  }}
-                />
-              </Text>
-              {state.step === "REQUEST" ? (
+      <OverrideWithOrganizationTheme cssVarsRoot="body" brand={brandTheme}>
+        <Head>
+          <title>Parallel</title>
+        </Head>
+        <Box backgroundColor="gray.50" minHeight="100vh">
+          <Container
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            minHeight="100vh"
+          >
+            <Card padding={{ base: 4, sm: 8 }} marginY={4}>
+              <Stack spacing={8}>
                 <Center>
-                  <Button
-                    colorScheme="primary"
-                    isLoading={isSendingCode}
-                    onClick={handleSendVerificationCode}
-                  >
-                    <FormattedMessage
-                      id="recipient-view.send-code"
-                      defaultMessage="Send verification code"
+                  {orgLogoUrl ? (
+                    <Box
+                      role="img"
+                      aria-label={orgName}
+                      width="200px"
+                      margin="auto"
+                      height="60px"
+                      backgroundImage={`url("${orgLogoUrl}")`}
+                      backgroundSize="contain"
+                      backgroundPosition="center"
+                      backgroundRepeat="no-repeat"
                     />
-                  </Button>
+                  ) : (
+                    <Logo width="200px" />
+                  )}
                 </Center>
-              ) : state.step === "VERIFY" ? (
-                <Flex
-                  flexDirection="column"
-                  alignItems="center"
-                  as="form"
-                  onSubmit={handleSubmitCode}
-                >
-                  <HStack
-                    sx={{
-                      "> :not(style) ~ :not(style):nth-of-type(4)": {
-                        marginLeft: 8,
-                      },
+                <Center>
+                  <Image
+                    maxWidth="320px"
+                    role="presentation"
+                    src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_mobile_devices.svg`}
+                  />
+                </Center>
+                <Text>
+                  <FormattedMessage
+                    id="recipient-view.verify-1"
+                    defaultMessage="It looks like you are trying to access this page from a new device."
+                    values={{ tone }}
+                  />
+                </Text>
+                <Text>
+                  <FormattedMessage
+                    id="recipient-view.verify-2"
+                    defaultMessage="To ensure the privacy of your data, we need to verify your identity with a code you will receive on your email {email}."
+                    values={{
+                      email: (
+                        <Text as="span" fontWeight="bold">
+                          {email.replace(/\*/g, "\u25CF")}
+                        </Text>
+                      ),
                     }}
-                  >
-                    <PinInput autoFocus value={code} onChange={setCode} isInvalid={state.isInvalid}>
-                      <PinInputField ref={firstInputRef} />
-                      <PinInputField />
-                      <PinInputField />
-                      <PinInputField />
-                      <PinInputField />
-                      <PinInputField />
-                    </PinInput>
-                  </HStack>
-                  {state.isInvalid ? (
-                    <Text color="red.500" fontSize="sm" marginTop={2}>
+                  />
+                </Text>
+                {state.step === "REQUEST" ? (
+                  <Center>
+                    <Button
+                      colorScheme="primary"
+                      isLoading={isSendingCode}
+                      onClick={handleSendVerificationCode}
+                    >
                       <FormattedMessage
-                        id="recipient-view.remaining-attempts"
-                        defaultMessage="You have {attempts, plural, =1{one more attempt} other{# more attempts}}"
-                        values={{ attempts: state.remainingAttempts }}
+                        id="recipient-view.send-code"
+                        defaultMessage="Send verification code"
                       />
-                    </Text>
-                  ) : null}
-                  <Button
-                    type="submit"
-                    colorScheme="primary"
-                    isLoading={isVerifyingCode}
-                    isDisabled={code.length < 6}
-                    marginTop={4}
+                    </Button>
+                  </Center>
+                ) : state.step === "VERIFY" ? (
+                  <Flex
+                    flexDirection="column"
+                    alignItems="center"
+                    as="form"
+                    onSubmit={handleSubmitCode}
                   >
-                    <FormattedMessage
-                      id="recipient-view.verify-button"
-                      defaultMessage="Verify code"
-                    />
-                  </Button>
-                </Flex>
-              ) : state.step === "VERIFIED" ? (
-                <Center height="96px">
-                  <ScaleFade initialScale={0} in={true}>
-                    <Center backgroundColor="green.500" borderRadius="full" boxSize="96px">
-                      <CheckIcon color="white" boxSize="64px" />
-                    </Center>
-                  </ScaleFade>
-                </Center>
-              ) : null}
-            </Stack>
-          </Card>
-        </Container>
-      </Box>
+                    <HStack
+                      sx={{
+                        "> :not(style) ~ :not(style):nth-of-type(4)": {
+                          marginLeft: 8,
+                        },
+                      }}
+                    >
+                      <PinInput
+                        autoFocus
+                        value={code}
+                        onChange={setCode}
+                        isInvalid={state.isInvalid}
+                      >
+                        <PinInputField ref={firstInputRef} />
+                        <PinInputField />
+                        <PinInputField />
+                        <PinInputField />
+                        <PinInputField />
+                        <PinInputField />
+                      </PinInput>
+                    </HStack>
+                    {state.isInvalid ? (
+                      <Text color="red.500" fontSize="sm" marginTop={2}>
+                        <FormattedMessage
+                          id="recipient-view.remaining-attempts"
+                          defaultMessage="You have {attempts, plural, =1{one more attempt} other{# more attempts}}"
+                          values={{ attempts: state.remainingAttempts }}
+                        />
+                      </Text>
+                    ) : null}
+                    <Button
+                      type="submit"
+                      colorScheme="primary"
+                      isLoading={isVerifyingCode}
+                      isDisabled={code.length < 6}
+                      marginTop={4}
+                    >
+                      <FormattedMessage
+                        id="recipient-view.verify-button"
+                        defaultMessage="Verify code"
+                      />
+                    </Button>
+                  </Flex>
+                ) : state.step === "VERIFIED" ? (
+                  <Center height="96px">
+                    <ScaleFade initialScale={0} in={true}>
+                      <Center backgroundColor="green.500" borderRadius="full" boxSize="96px">
+                        <CheckIcon color="white" boxSize="64px" />
+                      </Center>
+                    </ScaleFade>
+                  </Center>
+                ) : null}
+              </Stack>
+            </Card>
+          </Container>
+        </Box>
+      </OverrideWithOrganizationTheme>
     </ToneProvider>
   );
 }
@@ -333,6 +356,7 @@ RecipientViewVerify.mutations = [
         orgName
         orgLogoUrl
         tone
+        brandTheme
       }
     }
   `,

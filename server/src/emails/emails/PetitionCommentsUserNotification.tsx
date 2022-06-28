@@ -76,11 +76,18 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
     assetsUrl,
     logoUrl,
     logoAlt,
+    theme,
   }: PetitionCommentsUserNotificationProps) {
     const { locale } = useIntl();
     const commentCount = fields.reduce((acc, f) => acc + f.comments.length, 0);
     return (
-      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
+      <Layout
+        assetsUrl={assetsUrl}
+        parallelUrl={parallelUrl}
+        logoUrl={logoUrl}
+        logoAlt={logoAlt}
+        theme={theme}
+      >
         <MjmlSection padding="0">
           <MjmlColumn>
             <GreetingUser name={userName} />

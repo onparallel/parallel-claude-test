@@ -638,6 +638,8 @@ export type Mutation = {
   updateLandingTemplateMetadata: SupportMethodResponse;
   /** Updates the period after closed petitions of this organization are automatically anonymized. */
   updateOrganizationAutoAnonymizePeriod: Organization;
+  /** updates the theme of the organization brand */
+  updateOrganizationBrandTheme: Organization;
   /** updates the theme of the PDF documents of the organization */
   updateOrganizationDocumentTheme: Organization;
   /** Updates the limits of a given org. If 'Update Only Current Period' is left unchecked, the changes will be reflected on the next period. */
@@ -1372,6 +1374,10 @@ export type MutationupdateOrganizationAutoAnonymizePeriodArgs = {
   months?: InputMaybe<Scalars["Int"]>;
 };
 
+export type MutationupdateOrganizationBrandThemeArgs = {
+  data: OrganizationBrandThemeInput;
+};
+
 export type MutationupdateOrganizationDocumentThemeArgs = {
   data: OrganizationDocumentThemeInput;
 };
@@ -1577,6 +1583,7 @@ export type Organization = Timestamps & {
   /** The total number of active users */
   activeUserCount: Scalars["Int"];
   anonymizePetitionsAfterMonths: Maybe<Scalars["Int"]>;
+  brandTheme: Maybe<Scalars["JSONObject"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom host used in petition links and public links. */
@@ -1634,6 +1641,11 @@ export type OrganizationusersArgs = {
   offset?: InputMaybe<Scalars["Int"]>;
   search?: InputMaybe<Scalars["String"]>;
   sortBy?: InputMaybe<Array<OrganizationUsers_OrderBy>>;
+};
+
+export type OrganizationBrandThemeInput = {
+  color?: InputMaybe<Scalars["String"]>;
+  fontFamily?: InputMaybe<Scalars["String"]>;
 };
 
 export type OrganizationDocumentThemeInput = {
@@ -2590,6 +2602,7 @@ export type PetitionUserPermission = PetitionPermission &
   };
 
 export type PublicAccessVerification = {
+  brandTheme: Maybe<Scalars["JSONObject"]>;
   cookieName: Maybe<Scalars["String"]>;
   cookieValue: Maybe<Scalars["String"]>;
   email: Maybe<Scalars["String"]>;
@@ -2626,6 +2639,7 @@ export type PublicLicenseCode = {
 
 /** A public view of an organization */
 export type PublicOrganization = {
+  brandTheme: Maybe<Scalars["JSONObject"]>;
   /** If this organization has the REMOVE_PARALLEL_BRANDING feature flag enabled */
   hasRemoveParallelBranding: Scalars["Boolean"];
   /** The ID of the organization. */
@@ -2634,6 +2648,8 @@ export type PublicOrganization = {
   logoUrl: Maybe<Scalars["String"]>;
   /** The name of the organization. */
   name: Scalars["String"];
+  /** The preferred tone of organization. */
+  tone: Tone;
 };
 
 /** A public view of an organization */
@@ -2653,8 +2669,6 @@ export type PublicPetition = Timestamps & {
   deadline: Maybe<Scalars["DateTime"]>;
   /** The field definition of the petition. */
   fields: Array<PublicPetitionField>;
-  /** Wether the has activated REMOVE_PARALLEL_BRANDING or not. */
-  hasRemoveParallelBranding: Scalars["Boolean"];
   /** The ID of the petition. */
   id: Scalars["GID"];
   /** Wether the completion message will be shown to the recipients or not. */
@@ -2666,6 +2680,8 @@ export type PublicPetition = Timestamps & {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
+  /** The organization of the petition. */
+  organization: PublicOrganization;
   /** The recipients of the petition */
   recipients: Array<PublicContact>;
   /** The signature config of the petition */

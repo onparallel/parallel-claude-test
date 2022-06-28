@@ -53,6 +53,8 @@ export async function petitionClosedNotification(
     );
 
     const renderContext = { contact, user: senderData, petition };
+    const organization = await context.organizations.loadOrg(petition.org_id);
+
     const { html, text, subject, from } = await buildEmail(
       PetitionClosedNotification,
       {
@@ -62,6 +64,7 @@ export async function petitionClosedNotification(
         bodyHtml: toHtml(payload.message, renderContext),
         bodyPlainText: toPlainText(payload.message, renderContext),
         removeParallelBranding: hasRemoveParallelBranding,
+        theme: organization!.brand_theme,
         ...layoutProps,
       },
       { locale: petition.locale }

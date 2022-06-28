@@ -79,6 +79,7 @@ async function startSignatureProcess(
         templateData: {
           ...(await getLayoutProps(petition.org_id, ctx)),
           tone: org.preferred_tone,
+          theme: org.brand_theme,
           removeParallelBranding: hasRemoveParallelBranding,
         },
         signingMode: "parallel",

@@ -83,6 +83,7 @@ const email: Email<ContactAuthenticationRequest> = {
     logoAlt,
     tone,
     removeParallelBranding,
+    theme,
   }: ContactAuthenticationRequest) {
     return (
       <Layout
@@ -94,6 +95,7 @@ const email: Email<ContactAuthenticationRequest> = {
         utmCampaign="recipients"
         tone={tone}
         removeParallelBranding={removeParallelBranding}
+        theme={theme}
       >
         <MjmlSection padding="0">
           <MjmlColumn>

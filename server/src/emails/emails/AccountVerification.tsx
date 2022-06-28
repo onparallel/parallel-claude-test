@@ -45,9 +45,16 @@ const email: Email<AccountVerificationProps> = {
     assetsUrl,
     logoUrl,
     logoAlt,
+    theme,
   }: AccountVerificationProps) {
     return (
-      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
+      <Layout
+        assetsUrl={assetsUrl}
+        parallelUrl={parallelUrl}
+        logoUrl={logoUrl}
+        logoAlt={logoAlt}
+        theme={theme}
+      >
         <MjmlSection padding="0">
           <MjmlColumn>
             <GreetingUser name={userName} />

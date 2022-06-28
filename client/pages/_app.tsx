@@ -30,7 +30,7 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
   return (
     <LiquidProvider>
       <I18nProvider {...props}>
-        <ChakraProvider theme={theme} resetCSS portalZIndex={40}>
+        <ChakraProvider theme={theme} resetCSS portalZIndex={40} cssVarsRoot="body">
           <Fonts />
           <AnimateSharedLayout>
             <Component {...pageProps} />

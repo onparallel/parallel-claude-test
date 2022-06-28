@@ -1,6 +1,6 @@
 import deepmerge from "deepmerge";
 import { arg, booleanArg, inputObjectType, intArg, mutationField, nonNull, nullable } from "nexus";
-import { pick } from "remeda";
+import { isDefined, pick } from "remeda";
 import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { random } from "../../util/token";
 import { authenticateAnd } from "../helpers/authorize";
@@ -10,6 +10,7 @@ import { inRange } from "../helpers/validators/inRange";
 import { validateFile } from "../helpers/validators/validateFile";
 import { validFontFamily } from "../helpers/validators/validFontFamily";
 import { validRichTextContent } from "../helpers/validators/validRichTextContent";
+import { validWebSafeFontFamily } from "../helpers/validators/validWebSafeFontFamily";
 import { userHasFeatureFlag } from "../petition/authorizers";
 import { validateHexColor } from "../tag/validators";
 import { contextUserHasRole } from "../users/authorizers";
@@ -95,6 +96,39 @@ export const updateOrganizationAutoAnonymizePeriod = mutationField(
     },
   }
 );
+
+export const updateOrganizationBrandTheme = mutationField("updateOrganizationBrandTheme", {
+  description: "updates the theme of the organization brand",
+  type: "Organization",
+  authorize: authenticateAnd(contextUserHasRole("ADMIN")),
+  args: {
+    data: nonNull(
+      inputObjectType({
+        name: "OrganizationBrandThemeInput",
+        definition(t) {
+          t.nullable.string("fontFamily");
+          t.nullable.string("color");
+        },
+      }).asArg()
+    ),
+  },
+  validateArgs: validateAnd(
+    validWebSafeFontFamily((args) => args.data.fontFamily, "data.fontFamily"),
+    validateHexColor((args) => args.data.color, "data.color")
+  ),
+  resolve: async (_, args, ctx) => {
+    const organization = await ctx.organizations.loadOrg(ctx.user!.org_id);
+    const theme = deepmerge(organization?.brand_theme ?? {}, args.data);
+    if (isDefined(args.data.color)) {
+      ctx.integrations.removeSignaturitBrandingIds(ctx.user!.org_id, `User:${ctx.user!.id}`);
+    }
+    return await ctx.organizations.updateOrganization(
+      ctx.user!.org_id,
+      { brand_theme: theme },
+      `User:${ctx.user!.id}`
+    );
+  },
+});
 
 export const updateOrganizationDocumentTheme = mutationField("updateOrganizationDocumentTheme", {
   description: "updates the theme of the PDF documents of the organization",

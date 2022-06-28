@@ -105,6 +105,11 @@ export interface NexusGenInputs {
     height?: number | null; // Int
     width?: number | null; // Int
   };
+  OrganizationBrandThemeInput: {
+    // input type
+    color?: string | null; // String
+    fontFamily?: string | null; // String
+  };
   OrganizationDocumentThemeInput: {
     // input type
     legalText?: NexusGenInputs["OrganizationDocumentThemeInputLegalText"] | null; // OrganizationDocumentThemeInputLegalText
@@ -530,6 +535,7 @@ export interface NexusGenObjects {
   PetitionUserPermission: db.PetitionPermission;
   PublicAccessVerification: {
     // root type
+    brandTheme?: NexusGenScalars["JSONObject"] | null; // JSONObject
     cookieName?: string | null; // String
     cookieValue?: string | null; // String
     email?: string | null; // String
@@ -1078,6 +1084,7 @@ export interface NexusGenFieldTypes {
     updateFileUploadReplyComplete: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updateLandingTemplateMetadata: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateOrganizationAutoAnonymizePeriod: NexusGenRootTypes["Organization"]; // Organization!
+    updateOrganizationBrandTheme: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationDocumentTheme: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationLimits: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateOrganizationLogo: NexusGenRootTypes["Organization"]; // Organization!
@@ -1123,6 +1130,7 @@ export interface NexusGenFieldTypes {
     _id: number; // Int!
     activeUserCount: number; // Int!
     anonymizePetitionsAfterMonths: number | null; // Int
+    brandTheme: NexusGenScalars["JSONObject"] | null; // JSONObject
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customHost: string | null; // String
     hasSsoProvider: boolean; // Boolean!
@@ -1582,6 +1590,7 @@ export interface NexusGenFieldTypes {
   };
   PublicAccessVerification: {
     // field return type
+    brandTheme: NexusGenScalars["JSONObject"] | null; // JSONObject
     cookieName: string | null; // String
     cookieValue: string | null; // String
     email: string | null; // String
@@ -1611,10 +1620,12 @@ export interface NexusGenFieldTypes {
   };
   PublicOrganization: {
     // field return type
+    brandTheme: NexusGenScalars["JSONObject"] | null; // JSONObject
     hasRemoveParallelBranding: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     logoUrl: string | null; // String
     name: string; // String!
+    tone: NexusGenEnums["Tone"]; // Tone!
   };
   PublicPetition: {
     // field return type
@@ -1623,11 +1634,11 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     deadline: NexusGenScalars["DateTime"] | null; // DateTime
     fields: NexusGenRootTypes["PublicPetitionField"][]; // [PublicPetitionField!]!
-    hasRemoveParallelBranding: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     isCompletingMessageEnabled: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
+    organization: NexusGenRootTypes["PublicOrganization"]; // PublicOrganization!
     recipients: NexusGenRootTypes["PublicContact"][]; // [PublicContact!]!
     signatureConfig: NexusGenRootTypes["PublicSignatureConfig"] | null; // PublicSignatureConfig
     signatureStatus: NexusGenEnums["PublicSignatureStatus"] | null; // PublicSignatureStatus
@@ -2592,6 +2603,7 @@ export interface NexusGenFieldTypeNames {
     updateFileUploadReplyComplete: "PetitionFieldReply";
     updateLandingTemplateMetadata: "SupportMethodResponse";
     updateOrganizationAutoAnonymizePeriod: "Organization";
+    updateOrganizationBrandTheme: "Organization";
     updateOrganizationDocumentTheme: "Organization";
     updateOrganizationLimits: "SupportMethodResponse";
     updateOrganizationLogo: "Organization";
@@ -2637,6 +2649,7 @@ export interface NexusGenFieldTypeNames {
     _id: "Int";
     activeUserCount: "Int";
     anonymizePetitionsAfterMonths: "Int";
+    brandTheme: "JSONObject";
     createdAt: "DateTime";
     customHost: "String";
     hasSsoProvider: "Boolean";
@@ -3096,6 +3109,7 @@ export interface NexusGenFieldTypeNames {
   };
   PublicAccessVerification: {
     // field return type name
+    brandTheme: "JSONObject";
     cookieName: "String";
     cookieValue: "String";
     email: "String";
@@ -3125,10 +3139,12 @@ export interface NexusGenFieldTypeNames {
   };
   PublicOrganization: {
     // field return type name
+    brandTheme: "JSONObject";
     hasRemoveParallelBranding: "Boolean";
     id: "GID";
     logoUrl: "String";
     name: "String";
+    tone: "Tone";
   };
   PublicPetition: {
     // field return type name
@@ -3137,11 +3153,11 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     deadline: "DateTime";
     fields: "PublicPetitionField";
-    hasRemoveParallelBranding: "Boolean";
     id: "GID";
     isCompletingMessageEnabled: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
     locale: "PetitionLocale";
+    organization: "PublicOrganization";
     recipients: "PublicContact";
     signatureConfig: "PublicSignatureConfig";
     signatureStatus: "PublicSignatureStatus";
@@ -4413,6 +4429,10 @@ export interface NexusGenArgTypes {
     updateOrganizationAutoAnonymizePeriod: {
       // args
       months?: number | null; // Int
+    };
+    updateOrganizationBrandTheme: {
+      // args
+      data: NexusGenInputs["OrganizationBrandThemeInput"]; // OrganizationBrandThemeInput!
     };
     updateOrganizationDocumentTheme: {
       // args

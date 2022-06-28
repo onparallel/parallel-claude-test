@@ -18,6 +18,7 @@ import {
   withDialogs,
 } from "@parallel/components/common/dialogs/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/dialogs/ErrorDialog";
+import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import {
@@ -200,49 +201,109 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
   return (
     <LastSavedProvider>
       <ToneProvider value={tone}>
-        <Head>
-          {fields[0]?.type === "HEADING" && fields[0].title ? (
-            <title>
-              {fields[0].title}
-              {granter.organization.hasRemoveParallelBranding ? "" : " | Parallel"}
-            </title>
-          ) : (
-            <title>Parallel</title>
-          )}
-        </Head>
-        <Flex
-          backgroundColor="gray.50"
-          minHeight="100vh"
-          zIndex={1}
-          flexDirection="column"
-          alignItems="center"
-        >
-          <RecipientViewHeader
-            sender={granter}
-            contact={contact}
-            message={message}
-            recipients={recipients}
-            keycode={keycode}
-            isClosed={["COMPLETED", "CLOSED"].includes(petition.status)}
-          />
-          <Box position="sticky" top={0} width="100%" zIndex={2} marginBottom={4}>
-            {["COMPLETED", "CLOSED"].includes(petition.status) ? (
-              !petition.signatureConfig ||
-              (petition.signatureConfig && petition.signatureStatus === "COMPLETED") ? (
-                <CloseableAlert status="success" variant="subtle" zIndex={2}>
-                  <Flex
-                    maxWidth="container.lg"
-                    alignItems="center"
-                    justifyContent="flex-start"
-                    marginX="auto"
-                    width="100%"
-                    paddingLeft={4}
-                    paddingRight={12}
-                  >
-                    <AlertIcon />
-                    <AlertDescription>
-                      {petition.status === "COMPLETED" ? (
-                        <>
+        <OverrideWithOrganizationTheme cssVarsRoot="body" brand={granter.organization.brandTheme}>
+          <Head>
+            {fields[0]?.type === "HEADING" && fields[0].title ? (
+              <title>
+                {fields[0].title}
+                {granter.organization.hasRemoveParallelBranding ? "" : " | Parallel"}
+              </title>
+            ) : (
+              <title>Parallel</title>
+            )}
+          </Head>
+          <Flex
+            backgroundColor="gray.50"
+            minHeight="100vh"
+            zIndex={1}
+            flexDirection="column"
+            alignItems="center"
+          >
+            <RecipientViewHeader
+              sender={granter}
+              contact={contact}
+              message={message}
+              recipients={recipients}
+              keycode={keycode}
+              isClosed={["COMPLETED", "CLOSED"].includes(petition.status)}
+            />
+            <Box position="sticky" top={0} width="100%" zIndex={2} marginBottom={4}>
+              {["COMPLETED", "CLOSED"].includes(petition.status) ? (
+                !petition.signatureConfig ||
+                (petition.signatureConfig && petition.signatureStatus === "COMPLETED") ? (
+                  <CloseableAlert status="success" variant="subtle" zIndex={2}>
+                    <Flex
+                      maxWidth="container.lg"
+                      alignItems="center"
+                      justifyContent="flex-start"
+                      marginX="auto"
+                      width="100%"
+                      paddingLeft={4}
+                      paddingRight={12}
+                    >
+                      <AlertIcon />
+                      <AlertDescription>
+                        {petition.status === "COMPLETED" ? (
+                          <>
+                            <Text>
+                              <FormattedMessage
+                                id="recipient-view.petition-completed-alert-1"
+                                defaultMessage="{tone, select, INFORMAL{Great! You have completed the petition and we have notified {name} for review and validation.} other{This petition has been completed and {name} has been notified for its revision and validation.}}"
+                                values={{
+                                  name: <b>{granter.fullName}</b>,
+                                  tone,
+                                }}
+                              />
+                            </Text>
+                            <Text>
+                              <FormattedMessage
+                                id="recipient-view.petition-completed-alert-2"
+                                defaultMessage="If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
+                                values={{ tone }}
+                              />
+                            </Text>
+                          </>
+                        ) : (
+                          <FormattedMessage
+                            id="recipient-view.petition-closed-alert"
+                            defaultMessage="This petition has been closed. If you need to make any changes, please reach out to {name}."
+                            values={{
+                              name: <b>{granter.fullName}</b>,
+                            }}
+                          />
+                        )}
+                      </AlertDescription>
+                    </Flex>
+                  </CloseableAlert>
+                ) : (
+                  <CloseableAlert status="warning" zIndex={2}>
+                    <Flex
+                      maxWidth="container.lg"
+                      alignItems="center"
+                      justifyContent="flex-start"
+                      marginX="auto"
+                      width="100%"
+                      paddingLeft={4}
+                      paddingRight={12}
+                    >
+                      <AlertIcon color="yellow.400" />
+                      <AlertDescription>
+                        {petition.signatureConfig.review ? (
+                          <>
+                            <Text>
+                              <FormattedMessage
+                                id="recipient-view.petition-requires-signature-alert-1"
+                                defaultMessage="This petition requires an <b>eSignature</b> to be completed."
+                              />
+                            </Text>
+                            <Text>
+                              <FormattedMessage
+                                id="recipient-view.petition-requires-signature-alert-2"
+                                defaultMessage="We will send the <b>document to sign</b> once the replies have been reviewed and validated."
+                              />
+                            </Text>
+                          </>
+                        ) : (
                           <Text>
                             <FormattedMessage
                               id="recipient-view.petition-completed-alert-1"
@@ -253,15 +314,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                               }}
                             />
                           </Text>
-                          <Text>
-                            <FormattedMessage
-                              id="recipient-view.petition-completed-alert-2"
-                              defaultMessage="If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
-                              values={{ tone }}
-                            />
-                          </Text>
-                        </>
-                      ) : (
+                        )}
                         <FormattedMessage
                           id="recipient-view.petition-closed-alert"
                           defaultMessage="This parallel has been closed. If you need to make any changes, please reach out to {name}."
@@ -366,63 +419,71 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
               marginBottom={4}
               display={{ base: "none", [breakpoint]: "block" }}
             >
-              <Stack
-                spacing={4}
-                position={{ base: "relative", [breakpoint]: "sticky" }}
-                top={{ base: 0, [breakpoint]: `${sidebarTop}px` }}
+              <Box
+                flex={{ base: 0, [breakpoint]: 1 }}
+                minWidth={0}
+                marginRight={{ base: 0, [breakpoint]: 4 }}
+                marginBottom={4}
+                display={{ base: "none", [breakpoint]: "block" }}
               >
-                {petition.isRecipientViewContentsHidden ? null : (
-                  <RecipientViewContentsCard
+                <Stack
+                  spacing={4}
+                  position={{ base: "relative", [breakpoint]: "sticky" }}
+                  top={{ base: 0, [breakpoint]: `${sidebarTop}px` }}
+                >
+                  {petition.isRecipientViewContentsHidden ? null : (
+                    <RecipientViewContentsCard
+                      currentPage={currentPage}
+                      petition={petition}
+                      maxHeight="calc(100vh - 18rem)"
+                    />
+                  )}
+                </Stack>
+              </Box>
+              <Flex flexDirection="column" flex="2" minWidth={0}>
+                <Stack spacing={4} key={currentPage}>
+                  <LiquidScopeProvider scope={scope}>
+                    <AnimatePresence initial={false}>
+                      {fields.map((field) => {
+                        return (
+                          <motion.div key={field.id} layout="position">
+                            <RecipientViewPetitionField
+                              key={field.id}
+                              tone={tone}
+                              petitionId={petition.id}
+                              keycode={keycode}
+                              access={access!}
+                              field={field}
+                              isDisabled={petition.status === "CLOSED"}
+                              isInvalid={
+                                finalized &&
+                                completedFieldReplies(field).length === 0 &&
+                                !field.optional
+                              }
+                            />
+                          </motion.div>
+                        );
+                      })}
+                    </AnimatePresence>
+                  </LiquidScopeProvider>
+                </Stack>
+                <Spacer />
+                {pages > 1 ? (
+                  <RecipientViewPagination
+                    marginTop={8}
                     currentPage={currentPage}
-                    petition={petition}
-                    maxHeight="calc(100vh - 18rem)"
+                    pageCount={pageCount}
                   />
-                )}
-              </Stack>
-            </Box>
-            <Flex flexDirection="column" flex="2" minWidth={0}>
-              <Stack spacing={4} key={currentPage}>
-                <LiquidScopeProvider scope={scope}>
-                  <AnimatePresence initial={false}>
-                    {fields.map((field) => {
-                      return (
-                        <motion.div key={field.id} layout="position">
-                          <RecipientViewPetitionField
-                            key={field.id}
-                            tone={tone}
-                            petitionId={petition.id}
-                            keycode={keycode}
-                            access={access!}
-                            field={field}
-                            isDisabled={petition.status === "CLOSED"}
-                            isInvalid={
-                              finalized &&
-                              completedFieldReplies(field).length === 0 &&
-                              !field.optional
-                            }
-                          />
-                        </motion.div>
-                      );
-                    })}
-                  </AnimatePresence>
-                </LiquidScopeProvider>
-              </Stack>
-              <Spacer />
-              {pages > 1 ? (
-                <RecipientViewPagination
-                  marginTop={8}
-                  currentPage={currentPage}
-                  pageCount={pageCount}
-                />
-              ) : null}
-              <RecipientViewFooter marginTop={12} petition={petition} />
+                ) : null}
+                <RecipientViewFooter marginTop={12} petition={petition} />
+              </Flex>
             </Flex>
-          </Flex>
 
-          {petition.status !== "CLOSED" && (
-            <RecipientViewProgressFooter petition={petition} onFinalize={handleFinalize} />
-          )}
-        </Flex>
+            {petition.status !== "CLOSED" && (
+              <RecipientViewProgressFooter petition={petition} onFinalize={handleFinalize} />
+            )}
+          </Flex>
+        </OverrideWithOrganizationTheme>
       </ToneProvider>
     </LastSavedProvider>
   );
@@ -486,6 +547,7 @@ RecipientView.fragments = {
           ...RecipientView_PublicUser
           organization {
             hasRemoveParallelBranding
+            ...OverrideWithOrganizationTheme_PublicOrganization
           }
         }
         contact {
@@ -503,6 +565,7 @@ RecipientView.fragments = {
       ${useRecipientViewConfirmPetitionSignersDialog.fragments.PublicContact}
       ${RecipientViewPetitionField.fragments.PublicPetitionAccess}
       ${this.PublicPetitionMessage}
+      ${OverrideWithOrganizationTheme.fragments.PublicOrganization}
     `;
   },
   get PublicPetitionMessage() {

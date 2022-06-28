@@ -17,6 +17,7 @@ import SignatureCancelledEmail from "../emails/emails/SignatureCancelledEmail";
 import SignatureCompletedEmail from "../emails/emails/SignatureCompletedEmail";
 import SignatureReminderEmail from "../emails/emails/SignatureReminderEmail";
 import SignatureRequestedEmail from "../emails/emails/SignatureRequestedEmail";
+import { BrandTheme } from "../emails/utils/ThemeProvider";
 import { getBaseWebhookUrl } from "../util/getBaseWebhookUrl";
 import { toGlobalId } from "../util/globalId";
 import { downloadImageBase64 } from "../util/images";
@@ -35,6 +36,7 @@ type SignatureOptions = {
     assetsUrl: string;
     tone: Tone;
     removeParallelBranding: boolean;
+    theme: BrandTheme;
   };
   events_url?: string;
   signingMode?: "parallel" | "sequential";
@@ -406,7 +408,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
 
     return await this.sdk.createBranding({
       show_welcome_page: false,
-      layout_color: "#6059F7",
+      layout_color: opts.templateData?.theme?.color ?? "#6059F7",
       text_color: "#F6F6F6",
       logo: await downloadImageBase64(opts.templateData.logoUrl),
       application_texts: {

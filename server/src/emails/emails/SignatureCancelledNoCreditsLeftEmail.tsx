@@ -84,6 +84,7 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
     assetsUrl,
     logoUrl,
     logoAlt,
+    theme,
   }: SignatureCancelledNoCreditsLeftEmailProps) {
     return (
       <Layout
@@ -103,6 +104,7 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
             </MjmlColumn>
           </MjmlSection>
         }
+        theme={theme}
       >
         <MjmlSection padding="10px 0 0 0">
           <MjmlColumn>

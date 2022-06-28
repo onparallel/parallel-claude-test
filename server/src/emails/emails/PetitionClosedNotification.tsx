@@ -58,6 +58,7 @@ const email: Email<PetitionClosedNotificationProps> = {
     logoUrl,
     logoAlt,
     removeParallelBranding,
+    theme,
   }: PetitionClosedNotificationProps) {
     return (
       <Layout
@@ -67,6 +68,7 @@ const email: Email<PetitionClosedNotificationProps> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
         removeParallelBranding={removeParallelBranding}
+        theme={theme}
       >
         <MjmlSection padding="0">
           <MjmlColumn>

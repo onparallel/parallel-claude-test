@@ -52,6 +52,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { isDefined, omit } from "remeda";
 import { withMetadata } from "@parallel/utils/withMetadata";
+import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 
 type PetitionPreviewProps = UnwrapPromise<ReturnType<typeof PetitionPreview.getInitialProps>>;
 
@@ -320,23 +321,29 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
           minHeight="100%"
           flexDirection="column"
           alignItems="center"
+          id="recipient-view"
         >
-          <Flex
-            flex="1"
-            flexDirection={{ base: "column", [breakpoint]: "row" }}
-            width="100%"
-            maxWidth="container.lg"
-            paddingY={6}
-            paddingX={4}
+          <OverrideWithOrganizationTheme
+            cssVarsRoot="#recipient-view"
+            brand={me.organization.brandTheme}
           >
-            <Box
-              flex={{ base: 0, [breakpoint]: 1 }}
-              minWidth={0}
-              marginRight={{ base: 0, [breakpoint]: 4 }}
-              marginBottom={4}
-              display={{ base: "none", [breakpoint]: "block" }}
+            <Flex
+              flex="1"
+              flexDirection={{ base: "column", [breakpoint]: "row" }}
+              width="100%"
+              maxWidth="container.lg"
+              paddingY={6}
+              paddingX={4}
+              fontFamily="body"
             >
-              <Stack
+              <Box
+                flex={{ base: 0, [breakpoint]: 1 }}
+                minWidth={0}
+                marginRight={{ base: 0, [breakpoint]: 4 }}
+                marginBottom={4}
+                display={{ base: "none", [breakpoint]: "block" }}
+              >
+                <Stack
                 spacing={4}
                 position={{ base: "relative", [breakpoint]: "sticky" }}
                 top={{ base: 0, [breakpoint]: 6 }}
@@ -391,6 +398,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 petition.isAnonymized ||
                 myEffectivePermission === "READ"
               }
+              fontFamily="body"
             />
           )}
         </Flex>
@@ -465,6 +473,7 @@ PetitionPreview.fragments = {
         organization {
           name
           ...isUsageLimitsReached_Organization
+          ...OverrideWithOrganizationTheme_Organization
         }
         ...useSendPetitionHandler_User
         ...ConfirmPetitionSignersDialog_User
@@ -474,6 +483,7 @@ PetitionPreview.fragments = {
     ${useSendPetitionHandler.fragments.User}
     ${isUsageLimitsReached.fragments.Organization}
     ${ConfirmPetitionSignersDialog.fragments.User}
+    ${OverrideWithOrganizationTheme.fragments.Organization}
   `,
 };
 

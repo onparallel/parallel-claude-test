@@ -655,6 +655,7 @@ export interface Organization {
   appsumo_license: Maybe<any>; // jsonb
   pdf_document_theme: Maybe<any>; // jsonb
   anonymize_petitions_after_months: Maybe<number>; // int4
+  brand_theme: Maybe<any>; // jsonb
 }
 
 export type CreateOrganization = PartialProps<
@@ -674,6 +675,7 @@ export type CreateOrganization = PartialProps<
   | "appsumo_license"
   | "pdf_document_theme"
   | "anonymize_petitions_after_months"
+  | "brand_theme"
 >;
 
 export interface OrganizationUsageLimit {

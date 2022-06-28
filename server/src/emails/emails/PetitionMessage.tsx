@@ -98,6 +98,7 @@ const email: Email<PetitionMessageProps> = {
     removeWhyWeUseParallel,
     removeParallelBranding,
     showNextButton,
+    theme,
   }: PetitionMessageProps) {
     const intl = useIntl();
 
@@ -116,6 +117,7 @@ const email: Email<PetitionMessageProps> = {
         utmCampaign="recipients"
         tone={tone}
         removeParallelBranding={removeParallelBranding}
+        theme={theme}
       >
         <MjmlSection padding="0">
           <MjmlColumn>

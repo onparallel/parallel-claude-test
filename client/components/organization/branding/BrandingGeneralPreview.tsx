@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import {
   Box,
+  Button,
   Center,
   Image,
   ListItem,
@@ -9,6 +10,7 @@ import {
   Text,
   UnorderedList,
 } from "@chakra-ui/react";
+import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import { BrandingGeneralPreview_UserFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 
@@ -50,73 +52,80 @@ export function BrandingGeneralPreview({ user }: BrandingGeneralPreviewProps) {
             />
           </Text>
         </Box>
-        <Stack padding={8} spacing={5}>
-          <Stack>
-            <Center minHeight="100px">
-              <Image
-                boxSize="200px"
-                height="100px"
-                objectFit="contain"
-                alt={user.organization.name}
-                src={logoSrc}
-              />
-            </Center>
-            <Text>
-              <FormattedMessage
-                id="component.branding-general-preview.greetings"
-                defaultMessage="{tone, select, INFORMAL{🔔 Hello <b>[Recipient Name]</b>!} other{Dear <b>[Recipient Name]</b>,}}"
-                values={{ tone: user.organization.preferredTone }}
-              />
-            </Text>
-            <Text>
-              <FormattedMessage
-                id="component.branding-general-preview.body"
-                defaultMessage="We remind you that <b>{name}</b> sent you a parallel and some of the requested information has not yet been submitted."
-                values={{ tone: user.organization.preferredTone, name: user.fullName }}
-              />
-            </Text>
-          </Stack>
 
-          <Stack padding={4} spacing={2.5} backgroundColor="gray.100" borderRadius="md">
-            <SkeletonText noOfLines={1} width="20%" speed={0} endColor="gray.400" />
-            <SkeletonText noOfLines={1} width="100%" speed={0} endColor="gray.400" />
-            <SkeletonText
-              noOfLines={1}
-              width="70%"
-              paddingBottom={3}
-              speed={0}
-              endColor="gray.400"
-            />
+        <Stack padding={8} spacing={5} id="branding-preview" fontFamily="body">
+          <OverrideWithOrganizationTheme
+            cssVarsRoot="#branding-preview"
+            brand={user.organization.brandTheme}
+          >
+            <Stack>
+              <Center minHeight="100px">
+                <Image
+                  boxSize="200px"
+                  height="100px"
+                  objectFit="contain"
+                  alt={user.organization.name}
+                  src={logoSrc}
+                />
+              </Center>
+              <Text>
+                <FormattedMessage
+                  id="component.branding-general-preview.greetings"
+                  defaultMessage="{tone, select, INFORMAL{🔔 Hello <b>[Recipient Name]</b>!} other{Dear <b>[Recipient Name]</b>,}}"
+                  values={{ tone: user.organization.preferredTone }}
+                />
+              </Text>
+              <Text>
+                <FormattedMessage
+                  id="component.branding-general-preview.body"
+                  defaultMessage="We remind you that <b>{name}</b> sent you a parallel and some of the requested information has not yet been submitted."
+                  values={{ tone: user.organization.preferredTone, name: user.fullName }}
+                />
+              </Text>
+            </Stack>
 
-            <SkeletonText noOfLines={1} width="10%" speed={0} endColor="gray.400" />
-            <SkeletonText noOfLines={1} width="30%" speed={0} endColor="gray.400" />
-          </Stack>
-          <UnorderedList paddingLeft={4}>
-            <ListItem>
-              <FormattedMessage
-                id="component.branding-general-preview.pending-fields"
-                defaultMessage="{tone, select, INFORMAL{You have 12/40 fields pending} other{There are currently 12/40 fields pending}}"
-                values={{ tone: user.organization.preferredTone }}
+            <Stack padding={4} spacing={2.5} backgroundColor="gray.100" borderRadius="md">
+              <SkeletonText noOfLines={1} width="20%" speed={0} endColor="gray.400" />
+              <SkeletonText noOfLines={1} width="100%" speed={0} endColor="gray.400" />
+              <SkeletonText
+                noOfLines={1}
+                width="70%"
+                paddingBottom={3}
+                speed={0}
+                endColor="gray.400"
               />
-            </ListItem>
-          </UnorderedList>
 
-          <Stack width="100%" justifyContent="center" align="center" spacing={2.5}>
-            <Box
-              backgroundColor="primary.500"
-              paddingX={5}
-              paddingY={3}
-              maxWidth="140px"
+              <SkeletonText noOfLines={1} width="10%" speed={0} endColor="gray.400" />
+              <SkeletonText noOfLines={1} width="30%" speed={0} endColor="gray.400" />
+            </Stack>
+            <UnorderedList paddingLeft={4}>
+              <ListItem>
+                <FormattedMessage
+                  id="component.branding-general-preview.pending-fields"
+                  defaultMessage="{tone, select, INFORMAL{You have 12/40 fields pending} other{There are currently 12/40 fields pending}}"
+                  values={{ tone: user.organization.preferredTone }}
+                />
+              </ListItem>
+            </UnorderedList>
+
+            <Stack
               width="100%"
-              rounded="md"
-              marginY={4}
+              justifyContent="center"
+              align="center"
+              spacing={2.5}
+              paddingBottom={6}
             >
-              <SkeletonText noOfLines={1} width="100%" speed={0} endColor="white" />
-            </Box>
+              <Button colorScheme="primary" marginY={3}>
+                <FormattedMessage
+                  id="component.branding-general-preview.complete-information"
+                  defaultMessage="Complete the information"
+                />
+              </Button>
 
-            <SkeletonText noOfLines={1} width="95%" speed={0} endColor="gray.300" />
-            <SkeletonText noOfLines={1} width="40%" speed={0} endColor="gray.300" />
-          </Stack>
+              <SkeletonText noOfLines={1} width="95%" speed={0} endColor="gray.300" />
+              <SkeletonText noOfLines={1} width="40%" speed={0} endColor="gray.300" />
+            </Stack>
+          </OverrideWithOrganizationTheme>
         </Stack>
       </Box>
       <Text width="full" textAlign="center" fontSize="sm" color="gray.600" mt={4}>
@@ -137,7 +146,9 @@ BrandingGeneralPreview.fragments = {
         name
         preferredTone
         logoUrl(options: { resize: { width: 600 } })
+        ...OverrideWithOrganizationTheme_Organization
       }
     }
+    ${OverrideWithOrganizationTheme.fragments.Organization}
   `,
 };

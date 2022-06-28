@@ -72,6 +72,7 @@ const email: Email<SignatureRequestedProps> = {
     emailBody,
     tone,
     removeParallelBranding,
+    theme,
   }: SignatureRequestedProps) {
     const intl = useIntl();
     return (
@@ -88,6 +89,7 @@ const email: Email<SignatureRequestedProps> = {
         utmCampaign="recipients"
         tone={tone}
         removeParallelBranding={removeParallelBranding}
+        theme={theme}
       >
         <MjmlSection padding="0">
           <MjmlColumn>

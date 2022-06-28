@@ -22,7 +22,7 @@ export const RecipientViewFooter = Object.assign(
         alignItems="center"
         {...props}
       >
-        {props.petition.hasRemoveParallelBranding ? null : (
+        {props.petition.organization.hasRemoveParallelBranding ? null : (
           <Flex fontSize="sm" alignItems="center">
             <FormattedMessage
               id="recipient-view.created-with"
@@ -83,7 +83,10 @@ export const RecipientViewFooter = Object.assign(
       PublicPetition: gql`
         fragment RecipientViewFooter_PublicPetition on PublicPetition {
           id
-          hasRemoveParallelBranding
+          organization {
+            id
+            hasRemoveParallelBranding
+          }
         }
       `,
     },

@@ -1,0 +1,11 @@
+[
+  ["Arial", "Arial, Helvetica, sans-serif"],
+  ["Courier New", "Courier New, Courier, monospace"],
+  ["Verdana", "Verdana, Geneva, sans-serif"],
+  ["Helvetica", "Helvetica Neue, Helvetica, Arial, sans-serif"],
+  ["Times New Roman", "TimesNewRoman, Times New Roman, Times, Baskerville, Georgia, serif"],
+  ["Georgia", "Georgia, Times, Times New Roman, serif"],
+  ["Tahoma", "Tahoma, Verdana, Segoe, sans-serif"],
+  ["Lucida Grande", "Lucida Grande, Lucida Sans Unicode, Lucida Sans, Geneva, Verdana, sans-serif"],
+  ["Trebuchet MS", "Trebuchet MS, Helvetica, sans-serif"]
+]

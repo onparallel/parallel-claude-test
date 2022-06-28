@@ -67,6 +67,7 @@ const email: Email<SignatureReminderProps> = {
     documentName,
     tone,
     removeParallelBranding,
+    theme,
   }: SignatureReminderProps) {
     const intl = useIntl();
     return (
@@ -83,6 +84,7 @@ const email: Email<SignatureReminderProps> = {
         utmCampaign="recipients"
         tone={tone}
         removeParallelBranding={removeParallelBranding}
+        theme={theme}
       >
         <MjmlSection padding="0">
           <MjmlColumn>

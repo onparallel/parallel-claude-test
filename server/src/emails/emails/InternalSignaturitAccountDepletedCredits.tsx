@@ -42,6 +42,7 @@ const email: Email<InternalSignaturitAccountDepletedCreditsProps> = {
     parallelUrl,
     logoAlt,
     logoUrl,
+    theme,
   }: InternalSignaturitAccountDepletedCreditsProps) {
     return (
       <Layout
@@ -52,6 +53,7 @@ const email: Email<InternalSignaturitAccountDepletedCreditsProps> = {
         title="¡Acción necesaria!"
         tone="INFORMAL"
         omitGdprDisclaimer
+        theme={theme}
       >
         <MjmlSection padding="0">
           <MjmlColumn>

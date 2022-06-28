@@ -65,6 +65,7 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
       t.nullable.field("tone", {
         type: "Tone",
       });
+      t.nullable.jsonObject("brandTheme");
     },
   }),
   authorize: chain(checkClientServerToken("token"), fetchPetitionAccess("keycode")),
@@ -122,6 +123,7 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
           orgName: org!.name,
           orgLogoUrl: logoUrl,
           tone: org!.preferred_tone,
+          brandTheme: org!.brand_theme,
         };
       }
     } else {

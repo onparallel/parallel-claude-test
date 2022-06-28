@@ -68,6 +68,7 @@ export async function publicPetitionLinkAccess(
       petitionTitle: publicPetitionLink.title,
       keycode: access.keycode,
       tone: organization!.preferred_tone,
+      theme: organization!.brand_theme,
       removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
       removeParallelBranding: hasRemoveParallelBranding,
       ...layoutProps,

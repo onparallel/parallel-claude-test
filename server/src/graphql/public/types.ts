@@ -151,15 +151,11 @@ export const PublicPetition = objectType({
         return org.preferred_tone;
       },
     });
-    t.boolean("hasRemoveParallelBranding", {
-      description: "Wether the has activated REMOVE_PARALLEL_BRANDING or not.",
+    t.field("organization", {
+      description: "The organization of the petition.",
+      type: "PublicOrganization",
       resolve: async (root, _, ctx) => {
-        const hasRemoveParallelBranding = await ctx.featureFlags.orgHasFeatureFlag(
-          root.org_id,
-          "REMOVE_PARALLEL_BRANDING"
-        );
-
-        return hasRemoveParallelBranding;
+        return (await ctx.organizations.loadOrg(root.org_id))!;
       },
     });
     t.boolean("isCompletingMessageEnabled", {
@@ -424,6 +420,16 @@ export const PublicOrganization = objectType({
       description: "If this organization has the REMOVE_PARALLEL_BRANDING feature flag enabled",
       resolve: async (root, _, ctx) => {
         return await ctx.featureFlags.orgHasFeatureFlag(root.id, "REMOVE_PARALLEL_BRANDING");
+      },
+    });
+    t.nonNull.field("tone", {
+      type: "Tone",
+      description: "The preferred tone of organization.",
+      resolve: (o) => o.preferred_tone,
+    });
+    t.nullable.jsonObject("brandTheme", {
+      resolve: (o) => {
+        return o.brand_theme;
       },
     });
   },

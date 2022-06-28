@@ -671,6 +671,8 @@ export interface Mutation {
   updateLandingTemplateMetadata: SupportMethodResponse;
   /** Updates the period after closed petitions of this organization are automatically anonymized. */
   updateOrganizationAutoAnonymizePeriod: Organization;
+  /** updates the theme of the organization brand */
+  updateOrganizationBrandTheme: Organization;
   /** updates the theme of the PDF documents of the organization */
   updateOrganizationDocumentTheme: Organization;
   /** Updates the limits of a given org. If 'Update Only Current Period' is left unchecked, the changes will be reflected on the next period. */
@@ -1405,6 +1407,10 @@ export interface MutationupdateOrganizationAutoAnonymizePeriodArgs {
   months?: InputMaybe<Scalars["Int"]>;
 }
 
+export interface MutationupdateOrganizationBrandThemeArgs {
+  data: OrganizationBrandThemeInput;
+}
+
 export interface MutationupdateOrganizationDocumentThemeArgs {
   data: OrganizationDocumentThemeInput;
 }
@@ -1613,6 +1619,7 @@ export interface Organization extends Timestamps {
   /** The total number of active users */
   activeUserCount: Scalars["Int"];
   anonymizePetitionsAfterMonths?: Maybe<Scalars["Int"]>;
+  brandTheme?: Maybe<Scalars["JSONObject"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom host used in petition links and public links. */
@@ -1670,6 +1677,11 @@ export interface OrganizationusersArgs {
   offset?: InputMaybe<Scalars["Int"]>;
   search?: InputMaybe<Scalars["String"]>;
   sortBy?: InputMaybe<Array<OrganizationUsers_OrderBy>>;
+}
+
+export interface OrganizationBrandThemeInput {
+  color?: InputMaybe<Scalars["String"]>;
+  fontFamily?: InputMaybe<Scalars["String"]>;
 }
 
 export interface OrganizationDocumentThemeInput {
@@ -2708,6 +2720,7 @@ export interface PublicLicenseCode {
 /** A public view of an organization */
 export interface PublicOrganization {
   __typename?: "PublicOrganization";
+  brandTheme?: Maybe<Scalars["JSONObject"]>;
   /** If this organization has the REMOVE_PARALLEL_BRANDING feature flag enabled */
   hasRemoveParallelBranding: Scalars["Boolean"];
   /** The ID of the organization. */
@@ -2716,6 +2729,8 @@ export interface PublicOrganization {
   logoUrl?: Maybe<Scalars["String"]>;
   /** The name of the organization. */
   name: Scalars["String"];
+  /** The preferred tone of organization. */
+  tone: Tone;
 }
 
 /** A public view of an organization */
@@ -2736,8 +2751,6 @@ export interface PublicPetition extends Timestamps {
   deadline?: Maybe<Scalars["DateTime"]>;
   /** The field definition of the petition. */
   fields: Array<PublicPetitionField>;
-  /** Wether the has activated REMOVE_PARALLEL_BRANDING or not. */
-  hasRemoveParallelBranding: Scalars["Boolean"];
   /** The ID of the petition. */
   id: Scalars["GID"];
   /** Wether the completion message will be shown to the recipients or not. */
@@ -2749,6 +2762,8 @@ export interface PublicPetition extends Timestamps {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the parallel. */
   locale: PetitionLocale;
+  /** The organization of the petition. */
+  organization: PublicOrganization;
   /** The recipients of the petition */
   recipients: Array<PublicContact>;
   /** The signature config of the petition */
@@ -3873,6 +3888,18 @@ export type FileAttachmentButton_FileUploadFragment = {
   contentType: string;
   size: number;
   isComplete: boolean;
+};
+
+export type OverrideWithOrganizationTheme_OrganizationFragment = {
+  __typename?: "Organization";
+  id: string;
+  brandTheme?: { [key: string]: any } | null;
+};
+
+export type OverrideWithOrganizationTheme_PublicOrganizationFragment = {
+  __typename?: "PublicOrganization";
+  id: string;
+  brandTheme?: { [key: string]: any } | null;
 };
 
 export type PetitionFieldSelect_PetitionFieldFragment = {
@@ -5307,6 +5334,18 @@ export type BrandingGeneralForm_updateOrganizationPreferredToneMutation = {
   updateOrganizationPreferredTone: { __typename?: "Organization"; id: string; preferredTone: Tone };
 };
 
+export type BrandingGeneralForm_updateOrganizationBrandThemeMutationVariables = Exact<{
+  data: OrganizationBrandThemeInput;
+}>;
+
+export type BrandingGeneralForm_updateOrganizationBrandThemeMutation = {
+  updateOrganizationBrandTheme: {
+    __typename?: "Organization";
+    id: string;
+    brandTheme?: { [key: string]: any } | null;
+  };
+};
+
 export type BrandingGeneralForm_UserFragment = {
   __typename?: "User";
   id: string;
@@ -5317,6 +5356,7 @@ export type BrandingGeneralForm_UserFragment = {
     id: string;
     name: string;
     preferredTone: Tone;
+    brandTheme?: { [key: string]: any } | null;
     logoUrl?: string | null;
   };
 };
@@ -5329,6 +5369,8 @@ export type BrandingGeneralPreview_UserFragment = {
     name: string;
     preferredTone: Tone;
     logoUrl?: string | null;
+    id: string;
+    brandTheme?: { [key: string]: any } | null;
   };
 };
 
@@ -10589,7 +10631,11 @@ export type RecipientViewContentsCard_PetitionFieldFragment = {
 export type RecipientViewFooter_PublicPetitionFragment = {
   __typename?: "PublicPetition";
   id: string;
-  hasRemoveParallelBranding: boolean;
+  organization: {
+    __typename?: "PublicOrganization";
+    id: string;
+    hasRemoveParallelBranding: boolean;
+  };
 };
 
 export type RecipientViewHeader_PublicContactFragment = {
@@ -11986,6 +12032,7 @@ export type OrganizationBranding_userQuery = {
       preferredTone: Tone;
       pdfDocumentTheme: { [key: string]: any };
       isPdfDocumentThemeFontsDirty: boolean;
+      brandTheme?: { [key: string]: any } | null;
       iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
@@ -17039,6 +17086,7 @@ export type PetitionPreview_QueryFragment = {
       __typename?: "Organization";
       name: string;
       id: string;
+      brandTheme?: { [key: string]: any } | null;
       iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
@@ -17783,6 +17831,7 @@ export type PetitionPreview_userQuery = {
       __typename?: "Organization";
       name: string;
       id: string;
+      brandTheme?: { [key: string]: any } | null;
       iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
@@ -19995,7 +20044,6 @@ export type RecipientView_PublicPetitionAccessFragment = {
     isCompletingMessageEnabled: boolean;
     completingMessageBody?: string | null;
     completingMessageSubject?: string | null;
-    hasRemoveParallelBranding: boolean;
     recipients: Array<{
       __typename?: "PublicContact";
       firstName: string;
@@ -20060,6 +20108,11 @@ export type RecipientView_PublicPetitionAccessFragment = {
         email: string;
       }>;
     } | null;
+    organization: {
+      __typename?: "PublicOrganization";
+      id: string;
+      hasRemoveParallelBranding: boolean;
+    };
   } | null;
   granter?: {
     __typename?: "PublicUser";
@@ -20072,6 +20125,8 @@ export type RecipientView_PublicPetitionAccessFragment = {
       hasRemoveParallelBranding: boolean;
       name: string;
       logoUrl?: string | null;
+      id: string;
+      brandTheme?: { [key: string]: any } | null;
     };
   } | null;
   contact?: {
@@ -20102,7 +20157,6 @@ export type RecipientView_PublicPetitionFragment = {
   isCompletingMessageEnabled: boolean;
   completingMessageBody?: string | null;
   completingMessageSubject?: string | null;
-  hasRemoveParallelBranding: boolean;
   fields: Array<{
     __typename?: "PublicPetitionField";
     type: PetitionFieldType;
@@ -20166,6 +20220,11 @@ export type RecipientView_PublicPetitionFragment = {
     firstName: string;
     email: string;
   }>;
+  organization: {
+    __typename?: "PublicOrganization";
+    id: string;
+    hasRemoveParallelBranding: boolean;
+  };
 };
 
 export type RecipientView_PublicPetitionFieldFragment = {
@@ -20234,7 +20293,6 @@ export type RecipientView_publicCompletePetitionMutation = {
     isCompletingMessageEnabled: boolean;
     completingMessageBody?: string | null;
     completingMessageSubject?: string | null;
-    hasRemoveParallelBranding: boolean;
     fields: Array<{
       __typename?: "PublicPetitionField";
       type: PetitionFieldType;
@@ -20298,6 +20356,11 @@ export type RecipientView_publicCompletePetitionMutation = {
       firstName: string;
       email: string;
     }>;
+    organization: {
+      __typename?: "PublicOrganization";
+      id: string;
+      hasRemoveParallelBranding: boolean;
+    };
   };
 };
 
@@ -20319,7 +20382,6 @@ export type RecipientView_accessQuery = {
       isCompletingMessageEnabled: boolean;
       completingMessageBody?: string | null;
       completingMessageSubject?: string | null;
-      hasRemoveParallelBranding: boolean;
       recipients: Array<{
         __typename?: "PublicContact";
         firstName: string;
@@ -20384,6 +20446,11 @@ export type RecipientView_accessQuery = {
           email: string;
         }>;
       } | null;
+      organization: {
+        __typename?: "PublicOrganization";
+        id: string;
+        hasRemoveParallelBranding: boolean;
+      };
     } | null;
     granter?: {
       __typename?: "PublicUser";
@@ -20396,6 +20463,8 @@ export type RecipientView_accessQuery = {
         hasRemoveParallelBranding: boolean;
         name: string;
         logoUrl?: string | null;
+        id: string;
+        brandTheme?: { [key: string]: any } | null;
       };
     } | null;
     contact?: {
@@ -21881,10 +21950,17 @@ export const BrandingGeneralForm_UserFragmentDoc = gql`
       id
       name
       preferredTone
+      brandTheme
       logoUrl(options: { resize: { width: 600 } })
     }
   }
 ` as unknown as DocumentNode<BrandingGeneralForm_UserFragment, unknown>;
+export const OverrideWithOrganizationTheme_OrganizationFragmentDoc = gql`
+  fragment OverrideWithOrganizationTheme_Organization on Organization {
+    id
+    brandTheme
+  }
+` as unknown as DocumentNode<OverrideWithOrganizationTheme_OrganizationFragment, unknown>;
 export const BrandingGeneralPreview_UserFragmentDoc = gql`
   fragment BrandingGeneralPreview_User on User {
     fullName
@@ -21892,8 +21968,10 @@ export const BrandingGeneralPreview_UserFragmentDoc = gql`
       name
       preferredTone
       logoUrl(options: { resize: { width: 600 } })
+      ...OverrideWithOrganizationTheme_Organization
     }
   }
+  ${OverrideWithOrganizationTheme_OrganizationFragmentDoc}
 ` as unknown as DocumentNode<BrandingGeneralPreview_UserFragment, unknown>;
 export const DocumentThemeEditor_OrganizationFragmentDoc = gql`
   fragment DocumentThemeEditor_Organization on Organization {
@@ -24611,6 +24689,7 @@ export const PetitionPreview_QueryFragmentDoc = gql`
       organization {
         name
         ...isUsageLimitsReached_Organization
+        ...OverrideWithOrganizationTheme_Organization
       }
       ...useSendPetitionHandler_User
       ...ConfirmPetitionSignersDialog_User
@@ -24618,6 +24697,7 @@ export const PetitionPreview_QueryFragmentDoc = gql`
   }
   ${PetitionLayout_QueryFragmentDoc}
   ${isUsageLimitsReached_OrganizationFragmentDoc}
+  ${OverrideWithOrganizationTheme_OrganizationFragmentDoc}
   ${useSendPetitionHandler_UserFragmentDoc}
   ${ConfirmPetitionSignersDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<PetitionPreview_QueryFragment, unknown>;
@@ -25369,7 +25449,10 @@ export const useCompletingMessageDialog_PublicPetitionFragmentDoc = gql`
 export const RecipientViewFooter_PublicPetitionFragmentDoc = gql`
   fragment RecipientViewFooter_PublicPetition on PublicPetition {
     id
-    hasRemoveParallelBranding
+    organization {
+      id
+      hasRemoveParallelBranding
+    }
   }
 ` as unknown as DocumentNode<RecipientViewFooter_PublicPetitionFragment, unknown>;
 export const RecipientView_PublicPetitionFragmentDoc = gql`
@@ -25460,6 +25543,12 @@ export const RecipientView_PublicUserFragmentDoc = gql`
   ${RecipientViewContentsCard_PublicUserFragmentDoc}
   ${useCompletingMessageDialog_PublicUserFragmentDoc}
 ` as unknown as DocumentNode<RecipientView_PublicUserFragment, unknown>;
+export const OverrideWithOrganizationTheme_PublicOrganizationFragmentDoc = gql`
+  fragment OverrideWithOrganizationTheme_PublicOrganization on PublicOrganization {
+    id
+    brandTheme
+  }
+` as unknown as DocumentNode<OverrideWithOrganizationTheme_PublicOrganizationFragment, unknown>;
 export const RecipientView_PublicPetitionMessageFragmentDoc = gql`
   fragment RecipientView_PublicPetitionMessage on PublicPetitionMessage {
     id
@@ -25497,6 +25586,7 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
       ...RecipientView_PublicUser
       organization {
         hasRemoveParallelBranding
+        ...OverrideWithOrganizationTheme_PublicOrganization
       }
     }
     contact {
@@ -25511,6 +25601,7 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
   ${RecipientView_PublicPetitionFragmentDoc}
   ${useRecipientViewConfirmPetitionSignersDialog_PublicContactFragmentDoc}
   ${RecipientView_PublicUserFragmentDoc}
+  ${OverrideWithOrganizationTheme_PublicOrganizationFragmentDoc}
   ${RecipientViewHeader_PublicContactFragmentDoc}
   ${RecipientView_PublicPetitionMessageFragmentDoc}
   ${RecipientViewPetitionField_PublicPetitionAccessFragmentDoc}
@@ -25885,6 +25976,17 @@ export const BrandingGeneralForm_updateOrganizationPreferredToneDocument = gql`
 ` as unknown as DocumentNode<
   BrandingGeneralForm_updateOrganizationPreferredToneMutation,
   BrandingGeneralForm_updateOrganizationPreferredToneMutationVariables
+>;
+export const BrandingGeneralForm_updateOrganizationBrandThemeDocument = gql`
+  mutation BrandingGeneralForm_updateOrganizationBrandTheme($data: OrganizationBrandThemeInput!) {
+    updateOrganizationBrandTheme(data: $data) {
+      id
+      brandTheme
+    }
+  }
+` as unknown as DocumentNode<
+  BrandingGeneralForm_updateOrganizationBrandThemeMutation,
+  BrandingGeneralForm_updateOrganizationBrandThemeMutationVariables
 >;
 export const DocumentThemeEditor_updateOrganizationDocumentThemeDocument = gql`
   mutation DocumentThemeEditor_updateOrganizationDocumentTheme(

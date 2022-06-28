@@ -100,6 +100,7 @@ const email: Email<MessageBouncedEmailProps> = {
     assetsUrl,
     logoUrl,
     logoAlt,
+    theme,
   }: MessageBouncedEmailProps) {
     const intl = useIntl();
     return (
@@ -117,6 +118,7 @@ const email: Email<MessageBouncedEmailProps> = {
             </MjmlColumn>
           </MjmlSection>
         }
+        theme={theme}
       >
         <MjmlSection padding="10px 0 0 0">
           <MjmlColumn>

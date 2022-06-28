@@ -1,6 +1,7 @@
 import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, useIntl } from "react-intl";
+import { FORMATS } from "../../util/dates";
 import { Email } from "../buildEmail";
 import { CompleteInfoButton } from "../components/CompleteInfoButton";
 import { DateTime } from "../components/DateTime";
@@ -9,7 +10,6 @@ import { Layout, LayoutProps } from "../components/Layout";
 import { disclaimer } from "../components/texts";
 import { UserMessageBox } from "../components/UserMessageBox";
 import { WhyWeUseParallel } from "../components/WhyWeUseParallel";
-import { FORMATS } from "../../util/dates";
 import { Tone } from "../utils/types";
 
 export type AccessDelegatedEmailProps = {
@@ -116,6 +116,7 @@ const email: Email<AccessDelegatedEmailProps> = {
     tone,
     removeWhyWeUseParallel,
     removeParallelBranding,
+    theme,
   }: AccessDelegatedEmailProps) {
     const { locale } = useIntl();
     return (
@@ -128,6 +129,7 @@ const email: Email<AccessDelegatedEmailProps> = {
         utmCampaign="recipients"
         tone={tone}
         removeParallelBranding={removeParallelBranding}
+        theme={theme}
       >
         <MjmlSection padding="0">
           <MjmlColumn>

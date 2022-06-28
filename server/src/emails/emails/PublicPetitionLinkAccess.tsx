@@ -85,6 +85,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
     tone,
     removeWhyWeUseParallel,
     removeParallelBranding,
+    theme,
   }: PublicPetitionLinkAccessProps) {
     const { locale } = useIntl();
     return (
@@ -97,6 +98,7 @@ const email: Email<PublicPetitionLinkAccessProps> = {
         utmCampaign="recipients"
         tone={tone}
         removeParallelBranding={removeParallelBranding}
+        theme={theme}
       >
         <MjmlSection padding="0">
           <MjmlColumn>

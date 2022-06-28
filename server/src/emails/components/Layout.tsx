@@ -20,6 +20,7 @@ import {
 import { FC, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { URLSearchParams } from "url";
+import { BrandTheme, ThemeProvider, useTheme } from "../utils/ThemeProvider";
 import { GdprDisclaimer } from "./GdprDisclaimer";
 
 export type LayoutProps = {
@@ -36,9 +37,18 @@ export type LayoutProps = {
   tone?: string;
   utmCampaign?: string;
   removeParallelBranding?: boolean;
+  theme?: BrandTheme;
 };
 
-export const Layout: FC<LayoutProps> = function Layout({
+export const Layout: FC<LayoutProps> = function Layout({ theme, ...props }) {
+  return (
+    <ThemeProvider theme={theme ?? {}}>
+      <ThemedLayout {...props} />
+    </ThemeProvider>
+  );
+};
+
+const ThemedLayout: FC<LayoutProps> = function ThemedLayout({
   title,
   logoUrl,
   logoAlt,
@@ -60,15 +70,17 @@ export const Layout: FC<LayoutProps> = function Layout({
     ...(utmCampaign ? { utm_campaign: utmCampaign } : {}),
   });
 
+  const theme = useTheme();
+
   return (
     <Mjml>
       <MjmlHead>
         {title ? <MjmlTitle>{title}</MjmlTitle> : null}
         <MjmlAttributes>
-          <MjmlAll fontSize="14px" lineHeight="1.4" />
+          <MjmlAll fontSize="14px" lineHeight="1.4" fontFamily={theme.fontFamily} />
           <MjmlClass
             name="button-primary"
-            backgroundColor="#6059f7"
+            backgroundColor={theme.color[500]}
             color="#FFFFFF"
             fontWeight="600"
             borderRadius="4px"
@@ -81,7 +93,7 @@ export const Layout: FC<LayoutProps> = function Layout({
             padding: 0 16px;
           }
           .link {
-            color: #6059f7;
+            color: ${theme.color[500]};
             text-decoration: none;
           }
         `
@@ -145,25 +157,25 @@ export const Layout: FC<LayoutProps> = function Layout({
                       alt="LinkedIn"
                       name="linkedin-noshare"
                       href="https://www.linkedin.com/company/onparallel"
-                      backgroundColor="#6059f7"
+                      backgroundColor={theme.color[500]}
                     />
                     <MjmlSocialElement
                       alt="Slack"
                       src={`${assetsUrl}/static/emails/slack.png`}
                       href="https://joinparallel.slack.com/join/shared_invite/zt-sda28ew5-tCZBQzZpPupCIsd85RgwGA#/shared-invite/email"
-                      backgroundColor="#6059f7"
+                      backgroundColor={theme.color[500]}
                     />
                     <MjmlSocialElement
                       alt="Facebook"
                       name="facebook-noshare"
                       href="https://www.facebook.com/parallel.so"
-                      backgroundColor="#6059f7"
+                      backgroundColor={theme.color[500]}
                     />
                     <MjmlSocialElement
                       alt="Twitter"
                       name="twitter-noshare"
                       href="https://twitter.com/Parallel_SO"
-                      backgroundColor="#6059f7"
+                      backgroundColor={theme.color[500]}
                     />
                   </MjmlSocial>
                 )}

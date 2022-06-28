@@ -194,6 +194,7 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
     assetsUrl,
     logoUrl,
     logoAlt,
+    theme,
   }: OrganizationLimitsReachedEmailProps) {
     const petitionSendTotalCreditsUsed = used === total && limitName === "PETITION_SEND";
     const signatureTotalCreditsUsed = used === total && limitName === "SIGNATURIT_SHARED_APIKEY";
@@ -240,6 +241,7 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
             </MjmlColumn>
           </MjmlSection>
         }
+        theme={theme}
       >
         <MjmlSection padding="10px 0 0 0">
           <MjmlColumn>

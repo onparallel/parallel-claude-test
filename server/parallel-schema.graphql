@@ -1438,6 +1438,11 @@ type Mutation {
   updateOrganizationAutoAnonymizePeriod(months: Int): Organization!
 
   """
+  updates the theme of the organization brand
+  """
+  updateOrganizationBrandTheme(data: OrganizationBrandThemeInput!): Organization!
+
+  """
   updates the theme of the PDF documents of the organization
   """
   updateOrganizationDocumentTheme(data: OrganizationDocumentThemeInput!): Organization!
@@ -1752,6 +1757,7 @@ type Organization implements Timestamps {
   """
   activeUserCount: Int!
   anonymizePetitionsAfterMonths: Int
+  brandTheme: JSONObject
 
   """
   Time when the resource was created.
@@ -1862,6 +1868,11 @@ type Organization implements Timestamps {
     """
     sortBy: [OrganizationUsers_OrderBy!]
   ): UserPagination!
+}
+
+input OrganizationBrandThemeInput {
+  color: String
+  fontFamily: String
 }
 
 input OrganizationDocumentThemeInput {
@@ -3562,6 +3573,7 @@ type PetitionUserPermission implements PetitionPermission & Timestamps {
 }
 
 type PublicAccessVerification {
+  brandTheme: JSONObject
   cookieName: String
   cookieValue: String
   email: String
@@ -3616,6 +3628,8 @@ type PublicLicenseCode {
 A public view of an organization
 """
 type PublicOrganization {
+  brandTheme: JSONObject
+
   """
   If this organization has the REMOVE_PARALLEL_BRANDING feature flag enabled
   """
@@ -3635,6 +3649,11 @@ type PublicOrganization {
   The name of the organization.
   """
   name: String!
+
+  """
+  The preferred tone of organization.
+  """
+  tone: Tone!
 }
 
 """
@@ -3667,11 +3686,6 @@ type PublicPetition implements Timestamps {
   fields: [PublicPetitionField!]!
 
   """
-  Wether the has activated REMOVE_PARALLEL_BRANDING or not.
-  """
-  hasRemoveParallelBranding: Boolean!
-
-  """
   The ID of the petition.
   """
   id: GID!
@@ -3690,6 +3704,11 @@ type PublicPetition implements Timestamps {
   The locale of the parallel.
   """
   locale: PetitionLocale!
+
+  """
+  The organization of the petition.
+  """
+  organization: PublicOrganization!
 
   """
   The recipients of the petition

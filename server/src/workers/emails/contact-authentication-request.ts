@@ -54,6 +54,7 @@ export async function contactAuthenticationRequest(
       browserName: ua?.getBrowser()?.name ?? "Unknown",
       osName: ua?.getOS()?.name ?? "Unknown",
       tone: organization!.preferred_tone,
+      theme: organization!.brand_theme,
       removeParallelBranding: hasRemoveParallelBranding,
       ...layoutProps,
     },

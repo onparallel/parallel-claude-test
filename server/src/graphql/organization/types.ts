@@ -247,6 +247,11 @@ export const Organization = objectType({
         return o.pdf_document_theme ?? defaultPdfDocumentTheme;
       },
     });
+    t.nullable.jsonObject("brandTheme", {
+      resolve: (o) => {
+        return o.brand_theme;
+      },
+    });
     t.nonNull.boolean("isPdfDocumentThemeFontsDirty", {
       description:
         "Wether the 'fonts' section of the document theme has been changed from its default values or not",

@@ -54,7 +54,6 @@ function OrganizationBranding() {
     >
       <Tabs
         variant="enclosed"
-        tabIndex={styles.indexOf(style)}
         defaultIndex={styles.indexOf(style)}
         onChange={(index) => setStyle(styles[index])}
       >
@@ -64,7 +63,8 @@ function OrganizationBranding() {
             _selected={{
               backgroundColor: "gray.50",
               borderColor: "gray.200",
-              borderBottom: "transparent",
+              borderBottom: "1px solid",
+              borderBottomColor: "transparent",
               color: "blue.600",
             }}
           >
@@ -75,7 +75,8 @@ function OrganizationBranding() {
             _selected={{
               backgroundColor: "gray.50",
               borderColor: "gray.200",
-              borderBottom: "transparent",
+              borderBottom: "1px solid",
+              borderBottomColor: "transparent",
               color: "blue.600",
             }}
           >

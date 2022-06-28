@@ -45,9 +45,23 @@ const email: Email<ForgotPasswordProps> = {
     ${closing({}, intl)}
     `;
   },
-  html({ name, assetsUrl, parallelUrl, logoUrl, logoAlt, verificationCode }: ForgotPasswordProps) {
+  html({
+    name,
+    assetsUrl,
+    parallelUrl,
+    logoUrl,
+    logoAlt,
+    verificationCode,
+    theme,
+  }: ForgotPasswordProps) {
     return (
-      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
+      <Layout
+        assetsUrl={assetsUrl}
+        parallelUrl={parallelUrl}
+        logoUrl={logoUrl}
+        logoAlt={logoAlt}
+        theme={theme}
+      >
         <MjmlSection padding="0">
           <MjmlColumn>
             <GreetingUser name={name} />

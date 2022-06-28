@@ -85,6 +85,7 @@ export async function petitionMessage(
       deadline: petition.deadline,
       keycode: access.keycode,
       tone: organization!.preferred_tone,
+      theme: organization!.brand_theme,
       removeWhyWeUseParallel: hasRemoveWhyWeUseParallel,
       removeParallelBranding: hasRemoveParallelBranding,
       showNextButton,

@@ -86,6 +86,7 @@ const email: Email<InvitationProps> = {
     userName,
     organizationName,
     organizationUser,
+    theme,
   }: InvitationProps) {
     const { locale } = useIntl();
     return (
@@ -95,6 +96,7 @@ const email: Email<InvitationProps> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
         omitGdprDisclaimer
+        theme={theme}
       >
         <MjmlSection padding="0">
           <MjmlColumn>
