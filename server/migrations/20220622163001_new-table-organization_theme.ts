@@ -11,7 +11,7 @@ export async function up(knex: Knex): Promise<void> {
       useNative: true,
       enumName: "organization_theme_type",
     }).notNullable();
-    t.boolean("is_default").defaultTo(false);
+    t.boolean("is_default").notNullable().defaultTo(false);
     t.jsonb("data").notNullable();
     timestamps(t);
   });

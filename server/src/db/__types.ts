@@ -690,7 +690,7 @@ export interface OrganizationTheme {
   org_id: number; // int4
   name: string; // varchar
   type: OrganizationThemeType; // organization_theme_type
-  is_default: Maybe<boolean>; // bool
+  is_default: boolean; // bool
   data: any; // jsonb
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar

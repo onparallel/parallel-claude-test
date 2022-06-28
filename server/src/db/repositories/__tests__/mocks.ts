@@ -3,6 +3,7 @@ import { Knex } from "knex";
 import { isDefined, range } from "remeda";
 import { USER_COGNITO_ID } from "../../../../test/mocks";
 import { unMaybeArray } from "../../../util/arrays";
+import { defaultPdfDocumentTheme } from "../../../util/PdfDocumentTheme";
 import { removeNotDefined } from "../../../util/remedaExtensions";
 import { titleize } from "../../../util/strings";
 import { hash, random } from "../../../util/token";
@@ -29,6 +30,8 @@ import {
   FeatureFlagName,
   FileUpload,
   Organization,
+  OrganizationTheme,
+  OrganizationThemeType,
   OrganizationUsageLimit,
   OrganizationUsageLimitName,
   OrgIntegration,
@@ -871,6 +874,24 @@ export class Mocks {
       },
       "*"
     );
+  }
+
+  async createOrganizationThemes(
+    orgId: number,
+    amount?: number,
+    builder?: (i: number) => Partial<OrganizationTheme>
+  ) {
+    return await this.knex<OrganizationTheme>("organization_theme")
+      .insert(
+        range(0, amount || 1).map((i) => ({
+          org_id: orgId,
+          name: faker.name.jobDescriptor(),
+          data: defaultPdfDocumentTheme,
+          is_default: i === 0,
+          ...builder?.(i),
+        }))
+      )
+      .returning("*");
   }
 }
 

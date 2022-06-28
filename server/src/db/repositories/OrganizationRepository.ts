@@ -472,17 +472,39 @@ export class OrganizationRepository extends BaseRepository {
     });
   }
 
-  async setOrganizationThemeAsDefault(orgThemeId: number) {
+  async setOrganizationThemeAsDefault(orgThemeId: number, updatedBy: string) {
+    /**
+     TODO: try to do this with a deferred constraint
+    
+     with selected_theme as (select * from organization_theme where id = ?)
+      update organization_theme ot 
+      set 
+        is_default = (case ot.id when ? then true else false end),
+        updated_at = NOW(),
+        updated_by = ?
+      from selected_theme st
+      where ot.org_id = st.org_id and ot.type = st.type and ot.deleted_at is null
+      returning ot.*;
+    */
     await this.raw(
       /* sql */ `
       with selected_theme as (select * from organization_theme where id = ?)
       update organization_theme ot 
-      set is_default = (case ot.id when ? then true else false end) 
+      set 
+        is_default = false,
+        updated_at = NOW(),
+        updated_by = ?
       from selected_theme st
       where ot.org_id = st.org_id and ot.type = st.type and ot.deleted_at is null
       returning ot.*;
   `,
-      [orgThemeId, orgThemeId]
+      [orgThemeId, updatedBy]
     );
+
+    await this.from("organization_theme").where({ id: orgThemeId, deleted_at: null }).update({
+      is_default: true,
+      updated_at: this.now(),
+      updated_by: updatedBy,
+    });
   }
 }

@@ -20,7 +20,6 @@ import { validateAnd } from "../helpers/validateArgs";
 import { inRange } from "../helpers/validators/inRange";
 import { maxLength } from "../helpers/validators/maxLength";
 import { validateFile } from "../helpers/validators/validateFile";
-import { validBooleanValue } from "../helpers/validators/validBooleanValue";
 import { validFontFamily } from "../helpers/validators/validFontFamily";
 import { validRichTextContent } from "../helpers/validators/validRichTextContent";
 import { validWebSafeFontFamily } from "../helpers/validators/validWebSafeFontFamily";
@@ -182,12 +181,14 @@ export const updateOrganizationPdfDocumentTheme = mutationField(
       inRange((args) => args.data.theme?.textFontSize, "data.theme.textFontSize", 5, 72),
       validRichTextContent((args) => args.data.theme?.legalText?.es, "data.theme.legalText.es"),
       validRichTextContent((args) => args.data.theme?.legalText?.en, "data.theme.legalText.en"),
-      validBooleanValue((args) => args.data.isDefault, "data.isDefault", true),
       maxLength((args) => args.data.name, "data.name", 255)
     ),
     resolve: async (_, args, ctx) => {
       if (args.data.isDefault) {
-        await ctx.organizations.setOrganizationThemeAsDefault(args.orgThemeId);
+        await ctx.organizations.setOrganizationThemeAsDefault(
+          args.orgThemeId,
+          `User:${ctx.user!.id}`
+        );
       }
       const updateData: Partial<OrganizationTheme> = {};
       if (isDefined(args.data.name)) {
@@ -237,7 +238,7 @@ export const createOrganizationPdfDocumentTheme = mutationField(
         `User:${ctx.user!.id}`
       );
       if (isDefault) {
-        await ctx.organizations.setOrganizationThemeAsDefault(theme.id);
+        await ctx.organizations.setOrganizationThemeAsDefault(theme.id, `User:${ctx.user!.id}`);
       }
 
       return (await ctx.organizations.loadOrg(ctx.user!.org_id))!;
