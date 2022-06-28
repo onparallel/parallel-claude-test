@@ -148,6 +148,7 @@ export function DocumentThemeEditor({
               suffix=" mm"
               value={theme.marginTop}
               onChange={(value) => handleThemeChange({ marginTop: value })}
+              isDisabled={isDisabled}
             />
           </Stack>
           <Stack>
@@ -163,6 +164,7 @@ export function DocumentThemeEditor({
               suffix=" mm"
               value={theme.marginBottom}
               onChange={(value) => handleThemeChange({ marginBottom: value })}
+              isDisabled={isDisabled}
             />
           </Stack>
           <Stack>
@@ -178,6 +180,7 @@ export function DocumentThemeEditor({
               suffix=" mm"
               value={theme.marginLeft}
               onChange={(value) => handleThemeChange({ marginLeft: value, marginRight: value })}
+              isDisabled={isDisabled}
             />
           </Stack>
         </HStack>
