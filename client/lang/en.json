@@ -1416,8 +1416,8 @@
   },
   {
     "term": "component.new-template-dialog.authorization-template-description",
-    "definition": "SEPA mandate, proxy voting at meetings, etc.",
-    "context": "SEPA mandate, proxy voting at meetings, etc."
+    "definition": "Power of Attorney, proxy voting at meetings, etc.",
+    "context": "Power of Attorney, proxy voting at meetings, etc."
   },
   {
     "term": "component.new-template-dialog.contract-template",

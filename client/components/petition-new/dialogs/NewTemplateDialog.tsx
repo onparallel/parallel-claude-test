@@ -69,7 +69,7 @@ export function NewTemplateDialog({ ...props }: DialogProps<{}, NewTemplateDialo
           }),
           description: intl.formatMessage({
             id: "component.new-template-dialog.authorization-template-description",
-            defaultMessage: "SEPA mandate, proxy voting at meetings, etc.",
+            defaultMessage: "Power of Attorney, proxy voting at meetings, etc.",
           }),
           image: "authorization-preview",
           templateId:

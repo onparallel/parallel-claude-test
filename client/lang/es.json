@@ -1416,8 +1416,8 @@
   },
   {
     "term": "component.new-template-dialog.authorization-template-description",
-    "definition": "Mandato SEPA, delegación de voto en reunión/junta, etc.",
-    "context": "SEPA mandate, proxy voting at meetings, etc."
+    "definition": "Poderes (POA), delegación de voto en reunión/junta, etc.",
+    "context": "Power of Attorney, proxy voting at meetings, etc."
   },
   {
     "term": "component.new-template-dialog.contract-template",
