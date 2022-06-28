@@ -151,7 +151,7 @@ function OrganizationIntegrations() {
               as="a"
               target="_blank"
               rel="noopener"
-              href="https://parallel.canny.io/integrations"
+              href="https://roadmap.onparallel.com/feature-requests?category=integrations"
               aria-label={intl.formatMessage({
                 id: "organization.integrations.alert-button",
                 defaultMessage: "Suggest integration",
