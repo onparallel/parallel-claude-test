@@ -265,6 +265,45 @@ export const deleteOrganizationPdfDocumentTheme = mutationField(
   }
 );
 
+export const restoreDefaultOrganizationPdfDocumentThemeFonts = mutationField(
+  "restoreDefaultOrganizationPdfDocumentThemeFonts",
+  {
+    description:
+      "Restores the 'fonts' section of the organization document theme to its default values",
+    type: "OrganizationTheme",
+    authorize: authenticateAnd(
+      contextUserHasRole("ADMIN"),
+      userHasAccessToOrganizationTheme("orgThemeId", "PDF_DOCUMENT")
+    ),
+    args: {
+      orgThemeId: nonNull(globalIdArg("OrganizationTheme")),
+    },
+    resolve: async (_, { orgThemeId }, ctx) => {
+      const currentTheme = (await ctx.organizations.loadOrganizationTheme(orgThemeId))!;
+      return await ctx.organizations.updateOrganizationTheme(
+        orgThemeId,
+        {
+          data: Object.assign(
+            currentTheme.data,
+            pick(defaultPdfDocumentTheme, [
+              "title1FontFamily",
+              "title1Color",
+              "title1FontSize",
+              "title2FontFamily",
+              "title2Color",
+              "title2FontSize",
+              "textFontFamily",
+              "textColor",
+              "textFontSize",
+            ])
+          ),
+        },
+        `User:${ctx.user!.id}`
+      );
+    },
+  }
+);
+
 /** @deprecated */
 export const updateOrganizationDocumentTheme = mutationField("updateOrganizationDocumentTheme", {
   deprecation: "use updateOrganizationPdfDocumentTheme",
@@ -313,9 +352,11 @@ export const updateOrganizationDocumentTheme = mutationField("updateOrganization
   },
 });
 
+/** @deprecated */
 export const restoreDefaultOrganizationDocumentThemeFonts = mutationField(
   "restoreDefaultOrganizationDocumentThemeFonts",
   {
+    deprecation: "use restoreDefaultOrganizationPdfDocumentThemeFonts",
     description:
       "Restores the 'fonts' section of the organization document theme to its default values",
     type: "Organization",

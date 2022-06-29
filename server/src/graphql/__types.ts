@@ -1094,6 +1094,7 @@ export interface NexusGenFieldTypes {
     resetTemporaryPassword: NexusGenEnums["Result"]; // Result!
     resetUserPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     restoreDefaultOrganizationDocumentThemeFonts: NexusGenRootTypes["Organization"]; // Organization!
+    restoreDefaultOrganizationPdfDocumentThemeFonts: NexusGenRootTypes["OrganizationTheme"]; // OrganizationTheme!
     restoreLogin: NexusGenEnums["Result"]; // Result!
     revokeUserAuthToken: NexusGenEnums["Result"]; // Result!
     sendPetition: NexusGenRootTypes["SendPetitionResult"][]; // [SendPetitionResult!]!
@@ -2629,6 +2630,7 @@ export interface NexusGenFieldTypeNames {
     resetTemporaryPassword: "Result";
     resetUserPassword: "SupportMethodResponse";
     restoreDefaultOrganizationDocumentThemeFonts: "Organization";
+    restoreDefaultOrganizationPdfDocumentThemeFonts: "OrganizationTheme";
     restoreLogin: "Result";
     revokeUserAuthToken: "Result";
     sendPetition: "SendPetitionResult";
@@ -4368,6 +4370,10 @@ export interface NexusGenArgTypes {
       // args
       email: string; // String!
       locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
+    };
+    restoreDefaultOrganizationPdfDocumentThemeFonts: {
+      // args
+      orgThemeId: NexusGenScalars["GID"]; // GID!
     };
     revokeUserAuthToken: {
       // args

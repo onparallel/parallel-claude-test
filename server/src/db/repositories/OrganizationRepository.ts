@@ -455,14 +455,18 @@ export class OrganizationRepository extends BaseRepository {
     updatedBy: string,
     t?: Knex.Transaction
   ) {
-    await this.from("organization_theme", t)
+    const [theme] = await this.from("organization_theme", t)
       .where("id", id)
       .whereNull("deleted_at")
-      .update({
-        ...data,
-        updated_at: this.now(),
-        updated_by: updatedBy,
-      });
+      .update(
+        {
+          ...data,
+          updated_at: this.now(),
+          updated_by: updatedBy,
+        },
+        "*"
+      );
+    return theme;
   }
 
   async deleteOrganizationTheme(id: number, deletedBy: string) {

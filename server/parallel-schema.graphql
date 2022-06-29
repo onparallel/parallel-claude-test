@@ -1227,6 +1227,12 @@ type Mutation {
   Restores the 'fonts' section of the organization document theme to its default values
   """
   restoreDefaultOrganizationDocumentThemeFonts: Organization!
+    @deprecated(reason: "use restoreDefaultOrganizationPdfDocumentThemeFonts")
+
+  """
+  Restores the 'fonts' section of the organization document theme to its default values
+  """
+  restoreDefaultOrganizationPdfDocumentThemeFonts(orgThemeId: GID!): OrganizationTheme!
   restoreLogin: Result!
 
   """

@@ -473,6 +473,8 @@ export interface Mutation {
   createFileUploadReplyComplete: PetitionFieldReply;
   /** Creates a new organization. */
   createOrganization: SupportMethodResponse;
+  /** Creates a new PDF_DOCUMENT theme on the user's organization */
+  createOrganizationPdfDocumentTheme: Organization;
   /** Creates a new user in the same organization as the context user */
   createOrganizationUser: User;
   /** Create parallel. */
@@ -511,6 +513,7 @@ export interface Mutation {
   deleteContacts: Result;
   /** Deletes event subscriptions */
   deleteEventSubscriptions: Result;
+  deleteOrganizationPdfDocumentTheme: Organization;
   /** Soft-deletes any given petition on the database. */
   deletePetition: SupportMethodResponse;
   /** Remove a petition attachment */
@@ -621,8 +624,13 @@ export interface Mutation {
   resetTemporaryPassword: Result;
   /** Resets the given user password on AWS Cognito and sends an email with new temporary. */
   resetUserPassword: SupportMethodResponse;
-  /** Restores the 'fonts' section of the organization document theme to its default values */
+  /**
+   * Restores the 'fonts' section of the organization document theme to its default values
+   * @deprecated use restoreDefaultOrganizationPdfDocumentThemeFonts
+   */
   restoreDefaultOrganizationDocumentThemeFonts: Organization;
+  /** Restores the 'fonts' section of the organization document theme to its default values */
+  restoreDefaultOrganizationPdfDocumentThemeFonts: OrganizationTheme;
   restoreLogin: Result;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
@@ -673,12 +681,17 @@ export interface Mutation {
   updateOrganizationAutoAnonymizePeriod: Organization;
   /** updates the theme of the organization brand */
   updateOrganizationBrandTheme: Organization;
-  /** updates the theme of the PDF documents of the organization */
+  /**
+   * updates the theme of the PDF documents of the organization
+   * @deprecated use updateOrganizationPdfDocumentTheme
+   */
   updateOrganizationDocumentTheme: Organization;
   /** Updates the limits of a given org. If 'Update Only Current Period' is left unchecked, the changes will be reflected on the next period. */
   updateOrganizationLimits: SupportMethodResponse;
   /** Updates the logo of an organization */
   updateOrganizationLogo: Organization;
+  /** updates the PDF_DOCUMENT theme of the organization */
+  updateOrganizationPdfDocumentTheme: Organization;
   /** Changes the organization preferred tone */
   updateOrganizationPreferredTone: Organization;
   /** Applies a given tier to the organization */
@@ -864,6 +877,11 @@ export interface MutationcreateOrganizationArgs {
   status: OrganizationStatus;
 }
 
+export interface MutationcreateOrganizationPdfDocumentThemeArgs {
+  isDefault: Scalars["Boolean"];
+  name: Scalars["String"];
+}
+
 export interface MutationcreateOrganizationUserArgs {
   email: Scalars["String"];
   firstName: Scalars["String"];
@@ -978,6 +996,10 @@ export interface MutationdeleteContactsArgs {
 
 export interface MutationdeleteEventSubscriptionsArgs {
   ids: Array<Scalars["GID"]>;
+}
+
+export interface MutationdeleteOrganizationPdfDocumentThemeArgs {
+  orgThemeId: Scalars["GID"];
 }
 
 export interface MutationdeletePetitionArgs {
@@ -1272,6 +1294,10 @@ export interface MutationresetUserPasswordArgs {
   locale: PetitionLocale;
 }
 
+export interface MutationrestoreDefaultOrganizationPdfDocumentThemeFontsArgs {
+  orgThemeId: Scalars["GID"];
+}
+
 export interface MutationrevokeUserAuthTokenArgs {
   authTokenIds: Array<Scalars["GID"]>;
 }
@@ -1427,6 +1453,11 @@ export interface MutationupdateOrganizationLimitsArgs {
 export interface MutationupdateOrganizationLogoArgs {
   file: Scalars["Upload"];
   isIcon?: InputMaybe<Scalars["Boolean"]>;
+}
+
+export interface MutationupdateOrganizationPdfDocumentThemeArgs {
+  data: UpdateOrganizationPdfDocumentThemeInput;
+  orgThemeId: Scalars["GID"];
 }
 
 export interface MutationupdateOrganizationPreferredToneArgs {
@@ -1640,11 +1671,13 @@ export interface Organization extends Timestamps {
   logoUrl?: Maybe<Scalars["String"]>;
   /** The name of the organization. */
   name: Scalars["String"];
+  /** @deprecated Not used anymore. Use themes.pdfDocument[0].data */
   pdfDocumentTheme: Scalars["JSONObject"];
   /** The preferred tone of organization. */
   preferredTone: Tone;
   /** The status of the organization. */
   status: OrganizationStatus;
+  themes: OrganizationThemeList;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
   usageLimits: OrganizationUsageLimit;
@@ -1715,6 +1748,29 @@ export interface OrganizationPagination {
   totalCount: Scalars["Int"];
 }
 
+export interface OrganizationPdfDocumentThemeInput {
+  legalText?: InputMaybe<OrganizationPdfDocumentThemeInputLegalText>;
+  marginBottom?: InputMaybe<Scalars["Float"]>;
+  marginLeft?: InputMaybe<Scalars["Float"]>;
+  marginRight?: InputMaybe<Scalars["Float"]>;
+  marginTop?: InputMaybe<Scalars["Float"]>;
+  showLogo?: InputMaybe<Scalars["Boolean"]>;
+  textColor?: InputMaybe<Scalars["String"]>;
+  textFontFamily?: InputMaybe<Scalars["String"]>;
+  textFontSize?: InputMaybe<Scalars["Float"]>;
+  title1Color?: InputMaybe<Scalars["String"]>;
+  title1FontFamily?: InputMaybe<Scalars["String"]>;
+  title1FontSize?: InputMaybe<Scalars["Float"]>;
+  title2Color?: InputMaybe<Scalars["String"]>;
+  title2FontFamily?: InputMaybe<Scalars["String"]>;
+  title2FontSize?: InputMaybe<Scalars["Float"]>;
+}
+
+export interface OrganizationPdfDocumentThemeInputLegalText {
+  en?: InputMaybe<Scalars["JSON"]>;
+  es?: InputMaybe<Scalars["JSON"]>;
+}
+
 /** The roles of a user within an organization. */
 export type OrganizationRole = "ADMIN" | "COLLABORATOR" | "NORMAL" | "OWNER";
 
@@ -1730,6 +1786,19 @@ export type OrganizationStatus =
   | "DEV"
   /** Root client */
   | "ROOT";
+
+export interface OrganizationTheme {
+  __typename?: "OrganizationTheme";
+  data: Scalars["JSONObject"];
+  id: Scalars["GID"];
+  isDefault: Scalars["Boolean"];
+  name: Scalars["String"];
+}
+
+export interface OrganizationThemeList {
+  __typename?: "OrganizationThemeList";
+  pdfDocument: Array<OrganizationTheme>;
+}
 
 export interface OrganizationUsageLimit {
   __typename?: "OrganizationUsageLimit";
@@ -2752,6 +2821,11 @@ export interface PublicPetition extends Timestamps {
   deadline?: Maybe<Scalars["DateTime"]>;
   /** The field definition of the petition. */
   fields: Array<PublicPetitionField>;
+  /**
+   * If this organization has the REMOVE_PARALLEL_BRANDING feature flag enabled
+   * @deprecated Use PublicOrganization.hasRemoveParallelBranding
+   */
+  hasRemoveParallelBranding: Scalars["Boolean"];
   /** The ID of the petition. */
   id: Scalars["GID"];
   /** Wether the completion message will be shown to the recipients or not. */
@@ -3570,6 +3644,12 @@ export type Tone = "FORMAL" | "INFORMAL";
 export interface UpdateContactInput {
   firstName?: InputMaybe<Scalars["String"]>;
   lastName?: InputMaybe<Scalars["String"]>;
+}
+
+export interface UpdateOrganizationPdfDocumentThemeInput {
+  isDefault?: InputMaybe<Scalars["Boolean"]>;
+  name?: InputMaybe<Scalars["String"]>;
+  theme?: InputMaybe<OrganizationPdfDocumentThemeInput>;
 }
 
 export interface UpdatePetitionFieldInput {

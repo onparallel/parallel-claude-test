@@ -267,6 +267,35 @@ describe("GraphQL/Organization", () => {
   });
 
   describe("updateOrganizationPdfDocumentTheme", () => {
+    it("sends error when passing unknown font-family", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($orgThemeId: GID!, $data: UpdateOrganizationPdfDocumentThemeInput!) {
+            updateOrganizationPdfDocumentTheme(orgThemeId: $orgThemeId, data: $data) {
+              themes {
+                pdfDocument {
+                  id
+                  name
+                  isDefault
+                }
+              }
+            }
+          }
+        `,
+        {
+          orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[2].id),
+          data: {
+            theme: {
+              textFontFamily: "Comic Sans",
+            },
+          },
+        }
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
     it("updates the name of a theme and sets it as new default", async () => {
       const { errors, data } = await testClient.execute(
         gql`
@@ -428,6 +457,61 @@ describe("GraphQL/Organization", () => {
             { id: toGlobalId("OrganizationTheme", pdfDocumentThemes[2].id) },
             { id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id) },
           ],
+        },
+      });
+    });
+  });
+
+  describe("restoreDefaultOrganizationPdfDocumentThemeFonts", () => {
+    it("restores only the 'fonts' section of the theme", async () => {
+      const [newTheme] = await mocks.createOrganizationThemes(organization.id, 1, () => ({
+        type: "PDF_DOCUMENT",
+        is_default: false,
+        name: "test",
+        data: {
+          ...defaultPdfDocumentTheme,
+          legalText: {
+            es: [{ type: "paragraph", children: [{ text: "" }] }],
+            en: [{ type: "paragraph", children: [{ text: "" }] }],
+          },
+          marginTop: 50,
+          showLogo: false,
+          textColor: "#ababab",
+          title1Color: "#ffffff",
+          title2Color: "#ffffff",
+          textFontFamily: "Roboto Slab",
+          title1FontFamily: "Source Serif Pro",
+          title2FontFamily: "Inconsolata",
+          textFontSize: 100,
+          title1FontSize: 100,
+          title2FontSize: 100,
+        },
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($orgThemeId: GID!) {
+            restoreDefaultOrganizationPdfDocumentThemeFonts(orgThemeId: $orgThemeId) {
+              data
+            }
+          }
+        `,
+        { orgThemeId: toGlobalId("OrganizationTheme", newTheme.id) }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data!.restoreDefaultOrganizationPdfDocumentThemeFonts).toEqual({
+        data: {
+          ...newTheme.data,
+          textColor: "#000000",
+          title1Color: "#000000",
+          title2Color: "#000000",
+          textFontFamily: "IBM Plex Sans",
+          title1FontFamily: "IBM Plex Sans",
+          title2FontFamily: "IBM Plex Sans",
+          textFontSize: 12,
+          title1FontSize: 16,
+          title2FontSize: 14,
         },
       });
     });
