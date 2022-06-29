@@ -2680,6 +2680,7 @@ export interface PetitionUserPermission extends PetitionPermission, Timestamps {
 
 export interface PublicAccessVerification {
   __typename?: "PublicAccessVerification";
+  brandTheme?: Maybe<Scalars["JSONObject"]>;
   cookieName?: Maybe<Scalars["String"]>;
   cookieValue?: Maybe<Scalars["String"]>;
   email?: Maybe<Scalars["String"]>;
@@ -12030,9 +12031,9 @@ export type OrganizationBranding_userQuery = {
       logoUrl?: string | null;
       name: string;
       preferredTone: Tone;
+      brandTheme?: { [key: string]: any } | null;
       pdfDocumentTheme: { [key: string]: any };
       isPdfDocumentThemeFontsDirty: boolean;
-      brandTheme?: { [key: string]: any } | null;
       iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
@@ -20501,6 +20502,7 @@ export type RecipientViewVerify_verifyPublicAccessMutation = {
     orgName?: string | null;
     orgLogoUrl?: string | null;
     tone?: Tone | null;
+    brandTheme?: { [key: string]: any } | null;
   };
 };
 
@@ -28612,6 +28614,7 @@ export const RecipientViewVerify_verifyPublicAccessDocument = gql`
       orgName
       orgLogoUrl
       tone
+      brandTheme
     }
   }
 ` as unknown as DocumentNode<
