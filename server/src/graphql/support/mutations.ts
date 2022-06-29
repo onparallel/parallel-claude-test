@@ -409,7 +409,7 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
   validateArgs: validateAnd(
     validatePublicTemplateCategories((args) => args.categories, "categories"),
     validateHexColor((args) => args.backgroundColor, "backgroundColor"),
-    validateRegex((args) => args.slug, "slug", /^[a-z-]+$/),
+    validateRegex((args) => args.slug, "slug", /^[0-9a-z-]+$/),
     validateIf(
       (args) => isDefined(args.image),
       validateFile(
