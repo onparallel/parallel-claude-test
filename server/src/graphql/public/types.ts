@@ -1,6 +1,7 @@
 import { extension } from "mime-types";
 import { arg, core, enumType, inputObjectType, objectType, unionType } from "nexus";
 import { isDefined } from "remeda";
+import { PetitionAccess, PetitionMessage } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
@@ -173,15 +174,36 @@ export const PublicPetition = objectType({
       description: "The body of the optional completing message to be show to recipients.",
       resolve: async (o, _, ctx) => {
         if (o.completing_message_body) {
-          const [contact, user, [firstMessage]] = await Promise.all([
+          const [contact, user] = await Promise.all([
             ctx.contacts.loadContactByAccessId(ctx.access!.id),
             ctx.petitions.loadPetitionOwner(ctx.access!.petition_id),
-            ctx.petitions.loadMessagesByPetitionAccessId(ctx.access!.id),
           ]);
+
+          let firstMessage: PetitionMessage | null = null;
+          let petitionAccesses: PetitionAccess[] = [];
+          let originalAccess = ctx.access!;
+
+          try {
+            // if delegator_contact_id is defined, this access was delegated from another access and does not have a linked PetitionMessage
+            // here we need to recursively search for the original access
+            if (isDefined(originalAccess.delegator_contact_id)) {
+              petitionAccesses = await ctx.petitions.loadAccessesForPetition(
+                ctx.access!.petition_id
+              );
+              // max 100 cycles, it shouldn't be a problem but this can avoid infinite looping
+              for (let i = 0; i < 100 && isDefined(originalAccess.delegator_contact_id); i++) {
+                originalAccess = petitionAccesses.find(
+                  (a) => a.contact_id === originalAccess.delegator_contact_id!
+                )!;
+              }
+            }
+
+            [firstMessage] = await ctx.petitions.loadMessagesByPetitionAccessId(originalAccess.id);
+          } catch {}
 
           return toHtml(safeJsonParse(o.completing_message_body), {
             // in a public context, the petition title is instead the subject of the first message
-            petition: { ...o, name: firstMessage.email_subject },
+            petition: { ...o, name: firstMessage?.email_subject },
             contact,
             user: await ctx.users.loadUserDataByUserId(user!.id),
           });
