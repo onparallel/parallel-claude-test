@@ -120,7 +120,10 @@ export function PetitionFieldVisibilityEditor({
       }
 
       const field = fields.find((f) => f.id === last.fieldId)!;
-      if (field.type === "SELECT" || field.type === "CHECKBOX") {
+      if (
+        field.type === "CHECKBOX" ||
+        (field.type === "SELECT" && !["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(last.operator))
+      ) {
         // if the previous condition is of type SELECT or CHECKBOX try to get the next value
         const values = field.options.values as string[];
         const index = Math.min(values.indexOf(last.value as string) + 1, values.length - 1);
@@ -222,7 +225,7 @@ export function PetitionFieldVisibilityEditor({
                     onChange={(value) => updateCondition(index, defaultCondition(value!))}
                     isDisabled={isReadOnly}
                   />
-                  <Stack direction="row" gridColumn={{ base: "2", xl: "auto" }}>
+                  <Stack direction="row" gridColumn={{ base: "2", xl: "auto" }} alignItems="center">
                     {conditionField.multiple ? (
                       <ConditionMultipleFieldModifier
                         field={conditionField}
