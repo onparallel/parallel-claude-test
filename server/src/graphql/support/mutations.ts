@@ -440,7 +440,7 @@ export const updateLandingTemplateMetadata = mutationField("updateLandingTemplat
       newMetadata.categories =
         isDefined(args.categories) && args.categories.trim() !== ""
           ? uniq(args.categories.split(",").map((w) => w.trim()))
-          : templateMd.categories || null;
+          : templateMd.categories || [];
 
       newMetadata.description =
         isDefined(args.description) && args.description.trim() !== ""
