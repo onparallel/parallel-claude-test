@@ -22,7 +22,7 @@ export function TimelinePetitionReopenedEvent({
     >
       <FormattedMessage
         id="timeline.petition-reopened-description"
-        defaultMessage="{userIsYou, select, true {You} other {{user}}} reopened the petition {timeAgo}"
+        defaultMessage="{userIsYou, select, true {You} other {{user}}} reopened the parallel {timeAgo}"
         values={{
           userIsYou: userId === event.user?.id,
           user: <UserReference user={event.user} />,

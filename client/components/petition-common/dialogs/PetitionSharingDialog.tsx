@@ -284,7 +284,7 @@ export function PetitionSharingDialog({
     const petition = intl.formatMessage(
       {
         id: "petition-sharing.success-title",
-        defaultMessage: "{count, plural, =1 {Petition} other {Petitions}} shared",
+        defaultMessage: "{count, plural, =1 {Parallel} other {Parallels}} shared",
       },
       {
         count: petitionsOwnedWrite.length,
@@ -354,7 +354,7 @@ export function PetitionSharingDialog({
                           ? undefined
                           : intl.formatMessage({
                               id: "petition-sharing.input-placeholder-not-owner",
-                              defaultMessage: "Only the petition owner can share it",
+                              defaultMessage: "Only the parallel owner can share it",
                             })
                       }
                     />
@@ -406,7 +406,7 @@ export function PetitionSharingDialog({
                   <HelpPopover>
                     <FormattedMessage
                       id="component.petition-sharing-dialog.subscribe-help"
-                      defaultMessage="Users will receive notifications about the activity of this petition."
+                      defaultMessage="Users will receive notifications about the activity of this parallel."
                     />
                   </HelpPopover>
                 </Checkbox>
@@ -616,7 +616,7 @@ export function PetitionSharingDialog({
                           ) : (
                             <FormattedMessage
                               id="petition-sharing.insufficient-permissions-list"
-                              defaultMessage="The following {count, plural, =1 {petition has} other {petitions have}} been ignored and cannot be shared due to lack of permissions:"
+                              defaultMessage="The following {count, plural, =1 {parallel has} other {parallels have}} been ignored and cannot be shared due to lack of permissions:"
                               values={{ count: petitionsRead.length }}
                             />
                           )}
@@ -627,8 +627,8 @@ export function PetitionSharingDialog({
                               <Text as="span" textStyle={petition!.name ? undefined : "hint"}>
                                 {petition?.name ??
                                   intl.formatMessage({
-                                    id: "generic.unnamed-petition",
-                                    defaultMessage: "Unnamed petition",
+                                    id: "generic.unnamed-parallel",
+                                    defaultMessage: "Unnamed parallel",
                                   })}
                               </Text>
                             </ListItem>
@@ -645,7 +645,7 @@ export function PetitionSharingDialog({
                         ) : (
                           <FormattedMessage
                             id="petition-sharing.insufficient-permissions"
-                            defaultMessage="You do not have permission to share the selected petitions."
+                            defaultMessage="You do not have permission to share the selected parallels."
                           />
                         )}
                       </Text>
@@ -856,7 +856,7 @@ function ConfirmRemovePetitionPermissionDialog({
         name ? (
           <FormattedMessage
             id="petition-sharing.confirm-remove.message"
-            defaultMessage="Are you sure you want to stop sharing this petition with {name}?"
+            defaultMessage="Are you sure you want to stop sharing this parallel with {name}?"
             values={{
               name: <Text as="strong">{name}</Text>,
             }}
@@ -944,7 +944,7 @@ function ConfirmTransferPetitionOwnershipDialog({
       body={
         <FormattedMessage
           id="petition-sharing.confirm-transfer-ownership.message"
-          defaultMessage="Are you sure you want to transfer the ownership of this petition to {name}?"
+          defaultMessage="Are you sure you want to transfer the ownership of this parallel to {name}?"
           values={{
             name: <Text as="strong">{user.fullName}</Text>,
           }}

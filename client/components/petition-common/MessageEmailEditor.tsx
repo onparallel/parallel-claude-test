@@ -55,7 +55,7 @@ export function MessageEmailEditor({
         <FormErrorMessage>
           <FormattedMessage
             id="component.message-email-editor.subject-required-error"
-            defaultMessage="A subject helps the recipient understand the context of your petition"
+            defaultMessage="A subject helps the recipient understand the context of your parallel"
           />
         </FormErrorMessage>
       </FormControl>

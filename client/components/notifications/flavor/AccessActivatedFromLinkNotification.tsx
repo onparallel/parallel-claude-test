@@ -29,7 +29,7 @@ export const AccessActivatedFromLinkNotification = Object.assign(
         >
           <FormattedMessage
             id="component.notification-access-activated-link.body"
-            defaultMessage="{name} created the petition from a public link."
+            defaultMessage="{name} created the parallel from a public link."
             values={{
               name: (
                 <ContactReference

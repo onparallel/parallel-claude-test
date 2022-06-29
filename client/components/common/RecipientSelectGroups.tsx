@@ -220,7 +220,7 @@ export function RecipientSelectGroups({
                   {" "}
                   <FormattedMessage
                     id="component.recipient-select-groups.recipients-nth-group"
-                    defaultMessage="({number, selectordinal, one{#st} two{#nd} few{#rd} other{#th}} petition)"
+                    defaultMessage="({number, selectordinal, one{#st} two{#nd} few{#rd} other{#th}} parallel)"
                     values={{ number: index + 1 }}
                   />
                 </>
@@ -342,7 +342,7 @@ export function RecipientSelectGroups({
           <Text display="block">
             <FormattedMessage
               id="component.recipient-select-groups.same-petition-warning"
-              defaultMessage="All {recipientCount} recipients will receive a link to the same petition so they can fill it out collaboratively. Add a <b>recipient group</b> to send different petitions to each group."
+              defaultMessage="All {recipientCount} recipients will receive a link to the same parallel so they can fill it out collaboratively. Add a <b>recipient group</b> to send different parallels to each group."
               values={{
                 recipientCount: validRecipients(0).length,
               }}
@@ -383,7 +383,7 @@ function MultipleEmailsPastedDialog(props: DialogProps<{}, MultipleEmailsPastedA
             <Text>
               <FormattedMessage
                 id="components.multiple-emails-pasted-dialog.message-2"
-                defaultMessage="Do you want to add them to <b>separate groups</b> (they will fill different petitions) or <b>group them in the same petition</b>?"
+                defaultMessage="Do you want to add them to <b>separate groups</b> (they will fill different parallels) or <b>group them in the same parallel</b>?"
               />
             </Text>
           </Stack>
@@ -402,7 +402,7 @@ function MultipleEmailsPastedDialog(props: DialogProps<{}, MultipleEmailsPastedA
             <Radio value="SAME_GROUP">
               <FormattedMessage
                 id="components.multiple-emails-pasted-dialog.same-group"
-                defaultMessage="All in the same petition"
+                defaultMessage="All in the same parallel"
               />
             </Radio>
           </RadioGroup>

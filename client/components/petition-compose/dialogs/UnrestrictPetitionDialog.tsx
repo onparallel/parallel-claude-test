@@ -58,7 +58,7 @@ export function UnrestrictPetitionDialog({
           <Text>
             <FormattedMessage
               id="component.password-restrict-petition.body"
-              defaultMessage="This petition is protected. Enter the password to unlock it."
+              defaultMessage="This parallel is protected. Enter the password to unlock it."
             />
           </Text>
           <FormControl id="password" isInvalid={!!errors.password}>

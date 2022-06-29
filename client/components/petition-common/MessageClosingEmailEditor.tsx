@@ -24,7 +24,7 @@ export function MessageClosingEmailEditor({
       <FormLabel marginBottom={3.5}>
         <FormattedMessage
           id="component.message-closing-email-editor.body-label"
-          defaultMessage="The subject of this email will be the same as the subject of the petition message."
+          defaultMessage="The subject of this email will be the same as the subject of the parallel message."
         />
       </FormLabel>
       <RichTextEditor

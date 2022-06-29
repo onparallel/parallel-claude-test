@@ -23,7 +23,7 @@ export function TimelinePetitionClosedNotifiedEvent({
     >
       <FormattedMessage
         id="timeline.petition-correct-notified-description"
-        defaultMessage="{userIsYou, select, true {You} other {{user}}} notified {contact} that the petition is correct {timeAgo}"
+        defaultMessage="{userIsYou, select, true {You} other {{user}}} notified {contact} that the parallel is correct {timeAgo}"
         values={{
           userIsYou: userId === event.user?.id,
           contact: <ContactReference contact={event.access.contact} />,

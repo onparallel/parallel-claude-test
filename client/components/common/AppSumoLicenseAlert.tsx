@@ -32,12 +32,12 @@ export function AppSumoLicenseAlert({ license }: AppSumoLicenseAlertProps) {
             {license.name === "APPSUMO4" ? (
               <FormattedMessage
                 id="component.appsumo-license-alert.contact-text-max-license"
-                defaultMessage="Contact with us to increase your user and petition limits."
+                defaultMessage="Contact with us to increase your user and parallel limits."
               />
             ) : (
               <FormattedMessage
                 id="component.appsumo-license-alert.upgrade-text"
-                defaultMessage="Upgrade your plan to increase your user and petition limits."
+                defaultMessage="Upgrade your plan to increase your user and parallel limits."
               />
             )}
           </Text>

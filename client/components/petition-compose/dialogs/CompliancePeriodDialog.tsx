@@ -114,7 +114,7 @@ export function CompliancePeriodDialog({
           <Text fontStyle="italic" fontSize="sm">
             <FormattedMessage
               id="component.petition-compliance-period-dialog.explainer"
-              defaultMessage="This period will start from the closing of {type, select, PETITION{this petition} other{a petition created from this template}}, once completed, the data contained will be anonymized."
+              defaultMessage="This period will start from the closing of {type, select, PETITION{this parallel} other{a parallel created from this template}}, once completed, the data contained will be anonymized."
               values={{ type: petition.__typename === "Petition" ? "PETITION" : "TEMPLATE" }}
             />
           </Text>

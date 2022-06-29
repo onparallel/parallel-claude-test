@@ -85,7 +85,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         id: "petition-created-toast",
         title: intl.formatMessage({
           id: "page.preview.petition-created-toast",
-          defaultMessage: "Petition created from a template.",
+          defaultMessage: "Parallel created from a template.",
         }),
         status: "success",
         isClosable: true,
@@ -199,11 +199,11 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 id: "petition-completed-toast",
                 title: intl.formatMessage({
                   id: "recipient-view.completed-petition.toast-title",
-                  defaultMessage: "Petition completed!",
+                  defaultMessage: "Parallel completed!",
                 }),
                 description: intl.formatMessage({
                   id: "petition-preview.completed-petition.toast-description",
-                  defaultMessage: "Check that everything is OK to close the petition.",
+                  defaultMessage: "Check that everything is OK to close the parallel.",
                 }),
                 status: "success",
                 isClosable: true,
@@ -216,12 +216,12 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 id: "petition-completed-toast",
                 title: intl.formatMessage({
                   id: "recipient-view.completed-petition.toast-title",
-                  defaultMessage: "Petition completed!",
+                  defaultMessage: "Parallel completed!",
                 }),
                 description: intl.formatMessage({
                   id: "petition-preview.completed-petition.toast-description-check-signature",
                   defaultMessage:
-                    "Review the replies and send the signature to close the petition.",
+                    "Review the replies and send the signature to close the parallel.",
                 }),
                 status: "success",
                 isClosable: true,

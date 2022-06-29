@@ -23,7 +23,7 @@ export function TimelineUserPermissionAddedEvent({
     >
       <FormattedMessage
         id="timeline.add-user-permission-description"
-        defaultMessage="{userIsYou, select, true {You} other {{user}}} shared this petition with {other} as {permissionType} {timeAgo}"
+        defaultMessage="{userIsYou, select, true {You} other {{user}}} shared this parallel with {other} as {permissionType} {timeAgo}"
         values={{
           userIsYou: userId === event.user?.id,
           user: <UserReference user={event.user} />,

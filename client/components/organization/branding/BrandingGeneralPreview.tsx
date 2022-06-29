@@ -71,7 +71,7 @@ export function BrandingGeneralPreview({ user }: BrandingGeneralPreviewProps) {
             <Text>
               <FormattedMessage
                 id="component.branding-general-preview.body"
-                defaultMessage="We remind you that <b>{name}</b> sent you a petition and some of the requested information has not yet been submitted."
+                defaultMessage="We remind you that <b>{name}</b> sent you a parallel and some of the requested information has not yet been submitted."
                 values={{ tone: user.organization.preferredTone, name: user.fullName }}
               />
             </Text>

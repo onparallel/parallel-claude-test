@@ -55,7 +55,7 @@ function RenameDialog({
         ) : (
           <FormattedMessage
             id="component.rename-dialog.header-petition"
-            defaultMessage="Rename petition"
+            defaultMessage="Rename parallel"
           />
         )
       }
@@ -66,7 +66,7 @@ function RenameDialog({
               {isTemplate ? (
                 <FormattedMessage id="generic.template-name" defaultMessage="Template name" />
               ) : (
-                <FormattedMessage id="generic.petition-name" defaultMessage="Petition name" />
+                <FormattedMessage id="generic.parallel-name" defaultMessage="Parallel name" />
               )}
             </FormLabel>
             <Input {...nameProps} />

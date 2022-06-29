@@ -60,14 +60,14 @@ export const AppLayoutNavbar = Object.assign(
             isActive: pathname.startsWith("/app/petitions"),
             text: intl.formatMessage({
               id: "component.app-layout-navbar.petitions-link",
-              defaultMessage: "Petitions",
+              defaultMessage: "Parallels",
             }),
             warning: petitionLimitReached
               ? intl.formatMessage(
                   {
                     id: "component.app-layout-navbar.petitions-link.limit-reached-warning",
                     defaultMessage:
-                      "It seems that you have reached your limit of {limit} petitions, <a>reach out to us to upgrade your plan.</a>",
+                      "It seems that you have reached your limit of {limit} parallels, <a>reach out to us to upgrade your plan.</a>",
                   },
                   {
                     limit: me.organization.usageLimits.petitions.limit,
@@ -181,7 +181,7 @@ export const AppLayoutNavbar = Object.assign(
                 isRound
                 label={intl.formatMessage({
                   id: "new-petition.title",
-                  defaultMessage: "New petition",
+                  defaultMessage: "New parallel",
                 })}
                 placement={isMobile ? "top" : "right"}
               />

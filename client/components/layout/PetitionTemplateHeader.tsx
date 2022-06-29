@@ -222,7 +222,7 @@ export const PetitionTemplateHeader = Object.assign(
           />
           <Spacer minWidth={4} />
           <Button flexShrink={0} onClick={handleUseTemplate} data-action="use-template">
-            <FormattedMessage id="generic.create-petition" defaultMessage="Create petition" />
+            <FormattedMessage id="generic.create-petition" defaultMessage="Create parallel" />
           </Button>
           <Menu>
             <Tooltip

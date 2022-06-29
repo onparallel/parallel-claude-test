@@ -21,7 +21,7 @@ export function ConfirmCompliancePeriodDialog({
           <Text>
             <FormattedMessage
               id="component.confirm-compliance-period-dialog.body"
-              defaultMessage="This petition has been closed more than <b>{months, plural, =1{# month} other{# months}} ago</b>. If you confirm this changes, the petition will be anonymized in the next 24 hours and all sensitive information will be deleted. You will not lose access to the petition."
+              defaultMessage="This parallel has been closed more than <b>{months, plural, =1{# month} other{# months}} ago</b>. If you confirm this changes, the parallel will be anonymized in the next 24 hours and all sensitive information will be deleted. You will not lose access to the parallel."
               values={{ months }}
             />
           </Text>

@@ -72,7 +72,7 @@ export function RecipientViewHelpDialog({ tone, ...props }: DialogProps<{ tone: 
       <Text>
         <FormattedMessage
           id="recipient-view.first-time.finalize-whenever-body"
-          defaultMessage="Either from the link in your email or by copying the url of this page, you can return at any point and finalize the petition."
+          defaultMessage="Either from the link in your email or by copying the url of this page, you can return at any point and finalize the parallel."
           values={{ tone }}
         />
       </Text>

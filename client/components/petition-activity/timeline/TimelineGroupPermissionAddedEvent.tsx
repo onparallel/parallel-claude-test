@@ -26,7 +26,7 @@ export function TimelineGroupPermissionAddedEvent({
     >
       <FormattedMessage
         id="timeline.add-group-permission-description"
-        defaultMessage="{userIsYou, select, true {You} other {{user}}} shared this petition with {groupName} as {permissionType} {timeAgo}"
+        defaultMessage="{userIsYou, select, true {You} other {{user}}} shared this parallel with {groupName} as {permissionType} {timeAgo}"
         values={{
           userIsYou: userId === event.user?.id,
           user: <UserReference user={event.user} />,

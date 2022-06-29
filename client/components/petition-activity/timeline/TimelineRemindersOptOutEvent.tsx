@@ -28,7 +28,7 @@ export function TimelineRemindersOptOutEvent({ event }: TimelineRemindersOptOutE
       <Text as="div">
         <FormattedMessage
           id="timeline.reminders-opt-out-description"
-          defaultMessage="{contact} has opted out from receiving reminders for this petition {timeAgo}"
+          defaultMessage="{contact} has opted out from receiving reminders for this parallel {timeAgo}"
           values={{
             contact: <ContactReference contact={access.contact} />,
             timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,

@@ -132,7 +132,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
               id: "petition-completed-toast",
               title: intl.formatMessage({
                 id: "recipient-view.completed-petition.toast-title",
-                defaultMessage: "Petition completed!",
+                defaultMessage: "Parallel completed!",
               }),
               description: intl.formatMessage(
                 {
@@ -178,7 +178,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
               message: intl.formatMessage({
                 id: "recipient-view.complete-petition.error-message",
                 defaultMessage:
-                  "It looks like the petition has been updated since you last accessed it. Please refresh your browser and try again. You will not lose your submitted answers.",
+                  "It looks like the parallel has been updated since you last accessed it. Please refresh your browser and try again. You will not lose your submitted answers.",
               }),
             });
             window.location.reload();
@@ -246,7 +246,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                           <Text>
                             <FormattedMessage
                               id="recipient-view.petition-completed-alert-1"
-                              defaultMessage="{tone, select, INFORMAL{Great! You have completed the petition and we have notified {name} for review and validation.} other{This petition has been completed and {name} has been notified for its revision and validation.}}"
+                              defaultMessage="{tone, select, INFORMAL{Great! You have completed the parallel and we have notified {name} for review and validation.} other{This parallel has been completed and {name} has been notified for its revision and validation.}}"
                               values={{
                                 name: <b>{granter.fullName}</b>,
                                 tone,
@@ -264,7 +264,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                       ) : (
                         <FormattedMessage
                           id="recipient-view.petition-closed-alert"
-                          defaultMessage="This petition has been closed. If you need to make any changes, please reach out to {name}."
+                          defaultMessage="This parallel has been closed. If you need to make any changes, please reach out to {name}."
                           values={{
                             name: <b>{granter.fullName}</b>,
                           }}
@@ -291,7 +291,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                           <Text>
                             <FormattedMessage
                               id="recipient-view.petition-requires-signature-alert-1"
-                              defaultMessage="This petition requires an <b>eSignature</b> to be completed."
+                              defaultMessage="This parallel requires an <b>eSignature</b> to be completed."
                             />
                           </Text>
                           <Text>
@@ -306,7 +306,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                           {petition.signatureConfig.signers.length > 0 ? (
                             <FormattedMessage
                               id="recipient-view.petition-signature-request-sent-alert"
-                              defaultMessage="<b>We have sent the document to sign</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}} in order to finalize the petition."
+                              defaultMessage="<b>We have sent the document to sign</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}} in order to finalize the parallel."
                               values={{
                                 a: (chunks: any) => (
                                   <ContactListPopover
@@ -335,7 +335,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                           ) : (
                             <FormattedMessage
                               id="recipient-view.petition-signature-request-sent-alert.unknown-signer"
-                              defaultMessage="<b>We have sent the document to sign</b> to the specified person in order to finalize the petition."
+                              defaultMessage="<b>We have sent the document to sign</b> to the specified person in order to finalize the parallel."
                             />
                           )}
                         </Text>
@@ -448,7 +448,7 @@ function ReviewBeforeSignDialog({
         <>
           <FormattedMessage
             id="recipient-view.review-before-sign.body-1"
-            defaultMessage="This petition requires an <b>eSignature</b> in order to be completed."
+            defaultMessage="This parallel requires an <b>eSignature</b> in order to be completed."
             values={{ tone }}
           />
           <Spacer marginTop={2} />

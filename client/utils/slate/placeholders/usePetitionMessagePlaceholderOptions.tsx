@@ -56,8 +56,8 @@ export function usePetitionMessagePlaceholderOptions() {
       },
       {
         label: intl.formatMessage({
-          id: "petition-message.placeholder-option.petition-title",
-          defaultMessage: "Petition title",
+          id: "petition-message.placeholder-option.parallel-title",
+          defaultMessage: "Parallel title",
         }),
         value: "petition-title",
       },

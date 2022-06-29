@@ -59,7 +59,7 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
 
       - ${
         petitionName ||
-        intl.formatMessage({ id: "generic.unnamed-petition", defaultMessage: "Unnamed petition" })
+        intl.formatMessage({ id: "generic.unnamed-parallel", defaultMessage: "Unnamed parallel" })
       }
 
       ${intl.formatMessage(
@@ -122,8 +122,8 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
                   ) : (
                     <span style={{ fontStyle: "italic" }}>
                       <FormattedMessage
-                        id="generic.unnamed-petition"
-                        defaultMessage="Unnamed petition"
+                        id="generic.unnamed-parallel"
+                        defaultMessage="Unnamed parallel"
                       />
                     </span>
                   )}

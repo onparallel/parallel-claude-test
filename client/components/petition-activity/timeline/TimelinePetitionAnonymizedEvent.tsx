@@ -19,7 +19,7 @@ export function TimelinePetitionAnonymizedEvent({ event }: TimelinePetitionAnony
     >
       <FormattedMessage
         id="timeline.petition-anonymized-description"
-        defaultMessage="The petition has been anonymized {timeAgo}"
+        defaultMessage="The parallel has been anonymized {timeAgo}"
         values={{
           timeAgo: (
             <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />

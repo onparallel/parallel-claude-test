@@ -20,7 +20,7 @@ export function TimelinePetitionMessageBouncedEvent({
     >
       <FormattedMessage
         id="timeline.petition-message-bounced-description"
-        defaultMessage="We could not deliver the petition to contact {contactName} {timeAgo}"
+        defaultMessage="We could not deliver the parallel to contact {contactName} {timeAgo}"
         values={{
           contactName: <ContactReference contact={event.message.access.contact} />,
           timeAgo: (

@@ -68,8 +68,8 @@ export function useDeletePetitions() {
                 defaultMessage: "Unnamed template",
               })
             : intl.formatMessage({
-                id: "generic.unnamed-petition",
-                defaultMessage: "Unnamed petition",
+                id: "generic.unnamed-parallel",
+                defaultMessage: "Unnamed parallel",
               }));
 
         // first do a dry-run to check if errors will happen when deleting the petition
@@ -100,8 +100,8 @@ export function useDeletePetitions() {
           const petitionName =
             cachedPetitions[0].name ||
             intl.formatMessage({
-              id: "generic.unnamed-petition",
-              defaultMessage: "Unnamed petition",
+              id: "generic.unnamed-parallel",
+              defaultMessage: "Unnamed parallel",
             });
 
           const type =
@@ -111,7 +111,7 @@ export function useDeletePetitions() {
             const singlePetitionMessage = (
               <FormattedMessage
                 id="component.delete-petitions.group-error-singular"
-                defaultMessage="The {name} {type, select, PETITION {petition} other{template}} cannot be deleted because it has been shared with you through a team."
+                defaultMessage="The {name} {type, select, PETITION {parallel} other{template}} cannot be deleted because it has been shared with you through a team."
                 values={{ name: <b>{petitionName}</b>, type }}
               />
             );
@@ -120,7 +120,7 @@ export function useDeletePetitions() {
               <>
                 <FormattedMessage
                   id="component.delete-petitions.group-error-plural"
-                  defaultMessage="The following {type, select, PETITION {petitions} other{templates}} cannot be deleted because they have been shared with you through a team:"
+                  defaultMessage="The following {type, select, PETITION {parallels} other{templates}} cannot be deleted because they have been shared with you through a team:"
                   values={{ type }}
                 />
                 <UnorderedList paddingLeft={2} pt={2}>
@@ -128,8 +128,8 @@ export function useDeletePetitions() {
                     <ListItem key={petition!.id} textStyle={petition!.name ? undefined : "hint"}>
                       {petition?.name ??
                         intl.formatMessage({
-                          id: "generic.unnamed-petition",
-                          defaultMessage: "Unnamed petition",
+                          id: "generic.unnamed-parallel",
+                          defaultMessage: "Unnamed parallel",
                         })}
                     </ListItem>
                   ))}
@@ -210,7 +210,7 @@ function ConfirmDeletePetitionsDialog({
   ) : (
     <FormattedMessage
       id="component.delete-petitions.confirm-delete-petition.header"
-      defaultMessage="Delete {count, plural, =1 {petition} other {petitions}}"
+      defaultMessage="Delete {count, plural, =1 {parallel} other {parallels}}"
       values={{ count }}
     />
   );
@@ -227,7 +227,7 @@ function ConfirmDeletePetitionsDialog({
   ) : (
     <FormattedMessage
       id="component.delete-petitions.confirm-delete-petition.body"
-      defaultMessage="Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected petitions}}?"
+      defaultMessage="Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected parallels}}?"
       values={{
         count,
         name,
@@ -287,7 +287,7 @@ function ConfirmDeleteSharedPetitionsDialog({
   ) : (
     <FormattedMessage
       id="component.delete-shared-petitions-dialog.petition-header"
-      defaultMessage="Delete shared {count, plural, =1 {petition} other {petitions}}"
+      defaultMessage="Delete shared {count, plural, =1 {parallel} other {parallels}}"
       values={{ count }}
     />
   );
@@ -314,14 +314,14 @@ function ConfirmDeleteSharedPetitionsDialog({
       <Text>
         <FormattedMessage
           id="component.delete-shared-petitions-dialog.petition-body-1"
-          defaultMessage="You shared {count, plural, =1{this petition} other{these petitions}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{petition} other{petitions}}."
+          defaultMessage="You shared {count, plural, =1{this parallel} other{these parallels}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{parallel} other{parallels}}."
           values={{ count }}
         />
       </Text>
       <Text>
         <FormattedMessage
           id="component.delete-shared-petitions-dialog.petition-body-2"
-          defaultMessage="Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the <b>#</b> selected petitions}}?"
+          defaultMessage="Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the <b>#</b> selected parallels}}?"
           values={{ count, name }}
         />
       </Text>

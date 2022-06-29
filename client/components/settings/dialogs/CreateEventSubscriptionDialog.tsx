@@ -185,7 +185,7 @@ export function CreateEventSubscriptionDialog(
             <FormLabel>
               <FormattedMessage
                 id="component.create-event-subscription-dialog.from-template-label"
-                defaultMessage="Filter events from petitions created from a specific template (Optional)."
+                defaultMessage="Filter events from parallels created from a specific template (Optional)."
               />
             </FormLabel>
             <Controller

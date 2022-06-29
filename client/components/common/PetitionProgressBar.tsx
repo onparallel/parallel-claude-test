@@ -59,7 +59,7 @@ export function PetitionProgressBar({
             <Text fontStyle="italic" marginTop={2}>
               <FormattedMessage
                 id="component.petition-progress-bar.no-fields"
-                defaultMessage="This petition has no fields."
+                defaultMessage="This parallel has no fields."
               />
             </Text>
           </Box>
@@ -79,7 +79,7 @@ export function PetitionProgressBar({
             <Text marginTop={2}>
               <FormattedMessage
                 id="component.petition-progress-bar.completed"
-                defaultMessage="This petition is completed."
+                defaultMessage="This parallel is completed."
               />
             </Text>
           </Box>

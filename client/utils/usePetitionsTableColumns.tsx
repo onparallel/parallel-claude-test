@@ -53,8 +53,8 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
           header:
             type === "PETITION"
               ? intl.formatMessage({
-                  id: "generic.petition-name",
-                  defaultMessage: "Petition name",
+                  id: "generic.parallel-name",
+                  defaultMessage: "Parallel name",
                 })
               : intl.formatMessage({
                   id: "generic.template-name",
@@ -71,8 +71,8 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                 ? row.name
                 : type === "PETITION"
                 ? intl.formatMessage({
-                    id: "generic.unnamed-petition",
-                    defaultMessage: "Unnamed petition",
+                    id: "generic.unnamed-parallel",
+                    defaultMessage: "Unnamed parallel",
                   })
                 : intl.formatMessage({
                     id: "generic.unnamed-template",

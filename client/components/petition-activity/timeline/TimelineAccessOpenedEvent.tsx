@@ -18,7 +18,7 @@ export function TimelineAccessOpenedEvent({ event }: TimelineAccessOpenedEventPr
     >
       <FormattedMessage
         id="timeline.access-opened-description"
-        defaultMessage="{contact} opened the petition {timeAgo}"
+        defaultMessage="{contact} opened the parallel {timeAgo}"
         values={{
           contact: <ContactReference contact={event.access.contact} />,
           timeAgo: (

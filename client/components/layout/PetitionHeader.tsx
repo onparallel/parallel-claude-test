@@ -269,13 +269,13 @@ export const PetitionHeader = Object.assign(
                 petition.name
                   ? ""
                   : intl.formatMessage({
-                      id: "generic.unnamed-petition",
-                      defaultMessage: "Unnamed petition",
+                      id: "generic.unnamed-parallel",
+                      defaultMessage: "Unnamed parallel",
                     })
               }
               aria-label={intl.formatMessage({
-                id: "generic.petition-name",
-                defaultMessage: "Petition name",
+                id: "generic.parallel-name",
+                defaultMessage: "Parallel name",
               })}
             />
           </Flex>
@@ -310,7 +310,7 @@ export const PetitionHeader = Object.assign(
                     >
                       <FormattedMessage
                         id="component.petition-header.share-label"
-                        defaultMessage="Share petition"
+                        defaultMessage="Share parallel"
                       />
                     </MenuItem>
                     {me.hasPetitionPdfExport ? (
@@ -332,7 +332,7 @@ export const PetitionHeader = Object.assign(
                     >
                       <FormattedMessage
                         id="component.petition-header.duplicate-label"
-                        defaultMessage="Duplicate petition"
+                        defaultMessage="Duplicate parallel"
                       />
                     </MenuItem>
                     <MenuItem
@@ -352,7 +352,7 @@ export const PetitionHeader = Object.assign(
                       >
                         <FormattedMessage
                           id="component.petition-header.reopen-button"
-                          defaultMessage="Reopen petition"
+                          defaultMessage="Reopen parallel"
                         />
                       </MenuItem>
                     ) : null}
@@ -376,7 +376,7 @@ export const PetitionHeader = Object.assign(
                           <Text fontSize="sm" color="gray.500">
                             <FormattedMessage
                               id="component.petition-header.subscribed-description"
-                              defaultMessage="Get email notifications about activity in this petition."
+                              defaultMessage="Get email notifications about activity in this parallel."
                             />
                           </Text>
                         </Box>
@@ -392,7 +392,7 @@ export const PetitionHeader = Object.assign(
                           <Text fontSize="sm" color="gray.500">
                             <FormattedMessage
                               id="component.petition-header.not-subscribed-description"
-                              defaultMessage="Don't get notifications about this petition."
+                              defaultMessage="Don't get notifications about this parallel."
                             />
                           </Text>
                         </Box>
@@ -406,7 +406,7 @@ export const PetitionHeader = Object.assign(
                     >
                       <FormattedMessage
                         id="component.petition-header.delete-label"
-                        defaultMessage="Delete petition"
+                        defaultMessage="Delete parallel"
                       />
                     </MenuItem>
                   </MenuList>

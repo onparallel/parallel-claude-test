@@ -80,8 +80,8 @@ export const PetitionLayout = Object.assign(
           petition!.name ||
           (petition.__typename === "Petition"
             ? intl.formatMessage({
-                id: "generic.unnamed-petition",
-                defaultMessage: "Unnamed petition",
+                id: "generic.unnamed-parallel",
+                defaultMessage: "Unnamed parallel",
               })
             : intl.formatMessage({
                 id: "generic.unnamed-template",

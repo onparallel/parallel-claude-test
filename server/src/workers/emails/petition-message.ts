@@ -14,7 +14,7 @@ export async function petitionMessage(
 ) {
   const message = await context.petitions.loadMessage(payload.petition_message_id);
   if (!message) {
-    throw new Error(`Petition message not found for id ${payload.petition_message_id}`);
+    throw new Error(`Parallel message not found for id ${payload.petition_message_id}`);
   }
   const [petition, sender, senderData, access] = await Promise.all([
     context.petitions.loadPetition(message.petition_id),

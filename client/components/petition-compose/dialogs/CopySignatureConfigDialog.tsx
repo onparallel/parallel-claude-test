@@ -33,7 +33,7 @@ export function CopySignatureConfigDialog({
         <>
           <FormattedMessage
             id="component.copy-signature-config-dialog.body"
-            defaultMessage="You have assigned {contacts} to sign the first petition."
+            defaultMessage="You have assigned {contacts} to sign the first parallel."
             values={{
               contacts: (
                 <FormattedList
@@ -49,7 +49,7 @@ export function CopySignatureConfigDialog({
           <Text>
             <FormattedMessage
               id="component.copy-signature-config-dialog.body-2"
-              defaultMessage="Do you want {count, plural, =1{this contact} other{these contacts}} to sign the petition for each of the recipient groups?"
+              defaultMessage="Do you want {count, plural, =1{this contact} other{these contacts}} to sign the parallels for each of the recipient groups?"
               values={{ count: signers.length }}
             />
           </Text>
@@ -61,20 +61,20 @@ export function CopySignatureConfigDialog({
               >
                 <FormattedMessage
                   id="component.copy-signature-config-dialog.option-1"
-                  defaultMessage="Yes, allow this {count, plural, =1{contact} other{contacts}} to sign all the petitions."
+                  defaultMessage="Yes, allow this {count, plural, =1{contact} other{contacts}} to sign all the parallels."
                   values={{ count: signers.length }}
                 />
               </Radio>
               <Radio value="LET_RECIPIENT_CHOOSE" isChecked={option === "LET_RECIPIENT_CHOOSE"}>
                 <FormattedMessage
                   id="component.copy-signature-config-dialog.option-2"
-                  defaultMessage="No, let each recipient choose who will sign the petitions."
+                  defaultMessage="No, let each recipient choose who will sign the parallels."
                 />
               </Radio>
               <Radio value="DISABLE_SIGNATURE" isChecked={option === "DISABLE_SIGNATURE"}>
                 <FormattedMessage
                   id="component.copy-signature-config-dialog.option-3"
-                  defaultMessage="Disable eSignature from all the petitions."
+                  defaultMessage="Disable eSignature from all the parallels."
                 />
               </Radio>
             </Stack>

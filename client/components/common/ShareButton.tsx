@@ -37,7 +37,7 @@ export function ShareButton({
             {petition.__typename === "Petition" ? (
               <FormattedMessage
                 id="component.share-button.petition-not-shared"
-                defaultMessage="This petition has not been shared yet."
+                defaultMessage="This parallel has not been shared yet."
               />
             ) : (
               <FormattedMessage

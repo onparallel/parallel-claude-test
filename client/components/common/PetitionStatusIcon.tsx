@@ -16,22 +16,22 @@ export const PetitionStatusIcon = chakraForwardRef<"svg", PetitionStatusIconProp
       switch (status) {
         case "DRAFT":
           return intl.formatMessage({
-            id: "generic.petition-status.draft",
+            id: "generic.parallel-status.draft",
             defaultMessage: "Draft",
           });
         case "PENDING":
           return intl.formatMessage({
-            id: "generic.petition-status.pending",
+            id: "generic.parallel-status.pending",
             defaultMessage: "Pending",
           });
         case "COMPLETED":
           return intl.formatMessage({
-            id: "generic.petition-status.completed",
+            id: "generic.parallel-status.completed",
             defaultMessage: "Completed",
           });
         case "CLOSED":
           return intl.formatMessage({
-            id: "generic.petition-status.closed",
+            id: "generic.parallel-status.closed",
             defaultMessage: "Closed",
           });
         default:

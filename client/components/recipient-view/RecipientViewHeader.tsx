@@ -127,7 +127,7 @@ export const RecipientViewHeader = Object.assign(
             {
               id: "recipient-view.petition-delegated.toast-body",
               defaultMessage:
-                "We have sent an email to {email} with instructions to access this petition.",
+                "We have sent an email to {email} with instructions to access this parallel.",
             },
             { email: data.email }
           ),
@@ -270,7 +270,7 @@ export const RecipientViewHeader = Object.assign(
                   <Heading as="h2" flex="1" size="sm" textAlign="left">
                     <FormattedMessage
                       id="recipient-view.request-information"
-                      defaultMessage="Request information"
+                      defaultMessage="Parallel information"
                     />
                   </Heading>
                 </Flex>

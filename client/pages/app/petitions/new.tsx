@@ -204,7 +204,7 @@ function NewPetition() {
       id="main-container"
       title={intl.formatMessage({
         id: "new-petition.title",
-        defaultMessage: "New petition",
+        defaultMessage: "New parallel",
       })}
       me={me}
       realMe={realMe}

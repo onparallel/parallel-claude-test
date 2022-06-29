@@ -201,7 +201,7 @@ function Contact({ contactId }: ContactProps) {
             <CardHeader omitDivider>
               <FormattedMessage
                 id="contact.petitions-header"
-                defaultMessage="Petitions sent{name, select, null {} other { to {name}}}"
+                defaultMessage="Parallels sent{name, select, null {} other { to {name}}}"
                 values={{ name: contact!.firstName }}
               />
             </CardHeader>
@@ -219,7 +219,7 @@ function Contact({ contactId }: ContactProps) {
                 <Text color="gray.300" fontSize="lg">
                   <FormattedMessage
                     id="contact.no-petitions"
-                    defaultMessage="You haven't sent any petitions to {name, select, null {this contact} other {{name}}} yet"
+                    defaultMessage="You haven't sent any parallels to {name, select, null {this contact} other {{name}}} yet"
                     values={{ name: contact!.firstName }}
                   />
                 </Text>
@@ -244,8 +244,8 @@ function useContactPetitionAccessesColumns() {
         {
           key: "name",
           header: intl.formatMessage({
-            id: "generic.petition-name",
-            defaultMessage: "Petition name",
+            id: "generic.parallel-name",
+            defaultMessage: "Parallel name",
           }),
           headerProps: {
             width: "30%",
@@ -259,8 +259,8 @@ function useContactPetitionAccessesColumns() {
               {row.petition?.name
                 ? row.petition.name
                 : intl.formatMessage({
-                    id: "generic.unnamed-petition",
-                    defaultMessage: "Unnamed petition",
+                    id: "generic.unnamed-parallel",
+                    defaultMessage: "Unnamed parallel",
                   })}
             </OverflownText>
           ),

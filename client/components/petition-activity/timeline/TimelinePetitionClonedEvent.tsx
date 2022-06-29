@@ -19,7 +19,7 @@ export function TimelinePetitionClonedEvent({ event, userId }: TimelinePetitionC
     >
       <FormattedMessage
         id="timeline.petition-cloned-description"
-        defaultMessage="{userIsYou, select, true {You} other {{user}}} cloned this petition {timeAgo}"
+        defaultMessage="{userIsYou, select, true {You} other {{user}}} cloned this parallel {timeAgo}"
         values={{
           userIsYou: userId === event.user?.id,
           user: <UserReference user={event.user} />,

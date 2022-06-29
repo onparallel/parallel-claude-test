@@ -78,7 +78,7 @@ export function PublicSignupFormOrganization({
             <HelpPopover>
               <FormattedMessage
                 id="component.public-signup-form-organization.company-name-description"
-                defaultMessage="This is the name that will appear in your petitions, so make sure it is the one your customers will recognize."
+                defaultMessage="This is the name that will appear in your parallels, so make sure it is the one your customers will recognize."
               />
             </HelpPopover>
           </FormLabel>

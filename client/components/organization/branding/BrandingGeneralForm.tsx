@@ -202,7 +202,7 @@ export function BrandingGeneralForm({ user }: BrandingGeneralFormProps) {
             <Text>
               <FormattedMessage
                 id="organization.branding.parallel-branding-description"
-                defaultMessage="Displays the Parallel branding on all emails and requests that are sent."
+                defaultMessage="Displays the Parallel branding on all emails and parallels that are sent."
               />
             </Text>
           </Stack>

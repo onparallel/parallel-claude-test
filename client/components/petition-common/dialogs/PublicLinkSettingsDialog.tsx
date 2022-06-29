@@ -168,7 +168,7 @@ export function PublicLinkSettingsDialog({
             <Text>
               <FormattedMessage
                 id="component.settings-public-link-dialog.description"
-                defaultMessage="Generates a link that allows third parties to start a petition. These petitions will be assigned by default to the template owner."
+                defaultMessage="Generates a link that allows third parties to start a parallel. These parallels will be assigned by default to the template owner."
               />
             </Text>
             <HelpCenterLink articleId={6050184}>
@@ -307,7 +307,7 @@ export function PublicLinkSettingsDialog({
                 <HelpPopover>
                   <FormattedMessage
                     id="component.settings-public-link-dialog.prefill-secret-popover"
-                    defaultMessage="JWT secret used to verify the integrity of the parameter passed to prefill the petition. This must be set in case you use the <b>prefill</b> query parameter in your link."
+                    defaultMessage="JWT secret used to verify the integrity of the parameter passed to prefill the parallel. This must be set in case you use the <b>prefill</b> query parameter in your link."
                   />
                 </HelpPopover>
               </FormLabel>

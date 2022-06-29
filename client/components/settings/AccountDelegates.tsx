@@ -69,7 +69,7 @@ export function AccountDelegates({ user, onSubmit, ...props }: AccountDelegatesP
             <Text>
               <FormattedMessage
                 id="component.account-delegates.delegates-description"
-                defaultMessage="Delegates can submit petitions on your behalf."
+                defaultMessage="Delegates can submit parallels on your behalf."
               />
             </Text>
             {user.hasOnBehalfOf ? null : (
@@ -85,7 +85,7 @@ export function AccountDelegates({ user, onSubmit, ...props }: AccountDelegatesP
                 contactMessage={intl.formatMessage({
                   id: "component.account-delegates.upgrade-delegates-support-message",
                   defaultMessage:
-                    "Hi, I would like more information about sending petitions on behalf of another user.",
+                    "Hi, I would like more information about sending parallels on behalf of another user.",
                 })}
               />
             )}

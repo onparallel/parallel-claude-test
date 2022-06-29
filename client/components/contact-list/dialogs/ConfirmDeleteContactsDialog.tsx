@@ -49,7 +49,7 @@ function ConfirmDeleteContactsDialog({
                     <Text as="li">
                       <FormattedMessage
                         id="component.confirm-delete-contacts-dialog.alert.pending-petitions"
-                        defaultMessage="{count} pending {count, plural, =1{petition} other{petitions}}"
+                        defaultMessage="{count} pending {count, plural, =1{parallel} other{parallels}}"
                         values={{ count: extra.PENDING }}
                       />
                     </Text>
@@ -58,7 +58,7 @@ function ConfirmDeleteContactsDialog({
                     <Text as="li">
                       <FormattedMessage
                         id="component.confirm-delete-contacts-dialog.alert.completed-petitions"
-                        defaultMessage="{count} completed {count, plural, =1{petition} other{petitions}}"
+                        defaultMessage="{count} completed {count, plural, =1{parallel} other{parallels}}"
                         values={{ count: extra.COMPLETED }}
                       />
                     </Text>
@@ -67,7 +67,7 @@ function ConfirmDeleteContactsDialog({
                     <Text as="li">
                       <FormattedMessage
                         id="component.confirm-delete-contacts-dialog.alert.closed-petitions"
-                        defaultMessage="{count} closed {count, plural, =1{petition} other{petitions}}"
+                        defaultMessage="{count} closed {count, plural, =1{parallel} other{parallels}}"
                         values={{ count: extra.CLOSED }}
                       />
                     </Text>
@@ -77,7 +77,7 @@ function ConfirmDeleteContactsDialog({
             ) : (
               <FormattedMessage
                 id="component.confirm-delete-contacts-dialog.alert-multiple-text"
-                defaultMessage="We have found petitions sent to some of these contacts."
+                defaultMessage="We have found parallels sent to some of these contacts."
               />
             )}
           </Alert>

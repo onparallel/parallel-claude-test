@@ -19,12 +19,12 @@ export function LoadingDynamicText() {
         defaultMessage: "Giving color to the charts...",
       }),
       intl.formatMessage({
-        id: "component.loading-dynamic-text.searching-petitions",
-        defaultMessage: "Searching for petitions in every corner...",
+        id: "component.loading-dynamic-text.searching-parallels",
+        defaultMessage: "Searching for parallels in every corner...",
       }),
       intl.formatMessage({
         id: "component.loading-dynamic-text.dusting-off",
-        defaultMessage: "Dusting off closed petitions...",
+        defaultMessage: "Dusting off closed parallels...",
       }),
       intl.formatMessage({
         id: "component.loading-dynamic-text.calculating-average-times",

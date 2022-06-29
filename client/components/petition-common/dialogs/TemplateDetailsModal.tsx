@@ -128,7 +128,7 @@ export function TemplateDetailsModal({
       leftIcon={<PaperPlaneIcon />}
       onClick={handleCreatePetition}
     >
-      <FormattedMessage id="generic.create-petition" defaultMessage="Create petition" />
+      <FormattedMessage id="generic.create-petition" defaultMessage="Create parallel" />
     </Button>
   );
 

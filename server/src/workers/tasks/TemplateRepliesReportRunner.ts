@@ -74,7 +74,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
       const row: Record<string, any> = {
         [intl.formatMessage({
           id: "export-template-report.column-header.petition-name",
-          defaultMessage: "Petition name",
+          defaultMessage: "Parallel name",
         })]: petition.name || "",
         [intl.formatMessage({
           id: "export-template-report.column-header.recipient-names",

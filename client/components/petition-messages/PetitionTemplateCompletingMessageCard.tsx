@@ -131,7 +131,7 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
             <Text marginBottom={2}>
               <FormattedMessage
                 id="component.petition-template-completing-message.card-explainer"
-                defaultMessage="This message will be shown when the recipient <b>completes</b> the petition. Use it to thank them or to include further instructions."
+                defaultMessage="This message will be shown when the recipient <b>completes</b> the parallel. Use it to thank them or to include further instructions."
               />
             </Text>
             <PaddedCollapse in={isEnabled}>

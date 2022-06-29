@@ -21,8 +21,8 @@
   },
   {
     "term": "component.account-delegates.delegates-description",
-    "definition": "Los delegados podrán enviar peticiones en tu nombre.",
-    "context": "Delegates can submit petitions on your behalf."
+    "definition": "Los delegados podrán enviar parallels en tu nombre.",
+    "context": "Delegates can submit parallels on your behalf."
   },
   {
     "term": "component.account-delegates.delegates-label",
@@ -36,8 +36,8 @@
   },
   {
     "term": "component.account-delegates.upgrade-delegates-support-message",
-    "definition": "Hola, Me gustaría saber más sobre delegar el envío de peticiones a otros usuarios.",
-    "context": "Hi, I would like more information about sending petitions on behalf of another user."
+    "definition": "Hola, Me gustaría saber más sobre delegar el envío de parallels a otros usuarios.",
+    "context": "Hi, I would like more information about sending parallels on behalf of another user."
   },
   {
     "term": "component.add-member-group-dialog.members-label",
@@ -66,18 +66,18 @@
   },
   {
     "term": "component.add-petition-access-dialog.petition-limit-near.text",
-    "definition": "Puedes enviar {left, plural, =1{# petición} other{# peticiones}} más.",
-    "context": "You can send {left, plural, =1{# more petition} other{# more petitions}}."
+    "definition": "Puedes enviar {left, plural, =1{# parallel} other{# parallels}} más.",
+    "context": "You can send {left, plural, =1{# more parallel} other{# more parallels}}."
   },
   {
     "term": "component.add-petition-access-dialog.petition-limit-reached.text",
-    "definition": "Has alcanzado el límite de peticiones enviadas.",
-    "context": "You reached the limit of petitions sent."
+    "definition": "Has alcanzado el límite de parallels enviados.",
+    "context": "You reached the limit of parallels sent."
   },
   {
     "term": "component.add-petition-access-dialog.recipient-groups-description",
-    "definition": "Cada grupo responderá peticiones diferentes.",
-    "context": "Each group will reply to different petitions."
+    "definition": "Cada grupo responderá parallels diferentes.",
+    "context": "Each group will reply to different parallels."
   },
   {
     "term": "component.add-petition-access-dialog.recipient-groups-label",
@@ -86,8 +86,8 @@
   },
   {
     "term": "component.add-petition-access-dialog.recipients-description",
-    "definition": "Responderán a la misma petición colaborativamente.",
-    "context": "Will reply to the same petition collaboratively."
+    "definition": "Responderán al mismo parallel colaborativamente.",
+    "context": "Will reply to the same parallel collaboratively."
   },
   {
     "term": "component.add-petition-access-dialog.recipients-label",
@@ -106,8 +106,8 @@
   },
   {
     "term": "component.add-petition-access-dialog.subscribe-to-notifications-description",
-    "definition": "Los usuarios recibirán notificaciones sobre la actividad de esta petición.",
-    "context": "Users will receive notifications about the activity of this petition."
+    "definition": "Los usuarios recibirán notificaciones sobre la actividad de este parallel.",
+    "context": "Users will receive notifications about the activity of this parallel."
   },
   {
     "term": "component.add-signature-api-key-dialog.api-key-help",
@@ -151,13 +151,13 @@
   },
   {
     "term": "component.app-layout-navbar.petitions-link",
-    "definition": "Peticiones",
-    "context": "Petitions"
+    "definition": "Parallels",
+    "context": "Parallels"
   },
   {
     "term": "component.app-layout-navbar.petitions-link.limit-reached-warning",
-    "definition": "Parece que has alcanzado el límite de {limit} peticiones, <a>contacta con nosotros para mejorar tu plan.</a>",
-    "context": "It seems that you have reached your limit of {limit} petitions, <a>reach out to us to upgrade your plan.</a>"
+    "definition": "Parece que has alcanzado el límite de {limit} parallels, <a>contacta con nosotros para mejorar tu plan.</a>",
+    "context": "It seems that you have reached your limit of {limit} parallels, <a>reach out to us to upgrade your plan.</a>"
   },
   {
     "term": "component.app-layout-navbar.reports-link",
@@ -181,8 +181,8 @@
   },
   {
     "term": "component.appsumo-license-alert.contact-text-max-license",
-    "definition": "Contacta con nosotros para aumentar tus límites de usuarios y peticiones.",
-    "context": "Contact with us to increase your user and petition limits."
+    "definition": "Contacta con nosotros para aumentar tus límites de usuarios y parallels.",
+    "context": "Contact with us to increase your user and parallel limits."
   },
   {
     "term": "component.appsumo-license-alert.current-plan",
@@ -191,8 +191,8 @@
   },
   {
     "term": "component.appsumo-license-alert.upgrade-text",
-    "definition": "Actualiza tu plan para aumentar tus límites de usuarios y peticiones.",
-    "context": "Upgrade your plan to increase your user and petition limits."
+    "definition": "Actualiza tu plan para aumentar tus límites de usuarios y parallels.",
+    "context": "Upgrade your plan to increase your user and parallel limits."
   },
   {
     "term": "component.branding-document-preview.document-title",
@@ -211,8 +211,8 @@
   },
   {
     "term": "component.branding-general-preview.body",
-    "definition": "{tone, select, INFORMAL{Te recordamos que <b>{name}</b> te compartió un acceso a Parallel en el que queda información pendiente de completar.} other{Le recordamos que <b>[Tu nombre]</b> le envió una petición de la que queda información pendiente de completar.}}",
-    "context": "We remind you that <b>{name}</b> sent you a petition and some of the requested information has not yet been submitted."
+    "definition": "{tone, select, INFORMAL{Te recordamos que <b>{name}</b> te compartió un acceso a Parallel en el que queda información pendiente de completar.} other{Le recordamos que <b>[Tu nombre]</b> le envió un parallel en el que queda información pendiente de completar.}}",
+    "context": "We remind you that <b>{name}</b> sent you a parallel and some of the requested information has not yet been submitted."
   },
   {
     "term": "component.branding-general-preview.footer",
@@ -291,8 +291,8 @@
   },
   {
     "term": "component.close-petition-dialog.heading",
-    "definition": "Finalizar petición",
-    "context": "Finish petition"
+    "definition": "Finalizar parallel",
+    "context": "Finish parallel"
   },
   {
     "term": "component.close-petition-dialog.notify-recipient.message-placeholder",
@@ -306,8 +306,8 @@
   },
   {
     "term": "component.close-petition-dialog.subheading",
-    "definition": "Al finalizar, la petición quedará cerrada, pero podrás volver a revisar la información en cualquier momento.",
-    "context": "When finishing, the petition will remain closed. You can come back anytime to review the information."
+    "definition": "Al finalizar, el parallel quedará cerrado, pero podrás volver a revisar la información en cualquier momento.",
+    "context": "When finishing, the parallel will remain closed. You can come back anytime to review the information."
   },
   {
     "term": "component.configure-reminder-settings-dialog.header",
@@ -321,8 +321,8 @@
   },
   {
     "term": "component.confirm-compliance-period-dialog.body",
-    "definition": "Esta petición ha sido cerrada <b>hace más de {months, plural, =1{# mes} other{# meses}}</b>. Si confirmas estos cambios, la petición será anonimizada en las próximas 24 horas y toda la información sensible será eliminada. No perderás el acceso a esta petición.",
-    "context": "This petition has been closed more than <b>{months, plural, =1{# month} other{# months}} ago</b>. If you confirm this changes, the petition will be anonymized in the next 24 hours and all sensitive information will be deleted. You will not lose access to the petition."
+    "definition": "Este parallel ha sido cerrado <b>hace más de {months, plural, =1{# mes} other{# meses}}</b>. Si confirmas estos cambios,el parallel será anonimizado en las próximas 24 horas y toda la información sensible será eliminada. No perderás el acceso a este parallel.",
+    "context": "This parallel has been closed more than <b>{months, plural, =1{# month} other{# months}} ago</b>. If you confirm this changes, the parallel will be anonymized in the next 24 hours and all sensitive information will be deleted. You will not lose access to the parallel."
   },
   {
     "term": "component.confirm-compliance-period-dialog.header",
@@ -361,8 +361,8 @@
   },
   {
     "term": "component.confirm-delete-contacts-dialog.alert-multiple-text",
-    "definition": "Hemos encontrado peticiones enviadas a algunos de estos contactos.",
-    "context": "We have found petitions sent to some of these contacts."
+    "definition": "Hemos encontrado parallels enviados a algunos de estos contactos.",
+    "context": "We have found parallels sent to some of these contacts."
   },
   {
     "term": "component.confirm-delete-contacts-dialog.alert-single-text",
@@ -371,18 +371,18 @@
   },
   {
     "term": "component.confirm-delete-contacts-dialog.alert.closed-petitions",
-    "definition": "{count, plural, =1{# petición cerrada} other{# peticiones cerradas}}",
-    "context": "{count} closed {count, plural, =1{petition} other{petitions}}"
+    "definition": "{count, plural, =1{# parallel cerrado} other{# parallels cerrados}}",
+    "context": "{count} closed {count, plural, =1{parallel} other{parallels}}"
   },
   {
     "term": "component.confirm-delete-contacts-dialog.alert.completed-petitions",
-    "definition": "{count, plural, =1{# petición completada} other{# peticiones completadas}}",
-    "context": "{count} completed {count, plural, =1{petition} other{petitions}}"
+    "definition": "{count, plural, =1{# parallel completado} other{# parallels completados}}",
+    "context": "{count} completed {count, plural, =1{parallel} other{parallels}}"
   },
   {
     "term": "component.confirm-delete-contacts-dialog.alert.pending-petitions",
-    "definition": "{count, plural, =1{# petición pendiente} other{# peticiones pendientes}}",
-    "context": "{count} pending {count, plural, =1{petition} other{petitions}}"
+    "definition": "{count, plural, =1{# parallel pendiente} other{# parallels pendientes}}",
+    "context": "{count} pending {count, plural, =1{parallel} other{parallels}}"
   },
   {
     "term": "component.confirm-delete-contacts-dialog.body.1",
@@ -406,8 +406,8 @@
   },
   {
     "term": "component.confirm-disable-ongoing-signature-petition-close.body",
-    "definition": "Hay un proceso de firma digital pendiente. Si cierras esta petición, el proceso será cancelado.",
-    "context": "There is an ongoing eSignature process. If you close this petition now, the process will be cancelled."
+    "definition": "Hay un proceso de firma digital pendiente. Si cierras este parallel, el proceso será cancelado.",
+    "context": "There is an ongoing eSignature process. If you close this parallel now, the process will be cancelled."
   },
   {
     "term": "component.confirm-disable-ongoing-signature-petition-close.confirm",
@@ -466,8 +466,8 @@
   },
   {
     "term": "component.confirm-remove-member-dialog.body",
-    "definition": "¿Estás seguro de querer <b>quitar del equipo</b> a {count, plural, =1{{fullName}} other {los miembros seleccionados}}? Si continúas, {count, plural, =1{perderá} other {perderán}} el acceso a las peticiones compartidas con el equipo.",
-    "context": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the team? If you continue, {count, plural, =1{he} other {they}} will lose access to petitions shared with the team."
+    "definition": "¿Estás seguro de querer <b>quitar del equipo</b> a {count, plural, =1{{fullName}} other {los miembros seleccionados}}? Si continúas, {count, plural, =1{perderá} other {perderán}} el acceso a los parallels compartidos con el equipo.",
+    "context": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the team? If you continue, {count, plural, =1{he} other {they}} will lose access to parallels shared with the team."
   },
   {
     "term": "component.confirm-remove-member-dialog.confirm",
@@ -486,8 +486,8 @@
   },
   {
     "term": "component.confirm-resend-completed-notification.description",
-    "definition": "Ya hemos enviado un email de confirmación a los contactos de la petición. ¿Quieres enviarlo de nuevo?",
-    "context": "We have already sent a confirmation email to the petition contacts. Would you like to send it again?"
+    "definition": "Ya hemos enviado un email de confirmación a los contactos del parallel. ¿Quieres enviarlo de nuevo?",
+    "context": "We have already sent a confirmation email to the parallel contacts. Would you like to send it again?"
   },
   {
     "term": "component.confirm-resend-completed-notification.header",
@@ -511,8 +511,8 @@
   },
   {
     "term": "component.confirm-restart-signature-request.description",
-    "definition": "Ya tienes una petición firmada. Si continúas, gastarás un crédito de firma adicional.",
-    "context": "You already have a signed petition. If you continue you will spend an additional eSignature credit."
+    "definition": "Ya tienes un parallel firmado. Si continúas, gastarás un crédito de firma adicional.",
+    "context": "You already have a signed parallel. If you continue you will spend an additional eSignature credit."
   },
   {
     "term": "component.confirm-restart-signature-request.header",
@@ -546,13 +546,13 @@
   },
   {
     "term": "component.confirm-send-reminder-dialog.opted-out-warning",
-    "definition": "Este contacto ha optado por no recibir recordatorios para esta petición.",
-    "context": "This contact has opted out from receiving reminders for this petition."
+    "definition": "Este contacto ha optado por no recibir recordatorios para este parallel.",
+    "context": "This contact has opted out from receiving reminders for this parallel."
   },
   {
     "term": "component.confirm-send-reminder-dialog.opted-out-warning-multiple",
-    "definition": "Los siguientes contactos han optado por no recibir recordatorios para esta petición:",
-    "context": "The following contacts have opted out from receiving reminders for this petition:"
+    "definition": "Los siguientes contactos han optado por no recibir recordatorios para este parallel:",
+    "context": "The following contacts have opted out from receiving reminders for this parallel:"
   },
   {
     "term": "component.confirm-send-signature-reminder.body",
@@ -636,33 +636,33 @@
   },
   {
     "term": "component.copy-signature-config-dialog.body",
-    "definition": "Has asignado a {contacts} para firmar la primera petición.",
-    "context": "You have assigned {contacts} to sign the first petition."
+    "definition": "Has asignado a {contacts} para firmar el primer parallel.",
+    "context": "You have assigned {contacts} to sign the first parallel."
   },
   {
     "term": "component.copy-signature-config-dialog.body-2",
-    "definition": "¿Quieres que {count, plural, =1{este contacto firme} other{estos contactos firmen}} las peticiones de cada grupo de destinatarios?",
-    "context": "Do you want {count, plural, =1{this contact} other{these contacts}} to sign the petition for each of the recipient groups?"
+    "definition": "¿Quieres que {count, plural, =1{este contacto firme} other{estos contactos firmen}} los parallels de cada grupo de destinatarios?",
+    "context": "Do you want {count, plural, =1{this contact} other{these contacts}} to sign the parallels for each of the recipient groups?"
   },
   {
     "term": "component.copy-signature-config-dialog.header",
-    "definition": "Firma digital de petición",
+    "definition": "Firma digital de parallel",
     "context": "Petition eSignature"
   },
   {
     "term": "component.copy-signature-config-dialog.option-1",
-    "definition": "Sí, permitir a {count, plural, =1{este contacto} other{estos contactos}} firmar todas las peticiones.",
-    "context": "Yes, allow this {count, plural, =1{contact} other{contacts}} to sign all the petitions."
+    "definition": "Sí, permitir a {count, plural, =1{este contacto} other{estos contactos}} firmar todos los parallels.",
+    "context": "Yes, allow this {count, plural, =1{contact} other{contacts}} to sign all the parallels."
   },
   {
     "term": "component.copy-signature-config-dialog.option-2",
     "definition": "No, dejar que los destinatarios escojan quién firma.",
-    "context": "No, let each recipient choose who will sign the petitions."
+    "context": "No, let each recipient choose who will sign the parallels."
   },
   {
     "term": "component.copy-signature-config-dialog.option-3",
-    "definition": "Desactivar la firma digital de todas las peticiones.",
-    "context": "Disable eSignature from all the petitions."
+    "definition": "Desactivar la firma digital de todos los parallels.",
+    "context": "Disable eSignature from all the parallels."
   },
   {
     "term": "component.copy-to-clipboard-button.copied-label",
@@ -701,8 +701,8 @@
   },
   {
     "term": "component.create-event-subscription-dialog.from-template-label",
-    "definition": "Filtrar eventos provinientes de peticiones creadas a partir de una plantilla específica (Opcional).",
-    "context": "Filter events from petitions created from a specific template (Optional)."
+    "definition": "Filtrar eventos provinientes de parallels creados a partir de una plantilla específica (Opcional).",
+    "context": "Filter events from parallels created from a specific template (Optional)."
   },
   {
     "term": "component.create-event-subscription-dialog.from-template-placeholder",
@@ -821,13 +821,13 @@
   },
   {
     "term": "component.delete-petitions.confirm-delete-petition.body",
-    "definition": "¿Está seguro de que quiere eliminar {count, plural, =1 {<b>{name}</b>} other {las <b>#</b> peticiones seleccionadas}}?",
-    "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected petitions}}?"
+    "definition": "¿Está seguro de que quiere eliminar {count, plural, =1 {<b>{name}</b>} other {los <b>#</b> parallels seleccionados}}?",
+    "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected parallels}}?"
   },
   {
     "term": "component.delete-petitions.confirm-delete-petition.header",
-    "definition": "Eliminar {count, plural, =1 {petición} other {peticiones}}",
-    "context": "Delete {count, plural, =1 {petition} other {petitions}}"
+    "definition": "Eliminar {count, plural, =1 {parallel} other {parallels}}",
+    "context": "Delete {count, plural, =1 {parallel} other {parallels}}"
   },
   {
     "term": "component.delete-petitions.confirm-delete-template.body",
@@ -846,13 +846,13 @@
   },
   {
     "term": "component.delete-petitions.group-error-plural",
-    "definition": "Las siguientes {type, select, PETITION {peticiones} other{plantillas}} no se pueden eliminar porque se han compartido contigo a través de un equipo:",
-    "context": "The following {type, select, PETITION {petitions} other{templates}} cannot be deleted because they have been shared with you through a team:"
+    "definition": "{type, select, PETITION {Los siguientes parallels} other{Las siguientes plantillas}} no se pueden eliminar porque se han compartido contigo a través de un equipo:",
+    "context": "The following {type, select, PETITION {parallels} other{templates}} cannot be deleted because they have been shared with you through a team:"
   },
   {
     "term": "component.delete-petitions.group-error-singular",
-    "definition": "La {type, select, PETITION {petición} other{plantilla}} {name} no se puede eliminar porque se ha compartido contigo a través de un equipo.",
-    "context": "The {name} {type, select, PETITION {petition} other{template}} cannot be deleted because it has been shared with you through a team."
+    "definition": "{type, select, PETITION {El parallel} other{La plantilla}} {name} no se puede eliminar porque se ha compartido contigo a través de un equipo.",
+    "context": "The {name} {type, select, PETITION {parallel} other{template}} cannot be deleted because it has been shared with you through a team."
   },
   {
     "term": "component.delete-petitions.public-templates-error-plural",
@@ -866,18 +866,18 @@
   },
   {
     "term": "component.delete-shared-petitions-dialog.petition-body-1",
-    "definition": "Has compartido {count, plural, =1{esta petición} other{estas peticiones}} con otros usuarios. Al {count, plural, =1{eliminarla} other{eliminarlas}}, les quitarás el acceso a {count, plural, =1{la petición} other{las peticiones}}.",
-    "context": "You shared {count, plural, =1{this petition} other{these petitions}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{petition} other{petitions}}."
+    "definition": "Has compartido {count, plural, =1{este parallel} other{estos parallels}} con otros usuarios. Al {count, plural, =1{eliminarla} other{eliminarlas}}, les quitarás el acceso a {count, plural, =1{el parallel} other{los parallels}}.",
+    "context": "You shared {count, plural, =1{this parallel} other{these parallels}} with other users. By deleting {count, plural, =1{it} other{them}}, you will remove their access to the {count, plural, =1{parallel} other{parallels}}."
   },
   {
     "term": "component.delete-shared-petitions-dialog.petition-body-2",
-    "definition": "¿Estás seguro de querer eliminar {count, plural, =1{<b>{name}</b>} other{las <b>#</b> peticiones seleccionadas}}?",
-    "context": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the <b>#</b> selected petitions}}?"
+    "definition": "¿Estás seguro de querer eliminar {count, plural, =1{<b>{name}</b>} other{las <b>#</b> parallels seleccionados}}?",
+    "context": "Are you sure you want to delete {count, plural, =1{<b>{name}</b>} other{the <b>#</b> selected parallels}}?"
   },
   {
     "term": "component.delete-shared-petitions-dialog.petition-header",
-    "definition": "Eliminar {count, plural, =1 {petición compartida} other {peticiones compartidas}}",
-    "context": "Delete shared {count, plural, =1 {petition} other {petitions}}"
+    "definition": "Eliminar {count, plural, =1 {parallel compartido} other {parallels compartidos}}",
+    "context": "Delete shared {count, plural, =1 {parallel} other {parallels}}"
   },
   {
     "term": "component.delete-shared-petitions-dialog.template-body-1",
@@ -896,8 +896,8 @@
   },
   {
     "term": "component.delete-signature-error-confirmation.body",
-    "definition": "Se {count, plural, =1 {ha detectado <b>#</b> plantilla o petición que utiliza} other {han detectado <b>#</b> plantillas o peticiones que utilizan}} este token. Si lo eliminas, la configuración se borrará y todos los procesos de firma pendientes se cancelarán. ¿Estás seguro de querer eliminarlo?",
-    "context": "We have detected <b>{count}</b> petitions or templates using this token. If you delete it, the configuration will be reset and all pending signature processes will be cancelled. Are you sure you want to delete it?"
+    "definition": "Se {count, plural, =1 {ha detectado <b>#</b> plantilla o parallel que utiliza} other {han detectado <b>#</b> plantillas o parallels que utilizan}} este token. Si lo eliminas, la configuración se borrará y todos los procesos de firma pendientes se cancelarán. ¿Estás seguro de querer eliminarlo?",
+    "context": "We have detected <b>{count}</b> parallels or templates using this token. If you delete it, the configuration will be reset and all pending signature processes will be cancelled. Are you sure you want to delete it?"
   },
   {
     "term": "component.delete-signature-error-confirmation.title",
@@ -926,8 +926,8 @@
   },
   {
     "term": "component.document-theme-editor.legal-disclaimer-description",
-    "definition": "Este texto se mostrará al final de los documentos que incluyan un proceso de firma. El idioma se adaptará al idioma de la petición.",
-    "context": "This text will be displayed at the end of documents that include a signature process. The language will be adapted to the language of the petition."
+    "definition": "Este texto se mostrará al final de los documentos que incluyan un proceso de firma. El idioma se adaptará al idioma del parallel.",
+    "context": "This text will be displayed at the end of documents that include a signature process. The language will be adapted to the language of the parallel."
   },
   {
     "term": "component.document-theme-editor.margin-bottom",
@@ -1301,8 +1301,8 @@
   },
   {
     "term": "component.loading-dynamic-text.dusting-off",
-    "definition": "Desempolvando peticiones cerradas...",
-    "context": "Dusting off closed petitions..."
+    "definition": "Desempolvando parallels cerrados...",
+    "context": "Dusting off closed parallels..."
   },
   {
     "term": "component.loading-dynamic-text.giving-color",
@@ -1310,14 +1310,14 @@
     "context": "Giving color to the charts..."
   },
   {
-    "term": "component.loading-dynamic-text.searching-petitions",
-    "definition": "Buscando peticiones en cada rincón...",
-    "context": "Searching for petitions in every corner..."
+    "term": "component.loading-dynamic-text.searching-parallels",
+    "definition": "Buscando parallels en cada rincón...",
+    "context": "Searching for parallels in every corner..."
   },
   {
     "term": "component.message-closing-email-editor.body-label",
-    "definition": "El asunto de este correo será el mismo que el del mensaje de la petición.",
-    "context": "The subject of this email will be the same as the subject of the petition message."
+    "definition": "El asunto de este correo será el mismo que el del mensaje del parallel.",
+    "context": "The subject of this email will be the same as the subject of the parallel message."
   },
   {
     "term": "component.message-email-editor.body-required-error",
@@ -1336,8 +1336,8 @@
   },
   {
     "term": "component.message-email-editor.subject-required-error",
-    "definition": "El asunto ayuda al destinatario entender mejor el contexto de la petición",
-    "context": "A subject helps the recipient understand the context of your petition"
+    "definition": "El asunto ayuda al destinatario entender mejor el contexto de tu parallel",
+    "context": "A subject helps the recipient understand the context of your parallel"
   },
   {
     "term": "component.message-events-indicator.bounced-explanation",
@@ -1471,8 +1471,8 @@
   },
   {
     "term": "component.notification-access-activated-link.body",
-    "definition": "{name} creó la petición desde un enlace público.",
-    "context": "{name} created the petition from a public link."
+    "definition": "{name} creó el parallel desde un enlace público.",
+    "context": "{name} created the parallel from a public link."
   },
   {
     "term": "component.notification-comment.body",
@@ -1481,8 +1481,8 @@
   },
   {
     "term": "component.notification-email-bounced.body",
-    "definition": "Error al enviar la petición a {name}.",
-    "context": "Error sending petition to recipient {name}."
+    "definition": "Error al enviar el parallel a {name}.",
+    "context": "Error sending the parallel to recipient {name}."
   },
   {
     "term": "component.notification-internal-comment.body",
@@ -1491,18 +1491,18 @@
   },
   {
     "term": "component.notification-petition-completed.body",
-    "definition": "{name} completó la petición.",
-    "context": "{name} completed the petition."
+    "definition": "{name} completó el parallel.",
+    "context": "{name} completed the parallel."
   },
   {
     "term": "component.notification-petition-shared-group.body",
-    "definition": "{name} ha compartido la {isTemplate, select, true {plantilla} other {petición}} con el equipo \"{group}\" al que perteneces.",
-    "context": "{name} has shared the {isTemplate, select, true {template} other {petition}} with the team \"{group}\" to which you belong."
+    "definition": "{name} ha compartido {isTemplate, select, true {la plantilla} other {el parallel}} con el equipo \"{group}\" al que perteneces.",
+    "context": "{name} has shared the {isTemplate, select, true {template} other {parallel}} with the team \"{group}\" to which you belong."
   },
   {
     "term": "component.notification-petition-shared.body",
-    "definition": "{name} te ha compartido la {isTemplate, select, true {plantilla} other {petición}} como {permissionType}.",
-    "context": "{name} has shared the {isTemplate, select, true {template} other {petition}} with you as {permissionType}."
+    "definition": "{name} te ha compartido {isTemplate, select, true {la plantilla} other {el parallel}} como {permissionType}.",
+    "context": "{name} has shared the {isTemplate, select, true {template} other {parallel}} with you as {permissionType}."
   },
   {
     "term": "component.notification-reminder-bounced.body",
@@ -1612,7 +1612,7 @@
   {
     "term": "component.password-restrict-petition.body",
     "definition": "La edición está protegida. Introduce la contraseña para desbloquear la restricción.",
-    "context": "This petition is protected. Enter the password to unlock it."
+    "context": "This parallel is protected. Enter the password to unlock it."
   },
   {
     "term": "component.password-restrict-petition.title",
@@ -1626,8 +1626,8 @@
   },
   {
     "term": "component.petition-attachments-card.no-attachments",
-    "definition": "No se han adjuntado archivos a esta petición.",
-    "context": "No files have been attached to this petition."
+    "definition": "No se han adjuntado archivos a este parallel.",
+    "context": "No files have been attached to this parallel."
   },
   {
     "term": "component.petition-comments-and-notes.comments",
@@ -1651,8 +1651,8 @@
   },
   {
     "term": "component.petition-completed-alert.description",
-    "definition": "<b>Petición completada,</b> si realizas cualquier cambio, se deberá <b>finalizar la petición</b> de nuevo.",
-    "context": "<b>Petition completed</b>, if you make any changes, the petition must be <b>finalized again</b>."
+    "definition": "<b>Parallel completado,</b> si realizas cualquier cambio, se deberá <b>finalizar el parallel</b> de nuevo.",
+    "context": "<b>Parallel completed</b>, if you make any changes, the parallel must be <b>finalized again</b>."
   },
   {
     "term": "component.petition-compliance-period-dialog.anonymize-after-label",
@@ -1661,8 +1661,8 @@
   },
   {
     "term": "component.petition-compliance-period-dialog.explainer",
-    "definition": "Este plazo comenzará al cerrarse {type, select, PETITION{esta petición} other{una petición creada desde esta plantilla}}, tras el cuál, los datos que contenga serán anonimizados.",
-    "context": "This period will start from the closing of {type, select, PETITION{this petition} other{a petition created from this template}}, once completed, the data contained will be anonymized."
+    "definition": "Este plazo comenzará al cerrarse {type, select, PETITION{este parallel} other{un parallel creado desde esta plantilla}}, tras el cuál, los datos que contenga serán anonimizados.",
+    "context": "This period will start from the closing of {type, select, PETITION{this parallel} other{a parallel created from this template}}, once completed, the data contained will be anonymized."
   },
   {
     "term": "component.petition-compliance-period-dialog.header",
@@ -1716,8 +1716,8 @@
   },
   {
     "term": "component.petition-compose-field.drag-to-sort-label",
-    "definition": "Arrastrar para ordenar los campos de la petición",
-    "context": "Drag to sort this petition fields"
+    "definition": "Arrastrar para ordenar los campos del parallel",
+    "context": "Drag to sort this parallel fields"
   },
   {
     "term": "component.petition-compose-field.drop-files-to-attach",
@@ -1831,7 +1831,7 @@
   },
   {
     "term": "component.petition-contents.signature-status",
-    "definition": "Firma digital de petición",
+    "definition": "Firma digital de parallel",
     "context": "Petition eSignature"
   },
   {
@@ -2076,18 +2076,18 @@
   },
   {
     "term": "component.petition-from-template-dialog.body",
-    "definition": "Esta petición se ha creado a partir de una plantilla. Los cambios sobre campos o ajustes, afectarán <b>sólamente a esta petición</b>.",
-    "context": "This petition has been created from a template. Changes to fields or settings will <b>only affect this petition</b>."
+    "definition": "Este parallel se ha creado a partir de una plantilla. Los cambios sobre campos o ajustes, afectarán <b>sólamente a este parallel</b>.",
+    "context": "This parallel has been created from a template. Changes to fields or settings will <b>only affect this parallel</b>."
   },
   {
     "term": "component.petition-from-template-dialog.body-2",
-    "definition": "Si quieres que tus cambios se mantengan en todas las peticiones, hazlos desde la plantilla.",
-    "context": "If you want your changes to be maintained in all petitions, make them from the template."
+    "definition": "Si quieres que tus cambios se mantengan en todos los parallel, hazlos desde la plantilla.",
+    "context": "If you want your changes to be maintained in all parallels, make them from the template."
   },
   {
     "term": "component.petition-from-template-dialog.title",
-    "definition": "Editar petición",
-    "context": "Edit petition"
+    "definition": "Editar parallel",
+    "context": "Edit parallel"
   },
   {
     "term": "component.petition-header.compose-tab.readonly",
@@ -2096,8 +2096,8 @@
   },
   {
     "term": "component.petition-header.delete-label",
-    "definition": "Eliminar petición",
-    "context": "Delete petition"
+    "definition": "Eliminar parallel",
+    "context": "Delete parallel"
   },
   {
     "term": "component.petition-header.download-results",
@@ -2106,8 +2106,8 @@
   },
   {
     "term": "component.petition-header.duplicate-label",
-    "definition": "Duplicar petición",
-    "context": "Duplicate petition"
+    "definition": "Duplicar parallel",
+    "context": "Duplicate parallel"
   },
   {
     "term": "component.petition-header.export-pdf",
@@ -2116,13 +2116,13 @@
   },
   {
     "term": "component.petition-header.not-subscribed-description",
-    "definition": "No recibir notificaciones sobre esta petición.",
-    "context": "Don't get notifications about this petition."
+    "definition": "No recibir notificaciones sobre este parallel.",
+    "context": "Don't get notifications about this parallel."
   },
   {
     "term": "component.petition-header.reopen-button",
-    "definition": "Reabrir petición",
-    "context": "Reopen petition"
+    "definition": "Reabrir parallel",
+    "context": "Reopen parallel"
   },
   {
     "term": "component.petition-header.save-as-template-button",
@@ -2131,28 +2131,28 @@
   },
   {
     "term": "component.petition-header.share-label",
-    "definition": "Compartir petición",
-    "context": "Share petition"
+    "definition": "Compartir parallel",
+    "context": "Share parallel"
   },
   {
     "term": "component.petition-header.subscribed-description",
-    "definition": "Recibir notificaciones sobre actividad en esta petición.",
-    "context": "Get email notifications about activity in this petition."
+    "definition": "Recibir notificaciones sobre actividad en este parallel.",
+    "context": "Get email notifications about activity in this parallel."
   },
   {
     "term": "component.petition-limit-reached-alert.title",
-    "definition": "Parece que has alcanzado el límite de {limit} peticiones, <a>contacta con nosotros para mejorar tu plan.</a>",
-    "context": "It seems that you have reached your limit of {limit} petitions, <a>reach out to us to upgrade your plan.</a>"
+    "definition": "Parece que has alcanzado el límite de {limit} parallels, <a>contacta con nosotros para mejorar tu plan.</a>",
+    "context": "It seems that you have reached your limit of {limit} parallels, <a>reach out to us to upgrade your plan.</a>"
   },
   {
     "term": "component.petition-limit-reached-error-dialog.header",
-    "definition": "Error al enviar la petición",
-    "context": "Error sending the petition"
+    "definition": "Error al enviar el parallel",
+    "context": "Error sending the parallel"
   },
   {
     "term": "component.petition-limit-reached-error-dialog.message",
-    "definition": "Has alcanzado el límite de peticiones enviadas, <a>contacta con nosotros para mejorar tu plan.</a>",
-    "context": "You have reached your limit of petitions sent, <a>reach out to us to upgrade your plan.</a>"
+    "definition": "Has alcanzado el límite de parallels enviados, <a>contacta con nosotros para mejorar tu plan.</a>",
+    "context": "You have reached your limit of parallels sent, <a>reach out to us to upgrade your plan.</a>"
   },
   {
     "term": "component.petition-list-shared-with-filter.add-filter",
@@ -2231,8 +2231,8 @@
   },
   {
     "term": "component.petition-permission-row.default-owner",
-    "definition": "Usuario que inicia la petición",
-    "context": "Person starting the petition"
+    "definition": "Usuario que inicia el parallel",
+    "context": "Person starting the parallel"
   },
   {
     "term": "component.petition-preview-signature-review-alert.signature-required",
@@ -2251,13 +2251,13 @@
   },
   {
     "term": "component.petition-progress-bar.completed",
-    "definition": "Esta petición se ha completado.",
-    "context": "This petition is completed."
+    "definition": "Este parallel se ha completado.",
+    "context": "This parallel is completed."
   },
   {
     "term": "component.petition-progress-bar.no-fields",
-    "definition": "Esta petición no tiene campos.",
-    "context": "This petition has no fields."
+    "definition": "Este parallel no tiene campos.",
+    "context": "This parallel has no fields."
   },
   {
     "term": "component.petition-progress-bar.not-replied-with-internal",
@@ -2286,8 +2286,8 @@
   },
   {
     "term": "component.petition-reminder-settings.next-reminder",
-    "definition": "Después de enviar la petición, el primer recordatorio se enviará el {date} y hasta un máximo de 10 recordatorios se enviarán cada {days, plural, =1 {día} other {# días}} a las {time} hasta que la petición se complete",
-    "context": "After sending the petition, the first reminder will be sent on {date} and up to 10 reminders will be sent {days, plural, =1 {everyday} other {every # days}} at {time} until the petition is completed."
+    "definition": "Después de enviar el parallel, el primer recordatorio se enviará el {date} y hasta un máximo de 10 recordatorios se enviarán cada {days, plural, =1 {día} other {# días}} a las {time} hasta que el parallel se complete",
+    "context": "After sending the parallel, the first reminder will be sent on {date} and up to 10 reminders will be sent {days, plural, =1 {everyday} other {every # days}} at {time} until the parallel is completed."
   },
   {
     "term": "component.petition-reminder-settings.only-weekdays",
@@ -2356,13 +2356,13 @@
   },
   {
     "term": "component.petition-settings.adjustments-for-petitions",
-    "definition": "Ajustes para las peticiones",
-    "context": "Petition settings"
+    "definition": "Ajustes para los parallels",
+    "context": "Settings for parallels"
   },
   {
     "term": "component.petition-settings.adjustments-petitions",
-    "definition": "Ajustes de la petición",
-    "context": "Petition settings"
+    "definition": "Ajustes del parallel",
+    "context": "Parallel settings"
   },
   {
     "term": "component.petition-settings.adjustments-template",
@@ -2381,8 +2381,8 @@
   },
   {
     "term": "component.petition-settings.compliance-period-description",
-    "definition": "Establece el plazo de conservación de los datos recogidos con esta {type, select, PETITION {petición} other{plantilla}} según su finalidad. El plazo comenzará desde el cierre de la misma, tras el cuál, los datos serán anonimizados.",
-    "context": "Set the retention period of the data collected with this {type, select, PETITION {petition} other{template}} according to its purpose. The period will start from the closing of the petition, after which the data will be anonymized."
+    "definition": "Establece el plazo de conservación de los datos recogidos con {type, select, PETITION {este parallel} other{esta plantilla}} según su finalidad. El plazo comenzará desde el cierre de la misma, tras el cuál, los datos serán anonimizados.",
+    "context": "Set the retention period of the data collected with this {type, select, PETITION {parallel} other{template}} according to its purpose. The period will start from the closing of the parallel, after which the data will be anonymized."
   },
   {
     "term": "component.petition-settings.compliance-updated.toast-description",
@@ -2406,8 +2406,8 @@
   },
   {
     "term": "component.petition-settings.from-template-information",
-    "definition": "Petición creada a partir de {name}.",
-    "context": "Petition created from the {name}."
+    "definition": "Parallel creado a partir de {name}.",
+    "context": "Parallel created from the {name}."
   },
   {
     "term": "component.petition-settings.hide-recipient-view-contents",
@@ -2456,8 +2456,8 @@
   },
   {
     "term": "component.petition-settings.restrict-editing-description",
-    "definition": "Activa esta opción para prevenir que otros usuarios hagan cambios accidentalmente en esta petición.",
-    "context": "Enable this option to prevent users from accidentally making changes to this petition."
+    "definition": "Activa esta opción para prevenir que otros usuarios hagan cambios accidentalmente en este parallel.",
+    "context": "Enable this option to prevent users from accidentally making changes to this parallel."
   },
   {
     "term": "component.petition-settings.share-automatically",
@@ -2466,8 +2466,8 @@
   },
   {
     "term": "component.petition-settings.share-automatically-description",
-    "definition": "Indica los usuarios y equipos a los que quieras que se compartan las peticiones creadas a partir de esta plantilla.",
-    "context": "Specify which users or teams the petitions created from this template are shared with"
+    "definition": "Indica los usuarios y equipos a los que quieras que se compartan los parallels creados a partir de esta plantilla.",
+    "context": "Specify which users or teams the parallels created from this template are shared with."
   },
   {
     "term": "component.petition-settings.share-by-link",
@@ -2476,13 +2476,13 @@
   },
   {
     "term": "component.petition-settings.share-by-link-description",
-    "definition": "Comparte un enlace abierto para que tus clientes puedan crear peticiones por su cuenta. Estas, serán gestionadas por el propietario.",
-    "context": "Share an open link that allows your clients create petitions by themselves. They will be managed by the owner."
+    "definition": "Comparte un enlace abierto para que tus clientes puedan crear parallels por su cuenta. Estas, serán gestionadas por el propietario.",
+    "context": "Share an open link that allows your clients create parallels by themselves. They will be managed by the owner."
   },
   {
     "term": "component.petition-settings.signature-description",
-    "definition": "Genera un documento e inicia un proceso de firma digital al completar la petición, a través de uno de nuestros proveedores integrados.",
-    "context": "Generates a document and iniciates an eSignature process upon completion of the petition, through one of our integrated providers."
+    "definition": "Genera un documento e inicia un proceso de firma digital al completar el parallel, a través de uno de nuestros proveedores integrados.",
+    "context": "Generates a document and iniciates an eSignature process upon completion of the parallel, through one of our integrated providers."
   },
   {
     "term": "component.petition-settings.skip-forward-security",
@@ -2506,8 +2506,8 @@
   },
   {
     "term": "component.petition-sharing-dialog.subscribe-help",
-    "definition": "Los usuarios recibirán notificaciones sobre la actividad de esta petición.",
-    "context": "Users will receive notifications about the activity of this petition."
+    "definition": "Los usuarios recibirán notificaciones sobre la actividad de este parallel.",
+    "context": "Users will receive notifications about the activity of this parallel."
   },
   {
     "term": "component.petition-sigatures-card.awaiting",
@@ -2571,7 +2571,7 @@
   },
   {
     "term": "component.petition-signatures-card.header",
-    "definition": "Firma digital de petición",
+    "definition": "Firma digital de parallel",
     "context": "Petition eSignature"
   },
   {
@@ -2581,8 +2581,8 @@
   },
   {
     "term": "component.petition-signatures-card.no-signature-configured",
-    "definition": "No se ha configurado la firma para esta petición",
-    "context": "No signature has been configured for this petition."
+    "definition": "No se ha configurado la firma para este parallel",
+    "context": "No signature has been configured for this parallel."
   },
   {
     "term": "component.petition-signatures-card.previous-signatures",
@@ -2626,7 +2626,7 @@
   },
   {
     "term": "component.petition-template-closing-message.card-explainer",
-    "definition": "Este mensaje se utilizará al seleccionar la opción <b>notificar al destinatario</b> para notificar de la revisión y el cierre de la petición.",
+    "definition": "Este mensaje se utilizará al seleccionar la opción <b>notificar al destinatario</b> para notificar de la revisión y el cierre del parallel.",
     "context": "This message will be used when selecting the option <b>notify recipients</b> to notify that it has been reviewed and closed."
   },
   {
@@ -2641,8 +2641,8 @@
   },
   {
     "term": "component.petition-template-completing-message.card-explainer",
-    "definition": "Este mensaje se mostrará cuando el destinatario <b>complete</b> la petición. Úsalo para agradecer su tiempo o incluir instrucciones acerca de los siguientes pasos.",
-    "context": "This message will be shown when the recipient <b>completes</b> the petition. Use it to thank them or to include further instructions."
+    "definition": "Este mensaje se mostrará cuando el destinatario <b>complete</b> el parallel. Úsalo para agradecer su tiempo o incluir instrucciones acerca de los siguientes pasos.",
+    "context": "This message will be shown when the recipient <b>completes</b> the parallel. Use it to thank them or to include further instructions."
   },
   {
     "term": "component.petition-template-completing-message.card-header",
@@ -2671,13 +2671,13 @@
   },
   {
     "term": "component.petition-template-request-message.card-explainer",
-    "definition": "Este mensaje se utilizará <b>cuando se envíe</b> la petición a los destinatarios.",
-    "context": "This message will be used <b>when sending</b> the petition to the recipients."
+    "definition": "Este mensaje se utilizará <b>cuando se envíe</b> el parallel a los destinatarios.",
+    "context": "This message will be used <b>when sending</b> the parallel to the recipients."
   },
   {
     "term": "component.petition-template-request-message.card-header",
-    "definition": "Mensaje de la petición",
-    "context": "Petition message"
+    "definition": "Mensaje del parallel",
+    "context": "Parallel message"
   },
   {
     "term": "component.petition-template.delete-label",
@@ -2966,8 +2966,8 @@
   },
   {
     "term": "component.public-signup-form-organization.company-name-description",
-    "definition": "Este será el nombre que aparecerá en tus peticiones, elige uno que tus clientes puedan reconocer.",
-    "context": "This is the name that will appear in your petitions, so make sure it is the one your customers will recognize."
+    "definition": "Este será el nombre que aparecerá en tus parallels, elige uno que tus clientes puedan reconocer.",
+    "context": "This is the name that will appear in your parallels, so make sure it is the one your customers will recognize."
   },
   {
     "term": "component.public-signup-form-organization.company-name-label",
@@ -3111,8 +3111,8 @@
   },
   {
     "term": "component.recipient-select-groups.recipients-nth-group",
-    "definition": "({number}ª petición)",
-    "context": "({number, selectordinal, one{#st} two{#nd} few{#rd} other{#th}} petition)"
+    "definition": "({number, selectordinal, one{#er} other{#°}} parallel)",
+    "context": "({number, selectordinal, one{#st} two{#nd} few{#rd} other{#th}} parallel)"
   },
   {
     "term": "component.recipient-select-groups.recipients-placeholder",
@@ -3131,8 +3131,8 @@
   },
   {
     "term": "component.recipient-select-groups.same-petition-warning",
-    "definition": "Todos los {recipientCount} destinatarios recibirán un enlace a la misma petición para rellenarla de forma colaborativa. Añade un <b>grupo de destinatarios</b> para enviar diferentes peticiones a cada grupo.",
-    "context": "All {recipientCount} recipients will receive a link to the same petition so they can fill it out collaboratively. Add a <b>recipient group</b> to send different petitions to each group."
+    "definition": "Todos los {recipientCount} destinatarios recibirán un enlace al mismo parallel para rellenarlo de forma colaborativa. Añade un <b>grupo de destinatarios</b> para enviar diferentes parallels a cada grupo.",
+    "context": "All {recipientCount} recipients will receive a link to the same parallel so they can fill it out collaboratively. Add a <b>recipient group</b> to send different parallels to each group."
   },
   {
     "term": "component.recipient-select-groups.unknown-contacts-header",
@@ -3516,8 +3516,8 @@
   },
   {
     "term": "component.rename-dialog.header-petition",
-    "definition": "Renombrar petición",
-    "context": "Rename petition"
+    "definition": "Renombrar parallel",
+    "context": "Rename parallel"
   },
   {
     "term": "component.rename-dialog.header-template",
@@ -3545,19 +3545,19 @@
     "context": "Pending"
   },
   {
-    "term": "component.reports-doughnut-chart.status-of-petitions",
-    "definition": "Estado de las peticiones",
-    "context": "Status of the petitions"
+    "term": "component.reports-doughnut-chart.status-of-parallels",
+    "definition": "Estado de los parallels",
+    "context": "Status of the parallels"
   },
   {
-    "term": "component.reports-doughnut-chart.status-of-petitions-help-1",
-    "definition": "Este es el número de peticiones actual en cada estado.",
-    "context": "This shows the current number of petitions in each state."
+    "term": "component.reports-doughnut-chart.status-of-parallels-help-1",
+    "definition": "Este es el número de parallels actual en cada estado.",
+    "context": "This shows the current number of parallels in each state."
   },
   {
-    "term": "component.reports-doughnut-chart.status-of-petitions-help-2",
-    "definition": "La suma de todos es el total de peticiones creadas.",
-    "context": "The sum of all is the total number of petitions created."
+    "term": "component.reports-doughnut-chart.status-of-parallels-help-2",
+    "definition": "La suma de todos es el total de parallels creados.",
+    "context": "The sum of all is the total number of parallels created."
   },
   {
     "term": "component.reports-error-message.contact-support",
@@ -3711,8 +3711,8 @@
   },
   {
     "term": "component.settings-public-link-dialog.description",
-    "definition": "Genera un enlace que permita a terceros comenzar una petición. Estas peticiones se asignarán por defecto al propietario de la plantilla.",
-    "context": "Generates a link that allows third parties to start a petition. These petitions will be assigned by default to the template owner."
+    "definition": "Genera un enlace que permita a terceros comenzar un parallel. Estos parallels se asignarán por defecto al propietario de la plantilla.",
+    "context": "Generates a link that allows third parties to start a parallel. These parallels will be assigned by default to the template owner."
   },
   {
     "term": "component.settings-public-link-dialog.description-error",
@@ -3781,8 +3781,8 @@
   },
   {
     "term": "component.settings-public-link-dialog.prefill-secret-popover",
-    "definition": "Secreto del JWT usado para verificar la integridad del parametro usado para autorrellenar la petición. Debe estar definido en caso de que uses el parámetro <b>prefill</b> en el enlace.",
-    "context": "JWT secret used to verify the integrity of the parameter passed to prefill the petition. This must be set in case you use the <b>prefill</b> query parameter in your link."
+    "definition": "Secreto del JWT usado para verificar la integridad del parametro usado para autorrellenar el parallel. Debe estar definido en caso de que uses el parámetro <b>prefill</b> en el enlace.",
+    "context": "JWT secret used to verify the integrity of the parameter passed to prefill the parallel. This must be set in case you use the <b>prefill</b> query parameter in your link."
   },
   {
     "term": "component.settings-public-link-dialog.title",
@@ -3801,8 +3801,8 @@
   },
   {
     "term": "component.share-button.petition-not-shared",
-    "definition": "Esta petición no se ha compartido todavía.",
-    "context": "This petition has not been shared yet."
+    "definition": "Este parallel no se ha compartido todavía.",
+    "context": "This parallel has not been shared yet."
   },
   {
     "term": "component.share-button.shared-with",
@@ -3871,8 +3871,8 @@
   },
   {
     "term": "component.signature-config-dialog.review-before-send.option-no",
-    "definition": "Al completar la petición",
-    "context": "After the petition is completed"
+    "definition": "Al completar el parallel",
+    "context": "After the parallel is completed"
   },
   {
     "term": "component.signature-config-dialog.review-before-send.option-yes",
@@ -3901,8 +3901,8 @@
   },
   {
     "term": "component.signature-config-dialog.template-alert",
-    "definition": "Se asignarán estos firmantes a todas las peticiones que se creen desde esta plantilla.",
-    "context": "These signers will be assigned to all petitions created from this template."
+    "definition": "Se asignarán estos firmantes a todas los parallels que se creen desde esta plantilla.",
+    "context": "These signers will be assigned to all parallels created from this template."
   },
   {
     "term": "component.signature-config-dialog.title-help",
@@ -4031,8 +4031,8 @@
   },
   {
     "term": "component.template-default-permissions-dialog.description",
-    "definition": "Al utilizar la plantilla, se asignará la petición a los usuarios que indiques.",
-    "context": "Upon using this template, petitions will automatically be assigned to these users."
+    "definition": "Al utilizar la plantilla, se asignará el parallel a los usuarios que indiques.",
+    "context": "Upon using this template, parallels will automatically be assigned to these users."
   },
   {
     "term": "component.template-default-permissions-dialog.subscribe",
@@ -4041,8 +4041,8 @@
   },
   {
     "term": "component.template-default-permissions-dialog.subscribe-explanation",
-    "definition": "Los usuarios recibirán notificaciones de las peticiones creadas a partir de esta plantilla.",
-    "context": "These users will be receive notifications from the petitions created from this template."
+    "definition": "Los usuarios recibirán notificaciones de los parallels creadas a partir de esta plantilla.",
+    "context": "These users will be receive notifications from the parallels created from this template."
   },
   {
     "term": "component.template-details-modal.about",
@@ -4101,13 +4101,13 @@
   },
   {
     "term": "component.template-icon-compliance.text",
-    "definition": "Los datos de las peticiones cerradas se anonimizarán tras {months, plural, =1 {# mes} other {# meses}}.",
-    "context": "Data of closed petitions will be anonymized after {months, plural, =1 {# month} other {# months}}."
+    "definition": "Los datos de los parallels cerrados se anonimizarán tras {months, plural, =1 {# mes} other {# meses}}.",
+    "context": "Data of closed parallels will be anonymized after {months, plural, =1 {# month} other {# months}}."
   },
   {
     "term": "component.template-icon-default-permissions.text",
-    "definition": "Las peticiones se asignarán a:",
-    "context": "Petitions will be assigned to:"
+    "definition": "Los parallels se asignarán a:",
+    "context": "Parallels will be assigned to:"
   },
   {
     "term": "component.template-icon-reminders.text",
@@ -4116,8 +4116,8 @@
   },
   {
     "term": "component.template-icon-signature.esignature-active-no-review",
-    "definition": "Se iniciará una firma digital al completar la petición",
-    "context": "A eSignature will be initiated upon completion of the petition"
+    "definition": "Se iniciará una firma digital al completar el parallel",
+    "context": "A eSignature will be initiated upon completion of the parallel"
   },
   {
     "term": "component.template-icon-signature.esignature-active-review",
@@ -4281,13 +4281,13 @@
   },
   {
     "term": "components.multiple-emails-pasted-dialog.message-2",
-    "definition": "¿Quieres añadirlos en <b>grupos separados</b> (recibirán peticiones diferentes) o <b>agruparlos en una única petición</b>?",
-    "context": "Do you want to add them to <b>separate groups</b> (they will fill different petitions) or <b>group them in the same petition</b>?"
+    "definition": "¿Quieres añadirlos en <b>grupos separados</b> (recibirán parallels diferentes) o <b>agruparlos en un único parallel</b>?",
+    "context": "Do you want to add them to <b>separate groups</b> (they will fill different parallels) or <b>group them in the same parallel</b>?"
   },
   {
     "term": "components.multiple-emails-pasted-dialog.same-group",
-    "definition": "Todos en una única petición",
-    "context": "All in the same petition"
+    "definition": "Todos en un único parallel",
+    "context": "All in the same parallel"
   },
   {
     "term": "components.multiple-emails-pasted-dialog.separate-groups",
@@ -4401,13 +4401,13 @@
   },
   {
     "term": "contact.no-petitions",
-    "definition": "No has enviado peticiones a {name, select, null {este contacto} other {{name}}} todavía",
-    "context": "You haven't sent any petitions to {name, select, null {this contact} other {{name}}} yet"
+    "definition": "No has enviado parallels a {name, select, null {este contacto} other {{name}}} todavía",
+    "context": "You haven't sent any parallels to {name, select, null {this contact} other {{name}}} yet"
   },
   {
     "term": "contact.petitions-header",
-    "definition": "Peticiones enviadas{name, select, null {} other { a {name}}}",
-    "context": "Petitions sent{name, select, null {} other { to {name}}}"
+    "definition": "Parallels enviados{name, select, null {} other { a {name}}}",
+    "context": "Parallels sent{name, select, null {} other { to {name}}}"
   },
   {
     "term": "contacts.create-new-contact.header",
@@ -4531,8 +4531,8 @@
   },
   {
     "term": "error.petition-not-available.header",
-    "definition": "Parece que esta petición ya no está disponible.",
-    "context": "It seems that this petition is no longer available."
+    "definition": "Parece que este parallel ya no está disponible.",
+    "context": "It seems that this parallel is no longer available."
   },
   {
     "term": "error.petition-not-available.text",
@@ -4851,8 +4851,8 @@
   },
   {
     "term": "generic.create-petition",
-    "definition": "Crear petición",
-    "context": "Create petition"
+    "definition": "Crear parallel",
+    "context": "Create parallel"
   },
   {
     "term": "generic.created-at",
@@ -5285,34 +5285,34 @@
     "context": "Page break"
   },
   {
-    "term": "generic.petition-name",
-    "definition": "Nombre de la petición",
-    "context": "Petition name"
+    "term": "generic.parallel-name",
+    "definition": "Nombre del parallel",
+    "context": "Parallel name"
   },
   {
-    "term": "generic.petition-status.closed",
+    "term": "generic.parallel-status.closed",
     "definition": "Cerrada",
     "context": "Closed"
   },
   {
-    "term": "generic.petition-status.completed",
+    "term": "generic.parallel-status.completed",
     "definition": "Completada",
     "context": "Completed"
   },
   {
-    "term": "generic.petition-status.draft",
+    "term": "generic.parallel-status.draft",
     "definition": "Borrador",
     "context": "Draft"
   },
   {
-    "term": "generic.petition-status.pending",
+    "term": "generic.parallel-status.pending",
     "definition": "Pendiente",
     "context": "Pending"
   },
   {
-    "term": "generic.petition-type-plural",
-    "definition": "Peticiones",
-    "context": "Petitions"
+    "term": "generic.parallel-type-plural",
+    "definition": "Parallels",
+    "context": "Parallels"
   },
   {
     "term": "generic.plans.enterprise",
@@ -5520,9 +5520,9 @@
     "context": "unlimited"
   },
   {
-    "term": "generic.unnamed-petition",
-    "definition": "Petición sin nombre",
-    "context": "Unnamed petition"
+    "term": "generic.unnamed-parallel",
+    "definition": "Parallel sin nombre",
+    "context": "Unnamed parallel"
   },
   {
     "term": "generic.unnamed-template",
@@ -5636,8 +5636,8 @@
   },
   {
     "term": "new-petition.title",
-    "definition": "Nueva petición",
-    "context": "New petition"
+    "definition": "Nuevo parallel",
+    "context": "New parallel"
   },
   {
     "term": "organization-groups.add-user",
@@ -5786,8 +5786,8 @@
   },
   {
     "term": "organization.branding.parallel-branding-description",
-    "definition": "Muestra la marca de Parallel en todos los correos y peticiones que se envíen.",
-    "context": "Displays the Parallel branding on all emails and requests that are sent."
+    "definition": "Muestra la marca de Parallel en todos los correos y parallels que se envíen.",
+    "context": "Displays the Parallel branding on all emails and parallels that are sent."
   },
   {
     "term": "organization.branding.parallel-branding-header",
@@ -5851,8 +5851,8 @@
   },
   {
     "term": "organization.confirm-deactivate-user-dialog.transfer-to-user",
-    "definition": "Para continuar, debes seleccionar un usuario en tu organización para transferirle todas las peticiones de{count, plural, =1{l usuario} other { los usuarios}} a desactivar.",
-    "context": "To continue, you must select a user from your organization to transfer all the petitions of the {count, plural, =1{user} other {users}} to deactivate."
+    "definition": "Para continuar, debes seleccionar un usuario en tu organización para transferirle todos los parallels de{count, plural, =1{l usuario} other { los usuarios}} a desactivar.",
+    "context": "To continue, you must select a user from your organization to transfer all the parallels of the {count, plural, =1{user} other {users}} to deactivate."
   },
   {
     "term": "organization.confirm-deactivate.user-select.input-error",
@@ -5931,8 +5931,8 @@
   },
   {
     "term": "organization.integrations.signaturit-description",
-    "definition": "Añade firma digital a tus peticiones.",
-    "context": "Add digital signature to your petitions."
+    "definition": "Añade firma digital a tus parallels.",
+    "context": "Add digital signature to your parallels."
   },
   {
     "term": "organization.integrations.title",
@@ -6020,9 +6020,9 @@
     "context": "Organization name"
   },
   {
-    "term": "organizations.header.petitions-used",
-    "definition": "Peticiones utilizadas",
-    "context": "Petitions used"
+    "term": "organizations.header.parallels-used",
+    "definition": "Parallels utilizados",
+    "context": "Parallels used"
   },
   {
     "term": "organizations.header.status",
@@ -6061,8 +6061,8 @@
   },
   {
     "term": "page.compliance.description-text-2",
-    "definition": "Puedes configurar el <b>periodo de conservación</b> desde el <b>cierre</b> de las peticiones, tras el cuál, los datos serán anonimizados.",
-    "context": "You can set the <b>retention period</b> from the <b>closing</b> of the petitions, after which the data will be anonymized."
+    "definition": "Puedes configurar el <b>periodo de conservación</b> desde el <b>cierre</b> de los parallels, tras el cuál, los datos serán anonimizados.",
+    "context": "You can set the <b>retention period</b> from the <b>closing</b> of the parallels, after which the data will be anonymized."
   },
   {
     "term": "page.compliance.duration-period-error",
@@ -6156,8 +6156,8 @@
   },
   {
     "term": "page.preview.petition-created-toast",
-    "definition": "Petición creada a partir de una plantilla.",
-    "context": "Petition created from a template."
+    "definition": "Parallel creado a partir de una plantilla.",
+    "context": "Parallel created from a template."
   },
   {
     "term": "page.preview.template-only-cache-alert",
@@ -6182,7 +6182,7 @@
   {
     "term": "page.pricing.bulk-petitions",
     "definition": "Envíos masivos",
-    "context": "Bulk petitions"
+    "context": "Bulk parallels"
   },
   {
     "term": "page.pricing.core-features",
@@ -6326,13 +6326,13 @@
   },
   {
     "term": "page.reports.average-duration-help-2",
-    "definition": "La suma de ambas es la duración media del total de peticiones.",
-    "context": "The sum of the two is the average duration of the petitions."
+    "definition": "La suma de ambas es la duración media del total de parallels.",
+    "context": "The sum of the two is the average duration of the parallels."
   },
   {
     "term": "page.reports.average-duration-help-list-1",
-    "definition": "El tiempo medio desde que se comienza la petición hasta que se completa.",
-    "context": "Average time from the start of the petition until it is completed."
+    "definition": "El tiempo medio desde que se comienza el parallel hasta que se completa.",
+    "context": "Average time from the start of the parallel until it is completed."
   },
   {
     "term": "page.reports.average-duration-help-list-2",
@@ -6351,8 +6351,8 @@
   },
   {
     "term": "page.reports.average-signing-time-help-2",
-    "definition": "La barra representa el porcentaje respecto al tiempo transcurrido desde que se completa la petición hasta que se cierra.",
-    "context": "The bar represents the percentage of the time from the time the petition is completed until it is closed."
+    "definition": "La barra representa el porcentaje respecto al tiempo transcurrido desde que se completa el parallel hasta que se cierra.",
+    "context": "The bar represents the percentage of the time from the time the parallel is completed until it is closed."
   },
   {
     "term": "page.reports.download-replies",
@@ -6390,9 +6390,9 @@
     "context": "No eSignatures sent"
   },
   {
-    "term": "page.reports.no-petitions-closed",
-    "definition": "No hay peticiones cerradas",
-    "context": "No petitions closed"
+    "term": "page.reports.no-parallels-closed",
+    "definition": "No hay parallels cerrados",
+    "context": "No parallels closed"
   },
   {
     "term": "page.reports.select-a-template",
@@ -6400,19 +6400,19 @@
     "context": "Select a template..."
   },
   {
-    "term": "page.reports.started-petitions",
-    "definition": "Peticiones",
-    "context": "Started petitions"
+    "term": "page.reports.started-parallels",
+    "definition": "Parallels",
+    "context": "Started parallels"
   },
   {
-    "term": "page.reports.started-petitions-help-1",
-    "definition": "Este es el número total de peticiones enviadas o comenzadas, es decir, con al menos una respuesta.",
-    "context": "This is the total petitions sent or started, i.e. drafts with at least one response."
+    "term": "page.reports.started-parallels-help-1",
+    "definition": "Este es el número total de parallels enviados o comenzados, es decir, con al menos una respuesta.",
+    "context": "This is the total parallels sent or started, i.e. drafts with at least one response."
   },
   {
-    "term": "page.reports.started-petitions-help-2",
-    "definition": "No entran en esta cifra las peticiones eliminadas, ni los borradores sin respuestas.",
-    "context": "This number doesn't include deleted petitions or unanswered drafts."
+    "term": "page.reports.started-parallels-help-2",
+    "definition": "No entran en esta cifra los parallels eliminados, ni los borradores sin respuestas.",
+    "context": "This number doesn't include deleted o parallels or unanswered drafts."
   },
   {
     "term": "page.reports.title",
@@ -6445,9 +6445,9 @@
     "context": "Hi, I would like to use eSignatures. Could I have more information, please?"
   },
   {
-    "term": "page.usage.petitions",
-    "definition": "Peticiones",
-    "context": "Petitions"
+    "term": "page.usage.parallels",
+    "definition": "Parallels",
+    "context": "Parallels"
   },
   {
     "term": "page.usage.signatures",
@@ -6465,9 +6465,9 @@
     "context": "Click <a>here</a> to send it."
   },
   {
-    "term": "petition-access.havent-sent-petition",
-    "definition": "Todavía no has enviado esta petición.",
-    "context": "You haven't sent this petition yet."
+    "term": "petition-access.havent-sent-parallel",
+    "definition": "Todavía no has enviado este parallel.",
+    "context": "You haven't sent this parallel yet."
   },
   {
     "term": "petition-access.header",
@@ -6560,9 +6560,9 @@
     "context": "Recipient last name"
   },
   {
-    "term": "petition-message.placeholder-option.petition-title",
-    "definition": "Título de la petición",
-    "context": "Petition title"
+    "term": "petition-message.placeholder-option.parallel-title",
+    "definition": "Título del parallel",
+    "context": "Parallel title"
   },
   {
     "term": "petition-message.placeholder-option.user-first-name",
@@ -6601,13 +6601,13 @@
   },
   {
     "term": "petition-preview.completed-petition.toast-description",
-    "definition": "Comprueba que esté todo bien para cerrar la petición.",
-    "context": "Check that everything is OK to close the petition."
+    "definition": "Comprueba que esté todo bien para cerrar el parallel.",
+    "context": "Check that everything is OK to close the parallel."
   },
   {
     "term": "petition-preview.completed-petition.toast-description-check-signature",
-    "definition": "Revisa las respuestas y envía la firma para cerrar la petición.",
-    "context": "Review the replies and send the signature to close the petition."
+    "definition": "Revisa las respuestas y envía la firma para cerrar el parallel.",
+    "context": "Review the replies and send the signature to close the parallel."
   },
   {
     "term": "petition-preview.signature-sended.toast-description",
@@ -6626,8 +6626,8 @@
   },
   {
     "term": "petition-replies.finalize-petition.button",
-    "definition": "Finalizar petición",
-    "context": "Finish petition"
+    "definition": "Finalizar parallel",
+    "context": "Finish parallel"
   },
   {
     "term": "petition-replies.note-popover",
@@ -6691,8 +6691,8 @@
   },
   {
     "term": "petition-sharing.confirm-remove.message",
-    "definition": "¿Estás seguro de que quieres dejar de compartir esta petición con {name}?",
-    "context": "Are you sure you want to stop sharing this petition with {name}?"
+    "definition": "¿Estás seguro de que quieres dejar de compartir este parallel con {name}?",
+    "context": "Are you sure you want to stop sharing this parallel with {name}?"
   },
   {
     "term": "petition-sharing.confirm-remove.message-2",
@@ -6711,8 +6711,8 @@
   },
   {
     "term": "petition-sharing.confirm-transfer-ownership.message",
-    "definition": "¿Estás seguro de que quieres transferir la propiedad de esta petición a {name}?",
-    "context": "Are you sure you want to transfer the ownership of this petition to {name}?"
+    "definition": "¿Estás seguro de que quieres transferir la propiedad de este parallel a {name}?",
+    "context": "Are you sure you want to transfer the ownership of this parallel to {name}?"
   },
   {
     "term": "petition-sharing.header",
@@ -6721,18 +6721,18 @@
   },
   {
     "term": "petition-sharing.input-placeholder-not-owner",
-    "definition": "Solamente el propietario de la petición puede compartirla",
-    "context": "Only the petition owner can share it"
+    "definition": "Solamente el propietario del parallel puede compartirlo",
+    "context": "Only the parallel owner can share it"
   },
   {
     "term": "petition-sharing.insufficient-permissions",
-    "definition": "No tiene permisos para poder compartir las peticiones seleccionadas.",
-    "context": "You do not have permission to share the selected petitions."
+    "definition": "No tiene permisos para poder compartir los parallels seleccionados.",
+    "context": "You do not have permission to share the selected parallels."
   },
   {
     "term": "petition-sharing.insufficient-permissions-list",
-    "definition": "{count, plural, =1 {La siguiente petición se ha descartado y no se podrá} other {Las siguientes peticiones se han descartado y no se podrán}} compartir por falta de permisos:",
-    "context": "The following {count, plural, =1 {petition has} other {petitions have}} been ignored and cannot be shared due to lack of permissions:"
+    "definition": "{count, plural, =1 {El siguiente parallel se ha descartado y no se podrá} other {Los siguientes parallels se han descartado y no se podrán}} compartir por falta de permisos:",
+    "context": "The following {count, plural, =1 {parallel has} other {parallels have}} been ignored and cannot be shared due to lack of permissions:"
   },
   {
     "term": "petition-sharing.message-placeholder",
@@ -6746,8 +6746,8 @@
   },
   {
     "term": "petition-sharing.success-title",
-    "definition": "{count, plural, =1 {Petición compartida} other {Peticiones compartidas}}",
-    "context": "{count, plural, =1 {Petition} other {Petitions}} shared"
+    "definition": "{count, plural, =1 {Parallel compartido} other {Parallels compartidos}}",
+    "context": "{count, plural, =1 {Parallel} other {Parallels}} shared"
   },
   {
     "term": "petition-signature-status-label.e-signature-cancelled",
@@ -6796,8 +6796,8 @@
   },
   {
     "term": "petition.already-sent",
-    "definition": "Esta petición ya ha sido enviada.",
-    "context": "This petition has already been sent."
+    "definition": "Este parallel ya ha sido enviado.",
+    "context": "This parallel has already been sent."
   },
   {
     "term": "petition.confirm-activate-access-message.body",
@@ -7001,13 +7001,13 @@
   },
   {
     "term": "petition.long-batch-send-dialog.header",
-    "definition": "Enviando peticiones",
-    "context": "Sending petitions"
+    "definition": "Enviando parallels",
+    "context": "Sending parallels"
   },
   {
     "term": "petition.long-batch-send-dialog.message",
-    "definition": "Estamos enviando tus peticiones. Puede que tardemos unos instantes, por favor espere.",
-    "context": "We are sending your petitions. It might take a little bit, please wait."
+    "definition": "Estamos enviando tus parallels. Puede que tardemos unos instantes, por favor espere.",
+    "context": "We are sending your parallels. It might take a little bit, please wait."
   },
   {
     "term": "petition.message-sent.toast-description",
@@ -7036,18 +7036,18 @@
   },
   {
     "term": "petition.petition-scheduled-toast.description",
-    "definition": "{count, plural, =1{Tu petición ha sido programada} other{Tus peticiones han sido programadas}} para enviarse el {date}",
-    "context": "Your {count, plural, =1{petition} other{petitions}} will be sent on {date}."
+    "definition": "{count, plural, =1{Tu parallel ha sido programado} other{Tus parallels han sido programados}} para enviarse el {date}",
+    "context": "Your {count, plural, =1{parallel} other{parallels}} will be sent on {date}."
   },
   {
     "term": "petition.petition-scheduled-toast.title",
-    "definition": "{count, plural, =1{Petición programada} other{Peticiones programadas}}",
-    "context": "{count, plural, =1{Petition} other{Petitions}} scheduled"
+    "definition": "{count, plural, =1{Parallel programado} other{Parallels programados}}",
+    "context": "{count, plural, =1{Parallel} other{Parallels}} scheduled"
   },
   {
     "term": "petition.petition-send-error.description",
-    "definition": "Ocurrió un error al enviar tu petición. Vuélvelo a intentar y, si falla de nuevo, contact con soporte para que te podamos ayudar.",
-    "context": "There was an error sending your petition. Try again and, if it fails, reach out to support for help."
+    "definition": "Ocurrió un error al enviar tu parallel. Vuélvelo a intentar y, si falla de nuevo, contacta con soporte para que te podamos ayudar.",
+    "context": "There was an error sending your parallel. Try again and, if it fails, reach out to support for help."
   },
   {
     "term": "petition.petition-send-error.title",
@@ -7056,13 +7056,13 @@
   },
   {
     "term": "petition.petition-sent-toast.description",
-    "definition": "{count, plural, =1{Tu petición está} other{Tus peticiones están}} en camino.",
-    "context": "Your {count, plural, =1{petition is on its} other{petitions are on their}} way."
+    "definition": "{count, plural, =1{Tu parallel está} other{Tus parallels están}} en camino.",
+    "context": "Your {count, plural, =1{parallel is on its} other{parallels are on their}} way."
   },
   {
     "term": "petition.petition-sent-toast.title",
-    "definition": "{count, plural, =1{Petición enviada} other{Peticiones enviadas}}.",
-    "context": "{count, plural, =1{Petition} other{Petitions}} sent"
+    "definition": "{count, plural, =1{Parallel enviado} other{Parallels enviados}}.",
+    "context": "{count, plural, =1{Parallel} other{Parallels}} sent"
   },
   {
     "term": "petition.public-template-dialog.body",
@@ -7121,13 +7121,13 @@
   },
   {
     "term": "petition.reopen.dialog-heading",
-    "definition": "¿Reabrir la petición?",
-    "context": "Reopen petition?"
+    "definition": "¿Reabrir el parallel?",
+    "context": "Reopen parallel?"
   },
   {
     "term": "petition.reopen.dialog-subheading",
-    "definition": "Vas a reabrir la petición y quedará registrado internamente. Siempre podrás cerrarla de nuevo manualmente.",
-    "context": "You are about to reopen the petition and it will be registered internally. You can always close it again manually."
+    "definition": "Vas a reabrir el parallel y quedará registrado internamente. Siempre podrás cerrarlo de nuevo manualmente.",
+    "context": "You are about to reopen the parallel and it will be registered internally. You can always close it again manually."
   },
   {
     "term": "petition.replies.download-file-error-dialog.body",
@@ -7156,7 +7156,7 @@
   },
   {
     "term": "petition.send-from-activity",
-    "definition": "Si quieres enviarle la petición a alguien más puedes hacerlo desde la pestaña de <a>Actividad</a>.",
+    "definition": "Si quieres enviarle el parallel a alguien más puedes hacerlo desde la pestaña de <a>Actividad</a>.",
     "context": "If you want to send it to someone else you can do it from the <a>Activity</a> tab."
   },
   {
@@ -7225,9 +7225,9 @@
     "context": "Tags"
   },
   {
-    "term": "petitions.no-petitions",
-    "definition": "No tienes ninguna petición todavía. ¡Empieza creando una nueva!",
-    "context": "You have no petitions yet. Start by creating one now!"
+    "term": "petitions.no-parallels",
+    "definition": "No tienes ningún parallel todavía. ¡Empieza creando uno nuevo!",
+    "context": "You have no parallels yet. Start by creating one now!"
   },
   {
     "term": "petitions.no-reminders-left",
@@ -7236,8 +7236,8 @@
   },
   {
     "term": "petitions.no-results",
-    "definition": "No encontramos peticiones con este criterio",
-    "context": "There's no petitions matching your criteria"
+    "definition": "No encontramos parallels con este criterio",
+    "context": "There's no parallels matching your criteria"
   },
   {
     "term": "petitions.no-templates",
@@ -7251,8 +7251,8 @@
   },
   {
     "term": "petitions.title",
-    "definition": "Peticiones",
-    "context": "Petitions"
+    "definition": "Parallels",
+    "context": "Parallels"
   },
   {
     "term": "petitions.title-templates",
@@ -7891,8 +7891,8 @@
   },
   {
     "term": "recipient-view.complete-petition.error-message",
-    "definition": "Parece que la petición ha sido actualizada desde la última vez que ha accedido. Por favor, actualice su navegador e inténtelo de nuevo. No perderá sus respuestas enviadas.",
-    "context": "It looks like the petition has been updated since you last accessed it. Please refresh your browser and try again. You will not lose your submitted answers."
+    "definition": "Parece que el parallel ha sido actualizado desde la última vez que ha accedido. Por favor, actualice su navegador e inténtelo de nuevo. No perderá sus respuestas enviadas.",
+    "context": "It looks like the parallel has been updated since you last accessed it. Please refresh your browser and try again. You will not lose your submitted answers."
   },
   {
     "term": "recipient-view.completed-petition.toast-description",
@@ -7901,8 +7901,8 @@
   },
   {
     "term": "recipient-view.completed-petition.toast-title",
-    "definition": "¡Petición completada!",
-    "context": "Petition completed!"
+    "definition": "¡Parallel completado!",
+    "context": "Parallel completed!"
   },
   {
     "term": "recipient-view.contents-header",
@@ -7952,7 +7952,7 @@
   {
     "term": "recipient-view.first-time.finalize-whenever-body",
     "definition": "Desde el correo o copiando el enlace de esta página, {tone, select, INFORMAL{podrás cerrar y volver para terminar de completarlo cuando quieras.} other{ podrá volver para terminar de completar la información en otro momento.}}",
-    "context": "Either from the link in your email or by copying the url of this page, you can return at any point and finalize the petition."
+    "context": "Either from the link in your email or by copying the url of this page, you can return at any point and finalize the parallel."
   },
   {
     "term": "recipient-view.first-time.finalize-whenever-title",
@@ -8041,13 +8041,13 @@
   },
   {
     "term": "recipient-view.petition-closed-alert",
-    "definition": "Esta petición ha sido cerrada. Si deseas realizar cambios, por favor, contacta con {name}.",
-    "context": "This petition has been closed. If you need to make any changes, please reach out to {name}."
+    "definition": "Este parallel ha sido cerrado. Si deseas realizar cambios, por favor, contacta con {name}.",
+    "context": "This parallel has been closed. If you need to make any changes, please reach out to {name}."
   },
   {
     "term": "recipient-view.petition-completed-alert-1",
-    "definition": "{tone, select, INFORMAL{¡Perfecto! Has completado la petición y hemos avisado a {name} para que la revise y valide.} other{Esta petición ha sido completada y hemos notificado a {name} para su revisión y validación.}}",
-    "context": "{tone, select, INFORMAL{Great! You have completed the petition and we have notified {name} for review and validation.} other{This petition has been completed and {name} has been notified for its revision and validation.}}"
+    "definition": "{tone, select, INFORMAL{¡Perfecto! Has completado el parallel y hemos avisado a {name} para que lo revise y valide.} other{Este parallel ha sido completado y hemos notificado a {name} para su revisión y validación.}}",
+    "context": "{tone, select, INFORMAL{Great! You have completed the parallel and we have notified {name} for review and validation.} other{This parallel has been completed and {name} has been notified for its revision and validation.}}"
   },
   {
     "term": "recipient-view.petition-completed-alert-2",
@@ -8056,8 +8056,8 @@
   },
   {
     "term": "recipient-view.petition-delegated.toast-body",
-    "definition": "Hemos enviado un email a {email} con instrucciones para acceder a esta petición.",
-    "context": "We have sent an email to {email} with instructions to access this petition."
+    "definition": "Hemos enviado un email a {email} con instrucciones para acceder a este parallel.",
+    "context": "We have sent an email to {email} with instructions to access this parallel."
   },
   {
     "term": "recipient-view.petition-delegated.toast-header",
@@ -8066,8 +8066,8 @@
   },
   {
     "term": "recipient-view.petition-requires-signature-alert-1",
-    "definition": "Esta petición requiere de <b>firma digital</b> para ser completada.",
-    "context": "This petition requires an <b>eSignature</b> to be completed."
+    "definition": "Este parallel requiere de <b>firma digital</b> para ser completado.",
+    "context": "This parallel requires an <b>eSignature</b> to be completed."
   },
   {
     "term": "recipient-view.petition-requires-signature-alert-2",
@@ -8076,13 +8076,13 @@
   },
   {
     "term": "recipient-view.petition-signature-request-sent-alert",
-    "definition": "<b>Hemos enviado el documento a firmar</b> a {name} ({email}) {count, plural, =0{} other{y <a># más</a>}} para finalizar la petición.",
-    "context": "<b>We have sent the document to sign</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}} in order to finalize the petition."
+    "definition": "<b>Hemos enviado el documento a firmar</b> a {name} ({email}) {count, plural, =0{} other{y <a># más</a>}} para finalizar el parallel.",
+    "context": "<b>We have sent the document to sign</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}} in order to finalize the parallel."
   },
   {
     "term": "recipient-view.petition-signature-request-sent-alert.unknown-signer",
-    "definition": "<b>Hemos enviado el documento a firmar</b> a la persona indicada para finalizar la petición.",
-    "context": "<b>We have sent the document to sign</b> to the specified person in order to finalize the petition."
+    "definition": "<b>Hemos enviado el documento a firmar</b> a la persona indicada para finalizar el parallel.",
+    "context": "<b>We have sent the document to sign</b> to the specified person in order to finalize the parallel."
   },
   {
     "term": "recipient-view.petition-subject",
@@ -8101,8 +8101,8 @@
   },
   {
     "term": "recipient-view.request-information",
-    "definition": "Información de la petición",
-    "context": "Request information"
+    "definition": "Información del parallel",
+    "context": "Parallel information"
   },
   {
     "term": "recipient-view.requested-by",
@@ -8111,8 +8111,8 @@
   },
   {
     "term": "recipient-view.review-before-sign.body-1",
-    "definition": "{tone, select, INFORMAL{Para completar esta petición se necesita una <b>firma digital</b>.} other{Esta petición requiere de <b>firma digital</b> para ser completada.}}",
-    "context": "This petition requires an <b>eSignature</b> in order to be completed."
+    "definition": "{tone, select, INFORMAL{Para completar este parallel se necesita una <b>firma digital</b>.} other{Este parallel requiere de <b>firma digital</b> para ser completado.}}",
+    "context": "This parallel requires an <b>eSignature</b> in order to be completed."
   },
   {
     "term": "recipient-view.review-before-sign.body-2",
@@ -8256,8 +8256,8 @@
   },
   {
     "term": "settings.developers.subscriptions-explanation",
-    "definition": "Aquí puedes registrar webhooks para ser notificado cuando ocurra cualquier cosa en una de tus peticiones (por ejemplo, cuando un destinatario envía un comentario o cuando se completa la petición)",
-    "context": "Here you can register webhooks to get notified when anything happens in one of your petitions (e.g. when a recipients adds a comment or when the petition is completed)"
+    "definition": "Aquí puedes registrar webhooks para ser notificado cuando ocurra cualquier cosa en uno de tus parallels (por ejemplo, cuando un destinatario envía un comentario o cuando se completa el parallel)",
+    "context": "Here you can register webhooks to get notified when anything happens in one of your parallels (e.g. when a recipients adds a comment or when the parallel is completed)"
   },
   {
     "term": "settings.developers.subscriptions-title",
@@ -8276,8 +8276,8 @@
   },
   {
     "term": "settings.developers.subscriptions.header.from-any-petition",
-    "definition": "Cualquier petición",
-    "context": "Any petition"
+    "definition": "Cualquier parallel",
+    "context": "Any parallel"
   },
   {
     "term": "settings.developers.subscriptions.header.from-template",
@@ -8441,23 +8441,23 @@
   },
   {
     "term": "timeline.access-delegated-description",
-    "definition": "{contact} delegó la petición a {newContact} {timeAgo}",
-    "context": "{contact} has delegated the petition to {newContact} {timeAgo}"
+    "definition": "{contact} delegó el parallel a {newContact} {timeAgo}",
+    "context": "{contact} has delegated the parallel to {newContact} {timeAgo}"
   },
   {
     "term": "timeline.access-opened-description",
-    "definition": "{contact} abrió la petición {timeAgo}",
-    "context": "{contact} opened the petition {timeAgo}"
+    "definition": "{contact} abrió el parallel {timeAgo}",
+    "context": "{contact} opened the parallel {timeAgo}"
   },
   {
     "term": "timeline.add-group-permission-description",
-    "definition": "{userIsYou, select, true {Compartiste} other {{user} compartió}} esta petición con {groupName} como {permissionType} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} shared this petition with {groupName} as {permissionType} {timeAgo}"
+    "definition": "{userIsYou, select, true {Compartiste} other {{user} compartió}} este parallel con {groupName} como {permissionType} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} shared this parallel with {groupName} as {permissionType} {timeAgo}"
   },
   {
     "term": "timeline.add-user-permission-description",
-    "definition": "{userIsYou, select, true {Compartiste} other {{user} compartió}} esta petición con {other} como {permissionType} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} shared this petition with {other} as {permissionType} {timeAgo}"
+    "definition": "{userIsYou, select, true {Compartiste} other {{user} compartió}} este parallel con {other} como {permissionType} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} shared this parallel with {other} as {permissionType} {timeAgo}"
   },
   {
     "term": "timeline.comment-deleted",
@@ -8561,43 +8561,43 @@
   },
   {
     "term": "timeline.ownership-transferred-description",
-    "definition": "{userIsYou, select, true {Transferiste} other {{user} transfirió}} la propiedad de esta petición {previousOwner, select, null {} other {de {previousOwner} }}a {owner} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} transferred the ownership of this petition {previousOwner, select, null {} other {from {previousOwner} }}to {owner} {timeAgo}"
+    "definition": "{userIsYou, select, true {Transferiste} other {{user} transfirió}} la propiedad de este parallel {previousOwner, select, null {} other {de {previousOwner} }}a {owner} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} transferred the ownership of this parallel {previousOwner, select, null {} other {from {previousOwner} }}to {owner} {timeAgo}"
   },
   {
     "term": "timeline.petition-anonymized-description",
-    "definition": "La petición ha sido anonimizada {timeAgo}",
-    "context": "The petition has been anonymized {timeAgo}"
+    "definition": "El parallel ha sido anonimizado {timeAgo}",
+    "context": "The parallel has been anonymized {timeAgo}"
   },
   {
     "term": "timeline.petition-cloned-description",
-    "definition": "{userIsYou, select, true {Clonaste} other {{user} clonó}} esta petición {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} cloned this petition {timeAgo}"
+    "definition": "{userIsYou, select, true {Clonaste} other {{user} clonó}} este parallel {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} cloned this parallel {timeAgo}"
   },
   {
     "term": "timeline.petition-closed-description",
-    "definition": "{userIsYou, select, true {Cerraste} other {{user} cerró}} la petición {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} closed the petition {timeAgo}"
+    "definition": "{userIsYou, select, true {Cerraste} other {{user} cerró}} el parallel {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} closed the parallel {timeAgo}"
   },
   {
     "term": "timeline.petition-completed-description",
-    "definition": "{userIsYou, select, true {Completaste} other {{name} completó}} la petición {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{name}}} completed the petition {timeAgo}"
+    "definition": "{userIsYou, select, true {Completaste} other {{name} completó}} el parallel {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{name}}} completed the parallel {timeAgo}"
   },
   {
     "term": "timeline.petition-correct-notified-description",
-    "definition": "{userIsYou, select, true {Notificaste} other {{user} notificó}} a {contact} que la petición está correcta {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} notified {contact} that the petition is correct {timeAgo}"
+    "definition": "{userIsYou, select, true {Notificaste} other {{user} notificó}} a {contact} que el parallel está correcto {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} notified {contact} that the parallel is correct {timeAgo}"
   },
   {
     "term": "timeline.petition-created-description",
-    "definition": "{userIsYou, select, true {Creaste} other {{user} creó}} esta petición {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} created this petition {timeAgo}"
+    "definition": "{userIsYou, select, true {Creaste} other {{user} creó}} este parallel {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} created this parallel {timeAgo}"
   },
   {
     "term": "timeline.petition-message-bounced-description",
-    "definition": "No hemos podido enviar la petición al contacto {contactName} {timeAgo}",
-    "context": "We could not deliver the petition to contact {contactName} {timeAgo}"
+    "definition": "No hemos podido enviar el parallel al contacto {contactName} {timeAgo}",
+    "context": "We could not deliver the parallel to contact {contactName} {timeAgo}"
   },
   {
     "term": "timeline.petition-reminder-bounced-description",
@@ -8606,13 +8606,13 @@
   },
   {
     "term": "timeline.petition-reopened-description",
-    "definition": "{userIsYou, select, true {Reabriste} other {{user} reabrió}} esta petición {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} reopened the petition {timeAgo}"
+    "definition": "{userIsYou, select, true {Reabriste} other {{user} reabrió}} este parallel {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} reopened the parallel {timeAgo}"
   },
   {
     "term": "timeline.public-petition-link-created-description",
-    "definition": "{contact} creó la petición desde un enlace público {timeAgo}",
-    "context": "{contact} created the petition from a public link {timeAgo}"
+    "definition": "{contact} creó el parallel desde un enlace público {timeAgo}",
+    "context": "{contact} created the parallel from a public link {timeAgo}"
   },
   {
     "term": "timeline.recipient-signed-description",
@@ -8631,18 +8631,18 @@
   },
   {
     "term": "timeline.reminders-opt-out-description",
-    "definition": "{contact} ha optado por no recibir recordatorios para esta petición {timeAgo}",
-    "context": "{contact} has opted out from receiving reminders for this petition {timeAgo}"
+    "definition": "{contact} ha optado por no recibir recordatorios para este parallel {timeAgo}",
+    "context": "{contact} has opted out from receiving reminders for this parallel {timeAgo}"
   },
   {
     "term": "timeline.remove-group-permission-description",
-    "definition": "{userIsYou, select, true {Dejaste} other {{user} dejó}} de compartir esta petición con {groupName} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} stopped sharing this petition with {groupName} {timeAgo}"
+    "definition": "{userIsYou, select, true {Dejaste} other {{user} dejó}} de compartir este parallel con {groupName} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} stopped sharing this parallel with {groupName} {timeAgo}"
   },
   {
     "term": "timeline.remove-user-permission-description",
-    "definition": "{userIsYou, select, true {Dejaste} other {{user} dejó}} de compartir esta petición con {other} {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} stopped sharing this petition with {other} {timeAgo}"
+    "definition": "{userIsYou, select, true {Dejaste} other {{user} dejó}} de compartir este parallel con {other} {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} stopped sharing this parallel with {other} {timeAgo}"
   },
   {
     "term": "timeline.reply-created-description",
@@ -8681,8 +8681,8 @@
   },
   {
     "term": "timeline.signature-completed-description",
-    "definition": "El proceso de firma digital en la petición ha sido completado {timeAgo}",
-    "context": "The eSignature process on the petition has been completed {timeAgo}"
+    "definition": "El proceso de firma digital en el parallel ha sido completado {timeAgo}",
+    "context": "The eSignature process on the parallel has been completed {timeAgo}"
   },
   {
     "term": "timeline.signature-declined-by-signer.description",
@@ -8711,8 +8711,8 @@
   },
   {
     "term": "timeline.signature-started-description",
-    "definition": "Hemos iniciado un proceso de firma digital en la petición {timeAgo}",
-    "context": "We started an eSignature process on the petition {timeAgo}"
+    "definition": "Hemos iniciado un proceso de firma digital en el parallel {timeAgo}",
+    "context": "We started an eSignature process on the parallel {timeAgo}"
   },
   {
     "term": "validate-petition-fields..number-field-with-invalid-limits-error",
@@ -8776,8 +8776,8 @@
   },
   {
     "term": "view.groups.confirm-delete-body",
-    "definition": "¿Estás seguro de querer eliminar {count, plural, =1 {<b>{name}</b>} other {los <b>#</b> equipos seleccionados}}? Si continúa, todos los miembros perderán el acceso a las peticiones compartidas con {count, plural, =1 {el equipo} other {los equipos}}.",
-    "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected teams}}? If you continue, all members will lose access to petitions shared with the {count, plural, =1 {team} other {teams}}."
+    "definition": "¿Estás seguro de querer eliminar {count, plural, =1 {<b>{name}</b>} other {los <b>#</b> equipos seleccionados}}? Si continúa, todos los miembros perderán el acceso a los parallels compartidos con {count, plural, =1 {el equipo} other {los equipos}}.",
+    "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected teams}}? If you continue, all members will lose access to parallels shared with the {count, plural, =1 {team} other {teams}}."
   },
   {
     "term": "view.groups.confirm-delete-header",

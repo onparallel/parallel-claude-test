@@ -267,7 +267,7 @@ export function AddPetitionAccessDialog({
                   <Text fontSize="sm">
                     <FormattedMessage
                       id="component.add-petition-access-dialog.recipients-description"
-                      defaultMessage="Will reply to the same petition collaboratively."
+                      defaultMessage="Will reply to the same parallel collaboratively."
                     />
                   </Text>
                 </Stack>
@@ -286,7 +286,7 @@ export function AddPetitionAccessDialog({
                   <Text fontSize="sm">
                     <FormattedMessage
                       id="component.add-petition-access-dialog.recipient-groups-description"
-                      defaultMessage="Each group will reply to different petitions."
+                      defaultMessage="Each group will reply to different parallels."
                     />
                   </Text>
                 </Stack>
@@ -304,12 +304,12 @@ export function AddPetitionAccessDialog({
                 {limit === used ? (
                   <FormattedMessage
                     id="component.add-petition-access-dialog.petition-limit-reached.text"
-                    defaultMessage="You reached the limit of petitions sent."
+                    defaultMessage="You reached the limit of parallels sent."
                   />
                 ) : (
                   <FormattedMessage
                     id="component.add-petition-access-dialog.petition-limit-near.text"
-                    defaultMessage="You can send {left, plural, =1{# more petition} other{# more petitions}}."
+                    defaultMessage="You can send {left, plural, =1{# more parallel} other{# more parallels}}."
                     values={{ left: limit - used }}
                   />
                 )}
@@ -384,7 +384,7 @@ export function AddPetitionAccessDialog({
                     <HelpPopover>
                       <FormattedMessage
                         id="component.add-petition-access-dialog.subscribe-to-notifications-description"
-                        defaultMessage="Users will receive notifications about the activity of this petition."
+                        defaultMessage="Users will receive notifications about the activity of this parallel."
                       />
                     </HelpPopover>
                   </Flex>

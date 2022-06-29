@@ -14,7 +14,7 @@ export function PetitionLimitReachedAlert({ limit, ...props }: PetitionLimitReac
       <AlertDescription>
         <FormattedMessage
           id="component.petition-limit-reached-alert.title"
-          defaultMessage="It seems that you have reached your limit of {limit} petitions, <a>reach out to us to upgrade your plan.</a>"
+          defaultMessage="It seems that you have reached your limit of {limit} parallels, <a>reach out to us to upgrade your plan.</a>"
           values={{
             limit,
             a: (chunks: any) => (

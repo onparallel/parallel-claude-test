@@ -26,7 +26,7 @@ export default function CustomError({
       header={
         <FormattedMessage
           id="error.petition-not-available.header"
-          defaultMessage="It seems that this petition is no longer available."
+          defaultMessage="It seems that this parallel is no longer available."
         />
       }
       imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_road_sign.svg`}

@@ -8,7 +8,7 @@ export function ConfirmReopenPetitionDialog(props: DialogProps) {
     <ConfirmDialog
       header={
         <Text>
-          <FormattedMessage id="petition.reopen.dialog-heading" defaultMessage="Reopen petition?" />
+          <FormattedMessage id="petition.reopen.dialog-heading" defaultMessage="Reopen parallel?" />
         </Text>
       }
       body={
@@ -16,7 +16,7 @@ export function ConfirmReopenPetitionDialog(props: DialogProps) {
           <Text>
             <FormattedMessage
               id="petition.reopen.dialog-subheading"
-              defaultMessage="You are about to reopen the petition and it will be registered internally. You can always close it again manually."
+              defaultMessage="You are about to reopen the parallel and it will be registered internally. You can always close it again manually."
             />
           </Text>
         </Stack>

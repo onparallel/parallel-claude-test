@@ -324,7 +324,7 @@ function SignatureConfigDialogBodyStep1({
         value: "NO",
         label: intl.formatMessage({
           id: "component.signature-config-dialog.review-before-send.option-no",
-          defaultMessage: "After the petition is completed",
+          defaultMessage: "After the parallel is completed",
         }),
       },
       {
@@ -639,7 +639,7 @@ export function SignatureConfigDialogBodyStep2({
                   <AlertDescription>
                     <FormattedMessage
                       id="component.signature-config-dialog.template-alert"
-                      defaultMessage="These signers will be assigned to all petitions created from this template."
+                      defaultMessage="These signers will be assigned to all parallels created from this template."
                     />
                   </AlertDescription>
                 </CloseableAlert>

@@ -395,7 +395,7 @@ function _PetitionSettings({
       description={
         <FormattedMessage
           id="component.petition-settings.restrict-editing-description"
-          defaultMessage="Enable this option to prevent users from accidentally making changes to this petition."
+          defaultMessage="Enable this option to prevent users from accidentally making changes to this parallel."
         />
       }
       isChecked={petition.isRestricted}
@@ -468,7 +468,7 @@ function _PetitionSettings({
             description={
               <FormattedMessage
                 id="component.petition-settings.share-by-link-description"
-                defaultMessage="Share an open link that allows your clients create petitions by themselves. They will be managed by the owner."
+                defaultMessage="Share an open link that allows your clients create parallels by themselves. They will be managed by the owner."
               />
             }
             isActive={hasActivePublicLink}
@@ -500,7 +500,7 @@ function _PetitionSettings({
           <Heading as="h5" size="sm" paddingTop={2.5} paddingBottom={1.5}>
             <FormattedMessage
               id="component.petition-settings.adjustments-for-petitions"
-              defaultMessage="Petition settings"
+              defaultMessage="Settings for parallels"
             />
           </Heading>
         </>
@@ -508,7 +508,7 @@ function _PetitionSettings({
         <Heading as="h5" size="sm" marginY={1.5}>
           <FormattedMessage
             id="component.petition-settings.adjustments-petitions"
-            defaultMessage="Petition settings"
+            defaultMessage="Parallel settings"
           />
         </Heading>
       )}
@@ -582,7 +582,7 @@ function _PetitionSettings({
           description={
             <FormattedMessage
               id="component.petition-settings.share-automatically-description"
-              defaultMessage="Specify which users or teams the petitions created from this template are shared with"
+              defaultMessage="Specify which users or teams the parallels created from this template are shared with."
             />
           }
           controlId="share-automatically"
@@ -610,7 +610,7 @@ function _PetitionSettings({
               <HelpPopover popoverWidth="2xs">
                 <FormattedMessage
                   id="component.petition-settings.signature-description"
-                  defaultMessage="Generates a document and iniciates an eSignature process upon completion of the petition, through one of our integrated providers."
+                  defaultMessage="Generates a document and iniciates an eSignature process upon completion of the parallel, through one of our integrated providers."
                 />
               </HelpPopover>
               {petition.signatureConfig?.integration?.environment === "DEMO" || hasDemoSignature ? (
@@ -660,7 +660,7 @@ function _PetitionSettings({
           description={
             <FormattedMessage
               id="component.petition-settings.compliance-period-description"
-              defaultMessage="Set the retention period of the data collected with this {type, select, PETITION {petition} other{template}} according to its purpose. The period will start from the closing of the petition, after which the data will be anonymized."
+              defaultMessage="Set the retention period of the data collected with this {type, select, PETITION {parallel} other{template}} according to its purpose. The period will start from the closing of the parallel, after which the data will be anonymized."
               values={{ type: petition.__typename === "Petition" ? "PETITION" : "TEMPLATE" }}
             />
           }
@@ -721,7 +721,7 @@ function _PetitionSettings({
           <AlertDescription fontStyle="italic">
             <FormattedMessage
               id="component.petition-settings.from-template-information"
-              defaultMessage="Petition created from the {name}."
+              defaultMessage="Parallel created from the {name}."
               values={{
                 name:
                   petition.fromTemplateId && !petition.fromTemplate ? (

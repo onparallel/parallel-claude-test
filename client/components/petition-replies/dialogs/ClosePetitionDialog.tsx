@@ -105,7 +105,7 @@ export function ClosePetitionDialog({
           <Text>
             <FormattedMessage
               id="component.close-petition-dialog.heading"
-              defaultMessage="Finish petition"
+              defaultMessage="Finish parallel"
             />
           </Text>
         </Stack>
@@ -115,7 +115,7 @@ export function ClosePetitionDialog({
           <Text>
             <FormattedMessage
               id="component.close-petition-dialog.subheading"
-              defaultMessage="When finishing, the petition will remain closed. You can come back anytime to review the information."
+              defaultMessage="When finishing, the parallel will remain closed. You can come back anytime to review the information."
             />
           </Text>
           {showNotify ? (

@@ -375,7 +375,7 @@ export const PetitionSignaturesCard = Object.assign(
             <Text>
               <FormattedMessage
                 id="component.petition-signatures-card.no-signature-configured"
-                defaultMessage="No signature has been configured for this petition."
+                defaultMessage="No signature has been configured for this parallel."
               />
             </Text>
           </Center>

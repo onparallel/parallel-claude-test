@@ -23,7 +23,7 @@ export function TimelinePetitionCreatedEvent({
     >
       <FormattedMessage
         id="timeline.petition-created-description"
-        defaultMessage="{userIsYou, select, true {You} other {{user}}} created this petition {timeAgo}"
+        defaultMessage="{userIsYou, select, true {You} other {{user}}} created this parallel {timeAgo}"
         values={{
           userIsYou: userId === user?.id,
           user: <UserReference user={user} />,

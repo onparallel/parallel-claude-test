@@ -63,22 +63,22 @@ export function ReportsDoughnutChart({
       <HStack>
         <Text>
           <FormattedMessage
-            id="component.reports-doughnut-chart.status-of-petitions"
-            defaultMessage="Status of the petitions"
+            id="component.reports-doughnut-chart.status-of-parallels"
+            defaultMessage="Status of the parallels"
           />
         </Text>
         <HelpPopover>
           <Stack>
             <Text>
               <FormattedMessage
-                id="component.reports-doughnut-chart.status-of-petitions-help-1"
-                defaultMessage="This shows the current number of petitions in each state."
+                id="component.reports-doughnut-chart.status-of-parallels-help-1"
+                defaultMessage="This shows the current number of parallels in each state."
               />
             </Text>
             <Text>
               <FormattedMessage
-                id="component.reports-doughnut-chart.status-of-petitions-help-2"
-                defaultMessage="The sum of all is the total number of petitions created."
+                id="component.reports-doughnut-chart.status-of-parallels-help-2"
+                defaultMessage="The sum of all is the total number of parallels created."
               />
             </Text>
           </Stack>

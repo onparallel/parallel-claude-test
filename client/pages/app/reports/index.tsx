@@ -323,22 +323,22 @@ function TemplateStatsReport({ report }: { report: ReportType }) {
             </Center>
             <Text>
               <FormattedMessage
-                id="page.reports.started-petitions"
-                defaultMessage="Started petitions"
+                id="page.reports.started-parallels"
+                defaultMessage="Started parallels"
               />
             </Text>
             <HelpPopover>
               <Stack>
                 <Text>
                   <FormattedMessage
-                    id="page.reports.started-petitions-help-1"
-                    defaultMessage="This is the total petitions sent or started, i.e. drafts with at least one response."
+                    id="page.reports.started-parallels-help-1"
+                    defaultMessage="This is the total parallels sent or started, i.e. drafts with at least one response."
                   />
                 </Text>
                 <Text>
                   <FormattedMessage
-                    id="page.reports.started-petitions-help-2"
-                    defaultMessage="This number doesn't include deleted petitions or unanswered drafts."
+                    id="page.reports.started-parallels-help-2"
+                    defaultMessage="This number doesn't include deleted o parallels or unanswered drafts."
                   />
                 </Text>
               </Stack>
@@ -414,7 +414,7 @@ function TemplateStatsReport({ report }: { report: ReportType }) {
                     <ListItem>
                       <FormattedMessage
                         id="page.reports.average-duration-help-list-1"
-                        defaultMessage="Average time from the start of the petition until it is completed."
+                        defaultMessage="Average time from the start of the parallel until it is completed."
                       />
                     </ListItem>
                     <ListItem>
@@ -428,7 +428,7 @@ function TemplateStatsReport({ report }: { report: ReportType }) {
                 <Text>
                   <FormattedMessage
                     id="page.reports.average-duration-help-2"
-                    defaultMessage="The sum of the two is the average duration of the petitions."
+                    defaultMessage="The sum of the two is the average duration of the parallels."
                   />
                 </Text>
               </Stack>
@@ -476,8 +476,8 @@ function TemplateStatsReport({ report }: { report: ReportType }) {
                 {pendingToComplete && !completeToClose ? (
                   <Text textStyle="hint">
                     <FormattedMessage
-                      id="page.reports.no-petitions-closed"
-                      defaultMessage="No petitions closed"
+                      id="page.reports.no-parallels-closed"
+                      defaultMessage="No parallels closed"
                     />
                   </Text>
                 ) : null}
@@ -506,7 +506,7 @@ function TemplateStatsReport({ report }: { report: ReportType }) {
                 <Text>
                   <FormattedMessage
                     id="page.reports.average-signing-time-help-2"
-                    defaultMessage="The bar represents the percentage of the time from the time the petition is completed until it is closed."
+                    defaultMessage="The bar represents the percentage of the time from the time the parallel is completed until it is closed."
                   />
                 </Text>
               </Stack>

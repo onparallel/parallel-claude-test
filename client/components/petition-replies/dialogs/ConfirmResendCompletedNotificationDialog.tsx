@@ -16,7 +16,7 @@ export function ConfirmResendCompletedNotificationDialog(props: DialogProps) {
       body={
         <FormattedMessage
           id="component.confirm-resend-completed-notification.description"
-          defaultMessage="We have already sent a confirmation email to the petition contacts. Would you like to send it again?"
+          defaultMessage="We have already sent a confirmation email to the parallel contacts. Would you like to send it again?"
         />
       }
       confirm={

@@ -263,7 +263,7 @@ function Petitions() {
         state.type === "PETITION"
           ? intl.formatMessage({
               id: "petitions.title",
-              defaultMessage: "Petitions",
+              defaultMessage: "Parallels",
             })
           : intl.formatMessage({
               id: "petitions.title-templates",
@@ -312,7 +312,7 @@ function Petitions() {
                   <Text color="gray.300" fontSize="lg">
                     <FormattedMessage
                       id="petitions.no-results"
-                      defaultMessage="There's no petitions matching your criteria"
+                      defaultMessage="There's no parallels matching your criteria"
                     />
                   </Text>
                 </Flex>
@@ -326,8 +326,8 @@ function Petitions() {
                       />
                     ) : (
                       <FormattedMessage
-                        id="petitions.no-petitions"
-                        defaultMessage="You have no petitions yet. Start by creating one now!"
+                        id="petitions.no-parallels"
+                        defaultMessage="You have no parallels yet. Start by creating one now!"
                       />
                     )}
                   </Text>
@@ -365,8 +365,8 @@ function RenderFooter({
         >
           <option value="PETITION">
             {intl.formatMessage({
-              id: "generic.petition-type-plural",
-              defaultMessage: "Petitions",
+              id: "generic.parallel-type-plural",
+              defaultMessage: "Parallels",
             })}
           </option>
           <option value="TEMPLATE">
@@ -531,7 +531,7 @@ function usePetitionListActions({
           isDisabled: selectedCount !== 1,
           leftIcon: <PaperPlaneIcon />,
           children: (
-            <FormattedMessage id="generic.create-petition" defaultMessage="Create petition" />
+            <FormattedMessage id="generic.create-petition" defaultMessage="Create parallel" />
           ),
         },
     {

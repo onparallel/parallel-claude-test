@@ -54,7 +54,7 @@ function OrganizationIntegrations() {
       title: "Signaturit",
       body: intl.formatMessage({
         id: "organization.integrations.signaturit-description",
-        defaultMessage: "Add digital signature to your petitions.",
+        defaultMessage: "Add digital signature to your parallels.",
       }),
       showButton: true,
       route: "/app/organization/integrations/signature",

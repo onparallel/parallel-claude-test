@@ -507,7 +507,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               >
                 <FormattedMessage
                   id="petition-replies.finalize-petition.button"
-                  defaultMessage="Finish petition"
+                  defaultMessage="Finish parallel"
                 />
               </Button>
             )}
@@ -920,7 +920,7 @@ function ConfirmCancelOngoingSignature(props: DialogProps<{}, void>) {
       body={
         <FormattedMessage
           id="component.confirm-disable-ongoing-signature-petition-close.body"
-          defaultMessage="There is an ongoing eSignature process. If you close this petition now, the process will be cancelled."
+          defaultMessage="There is an ongoing eSignature process. If you close this parallel now, the process will be cancelled."
         />
       }
       confirm={

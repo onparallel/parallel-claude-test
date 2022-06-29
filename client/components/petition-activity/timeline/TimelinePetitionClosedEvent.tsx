@@ -19,7 +19,7 @@ export function TimelinePetitionClosedEvent({ event, userId }: TimelinePetitionC
     >
       <FormattedMessage
         id="timeline.petition-closed-description"
-        defaultMessage="{userIsYou, select, true {You} other {{user}}} closed the petition {timeAgo}"
+        defaultMessage="{userIsYou, select, true {You} other {{user}}} closed the parallel {timeAgo}"
         values={{
           userIsYou: userId === event.user?.id,
           user: <UserReference user={event.user} />,

@@ -167,7 +167,7 @@ function OrganizationCompliance() {
             <Text>
               <FormattedMessage
                 id="page.compliance.description-text-2"
-                defaultMessage="You can set the <b>retention period</b> from the <b>closing</b> of the petitions, after which the data will be anonymized."
+                defaultMessage="You can set the <b>retention period</b> from the <b>closing</b> of the parallels, after which the data will be anonymized."
               />
             </Text>
           </Box>

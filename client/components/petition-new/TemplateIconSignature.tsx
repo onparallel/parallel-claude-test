@@ -22,7 +22,7 @@ export function TemplateIconSignature({ signatureConfig, ...props }: TemplateIco
               })
             : intl.formatMessage({
                 id: "component.template-icon-signature.esignature-active-no-review",
-                defaultMessage: "A eSignature will be initiated upon completion of the petition",
+                defaultMessage: "A eSignature will be initiated upon completion of the parallel",
               })}
         </Text>
       }

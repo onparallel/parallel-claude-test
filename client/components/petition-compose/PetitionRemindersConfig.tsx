@@ -187,7 +187,7 @@ export function PetitionRemindersConfig({
             <Box as="span">*</Box>
             <FormattedMessage
               id="component.petition-reminder-settings.next-reminder"
-              defaultMessage="After sending the petition, the first reminder will be sent on {date} and up to 10 reminders will be sent {days, plural, =1 {everyday} other {every # days}} at {time} until the petition is completed."
+              defaultMessage="After sending the parallel, the first reminder will be sent on {date} and up to 10 reminders will be sent {days, plural, =1 {everyday} other {every # days}} at {time} until the parallel is completed."
               values={{
                 date: <DateTime value={firstReminder} format={FORMATS.LL} />,
                 days: value.offset,

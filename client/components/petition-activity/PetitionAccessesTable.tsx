@@ -173,8 +173,8 @@ export function PetitionAccessesTable({
               <Stack spacing={1}>
                 <Text>
                   <FormattedMessage
-                    id="petition-access.havent-sent-petition"
-                    defaultMessage="You haven't sent this petition yet."
+                    id="petition-access.havent-sent-parallel"
+                    defaultMessage="You haven't sent this parallel yet."
                   />
                 </Text>
                 {!petition.isAnonymized && myEffectivePermission !== "READ" ? (

@@ -679,7 +679,7 @@ type Mutation {
   ): User!
 
   """
-  Create petition.
+  Create parallel.
   """
   createPetition(
     locale: PetitionLocale
@@ -881,7 +881,7 @@ type Mutation {
   deletePetitionReply(petitionId: GID!, replyId: GID!): PetitionField!
 
   """
-  Delete petitions.
+  Delete parallels.
   """
   deletePetitions(
     """

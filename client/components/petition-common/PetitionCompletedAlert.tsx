@@ -8,7 +8,7 @@ export function PetitionCompletedAlert(props: AlertProps) {
       <AlertDescription>
         <FormattedMessage
           id="component.petition-completed-alert.description"
-          defaultMessage="<b>Petition completed</b>, if you make any changes, the petition must be <b>finalized again</b>."
+          defaultMessage="<b>Parallel completed</b>, if you make any changes, the parallel must be <b>finalized again</b>."
         />
       </AlertDescription>
     </Alert>

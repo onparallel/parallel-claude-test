@@ -31,7 +31,7 @@ function PetitionFromTemplateDialog({
         <Text>
           <FormattedMessage
             id="component.petition-from-template-dialog.title"
-            defaultMessage="Edit petition"
+            defaultMessage="Edit parallel"
           />
         </Text>
       }
@@ -41,14 +41,14 @@ function PetitionFromTemplateDialog({
             <Text>
               <FormattedMessage
                 id="component.petition-from-template-dialog.body"
-                defaultMessage="This petition has been created from a template. Changes to fields or settings will <b>only affect this petition</b>."
+                defaultMessage="This parallel has been created from a template. Changes to fields or settings will <b>only affect this parallel</b>."
               />
             </Text>
             <br />
             <Text>
               <FormattedMessage
                 id="component.petition-from-template-dialog.body-2"
-                defaultMessage="If you want your changes to be maintained in all petitions, make them from the template."
+                defaultMessage="If you want your changes to be maintained in all parallels, make them from the template."
               />
             </Text>
           </Box>

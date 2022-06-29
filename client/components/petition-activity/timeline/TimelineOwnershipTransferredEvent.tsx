@@ -22,7 +22,7 @@ export function TimelineOwnershipTransferredEvent({
     >
       <FormattedMessage
         id="timeline.ownership-transferred-description"
-        defaultMessage="{userIsYou, select, true {You} other {{user}}} transferred the ownership of this petition {previousOwner, select, null {} other {from {previousOwner} }}to {owner} {timeAgo}"
+        defaultMessage="{userIsYou, select, true {You} other {{user}}} transferred the ownership of this parallel {previousOwner, select, null {} other {from {previousOwner} }}to {owner} {timeAgo}"
         values={{
           userIsYou: userId === event.user?.id,
           previousOwner:

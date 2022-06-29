@@ -21,7 +21,7 @@ export function TimelineAccessActivatedFromLinkEvent({
     >
       <FormattedMessage
         id="timeline.public-petition-link-created-description"
-        defaultMessage="{contact} created the petition from a public link {timeAgo}"
+        defaultMessage="{contact} created the parallel from a public link {timeAgo}"
         values={{
           contact: <ContactReference contact={event.access.contact} />,
           timeAgo: (

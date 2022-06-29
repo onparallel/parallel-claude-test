@@ -29,7 +29,7 @@ export const PetitionCompletedUserNotification = Object.assign(
         >
           <FormattedMessage
             id="component.notification-petition-completed.body"
-            defaultMessage="{name} completed the petition."
+            defaultMessage="{name} completed the parallel."
             values={{
               name: (
                 <UserOrContactReference

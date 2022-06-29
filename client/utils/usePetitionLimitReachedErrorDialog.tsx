@@ -11,13 +11,13 @@ export function usePetitionLimitReachedErrorDialog() {
       showErrorDialog({
         header: intl.formatMessage({
           id: "component.petition-limit-reached-error-dialog.header",
-          defaultMessage: "Error sending the petition",
+          defaultMessage: "Error sending the parallel",
         }),
         message: intl.formatMessage(
           {
             id: "component.petition-limit-reached-error-dialog.message",
             defaultMessage:
-              "You have reached your limit of petitions sent, <a>reach out to us to upgrade your plan.</a>",
+              "You have reached your limit of parallels sent, <a>reach out to us to upgrade your plan.</a>",
           },
           {
             a: (chunks: any[]) => (

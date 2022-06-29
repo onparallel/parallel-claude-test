@@ -475,7 +475,7 @@ export interface Mutation {
   createOrganization: SupportMethodResponse;
   /** Creates a new user in the same organization as the context user */
   createOrganizationUser: User;
-  /** Create petition. */
+  /** Create parallel. */
   createPetition: PetitionBase;
   /** Generates and returns a signed url to upload a petition attachment to AWS S3 */
   createPetitionAttachmentUploadLink: PetitionAttachmentUploadData;
@@ -523,7 +523,7 @@ export interface Mutation {
   deletePetitionFieldComment: PetitionField;
   /** Deletes a reply to a petition field. */
   deletePetitionReply: PetitionField;
-  /** Delete petitions. */
+  /** Delete parallels. */
   deletePetitions: Success;
   /** Deletes a signature integration of the user's org. If there are pending signature requests using this integration, you must pass force argument to delete and cancel requests */
   deleteSignatureIntegration: Result;

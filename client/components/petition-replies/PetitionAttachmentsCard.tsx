@@ -95,7 +95,7 @@ export const PetitionAttachmentsCard = Object.assign(
             <Text>
               <FormattedMessage
                 id="component.petition-attachments-card.no-attachments"
-                defaultMessage="No files have been attached to this petition."
+                defaultMessage="No files have been attached to this parallel."
               />
             </Text>
           </Center>

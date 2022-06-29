@@ -196,7 +196,7 @@ export const api = new RestApi({
     {
       name: "Endpoints",
       tags: [
-        "Petitions",
+        "Parallels",
         "Petition replies",
         "Attachments",
         "Signatures",
@@ -213,7 +213,7 @@ export const api = new RestApi({
   ],
   tags: [
     {
-      name: "Petitions",
+      name: "Parallels",
       description: "Petitions are the main entities in Parallel",
     },
     {
@@ -435,7 +435,7 @@ api
         ...petitionIncludeParam,
       },
       responses: { 200: SuccessResponse(PaginatedPetitions) },
-      tags: ["Petitions"],
+      tags: ["Parallels"],
     },
     async ({ client, query }) => {
       let tagIds: string[] | undefined = undefined;
@@ -495,14 +495,14 @@ api
   .post(
     {
       operationId: "CreatePetition",
-      summary: "Create petition",
+      summary: "Create parallel",
       description: outdent`Create a new petition based on a template.`,
       body: JsonBody(CreatePetition),
       query: {
         ...petitionIncludeParam,
       },
       responses: { 201: SuccessResponse(Petition) },
-      tags: ["Petitions"],
+      tags: ["Parallels"],
     },
     async ({ client, body, query }) => {
       const _mutation = gql`
@@ -547,7 +547,7 @@ api
         ...petitionIncludeParam,
       },
       responses: { 200: SuccessResponse(Petition) },
-      tags: ["Petitions"],
+      tags: ["Parallels"],
     },
     async ({ client, params, query }) => {
       const _query = gql`
@@ -589,7 +589,7 @@ api
         ...petitionIncludeParam,
       },
       responses: { 200: SuccessResponse(Petition) },
-      tags: ["Petitions"],
+      tags: ["Parallels"],
     },
     async ({ client, params, body, query }) => {
       const _mutation = gql`
@@ -624,7 +624,7 @@ api
   .delete(
     {
       operationId: "DeletePetition",
-      summary: "Delete petition",
+      summary: "Delete parallel",
       query: {
         force: booleanParam({
           required: false,
@@ -646,7 +646,7 @@ api
           description: "The petition is being shared with another user. Set force=true to delete.",
         }),
       },
-      tags: ["Petitions"],
+      tags: ["Parallels"],
     },
     async ({ client, params, query }) => {
       try {
@@ -811,7 +811,7 @@ api
       responses: {
         200: SuccessResponse(PetitionCustomProperties),
       },
-      tags: ["Petitions"],
+      tags: ["Parallels"],
     },
     async ({ client, params }) => {
       const _query = gql`
@@ -848,7 +848,7 @@ api
           description: "You reached the maximum limit of custom properties on the petition",
         }),
       },
-      tags: ["Petitions"],
+      tags: ["Parallels"],
     },
     async ({ client, body, params }) => {
       try {
@@ -894,7 +894,7 @@ api
         Removes the provided key from the custom properties of the petition.
       `,
       responses: { 204: SuccessResponse() },
-      tags: ["Petitions"],
+      tags: ["Parallels"],
     },
     async ({ client, params }) => {
       const _mutation = gql`
@@ -973,7 +973,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
         description: "The petition was already sent to some of the provided contacts",
       }),
     },
-    tags: ["Petitions"],
+    tags: ["Parallels"],
   },
   async ({ client, params, body, query }) => {
     const contactIds = await pMap(
@@ -1135,7 +1135,7 @@ api.path("/petitions/:petitionId/recipients", { params: { petitionId } }).get(
         Returns the list of recipients this petition has been sent to.
       `,
     responses: { 200: SuccessResponse(ListOfPetitionAccesses) },
-    tags: ["Petitions"],
+    tags: ["Parallels"],
   },
   async ({ client, params }) => {
     const _query = gql`
@@ -1203,7 +1203,7 @@ api
     `,
       body: JsonBody(UpdatePetitionField),
       responses: { 200: SuccessResponse(PetitionField) },
-      tags: ["Petitions"],
+      tags: ["Parallels"],
     },
     async ({ client, params, body }) => {
       gql`

@@ -21,7 +21,7 @@ export function TemplateIconDefaultPermissions({
           <Text>
             <FormattedMessage
               id="component.template-icon-default-permissions.text"
-              defaultMessage="Petitions will be assigned to:"
+              defaultMessage="Parallels will be assigned to:"
             />
           </Text>
           <Stack as={List}>

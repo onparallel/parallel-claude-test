@@ -63,7 +63,7 @@ export function TemplateDefaultUserPermissionRow({
         ) : (
           <FormattedMessage
             id="component.petition-permission-row.default-owner"
-            defaultMessage="Person starting the petition"
+            defaultMessage="Person starting the parallel"
           />
         )}
       </Box>

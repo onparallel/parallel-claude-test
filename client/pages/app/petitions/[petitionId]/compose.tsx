@@ -566,7 +566,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 <Text>
                   <FormattedMessage
                     id="petition.already-sent"
-                    defaultMessage="This petition has already been sent."
+                    defaultMessage="This parallel has already been sent."
                   />
                 </Text>
                 <Text>

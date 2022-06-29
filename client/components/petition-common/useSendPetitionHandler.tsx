@@ -93,7 +93,7 @@ export function useSendPetitionHandler(
             header: (
               <FormattedMessage
                 id="petition.long-batch-send-dialog.header"
-                defaultMessage="Sending petitions"
+                defaultMessage="Sending parallels"
               />
             ),
             body: (
@@ -101,7 +101,7 @@ export function useSendPetitionHandler(
                 <Text>
                   <FormattedMessage
                     id="petition.long-batch-send-dialog.message"
-                    defaultMessage="We are sending your petitions. It might take a little bit, please wait."
+                    defaultMessage="We are sending your parallels. It might take a little bit, please wait."
                   />
                 </Text>
                 <Progress isIndeterminate size="sm" borderRadius="full" />
@@ -122,7 +122,7 @@ export function useSendPetitionHandler(
           description: intl.formatMessage({
             id: "petition.petition-send-error.description",
             defaultMessage:
-              "There was an error sending your petition. Try again and, if it fails, reach out to support for help.",
+              "There was an error sending your parallel. Try again and, if it fails, reach out to support for help.",
           }),
         });
         return;
@@ -147,7 +147,7 @@ export function useSendPetitionHandler(
           title: intl.formatMessage(
             {
               id: "petition.petition-scheduled-toast.title",
-              defaultMessage: "{count, plural, =1{Petition} other{Petitions}} scheduled",
+              defaultMessage: "{count, plural, =1{Parallel} other{Parallels}} scheduled",
             },
             { count: recipientIdGroups.length }
           ),
@@ -155,7 +155,7 @@ export function useSendPetitionHandler(
             {
               id: "petition.petition-scheduled-toast.description",
               defaultMessage:
-                "Your {count, plural, =1{petition} other{petitions}} will be sent on {date}.",
+                "Your {count, plural, =1{parallel} other{parallels}} will be sent on {date}.",
             },
             {
               count: recipientIdGroups.length,
@@ -170,7 +170,7 @@ export function useSendPetitionHandler(
           title: intl.formatMessage(
             {
               id: "petition.petition-sent-toast.title",
-              defaultMessage: "{count, plural, =1{Petition} other{Petitions}} sent",
+              defaultMessage: "{count, plural, =1{Parallel} other{Parallels}} sent",
             },
             { count: recipientIdGroups.length }
           ),
@@ -178,7 +178,7 @@ export function useSendPetitionHandler(
             {
               id: "petition.petition-sent-toast.description",
               defaultMessage:
-                "Your {count, plural, =1{petition is on its} other{petitions are on their}} way.",
+                "Your {count, plural, =1{parallel is on its} other{parallels are on their}} way.",
             },
             { count: recipientIdGroups.length }
           ),

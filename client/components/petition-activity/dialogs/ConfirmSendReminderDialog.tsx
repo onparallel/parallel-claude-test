@@ -63,7 +63,7 @@ export function ConfirmSendReminderDialog({
                       <Text>
                         <FormattedMessage
                           id="component.confirm-send-reminder-dialog.opted-out-warning-multiple"
-                          defaultMessage="The following contacts have opted out from receiving reminders for this petition:"
+                          defaultMessage="The following contacts have opted out from receiving reminders for this parallel:"
                         />
                       </Text>
                       <UnorderedList paddingLeft={2}>
@@ -78,7 +78,7 @@ export function ConfirmSendReminderDialog({
                     <Text>
                       <FormattedMessage
                         id="component.confirm-send-reminder-dialog.opted-out-warning"
-                        defaultMessage="This contact has opted out from receiving reminders for this petition."
+                        defaultMessage="This contact has opted out from receiving reminders for this parallel."
                       />
                     </Text>
                   )}

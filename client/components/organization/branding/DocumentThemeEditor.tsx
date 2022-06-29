@@ -353,7 +353,7 @@ export function DocumentThemeEditor({ organization, isDisabled }: DocumentThemeE
         <Text>
           <FormattedMessage
             id="component.document-theme-editor.legal-disclaimer-description"
-            defaultMessage="This text will be displayed at the end of documents that include a signature process. The language will be adapted to the language of the petition."
+            defaultMessage="This text will be displayed at the end of documents that include a signature process. The language will be adapted to the language of the parallel."
           />
         </Text>
 

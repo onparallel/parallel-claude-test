@@ -176,7 +176,7 @@ export function TemplateDefaultPermissionsDialog({
           <Text>
             <FormattedMessage
               id="component.template-default-permissions-dialog.description"
-              defaultMessage="Upon using this template, petitions will automatically be assigned to these users."
+              defaultMessage="Upon using this template, parallels will automatically be assigned to these users."
             />
           </Text>
           <Flex>
@@ -228,7 +228,7 @@ export function TemplateDefaultPermissionsDialog({
                   <HelpPopover>
                     <FormattedMessage
                       id="component.template-default-permissions-dialog.subscribe-explanation"
-                      defaultMessage="These users will be receive notifications from the petitions created from this template."
+                      defaultMessage="These users will be receive notifications from the parallels created from this template."
                     />
                   </HelpPopover>
                 </Flex>

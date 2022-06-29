@@ -1016,7 +1016,7 @@ export class PetitionRepository extends BaseRepository {
   }
 
   /**
-   * Delete petition, deactivate all accesses and cancel all scheduled messages
+   * Delete parallel, deactivate all accesses and cancel all scheduled messages
    */
   async deletePetition(petitionId: MaybeArray<number>, user: User, t?: Knex.Transaction) {
     const petitionIds = unMaybeArray(petitionId);

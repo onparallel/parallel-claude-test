@@ -72,8 +72,8 @@ function OrganizationUsage() {
           />
           <UsageCard
             title={intl.formatMessage({
-              id: "page.usage.petitions",
-              defaultMessage: "Petitions",
+              id: "page.usage.parallels",
+              defaultMessage: "Parallels",
             })}
             usage={petitions.used}
             limit={petitions.limit}

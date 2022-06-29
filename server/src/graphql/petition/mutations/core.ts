@@ -99,7 +99,7 @@ import {
 } from "./authorizers";
 
 export const createPetition = mutationField("createPetition", {
-  description: "Create petition.",
+  description: "Create parallel.",
   type: "PetitionBase",
   authorize: authenticateAnd(
     ifArgDefined(
@@ -271,7 +271,7 @@ export const clonePetitions = mutationField("clonePetitions", {
 });
 
 export const deletePetitions = mutationField("deletePetitions", {
-  description: "Delete petitions.",
+  description: "Delete parallels.",
   type: "Success",
   authorize: chain(authenticate(), userHasAccessToPetitions("ids")),
   args: {

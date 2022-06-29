@@ -176,8 +176,8 @@
   },
   {
     "term": "export-template-report.column-header.petition-name",
-    "definition": "Petition name",
-    "context": "Petition name"
+    "definition": "Parallel name",
+    "context": "Parallel name"
   },
   {
     "term": "export-template-report.column-header.recipient-emails",
@@ -310,9 +310,9 @@
     "context": "This information has been requested to be submitted before {deadline}."
   },
   {
-    "term": "generic.unnamed-petition",
-    "definition": "Unnamed petition",
-    "context": "Unnamed petition"
+    "term": "generic.unnamed-parallel",
+    "definition": "Unnamed parallel",
+    "context": "Unnamed parallel"
   },
   {
     "term": "generic.untitled",

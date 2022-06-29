@@ -18,7 +18,7 @@ function ConfirmRestartSignatureRequestDialog(props: DialogProps) {
           <Text>
             <FormattedMessage
               id="component.confirm-restart-signature-request.description"
-              defaultMessage="You already have a signed petition. If you continue you will spend an additional eSignature credit."
+              defaultMessage="You already have a signed parallel. If you continue you will spend an additional eSignature credit."
             />
           </Text>
           <Text>

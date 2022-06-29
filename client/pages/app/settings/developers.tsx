@@ -231,7 +231,7 @@ function Developers() {
           <Text>
             <FormattedMessage
               id="settings.developers.subscriptions-explanation"
-              defaultMessage="Here you can register webhooks to get notified when anything happens in one of your petitions (e.g. when a recipients adds a comment or when the petition is completed)"
+              defaultMessage="Here you can register webhooks to get notified when anything happens in one of your parallels (e.g. when a recipients adds a comment or when the parallel is completed)"
             />
           </Text>
           <Card display="flex" flexDirection="column" overflow="hidden">
@@ -441,7 +441,7 @@ function useSubscriptionsColumns(): TableColumn<
                 <Text textStyle="hint">
                   <FormattedMessage
                     id="settings.developers.subscriptions.header.from-any-petition"
-                    defaultMessage="Any petition"
+                    defaultMessage="Any parallel"
                   />
                 </Text>
               )}

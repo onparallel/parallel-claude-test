@@ -17,7 +17,7 @@ export function TemplateIconCompliance({
         <Text fontSize="sm">
           <FormattedMessage
             id="component.template-icon-compliance.text"
-            defaultMessage="Data of closed petitions will be anonymized after {months, plural, =1 {# month} other {# months}}."
+            defaultMessage="Data of closed parallels will be anonymized after {months, plural, =1 {# month} other {# months}}."
             values={{ months: anonymizeAfterMonths }}
           />
         </Text>

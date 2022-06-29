@@ -46,14 +46,14 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
             <EmailIcon marginRight={2} />
             <FormattedMessage
               id="component.petition-template-request-message.card-header"
-              defaultMessage="Petition message"
+              defaultMessage="Parallel message"
             />
           </CardHeader>
           <Box padding={4}>
             <Text marginBottom={2}>
               <FormattedMessage
                 id="component.petition-template-request-message.card-explainer"
-                defaultMessage="This message will be used <b>when sending</b> the petition to the recipients."
+                defaultMessage="This message will be used <b>when sending</b> the parallel to the recipients."
               />
             </Text>
             <MessageEmailEditor

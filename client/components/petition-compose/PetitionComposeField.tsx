@@ -338,7 +338,7 @@ const _PetitionComposeField = chakraForwardRef<
             }}
             aria-label={intl.formatMessage({
               id: "component.petition-compose-field.drag-to-sort-label",
-              defaultMessage: "Drag to sort this petition fields",
+              defaultMessage: "Drag to sort this parallel fields",
             })}
           >
             <DragHandleIcon role="presentation" />

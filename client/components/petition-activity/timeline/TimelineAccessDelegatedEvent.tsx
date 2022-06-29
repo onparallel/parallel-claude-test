@@ -18,7 +18,7 @@ export function TimelineAccessDelegatedEvent({ event }: TimelineAccessDelegatedE
     >
       <FormattedMessage
         id="timeline.access-delegated-description"
-        defaultMessage="{contact} has delegated the petition to {newContact} {timeAgo}"
+        defaultMessage="{contact} has delegated the parallel to {newContact} {timeAgo}"
         values={{
           contact: <ContactReference contact={event.originalAccess.contact} />,
           newContact: <ContactReference contact={event.newAccess.contact} />,

@@ -224,8 +224,8 @@ function useOrganizationColumns() {
       {
         key: "petitionsUsage",
         header: intl.formatMessage({
-          id: "organizations.header.petitions-used",
-          defaultMessage: "Petitions used",
+          id: "organizations.header.parallels-used",
+          defaultMessage: "Parallels used",
         }),
         cellProps: {
           width: "1px",

@@ -46,7 +46,7 @@ export const PetitionSharedUserNotification = Object.assign(
           ) : sharedWith?.__typename === "User" ? (
             <FormattedMessage
               id="component.notification-petition-shared.body"
-              defaultMessage="{name} has shared the {isTemplate, select, true {template} other {petition}} with you as {permissionType}."
+              defaultMessage="{name} has shared the {isTemplate, select, true {template} other {parallel}} with you as {permissionType}."
               values={{
                 isTemplate: petition.__typename === "PetitionTemplate",
                 name: <UserReference user={notification.owner} />,
