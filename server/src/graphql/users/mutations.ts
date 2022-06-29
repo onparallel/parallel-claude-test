@@ -505,6 +505,12 @@ export const userSignUp = mutationField("userSignUp", {
         t
       );
 
+      const [signatureSandboxIntegration] = await ctx.integrations.loadIntegrationsByOrgId(
+        org.id,
+        "SIGNATURE",
+        t
+      );
+
       // once the user is created, we need to update the created_by column on the different entries
       const [[newUser]] = await Promise.all([
         ctx.users.updateUserById(user.id, { created_by: `User:${user.id}` }, `User:${user.id}`, t),
@@ -527,6 +533,12 @@ export const userSignUp = mutationField("userSignUp", {
           {
             created_by: `User:${user.id}`,
           },
+          `User:${user.id}`,
+          t
+        ),
+        ctx.integrations.updateOrgIntegration(
+          signatureSandboxIntegration.id,
+          { created_by: `User:${user.id}` },
           `User:${user.id}`,
           t
         ),

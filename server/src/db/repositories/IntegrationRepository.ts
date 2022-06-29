@@ -60,9 +60,10 @@ export class IntegrationRepository extends BaseRepository {
 
   async loadIntegrationsByOrgId<IType extends IntegrationType>(
     orgId: number,
-    type?: IType | null
+    type?: IType | null,
+    t?: Knex.Transaction
   ): Promise<Replace<OrgIntegration, { settings: IntegrationSettings<IType> }>[]> {
-    return await this.from("org_integration")
+    return await this.from("org_integration", t)
       .where({
         org_id: orgId,
         deleted_at: null,
@@ -110,9 +111,10 @@ export class IntegrationRepository extends BaseRepository {
   async updateOrgIntegration<K extends IntegrationType>(
     integrationId: number,
     data: Partial<Replace<OrgIntegration, { settings: IntegrationSettings<K> }>>,
-    updatedBy: string
+    updatedBy: string,
+    t?: Knex.Transaction
   ) {
-    return await this.from("org_integration")
+    return await this.from("org_integration", t)
       .where({ id: integrationId, deleted_at: null })
       .update(
         {

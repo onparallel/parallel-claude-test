@@ -822,9 +822,6 @@ export const updateOrganizationTier = mutationField("updateOrganizationTier", {
         New Usage Limits: 
         USER_LIMIT: ${tier.USER_LIMIT}
         PETITION_SEND: ${tier.PETITION_SEND.limit} in ${tier.PETITION_SEND.period} 
-        SIGNATURIT_SHARED_APIKEY: ${tier.SIGNATURIT_SHARED_APIKEY.limit} in ${
-          tier.SIGNATURIT_SHARED_APIKEY.period
-        }
 
         Feature Flags: 
         ${tier.FEATURE_FLAGS.map((ff) => `${ff.name}: ${ff.value}`).join("\n")}`,

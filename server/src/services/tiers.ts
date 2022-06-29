@@ -11,7 +11,7 @@ import { FeatureFlagName, Organization } from "../db/__types";
 
 export const TIERS_SERVICE = Symbol.for("TIERS_SERVICE");
 
-type Tier = OrganizationUsageDetails & {
+type Tier = Omit<OrganizationUsageDetails, "SIGNATURIT_SHARED_APIKEY"> & {
   FEATURE_FLAGS: { name: FeatureFlagName; value: boolean }[];
 };
 
@@ -45,31 +45,26 @@ export class TiersService implements ITiersService {
     FREE: {
       USER_LIMIT: 2,
       PETITION_SEND: { limit: 20, period: "1 month" },
-      SIGNATURIT_SHARED_APIKEY: { limit: 0, period: "1 month" },
       FEATURE_FLAGS: [],
     },
     APPSUMO1: {
       USER_LIMIT: 5,
       PETITION_SEND: { limit: 40, period: "1 month" },
-      SIGNATURIT_SHARED_APIKEY: { limit: 0, period: "1 month" },
       FEATURE_FLAGS: this.defaultAppSumoFFs.map((name) => ({ name, value: true })),
     },
     APPSUMO2: {
       USER_LIMIT: 20,
       PETITION_SEND: { limit: 80, period: "1 month" },
-      SIGNATURIT_SHARED_APIKEY: { limit: 0, period: "1 month" },
       FEATURE_FLAGS: this.defaultAppSumoFFs.map((name) => ({ name, value: true })),
     },
     APPSUMO3: {
       USER_LIMIT: 50,
       PETITION_SEND: { limit: 150, period: "1 month" },
-      SIGNATURIT_SHARED_APIKEY: { limit: 0, period: "1 month" },
       FEATURE_FLAGS: this.defaultAppSumoFFs.map((name) => ({ name, value: true })),
     },
     APPSUMO4: {
       USER_LIMIT: 1000,
       PETITION_SEND: { limit: 300, period: "1 month" },
-      SIGNATURIT_SHARED_APIKEY: { limit: 0, period: "1 month" },
       FEATURE_FLAGS: this.defaultAppSumoFFs.map((name) => ({ name, value: true })),
     },
   };
@@ -89,7 +84,7 @@ export class TiersService implements ITiersService {
 
     const newUsageDetails = {
       ...org.usage_details,
-      ...pick(tier, ["USER_LIMIT", "PETITION_SEND", "SIGNATURIT_SHARED_APIKEY"]),
+      ...pick(tier, ["USER_LIMIT", "PETITION_SEND"]),
     };
 
     await this.organizations.withTransaction(async (t) => {
@@ -107,13 +102,6 @@ export class TiersService implements ITiersService {
           "PETITION_SEND",
           tier.PETITION_SEND.limit,
           tier.PETITION_SEND.period,
-          t
-        ),
-        this.organizations.upsertOrganizationUsageLimit(
-          org.id,
-          "SIGNATURIT_SHARED_APIKEY",
-          tier.SIGNATURIT_SHARED_APIKEY.limit,
-          tier.SIGNATURIT_SHARED_APIKEY.period,
           t
         ),
         this.integrations.removeSignaturitBrandingIds(org.id, updatedBy, t),
