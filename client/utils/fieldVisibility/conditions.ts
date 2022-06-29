@@ -90,6 +90,20 @@ export function updateConditionOperator<
     };
   } else if (field.multiple && condition.modifier === "NUMBER_OF_REPLIES") {
     return { ...condition, operator };
+  } else if (
+    ["SELECT", "DYNAMIC_SELECT"].includes(field.type) &&
+    condition.modifier !== "NUMBER_OF_REPLIES"
+  ) {
+    return {
+      ...condition,
+      operator,
+      value:
+        ["EQUAL", "NOT_EQUAL"].includes(operator) && Array.isArray(condition.value)
+          ? condition.value?.[0] ?? defaultConditionFieldValue(field, condition.column)
+          : ["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(operator) && typeof condition.value === "string"
+          ? [condition.value]
+          : condition.value,
+    };
   } else {
     return {
       ...condition,

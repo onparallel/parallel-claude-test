@@ -12,7 +12,7 @@ export interface PetitionFieldVisibilityCondition {
   fieldId: string;
   modifier: PetitionFieldVisibilityConditionModifier;
   operator: PetitionFieldVisibilityConditionOperator;
-  value: string | number | null;
+  value: string | string[] | number | null;
   column?: number;
 }
 
@@ -27,6 +27,8 @@ export type PetitionFieldVisibilityConditionOperator =
   | "END_WITH"
   | "CONTAIN"
   | "NOT_CONTAIN"
+  | "IS_ONE_OF"
+  | "NOT_IS_ONE_OF"
   | "LESS_THAN"
   | "LESS_THAN_OR_EQUAL"
   | "GREATER_THAN"

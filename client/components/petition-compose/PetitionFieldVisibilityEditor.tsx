@@ -500,6 +500,26 @@ function ConditionPredicate({
               { modifier: condition.modifier }
             ),
             value: "NOT_EQUAL",
+          },
+          {
+            label: intl.formatMessage(
+              {
+                id: "component.petition-field-visibility-editor.is-one-of-select",
+                defaultMessage: "{modifier, select, ALL {are one of} other {is one of}}",
+              },
+              { modifier: condition.modifier }
+            ),
+            value: "IS_ONE_OF",
+          },
+          {
+            label: intl.formatMessage(
+              {
+                id: "component.petition-field-visibility-editor.not-is-one-of-select",
+                defaultMessage: "{modifier, select, ALL {are not one of} other {is not one of}}",
+              },
+              { modifier: condition.modifier }
+            ),
+            value: "NOT_IS_ONE_OF",
           }
         );
       } else if (!isFileTypeField(field.type) && field.type !== "DYNAMIC_SELECT") {
@@ -797,13 +817,16 @@ function ConditionPredicateValueSelect({
       .sort((a, b) => a.localeCompare(b))
       .map((value) => toSimpleSelectOption(value)!);
   }, [field.type, field.options.values, condition.column]);
+  const isMultiCondition =
+    condition.operator === "IS_ONE_OF" || condition.operator === "NOT_IS_ONE_OF";
   return (
     <SimpleSelect
       size="sm"
       options={options}
       isDisabled={isReadOnly}
       isInvalid={showError && condition.value === null}
-      value={condition.value as string | null}
+      isMulti={isMultiCondition}
+      value={condition.value as string | string[] | null}
       onChange={(value) => onChange({ ...condition, value: value })}
       filterOption={createFilter({
         // this improves search performance on long lists

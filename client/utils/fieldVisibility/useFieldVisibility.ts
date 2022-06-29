@@ -26,7 +26,7 @@ type PetitionFieldSelection =
 function evaluatePredicate(
   reply: string | number | string[],
   operator: PetitionFieldVisibilityConditionOperator,
-  value: string | number | null
+  value: string | string[] | number | null
 ) {
   try {
     if (reply === undefined || value === undefined || value === null) {
@@ -52,7 +52,12 @@ function evaluatePredicate(
 
     // make matching case-insensitive
     const _reply = typeof reply === "string" ? reply.toLowerCase() : reply;
-    const _value = typeof value === "string" ? value.toLowerCase() : value;
+    const _value =
+      typeof value === "string"
+        ? value.toLowerCase()
+        : Array.isArray(value)
+        ? value.map((v) => v.toLowerCase())
+        : value;
 
     if (_reply === null || _value === null) return false;
     switch (operator) {
@@ -84,6 +89,14 @@ function evaluatePredicate(
         assert(typeof _reply === "string");
         assert(typeof _value === "string");
         return !_reply.includes(_value);
+      case "IS_ONE_OF":
+        assert(typeof _reply === "string");
+        assert(Array.isArray(_value));
+        return _value.includes(_reply);
+      case "NOT_IS_ONE_OF":
+        assert(typeof _reply === "string");
+        assert(Array.isArray(_value));
+        return !_value.includes(_reply);
       default:
         return false;
     }

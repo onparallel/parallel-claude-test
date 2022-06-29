@@ -1970,6 +1970,11 @@
     "context": "Hide when"
   },
   {
+    "term": "component.petition-field-visibility-editor.is-one-of-select",
+    "definition": "{modifier, select, ALL {son una de} other {es una de}}",
+    "context": "{modifier, select, ALL {are one of} other {is one of}}"
+  },
+  {
     "term": "component.petition-field-visibility-editor.less-or-equal-than-date",
     "definition": "es antes de (incl.)",
     "context": "is before the (incl.)"
@@ -2013,6 +2018,11 @@
     "term": "component.petition-field-visibility-editor.not-have-reply",
     "definition": "no tiene respuestas",
     "context": "does not have replies"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.not-is-one-of-select",
+    "definition": "{modifier, select, ALL {no son ninguna de} other {no es ninguna de}}",
+    "context": "{modifier, select, ALL {are not one of} other {is not one of}}"
   },
   {
     "term": "component.petition-field-visibility-editor.number-of-choices",

@@ -9,6 +9,8 @@ import {
   PetitionFieldVisibility,
 } from "../../../util/fieldVisibility";
 import { PetitionField } from "../../../db/__types";
+import { isFileTypeField } from "../../../util/isFileTypeField";
+import { DynamicSelectOption } from "../parseDynamicSelectValues";
 
 const schema = {
   type: "object",
@@ -38,6 +40,8 @@ const schema = {
               "END_WITH",
               "CONTAIN",
               "NOT_CONTAIN",
+              "IS_ONE_OF",
+              "NOT_IS_ONE_OF",
               "LESS_THAN",
               "LESS_THAN_OR_EQUAL",
               "GREATER_THAN",
@@ -45,7 +49,12 @@ const schema = {
               "NUMBER_OF_SUBREPLIES",
             ],
           },
-          value: { type: ["string", "integer", "number", "null"] },
+          value: {
+            oneOf: [
+              { type: ["string", "integer", "number", "null"] },
+              { type: "array", items: { type: "string" } },
+            ],
+          },
           column: { type: "number" },
         },
       },
@@ -125,19 +134,31 @@ function validateCondition(ctx: ApiContext, petitionId: number, field: PetitionF
           c.value === null || typeof c.value === "string",
           `Invalid value type ${typeof c.value} for field of type ${referencedField.type}`
         );
-      } else if (referencedField.type === "FILE_UPLOAD") {
+      } else if (isFileTypeField(referencedField.type)) {
         throw new Error(`Invalid modifier ${c.modifier} for field of type ${referencedField.type}`);
-      } else if (referencedField.type === "SELECT") {
+      } else if (
+        referencedField.type === "SELECT" ||
+        (referencedField.type === "DYNAMIC_SELECT" && c.column !== undefined)
+      ) {
+        const options =
+          referencedField.type === "SELECT"
+            ? referencedField.options.values
+            : getDynamicSelectValues(referencedField.options.values, c.column!);
         assertOneOf(
           c.operator,
-          ["EQUAL", "NOT_EQUAL"],
+          ["EQUAL", "NOT_EQUAL", "IS_ONE_OF", "NOT_IS_ONE_OF"],
           `Invalid operator ${c.operator} for field of type ${referencedField.type}`
         );
         assert(
-          c.value === null || referencedField.options.values.includes(c.value),
+          (["EQUAL", "NOT_EQUAL"].includes(c.operator) &&
+            typeof c.value === "string" &&
+            options.includes(c.value)) ||
+            (["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(c.operator) &&
+              Array.isArray(c.value) &&
+              c.value.every((v) => options.includes(v))),
           `Invalid value ${c.value} for field of type ${
             referencedField.type
-          }. Should be one of: ${referencedField.options.values.join(", ")}`
+          }. Should be one of: ${options.join(", ")}`
         );
       }
     }
@@ -179,4 +200,22 @@ export function validFieldVisibilityJson<TypeName extends string, FieldName exte
       throw new ArgValidationError(info, argName, e.message);
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
+}
+
+export function getDynamicSelectValues(
+  values: (string | DynamicSelectOption)[],
+  level: number
+): string[] {
+  if (level === 0) {
+    return Array.isArray(values[0])
+      ? (values as DynamicSelectOption[]).map(([value]) => value)
+      : (values as string[]);
+  } else {
+    if (values.length && !Array.isArray(values[0])) {
+      throw new Error("Invalid level");
+    }
+    return (values as DynamicSelectOption[]).flatMap(([, children]) =>
+      getDynamicSelectValues(children, level - 1)
+    );
+  }
 }
