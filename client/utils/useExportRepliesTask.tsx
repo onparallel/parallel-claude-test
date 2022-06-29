@@ -55,11 +55,22 @@ export function useExportRepliesTask() {
       });
     } else if (!error) {
       openNewWindow(async () => {
-        const { data } = await getTaskResultFile({ variables: { taskId: finishedTask!.id } });
-        if (!data?.getTaskResultFile?.url) {
-          throw new Error();
+        try {
+          const { data } = await getTaskResultFile({
+            variables: { taskId: finishedTask!.id },
+          });
+          return data!.getTaskResultFile.url;
+        } catch (error) {
+          // don't await this. we want to immediately rethrow the error so the new window is closed
+          showError({
+            message: intl.formatMessage({
+              id: "generic.unexpected-error-happened",
+              defaultMessage:
+                "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
+            }),
+          });
+          throw error;
         }
-        return data.getTaskResultFile.url;
       });
     }
   };
@@ -76,7 +87,9 @@ useExportRepliesTask.mutations = [
   `,
   gql`
     mutation useExportRepliesTask_getTaskResultFile($taskId: GID!) {
-      getTaskResultFile(taskId: $taskId, preview: false)
+      getTaskResultFile(taskId: $taskId, preview: false) {
+        url
+      }
     }
   `,
 ];

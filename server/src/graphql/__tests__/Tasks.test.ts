@@ -169,7 +169,10 @@ describe("GraphQL/Tasks", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($taskId: GID!) {
-            getTaskResultFile(taskId: $taskId)
+            getTaskResultFile(taskId: $taskId) {
+              url
+              filename
+            }
           }
         `,
         { taskId: toGlobalId("Task", completedTask.id) }
@@ -183,7 +186,9 @@ describe("GraphQL/Tasks", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($taskId: GID!) {
-            getTaskResultFile(taskId: $taskId)
+            getTaskResultFile(taskId: $taskId) {
+              url
+            }
           }
         `,
         { taskId: toGlobalId("Task", privateTask.id) }
@@ -197,7 +202,9 @@ describe("GraphQL/Tasks", () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($taskId: GID!) {
-            getTaskResultFile(taskId: $taskId)
+            getTaskResultFile(taskId: $taskId) {
+              url
+            }
           }
         `,
         { taskId: toGlobalId("Task", incompleteTask.id) }

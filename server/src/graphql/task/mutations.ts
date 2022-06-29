@@ -1,6 +1,6 @@
 import { ApolloError } from "apollo-server-core";
 import { differenceInDays } from "date-fns";
-import { booleanArg, mutationField, nonNull, nullable, stringArg } from "nexus";
+import { booleanArg, mutationField, nonNull, nullable, objectType, stringArg } from "nexus";
 import { isDefined } from "remeda";
 import { Task } from "../../db/repositories/TaskRepository";
 import { isValidTimezone } from "../../util/validators";
@@ -156,7 +156,13 @@ export const createTemplateStatsReportTask = mutationField("createTemplateStatsR
 
 export const getTaskResultFile = mutationField("getTaskResultFile", {
   description: "Returns an object with signed download url and filename for tasks with file output",
-  type: "JSONObject",
+  type: objectType({
+    name: "TaskResultFile",
+    definition(t) {
+      t.nonNull.string("filename");
+      t.nonNull.string("url");
+    },
+  }),
   authorize: authenticateAnd(
     userHasAccessToTasks("taskId"),
     tasksAreOfType("taskId", [

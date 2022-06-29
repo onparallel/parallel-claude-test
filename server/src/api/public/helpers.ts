@@ -270,17 +270,16 @@ export async function waitForTask(client: GraphQLClient, task: TaskType) {
 export async function getTaskResultFileUrl(client: GraphQLClient, task: TaskType) {
   const _mutation = gql`
     mutation getTaskResultFileUrl_getTaskResultFile($taskId: GID!) {
-      getTaskResultFile(taskId: $taskId)
+      getTaskResultFile(taskId: $taskId) {
+        url
+      }
     }
   `;
-  const result = await client.request(getTaskResultFileUrl_getTaskResultFileDocument, {
-    taskId: task.id,
-  });
-  if (!result?.getTaskResultFile?.url) {
-    throw new Error();
-  } else {
-    return result.getTaskResultFile.url as string;
-  }
+  const { getTaskResultFile } = await client.request(
+    getTaskResultFileUrl_getTaskResultFileDocument,
+    { taskId: task.id }
+  );
+  return getTaskResultFile.url;
 }
 
 export async function uploadFile(file: File, presignedPostData: AWSPresignedPostDataFragment) {

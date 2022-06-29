@@ -541,7 +541,7 @@ export interface Mutation {
   /** Get the user who owns an API Token */
   getApiTokenOwner: SupportMethodResponse;
   /** Returns an object with signed download url and filename for tasks with file output */
-  getTaskResultFile: Scalars["JSONObject"];
+  getTaskResultFile: TaskResultFile;
   /**
    * Returns a signed download url for tasks with file output
    * @deprecated use getTaskResultFile instead
@@ -3478,6 +3478,12 @@ export type TaskName =
   | "PRINT_PDF"
   | "TEMPLATE_REPLIES_REPORT"
   | "TEMPLATE_STATS_REPORT";
+
+export interface TaskResultFile {
+  __typename?: "TaskResultFile";
+  filename: Scalars["String"];
+  url: Scalars["String"];
+}
 
 export type TaskStatus = "COMPLETED" | "ENQUEUED" | "FAILED" | "PROCESSING";
 
@@ -21073,7 +21079,7 @@ export type useBackgroundTask_getTaskResultFileMutationVariables = Exact<{
 }>;
 
 export type useBackgroundTask_getTaskResultFileMutation = {
-  getTaskResultFile: { [key: string]: any };
+  getTaskResultFile: { __typename?: "TaskResultFile"; filename: string; url: string };
 };
 
 export type useBackgroundTask_taskQueryVariables = Exact<{
@@ -21108,7 +21114,7 @@ export type useExportRepliesTask_getTaskResultFileMutationVariables = Exact<{
 }>;
 
 export type useExportRepliesTask_getTaskResultFileMutation = {
-  getTaskResultFile: { [key: string]: any };
+  getTaskResultFile: { __typename?: "TaskResultFile"; url: string };
 };
 
 export type useFilenamePlaceholdersRename_PetitionFieldFragment = {
@@ -21450,7 +21456,7 @@ export type usePrintPdfTask_getTaskResultFileMutationVariables = Exact<{
 }>;
 
 export type usePrintPdfTask_getTaskResultFileMutation = {
-  getTaskResultFile: { [key: string]: any };
+  getTaskResultFile: { __typename?: "TaskResultFile"; url: string };
 };
 
 export type usePublicPrintPdfTask_publicCreatePrintPdfTaskMutationVariables = Exact<{
@@ -21532,7 +21538,7 @@ export type useTemplateRepliesReportTask_getTaskResultFileMutationVariables = Ex
 }>;
 
 export type useTemplateRepliesReportTask_getTaskResultFileMutation = {
-  getTaskResultFile: { [key: string]: any };
+  getTaskResultFile: { __typename?: "TaskResultFile"; url: string };
 };
 
 export type validatePetitionFields_PetitionFieldFragment = {
@@ -28919,7 +28925,10 @@ export const useBackgroundTask_createTemplateStatsReportTaskDocument = gql`
 >;
 export const useBackgroundTask_getTaskResultFileDocument = gql`
   mutation useBackgroundTask_getTaskResultFile($taskId: GID!) {
-    getTaskResultFile(taskId: $taskId, preview: false)
+    getTaskResultFile(taskId: $taskId, preview: false) {
+      filename
+      url
+    }
   }
 ` as unknown as DocumentNode<
   useBackgroundTask_getTaskResultFileMutation,
@@ -28946,7 +28955,9 @@ export const useExportRepliesTask_createExportRepliesTaskDocument = gql`
 >;
 export const useExportRepliesTask_getTaskResultFileDocument = gql`
   mutation useExportRepliesTask_getTaskResultFile($taskId: GID!) {
-    getTaskResultFile(taskId: $taskId, preview: false)
+    getTaskResultFile(taskId: $taskId, preview: false) {
+      url
+    }
   }
 ` as unknown as DocumentNode<
   useExportRepliesTask_getTaskResultFileMutation,
@@ -28989,7 +29000,9 @@ export const usePrintPdfTask_createPrintPdfTaskDocument = gql`
 >;
 export const usePrintPdfTask_getTaskResultFileDocument = gql`
   mutation usePrintPdfTask_getTaskResultFile($taskId: GID!) {
-    getTaskResultFile(taskId: $taskId, preview: true)
+    getTaskResultFile(taskId: $taskId, preview: true) {
+      url
+    }
   }
 ` as unknown as DocumentNode<
   usePrintPdfTask_getTaskResultFileMutation,
@@ -29054,7 +29067,9 @@ export const useTemplateRepliesReportTask_createTemplateRepliesReportTaskDocumen
 >;
 export const useTemplateRepliesReportTask_getTaskResultFileDocument = gql`
   mutation useTemplateRepliesReportTask_getTaskResultFile($taskId: GID!) {
-    getTaskResultFile(taskId: $taskId, preview: true)
+    getTaskResultFile(taskId: $taskId, preview: true) {
+      url
+    }
   }
 ` as unknown as DocumentNode<
   useTemplateRepliesReportTask_getTaskResultFileMutation,

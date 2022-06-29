@@ -59,10 +59,7 @@ export function usePrintPdfTask() {
           const { data } = await getTaskResultFile({
             variables: { taskId: finishedTask!.id },
           });
-          if (!data?.getTaskResultFile?.url) {
-            throw new Error();
-          }
-          return data.getTaskResultFile.url;
+          return data!.getTaskResultFile.url;
         } catch (error) {
           // don't await this. we want to immediately rethrow the error so the new window is closed
           showError({
@@ -90,7 +87,9 @@ usePrintPdfTask.mutations = [
   `,
   gql`
     mutation usePrintPdfTask_getTaskResultFile($taskId: GID!) {
-      getTaskResultFile(taskId: $taskId, preview: true)
+      getTaskResultFile(taskId: $taskId, preview: true) {
+        url
+      }
     }
   `,
 ];

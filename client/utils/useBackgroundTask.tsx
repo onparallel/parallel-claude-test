@@ -128,7 +128,10 @@ const _mutations = [
   `,
   gql`
     mutation useBackgroundTask_getTaskResultFile($taskId: GID!) {
-      getTaskResultFile(taskId: $taskId, preview: false)
+      getTaskResultFile(taskId: $taskId, preview: false) {
+        filename
+        url
+      }
     }
   `,
 ];

@@ -615,6 +615,11 @@ export interface NexusGenObjects {
     totalCount: number; // Int!
   };
   Task: db.Task;
+  TaskResultFile: {
+    // root type
+    filename: string; // String!
+    url: string; // String!
+  };
   TemplateDefaultUserGroupPermission: db.TemplateDefaultPermission;
   TemplateDefaultUserPermission: db.TemplateDefaultPermission;
   TemplateUsedEvent: events.TemplateUsedEvent;
@@ -1006,7 +1011,7 @@ export interface NexusGenFieldTypes {
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
     getApiTokenOwner: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
-    getTaskResultFile: NexusGenScalars["JSONObject"]; // JSONObject!
+    getTaskResultFile: NexusGenRootTypes["TaskResultFile"]; // TaskResultFile!
     getTaskResultFileUrl: string; // String!
     loginAs: NexusGenEnums["Result"]; // Result!
     markSignatureIntegrationAsDefault: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
@@ -1967,6 +1972,11 @@ export interface NexusGenFieldTypes {
     progress: number | null; // Int
     status: NexusGenEnums["TaskStatus"]; // TaskStatus!
   };
+  TaskResultFile: {
+    // field return type
+    filename: string; // String!
+    url: string; // String!
+  };
   TemplateDefaultUserGroupPermission: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -2513,7 +2523,7 @@ export interface NexusGenFieldTypeNames {
     fileUploadReplyDownloadLink: "FileUploadDownloadLinkResult";
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
     getApiTokenOwner: "SupportMethodResponse";
-    getTaskResultFile: "JSONObject";
+    getTaskResultFile: "TaskResultFile";
     getTaskResultFileUrl: "String";
     loginAs: "Result";
     markSignatureIntegrationAsDefault: "OrgIntegration";
@@ -3473,6 +3483,11 @@ export interface NexusGenFieldTypeNames {
     output: "JSONObject";
     progress: "Int";
     status: "TaskStatus";
+  };
+  TaskResultFile: {
+    // field return type name
+    filename: "String";
+    url: "String";
   };
   TemplateDefaultUserGroupPermission: {
     // field return type name

@@ -508,7 +508,7 @@ export type Mutation = {
   /** Get the user who owns an API Token */
   getApiTokenOwner: SupportMethodResponse;
   /** Returns an object with signed download url and filename for tasks with file output */
-  getTaskResultFile: Scalars["JSONObject"];
+  getTaskResultFile: TaskResultFile;
   /**
    * Returns a signed download url for tasks with file output
    * @deprecated use getTaskResultFile instead
@@ -3360,6 +3360,11 @@ export type TaskName =
   | "PRINT_PDF"
   | "TEMPLATE_REPLIES_REPORT"
   | "TEMPLATE_STATS_REPORT";
+
+export type TaskResultFile = {
+  filename: Scalars["String"];
+  url: Scalars["String"];
+};
 
 export type TaskStatus = "COMPLETED" | "ENQUEUED" | "FAILED" | "PROCESSING";
 

@@ -947,7 +947,7 @@ type Mutation {
   """
   Returns an object with signed download url and filename for tasks with file output
   """
-  getTaskResultFile(preview: Boolean, taskId: GID!): JSONObject!
+  getTaskResultFile(preview: Boolean, taskId: GID!): TaskResultFile!
 
   """
   Returns a signed download url for tasks with file output
@@ -4686,6 +4686,11 @@ enum TaskName {
   PRINT_PDF
   TEMPLATE_REPLIES_REPORT
   TEMPLATE_STATS_REPORT
+}
+
+type TaskResultFile {
+  filename: String!
+  url: String!
 }
 
 enum TaskStatus {
