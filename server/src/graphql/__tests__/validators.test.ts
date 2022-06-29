@@ -305,7 +305,7 @@ describe("GraphQL custom validators", () => {
       ).rejects.toThrowError();
     });
 
-    it("throws error if title is not defined", async () => {
+    it("don't throw error if title is not defined", async () => {
       await expect(
         validSignatureConfig((args) => args.config, "config")(
           {},
@@ -326,7 +326,7 @@ describe("GraphQL custom validators", () => {
           { ...ctx, user: users[0] },
           {} as any
         )
-      ).rejects.toThrowError();
+      ).resolves.not.toThrowError();
     });
 
     it("throws error if user didn't specify signers and recipient is not allowed to choose", async () => {
