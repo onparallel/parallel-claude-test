@@ -96,7 +96,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
   const petition = data!.petition as PetitionPreview_PetitionBaseFragment;
   const isPetition = petition.__typename === "Petition";
 
-  const myEffectivePermission = petition.myEffectivePermission?.permissionType ?? "READ";
+  const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
   const pageCount =
     petition.fields.filter((f) => f.type === "HEADING" && f.options!.hasPageBreak).length + 1;

@@ -36,7 +36,7 @@ export const HeaderNameEditable = Object.assign(
 
     const isPublic = petition.__typename === "PetitionTemplate" && petition.isPublic;
 
-    const myEffectivePermission = petition.myEffectivePermission?.permissionType ?? "READ";
+    const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
     const editablePreviewRef = useRef<HTMLSpanElement | null>(null);
 

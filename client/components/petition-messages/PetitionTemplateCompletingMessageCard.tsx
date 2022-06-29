@@ -69,7 +69,7 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
           textWithPlaceholderToSlateNodes(messagesBody[petition.locale], placeholders)
       );
 
-      const myEffectivePermission = petition.myEffectivePermission?.permissionType ?? "READ";
+      const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
       const handleSubjectChange = (completingMessageSubject: string) => {
         if (completingMessageSubject === subject) return;

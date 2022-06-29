@@ -74,7 +74,7 @@ export function PetitionAccessesTable({
     onConfigureReminders(selected);
   }, [selected]);
 
-  const myEffectivePermission = petition.myEffectivePermission?.permissionType ?? "READ";
+  const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
   const showActions =
     myEffectivePermission !== "READ" &&
@@ -332,7 +332,7 @@ function usePetitionAccessesColumns(): TableColumn<
           const { id, status, contact, remindersOptOut } = row;
           const intl = useIntl();
 
-          const myEffectivePermission = petition.myEffectivePermission?.permissionType ?? "READ";
+          const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
           return contact ? (
             <Stack direction="row" spacing={2} justifyContent="flex-end">

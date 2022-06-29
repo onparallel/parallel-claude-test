@@ -155,7 +155,7 @@ export const PetitionTemplateHeader = Object.assign(
 
     const handleTemplateRepliesReportTask = useTemplateRepliesReportTask();
 
-    const myEffectivePermission = petition.myEffectivePermission?.permissionType ?? "READ";
+    const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
     return (
       <Box

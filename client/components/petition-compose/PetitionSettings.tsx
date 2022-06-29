@@ -116,7 +116,7 @@ function _PetitionSettings({
       ? petition.currentSignatureRequest
       : null;
 
-  const myEffectivePermission = petition.myEffectivePermission?.permissionType ?? "READ";
+  const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
   const publicLink = petition.__typename === "PetitionTemplate" ? petition.publicLink : null;
 

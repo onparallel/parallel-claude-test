@@ -138,7 +138,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const petition = data!.petition as PetitionReplies_PetitionFragment;
 
-  const myEffectivePermission = petition.myEffectivePermission?.permissionType ?? "READ";
+  const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
   const fieldVisibility = useFieldVisibility(petition.fields);
   const toast = useToast();

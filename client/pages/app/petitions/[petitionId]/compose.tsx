@@ -93,7 +93,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const isPublicTemplate = petition?.__typename === "PetitionTemplate" && petition.isPublic;
 
-  const myEffectivePermission = petition.myEffectivePermission?.permissionType ?? "READ";
+  const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
   const isSharedByLink =
     (petition?.__typename === "PetitionTemplate" && petition.publicLink?.isActive) ?? false;

@@ -38,7 +38,7 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
         onUpdatePetition({ emailBody: isEmptyRTEValue(emailBody) ? null : emailBody });
       };
 
-      const myEffectivePermission = petition.myEffectivePermission?.permissionType ?? "READ";
+      const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
       return (
         <Card ref={ref} {...props}>
