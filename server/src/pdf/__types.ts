@@ -582,6 +582,8 @@ export type Mutation = {
   resetTemporaryPassword: Result;
   /** Resets the given user password on AWS Cognito and sends an email with new temporary. */
   resetUserPassword: SupportMethodResponse;
+  /** Restores the 'fonts' section of the organization document theme to its default values */
+  restoreDefaultOrganizationDocumentThemeFonts: Organization;
   restoreLogin: Result;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
@@ -1575,6 +1577,8 @@ export type Organization = Timestamps & {
   id: Scalars["GID"];
   /** A paginated list with enabled integrations for the organization */
   integrations: OrgIntegrationPagination;
+  /** Wether the 'fonts' section of the document theme has been changed from its default values or not */
+  isPdfDocumentThemeFontsDirty: Scalars["Boolean"];
   /** Current license for the organization */
   license: Maybe<OrgLicense>;
   /** URL of the organization logo */
@@ -2354,7 +2358,7 @@ export type PetitionSharedUserNotification = PetitionUserNotification & {
   owner: User;
   permissionType: PetitionPermissionTypeRW;
   petition: PetitionBase;
-  sharedWith: UserOrUserGroup;
+  sharedWith: Maybe<UserOrUserGroup>;
 };
 
 export type PetitionSharedWithFilter = {
@@ -3225,7 +3229,7 @@ export type SignatureConfig = {
   /** The timezone used to generate the document. */
   timezone: Scalars["String"];
   /** Title of the signature document */
-  title: Scalars["String"];
+  title: Maybe<Scalars["String"]>;
 };
 
 /** The signature settings for the petition */
@@ -3240,7 +3244,7 @@ export type SignatureConfigInput = {
   /** The timezone used to generate the document. */
   timezone: Scalars["String"];
   /** The title of the signing document */
-  title: Scalars["String"];
+  title?: InputMaybe<Scalars["String"]>;
 };
 
 /** The signer that need to sign the generated document. */

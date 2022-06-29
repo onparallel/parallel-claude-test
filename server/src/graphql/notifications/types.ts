@@ -1,4 +1,4 @@
-import { core, enumType, interfaceType, nonNull, objectType } from "nexus";
+import { core, enumType, interfaceType, objectType } from "nexus";
 import { userOrPetitionAccessResolver } from "../helpers/userOrPetitionAccessResolver";
 
 export const PetitionUserNotificationFilter = enumType({
@@ -121,18 +121,16 @@ export const PetitionSharedUserNotification = createPetitionUserNotification(
       type: "PetitionPermissionTypeRW",
       resolve: (root) => root.data.permission_type,
     });
-    t.field("sharedWith", {
-      type: nonNull("UserOrUserGroup"),
+    t.nullable.field("sharedWith", {
+      type: "UserOrUserGroup",
       resolve: async (root, _, ctx) => {
-        return root.data.user_id
-          ? {
-              __type: "User",
-              ...(await ctx.users.loadUser(root.data.user_id))!,
-            }
-          : {
-              __type: "UserGroup",
-              ...(await ctx.userGroups.loadUserGroup(root.data.user_group_id!))!,
-            };
+        if (root.data.user_id) {
+          const user = await ctx.users.loadUser(root.data.user_id);
+          return user ? { __type: "User", ...user } : null;
+        } else if (root.data.user_group_id) {
+          const userGroup = await ctx.userGroups.loadUserGroup(root.data.user_group_id!);
+          return userGroup ? { __type: "UserGroup", ...userGroup } : null;
+        } else return null;
       },
     });
   }

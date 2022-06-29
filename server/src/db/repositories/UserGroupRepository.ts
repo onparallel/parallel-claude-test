@@ -139,6 +139,11 @@ export class UserGroupRepository extends BaseRepository {
           .whereNull("deleted_at")
           .whereIn("user_group_id", userGroupIds)
           .update({ deleted_at: this.now(), deleted_by: deletedBy }),
+        // delete PETITION_SHARED notifications relating this user_groups
+        this.from("petition_user_notification", t)
+          .where("type", "PETITION_SHARED")
+          .whereRaw(`("data"->>'user_group_id')::int in ?`, [this.sqlIn(userGroupIds)])
+          .delete(),
       ]);
       await this.from("user_group", t)
         .where({

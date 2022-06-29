@@ -24,7 +24,7 @@ export const PetitionSharedUserNotification = Object.assign(
           notification={notification}
           icon={
             <Circle size="36px" background="primary.500">
-              {sharedWith.__typename === "UserGroup" ? (
+              {sharedWith?.__typename === "UserGroup" ? (
                 <UserGroupArrowIcon color="white" fontSize="1rem" />
               ) : (
                 <UserArrowIcon color="white" fontSize="1rem" />
@@ -33,7 +33,7 @@ export const PetitionSharedUserNotification = Object.assign(
           }
           path={``}
         >
-          {sharedWith.__typename === "UserGroup" ? (
+          {sharedWith?.__typename === "UserGroup" ? (
             <FormattedMessage
               id="component.notification-petition-shared-group.body"
               defaultMessage='{name} has shared the {isTemplate, select, true {template} other {petition}} with the team "{group}" to which you belong.'
@@ -43,7 +43,7 @@ export const PetitionSharedUserNotification = Object.assign(
                 group: sharedWith.name,
               }}
             />
-          ) : (
+          ) : sharedWith?.__typename === "User" ? (
             <FormattedMessage
               id="component.notification-petition-shared.body"
               defaultMessage="{name} has shared the {isTemplate, select, true {template} other {petition}} with you as {permissionType}."
@@ -58,7 +58,7 @@ export const PetitionSharedUserNotification = Object.assign(
                 ),
               }}
             />
-          )}
+          ) : null}
         </PetitionUserNotification>
       );
     }

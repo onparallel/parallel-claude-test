@@ -2430,7 +2430,7 @@ export interface PetitionSharedUserNotification extends PetitionUserNotification
   owner: User;
   permissionType: PetitionPermissionTypeRW;
   petition: PetitionBase;
-  sharedWith: UserOrUserGroup;
+  sharedWith?: Maybe<UserOrUserGroup>;
 }
 
 export interface PetitionSharedWithFilter {
@@ -4601,9 +4601,10 @@ export type NotificationsDrawer_PetitionUserNotification_PetitionSharedUserNotif
     | { __typename: "Petition"; id: string; name?: string | null }
     | { __typename: "PetitionTemplate"; id: string; name?: string | null };
   owner: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
-  sharedWith:
+  sharedWith?:
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-    | { __typename?: "UserGroup"; id: string; name: string };
+    | { __typename?: "UserGroup"; id: string; name: string }
+    | null;
 };
 
 export type NotificationsDrawer_PetitionUserNotification_ReminderEmailBouncedUserNotification_Fragment =
@@ -4786,9 +4787,10 @@ export type NotificationsDrawer_notificationsQuery = {
               fullName?: string | null;
               status: UserStatus;
             };
-            sharedWith:
+            sharedWith?:
               | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-              | { __typename?: "UserGroup"; id: string; name: string };
+              | { __typename?: "UserGroup"; id: string; name: string }
+              | null;
           }
         | {
             __typename?: "ReminderEmailBouncedUserNotification";
@@ -4934,9 +4936,10 @@ export type NotificationsList_PetitionUserNotification_PetitionSharedUserNotific
     | { __typename: "Petition"; id: string; name?: string | null }
     | { __typename: "PetitionTemplate"; id: string; name?: string | null };
   owner: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
-  sharedWith:
+  sharedWith?:
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-    | { __typename?: "UserGroup"; id: string; name: string };
+    | { __typename?: "UserGroup"; id: string; name: string }
+    | null;
 };
 
 export type NotificationsList_PetitionUserNotification_ReminderEmailBouncedUserNotification_Fragment =
@@ -5084,9 +5087,10 @@ export type PetitionSharedUserNotification_PetitionSharedUserNotificationFragmen
     | { __typename: "Petition"; id: string; name?: string | null }
     | { __typename: "PetitionTemplate"; id: string; name?: string | null };
   owner: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus };
-  sharedWith:
+  sharedWith?:
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-    | { __typename?: "UserGroup"; id: string; name: string };
+    | { __typename?: "UserGroup"; id: string; name: string }
+    | null;
 };
 
 export type PetitionUserNotification_PetitionUserNotification_AccessActivatedFromPublicPetitionLinkUserNotification_Fragment =
