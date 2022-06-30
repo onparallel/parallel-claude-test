@@ -423,6 +423,12 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     petition?.__typename === "Petition" &&
     petition.status === "DRAFT";
 
+  const isReadOnly =
+    petition.isRestricted ||
+    isPublicTemplate ||
+    petition.isAnonymized ||
+    myEffectivePermission === "READ";
+
   return (
     <ToneProvider value={petition.tone}>
       <PetitionLayout
@@ -476,12 +482,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   onFieldEdit={handleFieldEdit}
                   onFieldTypeChange={handleFieldTypeChange}
                   onClose={handleSettingsClose}
-                  isReadOnly={
-                    petition.isRestricted ||
-                    isPublicTemplate ||
-                    petition.isAnonymized ||
-                    myEffectivePermission === "READ"
-                  }
+                  isReadOnly={isReadOnly}
                   user={me}
                 />
               ) : (
@@ -514,12 +515,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                           onFieldClick={handleIndexFieldClick}
                           showAliasButtons={true}
                           onFieldEdit={handleFieldEdit}
-                          isReadOnly={
-                            petition.isRestricted ||
-                            isPublicTemplate ||
-                            petition.isAnonymized ||
-                            myEffectivePermission === "READ"
-                          }
+                          isReadOnly={isReadOnly}
                         />
                       </TabPanel>
                       <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
@@ -552,12 +548,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               onFieldEdit={handleFieldEdit}
               onFieldSettingsClick={handleFieldSettingsClick}
               onFieldTypeIndicatorClick={handleFieldTypeIndicatorClick}
-              isReadOnly={
-                petition.isRestricted ||
-                isPublicTemplate ||
-                petition.isAnonymized ||
-                myEffectivePermission === "READ"
-              }
+              isReadOnly={isReadOnly}
               isAttachDisabled={isPublicTemplate || myEffectivePermission === "READ"}
               isTemplate={petition?.__typename === "PetitionTemplate"}
             />
@@ -567,9 +558,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 marginTop="4"
                 description={petition.description}
                 onUpdatePetition={handleUpdatePetition}
-                isReadOnly={
-                  petition.isRestricted || isPublicTemplate || myEffectivePermission === "READ"
-                }
+                isReadOnly={isReadOnly}
               />
             ) : null}
             {petition && petition.__typename === "Petition" && petition.status !== "DRAFT" ? (

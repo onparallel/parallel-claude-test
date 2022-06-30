@@ -19558,10 +19558,6 @@ export type Reports_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
   name?: string | null;
-  myEffectivePermission?: {
-    __typename?: "EffectivePetitionUserPermission";
-    permissionType: PetitionPermissionType;
-  } | null;
 };
 
 export type Reports_templatesQueryVariables = Exact<{
@@ -19574,15 +19570,7 @@ export type Reports_templatesQuery = {
   templates: {
     __typename?: "PetitionTemplatePagination";
     totalCount: number;
-    items: Array<{
-      __typename?: "PetitionTemplate";
-      id: string;
-      name?: string | null;
-      myEffectivePermission?: {
-        __typename?: "EffectivePetitionUserPermission";
-        permissionType: PetitionPermissionType;
-      } | null;
-    }>;
+    items: Array<{ __typename?: "PetitionTemplate"; id: string; name?: string | null }>;
   };
 };
 
@@ -25117,9 +25105,6 @@ export const Reports_PetitionTemplateFragmentDoc = gql`
   fragment Reports_PetitionTemplate on PetitionTemplate {
     id
     name
-    myEffectivePermission {
-      permissionType
-    }
   }
 ` as unknown as DocumentNode<Reports_PetitionTemplateFragment, unknown>;
 export const SettingsLayout_QueryFragmentDoc = gql`

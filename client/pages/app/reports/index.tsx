@@ -198,10 +198,7 @@ export function Reports() {
               />
             </Button>
           </Stack>
-          {isDefined(report) &&
-          status === "IDLE" &&
-          templates.find((t) => t.id === prevTemplateId!)?.myEffectivePermission?.permissionType !==
-            "READ" ? (
+          {isDefined(report) && status === "IDLE" ? (
             <Button
               leftIcon={<TableIcon />}
               colorScheme="primary"
@@ -237,9 +234,6 @@ Reports.fragments = {
     fragment Reports_PetitionTemplate on PetitionTemplate {
       id
       name
-      myEffectivePermission {
-        permissionType
-      }
     }
   `,
 };

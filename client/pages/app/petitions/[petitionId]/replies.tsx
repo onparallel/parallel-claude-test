@@ -494,42 +494,40 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 defaultMessage: "Reload",
               })}
             />
-            <Button
-              data-action="close-petition"
-              hidden={
-                petition.status === "CLOSED" ||
-                petition.isAnonymized ||
-                myEffectivePermission === "READ"
-              }
-              colorScheme="green"
-              leftIcon={<CheckIcon />}
-              onClick={handleClosePetition}
-            >
-              <FormattedMessage
-                id="petition-replies.finalize-petition.button"
-                defaultMessage="Finish petition"
-              />
-            </Button>
-            <Button
-              hidden={
-                petition.status !== "CLOSED" ||
-                petition.accesses.length === 0 ||
-                petition.isAnonymized ||
-                myEffectivePermission === "READ"
-              }
-              colorScheme="blue"
-              leftIcon={<ThumbUpIcon fontSize="lg" display="block" />}
-              onClick={async () => {
-                try {
-                  await handleFinishPetition({ requiredMessage: true });
-                } catch {}
-              }}
-            >
-              <FormattedMessage
-                id="petition-replies.notify-petition-reviewed.button"
-                defaultMessage="Notify that it is correct"
-              />
-            </Button>
+            {petition.status === "CLOSED" ||
+            petition.isAnonymized ||
+            myEffectivePermission === "READ" ? null : (
+              <Button
+                data-action="close-petition"
+                colorScheme="green"
+                leftIcon={<CheckIcon />}
+                onClick={handleClosePetition}
+              >
+                <FormattedMessage
+                  id="petition-replies.finalize-petition.button"
+                  defaultMessage="Finish petition"
+                />
+              </Button>
+            )}
+            {petition.status !== "CLOSED" ||
+            petition.accesses.length === 0 ||
+            petition.isAnonymized ||
+            myEffectivePermission === "READ" ? null : (
+              <Button
+                colorScheme="blue"
+                leftIcon={<ThumbUpIcon fontSize="lg" display="block" />}
+                onClick={async () => {
+                  try {
+                    await handleFinishPetition({ requiredMessage: true });
+                  } catch {}
+                }}
+              >
+                <FormattedMessage
+                  id="petition-replies.notify-petition-reviewed.button"
+                  defaultMessage="Notify that it is correct"
+                />
+              </Button>
+            )}
             {showDownloadAll && !petition.isAnonymized ? (
               <ButtonGroup isAttached colorScheme="primary">
                 <Button

@@ -655,8 +655,8 @@ export interface Organization {
   preferred_tone: Tone; // tone
   icon_public_file_id: Maybe<number>; // int4
   appsumo_license: Maybe<any>; // jsonb
-  anonymize_petitions_after_months: Maybe<number>; // int4
   pdf_document_theme: Maybe<any>; // jsonb
+  anonymize_petitions_after_months: Maybe<number>; // int4
 }
 
 export type CreateOrganization = PartialProps<
@@ -674,8 +674,8 @@ export type CreateOrganization = PartialProps<
   | "preferred_tone"
   | "icon_public_file_id"
   | "appsumo_license"
-  | "anonymize_petitions_after_months"
   | "pdf_document_theme"
+  | "anonymize_petitions_after_months"
 >;
 
 export interface OrganizationUsageLimit {

@@ -436,6 +436,12 @@ function _PetitionSettings({
     } catch {}
   };
 
+  const settingIsDisabled =
+    isPublicTemplate ||
+    petition.isAnonymized ||
+    petition.isRestricted ||
+    myEffectivePermission === "READ";
+
   return (
     <Stack padding={4} spacing={2}>
       {petition.__typename === "PetitionTemplate" ? (
@@ -591,13 +597,7 @@ function _PetitionSettings({
       {petition.signatureConfig || hasSignature ? (
         <SettingsRowButton
           data-section="esignature-settings"
-          isDisabled={
-            !hasSignature ||
-            isPublicTemplate ||
-            petition.isAnonymized ||
-            petition.isRestricted ||
-            myEffectivePermission === "READ"
-          }
+          isDisabled={!hasSignature || settingIsDisabled}
           icon={<SignatureIcon />}
           label={
             <HStack>
@@ -627,12 +627,7 @@ function _PetitionSettings({
       ) : null}
       {petition.__typename === "PetitionTemplate" ? (
         <SettingsRowButton
-          isDisabled={
-            isPublicTemplate ||
-            petition.isAnonymized ||
-            petition.isRestricted ||
-            myEffectivePermission === "READ"
-          }
+          isDisabled={settingIsDisabled}
           icon={<BellSettingsIcon />}
           label={
             <FormattedMessage
@@ -678,12 +673,7 @@ function _PetitionSettings({
       ) : null}
       {user.hasSkipForwardSecurity ? (
         <SettingsRowSwitch
-          isDisabled={
-            isPublicTemplate ||
-            petition.isAnonymized ||
-            petition.isRestricted ||
-            myEffectivePermission === "READ"
-          }
+          isDisabled={settingIsDisabled}
           icon={<ShieldIcon />}
           label={
             <FormattedMessage
@@ -704,12 +694,7 @@ function _PetitionSettings({
       ) : null}
       {user.hasHideRecipientViewContents ? (
         <SettingsRowSwitch
-          isDisabled={
-            isPublicTemplate ||
-            petition.isAnonymized ||
-            petition.isRestricted ||
-            myEffectivePermission === "READ"
-          }
+          isDisabled={settingIsDisabled}
           icon={<ListIcon />}
           label={
             <FormattedMessage
