@@ -86,7 +86,7 @@ function ScalarInput({ arg, value, isInvalid, onValue }: SupportMethodArgumentIn
             isChecked={value}
             onChange={(event) => onValue(event.target.checked)}
           />
-          <Text marginLeft={2}>{String(value)}</Text>
+          <Text marginLeft={2}>{arg.description}</Text>
         </Flex>
       );
     case "Int":

@@ -1453,6 +1453,11 @@ type Mutation {
     e.g.: 1 month, 1 year, 20 days, etc...
     """
     period: String
+
+    """
+    End current period and start new with this arguments
+    """
+    startNewPeriod: Boolean!
     type: OrganizationUsageLimitName!
     updateOnlyCurrentPeriod: Boolean!
   ): SupportMethodResponse!

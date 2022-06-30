@@ -751,8 +751,14 @@ export const updateOrganizationLimits = mutationField("updateOrganizationLimits"
       })
     ),
     updateOnlyCurrentPeriod: nonNull(booleanArg()),
+    startNewPeriod: nonNull(
+      booleanArg({ description: "End current period and start new with this arguments" })
+    ),
   },
   resolve: async (_, args, ctx) => {
+    if (args.updateOnlyCurrentPeriod && args.startNewPeriod) {
+      return { result: RESULT.FAILURE, message: "Choose only one of the switches" };
+    }
     const org = await ctx.organizations.loadOrg(args.orgId);
     if (!org) {
       return { result: RESULT.FAILURE, message: `Organization:${args.orgId} not found` };
@@ -767,6 +773,24 @@ export const updateOrganizationLimits = mutationField("updateOrganizationLimits"
     }
 
     const period = args.period ?? ((org.usage_details[args.type] as any).period as string);
+
+    if (args.startNewPeriod) {
+      const currentPeriod = await ctx.organizations.getOrganizationCurrentUsageLimit(
+        org.id,
+        args.type
+      );
+      let newPeriodStartDate: Date | null = null;
+      if (currentPeriod) {
+        const [oldLimit] = await ctx.organizations.updateUsageLimitAsExpired(currentPeriod.id);
+        newPeriodStartDate = oldLimit.period_end_date;
+      }
+      await ctx.organizations.createOrganizationUsageLimit(org.id, {
+        limit_name: args.type,
+        limit: args.amount,
+        period,
+        period_start_date: newPeriodStartDate ?? undefined,
+      });
+    }
 
     if (!args.updateOnlyCurrentPeriod) {
       await ctx.organizations.updateOrganization(
@@ -784,10 +808,6 @@ export const updateOrganizationLimits = mutationField("updateOrganizationLimits"
         },
         `User:${ctx.user!.id}`
       );
-      return {
-        result: RESULT.SUCCESS,
-        message: "Limit updated successfully. Will be applied in the next period",
-      };
     } else {
       await ctx.organizations.upsertOrganizationUsageLimit(
         args.orgId,
@@ -795,11 +815,10 @@ export const updateOrganizationLimits = mutationField("updateOrganizationLimits"
         args.amount,
         period
       );
-
-      return {
-        result: RESULT.SUCCESS,
-      };
     }
+    return {
+      result: RESULT.SUCCESS,
+    };
   },
 });
 

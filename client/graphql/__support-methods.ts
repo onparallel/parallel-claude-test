@@ -690,6 +690,18 @@ export const supportMethods: {
           deprecationReason: null,
         },
         {
+          name: "startNewPeriod",
+          description: "End current period and start new with this arguments",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "Boolean", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
           name: "type",
           description: null,
           type: {

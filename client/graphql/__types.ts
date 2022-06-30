@@ -1402,6 +1402,7 @@ export interface MutationupdateOrganizationLimitsArgs {
   amount: Scalars["Int"];
   orgId: Scalars["Int"];
   period?: InputMaybe<Scalars["String"]>;
+  startNewPeriod: Scalars["Boolean"];
   type: OrganizationUsageLimitName;
   updateOnlyCurrentPeriod: Scalars["Boolean"];
 }

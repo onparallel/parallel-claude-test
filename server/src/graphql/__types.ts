@@ -4397,6 +4397,7 @@ export interface NexusGenArgTypes {
       amount: number; // Int!
       orgId: number; // Int!
       period?: string | null; // String
+      startNewPeriod: boolean; // Boolean!
       type: NexusGenEnums["OrganizationUsageLimitName"]; // OrganizationUsageLimitName!
       updateOnlyCurrentPeriod: boolean; // Boolean!
     };
