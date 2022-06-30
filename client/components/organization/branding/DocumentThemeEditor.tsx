@@ -23,7 +23,7 @@ import { RichTextEditor } from "@parallel/components/common/slate/RichTextEditor
 import { DocumentThemeEditor_OrganizationThemeFragment } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import fonts from "../../../utils/fonts.json";
@@ -51,6 +51,13 @@ export function DocumentThemeEditor({
   const [colorState, setColorState] = useState<Record<string, string>>(
     pick(theme.data, ["textColor", "title1Color", "title2Color"])
   );
+
+  // make sure to update the internal state when selected theme changes
+  useEffect(() => {
+    setColorState(pick(theme.data, ["textColor", "title1Color", "title2Color"]));
+    setColorError({});
+  }, [theme.id]);
+
   const [colorError, setColorError] = useState<Record<string, boolean>>({});
   async function handleColorChange(colorKey: string, color: string) {
     try {
@@ -292,7 +299,7 @@ export function DocumentThemeEditor({
             {locales.map(({ key }) => (
               <TabPanel key={key}>
                 <RichTextEditor
-                  id={`legal-text-editor-${key}`}
+                  id={`legal-text-editor-${theme.id}-${key}`}
                   value={theme.data.legalText[key]}
                   onChange={(value) => {
                     onChange({ legalText: { [key]: value } });
