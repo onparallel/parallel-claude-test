@@ -1,5 +1,6 @@
 import { PetitionField } from "@parallel/graphql/__types";
 import { format } from "date-fns";
+import { isDefined } from "remeda";
 import { isFileTypeField } from "../isFileTypeField";
 import { FieldOptions, getFirstDynamicSelectValue } from "../petitionFields";
 import {
@@ -105,19 +106,31 @@ export function updateConditionOperator<
           : condition.value,
     };
   } else {
-    return {
-      ...condition,
-      operator,
+    if (
+      condition.modifier === "NUMBER_OF_REPLIES" ||
+      condition.operator === "NUMBER_OF_SUBREPLIES"
+    ) {
       // override existing "has replies/does not have replies"
-      modifier:
-        condition.modifier === "NUMBER_OF_REPLIES" || condition.operator === "NUMBER_OF_SUBREPLIES"
-          ? "ANY"
-          : condition.modifier,
-      value:
-        condition.modifier === "NUMBER_OF_REPLIES" || condition.operator === "NUMBER_OF_SUBREPLIES"
-          ? defaultConditionFieldValue(field, condition.column)
-          : condition.value,
-    };
+      const defaultValue = defaultConditionFieldValue(field, condition.column);
+      return {
+        ...condition,
+        operator,
+        modifier: "ANY",
+        value: ["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(operator)
+          ? isDefined(defaultValue) && typeof defaultValue === "string"
+            ? [defaultValue]
+            : null
+          : defaultValue,
+      };
+    } else {
+      const { value, modifier } = condition;
+      return {
+        ...condition,
+        operator,
+        modifier,
+        value,
+      };
+    }
   }
 }
 

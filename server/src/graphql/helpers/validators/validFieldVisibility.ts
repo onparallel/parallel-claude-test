@@ -150,9 +150,10 @@ function validateCondition(ctx: ApiContext, petitionId: number, field: PetitionF
           `Invalid operator ${c.operator} for field of type ${referencedField.type}`
         );
         assert(
-          (["EQUAL", "NOT_EQUAL"].includes(c.operator) &&
-            typeof c.value === "string" &&
-            options.includes(c.value)) ||
+          c.value === null ||
+            (["EQUAL", "NOT_EQUAL"].includes(c.operator) &&
+              typeof c.value === "string" &&
+              options.includes(c.value)) ||
             (["IS_ONE_OF", "NOT_IS_ONE_OF"].includes(c.operator) &&
               Array.isArray(c.value) &&
               c.value.every((v) => options.includes(v))),
