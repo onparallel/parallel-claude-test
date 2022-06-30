@@ -270,7 +270,7 @@ export function PreviewPetitionFieldCommentsDialog({
             }
             isDisabled={isDisabled}
             isTemplate={isTemplate ?? false}
-            hasCommentsEnabled={hasCommentsEnabled}
+            hasCommentsEnabled={hasCommentsEnabled && !onlyInternalComments}
             onCommentKeyDown={async (event, content) =>
               await handleKeyDown({ event, content, isInternal: false })
             }

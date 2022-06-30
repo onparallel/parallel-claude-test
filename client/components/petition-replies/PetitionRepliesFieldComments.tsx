@@ -177,7 +177,7 @@ export function PetitionRepliesFieldComments({
         }
         isDisabled={isDisabled}
         isTemplate={false}
-        hasCommentsEnabled={hasCommentsEnabled}
+        hasCommentsEnabled={hasCommentsEnabled && !onlyInternalComments}
         onCommentKeyDown={async (event, content) =>
           await handleKeyDown({ event, content, isInternal: false })
         }

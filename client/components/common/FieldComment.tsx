@@ -100,7 +100,7 @@ export function FieldComment({
       paddingX={6}
       paddingY={2}
       position="relative"
-      backgroundColor={comment.isUnread ? "primary.50" : isInternal ? "gray.50" : "white"}
+      backgroundColor={comment.isUnread ? "primary.50" : isInternal ? "yellow.50" : "white"}
     >
       {comment.isUnread ? (
         <Circle

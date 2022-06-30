@@ -1,5 +1,6 @@
 import { booleanArg, mutationField, nonNull, stringArg } from "nexus";
-import { authenticateAnd, ifArgEquals, and } from "../../helpers/authorize";
+import { PetitionFieldComment } from "../../../db/__types";
+import { and, authenticateAnd, ifArgEquals } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import {
   commentsBelongsToPetition,
@@ -17,8 +18,15 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
-    ifArgEquals("isInternal", false, userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]), fieldsHaveCommentsEnabled("petitionFieldId")),
-    ifArgEquals("isInternal", false, fieldsAreNotInternal("petitionFieldId")),
+    ifArgEquals(
+      "isInternal",
+      false,
+      and(
+        userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+        fieldsHaveCommentsEnabled("petitionFieldId"),
+        fieldsAreNotInternal("petitionFieldId")
+      )
+    ),
     petitionIsNotAnonymized("petitionId")
   ),
   args: {
@@ -51,10 +59,12 @@ export const deletePetitionFieldComment = mutationField("deletePetitionFieldComm
   authorize: authenticateAnd(
     async (root, args, ctx, info) => {
       // if the comment is external, user must have OWNER or WRITE permissions on the petition
-      const comment = await ctx.petitions.loadPetitionFieldComment(args.petitionFieldCommentId);
+      const comment = (await ctx.petitions.loadPetitionFieldComment(
+        args.petitionFieldCommentId
+      )) as PetitionFieldComment;
       return await userHasAccessToPetitions(
         "petitionId",
-        comment?.is_internal ? undefined : ["OWNER", "WRITE"]
+        comment?.is_internal || comment?.user_id === ctx.user!.id ? undefined : ["OWNER", "WRITE"]
       )(root, args, ctx, info);
     },
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
@@ -87,7 +97,7 @@ export const updatePetitionFieldComment = mutationField("updatePetitionFieldComm
       const comment = await ctx.petitions.loadPetitionFieldComment(args.petitionFieldCommentId);
       return await userHasAccessToPetitions(
         "petitionId",
-        comment?.is_internal ? undefined : ["OWNER", "WRITE"]
+        comment?.is_internal || comment?.user_id === ctx.user!.id ? undefined : ["OWNER", "WRITE"]
       )(root, args, ctx, info);
     },
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
