@@ -1627,7 +1627,10 @@ export type Organization = Timestamps & {
   id: Scalars["GID"];
   /** A paginated list with enabled integrations for the organization */
   integrations: OrgIntegrationPagination;
-  /** Wether the 'fonts' section of the document theme has been changed from its default values or not */
+  /**
+   * Wether the 'fonts' section of the document theme has been changed from its default values or not
+   * @deprecated Not used anymore. Use themes.pdfDocument[0].isDirty
+   */
   isPdfDocumentThemeFontsDirty: Scalars["Boolean"];
   /** Current license for the organization */
   license: Maybe<OrgLicense>;
@@ -1754,6 +1757,7 @@ export type OrganizationTheme = {
   data: Scalars["JSONObject"];
   id: Scalars["GID"];
   isDefault: Scalars["Boolean"];
+  isDirty: Scalars["Boolean"];
   name: Scalars["String"];
 };
 

@@ -1829,6 +1829,7 @@ type Organization implements Timestamps {
   Wether the 'fonts' section of the document theme has been changed from its default values or not
   """
   isPdfDocumentThemeFontsDirty: Boolean!
+    @deprecated(reason: "Not used anymore. Use themes.pdfDocument[0].isDirty")
 
   """
   Current license for the organization
@@ -2000,6 +2001,7 @@ type OrganizationTheme {
   data: JSONObject!
   id: GID!
   isDefault: Boolean!
+  isDirty: Boolean!
   name: String!
 }
 

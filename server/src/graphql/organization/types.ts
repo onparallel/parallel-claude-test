@@ -59,6 +59,25 @@ export const OrganizationTheme = objectType({
     t.globalId("id");
     t.nonNull.string("name");
     t.nonNull.boolean("isDefault", { resolve: (o) => o.is_default ?? false });
+    t.nonNull.boolean("isDirty", {
+      resolve: (o) => {
+        if (o.type === "PDF_DOCUMENT") {
+          const fontKeys = [
+            "title1FontFamily",
+            "title1Color",
+            "title1FontSize",
+            "title2FontFamily",
+            "title2Color",
+            "title2FontSize",
+            "textFontFamily",
+            "textColor",
+            "textFontSize",
+          ] as (keyof PdfDocumentTheme)[];
+          return !equals(pick(o.data, fontKeys), pick(defaultPdfDocumentTheme, fontKeys));
+        }
+        return false;
+      },
+    });
     t.nonNull.jsonObject("data", { resolve: (o) => o.data });
   },
   sourceType: "db.OrganizationTheme",
@@ -352,6 +371,7 @@ export const Organization = objectType({
       },
     });
     t.nonNull.boolean("isPdfDocumentThemeFontsDirty", {
+      deprecation: "Not used anymore. Use themes.pdfDocument[0].isDirty",
       description:
         "Wether the 'fonts' section of the document theme has been changed from its default values or not",
       resolve: (o) => {

@@ -1,5 +1,4 @@
-import { gql, useApolloClient, useMutation } from "@apollo/client";
-import { mergeDeep } from "@apollo/client/utilities";
+import { gql } from "@apollo/client";
 import {
   Button,
   FormControl,
@@ -21,87 +20,47 @@ import { ColorInput } from "@parallel/components/common/ColorInput";
 import { Divider } from "@parallel/components/common/Divider";
 import { NumeralInput } from "@parallel/components/common/NumeralInput";
 import { RichTextEditor } from "@parallel/components/common/slate/RichTextEditor";
-import {
-  DocumentThemeEditor_OrganizationFragment,
-  DocumentThemeEditor_OrganizationFragmentDoc,
-  DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeFontsDocument,
-  DocumentThemeEditor_updateOrganizationDocumentThemeDocument,
-  DocumentThemeEditor_updateOrganizationDocumentThemeMutationVariables,
-} from "@parallel/graphql/__types";
+import { DocumentThemeEditor_OrganizationThemeFragment } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
-import { updateFragment } from "@parallel/utils/apollo/updateFragment";
-import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { pick } from "remeda";
 import fonts from "../../../utils/fonts.json";
 
 interface DocumentThemeEditorProps {
-  organization: DocumentThemeEditor_OrganizationFragment;
+  theme: DocumentThemeEditor_OrganizationThemeFragment;
+  onChange: (data: DocumentThemeEditor_OrganizationThemeFragment["data"]) => Promise<void>;
+  onResetFonts: () => Promise<void>;
   isDisabled?: boolean;
 }
 
-export function DocumentThemeEditor({ organization, isDisabled }: DocumentThemeEditorProps) {
+export function DocumentThemeEditor({
+  theme,
+  onChange,
+  onResetFonts,
+  isDisabled,
+}: DocumentThemeEditorProps) {
   const intl = useIntl();
-  const [theme, setTheme] = useState(organization.pdfDocumentTheme);
-  function updateTheme(partial: any) {
-    setTheme((current: any) => mergeDeep(current, partial));
-  }
 
   const FONT_SIZES_PT = [
     5, 5.5, 6.5, 7.5, 8, 9, 10, 10.5, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,
   ];
 
-  const [updateOrganizationDocumentTheme] = useMutation(
-    DocumentThemeEditor_updateOrganizationDocumentThemeDocument
+  // use state for colors to be able to show partial input
+  const [colorState, setColorState] = useState<Record<string, string>>(
+    pick(theme.data, ["textColor", "title1Color", "title2Color"])
   );
-
-  const updateOrganizationTheme = useDebouncedAsync(
-    async function (
-      data: DocumentThemeEditor_updateOrganizationDocumentThemeMutationVariables["data"]
-    ) {
-      await updateOrganizationDocumentTheme({
-        variables: { data },
-      });
-    },
-    500,
-    []
-  );
-
-  const apollo = useApolloClient();
-  async function handleThemeChange(data: Record<string, any>) {
-    // update cache so that the preview is more responsive
-    updateTheme(data);
-    updateFragment(apollo.cache, {
-      fragment: DocumentThemeEditor_OrganizationFragmentDoc,
-      id: organization.id,
-      data: (cached) => {
-        const pdfDocumentTheme = mergeDeep(cached!.pdfDocumentTheme, data);
-        return {
-          ...cached!,
-          pdfDocumentTheme,
-        };
-      },
-    });
-    try {
-      await updateOrganizationTheme(data);
-    } catch (error) {
-      if (error !== "DEBOUNCED") {
-        throw error;
-      }
-    }
-  }
-
   const [colorError, setColorError] = useState<Record<string, boolean>>({});
   async function handleColorChange(colorKey: string, color: string) {
     try {
+      if (colorState[colorKey] === color) return;
+      setColorState({ ...colorState, [colorKey]: color });
       const isError = !/^#[a-f\d]{6}$/i.test(color);
       setColorError({ ...colorError, [colorKey]: isError });
-      if (isError) {
-        updateTheme({ [colorKey]: color });
-        return;
+      if (!isError) {
+        await onChange({ [colorKey]: color });
       }
-      await handleThemeChange({ [colorKey]: color });
     } catch (error) {
       if (isApolloError(error, "ARG_VALIDATION_ERROR")) {
         if ((error.graphQLErrors[0].extensions.extra as any).code === "INVALID_HEX_VALUE_ERROR") {
@@ -111,16 +70,10 @@ export function DocumentThemeEditor({ organization, isDisabled }: DocumentThemeE
     }
   }
 
-  const [restoreDefaultOrganizationDocumentThemeFonts] = useMutation(
-    DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeFontsDocument
-  );
-
-  async function handleRestoreDefaultFonts() {
-    await restoreDefaultOrganizationDocumentThemeFonts({
-      update: (_, { data }) => {
-        setTheme(data!.restoreDefaultOrganizationDocumentThemeFonts.pdfDocumentTheme);
-      },
-    });
+  function handleResetFonts() {
+    setColorError({});
+    setColorState({ textColor: "#000000", title1Color: "#000000", title2Color: "#000000" });
+    onResetFonts();
   }
 
   const locales = useSupportedLocales();
@@ -154,8 +107,8 @@ export function DocumentThemeEditor({ organization, isDisabled }: DocumentThemeE
               background="white"
               decimals={1}
               suffix=" mm"
-              value={theme.marginTop}
-              onChange={(value) => handleThemeChange({ marginTop: value })}
+              value={theme.data.marginTop}
+              onChange={(value) => onChange({ marginTop: value })}
               isDisabled={isDisabled}
             />
           </Stack>
@@ -170,8 +123,8 @@ export function DocumentThemeEditor({ organization, isDisabled }: DocumentThemeE
               background="white"
               decimals={1}
               suffix=" mm"
-              value={theme.marginBottom}
-              onChange={(value) => handleThemeChange({ marginBottom: value })}
+              value={theme.data.marginBottom}
+              onChange={(value) => onChange({ marginBottom: value })}
               isDisabled={isDisabled}
             />
           </Stack>
@@ -186,8 +139,8 @@ export function DocumentThemeEditor({ organization, isDisabled }: DocumentThemeE
               background="white"
               decimals={1}
               suffix=" mm"
-              value={theme.marginLeft}
-              onChange={(value) => handleThemeChange({ marginLeft: value, marginRight: value })}
+              value={theme.data.marginLeft}
+              onChange={(value) => onChange({ marginLeft: value, marginRight: value })}
               isDisabled={isDisabled}
             />
           </Stack>
@@ -208,8 +161,8 @@ export function DocumentThemeEditor({ organization, isDisabled }: DocumentThemeE
             </Text>
           </Stack>
           <Switch
-            isChecked={theme.showLogo}
-            onChange={(e) => handleThemeChange({ showLogo: e.target.checked })}
+            isChecked={theme.data.showLogo}
+            onChange={(e) => onChange({ showLogo: e.target.checked })}
             isDisabled={isDisabled}
           />
         </HStack>
@@ -256,9 +209,9 @@ export function DocumentThemeEditor({ organization, isDisabled }: DocumentThemeE
               <FormLabel fontWeight="normal">{key.title}</FormLabel>
               <Select
                 backgroundColor="white"
-                value={theme[key.fontKey]}
+                value={theme.data[key.fontKey]}
                 onChange={(e) => {
-                  handleThemeChange({ [key.fontKey]: e.target.value });
+                  onChange({ [key.fontKey]: e.target.value });
                 }}
               >
                 {sortedFonts.map(({ family }) => (
@@ -277,9 +230,9 @@ export function DocumentThemeEditor({ organization, isDisabled }: DocumentThemeE
               </FormLabel>
               <Select
                 backgroundColor="white"
-                value={theme[key.sizeKey]}
+                value={theme.data[key.sizeKey]}
                 onChange={(e) => {
-                  handleThemeChange({ [key.sizeKey]: parseFloat(e.target.value) });
+                  onChange({ [key.sizeKey]: parseFloat(e.target.value) });
                 }}
               >
                 {FONT_SIZES_PT.map((v) => (
@@ -297,7 +250,7 @@ export function DocumentThemeEditor({ organization, isDisabled }: DocumentThemeE
                 />
               </FormLabel>
               <ColorInput
-                value={theme[key.colorKey]}
+                value={colorState[key.colorKey]}
                 onChange={(value) => handleColorChange(key.colorKey, value)}
               />
             </FormControl>
@@ -305,11 +258,7 @@ export function DocumentThemeEditor({ organization, isDisabled }: DocumentThemeE
         ))}
       </Stack>
       <HStack justifyContent="flex-end">
-        <Button
-          variant="link"
-          onClick={handleRestoreDefaultFonts}
-          isDisabled={!organization.isPdfDocumentThemeFontsDirty}
-        >
+        <Button variant="link" onClick={handleResetFonts} isDisabled={!theme.isDirty}>
           <FormattedMessage
             id="component.document-theme-editor.restore-defaults"
             defaultMessage="Restore defaults"
@@ -344,9 +293,9 @@ export function DocumentThemeEditor({ organization, isDisabled }: DocumentThemeE
               <TabPanel key={key}>
                 <RichTextEditor
                   id={`legal-text-editor-${key}`}
-                  value={theme.legalText[key]}
+                  value={theme.data.legalText[key]}
                   onChange={(value) => {
-                    handleThemeChange({ legalText: { [key]: value } });
+                    onChange({ legalText: { [key]: value } });
                   }}
                   isDisabled={isDisabled}
                   toolbarOpts={{ headingButton: false, listButtons: false }}
@@ -361,32 +310,11 @@ export function DocumentThemeEditor({ organization, isDisabled }: DocumentThemeE
 }
 
 DocumentThemeEditor.fragments = {
-  Organization: gql`
-    fragment DocumentThemeEditor_Organization on Organization {
+  OrganizationTheme: gql`
+    fragment DocumentThemeEditor_OrganizationTheme on OrganizationTheme {
       id
-      pdfDocumentTheme
-      isPdfDocumentThemeFontsDirty
+      data
+      isDirty
     }
   `,
 };
-
-const _mutations = [
-  gql`
-    mutation DocumentThemeEditor_updateOrganizationDocumentTheme(
-      $data: OrganizationDocumentThemeInput!
-    ) {
-      updateOrganizationDocumentTheme(data: $data) {
-        ...DocumentThemeEditor_Organization
-      }
-    }
-    ${DocumentThemeEditor.fragments.Organization}
-  `,
-  gql`
-    mutation DocumentThemeEditor_restoreDefaultOrganizationDocumentThemeFonts {
-      restoreDefaultOrganizationDocumentThemeFonts {
-        ...DocumentThemeEditor_Organization
-      }
-    }
-    ${DocumentThemeEditor.fragments.Organization}
-  `,
-];
