@@ -36,6 +36,7 @@ export async function openNewWindow(
     return _window;
   } catch (e) {
     _window?.close();
+    throw e;
   }
 }
 

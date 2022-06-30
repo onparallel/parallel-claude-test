@@ -60,18 +60,20 @@ export function RecipientViewPetitionField({ tone, ...props }: RecipientViewPeti
   const [publicPetitionFieldAttachmentDownloadLink] = useMutation(
     RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkDocument
   );
-  const handleDownloadAttachment = function (attachmentId: string) {
-    openNewWindow(async () => {
-      const { data } = await publicPetitionFieldAttachmentDownloadLink({
-        variables: {
-          keycode: props.keycode,
-          fieldId: props.field.id,
-          attachmentId,
-        },
-      });
-      const { url } = data!.publicPetitionFieldAttachmentDownloadLink;
-      return url!;
-    });
+  const handleDownloadAttachment = async function (attachmentId: string) {
+    await withError(
+      openNewWindow(async () => {
+        const { data } = await publicPetitionFieldAttachmentDownloadLink({
+          variables: {
+            keycode: props.keycode,
+            fieldId: props.field.id,
+            attachmentId,
+          },
+        });
+        const { url } = data!.publicPetitionFieldAttachmentDownloadLink;
+        return url!;
+      })
+    );
   };
 
   const showFieldComments = usePetitionFieldCommentsDialog();
@@ -172,7 +174,7 @@ export function RecipientViewPetitionField({ tone, ...props }: RecipientViewPeti
   const apollo = useApolloClient();
   const handleDownloadFileUploadReply = useCallback(
     async (replyId: string) => {
-      try {
+      await withError(
         openNewWindow(async () => {
           const reply = apollo.cache.readFragment({
             fragment: RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc,
@@ -190,8 +192,8 @@ export function RecipientViewPetitionField({ tone, ...props }: RecipientViewPeti
             throw new Error();
           }
           return url!;
-        });
-      } catch {}
+        })
+      );
     },
     [downloadFileUploadReply]
   );

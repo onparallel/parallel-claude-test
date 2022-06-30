@@ -30,6 +30,7 @@ import {
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
+import { withError } from "@parallel/utils/promises/withError";
 import { forwardRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { FieldDescription } from "../common/FieldDescription";
@@ -73,14 +74,16 @@ export const PetitionRepliesField = Object.assign(
     const [petitionFieldAttachmentDownloadLink] = useMutation(
       PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument
     );
-    const handleAttachmentClick = function (attachmentId: string) {
-      openNewWindow(async () => {
-        const { data } = await petitionFieldAttachmentDownloadLink({
-          variables: { petitionId, fieldId: field.id, attachmentId },
-        });
-        const { url } = data!.petitionFieldAttachmentDownloadLink;
-        return url!;
-      });
+    const handleAttachmentClick = async function (attachmentId: string) {
+      await withError(
+        openNewWindow(async () => {
+          const { data } = await petitionFieldAttachmentDownloadLink({
+            variables: { petitionId, fieldId: field.id, attachmentId },
+          });
+          const { url } = data!.petitionFieldAttachmentDownloadLink;
+          return url!;
+        })
+      );
     };
 
     return field.type === "HEADING" ? (

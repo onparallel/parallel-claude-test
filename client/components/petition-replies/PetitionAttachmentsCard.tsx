@@ -7,6 +7,7 @@ import {
   PetitionAttachmentsCard_PetitionFragment,
 } from "@parallel/graphql/__types";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
+import { withError } from "@parallel/utils/promises/withError";
 import { FormattedMessage } from "react-intl";
 import { Card, GenericCardHeader } from "../common/Card";
 import { FileAttachmentButton } from "../common/FileAttachmentButton";
@@ -55,13 +56,15 @@ export const PetitionAttachmentsCard = Object.assign(
       PetitionAttachmentsCard_petitionAttachmentDownloadLinkDocument
     );
     async function handleAttachmentClick(attachmentId: string) {
-      openNewWindow(async () => {
-        const { data } = await petitionAttachmentDownloadLink({
-          variables: { petitionId: petition.id, attachmentId },
-        });
-        const { url } = data!.petitionAttachmentDownloadLink;
-        return url!;
-      });
+      await withError(
+        openNewWindow(async () => {
+          const { data } = await petitionAttachmentDownloadLink({
+            variables: { petitionId: petition.id, attachmentId },
+          });
+          const { url } = data!.petitionAttachmentDownloadLink;
+          return url!;
+        })
+      );
     }
     return (
       <Card ref={ref} {...props}>

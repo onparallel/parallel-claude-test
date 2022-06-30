@@ -15,6 +15,7 @@ import {
 import { FORMATS } from "@parallel/utils/dates";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { FieldOptions } from "@parallel/utils/petitionFields";
+import { withError } from "@parallel/utils/promises/withError";
 import { useMemo, useState } from "react";
 import { FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -41,17 +42,19 @@ export function DynamicSelectSettings({
     DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument
   );
 
-  function handleDownloadListingsFile() {
-    openNewWindow(async () => {
-      const { data } = await downloadLink({
-        variables: { petitionId, fieldId: field.id },
-      });
-      const { url, result } = data!.dynamicSelectFieldFileDownloadLink;
-      if (result !== "SUCCESS") {
-        throw new Error();
-      }
-      return url!;
-    });
+  async function handleDownloadListingsFile() {
+    await withError(
+      openNewWindow(async () => {
+        const { data } = await downloadLink({
+          variables: { petitionId, fieldId: field.id },
+        });
+        const { url, result } = data!.dynamicSelectFieldFileDownloadLink;
+        if (result !== "SUCCESS") {
+          throw new Error();
+        }
+        return url!;
+      })
+    );
   }
 
   return (

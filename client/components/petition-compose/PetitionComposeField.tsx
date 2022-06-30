@@ -160,14 +160,16 @@ const _PetitionComposeField = chakraForwardRef<
     });
   };
 
-  const handleDownloadAttachment = function (attachmentId: string) {
-    openNewWindow(async () => {
-      const { data } = await petitionFieldAttachmentDownloadLink({
-        variables: { petitionId, fieldId: field.id, attachmentId },
-      });
-      const { url } = data!.petitionFieldAttachmentDownloadLink;
-      return url!;
-    });
+  const handleDownloadAttachment = async function (attachmentId: string) {
+    await withError(
+      openNewWindow(async () => {
+        const { data } = await petitionFieldAttachmentDownloadLink({
+          variables: { petitionId, fieldId: field.id, attachmentId },
+        });
+        const { url } = data!.petitionFieldAttachmentDownloadLink;
+        return url!;
+      })
+    );
   };
 
   const showErrorDialog = useErrorDialog();

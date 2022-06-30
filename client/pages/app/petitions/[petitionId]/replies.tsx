@@ -871,22 +871,24 @@ function useDownloadReplyFile() {
   const [mutate] = useMutation(PetitionReplies_fileUploadReplyDownloadLinkDocument);
   const showFailure = useFailureGeneratingLinkDialog();
   return useCallback(
-    function downloadReplyFile(
+    async function downloadReplyFile(
       petitionId: string,
       reply: Pick<PetitionFieldReply, "id" | "content">,
       preview: boolean
     ) {
-      openNewWindow(async () => {
-        const { data } = await mutate({
-          variables: { petitionId, replyId: reply.id, preview },
-        });
-        const { url, result } = data!.fileUploadReplyDownloadLink;
-        if (result !== "SUCCESS") {
-          await withError(showFailure({ filename: reply.content.filename }));
-          throw new Error();
-        }
-        return url!;
-      });
+      await withError(
+        openNewWindow(async () => {
+          const { data } = await mutate({
+            variables: { petitionId, replyId: reply.id, preview },
+          });
+          const { url, result } = data!.fileUploadReplyDownloadLink;
+          if (result !== "SUCCESS") {
+            await withError(showFailure({ filename: reply.content.filename }));
+            throw new Error();
+          }
+          return url!;
+        })
+      );
     },
     [mutate]
   );

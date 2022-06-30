@@ -22,7 +22,7 @@ export function useTemplateRepliesReportTask() {
   const intl = useIntl();
 
   return async (petitionId: string) => {
-    const [error, finishedTask] = await withError(async () => {
+    const [taskError, finishedTask] = await withError(async () => {
       return await showTaskProgressDialog({
         initTask: async () => {
           const { data } = await apollo.mutate({
@@ -45,33 +45,37 @@ export function useTemplateRepliesReportTask() {
       });
     });
 
-    if (error?.message === "SERVER_ERROR") {
-      await showError({
-        message: intl.formatMessage({
-          id: "generic.unexpected-error-happened",
-          defaultMessage:
-            "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
-        }),
-      });
-    } else if (!error) {
-      openNewWindow(async () => {
-        try {
+    if (taskError?.message === "SERVER_ERROR") {
+      await withError(
+        showError({
+          message: intl.formatMessage({
+            id: "generic.unexpected-error-happened",
+            defaultMessage:
+              "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
+          }),
+        })
+      );
+    } else if (!taskError) {
+      const [error] = await withError(
+        openNewWindow(async () => {
           const { data } = await getTaskResultFile({
             variables: { taskId: finishedTask!.id },
           });
           return data!.getTaskResultFile.url;
-        } catch (error) {
-          // don't await this. we want to immediately rethrow the error so the new window is closed
+        })
+      );
+
+      if (error) {
+        await withError(
           showError({
             message: intl.formatMessage({
               id: "generic.unexpected-error-happened",
               defaultMessage:
                 "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
             }),
-          });
-          throw error;
-        }
-      });
+          })
+        );
+      }
     }
   };
 }

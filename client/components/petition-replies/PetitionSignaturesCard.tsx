@@ -237,17 +237,19 @@ export const PetitionSignaturesCard = Object.assign(
     );
 
     const handleDownloadSignedDoc = useCallback(
-      (petitionSignatureRequestId: string) => {
-        openNewWindow(async () => {
-          const { data } = await downloadSignedDoc({
-            variables: { petitionSignatureRequestId, preview: true },
-          });
-          const { url, result } = data!.signedPetitionDownloadLink;
-          if (result !== "SUCCESS") {
-            throw new Error();
-          }
-          return url!;
-        });
+      async (petitionSignatureRequestId: string) => {
+        await withError(
+          openNewWindow(async () => {
+            const { data } = await downloadSignedDoc({
+              variables: { petitionSignatureRequestId, preview: true },
+            });
+            const { url, result } = data!.signedPetitionDownloadLink;
+            if (result !== "SUCCESS") {
+              throw new Error();
+            }
+            return url!;
+          })
+        );
       },
       [downloadSignedDoc]
     );
