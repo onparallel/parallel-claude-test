@@ -151,7 +151,7 @@ export function PetitionFieldVisibilityEditor({
           base: "auto minmax(160px, 1fr)",
           xl: "auto minmax(160px, 2fr) 3fr",
         }}
-        alignItems="center"
+        alignItems="start"
         columnGap={2}
         rowGap={2}
       >
@@ -190,7 +190,7 @@ export function PetitionFieldVisibilityEditor({
                     ) : (
                       <Flex
                         flex="1"
-                        alignItems="center"
+                        alignItems="start"
                         paddingLeft="11px"
                         textStyle={isReadOnly ? "muted" : undefined}
                       >
@@ -225,7 +225,7 @@ export function PetitionFieldVisibilityEditor({
                     onChange={(value) => updateCondition(index, defaultCondition(value!))}
                     isDisabled={isReadOnly}
                   />
-                  <Stack direction="row" gridColumn={{ base: "2", xl: "auto" }} alignItems="center">
+                  <Stack direction="row" gridColumn={{ base: "2", xl: "auto" }} alignItems="start">
                     {conditionField.multiple ? (
                       <ConditionMultipleFieldModifier
                         field={conditionField}
