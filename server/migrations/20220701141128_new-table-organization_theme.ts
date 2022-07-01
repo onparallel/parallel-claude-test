@@ -43,12 +43,14 @@ export async function up(knex: Knex): Promise<void> {
 
   // populate new column on petitions table with the id of recently created default themes
   const themes = result.rows as Array<{ id: number; org_id: number }>;
-  await knex.raw(/* sql */ `
+  if (themes.length > 0) {
+    await knex.raw(/* sql */ `
     with theme(id, org_id) as (values ${themes.map((t) => `(${t.id},${t.org_id})`).join(",")})
     update petition p set document_organization_theme_id = t.id
     from theme t
     where p.org_id = t.org_id
   `);
+  }
 
   // mark column as not nullable
   await knex.schema.alterTable("petition", (t) => {

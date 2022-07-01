@@ -22,13 +22,15 @@ describe("GraphQL/Organization", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
-    ({ organization, user } = await mocks.createSessionUserAndOrganization("ADMIN"));
+    ({ organization, user } = await mocks.createSessionUserAndOrganization("ADMIN", () => ({
+      created_at: subDays(new Date(), 4),
+    })));
 
-    pdfDocumentThemes = await mocks.createOrganizationThemes(organization.id, 3, (i) => ({
+    pdfDocumentThemes = await mocks.createOrganizationThemes(organization.id, 2, (i) => ({
       type: "PDF_DOCUMENT",
-      is_default: i === 0,
-      name: i === 0 ? "Default theme" : `Theme ${i}`,
-      created_at: subDays(new Date(), 4 - i), // to ensure correct order
+      is_default: false,
+      name: `Theme ${i + 1}`,
+      created_at: subDays(new Date(), 3 - i), // to ensure correct order
     }));
 
     await knex.from("feature_flag").delete();
@@ -237,26 +239,26 @@ describe("GraphQL/Organization", () => {
         themes: {
           pdfDocument: [
             {
-              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[2].id + 1),
+              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id + 1),
               name: "Newest theme",
               isDefault: true,
               data: defaultPdfDocumentTheme,
             },
             {
-              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[2].id),
+              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
               name: "Theme 2",
               isDefault: false,
               data: defaultPdfDocumentTheme,
             },
             {
-              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
+              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id),
               name: "Theme 1",
               isDefault: false,
               data: defaultPdfDocumentTheme,
             },
             {
-              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id),
-              name: "Default theme",
+              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id - 1),
+              name: "Default",
               isDefault: false,
               data: defaultPdfDocumentTheme,
             },
@@ -283,7 +285,7 @@ describe("GraphQL/Organization", () => {
           }
         `,
         {
-          orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[2].id),
+          orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
           data: {
             theme: {
               textFontFamily: "Comic Sans",
@@ -312,7 +314,7 @@ describe("GraphQL/Organization", () => {
           }
         `,
         {
-          orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[2].id),
+          orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
           data: {
             isDefault: true,
             name: "My new default theme",
@@ -325,23 +327,23 @@ describe("GraphQL/Organization", () => {
         themes: {
           pdfDocument: [
             {
-              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[2].id + 1),
+              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id + 1),
               name: "Newest theme",
               isDefault: false,
             },
             {
-              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[2].id),
+              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
               name: "My new default theme",
               isDefault: true,
             },
             {
-              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
+              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id),
               name: "Theme 1",
               isDefault: false,
             },
             {
-              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id),
-              name: "Default theme",
+              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id - 1),
+              name: "Default",
               isDefault: false,
             },
           ],
@@ -366,7 +368,7 @@ describe("GraphQL/Organization", () => {
           }
         `,
         {
-          orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
+          orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id),
           data: {
             theme: {
               marginLeft: 100,
@@ -382,19 +384,19 @@ describe("GraphQL/Organization", () => {
         themes: {
           pdfDocument: [
             {
-              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[2].id + 1),
+              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id + 1),
               name: "Newest theme",
               isDefault: false,
               data: defaultPdfDocumentTheme,
             },
             {
-              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[2].id),
+              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
               name: "My new default theme",
               isDefault: true,
               data: defaultPdfDocumentTheme,
             },
             {
-              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
+              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id),
               name: "Theme 1",
               isDefault: false,
               data: {
@@ -405,8 +407,8 @@ describe("GraphQL/Organization", () => {
               },
             },
             {
-              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id),
-              name: "Default theme",
+              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id - 1),
+              name: "Default",
               isDefault: false,
               data: defaultPdfDocumentTheme,
             },
@@ -426,7 +428,7 @@ describe("GraphQL/Organization", () => {
             }
           }
         `,
-        { orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[2].id) }
+        { orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id) }
       );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -446,16 +448,16 @@ describe("GraphQL/Organization", () => {
             }
           }
         `,
-        { orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id) }
+        { orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id) }
       );
 
       expect(errors).toBeUndefined();
       expect(data?.deleteOrganizationPdfDocumentTheme).toEqual({
         themes: {
           pdfDocument: [
-            { id: toGlobalId("OrganizationTheme", pdfDocumentThemes[2].id + 1) },
-            { id: toGlobalId("OrganizationTheme", pdfDocumentThemes[2].id) },
-            { id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id) },
+            { id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id + 1) },
+            { id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id) },
+            { id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id - 1) },
           ],
         },
       });

@@ -15,6 +15,7 @@ import {
   CreateFeatureFlag,
   CreateFileUpload,
   CreateOrganization,
+  CreateOrganizationTheme,
   CreateOrgIntegration,
   CreatePetition,
   CreatePetitionAccess,
@@ -100,10 +101,14 @@ export class Mocks {
     return data;
   }
 
-  async createSessionUserAndOrganization(orgRole?: UserOrganizationRole) {
+  async createSessionUserAndOrganization(
+    orgRole?: UserOrganizationRole,
+    orgBuilder?: () => Partial<Organization>
+  ) {
     const [organization] = await this.createRandomOrganizations(1, () => ({
       name: "Parallel",
       status: "DEV",
+      ...orgBuilder?.(),
     }));
     const [user] = await this.createRandomUsers(
       organization.id,
@@ -121,7 +126,7 @@ export class Mocks {
     amount: number,
     builder?: (index: number) => Partial<Organization>
   ) {
-    return await this.knex<Organization>("organization")
+    const orgs = await this.knex<Organization>("organization")
       .insert(
         range(0, amount).map<CreateOrganization>((index) => {
           return {
@@ -132,6 +137,24 @@ export class Mocks {
         })
       )
       .returning("*");
+
+    if (orgs.length > 0) {
+      await this.knex("organization_theme").insert(
+        range(0, orgs.length).map<CreateOrganizationTheme>((index) => {
+          const orgBuilderData = builder?.(index);
+          return {
+            type: "PDF_DOCUMENT",
+            is_default: true,
+            data: defaultPdfDocumentTheme,
+            name: "Default",
+            org_id: orgs[index].id,
+            created_at: orgBuilderData?.created_at ?? undefined,
+          };
+        })
+      );
+    }
+
+    return orgs;
   }
 
   async createRandomUsers(
@@ -206,6 +229,14 @@ export class Mocks {
     builder?: (index: number) => Partial<Petition>,
     permissionBuilder?: (index: number) => Partial<PetitionPermission>
   ) {
+    const [theme] = await this.knex("organization_theme")
+      .where({
+        type: "PDF_DOCUMENT",
+        is_default: true,
+        org_id: orgId,
+        deleted_at: null,
+      })
+      .select("*");
     const petitions = await this.knex<Petition>("petition")
       .insert(
         range(0, amount || 1).map<CreatePetition>((index) => {
@@ -215,6 +246,7 @@ export class Mocks {
             status: builder?.(index).is_template ? null : randomPetitionStatus(),
             name: faker.random.words(),
             locale: randomSupportedLocale(),
+            document_organization_theme_id: theme.id,
             ...builder?.(index),
           };
         })
@@ -240,6 +272,14 @@ export class Mocks {
     builder?: (index: number) => Partial<Petition>,
     permissionBuilder?: (index: number) => Partial<PetitionPermission>
   ) {
+    const [theme] = await this.knex("organization_theme")
+      .where({
+        type: "PDF_DOCUMENT",
+        is_default: true,
+        org_id: orgId,
+        deleted_at: null,
+      })
+      .select("*");
     const petitions = await this.knex<Petition>("petition")
       .insert(
         range(0, amount || 1).map<CreatePetition>((index) => {
@@ -249,6 +289,7 @@ export class Mocks {
             status: null,
             name: faker.random.words(),
             locale: randomSupportedLocale(),
+            document_organization_theme_id: theme.id,
             ...builder?.(index),
           };
         })
