@@ -6626,8 +6626,8 @@
   },
   {
     "term": "petition-replies.note-popover",
-    "definition": "This comment is only visible for people in your organization.",
-    "context": "This comment is only visible for people in your organization."
+    "definition": "This note is only visible for people in your organization.",
+    "context": "This note is only visible for people in your organization."
   },
   {
     "term": "petition-replies.notify-petition-reviewed.button",

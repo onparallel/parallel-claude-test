@@ -8,7 +8,7 @@ import {
 } from "@parallel/graphql/__types";
 import { isMetaReturn } from "@parallel/utils/keys";
 import usePreviousValue from "beautiful-react-hooks/usePreviousValue";
-import { Fragment, KeyboardEvent, useEffect, useRef } from "react";
+import { KeyboardEvent, useEffect, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../common/Divider";
 import { FieldComment } from "../common/FieldComment";
@@ -120,7 +120,7 @@ export function PetitionRepliesFieldComments({
                   thickness="4px"
                   speed="0.65s"
                   emptyColor="gray.200"
-                  color="purple.500"
+                  color="primary.500"
                   size="xl"
                 />
               </Center>
@@ -160,18 +160,18 @@ export function PetitionRepliesFieldComments({
                 )}
               </Flex>
             ) : (
-              comments.map((comment, index) => (
-                <Fragment key={comment.id}>
+              <Stack spacing={0} divider={<Divider />}>
+                {comments.map((comment) => (
                   <FieldComment
+                    key={comment.id}
                     comment={comment}
                     isAuthor={myId === comment.author?.id}
                     onEdit={(content) => onUpdateComment(comment.id, content)}
                     onDelete={() => onDeleteComment(comment.id)}
                     onMarkAsUnread={() => onMarkAsUnread(comment.id)}
                   />
-                  {index === comments.length - 1 ? null : <Divider />}
-                </Fragment>
-              ))
+                ))}
+              </Stack>
             )}
           </Box>
         }

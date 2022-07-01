@@ -105,7 +105,7 @@ export function FieldComment({
       {comment.isUnread ? (
         <Circle
           size={2}
-          backgroundColor="purple.400"
+          backgroundColor="primary.400"
           position="absolute"
           top="50%"
           transform="translateY(-50%)"
@@ -136,7 +136,7 @@ export function FieldComment({
               <Text fontSize="sm">
                 <FormattedMessage
                   id="petition-replies.note-popover"
-                  defaultMessage="This comment is only visible for people in your organization."
+                  defaultMessage="This note is only visible for people in your organization."
                 />
               </Text>
             }

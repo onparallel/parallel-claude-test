@@ -154,7 +154,7 @@ export function PetitionCommentsAndNotes({
               />
               <Button
                 height="37px"
-                colorScheme="purple"
+                colorScheme="primary"
                 isDisabled={commentDraft.trim().length === 0 || isTemplate}
                 onClick={handleCommentSubmitClick}
               >
@@ -191,7 +191,7 @@ export function PetitionCommentsAndNotes({
                   />
                   <Button
                     height="37px"
-                    colorScheme="purple"
+                    colorScheme="primary"
                     isDisabled={noteDraft.trim().length === 0 || isTemplate}
                     onClick={handleNoteSubmitClick}
                   >
