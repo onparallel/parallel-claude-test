@@ -15,6 +15,26 @@
     "context": "Admin panel"
   },
   {
+    "term": "branding.delete-theme-tooltip",
+    "definition": "Eliminar tema",
+    "context": "Delete theme"
+  },
+  {
+    "term": "branding.edit-theme-tooltip",
+    "definition": "Editar tema",
+    "context": "Edit theme"
+  },
+  {
+    "term": "branding.new-theme-button",
+    "definition": "Nuevo tema",
+    "context": "New theme"
+  },
+  {
+    "term": "branding.themes-header",
+    "definition": "Temas:",
+    "context": "Themes:"
+  },
+  {
     "term": "component.account-delegates.delegates",
     "definition": "Delegados",
     "context": "Delegates"
@@ -1008,6 +1028,16 @@
     "term": "component.document-theme-editor.typography-title2",
     "definition": "Título 2",
     "context": "Title 2"
+  },
+  {
+    "term": "component.document-theme-select.new-theme-button",
+    "definition": "Nuevo tema",
+    "context": "New theme"
+  },
+  {
+    "term": "component.document-theme-select.no-options-text",
+    "definition": "No hay más temas creados",
+    "context": "No more themes created"
   },
   {
     "term": "component.download-dialog.placeholder-field-number",
@@ -2423,6 +2453,16 @@
     "term": "component.petition-settings.deadline-description",
     "definition": "Esta fecha se utiliza para informar a los destinatarios de la fecha límite para la cuál necesitas tener la información.",
     "context": "This date is used to inform the recipients of the deadline for which you need to have the information."
+  },
+  {
+    "term": "component.petition-settings.document-theme-label",
+    "definition": "Tema del documento",
+    "context": "Document theme"
+  },
+  {
+    "term": "component.petition-settings.document-theme-popover",
+    "definition": "Selecciona el tema que quieres que utilice el documento. Puedes diseñar tus temas en el <Link>Branding del Documento</Link>.",
+    "context": "Select the theme to be used in the document. You can design your themes in the <Link>Document Branding</Link>"
   },
   {
     "term": "component.petition-settings.forward-security-description",
@@ -4275,6 +4315,31 @@
     "context": "Enter the signer's information"
   },
   {
+    "term": "components.create-or-update-document-theme-dialog.create-theme-button",
+    "definition": "Crear tema",
+    "context": "Create theme"
+  },
+  {
+    "term": "components.create-or-update-document-theme-dialog.edit-theme",
+    "definition": "Editar tema",
+    "context": "Edit theme"
+  },
+  {
+    "term": "components.create-or-update-document-theme-dialog.name-error",
+    "definition": "Por favor, ingrasa un nombre para el tema",
+    "context": "Please, enter a name for the theme"
+  },
+  {
+    "term": "components.create-or-update-document-theme-dialog.new-theme",
+    "definition": "Nuevo tema",
+    "context": "New theme"
+  },
+  {
+    "term": "components.create-or-update-document-theme-dialog.set-default-label",
+    "definition": "Establecer como tema por defecto",
+    "context": "Set as Default theme"
+  },
+  {
     "term": "components.create-or-update-user-dialog.included-in",
     "definition": "Incluido en (opcional)",
     "context": "Included in (optional)"
@@ -5093,6 +5158,11 @@
     "term": "generic.forms.message-label",
     "definition": "Mensaje",
     "context": "Message"
+  },
+  {
+    "term": "generic.forms.name-label",
+    "definition": "Nombre",
+    "context": "Name"
   },
   {
     "term": "generic.forms.new-password-label",
@@ -6933,6 +7003,21 @@
     "term": "petition.confirm-delete-field.header",
     "definition": "Eliminar campo",
     "context": "Delete field"
+  },
+  {
+    "term": "petition.confirm-delete-theme.body",
+    "definition": "Si eliminas este tema todas las plantillas y peticiones que lo estén utilizando volverán al tema por defecto.",
+    "context": "If you delete this theme all templates and petitions that are using it will revert to the default theme."
+  },
+  {
+    "term": "petition.confirm-delete-theme.confirm",
+    "definition": "¿Estás seguro de querer eliminarlo?",
+    "context": "Are you sure you want to delete it?"
+  },
+  {
+    "term": "petition.confirm-delete-theme.header",
+    "definition": "Eliminar tema",
+    "context": "Delete theme"
   },
   {
     "term": "petition.contents",

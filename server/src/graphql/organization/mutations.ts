@@ -181,7 +181,7 @@ export const updateOrganizationPdfDocumentTheme = mutationField(
       inRange((args) => args.data.theme?.textFontSize, "data.theme.textFontSize", 5, 72),
       validRichTextContent((args) => args.data.theme?.legalText?.es, "data.theme.legalText.es"),
       validRichTextContent((args) => args.data.theme?.legalText?.en, "data.theme.legalText.en"),
-      maxLength((args) => args.data.name, "data.name", 255)
+      maxLength((args) => args.data.name, "data.name", 50)
     ),
     resolve: async (_, args, ctx) => {
       if (args.data.isDefault) {
@@ -229,7 +229,7 @@ export const createOrganizationPdfDocumentTheme = mutationField(
       name: nonNull(stringArg()),
       isDefault: nonNull(booleanArg()),
     },
-    validateArgs: maxLength((args) => args.name, "name", 255),
+    validateArgs: maxLength((args) => args.name, "name", 50),
     resolve: async (_, { name, isDefault }, ctx) => {
       const theme = await ctx.organizations.createOrganizationTheme(
         ctx.user!.org_id,

@@ -1144,6 +1144,7 @@ export interface NexusGenFieldTypes {
     updateSignatureRequestMetadata: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     updateTag: NexusGenRootTypes["Tag"]; // Tag!
     updateTemplateDefaultPermissions: NexusGenRootTypes["PetitionTemplate"]; // PetitionTemplate!
+    updateTemplateDocumentTheme: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateUser: NexusGenRootTypes["User"]; // User!
     updateUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     uploadDynamicSelectFieldFile: NexusGenRootTypes["PetitionField"]; // PetitionField!
@@ -2684,6 +2685,7 @@ export interface NexusGenFieldTypeNames {
     updateSignatureRequestMetadata: "PetitionSignatureRequest";
     updateTag: "Tag";
     updateTemplateDefaultPermissions: "PetitionTemplate";
+    updateTemplateDocumentTheme: "PetitionBase";
     updateUser: "User";
     updateUserGroup: "UserGroup";
     uploadDynamicSelectFieldFile: "PetitionField";
@@ -4654,6 +4656,11 @@ export interface NexusGenArgTypes {
     updateTemplateDefaultPermissions: {
       // args
       permissions: NexusGenInputs["UserOrUserGroupPermissionInput"][]; // [UserOrUserGroupPermissionInput!]!
+      templateId: NexusGenScalars["GID"]; // GID!
+    };
+    updateTemplateDocumentTheme: {
+      // args
+      orgThemeId: NexusGenScalars["GID"]; // GID!
       templateId: NexusGenScalars["GID"]; // GID!
     };
     updateUser: {

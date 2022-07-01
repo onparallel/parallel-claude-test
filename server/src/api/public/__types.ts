@@ -702,6 +702,7 @@ export type Mutation = {
   updateTag: Tag;
   /** Updates the template default permissions */
   updateTemplateDefaultPermissions: PetitionTemplate;
+  updateTemplateDocumentTheme: PetitionBase;
   /** Updates the user with the provided data. */
   updateUser: User;
   /** Updates the name of a given user group */
@@ -1535,6 +1536,11 @@ export type MutationupdateTagArgs = {
 
 export type MutationupdateTemplateDefaultPermissionsArgs = {
   permissions: Array<UserOrUserGroupPermissionInput>;
+  templateId: Scalars["GID"];
+};
+
+export type MutationupdateTemplateDocumentThemeArgs = {
+  orgThemeId: Scalars["GID"];
   templateId: Scalars["GID"];
 };
 

@@ -1666,6 +1666,7 @@ type Mutation {
     permissions: [UserOrUserGroupPermissionInput!]!
     templateId: GID!
   ): PetitionTemplate!
+  updateTemplateDocumentTheme(orgThemeId: GID!, templateId: GID!): PetitionBase!
 
   """
   Updates the user with the provided data.

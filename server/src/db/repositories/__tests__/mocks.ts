@@ -928,7 +928,7 @@ export class Mocks {
           org_id: orgId,
           name: faker.name.jobDescriptor(),
           data: defaultPdfDocumentTheme,
-          is_default: i === 0,
+          is_default: false,
           ...builder?.(i),
         }))
       )

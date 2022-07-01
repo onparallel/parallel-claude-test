@@ -20,6 +20,7 @@ import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { BrandingGeneral } from "@parallel/components/organization/branding/BrandingGeneral";
+import { useConfirmDeleteThemeDialog } from "@parallel/components/organization/branding/ConfirmDeleteThemeDialog";
 import { useCreateOrUpdateDocumentThemeDialog } from "@parallel/components/organization/branding/CreateOrUpdateDocumentThemeDialog";
 import { DocumentThemeEditor } from "@parallel/components/organization/branding/DocumentThemeEditor";
 import { DocumentThemePreview } from "@parallel/components/organization/branding/DocumentThemePreview";
@@ -144,15 +145,19 @@ function OrganizationBranding() {
     }
   }
 
+  const showConfirmDeleteThemeDialog = useConfirmDeleteThemeDialog();
   async function handleDeleteDocumentTheme() {
-    await deleteOrganizationPdfDocumentTheme({
-      variables: { orgThemeId: selectedTheme.id },
-      onCompleted({ deleteOrganizationPdfDocumentTheme }) {
-        setSelectedThemeId(
-          deleteOrganizationPdfDocumentTheme.themes.pdfDocument.find((t) => t.isDefault)!.id
-        );
-      },
-    });
+    try {
+      await showConfirmDeleteThemeDialog({});
+      await await deleteOrganizationPdfDocumentTheme({
+        variables: { orgThemeId: selectedTheme.id },
+        onCompleted({ deleteOrganizationPdfDocumentTheme }) {
+          setSelectedThemeId(
+            deleteOrganizationPdfDocumentTheme.themes.pdfDocument.find((t) => t.isDefault)!.id
+          );
+        },
+      });
+    } catch {}
   }
 
   async function handleResetThemeFonts() {
@@ -231,7 +236,7 @@ function OrganizationBranding() {
                 alignItems="baseline"
               >
                 <Heading as="h4" size="md" fontWeight="semibold">
-                  Themes:
+                  <FormattedMessage id="branding.themes-header" defaultMessage="Themes:" />
                 </Heading>
                 <Box width="100%">
                   <DocumentThemeSelect
@@ -243,20 +248,26 @@ function OrganizationBranding() {
                 </Box>
                 <IconButtonWithTooltip
                   icon={<EditIcon />}
-                  label="Edit theme"
+                  label={intl.formatMessage({
+                    id: "branding.edit-theme-tooltip",
+                    defaultMessage: "Edit theme",
+                  })}
                   onClick={handleEditDocumentTheme}
                 />
                 <IconButtonWithTooltip
                   icon={<DeleteIcon />}
                   variant="outline"
-                  label="Delete theme"
+                  label={intl.formatMessage({
+                    id: "branding.delete-theme-tooltip",
+                    defaultMessage: "Delete theme",
+                  })}
                   isDisabled={selectedTheme?.isDefault}
                   onClick={handleDeleteDocumentTheme}
                 />
               </GridItem>
               <GridItem justifyContent="flex-end" display="flex">
                 <Button variant="solid" colorScheme="purple" onClick={handleCreateNewDocumentTheme}>
-                  New theme
+                  <FormattedMessage id="branding.new-theme-button" defaultMessage="New theme" />
                 </Button>
               </GridItem>
 

@@ -62,7 +62,10 @@ import { validIsDefined } from "../../helpers/validators/validIsDefined";
 import { validRemindersConfig } from "../../helpers/validators/validRemindersConfig";
 import { validRichTextContent } from "../../helpers/validators/validRichTextContent";
 import { validSignatureConfig } from "../../helpers/validators/validSignatureConfig";
-import { orgHasAvailablePetitionSendCredits } from "../../organization/authorizers";
+import {
+  orgHasAvailablePetitionSendCredits,
+  userHasAccessToOrganizationTheme,
+} from "../../organization/authorizers";
 import { contextUserHasRole } from "../../users/authorizers";
 import {
   accessesBelongToPetition,
@@ -770,6 +773,29 @@ export const updatePetition = mutationField("updatePetition", {
       `User:${ctx.user!.id}`
     );
     return petition;
+  },
+});
+
+export const updateTemplateDocumentTheme = mutationField("updateTemplateDocumentTheme", {
+  type: "PetitionBase",
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("templateId", ["OWNER", "WRITE"]),
+    petitionsAreNotPublicTemplates("templateId"),
+    petitionsAreEditable("templateId"),
+    petitionIsNotAnonymized("templateId"),
+    userHasAccessToOrganizationTheme("orgThemeId")
+  ),
+  args: {
+    templateId: nonNull(globalIdArg("Petition")),
+    orgThemeId: nonNull(globalIdArg("OrganizationTheme")),
+  },
+  resolve: async (_, args, ctx) => {
+    const [template] = await ctx.petitions.updatePetition(
+      args.templateId,
+      { document_organization_theme_id: args.orgThemeId },
+      `User:${ctx.user!.id}`
+    );
+    return template;
   },
 });
 

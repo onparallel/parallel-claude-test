@@ -20,6 +20,7 @@ import {
 import {
   ArrowShortRightIcon,
   BellSettingsIcon,
+  DocumentIcon,
   EmailIcon,
   FieldDateIcon,
   LinkIcon,
@@ -38,6 +39,7 @@ import {
   PetitionSettings_updatePetitionRestrictionDocument,
   PetitionSettings_updatePublicPetitionLinkDocument,
   PetitionSettings_updateTemplateDefaultPermissionsDocument,
+  PetitionSettings_updateTemplateDocumentThemeDocument,
   PetitionSettings_UserFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
@@ -59,6 +61,7 @@ import { ConfirmDialog } from "../common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/dialogs/DialogProvider";
 import { Divider } from "../common/Divider";
 import { HelpPopover } from "../common/HelpPopover";
+import { NormalLink } from "../common/Link";
 import { useConfigureRemindersDialog } from "../petition-activity/dialogs/ConfigureRemindersDialog";
 import {
   PublicLinkSettingsDialog,
@@ -442,6 +445,19 @@ function _PetitionSettings({
     petition.isRestricted ||
     myEffectivePermission === "READ";
 
+  const [updateTemplateDocumentTheme] = useMutation(
+    PetitionSettings_updateTemplateDocumentThemeDocument
+  );
+
+  async function handleUpdateTemplateDocumentTheme(orgThemeId: string) {
+    await updateTemplateDocumentTheme({
+      variables: {
+        templateId: petition.id,
+        orgThemeId,
+      },
+    });
+  }
+
   return (
     <Stack padding={4} spacing={2}>
       {petition.__typename === "PetitionTemplate" ? (
@@ -496,6 +512,61 @@ function _PetitionSettings({
               </InputRightAddon>
             </InputGroup>
           </SettingsRowButton>
+          <SettingsRow
+            controlId="template-document-theme"
+            isDisabled={
+              petition.isRestricted || petition.isAnonymized || myEffectivePermission === "READ"
+            }
+            icon={<DocumentIcon />}
+            label={
+              <>
+                <FormattedMessage
+                  id="component.petition-settings.document-theme-label"
+                  defaultMessage="Document theme"
+                />
+                <HelpPopover>
+                  <FormattedMessage
+                    id="component.petition-settings.document-theme-popover"
+                    defaultMessage="Select the theme to be used in the document. You can design your themes in the <Link>Document Branding</Link>"
+                    values={{
+                      Link: (chunks: any[]) => (
+                        <NormalLink
+                          role="a"
+                          href={`/${intl.locale}/app/organization/branding?style=document`}
+                          target="_blank"
+                        >
+                          {chunks}
+                        </NormalLink>
+                      ),
+                    }}
+                  />
+                </HelpPopover>
+              </>
+            }
+          >
+            <Box>
+              <Select
+                size="sm"
+                borderRadius="md"
+                name="template-selected-theme"
+                width="120px"
+                value={petition.selectedDocumentTheme.id}
+                onChange={(event) => handleUpdateTemplateDocumentTheme(event.target.value)}
+                isDisabled={
+                  petition.isRestricted ||
+                  isPublicTemplate ||
+                  petition.isAnonymized ||
+                  myEffectivePermission === "READ"
+                }
+              >
+                {user.organization.themes.pdfDocument.map((theme) => (
+                  <option key={theme.id} value={theme.id}>
+                    {theme.name}
+                  </option>
+                ))}
+              </Select>
+            </Box>
+          </SettingsRow>
           <Divider paddingTop={2} />
           <Heading as="h5" size="sm" paddingTop={2.5} paddingBottom={1.5}>
             <FormattedMessage
@@ -767,6 +838,12 @@ const fragments = {
             }
           }
         }
+        themes {
+          pdfDocument {
+            id
+            name
+          }
+        }
       }
       ...SignatureConfigDialog_User
     }
@@ -783,6 +860,10 @@ const fragments = {
       isRecipientViewContentsHidden
       isRestricted
       isRestrictedWithPassword
+      selectedDocumentTheme {
+        id
+        name
+      }
       myEffectivePermission {
         permissionType
       }
@@ -832,6 +913,17 @@ const fragments = {
   `,
 };
 const mutations = [
+  gql`
+    mutation PetitionSettings_updateTemplateDocumentTheme($templateId: GID!, $orgThemeId: GID!) {
+      updateTemplateDocumentTheme(templateId: $templateId, orgThemeId: $orgThemeId) {
+        id
+        selectedDocumentTheme {
+          id
+          name
+        }
+      }
+    }
+  `,
   gql`
     mutation PetitionSettings_updatePetitionRestriction(
       $petitionId: GID!

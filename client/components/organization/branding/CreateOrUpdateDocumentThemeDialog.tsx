@@ -7,7 +7,6 @@ import {
   FormLabel,
   Input,
   Stack,
-  Text,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
@@ -42,7 +41,7 @@ export function CreateOrUpdateDocumentThemeDialog({
   const nameRef = useRef<HTMLInputElement>(null);
   const nameRegisterProps = useRegisterWithRef(nameRef, register, "name", {
     required: true,
-    maxLength: 255,
+    maxLength: 50,
     minLength: 0,
   });
 
@@ -72,11 +71,21 @@ export function CreateOrUpdateDocumentThemeDialog({
             <FormLabel>
               <FormattedMessage id="generic.forms.name-label" defaultMessage="Name" />
             </FormLabel>
-            <Input {...nameRegisterProps} />
-            <FormErrorMessage>Please, enter a name for the theme</FormErrorMessage>
+            <Input {...nameRegisterProps} maxLength={50} />
+            <FormErrorMessage>
+              <FormattedMessage
+                id="components.create-or-update-document-theme-dialog.name-error"
+                defaultMessage="Please, enter a name for the theme"
+              />
+            </FormErrorMessage>
           </FormControl>
           <FormControl>
-            <Checkbox {...register("isDefault")}>Set as Default theme</Checkbox>
+            <Checkbox {...register("isDefault")}>
+              <FormattedMessage
+                id="components.create-or-update-document-theme-dialog.set-default-label"
+                defaultMessage="Set as Default theme"
+              />
+            </Checkbox>
           </FormControl>
         </Stack>
       }
@@ -85,7 +94,10 @@ export function CreateOrUpdateDocumentThemeDialog({
           {isUpdate ? (
             <FormattedMessage id="generic.save" defaultMessage="Save" />
           ) : (
-            <Text>Create theme</Text>
+            <FormattedMessage
+              id="components.create-or-update-document-theme-dialog.create-theme-button"
+              defaultMessage="Create theme"
+            />
           )}
         </Button>
       }

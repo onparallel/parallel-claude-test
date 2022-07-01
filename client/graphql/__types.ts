@@ -735,6 +735,7 @@ export interface Mutation {
   updateTag: Tag;
   /** Updates the template default permissions */
   updateTemplateDefaultPermissions: PetitionTemplate;
+  updateTemplateDocumentTheme: PetitionBase;
   /** Updates the user with the provided data. */
   updateUser: User;
   /** Updates the name of a given user group */
@@ -1571,6 +1572,11 @@ export interface MutationupdateTemplateDefaultPermissionsArgs {
   templateId: Scalars["GID"];
 }
 
+export interface MutationupdateTemplateDocumentThemeArgs {
+  orgThemeId: Scalars["GID"];
+  templateId: Scalars["GID"];
+}
+
 export interface MutationupdateUserArgs {
   firstName?: InputMaybe<Scalars["String"]>;
   lastName?: InputMaybe<Scalars["String"]>;
@@ -1928,6 +1934,7 @@ export interface Petition extends PetitionBase {
   progress: PetitionProgress;
   /** The reminders configuration for the petition. */
   remindersConfig?: Maybe<RemindersConfig>;
+  selectedDocumentTheme: OrganizationTheme;
   /** Date when the petition was first sent */
   sentAt?: Maybe<Scalars["DateTime"]>;
   /** The signature configuration for the petition. */
@@ -2078,6 +2085,7 @@ export interface PetitionBase {
   permissions: Array<PetitionPermission>;
   /** The reminders configuration for the petition. */
   remindersConfig?: Maybe<RemindersConfig>;
+  selectedDocumentTheme: OrganizationTheme;
   /** The signature configuration for the petition. */
   signatureConfig?: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
@@ -2676,6 +2684,7 @@ export interface PetitionTemplate extends PetitionBase {
   publicLink?: Maybe<PublicPetitionLink>;
   /** The reminders configuration for the petition. */
   remindersConfig?: Maybe<RemindersConfig>;
+  selectedDocumentTheme: OrganizationTheme;
   /** The signature configuration for the petition. */
   signatureConfig?: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
@@ -8795,6 +8804,10 @@ export type PetitionSettings_UserFragment = {
         | { __typename?: "UserProvisioningOrgIntegration" }
       >;
     };
+    themes: {
+      __typename?: "OrganizationThemeList";
+      pdfDocument: Array<{ __typename?: "OrganizationTheme"; id: string; name: string }>;
+    };
   };
 };
 
@@ -8820,6 +8833,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
     status: PetitionSignatureRequestStatus;
   } | null;
   fromTemplate?: { __typename?: "PetitionTemplate"; id: string; name?: string | null } | null;
+  selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -8932,6 +8946,7 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
         };
       }
   >;
+  selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
   myEffectivePermission?: {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
@@ -8962,6 +8977,25 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
 export type PetitionSettings_PetitionBaseFragment =
   | PetitionSettings_PetitionBase_Petition_Fragment
   | PetitionSettings_PetitionBase_PetitionTemplate_Fragment;
+
+export type PetitionSettings_updateTemplateDocumentThemeMutationVariables = Exact<{
+  templateId: Scalars["GID"];
+  orgThemeId: Scalars["GID"];
+}>;
+
+export type PetitionSettings_updateTemplateDocumentThemeMutation = {
+  updateTemplateDocumentTheme:
+    | {
+        __typename?: "Petition";
+        id: string;
+        selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
+      };
+};
 
 export type PetitionSettings_updatePetitionRestrictionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -15627,6 +15661,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     status: PetitionSignatureRequestStatus;
   } | null;
   fromTemplate?: { __typename?: "PetitionTemplate"; id: string; name?: string | null } | null;
+  selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
   effectivePermissions: Array<{
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
@@ -15766,6 +15801,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
         };
       }
   >;
+  selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
   organization: { __typename?: "Organization"; customHost?: string | null };
   signatureConfig?: {
     __typename?: "SignatureConfig";
@@ -15874,6 +15910,10 @@ export type PetitionCompose_QueryFragment = {
           | { __typename?: "UserProvisioningOrgIntegration" }
         >;
       };
+      themes: {
+        __typename?: "OrganizationThemeList";
+        pdfDocument: Array<{ __typename?: "OrganizationTheme"; id: string; name: string }>;
+      };
     };
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
@@ -15919,6 +15959,7 @@ export type PetitionCompose_updatePetitionMutation = {
           status: PetitionSignatureRequestStatus;
         } | null;
         fromTemplate?: { __typename?: "PetitionTemplate"; id: string; name?: string | null } | null;
+        selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
@@ -16064,6 +16105,7 @@ export type PetitionCompose_updatePetitionMutation = {
               };
             }
         >;
+        selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
         myEffectivePermission?: {
           __typename?: "EffectivePetitionUserPermission";
           permissionType: PetitionPermissionType;
@@ -16467,6 +16509,10 @@ export type PetitionCompose_userQuery = {
           | { __typename?: "UserProvisioningOrgIntegration" }
         >;
       };
+      themes: {
+        __typename?: "OrganizationThemeList";
+        pdfDocument: Array<{ __typename?: "OrganizationTheme"; id: string; name: string }>;
+      };
     };
     delegateOf: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
   };
@@ -16586,6 +16632,7 @@ export type PetitionCompose_petitionQuery = {
           status: PetitionSignatureRequestStatus;
         } | null;
         fromTemplate?: { __typename?: "PetitionTemplate"; id: string; name?: string | null } | null;
+        selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
         effectivePermissions: Array<{
           __typename?: "EffectivePetitionUserPermission";
           isSubscribed: boolean;
@@ -16733,6 +16780,7 @@ export type PetitionCompose_petitionQuery = {
               };
             }
         >;
+        selectedDocumentTheme: { __typename?: "OrganizationTheme"; id: string; name: string };
         organization: { __typename?: "Organization"; customHost?: string | null };
         signatureConfig?: {
           __typename?: "SignatureConfig";
@@ -24229,6 +24277,10 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     isRecipientViewContentsHidden
     isRestricted
     isRestrictedWithPassword
+    selectedDocumentTheme {
+      id
+      name
+    }
     myEffectivePermission {
       permissionType
     }
@@ -24482,6 +24534,12 @@ export const PetitionSettings_UserFragmentDoc = gql`
           ... on SignatureOrgIntegration {
             ...SignatureConfigDialog_SignatureOrgIntegration
           }
+        }
+      }
+      themes {
+        pdfDocument {
+          id
+          name
         }
       }
     }
@@ -26520,6 +26578,20 @@ export const PetitionComposeField_petitionFieldAttachmentDownloadLinkDocument = 
 ` as unknown as DocumentNode<
   PetitionComposeField_petitionFieldAttachmentDownloadLinkMutation,
   PetitionComposeField_petitionFieldAttachmentDownloadLinkMutationVariables
+>;
+export const PetitionSettings_updateTemplateDocumentThemeDocument = gql`
+  mutation PetitionSettings_updateTemplateDocumentTheme($templateId: GID!, $orgThemeId: GID!) {
+    updateTemplateDocumentTheme(templateId: $templateId, orgThemeId: $orgThemeId) {
+      id
+      selectedDocumentTheme {
+        id
+        name
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  PetitionSettings_updateTemplateDocumentThemeMutation,
+  PetitionSettings_updateTemplateDocumentThemeMutationVariables
 >;
 export const PetitionSettings_updatePetitionRestrictionDocument = gql`
   mutation PetitionSettings_updatePetitionRestriction(
