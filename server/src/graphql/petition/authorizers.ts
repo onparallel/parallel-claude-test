@@ -491,8 +491,12 @@ export function replyCanBeUpdated<
     const replyId = args[argReplyId] as unknown as number;
 
     const reply = await ctx.petitions.loadFieldReply(replyId);
+    if (!reply) {
+      // field or reply could be already deleted, throw FORBIDDEN error
+      return false;
+    }
 
-    if (reply!.status === "APPROVED" || reply!.anonymized_at !== null) {
+    if (reply.status === "APPROVED" || reply.anonymized_at !== null) {
       throw new ApolloError(
         `The reply has been approved and cannot be updated.`,
         "REPLY_ALREADY_APPROVED_ERROR"
