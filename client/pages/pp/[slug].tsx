@@ -29,7 +29,6 @@ import {
 } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
-import { isInsecureBrowser } from "@parallel/utils/isInsecureBrowser";
 import jwtDecode from "jwt-decode";
 import {
   GetServerSidePropsContext,
@@ -355,15 +354,6 @@ export async function getServerSideProps({
     defaultValues?: PublicPetitionInitialFormInputs;
   }>
 > {
-  if (isInsecureBrowser(req.headers["user-agent"])) {
-    return {
-      redirect: {
-        destination: `/${locale}/update`,
-        permanent: false,
-      },
-    };
-  }
-
   try {
     const client = createApolloClient({}, { req });
     const { data } = await client.query({

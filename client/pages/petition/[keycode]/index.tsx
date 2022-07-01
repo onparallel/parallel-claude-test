@@ -26,7 +26,6 @@ import {
   Tone,
 } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
-import { isInsecureBrowser } from "@parallel/utils/isInsecureBrowser";
 import { resolveUrl } from "@parallel/utils/next";
 import { serialize as serializeCookie } from "cookie";
 import { isPast } from "date-fns";
@@ -281,14 +280,6 @@ export async function getServerSideProps({
   req,
   res,
 }: GetServerSidePropsContext): Promise<GetServerSidePropsResult<RecipientViewVerifyProps>> {
-  if (isInsecureBrowser(req.headers["user-agent"])) {
-    return {
-      redirect: {
-        destination: `/${locale}/update`,
-        permanent: false,
-      },
-    };
-  }
   const client = createApolloClient({}, { req });
   const { data } = await client.mutate({
     mutation: RecipientViewVerify_verifyPublicAccessDocument,
