@@ -5,8 +5,6 @@ import { withApolloData, WithApolloDataContext } from "@parallel/components/comm
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { BrandingDocumentTheme } from "@parallel/components/organization/branding/BrandingDocumentTheme";
 import { BrandingGeneral } from "@parallel/components/organization/branding/BrandingGeneral";
-import { DocumentThemeEditor } from "@parallel/components/organization/branding/DocumentThemeEditor";
-import { DocumentThemePreview } from "@parallel/components/organization/branding/DocumentThemePreview";
 import { OrganizationBranding_userDocument } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";

@@ -86,6 +86,10 @@ export class PetitionBinder implements IPetitionBinder {
         petition.document_organization_theme_id
       );
 
+      if (documentTheme?.type !== "PDF_DOCUMENT") {
+        throw new Error(`Expected theme of type PDF_DOCUMENT on Petition:${petition.id}`);
+      }
+
       const mainDocPath = await this.writeTemporaryFile(
         this.printer.petitionExport(userId, {
           petitionId,
@@ -105,7 +109,7 @@ export class PetitionBinder implements IPetitionBinder {
                   {
                     fieldNumber: fieldIndex + 1,
                     fieldTitle: field.title,
-                    theme: documentTheme!.data,
+                    theme: documentTheme.data,
                   },
                   petition?.locale ?? "en"
                 )

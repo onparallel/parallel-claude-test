@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { Maybe } from "@parallel/utils/types";
 import { useRef } from "react";
@@ -17,7 +18,10 @@ import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { isDefined } from "remeda";
 
-type DocumentTheme = { name: string; isDefault: boolean }; // CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment
+type DocumentTheme = Omit<
+  CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment,
+  "__typename"
+>;
 type CreateOrUpdateDocumentThemeDialogResult = Partial<DocumentTheme>;
 
 export function CreateOrUpdateDocumentThemeDialog({

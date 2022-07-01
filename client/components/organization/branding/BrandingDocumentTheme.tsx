@@ -64,7 +64,6 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
       await createOrganizationPdfDocumentTheme({
         variables: { name: data.name!, isDefault: data.isDefault! },
         onCompleted({ createOrganizationPdfDocumentTheme }) {
-          console.log(createOrganizationPdfDocumentTheme.themes.pdfDocument[0]);
           setSelectedThemeId(createOrganizationPdfDocumentTheme.themes.pdfDocument[0]!.id);
         },
       });
