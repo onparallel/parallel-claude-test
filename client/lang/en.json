@@ -150,12 +150,12 @@
     "context": "Contacts"
   },
   {
-    "term": "component.app-layout-navbar.petitions-link",
+    "term": "component.app-layout-navbar.parallels-link",
     "definition": "Parallels",
     "context": "Parallels"
   },
   {
-    "term": "component.app-layout-navbar.petitions-link.limit-reached-warning",
+    "term": "component.app-layout-navbar.parallels-link.limit-reached-warning",
     "definition": "It seems that you have reached your limit of {limit} parallels, <a>reach out to us to upgrade your plan.</a>",
     "context": "It seems that you have reached your limit of {limit} parallels, <a>reach out to us to upgrade your plan.</a>"
   },
@@ -370,17 +370,17 @@
     "context": "This contact has access to:"
   },
   {
-    "term": "component.confirm-delete-contacts-dialog.alert.closed-petitions",
+    "term": "component.confirm-delete-contacts-dialog.alert.closed-parallels",
     "definition": "{count} closed {count, plural, =1{parallel} other{parallels}}",
     "context": "{count} closed {count, plural, =1{parallel} other{parallels}}"
   },
   {
-    "term": "component.confirm-delete-contacts-dialog.alert.completed-petitions",
+    "term": "component.confirm-delete-contacts-dialog.alert.completed-parallels",
     "definition": "{count} completed {count, plural, =1{parallel} other{parallels}}",
     "context": "{count} completed {count, plural, =1{parallel} other{parallels}}"
   },
   {
-    "term": "component.confirm-delete-contacts-dialog.alert.pending-petitions",
+    "term": "component.confirm-delete-contacts-dialog.alert.pending-parallels",
     "definition": "{count} pending {count, plural, =1{parallel} other{parallels}}",
     "context": "{count} pending {count, plural, =1{parallel} other{parallels}}"
   },
@@ -1496,8 +1496,8 @@
   },
   {
     "term": "component.notification-petition-shared-group.body",
-    "definition": "{name} has shared the {isTemplate, select, true {template} other {parallel}} with the team \"{group}\" to which you belong.",
-    "context": "{name} has shared the {isTemplate, select, true {template} other {parallel}} with the team \"{group}\" to which you belong."
+    "definition": "{name} has shared the {isTemplate, select, true {template} other {petition}} with the team \"{group}\" to which you belong.",
+    "context": "{name} has shared the {isTemplate, select, true {template} other {petition}} with the team \"{group}\" to which you belong."
   },
   {
     "term": "component.notification-petition-shared.body",
@@ -2355,12 +2355,12 @@
     "context": "Fields not shown to the recipient because the visibility conditions are not met."
   },
   {
-    "term": "component.petition-settings.adjustments-for-petitions",
+    "term": "component.petition-settings.adjustments-for-parallels",
     "definition": "Settings for parallels",
     "context": "Settings for parallels"
   },
   {
-    "term": "component.petition-settings.adjustments-petitions",
+    "term": "component.petition-settings.adjustments-parallels",
     "definition": "Parallel settings",
     "context": "Parallel settings"
   },
@@ -4400,12 +4400,12 @@
     "context": "Edit"
   },
   {
-    "term": "contact.no-petitions",
+    "term": "contact.no-parallels",
     "definition": "You haven't sent any parallels to {name, select, null {this contact} other {{name}}} yet",
     "context": "You haven't sent any parallels to {name, select, null {this contact} other {{name}}} yet"
   },
   {
-    "term": "contact.petitions-header",
+    "term": "contact.parallels-header",
     "definition": "Parallels sent{name, select, null {} other { to {name}}}",
     "context": "Parallels sent{name, select, null {} other { to {name}}}"
   },
@@ -6180,7 +6180,7 @@
     "context": "Automatic reminders"
   },
   {
-    "term": "page.pricing.bulk-petitions",
+    "term": "page.pricing.bulk-parallels",
     "definition": "Bulk parallels",
     "context": "Bulk parallels"
   },

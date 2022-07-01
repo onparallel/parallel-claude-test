@@ -98,7 +98,7 @@ export const PublicPetition = objectType({
     });
     t.field("locale", {
       type: "PetitionLocale",
-      description: "The locale of the petition.",
+      description: "The locale of the parallel.",
     });
     t.field("status", {
       type: "PetitionStatus",

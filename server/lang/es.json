@@ -1,8 +1,8 @@
 [
   {
     "term": "access-delegated-email.subject",
-    "definition": "{senderName} {tone, select, INFORMAL{te} other{le}} ha invitado a colaborar en {subject, select, null{su petición} other{{subject}}}",
-    "context": "{senderName} has invited you to collaborate on {subject, select, null{a petition} other{{subject}}}"
+    "definition": "{senderName} {tone, select, INFORMAL{te} other{le}} ha invitado a colaborar en {subject, select, null{su parallel} other{{subject}}}",
+    "context": "{senderName} has invited you to collaborate on {subject, select, null{a parallel} other{{subject}}}"
   },
   {
     "term": "access-delegated.text",
@@ -291,7 +291,7 @@
   },
   {
     "term": "generic.complete-information-click-link",
-    "definition": "Por favor, haz click en el enlace siguiente para responder a la petición.",
+    "definition": "Por favor, haz click en el enlace siguiente para responder al parallel.",
     "context": "Please click the link below to complete the information."
   },
   {
@@ -412,47 +412,47 @@
   {
     "term": "new-petition.text",
     "definition": "{tone, select, INFORMAL{{senderName} ({senderEmail}) te ha compartido un acceso a Parallel:} other{{senderName} ({senderEmail}) le ha compartido un acceso a Parallel:}}",
-    "context": "{senderName} ({senderEmail}) has sent you the following petition:"
+    "context": "{senderName} ({senderEmail}) has sent you the following parallel:"
   },
   {
-    "term": "organization-limits-reached.petition-send.few-credits-remaining-text",
-    "definition": "Nos alegra que estés acelerando tus procesos con Parallel. Pero parece que ya has usado gran parte de las peticiones incluidas en tu plan.",
-    "context": "We are glad that you are speeding up your processes with Parallel. But it looks like you have already used a large part of the petitions included in your plan."
+    "term": "organization-limits-reached.parallel-send.few-credits-remaining-text",
+    "definition": "Nos alegra que estés acelerando tus procesos con Parallel. Pero parece que ya has usado gran parte de los parallels incluidos en tu plan.",
+    "context": "We are glad that you are speeding up your processes with Parallel. But it looks like you have already used a large part of the parallels included in your plan."
   },
   {
-    "term": "organization-limits-reached.petition-send.few-credits-remaining-text-2",
-    "definition": "En el momento en el que se envió este correo, te quedaban <b>{remaining, number} peticiones</b>, un {percent, number, percent} de las incluidas en tu plan.",
-    "context": "At the time this email was sent, you had <b>{remaining, number} petitions left</b>, {percent, number, percent} of those included in the plan."
+    "term": "organization-limits-reached.parallel-send.few-credits-remaining-text-2",
+    "definition": "En el momento en el que se envió este correo, te quedaban <b>{remaining, number} parallels</b>, un {percent, number, percent} de los incluidos en tu plan.",
+    "context": "At the time this email was sent, you had <b>{remaining, number} parallels left</b>, {percent, number, percent} of those included in the plan."
   },
   {
-    "term": "organization-limits-reached.petition-send.few-credits-remaining-warning",
-    "definition": "Has usado un {value, number, percent} de tus peticiones",
-    "context": "You have used {value, number, percent} of your petitions"
+    "term": "organization-limits-reached.parallel-send.few-credits-remaining-warning",
+    "definition": "Has usado un {value, number, percent} de tus parallels",
+    "context": "You have used {value, number, percent} of your parallels"
   },
   {
-    "term": "organization-limits-reached.petition-send.few-credits-remaining.subject",
-    "definition": "Aviso: Has usado un {value, number, percent} de tus peticiones",
-    "context": "Alert: You have used {value, number, percent} of your petitions"
+    "term": "organization-limits-reached.parallel-send.few-credits-remaining.subject",
+    "definition": "Aviso: Has usado un {value, number, percent} de tus parallels",
+    "context": "Alert: You have used {value, number, percent} of your parallels"
   },
   {
-    "term": "organization-limits-reached.petition-send.get-more-petitions",
-    "definition": "Para incrementar el límite de peticiones, puedes contactar con nosotros en <a>support@onparallel.com</a>.",
-    "context": "To increase the petitions limit, you can contact us at <a>support@onparallel.com</a>."
+    "term": "organization-limits-reached.parallel-send.get-more-parallels",
+    "definition": "Para incrementar el límite de parallels, puedes contactar con nosotros en <a>support@onparallel.com</a>.",
+    "context": "To increase the parallels limit, you can contact us at <a>support@onparallel.com</a>."
   },
   {
-    "term": "organization-limits-reached.petition-send.last-credit-used-text",
-    "definition": "Parece que Parallel está ayudándote en muchos procesos, y es que ya <b>has alcanzado tu límite de {total, number} peticiones</b>.",
-    "context": "It seems that Parallel is helping you with many of your processes, and you have already <b>reached your limit of {total, number} petitions</b>."
+    "term": "organization-limits-reached.parallel-send.last-credit-used-text",
+    "definition": "Parece que Parallel está ayudándote en muchos procesos, y es que ya <b>has alcanzado tu límite de {total, number} parallels</b>.",
+    "context": "It seems that Parallel is helping you with many of your processes, and you have already <b>reached your limit of {total, number} parallels</b>."
   },
   {
-    "term": "organization-limits-reached.petition-send.last-credit-used-warning",
-    "definition": "Has alcanzado el límite de peticiones de tu plan",
-    "context": "You have reached your plan's petitions limit"
+    "term": "organization-limits-reached.parallel-send.last-credit-used-warning",
+    "definition": "Has alcanzado el límite de parallels de tu plan",
+    "context": "You have reached your plan's parallels limit"
   },
   {
-    "term": "organization-limits-reached.petition-send.last-credit-used.subject",
-    "definition": "Has alcanzado el límite de peticiones de tu plan",
-    "context": "You have reached your plan's petitions limit"
+    "term": "organization-limits-reached.parallel-send.last-credit-used.subject",
+    "definition": "Has alcanzado el límite de parallels de tu plan",
+    "context": "You have reached your plan's parallels limit"
   },
   {
     "term": "organization-limits-reached.signaturit-shared-apikey.few-credits-remaining-text",
@@ -516,13 +516,13 @@
   },
   {
     "term": "petition-comments-contact-notification.intro-text",
-    "definition": "{tone, select, INFORMAL{Tienes {count, plural, =1{# comentario nuevo} other{# comentarios nuevos}} en {subject, select, null{tu petición} other{{subject}}}:} other{Tiene {count, plural, =1{# comentario nuevo} other{# comentarios nuevos}} en {subject, select, null{su petición} other{{subject}}}:}}",
-    "context": "You have {count, plural, =1{# new comment} other{# new comments}} on {subject, select, null{your petition} other{{subject}}}:"
+    "definition": "{tone, select, INFORMAL{Tienes {count, plural, =1{# comentario nuevo} other{# comentarios nuevos}} en {subject, select, null{tu parallel} other{{subject}}}:} other{Tiene {count, plural, =1{# comentario nuevo} other{# comentarios nuevos}} en {subject, select, null{su parallel} other{{subject}}}:}}",
+    "context": "You have {count, plural, =1{# new comment} other{# new comments}} on {subject, select, null{your parallel} other{{subject}}}:"
   },
   {
     "term": "petition-comments-contact-notification.subject",
-    "definition": "{tone, select, INFORMAL{Nuevos comentarios en {subject, select, null{su petición} other{{subject}}}} other{Tiene comentarios nuevos en {subject, select, null{su petición} other{{subject}}}}}",
-    "context": "New comments on {subject, select, null{your petition} other{{subject}}}"
+    "definition": "{tone, select, INFORMAL{Nuevos comentarios en {subject, select, null{su parallel} other{{subject}}}} other{Tiene comentarios nuevos en {subject, select, null{su parallel} other{{subject}}}}}",
+    "context": "New comments on {subject, select, null{your parallel} other{{subject}}}"
   },
   {
     "term": "petition-comments-user-notification.access-button",
@@ -536,13 +536,13 @@
   },
   {
     "term": "petition-comments-user-notification.intro-text",
-    "definition": "Tienes {count, plural, =1{# comentario nuevo} other{# comentarios nuevos}} en { petitionName, select, null {tu petición} other {{petitionName}}}:",
-    "context": "You have {count, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your petition} other{{petitionName}}}:"
+    "definition": "Tienes {count, plural, =1{# comentario nuevo} other{# comentarios nuevos}} en { petitionName, select, null {tu parallel} other {{petitionName}}}:",
+    "context": "You have {count, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your parallel} other{{petitionName}}}:"
   },
   {
     "term": "petition-comments-user-notification.subject",
-    "definition": "Tienes comentarios nuevos en { petitionName, select, null {tu petición} other {{petitionName}}}",
-    "context": "New comments on {petitionName, select, null{your petition} other{{petitionName}}}"
+    "definition": "Tienes comentarios nuevos en { petitionName, select, null {tu parallel} other {{petitionName}}}",
+    "context": "New comments on {petitionName, select, null{your parallel} other{{petitionName}}}"
   },
   {
     "term": "petition-completed.access-button",
@@ -556,13 +556,13 @@
   },
   {
     "term": "petition-completed.subject",
-    "definition": "¡Petición \"{petitionName}\" completada!",
+    "definition": "¡Parallel \"{petitionName}\" completado!",
     "context": "Petition \"{petitionName}\" completed!"
   },
   {
     "term": "petition-completed.text",
-    "definition": "{recipient} ha completado {signed, select, true{y firmado } other{}}la petición que le enviaste.",
-    "context": "{recipient} completed {signed, select, true{and signed } other{}}the petition you sent to him."
+    "definition": "{recipient} ha completado {signed, select, true{y firmado } other{}}el parallel que le enviaste.",
+    "context": "{recipient} completed {signed, select, true{and signed } other{}}the parallel you sent to him."
   },
   {
     "term": "petition-excel-export.comments",
@@ -576,13 +576,13 @@
   },
   {
     "term": "petition-message-bounced.access-click-link",
-    "definition": "Sigue el enlace siguiente para acceder a la petición.",
-    "context": "Follow the link below to access the petition."
+    "definition": "Sigue el enlace siguiente para acceder al parallel.",
+    "context": "Follow the link below to access the parallel."
   },
   {
     "term": "petition-message-bounced.intro-text",
-    "definition": "No hemos podido entregar la petición {petitionName} que enviaste a {contact}:",
-    "context": "We couldn't deliver the petition {petitionName} you sent to {contact}:"
+    "definition": "No hemos podido entregar el parallel {petitionName} que enviaste a {contact}:",
+    "context": "We couldn't deliver the parallel {petitionName} you sent to {contact}:"
   },
   {
     "term": "petition-message-bounced.intro-text-2",
@@ -601,13 +601,13 @@
   },
   {
     "term": "petition-reminder.subject",
-    "definition": "Recuerde que {senderName} le envió una petición",
-    "context": "Remember that {senderName} sent you a petition"
+    "definition": "Recuerde que {senderName} le envió un parallel",
+    "context": "Remember that {senderName} sent you a parallel"
   },
   {
     "term": "petition-shared-email.access-button",
-    "definition": "Acceder a la {isTemplate, select, true{plantilla} other{petición}}",
-    "context": "Access the {isTemplate, select, true{template} other{petition}}"
+    "definition": "Acceder a la {isTemplate, select, true{plantilla} other{parallel}}",
+    "context": "Access the {isTemplate, select, true{template} other{parallel}}"
   },
   {
     "term": "petition-shared-email.subject",
@@ -616,13 +616,13 @@
   },
   {
     "term": "petition-shared-email.text",
-    "definition": "{owner} ha compartido la siguiente {isTemplate, select, true{plantilla} other{petición}} contigo:",
-    "context": "{owner} has shared the following {isTemplate, select, true{template} other{petition}} with you."
+    "definition": "{owner} ha compartido {isTemplate, select, true{la siguiente plantilla} other{el siguiente parallel}} contigo:",
+    "context": "{owner} has shared the following {isTemplate, select, true{template} other{parallel}} with you."
   },
   {
     "term": "petition-sharing-notification.access-button",
-    "definition": "Accede a la petición",
-    "context": "Access the petition"
+    "definition": "Accede al parallel",
+    "context": "Access the parallel"
   },
   {
     "term": "petition-sharing-notification.access-click-link",
@@ -656,8 +656,8 @@
   },
   {
     "term": "reminder.text",
-    "definition": "{tone, select, INFORMAL{Te recordamos que {senderName} ({senderEmail}) te compartió un acceso a Parallel en el que queda información pendiente de completar.} other{Le recordamos que {senderName} ({senderEmail}) le envió una petición de la que queda información pendiente de completar.}}",
-    "context": "We remind you that {senderName} ({senderEmail}) sent you a petition and some of the requested information has not yet been submitted."
+    "definition": "{tone, select, INFORMAL{Te recordamos que {senderName} ({senderEmail}) te compartió un acceso a Parallel en el que queda información pendiente de completar.} other{Le recordamos que {senderName} ({senderEmail}) le envió un parallel en el que queda información pendiente de completar.}}",
+    "context": "We remind you that {senderName} ({senderEmail}) sent you a parallel and some of the requested information has not yet been submitted."
   },
   {
     "term": "signature-cancelled-no-credits-left.contact-org-user",

@@ -24,11 +24,11 @@ const email: Email<InternalSignaturitAccountDepletedCreditsProps> = {
     return outdent`
       ¡Hola!
 
-      La organización ${organizationName} acaba de enviar a firmar una petición con Signaturit,
+      La organización ${organizationName} acaba de enviar a firmar un parallel con Signaturit,
       pero se canceló automáticamente porque la APIKEY que está usando se quedó sin créditos.
 
       APIKEY: ${apiKeyHint}...
-      ID de petición: ${petitionGID}
+      ID del parallel: ${petitionGID}
 
       Saludos,
       El bot.
@@ -58,13 +58,13 @@ const email: Email<InternalSignaturitAccountDepletedCreditsProps> = {
             <MjmlText>¡Hola!</MjmlText>
 
             <MjmlText>
-              La organización {organizationName} acaba de enviar a firmar una petición con
+              La organización {organizationName} acaba de enviar a firmar un parallel con
               Signaturit, pero se canceló automáticamente porque la APIKEY que está usando se quedó
               sin créditos.
             </MjmlText>
 
             <MjmlText>APIKEY: {apiKeyHint}...</MjmlText>
-            <MjmlText>ID de petición: {petitionGID}</MjmlText>
+            <MjmlText>ID del parallel: {petitionGID}</MjmlText>
 
             <MjmlText> Saludos, El bot.</MjmlText>
           </MjmlColumn>

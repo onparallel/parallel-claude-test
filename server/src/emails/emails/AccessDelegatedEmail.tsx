@@ -42,7 +42,7 @@ const email: Email<AccessDelegatedEmailProps> = {
       {
         id: "access-delegated-email.subject",
         defaultMessage:
-          "{senderName} has invited you to collaborate on {subject, select, null{a petition} other{{subject}}}",
+          "{senderName} has invited you to collaborate on {subject, select, null{a parallel} other{{subject}}}",
       },
       {
         senderName,

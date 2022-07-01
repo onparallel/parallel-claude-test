@@ -51,7 +51,7 @@ const email: Email<PetitionCompletedProps> = {
         {
           id: "petition-completed.text",
           defaultMessage:
-            "{recipient} completed {signed, select, true{and signed } other{}}the petition you sent to him.",
+            "{recipient} completed {signed, select, true{and signed } other{}}the parallel you sent to him.",
         },
         { recipient: `${contactName} (${contactEmail})`, signed: isSigned }
       )}
@@ -94,7 +94,7 @@ const email: Email<PetitionCompletedProps> = {
             <MjmlText>
               <FormattedMessage
                 id="petition-completed.text"
-                defaultMessage="{recipient} completed {signed, select, true{and signed } other{}}the petition you sent to him."
+                defaultMessage="{recipient} completed {signed, select, true{and signed } other{}}the parallel you sent to him."
                 values={{
                   recipient: (
                     <b>

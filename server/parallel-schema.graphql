@@ -485,7 +485,7 @@ type Mutation {
   activateUser(userIds: [GID!]!): [User!]!
 
   """
-  Adds permissions on given petitions and users
+  Adds permissions on given parallel and users
   """
   addPetitionPermission(
     message: String
@@ -913,7 +913,7 @@ type Mutation {
   dynamicSelectFieldFileDownloadLink(fieldId: GID!, petitionId: GID!): FileUploadDownloadLinkResult!
 
   """
-  Edits permissions on given petitions and users
+  Edits permissions on given parallel and users
   """
   editPetitionPermission(
     permissionType: PetitionPermissionType!
@@ -1174,7 +1174,7 @@ type Mutation {
   reactivateAccesses(accessIds: [GID!]!, petitionId: GID!): [PetitionAccess!]!
 
   """
-  Removes permissions on given petitions and users
+  Removes permissions on given parallel and users
   """
   removePetitionPermission(
     petitionIds: [GID!]!
@@ -2126,7 +2126,7 @@ type Petition implements PetitionBase {
   isRestrictedWithPassword: Boolean!
 
   """
-  The locale of the petition.
+  The locale of the parallel.
   """
   locale: PetitionLocale!
 
@@ -2414,7 +2414,7 @@ interface PetitionBase {
   isRestrictedWithPassword: Boolean!
 
   """
-  The locale of the petition.
+  The locale of the parallel.
   """
   locale: PetitionLocale!
 
@@ -3398,7 +3398,7 @@ type PetitionTemplate implements PetitionBase {
   isRestrictedWithPassword: Boolean!
 
   """
-  The locale of the petition.
+  The locale of the parallel.
   """
   locale: PetitionLocale!
 
@@ -3687,7 +3687,7 @@ type PublicPetition implements Timestamps {
   isRecipientViewContentsHidden: Boolean! @deprecated(reason: "Don't use this")
 
   """
-  The locale of the petition.
+  The locale of the parallel.
   """
   locale: PetitionLocale!
 

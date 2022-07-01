@@ -52,7 +52,7 @@ const email: Email<PetitionReminderProps> = {
         intl.formatMessage(
           {
             id: "petition-reminder.subject",
-            defaultMessage: "Remember that {senderName} sent you a petition",
+            defaultMessage: "Remember that {senderName} sent you a parallel",
           },
           { senderName }
         )
@@ -82,7 +82,7 @@ const email: Email<PetitionReminderProps> = {
         {
           id: "reminder.text",
           defaultMessage:
-            "We remind you that {senderName} ({senderEmail}) sent you a petition and some of the requested information has not yet been submitted.",
+            "We remind you that {senderName} ({senderEmail}) sent you a parallel and some of the requested information has not yet been submitted.",
         },
         { senderName, senderEmail, tone }
       )}
@@ -182,7 +182,7 @@ const email: Email<PetitionReminderProps> = {
             <MjmlText lineHeight="24px">
               <FormattedMessage
                 id="reminder.text"
-                defaultMessage="We remind you that {senderName} ({senderEmail}) sent you a petition and some of the requested information has not yet been submitted."
+                defaultMessage="We remind you that {senderName} ({senderEmail}) sent you a parallel and some of the requested information has not yet been submitted."
                 values={{
                   senderName: <b>{senderName}</b>,
                   senderEmail: <b>{senderEmail}</b>,

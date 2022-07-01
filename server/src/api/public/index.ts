@@ -197,50 +197,50 @@ export const api = new RestApi({
       name: "Endpoints",
       tags: [
         "Parallels",
-        "Petition replies",
+        "Parallel replies",
         "Attachments",
         "Signatures",
-        "Petition Sharing",
+        "Parallel Sharing",
         "Templates",
         "Tags",
         "Contacts",
         "Users",
         "Subscriptions",
-        "Petition Events",
+        "Parallel Events",
       ],
     },
-    { name: "Events", tags: ["Petition Event"] },
+    { name: "Events", tags: ["Parallel Event"] },
   ],
   tags: [
     {
       name: "Parallels",
-      description: "Petitions are the main entities in Parallel",
+      description: "Parallels are the main entities in Parallel",
     },
     {
-      name: "Petition replies",
-      description: "See what your clients replied in your petitions",
+      name: "Parallel replies",
+      description: "See what your clients replied in your parallels",
     },
-    { name: "Attachments", description: "Attach files to your petitions" },
+    { name: "Attachments", description: "Attach files to your parallels" },
     {
       name: "Signatures",
       description:
-        "Request a digital signature on your petitions with our eSignature integrations.",
+        "Request a digital signature on your parallels with our eSignature integrations.",
     },
     {
-      name: "Petition Sharing",
-      description: "Share your petitions with members of your organization for collaborative work",
+      name: "Parallel Sharing",
+      description: "Share your parallels with members of your organization for collaborative work",
     },
     {
       name: "Templates",
-      description: "Use templates to quickly create new petitions for repetitive workflows",
+      description: "Use templates to quickly create new parallels for repetitive workflows",
     },
     {
       name: "Tags",
-      description: "Use tags to organize your templates and petitions so you can find them faster",
+      description: "Use tags to organize your templates and parallels so you can find them faster",
     },
     {
       name: "Contacts",
-      description: "Contacts are the entities that represent the recipients of petitions",
+      description: "Contacts are the entities that represent the recipients of parallels",
     },
 
     {
@@ -249,14 +249,14 @@ export const api = new RestApi({
     },
     {
       name: "Subscriptions",
-      description: "Subscribe to our events to get real time updates on your petitions",
+      description: "Subscribe to our events to get real time updates on your parallels",
     },
     {
-      name: "Petition Event",
-      description: "Subscribe to our events to get real time updates on your petitions",
+      name: "Parallel Event",
+      description: "Subscribe to our events to get real time updates on your parallels",
     },
     {
-      name: "Petition Event",
+      name: "Parallel Event",
       description: '<SchemaDefinition schemaRef="#/components/schemas/PetitionEvent" />',
     },
   ],
@@ -307,11 +307,11 @@ const templateIncludeParam = {
 
 const petitionId = idParam({
   type: "Petition",
-  description: "The ID of the petition",
+  description: "The ID of the parallel",
 });
 const attachmentId = idParam({
   type: "PetitionAttachment",
-  description: "The ID of the petition attachment",
+  description: "The ID of the parallel attachment",
 });
 const replyId = idParam({
   type: "PetitionFieldReply",
@@ -319,7 +319,7 @@ const replyId = idParam({
 });
 const fieldId = idParam({
   type: "PetitionField",
-  description: "The ID of the petition field",
+  description: "The ID of the parallel field",
 });
 const userId = idParam({
   type: "User",
@@ -414,15 +414,15 @@ api
   .get(
     {
       operationId: "GetPetitions",
-      summary: "Get petitions list",
+      summary: "Get parallels list",
       description: outdent`
-        Returns a paginated list of all petitions the user has access to.
+        Returns a paginated list of all parallels the user has access to.
       `,
       query: {
         ...paginationParams(),
         ...sortByParam(["createdAt", "name"]),
         status: enumParam({
-          description: "Optionally filter petitions by their status",
+          description: "Optionally filter parallels by their status",
           required: false,
           values: ["DRAFT", "PENDING", "COMPLETED", "CLOSED"],
         }),
@@ -496,7 +496,7 @@ api
     {
       operationId: "CreatePetition",
       summary: "Create parallel",
-      description: outdent`Create a new petition based on a template.`,
+      description: outdent`Create a new parallel based on a template.`,
       body: JsonBody(CreatePetition),
       query: {
         ...petitionIncludeParam,
@@ -539,9 +539,9 @@ api
   .get(
     {
       operationId: "GetPetition",
-      summary: "Get petition",
+      summary: "Get parallel",
       description: outdent`
-        Returns the specified petition.
+        Returns the specified parallel.
       `,
       query: {
         ...petitionIncludeParam,
@@ -580,9 +580,9 @@ api
   .put(
     {
       operationId: "UpdatePetition",
-      summary: "Update petition",
+      summary: "Update parallel",
       description: outdent`
-        Update the specified petition.
+        Update the specified parallel.
       `,
       body: JsonBody(UpdatePetition),
       query: {
@@ -629,21 +629,21 @@ api
         force: booleanParam({
           required: false,
           description: outdent`
-            If the petition is shared with other users this method will fail
+            If the parallel is shared with other users this method will fail
             unless passing \`true\` to this parameter
           `,
         }),
       },
       description: outdent`
-        Delete the specified petition.
+        Delete the specified parallel.
 
-        If the petition is shared with other users this method will fail unless
+        If the parallel is shared with other users this method will fail unless
         passing \`true\` to the \`force\` parameter"
       `,
       responses: {
         204: SuccessResponse(),
         400: ErrorResponse({
-          description: "The petition is being shared with another user. Set force=true to delete.",
+          description: "The parallel is being shared with another user. Set force=true to delete.",
         }),
       },
       tags: ["Parallels"],
@@ -666,7 +666,7 @@ api
           containsGraphQLError(error, "DELETE_SHARED_PETITION_ERROR")
         ) {
           throw new BadRequestError(
-            "The petition is being shared with another user. Set force=true to delete."
+            "The parallel is being shared with another user. Set force=true to delete."
           );
         }
         throw error;
@@ -681,8 +681,8 @@ api
   .get(
     {
       operationId: "GetPetitionAttachments",
-      summary: "List the petition attachments",
-      description: "Returns a list with information on files attached to the petition.",
+      summary: "List the parallel attachments",
+      description: "Returns a list with information on files attached to the parallel.",
       responses: {
         200: SuccessResponse(ListOfPetitionAttachments),
       },
@@ -700,8 +700,8 @@ api
     {
       middleware: singleFileUploadMiddleware("file"),
       operationId: "CreatePetitionAttachment",
-      summary: "Attach a file to the petition",
-      description: "Attaches the provided file to the petition.",
+      summary: "Attach a file to the parallel",
+      description: "Attaches the provided file to the parallel.",
       responses: {
         200: SuccessResponse(PetitionAttachment),
       },
@@ -746,7 +746,7 @@ api
     {
       operationId: "DeletePetitionAttachment",
       summary: "Delete an attachment",
-      description: "Removes an attachment from the petition.",
+      description: "Removes an attachment from the parallel.",
       responses: {
         204: SuccessResponse(),
       },
@@ -806,8 +806,8 @@ api
   .get(
     {
       operationId: "ReadPetitionCustomProperties",
-      summary: "Get petition custom properties",
-      description: "Returns a key-value object with the custom properties of the petition",
+      summary: "Get parallel custom properties",
+      description: "Returns a key-value object with the custom properties of the parallel",
       responses: {
         200: SuccessResponse(PetitionCustomProperties),
       },
@@ -832,20 +832,20 @@ api
   .post(
     {
       operationId: "CreateOrUpdatePetitionCustomProperty",
-      summary: "Create or update petition custom property",
+      summary: "Create or update parallel custom property",
       description: outdent`
-        Creates or updates a custom property on the petition.
+        Creates or updates a custom property on the parallel.
 
         If the provided key already exists as a property, its value is overwritten.
         If the provided key doesn't exist, it's added.
 
-        The petition can have up to 20 different properties.
+        The parallel can have up to 20 different properties.
       `,
       body: JsonBody(CreateOrUpdatePetitionCustomProperty),
       responses: {
         200: SuccessResponse(PetitionCustomProperties),
         409: ErrorResponse({
-          description: "You reached the maximum limit of custom properties on the petition",
+          description: "You reached the maximum limit of custom properties on the parallel",
         }),
       },
       tags: ["Parallels"],
@@ -874,7 +874,7 @@ api
           containsGraphQLError(error, "CUSTOM_PROPERTIES_LIMIT_ERROR")
         ) {
           throw new ConflictError(
-            "You reached the maximum limit of custom properties on the petition."
+            "You reached the maximum limit of custom properties on the parallel."
           );
         }
         throw error;
@@ -889,9 +889,9 @@ api
   .delete(
     {
       operationId: "DeletePetitionCustomProperty",
-      summary: "Deletes petition custom property",
+      summary: "Deletes parallel custom property",
       description: outdent`
-        Removes the provided key from the custom properties of the petition.
+        Removes the provided key from the custom properties of the parallel.
       `,
       responses: { 204: SuccessResponse() },
       tags: ["Parallels"],
@@ -919,12 +919,12 @@ api
 api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
   {
     operationId: "SendPetition",
-    summary: "Send petition",
+    summary: "Send parallel",
     description: outdent`
-      Send a petition to a contact. You can send a petition to multiple
-      people at once so they can fill the petition collaboratively.
+      Send a parallel to a contact. You can send a parallel to multiple
+      people at once so they can fill the parallel collaboratively.
 
-      There are two ways of specifying the recipients of the petition.
+      There are two ways of specifying the recipients of the parallel.
 
       One way is to pass a list of contact IDs if you know them beforehand:
       ~~~json
@@ -970,7 +970,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
         description: "Invalid parameter",
       }),
       409: ErrorResponse({
-        description: "The petition was already sent to some of the provided contacts",
+        description: "The parallel was already sent to some of the provided contacts",
       }),
     },
     tags: ["Parallels"],
@@ -1093,7 +1093,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
         message = message ?? query.petition?.emailBody ?? null;
         if (!isDefined(subject) || !isDefined(message)) {
           throw new BadRequestError(
-            "The subject or the message are missing and not defined on the petition"
+            "The subject or the message are missing and not defined on the parallel"
           );
         }
       }
@@ -1120,7 +1120,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
         error instanceof ClientError &&
         containsGraphQLError(error, "PETITION_ALREADY_SENT_ERROR")
       ) {
-        throw new ConflictError("The petition was already sent to some of the provided contacts");
+        throw new ConflictError("The parallel was already sent to some of the provided contacts");
       }
       throw error;
     }
@@ -1130,9 +1130,9 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
 api.path("/petitions/:petitionId/recipients", { params: { petitionId } }).get(
   {
     operationId: "GetPetitionRecipients",
-    summary: "Get petition recipients",
+    summary: "Get parallel recipients",
     description: outdent`
-        Returns the list of recipients this petition has been sent to.
+        Returns the list of recipients this parallel has been sent to.
       `,
     responses: { 200: SuccessResponse(ListOfPetitionAccesses) },
     tags: ["Parallels"],
@@ -1162,11 +1162,11 @@ api.path("/petitions/:petitionId/recipients", { params: { petitionId } }).get(
 api.path("/petitions/:petitionId/fields", { params: { petitionId } }).get(
   {
     operationId: "PetitionFields",
-    summary: "List petition replies",
+    summary: "List parallel replies",
     description: outdent`
-      Returns a list of the petition fields with their submitted replies.
+      Returns a list of the parallels fields with their submitted replies.
     `,
-    tags: ["Petition replies"],
+    tags: ["Parallel replies"],
     responses: {
       200: SuccessResponse(ListOfPetitionFieldsWithReplies),
     },
@@ -1197,9 +1197,9 @@ api
   .put(
     {
       operationId: "UpdatePetitionField",
-      summary: "Update petition field",
+      summary: "Update parallel field",
       description: outdent`
-      Update the title and/or description of the specified field on a petition.
+      Update the title and/or description of the specified field on a parallel.
     `,
       body: JsonBody(UpdatePetitionField),
       responses: { 200: SuccessResponse(PetitionField) },
@@ -1255,7 +1255,7 @@ api
       operationId: "SubmitReply",
       summary: "Submit a reply",
       description: outdent`
-        Submits a reply on a given field of the petition.
+        Submits a reply on a given field of the parallel.
       `,
       body: Body([FormDataBodyContent(SubmitFileReply), JsonBodyContent(SubmitReply)], {
         description: replyBodyDescription,
@@ -1265,7 +1265,7 @@ api
         400: ErrorResponse({ description: "Invalid parameters" }),
         409: ErrorResponse({ description: "The field does not accept more replies." }),
       },
-      tags: ["Petition replies"],
+      tags: ["Parallel replies"],
     },
     async ({ client, body, params, files }) => {
       const { petition } = await client.request(SubmitReply_petitionDocument, {
@@ -1386,7 +1386,7 @@ api
         400: ErrorResponse({ description: "Invalid parameters" }),
         409: ErrorResponse({ description: "The reply cannot be updated." }),
       },
-      tags: ["Petition replies"],
+      tags: ["Parallel replies"],
       body: Body([FormDataBodyContent(SubmitFileReply), JsonBodyContent(SubmitReply)], {
         description: replyBodyDescription,
       }),
@@ -1529,7 +1529,7 @@ api
         204: SuccessResponse(),
         409: ErrorResponse({ description: "The reply can't be deleted" }),
       },
-      tags: ["Petition replies"],
+      tags: ["Parallel replies"],
     },
     async ({ client, params }) => {
       try {
@@ -1568,7 +1568,7 @@ api
         201: SuccessResponse(PetitionFieldReply),
         400: ErrorResponse({ description: "Invalid parameters" }),
       },
-      tags: ["Petition replies"],
+      tags: ["Parallel replies"],
     },
     async ({ client, params }) => {
       const { updatePetitionFieldRepliesStatus } = await client.request(
@@ -1600,7 +1600,7 @@ api
         201: SuccessResponse(PetitionFieldReply),
         400: ErrorResponse({ description: "Invalid parameters" }),
       },
-      tags: ["Petition replies"],
+      tags: ["Parallel replies"],
     },
     async ({ client, params }) => {
       const { updatePetitionFieldRepliesStatus } = await client.request(
@@ -1628,13 +1628,13 @@ api
       operationId: "SubmitReplies",
       summary: "Submit replies by field alias",
       description: outdent`
-      Submits replies on a petition given a JSON object where each key is a field alias and each value is one or more replies on that field.
+      Submits replies on a parallel given a JSON object where each key is a field alias and each value is one or more replies on that field.
     `,
       responses: {
         200: SuccessResponse(SubmitPetitionRepliesResponse),
       },
       body: JsonBody(SubmitPetitionReplies),
-      tags: ["Petition replies"],
+      tags: ["Parallel replies"],
     },
     async ({ client, params, body }) => {
       const res = await client.request(SubmitReplies_bulkCreatePetitionRepliesDocument, {
@@ -1676,7 +1676,7 @@ api
           > image.png
         ~~~
       `,
-      tags: ["Petition replies"],
+      tags: ["Parallel replies"],
       responses: {
         302: RedirectResponse("Redirect to the resource on AWS S3"),
         400: ErrorResponse({
@@ -1717,9 +1717,9 @@ api
   .get(
     {
       operationId: "ExportPetitionReplies",
-      summary: "Export the petition replies",
+      summary: "Export the parallel replies",
       description: outdent`
-        Export the replies to a petition in the specified format.
+        Export the replies to a parallel in the specified format.
 
         ### Important
         Note that *there will be a redirect* to a temporary download endpoint on
@@ -1742,7 +1742,7 @@ api
           description: "The format of the export.",
         }),
       },
-      tags: ["Petition replies"],
+      tags: ["Parallel replies"],
       responses: {
         302: RedirectResponse("Redirect to the resource on AWS S3"),
         500: ErrorResponse({ description: "Error generating the file" }),
@@ -1802,10 +1802,10 @@ api
       operationId: "GetPermissions",
       summary: "Get permissions list",
       description: outdent`
-        Return a list of users this petition is shared with.
+        Return a list of users this parallel is shared with.
       `,
       responses: { 200: SuccessResponse(ListOfPermissions) },
-      tags: ["Petition Sharing"],
+      tags: ["Parallel Sharing"],
     },
     async ({ client, params }) => {
       const _query = gql`
@@ -1826,16 +1826,16 @@ api
   .post(
     {
       operationId: "SharePetition",
-      summary: "Share the petition",
+      summary: "Share the parallel",
       description: outdent`
-        Share the specified petition with users and groups from your organization, giving them \`WRITE\` permissions.
+        Share the specified parallel with users and groups from your organization, giving them \`WRITE\` permissions.
       `,
       body: JsonBody(SharePetition),
       responses: {
         201: SuccessResponse(ListOfPermissions),
         400: ErrorResponse({ description: "Invalid user input" }),
       },
-      tags: ["Petition Sharing"],
+      tags: ["Parallel Sharing"],
     },
     async ({ client, params, body }) => {
       const _usersQuery = gql`
@@ -1898,11 +1898,11 @@ api
   .delete(
     {
       operationId: "StopSharing",
-      summary: "Stop sharing the petition",
+      summary: "Stop sharing the parallel",
       description: outdent`
-        Stop sharing the specified petition.
+        Stop sharing the specified parallel.
       `,
-      tags: ["Petition Sharing"],
+      tags: ["Parallel Sharing"],
       responses: { 204: SuccessResponse() },
     },
     async ({ client, params }) => {
@@ -1929,9 +1929,9 @@ api
       operationId: "RemoveUserPermission",
       summary: "Delete a permission",
       description: outdent`
-        Stop sharing the specified petition with the specified user.
+        Stop sharing the specified parallel with the specified user.
       `,
-      tags: ["Petition Sharing"],
+      tags: ["Parallel Sharing"],
       responses: { 204: SuccessResponse() },
     },
     async ({ client, params }) => {
@@ -1959,9 +1959,9 @@ api
       operationId: "RemoveUserGroupPermission",
       summary: "Delete a permission",
       description: outdent`
-        Stop sharing the specified petition with the specified user group.
+        Stop sharing the specified parallel with the specified user group.
       `,
-      tags: ["Petition Sharing"],
+      tags: ["Parallel Sharing"],
       responses: { 204: SuccessResponse() },
     },
     async ({ client, params }) => {
@@ -1990,15 +1990,15 @@ api
   .post(
     {
       operationId: "TransferPetition",
-      summary: "Transfer the petition",
+      summary: "Transfer the parallel",
       query: {
         userId: idParam({ type: "User", required: false }),
         email: stringParam({ required: false }),
       },
       description: outdent`
-        Transfer the petition ownership to another user from your organization.
+        Transfer the parallel ownership to another user from your organization.
 
-        Note that you will still have \`WRITE\` access to the petition.
+        Note that you will still have \`WRITE\` access to the parallel.
 
         You must specify in the query params either \`userId\` or \`email\` argument, but not both.
         If the provided ID or email does not correspond with an active user in your organization, this method will return error.
@@ -2007,7 +2007,7 @@ api
         201: SuccessResponse(ListOfPermissions),
         400: ErrorResponse({ description: "Bad user input" }),
       },
-      tags: ["Petition Sharing"],
+      tags: ["Parallel Sharing"],
     },
     async ({ client, params, query }) => {
       const _usersQuery = gql`
@@ -2072,8 +2072,8 @@ api
 api.path("/petitions/:petitionId/signatures", { params: { petitionId } }).get(
   {
     operationId: "GetSignatures",
-    summary: "List petition signatures",
-    description: "List every signature request linked with your petition.",
+    summary: "List parallel signatures",
+    description: "List every signature request linked with your parallel.",
     responses: { 204: SuccessResponse(ListOfSignatureRequests) },
     tags: ["Signatures"],
   },
@@ -2618,7 +2618,7 @@ api.path("/petition-events").get(
   {
     operationId: "GetPetitionEvents",
     summary: "Get your latest petition events",
-    description: "Returns a list with your latest petition events",
+    description: "Returns a list with your latest parallel events",
     query: {
       before: idParam({
         type: "PetitionEvent",
@@ -2633,7 +2633,7 @@ api.path("/petition-events").get(
       }),
     },
     responses: { 200: SuccessResponse(ListOfPetitionEvents) },
-    tags: ["Petition Events"],
+    tags: ["Parallel Events"],
   },
   async ({ client, query }) => {
     const _query = gql`

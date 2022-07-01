@@ -48,7 +48,7 @@ function ConfirmDeleteContactsDialog({
                   {extra.PENDING > 0 ? (
                     <Text as="li">
                       <FormattedMessage
-                        id="component.confirm-delete-contacts-dialog.alert.pending-petitions"
+                        id="component.confirm-delete-contacts-dialog.alert.pending-parallels"
                         defaultMessage="{count} pending {count, plural, =1{parallel} other{parallels}}"
                         values={{ count: extra.PENDING }}
                       />
@@ -57,7 +57,7 @@ function ConfirmDeleteContactsDialog({
                   {extra.COMPLETED > 0 ? (
                     <Text as="li">
                       <FormattedMessage
-                        id="component.confirm-delete-contacts-dialog.alert.completed-petitions"
+                        id="component.confirm-delete-contacts-dialog.alert.completed-parallels"
                         defaultMessage="{count} completed {count, plural, =1{parallel} other{parallels}}"
                         values={{ count: extra.COMPLETED }}
                       />
@@ -66,7 +66,7 @@ function ConfirmDeleteContactsDialog({
                   {extra.CLOSED > 0 ? (
                     <Text as="li">
                       <FormattedMessage
-                        id="component.confirm-delete-contacts-dialog.alert.closed-petitions"
+                        id="component.confirm-delete-contacts-dialog.alert.closed-parallels"
                         defaultMessage="{count} closed {count, plural, =1{parallel} other{parallels}}"
                         values={{ count: extra.CLOSED }}
                       />

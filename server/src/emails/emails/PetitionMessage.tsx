@@ -45,7 +45,7 @@ const email: Email<PetitionMessageProps> = {
       ${intl.formatMessage(
         {
           id: "new-petition.text",
-          defaultMessage: "{senderName} ({senderEmail}) has sent you the following petition:",
+          defaultMessage: "{senderName} ({senderEmail}) has sent you the following parallel:",
         },
         { senderName, senderEmail, tone }
       )}
@@ -122,7 +122,7 @@ const email: Email<PetitionMessageProps> = {
             <MjmlText align="center">
               <FormattedMessage
                 id="new-petition.text"
-                defaultMessage="{senderName} ({senderEmail}) has sent you the following petition:"
+                defaultMessage="{senderName} ({senderEmail}) has sent you the following parallel:"
                 values={{
                   senderName: <b>{senderName}</b>,
                   senderEmail: <b>{senderEmail}</b>,

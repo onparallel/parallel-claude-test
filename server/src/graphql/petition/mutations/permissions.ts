@@ -34,7 +34,7 @@ export const transferPetitionOwnership = mutationField("transferPetitionOwnershi
 });
 
 export const addPetitionPermission = mutationField("addPetitionPermission", {
-  description: "Adds permissions on given petitions and users",
+  description: "Adds permissions on given parallel and users",
   type: list(nonNull("PetitionBase")),
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
@@ -159,7 +159,7 @@ export const addPetitionPermission = mutationField("addPetitionPermission", {
 });
 
 export const editPetitionPermission = mutationField("editPetitionPermission", {
-  description: "Edits permissions on given petitions and users",
+  description: "Edits permissions on given parallel and users",
   type: list(nonNull("Petition")),
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
@@ -214,7 +214,7 @@ export const editPetitionPermission = mutationField("editPetitionPermission", {
 });
 
 export const removePetitionPermission = mutationField("removePetitionPermission", {
-  description: "Removes permissions on given petitions and users",
+  description: "Removes permissions on given parallel and users",
   type: nonNull(list(nullable("PetitionBase"))),
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),

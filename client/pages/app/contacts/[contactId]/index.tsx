@@ -200,7 +200,7 @@ function Contact({ contactId }: ContactProps) {
           <Card marginTop={4} id="contact-petitions">
             <CardHeader omitDivider>
               <FormattedMessage
-                id="contact.petitions-header"
+                id="contact.parallels-header"
                 defaultMessage="Parallels sent{name, select, null {} other { to {name}}}"
                 values={{ name: contact!.firstName }}
               />
@@ -218,7 +218,7 @@ function Contact({ contactId }: ContactProps) {
               <Flex height="100px" alignItems="center" justifyContent="center">
                 <Text color="gray.300" fontSize="lg">
                   <FormattedMessage
-                    id="contact.no-petitions"
+                    id="contact.no-parallels"
                     defaultMessage="You haven't sent any parallels to {name, select, null {this contact} other {{name}}} yet"
                     values={{ name: contact!.firstName }}
                   />

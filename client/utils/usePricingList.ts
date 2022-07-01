@@ -59,7 +59,7 @@ export function usePricingList(): PricingListCategory[] {
           },
           {
             label: intl.formatMessage({
-              id: "page.pricing.bulk-petitions",
+              id: "page.pricing.bulk-parallels",
               defaultMessage: "Bulk parallels",
             }),
             plan: "BASIC",

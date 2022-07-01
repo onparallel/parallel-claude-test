@@ -32,8 +32,8 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
 
     return petitionSendTotalCreditsUsed
       ? intl.formatMessage({
-          id: "organization-limits-reached.petition-send.last-credit-used.subject",
-          defaultMessage: "You have reached your plan's petitions limit",
+          id: "organization-limits-reached.parallel-send.last-credit-used.subject",
+          defaultMessage: "You have reached your plan's parallels limit",
         })
       : signatureTotalCreditsUsed
       ? intl.formatMessage({
@@ -43,8 +43,8 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
       : petitionSendFewCreditsRemaining
       ? intl.formatMessage(
           {
-            id: "organization-limits-reached.petition-send.few-credits-remaining.subject",
-            defaultMessage: "Alert: You have used {value, number, percent} of your petitions",
+            id: "organization-limits-reached.parallel-send.few-credits-remaining.subject",
+            defaultMessage: "Alert: You have used {value, number, percent} of your parallels",
           },
           { value }
         )
@@ -73,18 +73,18 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
 
         ${intl.formatMessage(
           {
-            id: "organization-limits-reached.petition-send.last-credit-used-text",
+            id: "organization-limits-reached.parallel-send.last-credit-used-text",
             defaultMessage:
-              "It seems that Parallel is helping you with many of your processes, and you have already <b>reached your limit of {total, number} petitions</b>.",
+              "It seems that Parallel is helping you with many of your processes, and you have already <b>reached your limit of {total, number} parallels</b>.",
           },
           { b: (chunks: any[]) => chunks, total }
         )}
         
         ${intl.formatMessage(
           {
-            id: "organization-limits-reached.petition-send.get-more-petitions",
+            id: "organization-limits-reached.parallel-send.get-more-parallels",
             defaultMessage:
-              "To increase the petitions limit, you can contact us at <a>support@onparallel.com</a>.",
+              "To increase the parallels limit, you can contact us at <a>support@onparallel.com</a>.",
           },
           { a: (chunks: any[]) => chunks }
         )}
@@ -120,16 +120,16 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
         ${greetingUser({ name: senderName }, intl)}
 
         ${intl.formatMessage({
-          id: "organization-limits-reached.petition-send.few-credits-remaining-text",
+          id: "organization-limits-reached.parallel-send.few-credits-remaining-text",
           defaultMessage:
-            "We are glad that you are speeding up your processes with Parallel. But it looks like you have already used a large part of the petitions included in your plan.",
+            "We are glad that you are speeding up your processes with Parallel. But it looks like you have already used a large part of the parallels included in your plan.",
         })}
           
         ${intl.formatMessage(
           {
-            id: "organization-limits-reached.petition-send.few-credits-remaining-text-2",
+            id: "organization-limits-reached.parallel-send.few-credits-remaining-text-2",
             defaultMessage:
-              "At the time this email was sent, you had <b>{remaining, number} petitions left</b>, {percent, number, percent} of those included in the plan.",
+              "At the time this email was sent, you had <b>{remaining, number} parallels left</b>, {percent, number, percent} of those included in the plan.",
           },
           {
             remaining: total - used,
@@ -140,9 +140,9 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
           
         ${intl.formatMessage(
           {
-            id: "organization-limits-reached.petition-send.get-more-petitions",
+            id: "organization-limits-reached.parallel-send.get-more-parallels",
             defaultMessage:
-              "To increase the petitions limit, you can contact us at <a>support@onparallel.com</a>.",
+              "To increase the parallels limit, you can contact us at <a>support@onparallel.com</a>.",
           },
           { a: (chunks: any[]) => chunks }
         )}
@@ -213,8 +213,8 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
               <MjmlText align="center" color="#153E75" fontWeight={600} textTransform="uppercase">
                 {petitionSendTotalCreditsUsed ? (
                   <FormattedMessage
-                    id="organization-limits-reached.petition-send.last-credit-used-warning"
-                    defaultMessage="You have reached your plan's petitions limit"
+                    id="organization-limits-reached.parallel-send.last-credit-used-warning"
+                    defaultMessage="You have reached your plan's parallels limit"
                   />
                 ) : signatureTotalCreditsUsed ? (
                   <FormattedMessage
@@ -223,8 +223,8 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
                   />
                 ) : petitionSendFewCreditsRemaining ? (
                   <FormattedMessage
-                    id="organization-limits-reached.petition-send.few-credits-remaining-warning"
-                    defaultMessage="You have used {value, number, percent} of your petitions"
+                    id="organization-limits-reached.parallel-send.few-credits-remaining-warning"
+                    defaultMessage="You have used {value, number, percent} of your parallels"
                     values={{ value }}
                   />
                 ) : signatureFewCreditsRemaining ? (
@@ -248,15 +248,15 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
               <>
                 <MjmlText lineHeight="24px">
                   <FormattedMessage
-                    id="organization-limits-reached.petition-send.last-credit-used-text"
-                    defaultMessage="It seems that Parallel is helping you with many of your processes, and you have already <b>reached your limit of {total, number} petitions</b>."
+                    id="organization-limits-reached.parallel-send.last-credit-used-text"
+                    defaultMessage="It seems that Parallel is helping you with many of your processes, and you have already <b>reached your limit of {total, number} parallels</b>."
                     values={{ total }}
                   />
                 </MjmlText>
                 <MjmlText lineHeight="24px">
                   <FormattedMessage
-                    id="organization-limits-reached.petition-send.get-more-petitions"
-                    defaultMessage="To increase the petitions limit, you can contact us at <a>support@onparallel.com</a>."
+                    id="organization-limits-reached.parallel-send.get-more-parallels"
+                    defaultMessage="To increase the parallels limit, you can contact us at <a>support@onparallel.com</a>."
                     values={{
                       a: (chunks: any[]) => <a href="mailto:support@onparallel.com">{chunks}</a>,
                     }}
@@ -286,14 +286,14 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
               <>
                 <MjmlText lineHeight="24px">
                   <FormattedMessage
-                    id="organization-limits-reached.petition-send.few-credits-remaining-text"
-                    defaultMessage="We are glad that you are speeding up your processes with Parallel. But it looks like you have already used a large part of the petitions included in your plan."
+                    id="organization-limits-reached.parallel-send.few-credits-remaining-text"
+                    defaultMessage="We are glad that you are speeding up your processes with Parallel. But it looks like you have already used a large part of the parallels included in your plan."
                   />
                 </MjmlText>
                 <MjmlText lineHeight="24px">
                   <FormattedMessage
-                    id="organization-limits-reached.petition-send.few-credits-remaining-text-2"
-                    defaultMessage="At the time this email was sent, you had <b>{remaining, number} petitions left</b>, {percent, number, percent} of those included in the plan."
+                    id="organization-limits-reached.parallel-send.few-credits-remaining-text-2"
+                    defaultMessage="At the time this email was sent, you had <b>{remaining, number} parallels left</b>, {percent, number, percent} of those included in the plan."
                     values={{
                       remaining: total - used,
                       percent: (total - used) / total,
@@ -302,8 +302,8 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
                 </MjmlText>
                 <MjmlText lineHeight="24px">
                   <FormattedMessage
-                    id="organization-limits-reached.petition-send.get-more-petitions"
-                    defaultMessage="To increase the petitions limit, you can contact us at <a>support@onparallel.com</a>."
+                    id="organization-limits-reached.parallel-send.get-more-parallels"
+                    defaultMessage="To increase the parallels limit, you can contact us at <a>support@onparallel.com</a>."
                     values={{
                       a: (chunks: any[]) => <a href="mailto:support@onparallel.com">{chunks}</a>,
                     }}

@@ -32,7 +32,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
     return intl.formatMessage(
       {
         id: "petition-comments-contact-notification.subject",
-        defaultMessage: "New comments on {subject, select, null{your petition} other{{subject}}}",
+        defaultMessage: "New comments on {subject, select, null{your parallel} other{{subject}}}",
       },
       { subject: emailSubject, tone }
     );
@@ -57,7 +57,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
         {
           id: "petition-comments-contact-notification.intro-text",
           defaultMessage:
-            "You have {count, plural, =1{# new comment} other{# new comments}} on {subject, select, null{your petition} other{{subject}}}:",
+            "You have {count, plural, =1{# new comment} other{# new comments}} on {subject, select, null{your parallel} other{{subject}}}:",
         },
         { count: commentCount, subject: emailSubject }
       )}
@@ -105,7 +105,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
             <MjmlText>
               <FormattedMessage
                 id="petition-comments-contact-notification.intro-text"
-                defaultMessage="You have {count, plural, =1{# new comment} other{# new comments}} on {subject, select, null{your petition} other{{subject}}}:"
+                defaultMessage="You have {count, plural, =1{# new comment} other{# new comments}} on {subject, select, null{your parallel} other{{subject}}}:"
                 values={{
                   count: commentCount,
                   subject: emailSubject ? <b>{emailSubject}</b> : null,

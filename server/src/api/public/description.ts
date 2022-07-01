@@ -31,12 +31,12 @@ To start you will need the following:
 
 - An **API token**: You can generate one on the [API tokens section](https://www.onparallel.com/en/app/settings/tokens)
   under your account settings.
-- At least **one Petition Template**. Make sure to write down the ID so we can
-  create a petition based on it. You can find this ID on the [browser URL](https://help.onparallel.com/en/articles/6076363)
+- At least **one Parallel Template**. Make sure to write down the ID so we can
+  create a parallel based on it. You can find this ID on the [browser URL](https://help.onparallel.com/en/articles/6076363)
   or by using the [GET /templates](#operation/GetTemplates) endpoint.
 
-### Step 1: Create the petition
-Create the petition with the [POST /petitions](#operation/CreatePetition)
+### Step 1: Create the parallel
+Create the parallel with the [POST /petitions](#operation/CreatePetition)
 endpoint using the template ID you wrote down earlier.
 ~~~bash
 curl -s -XPOST \\
@@ -49,11 +49,11 @@ curl -s -XPOST \\
 'https://www.onparallel.com/api/v1/petitions'
 ~~~
 
-If everything goes well, you should have received the created petition. Write
+If everything goes well, you should have received the created parallel. Write
 down the ID because we will need it in the next step.
 
-### Step 2: Send the petition
-Send the petition using the [(POST /petitions/{petitionId}/recipients)](#operation/CreatePetitionRecipients)
+### Step 2: Send the parallel
+Send the parallel using the [(POST /petitions/{petitionId}/recipients)](#operation/CreatePetitionRecipients)
 endpoint.
 
 ~~~bash
@@ -72,13 +72,13 @@ curl -s -XPOST \\
       "format": "PLAIN_TEXT",
       "content": "Hi Morty,\\nPlease fill the following information\\n\\nRegards,\\nRick"
     },
-    "subject": "Please fill this petition"
+    "subject": "Please fill this parallel"
   }' \\
   'https://www.onparallel.com/api/v1/petitions/{petitionId}/recipients'
 ~~~
 
 If everything went correctly, you should have received an email with your first
-petition. Congrats! Now fill it out and complete it as a recipient would do.  
+parallel. Congrats! Now fill it out and complete it as a recipient would do.  
 
 ### Step 3: Get the replies
 Finally, use the [GET /petitions/{petitionId}/fields](#operation/PetitionFields)
@@ -93,7 +93,7 @@ curl -s -XGET \\
 ~~~
 
 ### Step 4: Download files
-If the petition you created had any uploaded files you will have to use the
+If the parallel you created had any uploaded files you will have to use the
 [GET /petitions/{petitionId}/replies/{replyId}/download](#operation/DownloadFileReply)
 in order to get the uploaded file.
 

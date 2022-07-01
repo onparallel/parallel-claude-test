@@ -59,13 +59,13 @@ export const AppLayoutNavbar = Object.assign(
             isAvailable: true,
             isActive: pathname.startsWith("/app/petitions"),
             text: intl.formatMessage({
-              id: "component.app-layout-navbar.petitions-link",
+              id: "component.app-layout-navbar.parallels-link",
               defaultMessage: "Parallels",
             }),
             warning: petitionLimitReached
               ? intl.formatMessage(
                   {
-                    id: "component.app-layout-navbar.petitions-link.limit-reached-warning",
+                    id: "component.app-layout-navbar.parallels-link.limit-reached-warning",
                     defaultMessage:
                       "It seems that you have reached your limit of {limit} parallels, <a>reach out to us to upgrade your plan.</a>",
                   },

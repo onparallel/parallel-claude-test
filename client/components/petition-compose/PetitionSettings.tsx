@@ -499,7 +499,7 @@ function _PetitionSettings({
           <Divider paddingTop={2} />
           <Heading as="h5" size="sm" paddingTop={2.5} paddingBottom={1.5}>
             <FormattedMessage
-              id="component.petition-settings.adjustments-for-petitions"
+              id="component.petition-settings.adjustments-for-parallels"
               defaultMessage="Settings for parallels"
             />
           </Heading>
@@ -507,7 +507,7 @@ function _PetitionSettings({
       ) : (
         <Heading as="h5" size="sm" marginY={1.5}>
           <FormattedMessage
-            id="component.petition-settings.adjustments-petitions"
+            id="component.petition-settings.adjustments-parallels"
             defaultMessage="Parallel settings"
           />
         </Heading>

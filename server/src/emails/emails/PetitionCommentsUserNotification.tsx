@@ -30,7 +30,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
       {
         id: "petition-comments-user-notification.subject",
         defaultMessage:
-          "New comments on {petitionName, select, null{your petition} other{{petitionName}}}",
+          "New comments on {petitionName, select, null{your parallel} other{{petitionName}}}",
       },
       { petitionName }
     );
@@ -53,7 +53,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
         {
           id: "petition-comments-user-notification.intro-text",
           defaultMessage:
-            "You have {count, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your petition} other{{petitionName}}}:",
+            "You have {count, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your parallel} other{{petitionName}}}:",
         },
         { count: commentCount, petitionName }
       )}
@@ -87,7 +87,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
             <MjmlText>
               <FormattedMessage
                 id="petition-comments-user-notification.intro-text"
-                defaultMessage="You have {count, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your petition} other{{petitionName}}}:"
+                defaultMessage="You have {count, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your parallel} other{{petitionName}}}:"
                 values={{
                   count: commentCount,
                   petitionName: petitionName ? <b>{petitionName}</b> : null,

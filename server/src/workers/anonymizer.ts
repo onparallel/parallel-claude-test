@@ -42,13 +42,13 @@ createCronWorker("anonymizer", async (ctx, config) => {
     "Worker:Anonymizer"
   );
 
-  // search for closed petitions that are configured to be anonymized after a certain time
+  // search for closed parallels that are configured to be anonymized after a certain time
   const organizations = await ctx.organizations.getOrganizationsWithFeatureFlag("AUTO_ANONYMIZE");
   for (const org of organizations) {
-    ctx.logger.debug(`Anonymizing closed petitions of Organization:${org.id}: ${org.name}`);
+    ctx.logger.debug(`Anonymizing closed parallels of Organization:${org.id}: ${org.name}`);
     const closedPetitions = await ctx.petitions.getClosedPetitionsToAnonymize(org.id);
     count = 0;
-    ctx.logger.debug(`Anonymizing ${closedPetitions.length} closed petitions`);
+    ctx.logger.debug(`Anonymizing ${closedPetitions.length} closed parallels`);
     for (const petition of closedPetitions) {
       ctx.logger.debug(
         `Anonymizing closed petition ${petition.id} (${++count}/${closedPetitions.length})`

@@ -59,7 +59,7 @@ const email: Email<PetitionSharedEmailProps> = {
         {
           id: "petition-shared-email.text",
           defaultMessage:
-            "{owner} has shared the following {isTemplate, select, true{template} other{petition}} with you.",
+            "{owner} has shared the following {isTemplate, select, true{template} other{parallel}} with you.",
         },
         { owner: `${ownerName} (${ownerEmail})`, ownerEmail, isTemplate }
       )}
@@ -108,7 +108,7 @@ const email: Email<PetitionSharedEmailProps> = {
             <MjmlText>
               <FormattedMessage
                 id="petition-shared-email.text"
-                defaultMessage="{owner} has shared the following {isTemplate, select, true{template} other{petition}} with you."
+                defaultMessage="{owner} has shared the following {isTemplate, select, true{template} other{parallel}} with you."
                 values={{
                   owner: (
                     <b>
@@ -146,7 +146,7 @@ const email: Email<PetitionSharedEmailProps> = {
             <Button href={`${parallelUrl}/${locale}/app/petitions/${petitionId}`}>
               <FormattedMessage
                 id="petition-shared-email.access-button"
-                defaultMessage="Access the {isTemplate, select, true{template} other{petition}}"
+                defaultMessage="Access the {isTemplate, select, true{template} other{parallel}}"
                 values={{ isTemplate }}
               />
             </Button>

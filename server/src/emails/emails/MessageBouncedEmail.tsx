@@ -57,7 +57,7 @@ const email: Email<MessageBouncedEmailProps> = {
       ${intl.formatMessage(
         {
           id: "petition-message-bounced.intro-text",
-          defaultMessage: "We couldn't deliver the petition {petitionName} you sent to {contact}:",
+          defaultMessage: "We couldn't deliver the parallel {petitionName} you sent to {contact}:",
         },
         {
           contact: `${contactFullName} (${contactEmail})`,
@@ -82,7 +82,7 @@ const email: Email<MessageBouncedEmailProps> = {
 
       ${intl.formatMessage({
         id: "petition-message-bounced.access-click-link",
-        defaultMessage: "Follow the link below to access the petition.",
+        defaultMessage: "Follow the link below to access the parallel.",
       })}
       ${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/activity
 
@@ -124,7 +124,7 @@ const email: Email<MessageBouncedEmailProps> = {
             <MjmlText>
               <FormattedMessage
                 id="petition-message-bounced.intro-text"
-                defaultMessage="We couldn't deliver the petition {petitionName} you sent to {contact}:"
+                defaultMessage="We couldn't deliver the parallel {petitionName} you sent to {contact}:"
                 values={{
                   contact: (
                     <b>
@@ -154,7 +154,7 @@ const email: Email<MessageBouncedEmailProps> = {
             <Button href={`${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/activity`}>
               <FormattedMessage
                 id="petition-sharing-notification.access-button"
-                defaultMessage="Access the petition"
+                defaultMessage="Access the parallel"
               />
             </Button>
             <ClosingParallelTeam />

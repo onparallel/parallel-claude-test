@@ -88,7 +88,7 @@ export const PetitionBase = interfaceType({
     });
     t.field("locale", {
       type: "PetitionLocale",
-      description: "The locale of the petition.",
+      description: "The locale of the parallel.",
     });
     t.field("owner", {
       type: "User",

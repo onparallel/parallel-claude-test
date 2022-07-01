@@ -181,38 +181,38 @@ const _PetitionAccess = {
   ],
   properties: {
     id: {
-      description: "The ID of the petition access",
+      description: "The ID of the parallel access",
       type: "string",
       example: toGlobalId("PetitionAccess", 42),
     },
     contact: {
       ..._Contact,
-      description: "The recipient contact of the petition access",
+      description: "The recipient contact of the parallel access",
       type: [_Contact.type, "null"],
     },
     granter: {
       ..._User,
-      description: "The user who created this petition access",
+      description: "The user who created this parallel access",
       type: [_User.type, "null"],
     },
     status: {
-      description: "The status of the petition access",
+      description: "The status of the parallel access",
       type: "string",
       enum: ["ACTIVE", "INACTIVE"],
       example: "ACTIVE",
     },
     reminderCount: {
-      description: "Number of reminders sent for the petition access",
+      description: "Number of reminders sent for the parallel access",
       type: "integer",
       example: 2,
     },
     remindersLeft: {
-      description: "Number of reminders left for the petition access",
+      description: "Number of reminders left for the parallel access",
       type: "integer",
       example: 8,
     },
     remindersActive: {
-      description: "Whether reminders are active for the petition access",
+      description: "Whether reminders are active for the parallel access",
       type: "boolean",
       example: true,
     },
@@ -223,13 +223,13 @@ const _PetitionAccess = {
       example: new Date(2020, 2, 17, 8, 0, 0).toISOString(),
     },
     createdAt: {
-      description: "Creation date of the petition access",
+      description: "Creation date of the parallel access",
       type: "string",
       format: "date-time",
       example: new Date(2020, 2, 15).toISOString(),
     },
     recipientUrl: {
-      description: "URL of the recipient portal for this petition access",
+      description: "URL of the recipient portal for this parallel access",
       type: "string",
     },
   },
@@ -242,7 +242,7 @@ const _PetitionField = {
   properties: {
     id: {
       type: "string",
-      description: "The ID of the petition field",
+      description: "The ID of the parallel field",
       example: toGlobalId("PetitionField", 100),
     },
     title: {
@@ -302,7 +302,7 @@ const _PetitionFieldReply = {
   properties: {
     id: {
       type: "string",
-      description: "The ID of the petition field reply",
+      description: "The ID of the parallel field reply",
       example: toGlobalId("PetitionFieldReply", 100),
     },
     status: {
@@ -413,62 +413,62 @@ const _Petition = {
   required: ["id", "name", "status", "deadline", "locale", "createdAt", "customProperties"],
   properties: {
     id: {
-      description: "The ID of the petition",
+      description: "The ID of the parallel",
       type: "string",
       example: toGlobalId("Petition", 42),
     },
     name: {
-      description: "The name of the petition",
-      example: "My petition",
+      description: "The name of the parallel",
+      example: "My parallel",
       type: ["string", "null"],
     },
     status: {
-      description: "The status of the petition",
+      description: "The status of the parallel",
       type: "string",
       enum: ["DRAFT", "PENDING", "COMPLETED", "CLOSED"],
     },
     deadline: {
-      description: "The deadline of the petition for informative purposes",
+      description: "The deadline of the parallel for informative purposes",
       type: ["string", "null"],
       format: "date-time",
       example: new Date(2020, 2, 15).toISOString(),
     },
     locale: {
-      description: "The locale of the petition",
+      description: "The locale of the parallel",
       type: "string",
       enum: ["en", "es"],
       example: "en",
     },
     createdAt: {
-      description: "Creation date of the petition",
+      description: "Creation date of the parallel",
       type: "string",
       format: "date-time",
       example: new Date(2020, 2, 15).toISOString(),
     },
     fromTemplateId: {
-      description: "ID of the template used to create the petition",
+      description: "ID of the template used to create the parallel",
       type: ["string", "null"],
       example: toGlobalId("Petition", 1),
     },
     customProperties: {
-      description: "The custom properties of the petition",
+      description: "The custom properties of the parallel",
       type: "object",
       example: { clientId: "1234" },
     },
     recipients: {
       description:
-        "If parameter `include` contains `recipients`, this will be the list of recipients this petition has been sent to.",
+        "If parameter `include` contains `recipients`, this will be the list of recipients this parallel has been sent to.",
       ..._ListOf(_PetitionAccess),
     },
     fields: {
       description:
-        "If parameter `include` contains `fields`, this will be the list of the petition fields with their submitted replies.",
+        "If parameter `include` contains `fields`, this will be the list of the parallel fields with their submitted replies.",
       ..._ListOf(_PetitionFieldWithReplies),
     },
     tags: {
       type: "array",
       description:
-        "If parameter `include` contains `tags`, this will be the list of tags of the petition.",
+        "If parameter `include` contains `tags`, this will be the list of tags of the parallel.",
       items: {
         type: "string",
       },
@@ -510,7 +510,7 @@ const _Template = {
     name: {
       description: "The name of the template",
       type: ["string", "null"],
-      example: "My petition",
+      example: "My parallel",
     },
     description: {
       description: "The description of the template",
@@ -537,7 +537,7 @@ const _Template = {
     },
     fields: {
       description:
-        "If parameter `include` contains `fields`, this will be the list of the petition fields.",
+        "If parameter `include` contains `fields`, this will be the list of the parallel fields.",
       ..._ListOf(_PetitionField),
     },
     tags: {
@@ -611,8 +611,8 @@ const _CommonPermission = {
   permissionType: {
     description: outdent`
       The type of permission.  
-      \`OWNER\`: Full access to the petition. There can only be one owner per petition.  
-      \`READ\`: Read-only access. Users with READ permission can't modify the petition in any way.  
+      \`OWNER\`: Full access to the parallel. There can only be one owner per parallel.  
+      \`READ\`: Read-only access. Users with READ permission can't modify the parallel in any way.  
       \`WRITE\`: Same level of access as the owner.   
     `,
     type: "string",
@@ -666,18 +666,18 @@ export const UpdatePetition = schema({
   minProperties: 1,
   properties: {
     name: {
-      description: "The name of the petition",
+      description: "The name of the parallel",
       type: ["string", "null"],
-      example: "My petition",
+      example: "My parallel",
     },
     deadline: {
-      description: "The deadline of the petition for informative purposes",
+      description: "The deadline of the parallel for informative purposes",
       type: ["string", "null"],
       format: "date-time",
       example: new Date(2020, 2, 15).toISOString(),
     },
     locale: {
-      description: "The locale of the petition",
+      description: "The locale of the parallel",
       type: "string",
       enum: ["en", "es"],
       example: "en",
@@ -696,9 +696,9 @@ export const CreatePetition = schema({
       example: toGlobalId("Petition", 42),
     },
     name: {
-      description: "An optional name for the created petition",
+      description: "An optional name for the created parallel",
       type: ["string", "null"],
-      example: "My petition",
+      example: "My parallel",
     },
   },
 } as const);
@@ -709,12 +709,12 @@ export const UpdatePetitionField = schema({
   minProperties: 1,
   properties: {
     title: {
-      description: "The title of the petition field",
+      description: "The title of the parallel field",
       type: ["string", "null"],
       example: "ID",
     },
     description: {
-      description: "The description of the petition field",
+      description: "The description of the parallel field",
       type: ["string", "null"],
       example: "Please, write your ID number",
     },
@@ -770,12 +770,12 @@ export const SendPetition = schema({
   additionalProperties: false,
   properties: {
     contacts: {
-      description: "A list of recipients to send this petition to",
+      description: "A list of recipients to send this parallel to",
       type: "array",
       items: {
         oneOf: [
           {
-            description: "The ID of the contact to send this petition to",
+            description: "The ID of the contact to send this parallel to",
             type: "string",
             example: toGlobalId("Contact", 42),
           },
@@ -788,7 +788,7 @@ export const SendPetition = schema({
               email: {
                 type: "string",
                 format: "email",
-                description: "The email of the contact to send this petition to",
+                description: "The email of the contact to send this parallel to",
               },
               firstName: {
                 type: "string",
@@ -818,7 +818,7 @@ export const SendPetition = schema({
       description: "The subject of the email that will be sent to the contacts",
       type: "string",
       maxLength: 255,
-      example: "Please fill this petition",
+      example: "Please fill this parallel",
     }),
     remindersConfig: {
       ..._RemindersConfig,
@@ -840,7 +840,7 @@ export const SharePetition = schema({
   required: [],
   properties: {
     emails: {
-      description: "List with emails of the users you want to share the petition with",
+      description: "List with emails of the users you want to share the parallel with",
       type: "array",
       items: {
         type: "string",
@@ -848,7 +848,7 @@ export const SharePetition = schema({
       },
     },
     userIds: {
-      description: "IDs of the users you want to share the petition with",
+      description: "IDs of the users you want to share the parallel with",
       type: "array",
       items: {
         type: "string",
@@ -856,7 +856,7 @@ export const SharePetition = schema({
       },
     },
     userGroupIds: {
-      description: "IDs of the user groups you want to share the petition with",
+      description: "IDs of the user groups you want to share the parallel with",
       type: "array",
       items: {
         type: "string",
@@ -986,10 +986,10 @@ const _PetitionSigner = {
 
 const PetitionEventSchemas = {
   ACCESS_ACTIVATED: {
-    description: "The user created or reactivated an access on the petition",
+    description: "The user created or reactivated an access on the parallel",
     properties: {
       petitionAccessId: {
-        description: "The ID of the petition access",
+        description: "The ID of the parallel access",
         type: "string",
         example: toGlobalId("PetitionAccess", 2),
       },
@@ -1001,10 +1001,10 @@ const PetitionEventSchemas = {
     },
   },
   ACCESS_DEACTIVATED: {
-    description: "An access on the petition has been deactivated.",
+    description: "An access on the parallel has been deactivated.",
     properties: {
       petitionAccessId: {
-        description: "The ID of the petition access",
+        description: "The ID of the parallel access",
         type: "string",
         example: toGlobalId("PetitionAccess", 2),
       },
@@ -1025,7 +1025,7 @@ const PetitionEventSchemas = {
   },
   ACCESS_DELEGATED: {
     description:
-      "A recipient delegated their petition to another person, creating a new access on the petition",
+      "A recipient delegated their parallel to another person, creating a new access on the parallel",
     properties: {
       newPetitionAccessId: {
         description: "The ID of the new access created by the recipient",
@@ -1040,10 +1040,10 @@ const PetitionEventSchemas = {
     },
   },
   ACCESS_OPENED: {
-    description: "A recipient opened their access to the petition",
+    description: "A recipient opened their access to the parallel",
     properties: {
       petitionAccessId: {
-        description: "The ID of the petition access",
+        description: "The ID of the parallel access",
         type: "string",
         example: toGlobalId("PetitionAccess", 2),
       },
@@ -1076,7 +1076,7 @@ const PetitionEventSchemas = {
     },
   },
   COMMENT_PUBLISHED: {
-    description: "A comment was published on a petition field",
+    description: "A comment was published on a parallel field",
     properties: {
       petitionFieldCommentId: {
         description: "The ID of the comment",
@@ -1134,20 +1134,20 @@ const PetitionEventSchemas = {
     },
   },
   OWNERSHIP_TRANSFERRED: {
-    description: "A user transferred the ownership of a petition to another user",
+    description: "A user transferred the ownership of a parallel to another user",
     properties: {
       userId: {
-        description: "The ID of the user that transferred the petition",
+        description: "The ID of the user that transferred the parallel",
         type: "string",
         example: toGlobalId("User", 10),
       },
       ownerId: {
-        description: "The ID of the new owner of the petition",
+        description: "The ID of the new owner of the parallel",
         type: "string",
         example: toGlobalId("User", 1),
       },
       previousOwnerId: {
-        description: "The ID of the previous owner of the petition",
+        description: "The ID of the previous owner of the parallel",
         type: ["string", "null"],
         example: toGlobalId("User", 2),
       },
@@ -1157,14 +1157,14 @@ const PetitionEventSchemas = {
     description: "A petition was marked as `closed` by an user",
     properties: {
       userId: {
-        description: "The ID of the user that closed the petition",
+        description: "The ID of the user that closed the parallel",
         type: "string",
         example: toGlobalId("User", 1),
       },
     },
   },
   PETITION_CLOSED_NOTIFIED: {
-    description: "A user notified a recipient that the petition was closed",
+    description: "A user notified a recipient that the parallel was closed",
     properties: {
       userId: {
         description: "The ID of the user",
@@ -1172,7 +1172,7 @@ const PetitionEventSchemas = {
         example: toGlobalId("User", 1),
       },
       petitionAccessId: {
-        description: "The ID of the petition access",
+        description: "The ID of the parallel access",
         type: "string",
         example: toGlobalId("PetitionAccess", 1),
       },
@@ -1180,15 +1180,15 @@ const PetitionEventSchemas = {
   },
   PETITION_COMPLETED: {
     description:
-      "A petition was completed. If a user completed it, `userId` will be set in the event data. Else, `petitionAccessId` will be set.",
+      "A parallel was completed. If a user completed it, `userId` will be set in the event data. Else, `petitionAccessId` will be set.",
     properties: {
       userId: {
-        description: "The ID of the user that completed the petition",
+        description: "The ID of the user that completed the parallel",
         type: ["string", "null"],
         example: toGlobalId("User", 1),
       },
       petitionAccessId: {
-        description: "The ID of the petition access linked to the recipient",
+        description: "The ID of the parallel access linked to the recipient",
         type: ["string", "null"],
         example: toGlobalId("PetitionAccess", 1),
       },
@@ -1198,24 +1198,24 @@ const PetitionEventSchemas = {
     description: "A petition was created",
     properties: {
       userId: {
-        description: "The ID of the user that created the petition",
+        description: "The ID of the user that created the parallel",
         type: "string",
         example: toGlobalId("User", 10),
       },
     },
   },
   PETITION_REOPENED: {
-    description: "A user reopened a closed petition",
+    description: "A user reopened a closed parallel",
     properties: {
       userId: {
-        description: "The ID of the user that reopened the petition",
+        description: "The ID of the user that reopened the parallel",
         type: "string",
         example: toGlobalId("User", 5),
       },
     },
   },
   REMINDER_SENT: {
-    description: "A manual or automatic reminder was sent to the petition recipients",
+    description: "A manual or automatic reminder was sent to the parallel recipients",
     properties: {
       petitionReminderId: {
         description: "The ID of the reminder",
@@ -1225,7 +1225,7 @@ const PetitionEventSchemas = {
     },
   },
   REPLY_CREATED: {
-    description: "A reply on the petition was submitted either by a recipient or an user.",
+    description: "A reply on the parallel was submitted either by a recipient or an user.",
     properties: {
       petitionAccessId: {
         description:
@@ -1251,7 +1251,7 @@ const PetitionEventSchemas = {
     },
   },
   REPLY_DELETED: {
-    description: "A reply on the petition was deleted either by a recipient or an user.",
+    description: "A reply on the parallel was deleted either by a recipient or an user.",
     properties: {
       petitionAccessId: {
         description:
@@ -1277,7 +1277,7 @@ const PetitionEventSchemas = {
     },
   },
   REPLY_UPDATED: {
-    description: "A reply on the petition was updated either by a recipient or an user.",
+    description: "A reply on the parallel was updated either by a recipient or an user.",
     properties: {
       petitionAccessId: {
         description:
@@ -1303,7 +1303,7 @@ const PetitionEventSchemas = {
     },
   },
   SIGNATURE_CANCELLED: {
-    description: "An eSignature request on the petition was cancelled.",
+    description: "An eSignature request on the parallel was cancelled.",
     properties: {
       petitionSignatureRequestId: {
         description:
@@ -1390,7 +1390,7 @@ const PetitionEventSchemas = {
     },
   },
   SIGNATURE_COMPLETED: {
-    description: "The eSignature request on the petition was completed",
+    description: "The eSignature request on the parallel was completed",
     properties: {
       fileUploadId: {
         description: "The ID of the signed PDF file",
@@ -1405,7 +1405,7 @@ const PetitionEventSchemas = {
     },
   },
   SIGNATURE_STARTED: {
-    description: "An eSignature request on the petition started",
+    description: "An eSignature request on the parallel started",
     properties: {
       petitionSignatureRequestId: {
         description: "The ID of the eSignature request",
@@ -1430,7 +1430,7 @@ const PetitionEventSchemas = {
     },
   },
   USER_PERMISSION_ADDED: {
-    description: "The user shared their petition with another user",
+    description: "The user shared their parallel with another user",
     properties: {
       permissionType: {
         description: "The type of permission for the new user",
@@ -1439,7 +1439,7 @@ const PetitionEventSchemas = {
         example: "WRITE",
       },
       userId: {
-        description: "The ID of the user that shared the petition",
+        description: "The ID of the user that shared the parallel",
         type: "string",
         example: toGlobalId("User", 10),
       },
@@ -1451,7 +1451,7 @@ const PetitionEventSchemas = {
     },
   },
   USER_PERMISSION_EDITED: {
-    description: "The user modified the type of permission on a shared petition",
+    description: "The user modified the type of permission on a shared parallel",
     properties: {
       permissionType: {
         description: "The new permission for the user",
@@ -1472,7 +1472,7 @@ const PetitionEventSchemas = {
     },
   },
   USER_PERMISSION_REMOVED: {
-    description: "The user removed a permission on their petition",
+    description: "The user removed a permission on their parallel",
     properties: {
       userId: {
         description: "The ID of the user that removed the permission",
@@ -1487,7 +1487,7 @@ const PetitionEventSchemas = {
     },
   },
   GROUP_PERMISSION_ADDED: {
-    description: "The user shared their petition with a user group",
+    description: "The user shared their parallel with a user group",
     properties: {
       permissionType: {
         description: "The type of permission for the group members",
@@ -1496,7 +1496,7 @@ const PetitionEventSchemas = {
         example: "READ",
       },
       userId: {
-        description: "The ID of the user that shared the petition",
+        description: "The ID of the user that shared the parallel",
         type: "string",
         example: toGlobalId("User", 10),
       },
@@ -1508,7 +1508,7 @@ const PetitionEventSchemas = {
     },
   },
   GROUP_PERMISSION_EDITED: {
-    description: "The user modified the type of permission on a shared petition",
+    description: "The user modified the type of permission on a shared parallel",
     properties: {
       permissionType: {
         description: "The new permission for the group",
@@ -1529,7 +1529,7 @@ const PetitionEventSchemas = {
     },
   },
   GROUP_PERMISSION_REMOVED: {
-    description: "The user removed a permission on their petition",
+    description: "The user removed a permission on their parallel",
     properties: {
       userId: {
         description: "The ID of the user that removed the permission",
@@ -1544,42 +1544,42 @@ const PetitionEventSchemas = {
     },
   },
   PETITION_CLONED: {
-    description: "The user cloned a petition",
+    description: "The user cloned a parallel",
     properties: {
       newPetitionId: {
-        description: "The ID of the new created petition",
+        description: "The ID of the new created parallel",
         type: "string",
         example: toGlobalId("Petition", 1),
       },
       type: {
-        description: "The type of the new created petition",
+        description: "The type of the new created parallel",
         enum: ["PETITION", "TEMPLATE"],
         example: "PETITION",
       },
       userId: {
-        description: "The ID of the user that cloned the petition",
+        description: "The ID of the user that cloned the parallel",
         type: "string",
         example: toGlobalId("User", 10),
       },
     },
   },
   PETITION_DELETED: {
-    description: "The user deleted a petition",
+    description: "The user deleted a parallel",
     properties: {
       userId: {
-        description: "The ID of the user that deleted the petition",
+        description: "The ID of the user that deleted the parallel",
         type: "string",
         example: toGlobalId("User", 10),
       },
       status: {
-        description: "The status of the petition in the moment it was deleted",
+        description: "The status of the parallel in the moment it was deleted",
         enum: ["CLOSED", "COMPLETED", "DRAFT", "PENDING"],
         example: "COMPLETED",
       },
     },
   },
   TEMPLATE_USED: {
-    description: "A template has been used to create a petition",
+    description: "A template has been used to create a parallel",
     properties: {
       userId: {
         description: "The ID of the user that used the template",
@@ -1587,14 +1587,14 @@ const PetitionEventSchemas = {
         example: toGlobalId("User", 10),
       },
       newPetitionId: {
-        description: "The ID of the new created petition",
+        description: "The ID of the new created parallel",
         type: "string",
         example: toGlobalId("Petition", 1),
       },
     },
   },
   REMINDERS_OPT_OUT: {
-    description: "The contact has opted out from receiving reminders for this petition",
+    description: "The contact has opted out from receiving reminders for this parallel",
     properties: {
       petitionAccessId: {
         description: "The ID of the petition access",
@@ -1615,10 +1615,10 @@ const PetitionEventSchemas = {
     },
   },
   ACCESS_ACTIVATED_FROM_PUBLIC_PETITION_LINK: {
-    description: "A contact started and sent itself a petition through a public petition link",
+    description: "A contact started and sent itself a parallel through a public parallel link",
     properties: {
       petitionAccessId: {
-        description: "The ID of the petition access",
+        description: "The ID of the parallel access",
         type: "string",
         example: toGlobalId("PetitionAccess", 10),
       },
@@ -1628,7 +1628,7 @@ const PetitionEventSchemas = {
     description: "A message email has bounced",
     properties: {
       petitionMessageId: {
-        description: "The ID of the petition message that caused the bounce",
+        description: "The ID of the parallel message that caused the bounce",
         type: "string",
         example: toGlobalId("PetitionMessage", 10),
       },
@@ -1638,7 +1638,7 @@ const PetitionEventSchemas = {
     description: "A reminder email has bounced",
     properties: {
       petitionReminderId: {
-        description: "The ID of the petition reminder that caused the bounce",
+        description: "The ID of the parallel reminder that caused the bounce",
         type: "string",
         example: toGlobalId("PetitionReminder", 10),
       },
@@ -1656,7 +1656,7 @@ const PetitionEventSchemas = {
     },
   },
   PETITION_ANONYMIZED: {
-    description: "The petition has been anonymized.",
+    description: "The parallel has been anonymized.",
     properties: {},
   },
 } as Record<PetitionEventType, JsonSchema>;
@@ -1677,7 +1677,7 @@ export const _PetitionEvent = {
           properties: {
             id: {
               type: "string",
-              description: "The ID of the petition event",
+              description: "The ID of the parallel event",
               example: toGlobalId("PetitionEvent", 1),
             },
             type: {
@@ -1688,7 +1688,7 @@ export const _PetitionEvent = {
             },
             petitionId: {
               type: "string",
-              description: "The ID of the petition where this event occurred",
+              description: "The ID of the parallel where this event occurred",
               example: toGlobalId("Petition", 42),
             },
             data: {
@@ -1737,7 +1737,7 @@ const _Subscription = {
     },
     eventsUrl: {
       type: "string",
-      description: "URL where we will send POST requests with real-time petition events",
+      description: "URL where we will send POST requests with real-time parallel events",
       example: "https://www.example.com/events",
     },
     isEnabled: {
@@ -1754,7 +1754,7 @@ const _Subscription = {
     fromTemplateId: {
       type: ["string", "null"],
       description:
-        "Optional template ID. If specified, only events originating in petitions created from this template will be sent.",
+        "Optional template ID. If specified, only events originating in parallels created from this template will be sent.",
       example: "4exV9AsWJrjj7pVHq",
     },
   },
@@ -1773,7 +1773,7 @@ export const CreateSubscription = schema({
       example: "My subscription",
     },
     eventsUrl: {
-      description: "The URL where you will receive POST requests with real time petition events",
+      description: "The URL where you will receive POST requests with real time parallel events",
       type: "string",
       example: "https://www.example.com/events",
     },
@@ -1790,7 +1790,7 @@ export const CreateSubscription = schema({
     fromTemplateId: {
       type: ["string", "null"],
       description:
-        "Optional template ID. If specified, only events originating in petitions created from this template will be sent.",
+        "Optional template ID. If specified, only events originating in parallels created from this template will be sent.",
       example: "4exV9AsWJrjj7pVHq",
     },
   },
@@ -1862,7 +1862,7 @@ const _PetitionAttachment = {
   properties: {
     id: {
       type: "string",
-      description: "The ID of the petition attachment",
+      description: "The ID of the parallel attachment",
       example: toGlobalId("PetitionAttachment", 1),
     },
     file: {
@@ -1924,7 +1924,7 @@ const _SignatureRequest = {
   properties: {
     id: {
       type: "string",
-      description: "The ID of the petition signature request",
+      description: "The ID of the parallel signature request",
       example: toGlobalId("PetitionSignatureRequest", 1),
     },
     environment: {
