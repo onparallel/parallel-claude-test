@@ -1,16 +1,10 @@
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
-import { gql } from "apollo-server-core";
 import { FormattedMessage } from "react-intl";
-import { PdfDocumentGetProps } from "../utils/pdf";
 import { PdfDocumentTheme } from "../../util/PdfDocumentTheme";
-import { AnnexCoverPage_meDocument } from "../__types";
 
-export interface AnnexCoverPageInitialData {
+export interface AnnexCoverPageProps {
   fieldTitle: string | null;
   fieldNumber: number;
-}
-
-interface AnnexCoverPageProps extends AnnexCoverPageInitialData {
   theme: PdfDocumentTheme;
 }
 
@@ -60,23 +54,3 @@ export default function AnnexCoverPage({ fieldNumber, fieldTitle, theme }: Annex
     </Document>
   );
 }
-
-AnnexCoverPage.queries = [
-  gql`
-    query AnnexCoverPage_me {
-      me {
-        organization {
-          pdfDocumentTheme
-        }
-      }
-    }
-  `,
-];
-
-AnnexCoverPage.getProps = (async (props, { client }) => {
-  const response = await client!.request(AnnexCoverPage_meDocument);
-  return {
-    ...props,
-    theme: response.me.organization.pdfDocumentTheme,
-  };
-}) as PdfDocumentGetProps<AnnexCoverPageInitialData, AnnexCoverPageProps>;

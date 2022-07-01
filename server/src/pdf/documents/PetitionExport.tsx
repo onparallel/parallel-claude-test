@@ -40,7 +40,7 @@ export default function PetitionExport({
   petition,
 }: PetitionExportProps) {
   const intl = useIntl();
-  const theme = petition.organization.pdfDocumentTheme as PdfDocumentTheme;
+  const theme = petition.selectedDocumentTheme.data as PdfDocumentTheme;
   const styles = StyleSheet.create({
     page: {
       paddingLeft: `${theme.marginLeft}mm`,
@@ -393,7 +393,9 @@ PetitionExport.fragments = {
         organization {
           name
           logoUrl
-          pdfDocumentTheme
+        }
+        selectedDocumentTheme {
+          data
         }
         ... on Petition {
           fromTemplateId

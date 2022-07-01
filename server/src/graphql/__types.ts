@@ -1271,6 +1271,7 @@ export interface NexusGenFieldTypes {
     permissions: NexusGenRootTypes["PetitionPermission"][]; // [PetitionPermission!]!
     progress: NexusGenRootTypes["PetitionProgress"]; // PetitionProgress!
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
+    selectedDocumentTheme: NexusGenRootTypes["OrganizationTheme"]; // OrganizationTheme!
     sentAt: NexusGenScalars["DateTime"] | null; // DateTime
     signatureConfig: NexusGenRootTypes["SignatureConfig"] | null; // SignatureConfig
     signatureRequests: NexusGenRootTypes["PetitionSignatureRequest"][]; // [PetitionSignatureRequest!]!
@@ -1609,6 +1610,7 @@ export interface NexusGenFieldTypes {
     permissions: NexusGenRootTypes["PetitionPermission"][]; // [PetitionPermission!]!
     publicLink: NexusGenRootTypes["PublicPetitionLink"] | null; // PublicPetitionLink
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
+    selectedDocumentTheme: NexusGenRootTypes["OrganizationTheme"]; // OrganizationTheme!
     signatureConfig: NexusGenRootTypes["SignatureConfig"] | null; // SignatureConfig
     skipForwardSecurity: boolean; // Boolean!
     tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
@@ -2223,6 +2225,7 @@ export interface NexusGenFieldTypes {
     owner: NexusGenRootTypes["User"]; // User!
     permissions: NexusGenRootTypes["PetitionPermission"][]; // [PetitionPermission!]!
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
+    selectedDocumentTheme: NexusGenRootTypes["OrganizationTheme"]; // OrganizationTheme!
     signatureConfig: NexusGenRootTypes["SignatureConfig"] | null; // SignatureConfig
     skipForwardSecurity: boolean; // Boolean!
     tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
@@ -2808,6 +2811,7 @@ export interface NexusGenFieldTypeNames {
     permissions: "PetitionPermission";
     progress: "PetitionProgress";
     remindersConfig: "RemindersConfig";
+    selectedDocumentTheme: "OrganizationTheme";
     sentAt: "DateTime";
     signatureConfig: "SignatureConfig";
     signatureRequests: "PetitionSignatureRequest";
@@ -3146,6 +3150,7 @@ export interface NexusGenFieldTypeNames {
     permissions: "PetitionPermission";
     publicLink: "PublicPetitionLink";
     remindersConfig: "RemindersConfig";
+    selectedDocumentTheme: "OrganizationTheme";
     signatureConfig: "SignatureConfig";
     skipForwardSecurity: "Boolean";
     tags: "Tag";
@@ -3760,6 +3765,7 @@ export interface NexusGenFieldTypeNames {
     owner: "User";
     permissions: "PetitionPermission";
     remindersConfig: "RemindersConfig";
+    selectedDocumentTheme: "OrganizationTheme";
     signatureConfig: "SignatureConfig";
     skipForwardSecurity: "Boolean";
     tags: "Tag";

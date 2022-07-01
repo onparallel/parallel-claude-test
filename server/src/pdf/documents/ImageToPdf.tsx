@@ -1,11 +1,7 @@
 import { Document, Image, Page, StyleSheet, View } from "@react-pdf/renderer";
-import { gql } from "apollo-server-core";
-import { PdfDocumentGetProps } from "../utils/pdf";
 import { PdfDocumentTheme } from "../../util/PdfDocumentTheme";
-import { ImageToPdf_meDocument } from "../__types";
 
-export interface ImageToPdfInitialData extends Omit<ImageToPdfProps, "theme"> {}
-interface ImageToPdfProps {
+export interface ImageToPdfProps {
   imageUrl: string;
   theme: PdfDocumentTheme;
 }
@@ -39,23 +35,3 @@ export default function ImageToPdf({ imageUrl, theme }: ImageToPdfProps) {
     </Document>
   );
 }
-
-ImageToPdf.queries = [
-  gql`
-    query ImageToPdf_me {
-      me {
-        organization {
-          pdfDocumentTheme
-        }
-      }
-    }
-  `,
-];
-
-ImageToPdf.getProps = (async ({ imageUrl }, { client }) => {
-  const response = await client!.request(ImageToPdf_meDocument);
-  return {
-    imageUrl,
-    theme: response.me.organization.pdfDocumentTheme,
-  };
-}) as PdfDocumentGetProps<ImageToPdfInitialData, ImageToPdfProps>;

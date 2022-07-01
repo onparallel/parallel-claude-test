@@ -798,6 +798,7 @@ export interface Petition {
   closed_at: Maybe<Date>; // timestamptz
   anonymize_after_months: Maybe<number>; // int4
   anonymize_purpose: Maybe<string>; // text
+  document_organization_theme_id: number; // int4
 }
 
 export type CreatePetition = PartialProps<

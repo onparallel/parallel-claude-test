@@ -2,8 +2,8 @@ import { GraphQLClient } from "graphql-request";
 import { inject, injectable } from "inversify";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { buildPdf } from "../pdf/buildPdf";
-import AnnexCoverPage, { AnnexCoverPageInitialData } from "../pdf/documents/AnnexCoverPage";
-import ImageToPdf, { ImageToPdfInitialData } from "../pdf/documents/ImageToPdf";
+import AnnexCoverPage, { AnnexCoverPageProps } from "../pdf/documents/AnnexCoverPage";
+import ImageToPdf, { ImageToPdfProps } from "../pdf/documents/ImageToPdf";
 import PetitionExport, { PetitionExportInitialData } from "../pdf/documents/PetitionExport";
 import { toGlobalId } from "../util/globalId";
 import { AUTH, IAuth } from "./auth";
@@ -15,10 +15,10 @@ export interface IPrinter {
   ): Promise<NodeJS.ReadableStream>;
   annexCoverPage(
     userId: number,
-    data: AnnexCoverPageInitialData,
+    props: AnnexCoverPageProps,
     locale: string
   ): Promise<NodeJS.ReadableStream>;
-  imageToPdf(userId: number, data: ImageToPdfInitialData): Promise<NodeJS.ReadableStream>;
+  imageToPdf(userId: number, props: ImageToPdfProps): Promise<NodeJS.ReadableStream>;
 }
 
 export const PRINTER = Symbol.for("PRINTER");
@@ -50,14 +50,14 @@ export class Printer implements IPrinter {
     );
   }
 
-  public async annexCoverPage(userId: number, data: AnnexCoverPageInitialData, locale: string) {
+  public async annexCoverPage(userId: number, props: AnnexCoverPageProps, locale: string) {
     const client = await this.createClient(userId);
-    return await buildPdf(AnnexCoverPage, data, { client, locale });
+    return await buildPdf(AnnexCoverPage, props, { client, locale });
   }
 
-  public async imageToPdf(userId: number, data: ImageToPdfInitialData) {
+  public async imageToPdf(userId: number, props: ImageToPdfProps) {
     const client = await this.createClient(userId);
-    return await buildPdf(ImageToPdf, data, {
+    return await buildPdf(ImageToPdf, props, {
       client,
       locale: "es" /* locale doesn't matter here as this is an image-only document */,
     });

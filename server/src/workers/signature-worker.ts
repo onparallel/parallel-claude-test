@@ -9,7 +9,6 @@ import {
 import { SignatureResponse } from "../services/signature";
 import { fullName } from "../util/fullName";
 import { toGlobalId } from "../util/globalId";
-import { defaultPdfDocumentTheme } from "../util/PdfDocumentTheme";
 import { removeKeys } from "../util/remedaExtensions";
 import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
 import { random } from "../util/token";
@@ -69,6 +68,14 @@ async function startSignatureProcess(
       "REMOVE_PARALLEL_BRANDING"
     );
 
+    const petitionTheme = await ctx.organizations.loadOrganizationTheme(
+      petition.document_organization_theme_id
+    );
+
+    if (petitionTheme?.type !== "PDF_DOCUMENT") {
+      throw new Error(`Expected theme of type PDF_DOCUMENT on Petition:${petition.id}`);
+    }
+
     // send request to signature client
     const data = await signatureClient.startSignatureRequest(
       toGlobalId("Petition", petition.id),
@@ -84,7 +91,7 @@ async function startSignatureProcess(
         },
         signingMode: "parallel",
         initialMessage: message,
-        pdfDocumentTheme: org.pdf_document_theme ?? defaultPdfDocumentTheme,
+        pdfDocumentTheme: petitionTheme.data,
       }
     );
 

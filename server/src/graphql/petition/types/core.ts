@@ -233,6 +233,12 @@ export const PetitionBase = interfaceType({
       description: "Purpose of the anonymization",
       resolve: (o) => o.anonymize_purpose,
     });
+    t.nonNull.field("selectedDocumentTheme", {
+      type: "OrganizationTheme",
+      resolve: async (o, _, ctx) => {
+        return (await ctx.organizations.loadOrganizationTheme(o.document_organization_theme_id))!;
+      },
+    });
   },
   resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),
   sourceType: "db.Petition",

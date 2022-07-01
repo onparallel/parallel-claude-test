@@ -1883,6 +1883,7 @@ export type Petition = PetitionBase & {
   progress: PetitionProgress;
   /** The reminders configuration for the petition. */
   remindersConfig: Maybe<RemindersConfig>;
+  selectedDocumentTheme: OrganizationTheme;
   /** Date when the petition was first sent */
   sentAt: Maybe<Scalars["DateTime"]>;
   /** The signature configuration for the petition. */
@@ -2028,6 +2029,7 @@ export type PetitionBase = {
   permissions: Array<PetitionPermission>;
   /** The reminders configuration for the petition. */
   remindersConfig: Maybe<RemindersConfig>;
+  selectedDocumentTheme: OrganizationTheme;
   /** The signature configuration for the petition. */
   signatureConfig: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
@@ -2598,6 +2600,7 @@ export type PetitionTemplate = PetitionBase & {
   publicLink: Maybe<PublicPetitionLink>;
   /** The reminders configuration for the petition. */
   remindersConfig: Maybe<RemindersConfig>;
+  selectedDocumentTheme: OrganizationTheme;
   /** The signature configuration for the petition. */
   signatureConfig: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
@@ -3755,18 +3758,6 @@ export type SignaturesBlock_SignatureConfigFragment = {
   signers: Array<{ fullName: string; email: string } | null>;
 };
 
-export type AnnexCoverPage_meQueryVariables = Exact<{ [key: string]: never }>;
-
-export type AnnexCoverPage_meQuery = {
-  me: { organization: { pdfDocumentTheme: { [key: string]: any } } };
-};
-
-export type ImageToPdf_meQueryVariables = Exact<{ [key: string]: never }>;
-
-export type ImageToPdf_meQuery = {
-  me: { organization: { pdfDocumentTheme: { [key: string]: any } } };
-};
-
 export type PetitionExport_PetitionBase_Petition_Fragment = {
   __typename: "Petition";
   fromTemplateId: string | null;
@@ -3795,7 +3786,8 @@ export type PetitionExport_PetitionBase_Petition_Fragment = {
       metadata: { [key: string]: any };
     }>;
   }>;
-  organization: { name: string; logoUrl: string | null; pdfDocumentTheme: { [key: string]: any } };
+  organization: { name: string; logoUrl: string | null };
+  selectedDocumentTheme: { data: { [key: string]: any } };
 };
 
 export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
@@ -3819,7 +3811,8 @@ export type PetitionExport_PetitionBase_PetitionTemplate_Fragment = {
       metadata: { [key: string]: any };
     }>;
   }>;
-  organization: { name: string; logoUrl: string | null; pdfDocumentTheme: { [key: string]: any } };
+  organization: { name: string; logoUrl: string | null };
+  selectedDocumentTheme: { data: { [key: string]: any } };
 };
 
 export type PetitionExport_PetitionBaseFragment =
@@ -3876,11 +3869,8 @@ export type PetitionExport_petitionQuery = {
             metadata: { [key: string]: any };
           }>;
         }>;
-        organization: {
-          name: string;
-          logoUrl: string | null;
-          pdfDocumentTheme: { [key: string]: any };
-        };
+        organization: { name: string; logoUrl: string | null };
+        selectedDocumentTheme: { data: { [key: string]: any } };
       }
     | {
         __typename: "PetitionTemplate";
@@ -3903,11 +3893,8 @@ export type PetitionExport_petitionQuery = {
             metadata: { [key: string]: any };
           }>;
         }>;
-        organization: {
-          name: string;
-          logoUrl: string | null;
-          pdfDocumentTheme: { [key: string]: any };
-        };
+        organization: { name: string; logoUrl: string | null };
+        selectedDocumentTheme: { data: { [key: string]: any } };
       }
     | null;
 };
@@ -3986,7 +3973,9 @@ export const PetitionExport_PetitionBaseFragmentDoc = gql`
     organization {
       name
       logoUrl
-      pdfDocumentTheme
+    }
+    selectedDocumentTheme {
+      data
     }
     ... on Petition {
       fromTemplateId
@@ -4003,24 +3992,6 @@ export const PetitionExport_PetitionBaseFragmentDoc = gql`
   ${SignaturesBlock_SignatureConfigFragmentDoc}
   ${useLiquidScope_PetitionBaseFragmentDoc}
 ` as unknown as DocumentNode<PetitionExport_PetitionBaseFragment, unknown>;
-export const AnnexCoverPage_meDocument = gql`
-  query AnnexCoverPage_me {
-    me {
-      organization {
-        pdfDocumentTheme
-      }
-    }
-  }
-` as unknown as DocumentNode<AnnexCoverPage_meQuery, AnnexCoverPage_meQueryVariables>;
-export const ImageToPdf_meDocument = gql`
-  query ImageToPdf_me {
-    me {
-      organization {
-        pdfDocumentTheme
-      }
-    }
-  }
-` as unknown as DocumentNode<ImageToPdf_meQuery, ImageToPdf_meQueryVariables>;
 export const PetitionExport_petitionDocument = gql`
   query PetitionExport_petition($petitionId: GID!) {
     petition(id: $petitionId) {

@@ -2231,6 +2231,7 @@ type Petition implements PetitionBase {
   The reminders configuration for the petition.
   """
   remindersConfig: RemindersConfig
+  selectedDocumentTheme: OrganizationTheme!
 
   """
   Date when the petition was first sent
@@ -2514,6 +2515,7 @@ interface PetitionBase {
   The reminders configuration for the petition.
   """
   remindersConfig: RemindersConfig
+  selectedDocumentTheme: OrganizationTheme!
 
   """
   The signature configuration for the petition.
@@ -3503,6 +3505,7 @@ type PetitionTemplate implements PetitionBase {
   The reminders configuration for the petition.
   """
   remindersConfig: RemindersConfig
+  selectedDocumentTheme: OrganizationTheme!
 
   """
   The signature configuration for the petition.

@@ -7,6 +7,7 @@ import pMap from "p-map";
 import { resolve } from "path";
 import { isDefined, zip } from "remeda";
 import { FileRepository } from "../db/repositories/FileRepository";
+import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { PetitionRepository } from "../db/repositories/PetitionRepository";
 import { evaluateFieldVisibility } from "../util/fieldVisibility";
 import { isFileTypeField } from "../util/isFileTypeField";
@@ -50,6 +51,7 @@ export class PetitionBinder implements IPetitionBinder {
   constructor(
     @inject(PetitionRepository) private petitions: PetitionRepository,
     @inject(FileRepository) private files: FileRepository,
+    @inject(OrganizationRepository) private organizations: OrganizationRepository,
     @inject(AWS_SERVICE) private aws: IAws,
     @inject(PRINTER) private printer: IPrinter
   ) {}
@@ -76,6 +78,14 @@ export class PetitionBinder implements IPetitionBinder {
         this.getPrintableFiles(petitionId),
       ]);
 
+      if (!petition) {
+        throw new Error(`Petition:${petitionId} not found`);
+      }
+
+      const documentTheme = await this.organizations.loadOrganizationTheme(
+        petition.document_organization_theme_id
+      );
+
       const mainDocPath = await this.writeTemporaryFile(
         this.printer.petitionExport(userId, {
           petitionId,
@@ -92,7 +102,11 @@ export class PetitionBinder implements IPetitionBinder {
               const coverPagePath = await this.writeTemporaryFile(
                 this.printer.annexCoverPage(
                   userId,
-                  { fieldNumber: fieldIndex + 1, fieldTitle: field.title },
+                  {
+                    fieldNumber: fieldIndex + 1,
+                    fieldTitle: field.title,
+                    theme: documentTheme!.data,
+                  },
                   petition?.locale ?? "en"
                 )
               );
@@ -112,7 +126,7 @@ export class PetitionBinder implements IPetitionBinder {
                         : await this.convertImage(file.path, file.content_type);
 
                     return await this.writeTemporaryFile(
-                      this.printer.imageToPdf(userId, { imageUrl })
+                      this.printer.imageToPdf(userId, { imageUrl, theme: documentTheme!.data })
                     );
                   } else if (file.content_type === "application/pdf") {
                     return await this.writeTemporaryFile(

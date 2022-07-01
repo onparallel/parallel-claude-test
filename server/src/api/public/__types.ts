@@ -1883,6 +1883,7 @@ export type Petition = PetitionBase & {
   progress: PetitionProgress;
   /** The reminders configuration for the petition. */
   remindersConfig: Maybe<RemindersConfig>;
+  selectedDocumentTheme: OrganizationTheme;
   /** Date when the petition was first sent */
   sentAt: Maybe<Scalars["DateTime"]>;
   /** The signature configuration for the petition. */
@@ -2028,6 +2029,7 @@ export type PetitionBase = {
   permissions: Array<PetitionPermission>;
   /** The reminders configuration for the petition. */
   remindersConfig: Maybe<RemindersConfig>;
+  selectedDocumentTheme: OrganizationTheme;
   /** The signature configuration for the petition. */
   signatureConfig: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */
@@ -2598,6 +2600,7 @@ export type PetitionTemplate = PetitionBase & {
   publicLink: Maybe<PublicPetitionLink>;
   /** The reminders configuration for the petition. */
   remindersConfig: Maybe<RemindersConfig>;
+  selectedDocumentTheme: OrganizationTheme;
   /** The signature configuration for the petition. */
   signatureConfig: Maybe<SignatureConfig>;
   /** Whether to skip the forward security check on the recipient view. */

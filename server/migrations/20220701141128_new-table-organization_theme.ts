@@ -27,18 +27,40 @@ export async function up(knex: Knex): Promise<void> {
   `);
 
   // populate table with custom or default theme for every org
-  await knex.raw(
+  const result = await knex.raw(
     /* sql */ `
     insert into "organization_theme" (org_id, name, type, is_default, data)
     select id, 'Default', 'PDF_DOCUMENT', true, coalesce(pdf_document_theme, ?)
     from organization
-    where deleted_at is null
+    returning id, org_id;
   `,
     [JSON.stringify(defaultPdfDocumentTheme)]
   );
+
+  await knex.schema.alterTable("petition", (t) => {
+    t.integer("document_organization_theme_id").nullable().references("organization_theme.id");
+  });
+
+  // populate new column on petitions table with the id of recently created default themes
+  const themes = result.rows as Array<{ id: number; org_id: number }>;
+  await knex.raw(/* sql */ `
+    with theme(id, org_id) as (values ${themes.map((t) => `(${t.id},${t.org_id})`).join(",")})
+    update petition p set document_organization_theme_id = t.id
+    from theme t
+    where p.org_id = t.org_id
+  `);
+
+  // mark column as not nullable
+  await knex.schema.alterTable("petition", (t) => {
+    t.integer("document_organization_theme_id").notNullable().alter();
+  });
 }
 
 export async function down(knex: Knex): Promise<void> {
+  await knex.schema.alterTable("petition", (t) => {
+    t.dropColumn("document_organization_theme_id");
+  });
+
   await knex.schema.dropTable("organization_theme");
 
   await knex.raw(/* sql*/ `
