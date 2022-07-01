@@ -727,7 +727,7 @@ export class Auth implements IAuth {
     // TODO which org to use??
     const user = definedUsers[0];
     if (user.status === "INACTIVE") {
-      throw new ForbiddenError("Not authorized");
+      throw new ApolloError(`Wrong user status`, "RESET_USER_PASSWORD_INACTIVE_ERROR");
     }
 
     const [organization, userData] = await Promise.all([
@@ -746,7 +746,8 @@ export class Auth implements IAuth {
       );
     }
 
-    if (cognitoUser.UserStatus !== "FORCE_CHANGE_PASSWORD") {
+    // user already changed their tmp password
+    if (cognitoUser.UserStatus !== "FORCE_CHANGE_PASSWORD" || isDefined(user.last_active_at)) {
       throw new ApolloError(`Wrong user status`, "RESET_USER_PASSWORD_STATUS_ERROR");
     }
 

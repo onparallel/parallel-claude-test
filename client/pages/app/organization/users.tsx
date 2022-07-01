@@ -290,6 +290,58 @@ function OrganizationUsers() {
           duration: 5000,
           isClosable: true,
         });
+      } else if (isApolloError(e, "RESET_USER_PASSWORD_STATUS_ERROR")) {
+        toast({
+          title: intl.formatMessage({
+            id: "organization.user-invitation-not-sent-error.toast-title",
+            defaultMessage: "Invitation not sent",
+          }),
+          description: intl.formatMessage(
+            {
+              id: "organization.user-invitation-status-error.toast-description",
+              defaultMessage:
+                "It seems the user has already logged in. There is no need to resend the invitation.",
+            },
+            { email: selectedUsers[0].email }
+          ),
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      } else if (isApolloError(e, "RESET_USER_PASSWORD_INACTIVE_ERROR")) {
+        toast({
+          title: intl.formatMessage({
+            id: "organization.user-invitation-not-sent-error.toast-title",
+            defaultMessage: "Invitation not sent",
+          }),
+          description: intl.formatMessage(
+            {
+              id: "organization.user-invitation-inactive-error.toast-description",
+              defaultMessage: "The selected user is inactive. Refresh your browser and try again.",
+            },
+            { email: selectedUsers[0].email }
+          ),
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      } else if (isApolloError(e, "RESET_USER_PASSWORD_SSO_ERROR")) {
+        toast({
+          title: intl.formatMessage({
+            id: "organization.user-invitation-not-sent-error.toast-title",
+            defaultMessage: "Invitation not sent",
+          }),
+          description: intl.formatMessage(
+            {
+              id: "organization.user-invitation-sso-error.toast-description",
+              defaultMessage: "We can't resend the invitation to SSO users.",
+            },
+            { email: selectedUsers[0].email }
+          ),
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
       } else if (e.message !== "CANCEL" && e.message !== "CLOSE") {
         genericErrorToast();
       }
@@ -440,7 +492,9 @@ function OrganizationUsers() {
                     key: "reset-password",
                     onClick: handleResendInvitation,
                     isDisabled:
-                      selectedUsers.some((u) => u.lastActiveAt) || selectedUsers.length !== 1,
+                      selectedUsers.some(
+                        (u) => u.lastActiveAt || u.status === "INACTIVE" || u.isSsoUser
+                      ) || selectedUsers.length !== 1,
                     leftIcon: <ArrowUpRightIcon />,
                     children: (
                       <FormattedMessage

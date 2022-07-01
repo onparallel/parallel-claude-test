@@ -5950,6 +5950,16 @@
     "context": "User created successfully."
   },
   {
+    "term": "organization.user-invitation-inactive-error.toast-description",
+    "definition": "El usuario seleccionado está inactivo. Refresca tu navegador e intenta nuevamente.",
+    "context": "The selected user is inactive. Refresh your browser and try again."
+  },
+  {
+    "term": "organization.user-invitation-not-sent-error.toast-title",
+    "definition": "La invitación no fue enviada",
+    "context": "Invitation not sent"
+  },
+  {
     "term": "organization.user-invitation-sent-error.toast-description",
     "definition": "Se ha enviado una invitación a {email} recientemente, prueba más tarde.",
     "context": "An invitation has been sent to {email} recently, try again later."
@@ -5963,6 +5973,16 @@
     "term": "organization.user-invitation-sent.toast-title",
     "definition": "Invitación enviada",
     "context": "Invitation sent"
+  },
+  {
+    "term": "organization.user-invitation-sso-error.toast-description",
+    "definition": "No podemos reenviar la invitación a usuarios SSO.",
+    "context": "We can't resend the invitation to SSO users."
+  },
+  {
+    "term": "organization.user-invitation-status-error.toast-description",
+    "definition": "Parece que el usuario ya ha iniciado sesión. No hay necesidad de reenviar la invitación.",
+    "context": "It seems the user has already logged in. There is no need to resend the invitation."
   },
   {
     "term": "organization.user-updated-success.toast-title",
