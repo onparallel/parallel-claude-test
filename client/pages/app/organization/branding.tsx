@@ -90,9 +90,7 @@ function OrganizationBranding() {
       await createOrganizationPdfDocumentTheme({
         variables: { name: data.name!, isDefault: data.isDefault! },
         onCompleted({ createOrganizationPdfDocumentTheme }) {
-          setSelectedThemeId(
-            createOrganizationPdfDocumentTheme.themes.pdfDocument.find((t) => t.isDefault)!.id
-          );
+          setSelectedThemeId(createOrganizationPdfDocumentTheme.themes.pdfDocument[0]!.id);
         },
       });
     }
@@ -244,6 +242,7 @@ function OrganizationBranding() {
                     onChange={(t) => setSelectedThemeId(t!.id)}
                     value={pick(selectedTheme!, ["id", "name"])}
                     options={themeOptions.filter((t) => t.id !== selectedThemeId)}
+                    isCreateNewThemeDisabled={!hasAdminRole}
                   />
                 </Box>
                 <IconButtonWithTooltip
@@ -252,6 +251,7 @@ function OrganizationBranding() {
                     id: "branding.edit-theme-tooltip",
                     defaultMessage: "Edit theme",
                   })}
+                  isDisabled={!hasAdminRole}
                   onClick={handleEditDocumentTheme}
                 />
                 <IconButtonWithTooltip
@@ -261,12 +261,17 @@ function OrganizationBranding() {
                     id: "branding.delete-theme-tooltip",
                     defaultMessage: "Delete theme",
                   })}
-                  isDisabled={selectedTheme?.isDefault}
+                  isDisabled={selectedTheme?.isDefault || !hasAdminRole}
                   onClick={handleDeleteDocumentTheme}
                 />
               </GridItem>
               <GridItem justifyContent="flex-end" display="flex">
-                <Button variant="solid" colorScheme="purple" onClick={handleCreateNewDocumentTheme}>
+                <Button
+                  variant="solid"
+                  colorScheme="purple"
+                  onClick={handleCreateNewDocumentTheme}
+                  isDisabled={!hasAdminRole}
+                >
                   <FormattedMessage id="branding.new-theme-button" defaultMessage="New theme" />
                 </Button>
               </GridItem>

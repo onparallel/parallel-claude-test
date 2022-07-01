@@ -12,11 +12,20 @@ export interface DocumentThemeSelectProps
   extends Omit<CustomSelectProps<DocumentThemeSelectSelection, false, never>, "value"> {
   value: DocumentThemeSelectSelection;
   onCreateNewTheme: () => void;
+  isCreateNewThemeDisabled?: boolean;
 }
 
 export const DocumentThemeSelect = Object.assign(
   forwardRef(function DocumentThemeSelect(
-    { value, onChange, options, placeholder, onCreateNewTheme, ...props }: DocumentThemeSelectProps,
+    {
+      value,
+      onChange,
+      options,
+      placeholder,
+      onCreateNewTheme,
+      isCreateNewThemeDisabled,
+      ...props
+    }: DocumentThemeSelectProps,
     ref: ForwardedRef<DocumentThemeSelectInstance>
   ) {
     const rsProps = useReactSelectProps({
@@ -27,7 +36,7 @@ export const DocumentThemeSelect = Object.assign(
       },
     });
 
-    const extensions = { onCreateNewTheme };
+    const extensions = { onCreateNewTheme, isCreateNewThemeDisabled };
 
     return (
       <Select<DocumentThemeSelectSelection, false, never>
@@ -55,13 +64,14 @@ const rsComponent = genericRsComponent<
   {
     selectProps: {
       onCreateNewTheme: () => void;
+      isCreateNewThemeDisabled?: boolean;
     };
   }
 >();
 
 const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
   const {
-    selectProps: { onCreateNewTheme },
+    selectProps: { onCreateNewTheme, isCreateNewThemeDisabled },
   } = props;
   return (
     <Stack alignItems="center" textAlign="center" padding={2}>
@@ -71,7 +81,11 @@ const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
           defaultMessage="No more themes created"
         />
       </Text>
-      <Button colorScheme="primary" onClick={onCreateNewTheme}>
+      <Button
+        colorScheme="primary"
+        onClick={onCreateNewTheme}
+        isDisabled={isCreateNewThemeDisabled}
+      >
         <FormattedMessage
           id="component.document-theme-select.new-theme-button"
           defaultMessage="New theme"

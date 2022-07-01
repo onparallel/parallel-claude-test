@@ -450,12 +450,14 @@ function _PetitionSettings({
   );
 
   async function handleUpdateTemplateDocumentTheme(orgThemeId: string) {
-    await updateTemplateDocumentTheme({
-      variables: {
-        templateId: petition.id,
-        orgThemeId,
-      },
-    });
+    await withError(
+      updateTemplateDocumentTheme({
+        variables: {
+          templateId: petition.id,
+          orgThemeId,
+        },
+      })
+    );
   }
 
   return (

@@ -72,6 +72,5 @@ export async function down(knex: Knex): Promise<void> {
 
   await knex.raw(/* sql*/ `
     drop type "organization_theme_type";
-    drop index "petition__org_id__document_organization_theme_id";
   `);
 }

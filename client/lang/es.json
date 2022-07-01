@@ -4326,7 +4326,7 @@
   },
   {
     "term": "components.create-or-update-document-theme-dialog.name-error",
-    "definition": "Por favor, ingrasa un nombre para el tema",
+    "definition": "Por favor, ingresa un nombre para el tema",
     "context": "Please, enter a name for the theme"
   },
   {
