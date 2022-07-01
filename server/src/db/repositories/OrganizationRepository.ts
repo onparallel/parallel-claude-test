@@ -469,10 +469,30 @@ export class OrganizationRepository extends BaseRepository {
     return theme;
   }
 
-  async deleteOrganizationTheme(id: number, deletedBy: string) {
-    await this.from("organization_theme").where("id", id).whereNull("deleted_at").update({
-      deleted_at: this.now(),
-      deleted_by: deletedBy,
+  async deleteOrganizationTheme(id: number, deletedBy: User) {
+    await this.withTransaction(async (t) => {
+      const [deletedTheme] = await this.from("organization_theme", t)
+        .where("id", id)
+        .whereNull("deleted_at")
+        .update(
+          {
+            deleted_at: this.now(),
+            deleted_by: `User:${deletedBy.id}`,
+          },
+          "*"
+        );
+
+      // update every petition using this deleted theme to go back to the default theme
+      await this.raw(
+        /* sql */ `
+        with default_theme as (select * from organization_theme where org_id = ? and "type" = 'PDF_DOCUMENT' and is_default)
+        update petition p set document_organization_theme_id = dt.id
+        from default_theme dt
+        where p.org_id = ? and p.document_organization_theme_id = ? and p.deleted_at is null
+      `,
+        [deletedBy.org_id, deletedBy.org_id, deletedTheme.id],
+        t
+      );
     });
   }
 

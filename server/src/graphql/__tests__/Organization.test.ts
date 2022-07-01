@@ -192,7 +192,7 @@ describe("GraphQL/Organization", () => {
   });
 
   describe("createOrganizationPdfDocumentTheme", () => {
-    it("sends error when creating a theme with name longer than 255 chars", async () => {
+    it("sends error when creating a theme with name longer than 50 chars", async () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($name: String!, $isDefault: Boolean!) {
@@ -208,7 +208,7 @@ describe("GraphQL/Organization", () => {
             }
           }
         `,
-        { name: "X".repeat(256), isDefault: false }
+        { name: "X".repeat(51), isDefault: false }
       );
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
@@ -433,6 +433,61 @@ describe("GraphQL/Organization", () => {
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
+    });
+
+    it("sets petition theme to default when deleting a theme that is being used", async () => {
+      const [themeToDelete] = await mocks.createOrganizationThemes(organization.id, 1, () => ({
+        type: "PDF_DOCUMENT",
+      }));
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+        document_organization_theme_id: themeToDelete.id,
+      }));
+
+      const { errors: deleteErrors, data: deleteData } = await testClient.execute(
+        gql`
+          mutation ($orgThemeId: GID!) {
+            deleteOrganizationPdfDocumentTheme(orgThemeId: $orgThemeId) {
+              themes {
+                pdfDocument {
+                  id
+                  isDefault
+                }
+              }
+            }
+          }
+        `,
+        { orgThemeId: toGlobalId("OrganizationTheme", themeToDelete.id) }
+      );
+
+      expect(deleteErrors).toBeUndefined();
+      const newDefaultThemeId =
+        deleteData!.deleteOrganizationPdfDocumentTheme.themes.pdfDocument.find(
+          (t: any) => t.isDefault
+        )!.id as string;
+
+      expect(newDefaultThemeId).toBeDefined();
+
+      const { errors: queryErrors, data: queryData } = await testClient.execute(
+        gql`
+          query ($id: GID!) {
+            petition(id: $id) {
+              selectedDocumentTheme {
+                id
+              }
+            }
+          }
+        `,
+        {
+          id: toGlobalId("Petition", petition.id),
+        }
+      );
+
+      expect(queryErrors).toBeUndefined();
+      expect(queryData!.petition).toEqual({
+        selectedDocumentTheme: {
+          id: newDefaultThemeId,
+        },
+      });
     });
 
     it("deletes a document theme", async () => {

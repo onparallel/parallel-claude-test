@@ -259,7 +259,7 @@ export const deleteOrganizationPdfDocumentTheme = mutationField(
       orgThemeId: nonNull(globalIdArg("OrganizationTheme")),
     },
     resolve: async (_, { orgThemeId }, ctx) => {
-      await ctx.organizations.deleteOrganizationTheme(orgThemeId, `User:${ctx.user!.id}`);
+      await ctx.organizations.deleteOrganizationTheme(orgThemeId, ctx.user!);
       return (await ctx.organizations.loadOrg(ctx.user!.org_id))!;
     },
   }

@@ -56,6 +56,11 @@ export async function up(knex: Knex): Promise<void> {
   await knex.schema.alterTable("petition", (t) => {
     t.integer("document_organization_theme_id").notNullable().alter();
   });
+
+  await knex.raw(/* sql */ `
+    -- useful for OrganizationRepository.deleteOrganizationTheme (restore to default when theme is deleted)
+    create index "petition__org_id__document_organization_theme_id" on "petition" (org_id, document_organization_theme_id) where deleted_at is null;
+  `);
 }
 
 export async function down(knex: Knex): Promise<void> {
@@ -67,5 +72,6 @@ export async function down(knex: Knex): Promise<void> {
 
   await knex.raw(/* sql*/ `
     drop type "organization_theme_type";
+    drop index "petition__org_id__document_organization_theme_id";
   `);
 }
