@@ -937,13 +937,29 @@ export class PetitionRepository extends BaseRepository {
     return row;
   }
 
-  async createPetition(data: Omit<TableCreateTypes["petition"], "org_id" | "status">, user: User) {
+  async createPetition(
+    data: Omit<
+      TableCreateTypes["petition"],
+      "org_id" | "status" | "document_organization_theme_id"
+    >,
+    user: User
+  ) {
     return await this.withTransaction(async (t) => {
+      const [defaultDocumentTheme] = await this.from("organization_theme", t)
+        .where({
+          org_id: user.org_id,
+          type: "PDF_DOCUMENT",
+          is_default: true,
+          deleted_at: null,
+        })
+        .select("*");
+
       const [petition] = await this.insert(
         "petition",
         {
           org_id: user.org_id,
           status: data.is_template ? null : "DRAFT",
+          document_organization_theme_id: defaultDocumentTheme.id,
           ...data,
           created_by: `User:${user.id}`,
           updated_by: `User:${user.id}`,
@@ -1757,9 +1773,9 @@ export class PetitionRepository extends BaseRepository {
   async clonePetition(
     petitionId: number,
     owner: User,
-    data: Partial<TableTypes["petition"]> = {},
+    // never expose document_organization_theme_id as this must be fetched from the owner's organization
+    data: Partial<Omit<TableTypes["petition"], "document_organization_theme_id">> = {},
     options?: { insertPermissions?: boolean; cloneReplies?: boolean },
-
     createdBy = `User:${owner.id}`,
     t?: Knex.Transaction
   ) {
@@ -1789,6 +1805,14 @@ export class PetitionRepository extends BaseRepository {
         owner.org_id,
         t
       );
+      const [defaultOrganizationTheme] = await this.from("organization_theme", t)
+        .where({
+          org_id: owner.org_id,
+          type: "PDF_DOCUMENT",
+          is_default: true,
+          deleted_at: null,
+        })
+        .select("*");
 
       const [cloned] = await this.insert(
         "petition",
@@ -1831,6 +1855,11 @@ export class PetitionRepository extends BaseRepository {
                   }
                 : null // if new owner does not have a default signature integration, remove the signature config on the cloned petition
               : sourcePetition?.signature_config,
+
+          // if coming from a public template, update document_organization_theme_id to the default of user organization
+          document_organization_theme_id: sourcePetition!.template_public
+            ? defaultOrganizationTheme.id
+            : sourcePetition!.document_organization_theme_id,
           ...data,
         },
         t
