@@ -12,7 +12,7 @@ export function PublicTemplatesHero() {
         backgroundColor: "gray.50",
       }}
     >
-      <Heading mb={6} size="3xl">
+      <Heading mb={6} size="3xl" as="h1">
         <FormattedMessage
           id="public.templates-hero.template-library"
           defaultMessage="Template library"
