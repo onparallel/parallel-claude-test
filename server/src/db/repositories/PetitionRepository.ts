@@ -1821,10 +1821,7 @@ export class PetitionRepository extends BaseRepository {
           from_template_id: fromTemplateId,
           // if source petition is from another organization, update signatureConfig org_integration.id and empty signers array
           signature_config:
-            sourcePetition?.is_template &&
-            sourcePetition.template_public &&
-            sourcePetition.signature_config &&
-            sourcePetition.org_id !== owner.org_id
+            sourcePetition?.signature_config && sourcePetition.org_id !== owner.org_id
               ? defaultSignatureOrgIntegration
                 ? {
                     ...sourcePetition.signature_config,
