@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { pick } from "remeda";
+import { isDefined, pick } from "remeda";
 import { SignatureEvents } from "signaturit-sdk";
 import { ApiContext } from "../../context";
 import { SignatureStartedEvent } from "../../db/events";
@@ -304,6 +304,11 @@ async function updateSignatureStartedEvent(
   const [signatureStartedEvent] = await ctx.petitions.getPetitionEventsByType(petitionId, [
     "SIGNATURE_STARTED",
   ]);
+
+  if (isDefined(newData.email_opened_at) && isDefined(signatureStartedEvent.data.email_opened_at)) {
+    // write the email_opened_at Date only once, so future email opens after signature is completed don't overwrite this date
+    return;
+  }
 
   await ctx.petitions.updateEvent(signatureStartedEvent.id, {
     ...signatureStartedEvent,
