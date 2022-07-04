@@ -64,7 +64,7 @@ export function SignaturesBlock({ signatureConfig, templateId, style }: Signatur
               date,
             } as SignatureBoxProps,
           ]
-        : templateId === "zas25KHxAByKWUgG8U2"
+        : ["zas25KHxAByKWUgG8U2", "zas25KHxAByKWUhxeC6"].includes(templateId)
         ? [
             {
               fullName: "Marta Blanco Maseda",
