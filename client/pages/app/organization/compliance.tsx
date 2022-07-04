@@ -367,20 +367,6 @@ const _fragments = {
   Organization: gql`
     fragment OrganizationCompliance_Organization on Organization {
       id
-      activeUserCount
-      usageLimits {
-        users {
-          limit
-        }
-        petitions {
-          used
-          limit
-        }
-        signatures {
-          used
-          limit
-        }
-      }
       anonymizePetitionsAfterMonths
     }
   `,

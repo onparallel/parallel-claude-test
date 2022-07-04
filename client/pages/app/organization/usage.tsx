@@ -26,7 +26,7 @@ function OrganizationUsage() {
   const {
     activeUserCount,
     license,
-    usageLimits: { petitions, users },
+    usageLimits: { petitions, users, signatures },
   } = organization;
 
   return (
@@ -78,6 +78,16 @@ function OrganizationUsage() {
             usage={petitions.used}
             limit={petitions.limit}
           />
+          {signatures && signatures.limit > 0 ? (
+            <UsageCard
+              title={intl.formatMessage({
+                id: "page.usage.signatures",
+                defaultMessage: "eSignatures",
+              })}
+              usage={signatures.used}
+              limit={signatures.limit}
+            />
+          ) : null}
         </Grid>
       </Stack>
     </SettingsLayout>

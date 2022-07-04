@@ -1,5 +1,5 @@
 import { arg, booleanArg, enumType, list, nonNull, nullable, objectType } from "nexus";
-import { isDefined, equals, pick } from "remeda";
+import { equals, isDefined, pick } from "remeda";
 import { defaultPdfDocumentTheme, PdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { or, userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -171,7 +171,7 @@ export const Organization = objectType({
           signatures: {
             limit: number,
             used: number,
-          }
+          } | null
         }`,
         definition(t) {
           t.nonNull.field("petitions", {
@@ -191,7 +191,7 @@ export const Organization = objectType({
               },
             }),
           });
-          t.nonNull.field("signatures", {
+          t.nullable.field("signatures", {
             type: objectType({
               name: "OrganizationUsageSignaturesLimit",
               definition(d) {
@@ -203,11 +203,23 @@ export const Organization = objectType({
         },
       }),
       resolve: async (root, _, ctx) => {
-        const [organization, petitionSendLimits, signatureSendLimits] = await Promise.all([
-          ctx.organizations.loadOrg(root.id),
-          ctx.organizations.getOrganizationCurrentUsageLimit(root.id, "PETITION_SEND"),
-          ctx.organizations.getOrganizationCurrentUsageLimit(root.id, "SIGNATURIT_SHARED_APIKEY"),
-        ]);
+        const [organization, petitionSendLimits, signatureSendLimits, signatureIntegrations] =
+          await Promise.all([
+            ctx.organizations.loadOrg(root.id),
+            ctx.organizations.getOrganizationCurrentUsageLimit(root.id, "PETITION_SEND"),
+            ctx.organizations.getOrganizationCurrentUsageLimit(root.id, "SIGNATURIT_SHARED_APIKEY"),
+            ctx.integrations.loadIntegrationsByOrgId(root.id, "SIGNATURE"),
+          ]);
+
+        // only return signature limits if org has an enabled signature integration with our shared APIKEY
+        const hasSharedSignatureIntegration =
+          isDefined(signatureSendLimits) &&
+          signatureIntegrations.some(
+            (i) =>
+              i.settings.API_KEY === ctx.config.signature.signaturitSharedProductionApiKey &&
+              i.settings.ENVIRONMENT === "production" &&
+              i.is_enabled
+          );
 
         return {
           petitions: {
@@ -217,10 +229,9 @@ export const Organization = objectType({
           users: {
             limit: organization!.usage_details.USER_LIMIT,
           },
-          signatures: {
-            limit: signatureSendLimits?.limit || 0,
-            used: signatureSendLimits?.used || 0,
-          },
+          signatures: hasSharedSignatureIntegration
+            ? pick(signatureSendLimits, ["limit", "used"])
+            : null,
         };
       },
     });

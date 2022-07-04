@@ -6450,6 +6450,11 @@
     "context": "Petitions"
   },
   {
+    "term": "page.usage.signatures",
+    "definition": "Firmas electrónicas",
+    "context": "eSignatures"
+  },
+  {
     "term": "page.usage.users",
     "definition": "Usuarios",
     "context": "Users"

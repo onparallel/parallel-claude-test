@@ -1722,7 +1722,7 @@ export type OrganizationStatus =
 export interface OrganizationUsageLimit {
   __typename?: "OrganizationUsageLimit";
   petitions: OrganizationUsagePetitionLimit;
-  signatures: OrganizationUsageSignaturesLimit;
+  signatures?: Maybe<OrganizationUsageSignaturesLimit>;
   users: OrganizationUsageUserLimit;
 }
 
@@ -12006,14 +12006,7 @@ export type OrganizationBranding_userQuery = {
 export type OrganizationCompliance_OrganizationFragment = {
   __typename?: "Organization";
   id: string;
-  activeUserCount: number;
   anonymizePetitionsAfterMonths?: number | null;
-  usageLimits: {
-    __typename?: "OrganizationUsageLimit";
-    users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
-    petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
-    signatures: { __typename?: "OrganizationUsageSignaturesLimit"; used: number; limit: number };
-  };
 };
 
 export type OrganizationCompliance_updateOrganizationAutoAnonymizePeriodMutationVariables = Exact<{
@@ -12024,14 +12017,7 @@ export type OrganizationCompliance_updateOrganizationAutoAnonymizePeriodMutation
   updateOrganizationAutoAnonymizePeriod: {
     __typename?: "Organization";
     id: string;
-    activeUserCount: number;
     anonymizePetitionsAfterMonths?: number | null;
-    usageLimits: {
-      __typename?: "OrganizationUsageLimit";
-      users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
-      petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
-      signatures: { __typename?: "OrganizationUsageSignaturesLimit"; used: number; limit: number };
-    };
   };
 };
 
@@ -12055,18 +12041,11 @@ export type OrganizationCompliance_userQuery = {
       __typename?: "Organization";
       id: string;
       name: string;
-      activeUserCount: number;
       anonymizePetitionsAfterMonths?: number | null;
       iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
-        users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
-        signatures: {
-          __typename?: "OrganizationUsageSignaturesLimit";
-          used: number;
-          limit: number;
-        };
       };
     };
   };
@@ -12667,11 +12646,11 @@ export type OrganizationUsage_userQuery = {
         __typename?: "OrganizationUsageLimit";
         users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
         petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
-        signatures: {
+        signatures?: {
           __typename?: "OrganizationUsageSignaturesLimit";
           used: number;
           limit: number;
-        };
+        } | null;
       };
     };
   };
@@ -22559,20 +22538,6 @@ export const ChooseOrg_OrganizationFragmentDoc = gql`
 export const OrganizationCompliance_OrganizationFragmentDoc = gql`
   fragment OrganizationCompliance_Organization on Organization {
     id
-    activeUserCount
-    usageLimits {
-      users {
-        limit
-      }
-      petitions {
-        used
-        limit
-      }
-      signatures {
-        used
-        limit
-      }
-    }
     anonymizePetitionsAfterMonths
   }
 ` as unknown as DocumentNode<OrganizationCompliance_OrganizationFragment, unknown>;

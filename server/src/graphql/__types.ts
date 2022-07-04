@@ -424,7 +424,7 @@ export interface NexusGenObjects {
     signatures: {
       limit: number;
       used: number;
-    };
+    } | null;
   };
   OrganizationUsagePetitionLimit: {
     // root type
@@ -1148,7 +1148,7 @@ export interface NexusGenFieldTypes {
   OrganizationUsageLimit: {
     // field return type
     petitions: NexusGenRootTypes["OrganizationUsagePetitionLimit"]; // OrganizationUsagePetitionLimit!
-    signatures: NexusGenRootTypes["OrganizationUsageSignaturesLimit"]; // OrganizationUsageSignaturesLimit!
+    signatures: NexusGenRootTypes["OrganizationUsageSignaturesLimit"] | null; // OrganizationUsageSignaturesLimit
     users: NexusGenRootTypes["OrganizationUsageUserLimit"]; // OrganizationUsageUserLimit!
   };
   OrganizationUsagePetitionLimit: {

@@ -1380,6 +1380,7 @@ export type MutationupdateOrganizationLimitsArgs = {
   amount: Scalars["Int"];
   orgId: Scalars["Int"];
   period?: InputMaybe<Scalars["String"]>;
+  startNewPeriod: Scalars["Boolean"];
   type: OrganizationUsageLimitName;
   updateOnlyCurrentPeriod: Scalars["Boolean"];
 };
@@ -1683,7 +1684,7 @@ export type OrganizationStatus =
 
 export type OrganizationUsageLimit = {
   petitions: OrganizationUsagePetitionLimit;
-  signatures: OrganizationUsageSignaturesLimit;
+  signatures: Maybe<OrganizationUsageSignaturesLimit>;
   users: OrganizationUsageUserLimit;
 };
 
