@@ -15,6 +15,7 @@ import { random } from "../util/token";
 import { MaybePromise } from "../util/types";
 import { AWS_SERVICE, IAws } from "./aws";
 import { IPrinter, PRINTER } from "./printer";
+import sanitizeFilename from "sanitize-filename";
 
 function isPrintableContentType(contentType: string) {
   return [
@@ -132,7 +133,7 @@ export class PetitionBinder implements IPetitionBinder {
 
       return await this.merge([mainDocPath, ...annexedDocumentPaths], {
         maxOutputSize,
-        outputFileName,
+        outputFileName: outputFileName ? sanitizeFilename(outputFileName) : undefined,
       });
     } finally {
       try {
