@@ -46,7 +46,7 @@ interface RecipientViewVerifyProps {
   orgName: string;
   orgLogoUrl: string;
   tone: Tone;
-  brandTheme: null | undefined | OrganizationBrand;
+  brandTheme?: OrganizationBrand | null;
 }
 
 type RecipientViewVerifyState =

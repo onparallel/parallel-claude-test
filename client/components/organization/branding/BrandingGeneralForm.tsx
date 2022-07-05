@@ -42,6 +42,7 @@ import {
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { isAtLeast } from "@parallel/utils/roles";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import Color from "color";
 import { useMemo, useRef, useState } from "react";
 import { DropzoneRef, FileRejection } from "react-dropzone";
@@ -73,6 +74,7 @@ export function BrandingGeneralForm({ user }: BrandingGeneralFormProps) {
   const [isLight, setIsLight] = useState(false);
   const [fontFamily, setFontFamily] = useState(theme?.fontFamily ?? "DEFAULT");
 
+  const genericErrorToast = useGenericErrorToast();
   const showErrorDialog = useErrorDialog();
   const [updateLogo, { loading }] = useMutation(BrandingGeneralForm_updateOrgLogoDocument);
   const handleLogoUpload = async (files: File[], rejected: FileRejection[]) => {
@@ -137,19 +139,25 @@ export function BrandingGeneralForm({ user }: BrandingGeneralFormProps) {
         if ((error.graphQLErrors[0].extensions.extra as any).code === "INVALID_HEX_VALUE_ERROR") {
           setInvalidColor(true);
         }
+      } else if (error !== "DEBOUNCED") {
+        genericErrorToast();
       }
     }
   };
 
   const handleFontFamilyChange = async (fontFamily: string) => {
-    setFontFamily(fontFamily);
-    updateOrganizationBrandTheme({
-      variables: {
-        data: {
-          fontFamily: fontFamily === "DEFAULT" ? null : fontFamily,
+    try {
+      setFontFamily(fontFamily);
+      await updateOrganizationBrandTheme({
+        variables: {
+          data: {
+            fontFamily: fontFamily === "DEFAULT" ? null : fontFamily,
+          },
         },
-      },
-    });
+      });
+    } catch {
+      genericErrorToast();
+    }
   };
 
   const sortedFonts = useMemo(
