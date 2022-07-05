@@ -146,15 +146,10 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
             variables: { petitionId, accessIds, body: message },
           });
         } catch (error) {
-          if (isApolloError(error)) {
-            const extra = error.graphQLErrors[0]?.extensions?.extra as any;
-            switch (extra?.errorCode) {
-              case "NO_REMINDERS_LEFT": {
-                showNoRemindersLeftToast(extra.petitionAccessId);
-                return;
-              }
-            }
+          if (isApolloError(error, "NO_REMINDERS_LEFT")) {
+            showNoRemindersLeftToast(error.graphQLErrors[0]!.extensions.petitionAccessId as string);
           }
+          return;
         }
       } catch {
         return;
@@ -277,28 +272,22 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
           status: "success",
         });
       } catch (e) {
-        if (isApolloError(e)) {
-          const extra = e.graphQLErrors[0]?.extensions?.extra as any;
-          switch (extra?.errorCode) {
-            case "NO_REMINDERS_LEFT":
-              showNoRemindersLeftToast();
-              break;
-            default:
-              toast({
-                title: intl.formatMessage({
-                  id: "petition.reminder-settings-error.toast-header",
-                  defaultMessage: "Error",
-                }),
-                description: intl.formatMessage({
-                  id: "petition.reminder-settings-error.toast-body",
-                  defaultMessage: "There was an error setting the reminders. Please try again.",
-                }),
-                duration: 5000,
-                isClosable: true,
-                status: "error",
-              });
-          }
-          return;
+        if (isApolloError(e, "NO_REMINDERS_LEFT")) {
+          showNoRemindersLeftToast();
+        } else {
+          toast({
+            title: intl.formatMessage({
+              id: "petition.reminder-settings-error.toast-header",
+              defaultMessage: "Error",
+            }),
+            description: intl.formatMessage({
+              id: "petition.reminder-settings-error.toast-body",
+              defaultMessage: "There was an error setting the reminders. Please try again.",
+            }),
+            duration: 5000,
+            isClosable: true,
+            status: "error",
+          });
         }
       }
     },

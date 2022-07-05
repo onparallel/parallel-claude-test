@@ -4,12 +4,56 @@ import { countBy, isDefined, uniq } from "remeda";
 import {
   FeatureFlagName,
   IntegrationType,
+  Petition,
+  PetitionAccess,
+  PetitionAccessStatus,
   PetitionFieldType,
   PetitionPermissionType,
+  PetitionStatus,
 } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
+import { toGlobalId } from "../../util/globalId";
 import { MaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
+
+function petitionMatches<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(ids: TArg, condition: (p: Petition) => boolean): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const petitionIds = unMaybeArray(args[ids] as unknown as MaybeArray<number>);
+      if (petitionIds.length === 0) {
+        return true;
+      }
+      const petitions = await ctx.petitions.loadPetition(petitionIds);
+      return petitions.every((p) => p && condition(p));
+    } catch {}
+    return false;
+  };
+}
+
+function petitionAccessMatches<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(
+  ids: TArg,
+  condition: (a: PetitionAccess) => boolean
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const accessIds = unMaybeArray(args[ids] as unknown as MaybeArray<number>);
+      if (accessIds.length === 0) {
+        return true;
+      }
+      const accesses = await ctx.petitions.loadAccess(accessIds);
+      return accesses.every((a) => a && condition(a));
+    } catch {}
+    return false;
+  };
+}
 
 export function userHasAccessToPetitions<
   TypeName extends string,
@@ -86,13 +130,7 @@ export function petitionsArePublicTemplates<
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, number | number[]>
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    try {
-      const templateIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
-      return await ctx.petitions.arePublicTemplates(templateIds);
-    } catch {}
-    return false;
-  };
+  return petitionMatches(argName, (p) => p.is_template && p.template_public);
 }
 
 export function petitionsAreOfTypePetition<
@@ -100,14 +138,7 @@ export function petitionsAreOfTypePetition<
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    try {
-      const petitionIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
-      const petitions = await ctx.petitions.loadPetition(petitionIds);
-      return petitions.every((p) => p && !p.is_template);
-    } catch {}
-    return false;
-  };
+  return petitionMatches(argName, (p) => !p.is_template);
 }
 
 export function petitionsAreOfTypeTemplate<
@@ -115,14 +146,7 @@ export function petitionsAreOfTypeTemplate<
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    try {
-      const petitionIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
-      const petitions = await ctx.petitions.loadPetition(petitionIds);
-      return petitions.every((p) => p && p.is_template);
-    } catch {}
-    return false;
-  };
+  return petitionMatches(argName, (p) => p.is_template);
 }
 
 export function fieldIsNotFixed<
@@ -342,6 +366,46 @@ export function accessesBelongToPetition<
   };
 }
 
+export function accessesHaveStatus<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(
+  argNameAccessIds: TArg,
+  status: PetitionAccessStatus
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return petitionAccessMatches(argNameAccessIds, (a) => a.status === status);
+}
+
+export function accessesHaveRemindersLeft<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(argNameAccessIds: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const ids = unMaybeArray(args[argNameAccessIds] as unknown as MaybeArray<number>);
+    if (ids.length === 0) {
+      return true;
+    }
+    const accesses = await ctx.petitions.loadAccess(ids);
+    const accessWithNoReminders = accesses.find((a) => a?.reminders_left === 0);
+    if (accessWithNoReminders) {
+      throw new ApolloError(`No reminders left.`, "NO_REMINDERS_LEFT", {
+        petitionAccessId: toGlobalId("PetitionAccess", accessWithNoReminders.id),
+      });
+    }
+    return true;
+  };
+}
+
+export function accessesIsNotOptedOut<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(argNameAccessIds: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return petitionAccessMatches(argNameAccessIds, (a) => !a.reminders_opt_out);
+}
+
 export function messageBelongToPetition<
   TypeName extends string,
   FieldName extends string,
@@ -427,15 +491,7 @@ export function petitionsAreEditable<
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
 >(argNamePetitionIds: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    try {
-      const petitions = await ctx.petitions.loadPetition(
-        unMaybeArray(args[argNamePetitionIds] as unknown as MaybeArray<number>)
-      );
-      return petitions.every((p) => isDefined(p) && !p.restricted_by_user_id);
-    } catch {}
-    return false;
-  };
+  return petitionMatches(argNamePetitionIds, (p) => !p.restricted_by_user_id);
 }
 
 export function petitionsAreNotPublicTemplates<
@@ -443,15 +499,7 @@ export function petitionsAreNotPublicTemplates<
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
 >(argNamePetitionIds: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    try {
-      const petitions = await ctx.petitions.loadPetition(
-        unMaybeArray(args[argNamePetitionIds] as unknown as MaybeArray<number>)
-      );
-      return petitions.every((p) => isDefined(p) && !p.template_public);
-    } catch {}
-    return false;
-  };
+  return petitionMatches(argNamePetitionIds, (p) => !p.template_public);
 }
 
 export function templateDoesNotHavePublicPetitionLink<
@@ -510,12 +558,9 @@ export function replyCanBeUpdated<
 export function petitionIsNotAnonymized<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, number>
+  TArg1 extends Arg<TypeName, FieldName, MaybeArray<number>>
 >(argPetitionId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    const petition = await ctx.petitions.loadPetition(args[argPetitionId] as unknown as number);
-    return petition?.anonymized_at === null;
-  };
+  return petitionMatches(argPetitionId, (p) => p.anonymized_at === null);
 }
 
 export function signatureRequestIsNotAnonymized<
@@ -529,4 +574,12 @@ export function signatureRequestIsNotAnonymized<
     );
     return signature?.anonymized_at === null;
   };
+}
+
+export function petitionHasStatus<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(argPetitionId: TArg1, status: PetitionStatus): FieldAuthorizeResolver<TypeName, FieldName> {
+  return petitionMatches(argPetitionId, (p) => p.status === status);
 }

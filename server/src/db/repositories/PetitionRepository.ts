@@ -3735,19 +3735,6 @@ export class PetitionRepository extends BaseRepository {
     }
   }
 
-  async arePublicTemplates(templateIds: MaybeArray<number>): Promise<boolean> {
-    const [{ count }] = await this.from("petition")
-      .whereIn("id", unMaybeArray(templateIds))
-      .where({
-        deleted_at: null,
-        template_public: true,
-        is_template: true,
-      })
-      .select(this.count());
-
-    return count === uniq(unMaybeArray(templateIds)).length;
-  }
-
   async loadPublicTemplates(
     opts: {
       search?: string | null;

@@ -67,11 +67,15 @@ import { contextUserHasRole } from "../../users/authorizers";
 import {
   accessesBelongToPetition,
   accessesBelongToValidContacts,
+  accessesHaveRemindersLeft,
+  accessesHaveStatus,
+  accessesIsNotOptedOut,
   fieldHasType,
   fieldIsNotFixed,
   fieldsBelongsToPetition,
   messageBelongToPetition,
   petitionHasRepliableFields,
+  petitionHasStatus,
   petitionIsNotAnonymized,
   petitionsAreEditable,
   petitionsAreNotPublicTemplates,
@@ -84,13 +88,7 @@ import {
   userHasAccessToPetitions,
   userHasFeatureFlag,
 } from "../authorizers";
-import {
-  petitionAccessesNotOptedOut,
-  validateAccessesRemindersLeft,
-  validateAccessesStatus,
-  validatePetitionStatus,
-  validatePublicPetitionLinkSlug,
-} from "../validations";
+import { validatePublicPetitionLinkSlug } from "../validations";
 import { ArgValidationError } from "./../../helpers/errors";
 import {
   userCanSendAs,
@@ -1395,7 +1393,10 @@ export const sendReminders = mutationField("sendReminders", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     accessesBelongToPetition("petitionId", "accessIds"),
-    petitionIsNotAnonymized("petitionId")
+    accessesHaveStatus("accessIds", "ACTIVE"),
+    accessesHaveRemindersLeft("accessIds"),
+    petitionIsNotAnonymized("petitionId"),
+    petitionHasStatus("petitionId", "PENDING")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1403,16 +1404,7 @@ export const sendReminders = mutationField("sendReminders", {
     accessIds: nonNull(list(nonNull(globalIdArg("PetitionAccess")))),
   },
   validateArgs: validRichTextContent((args) => args.body, "body"),
-  resolve: async (_, args, ctx, info) => {
-    const [petition, accesses] = await Promise.all([
-      ctx.petitions.loadPetition(args.petitionId),
-      ctx.petitions.loadAccess(args.accessIds),
-    ]);
-
-    validatePetitionStatus(petition, "PENDING", info);
-    validateAccessesStatus(accesses, "ACTIVE", info);
-    validateAccessesRemindersLeft(accesses, info);
-
+  resolve: async (_, args, ctx) => {
     try {
       const reminders = await ctx.petitions.createReminders(
         args.accessIds.map((accessId) => ({
@@ -1450,7 +1442,11 @@ export const switchAutomaticReminders = mutationField("switchAutomaticReminders"
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
     accessesBelongToPetition("petitionId", "accessIds"),
-    petitionIsNotAnonymized("petitionId")
+    accessesHaveStatus("accessIds", "ACTIVE"),
+    accessesIsNotOptedOut("accessIds"),
+    petitionIsNotAnonymized("petitionId"),
+    petitionHasStatus("petitionId", "PENDING"),
+    ifArgEquals("start", true, accessesHaveRemindersLeft("accessIds"))
   ),
   args: {
     start: nonNull(booleanArg()),
@@ -1465,21 +1461,9 @@ export const switchAutomaticReminders = mutationField("switchAutomaticReminders"
       validRemindersConfig((args) => args.remindersConfig, "remindersConfig")
     )
   ),
-  resolve: async (_, args, ctx, info) => {
-    const [petition, accesses] = await Promise.all([
-      ctx.petitions.loadPetition(args.petitionId),
-      ctx.petitions.loadAccess(args.accessIds),
-    ]);
-
-    validatePetitionStatus(petition, "PENDING", info);
-    validateAccessesStatus(accesses, "ACTIVE", info);
-    petitionAccessesNotOptedOut(accesses, info);
-
+  resolve: async (_, args, ctx) => {
     if (args.start) {
-      validateAccessesRemindersLeft(accesses, info);
-      const validAccessIds: number[] = accesses.filter((a) => a !== null).map((a) => a!.id);
-
-      return await ctx.petitions.startAccessReminders(validAccessIds, args.remindersConfig!);
+      return await ctx.petitions.startAccessReminders(args.accessIds, args.remindersConfig!);
     } else {
       return await ctx.petitions.stopAccessReminders(args.accessIds);
     }

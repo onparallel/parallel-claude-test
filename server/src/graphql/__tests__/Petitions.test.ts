@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { faker } from "@faker-js/faker";
-import { Knex } from "knex";
+import knex, { Knex } from "knex";
 import { sortBy } from "remeda";
 import { PetitionEvent } from "../../db/events";
 import { KNEX } from "../../db/knex";
@@ -4694,6 +4694,380 @@ describe("GraphQL/Petitions", () => {
         expect(errors).toContainGraphQLError("FORBIDDEN");
         expect(data).toBeNull();
       });
+    });
+  });
+
+  describe("sendReminders", () => {
+    let petition: Petition;
+    let access: PetitionAccess;
+    let contact: Contact;
+    beforeAll(async () => {
+      [petition] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ is_template: false }),
+        () => ({ type: "OWNER" })
+      );
+
+      [contact] = await mocks.createRandomContacts(organization.id, 1, () => ({
+        email: faker.internet.email(),
+      }));
+
+      [access] = await mocks.createPetitionAccess(
+        petition.id,
+        sessionUser.id,
+        [contact.id],
+        sessionUser.id
+      );
+    });
+
+    it("sends error if access is inactive", async () => {
+      await mocks.knex.from("petition_access").where("id", access.id).update("status", "INACTIVE");
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $accessIds: [GID!]!) {
+            sendReminders(petitionId: $petitionId, accessIds: $accessIds)
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          accessIds: [toGlobalId("PetitionAccess", access.id)],
+        }
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+
+      await mocks.knex.from("petition_access").where("id", access.id).update("status", "ACTIVE");
+    });
+
+    it("sends error if access has no reminders left", async () => {
+      await mocks.knex.from("petition_access").where("id", access.id).update("reminders_left", 0);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $accessIds: [GID!]!) {
+            sendReminders(petitionId: $petitionId, accessIds: $accessIds)
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          accessIds: [toGlobalId("PetitionAccess", access.id)],
+        }
+      );
+      expect(errors).toContainGraphQLError("NO_REMINDERS_LEFT");
+      expect(data).toBeNull();
+
+      await mocks.knex.from("petition_access").where("id", access.id).update("reminders_left", 10);
+    });
+
+    it("sends error if petition is not pending", async () => {
+      await mocks.knex.from("petition").where("id", petition.id).update("status", "COMPLETED");
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $accessIds: [GID!]!) {
+            sendReminders(petitionId: $petitionId, accessIds: $accessIds)
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          accessIds: [toGlobalId("PetitionAccess", access.id)],
+        }
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+
+      await mocks.knex.from("petition").where("id", petition.id).update("status", "PENDING");
+    });
+
+    it("substract 1 from reminders_left and creates a reminder for later processing", async () => {
+      const [accessBefore] = await mocks.knex
+        .from("petition_access")
+        .where("id", access.id)
+        .select("*");
+
+      expect(accessBefore.reminders_left).toEqual(10);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $accessIds: [GID!]!) {
+            sendReminders(petitionId: $petitionId, accessIds: $accessIds)
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          accessIds: [toGlobalId("PetitionAccess", access.id)],
+        }
+      );
+      expect(errors).toBeUndefined();
+      expect(data?.sendReminders).toEqual("SUCCESS");
+
+      const [accessAfter] = await mocks.knex
+        .from("petition_access")
+        .where("id", access.id)
+        .select("*");
+
+      expect(accessAfter.reminders_left).toEqual(9);
+
+      const reminders = await mocks.knex
+        .from("petition_reminder")
+        .where("petition_access_id", access.id)
+        .select("*");
+
+      expect(reminders).toHaveLength(1);
+      expect(reminders[0]).toMatchObject({
+        type: "MANUAL",
+        status: "PROCESSING",
+        petition_access_id: access.id,
+        sender_id: sessionUser.id,
+        email_body: null,
+        created_by: `User:${sessionUser.id}`,
+      });
+    });
+  });
+
+  describe("switchAutomaticReminders", () => {
+    let petition: Petition;
+    let access: PetitionAccess;
+    let contact: Contact;
+    beforeAll(async () => {
+      [petition] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ is_template: false }),
+        () => ({ type: "OWNER" })
+      );
+
+      [contact] = await mocks.createRandomContacts(organization.id, 1, () => ({
+        email: faker.internet.email(),
+      }));
+
+      [access] = await mocks.createPetitionAccess(
+        petition.id,
+        sessionUser.id,
+        [contact.id],
+        sessionUser.id
+      );
+    });
+
+    it("sends error if access is inactive", async () => {
+      await mocks.knex.from("petition_access").where("id", access.id).update("status", "INACTIVE");
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $accessIds: [GID!]!
+            $start: Boolean!
+            $remindersConfig: RemindersConfigInput
+          ) {
+            switchAutomaticReminders(
+              petitionId: $petitionId
+              accessIds: $accessIds
+              start: $start
+              remindersConfig: $remindersConfig
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          accessIds: [toGlobalId("PetitionAccess", access.id)],
+          start: true,
+          remindersConfig: {
+            offset: 10,
+            time: "10:45",
+            timezone: "Europe/Madrid",
+            weekdaysOnly: false,
+          },
+        }
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+
+      await mocks.knex.from("petition_access").where("id", access.id).update("status", "ACTIVE");
+    });
+
+    it("sends error if starting reminders and access has no reminders left", async () => {
+      await mocks.knex.from("petition_access").where("id", access.id).update("reminders_left", 0);
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $accessIds: [GID!]!
+            $start: Boolean!
+            $remindersConfig: RemindersConfigInput
+          ) {
+            switchAutomaticReminders(
+              petitionId: $petitionId
+              accessIds: $accessIds
+              start: $start
+              remindersConfig: $remindersConfig
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          accessIds: [toGlobalId("PetitionAccess", access.id)],
+          start: true,
+          remindersConfig: {
+            offset: 10,
+            time: "10:45",
+            timezone: "Europe/Madrid",
+            weekdaysOnly: false,
+          },
+        }
+      );
+      expect(errors).toContainGraphQLError("NO_REMINDERS_LEFT");
+      expect(data).toBeNull();
+
+      await mocks.knex.from("petition_access").where("id", access.id).update("reminders_left", 10);
+    });
+
+    it("sends error if petition is not pending", async () => {
+      await mocks.knex.from("petition").where("id", petition.id).update("status", "COMPLETED");
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $accessIds: [GID!]!
+            $start: Boolean!
+            $remindersConfig: RemindersConfigInput
+          ) {
+            switchAutomaticReminders(
+              petitionId: $petitionId
+              accessIds: $accessIds
+              start: $start
+              remindersConfig: $remindersConfig
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          accessIds: [toGlobalId("PetitionAccess", access.id)],
+          start: true,
+          remindersConfig: {
+            offset: 10,
+            time: "10:45",
+            timezone: "Europe/Madrid",
+            weekdaysOnly: false,
+          },
+        }
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+
+      await mocks.knex.from("petition").where("id", petition.id).update("status", "PENDING");
+    });
+
+    it("activates automatic reminders on access", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $accessIds: [GID!]!
+            $start: Boolean!
+            $remindersConfig: RemindersConfigInput
+          ) {
+            switchAutomaticReminders(
+              petitionId: $petitionId
+              accessIds: $accessIds
+              start: $start
+              remindersConfig: $remindersConfig
+            ) {
+              remindersActive
+              remindersConfig {
+                offset
+                time
+                timezone
+                weekdaysOnly
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          accessIds: [toGlobalId("PetitionAccess", access.id)],
+          start: true,
+          remindersConfig: {
+            offset: 10,
+            time: "10:45",
+            timezone: "Europe/Madrid",
+            weekdaysOnly: false,
+          },
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.switchAutomaticReminders).toEqual([
+        {
+          remindersActive: true,
+          remindersConfig: {
+            offset: 10,
+            time: "10:45",
+            timezone: "Europe/Madrid",
+            weekdaysOnly: false,
+          },
+        },
+      ]);
+    });
+
+    it("disables automatic reminders on access", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $accessIds: [GID!]!
+            $start: Boolean!
+            $remindersConfig: RemindersConfigInput
+          ) {
+            switchAutomaticReminders(
+              petitionId: $petitionId
+              accessIds: $accessIds
+              start: $start
+              remindersConfig: $remindersConfig
+            ) {
+              remindersActive
+              nextReminderAt
+              remindersConfig {
+                offset
+                time
+                timezone
+                weekdaysOnly
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          accessIds: [toGlobalId("PetitionAccess", access.id)],
+          start: false,
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data?.switchAutomaticReminders).toEqual([
+        {
+          remindersActive: false,
+          nextReminderAt: null,
+          remindersConfig: {
+            offset: 10,
+            time: "10:45",
+            timezone: "Europe/Madrid",
+            weekdaysOnly: false,
+          },
+        },
+      ]);
     });
   });
 });
