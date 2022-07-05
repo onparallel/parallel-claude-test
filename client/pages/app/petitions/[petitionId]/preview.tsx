@@ -344,51 +344,54 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
                 display={{ base: "none", [breakpoint]: "block" }}
               >
                 <Stack
-                spacing={4}
-                position={{ base: "relative", [breakpoint]: "sticky" }}
-                top={{ base: 0, [breakpoint]: 6 }}
-              >
-                <RecipientViewContentsCard
-                  currentPage={currentPage}
-                  petition={petition}
-                  maxHeight="calc(100vh - 10.5rem)"
-                  usePreviewReplies={!isPetition}
-                />
-              </Stack>
-            </Box>
-            <Flex data-section="preview-fields" flexDirection="column" flex="2" minWidth={0}>
-              <Stack spacing={4} key={0}>
-                <LiquidScopeProvider scope={scope}>
-                  {fields.map((field) => (
-                    <motion.div key={field.id} layout="position">
-                      <PreviewPetitionField
-                        tone={petition.tone}
-                        key={field.id}
-                        petitionId={petition.id}
-                        field={field}
-                        isDisabled={
-                          (isPetition && petition.status === "CLOSED") || petition.isAnonymized
-                        }
-                        isInvalid={
-                          finalized && completedFieldReplies(field).length === 0 && !field.optional
-                        }
-                        isCacheOnly={!isPetition}
-                        myEffectivePermission={myEffectivePermission}
-                      />
-                    </motion.div>
-                  ))}
-                </LiquidScopeProvider>
-              </Stack>
-              <Spacer />
-              {pages > 1 ? (
-                <RecipientViewPagination
-                  marginTop={8}
-                  currentPage={currentPage}
-                  pageCount={pageCount}
-                />
-              ) : null}
+                  spacing={4}
+                  position={{ base: "relative", [breakpoint]: "sticky" }}
+                  top={{ base: 0, [breakpoint]: 6 }}
+                >
+                  <RecipientViewContentsCard
+                    currentPage={currentPage}
+                    petition={petition}
+                    maxHeight="calc(100vh - 10.5rem)"
+                    usePreviewReplies={!isPetition}
+                  />
+                </Stack>
+              </Box>
+              <Flex data-section="preview-fields" flexDirection="column" flex="2" minWidth={0}>
+                <Stack spacing={4} key={0}>
+                  <LiquidScopeProvider scope={scope}>
+                    {fields.map((field) => (
+                      <motion.div key={field.id} layout="position">
+                        <PreviewPetitionField
+                          tone={petition.tone}
+                          key={field.id}
+                          petitionId={petition.id}
+                          field={field}
+                          isDisabled={
+                            (isPetition && petition.status === "CLOSED") || petition.isAnonymized
+                          }
+                          isInvalid={
+                            finalized &&
+                            completedFieldReplies(field).length === 0 &&
+                            !field.optional
+                          }
+                          isCacheOnly={!isPetition}
+                          myEffectivePermission={myEffectivePermission}
+                        />
+                      </motion.div>
+                    ))}
+                  </LiquidScopeProvider>
+                </Stack>
+                <Spacer />
+                {pages > 1 ? (
+                  <RecipientViewPagination
+                    marginTop={8}
+                    currentPage={currentPage}
+                    pageCount={pageCount}
+                  />
+                ) : null}
+              </Flex>
             </Flex>
-          </Flex>
+          </OverrideWithOrganizationTheme>
           {isPetition && petition.status !== "CLOSED" && (
             <RecipientViewProgressFooter
               petition={petition}

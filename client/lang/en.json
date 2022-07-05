@@ -4821,8 +4821,8 @@
   },
   {
     "term": "generic.color.purple",
-    "definition": "primary",
-    "context": "primary"
+    "definition": "purple",
+    "context": "purple"
   },
   {
     "term": "generic.color.red",
