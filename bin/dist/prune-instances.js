@@ -14,7 +14,7 @@ aws_sdk_1.default.config.region = "eu-central-1";
 const ec2 = new aws_sdk_1.default.EC2();
 const elbv2 = new aws_sdk_1.default.ELBv2();
 async function main() {
-    var _a, _b;
+    var _a;
     const { env, "dry-run": dryRun } = await yargs_1.default
         .usage("Usage: $0 --env [env]")
         .option("dry-run", {
@@ -26,58 +26,43 @@ async function main() {
         choices: ["staging", "production"],
         description: "The environment for the build",
     }).argv;
-    const [result1, result2] = await Promise.all([
-        ec2
-            .describeInstances({
-            Filters: [
-                { Name: "tag-key", Values: ["Release"] },
-                { Name: "tag:Environment", Values: [env] },
-            ],
-        })
-            .promise(),
-        elbv2
-            .describeLoadBalancers({
-            Names: [env],
-        })
-            .promise(),
-    ]);
-    const result3 = await elbv2
-        .describeListeners({
-        LoadBalancerArn: result2.LoadBalancers[0].LoadBalancerArn,
+    const loadBalancerArn = await elbv2
+        .describeLoadBalancers({ Names: [`parallel-${env}`] })
+        .promise()
+        .then((r) => r.LoadBalancers[0].LoadBalancerArn);
+    const targetGroupsArns = await elbv2
+        .describeListeners({ LoadBalancerArn: loadBalancerArn })
+        .promise()
+        .then((r) => r.Listeners.map((l) => l.DefaultActions[0].TargetGroupArn));
+    const liveInstancesIds = await elbv2
+        .describeTargetHealth({ TargetGroupArn: targetGroupsArns[0] })
+        .promise()
+        .then((r) => r.TargetHealthDescriptions.map((thd) => thd.Target.Id));
+    const instances = await ec2
+        .describeInstances({
+        Filters: [
+            { Name: "tag-key", Values: ["Release"] },
+            { Name: "tag:Environment", Values: [env] },
+        ],
     })
-        .promise();
-    const tgArn = (_a = result3.Listeners) === null || _a === void 0 ? void 0 : _a.find((l) => l.Protocol === "HTTPS").DefaultActions[0].TargetGroupArn;
-    const result4 = await elbv2
-        .describeTargetHealth({
-        TargetGroupArn: tgArn,
-    })
-        .promise();
-    const used = result4.TargetHealthDescriptions.map((thd) => thd.Target.Id);
-    for (const instance of result1.Reservations.flatMap((r) => r.Instances)) {
-        const id = instance.InstanceId;
-        if (!used.includes(id)) {
-            const name = (_b = instance.Tags.find((t) => t.Key === "Name")) === null || _b === void 0 ? void 0 : _b.Value;
-            const state = instance.State.Name;
-            if (state === "running") {
-                console.log((0, chalk_1.default) `Stopping instance {bold ${id}} {yellow {bold ${name}}}`);
+        .promise()
+        .then((r) => r.Reservations.flatMap((r) => r.Instances));
+    for (const instance of instances) {
+        const instanceId = instance.InstanceId;
+        if (!liveInstancesIds.includes(instanceId)) {
+            const instanceName = (_a = instance.Tags.find((t) => t.Key === "Name")) === null || _a === void 0 ? void 0 : _a.Value;
+            const instanceState = instance.State.Name;
+            if (instanceState === "running") {
+                console.log((0, chalk_1.default) `Stopping instance {bold ${instanceId}} {yellow {bold ${instanceName}}}`);
                 if (!dryRun) {
-                    await ec2.stopInstances({ InstanceIds: [id] }).promise();
+                    await ec2.stopInstances({ InstanceIds: [instanceId] }).promise();
                 }
             }
-            else if (state === "stopped" || state === "stopping") {
-                console.log((0, chalk_1.default) `Terminating instance {bold ${id}} {red {bold ${name}}}`);
+            else if (instanceState === "stopped" || instanceState === "stopping") {
+                console.log((0, chalk_1.default) `Terminating instance {bold ${instanceId}} {red {bold ${instanceName}}}`);
                 if (!dryRun) {
-                    await ec2.terminateInstances({ InstanceIds: [id] }).promise();
+                    await ec2.terminateInstances({ InstanceIds: [instanceId] }).promise();
                 }
-            }
-        }
-    }
-    const result5 = await elbv2.describeTargetGroups().promise();
-    for (const tg of result5.TargetGroups) {
-        if (tg.TargetGroupName.endsWith(`-${env}`) && tg.TargetGroupArn !== tgArn) {
-            console.log((0, chalk_1.default) `Deleting target group {red {bold ${tg.TargetGroupName}}}`);
-            if (!dryRun) {
-                await elbv2.deleteTargetGroup({ TargetGroupArn: tg.TargetGroupArn }).promise();
             }
         }
     }

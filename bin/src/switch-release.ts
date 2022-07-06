@@ -29,46 +29,66 @@ async function main() {
     }).argv;
 
   const commit = _commit.slice(0, 7);
-  const buildId = `${commit}-${env}`;
+  const buildId = `parallel-${env}-${commit}`;
 
-  // Shutdown workers in current build
-  console.log("Getting current target group.");
-  const result1 = await elbv2.describeLoadBalancers({ Names: [env] }).promise();
-  const loadBalancerArn = result1.LoadBalancers![0].LoadBalancerArn!;
-  const result2 = await elbv2
-    .describeListeners({
-      LoadBalancerArn: loadBalancerArn,
+  const newInstances = await ec2
+    .describeInstances({
+      Filters: [
+        { Name: "tag:Release", Values: [commit] },
+        { Name: "tag:Environment", Values: [env] },
+        { Name: "instance-state-name", Values: ["running"] },
+      ],
     })
-    .promise();
-  const oldTargetGroupArn = result2.Listeners!.find((l) => l.Protocol === "HTTPS")!
-    .DefaultActions![0].TargetGroupArn!;
+    .promise()
+    .then((r) => r.Reservations?.flatMap((r) => r.Instances ?? []) ?? []);
 
-  const result3 = await getTargetGroupInstances(oldTargetGroupArn);
-  for (const instance of result3.Reservations!.flatMap((r) => r.Instances!)) {
-    const ipAddress = instance.PrivateIpAddress!;
-    console.log(chalk`Stopping workers on ${instance.Tags?.find((t) => t.Key === "Name")!.Value}`);
-    execSync(`ssh \
-      -o "UserKnownHostsFile=/dev/null" \
-      -o StrictHostKeyChecking=no \
-      ${ipAddress} /home/ec2-user/workers.sh stop`);
-    console.log(chalk`Workers stopped on ${instance.Tags?.find((t) => t.Key === "Name")!.Value}`);
+  if (newInstances.length === 0) {
+    throw new Error(`No running instances for environment ${env} and release ${commit}.`);
   }
 
-  console.log("Getting new target group.");
-  const targetGroupName = `${commit}-${env}`;
-  const result4 = await elbv2.describeTargetGroups({ Names: [targetGroupName] }).promise();
-  const targetGroupArn = result4.TargetGroups![0].TargetGroupArn!;
+  const targetGroups = await elbv2
+    .describeTargetGroups({ Names: [`parallel-${env}-80`, `parallel-${env}-443`] })
+    .promise()
+    .then((r) => r.TargetGroups!);
 
-  const result5 = await getTargetGroupInstances(targetGroupArn);
-  for (const instance of result5.Reservations!.flatMap((r) => r.Instances!)) {
-    const ipAddress = instance.PrivateIpAddress!;
-    console.log(chalk`Starting services on ${instance.Tags?.find((t) => t.Key === "Name")!.Value}`);
-    execSync(`ssh \
-      -o "UserKnownHostsFile=/dev/null" \
-      -o StrictHostKeyChecking=no \
-      ${ipAddress} /home/ec2-user/workers.sh start`);
-    console.log(chalk`Workers started on ${instance.Tags?.find((t) => t.Key === "Name")!.Value}`);
-  }
+  const oldInstances = await getTargetGroupInstances(targetGroups[0].TargetGroupArn!);
+
+  await Promise.all(
+    [80, 443].map(async (port) => {
+      const targetGroup = targetGroups.find((tg) => tg.Port === port)!;
+      const instancesIds = newInstances.map((i) => i.InstanceId!);
+
+      console.log(`Registering instances ${instancesIds} on TG parallel-${env}-${port}`);
+      await elbv2
+        .registerTargets({
+          TargetGroupArn: targetGroup.TargetGroupArn!,
+          Targets: instancesIds.map((id) => ({ Id: id })),
+        })
+        .promise();
+    })
+  );
+
+  await waitFor(
+    async () => {
+      const [ok1, ok2] = await Promise.all(
+        targetGroups.map(async (tg) => {
+          return elbv2
+            .describeTargetHealth({ TargetGroupArn: tg.TargetGroupArn! })
+            .promise()
+            .then((r) =>
+              newInstances.every(
+                (i) =>
+                  r.TargetHealthDescriptions!.find((d) => d.Target?.Id === i.InstanceId!)
+                    ?.TargetHealth?.State === "healthy"
+              )
+            );
+        })
+      );
+      return ok1 && ok2;
+    },
+    `Waiting for new targets to become healthy on TGs`,
+    5000
+  );
 
   console.log("Create invalidation for static files");
   const result = await cloudfront.listDistributions().promise();
@@ -89,35 +109,63 @@ async function main() {
     })
     .promise();
 
-  console.log(
-    chalk`Updating LB {blue {bold ${env}}} to point to TG {blue {bold ${targetGroupName}}}`
-  );
-  const result6 = await elbv2.describeListeners({ LoadBalancerArn: loadBalancerArn }).promise();
-  const listenerArn = result6.Listeners!.find((l) => l.Protocol === "HTTPS")!.ListenerArn!;
-  await elbv2
-    .modifyListener({
-      ListenerArn: listenerArn,
-      DefaultActions: [
-        {
-          Type: "forward",
-          TargetGroupArn: targetGroupArn,
-        },
-      ],
+  await Promise.all(
+    oldInstances.map(async (instance) => {
+      const ipAddress = instance.PrivateIpAddress!;
+      const instanceName = instance.Tags?.find((t) => t.Key === "Name")!.Value;
+      console.log(chalk`Stopping workers on ${instance.InstanceId!} ${instanceName}`);
+      execSync(`ssh \
+      -o "UserKnownHostsFile=/dev/null" \
+      -o StrictHostKeyChecking=no \
+      ${ipAddress} /home/ec2-user/workers.sh stop`);
+      console.log(chalk`Workers stopped on ${instance.InstanceId!} ${instanceName}`);
     })
-    .promise();
+  );
+  await Promise.all(
+    newInstances.map(async (instance) => {
+      const ipAddress = instance.PrivateIpAddress!;
+      const instanceName = instance.Tags?.find((t) => t.Key === "Name")!.Value;
+      console.log(chalk`Starting workers on ${instance.InstanceId!} ${instanceName}`);
+      // execSync(`ssh \
+      // -o "UserKnownHostsFile=/dev/null" \
+      // -o StrictHostKeyChecking=no \
+      // ${ipAddress} /home/ec2-user/workers.sh start`);
+      console.log(chalk`Workers started on ${instance.InstanceId!} ${instanceName}`);
+    })
+  );
+
+  await Promise.all(
+    [80, 443].map(async (port) => {
+      const targetGroup = targetGroups.find((tg) => tg.Port === port)!;
+      const instancesIds = oldInstances.map((i) => i.InstanceId!);
+
+      console.log(`Deregistering instances ${instancesIds} on TG parallel-${env}-${port}`);
+      await elbv2
+        .deregisterTargets({
+          TargetGroupArn: targetGroup.TargetGroupArn!,
+          Targets: instancesIds.map((id) => ({ Id: id })),
+        })
+        .promise();
+    })
+  );
 
   await waitFor(
     async () => {
-      const result = await elbv2
-        .describeTargetHealth({
-          TargetGroupArn: targetGroupArn,
+      const [ok1, ok2] = await Promise.all(
+        targetGroups.map(async (tg) => {
+          return elbv2
+            .describeTargetHealth({ TargetGroupArn: tg.TargetGroupArn! })
+            .promise()
+            .then((r) =>
+              oldInstances.every(
+                (i) => !r.TargetHealthDescriptions!.find((d) => d.Target?.Id === i.InstanceId!)
+              )
+            );
         })
-        .promise();
-      return (
-        result.TargetHealthDescriptions?.every((t) => t.TargetHealth?.State === "healthy") ?? false
       );
+      return ok1 && ok2;
     },
-    "Target not healthy. Waiting 5 more seconds...",
+    `Waiting for new targets to become healthy on TGs`,
     5000
   );
 }
@@ -125,19 +173,15 @@ async function main() {
 run(main);
 
 async function getTargetGroupInstances(targetGroupArn: string) {
-  const result1 = await elbv2
-    .describeTargetGroups({
-      TargetGroupArns: [targetGroupArn],
-    })
-    .promise();
-  const [commit, env] = result1.TargetGroups![0].TargetGroupName!.split("-");
+  const instanceIds = await elbv2
+    .describeTargetHealth({ TargetGroupArn: targetGroupArn })
+    .promise()
+    .then((r) => r.TargetHealthDescriptions!.map((d) => d.Target!.Id));
   return await ec2
     .describeInstances({
-      Filters: [
-        { Name: "tag:Release", Values: [commit] },
-        { Name: "tag:Environment", Values: [env] },
-        { Name: "instance-state-name", Values: ["running"] },
-      ],
+      InstanceIds: instanceIds,
+      Filters: [{ Name: "instance-state-name", Values: ["running"] }],
     })
-    .promise();
+    .promise()
+    .then((r) => r.Reservations?.flatMap((r) => r.Instances ?? []) ?? []);
 }

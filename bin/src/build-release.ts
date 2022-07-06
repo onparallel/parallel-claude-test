@@ -27,7 +27,7 @@ async function main() {
     }).argv;
 
   const commit = _commit.slice(0, 7);
-  const buildId = `${commit}-${env}`;
+  const buildId = `parallel-${env}-${commit}`;
   const buildDir = `${WORK_DIR}/${buildId}`;
 
   console.log(chalk`Checking out the code for commit {bold ${commit}}`);

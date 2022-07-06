@@ -24,6 +24,7 @@ yum install -y \
     ImageMagick \
     ImageMagick-devel \
     qpdf \
+    amazon-efs-utils
     
 echo "Installing node.js"
 curl -sL https://rpm.nodesource.com/setup_${nodejs_version}.x | bash -

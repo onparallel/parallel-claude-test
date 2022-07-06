@@ -28,7 +28,7 @@ async function main() {
         description: "The environment for the build",
     }).argv;
     const commit = _commit.slice(0, 7);
-    const buildId = `${commit}-${env}`;
+    const buildId = `parallel-${env}-${commit}`;
     const buildDir = `${WORK_DIR}/${buildId}`;
     console.log((0, chalk_1.default) `Checking out the code for commit {bold ${commit}}`);
     (0, child_process_1.execSync)(`git clone --no-checkout git@github.com:onparallel/parallel.git ${buildDir}`, {
