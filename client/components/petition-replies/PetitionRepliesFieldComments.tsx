@@ -1,6 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import { Box, Center, Flex, Spinner, Stack, Text } from "@chakra-ui/react";
-import { AlertCircleIcon, CommentIcon } from "@parallel/chakra/icons";
+import { CommentIcon, NoteIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import {
   PetitionRepliesFieldComments_PetitionFieldFragment,
@@ -25,7 +25,7 @@ export interface PetitionRepliesFieldCommentsProps {
   onMarkAsUnread: (petitionFieldCommentId: string) => void;
   onClose: () => void;
   isDisabled: boolean;
-  onlyInternalComments: boolean;
+  onlyReadPermission: boolean;
 }
 
 export function PetitionRepliesFieldComments({
@@ -38,7 +38,7 @@ export function PetitionRepliesFieldComments({
   onMarkAsUnread,
   onClose,
   isDisabled,
-  onlyInternalComments,
+  onlyReadPermission,
 }: PetitionRepliesFieldCommentsProps) {
   const intl = useIntl();
 
@@ -132,30 +132,40 @@ export function PetitionRepliesFieldComments({
                 justifyContent="center"
                 alignItems="center"
               >
-                {hasCommentsEnabled ? (
+                {hasCommentsEnabled && !onlyReadPermission ? (
                   <CommentIcon boxSize="64px" color="gray.200" />
                 ) : (
                   <Stack alignItems="center" textAlign="center">
-                    <AlertCircleIcon boxSize="64px" color="gray.200" />
-                    <Text color="gray.400">
-                      <FormattedMessage
-                        id="petition-replies.field-comments.disabled-comments-2"
-                        defaultMessage="You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
-                        values={{
-                          composeTab: intl.formatMessage({
-                            id: "petition.header.compose-tab",
-                            defaultMessage: "Compose",
-                          }),
-                          a: (chunks: any) => (
-                            <Link
-                              href={`/app/petitions/${petitionId}/compose#field-settings-${field.id}`}
-                            >
-                              {chunks}
-                            </Link>
-                          ),
-                        }}
-                      />
-                    </Text>
+                    <NoteIcon boxSize="64px" color="gray.200" />
+                    {onlyReadPermission ? null : (
+                      <>
+                        <Text color="gray.400">
+                          <FormattedMessage
+                            id="petition-replies.field-comments.only-notes"
+                            defaultMessage="This field only accepts notes"
+                          />
+                        </Text>
+                        <Text color="gray.400">
+                          <FormattedMessage
+                            id="petition-replies.field-comments.disabled-comments-2"
+                            defaultMessage="You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
+                            values={{
+                              composeTab: intl.formatMessage({
+                                id: "petition.header.compose-tab",
+                                defaultMessage: "Compose",
+                              }),
+                              a: (chunks: any) => (
+                                <Link
+                                  href={`/app/petitions/${petitionId}/compose#field-settings-${field.id}`}
+                                >
+                                  {chunks}
+                                </Link>
+                              ),
+                            }}
+                          />
+                        </Text>
+                      </>
+                    )}
                   </Stack>
                 )}
               </Flex>
@@ -177,7 +187,7 @@ export function PetitionRepliesFieldComments({
         }
         isDisabled={isDisabled}
         isTemplate={false}
-        hasCommentsEnabled={hasCommentsEnabled && !onlyInternalComments}
+        hasCommentsEnabled={hasCommentsEnabled && !onlyReadPermission}
         onCommentKeyDown={async (event, content) =>
           await handleKeyDown({ event, content, isInternal: false })
         }

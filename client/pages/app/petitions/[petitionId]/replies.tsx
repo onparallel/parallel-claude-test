@@ -607,7 +607,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 onUpdateComment={handleUpdateComment}
                 onDeleteComment={handleDeleteComment}
                 onMarkAsUnread={handleMarkAsUnread}
-                onlyInternalComments={myEffectivePermission === "READ"}
+                onlyReadPermission={myEffectivePermission === "READ"}
               />
             ) : (
               <Card display="flex" flexDirection="column" maxHeight={`calc(100vh - 153px)`}>

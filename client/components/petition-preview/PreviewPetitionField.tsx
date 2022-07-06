@@ -93,7 +93,7 @@ export function PreviewPetitionField({
         isTemplate: isCacheOnly,
         isDisabled,
         tone,
-        onlyInternalComments: myEffectivePermission === "READ",
+        onlyReadPermission: myEffectivePermission === "READ",
       });
     } catch {}
   }

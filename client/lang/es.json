@@ -6625,6 +6625,11 @@
     "context": "You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
   },
   {
+    "term": "petition-replies.field-comments.only-notes",
+    "definition": "Este campo solo admite notas",
+    "context": "This field only accepts notes"
+  },
+  {
     "term": "petition-replies.finalize-petition.button",
     "definition": "Finalizar parallel",
     "context": "Finish parallel"

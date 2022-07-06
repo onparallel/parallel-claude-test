@@ -41,7 +41,7 @@ interface PreviewPetitionFieldCommentsDialogProps {
   isTemplate?: boolean;
   tone: Tone;
   isDisabled: boolean;
-  onlyInternalComments: boolean;
+  onlyReadPermission: boolean;
 }
 
 export function PreviewPetitionFieldCommentsDialog({
@@ -50,7 +50,7 @@ export function PreviewPetitionFieldCommentsDialog({
   isTemplate,
   tone,
   isDisabled,
-  onlyInternalComments,
+  onlyReadPermission,
   ...props
 }: DialogProps<PreviewPetitionFieldCommentsDialogProps>) {
   const intl = useIntl();
@@ -205,32 +205,42 @@ export function PreviewPetitionFieldCommentsDialog({
                     justifyContent="center"
                     alignItems="center"
                   >
-                    {hasCommentsEnabled ? (
+                    {hasCommentsEnabled && !onlyReadPermission ? (
                       <>
                         <CommentIcon color="gray.300" boxSize="64px" />
                       </>
                     ) : (
                       <Stack alignItems="center" textAlign="center">
                         <NoteIcon boxSize="64px" color="gray.200" />
-                        <Text color="gray.400">
-                          <FormattedMessage
-                            id="petition-replies.field-comments.disabled-comments-2"
-                            defaultMessage="You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
-                            values={{
-                              composeTab: intl.formatMessage({
-                                id: "petition.header.compose-tab",
-                                defaultMessage: "Compose",
-                              }),
-                              a: (chunks: any) => (
-                                <Link
-                                  href={`/app/petitions/${petitionId}/compose#field-settings-${field.id}`}
-                                >
-                                  {chunks}
-                                </Link>
-                              ),
-                            }}
-                          />
-                        </Text>
+                        {onlyReadPermission ? null : (
+                          <>
+                            <Text color="gray.400">
+                              <FormattedMessage
+                                id="petition-replies.field-comments.only-notes"
+                                defaultMessage="This field only accepts notes"
+                              />
+                            </Text>
+                            <Text color="gray.400">
+                              <FormattedMessage
+                                id="petition-replies.field-comments.disabled-comments-2"
+                                defaultMessage="You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
+                                values={{
+                                  composeTab: intl.formatMessage({
+                                    id: "petition.header.compose-tab",
+                                    defaultMessage: "Compose",
+                                  }),
+                                  a: (chunks: any) => (
+                                    <Link
+                                      href={`/app/petitions/${petitionId}/compose#field-settings-${field.id}`}
+                                    >
+                                      {chunks}
+                                    </Link>
+                                  ),
+                                }}
+                              />
+                            </Text>
+                          </>
+                        )}
                       </Stack>
                     )}
                   </Flex>
@@ -270,7 +280,7 @@ export function PreviewPetitionFieldCommentsDialog({
             }
             isDisabled={isDisabled}
             isTemplate={isTemplate ?? false}
-            hasCommentsEnabled={hasCommentsEnabled && !onlyInternalComments}
+            hasCommentsEnabled={hasCommentsEnabled && !onlyReadPermission}
             onCommentKeyDown={async (event, content) =>
               await handleKeyDown({ event, content, isInternal: false })
             }
