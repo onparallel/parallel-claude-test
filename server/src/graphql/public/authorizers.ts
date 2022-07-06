@@ -2,7 +2,7 @@ import { ApolloError } from "apollo-server-core";
 import { parse as parseCookie } from "cookie";
 import { IncomingMessage } from "http";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { countBy, isDefined } from "remeda";
+import { isDefined } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { toGlobalId } from "../../util/globalId";
 import { verify } from "../../util/jwt";
@@ -168,7 +168,8 @@ export function validPublicPetitionLinkSlug<
     if (!isDefined(publicPetitionLink) || !publicPetitionLink.is_active) {
       return false;
     }
-    return true;
+    const template = await ctx.petitions.loadPetition(publicPetitionLink.template_id);
+    return isDefined(template) && template.is_template && template.anonymized_at === null;
   };
 }
 
@@ -189,43 +190,6 @@ export function validPublicPetitionLinkPrefill<
       }
     } catch {}
     return false;
-  };
-}
-
-export function validPublicPetitionLink<
-  TypeName extends string,
-  FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>
->(argPublicPetitionLinkId: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    const id = args[argPublicPetitionLinkId] as unknown as number;
-
-    const publicPetitionLink = await ctx.petitions.loadPublicPetitionLink(id);
-
-    if (!isDefined(publicPetitionLink) || !publicPetitionLink.is_active) {
-      return false;
-    }
-
-    const [petition, fields] = await Promise.all([
-      ctx.petitions.loadPetition(publicPetitionLink.template_id),
-      ctx.petitions.loadFieldsForPetition(publicPetitionLink.template_id),
-    ]);
-
-    // petition exists and is of type template
-    if (!petition || !petition.is_template) {
-      return false;
-    }
-
-    // template has repliable fields
-    if (countBy(fields, (f) => f.type !== "HEADING") === 0) {
-      return false;
-    }
-
-    // every repliable field has a title
-    if (fields.find((f) => f.type !== "HEADING" && !isDefined(f.title))) {
-      return false;
-    }
-    return true;
   };
 }
 

@@ -4449,6 +4449,8 @@ export class PetitionRepository extends BaseRepository {
 
       await this.anonymizePetitionSignatureRequests(petitionId, t);
 
+      await this.deactivatePublicPetitionLinks(petitionId, "Worker:Anonymizer", t);
+
       await this.createEvent(
         {
           type: "PETITION_ANONYMIZED",
@@ -4593,6 +4595,18 @@ export class PetitionRepository extends BaseRepository {
     ];
 
     await this.files.deleteFileUpload(fileUploadIds, "Worker:Anonymizer", t);
+  }
+
+  private async deactivatePublicPetitionLinks(
+    petitionId: number,
+    updatedBy: string,
+    t: Knex.Transaction
+  ) {
+    await this.from("public_petition_link", t).where("template_id", petitionId).update({
+      is_active: false,
+      updated_at: this.now(),
+      updated_by: updatedBy,
+    });
   }
 
   async getPetitionStatsByFromTemplateId(fromTemplateId: number, orgId: number) {
