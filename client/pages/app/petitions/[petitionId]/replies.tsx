@@ -192,8 +192,10 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         const input = document.querySelector<HTMLTextAreaElement>(
           "#petition-replies-comments-input"
         );
-        scrollIntoView(input!, { block: "center", behavior: "smooth" });
-        input!.focus();
+        if (input) {
+          scrollIntoView(input, { block: "center", behavior: "smooth" });
+          input.focus();
+        }
       }, 150);
     }
     await updatePetitionFieldRepliesStatus(

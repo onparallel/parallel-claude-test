@@ -136,6 +136,7 @@ export function PetitionCommentsAndNotes({
               padding={2}
             >
               <GrowingTextarea
+                id="petition-replies-comments-input"
                 ref={textareaCommentRef}
                 size="md"
                 borderRadius="md"
