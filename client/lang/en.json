@@ -2580,6 +2580,11 @@
     "context": "Cancelled"
   },
   {
+    "term": "component.petition-sigatures-card.cancelled-request-error",
+    "definition": "Error sending",
+    "context": "Error sending"
+  },
+  {
     "term": "component.petition-sigatures-card.completed",
     "definition": "Completed",
     "context": "Completed"
@@ -2635,6 +2640,11 @@
     "context": "Edit signers"
   },
   {
+    "term": "component.petition-signatures-card.more-info-button",
+    "definition": "More information",
+    "context": "More information"
+  },
+  {
     "term": "component.petition-signatures-card.no-credits-left.error",
     "definition": "The eSignature could not be started due to lack of signature credits. Please <a>contact with support</a> to get more credits.",
     "context": "The eSignature could not be started due to lack of signature credits. Please <a>contact with support</a> to get more credits."
@@ -2668,6 +2678,16 @@
     "term": "component.petition-signatures-card.signature-description",
     "definition": "Generates a document and iniciates an eSignature process, through one of our integrated providers.",
     "context": "Generates a document and iniciates an eSignature process, through one of our integrated providers."
+  },
+  {
+    "term": "component.petition-signatures-card.signature-sent-toast-description",
+    "definition": "Your signature is on its way.",
+    "context": "Your signature is on its way."
+  },
+  {
+    "term": "component.petition-signatures-card.signature-sent-toast-title",
+    "definition": "eSignature sent.",
+    "context": "eSignature sent."
   },
   {
     "term": "component.petition-signatures-card.signed-document",

@@ -2547,6 +2547,7 @@ export type PetitionSignatureCancelReason =
 export interface PetitionSignatureRequest extends Timestamps {
   __typename?: "PetitionSignatureRequest";
   auditTrailFilename?: Maybe<Scalars["String"]>;
+  cancelReason?: Maybe<Scalars["String"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The environment of the petition signature. */
@@ -9935,6 +9936,7 @@ export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
   isAnonymized: boolean;
   metadata: { [key: string]: any };
   auditTrailFilename?: string | null;
+  cancelReason?: string | null;
   signerStatus: Array<{
     __typename?: "PetitionSignatureRequestSignerStatus";
     status: string;
@@ -9944,6 +9946,7 @@ export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
     declinedAt?: string | null;
     signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
   }>;
+  petition: { __typename?: "Petition"; id: string };
 };
 
 export type NewSignatureRequestRow_UserFragment = {
@@ -10012,10 +10015,12 @@ export type OlderSignatureRequestRows_PetitionSignatureRequestFragment = {
   metadata: { [key: string]: any };
   isAnonymized: boolean;
   auditTrailFilename?: string | null;
+  cancelReason?: string | null;
   signatureConfig: {
     __typename?: "SignatureConfig";
     signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string } | null>;
   };
+  petition: { __typename?: "Petition"; id: string };
 };
 
 export type PetitionAttachmentsCard_PetitionFragment = {
@@ -10192,6 +10197,12 @@ export type PetitionSignatureRequestSignerStatusIcon_SignerStatusFragment = {
   declinedAt?: string | null;
 };
 
+export type PetitionSignatureRequestStatusText_PetitionSignatureRequestFragment = {
+  __typename?: "PetitionSignatureRequest";
+  status: PetitionSignatureRequestStatus;
+  cancelReason?: string | null;
+};
+
 export type PetitionSignaturesCard_UserFragment = {
   __typename?: "User";
   firstName?: string | null;
@@ -10230,6 +10241,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
     isAnonymized: boolean;
     metadata: { [key: string]: any };
     auditTrailFilename?: string | null;
+    cancelReason?: string | null;
     signatureConfig: {
       __typename?: "SignatureConfig";
       signers: Array<{
@@ -10250,6 +10262,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
       declinedAt?: string | null;
       signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
     }>;
+    petition: { __typename?: "Petition"; id: string };
   }>;
   accesses: Array<{
     __typename?: "PetitionAccess";
@@ -10311,6 +10324,7 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
           isAnonymized: boolean;
           metadata: { [key: string]: any };
           auditTrailFilename?: string | null;
+          cancelReason?: string | null;
           signatureConfig: {
             __typename?: "SignatureConfig";
             signers: Array<{
@@ -10331,6 +10345,7 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
             declinedAt?: string | null;
             signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
           }>;
+          petition: { __typename?: "Petition"; id: string };
         }>;
         accesses: Array<{
           __typename?: "PetitionAccess";
@@ -17970,6 +17985,7 @@ export type PetitionReplies_PetitionFragment = {
     isAnonymized: boolean;
     metadata: { [key: string]: any };
     auditTrailFilename?: string | null;
+    cancelReason?: string | null;
     signatureConfig: {
       __typename?: "SignatureConfig";
       signers: Array<{
@@ -17990,6 +18006,7 @@ export type PetitionReplies_PetitionFragment = {
       declinedAt?: string | null;
       signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
     }>;
+    petition: { __typename?: "Petition"; id: string };
   }>;
   signatureConfig?: {
     __typename?: "SignatureConfig";
@@ -18297,6 +18314,7 @@ export type PetitionReplies_closePetitionMutation = {
       isAnonymized: boolean;
       metadata: { [key: string]: any };
       auditTrailFilename?: string | null;
+      cancelReason?: string | null;
       signatureConfig: {
         __typename?: "SignatureConfig";
         signers: Array<{
@@ -18317,6 +18335,7 @@ export type PetitionReplies_closePetitionMutation = {
         declinedAt?: string | null;
         signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
       }>;
+      petition: { __typename?: "Petition"; id: string };
     }>;
     signatureConfig?: {
       __typename?: "SignatureConfig";
@@ -18477,6 +18496,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       isAnonymized: boolean;
       metadata: { [key: string]: any };
       auditTrailFilename?: string | null;
+      cancelReason?: string | null;
       signatureConfig: {
         __typename?: "SignatureConfig";
         signers: Array<{
@@ -18497,6 +18517,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
         declinedAt?: string | null;
         signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
       }>;
+      petition: { __typename?: "Petition"; id: string };
     }>;
     signatureConfig?: {
       __typename?: "SignatureConfig";
@@ -18759,6 +18780,7 @@ export type PetitionReplies_petitionQuery = {
           isAnonymized: boolean;
           metadata: { [key: string]: any };
           auditTrailFilename?: string | null;
+          cancelReason?: string | null;
           signatureConfig: {
             __typename?: "SignatureConfig";
             signers: Array<{
@@ -18779,6 +18801,7 @@ export type PetitionReplies_petitionQuery = {
             declinedAt?: string | null;
             signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
           }>;
+          petition: { __typename?: "Petition"; id: string };
         }>;
         signatureConfig?: {
           __typename?: "SignatureConfig";
@@ -21299,6 +21322,7 @@ export type PetitionSignaturesCardPolling_petitionQuery = {
           isAnonymized: boolean;
           metadata: { [key: string]: any };
           auditTrailFilename?: string | null;
+          cancelReason?: string | null;
           signatureConfig: {
             __typename?: "SignatureConfig";
             signers: Array<{
@@ -21319,6 +21343,7 @@ export type PetitionSignaturesCardPolling_petitionQuery = {
             declinedAt?: string | null;
             signer: { __typename?: "PetitionSigner"; email: string; fullName: string };
           }>;
+          petition: { __typename?: "Petition"; id: string };
         }>;
         accesses: Array<{
           __typename?: "PetitionAccess";
@@ -24890,6 +24915,15 @@ export const NewSignatureRequestRow_PetitionFragmentDoc = gql`
   ${ConfirmPetitionSignersDialog_PetitionAccessFragmentDoc}
   ${ConfirmPetitionSignersDialog_PetitionSignatureRequestFragmentDoc}
 ` as unknown as DocumentNode<NewSignatureRequestRow_PetitionFragment, unknown>;
+export const PetitionSignatureRequestStatusText_PetitionSignatureRequestFragmentDoc = gql`
+  fragment PetitionSignatureRequestStatusText_PetitionSignatureRequest on PetitionSignatureRequest {
+    status
+    cancelReason
+  }
+` as unknown as DocumentNode<
+  PetitionSignatureRequestStatusText_PetitionSignatureRequestFragment,
+  unknown
+>;
 export const DatesList_SignerStatusFragmentDoc = gql`
   fragment DatesList_SignerStatus on PetitionSignatureRequestSignerStatus {
     sentAt
@@ -24913,15 +24947,20 @@ export const CurrentSignatureRequestRow_PetitionSignatureRequestFragmentDoc = gq
     id
     status
     isAnonymized
+    ...PetitionSignatureRequestStatusText_PetitionSignatureRequest
     signerStatus {
       signer {
         ...SignerReference_PetitionSigner
       }
       ...PetitionSignatureRequestSignerStatusIcon_SignerStatus
     }
+    petition {
+      id
+    }
     metadata
     auditTrailFilename
   }
+  ${PetitionSignatureRequestStatusText_PetitionSignatureRequestFragmentDoc}
   ${SignerReference_PetitionSignerFragmentDoc}
   ${PetitionSignatureRequestSignerStatusIcon_SignerStatusFragmentDoc}
 ` as unknown as DocumentNode<CurrentSignatureRequestRow_PetitionSignatureRequestFragment, unknown>;
@@ -24929,15 +24968,20 @@ export const OlderSignatureRequestRows_PetitionSignatureRequestFragmentDoc = gql
   fragment OlderSignatureRequestRows_PetitionSignatureRequest on PetitionSignatureRequest {
     id
     status
+    ...PetitionSignatureRequestStatusText_PetitionSignatureRequest
     signatureConfig {
       signers {
         ...SignerReference_PetitionSigner
       }
     }
+    petition {
+      id
+    }
     metadata
     isAnonymized
     auditTrailFilename
   }
+  ${PetitionSignatureRequestStatusText_PetitionSignatureRequestFragmentDoc}
   ${SignerReference_PetitionSignerFragmentDoc}
 ` as unknown as DocumentNode<OlderSignatureRequestRows_PetitionSignatureRequestFragment, unknown>;
 export const PetitionSignaturesCard_PetitionFragmentDoc = gql`

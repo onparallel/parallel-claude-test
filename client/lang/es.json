@@ -2580,6 +2580,11 @@
     "context": "Cancelled"
   },
   {
+    "term": "component.petition-sigatures-card.cancelled-request-error",
+    "definition": "Error al enviar",
+    "context": "Error sending"
+  },
+  {
     "term": "component.petition-sigatures-card.completed",
     "definition": "Completado",
     "context": "Completed"
@@ -2635,6 +2640,11 @@
     "context": "Edit signers"
   },
   {
+    "term": "component.petition-signatures-card.more-info-button",
+    "definition": "Más información",
+    "context": "More information"
+  },
+  {
     "term": "component.petition-signatures-card.no-credits-left.error",
     "definition": "No se ha podido iniciar el proceso de firma digital por falta de créditos de firma. Por favor, <a>contacta con soporte</a> para obtener más créditos.",
     "context": "The eSignature could not be started due to lack of signature credits. Please <a>contact with support</a> to get more credits."
@@ -2668,6 +2678,16 @@
     "term": "component.petition-signatures-card.signature-description",
     "definition": "Genera un documento e inicia un proceso de firma digital a través de uno de nuestros proveedores integrados.",
     "context": "Generates a document and iniciates an eSignature process, through one of our integrated providers."
+  },
+  {
+    "term": "component.petition-signatures-card.signature-sent-toast-description",
+    "definition": "Tu firma está en camino.",
+    "context": "Your signature is on its way."
+  },
+  {
+    "term": "component.petition-signatures-card.signature-sent-toast-title",
+    "definition": "Firma enviada.",
+    "context": "eSignature sent."
   },
   {
     "term": "component.petition-signatures-card.signed-document",

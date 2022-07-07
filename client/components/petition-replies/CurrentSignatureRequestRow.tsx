@@ -1,7 +1,8 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Heading, HStack, MenuItem, MenuList, Text } from "@chakra-ui/react";
+import { Box, Button, GridItem, Heading, HStack, MenuItem, MenuList, Text } from "@chakra-ui/react";
 import { BellIcon, DocumentIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { CurrentSignatureRequestRow_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
+import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { withError } from "@parallel/utils/promises/withError";
 import { Fragment } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
@@ -55,18 +56,20 @@ export function CurrentSignatureRequestRow({
     }
   }
 
+  const goTo = useGoToPetition();
+
   return (
     <>
-      <Box padding={2} paddingLeft={4}>
+      <GridItem padding={2} paddingLeft={4}>
         <Heading size="xs" as="h4">
           <FormattedMessage
             id="component.petition-signatures-card.status"
             defaultMessage="Status"
           />
         </Heading>
-        <PetitionSignatureRequestStatusText status={status} />
-      </Box>
-      <Box padding={2}>
+        <PetitionSignatureRequestStatusText signature={signatureRequest} />
+      </GridItem>
+      <GridItem padding={2}>
         <Heading size="xs" as="h4">
           <FormattedMessage
             id="component.petition-signatures-card.signers"
@@ -96,8 +99,8 @@ export function CurrentSignatureRequestRow({
             </Text>
           )}
         </Box>
-      </Box>
-      <Box padding={2} paddingRight={4} marginLeft="auto">
+      </GridItem>
+      <GridItem padding={2} paddingRight={4} marginLeft="auto">
         {status === "PROCESSED" && someSignerIsPending ? (
           <>
             <IconButtonWithTooltip
@@ -155,8 +158,15 @@ export function CurrentSignatureRequestRow({
               }
             />
           </HStack>
+        ) : status === "CANCELLED" ? (
+          <Button size="sm" onClick={() => goTo(signatureRequest.petition.id, "activity")}>
+            <FormattedMessage
+              id="component.petition-signatures-card.more-info-button"
+              defaultMessage="More information"
+            />
+          </Button>
         ) : null}
-      </Box>
+      </GridItem>
     </>
   );
 }
@@ -167,15 +177,20 @@ CurrentSignatureRequestRow.fragments = {
       id
       status
       isAnonymized
+      ...PetitionSignatureRequestStatusText_PetitionSignatureRequest
       signerStatus {
         signer {
           ...SignerReference_PetitionSigner
         }
         ...PetitionSignatureRequestSignerStatusIcon_SignerStatus
       }
+      petition {
+        id
+      }
       metadata
       auditTrailFilename
     }
+    ${PetitionSignatureRequestStatusText.fragments.PetitionSignatureRequest}
     ${SignerReference.fragments.PetitionSigner}
     ${PetitionSignatureRequestSignerStatusIcon.fragments.SignerStatus}
   `,

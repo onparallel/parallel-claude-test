@@ -1529,6 +1529,7 @@ export interface NexusGenFieldTypes {
   PetitionSignatureRequest: {
     // field return type
     auditTrailFilename: string | null; // String
+    cancelReason: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     environment: NexusGenEnums["SignatureOrgIntegrationEnvironment"]; // SignatureOrgIntegrationEnvironment!
     id: NexusGenScalars["GID"]; // GID!
@@ -3065,6 +3066,7 @@ export interface NexusGenFieldTypeNames {
   PetitionSignatureRequest: {
     // field return type name
     auditTrailFilename: "String";
+    cancelReason: "String";
     createdAt: "DateTime";
     environment: "SignatureOrgIntegrationEnvironment";
     id: "GID";

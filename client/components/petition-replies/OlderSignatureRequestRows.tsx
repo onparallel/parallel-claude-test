@@ -1,7 +1,8 @@
 import { gql } from "@apollo/client";
-import { Box, GridItem, Heading, HStack, MenuItem, MenuList, Text } from "@chakra-ui/react";
+import { Box, Button, GridItem, Heading, HStack, MenuItem, MenuList, Text } from "@chakra-ui/react";
 import { DocumentIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { OlderSignatureRequestRows_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
+import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { Fragment } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
@@ -20,6 +21,7 @@ export function OlderSignatureRequestRows({
   onDownload: (petitionSignatureRequestId: string, downloadAuditTrail: boolean) => void;
 }) {
   const intl = useIntl();
+  const goTo = useGoToPetition();
   return (
     <>
       <GridItem colSpan={3}>
@@ -36,10 +38,10 @@ export function OlderSignatureRequestRows({
       </GridItem>
       {signatures.map((signature, i) => (
         <Fragment key={i}>
-          <Box padding={2} paddingLeft={4}>
-            <PetitionSignatureRequestStatusText status={signature.status} />
-          </Box>
-          <GridItem padding={2} colSpan={signature.status === "COMPLETED" ? 1 : 2}>
+          <GridItem padding={2} paddingLeft={4}>
+            <PetitionSignatureRequestStatusText signature={signature} />
+          </GridItem>
+          <GridItem padding={2}>
             {signature.isAnonymized ? (
               <Text textStyle="hint">
                 <FormattedMessage id="generic.not-available" defaultMessage="Not available" />
@@ -52,9 +54,9 @@ export function OlderSignatureRequestRows({
               />
             )}
           </GridItem>
-          {signature.status === "COMPLETED" ? (
-            <Box padding={2} paddingRight={4} marginLeft="auto">
-              <HStack>
+          <GridItem padding={2} paddingRight={4} marginLeft="auto">
+            {signature.status === "COMPLETED" ? (
+              <HStack justifyContent="flex-end">
                 {signature.metadata.SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS ? (
                   <NetDocumentsIconButton
                     externalId={signature.metadata.SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS}
@@ -87,8 +89,15 @@ export function OlderSignatureRequestRows({
                   }
                 />
               </HStack>
-            </Box>
-          ) : null}
+            ) : signature.status === "CANCELLED" ? (
+              <Button size="xs" onClick={() => goTo(signature.petition.id, "activity")}>
+                <FormattedMessage
+                  id="component.petition-signatures-card.more-info-button"
+                  defaultMessage="More information"
+                />
+              </Button>
+            ) : null}
+          </GridItem>
         </Fragment>
       ))}
     </>
@@ -100,15 +109,20 @@ OlderSignatureRequestRows.fragments = {
     fragment OlderSignatureRequestRows_PetitionSignatureRequest on PetitionSignatureRequest {
       id
       status
+      ...PetitionSignatureRequestStatusText_PetitionSignatureRequest
       signatureConfig {
         signers {
           ...SignerReference_PetitionSigner
         }
       }
+      petition {
+        id
+      }
       metadata
       isAnonymized
       auditTrailFilename
     }
+    ${PetitionSignatureRequestStatusText.fragments.PetitionSignatureRequest}
     ${SignerReference.fragments.PetitionSigner}
   `,
 };

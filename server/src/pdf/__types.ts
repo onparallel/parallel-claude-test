@@ -2473,6 +2473,7 @@ export type PetitionSignatureCancelReason =
 
 export type PetitionSignatureRequest = Timestamps & {
   auditTrailFilename: Maybe<Scalars["String"]>;
+  cancelReason: Maybe<Scalars["String"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The environment of the petition signature. */

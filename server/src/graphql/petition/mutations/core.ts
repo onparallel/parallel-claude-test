@@ -1935,7 +1935,7 @@ export const completePetition = mutationField("completePetition", {
         );
       } else if (error.message === "SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED") {
         // complete the petition anyways and send signature_cancelled event for later notification to the user
-        const completedPetition = await ctx.petitions.withTransaction(async (t) => {
+        return await ctx.petitions.withTransaction(async (t) => {
           const requiredCredits = await getRequiredPetitionSendCredits(args.petitionId, 1, ctx);
           const [petition] = await Promise.all([
             ctx.petitions.completePetition(
@@ -1959,22 +1959,42 @@ export const completePetition = mutationField("completePetition", {
             },
             t
           );
+          // insert a CANCELLED signature request so user can see it on the signatures card
+          await ctx.petitions.createPetitionSignature(
+            petition.id,
+            {
+              signature_config: {
+                ...petition.signature_config,
+                additionalSignersInfo: args.additionalSigners ?? [],
+                message: args.message ?? undefined,
+              },
+              status: "CANCELLED",
+              cancel_reason: "REQUEST_ERROR",
+              cancel_data: {
+                error:
+                  "The signature request could not be started due to lack of signature credits",
+                error_code: "INSUFFICIENT_SIGNATURE_CREDITS",
+              },
+            },
+            t
+          );
+          await ctx.petitions.createEvent(
+            {
+              type: "SIGNATURE_CANCELLED",
+              data: {
+                cancel_reason: "REQUEST_ERROR",
+                cancel_data: {
+                  error:
+                    "The signature request could not be started due to lack of signature credits",
+                  error_code: "INSUFFICIENT_SIGNATURE_CREDITS",
+                },
+              },
+              petition_id: args.petitionId,
+            },
+            t
+          );
           return petition;
         });
-
-        await ctx.petitions.createEvent({
-          type: "SIGNATURE_CANCELLED",
-          data: {
-            cancel_reason: "REQUEST_ERROR",
-            cancel_data: {
-              error: "The signature request could not be started due to lack of signature credits",
-              error_code: "INSUFFICIENT_SIGNATURE_CREDITS",
-            },
-          },
-          petition_id: args.petitionId,
-        });
-
-        return completedPetition;
       } else {
         throw error;
       }

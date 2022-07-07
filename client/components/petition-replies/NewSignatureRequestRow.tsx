@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Heading, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, GridItem, Heading, Stack, Text } from "@chakra-ui/react";
 import { TimeIcon } from "@parallel/chakra/icons";
 import {
   Maybe,
@@ -65,7 +65,7 @@ export function NewSignatureRequestRow({
 
   return (
     <>
-      <Box padding={2} paddingLeft={4}>
+      <GridItem padding={2} paddingLeft={4}>
         <Heading size="xs" as="h4">
           <FormattedMessage
             id="component.petition-signatures-card.status"
@@ -81,8 +81,8 @@ export function NewSignatureRequestRow({
             />
           </Text>
         </Stack>
-      </Box>
-      <Box padding={2}>
+      </GridItem>
+      <GridItem padding={2}>
         <Heading size="xs" as="h4">
           <FormattedMessage
             id="component.petition-signatures-card.signers"
@@ -100,8 +100,8 @@ export function NewSignatureRequestRow({
             <FormattedMessage id="generic.not-specified" defaultMessage="Not specified" />
           )}
         </Box>
-      </Box>
-      <Box padding={2} paddingRight={4} marginLeft="auto">
+      </GridItem>
+      <GridItem padding={2} paddingRight={4} marginLeft="auto">
         <Flex alignItems="center">
           <Button width="24" onClick={() => onUpdateConfig(null)} isDisabled={isDisabled}>
             <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
@@ -125,7 +125,7 @@ export function NewSignatureRequestRow({
             )}
           </Button>
         </Flex>
-      </Box>
+      </GridItem>
     </>
   );
 }

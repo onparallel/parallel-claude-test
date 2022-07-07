@@ -1,14 +1,15 @@
+import { gql } from "@apollo/client";
 import { Stack, Text } from "@chakra-ui/layout";
 import { AlertCircleIcon, CheckIcon, PaperPlaneIcon, TimeIcon } from "@parallel/chakra/icons";
-import { PetitionSignatureRequestStatus } from "@parallel/graphql/__types";
+import { PetitionSignatureRequestStatusText_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 
 export function PetitionSignatureRequestStatusText({
-  status,
+  signature,
 }: {
-  status: PetitionSignatureRequestStatus;
+  signature: PetitionSignatureRequestStatusText_PetitionSignatureRequestFragment;
 }) {
-  switch (status) {
+  switch (signature.status) {
     case "ENQUEUED":
     case "PROCESSING":
       return (
@@ -39,10 +40,17 @@ export function PetitionSignatureRequestStatusText({
         <Stack direction="row" display="inline-flex" alignItems="center" color="red.500">
           <AlertCircleIcon />
           <Text>
-            <FormattedMessage
-              id="component.petition-sigatures-card.cancelled"
-              defaultMessage="Cancelled"
-            />
+            {signature.cancelReason === "REQUEST_ERROR" ? (
+              <FormattedMessage
+                id="component.petition-sigatures-card.cancelled-request-error"
+                defaultMessage="Error sending"
+              />
+            ) : (
+              <FormattedMessage
+                id="component.petition-sigatures-card.cancelled"
+                defaultMessage="Cancelled"
+              />
+            )}
           </Text>
         </Stack>
       );
@@ -60,3 +68,12 @@ export function PetitionSignatureRequestStatusText({
       );
   }
 }
+
+PetitionSignatureRequestStatusText.fragments = {
+  PetitionSignatureRequest: gql`
+    fragment PetitionSignatureRequestStatusText_PetitionSignatureRequest on PetitionSignatureRequest {
+      status
+      cancelReason
+    }
+  `,
+};

@@ -203,6 +203,19 @@ export const PetitionSignaturesCard = Object.assign(
           await startSignatureRequest({
             variables: { petitionId: petition.id, message },
           });
+          toast({
+            isClosable: true,
+            duration: 5000,
+            title: intl.formatMessage({
+              id: "component.petition-signatures-card.signature-sent-toast-title",
+              defaultMessage: "eSignature sent.",
+            }),
+            description: intl.formatMessage({
+              id: "component.petition-signatures-card.signature-sent-toast-description",
+              defaultMessage: "Your signature is on its way.",
+            }),
+            status: "success",
+          });
           await onRefetchPetition();
         } catch (error: any) {
           if (isApolloError(error, "SIGNATURIT_SHARED_APIKEY_LIMIT_REACHED")) {

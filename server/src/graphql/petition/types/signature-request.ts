@@ -75,6 +75,9 @@ export const PetitionSignatureRequest = objectType({
       type: "PetitionSignatureRequestStatus",
       description: "The status of the petition signature.",
     });
+    t.nullable.string("cancelReason", {
+      resolve: (o) => o.cancel_reason,
+    });
     t.field("environment", {
       type: "SignatureOrgIntegrationEnvironment",
       description: "The environment of the petition signature.",

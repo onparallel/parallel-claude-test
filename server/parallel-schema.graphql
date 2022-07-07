@@ -3257,6 +3257,7 @@ enum PetitionSignatureCancelReason {
 
 type PetitionSignatureRequest implements Timestamps {
   auditTrailFilename: String
+  cancelReason: String
 
   """
   Time when the resource was created.

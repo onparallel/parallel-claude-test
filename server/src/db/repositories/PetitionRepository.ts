@@ -54,6 +54,7 @@ import {
   CreatePetitionFieldReply,
   CreatePetitionMessage,
   CreatePetitionReminder,
+  CreatePetitionSignatureRequest,
   CreatePublicPetitionLink,
   FileUpload,
   OrgIntegration,
@@ -3909,14 +3910,14 @@ export class PetitionRepository extends BaseRepository {
 
   async createPetitionSignature(
     petitionId: number,
-    config: PetitionSignatureConfig,
+    data: Omit<CreatePetitionSignatureRequest, "petition_id">,
     t?: Knex.Transaction
   ) {
     const [row] = await this.insert(
       "petition_signature_request",
       {
         petition_id: petitionId,
-        signature_config: config,
+        ...data,
       },
       t
     ).returning("*");
