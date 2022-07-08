@@ -2,6 +2,7 @@ import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape } from "react-intl";
 import { Email } from "../buildEmail";
+import { Alert } from "../components/Alert";
 import { ClosingParallelTeam } from "../components/ClosingParallelTeam";
 import { GreetingUser } from "../components/Greeting";
 import { Layout, LayoutProps } from "../components/Layout";
@@ -41,7 +42,7 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
     return outdent`
       **${intl
         .formatMessage({
-          id: "generic.action-required.signature-cancelled-no-credits-left",
+          id: "signature-cancelled-no-credits-left.alert",
           defaultMessage: "You reached your plan's signatures limit",
         })
         .toUpperCase()}**
@@ -93,16 +94,12 @@ const email: Email<SignatureCancelledNoCreditsLeftEmailProps> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
         contentHeading={
-          <MjmlSection backgroundColor="#CEEDFF" borderRadius="5px" padding="10px 0">
-            <MjmlColumn>
-              <MjmlText align="center" color="#153E75" fontWeight={600} textTransform="uppercase">
-                <FormattedMessage
-                  id="generic.action-required.signature-cancelled-no-credits-left"
-                  defaultMessage="You reached your plan's signatures limit"
-                />
-              </MjmlText>
-            </MjmlColumn>
-          </MjmlSection>
+          <Alert textColor="#153E75" backgroundColor="#CEEDFF">
+            <FormattedMessage
+              id="signature-cancelled-no-credits-left.alert"
+              defaultMessage="You reached your plan's signatures limit"
+            />
+          </Alert>
         }
         theme={theme}
       >

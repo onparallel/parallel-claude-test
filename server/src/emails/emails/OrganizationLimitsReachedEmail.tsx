@@ -3,6 +3,7 @@ import outdent from "outdent";
 import { FormattedMessage, IntlShape } from "react-intl";
 import { OrganizationUsageLimitName } from "../../db/__types";
 import { Email } from "../buildEmail";
+import { Alert } from "../components/Alert";
 import { ClosingParallelTeam } from "../components/ClosingParallelTeam";
 import { GreetingUser } from "../components/Greeting";
 import { Layout, LayoutProps } from "../components/Layout";
@@ -209,37 +210,33 @@ const email: Email<OrganizationLimitsReachedEmailProps> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
         contentHeading={
-          <MjmlSection backgroundColor="#CEEDFF" borderRadius="5px" padding="10px 0">
-            <MjmlColumn>
-              <MjmlText align="center" color="#153E75" fontWeight={600} textTransform="uppercase">
-                {petitionSendTotalCreditsUsed ? (
-                  <FormattedMessage
-                    id="organization-limits-reached.parallel-send.last-credit-used-warning"
-                    defaultMessage="You have reached your plan's parallels limit"
-                  />
-                ) : signatureTotalCreditsUsed ? (
-                  <FormattedMessage
-                    id="organization-limits-reached.signaturit-shared-apikey.last-credit-used-warning"
-                    defaultMessage="You have reached your plan's signatures limit"
-                  />
-                ) : petitionSendFewCreditsRemaining ? (
-                  <FormattedMessage
-                    id="organization-limits-reached.parallel-send.few-credits-remaining-warning"
-                    defaultMessage="You have used {value, number, percent} of your parallels"
-                    values={{ value }}
-                  />
-                ) : signatureFewCreditsRemaining ? (
-                  <FormattedMessage
-                    id="organization-limits-reached.signaturit-shared-apikey.few-credits-remaining-warning"
-                    defaultMessage="You have used {value, number, percent} of your signatures"
-                    values={{ value }}
-                  />
-                ) : (
-                  (null as never)
-                )}
-              </MjmlText>
-            </MjmlColumn>
-          </MjmlSection>
+          <Alert textColor="#153E75" backgroundColor="#CEEDFF">
+            {petitionSendTotalCreditsUsed ? (
+              <FormattedMessage
+                id="organization-limits-reached.parallel-send.last-credit-used-warning"
+                defaultMessage="You have reached your plan's parallels limit"
+              />
+            ) : signatureTotalCreditsUsed ? (
+              <FormattedMessage
+                id="organization-limits-reached.signaturit-shared-apikey.last-credit-used-warning"
+                defaultMessage="You have reached your plan's signatures limit"
+              />
+            ) : petitionSendFewCreditsRemaining ? (
+              <FormattedMessage
+                id="organization-limits-reached.parallel-send.few-credits-remaining-warning"
+                defaultMessage="You have used {value, number, percent} of your parallels"
+                values={{ value }}
+              />
+            ) : signatureFewCreditsRemaining ? (
+              <FormattedMessage
+                id="organization-limits-reached.signaturit-shared-apikey.few-credits-remaining-warning"
+                defaultMessage="You have used {value, number, percent} of your signatures"
+                values={{ value }}
+              />
+            ) : (
+              (null as never)
+            )}
+          </Alert>
         }
         theme={theme}
       >

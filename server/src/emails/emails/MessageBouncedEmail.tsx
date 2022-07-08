@@ -2,6 +2,7 @@ import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
+import { Alert } from "../components/Alert";
 import { Button } from "../components/Button";
 import { ClosingParallelTeam } from "../components/ClosingParallelTeam";
 import { GreetingUser } from "../components/Greeting";
@@ -110,13 +111,9 @@ const email: Email<MessageBouncedEmailProps> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
         contentHeading={
-          <MjmlSection backgroundColor="#3182CE" borderRadius="5px" padding="10px 0">
-            <MjmlColumn>
-              <MjmlText align="center" color="white" fontWeight={600} textTransform="uppercase">
-                <FormattedMessage id="generic.action-required" defaultMessage="Action required" />
-              </MjmlText>
-            </MjmlColumn>
-          </MjmlSection>
+          <Alert>
+            <FormattedMessage id="generic.action-required" defaultMessage="Action required" />
+          </Alert>
         }
         theme={theme}
       >

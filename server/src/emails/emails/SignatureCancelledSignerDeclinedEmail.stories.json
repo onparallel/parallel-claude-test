@@ -1,0 +1,37 @@
+{
+  "title": "Emails",
+  "stories": [
+    {
+      "name": "Signature Cancelled Signer Declined",
+      "parameters": {
+        "server": {
+          "id": "emails/SignatureCancelledSignerDeclinedEmail"
+        }
+      },
+      "args": {
+        "signatureProvider": "Signaturit",
+        "userName": "Derek",
+        "signerName": "Mariano Rodriguez",
+        "signerEmail": "mariano@onparallel.com",
+        "petitionName": "KYC (Know your Customer)",
+        "petitionId": "abcdefgh",
+        "parallelUrl": "https://staging.onparallel.com",
+        "assetsUrl": "https://static-staging.onparallel.com",
+        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
+        "logoAlt": "Parallel"
+      },
+      "argTypes": {
+        "signatureProvider": { "control": { "type": "text" } },
+        "userName": { "control": { "type": "text" } },
+        "signerName": { "control": { "type": "text" } },
+        "signerEmail": { "control": { "type": "text" } },
+        "petitionName": { "control": { "type": "text" } },
+        "petitionId": { "control": { "type": "text" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}

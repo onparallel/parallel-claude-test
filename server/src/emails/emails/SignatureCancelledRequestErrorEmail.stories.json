@@ -1,0 +1,37 @@
+{
+  "title": "Emails",
+  "stories": [
+    {
+      "name": "Signature Cancelled Request Error",
+      "parameters": {
+        "server": {
+          "id": "emails/SignatureCancelledRequestErrorEmail"
+        }
+      },
+      "args": {
+        "userName": "Derek",
+        "signers": [
+          { "name": "Jon Snow", "email": "jon@thewall.com" },
+          { "name": "Ned Stark", "email": "ned@winterfell.com" },
+          { "name": "Catelyn Stark", "email": "catelyn@winterfell.com" }
+        ],
+        "petitionName": "KYC (Know your Customer)",
+        "petitionId": "abcdefgh",
+        "parallelUrl": "https://staging.onparallel.com",
+        "assetsUrl": "https://static-staging.onparallel.com",
+        "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
+        "logoAlt": "Parallel"
+      },
+      "argTypes": {
+        "userName": { "control": { "type": "text" } },
+        "signers": { "control": { "type": "object" } },
+        "petitionName": { "control": { "type": "text" } },
+        "petitionId": { "control": { "type": "text" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}

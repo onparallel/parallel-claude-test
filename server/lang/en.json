@@ -275,14 +275,14 @@
     "context": "Under the provisions of Regulation (EU) 2016/679 of the European Parliament and of the Council of April 27, 2016 regarding the protection of natural persons with regard to the processing of personal data and on the free movement of such data, you are informed that Parallel Solutions, SL has sent you this email in fulfillment of the order received for the provision of services regarding the management of information workflows. You can contact the data controller to exercise your rights."
   },
   {
+    "term": "generic.access-the-parallel-button",
+    "definition": "Access the parallel",
+    "context": "Access the parallel"
+  },
+  {
     "term": "generic.action-required",
     "definition": "Action required",
     "context": "Action required"
-  },
-  {
-    "term": "generic.action-required.signature-cancelled-no-credits-left",
-    "definition": "You reached your plan's signatures limit",
-    "context": "You reached your plan's signatures limit"
   },
   {
     "term": "generic.complete-information-button",
@@ -660,6 +660,11 @@
     "context": "We remind you that {senderName} ({senderEmail}) shared with you an access to Parallel in which there is still some information to be completed."
   },
   {
+    "term": "signature-cancelled-no-credits-left.alert",
+    "definition": "You reached your plan's signatures limit",
+    "context": "You reached your plan's signatures limit"
+  },
+  {
     "term": "signature-cancelled-no-credits-left.contact-org-user",
     "definition": "Please contact {orgContactName} (<a>{orgContactEmail}</a>) so you can start the signing process.",
     "context": "Please contact {orgContactName} (<a>{orgContactEmail}</a>) so you can start the signing process."
@@ -673,6 +678,41 @@
     "term": "signature-cancelled-no-credits-left.subject",
     "definition": "eSignature couldn't be started",
     "context": "eSignature couldn't be started"
+  },
+  {
+    "term": "signature-cancelled-request-error.alert",
+    "definition": "Error sending eSignature",
+    "context": "Error sending eSignature"
+  },
+  {
+    "term": "signature-cancelled-request-error.html-2",
+    "definition": "You can access the parallel through the following button to see more information about the error.",
+    "context": "You can access the parallel through the following button to see more information about the error."
+  },
+  {
+    "term": "signature-cancelled-request-error.subject",
+    "definition": "The eSignature could not be sent",
+    "context": "The eSignature could not be sent"
+  },
+  {
+    "term": "signature-cancelled-request-error.text",
+    "definition": "We couldn't send the document on {petitionName} sent to {signers}.",
+    "context": "We couldn't send the document on {petitionName} sent to {signers}."
+  },
+  {
+    "term": "signature-cancelled-request-error.text-2",
+    "definition": "You can access the parallel through the following link to see more information about the error.",
+    "context": "You can access the parallel through the following link to see more information about the error."
+  },
+  {
+    "term": "signature-cancelled-request-error.text-3",
+    "definition": "If the problem persists, please contact our support team via support chat.",
+    "context": "If the problem persists, please contact our support team via support chat."
+  },
+  {
+    "term": "signature-cancelled-signer-declined.text",
+    "definition": "{signerName} ({signerEmail}) has declined the signature request on {petitionName} sent through {signatureProvider}.",
+    "context": "{signerName} ({signerEmail}) has declined the signature request on {petitionName} sent through {signatureProvider}."
   },
   {
     "term": "signature-cancelled.subject",
