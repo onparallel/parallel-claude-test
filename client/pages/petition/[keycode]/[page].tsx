@@ -157,13 +157,14 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
           // go to first repliable field without replies
           let page = 1;
           const field = petition.fields.find((field, index) => {
-            if (field.type === "HEADING" && field.options.hasPageBreak) {
+            if (field.type === "HEADING" && field.options.hasPageBreak && !field.isInternal) {
               page += 1;
             }
             return (
               visibility[index] &&
               !completedFieldReplies(field).length &&
               !field.optional &&
+              !field.isInternal &&
               !field.isReadOnly
             );
           })!;
