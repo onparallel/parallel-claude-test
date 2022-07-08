@@ -19,7 +19,7 @@ const INSTANCE_TYPES = {
 };
 const KEY_NAME = "ops";
 const IMAGE_ID = "ami-0f1caa0e6a5b1eb09";
-const SECURITY_GROUP_IDS = ["sg-096e52b7831e97f1d"];
+const SECURITY_GROUP_IDS = ["sg-0486098a6131eb458"];
 const IAM_ROLE = "parallel-server";
 const SUBNET_ID = "subnet-d3cc68b9";
 const REGION = "eu-central-1";

@@ -1,8 +1,7 @@
 import AWS from "aws-sdk";
-import { run } from "./utils/run";
-import { indexBy } from "remeda";
-import Table from "cli-table3";
 import chalk from "chalk";
+import Table from "cli-table3";
+import { run } from "./utils/run";
 
 AWS.config.credentials = new AWS.SharedIniFileCredentials({
   profile: "parallel-deploy",
@@ -10,42 +9,46 @@ AWS.config.credentials = new AWS.SharedIniFileCredentials({
 AWS.config.region = "eu-central-1";
 
 const ec2 = new AWS.EC2();
-const elbv2 = new AWS.ELBv2();
+const elb = new AWS.ELB();
 
 async function main() {
-  const [r1, r2] = await Promise.all([
-    ec2
-      .describeInstances({
-        Filters: [{ Name: "tag-key", Values: ["Release"] }],
-      })
-      .promise(),
-    elbv2
-      .describeLoadBalancers({
-        Names: ["staging", "production"],
-      })
-      .promise(),
-  ]);
-  const lbs = await Promise.all(
-    r2.LoadBalancers!.map(async (lb) => {
-      const listeners = await elbv2
-        .describeListeners({
-          LoadBalancerArn: lb.LoadBalancerArn,
-        })
-        .promise();
-      const tgArn = listeners.Listeners?.find((l) => l.Protocol === "HTTPS")!.DefaultActions![0]
-        .TargetGroupArn as string;
-      const tgHealth = await elbv2
-        .describeTargetHealth({
-          TargetGroupArn: tgArn,
-        })
-        .promise();
-      return [lb.LoadBalancerName!, tgHealth.TargetHealthDescriptions![0]] as const;
+  const instances = await ec2
+    .describeInstances({
+      Filters: [{ Name: "tag-key", Values: ["Release"] }],
     })
-  );
-  const instanceToLb = indexBy(lbs, ([_, h]) => h.Target?.Id);
-  const instances = (r1.Reservations || [])
-    .flatMap((r) => r.Instances ?? [])
-    .filter((i) => i.Tags?.some((t) => t.Key === "Release"));
+    .promise()
+    .then((r) => r.Reservations!.flatMap((r) => r.Instances!));
+
+  const loadBalancers = await elb
+    .describeLoadBalancers({
+      LoadBalancerNames: ["parallel-staging", "parallel-production"],
+    })
+    .promise();
+
+  const instancesToLb: Record<string, string> = {};
+  const instancesToLbState: Record<string, string> = {};
+  for (const lb of loadBalancers.LoadBalancerDescriptions!) {
+    const descriptions = await elb
+      .describeInstanceHealth({ LoadBalancerName: lb.LoadBalancerName! })
+      .promise();
+    for (const state of descriptions.InstanceStates!) {
+      if (state.State === "InService") {
+        instancesToLb[state.InstanceId!] = lb.LoadBalancerName!;
+        if (state.Description === "Instance deregistration currently in progress.") {
+          instancesToLbState[state.InstanceId!] = "Deregistering";
+        } else if (state.Description === "N/A") {
+          instancesToLbState[state.InstanceId!] = "InService";
+        }
+      } else if (state.State === "OutOfService") {
+        if (state.Description === "Instance registration is still in progress.") {
+          instancesToLb[state.InstanceId!] = lb.LoadBalancerName!;
+          instancesToLbState[state.InstanceId!] = "Registering";
+        }
+      } else {
+        instancesToLbState[state.InstanceId!] = "Unknown";
+      }
+    }
+  }
 
   const table = new Table({
     head: [
@@ -67,23 +70,23 @@ async function main() {
       const state = (() => {
         switch (i.State?.Name) {
           case "running":
-            return chalk.green("✓ running");
+            return chalk.green("✓ Running");
           case "stopped":
-            return chalk.red("⨯ stopped");
+            return chalk.red("⨯ Stopped");
           case "terminated":
-            return chalk.red("⨯ terminated");
+            return chalk.red("⨯ Terminated");
           default:
             return chalk.yellow(i.State?.Name);
         }
       })();
       const health = (() => {
-        switch (instanceToLb[i.InstanceId!]?.[1].TargetHealth?.State) {
+        switch (instancesToLbState[i.InstanceId!]) {
+          case "InService":
+            return chalk.green("✓ InService");
           case undefined:
-            return chalk.yellow("?");
-          case "healthy":
-            return chalk.green("✓");
-          default:
             return chalk.red("⨯");
+          default:
+            return chalk.yellow(`… ${instancesToLbState[i.InstanceId!]}`);
         }
       })();
       return [
@@ -92,7 +95,7 @@ async function main() {
         i.Tags?.find((t) => t.Key === "Name")?.Value ?? chalk.gray`-`,
         i.Tags?.find((t) => t.Key === "Release")?.Value ?? chalk.gray`-`,
         state,
-        instanceToLb[i.InstanceId!]?.[0] ?? chalk.red`⨯`,
+        instancesToLb[i.InstanceId!] ?? chalk.red`⨯`,
         health,
         i.LaunchTime?.toLocaleString("en-GB"),
       ];

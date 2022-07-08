@@ -9,7 +9,7 @@ AWS.config.credentials = new AWS.SharedIniFileCredentials({
 AWS.config.region = "eu-central-1";
 
 const ec2 = new AWS.EC2();
-const elbv2 = new AWS.ELBv2();
+const elb = new AWS.ELB();
 
 async function main() {
   const { env, "dry-run": dryRun } = await yargs
@@ -24,18 +24,10 @@ async function main() {
       description: "The environment for the build",
     }).argv;
 
-  const loadBalancerArn = await elbv2
-    .describeLoadBalancers({ Names: [`parallel-${env}`] })
+  const liveInstances = await elb
+    .describeLoadBalancers({ LoadBalancerNames: [`parallel-${env}`] })
     .promise()
-    .then((r) => r.LoadBalancers![0].LoadBalancerArn!);
-  const targetGroupsArns = await elbv2
-    .describeListeners({ LoadBalancerArn: loadBalancerArn })
-    .promise()
-    .then((r) => r.Listeners!.map((l) => l.DefaultActions![0].TargetGroupArn!));
-  const liveInstancesIds = await elbv2
-    .describeTargetHealth({ TargetGroupArn: targetGroupsArns[0] })
-    .promise()
-    .then((r) => r.TargetHealthDescriptions!.map((thd) => thd.Target!.Id));
+    .then((r) => r.LoadBalancerDescriptions![0].Instances!.map((i) => i.InstanceId!));
   const instances = await ec2
     .describeInstances({
       Filters: [
@@ -47,7 +39,7 @@ async function main() {
     .then((r) => r.Reservations!.flatMap((r) => r.Instances!));
   for (const instance of instances) {
     const instanceId = instance.InstanceId!;
-    if (!liveInstancesIds.includes(instanceId)) {
+    if (!liveInstances.includes(instanceId)) {
       const instanceName = instance.Tags!.find((t) => t.Key === "Name")?.Value;
       const instanceState = instance.State!.Name;
       if (instanceState === "running") {
