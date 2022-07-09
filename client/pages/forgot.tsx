@@ -138,11 +138,9 @@ function Forgot() {
       <Flex minHeight="100vh">
         <Flex direction="column" paddingX={{ base: 6, md: 20 }} flex="1">
           <Box paddingTop={5} marginLeft={-1}>
-            <NakedLink href="/">
-              <Box as="a">
-                <Logo width="152px" />
-              </Box>
-            </NakedLink>
+            <Box as="a" href="/">
+              <Logo width="152px" />
+            </Box>
           </Box>
           <Center
             flex="1"
