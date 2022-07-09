@@ -67,6 +67,7 @@ async function main() {
       ${ipAddress} /home/ec2-user/workers.sh stop`);
         console.log((0, chalk_1.default) `Workers stopped on ${instance.InstanceId} ${instanceName}`);
     }));
+    console.log("Registering new instances on LB");
     await elb
         .registerInstancesWithLoadBalancer({
         LoadBalancerName: `parallel-${env}`,
@@ -92,6 +93,7 @@ async function main() {
             .then((r) => r.InstanceStates.every((i) => i.State === "InService"));
     }, `Waiting for new targets to become healthy`, 3000);
     if (oldInstances.length) {
+        console.log("Deregistering new instances on LB");
         await elb
             .deregisterInstancesFromLoadBalancer({
             LoadBalancerName: `parallel-${env}`,

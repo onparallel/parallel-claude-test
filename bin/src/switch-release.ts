@@ -75,6 +75,7 @@ async function main() {
     })
   );
 
+  console.log("Registering new instances on LB");
   await elb
     .registerInstancesWithLoadBalancer({
       LoadBalancerName: `parallel-${env}`,
@@ -112,6 +113,7 @@ async function main() {
   );
 
   if (oldInstances.length) {
+    console.log("Deregistering new instances on LB");
     await elb
       .deregisterInstancesFromLoadBalancer({
         LoadBalancerName: `parallel-${env}`,
