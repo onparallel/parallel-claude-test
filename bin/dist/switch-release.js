@@ -16,6 +16,7 @@ aws_sdk_1.default.config.region = "eu-central-1";
 const ec2 = new aws_sdk_1.default.EC2();
 const elb = new aws_sdk_1.default.ELB();
 const cloudfront = new aws_sdk_1.default.CloudFront();
+const OPS_DIR = "/home/ec2-user/parallel/ops/prod";
 async function main() {
     const { commit: _commit, env } = await yargs_1.default
         .usage("Usage: $0 --commit [commit] --env [env]")
@@ -64,7 +65,7 @@ async function main() {
         (0, child_process_1.execSync)(`ssh \
       -o "UserKnownHostsFile=/dev/null" \
       -o StrictHostKeyChecking=no \
-      ${ipAddress} /home/ec2-user/workers.sh stop`);
+      ${ipAddress} ${OPS_DIR}/workers.sh stop`);
         console.log((0, chalk_1.default) `Workers stopped on ${instance.InstanceId} ${instanceName}`);
     }));
     console.log("Registering new instances on LB");
@@ -121,7 +122,7 @@ async function main() {
         (0, child_process_1.execSync)(`ssh \
       -o "UserKnownHostsFile=/dev/null" \
       -o StrictHostKeyChecking=no \
-      ${ipAddress} /home/ec2-user/workers.sh start`);
+      ${ipAddress} ${OPS_DIR}/workers.sh start`);
         console.log((0, chalk_1.default) `Workers started on ${instance.InstanceId} ${instanceName}`);
     }));
 }

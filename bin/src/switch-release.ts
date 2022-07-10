@@ -13,6 +13,7 @@ AWS.config.region = "eu-central-1";
 const ec2 = new AWS.EC2();
 const elb = new AWS.ELB();
 const cloudfront = new AWS.CloudFront();
+const OPS_DIR = "/home/ec2-user/parallel/ops/prod";
 
 async function main() {
   const { commit: _commit, env } = await yargs
@@ -70,7 +71,7 @@ async function main() {
       execSync(`ssh \
       -o "UserKnownHostsFile=/dev/null" \
       -o StrictHostKeyChecking=no \
-      ${ipAddress} /home/ec2-user/workers.sh stop`);
+      ${ipAddress} ${OPS_DIR}/workers.sh stop`);
       console.log(chalk`Workers stopped on ${instance.InstanceId!} ${instanceName}`);
     })
   );
@@ -147,7 +148,7 @@ async function main() {
       execSync(`ssh \
       -o "UserKnownHostsFile=/dev/null" \
       -o StrictHostKeyChecking=no \
-      ${ipAddress} /home/ec2-user/workers.sh start`);
+      ${ipAddress} ${OPS_DIR}/workers.sh start`);
       console.log(chalk`Workers started on ${instance.InstanceId!} ${instanceName}`);
     })
   );
