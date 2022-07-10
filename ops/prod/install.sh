@@ -1,3 +1,6 @@
+COMMIT_SHA=$1
+ENV=$2
+
 # mount shared folder
 sudo mkdir -p /nfs/parallel
 sudo mount -t efs -o tls fs-05b0e1c4df3ecd227:/ /nfs/parallel
@@ -6,7 +9,7 @@ sed -i "s/#ENV#/${ENV}/g" workers.sh main/ops/prod/systemd/parallel-client.servi
 sudo sed -i "s/#COMMIT_SHA#/${COMMIT_SHA}/g" main/ops/prod/nginx/helpers/common.conf
 sudo cp main/ops/prod/systemd/* /lib/systemd/system
 sudo cp -r main/ops/prod/nginx/* /etc/nginx/
-sudo cp main/ops/prod/awslogs.conf /var/awslogs/etc/awslogs.conf
+sudo cp main/ops/prod/awslogs.conf /etc/awslogs/awslogs.conf
 
 echo 'parallel:$apr1$wY1qv83a$ErfofKvlFLeIZ4r4ijEDw/' >>.htpasswd
 sudo mv .htpasswd /etc/nginx/.htpasswd
