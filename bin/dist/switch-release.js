@@ -16,7 +16,7 @@ aws_sdk_1.default.config.region = "eu-central-1";
 const ec2 = new aws_sdk_1.default.EC2();
 const elb = new aws_sdk_1.default.ELB();
 const cloudfront = new aws_sdk_1.default.CloudFront();
-const OPS_DIR = "/home/ec2-user/parallel/ops/prod";
+const OPS_DIR = "/home/ec2-user/main/ops/prod";
 async function main() {
     const { commit: _commit, env } = await yargs_1.default
         .usage("Usage: $0 --commit [commit] --env [env]")

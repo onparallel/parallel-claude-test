@@ -13,7 +13,7 @@ AWS.config.region = "eu-central-1";
 const ec2 = new AWS.EC2();
 const elb = new AWS.ELB();
 const cloudfront = new AWS.CloudFront();
-const OPS_DIR = "/home/ec2-user/parallel/ops/prod";
+const OPS_DIR = "/home/ec2-user/main/ops/prod";
 
 async function main() {
   const { commit: _commit, env } = await yargs
