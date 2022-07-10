@@ -18,7 +18,7 @@ const INSTANCE_TYPES = {
     staging: "t2.medium",
 };
 const KEY_NAME = "ops";
-const IMAGE_ID = "ami-0f1caa0e6a5b1eb09";
+const IMAGE_ID = "ami-0e4fffc73062f3868";
 const SECURITY_GROUP_IDS = ["sg-0486098a6131eb458"];
 const IAM_ROLE = "parallel-server";
 const SUBNET_ID = "subnet-d3cc68b9";
@@ -96,11 +96,11 @@ async function main() {
     (0, child_process_1.execSync)(`scp \
     -o "UserKnownHostsFile=/dev/null" \
     -o "StrictHostKeyChecking=no" \
-    ${OPS_DIR}/{install.sh,workers.sh} ${ipAddress}:/home/ec2-user/`);
+    ${OPS_DIR}/bootstrap.sh ${ipAddress}:/home/ec2-user/`);
     (0, child_process_1.execSync)(`ssh \
     -o "UserKnownHostsFile=/dev/null" \
     -o StrictHostKeyChecking=no \
-    ${ipAddress} /home/ec2-user/install.sh ${commit} ${env}`);
+    ${ipAddress} /home/ec2-user/bootstrap.sh ${commit} ${env}`);
 }
 (0, run_1.run)(main);
 async function waitForInstance(ipAddress) {
