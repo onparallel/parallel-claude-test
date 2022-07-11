@@ -41,14 +41,15 @@ export class PrintPdfRunner extends TaskRunner<"PRINT_PDF"> {
       }
 
       let documentTitle: Maybe<string> = null;
-      // if the task was started by a recipient, the title of the PDF should be the message subject instead of the petition name
       if (isDefined(this.task.petition_access_id)) {
+        // if the task was started by a recipient, the title of the PDF should be the message subject
         const [firstMessage] = await this.ctx.petitions.loadMessagesByPetitionAccessId(
           this.task.petition_access_id
         );
         documentTitle = firstMessage?.email_subject ?? null;
       } else {
-        documentTitle = petition.name;
+        // if started by an user, use the title of the signing document or no title at all
+        documentTitle = petition.signature_config?.title ?? null;
       }
 
       await this.onProgress(25);
