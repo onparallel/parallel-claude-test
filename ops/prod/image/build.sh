@@ -30,7 +30,8 @@ yum install -y \
 
 function download_and_untar() {
   curl --silent --location --output $1.tar.gz $2
-  tar -xvf $1.tar.gz 
+  mkdir $1
+  tar -xvf $1.tar.gz --directory $1 --strip-components 1
   rm $1.tar.gz
 }
 
