@@ -6,7 +6,7 @@ import {
   ForgotPasswordForm,
 } from "@parallel/components/auth/ForgotPasswordForm";
 import { PasswordResetData, PasswordResetForm } from "@parallel/components/auth/PasswordResetForm";
-import { NakedLink, NormalLink } from "@parallel/components/common/Link";
+import { NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { withApolloData } from "@parallel/components/common/withApolloData";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
