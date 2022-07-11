@@ -290,7 +290,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
                       value={value}
                       isInvalid={!!errors.color}
                     />
-                    <FormControl height="40px">
+                    <FormControl height="40px" width="auto">
                       <ColorInput
                         width="40px"
                         minWidth="40px"
