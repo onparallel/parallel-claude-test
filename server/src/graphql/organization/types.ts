@@ -59,7 +59,7 @@ export const OrganizationTheme = objectType({
     t.globalId("id");
     t.nonNull.string("name");
     t.nonNull.boolean("isDefault", { resolve: (o) => o.is_default ?? false });
-    t.nonNull.boolean("isDirty", {
+    t.nonNull.boolean("isCustomized", {
       resolve: (o) => {
         if (o.type === "PDF_DOCUMENT") {
           const fontKeys = [

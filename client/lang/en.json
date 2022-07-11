@@ -4920,6 +4920,11 @@
     "context": "Yes, delete"
   },
   {
+    "term": "generic.confirm-restore-button",
+    "definition": "Yes, restore",
+    "context": "Yes, restore"
+  },
+  {
     "term": "generic.confirm-send",
     "definition": "Yes, send",
     "context": "Yes, send"
@@ -7018,6 +7023,16 @@
     "term": "petition.confirm-delete-theme.header",
     "definition": "Delete theme",
     "context": "Delete theme"
+  },
+  {
+    "term": "petition.confirm-reset-theme.body",
+    "definition": "If you proceed all font settings will revert to the default value.",
+    "context": "If you proceed all font settings will revert to the default value."
+  },
+  {
+    "term": "petition.confirm-reset-theme.header",
+    "definition": "Restore defaults",
+    "context": "Restore defaults"
   },
   {
     "term": "petition.contents",

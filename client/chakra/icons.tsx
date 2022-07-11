@@ -2115,3 +2115,21 @@ export const DocumentIcon = createIcon({
     </g>
   ),
 });
+
+export const SaveIcon = createIcon({
+  displayName: "SaveIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      stroke="currentColor"
+    >
+      <path d="m19.7778 22h-15.55558c-.58937 0-1.1546-.2341-1.57135-.6509-.41674-.4167-.65087-.982-.65087-1.5713v-15.55558c0-.58937.23413-1.1546.65087-1.57135.41675-.41674.98198-.65087 1.57135-.65087h12.22218l5.5556 5.55556v12.22224c0 .5893-.2341 1.1546-.6509 1.5713-.4167.4168-.982.6509-1.5713.6509z" />
+      <path d="m17.5554 22v-8.8889h-11.11106v8.8889" />
+      <path d="m6.44434 2v5.55556h8.88886" />
+    </g>
+  ),
+});

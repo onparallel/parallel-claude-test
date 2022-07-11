@@ -1800,8 +1800,8 @@ export interface OrganizationTheme {
   __typename?: "OrganizationTheme";
   data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  isCustomized: Scalars["Boolean"];
   isDefault: Scalars["Boolean"];
-  isDirty: Scalars["Boolean"];
   name: Scalars["String"];
 }
 
@@ -5427,8 +5427,8 @@ export type BrandingDocumentTheme_UserFragment = {
         id: string;
         name: string;
         isDefault: boolean;
+        isCustomized: boolean;
         data: { [key: string]: any };
-        isDirty: boolean;
       }>;
     };
   };
@@ -5441,6 +5441,7 @@ export type BrandingDocumentTheme_OrganizationThemeListFragment = {
     id: string;
     name: string;
     isDefault: boolean;
+    isCustomized: boolean;
     data: { [key: string]: any };
   }>;
 };
@@ -5461,6 +5462,7 @@ export type BrandingDocumentTheme_createOrganizationPdfDocumentThemeMutation = {
         id: string;
         name: string;
         isDefault: boolean;
+        isCustomized: boolean;
         data: { [key: string]: any };
       }>;
     };
@@ -5480,7 +5482,7 @@ export type BrandingDocumentTheme_updateOrganizationPdfDocumentThemeMutation = {
       __typename?: "OrganizationThemeList";
       pdfDocument: Array<{
         __typename?: "OrganizationTheme";
-        isDirty: boolean;
+        isCustomized: boolean;
         id: string;
         name: string;
         isDefault: boolean;
@@ -5505,6 +5507,7 @@ export type BrandingDocumentTheme_deleteOrganizationPdfDocumentThemeMutation = {
         id: string;
         name: string;
         isDefault: boolean;
+        isCustomized: boolean;
         data: { [key: string]: any };
       }>;
     };
@@ -5519,7 +5522,7 @@ export type BrandingDocumentTheme_restoreDefaultOrganizationPdfDocumentThemeFont
 export type BrandingDocumentTheme_restoreDefaultOrganizationPdfDocumentThemeFontsMutation = {
   restoreDefaultOrganizationPdfDocumentThemeFonts: {
     __typename?: "OrganizationTheme";
-    isDirty: boolean;
+    isCustomized: boolean;
     id: string;
     data: { [key: string]: any };
   };
@@ -5592,7 +5595,7 @@ export type DocumentThemeEditor_OrganizationThemeFragment = {
   __typename?: "OrganizationTheme";
   id: string;
   data: { [key: string]: any };
-  isDirty: boolean;
+  isCustomized: boolean;
 };
 
 export type DocumentThemePreview_OrganizationFragment = {
@@ -12262,8 +12265,8 @@ export type OrganizationBranding_userQuery = {
           id: string;
           name: string;
           isDefault: boolean;
+          isCustomized: boolean;
           data: { [key: string]: any };
-          isDirty: boolean;
         }>;
       };
     };
@@ -22203,6 +22206,7 @@ export const BrandingDocumentTheme_OrganizationThemeListFragmentDoc = gql`
       id
       name
       isDefault
+      isCustomized
       ...DocumentThemePreview_OrganizationTheme
     }
   }
@@ -22212,7 +22216,7 @@ export const DocumentThemeEditor_OrganizationThemeFragmentDoc = gql`
   fragment DocumentThemeEditor_OrganizationTheme on OrganizationTheme {
     id
     data
-    isDirty
+    isCustomized
   }
 ` as unknown as DocumentNode<DocumentThemeEditor_OrganizationThemeFragment, unknown>;
 export const BrandingDocumentTheme_UserFragmentDoc = gql`
@@ -26278,7 +26282,7 @@ export const BrandingDocumentTheme_updateOrganizationPdfDocumentThemeDocument = 
       themes {
         ...BrandingDocumentTheme_OrganizationThemeList
         pdfDocument {
-          isDirty
+          isCustomized
         }
       }
     }
@@ -26308,7 +26312,7 @@ export const BrandingDocumentTheme_restoreDefaultOrganizationPdfDocumentThemeFon
   ) {
     restoreDefaultOrganizationPdfDocumentThemeFonts(orgThemeId: $orgThemeId) {
       ...DocumentThemePreview_OrganizationTheme
-      isDirty
+      isCustomized
     }
   }
   ${DocumentThemePreview_OrganizationThemeFragmentDoc}

@@ -32,6 +32,7 @@ interface DocumentThemeEditorProps {
   theme: DocumentThemeEditor_OrganizationThemeFragment;
   onChange: (data: DocumentThemeEditor_OrganizationThemeFragment["data"]) => Promise<void>;
   onResetFonts: () => Promise<void>;
+  onInvalid: (isInvalid: boolean) => void;
   isDisabled?: boolean;
 }
 
@@ -39,6 +40,7 @@ export function DocumentThemeEditor({
   theme,
   onChange,
   onResetFonts,
+  onInvalid,
   isDisabled,
 }: DocumentThemeEditorProps) {
   const intl = useIntl();
@@ -56,17 +58,28 @@ export function DocumentThemeEditor({
   useEffect(() => {
     setColorState(pick(theme.data, ["textColor", "title1Color", "title2Color"]));
     setColorError({});
-  }, [theme.id]);
+  }, [theme]);
 
   const [colorError, setColorError] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (Object.keys(colorError).length === 0) {
+      onInvalid(false);
+    } else {
+      onInvalid(true);
+    }
+  }, [colorError]);
+
   async function handleColorChange(colorKey: string, color: string) {
     try {
       if (colorState[colorKey] === color) return;
       setColorState({ ...colorState, [colorKey]: color });
       const isError = !/^#[a-f\d]{6}$/i.test(color);
-      setColorError({ ...colorError, [colorKey]: isError });
+
       if (!isError) {
         await onChange({ [colorKey]: color });
+      } else {
+        setColorError({ ...colorError, [colorKey]: isError });
       }
     } catch (error) {
       if (isApolloError(error, "ARG_VALIDATION_ERROR")) {
@@ -75,12 +88,6 @@ export function DocumentThemeEditor({
         }
       }
     }
-  }
-
-  function handleResetFonts() {
-    setColorError({});
-    setColorState({ textColor: "#000000", title1Color: "#000000", title2Color: "#000000" });
-    onResetFonts();
   }
 
   const locales = useSupportedLocales();
@@ -265,7 +272,7 @@ export function DocumentThemeEditor({
         ))}
       </Stack>
       <HStack justifyContent="flex-end">
-        <Button variant="link" onClick={handleResetFonts} isDisabled={!theme.isDirty}>
+        <Button variant="link" onClick={onResetFonts} isDisabled={!theme.isCustomized}>
           <FormattedMessage
             id="component.document-theme-editor.restore-defaults"
             defaultMessage="Restore defaults"
@@ -321,7 +328,7 @@ DocumentThemeEditor.fragments = {
     fragment DocumentThemeEditor_OrganizationTheme on OrganizationTheme {
       id
       data
-      isDirty
+      isCustomized
     }
   `,
 };

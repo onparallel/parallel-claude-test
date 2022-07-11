@@ -2001,8 +2001,8 @@ enum OrganizationStatus {
 type OrganizationTheme {
   data: JSONObject!
   id: GID!
+  isCustomized: Boolean!
   isDefault: Boolean!
-  isDirty: Boolean!
   name: String!
 }
 

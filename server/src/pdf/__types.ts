@@ -1762,8 +1762,8 @@ export type OrganizationStatus =
 export type OrganizationTheme = {
   data: Scalars["JSONObject"];
   id: Scalars["GID"];
+  isCustomized: Scalars["Boolean"];
   isDefault: Scalars["Boolean"];
-  isDirty: Scalars["Boolean"];
   name: Scalars["String"];
 };
 

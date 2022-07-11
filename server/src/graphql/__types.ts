@@ -1196,8 +1196,8 @@ export interface NexusGenFieldTypes {
     // field return type
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
+    isCustomized: boolean; // Boolean!
     isDefault: boolean; // Boolean!
-    isDirty: boolean; // Boolean!
     name: string; // String!
   };
   OrganizationThemeList: {
@@ -2737,8 +2737,8 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     data: "JSONObject";
     id: "GID";
+    isCustomized: "Boolean";
     isDefault: "Boolean";
-    isDirty: "Boolean";
     name: "String";
   };
   OrganizationThemeList: {
