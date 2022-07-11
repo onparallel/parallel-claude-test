@@ -5319,6 +5319,50 @@ export type SignatureCompletedUserNotification_SignatureCompletedUserNotificatio
     | { __typename?: "PetitionTemplate"; id: string; name?: string | null };
 };
 
+export type BrandingGeneral_UserFragment = {
+  __typename?: "User";
+  id: string;
+  role: OrganizationRole;
+  fullName?: string | null;
+  hasRemovedParallelBranding: boolean;
+  organization: {
+    __typename?: "Organization";
+    id: string;
+    name: string;
+    preferredTone: Tone;
+    brandTheme?: { [key: string]: any } | null;
+    logoUrl?: string | null;
+  };
+};
+
+export type BrandingGeneral_updateOrgLogoMutationVariables = Exact<{
+  file: Scalars["Upload"];
+}>;
+
+export type BrandingGeneral_updateOrgLogoMutation = {
+  updateOrganizationLogo: { __typename?: "Organization"; id: string; logoUrl?: string | null };
+};
+
+export type BrandingGeneral_updateOrganizationPreferredToneMutationVariables = Exact<{
+  tone: Tone;
+}>;
+
+export type BrandingGeneral_updateOrganizationPreferredToneMutation = {
+  updateOrganizationPreferredTone: { __typename?: "Organization"; id: string; preferredTone: Tone };
+};
+
+export type BrandingGeneral_updateOrganizationBrandThemeMutationVariables = Exact<{
+  data: OrganizationBrandThemeInput;
+}>;
+
+export type BrandingGeneral_updateOrganizationBrandThemeMutation = {
+  updateOrganizationBrandTheme: {
+    __typename?: "Organization";
+    id: string;
+    brandTheme?: { [key: string]: any } | null;
+  };
+};
+
 export type BrandingGeneralForm_updateOrgLogoMutationVariables = Exact<{
   file: Scalars["Upload"];
 }>;
@@ -21943,20 +21987,6 @@ export const NotificationsDrawer_PetitionUserNotificationFragmentDoc = gql`
   }
   ${NotificationsList_PetitionUserNotificationFragmentDoc}
 ` as unknown as DocumentNode<NotificationsDrawer_PetitionUserNotificationFragment, unknown>;
-export const BrandingGeneralForm_UserFragmentDoc = gql`
-  fragment BrandingGeneralForm_User on User {
-    id
-    role
-    hasRemovedParallelBranding: hasFeatureFlag(featureFlag: REMOVE_PARALLEL_BRANDING)
-    organization {
-      id
-      name
-      preferredTone
-      brandTheme
-      logoUrl(options: { resize: { width: 600 } })
-    }
-  }
-` as unknown as DocumentNode<BrandingGeneralForm_UserFragment, unknown>;
 export const OverrideWithOrganizationTheme_OrganizationFragmentDoc = gql`
   fragment OverrideWithOrganizationTheme_Organization on Organization {
     id
@@ -21975,6 +22005,36 @@ export const BrandingGeneralPreview_UserFragmentDoc = gql`
   }
   ${OverrideWithOrganizationTheme_OrganizationFragmentDoc}
 ` as unknown as DocumentNode<BrandingGeneralPreview_UserFragment, unknown>;
+export const BrandingGeneral_UserFragmentDoc = gql`
+  fragment BrandingGeneral_User on User {
+    id
+    role
+    hasRemovedParallelBranding: hasFeatureFlag(featureFlag: REMOVE_PARALLEL_BRANDING)
+    organization {
+      id
+      name
+      preferredTone
+      brandTheme
+      logoUrl(options: { resize: { width: 600 } })
+    }
+    ...BrandingGeneralPreview_User
+  }
+  ${BrandingGeneralPreview_UserFragmentDoc}
+` as unknown as DocumentNode<BrandingGeneral_UserFragment, unknown>;
+export const BrandingGeneralForm_UserFragmentDoc = gql`
+  fragment BrandingGeneralForm_User on User {
+    id
+    role
+    hasRemovedParallelBranding: hasFeatureFlag(featureFlag: REMOVE_PARALLEL_BRANDING)
+    organization {
+      id
+      name
+      preferredTone
+      brandTheme
+      logoUrl(options: { resize: { width: 600 } })
+    }
+  }
+` as unknown as DocumentNode<BrandingGeneralForm_UserFragment, unknown>;
 export const DocumentThemeEditor_OrganizationFragmentDoc = gql`
   fragment DocumentThemeEditor_Organization on Organization {
     id
@@ -25957,6 +26017,39 @@ export const NotificationsDrawer_notificationsDocument = gql`
   NotificationsDrawer_notificationsQuery,
   NotificationsDrawer_notificationsQueryVariables
 >;
+export const BrandingGeneral_updateOrgLogoDocument = gql`
+  mutation BrandingGeneral_updateOrgLogo($file: Upload!) {
+    updateOrganizationLogo(file: $file) {
+      id
+      logoUrl(options: { resize: { width: 600 } })
+    }
+  }
+` as unknown as DocumentNode<
+  BrandingGeneral_updateOrgLogoMutation,
+  BrandingGeneral_updateOrgLogoMutationVariables
+>;
+export const BrandingGeneral_updateOrganizationPreferredToneDocument = gql`
+  mutation BrandingGeneral_updateOrganizationPreferredTone($tone: Tone!) {
+    updateOrganizationPreferredTone(tone: $tone) {
+      id
+      preferredTone
+    }
+  }
+` as unknown as DocumentNode<
+  BrandingGeneral_updateOrganizationPreferredToneMutation,
+  BrandingGeneral_updateOrganizationPreferredToneMutationVariables
+>;
+export const BrandingGeneral_updateOrganizationBrandThemeDocument = gql`
+  mutation BrandingGeneral_updateOrganizationBrandTheme($data: OrganizationBrandThemeInput!) {
+    updateOrganizationBrandTheme(data: $data) {
+      id
+      brandTheme
+    }
+  }
+` as unknown as DocumentNode<
+  BrandingGeneral_updateOrganizationBrandThemeMutation,
+  BrandingGeneral_updateOrganizationBrandThemeMutationVariables
+>;
 export const BrandingGeneralForm_updateOrgLogoDocument = gql`
   mutation BrandingGeneralForm_updateOrgLogo($file: Upload!) {
     updateOrganizationLogo(file: $file) {
@@ -27410,15 +27503,13 @@ export const OrganizationBranding_userDocument = gql`
         ...DocumentThemePreview_Organization
         ...DocumentThemeEditor_Organization
       }
-      ...BrandingGeneralForm_User
-      ...BrandingGeneralPreview_User
+      ...BrandingGeneral_User
     }
   }
   ${SettingsLayout_QueryFragmentDoc}
   ${DocumentThemePreview_OrganizationFragmentDoc}
   ${DocumentThemeEditor_OrganizationFragmentDoc}
-  ${BrandingGeneralForm_UserFragmentDoc}
-  ${BrandingGeneralPreview_UserFragmentDoc}
+  ${BrandingGeneral_UserFragmentDoc}
 ` as unknown as DocumentNode<
   OrganizationBranding_userQuery,
   OrganizationBranding_userQueryVariables

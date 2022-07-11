@@ -27,7 +27,10 @@ export function OverrideWithOrganizationTheme({
     },
     colors: {
       ...theme.colors,
-      primary: brand?.color ? generateOrganizationPallete(brand.color) : theme.colors.primary,
+      primary:
+        brand?.color && /^#[a-f\d]{6}$/i.test(brand?.color)
+          ? generateOrganizationPallete(brand.color)
+          : theme.colors.primary,
     },
   });
 

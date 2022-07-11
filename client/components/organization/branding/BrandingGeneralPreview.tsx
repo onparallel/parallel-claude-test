@@ -10,17 +10,27 @@ import {
   Text,
   UnorderedList,
 } from "@chakra-ui/react";
-import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
-import { BrandingGeneralPreview_UserFragment } from "@parallel/graphql/__types";
+import {
+  OrganizationBrand,
+  OverrideWithOrganizationTheme,
+} from "@parallel/components/common/OverrideWithOrganizationTheme";
+import { BrandingGeneralPreview_UserFragment, Maybe, Tone } from "@parallel/graphql/__types";
+import { useMemo } from "react";
 import { FormattedMessage } from "react-intl";
 
 interface BrandingGeneralPreviewProps {
   user: BrandingGeneralPreview_UserFragment;
+  brand: OrganizationBrand;
+  tone: Tone;
+  logo: Maybe<File> | string;
 }
 
-export function BrandingGeneralPreview({ user }: BrandingGeneralPreviewProps) {
-  const logoSrc =
-    user.organization.logoUrl ?? `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/emails/logo.png`;
+export function BrandingGeneralPreview({ user, brand, tone, logo }: BrandingGeneralPreviewProps) {
+  const objectUrl = useMemo(() => {
+    return logo && typeof logo !== "string"
+      ? URL.createObjectURL(logo)
+      : logo ?? `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/emails/logo.png`;
+  }, [logo]);
 
   return (
     <Box width="100%" paddingBottom={8}>
@@ -54,10 +64,7 @@ export function BrandingGeneralPreview({ user }: BrandingGeneralPreviewProps) {
         </Box>
 
         <Stack padding={8} spacing={5} id="branding-preview" fontFamily="body">
-          <OverrideWithOrganizationTheme
-            cssVarsRoot="#branding-preview"
-            brand={user.organization.brandTheme}
-          >
+          <OverrideWithOrganizationTheme cssVarsRoot="#branding-preview" brand={brand}>
             <Stack>
               <Center minHeight="100px">
                 <Image
@@ -65,21 +72,21 @@ export function BrandingGeneralPreview({ user }: BrandingGeneralPreviewProps) {
                   height="100px"
                   objectFit="contain"
                   alt={user.organization.name}
-                  src={logoSrc}
+                  src={objectUrl}
                 />
               </Center>
               <Text>
                 <FormattedMessage
                   id="component.branding-general-preview.greetings"
                   defaultMessage="{tone, select, INFORMAL{🔔 Hello <b>[Recipient Name]</b>!} other{Dear <b>[Recipient Name]</b>,}}"
-                  values={{ tone: user.organization.preferredTone }}
+                  values={{ tone }}
                 />
               </Text>
               <Text>
                 <FormattedMessage
                   id="component.branding-general-preview.body"
                   defaultMessage="We remind you that <b>{name}</b> sent you a parallel and some of the requested information has not yet been submitted."
-                  values={{ tone: user.organization.preferredTone, name: user.fullName }}
+                  values={{ tone, name: user.fullName }}
                 />
               </Text>
             </Stack>
@@ -103,7 +110,7 @@ export function BrandingGeneralPreview({ user }: BrandingGeneralPreviewProps) {
                 <FormattedMessage
                   id="component.branding-general-preview.pending-fields"
                   defaultMessage="{tone, select, INFORMAL{You have 12/40 fields pending} other{There are currently 12/40 fields pending}}"
-                  values={{ tone: user.organization.preferredTone }}
+                  values={{ tone }}
                 />
               </ListItem>
             </UnorderedList>

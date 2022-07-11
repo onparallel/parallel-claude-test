@@ -1,20 +1,19 @@
 import { gql } from "@apollo/client";
 import { Heading, Stack, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { BrandingGeneral } from "@parallel/components/organization/branding/BrandingGeneral";
 import { DocumentThemeEditor } from "@parallel/components/organization/branding/DocumentThemeEditor";
 import { DocumentThemePreview } from "@parallel/components/organization/branding/DocumentThemePreview";
-import { BrandingGeneralForm } from "@parallel/components/organization/branding/BrandingGeneralForm";
-import { BrandingGeneralPreview } from "@parallel/components/organization/branding/BrandingGeneralPreview";
 import { OrganizationBranding_userDocument } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useQueryState, useQueryStateSlice, values } from "@parallel/utils/queryState";
+import { isAdmin } from "@parallel/utils/roles";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isAdmin } from "@parallel/utils/roles";
-import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
 
 const styles = ["general", "document"] as ("general" | "document")[];
 const QUERY_STATE = {
@@ -85,15 +84,7 @@ function OrganizationBranding() {
         </TabList>
         <TabPanels>
           <TabPanel padding={0}>
-            <Stack
-              padding={6}
-              flexDirection={{ base: "column", xl: "row" }}
-              gridGap={{ base: 8, xl: 16 }}
-              paddingBottom={16}
-            >
-              <BrandingGeneralForm user={me} />
-              <BrandingGeneralPreview user={me} />
-            </Stack>
+            <BrandingGeneral user={me} />
           </TabPanel>
           <TabPanel padding={0}>
             <Stack
@@ -129,15 +120,13 @@ OrganizationBranding.queries = [
           ...DocumentThemePreview_Organization
           ...DocumentThemeEditor_Organization
         }
-        ...BrandingGeneralForm_User
-        ...BrandingGeneralPreview_User
+        ...BrandingGeneral_User
       }
     }
     ${SettingsLayout.fragments.Query}
     ${DocumentThemePreview.fragments.Organization}
     ${DocumentThemeEditor.fragments.Organization}
-    ${BrandingGeneralForm.fragments.User}
-    ${BrandingGeneralPreview.fragments.User}
+    ${BrandingGeneral.fragments.User}
   `,
 ];
 

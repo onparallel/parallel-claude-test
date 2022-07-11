@@ -210,31 +210,6 @@
     "context": "Preview"
   },
   {
-    "term": "component.branding-general-form.main-font",
-    "definition": "Main font",
-    "context": "Main font"
-  },
-  {
-    "term": "component.branding-general-form.main-font-help",
-    "definition": "This font will be used in your emails and petitions. The list includes only secure fonts for all email clients.",
-    "context": "This font will be used in your emails and petitions. The list includes only secure fonts for all email clients."
-  },
-  {
-    "term": "component.branding-general-form.primary-color",
-    "definition": "Primary color",
-    "context": "Primary color"
-  },
-  {
-    "term": "component.branding-general-form.primary-color-help",
-    "definition": "This color will be used in the buttons and links of your messages and petitions with recipient.",
-    "context": "This color will be used in the buttons and links of your messages and petitions with recipient."
-  },
-  {
-    "term": "component.branding-general-form.primary-color-warning",
-    "definition": "The color you have entered is too light. We recommend using a darker color to improve readability.",
-    "context": "The color you have entered is too light. We recommend using a darker color to improve readability."
-  },
-  {
     "term": "component.branding-general-preview.body",
     "definition": "We remind you that <b>{name}</b> sent you a parallel and some of the requested information has not yet been submitted.",
     "context": "We remind you that <b>{name}</b> sent you a parallel and some of the requested information has not yet been submitted."
@@ -263,6 +238,36 @@
     "term": "component.branding-general-preview.pending-fields",
     "definition": "{tone, select, INFORMAL{You have 12/40 fields pending} other{There are currently 12/40 fields pending}}",
     "context": "{tone, select, INFORMAL{You have 12/40 fields pending} other{There are currently 12/40 fields pending}}"
+  },
+  {
+    "term": "component.branding-general.main-font",
+    "definition": "Main font",
+    "context": "Main font"
+  },
+  {
+    "term": "component.branding-general.main-font-help",
+    "definition": "This font will be used in your emails and petitions. The list includes only secure fonts for all email clients.",
+    "context": "This font will be used in your emails and petitions. The list includes only secure fonts for all email clients."
+  },
+  {
+    "term": "component.branding-general.primary-color",
+    "definition": "Primary color",
+    "context": "Primary color"
+  },
+  {
+    "term": "component.branding-general.primary-color-help",
+    "definition": "This color will be used in the buttons and links of your messages and petitions with recipient.",
+    "context": "This color will be used in the buttons and links of your messages and petitions with recipient."
+  },
+  {
+    "term": "component.branding-general.primary-color-warning",
+    "definition": "The color you have entered is too light. We recommend using a darker color to improve readability.",
+    "context": "The color you have entered is too light. We recommend using a darker color to improve readability."
+  },
+  {
+    "term": "component.branding-general.save-changes",
+    "definition": "Save changes",
+    "context": "Save changes"
   },
   {
     "term": "component.burger-button.label-close",

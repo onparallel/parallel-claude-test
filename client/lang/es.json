@@ -210,31 +210,6 @@
     "context": "Preview"
   },
   {
-    "term": "component.branding-general-form.main-font",
-    "definition": "Fuente principal",
-    "context": "Main font"
-  },
-  {
-    "term": "component.branding-general-form.main-font-help",
-    "definition": "Esta fuente se utilizará en tus mensajes y peticiones con destinatario. El listado incluye solo fuentes seguras para todos los clientes de correo.",
-    "context": "This font will be used in your emails and petitions. The list includes only secure fonts for all email clients."
-  },
-  {
-    "term": "component.branding-general-form.primary-color",
-    "definition": "Color principal",
-    "context": "Primary color"
-  },
-  {
-    "term": "component.branding-general-form.primary-color-help",
-    "definition": "Este color se utilizará en los botones y enlaces de tus mensajes y peticiones con destinatario.",
-    "context": "This color will be used in the buttons and links of your messages and petitions with recipient."
-  },
-  {
-    "term": "component.branding-general-form.primary-color-warning",
-    "definition": "El color que has introducido es demasiado claro. Recomendamos utilizar un color más oscuro para mejorar la legibilidad.",
-    "context": "The color you have entered is too light. We recommend using a darker color to improve readability."
-  },
-  {
     "term": "component.branding-general-preview.body",
     "definition": "{tone, select, INFORMAL{Te recordamos que <b>{name}</b> te compartió un acceso a Parallel en el que queda información pendiente de completar.} other{Le recordamos que <b>[Tu nombre]</b> le envió un parallel en el que queda información pendiente de completar.}}",
     "context": "We remind you that <b>{name}</b> sent you a parallel and some of the requested information has not yet been submitted."
@@ -263,6 +238,36 @@
     "term": "component.branding-general-preview.pending-fields",
     "definition": "{tone, select, INFORMAL{En este momento hay 12/40 campos pendientes} other{Tiene 12/40 campos pendientes}}",
     "context": "{tone, select, INFORMAL{You have 12/40 fields pending} other{There are currently 12/40 fields pending}}"
+  },
+  {
+    "term": "component.branding-general.main-font",
+    "definition": "Fuente principal",
+    "context": "Main font"
+  },
+  {
+    "term": "component.branding-general.main-font-help",
+    "definition": "Esta fuente se utilizará en tus mensajes y peticiones con destinatario. El listado incluye solo fuentes seguras para todos los clientes de correo.",
+    "context": "This font will be used in your emails and petitions. The list includes only secure fonts for all email clients."
+  },
+  {
+    "term": "component.branding-general.primary-color",
+    "definition": "Color principal",
+    "context": "Primary color"
+  },
+  {
+    "term": "component.branding-general.primary-color-help",
+    "definition": "Este color se utilizará en los botones y enlaces de tus mensajes y peticiones con destinatario.",
+    "context": "This color will be used in the buttons and links of your messages and petitions with recipient."
+  },
+  {
+    "term": "component.branding-general.primary-color-warning",
+    "definition": "El color que has introducido es demasiado claro. Recomendamos utilizar un color más oscuro para mejorar la legibilidad.",
+    "context": "The color you have entered is too light. We recommend using a darker color to improve readability."
+  },
+  {
+    "term": "component.branding-general.save-changes",
+    "definition": "Guardar cambios",
+    "context": "Save changes"
   },
   {
     "term": "component.burger-button.label-close",
