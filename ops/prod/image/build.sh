@@ -26,7 +26,14 @@ yum install -y \
     qpdf \
     amazon-efs-utils \
     awslogs 
-    
+
+
+function download_and_untar() {
+  curl --silent --location --output $1.tar.gz $2
+  tar -xvf $1.tar.gz 
+  rm $1.tar.gz
+}
+
 echo "Installing node.js"
 curl -sL https://rpm.nodesource.com/setup_${nodejs_version}.x | bash -
 
@@ -35,9 +42,11 @@ curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo
 yum -y install yarn
 
 echo "Installing nginx"
-curl -O https://nginx.org/download/nginx-${nginx_version}.tar.gz
-tar -xvf nginx-${nginx_version}.tar.gz 
+download_and_untar nginx-${nginx_version} https://nginx.org/download/nginx-${nginx_version}.tar.gz
 git clone https://github.com/giom/nginx_accept_language_module
+download_and_untar ngx_devel_kit https://github.com/vision5/ngx_devel_kit/archive/refs/tags/v0.3.1.tar.gz
+download_and_untar set-misc-nginx-module https://github.com/openresty/set-misc-nginx-module/archive/refs/tags/v0.33.tar.gz
+
 pushd nginx-${nginx_version}
 ./configure \
     --prefix=/usr/share/nginx \
@@ -83,15 +92,17 @@ pushd nginx-${nginx_version}
     --with-debug \
     --with-cc-opt='-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic' \
     --with-ld-opt=' -Wl,-E' \
-    --add-module=../nginx_accept_language_module
+    --add-module=../nginx_accept_language_module \
+    --add-module=../ngx_devel_kit \
+    --add-module=../set-misc-nginx-module
 make
 make install
 popd > /dev/null
 
 echo "Installing exiftool"
-curl -sLO https://exiftool.org/Image-ExifTool-12.41.tar.gz
-tar -vxf Image-ExifTool-12.41.tar.gz
-cd Image-ExifTool-12.41
+download_and_untar Image-ExifTool-12.41 https://exiftool.org/Image-ExifTool-12.41.tar.gz
+pushd Image-ExifTool-12.41
 perl Makefile.PL
 make test
 make install
+popd > /dev/null
