@@ -1,6 +1,8 @@
 COMMIT_SHA=$1
 ENV=$2
 
+sudo hostnamectl set-hostname "parallel-${ENV}-${COMMIT_SHA}"
+
 # mount shared folder
 sudo mkdir -p /nfs/parallel
 sudo mount -t efs -o tls fs-05b0e1c4df3ecd227:/ /nfs/parallel
