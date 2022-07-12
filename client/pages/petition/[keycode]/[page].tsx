@@ -248,7 +248,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                             <Text>
                               <FormattedMessage
                                 id="recipient-view.petition-completed-alert-1"
-                                defaultMessage="{tone, select, INFORMAL{Great! You have completed the petition and we have notified {name} for review and validation.} other{This petition has been completed and {name} has been notified for its revision and validation.}}"
+                                defaultMessage="{tone, select, INFORMAL{Great! You have completed the parallel and we have notified {name} for review and validation.} other{This parallel has been completed and {name} has been notified for its revision and validation.}}"
                                 values={{
                                   name: <b>{granter.fullName}</b>,
                                   tone,
@@ -266,7 +266,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                         ) : (
                           <FormattedMessage
                             id="recipient-view.petition-closed-alert"
-                            defaultMessage="This petition has been closed. If you need to make any changes, please reach out to {name}."
+                            defaultMessage="This parallel has been closed. If you need to make any changes, please reach out to {name}."
                             values={{
                               name: <b>{granter.fullName}</b>,
                             }}
@@ -293,7 +293,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                             <Text>
                               <FormattedMessage
                                 id="recipient-view.petition-requires-signature-alert-1"
-                                defaultMessage="This petition requires an <b>eSignature</b> to be completed."
+                                defaultMessage="This parallel requires an <b>eSignature</b> to be completed."
                               />
                             </Text>
                             <Text>
@@ -305,119 +305,61 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
                           </>
                         ) : (
                           <Text>
-                            <FormattedMessage
-                              id="recipient-view.petition-completed-alert-1"
-                              defaultMessage="{tone, select, INFORMAL{Great! You have completed the parallel and we have notified {name} for review and validation.} other{This parallel has been completed and {name} has been notified for its revision and validation.}}"
-                              values={{
-                                name: <b>{granter.fullName}</b>,
-                                tone,
-                              }}
-                            />
+                            {petition.signatureConfig.signers.length > 0 ? (
+                              <FormattedMessage
+                                id="recipient-view.petition-signature-request-sent-alert"
+                                defaultMessage="<b>We have sent the document to sign</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}} in order to finalize the parallel."
+                                values={{
+                                  a: (chunks: any) => (
+                                    <ContactListPopover
+                                      contacts={petition
+                                        .signatureConfig!.signers.slice(1)
+                                        .concat(petition.signatureConfig!.additionalSigners)}
+                                    >
+                                      <Text
+                                        display="initial"
+                                        textDecoration="underline"
+                                        color="primary.600"
+                                        cursor="pointer"
+                                      >
+                                        {chunks}
+                                      </Text>
+                                    </ContactListPopover>
+                                  ),
+                                  name: petition.signatureConfig.signers[0]!.fullName,
+                                  email: petition.signatureConfig.signers[0]!.email,
+                                  count:
+                                    petition.signatureConfig.signers.length +
+                                    petition.signatureConfig.additionalSigners.length -
+                                    1,
+                                }}
+                              />
+                            ) : (
+                              <FormattedMessage
+                                id="recipient-view.petition-signature-request-sent-alert.unknown-signer"
+                                defaultMessage="<b>We have sent the document to sign</b> to the specified person in order to finalize the parallel."
+                              />
+                            )}
                           </Text>
                         )}
                         <FormattedMessage
-                          id="recipient-view.petition-closed-alert"
-                          defaultMessage="This parallel has been closed. If you need to make any changes, please reach out to {name}."
-                          values={{
-                            name: <b>{granter.fullName}</b>,
-                          }}
+                          id="recipient-view.petition-completed-alert-2"
+                          defaultMessage="If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
+                          values={{ tone }}
                         />
-                      )}
-                    </AlertDescription>
-                  </Flex>
-                </CloseableAlert>
-              ) : (
-                <CloseableAlert status="warning" zIndex={2}>
-                  <Flex
-                    maxWidth="container.lg"
-                    alignItems="center"
-                    justifyContent="flex-start"
-                    marginX="auto"
-                    width="100%"
-                    paddingLeft={4}
-                    paddingRight={12}
-                  >
-                    <AlertIcon color="yellow.400" />
-                    <AlertDescription>
-                      {petition.signatureConfig.review ? (
-                        <>
-                          <Text>
-                            <FormattedMessage
-                              id="recipient-view.petition-requires-signature-alert-1"
-                              defaultMessage="This parallel requires an <b>eSignature</b> to be completed."
-                            />
-                          </Text>
-                          <Text>
-                            <FormattedMessage
-                              id="recipient-view.petition-requires-signature-alert-2"
-                              defaultMessage="We will send the <b>document to sign</b> once the replies have been reviewed and validated."
-                            />
-                          </Text>
-                        </>
-                      ) : (
-                        <Text>
-                          {petition.signatureConfig.signers.length > 0 ? (
-                            <FormattedMessage
-                              id="recipient-view.petition-signature-request-sent-alert"
-                              defaultMessage="<b>We have sent the document to sign</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}} in order to finalize the parallel."
-                              values={{
-                                a: (chunks: any) => (
-                                  <ContactListPopover
-                                    contacts={petition
-                                      .signatureConfig!.signers.slice(1)
-                                      .concat(petition.signatureConfig!.additionalSigners)}
-                                  >
-                                    <Text
-                                      display="initial"
-                                      textDecoration="underline"
-                                      color="primary.600"
-                                      cursor="pointer"
-                                    >
-                                      {chunks}
-                                    </Text>
-                                  </ContactListPopover>
-                                ),
-                                name: petition.signatureConfig.signers[0]!.fullName,
-                                email: petition.signatureConfig.signers[0]!.email,
-                                count:
-                                  petition.signatureConfig.signers.length +
-                                  petition.signatureConfig.additionalSigners.length -
-                                  1,
-                              }}
-                            />
-                          ) : (
-                            <FormattedMessage
-                              id="recipient-view.petition-signature-request-sent-alert.unknown-signer"
-                              defaultMessage="<b>We have sent the document to sign</b> to the specified person in order to finalize the parallel."
-                            />
-                          )}
-                        </Text>
-                      )}
-                      <FormattedMessage
-                        id="recipient-view.petition-completed-alert-2"
-                        defaultMessage="If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
-                        values={{ tone }}
-                      />
-                    </AlertDescription>
-                  </Flex>
-                </CloseableAlert>
-              )
-            ) : null}
-            <ResizeObserver onResize={readjustHeight} />
-          </Box>
-          <Flex
-            flex="1"
-            flexDirection={{ base: "column", [breakpoint]: "row" }}
-            width="100%"
-            maxWidth="container.lg"
-            paddingX={4}
-          >
-            <Box
-              flex={{ base: 0, [breakpoint]: 1 }}
-              minWidth={0}
-              marginRight={{ base: 0, [breakpoint]: 4 }}
-              marginBottom={4}
-              display={{ base: "none", [breakpoint]: "block" }}
+                      </AlertDescription>
+                    </Flex>
+                  </CloseableAlert>
+                )
+              ) : null}
+              <ResizeObserver onResize={readjustHeight} />
+            </Box>
+            <Flex
+              flex="1"
+              flexDirection={{ base: "column", [breakpoint]: "row" }}
+              width="100%"
+              maxWidth="container.lg"
+              paddingX={4}
             >
               <Box
                 flex={{ base: 0, [breakpoint]: 1 }}

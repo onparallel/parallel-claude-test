@@ -393,7 +393,7 @@ export type MessageSentEvent = PetitionEvent & {
 export type Mutation = {
   /** set user status to ACTIVE. */
   activateUser: Array<User>;
-  /** Adds permissions on given petitions and users */
+  /** Adds permissions on given parallel and users */
   addPetitionPermission: Array<PetitionBase>;
   /** Add users to a user group */
   addUsersToUserGroup: UserGroup;
@@ -500,7 +500,7 @@ export type Mutation = {
   deleteUserGroup: Result;
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
   dynamicSelectFieldFileDownloadLink: FileUploadDownloadLinkResult;
-  /** Edits permissions on given petitions and users */
+  /** Edits permissions on given parallel and users */
   editPetitionPermission: Array<Petition>;
   /** Generates a download link for a file reply. */
   fileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
@@ -574,7 +574,7 @@ export type Mutation = {
   publicUpdatePetitionFieldReply: PublicPetitionFieldReply;
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
-  /** Removes permissions on given petitions and users */
+  /** Removes permissions on given parallel and users */
   removePetitionPermission: Array<Maybe<PetitionBase>>;
   /** Removes users from a user group */
   removeUsersFromGroup: UserGroup;
@@ -1796,7 +1796,7 @@ export type Petition = PetitionBase & {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   isRestricted: Scalars["Boolean"];
   isRestrictedWithPassword: Scalars["Boolean"];
-  /** The locale of the petition. */
+  /** The locale of the parallel. */
   locale: PetitionLocale;
   /** Metadata for this petition. */
   metadata: Scalars["JSONObject"];
@@ -1943,7 +1943,7 @@ export type PetitionBase = {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   isRestricted: Scalars["Boolean"];
   isRestrictedWithPassword: Scalars["Boolean"];
-  /** The locale of the petition. */
+  /** The locale of the parallel. */
   locale: PetitionLocale;
   /** Metadata for this petition. */
   metadata: Scalars["JSONObject"];
@@ -2511,7 +2511,7 @@ export type PetitionTemplate = PetitionBase & {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   isRestricted: Scalars["Boolean"];
   isRestrictedWithPassword: Scalars["Boolean"];
-  /** The locale of the petition. */
+  /** The locale of the parallel. */
   locale: PetitionLocale;
   /** Metadata for this petition. */
   metadata: Scalars["JSONObject"];
@@ -2678,7 +2678,7 @@ export type PublicPetition = Timestamps & {
    * @deprecated Don't use this
    */
   isRecipientViewContentsHidden: Scalars["Boolean"];
-  /** The locale of the petition. */
+  /** The locale of the parallel. */
   locale: PetitionLocale;
   /** The organization of the petition. */
   organization: PublicOrganization;
