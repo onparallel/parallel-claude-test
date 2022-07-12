@@ -317,7 +317,7 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         }
       >
         <Flex
-          backgroundColor={isPetition ? "gray.50" : "primary.50"}
+          backgroundColor={isPetition ? "gray.50" : "purple.50"}
           minHeight="100%"
           flexDirection="column"
           alignItems="center"
