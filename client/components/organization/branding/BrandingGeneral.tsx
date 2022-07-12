@@ -32,7 +32,7 @@ import { FileSize } from "@parallel/components/common/FileSize";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { OnlyAdminsAlert } from "@parallel/components/common/OnlyAdminsAlert";
 import {
-  BrandingGeneralForm_updateOrganizationBrandThemeDocument,
+  BrandingGeneral_updateOrganizationBrandThemeDocument,
   BrandingGeneral_updateOrganizationPreferredToneDocument,
   BrandingGeneral_updateOrgLogoDocument,
   BrandingGeneral_UserFragment,
@@ -116,7 +116,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
     BrandingGeneral_updateOrganizationPreferredToneDocument
   );
   const [updateOrganizationBrandTheme, { loading: updateBrandLoading }] = useMutation(
-    BrandingGeneralForm_updateOrganizationBrandThemeDocument
+    BrandingGeneral_updateOrganizationBrandThemeDocument
   );
 
   return (
@@ -469,7 +469,7 @@ function ParallelBrandingSwitch({
           <Text>
             <FormattedMessage
               id="organization.branding.parallel-branding-description"
-              defaultMessage="Displays the Parallel branding on all emails and requests that are sent."
+              defaultMessage="Displays the Parallel branding on all emails and parallels that are sent."
             />
           </Text>
         </Stack>
