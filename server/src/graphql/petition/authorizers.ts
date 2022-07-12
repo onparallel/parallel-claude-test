@@ -52,6 +52,30 @@ function createPetitionAccessAuthorizer<TRest extends any[] = []>(
   }) as ArgAuthorizer<MaybeArray<number>, TRest>;
 }
 
+export function userHasAccessToPetitions<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(
+  argName: TArg,
+  permissionTypes?: PetitionPermissionType[]
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const petitionIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+      if (petitionIds.length === 0) {
+        return true;
+      }
+      return await ctx.petitions.userHasAccessToPetitions(
+        ctx.user!.id,
+        petitionIds,
+        permissionTypes
+      );
+    } catch {}
+    return false;
+  };
+}
+
 export function userHasAccessToSignatureRequest<
   TypeName extends string,
   FieldName extends string,
@@ -101,6 +125,8 @@ export function userHasAccessToPetitionFieldComments<
 export const petitionsArePublicTemplates = createPetitionAuthorizer(
   (p) => p.is_template && p.template_public
 );
+
+export const petitionsAreNotPublicTemplates = createPetitionAuthorizer((p) => !p.template_public);
 
 export const petitionsAreOfTypePetition = createPetitionAuthorizer((p) => !p.is_template);
 export const petitionsAreOfTypeTemplate = createPetitionAuthorizer((p) => p.is_template);
