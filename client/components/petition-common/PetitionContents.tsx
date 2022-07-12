@@ -136,10 +136,7 @@ function SignatureStatusInfo({
         padding={2}
       >
         <Text fontWeight="bold">
-          <FormattedMessage
-            id="component.petition-contents.signature-status"
-            defaultMessage="Petition eSignature"
-          />
+          <FormattedMessage id="generic.e-signature" defaultMessage="eSignature" />
         </Text>
         <PetitionSignatureStatusIcon
           status={status}

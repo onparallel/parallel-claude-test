@@ -557,7 +557,7 @@
   {
     "term": "petition-completed.subject",
     "definition": "¡Parallel \"{petitionName}\" completado!",
-    "context": "Petition \"{petitionName}\" completed!"
+    "context": "Parallel \"{petitionName}\" completed!"
   },
   {
     "term": "petition-completed.text",

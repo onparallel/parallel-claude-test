@@ -645,11 +645,6 @@
     "context": "Do you want {count, plural, =1{this contact} other{these contacts}} to sign the parallels for each of the recipient groups?"
   },
   {
-    "term": "component.copy-signature-config-dialog.header",
-    "definition": "Firma digital de parallel",
-    "context": "Petition eSignature"
-  },
-  {
     "term": "component.copy-signature-config-dialog.option-1",
     "definition": "Sí, permitir a {count, plural, =1{este contacto} other{estos contactos}} firmar todos los parallels.",
     "context": "Yes, allow this {count, plural, =1{contact} other{contacts}} to sign all the parallels."
@@ -1830,11 +1825,6 @@
     "context": "{count, plural, =1 {1 field is} other {# fields are}} not applicable"
   },
   {
-    "term": "component.petition-contents.signature-status",
-    "definition": "Firma digital de parallel",
-    "context": "Petition eSignature"
-  },
-  {
     "term": "component.petition-field-checkbox-settings.exact-number",
     "definition": "Número exacto",
     "context": "Exact number"
@@ -2568,11 +2558,6 @@
     "term": "component.petition-signatures-card.edit-signers",
     "definition": "Editar firmantes",
     "context": "Edit signers"
-  },
-  {
-    "term": "component.petition-signatures-card.header",
-    "definition": "Firma digital de parallel",
-    "context": "Petition eSignature"
   },
   {
     "term": "component.petition-signatures-card.no-credits-left.error",
@@ -4918,6 +4903,11 @@
     "term": "generic.dropzone-single.default",
     "definition": "Arrastra el archivo aquí o haz click para seleccionarlo",
     "context": "Drag the file here, or click to select it"
+  },
+  {
+    "term": "generic.e-signature",
+    "definition": "Firma digital",
+    "context": "eSignature"
   },
   {
     "term": "generic.edit",

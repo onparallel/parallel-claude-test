@@ -23,12 +23,7 @@ export function CopySignatureConfigDialog({
       size="xl"
       closeOnEsc={false}
       closeOnOverlayClick={false}
-      header={
-        <FormattedMessage
-          id="component.copy-signature-config-dialog.header"
-          defaultMessage="Petition eSignature"
-        />
-      }
+      header={<FormattedMessage id="generic.e-signature" defaultMessage="eSignature" />}
       body={
         <>
           <FormattedMessage

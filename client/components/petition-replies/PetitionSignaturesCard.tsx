@@ -331,10 +331,7 @@ export const PetitionSignaturesCard = Object.assign(
           <HStack as="span" spacing={2}>
             <SignatureIcon fontSize="20px" />
             <Text as="span">
-              <FormattedMessage
-                id="component.petition-signatures-card.header"
-                defaultMessage="Petition eSignature"
-              />
+              <FormattedMessage id="generic.e-signature" defaultMessage="eSignature" />
             </Text>
             <HelpPopover popoverWidth="2xs">
               <FormattedMessage

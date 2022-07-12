@@ -28,7 +28,7 @@ const email: Email<PetitionCompletedProps> = {
     return intl.formatMessage(
       {
         id: "petition-completed.subject",
-        defaultMessage: 'Petition "{petitionName}" completed!',
+        defaultMessage: 'Parallel "{petitionName}" completed!',
       },
       { petitionName }
     );
