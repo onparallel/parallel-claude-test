@@ -610,7 +610,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 onlyReadPermission={myEffectivePermission === "READ"}
               />
             ) : (
-              <Card display="flex" flexDirection="column" maxHeight={`calc(100vh - 153px)`}>
+              <Card display="flex" flexDirection="column" maxHeight={`calc(100vh - 14.5rem)`}>
                 <GenericCardHeader
                   rightAction={<PetitionRepliesFilterButton value={filter} onChange={setFilter} />}
                 >
