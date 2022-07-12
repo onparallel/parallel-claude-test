@@ -6436,13 +6436,13 @@
   },
   {
     "term": "page.signature.upgrade-plan-alert-2",
-    "definition": "<b>Amplia tu plan</b> para acceder a la integración de firma.",
-    "context": "<b>Upgrade your plan</b> to access signature integration."
+    "definition": "Contacta con nuestro equipo para acceder a la integración de firma.",
+    "context": "Contact our team to access signature integration."
   },
   {
     "term": "page.signature.upgrade-plan-support-message",
-    "definition": "Hola, me gustaría obtener más información acerca de como actualizar mi plan para acceder a la integración de firma.",
-    "context": "Hi, I would like more information about upgrade my plan to access signature integration."
+    "definition": "Hola, quiero utilizar la integración de firma electrónica. ¿Podéis darme más información?",
+    "context": "Hi, I want to use electronic signatures. ¿Can I have more information?"
   },
   {
     "term": "page.usage.petitions",

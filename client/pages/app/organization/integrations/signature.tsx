@@ -229,7 +229,7 @@ function IntegrationsSignature() {
                 <Text>
                   <FormattedMessage
                     id="page.signature.upgrade-plan-alert-2"
-                    defaultMessage="<b>Upgrade your plan</b> to access signature integration."
+                    defaultMessage="Contact our team to access signature integration."
                   />
                 </Text>
               </>
@@ -237,7 +237,7 @@ function IntegrationsSignature() {
             contactMessage={intl.formatMessage({
               id: "page.signature.upgrade-plan-support-message",
               defaultMessage:
-                "Hi, I would like more information about upgrade my plan to access signature integration.",
+                "Hi, I want to use electronic signatures. ¿Can I have more information?",
             })}
           />
         ) : null}
