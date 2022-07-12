@@ -14,7 +14,7 @@ aws_sdk_1.default.config.region = "eu-central-1";
 const ec2 = new aws_sdk_1.default.EC2();
 const elb = new aws_sdk_1.default.ELB();
 async function main() {
-    var _a;
+    var _a, _b;
     const { env, "dry-run": dryRun } = await yargs_1.default
         .usage("Usage: $0 --env [env]")
         .option("dry-run", {
@@ -51,9 +51,16 @@ async function main() {
                 }
             }
             else if (instanceState === "stopped" || instanceState === "stopping") {
-                console.log((0, chalk_1.default) `Terminating instance {bold ${instanceId}} {red {bold ${instanceName}}}`);
-                if (!dryRun) {
-                    await ec2.terminateInstances({ InstanceIds: [instanceId] }).promise();
+                const match = (_b = instance.StateTransitionReason) === null || _b === void 0 ? void 0 : _b.match(/^User initiated \((.*)\)$/);
+                if (match) {
+                    const transitionDate = new Date(match[1]);
+                    // terminate instance that were stopped more than 7 days ago, so we can keep the instance data for a while
+                    if (new Date().valueOf() - transitionDate.valueOf() > 7 * 24 * 60 * 60 * 1000) {
+                        console.log((0, chalk_1.default) `Terminating instance {bold ${instanceId}} {red {bold ${instanceName}}}`);
+                        if (!dryRun) {
+                            await ec2.terminateInstances({ InstanceIds: [instanceId] }).promise();
+                        }
+                    }
                 }
             }
         }

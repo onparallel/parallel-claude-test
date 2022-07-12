@@ -48,9 +48,18 @@ async function main() {
           await ec2.stopInstances({ InstanceIds: [instanceId] }).promise();
         }
       } else if (instanceState === "stopped" || instanceState === "stopping") {
-        console.log(chalk`Terminating instance {bold ${instanceId}} {red {bold ${instanceName}}}`);
-        if (!dryRun) {
-          await ec2.terminateInstances({ InstanceIds: [instanceId] }).promise();
+        const match = instance.StateTransitionReason?.match(/^User initiated \((.*)\)$/);
+        if (match) {
+          const transitionDate = new Date(match[1]);
+          // terminate instance that were stopped more than 7 days ago, so we can keep the instance data for a while
+          if (new Date().valueOf() - transitionDate.valueOf() > 7 * 24 * 60 * 60 * 1000) {
+            console.log(
+              chalk`Terminating instance {bold ${instanceId}} {red {bold ${instanceName}}}`
+            );
+            if (!dryRun) {
+              await ec2.terminateInstances({ InstanceIds: [instanceId] }).promise();
+            }
+          }
         }
       }
     }
