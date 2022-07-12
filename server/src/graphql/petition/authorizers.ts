@@ -14,69 +14,42 @@ import {
 import { unMaybeArray } from "../../util/arrays";
 import { toGlobalId } from "../../util/globalId";
 import { MaybeArray } from "../../util/types";
-import { Arg } from "../helpers/authorize";
+import { Arg, ArgAuthorizer } from "../helpers/authorize";
 
-function petitionMatches<
-  TypeName extends string,
-  FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
->(ids: TArg, condition: (p: Petition) => boolean): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    try {
-      const petitionIds = unMaybeArray(args[ids] as unknown as MaybeArray<number>);
-      if (petitionIds.length === 0) {
-        return true;
-      }
-      const petitions = await ctx.petitions.loadPetition(petitionIds);
-      return petitions.every((p) => p && condition(p));
-    } catch {}
-    return false;
-  };
+function createPetitionAuthorizer<TRest extends any[] = []>(
+  predicate: (petition: Petition, ...rest: TRest) => boolean
+) {
+  return ((argName, ...rest: TRest) => {
+    return async (_, args, ctx) => {
+      try {
+        const petitionIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+        if (petitionIds.length === 0) {
+          return true;
+        }
+        const petitions = await ctx.petitions.loadPetition(petitionIds);
+        return petitions.every((petition) => isDefined(petition) && predicate(petition, ...rest));
+      } catch {}
+      return false;
+    };
+  }) as ArgAuthorizer<MaybeArray<number>, TRest>;
 }
 
-function petitionAccessMatches<
-  TypeName extends string,
-  FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
->(
-  ids: TArg,
-  condition: (a: PetitionAccess) => boolean
-): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    try {
-      const accessIds = unMaybeArray(args[ids] as unknown as MaybeArray<number>);
-      if (accessIds.length === 0) {
-        return true;
-      }
-      const accesses = await ctx.petitions.loadAccess(accessIds);
-      return accesses.every((a) => a && condition(a));
-    } catch {}
-    return false;
-  };
-}
-
-export function userHasAccessToPetitions<
-  TypeName extends string,
-  FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
->(
-  argName: TArg,
-  permissionTypes?: PetitionPermissionType[]
-): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    try {
-      const petitionIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
-      if (petitionIds.length === 0) {
-        return true;
-      }
-      return await ctx.petitions.userHasAccessToPetitions(
-        ctx.user!.id,
-        petitionIds,
-        permissionTypes
-      );
-    } catch {}
-    return false;
-  };
+function createPetitionAccessAuthorizer<TRest extends any[] = []>(
+  predicate: (access: PetitionAccess, ...rest: TRest) => boolean
+) {
+  return ((argName, ...rest: TRest) => {
+    return async (_, args, ctx) => {
+      try {
+        const accessIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+        if (accessIds.length === 0) {
+          return true;
+        }
+        const accesses = await ctx.petitions.loadAccess(accessIds);
+        return accesses.every((access) => isDefined(access) && predicate(access, ...rest));
+      } catch {}
+      return false;
+    };
+  }) as ArgAuthorizer<MaybeArray<number>, TRest>;
 }
 
 export function userHasAccessToSignatureRequest<
@@ -125,29 +98,12 @@ export function userHasAccessToPetitionFieldComments<
   };
 }
 
-export function petitionsArePublicTemplates<
-  TypeName extends string,
-  FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number | number[]>
->(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
-  return petitionMatches(argName, (p) => p.is_template && p.template_public);
-}
+export const petitionsArePublicTemplates = createPetitionAuthorizer(
+  (p) => p.is_template && p.template_public
+);
 
-export function petitionsAreOfTypePetition<
-  TypeName extends string,
-  FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
->(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
-  return petitionMatches(argName, (p) => !p.is_template);
-}
-
-export function petitionsAreOfTypeTemplate<
-  TypeName extends string,
-  FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
->(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
-  return petitionMatches(argName, (p) => p.is_template);
-}
+export const petitionsAreOfTypePetition = createPetitionAuthorizer((p) => !p.is_template);
+export const petitionsAreOfTypeTemplate = createPetitionAuthorizer((p) => p.is_template);
 
 export function fieldIsNotFixed<
   TypeName extends string,
@@ -366,16 +322,9 @@ export function accessesBelongToPetition<
   };
 }
 
-export function accessesHaveStatus<
-  TypeName extends string,
-  FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
->(
-  argNameAccessIds: TArg,
-  status: PetitionAccessStatus
-): FieldAuthorizeResolver<TypeName, FieldName> {
-  return petitionAccessMatches(argNameAccessIds, (a) => a.status === status);
-}
+export const accessesHaveStatus = createPetitionAccessAuthorizer(
+  (access, status: PetitionAccessStatus) => access.status === status
+);
 
 export function accessesHaveRemindersLeft<
   TypeName extends string,
@@ -398,13 +347,9 @@ export function accessesHaveRemindersLeft<
   };
 }
 
-export function accessesIsNotOptedOut<
-  TypeName extends string,
-  FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
->(argNameAccessIds: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
-  return petitionAccessMatches(argNameAccessIds, (a) => !a.reminders_opt_out);
-}
+export const accessesIsNotOptedOut = createPetitionAccessAuthorizer(
+  (access) => !access.reminders_opt_out
+);
 
 export function messageBelongToPetition<
   TypeName extends string,
@@ -486,21 +431,9 @@ export function petitionHasRepliableFields<
   };
 }
 
-export function petitionsAreEditable<
-  TypeName extends string,
-  FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
->(argNamePetitionIds: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
-  return petitionMatches(argNamePetitionIds, (p) => !p.restricted_by_user_id);
-}
-
-export function petitionsAreNotPublicTemplates<
-  TypeName extends string,
-  FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
->(argNamePetitionIds: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
-  return petitionMatches(argNamePetitionIds, (p) => !p.template_public);
-}
+export const petitionsAreEditable = createPetitionAuthorizer(
+  (petition) => !isDefined(petition.restricted_by_user_id)
+);
 
 export function templateDoesNotHavePublicPetitionLink<
   TypeName extends string,
@@ -555,13 +488,9 @@ export function replyCanBeUpdated<
   };
 }
 
-export function petitionIsNotAnonymized<
-  TypeName extends string,
-  FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, MaybeArray<number>>
->(argPetitionId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
-  return petitionMatches(argPetitionId, (p) => p.anonymized_at === null);
-}
+export const petitionIsNotAnonymized = createPetitionAuthorizer(
+  (petition) => petition.anonymized_at === null
+);
 
 export function signatureRequestIsNotAnonymized<
   TypeName extends string,
@@ -576,10 +505,6 @@ export function signatureRequestIsNotAnonymized<
   };
 }
 
-export function petitionHasStatus<
-  TypeName extends string,
-  FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, MaybeArray<number>>
->(argPetitionId: TArg1, status: PetitionStatus): FieldAuthorizeResolver<TypeName, FieldName> {
-  return petitionMatches(argPetitionId, (p) => p.status === status);
-}
+export const petitionHasStatus = createPetitionAuthorizer(
+  (petition, status: PetitionStatus) => petition.status === status
+);

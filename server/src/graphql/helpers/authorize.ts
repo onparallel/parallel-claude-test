@@ -10,6 +10,15 @@ import { authenticateFromRequest } from "../../util/authenticateFromRequest";
 import { KeysOfType } from "../../util/types";
 import { userHasRole } from "../../util/userHasRole";
 
+export type ArgAuthorizer<TArg, TRest extends any[] = []> = <
+  TypeName extends string,
+  FieldName extends string,
+  TArgName extends Arg<TypeName, FieldName, TArg>
+>(
+  argName: TArgName,
+  ...args: TRest
+) => FieldAuthorizeResolver<TypeName, FieldName>;
+
 export function authenticate<
   TypeName extends string,
   FieldName extends string
