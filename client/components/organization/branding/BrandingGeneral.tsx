@@ -11,7 +11,6 @@ import {
   Heading,
   HStack,
   Image,
-  Input,
   Radio,
   RadioGroup,
   Select,
@@ -46,7 +45,6 @@ import Color from "color";
 import { useMemo, useRef, useState } from "react";
 import { DropzoneRef, FileRejection } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
-import { IMaskInput } from "react-imask";
 import { FormattedMessage, useIntl } from "react-intl";
 import fonts from "../../../utils/webSafeFonts.json";
 import { BrandingGeneralPreview } from "./BrandingGeneralPreview";
@@ -251,9 +249,15 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
         </Stack>
 
         <Stack spacing={6}>
-          <FormControl>
+          <FormControl isInvalid={!!errors.color}>
             <HStack>
-              <FormLabel display="flex" marginY={0} alignItems="center" fontWeight="normal">
+              <FormLabel
+                display="flex"
+                marginY={0}
+                alignItems="center"
+                fontWeight="normal"
+                whiteSpace="nowrap"
+              >
                 <FormattedMessage
                   id="component.branding-general.primary-color"
                   defaultMessage="Primary color"
@@ -272,37 +276,15 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
                   validate: (v) => /^#[a-f\d]{6}$/i.test(v),
                 }}
                 render={({ field: { onChange, value } }) => (
-                  <HStack>
-                    <Input
-                      as={IMaskInput}
-                      {...({
-                        mask: "#AAAAAA",
-                        definitions: { A: /[0-9A-Fa-f]/ },
-                        onAccept: (value: string) => {
-                          if (/^#[a-f\d]{6}$/i.test(value)) {
-                            setIsLight(new Color(value).isLight());
-                          }
-                          onChange(value);
-                        },
-                      } as any)}
-                      minWidth="102px"
-                      backgroundColor="white"
-                      value={value}
-                      isInvalid={!!errors.color}
-                    />
-                    <FormControl height="40px" width="auto">
-                      <ColorInput
-                        width="40px"
-                        minWidth="40px"
-                        borderRadius="100%"
-                        value={value}
-                        onChange={(value) => {
-                          onChange(value);
-                        }}
-                        isInvalid={!!errors.color}
-                      />
-                    </FormControl>
-                  </HStack>
+                  <ColorInput
+                    value={value}
+                    onChange={(value: string) => {
+                      if (/^#[a-f\d]{6}$/i.test(value)) {
+                        setIsLight(new Color(value).isLight());
+                      }
+                      onChange(value);
+                    }}
+                  />
                 )}
               />
             </HStack>
@@ -320,7 +302,13 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
           </FormControl>
           <FormControl>
             <HStack align="center">
-              <FormLabel display="flex" alignItems="center" fontWeight="normal" whiteSpace="nowrap">
+              <FormLabel
+                display="flex"
+                alignItems="center"
+                marginY={0}
+                fontWeight="normal"
+                whiteSpace="nowrap"
+              >
                 <FormattedMessage
                   id="component.branding-general.main-font"
                   defaultMessage="Main font"

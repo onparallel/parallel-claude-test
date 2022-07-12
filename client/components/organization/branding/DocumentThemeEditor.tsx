@@ -6,7 +6,6 @@ import {
   FormLabel,
   Heading,
   HStack,
-  Input,
   Select,
   Stack,
   Switch,
@@ -34,7 +33,6 @@ import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { useMemo, useState } from "react";
-import { IMaskInput } from "react-imask";
 import { FormattedMessage, useIntl } from "react-intl";
 import fonts from "../../../utils/fonts.json";
 
@@ -254,7 +252,7 @@ export function DocumentThemeEditor({ organization, isDisabled }: DocumentThemeE
           },
         ].map((key, i) => (
           <HStack align="center" spacing={4} key={i}>
-            <FormControl>
+            <FormControl isDisabled={isDisabled}>
               <FormLabel fontWeight="normal">{key.title}</FormLabel>
               <Select
                 backgroundColor="white"
@@ -262,7 +260,6 @@ export function DocumentThemeEditor({ organization, isDisabled }: DocumentThemeE
                 onChange={(e) => {
                   handleThemeChange({ [key.fontKey]: e.target.value });
                 }}
-                isDisabled={isDisabled}
               >
                 {sortedFonts.map(({ family }) => (
                   <option key={family} value={family}>
@@ -271,7 +268,7 @@ export function DocumentThemeEditor({ organization, isDisabled }: DocumentThemeE
                 ))}
               </Select>
             </FormControl>
-            <FormControl>
+            <FormControl isDisabled={isDisabled}>
               <FormLabel fontWeight="normal">
                 <FormattedMessage
                   id="component.document-theme-editor.font-size"
@@ -284,7 +281,6 @@ export function DocumentThemeEditor({ organization, isDisabled }: DocumentThemeE
                 onChange={(e) => {
                   handleThemeChange({ [key.sizeKey]: parseFloat(e.target.value) });
                 }}
-                isDisabled={isDisabled}
               >
                 {FONT_SIZES_PT.map((v) => (
                   <option key={v} value={v}>
@@ -293,39 +289,17 @@ export function DocumentThemeEditor({ organization, isDisabled }: DocumentThemeE
                 ))}
               </Select>
             </FormControl>
-            <FormControl>
+            <FormControl isInvalid={colorError[key.colorKey]} isDisabled={isDisabled}>
               <FormLabel fontWeight="normal">
                 <FormattedMessage
                   id="component.document-theme-editor.font-color"
                   defaultMessage="Color"
                 />
               </FormLabel>
-              <HStack spacing={2}>
-                <Input
-                  as={IMaskInput}
-                  {...({
-                    mask: "#AAAAAA",
-                    definitions: { A: /[0-9A-Fa-f]/ },
-                    onAccept: (value: string) => handleColorChange(key.colorKey, value),
-                  } as any)}
-                  minWidth="102px"
-                  backgroundColor="white"
-                  value={theme[key.colorKey]}
-                  isDisabled={isDisabled}
-                  isInvalid={colorError[key.colorKey]}
-                />
-                <FormControl height="40px">
-                  <ColorInput
-                    width="40px"
-                    minWidth="40px"
-                    borderRadius="100%"
-                    value={theme[key.colorKey].length === 7 ? theme[key.colorKey] : "#ffffff"}
-                    onChange={(value) => handleColorChange(key.colorKey, value)}
-                    isDisabled={isDisabled}
-                    isInvalid={colorError[key.colorKey]}
-                  />
-                </FormControl>
-              </HStack>
+              <ColorInput
+                value={theme[key.colorKey]}
+                onChange={(value) => handleColorChange(key.colorKey, value)}
+              />
             </FormControl>
           </HStack>
         ))}
