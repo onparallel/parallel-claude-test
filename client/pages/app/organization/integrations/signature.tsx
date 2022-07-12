@@ -237,7 +237,7 @@ function IntegrationsSignature() {
             contactMessage={intl.formatMessage({
               id: "page.signature.upgrade-plan-support-message",
               defaultMessage:
-                "Hi, I want to use electronic signatures. ¿Can I have more information?",
+                "Hi, I would like to use eSignatures. Could I have more information, please?",
             })}
           />
         ) : null}

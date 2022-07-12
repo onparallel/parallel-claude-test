@@ -6442,7 +6442,7 @@
   {
     "term": "page.signature.upgrade-plan-support-message",
     "definition": "Hola, quiero utilizar la integración de firma electrónica. ¿Podéis darme más información?",
-    "context": "Hi, I want to use electronic signatures. ¿Can I have more information?"
+    "context": "Hi, I would like to use eSignatures. Could I have more information, please?"
   },
   {
     "term": "page.usage.petitions",

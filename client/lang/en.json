@@ -6441,8 +6441,8 @@
   },
   {
     "term": "page.signature.upgrade-plan-support-message",
-    "definition": "Hi, I want to use electronic signatures. ¿Can I have more information?",
-    "context": "Hi, I want to use electronic signatures. ¿Can I have more information?"
+    "definition": "Hi, I would like to use eSignatures. Could I have more information, please?",
+    "context": "Hi, I would like to use eSignatures. Could I have more information, please?"
   },
   {
     "term": "page.usage.petitions",
