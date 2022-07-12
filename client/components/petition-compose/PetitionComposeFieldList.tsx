@@ -38,7 +38,7 @@ import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { Fragment, memo, useCallback, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { indexBy, pick, zip } from "remeda";
+import { indexBy, intersection, pick, zip } from "remeda";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { useReferencedFieldDialog } from "./dialogs/ReferencedFieldDialog";
 
@@ -222,11 +222,18 @@ export const PetitionComposeFieldList = Object.assign(
                   visibility: {
                     ...visibility,
                     conditions: visibility.conditions.map((c) => {
-                      if (
-                        c.fieldId === fieldId &&
-                        c.value !== null &&
-                        !newValues.includes(c.value)
-                      ) {
+                      if (c.fieldId !== fieldId) return c;
+
+                      if (c.operator === "NOT_IS_ONE_OF" || c.operator === "IS_ONE_OF") {
+                        if (Array.isArray(c.value)) {
+                          return {
+                            ...c,
+                            value: intersection(c.value, newValues),
+                          };
+                        } else {
+                          return c;
+                        }
+                      } else if (c.value !== null && !newValues.includes(c.value)) {
                         const index = values.indexOf(c.value);
                         return {
                           ...c,
