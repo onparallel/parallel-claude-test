@@ -11,7 +11,7 @@ import {
   UnorderedList,
 } from "@chakra-ui/react";
 import {
-  OrganizationBrand,
+  OrganizationBrandTheme,
   OverrideWithOrganizationTheme,
 } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import { BrandingGeneralPreview_UserFragment, Maybe, Tone } from "@parallel/graphql/__types";
@@ -20,7 +20,7 @@ import { FormattedMessage } from "react-intl";
 
 interface BrandingGeneralPreviewProps {
   user: BrandingGeneralPreview_UserFragment;
-  brand: OrganizationBrand;
+  brand: OrganizationBrandTheme;
   tone: Tone;
   logo: Maybe<File> | string;
 }
@@ -64,7 +64,7 @@ export function BrandingGeneralPreview({ user, brand, tone, logo }: BrandingGene
         </Box>
 
         <Stack padding={8} spacing={5} id="branding-preview" fontFamily="body">
-          <OverrideWithOrganizationTheme cssVarsRoot="#branding-preview" brand={brand}>
+          <OverrideWithOrganizationTheme cssVarsRoot="#branding-preview" brandTheme={brand}>
             <Stack>
               <Center minHeight="100px">
                 <Image

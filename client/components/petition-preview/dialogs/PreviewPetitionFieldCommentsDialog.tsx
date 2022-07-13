@@ -8,6 +8,7 @@ import {
   ModalBody,
   ModalCloseButton,
   ModalContent,
+  ModalFooter,
   ModalHeader,
   Spinner,
   Stack,
@@ -19,7 +20,7 @@ import { BaseDialog } from "@parallel/components/common/dialogs/BaseDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { FieldComment } from "@parallel/components/common/FieldComment";
 import { Link } from "@parallel/components/common/Link";
-import { PetitionCommentsAndNotes } from "@parallel/components/petition-common/PetitionCommentsAndNotes";
+import { PetitionCommentsAndNotesEditor } from "@parallel/components/petition-common/PetitionCommentsAndNotesEditor";
 import {
   PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument,
   PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument,
@@ -166,7 +167,12 @@ export function PreviewPetitionFieldCommentsDialog({
 
   return (
     <BaseDialog closeOnOverlayClick={false} {...props}>
-      <ModalContent maxHeight="calc(100vh - 7.5rem)">
+      <ModalContent
+        className="with-organization-brand-theme"
+        maxHeight="calc(100vh - 7.5rem)"
+        minHeight="calc(60vh - 7.5rem)"
+        overflow="hidden"
+      >
         <ModalCloseButton
           ref={closeRef}
           aria-label={intl.formatMessage({
@@ -183,101 +189,103 @@ export function PreviewPetitionFieldCommentsDialog({
         </ModalHeader>
         <Divider />
         <ModalBody padding={0} minHeight="0">
-          <PetitionCommentsAndNotes
-            body={
-              <>
-                {loading && !comments.length ? (
-                  <Center minHeight={44}>
-                    <Spinner
-                      thickness="4px"
-                      speed="0.65s"
-                      emptyColor="gray.200"
-                      color="primary.500"
-                      size="xl"
-                    />
-                  </Center>
-                ) : comments.length === 0 ? (
-                  <Flex
-                    overflow="auto"
-                    flexDirection="column"
-                    paddingX={4}
-                    paddingY={8}
-                    justifyContent="center"
-                    alignItems="center"
-                  >
-                    {hasCommentsEnabled && !onlyReadPermission ? (
-                      <>
-                        <CommentIcon color="gray.300" boxSize="64px" />
-                      </>
-                    ) : (
-                      <Stack alignItems="center" textAlign="center">
-                        <NoteIcon boxSize="64px" color="gray.200" />
-                        {onlyReadPermission ? null : (
-                          <>
-                            <Text color="gray.400">
-                              <FormattedMessage
-                                id="petition-replies.field-comments.only-notes"
-                                defaultMessage="This field only accepts notes"
-                              />
-                            </Text>
-                            <Text color="gray.400">
-                              <FormattedMessage
-                                id="petition-replies.field-comments.disabled-comments-2"
-                                defaultMessage="You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
-                                values={{
-                                  composeTab: intl.formatMessage({
-                                    id: "petition.header.compose-tab",
-                                    defaultMessage: "Compose",
-                                  }),
-                                  a: (chunks: any) => (
-                                    <Link
-                                      href={`/app/petitions/${petitionId}/compose#field-settings-${field.id}`}
-                                    >
-                                      {chunks}
-                                    </Link>
-                                  ),
-                                }}
-                              />
-                            </Text>
-                          </>
-                        )}
-                      </Stack>
-                    )}
-                  </Flex>
-                ) : (
-                  <Stack
-                    spacing={0}
-                    divider={<Divider />}
-                    overflow="auto"
-                    maxHeight="calc(100vh - 20rem)"
-                  >
-                    {comments.map((comment) => (
-                      <FieldComment
-                        key={comment.id}
-                        comment={comment}
-                        isAuthor={myId === comment.author?.id}
-                        onEdit={(content) => handleEditCommentContent(comment.id, content)}
-                        onDelete={() => handleDeleteClick(comment.id)}
-                        onMarkAsUnread={() => handleMarkAsUnread(comment.id)}
-                      />
-                    ))}
-                  </Stack>
-                )}
-                {isTemplate ? (
-                  <Box padding={2}>
-                    <Alert status="info" borderRadius="md">
-                      <AlertIcon />
-                      <Text>
+          {loading && !comments.length ? (
+            <Center minHeight={44}>
+              <Spinner
+                thickness="4px"
+                speed="0.65s"
+                emptyColor="gray.200"
+                color="primary.500"
+                size="xl"
+              />
+            </Center>
+          ) : comments.length === 0 ? (
+            <Flex
+              overflow="auto"
+              flexDirection="column"
+              paddingX={4}
+              paddingY={8}
+              justifyContent="center"
+              alignItems="center"
+            >
+              {hasCommentsEnabled && !onlyReadPermission ? (
+                <>
+                  <CommentIcon color="gray.300" boxSize="64px" />
+                </>
+              ) : (
+                <Stack alignItems="center" textAlign="center">
+                  <NoteIcon boxSize="64px" color="gray.200" />
+                  {onlyReadPermission ? null : (
+                    <>
+                      <Text color="gray.400">
                         <FormattedMessage
-                          id="component.preview-comments-dialog.template-no-comments-added"
-                          defaultMessage="<b>Preview only</b> - comments are disabled."
+                          id="petition-replies.field-comments.only-notes"
+                          defaultMessage="This field only accepts notes"
                         />
                       </Text>
-                    </Alert>
-                  </Box>
-                ) : null}
-              </>
-            }
+                      <Text color="gray.400">
+                        <FormattedMessage
+                          id="petition-replies.field-comments.disabled-comments-2"
+                          defaultMessage="You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
+                          values={{
+                            composeTab: intl.formatMessage({
+                              id: "petition.header.compose-tab",
+                              defaultMessage: "Compose",
+                            }),
+                            a: (chunks: any) => (
+                              <Link
+                                href={`/app/petitions/${petitionId}/compose#field-settings-${field.id}`}
+                              >
+                                {chunks}
+                              </Link>
+                            ),
+                          }}
+                        />
+                      </Text>
+                    </>
+                  )}
+                </Stack>
+              )}
+            </Flex>
+          ) : (
+            <>
+              <Stack
+                spacing={0}
+                divider={<Divider />}
+                overflow="auto"
+                maxHeight="calc(100vh - 20rem)"
+              >
+                {comments.map((comment) => (
+                  <FieldComment
+                    key={comment.id}
+                    comment={comment}
+                    isAuthor={myId === comment.author?.id}
+                    onEdit={(content) => handleEditCommentContent(comment.id, content)}
+                    onDelete={() => handleDeleteClick(comment.id)}
+                    onMarkAsUnread={() => handleMarkAsUnread(comment.id)}
+                  />
+                ))}
+              </Stack>
+              <Divider />
+            </>
+          )}
+          {isTemplate ? (
+            <Box padding={2}>
+              <Alert status="info" borderRadius="md">
+                <AlertIcon />
+                <Text>
+                  <FormattedMessage
+                    id="component.preview-comments-dialog.template-no-comments-added"
+                    defaultMessage="<b>Preview only</b> - comments are disabled."
+                  />
+                </Text>
+              </Alert>
+            </Box>
+          ) : null}
+        </ModalBody>
+        <Divider />
+        <ModalFooter paddingX={0} paddingTop={2} paddingBottom={0}>
+          <PetitionCommentsAndNotesEditor
             isDisabled={isDisabled}
             isTemplate={isTemplate ?? false}
             hasCommentsEnabled={hasCommentsEnabled && !onlyReadPermission}
@@ -292,7 +300,7 @@ export function PreviewPetitionFieldCommentsDialog({
             }
             onNoteSubmit={async (content) => await handleSubmitClick({ content, isInternal: true })}
           />
-        </ModalBody>
+        </ModalFooter>
       </ModalContent>
     </BaseDialog>
   );

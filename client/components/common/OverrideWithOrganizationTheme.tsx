@@ -3,19 +3,19 @@ import { ReactNode } from "react";
 import Color from "color";
 import { gql } from "@apollo/client";
 
-export type OrganizationBrand = {
+export interface OrganizationBrandTheme {
   fontFamily?: string;
   color?: string;
-};
+}
 
 export function OverrideWithOrganizationTheme({
   children,
   cssVarsRoot,
-  brand,
+  brandTheme: brand,
 }: {
   children: ReactNode;
-  cssVarsRoot: string;
-  brand?: OrganizationBrand | null;
+  cssVarsRoot?: string;
+  brandTheme?: OrganizationBrandTheme | null;
 }) {
   const theme = useTheme();
   const customTheme = extendTheme({

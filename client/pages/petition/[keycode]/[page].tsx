@@ -201,7 +201,10 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
   return (
     <LastSavedProvider>
       <ToneProvider value={tone}>
-        <OverrideWithOrganizationTheme cssVarsRoot="body" brand={granter.organization.brandTheme}>
+        <OverrideWithOrganizationTheme
+          cssVarsRoot="body"
+          brandTheme={granter.organization.brandTheme}
+        >
           <Head>
             {fields[0]?.type === "HEADING" && fields[0].title ? (
               <title>

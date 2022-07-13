@@ -18,7 +18,7 @@ import { CheckIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
 import {
-  OrganizationBrand,
+  OrganizationBrandTheme,
   OverrideWithOrganizationTheme,
 } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
@@ -46,7 +46,7 @@ interface RecipientViewVerifyProps {
   orgName: string;
   orgLogoUrl: string;
   tone: Tone;
-  brandTheme?: OrganizationBrand | null;
+  brandTheme?: OrganizationBrandTheme | null;
 }
 
 type RecipientViewVerifyState =
@@ -159,7 +159,7 @@ function RecipientViewVerify({
 
   return (
     <ToneProvider value={tone}>
-      <OverrideWithOrganizationTheme cssVarsRoot="body" brand={brandTheme}>
+      <OverrideWithOrganizationTheme cssVarsRoot="body" brandTheme={brandTheme}>
         <Head>
           <title>Parallel</title>
         </Head>

@@ -321,11 +321,11 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
           minHeight="100%"
           flexDirection="column"
           alignItems="center"
-          id="recipient-view"
+          className="with-organization-brand-theme"
         >
           <OverrideWithOrganizationTheme
-            cssVarsRoot="#recipient-view"
-            brand={me.organization.brandTheme}
+            cssVarsRoot=".with-organization-brand-theme"
+            brandTheme={me.organization.brandTheme}
           >
             <Flex
               flex="1"

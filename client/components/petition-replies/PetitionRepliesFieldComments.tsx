@@ -13,7 +13,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../common/Divider";
 import { FieldComment } from "../common/FieldComment";
 import { Link } from "../common/Link";
-import { PetitionCommentsAndNotes } from "../petition-common/PetitionCommentsAndNotes";
+import { PetitionCommentsAndNotesEditor } from "../petition-common/PetitionCommentsAndNotesEditor";
 
 export interface PetitionRepliesFieldCommentsProps {
   petitionId: string;
@@ -102,101 +102,103 @@ export function PetitionRepliesFieldComments({
           </Text>
         )}
       </CardHeader>
-
-      <PetitionCommentsAndNotes
-        body={
-          <Box
-            maxHeight={{
-              base: `calc(100vh - 364px)`,
-              sm: `calc(100vh - 300px)`,
-              md: `calc(100vh - 300px)`,
-            }}
-            overflow="auto"
-            ref={commentsRef}
+      <Box
+        maxHeight={{
+          base: `calc(100vh - 364px)`,
+          sm: `calc(100vh - 300px)`,
+          md: `calc(100vh - 300px)`,
+        }}
+        overflow="auto"
+        ref={commentsRef}
+      >
+        {loading && !comments.length ? (
+          <Center minHeight={44}>
+            <Spinner
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              color="primary.500"
+              size="xl"
+            />
+          </Center>
+        ) : comments.length === 0 ? (
+          <Flex
+            flexDirection="column"
+            paddingX={4}
+            paddingY={8}
+            justifyContent="center"
+            alignItems="center"
           >
-            {loading && !comments.length ? (
-              <Center minHeight={44}>
-                <Spinner
-                  thickness="4px"
-                  speed="0.65s"
-                  emptyColor="gray.200"
-                  color="primary.500"
-                  size="xl"
-                />
-              </Center>
-            ) : comments.length === 0 ? (
-              <Flex
-                flexDirection="column"
-                paddingX={4}
-                paddingY={8}
-                justifyContent="center"
-                alignItems="center"
-              >
-                {hasCommentsEnabled && !onlyReadPermission ? (
-                  <CommentIcon boxSize="64px" color="gray.200" />
-                ) : (
-                  <Stack alignItems="center" textAlign="center">
-                    <NoteIcon boxSize="64px" color="gray.200" />
-                    {onlyReadPermission ? null : (
-                      <>
-                        <Text color="gray.400">
-                          <FormattedMessage
-                            id="petition-replies.field-comments.only-notes"
-                            defaultMessage="This field only accepts notes"
-                          />
-                        </Text>
-                        <Text color="gray.400">
-                          <FormattedMessage
-                            id="petition-replies.field-comments.disabled-comments-2"
-                            defaultMessage="You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
-                            values={{
-                              composeTab: intl.formatMessage({
-                                id: "petition.header.compose-tab",
-                                defaultMessage: "Compose",
-                              }),
-                              a: (chunks: any) => (
-                                <Link
-                                  href={`/app/petitions/${petitionId}/compose#field-settings-${field.id}`}
-                                >
-                                  {chunks}
-                                </Link>
-                              ),
-                            }}
-                          />
-                        </Text>
-                      </>
-                    )}
-                  </Stack>
-                )}
-              </Flex>
+            {hasCommentsEnabled && !onlyReadPermission ? (
+              <CommentIcon boxSize="64px" color="gray.200" />
             ) : (
-              <Stack spacing={0} divider={<Divider />}>
-                {comments.map((comment) => (
-                  <FieldComment
-                    key={comment.id}
-                    comment={comment}
-                    isAuthor={myId === comment.author?.id}
-                    onEdit={(content) => onUpdateComment(comment.id, content)}
-                    onDelete={() => onDeleteComment(comment.id)}
-                    onMarkAsUnread={() => onMarkAsUnread(comment.id)}
-                  />
-                ))}
+              <Stack alignItems="center" textAlign="center">
+                <NoteIcon boxSize="64px" color="gray.200" />
+                {onlyReadPermission ? null : (
+                  <>
+                    <Text color="gray.400">
+                      <FormattedMessage
+                        id="petition-replies.field-comments.only-notes"
+                        defaultMessage="This field only accepts notes"
+                      />
+                    </Text>
+                    <Text color="gray.400">
+                      <FormattedMessage
+                        id="petition-replies.field-comments.disabled-comments-2"
+                        defaultMessage="You can enable comments from the <a>Field settings</a> in the {composeTab} tab."
+                        values={{
+                          composeTab: intl.formatMessage({
+                            id: "petition.header.compose-tab",
+                            defaultMessage: "Compose",
+                          }),
+                          a: (chunks: any) => (
+                            <Link
+                              href={`/app/petitions/${petitionId}/compose#field-settings-${field.id}`}
+                            >
+                              {chunks}
+                            </Link>
+                          ),
+                        }}
+                      />
+                    </Text>
+                  </>
+                )}
               </Stack>
             )}
-          </Box>
-        }
-        isDisabled={isDisabled}
-        isTemplate={false}
-        hasCommentsEnabled={hasCommentsEnabled && !onlyReadPermission}
-        onCommentKeyDown={async (event, content) =>
-          await handleKeyDown({ event, content, isInternal: false })
-        }
-        onCommentSubmit={async (content) => await handleSubmitClick({ content, isInternal: false })}
-        onNotetKeyDown={async (event, content) =>
-          await handleKeyDown({ event, content, isInternal: true })
-        }
-        onNoteSubmit={async (content) => await handleSubmitClick({ content, isInternal: true })}
-      />
+          </Flex>
+        ) : (
+          <Stack spacing={0} divider={<Divider />}>
+            {comments.map((comment) => (
+              <FieldComment
+                key={comment.id}
+                comment={comment}
+                isAuthor={myId === comment.author?.id}
+                onEdit={(content) => onUpdateComment(comment.id, content)}
+                onDelete={() => onDeleteComment(comment.id)}
+                onMarkAsUnread={() => onMarkAsUnread(comment.id)}
+              />
+            ))}
+          </Stack>
+        )}
+      </Box>
+      <Divider />
+      <Box paddingTop={2}>
+        <PetitionCommentsAndNotesEditor
+          isDisabled={isDisabled}
+          isTemplate={false}
+          hasCommentsEnabled={hasCommentsEnabled && !onlyReadPermission}
+          onCommentKeyDown={async (event, content) =>
+            await handleKeyDown({ event, content, isInternal: false })
+          }
+          onCommentSubmit={async (content) =>
+            await handleSubmitClick({ content, isInternal: false })
+          }
+          onNotetKeyDown={async (event, content) =>
+            await handleKeyDown({ event, content, isInternal: true })
+          }
+          onNoteSubmit={async (content) => await handleSubmitClick({ content, isInternal: true })}
+        />
+      </Box>
     </Card>
   );
 }
