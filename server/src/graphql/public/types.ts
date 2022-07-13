@@ -151,6 +151,13 @@ export const PublicPetition = objectType({
         return org.preferred_tone;
       },
     });
+    t.boolean("hasRemoveParallelBranding", {
+      deprecation: "Use PublicOrganization.hasRemoveParallelBranding",
+      description: "If this organization has the REMOVE_PARALLEL_BRANDING feature flag enabled",
+      resolve: async (root, _, ctx) => {
+        return await ctx.featureFlags.orgHasFeatureFlag(root.org_id, "REMOVE_PARALLEL_BRANDING");
+      },
+    });
     t.field("organization", {
       description: "The organization of the petition.",
       type: "PublicOrganization",

@@ -3686,6 +3686,12 @@ type PublicPetition implements Timestamps {
   fields: [PublicPetitionField!]!
 
   """
+  If this organization has the REMOVE_PARALLEL_BRANDING feature flag enabled
+  """
+  hasRemoveParallelBranding: Boolean!
+    @deprecated(reason: "Use PublicOrganization.hasRemoveParallelBranding")
+
+  """
   The ID of the petition.
   """
   id: GID!
