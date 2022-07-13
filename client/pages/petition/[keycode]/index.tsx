@@ -163,7 +163,7 @@ function RecipientViewVerify({
         <Head>
           <title>Parallel</title>
         </Head>
-        <Box backgroundColor="gray.50" minHeight="100vh">
+        <Box backgroundColor="primary.50" minHeight="100vh">
           <Container
             display="flex"
             flexDirection="column"

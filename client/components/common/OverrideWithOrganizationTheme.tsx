@@ -64,7 +64,7 @@ export function generateOrganizationPallete(color: string) {
   const darkenOffset = lightness > 21 ? (lightness - 20) / 4 : 6;
 
   return {
-    50: _color.lightness(97).hex().toString(),
+    50: _color.lightness(99).hex().toString(),
     100: _color
       .lightness(lightness + lightenOffset * 4)
       .hex()

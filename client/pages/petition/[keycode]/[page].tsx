@@ -216,7 +216,7 @@ function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) 
             )}
           </Head>
           <Flex
-            backgroundColor="gray.50"
+            backgroundColor="primary.50"
             minHeight="100vh"
             zIndex={1}
             flexDirection="column"
