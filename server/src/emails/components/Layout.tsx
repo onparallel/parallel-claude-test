@@ -20,7 +20,7 @@ import {
 import { FC, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { URLSearchParams } from "url";
-import { BrandTheme, ThemeProvider, useTheme } from "../utils/ThemeProvider";
+import { OrganizationBrandTheme, ThemeProvider, useTheme } from "../utils/ThemeProvider";
 import { GdprDisclaimer } from "./GdprDisclaimer";
 
 export type LayoutProps = {
@@ -37,7 +37,7 @@ export type LayoutProps = {
   tone?: string;
   utmCampaign?: string;
   removeParallelBranding?: boolean;
-  theme?: BrandTheme;
+  theme?: OrganizationBrandTheme;
 };
 
 export const Layout: FC<LayoutProps> = function Layout({ theme, ...props }) {
@@ -80,7 +80,7 @@ const ThemedLayout: FC<LayoutProps> = function ThemedLayout({
           <MjmlAll fontSize="14px" lineHeight="1.4" fontFamily={theme.fontFamily} />
           <MjmlClass
             name="button-primary"
-            backgroundColor={theme.color[500]}
+            backgroundColor={theme.colors.primary[500]}
             color="#FFFFFF"
             fontWeight="600"
             borderRadius="4px"
@@ -93,7 +93,7 @@ const ThemedLayout: FC<LayoutProps> = function ThemedLayout({
             padding: 0 16px;
           }
           .link {
-            color: ${theme.color[500]};
+            color: ${theme.colors.primary[500]};
             text-decoration: none;
           }
         `
@@ -157,25 +157,25 @@ const ThemedLayout: FC<LayoutProps> = function ThemedLayout({
                       alt="LinkedIn"
                       name="linkedin-noshare"
                       href="https://www.linkedin.com/company/onparallel"
-                      backgroundColor={theme.color[500]}
+                      backgroundColor={theme.colors.primary[500]}
                     />
                     <MjmlSocialElement
                       alt="Slack"
                       src={`${assetsUrl}/static/emails/slack.png`}
                       href="https://joinparallel.slack.com/join/shared_invite/zt-sda28ew5-tCZBQzZpPupCIsd85RgwGA#/shared-invite/email"
-                      backgroundColor={theme.color[500]}
+                      backgroundColor={theme.colors.primary[500]}
                     />
                     <MjmlSocialElement
                       alt="Facebook"
                       name="facebook-noshare"
                       href="https://www.facebook.com/parallel.so"
-                      backgroundColor={theme.color[500]}
+                      backgroundColor={theme.colors.primary[500]}
                     />
                     <MjmlSocialElement
                       alt="Twitter"
                       name="twitter-noshare"
                       href="https://twitter.com/Parallel_SO"
-                      backgroundColor={theme.color[500]}
+                      backgroundColor={theme.colors.primary[500]}
                     />
                   </MjmlSocial>
                 )}

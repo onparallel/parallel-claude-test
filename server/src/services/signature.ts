@@ -17,7 +17,7 @@ import SignatureCancelledEmail from "../emails/emails/SignatureCancelledEmail";
 import SignatureCompletedEmail from "../emails/emails/SignatureCompletedEmail";
 import SignatureReminderEmail from "../emails/emails/SignatureReminderEmail";
 import SignatureRequestedEmail from "../emails/emails/SignatureRequestedEmail";
-import { BrandTheme } from "../emails/utils/ThemeProvider";
+import { OrganizationBrandTheme } from "../emails/utils/ThemeProvider";
 import { getBaseWebhookUrl } from "../util/getBaseWebhookUrl";
 import { toGlobalId } from "../util/globalId";
 import { downloadImageBase64 } from "../util/images";
@@ -36,7 +36,7 @@ type SignatureOptions = {
     assetsUrl: string;
     tone: Tone;
     removeParallelBranding: boolean;
-    theme: BrandTheme;
+    theme: OrganizationBrandTheme;
   };
   events_url?: string;
   signingMode?: "parallel" | "sequential";

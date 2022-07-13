@@ -1,47 +1,43 @@
 import { createContext, PropsWithChildren, useContext } from "react";
 import Color from "color";
 
-export type OrganizationBrand = {
+type EmailThemeColor = Record<50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900, "string">;
+
+export type EmailTheme = {
   fontFamily: string | undefined;
-  color: {
-    50: string;
-    100: string;
-    200: string;
-    300: string;
-    400: string;
-    500: string;
-    600: string;
-    700: string;
-    800: string;
-    900: string;
-  };
+  colors: Record<"primary", EmailThemeColor>;
 };
 
-export type BrandTheme = {
+export interface OrganizationBrandTheme {
   fontFamily?: string;
   color?: string;
-};
+}
 
-const ThemeContext = createContext<OrganizationBrand | undefined>(undefined);
+const ThemeContext = createContext<EmailTheme | undefined>(undefined);
 
-export function ThemeProvider({ theme, children }: PropsWithChildren<{ theme: BrandTheme }>) {
+export function ThemeProvider({
+  theme,
+  children,
+}: PropsWithChildren<{ theme: OrganizationBrandTheme }>) {
   const value = {
-    color: theme?.color
-      ? generateOrganizationPallete(theme!.color)
-      : {
-          50: "#f8f8ff",
-          100: "#dddbff",
-          200: "#b0acfb",
-          300: "#938eff",
-          400: "#746eff",
-          500: "#6059f7",
-          600: "#5650de",
-          700: "#433ead",
-          800: "#332f80",
-          900: "#282666",
-        },
+    colors: {
+      primary: theme?.color
+        ? generateOrganizationPallete(theme!.color)
+        : {
+            50: "#f8f8ff",
+            100: "#dddbff",
+            200: "#b0acfb",
+            300: "#938eff",
+            400: "#746eff",
+            500: "#6059f7",
+            600: "#5650de",
+            700: "#433ead",
+            800: "#332f80",
+            900: "#282666",
+          },
+    },
     fontFamily: theme?.fontFamily ?? undefined,
-  } as OrganizationBrand;
+  } as EmailTheme;
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
