@@ -262,7 +262,7 @@
   {
     "term": "component.branding-general.primary-color-warning",
     "definition": "El color que has introducido es demasiado claro. Recomendamos utilizar un color más oscuro para mejorar la legibilidad.",
-    "context": "The color you have entered is too light. We recommend using a darker color to improve readability."
+    "context": "The color you have entered is a bit too light. We recommend using a darker color to improve readability."
   },
   {
     "term": "component.branding-general.save-changes",

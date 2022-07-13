@@ -42,7 +42,7 @@ import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { isAtLeast } from "@parallel/utils/roles";
 import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import Color from "color";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import { DropzoneRef, FileRejection } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -65,7 +65,6 @@ const MAX_FILE_SIZE = 1024 * 1024;
 export function BrandingGeneral({ user }: BrandingGeneralProps) {
   const parallelTheme = useTheme();
   const intl = useIntl();
-  const [isLight, setIsLight] = useState(false);
   const dropzoneRef = useRef<DropzoneRef>(null);
   const {
     handleSubmit,
@@ -87,6 +86,10 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
 
   const tone = watch("tone");
   const color = watch("color");
+
+  const isLight =
+    /^#[a-f\d]{6}$/i.test(color) && new Color(color).contrast(new Color("#ffffff")) < 3;
+
   const fontFamily = watch("fontFamily");
   const logo = watch("logo");
 
@@ -276,15 +279,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
                   validate: (v) => /^#[a-f\d]{6}$/i.test(v),
                 }}
                 render={({ field: { onChange, value } }) => (
-                  <ColorInput
-                    value={value}
-                    onChange={(value: string) => {
-                      if (/^#[a-f\d]{6}$/i.test(value)) {
-                        setIsLight(new Color(value).isLight());
-                      }
-                      onChange(value);
-                    }}
-                  />
+                  <ColorInput value={value} onChange={onChange} />
                 )}
               />
             </HStack>
@@ -294,7 +289,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
                 <AlertDescription>
                   <FormattedMessage
                     id="component.branding-general.primary-color-warning"
-                    defaultMessage="The color you have entered is too light. We recommend using a darker color to improve readability."
+                    defaultMessage="The color you have entered is a bit too light. We recommend using a darker color to improve readability."
                   />
                 </AlertDescription>
               </CloseableAlert>

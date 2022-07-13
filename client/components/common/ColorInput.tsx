@@ -39,7 +39,7 @@ export const ColorInput = chakraForwardRef<"input", ColorInputProps, HTMLInputEl
             definitions: { A: /[0-9A-Fa-f]/ },
             onAccept: (value: string) => onChange?.(value),
           } as any)}
-          htmlSize={7}
+          size={7}
           backgroundColor="white"
           value={value}
         />

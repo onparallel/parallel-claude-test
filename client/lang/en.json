@@ -261,8 +261,8 @@
   },
   {
     "term": "component.branding-general.primary-color-warning",
-    "definition": "The color you have entered is too light. We recommend using a darker color to improve readability.",
-    "context": "The color you have entered is too light. We recommend using a darker color to improve readability."
+    "definition": "The color you have entered is a bit too light. We recommend using a darker color to improve readability.",
+    "context": "The color you have entered is a bit too light. We recommend using a darker color to improve readability."
   },
   {
     "term": "component.branding-general.save-changes",
