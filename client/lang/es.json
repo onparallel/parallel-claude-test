@@ -2625,6 +2625,11 @@
     "context": "Add signature"
   },
   {
+    "term": "component.petition-signatures-card.audit-trail",
+    "definition": "Documento probatorio",
+    "context": "Audit trail"
+  },
+  {
     "term": "component.petition-signatures-card.edit-signers",
     "definition": "Editar firmantes",
     "context": "Edit signers"
@@ -2663,6 +2668,11 @@
     "term": "component.petition-signatures-card.signature-description",
     "definition": "Genera un documento e inicia un proceso de firma digital a través de uno de nuestros proveedores integrados.",
     "context": "Generates a document and iniciates an eSignature process, through one of our integrated providers."
+  },
+  {
+    "term": "component.petition-signatures-card.signed-document",
+    "definition": "Documento firmado",
+    "context": "Signed document"
   },
   {
     "term": "component.petition-signatures-card.signers",

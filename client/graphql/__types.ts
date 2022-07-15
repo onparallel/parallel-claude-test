@@ -10067,6 +10067,7 @@ export type CurrentSignatureRequestRow_PetitionSignatureRequestFragment = {
   status: PetitionSignatureRequestStatus;
   isAnonymized: boolean;
   metadata: { [key: string]: any };
+  auditTrailFilename?: string | null;
   signerStatus: Array<{
     __typename?: "PetitionSignatureRequestSignerStatus";
     status: string;
@@ -10143,6 +10144,7 @@ export type OlderSignatureRequestRows_PetitionSignatureRequestFragment = {
   status: PetitionSignatureRequestStatus;
   metadata: { [key: string]: any };
   isAnonymized: boolean;
+  auditTrailFilename?: string | null;
   signatureConfig: {
     __typename?: "SignatureConfig";
     signers: Array<{ __typename?: "PetitionSigner"; email: string; fullName: string } | null>;
@@ -10360,6 +10362,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
     status: PetitionSignatureRequestStatus;
     isAnonymized: boolean;
     metadata: { [key: string]: any };
+    auditTrailFilename?: string | null;
     signatureConfig: {
       __typename?: "SignatureConfig";
       signers: Array<{
@@ -10440,6 +10443,7 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
           status: PetitionSignatureRequestStatus;
           isAnonymized: boolean;
           metadata: { [key: string]: any };
+          auditTrailFilename?: string | null;
           signatureConfig: {
             __typename?: "SignatureConfig";
             signers: Array<{
@@ -10532,6 +10536,7 @@ export type PetitionSignaturesCard_startSignatureRequestMutation = {
 export type PetitionSignaturesCard_signedPetitionDownloadLinkMutationVariables = Exact<{
   petitionSignatureRequestId: Scalars["GID"];
   preview?: InputMaybe<Scalars["Boolean"]>;
+  downloadAuditTrail?: InputMaybe<Scalars["Boolean"]>;
 }>;
 
 export type PetitionSignaturesCard_signedPetitionDownloadLinkMutation = {
@@ -18143,6 +18148,7 @@ export type PetitionReplies_PetitionFragment = {
     status: PetitionSignatureRequestStatus;
     isAnonymized: boolean;
     metadata: { [key: string]: any };
+    auditTrailFilename?: string | null;
     signatureConfig: {
       __typename?: "SignatureConfig";
       signers: Array<{
@@ -18469,6 +18475,7 @@ export type PetitionReplies_closePetitionMutation = {
       status: PetitionSignatureRequestStatus;
       isAnonymized: boolean;
       metadata: { [key: string]: any };
+      auditTrailFilename?: string | null;
       signatureConfig: {
         __typename?: "SignatureConfig";
         signers: Array<{
@@ -18648,6 +18655,7 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
       status: PetitionSignatureRequestStatus;
       isAnonymized: boolean;
       metadata: { [key: string]: any };
+      auditTrailFilename?: string | null;
       signatureConfig: {
         __typename?: "SignatureConfig";
         signers: Array<{
@@ -18929,6 +18937,7 @@ export type PetitionReplies_petitionQuery = {
           status: PetitionSignatureRequestStatus;
           isAnonymized: boolean;
           metadata: { [key: string]: any };
+          auditTrailFilename?: string | null;
           signatureConfig: {
             __typename?: "SignatureConfig";
             signers: Array<{
@@ -21468,6 +21477,7 @@ export type PetitionSignaturesCardPolling_petitionQuery = {
           status: PetitionSignatureRequestStatus;
           isAnonymized: boolean;
           metadata: { [key: string]: any };
+          auditTrailFilename?: string | null;
           signatureConfig: {
             __typename?: "SignatureConfig";
             signers: Array<{
@@ -25086,6 +25096,7 @@ export const CurrentSignatureRequestRow_PetitionSignatureRequestFragmentDoc = gq
       ...PetitionSignatureRequestSignerStatusIcon_SignerStatus
     }
     metadata
+    auditTrailFilename
   }
   ${SignerReference_PetitionSignerFragmentDoc}
   ${PetitionSignatureRequestSignerStatusIcon_SignerStatusFragmentDoc}
@@ -25101,6 +25112,7 @@ export const OlderSignatureRequestRows_PetitionSignatureRequestFragmentDoc = gql
     }
     metadata
     isAnonymized
+    auditTrailFilename
   }
   ${SignerReference_PetitionSignerFragmentDoc}
 ` as unknown as DocumentNode<OlderSignatureRequestRows_PetitionSignatureRequestFragment, unknown>;
@@ -27111,10 +27123,12 @@ export const PetitionSignaturesCard_signedPetitionDownloadLinkDocument = gql`
   mutation PetitionSignaturesCard_signedPetitionDownloadLink(
     $petitionSignatureRequestId: GID!
     $preview: Boolean
+    $downloadAuditTrail: Boolean
   ) {
     signedPetitionDownloadLink(
       petitionSignatureRequestId: $petitionSignatureRequestId
       preview: $preview
+      downloadAuditTrail: $downloadAuditTrail
     ) {
       result
       url

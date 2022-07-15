@@ -118,10 +118,12 @@ const mutations = [
     mutation PetitionSignaturesCard_signedPetitionDownloadLink(
       $petitionSignatureRequestId: GID!
       $preview: Boolean
+      $downloadAuditTrail: Boolean
     ) {
       signedPetitionDownloadLink(
         petitionSignatureRequestId: $petitionSignatureRequestId
         preview: $preview
+        downloadAuditTrail: $downloadAuditTrail
       ) {
         result
         url
@@ -237,11 +239,11 @@ export const PetitionSignaturesCard = Object.assign(
     );
 
     const handleDownloadSignedDoc = useCallback(
-      async (petitionSignatureRequestId: string) => {
+      async (petitionSignatureRequestId: string, downloadAuditTrail: boolean) => {
         await withError(
           openNewWindow(async () => {
             const { data } = await downloadSignedDoc({
-              variables: { petitionSignatureRequestId, preview: true },
+              variables: { petitionSignatureRequestId, downloadAuditTrail, preview: true },
             });
             const { url, result } = data!.signedPetitionDownloadLink;
             if (result !== "SUCCESS") {

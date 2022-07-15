@@ -1,10 +1,27 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, GridItem, Heading, HStack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  ButtonGroup,
+  Flex,
+  GridItem,
+  Heading,
+  HStack,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Text,
+  Tooltip,
+} from "@chakra-ui/react";
+import { ChevronDownIcon, DocumentIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { OlderSignatureRequestRows_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { Fragment } from "react";
-import { FormattedList, FormattedMessage } from "react-intl";
+import { FormattedList, FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 import { Divider } from "../common/Divider";
 import { NetDocumentsIconButton } from "../common/NetDocumentsLink";
+import { ResponsiveButtonIcon } from "../common/ResponsiveButtonIcon";
 import { SignerReference } from "../common/SignerReference";
 import { PetitionSignatureRequestStatusText } from "./PetitionSignatureRequestStatusText";
 
@@ -13,8 +30,9 @@ export function OlderSignatureRequestRows({
   onDownload,
 }: {
   signatures: OlderSignatureRequestRows_PetitionSignatureRequestFragment[];
-  onDownload: (petitionSignatureRequestId: string) => void;
+  onDownload: (petitionSignatureRequestId: string, downloadAuditTrail: boolean) => void;
 }) {
+  const intl = useIntl();
   return (
     <>
       <GridItem colSpan={3}>
@@ -56,15 +74,53 @@ export function OlderSignatureRequestRows({
                     size="sm"
                   />
                 ) : null}
-                <Button
-                  width="24"
-                  fontSize="sm"
-                  height={8}
-                  onClick={() => onDownload(signature.id)}
-                  isDisabled={signature.isAnonymized}
-                >
-                  <FormattedMessage id="generic.download" defaultMessage="Download" />
-                </Button>
+                <ButtonGroup isAttached colorScheme="primary" isDisabled={signature.isAnonymized}>
+                  <ResponsiveButtonIcon
+                    breakpoint="lg"
+                    colorScheme="primary"
+                    icon={<DownloadIcon fontSize="lg" display="block" />}
+                    label={intl.formatMessage({
+                      id: "component.petition-signatures-card.signed-document",
+                      defaultMessage: "Signed document",
+                    })}
+                    onClick={() => onDownload(signature.id, false)}
+                  />
+                  <Divider
+                    isVertical
+                    color="primary.600"
+                    opacity={signature.isAnonymized ? 0.43 : undefined}
+                  />
+                  <Menu placement="bottom-end">
+                    <Tooltip
+                      label={intl.formatMessage({
+                        id: "generic.more-options",
+                        defaultMessage: "More options...",
+                      })}
+                    >
+                      <MenuButton
+                        as={IconButton}
+                        icon={<ChevronDownIcon fontSize="lg" />}
+                        aria-label={intl.formatMessage({
+                          id: "generic.more-options",
+                          defaultMessage: "More options...",
+                        })}
+                        minWidth={8}
+                      />
+                    </Tooltip>
+                    <MenuList minWidth="fit-content">
+                      <MenuItem
+                        icon={<DocumentIcon boxSize={5} />}
+                        onClick={() => onDownload(signature.id, true)}
+                        isDisabled={!isDefined(signature.auditTrailFilename)}
+                      >
+                        <FormattedMessage
+                          id="component.petition-signatures-card.audit-trail"
+                          defaultMessage="Audit trail"
+                        />
+                      </MenuItem>
+                    </MenuList>
+                  </Menu>
+                </ButtonGroup>
               </HStack>
             </Flex>
           ) : null}
@@ -86,6 +142,7 @@ OlderSignatureRequestRows.fragments = {
       }
       metadata
       isAnonymized
+      auditTrailFilename
     }
     ${SignerReference.fragments.PetitionSigner}
   `,

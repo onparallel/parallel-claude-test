@@ -2625,6 +2625,11 @@
     "context": "Add signature"
   },
   {
+    "term": "component.petition-signatures-card.audit-trail",
+    "definition": "Audit trail",
+    "context": "Audit trail"
+  },
+  {
     "term": "component.petition-signatures-card.edit-signers",
     "definition": "Edit signers",
     "context": "Edit signers"
@@ -2663,6 +2668,11 @@
     "term": "component.petition-signatures-card.signature-description",
     "definition": "Generates a document and iniciates an eSignature process, through one of our integrated providers.",
     "context": "Generates a document and iniciates an eSignature process, through one of our integrated providers."
+  },
+  {
+    "term": "component.petition-signatures-card.signed-document",
+    "definition": "Signed document",
+    "context": "Signed document"
   },
   {
     "term": "component.petition-signatures-card.signers",
