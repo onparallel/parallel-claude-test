@@ -45,11 +45,13 @@ export const AppLayout = Object.assign(
     // Show spinner if a page takes more than 1s to load
     useEffect(() => {
       router.events.on("routeChangeStart", handleRouteChangeStart);
-      router.events.on("routeChangeComplete", handleRouteChangeComplete);
+      router.events.on("routeChangeError", handleRouteChangeFinish);
+      router.events.on("routeChangeComplete", handleRouteChangeFinish);
       return () => {
         window.clearTimeout(timeoutRef.current);
         router.events.off("routeChangeStart", handleRouteChangeStart);
-        router.events.off("routeChangeComplete", handleRouteChangeComplete);
+        router.events.off("routeChangeError", handleRouteChangeFinish);
+        router.events.off("routeChangeComplete", handleRouteChangeFinish);
       };
       function handleRouteChangeStart() {
         if (!isDefined(timeoutRef.current)) {
@@ -59,7 +61,7 @@ export const AppLayout = Object.assign(
           }, 1000);
         }
       }
-      function handleRouteChangeComplete() {
+      function handleRouteChangeFinish() {
         if (timeoutRef.current) {
           window.clearTimeout(timeoutRef.current);
         } else {

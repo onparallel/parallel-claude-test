@@ -561,7 +561,7 @@ function _PetitionSettings({
                   myEffectivePermission === "READ"
                 }
               >
-                {user.organization.themes.pdfDocument.map((theme) => (
+                {user.organization.pdfDocumentThemes.map((theme) => (
                   <option key={theme.id} value={theme.id}>
                     {theme.name}
                   </option>
@@ -840,11 +840,9 @@ const fragments = {
             }
           }
         }
-        themes {
-          pdfDocument {
-            id
-            name
-          }
+        pdfDocumentThemes {
+          id
+          name
         }
       }
       ...SignatureConfigDialog_User

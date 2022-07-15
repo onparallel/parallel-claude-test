@@ -23,15 +23,32 @@ export async function up(knex: Knex): Promise<void> {
     check ((is_default = true and deleted_at is null) or (is_default = false));
 
     -- at most 1 default theme on (org_id, type)
-    create unique index "organization_theme__org_id__type" on "organization_theme" ("org_id", "type") where is_default and deleted_at is null;
+    create unique index "organization_theme__org_id__type__is_default" on "organization_theme" ("org_id", "type") where is_default and deleted_at is null;
+
+    -- make it easy to get themes for organizations
+    create index "organization_theme__org_id__type" on "organization_theme" ("org_id", "type");
   `);
 
   // populate table with custom or default theme for every org
   const result = await knex.raw(
     /* sql */ `
+    with orgs as (
+      select
+        o.id,
+        coalesce(ud.details->>'preferredLocale', 'en') as locale,
+        pdf_document_theme
+      from "organization" o
+      left join "user" u on u.org_id = o.id and u.organization_role = 'OWNER'
+      left join "user_data" ud on u.user_data_id = ud.id
+    )
     insert into "organization_theme" (org_id, name, type, is_default, data)
-    select id, 'Default', 'PDF_DOCUMENT', true, coalesce(pdf_document_theme, ?)
-    from organization
+    select
+      id,
+      case locale when 'es' then 'Tema por defecto' else 'Default theme' end ,
+      'PDF_DOCUMENT',
+      true,
+      coalesce(pdf_document_theme, ?::jsonb)
+    from orgs order by id
     returning id, org_id;
   `,
     [JSON.stringify(defaultPdfDocumentTheme)]
@@ -45,9 +62,8 @@ export async function up(knex: Knex): Promise<void> {
   const themes = result.rows as Array<{ id: number; org_id: number }>;
   if (themes.length > 0) {
     await knex.raw(/* sql */ `
-    with theme(id, org_id) as (values ${themes.map((t) => `(${t.id},${t.org_id})`).join(",")})
     update petition p set document_organization_theme_id = t.id
-    from theme t
+    from "organization_theme" t
     where p.org_id = t.org_id
   `);
   }

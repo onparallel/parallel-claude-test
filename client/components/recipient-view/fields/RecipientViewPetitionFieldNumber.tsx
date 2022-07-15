@@ -138,7 +138,7 @@ export function RecipientViewPetitionFieldNumber({
     ref: newReplyRef,
     isDisabled: isDisabled,
     isInvalid: isInvalidReply[field.id],
-    allowNegative: !isDefined(range.min) || range.min < 0,
+    onlyPositive: isDefined(range.min) && range.min >= 0,
     decimals: decimals ?? 2,
     prefix,
     suffix,
@@ -349,7 +349,7 @@ export const RecipientViewPetitionFieldReplyNumber = forwardRef<
     id: `reply-${field.id}-${reply.id}`,
     isDisabled: isDisabled || reply.status === "APPROVED",
     isInvalid: reply.status === "REJECTED" || isInvalid,
-    allowNegative: !isDefined(range.min) || range.min < 0,
+    onlyPositive: isDefined(range.min) && range.min >= 0,
     decimals: decimals ?? 2,
     paddingRight: 10,
     onKeyDown: async (event) => {

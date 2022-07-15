@@ -16,6 +16,8 @@ export type If<Condition extends boolean | undefined, Then, Else = never> = Cond
 
 export type UnionToArrayUnion<T> = T extends any ? T[] : never;
 
+export type IsEmptyObject<T> = keyof T extends [never] ? true : false;
+
 export interface Focusable {
   focus(options?: FocusOptions): void;
 }

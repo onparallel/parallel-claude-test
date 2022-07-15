@@ -18,6 +18,7 @@ export interface ConfirmDialogProps<TResult> extends Omit<BaseDialogProps<TResul
   body: ReactNode;
   confirm: ReactNode;
   cancel?: ReactNode;
+  alternative?: ReactNode;
   content?: ModalContentProps;
   hasCloseButton?: boolean;
 }
@@ -27,6 +28,7 @@ export function ConfirmDialog<TResult = void>({
   body,
   confirm,
   cancel,
+  alternative,
   content,
   initialFocusRef,
   hasCloseButton,
@@ -60,6 +62,7 @@ export function ConfirmDialog<TResult = void>({
         <ModalHeader>{header}</ModalHeader>
         <ModalBody>{body}</ModalBody>
         <ModalFooter as={Stack} direction="row">
+          {alternative}
           {cancel ?? (
             <Button ref={cancelRef} onClick={() => props.onReject()}>
               <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />

@@ -1190,12 +1190,10 @@ describe("GraphQL/Users", () => {
                   isDefault
                 }
               }
-              themes {
-                pdfDocument {
-                  name
-                  isDefault
-                  data
-                }
+              pdfDocumentThemes {
+                name
+                isDefault
+                data
               }
               usageLimits {
                 petitions {
@@ -1226,18 +1224,19 @@ describe("GraphQL/Users", () => {
               totalCount: 1,
               items: [{ type: "SIGNATURE", name: "Signaturit Sandbox", isDefault: true }],
             },
-            themes: {
-              pdfDocument: [{ name: "Default", isDefault: true, data: defaultPdfDocumentTheme }],
-            },
+            pdfDocumentThemes: [
+              {
+                name: "Default",
+                isDefault: true,
+                data: omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
+              },
+            ],
             usageLimits: {
               petitions: {
                 limit: 20,
                 used: 0,
               },
-              signatures: {
-                limit: 0,
-                used: 0,
-              },
+              signatures: null,
               users: {
                 limit: 2,
               },

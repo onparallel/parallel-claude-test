@@ -1,23 +1,18 @@
 import { gql } from "@apollo/client";
 import { Box, Center, Flex, Image, Stack, Text } from "@chakra-ui/react";
 import { Fonts } from "@parallel/components/organization/branding/DocumentFont";
-import {
-  DocumentThemePreview_OrganizationFragment,
-  DocumentThemePreview_OrganizationThemeFragment,
-} from "@parallel/graphql/__types";
+import { DocumentThemePreview_OrganizationFragment } from "@parallel/graphql/__types";
 import { CSSProperties } from "react";
 import { FormattedMessage } from "react-intl";
 import { uniq } from "remeda";
+import { DocumentThemeEditorData } from "./DocumentThemeEditor";
 
 interface DocumentThemePreviewProps {
   organization: DocumentThemePreview_OrganizationFragment;
-  theme: DocumentThemePreview_OrganizationThemeFragment;
+  theme: DocumentThemeEditorData;
 }
 
-export function DocumentThemePreview({
-  organization,
-  theme: { data: theme },
-}: DocumentThemePreviewProps) {
+export function DocumentThemePreview({ organization, theme }: DocumentThemePreviewProps) {
   const mmRatio = "var(--page-width)/210";
   const ptRatio = "25.4/72*var(--page-width)/210";
   const styles: Record<string, CSSProperties> = {
@@ -188,12 +183,6 @@ DocumentThemePreview.fragments = {
       id
       name
       logoUrl(options: { resize: { width: 600 } })
-    }
-  `,
-  OrganizationTheme: gql`
-    fragment DocumentThemePreview_OrganizationTheme on OrganizationTheme {
-      id
-      data
     }
   `,
 };

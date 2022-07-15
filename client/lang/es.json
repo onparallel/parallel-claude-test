@@ -15,11 +15,6 @@
     "context": "Admin panel"
   },
   {
-    "term": "branding.delete-theme-tooltip",
-    "definition": "Eliminar tema",
-    "context": "Delete theme"
-  },
-  {
     "term": "branding.edit-theme-tooltip",
     "definition": "Editar tema",
     "context": "Edit theme"
@@ -31,8 +26,8 @@
   },
   {
     "term": "branding.themes-header",
-    "definition": "Temas:",
-    "context": "Themes:"
+    "definition": "Temas",
+    "context": "Themes"
   },
   {
     "term": "component.account-delegates.delegates",
@@ -266,8 +261,8 @@
   },
   {
     "term": "component.branding-general.main-font-help",
-    "definition": "Esta fuente se utilizará en tus mensajes y peticiones con destinatario. El listado incluye solo fuentes seguras para todos los clientes de correo.",
-    "context": "This font will be used in your emails and petitions. The list includes only secure fonts for all email clients."
+    "definition": "Esta fuente se utilizará en tus mensajes y parallels con destinatario. El listado incluye solo fuentes seguras para todos los clientes de correo.",
+    "context": "This font will be used in your emails and parallels. The list includes only secure fonts for all email clients."
   },
   {
     "term": "component.branding-general.primary-color",
@@ -276,8 +271,8 @@
   },
   {
     "term": "component.branding-general.primary-color-help",
-    "definition": "Este color se utilizará en los botones y enlaces de tus mensajes y peticiones con destinatario.",
-    "context": "This color will be used in the buttons and links of your messages and petitions with recipient."
+    "definition": "Este color se utilizará en los botones y enlaces de tus mensajes y parallels con destinatario.",
+    "context": "This color will be used in the buttons and links of your messages and parallels with recipient."
   },
   {
     "term": "component.branding-general.primary-color-warning",
@@ -1006,8 +1001,8 @@
   },
   {
     "term": "component.document-theme-editor.show-logo-description",
-    "definition": "Muestra el logotipo de la organización en tus documentos.",
-    "context": "Display the organization's logo on your documents."
+    "definition": "Mostrar tu logo en los documentos",
+    "context": "Display your logo on the documents"
   },
   {
     "term": "component.document-theme-editor.show-logo-header",
@@ -4315,9 +4310,34 @@
     "context": "Enter the signer's information"
   },
   {
+    "term": "components.confirm-discard-changes-dialog.body",
+    "definition": "",
+    "context": "You have unsaved changes. Would you like to discard them?"
+  },
+  {
+    "term": "components.confirm-discard-changes-dialog.cancel",
+    "definition": "",
+    "context": "Stay"
+  },
+  {
+    "term": "components.confirm-discard-changes-dialog.confirm",
+    "definition": "",
+    "context": "Discard and continue"
+  },
+  {
+    "term": "components.confirm-discard-changes-dialog.header",
+    "definition": "",
+    "context": "Unsaved changes"
+  },
+  {
     "term": "components.create-or-update-document-theme-dialog.create-theme-button",
     "definition": "Crear tema",
     "context": "Create theme"
+  },
+  {
+    "term": "components.create-or-update-document-theme-dialog.delete-theme-button",
+    "definition": "",
+    "context": "Delete theme"
   },
   {
     "term": "components.create-or-update-document-theme-dialog.edit-theme",
@@ -4335,9 +4355,14 @@
     "context": "New theme"
   },
   {
+    "term": "components.create-or-update-document-theme-dialog.set-default-help",
+    "definition": "",
+    "context": "When creating new templates, this theme will be used as default. Existing templates are not affected."
+  },
+  {
     "term": "components.create-or-update-document-theme-dialog.set-default-label",
     "definition": "Establecer como tema por defecto",
-    "context": "Set as Default theme"
+    "context": "Set as default theme"
   },
   {
     "term": "components.create-or-update-user-dialog.included-in",
@@ -4920,11 +4945,6 @@
     "context": "Yes, delete"
   },
   {
-    "term": "generic.confirm-restore-button",
-    "definition": "Sí, restaurar",
-    "context": "Yes, restore"
-  },
-  {
     "term": "generic.confirm-send",
     "definition": "Si, enviar",
     "context": "Yes, send"
@@ -4953,6 +4973,11 @@
     "term": "generic.created-at",
     "definition": "Fecha de creación",
     "context": "Created at"
+  },
+  {
+    "term": "generic.default",
+    "definition": "",
+    "context": "Default"
   },
   {
     "term": "generic.delete",
@@ -5871,8 +5896,8 @@
   },
   {
     "term": "organization.branding.brand-description",
-    "definition": "Tu marca se utilizará en los mensajes y peticiones que envíes.",
-    "context": "Your brand will be used in the messages and petitions you send."
+    "definition": "Tu marca se utilizará en los mensajes y parallels que envíes.",
+    "context": "Your brand will be used in the messages and parallels you send."
   },
   {
     "term": "organization.branding.documents.tab",
@@ -7011,8 +7036,8 @@
   },
   {
     "term": "petition.confirm-delete-theme.body",
-    "definition": "Si eliminas este tema todas las plantillas y peticiones que lo estén utilizando volverán al tema por defecto.",
-    "context": "If you delete this theme all templates and petitions that are using it will revert to the default theme."
+    "definition": "Si eliminas este tema todas las plantillas y parallels que lo estén utilizando volverán al tema por defecto.",
+    "context": "If you delete this theme all templates and parallels that are using it will revert to the default theme."
   },
   {
     "term": "petition.confirm-delete-theme.confirm",
@@ -7023,16 +7048,6 @@
     "term": "petition.confirm-delete-theme.header",
     "definition": "Eliminar tema",
     "context": "Delete theme"
-  },
-  {
-    "term": "petition.confirm-reset-theme.body",
-    "definition": "Si procedes, todos los ajustes de las fuentes volverán al valor por defecto.",
-    "context": "If you proceed all font settings will revert to the default value."
-  },
-  {
-    "term": "petition.confirm-reset-theme.header",
-    "definition": "Restaurar predeterminado",
-    "context": "Restore defaults"
   },
   {
     "term": "petition.contents",

@@ -1,7 +1,7 @@
 import { TableSorting, TableSortingDirection } from "@parallel/components/common/Table";
 import type Router from "next/router";
 import { NextRouter, useRouter } from "next/router";
-import { Dispatch, SetStateAction, useCallback, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { equals, pick } from "remeda";
 import { fromBase64, toBase64 } from "./base64";
 import { pathParams, resolveUrl } from "./next";
@@ -155,10 +155,16 @@ export interface QueryStateOptions {
 
 export type QueryStateOf<T extends {}> = { [P in keyof T]: QueryItem<T[P]> };
 
+type SetQueryState<T> = (state: T | ((prevState: T) => T), options?: SetQueryStateOptions) => void;
+
+export interface SetQueryStateOptions {
+  type?: "replace" | "push";
+}
+
 export function useQueryState<T extends {}>(
   shape: QueryStateOf<T>,
   { prefix }: QueryStateOptions = {}
-): [T, Dispatch<SetStateAction<Partial<T>>>] {
+): [T, SetQueryState<Partial<T>>] {
   const router = useRouter();
   const state = useMemo(() => {
     return parseQuery(router.query, shape, { prefix });
@@ -168,7 +174,7 @@ export function useQueryState<T extends {}>(
   );
   return [
     state,
-    useCallback(async function (state) {
+    useCallback(async function (state, { type = "replace" } = {}) {
       const { query, pathname } = ref.current;
       const newState =
         typeof state === "function" ? state(parseQuery(query, shape, { prefix })) : state;
@@ -196,7 +202,7 @@ export function useQueryState<T extends {}>(
         ) as [string, string][]),
       ];
       const route = resolveUrl(pathname, query);
-      await router.replace(
+      await router[type](
         newQuery.length > 0 ? `${route}?${new URLSearchParams(newQuery)}` : route,
         undefined,
         { shallow: true }
@@ -207,17 +213,20 @@ export function useQueryState<T extends {}>(
 
 export function useQueryStateSlice<T extends {}, K extends keyof T>(
   state: T,
-  setState: Dispatch<SetStateAction<Partial<T>>>,
+  setState: SetQueryState<Partial<T>>,
   slice: K
-): [T[K], Dispatch<SetStateAction<T[K]>>] {
+): [T[K], SetQueryState<T[K]>] {
   return [
     state[slice],
     useCallback(
-      function (value) {
-        setState((prevState) => ({
-          ...prevState,
-          [slice]: typeof value === "function" ? (value as any)(prevState[slice]) : value,
-        }));
+      function (value, options) {
+        setState(
+          (prevState) => ({
+            ...prevState,
+            [slice]: typeof value === "function" ? (value as any)(prevState[slice]) : value,
+          }),
+          options
+        );
       },
       [setState]
     ),

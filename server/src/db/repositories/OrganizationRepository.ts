@@ -408,10 +408,10 @@ export class OrganizationRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
-  readonly loadOrganizationThemesByOrgId = this.buildLoadMultipleBy(
+  readonly loadPdfDocumentThemesByOrgId = this.buildLoadMultipleBy(
     "organization_theme",
     "org_id",
-    (q) => q.whereNull("deleted_at").orderBy("created_at", "desc")
+    (q) => q.where("type", "PDF_DOCUMENT").whereNull("deleted_at").orderBy("created_at", "desc")
   );
 
   async createDefaultOrganizationThemes(orgId: number, createdBy?: string, t?: Knex.Transaction) {

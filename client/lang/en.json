@@ -15,11 +15,6 @@
     "context": "Admin panel"
   },
   {
-    "term": "branding.delete-theme-tooltip",
-    "definition": "Delete theme",
-    "context": "Delete theme"
-  },
-  {
     "term": "branding.edit-theme-tooltip",
     "definition": "Edit theme",
     "context": "Edit theme"
@@ -31,8 +26,8 @@
   },
   {
     "term": "branding.themes-header",
-    "definition": "Themes:",
-    "context": "Themes:"
+    "definition": "Themes",
+    "context": "Themes"
   },
   {
     "term": "component.account-delegates.delegates",
@@ -266,8 +261,8 @@
   },
   {
     "term": "component.branding-general.main-font-help",
-    "definition": "This font will be used in your emails and petitions. The list includes only secure fonts for all email clients.",
-    "context": "This font will be used in your emails and petitions. The list includes only secure fonts for all email clients."
+    "definition": "This font will be used in your emails and parallels. The list includes only secure fonts for all email clients.",
+    "context": "This font will be used in your emails and parallels. The list includes only secure fonts for all email clients."
   },
   {
     "term": "component.branding-general.primary-color",
@@ -276,8 +271,8 @@
   },
   {
     "term": "component.branding-general.primary-color-help",
-    "definition": "This color will be used in the buttons and links of your messages and petitions with recipient.",
-    "context": "This color will be used in the buttons and links of your messages and petitions with recipient."
+    "definition": "This color will be used in the buttons and links of your messages and parallels with recipient.",
+    "context": "This color will be used in the buttons and links of your messages and parallels with recipient."
   },
   {
     "term": "component.branding-general.primary-color-warning",
@@ -1006,8 +1001,8 @@
   },
   {
     "term": "component.document-theme-editor.show-logo-description",
-    "definition": "Display the organization's logo on your documents.",
-    "context": "Display the organization's logo on your documents."
+    "definition": "Display your logo on the documents",
+    "context": "Display your logo on the documents"
   },
   {
     "term": "component.document-theme-editor.show-logo-header",
@@ -4315,9 +4310,34 @@
     "context": "Enter the signer's information"
   },
   {
+    "term": "components.confirm-discard-changes-dialog.body",
+    "definition": "You have unsaved changes. Would you like to discard them?",
+    "context": "You have unsaved changes. Would you like to discard them?"
+  },
+  {
+    "term": "components.confirm-discard-changes-dialog.cancel",
+    "definition": "Stay",
+    "context": "Stay"
+  },
+  {
+    "term": "components.confirm-discard-changes-dialog.confirm",
+    "definition": "Discard and continue",
+    "context": "Discard and continue"
+  },
+  {
+    "term": "components.confirm-discard-changes-dialog.header",
+    "definition": "Unsaved changes",
+    "context": "Unsaved changes"
+  },
+  {
     "term": "components.create-or-update-document-theme-dialog.create-theme-button",
     "definition": "Create theme",
     "context": "Create theme"
+  },
+  {
+    "term": "components.create-or-update-document-theme-dialog.delete-theme-button",
+    "definition": "Delete theme",
+    "context": "Delete theme"
   },
   {
     "term": "components.create-or-update-document-theme-dialog.edit-theme",
@@ -4335,9 +4355,14 @@
     "context": "New theme"
   },
   {
+    "term": "components.create-or-update-document-theme-dialog.set-default-help",
+    "definition": "When creating new templates, this theme will be used as default. Existing templates are not affected.",
+    "context": "When creating new templates, this theme will be used as default. Existing templates are not affected."
+  },
+  {
     "term": "components.create-or-update-document-theme-dialog.set-default-label",
-    "definition": "Set as Default theme",
-    "context": "Set as Default theme"
+    "definition": "Set as default theme",
+    "context": "Set as default theme"
   },
   {
     "term": "components.create-or-update-user-dialog.included-in",
@@ -4920,11 +4945,6 @@
     "context": "Yes, delete"
   },
   {
-    "term": "generic.confirm-restore-button",
-    "definition": "Yes, restore",
-    "context": "Yes, restore"
-  },
-  {
     "term": "generic.confirm-send",
     "definition": "Yes, send",
     "context": "Yes, send"
@@ -4953,6 +4973,11 @@
     "term": "generic.created-at",
     "definition": "Created at",
     "context": "Created at"
+  },
+  {
+    "term": "generic.default",
+    "definition": "Default",
+    "context": "Default"
   },
   {
     "term": "generic.delete",
@@ -5871,8 +5896,8 @@
   },
   {
     "term": "organization.branding.brand-description",
-    "definition": "Your brand will be used in the messages and petitions you send.",
-    "context": "Your brand will be used in the messages and petitions you send."
+    "definition": "Your brand will be used in the messages and parallels you send.",
+    "context": "Your brand will be used in the messages and parallels you send."
   },
   {
     "term": "organization.branding.documents.tab",
@@ -7011,8 +7036,8 @@
   },
   {
     "term": "petition.confirm-delete-theme.body",
-    "definition": "If you delete this theme all templates and petitions that are using it will revert to the default theme.",
-    "context": "If you delete this theme all templates and petitions that are using it will revert to the default theme."
+    "definition": "If you delete this theme all templates and parallels that are using it will revert to the default theme.",
+    "context": "If you delete this theme all templates and parallels that are using it will revert to the default theme."
   },
   {
     "term": "petition.confirm-delete-theme.confirm",
@@ -7023,16 +7048,6 @@
     "term": "petition.confirm-delete-theme.header",
     "definition": "Delete theme",
     "context": "Delete theme"
-  },
-  {
-    "term": "petition.confirm-reset-theme.body",
-    "definition": "If you proceed all font settings will revert to the default value.",
-    "context": "If you proceed all font settings will revert to the default value."
-  },
-  {
-    "term": "petition.confirm-reset-theme.header",
-    "definition": "Restore defaults",
-    "context": "Restore defaults"
   },
   {
     "term": "petition.contents",

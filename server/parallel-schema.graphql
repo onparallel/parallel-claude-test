@@ -1228,11 +1228,6 @@ type Mutation {
   """
   restoreDefaultOrganizationDocumentThemeFonts: Organization!
     @deprecated(reason: "use restoreDefaultOrganizationPdfDocumentThemeFonts")
-
-  """
-  Restores the 'fonts' section of the organization document theme to its default values
-  """
-  restoreDefaultOrganizationPdfDocumentThemeFonts(orgThemeId: GID!): OrganizationTheme!
   restoreLogin: Result!
 
   """
@@ -1496,7 +1491,9 @@ type Mutation {
   updates the PDF_DOCUMENT theme of the organization
   """
   updateOrganizationPdfDocumentTheme(
-    data: UpdateOrganizationPdfDocumentThemeInput!
+    data: OrganizationPdfDocumentThemeInput
+    isDefault: Boolean
+    name: String
     orgThemeId: GID!
   ): Organization!
 
@@ -1848,6 +1845,7 @@ type Organization implements Timestamps {
   name: String!
   pdfDocumentTheme: JSONObject!
     @deprecated(reason: "Not used anymore. Use themes.pdfDocument[0].data")
+  pdfDocumentThemes: [OrganizationTheme!]!
 
   """
   The preferred tone of organization.
@@ -1858,7 +1856,6 @@ type Organization implements Timestamps {
   The status of the organization.
   """
   status: OrganizationStatus!
-  themes: OrganizationThemeList!
 
   """
   Time when the resource was last updated.
@@ -2001,13 +1998,8 @@ enum OrganizationStatus {
 type OrganizationTheme {
   data: JSONObject!
   id: GID!
-  isCustomized: Boolean!
   isDefault: Boolean!
   name: String!
-}
-
-type OrganizationThemeList {
-  pdfDocument: [OrganizationTheme!]!
 }
 
 type OrganizationUsageLimit {
@@ -4905,12 +4897,6 @@ enum Tone {
 input UpdateContactInput {
   firstName: String
   lastName: String
-}
-
-input UpdateOrganizationPdfDocumentThemeInput {
-  isDefault: Boolean
-  name: String
-  theme: OrganizationPdfDocumentThemeInput
 }
 
 input UpdatePetitionFieldInput {

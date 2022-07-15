@@ -208,12 +208,6 @@ export interface NexusGenInputs {
     firstName?: string | null; // String
     lastName?: string | null; // String
   };
-  UpdateOrganizationPdfDocumentThemeInput: {
-    // input type
-    isDefault?: boolean | null; // Boolean
-    name?: string | null; // String
-    theme?: NexusGenInputs["OrganizationPdfDocumentThemeInput"] | null; // OrganizationPdfDocumentThemeInput
-  };
   UpdatePetitionFieldInput: {
     // input type
     alias?: string | null; // String
@@ -448,9 +442,6 @@ export interface NexusGenObjects {
     totalCount: number; // Int!
   };
   OrganizationTheme: db.OrganizationTheme;
-  OrganizationThemeList: {
-    pdfDocument: db.OrganizationTheme[];
-  };
   OrganizationUsageLimit: {
     petitions: {
       limit: number;
@@ -1094,7 +1085,6 @@ export interface NexusGenFieldTypes {
     resetTemporaryPassword: NexusGenEnums["Result"]; // Result!
     resetUserPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     restoreDefaultOrganizationDocumentThemeFonts: NexusGenRootTypes["Organization"]; // Organization!
-    restoreDefaultOrganizationPdfDocumentThemeFonts: NexusGenRootTypes["OrganizationTheme"]; // OrganizationTheme!
     restoreLogin: NexusGenEnums["Result"]; // Result!
     revokeUserAuthToken: NexusGenEnums["Result"]; // Result!
     sendPetition: NexusGenRootTypes["SendPetitionResult"][]; // [SendPetitionResult!]!
@@ -1180,9 +1170,9 @@ export interface NexusGenFieldTypes {
     logoUrl: string | null; // String
     name: string; // String!
     pdfDocumentTheme: NexusGenScalars["JSONObject"]; // JSONObject!
+    pdfDocumentThemes: NexusGenRootTypes["OrganizationTheme"][]; // [OrganizationTheme!]!
     preferredTone: NexusGenEnums["Tone"]; // Tone!
     status: NexusGenEnums["OrganizationStatus"]; // OrganizationStatus!
-    themes: NexusGenRootTypes["OrganizationThemeList"]; // OrganizationThemeList!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     usageLimits: NexusGenRootTypes["OrganizationUsageLimit"]; // OrganizationUsageLimit!
     users: NexusGenRootTypes["UserPagination"]; // UserPagination!
@@ -1196,13 +1186,8 @@ export interface NexusGenFieldTypes {
     // field return type
     data: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    isCustomized: boolean; // Boolean!
     isDefault: boolean; // Boolean!
     name: string; // String!
-  };
-  OrganizationThemeList: {
-    // field return type
-    pdfDocument: NexusGenRootTypes["OrganizationTheme"][]; // [OrganizationTheme!]!
   };
   OrganizationUsageLimit: {
     // field return type
@@ -2635,7 +2620,6 @@ export interface NexusGenFieldTypeNames {
     resetTemporaryPassword: "Result";
     resetUserPassword: "SupportMethodResponse";
     restoreDefaultOrganizationDocumentThemeFonts: "Organization";
-    restoreDefaultOrganizationPdfDocumentThemeFonts: "OrganizationTheme";
     restoreLogin: "Result";
     revokeUserAuthToken: "Result";
     sendPetition: "SendPetitionResult";
@@ -2721,9 +2705,9 @@ export interface NexusGenFieldTypeNames {
     logoUrl: "String";
     name: "String";
     pdfDocumentTheme: "JSONObject";
+    pdfDocumentThemes: "OrganizationTheme";
     preferredTone: "Tone";
     status: "OrganizationStatus";
-    themes: "OrganizationThemeList";
     updatedAt: "DateTime";
     usageLimits: "OrganizationUsageLimit";
     users: "UserPagination";
@@ -2737,13 +2721,8 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     data: "JSONObject";
     id: "GID";
-    isCustomized: "Boolean";
     isDefault: "Boolean";
     name: "String";
-  };
-  OrganizationThemeList: {
-    // field return type name
-    pdfDocument: "OrganizationTheme";
   };
   OrganizationUsageLimit: {
     // field return type name
@@ -4381,10 +4360,6 @@ export interface NexusGenArgTypes {
       email: string; // String!
       locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     };
-    restoreDefaultOrganizationPdfDocumentThemeFonts: {
-      // args
-      orgThemeId: NexusGenScalars["GID"]; // GID!
-    };
     revokeUserAuthToken: {
       // args
       authTokenIds: NexusGenScalars["GID"][]; // [GID!]!
@@ -4544,7 +4519,9 @@ export interface NexusGenArgTypes {
     };
     updateOrganizationPdfDocumentTheme: {
       // args
-      data: NexusGenInputs["UpdateOrganizationPdfDocumentThemeInput"]; // UpdateOrganizationPdfDocumentThemeInput!
+      data?: NexusGenInputs["OrganizationPdfDocumentThemeInput"] | null; // OrganizationPdfDocumentThemeInput
+      isDefault?: boolean | null; // Boolean
+      name?: string | null; // String
       orgThemeId: NexusGenScalars["GID"]; // GID!
     };
     updateOrganizationPreferredTone: {

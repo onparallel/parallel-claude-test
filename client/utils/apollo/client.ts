@@ -199,6 +199,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
             users: { merge: false },
             usageLimits: { merge: true },
             integrations: { merge: false },
+            pdfDocumentThemes: { merge: false },
           },
         },
         User: {

@@ -49,8 +49,11 @@ function OrganizationBranding() {
     >
       <Tabs
         variant="enclosed"
-        defaultIndex={styles.indexOf(style)}
-        onChange={(index) => setStyle(styles[index])}
+        index={styles.indexOf(style)}
+        onChange={(index) => setStyle(styles[index], { type: "push" })}
+        isManual
+        isLazy
+        lazyBehavior="unmount"
       >
         <TabList paddingLeft={6} background="white" paddingTop={2}>
           <Tab

@@ -1,13 +1,13 @@
-import { FormControlOptions, Input, ThemingProps } from "@chakra-ui/react";
+import { assignRef, FormControlOptions, Input, ThemingProps } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import NumberFormat, { NumberFormatValues, SourceInfo } from "react-number-format";
 import { isDefined } from "remeda";
 
 interface NumeralInputProps extends ThemingProps<"Input">, FormControlOptions {
   decimals?: number;
-  allowNegative?: boolean;
+  onlyPositive?: boolean;
   onChange: (value: number | undefined) => void;
   value: number | undefined;
   prefix?: string;
@@ -15,18 +15,28 @@ interface NumeralInputProps extends ThemingProps<"Input">, FormControlOptions {
 }
 
 export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(function NumeralInput(
-  { decimals, allowNegative, value, prefix, suffix, onChange, ...props },
+  { decimals, onlyPositive, value, prefix, suffix, onChange, ...props },
   ref
 ) {
-  const intl = useIntl();
-  const [_value, setValue] = useState(
-    isDefined(value)
+  function format(value: number | undefined) {
+    return isDefined(value)
       ? intl.formatNumber(value, {
           minimumFractionDigits: 0,
           maximumFractionDigits: decimals ?? 5,
         })
-      : ""
-  );
+      : "";
+  }
+
+  const intl = useIntl();
+  const [_value, setValue] = useState(format(value));
+
+  const valueRef = useRef(value);
+  useEffect(() => {
+    if (value !== valueRef.current) {
+      setValue(format(value));
+      assignRef(valueRef, value);
+    }
+  }, [value]);
 
   const { decimalSeparator, thousandSeparator } = useMemo<{
     decimalSeparator: string;
@@ -48,6 +58,7 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
     const { event, source } = sourceInfo;
     if (source === "event" && (event.type === "change" || event.type === "keydown")) {
       onChange(floatValue);
+      assignRef(valueRef, value);
     }
   };
 
@@ -60,7 +71,7 @@ export const NumeralInput = chakraForwardRef<"input", NumeralInputProps>(functio
       thousandSeparator={thousandSeparator}
       decimalSeparator={decimalSeparator}
       decimalScale={decimals ?? 5}
-      allowNegative={allowNegative ?? true}
+      allowNegative={isDefined(onlyPositive) ? !onlyPositive : true}
       value={_value}
       onValueChange={handleOnValueChange}
       {...props}

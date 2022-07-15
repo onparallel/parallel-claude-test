@@ -8,7 +8,7 @@ import {
   nullable,
   objectType,
 } from "nexus";
-import { equals, isDefined, pick } from "remeda";
+import { equals, isDefined, omit, pick } from "remeda";
 import { defaultPdfDocumentTheme, PdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { or, userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -59,38 +59,9 @@ export const OrganizationTheme = objectType({
     t.globalId("id");
     t.nonNull.string("name");
     t.nonNull.boolean("isDefault", { resolve: (o) => o.is_default ?? false });
-    t.nonNull.boolean("isCustomized", {
-      resolve: (o) => {
-        if (o.type === "PDF_DOCUMENT") {
-          const fontKeys = [
-            "title1FontFamily",
-            "title1Color",
-            "title1FontSize",
-            "title2FontFamily",
-            "title2Color",
-            "title2FontSize",
-            "textFontFamily",
-            "textColor",
-            "textFontSize",
-          ] as (keyof PdfDocumentTheme)[];
-          return !equals(pick(o.data, fontKeys), pick(defaultPdfDocumentTheme, fontKeys));
-        }
-        return false;
-      },
-    });
     t.nonNull.jsonObject("data", { resolve: (o) => o.data });
   },
   sourceType: "db.OrganizationTheme",
-});
-
-export const OrganizationThemeList = objectType({
-  name: "OrganizationThemeList",
-  definition(t) {
-    t.nonNull.list.nonNull.field("pdfDocument", { type: "OrganizationTheme" });
-  },
-  sourceType: /* ts */ `{
-    pdfDocument: db.OrganizationTheme[];
-  }`,
 });
 
 /** @deprecated not used anymore */
@@ -126,26 +97,26 @@ export const OrganizationDocumentThemeInput = inputObjectType({
 export const OrganizationPdfDocumentThemeInput = inputObjectType({
   name: "OrganizationPdfDocumentThemeInput",
   definition(t) {
-    t.nullable.float("marginTop");
-    t.nullable.float("marginRight");
-    t.nullable.float("marginBottom");
-    t.nullable.float("marginLeft");
-    t.nullable.boolean("showLogo");
-    t.nullable.string("title1FontFamily");
-    t.nullable.string("title1Color");
-    t.nullable.float("title1FontSize");
-    t.nullable.string("title2FontFamily");
-    t.nullable.string("title2Color");
-    t.nullable.float("title2FontSize");
-    t.nullable.string("textFontFamily");
-    t.nullable.string("textColor");
-    t.nullable.float("textFontSize");
-    t.nullable.field("legalText", {
+    t.float("marginTop");
+    t.float("marginRight");
+    t.float("marginBottom");
+    t.float("marginLeft");
+    t.boolean("showLogo");
+    t.string("title1FontFamily");
+    t.string("title1Color");
+    t.float("title1FontSize");
+    t.string("title2FontFamily");
+    t.string("title2Color");
+    t.float("title2FontSize");
+    t.string("textFontFamily");
+    t.string("textColor");
+    t.float("textFontSize");
+    t.field("legalText", {
       type: inputObjectType({
         name: "OrganizationPdfDocumentThemeInputLegalText",
         definition(t) {
-          t.nullable.json("es");
-          t.nullable.json("en");
+          t.json("es");
+          t.json("en");
         },
       }),
     });
@@ -350,13 +321,14 @@ export const Organization = objectType({
         return o.preferred_tone;
       },
     });
-    t.nonNull.field("themes", {
-      type: "OrganizationThemeList",
+    t.nonNull.list.nonNull.field("pdfDocumentThemes", {
+      type: "OrganizationTheme",
       resolve: async (o, _, ctx) => {
-        const themes = await ctx.organizations.loadOrganizationThemesByOrgId(o.id);
-        return {
-          pdfDocument: themes.filter((t) => t.type === "PDF_DOCUMENT"),
-        };
+        const themes = await ctx.organizations.loadPdfDocumentThemesByOrgId(o.id);
+        return themes.map((theme) => ({
+          ...theme,
+          data: omit(theme.data, ["paginationPosition", "logoPosition"]),
+        }));
       },
     });
     t.nonNull.jsonObject("pdfDocumentTheme", {

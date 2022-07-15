@@ -2,6 +2,7 @@ import deepmerge from "deepmerge";
 import {
   arg,
   booleanArg,
+  core,
   inputObjectType,
   intArg,
   mutationField,
@@ -17,6 +18,7 @@ import { authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { uploadArg } from "../helpers/scalars";
 import { validateAnd } from "../helpers/validateArgs";
+import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
 import { inRange } from "../helpers/validators/inRange";
 import { maxLength } from "../helpers/validators/maxLength";
 import { validateFile } from "../helpers/validators/validateFile";
@@ -143,6 +145,25 @@ export const updateOrganizationBrandTheme = mutationField("updateOrganizationBra
   },
 });
 
+export function validateTheme<TypeName extends string, FieldName extends string>(
+  prop: (args: core.ArgsValue<TypeName, FieldName>) => any,
+  argName: string
+) {
+  return validateAnd(
+    ...["Top", "Right", "Bottom", "Left"].map((p) =>
+      inRange((args) => prop(args)?.[`margin${p}`], `${argName}.margin${p}`, 0)
+    ),
+    ...["text", "title1", "title2"].flatMap((p) => [
+      validFontFamily((args) => prop(args)?.[`${p}FontFamily`], `${argName}.${p}FontFamily`),
+      validateHexColor((args) => prop(args)?.[`${p}Color`], `${argName}.${p}Color`),
+      inRange((args) => prop(args)?.[`${p}FontSize`], `${argName}.${p}FontSize`, 5, 72),
+    ]),
+    ...["es", "en"].map((p) =>
+      validRichTextContent((args) => prop(args)?.legalText?.[p], `${argName}.legalText.${p}`)
+    )
+  ) as unknown as FieldValidateArgsResolver<TypeName, FieldName>;
+}
+
 export const updateOrganizationPdfDocumentTheme = mutationField(
   "updateOrganizationPdfDocumentTheme",
   {
@@ -154,58 +175,32 @@ export const updateOrganizationPdfDocumentTheme = mutationField(
     ),
     args: {
       orgThemeId: nonNull(globalIdArg("OrganizationTheme")),
-      data: nonNull(
-        inputObjectType({
-          name: "UpdateOrganizationPdfDocumentThemeInput",
-          definition(t) {
-            t.nullable.string("name");
-            t.nullable.boolean("isDefault");
-            t.nullable.field({ name: "theme", type: "OrganizationPdfDocumentThemeInput" });
-          },
-        }).asArg()
-      ),
+      name: stringArg(),
+      isDefault: booleanArg(),
+      data: arg({ type: "OrganizationPdfDocumentThemeInput" }),
     },
     validateArgs: validateAnd(
-      inRange((args) => args.data.theme?.marginTop, "data.theme.marginTop", 0),
-      inRange((args) => args.data.theme?.marginLeft, "data.theme.marginLeft", 0),
-      inRange((args) => args.data.theme?.marginBottom, "data.theme.marginBottom", 0),
-      inRange((args) => args.data.theme?.marginRight, "data.theme.marginRight", 0),
-      validFontFamily((args) => args.data.theme?.title1FontFamily, "data.theme.title1FontFamily"),
-      validFontFamily((args) => args.data.theme?.title2FontFamily, "data.theme.title2FontFamily"),
-      validFontFamily((args) => args.data.theme?.textFontFamily, "data.theme.textFontFamily"),
-      validateHexColor((args) => args.data.theme?.title1Color, "data.theme.title1Color"),
-      validateHexColor((args) => args.data.theme?.title2Color, "data.theme.title2Color"),
-      validateHexColor((args) => args.data.theme?.textColor, "data.theme.textColor"),
-      inRange((args) => args.data.theme?.title1FontSize, "data.theme.title1FontSize", 5, 72),
-      inRange((args) => args.data.theme?.title2FontSize, "data.theme.title2FontSize", 5, 72),
-      inRange((args) => args.data.theme?.textFontSize, "data.theme.textFontSize", 5, 72),
-      validRichTextContent((args) => args.data.theme?.legalText?.es, "data.theme.legalText.es"),
-      validRichTextContent((args) => args.data.theme?.legalText?.en, "data.theme.legalText.en"),
-      maxLength((args) => args.data.name, "data.name", 50)
+      maxLength((args) => args.name, "name", 50),
+      validateTheme((args) => args.data, "data")
     ),
     resolve: async (_, args, ctx) => {
-      if (args.data.isDefault) {
+      const theme = (await ctx.organizations.loadOrganizationTheme(args.orgThemeId))!;
+      if (args.isDefault && !theme.is_default) {
         await ctx.organizations.setOrganizationThemeAsDefault(
           args.orgThemeId,
           `User:${ctx.user!.id}`
         );
       }
       const updateData: Partial<OrganizationTheme> = {};
-      if (isDefined(args.data.name)) {
-        updateData.name = args.data.name;
+      if (isDefined(args.name)) {
+        updateData.name = args.name;
       }
-      if (isDefined(args.data.theme)) {
-        const pdfDocumentTheme = (await ctx.organizations.loadOrganizationTheme(args.orgThemeId))!;
-        updateData.data = deepmerge(pdfDocumentTheme.data, args.data.theme, {
-          // avoid deepmerge on legalText
-          customMerge: (key) => (from: any, to: any) => {
-            if (key === "legalText") {
-              return Object.assign(from, to);
-            }
-          },
-        });
+      if (isDefined(args.data)) {
+        updateData.data = {
+          ...pick(theme.data, ["paginationPosition", "logoPosition"]),
+          ...args.data,
+        };
       }
-
       if (Object.keys(updateData).length > 0) {
         await ctx.organizations.updateOrganizationTheme(
           args.orgThemeId,
@@ -213,7 +208,6 @@ export const updateOrganizationPdfDocumentTheme = mutationField(
           `User:${ctx.user!.id}`
         );
       }
-
       return (await ctx.organizations.loadOrg(ctx.user!.org_id))!;
     },
   }
@@ -265,45 +259,6 @@ export const deleteOrganizationPdfDocumentTheme = mutationField(
   }
 );
 
-export const restoreDefaultOrganizationPdfDocumentThemeFonts = mutationField(
-  "restoreDefaultOrganizationPdfDocumentThemeFonts",
-  {
-    description:
-      "Restores the 'fonts' section of the organization document theme to its default values",
-    type: "OrganizationTheme",
-    authorize: authenticateAnd(
-      contextUserHasRole("ADMIN"),
-      userHasAccessToOrganizationTheme("orgThemeId", "PDF_DOCUMENT")
-    ),
-    args: {
-      orgThemeId: nonNull(globalIdArg("OrganizationTheme")),
-    },
-    resolve: async (_, { orgThemeId }, ctx) => {
-      const currentTheme = (await ctx.organizations.loadOrganizationTheme(orgThemeId))!;
-      return await ctx.organizations.updateOrganizationTheme(
-        orgThemeId,
-        {
-          data: Object.assign(
-            currentTheme.data,
-            pick(defaultPdfDocumentTheme, [
-              "title1FontFamily",
-              "title1Color",
-              "title1FontSize",
-              "title2FontFamily",
-              "title2Color",
-              "title2FontSize",
-              "textFontFamily",
-              "textColor",
-              "textFontSize",
-            ])
-          ),
-        },
-        `User:${ctx.user!.id}`
-      );
-    },
-  }
-);
-
 /** @deprecated */
 export const updateOrganizationDocumentTheme = mutationField("updateOrganizationDocumentTheme", {
   deprecation: "use updateOrganizationPdfDocumentTheme",
@@ -313,23 +268,7 @@ export const updateOrganizationDocumentTheme = mutationField("updateOrganization
   args: {
     data: nonNull("OrganizationDocumentThemeInput"),
   },
-  validateArgs: validateAnd(
-    inRange((args) => args.data.marginTop, "data.marginTop", 0),
-    inRange((args) => args.data.marginLeft, "data.marginLeft", 0),
-    inRange((args) => args.data.marginBottom, "data.marginBottom", 0),
-    inRange((args) => args.data.marginRight, "data.marginRight", 0),
-    validFontFamily((args) => args.data.title1FontFamily, "data.title1FontFamily"),
-    validFontFamily((args) => args.data.title2FontFamily, "data.title2FontFamily"),
-    validFontFamily((args) => args.data.textFontFamily, "data.textFontFamily"),
-    validateHexColor((args) => args.data.title1Color, "data.title1Color"),
-    validateHexColor((args) => args.data.title2Color, "data.title2Color"),
-    validateHexColor((args) => args.data.textColor, "data.textColor"),
-    inRange((args) => args.data.title1FontSize, "data.title1FontSize", 5, 72),
-    inRange((args) => args.data.title2FontSize, "data.title2FontSize", 5, 72),
-    inRange((args) => args.data.textFontSize, "data.textFontSize", 5, 72),
-    validRichTextContent((args) => args.data.legalText?.es, "data.legalText.es"),
-    validRichTextContent((args) => args.data.legalText?.en, "data.legalText.en")
-  ),
+  validateArgs: validateTheme((args) => args.data, "data"),
   resolve: async (_, args, ctx) => {
     const organization = await ctx.organizations.loadOrg(ctx.user!.org_id);
     const theme = deepmerge(

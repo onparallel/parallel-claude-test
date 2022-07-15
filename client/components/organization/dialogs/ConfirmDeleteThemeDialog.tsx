@@ -14,7 +14,7 @@ export function ConfirmDeleteThemeDialog({ ...props }: DialogProps) {
           <Text>
             <FormattedMessage
               id="petition.confirm-delete-theme.body"
-              defaultMessage="If you delete this theme all templates and petitions that are using it will revert to the default theme."
+              defaultMessage="If you delete this theme all templates and parallels that are using it will revert to the default theme."
             />
           </Text>
           <Text>

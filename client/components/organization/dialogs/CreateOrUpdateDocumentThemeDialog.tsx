@@ -2,14 +2,17 @@ import { gql } from "@apollo/client";
 import {
   Button,
   Checkbox,
+  Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
+  HStack,
   Input,
   Stack,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { Maybe } from "@parallel/utils/types";
@@ -18,16 +21,16 @@ import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { isDefined } from "remeda";
 
-type DocumentTheme = Omit<
+type DocumentThemeSelection = Omit<
   CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment,
   "__typename"
 >;
-type CreateOrUpdateDocumentThemeDialogResult = Partial<DocumentTheme>;
+type CreateOrUpdateDocumentThemeDialogResult = DocumentThemeSelection;
 
 export function CreateOrUpdateDocumentThemeDialog({
   theme,
   ...props
-}: DialogProps<{ theme: Maybe<DocumentTheme> }, CreateOrUpdateDocumentThemeDialogResult>) {
+}: DialogProps<{ theme: Maybe<DocumentThemeSelection> }, CreateOrUpdateDocumentThemeDialogResult>) {
   const isUpdate = isDefined(theme);
 
   const {
@@ -83,18 +86,36 @@ export function CreateOrUpdateDocumentThemeDialog({
               />
             </FormErrorMessage>
           </FormControl>
-          <FormControl>
+          <FormControl as={HStack}>
             <Checkbox {...register("isDefault")}>
               <FormattedMessage
                 id="components.create-or-update-document-theme-dialog.set-default-label"
-                defaultMessage="Set as Default theme"
+                defaultMessage="Set as default theme"
               />
             </Checkbox>
+            <HelpPopover>
+              <FormattedMessage
+                id="components.create-or-update-document-theme-dialog.set-default-help"
+                defaultMessage="When creating new templates, this theme will be used as default. Existing templates are not affected."
+              />
+            </HelpPopover>
           </FormControl>
         </Stack>
       }
+      alternative={
+        isDefined(theme) && !theme.isDefault ? (
+          <Flex flex="1">
+            <Button colorScheme="red" onClick={() => props.onReject("DELETE_THEME")}>
+              <FormattedMessage
+                id="components.create-or-update-document-theme-dialog.delete-theme-button"
+                defaultMessage="Delete theme"
+              />
+            </Button>
+          </Flex>
+        ) : null
+      }
       confirm={
-        <Button type="submit" colorScheme="purple" variant="solid">
+        <Button type="submit" colorScheme="primary" variant="solid">
           {isUpdate ? (
             <FormattedMessage id="generic.save" defaultMessage="Save" />
           ) : (

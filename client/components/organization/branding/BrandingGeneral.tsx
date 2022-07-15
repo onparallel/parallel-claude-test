@@ -176,7 +176,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
             <Text>
               <FormattedMessage
                 id="organization.branding.brand-description"
-                defaultMessage="Your brand will be used in the messages and petitions you send."
+                defaultMessage="Your brand will be used in the messages and parallels you send."
               />
             </Text>
           </Stack>
@@ -268,7 +268,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
                 <HelpPopover>
                   <FormattedMessage
                     id="component.branding-general.primary-color-help"
-                    defaultMessage="This color will be used in the buttons and links of your messages and petitions with recipient."
+                    defaultMessage="This color will be used in the buttons and links of your messages and parallels with recipient."
                   />
                 </HelpPopover>
               </FormLabel>
@@ -311,7 +311,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
                 <HelpPopover>
                   <FormattedMessage
                     id="component.branding-general.main-font-help"
-                    defaultMessage="This font will be used in your emails and petitions. The list includes only secure fonts for all email clients."
+                    defaultMessage="This font will be used in your emails and parallels. The list includes only secure fonts for all email clients."
                   />
                 </HelpPopover>
               </FormLabel>

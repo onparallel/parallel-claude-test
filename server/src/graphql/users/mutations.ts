@@ -507,7 +507,7 @@ export const userSignUp = mutationField("userSignUp", {
 
       const [[signatureSandboxIntegration], [pdfDocTheme]] = await Promise.all([
         ctx.integrations.loadIntegrationsByOrgId(org.id, "SIGNATURE", t),
-        ctx.organizations.loadOrganizationThemesByOrgId.raw(org.id, t),
+        ctx.organizations.loadPdfDocumentThemesByOrgId.raw(org.id, t),
       ]);
 
       // once the user is created, we need to update the created_by column on the different entries

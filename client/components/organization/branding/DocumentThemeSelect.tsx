@@ -1,22 +1,23 @@
-import { Button, Stack, Text } from "@chakra-ui/react";
+import { gql } from "@apollo/client";
+import { Badge, Box, Button, HStack, Stack, Text } from "@chakra-ui/react";
+import { DocumentThemeSelect_OrganizationThemeFragment } from "@parallel/graphql/__types";
 import { genericRsComponent, useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomSelectProps } from "@parallel/utils/react-select/types";
 import { ForwardedRef, forwardRef, ReactElement, RefAttributes } from "react";
 import { FormattedMessage } from "react-intl";
-import Select, { SelectInstance } from "react-select";
+import Select, { components, SelectInstance } from "react-select";
 
-export type DocumentThemeSelectSelection = { id: string; name: string };
-export type DocumentThemeSelectInstance = SelectInstance<DocumentThemeSelectSelection>;
+type Selection = DocumentThemeSelect_OrganizationThemeFragment;
+export type DocumentThemeSelectInstance = SelectInstance<Selection>;
 
-export interface DocumentThemeSelectProps
-  extends Omit<CustomSelectProps<DocumentThemeSelectSelection, false, never>, "value"> {
-  value: DocumentThemeSelectSelection;
+export interface DocumentThemeSelectProps<T extends Selection>
+  extends CustomSelectProps<T, false, never> {
   onCreateNewTheme: () => void;
   isCreateNewThemeDisabled?: boolean;
 }
 
 export const DocumentThemeSelect = Object.assign(
-  forwardRef(function DocumentThemeSelect(
+  forwardRef(function DocumentThemeSelect<T extends Selection>(
     {
       value,
       onChange,
@@ -25,21 +26,23 @@ export const DocumentThemeSelect = Object.assign(
       onCreateNewTheme,
       isCreateNewThemeDisabled,
       ...props
-    }: DocumentThemeSelectProps,
+    }: DocumentThemeSelectProps<T>,
     ref: ForwardedRef<DocumentThemeSelectInstance>
   ) {
     const rsProps = useReactSelectProps({
       ...props,
       components: {
         NoOptionsMessage,
+        SingleValue,
+        Option,
         ...props.components,
-      },
+      } as any,
     });
 
     const extensions = { onCreateNewTheme, isCreateNewThemeDisabled };
 
     return (
-      <Select<DocumentThemeSelectSelection, false, never>
+      <Select<Selection, false, never>
         ref={ref as any}
         value={value}
         onChange={onChange}
@@ -51,14 +54,24 @@ export const DocumentThemeSelect = Object.assign(
         {...(extensions as any)}
       />
     );
-  }) as (
-    props: DocumentThemeSelectProps & RefAttributes<DocumentThemeSelectInstance>
+  }) as <T extends Selection>(
+    props: DocumentThemeSelectProps<T> & RefAttributes<DocumentThemeSelectInstance>
   ) => ReactElement,
-  { fragments: {} }
+  {
+    fragments: {
+      OrganizationTheme: gql`
+        fragment DocumentThemeSelect_OrganizationTheme on OrganizationTheme {
+          id
+          name
+          isDefault
+        }
+      `,
+    },
+  }
 );
 
 const rsComponent = genericRsComponent<
-  DocumentThemeSelectSelection,
+  Selection,
   false,
   never,
   {
@@ -92,5 +105,39 @@ const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
         />
       </Button>
     </Stack>
+  );
+});
+
+const SingleValue = rsComponent("SingleValue", function (props) {
+  return (
+    <components.SingleValue {...props}>
+      <HStack>
+        <Box flex="1" minWidth={0} isTruncated>
+          {props.data.name}
+        </Box>
+        {props.data.isDefault ? (
+          <Badge colorScheme="primary">
+            <FormattedMessage id="generic.default" defaultMessage="Default" />
+          </Badge>
+        ) : null}
+      </HStack>
+    </components.SingleValue>
+  );
+});
+
+const Option = rsComponent("Option", function ({ children, ...props }) {
+  return (
+    <components.Option {...props}>
+      <HStack>
+        <Box flex="1" minWidth={0} isTruncated>
+          {props.data.name}
+        </Box>
+        {props.data.isDefault ? (
+          <Badge colorScheme="primary">
+            <FormattedMessage id="generic.default" defaultMessage="Default" />
+          </Badge>
+        ) : null}
+      </HStack>
+    </components.Option>
   );
 });
