@@ -105,6 +105,11 @@ export interface NexusGenInputs {
     height?: number | null; // Int
     width?: number | null; // Int
   };
+  InputFeatureFlag: {
+    // input type
+    name: NexusGenEnums["FeatureFlag"]; // FeatureFlag!
+    value: boolean; // Boolean!
+  };
   OrganizationBrandThemeInput: {
     // input type
     color?: string | null; // String
@@ -391,6 +396,11 @@ export interface NexusGenObjects {
     db.PetitionPermission,
     "petition_id" | "user_id" | "type" | "is_subscribed"
   >;
+  FeatureFlagEntry: {
+    // root type
+    name: NexusGenEnums["FeatureFlag"]; // FeatureFlag!
+    value: boolean; // Boolean!
+  };
   FileUpload: db.FileUpload;
   FileUploadDownloadLinkResult: {
     // root type
@@ -860,6 +870,11 @@ export interface NexusGenFieldTypes {
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
     user: NexusGenRootTypes["User"]; // User!
   };
+  FeatureFlagEntry: {
+    // field return type
+    name: NexusGenEnums["FeatureFlag"]; // FeatureFlag!
+    value: boolean; // Boolean!
+  };
   FileUpload: {
     // field return type
     contentType: string; // String!
@@ -1111,6 +1126,7 @@ export interface NexusGenFieldTypes {
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
     updateEventSubscription: NexusGenRootTypes["PetitionEventSubscription"]; // PetitionEventSubscription!
     updateFeatureFlag: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    updateFeatureFlags: NexusGenRootTypes["Organization"]; // Organization!
     updateFieldPositions: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateFileUploadReply: NexusGenRootTypes["FileUploadReplyResponse"]; // FileUploadReplyResponse!
     updateFileUploadReplyComplete: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
@@ -1168,6 +1184,7 @@ export interface NexusGenFieldTypes {
     brandTheme: NexusGenScalars["JSONObject"] | null; // JSONObject
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customHost: string | null; // String
+    features: NexusGenRootTypes["FeatureFlagEntry"][]; // [FeatureFlagEntry!]!
     hasSsoProvider: boolean; // Boolean!
     iconUrl: string | null; // String
     id: NexusGenScalars["GID"]; // GID!
@@ -2405,6 +2422,11 @@ export interface NexusGenFieldTypeNames {
     permissionType: "PetitionPermissionType";
     user: "User";
   };
+  FeatureFlagEntry: {
+    // field return type name
+    name: "FeatureFlag";
+    value: "Boolean";
+  };
   FileUpload: {
     // field return type name
     contentType: "String";
@@ -2656,6 +2678,7 @@ export interface NexusGenFieldTypeNames {
     updateContact: "Contact";
     updateEventSubscription: "PetitionEventSubscription";
     updateFeatureFlag: "SupportMethodResponse";
+    updateFeatureFlags: "Organization";
     updateFieldPositions: "PetitionBase";
     updateFileUploadReply: "FileUploadReplyResponse";
     updateFileUploadReplyComplete: "PetitionFieldReply";
@@ -2713,6 +2736,7 @@ export interface NexusGenFieldTypeNames {
     brandTheme: "JSONObject";
     createdAt: "DateTime";
     customHost: "String";
+    features: "FeatureFlagEntry";
     hasSsoProvider: "Boolean";
     iconUrl: "String";
     id: "GID";
@@ -3979,6 +4003,7 @@ export interface NexusGenArgTypes {
       firstName: string; // String!
       lastName: string; // String!
       locale?: string | null; // String
+      orgId?: NexusGenScalars["GID"] | null; // GID
       role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
       userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
     };
@@ -4496,6 +4521,11 @@ export interface NexusGenArgTypes {
       featureFlag: NexusGenEnums["FeatureFlag"]; // FeatureFlag!
       orgId: number; // Int!
       value: boolean; // Boolean!
+    };
+    updateFeatureFlags: {
+      // args
+      featureFlags: NexusGenInputs["InputFeatureFlag"][]; // [InputFeatureFlag!]!
+      orgId: NexusGenScalars["GID"]; // GID!
     };
     updateFieldPositions: {
       // args

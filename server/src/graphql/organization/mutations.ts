@@ -332,3 +332,34 @@ export const restoreDefaultOrganizationDocumentThemeFonts = mutationField(
     },
   }
 );
+
+export const InputFeatureFlag = inputObjectType({
+  name: "InputFeatureFlag",
+  description: "A feature flag name with his value",
+  definition(t) {
+    t.nonNull.field("name", { type: "FeatureFlag" });
+    t.nonNull.boolean("value");
+  },
+});
+
+export const updateFeatureFlags = mutationField("updateFeatureFlags", {
+  description: "Activate or deactivate a list of organization feature flag",
+  type: "Organization",
+  args: {
+    featureFlags: nonNull(list(nonNull("InputFeatureFlag"))),
+    orgId: nonNull(globalIdArg("Organization")),
+  },
+  authorize: authenticateAnd(contextUserHasRole("ADMIN")),
+  resolve: async (_, { featureFlags, orgId }, ctx) => {
+    try {
+      const needRemoveBranding = featureFlags.some((f) => f.name === "REMOVE_PARALLEL_BRANDING");
+
+      await ctx.featureFlags.addOrUpdateFeatureFlagOverride(orgId, featureFlags);
+      if (needRemoveBranding) {
+        await ctx.integrations.removeSignaturitBrandingIds(orgId, `User:${ctx.user!.id}`);
+      }
+    } catch {}
+
+    return (await ctx.organizations.loadOrg(orgId))!;
+  },
+});

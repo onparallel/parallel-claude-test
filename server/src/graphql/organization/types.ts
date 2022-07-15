@@ -381,5 +381,12 @@ export const Organization = objectType({
     t.nullable.int("anonymizePetitionsAfterMonths", {
       resolve: (o) => o.anonymize_petitions_after_months,
     });
+    t.nonNull.list.nonNull.field("features", {
+      description: "A list of all feature flag and the value asigned to this org",
+      type: "FeatureFlagEntry",
+      resolve: async (o, _, ctx) => {
+        return await ctx.featureFlags.loadOrganizationFeatureFlags(o.id);
+      },
+    });
   },
 });

@@ -51,10 +51,7 @@ export function OrganizationUsersListTableHeader({
             leftIcon={<UserPlusIcon fontSize="18px" />}
             onClick={onCreateUser}
           >
-            <FormattedMessage
-              id="components.create-or-update-user-dialog.invite-user"
-              defaultMessage="Invite user"
-            />
+            <FormattedMessage id="generic.invite-user" defaultMessage="Invite user" />
           </Button>
         )}
       </WhenOrgRole>

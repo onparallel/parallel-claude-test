@@ -1185,6 +1185,156 @@
     "context": "Generating report..."
   },
   {
+    "term": "component.feature-flag-descriptions.auto-anonymize-description",
+    "definition": "Allows to include a period for the prallels to be automatically anonymized after x days of its closing.",
+    "context": "Allows to include a period for the prallels to be automatically anonymized after x days of its closing."
+  },
+  {
+    "term": "component.feature-flag-descriptions.auto-anonymize-name",
+    "definition": "Compliance feature",
+    "context": "Compliance feature"
+  },
+  {
+    "term": "component.feature-flag-descriptions.custom-host-ui-description",
+    "definition": "Remove the enterprise banners around the button to request a subdomain change.",
+    "context": "Remove the enterprise banners around the button to request a subdomain change."
+  },
+  {
+    "term": "component.feature-flag-descriptions.custom-host-ui-name",
+    "definition": "Subdomain feature (UI)",
+    "context": "Subdomain feature (UI)"
+  },
+  {
+    "term": "component.feature-flag-descriptions.developer-access-description",
+    "definition": "Gives access to the developers view.",
+    "context": "Gives access to the developers view."
+  },
+  {
+    "term": "component.feature-flag-descriptions.developer-access-name",
+    "definition": "Developer access",
+    "context": "Developer access"
+  },
+  {
+    "term": "component.feature-flag-descriptions.es-tax-documents-field-description",
+    "definition": "Gives access to the Bankflip field.",
+    "context": "Gives access to the Bankflip field."
+  },
+  {
+    "term": "component.feature-flag-descriptions.es-tax-documents-field-name",
+    "definition": "Tax documents field (ESP)",
+    "context": "Tax documents field (ESP)"
+  },
+  {
+    "term": "component.feature-flag-descriptions.export-cuatrecasas-description",
+    "definition": "Allows Cuatrecasas to export the contents to its LocalAPI",
+    "context": "Allows Cuatrecasas to export the contents to its LocalAPI"
+  },
+  {
+    "term": "component.feature-flag-descriptions.export-cuatrecasas-name",
+    "definition": "Export Cuatrecasas",
+    "context": "Export Cuatrecasas"
+  },
+  {
+    "term": "component.feature-flag-descriptions.ghost-login-description",
+    "definition": "Allows the organization's admin to login as users of your org (ghost login).",
+    "context": "Allows the organization's admin to login as users of your org (ghost login)."
+  },
+  {
+    "term": "component.feature-flag-descriptions.ghost-login-name",
+    "definition": "\"Access as\" feature",
+    "context": "\"Access as\" feature"
+  },
+  {
+    "term": "component.feature-flag-descriptions.hide-recipient-view-contents-description",
+    "definition": "Activate the setting to hide the table of contents in the recipient view.",
+    "context": "Activate the setting to hide the table of contents in the recipient view."
+  },
+  {
+    "term": "component.feature-flag-descriptions.hide-recipient-view-contents-name",
+    "definition": "Hide recipient view contents",
+    "context": "Hide recipient view contents"
+  },
+  {
+    "term": "component.feature-flag-descriptions.on-behalf-of-description",
+    "definition": "Add the option to send parallels on behalf of other user.",
+    "context": "Add the option to send parallels on behalf of other user."
+  },
+  {
+    "term": "component.feature-flag-descriptions.on-behalf-of-name",
+    "definition": "\"Send as\" feature",
+    "context": "\"Send as\" feature"
+  },
+  {
+    "term": "component.feature-flag-descriptions.petition-access-recipient-url-field-description",
+    "definition": "Allows to obtain the url of the recipient view through the API. Only for Paymefy type applications that validate the user's identity.",
+    "context": "Allows to obtain the url of the recipient view through the API. Only for Paymefy type applications that validate the user's identity."
+  },
+  {
+    "term": "component.feature-flag-descriptions.petition-access-recipient-url-field-name",
+    "definition": "API access to the recipient's URL",
+    "context": "API access to the recipient's URL"
+  },
+  {
+    "term": "component.feature-flag-descriptions.petition-pdf-export-description",
+    "definition": "Allows exporting the parallel to PDF.",
+    "context": "Allows exporting the parallel to PDF."
+  },
+  {
+    "term": "component.feature-flag-descriptions.petition-pdf-export-name",
+    "definition": "PDF export",
+    "context": "PDF export"
+  },
+  {
+    "term": "component.feature-flag-descriptions.petition-signature-description",
+    "definition": "Activates the Signaturit integration section so that the TOKEN API can be entered.",
+    "context": "Activates the Signaturit integration section so that the TOKEN API can be entered."
+  },
+  {
+    "term": "component.feature-flag-descriptions.petition-signature-name",
+    "definition": "Signaturit Integration",
+    "context": "Signaturit Integration"
+  },
+  {
+    "term": "component.feature-flag-descriptions.prefill-public-links-description",
+    "definition": "Allows you to pre-fill public links.",
+    "context": "Allows you to pre-fill public links."
+  },
+  {
+    "term": "component.feature-flag-descriptions.prefill-public-links-name",
+    "definition": "Pre-fill public links (UI)",
+    "context": "Pre-fill public links (UI)"
+  },
+  {
+    "term": "component.feature-flag-descriptions.remove-parallel-branding-description",
+    "definition": "Eliminates all Parallel branding from recipient and mailing view (including \"Why we use Parallel\")",
+    "context": "Eliminates all Parallel branding from recipient and mailing view (including \"Why we use Parallel\")"
+  },
+  {
+    "term": "component.feature-flag-descriptions.remove-parallel-branding-name",
+    "definition": "Remove Parallel branding",
+    "context": "Remove Parallel branding"
+  },
+  {
+    "term": "component.feature-flag-descriptions.remove-why-we-use-parallel-description",
+    "definition": "Removes the \"Why we use Parallel\" block in mails to recipients",
+    "context": "Removes the \"Why we use Parallel\" block in mails to recipients"
+  },
+  {
+    "term": "component.feature-flag-descriptions.remove-why-we-use-parallel-name",
+    "definition": "Remove \"Why do we use Parallel?\"",
+    "context": "Remove \"Why do we use Parallel?\""
+  },
+  {
+    "term": "component.feature-flag-descriptions.skip-forward-security-description",
+    "definition": "Enables the setting for the request to skip recipient verification (forward security).",
+    "context": "Enables the setting for the request to skip recipient verification (forward security)."
+  },
+  {
+    "term": "component.feature-flag-descriptions.skip-forward-security-name",
+    "definition": "Feature Disable forwarding protection",
+    "context": "Feature Disable forwarding protection"
+  },
+  {
     "term": "component.field-comment.message-not-available",
     "definition": "Message not available",
     "context": "Message not available"
@@ -4395,11 +4545,6 @@
     "context": "Included in (optional)"
   },
   {
-    "term": "components.create-or-update-user-dialog.invite-user",
-    "definition": "Invite user",
-    "context": "Invite user"
-  },
-  {
     "term": "components.create-or-update-user-dialog.update-user",
     "definition": "Update user",
     "context": "Update user"
@@ -5085,7 +5230,7 @@
     "context": "Edit"
   },
   {
-    "term": "generic.edited-comment-indicator",
+    "term": "generic.edited-indicator",
     "definition": "Edited",
     "context": "Edited"
   },
@@ -5350,6 +5495,11 @@
     "context": "Provider"
   },
   {
+    "term": "generic.invite-user",
+    "definition": "Invite user",
+    "context": "Invite user"
+  },
+  {
     "term": "generic.last-active-at",
     "definition": "Last active at",
     "context": "Last active at"
@@ -5403,6 +5553,11 @@
     "term": "generic.no-deadline",
     "definition": "No deadline",
     "context": "No deadline"
+  },
+  {
+    "term": "generic.no-description",
+    "definition": "No description",
+    "context": "No description"
   },
   {
     "term": "generic.not-available",
@@ -5536,8 +5691,8 @@
   },
   {
     "term": "generic.save-changes",
-    "definition": "Save",
-    "context": "Save"
+    "definition": "Save changes",
+    "context": "Save changes"
   },
   {
     "term": "generic.saving-changes",
@@ -6298,6 +6453,21 @@
     "term": "page.compliance.x-years",
     "definition": "{amount} years",
     "context": "{amount} years"
+  },
+  {
+    "term": "page.oganizations.features",
+    "definition": "Features",
+    "context": "Features"
+  },
+  {
+    "term": "page.oganizations.features-active",
+    "definition": "Enabled features",
+    "context": "Enabled features"
+  },
+  {
+    "term": "page.oganizations.users",
+    "definition": "Users",
+    "context": "Users"
   },
   {
     "term": "page.petition-replies.export-pdf",
@@ -8370,7 +8540,7 @@
     "context": "Change password"
   },
   {
-    "term": "settings.account.language",
+    "term": "generic.language",
     "definition": "Language",
     "context": "Language"
   },

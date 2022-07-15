@@ -24,6 +24,15 @@ export const FeatureFlag = enumType({
   sourceType: "db.FeatureFlagName",
 });
 
+export const FeatureFlagEntry = objectType({
+  name: "FeatureFlagEntry",
+  description: "A feature flag name with his value",
+  definition(t) {
+    t.nonNull.field("name", { type: "FeatureFlag" });
+    t.nonNull.boolean("value");
+  },
+});
+
 export const UserStatus = enumType({
   name: "UserStatus",
   members: UserStatusValues,

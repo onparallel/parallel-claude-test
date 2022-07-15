@@ -132,6 +132,21 @@ export class FeatureFlagRepository extends BaseRepository {
     )
   );
 
+  async loadOrganizationFeatureFlags(orgId: number, t?: Knex.Transaction) {
+    const rows = await this.raw<{ name: FeatureFlagName; value: boolean }>(
+      /* sql */ `
+      select
+        ff.name as name,
+        coalesce(ffoo.value, ff.default_value) as value
+        from feature_flag ff left join feature_flag_override ffoo
+          on ffoo.org_id = ? and ffoo.user_id is null and ffoo."feature_flag_name"  = ff."name" 
+    `,
+      [orgId]
+    );
+
+    return rows;
+  }
+
   async addOrUpdateFeatureFlagOverride(
     orgId: number,
     featureFlag: MaybeArray<{ name: FeatureFlagName; value: boolean }>,

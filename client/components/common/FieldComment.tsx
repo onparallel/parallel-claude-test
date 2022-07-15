@@ -143,7 +143,7 @@ export function FieldComment({
         <DateTime color="gray.500" value={comment.createdAt} format={FORMATS.LLL} useRelativeTime />
         {isEdited ? (
           <Text as="span" color="gray.400" marginLeft={2} fontSize="xs">
-            <FormattedMessage id="generic.edited-comment-indicator" defaultMessage="Edited" />
+            <FormattedMessage id="generic.edited-indicator" defaultMessage="Edited" />
           </Text>
         ) : null}
         <Spacer />

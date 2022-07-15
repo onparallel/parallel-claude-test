@@ -15,7 +15,7 @@ export function AccountLocaleChange({ user, onChange, ...props }: AccountLocaleC
   return (
     <Stack {...props}>
       <Heading as="h4" size="md" marginBottom={2}>
-        <FormattedMessage id="settings.account.language" defaultMessage="Language" />
+        <FormattedMessage id="generic.language" defaultMessage="Language" />
       </Heading>
       <RadioGroup onChange={onChange} value={user.preferredLocale ?? intl.locale}>
         <Stack>

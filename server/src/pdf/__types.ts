@@ -218,6 +218,12 @@ export type FeatureFlag =
   | "REMOVE_WHY_WE_USE_PARALLEL"
   | "SKIP_FORWARD_SECURITY";
 
+/** A feature flag name with his value */
+export type FeatureFlagEntry = {
+  name: FeatureFlag;
+  value: Scalars["Boolean"];
+};
+
 export type FileUpload = {
   contentType: Scalars["String"];
   filename: Scalars["String"];
@@ -298,6 +304,12 @@ export type ImageOptionsResize = {
 };
 
 export type ImageOptionsResizeFit = "contain" | "cover" | "fill" | "inside" | "outside";
+
+/** A feature flag name with his value */
+export type InputFeatureFlag = {
+  name: FeatureFlag;
+  value: Scalars["Boolean"];
+};
 
 /** The types of integrations available. */
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
@@ -639,6 +651,8 @@ export type Mutation = {
   updateEventSubscription: PetitionEventSubscription;
   /** Activate or deactivate an organization feature flag */
   updateFeatureFlag: SupportMethodResponse;
+  /** Activate or deactivate a list of organization feature flag */
+  updateFeatureFlags: Organization;
   /** Updates the positions of the petition fields */
   updateFieldPositions: PetitionBase;
   /** Updates the file of a FILE_UPLOAD reply. The previous file will be deleted from AWS S3 when client notifies of upload completed via updateFileUploadReplyComplete mutation. */
@@ -860,6 +874,7 @@ export type MutationcreateOrganizationUserArgs = {
   firstName: Scalars["String"];
   lastName: Scalars["String"];
   locale?: InputMaybe<Scalars["String"]>;
+  orgId?: InputMaybe<Scalars["GID"]>;
   role: OrganizationRole;
   userGroupIds?: InputMaybe<Array<Scalars["GID"]>>;
 };
@@ -1379,6 +1394,11 @@ export type MutationupdateFeatureFlagArgs = {
   value: Scalars["Boolean"];
 };
 
+export type MutationupdateFeatureFlagsArgs = {
+  featureFlags: Array<InputFeatureFlag>;
+  orgId: Scalars["GID"];
+};
+
 export type MutationupdateFieldPositionsArgs = {
   fieldIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
@@ -1639,6 +1659,8 @@ export type Organization = Timestamps & {
   createdAt: Scalars["DateTime"];
   /** Custom host used in petition links and public links. */
   customHost: Maybe<Scalars["String"]>;
+  /** A list of all feature flag and the value asigned to this org */
+  features: Array<FeatureFlagEntry>;
   /** Whether the organization has an SSO provider configured. */
   hasSsoProvider: Scalars["Boolean"];
   /** URL of the organization logo */

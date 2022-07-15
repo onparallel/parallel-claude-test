@@ -183,7 +183,7 @@ function Contact({ contactId }: ContactProps) {
                       defaultMessage: "Saving...",
                     })}
                   >
-                    <FormattedMessage id="generic.save-changes" defaultMessage="Save" />
+                    <FormattedMessage id="generic.save" defaultMessage="Save" />
                   </Button>
                 </>
               ) : (

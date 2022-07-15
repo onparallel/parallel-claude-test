@@ -1,18 +1,44 @@
-import { gql } from "@apollo/client";
-import { Badge, Flex, Heading, Text, Tooltip } from "@chakra-ui/react";
+import { gql, useMutation } from "@apollo/client";
+import {
+  Badge,
+  Button,
+  Divider,
+  Flex,
+  Heading,
+  HStack,
+  Stack,
+  Switch,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  Text,
+  Tooltip,
+  useToast,
+} from "@chakra-ui/react";
 import { ForbiddenIcon, LogInIcon } from "@parallel/chakra/icons";
+import { Card, CardHeader } from "@parallel/components/common/Card";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { HelpCenterLink } from "@parallel/components/common/HelpCenterLink";
+import { HelpPopover } from "@parallel/components/common/HelpPopover";
+import { SearchInput } from "@parallel/components/common/SearchInput";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { useInviteUserDialog } from "@parallel/components/organization/dialogs/InviteUserDialog";
 import { OrganizationMembersListTableHeader } from "@parallel/components/organization/OrganizationMembersListTableHeader";
 import {
+  FeatureFlag,
+  FeatureFlagEntry,
+  OrganizationMembers_createOrganizationUserDocument,
   OrganizationMembers_organizationDocument,
   OrganizationMembers_OrganizationUserFragment,
+  OrganizationMembers_updateFeatureFlagsDocument,
   OrganizationMembers_userDocument,
   OrganizationRole,
   OrganizationUsers_OrderBy,
@@ -35,11 +61,12 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { useAdminSections } from "@parallel/utils/useAdminSections";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { useFeatureFlagDescriptions } from "@parallel/utils/useFeatureFlagDescriptions";
 import { useLoginAs } from "@parallel/utils/useLoginAs";
 import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
-import { useCallback, useMemo, useState } from "react";
+import { FormEvent, useCallback, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
+import { equals, isDefined } from "remeda";
 
 const SORTING = ["fullName", "email", "createdAt", "lastActiveAt"] as const;
 
@@ -58,6 +85,9 @@ type OrganizationMembersProps = UnwrapPromise<
 >;
 
 function OrganizationMembers({ organizationId }: OrganizationMembersProps) {
+  const intl = useIntl();
+  const toast = useToast();
+
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const [search, setSearch] = useState(state.search);
   const [selected, setSelected] = useState<string[]>([]);
@@ -84,6 +114,44 @@ function OrganizationMembers({ organizationId }: OrganizationMembersProps) {
     () => selected.map((userId) => users.find((u) => u.id === userId)).filter(isDefined),
     [selected.join(","), users]
   );
+
+  const [createOrganizationUser] = useMutation(OrganizationMembers_createOrganizationUserDocument);
+  const showInviteUserDialog = useInviteUserDialog();
+  async function handleInviteUser() {
+    try {
+      const user = await showInviteUserDialog({});
+
+      await createOrganizationUser({
+        variables: {
+          ...user,
+          orgId: organization.id,
+        },
+        update: () => {
+          refetch();
+        },
+      });
+
+      toast({
+        isClosable: true,
+        duration: 5000,
+        status: "success",
+        title: intl.formatMessage({
+          id: "organization.user-created-success.toast-title",
+          defaultMessage: "User created successfully.",
+        }),
+        description: intl.formatMessage(
+          {
+            id: "organization.user-created-success.toast-description",
+            defaultMessage:
+              "We have sent an email to {email} with instructions to register in Parallel.",
+          },
+          {
+            email: user.email,
+          }
+        ),
+      });
+    } catch {}
+  }
 
   const sections = useAdminSections();
   const columns = useOrganizationMembersTableColumns();
@@ -112,6 +180,51 @@ function OrganizationMembers({ organizationId }: OrganizationMembersProps) {
     await loginAs(selected[0]);
   };
 
+  const [featureFlags, setFeatureFlags] = useState(organization.features);
+  const [editedFeatures, setEditedFeatures] = useState<FeatureFlagEntry[]>([]);
+  const [featureSearch, setFeatureSearch] = useState("");
+  const originalFeatureFlags = useRef(organization.features);
+
+  function handleChangeFeature(name: FeatureFlag, value: boolean) {
+    setFeatureFlags((currentFeatures) => {
+      return currentFeatures.map((f) => {
+        if (f.name === name) {
+          return { ...f, value };
+        }
+        return f;
+      });
+    });
+
+    const originalFeature = originalFeatureFlags.current.find((f) => f.name === name);
+    if (equals({ name: originalFeature?.name, value: originalFeature?.value }, { name, value })) {
+      setEditedFeatures((ef) => ef.filter((f) => f.name !== name));
+    } else {
+      setEditedFeatures((ef) => [...ef, { name, value }]);
+    }
+  }
+
+  const [updateFeatureFlags, { loading: updatingFeatureFlags }] = useMutation(
+    OrganizationMembers_updateFeatureFlagsDocument
+  );
+
+  async function handleSubmitFeatureFlags(event: FormEvent) {
+    event.preventDefault();
+    try {
+      const { data } = await updateFeatureFlags({
+        variables: { orgId: organization.id, featureFlags: editedFeatures },
+      });
+
+      const featureFlags = data?.updateFeatureFlags.features;
+      if (isDefined(featureFlags)) {
+        originalFeatureFlags.current = featureFlags;
+        setFeatureFlags(featureFlags);
+        setEditedFeatures([]);
+      }
+    } catch {}
+  }
+
+  const featureFlagDescriptions = useFeatureFlagDescriptions();
+
   return (
     <SettingsLayout
       title={organization?.name ?? ""}
@@ -127,70 +240,200 @@ function OrganizationMembers({ organizationId }: OrganizationMembersProps) {
       }
       showBackButton={true}
     >
-      <Flex flexDirection="column" flex="1" minHeight={0} padding={4} paddingBottom={16}>
-        <TablePage
-          flex="0 1 auto"
-          minHeight={0}
-          isSelectable
-          isHighlightable
-          columns={columns}
-          rows={users ?? []}
-          rowKeyProp="id"
-          loading={loading}
-          page={state.page}
-          pageSize={state.items}
-          totalCount={organization?.users.totalCount ?? 0}
-          sort={state.sort}
-          onSelectionChange={setSelected}
-          onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
-          onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
-          onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
-          actions={[
-            {
-              key: "login-as",
-              onClick: handleLoginAs,
-              isDisabled:
-                selectedUsers.length !== 1 ||
-                selectedUsers[0].id === me.id ||
-                selectedUsers[0].status === "INACTIVE",
-              leftIcon: <LogInIcon />,
-              children: (
-                <FormattedMessage id="organization-users.login-as" defaultMessage="Login as..." />
-              ),
-            },
-          ]}
-          header={
-            <OrganizationMembersListTableHeader
-              search={search}
-              onReload={() => refetch()}
-              onSearchChange={handleSearchChange}
-            />
-          }
-          body={
-            users.length === 0 && !loading ? (
-              state.search ? (
-                <Flex flex="1" alignItems="center" justifyContent="center">
-                  <Text color="gray.300" fontSize="lg">
-                    <FormattedMessage
-                      id="view.group.no-results"
-                      defaultMessage="There's no users matching your search"
-                    />
-                  </Text>
-                </Flex>
-              ) : (
-                <Flex flex="1" alignItems="center" justifyContent="center">
-                  <Text fontSize="lg">
-                    <FormattedMessage
-                      id="view.group.no-users"
-                      defaultMessage="No users added to this team yet"
-                    />
-                  </Text>
-                </Flex>
-              )
-            ) : null
-          }
-        />
-      </Flex>
+      <Tabs variant="enclosed">
+        <TabList paddingLeft={6} background="white" paddingTop={2}>
+          <Tab
+            fontWeight="500"
+            _selected={{
+              backgroundColor: "gray.50",
+              borderColor: "gray.200",
+              borderBottom: "1px solid transparent",
+              color: "blue.600",
+            }}
+          >
+            <FormattedMessage id="page.oganizations.users" defaultMessage="Users" />
+          </Tab>
+          <Tab
+            fontWeight="500"
+            _selected={{
+              backgroundColor: "gray.50",
+              borderColor: "gray.200",
+              borderBottom: "1px solid transparent",
+              color: "blue.600",
+            }}
+          >
+            <FormattedMessage id="page.oganizations.features" defaultMessage="Features" />
+          </Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel padding={0}>
+            <Flex flexDirection="column" flex="1" minHeight={0} padding={4} paddingBottom={16}>
+              <TablePage
+                flex="0 1 auto"
+                minHeight={0}
+                isSelectable
+                isHighlightable
+                columns={columns}
+                rows={users ?? []}
+                rowKeyProp="id"
+                loading={loading}
+                page={state.page}
+                pageSize={state.items}
+                totalCount={organization?.users.totalCount ?? 0}
+                sort={state.sort}
+                onSelectionChange={setSelected}
+                onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
+                onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
+                onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
+                actions={[
+                  {
+                    key: "login-as",
+                    onClick: handleLoginAs,
+                    isDisabled:
+                      selectedUsers.length !== 1 ||
+                      selectedUsers[0].id === me.id ||
+                      selectedUsers[0].status === "INACTIVE",
+                    leftIcon: <LogInIcon />,
+                    children: (
+                      <FormattedMessage
+                        id="organization-users.login-as"
+                        defaultMessage="Login as..."
+                      />
+                    ),
+                  },
+                ]}
+                header={
+                  <OrganizationMembersListTableHeader
+                    search={search}
+                    onReload={() => refetch()}
+                    onSearchChange={handleSearchChange}
+                    onInviteClick={handleInviteUser}
+                  />
+                }
+                body={
+                  users.length === 0 && !loading ? (
+                    state.search ? (
+                      <Flex flex="1" alignItems="center" justifyContent="center">
+                        <Text color="gray.300" fontSize="lg">
+                          <FormattedMessage
+                            id="view.group.no-results"
+                            defaultMessage="There's no users matching your search"
+                          />
+                        </Text>
+                      </Flex>
+                    ) : (
+                      <Flex flex="1" alignItems="center" justifyContent="center">
+                        <Text fontSize="lg">
+                          <FormattedMessage
+                            id="view.group.no-users"
+                            defaultMessage="No users added to this team yet"
+                          />
+                        </Text>
+                      </Flex>
+                    )
+                  ) : null
+                }
+              />
+            </Flex>
+          </TabPanel>
+          <TabPanel padding={4}>
+            <Card maxWidth="container.sm" as="form" onSubmit={handleSubmitFeatureFlags}>
+              <CardHeader>
+                <FormattedMessage
+                  id="page.oganizations.features-active"
+                  defaultMessage="Enabled features"
+                />
+              </CardHeader>
+              <Stack paddingX={6} paddingY={4} spacing={4}>
+                <SearchInput
+                  value={featureSearch ?? ""}
+                  onChange={(e) => setFeatureSearch(e.target.value)}
+                />
+                {featureFlags.map(({ name, value }) => {
+                  const featureName = featureFlagDescriptions[name as FeatureFlag]?.name ?? name;
+
+                  const search = featureSearch.toLowerCase().trim();
+                  if (
+                    search &&
+                    !featureName.toLowerCase().includes(search) &&
+                    !name.toLowerCase().includes(search)
+                  ) {
+                    return null;
+                  }
+
+                  const isEdited = editedFeatures.some((f) => f.name === name);
+
+                  return (
+                    <HStack key={name} alignItems="center" justifyContent="space-between">
+                      <Flex alignItems="center">
+                        <Text as="span">{featureName}</Text>
+
+                        <HelpPopover popoverWidth="sm">
+                          <Stack>
+                            <Text fontSize="xs">{name}</Text>
+                            <Divider />
+                            <Text fontSize="sm">
+                              {featureFlagDescriptions[name as FeatureFlag]?.description ??
+                                intl.formatMessage({
+                                  id: "generic.no-description",
+                                  defaultMessage: "No description",
+                                })}
+                            </Text>
+
+                            {isDefined(featureFlagDescriptions[name as FeatureFlag]?.articleId) ? (
+                              <HelpCenterLink
+                                articleId={featureFlagDescriptions[name as FeatureFlag]!.articleId!}
+                                width="fit-content"
+                              >
+                                <FormattedMessage id="generic.help" defaultMessage="Help" />
+                              </HelpCenterLink>
+                            ) : null}
+                          </Stack>
+                        </HelpPopover>
+                      </Flex>
+                      <HStack alignItems="center">
+                        {isEdited ? (
+                          <Badge colorScheme="yellow">
+                            <FormattedMessage
+                              id="generic.edited-indicator"
+                              defaultMessage="Edited"
+                            />
+                          </Badge>
+                        ) : null}
+                        <Switch
+                          isChecked={value}
+                          onChange={(event) => {
+                            handleChangeFeature(name, event.target.checked);
+                          }}
+                        />
+                      </HStack>
+                    </HStack>
+                  );
+                })}
+                <HStack paddingTop={6} alignSelf="flex-end">
+                  <Button
+                    onClick={() => {
+                      setFeatureFlags(originalFeatureFlags.current);
+                      setEditedFeatures([]);
+                    }}
+                    isDisabled={!editedFeatures.length}
+                  >
+                    <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
+                  </Button>
+                  <Button
+                    colorScheme="primary"
+                    type="submit"
+                    isDisabled={!editedFeatures.length}
+                    isLoading={updatingFeatureFlags}
+                  >
+                    <FormattedMessage id="generic.save-changes" defaultMessage="Save changes" />
+                  </Button>
+                </HStack>
+              </Stack>
+            </Card>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
     </SettingsLayout>
   );
 }
@@ -369,10 +612,54 @@ OrganizationMembers.fragments = {
       fragment OrganizationMembers_Organization on Organization {
         id
         name
+        hasSsoProvider
+        features {
+          name
+          value
+        }
       }
     `;
   },
 };
+
+OrganizationMembers.mutations = [
+  gql`
+    mutation OrganizationMembers_updateFeatureFlags(
+      $orgId: GID!
+      $featureFlags: [InputFeatureFlag!]!
+    ) {
+      updateFeatureFlags(orgId: $orgId, featureFlags: $featureFlags) {
+        id
+        features {
+          name
+          value
+        }
+      }
+    }
+  `,
+  gql`
+    mutation OrganizationMembers_createOrganizationUser(
+      $firstName: String!
+      $lastName: String!
+      $email: String!
+      $role: OrganizationRole!
+      $locale: String
+      $orgId: GID
+    ) {
+      createOrganizationUser(
+        email: $email
+        firstName: $firstName
+        lastName: $lastName
+        role: $role
+        locale: $locale
+        orgId: $orgId
+      ) {
+        ...OrganizationMembers_OrganizationUser
+      }
+    }
+    ${OrganizationMembers.fragments.OrganizationUser}
+  `,
+];
 
 const _queries = [
   gql`

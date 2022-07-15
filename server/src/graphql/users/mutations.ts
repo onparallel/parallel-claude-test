@@ -101,13 +101,14 @@ export const changePassword = mutationField("changePassword", {
 });
 
 export const createOrganizationUser = mutationField("createOrganizationUser", {
-  description: "Creates a new user in the same organization as the context user",
+  description: "Creates a new user in the same organization as the context user if is not provided",
   type: "User",
   authorize: authenticateAnd(
     contextUserHasRole("ADMIN"),
     orgDoesNotHaveSsoProvider(),
     orgCanCreateNewUser(),
-    ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never))
+    ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never)),
+    ifArgDefined("orgId", userIsSuperAdmin())
   ),
   args: {
     email: nonNull(stringArg()),
@@ -116,6 +117,7 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
     role: nonNull(arg({ type: "OrganizationRole" })),
     locale: stringArg(),
     userGroupIds: list(nonNull(globalIdArg("UserGroup"))),
+    orgId: globalIdArg("Organization"),
   },
   validateArgs: validateAnd(
     validLocale((args) => args.locale, "locale"),
@@ -128,8 +130,10 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
     }
   ),
   resolve: async (_, args, ctx) => {
+    const orgId = args.orgId ?? ctx.user!.org_id;
+
     const [organization, userData] = await Promise.all([
-      ctx.organizations.loadOrg(ctx.user!.org_id),
+      ctx.organizations.loadOrg(orgId),
       ctx.users.loadUserData(ctx.user!.user_data_id),
     ]);
     const email = args.email.trim().toLowerCase();
@@ -148,7 +152,7 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
     const [user] = await Promise.all([
       ctx.users.createUser(
         {
-          org_id: ctx.user!.org_id,
+          org_id: orgId,
           organization_role: args.role,
         },
         {

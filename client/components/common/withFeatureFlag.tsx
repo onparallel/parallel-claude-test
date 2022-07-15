@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
-import { FeatureFlag, HasFeatureFlagQuery } from "@parallel/graphql/__types";
+import { FeatureFlagEntry, HasFeatureFlagQuery } from "@parallel/graphql/__types";
 import { NextComponentType } from "next";
 import { WithApolloDataContext } from "./withApolloData";
 
-export function withFeatureFlag(featureFlag: FeatureFlag) {
+export function withFeatureFlag(featureFlag: FeatureFlagEntry) {
   return function <P = {}>(
     // eslint-disable-next-line @typescript-eslint/naming-convention
     Component: NextComponentType<WithApolloDataContext, P, P>

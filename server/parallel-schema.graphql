@@ -267,6 +267,14 @@ enum FeatureFlag {
   SKIP_FORWARD_SECURITY
 }
 
+"""
+A feature flag name with his value
+"""
+type FeatureFlagEntry {
+  name: FeatureFlag!
+  value: Boolean!
+}
+
 type FileUpload {
   contentType: String!
   filename: String!
@@ -358,6 +366,14 @@ enum ImageOptionsResizeFit {
   fill
   inside
   outside
+}
+
+"""
+A feature flag name with his value
+"""
+input InputFeatureFlag {
+  name: FeatureFlag!
+  value: Boolean!
 }
 
 """
@@ -679,6 +695,7 @@ type Mutation {
     firstName: String!
     lastName: String!
     locale: String
+    orgId: GID
     role: OrganizationRole!
     userGroupIds: [GID!]
   ): User!
@@ -1399,6 +1416,11 @@ type Mutation {
   ): SupportMethodResponse!
 
   """
+  Activate or deactivate a list of organization feature flag
+  """
+  updateFeatureFlags(featureFlags: [InputFeatureFlag!]!, orgId: GID!): Organization!
+
+  """
   Updates the positions of the petition fields
   """
   updateFieldPositions(fieldIds: [GID!]!, petitionId: GID!): PetitionBase!
@@ -1804,6 +1826,11 @@ type Organization implements Timestamps {
   Custom host used in petition links and public links.
   """
   customHost: String
+
+  """
+  A list of all feature flag and the value asigned to this org
+  """
+  features: [FeatureFlagEntry!]!
 
   """
   Whether the organization has an SSO provider configured.

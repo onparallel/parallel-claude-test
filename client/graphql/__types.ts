@@ -235,6 +235,13 @@ export type FeatureFlag =
   | "REMOVE_WHY_WE_USE_PARALLEL"
   | "SKIP_FORWARD_SECURITY";
 
+/** A feature flag name with his value */
+export interface FeatureFlagEntry {
+  __typename?: "FeatureFlagEntry";
+  name: FeatureFlag;
+  value: Scalars["Boolean"];
+}
+
 export interface FileUpload {
   __typename?: "FileUpload";
   contentType: Scalars["String"];
@@ -322,6 +329,12 @@ export interface ImageOptionsResize {
 }
 
 export type ImageOptionsResizeFit = "contain" | "cover" | "fill" | "inside" | "outside";
+
+/** A feature flag name with his value */
+export interface InputFeatureFlag {
+  name: FeatureFlag;
+  value: Scalars["Boolean"];
+}
 
 /** The types of integrations available. */
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
@@ -672,6 +685,8 @@ export interface Mutation {
   updateEventSubscription: PetitionEventSubscription;
   /** Activate or deactivate an organization feature flag */
   updateFeatureFlag: SupportMethodResponse;
+  /** Activate or deactivate a list of organization feature flag */
+  updateFeatureFlags: Organization;
   /** Updates the positions of the petition fields */
   updateFieldPositions: PetitionBase;
   /** Updates the file of a FILE_UPLOAD reply. The previous file will be deleted from AWS S3 when client notifies of upload completed via updateFileUploadReplyComplete mutation. */
@@ -893,6 +908,7 @@ export interface MutationcreateOrganizationUserArgs {
   firstName: Scalars["String"];
   lastName: Scalars["String"];
   locale?: InputMaybe<Scalars["String"]>;
+  orgId?: InputMaybe<Scalars["GID"]>;
   role: OrganizationRole;
   userGroupIds?: InputMaybe<Array<Scalars["GID"]>>;
 }
@@ -1412,6 +1428,11 @@ export interface MutationupdateFeatureFlagArgs {
   value: Scalars["Boolean"];
 }
 
+export interface MutationupdateFeatureFlagsArgs {
+  featureFlags: Array<InputFeatureFlag>;
+  orgId: Scalars["GID"];
+}
+
 export interface MutationupdateFieldPositionsArgs {
   fieldIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
@@ -1675,6 +1696,8 @@ export interface Organization extends Timestamps {
   createdAt: Scalars["DateTime"];
   /** Custom host used in petition links and public links. */
   customHost?: Maybe<Scalars["String"]>;
+  /** A list of all feature flag and the value asigned to this org */
+  features: Array<FeatureFlagEntry>;
   /** Whether the organization has an SSO provider configured. */
   hasSsoProvider: Scalars["Boolean"];
   /** URL of the organization logo */
@@ -5626,6 +5649,12 @@ export type CreateUserDialog_emailIsAvailableQueryVariables = Exact<{
 }>;
 
 export type CreateUserDialog_emailIsAvailableQuery = { emailIsAvailable: boolean };
+
+export type InviteUserDialog_emailIsAvailableQueryVariables = Exact<{
+  email: Scalars["String"];
+}>;
+
+export type InviteUserDialog_emailIsAvailableQuery = { emailIsAvailable: boolean };
 
 export type EmailEventsIndicator_PetitionMessageFragment = {
   __typename?: "PetitionMessage";
@@ -11486,6 +11515,43 @@ export type OrganizationMembers_OrganizationFragment = {
   __typename?: "Organization";
   id: string;
   name: string;
+  hasSsoProvider: boolean;
+  features: Array<{ __typename?: "FeatureFlagEntry"; name: FeatureFlag; value: boolean }>;
+};
+
+export type OrganizationMembers_updateFeatureFlagsMutationVariables = Exact<{
+  orgId: Scalars["GID"];
+  featureFlags: Array<InputFeatureFlag> | InputFeatureFlag;
+}>;
+
+export type OrganizationMembers_updateFeatureFlagsMutation = {
+  updateFeatureFlags: {
+    __typename?: "Organization";
+    id: string;
+    features: Array<{ __typename?: "FeatureFlagEntry"; name: FeatureFlag; value: boolean }>;
+  };
+};
+
+export type OrganizationMembers_createOrganizationUserMutationVariables = Exact<{
+  firstName: Scalars["String"];
+  lastName: Scalars["String"];
+  email: Scalars["String"];
+  role: OrganizationRole;
+  locale?: InputMaybe<Scalars["String"]>;
+  orgId?: InputMaybe<Scalars["GID"]>;
+}>;
+
+export type OrganizationMembers_createOrganizationUserMutation = {
+  createOrganizationUser: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    email: string;
+    role: OrganizationRole;
+    createdAt: string;
+    lastActiveAt?: string | null;
+    status: UserStatus;
+  };
 };
 
 export type OrganizationMembers_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -11537,6 +11603,7 @@ export type OrganizationMembers_organizationQuery = {
     __typename?: "Organization";
     id: string;
     name: string;
+    hasSsoProvider: boolean;
     users: {
       __typename?: "UserPagination";
       totalCount: number;
@@ -11551,6 +11618,7 @@ export type OrganizationMembers_organizationQuery = {
         status: UserStatus;
       }>;
     };
+    features: Array<{ __typename?: "FeatureFlagEntry"; name: FeatureFlag; value: boolean }>;
   } | null;
 };
 
@@ -22599,6 +22667,11 @@ export const OrganizationMembers_OrganizationFragmentDoc = gql`
   fragment OrganizationMembers_Organization on Organization {
     id
     name
+    hasSsoProvider
+    features {
+      name
+      value
+    }
   }
 ` as unknown as DocumentNode<OrganizationMembers_OrganizationFragment, unknown>;
 export const AdminOrganizations_OrganizationFragmentDoc = gql`
@@ -26251,6 +26324,14 @@ export const CreateUserDialog_emailIsAvailableDocument = gql`
   CreateUserDialog_emailIsAvailableQuery,
   CreateUserDialog_emailIsAvailableQueryVariables
 >;
+export const InviteUserDialog_emailIsAvailableDocument = gql`
+  query InviteUserDialog_emailIsAvailable($email: String!) {
+    emailIsAvailable(email: $email)
+  }
+` as unknown as DocumentNode<
+  InviteUserDialog_emailIsAvailableQuery,
+  InviteUserDialog_emailIsAvailableQueryVariables
+>;
 export const PetitionSharingModal_addPetitionPermissionDocument = gql`
   mutation PetitionSharingModal_addPetitionPermission(
     $petitionIds: [GID!]!
@@ -27500,6 +27581,48 @@ export const Admin_userDocument = gql`
   }
   ${AppLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<Admin_userQuery, Admin_userQueryVariables>;
+export const OrganizationMembers_updateFeatureFlagsDocument = gql`
+  mutation OrganizationMembers_updateFeatureFlags(
+    $orgId: GID!
+    $featureFlags: [InputFeatureFlag!]!
+  ) {
+    updateFeatureFlags(orgId: $orgId, featureFlags: $featureFlags) {
+      id
+      features {
+        name
+        value
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  OrganizationMembers_updateFeatureFlagsMutation,
+  OrganizationMembers_updateFeatureFlagsMutationVariables
+>;
+export const OrganizationMembers_createOrganizationUserDocument = gql`
+  mutation OrganizationMembers_createOrganizationUser(
+    $firstName: String!
+    $lastName: String!
+    $email: String!
+    $role: OrganizationRole!
+    $locale: String
+    $orgId: GID
+  ) {
+    createOrganizationUser(
+      email: $email
+      firstName: $firstName
+      lastName: $lastName
+      role: $role
+      locale: $locale
+      orgId: $orgId
+    ) {
+      ...OrganizationMembers_OrganizationUser
+    }
+  }
+  ${OrganizationMembers_OrganizationUserFragmentDoc}
+` as unknown as DocumentNode<
+  OrganizationMembers_createOrganizationUserMutation,
+  OrganizationMembers_createOrganizationUserMutationVariables
+>;
 export const OrganizationMembers_userDocument = gql`
   query OrganizationMembers_user {
     ...AppLayout_Query

@@ -128,10 +128,7 @@ function CreateOrUpdateUserDialog({
             defaultMessage="Update user"
           />
         ) : (
-          <FormattedMessage
-            id="components.create-or-update-user-dialog.invite-user"
-            defaultMessage="Invite user"
-          />
+          <FormattedMessage id="generic.invite-user" defaultMessage="Invite user" />
         )
       }
       body={
@@ -285,10 +282,7 @@ function CreateOrUpdateUserDialog({
               defaultMessage="Update user"
             />
           ) : (
-            <FormattedMessage
-              id="components.create-or-update-user-dialog.invite-user"
-              defaultMessage="Invite user"
-            />
+            <FormattedMessage id="generic.invite-user" defaultMessage="Invite user" />
           )}
         </Button>
       }
