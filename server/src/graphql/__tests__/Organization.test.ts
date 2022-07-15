@@ -266,7 +266,7 @@ describe("GraphQL/Organization", () => {
     it("sends error when passing unknown font-family", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($orgThemeId: GID!, $data: UpdateOrganizationPdfDocumentThemeInput!) {
+          mutation ($orgThemeId: GID!, $data: OrganizationPdfDocumentThemeInput) {
             updateOrganizationPdfDocumentTheme(orgThemeId: $orgThemeId, data: $data) {
               pdfDocumentThemes {
                 id
@@ -279,10 +279,8 @@ describe("GraphQL/Organization", () => {
         {
           orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
           data: {
-            theme: {
-              ...omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
-              textFontFamily: "Comic Sans",
-            },
+            ...omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
+            textFontFamily: "Comic Sans",
           },
         }
       );
@@ -347,7 +345,7 @@ describe("GraphQL/Organization", () => {
     it("partially updates the data of a document theme", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($orgThemeId: GID!, $data: OrganizationPdfDocumentThemeInput!) {
+          mutation ($orgThemeId: GID!, $data: OrganizationPdfDocumentThemeInput) {
             updateOrganizationPdfDocumentTheme(orgThemeId: $orgThemeId, data: $data) {
               pdfDocumentThemes {
                 id
@@ -361,12 +359,10 @@ describe("GraphQL/Organization", () => {
         {
           orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id),
           data: {
-            theme: {
-              ...omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
-              marginTop: 10,
-              showLogo: false,
-              textColor: "#ababab",
-            },
+            ...omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
+            marginTop: 10,
+            showLogo: false,
+            textColor: "#ababab",
           },
         }
       );
@@ -378,20 +374,20 @@ describe("GraphQL/Organization", () => {
             id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id + 1),
             name: "Newest theme",
             isDefault: false,
-            data: defaultPdfDocumentTheme,
+            data: omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
           },
           {
             id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
             name: "My new default theme",
             isDefault: true,
-            data: defaultPdfDocumentTheme,
+            data: omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
           },
           {
             id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id),
             name: "Theme 1",
             isDefault: false,
             data: {
-              ...defaultPdfDocumentTheme,
+              ...omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
               marginTop: 10,
               showLogo: false,
               textColor: "#ababab",
@@ -401,7 +397,7 @@ describe("GraphQL/Organization", () => {
             id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id - 1),
             name: "Default",
             isDefault: false,
-            data: defaultPdfDocumentTheme,
+            data: omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
           },
         ],
       });

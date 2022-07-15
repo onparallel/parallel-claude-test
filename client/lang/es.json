@@ -4311,22 +4311,22 @@
   },
   {
     "term": "components.confirm-discard-changes-dialog.body",
-    "definition": "",
+    "definition": "Tienes cambios sin guardar. ¿Quieres descartarlos?",
     "context": "You have unsaved changes. Would you like to discard them?"
   },
   {
     "term": "components.confirm-discard-changes-dialog.cancel",
-    "definition": "",
+    "definition": "Mantener",
     "context": "Stay"
   },
   {
     "term": "components.confirm-discard-changes-dialog.confirm",
-    "definition": "",
+    "definition": "Descartar y continuar",
     "context": "Discard and continue"
   },
   {
     "term": "components.confirm-discard-changes-dialog.header",
-    "definition": "",
+    "definition": "Cambios sin guardar",
     "context": "Unsaved changes"
   },
   {
@@ -4336,7 +4336,7 @@
   },
   {
     "term": "components.create-or-update-document-theme-dialog.delete-theme-button",
-    "definition": "",
+    "definition": "Eliminar tema",
     "context": "Delete theme"
   },
   {
@@ -4356,7 +4356,7 @@
   },
   {
     "term": "components.create-or-update-document-theme-dialog.set-default-help",
-    "definition": "",
+    "definition": "Al crear nuevas plantillas, se utilizará este tema por defecto. Las plantillas existentes no se verán afectadas.",
     "context": "When creating new templates, this theme will be used as default. Existing templates are not affected."
   },
   {
@@ -4976,7 +4976,7 @@
   },
   {
     "term": "generic.default",
-    "definition": "",
+    "definition": "Defecto",
     "context": "Default"
   },
   {
