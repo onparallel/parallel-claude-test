@@ -45,7 +45,7 @@ const email: Email<PetitionMessageProps> = {
       ${intl.formatMessage(
         {
           id: "new-petition.text",
-          defaultMessage: "{senderName} ({senderEmail}) has sent you the following parallel:",
+          defaultMessage: "{senderName} ({senderEmail}) has shared an access to Parallel:",
         },
         { senderName, senderEmail, tone }
       )}
@@ -124,7 +124,7 @@ const email: Email<PetitionMessageProps> = {
             <MjmlText align="center">
               <FormattedMessage
                 id="new-petition.text"
-                defaultMessage="{senderName} ({senderEmail}) has sent you the following parallel:"
+                defaultMessage="{senderName} ({senderEmail}) has shared an access to Parallel:"
                 values={{
                   senderName: <b>{senderName}</b>,
                   senderEmail: <b>{senderEmail}</b>,

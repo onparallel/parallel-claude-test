@@ -82,7 +82,7 @@ const email: Email<PetitionReminderProps> = {
         {
           id: "reminder.text",
           defaultMessage:
-            "We remind you that {senderName} ({senderEmail}) sent you a parallel and some of the requested information has not yet been submitted.",
+            "We remind you that {senderName} ({senderEmail}) shared with you an access to Parallel in which there is still some information to be completed.",
         },
         { senderName, senderEmail, tone }
       )}
@@ -92,7 +92,8 @@ const email: Email<PetitionReminderProps> = {
       ${intl.formatMessage(
         {
           id: "reminder.pending-fields-count",
-          defaultMessage: "You have {pending}/{total} fields pending.",
+          defaultMessage:
+            "{tone, select, INFORMAL{You have} other{There are currently}} {pending}/{total} fields pending.",
         },
         { pending: missingFieldCount, total: totalFieldCount, tone }
       )}
@@ -184,7 +185,7 @@ const email: Email<PetitionReminderProps> = {
             <MjmlText lineHeight="24px">
               <FormattedMessage
                 id="reminder.text"
-                defaultMessage="We remind you that {senderName} ({senderEmail}) sent you a parallel and some of the requested information has not yet been submitted."
+                defaultMessage="We remind you that {senderName} ({senderEmail}) shared with you an access to Parallel in which there is still some information to be completed."
                 values={{
                   senderName: <b>{senderName}</b>,
                   senderEmail: <b>{senderEmail}</b>,
@@ -203,7 +204,7 @@ const email: Email<PetitionReminderProps> = {
               <li>
                 <FormattedMessage
                   id="reminder.pending-fields-count"
-                  defaultMessage="You have {pending}/{total} fields pending."
+                  defaultMessage="{tone, select, INFORMAL{You have} other{There are currently}} {pending}/{total} fields pending."
                   values={{ pending: missingFieldCount, total: totalFieldCount, tone }}
                 />
               </li>

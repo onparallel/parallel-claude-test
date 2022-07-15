@@ -412,7 +412,7 @@
   {
     "term": "new-petition.text",
     "definition": "{tone, select, INFORMAL{{senderName} ({senderEmail}) te ha compartido un acceso a Parallel:} other{{senderName} ({senderEmail}) le ha compartido un acceso a Parallel:}}",
-    "context": "{senderName} ({senderEmail}) has sent you the following parallel:"
+    "context": "{senderName} ({senderEmail}) has shared an access to Parallel:"
   },
   {
     "term": "organization-limits-reached.parallel-send.few-credits-remaining-text",
@@ -651,13 +651,13 @@
   },
   {
     "term": "reminder.pending-fields-count",
-    "definition": "{tone, select, INFORMAL{En este momento hay {pending}/{total} campos pendientes.} other{Tienes {pending}/{total} campos pendientes.}}",
-    "context": "You have {pending}/{total} fields pending."
+    "definition": "{tone, select, INFORMAL{Tienes {pending}/{total} campos pendientes.} other{En este momento hay {pending}/{total} campos pendientes.}}",
+    "context": "{tone, select, INFORMAL{You have} other{There are currently}} {pending}/{total} fields pending."
   },
   {
     "term": "reminder.text",
-    "definition": "{tone, select, INFORMAL{Te recordamos que {senderName} ({senderEmail}) te compartió un acceso a Parallel en el que queda información pendiente de completar.} other{Le recordamos que {senderName} ({senderEmail}) le envió un parallel en el que queda información pendiente de completar.}}",
-    "context": "We remind you that {senderName} ({senderEmail}) sent you a parallel and some of the requested information has not yet been submitted."
+    "definition": "{tone, select, INFORMAL{Te recordamos que {senderName} ({senderEmail}) te compartió un acceso a Parallel en el que queda información pendiente de completar.} other{Le recordamos que {senderName} ({senderEmail}) le compartió un accesso a Parallel en el que queda información pendiente de completar.}}",
+    "context": "We remind you that {senderName} ({senderEmail}) shared with you an access to Parallel in which there is still some information to be completed."
   },
   {
     "term": "signature-cancelled-no-credits-left.contact-org-user",
