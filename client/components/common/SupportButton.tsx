@@ -8,9 +8,17 @@ interface SupportButton extends ButtonProps {
 }
 
 export const SupportButton = chakraForwardRef<"a", SupportButton>(function SupportButton(
-  { message, onClick, children, ...props },
+  { message, onClick, children, isDisabled, ...props },
   ref
 ) {
+  if (isDisabled) {
+    return (
+      <Button ref={ref as any} as="a" {...props} isDisabled={isDisabled}>
+        {children}
+      </Button>
+    );
+  }
+
   return (
     <NakedLink href={`mailto:support@onparallel.com?body=${encodeURIComponent(message)}`}>
       <Button
