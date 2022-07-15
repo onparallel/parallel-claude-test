@@ -308,6 +308,7 @@ function OrganizationMembers({ organizationId }: OrganizationMembersProps) {
                     onReload={() => refetch()}
                     onSearchChange={handleSearchChange}
                     onInviteClick={handleInviteUser}
+                    hasSsoProvider={organization.hasSsoProvider}
                   />
                 }
                 body={

@@ -1805,6 +1805,11 @@
     "context": "Only admins can edit these settings. Please ask them if you need any changes on this page."
   },
   {
+    "term": "component.organization-memebers-list-table-headr.sso-provider",
+    "definition": "Proveedor SSO",
+    "context": "SSO provider"
+  },
+  {
     "term": "component.password-input.hide",
     "definition": "Ocultar contraseña",
     "context": "Hide"
@@ -5500,6 +5505,11 @@
     "context": "Invite user"
   },
   {
+    "term": "generic.language",
+    "definition": "Idioma",
+    "context": "Language"
+  },
+  {
     "term": "generic.last-active-at",
     "definition": "Activo por última vez",
     "context": "Last active at"
@@ -8538,11 +8548,6 @@
     "term": "settings.account.change-password-button",
     "definition": "Cambiar contraseña",
     "context": "Change password"
-  },
-  {
-    "term": "generic.language",
-    "definition": "Idioma",
-    "context": "Language"
   },
   {
     "term": "settings.account.name-header",

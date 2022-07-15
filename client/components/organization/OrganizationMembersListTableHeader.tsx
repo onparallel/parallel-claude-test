@@ -1,4 +1,4 @@
-import { Box, Button, HStack } from "@chakra-ui/react";
+import { Badge, Box, Button, HStack } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -9,6 +9,7 @@ export interface OrganizationMembersListTableHeaderProps {
   onSearchChange(value: string | null): void;
   onReload(): void;
   onInviteClick(): void;
+  hasSsoProvider: boolean;
 }
 
 export function OrganizationMembersListTableHeader({
@@ -16,6 +17,7 @@ export function OrganizationMembersListTableHeader({
   onSearchChange,
   onReload,
   onInviteClick,
+  hasSsoProvider,
 }: OrganizationMembersListTableHeaderProps) {
   const intl = useIntl();
 
@@ -35,6 +37,14 @@ export function OrganizationMembersListTableHeader({
             defaultMessage: "Reload",
           })}
         />
+        {hasSsoProvider ? (
+          <Badge colorScheme="primary">
+            <FormattedMessage
+              id="component.organization-memebers-list-table-headr.sso-provider"
+              defaultMessage="SSO provider"
+            />
+          </Badge>
+        ) : null}
       </HStack>
       <Button colorScheme="primary" onClick={onInviteClick}>
         <FormattedMessage id="generic.invite-user" defaultMessage="Invite user" />
