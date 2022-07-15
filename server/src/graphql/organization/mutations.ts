@@ -333,20 +333,24 @@ export const restoreDefaultOrganizationDocumentThemeFonts = mutationField(
   }
 );
 
-export const InputFeatureFlag = inputObjectType({
-  name: "InputFeatureFlag",
-  description: "A feature flag name with his value",
-  definition(t) {
-    t.nonNull.field("name", { type: "FeatureFlag" });
-    t.nonNull.boolean("value");
-  },
-});
-
 export const updateFeatureFlags = mutationField("updateFeatureFlags", {
   description: "Activate or deactivate a list of organization feature flag",
   type: "Organization",
   args: {
-    featureFlags: nonNull(list(nonNull("InputFeatureFlag"))),
+    featureFlags: nonNull(
+      list(
+        nonNull(
+          inputObjectType({
+            name: "InputFeatureFlag",
+            description: "A feature flag name with his value",
+            definition(t) {
+              t.nonNull.field("name", { type: "FeatureFlag" });
+              t.nonNull.boolean("value");
+            },
+          })
+        )
+      )
+    ),
     orgId: nonNull(globalIdArg("Organization")),
   },
   authorize: authenticateAnd(contextUserHasRole("ADMIN")),
