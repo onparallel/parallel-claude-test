@@ -239,7 +239,10 @@ export function DocumentThemeEditor({
                   defaultMessage="Size"
                 />
               </FormLabel>
-              <Select {...register(`${key}FontSize`)} backgroundColor="white">
+              <Select
+                {...register(`${key}FontSize`, { valueAsNumber: true })}
+                backgroundColor="white"
+              >
                 {FONT_SIZES_PT.map((v) => (
                   <option key={v} value={v}>{`${v} pt`}</option>
                 ))}

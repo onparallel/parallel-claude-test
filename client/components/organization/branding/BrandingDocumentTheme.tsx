@@ -93,7 +93,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
   ).some(([a, b]) => a !== b);
   async function handleRestoreFonts() {
     for (const [prop, value] of zip(fontProperties, defaultFontValues)) {
-      setValue(prop, value);
+      setValue(prop, value, { shouldDirty: true });
     }
   }
 
