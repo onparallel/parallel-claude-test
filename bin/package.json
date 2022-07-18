@@ -15,7 +15,8 @@
     "list-instances": "node dist/list-instances.js",
     "prune-instances": "node dist/prune-instances.js",
     "full-release": "node dist/full-release.js",
-    "strip-js": "node dist/strip-js.js"
+    "strip-js": "node dist/strip-js.js",
+    "create-cert": "node dist/create-cert.js"
   },
   "dependencies": {
     "@formatjs/cli": "^5.0.2",
