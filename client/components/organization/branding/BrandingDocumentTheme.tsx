@@ -197,7 +197,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
           <Box flex="1">
             <DocumentThemeSelect
               onCreateNewTheme={handleCreateNewDocumentTheme}
-              onChange={handleThemeChange}
+              onChange={(t) => handleThemeChange(t!)}
               value={selectedTheme}
               options={documentThemes.filter((t) => t.id !== selectedTheme.id)}
               isCreateNewThemeDisabled={!hasAdminRole}
