@@ -15,7 +15,6 @@ describe("GraphQL/Organization", () => {
   let mocks: Mocks;
   let organization: Organization;
   let user: User;
-  let pdfDocumentThemes: OrganizationTheme[];
 
   beforeAll(async () => {
     testClient = await initServer();
@@ -25,13 +24,6 @@ describe("GraphQL/Organization", () => {
     ({ organization, user } = await mocks.createSessionUserAndOrganization("ADMIN", () => ({
       created_at: subDays(new Date(), 4),
     })));
-
-    pdfDocumentThemes = await mocks.createOrganizationThemes(organization.id, 2, (i) => ({
-      type: "PDF_DOCUMENT",
-      is_default: false,
-      name: `Theme ${i + 1}`,
-      created_at: subDays(new Date(), 3 - i), // to ensure correct order
-    }));
 
     await knex.from("feature_flag").delete();
   });
@@ -191,310 +183,312 @@ describe("GraphQL/Organization", () => {
     });
   });
 
-  describe("createOrganizationPdfDocumentTheme", () => {
-    it("sends error when creating a theme with name longer than 50 chars", async () => {
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation ($name: String!, $isDefault: Boolean!) {
-            createOrganizationPdfDocumentTheme(name: $name, isDefault: $isDefault) {
-              pdfDocumentThemes {
-                id
-                name
-                isDefault
-                data
-              }
-            }
-          }
-        `,
-        { name: "X".repeat(51), isDefault: false }
-      );
+  describe("Organization Themes", () => {
+    let pdfDocumentThemes: OrganizationTheme[];
+    beforeEach(async () => {
+      await mocks.knex
+        .from("organization_theme")
+        .update({ is_default: false, deleted_at: new Date() });
 
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
-      expect(data).toBeNull();
+      pdfDocumentThemes = await mocks.createOrganizationThemes(organization.id, 3, (i) => ({
+        type: "PDF_DOCUMENT",
+        is_default: i === 0,
+        name: `Theme ${i}`,
+        created_at: subDays(new Date(), 3 - i), // to ensure correct order
+      }));
     });
 
-    it("creates a pdf document theme with default values and sets it as default theme", async () => {
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation ($name: String!, $isDefault: Boolean!) {
-            createOrganizationPdfDocumentTheme(name: $name, isDefault: $isDefault) {
-              pdfDocumentThemes {
-                id
-                name
-                isDefault
-                data
+    describe("createOrganizationPdfDocumentTheme", () => {
+      it("sends error when creating a theme with name longer than 50 chars", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($name: String!, $isDefault: Boolean!) {
+              createOrganizationPdfDocumentTheme(name: $name, isDefault: $isDefault) {
+                pdfDocumentThemes {
+                  id
+                  name
+                  isDefault
+                  data
+                }
               }
             }
-          }
-        `,
-        { name: "Newest theme", isDefault: true }
-      );
+          `,
+          { name: "X".repeat(51), isDefault: false }
+        );
 
-      expect(errors).toBeUndefined();
-      expect(data?.createOrganizationPdfDocumentTheme).toEqual({
-        pdfDocumentThemes: [
-          {
-            id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id + 1),
-            name: "Newest theme",
-            isDefault: true,
-            data: omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
-          },
-          {
-            id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
-            name: "Theme 2",
-            isDefault: false,
-            data: omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
-          },
-          {
-            id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id),
-            name: "Theme 1",
-            isDefault: false,
-            data: omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
-          },
-          {
-            id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id - 1),
-            name: "Default",
-            isDefault: false,
-            data: omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
-          },
-        ],
+        expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+        expect(data).toBeNull();
       });
-    });
-  });
 
-  describe("updateOrganizationPdfDocumentTheme", () => {
-    it("sends error when passing unknown font-family", async () => {
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation ($orgThemeId: GID!, $data: OrganizationPdfDocumentThemeInput) {
-            updateOrganizationPdfDocumentTheme(orgThemeId: $orgThemeId, data: $data) {
-              pdfDocumentThemes {
-                id
-                name
-                isDefault
+      it("creates a pdf document theme with default values and sets it as default theme", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($name: String!, $isDefault: Boolean!) {
+              createOrganizationPdfDocumentTheme(name: $name, isDefault: $isDefault) {
+                pdfDocumentThemes {
+                  id
+                  name
+                  isDefault
+                  data
+                }
               }
             }
-          }
-        `,
-        {
-          orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
-          data: {
-            ...omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
-            textFontFamily: "Comic Sans",
-          },
-        }
-      );
+          `,
+          { name: "Newest theme", isDefault: true }
+        );
 
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
-      expect(data).toBeNull();
-    });
-
-    it("updates the name of a theme and sets it as new default", async () => {
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation ($orgThemeId: GID!, $name: String, $isDefault: Boolean) {
-            updateOrganizationPdfDocumentTheme(
-              orgThemeId: $orgThemeId
-              name: $name
-              isDefault: $isDefault
-            ) {
-              pdfDocumentThemes {
-                id
-                name
-                isDefault
-              }
-            }
-          }
-        `,
-        {
-          orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
-          data: {
-            isDefault: true,
-            name: "My new default theme",
-          },
-        }
-      );
-
-      expect(errors).toBeUndefined();
-      expect(data?.updateOrganizationPdfDocumentTheme).toEqual({
-        pdfDocumentThemes: [
-          {
-            id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id + 1),
-            name: "Newest theme",
-            isDefault: false,
-          },
-          {
-            id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
-            name: "My new default theme",
-            isDefault: true,
-          },
-          {
-            id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id),
-            name: "Theme 1",
-            isDefault: false,
-          },
-          {
-            id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id - 1),
-            name: "Default",
-            isDefault: false,
-          },
-        ],
+        expect(errors).toBeUndefined();
+        expect(data?.createOrganizationPdfDocumentTheme).toEqual({
+          pdfDocumentThemes: [
+            {
+              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[2].id + 1),
+              name: "Newest theme",
+              isDefault: true,
+              data: omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
+            },
+            {
+              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[2].id),
+              name: "Theme 2",
+              isDefault: false,
+              data: omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
+            },
+            {
+              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
+              name: "Theme 1",
+              isDefault: false,
+              data: omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
+            },
+            {
+              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id),
+              name: "Theme 0",
+              isDefault: false,
+              data: omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
+            },
+          ],
+        });
       });
     });
 
-    it("partially updates the data of a document theme", async () => {
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation ($orgThemeId: GID!, $data: OrganizationPdfDocumentThemeInput) {
-            updateOrganizationPdfDocumentTheme(orgThemeId: $orgThemeId, data: $data) {
-              pdfDocumentThemes {
-                id
-                name
-                isDefault
-                data
+    describe("updateOrganizationPdfDocumentTheme", () => {
+      it("sends error when passing unknown font-family", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($orgThemeId: GID!, $data: OrganizationPdfDocumentThemeInput) {
+              updateOrganizationPdfDocumentTheme(orgThemeId: $orgThemeId, data: $data) {
+                pdfDocumentThemes {
+                  id
+                  name
+                  isDefault
+                }
               }
             }
+          `,
+          {
+            orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
+            data: {
+              ...omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
+              textFontFamily: "Comic Sans",
+            },
           }
-        `,
-        {
-          orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id),
-          data: {
-            ...omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
-            marginTop: 10,
-            showLogo: false,
-            textColor: "#ababab",
-          },
-        }
-      );
+        );
 
-      expect(errors).toBeUndefined();
-      expect(data?.updateOrganizationPdfDocumentTheme).toEqual({
-        pdfDocumentThemes: [
+        expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+        expect(data).toBeNull();
+      });
+
+      it("updates the name of a theme and sets it as new default", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($orgThemeId: GID!, $name: String, $isDefault: Boolean) {
+              updateOrganizationPdfDocumentTheme(
+                orgThemeId: $orgThemeId
+                name: $name
+                isDefault: $isDefault
+              ) {
+                pdfDocumentThemes {
+                  id
+                  name
+                  isDefault
+                }
+              }
+            }
+          `,
           {
-            id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id + 1),
-            name: "Newest theme",
-            isDefault: false,
-            data: omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
-          },
-          {
-            id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
-            name: "My new default theme",
+            orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
             isDefault: true,
-            data: omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
-          },
+            name: "My new default theme",
+          }
+        );
+
+        expect(errors).toBeUndefined();
+        expect(data?.updateOrganizationPdfDocumentTheme).toEqual({
+          pdfDocumentThemes: [
+            {
+              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[2].id),
+              name: "Theme 2",
+              isDefault: false,
+            },
+            {
+              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
+              name: "My new default theme",
+              isDefault: true,
+            },
+            {
+              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id),
+              name: "Theme 0",
+              isDefault: false,
+            },
+          ],
+        });
+      });
+
+      it("partially updates the data of a document theme", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($orgThemeId: GID!, $data: OrganizationPdfDocumentThemeInput) {
+              updateOrganizationPdfDocumentTheme(orgThemeId: $orgThemeId, data: $data) {
+                pdfDocumentThemes {
+                  id
+                  name
+                  isDefault
+                  data
+                }
+              }
+            }
+          `,
           {
-            id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id),
-            name: "Theme 1",
-            isDefault: false,
+            orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
             data: {
               ...omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
               marginTop: 10,
               showLogo: false,
               textColor: "#ababab",
             },
-          },
+          }
+        );
+
+        expect(errors).toBeUndefined();
+        expect(data?.updateOrganizationPdfDocumentTheme).toEqual({
+          pdfDocumentThemes: [
+            {
+              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[2].id),
+              name: "Theme 2",
+              isDefault: false,
+              data: omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
+            },
+            {
+              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id),
+              name: "Theme 1",
+              isDefault: false,
+              data: {
+                ...omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
+                marginTop: 10,
+                showLogo: false,
+                textColor: "#ababab",
+              },
+            },
+            {
+              id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id),
+              name: "Theme 0",
+              isDefault: true,
+              data: omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
+            },
+          ],
+        });
+      });
+    });
+
+    describe("deleteOrganizationPdfDocumentTheme", () => {
+      it("sends error when trying to delete the default theme", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($orgThemeId: GID!) {
+              deleteOrganizationPdfDocumentTheme(orgThemeId: $orgThemeId) {
+                id
+              }
+            }
+          `,
+          { orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id) }
+        );
+
+        expect(errors).toContainGraphQLError("FORBIDDEN");
+        expect(data).toBeNull();
+      });
+
+      it("sets petition theme to default when deleting a theme that is being used", async () => {
+        const [themeToDelete] = await mocks.createOrganizationThemes(organization.id, 1, () => ({
+          type: "PDF_DOCUMENT",
+        }));
+        const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+          document_organization_theme_id: themeToDelete.id,
+        }));
+
+        const { errors: deleteErrors, data: deleteData } = await testClient.execute(
+          gql`
+            mutation ($orgThemeId: GID!) {
+              deleteOrganizationPdfDocumentTheme(orgThemeId: $orgThemeId) {
+                pdfDocumentThemes {
+                  id
+                  isDefault
+                }
+              }
+            }
+          `,
+          { orgThemeId: toGlobalId("OrganizationTheme", themeToDelete.id) }
+        );
+
+        expect(deleteErrors).toBeUndefined();
+        const newDefaultThemeId =
+          deleteData!.deleteOrganizationPdfDocumentTheme.pdfDocumentThemes.find(
+            (t: any) => t.isDefault
+          )!.id as string;
+
+        expect(newDefaultThemeId).toBeDefined();
+
+        const { errors: queryErrors, data: queryData } = await testClient.execute(
+          gql`
+            query ($id: GID!) {
+              petition(id: $id) {
+                selectedDocumentTheme {
+                  id
+                }
+              }
+            }
+          `,
           {
-            id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id - 1),
-            name: "Default",
-            isDefault: false,
-            data: omit(defaultPdfDocumentTheme, ["logoPosition", "paginationPosition"]),
+            id: toGlobalId("Petition", petition.id),
+          }
+        );
+
+        expect(queryErrors).toBeUndefined();
+        expect(queryData!.petition).toEqual({
+          selectedDocumentTheme: {
+            id: newDefaultThemeId,
           },
-        ],
+        });
       });
-    });
-  });
 
-  describe("deleteOrganizationPdfDocumentTheme", () => {
-    it("sends error when trying to delete the default theme", async () => {
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation ($orgThemeId: GID!) {
-            deleteOrganizationPdfDocumentTheme(orgThemeId: $orgThemeId) {
-              id
-            }
-          }
-        `,
-        { orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id) }
-      );
-
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
-    });
-
-    it("sets petition theme to default when deleting a theme that is being used", async () => {
-      const [themeToDelete] = await mocks.createOrganizationThemes(organization.id, 1, () => ({
-        type: "PDF_DOCUMENT",
-      }));
-      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
-        document_organization_theme_id: themeToDelete.id,
-      }));
-
-      const { errors: deleteErrors, data: deleteData } = await testClient.execute(
-        gql`
-          mutation ($orgThemeId: GID!) {
-            deleteOrganizationPdfDocumentTheme(orgThemeId: $orgThemeId) {
-              pdfDocumentThemes {
-                id
-                isDefault
+      it("deletes a document theme", async () => {
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($orgThemeId: GID!) {
+              deleteOrganizationPdfDocumentTheme(orgThemeId: $orgThemeId) {
+                pdfDocumentThemes {
+                  id
+                }
               }
             }
-          }
-        `,
-        { orgThemeId: toGlobalId("OrganizationTheme", themeToDelete.id) }
-      );
+          `,
+          { orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[2].id) }
+        );
 
-      expect(deleteErrors).toBeUndefined();
-      const newDefaultThemeId =
-        deleteData!.deleteOrganizationPdfDocumentTheme.pdfDocumentThemes.find(
-          (t: any) => t.isDefault
-        )!.id as string;
-
-      expect(newDefaultThemeId).toBeDefined();
-
-      const { errors: queryErrors, data: queryData } = await testClient.execute(
-        gql`
-          query ($id: GID!) {
-            petition(id: $id) {
-              selectedDocumentTheme {
-                id
-              }
-            }
-          }
-        `,
-        {
-          id: toGlobalId("Petition", petition.id),
-        }
-      );
-
-      expect(queryErrors).toBeUndefined();
-      expect(queryData!.petition).toEqual({
-        selectedDocumentTheme: {
-          id: newDefaultThemeId,
-        },
-      });
-    });
-
-    it("deletes a document theme", async () => {
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation ($orgThemeId: GID!) {
-            deleteOrganizationPdfDocumentTheme(orgThemeId: $orgThemeId) {
-              pdfDocumentThemes {
-                id
-              }
-            }
-          }
-        `,
-        { orgThemeId: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id) }
-      );
-
-      expect(errors).toBeUndefined();
-      expect(data?.deleteOrganizationPdfDocumentTheme).toEqual({
-        pdfDocumentThemes: [
-          { id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id + 1) },
-          { id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id) },
-          { id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id - 1) },
-        ],
+        expect(errors).toBeUndefined();
+        expect(data?.deleteOrganizationPdfDocumentTheme).toEqual({
+          pdfDocumentThemes: [
+            { id: toGlobalId("OrganizationTheme", pdfDocumentThemes[1].id) },
+            { id: toGlobalId("OrganizationTheme", pdfDocumentThemes[0].id) },
+          ],
+        });
       });
     });
   });
