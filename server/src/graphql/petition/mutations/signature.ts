@@ -1,6 +1,5 @@
 import { ApolloError } from "apollo-server-core";
 import { booleanArg, mutationField, nonNull, nullable, stringArg } from "nexus";
-import { toGlobalId } from "../../../util/globalId";
 import { authenticateAnd } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { RESULT } from "../../helpers/result";
@@ -134,15 +133,7 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
       ctx.petitions.cancelPetitionSignatureRequest(signature, "CANCELLED_BY_USER", {
         user_id: ctx.user!.id,
       }),
-      signature.status === "PROCESSED"
-        ? ctx.aws.enqueueMessages("signature-worker", {
-            groupId: `signature-${toGlobalId("Petition", petition.id)}`,
-            body: {
-              type: "cancel-signature-process",
-              payload: { petitionSignatureRequestId: signature.id },
-            },
-          })
-        : null,
+      ctx.signature.cancelSignatureRequest(signature),
     ]);
 
     return signatureRequest;
@@ -253,13 +244,7 @@ export const sendSignatureRequestReminders = mutationField("sendSignatureRequest
 
     if (signature.status === "PROCESSED") {
       await Promise.all([
-        ctx.aws.enqueueMessages("signature-worker", {
-          groupId: `signature-${toGlobalId("Petition", petition.id)}`,
-          body: {
-            type: "send-signature-reminder",
-            payload: { petitionSignatureRequestId },
-          },
-        }),
+        ctx.signature.sendSignatureReminders(signature),
         ctx.petitions.createEvent({
           type: "SIGNATURE_REMINDER",
           petition_id: petition.id,

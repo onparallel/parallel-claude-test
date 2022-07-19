@@ -1,6 +1,5 @@
 import { ApolloError } from "apollo-server-core";
 import { arg, booleanArg, mutationField, nonNull, nullable, stringArg } from "nexus";
-import { toGlobalId } from "../../util/globalId";
 import { withError } from "../../util/promises/withError";
 import { authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -204,19 +203,7 @@ export const deleteSignatureIntegration = mutationField("deleteSignatureIntegrat
           ctx.petitions.cancelPetitionSignatureRequest(pendingSignatures, "CANCELLED_BY_USER", {
             user_id: ctx.user!.id,
           }),
-          ctx.aws.enqueueMessages(
-            "signature-worker",
-            pendingSignatures
-              .filter((s) => s.status === "PROCESSED")
-              .map((s) => ({
-                id: `signature-${toGlobalId("Petition", s.petition_id)}`,
-                groupId: `signature-${toGlobalId("Petition", s.petition_id)}`,
-                body: {
-                  type: "cancel-signature-process",
-                  payload: { petitionSignatureRequestId: s.id },
-                },
-              }))
-          ),
+          ctx.signature.cancelSignatureRequest(pendingSignatures),
         ]);
       }
 

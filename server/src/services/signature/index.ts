@@ -11,9 +11,18 @@ import { OrganizationRepository } from "../../db/repositories/OrganizationReposi
 import {
   PetitionRepository,
   PetitionSignatureConfig,
+  PetitionSignatureConfigSigner,
 } from "../../db/repositories/PetitionRepository";
-import { OrgIntegration, PetitionAccess, Tone, User } from "../../db/__types";
+import {
+  OrgIntegration,
+  PetitionAccess,
+  PetitionSignatureRequest,
+  Tone,
+  User,
+} from "../../db/__types";
+import { unMaybeArray } from "../../util/arrays";
 import { toGlobalId } from "../../util/globalId";
+import { MaybeArray } from "../../util/types";
 import { AWS_SERVICE, IAws } from "../aws";
 import { FETCH_SERVICE, IFetchService } from "../fetch";
 import { I18N_SERVICE, II18nService } from "../i18n";
@@ -29,6 +38,20 @@ export interface ISignatureService {
     starter: User | PetitionAccess,
     t?: Knex.Transaction
   ): Promise<any>;
+  cancelSignatureRequest(
+    signatures: MaybeArray<PetitionSignatureRequest>,
+    t?: Knex.Transaction
+  ): Promise<void>;
+  sendSignatureReminders(signatures: MaybeArray<PetitionSignatureRequest>): Promise<void>;
+  storeSignedDocument(
+    signature: PetitionSignatureRequest,
+    signedDocumentExternalId: string,
+    signer: PetitionSignatureConfigSigner
+  ): Promise<void>;
+  storeAuditTrail(
+    signature: PetitionSignatureRequest,
+    signedDocumentExternalId: string
+  ): Promise<void>;
 }
 
 export const SIGNATURE = Symbol.for("SIGNATURE");
@@ -44,6 +67,7 @@ export class SignatureService implements ISignatureService {
     @inject(FETCH_SERVICE) private fetch: IFetchService,
     @inject(I18N_SERVICE) public readonly i18n: II18nService
   ) {}
+
   public getClient(integration: OrgIntegration): ISignatureClient {
     switch (integration.provider.toUpperCase()) {
       case "SIGNATURIT":
@@ -219,6 +243,76 @@ export class SignatureService implements ISignatureService {
 
     return { petition: updatedPetition, signatureRequest };
   }
+
+  async storeSignedDocument(
+    signature: PetitionSignatureRequest,
+    signedDocumentExternalId: string,
+    signer: PetitionSignatureConfigSigner
+  ) {
+    await this.aws.enqueueMessages("signature-worker", {
+      groupId: `signature-${toGlobalId("Petition", signature.petition_id)}`,
+      body: {
+        type: "store-signed-document",
+        payload: {
+          petitionSignatureRequestId: signature.id,
+          signedDocumentExternalId,
+          signer,
+        },
+      },
+    });
+  }
+
+  async storeAuditTrail(signature: PetitionSignatureRequest, signedDocumentExternalId: string) {
+    await this.aws.enqueueMessages("signature-worker", {
+      groupId: `signature-${toGlobalId("Petition", signature.petition_id)}`,
+      body: {
+        type: "store-audit-trail",
+        payload: {
+          petitionSignatureRequestId: signature.id,
+          signedDocumentExternalId,
+        },
+      },
+    });
+  }
+
+  async cancelSignatureRequest(
+    signature: MaybeArray<PetitionSignatureRequest>,
+    t?: Knex.Transaction
+  ): Promise<void> {
+    const signatures = unMaybeArray(signature).filter((s) => s.status === "PROCESSED");
+    if (signatures.length > 0) {
+      await this.aws.enqueueMessages(
+        "signature-worker",
+        signatures.map((s) => ({
+          id: `signature-${toGlobalId("Petition", s.petition_id)}`,
+          groupId: `signature-${toGlobalId("Petition", s.petition_id)}`,
+          body: {
+            type: "cancel-signature-process",
+            payload: { petitionSignatureRequestId: s.id },
+          },
+        })),
+        t
+      );
+    }
+  }
+
+  async sendSignatureReminders(signature: MaybeArray<PetitionSignatureRequest>): Promise<void> {
+    const signatures = unMaybeArray(signature).filter((s) => s.status === "PROCESSED");
+    if (signatures.length > 0) {
+      await this.aws.enqueueMessages(
+        "signature-worker",
+        signatures.map((s) => ({
+          id: `signature-${toGlobalId("Petition", s.petition_id)}`,
+          groupId: `signature-${toGlobalId("Petition", s.petition_id)}`,
+          body: {
+            type: "send-signature-reminder",
+            payload: { petitionSignatureRequestId: s.id },
+          },
+        }))
+      );
+    }
+  }
+
   /**
    *
    * checks that the signature integration exists and is valid.

@@ -404,20 +404,7 @@ export const deletePetitions = mutationField("deletePetitions", {
             undefined,
             t
           ),
-          ctx.aws.enqueueMessages(
-            "signature-worker",
-            pendingSignatureRequests
-              .filter((s) => s.status === "PROCESSED")
-              .map((s) => ({
-                id: `signature-${toGlobalId("Petition", s.petition_id)}`,
-                groupId: `signature-${toGlobalId("Petition", s.petition_id)}`,
-                body: {
-                  type: "cancel-signature-process",
-                  payload: { petitionSignatureRequestId: s.id },
-                },
-              })),
-            t
-          ),
+          ctx.signature.cancelSignatureRequest(pendingSignatureRequests),
         ]);
       }
     });

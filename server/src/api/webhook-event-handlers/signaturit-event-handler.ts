@@ -7,7 +7,6 @@ import {
   PetitionSignatureConfigSigner,
   PetitionSignatureRequestCancelData,
 } from "../../db/repositories/PetitionRepository";
-import { toGlobalId } from "../../util/globalId";
 
 export async function validateSignaturitRequest(
   req: Request & { context: ApiContext },
@@ -165,22 +164,10 @@ async function documentCompleted(ctx: ApiContext, data: SignaturItEventBody, pet
   } = data.document;
 
   const signature = await fetchPetitionSignature(signatureId, ctx);
-
   const [signer] = findSigner(signature!.signature_config.signersInfo, data.document);
-  await Promise.all([
-    ctx.aws.enqueueMessages("signature-worker", {
-      groupId: `signature-${toGlobalId("Petition", petitionId)}`,
-      body: {
-        type: "store-signed-document",
-        payload: {
-          petitionSignatureRequestId: signature.id,
-          signedDocumentExternalId: `${signatureId}/${documentId}`,
-          signer,
-        },
-      },
-    }),
-    appendEventLogs(ctx, data),
-  ]);
+
+  await ctx.signature.storeSignedDocument(signature, `${signatureId}/${documentId}`, signer);
+  await appendEventLogs(ctx, data);
 }
 
 /** audit trail has been completed and is ready to be downloaded */
@@ -192,19 +179,8 @@ async function auditTrailCompleted(ctx: ApiContext, data: SignaturItEventBody, p
 
   const signature = await fetchPetitionSignature(signatureId, ctx);
 
-  await Promise.all([
-    ctx.aws.enqueueMessages("signature-worker", {
-      groupId: `signature-${toGlobalId("Petition", petitionId)}`,
-      body: {
-        type: "store-audit-trail",
-        payload: {
-          petitionSignatureRequestId: signature.id,
-          signedDocumentExternalId: `${signatureId}/${documentId}`,
-        },
-      },
-    }),
-    appendEventLogs(ctx, data),
-  ]);
+  await ctx.signature.storeAuditTrail(signature, `${signatureId}/${documentId}`);
+  await appendEventLogs(ctx, data);
 }
 
 async function emailDelivered(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
