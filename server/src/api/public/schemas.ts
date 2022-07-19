@@ -1306,9 +1306,8 @@ const PetitionEventSchemas = {
     description: "An eSignature request on the parallel was cancelled.",
     properties: {
       petitionSignatureRequestId: {
-        description:
-          "The ID of the eSignature request. Only set if the request was already started when the cancellation happens.",
-        type: ["string", "null"],
+        description: "The ID of the eSignature request.",
+        type: "string",
         example: toGlobalId("PetitionSignatureRequest", 1),
       },
       cancelReason: {

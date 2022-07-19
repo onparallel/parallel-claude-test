@@ -1,21 +1,23 @@
 import { unMaybeArray } from "../util/arrays";
+import { appSumoActivateAccount } from "./emails/appsumo-activate-account";
 import { commentsContactNotification } from "./emails/comments-contact-notification";
 import { commentsUserNotification } from "./emails/comments-user-notification";
+import { contactAuthenticationRequest } from "./emails/contact-authentication-request";
+import { developerWebhookFailed } from "./emails/developer-webhook-failed";
+import { internalSignaturitAccountDepletedCredits } from "./emails/internal-signaturit-account-depleted-credits";
+import { organizationLimitsReached } from "./emails/organization-limits-reached";
+import { petitionAccessDelegated } from "./emails/petition-access-delegated";
+import { petitionClosedNotification } from "./emails/petition-closed-notification";
 import { petitionCompleted } from "./emails/petition-completed";
 import { petitionMessage } from "./emails/petition-message";
-import { petitionReminder } from "./emails/petition-reminder";
-import { petitionClosedNotification } from "./emails/petition-closed-notification";
-import { petitionShared } from "./emails/petition-shared";
 import { petitionMessageBounced } from "./emails/petition-message-bounced";
-import { createQueueWorker } from "./helpers/createQueueWorker";
-import { contactAuthenticationRequest } from "./emails/contact-authentication-request";
-import { petitionAccessDelegated } from "./emails/petition-access-delegated";
-import { developerWebhookFailed } from "./emails/developer-webhook-failed";
+import { petitionReminder } from "./emails/petition-reminder";
+import { petitionShared } from "./emails/petition-shared";
 import { publicPetitionLinkAccess } from "./emails/public-petition-link-access";
+import { signatureCancelledDeclinedBySigner } from "./emails/signature-cancelled-declined-by-signer";
 import { signatureCancelledNoCreditsLeft } from "./emails/signature-cancelled-no-credits-left";
-import { organizationLimitsReached } from "./emails/organization-limits-reached";
-import { appSumoActivateAccount } from "./emails/appsumo-activate-account";
-import { internalSignaturitAccountDepletedCredits } from "./emails/internal-signaturit-account-depleted-credits";
+import { signatureCancelledRequestError } from "./emails/signature-cancelled-request-error";
+import { createQueueWorker } from "./helpers/createQueueWorker";
 
 const builders = {
   "petition-completed": petitionCompleted,
@@ -30,10 +32,12 @@ const builders = {
   "petition-access-delegated": petitionAccessDelegated,
   "developer-webhook-failed": developerWebhookFailed,
   "public-petition-link-access": publicPetitionLinkAccess,
-  "signature-cancelled-no-credits-left": signatureCancelledNoCreditsLeft,
   "organization-limits-reached": organizationLimitsReached,
   "appsumo-activate-account": appSumoActivateAccount,
   "internal-signaturit-account-depleted-credits": internalSignaturitAccountDepletedCredits,
+  "signature-cancelled-no-credits-left": signatureCancelledNoCreditsLeft,
+  "signature-cancelled-request-error": signatureCancelledRequestError,
+  "signature-cancelled-declined-by-signer": signatureCancelledDeclinedBySigner,
 };
 
 export type EmailType = keyof typeof builders;

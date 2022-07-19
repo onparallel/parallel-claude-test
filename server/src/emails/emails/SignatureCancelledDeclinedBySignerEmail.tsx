@@ -8,16 +8,16 @@ import { GreetingUser } from "../components/Greeting";
 import { Layout, LayoutProps } from "../components/Layout";
 import { closing, greetingUser } from "../components/texts";
 
-type SignatureCancelledSignerDeclinedProps = {
-  userName: string;
+type SignatureCancelledDeclinedBySignerProps = {
+  userName: string | null;
   signerName: string;
   signerEmail: string;
-  petitionName: string;
+  petitionName: string | null;
   petitionId: string;
   signatureProvider: string;
 } & LayoutProps;
 
-const email: Email<SignatureCancelledSignerDeclinedProps> = {
+const email: Email<SignatureCancelledDeclinedBySignerProps> = {
   from({}, intl) {
     return intl.formatMessage({
       id: "from.parallel-team",
@@ -39,7 +39,7 @@ const email: Email<SignatureCancelledSignerDeclinedProps> = {
       signatureProvider,
       petitionId,
       parallelUrl,
-    }: SignatureCancelledSignerDeclinedProps,
+    }: SignatureCancelledDeclinedBySignerProps,
     intl: IntlShape
   ) {
     return outdent`
@@ -51,7 +51,17 @@ const email: Email<SignatureCancelledSignerDeclinedProps> = {
           defaultMessage:
             "{signerName} ({signerEmail}) has declined the signature request on {petitionName} sent through {signatureProvider}.",
         },
-        { signerName, signerEmail, petitionName, signatureProvider }
+        {
+          signerName,
+          signerEmail,
+          petitionName:
+            petitionName ??
+            intl.formatMessage({
+              id: "generic.unnamed-parallel",
+              defaultMessage: "Unnamed parallel",
+            }),
+          signatureProvider,
+        }
       )}
 
       ${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/replies#signatures
@@ -71,8 +81,8 @@ const email: Email<SignatureCancelledSignerDeclinedProps> = {
     assetsUrl,
     logoAlt,
     logoUrl,
-  }: SignatureCancelledSignerDeclinedProps) {
-    const { locale } = useIntl();
+  }: SignatureCancelledDeclinedBySignerProps) {
+    const intl = useIntl();
     return (
       <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
         <MjmlSection padding="0">
@@ -85,12 +95,21 @@ const email: Email<SignatureCancelledSignerDeclinedProps> = {
                 values={{
                   signerName,
                   signerEmail,
-                  petitionName,
+                  petitionName: petitionName ?? (
+                    <i>
+                      {intl.formatMessage({
+                        id: "generic.unnamed-parallel",
+                        defaultMessage: "Unnamed parallel",
+                      })}
+                    </i>
+                  ),
                   signatureProvider,
                 }}
               />
             </MjmlText>
-            <Button href={`${parallelUrl}/${locale}/app/petition/${petitionId}/replies#signatures`}>
+            <Button
+              href={`${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/replies#signatures`}
+            >
               <FormattedMessage
                 id="generic.access-the-parallel-button"
                 defaultMessage="Access the parallel"

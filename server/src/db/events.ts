@@ -120,7 +120,7 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     email_bounced_at?: Date;
   };
   SIGNATURE_CANCELLED: {
-    petition_signature_request_id?: number; // if signature was cancelled because of lack of credits, the petition_signature_request_id will be undefined
+    petition_signature_request_id: number;
     cancel_reason: PetitionSignatureCancelReason;
     cancel_data?: any; // cancel_data structure varies with cancel_reason. see PetitionRepository.PetitionSignatureRequestCancelData
   };

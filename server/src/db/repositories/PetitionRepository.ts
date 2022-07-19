@@ -2514,6 +2514,12 @@ export class PetitionRepository extends BaseRepository {
       .update({ processed_at: this.now() }, "*");
   }
 
+  async updatePetitionContactNotificationsProcessedAt(petitionContactNotificationIds: number[]) {
+    return await this.from("petition_contact_notification")
+      .whereIn("id", petitionContactNotificationIds)
+      .update({ processed_at: this.now() }, "*");
+  }
+
   async updatePetitionUserNotificationsReadStatus(
     petitionUserNotificationIds: number[],
     isRead: boolean,

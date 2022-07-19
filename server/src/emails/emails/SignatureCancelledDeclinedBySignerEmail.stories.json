@@ -2,10 +2,10 @@
   "title": "Emails",
   "stories": [
     {
-      "name": "Signature Cancelled Signer Declined",
+      "name": "Signature Cancelled Declined By Signer",
       "parameters": {
         "server": {
-          "id": "emails/SignatureCancelledSignerDeclinedEmail"
+          "id": "emails/SignatureCancelledDeclinedBySignerEmail"
         }
       },
       "args": {

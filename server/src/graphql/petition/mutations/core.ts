@@ -1960,7 +1960,7 @@ export const completePetition = mutationField("completePetition", {
             t
           );
           // insert a CANCELLED signature request so user can see it on the signatures card
-          await ctx.petitions.createPetitionSignature(
+          const cancelledSignature = await ctx.petitions.createPetitionSignature(
             petition.id,
             {
               signature_config: {
@@ -1982,6 +1982,7 @@ export const completePetition = mutationField("completePetition", {
             {
               type: "SIGNATURE_CANCELLED",
               data: {
+                petition_signature_request_id: cancelledSignature.id,
                 cancel_reason: "REQUEST_ERROR",
                 cancel_data: {
                   error:

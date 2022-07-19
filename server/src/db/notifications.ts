@@ -28,7 +28,7 @@ export type PetitionUserNotificationPayload<TType extends PetitionUserNotificati
     user_group_id?: number;
   };
   SIGNATURE_CANCELLED: {
-    petition_signature_request_id?: number;
+    petition_signature_request_id: number;
     cancel_reason?: PetitionSignatureCancelReason;
     cancel_data?: any;
   };

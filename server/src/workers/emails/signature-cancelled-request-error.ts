@@ -1,19 +1,20 @@
 import { WorkerContext } from "../../context";
 import { PetitionSignatureConfig } from "../../db/repositories/PetitionRepository";
 import { buildEmail } from "../../emails/buildEmail";
-import SignatureCancelledNoCreditsLeftEmail from "../../emails/emails/SignatureCancelledNoCreditsLeftEmail";
+import SignatureCancelledRequestErrorEmail from "../../emails/emails/SignatureCancelledRequestErrorEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
+import { toGlobalId } from "../../util/globalId";
 import { getLayoutProps } from "../helpers/getLayoutProps";
 
-export async function signatureCancelledNoCreditsLeft(
+export async function signatureCancelledRequestError(
   payload: { petition_signature_request_id: number },
   context: WorkerContext
 ) {
-  const [signatureRequest, parallelOrg] = await Promise.all([
-    context.petitions.loadPetitionSignatureById(payload.petition_signature_request_id),
-    context.organizations.loadRootOrganization(),
-  ]);
+  const signatureRequest = await context.petitions.loadPetitionSignatureById(
+    payload.petition_signature_request_id
+  );
+
   if (!signatureRequest) return;
 
   const petition = await context.petitions.loadPetition(signatureRequest.petition_id);
@@ -22,15 +23,6 @@ export async function signatureCancelledNoCreditsLeft(
   const users = await context.petitions.loadUsersOnPetition(petition.id);
 
   const config = petition.signature_config as PetitionSignatureConfig;
-  const signatureIntegration = await context.integrations.loadIntegration(config.orgIntegrationId);
-
-  const orgOwner = (await context.organizations.loadOwnerAndAdmins(petition.org_id)).find(
-    (u) => u.organization_role === "OWNER"
-  )!;
-  const orgOwnerData = await context.users.loadUserData(orgOwner.user_data_id);
-  if (!orgOwnerData) {
-    throw new Error(`UserData:${orgOwner.user_data_id} not found for User:${orgOwner.id}`);
-  }
 
   const emails = [];
   for (const user of users) {
@@ -43,16 +35,18 @@ export async function signatureCancelledNoCreditsLeft(
     if (!userData) {
       throw new Error(`UserData:${user.user_data_id} not found for User:${user.id}`);
     }
-    const { emailFrom, ...layoutProps } = await getLayoutProps(parallelOrg.id, context);
+    const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
 
     const { html, text, subject, from } = await buildEmail(
-      SignatureCancelledNoCreditsLeftEmail,
+      SignatureCancelledRequestErrorEmail,
       {
-        orgContactEmail: orgOwnerData.email,
-        orgContactName: fullName(orgOwnerData.first_name, orgOwnerData.last_name),
-        senderName: userData.first_name!,
+        petitionId: toGlobalId("Petition", petition.id),
         petitionName: petition.name,
-        signatureProvider: signatureIntegration!.name,
+        userName: userData.first_name,
+        signers: config.signersInfo.map((s) => ({
+          email: s.email,
+          name: fullName(s.firstName, s.lastName),
+        })),
         ...layoutProps,
       },
       { locale: petition.locale }

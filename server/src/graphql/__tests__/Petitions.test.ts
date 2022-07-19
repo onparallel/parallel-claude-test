@@ -4142,7 +4142,7 @@ describe("GraphQL/Petitions", () => {
         .knex("petition_signature_request")
         .where("petition_id", petition.id)
         .select("*");
-      expect(signatureRequest).toBeUndefined();
+      expect(signatureRequest?.status).toEqual("CANCELLED");
 
       const [event] = await mocks
         .knex("petition_event")
@@ -4153,6 +4153,7 @@ describe("GraphQL/Petitions", () => {
       expect(event).toMatchObject({
         type: "SIGNATURE_CANCELLED",
         data: {
+          petition_signature_request_id: signatureRequest!.id,
           cancel_reason: "REQUEST_ERROR",
           cancel_data: {
             error: "The signature request could not be started due to lack of signature credits",

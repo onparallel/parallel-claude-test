@@ -91,6 +91,8 @@ export class MockEmailsService implements IEmailsService {
   async sendOrganizationLimitsReachedEmail() {}
   async sendSignatureCancelledNoCreditsLeftEmail() {}
   async sendInternalSignaturitAccountDepletedCreditsEmail() {}
+  async sendSignatureCancelledRequestErrorEmail() {}
+  async sendSignatureCancelledDeclinedBySignerEmail() {}
   async validateEmail(email: string) {
     return EMAIL_REGEX.test(email);
   }

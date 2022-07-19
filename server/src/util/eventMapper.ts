@@ -176,10 +176,10 @@ export function mapEventPayload(event: PetitionEvent) {
       return {
         cancelData,
         cancelReason,
-        petitionSignatureRequestId:
-          event.data.petition_signature_request_id !== undefined
-            ? toGlobalId("PetitionSignatureRequest", event.data.petition_signature_request_id)
-            : undefined,
+        petitionSignatureRequestId: toGlobalId(
+          "PetitionSignatureRequest",
+          event.data.petition_signature_request_id
+        ),
       };
     }
     case "SIGNATURE_COMPLETED": {

@@ -69,7 +69,6 @@ export interface IEmailsService {
     used: number,
     t?: Knex.Transaction
   ): Promise<void>;
-  sendSignatureCancelledNoCreditsLeftEmail(petitionId: number): Promise<void>;
   validateEmail(email: string): Promise<boolean>;
   sendAppSumoActivateAccountEmail(redirectUrl: string, email: string): Promise<void>;
   sendInternalSignaturitAccountDepletedCreditsEmail(
@@ -77,6 +76,9 @@ export interface IEmailsService {
     petitionId: number,
     apiKeyHint: string
   ): Promise<void>;
+  sendSignatureCancelledNoCreditsLeftEmail(petitionSignatureRequestId: number): Promise<void>;
+  sendSignatureCancelledRequestErrorEmail(petitionSignatureRequestId: number): Promise<void>;
+  sendSignatureCancelledDeclinedBySignerEmail(petitionSignatureRequestId: number): Promise<void>;
 }
 export const EMAILS = Symbol.for("EMAILS");
 
@@ -281,16 +283,6 @@ export class EmailsService implements IEmailsService {
     );
   }
 
-  /**
-   * notify users subscribed to petition that the signature request was cancelled due to lack of signature credits
-   */
-  async sendSignatureCancelledNoCreditsLeftEmail(petitionId: number) {
-    return await this.enqueueEmail("signature-cancelled-no-credits-left", {
-      id: this.buildQueueId("Petition", petitionId),
-      petition_id: petitionId,
-    });
-  }
-
   async sendAppSumoActivateAccountEmail(redirectUrl: string, email: string) {
     return await this.enqueueEmail("appsumo-activate-account", {
       id: this.buildQueueId("AppSumoActivation", email),
@@ -309,6 +301,30 @@ export class EmailsService implements IEmailsService {
       orgId,
       petitionId,
       apiKeyHint,
+    });
+  }
+
+  /**
+   * notify users subscribed to petition that the signature request was cancelled due to lack of signature credits
+   */
+  async sendSignatureCancelledNoCreditsLeftEmail(petitionSignatureRequestId: number) {
+    return await this.enqueueEmail("signature-cancelled-no-credits-left", {
+      id: this.buildQueueId("SignatureCancelledNoCreditsLeft", petitionSignatureRequestId),
+      petition_signature_request_id: petitionSignatureRequestId,
+    });
+  }
+
+  async sendSignatureCancelledRequestErrorEmail(petitionSignatureRequestId: number) {
+    return await this.enqueueEmail("signature-cancelled-request-error", {
+      id: this.buildQueueId("SignatureCancelledRequestError", petitionSignatureRequestId),
+      petition_signature_request_id: petitionSignatureRequestId,
+    });
+  }
+
+  async sendSignatureCancelledDeclinedBySignerEmail(petitionSignatureRequestId: number) {
+    return await this.enqueueEmail("signature-cancelled-declined-by-signer", {
+      id: this.buildQueueId("SignatureCancelledDeclinedBySigner", petitionSignatureRequestId),
+      petition_signature_request_id: petitionSignatureRequestId,
     });
   }
 

@@ -11,9 +11,9 @@ import { Layout, LayoutProps } from "../components/Layout";
 import { closing, greetingUser } from "../components/texts";
 
 type SignatureCancelledRequestErrorProps = {
-  userName: string;
+  userName: string | null;
   signers: { name: string; email: string }[];
-  petitionName: string;
+  petitionName: string | null;
   petitionId: string;
 } & LayoutProps;
 
@@ -56,7 +56,12 @@ const email: Email<SignatureCancelledRequestErrorProps> = {
         defaultMessage: "We couldn't send the document on {petitionName} sent to {signers}.",
       },
       {
-        petitionName,
+        petitionName:
+          petitionName ??
+          intl.formatMessage({
+            id: "generic.unnamed-parallel",
+            defaultMessage: "Unnamed parallel",
+          }),
         signers: intl.formatList(signers.map((s) => `${s.name} (${s.email})`)),
       }
     )}
@@ -67,7 +72,7 @@ const email: Email<SignatureCancelledRequestErrorProps> = {
         "You can access the parallel through the following link to see more information about the error.",
     })}
 
-    ${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/activity
+    ${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/replies#signatures
 
     ${intl.formatMessage({
       id: "signature-cancelled-request-error.text-3",
@@ -88,7 +93,7 @@ const email: Email<SignatureCancelledRequestErrorProps> = {
     logoAlt,
     logoUrl,
   }: SignatureCancelledRequestErrorProps) {
-    const { locale } = useIntl();
+    const intl = useIntl();
     return (
       <Layout
         assetsUrl={assetsUrl}
@@ -112,7 +117,14 @@ const email: Email<SignatureCancelledRequestErrorProps> = {
                 id="signature-cancelled-request-error.text"
                 defaultMessage="We couldn't send the document on {petitionName} sent to {signers}."
                 values={{
-                  petitionName,
+                  petitionName: petitionName ?? (
+                    <i>
+                      {intl.formatMessage({
+                        id: "generic.unnamed-parallel",
+                        defaultMessage: "Unnamed parallel",
+                      })}
+                    </i>
+                  ),
                   signers: (
                     <FormattedList
                       value={signers.map((signer, i) => (
@@ -131,7 +143,9 @@ const email: Email<SignatureCancelledRequestErrorProps> = {
                 defaultMessage="You can access the parallel through the following button to see more information about the error."
               />
             </MjmlText>
-            <Button href={`${parallelUrl}/${locale}/app/petition/${petitionId}/activity`}>
+            <Button
+              href={`${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/replies#signatures`}
+            >
               <FormattedMessage
                 id="generic.access-the-parallel-button"
                 defaultMessage="Access the parallel"

@@ -696,7 +696,7 @@
   },
   {
     "term": "signature-cancelled-request-error.text",
-    "definition": "No se ha podido enviar el document en {petitionName} enviado a {signers}.",
+    "definition": "No se ha podido enviar el documento en {petitionName} enviado a {signers}.",
     "context": "We couldn't send the document on {petitionName} sent to {signers}."
   },
   {
@@ -706,7 +706,7 @@
   },
   {
     "term": "signature-cancelled-request-error.text-3",
-    "definition": "Si el problema continúa, ponte en contacto con nuestro equipo de sorporte desde el chat de ayuda.",
+    "definition": "Si el problema continúa, ponte en contacto con nuestro equipo de soporte desde el chat de ayuda.",
     "context": "If the problem persists, please contact our support team via support chat."
   },
   {

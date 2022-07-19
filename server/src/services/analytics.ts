@@ -179,7 +179,7 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
   };
   SIGNATURE_CANCELLED: {
     petition_id: number;
-    petition_signature_request_id?: number;
+    petition_signature_request_id: number;
     cancel_reason: PetitionSignatureCancelReason;
     test_mode?: boolean;
   };
