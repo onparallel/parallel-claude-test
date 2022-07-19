@@ -47,6 +47,7 @@ import { DropzoneRef, FileRejection } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import fonts from "../../../utils/webSafeFonts.json";
+import { useAutoConfirmDiscardChangesDialog } from "../dialogs/ConfirmDiscardChangesDialog";
 import { BrandingGeneralPreview } from "./BrandingGeneralPreview";
 
 interface BrandingGeneralProps {
@@ -83,6 +84,7 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
       logo: user.organization.logoUrl,
     },
   });
+  useAutoConfirmDiscardChangesDialog(isDirty);
 
   const tone = watch("tone");
   const color = watch("color");

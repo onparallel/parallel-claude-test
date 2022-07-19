@@ -21,12 +21,14 @@ import {
   BrandingDocumentTheme_UserFragment,
 } from "@parallel/graphql/__types";
 import { isAdmin } from "@parallel/utils/roles";
-import Router from "next/router";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, noop, zip } from "remeda";
-import { useConfirmDiscardChangesDialog } from "../dialogs/ConfirmDiscardChangesDialog";
+import { isDefined, zip } from "remeda";
+import {
+  useAutoConfirmDiscardChangesDialog,
+  useConfirmDiscardChangesDialog,
+} from "../dialogs/ConfirmDiscardChangesDialog";
 
 interface BrandingDocumentThemeProps {
   user: BrandingDocumentTheme_UserFragment;
@@ -56,31 +58,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
     reset(selectedTheme.data);
   }, [selectedTheme.id]);
 
-  const showConfirmDiscardChangesDialog = useConfirmDiscardChangesDialog();
-  useEffect(() => {
-    let omitNextRouteChange = false;
-    async function confirmRouteChange(path: string) {
-      try {
-        await showConfirmDiscardChangesDialog({});
-        omitNextRouteChange = true;
-        Router.push(path);
-      } catch {}
-    }
-    function handleRouteChangeStart(path: string) {
-      if (omitNextRouteChange) {
-        return;
-      }
-      if (form.formState.isDirty) {
-        confirmRouteChange(path).then(noop);
-        Router.events.emit("routeChangeError");
-        throw "CANCEL_ROUTE_CHANGE";
-      }
-    }
-    Router.events.on("routeChangeStart", handleRouteChangeStart);
-    return () => {
-      Router.events.off("routeChangeStart", handleRouteChangeStart);
-    };
-  }, []);
+  useAutoConfirmDiscardChangesDialog(isDirty);
 
   const fontProperties = (["title1", "title2", "text"] as const).flatMap((k) =>
     (["FontFamily", "FontSize", "Color"] as const).map((p) => `${k}${p}` as const)
@@ -153,6 +131,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
     }
   }
 
+  const showConfirmDiscardChangesDialog = useConfirmDiscardChangesDialog();
   async function handleThemeChange(theme: BrandingDocumentTheme_OrganizationThemeFragment) {
     if (isDirty) {
       try {
