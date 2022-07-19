@@ -32,23 +32,14 @@ export async function up(knex: Knex): Promise<void> {
   // populate table with custom or default theme for every org
   const result = await knex.raw(
     /* sql */ `
-    with orgs as (
-      select
-        o.id,
-        coalesce(ud.details->>'preferredLocale', 'en') as locale,
-        pdf_document_theme
-      from "organization" o
-      left join "user" u on u.org_id = o.id and u.organization_role = 'OWNER'
-      left join "user_data" ud on u.user_data_id = ud.id
-    )
     insert into "organization_theme" (org_id, name, type, is_default, data)
     select
       id,
-      case locale when 'es' then 'Tema por defecto' else 'Default theme' end ,
+      name,
       'PDF_DOCUMENT',
       true,
       coalesce(pdf_document_theme, ?::jsonb)
-    from orgs order by id
+    from "organization" order by id
     returning id, org_id;
   `,
     [JSON.stringify(defaultPdfDocumentTheme)]
