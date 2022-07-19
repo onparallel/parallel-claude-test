@@ -194,7 +194,10 @@ export async function seed(knex: Knex): Promise<any> {
     type: "SIGNATURE",
     provider: "SIGNATURIT",
     name: "Signaturit Sandbox",
-    settings: { API_KEY: process.env.SIGNATURIT_SANDBOX_API_KEY, ENVIRONMENT: "sandbox" },
+    settings: {
+      CREDENTIALS: { API_KEY: process.env.SIGNATURIT_SANDBOX_API_KEY },
+      ENVIRONMENT: "sandbox",
+    },
     is_enabled: true,
     created_by: `User:${userIds[0]}`,
     is_default: true,

@@ -49,9 +49,9 @@ export const createSignatureIntegration = mutationField("createSignatureIntegrat
     }
 
     const newIntegration = await ctx.integrations.createOrgIntegration<"SIGNATURE", "SIGNATURIT">(
-      "SIGNATURIT",
       {
         type: "SIGNATURE",
+        provider: "SIGNATURIT",
         org_id: ctx.user!.org_id,
         name: args.name,
         settings: {
@@ -115,9 +115,9 @@ export const createSignaturitIntegration = mutationField("createSignaturitIntegr
     }
 
     const newIntegration = await ctx.integrations.createOrgIntegration<"SIGNATURE", "SIGNATURIT">(
-      "SIGNATURIT",
       {
         type: "SIGNATURE",
+        provider: "SIGNATURIT",
         org_id: ctx.user!.org_id,
         name: args.name,
         settings: {

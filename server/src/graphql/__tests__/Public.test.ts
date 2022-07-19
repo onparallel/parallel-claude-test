@@ -54,7 +54,9 @@ describe("GraphQL/Public", () => {
       is_enabled: true,
       name: "SIGNATURIT TEST",
       settings: {
-        API_KEY: "SHARED_PRODUCTION_APIKEY",
+        CREDENTIALS: {
+          API_KEY: "SHARED_PRODUCTION_APIKEY",
+        },
       },
     });
 

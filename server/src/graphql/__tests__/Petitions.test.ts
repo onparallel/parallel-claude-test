@@ -126,7 +126,7 @@ describe("GraphQL/Petitions", () => {
         type: "SIGNATURE",
         provider: "SIGNATURIT",
         org_id: organization.id,
-        settings: { API_KEY: "<API_KEY>" },
+        settings: { CREDENTIALS: { API_KEY: "<API_KEY>" } },
         is_enabled: true,
         is_default: true,
       },
@@ -134,7 +134,7 @@ describe("GraphQL/Petitions", () => {
         type: "SIGNATURE",
         provider: "DOCUSIGN",
         org_id: organization.id,
-        settings: { API_KEY: "<API_KEY>" },
+        settings: { CREDENTIALS: {} },
         is_enabled: true,
         is_default: false,
       },
@@ -951,7 +951,7 @@ describe("GraphQL/Petitions", () => {
           name: "Docusign Test",
           is_default: false,
           is_enabled: true,
-          settings: { environment: "sandbox", API_KEY: "<APIKEY>" },
+          settings: { ENVIRONMENT: "sandbox", CREDENTIALS: { API_KEY: "<APIKEY>" } },
         },
       ]);
 
@@ -3863,7 +3863,9 @@ describe("GraphQL/Petitions", () => {
         type: "SIGNATURE",
         is_enabled: true,
         settings: {
-          API_KEY: "<APIKEY>",
+          CREDENTIALS: {
+            API_KEY: "<APIKEY>",
+          },
           ENVIRONMENT: "sandbox",
         },
       });
@@ -3873,7 +3875,9 @@ describe("GraphQL/Petitions", () => {
         type: "SIGNATURE",
         is_enabled: true,
         settings: {
-          API_KEY: "SHARED_PRODUCTION_APIKEY",
+          CREDENTIALS: {
+            API_KEY: "SHARED_PRODUCTION_APIKEY",
+          },
         },
       });
 

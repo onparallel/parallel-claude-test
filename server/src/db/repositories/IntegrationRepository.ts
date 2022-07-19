@@ -192,12 +192,11 @@ export class IntegrationRepository extends BaseRepository {
     });
   }
 
-  async createOrgIntegration<IType extends IntegrationType, TProvider extends SignatureProvider>(
-    provider: TProvider,
-    data: Replace<
-      Omit<CreateOrgIntegration, "provider">,
-      { settings: IntegrationSettings<IType, TProvider> }
-    >,
+  async createOrgIntegration<
+    IType extends IntegrationType,
+    TProvider extends SignatureProvider = any
+  >(
+    data: Replace<CreateOrgIntegration, { settings: IntegrationSettings<IType, TProvider> }>,
     createdBy: string,
     t?: Knex.Transaction
   ) {
@@ -205,7 +204,6 @@ export class IntegrationRepository extends BaseRepository {
       "org_integration",
       {
         ...data,
-        provider,
         created_by: createdBy,
       },
       t

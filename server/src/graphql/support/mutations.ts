@@ -584,10 +584,10 @@ export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
       try {
         await Promise.all([
           !hasSharedSignaturitApiKey
-            ? ctx.integrations.createOrgIntegration(
-                "SIGNATURIT",
+            ? ctx.integrations.createOrgIntegration<"SIGNATURE", "SIGNATURIT">(
                 {
                   type: "SIGNATURE",
+                  provider: "SIGNATURIT",
                   name: "Signaturit",
                   org_id: orgId,
                   settings: {

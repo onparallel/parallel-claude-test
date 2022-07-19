@@ -380,8 +380,10 @@ export class OrganizationRepository extends BaseRepository {
         provider: "SIGNATURIT",
         name: "Signaturit Sandbox",
         settings: {
-          API_KEY: this.config.signature.signaturitSandboxApiKey,
-          environment: "sandbox",
+          CREDENTIALS: {
+            API_KEY: this.config.signature.signaturitSandboxApiKey,
+          },
+          ENVIRONMENT: "sandbox",
         },
         is_default: true,
         is_enabled: true,

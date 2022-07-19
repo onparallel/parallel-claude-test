@@ -56,7 +56,9 @@ describe("GraphQL/OrgIntegrations", () => {
         type: "SIGNATURE",
         provider: "SIGNATURIT",
         settings: {
-          API_KEY: "<APIKEY>",
+          CREDENTIALS: {
+            API_KEY: "<APIKEY>",
+          },
         },
         created_at: addDays(new Date(), 1),
         is_enabled: true,
@@ -68,7 +70,9 @@ describe("GraphQL/OrgIntegrations", () => {
         type: "SIGNATURE",
         provider: "SIGNATURIT",
         settings: {
-          API_KEY: "<APIKEY>",
+          CREDENTIALS: {
+            API_KEY: "<APIKEY>",
+          },
         },
         created_at: addDays(new Date(), 1),
         is_enabled: false,
@@ -149,8 +153,8 @@ describe("GraphQL/OrgIntegrations", () => {
   it("creates a new signature integration", async () => {
     const { data, errors } = await testClient.mutate({
       mutation: gql`
-        mutation ($name: String!, $provider: SignatureOrgIntegrationProvider!, $apiKey: String!) {
-          createSignatureIntegration(name: $name, provider: $provider, apiKey: $apiKey) {
+        mutation ($name: String!, $apiKey: String!) {
+          createSignaturitIntegration(name: $name, apiKey: $apiKey) {
             name
             isDefault
             provider
@@ -161,13 +165,12 @@ describe("GraphQL/OrgIntegrations", () => {
       `,
       variables: {
         name: "My signature integration",
-        provider: "SIGNATURIT",
         apiKey: "<APIKEY>",
       },
     });
 
     expect(errors).toBeUndefined();
-    expect(data?.createSignatureIntegration).toEqual({
+    expect(data?.createSignaturitIntegration).toEqual({
       name: "My signature integration",
       isDefault: false,
       provider: "SIGNATURIT",
@@ -179,18 +182,8 @@ describe("GraphQL/OrgIntegrations", () => {
   it("creates a new signature integration and sets it as default", async () => {
     const { data, errors } = await testClient.mutate({
       mutation: gql`
-        mutation (
-          $name: String!
-          $provider: SignatureOrgIntegrationProvider!
-          $apiKey: String!
-          $isDefault: Boolean
-        ) {
-          createSignatureIntegration(
-            name: $name
-            provider: $provider
-            apiKey: $apiKey
-            isDefault: $isDefault
-          ) {
+        mutation ($name: String!, $apiKey: String!, $isDefault: Boolean) {
+          createSignaturitIntegration(name: $name, apiKey: $apiKey, isDefault: $isDefault) {
             id
             name
             isDefault
@@ -209,7 +202,7 @@ describe("GraphQL/OrgIntegrations", () => {
     });
 
     expect(errors).toBeUndefined();
-    expect(omit(data?.createSignatureIntegration, ["id"])).toEqual({
+    expect(omit(data?.createSignaturitIntegration, ["id"])).toEqual({
       name: "My signature integration",
       isDefault: true,
       provider: "SIGNATURIT",
@@ -227,7 +220,7 @@ describe("GraphQL/OrgIntegrations", () => {
     const defaultSignatureIntegration = signatureIntegrations.filter((i) => i.is_default);
     expect(defaultSignatureIntegration).toEqual([
       {
-        id: fromGlobalId(data!.createSignatureIntegration.id, "OrgIntegration").id,
+        id: fromGlobalId(data!.createSignaturitIntegration.id, "OrgIntegration").id,
         is_default: true,
       },
     ]);
@@ -345,18 +338,8 @@ describe("GraphQL/OrgIntegrations", () => {
   it("throws error if a normal user tries to create an integration", async () => {
     const { errors, data } = await testClient.withApiKey(normalUserApiKey).mutate({
       mutation: gql`
-        mutation (
-          $name: String!
-          $provider: SignatureOrgIntegrationProvider!
-          $apiKey: String!
-          $isDefault: Boolean
-        ) {
-          createSignatureIntegration(
-            name: $name
-            provider: $provider
-            apiKey: $apiKey
-            isDefault: $isDefault
-          ) {
+        mutation ($name: String!, $apiKey: String!, $isDefault: Boolean) {
+          createSignaturitIntegration(name: $name, apiKey: $apiKey, isDefault: $isDefault) {
             id
           }
         }

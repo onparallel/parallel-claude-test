@@ -39,14 +39,18 @@ describe("GraphQL custom validators", () => {
       type: "SIGNATURE",
       provider: "SIGNATURIT",
       org_id: organizations[0].id,
-      settings: { API_KEY: "<APIKEY>" },
+      settings: {
+        CREDENTIALS: {
+          API_KEY: "<APIKEY>",
+        },
+      },
       is_enabled: true,
     });
     [org1SignatureIntegration] = await mocks.createOrgIntegration({
       type: "SIGNATURE",
       provider: "SIGNATURIT",
       org_id: organizations[1].id,
-      settings: { API_KEY: "<APIKEY>" },
+      settings: { CREDENTIALS: { API_KEY: "<APIKEY>" } },
       is_enabled: true,
     });
     [ssoIntegration] = await mocks.createOrgIntegration({
@@ -192,14 +196,14 @@ describe("GraphQL custom validators", () => {
           org_id: organizations[0].id,
           provider: "SIGNATURIT",
           type: "SIGNATURE",
-          settings: {},
+          settings: { CREDENTIALS: { API_KEY: "" } },
         },
         {
           is_enabled: false,
           org_id: organizations[1].id,
           provider: "SIGNATURIT",
           type: "SIGNATURE",
-          settings: {},
+          settings: { CREDENTIALS: { API_KEY: "" } },
         },
       ]);
       contacts = await mocks.createRandomContacts(organizations[0].id, 2);
