@@ -1,20 +1,10 @@
-import {
-  Box,
-  Button,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Portal,
-  Stack,
-  Tooltip,
-} from "@chakra-ui/react";
-import { MoreVerticalIcon, RepeatIcon, UploadIcon, UserPlusIcon } from "@parallel/chakra/icons";
+import { Box, Button, MenuItem, MenuList, Stack } from "@chakra-ui/react";
+import { RepeatIcon, UploadIcon, UserPlusIcon } from "@parallel/chakra/icons";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
 import { ResponsiveButtonIcon } from "../common/ResponsiveButtonIcon";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
@@ -80,27 +70,10 @@ export function ContactListHeader({
           defaultMessage: "Create contact",
         })}
       />
-      <Menu placement="bottom-end">
-        <Tooltip
-          placement="bottom-end"
-          label={intl.formatMessage({
-            id: "generic.more-options",
-            defaultMessage: "More options...",
-          })}
-          whiteSpace="nowrap"
-        >
-          <MenuButton
-            display={{ base: "block", md: "none" }}
-            as={IconButton}
-            variant="outline"
-            icon={<MoreVerticalIcon />}
-            aria-label={intl.formatMessage({
-              id: "generic.more-options",
-              defaultMessage: "More options...",
-            })}
-          />
-        </Tooltip>
-        <Portal>
+      <MoreOptionsMenuButton
+        display={{ base: "block", md: "none" }}
+        variant="outline"
+        options={
           <MenuList width="min-content">
             <MenuItem onClick={onImportClick} icon={<UploadIcon display="block" boxSize={4} />}>
               <FormattedMessage
@@ -120,8 +93,8 @@ export function ContactListHeader({
               />
             </MenuItem>
           </MenuList>
-        </Portal>
-      </Menu>
+        }
+      />
     </Stack>
   );
 }

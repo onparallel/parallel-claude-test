@@ -5,28 +5,18 @@ import {
   EditablePreview,
   Flex,
   Heading,
-  IconButton,
-  Menu,
-  MenuButton,
   MenuDivider,
   MenuItem,
   MenuList,
-  Portal,
   Text,
-  Tooltip,
   useEditableControls,
   useToast,
 } from "@chakra-ui/react";
-import {
-  CopyIcon,
-  DeleteIcon,
-  EditSimpleIcon,
-  MoreVerticalIcon,
-  UserXIcon,
-} from "@parallel/chakra/icons";
+import { CopyIcon, DeleteIcon, EditSimpleIcon, UserXIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { WhenOrgRole } from "@parallel/components/common/WhenOrgRole";
@@ -257,27 +247,9 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
         <Flex width="100%" justifyContent="space-between" alignItems="center">
           <EditableHeading isDisabled={!canEdit} value={name} onChange={handleChangeGroupName} />
           <WhenOrgRole role="ADMIN">
-            <Menu>
-              <Tooltip
-                placement="left"
-                label={intl.formatMessage({
-                  id: "generic.more-options",
-                  defaultMessage: "More options...",
-                })}
-                whiteSpace="nowrap"
-              >
-                <MenuButton
-                  as={IconButton}
-                  variant="outline"
-                  icon={<MoreVerticalIcon />}
-                  marginLeft={4}
-                  aria-label={intl.formatMessage({
-                    id: "generic.more-options",
-                    defaultMessage: "More options...",
-                  })}
-                />
-              </Tooltip>
-              <Portal>
+            <MoreOptionsMenuButton
+              variant="outline"
+              options={
                 <MenuList>
                   <MenuItem
                     onClick={handleCloneGroup}
@@ -300,8 +272,8 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
                     />
                   </MenuItem>
                 </MenuList>
-              </Portal>
-            </Menu>
+              }
+            />
           </WhenOrgRole>
         </Flex>
       }

@@ -1,22 +1,8 @@
 import { gql, useMutation } from "@apollo/client";
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Stack,
-  Text,
-  Tooltip,
-  useToast,
-} from "@chakra-ui/react";
+import { Box, Button, MenuItem, MenuList, Stack, Text, useToast } from "@chakra-ui/react";
 import { VariablesOf } from "@graphql-typed-document-node/core";
 import {
   CheckIcon,
-  ChevronDownIcon,
   CommentIcon,
   DownloadIcon,
   FilePdfIcon,
@@ -24,6 +10,7 @@ import {
   RepeatIcon,
   ThumbUpIcon,
 } from "@parallel/chakra/icons";
+import { ButtonWithMoreOptions } from "@parallel/components/common/ButtonWithMoreOptions";
 import { Card, GenericCardHeader } from "@parallel/components/common/Card";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
@@ -531,34 +518,11 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               </Button>
             )}
             {showDownloadAll && !petition.isAnonymized ? (
-              <ButtonGroup isAttached colorScheme="primary">
-                <Button
-                  leftIcon={<DownloadIcon fontSize="lg" display="block" />}
-                  onClick={handleDownloadAllClick}
-                >
-                  <FormattedMessage
-                    id="petition-replies.export-replies"
-                    defaultMessage="Export replies"
-                  />
-                </Button>
-                <Divider isVertical color="primary.600" />
-                <Menu placement="bottom-end">
-                  <Tooltip
-                    label={intl.formatMessage({
-                      id: "generic.more-options",
-                      defaultMessage: "More options...",
-                    })}
-                  >
-                    <MenuButton
-                      as={IconButton}
-                      icon={<ChevronDownIcon fontSize="lg" />}
-                      aria-label={intl.formatMessage({
-                        id: "generic.more-options",
-                        defaultMessage: "More options...",
-                      })}
-                      minWidth={8}
-                    />
-                  </Tooltip>
+              <ButtonWithMoreOptions
+                colorScheme="primary"
+                leftIcon={<DownloadIcon fontSize="lg" display="block" />}
+                onClick={handleDownloadAllClick}
+                options={
                   <MenuList>
                     <MenuItem
                       icon={<FilePdfIcon boxSize={5} />}
@@ -582,8 +546,13 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                       )}
                     </MenuItem>
                   </MenuList>
-                </Menu>
-              </ButtonGroup>
+                }
+              >
+                <FormattedMessage
+                  id="petition-replies.export-replies"
+                  defaultMessage="Export replies"
+                />
+              </ButtonWithMoreOptions>
             ) : null}
           </Stack>
           <Divider />

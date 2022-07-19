@@ -4,18 +4,13 @@ import {
   Box,
   Center,
   Flex,
-  IconButton,
-  Menu,
-  MenuButton,
   MenuDivider,
   MenuItem,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  Portal,
   Stack,
   Text,
-  Tooltip,
 } from "@chakra-ui/react";
 import {
   CopyIcon,
@@ -23,7 +18,6 @@ import {
   DownloadIcon,
   EditIcon,
   LockClosedIcon,
-  MoreVerticalIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -46,6 +40,7 @@ import { ReactNode, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
 import { LocaleBadge } from "../common/LocaleBadge";
+import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
 import { PetitionStatusIcon } from "../common/PetitionStatusIcon";
 import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
@@ -283,26 +278,9 @@ export const PetitionHeader = Object.assign(
           <Stack direction="row">
             {actions ?? null}
             <Box>
-              <Menu>
-                <Tooltip
-                  placement="bottom-end"
-                  label={intl.formatMessage({
-                    id: "generic.more-options",
-                    defaultMessage: "More options...",
-                  })}
-                  whiteSpace="nowrap"
-                >
-                  <MenuButton
-                    as={IconButton}
-                    variant="outline"
-                    icon={<MoreVerticalIcon />}
-                    aria-label={intl.formatMessage({
-                      id: "generic.more-options",
-                      defaultMessage: "More options...",
-                    })}
-                  />
-                </Tooltip>
-                <Portal>
+              <MoreOptionsMenuButton
+                variant="outline"
+                options={
                   <MenuList width="min-content" minWidth="16rem">
                     <MenuItem
                       onClick={handlePetitionSharingClick}
@@ -410,8 +388,8 @@ export const PetitionHeader = Object.assign(
                       />
                     </MenuItem>
                   </MenuList>
-                </Portal>
-              </Menu>
+                }
+              />
             </Box>
           </Stack>
         </Flex>

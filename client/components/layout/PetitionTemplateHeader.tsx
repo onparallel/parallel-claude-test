@@ -1,25 +1,10 @@
 import { gql } from "@apollo/client";
-import {
-  Badge,
-  Box,
-  Button,
-  Flex,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuDivider,
-  MenuItem,
-  MenuList,
-  Portal,
-  Text,
-  Tooltip,
-} from "@chakra-ui/react";
+import { Badge, Box, Button, Flex, MenuDivider, MenuItem, MenuList, Text } from "@chakra-ui/react";
 import {
   CopyIcon,
   DeleteIcon,
   DownloadIcon,
   LockClosedIcon,
-  MoreVerticalIcon,
   TableIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
@@ -34,14 +19,15 @@ import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import { isAtLeast } from "@parallel/utils/roles";
-import { useTemplateRepliesReportTask } from "@parallel/utils/useTemplateRepliesReportTask";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { usePrintPdfTask } from "@parallel/utils/usePrintPdfTask";
+import { useTemplateRepliesReportTask } from "@parallel/utils/useTemplateRepliesReportTask";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
 import { LocaleBadge } from "../common/LocaleBadge";
+import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
 import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
 import { usePetitionSharingDialog } from "../petition-common/dialogs/PetitionSharingDialog";
@@ -224,27 +210,9 @@ export const PetitionTemplateHeader = Object.assign(
           <Button flexShrink={0} onClick={handleUseTemplate} data-action="use-template">
             <FormattedMessage id="generic.create-petition" defaultMessage="Create parallel" />
           </Button>
-          <Menu>
-            <Tooltip
-              placement="bottom-end"
-              label={intl.formatMessage({
-                id: "generic.more-options",
-                defaultMessage: "More options...",
-              })}
-              whiteSpace="nowrap"
-            >
-              <MenuButton
-                as={IconButton}
-                variant="outline"
-                icon={<MoreVerticalIcon />}
-                marginLeft={4}
-                aria-label={intl.formatMessage({
-                  id: "generic.more-options",
-                  defaultMessage: "More options...",
-                })}
-              />
-            </Tooltip>
-            <Portal>
+          <MoreOptionsMenuButton
+            variant="outline"
+            options={
               <MenuList>
                 <MenuItem
                   onClick={handlePetitionSharingClick}
@@ -303,8 +271,8 @@ export const PetitionTemplateHeader = Object.assign(
                   </>
                 )}
               </MenuList>
-            </Portal>
-          </Menu>
+            }
+          />
         </Flex>
         <PetitionHeaderTabs>
           {sections.map(({ section, label, rightIcon, attributes }) => {

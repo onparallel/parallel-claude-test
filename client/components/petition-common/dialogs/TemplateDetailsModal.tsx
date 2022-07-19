@@ -9,9 +9,6 @@ import {
   Button,
   Flex,
   HStack,
-  IconButton,
-  Menu,
-  MenuButton,
   MenuItem,
   MenuList,
   Modal,
@@ -21,21 +18,19 @@ import {
   ModalHeader,
   ModalOverlay,
   ModalProps,
-  Portal,
   Stack,
   Text,
-  Tooltip,
 } from "@chakra-ui/react";
 import {
   CopyIcon,
   EditIcon,
   LinkIcon,
-  MoreVerticalIcon,
   PaperPlaneIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { HtmlBlock } from "@parallel/components/common/HtmlBlock";
+import { MoreOptionsMenuButton } from "@parallel/components/common/MoreOptionsMenuButton";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { TemplateActiveSettingsIcons } from "@parallel/components/petition-new/TemplateActiveSettingsIcons";
 import {
@@ -240,26 +235,9 @@ export function TemplateDetailsModal({
               <HStack flex="1" spacing={3}>
                 {template.isPublic ? saveToEditButton : createPetitionButton}
                 {isFromPublicTemplates && !template.publicLink?.isActive ? null : (
-                  <Menu placement="bottom-end">
-                    <Tooltip
-                      placement="bottom-end"
-                      label={intl.formatMessage({
-                        id: "generic.more-options",
-                        defaultMessage: "More options...",
-                      })}
-                      whiteSpace="nowrap"
-                    >
-                      <MenuButton
-                        as={IconButton}
-                        variant="outline"
-                        icon={<MoreVerticalIcon />}
-                        aria-label={intl.formatMessage({
-                          id: "generic.more-options",
-                          defaultMessage: "More options...",
-                        })}
-                      />
-                    </Tooltip>
-                    <Portal>
+                  <MoreOptionsMenuButton
+                    variant="outline"
+                    options={
                       <MenuList width="min-content">
                         {hasAccess && template.publicLink?.isActive ? (
                           <MenuItem
@@ -307,8 +285,8 @@ export function TemplateDetailsModal({
                           </MenuItem>
                         ) : null}
                       </MenuList>
-                    </Portal>
-                  </Menu>
+                    }
+                  />
                 )}
               </HStack>
             </Flex>

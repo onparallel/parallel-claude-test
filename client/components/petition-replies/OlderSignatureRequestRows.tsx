@@ -1,24 +1,11 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  ButtonGroup,
-  Flex,
-  GridItem,
-  Heading,
-  HStack,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Text,
-  Tooltip,
-} from "@chakra-ui/react";
-import { ChevronDownIcon, DocumentIcon, DownloadIcon } from "@parallel/chakra/icons";
+import { Box, Flex, GridItem, Heading, HStack, MenuItem, MenuList, Text } from "@chakra-ui/react";
+import { DocumentIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { OlderSignatureRequestRows_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { Fragment } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
+import { ButtonWithMoreOptions } from "../common/ButtonWithMoreOptions";
 import { Divider } from "../common/Divider";
 import { NetDocumentsIconButton } from "../common/NetDocumentsLink";
 import { ResponsiveButtonIcon } from "../common/ResponsiveButtonIcon";
@@ -74,39 +61,17 @@ export function OlderSignatureRequestRows({
                     size="sm"
                   />
                 ) : null}
-                <ButtonGroup isAttached colorScheme="primary" isDisabled={signature.isAnonymized}>
-                  <ResponsiveButtonIcon
-                    breakpoint="lg"
-                    colorScheme="primary"
-                    icon={<DownloadIcon fontSize="lg" display="block" />}
-                    label={intl.formatMessage({
-                      id: "component.petition-signatures-card.signed-document",
-                      defaultMessage: "Signed document",
-                    })}
-                    onClick={() => onDownload(signature.id, false)}
-                  />
-                  <Divider
-                    isVertical
-                    color="primary.600"
-                    opacity={signature.isAnonymized ? 0.43 : undefined}
-                  />
-                  <Menu placement="bottom-end">
-                    <Tooltip
-                      label={intl.formatMessage({
-                        id: "generic.more-options",
-                        defaultMessage: "More options...",
-                      })}
-                    >
-                      <MenuButton
-                        as={IconButton}
-                        icon={<ChevronDownIcon fontSize="lg" />}
-                        aria-label={intl.formatMessage({
-                          id: "generic.more-options",
-                          defaultMessage: "More options...",
-                        })}
-                        minWidth={8}
-                      />
-                    </Tooltip>
+                <ButtonWithMoreOptions
+                  colorScheme="primary"
+                  as={ResponsiveButtonIcon}
+                  icon={<DownloadIcon fontSize="lg" display="block" />}
+                  breakpoint="lg"
+                  label={intl.formatMessage({
+                    id: "component.petition-signatures-card.signed-document",
+                    defaultMessage: "Signed document",
+                  })}
+                  onClick={() => onDownload(signature.id, false)}
+                  options={
                     <MenuList minWidth="fit-content">
                       <MenuItem
                         icon={<DocumentIcon boxSize={5} />}
@@ -119,8 +84,8 @@ export function OlderSignatureRequestRows({
                         />
                       </MenuItem>
                     </MenuList>
-                  </Menu>
-                </ButtonGroup>
+                  }
+                />
               </HStack>
             </Flex>
           ) : null}

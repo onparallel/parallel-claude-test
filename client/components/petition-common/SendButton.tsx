@@ -1,77 +1,38 @@
-import {
-  Button,
-  ButtonGroup,
-  IconButton,
-  layoutPropNames,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Portal,
-  Tooltip,
-} from "@chakra-ui/react";
-import { ChevronDownIcon, PaperPlaneIcon, TimeIcon } from "@parallel/chakra/icons";
+import { MenuItem, MenuList } from "@chakra-ui/react";
+import { PaperPlaneIcon, TimeIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { MouseEvent } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
-import { omit, pick } from "remeda";
-import { Divider } from "../common/Divider";
+import { FormattedMessage } from "react-intl";
+import { ButtonWithMoreOptions } from "../common/ButtonWithMoreOptions";
 
 export interface SendButtonProps {
   onSendClick: (event: MouseEvent) => void;
   onScheduleClick: (event: MouseEvent) => void;
 }
 
-export const SendButton = chakraForwardRef<"div", SendButtonProps>(function SendButton(
+export const SendButton = chakraForwardRef<"button", SendButtonProps>(function SendButton(
   { onSendClick, onScheduleClick, ...props },
   ref
 ) {
-  const intl = useIntl();
-  const layoutProps = pick(props, layoutPropNames as any);
-  const otherProps = omit(props, layoutPropNames as any);
   return (
-    <ButtonGroup ref={ref} isAttached {...layoutProps}>
-      <Button
-        colorScheme="primary"
-        leftIcon={<PaperPlaneIcon fontSize="18px" />}
-        onClick={onSendClick}
-        {...(otherProps as any)}
-      >
-        <FormattedMessage id="generic.send" defaultMessage="Send" />
-      </Button>
-      <Divider isVertical color="primary.600" />
-      <Menu placement="bottom-end">
-        <Tooltip
-          label={intl.formatMessage({
-            id: "generic.more-options",
-            defaultMessage: "More options...",
-          })}
-        >
-          <MenuButton
-            as={IconButton}
-            colorScheme="primary"
-            icon={<ChevronDownIcon />}
-            aria-label={intl.formatMessage({
-              id: "generic.more-options",
-              defaultMessage: "More options...",
-            })}
-            minWidth={8}
-          />
-        </Tooltip>
-        <Portal>
-          <MenuList minWidth={0}>
-            <MenuItem
-              onClick={onScheduleClick as any}
-              icon={<TimeIcon display="block" boxSize={4} />}
-            >
-              <FormattedMessage
-                id="component.send-button.schedule"
-                defaultMessage="Schedule send"
-              />
-            </MenuItem>
-          </MenuList>
-        </Portal>
-      </Menu>
-    </ButtonGroup>
+    <ButtonWithMoreOptions
+      ref={ref}
+      colorScheme="primary"
+      leftIcon={<PaperPlaneIcon fontSize="18px" />}
+      onClick={onSendClick}
+      {...props}
+      options={
+        <MenuList minWidth={0}>
+          <MenuItem
+            onClick={onScheduleClick as any}
+            icon={<TimeIcon display="block" boxSize={4} />}
+          >
+            <FormattedMessage id="component.send-button.schedule" defaultMessage="Schedule send" />
+          </MenuItem>
+        </MenuList>
+      }
+    >
+      <FormattedMessage id="generic.send" defaultMessage="Send" />
+    </ButtonWithMoreOptions>
   );
 });

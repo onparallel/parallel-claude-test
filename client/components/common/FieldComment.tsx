@@ -4,18 +4,12 @@ import {
   Box,
   Button,
   Circle,
-  IconButton,
-  Menu,
-  MenuButton,
   MenuItem,
   MenuList,
-  Portal,
   Spacer,
   Stack,
   Text,
-  Tooltip,
 } from "@chakra-ui/react";
-import { MoreVerticalIcon } from "@parallel/chakra/icons";
 import {
   FieldComment_PetitionFieldCommentFragment,
   FieldComment_PublicPetitionFieldCommentFragment,
@@ -23,12 +17,13 @@ import {
 import { FORMATS } from "@parallel/utils/dates";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { ChangeEvent, KeyboardEvent, useRef, useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage } from "react-intl";
 import { UserReference } from "../petition-activity/UserReference";
 import { BreakLines } from "./BreakLines";
 import { ContactReference } from "./ContactReference";
 import { DateTime } from "./DateTime";
 import { GrowingTextarea } from "./GrowingTextarea";
+import { MoreOptionsMenuButton } from "./MoreOptionsMenuButton";
 import { SmallPopover } from "./SmallPopover";
 
 export function FieldComment({
@@ -48,7 +43,6 @@ export function FieldComment({
   onMarkAsUnread?: () => void;
   isDisabled?: boolean;
 }) {
-  const intl = useIntl();
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(comment.content);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -154,26 +148,11 @@ export function FieldComment({
         ) : null}
         <Spacer />
         {isAuthor || comment.__typename === "PetitionFieldComment" ? (
-          <Menu placement="bottom-end">
-            <Tooltip
-              label={intl.formatMessage({
-                id: "generic.more-options",
-                defaultMessage: "More options...",
-              })}
-            >
-              <MenuButton
-                disabled={comment.isAnonymized}
-                as={IconButton}
-                variant="ghost"
-                size="xs"
-                icon={<MoreVerticalIcon />}
-                aria-label={intl.formatMessage({
-                  id: "generic.more-options",
-                  defaultMessage: "More options...",
-                })}
-              />
-            </Tooltip>
-            <Portal>
+          <MoreOptionsMenuButton
+            isDisabled={comment.isAnonymized}
+            variant="ghost"
+            size="xs"
+            options={
               <MenuList minWidth="160px">
                 {isAuthor ? (
                   <MenuItem onClick={handleEditClick} isDisabled={isDisabled}>
@@ -195,8 +174,8 @@ export function FieldComment({
                   </MenuItem>
                 ) : null}
               </MenuList>
-            </Portal>
-          </Menu>
+            }
+          />
         ) : null}
       </Box>
       {comment.isAnonymized ? (
