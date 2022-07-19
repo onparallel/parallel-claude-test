@@ -8251,8 +8251,8 @@
   },
   {
     "term": "recipient-view.request-information",
-    "definition": "Información del parallel",
-    "context": "Parallel information"
+    "definition": "Información",
+    "context": "Information"
   },
   {
     "term": "recipient-view.requested-by",

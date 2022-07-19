@@ -8251,8 +8251,8 @@
   },
   {
     "term": "recipient-view.request-information",
-    "definition": "Parallel information",
-    "context": "Parallel information"
+    "definition": "Information",
+    "context": "Information"
   },
   {
     "term": "recipient-view.requested-by",

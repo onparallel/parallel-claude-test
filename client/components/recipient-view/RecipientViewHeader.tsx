@@ -270,7 +270,7 @@ export const RecipientViewHeader = Object.assign(
                   <Heading as="h2" flex="1" size="sm" textAlign="left">
                     <FormattedMessage
                       id="recipient-view.request-information"
-                      defaultMessage="Parallel information"
+                      defaultMessage="Information"
                     />
                   </Heading>
                 </Flex>
