@@ -167,6 +167,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
   return (
     <Grid
       as="form"
+      autoComplete="off"
       onSubmit={handleSubmit(async (value) => {
         try {
           const { data } = await updateOrganizationPdfDocumentTheme({
