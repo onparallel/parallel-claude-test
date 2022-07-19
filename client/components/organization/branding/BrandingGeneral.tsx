@@ -319,7 +319,10 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
               </FormLabel>
               <Select backgroundColor="white" {...register("fontFamily")}>
                 <option key="Default" value="DEFAULT">
-                  {intl.formatMessage({ id: "generic.by-default", defaultMessage: "By default" })}
+                  {intl.formatMessage({
+                    id: "generic.default-font-name",
+                    defaultMessage: "Default",
+                  })}
                 </option>
                 {sortedFonts.map((font, index) => (
                   <option key={index} value={font[1]}>

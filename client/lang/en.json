@@ -4855,11 +4855,6 @@
     "context": "Before"
   },
   {
-    "term": "generic.by-default",
-    "definition": "By default",
-    "context": "By default"
-  },
-  {
     "term": "generic.cancel",
     "definition": "Cancel",
     "context": "Cancel"
@@ -4976,6 +4971,11 @@
   },
   {
     "term": "generic.default",
+    "definition": "Default",
+    "context": "Default"
+  },
+  {
+    "term": "generic.default-font-name",
     "definition": "Default",
     "context": "Default"
   },

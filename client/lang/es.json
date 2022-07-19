@@ -4855,11 +4855,6 @@
     "context": "Before"
   },
   {
-    "term": "generic.by-default",
-    "definition": "Por defecto",
-    "context": "By default"
-  },
-  {
     "term": "generic.cancel",
     "definition": "Cancelar",
     "context": "Cancel"
@@ -4977,6 +4972,11 @@
   {
     "term": "generic.default",
     "definition": "Defecto",
+    "context": "Default"
+  },
+  {
+    "term": "generic.default-font-name",
+    "definition": "Por defecto",
     "context": "Default"
   },
   {
