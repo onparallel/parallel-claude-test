@@ -571,7 +571,9 @@ export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
     const hasSharedSignaturitApiKey =
       signatureIntegrations.length > 0 &&
       signatureIntegrations.some(
-        (i) => i.settings.API_KEY === ctx.config.signature.signaturitSharedProductionApiKey
+        (i) =>
+          i.provider.toUpperCase() === "SIGNATURIT" &&
+          i.settings.CREDENTIALS.API_KEY === ctx.config.signature.signaturitSharedProductionApiKey
       );
 
     if (!org) {
@@ -583,13 +585,15 @@ export const shareSignaturitApiKey = mutationField("shareSignaturitApiKey", {
         await Promise.all([
           !hasSharedSignaturitApiKey
             ? ctx.integrations.createOrgIntegration(
+                "SIGNATURIT",
                 {
                   type: "SIGNATURE",
                   name: "Signaturit",
-                  provider: "SIGNATURIT",
                   org_id: orgId,
                   settings: {
-                    API_KEY: ctx.config.signature.signaturitSharedProductionApiKey,
+                    CREDENTIALS: {
+                      API_KEY: ctx.config.signature.signaturitSharedProductionApiKey,
+                    },
                     ENVIRONMENT: "production",
                   },
                   is_enabled: true,

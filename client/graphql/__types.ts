@@ -493,8 +493,13 @@ export interface Mutation {
   createPrintPdfTask: Task;
   /** Creates a public link from a user's template */
   createPublicPetitionLink: PublicPetitionLink;
-  /** Creates a new signature integration on the user's organization */
+  /**
+   * Creates a new signature integration on the user's organization
+   * @deprecated use createSignaturitIntegration
+   */
   createSignatureIntegration: SignatureOrgIntegration;
+  /** Creates a new Signaturit integration on the user's organization */
+  createSignaturitIntegration: SignatureOrgIntegration;
   /** Creates a tag in the user's organization */
   createTag: Tag;
   /** Creates a task for exporting a report grouping the replies of every petition coming from the same template */
@@ -744,6 +749,8 @@ export interface Mutation {
   uploadUserAvatar: SupportMethodResponse;
   /** Triggered by new users that want to sign up into Parallel */
   userSignUp: User;
+  /** Runs backend checks to validate signature credentials. */
+  validateSignatureCredentials: Scalars["JSONObject"];
   verifyPublicAccess: PublicAccessVerification;
 }
 
@@ -946,6 +953,12 @@ export interface MutationcreateSignatureIntegrationArgs {
   isDefault?: InputMaybe<Scalars["Boolean"]>;
   name: Scalars["String"];
   provider: SignatureOrgIntegrationProvider;
+}
+
+export interface MutationcreateSignaturitIntegrationArgs {
+  apiKey: Scalars["String"];
+  isDefault?: InputMaybe<Scalars["Boolean"]>;
+  name: Scalars["String"];
 }
 
 export interface MutationcreateTagArgs {
@@ -1607,6 +1620,11 @@ export interface MutationuserSignUpArgs {
   password: Scalars["String"];
   position?: InputMaybe<Scalars["String"]>;
   role?: InputMaybe<Scalars["String"]>;
+}
+
+export interface MutationvalidateSignatureCredentialsArgs {
+  credentials: Scalars["JSONObject"];
+  provider: SignatureOrgIntegrationProvider;
 }
 
 export interface MutationverifyPublicAccessArgs {
@@ -12618,15 +12636,23 @@ export type IntegrationsSignature_SignatureOrgIntegrationFragment = {
   environment: SignatureOrgIntegrationEnvironment;
 };
 
-export type IntegrationsSignature_createSignatureIntegrationMutationVariables = Exact<{
-  name: Scalars["String"];
+export type IntegrationsSignature_validateSignatureCredentialsMutationVariables = Exact<{
   provider: SignatureOrgIntegrationProvider;
+  credentials: Scalars["JSONObject"];
+}>;
+
+export type IntegrationsSignature_validateSignatureCredentialsMutation = {
+  validateSignatureCredentials: { [key: string]: any };
+};
+
+export type IntegrationsSignature_createSignaturitIntegrationMutationVariables = Exact<{
+  name: Scalars["String"];
   apiKey: Scalars["String"];
   isDefault?: InputMaybe<Scalars["Boolean"]>;
 }>;
 
-export type IntegrationsSignature_createSignatureIntegrationMutation = {
-  createSignatureIntegration: {
+export type IntegrationsSignature_createSignaturitIntegrationMutation = {
+  createSignaturitIntegration: {
     __typename?: "SignatureOrgIntegration";
     id: string;
     name: string;
@@ -18117,9 +18143,9 @@ export type PetitionReplies_QueryFragment = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasPetitionSignature: boolean;
     hasPetitionPdfExport: boolean;
     hasExportCuatrecasas: boolean;
+    hasPetitionSignature: boolean;
     organization: {
       __typename?: "Organization";
       name: string;
@@ -18620,9 +18646,9 @@ export type PetitionReplies_userQuery = {
     unreadNotificationIds: Array<string>;
     avatarUrl?: string | null;
     initials?: string | null;
-    hasPetitionSignature: boolean;
     hasPetitionPdfExport: boolean;
     hasExportCuatrecasas: boolean;
+    hasPetitionSignature: boolean;
     organization: {
       __typename?: "Organization";
       name: string;
@@ -25101,7 +25127,6 @@ export const PetitionReplies_QueryFragmentDoc = gql`
         name
         ...isUsageLimitsReached_Organization
       }
-      hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
       hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
       ...PetitionRepliesFieldComments_User
       ...ExportRepliesDialog_User
@@ -27766,26 +27791,31 @@ export const OrganizationIntegrations_userDocument = gql`
   OrganizationIntegrations_userQuery,
   OrganizationIntegrations_userQueryVariables
 >;
-export const IntegrationsSignature_createSignatureIntegrationDocument = gql`
-  mutation IntegrationsSignature_createSignatureIntegration(
-    $name: String!
+export const IntegrationsSignature_validateSignatureCredentialsDocument = gql`
+  mutation IntegrationsSignature_validateSignatureCredentials(
     $provider: SignatureOrgIntegrationProvider!
+    $credentials: JSONObject!
+  ) {
+    validateSignatureCredentials(provider: $provider, credentials: $credentials)
+  }
+` as unknown as DocumentNode<
+  IntegrationsSignature_validateSignatureCredentialsMutation,
+  IntegrationsSignature_validateSignatureCredentialsMutationVariables
+>;
+export const IntegrationsSignature_createSignaturitIntegrationDocument = gql`
+  mutation IntegrationsSignature_createSignaturitIntegration(
+    $name: String!
     $apiKey: String!
     $isDefault: Boolean
   ) {
-    createSignatureIntegration(
-      name: $name
-      provider: $provider
-      apiKey: $apiKey
-      isDefault: $isDefault
-    ) {
+    createSignaturitIntegration(name: $name, apiKey: $apiKey, isDefault: $isDefault) {
       ...IntegrationsSignature_SignatureOrgIntegration
     }
   }
   ${IntegrationsSignature_SignatureOrgIntegrationFragmentDoc}
 ` as unknown as DocumentNode<
-  IntegrationsSignature_createSignatureIntegrationMutation,
-  IntegrationsSignature_createSignatureIntegrationMutationVariables
+  IntegrationsSignature_createSignaturitIntegrationMutation,
+  IntegrationsSignature_createSignaturitIntegrationMutationVariables
 >;
 export const IntegrationsSignature_markSignatureIntegrationAsDefaultDocument = gql`
   mutation IntegrationsSignature_markSignatureIntegrationAsDefault($id: GID!) {

@@ -295,7 +295,9 @@ export const Organization = objectType({
           isDefined(signatureSendLimits) &&
           signatureIntegrations.some(
             (i) =>
-              i.settings.API_KEY === ctx.config.signature.signaturitSharedProductionApiKey &&
+              i.provider.toUpperCase() === "SIGNATURIT" &&
+              i.settings.CREDENTIALS.API_KEY ===
+                ctx.config.signature.signaturitSharedProductionApiKey &&
               i.settings.ENVIRONMENT === "production" &&
               i.is_enabled
           );

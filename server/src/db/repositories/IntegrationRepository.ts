@@ -5,9 +5,20 @@ import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
 import { CreateOrgIntegration, IntegrationType, OrgIntegration, User } from "../__types";
 
-export type IntegrationSettings<K extends IntegrationType> = {
+type SignatureProvider = "SIGNATURIT";
+
+type SignatureIntegrationCredentials<TProvider extends SignatureProvider> = {
+  SIGNATURIT: { API_KEY: string };
+}[TProvider];
+
+export type IntegrationSettings<
+  TType extends IntegrationType,
+  TProvider extends SignatureProvider = any
+> = {
   SIGNATURE: {
-    API_KEY: string;
+    /** @deprecated previously used for Signaturit API_KEY. Use CREDENTIALS.API_KEY instead (when TProvider is SIGNATURIT)  */
+    API_KEY?: string;
+    CREDENTIALS: SignatureIntegrationCredentials<TProvider>;
     ENVIRONMENT?: "production" | "sandbox";
     EN_FORMAL_BRANDING_ID?: string;
     ES_FORMAL_BRANDING_ID?: string;
@@ -21,7 +32,7 @@ export type IntegrationSettings<K extends IntegrationType> = {
   USER_PROVISIONING: {
     AUTH_KEY: string;
   };
-}[K];
+}[TType];
 
 @injectable()
 export class IntegrationRepository extends BaseRepository {
@@ -181,8 +192,12 @@ export class IntegrationRepository extends BaseRepository {
     });
   }
 
-  async createOrgIntegration<IType extends IntegrationType>(
-    data: Replace<CreateOrgIntegration, { settings: IntegrationSettings<IType> }>,
+  async createOrgIntegration<IType extends IntegrationType, TProvider extends SignatureProvider>(
+    provider: TProvider,
+    data: Replace<
+      Omit<CreateOrgIntegration, "provider">,
+      { settings: IntegrationSettings<IType, TProvider> }
+    >,
     createdBy: string,
     t?: Knex.Transaction
   ) {
@@ -190,6 +205,7 @@ export class IntegrationRepository extends BaseRepository {
       "org_integration",
       {
         ...data,
+        provider,
         created_by: createdBy,
       },
       t

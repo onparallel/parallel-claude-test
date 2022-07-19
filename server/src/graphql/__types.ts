@@ -1020,6 +1020,7 @@ export interface NexusGenFieldTypes {
     createPrintPdfTask: NexusGenRootTypes["Task"]; // Task!
     createPublicPetitionLink: NexusGenRootTypes["PublicPetitionLink"]; // PublicPetitionLink!
     createSignatureIntegration: NexusGenRootTypes["SignatureOrgIntegration"]; // SignatureOrgIntegration!
+    createSignaturitIntegration: NexusGenRootTypes["SignatureOrgIntegration"]; // SignatureOrgIntegration!
     createTag: NexusGenRootTypes["Tag"]; // Tag!
     createTemplateRepliesReportTask: NexusGenRootTypes["Task"]; // Task!
     createTemplateStatsReportTask: NexusGenRootTypes["Task"]; // Task!
@@ -1140,6 +1141,7 @@ export interface NexusGenFieldTypes {
     uploadDynamicSelectFieldFile: NexusGenRootTypes["PetitionField"]; // PetitionField!
     uploadUserAvatar: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     userSignUp: NexusGenRootTypes["User"]; // User!
+    validateSignatureCredentials: NexusGenScalars["JSONObject"]; // JSONObject!
     verifyPublicAccess: NexusGenRootTypes["PublicAccessVerification"]; // PublicAccessVerification!
   };
   OrgIntegrationPagination: {
@@ -2557,6 +2559,7 @@ export interface NexusGenFieldTypeNames {
     createPrintPdfTask: "Task";
     createPublicPetitionLink: "PublicPetitionLink";
     createSignatureIntegration: "SignatureOrgIntegration";
+    createSignaturitIntegration: "SignatureOrgIntegration";
     createTag: "Tag";
     createTemplateRepliesReportTask: "Task";
     createTemplateStatsReportTask: "Task";
@@ -2677,6 +2680,7 @@ export interface NexusGenFieldTypeNames {
     uploadDynamicSelectFieldFile: "PetitionField";
     uploadUserAvatar: "SupportMethodResponse";
     userSignUp: "User";
+    validateSignatureCredentials: "JSONObject";
     verifyPublicAccess: "PublicAccessVerification";
   };
   OrgIntegrationPagination: {
@@ -4019,6 +4023,12 @@ export interface NexusGenArgTypes {
       name: string; // String!
       provider: NexusGenEnums["SignatureOrgIntegrationProvider"]; // SignatureOrgIntegrationProvider!
     };
+    createSignaturitIntegration: {
+      // args
+      apiKey: string; // String!
+      isDefault?: boolean | null; // Boolean
+      name: string; // String!
+    };
     createTag: {
       // args
       color: string; // String!
@@ -4679,6 +4689,11 @@ export interface NexusGenArgTypes {
       password: string; // String!
       position?: string | null; // String
       role?: string | null; // String
+    };
+    validateSignatureCredentials: {
+      // args
+      credentials: NexusGenScalars["JSONObject"]; // JSONObject!
+      provider: NexusGenEnums["SignatureOrgIntegrationProvider"]; // SignatureOrgIntegrationProvider!
     };
     verifyPublicAccess: {
       // args

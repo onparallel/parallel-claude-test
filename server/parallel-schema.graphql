@@ -762,6 +762,15 @@ type Mutation {
     isDefault: Boolean
     name: String!
     provider: SignatureOrgIntegrationProvider!
+  ): SignatureOrgIntegration! @deprecated(reason: "use createSignaturitIntegration")
+
+  """
+  Creates a new Signaturit integration on the user's organization
+  """
+  createSignaturitIntegration(
+    apiKey: String!
+    isDefault: Boolean
+    name: String!
   ): SignatureOrgIntegration!
 
   """
@@ -1713,6 +1722,14 @@ type Mutation {
     position: String
     role: String
   ): User!
+
+  """
+  Runs backend checks to validate signature credentials.
+  """
+  validateSignatureCredentials(
+    credentials: JSONObject!
+    provider: SignatureOrgIntegrationProvider!
+  ): JSONObject!
   verifyPublicAccess(
     ip: String
     keycode: ID!

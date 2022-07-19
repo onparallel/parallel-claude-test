@@ -29,6 +29,7 @@ export const markSignatureIntegrationAsDefault = mutationField(
 );
 
 export const createSignatureIntegration = mutationField("createSignatureIntegration", {
+  deprecation: "use createSignaturitIntegration",
   description: "Creates a new signature integration on the user's organization",
   type: nonNull("SignatureOrgIntegration"),
   authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("PETITION_SIGNATURE")),
@@ -47,14 +48,82 @@ export const createSignatureIntegration = mutationField("createSignatureIntegrat
       );
     }
 
-    const newIntegration = await ctx.integrations.createOrgIntegration<"SIGNATURE">(
+    const newIntegration = await ctx.integrations.createOrgIntegration<"SIGNATURE", "SIGNATURIT">(
+      "SIGNATURIT",
       {
         type: "SIGNATURE",
         org_id: ctx.user!.org_id,
-        provider: args.provider,
         name: args.name,
         settings: {
-          API_KEY: args.apiKey,
+          CREDENTIALS: {
+            API_KEY: args.apiKey,
+          },
+          ENVIRONMENT: environment,
+        },
+        is_enabled: true,
+      },
+      `User:${ctx.user!.id}`
+    );
+
+    if (args.isDefault) {
+      return await ctx.integrations.setDefaultOrgIntegration(
+        newIntegration.id,
+        "SIGNATURE",
+        ctx.user!
+      );
+    } else {
+      return newIntegration;
+    }
+  },
+});
+
+export const validateSignatureCredentials = mutationField("validateSignatureCredentials", {
+  description: "Runs backend checks to validate signature credentials.",
+  type: "JSONObject",
+  authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("PETITION_SIGNATURE")),
+  args: {
+    provider: nonNull("SignatureOrgIntegrationProvider"),
+    credentials: nonNull("JSONObject"),
+  },
+  resolve: async (_, args, ctx) => {
+    try {
+      if (args.provider === "SIGNATURIT") {
+        await ctx.signature.checkSignaturitApiKey(args.credentials.API_KEY);
+        return { success: true };
+      }
+    } catch {}
+    return { success: false };
+  },
+});
+
+export const createSignaturitIntegration = mutationField("createSignaturitIntegration", {
+  description: "Creates a new Signaturit integration on the user's organization",
+  type: nonNull("SignatureOrgIntegration"),
+  authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("PETITION_SIGNATURE")),
+  args: {
+    name: nonNull(stringArg()),
+    apiKey: nonNull(stringArg()),
+    isDefault: nullable(booleanArg()),
+  },
+  resolve: async (_, args, ctx) => {
+    const [error, environment] = await withError(ctx.signature.checkSignaturitApiKey(args.apiKey));
+    if (error) {
+      throw new ApolloError(
+        `Unable to check Signaturit APIKEY environment`,
+        "INVALID_APIKEY_ERROR"
+      );
+    }
+
+    const newIntegration = await ctx.integrations.createOrgIntegration<"SIGNATURE", "SIGNATURIT">(
+      "SIGNATURIT",
+      {
+        type: "SIGNATURE",
+        org_id: ctx.user!.org_id,
+        name: args.name,
+        settings: {
+          CREDENTIALS: {
+            API_KEY: args.apiKey,
+          },
           ENVIRONMENT: environment,
         },
         is_enabled: true,

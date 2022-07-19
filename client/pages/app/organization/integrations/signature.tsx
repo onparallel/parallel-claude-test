@@ -22,15 +22,16 @@ import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withOrgRole } from "@parallel/components/common/withOrgRole";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { useAddSignatureApiKeyDialog } from "@parallel/components/organization/dialogs/AddSignatureApiKeyDialog";
+import { useAddSignatureCredentialsDialog } from "@parallel/components/organization/dialogs/AddSignatureCredentialsDialog";
 import { useDeleteSignatureErrorConfirmationDialog } from "@parallel/components/organization/dialogs/DeleteSignatureErrorConfirmationDialog";
 import { useDeleteSignatureTokenDialog } from "@parallel/components/organization/dialogs/DeleteSignatureTokenDialog";
 import {
-  IntegrationsSignature_createSignatureIntegrationDocument,
+  IntegrationsSignature_createSignaturitIntegrationDocument,
   IntegrationsSignature_deleteSignatureIntegrationDocument,
   IntegrationsSignature_markSignatureIntegrationAsDefaultDocument,
   IntegrationsSignature_SignatureOrgIntegrationFragment,
   IntegrationsSignature_userDocument,
+  IntegrationsSignature_validateSignatureCredentialsDocument,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { assertTypenameArray } from "@parallel/utils/apollo/typename";
@@ -75,19 +76,33 @@ function IntegrationsSignature() {
   const columns = useSignatureTokensTableColumns();
 
   const genericErrorToast = useGenericErrorToast();
-  const addSignaturitAPIKey = useAddSignatureApiKeyDialog();
-  const [createSignatureIntegration] = useMutation(
-    IntegrationsSignature_createSignatureIntegrationDocument
+  const showAddSignatureCredentialsDialog = useAddSignatureCredentialsDialog();
+  const [createSignaturitIntegration] = useMutation(
+    IntegrationsSignature_createSignaturitIntegrationDocument
   );
-  const handleAddSignatureToken = async () => {
+  const [validateSignatureCredentials] = useMutation(
+    IntegrationsSignature_validateSignatureCredentialsDocument
+  );
+  const handleAddSignatureProvider = async () => {
     try {
-      const data = await addSignaturitAPIKey({});
-
-      await createSignatureIntegration({
-        variables: data,
+      const data = await showAddSignatureCredentialsDialog({
+        validateCredentials: async (provider, credentials) => {
+          const response = await validateSignatureCredentials({
+            variables: { provider, credentials },
+          });
+          return { success: response.data?.validateSignatureCredentials.success };
+        },
       });
-
-      refetch();
+      if (data.provider === "SIGNATURIT") {
+        await createSignaturitIntegration({
+          variables: {
+            apiKey: data.credentials.API_KEY,
+            isDefault: data.isDefault,
+            name: data.name,
+          },
+        });
+        refetch();
+      }
     } catch (error) {
       if (isApolloError(error)) {
         if (error.graphQLErrors[0]?.extensions?.code === "INVALID_APIKEY_ERROR") {
@@ -206,7 +221,7 @@ function IntegrationsSignature() {
               <Button
                 isDisabled={!me.hasPetitionSignature}
                 colorScheme="primary"
-                onClick={handleAddSignatureToken}
+                onClick={handleAddSignatureProvider}
               >
                 <FormattedMessage
                   id="organization.signature.add-new-token"
@@ -401,18 +416,20 @@ IntegrationsSignature.fragments = {
 
 IntegrationsSignature.mutations = [
   gql`
-    mutation IntegrationsSignature_createSignatureIntegration(
-      $name: String!
+    mutation IntegrationsSignature_validateSignatureCredentials(
       $provider: SignatureOrgIntegrationProvider!
+      $credentials: JSONObject!
+    ) {
+      validateSignatureCredentials(provider: $provider, credentials: $credentials)
+    }
+  `,
+  gql`
+    mutation IntegrationsSignature_createSignaturitIntegration(
+      $name: String!
       $apiKey: String!
       $isDefault: Boolean
     ) {
-      createSignatureIntegration(
-        name: $name
-        provider: $provider
-        apiKey: $apiKey
-        isDefault: $isDefault
-      ) {
+      createSignaturitIntegration(name: $name, apiKey: $apiKey, isDefault: $isDefault) {
         ...IntegrationsSignature_SignatureOrgIntegration
       }
     }

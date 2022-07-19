@@ -6,7 +6,7 @@ import {
   PetitionSignatureConfigSigner,
   PetitionSignatureRequestCancelData,
 } from "../db/repositories/PetitionRepository";
-import { SignatureResponse } from "../services/signature";
+import { SignatureResponse } from "../services/signature/clients";
 import { fullName } from "../util/fullName";
 import { toGlobalId } from "../util/globalId";
 import { removeKeys } from "../util/remedaExtensions";
@@ -107,13 +107,18 @@ async function startSignatureProcess(
     );
 
     // when reaching this part, we can be sure the org has at least 1 signature credit available
-    if (settings.API_KEY === ctx.config.signature.signaturitSharedProductionApiKey) {
-      // sets used signature credits += 1
-      await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
-        signatureIntegration.org_id,
-        "SIGNATURIT_SHARED_APIKEY",
-        1
-      );
+    if (signatureIntegration.provider.toUpperCase() === "SIGNATURIT") {
+      const signaturitSettings = settings as IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
+      if (
+        signaturitSettings.CREDENTIALS.API_KEY ===
+        ctx.config.signature.signaturitSharedProductionApiKey
+      )
+        // sets used signature credits += 1
+        await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
+          signatureIntegration.org_id,
+          "SIGNATURIT_SHARED_APIKEY",
+          1
+        );
     }
 
     await ctx.petitions.updatePetitionSignature(signature.id, {
@@ -132,11 +137,15 @@ async function startSignatureProcess(
 
     await ctx.petitions.cancelPetitionSignatureRequest(signature, "REQUEST_ERROR", cancelData);
 
-    if (error.message === "Account depleted all it's advanced signature requests") {
+    if (
+      signatureIntegration.provider.toUpperCase() === "SIGNATURIT" &&
+      error.message === "Account depleted all it's advanced signature requests"
+    ) {
+      const signaturitSettings = settings as IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
       await ctx.emails.sendInternalSignaturitAccountDepletedCreditsEmail(
         org.id,
         petition.id,
-        settings.API_KEY.slice(0, 10)
+        signaturitSettings.CREDENTIALS.API_KEY.slice(0, 10)
       );
     }
 

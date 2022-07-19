@@ -1,0 +1,63 @@
+import { Tone } from "../../../db/__types";
+import { OrganizationBrandTheme } from "../../../emails/utils/ThemeProvider";
+import { PdfDocumentTheme } from "../../../util/PdfDocumentTheme";
+
+type Document = {
+  id: string;
+  created_at: Date;
+  file: {
+    name: string;
+    pages?: number;
+    size: number;
+  };
+  events: {
+    created_at: Date;
+    type: string;
+  }[];
+  email: string;
+  name: string;
+  status: string;
+};
+
+export type SignatureOptions = {
+  locale: string;
+  templateData?: {
+    logoUrl: string;
+    logoAlt: string;
+    parallelUrl: string;
+    assetsUrl: string;
+    tone: Tone;
+    removeParallelBranding: boolean;
+    theme: OrganizationBrandTheme;
+  };
+  events_url?: string;
+  signingMode?: "parallel" | "sequential";
+  pdfDocumentTheme: PdfDocumentTheme;
+  /**
+   * Optional plain-text custom message to include in the "signature requested" emails
+   */
+  initialMessage?: string;
+};
+
+export type SignatureResponse = {
+  id: string;
+  created_at: Date;
+  data: any[];
+  documents: Document[];
+  url?: string;
+};
+
+export type Recipient = { email: string; name: string };
+
+export interface ISignatureClient {
+  startSignatureRequest: (
+    petitionId: string,
+    filePath: string,
+    recipients: Recipient[],
+    options: SignatureOptions
+  ) => Promise<SignatureResponse>;
+  cancelSignatureRequest: (externalId: string) => Promise<SignatureResponse>;
+  downloadSignedDocument: (externalId: string) => Promise<Buffer>;
+  downloadAuditTrail: (externalId: string) => Promise<Buffer>;
+  sendPendingSignatureReminder: (signatureId: string) => Promise<SignatureResponse>;
+}

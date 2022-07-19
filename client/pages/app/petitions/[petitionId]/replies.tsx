@@ -731,7 +731,6 @@ PetitionReplies.fragments = {
             name
             ...isUsageLimitsReached_Organization
           }
-          hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
           hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
           ...PetitionRepliesFieldComments_User
           ...ExportRepliesDialog_User

@@ -136,8 +136,8 @@
   },
   {
     "term": "component.add-signature-api-key-dialog.api-key-required-error",
-    "definition": "Por favor, introduce una clave API",
-    "context": "Please, enter an API Key"
+    "definition": "Por favor, introduce una clave API válida",
+    "context": "Please, enter a valid API Key"
   },
   {
     "term": "component.add-signature-api-key-dialog.checkbox-set-default",

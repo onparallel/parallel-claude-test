@@ -460,8 +460,13 @@ export type Mutation = {
   createPrintPdfTask: Task;
   /** Creates a public link from a user's template */
   createPublicPetitionLink: PublicPetitionLink;
-  /** Creates a new signature integration on the user's organization */
+  /**
+   * Creates a new signature integration on the user's organization
+   * @deprecated use createSignaturitIntegration
+   */
   createSignatureIntegration: SignatureOrgIntegration;
+  /** Creates a new Signaturit integration on the user's organization */
+  createSignaturitIntegration: SignatureOrgIntegration;
   /** Creates a tag in the user's organization */
   createTag: Tag;
   /** Creates a task for exporting a report grouping the replies of every petition coming from the same template */
@@ -711,6 +716,8 @@ export type Mutation = {
   uploadUserAvatar: SupportMethodResponse;
   /** Triggered by new users that want to sign up into Parallel */
   userSignUp: User;
+  /** Runs backend checks to validate signature credentials. */
+  validateSignatureCredentials: Scalars["JSONObject"];
   verifyPublicAccess: PublicAccessVerification;
 };
 
@@ -913,6 +920,12 @@ export type MutationcreateSignatureIntegrationArgs = {
   isDefault?: InputMaybe<Scalars["Boolean"]>;
   name: Scalars["String"];
   provider: SignatureOrgIntegrationProvider;
+};
+
+export type MutationcreateSignaturitIntegrationArgs = {
+  apiKey: Scalars["String"];
+  isDefault?: InputMaybe<Scalars["Boolean"]>;
+  name: Scalars["String"];
 };
 
 export type MutationcreateTagArgs = {
@@ -1574,6 +1587,11 @@ export type MutationuserSignUpArgs = {
   password: Scalars["String"];
   position?: InputMaybe<Scalars["String"]>;
   role?: InputMaybe<Scalars["String"]>;
+};
+
+export type MutationvalidateSignatureCredentialsArgs = {
+  credentials: Scalars["JSONObject"];
+  provider: SignatureOrgIntegrationProvider;
 };
 
 export type MutationverifyPublicAccessArgs = {

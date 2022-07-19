@@ -134,7 +134,11 @@ export const updateOrganizationBrandTheme = mutationField("updateOrganizationBra
   resolve: async (_, args, ctx) => {
     const organization = await ctx.organizations.loadOrg(ctx.user!.org_id);
     const theme = Object.assign(organization?.brand_theme ?? {}, args.data);
-    if (isDefined(args.data.color) && organization?.brand_theme?.color !== args.data.color) {
+    if (
+      (isDefined(args.data.color) && organization?.brand_theme?.color !== args.data.color) ||
+      (isDefined(args.data.fontFamily) &&
+        organization?.brand_theme?.fontFamily !== args.data.fontFamily)
+    ) {
       ctx.integrations.removeSignaturitBrandingIds(ctx.user!.org_id, `User:${ctx.user!.id}`);
     }
     return await ctx.organizations.updateOrganization(
