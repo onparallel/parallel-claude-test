@@ -78,7 +78,7 @@ export function BrandingGeneralPreview({ user, brand, tone, logo }: BrandingGene
               <Text>
                 <FormattedMessage
                   id="component.branding-general-preview.greetings"
-                  defaultMessage="{tone, select, INFORMAL{🔔 Hello <b>[Recipient Name]</b>!} other{Dear <b>[Recipient Name]</b>,}}"
+                  defaultMessage="{tone, select, INFORMAL{Hello <b>[Recipient Name]</b>!} other{Dear <b>[Recipient Name]</b>,}}"
                   values={{ tone }}
                 />
               </Text>
