@@ -1,4 +1,4 @@
-import { Box, Button, HStack } from "@chakra-ui/react";
+import { Box, Button, Flex, HStack } from "@chakra-ui/react";
 import { DeleteIcon, SettingsIcon } from "@parallel/chakra/icons";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -26,7 +26,7 @@ export function SettingsRowButton({
   const intl = useIntl();
 
   return (
-    <Box>
+    <Flex>
       <SettingsRow isActive={isActive} {...props}>
         {isActive ? (
           <HStack>
@@ -71,6 +71,6 @@ export function SettingsRowButton({
           <Box marginTop={2}>{children}</Box>
         </PaddedCollapse>
       ) : null}
-    </Box>
+    </Flex>
   );
 }

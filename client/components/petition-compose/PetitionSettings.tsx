@@ -517,49 +517,43 @@ function _PetitionSettings({
           <SettingsRow
             controlId="template-document-theme"
             isDisabled={
-              petition.isRestricted || petition.isAnonymized || myEffectivePermission === "READ"
+              petition.isRestricted ||
+              petition.isAnonymized ||
+              isPublicTemplate ||
+              myEffectivePermission === "READ"
             }
             icon={<DocumentIcon />}
             label={
-              <>
-                <FormattedMessage
-                  id="component.petition-settings.document-theme-label"
-                  defaultMessage="Document theme"
-                />
-                <HelpPopover>
-                  <FormattedMessage
-                    id="component.petition-settings.document-theme-popover"
-                    defaultMessage="Select the theme to be used in the document. You can design your themes in the <Link>Document Branding</Link>"
-                    values={{
-                      Link: (chunks: any[]) => (
-                        <NormalLink
-                          role="a"
-                          href={`/${intl.locale}/app/organization/branding?style=document`}
-                          target="_blank"
-                        >
-                          {chunks}
-                        </NormalLink>
-                      ),
-                    }}
-                  />
-                </HelpPopover>
-              </>
+              <FormattedMessage
+                id="component.petition-settings.document-theme-label"
+                defaultMessage="Document theme"
+              />
+            }
+            description={
+              <FormattedMessage
+                id="component.petition-settings.document-theme-popover"
+                defaultMessage="Select the theme to be used in the document. You can design your themes in the <Link>Document Branding</Link>"
+                values={{
+                  Link: (chunks: any[]) => (
+                    <NormalLink
+                      role="a"
+                      href={`/${intl.locale}/app/organization/branding?style=document`}
+                      target="_blank"
+                    >
+                      {chunks}
+                    </NormalLink>
+                  ),
+                }}
+              />
             }
           >
             <Box>
               <Select
                 size="sm"
                 borderRadius="md"
-                name="template-selected-theme"
                 width="120px"
                 value={petition.selectedDocumentTheme.id}
                 onChange={(event) => handleUpdateTemplateDocumentTheme(event.target.value)}
-                isDisabled={
-                  petition.isRestricted ||
-                  isPublicTemplate ||
-                  petition.isAnonymized ||
-                  myEffectivePermission === "READ"
-                }
               >
                 {user.organization.pdfDocumentThemes.map((theme) => (
                   <option key={theme.id} value={theme.id}>
@@ -588,7 +582,10 @@ function _PetitionSettings({
       <SettingsRow
         controlId="petition-locale"
         isDisabled={
-          petition.isRestricted || petition.isAnonymized || myEffectivePermission === "READ"
+          petition.isRestricted ||
+          isPublicTemplate ||
+          petition.isAnonymized ||
+          myEffectivePermission === "READ"
         }
         icon={<EmailIcon />}
         label={
@@ -606,12 +603,6 @@ function _PetitionSettings({
             minWidth="120px"
             value={petition.locale}
             onChange={(event) => onUpdatePetition({ locale: event.target.value as any })}
-            isDisabled={
-              petition.isRestricted ||
-              isPublicTemplate ||
-              petition.isAnonymized ||
-              myEffectivePermission === "READ"
-            }
           >
             {locales.map((locale) => (
               <option key={locale.key} value={locale.key}>
