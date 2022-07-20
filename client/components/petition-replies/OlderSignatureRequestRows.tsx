@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, GridItem, Heading, HStack, MenuItem, MenuList, Text } from "@chakra-ui/react";
+import { Box, GridItem, Heading, HStack, MenuItem, MenuList, Text } from "@chakra-ui/react";
 import { DocumentIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { OlderSignatureRequestRows_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
 import { Fragment } from "react";
@@ -53,7 +53,7 @@ export function OlderSignatureRequestRows({
             )}
           </GridItem>
           {signature.status === "COMPLETED" ? (
-            <Flex justifyContent="flex-end" padding={2} paddingRight={4}>
+            <Box padding={2} paddingRight={4} marginLeft="auto">
               <HStack>
                 {signature.metadata.SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS ? (
                   <NetDocumentsIconButton
@@ -87,7 +87,7 @@ export function OlderSignatureRequestRows({
                   }
                 />
               </HStack>
-            </Flex>
+            </Box>
           ) : null}
         </Fragment>
       ))}

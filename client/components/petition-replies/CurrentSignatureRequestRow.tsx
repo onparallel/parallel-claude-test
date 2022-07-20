@@ -97,7 +97,7 @@ export function CurrentSignatureRequestRow({
           )}
         </Box>
       </Box>
-      <Box padding={2} paddingRight={4}>
+      <Box padding={2} paddingRight={4} marginLeft="auto">
         {status === "PROCESSED" && someSignerIsPending ? (
           <>
             <IconButtonWithTooltip

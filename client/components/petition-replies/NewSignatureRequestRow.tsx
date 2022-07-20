@@ -101,7 +101,7 @@ export function NewSignatureRequestRow({
           )}
         </Box>
       </Box>
-      <Box padding={2} paddingRight={4}>
+      <Box padding={2} paddingRight={4} marginLeft="auto">
         <Flex alignItems="center">
           <Button width="24" onClick={() => onUpdateConfig(null)} isDisabled={isDisabled}>
             <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
