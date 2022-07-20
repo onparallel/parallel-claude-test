@@ -6,7 +6,6 @@ import { URLSearchParams } from "url";
 import { BrandingIdKey, ISignatureClient, Recipient, SignatureOptions } from ".";
 import { Config } from "../../../config";
 import { IntegrationSettings } from "../../../db/repositories/IntegrationRepository";
-import { Tone } from "../../../db/__types";
 import { buildEmail } from "../../../emails/buildEmail";
 import SignatureCancelledEmail from "../../../emails/emails/SignatureCancelledEmail";
 import SignatureCompletedEmail from "../../../emails/emails/SignatureCompletedEmail";

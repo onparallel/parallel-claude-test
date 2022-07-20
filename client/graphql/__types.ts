@@ -545,6 +545,8 @@ export interface Mutation {
   editPetitionPermission: Array<Petition>;
   /** Generates a download link for a file reply. */
   fileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
+  /** Forces an update of the branding of every signature integration of the selected organization. */
+  forceUpdateSignatureOrganizationBrandings: SupportMethodResponse;
   /** Generates a new API token for the context user */
   generateUserAuthToken: GenerateUserAuthTokenResponse;
   /** Get the user who owns an API Token */
@@ -623,8 +625,6 @@ export interface Mutation {
   reopenPetition: Petition;
   /** Sends the AccountVerification email with confirmation code to unconfirmed user emails */
   resendVerificationCode: Result;
-  /** Removes the Signaturit Branding Ids of selected organization. */
-  resetSignaturitOrganizationBranding: SupportMethodResponse;
   /** Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD */
   resetTemporaryPassword: Result;
   /** Resets the given user password on AWS Cognito and sends an email with new temporary. */
@@ -1083,6 +1083,10 @@ export interface MutationfileUploadReplyDownloadLinkArgs {
   replyId: Scalars["GID"];
 }
 
+export interface MutationforceUpdateSignatureOrganizationBrandingsArgs {
+  orgId: Scalars["Int"];
+}
+
 export interface MutationgenerateUserAuthTokenArgs {
   tokenName: Scalars["String"];
 }
@@ -1290,10 +1294,6 @@ export interface MutationreopenPetitionArgs {
 export interface MutationresendVerificationCodeArgs {
   email: Scalars["String"];
   locale?: InputMaybe<Scalars["String"]>;
-}
-
-export interface MutationresetSignaturitOrganizationBrandingArgs {
-  orgId: Scalars["Int"];
 }
 
 export interface MutationresetTemporaryPasswordArgs {

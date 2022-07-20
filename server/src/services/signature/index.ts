@@ -22,6 +22,7 @@ import {
 } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
 import { toGlobalId } from "../../util/globalId";
+import { random } from "../../util/token";
 import { MaybeArray } from "../../util/types";
 import { AWS_SERVICE, IAws } from "../aws";
 import { FETCH_SERVICE, IFetchService } from "../fetch";
@@ -319,7 +320,10 @@ export class SignatureService implements ISignatureService {
         groupId: `signature-branding-${toGlobalId("Organization", orgId)}`,
         body: {
           type: "update-branding",
-          payload: { orgId },
+          payload: {
+            orgId,
+            _: random(10), // random value on message body to override sqs contentBasedDeduplication and allow processing repeated messages in short periods of time
+          },
         },
       },
       t

@@ -325,7 +325,7 @@ async function updateOrganizationBranding(payload: { orgId: number }, ctx: Worke
       for (const [key, brandingId] of Object.entries(definedBrandingIds)) {
         const [locale, tone] = key.split("_");
         try {
-          settings[key as BrandingIdKey] = await client.updateBranding(brandingId, {
+          await client.updateBranding(brandingId, {
             locale,
             templateData: {
               ...(await getLayoutProps(payload.orgId, ctx)),
@@ -341,12 +341,6 @@ async function updateOrganizationBranding(payload: { orgId: number }, ctx: Worke
           );
         }
       }
-
-      await ctx.integrations.updateOrgIntegration(
-        integration.id,
-        { settings },
-        `OrgIntegration:${integration.id}`
-      );
     },
     { concurrency: 1 }
   );

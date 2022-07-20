@@ -131,20 +131,24 @@ export const updateOrganizationBrandTheme = mutationField("updateOrganizationBra
     validateHexColor((args) => args.data.color, "data.color")
   ),
   resolve: async (_, args, ctx) => {
-    const organization = await ctx.organizations.loadOrg(ctx.user!.org_id);
-    const theme = Object.assign(organization?.brand_theme ?? {}, args.data);
+    const { brand_theme: theme } = (await ctx.organizations.loadOrg(ctx.user!.org_id))!;
+    const organization = await ctx.organizations.updateOrganization(
+      ctx.user!.org_id,
+      {
+        brand_theme: {
+          color: args.data.color ?? theme.color,
+          fontFamily: args.data.fontFamily ?? theme.fontFamily,
+        },
+      },
+      `User:${ctx.user!.id}`
+    );
     if (
-      (isDefined(args.data.color) && organization?.brand_theme?.color !== args.data.color) ||
-      (isDefined(args.data.fontFamily) &&
-        organization?.brand_theme?.fontFamily !== args.data.fontFamily)
+      (isDefined(args.data.color) && theme?.color !== args.data.color) ||
+      (isDefined(args.data.fontFamily) && theme?.fontFamily !== args.data.fontFamily)
     ) {
       await ctx.signature.updateBranding(ctx.user!.org_id);
     }
-    return await ctx.organizations.updateOrganization(
-      ctx.user!.org_id,
-      { brand_theme: theme },
-      `User:${ctx.user!.id}`
-    );
+    return organization;
   },
 });
 

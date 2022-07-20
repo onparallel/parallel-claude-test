@@ -274,6 +274,35 @@ export const supportMethods: {
   },
   {
     field: {
+      name: "forceUpdateSignatureOrganizationBrandings",
+      description:
+        "Forces an update of the branding of every signature integration of the selected organization.",
+      args: [
+        {
+          name: "orgId",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "Int", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
+  {
+    field: {
       name: "getApiTokenOwner",
       description: "Get the user who owns an API Token",
       args: [
@@ -367,34 +396,6 @@ export const supportMethods: {
       deprecationReason: null,
     },
     queryType: "query",
-  },
-  {
-    field: {
-      name: "resetSignaturitOrganizationBranding",
-      description: "Removes the Signaturit Branding Ids of selected organization.",
-      args: [
-        {
-          name: "orgId",
-          description: null,
-          type: {
-            kind: "NON_NULL",
-            name: null,
-            ofType: { kind: "SCALAR", name: "Int", ofType: null },
-          },
-          defaultValue: null,
-          isDeprecated: false,
-          deprecationReason: null,
-        },
-      ],
-      type: {
-        kind: "NON_NULL",
-        name: null,
-        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
-      },
-      isDeprecated: false,
-      deprecationReason: null,
-    },
-    queryType: "mutation",
   },
   {
     field: {

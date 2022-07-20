@@ -1044,6 +1044,7 @@ export interface NexusGenFieldTypes {
     dynamicSelectFieldFileDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     editPetitionPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
+    forceUpdateSignatureOrganizationBrandings: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
     getApiTokenOwner: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     getTaskResultFile: NexusGenRootTypes["TaskResultFile"]; // TaskResultFile!
@@ -1082,7 +1083,6 @@ export interface NexusGenFieldTypes {
     removeUsersFromGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
     resendVerificationCode: NexusGenEnums["Result"]; // Result!
-    resetSignaturitOrganizationBranding: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     resetTemporaryPassword: NexusGenEnums["Result"]; // Result!
     resetUserPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     restoreDefaultOrganizationDocumentThemeFonts: NexusGenRootTypes["Organization"]; // Organization!
@@ -2583,6 +2583,7 @@ export interface NexusGenFieldTypeNames {
     dynamicSelectFieldFileDownloadLink: "FileUploadDownloadLinkResult";
     editPetitionPermission: "Petition";
     fileUploadReplyDownloadLink: "FileUploadDownloadLinkResult";
+    forceUpdateSignatureOrganizationBrandings: "SupportMethodResponse";
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
     getApiTokenOwner: "SupportMethodResponse";
     getTaskResultFile: "TaskResultFile";
@@ -2621,7 +2622,6 @@ export interface NexusGenFieldTypeNames {
     removeUsersFromGroup: "UserGroup";
     reopenPetition: "Petition";
     resendVerificationCode: "Result";
-    resetSignaturitOrganizationBranding: "SupportMethodResponse";
     resetTemporaryPassword: "Result";
     resetUserPassword: "SupportMethodResponse";
     restoreDefaultOrganizationDocumentThemeFonts: "Organization";
@@ -4151,6 +4151,10 @@ export interface NexusGenArgTypes {
       preview?: boolean | null; // Boolean
       replyId: NexusGenScalars["GID"]; // GID!
     };
+    forceUpdateSignatureOrganizationBrandings: {
+      // args
+      orgId: number; // Int!
+    };
     generateUserAuthToken: {
       // args
       tokenName: string; // String!
@@ -4359,10 +4363,6 @@ export interface NexusGenArgTypes {
       // args
       email: string; // String!
       locale?: string | null; // String
-    };
-    resetSignaturitOrganizationBranding: {
-      // args
-      orgId: number; // Int!
     };
     resetTemporaryPassword: {
       // args

@@ -951,6 +951,11 @@ type Mutation {
   ): FileUploadDownloadLinkResult!
 
   """
+  Forces an update of the branding of every signature integration of the selected organization.
+  """
+  forceUpdateSignatureOrganizationBrandings(orgId: Int!): SupportMethodResponse!
+
+  """
   Generates a new API token for the context user
   """
   generateUserAuthToken(tokenName: String!): GenerateUserAuthTokenResponse!
@@ -1216,11 +1221,6 @@ type Mutation {
   Sends the AccountVerification email with confirmation code to unconfirmed user emails
   """
   resendVerificationCode(email: String!, locale: String): Result!
-
-  """
-  Removes the Signaturit Branding Ids of selected organization.
-  """
-  resetSignaturitOrganizationBranding(orgId: Int!): SupportMethodResponse!
 
   """
   Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD

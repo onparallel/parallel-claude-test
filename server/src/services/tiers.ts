@@ -8,7 +8,7 @@ import {
   OrganizationUsageDetails,
 } from "../db/repositories/OrganizationRepository";
 import { FeatureFlagName, Organization } from "../db/__types";
-import { SignatureService } from "./signature";
+import { SIGNATURE, SignatureService } from "./signature";
 
 export const TIERS_SERVICE = Symbol.for("TIERS_SERVICE");
 
@@ -32,7 +32,7 @@ export class TiersService implements ITiersService {
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
     @inject(FeatureFlagRepository)
     private featureFlags: FeatureFlagRepository,
-    @inject(SignatureService) private signatures: SignatureService
+    @inject(SIGNATURE) private signatures: SignatureService
   ) {}
 
   private readonly defaultAppSumoFFs: FeatureFlagName[] = [
