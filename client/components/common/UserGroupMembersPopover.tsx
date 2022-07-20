@@ -72,7 +72,7 @@ export function UserGroupMembersPopover({ userGroupId, children }: UserGroupMemb
                 <Center height="60px" paddingX={3}>
                   <Text textStyle="hint" fontSize="sm">
                     <FormattedMessage
-                      id="scomponents.user-group-members-popover.no-members"
+                      id="components.user-group-members-popover.no-members"
                       defaultMessage="This team has no members yet"
                     />
                   </Text>
