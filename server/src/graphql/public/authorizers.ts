@@ -25,7 +25,10 @@ export function authenticatePublicAccess<
     if (petition.skip_forward_security) {
       return true;
     }
-    const contactId = ctx.contact!.id;
+    const contactId = ctx.contact?.id;
+    if (!isDefined(contactId)) {
+      throw new ApolloError("Contact not found", "CONTACT_NOT_FOUND");
+    }
     const cookieValue = getContactAuthCookieValue(ctx.req, contactId);
     if (cookieValue && (await ctx.contacts.verifyContact(contactId, cookieValue))) {
       return true;

@@ -850,7 +850,7 @@ export interface PetitionAccess {
   id: number; // int4
   petition_id: number; // int4
   granter_id: number; // int4
-  contact_id: number; // int4
+  contact_id: Maybe<number>; // int4
   keycode: string; // varchar
   status: PetitionAccessStatus; // petition_access_status
   next_reminder_at: Maybe<Date>; // timestamptz
@@ -868,6 +868,7 @@ export interface PetitionAccess {
 
 export type CreatePetitionAccess = PartialProps<
   Omit<PetitionAccess, "id">,
+  | "contact_id"
   | "next_reminder_at"
   | "reminders_active"
   | "reminders_config"
