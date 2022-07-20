@@ -1,5 +1,5 @@
 import { ApolloError } from "apollo-server-core";
-import { arg, booleanArg, mutationField, nonNull, nullable, stringArg } from "nexus";
+import { arg, booleanArg, mutationField, nonNull, nullable, objectType, stringArg } from "nexus";
 import { withError } from "../../util/promises/withError";
 import { authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -39,7 +39,9 @@ export const createSignatureIntegration = mutationField("createSignatureIntegrat
     isDefault: nullable(booleanArg()),
   },
   resolve: async (_, args, ctx) => {
-    const [error, environment] = await withError(ctx.signature.checkSignaturitApiKey(args.apiKey));
+    const [error, data] = await withError(
+      ctx.signature.validateCredentials("SIGNATURIT", { API_KEY: args.apiKey })
+    );
     if (error) {
       throw new ApolloError(
         `Unable to check Signaturit APIKEY environment`,
@@ -57,7 +59,7 @@ export const createSignatureIntegration = mutationField("createSignatureIntegrat
           CREDENTIALS: {
             API_KEY: args.apiKey,
           },
-          ENVIRONMENT: environment,
+          ENVIRONMENT: data.environment,
         },
         is_enabled: true,
       },
@@ -78,7 +80,13 @@ export const createSignatureIntegration = mutationField("createSignatureIntegrat
 
 export const validateSignatureCredentials = mutationField("validateSignatureCredentials", {
   description: "Runs backend checks to validate signature credentials.",
-  type: "JSONObject",
+  type: objectType({
+    name: "ValidateSignatureCredentialsResult",
+    definition(t) {
+      t.nonNull.boolean("success");
+      t.nullable.jsonObject("data");
+    },
+  }),
   authorize: authenticateAnd(contextUserHasRole("ADMIN"), userHasFeatureFlag("PETITION_SIGNATURE")),
   args: {
     provider: nonNull("SignatureOrgIntegrationProvider"),
@@ -86,10 +94,8 @@ export const validateSignatureCredentials = mutationField("validateSignatureCred
   },
   resolve: async (_, args, ctx) => {
     try {
-      if (args.provider === "SIGNATURIT") {
-        await ctx.signature.checkSignaturitApiKey(args.credentials.API_KEY);
-        return { success: true };
-      }
+      const data = await ctx.signature.validateCredentials(args.provider, args.credentials);
+      return { success: true, data };
     } catch {}
     return { success: false };
   },
@@ -105,7 +111,9 @@ export const createSignaturitIntegration = mutationField("createSignaturitIntegr
     isDefault: nullable(booleanArg()),
   },
   resolve: async (_, args, ctx) => {
-    const [error, environment] = await withError(ctx.signature.checkSignaturitApiKey(args.apiKey));
+    const [error, data] = await withError(
+      ctx.signature.validateCredentials("SIGNATURIT", { API_KEY: args.apiKey })
+    );
     if (error) {
       throw new ApolloError(
         `Unable to check Signaturit APIKEY environment`,
@@ -123,7 +131,7 @@ export const createSignaturitIntegration = mutationField("createSignaturitIntegr
           CREDENTIALS: {
             API_KEY: args.apiKey,
           },
-          ENVIRONMENT: environment,
+          ENVIRONMENT: data.environment,
         },
         is_enabled: true,
       },

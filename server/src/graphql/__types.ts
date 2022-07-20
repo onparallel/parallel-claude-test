@@ -676,6 +676,11 @@ export interface NexusGenObjects {
   UserPermissionEditedEvent: events.UserPermissionEditedEvent;
   UserPermissionRemovedEvent: events.UserPermissionRemovedEvent;
   UserProvisioningOrgIntegration: db.OrgIntegration;
+  ValidateSignatureCredentialsResult: {
+    // root type
+    data?: NexusGenScalars["JSONObject"] | null; // JSONObject
+    success: boolean; // Boolean!
+  };
   VerificationCodeCheck: {
     // root type
     remainingAttempts?: number | null; // Int
@@ -1141,7 +1146,7 @@ export interface NexusGenFieldTypes {
     uploadDynamicSelectFieldFile: NexusGenRootTypes["PetitionField"]; // PetitionField!
     uploadUserAvatar: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     userSignUp: NexusGenRootTypes["User"]; // User!
-    validateSignatureCredentials: NexusGenScalars["JSONObject"]; // JSONObject!
+    validateSignatureCredentials: NexusGenRootTypes["ValidateSignatureCredentialsResult"]; // ValidateSignatureCredentialsResult!
     verifyPublicAccess: NexusGenRootTypes["PublicAccessVerification"]; // PublicAccessVerification!
   };
   OrgIntegrationPagination: {
@@ -2164,6 +2169,11 @@ export interface NexusGenFieldTypes {
     name: string; // String!
     type: NexusGenEnums["IntegrationType"]; // IntegrationType!
   };
+  ValidateSignatureCredentialsResult: {
+    // field return type
+    data: NexusGenScalars["JSONObject"] | null; // JSONObject
+    success: boolean; // Boolean!
+  };
   VerificationCodeCheck: {
     // field return type
     remainingAttempts: number | null; // Int
@@ -2680,7 +2690,7 @@ export interface NexusGenFieldTypeNames {
     uploadDynamicSelectFieldFile: "PetitionField";
     uploadUserAvatar: "SupportMethodResponse";
     userSignUp: "User";
-    validateSignatureCredentials: "JSONObject";
+    validateSignatureCredentials: "ValidateSignatureCredentialsResult";
     verifyPublicAccess: "PublicAccessVerification";
   };
   OrgIntegrationPagination: {
@@ -3702,6 +3712,11 @@ export interface NexusGenFieldTypeNames {
     isDefault: "Boolean";
     name: "String";
     type: "IntegrationType";
+  };
+  ValidateSignatureCredentialsResult: {
+    // field return type name
+    data: "JSONObject";
+    success: "Boolean";
   };
   VerificationCodeCheck: {
     // field return type name

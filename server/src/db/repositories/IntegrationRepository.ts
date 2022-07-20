@@ -5,7 +5,7 @@ import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
 import { CreateOrgIntegration, IntegrationType, OrgIntegration, User } from "../__types";
 
-type SignatureProvider = "SIGNATURIT";
+export type SignatureProvider = "SIGNATURIT";
 
 type SignatureIntegrationCredentials<TProvider extends SignatureProvider> = {
   SIGNATURIT: { API_KEY: string };

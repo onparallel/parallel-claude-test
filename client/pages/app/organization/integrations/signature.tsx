@@ -90,7 +90,7 @@ function IntegrationsSignature() {
           const response = await validateSignatureCredentials({
             variables: { provider, credentials },
           });
-          return { success: response.data?.validateSignatureCredentials.success };
+          return { success: response.data?.validateSignatureCredentials.success ?? false };
         },
       });
       if (data.provider === "SIGNATURIT") {
@@ -420,7 +420,9 @@ IntegrationsSignature.mutations = [
       $provider: SignatureOrgIntegrationProvider!
       $credentials: JSONObject!
     ) {
-      validateSignatureCredentials(provider: $provider, credentials: $credentials)
+      validateSignatureCredentials(provider: $provider, credentials: $credentials) {
+        success
+      }
     }
   `,
   gql`

@@ -750,7 +750,7 @@ export interface Mutation {
   /** Triggered by new users that want to sign up into Parallel */
   userSignUp: User;
   /** Runs backend checks to validate signature credentials. */
-  validateSignatureCredentials: Scalars["JSONObject"];
+  validateSignatureCredentials: ValidateSignatureCredentialsResult;
   verifyPublicAccess: PublicAccessVerification;
 }
 
@@ -3883,6 +3883,12 @@ export interface UserProvisioningOrgIntegration extends OrgIntegration {
 }
 
 export type UserStatus = "ACTIVE" | "INACTIVE";
+
+export interface ValidateSignatureCredentialsResult {
+  __typename?: "ValidateSignatureCredentialsResult";
+  data?: Maybe<Scalars["JSONObject"]>;
+  success: Scalars["Boolean"];
+}
 
 export interface VerificationCodeCheck {
   __typename?: "VerificationCodeCheck";
@@ -12642,7 +12648,10 @@ export type IntegrationsSignature_validateSignatureCredentialsMutationVariables 
 }>;
 
 export type IntegrationsSignature_validateSignatureCredentialsMutation = {
-  validateSignatureCredentials: { [key: string]: any };
+  validateSignatureCredentials: {
+    __typename?: "ValidateSignatureCredentialsResult";
+    success: boolean;
+  };
 };
 
 export type IntegrationsSignature_createSignaturitIntegrationMutationVariables = Exact<{
@@ -27796,7 +27805,9 @@ export const IntegrationsSignature_validateSignatureCredentialsDocument = gql`
     $provider: SignatureOrgIntegrationProvider!
     $credentials: JSONObject!
   ) {
-    validateSignatureCredentials(provider: $provider, credentials: $credentials)
+    validateSignatureCredentials(provider: $provider, credentials: $credentials) {
+      success
+    }
   }
 ` as unknown as DocumentNode<
   IntegrationsSignature_validateSignatureCredentialsMutation,

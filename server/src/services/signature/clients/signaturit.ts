@@ -15,6 +15,7 @@ import { getBaseWebhookUrl } from "../../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../../util/globalId";
 import { downloadImageBase64 } from "../../../util/images";
 import { removeNotDefined } from "../../../util/remedaExtensions";
+import { IFetchService } from "../../fetch";
 import { II18nService } from "../../i18n";
 
 export class SignaturItClient extends EventEmitter implements ISignatureClient {
@@ -33,6 +34,31 @@ export class SignaturItClient extends EventEmitter implements ISignatureClient {
     this.sdk = new SignaturitSDK(
       this.settings.CREDENTIALS.API_KEY,
       settings.ENVIRONMENT === "production"
+    );
+  }
+
+  static async guessEnvironment(apiKey: string, fetch: IFetchService) {
+    return await Promise.any(
+      Object.entries({
+        sandbox: "https://api.sandbox.signaturit.com",
+        production: "https://api.signaturit.com",
+      }).map(([environment, url]) =>
+        fetch
+          .fetchWithTimeout(
+            `${url}/v3/team/users.json`,
+            {
+              headers: { authorization: `Bearer ${apiKey}` },
+            },
+            5000
+          )
+          .then((res) => {
+            if (res.status === 200) {
+              return environment as "sandbox" | "production";
+            } else {
+              throw new Error();
+            }
+          })
+      )
     );
   }
 

@@ -1729,7 +1729,7 @@ type Mutation {
   validateSignatureCredentials(
     credentials: JSONObject!
     provider: SignatureOrgIntegrationProvider!
-  ): JSONObject!
+  ): ValidateSignatureCredentialsResult!
   verifyPublicAccess(
     ip: String
     keycode: ID!
@@ -5198,6 +5198,11 @@ type UserProvisioningOrgIntegration implements OrgIntegration {
 enum UserStatus {
   ACTIVE
   INACTIVE
+}
+
+type ValidateSignatureCredentialsResult {
+  data: JSONObject
+  success: Boolean!
 }
 
 type VerificationCodeCheck {

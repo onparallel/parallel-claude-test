@@ -6,6 +6,7 @@ import { CONFIG, Config } from "../../config";
 import {
   IntegrationRepository,
   IntegrationSettings,
+  SignatureProvider,
 } from "../../db/repositories/IntegrationRepository";
 import { OrganizationRepository } from "../../db/repositories/OrganizationRepository";
 import {
@@ -32,7 +33,7 @@ import { SignaturItClient } from "./clients/signaturit";
 
 export interface ISignatureService {
   getClient(integration: OrgIntegration): ISignatureClient;
-  checkSignaturitApiKey(apiKey: string): Promise<"sandbox" | "production">;
+  validateCredentials(provider: SignatureProvider, credentials: any): Promise<any>;
   createSignatureRequest(
     petitionId: number,
     signatureConfig: PetitionSignatureConfig,
@@ -79,6 +80,17 @@ export class SignatureService implements ISignatureService {
     }
   }
 
+  /**
+   * runs validations on signature provider to make sure credentials are valid.
+   * @returns optional object with extra data for later configuration of the integration
+   */
+  async validateCredentials(provider: SignatureProvider, credentials: any) {
+    if (provider === "SIGNATURIT" && isDefined(credentials.API_KEY)) {
+      const environment = await SignaturItClient.guessEnvironment(credentials.API_KEY, this.fetch);
+      return { environment };
+    }
+  }
+
   private buildSignaturItClient(integration: OrgIntegration): SignaturItClient {
     const settings = integration.settings as IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
     const client = new SignaturItClient(settings, this.config, integration.org_id, this.i18n);
@@ -97,29 +109,6 @@ export class SignatureService implements ISignatureService {
       }
     );
     return client;
-  }
-
-  async checkSignaturitApiKey(apiKey: string) {
-    return await Promise.any(
-      Object.entries({
-        sandbox: "https://api.sandbox.signaturit.com",
-        production: "https://api.signaturit.com",
-      }).map(([environment, url]) =>
-        this.fetch
-          .fetchWithTimeout(
-            `${url}/v3/team/users.json`,
-            { headers: { authorization: `Bearer ${apiKey}` } },
-            5000
-          )
-          .then((res) => {
-            if (res.status === 200) {
-              return environment as "sandbox" | "production";
-            } else {
-              throw new Error();
-            }
-          })
-      )
-    );
   }
 
   async createSignatureRequest(
