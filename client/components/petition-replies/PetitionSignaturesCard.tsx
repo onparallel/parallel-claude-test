@@ -208,7 +208,7 @@ export const PetitionSignaturesCard = Object.assign(
             duration: 5000,
             title: intl.formatMessage({
               id: "component.petition-signatures-card.signature-sent-toast-title",
-              defaultMessage: "eSignature sent.",
+              defaultMessage: "eSignature sent",
             }),
             description: intl.formatMessage({
               id: "component.petition-signatures-card.signature-sent-toast-description",

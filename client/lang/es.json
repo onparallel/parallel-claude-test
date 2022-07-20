@@ -2686,8 +2686,8 @@
   },
   {
     "term": "component.petition-signatures-card.signature-sent-toast-title",
-    "definition": "Firma enviada.",
-    "context": "eSignature sent."
+    "definition": "Firma enviada",
+    "context": "eSignature sent"
   },
   {
     "term": "component.petition-signatures-card.signed-document",

@@ -15,6 +15,40 @@ function shouldBeProcessed(
 }
 
 /**
+ * iterates over an array of unprocessed COMMENT_CREATED user notifications,
+ * sending an email to the user with the accumulated comments if the last notification
+ * was created more than `config.minutesBeforeNotify` minutes ago
+ */
+async function processCommentCreatedUserNotifications(
+  context: WorkerContext,
+  config: Config["cronWorkers"]["petition-notifications"]
+) {
+  const notifications = await context.petitions.loadUnprocessedUserNotificationsOfType(
+    "COMMENT_CREATED"
+  );
+
+  if (notifications.length > 0) {
+    const groupedUserNotifications = groupBy(notifications, (n) => `${n.petition_id},${n.user_id}`);
+    for (const group of Object.values(groupedUserNotifications)) {
+      if (shouldBeProcessed(group, config.minutesBeforeNotify)) {
+        const petitionId = group[0].petition_id;
+        const userId = group[0].user_id;
+        const isSubscribed = await context.petitions.isUserSubscribedToPetition(userId, petitionId);
+        if (isSubscribed) {
+          await context.emails.sendPetitionCommentsUserNotificationEmail(
+            petitionId,
+            userId,
+            group.map((n) => n.data.petition_field_comment_id)
+          );
+        }
+
+        await context.petitions.updatePetitionUserNotificationsProcessedAt(group.map((n) => n.id));
+      }
+    }
+  }
+}
+
+/**
  * iterates over an array of unprocessed COMMENT_CREATED contact notifications,
  * sending an email to the contact with the accumulated comments if the last notification
  * was created more than `config.minutesBeforeNotify` minutes ago
@@ -46,40 +80,6 @@ async function processCommentCreatedContactNotifications(
         await context.petitions.updatePetitionContactNotificationsProcessedAt(
           group.map((n) => n.id)
         );
-      }
-    }
-  }
-}
-
-/**
- * iterates over an array of unprocessed COMMENT_CREATED user notifications,
- * sending an email to the user with the accumulated comments if the last notification
- * was created more than `config.minutesBeforeNotify` minutes ago
- */
-async function processCommentCreatedUserNotifications(
-  context: WorkerContext,
-  config: Config["cronWorkers"]["petition-notifications"]
-) {
-  const notifications = await context.petitions.loadUnprocessedUserNotificationsOfType(
-    "COMMENT_CREATED"
-  );
-
-  if (notifications.length > 0) {
-    const groupedUserNotifications = groupBy(notifications, (n) => `${n.petition_id},${n.user_id}`);
-    for (const group of Object.values(groupedUserNotifications)) {
-      if (shouldBeProcessed(group, config.minutesBeforeNotify)) {
-        const petitionId = group[0].petition_id;
-        const userId = group[0].user_id;
-        const isSubscribed = await context.petitions.isUserSubscribedToPetition(userId, petitionId);
-        if (isSubscribed) {
-          await context.emails.sendPetitionCommentsUserNotificationEmail(
-            petitionId,
-            userId,
-            group.map((n) => n.data.petition_field_comment_id)
-          );
-        }
-
-        await context.petitions.updatePetitionUserNotificationsProcessedAt(group.map((n) => n.id));
       }
     }
   }

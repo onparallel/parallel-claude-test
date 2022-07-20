@@ -2,13 +2,13 @@ import { gql } from "@apollo/client";
 import { Box, Button, GridItem, Heading, HStack, MenuItem, MenuList, Text } from "@chakra-ui/react";
 import { BellIcon, DocumentIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { CurrentSignatureRequestRow_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
-import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { withError } from "@parallel/utils/promises/withError";
 import { Fragment } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { ButtonWithMoreOptions } from "../common/ButtonWithMoreOptions";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { NakedLink } from "../common/Link";
 import { NetDocumentsIconButton } from "../common/NetDocumentsLink";
 import { ResponsiveButtonIcon } from "../common/ResponsiveButtonIcon";
 import { SignerReference } from "../common/SignerReference";
@@ -55,8 +55,6 @@ export function CurrentSignatureRequestRow({
       onSendReminder(signatureRequest.id);
     }
   }
-
-  const goTo = useGoToPetition();
 
   return (
     <>
@@ -159,12 +157,14 @@ export function CurrentSignatureRequestRow({
             />
           </HStack>
         ) : status === "CANCELLED" ? (
-          <Button size="sm" onClick={() => goTo(signatureRequest.petition.id, "activity")}>
-            <FormattedMessage
-              id="component.petition-signatures-card.more-info-button"
-              defaultMessage="More information"
-            />
-          </Button>
+          <NakedLink href={`/app/petitions/${signatureRequest.petition.id}/activity`}>
+            <Button size="sm">
+              <FormattedMessage
+                id="component.petition-signatures-card.more-info-button"
+                defaultMessage="More information"
+              />
+            </Button>
+          </NakedLink>
         ) : null}
       </GridItem>
     </>

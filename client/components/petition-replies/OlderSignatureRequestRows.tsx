@@ -2,12 +2,12 @@ import { gql } from "@apollo/client";
 import { Box, Button, GridItem, Heading, HStack, MenuItem, MenuList, Text } from "@chakra-ui/react";
 import { DocumentIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { OlderSignatureRequestRows_PetitionSignatureRequestFragment } from "@parallel/graphql/__types";
-import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { Fragment } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { ButtonWithMoreOptions } from "../common/ButtonWithMoreOptions";
 import { Divider } from "../common/Divider";
+import { NakedLink } from "../common/Link";
 import { NetDocumentsIconButton } from "../common/NetDocumentsLink";
 import { ResponsiveButtonIcon } from "../common/ResponsiveButtonIcon";
 import { SignerReference } from "../common/SignerReference";
@@ -21,7 +21,7 @@ export function OlderSignatureRequestRows({
   onDownload: (petitionSignatureRequestId: string, downloadAuditTrail: boolean) => void;
 }) {
   const intl = useIntl();
-  const goTo = useGoToPetition();
+
   return (
     <>
       <GridItem colSpan={3}>
@@ -90,12 +90,14 @@ export function OlderSignatureRequestRows({
                 />
               </HStack>
             ) : signature.status === "CANCELLED" ? (
-              <Button size="xs" onClick={() => goTo(signature.petition.id, "activity")}>
-                <FormattedMessage
-                  id="component.petition-signatures-card.more-info-button"
-                  defaultMessage="More information"
-                />
-              </Button>
+              <NakedLink href={`/app/petitions/${signature.petition.id}/activity`}>
+                <Button size="xs">
+                  <FormattedMessage
+                    id="component.petition-signatures-card.more-info-button"
+                    defaultMessage="More information"
+                  />
+                </Button>
+              </NakedLink>
             ) : null}
           </GridItem>
         </Fragment>
