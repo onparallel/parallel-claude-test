@@ -4378,7 +4378,7 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sessionUser.id,
         1,
-        () => ({ is_template: false }),
+        () => ({ is_template: false, status: "PENDING" }),
         () => ({ type: "READ" })
       );
 
@@ -4837,7 +4837,7 @@ describe("GraphQL/Petitions", () => {
         organization.id,
         sessionUser.id,
         1,
-        () => ({ is_template: false }),
+        () => ({ is_template: false, status: "PENDING" }),
         () => ({ type: "OWNER" })
       );
 
