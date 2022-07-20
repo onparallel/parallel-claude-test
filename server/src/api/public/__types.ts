@@ -596,8 +596,6 @@ export type Mutation = {
    * @deprecated use restoreDefaultOrganizationPdfDocumentThemeFonts
    */
   restoreDefaultOrganizationDocumentThemeFonts: Organization;
-  /** Restores the 'fonts' section of the organization document theme to its default values */
-  restoreDefaultOrganizationPdfDocumentThemeFonts: OrganizationTheme;
   restoreLogin: Result;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
@@ -1262,10 +1260,6 @@ export type MutationresetUserPasswordArgs = {
   locale: PetitionLocale;
 };
 
-export type MutationrestoreDefaultOrganizationPdfDocumentThemeFontsArgs = {
-  orgThemeId: Scalars["GID"];
-};
-
 export type MutationrevokeUserAuthTokenArgs = {
   authTokenIds: Array<Scalars["GID"]>;
 };
@@ -1424,7 +1418,9 @@ export type MutationupdateOrganizationLogoArgs = {
 };
 
 export type MutationupdateOrganizationPdfDocumentThemeArgs = {
-  data: UpdateOrganizationPdfDocumentThemeInput;
+  data?: InputMaybe<OrganizationPdfDocumentThemeInput>;
+  isDefault?: InputMaybe<Scalars["Boolean"]>;
+  name?: InputMaybe<Scalars["String"]>;
   orgThemeId: Scalars["GID"];
 };
 
@@ -1646,11 +1642,11 @@ export type Organization = Timestamps & {
   name: Scalars["String"];
   /** @deprecated Not used anymore. Use themes.pdfDocument[0].data */
   pdfDocumentTheme: Scalars["JSONObject"];
+  pdfDocumentThemes: Array<OrganizationTheme>;
   /** The preferred tone of organization. */
   preferredTone: Tone;
   /** The status of the organization. */
   status: OrganizationStatus;
-  themes: OrganizationThemeList;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
   usageLimits: OrganizationUsageLimit;
@@ -1762,13 +1758,8 @@ export type OrganizationStatus =
 export type OrganizationTheme = {
   data: Scalars["JSONObject"];
   id: Scalars["GID"];
-  isCustomized: Scalars["Boolean"];
   isDefault: Scalars["Boolean"];
   name: Scalars["String"];
-};
-
-export type OrganizationThemeList = {
-  pdfDocument: Array<OrganizationTheme>;
 };
 
 export type OrganizationUsageLimit = {
@@ -3536,12 +3527,6 @@ export type Tone = "FORMAL" | "INFORMAL";
 export type UpdateContactInput = {
   firstName?: InputMaybe<Scalars["String"]>;
   lastName?: InputMaybe<Scalars["String"]>;
-};
-
-export type UpdateOrganizationPdfDocumentThemeInput = {
-  isDefault?: InputMaybe<Scalars["Boolean"]>;
-  name?: InputMaybe<Scalars["String"]>;
-  theme?: InputMaybe<OrganizationPdfDocumentThemeInput>;
 };
 
 export type UpdatePetitionFieldInput = {
