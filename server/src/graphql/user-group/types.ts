@@ -15,6 +15,11 @@ export const UserGroup = objectType({
         return await ctx.userGroups.loadUserGroupMembers(root.id);
       },
     });
+    t.int("memberCount", {
+      resolve: async (root, _, ctx) => {
+        return await ctx.userGroups.loadUserGroupCount(root.id);
+      },
+    });
     t.implements("Timestamps");
   },
 });

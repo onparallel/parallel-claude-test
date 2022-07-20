@@ -5060,6 +5060,7 @@ type UserGroup implements Timestamps {
   createdAt: DateTime!
   id: GID!
   initials: String!
+  memberCount: Int!
   members: [UserGroupMember!]!
   name: String!
 

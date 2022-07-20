@@ -4515,6 +4515,11 @@
     "context": "Tag"
   },
   {
+    "term": "components.user-group-members-popover.members-of",
+    "definition": "Miembros de {name}:",
+    "context": "Members of {name}:"
+  },
+  {
     "term": "contact.edit-details-button",
     "definition": "Editar",
     "context": "Edit"
@@ -8328,6 +8333,11 @@
     "term": "recipient-view.verify-button",
     "definition": "Verificar código",
     "context": "Verify code"
+  },
+  {
+    "term": "scomponents.user-group-members-popover.no-members",
+    "definition": "Este equipo no tiene miembros todavía",
+    "context": "This team has no members yet"
   },
   {
     "term": "settings.account",

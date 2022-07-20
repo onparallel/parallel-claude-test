@@ -2096,6 +2096,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     initials: string; // String!
+    memberCount: number; // Int!
     members: NexusGenRootTypes["UserGroupMember"][]; // [UserGroupMember!]!
     name: string; // String!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -3631,6 +3632,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     id: "GID";
     initials: "String";
+    memberCount: "Int";
     members: "UserGroupMember";
     name: "String";
     updatedAt: "DateTime";

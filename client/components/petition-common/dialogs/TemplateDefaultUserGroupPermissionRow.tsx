@@ -12,8 +12,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { ChevronDownIcon, DeleteIcon, UsersIcon } from "@parallel/chakra/icons";
-import { UserListPopover } from "@parallel/components/common/UserListPopover";
-import { UserSelect } from "@parallel/components/common/UserSelect";
+import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
 import { TemplateDefaultUserGroupPermissionRow_TemplateDefaultUserGroupPermissionFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { PetitionPermissionTypeText } from "../PetitionPermissionType";
@@ -42,15 +41,15 @@ export function TemplateDefaultUserGroupPermissionRow({
           justifyContent="flex-end"
           alignItems="center"
         >
-          <UserListPopover usersOrGroups={group.members.map((m) => m.user)}>
-            <Text color="gray.500" isTruncated>
+          <UserGroupMembersPopover userGroupId={group.id}>
+            <Text color="gray.500" cursor="default" isTruncated>
               <FormattedMessage
                 id="component.user-select.group-members"
                 defaultMessage="{count, plural, =1 {1 member} other {# members}}"
-                values={{ count: group.members.length }}
+                values={{ count: group.memberCount }}
               />
             </Text>
-          </UserListPopover>
+          </UserGroupMembersPopover>
         </Flex>
       </Box>
       <Menu placement="bottom-end">
@@ -79,9 +78,8 @@ TemplateDefaultUserGroupPermissionRow.fragments = {
         id
         initials
         name
-        ...UserSelect_UserGroup
+        memberCount
       }
     }
-    ${UserSelect.fragments.UserGroup}
   `,
 };

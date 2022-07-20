@@ -21,7 +21,7 @@ import AsyncSelect from "react-select/async";
 import { indexBy, zip } from "remeda";
 import { EmptySearchTemplatesIcon } from "../petition-new/icons/EmtpySearchTemplatesIcon";
 import { Link, NakedLink } from "./Link";
-import { UserListPopover } from "./UserListPopover";
+import { UserGroupMembersPopover } from "./UserGroupMembersPopover";
 
 export type UserSelectSelection<IncludeGroups extends boolean = false> =
   | UserSelect_UserFragment
@@ -48,13 +48,8 @@ const fragments = {
       fragment UserSelect_UserGroup on UserGroup {
         id
         name
-        members {
-          user {
-            ...UserSelect_User
-          }
-        }
+        memberCount
       }
-      ${this.User}
     `;
   },
 };
@@ -444,7 +439,7 @@ const MultiValueLabel = rsComponent("MultiValueLabel", function ({ children, ...
       {data.__typename === "User" ? (
         <Text as="span">{data.fullName ? `${data.fullName} <${data.email}>` : data.email}</Text>
       ) : data.__typename === "UserGroup" ? (
-        <UserListPopover usersOrGroups={data.members.map((m) => m.user)}>
+        <UserGroupMembersPopover userGroupId={data.id}>
           <Box>
             <UsersIcon
               marginRight={1}
@@ -457,11 +452,11 @@ const MultiValueLabel = rsComponent("MultiValueLabel", function ({ children, ...
             <FormattedMessage
               id="component.user-select.group-members"
               defaultMessage="{count, plural, =1 {1 member} other {# members}}"
-              values={{ count: data.members.length }}
+              values={{ count: data.memberCount }}
             />
             )
           </Box>
-        </UserListPopover>
+        </UserGroupMembersPopover>
       ) : null}
     </components.MultiValueLabel>
   );
@@ -508,7 +503,7 @@ function UserSelectOption({ data }: { data: UserSelectSelection<any> }) {
           <FormattedMessage
             id="component.user-select.group-members"
             defaultMessage="{count, plural, =1 {1 member} other {# members}}"
-            values={{ count: data.members.length }}
+            values={{ count: data.memberCount }}
           />
         </Text>
       </Box>

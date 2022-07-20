@@ -3644,6 +3644,7 @@ export type UserGroup = Timestamps & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   initials: Scalars["String"];
+  memberCount: Scalars["Int"];
   members: Array<UserGroupMember>;
   name: Scalars["String"];
   /** Time when the resource was last updated. */

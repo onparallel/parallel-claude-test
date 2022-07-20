@@ -27,6 +27,7 @@ import {
 import { ChevronDownIcon, DeleteIcon, UserArrowIcon, UsersIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { UserGroupMembersPopover } from "@parallel/components/common/UserGroupMembersPopover";
 import {
   NewPetition_templatesDocument,
   PetitionActivity_petitionDocument,
@@ -52,7 +53,6 @@ import { GrowingTextarea } from "../../common/GrowingTextarea";
 import { HelpPopover } from "../../common/HelpPopover";
 import { PaddedCollapse } from "../../common/PaddedCollapse";
 import { UserAvatar } from "../../common/UserAvatar";
-import { UserListPopover } from "../../common/UserListPopover";
 import {
   UserSelect,
   UserSelectInstance,
@@ -524,15 +524,15 @@ export function PetitionSharingDialog({
                         justifyContent="flex-end"
                         alignItems="center"
                       >
-                        <UserListPopover usersOrGroups={group.members.map((m) => m.user)}>
-                          <Text color="gray.500" isTruncated>
+                        <UserGroupMembersPopover userGroupId={group.id}>
+                          <Text color="gray.500" cursor="default" isTruncated>
                             <FormattedMessage
                               id="component.user-select.group-members"
                               defaultMessage="{count, plural, =1 {1 member} other {# members}}"
-                              values={{ count: group.members.length }}
+                              values={{ count: group.memberCount }}
                             />
                           </Text>
-                        </UserListPopover>
+                        </UserGroupMembersPopover>
                       </Flex>
                     </Box>
                     {petitionsOwnedWrite.length === 0 ? (
@@ -745,13 +745,8 @@ PetitionSharingDialog.fragments = {
         id
         name
         initials
-        members {
-          user {
-            ...PetitionSharingModal_User
-          }
-        }
+        memberCount
       }
-      ${this.User}
     `;
   },
 };
