@@ -18,7 +18,8 @@
         "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel",
         "tone": "FORMAL",
-        "removeParallelBranding": false
+        "removeParallelBranding": false,
+        "isContactVerification": false
       },
       "argTypes": {
         "fullName": { "control": { "type": "text" } },
@@ -30,7 +31,8 @@
         "logoUrl": { "control": { "type": "text" } },
         "logoAlt": { "control": { "type": "text" } },
         "tone": { "control": { "type": "text" } },
-        "removeParallelBranding": { "control": { "type": "boolean" } }
+        "removeParallelBranding": { "control": { "type": "boolean" } },
+        "isContactVerification": { "control": { "type": "boolean" } }
       }
     }
   ]

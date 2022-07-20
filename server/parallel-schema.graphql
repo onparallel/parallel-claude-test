@@ -1181,7 +1181,7 @@ type Mutation {
   """
   publicResetTemporaryPassword(email: String!, locale: String): Result!
   publicSendReminder(contactEmail: String!, slug: ID!): Result!
-  publicSendVerificationCode(keycode: ID!): VerificationCodeRequest!
+  publicSendVerificationCode(isContactVerification: Boolean, keycode: ID!): VerificationCodeRequest!
 
   """
   Starts the completion of an async field
@@ -2344,6 +2344,11 @@ type PetitionAccess implements Timestamps {
   id: GID!
 
   """
+  It will be true if dont have contact assigned
+  """
+  isContactless: Boolean!
+
+  """
   When the next reminder will be sent.
   """
   nextReminderAt: DateTime
@@ -2645,6 +2650,15 @@ type PetitionCompletedUserNotification implements PetitionUserNotification {
   petition: PetitionBase!
 }
 
+type PetitionContactlessLinkCreatedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  data: JSONObject!
+  id: GID!
+  petition: Petition
+  type: PetitionEventType!
+  user: User
+}
+
 type PetitionCreatedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!
@@ -2711,6 +2725,7 @@ enum PetitionEventType {
   PETITION_CLOSED
   PETITION_CLOSED_NOTIFIED
   PETITION_COMPLETED
+  PETITION_CONTACTLESS_LINK_CREATED
   PETITION_CREATED
   PETITION_DELETED
   PETITION_MESSAGE_BOUNCED
@@ -3716,8 +3731,10 @@ type PublicAccessVerification {
   cookieValue: String
   email: String
   isAllowed: Boolean!
+  isContactlessAccess: Boolean
   orgLogoUrl: String
   orgName: String
+  ownerName: String
   tone: Tone
 }
 

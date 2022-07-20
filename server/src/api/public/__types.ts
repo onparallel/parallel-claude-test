@@ -1233,6 +1233,7 @@ export type MutationpublicSendReminderArgs = {
 };
 
 export type MutationpublicSendVerificationCodeArgs = {
+  isContactVerification?: InputMaybe<Scalars["Boolean"]>;
   keycode: Scalars["ID"];
 };
 
@@ -1960,6 +1961,8 @@ export type PetitionAccess = Timestamps & {
   granter: Maybe<User>;
   /** The ID of the petition access. */
   id: Scalars["GID"];
+  /** It will be true if dont have contact assigned */
+  isContactless: Scalars["Boolean"];
   /** When the next reminder will be sent. */
   nextReminderAt: Maybe<Scalars["DateTime"]>;
   /** The petition for this message access. */
@@ -2136,6 +2139,15 @@ export type PetitionCompletedUserNotification = PetitionUserNotification & {
   petition: PetitionBase;
 };
 
+export type PetitionContactlessLinkCreatedEvent = PetitionEvent & {
+  createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
+  id: Scalars["GID"];
+  petition: Maybe<Petition>;
+  type: PetitionEventType;
+  user: Maybe<User>;
+};
+
 export type PetitionCreatedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   data: Scalars["JSONObject"];
@@ -2197,6 +2209,7 @@ export type PetitionEventType =
   | "PETITION_CLOSED"
   | "PETITION_CLOSED_NOTIFIED"
   | "PETITION_COMPLETED"
+  | "PETITION_CONTACTLESS_LINK_CREATED"
   | "PETITION_CREATED"
   | "PETITION_DELETED"
   | "PETITION_MESSAGE_BOUNCED"
@@ -2747,8 +2760,10 @@ export type PublicAccessVerification = {
   cookieValue: Maybe<Scalars["String"]>;
   email: Maybe<Scalars["String"]>;
   isAllowed: Scalars["Boolean"];
+  isContactlessAccess: Maybe<Scalars["Boolean"]>;
   orgLogoUrl: Maybe<Scalars["String"]>;
   orgName: Maybe<Scalars["String"]>;
+  ownerName: Maybe<Scalars["String"]>;
   tone: Maybe<Tone>;
 };
 
@@ -5153,6 +5168,13 @@ export type GetPetitionEvents_PetitionEventsQueryVariables = Exact<{
 
 export type GetPetitionEvents_PetitionEventsQuery = {
   petitionEvents: Array<
+    | {
+        id: string;
+        data: { [key: string]: any };
+        type: PetitionEventType;
+        createdAt: string;
+        petition: { id: string } | null;
+      }
     | {
         id: string;
         data: { [key: string]: any };

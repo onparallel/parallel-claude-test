@@ -13,6 +13,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { LinkIcon } from "@parallel/chakra/icons";
 import {
   ContactSelectProps,
   ContactSelectSelection,
@@ -53,6 +54,7 @@ import { HelpPopover } from "../../common/HelpPopover";
 import { RecipientSelectGroups } from "../../common/RecipientSelectGroups";
 import { MessageEmailEditor } from "../../petition-common/MessageEmailEditor";
 import { SendButton } from "../../petition-common/SendButton";
+import { useContactlessLinkDialog } from "./ContactlessLinkDialog";
 
 export type AddPetitionAccessDialogProps = {
   onSearchContacts?: ContactSelectProps["onSearchContacts"];
@@ -226,6 +228,18 @@ export function AddPetitionAccessDialog({
           allowAdditionalSigners,
         },
       });
+    } catch {}
+  };
+  const showContactlessLinkDialog = useContactlessLinkDialog();
+  const handleCopyLinkClick = async () => {
+    try {
+      const data = await showContactlessLinkDialog({
+        link: "somelink",
+        petitionId: petition.id,
+      });
+      if (data.forceClose) {
+        props.onReject();
+      }
     } catch {}
   };
 
@@ -420,17 +434,32 @@ export function AddPetitionAccessDialog({
         </>
       }
       confirm={
-        <SendButton
-          data-action="send-petition"
-          onSendClick={() => handleSendClick(false)}
-          onScheduleClick={() => handleSendClick(true)}
-        />
+        <Flex justifyContent="space-between" w="full" wrap="wrap" gridGap={2}>
+          <Button
+            variant="outline"
+            leftIcon={<LinkIcon />}
+            width={{ base: "full", sm: "fit-content" }}
+            onClick={handleCopyLinkClick}
+            isDisabled={recipientGroups.some((g) => g.length > 0)}
+          >
+            <FormattedMessage id="generic.share-by-link" defaultMessage="Share by link" />
+          </Button>
+          <HStack spacing={0} gridGap={2} width={{ base: "full", sm: "fit-content" }}>
+            <Box width="full">
+              <Button onClick={() => props.onReject()} width="full">
+                <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
+              </Button>
+            </Box>
+            <SendButton
+              data-action="send-petition"
+              onSendClick={() => handleSendClick(false)}
+              onScheduleClick={() => handleSendClick(true)}
+              width="full"
+            />
+          </HStack>
+        </Flex>
       }
-      cancel={
-        <Button onClick={() => props.onReject()}>
-          <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
-        </Button>
-      }
+      cancel={<></>}
       {...props}
     />
   );

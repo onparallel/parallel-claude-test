@@ -15,6 +15,7 @@ export type ContactAuthenticationRequest = {
   osName: string;
   code: string;
   tone: Tone;
+  isContactVerification: boolean;
 } & LayoutProps;
 
 const email: Email<ContactAuthenticationRequest> = {
@@ -33,32 +34,48 @@ const email: Email<ContactAuthenticationRequest> = {
       { code, tone }
     );
   },
-  text({ name, fullName, code, browserName, osName, tone }, intl) {
+  text({ name, fullName, code, browserName, osName, tone, isContactVerification }, intl) {
     return outdent`
       ${greetingContact({ name, fullName, tone }, intl)}
-      ${intl.formatMessage(
-        {
-          id: "verification-code-request.instructions",
-          defaultMessage: "Please use the following verification code on the unrecognized device.",
-        },
-        { tone }
-      )}
+      ${
+        isContactVerification
+          ? intl.formatMessage(
+              {
+                id: "verification-code-request.instructions-contact",
+                defaultMessage:
+                  "Please use the following verification code to access the information:",
+              },
+              { tone }
+            )
+          : intl.formatMessage(
+              {
+                id: "verification-code-request.instructions",
+                defaultMessage:
+                  "Please use the following verification code on the unrecognized device.",
+              },
+              { tone }
+            )
+      }
 
-      ${intl.formatMessage({
-        id: "verification-code-request.device-label",
-        defaultMessage: "Device:",
-      })} ${intl.formatMessage(
-      {
-        id: "verification-code-request.device",
-        defaultMessage: "{browserName} on {osName}",
-      },
-      { browserName, osName }
-    )}
       ${intl.formatMessage({
         id: "verification-code-request.code-label",
         defaultMessage: "Verification code:",
       })} ${code}
-
+      ${
+        isContactVerification
+          ? ""
+          : `${intl.formatMessage({
+              id: "verification-code-request.device-label",
+              defaultMessage: "Device:",
+            })} ${intl.formatMessage(
+              {
+                id: "verification-code-request.device",
+                defaultMessage: "{browserName} on {osName}",
+              },
+              { browserName, osName }
+            )}`
+      }
+    
       ${intl.formatMessage(
         {
           id: "verification-code-request.expiry",
@@ -83,6 +100,7 @@ const email: Email<ContactAuthenticationRequest> = {
     logoAlt,
     tone,
     removeParallelBranding,
+    isContactVerification,
     theme,
   }: ContactAuthenticationRequest) {
     return (
@@ -100,13 +118,23 @@ const email: Email<ContactAuthenticationRequest> = {
         <MjmlSection padding="0">
           <MjmlColumn>
             <GreetingContact name={name} fullName={fullName} tone={tone} />
-            <MjmlText>
-              <FormattedMessage
-                id="verification-code-request.instructions"
-                defaultMessage="Please use the following verification code on the unrecognized device."
-                values={{ tone }}
-              />
-            </MjmlText>
+            {isContactVerification ? (
+              <MjmlText>
+                <FormattedMessage
+                  id="verification-code-request.instructions-contact"
+                  defaultMessage="Please use the following verification code to access the information:"
+                  values={{ tone }}
+                />
+              </MjmlText>
+            ) : (
+              <MjmlText>
+                <FormattedMessage
+                  id="verification-code-request.instructions"
+                  defaultMessage="Please use the following verification code on the unrecognized device."
+                  values={{ tone }}
+                />
+              </MjmlText>
+            )}
           </MjmlColumn>
         </MjmlSection>
         <MjmlSection paddingTop="10px">
@@ -116,17 +144,19 @@ const email: Email<ContactAuthenticationRequest> = {
             </MjmlText>
           </MjmlColumn>
         </MjmlSection>
-        <MjmlSection padding="0">
-          <MjmlColumn>
-            <MjmlText align="center" fontSize="12px" padding="0">
-              <FormattedMessage
-                id="verification-code-request.device"
-                defaultMessage="{browserName} on {osName}"
-                values={{ browserName, osName }}
-              />
-            </MjmlText>
-          </MjmlColumn>
-        </MjmlSection>
+        {isContactVerification ? null : (
+          <MjmlSection padding="0">
+            <MjmlColumn>
+              <MjmlText align="center" fontSize="12px" padding="0">
+                <FormattedMessage
+                  id="verification-code-request.device"
+                  defaultMessage="{browserName} on {osName}"
+                  values={{ browserName, osName }}
+                />
+              </MjmlText>
+            </MjmlColumn>
+          </MjmlSection>
+        )}
         <MjmlSection>
           <MjmlColumn>
             <MjmlText>

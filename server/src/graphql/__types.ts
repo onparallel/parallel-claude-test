@@ -504,6 +504,7 @@ export interface NexusGenObjects {
   PetitionClosedNotifiedEvent: events.PetitionClosedNotifiedEvent;
   PetitionCompletedEvent: events.PetitionCompletedEvent;
   PetitionCompletedUserNotification: notifications.PetitionCompletedUserNotification;
+  PetitionContactlessLinkCreatedEvent: events.PetitionContactlessLinkCreatedEvent;
   PetitionCreatedEvent: events.PetitionCreatedEvent;
   PetitionDeletedEvent: events.PetitionDeletedEvent;
   PetitionEventPagination: {
@@ -576,8 +577,10 @@ export interface NexusGenObjects {
     cookieValue?: string | null; // String
     email?: string | null; // String
     isAllowed: boolean; // Boolean!
+    isContactlessAccess?: boolean | null; // Boolean
     orgLogoUrl?: string | null; // String
     orgName?: string | null; // String
+    ownerName?: string | null; // String
     tone?: NexusGenEnums["Tone"] | null; // Tone
   };
   PublicContact: db.Contact;
@@ -1303,6 +1306,7 @@ export interface NexusGenFieldTypes {
     delegateGranter: NexusGenRootTypes["User"] | null; // User
     granter: NexusGenRootTypes["User"] | null; // User
     id: NexusGenScalars["GID"]; // GID!
+    isContactless: boolean; // Boolean!
     nextReminderAt: NexusGenScalars["DateTime"] | null; // DateTime
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     recipientUrl: string; // String!
@@ -1388,6 +1392,15 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isRead: boolean; // Boolean!
     petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
+  };
+  PetitionContactlessLinkCreatedEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"]; // JSONObject!
+    id: NexusGenScalars["GID"]; // GID!
+    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
+    user: NexusGenRootTypes["User"] | null; // User
   };
   PetitionCreatedEvent: {
     // field return type
@@ -1676,8 +1689,10 @@ export interface NexusGenFieldTypes {
     cookieValue: string | null; // String
     email: string | null; // String
     isAllowed: boolean; // Boolean!
+    isContactlessAccess: boolean | null; // Boolean
     orgLogoUrl: string | null; // String
     orgName: string | null; // String
+    ownerName: string | null; // String
     tone: NexusGenEnums["Tone"] | null; // Tone
   };
   PublicContact: {
@@ -2871,6 +2886,7 @@ export interface NexusGenFieldTypeNames {
     delegateGranter: "User";
     granter: "User";
     id: "GID";
+    isContactless: "Boolean";
     nextReminderAt: "DateTime";
     petition: "Petition";
     recipientUrl: "String";
@@ -2956,6 +2972,15 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isRead: "Boolean";
     petition: "PetitionBase";
+  };
+  PetitionContactlessLinkCreatedEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    data: "JSONObject";
+    id: "GID";
+    petition: "Petition";
+    type: "PetitionEventType";
+    user: "User";
   };
   PetitionCreatedEvent: {
     // field return type name
@@ -3244,8 +3269,10 @@ export interface NexusGenFieldTypeNames {
     cookieValue: "String";
     email: "String";
     isAllowed: "Boolean";
+    isContactlessAccess: "Boolean";
     orgLogoUrl: "String";
     orgName: "String";
+    ownerName: "String";
     tone: "Tone";
   };
   PublicContact: {
@@ -4398,6 +4425,7 @@ export interface NexusGenArgTypes {
     };
     publicSendVerificationCode: {
       // args
+      isContactVerification?: boolean | null; // Boolean
       keycode: string; // ID!
     };
     publicStartAsyncFieldCompletion: {
@@ -5057,6 +5085,7 @@ export interface NexusGenAbstractTypeMembers {
     | "PetitionClosedEvent"
     | "PetitionClosedNotifiedEvent"
     | "PetitionCompletedEvent"
+    | "PetitionContactlessLinkCreatedEvent"
     | "PetitionCreatedEvent"
     | "PetitionDeletedEvent"
     | "PetitionMessageBouncedEvent"
@@ -5134,6 +5163,7 @@ export interface NexusGenTypeInterfaces {
   PetitionClosedNotifiedEvent: "PetitionEvent";
   PetitionCompletedEvent: "PetitionEvent";
   PetitionCompletedUserNotification: "PetitionUserNotification";
+  PetitionContactlessLinkCreatedEvent: "PetitionEvent";
   PetitionCreatedEvent: "PetitionEvent";
   PetitionDeletedEvent: "PetitionEvent";
   PetitionFieldAttachment: "CreatedAt";

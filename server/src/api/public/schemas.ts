@@ -1687,6 +1687,16 @@ const PetitionEventSchemas = {
     description: "The parallel has been anonymized.",
     properties: {},
   },
+  PETITION_CONTACTLESS_LINK_CREATED: {
+    description: "The link to access without contact",
+    properties: {
+      userId: {
+        description: "The ID of the user that created the link",
+        type: "string",
+        example: toGlobalId("User", 10),
+      },
+    },
+  },
 } as Record<PetitionEventType, JsonSchema>;
 
 export const petitionEventTypes = Object.keys(PetitionEventSchemas) as PetitionEventType[];

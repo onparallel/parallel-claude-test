@@ -830,6 +830,11 @@
     "context": "Please use the following verification code on the unrecognized device."
   },
   {
+    "term": "verification-code-request.instructions-contact",
+    "definition": "Please use the following verification code to access the information:",
+    "context": "Please use the following verification code to access the information:"
+  },
+  {
     "term": "verification-code-request.subject",
     "definition": "{code} is your verification code on Parallel",
     "context": "{code} is your verification code on Parallel"

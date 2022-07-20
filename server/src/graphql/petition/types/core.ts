@@ -731,6 +731,12 @@ export const PetitionAccess = objectType({
         return `${ctx.config.misc.parallelUrl}/${locale}/petition/${root.keycode}`;
       },
     });
+    t.boolean("isContactless", {
+      description: "It will be true if dont have contact assigned",
+      resolve: (root) => {
+        return root.contact_id === null;
+      },
+    });
   },
 });
 

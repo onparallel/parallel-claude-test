@@ -1267,6 +1267,7 @@ export interface MutationpublicSendReminderArgs {
 }
 
 export interface MutationpublicSendVerificationCodeArgs {
+  isContactVerification?: InputMaybe<Scalars["Boolean"]>;
   keycode: Scalars["ID"];
 }
 
@@ -2006,6 +2007,8 @@ export interface PetitionAccess extends Timestamps {
   granter?: Maybe<User>;
   /** The ID of the petition access. */
   id: Scalars["GID"];
+  /** It will be true if dont have contact assigned */
+  isContactless: Scalars["Boolean"];
   /** When the next reminder will be sent. */
   nextReminderAt?: Maybe<Scalars["DateTime"]>;
   /** The petition for this message access. */
@@ -2192,6 +2195,16 @@ export interface PetitionCompletedUserNotification extends PetitionUserNotificat
   petition: PetitionBase;
 }
 
+export interface PetitionContactlessLinkCreatedEvent extends PetitionEvent {
+  __typename?: "PetitionContactlessLinkCreatedEvent";
+  createdAt: Scalars["DateTime"];
+  data: Scalars["JSONObject"];
+  id: Scalars["GID"];
+  petition?: Maybe<Petition>;
+  type: PetitionEventType;
+  user?: Maybe<User>;
+}
+
 export interface PetitionCreatedEvent extends PetitionEvent {
   __typename?: "PetitionCreatedEvent";
   createdAt: Scalars["DateTime"];
@@ -2257,6 +2270,7 @@ export type PetitionEventType =
   | "PETITION_CLOSED"
   | "PETITION_CLOSED_NOTIFIED"
   | "PETITION_COMPLETED"
+  | "PETITION_CONTACTLESS_LINK_CREATED"
   | "PETITION_CREATED"
   | "PETITION_DELETED"
   | "PETITION_MESSAGE_BOUNCED"
@@ -2829,8 +2843,10 @@ export interface PublicAccessVerification {
   cookieValue?: Maybe<Scalars["String"]>;
   email?: Maybe<Scalars["String"]>;
   isAllowed: Scalars["Boolean"];
+  isContactlessAccess?: Maybe<Scalars["Boolean"]>;
   orgLogoUrl?: Maybe<Scalars["String"]>;
   orgName?: Maybe<Scalars["String"]>;
+  ownerName?: Maybe<Scalars["String"]>;
   tone?: Maybe<Tone>;
 }
 
@@ -5874,6 +5890,7 @@ export type PetitionAccessTable_PetitionFragment = {
     reminderCount: number;
     remindersActive: boolean;
     remindersOptOut: boolean;
+    isContactless: boolean;
     createdAt: string;
     contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     remindersConfig?: {
@@ -5907,6 +5924,7 @@ export type PetitionAccessTable_PetitionAccessFragment = {
   reminderCount: number;
   remindersActive: boolean;
   remindersOptOut: boolean;
+  isContactless: boolean;
   createdAt: string;
   contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   remindersConfig?: {
@@ -5970,6 +5988,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
           } | null;
           access: {
             __typename?: "PetitionAccess";
+            isContactless: boolean;
             contact?: {
               __typename?: "Contact";
               id: string;
@@ -6303,6 +6322,17 @@ export type PetitionActivityTimeline_PetitionFragment = {
             | null;
         }
       | {
+          __typename?: "PetitionContactlessLinkCreatedEvent";
+          id: string;
+          createdAt: string;
+          user?: {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null;
+            status: UserStatus;
+          } | null;
+        }
+      | {
           __typename?: "PetitionCreatedEvent";
           id: string;
           createdAt: string;
@@ -6597,6 +6627,7 @@ export type PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragme
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
   access: {
     __typename?: "PetitionAccess";
+    isContactless: boolean;
     contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
 };
@@ -6840,6 +6871,13 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragme
     | null;
 };
 
+export type PetitionActivityTimeline_PetitionEvent_PetitionContactlessLinkCreatedEvent_Fragment = {
+  __typename?: "PetitionContactlessLinkCreatedEvent";
+  id: string;
+  createdAt: string;
+  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+};
+
 export type PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment = {
   __typename?: "PetitionCreatedEvent";
   id: string;
@@ -7081,6 +7119,7 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_PetitionClosedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionClosedNotifiedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_PetitionContactlessLinkCreatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionDeletedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionMessageBouncedEvent_Fragment
@@ -7264,6 +7303,7 @@ export type TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment = {
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
   access: {
     __typename?: "PetitionAccess";
+    isContactless: boolean;
     contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
 };
@@ -7489,6 +7529,13 @@ export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
 };
+
+export type TimelinePetitionContactlessLinkCreatedEvent_PetitionContactlessLinkCreatedEventFragment =
+  {
+    __typename?: "PetitionContactlessLinkCreatedEvent";
+    createdAt: string;
+    user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
+  };
 
 export type TimelinePetitionCreatedEvent_PetitionCreatedEventFragment = {
   __typename?: "PetitionCreatedEvent";
@@ -10874,6 +10921,34 @@ export type LandingTemplateCard_LandingTemplateFragment = {
   organizationName: string;
 };
 
+export type RecipientViewContactlessForm_publicSendVerificationCodeMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  isContactVerification?: InputMaybe<Scalars["Boolean"]>;
+}>;
+
+export type RecipientViewContactlessForm_publicSendVerificationCodeMutation = {
+  publicSendVerificationCode: {
+    __typename?: "VerificationCodeRequest";
+    token: string;
+    remainingAttempts: number;
+    expiresAt: string;
+  };
+};
+
+export type RecipientViewContactlessForm_publicCheckVerificationCodeMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  token: Scalars["ID"];
+  code: Scalars["String"];
+}>;
+
+export type RecipientViewContactlessForm_publicCheckVerificationCodeMutation = {
+  publicCheckVerificationCode: {
+    __typename?: "VerificationCodeCheck";
+    result: Result;
+    remainingAttempts?: number | null;
+  };
+};
+
 export type RecipientViewContentsCard_PublicUserFragment = {
   __typename?: "PublicUser";
   firstName?: string | null;
@@ -11065,6 +11140,33 @@ export type RecipientViewHeader_publicDelegateAccessToContactMutation = {
         email: string;
       }>;
     } | null;
+  };
+};
+
+export type RecipientViewNewDevice_publicSendVerificationCodeMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+}>;
+
+export type RecipientViewNewDevice_publicSendVerificationCodeMutation = {
+  publicSendVerificationCode: {
+    __typename?: "VerificationCodeRequest";
+    token: string;
+    remainingAttempts: number;
+    expiresAt: string;
+  };
+};
+
+export type RecipientViewNewDevice_publicCheckVerificationCodeMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  token: Scalars["ID"];
+  code: Scalars["String"];
+}>;
+
+export type RecipientViewNewDevice_publicCheckVerificationCodeMutation = {
+  publicCheckVerificationCode: {
+    __typename?: "VerificationCodeCheck";
+    result: Result;
+    remainingAttempts?: number | null;
   };
 };
 
@@ -13419,6 +13521,7 @@ export type PetitionActivity_PetitionFragment = {
     reminderCount: number;
     remindersActive: boolean;
     remindersOptOut: boolean;
+    isContactless: boolean;
     createdAt: string;
     contact?: {
       __typename?: "Contact";
@@ -13498,6 +13601,7 @@ export type PetitionActivity_PetitionFragment = {
           } | null;
           access: {
             __typename?: "PetitionAccess";
+            isContactless: boolean;
             contact?: {
               __typename?: "Contact";
               id: string;
@@ -13829,6 +13933,17 @@ export type PetitionActivity_PetitionFragment = {
               }
             | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
             | null;
+        }
+      | {
+          __typename?: "PetitionContactlessLinkCreatedEvent";
+          id: string;
+          createdAt: string;
+          user?: {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null;
+            status: UserStatus;
+          } | null;
         }
       | {
           __typename?: "PetitionCreatedEvent";
@@ -14227,6 +14342,7 @@ export type PetitionActivity_updatePetitionMutation = {
           reminderCount: number;
           remindersActive: boolean;
           remindersOptOut: boolean;
+          isContactless: boolean;
           createdAt: string;
           contact?: {
             __typename?: "Contact";
@@ -14306,6 +14422,7 @@ export type PetitionActivity_updatePetitionMutation = {
                 } | null;
                 access: {
                   __typename?: "PetitionAccess";
+                  isContactless: boolean;
                   contact?: {
                     __typename?: "Contact";
                     id: string;
@@ -14652,6 +14769,17 @@ export type PetitionActivity_updatePetitionMutation = {
                       status: UserStatus;
                     }
                   | null;
+              }
+            | {
+                __typename?: "PetitionContactlessLinkCreatedEvent";
+                id: string;
+                createdAt: string;
+                user?: {
+                  __typename?: "User";
+                  id: string;
+                  fullName?: string | null;
+                  status: UserStatus;
+                } | null;
               }
             | {
                 __typename?: "PetitionCreatedEvent";
@@ -15099,6 +15227,7 @@ export type PetitionActivity_petitionQuery = {
           reminderCount: number;
           remindersActive: boolean;
           remindersOptOut: boolean;
+          isContactless: boolean;
           createdAt: string;
           contact?: {
             __typename?: "Contact";
@@ -15178,6 +15307,7 @@ export type PetitionActivity_petitionQuery = {
                 } | null;
                 access: {
                   __typename?: "PetitionAccess";
+                  isContactless: boolean;
                   contact?: {
                     __typename?: "Contact";
                     id: string;
@@ -15524,6 +15654,17 @@ export type PetitionActivity_petitionQuery = {
                       status: UserStatus;
                     }
                   | null;
+              }
+            | {
+                __typename?: "PetitionContactlessLinkCreatedEvent";
+                id: string;
+                createdAt: string;
+                user?: {
+                  __typename?: "User";
+                  id: string;
+                  fullName?: string | null;
+                  status: UserStatus;
+                } | null;
               }
             | {
                 __typename?: "PetitionCreatedEvent";
@@ -21308,6 +21449,8 @@ export type RecipientViewVerify_verifyPublicAccessMutation = {
   verifyPublicAccess: {
     __typename?: "PublicAccessVerification";
     isAllowed: boolean;
+    isContactlessAccess?: boolean | null;
+    ownerName?: string | null;
     cookieName?: string | null;
     cookieValue?: string | null;
     email?: string | null;
@@ -21315,33 +21458,6 @@ export type RecipientViewVerify_verifyPublicAccessMutation = {
     orgLogoUrl?: string | null;
     tone?: Tone | null;
     brandTheme?: { [key: string]: any } | null;
-  };
-};
-
-export type RecipientViewVerify_publicSendVerificationCodeMutationVariables = Exact<{
-  keycode: Scalars["ID"];
-}>;
-
-export type RecipientViewVerify_publicSendVerificationCodeMutation = {
-  publicSendVerificationCode: {
-    __typename?: "VerificationCodeRequest";
-    token: string;
-    remainingAttempts: number;
-    expiresAt: string;
-  };
-};
-
-export type RecipientViewVerify_publicCheckVerificationCodeMutationVariables = Exact<{
-  keycode: Scalars["ID"];
-  token: Scalars["ID"];
-  code: Scalars["String"];
-}>;
-
-export type RecipientViewVerify_publicCheckVerificationCodeMutation = {
-  publicCheckVerificationCode: {
-    __typename?: "VerificationCodeCheck";
-    result: Result;
-    remainingAttempts?: number | null;
   };
 };
 
@@ -24005,6 +24121,7 @@ export const PetitionAccessTable_PetitionAccessFragmentDoc = gql`
     remindersConfig {
       ...PetitionAccessTable_PetitionAccessRemindersConfig
     }
+    isContactless
     createdAt
   }
   ${ContactReference_ContactFragmentDoc}
@@ -24069,6 +24186,7 @@ export const TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragmentDoc = 
       contact {
         ...ContactReference_Contact
       }
+      isContactless
     }
     createdAt
   }
@@ -24680,6 +24798,19 @@ export const TimelinePetitionAnonymizedEvent_PetitionAnonymizedEventFragmentDoc 
   TimelinePetitionAnonymizedEvent_PetitionAnonymizedEventFragment,
   unknown
 >;
+export const TimelinePetitionContactlessLinkCreatedEvent_PetitionContactlessLinkCreatedEventFragmentDoc =
+  gql`
+    fragment TimelinePetitionContactlessLinkCreatedEvent_PetitionContactlessLinkCreatedEvent on PetitionContactlessLinkCreatedEvent {
+      user {
+        ...UserReference_User
+      }
+      createdAt
+    }
+    ${UserReference_UserFragmentDoc}
+  ` as unknown as DocumentNode<
+    TimelinePetitionContactlessLinkCreatedEvent_PetitionContactlessLinkCreatedEventFragment,
+    unknown
+  >;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
     id
@@ -24797,6 +24928,9 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on PetitionAnonymizedEvent {
       ...TimelinePetitionAnonymizedEvent_PetitionAnonymizedEvent
     }
+    ... on PetitionContactlessLinkCreatedEvent {
+      ...TimelinePetitionContactlessLinkCreatedEvent_PetitionContactlessLinkCreatedEvent
+    }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
   ${TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc}
@@ -24835,6 +24969,7 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEventFragmentDoc}
   ${TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEventFragmentDoc}
   ${TimelinePetitionAnonymizedEvent_PetitionAnonymizedEventFragmentDoc}
+  ${TimelinePetitionContactlessLinkCreatedEvent_PetitionContactlessLinkCreatedEventFragmentDoc}
 ` as unknown as DocumentNode<PetitionActivityTimeline_PetitionEventFragment, unknown>;
 export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
   fragment PetitionActivityTimeline_Petition on Petition {
@@ -28097,6 +28232,36 @@ export const PublicSignupForm_emailIsAvailableDocument = gql`
   PublicSignupForm_emailIsAvailableQuery,
   PublicSignupForm_emailIsAvailableQueryVariables
 >;
+export const RecipientViewContactlessForm_publicSendVerificationCodeDocument = gql`
+  mutation RecipientViewContactlessForm_publicSendVerificationCode(
+    $keycode: ID!
+    $isContactVerification: Boolean
+  ) {
+    publicSendVerificationCode(keycode: $keycode, isContactVerification: $isContactVerification) {
+      token
+      remainingAttempts
+      expiresAt
+    }
+  }
+` as unknown as DocumentNode<
+  RecipientViewContactlessForm_publicSendVerificationCodeMutation,
+  RecipientViewContactlessForm_publicSendVerificationCodeMutationVariables
+>;
+export const RecipientViewContactlessForm_publicCheckVerificationCodeDocument = gql`
+  mutation RecipientViewContactlessForm_publicCheckVerificationCode(
+    $keycode: ID!
+    $token: ID!
+    $code: String!
+  ) {
+    publicCheckVerificationCode(keycode: $keycode, token: $token, code: $code) {
+      result
+      remainingAttempts
+    }
+  }
+` as unknown as DocumentNode<
+  RecipientViewContactlessForm_publicCheckVerificationCodeMutation,
+  RecipientViewContactlessForm_publicCheckVerificationCodeMutationVariables
+>;
 export const RecipientViewHeader_publicDelegateAccessToContactDocument = gql`
   mutation RecipientViewHeader_publicDelegateAccessToContact(
     $keycode: ID!
@@ -28125,6 +28290,33 @@ export const RecipientViewHeader_publicDelegateAccessToContactDocument = gql`
 ` as unknown as DocumentNode<
   RecipientViewHeader_publicDelegateAccessToContactMutation,
   RecipientViewHeader_publicDelegateAccessToContactMutationVariables
+>;
+export const RecipientViewNewDevice_publicSendVerificationCodeDocument = gql`
+  mutation RecipientViewNewDevice_publicSendVerificationCode($keycode: ID!) {
+    publicSendVerificationCode(keycode: $keycode) {
+      token
+      remainingAttempts
+      expiresAt
+    }
+  }
+` as unknown as DocumentNode<
+  RecipientViewNewDevice_publicSendVerificationCodeMutation,
+  RecipientViewNewDevice_publicSendVerificationCodeMutationVariables
+>;
+export const RecipientViewNewDevice_publicCheckVerificationCodeDocument = gql`
+  mutation RecipientViewNewDevice_publicCheckVerificationCode(
+    $keycode: ID!
+    $token: ID!
+    $code: String!
+  ) {
+    publicCheckVerificationCode(keycode: $keycode, token: $token, code: $code) {
+      result
+      remainingAttempts
+    }
+  }
+` as unknown as DocumentNode<
+  RecipientViewNewDevice_publicCheckVerificationCodeMutation,
+  RecipientViewNewDevice_publicCheckVerificationCodeMutationVariables
 >;
 export const RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldDocument = gql`
   query RecipientViewPetitionFieldCommentsDialog_publicPetitionField(
@@ -29875,6 +30067,8 @@ export const RecipientViewVerify_verifyPublicAccessDocument = gql`
   ) {
     verifyPublicAccess(token: $token, keycode: $keycode, ip: $ip, userAgent: $userAgent) {
       isAllowed
+      isContactlessAccess
+      ownerName
       cookieName
       cookieValue
       email
@@ -29887,33 +30081,6 @@ export const RecipientViewVerify_verifyPublicAccessDocument = gql`
 ` as unknown as DocumentNode<
   RecipientViewVerify_verifyPublicAccessMutation,
   RecipientViewVerify_verifyPublicAccessMutationVariables
->;
-export const RecipientViewVerify_publicSendVerificationCodeDocument = gql`
-  mutation RecipientViewVerify_publicSendVerificationCode($keycode: ID!) {
-    publicSendVerificationCode(keycode: $keycode) {
-      token
-      remainingAttempts
-      expiresAt
-    }
-  }
-` as unknown as DocumentNode<
-  RecipientViewVerify_publicSendVerificationCodeMutation,
-  RecipientViewVerify_publicSendVerificationCodeMutationVariables
->;
-export const RecipientViewVerify_publicCheckVerificationCodeDocument = gql`
-  mutation RecipientViewVerify_publicCheckVerificationCode(
-    $keycode: ID!
-    $token: ID!
-    $code: String!
-  ) {
-    publicCheckVerificationCode(keycode: $keycode, token: $token, code: $code) {
-      result
-      remainingAttempts
-    }
-  }
-` as unknown as DocumentNode<
-  RecipientViewVerify_publicCheckVerificationCodeMutation,
-  RecipientViewVerify_publicCheckVerificationCodeMutationVariables
 >;
 export const OptOut_publicOptOutRemindersDocument = gql`
   mutation OptOut_publicOptOutReminders(

@@ -26,7 +26,12 @@ export function TimelineAccessDeactivatedEvent({
           values={{
             userIsYou: userId === event.user?.id,
             user: <UserReference user={event.user} />,
-            contact: <ContactReference contact={event.access.contact} />,
+            contact: (
+              <ContactReference
+                contact={event.access.contact}
+                isEmpty={event.access.isContactless}
+              />
+            ),
             timeAgo: (
               <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
             ),
@@ -70,6 +75,7 @@ TimelineAccessDeactivatedEvent.fragments = {
         contact {
           ...ContactReference_Contact
         }
+        isContactless
       }
       createdAt
     }

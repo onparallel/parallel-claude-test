@@ -1,5 +1,6 @@
 import { ApolloError } from "apollo-server-core";
 import { differenceInDays } from "date-fns";
+import { decode, JwtPayload } from "jsonwebtoken";
 import {
   booleanArg,
   idArg,
@@ -14,12 +15,14 @@ import { outdent } from "outdent";
 import { isDefined } from "remeda";
 import { getClientIp } from "request-ip";
 import { Task } from "../../db/repositories/TaskRepository";
+import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { stallFor } from "../../util/promises/stallFor";
+import { toPlainText } from "../../util/slate";
 import { and, chain, checkClientServerToken, ifArgDefined } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { presendPetition } from "../helpers/presendPetition";
 import { prefillPetition } from "../helpers/prefillPetition";
+import { presendPetition } from "../helpers/presendPetition";
 import { RESULT } from "../helpers/result";
 import { jsonArg } from "../helpers/scalars";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
@@ -27,7 +30,6 @@ import { validEmail } from "../helpers/validators/validEmail";
 import { validRichTextContent } from "../helpers/validators/validRichTextContent";
 import { fieldAttachmentBelongsToField, fieldsHaveCommentsEnabled } from "../petition/authorizers";
 import { tasksAreOfType } from "../task/authorizers";
-import { decode, JwtPayload } from "jsonwebtoken";
 import {
   authenticatePublicAccess,
   commentsBelongsToAccess,
@@ -39,7 +41,6 @@ import {
   validPublicPetitionLinkPrefill,
   validPublicPetitionLinkSlug,
 } from "./authorizers";
-import { toPlainText } from "../../util/slate";
 
 function anonymizePart(part: string) {
   return part.length > 2
@@ -59,11 +60,13 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
     name: "PublicAccessVerification",
     definition(t) {
       t.boolean("isAllowed");
+      t.nullable.boolean("isContactlessAccess");
       t.nullable.string("cookieName");
       t.nullable.string("cookieValue");
       t.nullable.string("email");
       t.nullable.string("orgLogoUrl");
       t.nullable.string("orgName");
+      t.nullable.string("ownerName");
       t.nullable.field("tone", {
         type: "Tone",
       });
@@ -93,7 +96,19 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
       ip: args.ip ?? null,
       userAgent: args.userAgent ?? null,
     };
-    const contactId = ctx.contact!.id;
+    const contactId = ctx.contact?.id;
+
+    if (!isDefined(contactId)) {
+      const owner = (await ctx.petitions.loadPetitionOwner(petition.id))!;
+      const data = (await ctx.users.loadUserData(owner.user_data_id))!;
+
+      return {
+        isAllowed: false,
+        isContactlessAccess: true,
+        ownerName: fullName(data.first_name, data.last_name),
+      };
+    }
+
     if (await ctx.contacts.hasContactAuthentication(contactId)) {
       const cookieValue = getContactAuthCookieValue(ctx.req, contactId);
       const authenticationId = cookieValue
@@ -161,6 +176,7 @@ export const publicSendVerificationCode = mutationField("publicSendVerificationC
   authorize: fetchPetitionAccess("keycode"),
   args: {
     keycode: nonNull(idArg()),
+    isContactVerification: booleanArg(),
   },
   resolve: async (_, args, ctx) => {
     return await stallFor(async function () {
@@ -169,7 +185,10 @@ export const publicSendVerificationCode = mutationField("publicSendVerificationC
         user_agent: ctx.req!.headers["user-agent"] ?? null,
         ip: getClientIp(ctx.req),
       });
-      await ctx.emails.sendContactAuthenticationRequestEmail(request.id);
+      await ctx.emails.sendContactAuthenticationRequestEmail(
+        request.id,
+        args.isContactVerification ?? false
+      );
       return {
         token,
         expiresAt: request.expires_at,

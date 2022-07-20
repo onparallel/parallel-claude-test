@@ -20,6 +20,7 @@ import {
   BellOffIcon,
   BellSettingsIcon,
   ChevronDownIcon,
+  PaperclipIcon,
   SettingsIcon,
   UserCheckIcon,
   UserPlusIcon,
@@ -32,6 +33,7 @@ import {
 import { FORMATS } from "@parallel/utils/dates";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 import { Card, CardHeader } from "../common/Card";
 import { ContactReference } from "../common/ContactReference";
 import { DateTime } from "../common/DateTime";
@@ -215,9 +217,9 @@ function usePetitionAccessesColumns(): TableColumn<
           id: "petition-accesses.contact-header",
           defaultMessage: "Contact",
         }),
-        CellContent: ({ row: { contact, remindersOptOut } }) => (
+        CellContent: ({ row: { contact, remindersOptOut, isContactless } }) => (
           <HStack>
-            <ContactReference contact={contact} />
+            <ContactReference contact={contact} isEmpty={isContactless} />
             {remindersOptOut ? (
               <Tooltip
                 label={intl.formatMessage({
@@ -246,7 +248,15 @@ function usePetitionAccessesColumns(): TableColumn<
           id: "petition-accesses.status-header",
           defaultMessage: "Status",
         }),
-        CellContent: ({ row: { status } }) => {
+        CellContent: ({ row: { status, isContactless } }) => {
+          if (isContactless) {
+            return (
+              <Text color="yellow.500">
+                <FormattedMessage id="petition-access.status-pending" defaultMessage="Pending" />
+              </Text>
+            );
+          }
+
           return status === "ACTIVE" ? (
             <Text color="green.500">
               <FormattedMessage id="petition-access.status-active" defaultMessage="Active" />
@@ -325,18 +335,46 @@ function usePetitionAccessesColumns(): TableColumn<
             onDeactivateAccess,
             onReactivateAccess,
           } = context!;
-          const { id, status, contact, remindersOptOut } = row;
+          const { id, status, contact, remindersOptOut, isContactless } = row;
           const intl = useIntl();
 
           const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
-          const contactHasActiveAccess = petition.accesses.some(
-            (access) => access.contact?.id === contact?.id && access.status === "ACTIVE"
-          );
+          if (!isContactless && !isDefined(contact)) return null;
 
-          return contact ? (
+          if (status === "INACTIVE") {
+            return (
+              <Stack direction="row" spacing={2} justifyContent="flex-end">
+                <IconButtonWithTooltip
+                  label={intl.formatMessage({
+                    id: "petition-accesses.activate-access",
+                    defaultMessage: "Reactivate access",
+                  })}
+                  onClick={() => onReactivateAccess(id)}
+                  placement="left"
+                  icon={<UserCheckIcon fontSize="16px" />}
+                  size="sm"
+                  isDisabled={petition.isAnonymized}
+                />
+              </Stack>
+            );
+          }
+
+          return (
             <Stack direction="row" spacing={2} justifyContent="flex-end">
-              {status === "ACTIVE" ? (
+              {isContactless ? (
+                <IconButtonWithTooltip
+                  label={intl.formatMessage({
+                    id: "generic.copy-link",
+                    defaultMessage: "Copy link",
+                  })}
+                  onClick={() => {}}
+                  placement="left"
+                  icon={<PaperclipIcon fontSize="16px" />}
+                  size="sm"
+                  isDisabled={petition.isAnonymized}
+                />
+              ) : (
                 <>
                   <IconButtonWithTooltip
                     isDisabled={
@@ -369,33 +407,21 @@ function usePetitionAccessesColumns(): TableColumn<
                     icon={<BellSettingsIcon fontSize="16px" />}
                     size="sm"
                   />
-                  <IconButtonWithTooltip
-                    label={intl.formatMessage({
-                      id: "petition-accesses.deactivate-access",
-                      defaultMessage: "Remove access",
-                    })}
-                    onClick={() => onDeactivateAccess(id)}
-                    placement="bottom"
-                    icon={<UserXIcon fontSize="16px" />}
-                    size="sm"
-                    isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
-                  />
                 </>
-              ) : (
-                <IconButtonWithTooltip
-                  label={intl.formatMessage({
-                    id: "petition-accesses.activate-access",
-                    defaultMessage: "Reactivate access",
-                  })}
-                  onClick={() => onReactivateAccess(id)}
-                  placement="left"
-                  icon={<UserCheckIcon fontSize="16px" />}
-                  size="sm"
-                  isDisabled={petition.isAnonymized || contactHasActiveAccess}
-                />
               )}
+              <IconButtonWithTooltip
+                label={intl.formatMessage({
+                  id: "petition-accesses.deactivate-access",
+                  defaultMessage: "Remove access",
+                })}
+                onClick={() => onDeactivateAccess(id)}
+                placement="bottom"
+                icon={<UserXIcon fontSize="16px" />}
+                size="sm"
+                isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
+              />
             </Stack>
-          ) : null;
+          );
         },
       },
     ],
@@ -435,6 +461,7 @@ PetitionAccessesTable.fragments = {
       remindersConfig {
         ...PetitionAccessTable_PetitionAccessRemindersConfig
       }
+      isContactless
       createdAt
     }
     ${ContactReference.fragments.Contact}

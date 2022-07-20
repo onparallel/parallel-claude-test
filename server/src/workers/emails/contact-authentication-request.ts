@@ -7,7 +7,7 @@ import { fullName } from "../../util/fullName";
 import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function contactAuthenticationRequest(
-  payload: { contact_authentication_request_id: number },
+  payload: { contact_authentication_request_id: number; is_contact_verification: boolean },
   context: WorkerContext
 ) {
   const request = await context.contacts.loadContactAuthenticationRequest(
@@ -56,6 +56,7 @@ export async function contactAuthenticationRequest(
       tone: organization!.preferred_tone,
       theme: organization!.brand_theme,
       removeParallelBranding: hasRemoveParallelBranding,
+      isContactVerification: payload.is_contact_verification,
       ...layoutProps,
     },
     { locale: petition.locale }

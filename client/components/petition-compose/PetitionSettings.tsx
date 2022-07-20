@@ -477,12 +477,7 @@ function _PetitionSettings({
               isPublicTemplate || petition.isRestricted || myEffectivePermission === "READ"
             }
             icon={<LinkIcon />}
-            label={
-              <FormattedMessage
-                id="component.petition-settings.share-by-link"
-                defaultMessage="Share by link"
-              />
-            }
+            label={<FormattedMessage id="generic.share-by-link" defaultMessage="Share by link" />}
             description={
               <FormattedMessage
                 id="component.petition-settings.share-by-link-description"

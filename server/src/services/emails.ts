@@ -49,7 +49,10 @@ export interface IEmailsService {
     pdfExportTitle: Maybe<string>
   ): Promise<void>;
   sendPetitionMessageBouncedEmail(emailLogId: number): Promise<void>;
-  sendContactAuthenticationRequestEmail(requestId: number): Promise<void>;
+  sendContactAuthenticationRequestEmail(
+    requestId: number,
+    isContactVerification: boolean
+  ): Promise<void>;
   sendAccessDelegatedEmail(
     petitionId: number,
     originalAccessId: number,
@@ -219,10 +222,11 @@ export class EmailsService implements IEmailsService {
     });
   }
 
-  async sendContactAuthenticationRequestEmail(requestId: number) {
+  async sendContactAuthenticationRequestEmail(requestId: number, isContactVerification: boolean) {
     return await this.enqueueEmail("contact-authentication-request", {
       id: this.buildQueueId("ContactAuthenticationRequest", requestId),
       contact_authentication_request_id: requestId,
+      is_contact_verification: isContactVerification,
     });
   }
 

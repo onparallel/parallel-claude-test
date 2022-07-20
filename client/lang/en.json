@@ -660,6 +660,11 @@
     "context": "Import contacts"
   },
   {
+    "term": "component.contact-reference.empty",
+    "definition": "Empty",
+    "context": "Empty"
+  },
+  {
     "term": "component.contact-select.bounced-email-tooltip",
     "definition": "Previously bounced email",
     "context": "Previously bounced email"
@@ -2375,6 +2380,16 @@
     "context": "You have reached your limit of parallels sent, <a>reach out to us to upgrade your plan.</a>"
   },
   {
+    "term": "component.petition-link-dialog.body-1",
+    "definition": "The link to access this parallel has been generated.",
+    "context": "The link to access this parallel has been generated."
+  },
+  {
+    "term": "component.petition-link-dialog.body-2",
+    "definition": "This link is individual and <b>can only be used once</b>. If you want to add more recipients you can do it from the {activityLink} tab.",
+    "context": "This link is individual and <b>can only be used once</b>. If you want to add more recipients you can do it from the {activityLink} tab."
+  },
+  {
     "term": "component.petition-list-shared-with-filter.add-filter",
     "definition": "Add filter",
     "context": "Add filter"
@@ -2698,11 +2713,6 @@
     "term": "component.petition-settings.share-automatically-description",
     "definition": "Specify which users or teams the parallels created from this template are shared with.",
     "context": "Specify which users or teams the parallels created from this template are shared with."
-  },
-  {
-    "term": "component.petition-settings.share-by-link",
-    "definition": "Share by link",
-    "context": "Share by link"
   },
   {
     "term": "component.petition-settings.share-by-link-description",
@@ -3408,6 +3418,21 @@
     "term": "component.recipient-select-groups.unknown-recipients",
     "definition": "We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list.",
     "context": "We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list."
+  },
+  {
+    "term": "component.recipient-view-contactless-form.access",
+    "definition": "Access",
+    "context": "Access"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.has-shared-with-you",
+    "definition": "{ownerName} has shared with you an access to Parallel.",
+    "context": "{ownerName} has shared with you an access to Parallel."
+  },
+  {
+    "term": "component.recipient-view-contactless-form.heading",
+    "definition": "Enter your data to access",
+    "context": "Enter your data to access"
   },
   {
     "term": "component.recipient-view-content-card.comment-count",
@@ -4655,6 +4680,26 @@
     "context": "and <b>{extra} more</b>"
   },
   {
+    "term": "components.recipient-view-contactless-help-dialog.body-1",
+    "definition": "If you have received this link, it means that someone is requesting information from you. After identifying yourself, you will <b>receive an email</b> to access and complete it.",
+    "context": "If you have received this link, it means that someone is requesting information from you. After identifying yourself, you will <b>receive an email</b> to access and complete it."
+  },
+  {
+    "term": "components.recipient-view-contactless-help-dialog.body-2",
+    "definition": "This link is personal and unique, so it cannot be shared. Once inside, you will be able to invite the collaborators you need.",
+    "context": "This link is personal and unique, so it cannot be shared. Once inside, you will be able to invite the collaborators you need."
+  },
+  {
+    "term": "components.recipient-view-contactless-help-dialog.faq",
+    "definition": "See more frequently asked questions",
+    "context": "See more frequently asked questions"
+  },
+  {
+    "term": "components.recipient-view-contactless-help-dialog.header",
+    "definition": "Why do we ask for this data?",
+    "context": "Why do we ask for this data?"
+  },
+  {
     "term": "components.table.change-sorting",
     "definition": "Change sorting for \"{column}\"",
     "context": "Change sorting for \"{column}\""
@@ -5665,14 +5710,14 @@
     "context": "Draft"
   },
   {
-    "term": "generic.parallel-status.pending",
-    "definition": "Pending",
-    "context": "Pending"
-  },
-  {
     "term": "generic.parallel-type-plural",
     "definition": "Parallels",
     "context": "Parallels"
+  },
+  {
+    "term": "generic.pending",
+    "definition": "Pending",
+    "context": "Pending"
   },
   {
     "term": "generic.plans.enterprise",
@@ -5758,6 +5803,11 @@
     "term": "generic.share",
     "definition": "Share",
     "context": "Share"
+  },
+  {
+    "term": "generic.share-by-link",
+    "definition": "Share by link",
+    "context": "Share by link"
   },
   {
     "term": "generic.show-more-less",
@@ -6853,6 +6903,11 @@
     "term": "petition-access.status-inactive",
     "definition": "Inactive",
     "context": "Inactive"
+  },
+  {
+    "term": "petition-access.status-pending",
+    "definition": "Pending",
+    "context": "Pending"
   },
   {
     "term": "petition-accesses.activate-access",
@@ -8280,6 +8335,16 @@
     "context": "Try for free"
   },
   {
+    "term": "recipient-view.cant-find-email-help",
+    "definition": "<b>Can't find our email?</b> Check your spam folder and if it's not there, contact the person who shared the link with you.",
+    "context": "<b>Can't find our email?</b> Check your spam folder and if it's not there, contact the person who shared the link with you."
+  },
+  {
+    "term": "recipient-view.change-email",
+    "definition": "Change email",
+    "context": "Change email"
+  },
+  {
     "term": "recipient-view.complete-petition.error-message",
     "definition": "It looks like the parallel has been updated since you last accessed it. Please refresh your browser and try again. You will not lose your submitted answers.",
     "context": "It looks like the parallel has been updated since you last accessed it. Please refresh your browser and try again. You will not lose your submitted answers."
@@ -8558,6 +8623,11 @@
     "term": "recipient-view.verify-button",
     "definition": "Verify code",
     "context": "Verify code"
+  },
+  {
+    "term": "recipient-view.verify-title",
+    "definition": "Enter verification code",
+    "context": "Enter verification code"
   },
   {
     "term": "settings.account",
@@ -8968,6 +9038,11 @@
     "term": "timeline.petition-completed-description",
     "definition": "{userIsYou, select, true {You} other {{name}}} completed the parallel {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{name}}} completed the parallel {timeAgo}"
+  },
+  {
+    "term": "timeline.petition-contactless-link-created-description",
+    "definition": "{userIsYou, select, true {You} other {{user}}} created a link access {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} created a link access {timeAgo}"
   },
   {
     "term": "timeline.petition-correct-notified-description",

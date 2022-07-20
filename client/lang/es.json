@@ -660,6 +660,11 @@
     "context": "Import contacts"
   },
   {
+    "term": "component.contact-reference.empty",
+    "definition": "Vacío",
+    "context": "Empty"
+  },
+  {
     "term": "component.contact-select.bounced-email-tooltip",
     "definition": "Correo rebotado previamente",
     "context": "Previously bounced email"
@@ -2375,6 +2380,16 @@
     "context": "You have reached your limit of parallels sent, <a>reach out to us to upgrade your plan.</a>"
   },
   {
+    "term": "component.petition-link-dialog.body-1",
+    "definition": "Se ha generado el enlace para acceder a este parallel.",
+    "context": "The link to access this parallel has been generated."
+  },
+  {
+    "term": "component.petition-link-dialog.body-2",
+    "definition": "Este enlace es individual y <b>solo podrá usarse una vez</b>. Si quieres añadir más destinatarios puedes hacerlo desde la pestaña de {activityLink}.",
+    "context": "This link is individual and <b>can only be used once</b>. If you want to add more recipients you can do it from the {activityLink} tab."
+  },
+  {
     "term": "component.petition-list-shared-with-filter.add-filter",
     "definition": "Añadir filtro",
     "context": "Add filter"
@@ -2698,11 +2713,6 @@
     "term": "component.petition-settings.share-automatically-description",
     "definition": "Indica los usuarios y equipos a los que quieras que se compartan los parallels creados a partir de esta plantilla.",
     "context": "Specify which users or teams the parallels created from this template are shared with."
-  },
-  {
-    "term": "component.petition-settings.share-by-link",
-    "definition": "Compartir por enlace",
-    "context": "Share by link"
   },
   {
     "term": "component.petition-settings.share-by-link-description",
@@ -3176,7 +3186,7 @@
   },
   {
     "term": "component.public-signup-form-inbox.description-two",
-    "definition": "¿No encuentras nuestro mail? Revisa la bandeja de spam y si no está ponte en contacto con nuestro <Link>Equipo de soporte</Link>.",
+    "definition": "¿No encuentras nuestro correo? Revisa la bandeja de spam y si no está ponte en contacto con nuestro <Link>Equipo de soporte</Link>.",
     "context": "Didn't receive our email? Check your spam folder and if you don't found it contact with our <Link>Support team</Link>."
   },
   {
@@ -3408,6 +3418,21 @@
     "term": "component.recipient-select-groups.unknown-recipients",
     "definition": "No hemos encontrado {count, plural, =1 {a {email}} other {algunos emails}} en tu lista de contactos.",
     "context": "We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list."
+  },
+  {
+    "term": "component.recipient-view-contactless-form.access",
+    "definition": "Acceder",
+    "context": "Access"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.has-shared-with-you",
+    "definition": "{ownerName} {tone, select, INFORMAL {te} other {le}} ha compartido un acceso a Parallel.",
+    "context": "{ownerName} has shared with you an access to Parallel."
+  },
+  {
+    "term": "component.recipient-view-contactless-form.heading",
+    "definition": "Introduce {tone, select, INFORMAL {tus} other {sus}} datos para acceder",
+    "context": "Enter your data to access"
   },
   {
     "term": "component.recipient-view-content-card.comment-count",
@@ -4655,6 +4680,26 @@
     "context": "and <b>{extra} more</b>"
   },
   {
+    "term": "components.recipient-view-contactless-help-dialog.body-1",
+    "definition": "{tone, select, INFORMAL{Si te han compartido este enlace, significa que van a solicitarte información. Una vez identificado, te <b>enviaremos un correo</b> para que puedas acceder y completarla.} other{Si ha recibido este enlace, quiere decir que alguien le solicita una información. Tras identificarse, <b>recibirá un correo</b> que le permitirá acceder y completarla.}}",
+    "context": "If you have received this link, it means that someone is requesting information from you. After identifying yourself, you will <b>receive an email</b> to access and complete it."
+  },
+  {
+    "term": "components.recipient-view-contactless-help-dialog.body-2",
+    "definition": "Este enlace es personal y único, por lo que no puede compartirse. {tone, select, INFORMAL{Una vez dentro, podrás invitar a los colaboradores que necesites.} other{Una vez dentro, podrá invitar a los colaboradores que necesite.}}",
+    "context": "This link is personal and unique, so it cannot be shared. Once inside, you will be able to invite the collaborators you need."
+  },
+  {
+    "term": "components.recipient-view-contactless-help-dialog.faq",
+    "definition": "Ver más preguntas frecuentes",
+    "context": "See more frequently asked questions"
+  },
+  {
+    "term": "components.recipient-view-contactless-help-dialog.header",
+    "definition": "¿Por qué pedimos estos datos?",
+    "context": "Why do we ask for this data?"
+  },
+  {
     "term": "components.table.change-sorting",
     "definition": "Cambiar ordenación para \"{column}\"",
     "context": "Change sorting for \"{column}\""
@@ -5665,14 +5710,14 @@
     "context": "Draft"
   },
   {
-    "term": "generic.parallel-status.pending",
-    "definition": "Pendiente",
-    "context": "Pending"
-  },
-  {
     "term": "generic.parallel-type-plural",
     "definition": "Parallels",
     "context": "Parallels"
+  },
+  {
+    "term": "generic.pending",
+    "definition": "Pendiente",
+    "context": "Pending"
   },
   {
     "term": "generic.plans.enterprise",
@@ -5758,6 +5803,11 @@
     "term": "generic.share",
     "definition": "Compartir",
     "context": "Share"
+  },
+  {
+    "term": "generic.share-by-link",
+    "definition": "Compartir por enlace",
+    "context": "Share by link"
   },
   {
     "term": "generic.show-more-less",
@@ -6853,6 +6903,11 @@
     "term": "petition-access.status-inactive",
     "definition": "Inactivo",
     "context": "Inactive"
+  },
+  {
+    "term": "petition-access.status-pending",
+    "definition": "Pendiente",
+    "context": "Pending"
   },
   {
     "term": "petition-accesses.activate-access",
@@ -8280,6 +8335,16 @@
     "context": "Try for free"
   },
   {
+    "term": "recipient-view.cant-find-email-help",
+    "definition": "{tone, select, INFORMAL{<b>¿No encuentras nuestro correo?</b> Revisa la bandeja de spam y si no está ponte en contacto con la persona que te haya compartido el enlace.} other{<b>Si no encuentra el correo</b> revisa la bandeja de spam y si no está póngase en contacto con la persona que le compartiera el enlace.}}",
+    "context": "<b>Can't find our email?</b> Check your spam folder and if it's not there, contact the person who shared the link with you."
+  },
+  {
+    "term": "recipient-view.change-email",
+    "definition": "Cambiar correo electrónico",
+    "context": "Change email"
+  },
+  {
     "term": "recipient-view.complete-petition.error-message",
     "definition": "Parece que el parallel ha sido actualizado desde la última vez que ha accedido. Por favor, actualice su navegador e inténtelo de nuevo. No perderá sus respuestas enviadas.",
     "context": "It looks like the parallel has been updated since you last accessed it. Please refresh your browser and try again. You will not lose your submitted answers."
@@ -8560,6 +8625,11 @@
     "context": "Verify code"
   },
   {
+    "term": "recipient-view.verify-title",
+    "definition": "Introduce el código de verificación",
+    "context": "Enter verification code"
+  },
+  {
     "term": "settings.account",
     "definition": "Cuenta",
     "context": "Account"
@@ -8821,7 +8891,7 @@
   },
   {
     "term": "timeline.access-deactivated-manual-description",
-    "definition": "{userIsYou, select, true {Revocaste} other {{user} revocó}} el acceso a {contact} {timeAgo}",
+    "definition": "{userIsYou, select, true {Quitaste} other {{user} quitó}} el acceso a {contact} {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{user}}} removed access to {contact} {timeAgo}"
   },
   {
@@ -8968,6 +9038,11 @@
     "term": "timeline.petition-completed-description",
     "definition": "{userIsYou, select, true {Completaste} other {{name} completó}} el parallel {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{name}}} completed the parallel {timeAgo}"
+  },
+  {
+    "term": "timeline.petition-contactless-link-created-description",
+    "definition": "{userIsYou, select, true {Creaste} other {{user} creó}} un acceso por enlace {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} created a link access {timeAgo}"
   },
   {
     "term": "timeline.petition-correct-notified-description",

@@ -39,6 +39,7 @@ import { TimelinePetitionMessageBouncedEvent } from "./timeline/TimelinePetition
 import { TimelinePetitionReminderBouncedEvent } from "./timeline/TimelinePetitionReminderBouncedEvent";
 import { TimelineSignatureOpenedEvent } from "./timeline/TimelineSignatureOpenedEvent";
 import { TimelinePetitionAnonymizedEvent } from "./timeline/TimelinePetitionAnonymizedEvent";
+import { TimelinePetitionContactlessLinkCreatedEvent } from "./timeline/TimelinePetitionContactlessLinkCreatedEvent";
 
 export type PetitionActivityTimelineProps = {
   userId: string;
@@ -139,6 +140,8 @@ export function PetitionActivityTimeline({
               <TimelinePetitionReminderBouncedEvent event={event} />
             ) : event.__typename === "PetitionAnonymizedEvent" ? (
               <TimelinePetitionAnonymizedEvent event={event} />
+            ) : event.__typename === "PetitionContactlessLinkCreatedEvent" ? (
+              <TimelinePetitionContactlessLinkCreatedEvent event={event} userId={userId} />
             ) : (
               <pre>{JSON.stringify(event, null, "  ")}</pre>
             )}
@@ -274,6 +277,9 @@ PetitionActivityTimeline.fragments = {
       ... on PetitionAnonymizedEvent {
         ...TimelinePetitionAnonymizedEvent_PetitionAnonymizedEvent
       }
+      ... on PetitionContactlessLinkCreatedEvent {
+        ...TimelinePetitionContactlessLinkCreatedEvent_PetitionContactlessLinkCreatedEvent
+      }
     }
     ${TimelinePetitionCreatedEvent.fragments.PetitionCreatedEvent}
     ${TimelinePetitionCompletedEvent.fragments.PetitionCompletedEvent}
@@ -312,5 +318,6 @@ PetitionActivityTimeline.fragments = {
     ${TimelinePetitionMessageBouncedEvent.fragments.PetitionMessageBouncedEvent}
     ${TimelinePetitionReminderBouncedEvent.fragments.PetitionReminderBouncedEvent}
     ${TimelinePetitionAnonymizedEvent.fragments.PetitionAnonymizedEvent}
+    ${TimelinePetitionContactlessLinkCreatedEvent.fragments.PetitionContactlessLinkCreatedEvent}
   `,
 };

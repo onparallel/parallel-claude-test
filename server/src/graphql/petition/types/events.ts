@@ -103,6 +103,8 @@ export const PetitionEvent = interfaceType({
         return "PetitionReminderBouncedEvent";
       case "PETITION_ANONYMIZED":
         return "PetitionAnonymizedEvent";
+      case "PETITION_CONTACTLESS_LINK_CREATED":
+        return "PetitionContactlessLinkCreatedEvent";
     }
   },
   sourceType: "events.PetitionEvent",
@@ -662,3 +664,15 @@ export const PetitionReminderBouncedEvent = createPetitionEvent(
 );
 
 export const PetitionAnonymizedEvent = createPetitionEvent("PetitionAnonymizedEvent", (t) => {});
+
+export const PetitionContactlessLinkCreatedEvent = createPetitionEvent(
+  "PetitionContactlessLinkCreatedEvent",
+  (t) => {
+    t.nullable.field("user", {
+      type: "User",
+      resolve: async (root, _, ctx) => {
+        return await ctx.users.loadUser(root.data.user_id);
+      },
+    });
+  }
+);
