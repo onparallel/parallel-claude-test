@@ -12,6 +12,7 @@
         "organizationName": "Organization",
         "apiKeyHint": "aBcDeFg",
         "petitionGID": "4exV9AsWJrjj7p8EL",
+        "userEmail": "mike@onparallel.com",
         "parallelUrl": "https://staging.onparallel.com",
         "assetsUrl": "https://static-staging.onparallel.com",
         "logoUrl": "http://static-staging.onparallel.com/static/emails/logo.png",
@@ -20,6 +21,7 @@
       "argTypes": {
         "organizationName": { "control": { "type": "text" } },
         "petitionGID": { "control": { "type": "text" } },
+        "userEmail": { "control": { "type": "text" } },
         "apiKeyHint": { "control": { "type": "text" } },
         "parallelUrl": { "control": { "type": "text" } },
         "assetsUrl": { "control": { "type": "text" } },

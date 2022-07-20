@@ -10,6 +10,8 @@ export async function internalSignaturitAccountDepletedCredits(
   context: WorkerContext
 ) {
   const org = await context.organizations.loadOrg(payload.orgId);
+  const user = await context.petitions.loadPetitionOwner(payload.petitionId);
+  const userData = await context.users.loadUserData(user!.user_data_id);
 
   const { html, text, subject, from } = await buildEmail(
     InternalSignaturitAccountDepletedCredits,
@@ -21,6 +23,7 @@ export async function internalSignaturitAccountDepletedCredits(
       apiKeyHint: payload.apiKeyHint,
       organizationName: org!.name,
       petitionGID: toGlobalId("Petition", payload.petitionId),
+      userEmail: userData!.email,
     },
     { locale: "es" }
   );

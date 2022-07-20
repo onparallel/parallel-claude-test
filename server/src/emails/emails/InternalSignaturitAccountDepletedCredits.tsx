@@ -6,6 +6,7 @@ import { Layout, LayoutProps } from "../components/Layout";
 type InternalSignaturitAccountDepletedCreditsProps = {
   organizationName: string;
   petitionGID: string;
+  userEmail: string;
   apiKeyHint: string;
 } & LayoutProps;
 
@@ -19,6 +20,7 @@ const email: Email<InternalSignaturitAccountDepletedCreditsProps> = {
   text({
     organizationName,
     petitionGID,
+    userEmail,
     apiKeyHint,
   }: InternalSignaturitAccountDepletedCreditsProps) {
     return outdent`
@@ -29,6 +31,7 @@ const email: Email<InternalSignaturitAccountDepletedCreditsProps> = {
 
       APIKEY: ${apiKeyHint}...
       ID del parallel: ${petitionGID}
+      Email del propietario del parallel: ${userEmail}
 
       Saludos,
       El bot.
@@ -38,6 +41,7 @@ const email: Email<InternalSignaturitAccountDepletedCreditsProps> = {
     organizationName,
     apiKeyHint,
     petitionGID,
+    userEmail,
     assetsUrl,
     parallelUrl,
     logoAlt,
@@ -67,6 +71,7 @@ const email: Email<InternalSignaturitAccountDepletedCreditsProps> = {
 
             <MjmlText>APIKEY: {apiKeyHint}...</MjmlText>
             <MjmlText>ID del parallel: {petitionGID}</MjmlText>
+            <MjmlText>Email del propietario del parallel: {userEmail}</MjmlText>
 
             <MjmlText> Saludos, El bot.</MjmlText>
           </MjmlColumn>
