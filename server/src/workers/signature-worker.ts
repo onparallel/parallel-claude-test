@@ -299,11 +299,13 @@ async function storeAuditTrail(
 }
 
 async function updateOrganizationBranding(payload: { orgId: number }, ctx: WorkerContext) {
-  const [organization, signatureIntegrations, hasRemoveParallelBranding] = await Promise.all([
-    ctx.organizations.loadOrg(payload.orgId),
-    ctx.integrations.loadIntegrationsByOrgId(payload.orgId, "SIGNATURE"),
-    ctx.featureFlags.orgHasFeatureFlag(payload.orgId, "REMOVE_PARALLEL_BRANDING"),
-  ]);
+  const [organization, signatureIntegrations, hasRemoveParallelBranding, layoutProps] =
+    await Promise.all([
+      ctx.organizations.loadOrg(payload.orgId),
+      ctx.integrations.loadIntegrationsByOrgId(payload.orgId, "SIGNATURE"),
+      ctx.featureFlags.orgHasFeatureFlag(payload.orgId, "REMOVE_PARALLEL_BRANDING"),
+      getLayoutProps(payload.orgId, ctx),
+    ]);
 
   if (!organization) {
     return;
@@ -328,7 +330,7 @@ async function updateOrganizationBranding(payload: { orgId: number }, ctx: Worke
           await client.updateBranding(brandingId, {
             locale,
             templateData: {
-              ...(await getLayoutProps(payload.orgId, ctx)),
+              ...layoutProps,
               tone: tone as Tone,
               theme: organization.brand_theme,
               removeParallelBranding: hasRemoveParallelBranding,
