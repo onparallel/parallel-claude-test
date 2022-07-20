@@ -8,6 +8,7 @@ import {
   OrganizationUsageDetails,
 } from "../db/repositories/OrganizationRepository";
 import { FeatureFlagName, Organization } from "../db/__types";
+import { SignatureService } from "./signature";
 
 export const TIERS_SERVICE = Symbol.for("TIERS_SERVICE");
 
@@ -30,7 +31,8 @@ export class TiersService implements ITiersService {
     @inject(IntegrationRepository) private integrations: IntegrationRepository,
     @inject(OrganizationRepository) private organizations: OrganizationRepository,
     @inject(FeatureFlagRepository)
-    private featureFlags: FeatureFlagRepository
+    private featureFlags: FeatureFlagRepository,
+    @inject(SignatureService) private signatures: SignatureService
   ) {}
 
   private readonly defaultAppSumoFFs: FeatureFlagName[] = [
@@ -103,7 +105,7 @@ export class TiersService implements ITiersService {
           tier.PETITION_SEND.period,
           t
         ),
-        this.integrations.removeSignaturitBrandingIds(org.id, updatedBy, t),
+        this.signatures.updateBranding(org.id, t),
       ]);
     }, t);
 

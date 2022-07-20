@@ -404,7 +404,7 @@ export const deletePetitions = mutationField("deletePetitions", {
             undefined,
             t
           ),
-          ctx.signature.cancelSignatureRequest(pendingSignatureRequests),
+          ctx.signature.cancelSignatureRequest(pendingSignatureRequests, t),
         ]);
       }
     });

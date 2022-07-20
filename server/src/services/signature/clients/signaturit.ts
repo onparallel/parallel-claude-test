@@ -1,9 +1,9 @@
 import { EventEmitter } from "events";
 import "reflect-metadata";
 import { isDefined } from "remeda";
-import SignaturitSDK, { BrandingParams, BrandingResponse } from "signaturit-sdk";
+import SignaturitSDK, { BrandingParams } from "signaturit-sdk";
 import { URLSearchParams } from "url";
-import { ISignatureClient, Recipient, SignatureOptions } from ".";
+import { BrandingIdKey, ISignatureClient, Recipient, SignatureOptions } from ".";
 import { Config } from "../../../config";
 import { IntegrationSettings } from "../../../db/repositories/IntegrationRepository";
 import { Tone } from "../../../db/__types";
@@ -15,6 +15,7 @@ import SignatureRequestedEmail from "../../../emails/emails/SignatureRequestedEm
 import { getBaseWebhookUrl } from "../../../util/getBaseWebhookUrl";
 import { toGlobalId } from "../../../util/globalId";
 import { downloadImageBase64 } from "../../../util/images";
+import { removeNotDefined } from "../../../util/remedaExtensions";
 import { II18nService } from "../../i18n";
 
 export class SignaturItClient extends EventEmitter implements ISignatureClient {
@@ -36,7 +37,7 @@ export class SignaturItClient extends EventEmitter implements ISignatureClient {
     );
   }
 
-  public async startSignatureRequest(
+  async startSignatureRequest(
     petitionId: string,
     files: string,
     recipients: Recipient[],
@@ -45,15 +46,13 @@ export class SignaturItClient extends EventEmitter implements ISignatureClient {
     const locale = opts.locale;
     const tone = opts.templateData?.tone ?? "INFORMAL";
 
-    const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as `${
-      | "EN"
-      | "ES"}_${Tone}_BRANDING_ID`;
+    const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as BrandingIdKey;
 
     let brandingId = this.settings[key];
 
     if (!brandingId) {
-      brandingId = (await this.createOrgBranding(opts)).id;
-      this.emit("branding_updated", { locale, brandingId, tone });
+      brandingId = await this.createBranding(opts);
+      this.emit("branding_created", { locale, brandingId, tone });
     }
 
     const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.parallelUrl);
@@ -91,29 +90,60 @@ export class SignaturItClient extends EventEmitter implements ISignatureClient {
     });
   }
 
-  public async cancelSignatureRequest(externalId: string) {
+  async cancelSignatureRequest(externalId: string) {
     return await this.sdk.cancelSignature(externalId);
   }
 
   // returns a binary encoded buffer of the signed document
-  public async downloadSignedDocument(externalId: string): Promise<Buffer> {
+  async downloadSignedDocument(externalId: string) {
     const [signatureId, documentId] = externalId.split("/");
     return Buffer.from(await this.sdk.downloadSignedDocument(signatureId, documentId));
   }
 
-  public async downloadAuditTrail(externalId: string) {
+  async downloadAuditTrail(externalId: string) {
     const [signatureId, documentId] = externalId.split("/");
     return Buffer.from(await this.sdk.downloadAuditTrail(signatureId, documentId));
   }
 
-  public async sendPendingSignatureReminder(signatureId: string) {
+  async sendPendingSignatureReminder(signatureId: string) {
     return await this.sdk.sendSignatureReminder(signatureId);
   }
 
-  private async createOrgBranding(opts: SignatureOptions): Promise<BrandingResponse> {
+  async updateBranding(
+    brandingId: string,
+    opts: Pick<SignatureOptions, "locale" | "templateData">
+  ) {
     const intl = await this.i18n.getIntl(opts.locale);
 
-    return await this.sdk.createBranding({
+    const branding = await this.sdk.updateBranding(
+      brandingId,
+      removeNotDefined({
+        layout_color: opts.templateData?.theme?.color,
+        logo: opts.templateData?.logoUrl
+          ? await downloadImageBase64(opts.templateData.logoUrl)
+          : undefined,
+        application_texts: {
+          open_sign_button: intl.formatMessage({
+            id: "signature-client.open-document",
+            defaultMessage: "Open document",
+          }),
+        },
+        templates: isDefined(opts.templateData)
+          ? await this.buildSignaturItBrandingTemplates({
+              locale: opts.locale,
+              templateData: opts.templateData!,
+            })
+          : undefined,
+      })
+    );
+
+    return branding.id;
+  }
+
+  private async createBranding(opts: SignatureOptions) {
+    const intl = await this.i18n.getIntl(opts.locale);
+
+    const branding = await this.sdk.createBranding({
       show_welcome_page: false,
       layout_color: opts.templateData?.theme?.color ?? "#6059F7",
       text_color: "#F6F6F6",
@@ -130,10 +160,12 @@ export class SignaturItClient extends EventEmitter implements ISignatureClient {
         ? await this.buildSignaturItBrandingTemplates(opts)
         : undefined,
     });
+
+    return branding.id;
   }
 
   private async buildSignaturItBrandingTemplates(
-    opts: SignatureOptions
+    opts: Pick<SignatureOptions, "locale" | "templateData">
   ): Promise<BrandingParams["templates"]> {
     const [
       { html: signatureRequestedEmail },

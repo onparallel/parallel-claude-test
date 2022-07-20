@@ -49,6 +49,8 @@ export type SignatureResponse = {
 
 export type Recipient = { email: string; name: string };
 
+export type BrandingIdKey = `${"EN" | "ES"}_${Tone}_BRANDING_ID`;
+
 export interface ISignatureClient {
   startSignatureRequest: (
     petitionId: string,
@@ -60,4 +62,8 @@ export interface ISignatureClient {
   downloadSignedDocument: (externalId: string) => Promise<Buffer>;
   downloadAuditTrail: (externalId: string) => Promise<Buffer>;
   sendPendingSignatureReminder: (signatureId: string) => Promise<SignatureResponse>;
+  updateBranding(
+    brandingId: string,
+    opts: Pick<SignatureOptions, "locale" | "templateData">
+  ): Promise<string>;
 }

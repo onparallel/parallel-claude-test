@@ -26,7 +26,7 @@ import { MaybeArray } from "../../util/types";
 import { AWS_SERVICE, IAws } from "../aws";
 import { FETCH_SERVICE, IFetchService } from "../fetch";
 import { I18N_SERVICE, II18nService } from "../i18n";
-import { ISignatureClient } from "./clients";
+import { BrandingIdKey, ISignatureClient } from "./clients";
 import { SignaturItClient } from "./clients/signaturit";
 
 export interface ISignatureService {
@@ -52,6 +52,7 @@ export interface ISignatureService {
     signature: PetitionSignatureRequest,
     signedDocumentExternalId: string
   ): Promise<void>;
+  updateBranding(orgId: number, t?: Knex.Transaction): Promise<void>;
 }
 
 export const SIGNATURE = Symbol.for("SIGNATURE");
@@ -81,11 +82,9 @@ export class SignatureService implements ISignatureService {
     const settings = integration.settings as IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
     const client = new SignaturItClient(settings, this.config, integration.org_id, this.i18n);
     client.on(
-      "branding_updated",
+      "branding_created",
       ({ locale, brandingId, tone }: { locale: string; brandingId: string; tone: Tone }) => {
-        const key = `${locale.toUpperCase()}_${tone.toUpperCase()}_BRANDING_ID` as `${
-          | "EN"
-          | "ES"}_${Tone}_BRANDING_ID`;
+        const key = `${locale.toUpperCase()}_${tone.toUpperCase()}_BRANDING_ID` as BrandingIdKey;
 
         settings[key] = brandingId;
 
@@ -311,6 +310,20 @@ export class SignatureService implements ISignatureService {
         }))
       );
     }
+  }
+
+  async updateBranding(orgId: number, t?: Knex.Transaction): Promise<void> {
+    await this.aws.enqueueMessages(
+      "signature-worker",
+      {
+        groupId: `signature-branding-${toGlobalId("Organization", orgId)}`,
+        body: {
+          type: "update-branding",
+          payload: { orgId },
+        },
+      },
+      t
+    );
   }
 
   /**

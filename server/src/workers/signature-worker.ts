@@ -1,4 +1,5 @@
 import { unlink } from "fs/promises";
+import pMap from "p-map";
 import { isDefined } from "remeda";
 import { WorkerContext } from "../context";
 import { IntegrationSettings } from "../db/repositories/IntegrationRepository";
@@ -6,12 +7,14 @@ import {
   PetitionSignatureConfigSigner,
   PetitionSignatureRequestCancelData,
 } from "../db/repositories/PetitionRepository";
-import { SignatureResponse } from "../services/signature/clients";
+import { OrgIntegration, Tone } from "../db/__types";
+import { BrandingIdKey, SignatureResponse } from "../services/signature/clients";
 import { fullName } from "../util/fullName";
 import { toGlobalId } from "../util/globalId";
-import { removeKeys } from "../util/remedaExtensions";
+import { removeKeys, removeNotDefined } from "../util/remedaExtensions";
 import { sanitizeFilenameWithSuffix } from "../util/sanitizeFilenameWithSuffix";
 import { random } from "../util/token";
+import { Replace } from "../util/types";
 import { createQueueWorker } from "./helpers/createQueueWorker";
 import { getLayoutProps } from "./helpers/getLayoutProps";
 
@@ -295,12 +298,67 @@ async function storeAuditTrail(
   });
 }
 
+async function updateOrganizationBranding(payload: { orgId: number }, ctx: WorkerContext) {
+  const [organization, signatureIntegrations, hasRemoveParallelBranding] = await Promise.all([
+    ctx.organizations.loadOrg(payload.orgId),
+    ctx.integrations.loadIntegrationsByOrgId(payload.orgId, "SIGNATURE"),
+    ctx.featureFlags.orgHasFeatureFlag(payload.orgId, "REMOVE_PARALLEL_BRANDING"),
+  ]);
+
+  if (!organization) {
+    return;
+  }
+
+  await pMap(
+    signatureIntegrations,
+    async (integration) => {
+      const settings = integration.settings;
+      const definedBrandingIds = removeNotDefined<Record<BrandingIdKey, string | undefined>>({
+        EN_FORMAL_BRANDING_ID: settings.EN_FORMAL_BRANDING_ID,
+        EN_INFORMAL_BRANDING_ID: settings.EN_INFORMAL_BRANDING_ID,
+        ES_FORMAL_BRANDING_ID: settings.ES_FORMAL_BRANDING_ID,
+        ES_INFORMAL_BRANDING_ID: settings.ES_INFORMAL_BRANDING_ID,
+      });
+
+      const client = ctx.signature.getClient(integration);
+
+      for (const [key, brandingId] of Object.entries(definedBrandingIds)) {
+        const [locale, tone] = key.split("_");
+        try {
+          settings[key as BrandingIdKey] = await client.updateBranding(brandingId, {
+            locale,
+            templateData: {
+              ...(await getLayoutProps(payload.orgId, ctx)),
+              tone: tone as Tone,
+              theme: organization.brand_theme,
+              removeParallelBranding: hasRemoveParallelBranding,
+            },
+          });
+        } catch (error) {
+          console.error(
+            `Error updating ${key} branding on OrgIntegration:${integration.id}:`,
+            error
+          );
+        }
+      }
+
+      await ctx.integrations.updateOrgIntegration(
+        integration.id,
+        { settings },
+        `OrgIntegration:${integration.id}`
+      );
+    },
+    { concurrency: 1 }
+  );
+}
+
 const handlers = {
   "start-signature-process": startSignatureProcess,
   "cancel-signature-process": cancelSignatureProcess,
   "send-signature-reminder": sendSignatureReminder,
   "store-signed-document": storeSignedDocument,
   "store-audit-trail": storeAuditTrail,
+  "update-branding": updateOrganizationBranding,
 };
 
 type HandlerType = keyof typeof handlers;
@@ -320,7 +378,10 @@ createQueueWorker("signature-worker", async (data: SignatureWorkerPayload, ctx) 
   await handlers[data.type](data.payload as any, ctx);
 });
 
-async function fetchOrgSignatureIntegration(orgIntegrationId: number, ctx: WorkerContext) {
+async function fetchOrgSignatureIntegration(
+  orgIntegrationId: number,
+  ctx: WorkerContext
+): Promise<Replace<OrgIntegration, { settings: IntegrationSettings<"SIGNATURE"> }>> {
   const signatureIntegration = await ctx.integrations.loadIntegration(orgIntegrationId);
 
   if (!signatureIntegration || signatureIntegration.type !== "SIGNATURE") {

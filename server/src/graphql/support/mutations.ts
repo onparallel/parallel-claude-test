@@ -235,10 +235,11 @@ export const createUser = mutationField("createUser", {
   },
 });
 
-export const resetSignaturitOrganizationBranding = mutationField(
-  "resetSignaturitOrganizationBranding",
+export const forceUpdateSignatureOrganizationBrandings = mutationField(
+  "forceUpdateSignatureOrganizationBrandings",
   {
-    description: "Removes the Signaturit Branding Ids of selected organization.",
+    description:
+      "Forces an update of the branding of every signature integration of the selected organization.",
     type: "SupportMethodResponse",
     args: {
       orgId: nonNull(intArg()),
@@ -253,10 +254,10 @@ export const resetSignaturitOrganizationBranding = mutationField(
             message: `Can't find organization with id ${orgId}`,
           };
         }
-        await ctx.integrations.removeSignaturitBrandingIds(orgId, `User:${ctx.user!.id}`);
+        await ctx.signature.updateBranding(orgId);
         return {
           result: RESULT.SUCCESS,
-          message: `Brandings resetted successfully`,
+          message: `Brandings queued to update successfully`,
         };
       } catch (e: any) {
         return { result: RESULT.FAILURE, message: e.message };
@@ -656,7 +657,7 @@ export const updateFeatureFlag = mutationField("updateFeatureFlag", {
     try {
       await ctx.featureFlags.addOrUpdateFeatureFlagOverride(orgId, { name: featureFlag, value });
       if (["REMOVE_PARALLEL_BRANDING"].includes(featureFlag)) {
-        await ctx.integrations.removeSignaturitBrandingIds(orgId, `User:${ctx.user!.id}`);
+        await ctx.signature.updateBranding(orgId);
       }
       return {
         result: RESULT.SUCCESS,

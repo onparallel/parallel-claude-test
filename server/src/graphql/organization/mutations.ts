@@ -60,16 +60,15 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
       `User:${ctx.user!.id}`
     );
 
-    const [org] = await Promise.all([
-      ctx.organizations.updateOrganization(
-        ctx.user!.org_id,
-        { [args.isIcon ? "icon_public_file_id" : "logo_public_file_id"]: logoFile.id },
-        `User:${ctx.user!.id}`
-      ),
-      args.isIcon
-        ? null
-        : ctx.integrations.removeSignaturitBrandingIds(ctx.user!.org_id, `User:${ctx.user!.id}`),
-    ]);
+    const org = await ctx.organizations.updateOrganization(
+      ctx.user!.org_id,
+      { [args.isIcon ? "icon_public_file_id" : "logo_public_file_id"]: logoFile.id },
+      `User:${ctx.user!.id}`
+    );
+
+    if (!args.isIcon) {
+      await ctx.signature.updateBranding(ctx.user!.org_id);
+    }
 
     return org;
   },
@@ -139,7 +138,7 @@ export const updateOrganizationBrandTheme = mutationField("updateOrganizationBra
       (isDefined(args.data.fontFamily) &&
         organization?.brand_theme?.fontFamily !== args.data.fontFamily)
     ) {
-      ctx.integrations.removeSignaturitBrandingIds(ctx.user!.org_id, `User:${ctx.user!.id}`);
+      await ctx.signature.updateBranding(ctx.user!.org_id);
     }
     return await ctx.organizations.updateOrganization(
       ctx.user!.org_id,

@@ -137,20 +137,6 @@ export class IntegrationRepository extends BaseRepository {
       );
   }
 
-  async removeSignaturitBrandingIds(orgId: number, updatedBy: string, t?: Knex.Transaction) {
-    await this.raw(
-      /* sql */ `
-      update org_integration 
-      set 
-        settings = settings - 'EN_FORMAL_BRANDING_ID' - 'ES_FORMAL_BRANDING_ID' - 'EN_INFORMAL_BRANDING_ID' - 'ES_INFORMAL_BRANDING_ID',
-        updated_by = ?,
-        updated_at = NOW()
-      where org_id = ? and provider = 'SIGNATURIT' and deleted_at is null`,
-      [updatedBy, orgId],
-      t
-    );
-  }
-
   async userHasAccessToIntegration(
     ids: number[],
     user: User,
