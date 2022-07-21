@@ -6,6 +6,7 @@ import {
   CreatePetitionPermission,
   CreateUserGroupMember,
   Organization,
+  OrganizationTheme,
   OrganizationUsageLimit,
   OrgIntegration,
   Petition,
@@ -17,6 +18,7 @@ import {
   UserGroupMember,
 } from "../src/db/__types";
 import { deleteAllData } from "../src/util/knexUtils";
+import { defaultPdfDocumentTheme } from "../src/util/PdfDocumentTheme";
 
 export async function seed(knex: Knex): Promise<any> {
   await deleteAllData(knex);
@@ -46,7 +48,9 @@ export async function seed(knex: Knex): Promise<any> {
     ],
     "id"
   );
+
   const orgIds = orgs.map((o) => o.id);
+
   const usersInfo = [
     {
       org_id: orgIds[0],
@@ -247,6 +251,21 @@ export async function seed(knex: Knex): Promise<any> {
 
   await knex<UserGroupMember>("user_group_member").insert(userGroupMembers);
 
+  const orgThemes = await knex<OrganizationTheme>("organization_theme").insert(
+    [
+      {
+        org_id: orgIds[0],
+        name: "Default theme",
+        type: "PDF_DOCUMENT",
+        is_default: true,
+        data: defaultPdfDocumentTheme,
+        created_by: `User:${userIds[0]}`,
+        updated_by: `User:${userIds[0]}`,
+      },
+    ],
+    "id"
+  );
+
   const petitions = await knex<Petition>("petition").insert(
     [
       {
@@ -280,6 +299,7 @@ export async function seed(knex: Knex): Promise<any> {
         "image_public_file_id": null
       }`,
         from_public_petition_link_id: null,
+        document_organization_theme_id: orgThemes[0].id,
       },
     ],
     "id"
