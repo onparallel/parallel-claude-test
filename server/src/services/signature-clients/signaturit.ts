@@ -3,7 +3,6 @@ import "reflect-metadata";
 import { isDefined } from "remeda";
 import SignaturitSDK, { BrandingParams } from "signaturit-sdk";
 import { URLSearchParams } from "url";
-import { BrandingIdKey, ISignatureClient, Recipient, SignatureOptions } from "./client";
 import { Config } from "../../config";
 import { IntegrationSettings } from "../../db/repositories/IntegrationRepository";
 import { buildEmail } from "../../emails/buildEmail";
@@ -12,18 +11,17 @@ import SignatureCompletedEmail from "../../emails/emails/SignatureCompletedEmail
 import SignatureReminderEmail from "../../emails/emails/SignatureReminderEmail";
 import SignatureRequestedEmail from "../../emails/emails/SignatureRequestedEmail";
 import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
-import { toGlobalId } from "../../util/globalId";
 import { downloadImageBase64 } from "../../util/images";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import { IFetchService } from "../fetch";
 import { II18nService } from "../i18n";
+import { BrandingIdKey, ISignatureClient, Recipient, SignatureOptions } from "./client";
 
 export class SignaturItClient extends EventEmitter implements ISignatureClient {
   private sdk: SignaturitSDK;
   constructor(
     private settings: IntegrationSettings<"SIGNATURE", "SIGNATURIT">,
     private config: Config,
-    private orgId: number,
     private i18n: II18nService
   ) {
     super();
@@ -64,6 +62,7 @@ export class SignaturItClient extends EventEmitter implements ISignatureClient {
 
   async startSignatureRequest(
     petitionId: string,
+    orgId: string,
     files: string,
     recipients: Recipient[],
     opts: SignatureOptions
@@ -89,7 +88,7 @@ export class SignaturItClient extends EventEmitter implements ISignatureClient {
       branding_id: brandingId,
       events_url: `${baseEventsUrl}/api/webhooks/signaturit/${petitionId}/events`,
       callback_url: `${this.config.misc.parallelUrl}/${locale}/thanks?${new URLSearchParams({
-        o: toGlobalId("Organization", this.orgId),
+        o: orgId,
       })}`,
       recipients: recipients.map((r, recipientIndex) => ({
         email: r.email,

@@ -93,7 +93,7 @@ export class SignatureService implements ISignatureService {
 
   private buildSignaturItClient(integration: OrgIntegration): SignaturItClient {
     const settings = integration.settings as IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
-    const client = new SignaturItClient(settings, this.config, integration.org_id, this.i18n);
+    const client = new SignaturItClient(settings, this.config, this.i18n);
     client.on(
       "branding_created",
       ({ locale, brandingId, tone }: { locale: string; brandingId: string; tone: Tone }) => {

@@ -54,6 +54,7 @@ export type BrandingIdKey = `${"EN" | "ES"}_${Tone}_BRANDING_ID`;
 export interface ISignatureClient {
   startSignatureRequest: (
     petitionId: string,
+    orgId: string,
     filePath: string,
     recipients: Recipient[],
     options: SignatureOptions

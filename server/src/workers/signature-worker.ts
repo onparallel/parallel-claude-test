@@ -82,6 +82,7 @@ async function startSignatureProcess(
     // send request to signature client
     const data = await signatureClient.startSignatureRequest(
       toGlobalId("Petition", petition.id),
+      toGlobalId("Organization", petition.org_id),
       documentTmpPath,
       recipients,
       {
