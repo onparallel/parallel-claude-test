@@ -1,6 +1,6 @@
-import { Tone } from "../../../db/__types";
-import { OrganizationBrandTheme } from "../../../emails/utils/ThemeProvider";
-import { PdfDocumentTheme } from "../../../util/PdfDocumentTheme";
+import { Tone } from "../../db/__types";
+import { OrganizationBrandTheme } from "../../emails/utils/ThemeProvider";
+import { PdfDocumentTheme } from "../../util/PdfDocumentTheme";
 
 type Document = {
   id: string;

@@ -2,34 +2,34 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import "reflect-metadata";
 import { countBy, isDefined, omit } from "remeda";
-import { CONFIG, Config } from "../../config";
+import { CONFIG, Config } from "../config";
 import {
   IntegrationRepository,
   IntegrationSettings,
   SignatureProvider,
-} from "../../db/repositories/IntegrationRepository";
-import { OrganizationRepository } from "../../db/repositories/OrganizationRepository";
+} from "../db/repositories/IntegrationRepository";
+import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import {
   PetitionRepository,
   PetitionSignatureConfig,
   PetitionSignatureConfigSigner,
-} from "../../db/repositories/PetitionRepository";
+} from "../db/repositories/PetitionRepository";
 import {
   OrgIntegration,
   PetitionAccess,
   PetitionSignatureRequest,
   Tone,
   User,
-} from "../../db/__types";
-import { unMaybeArray } from "../../util/arrays";
-import { toGlobalId } from "../../util/globalId";
-import { random } from "../../util/token";
-import { MaybeArray } from "../../util/types";
-import { AWS_SERVICE, IAws } from "../aws";
-import { FETCH_SERVICE, IFetchService } from "../fetch";
-import { I18N_SERVICE, II18nService } from "../i18n";
-import { BrandingIdKey, ISignatureClient } from "./clients";
-import { SignaturItClient } from "./clients/signaturit";
+} from "../db/__types";
+import { unMaybeArray } from "../util/arrays";
+import { toGlobalId } from "../util/globalId";
+import { random } from "../util/token";
+import { MaybeArray } from "../util/types";
+import { AWS_SERVICE, IAws } from "./aws";
+import { FETCH_SERVICE, IFetchService } from "./fetch";
+import { I18N_SERVICE, II18nService } from "./i18n";
+import { BrandingIdKey, ISignatureClient } from "./signature-clients/client";
+import { SignaturItClient } from "./signature-clients/signaturit";
 
 export interface ISignatureService {
   getClient(integration: OrgIntegration): ISignatureClient;

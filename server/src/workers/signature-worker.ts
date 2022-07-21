@@ -8,7 +8,7 @@ import {
   PetitionSignatureRequestCancelData,
 } from "../db/repositories/PetitionRepository";
 import { OrgIntegration, Tone } from "../db/__types";
-import { BrandingIdKey, SignatureResponse } from "../services/signature/clients";
+import { BrandingIdKey, SignatureResponse } from "../services/signature-clients/client";
 import { fullName } from "../util/fullName";
 import { toGlobalId } from "../util/globalId";
 import { removeKeys, removeNotDefined } from "../util/remedaExtensions";
