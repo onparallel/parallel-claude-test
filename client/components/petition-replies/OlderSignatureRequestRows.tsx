@@ -64,6 +64,7 @@ export function OlderSignatureRequestRows({
                   />
                 ) : null}
                 <ButtonWithMoreOptions
+                  size="sm"
                   colorScheme="primary"
                   as={ResponsiveButtonIcon}
                   icon={<DownloadIcon fontSize="lg" display="block" />}
