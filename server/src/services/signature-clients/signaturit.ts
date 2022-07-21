@@ -17,7 +17,7 @@ import { IFetchService } from "../fetch";
 import { II18nService } from "../i18n";
 import { BrandingIdKey, ISignatureClient, Recipient, SignatureOptions } from "./client";
 
-export class SignaturItClient extends EventEmitter implements ISignatureClient {
+export class SignaturItClient extends EventEmitter implements ISignatureClient<"SIGNATURIT"> {
   private sdk: SignaturitSDK;
   constructor(
     private settings: IntegrationSettings<"SIGNATURE", "SIGNATURIT">,
@@ -35,28 +35,39 @@ export class SignaturItClient extends EventEmitter implements ISignatureClient {
     );
   }
 
-  static async guessEnvironment(apiKey: string, fetch: IFetchService) {
+  get environment() {
+    return this.settings.ENVIRONMENT;
+  }
+
+  async authenticate(fetch: IFetchService) {
     return await Promise.any(
       Object.entries({
         sandbox: "https://api.sandbox.signaturit.com",
         production: "https://api.signaturit.com",
-      }).map(([environment, url]) =>
-        fetch
-          .fetchWithTimeout(
-            `${url}/v3/team/users.json`,
-            {
-              headers: { authorization: `Bearer ${apiKey}` },
-            },
-            5000
-          )
-          .then((res) => {
-            if (res.status === 200) {
-              return environment as "sandbox" | "production";
-            } else {
-              throw new Error();
-            }
-          })
-      )
+      })
+        .filter(([env]) => {
+          // if environment is already defined on settings, check only against that env.
+          // if nothing is defined, check both and store result
+          return !isDefined(this.settings.ENVIRONMENT) || env === this.settings.ENVIRONMENT;
+        })
+        .map(([environment, url]) =>
+          fetch
+            .fetchWithTimeout(
+              `${url}/v3/team/users.json`,
+              {
+                headers: { authorization: `Bearer ${this.settings.CREDENTIALS.API_KEY}` },
+              },
+              5000
+            )
+            .then((res) => {
+              if (res.status === 200) {
+                this.settings.ENVIRONMENT = environment as "sandbox" | "production";
+                return { environment: this.settings.ENVIRONMENT! };
+              } else {
+                throw new Error();
+              }
+            })
+        )
     );
   }
 

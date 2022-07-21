@@ -40,9 +40,14 @@ export const createSignatureIntegration = mutationField("createSignatureIntegrat
   },
   resolve: async (_, args, ctx) => {
     const [error, data] = await withError(
-      ctx.signature.validateCredentials("SIGNATURIT", { API_KEY: args.apiKey })
+      ctx.signature
+        .getClient({
+          provider: "SIGNATURIT",
+          settings: { CREDENTIALS: { API_KEY: args.apiKey } },
+        })
+        .authenticate(ctx.fetch)
     );
-    if (error) {
+    if (error || !data.environment) {
       throw new ApolloError(
         `Unable to check Signaturit APIKEY environment`,
         "INVALID_APIKEY_ERROR"
@@ -94,7 +99,12 @@ export const validateSignatureCredentials = mutationField("validateSignatureCred
   },
   resolve: async (_, args, ctx) => {
     try {
-      const data = await ctx.signature.validateCredentials(args.provider, args.credentials);
+      const data = await ctx.signature
+        .getClient({
+          provider: args.provider,
+          settings: { CREDENTIALS: args.credentials as any },
+        })
+        .authenticate(ctx.fetch);
       return { success: true, data };
     } catch {}
     return { success: false };
@@ -112,9 +122,14 @@ export const createSignaturitIntegration = mutationField("createSignaturitIntegr
   },
   resolve: async (_, args, ctx) => {
     const [error, data] = await withError(
-      ctx.signature.validateCredentials("SIGNATURIT", { API_KEY: args.apiKey })
+      ctx.signature
+        .getClient({
+          provider: "SIGNATURIT",
+          settings: { CREDENTIALS: { API_KEY: args.apiKey } },
+        })
+        .authenticate(ctx.fetch)
     );
-    if (error) {
+    if (error || !data.environment) {
       throw new ApolloError(
         `Unable to check Signaturit APIKEY environment`,
         "INVALID_APIKEY_ERROR"

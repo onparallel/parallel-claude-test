@@ -14,13 +14,7 @@ import {
   PetitionSignatureConfig,
   PetitionSignatureConfigSigner,
 } from "../db/repositories/PetitionRepository";
-import {
-  OrgIntegration,
-  PetitionAccess,
-  PetitionSignatureRequest,
-  Tone,
-  User,
-} from "../db/__types";
+import { PetitionAccess, PetitionSignatureRequest, Tone, User } from "../db/__types";
 import { unMaybeArray } from "../util/arrays";
 import { toGlobalId } from "../util/globalId";
 import { random } from "../util/token";
@@ -32,8 +26,11 @@ import { BrandingIdKey, ISignatureClient } from "./signature-clients/client";
 import { SignaturItClient } from "./signature-clients/signaturit";
 
 export interface ISignatureService {
-  getClient(integration: OrgIntegration): ISignatureClient;
-  validateCredentials(provider: SignatureProvider, credentials: any): Promise<any>;
+  getClient<TProvider extends SignatureProvider>(integration: {
+    id?: number;
+    provider: TProvider;
+    settings: IntegrationSettings<"SIGNATURE", TProvider>;
+  }): ISignatureClient<TProvider>;
   createSignatureRequest(
     petitionId: number,
     signatureConfig: PetitionSignatureConfig,
@@ -71,7 +68,11 @@ export class SignatureService implements ISignatureService {
     @inject(I18N_SERVICE) public readonly i18n: II18nService
   ) {}
 
-  public getClient(integration: OrgIntegration): ISignatureClient {
+  public getClient<TProvider extends SignatureProvider>(integration: {
+    id?: number;
+    provider: TProvider;
+    settings: IntegrationSettings<"SIGNATURE", TProvider>;
+  }): ISignatureClient<TProvider> {
     switch (integration.provider.toUpperCase()) {
       case "SIGNATURIT":
         return this.buildSignaturItClient(integration);
@@ -80,34 +81,27 @@ export class SignatureService implements ISignatureService {
     }
   }
 
-  /**
-   * runs validations on signature provider to make sure credentials are valid.
-   * @returns optional object with extra data for later configuration of the integration
-   */
-  async validateCredentials(provider: SignatureProvider, credentials: any) {
-    if (provider === "SIGNATURIT" && isDefined(credentials.API_KEY)) {
-      const environment = await SignaturItClient.guessEnvironment(credentials.API_KEY, this.fetch);
-      return { environment };
+  private buildSignaturItClient(integration: {
+    id?: number;
+    settings: IntegrationSettings<"SIGNATURE">;
+  }): SignaturItClient {
+    const client = new SignaturItClient(integration.settings, this.config, this.i18n);
+    if (isDefined(integration.id)) {
+      client.on(
+        "branding_created",
+        ({ locale, brandingId, tone }: { locale: string; brandingId: string; tone: Tone }) => {
+          const key = `${locale.toUpperCase()}_${tone.toUpperCase()}_BRANDING_ID` as BrandingIdKey;
+
+          integration.settings[key] = brandingId;
+
+          this.integrationRepository.updateOrgIntegration<"SIGNATURE">(
+            integration.id!,
+            { settings: integration.settings },
+            `OrgIntegration:${integration.id}`
+          );
+        }
+      );
     }
-  }
-
-  private buildSignaturItClient(integration: OrgIntegration): SignaturItClient {
-    const settings = integration.settings as IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
-    const client = new SignaturItClient(settings, this.config, this.i18n);
-    client.on(
-      "branding_created",
-      ({ locale, brandingId, tone }: { locale: string; brandingId: string; tone: Tone }) => {
-        const key = `${locale.toUpperCase()}_${tone.toUpperCase()}_BRANDING_ID` as BrandingIdKey;
-
-        settings[key] = brandingId;
-
-        this.integrationRepository.updateOrgIntegration<"SIGNATURE">(
-          integration.id,
-          { settings },
-          `OrgIntegration:${integration.id}`
-        );
-      }
-    );
     return client;
   }
 

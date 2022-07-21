@@ -1,6 +1,8 @@
+import { SignatureProvider } from "../../db/repositories/IntegrationRepository";
 import { Tone } from "../../db/__types";
 import { OrganizationBrandTheme } from "../../emails/utils/ThemeProvider";
 import { PdfDocumentTheme } from "../../util/PdfDocumentTheme";
+import { IFetchService } from "../fetch";
 
 type Document = {
   id: string;
@@ -51,7 +53,13 @@ export type Recipient = { email: string; name: string };
 
 export type BrandingIdKey = `${"EN" | "ES"}_${Tone}_BRANDING_ID`;
 
-export interface ISignatureClient {
+type AuthenticationResponse<TProvider extends SignatureProvider = any> = {
+  SIGNATURIT: { environment: "production" | "sandbox" };
+}[TProvider];
+
+export interface ISignatureClient<TProvider extends SignatureProvider = any> {
+  get environment(): "production" | "sandbox" | undefined;
+  authenticate(fetch: IFetchService): Promise<AuthenticationResponse<TProvider>>;
   startSignatureRequest: (
     petitionId: string,
     orgId: string,

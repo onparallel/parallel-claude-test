@@ -2,7 +2,7 @@ import { unlink } from "fs/promises";
 import pMap from "p-map";
 import { isDefined } from "remeda";
 import { WorkerContext } from "../context";
-import { IntegrationSettings } from "../db/repositories/IntegrationRepository";
+import { IntegrationSettings, SignatureProvider } from "../db/repositories/IntegrationRepository";
 import {
   PetitionSignatureConfigSigner,
   PetitionSignatureRequestCancelData,
@@ -17,6 +17,11 @@ import { random } from "../util/token";
 import { Replace } from "../util/types";
 import { createQueueWorker } from "./helpers/createQueueWorker";
 import { getLayoutProps } from "./helpers/getLayoutProps";
+
+type SignatureOrgIntegration = Replace<
+  OrgIntegration,
+  { settings: IntegrationSettings<"SIGNATURE">; provider: SignatureProvider }
+>;
 
 /** starts a signature request on the petition */
 async function startSignatureProcess(
@@ -180,9 +185,9 @@ async function cancelSignatureProcess(
 
     // here we need to lookup all signature integrations, also disabled and deleted ones
     // this is because the user could have deleted their signature integration, triggering a cancel of all pending signature requests
-    const signatureIntegration = await ctx.integrations.loadAnySignatureIntegration(
+    const signatureIntegration = (await ctx.integrations.loadAnySignatureIntegration(
       orgIntegrationId
-    );
+    )) as SignatureOrgIntegration | null;
 
     if (!signatureIntegration) {
       throw new Error(
@@ -313,7 +318,7 @@ async function updateOrganizationBranding(payload: { orgId: number }, ctx: Worke
   }
 
   await pMap(
-    signatureIntegrations,
+    signatureIntegrations as SignatureOrgIntegration[],
     async (integration) => {
       const settings = integration.settings;
       const definedBrandingIds = removeNotDefined<Record<BrandingIdKey, string | undefined>>({
@@ -378,7 +383,7 @@ createQueueWorker("signature-worker", async (data: SignatureWorkerPayload, ctx) 
 async function fetchOrgSignatureIntegration(
   orgIntegrationId: number,
   ctx: WorkerContext
-): Promise<Replace<OrgIntegration, { settings: IntegrationSettings<"SIGNATURE"> }>> {
+): Promise<SignatureOrgIntegration> {
   const signatureIntegration = await ctx.integrations.loadIntegration(orgIntegrationId);
 
   if (!signatureIntegration || signatureIntegration.type !== "SIGNATURE") {
@@ -387,7 +392,7 @@ async function fetchOrgSignatureIntegration(
     );
   }
 
-  return signatureIntegration;
+  return signatureIntegration as any;
 }
 
 async function fetchPetition(id: number, ctx: WorkerContext) {
