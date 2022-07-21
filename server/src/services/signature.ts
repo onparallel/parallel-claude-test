@@ -198,10 +198,12 @@ export class SignatureService implements ISignatureService {
     const signatureRequest = await this.petitionsRepository.createPetitionSignature(
       petitionId,
       {
-        ...(omit(signatureConfig, ["additionalSignersInfo"]) as any),
-        signersInfo: signatureConfig.signersInfo.concat(
-          signatureConfig.additionalSignersInfo ?? []
-        ),
+        signature_config: {
+          ...(omit(signatureConfig, ["additionalSignersInfo"]) as any),
+          signersInfo: signatureConfig.signersInfo.concat(
+            signatureConfig.additionalSignersInfo ?? []
+          ),
+        },
       },
       t
     );
