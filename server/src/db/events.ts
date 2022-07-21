@@ -171,7 +171,6 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     petition_reminder_id: number;
   };
   PETITION_ANONYMIZED: {};
-  PETITION_CONTACTLESS_LINK_CREATED: { user_id: number };
 }[TType];
 
 export type GenericPetitionEvent<
@@ -343,11 +342,6 @@ export type PetitionAnonymizedEvent<IsCreate extends boolean = false> = GenericP
   IsCreate
 >;
 
-export type PetitionContactlessLinkCreated<IsCreate extends boolean = false> = GenericPetitionEvent<
-  "PETITION_CONTACTLESS_LINK_CREATED",
-  IsCreate
->;
-
 export type PetitionEvent<IsCreate extends boolean = false> =
   | PetitionCreatedEvent<IsCreate>
   | PetitionCompletedEvent<IsCreate>
@@ -387,8 +381,7 @@ export type PetitionEvent<IsCreate extends boolean = false> =
   | RecipientSignedEvent<IsCreate>
   | PetitionReminderBouncedEvent<IsCreate>
   | PetitionMessageBouncedEvent<IsCreate>
-  | PetitionAnonymizedEvent<IsCreate>
-  | PetitionContactlessLinkCreated<IsCreate>;
+  | PetitionAnonymizedEvent<IsCreate>;
 
 export type CreatePetitionEvent = PetitionEvent<true>;
 

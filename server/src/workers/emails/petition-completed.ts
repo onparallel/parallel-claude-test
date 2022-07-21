@@ -30,7 +30,7 @@ export async function petitionCompleted(
     if (!access) {
       throw new Error(`Access not found for id ${payload.petition_access_id}`);
     }
-    contact = await context.contacts.loadContact(access.contact_id);
+    contact = access.contact_id ? await context.contacts.loadContact(access.contact_id) : null;
   } else if (payload.signer) {
     // if payload.signer is set, the petition has been completed and signed
     contact = {

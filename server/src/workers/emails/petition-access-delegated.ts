@@ -32,8 +32,8 @@ export async function petitionAccessDelegated(
   }
 
   const [contact, delegator, petitionOwnerData, originalMessage] = await Promise.all([
-    context.contacts.loadContact(newAccess.contact_id),
-    context.contacts.loadContact(originalAccess.contact_id),
+    newAccess.contact_id ? context.contacts.loadContact(newAccess.contact_id) : null,
+    originalAccess.contact_id ? context.contacts.loadContact(originalAccess.contact_id) : null,
     context.users.loadUserDataByUserId(originalAccess.granter_id),
     loadOriginalMessageByPetitionAccess(payload.original_access_id, payload.petition_id, context),
   ]);

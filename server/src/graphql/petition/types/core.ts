@@ -680,7 +680,7 @@ export const PetitionAccess = objectType({
       type: "Contact",
       description: "The contact of this access.",
       resolve: async (root, _, ctx) => {
-        return await ctx.contacts.loadContact(root.contact_id);
+        return root.contact_id ? await ctx.contacts.loadContact(root.contact_id) : null;
       },
     });
     t.field("status", {
@@ -727,6 +727,7 @@ export const PetitionAccess = objectType({
     t.nonNull.string("recipientUrl", {
       authorize: userHasFeatureFlag("PETITION_ACCESS_RECIPIENT_URL_FIELD"),
       resolve: async (root, _, ctx) => {
+        // check FF and if is contactless
         const { locale } = (await ctx.petitions.loadPetition(root.petition_id))!;
         return `${ctx.config.misc.parallelUrl}/${locale}/petition/${root.keycode}`;
       },

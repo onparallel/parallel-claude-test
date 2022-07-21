@@ -122,8 +122,7 @@ export type PetitionEventType =
   | "PETITION_REMINDER_BOUNCED"
   | "SIGNATURE_REMINDER"
   | "SIGNATURE_OPENED"
-  | "PETITION_ANONYMIZED"
-  | "PETITION_CONTACTLESS_LINK_CREATED";
+  | "PETITION_ANONYMIZED";
 
 export const PetitionEventTypeValues = [
   "PETITION_CREATED",
@@ -165,7 +164,6 @@ export const PetitionEventTypeValues = [
   "SIGNATURE_REMINDER",
   "SIGNATURE_OPENED",
   "PETITION_ANONYMIZED",
-  "PETITION_CONTACTLESS_LINK_CREATED",
 ] as PetitionEventType[];
 
 export type PetitionFieldReplyStatus = "PENDING" | "REJECTED" | "APPROVED";
@@ -528,11 +526,19 @@ export interface ContactAuthenticationRequest {
   ip: Maybe<string>; // varchar
   user_agent: Maybe<string>; // varchar
   expires_at: Date; // timestamptz
+  contact_first_name: Maybe<string>; // text
+  contact_last_name: Maybe<string>; // text
+  contact_email: Maybe<string>; // text
 }
 
 export type CreateContactAuthenticationRequest = PartialProps<
   Omit<ContactAuthenticationRequest, "id">,
-  "email_log_id" | "ip" | "user_agent"
+  | "email_log_id"
+  | "ip"
+  | "user_agent"
+  | "contact_first_name"
+  | "contact_last_name"
+  | "contact_email"
 >;
 
 export interface EmailAttachment {

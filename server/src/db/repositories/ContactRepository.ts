@@ -13,6 +13,7 @@ import { escapeLike, SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 import {
   Contact,
+  ContactAuthenticationRequest,
   CreateContact,
   CreateContactAuthenticationRequest,
   PetitionAccess,
@@ -305,7 +306,15 @@ export class ContactRepository extends BaseRepository {
   }
 
   async createContactAuthenticationRequest(
-    data: Pick<CreateContactAuthenticationRequest, "petition_access_id" | "ip" | "user_agent">
+    data: Pick<
+      CreateContactAuthenticationRequest,
+      | "petition_access_id"
+      | "ip"
+      | "user_agent"
+      | "contact_first_name"
+      | "contact_last_name"
+      | "contact_email"
+    >
   ) {
     const token = random(48);
     const [request] = await this.insert("contact_authentication_request", {
@@ -324,7 +333,11 @@ export class ContactRepository extends BaseRepository {
     accessId: number,
     token: string,
     code: string
-  ): Promise<{ success: boolean; remainingAttempts?: number }> {
+  ): Promise<{
+    success: boolean;
+    remainingAttempts?: number;
+    data?: ContactAuthenticationRequest;
+  }> {
     const [row] = await this.from("contact_authentication_request")
       .where({
         petition_access_id: accessId,
@@ -335,7 +348,7 @@ export class ContactRepository extends BaseRepository {
       .update({ remaining_attempts: this.knex.raw(`"remaining_attempts" - 1`) }, "*");
     if (row) {
       if (row.code === code) {
-        return { success: true };
+        return { success: true, data: row };
       } else {
         return { success: false, remainingAttempts: row.remaining_attempts };
       }

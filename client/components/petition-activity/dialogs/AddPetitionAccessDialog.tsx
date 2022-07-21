@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   Alert,
   AlertIcon,
@@ -32,6 +32,7 @@ import {
 import { useScheduleMessageDialog } from "@parallel/components/petition-compose/dialogs/ScheduleMessageDialog";
 import { PetitionRemindersConfig } from "@parallel/components/petition-compose/PetitionRemindersConfig";
 import {
+  AddPetitionAccessDialog_createPetitionAccessDocument,
   AddPetitionAccessDialog_PetitionFragment,
   AddPetitionAccessDialog_UserFragment,
   BulkSendSigningMode,
@@ -230,11 +231,18 @@ export function AddPetitionAccessDialog({
       });
     } catch {}
   };
+
+  const [createPetitionAccess] = useMutation(AddPetitionAccessDialog_createPetitionAccessDocument);
   const showContactlessLinkDialog = useContactlessLinkDialog();
-  const handleCopyLinkClick = async () => {
+  const handleShareByLinkClick = async () => {
     try {
+      const petitionAccess = await createPetitionAccess({
+        variables: {
+          petitionId: petition.id,
+        },
+      });
       const data = await showContactlessLinkDialog({
-        link: "somelink",
+        link: petitionAccess.data?.createPetitionAccess.recipientUrl ?? "",
         petitionId: petition.id,
       });
       if (data.forceClose) {
@@ -439,7 +447,7 @@ export function AddPetitionAccessDialog({
             variant="outline"
             leftIcon={<LinkIcon />}
             width={{ base: "full", sm: "fit-content" }}
-            onClick={handleCopyLinkClick}
+            onClick={handleShareByLinkClick}
             isDisabled={recipientGroups.some((g) => g.length > 0)}
           >
             <FormattedMessage id="generic.share-by-link" defaultMessage="Share by link" />
@@ -464,6 +472,17 @@ export function AddPetitionAccessDialog({
     />
   );
 }
+
+AddPetitionAccessDialog.mutations = [
+  gql`
+    mutation AddPetitionAccessDialog_createPetitionAccess($petitionId: GID!) {
+      createPetitionAccess(petitionId: $petitionId) {
+        id
+        recipientUrl
+      }
+    }
+  `,
+];
 
 AddPetitionAccessDialog.fragments = {
   User: gql`

@@ -459,6 +459,8 @@ export type Mutation = {
   createOrganizationUser: User;
   /** Create parallel. */
   createPetition: PetitionBase;
+  /** Creates a petition access */
+  createPetitionAccess: PetitionAccess;
   /** Generates and returns a signed url to upload a petition attachment to AWS S3 */
   createPetitionAttachmentUploadLink: PetitionAttachmentUploadData;
   /** Creates a petition field */
@@ -887,6 +889,11 @@ export type MutationcreatePetitionArgs = {
   type?: InputMaybe<PetitionBaseType>;
 };
 
+export type MutationcreatePetitionAccessArgs = {
+  contactId?: InputMaybe<Scalars["GID"]>;
+  petitionId: Scalars["GID"];
+};
+
 export type MutationcreatePetitionAttachmentUploadLinkArgs = {
   data: FileUploadInput;
   petitionId: Scalars["GID"];
@@ -1233,8 +1240,10 @@ export type MutationpublicSendReminderArgs = {
 };
 
 export type MutationpublicSendVerificationCodeArgs = {
-  isContactVerification?: InputMaybe<Scalars["Boolean"]>;
+  email?: InputMaybe<Scalars["String"]>;
+  firstName?: InputMaybe<Scalars["String"]>;
   keycode: Scalars["ID"];
+  lastName?: InputMaybe<Scalars["String"]>;
 };
 
 export type MutationpublicStartAsyncFieldCompletionArgs = {
@@ -2209,7 +2218,6 @@ export type PetitionEventType =
   | "PETITION_CLOSED"
   | "PETITION_CLOSED_NOTIFIED"
   | "PETITION_COMPLETED"
-  | "PETITION_CONTACTLESS_LINK_CREATED"
   | "PETITION_CREATED"
   | "PETITION_DELETED"
   | "PETITION_MESSAGE_BOUNCED"

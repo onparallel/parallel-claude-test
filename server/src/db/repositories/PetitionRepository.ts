@@ -740,6 +740,21 @@ export class PetitionRepository extends BaseRepository {
     return rows;
   }
 
+  async createAccess(petitionId: number, granterId: number, contactId: number | null, user: User) {
+    const [access] = await this.insert("petition_access", {
+      petition_id: petitionId,
+      granter_id: granterId,
+      contact_id: contactId,
+      keycode: random(16),
+      reminders_left: 10,
+      status: "ACTIVE",
+      created_by: `User:${user.id}`,
+      updated_by: `User:${user.id}`,
+    }).returning("*");
+
+    return access;
+  }
+
   async createAccessFromRecipient(
     petitionId: number,
     granterId: number,

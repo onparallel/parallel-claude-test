@@ -3,12 +3,12 @@ import { Box, BoxProps } from "@chakra-ui/react";
 import { PetitionActivityTimeline_PetitionEventFragment } from "@parallel/graphql/__types";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { TimelineAccessActivatedEvent } from "./timeline/TimelineAccessActivatedEvent";
+import { TimelineAccessActivatedFromLinkEvent } from "./timeline/TimelineAccessActivatedFromLinkEvent";
 import { TimelineAccessDeactivatedEvent } from "./timeline/TimelineAccessDeactivatedEvent";
 import { TimelineAccessDelegatedEvent } from "./timeline/TimelineAccessDelegatedEvent";
 import { TimelineAccessOpenedEvent } from "./timeline/TimelineAccessOpenedEvent";
 import { TimelineCommentDeletedEvent } from "./timeline/TimelineCommentDeletedEvent";
 import { TimelineCommentPublishedEvent } from "./timeline/TimelineCommentPublishedEvent";
-import { TimelineRemindersOptOutEvent } from "./timeline/TimelineRemindersOptOutEvent";
 import { TimelineGroupPermissionAddedEvent } from "./timeline/TimelineGroupPermissionAddedEvent";
 import { TimelineGroupPermissionEditedEvent } from "./timeline/TimelineGroupPermissionEditedEvent";
 import { TimelineGroupPermissionRemovedEvent } from "./timeline/TimelineGroupPermissionRemovedEvent";
@@ -16,30 +16,29 @@ import { TimelineMessageCancelledEvent } from "./timeline/TimelineMessageCancell
 import { TimelineMessageScheduledEvent } from "./timeline/TimelineMessageScheduledEvent";
 import { TimelineMessageSentEvent } from "./timeline/TimelineMessageSentEvent";
 import { TimelineOwnershipTransferredEvent } from "./timeline/TimelineOwnershipTransferredEvent";
+import { TimelinePetitionAnonymizedEvent } from "./timeline/TimelinePetitionAnonymizedEvent";
 import { TimelinePetitionClonedEvent } from "./timeline/TimelinePetitionClonedEvent";
 import { TimelinePetitionClosedEvent } from "./timeline/TimelinePetitionClosedEvent";
 import { TimelinePetitionClosedNotifiedEvent } from "./timeline/TimelinePetitionClosedNotifiedEvent";
 import { TimelinePetitionCompletedEvent } from "./timeline/TimelinePetitionCompletedEvent";
 import { TimelinePetitionCreatedEvent } from "./timeline/TimelinePetitionCreatedEvent";
+import { TimelinePetitionMessageBouncedEvent } from "./timeline/TimelinePetitionMessageBouncedEvent";
+import { TimelinePetitionReminderBouncedEvent } from "./timeline/TimelinePetitionReminderBouncedEvent";
 import { TimelinePetitionReopenedEvent } from "./timeline/TimelinePetitionReopenedEvent";
+import { TimelineRecipientSignedEvent } from "./timeline/TimelineRecipientSignedEvent";
 import { TimelineReminderSentEvent } from "./timeline/TimelineReminderSentEvent";
+import { TimelineRemindersOptOutEvent } from "./timeline/TimelineRemindersOptOutEvent";
 import { TimelineReplyCreatedEvent } from "./timeline/TimelineReplyCreatedEvent";
 import { TimelineReplyDeletedEvent } from "./timeline/TimelineReplyDeletedEvent";
 import { TimelineReplyUpdatedEvent } from "./timeline/TimelineReplyUpdatedEvent";
 import { TimelineSignatureCancelledEvent } from "./timeline/TimelineSignatureCancelledEvent";
 import { TimelineSignatureCompletedEvent } from "./timeline/TimelineSignatureCompletedEvent";
-import { TimelineSignatureStartedEvent } from "./timeline/TimelineSignatureStartedEvent";
+import { TimelineSignatureOpenedEvent } from "./timeline/TimelineSignatureOpenedEvent";
 import { TimelineSignatureReminderEvent } from "./timeline/TimelineSignatureReminderEvent";
+import { TimelineSignatureStartedEvent } from "./timeline/TimelineSignatureStartedEvent";
 import { TimelineUserPermissionAddedEvent } from "./timeline/TimelineUserPermissionAddedEvent";
 import { TimelineUserPermissionEditedEvent } from "./timeline/TimelineUserPermissionEditedEvent";
 import { TimelineUserPermissionRemovedEvent } from "./timeline/TimelineUserPermissionRemovedEvent";
-import { TimelineAccessActivatedFromLinkEvent } from "./timeline/TimelineAccessActivatedFromLinkEvent";
-import { TimelineRecipientSignedEvent } from "./timeline/TimelineRecipientSignedEvent";
-import { TimelinePetitionMessageBouncedEvent } from "./timeline/TimelinePetitionMessageBouncedEvent";
-import { TimelinePetitionReminderBouncedEvent } from "./timeline/TimelinePetitionReminderBouncedEvent";
-import { TimelineSignatureOpenedEvent } from "./timeline/TimelineSignatureOpenedEvent";
-import { TimelinePetitionAnonymizedEvent } from "./timeline/TimelinePetitionAnonymizedEvent";
-import { TimelinePetitionContactlessLinkCreatedEvent } from "./timeline/TimelinePetitionContactlessLinkCreatedEvent";
 
 export type PetitionActivityTimelineProps = {
   userId: string;
@@ -140,8 +139,6 @@ export function PetitionActivityTimeline({
               <TimelinePetitionReminderBouncedEvent event={event} />
             ) : event.__typename === "PetitionAnonymizedEvent" ? (
               <TimelinePetitionAnonymizedEvent event={event} />
-            ) : event.__typename === "PetitionContactlessLinkCreatedEvent" ? (
-              <TimelinePetitionContactlessLinkCreatedEvent event={event} userId={userId} />
             ) : (
               <pre>{JSON.stringify(event, null, "  ")}</pre>
             )}
@@ -277,9 +274,6 @@ PetitionActivityTimeline.fragments = {
       ... on PetitionAnonymizedEvent {
         ...TimelinePetitionAnonymizedEvent_PetitionAnonymizedEvent
       }
-      ... on PetitionContactlessLinkCreatedEvent {
-        ...TimelinePetitionContactlessLinkCreatedEvent_PetitionContactlessLinkCreatedEvent
-      }
     }
     ${TimelinePetitionCreatedEvent.fragments.PetitionCreatedEvent}
     ${TimelinePetitionCompletedEvent.fragments.PetitionCompletedEvent}
@@ -318,6 +312,5 @@ PetitionActivityTimeline.fragments = {
     ${TimelinePetitionMessageBouncedEvent.fragments.PetitionMessageBouncedEvent}
     ${TimelinePetitionReminderBouncedEvent.fragments.PetitionReminderBouncedEvent}
     ${TimelinePetitionAnonymizedEvent.fragments.PetitionAnonymizedEvent}
-    ${TimelinePetitionContactlessLinkCreatedEvent.fragments.PetitionContactlessLinkCreatedEvent}
   `,
 };

@@ -13,6 +13,7 @@ export async function contactAuthenticationRequest(
   const request = await context.contacts.loadContactAuthenticationRequest(
     payload.contact_authentication_request_id
   );
+
   if (!request) {
     throw new Error(
       `Contact authentication request not found for id ${payload.contact_authentication_request_id}`
@@ -25,12 +26,10 @@ export async function contactAuthenticationRequest(
     );
   }
   const [contact, petition] = await Promise.all([
-    context.contacts.loadContact(access.contact_id),
+    access.contact_id ? context.contacts.loadContact(access.contact_id) : null,
     context.petitions.loadPetition(access.petition_id),
   ]);
-  if (!contact) {
-    throw new Error(`Contact not found for petition_access.contact_id ${access.contact_id}`);
-  }
+
   if (!petition) {
     throw new Error(`Petition not found for petition_access.petition_id ${access.petition_id}`);
   }
@@ -48,8 +47,10 @@ export async function contactAuthenticationRequest(
   const { html, text, subject, from } = await buildEmail(
     ContactAuthenticationRequest,
     {
-      name: contact.first_name,
-      fullName: fullName(contact.first_name, contact.last_name),
+      name: contact ? contact.first_name : request.contact_first_name!,
+      fullName: contact
+        ? fullName(contact.first_name, contact.last_name)
+        : fullName(request.contact_first_name, request.contact_last_name),
       code: request.code,
       browserName: ua?.getBrowser()?.name ?? "Unknown",
       osName: ua?.getOS()?.name ?? "Unknown",
@@ -63,7 +64,7 @@ export async function contactAuthenticationRequest(
   );
   const email = await context.emailLogs.createEmail({
     from: buildFrom(from, emailFrom),
-    to: contact.email,
+    to: contact ? contact.email : request.contact_email!,
     subject,
     text,
     html,

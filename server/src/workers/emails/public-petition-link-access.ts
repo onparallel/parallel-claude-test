@@ -37,7 +37,7 @@ export async function publicPetitionLinkAccess(
     throw new Error(`PetitionAccess:${message.petition_access_id} not found`);
   }
   const [contact, publicPetitionLink] = await Promise.all([
-    context.contacts.loadContact(access.contact_id),
+    access.contact_id ? context.contacts.loadContact(access.contact_id) : null,
     context.petitions.loadPublicPetitionLink(petition.from_public_petition_link_id),
   ]);
   if (!contact) {

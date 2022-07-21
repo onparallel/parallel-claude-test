@@ -28,7 +28,7 @@ export const PublicPetitionAccess = objectType({
     t.nullable.field("contact", {
       type: "PublicContact",
       resolve: async (root, _, ctx) => {
-        return await ctx.contacts.loadContact(root.contact_id);
+        return root.contact_id ? await ctx.contacts.loadContact(root.contact_id) : null;
       },
     });
     t.nullable.field("message", {
@@ -110,7 +110,9 @@ export const PublicPetition = objectType({
       description: "The recipients of the petition",
       resolve: async (root, _, ctx) => {
         const accesses = await ctx.petitions.loadAccessesForPetition(root.id);
-        const contactIds = accesses.filter((a) => a.status === "ACTIVE").map((a) => a.contact_id);
+        const contactIds = accesses
+          .filter((a) => a.status === "ACTIVE" && isDefined(a.contact_id))
+          .map((a) => a.contact_id!);
         return (await ctx.contacts.loadContact(contactIds)).filter(isDefined);
       },
     });
@@ -552,7 +554,7 @@ export const PublicPetitionFieldComment = objectType({
           return user && { __type: "User", ...user };
         } else if (root.petition_access_id !== null) {
           const access = await ctx.petitions.loadAccess(root.petition_access_id);
-          const contact = access && (await ctx.contacts.loadContact(access.contact_id));
+          const contact = access && (await ctx.contacts.loadContact(access.contact_id!));
           return contact && { __type: "Contact", ...contact };
         }
         throw new Error(`Both "user_id" and "petition_access_id" are null`);

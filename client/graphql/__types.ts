@@ -493,6 +493,8 @@ export interface Mutation {
   createOrganizationUser: User;
   /** Create parallel. */
   createPetition: PetitionBase;
+  /** Creates a petition access */
+  createPetitionAccess: PetitionAccess;
   /** Generates and returns a signed url to upload a petition attachment to AWS S3 */
   createPetitionAttachmentUploadLink: PetitionAttachmentUploadData;
   /** Creates a petition field */
@@ -921,6 +923,11 @@ export interface MutationcreatePetitionArgs {
   type?: InputMaybe<PetitionBaseType>;
 }
 
+export interface MutationcreatePetitionAccessArgs {
+  contactId?: InputMaybe<Scalars["GID"]>;
+  petitionId: Scalars["GID"];
+}
+
 export interface MutationcreatePetitionAttachmentUploadLinkArgs {
   data: FileUploadInput;
   petitionId: Scalars["GID"];
@@ -1267,8 +1274,10 @@ export interface MutationpublicSendReminderArgs {
 }
 
 export interface MutationpublicSendVerificationCodeArgs {
-  isContactVerification?: InputMaybe<Scalars["Boolean"]>;
+  email?: InputMaybe<Scalars["String"]>;
+  firstName?: InputMaybe<Scalars["String"]>;
   keycode: Scalars["ID"];
+  lastName?: InputMaybe<Scalars["String"]>;
 }
 
 export interface MutationpublicStartAsyncFieldCompletionArgs {
@@ -2270,7 +2279,6 @@ export type PetitionEventType =
   | "PETITION_CLOSED"
   | "PETITION_CLOSED_NOTIFIED"
   | "PETITION_COMPLETED"
-  | "PETITION_CONTACTLESS_LINK_CREATED"
   | "PETITION_CREATED"
   | "PETITION_DELETED"
   | "PETITION_MESSAGE_BOUNCED"
@@ -5953,6 +5961,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
           } | null;
           access: {
             __typename?: "PetitionAccess";
+            isContactless: boolean;
             contact?: {
               __typename?: "Contact";
               id: string;
@@ -6321,17 +6330,7 @@ export type PetitionActivityTimeline_PetitionFragment = {
             | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
             | null;
         }
-      | {
-          __typename?: "PetitionContactlessLinkCreatedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-        }
+      | { __typename?: "PetitionContactlessLinkCreatedEvent"; id: string }
       | {
           __typename?: "PetitionCreatedEvent";
           id: string;
@@ -6604,6 +6603,7 @@ export type PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
   access: {
     __typename?: "PetitionAccess";
+    isContactless: boolean;
     contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
 };
@@ -6874,8 +6874,6 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragme
 export type PetitionActivityTimeline_PetitionEvent_PetitionContactlessLinkCreatedEvent_Fragment = {
   __typename?: "PetitionContactlessLinkCreatedEvent";
   id: string;
-  createdAt: string;
-  user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
 };
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment = {
@@ -7171,6 +7169,14 @@ export type UserReference_UserFragment = {
   status: UserStatus;
 };
 
+export type AddPetitionAccessDialog_createPetitionAccessMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type AddPetitionAccessDialog_createPetitionAccessMutation = {
+  createPetitionAccess: { __typename?: "PetitionAccess"; id: string; recipientUrl: string };
+};
+
 export type AddPetitionAccessDialog_UserFragment = {
   __typename?: "User";
   id: string;
@@ -7282,6 +7288,7 @@ export type TimelineAccessActivatedEvent_AccessActivatedEventFragment = {
   user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
   access: {
     __typename?: "PetitionAccess";
+    isContactless: boolean;
     contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   };
 };
@@ -7529,13 +7536,6 @@ export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
     | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
     | null;
 };
-
-export type TimelinePetitionContactlessLinkCreatedEvent_PetitionContactlessLinkCreatedEventFragment =
-  {
-    __typename?: "PetitionContactlessLinkCreatedEvent";
-    createdAt: string;
-    user?: { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus } | null;
-  };
 
 export type TimelinePetitionCreatedEvent_PetitionCreatedEventFragment = {
   __typename?: "PetitionCreatedEvent";
@@ -10923,7 +10923,9 @@ export type LandingTemplateCard_LandingTemplateFragment = {
 
 export type RecipientViewContactlessForm_publicSendVerificationCodeMutationVariables = Exact<{
   keycode: Scalars["ID"];
-  isContactVerification?: InputMaybe<Scalars["Boolean"]>;
+  firstName?: InputMaybe<Scalars["String"]>;
+  lastName?: InputMaybe<Scalars["String"]>;
+  email?: InputMaybe<Scalars["String"]>;
 }>;
 
 export type RecipientViewContactlessForm_publicSendVerificationCodeMutation = {
@@ -13566,6 +13568,7 @@ export type PetitionActivity_PetitionFragment = {
           } | null;
           access: {
             __typename?: "PetitionAccess";
+            isContactless: boolean;
             contact?: {
               __typename?: "Contact";
               id: string;
@@ -13934,17 +13937,7 @@ export type PetitionActivity_PetitionFragment = {
             | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
             | null;
         }
-      | {
-          __typename?: "PetitionContactlessLinkCreatedEvent";
-          id: string;
-          createdAt: string;
-          user?: {
-            __typename?: "User";
-            id: string;
-            fullName?: string | null;
-            status: UserStatus;
-          } | null;
-        }
+      | { __typename?: "PetitionContactlessLinkCreatedEvent"; id: string }
       | {
           __typename?: "PetitionCreatedEvent";
           id: string;
@@ -14387,6 +14380,7 @@ export type PetitionActivity_updatePetitionMutation = {
                 } | null;
                 access: {
                   __typename?: "PetitionAccess";
+                  isContactless: boolean;
                   contact?: {
                     __typename?: "Contact";
                     id: string;
@@ -14770,17 +14764,7 @@ export type PetitionActivity_updatePetitionMutation = {
                     }
                   | null;
               }
-            | {
-                __typename?: "PetitionContactlessLinkCreatedEvent";
-                id: string;
-                createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-              }
+            | { __typename?: "PetitionContactlessLinkCreatedEvent"; id: string }
             | {
                 __typename?: "PetitionCreatedEvent";
                 id: string;
@@ -15272,6 +15256,7 @@ export type PetitionActivity_petitionQuery = {
                 } | null;
                 access: {
                   __typename?: "PetitionAccess";
+                  isContactless: boolean;
                   contact?: {
                     __typename?: "Contact";
                     id: string;
@@ -15655,17 +15640,7 @@ export type PetitionActivity_petitionQuery = {
                     }
                   | null;
               }
-            | {
-                __typename?: "PetitionContactlessLinkCreatedEvent";
-                id: string;
-                createdAt: string;
-                user?: {
-                  __typename?: "User";
-                  id: string;
-                  fullName?: string | null;
-                  status: UserStatus;
-                } | null;
-              }
+            | { __typename?: "PetitionContactlessLinkCreatedEvent"; id: string }
             | {
                 __typename?: "PetitionCreatedEvent";
                 id: string;
@@ -24170,6 +24145,7 @@ export const TimelineAccessActivatedEvent_AccessActivatedEventFragmentDoc = gql`
       contact {
         ...ContactReference_Contact
       }
+      isContactless
     }
     createdAt
   }
@@ -24798,19 +24774,6 @@ export const TimelinePetitionAnonymizedEvent_PetitionAnonymizedEventFragmentDoc 
   TimelinePetitionAnonymizedEvent_PetitionAnonymizedEventFragment,
   unknown
 >;
-export const TimelinePetitionContactlessLinkCreatedEvent_PetitionContactlessLinkCreatedEventFragmentDoc =
-  gql`
-    fragment TimelinePetitionContactlessLinkCreatedEvent_PetitionContactlessLinkCreatedEvent on PetitionContactlessLinkCreatedEvent {
-      user {
-        ...UserReference_User
-      }
-      createdAt
-    }
-    ${UserReference_UserFragmentDoc}
-  ` as unknown as DocumentNode<
-    TimelinePetitionContactlessLinkCreatedEvent_PetitionContactlessLinkCreatedEventFragment,
-    unknown
-  >;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
     id
@@ -24928,9 +24891,6 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on PetitionAnonymizedEvent {
       ...TimelinePetitionAnonymizedEvent_PetitionAnonymizedEvent
     }
-    ... on PetitionContactlessLinkCreatedEvent {
-      ...TimelinePetitionContactlessLinkCreatedEvent_PetitionContactlessLinkCreatedEvent
-    }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
   ${TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc}
@@ -24969,7 +24929,6 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelinePetitionMessageBouncedEvent_PetitionMessageBouncedEventFragmentDoc}
   ${TimelinePetitionReminderBouncedEvent_PetitionReminderBouncedEventFragmentDoc}
   ${TimelinePetitionAnonymizedEvent_PetitionAnonymizedEventFragmentDoc}
-  ${TimelinePetitionContactlessLinkCreatedEvent_PetitionContactlessLinkCreatedEventFragmentDoc}
 ` as unknown as DocumentNode<PetitionActivityTimeline_PetitionEventFragment, unknown>;
 export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
   fragment PetitionActivityTimeline_Petition on Petition {
@@ -27435,6 +27394,17 @@ export const InviteUserDialog_emailIsAvailableDocument = gql`
   InviteUserDialog_emailIsAvailableQuery,
   InviteUserDialog_emailIsAvailableQueryVariables
 >;
+export const AddPetitionAccessDialog_createPetitionAccessDocument = gql`
+  mutation AddPetitionAccessDialog_createPetitionAccess($petitionId: GID!) {
+    createPetitionAccess(petitionId: $petitionId) {
+      id
+      recipientUrl
+    }
+  }
+` as unknown as DocumentNode<
+  AddPetitionAccessDialog_createPetitionAccessMutation,
+  AddPetitionAccessDialog_createPetitionAccessMutationVariables
+>;
 export const PetitionSharingModal_addPetitionPermissionDocument = gql`
   mutation PetitionSharingModal_addPetitionPermission(
     $petitionIds: [GID!]!
@@ -28235,9 +28205,16 @@ export const PublicSignupForm_emailIsAvailableDocument = gql`
 export const RecipientViewContactlessForm_publicSendVerificationCodeDocument = gql`
   mutation RecipientViewContactlessForm_publicSendVerificationCode(
     $keycode: ID!
-    $isContactVerification: Boolean
+    $firstName: String
+    $lastName: String
+    $email: String
   ) {
-    publicSendVerificationCode(keycode: $keycode, isContactVerification: $isContactVerification) {
+    publicSendVerificationCode(
+      keycode: $keycode
+      firstName: $firstName
+      lastName: $lastName
+      email: $email
+    ) {
       token
       remainingAttempts
       expiresAt

@@ -1040,6 +1040,7 @@ export interface NexusGenFieldTypes {
     createOrganizationPdfDocumentTheme: NexusGenRootTypes["Organization"]; // Organization!
     createOrganizationUser: NexusGenRootTypes["User"]; // User!
     createPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
+    createPetitionAccess: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createPetitionAttachmentUploadLink: NexusGenRootTypes["PetitionAttachmentUploadData"]; // PetitionAttachmentUploadData!
     createPetitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
     createPetitionFieldAttachmentUploadLink: NexusGenRootTypes["PetitionFieldAttachmentUploadData"]; // PetitionFieldAttachmentUploadData!
@@ -2620,6 +2621,7 @@ export interface NexusGenFieldTypeNames {
     createOrganizationPdfDocumentTheme: "Organization";
     createOrganizationUser: "User";
     createPetition: "PetitionBase";
+    createPetitionAccess: "PetitionAccess";
     createPetitionAttachmentUploadLink: "PetitionAttachmentUploadData";
     createPetitionField: "PetitionField";
     createPetitionFieldAttachmentUploadLink: "PetitionFieldAttachmentUploadData";
@@ -4078,6 +4080,11 @@ export interface NexusGenArgTypes {
       petitionId?: NexusGenScalars["GID"] | null; // GID
       type: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
     };
+    createPetitionAccess: {
+      // args
+      contactId?: NexusGenScalars["GID"] | null; // GID
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
     createPetitionAttachmentUploadLink: {
       // args
       data: NexusGenInputs["FileUploadInput"]; // FileUploadInput!
@@ -4425,8 +4432,10 @@ export interface NexusGenArgTypes {
     };
     publicSendVerificationCode: {
       // args
-      isContactVerification?: boolean | null; // Boolean
+      email?: string | null; // String
+      firstName?: string | null; // String
       keycode: string; // ID!
+      lastName?: string | null; // String
     };
     publicStartAsyncFieldCompletion: {
       // args

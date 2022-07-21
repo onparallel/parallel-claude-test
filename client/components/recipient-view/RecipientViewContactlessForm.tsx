@@ -74,8 +74,6 @@ export function RecipientViewContactlessForm({
     step: "FORM",
   });
 
-  const isCreatingContact = false;
-
   const {
     handleSubmit,
     register,
@@ -106,12 +104,6 @@ export function RecipientViewContactlessForm({
     }
   }, [state]);
 
-  const handleSubmitForm = async (props: RecipientViewContactlessFormData) => {
-    try {
-      await handleSendVerificationCode();
-    } catch {}
-  };
-
   const [sendVerificationCode, { loading: isSendingCode }] = useMutation(
     RecipientViewContactlessForm_publicSendVerificationCodeDocument
   );
@@ -120,19 +112,24 @@ export function RecipientViewContactlessForm({
     RecipientViewContactlessForm_publicCheckVerificationCodeDocument
   );
 
-  async function handleSendVerificationCode() {
-    const { data } = await sendVerificationCode({
-      variables: { keycode, isContactVerification: true },
-    });
-    if (!data) {
-      return;
-    }
-    setState({
-      step: "VERIFY",
-      ...omit(data.publicSendVerificationCode, ["__typename"]),
-    });
-  }
-
+  const handleSubmitForm = async ({
+    email,
+    firstName,
+    lastName,
+  }: RecipientViewContactlessFormData) => {
+    try {
+      const { data } = await sendVerificationCode({
+        variables: { keycode, email, firstName, lastName },
+      });
+      if (!data) {
+        return;
+      }
+      setState({
+        step: "VERIFY",
+        ...omit(data.publicSendVerificationCode, ["__typename"]),
+      });
+    } catch {}
+  };
   function codeExpired() {
     codeExpiredToast();
     setState({ step: "FORM" });
@@ -292,11 +289,7 @@ export function RecipientViewContactlessForm({
                 </FormErrorMessage>
               </FormControl>
             </Stack>
-            <Button
-              type="submit"
-              colorScheme="primary"
-              isLoading={isCreatingContact || isSendingCode}
-            >
+            <Button type="submit" colorScheme="primary" isLoading={isSendingCode}>
               <FormattedMessage
                 id="component.recipient-view-contactless-form.access"
                 defaultMessage="Access"
@@ -390,9 +383,16 @@ RecipientViewContactlessForm.mutations = [
   gql`
     mutation RecipientViewContactlessForm_publicSendVerificationCode(
       $keycode: ID!
-      $isContactVerification: Boolean
+      $firstName: String
+      $lastName: String
+      $email: String
     ) {
-      publicSendVerificationCode(keycode: $keycode, isContactVerification: $isContactVerification) {
+      publicSendVerificationCode(
+        keycode: $keycode
+        firstName: $firstName
+        lastName: $lastName
+        email: $email
+      ) {
         token
         remainingAttempts
         expiresAt

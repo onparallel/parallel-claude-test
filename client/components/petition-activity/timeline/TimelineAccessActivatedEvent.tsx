@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { UserPlusIcon } from "@parallel/chakra/icons";
+import { PaperclipIcon, UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineAccessActivatedEvent_AccessActivatedEventFragment } from "@parallel/graphql/__types";
@@ -16,20 +16,40 @@ type TimelineAccessActivatedEventProps = {
 export function TimelineAccessActivatedEvent({ event, userId }: TimelineAccessActivatedEventProps) {
   return (
     <TimelineItem
-      icon={<TimelineIcon icon={UserPlusIcon} color="white" backgroundColor="blue.500" />}
+      icon={
+        <TimelineIcon
+          icon={event.access.isContactless ? <PaperclipIcon /> : <UserPlusIcon />}
+          color="white"
+          backgroundColor="blue.500"
+        />
+      }
     >
-      <FormattedMessage
-        id="timeline.access-activated-description"
-        defaultMessage="{userIsYou, select, true {You} other {{user}}} gave access to {contact} {timeAgo}"
-        values={{
-          userIsYou: userId === event.user?.id,
-          user: <UserReference user={event.user} />,
-          contact: <ContactReference contact={event.access.contact} />,
-          timeAgo: (
-            <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
-          ),
-        }}
-      />
+      {event.access.isContactless ? (
+        <FormattedMessage
+          id="timeline.petition-contactless-link-created-description"
+          defaultMessage="{userIsYou, select, true {You} other {{user}}} created a link access {timeAgo}"
+          values={{
+            userIsYou: userId === event.user?.id,
+            user: <UserReference user={event.user} />,
+            timeAgo: (
+              <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+            ),
+          }}
+        />
+      ) : (
+        <FormattedMessage
+          id="timeline.access-activated-description"
+          defaultMessage="{userIsYou, select, true {You} other {{user}}} gave access to {contact} {timeAgo}"
+          values={{
+            userIsYou: userId === event.user?.id,
+            user: <UserReference user={event.user} />,
+            contact: <ContactReference contact={event.access.contact} />,
+            timeAgo: (
+              <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+            ),
+          }}
+        />
+      )}
     </TimelineItem>
   );
 }
@@ -44,6 +64,7 @@ TimelineAccessActivatedEvent.fragments = {
         contact {
           ...ContactReference_Contact
         }
+        isContactless
       }
       createdAt
     }

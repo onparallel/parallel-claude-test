@@ -720,6 +720,11 @@ type Mutation {
   ): PetitionBase!
 
   """
+  Creates a petition access
+  """
+  createPetitionAccess(contactId: GID, petitionId: GID!): PetitionAccess!
+
+  """
   Generates and returns a signed url to upload a petition attachment to AWS S3
   """
   createPetitionAttachmentUploadLink(
@@ -1181,7 +1186,12 @@ type Mutation {
   """
   publicResetTemporaryPassword(email: String!, locale: String): Result!
   publicSendReminder(contactEmail: String!, slug: ID!): Result!
-  publicSendVerificationCode(isContactVerification: Boolean, keycode: ID!): VerificationCodeRequest!
+  publicSendVerificationCode(
+    email: String
+    firstName: String
+    keycode: ID!
+    lastName: String
+  ): VerificationCodeRequest!
 
   """
   Starts the completion of an async field
@@ -2725,7 +2735,6 @@ enum PetitionEventType {
   PETITION_CLOSED
   PETITION_CLOSED_NOTIFIED
   PETITION_COMPLETED
-  PETITION_CONTACTLESS_LINK_CREATED
   PETITION_CREATED
   PETITION_DELETED
   PETITION_MESSAGE_BOUNCED

@@ -96,7 +96,7 @@ describe("GraphQL/Public", () => {
   describe("unauthenticated", () => {
     it("allows access on the first time and gives cookie required for subsequent times", async () => {
       // make sure there's no previous contact authentications
-      expect(await contactRepository.hasContactAuthentication(access.contact_id)).toBe(false);
+      expect(await contactRepository.hasContactAuthentication(access.contact_id!)).toBe(false);
       const mutation = gql`
         mutation ($token: ID!, $keycode: ID!, $ip: String, $userAgent: String) {
           verifyPublicAccess(token: $token, keycode: $keycode, ip: $ip, userAgent: $userAgent) {
@@ -151,7 +151,7 @@ describe("GraphQL/Public", () => {
 
     it("sends a verification code", async () => {
       // assume already existing contact authentication from previous test
-      expect(await contactRepository.hasContactAuthentication(access.contact_id)).toBe(true);
+      expect(await contactRepository.hasContactAuthentication(access.contact_id!)).toBe(true);
 
       const emailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
@@ -242,11 +242,11 @@ describe("GraphQL/Public", () => {
   describe("authenticated", () => {
     let cookieValue: string;
     beforeAll(async () => {
-      cookieValue = await mocks.createContactAuthentication(access.contact_id);
+      cookieValue = await mocks.createContactAuthentication(access.contact_id!);
     });
 
     beforeEach(() => {
-      setCookieHeader(testClient, access.contact_id, cookieValue);
+      setCookieHeader(testClient, access.contact_id!, cookieValue);
     });
 
     describe("publicPetitionFieldAttachmentDownloadLink", () => {
@@ -633,7 +633,7 @@ describe("GraphQL/Public", () => {
 
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
             expect(data).toBeNull();
-            setCookieHeader(testClient, access.contact_id, cookieValue);
+            setCookieHeader(testClient, access.contact_id!, cookieValue);
           }
         });
       });
@@ -700,7 +700,7 @@ describe("GraphQL/Public", () => {
 
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
             expect(data).toBeNull();
-            setCookieHeader(testClient, access.contact_id, cookieValue);
+            setCookieHeader(testClient, access.contact_id!, cookieValue);
           }
         });
       });
@@ -774,7 +774,7 @@ describe("GraphQL/Public", () => {
 
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
             expect(data).toBeNull();
-            setCookieHeader(testClient, access.contact_id, cookieValue);
+            setCookieHeader(testClient, access.contact_id!, cookieValue);
           }
         });
       });
@@ -888,7 +888,7 @@ describe("GraphQL/Public", () => {
 
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
             expect(data).toBeNull();
-            setCookieHeader(testClient, access.contact_id, cookieValue);
+            setCookieHeader(testClient, access.contact_id!, cookieValue);
           }
         });
       });
@@ -986,7 +986,7 @@ describe("GraphQL/Public", () => {
 
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
             expect(data).toBeNull();
-            setCookieHeader(testClient, access.contact_id, cookieValue);
+            setCookieHeader(testClient, access.contact_id!, cookieValue);
           }
         });
       });
@@ -1138,7 +1138,7 @@ describe("GraphQL/Public", () => {
 
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
             expect(data).toBeNull();
-            setCookieHeader(testClient, access.contact_id, cookieValue);
+            setCookieHeader(testClient, access.contact_id!, cookieValue);
           }
         });
       });
@@ -1239,7 +1239,7 @@ describe("GraphQL/Public", () => {
 
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
             expect(data).toBeNull();
-            setCookieHeader(testClient, access.contact_id, cookieValue);
+            setCookieHeader(testClient, access.contact_id!, cookieValue);
           }
         });
       });
@@ -1615,7 +1615,7 @@ describe("GraphQL/Public", () => {
 
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
             expect(data).toBeNull();
-            setCookieHeader(testClient, access.contact_id, cookieValue);
+            setCookieHeader(testClient, access.contact_id!, cookieValue);
           }
         });
       });
@@ -1732,7 +1732,7 @@ describe("GraphQL/Public", () => {
 
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
             expect(data).toBeNull();
-            setCookieHeader(testClient, access.contact_id, cookieValue);
+            setCookieHeader(testClient, access.contact_id!, cookieValue);
           }
         });
       });
@@ -1813,7 +1813,7 @@ describe("GraphQL/Public", () => {
             );
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
             expect(data).toBeNull();
-            setCookieHeader(testClient, access.contact_id, cookieValue);
+            setCookieHeader(testClient, access.contact_id!, cookieValue);
           }
         });
       });
@@ -1932,7 +1932,7 @@ describe("GraphQL/Public", () => {
 
             expect(errors).toContainGraphQLError("INVALID_REPLY_ERROR");
             expect(data).toBeNull();
-            setCookieHeader(testClient, access.contact_id, cookieValue);
+            setCookieHeader(testClient, access.contact_id!, cookieValue);
           }
         });
       });

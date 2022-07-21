@@ -66,21 +66,23 @@ export function fetchPetitionAccess<
     } else {
       ctx.access = access;
       const [contact, petition] = await Promise.all([
-        ctx.contacts.loadContact(access.contact_id),
+        access.contact_id ? ctx.contacts.loadContact(access.contact_id) : null,
         ctx.petitions.loadPetition(access.petition_id),
       ]);
+      ctx.contact = contact;
+
       if (!petition) {
         throw new PublicPetitionNotAvailableError(
           `Petition for petition access with keycode ${keycode} not found`
         );
       }
-      if (!contact) {
-        throw new PublicPetitionNotAvailableError(
-          `Contact for petition access with keycode ${keycode} not found`
-        );
-      } else {
-        ctx.contact = contact;
-      }
+      // if (!contact) {
+      //   throw new PublicPetitionNotAvailableError(
+      //     `Contact for petition access with keycode ${keycode} not found`
+      //   );
+      // } else {
+      //   ctx.contact = contact;
+      // }
     }
     return true;
   };

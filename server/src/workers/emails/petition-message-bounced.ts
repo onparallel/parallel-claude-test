@@ -35,7 +35,7 @@ export async function petitionMessageBounced(
       `Petition access not found for petition_message.petition_access_id ${message.petition_access_id}`
     );
   }
-  const contact = await context.contacts.loadContact(access.contact_id);
+  const contact = access.contact_id ? await context.contacts.loadContact(access.contact_id) : null;
   if (!contact) {
     throw new Error(`Contact not found for petition_access.contact_id ${access.contact_id}`);
   }

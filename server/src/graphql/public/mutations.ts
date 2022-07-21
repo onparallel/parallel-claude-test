@@ -176,19 +176,35 @@ export const publicSendVerificationCode = mutationField("publicSendVerificationC
   authorize: fetchPetitionAccess("keycode"),
   args: {
     keycode: nonNull(idArg()),
-    isContactVerification: booleanArg(),
+    firstName: stringArg(),
+    lastName: stringArg(),
+    email: stringArg(),
   },
   resolve: async (_, args, ctx) => {
     return await stallFor(async function () {
+      const access = await ctx.petitions.loadAccessByKeycode(args.keycode);
+
+      const isContactless = !isDefined(access!.contact_id);
+      const { firstName, lastName, email } = args;
+
+      if (isContactless) {
+        if (!isDefined(firstName) || !isDefined(lastName) || !isDefined(email)) {
+          throw new ApolloError(
+            "INVALID_CONTACT_FORM",
+            "The information to create a contact is not valid"
+          );
+        }
+      }
+
       const { token, request } = await ctx.contacts.createContactAuthenticationRequest({
         petition_access_id: ctx.access!.id,
         user_agent: ctx.req!.headers["user-agent"] ?? null,
         ip: getClientIp(ctx.req),
+        contact_first_name: firstName,
+        contact_last_name: lastName,
+        contact_email: email,
       });
-      await ctx.emails.sendContactAuthenticationRequestEmail(
-        request.id,
-        args.isContactVerification ?? false
-      );
+      await ctx.emails.sendContactAuthenticationRequestEmail(request.id, isContactless);
       return {
         token,
         expiresAt: request.expires_at,
@@ -220,6 +236,33 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
           args.token,
           args.code
         );
+
+        if (result.success && isDefined(result.data) && !isDefined(ctx.access!.contact_id)) {
+          const access = await ctx.petitions.loadAccessByKeycode(args.keycode);
+          const petition = await ctx.petitions.loadPetition(access!.petition_id);
+
+          if (petition) {
+            const email = result.data.contact_email!.toLowerCase();
+            const contact = await ctx.contacts.loadContactByEmail({
+              email,
+              orgId: petition.org_id,
+            });
+
+            ctx.contact = contact
+              ? contact
+              : await ctx.contacts.createContact(
+                  {
+                    org_id: petition.org_id,
+                    email,
+                    first_name: result.data.contact_first_name!,
+                    last_name: result.data.contact_last_name || null,
+                  },
+                  `PetitionAccess:${access!.id}`
+                );
+          }
+          // Set contact_id in petition_access
+        }
+
         const { contactAuthentication, cookieValue } =
           await ctx.contacts.createContactAuthentication(ctx.contact!.id);
         await ctx.contacts.addContactAuthenticationLogAccessEntry(contactAuthentication.id, {

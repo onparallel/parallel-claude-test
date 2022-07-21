@@ -103,8 +103,6 @@ export const PetitionEvent = interfaceType({
         return "PetitionReminderBouncedEvent";
       case "PETITION_ANONYMIZED":
         return "PetitionAnonymizedEvent";
-      case "PETITION_CONTACTLESS_LINK_CREATED":
-        return "PetitionContactlessLinkCreatedEvent";
     }
   },
   sourceType: "events.PetitionEvent",

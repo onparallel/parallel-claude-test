@@ -42,7 +42,9 @@ export async function petitionClosedNotification(
   const emails: EmailLog[] = [];
   for (const accessId of payload.petition_access_ids) {
     const access = await context.petitions.loadAccess(accessId);
-    const contact = await context.contacts.loadContact(access!.contact_id);
+    const contact = access!.contact_id
+      ? await context.contacts.loadContact(access!.contact_id)
+      : null;
     if (!contact) {
       continue;
     }

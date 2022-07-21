@@ -1241,6 +1241,32 @@ export const fileUploadReplyDownloadLink = mutationField("fileUploadReplyDownloa
   },
 });
 
+export const createPetitionAccess = mutationField("createPetitionAccess", {
+  description: "Creates a petition access",
+  type: "PetitionAccess",
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
+    petitionHasRepliableFields("petitionId"),
+    orgHasAvailablePetitionSendCredits(
+      (args) => args.petitionId,
+      () => 1
+    ),
+    petitionIsNotAnonymized("petitionId")
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    contactId: globalIdArg("Contact"),
+  },
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.createAccess(
+      args.petitionId,
+      ctx.user!.id,
+      args.contactId ?? null,
+      ctx.user!
+    );
+  },
+});
+
 export const sendPetition = mutationField("sendPetition", {
   description:
     "Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages",
