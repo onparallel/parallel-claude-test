@@ -12,7 +12,7 @@ import {
   isCollapsed,
 } from "@udecode/plate-common";
 import { focusEditor, moveSelection, select } from "@udecode/plate-core";
-import { upsertLinkAtSelection } from "@udecode/plate-link";
+import { upsertLink } from "@udecode/plate-link";
 import { useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -38,7 +38,10 @@ export const ToolbarLinkButton = chakraForwardRef<"button", ToolbarLinkButtonPro
     const handleMouseDown = useCallback(
       getPreventDefaultHandler(async () => {
         const selection = editorRef.current.selection;
-        const endOfEditor = Editor.range(editorRef.current as any, Editor.end(editor as any, []));
+        const endOfEditor = Editor.range(
+          editorRef.current as any,
+          Editor.end(editorRef.current as any, [])
+        );
         const linkNode = editorRef.current.selection
           ? getAbove<LinkNode>(editorRef.current as any, { match: { type: "link" } })
           : undefined;
@@ -57,7 +60,11 @@ export const ToolbarLinkButton = chakraForwardRef<"button", ToolbarLinkButtonPro
           return;
         }
         if (linkNode || (selection && !isCollapsed(selection))) {
-          upsertLinkAtSelection(editorRef.current, { url: link.url, wrap: true });
+          upsertLink(editorRef.current, {
+            url: link.url,
+            text: linkNode?.[0].children.length === 1 ? linkNode[0].children[0].text : undefined,
+            update: true,
+          });
         } else {
           const text = link.text || link.url;
           insertNodes(

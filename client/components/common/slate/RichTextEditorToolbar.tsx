@@ -7,9 +7,8 @@ import {
   UnderlineIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { CustomEditor } from "@parallel/utils/slate/types";
+import { usePlateEditorRef } from "@udecode/plate-core";
 import { useIntl } from "react-intl";
-import { useSlate } from "slate-react";
 import { ToolbarHeadingButton } from "./ToolbarHeadingButton";
 import { ToolbarLinkButton } from "./ToolbarLinkButton";
 import { ToolbarListButton } from "./ToolbarListButton";
@@ -17,6 +16,7 @@ import { ToolbarMarkButton } from "./ToolbarMarkButton";
 import { ToolbarPlaceholderButton } from "./ToolbarPlaceholderButton";
 
 interface RichTextEditorToolbarProps {
+  editorId: string;
   isDisabled?: boolean;
   hasPlaceholders?: boolean;
   hasHeadingButton?: boolean;
@@ -25,11 +25,18 @@ interface RichTextEditorToolbarProps {
 
 export const RichTextEditorToolbar = chakraForwardRef<"div", RichTextEditorToolbarProps>(
   function RichTextEditorToolbar(
-    { isDisabled, hasPlaceholders, hasHeadingButton = true, hasListButtons = true, ...props },
+    {
+      editorId,
+      isDisabled,
+      hasPlaceholders,
+      hasHeadingButton = true,
+      hasListButtons = true,
+      ...props
+    },
     ref
   ) {
     const intl = useIntl();
-    const editor = useSlate() as CustomEditor;
+    const editor = usePlateEditorRef(editorId)!;
     return (
       <Stack
         ref={ref}

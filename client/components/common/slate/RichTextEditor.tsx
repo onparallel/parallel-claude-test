@@ -264,6 +264,14 @@ const _RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorProps>(
         {...formControlProps}
         {...inputStyles}
       >
+        <RichTextEditorToolbar
+          editorId={id}
+          height="40px"
+          isDisabled={formControl.disabled || formControl.readOnly}
+          hasPlaceholders={placeholderOptions.length > 0}
+          hasHeadingButton={toolbarOpts?.headingButton}
+          hasListButtons={toolbarOpts?.listButtons}
+        />
         <Plate<RichTextEditorValue, RichTextPEditor>
           id={id}
           plugins={plugins}
@@ -271,15 +279,7 @@ const _RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorProps>(
           onChange={!isDisabled ? onChange : undefined}
           editableProps={editableProps}
           renderEditable={renderEditable}
-        >
-          <RichTextEditorToolbar
-            height="40px"
-            isDisabled={formControl.disabled || formControl.readOnly}
-            hasPlaceholders={placeholderOptions.length > 0}
-            hasHeadingButton={toolbarOpts?.headingButton}
-            hasListButtons={toolbarOpts?.listButtons}
-          />
-        </Plate>
+        ></Plate>
         <Portal>
           <PlaceholderMenu
             ref={popperRef}
