@@ -43,7 +43,7 @@ export type RecipientViewContactlessFormData = {
   email: string;
 };
 
-type RRecipientViewContactlessState =
+type RecipientViewContactlessState =
   | { step: "FORM" }
   | {
       step: "VERIFY";
@@ -70,7 +70,7 @@ export function RecipientViewContactlessForm({
   const { query } = router;
   const keycode = query.keycode as string;
 
-  const [state, setState] = useState<RRecipientViewContactlessState>({
+  const [state, setState] = useState<RecipientViewContactlessState>({
     step: "FORM",
   });
 

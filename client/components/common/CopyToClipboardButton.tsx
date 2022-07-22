@@ -11,23 +11,39 @@ export interface CopyToClipboardButtonProps extends Omit<IconButtonProps, "icon"
   placement?: PlacementWithLogical;
   "aria-label"?: string;
   icon?: ReactElement;
+  copyLabel?: string;
+  copiedLabel?: string;
 }
 
 export const CopyToClipboardButton = chakraForwardRef<"button", CopyToClipboardButtonProps>(
   function CopyToClipboardButton(
-    { "aria-label": ariaLabel, text, placement, icon, onClick, onMouseEnter, ...props },
+    {
+      "aria-label": ariaLabel,
+      text,
+      placement,
+      icon,
+      copyLabel,
+      copiedLabel,
+      onClick,
+      onMouseEnter,
+      ...props
+    },
     ref
   ) {
     const intl = useIntl();
     const labels = {
-      copy: intl.formatMessage({
-        id: "component.copy-to-clipboard-button.copy-label",
-        defaultMessage: "Copy to clipboard",
-      }),
-      copied: intl.formatMessage({
-        id: "component.copy-to-clipboard-button.copied-label",
-        defaultMessage: "Copied to clipboard!",
-      }),
+      copy:
+        copyLabel ??
+        intl.formatMessage({
+          id: "component.copy-to-clipboard-button.copy-label",
+          defaultMessage: "Copy to clipboard",
+        }),
+      copied:
+        copiedLabel ??
+        intl.formatMessage({
+          id: "component.copy-to-clipboard-button.copied-label",
+          defaultMessage: "Copied to clipboard!",
+        }),
     };
     const [copied, setState] = useState(false);
 

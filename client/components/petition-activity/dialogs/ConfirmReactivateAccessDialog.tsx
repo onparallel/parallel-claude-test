@@ -16,11 +16,18 @@ export function ConfirmReactivateAccessDialog({
         />
       }
       body={
-        <FormattedMessage
-          id="petition.confirm-activate-access-message.body"
-          defaultMessage="Are you sure you want to <b>reactivate access</b> to {nameOrEmail}?"
-          values={{ nameOrEmail }}
-        />
+        nameOrEmail ? (
+          <FormattedMessage
+            id="petition.confirm-activate-access-message.body"
+            defaultMessage="Are you sure you want to <b>reactivate access</b> to {nameOrEmail}?"
+            values={{ nameOrEmail }}
+          />
+        ) : (
+          <FormattedMessage
+            id="petition.confirm-activate-access-message.body-empty-access"
+            defaultMessage="Are you sure you want to <b>reactivate the empty access</b>?"
+          />
+        )
       }
       confirm={
         <Button colorScheme="red" onClick={() => props.onResolve()}>

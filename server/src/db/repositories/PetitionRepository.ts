@@ -740,17 +740,27 @@ export class PetitionRepository extends BaseRepository {
     return rows;
   }
 
-  async createAccess(petitionId: number, granterId: number, contactId: number | null, user: User) {
-    const [access] = await this.insert("petition_access", {
-      petition_id: petitionId,
-      granter_id: granterId,
-      contact_id: contactId,
-      keycode: random(16),
-      reminders_left: 10,
-      status: "ACTIVE",
-      created_by: `User:${user.id}`,
-      updated_by: `User:${user.id}`,
-    }).returning("*");
+  async createAccess(
+    petitionId: number,
+    granterId: number,
+    contactId: number | null,
+    user: User,
+    t?: Knex.Transaction
+  ) {
+    const [access] = await this.insert(
+      "petition_access",
+      {
+        petition_id: petitionId,
+        granter_id: granterId,
+        contact_id: contactId,
+        keycode: random(16),
+        reminders_left: 10,
+        status: "ACTIVE",
+        created_by: `User:${user.id}`,
+        updated_by: `User:${user.id}`,
+      },
+      t
+    ).returning("*");
 
     return access;
   }
@@ -950,6 +960,21 @@ export class PetitionRepository extends BaseRepository {
       }))
     );
     return accesses;
+  }
+
+  async addContactToPetitionAccess(accessId: number, contactId: number, updatedBy: string) {
+    return await this.from("petition_access")
+      .where("id", accessId)
+      .where("status", "ACTIVE")
+      .whereNull("contact_id")
+      .update(
+        {
+          contact_id: contactId,
+          updated_at: this.now(),
+          updated_by: updatedBy,
+        },
+        "*"
+      );
   }
 
   async updatePetitionAccessNextReminder(accessId: number, nextReminderAt: Date | null) {
@@ -3037,12 +3062,12 @@ export class PetitionRepository extends BaseRepository {
       rows: [{ count }],
     } = await this.knex.raw(
       /* sql */ `
-      select count(distinct c.id)::int as count
+      select count(distinct pa.id)::int as count
         from petition_access as pa
-          join contact as c on c.id = pa.contact_id
+          left join contact as c on c.id = pa.contact_id
         where
           pa.id in ?
-          and c.deleted_at is null
+          and (pa.contact_id is null or c.deleted_at is null)
     `,
       [this.sqlIn(accessIds)]
     );

@@ -259,8 +259,13 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
                   },
                   `PetitionAccess:${access!.id}`
                 );
+
+            await ctx.petitions.addContactToPetitionAccess(
+              access!.id,
+              ctx.contact.id,
+              `PetitionAccess:${access!.id}`
+            );
           }
-          // Set contact_id in petition_access
         }
 
         const { contactAuthentication, cookieValue } =

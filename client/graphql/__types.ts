@@ -5899,6 +5899,7 @@ export type PetitionAccessTable_PetitionFragment = {
     remindersActive: boolean;
     remindersOptOut: boolean;
     isContactless: boolean;
+    recipientUrl: string;
     createdAt: string;
     contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     remindersConfig?: {
@@ -5933,6 +5934,7 @@ export type PetitionAccessTable_PetitionAccessFragment = {
   remindersActive: boolean;
   remindersOptOut: boolean;
   isContactless: boolean;
+  recipientUrl: string;
   createdAt: string;
   contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   remindersConfig?: {
@@ -7248,6 +7250,8 @@ export type AddPetitionAccessDialog_PetitionFragment = {
   };
   accesses: Array<{
     __typename?: "PetitionAccess";
+    isContactless: boolean;
+    recipientUrl: string;
     id: string;
     status: PetitionAccessStatus;
     contact?: {
@@ -8720,6 +8724,8 @@ export type useSendPetitionHandler_PetitionFragment = {
   emailBody?: any | null;
   accesses: Array<{
     __typename?: "PetitionAccess";
+    isContactless: boolean;
+    recipientUrl: string;
     id: string;
     status: PetitionAccessStatus;
     contact?: {
@@ -8831,6 +8837,8 @@ export type useSendPetitionHandler_addPetitionPermissionMutation = {
         emailBody?: any | null;
         accesses: Array<{
           __typename?: "PetitionAccess";
+          isContactless: boolean;
+          recipientUrl: string;
           id: string;
           status: PetitionAccessStatus;
           contact?: {
@@ -13518,12 +13526,13 @@ export type PetitionActivity_PetitionFragment = {
     __typename?: "PetitionAccess";
     id: string;
     status: PetitionAccessStatus;
+    isContactless: boolean;
+    recipientUrl: string;
     nextReminderAt?: string | null;
     remindersLeft: number;
     reminderCount: number;
     remindersActive: boolean;
     remindersOptOut: boolean;
-    isContactless: boolean;
     createdAt: string;
     contact?: {
       __typename?: "Contact";
@@ -14330,12 +14339,13 @@ export type PetitionActivity_updatePetitionMutation = {
           __typename?: "PetitionAccess";
           id: string;
           status: PetitionAccessStatus;
+          isContactless: boolean;
+          recipientUrl: string;
           nextReminderAt?: string | null;
           remindersLeft: number;
           reminderCount: number;
           remindersActive: boolean;
           remindersOptOut: boolean;
-          isContactless: boolean;
           createdAt: string;
           contact?: {
             __typename?: "Contact";
@@ -15206,12 +15216,13 @@ export type PetitionActivity_petitionQuery = {
           __typename?: "PetitionAccess";
           id: string;
           status: PetitionAccessStatus;
+          isContactless: boolean;
+          recipientUrl: string;
           nextReminderAt?: string | null;
           remindersLeft: number;
           reminderCount: number;
           remindersActive: boolean;
           remindersOptOut: boolean;
-          isContactless: boolean;
           createdAt: string;
           contact?: {
             __typename?: "Contact";
@@ -16067,6 +16078,8 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     __typename?: "PetitionAccess";
     id: string;
     status: PetitionAccessStatus;
+    isContactless: boolean;
+    recipientUrl: string;
     contact?: {
       __typename?: "Contact";
       id: string;
@@ -16502,6 +16515,8 @@ export type PetitionCompose_updatePetitionMutation = {
         };
         accesses: Array<{
           __typename?: "PetitionAccess";
+          isContactless: boolean;
+          recipientUrl: string;
           status: PetitionAccessStatus;
           id: string;
           contact?: {
@@ -17021,6 +17036,8 @@ export type PetitionCompose_petitionQuery = {
           __typename?: "PetitionAccess";
           id: string;
           status: PetitionAccessStatus;
+          isContactless: boolean;
+          recipientUrl: string;
           contact?: {
             __typename?: "Contact";
             id: string;
@@ -17501,6 +17518,8 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
     __typename?: "PetitionAccess";
     id: string;
     status: PetitionAccessStatus;
+    isContactless: boolean;
+    recipientUrl: string;
     contact?: {
       __typename?: "Contact";
       id: string;
@@ -17866,6 +17885,8 @@ export type PetitionPreview_updatePetitionMutation = {
           __typename?: "PetitionAccess";
           id: string;
           status: PetitionAccessStatus;
+          isContactless: boolean;
+          recipientUrl: string;
           contact?: {
             __typename?: "Contact";
             id: string;
@@ -18195,6 +18216,8 @@ export type PetitionPreview_completePetitionMutation = {
       __typename?: "PetitionAccess";
       id: string;
       status: PetitionAccessStatus;
+      isContactless: boolean;
+      recipientUrl: string;
       contact?: {
         __typename?: "Contact";
         id: string;
@@ -18388,6 +18411,8 @@ export type PetitionPreview_petitionQuery = {
           __typename?: "PetitionAccess";
           id: string;
           status: PetitionAccessStatus;
+          isContactless: boolean;
+          recipientUrl: string;
           contact?: {
             __typename?: "Contact";
             id: string;
@@ -24097,6 +24122,7 @@ export const PetitionAccessTable_PetitionAccessFragmentDoc = gql`
       ...PetitionAccessTable_PetitionAccessRemindersConfig
     }
     isContactless
+    recipientUrl
     createdAt
   }
   ${ContactReference_ContactFragmentDoc}
@@ -25062,6 +25088,8 @@ export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
       }
     }
     accesses {
+      isContactless
+      recipientUrl
       ...ConfirmPetitionSignersDialog_PetitionAccess
     }
   }

@@ -7235,6 +7235,11 @@
     "context": "Are you sure you want to <b>reactivate access</b> to {nameOrEmail}?"
   },
   {
+    "term": "petition.confirm-activate-access-message.body-empty-access",
+    "definition": "Are you sure you want to reactivate the empty access?",
+    "context": "Are you sure you want to reactivate the empty access?"
+  },
+  {
     "term": "petition.confirm-activate-access-message.confirm",
     "definition": "Yes, activate access",
     "context": "Yes, activate access"

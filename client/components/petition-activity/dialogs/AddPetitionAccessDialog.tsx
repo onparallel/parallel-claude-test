@@ -236,13 +236,18 @@ export function AddPetitionAccessDialog({
   const showContactlessLinkDialog = useContactlessLinkDialog();
   const handleShareByLinkClick = async () => {
     try {
-      const petitionAccess = await createPetitionAccess({
-        variables: {
-          petitionId: petition.id,
-        },
-      });
+      const petitionAccess =
+        petition.accesses.find((a) => a.isContactless) ||
+        (
+          await createPetitionAccess({
+            variables: {
+              petitionId: petition.id,
+            },
+          })
+        ).data?.createPetitionAccess;
+
       const data = await showContactlessLinkDialog({
-        link: petitionAccess.data?.createPetitionAccess.recipientUrl ?? "",
+        link: petitionAccess?.recipientUrl ?? "",
         petitionId: petition.id,
       });
       if (data.forceClose) {
@@ -546,6 +551,8 @@ AddPetitionAccessDialog.fragments = {
         }
       }
       accesses {
+        isContactless
+        recipientUrl
         ...ConfirmPetitionSignersDialog_PetitionAccess
       }
     }

@@ -36,6 +36,7 @@ import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 import { Card, CardHeader } from "../common/Card";
 import { ContactReference } from "../common/ContactReference";
+import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { DateTime } from "../common/DateTime";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NormalLink } from "../common/Link";
@@ -249,7 +250,7 @@ function usePetitionAccessesColumns(): TableColumn<
           defaultMessage: "Status",
         }),
         CellContent: ({ row: { status, isContactless } }) => {
-          if (isContactless) {
+          if (isContactless && status === "ACTIVE") {
             return (
               <Text color="yellow.500">
                 <FormattedMessage id="petition-access.status-pending" defaultMessage="Pending" />
@@ -335,7 +336,7 @@ function usePetitionAccessesColumns(): TableColumn<
             onDeactivateAccess,
             onReactivateAccess,
           } = context!;
-          const { id, status, contact, remindersOptOut, isContactless } = row;
+          const { id, status, contact, remindersOptOut, isContactless, recipientUrl } = row;
           const intl = useIntl();
 
           const myEffectivePermission = petition.myEffectivePermission!.permissionType;
@@ -363,15 +364,15 @@ function usePetitionAccessesColumns(): TableColumn<
           return (
             <Stack direction="row" spacing={2} justifyContent="flex-end">
               {isContactless ? (
-                <IconButtonWithTooltip
-                  label={intl.formatMessage({
+                <CopyToClipboardButton
+                  copyLabel={intl.formatMessage({
                     id: "generic.copy-link",
                     defaultMessage: "Copy link",
                   })}
-                  onClick={() => {}}
-                  placement="left"
                   icon={<PaperclipIcon fontSize="16px" />}
                   size="sm"
+                  placement="bottom"
+                  text={recipientUrl}
                   isDisabled={petition.isAnonymized}
                 />
               ) : (
@@ -462,6 +463,7 @@ PetitionAccessesTable.fragments = {
         ...PetitionAccessTable_PetitionAccessRemindersConfig
       }
       isContactless
+      recipientUrl
       createdAt
     }
     ${ContactReference.fragments.Contact}

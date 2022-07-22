@@ -1258,12 +1258,29 @@ export const createPetitionAccess = mutationField("createPetitionAccess", {
     contactId: globalIdArg("Contact"),
   },
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.createAccess(
-      args.petitionId,
-      ctx.user!.id,
-      args.contactId ?? null,
-      ctx.user!
-    );
+    return await ctx.petitions.withTransaction(async (t) => {
+      const petitionAccess = await ctx.petitions.createAccess(
+        args.petitionId,
+        ctx.user!.id,
+        args.contactId ?? null,
+        ctx.user!,
+        t
+      );
+
+      await ctx.petitions.createEvent(
+        {
+          type: "ACCESS_ACTIVATED",
+          petition_id: args.petitionId,
+          data: {
+            petition_access_id: petitionAccess.id,
+            user_id: ctx.user!.id,
+          },
+        },
+        t
+      );
+
+      return petitionAccess;
+    });
   },
 });
 
