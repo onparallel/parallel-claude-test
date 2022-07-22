@@ -3,7 +3,10 @@ import { isDefined } from "remeda";
 import SignaturitSDK, { BrandingParams } from "signaturit-sdk";
 import { URLSearchParams } from "url";
 import { CONFIG, Config } from "../../config";
-import { IntegrationSettings } from "../../db/repositories/IntegrationRepository";
+import {
+  IntegrationRepository,
+  IntegrationSettings,
+} from "../../db/repositories/IntegrationRepository";
 import { buildEmail } from "../../emails/buildEmail";
 import SignatureCancelledEmail from "../../emails/emails/SignatureCancelledEmail";
 import SignatureCompletedEmail from "../../emails/emails/SignatureCompletedEmail";
@@ -20,21 +23,27 @@ import { BrandingIdKey, ISignatureClient, Recipient, SignatureOptions } from "./
 export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
   private sdk!: SignaturitSDK;
   private settings!: IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
+  private integrationId: number | undefined;
 
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(I18N_SERVICE) private i18n: II18nService,
-    @inject(FETCH_SERVICE) private fetch: IFetchService
+    @inject(FETCH_SERVICE) private fetch: IFetchService,
+    @inject(IntegrationRepository) private integrationRepository: IntegrationRepository
   ) {}
 
-  configure(settings: IntegrationSettings<"SIGNATURE", "SIGNATURIT">) {
-    if (!settings.CREDENTIALS.API_KEY) {
+  configure(integration: {
+    id?: number;
+    settings: IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
+  }) {
+    if (!integration.settings.CREDENTIALS.API_KEY) {
       throw new Error("Signaturit API KEY not found on org_integration settings");
     }
-    this.settings = settings;
+    this.settings = integration.settings;
+    this.integrationId = integration.id;
     this.sdk = new SignaturitSDK(
-      this.settings.CREDENTIALS.API_KEY,
-      settings.ENVIRONMENT === "production"
+      integration.settings.CREDENTIALS.API_KEY,
+      integration.settings.ENVIRONMENT === "production"
     );
   }
 
@@ -81,13 +90,18 @@ export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
     const tone = opts.templateData?.tone ?? "INFORMAL";
 
     const key = `${locale.toUpperCase()}_${tone}_BRANDING_ID` as BrandingIdKey;
-
     let brandingId = this.settings[key];
-
     if (!brandingId) {
       brandingId = await this.createBranding(opts);
-      // TODO update branding
-      // this.emit("branding_created", { locale, brandingId, tone });
+      this.settings[key] = brandingId;
+
+      if (isDefined(this.integrationId)) {
+        this.integrationRepository.updateOrgIntegration<"SIGNATURE">(
+          this.integrationId,
+          { settings: this.settings },
+          `OrgIntegration:${this.integrationId}`
+        );
+      }
     }
 
     const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.parallelUrl);

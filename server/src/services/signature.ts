@@ -23,10 +23,11 @@ import { AWS_SERVICE, IAws } from "./aws";
 import { ISignatureClient, SIGNATURE_CLIENT } from "./signature-clients/client";
 
 export interface ISignatureService {
-  getClient<TProvider extends SignatureProvider>(
-    provider: TProvider,
-    settings: IntegrationSettings<"SIGNATURE", TProvider>
-  ): ISignatureClient<TProvider>;
+  getClient<TProvider extends SignatureProvider>(integration: {
+    id?: number;
+    provider: TProvider;
+    settings: IntegrationSettings<"SIGNATURE", TProvider>;
+  }): ISignatureClient<TProvider>;
   createSignatureRequest(
     petitionId: number,
     signatureConfig: PetitionSignatureConfig,
@@ -63,39 +64,18 @@ export class SignatureService implements ISignatureService {
     @inject(Container) private container: Container
   ) {}
 
-  public getClient<TProvider extends SignatureProvider>(
-    provider: TProvider,
-    settings: IntegrationSettings<"SIGNATURE", TProvider>
-  ): ISignatureClient<TProvider> {
-    const client = this.container.getNamed<ISignatureClient<TProvider>>(SIGNATURE_CLIENT, provider);
-    client.configure(settings);
+  public getClient<TProvider extends SignatureProvider>(integration: {
+    id?: number;
+    provider: TProvider;
+    settings: IntegrationSettings<"SIGNATURE", TProvider>;
+  }): ISignatureClient<TProvider> {
+    const client = this.container.getNamed<ISignatureClient<TProvider>>(
+      SIGNATURE_CLIENT,
+      integration.provider
+    );
+    client.configure(integration);
     return client;
   }
-
-  // TODO remove this
-  // private buildSignaturItClient(integration: {
-  //   id?: number;
-  //   settings: IntegrationSettings<"SIGNATURE">;
-  // }): SignaturitClient {
-  //   const client = new SignaturitClient(integration.settings, this.config, this.i18n);
-  //   if (isDefined(integration.id)) {
-  //     client.on(
-  //       "branding_created",
-  //       ({ locale, brandingId, tone }: { locale: string; brandingId: string; tone: Tone }) => {
-  //         const key = `${locale.toUpperCase()}_${tone.toUpperCase()}_BRANDING_ID` as BrandingIdKey;
-
-  //         integration.settings[key] = brandingId;
-
-  //         this.integrationRepository.updateOrgIntegration<"SIGNATURE">(
-  //           integration.id!,
-  //           { settings: integration.settings },
-  //           `OrgIntegration:${integration.id}`
-  //         );
-  //       }
-  //     );
-  //   }
-  //   return client;
-  // }
 
   async createSignatureRequest(
     petitionId: number,

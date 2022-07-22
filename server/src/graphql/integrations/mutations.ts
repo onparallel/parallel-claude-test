@@ -41,7 +41,7 @@ export const createSignatureIntegration = mutationField("createSignatureIntegrat
   resolve: async (_, args, ctx) => {
     const [error, data] = await withError(
       ctx.signature
-        .getClient("SIGNATURIT", { CREDENTIALS: { API_KEY: args.apiKey } })
+        .getClient({ provider: "SIGNATURIT", settings: { CREDENTIALS: { API_KEY: args.apiKey } } })
         .authenticate()
     );
     if (error || !data.environment) {
@@ -97,7 +97,7 @@ export const validateSignatureCredentials = mutationField("validateSignatureCred
   resolve: async (_, args, ctx) => {
     try {
       const data = await ctx.signature
-        .getClient(args.provider, { CREDENTIALS: args.credentials as any })
+        .getClient({ provider: args.provider, settings: { CREDENTIALS: args.credentials as any } })
         .authenticate();
       return { success: true, data };
     } catch {}
@@ -117,7 +117,7 @@ export const createSignaturitIntegration = mutationField("createSignaturitIntegr
   resolve: async (_, args, ctx) => {
     const [error, data] = await withError(
       ctx.signature
-        .getClient("SIGNATURIT", { CREDENTIALS: { API_KEY: args.apiKey } })
+        .getClient({ provider: "SIGNATURIT", settings: { CREDENTIALS: { API_KEY: args.apiKey } } })
         .authenticate()
     );
     if (error || !data.environment) {

@@ -12,7 +12,6 @@ export function createContainer() {
   container.bind<WorkerContext>(WorkerContext).toSelf();
   container.load(dbModule);
   container.load(servicesModule);
-  container.load(servicesModule);
   container.load(signatureClientsModule);
   container.bind<Container>(Container).toConstantValue(container);
   return container;

@@ -5,7 +5,6 @@ import {
 import { Tone } from "../../db/__types";
 import { OrganizationBrandTheme } from "../../emails/utils/ThemeProvider";
 import { PdfDocumentTheme } from "../../util/PdfDocumentTheme";
-import { IFetchService } from "../fetch";
 
 type Document = {
   id: string;
@@ -63,7 +62,10 @@ type AuthenticationResponse<TProvider extends SignatureProvider = any> = {
 export const SIGNATURE_CLIENT = Symbol.for("SIGNATURE_CLIENT");
 
 export interface ISignatureClient<TProvider extends SignatureProvider> {
-  configure(settings: IntegrationSettings<"SIGNATURE", "SIGNATURIT">): void;
+  configure(integration: {
+    id?: number;
+    settings: IntegrationSettings<"SIGNATURE", TProvider>;
+  }): void;
   authenticate(): Promise<AuthenticationResponse<TProvider>>;
   startSignatureRequest: (
     petitionId: string,
