@@ -1,4 +1,4 @@
-import { inject, injectable } from "inversify";
+import { Container, inject, injectable } from "inversify";
 import { Knex } from "knex";
 import "reflect-metadata";
 import { countBy, isDefined, omit } from "remeda";
@@ -14,23 +14,19 @@ import {
   PetitionSignatureConfig,
   PetitionSignatureConfigSigner,
 } from "../db/repositories/PetitionRepository";
-import { PetitionAccess, PetitionSignatureRequest, Tone, User } from "../db/__types";
+import { PetitionAccess, PetitionSignatureRequest, User } from "../db/__types";
 import { unMaybeArray } from "../util/arrays";
 import { toGlobalId } from "../util/globalId";
 import { random } from "../util/token";
 import { MaybeArray } from "../util/types";
 import { AWS_SERVICE, IAws } from "./aws";
-import { FETCH_SERVICE, IFetchService } from "./fetch";
-import { I18N_SERVICE, II18nService } from "./i18n";
-import { BrandingIdKey, ISignatureClient } from "./signature-clients/client";
-import { SignaturItClient } from "./signature-clients/signaturit";
+import { ISignatureClient, SIGNATURE_CLIENT } from "./signature-clients/client";
 
 export interface ISignatureService {
-  getClient<TProvider extends SignatureProvider>(integration: {
-    id?: number;
-    provider: TProvider;
-    settings: IntegrationSettings<"SIGNATURE", TProvider>;
-  }): ISignatureClient<TProvider>;
+  getClient<TProvider extends SignatureProvider>(
+    provider: TProvider,
+    settings: IntegrationSettings<"SIGNATURE", TProvider>
+  ): ISignatureClient<TProvider>;
   createSignatureRequest(
     petitionId: number,
     signatureConfig: PetitionSignatureConfig,
@@ -64,46 +60,42 @@ export class SignatureService implements ISignatureService {
     @inject(PetitionRepository) private petitionsRepository: PetitionRepository,
     @inject(OrganizationRepository) private organizationsRepository: OrganizationRepository,
     @inject(AWS_SERVICE) private aws: IAws,
-    @inject(FETCH_SERVICE) private fetch: IFetchService,
-    @inject(I18N_SERVICE) public readonly i18n: II18nService
+    @inject(Container) private container: Container
   ) {}
 
-  public getClient<TProvider extends SignatureProvider>(integration: {
-    id?: number;
-    provider: TProvider;
-    settings: IntegrationSettings<"SIGNATURE", TProvider>;
-  }): ISignatureClient<TProvider> {
-    switch (integration.provider.toUpperCase()) {
-      case "SIGNATURIT":
-        return this.buildSignaturItClient(integration);
-      default:
-        throw new Error(`Couldn't resolve signature client: ${integration.provider}`);
-    }
-  }
-
-  private buildSignaturItClient(integration: {
-    id?: number;
-    settings: IntegrationSettings<"SIGNATURE">;
-  }): SignaturItClient {
-    const client = new SignaturItClient(integration.settings, this.config, this.i18n);
-    if (isDefined(integration.id)) {
-      client.on(
-        "branding_created",
-        ({ locale, brandingId, tone }: { locale: string; brandingId: string; tone: Tone }) => {
-          const key = `${locale.toUpperCase()}_${tone.toUpperCase()}_BRANDING_ID` as BrandingIdKey;
-
-          integration.settings[key] = brandingId;
-
-          this.integrationRepository.updateOrgIntegration<"SIGNATURE">(
-            integration.id!,
-            { settings: integration.settings },
-            `OrgIntegration:${integration.id}`
-          );
-        }
-      );
-    }
+  public getClient<TProvider extends SignatureProvider>(
+    provider: TProvider,
+    settings: IntegrationSettings<"SIGNATURE", TProvider>
+  ): ISignatureClient<TProvider> {
+    const client = this.container.getNamed<ISignatureClient<TProvider>>(SIGNATURE_CLIENT, provider);
+    client.configure(settings);
     return client;
   }
+
+  // TODO remove this
+  // private buildSignaturItClient(integration: {
+  //   id?: number;
+  //   settings: IntegrationSettings<"SIGNATURE">;
+  // }): SignaturitClient {
+  //   const client = new SignaturitClient(integration.settings, this.config, this.i18n);
+  //   if (isDefined(integration.id)) {
+  //     client.on(
+  //       "branding_created",
+  //       ({ locale, brandingId, tone }: { locale: string; brandingId: string; tone: Tone }) => {
+  //         const key = `${locale.toUpperCase()}_${tone.toUpperCase()}_BRANDING_ID` as BrandingIdKey;
+
+  //         integration.settings[key] = brandingId;
+
+  //         this.integrationRepository.updateOrgIntegration<"SIGNATURE">(
+  //           integration.id!,
+  //           { settings: integration.settings },
+  //           `OrgIntegration:${integration.id}`
+  //         );
+  //       }
+  //     );
+  //   }
+  //   return client;
+  // }
 
   async createSignatureRequest(
     petitionId: number,

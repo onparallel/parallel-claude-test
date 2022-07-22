@@ -1,4 +1,7 @@
-import { SignatureProvider } from "../../db/repositories/IntegrationRepository";
+import {
+  IntegrationSettings,
+  SignatureProvider,
+} from "../../db/repositories/IntegrationRepository";
 import { Tone } from "../../db/__types";
 import { OrganizationBrandTheme } from "../../emails/utils/ThemeProvider";
 import { PdfDocumentTheme } from "../../util/PdfDocumentTheme";
@@ -57,9 +60,11 @@ type AuthenticationResponse<TProvider extends SignatureProvider = any> = {
   SIGNATURIT: { environment: "production" | "sandbox" };
 }[TProvider];
 
-export interface ISignatureClient<TProvider extends SignatureProvider = any> {
-  get environment(): "production" | "sandbox" | undefined;
-  authenticate(fetch: IFetchService): Promise<AuthenticationResponse<TProvider>>;
+export const SIGNATURE_CLIENT = Symbol.for("SIGNATURE_CLIENT");
+
+export interface ISignatureClient<TProvider extends SignatureProvider> {
+  configure(settings: IntegrationSettings<"SIGNATURE", "SIGNATURIT">): void;
+  authenticate(): Promise<AuthenticationResponse<TProvider>>;
   startSignatureRequest: (
     petitionId: string,
     orgId: string,

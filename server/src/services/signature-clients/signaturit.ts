@@ -1,9 +1,8 @@
-import { EventEmitter } from "events";
-import "reflect-metadata";
+import { inject, injectable } from "inversify";
 import { isDefined } from "remeda";
 import SignaturitSDK, { BrandingParams } from "signaturit-sdk";
 import { URLSearchParams } from "url";
-import { Config } from "../../config";
+import { CONFIG, Config } from "../../config";
 import { IntegrationSettings } from "../../db/repositories/IntegrationRepository";
 import { buildEmail } from "../../emails/buildEmail";
 import SignatureCancelledEmail from "../../emails/emails/SignatureCancelledEmail";
@@ -13,33 +12,33 @@ import SignatureRequestedEmail from "../../emails/emails/SignatureRequestedEmail
 import { getBaseWebhookUrl } from "../../util/getBaseWebhookUrl";
 import { downloadImageBase64 } from "../../util/images";
 import { removeNotDefined } from "../../util/remedaExtensions";
-import { IFetchService } from "../fetch";
-import { II18nService } from "../i18n";
+import { FETCH_SERVICE, IFetchService } from "../fetch";
+import { I18N_SERVICE, II18nService } from "../i18n";
 import { BrandingIdKey, ISignatureClient, Recipient, SignatureOptions } from "./client";
 
-export class SignaturItClient extends EventEmitter implements ISignatureClient<"SIGNATURIT"> {
-  private sdk: SignaturitSDK;
+@injectable()
+export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
+  private sdk!: SignaturitSDK;
+  private settings!: IntegrationSettings<"SIGNATURE", "SIGNATURIT">;
+
   constructor(
-    private settings: IntegrationSettings<"SIGNATURE", "SIGNATURIT">,
-    private config: Config,
-    private i18n: II18nService
-  ) {
-    super();
-    if (!this.settings.CREDENTIALS.API_KEY) {
+    @inject(CONFIG) private config: Config,
+    @inject(I18N_SERVICE) private i18n: II18nService,
+    @inject(FETCH_SERVICE) private fetch: IFetchService
+  ) {}
+
+  configure(settings: IntegrationSettings<"SIGNATURE", "SIGNATURIT">) {
+    if (!settings.CREDENTIALS.API_KEY) {
       throw new Error("Signaturit API KEY not found on org_integration settings");
     }
-
+    this.settings = settings;
     this.sdk = new SignaturitSDK(
       this.settings.CREDENTIALS.API_KEY,
       settings.ENVIRONMENT === "production"
     );
   }
 
-  get environment() {
-    return this.settings.ENVIRONMENT;
-  }
-
-  async authenticate(fetch: IFetchService) {
+  async authenticate() {
     return await Promise.any(
       Object.entries({
         sandbox: "https://api.sandbox.signaturit.com",
@@ -51,7 +50,7 @@ export class SignaturItClient extends EventEmitter implements ISignatureClient<"
           return !isDefined(this.settings.ENVIRONMENT) || env === this.settings.ENVIRONMENT;
         })
         .map(([environment, url]) =>
-          fetch
+          this.fetch
             .fetchWithTimeout(
               `${url}/v3/team/users.json`,
               {
@@ -87,7 +86,8 @@ export class SignaturItClient extends EventEmitter implements ISignatureClient<"
 
     if (!brandingId) {
       brandingId = await this.createBranding(opts);
-      this.emit("branding_created", { locale, brandingId, tone });
+      // TODO update branding
+      // this.emit("branding_created", { locale, brandingId, tone });
     }
 
     const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.parallelUrl);

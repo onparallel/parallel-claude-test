@@ -41,11 +41,8 @@ export const createSignatureIntegration = mutationField("createSignatureIntegrat
   resolve: async (_, args, ctx) => {
     const [error, data] = await withError(
       ctx.signature
-        .getClient({
-          provider: "SIGNATURIT",
-          settings: { CREDENTIALS: { API_KEY: args.apiKey } },
-        })
-        .authenticate(ctx.fetch)
+        .getClient("SIGNATURIT", { CREDENTIALS: { API_KEY: args.apiKey } })
+        .authenticate()
     );
     if (error || !data.environment) {
       throw new ApolloError(
@@ -100,11 +97,8 @@ export const validateSignatureCredentials = mutationField("validateSignatureCred
   resolve: async (_, args, ctx) => {
     try {
       const data = await ctx.signature
-        .getClient({
-          provider: args.provider,
-          settings: { CREDENTIALS: args.credentials as any },
-        })
-        .authenticate(ctx.fetch);
+        .getClient(args.provider, { CREDENTIALS: args.credentials as any })
+        .authenticate();
       return { success: true, data };
     } catch {}
     return { success: false };
@@ -123,11 +117,8 @@ export const createSignaturitIntegration = mutationField("createSignaturitIntegr
   resolve: async (_, args, ctx) => {
     const [error, data] = await withError(
       ctx.signature
-        .getClient({
-          provider: "SIGNATURIT",
-          settings: { CREDENTIALS: { API_KEY: args.apiKey } },
-        })
-        .authenticate(ctx.fetch)
+        .getClient("SIGNATURIT", { CREDENTIALS: { API_KEY: args.apiKey } })
+        .authenticate()
     );
     if (error || !data.environment) {
       throw new ApolloError(

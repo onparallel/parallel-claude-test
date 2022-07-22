@@ -1,8 +1,9 @@
 import { Container } from "inversify";
-import { Config, CONFIG, buildConfig } from "./config";
+import { buildConfig, Config, CONFIG } from "./config";
 import { ApiContext, WorkerContext } from "./context";
 import { dbModule } from "./db/module";
 import { servicesModule } from "./services/module";
+import { signatureClientsModule } from "./services/signature-clients/module";
 
 export function createContainer() {
   const container = new Container();
@@ -11,5 +12,8 @@ export function createContainer() {
   container.bind<WorkerContext>(WorkerContext).toSelf();
   container.load(dbModule);
   container.load(servicesModule);
+  container.load(servicesModule);
+  container.load(signatureClientsModule);
+  container.bind<Container>(Container).toConstantValue(container);
   return container;
 }
