@@ -551,7 +551,7 @@ function _PetitionSettings({
               <Select
                 size="sm"
                 borderRadius="md"
-                width="120px"
+                minWidth="120px"
                 value={petition.selectedDocumentTheme.id}
                 onChange={(event) => handleUpdateTemplateDocumentTheme(event.target.value)}
               >

@@ -211,7 +211,7 @@ export const PetitionTemplateHeader = Object.assign(
             flexShrink={0}
             onClick={handleUseTemplate}
             data-action="use-template"
-            marginRight={{ base: 3, md: 4 }}
+            marginRight={2}
           >
             <FormattedMessage id="generic.create-petition" defaultMessage="Create parallel" />
           </Button>
