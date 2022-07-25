@@ -6,6 +6,7 @@ import {
   PetitionSignaturesCard_PetitionFragment,
 } from "@parallel/graphql/__types";
 import { useEffect } from "react";
+import { isDefined } from "remeda";
 
 const POLL_INTERVAL = 10000;
 
@@ -31,10 +32,14 @@ export function usePetitionSignaturesCardPolling(
   useEffect(() => {
     if (current && ["ENQUEUED", "PROCESSING", "PROCESSED"].includes(current.status)) {
       startPolling(POLL_INTERVAL);
-    } else if (current && ["COMPLETED", "CANCELLED"].includes(current.status)) {
+    } else if (
+      current &&
+      ["COMPLETED", "CANCELLED"].includes(current.status) &&
+      isDefined(current.auditTrailFilename)
+    ) {
       stopPolling();
     }
 
     return stopPolling;
-  }, [current?.status]);
+  }, [current?.status, current?.auditTrailFilename]);
 }
