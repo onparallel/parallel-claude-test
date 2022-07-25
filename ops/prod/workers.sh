@@ -1,5 +1,4 @@
 COMMAND=$1
-ENV="#ENV#"
 
 if [[ "$COMMAND" == "start" ]]; then
   
