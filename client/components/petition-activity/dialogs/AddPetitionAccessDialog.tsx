@@ -90,6 +90,7 @@ export function AddPetitionAccessDialog({
   const [showErrors, setShowErrors] = useState(false);
   const [recipientGroups, setRecipientGroups] = useState<ContactSelectSelection[][]>([[]]);
   const [sendAsId, setSendAsId] = useState(user.id);
+  const [accesses, setAccesses] = useState(petition.accesses);
 
   const [subscribeSender, setSubscribeSender] = useState(false);
   const [subject, setSubject] = useState(petition.emailSubject ?? "");
@@ -234,27 +235,33 @@ export function AddPetitionAccessDialog({
 
   const [createPetitionAccess] = useMutation(AddPetitionAccessDialog_createPetitionAccessDocument);
   const showContactlessLinkDialog = useContactlessLinkDialog();
-  const handleShareByLinkClick = async () => {
+  const handleShareByLinkClick = useCallback(async () => {
     try {
-      const petitionAccess =
-        petition.accesses.find((a) => a.isContactless) ||
-        (
-          await createPetitionAccess({
-            variables: {
-              petitionId: petition.id,
-            },
-          })
-        ).data?.createPetitionAccess;
+      const currentAccessLink = accesses.find((a) => a.isContactless && a.status === "ACTIVE");
+      let link = currentAccessLink?.recipientUrl ?? "";
+
+      if (!currentAccessLink) {
+        const newAccess = await createPetitionAccess({
+          variables: {
+            petitionId: petition.id,
+          },
+        });
+
+        if (isDefined(newAccess.data)) {
+          link = newAccess.data.createPetitionAccess.recipientUrl;
+          setAccesses(newAccess.data.createPetitionAccess.petition!.accesses);
+        }
+      }
 
       const data = await showContactlessLinkDialog({
-        link: petitionAccess?.recipientUrl ?? "",
+        link,
         petitionId: petition.id,
       });
       if (data.forceClose) {
         props.onReject();
       }
     } catch {}
-  };
+  }, [accesses]);
 
   const { used, limit } = petition.organization.usageLimits.petitions;
 
@@ -478,17 +485,6 @@ export function AddPetitionAccessDialog({
   );
 }
 
-AddPetitionAccessDialog.mutations = [
-  gql`
-    mutation AddPetitionAccessDialog_createPetitionAccess($petitionId: GID!) {
-      createPetitionAccess(petitionId: $petitionId) {
-        id
-        recipientUrl
-      }
-    }
-  `,
-];
-
 AddPetitionAccessDialog.fragments = {
   User: gql`
     fragment AddPetitionAccessDialog_User on User {
@@ -562,6 +558,21 @@ AddPetitionAccessDialog.fragments = {
     ${ConfirmPetitionSignersDialog.fragments.PetitionSignatureRequest}
   `,
 };
+
+AddPetitionAccessDialog.mutations = [
+  gql`
+    mutation AddPetitionAccessDialog_createPetitionAccess($petitionId: GID!) {
+      createPetitionAccess(petitionId: $petitionId) {
+        id
+        recipientUrl
+        petition {
+          ...AddPetitionAccessDialog_Petition
+        }
+      }
+    }
+    ${AddPetitionAccessDialog.fragments.Petition}
+  `,
+];
 
 export function useAddPetitionAccessDialog() {
   return useDialog(AddPetitionAccessDialog);

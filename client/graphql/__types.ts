@@ -7172,14 +7172,6 @@ export type UserReference_UserFragment = {
   status: UserStatus;
 };
 
-export type AddPetitionAccessDialog_createPetitionAccessMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-}>;
-
-export type AddPetitionAccessDialog_createPetitionAccessMutation = {
-  createPetitionAccess: { __typename?: "PetitionAccess"; id: string; recipientUrl: string };
-};
-
 export type AddPetitionAccessDialog_UserFragment = {
   __typename?: "User";
   id: string;
@@ -7263,6 +7255,91 @@ export type AddPetitionAccessDialog_PetitionFragment = {
       lastName?: string | null;
     } | null;
   }>;
+};
+
+export type AddPetitionAccessDialog_createPetitionAccessMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type AddPetitionAccessDialog_createPetitionAccessMutation = {
+  createPetitionAccess: {
+    __typename?: "PetitionAccess";
+    id: string;
+    recipientUrl: string;
+    petition?: {
+      __typename?: "Petition";
+      id: string;
+      emailSubject?: string | null;
+      emailBody?: any | null;
+      myEffectivePermission?: {
+        __typename?: "EffectivePetitionUserPermission";
+        permissionType: PetitionPermissionType;
+      } | null;
+      effectivePermissions: Array<{
+        __typename?: "EffectivePetitionUserPermission";
+        isSubscribed: boolean;
+        user: { __typename?: "User"; id: string };
+      }>;
+      signatureRequests: Array<{
+        __typename?: "PetitionSignatureRequest";
+        signatureConfig: {
+          __typename?: "SignatureConfig";
+          signers: Array<{
+            __typename?: "PetitionSigner";
+            contactId?: string | null;
+            email: string;
+            firstName: string;
+            lastName?: string | null;
+          } | null>;
+        };
+      }>;
+      signatureConfig?: {
+        __typename?: "SignatureConfig";
+        review: boolean;
+        timezone: string;
+        title?: string | null;
+        allowAdditionalSigners: boolean;
+        integration?: { __typename?: "SignatureOrgIntegration"; id: string } | null;
+        signers: Array<{
+          __typename?: "PetitionSigner";
+          email: string;
+          fullName: string;
+          contactId?: string | null;
+          firstName: string;
+          lastName?: string | null;
+        } | null>;
+      } | null;
+      remindersConfig?: {
+        __typename?: "RemindersConfig";
+        offset: number;
+        time: string;
+        timezone: string;
+        weekdaysOnly: boolean;
+      } | null;
+      organization: {
+        __typename?: "Organization";
+        id: string;
+        usageLimits: {
+          __typename?: "OrganizationUsageLimit";
+          petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+        };
+      };
+      accesses: Array<{
+        __typename?: "PetitionAccess";
+        isContactless: boolean;
+        recipientUrl: string;
+        id: string;
+        status: PetitionAccessStatus;
+        contact?: {
+          __typename?: "Contact";
+          id: string;
+          email: string;
+          firstName: string;
+          lastName?: string | null;
+        } | null;
+      }>;
+    } | null;
+  };
 };
 
 export type SentPetitionMessageDialog_PetitionMessageFragment = {
@@ -27439,8 +27516,12 @@ export const AddPetitionAccessDialog_createPetitionAccessDocument = gql`
     createPetitionAccess(petitionId: $petitionId) {
       id
       recipientUrl
+      petition {
+        ...AddPetitionAccessDialog_Petition
+      }
     }
   }
+  ${AddPetitionAccessDialog_PetitionFragmentDoc}
 ` as unknown as DocumentNode<
   AddPetitionAccessDialog_createPetitionAccessMutation,
   AddPetitionAccessDialog_createPetitionAccessMutationVariables

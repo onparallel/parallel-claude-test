@@ -1258,7 +1258,7 @@ export const createPetitionAccess = mutationField("createPetitionAccess", {
     contactId: globalIdArg("Contact"),
   },
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.withTransaction(async (t) => {
+    const accesses = await ctx.petitions.withTransaction(async (t) => {
       const petitionAccess = await ctx.petitions.createAccess(
         args.petitionId,
         ctx.user!.id,
@@ -1281,6 +1281,9 @@ export const createPetitionAccess = mutationField("createPetitionAccess", {
 
       return petitionAccess;
     });
+
+    ctx.petitions.loadAccessesForPetition.dataloader.clear(args.petitionId);
+    return accesses;
   },
 });
 

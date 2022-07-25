@@ -346,7 +346,7 @@ function usePetitionAccessesColumns(): TableColumn<
 
           if (status === "INACTIVE") {
             const contactHasActiveAccess = petition.accesses.some(
-              (access) => access.contact?.id === contact!.id && access.status === "ACTIVE"
+              (access) => access.contact?.id === contact?.id && access.status === "ACTIVE"
             );
 
             if (contactHasActiveAccess) return null;

@@ -1236,7 +1236,8 @@ export type MutationpublicResetTemporaryPasswordArgs = {
 
 export type MutationpublicSendReminderArgs = {
   contactEmail: Scalars["String"];
-  slug: Scalars["ID"];
+  keycode?: InputMaybe<Scalars["ID"]>;
+  slug?: InputMaybe<Scalars["ID"]>;
 };
 
 export type MutationpublicSendVerificationCodeArgs = {
