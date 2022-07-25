@@ -74,7 +74,7 @@ export function RecipientViewNewDevice({
   }
 
   async function handleSubmitCode(code: string) {
-    if (state.step === "REQUEST" || state.step === "VERIFIED") {
+    if (state.step !== "VERIFY") {
       return;
     }
     if (isPast(new Date(state.expiresAt))) {

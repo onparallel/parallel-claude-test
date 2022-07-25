@@ -1270,7 +1270,8 @@ export interface MutationpublicResetTemporaryPasswordArgs {
 
 export interface MutationpublicSendReminderArgs {
   contactEmail: Scalars["String"];
-  slug: Scalars["ID"];
+  keycode?: InputMaybe<Scalars["ID"]>;
+  slug?: InputMaybe<Scalars["ID"]>;
 }
 
 export interface MutationpublicSendVerificationCodeArgs {
@@ -10957,6 +10958,15 @@ export type RecipientViewContactlessForm_publicCheckVerificationCodeMutation = {
     result: Result;
     remainingAttempts?: number | null;
   };
+};
+
+export type RecipientViewContactlessForm_publicSendReminderMutationVariables = Exact<{
+  keycode?: InputMaybe<Scalars["ID"]>;
+  contactEmail: Scalars["String"];
+}>;
+
+export type RecipientViewContactlessForm_publicSendReminderMutation = {
+  publicSendReminder: Result;
 };
 
 export type RecipientViewContentsCard_PublicUserFragment = {
@@ -21532,7 +21542,7 @@ export type PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation
 };
 
 export type PublicPetitionLink_publicSendReminderMutationVariables = Exact<{
-  slug: Scalars["ID"];
+  slug?: InputMaybe<Scalars["ID"]>;
   contactEmail: Scalars["String"];
 }>;
 
@@ -25572,6 +25582,7 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
       accesses {
         id
         status
+        isContactless
       }
       status
       signatureConfig {
@@ -25976,6 +25987,7 @@ export const PetitionPreview_PetitionBaseFragmentDoc = gql`
       accesses {
         id
         status
+        isContactless
         ...ConfirmPetitionSignersDialog_PetitionAccess
       }
       ...RecipientViewProgressFooter_Petition
@@ -28267,6 +28279,14 @@ export const RecipientViewContactlessForm_publicCheckVerificationCodeDocument = 
   RecipientViewContactlessForm_publicCheckVerificationCodeMutation,
   RecipientViewContactlessForm_publicCheckVerificationCodeMutationVariables
 >;
+export const RecipientViewContactlessForm_publicSendReminderDocument = gql`
+  mutation RecipientViewContactlessForm_publicSendReminder($keycode: ID, $contactEmail: String!) {
+    publicSendReminder(keycode: $keycode, contactEmail: $contactEmail)
+  }
+` as unknown as DocumentNode<
+  RecipientViewContactlessForm_publicSendReminderMutation,
+  RecipientViewContactlessForm_publicSendReminderMutationVariables
+>;
 export const RecipientViewHeader_publicDelegateAccessToContactDocument = gql`
   mutation RecipientViewHeader_publicDelegateAccessToContact(
     $keycode: ID!
@@ -30135,7 +30155,7 @@ export const PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkDocumen
   PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutationVariables
 >;
 export const PublicPetitionLink_publicSendReminderDocument = gql`
-  mutation PublicPetitionLink_publicSendReminder($slug: ID!, $contactEmail: String!) {
+  mutation PublicPetitionLink_publicSendReminder($slug: ID, $contactEmail: String!) {
     publicSendReminder(slug: $slug, contactEmail: $contactEmail)
   }
 ` as unknown as DocumentNode<

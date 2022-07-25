@@ -962,8 +962,13 @@ export class PetitionRepository extends BaseRepository {
     return accesses;
   }
 
-  async addContactToPetitionAccess(accessId: number, contactId: number, updatedBy: string) {
-    return await this.from("petition_access")
+  async addContactToPetitionAccess(
+    accessId: number,
+    contactId: number,
+    updatedBy: string,
+    t?: Knex.Transaction
+  ) {
+    return await this.from("petition_access", t)
       .where("id", accessId)
       .where("status", "ACTIVE")
       .whereNull("contact_id")

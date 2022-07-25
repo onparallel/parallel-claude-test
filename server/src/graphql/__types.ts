@@ -4428,7 +4428,8 @@ export interface NexusGenArgTypes {
     publicSendReminder: {
       // args
       contactEmail: string; // String!
-      slug: string; // ID!
+      keycode?: string | null; // ID
+      slug?: string | null; // ID
     };
     publicSendVerificationCode: {
       // args

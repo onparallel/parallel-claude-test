@@ -6,7 +6,6 @@ import { toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { safeJsonParse } from "../../../util/safeJsonParse";
 import { toHtml, toPlainText } from "../../../util/slate";
-import { userHasFeatureFlag } from "../authorizers";
 
 export const PetitionLocale = enumType({
   name: "PetitionLocale",
@@ -725,9 +724,20 @@ export const PetitionAccess = objectType({
       resolve: async (root, _, ctx) => ctx.petitions.loadRemindersByAccessId(root.id),
     });
     t.nonNull.string("recipientUrl", {
-      authorize: userHasFeatureFlag("PETITION_ACCESS_RECIPIENT_URL_FIELD"),
+      authorize: async (root, _, ctx) => {
+        const hasFeatureFlag = ctx.user?.id
+          ? await ctx.featureFlags.userHasFeatureFlag(
+              ctx.user.id,
+              "PETITION_ACCESS_RECIPIENT_URL_FIELD"
+            )
+          : false;
+
+        if (!hasFeatureFlag && root.contact_id !== null) {
+          return false;
+        }
+        return true;
+      },
       resolve: async (root, _, ctx) => {
-        // check FF and if is contactless
         const { locale } = (await ctx.petitions.loadPetition(root.petition_id))!;
         return `${ctx.config.misc.parallelUrl}/${locale}/petition/${root.keycode}`;
       },

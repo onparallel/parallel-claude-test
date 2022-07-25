@@ -1185,7 +1185,7 @@ type Mutation {
   Resets the user password and resend the Invitation email. Only works if cognito user has status FORCE_CHANGE_PASSWORD
   """
   publicResetTemporaryPassword(email: String!, locale: String): Result!
-  publicSendReminder(contactEmail: String!, slug: ID!): Result!
+  publicSendReminder(contactEmail: String!, keycode: ID, slug: ID): Result!
   publicSendVerificationCode(
     email: String
     firstName: String

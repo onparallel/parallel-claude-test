@@ -3425,6 +3425,26 @@
     "context": "Access"
   },
   {
+    "term": "component.recipient-view-contactless-form.change-email",
+    "definition": "Cambiar correo electrónico",
+    "context": "Change email"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.existing-email",
+    "definition": "Correo existente",
+    "context": "Existing email"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.existing-email-body",
+    "definition": "El correo {email} ya tiene un acceso. {tone, select, INFORMAL {Puedes volver a acceder desde el anterior correo que te mandamos.} other {Puede acceder de nuevo desde el correo recibido anteriormente.}}",
+    "context": "There is already an access associated to {email}. You can access again from the previously received mail."
+  },
+  {
+    "term": "component.recipient-view-contactless-form.existing-email-body-question",
+    "definition": "{tone, select, INFORMAL {Si no encuentras el correo inicial, te reenviaremos el acceso de nuevo. ¿Qué quieres hacer?} other {Si no encuentra dicho el correo, le reenviaremos el acceso de nuevo. ¿Qué quiere hacer?}}",
+    "context": "If you can't find the initial email, we will resend you the access again. What do you want to do?"
+  },
+  {
     "term": "component.recipient-view-contactless-form.has-shared-with-you",
     "definition": "{ownerName} {tone, select, INFORMAL {te} other {le}} ha compartido un acceso a Parallel.",
     "context": "{ownerName} has shared with you an access to Parallel."
@@ -3433,6 +3453,11 @@
     "term": "component.recipient-view-contactless-form.heading",
     "definition": "Introduce {tone, select, INFORMAL {tus} other {sus}} datos para acceder",
     "context": "Enter your data to access"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.resend-access",
+    "definition": "Reenviar acceso",
+    "context": "Resend access"
   },
   {
     "term": "component.recipient-view-content-card.comment-count",
@@ -7237,7 +7262,7 @@
   {
     "term": "petition.confirm-activate-access-message.body-empty-access",
     "definition": "¿Estás seguro de que quieres <b>reactivar el acceso vacío</b>?",
-    "context": "Are you sure you want to reactivate the empty access?"
+    "context": "Are you sure you want to <b>reactivate the empty access</b>?"
   },
   {
     "term": "petition.confirm-activate-access-message.confirm",

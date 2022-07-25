@@ -22,11 +22,14 @@ import { Logo } from "@parallel/components/common/Logo";
 import { RecipientViewPinForm } from "@parallel/components/recipient-view/RecipientViewPinForm";
 import {
   RecipientViewContactlessForm_publicCheckVerificationCodeDocument,
+  RecipientViewContactlessForm_publicSendReminderDocument,
   RecipientViewContactlessForm_publicSendVerificationCodeDocument,
 } from "@parallel/graphql/__types";
+import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { resolveUrl } from "@parallel/utils/next";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useCodeExpiredToast } from "@parallel/utils/useCodeExpiredToast";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { isPast } from "date-fns";
 import { useRouter } from "next/router";
@@ -52,6 +55,7 @@ type RecipientViewContactlessState =
       expiresAt: string;
       remainingAttempts: number;
     }
+  | { step: "EMAIL_EXISTS" }
   | { step: "VERIFIED" };
 
 export function RecipientViewContactlessForm({
@@ -65,7 +69,7 @@ export function RecipientViewContactlessForm({
 }) {
   const tone = useTone();
   const codeExpiredToast = useCodeExpiredToast();
-
+  const showGenericErrorToast = useGenericErrorToast();
   const router = useRouter();
   const { query } = router;
   const keycode = query.keycode as string;
@@ -112,6 +116,28 @@ export function RecipientViewContactlessForm({
     RecipientViewContactlessForm_publicCheckVerificationCodeDocument
   );
 
+  const [publicSendReminder, { loading: reminderLoading }] = useMutation(
+    RecipientViewContactlessForm_publicSendReminderDocument
+  );
+
+  const handleSendReminder = async () => {
+    const { data, errors } = await publicSendReminder({
+      variables: {
+        keycode,
+        contactEmail: email,
+      },
+    });
+
+    if (errors) {
+      throw errors;
+    }
+
+    if (data?.publicSendReminder === "SUCCESS") {
+      console.log("reminderSent");
+    } else if (data?.publicSendReminder === "FAILURE") {
+      showGenericErrorToast();
+    }
+  };
   const handleSubmitForm = async ({
     email,
     firstName,
@@ -128,7 +154,13 @@ export function RecipientViewContactlessForm({
         step: "VERIFY",
         ...omit(data.publicSendVerificationCode, ["__typename"]),
       });
-    } catch {}
+    } catch (error) {
+      if (isApolloError(error, "ACCESS_ALREADY_EXISTS")) {
+        setState({ step: "EMAIL_EXISTS" });
+      } else {
+        showGenericErrorToast();
+      }
+    }
   };
   function codeExpired() {
     codeExpiredToast();
@@ -136,7 +168,7 @@ export function RecipientViewContactlessForm({
   }
 
   async function handleSubmitCode(code: string) {
-    if (state.step === "FORM" || state.step === "VERIFIED") {
+    if (state.step !== "VERIFY") {
       return;
     }
     if (isPast(new Date(state.expiresAt))) {
@@ -183,8 +215,8 @@ export function RecipientViewContactlessForm({
   return (
     <Card
       padding={{ base: 4, sm: 8 }}
-      paddingTop={8}
-      paddingBottom={{ base: 12, sm: 14 }}
+      paddingTop={{ base: 8, sm: 10 }}
+      paddingBottom={{ base: 14, sm: 16 }}
       position="relative"
     >
       <Stack spacing={8}>
@@ -295,6 +327,60 @@ export function RecipientViewContactlessForm({
                 defaultMessage="Access"
               />
             </Button>
+          </Stack>
+        ) : state.step === "EMAIL_EXISTS" ? (
+          <Stack spacing={4}>
+            <Heading fontSize="2xl">
+              <FormattedMessage
+                id="component.recipient-view-contactless-form.existing-email"
+                defaultMessage="Existing email"
+              />
+            </Heading>
+            <Text>
+              <FormattedMessage
+                id="component.recipient-view-contactless-form.existing-email-body"
+                defaultMessage="There is already an access associated to {email}. You can access again from the previously received mail."
+                values={{
+                  email: (
+                    <Text as="span" fontWeight="bold">
+                      {email}
+                    </Text>
+                  ),
+                  tone,
+                }}
+              />
+            </Text>
+
+            <Text>
+              <FormattedMessage
+                id="component.recipient-view-contactless-form.existing-email-body-question"
+                defaultMessage="If you can't find the initial email, we will resend you the access again. What do you want to do?"
+                values={{ tone }}
+              />
+            </Text>
+            <HStack wrap="wrap" gridGap={2} spacing={0}>
+              <Box flex="1">
+                <Button variant="outline" width="full" onClick={handleChangeEmail}>
+                  <FormattedMessage
+                    id="component.recipient-view-contactless-form.change-email"
+                    defaultMessage="Change email"
+                  />
+                </Button>
+              </Box>
+              <Box flex="1">
+                <Button
+                  colorScheme="primary"
+                  width="full"
+                  isLoading={reminderLoading}
+                  onClick={handleSendReminder}
+                >
+                  <FormattedMessage
+                    id="component.recipient-view-contactless-form.resend-access"
+                    defaultMessage="Resend access"
+                  />
+                </Button>
+              </Box>
+            </HStack>
           </Stack>
         ) : (
           <>
@@ -409,6 +495,11 @@ RecipientViewContactlessForm.mutations = [
         result
         remainingAttempts
       }
+    }
+  `,
+  gql`
+    mutation RecipientViewContactlessForm_publicSendReminder($keycode: ID, $contactEmail: String!) {
+      publicSendReminder(keycode: $keycode, contactEmail: $contactEmail)
     }
   `,
 ];

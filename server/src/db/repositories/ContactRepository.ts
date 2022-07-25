@@ -199,13 +199,17 @@ export class ContactRepository extends BaseRepository {
     );
   }
 
-  async createContact({ email, ...data }: CreateContact, createdBy: string) {
-    const [row] = await this.insert("contact", {
-      email: email.toLowerCase().trim(),
-      ...data,
-      created_by: createdBy,
-      updated_by: createdBy,
-    });
+  async createContact({ email, ...data }: CreateContact, createdBy: string, t?: Knex.Transaction) {
+    const [row] = await this.insert(
+      "contact",
+      {
+        email: email.toLowerCase().trim(),
+        ...data,
+        created_by: createdBy,
+        updated_by: createdBy,
+      },
+      t
+    );
     return row;
   }
 

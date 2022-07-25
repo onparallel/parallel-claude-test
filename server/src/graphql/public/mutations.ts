@@ -15,6 +15,7 @@ import { outdent } from "outdent";
 import { isDefined } from "remeda";
 import { getClientIp } from "request-ip";
 import { Task } from "../../db/repositories/TaskRepository";
+import { PetitionAccess, User } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { stallFor } from "../../util/promises/stallFor";
@@ -190,8 +191,24 @@ export const publicSendVerificationCode = mutationField("publicSendVerificationC
       if (isContactless) {
         if (!isDefined(firstName) || !isDefined(lastName) || !isDefined(email)) {
           throw new ApolloError(
-            "INVALID_CONTACT_FORM",
-            "The information to create a contact is not valid"
+            "The information to create a contact is not valid",
+            "INVALID_CONTACT_FORM"
+          );
+        }
+
+        const petition = await ctx.petitions.loadPetition(access!.petition_id);
+        const contact = await ctx.contacts.loadContactByEmail({
+          email,
+          orgId: petition!.org_id,
+        });
+
+        const accesses = await ctx.petitions.loadAccessesForPetition(petition!.id);
+        if (
+          accesses.some((access) => access.contact_id !== null && access.contact_id === contact?.id)
+        ) {
+          throw new ApolloError(
+            "The contact already has an access in this petition",
+            "ACCESS_ALREADY_EXISTS"
           );
         }
       }
@@ -237,6 +254,7 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
           args.code
         );
 
+        // if is a contactless petition access
         if (result.success && isDefined(result.data) && !isDefined(ctx.access!.contact_id)) {
           const access = await ctx.petitions.loadAccessByKeycode(args.keycode);
           const petition = await ctx.petitions.loadPetition(access!.petition_id);
@@ -248,23 +266,34 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
               orgId: petition.org_id,
             });
 
-            ctx.contact = contact
-              ? contact
-              : await ctx.contacts.createContact(
-                  {
-                    org_id: petition.org_id,
-                    email,
-                    first_name: result.data.contact_first_name!,
-                    last_name: result.data.contact_last_name || null,
-                  },
-                  `PetitionAccess:${access!.id}`
-                );
+            await ctx.petitions.withTransaction(async (t) => {
+              ctx.contact = contact
+                ? contact
+                : await ctx.contacts.createContact(
+                    {
+                      org_id: petition.org_id,
+                      email,
+                      first_name: result.data!.contact_first_name!,
+                      last_name: result.data!.contact_last_name || null,
+                    },
+                    `PetitionAccess:${access!.id}`,
+                    t
+                  );
 
-            await ctx.petitions.addContactToPetitionAccess(
-              access!.id,
-              ctx.contact.id,
-              `PetitionAccess:${access!.id}`
-            );
+              await ctx.petitions.addContactToPetitionAccess(
+                access!.id,
+                ctx.contact.id,
+                `PetitionAccess:${access!.id}`,
+                t
+              );
+
+              await ctx.petitions.updatePetition(
+                petition.id,
+                { status: "PENDING", credits_used: 1, closed_at: null },
+                `PetitionAccess:${access!.id}`,
+                t
+              );
+            });
           }
         }
 
@@ -291,8 +320,8 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
           result: result.success ? RESULT.SUCCESS : RESULT.FAILURE,
           remainingAttempts: result.remainingAttempts,
         };
-      } catch (e: any) {
-        throw new ApolloError("INVALID_TOKEN", "The token is no longer valid");
+      } catch {
+        throw new ApolloError("The token is no longer valid", "INVALID_TOKEN");
       }
     }, 2000);
   },
@@ -836,17 +865,37 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
 export const publicSendReminder = mutationField("publicSendReminder", {
   type: "Result",
   args: {
-    slug: nonNull(idArg()),
     contactEmail: nonNull(stringArg()),
+    keycode: idArg(),
+    slug: idArg(),
   },
-  authorize: validPublicPetitionLinkSlug("slug"),
+  authorize: chain(
+    ifArgDefined("slug", validPublicPetitionLinkSlug("slug" as never)),
+    ifArgDefined("keycode", fetchPetitionAccess("keycode" as never))
+  ),
   validateArgs: validEmail((args) => args.contactEmail, "contactEmail"),
   resolve: async (_, args, ctx) => {
-    const link = (await ctx.petitions.loadPublicPetitionLinkBySlug(args.slug))!;
-    const [access, owner] = await Promise.all([
-      ctx.petitions.getLatestPetitionAccessFromPublicPetitionLink(link.id, args.contactEmail),
-      ctx.petitions.loadTemplateDefaultOwner(link.template_id),
-    ]);
+    let access: PetitionAccess;
+    let owner: User;
+
+    if (args.keycode) {
+      access = (await ctx.petitions.loadAccessByKeycode(args.keycode))!;
+      const petition = (await ctx.petitions.loadPetition(access!.petition_id))!;
+      const contact = await ctx.contacts.loadContactByEmail({
+        email: args.contactEmail,
+        orgId: petition.org_id,
+      });
+      access = (await ctx.petitions.loadActiveAccessByContactId(contact!.id))![0];
+      owner = (await ctx.petitions.loadPetitionOwner(petition.id))!;
+    } else {
+      const link = (await ctx.petitions.loadPublicPetitionLinkBySlug(args.slug!))!;
+      access = await ctx.petitions.getLatestPetitionAccessFromPublicPetitionLink(
+        link.id,
+        args.contactEmail
+      );
+      const defaultOwner = await ctx.petitions.loadTemplateDefaultOwner(link.template_id);
+      owner = defaultOwner!.user;
+    }
 
     if (!access || access.status === "INACTIVE" || access.reminders_left === 0 || !owner) {
       return RESULT.FAILURE;
@@ -870,7 +919,7 @@ export const publicSendReminder = mutationField("publicSendReminder", {
           type: "MANUAL",
           status: "PROCESSING",
           petition_access_id: access.id,
-          sender_id: owner.user.id,
+          sender_id: owner.id,
           email_body: null,
           created_by: `Contact:${access.contact_id}`,
         },

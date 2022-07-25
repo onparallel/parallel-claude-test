@@ -283,7 +283,8 @@ function PetitionPreview({ petitionId }: PetitionPreviewProps) {
         onUpdatePetition={handleUpdatePetition}
         section="preview"
         headerActions={
-          isPetition && !petition.accesses?.find((a) => a.status === "ACTIVE") ? (
+          isPetition &&
+          !petition.accesses?.find((a) => a.status === "ACTIVE" && !a.isContactless) ? (
             <ResponsiveButtonIcon
               data-action="preview-next"
               id="petition-next"
@@ -423,6 +424,7 @@ PetitionPreview.fragments = {
         accesses {
           id
           status
+          isContactless
           ...ConfirmPetitionSignersDialog_PetitionAccess
         }
         ...RecipientViewProgressFooter_Petition

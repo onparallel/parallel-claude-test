@@ -3425,6 +3425,26 @@
     "context": "Access"
   },
   {
+    "term": "component.recipient-view-contactless-form.change-email",
+    "definition": "Change email",
+    "context": "Change email"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.existing-email",
+    "definition": "Existing email",
+    "context": "Existing email"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.existing-email-body",
+    "definition": "There is already an access associated to {email}. You can access again from the previously received mail.",
+    "context": "There is already an access associated to {email}. You can access again from the previously received mail."
+  },
+  {
+    "term": "component.recipient-view-contactless-form.existing-email-body-question",
+    "definition": "If you can't find the initial email, we will resend you the access again. What do you want to do?",
+    "context": "If you can't find the initial email, we will resend you the access again. What do you want to do?"
+  },
+  {
     "term": "component.recipient-view-contactless-form.has-shared-with-you",
     "definition": "{ownerName} has shared with you an access to Parallel.",
     "context": "{ownerName} has shared with you an access to Parallel."
@@ -3433,6 +3453,11 @@
     "term": "component.recipient-view-contactless-form.heading",
     "definition": "Enter your data to access",
     "context": "Enter your data to access"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.resend-access",
+    "definition": "Resend access",
+    "context": "Resend access"
   },
   {
     "term": "component.recipient-view-content-card.comment-count",
@@ -7236,8 +7261,8 @@
   },
   {
     "term": "petition.confirm-activate-access-message.body-empty-access",
-    "definition": "Are you sure you want to reactivate the empty access?",
-    "context": "Are you sure you want to reactivate the empty access?"
+    "definition": "Are you sure you want to <b>reactivate the empty access</b>?",
+    "context": "Are you sure you want to <b>reactivate the empty access</b>?"
   },
   {
     "term": "petition.confirm-activate-access-message.confirm",
