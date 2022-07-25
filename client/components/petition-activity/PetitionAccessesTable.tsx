@@ -341,9 +341,16 @@ function usePetitionAccessesColumns(): TableColumn<
 
           const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
+          // if the contact is deleted have no actions
           if (!isContactless && !isDefined(contact)) return null;
 
           if (status === "INACTIVE") {
+            const contactHasActiveAccess = petition.accesses.some(
+              (access) => access.contact?.id === contact!.id && access.status === "ACTIVE"
+            );
+
+            if (contactHasActiveAccess) return null;
+
             return (
               <Stack direction="row" spacing={2} justifyContent="flex-end">
                 <IconButtonWithTooltip

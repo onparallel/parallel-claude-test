@@ -204,7 +204,12 @@ export const publicSendVerificationCode = mutationField("publicSendVerificationC
 
         const accesses = await ctx.petitions.loadAccessesForPetition(petition!.id);
         if (
-          accesses.some((access) => access.contact_id !== null && access.contact_id === contact?.id)
+          accesses.some(
+            (access) =>
+              access.contact_id !== null &&
+              access.status === "ACTIVE" &&
+              access.contact_id === contact?.id
+          )
         ) {
           throw new ApolloError(
             "The contact already has an access in this petition",
