@@ -14,6 +14,7 @@ import {
   ScaleFade,
   Stack,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import { CheckIcon, QuestionOutlineIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
@@ -35,7 +36,7 @@ import { isPast } from "date-fns";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 import { useTone } from "../common/ToneProvider";
 import { useRecipientViewContactlessHelpDialog } from "./dialogs/RecipientViewContactlessHelpDialog";
@@ -70,6 +71,8 @@ export function RecipientViewContactlessForm({
   const tone = useTone();
   const codeExpiredToast = useCodeExpiredToast();
   const showGenericErrorToast = useGenericErrorToast();
+  const toast = useToast();
+  const intl = useIntl();
   const router = useRouter();
   const { query } = router;
   const keycode = query.keycode as string;
@@ -120,22 +123,50 @@ export function RecipientViewContactlessForm({
     RecipientViewContactlessForm_publicSendReminderDocument
   );
 
-  const handleSendReminder = async () => {
-    const { data, errors } = await publicSendReminder({
-      variables: {
-        keycode,
-        contactEmail: email,
-      },
+  const accessSentToast = () => {
+    toast({
+      title: intl.formatMessage({
+        id: "component.recipient-view-contactless-form.access-sent",
+        defaultMessage: "Access sent",
+      }),
+      description: intl.formatMessage(
+        {
+          id: "component.recipient-view-contactless-form.access-sent-body",
+          defaultMessage:
+            "We have sent a access to <b>{email}</b> with a link to your ongoing process so you can get back and continue completing it.",
+        },
+        { email }
+      ),
+      duration: 5000,
+      status: "success",
+      isClosable: true,
     });
+  };
 
-    if (errors) {
-      throw errors;
-    }
+  const handleSendReminder = async () => {
+    try {
+      const { data, errors } = await publicSendReminder({
+        variables: {
+          keycode,
+          contactEmail: email,
+        },
+      });
 
-    if (data?.publicSendReminder === "SUCCESS") {
-      console.log("reminderSent");
-    } else if (data?.publicSendReminder === "FAILURE") {
-      showGenericErrorToast();
+      if (errors) {
+        throw errors;
+      }
+
+      if (data?.publicSendReminder === "SUCCESS") {
+        accessSentToast();
+      } else {
+        showGenericErrorToast();
+      }
+    } catch (error) {
+      if (isApolloError(error, "REMINDER_ALREADY_SENT_ERROR")) {
+        accessSentToast();
+      } else {
+        showGenericErrorToast();
+      }
     }
   };
   const handleSubmitForm = async ({

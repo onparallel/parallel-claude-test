@@ -3425,6 +3425,16 @@
     "context": "Access"
   },
   {
+    "term": "component.recipient-view-contactless-form.access-sent",
+    "definition": "Access sent",
+    "context": "Access sent"
+  },
+  {
+    "term": "component.recipient-view-contactless-form.access-sent-body",
+    "definition": "We have sent a access to <b>{email}</b> with a link to your ongoing process so you can get back and continue completing it.",
+    "context": "We have sent a access to <b>{email}</b> with a link to your ongoing process so you can get back and continue completing it."
+  },
+  {
     "term": "component.recipient-view-contactless-form.change-email",
     "definition": "Change email",
     "context": "Change email"
