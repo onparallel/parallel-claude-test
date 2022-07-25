@@ -454,7 +454,12 @@ export function AddPetitionAccessDialog({
         </>
       }
       confirm={
-        <Flex justifyContent="space-between" w="full" wrap="wrap" gridGap={2}>
+        <Flex
+          justifyContent="space-between"
+          width="full"
+          wrap={{ base: "wrap", sm: "nowrap" }}
+          gridGap={2}
+        >
           <Button
             variant="outline"
             leftIcon={<LinkIcon />}
@@ -462,19 +467,21 @@ export function AddPetitionAccessDialog({
             onClick={handleShareByLinkClick}
             isDisabled={recipientGroups.some((g) => g.length > 0)}
           >
-            <FormattedMessage id="generic.share-by-link" defaultMessage="Share by link" />
+            <Text isTruncated>
+              <FormattedMessage id="generic.share-by-link" defaultMessage="Share by link" />
+            </Text>
           </Button>
           <HStack spacing={0} gridGap={2} width={{ base: "full", sm: "fit-content" }}>
-            <Box width="full">
-              <Button onClick={() => props.onReject()} width="full">
+            <Button onClick={() => props.onReject()} flex="1">
+              <Text isTruncated>
                 <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
-              </Button>
-            </Box>
+              </Text>
+            </Button>
             <SendButton
+              flex="1"
               data-action="send-petition"
               onSendClick={() => handleSendClick(false)}
               onScheduleClick={() => handleSendClick(true)}
-              width="full"
             />
           </HStack>
         </Flex>

@@ -21,9 +21,10 @@ export const ButtonWithMoreOptions = chakraForwardRef<"button", ButtonWithMoreOp
     const layoutProps = pick(props, layoutPropNames as any);
     const otherProps = omitThemingProps(omit(props, layoutPropNames as any));
     const themingProps = pick(props, ["styleConfig", "size", "variant", "colorScheme"]);
+
     return (
       <ButtonGroup isAttached {...(layoutProps as any)} {...themingProps}>
-        <Button ref={ref} as={as} {...(otherProps as any)} />
+        <Button ref={ref} as={as} flex="1" {...(otherProps as any)} />
         <Divider
           isVertical
           opacity={props.isDisabled ? 0.4 : undefined}
