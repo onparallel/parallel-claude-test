@@ -662,15 +662,3 @@ export const PetitionReminderBouncedEvent = createPetitionEvent(
 );
 
 export const PetitionAnonymizedEvent = createPetitionEvent("PetitionAnonymizedEvent", (t) => {});
-
-export const PetitionContactlessLinkCreatedEvent = createPetitionEvent(
-  "PetitionContactlessLinkCreatedEvent",
-  (t) => {
-    t.nullable.field("user", {
-      type: "User",
-      resolve: async (root, _, ctx) => {
-        return await ctx.users.loadUser(root.data.user_id);
-      },
-    });
-  }
-);

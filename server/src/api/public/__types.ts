@@ -2149,15 +2149,6 @@ export type PetitionCompletedUserNotification = PetitionUserNotification & {
   petition: PetitionBase;
 };
 
-export type PetitionContactlessLinkCreatedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
-  petition: Maybe<Petition>;
-  type: PetitionEventType;
-  user: Maybe<User>;
-};
-
 export type PetitionCreatedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   data: Scalars["JSONObject"];
@@ -5177,13 +5168,6 @@ export type GetPetitionEvents_PetitionEventsQueryVariables = Exact<{
 
 export type GetPetitionEvents_PetitionEventsQuery = {
   petitionEvents: Array<
-    | {
-        id: string;
-        data: { [key: string]: any };
-        type: PetitionEventType;
-        createdAt: string;
-        petition: { id: string } | null;
-      }
     | {
         id: string;
         data: { [key: string]: any };

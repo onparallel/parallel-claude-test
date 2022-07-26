@@ -2660,15 +2660,6 @@ type PetitionCompletedUserNotification implements PetitionUserNotification {
   petition: PetitionBase!
 }
 
-type PetitionContactlessLinkCreatedEvent implements PetitionEvent {
-  createdAt: DateTime!
-  data: JSONObject!
-  id: GID!
-  petition: Petition
-  type: PetitionEventType!
-  user: User
-}
-
 type PetitionCreatedEvent implements PetitionEvent {
   createdAt: DateTime!
   data: JSONObject!

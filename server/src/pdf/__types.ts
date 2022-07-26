@@ -2149,15 +2149,6 @@ export type PetitionCompletedUserNotification = PetitionUserNotification & {
   petition: PetitionBase;
 };
 
-export type PetitionContactlessLinkCreatedEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
-  petition: Maybe<Petition>;
-  type: PetitionEventType;
-  user: Maybe<User>;
-};
-
 export type PetitionCreatedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   data: Scalars["JSONObject"];

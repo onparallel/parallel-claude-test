@@ -2205,16 +2205,6 @@ export interface PetitionCompletedUserNotification extends PetitionUserNotificat
   petition: PetitionBase;
 }
 
-export interface PetitionContactlessLinkCreatedEvent extends PetitionEvent {
-  __typename?: "PetitionContactlessLinkCreatedEvent";
-  createdAt: Scalars["DateTime"];
-  data: Scalars["JSONObject"];
-  id: Scalars["GID"];
-  petition?: Maybe<Petition>;
-  type: PetitionEventType;
-  user?: Maybe<User>;
-}
-
 export interface PetitionCreatedEvent extends PetitionEvent {
   __typename?: "PetitionCreatedEvent";
   createdAt: Scalars["DateTime"];
@@ -6333,7 +6323,6 @@ export type PetitionActivityTimeline_PetitionFragment = {
             | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
             | null;
         }
-      | { __typename?: "PetitionContactlessLinkCreatedEvent"; id: string }
       | {
           __typename?: "PetitionCreatedEvent";
           id: string;
@@ -6874,11 +6863,6 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragme
     | null;
 };
 
-export type PetitionActivityTimeline_PetitionEvent_PetitionContactlessLinkCreatedEvent_Fragment = {
-  __typename?: "PetitionContactlessLinkCreatedEvent";
-  id: string;
-};
-
 export type PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment = {
   __typename?: "PetitionCreatedEvent";
   id: string;
@@ -7120,7 +7104,6 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_PetitionClosedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionClosedNotifiedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment
-  | PetitionActivityTimeline_PetitionEvent_PetitionContactlessLinkCreatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionDeletedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionMessageBouncedEvent_Fragment
@@ -14033,7 +14016,6 @@ export type PetitionActivity_PetitionFragment = {
             | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
             | null;
         }
-      | { __typename?: "PetitionContactlessLinkCreatedEvent"; id: string }
       | {
           __typename?: "PetitionCreatedEvent";
           id: string;
@@ -14861,7 +14843,6 @@ export type PetitionActivity_updatePetitionMutation = {
                     }
                   | null;
               }
-            | { __typename?: "PetitionContactlessLinkCreatedEvent"; id: string }
             | {
                 __typename?: "PetitionCreatedEvent";
                 id: string;
@@ -15738,7 +15719,6 @@ export type PetitionActivity_petitionQuery = {
                     }
                   | null;
               }
-            | { __typename?: "PetitionContactlessLinkCreatedEvent"; id: string }
             | {
                 __typename?: "PetitionCreatedEvent";
                 id: string;

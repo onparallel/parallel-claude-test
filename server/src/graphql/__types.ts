@@ -504,7 +504,6 @@ export interface NexusGenObjects {
   PetitionClosedNotifiedEvent: events.PetitionClosedNotifiedEvent;
   PetitionCompletedEvent: events.PetitionCompletedEvent;
   PetitionCompletedUserNotification: notifications.PetitionCompletedUserNotification;
-  PetitionContactlessLinkCreatedEvent: events.PetitionContactlessLinkCreatedEvent;
   PetitionCreatedEvent: events.PetitionCreatedEvent;
   PetitionDeletedEvent: events.PetitionDeletedEvent;
   PetitionEventPagination: {
@@ -1393,15 +1392,6 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isRead: boolean; // Boolean!
     petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
-  };
-  PetitionContactlessLinkCreatedEvent: {
-    // field return type
-    createdAt: NexusGenScalars["DateTime"]; // DateTime!
-    data: NexusGenScalars["JSONObject"]; // JSONObject!
-    id: NexusGenScalars["GID"]; // GID!
-    petition: NexusGenRootTypes["Petition"] | null; // Petition
-    type: NexusGenEnums["PetitionEventType"]; // PetitionEventType!
-    user: NexusGenRootTypes["User"] | null; // User
   };
   PetitionCreatedEvent: {
     // field return type
@@ -2974,15 +2964,6 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isRead: "Boolean";
     petition: "PetitionBase";
-  };
-  PetitionContactlessLinkCreatedEvent: {
-    // field return type name
-    createdAt: "DateTime";
-    data: "JSONObject";
-    id: "GID";
-    petition: "Petition";
-    type: "PetitionEventType";
-    user: "User";
   };
   PetitionCreatedEvent: {
     // field return type name
@@ -5095,7 +5076,6 @@ export interface NexusGenAbstractTypeMembers {
     | "PetitionClosedEvent"
     | "PetitionClosedNotifiedEvent"
     | "PetitionCompletedEvent"
-    | "PetitionContactlessLinkCreatedEvent"
     | "PetitionCreatedEvent"
     | "PetitionDeletedEvent"
     | "PetitionMessageBouncedEvent"
@@ -5173,7 +5153,6 @@ export interface NexusGenTypeInterfaces {
   PetitionClosedNotifiedEvent: "PetitionEvent";
   PetitionCompletedEvent: "PetitionEvent";
   PetitionCompletedUserNotification: "PetitionUserNotification";
-  PetitionContactlessLinkCreatedEvent: "PetitionEvent";
   PetitionCreatedEvent: "PetitionEvent";
   PetitionDeletedEvent: "PetitionEvent";
   PetitionFieldAttachment: "CreatedAt";
