@@ -731,7 +731,7 @@ export type Mutation = {
   /** Triggered by new users that want to sign up into Parallel */
   userSignUp: User;
   /** Runs backend checks to validate signature credentials. */
-  validateSignatureCredentials: Scalars["JSONObject"];
+  validateSignatureCredentials: ValidateSignatureCredentialsResult;
   verifyPublicAccess: PublicAccessVerification;
 };
 
@@ -3774,6 +3774,11 @@ export type UserProvisioningOrgIntegration = OrgIntegration & {
 };
 
 export type UserStatus = "ACTIVE" | "INACTIVE";
+
+export type ValidateSignatureCredentialsResult = {
+  data: Maybe<Scalars["JSONObject"]>;
+  success: Scalars["Boolean"];
+};
 
 export type VerificationCodeCheck = {
   remainingAttempts: Maybe<Scalars["Int"]>;

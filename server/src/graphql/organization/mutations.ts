@@ -5,6 +5,7 @@ import {
   core,
   inputObjectType,
   intArg,
+  list,
   mutationField,
   nonNull,
   nullable,
@@ -360,7 +361,7 @@ export const updateFeatureFlags = mutationField("updateFeatureFlags", {
 
       await ctx.featureFlags.addOrUpdateFeatureFlagOverride(orgId, featureFlags);
       if (needRemoveBranding) {
-        await ctx.integrations.removeSignaturitBrandingIds(orgId, `User:${ctx.user!.id}`);
+        await ctx.signature.updateBranding(orgId);
       }
     } catch {}
 
