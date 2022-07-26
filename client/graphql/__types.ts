@@ -4304,19 +4304,18 @@ export type UserSelect_useGetUsersOrGroupsQuery = {
   >;
 };
 
-export type useSearchUsers_searchUsersQueryVariables = Exact<{
-  search: Scalars["String"];
-  excludeUsers?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
-  excludeUserGroups?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
-  includeGroups?: InputMaybe<Scalars["Boolean"]>;
-  includeInactive?: InputMaybe<Scalars["Boolean"]>;
-}>;
+export type UserSelectOption_UserFragment = {
+  __typename?: "User";
+  id: string;
+  fullName?: string | null;
+  email: string;
+};
 
-export type useSearchUsers_searchUsersQuery = {
-  searchUsers: Array<
-    | { __typename?: "User"; id: string; fullName?: string | null; email: string }
-    | { __typename?: "UserGroup"; id: string; name: string; memberCount: number }
-  >;
+export type UserSelectOption_UserGroupFragment = {
+  __typename?: "UserGroup";
+  id: string;
+  name: string;
+  memberCount: number;
 };
 
 export type FieldErrorDialog_PetitionFieldFragment = {
@@ -21642,6 +21641,21 @@ export type useSearchContactsByEmail_contactsByEmailQuery = {
   } | null>;
 };
 
+export type useSearchUsers_searchUsersQueryVariables = Exact<{
+  search: Scalars["String"];
+  excludeUsers?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  excludeUserGroups?: InputMaybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  includeGroups?: InputMaybe<Scalars["Boolean"]>;
+  includeInactive?: InputMaybe<Scalars["Boolean"]>;
+}>;
+
+export type useSearchUsers_searchUsersQuery = {
+  searchUsers: Array<
+    | { __typename?: "User"; id: string; fullName?: string | null; email: string }
+    | { __typename?: "UserGroup"; id: string; name: string; memberCount: number }
+  >;
+};
+
 export type useSettingsSections_UserFragment = { __typename?: "User"; hasDeveloperAccess: boolean };
 
 export type useTemplateRepliesReportTask_createTemplateRepliesReportTaskMutationVariables = Exact<{
@@ -22100,12 +22114,21 @@ export const CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragmentDoc = gq
     isDefault
   }
 ` as unknown as DocumentNode<CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment, unknown>;
+export const UserSelectOption_UserGroupFragmentDoc = gql`
+  fragment UserSelectOption_UserGroup on UserGroup {
+    id
+    name
+    memberCount
+  }
+` as unknown as DocumentNode<UserSelectOption_UserGroupFragment, unknown>;
 export const UserSelect_UserGroupFragmentDoc = gql`
   fragment UserSelect_UserGroup on UserGroup {
     id
     name
     memberCount
+    ...UserSelectOption_UserGroup
   }
+  ${UserSelectOption_UserGroupFragmentDoc}
 ` as unknown as DocumentNode<UserSelect_UserGroupFragment, unknown>;
 export const useCreateOrUpdateUserDialog_UserGroupFragmentDoc = gql`
   fragment useCreateOrUpdateUserDialog_UserGroup on UserGroup {
@@ -22137,12 +22160,21 @@ export const CreateReferenceDialog_PetitionFieldFragmentDoc = gql`
     options
   }
 ` as unknown as DocumentNode<CreateReferenceDialog_PetitionFieldFragment, unknown>;
+export const UserSelectOption_UserFragmentDoc = gql`
+  fragment UserSelectOption_User on User {
+    id
+    fullName
+    email
+  }
+` as unknown as DocumentNode<UserSelectOption_UserFragment, unknown>;
 export const UserSelect_UserFragmentDoc = gql`
   fragment UserSelect_User on User {
     id
     fullName
     email
+    ...UserSelectOption_User
   }
+  ${UserSelectOption_UserFragmentDoc}
 ` as unknown as DocumentNode<UserSelect_UserFragment, unknown>;
 export const PetitionSharingModal_UserFragmentDoc = gql`
   fragment PetitionSharingModal_User on User {
@@ -25932,35 +25964,6 @@ export const UserSelect_useGetUsersOrGroupsDocument = gql`
   UserSelect_useGetUsersOrGroupsQuery,
   UserSelect_useGetUsersOrGroupsQueryVariables
 >;
-export const useSearchUsers_searchUsersDocument = gql`
-  query useSearchUsers_searchUsers(
-    $search: String!
-    $excludeUsers: [GID!]
-    $excludeUserGroups: [GID!]
-    $includeGroups: Boolean
-    $includeInactive: Boolean
-  ) {
-    searchUsers(
-      search: $search
-      excludeUsers: $excludeUsers
-      excludeUserGroups: $excludeUserGroups
-      includeGroups: $includeGroups
-      includeInactive: $includeInactive
-    ) {
-      ... on User {
-        ...UserSelect_User
-      }
-      ... on UserGroup {
-        ...UserSelect_UserGroup
-      }
-    }
-  }
-  ${UserSelect_UserFragmentDoc}
-  ${UserSelect_UserGroupFragmentDoc}
-` as unknown as DocumentNode<
-  useSearchUsers_searchUsersQuery,
-  useSearchUsers_searchUsersQueryVariables
->;
 export const TagEditDialog_tagsDocument = gql`
   query TagEditDialog_tags {
     tags {
@@ -29286,6 +29289,35 @@ export const useSearchContactsByEmail_contactsByEmailDocument = gql`
 ` as unknown as DocumentNode<
   useSearchContactsByEmail_contactsByEmailQuery,
   useSearchContactsByEmail_contactsByEmailQueryVariables
+>;
+export const useSearchUsers_searchUsersDocument = gql`
+  query useSearchUsers_searchUsers(
+    $search: String!
+    $excludeUsers: [GID!]
+    $excludeUserGroups: [GID!]
+    $includeGroups: Boolean
+    $includeInactive: Boolean
+  ) {
+    searchUsers(
+      search: $search
+      excludeUsers: $excludeUsers
+      excludeUserGroups: $excludeUserGroups
+      includeGroups: $includeGroups
+      includeInactive: $includeInactive
+    ) {
+      ... on User {
+        ...UserSelect_User
+      }
+      ... on UserGroup {
+        ...UserSelect_UserGroup
+      }
+    }
+  }
+  ${UserSelect_UserFragmentDoc}
+  ${UserSelect_UserGroupFragmentDoc}
+` as unknown as DocumentNode<
+  useSearchUsers_searchUsersQuery,
+  useSearchUsers_searchUsersQueryVariables
 >;
 export const useTemplateRepliesReportTask_createTemplateRepliesReportTaskDocument = gql`
   mutation useTemplateRepliesReportTask_createTemplateRepliesReportTask(

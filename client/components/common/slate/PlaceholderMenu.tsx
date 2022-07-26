@@ -94,9 +94,9 @@ export const PlaceholderMenu = chakraForwardRef<"div", PlaceholderMenuProps>(
                 onMouseDown={() => onAddPlaceholder(placeholder)}
                 onMouseEnter={() => onHighlightOption(index)}
               >
-                <Box whiteSpace="nowrap">
-                  <HighlightText text={placeholder.label} search={search ?? ""} />
-                </Box>
+                <HighlightText as="div" whiteSpace="nowrap" search={search ?? ""}>
+                  {placeholder.label}
+                </HighlightText>
               </Box>
             );
           })}

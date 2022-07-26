@@ -4280,11 +4280,6 @@
     "context": "Notifications"
   },
   {
-    "term": "component.user-select.group-members",
-    "definition": "{count, plural, =1 {1 member} other {# members}}",
-    "context": "{count, plural, =1 {1 member} other {# members}}"
-  },
-  {
     "term": "component.user-select.invite-button",
     "definition": "Invite people",
     "context": "Invite people"
@@ -5373,6 +5368,11 @@
     "term": "generic.more-options",
     "definition": "More options...",
     "context": "More options..."
+  },
+  {
+    "term": "generic.n-group-members",
+    "definition": "{count, plural, =1 {1 member} other {# members}}",
+    "context": "{count, plural, =1 {1 member} other {# members}}"
   },
   {
     "term": "generic.n-more",

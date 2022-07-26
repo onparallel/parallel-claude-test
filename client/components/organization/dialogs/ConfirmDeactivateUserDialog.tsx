@@ -5,8 +5,8 @@ import {
   UserSelect,
   UserSelectInstance,
   UserSelectSelection,
-  useSearchUsers,
 } from "@parallel/components/common/UserSelect";
+import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";

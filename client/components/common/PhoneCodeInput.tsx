@@ -66,9 +66,9 @@ const formatOptionLabel: SelectProps<
       <Text as="span" minWidth={4} role="presentation">
         {flag}
       </Text>
-      <Text as="span">
-        <HighlightText text={label} search={inputValue} />
-      </Text>
+      <HighlightText as="span" search={inputValue}>
+        {label}
+      </HighlightText>
       <Text as="span" color="gray.500">
         {code}
       </Text>

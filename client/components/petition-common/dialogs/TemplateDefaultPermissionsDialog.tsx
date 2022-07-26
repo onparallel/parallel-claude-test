@@ -7,8 +7,8 @@ import {
   UserSelect,
   UserSelectInstance,
   UserSelectSelection,
-  useSearchUsers,
 } from "@parallel/components/common/UserSelect";
+import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import {
   Maybe,
   PetitionPermissionType,

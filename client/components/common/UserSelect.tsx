@@ -1,5 +1,5 @@
 import { gql, useApolloClient, useQuery } from "@apollo/client";
-import { Box, Button, Flex, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Stack, Text } from "@chakra-ui/react";
 import { UsersIcon } from "@parallel/chakra/icons";
 import {
   UserSelect_canCreateUsersDocument,
@@ -8,7 +8,6 @@ import {
   UserSelect_UserFragmentDoc,
   UserSelect_UserGroupFragment,
   UserSelect_UserGroupFragmentDoc,
-  useSearchUsers_searchUsersDocument,
 } from "@parallel/graphql/__types";
 import { genericRsComponent, useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomSelectProps } from "@parallel/utils/react-select/types";
@@ -22,6 +21,7 @@ import { indexBy, zip } from "remeda";
 import { EmptySearchTemplatesIcon } from "../petition-new/icons/EmtpySearchTemplatesIcon";
 import { Link, NakedLink } from "./Link";
 import { UserGroupMembersPopover } from "./UserGroupMembersPopover";
+import { UserSelectOption } from "./UserSelectOption";
 
 export type UserSelectSelection<IncludeGroups extends boolean = false> =
   | UserSelect_UserFragment
@@ -34,24 +34,24 @@ export type UserSelectInstance<
 > = SelectInstance<OptionType, IsMulti, never>;
 
 const fragments = {
-  get User() {
-    return gql`
-      fragment UserSelect_User on User {
-        id
-        fullName
-        email
-      }
-    `;
-  },
-  get UserGroup() {
-    return gql`
-      fragment UserSelect_UserGroup on UserGroup {
-        id
-        name
-        memberCount
-      }
-    `;
-  },
+  User: gql`
+    fragment UserSelect_User on User {
+      id
+      fullName
+      email
+      ...UserSelectOption_User
+    }
+    ${UserSelectOption.fragments.User}
+  `,
+  UserGroup: gql`
+    fragment UserSelect_UserGroup on UserGroup {
+      id
+      name
+      memberCount
+      ...UserSelectOption_UserGroup
+    }
+    ${UserSelectOption.fragments.UserGroup}
+  `,
 };
 
 const _queries = [
@@ -241,65 +241,6 @@ export const UserSelect = Object.assign(
   { fragments }
 );
 
-export function useSearchUsers() {
-  const client = useApolloClient();
-  return useCallback(
-    async <IncludeGroups extends boolean = false>(
-      search: string,
-      options: {
-        excludeUsers?: string[];
-        excludeUserGroups?: string[];
-        includeGroups?: IncludeGroups;
-        includeInactive?: boolean;
-      } = {}
-    ): Promise<UserSelectSelection<IncludeGroups>[]> => {
-      const { excludeUsers, excludeUserGroups, includeGroups, includeInactive } = options;
-      const { data } = await client.query({
-        query: useSearchUsers_searchUsersDocument,
-        variables: {
-          search,
-          excludeUsers,
-          excludeUserGroups,
-          includeGroups,
-          includeInactive,
-        },
-        fetchPolicy: "no-cache",
-      });
-      return data!.searchUsers as UserSelectSelection<IncludeGroups>[];
-    },
-    []
-  );
-}
-
-useSearchUsers.queries = [
-  gql`
-    query useSearchUsers_searchUsers(
-      $search: String!
-      $excludeUsers: [GID!]
-      $excludeUserGroups: [GID!]
-      $includeGroups: Boolean
-      $includeInactive: Boolean
-    ) {
-      searchUsers(
-        search: $search
-        excludeUsers: $excludeUsers
-        excludeUserGroups: $excludeUserGroups
-        includeGroups: $includeGroups
-        includeInactive: $includeInactive
-      ) {
-        ... on User {
-          ...UserSelect_User
-        }
-        ... on UserGroup {
-          ...UserSelect_UserGroup
-        }
-      }
-    }
-    ${UserSelect.fragments.User}
-    ${UserSelect.fragments.UserGroup}
-  `,
-];
-
 function useGetUsersOrGroups() {
   const client = useApolloClient();
   return useCallback(async (ids: MaybeArray<string>) => {
@@ -426,7 +367,7 @@ const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
 const SingleValue = rsComponent("SingleValue", function (props) {
   return (
     <components.SingleValue {...props}>
-      <UserSelectOption data={props.data} />
+      <UserSelectOption data={props.data} isDisabled={props.isDisabled} />
     </components.SingleValue>
   );
 });
@@ -450,7 +391,7 @@ const MultiValueLabel = rsComponent("MultiValueLabel", function ({ children, ...
             />
             {data.name} (
             <FormattedMessage
-              id="component.user-select.group-members"
+              id="generic.n-group-members"
               defaultMessage="{count, plural, =1 {1 member} other {# members}}"
               values={{ count: data.memberCount }}
             />
@@ -465,48 +406,11 @@ const MultiValueLabel = rsComponent("MultiValueLabel", function ({ children, ...
 const Option = rsComponent("Option", function ({ children, ...props }) {
   return (
     <components.Option {...props}>
-      <UserSelectOption data={props.data} />
+      <UserSelectOption
+        data={props.data}
+        highlight={props.selectProps.inputValue}
+        isDisabled={props.isDisabled}
+      />
     </components.Option>
   );
 });
-
-function UserSelectOption({ data }: { data: UserSelectSelection<any> }) {
-  const intl = useIntl();
-  return data.__typename === "User" ? (
-    <Box verticalAlign="baseline">
-      {data.fullName ? (
-        <>
-          <Text as="span">{data.fullName}</Text>
-          <Text as="span" display="inline-block" width={2} />
-          <Text as="span" fontSize="85%" opacity={0.7}>
-            {data.email}
-          </Text>
-        </>
-      ) : (
-        <Text as="span">{data.email}</Text>
-      )}
-    </Box>
-  ) : data.__typename === "UserGroup" ? (
-    <Flex alignItems="center">
-      <UsersIcon
-        marginRight={2}
-        position="relative"
-        aria-label={intl.formatMessage({
-          id: "component.user-select.user-group-icon-alt",
-          defaultMessage: "Team",
-        })}
-      />
-      <Box verticalAlign="baseline">
-        <Text as="span">{data.name}</Text>
-        <Text as="span" display="inline-block" width={2} />
-        <Text as="span" fontSize="85%" opacity={0.7}>
-          <FormattedMessage
-            id="component.user-select.group-members"
-            defaultMessage="{count, plural, =1 {1 member} other {# members}}"
-            values={{ count: data.memberCount }}
-          />
-        </Text>
-      </Box>
-    </Flex>
-  ) : null;
-}

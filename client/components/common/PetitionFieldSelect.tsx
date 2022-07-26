@@ -152,11 +152,9 @@ const PetitionFieldSelectItem = memo(function PetitionFieldSelectItem<
         />
         <Box fontSize="sm" marginLeft={2} paddingRight={1} flex="1" minWidth="0" isTruncated>
           {field.title ? (
-            highlight ? (
-              <HighlightText text={field.title} search={highlight} />
-            ) : (
-              field.title
-            )
+            <HighlightText as="span" search={highlight}>
+              {field.title}
+            </HighlightText>
           ) : (
             <Text as="span" textStyle="hint">
               <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
@@ -183,9 +181,18 @@ const PetitionFieldSelectItem = memo(function PetitionFieldSelectItem<
           {fieldIndex}
           {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".charAt(column)}
         </Center>
-        <Box fontSize="sm" marginLeft={2} paddingRight={1} flex="1" minWidth="0" isTruncated>
-          {highlight ? <HighlightText text={label} search={highlight} /> : label}
-        </Box>
+        <HighlightText
+          as="div"
+          search={highlight}
+          fontSize="sm"
+          marginLeft={2}
+          paddingRight={1}
+          flex="1"
+          minWidth="0"
+          isTruncated
+        >
+          {label}
+        </HighlightText>
       </>
     );
   }

@@ -4,7 +4,8 @@ import { FilterSharedWithOperator, PetitionSharedWithFilterLine } from "@paralle
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { useCallback, useMemo } from "react";
 import { useIntl } from "react-intl";
-import { UserSelect, useSearchUsers } from "../../../common/UserSelect";
+import { UserSelect } from "../../../common/UserSelect";
+import { useSearchUsers } from "../../../../utils/useSearchUsers";
 
 export interface PetitionListSharedWithFilterProps
   extends ValueProps<PetitionSharedWithFilterLine, false> {

@@ -53,12 +53,8 @@ import { GrowingTextarea } from "../../common/GrowingTextarea";
 import { HelpPopover } from "../../common/HelpPopover";
 import { PaddedCollapse } from "../../common/PaddedCollapse";
 import { UserAvatar } from "../../common/UserAvatar";
-import {
-  UserSelect,
-  UserSelectInstance,
-  UserSelectSelection,
-  useSearchUsers,
-} from "../../common/UserSelect";
+import { UserSelect, UserSelectInstance, UserSelectSelection } from "../../common/UserSelect";
+import { useSearchUsers } from "../../../utils/useSearchUsers";
 import { PetitionPermissionTypeText } from "../PetitionPermissionType";
 import { PetitionPermissionTypeSelect } from "../PetitionPermissionTypeSelect";
 
@@ -527,7 +523,7 @@ export function PetitionSharingDialog({
                         <UserGroupMembersPopover userGroupId={group.id}>
                           <Text color="gray.500" cursor="default" isTruncated>
                             <FormattedMessage
-                              id="component.user-select.group-members"
+                              id="generic.n-group-members"
                               defaultMessage="{count, plural, =1 {1 member} other {# members}}"
                               values={{ count: group.memberCount }}
                             />

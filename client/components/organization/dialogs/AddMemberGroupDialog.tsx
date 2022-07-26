@@ -5,12 +5,8 @@ import { DialogProps, useDialog } from "@parallel/components/common/dialogs/Dial
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
-import {
-  UserSelect,
-  UserSelectInstance,
-  UserSelectSelection,
-  useSearchUsers,
-} from "../../common/UserSelect";
+import { UserSelect, UserSelectInstance, UserSelectSelection } from "../../common/UserSelect";
+import { useSearchUsers } from "../../../utils/useSearchUsers";
 
 interface AddMemberGroupDialogData {
   users: UserSelectSelection[];

@@ -1,21 +1,30 @@
 import { Text } from "@chakra-ui/react";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import escapeStringRegexp from "escape-string-regexp";
 import { Fragment } from "react";
+import { isDefined } from "remeda";
 
 export interface HighlightTextProps {
-  text: string;
-  search: string;
+  children?: string;
+  search?: string;
 }
 
-export function HighlightText({ text, search }: HighlightTextProps) {
-  if (search === "") {
-    return <>{text}</>;
+export const HighlightText = chakraForwardRef<"p", HighlightTextProps>(function HighlightText(
+  { children, search, ...props },
+  ref
+) {
+  if (search === "" || !isDefined(search) || !isDefined(children)) {
+    return (
+      <Text ref={ref} {...props}>
+        {children}
+      </Text>
+    );
   }
   const _search = search.toLowerCase();
   const regex = new RegExp(`(${escapeStringRegexp(_search)})`, "gi");
   return (
-    <>
-      {text.split(regex).map((value, i) => {
+    <Text ref={ref} {...props}>
+      {children.split(regex).map((value, i) => {
         if (value.toLowerCase() === _search) {
           return (
             <Text key={i} as="span" sx={{ WebkitTextStrokeWidth: "0.04em" }}>
@@ -26,6 +35,6 @@ export function HighlightText({ text, search }: HighlightTextProps) {
           return <Fragment key={i}>{value}</Fragment>;
         }
       })}
-    </>
+    </Text>
   );
-}
+});

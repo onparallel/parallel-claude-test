@@ -44,7 +44,7 @@ export function TemplateDefaultUserGroupPermissionRow({
           <UserGroupMembersPopover userGroupId={group.id}>
             <Text color="gray.500" cursor="default" isTruncated>
               <FormattedMessage
-                id="component.user-select.group-members"
+                id="generic.n-group-members"
                 defaultMessage="{count, plural, =1 {1 member} other {# members}}"
                 values={{ count: group.memberCount }}
               />

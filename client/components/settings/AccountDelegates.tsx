@@ -1,10 +1,7 @@
 import { gql } from "@apollo/client";
 import { Button, FormControl, FormLabel, Heading, Stack, StackProps, Text } from "@chakra-ui/react";
-import {
-  UserSelect,
-  UserSelectInstance,
-  useSearchUsers,
-} from "@parallel/components/common/UserSelect";
+import { UserSelect, UserSelectInstance } from "@parallel/components/common/UserSelect";
+import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { AccountDelegates_UserFragment, UserSelect_UserFragment } from "@parallel/graphql/__types";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
