@@ -5013,6 +5013,7 @@ type User implements Timestamps {
   The initials of the user.
   """
   initials: String
+  isMe: Boolean!
   isSsoUser: Boolean!
   isSuperAdmin: Boolean!
   lastActiveAt: DateTime

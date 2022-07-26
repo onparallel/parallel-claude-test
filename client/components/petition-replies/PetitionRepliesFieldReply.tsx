@@ -1,4 +1,4 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { Box, Flex, List, ListItem, Stack, Text, VisuallyHidden } from "@chakra-ui/react";
 import { CheckIcon, CloseIcon } from "@parallel/chakra/icons";
 import {
@@ -6,7 +6,6 @@ import {
   PetitionFieldType,
   PetitionRepliesFieldReply_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
-import { getMyId } from "@parallel/utils/apollo/getMyId";
 import { FORMATS } from "@parallel/utils/dates";
 import { formatNumberWithPrefix } from "@parallel/utils/formatNumberWithPrefix";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
@@ -36,10 +35,6 @@ export function PetitionRepliesFieldReply({
 }: PetitionRepliesFieldReplyProps) {
   const intl = useIntl();
   const isTextLikeType = ["TEXT", "SHORT_TEXT", "SELECT"].includes(reply.field!.type);
-
-  const apollo = useApolloClient();
-  const myId = getMyId(apollo);
-
   return (
     <Flex>
       <CopyOrDownloadReplyButton reply={reply} onAction={onAction} />
@@ -119,7 +114,7 @@ export function PetitionRepliesFieldReply({
             </Text>
           ) : (
             <Text color="gray.500">
-              {reply.updatedBy?.__typename === "User" && reply.updatedBy.id === myId ? (
+              {reply.updatedBy?.__typename === "User" && reply.updatedBy.isMe ? (
                 <FormattedMessage id="generic.you" defaultMessage="You" />
               ) : (
                 <UserOrContactReference userOrAccess={reply.updatedBy} isLink={false} />
@@ -180,6 +175,9 @@ PetitionRepliesFieldReply.fragments = {
       }
       updatedBy {
         ...UserOrContactReference_UserOrPetitionAccess
+        ... on User {
+          isMe
+        }
       }
       isAnonymized
       ...CopyOrDownloadReplyButton_PetitionFieldReply

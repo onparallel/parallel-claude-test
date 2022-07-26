@@ -3732,6 +3732,7 @@ export interface User extends Timestamps {
   id: Scalars["GID"];
   /** The initials of the user. */
   initials?: Maybe<Scalars["String"]>;
+  isMe: Scalars["Boolean"];
   isSsoUser: Scalars["Boolean"];
   isSuperAdmin: Scalars["Boolean"];
   lastActiveAt?: Maybe<Scalars["DateTime"]>;
@@ -5609,6 +5610,7 @@ export type useCreateOrUpdateUserDialog_UserFragment = {
   email: string;
   role: OrganizationRole;
   status: UserStatus;
+  isMe: boolean;
   userGroups: Array<{ __typename?: "UserGroup"; id: string; name: string; memberCount: number }>;
 };
 
@@ -10102,7 +10104,13 @@ export type PetitionRepliesField_PetitionFieldFragment = {
           __typename?: "PetitionAccess";
           contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
         }
-      | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+      | {
+          __typename?: "User";
+          isMe: boolean;
+          id: string;
+          fullName?: string | null;
+          status: UserStatus;
+        }
       | null;
   }>;
   comments: Array<{
@@ -10142,7 +10150,13 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
         __typename?: "PetitionAccess";
         contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
       }
-    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+    | {
+        __typename?: "User";
+        isMe: boolean;
+        id: string;
+        fullName?: string | null;
+        status: UserStatus;
+      }
     | null;
 };
 
@@ -10199,7 +10213,13 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
         __typename?: "PetitionAccess";
         contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
       }
-    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+    | {
+        __typename?: "User";
+        isMe: boolean;
+        id: string;
+        fullName?: string | null;
+        status: UserStatus;
+      }
     | null;
 };
 
@@ -12814,6 +12834,7 @@ export type OrganizationUsers_UserFragment = {
   lastActiveAt?: string | null;
   status: UserStatus;
   isSsoUser: boolean;
+  isMe: boolean;
   userGroups: Array<{ __typename?: "UserGroup"; id: string; name: string; memberCount: number }>;
 };
 
@@ -12839,6 +12860,7 @@ export type OrganizationUsers_createOrganizationUserMutation = {
     lastActiveAt?: string | null;
     status: UserStatus;
     isSsoUser: boolean;
+    isMe: boolean;
     userGroups: Array<{ __typename?: "UserGroup"; id: string; name: string; memberCount: number }>;
   };
 };
@@ -12862,6 +12884,7 @@ export type OrganizationUsers_updateOrganizationUserMutation = {
     lastActiveAt?: string | null;
     status: UserStatus;
     isSsoUser: boolean;
+    isMe: boolean;
     userGroups: Array<{ __typename?: "UserGroup"; id: string; name: string; memberCount: number }>;
   };
 };
@@ -12934,6 +12957,7 @@ export type OrganizationUsers_userQuery = {
           lastActiveAt?: string | null;
           status: UserStatus;
           isSsoUser: boolean;
+          isMe: boolean;
           userGroups: Array<{
             __typename?: "UserGroup";
             id: string;
@@ -17968,7 +17992,13 @@ export type PetitionReplies_PetitionFragment = {
               email: string;
             } | null;
           }
-        | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+        | {
+            __typename?: "User";
+            isMe: boolean;
+            id: string;
+            fullName?: string | null;
+            status: UserStatus;
+          }
         | null;
     }>;
     comments: Array<{
@@ -18110,7 +18140,13 @@ export type PetitionReplies_PetitionFieldFragment = {
           __typename?: "PetitionAccess";
           contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
         }
-      | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+      | {
+          __typename?: "User";
+          isMe: boolean;
+          id: string;
+          fullName?: string | null;
+          status: UserStatus;
+        }
       | null;
   }>;
   comments: Array<{
@@ -18297,7 +18333,13 @@ export type PetitionReplies_closePetitionMutation = {
                 email: string;
               } | null;
             }
-          | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+          | {
+              __typename?: "User";
+              isMe: boolean;
+              id: string;
+              fullName?: string | null;
+              status: UserStatus;
+            }
           | null;
       }>;
       comments: Array<{
@@ -18479,7 +18521,13 @@ export type PetitionReplies_approveOrRejectPetitionFieldRepliesMutation = {
                 email: string;
               } | null;
             }
-          | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+          | {
+              __typename?: "User";
+              isMe: boolean;
+              id: string;
+              fullName?: string | null;
+              status: UserStatus;
+            }
           | null;
       }>;
       comments: Array<{
@@ -18763,7 +18811,13 @@ export type PetitionReplies_petitionQuery = {
                     email: string;
                   } | null;
                 }
-              | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+              | {
+                  __typename?: "User";
+                  isMe: boolean;
+                  id: string;
+                  fullName?: string | null;
+                  status: UserStatus;
+                }
               | null;
           }>;
           comments: Array<{
@@ -22114,43 +22168,6 @@ export const CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragmentDoc = gq
     isDefault
   }
 ` as unknown as DocumentNode<CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment, unknown>;
-export const UserSelectOption_UserGroupFragmentDoc = gql`
-  fragment UserSelectOption_UserGroup on UserGroup {
-    id
-    name
-    memberCount
-  }
-` as unknown as DocumentNode<UserSelectOption_UserGroupFragment, unknown>;
-export const UserSelect_UserGroupFragmentDoc = gql`
-  fragment UserSelect_UserGroup on UserGroup {
-    id
-    name
-    memberCount
-    ...UserSelectOption_UserGroup
-  }
-  ${UserSelectOption_UserGroupFragmentDoc}
-` as unknown as DocumentNode<UserSelect_UserGroupFragment, unknown>;
-export const useCreateOrUpdateUserDialog_UserGroupFragmentDoc = gql`
-  fragment useCreateOrUpdateUserDialog_UserGroup on UserGroup {
-    id
-    ...UserSelect_UserGroup
-  }
-  ${UserSelect_UserGroupFragmentDoc}
-` as unknown as DocumentNode<useCreateOrUpdateUserDialog_UserGroupFragment, unknown>;
-export const useCreateOrUpdateUserDialog_UserFragmentDoc = gql`
-  fragment useCreateOrUpdateUserDialog_User on User {
-    id
-    firstName
-    lastName
-    email
-    role
-    status
-    userGroups {
-      ...useCreateOrUpdateUserDialog_UserGroup
-    }
-  }
-  ${useCreateOrUpdateUserDialog_UserGroupFragmentDoc}
-` as unknown as DocumentNode<useCreateOrUpdateUserDialog_UserFragment, unknown>;
 export const CreateReferenceDialog_PetitionFieldFragmentDoc = gql`
   fragment CreateReferenceDialog_PetitionField on PetitionField {
     id
@@ -22806,6 +22823,44 @@ export const IntegrationsSignature_SignatureOrgIntegrationFragmentDoc = gql`
     environment
   }
 ` as unknown as DocumentNode<IntegrationsSignature_SignatureOrgIntegrationFragment, unknown>;
+export const UserSelectOption_UserGroupFragmentDoc = gql`
+  fragment UserSelectOption_UserGroup on UserGroup {
+    id
+    name
+    memberCount
+  }
+` as unknown as DocumentNode<UserSelectOption_UserGroupFragment, unknown>;
+export const UserSelect_UserGroupFragmentDoc = gql`
+  fragment UserSelect_UserGroup on UserGroup {
+    id
+    name
+    memberCount
+    ...UserSelectOption_UserGroup
+  }
+  ${UserSelectOption_UserGroupFragmentDoc}
+` as unknown as DocumentNode<UserSelect_UserGroupFragment, unknown>;
+export const useCreateOrUpdateUserDialog_UserGroupFragmentDoc = gql`
+  fragment useCreateOrUpdateUserDialog_UserGroup on UserGroup {
+    id
+    ...UserSelect_UserGroup
+  }
+  ${UserSelect_UserGroupFragmentDoc}
+` as unknown as DocumentNode<useCreateOrUpdateUserDialog_UserGroupFragment, unknown>;
+export const useCreateOrUpdateUserDialog_UserFragmentDoc = gql`
+  fragment useCreateOrUpdateUserDialog_User on User {
+    id
+    firstName
+    lastName
+    email
+    role
+    status
+    isMe
+    userGroups {
+      ...useCreateOrUpdateUserDialog_UserGroup
+    }
+  }
+  ${useCreateOrUpdateUserDialog_UserGroupFragmentDoc}
+` as unknown as DocumentNode<useCreateOrUpdateUserDialog_UserFragment, unknown>;
 export const OrganizationUsers_UserFragmentDoc = gql`
   fragment OrganizationUsers_User on User {
     id
@@ -22818,12 +22873,9 @@ export const OrganizationUsers_UserFragmentDoc = gql`
     lastActiveAt
     status
     isSsoUser
-    userGroups {
-      id
-      ...useCreateOrUpdateUserDialog_UserGroup
-    }
+    ...useCreateOrUpdateUserDialog_User
   }
-  ${useCreateOrUpdateUserDialog_UserGroupFragmentDoc}
+  ${useCreateOrUpdateUserDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<OrganizationUsers_UserFragment, unknown>;
 export const HeaderNameEditable_PetitionBaseFragmentDoc = gql`
   fragment HeaderNameEditable_PetitionBase on PetitionBase {
@@ -24865,6 +24917,9 @@ export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
     }
     updatedBy {
       ...UserOrContactReference_UserOrPetitionAccess
+      ... on User {
+        isMe
+      }
     }
     isAnonymized
     ...CopyOrDownloadReplyButton_PetitionFieldReply

@@ -34,7 +34,6 @@ import { isDefined } from "remeda";
 
 interface CreateOrUpdateUserDialogProps {
   user?: useCreateOrUpdateUserDialog_UserFragment;
-  myId: string;
 }
 
 interface CreateOrUpdateUserDialogData {
@@ -46,7 +45,6 @@ interface CreateOrUpdateUserDialogData {
 }
 
 function CreateOrUpdateUserDialog({
-  myId,
   user,
   ...props
 }: DialogProps<CreateOrUpdateUserDialogProps, CreateOrUpdateUserDialogData>) {
@@ -218,7 +216,7 @@ function CreateOrUpdateUserDialog({
           <FormControl
             id="create-user-role"
             isInvalid={!!errors.role}
-            isDisabled={user?.id === myId || user?.role === "OWNER" || user?.status === "INACTIVE"}
+            isDisabled={user?.isMe || user?.role === "OWNER" || user?.status === "INACTIVE"}
           >
             <FormLabel>
               <FormattedMessage
@@ -309,6 +307,7 @@ useCreateOrUpdateUserDialog.fragments = {
         email
         role
         status
+        isMe
         userGroups {
           ...useCreateOrUpdateUserDialog_UserGroup
         }

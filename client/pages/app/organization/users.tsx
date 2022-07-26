@@ -135,9 +135,7 @@ function OrganizationUsers() {
   const showCreateOrUpdateUserDialog = useCreateOrUpdateUserDialog();
   const handleCreateUser = async () => {
     try {
-      const { userGroups, ...user } = await showCreateOrUpdateUserDialog({
-        myId: me.id,
-      });
+      const { userGroups, ...user } = await showCreateOrUpdateUserDialog({});
 
       await createOrganizationUser({
         variables: {
@@ -179,10 +177,7 @@ function OrganizationUsers() {
   const [updateOrganizationUser] = useMutation(OrganizationUsers_updateOrganizationUserDocument);
   const handleUpdateUser = async (user: OrganizationUsers_UserFragment) => {
     try {
-      const { role, userGroups } = await showCreateOrUpdateUserDialog({
-        user,
-        myId: me.id,
-      });
+      const { role, userGroups } = await showCreateOrUpdateUserDialog({ user });
 
       await updateOrganizationUser({
         variables: {
@@ -673,12 +668,9 @@ OrganizationUsers.fragments = {
         lastActiveAt
         status
         isSsoUser
-        userGroups {
-          id
-          ...useCreateOrUpdateUserDialog_UserGroup
-        }
+        ...useCreateOrUpdateUserDialog_User
       }
-      ${useCreateOrUpdateUserDialog.fragments.UserGroup}
+      ${useCreateOrUpdateUserDialog.fragments.User}
     `;
   },
 };

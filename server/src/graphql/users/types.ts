@@ -38,6 +38,9 @@ export const User = objectType({
     t.globalId("id", {
       description: "The ID of the user.",
     });
+    t.boolean("isMe", {
+      resolve: (o, _, ctx) => o.id === ctx.user!.id,
+    });
     t.field("role", {
       type: "OrganizationRole",
       resolve: (o) => o.organization_role,

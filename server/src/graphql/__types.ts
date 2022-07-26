@@ -2076,6 +2076,7 @@ export interface NexusGenFieldTypes {
     hasFeatureFlag: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     initials: string | null; // String
+    isMe: boolean; // Boolean!
     isSsoUser: boolean; // Boolean!
     isSuperAdmin: boolean; // Boolean!
     lastActiveAt: NexusGenScalars["DateTime"] | null; // DateTime
@@ -3620,6 +3621,7 @@ export interface NexusGenFieldTypeNames {
     hasFeatureFlag: "Boolean";
     id: "GID";
     initials: "String";
+    isMe: "Boolean";
     isSsoUser: "Boolean";
     isSuperAdmin: "Boolean";
     lastActiveAt: "DateTime";
