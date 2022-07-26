@@ -16,7 +16,7 @@ export function ConfirmReactivateAccessDialog({
         />
       }
       body={
-        nameOrEmail ? (
+        nameOrEmail.length > 0 ? (
           <FormattedMessage
             id="petition.confirm-activate-access-message.body"
             defaultMessage="Are you sure you want to <b>reactivate access</b> to {nameOrEmail}?"

@@ -16,11 +16,18 @@ export function ConfirmDeactivateAccessDialog({
         />
       }
       body={
-        <FormattedMessage
-          id="petition.confirm-deactivate-access-message.body"
-          defaultMessage="Are you sure you want to <b>remove access</b> to {nameOrEmail}?"
-          values={{ nameOrEmail }}
-        />
+        nameOrEmail.length > 0 ? (
+          <FormattedMessage
+            id="petition.confirm-deactivate-access-message.body"
+            defaultMessage="Are you sure you want to <b>remove access</b> to {nameOrEmail}?"
+            values={{ nameOrEmail }}
+          />
+        ) : (
+          <FormattedMessage
+            id="petition.confirm-deactivate-access-message.body-empty-access"
+            defaultMessage="Are you sure you want to <b>remove the empty access</b>?"
+          />
+        )
       }
       confirm={
         <Button colorScheme="red" onClick={() => props.onResolve()}>

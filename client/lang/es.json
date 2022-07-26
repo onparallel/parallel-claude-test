@@ -7340,6 +7340,11 @@
     "context": "Are you sure you want to <b>remove access</b> to {nameOrEmail}?"
   },
   {
+    "term": "petition.confirm-deactivate-access-message.body-empty-access",
+    "definition": "¿Estás seguro de que quieres <b>quitar el acceso vacío</b>?",
+    "context": "Are you sure you want to <b>remove the empty access</b>?"
+  },
+  {
     "term": "petition.confirm-deactivate-access-message.confirm",
     "definition": "Sí, quitar acceso",
     "context": "Yes, remove access"
