@@ -30,12 +30,11 @@ export function usePetitionSignaturesCardPolling(
   );
 
   useEffect(() => {
-    if (current && ["ENQUEUED", "PROCESSING", "PROCESSED"].includes(current.status)) {
+    if (current && current.status !== "CANCELLED" && !isDefined(current.auditTrailFilename)) {
       startPolling(POLL_INTERVAL);
     } else if (
-      current &&
-      ["COMPLETED", "CANCELLED"].includes(current.status) &&
-      isDefined(current.auditTrailFilename)
+      (current?.status === "COMPLETED" && isDefined(current.auditTrailFilename)) ||
+      current?.status === "CANCELLED"
     ) {
       stopPolling();
     }
