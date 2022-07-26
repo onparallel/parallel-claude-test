@@ -454,7 +454,7 @@ export type Mutation = {
   createOrganization: SupportMethodResponse;
   /** Creates a new PDF_DOCUMENT theme on the user's organization */
   createOrganizationPdfDocumentTheme: Organization;
-  /** Creates a new user in the same organization as the context user */
+  /** Creates a new user in the same organization as the context user if is not provided */
   createOrganizationUser: User;
   /** Create parallel. */
   createPetition: PetitionBase;

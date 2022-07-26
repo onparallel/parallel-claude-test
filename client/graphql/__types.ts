@@ -488,7 +488,7 @@ export interface Mutation {
   createOrganization: SupportMethodResponse;
   /** Creates a new PDF_DOCUMENT theme on the user's organization */
   createOrganizationPdfDocumentTheme: Organization;
-  /** Creates a new user in the same organization as the context user */
+  /** Creates a new user in the same organization as the context user if `orgId` is not provided */
   createOrganizationUser: User;
   /** Create parallel. */
   createPetition: PetitionBase;
@@ -3926,6 +3926,43 @@ export interface VerificationCodeRequest {
   remainingAttempts: Scalars["Int"];
   token: Scalars["ID"];
 }
+
+export type OrganizationFeaturesTab_updateFeatureFlagsMutationVariables = Exact<{
+  orgId: Scalars["GID"];
+  featureFlags: Array<InputFeatureFlag> | InputFeatureFlag;
+}>;
+
+export type OrganizationFeaturesTab_updateFeatureFlagsMutation = {
+  updateFeatureFlags: {
+    __typename?: "Organization";
+    id: string;
+    features: Array<{ __typename?: "FeatureFlagEntry"; name: FeatureFlag; value: boolean }>;
+  };
+};
+
+export type OrganizationFeaturesTab_OrganizationFragment = {
+  __typename?: "Organization";
+  id: string;
+  features: Array<{ __typename?: "FeatureFlagEntry"; name: FeatureFlag; value: boolean }>;
+};
+
+export type OrganizationUsersTab_OrganizationUserFragment = {
+  __typename?: "User";
+  id: string;
+  fullName?: string | null;
+  email: string;
+  role: OrganizationRole;
+  createdAt: string;
+  lastActiveAt?: string | null;
+  status: UserStatus;
+};
+
+export type OrganizationUsersTab_OrganizationFragment = {
+  __typename?: "Organization";
+  id: string;
+  name: string;
+  hasSsoProvider: boolean;
+};
 
 export type AlreadyLoggedIn_UserFragment = {
   __typename?: "User";
@@ -21810,6 +21847,24 @@ export type validatePetitionFields_PetitionFieldFragment = {
   options: { [key: string]: any };
 };
 
+export const OrganizationUsersTab_OrganizationUserFragmentDoc = gql`
+  fragment OrganizationUsersTab_OrganizationUser on User {
+    id
+    fullName
+    email
+    role
+    createdAt
+    lastActiveAt
+    status
+  }
+` as unknown as DocumentNode<OrganizationUsersTab_OrganizationUserFragment, unknown>;
+export const OrganizationUsersTab_OrganizationFragmentDoc = gql`
+  fragment OrganizationUsersTab_Organization on Organization {
+    id
+    name
+    hasSsoProvider
+  }
+` as unknown as DocumentNode<OrganizationUsersTab_OrganizationFragment, unknown>;
 export const UserAvatar_UserFragmentDoc = gql`
   fragment UserAvatar_User on User {
     fullName
@@ -22663,16 +22718,23 @@ export const OrganizationMembers_OrganizationUserFragmentDoc = gql`
     status
   }
 ` as unknown as DocumentNode<OrganizationMembers_OrganizationUserFragment, unknown>;
-export const OrganizationMembers_OrganizationFragmentDoc = gql`
-  fragment OrganizationMembers_Organization on Organization {
+export const OrganizationFeaturesTab_OrganizationFragmentDoc = gql`
+  fragment OrganizationFeaturesTab_Organization on Organization {
     id
-    name
-    hasSsoProvider
     features {
       name
       value
     }
   }
+` as unknown as DocumentNode<OrganizationFeaturesTab_OrganizationFragment, unknown>;
+export const OrganizationMembers_OrganizationFragmentDoc = gql`
+  fragment OrganizationMembers_Organization on Organization {
+    id
+    name
+    hasSsoProvider
+    ...OrganizationFeaturesTab_Organization
+  }
+  ${OrganizationFeaturesTab_OrganizationFragmentDoc}
 ` as unknown as DocumentNode<OrganizationMembers_OrganizationFragment, unknown>;
 export const AdminOrganizations_OrganizationFragmentDoc = gql`
   fragment AdminOrganizations_Organization on Organization {
@@ -25988,6 +26050,23 @@ export const useBackgroundTask_TaskFragmentDoc = gql`
     output
   }
 ` as unknown as DocumentNode<useBackgroundTask_TaskFragment, unknown>;
+export const OrganizationFeaturesTab_updateFeatureFlagsDocument = gql`
+  mutation OrganizationFeaturesTab_updateFeatureFlags(
+    $orgId: GID!
+    $featureFlags: [InputFeatureFlag!]!
+  ) {
+    updateFeatureFlags(orgId: $orgId, featureFlags: $featureFlags) {
+      id
+      features {
+        name
+        value
+      }
+    }
+  }
+` as unknown as DocumentNode<
+  OrganizationFeaturesTab_updateFeatureFlagsMutation,
+  OrganizationFeaturesTab_updateFeatureFlagsMutationVariables
+>;
 export const PetitionTagListCellContent_tagsDocument = gql`
   query PetitionTagListCellContent_tags($search: String) {
     tags(search: $search) {
