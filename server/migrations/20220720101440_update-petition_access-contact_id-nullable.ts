@@ -35,6 +35,8 @@ export async function down(knex: Knex): Promise<void> {
       .whereIn("petition_access_id", petitionAccessIds)
       .delete();
 
+    await knex.from("petition_message").whereIn("petition_access_id", petitionAccessIds).delete();
+
     await knex
       .from("petition_event")
       .whereIn(knex.raw("(data ->> 'petition_access_id')::int") as any, petitionAccessIds)
