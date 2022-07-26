@@ -1187,7 +1187,7 @@
   {
     "term": "component.feature-flag-descriptions.auto-anonymize-description",
     "definition": "Permite incluir un periodo para que las peticiones se anonimicen automaticamente pasados x dias de su cierre.",
-    "context": "Allows to include a period for the prallels to be automatically anonymized after x days of its closing."
+    "context": "Allows setting up a period of time for the parallels to be automatically anonymized after x days of their closing."
   },
   {
     "term": "component.feature-flag-descriptions.auto-anonymize-name",
@@ -1237,12 +1237,12 @@
   {
     "term": "component.feature-flag-descriptions.ghost-login-description",
     "definition": "Permite a los admin de la organización acceder como usuarios de su org (ghost login)",
-    "context": "Allows the organization's admin to login as users of your org (ghost login)."
+    "context": "Allows the admins to login as users from their organization."
   },
   {
     "term": "component.feature-flag-descriptions.ghost-login-name",
     "definition": "Funcionalidad \"Acceder como\"",
-    "context": "\"Access as\" feature"
+    "context": "\"Ghost login\" feature"
   },
   {
     "term": "component.feature-flag-descriptions.hide-recipient-view-contents-description",
@@ -1257,7 +1257,7 @@
   {
     "term": "component.feature-flag-descriptions.on-behalf-of-description",
     "definition": "Añade la opción de enviar parallels como otra persona.",
-    "context": "Add the option to send parallels on behalf of other user."
+    "context": "Add the option to send parallels on behalf of another user from their organization."
   },
   {
     "term": "component.feature-flag-descriptions.on-behalf-of-name",
@@ -1267,7 +1267,7 @@
   {
     "term": "component.feature-flag-descriptions.petition-access-recipient-url-field-description",
     "definition": "Permite obtener la url de la vista de destinatario a traves de la API. Solamente para aplicaciones tipo Paymefy que validan la identidad del usuario.",
-    "context": "Allows to obtain the url of the recipient view through the API. Only for Paymefy type applications that validate the user's identity."
+    "context": "Allows obtaining the url of the recipient view through the API. Only for Paymefy type applications that validate the user's identity."
   },
   {
     "term": "component.feature-flag-descriptions.petition-access-recipient-url-field-name",

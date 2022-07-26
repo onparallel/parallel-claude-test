@@ -22,7 +22,7 @@ export function useFeatureFlagDescriptions(): FeatureFlagDescription {
         description: intl.formatMessage({
           id: "component.feature-flag-descriptions.auto-anonymize-description",
           defaultMessage:
-            "Allows to include a period for the prallels to be automatically anonymized after x days of its closing.",
+            "Allows setting up a period of time for the parallels to be automatically anonymized after x days of their closing.",
         }),
       },
       CUSTOM_HOST_UI: {
@@ -69,12 +69,11 @@ export function useFeatureFlagDescriptions(): FeatureFlagDescription {
       GHOST_LOGIN: {
         name: intl.formatMessage({
           id: "component.feature-flag-descriptions.ghost-login-name",
-          defaultMessage: '"Access as" feature ',
+          defaultMessage: '"Ghost login" feature',
         }),
         description: intl.formatMessage({
           id: "component.feature-flag-descriptions.ghost-login-description",
-          defaultMessage:
-            "Allows the organization's admin to login as users of your org (ghost login).",
+          defaultMessage: "Allows the admins to login as users from their organization.",
         }),
       },
       HIDE_RECIPIENT_VIEW_CONTENTS: {
@@ -95,7 +94,8 @@ export function useFeatureFlagDescriptions(): FeatureFlagDescription {
         }),
         description: intl.formatMessage({
           id: "component.feature-flag-descriptions.on-behalf-of-description",
-          defaultMessage: "Add the option to send parallels on behalf of other user.",
+          defaultMessage:
+            "Add the option to send parallels on behalf of another user from their organization.",
         }),
       },
       PETITION_ACCESS_RECIPIENT_URL_FIELD: {
@@ -106,7 +106,7 @@ export function useFeatureFlagDescriptions(): FeatureFlagDescription {
         description: intl.formatMessage({
           id: "component.feature-flag-descriptions.petition-access-recipient-url-field-description",
           defaultMessage:
-            "Allows to obtain the url of the recipient view through the API. Only for Paymefy type applications that validate the user's identity.",
+            "Allows obtaining the url of the recipient view through the API. Only for Paymefy type applications that validate the user's identity.",
         }),
       },
       PETITION_PDF_EXPORT: {

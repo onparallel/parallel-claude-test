@@ -101,14 +101,14 @@ export const changePassword = mutationField("changePassword", {
 });
 
 export const createOrganizationUser = mutationField("createOrganizationUser", {
-  description: "Creates a new user in the same organization as the context user if is not provided",
+  description:
+    "Creates a new user in the same organization as the context user if `orgId` is not provided",
   type: "User",
   authorize: authenticateAnd(
-    contextUserHasRole("ADMIN"),
     orgDoesNotHaveSsoProvider(),
     orgCanCreateNewUser(),
     ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never)),
-    ifArgDefined("orgId", userIsSuperAdmin())
+    ifArgDefined("orgId", userIsSuperAdmin(), contextUserHasRole("ADMIN"))
   ),
   args: {
     email: nonNull(stringArg()),

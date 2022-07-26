@@ -383,6 +383,7 @@ export const Organization = objectType({
     });
     t.nonNull.list.nonNull.field("features", {
       description: "A list of all feature flag and the value asigned to this org",
+      authorize: isOwnOrgOrSuperAdmin(),
       type: "FeatureFlagEntry",
       resolve: async (o, _, ctx) => {
         return await ctx.featureFlags.loadOrganizationFeatureFlags(o.id);

@@ -141,7 +141,8 @@ export class FeatureFlagRepository extends BaseRepository {
         from feature_flag ff left join feature_flag_override ffoo
           on ffoo.org_id = ? and ffoo.user_id is null and ffoo."feature_flag_name"  = ff."name" 
     `,
-      [orgId]
+      [orgId],
+      t
     );
 
     return rows;

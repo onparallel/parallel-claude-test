@@ -15,7 +15,7 @@ import { isDefined, pick } from "remeda";
 import { OrganizationTheme } from "../../db/__types";
 import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { random } from "../../util/token";
-import { authenticateAnd } from "../helpers/authorize";
+import { authenticateAnd, userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { uploadArg } from "../helpers/scalars";
 import { validateAnd } from "../helpers/validateArgs";
@@ -354,7 +354,7 @@ export const updateFeatureFlags = mutationField("updateFeatureFlags", {
     ),
     orgId: nonNull(globalIdArg("Organization")),
   },
-  authorize: authenticateAnd(contextUserHasRole("ADMIN")),
+  authorize: authenticateAnd(userIsSuperAdmin()),
   resolve: async (_, { featureFlags, orgId }, ctx) => {
     try {
       const needRemoveBranding = featureFlags.some((f) => f.name === "REMOVE_PARALLEL_BRANDING");
