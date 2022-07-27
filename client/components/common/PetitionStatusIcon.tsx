@@ -42,17 +42,39 @@ export const PetitionStatusIcon = chakraForwardRef<"svg", PetitionStatusIconProp
     return (
       <Tooltip label={getTooltipLabel()} aria-label={getTooltipLabel()!}>
         {status === "DRAFT" ? (
-          <EditIcon ref={ref} boxSize="18px" color="gray.500" role="presentation" {...props} />
+          <EditIcon
+            ref={ref}
+            boxSize="18px"
+            color="gray.500"
+            role="presentation"
+            tabIndex={0}
+            {...props}
+          />
         ) : status === "PENDING" ? (
-          <TimeIcon ref={ref} boxSize="18px" color="yellow.600" role="presentation" {...props} />
+          <TimeIcon
+            ref={ref}
+            boxSize="18px"
+            color="yellow.600"
+            role="presentation"
+            tabIndex={0}
+            {...props}
+          />
         ) : status === "COMPLETED" ? (
-          <CheckIcon ref={ref} boxSize="18px" color="green.500" role="presentation" {...props} />
+          <CheckIcon
+            ref={ref}
+            boxSize="18px"
+            color="green.500"
+            role="presentation"
+            tabIndex={0}
+            {...props}
+          />
         ) : status === "CLOSED" ? (
           <DoubleCheckIcon
             ref={ref}
             boxSize="24px"
             color="green.500"
             role="presentation"
+            tabIndex={0}
             {...props}
           />
         ) : null}

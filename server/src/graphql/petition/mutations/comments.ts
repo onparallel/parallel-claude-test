@@ -31,7 +31,7 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
       )
     ),
     petitionIsNotAnonymized("petitionId"),
-    validPetitionFieldCommentContent("content", "petitionFieldId") // TODO pass true as 3rd argument,
+    validPetitionFieldCommentContent("content", "petitionFieldId", true)
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -114,7 +114,7 @@ export const updatePetitionFieldComment = mutationField("updatePetitionFieldComm
     commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
     userIsCommentAuthor("petitionFieldCommentId"),
     petitionIsNotAnonymized("petitionId"),
-    validPetitionFieldCommentContent("content", "petitionFieldId") // TODO pass true as 3rd argument,
+    validPetitionFieldCommentContent("content", "petitionFieldId", true)
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
