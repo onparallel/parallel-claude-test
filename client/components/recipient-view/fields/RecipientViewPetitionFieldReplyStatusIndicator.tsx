@@ -51,7 +51,7 @@ export function RecipientViewPetitionFieldReplyStatusIndicator({
         { date: intl.formatDate(reply.updatedAt, FORMATS.LLL) }
       )}
     >
-      <CloudOkIcon fontSize="18px" color="green.600" />
+      <CloudOkIcon fontSize="18px" color="green.600" role="presentation" />
     </Tooltip>
   ) : null;
 }

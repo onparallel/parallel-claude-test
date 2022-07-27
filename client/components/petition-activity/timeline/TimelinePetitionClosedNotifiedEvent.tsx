@@ -19,7 +19,7 @@ export function TimelinePetitionClosedNotifiedEvent({
 }: TimelinePetitionClosedNotifiedEventProps) {
   return (
     <TimelineItem
-      icon={<TimelineIcon icon={<ThumbUpIcon />} color="white" backgroundColor="blue.500" />}
+      icon={<TimelineIcon icon={ThumbUpIcon} color="white" backgroundColor="blue.500" />}
     >
       <FormattedMessage
         id="timeline.petition-correct-notified-description"

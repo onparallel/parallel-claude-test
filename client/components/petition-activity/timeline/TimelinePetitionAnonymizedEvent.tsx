@@ -13,9 +13,7 @@ type TimelinePetitionAnonymizedEventProps = {
 export function TimelinePetitionAnonymizedEvent({ event }: TimelinePetitionAnonymizedEventProps) {
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon icon={<CircleCrossFilledIcon />} color="white" backgroundColor="red.500" />
-      }
+      icon={<TimelineIcon icon={CircleCrossFilledIcon} color="white" backgroundColor="red.500" />}
     >
       <FormattedMessage
         id="timeline.petition-anonymized-description"

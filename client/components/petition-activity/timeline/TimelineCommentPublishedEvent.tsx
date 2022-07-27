@@ -85,7 +85,7 @@ export function TimelineCommentPublishedEvent({
       <TimelineItem
         icon={
           <TimelineIcon
-            icon={isInternal ? <NoteIcon /> : <CommentIcon />}
+            icon={isInternal ? NoteIcon : CommentIcon}
             color="black"
             backgroundColor="gray.200"
           />

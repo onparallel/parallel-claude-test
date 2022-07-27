@@ -20,7 +20,7 @@ export function TimelineReplyCreatedEvent({
 }: TimelineReplyCreatedEventProps) {
   return (
     <TimelineItem
-      icon={<TimelineIcon icon={<PlusCircleIcon />} color="gray.600" size="18px" />}
+      icon={<TimelineIcon icon={PlusCircleIcon} color="gray.600" size="18px" />}
       paddingY={2}
     >
       <FormattedMessage

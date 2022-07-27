@@ -17,9 +17,7 @@ export function TimelineUserPermissionRemovedEvent({
   userId,
 }: TimelineUserPermissionRemovedEventProps) {
   return (
-    <TimelineItem
-      icon={<TimelineIcon icon={<UserXIcon />} color="white" backgroundColor="red.500" />}
-    >
+    <TimelineItem icon={<TimelineIcon icon={UserXIcon} color="white" backgroundColor="red.500" />}>
       <FormattedMessage
         id="timeline.remove-user-permission-description"
         defaultMessage="{userIsYou, select, true {You} other {{user}}} stopped sharing this parallel with {other} {timeAgo}"

@@ -19,7 +19,7 @@ export function TimelineSignatureReminderEvent({
 }: TimelineSignatureReminderEventProps) {
   return (
     <TimelineItem
-      icon={<TimelineIcon icon={<SignatureIcon />} color="black" backgroundColor="gray.200" />}
+      icon={<TimelineIcon icon={SignatureIcon} color="black" backgroundColor="gray.200" />}
     >
       <Flex alignItems="center">
         <Box>

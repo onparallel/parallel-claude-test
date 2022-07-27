@@ -191,7 +191,7 @@ export const RecipientViewHeader = Object.assign(
                   width="320px"
                 >
                   <HStack>
-                    <CloudOkIcon fontSize="18px" color="green.600" />
+                    <CloudOkIcon fontSize="18px" color="green.600" role="presentation" />
                     <Text
                       fontStyle="italic"
                       color="green.600"

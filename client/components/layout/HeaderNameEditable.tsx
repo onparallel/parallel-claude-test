@@ -144,11 +144,11 @@ export const HeaderNameEditable = Object.assign(
                     cursor="default"
                   >
                     {state === "SAVING" ? (
-                      <CloudUploadIcon fontSize="sm" />
+                      <CloudUploadIcon fontSize="sm" role="presentation" />
                     ) : state === "SAVED" ? (
-                      <CloudOkIcon fontSize="sm" />
+                      <CloudOkIcon fontSize="sm" role="presentation" />
                     ) : state === "ERROR" ? (
-                      <CloudErrorIcon fontSize="sm" />
+                      <CloudErrorIcon fontSize="sm" role="presentation" />
                     ) : null}
                     <Text
                       as="span"

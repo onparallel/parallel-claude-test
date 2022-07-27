@@ -23,7 +23,7 @@ export function TimelineRemindersOptOutEvent({ event }: TimelineRemindersOptOutE
 
   return (
     <TimelineItem
-      icon={<TimelineIcon icon={<BellOffIcon />} color="white" backgroundColor="red.500" />}
+      icon={<TimelineIcon icon={BellOffIcon} color="white" backgroundColor="red.500" />}
     >
       <Text as="div">
         <FormattedMessage

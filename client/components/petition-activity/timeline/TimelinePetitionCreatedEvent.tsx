@@ -18,7 +18,7 @@ export function TimelinePetitionCreatedEvent({
 }: TimelinePetitionCreatedEventProps) {
   return (
     <TimelineItem
-      icon={<TimelineIcon icon={<ShinyIcon />} color="white" backgroundColor="primary.500" />}
+      icon={<TimelineIcon icon={ShinyIcon} color="white" backgroundColor="primary.500" />}
       paddingBottom={0}
     >
       <FormattedMessage

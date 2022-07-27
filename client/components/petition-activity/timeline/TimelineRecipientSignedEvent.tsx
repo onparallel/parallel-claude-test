@@ -16,7 +16,7 @@ export function TimelineRecipientSignedEvent({
 }: TimelineRecipientSignedEventProps) {
   return (
     <TimelineItem
-      icon={<TimelineIcon icon={<SignaturePlusIcon />} color="black" backgroundColor="gray.200" />}
+      icon={<TimelineIcon icon={SignaturePlusIcon} color="black" backgroundColor="gray.200" />}
     >
       <FormattedMessage
         id="timeline.recipient-signed-description"

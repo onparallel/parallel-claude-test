@@ -20,9 +20,7 @@ export function TimelineGroupPermissionEditedEvent({
 }: TimelineGroupPermissionEditedEventProps) {
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon icon={<UserGroupArrowIcon />} color="white" backgroundColor="yellow.500" />
-      }
+      icon={<TimelineIcon icon={UserGroupArrowIcon} color="white" backgroundColor="yellow.500" />}
     >
       <FormattedMessage
         id="timeline.edit-group-permission-description"

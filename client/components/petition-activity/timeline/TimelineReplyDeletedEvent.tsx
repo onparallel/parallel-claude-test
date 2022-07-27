@@ -20,7 +20,7 @@ export function TimelineReplyDeletedEvent({
 }: TimelineReplyDeletedEventProps) {
   return (
     <TimelineItem
-      icon={<TimelineIcon icon={<XCircleIcon />} color="gray.600" size="18px" />}
+      icon={<TimelineIcon icon={XCircleIcon} color="gray.600" size="18px" />}
       paddingY={2}
     >
       <FormattedMessage

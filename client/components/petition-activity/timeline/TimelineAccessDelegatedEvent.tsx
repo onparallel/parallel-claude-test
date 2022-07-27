@@ -14,7 +14,7 @@ export type TimelineAccessDelegatedEventProps = {
 export function TimelineAccessDelegatedEvent({ event }: TimelineAccessDelegatedEventProps) {
   return (
     <TimelineItem
-      icon={<TimelineIcon icon={<UserPlusIcon />} color="white" backgroundColor="blue.500" />}
+      icon={<TimelineIcon icon={UserPlusIcon} color="white" backgroundColor="blue.500" />}
     >
       <FormattedMessage
         id="timeline.access-delegated-description"

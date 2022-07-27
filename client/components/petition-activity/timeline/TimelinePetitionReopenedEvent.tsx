@@ -17,9 +17,7 @@ export function TimelinePetitionReopenedEvent({
   userId,
 }: TimelinePetitionReopenedEventProps) {
   return (
-    <TimelineItem
-      icon={<TimelineIcon icon={<EditIcon />} color="black" backgroundColor="gray.200" />}
-    >
+    <TimelineItem icon={<TimelineIcon icon={EditIcon} color="black" backgroundColor="gray.200" />}>
       <FormattedMessage
         id="timeline.petition-reopened-description"
         defaultMessage="{userIsYou, select, true {You} other {{user}}} reopened the parallel {timeAgo}"

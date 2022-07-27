@@ -15,7 +15,7 @@ export type TimelinePetitionClosedEventProps = {
 export function TimelinePetitionClosedEvent({ event, userId }: TimelinePetitionClosedEventProps) {
   return (
     <TimelineItem
-      icon={<TimelineIcon icon={<DoubleCheckIcon />} color="white" backgroundColor="green.500" />}
+      icon={<TimelineIcon icon={DoubleCheckIcon} color="white" backgroundColor="green.500" />}
     >
       <FormattedMessage
         id="timeline.petition-closed-description"

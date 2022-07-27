@@ -14,7 +14,7 @@ export type TimelineSignatureCompletedEventProps = {
 export function TimelineSignatureCompletedEvent({ event }: TimelineSignatureCompletedEventProps) {
   return (
     <TimelineItem
-      icon={<TimelineIcon icon={<SignatureIcon />} color="white" backgroundColor="green.500" />}
+      icon={<TimelineIcon icon={SignatureIcon} color="white" backgroundColor="green.500" />}
     >
       <FormattedMessage
         id="timeline.signature-completed-description"

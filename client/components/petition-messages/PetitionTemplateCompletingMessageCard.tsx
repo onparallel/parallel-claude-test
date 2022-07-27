@@ -106,9 +106,8 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
 
       return (
         <Card {...props}>
-          <CardHeader>
+          <CardHeader leftIcon={<AppWindowIcon marginRight={2} role="presentation" />}>
             <Flex alignItems="center">
-              <AppWindowIcon marginRight={2} />
               <FormattedMessage
                 id="component.petition-template-completing-message.card-header"
                 defaultMessage="Thank you message"

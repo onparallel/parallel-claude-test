@@ -15,9 +15,7 @@ export function TimelinePetitionReminderBouncedEvent({
   event,
 }: TimelinePetitionReminderBouncedEventProps) {
   return (
-    <TimelineItem
-      icon={<TimelineIcon icon={<EmailXIcon />} color="white" backgroundColor="red.500" />}
-    >
+    <TimelineItem icon={<TimelineIcon icon={EmailXIcon} color="white" backgroundColor="red.500" />}>
       <FormattedMessage
         id="timeline.petition-reminder-bounced-description"
         defaultMessage="We could not send a reminder to contact {contactName} {timeAgo}"

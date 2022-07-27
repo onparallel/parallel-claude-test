@@ -18,7 +18,7 @@ export function TimelinePetitionCompletedEvent({
 }: TimelinePetitionCompletedEventProps) {
   return (
     <TimelineItem
-      icon={<TimelineIcon icon={<CheckIcon />} color="white" backgroundColor="green.500" />}
+      icon={<TimelineIcon icon={CheckIcon} color="white" backgroundColor="green.500" />}
     >
       <FormattedMessage
         id="timeline.petition-completed-description"

@@ -18,9 +18,7 @@ export function TimelineAccessDeactivatedEvent({
   userId,
 }: TimelineAccessDeactivatedEventProps) {
   return (
-    <TimelineItem
-      icon={<TimelineIcon icon={<UserXIcon />} color="white" backgroundColor="red.500" />}
-    >
+    <TimelineItem icon={<TimelineIcon icon={UserXIcon} color="white" backgroundColor="red.500" />}>
       {event.reason === "DEACTIVATED_BY_USER" ? (
         <FormattedMessage
           id="timeline.access-deactivated-manual-description"

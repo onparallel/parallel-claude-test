@@ -21,7 +21,7 @@ export function TimelineCommentDeletedEvent({
 }: TimelineCommentDeletedEventProps) {
   return (
     <TimelineItem
-      icon={<TimelineIcon icon={<CommentXIcon />} color="gray.700" backgroundColor="gray.200" />}
+      icon={<TimelineIcon icon={CommentXIcon} color="gray.700" backgroundColor="gray.200" />}
       paddingY={2}
     >
       {isInternal ? (

@@ -490,7 +490,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   <Tabs variant="enclosed" {...extendFlexColumn} defaultIndex={1}>
                     <TabList marginX="-1px" marginTop="-1px" flex="none">
                       <Tab padding={4} lineHeight={5} fontWeight="bold">
-                        <ListIcon fontSize="18px" marginRight={2} />
+                        <ListIcon fontSize="18px" marginRight={2} aria-hidden="true" />
                         <FormattedMessage id="petition.contents" defaultMessage="Contents" />
                       </Tab>
                       <Tab
@@ -500,7 +500,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                         lineHeight={5}
                         fontWeight="bold"
                       >
-                        <SettingsIcon fontSize="16px" marginRight={2} />
+                        <SettingsIcon fontSize="16px" marginRight={2} aria-hidden="true" />
                         <FormattedMessage
                           id="petition-compose.settings"
                           defaultMessage="Settings"

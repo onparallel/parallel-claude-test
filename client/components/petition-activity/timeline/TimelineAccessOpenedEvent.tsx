@@ -13,9 +13,7 @@ export type TimelineAccessOpenedEventProps = {
 
 export function TimelineAccessOpenedEvent({ event }: TimelineAccessOpenedEventProps) {
   return (
-    <TimelineItem
-      icon={<TimelineIcon icon={<EyeIcon />} color="white" backgroundColor="blue.500" />}
-    >
+    <TimelineItem icon={<TimelineIcon icon={EyeIcon} color="white" backgroundColor="blue.500" />}>
       <FormattedMessage
         id="timeline.access-opened-description"
         defaultMessage="{contact} opened the parallel {timeAgo}"

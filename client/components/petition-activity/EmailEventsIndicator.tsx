@@ -59,6 +59,7 @@ export function EmailEventsIndicator({
             color={deliveredAt ? "green.500" : "gray.300"}
             position="relative"
             top="-1px"
+            role="presentation"
           />
         </Box>
         <Box
@@ -84,6 +85,7 @@ export function EmailEventsIndicator({
             color={openedAt ? "green.500" : "gray.300"}
             position="relative"
             top="-1px"
+            role="presentation"
           />
         </Box>
       </Box>

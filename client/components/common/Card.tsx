@@ -77,6 +77,7 @@ export interface GenericCardHeaderProps {
   size?: HeadingProps["size"];
   rightAction?: ReactNode;
   omitDivider?: boolean;
+  leftIcon?: ReactNode;
 }
 
 export function GenericCardHeader({
@@ -85,6 +86,7 @@ export function GenericCardHeader({
   children,
   rightAction,
   omitDivider,
+  leftIcon,
 }: GenericCardHeaderProps) {
   return (
     <>
@@ -96,6 +98,7 @@ export function GenericCardHeader({
         minHeight="52px"
         alignItems="center"
       >
+        {leftIcon}
         <Heading flex="1" as={as} size={size} overflowWrap="anywhere">
           {children}
         </Heading>

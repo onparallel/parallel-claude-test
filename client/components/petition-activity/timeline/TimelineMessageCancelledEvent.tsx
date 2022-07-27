@@ -19,7 +19,7 @@ export function TimelineMessageCancelledEvent({
 }: TimelineMessageCancelledEventProps) {
   return (
     <TimelineItem
-      icon={<TimelineIcon icon={<ForbiddenIcon />} color="white" backgroundColor="red.500" />}
+      icon={<TimelineIcon icon={ForbiddenIcon} color="white" backgroundColor="red.500" />}
     >
       {reason === "CANCELLED_BY_USER" ? (
         <FormattedMessage

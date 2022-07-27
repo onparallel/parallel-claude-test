@@ -29,9 +29,7 @@ export function TimelineReminderSentEvent({
     } catch {}
   }
   return (
-    <TimelineItem
-      icon={<TimelineIcon icon={<BellIcon />} color="black" backgroundColor="gray.200" />}
-    >
+    <TimelineItem icon={<TimelineIcon icon={BellIcon} color="black" backgroundColor="gray.200" />}>
       <Flex align="center">
         <Box>
           {reminder.type === "MANUAL" ? (

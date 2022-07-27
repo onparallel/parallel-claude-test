@@ -344,7 +344,7 @@ export const PetitionSignaturesCard = Object.assign(
           }
         >
           <HStack as="span" spacing={2}>
-            <SignatureIcon fontSize="20px" />
+            <SignatureIcon fontSize="20px" role="presentation" />
             <Text as="span">
               <FormattedMessage id="generic.e-signature" defaultMessage="eSignature" />
             </Text>

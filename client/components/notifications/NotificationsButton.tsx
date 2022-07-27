@@ -72,7 +72,7 @@ export const NotificationsButton = chakraForwardRef<"button", {}>(function Notif
             whileTap={{ scale: 0.9 }}
             animate={unreadCount ? bellAnimation : {}}
           >
-            <BellIcon fontSize="22px" />
+            <BellIcon fontSize="22px" aria-hidden="true" />
           </motion.div>
           <AnimatePresence>
             {unreadCount ? (

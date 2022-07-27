@@ -31,7 +31,7 @@ export function TimelineSignatureCancelledEvent({
 
   return (
     <TimelineItem
-      icon={<TimelineIcon icon={<SignatureIcon />} color="white" backgroundColor="red.500" />}
+      icon={<TimelineIcon icon={SignatureIcon} color="white" backgroundColor="red.500" />}
     >
       <Flex alignItems="center">
         <Box>

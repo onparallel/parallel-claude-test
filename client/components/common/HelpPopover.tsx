@@ -24,6 +24,12 @@ export const HelpPopover = chakraForwardRef<"svg", HelpPopoverProps>(function (
         marginLeft={2}
         color="gray.400"
         _hover={{ color: "gray.500" }}
+        _focus={{
+          boxShadow: "outline",
+          outline: "none",
+          borderRadius: "full",
+        }}
+        tabindex="0"
         {...(props as any)}
       />
     </SmallPopover>

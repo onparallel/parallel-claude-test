@@ -42,8 +42,7 @@ export const PetitionTemplateRequestMessageCard = Object.assign(
 
       return (
         <Card ref={ref} {...props}>
-          <CardHeader>
-            <EmailIcon marginRight={2} />
+          <CardHeader leftIcon={<EmailIcon marginRight={2} role="presentation" />}>
             <FormattedMessage
               id="component.petition-template-request-message.card-header"
               defaultMessage="Parallel message"

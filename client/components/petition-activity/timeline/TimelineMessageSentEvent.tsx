@@ -31,7 +31,7 @@ export function TimelineMessageSentEvent({
   }
   return (
     <TimelineItem
-      icon={<TimelineIcon icon={<EmailSentIcon />} color="black" backgroundColor="gray.200" />}
+      icon={<TimelineIcon icon={EmailSentIcon} color="black" backgroundColor="gray.200" />}
     >
       <Flex alignItems="center">
         <Box>

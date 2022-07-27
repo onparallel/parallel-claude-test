@@ -15,7 +15,7 @@ export type TimelineSignatureStartedEventProps = {
 export function TimelineSignatureStartedEvent({ event }: TimelineSignatureStartedEventProps) {
   return (
     <TimelineItem
-      icon={<TimelineIcon icon={<SignatureIcon />} color="black" backgroundColor="gray.200" />}
+      icon={<TimelineIcon icon={SignatureIcon} color="black" backgroundColor="gray.200" />}
     >
       <Flex alignItems="center">
         <Box>

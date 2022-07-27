@@ -584,7 +584,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                   rightAction={<PetitionRepliesFilterButton value={filter} onChange={setFilter} />}
                 >
                   <Text as="span" display="flex" alignItems="center">
-                    <ListIcon fontSize="18px" marginRight={2} />
+                    <ListIcon fontSize="18px" marginRight={2} role="presentation" />
                     <FormattedMessage id="petition.contents" defaultMessage="Contents" />
                   </Text>
                 </GenericCardHeader>

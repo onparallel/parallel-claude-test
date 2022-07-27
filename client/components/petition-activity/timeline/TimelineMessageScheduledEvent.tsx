@@ -32,9 +32,7 @@ export function TimelineMessageScheduledEvent({
     } catch {}
   }
   return (
-    <TimelineItem
-      icon={<TimelineIcon icon={<TimeIcon />} color="black" backgroundColor="gray.200" />}
-    >
+    <TimelineItem icon={<TimelineIcon icon={TimeIcon} color="black" backgroundColor="gray.200" />}>
       <Flex alignItems="center">
         <Box>
           {message.access.delegateGranter ? (

@@ -16,7 +16,7 @@ export function TimelineSignatureOpenedEvent({
 }: TimelineSignatureOpenedEventProps) {
   return (
     <TimelineItem
-      icon={<TimelineIcon icon={<SignatureIcon />} color="white" backgroundColor="blue.500" />}
+      icon={<TimelineIcon icon={SignatureIcon} color="white" backgroundColor="blue.500" />}
     >
       <FormattedMessage
         id="timeline.signature-opened-description"
