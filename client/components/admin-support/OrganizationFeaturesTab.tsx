@@ -11,9 +11,14 @@ import {
   OrganizationFeaturesTab_updateFeatureFlagsDocument,
 } from "@parallel/graphql/__types";
 import { useFeatureFlagDescriptions } from "@parallel/utils/useFeatureFlagDescriptions";
-import { FormEvent, useRef, useState } from "react";
+import { useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { equals, isDefined } from "remeda";
+import { isDefined, omit } from "remeda";
+
+type FeaturesFormData = {
+  features: FeatureFlagEntry[];
+};
 
 export function OrganizationFeaturesTab({
   organization,
@@ -21,45 +26,50 @@ export function OrganizationFeaturesTab({
   organization: OrganizationFeaturesTab_OrganizationFragment;
 }) {
   const intl = useIntl();
-  const [featureFlags, setFeatureFlags] = useState(organization.features);
-  const [editedFeatures, setEditedFeatures] = useState<FeatureFlagEntry[]>([]);
-  const [featureSearch, setFeatureSearch] = useState("");
-  const originalFeatureFlags = useRef(organization.features);
 
-  function handleChangeFeature(name: FeatureFlag, value: boolean) {
-    setFeatureFlags((currentFeatures) => {
-      return currentFeatures.map((f) => {
-        if (f.name === name) {
-          return { ...f, value };
-        }
-        return f;
-      });
-    });
+  const [search, setSearch] = useState("");
 
-    const originalFeature = originalFeatureFlags.current.find((f) => f.name === name);
-    if (equals({ name: originalFeature?.name, value: originalFeature?.value }, { name, value })) {
-      setEditedFeatures((ef) => ef.filter((f) => f.name !== name));
-    } else {
-      setEditedFeatures((ef) => [...ef, { name, value }]);
-    }
-  }
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    getFieldState,
+    formState: { dirtyFields },
+  } = useForm<FeaturesFormData>({
+    defaultValues: {
+      features: organization.features,
+    },
+    mode: "onSubmit",
+  });
+
+  const { fields } = useFieldArray({
+    name: "features",
+    control,
+  });
 
   const [updateFeatureFlags, { loading: updatingFeatureFlags }] = useMutation(
     OrganizationFeaturesTab_updateFeatureFlagsDocument
   );
 
-  async function handleSubmitFeatureFlags(event: FormEvent) {
-    event.preventDefault();
+  async function handleSubmitFeatureFlags(formData: FeaturesFormData) {
     try {
+      const dirtyFeatures = [] as FeatureFlagEntry[];
+      formData?.features?.forEach((feature, index) => {
+        const { isDirty } = getFieldState(`features.${index}.value`);
+        if (isDirty) {
+          dirtyFeatures.push(omit(feature, ["__typename"]));
+        }
+      });
       const { data } = await updateFeatureFlags({
-        variables: { orgId: organization.id, featureFlags: editedFeatures },
+        variables: { orgId: organization.id, featureFlags: dirtyFeatures },
       });
 
       const featureFlags = data?.updateFeatureFlags.features;
       if (isDefined(featureFlags)) {
-        originalFeatureFlags.current = featureFlags;
-        setFeatureFlags(featureFlags);
-        setEditedFeatures([]);
+        reset({
+          features: featureFlags,
+        });
       }
     } catch {}
   }
@@ -67,7 +77,7 @@ export function OrganizationFeaturesTab({
   const featureFlagDescriptions = useFeatureFlagDescriptions();
 
   return (
-    <Card maxWidth="container.sm" as="form" onSubmit={handleSubmitFeatureFlags}>
+    <Card maxWidth="container.sm" as="form" onSubmit={handleSubmit(handleSubmitFeatureFlags)}>
       <CardHeader>
         <FormattedMessage
           id="page.oganizations.features-active"
@@ -75,26 +85,23 @@ export function OrganizationFeaturesTab({
         />
       </CardHeader>
       <Stack paddingX={6} paddingY={4} spacing={4}>
-        <SearchInput
-          value={featureSearch ?? ""}
-          onChange={(e) => setFeatureSearch(e.target.value)}
-        />
-        {featureFlags.map(({ name, value }) => {
+        <SearchInput value={search ?? ""} onChange={(e) => setSearch(e.target.value)} />
+        {fields.map((field, index) => {
+          const { name } = field;
+
           const featureName = featureFlagDescriptions[name as FeatureFlag]?.name ?? name;
 
-          const search = featureSearch.toLowerCase().trim();
+          const _search = search.toLowerCase().trim();
           if (
-            search &&
-            !featureName.toLowerCase().includes(search) &&
-            !name.toLowerCase().includes(search)
+            _search &&
+            !featureName.toLowerCase().includes(_search) &&
+            !name.toLowerCase().includes(_search)
           ) {
             return null;
           }
 
-          const isEdited = editedFeatures.some((f) => f.name === name);
-
           return (
-            <HStack key={name} alignItems="center" justifyContent="space-between">
+            <HStack key={field.id} alignItems="center" justifyContent="space-between">
               <Flex alignItems="center">
                 <Text as="span">{featureName}</Text>
 
@@ -122,17 +129,12 @@ export function OrganizationFeaturesTab({
                 </HelpPopover>
               </Flex>
               <HStack alignItems="center">
-                {isEdited ? (
+                {dirtyFields?.features?.[index]?.value ? (
                   <Badge colorScheme="yellow">
                     <FormattedMessage id="generic.edited-indicator" defaultMessage="Edited" />
                   </Badge>
                 ) : null}
-                <Switch
-                  isChecked={value}
-                  onChange={(event) => {
-                    handleChangeFeature(name, event.target.checked);
-                  }}
-                />
+                <Switch {...register(`features.${index}.value`)} />
               </HStack>
             </HStack>
           );
@@ -140,17 +142,18 @@ export function OrganizationFeaturesTab({
         <HStack paddingTop={6} alignSelf="flex-end">
           <Button
             onClick={() => {
-              setFeatureFlags(originalFeatureFlags.current);
-              setEditedFeatures([]);
+              reset({
+                features: organization.features,
+              });
             }}
-            isDisabled={!editedFeatures.length}
+            isDisabled={!dirtyFields?.features?.length}
           >
             <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
           </Button>
           <Button
             colorScheme="primary"
             type="submit"
-            isDisabled={!editedFeatures.length}
+            isDisabled={!dirtyFields?.features?.length}
             isLoading={updatingFeatureFlags}
           >
             <FormattedMessage id="generic.save-changes" defaultMessage="Save changes" />
