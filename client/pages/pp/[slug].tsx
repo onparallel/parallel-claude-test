@@ -342,17 +342,19 @@ PublicPetitionLink.queries = [
   `,
 ];
 
+type PublicPetitionLinkServerSideProps = {
+  prefill: string | null;
+  slug: string;
+  publicPetitionLink: PublicPetitionLink_PublicPublicPetitionLinkFragment;
+  defaultValues?: PublicPetitionInitialFormInputs;
+};
+
 export async function getServerSideProps({
   req,
   query: { slug, prefill },
   locale,
 }: GetServerSidePropsContext): Promise<
-  GetServerSidePropsResult<{
-    prefill: string | null;
-    slug: string;
-    publicPetitionLink: PublicPetitionLink_PublicPublicPetitionLinkFragment;
-    defaultValues?: PublicPetitionInitialFormInputs;
-  }>
+  GetServerSidePropsResult<PublicPetitionLinkServerSideProps>
 > {
   try {
     const client = createApolloClient({}, { req });
@@ -364,16 +366,19 @@ export async function getServerSideProps({
       },
     });
 
-    return data?.publicPetitionLinkBySlug
-      ? {
-          props: {
-            slug: slug as string,
-            publicPetitionLink: data.publicPetitionLinkBySlug,
-            prefill: (prefill ?? null) as string | null,
-            defaultValues: prefill ? jwtDecode(prefill as string) : undefined,
-          },
-        }
-      : { notFound: true };
+    if (data?.publicPetitionLinkBySlug) {
+      const props: PublicPetitionLinkServerSideProps = {
+        slug: slug as string,
+        publicPetitionLink: data.publicPetitionLinkBySlug,
+        prefill: (prefill ?? null) as string | null,
+      };
+      if (prefill && typeof prefill === "string") {
+        props.defaultValues = jwtDecode(prefill);
+      }
+      return { props };
+    } else {
+      return { notFound: true };
+    }
   } catch (err) {
     return {
       notFound: true,
