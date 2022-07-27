@@ -130,6 +130,7 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
     }
   ),
   resolve: async (_, args, ctx) => {
+    // if orgId is provided the invitation email will be anonymous
     const orgId = args.orgId ?? ctx.user!.org_id;
 
     const [organization, userData] = await Promise.all([
@@ -145,7 +146,7 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
       {
         locale: args.locale ?? "en",
         organizationName: organization!.name,
-        organizationUser: fullName(userData!.first_name, userData!.last_name),
+        organizationUser: args.orgId ? "" : fullName(userData!.first_name, userData!.last_name),
       },
       true
     );

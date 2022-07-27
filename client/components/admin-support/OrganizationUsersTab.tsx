@@ -7,9 +7,9 @@ import { TablePage } from "@parallel/components/common/TablePage";
 import { useInviteUserDialog } from "@parallel/components/organization/dialogs/InviteUserDialog";
 import { OrganizationMembersListTableHeader } from "@parallel/components/organization/OrganizationMembersListTableHeader";
 import {
-  OrganizationMembers_createOrganizationUserDocument,
   OrganizationMembers_OrganizationUserFragment,
   OrganizationRole,
+  OrganizationUsersTab_createOrganizationUserDocument,
   OrganizationUsersTab_OrganizationFragment,
   OrganizationUsersTab_OrganizationUserFragment,
 } from "@parallel/graphql/__types";
@@ -53,7 +53,7 @@ export function OrganizationUsersTab({
     [selected.join(","), users]
   );
 
-  const [createOrganizationUser] = useMutation(OrganizationMembers_createOrganizationUserDocument);
+  const [createOrganizationUser] = useMutation(OrganizationUsersTab_createOrganizationUserDocument);
   const showInviteUserDialog = useInviteUserDialog();
   async function handleInviteUser() {
     try {
@@ -366,3 +366,28 @@ OrganizationUsersTab.fragments = {
     `;
   },
 };
+
+OrganizationUsersTab.mutations = [
+  gql`
+    mutation OrganizationUsersTab_createOrganizationUser(
+      $firstName: String!
+      $lastName: String!
+      $email: String!
+      $role: OrganizationRole!
+      $locale: String
+      $orgId: GID
+    ) {
+      createOrganizationUser(
+        email: $email
+        firstName: $firstName
+        lastName: $lastName
+        role: $role
+        locale: $locale
+        orgId: $orgId
+      ) {
+        ...OrganizationUsersTab_OrganizationUser
+      }
+    }
+    ${OrganizationUsersTab.fragments.OrganizationUser}
+  `,
+];

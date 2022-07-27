@@ -370,9 +370,19 @@
     "context": "{organizationUser} invited you to join {organizationName} on Parallel 🎊"
   },
   {
+    "term": "invitation.subject-anonymous",
+    "definition": "You have been invited to join {organizationName} on Parallel 🎊",
+    "context": "You have been invited to join {organizationName} on Parallel 🎊"
+  },
+  {
     "term": "invitation.text",
     "definition": "{organizationUser} has invited you to join {organizationName} on Parallel.",
     "context": "{organizationUser} has invited you to join {organizationName} on Parallel."
+  },
+  {
+    "term": "invitation.text-anonymous",
+    "definition": "You have been invited to join {organizationName} on Parallel.",
+    "context": "You have been invited to join {organizationName} on Parallel."
   },
   {
     "term": "invitation.waiting-to-collaborate",

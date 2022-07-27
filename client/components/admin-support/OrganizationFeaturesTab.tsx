@@ -161,23 +161,6 @@ export function OrganizationFeaturesTab({
   );
 }
 
-OrganizationFeaturesTab.mutations = [
-  gql`
-    mutation OrganizationFeaturesTab_updateFeatureFlags(
-      $orgId: GID!
-      $featureFlags: [InputFeatureFlag!]!
-    ) {
-      updateFeatureFlags(orgId: $orgId, featureFlags: $featureFlags) {
-        id
-        features {
-          name
-          value
-        }
-      }
-    }
-  `,
-];
-
 OrganizationFeaturesTab.fragments = {
   get Organization() {
     return gql`
@@ -191,3 +174,17 @@ OrganizationFeaturesTab.fragments = {
     `;
   },
 };
+
+OrganizationFeaturesTab.mutations = [
+  gql`
+    mutation OrganizationFeaturesTab_updateFeatureFlags(
+      $orgId: GID!
+      $featureFlags: [InputFeatureFlag!]!
+    ) {
+      updateFeatureFlags(orgId: $orgId, featureFlags: $featureFlags) {
+        ...OrganizationFeaturesTab_Organization
+      }
+    }
+    ${OrganizationFeaturesTab.fragments.Organization}
+  `,
+];

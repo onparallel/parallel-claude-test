@@ -3927,6 +3927,12 @@ export interface VerificationCodeRequest {
   token: Scalars["ID"];
 }
 
+export type OrganizationFeaturesTab_OrganizationFragment = {
+  __typename?: "Organization";
+  id: string;
+  features: Array<{ __typename?: "FeatureFlagEntry"; name: FeatureFlag; value: boolean }>;
+};
+
 export type OrganizationFeaturesTab_updateFeatureFlagsMutationVariables = Exact<{
   orgId: Scalars["GID"];
   featureFlags: Array<InputFeatureFlag> | InputFeatureFlag;
@@ -3938,12 +3944,6 @@ export type OrganizationFeaturesTab_updateFeatureFlagsMutation = {
     id: string;
     features: Array<{ __typename?: "FeatureFlagEntry"; name: FeatureFlag; value: boolean }>;
   };
-};
-
-export type OrganizationFeaturesTab_OrganizationFragment = {
-  __typename?: "Organization";
-  id: string;
-  features: Array<{ __typename?: "FeatureFlagEntry"; name: FeatureFlag; value: boolean }>;
 };
 
 export type OrganizationUsersTab_OrganizationUserFragment = {
@@ -3962,6 +3962,28 @@ export type OrganizationUsersTab_OrganizationFragment = {
   id: string;
   name: string;
   hasSsoProvider: boolean;
+};
+
+export type OrganizationUsersTab_createOrganizationUserMutationVariables = Exact<{
+  firstName: Scalars["String"];
+  lastName: Scalars["String"];
+  email: Scalars["String"];
+  role: OrganizationRole;
+  locale?: InputMaybe<Scalars["String"]>;
+  orgId?: InputMaybe<Scalars["GID"]>;
+}>;
+
+export type OrganizationUsersTab_createOrganizationUserMutation = {
+  createOrganizationUser: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    email: string;
+    role: OrganizationRole;
+    createdAt: string;
+    lastActiveAt?: string | null;
+    status: UserStatus;
+  };
 };
 
 export type AlreadyLoggedIn_UserFragment = {
@@ -11554,41 +11576,6 @@ export type OrganizationMembers_OrganizationFragment = {
   name: string;
   hasSsoProvider: boolean;
   features: Array<{ __typename?: "FeatureFlagEntry"; name: FeatureFlag; value: boolean }>;
-};
-
-export type OrganizationMembers_updateFeatureFlagsMutationVariables = Exact<{
-  orgId: Scalars["GID"];
-  featureFlags: Array<InputFeatureFlag> | InputFeatureFlag;
-}>;
-
-export type OrganizationMembers_updateFeatureFlagsMutation = {
-  updateFeatureFlags: {
-    __typename?: "Organization";
-    id: string;
-    features: Array<{ __typename?: "FeatureFlagEntry"; name: FeatureFlag; value: boolean }>;
-  };
-};
-
-export type OrganizationMembers_createOrganizationUserMutationVariables = Exact<{
-  firstName: Scalars["String"];
-  lastName: Scalars["String"];
-  email: Scalars["String"];
-  role: OrganizationRole;
-  locale?: InputMaybe<Scalars["String"]>;
-  orgId?: InputMaybe<Scalars["GID"]>;
-}>;
-
-export type OrganizationMembers_createOrganizationUserMutation = {
-  createOrganizationUser: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    email: string;
-    role: OrganizationRole;
-    createdAt: string;
-    lastActiveAt?: string | null;
-    status: UserStatus;
-  };
 };
 
 export type OrganizationMembers_userQueryVariables = Exact<{ [key: string]: never }>;
@@ -21847,24 +21834,6 @@ export type validatePetitionFields_PetitionFieldFragment = {
   options: { [key: string]: any };
 };
 
-export const OrganizationUsersTab_OrganizationUserFragmentDoc = gql`
-  fragment OrganizationUsersTab_OrganizationUser on User {
-    id
-    fullName
-    email
-    role
-    createdAt
-    lastActiveAt
-    status
-  }
-` as unknown as DocumentNode<OrganizationUsersTab_OrganizationUserFragment, unknown>;
-export const OrganizationUsersTab_OrganizationFragmentDoc = gql`
-  fragment OrganizationUsersTab_Organization on Organization {
-    id
-    name
-    hasSsoProvider
-  }
-` as unknown as DocumentNode<OrganizationUsersTab_OrganizationFragment, unknown>;
 export const UserAvatar_UserFragmentDoc = gql`
   fragment UserAvatar_User on User {
     fullName
@@ -22707,8 +22676,8 @@ export const CreateEventSubscriptionDialog_PetitionBaseFragmentDoc = gql`
     name
   }
 ` as unknown as DocumentNode<CreateEventSubscriptionDialog_PetitionBaseFragment, unknown>;
-export const OrganizationMembers_OrganizationUserFragmentDoc = gql`
-  fragment OrganizationMembers_OrganizationUser on User {
+export const OrganizationUsersTab_OrganizationUserFragmentDoc = gql`
+  fragment OrganizationUsersTab_OrganizationUser on User {
     id
     fullName
     email
@@ -22717,7 +22686,21 @@ export const OrganizationMembers_OrganizationUserFragmentDoc = gql`
     lastActiveAt
     status
   }
+` as unknown as DocumentNode<OrganizationUsersTab_OrganizationUserFragment, unknown>;
+export const OrganizationMembers_OrganizationUserFragmentDoc = gql`
+  fragment OrganizationMembers_OrganizationUser on User {
+    id
+    ...OrganizationUsersTab_OrganizationUser
+  }
+  ${OrganizationUsersTab_OrganizationUserFragmentDoc}
 ` as unknown as DocumentNode<OrganizationMembers_OrganizationUserFragment, unknown>;
+export const OrganizationUsersTab_OrganizationFragmentDoc = gql`
+  fragment OrganizationUsersTab_Organization on Organization {
+    id
+    name
+    hasSsoProvider
+  }
+` as unknown as DocumentNode<OrganizationUsersTab_OrganizationFragment, unknown>;
 export const OrganizationFeaturesTab_OrganizationFragmentDoc = gql`
   fragment OrganizationFeaturesTab_Organization on Organization {
     id
@@ -22731,9 +22714,10 @@ export const OrganizationMembers_OrganizationFragmentDoc = gql`
   fragment OrganizationMembers_Organization on Organization {
     id
     name
-    hasSsoProvider
+    ...OrganizationUsersTab_Organization
     ...OrganizationFeaturesTab_Organization
   }
+  ${OrganizationUsersTab_OrganizationFragmentDoc}
   ${OrganizationFeaturesTab_OrganizationFragmentDoc}
 ` as unknown as DocumentNode<OrganizationMembers_OrganizationFragment, unknown>;
 export const AdminOrganizations_OrganizationFragmentDoc = gql`
@@ -26056,16 +26040,38 @@ export const OrganizationFeaturesTab_updateFeatureFlagsDocument = gql`
     $featureFlags: [InputFeatureFlag!]!
   ) {
     updateFeatureFlags(orgId: $orgId, featureFlags: $featureFlags) {
-      id
-      features {
-        name
-        value
-      }
+      ...OrganizationFeaturesTab_Organization
     }
   }
+  ${OrganizationFeaturesTab_OrganizationFragmentDoc}
 ` as unknown as DocumentNode<
   OrganizationFeaturesTab_updateFeatureFlagsMutation,
   OrganizationFeaturesTab_updateFeatureFlagsMutationVariables
+>;
+export const OrganizationUsersTab_createOrganizationUserDocument = gql`
+  mutation OrganizationUsersTab_createOrganizationUser(
+    $firstName: String!
+    $lastName: String!
+    $email: String!
+    $role: OrganizationRole!
+    $locale: String
+    $orgId: GID
+  ) {
+    createOrganizationUser(
+      email: $email
+      firstName: $firstName
+      lastName: $lastName
+      role: $role
+      locale: $locale
+      orgId: $orgId
+    ) {
+      ...OrganizationUsersTab_OrganizationUser
+    }
+  }
+  ${OrganizationUsersTab_OrganizationUserFragmentDoc}
+` as unknown as DocumentNode<
+  OrganizationUsersTab_createOrganizationUserMutation,
+  OrganizationUsersTab_createOrganizationUserMutationVariables
 >;
 export const PetitionTagListCellContent_tagsDocument = gql`
   query PetitionTagListCellContent_tags($search: String) {
@@ -27660,48 +27666,6 @@ export const Admin_userDocument = gql`
   }
   ${AppLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<Admin_userQuery, Admin_userQueryVariables>;
-export const OrganizationMembers_updateFeatureFlagsDocument = gql`
-  mutation OrganizationMembers_updateFeatureFlags(
-    $orgId: GID!
-    $featureFlags: [InputFeatureFlag!]!
-  ) {
-    updateFeatureFlags(orgId: $orgId, featureFlags: $featureFlags) {
-      id
-      features {
-        name
-        value
-      }
-    }
-  }
-` as unknown as DocumentNode<
-  OrganizationMembers_updateFeatureFlagsMutation,
-  OrganizationMembers_updateFeatureFlagsMutationVariables
->;
-export const OrganizationMembers_createOrganizationUserDocument = gql`
-  mutation OrganizationMembers_createOrganizationUser(
-    $firstName: String!
-    $lastName: String!
-    $email: String!
-    $role: OrganizationRole!
-    $locale: String
-    $orgId: GID
-  ) {
-    createOrganizationUser(
-      email: $email
-      firstName: $firstName
-      lastName: $lastName
-      role: $role
-      locale: $locale
-      orgId: $orgId
-    ) {
-      ...OrganizationMembers_OrganizationUser
-    }
-  }
-  ${OrganizationMembers_OrganizationUserFragmentDoc}
-` as unknown as DocumentNode<
-  OrganizationMembers_createOrganizationUserMutation,
-  OrganizationMembers_createOrganizationUserMutationVariables
->;
 export const OrganizationMembers_userDocument = gql`
   query OrganizationMembers_user {
     ...AppLayout_Query

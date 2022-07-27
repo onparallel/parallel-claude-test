@@ -24,13 +24,22 @@ const email: Email<InvitationProps> = {
     });
   },
   subject({ organizationUser, organizationName }, intl) {
-    return intl.formatMessage(
-      {
-        id: "invitation.subject",
-        defaultMessage: "{organizationUser} invited you to join {organizationName} on Parallel 🎊",
-      },
-      { organizationUser, organizationName }
-    );
+    return organizationUser.length
+      ? intl.formatMessage(
+          {
+            id: "invitation.subject",
+            defaultMessage:
+              "{organizationUser} invited you to join {organizationName} on Parallel 🎊",
+          },
+          { organizationUser, organizationName }
+        )
+      : intl.formatMessage(
+          {
+            id: "invitation.subject-anonymous",
+            defaultMessage: "You have been invited to join {organizationName} on Parallel 🎊",
+          },
+          { organizationName }
+        );
   },
   text(
     { userName, organizationName, organizationUser, parallelUrl, email, password }: InvitationProps,
@@ -39,14 +48,24 @@ const email: Email<InvitationProps> = {
     return outdent`
     ${greetingUser({ name: userName }, intl)}
     
-    ${intl.formatMessage(
-      {
-        id: "invitation.text",
-        defaultMessage:
-          "{organizationUser} has invited you to join {organizationName} on Parallel.",
-      },
-      { organizationName, organizationUser }
-    )}
+    ${
+      organizationName.length
+        ? intl.formatMessage(
+            {
+              id: "invitation.text",
+              defaultMessage:
+                "{organizationUser} has invited you to join {organizationName} on Parallel.",
+            },
+            { organizationName, organizationUser }
+          )
+        : intl.formatMessage(
+            {
+              id: "invitation.text-anonymous",
+              defaultMessage: "You have been invited to join {organizationName} on Parallel.",
+            },
+            { organizationName }
+          )
+    }
 
     ${intl.formatMessage({
       id: "invitation.details",
@@ -102,11 +121,19 @@ const email: Email<InvitationProps> = {
           <MjmlColumn>
             <GreetingNewUser name={userName} />
             <MjmlText>
-              <FormattedMessage
-                id="invitation.text"
-                defaultMessage="{organizationUser} has invited you to join {organizationName} on Parallel."
-                values={{ organizationUser, organizationName }}
-              />
+              {organizationUser.length ? (
+                <FormattedMessage
+                  id="invitation.text"
+                  defaultMessage="{organizationUser} has invited you to join {organizationName} on Parallel."
+                  values={{ organizationUser, organizationName }}
+                />
+              ) : (
+                <FormattedMessage
+                  id="invitation.text-anonymous"
+                  defaultMessage="You have been invited to join {organizationName} on Parallel."
+                  values={{ organizationName }}
+                />
+              )}
             </MjmlText>
             <MjmlText>
               <FormattedMessage
@@ -131,13 +158,15 @@ const email: Email<InvitationProps> = {
                 />
               </MjmlText>
             </MjmlSection>
-            <MjmlText>
-              <FormattedMessage
-                id="invitation.waiting-to-collaborate"
-                defaultMessage="{organizationUser} is waiting for you to collaborate together! 😁"
-                values={{ organizationUser }}
-              />
-            </MjmlText>
+            {organizationUser.length ? (
+              <MjmlText>
+                <FormattedMessage
+                  id="invitation.waiting-to-collaborate"
+                  defaultMessage="{organizationUser} is waiting for you to collaborate together! 😁"
+                  values={{ organizationUser }}
+                />
+              </MjmlText>
+            ) : null}
           </MjmlColumn>
         </MjmlSection>
         <MjmlSection>

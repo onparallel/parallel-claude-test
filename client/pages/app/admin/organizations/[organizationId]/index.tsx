@@ -152,45 +152,6 @@ OrganizationMembers.fragments = {
   },
 };
 
-OrganizationMembers.mutations = [
-  gql`
-    mutation OrganizationMembers_updateFeatureFlags(
-      $orgId: GID!
-      $featureFlags: [InputFeatureFlag!]!
-    ) {
-      updateFeatureFlags(orgId: $orgId, featureFlags: $featureFlags) {
-        id
-        features {
-          name
-          value
-        }
-      }
-    }
-  `,
-  gql`
-    mutation OrganizationMembers_createOrganizationUser(
-      $firstName: String!
-      $lastName: String!
-      $email: String!
-      $role: OrganizationRole!
-      $locale: String
-      $orgId: GID
-    ) {
-      createOrganizationUser(
-        email: $email
-        firstName: $firstName
-        lastName: $lastName
-        role: $role
-        locale: $locale
-        orgId: $orgId
-      ) {
-        ...OrganizationMembers_OrganizationUser
-      }
-    }
-    ${OrganizationMembers.fragments.OrganizationUser}
-  `,
-];
-
 const _queries = [
   gql`
     query OrganizationMembers_user {
