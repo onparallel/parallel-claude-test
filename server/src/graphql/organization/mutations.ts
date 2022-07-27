@@ -136,8 +136,8 @@ export const updateOrganizationBrandTheme = mutationField("updateOrganizationBra
       ctx.user!.org_id,
       {
         brand_theme: {
-          color: args.data.color ?? theme.color,
-          fontFamily: args.data.fontFamily ?? theme.fontFamily,
+          color: args.data.color ?? theme?.color,
+          fontFamily: args.data.fontFamily ?? theme?.fontFamily,
         },
       },
       `User:${ctx.user!.id}`
