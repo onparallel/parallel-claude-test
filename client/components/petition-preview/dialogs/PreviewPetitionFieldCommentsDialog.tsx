@@ -1,4 +1,4 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import {
   Alert,
   AlertIcon,
@@ -14,26 +14,28 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { VariablesOf } from "@graphql-typed-document-node/core";
 import { CommentIcon, NoteIcon } from "@parallel/chakra/icons";
 import { BaseDialog } from "@parallel/components/common/dialogs/BaseDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { FieldComment } from "@parallel/components/common/FieldComment";
 import { Link } from "@parallel/components/common/Link";
+import { PetitionFieldComment } from "@parallel/components/common/PetitionFieldComment";
 import { PetitionCommentsAndNotesEditor } from "@parallel/components/petition-common/PetitionCommentsAndNotesEditor";
 import {
-  PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument,
-  PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument,
   PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument,
-  PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument,
-  PreviewPetitionFieldCommentsDialog_userDocument,
   PreviewPetitionField_PetitionFieldFragment,
   Tone,
 } from "@parallel/graphql/__types";
-import { isMetaReturn } from "@parallel/utils/keys";
+import { useGetMyId } from "@parallel/utils/apollo/getMyId";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
-import { KeyboardEvent, useCallback, useEffect, useRef } from "react";
+import { useSearchUsers } from "@parallel/utils/useSearchUsers";
+import { useTimeoutEffect } from "@parallel/utils/useTimeoutEffect";
+import { useCallback, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import {
+  useCreatePetitionFieldComment,
+  useDeletePetitionFieldComment,
+  useUpdatePetitionFieldComment,
+} from "../../../utils/mutations/comments";
 import { Divider } from "../../common/Divider";
 
 interface PreviewPetitionFieldCommentsDialogProps {
@@ -56,9 +58,6 @@ export function PreviewPetitionFieldCommentsDialog({
 }: DialogProps<PreviewPetitionFieldCommentsDialogProps>) {
   const intl = useIntl();
 
-  const { data: userData } = useQuery(PreviewPetitionFieldCommentsDialog_userDocument);
-
-  const myId = userData?.me.id;
   const { data, loading } = useQuery(
     PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument,
     {
@@ -79,69 +78,37 @@ export function PreviewPetitionFieldCommentsDialog({
     });
   }
 
-  useEffect(() => {
-    if (comments.length) {
-      const timeout = setTimeout(async () => {
-        const petitionFieldCommentIds = comments.filter((c) => c.isUnread).map((c) => c.id);
-        if (petitionFieldCommentIds.length > 0) {
-          await updateIsReadNotification({
-            petitionFieldCommentIds,
-            isRead: true,
-          });
-        }
-      }, 1000);
-      return () => clearTimeout(timeout);
-    }
-  }, [field.id, comments.length]);
+  useTimeoutEffect(
+    async () => {
+      const petitionFieldCommentIds = comments.filter((c) => c.isUnread).map((c) => c.id);
+      if (petitionFieldCommentIds.length > 0) {
+        await updateIsReadNotification({
+          petitionFieldCommentIds,
+          isRead: true,
+        });
+      }
+    },
+    1000,
+    [field.id, comments.length]
+  );
 
   const createPetitionFieldComment = useCreatePetitionFieldComment();
-  async function handleKeyDown({
-    event,
-    content,
-    isInternal,
-  }: {
-    event: KeyboardEvent<HTMLTextAreaElement>;
-    content: string;
-    isInternal: boolean;
-  }) {
-    let cleanTextarea = false;
-    if (isTemplate) return cleanTextarea;
-    if (isMetaReturn(event) && content) {
-      event.preventDefault();
-      try {
-        await createPetitionFieldComment({
-          petitionId,
-          petitionFieldId: field.id,
-          content,
-          isInternal,
-        });
-        cleanTextarea = true;
-      } catch {}
-    }
-    return cleanTextarea;
-  }
 
-  async function handleSubmitClick({
-    content,
-    isInternal,
-  }: {
-    content: string;
-    isInternal: boolean;
-  }) {
+  async function handleSubmitClick(content: any, isNote: boolean) {
     if (isTemplate) return;
     try {
       await createPetitionFieldComment({
         petitionId,
         petitionFieldId: field.id,
         content,
-        isInternal,
+        isInternal: isNote,
       });
     } catch {}
     closeRef.current!.focus();
   }
 
   const updatePetitionFieldComment = useUpdatePetitionFieldComment();
-  async function handleEditCommentContent(commentId: string, content: string) {
+  async function handleEditCommentContent(commentId: string, content: any) {
     if (isTemplate) return;
     try {
       await updatePetitionFieldComment({
@@ -164,6 +131,15 @@ export function PreviewPetitionFieldCommentsDialog({
       });
     } catch {}
   }
+
+  const searchUsers = useSearchUsers();
+  const myId = useGetMyId();
+  const handleSearcMentionables = useCallback(
+    async (search: string) => {
+      return await searchUsers(search, { includeGroups: true, excludeUsers: [myId] });
+    },
+    [searchUsers]
+  );
 
   return (
     <BaseDialog closeOnOverlayClick={false} {...props}>
@@ -256,13 +232,13 @@ export function PreviewPetitionFieldCommentsDialog({
                 maxHeight="calc(100vh - 20rem)"
               >
                 {comments.map((comment) => (
-                  <FieldComment
+                  <PetitionFieldComment
                     key={comment.id}
                     comment={comment}
-                    isAuthor={myId === comment.author?.id}
                     onEdit={(content) => handleEditCommentContent(comment.id, content)}
                     onDelete={() => handleDeleteClick(comment.id)}
                     onMarkAsUnread={() => handleMarkAsUnread(comment.id)}
+                    onSearchMentionables={handleSearcMentionables}
                   />
                 ))}
               </Stack>
@@ -286,19 +262,12 @@ export function PreviewPetitionFieldCommentsDialog({
         <Divider />
         <ModalFooter paddingX={0} paddingTop={2} paddingBottom={0}>
           <PetitionCommentsAndNotesEditor
+            id={field.id}
             isDisabled={isDisabled}
             isTemplate={isTemplate ?? false}
+            onSearchMentionables={handleSearcMentionables}
             hasCommentsEnabled={hasCommentsEnabled && !onlyReadPermission}
-            onCommentKeyDown={async (event, content) =>
-              await handleKeyDown({ event, content, isInternal: false })
-            }
-            onCommentSubmit={async (content) =>
-              await handleSubmitClick({ content, isInternal: false })
-            }
-            onNotetKeyDown={async (event, content) =>
-              await handleKeyDown({ event, content, isInternal: true })
-            }
-            onNoteSubmit={async (content) => await handleSubmitClick({ content, isInternal: true })}
+            onSubmit={handleSubmitClick}
           />
         </ModalFooter>
       </ModalContent>
@@ -311,32 +280,23 @@ export function usePreviewPetitionFieldCommentsDialog() {
 }
 
 PreviewPetitionFieldCommentsDialog.fragments = {
-  get PetitionField() {
-    return gql`
-      fragment PreviewPetitionFieldCommentsDialog_PetitionField on PetitionField {
-        id
-        title
-        isInternal
-        commentCount
-        unreadCommentCount
-        comments {
-          ...FieldComment_PetitionFieldComment
-        }
-        hasCommentsEnabled
+  PetitionField: gql`
+    fragment PreviewPetitionFieldCommentsDialog_PetitionField on PetitionField {
+      id
+      title
+      isInternal
+      commentCount
+      unreadCommentCount
+      comments {
+        ...PetitionFieldComment_PetitionFieldComment
       }
-      ${FieldComment.fragments.PetitionFieldComment}
-    `;
-  },
+      hasCommentsEnabled
+    }
+    ${PetitionFieldComment.fragments.PetitionFieldComment}
+  `,
 };
 
-PreviewPetitionFieldCommentsDialog.queries = [
-  gql`
-    query PreviewPetitionFieldCommentsDialog_user {
-      me {
-        id
-      }
-    }
-  `,
+const _queries = [
   gql`
     query PreviewPetitionFieldCommentsDialog_petitionFieldQuery(
       $petitionId: GID!
@@ -349,126 +309,3 @@ PreviewPetitionFieldCommentsDialog.queries = [
     ${PreviewPetitionFieldCommentsDialog.fragments.PetitionField}
   `,
 ];
-
-PreviewPetitionFieldCommentsDialog.mutations = [
-  gql`
-    mutation PreviewPetitionFieldCommentsDialog_createPetitionFieldComment(
-      $petitionId: GID!
-      $petitionFieldId: GID!
-      $content: String!
-      $isInternal: Boolean
-    ) {
-      createPetitionFieldComment(
-        petitionId: $petitionId
-        petitionFieldId: $petitionFieldId
-        content: $content
-        isInternal: $isInternal
-      ) {
-        ...FieldComment_PetitionFieldComment
-        field {
-          id
-          commentCount
-          unreadCommentCount
-          comments {
-            id
-          }
-        }
-      }
-    }
-    ${FieldComment.fragments.PetitionFieldComment}
-  `,
-  gql`
-    mutation PreviewPetitionFieldCommentsDialog_updatePetitionFieldComment(
-      $petitionId: GID!
-      $petitionFieldId: GID!
-      $petitionFieldCommentId: GID!
-      $content: String!
-    ) {
-      updatePetitionFieldComment(
-        petitionId: $petitionId
-        petitionFieldId: $petitionFieldId
-        petitionFieldCommentId: $petitionFieldCommentId
-        content: $content
-      ) {
-        ...FieldComment_PetitionFieldComment
-        field {
-          id
-          comments {
-            id
-          }
-        }
-      }
-    }
-    ${FieldComment.fragments.PetitionFieldComment}
-  `,
-  gql`
-    mutation PreviewPetitionFieldCommentsDialog_deletePetitionFieldComment(
-      $petitionId: GID!
-      $petitionFieldId: GID!
-      $petitionFieldCommentId: GID!
-    ) {
-      deletePetitionFieldComment(
-        petitionId: $petitionId
-        petitionFieldId: $petitionFieldId
-        petitionFieldCommentId: $petitionFieldCommentId
-      ) {
-        ...PreviewPetitionFieldCommentsDialog_PetitionField
-        commentCount
-        unreadCommentCount
-        comments {
-          id
-        }
-      }
-    }
-    ${PreviewPetitionFieldCommentsDialog.fragments.PetitionField}
-  `,
-];
-
-export function useCreatePetitionFieldComment() {
-  const [createPetitionFieldComment] = useMutation(
-    PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument
-  );
-
-  return useCallback(
-    async (
-      variables: VariablesOf<
-        typeof PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument
-      >
-    ) => {
-      await createPetitionFieldComment({ variables });
-    },
-    [createPetitionFieldComment]
-  );
-}
-
-export function useUpdatePetitionFieldComment() {
-  const [updatePetitionFieldComment] = useMutation(
-    PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument
-  );
-  return useCallback(
-    async (
-      variables: VariablesOf<
-        typeof PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument
-      >
-    ) => {
-      await updatePetitionFieldComment({ variables });
-    },
-    [updatePetitionFieldComment]
-  );
-}
-
-export function useDeletePetitionFieldComment() {
-  const [deletePetitionFieldComment] = useMutation(
-    PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument
-  );
-  return useCallback(
-    async (
-      variables: VariablesOf<
-        typeof PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument
-      >
-    ) => {
-      await deletePetitionFieldComment({ variables });
-    },
-    [deletePetitionFieldComment]
-  );
-}

@@ -1,13 +1,8 @@
 import { Box, Link } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import createDOMPurify from "dompurify";
+import { sanitizeHtml } from "@parallel/utils/sanitizeHtml";
 import parse, { domToReact, Element, HTMLReactParserOptions } from "html-react-parser";
 import { useMemo } from "react";
-
-const DOMPurify = createDOMPurify(
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  typeof window === "undefined" ? (new (require("jsdom").JSDOM)("").window as any) : window
-);
 
 export const HtmlBlock = chakraForwardRef<"div", { dangerousInnerHtml: string }>(function HtmlBlock(
   { children, dangerousInnerHtml: html, ...props },
@@ -25,7 +20,7 @@ export const HtmlBlock = chakraForwardRef<"div", { dangerousInnerHtml: string }>
     },
   };
   const memoizedHtml = useMemo(() => {
-    return parse(DOMPurify.sanitize(html), options);
+    return parse(sanitizeHtml(html), options);
   }, [html]);
 
   return (

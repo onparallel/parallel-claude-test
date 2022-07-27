@@ -9,6 +9,14 @@ export const UserGroup = objectType({
     t.string("initials", {
       resolve: (o) => getInitials(o.name, { removeAffixes: false }),
     });
+    t.boolean("imMember", {
+      resolve: async (root, _, ctx) => {
+        return await ctx.userGroups.loadUsersBelongsToGroup({
+          userGroupId: root.id,
+          userIds: [ctx.user!.id],
+        });
+      },
+    });
     t.list.field("members", {
       type: "UserGroupMember",
       resolve: async (root, _, ctx) => {

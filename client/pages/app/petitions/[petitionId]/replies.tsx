@@ -32,7 +32,7 @@ import {
   useCreatePetitionFieldComment,
   useDeletePetitionFieldComment,
   useUpdatePetitionFieldComment,
-} from "@parallel/components/petition-preview/dialogs/PreviewPetitionFieldCommentsDialog";
+} from "@parallel/utils/mutations/comments";
 import { useClosePetitionDialog } from "@parallel/components/petition-replies/dialogs/ClosePetitionDialog";
 import { useConfirmResendCompletedNotificationDialog } from "@parallel/components/petition-replies/dialogs/ConfirmResendCompletedNotificationDialog";
 import {
@@ -244,12 +244,12 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const handlePrintPdfTask = usePrintPdfTask();
 
   const createPetitionFieldComment = useCreatePetitionFieldComment();
-  async function handleAddComment(content: string, isInternal?: boolean) {
+  async function handleAddComment(content: any, isNote: boolean) {
     await createPetitionFieldComment({
       petitionId,
       petitionFieldId: activeFieldId!,
       content,
-      isInternal,
+      isInternal: isNote,
     });
   }
 
@@ -569,7 +569,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 key={activeFieldId}
                 petitionId={petition.id}
                 field={activeField}
-                myId={me.id}
                 isDisabled={petition.isAnonymized}
                 onClose={() => setActiveFieldId(null)}
                 onAddComment={handleAddComment}

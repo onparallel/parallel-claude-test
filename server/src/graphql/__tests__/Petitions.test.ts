@@ -3523,8 +3523,8 @@ describe("GraphQL/Petitions", () => {
         1
       );
 
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation (
             $petitionId: GID!
             $contactIdGroups: [[GID!]!]!
@@ -3570,7 +3570,7 @@ describe("GraphQL/Petitions", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", petition.id),
           contactIdGroups: [
             [toGlobalId("Contact", contacts[0].id)],
@@ -3578,8 +3578,8 @@ describe("GraphQL/Petitions", () => {
           ],
           subject: "petition send subject",
           body: [],
-        },
-      });
+        }
+      );
 
       expect(errors).toBeUndefined();
       expect(data?.sendPetition).toEqual([
@@ -3597,7 +3597,7 @@ describe("GraphQL/Petitions", () => {
               {
                 comments: [
                   {
-                    content: comment.content,
+                    content: comment.content_json,
                     isUnread: false,
                     isEdited: false,
                     isInternal: false,

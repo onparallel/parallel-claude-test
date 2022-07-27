@@ -5,6 +5,7 @@ import { USER_COGNITO_ID } from "../../../../test/mocks";
 import { unMaybeArray } from "../../../util/arrays";
 import { defaultPdfDocumentTheme } from "../../../util/PdfDocumentTheme";
 import { removeNotDefined } from "../../../util/remedaExtensions";
+import { toPlainText } from "../../../util/slate";
 import { titleize } from "../../../util/strings";
 import { hash, random } from "../../../util/token";
 import { MaybeArray, Replace } from "../../../util/types";
@@ -688,6 +689,13 @@ export class Mocks {
     return await this.knex<PetitionUserNotification>("petition_user_notification").delete();
   }
 
+  createRandomCommentContent() {
+    return range(0, faker.datatype.number({ min: 1, max: 5 })).map(() => ({
+      type: "paragraph" as const,
+      children: [{ text: faker.lorem.words() }],
+    }));
+  }
+
   async createRandomCommentsFromUser(
     userId: number,
     petitionFieldId: number,
@@ -695,10 +703,12 @@ export class Mocks {
     amount?: number,
     builder?: (index: number) => Partial<PetitionFieldComment>
   ) {
+    const content = this.createRandomCommentContent();
     return await this.knex<PetitionFieldComment>("petition_field_comment")
       .insert(
         range(0, amount || 1).map((i) => ({
-          content: faker.lorem.words(),
+          content: toPlainText(content),
+          content_json: this.knex.raw("?::jsonb", JSON.stringify(content)),
           user_id: userId,
           petition_field_id: petitionFieldId,
           petition_id: petitionId,
@@ -715,10 +725,12 @@ export class Mocks {
     amount?: number,
     builder?: (index: number) => Partial<PetitionFieldComment>
   ) {
+    const content = this.createRandomCommentContent();
     return await this.knex<PetitionFieldComment>("petition_field_comment")
       .insert(
         range(0, amount || 1).map((i) => ({
-          content: faker.lorem.words(),
+          content: toPlainText(content),
+          content_json: this.knex.raw("?::jsonb", JSON.stringify(content)),
           petition_access_id: petitionAccessId,
           petition_field_id: petitionFieldId,
           petition_id: petitionId,

@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, Text, useTheme } from "@chakra-ui/react";
 import { CommentIcon, NoteIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
+import { PetitionFieldCommentContent } from "@parallel/components/common/PetitionFieldCommentContent";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Divider } from "@parallel/components/common/Divider";
@@ -28,7 +29,7 @@ export function TimelineCommentPublishedEvent({
     timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
   };
   if (comment) {
-    const { author, content, isEdited } = comment;
+    const { author, isEdited } = comment;
     return (
       <Box
         background={`${colors.transparent} linear-gradient(${colors.gray[300]}, ${colors.gray[300]}) no-repeat 17px / 2px 100%`}
@@ -67,14 +68,16 @@ export function TimelineCommentPublishedEvent({
             ) : null}
           </Box>
           <Divider />
-          <Box padding={4} textStyle={comment.isAnonymized ? "hint" : undefined}>
+          <Box padding={4}>
             {comment.isAnonymized ? (
-              <FormattedMessage
-                id="timeline.comment-published.message-not-available"
-                defaultMessage="Message not available"
-              />
+              <Text textStyle="hint">
+                <FormattedMessage
+                  id="timeline.comment-published.message-not-available"
+                  defaultMessage="Message not available"
+                />
+              </Text>
             ) : (
-              content
+              <PetitionFieldCommentContent comment={comment} />
             )}
           </Box>
         </Card>
@@ -125,8 +128,8 @@ TimelineCommentPublishedEvent.fragments = {
           ...UserOrContactReference_UserOrPetitionAccess
         }
         isEdited
-        content
         isAnonymized
+        ...PetitionFieldCommentContent_PetitionFieldComment
       }
       isInternal
       createdAt
@@ -135,5 +138,6 @@ TimelineCommentPublishedEvent.fragments = {
     ${UserOrContactReference.fragments.UserOrPetitionAccess}
     ${UserReference.fragments.User}
     ${ContactReference.fragments.Contact}
+    ${PetitionFieldCommentContent.fragments.PetitionFieldComment}
   `,
 };

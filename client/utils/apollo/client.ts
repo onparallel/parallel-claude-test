@@ -192,6 +192,9 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
             replies: {
               merge: mergeArraysBy(["id"]),
             },
+            comments: {
+              merge: false,
+            },
           },
         },
         Organization: {

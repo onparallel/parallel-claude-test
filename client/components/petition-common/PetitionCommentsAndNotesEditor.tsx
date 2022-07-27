@@ -1,88 +1,67 @@
 import { Box, Button, HStack, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
-import { setNativeValue } from "@parallel/utils/setNativeValue";
-import { ChangeEvent, KeyboardEvent, useRef, useState } from "react";
+import { isMetaReturn } from "@parallel/utils/keys";
+import { KeyboardEvent, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { GrowingTextarea } from "../common/GrowingTextarea";
+import { HelpPopover } from "../common/HelpPopover";
+import {
+  CommentEditor,
+  CommentEditorInstance,
+  CommentEditorProps,
+  CommentEditorValue,
+  emptyCommentEditorValue,
+  isEmptyCommentEditorValue,
+} from "../common/slate/CommentEditor";
 
-interface PetitionCommentsAndNotesEditorProps {
-  onCommentKeyDown: (
-    event: KeyboardEvent<HTMLTextAreaElement>,
-    content: string
-  ) => Promise<boolean>;
-  onCommentSubmit: (comment: string) => Promise<void>;
-  onNotetKeyDown: (event: KeyboardEvent<HTMLTextAreaElement>, content: string) => Promise<boolean>;
-  onNoteSubmit: (note: string) => Promise<void>;
+interface PetitionCommentsAndNotesEditorProps
+  extends Pick<CommentEditorProps, "onSearchMentionables"> {
+  id: string;
+  onSubmit: (content: CommentEditorValue, isNote: boolean) => Promise<void>;
   hasCommentsEnabled: boolean;
   isDisabled: boolean;
   isTemplate: boolean;
 }
 
 export function PetitionCommentsAndNotesEditor({
-  onCommentKeyDown,
-  onCommentSubmit,
-  onNotetKeyDown,
-  onNoteSubmit,
+  id,
+  onSubmit,
+  onSearchMentionables,
   hasCommentsEnabled,
   isDisabled,
   isTemplate,
 }: PetitionCommentsAndNotesEditorProps) {
   const intl = useIntl();
-  const [isInternalComment, setInternalComment] = useState(!hasCommentsEnabled);
-  const [commentDraft, setCommentDraft] = useState("");
-  const [noteDraft, setNoteDraft] = useState("");
+  const [isNote, setIsNote] = useState(!hasCommentsEnabled);
+  const [commentDraft, setCommentDraft] = useState(emptyCommentEditorValue());
+  const [noteDraft, setNoteDraft] = useState(emptyCommentEditorValue());
+  const isCommentEmpty = isEmptyCommentEditorValue(commentDraft);
+  const isNoteEmpty = isEmptyCommentEditorValue(noteDraft);
 
-  const textareaCommentRef = useRef<HTMLTextAreaElement>(null);
-  const textareaNoteRef = useRef<HTMLTextAreaElement>(null);
+  const commentRef = useRef<CommentEditorInstance>(null);
+  const noteRef = useRef<CommentEditorInstance>(null);
 
-  function handleCommentDraftChange(event: ChangeEvent<HTMLTextAreaElement>) {
-    setCommentDraft(event.target.value);
-  }
-
-  function handleCommentTabSelect() {
-    setInternalComment(false);
-  }
-
-  function handleNoteDraftChange(event: ChangeEvent<HTMLTextAreaElement>) {
-    setNoteDraft(event.target.value);
-  }
-
-  function handleNoteTabSelect() {
-    setInternalComment(true);
-  }
-
-  async function handleCommentKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if (await onCommentKeyDown(event, commentDraft.trim())) {
-      setNativeValue(textareaCommentRef.current!, "");
+  async function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (isMetaReturn(event) && !isTemplate) {
+      event.preventDefault();
+      handleSubmitClick();
     }
   }
 
-  async function handleNoteKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if (await onNotetKeyDown(event, noteDraft.trim())) {
-      setNativeValue(textareaNoteRef.current!, "");
+  async function handleSubmitClick() {
+    const content = isNote ? noteDraft : commentDraft;
+    if (!isEmptyCommentEditorValue(content)) {
+      try {
+        await onSubmit(content, isNote);
+        (isNote ? noteRef : commentRef).current?.clear();
+      } catch {}
     }
-  }
-
-  async function handleCommentSubmitClick() {
-    try {
-      await onCommentSubmit(commentDraft.trim());
-    } catch {}
-    setNativeValue(textareaCommentRef.current!, "");
-  }
-
-  async function handleNoteSubmitClick() {
-    try {
-      await onNoteSubmit(noteDraft.trim());
-    } catch {}
-    setNativeValue(textareaNoteRef.current!, "");
   }
 
   return (
     <Box flex="1">
-      <Tabs defaultIndex={hasCommentsEnabled ? 0 : 1} variant="enclosed">
+      <Tabs index={isNote ? 1 : 0} onChange={(index) => setIsNote(index === 1)} variant="enclosed">
         <TabList>
           <Tab
             borderTopLeftRadius={0}
-            onFocus={handleCommentTabSelect}
             isDisabled={!hasCommentsEnabled}
             cursor={hasCommentsEnabled ? "pointer" : "not-allowed"}
             color={hasCommentsEnabled ? "inherit" : "gray.400"}
@@ -90,12 +69,11 @@ export function PetitionCommentsAndNotesEditor({
             borderLeft="none"
           >
             <FormattedMessage
-              id="component.petition-comments-and-notes.comments"
+              id="component.petition-comments-and-notes-editor.comments"
               defaultMessage="Comments"
             />
           </Tab>
           <Tab
-            onFocus={handleNoteTabSelect}
             _selected={{
               color: "blue.600",
               bg: "yellow.100",
@@ -106,9 +84,15 @@ export function PetitionCommentsAndNotesEditor({
             fontWeight="semibold"
           >
             <FormattedMessage
-              id="component.petition-comments-and-notes.notes"
+              id="component.petition-comments-and-notes-editor.notes"
               defaultMessage="Notes"
             />
+            <HelpPopover>
+              <FormattedMessage
+                id="component.petition-comments-and-notes-editor.notes-description"
+                defaultMessage="Notes are only visible within your organization. You can use them to communicate internally."
+              />
+            </HelpPopover>
           </Tab>
         </TabList>
         <TabPanels>
@@ -119,29 +103,23 @@ export function PetitionCommentsAndNotesEditor({
             alignItems="flex-start"
             padding={2}
           >
-            <GrowingTextarea
-              id="petition-replies-comments-input"
-              ref={textareaCommentRef}
-              size="md"
-              borderRadius="md"
-              paddingX={2}
-              minHeight={0}
-              maxHeight={20}
-              rows={1}
+            <CommentEditor
+              id={`comment-editor-${id}`}
+              ref={commentRef}
               placeholder={intl.formatMessage({
-                id: "component.petition-comments-and-notes.write-a-comment",
+                id: "component.petition-comments-and-notes-editor.comment-placeholder",
                 defaultMessage: "Write a comment",
               })}
               value={commentDraft}
-              onKeyDown={handleCommentKeyDown as any}
-              onChange={handleCommentDraftChange as any}
-              isDisabled={isDisabled || !hasCommentsEnabled}
+              isDisabled={isDisabled}
+              onKeyDown={handleKeyDown}
+              onChange={setCommentDraft}
+              onSearchMentionables={onSearchMentionables}
             />
             <Button
-              height="37px"
               colorScheme="primary"
-              isDisabled={commentDraft.trim().length === 0 || isTemplate}
-              onClick={handleCommentSubmitClick}
+              isDisabled={isDisabled || isCommentEmpty || isTemplate}
+              onClick={handleSubmitClick}
             >
               <FormattedMessage id="generic.submit" defaultMessage="Submit" />
             </Button>
@@ -154,31 +132,26 @@ export function PetitionCommentsAndNotesEditor({
             alignItems="flex-start"
             padding={2}
           >
-            {isInternalComment ? (
+            {isNote ? (
               <>
-                <GrowingTextarea
-                  ref={textareaNoteRef}
-                  size="md"
-                  borderRadius="md"
-                  paddingX={2}
-                  minHeight={0}
-                  maxHeight={20}
-                  rows={1}
+                <CommentEditor
+                  ref={noteRef}
+                  id={`note-editor-${id}`}
                   placeholder={intl.formatMessage({
-                    id: "component.petition-comments-and-notes.write-a-note",
-                    defaultMessage: "Write a note. It will only be visible in your organization.",
+                    id: "component.petition-comments-and-notes-editor.note-placeholder",
+                    // TODO: defaultMessage: "Type @ to mention other users",
+                    defaultMessage: "Write a note",
                   })}
                   value={noteDraft}
-                  onKeyDown={handleNoteKeyDown as any}
-                  onChange={handleNoteDraftChange as any}
                   isDisabled={isDisabled}
-                  backgroundColor="white"
+                  onKeyDown={handleKeyDown}
+                  onChange={setNoteDraft}
+                  onSearchMentionables={onSearchMentionables}
                 />
                 <Button
-                  height="37px"
                   colorScheme="primary"
-                  isDisabled={noteDraft.trim().length === 0 || isTemplate}
-                  onClick={handleNoteSubmitClick}
+                  isDisabled={isDisabled || isNoteEmpty || isTemplate}
+                  onClick={handleSubmitClick}
                 >
                   <FormattedMessage id="generic.add" defaultMessage="Add" />
                 </Button>

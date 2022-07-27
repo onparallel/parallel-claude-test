@@ -496,6 +496,9 @@ export const PublicContact = objectType({
       description: "The ID of the contact.",
       prefixName: "Contact",
     });
+    t.boolean("isMe", {
+      resolve: (o, _, ctx) => o.id === ctx.contact!.id,
+    });
     t.string("email", {
       description: "The email of the user.",
     });
@@ -555,8 +558,17 @@ export const PublicPetitionFieldComment = objectType({
         throw new Error(`Both "user_id" and "petition_access_id" are null`);
       },
     });
-    t.string("content", {
-      description: "The content of the comment.",
+    t.json("content", {
+      description: "The JSON content of the comment.",
+      resolve: async (root, _, ctx) => {
+        return root.content_json;
+      },
+    });
+    t.string("contentHtml", {
+      description: "The HTML content of the comment.",
+      resolve: async (root, _, ctx) => {
+        return toHtml(root.content_json);
+      },
     });
     t.datetime("createdAt", {
       description: "Time when the comment was created.",

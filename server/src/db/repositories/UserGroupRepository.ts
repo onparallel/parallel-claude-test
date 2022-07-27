@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { groupBy, omit } from "remeda";
+import { groupBy, omit, uniq } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
@@ -63,6 +63,31 @@ export class UserGroupRepository extends BaseRepository {
     const byUserId = groupBy(userGroups, (ug) => ug.user_id);
     return userIds.map((id) => byUserId[id]?.map((g) => omit(g, ["user_id"])) ?? []);
   });
+
+  loadUsersBelongsToGroup = this.buildLoader<{ userGroupId: number; userIds: number[] }, boolean>(
+    async (keys, t) => {
+      const rows = await this.from("user_group_member")
+        .whereNull("deleted_at")
+        .whereIn("user_group_id", uniq(keys.map((k) => k.userGroupId)))
+        .whereIn("user_id", uniq(keys.flatMap((k) => k.userIds)))
+        .distinct("user_id", "user_group_id");
+      const members = new Map<number, Set<number>>();
+      for (const row of rows) {
+        if (!members.has(row.user_group_id)) {
+          members.set(row.user_group_id, new Set([row.user_id]));
+        } else {
+          members.get(row.user_group_id)!.add(row.user_id);
+        }
+      }
+      return keys.map((k) => {
+        if (!members.has(k.userGroupId)) {
+          return false;
+        }
+        const group = members.get(k.userGroupId)!;
+        return k.userIds.every((userId) => group.has(userId));
+      });
+    }
+  );
 
   async updateUserGroupById(
     id: MaybeArray<number>,

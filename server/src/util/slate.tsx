@@ -1,12 +1,15 @@
 import { createElement, Fragment, ReactNode } from "react";
 import { renderToString } from "react-dom/server";
-import { Contact, Petition, UserData } from "../db/__types";
+import { Contact, Petition, User, UserData } from "../db/__types";
+import { UserGroup } from "../pdf/__types";
 import { fullName } from "./fullName";
+import { fromGlobalId } from "./globalId";
 
 interface SlateContext {
   petition?: Partial<Petition> | null;
   user?: Partial<UserData> | null;
   contact?: Partial<Contact> | null;
+  mentions?: (Partial<User> | Partial<UserGroup>)[];
 }
 
 export type SlateNode = {
@@ -20,13 +23,15 @@ export type SlateNode = {
     | "list-item"
     | "list-item-child"
     | "placeholder"
-    | "link";
+    | "link"
+    | "mention";
   placeholder?: string;
   url?: string;
   text?: string;
   bold?: boolean;
   italic?: boolean;
   underline?: boolean;
+  mention?: string;
 };
 
 function getPlaceholder(key?: string, ctx?: SlateContext) {
@@ -107,6 +112,13 @@ function renderSlate(
           <a href={node.url} target="_blank" rel="noopener noreferrer">
             {renderSlate(node.children, opts, ctx)}
           </a>
+        );
+      }
+      case "mention": {
+        return createElement(
+          "mention",
+          { "data-mention-id": node.mention },
+          renderSlate(node.children, opts, ctx)
         );
       }
     }
@@ -201,6 +213,8 @@ export function toPlainText(body: SlateNode[], ctx?: SlateContext) {
           return getPlaceholder(node.placeholder, ctx);
         case "link":
           return `${node.children.map((child) => serialize(child, node)).join("")}`;
+        case "mention":
+          return `@${node.children.map((child) => serialize(child, node)).join("")}`;
       }
     } else if (typeof node.text === "string") {
       return node.text;
@@ -212,4 +226,23 @@ export function toPlainText(body: SlateNode[], ctx?: SlateContext) {
 
 export function fromPlainText(value: string): SlateNode[] {
   return value.split("\n").map((line) => ({ type: "paragraph", children: [{ text: line }] }));
+}
+
+export function getMentions(value: SlateNode[]) {
+  const seen: Record<string, boolean> = {};
+  const mentions: { id: number; type: "User" | "UserGroup" }[] = [];
+  function walk(value: SlateNode[]) {
+    for (const node of value) {
+      if (node.type === "mention") {
+        if (!seen[node.mention!]) {
+          seen[node.mention!] = true;
+          mentions.push(fromGlobalId<"User" | "UserGroup">(node.mention!));
+        }
+      } else if (node.children) {
+        walk(node.children);
+      }
+    }
+  }
+  walk(value);
+  return mentions;
 }

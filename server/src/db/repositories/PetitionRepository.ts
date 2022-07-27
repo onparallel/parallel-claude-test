@@ -2434,6 +2434,26 @@ export class PetitionRepository extends BaseRepository {
     )
   );
 
+  async canBeMentionedInPetitionFieldComment(
+    orgId: number,
+    userIds: number[],
+    userGroupIds: number[]
+  ) {
+    // deleted entities can still be mentioned to avoid issues updating old comments
+    // where deleted entities are deleted
+    const [[{ count: userCount }], [{ count: userGroupCount }]] = await Promise.all([
+      this.from("user")
+        .where("org_id", orgId)
+        .whereIn("id", userIds)
+        .select(this.raw(`count(distinct id)::int as count`)) as Promise<{ count: number }[]>,
+      this.from("user_group")
+        .where("org_id", orgId)
+        .whereIn("id", userGroupIds)
+        .select(this.raw(`count(distinct id)::int as count`)) as Promise<{ count: number }[]>,
+    ]);
+    return userCount === new Set(userIds).size && userGroupCount === new Set(userGroupIds).size;
+  }
+
   private sortComments(comments: PetitionFieldComment[]) {
     return comments.sort((a, b) => a.created_at.valueOf() - b.created_at.valueOf());
   }
@@ -2768,6 +2788,7 @@ export class PetitionRepository extends BaseRepository {
       petitionId: number;
       petitionFieldId: number;
       content: string;
+      contentJson: any;
       isInternal: boolean;
     },
     user: User
@@ -2779,6 +2800,7 @@ export class PetitionRepository extends BaseRepository {
           petition_id: data.petitionId,
           petition_field_id: data.petitionFieldId,
           content: data.content,
+          content_json: this.json(data.contentJson),
           user_id: user.id,
           is_internal: data.isInternal,
           created_by: `User:${user.id}`,
@@ -2808,6 +2830,7 @@ export class PetitionRepository extends BaseRepository {
       petitionId: number;
       petitionFieldId: number;
       content: string;
+      contentJson: string;
     },
     access: PetitionAccess
   ) {
@@ -2818,6 +2841,7 @@ export class PetitionRepository extends BaseRepository {
           petition_id: data.petitionId,
           petition_field_id: data.petitionFieldId,
           content: data.content,
+          content_json: this.json(data.contentJson),
           petition_access_id: access.id,
           created_by: `PetitionAccess:${access.id}`,
         },
@@ -2912,16 +2936,20 @@ export class PetitionRepository extends BaseRepository {
 
   async updatePetitionFieldCommentFromUser(
     petitionFieldCommentId: number,
-    content: string,
-    user: User
+    data: {
+      content: string;
+      contentJson: any;
+    },
+    updatedBy: User
   ) {
     const [comment] = await this.from("petition_field_comment")
       .where("id", petitionFieldCommentId)
       .update(
         {
-          content,
+          content: data.content,
+          content_json: this.json(data.contentJson),
           updated_at: this.now(),
-          updated_by: `User:${user.id}`,
+          updated_by: `User:${updatedBy.id}`,
         },
         "*"
       );
@@ -2930,17 +2958,21 @@ export class PetitionRepository extends BaseRepository {
 
   async updatePetitionFieldCommentFromContact(
     petitionFieldCommentId: number,
-    content: string,
-    contact: Contact
+    data: {
+      content: string;
+      contentJson: any;
+    },
+    updatedBy: Contact
   ) {
     const [comment] = await this.from("petition_field_comment")
       .where("id", petitionFieldCommentId)
       .whereNull("deleted_at")
       .update(
         {
-          content,
+          content: data.content,
+          content_json: this.json(data.contentJson),
           updated_at: this.now(),
-          updated_by: `Contact:${contact.id}`,
+          updated_by: `Contact:${updatedBy.id}`,
         },
         "*"
       );

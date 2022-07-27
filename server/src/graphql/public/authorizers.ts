@@ -1,14 +1,16 @@
+import Ajv from "ajv";
 import { ApolloError } from "apollo-server-core";
 import { parse as parseCookie } from "cookie";
 import { IncomingMessage } from "http";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { isDefined } from "remeda";
+import { isDefined, partition } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { toGlobalId } from "../../util/globalId";
 import { verify } from "../../util/jwt";
+import { getMentions } from "../../util/slate";
 import { MaybeArray } from "../../util/types";
 import { Arg, chain } from "../helpers/authorize";
-import { PublicPetitionNotAvailableError } from "../helpers/errors";
+import { ArgValidationError, PublicPetitionNotAvailableError } from "../helpers/errors";
 
 export function authenticatePublicAccess<
   TypeName extends string,
@@ -206,5 +208,83 @@ export function taskBelongsToAccess<
       );
     } catch {}
     return false;
+  };
+}
+
+export function validPetitionFieldCommentContent<
+  TypeName extends string,
+  FieldName extends string,
+  TArgContent extends Arg<TypeName, FieldName, any>,
+  TArgFieldId extends Arg<TypeName, FieldName, number>
+>(
+  argContent: TArgContent,
+  argFieldId: TArgFieldId,
+  allowMentions: boolean
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx, info) => {
+    const content = args[argContent] as any;
+    const fieldId = args[argFieldId] as unknown as number;
+    const ajv = new Ajv();
+    if (!content) {
+      return false;
+    }
+    const valid = ajv.validate(
+      {
+        definitions: {
+          paragraph: {
+            type: "object",
+            properties: {
+              children: { type: "array", items: { $ref: "#/definitions/leaf" } },
+              type: { enum: ["paragraph"] },
+            },
+            required: ["type", "children"],
+            additionalProperties: false,
+          },
+          mention: {
+            type: "object",
+            properties: {
+              type: { const: "placeholder" },
+              mention: { type: "string" },
+              children: { type: "array", items: { $ref: "#/definitions/leaf" } },
+            },
+            additionalProperties: false,
+            required: ["type", "mention", "children"],
+          },
+          text: {
+            type: "object",
+            properties: {
+              text: { type: "string" },
+            },
+            additionalProperties: false,
+            required: ["text"],
+          },
+          leaf: {
+            type: "object",
+            anyOf: [
+              ...(allowMentions ? [{ $ref: "#/definitions/mention" }] : []),
+              { $ref: "#/definitions/text" },
+            ],
+          },
+          root: { type: "array", items: { $ref: "#/definitions/paragraph" } },
+        },
+        $ref: "#/definitions/root",
+      },
+      content
+    );
+    if (!valid) {
+      throw new ArgValidationError(info, argContent, ajv.errorsText());
+    }
+    if (allowMentions) {
+      const field = (await ctx.petitions.loadField(fieldId))!;
+      const petition = (await ctx.petitions.loadPetition(field.petition_id))!;
+      const mentions = getMentions(content);
+      const [userMentions, userGroupMentions] = partition(mentions, (m) => m.type === "User");
+      return await ctx.petitions.canBeMentionedInPetitionFieldComment(
+        petition.org_id,
+        userMentions.map((m) => m.id),
+        userGroupMentions.map((m) => m.id)
+      );
+    }
+    return true;
   };
 }

@@ -94,6 +94,10 @@ export class BaseRepository {
     return this.knex.raw(`count(*)::int as ??`, [as ?? "count"]);
   }
 
+  protected json(value: any) {
+    return this.knex.raw("?::jsonb", JSON.stringify(value)) as any;
+  }
+
   protected from<TName extends TableNames>(tableName: TName, transaction?: Knex.Transaction) {
     return transaction
       ? transaction<TableTypes[TName]>(tableName)

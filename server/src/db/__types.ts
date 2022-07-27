@@ -1026,6 +1026,7 @@ export interface PetitionFieldComment {
   deleted_by: Maybe<string>; // varchar
   is_internal: boolean; // bool
   anonymized_at: Maybe<Date>; // timestamptz
+  content_json: Maybe<any>; // jsonb
 }
 
 export type CreatePetitionFieldComment = PartialProps<
@@ -1040,6 +1041,7 @@ export type CreatePetitionFieldComment = PartialProps<
   | "deleted_by"
   | "is_internal"
   | "anonymized_at"
+  | "content_json"
 >;
 
 export interface PetitionFieldReply {

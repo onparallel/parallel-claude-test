@@ -3,6 +3,7 @@ import {
   Button,
   Center,
   Flex,
+  HStack,
   ModalBody,
   ModalCloseButton,
   ModalContent,
@@ -15,37 +16,39 @@ import {
 import { CommentIcon } from "@parallel/chakra/icons";
 import { BaseDialog } from "@parallel/components/common/dialogs/BaseDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { FieldComment } from "@parallel/components/common/FieldComment";
-import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
+import { PublicPetitionFieldComment } from "@parallel/components/common/PublicPetitionFieldComment";
+import {
+  CommentEditor,
+  CommentEditorInstance,
+  emptyCommentEditorValue,
+  isEmptyCommentEditorValue,
+} from "@parallel/components/common/slate/CommentEditor";
 import {
   RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument,
   RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument,
   RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadDocument,
   RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment,
   RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldDocument,
-  RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment,
   RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument,
   Tone,
 } from "@parallel/graphql/__types";
 import { isMetaReturn } from "@parallel/utils/keys";
-import { setNativeValue } from "@parallel/utils/setNativeValue";
-import { useFocus } from "@parallel/utils/useFocus";
-import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
+import { useTimeoutEffect } from "@parallel/utils/useTimeoutEffect";
+import { KeyboardEvent, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../../common/Divider";
-import { GrowingTextarea } from "../../common/GrowingTextarea";
 
 interface RecipientViewPetitionFieldCommentsDialogProps {
   keycode: string;
+  fieldId: string;
   access: RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment;
-  field: RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment;
   tone: Tone;
 }
 
 export function RecipientViewPetitionFieldCommentsDialog({
   keycode,
   access,
-  field,
+  fieldId,
   tone,
   ...props
 }: DialogProps<RecipientViewPetitionFieldCommentsDialogProps>) {
@@ -53,27 +56,22 @@ export function RecipientViewPetitionFieldCommentsDialog({
 
   const { data, loading } = useQuery(
     RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldDocument,
-    {
-      variables: { keycode, petitionFieldId: field.id },
-    }
+    { variables: { keycode, petitionFieldId: fieldId } }
   );
+  const field = data?.publicPetitionField;
   const comments = data?.publicPetitionField.comments ?? [];
 
-  const [draft, setDraft] = useState("");
-  const [inputFocused, inputFocusBind] = useFocus({
-    onBlurDelay: 300,
-  });
-
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
+  const [draft, setDraft] = useState(emptyCommentEditorValue());
+  const isDraftEmpty = isEmptyCommentEditorValue(draft);
+  const editorRef = useRef<CommentEditorInstance>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
   const [markPetitionFieldCommentsAsRead] = useMutation(
     RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadDocument
   );
 
-  useEffect(() => {
-    const timeout = setTimeout(async () => {
+  useTimeoutEffect(
+    async () => {
       const petitionFieldCommentIds = comments.filter((c) => c.isUnread).map((c) => c.id);
       if (petitionFieldCommentIds.length > 0) {
         await markPetitionFieldCommentsAsRead({
@@ -83,50 +81,34 @@ export function RecipientViewPetitionFieldCommentsDialog({
           },
         });
       }
-    }, 1000);
-    return () => clearTimeout(timeout);
-  }, [field.id, comments.map((c) => c.id).join(",")]);
+    },
+    1000,
+    [fieldId, comments.map((c) => c.id).join(",")]
+  );
 
   const [createPetitionFieldComment] = useMutation(
     RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument
   );
-  async function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    const content = draft.trim();
-    if (isMetaReturn(event) && content) {
+  async function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (isMetaReturn(event)) {
       event.preventDefault();
+      await handleSubmitClick();
+    }
+  }
+
+  async function handleSubmitClick() {
+    if (!isEmptyCommentEditorValue(draft)) {
       try {
         await createPetitionFieldComment({
           variables: {
             keycode,
-            petitionFieldId: field.id,
-            content,
+            petitionFieldId: fieldId,
+            content: draft,
           },
         });
+        editorRef.current?.clear();
       } catch {}
-      setNativeValue(textareaRef.current!, "");
     }
-  }
-
-  function handleDraftChange(event: ChangeEvent<HTMLTextAreaElement>) {
-    setDraft(event.target.value);
-  }
-
-  async function handleSubmitClick() {
-    try {
-      await createPetitionFieldComment({
-        variables: {
-          keycode,
-          petitionFieldId: field.id,
-          content: draft.trim(),
-        },
-      });
-    } catch {}
-    setNativeValue(textareaRef.current!, "");
-    closeRef.current!.focus();
-  }
-
-  function handleCancelClick() {
-    setNativeValue(textareaRef.current!, "");
     closeRef.current!.focus();
   }
 
@@ -134,12 +116,12 @@ export function RecipientViewPetitionFieldCommentsDialog({
     RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument
   );
 
-  async function handleEditCommentContent(commentId: string, content: string) {
+  async function handleEditCommentContent(commentId: string, content: any) {
     try {
       await updatePetitionFieldComment({
         variables: {
           keycode,
-          petitionFieldId: field.id,
+          petitionFieldId: fieldId,
           petitionFieldCommentId: commentId,
           content,
         },
@@ -155,14 +137,12 @@ export function RecipientViewPetitionFieldCommentsDialog({
       await deletePetitionFieldComment({
         variables: {
           keycode,
-          petitionFieldId: field.id,
+          petitionFieldId: fieldId,
           petitionFieldCommentId: commentId,
         },
       });
     } catch {}
   }
-
-  const isExpanded = Boolean(inputFocused || draft);
 
   return (
     <BaseDialog closeOnOverlayClick={false} {...props}>
@@ -174,13 +154,15 @@ export function RecipientViewPetitionFieldCommentsDialog({
             defaultMessage: "Close",
           })}
         />
-        <ModalHeader paddingRight={12}>
-          {field.title || (
-            <Text fontWeight="normal" textStyle="hint">
-              <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
-            </Text>
-          )}
-        </ModalHeader>
+        {loading ? null : (
+          <ModalHeader paddingRight={12}>
+            {field!.title || (
+              <Text fontWeight="normal" textStyle="hint">
+                <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
+              </Text>
+            )}
+          </ModalHeader>
+        )}
         <Divider />
         <ModalBody padding={0} display="flex" flexDirection="column-reverse" minHeight="0">
           {loading ? (
@@ -222,10 +204,9 @@ export function RecipientViewPetitionFieldCommentsDialog({
           ) : (
             <Stack spacing={0} divider={<Divider />} overflow="auto">
               {comments.map((comment) => (
-                <FieldComment
+                <PublicPetitionFieldComment
                   key={comment.id}
                   comment={comment}
-                  isAuthor={access.contact!.id === comment.author?.id}
                   onEdit={(content) => handleEditCommentContent(comment.id, content)}
                   onDelete={() => handleDeleteClick(comment.id)}
                 />
@@ -233,44 +214,32 @@ export function RecipientViewPetitionFieldCommentsDialog({
             </Stack>
           )}
         </ModalBody>
-        <Divider />
-        <ModalFooter display="block">
-          <GrowingTextarea
-            ref={textareaRef}
-            size="sm"
-            borderRadius="md"
-            paddingX={2}
-            minHeight={0}
-            maxHeight={20}
-            rows={1}
-            placeholder={intl.formatMessage(
-              {
-                id: "recipient-view.field-comments.placeholder",
-                defaultMessage: "Ask here your questions and doubts",
-              },
-              { tone }
-            )}
-            value={draft}
-            onKeyDown={handleKeyDown as any}
-            onChange={handleDraftChange as any}
-            {...inputFocusBind}
-          />
-          <PaddedCollapse in={isExpanded}>
-            <Stack direction="row" justifyContent="flex-end" paddingTop={2}>
-              <Button size="sm" onClick={handleCancelClick}>
-                <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
-              </Button>
-              <Button
-                size="sm"
-                colorScheme="primary"
-                isDisabled={draft.trim().length === 0}
-                onClick={handleSubmitClick}
-              >
-                <FormattedMessage id="generic.submit" defaultMessage="Submit" />
-              </Button>
-            </Stack>
-          </PaddedCollapse>
-        </ModalFooter>
+        {loading ? null : (
+          <>
+            <Divider />
+            <ModalFooter display="block" padding={2}>
+              <HStack>
+                <CommentEditor
+                  id={`comment-draft-editor-${fieldId}`}
+                  ref={editorRef}
+                  value={draft}
+                  onChange={setDraft}
+                  onKeyDown={handleKeyDown}
+                  placeholder={intl.formatMessage(
+                    {
+                      id: "recipient-view.field-comments.placeholder",
+                      defaultMessage: "Ask here your questions and doubts",
+                    },
+                    { tone }
+                  )}
+                />
+                <Button colorScheme="primary" isDisabled={isDraftEmpty} onClick={handleSubmitClick}>
+                  <FormattedMessage id="generic.submit" defaultMessage="Submit" />
+                </Button>
+              </HStack>
+            </ModalFooter>
+          </>
+        )}
       </ModalContent>
     </BaseDialog>
   );
@@ -293,14 +262,7 @@ RecipientViewPetitionFieldCommentsDialog.fragments = {
       }
     `;
   },
-  get PetitionField() {
-    return gql`
-      fragment RecipientViewPetitionFieldCommentsDialog_PetitionField on PetitionField {
-        id
-        title
-      }
-    `;
-  },
+
   get PublicPetitionField() {
     return gql`
       fragment RecipientViewPetitionFieldCommentsDialog_PublicPetitionField on PublicPetitionField {
@@ -308,12 +270,17 @@ RecipientViewPetitionFieldCommentsDialog.fragments = {
         title
         commentCount
         unreadCommentCount
+        comments {
+          id
+          ...PublicPetitionFieldComment_PublicPetitionFieldComment
+        }
       }
+      ${PublicPetitionFieldComment.fragments.PublicPetitionFieldComment}
     `;
   },
 };
 
-RecipientViewPetitionFieldCommentsDialog.queries = [
+const _queries = [
   gql`
     query RecipientViewPetitionFieldCommentsDialog_publicPetitionField(
       $keycode: ID!
@@ -321,18 +288,13 @@ RecipientViewPetitionFieldCommentsDialog.queries = [
     ) {
       publicPetitionField(keycode: $keycode, petitionFieldId: $petitionFieldId) {
         ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
-        comments {
-          id
-          ...FieldComment_PublicPetitionFieldComment
-        }
       }
     }
     ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionField}
-    ${FieldComment.fragments.PublicPetitionFieldComment}
   `,
 ];
 
-RecipientViewPetitionFieldCommentsDialog.mutations = [
+const _mutations = [
   gql`
     mutation RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsRead(
       $keycode: ID!
@@ -344,6 +306,10 @@ RecipientViewPetitionFieldCommentsDialog.mutations = [
       ) {
         id
         isUnread
+        field {
+          id
+          unreadCommentCount
+        }
       }
     }
   `,
@@ -351,14 +317,14 @@ RecipientViewPetitionFieldCommentsDialog.mutations = [
     mutation RecipientViewPetitionFieldCommentsDialog_createPetitionFieldComment(
       $keycode: ID!
       $petitionFieldId: GID!
-      $content: String!
+      $content: JSON!
     ) {
       publicCreatePetitionFieldComment(
         keycode: $keycode
         petitionFieldId: $petitionFieldId
         content: $content
       ) {
-        ...FieldComment_PublicPetitionFieldComment
+        ...PublicPetitionFieldComment_PublicPetitionFieldComment
         field {
           id
           commentCount
@@ -369,14 +335,14 @@ RecipientViewPetitionFieldCommentsDialog.mutations = [
         }
       }
     }
-    ${FieldComment.fragments.PublicPetitionFieldComment}
+    ${PublicPetitionFieldComment.fragments.PublicPetitionFieldComment}
   `,
   gql`
     mutation RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldComment(
       $keycode: ID!
       $petitionFieldId: GID!
       $petitionFieldCommentId: GID!
-      $content: String!
+      $content: JSON!
     ) {
       publicUpdatePetitionFieldComment(
         keycode: $keycode
@@ -384,10 +350,10 @@ RecipientViewPetitionFieldCommentsDialog.mutations = [
         petitionFieldCommentId: $petitionFieldCommentId
         content: $content
       ) {
-        ...FieldComment_PublicPetitionFieldComment
+        ...PublicPetitionFieldComment_PublicPetitionFieldComment
       }
     }
-    ${FieldComment.fragments.PublicPetitionFieldComment}
+    ${PublicPetitionFieldComment.fragments.PublicPetitionFieldComment}
   `,
   gql`
     mutation RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldComment(

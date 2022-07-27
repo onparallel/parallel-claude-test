@@ -1,7 +1,10 @@
-import { booleanArg, mutationField, nonNull, stringArg } from "nexus";
+import { booleanArg, mutationField, nonNull } from "nexus";
 import { PetitionFieldComment } from "../../../db/__types";
+import { toPlainText } from "../../../util/slate";
 import { and, authenticateAnd, ifArgEquals } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
+import { jsonArg } from "../../helpers/scalars";
+import { validPetitionFieldCommentContent } from "../../public/authorizers";
 import {
   commentsBelongsToPetition,
   fieldsAreNotInternal,
@@ -27,15 +30,22 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
         fieldsAreNotInternal("petitionFieldId")
       )
     ),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
+    // TODO remove false,
+    validPetitionFieldCommentContent("content", "petitionFieldId", false)
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     petitionFieldId: nonNull(globalIdArg("PetitionField")),
-    content: nonNull(stringArg()),
+    content: nonNull(jsonArg()),
     isInternal: booleanArg(),
+    subscribeNoPermissions: booleanArg(),
   },
   resolve: async (_, args, ctx) => {
+    // TODO verificar que los mencionados tienen permisos a la peticion
+    // - si no tienen permisos el flag subcribeNoPermissions ha de ser true
+    // - si no tienen permisos, tira un error con los mencionados sin permisos
+    // para mostrar una confirmacion de subscripcion en el front.
     ctx.petitions.loadPetitionFieldCommentsForField.dataloader.clear({
       loadInternalComments: true,
       petitionFieldId: args.petitionFieldId,
@@ -45,7 +55,8 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
       {
         petitionId: args.petitionId,
         petitionFieldId: args.petitionFieldId,
-        content: args.content,
+        contentJson: args.content,
+        content: toPlainText(args.content),
         isInternal: args.isInternal ?? false,
       },
       ctx.user!
@@ -103,18 +114,28 @@ export const updatePetitionFieldComment = mutationField("updatePetitionFieldComm
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
     commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
     userIsCommentAuthor("petitionFieldCommentId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
+    // TODO remove false,
+    validPetitionFieldCommentContent("content", "petitionFieldId", false)
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     petitionFieldId: nonNull(globalIdArg("PetitionField")),
     petitionFieldCommentId: nonNull(globalIdArg("PetitionFieldComment")),
-    content: nonNull(stringArg()),
+    content: nonNull(jsonArg()),
+    subscribeNoPermissions: booleanArg(),
   },
   resolve: async (_, args, ctx) => {
+    // TODO verificar que los mencionados tienen permisos a la peticion
+    // - si no tienen permisos el flag subcribeNoPermissions ha de ser true
+    // - si no tienen permisos, tira un error con los mencionados sin permisos
+    // para mostrar una confirmacion de subscripcion en el front.
     return await ctx.petitions.updatePetitionFieldCommentFromUser(
       args.petitionFieldCommentId,
-      args.content,
+      {
+        content: toPlainText(args.content),
+        contentJson: args.content,
+      },
       ctx.user!
     );
   },

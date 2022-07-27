@@ -35,9 +35,11 @@ import {
   fieldBelongsToAccess,
   getContactAuthCookieValue,
   taskBelongsToAccess,
+  validPetitionFieldCommentContent,
   validPublicPetitionLinkPrefill,
   validPublicPetitionLinkSlug,
 } from "./authorizers";
+import { toPlainText } from "../../util/slate";
 
 function anonymizePart(part: string) {
   return part.length > 2
@@ -363,12 +365,13 @@ export const publicCreatePetitionFieldComment = mutationField("publicCreatePetit
   type: "PublicPetitionFieldComment",
   authorize: chain(
     authenticatePublicAccess("keycode"),
-    and(fieldBelongsToAccess("petitionFieldId"), fieldsHaveCommentsEnabled("petitionFieldId"))
+    and(fieldBelongsToAccess("petitionFieldId"), fieldsHaveCommentsEnabled("petitionFieldId")),
+    validPetitionFieldCommentContent("content", "petitionFieldId", false)
   ),
   args: {
     keycode: nonNull(idArg()),
     petitionFieldId: nonNull(globalIdArg("PetitionField")),
-    content: nonNull(stringArg()),
+    content: nonNull(jsonArg()),
   },
   resolve: async (_, args, ctx) => {
     const petitionId = ctx.access!.petition_id;
@@ -380,7 +383,8 @@ export const publicCreatePetitionFieldComment = mutationField("publicCreatePetit
       {
         petitionId: petitionId,
         petitionFieldId: args.petitionFieldId,
-        content: args.content,
+        contentJson: args.content,
+        content: toPlainText(args.content),
       },
       ctx.access!
     );
@@ -419,18 +423,22 @@ export const publicUpdatePetitionFieldComment = mutationField("publicUpdatePetit
   type: "PublicPetitionFieldComment",
   authorize: chain(
     authenticatePublicAccess("keycode"),
-    and(fieldBelongsToAccess("petitionFieldId"), commentsBelongsToAccess("petitionFieldCommentId"))
+    and(fieldBelongsToAccess("petitionFieldId"), commentsBelongsToAccess("petitionFieldCommentId")),
+    validPetitionFieldCommentContent("content", "petitionFieldId", false)
   ),
   args: {
     keycode: nonNull(idArg()),
     petitionFieldId: nonNull(globalIdArg("PetitionField")),
     petitionFieldCommentId: nonNull(globalIdArg("PetitionFieldComment")),
-    content: nonNull(stringArg()),
+    content: nonNull(jsonArg()),
   },
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.updatePetitionFieldCommentFromContact(
       args.petitionFieldCommentId,
-      args.content,
+      {
+        content: toPlainText(args.content),
+        contentJson: args.content,
+      },
       ctx.contact!
     );
   },

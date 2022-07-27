@@ -17,7 +17,6 @@ import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { CommentsButton } from "../CommentsButton";
-import { RecipientViewPetitionFieldCommentsDialog } from "../dialogs/RecipientViewPetitionFieldCommentsDialog";
 
 export type RecipientViewPetitionFieldCard_PetitionFieldSelection =
   | RecipientViewPetitionFieldCard_PublicPetitionFieldFragment
@@ -200,13 +199,11 @@ RecipientViewPetitionFieldCard.fragments = {
         }
         commentCount
         unreadCommentCount
-        ...RecipientViewPetitionFieldCommentsDialog_PetitionField
         hasCommentsEnabled
         ...completedFieldReplies_PetitionField
       }
       ${this.PetitionFieldReply}
       ${FileAttachmentButton.fragments.FileUpload}
-      ${RecipientViewPetitionFieldCommentsDialog.fragments.PetitionField}
       ${completedFieldReplies.fragments.PetitionField}
     `;
   },
@@ -245,12 +242,10 @@ RecipientViewPetitionFieldCard.fragments = {
         commentCount
         unreadCommentCount
         hasCommentsEnabled
-        ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
         ...completedFieldReplies_PublicPetitionField
       }
       ${this.PublicPetitionFieldReply}
       ${FileAttachmentButton.fragments.FileUpload}
-      ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionField}
       ${completedFieldReplies.fragments.PublicPetitionField}
     `;
   },

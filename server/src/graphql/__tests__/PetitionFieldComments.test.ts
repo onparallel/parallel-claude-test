@@ -10,6 +10,7 @@ import {
   User,
 } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
+import { toHtml } from "../../util/slate";
 import { initServer, TestClient } from "./server";
 
 describe("GraphQL/Petition Fields Comments", () => {
@@ -84,7 +85,7 @@ describe("GraphQL/Petition Fields Comments", () => {
             $petitionId: GID!
             $petitionFieldId: GID!
             $isInternal: Boolean
-            $content: String!
+            $content: JSON!
           ) {
             createPetitionFieldComment(
               petitionId: $petitionId
@@ -100,7 +101,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionId: toGlobalId("Petition", readPetition.id),
           petitionFieldId: toGlobalId("PetitionField", readField.id),
           isInternal: false,
-          content: "hello",
+          content: mocks.createRandomCommentContent(),
         }
       );
       expect(errors).toContainGraphQLError("FORBIDDEN");
@@ -114,7 +115,7 @@ describe("GraphQL/Petition Fields Comments", () => {
             $petitionId: GID!
             $petitionFieldId: GID!
             $isInternal: Boolean
-            $content: String!
+            $content: JSON!
           ) {
             createPetitionFieldComment(
               petitionId: $petitionId
@@ -130,7 +131,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionId: toGlobalId("Petition", readPetition.id),
           petitionFieldId: toGlobalId("PetitionField", readField.id),
           isInternal: true,
-          content: "hello",
+          content: mocks.createRandomCommentContent(),
         }
       );
 
@@ -139,16 +140,17 @@ describe("GraphQL/Petition Fields Comments", () => {
     });
 
     it("creates a comment on a petition field", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
-          mutation ($petitionId: GID!, $petitionFieldId: GID!, $content: String!) {
+      const content = mocks.createRandomCommentContent();
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $petitionFieldId: GID!, $content: JSON!) {
             createPetitionFieldComment(
               petitionId: $petitionId
               petitionFieldId: $petitionFieldId
               content: $content
             ) {
               id
-              content
+              contentHtml
               isInternal
               field {
                 id
@@ -159,17 +161,17 @@ describe("GraphQL/Petition Fields Comments", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", petition.id),
           petitionFieldId: toGlobalId("PetitionField", headingField.id),
-          content: "Hello this is my comment",
-        },
-      });
+          content,
+        }
+      );
 
       expect(errors).toBeUndefined();
       expect(data?.createPetitionFieldComment).toEqual({
         id: data!.createPetitionFieldComment.id,
-        content: "Hello this is my comment",
+        contentHtml: toHtml(content),
         isInternal: false,
         field: {
           id: toGlobalId("PetitionField", headingField.id),
@@ -179,12 +181,13 @@ describe("GraphQL/Petition Fields Comments", () => {
     });
 
     it("creates an internal comment on a petition field with comments disabled", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const content = mocks.createRandomCommentContent();
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation (
             $petitionId: GID!
             $petitionFieldId: GID!
-            $content: String!
+            $content: JSON!
             $isInternal: Boolean
           ) {
             createPetitionFieldComment(
@@ -194,7 +197,7 @@ describe("GraphQL/Petition Fields Comments", () => {
               isInternal: $isInternal
             ) {
               id
-              content
+              contentHtml
               isInternal
               field {
                 id
@@ -205,18 +208,18 @@ describe("GraphQL/Petition Fields Comments", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", petition.id),
           petitionFieldId: toGlobalId("PetitionField", textFieldWithCommentsDisabled.id),
-          content: "Hello this is my comment",
+          content,
           isInternal: true,
-        },
-      });
+        }
+      );
 
       expect(errors).toBeUndefined();
       expect(data?.createPetitionFieldComment).toEqual({
         id: data!.createPetitionFieldComment.id,
-        content: "Hello this is my comment",
+        contentHtml: toHtml(content),
         isInternal: true,
         field: {
           id: toGlobalId("PetitionField", textFieldWithCommentsDisabled.id),
@@ -226,12 +229,12 @@ describe("GraphQL/Petition Fields Comments", () => {
     });
 
     it("throws error if user wants to submit a comment on a field with comments disabled", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation (
             $petitionId: GID!
             $petitionFieldId: GID!
-            $content: String!
+            $content: JSON!
             $isInternal: Boolean
           ) {
             createPetitionFieldComment(
@@ -244,25 +247,25 @@ describe("GraphQL/Petition Fields Comments", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", petition.id),
           petitionFieldId: toGlobalId("PetitionField", textFieldWithCommentsDisabled.id),
-          content: "Hello this is my comment",
+          content: mocks.createRandomCommentContent(),
           isInternal: false,
-        },
-      });
+        }
+      );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
     it("throws error if user wants to submit an external comment on a internal field", async () => {
-      const { errors, data } = await testClient.mutate({
-        mutation: gql`
+      const { errors, data } = await testClient.execute(
+        gql`
           mutation (
             $petitionId: GID!
             $petitionFieldId: GID!
-            $content: String!
+            $content: JSON!
             $isInternal: Boolean
           ) {
             createPetitionFieldComment(
@@ -275,13 +278,13 @@ describe("GraphQL/Petition Fields Comments", () => {
             }
           }
         `,
-        variables: {
+        {
           petitionId: toGlobalId("Petition", petition.id),
           petitionFieldId: toGlobalId("PetitionField", textFieldInternal.id),
-          content: "Hello this is my comment",
+          content: mocks.createRandomCommentContent(),
           isInternal: false,
-        },
-      });
+        }
+      );
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
@@ -317,7 +320,7 @@ describe("GraphQL/Petition Fields Comments", () => {
             $petitionId: GID!
             $petitionFieldId: GID!
             $petitionFieldCommentId: GID!
-            $content: String!
+            $content: JSON!
           ) {
             updatePetitionFieldComment(
               petitionId: $petitionId
@@ -333,7 +336,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionId: toGlobalId("Petition", readPetition.id),
           petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", otherUserComment.id),
-          content: "aaaa",
+          content: mocks.createRandomCommentContent(),
         }
       );
 
@@ -346,7 +349,7 @@ describe("GraphQL/Petition Fields Comments", () => {
             $petitionId: GID!
             $petitionFieldId: GID!
             $petitionFieldCommentId: GID!
-            $content: String!
+            $content: JSON!
           ) {
             updatePetitionFieldComment(
               petitionId: $petitionId
@@ -362,7 +365,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionId: toGlobalId("Petition", readPetition.id),
           petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", otherUserInternalComment.id),
-          content: "aaaa",
+          content: mocks.createRandomCommentContent(),
         }
       );
 
@@ -377,7 +380,7 @@ describe("GraphQL/Petition Fields Comments", () => {
             $petitionId: GID!
             $petitionFieldId: GID!
             $petitionFieldCommentId: GID!
-            $content: String!
+            $content: JSON!
           ) {
             updatePetitionFieldComment(
               petitionId: $petitionId
@@ -393,7 +396,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionId: toGlobalId("Petition", readPetition.id),
           petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", comment.id),
-          content: "aaaa",
+          content: mocks.createRandomCommentContent(),
         }
       );
 
@@ -406,7 +409,7 @@ describe("GraphQL/Petition Fields Comments", () => {
             $petitionId: GID!
             $petitionFieldId: GID!
             $petitionFieldCommentId: GID!
-            $content: String!
+            $content: JSON!
           ) {
             updatePetitionFieldComment(
               petitionId: $petitionId
@@ -422,7 +425,7 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionId: toGlobalId("Petition", readPetition.id),
           petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", internalComment.id),
-          content: "aaaa",
+          content: mocks.createRandomCommentContent(),
         }
       );
 
@@ -436,6 +439,7 @@ describe("GraphQL/Petition Fields Comments", () => {
     let internalComment: PetitionFieldComment;
     let otherUserComment: PetitionFieldComment;
     let otherUserInternalComment: PetitionFieldComment;
+
     beforeAll(async () => {
       [comment, internalComment] = await mocks.createRandomCommentsFromUser(
         user.id,
@@ -452,6 +456,7 @@ describe("GraphQL/Petition Fields Comments", () => {
         (i) => ({ is_internal: i === 1 })
       );
     });
+
     it("should send error when trying to delete others user comment", async () => {
       const dataExternal = await testClient.execute(
         gql`
@@ -469,7 +474,6 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionId: toGlobalId("Petition", readPetition.id),
           petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", otherUserComment.id),
-          content: "aaaa",
         }
       );
       expect(dataExternal.errors).toContainGraphQLError("FORBIDDEN");
@@ -491,7 +495,6 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionId: toGlobalId("Petition", readPetition.id),
           petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", otherUserInternalComment.id),
-          content: "aaaa",
         }
       );
       expect(dataInternal.errors).toContainGraphQLError("FORBIDDEN");
@@ -515,7 +518,6 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionId: toGlobalId("Petition", readPetition.id),
           petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", comment.id),
-          content: "aaaa",
         }
       );
       expect(dataExternal.errors).toBeUndefined();
@@ -537,7 +539,6 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionId: toGlobalId("Petition", readPetition.id),
           petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", internalComment.id),
-          content: "aaaa",
         }
       );
       expect(dataInternal.errors).toBeUndefined();

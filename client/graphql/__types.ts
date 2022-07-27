@@ -938,7 +938,7 @@ export interface MutationcreatePetitionFieldAttachmentUploadLinkArgs {
 }
 
 export interface MutationcreatePetitionFieldCommentArgs {
-  content: Scalars["String"];
+  content: Scalars["JSON"];
   isInternal?: InputMaybe<Scalars["Boolean"]>;
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
@@ -1185,7 +1185,7 @@ export interface MutationpublicCreateFileUploadReplyArgs {
 }
 
 export interface MutationpublicCreatePetitionFieldCommentArgs {
-  content: Scalars["String"];
+  content: Scalars["JSON"];
   keycode: Scalars["ID"];
   petitionFieldId: Scalars["GID"];
 }
@@ -1274,7 +1274,7 @@ export interface MutationpublicStartAsyncFieldCompletionArgs {
 }
 
 export interface MutationpublicUpdatePetitionFieldCommentArgs {
-  content: Scalars["String"];
+  content: Scalars["JSON"];
   keycode: Scalars["ID"];
   petitionFieldCommentId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
@@ -1524,7 +1524,7 @@ export interface MutationupdatePetitionFieldArgs {
 }
 
 export interface MutationupdatePetitionFieldCommentArgs {
-  content: Scalars["String"];
+  content: Scalars["JSON"];
   petitionFieldCommentId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
@@ -2341,8 +2341,10 @@ export interface PetitionFieldComment {
   __typename?: "PetitionFieldComment";
   /** The author of the comment. */
   author?: Maybe<UserOrPetitionAccess>;
-  /** The content of the comment. */
-  content: Scalars["String"];
+  /** The JSON content of the comment. */
+  content: Scalars["JSON"];
+  /** The HTML content of the comment. */
+  contentHtml: Scalars["String"];
   /** Time when the comment was created. */
   createdAt: Scalars["DateTime"];
   field: PetitionField;
@@ -2355,6 +2357,26 @@ export interface PetitionFieldComment {
   isInternal: Scalars["Boolean"];
   /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
+  /** The mentiones of the comments. */
+  mentions: Array<PetitionFieldCommentMention>;
+}
+
+export type PetitionFieldCommentMention =
+  | PetitionFieldCommentUserGroupMention
+  | PetitionFieldCommentUserMention;
+
+/** A user group mention on a petition field comment */
+export interface PetitionFieldCommentUserGroupMention {
+  __typename?: "PetitionFieldCommentUserGroupMention";
+  mentionedId: Scalars["GID"];
+  userGroup?: Maybe<UserGroup>;
+}
+
+/** A user mention on a petition field comment */
+export interface PetitionFieldCommentUserMention {
+  __typename?: "PetitionFieldCommentUserMention";
+  mentionedId: Scalars["GID"];
+  user?: Maybe<User>;
 }
 
 /** The progress of the petition */
@@ -2815,6 +2837,7 @@ export interface PublicContact {
   fullName: Scalars["String"];
   /** The ID of the contact. */
   id: Scalars["GID"];
+  isMe: Scalars["Boolean"];
   /** The last name of the user. */
   lastName?: Maybe<Scalars["String"]>;
 }
@@ -2948,8 +2971,10 @@ export interface PublicPetitionFieldComment {
   __typename?: "PublicPetitionFieldComment";
   /** The author of the comment. */
   author?: Maybe<PublicUserOrContact>;
-  /** The content of the comment. */
-  content: Scalars["String"];
+  /** The JSON content of the comment. */
+  content: Scalars["JSON"];
+  /** The HTML content of the comment. */
+  contentHtml: Scalars["String"];
   /** Time when the comment was created. */
   createdAt: Scalars["DateTime"];
   field: PublicPetitionField;
@@ -3809,6 +3834,7 @@ export interface UserGroup extends Timestamps {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  imMember: Scalars["Boolean"];
   initials: Scalars["String"];
   memberCount: Scalars["Int"];
   members: Array<UserGroupMember>;
@@ -4012,38 +4038,6 @@ export type ContactSelect_ContactFragment = {
   hasBouncedEmail: boolean;
 };
 
-export type FieldComment_PublicPetitionFieldCommentFragment = {
-  __typename?: "PublicPetitionFieldComment";
-  id: string;
-  content: string;
-  createdAt: string;
-  isUnread: boolean;
-  isAnonymized: boolean;
-  author?:
-    | { __typename?: "PublicContact"; id: string; fullName: string }
-    | { __typename?: "PublicUser"; id: string; fullName: string }
-    | null;
-};
-
-export type FieldComment_PetitionFieldCommentFragment = {
-  __typename?: "PetitionFieldComment";
-  id: string;
-  createdAt: string;
-  content: string;
-  isUnread: boolean;
-  isInternal: boolean;
-  isEdited: boolean;
-  isAnonymized: boolean;
-  author?:
-    | {
-        __typename?: "PetitionAccess";
-        id: string;
-        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-      }
-    | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-    | null;
-};
-
 export type FileAttachmentButton_FileUploadFragment = {
   __typename?: "FileUpload";
   filename: string;
@@ -4051,6 +4045,28 @@ export type FileAttachmentButton_FileUploadFragment = {
   size: number;
   isComplete: boolean;
 };
+
+export type Mention_PetitionFieldCommentMention_PetitionFieldCommentUserGroupMention_Fragment = {
+  __typename?: "PetitionFieldCommentUserGroupMention";
+  mentionedId: string;
+  userGroup?: { __typename?: "UserGroup"; id: string; name: string; imMember: boolean } | null;
+};
+
+export type Mention_PetitionFieldCommentMention_PetitionFieldCommentUserMention_Fragment = {
+  __typename?: "PetitionFieldCommentUserMention";
+  mentionedId: string;
+  user?: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    status: UserStatus;
+    isMe: boolean;
+  } | null;
+};
+
+export type Mention_PetitionFieldCommentMentionFragment =
+  | Mention_PetitionFieldCommentMention_PetitionFieldCommentUserGroupMention_Fragment
+  | Mention_PetitionFieldCommentMention_PetitionFieldCommentUserMention_Fragment;
 
 export type OverrideWithOrganizationTheme_OrganizationFragment = {
   __typename?: "Organization";
@@ -4062,6 +4078,83 @@ export type OverrideWithOrganizationTheme_PublicOrganizationFragment = {
   __typename?: "PublicOrganization";
   id: string;
   brandTheme?: { [key: string]: any } | null;
+};
+
+export type PetitionFieldComment_PetitionFieldCommentFragment = {
+  __typename?: "PetitionFieldComment";
+  id: string;
+  createdAt: string;
+  content: any;
+  isUnread: boolean;
+  isInternal: boolean;
+  isEdited: boolean;
+  isAnonymized: boolean;
+  contentHtml: string;
+  author?:
+    | {
+        __typename?: "PetitionAccess";
+        id: string;
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+      }
+    | {
+        __typename?: "User";
+        id: string;
+        isMe: boolean;
+        fullName?: string | null;
+        status: UserStatus;
+      }
+    | null;
+  mentions: Array<
+    | {
+        __typename?: "PetitionFieldCommentUserGroupMention";
+        mentionedId: string;
+        userGroup?: {
+          __typename?: "UserGroup";
+          id: string;
+          name: string;
+          imMember: boolean;
+        } | null;
+      }
+    | {
+        __typename?: "PetitionFieldCommentUserMention";
+        mentionedId: string;
+        user?: {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null;
+          status: UserStatus;
+          isMe: boolean;
+        } | null;
+      }
+  >;
+};
+
+export type PetitionFieldCommentContent_PetitionFieldCommentFragment = {
+  __typename?: "PetitionFieldComment";
+  contentHtml: string;
+  mentions: Array<
+    | {
+        __typename?: "PetitionFieldCommentUserGroupMention";
+        mentionedId: string;
+        userGroup?: {
+          __typename?: "UserGroup";
+          id: string;
+          name: string;
+          imMember: boolean;
+        } | null;
+      }
+    | {
+        __typename?: "PetitionFieldCommentUserMention";
+        mentionedId: string;
+        user?: {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null;
+          status: UserStatus;
+          isMe: boolean;
+        } | null;
+      }
+  >;
 };
 
 export type PetitionFieldSelect_PetitionFieldFragment = {
@@ -4193,6 +4286,25 @@ export type PetitionTagListCellContent_createTagMutationVariables = Exact<{
 
 export type PetitionTagListCellContent_createTagMutation = {
   createTag: { __typename?: "Tag"; id: string; name: string; color: string };
+};
+
+export type PublicPetitionFieldComment_PublicPetitionFieldCommentFragment = {
+  __typename?: "PublicPetitionFieldComment";
+  id: string;
+  content: any;
+  createdAt: string;
+  isUnread: boolean;
+  isAnonymized: boolean;
+  contentHtml: string;
+  author?:
+    | { __typename?: "PublicContact"; id: string; fullName: string; isMe: boolean }
+    | { __typename?: "PublicUser"; id: string; fullName: string }
+    | null;
+};
+
+export type PublicPetitionFieldCommentContent_PetitionFieldCommentFragment = {
+  __typename?: "PublicPetitionFieldComment";
+  contentHtml: string;
 };
 
 export type ShareButton_PetitionBase_Petition_Fragment = {
@@ -5886,8 +5998,8 @@ export type PetitionActivityTimeline_PetitionFragment = {
           comment?: {
             __typename?: "PetitionFieldComment";
             isEdited: boolean;
-            content: string;
             isAnonymized: boolean;
+            contentHtml: string;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -5900,6 +6012,29 @@ export type PetitionActivityTimeline_PetitionFragment = {
                 }
               | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
               | null;
+            mentions: Array<
+              | {
+                  __typename?: "PetitionFieldCommentUserGroupMention";
+                  mentionedId: string;
+                  userGroup?: {
+                    __typename?: "UserGroup";
+                    id: string;
+                    name: string;
+                    imMember: boolean;
+                  } | null;
+                }
+              | {
+                  __typename?: "PetitionFieldCommentUserMention";
+                  mentionedId: string;
+                  user?: {
+                    __typename?: "User";
+                    id: string;
+                    fullName?: string | null;
+                    status: UserStatus;
+                    isMe: boolean;
+                  } | null;
+                }
+            >;
           } | null;
         }
       | {
@@ -6469,8 +6604,8 @@ export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragmen
   comment?: {
     __typename?: "PetitionFieldComment";
     isEdited: boolean;
-    content: string;
     isAnonymized: boolean;
+    contentHtml: string;
     author?:
       | {
           __typename?: "PetitionAccess";
@@ -6478,6 +6613,29 @@ export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragmen
         }
       | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
       | null;
+    mentions: Array<
+      | {
+          __typename?: "PetitionFieldCommentUserGroupMention";
+          mentionedId: string;
+          userGroup?: {
+            __typename?: "UserGroup";
+            id: string;
+            name: string;
+            imMember: boolean;
+          } | null;
+        }
+      | {
+          __typename?: "PetitionFieldCommentUserMention";
+          mentionedId: string;
+          user?: {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null;
+            status: UserStatus;
+            isMe: boolean;
+          } | null;
+        }
+    >;
   } | null;
 };
 
@@ -7109,8 +7267,8 @@ export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
   comment?: {
     __typename?: "PetitionFieldComment";
     isEdited: boolean;
-    content: string;
     isAnonymized: boolean;
+    contentHtml: string;
     author?:
       | {
           __typename?: "PetitionAccess";
@@ -7118,6 +7276,29 @@ export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
         }
       | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
       | null;
+    mentions: Array<
+      | {
+          __typename?: "PetitionFieldCommentUserGroupMention";
+          mentionedId: string;
+          userGroup?: {
+            __typename?: "UserGroup";
+            id: string;
+            name: string;
+            imMember: boolean;
+          } | null;
+        }
+      | {
+          __typename?: "PetitionFieldCommentUserMention";
+          mentionedId: string;
+          user?: {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null;
+            status: UserStatus;
+            isMe: boolean;
+          } | null;
+        }
+    >;
   } | null;
 };
 
@@ -9556,19 +9737,49 @@ export type PreviewPetitionField_PetitionFieldFragment = {
     __typename?: "PetitionFieldComment";
     id: string;
     createdAt: string;
-    content: string;
+    content: any;
     isUnread: boolean;
     isInternal: boolean;
     isEdited: boolean;
     isAnonymized: boolean;
+    contentHtml: string;
     author?:
       | {
           __typename?: "PetitionAccess";
           id: string;
           contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
         }
-      | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+      | {
+          __typename?: "User";
+          id: string;
+          isMe: boolean;
+          fullName?: string | null;
+          status: UserStatus;
+        }
       | null;
+    mentions: Array<
+      | {
+          __typename?: "PetitionFieldCommentUserGroupMention";
+          mentionedId: string;
+          userGroup?: {
+            __typename?: "UserGroup";
+            id: string;
+            name: string;
+            imMember: boolean;
+          } | null;
+        }
+      | {
+          __typename?: "PetitionFieldCommentUserMention";
+          mentionedId: string;
+          user?: {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null;
+            status: UserStatus;
+            isMe: boolean;
+          } | null;
+        }
+    >;
   }>;
 };
 
@@ -9629,11 +9840,12 @@ export type PreviewPetitionField_PetitionFieldQuery = {
       __typename?: "PetitionFieldComment";
       id: string;
       createdAt: string;
-      content: string;
+      content: any;
       isUnread: boolean;
       isInternal: boolean;
       isEdited: boolean;
       isAnonymized: boolean;
+      contentHtml: string;
       author?:
         | {
             __typename?: "PetitionAccess";
@@ -9645,8 +9857,37 @@ export type PreviewPetitionField_PetitionFieldQuery = {
               email: string;
             } | null;
           }
-        | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+        | {
+            __typename?: "User";
+            id: string;
+            isMe: boolean;
+            fullName?: string | null;
+            status: UserStatus;
+          }
         | null;
+      mentions: Array<
+        | {
+            __typename?: "PetitionFieldCommentUserGroupMention";
+            mentionedId: string;
+            userGroup?: {
+              __typename?: "UserGroup";
+              id: string;
+              name: string;
+              imMember: boolean;
+            } | null;
+          }
+        | {
+            __typename?: "PetitionFieldCommentUserMention";
+            mentionedId: string;
+            user?: {
+              __typename?: "User";
+              id: string;
+              fullName?: string | null;
+              status: UserStatus;
+              isMe: boolean;
+            } | null;
+          }
+      >;
     }>;
   };
 };
@@ -9838,26 +10079,50 @@ export type PreviewPetitionFieldCommentsDialog_PetitionFieldFragment = {
     __typename?: "PetitionFieldComment";
     id: string;
     createdAt: string;
-    content: string;
+    content: any;
     isUnread: boolean;
     isInternal: boolean;
     isEdited: boolean;
     isAnonymized: boolean;
+    contentHtml: string;
     author?:
       | {
           __typename?: "PetitionAccess";
           id: string;
           contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
         }
-      | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+      | {
+          __typename?: "User";
+          id: string;
+          isMe: boolean;
+          fullName?: string | null;
+          status: UserStatus;
+        }
       | null;
+    mentions: Array<
+      | {
+          __typename?: "PetitionFieldCommentUserGroupMention";
+          mentionedId: string;
+          userGroup?: {
+            __typename?: "UserGroup";
+            id: string;
+            name: string;
+            imMember: boolean;
+          } | null;
+        }
+      | {
+          __typename?: "PetitionFieldCommentUserMention";
+          mentionedId: string;
+          user?: {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null;
+            status: UserStatus;
+            isMe: boolean;
+          } | null;
+        }
+    >;
   }>;
-};
-
-export type PreviewPetitionFieldCommentsDialog_userQueryVariables = Exact<{ [key: string]: never }>;
-
-export type PreviewPetitionFieldCommentsDialog_userQuery = {
-  me: { __typename?: "User"; id: string };
 };
 
 export type PreviewPetitionFieldCommentsDialog_petitionFieldQueryQueryVariables = Exact<{
@@ -9878,11 +10143,12 @@ export type PreviewPetitionFieldCommentsDialog_petitionFieldQueryQuery = {
       __typename?: "PetitionFieldComment";
       id: string;
       createdAt: string;
-      content: string;
+      content: any;
       isUnread: boolean;
       isInternal: boolean;
       isEdited: boolean;
       isAnonymized: boolean;
+      contentHtml: string;
       author?:
         | {
             __typename?: "PetitionAccess";
@@ -9894,117 +10160,37 @@ export type PreviewPetitionFieldCommentsDialog_petitionFieldQueryQuery = {
               email: string;
             } | null;
           }
-        | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-        | null;
-    }>;
-  };
-};
-
-export type PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  petitionFieldId: Scalars["GID"];
-  content: Scalars["String"];
-  isInternal?: InputMaybe<Scalars["Boolean"]>;
-}>;
-
-export type PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation = {
-  createPetitionFieldComment: {
-    __typename?: "PetitionFieldComment";
-    id: string;
-    createdAt: string;
-    content: string;
-    isUnread: boolean;
-    isInternal: boolean;
-    isEdited: boolean;
-    isAnonymized: boolean;
-    field: {
-      __typename?: "PetitionField";
-      id: string;
-      commentCount: number;
-      unreadCommentCount: number;
-      comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-    };
-    author?:
-      | {
-          __typename?: "PetitionAccess";
-          id: string;
-          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-        }
-      | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-      | null;
-  };
-};
-
-export type PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  petitionFieldId: Scalars["GID"];
-  petitionFieldCommentId: Scalars["GID"];
-  content: Scalars["String"];
-}>;
-
-export type PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation = {
-  updatePetitionFieldComment: {
-    __typename?: "PetitionFieldComment";
-    id: string;
-    createdAt: string;
-    content: string;
-    isUnread: boolean;
-    isInternal: boolean;
-    isEdited: boolean;
-    isAnonymized: boolean;
-    field: {
-      __typename?: "PetitionField";
-      id: string;
-      comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
-    };
-    author?:
-      | {
-          __typename?: "PetitionAccess";
-          id: string;
-          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-        }
-      | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-      | null;
-  };
-};
-
-export type PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  petitionFieldId: Scalars["GID"];
-  petitionFieldCommentId: Scalars["GID"];
-}>;
-
-export type PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation = {
-  deletePetitionFieldComment: {
-    __typename?: "PetitionField";
-    commentCount: number;
-    unreadCommentCount: number;
-    id: string;
-    title?: string | null;
-    isInternal: boolean;
-    hasCommentsEnabled: boolean;
-    comments: Array<{
-      __typename?: "PetitionFieldComment";
-      id: string;
-      createdAt: string;
-      content: string;
-      isUnread: boolean;
-      isInternal: boolean;
-      isEdited: boolean;
-      isAnonymized: boolean;
-      author?:
         | {
-            __typename?: "PetitionAccess";
+            __typename?: "User";
             id: string;
-            contact?: {
-              __typename?: "Contact";
+            isMe: boolean;
+            fullName?: string | null;
+            status: UserStatus;
+          }
+        | null;
+      mentions: Array<
+        | {
+            __typename?: "PetitionFieldCommentUserGroupMention";
+            mentionedId: string;
+            userGroup?: {
+              __typename?: "UserGroup";
               id: string;
-              fullName: string;
-              email: string;
+              name: string;
+              imMember: boolean;
             } | null;
           }
-        | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
-        | null;
+        | {
+            __typename?: "PetitionFieldCommentUserMention";
+            mentionedId: string;
+            user?: {
+              __typename?: "User";
+              id: string;
+              fullName?: string | null;
+              status: UserStatus;
+              isMe: boolean;
+            } | null;
+          }
+      >;
     }>;
   };
 };
@@ -10957,18 +11143,25 @@ export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragmen
   contact?: { __typename?: "PublicContact"; id: string } | null;
 };
 
-export type RecipientViewPetitionFieldCommentsDialog_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  title?: string | null;
-};
-
 export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
   id: string;
   title?: string | null;
   commentCount: number;
   unreadCommentCount: number;
+  comments: Array<{
+    __typename?: "PublicPetitionFieldComment";
+    id: string;
+    content: any;
+    createdAt: string;
+    isUnread: boolean;
+    isAnonymized: boolean;
+    contentHtml: string;
+    author?:
+      | { __typename?: "PublicContact"; id: string; fullName: string; isMe: boolean }
+      | { __typename?: "PublicUser"; id: string; fullName: string }
+      | null;
+  }>;
 };
 
 export type RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldQueryVariables = Exact<{
@@ -10986,12 +11179,13 @@ export type RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldQuery = 
     comments: Array<{
       __typename?: "PublicPetitionFieldComment";
       id: string;
-      content: string;
+      content: any;
       createdAt: string;
       isUnread: boolean;
       isAnonymized: boolean;
+      contentHtml: string;
       author?:
-        | { __typename?: "PublicContact"; id: string; fullName: string }
+        | { __typename?: "PublicContact"; id: string; fullName: string; isMe: boolean }
         | { __typename?: "PublicUser"; id: string; fullName: string }
         | null;
     }>;
@@ -11009,6 +11203,7 @@ export type RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAs
     __typename?: "PublicPetitionFieldComment";
     id: string;
     isUnread: boolean;
+    field: { __typename?: "PublicPetitionField"; id: string; unreadCommentCount: number };
   }>;
 };
 
@@ -11016,17 +11211,18 @@ export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentM
   Exact<{
     keycode: Scalars["ID"];
     petitionFieldId: Scalars["GID"];
-    content: Scalars["String"];
+    content: Scalars["JSON"];
   }>;
 
 export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation = {
   publicCreatePetitionFieldComment: {
     __typename?: "PublicPetitionFieldComment";
     id: string;
-    content: string;
+    content: any;
     createdAt: string;
     isUnread: boolean;
     isAnonymized: boolean;
+    contentHtml: string;
     field: {
       __typename?: "PublicPetitionField";
       id: string;
@@ -11035,7 +11231,7 @@ export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentM
       comments: Array<{ __typename?: "PublicPetitionFieldComment"; id: string }>;
     };
     author?:
-      | { __typename?: "PublicContact"; id: string; fullName: string }
+      | { __typename?: "PublicContact"; id: string; fullName: string; isMe: boolean }
       | { __typename?: "PublicUser"; id: string; fullName: string }
       | null;
   };
@@ -11046,19 +11242,20 @@ export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentM
     keycode: Scalars["ID"];
     petitionFieldId: Scalars["GID"];
     petitionFieldCommentId: Scalars["GID"];
-    content: Scalars["String"];
+    content: Scalars["JSON"];
   }>;
 
 export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation = {
   publicUpdatePetitionFieldComment: {
     __typename?: "PublicPetitionFieldComment";
     id: string;
-    content: string;
+    content: any;
     createdAt: string;
     isUnread: boolean;
     isAnonymized: boolean;
+    contentHtml: string;
     author?:
-      | { __typename?: "PublicContact"; id: string; fullName: string }
+      | { __typename?: "PublicContact"; id: string; fullName: string; isMe: boolean }
       | { __typename?: "PublicUser"; id: string; fullName: string }
       | null;
   };
@@ -13305,8 +13502,8 @@ export type PetitionActivity_PetitionFragment = {
           comment?: {
             __typename?: "PetitionFieldComment";
             isEdited: boolean;
-            content: string;
             isAnonymized: boolean;
+            contentHtml: string;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -13319,6 +13516,29 @@ export type PetitionActivity_PetitionFragment = {
                 }
               | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
               | null;
+            mentions: Array<
+              | {
+                  __typename?: "PetitionFieldCommentUserGroupMention";
+                  mentionedId: string;
+                  userGroup?: {
+                    __typename?: "UserGroup";
+                    id: string;
+                    name: string;
+                    imMember: boolean;
+                  } | null;
+                }
+              | {
+                  __typename?: "PetitionFieldCommentUserMention";
+                  mentionedId: string;
+                  user?: {
+                    __typename?: "User";
+                    id: string;
+                    fullName?: string | null;
+                    status: UserStatus;
+                    isMe: boolean;
+                  } | null;
+                }
+            >;
           } | null;
         }
       | {
@@ -14095,8 +14315,8 @@ export type PetitionActivity_updatePetitionMutation = {
                 comment?: {
                   __typename?: "PetitionFieldComment";
                   isEdited: boolean;
-                  content: string;
                   isAnonymized: boolean;
+                  contentHtml: string;
                   author?:
                     | {
                         __typename?: "PetitionAccess";
@@ -14114,6 +14334,29 @@ export type PetitionActivity_updatePetitionMutation = {
                         status: UserStatus;
                       }
                     | null;
+                  mentions: Array<
+                    | {
+                        __typename?: "PetitionFieldCommentUserGroupMention";
+                        mentionedId: string;
+                        userGroup?: {
+                          __typename?: "UserGroup";
+                          id: string;
+                          name: string;
+                          imMember: boolean;
+                        } | null;
+                      }
+                    | {
+                        __typename?: "PetitionFieldCommentUserMention";
+                        mentionedId: string;
+                        user?: {
+                          __typename?: "User";
+                          id: string;
+                          fullName?: string | null;
+                          status: UserStatus;
+                          isMe: boolean;
+                        } | null;
+                      }
+                  >;
                 } | null;
               }
             | {
@@ -14944,8 +15187,8 @@ export type PetitionActivity_petitionQuery = {
                 comment?: {
                   __typename?: "PetitionFieldComment";
                   isEdited: boolean;
-                  content: string;
                   isAnonymized: boolean;
+                  contentHtml: string;
                   author?:
                     | {
                         __typename?: "PetitionAccess";
@@ -14963,6 +15206,29 @@ export type PetitionActivity_petitionQuery = {
                         status: UserStatus;
                       }
                     | null;
+                  mentions: Array<
+                    | {
+                        __typename?: "PetitionFieldCommentUserGroupMention";
+                        mentionedId: string;
+                        userGroup?: {
+                          __typename?: "UserGroup";
+                          id: string;
+                          name: string;
+                          imMember: boolean;
+                        } | null;
+                      }
+                    | {
+                        __typename?: "PetitionFieldCommentUserMention";
+                        mentionedId: string;
+                        user?: {
+                          __typename?: "User";
+                          id: string;
+                          fullName?: string | null;
+                          status: UserStatus;
+                          isMe: boolean;
+                        } | null;
+                      }
+                  >;
                 } | null;
               }
             | {
@@ -17126,11 +17392,12 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
       __typename?: "PetitionFieldComment";
       id: string;
       createdAt: string;
-      content: string;
+      content: any;
       isUnread: boolean;
       isInternal: boolean;
       isEdited: boolean;
       isAnonymized: boolean;
+      contentHtml: string;
       author?:
         | {
             __typename?: "PetitionAccess";
@@ -17142,8 +17409,37 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
               email: string;
             } | null;
           }
-        | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+        | {
+            __typename?: "User";
+            id: string;
+            isMe: boolean;
+            fullName?: string | null;
+            status: UserStatus;
+          }
         | null;
+      mentions: Array<
+        | {
+            __typename?: "PetitionFieldCommentUserGroupMention";
+            mentionedId: string;
+            userGroup?: {
+              __typename?: "UserGroup";
+              id: string;
+              name: string;
+              imMember: boolean;
+            } | null;
+          }
+        | {
+            __typename?: "PetitionFieldCommentUserMention";
+            mentionedId: string;
+            user?: {
+              __typename?: "User";
+              id: string;
+              fullName?: string | null;
+              status: UserStatus;
+              isMe: boolean;
+            } | null;
+          }
+      >;
     }>;
   }>;
   signatureConfig?: {
@@ -17253,11 +17549,12 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
       __typename?: "PetitionFieldComment";
       id: string;
       createdAt: string;
-      content: string;
+      content: any;
       isUnread: boolean;
       isInternal: boolean;
       isEdited: boolean;
       isAnonymized: boolean;
+      contentHtml: string;
       author?:
         | {
             __typename?: "PetitionAccess";
@@ -17269,8 +17566,37 @@ export type PetitionPreview_PetitionBase_PetitionTemplate_Fragment = {
               email: string;
             } | null;
           }
-        | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+        | {
+            __typename?: "User";
+            id: string;
+            isMe: boolean;
+            fullName?: string | null;
+            status: UserStatus;
+          }
         | null;
+      mentions: Array<
+        | {
+            __typename?: "PetitionFieldCommentUserGroupMention";
+            mentionedId: string;
+            userGroup?: {
+              __typename?: "UserGroup";
+              id: string;
+              name: string;
+              imMember: boolean;
+            } | null;
+          }
+        | {
+            __typename?: "PetitionFieldCommentUserMention";
+            mentionedId: string;
+            user?: {
+              __typename?: "User";
+              id: string;
+              fullName?: string | null;
+              status: UserStatus;
+              isMe: boolean;
+            } | null;
+          }
+      >;
     }>;
   }>;
   signatureConfig?: {
@@ -17431,11 +17757,12 @@ export type PetitionPreview_updatePetitionMutation = {
             __typename?: "PetitionFieldComment";
             id: string;
             createdAt: string;
-            content: string;
+            content: any;
             isUnread: boolean;
             isInternal: boolean;
             isEdited: boolean;
             isAnonymized: boolean;
+            contentHtml: string;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -17447,8 +17774,37 @@ export type PetitionPreview_updatePetitionMutation = {
                     email: string;
                   } | null;
                 }
-              | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+              | {
+                  __typename?: "User";
+                  id: string;
+                  isMe: boolean;
+                  fullName?: string | null;
+                  status: UserStatus;
+                }
               | null;
+            mentions: Array<
+              | {
+                  __typename?: "PetitionFieldCommentUserGroupMention";
+                  mentionedId: string;
+                  userGroup?: {
+                    __typename?: "UserGroup";
+                    id: string;
+                    name: string;
+                    imMember: boolean;
+                  } | null;
+                }
+              | {
+                  __typename?: "PetitionFieldCommentUserMention";
+                  mentionedId: string;
+                  user?: {
+                    __typename?: "User";
+                    id: string;
+                    fullName?: string | null;
+                    status: UserStatus;
+                    isMe: boolean;
+                  } | null;
+                }
+            >;
           }>;
         }>;
         signatureConfig?: {
@@ -17561,11 +17917,12 @@ export type PetitionPreview_updatePetitionMutation = {
             __typename?: "PetitionFieldComment";
             id: string;
             createdAt: string;
-            content: string;
+            content: any;
             isUnread: boolean;
             isInternal: boolean;
             isEdited: boolean;
             isAnonymized: boolean;
+            contentHtml: string;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -17577,8 +17934,37 @@ export type PetitionPreview_updatePetitionMutation = {
                     email: string;
                   } | null;
                 }
-              | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+              | {
+                  __typename?: "User";
+                  id: string;
+                  isMe: boolean;
+                  fullName?: string | null;
+                  status: UserStatus;
+                }
               | null;
+            mentions: Array<
+              | {
+                  __typename?: "PetitionFieldCommentUserGroupMention";
+                  mentionedId: string;
+                  userGroup?: {
+                    __typename?: "UserGroup";
+                    id: string;
+                    name: string;
+                    imMember: boolean;
+                  } | null;
+                }
+              | {
+                  __typename?: "PetitionFieldCommentUserMention";
+                  mentionedId: string;
+                  user?: {
+                    __typename?: "User";
+                    id: string;
+                    fullName?: string | null;
+                    status: UserStatus;
+                    isMe: boolean;
+                  } | null;
+                }
+            >;
           }>;
         }>;
         signatureConfig?: {
@@ -17700,11 +18086,12 @@ export type PetitionPreview_completePetitionMutation = {
         __typename?: "PetitionFieldComment";
         id: string;
         createdAt: string;
-        content: string;
+        content: any;
         isUnread: boolean;
         isInternal: boolean;
         isEdited: boolean;
         isAnonymized: boolean;
+        contentHtml: string;
         author?:
           | {
               __typename?: "PetitionAccess";
@@ -17716,8 +18103,37 @@ export type PetitionPreview_completePetitionMutation = {
                 email: string;
               } | null;
             }
-          | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+          | {
+              __typename?: "User";
+              id: string;
+              isMe: boolean;
+              fullName?: string | null;
+              status: UserStatus;
+            }
           | null;
+        mentions: Array<
+          | {
+              __typename?: "PetitionFieldCommentUserGroupMention";
+              mentionedId: string;
+              userGroup?: {
+                __typename?: "UserGroup";
+                id: string;
+                name: string;
+                imMember: boolean;
+              } | null;
+            }
+          | {
+              __typename?: "PetitionFieldCommentUserMention";
+              mentionedId: string;
+              user?: {
+                __typename?: "User";
+                id: string;
+                fullName?: string | null;
+                status: UserStatus;
+                isMe: boolean;
+              } | null;
+            }
+        >;
       }>;
     }>;
     signatureConfig?: {
@@ -17863,11 +18279,12 @@ export type PetitionPreview_petitionQuery = {
             __typename?: "PetitionFieldComment";
             id: string;
             createdAt: string;
-            content: string;
+            content: any;
             isUnread: boolean;
             isInternal: boolean;
             isEdited: boolean;
             isAnonymized: boolean;
+            contentHtml: string;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -17879,8 +18296,37 @@ export type PetitionPreview_petitionQuery = {
                     email: string;
                   } | null;
                 }
-              | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+              | {
+                  __typename?: "User";
+                  id: string;
+                  isMe: boolean;
+                  fullName?: string | null;
+                  status: UserStatus;
+                }
               | null;
+            mentions: Array<
+              | {
+                  __typename?: "PetitionFieldCommentUserGroupMention";
+                  mentionedId: string;
+                  userGroup?: {
+                    __typename?: "UserGroup";
+                    id: string;
+                    name: string;
+                    imMember: boolean;
+                  } | null;
+                }
+              | {
+                  __typename?: "PetitionFieldCommentUserMention";
+                  mentionedId: string;
+                  user?: {
+                    __typename?: "User";
+                    id: string;
+                    fullName?: string | null;
+                    status: UserStatus;
+                    isMe: boolean;
+                  } | null;
+                }
+            >;
           }>;
         }>;
         signatureConfig?: {
@@ -17993,11 +18439,12 @@ export type PetitionPreview_petitionQuery = {
             __typename?: "PetitionFieldComment";
             id: string;
             createdAt: string;
-            content: string;
+            content: any;
             isUnread: boolean;
             isInternal: boolean;
             isEdited: boolean;
             isAnonymized: boolean;
+            contentHtml: string;
             author?:
               | {
                   __typename?: "PetitionAccess";
@@ -18009,8 +18456,37 @@ export type PetitionPreview_petitionQuery = {
                     email: string;
                   } | null;
                 }
-              | { __typename?: "User"; id: string; fullName?: string | null; status: UserStatus }
+              | {
+                  __typename?: "User";
+                  id: string;
+                  isMe: boolean;
+                  fullName?: string | null;
+                  status: UserStatus;
+                }
               | null;
+            mentions: Array<
+              | {
+                  __typename?: "PetitionFieldCommentUserGroupMention";
+                  mentionedId: string;
+                  userGroup?: {
+                    __typename?: "UserGroup";
+                    id: string;
+                    name: string;
+                    imMember: boolean;
+                  } | null;
+                }
+              | {
+                  __typename?: "PetitionFieldCommentUserMention";
+                  mentionedId: string;
+                  user?: {
+                    __typename?: "User";
+                    id: string;
+                    fullName?: string | null;
+                    status: UserStatus;
+                    isMe: boolean;
+                  } | null;
+                }
+            >;
           }>;
         }>;
         signatureConfig?: {
@@ -21096,6 +21572,25 @@ export type Thanks_petitionLogoQueryVariables = Exact<{
 
 export type Thanks_petitionLogoQuery = { publicOrgLogoUrl?: string | null };
 
+export type lolQueryVariables = Exact<{ [key: string]: never }>;
+
+export type lolQuery = {
+  me: {
+    __typename?: "User";
+    organization: {
+      __typename?: "Organization";
+      users: {
+        __typename?: "UserPagination";
+        items: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
+      };
+    };
+  };
+  userGroups: {
+    __typename?: "UserGroupPagination";
+    items: Array<{ __typename?: "UserGroup"; id: string; name: string; memberCount: number }>;
+  };
+};
+
 export type GetMyIdQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetMyIdQuery = { me: { __typename?: "User"; id: string } };
@@ -21217,6 +21712,209 @@ export type isUsageLimitsReached_OrganizationFragment = {
   usageLimits: {
     __typename?: "OrganizationUsageLimit";
     petitions: { __typename?: "OrganizationUsagePetitionLimit"; used: number; limit: number };
+  };
+};
+
+export type usePetitionCommentsMutations_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  commentCount: number;
+  unreadCommentCount: number;
+  comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
+};
+
+export type usePetitionCommentsMutations_PetitionFieldCommentFragment = {
+  __typename?: "PetitionFieldComment";
+  id: string;
+  createdAt: string;
+  content: any;
+  isUnread: boolean;
+  isInternal: boolean;
+  isEdited: boolean;
+  isAnonymized: boolean;
+  contentHtml: string;
+  author?:
+    | {
+        __typename?: "PetitionAccess";
+        id: string;
+        contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+      }
+    | {
+        __typename?: "User";
+        id: string;
+        isMe: boolean;
+        fullName?: string | null;
+        status: UserStatus;
+      }
+    | null;
+  mentions: Array<
+    | {
+        __typename?: "PetitionFieldCommentUserGroupMention";
+        mentionedId: string;
+        userGroup?: {
+          __typename?: "UserGroup";
+          id: string;
+          name: string;
+          imMember: boolean;
+        } | null;
+      }
+    | {
+        __typename?: "PetitionFieldCommentUserMention";
+        mentionedId: string;
+        user?: {
+          __typename?: "User";
+          id: string;
+          fullName?: string | null;
+          status: UserStatus;
+          isMe: boolean;
+        } | null;
+      }
+  >;
+};
+
+export type usePetitionCommentsMutations_createPetitionFieldCommentMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"];
+  content: Scalars["JSON"];
+  isInternal?: InputMaybe<Scalars["Boolean"]>;
+}>;
+
+export type usePetitionCommentsMutations_createPetitionFieldCommentMutation = {
+  createPetitionFieldComment: {
+    __typename?: "PetitionFieldComment";
+    id: string;
+    createdAt: string;
+    content: any;
+    isUnread: boolean;
+    isInternal: boolean;
+    isEdited: boolean;
+    isAnonymized: boolean;
+    contentHtml: string;
+    field: {
+      __typename?: "PetitionField";
+      id: string;
+      commentCount: number;
+      unreadCommentCount: number;
+      comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
+    };
+    author?:
+      | {
+          __typename?: "PetitionAccess";
+          id: string;
+          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+        }
+      | {
+          __typename?: "User";
+          id: string;
+          isMe: boolean;
+          fullName?: string | null;
+          status: UserStatus;
+        }
+      | null;
+    mentions: Array<
+      | {
+          __typename?: "PetitionFieldCommentUserGroupMention";
+          mentionedId: string;
+          userGroup?: {
+            __typename?: "UserGroup";
+            id: string;
+            name: string;
+            imMember: boolean;
+          } | null;
+        }
+      | {
+          __typename?: "PetitionFieldCommentUserMention";
+          mentionedId: string;
+          user?: {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null;
+            status: UserStatus;
+            isMe: boolean;
+          } | null;
+        }
+    >;
+  };
+};
+
+export type usePetitionCommentsMutations_updatePetitionFieldCommentMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"];
+  petitionFieldCommentId: Scalars["GID"];
+  content: Scalars["JSON"];
+}>;
+
+export type usePetitionCommentsMutations_updatePetitionFieldCommentMutation = {
+  updatePetitionFieldComment: {
+    __typename?: "PetitionFieldComment";
+    id: string;
+    createdAt: string;
+    content: any;
+    isUnread: boolean;
+    isInternal: boolean;
+    isEdited: boolean;
+    isAnonymized: boolean;
+    contentHtml: string;
+    field: {
+      __typename?: "PetitionField";
+      id: string;
+      commentCount: number;
+      unreadCommentCount: number;
+      comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
+    };
+    author?:
+      | {
+          __typename?: "PetitionAccess";
+          id: string;
+          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+        }
+      | {
+          __typename?: "User";
+          id: string;
+          isMe: boolean;
+          fullName?: string | null;
+          status: UserStatus;
+        }
+      | null;
+    mentions: Array<
+      | {
+          __typename?: "PetitionFieldCommentUserGroupMention";
+          mentionedId: string;
+          userGroup?: {
+            __typename?: "UserGroup";
+            id: string;
+            name: string;
+            imMember: boolean;
+          } | null;
+        }
+      | {
+          __typename?: "PetitionFieldCommentUserMention";
+          mentionedId: string;
+          user?: {
+            __typename?: "User";
+            id: string;
+            fullName?: string | null;
+            status: UserStatus;
+            isMe: boolean;
+          } | null;
+        }
+    >;
+  };
+};
+
+export type usePetitionCommentsMutations_deletePetitionFieldCommentMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"];
+  petitionFieldCommentId: Scalars["GID"];
+}>;
+
+export type usePetitionCommentsMutations_deletePetitionFieldCommentMutation = {
+  deletePetitionFieldComment: {
+    __typename?: "PetitionField";
+    id: string;
+    commentCount: number;
+    unreadCommentCount: number;
+    comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
   };
 };
 
@@ -21345,6 +22043,24 @@ export type useUpdateIsReadNotification_updatePetitionUserNotificationReadStatus
 export type useOrgRole_MeQueryVariables = Exact<{ [key: string]: never }>;
 
 export type useOrgRole_MeQuery = { me: { __typename?: "User"; role: OrganizationRole } };
+
+export type createMentionPlugin_UserOrUserGroup_User_Fragment = {
+  __typename?: "User";
+  id: string;
+  fullName?: string | null;
+  email: string;
+};
+
+export type createMentionPlugin_UserOrUserGroup_UserGroup_Fragment = {
+  __typename?: "UserGroup";
+  id: string;
+  name: string;
+  memberCount: number;
+};
+
+export type createMentionPlugin_UserOrUserGroupFragment =
+  | createMentionPlugin_UserOrUserGroup_User_Fragment
+  | createMentionPlugin_UserOrUserGroup_UserGroup_Fragment;
 
 export type uploadFile_AWSPresignedPostDataFragment = {
   __typename?: "AWSPresignedPostData";
@@ -22017,25 +22733,6 @@ export const ContactSelect_ContactFragmentDoc = gql`
     hasBouncedEmail
   }
 ` as unknown as DocumentNode<ContactSelect_ContactFragment, unknown>;
-export const FieldComment_PublicPetitionFieldCommentFragmentDoc = gql`
-  fragment FieldComment_PublicPetitionFieldComment on PublicPetitionFieldComment {
-    id
-    content
-    createdAt
-    isUnread
-    author {
-      ... on PublicUser {
-        id
-        fullName
-      }
-      ... on PublicContact {
-        id
-        fullName
-      }
-    }
-    isAnonymized
-  }
-` as unknown as DocumentNode<FieldComment_PublicPetitionFieldCommentFragment, unknown>;
 export const UserGroupMembersPopover_UserGroupFragmentDoc = gql`
   fragment UserGroupMembersPopover_UserGroup on UserGroup {
     id
@@ -22788,6 +23485,55 @@ export const LandingTemplateCard_LandingTemplateFragmentDoc = gql`
     organizationName
   }
 ` as unknown as DocumentNode<LandingTemplateCard_LandingTemplateFragment, unknown>;
+export const PublicPetitionFieldCommentContent_PetitionFieldCommentFragmentDoc = gql`
+  fragment PublicPetitionFieldCommentContent_PetitionFieldComment on PublicPetitionFieldComment {
+    contentHtml
+  }
+` as unknown as DocumentNode<
+  PublicPetitionFieldCommentContent_PetitionFieldCommentFragment,
+  unknown
+>;
+export const PublicPetitionFieldComment_PublicPetitionFieldCommentFragmentDoc = gql`
+  fragment PublicPetitionFieldComment_PublicPetitionFieldComment on PublicPetitionFieldComment {
+    id
+    content
+    ...PublicPetitionFieldCommentContent_PetitionFieldComment
+    createdAt
+    isUnread
+    author {
+      ... on PublicUser {
+        id
+        fullName
+      }
+      ... on PublicContact {
+        id
+        fullName
+        isMe
+      }
+    }
+    isAnonymized
+  }
+  ${PublicPetitionFieldCommentContent_PetitionFieldCommentFragmentDoc}
+` as unknown as DocumentNode<
+  PublicPetitionFieldComment_PublicPetitionFieldCommentFragment,
+  unknown
+>;
+export const RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragmentDoc = gql`
+  fragment RecipientViewPetitionFieldCommentsDialog_PublicPetitionField on PublicPetitionField {
+    id
+    title
+    commentCount
+    unreadCommentCount
+    comments {
+      id
+      ...PublicPetitionFieldComment_PublicPetitionFieldComment
+    }
+  }
+  ${PublicPetitionFieldComment_PublicPetitionFieldCommentFragmentDoc}
+` as unknown as DocumentNode<
+  RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment,
+  unknown
+>;
 export const RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc = gql`
   fragment RecipientViewPetitionField_PublicPetitionFieldReply on PublicPetitionFieldReply {
     content
@@ -23464,6 +24210,42 @@ export const TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc = gql`
   ${UserReference_UserFragmentDoc}
   ${ContactReference_ContactFragmentDoc}
 ` as unknown as DocumentNode<TimelineReplyDeletedEvent_ReplyDeletedEventFragment, unknown>;
+export const Mention_PetitionFieldCommentMentionFragmentDoc = gql`
+  fragment Mention_PetitionFieldCommentMention on PetitionFieldCommentMention {
+    ... on PetitionFieldCommentUserMention {
+      mentionedId
+      user {
+        id
+        fullName
+        status
+        isMe
+      }
+    }
+    ... on PetitionFieldCommentUserGroupMention {
+      mentionedId
+      userGroup {
+        id
+        name
+        imMember
+      }
+    }
+  }
+` as unknown as DocumentNode<Mention_PetitionFieldCommentMentionFragment, unknown>;
+export const PetitionFieldCommentContent_PetitionFieldCommentFragmentDoc = gql`
+  fragment PetitionFieldCommentContent_PetitionFieldComment on PetitionFieldComment {
+    contentHtml
+    mentions {
+      ... on PetitionFieldCommentUserMention {
+        mentionedId
+      }
+      ... on PetitionFieldCommentUserGroupMention {
+        mentionedId
+      }
+      ...Mention_PetitionFieldCommentMention
+    }
+  }
+  ${Mention_PetitionFieldCommentMentionFragmentDoc}
+` as unknown as DocumentNode<PetitionFieldCommentContent_PetitionFieldCommentFragment, unknown>;
 export const TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc = gql`
   fragment TimelineCommentPublishedEvent_CommentPublishedEvent on CommentPublishedEvent {
     field {
@@ -23474,14 +24256,15 @@ export const TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc = gq
         ...UserOrContactReference_UserOrPetitionAccess
       }
       isEdited
-      content
       isAnonymized
+      ...PetitionFieldCommentContent_PetitionFieldComment
     }
     isInternal
     createdAt
   }
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
   ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}
+  ${PetitionFieldCommentContent_PetitionFieldCommentFragmentDoc}
 ` as unknown as DocumentNode<TimelineCommentPublishedEvent_CommentPublishedEventFragment, unknown>;
 export const TimelineCommentDeletedEvent_CommentDeletedEventFragmentDoc = gql`
   fragment TimelineCommentDeletedEvent_CommentDeletedEvent on CommentDeletedEvent {
@@ -24838,15 +25621,6 @@ export const FileAttachmentButton_FileUploadFragmentDoc = gql`
     isComplete
   }
 ` as unknown as DocumentNode<FileAttachmentButton_FileUploadFragment, unknown>;
-export const RecipientViewPetitionFieldCommentsDialog_PetitionFieldFragmentDoc = gql`
-  fragment RecipientViewPetitionFieldCommentsDialog_PetitionField on PetitionField {
-    id
-    title
-  }
-` as unknown as DocumentNode<
-  RecipientViewPetitionFieldCommentsDialog_PetitionFieldFragment,
-  unknown
->;
 export const RecipientViewPetitionFieldCard_PetitionFieldFragmentDoc = gql`
   fragment RecipientViewPetitionFieldCard_PetitionField on PetitionField {
     id
@@ -24868,26 +25642,27 @@ export const RecipientViewPetitionFieldCard_PetitionFieldFragmentDoc = gql`
     }
     commentCount
     unreadCommentCount
-    ...RecipientViewPetitionFieldCommentsDialog_PetitionField
     hasCommentsEnabled
     ...completedFieldReplies_PetitionField
   }
   ${RecipientViewPetitionFieldCard_PetitionFieldReplyFragmentDoc}
   ${FileAttachmentButton_FileUploadFragmentDoc}
-  ${RecipientViewPetitionFieldCommentsDialog_PetitionFieldFragmentDoc}
   ${completedFieldReplies_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<RecipientViewPetitionFieldCard_PetitionFieldFragment, unknown>;
-export const FieldComment_PetitionFieldCommentFragmentDoc = gql`
-  fragment FieldComment_PetitionFieldComment on PetitionFieldComment {
+export const PetitionFieldComment_PetitionFieldCommentFragmentDoc = gql`
+  fragment PetitionFieldComment_PetitionFieldComment on PetitionFieldComment {
     id
     createdAt
     content
+    content
+    ...PetitionFieldCommentContent_PetitionFieldComment
     isUnread
     isInternal
     isEdited
     author {
       ... on User {
         id
+        isMe
         ...UserReference_User
       }
       ... on PetitionAccess {
@@ -24899,9 +25674,10 @@ export const FieldComment_PetitionFieldCommentFragmentDoc = gql`
     }
     isAnonymized
   }
+  ${PetitionFieldCommentContent_PetitionFieldCommentFragmentDoc}
   ${UserReference_UserFragmentDoc}
   ${ContactReference_ContactFragmentDoc}
-` as unknown as DocumentNode<FieldComment_PetitionFieldCommentFragment, unknown>;
+` as unknown as DocumentNode<PetitionFieldComment_PetitionFieldCommentFragment, unknown>;
 export const PreviewPetitionFieldCommentsDialog_PetitionFieldFragmentDoc = gql`
   fragment PreviewPetitionFieldCommentsDialog_PetitionField on PetitionField {
     id
@@ -24910,11 +25686,11 @@ export const PreviewPetitionFieldCommentsDialog_PetitionFieldFragmentDoc = gql`
     commentCount
     unreadCommentCount
     comments {
-      ...FieldComment_PetitionFieldComment
+      ...PetitionFieldComment_PetitionFieldComment
     }
     hasCommentsEnabled
   }
-  ${FieldComment_PetitionFieldCommentFragmentDoc}
+  ${PetitionFieldComment_PetitionFieldCommentFragmentDoc}
 ` as unknown as DocumentNode<PreviewPetitionFieldCommentsDialog_PetitionFieldFragment, unknown>;
 export const PreviewPetitionField_PetitionFieldFragmentDoc = gql`
   fragment PreviewPetitionField_PetitionField on PetitionField {
@@ -25629,17 +26405,6 @@ export const RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc 
   RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment,
   unknown
 >;
-export const RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragmentDoc = gql`
-  fragment RecipientViewPetitionFieldCommentsDialog_PublicPetitionField on PublicPetitionField {
-    id
-    title
-    commentCount
-    unreadCommentCount
-  }
-` as unknown as DocumentNode<
-  RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment,
-  unknown
->;
 export const completedFieldReplies_PublicPetitionFieldFragmentDoc = gql`
   fragment completedFieldReplies_PublicPetitionField on PublicPetitionField {
     type
@@ -25672,12 +26437,10 @@ export const RecipientViewPetitionFieldCard_PublicPetitionFieldFragmentDoc = gql
     commentCount
     unreadCommentCount
     hasCommentsEnabled
-    ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
     ...completedFieldReplies_PublicPetitionField
   }
   ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
   ${FileAttachmentButton_FileUploadFragmentDoc}
-  ${RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragmentDoc}
   ${completedFieldReplies_PublicPetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<RecipientViewPetitionFieldCard_PublicPetitionFieldFragment, unknown>;
 export const RecipientViewPetitionField_PublicPetitionFieldFragmentDoc = gql`
@@ -26060,6 +26823,23 @@ export const LandintTemplatesCategory_LandingTemplateCategorySampleFragmentDoc =
   LandintTemplatesCategory_LandingTemplateCategorySampleFragment,
   unknown
 >;
+export const usePetitionCommentsMutations_PetitionFieldFragmentDoc = gql`
+  fragment usePetitionCommentsMutations_PetitionField on PetitionField {
+    id
+    commentCount
+    unreadCommentCount
+    comments {
+      id
+    }
+  }
+` as unknown as DocumentNode<usePetitionCommentsMutations_PetitionFieldFragment, unknown>;
+export const usePetitionCommentsMutations_PetitionFieldCommentFragmentDoc = gql`
+  fragment usePetitionCommentsMutations_PetitionFieldComment on PetitionFieldComment {
+    id
+    ...PetitionFieldComment_PetitionFieldComment
+  }
+  ${PetitionFieldComment_PetitionFieldCommentFragmentDoc}
+` as unknown as DocumentNode<usePetitionCommentsMutations_PetitionFieldCommentFragment, unknown>;
 export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`
   fragment ConfirmDeletePetitionsDialog_PetitionBase on PetitionBase {
     id
@@ -26072,6 +26852,24 @@ export const useUpdateIsReadNotification_PetitionFieldCommentFragmentDoc = gql`
     isUnread
   }
 ` as unknown as DocumentNode<useUpdateIsReadNotification_PetitionFieldCommentFragment, unknown>;
+export const createMentionPlugin_UserOrUserGroupFragmentDoc = gql`
+  fragment createMentionPlugin_UserOrUserGroup on UserOrUserGroup {
+    ... on User {
+      id
+      fullName
+      email
+      ...UserSelectOption_User
+    }
+    ... on UserGroup {
+      id
+      name
+      memberCount
+      ...UserSelectOption_UserGroup
+    }
+  }
+  ${UserSelectOption_UserFragmentDoc}
+  ${UserSelectOption_UserGroupFragmentDoc}
+` as unknown as DocumentNode<createMentionPlugin_UserOrUserGroupFragment, unknown>;
 export const uploadFile_AWSPresignedPostDataFragmentDoc = gql`
   fragment uploadFile_AWSPresignedPostData on AWSPresignedPostData {
     url
@@ -27096,16 +27894,6 @@ export const PreviewPetitionFieldMutations_startAsyncFieldCompletionDocument = g
   PreviewPetitionFieldMutations_startAsyncFieldCompletionMutation,
   PreviewPetitionFieldMutations_startAsyncFieldCompletionMutationVariables
 >;
-export const PreviewPetitionFieldCommentsDialog_userDocument = gql`
-  query PreviewPetitionFieldCommentsDialog_user {
-    me {
-      id
-    }
-  }
-` as unknown as DocumentNode<
-  PreviewPetitionFieldCommentsDialog_userQuery,
-  PreviewPetitionFieldCommentsDialog_userQueryVariables
->;
 export const PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument = gql`
   query PreviewPetitionFieldCommentsDialog_petitionFieldQuery(
     $petitionId: GID!
@@ -27119,86 +27907,6 @@ export const PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument = gql
 ` as unknown as DocumentNode<
   PreviewPetitionFieldCommentsDialog_petitionFieldQueryQuery,
   PreviewPetitionFieldCommentsDialog_petitionFieldQueryQueryVariables
->;
-export const PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument = gql`
-  mutation PreviewPetitionFieldCommentsDialog_createPetitionFieldComment(
-    $petitionId: GID!
-    $petitionFieldId: GID!
-    $content: String!
-    $isInternal: Boolean
-  ) {
-    createPetitionFieldComment(
-      petitionId: $petitionId
-      petitionFieldId: $petitionFieldId
-      content: $content
-      isInternal: $isInternal
-    ) {
-      ...FieldComment_PetitionFieldComment
-      field {
-        id
-        commentCount
-        unreadCommentCount
-        comments {
-          id
-        }
-      }
-    }
-  }
-  ${FieldComment_PetitionFieldCommentFragmentDoc}
-` as unknown as DocumentNode<
-  PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation,
-  PreviewPetitionFieldCommentsDialog_createPetitionFieldCommentMutationVariables
->;
-export const PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument = gql`
-  mutation PreviewPetitionFieldCommentsDialog_updatePetitionFieldComment(
-    $petitionId: GID!
-    $petitionFieldId: GID!
-    $petitionFieldCommentId: GID!
-    $content: String!
-  ) {
-    updatePetitionFieldComment(
-      petitionId: $petitionId
-      petitionFieldId: $petitionFieldId
-      petitionFieldCommentId: $petitionFieldCommentId
-      content: $content
-    ) {
-      ...FieldComment_PetitionFieldComment
-      field {
-        id
-        comments {
-          id
-        }
-      }
-    }
-  }
-  ${FieldComment_PetitionFieldCommentFragmentDoc}
-` as unknown as DocumentNode<
-  PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation,
-  PreviewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutationVariables
->;
-export const PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument = gql`
-  mutation PreviewPetitionFieldCommentsDialog_deletePetitionFieldComment(
-    $petitionId: GID!
-    $petitionFieldId: GID!
-    $petitionFieldCommentId: GID!
-  ) {
-    deletePetitionFieldComment(
-      petitionId: $petitionId
-      petitionFieldId: $petitionFieldId
-      petitionFieldCommentId: $petitionFieldCommentId
-    ) {
-      ...PreviewPetitionFieldCommentsDialog_PetitionField
-      commentCount
-      unreadCommentCount
-      comments {
-        id
-      }
-    }
-  }
-  ${PreviewPetitionFieldCommentsDialog_PetitionFieldFragmentDoc}
-` as unknown as DocumentNode<
-  PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation,
-  PreviewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutationVariables
 >;
 export const PetitionAttachmentsCard_petitionAttachmentDownloadLinkDocument = gql`
   mutation PetitionAttachmentsCard_petitionAttachmentDownloadLink(
@@ -27352,14 +28060,9 @@ export const RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldDocumen
   ) {
     publicPetitionField(keycode: $keycode, petitionFieldId: $petitionFieldId) {
       ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
-      comments {
-        id
-        ...FieldComment_PublicPetitionFieldComment
-      }
     }
   }
   ${RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragmentDoc}
-  ${FieldComment_PublicPetitionFieldCommentFragmentDoc}
 ` as unknown as DocumentNode<
   RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldQuery,
   RecipientViewPetitionFieldCommentsDialog_publicPetitionFieldQueryVariables
@@ -27375,6 +28078,10 @@ export const RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsA
     ) {
       id
       isUnread
+      field {
+        id
+        unreadCommentCount
+      }
     }
   }
 ` as unknown as DocumentNode<
@@ -27385,14 +28092,14 @@ export const RecipientViewPetitionFieldCommentsDialog_createPetitionFieldComment
   mutation RecipientViewPetitionFieldCommentsDialog_createPetitionFieldComment(
     $keycode: ID!
     $petitionFieldId: GID!
-    $content: String!
+    $content: JSON!
   ) {
     publicCreatePetitionFieldComment(
       keycode: $keycode
       petitionFieldId: $petitionFieldId
       content: $content
     ) {
-      ...FieldComment_PublicPetitionFieldComment
+      ...PublicPetitionFieldComment_PublicPetitionFieldComment
       field {
         id
         commentCount
@@ -27403,7 +28110,7 @@ export const RecipientViewPetitionFieldCommentsDialog_createPetitionFieldComment
       }
     }
   }
-  ${FieldComment_PublicPetitionFieldCommentFragmentDoc}
+  ${PublicPetitionFieldComment_PublicPetitionFieldCommentFragmentDoc}
 ` as unknown as DocumentNode<
   RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation,
   RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutationVariables
@@ -27413,7 +28120,7 @@ export const RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldComment
     $keycode: ID!
     $petitionFieldId: GID!
     $petitionFieldCommentId: GID!
-    $content: String!
+    $content: JSON!
   ) {
     publicUpdatePetitionFieldComment(
       keycode: $keycode
@@ -27421,10 +28128,10 @@ export const RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldComment
       petitionFieldCommentId: $petitionFieldCommentId
       content: $content
     ) {
-      ...FieldComment_PublicPetitionFieldComment
+      ...PublicPetitionFieldComment_PublicPetitionFieldComment
     }
   }
-  ${FieldComment_PublicPetitionFieldCommentFragmentDoc}
+  ${PublicPetitionFieldComment_PublicPetitionFieldCommentFragmentDoc}
 ` as unknown as DocumentNode<
   RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation,
   RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutationVariables
@@ -29315,6 +30022,25 @@ export const Thanks_petitionLogoDocument = gql`
     publicOrgLogoUrl(id: $id)
   }
 ` as unknown as DocumentNode<Thanks_petitionLogoQuery, Thanks_petitionLogoQueryVariables>;
+export const lolDocument = gql`
+  query lol {
+    me {
+      organization {
+        users(limit: 100) {
+          items {
+            ...createMentionPlugin_UserOrUserGroup
+          }
+        }
+      }
+    }
+    userGroups(limit: 100) {
+      items {
+        ...createMentionPlugin_UserOrUserGroup
+      }
+    }
+  }
+  ${createMentionPlugin_UserOrUserGroupFragmentDoc}
+` as unknown as DocumentNode<lolQuery, lolQueryVariables>;
 export const GetMyIdDocument = gql`
   query GetMyId {
     me {
@@ -29322,6 +30048,75 @@ export const GetMyIdDocument = gql`
     }
   }
 ` as unknown as DocumentNode<GetMyIdQuery, GetMyIdQueryVariables>;
+export const usePetitionCommentsMutations_createPetitionFieldCommentDocument = gql`
+  mutation usePetitionCommentsMutations_createPetitionFieldComment(
+    $petitionId: GID!
+    $petitionFieldId: GID!
+    $content: JSON!
+    $isInternal: Boolean
+  ) {
+    createPetitionFieldComment(
+      petitionId: $petitionId
+      petitionFieldId: $petitionFieldId
+      content: $content
+      isInternal: $isInternal
+    ) {
+      ...usePetitionCommentsMutations_PetitionFieldComment
+      field {
+        ...usePetitionCommentsMutations_PetitionField
+      }
+    }
+  }
+  ${usePetitionCommentsMutations_PetitionFieldCommentFragmentDoc}
+  ${usePetitionCommentsMutations_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<
+  usePetitionCommentsMutations_createPetitionFieldCommentMutation,
+  usePetitionCommentsMutations_createPetitionFieldCommentMutationVariables
+>;
+export const usePetitionCommentsMutations_updatePetitionFieldCommentDocument = gql`
+  mutation usePetitionCommentsMutations_updatePetitionFieldComment(
+    $petitionId: GID!
+    $petitionFieldId: GID!
+    $petitionFieldCommentId: GID!
+    $content: JSON!
+  ) {
+    updatePetitionFieldComment(
+      petitionId: $petitionId
+      petitionFieldId: $petitionFieldId
+      petitionFieldCommentId: $petitionFieldCommentId
+      content: $content
+    ) {
+      ...usePetitionCommentsMutations_PetitionFieldComment
+      field {
+        ...usePetitionCommentsMutations_PetitionField
+      }
+    }
+  }
+  ${usePetitionCommentsMutations_PetitionFieldCommentFragmentDoc}
+  ${usePetitionCommentsMutations_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<
+  usePetitionCommentsMutations_updatePetitionFieldCommentMutation,
+  usePetitionCommentsMutations_updatePetitionFieldCommentMutationVariables
+>;
+export const usePetitionCommentsMutations_deletePetitionFieldCommentDocument = gql`
+  mutation usePetitionCommentsMutations_deletePetitionFieldComment(
+    $petitionId: GID!
+    $petitionFieldId: GID!
+    $petitionFieldCommentId: GID!
+  ) {
+    deletePetitionFieldComment(
+      petitionId: $petitionId
+      petitionFieldId: $petitionFieldId
+      petitionFieldCommentId: $petitionFieldCommentId
+    ) {
+      ...usePetitionCommentsMutations_PetitionField
+    }
+  }
+  ${usePetitionCommentsMutations_PetitionFieldFragmentDoc}
+` as unknown as DocumentNode<
+  usePetitionCommentsMutations_deletePetitionFieldCommentMutation,
+  usePetitionCommentsMutations_deletePetitionFieldCommentMutationVariables
+>;
 export const useClonePetitions_clonePetitionsDocument = gql`
   mutation useClonePetitions_clonePetitions($petitionIds: [GID!]!, $keepTitle: Boolean) {
     clonePetitions(petitionIds: $petitionIds, keepTitle: $keepTitle) {

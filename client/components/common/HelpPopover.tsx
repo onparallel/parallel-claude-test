@@ -15,10 +15,12 @@ export const HelpPopover = chakraForwardRef<"svg", HelpPopoverProps>(function (
   { children, placement = "bottom", popoverWidth, fontSize = "sm", ...props },
   ref
 ) {
-  const content = <Box fontSize={fontSize}>{children}</Box>;
-
   return (
-    <SmallPopover content={content} placement={placement} width={popoverWidth}>
+    <SmallPopover
+      content={<Box fontSize={fontSize}>{children}</Box>}
+      placement={placement}
+      width={popoverWidth}
+    >
       <QuestionIcon
         ref={ref}
         marginLeft={2}

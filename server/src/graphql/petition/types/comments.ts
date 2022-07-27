@@ -1,4 +1,6 @@
 import { objectType, unionType } from "nexus";
+import { isDefined } from "remeda";
+import { toHtml } from "../../../util/slate";
 
 export const UserOrPetitionAccess = unionType({
   name: "UserOrPetitionAccess",
@@ -14,6 +16,63 @@ export const UserOrPetitionAccess = unionType({
   sourceType: /* ts */ `
     | ({__type: "User"} & NexusGenRootTypes["User"])
     | ({__type: "PetitionAccess"} & NexusGenRootTypes["PetitionAccess"])
+  `,
+});
+
+export const PetitionFieldCommentMention = unionType({
+  name: "PetitionFieldCommentMention",
+  definition(t) {
+    t.members("PetitionFieldCommentUserMention", "PetitionFieldCommentUserGroupMention");
+  },
+  resolveType: (o) => {
+    if (isDefined(o.__type)) {
+      return `PetitionFieldComment${o.__type}Mention` as const;
+    }
+    throw new Error("Missing __type on UserOrPetitionAccess");
+  },
+  sourceType: /* ts */ `
+    | {__type: "User", user_id: number}
+    | {__type: "UserGroup", user_group_id: number}
+  `,
+});
+
+export const PetitionFieldCommentUserMention = objectType({
+  name: "PetitionFieldCommentUserMention",
+  description: "A user mention on a petition field comment",
+  definition(t) {
+    t.globalId("mentionedId", {
+      prefixName: "User",
+      resolve: (o) => o.user_id,
+    });
+    t.nullable.field("user", {
+      type: "User",
+      resolve: async (o, _, ctx) => {
+        return await ctx.users.loadUser(o.user_id);
+      },
+    });
+  },
+  sourceType: /* ts */ `
+    {__type: "User", user_id: number}
+  `,
+});
+
+export const PetitionFieldCommentUserGroupMention = objectType({
+  name: "PetitionFieldCommentUserGroupMention",
+  description: "A user group mention on a petition field comment",
+  definition(t) {
+    t.globalId("mentionedId", {
+      prefixName: "UserGroup",
+      resolve: (o) => o.user_group_id,
+    });
+    t.nullable.field("userGroup", {
+      type: "UserGroup",
+      resolve: async (o, _, ctx) => {
+        return await ctx.userGroups.loadUserGroup(o.user_group_id);
+      },
+    });
+  },
+  sourceType: /* ts */ `
+    {__type: "UserGroup", user_group_id: number}
   `,
 });
 
@@ -38,8 +97,34 @@ export const PetitionFieldComment = objectType({
         throw new Error(`Both "user_id" and "petition_access_id" are null`);
       },
     });
-    t.string("content", {
-      description: "The content of the comment.",
+    t.json("content", {
+      description: "The JSON content of the comment.",
+      resolve: async (root, _, ctx) => {
+        return root.content_json;
+      },
+    });
+    t.string("contentHtml", {
+      description: "The HTML content of the comment.",
+      resolve: async (root, _, ctx) => {
+        return toHtml(root.content_json);
+      },
+    });
+    t.list.field("mentions", {
+      type: "PetitionFieldCommentMention",
+      description: "The mentiones of the comments.",
+      resolve: async (root, _, ctx) => {
+        return [];
+        // TODO coger mentions de la tabla de petition_field_comment_mentions
+        // return getMentions(root.content_json).map((m) => {
+        //   if (m.type === "User") {
+        //     return { __type: "User", user_id: m.id };
+        //   } else if (m.type === "UserGroup") {
+        //     return { __type: "UserGroup", user_group_id: m.id };
+        //   } else {
+        //     throw new Error("Unknown mention type");
+        //   }
+        // });
+      },
     });
     t.datetime("createdAt", {
       description: "Time when the comment was created.",

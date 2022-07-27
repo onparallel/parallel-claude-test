@@ -6244,6 +6244,13 @@
   dependencies:
     "@udecode/plate-core" "15.0.0"
 
+"@udecode/plate-ui-popper@^15.0.0":
+  version "15.0.0"
+  resolved "https://registry.yarnpkg.com/@udecode/plate-ui-popper/-/plate-ui-popper-15.0.0.tgz#f53415124a95b922f112ffa9ea6e01589bcc6b89"
+  integrity sha512-isuARmY2Y+ADrlLqmdo7IoBHSVZaiy5GwpFO75BOuRIhNtrZQqkEEDLryqX0XPFRHdBXM+3Dlne7+a3N92bRcw==
+  dependencies:
+    "@udecode/plate-core" "15.0.0"
+
 "@udecode/zustood@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@udecode/zustood/-/zustood-1.1.1.tgz#def16fb122fe4173953aecb0fa7f10f22f074015"
@@ -9019,9 +9026,9 @@ core-js-pure@^3.8.1:
   integrity sha512-3qNgf6TqI3U1uhuSYRzJZGfFd4T+YlbyVPl+jgRiKjdZopvG4keZQwWZDAWpu1UH9nCgTpUzIV3GFawC7cJsqg==
 
 core-js@^2.4.0, core-js@^3.0.4, core-js@^3.21.1, core-js@^3.23.1, core-js@^3.6.5, core-js@^3.8.2:
-  version "3.23.5"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.23.5.tgz#1f82b0de5eece800827a2f59d597509c67650475"
-  integrity sha512-7Vh11tujtAZy82da4duVreQysIoO2EvVrur7y6IzZkH1IHPSekuDi8Vuw1+YKjkbfWLRD7Nc9ICQ/sIUDutcyg==
+  version "3.24.0"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.24.0.tgz#4928d4e99c593a234eb1a1f9abd3122b04d3ac57"
+  integrity sha512-IeOyT8A6iK37Ep4kZDD423mpi6JfPRoPUdQwEWYiGolvn4o6j2diaRzNfDfpTdu3a5qMbrGUzKUpYpRY8jXCkQ==
 
 core-util-is@1.0.2:
   version "1.0.2"

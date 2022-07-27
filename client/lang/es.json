@@ -1840,24 +1840,29 @@
     "context": "No files have been attached to this parallel."
   },
   {
-    "term": "component.petition-comments-and-notes.comments",
-    "definition": "Comentarios",
-    "context": "Comments"
-  },
-  {
-    "term": "component.petition-comments-and-notes.notes",
-    "definition": "Notas",
-    "context": "Notes"
-  },
-  {
-    "term": "component.petition-comments-and-notes.write-a-comment",
+    "term": "component.petition-comments-and-notes-editor.comment-placeholder",
     "definition": "Escribe un comentario",
     "context": "Write a comment"
   },
   {
-    "term": "component.petition-comments-and-notes.write-a-note",
-    "definition": "Escribe una nota. Solo será visible en tu organización.",
-    "context": "Write a note. It will only be visible in your organization."
+    "term": "component.petition-comments-and-notes-editor.comments",
+    "definition": "Comentarios",
+    "context": "Comments"
+  },
+  {
+    "term": "component.petition-comments-and-notes-editor.note-placeholder",
+    "definition": "Escribe una nota",
+    "context": "Write a note"
+  },
+  {
+    "term": "component.petition-comments-and-notes-editor.notes",
+    "definition": "Notas",
+    "context": "Notes"
+  },
+  {
+    "term": "component.petition-comments-and-notes-editor.notes-description",
+    "definition": "Las notas son solo visibles en tu organización. Puedes usarlas para comunicarte internamente.",
+    "context": "Notes are only visible within your organization. You can use them to communicate internally."
   },
   {
     "term": "component.petition-completed-alert.description",
@@ -4395,6 +4400,31 @@
     "context": "{days, plural, =0 {} =1 {# day } other {# days }} {hours}h {minutes}'"
   },
   {
+    "term": "component.user-dropdown-empty.invite-button",
+    "definition": "Invitar gente",
+    "context": "Invite people"
+  },
+  {
+    "term": "component.user-dropdown-empty.no-options",
+    "definition": "¿No encuentras a alguien?",
+    "context": "Can't find someone?"
+  },
+  {
+    "term": "component.user-dropdown-empty.no-options-contact-admin",
+    "definition": "Contacta con <a>el propietario o un administrador</a> de tu organización para crearle una cuenta.",
+    "context": "Contact with <a>the owner or an admin</a> of your organization to create them an account."
+  },
+  {
+    "term": "component.user-dropdown-empty.search-hint",
+    "definition": "Busca usuarios existentes",
+    "context": "Search for existing users"
+  },
+  {
+    "term": "component.user-dropdown-empty.search-hint-include-groups",
+    "definition": "Busca usuarios y equipos existentes",
+    "context": "Search for existing users and teams"
+  },
+  {
     "term": "component.user-group-select.no-options",
     "definition": "No se han encontrado equipos",
     "context": "No teams have been found"
@@ -4435,21 +4465,6 @@
     "context": "Notifications"
   },
   {
-    "term": "component.user-select.invite-button",
-    "definition": "Invitar gente",
-    "context": "Invite people"
-  },
-  {
-    "term": "component.user-select.no-options",
-    "definition": "¿No encuentras a alguien?",
-    "context": "Can't find someone?"
-  },
-  {
-    "term": "component.user-select.no-options-contact-admin",
-    "definition": "Contacta con <a>el propietario o un administrador</a> de tu organización para crearle una cuenta.",
-    "context": "Contact with <a>the owner or an admin</a> of your organization to create them an account."
-  },
-  {
     "term": "component.user-select.placeholder-multi-with-groups",
     "definition": "Selecciona usuarios o equipos de tu organización",
     "context": "Select users or teams from your organization"
@@ -4468,16 +4483,6 @@
     "term": "component.user-select.placeholder-single-without-groups",
     "definition": "Selecciona un usuario de tu organización",
     "context": "Select a user from your organization"
-  },
-  {
-    "term": "component.user-select.search-hint",
-    "definition": "Busca usuarios existentes",
-    "context": "Search for existing users"
-  },
-  {
-    "term": "component.user-select.search-hint-include-groups",
-    "definition": "Busca usuarios y equipos existentes",
-    "context": "Search for existing users and teams"
   },
   {
     "term": "component.user-select.user-group-icon-alt",
@@ -5858,6 +5863,11 @@
     "term": "generic.unexpected-error-happened",
     "definition": "Ocurrió un error inesperado. Por favor, refresca esta ventana y, si vuelve a ocurrir, contacta con soporte para que te podamos ayudar.",
     "context": "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help."
+  },
+  {
+    "term": "generic.unknown",
+    "definition": "Desconocido",
+    "context": "Unknown"
   },
   {
     "term": "generic.unlimited",

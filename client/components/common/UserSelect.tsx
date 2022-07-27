@@ -1,5 +1,5 @@
 import { gql, useApolloClient, useQuery } from "@apollo/client";
-import { Box, Button, Stack, Text } from "@chakra-ui/react";
+import { Box, Text } from "@chakra-ui/react";
 import { UsersIcon } from "@parallel/chakra/icons";
 import {
   UserSelect_canCreateUsersDocument,
@@ -18,8 +18,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import Select, { components, SelectComponentsConfig, SelectInstance } from "react-select";
 import AsyncSelect from "react-select/async";
 import { indexBy, zip } from "remeda";
-import { EmptySearchTemplatesIcon } from "../petition-new/icons/EmtpySearchTemplatesIcon";
-import { Link, NakedLink } from "./Link";
+import { UserDropdownEmtpy } from "./UserDropdownEmtpy";
 import { UserGroupMembersPopover } from "./UserGroupMembersPopover";
 import { UserSelectOption } from "./UserSelectOption";
 
@@ -315,53 +314,11 @@ const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
     selectProps: { inputValue: search, canCreateUsers, includeGroups },
   } = props;
   return (
-    <Stack alignItems="center" textAlign="center" padding={4} spacing={4}>
-      {search ? (
-        <>
-          <EmptySearchTemplatesIcon width="166px" height="77px" />
-          <Text as="strong">
-            <FormattedMessage
-              id="component.user-select.no-options"
-              defaultMessage="Can't find someone?"
-            />
-          </Text>
-          {canCreateUsers ? (
-            <NakedLink href="/app/organization/users?dialog=true">
-              <Button colorScheme="primary">
-                <FormattedMessage
-                  id="component.user-select.invite-button"
-                  defaultMessage="Invite people"
-                />
-              </Button>
-            </NakedLink>
-          ) : (
-            <Text>
-              <FormattedMessage
-                id="component.user-select.no-options-contact-admin"
-                defaultMessage="Contact with <a>the owner or an admin</a> of your organization to create them an account."
-                values={{
-                  a: (chunks: any) => <Link href={`/app/organization/users`}>{chunks}</Link>,
-                }}
-              />
-            </Text>
-          )}
-        </>
-      ) : (
-        <Text as="div" color="gray.400">
-          {includeGroups ? (
-            <FormattedMessage
-              id="component.user-select.search-hint-include-groups"
-              defaultMessage="Search for existing users and teams"
-            />
-          ) : (
-            <FormattedMessage
-              id="component.user-select.search-hint"
-              defaultMessage="Search for existing users"
-            />
-          )}
-        </Text>
-      )}
-    </Stack>
+    <UserDropdownEmtpy
+      search={search}
+      canCreateUsers={canCreateUsers}
+      includeGroups={includeGroups}
+    />
   );
 });
 

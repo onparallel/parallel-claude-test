@@ -744,10 +744,11 @@ type Mutation {
   Create a petition field comment.
   """
   createPetitionFieldComment(
-    content: String!
+    content: JSON!
     isInternal: Boolean
     petitionFieldId: GID!
     petitionId: GID!
+    subscribeNoPermissions: Boolean
   ): PetitionFieldComment!
 
   """
@@ -1075,7 +1076,7 @@ type Mutation {
   Create a petition field comment.
   """
   publicCreatePetitionFieldComment(
-    content: String!
+    content: JSON!
     keycode: ID!
     petitionFieldId: GID!
   ): PublicPetitionFieldComment!
@@ -1190,7 +1191,7 @@ type Mutation {
   Update a petition field comment.
   """
   publicUpdatePetitionFieldComment(
-    content: String!
+    content: JSON!
     keycode: ID!
     petitionFieldCommentId: GID!
     petitionFieldId: GID!
@@ -1587,10 +1588,11 @@ type Mutation {
   Update a petition field comment.
   """
   updatePetitionFieldComment(
-    content: String!
+    content: JSON!
     petitionFieldCommentId: GID!
     petitionFieldId: GID!
     petitionId: GID!
+    subscribeNoPermissions: Boolean
   ): PetitionFieldComment!
 
   """
@@ -2853,9 +2855,14 @@ type PetitionFieldComment {
   author: UserOrPetitionAccess
 
   """
-  The content of the comment.
+  The JSON content of the comment.
   """
-  content: String!
+  content: JSON!
+
+  """
+  The HTML content of the comment.
+  """
+  contentHtml: String!
 
   """
   Time when the comment was created.
@@ -2883,6 +2890,31 @@ type PetitionFieldComment {
   Whether the comment has been read or not.
   """
   isUnread: Boolean!
+
+  """
+  The mentiones of the comments.
+  """
+  mentions: [PetitionFieldCommentMention!]!
+}
+
+union PetitionFieldCommentMention =
+    PetitionFieldCommentUserGroupMention
+  | PetitionFieldCommentUserMention
+
+"""
+A user group mention on a petition field comment
+"""
+type PetitionFieldCommentUserGroupMention {
+  mentionedId: GID!
+  userGroup: UserGroup
+}
+
+"""
+A user mention on a petition field comment
+"""
+type PetitionFieldCommentUserMention {
+  mentionedId: GID!
+  user: User
 }
 
 """
@@ -3706,6 +3738,7 @@ type PublicContact {
   The ID of the contact.
   """
   id: GID!
+  isMe: Boolean!
 
   """
   The last name of the user.
@@ -3942,9 +3975,14 @@ type PublicPetitionFieldComment {
   author: PublicUserOrContact
 
   """
-  The content of the comment.
+  The JSON content of the comment.
   """
-  content: String!
+  content: JSON!
+
+  """
+  The HTML content of the comment.
+  """
+  contentHtml: String!
 
   """
   Time when the comment was created.
@@ -5105,6 +5143,7 @@ type UserGroup implements Timestamps {
   """
   createdAt: DateTime!
   id: GID!
+  imMember: Boolean!
   initials: String!
   memberCount: Int!
   members: [UserGroupMember!]!

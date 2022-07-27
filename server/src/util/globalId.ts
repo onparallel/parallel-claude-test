@@ -5,7 +5,10 @@ export function toGlobalId(type: string, id: number) {
   return encode(Buffer.from(`${type}:${id}`, "utf8"));
 }
 
-export function fromGlobalId<T extends string>(globalId: string, type?: T) {
+export function fromGlobalId<T extends string = string>(
+  globalId: string,
+  type?: T
+): { id: number; type: T } {
   let decoded: string;
   try {
     decoded = decode(globalId).toString("utf8");
@@ -20,7 +23,7 @@ export function fromGlobalId<T extends string>(globalId: string, type?: T) {
     throw new Error(`Invalid id ${globalId}`);
   }
   return {
-    type: _type,
+    type: _type as T,
     id: parseInt(id, 10),
   };
 }

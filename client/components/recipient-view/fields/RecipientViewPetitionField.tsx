@@ -82,7 +82,7 @@ export function RecipientViewPetitionField({ tone, ...props }: RecipientViewPeti
       await showFieldComments({
         keycode: props.keycode,
         access: props.access,
-        field: props.field,
+        fieldId: props.field.id,
         tone,
       });
     } catch {}

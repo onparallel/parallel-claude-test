@@ -6,22 +6,22 @@ import {
   PetitionRepliesFieldComments_PetitionFieldFragment,
   PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument,
 } from "@parallel/graphql/__types";
-import { isMetaReturn } from "@parallel/utils/keys";
+import { useGetMyId } from "@parallel/utils/apollo/getMyId";
+import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import usePreviousValue from "beautiful-react-hooks/usePreviousValue";
-import { KeyboardEvent, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../common/Divider";
-import { FieldComment } from "../common/FieldComment";
 import { Link } from "../common/Link";
+import { PetitionFieldComment } from "../common/PetitionFieldComment";
 import { PetitionCommentsAndNotesEditor } from "../petition-common/PetitionCommentsAndNotesEditor";
 
 export interface PetitionRepliesFieldCommentsProps {
   petitionId: string;
   field: PetitionRepliesFieldComments_PetitionFieldFragment;
-  myId: string;
-  onAddComment: (value: string, internal?: boolean) => Promise<void>;
+  onAddComment: (content: any, isNote: boolean) => Promise<void>;
   onDeleteComment: (petitionFieldCommentId: string) => void;
-  onUpdateComment: (petitionFieldCommentId: string, content: string) => void;
+  onUpdateComment: (petitionFieldCommentId: string, content: any) => void;
   onMarkAsUnread: (petitionFieldCommentId: string) => void;
   onClose: () => void;
   isDisabled: boolean;
@@ -31,7 +31,6 @@ export interface PetitionRepliesFieldCommentsProps {
 export function PetitionRepliesFieldComments({
   petitionId,
   field,
-  myId,
   onAddComment,
   onDeleteComment,
   onUpdateComment,
@@ -49,10 +48,7 @@ export function PetitionRepliesFieldComments({
   const { data, loading } = useQuery(
     PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument,
     {
-      variables: {
-        petitionId,
-        petitionFieldId: field.id,
-      },
+      variables: { petitionId, petitionFieldId: field.id },
       fetchPolicy: "cache-and-network",
     }
   );
@@ -66,32 +62,14 @@ export function PetitionRepliesFieldComments({
     }
   }, [comments, previousCommentCount]);
 
-  async function handleKeyDown({
-    event,
-    content,
-    isInternal,
-  }: {
-    event: KeyboardEvent<HTMLTextAreaElement>;
-    content: string;
-    isInternal: boolean;
-  }) {
-    if (isMetaReturn(event) && content) {
-      event.preventDefault();
-      await onAddComment(content, isInternal);
-      return true;
-    }
-    return false;
-  }
-
-  async function handleSubmitClick({
-    content,
-    isInternal,
-  }: {
-    content: string;
-    isInternal: boolean;
-  }) {
-    await onAddComment(content, isInternal);
-  }
+  const searchUsers = useSearchUsers();
+  const myId = useGetMyId();
+  const handleSearcMentionables = useCallback(
+    async (search: string) => {
+      return await searchUsers(search, { includeGroups: true, excludeUsers: [myId] });
+    },
+    [searchUsers]
+  );
 
   return (
     <Card>
@@ -169,10 +147,10 @@ export function PetitionRepliesFieldComments({
         ) : (
           <Stack spacing={0} divider={<Divider />}>
             {comments.map((comment) => (
-              <FieldComment
+              <PetitionFieldComment
                 key={comment.id}
                 comment={comment}
-                isAuthor={myId === comment.author?.id}
+                onSearchMentionables={handleSearcMentionables}
                 onEdit={(content) => onUpdateComment(comment.id, content)}
                 onDelete={() => onDeleteComment(comment.id)}
                 onMarkAsUnread={() => onMarkAsUnread(comment.id)}
@@ -184,19 +162,14 @@ export function PetitionRepliesFieldComments({
       <Divider />
       <Box paddingTop={2}>
         <PetitionCommentsAndNotesEditor
+          id={field.id}
           isDisabled={isDisabled}
           isTemplate={false}
+          onSearchMentionables={handleSearcMentionables}
           hasCommentsEnabled={hasCommentsEnabled && !onlyReadPermission}
-          onCommentKeyDown={async (event, content) =>
-            await handleKeyDown({ event, content, isInternal: false })
-          }
-          onCommentSubmit={async (content) =>
-            await handleSubmitClick({ content, isInternal: false })
-          }
-          onNotetKeyDown={async (event, content) =>
-            await handleKeyDown({ event, content, isInternal: true })
-          }
-          onNoteSubmit={async (content) => await handleSubmitClick({ content, isInternal: true })}
+          onSubmit={async (content, isNote) => {
+            await onAddComment(content, isNote);
+          }}
         />
       </Box>
     </Card>
