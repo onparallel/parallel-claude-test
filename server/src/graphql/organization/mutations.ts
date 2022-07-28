@@ -136,24 +136,38 @@ export const updateOrganizationBrandTheme = mutationField("updateOrganizationBra
     validateHexColor((args) => args.data.color, "data.color")
   ),
   resolve: async (_, args, ctx) => {
-    const { brand_theme: theme } = (await ctx.organizations.loadOrg(ctx.user!.org_id))!;
-    const organization = await ctx.organizations.updateOrganization(
-      ctx.user!.org_id,
-      {
-        brand_theme: {
-          color: args.data.color ?? theme?.color,
-          fontFamily: args.data.fontFamily !== undefined ? args.data.fontFamily : theme?.fontFamily,
+    const orgTheme = (await ctx.organizations.loadBrandThemesByOrgId(ctx.user!.org_id))[0];
+    const theme = orgTheme?.data;
+
+    if (isDefined(orgTheme)) {
+      const updatedTheme = {
+        data: {
+          color: args.data.color ?? theme.color,
+          fontFamily: args.data.fontFamily ?? theme.fontFamily,
         },
-      },
-      `User:${ctx.user!.id}`
-    );
+      };
+
+      await ctx.organizations.updateOrganizationTheme(
+        orgTheme.id,
+        updatedTheme,
+        `User:${ctx.user!.id}`
+      );
+    } else {
+      await ctx.organizations.createOrganizationTheme(
+        ctx.user!.org_id,
+        "Default",
+        "BRAND",
+        args.data,
+        `User:${ctx.user!.id}`
+      );
+    }
     if (
       (isDefined(args.data.color) && theme?.color !== args.data.color) ||
       (args.data.fontFamily !== undefined && theme?.fontFamily !== args.data.fontFamily)
     ) {
       await ctx.signature.updateBranding(ctx.user!.org_id);
     }
-    return organization;
+    return (await ctx.organizations.loadOrg(ctx.user!.org_id))!;
   },
 });
 
@@ -241,6 +255,7 @@ export const createOrganizationPdfDocumentTheme = mutationField(
         ctx.user!.org_id,
         name,
         "PDF_DOCUMENT",
+        defaultPdfDocumentTheme,
         `User:${ctx.user!.id}`
       );
       if (isDefault) {

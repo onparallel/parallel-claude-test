@@ -340,8 +340,9 @@ export const Organization = objectType({
       },
     });
     t.nullable.jsonObject("brandTheme", {
-      resolve: (o) => {
-        return o.brand_theme;
+      resolve: async (o, _, ctx) => {
+        const theme = (await ctx.organizations.loadBrandThemesByOrgId(o.id))[0];
+        return theme?.data ?? null;
       },
     });
     t.nonNull.boolean("isPdfDocumentThemeFontsDirty", {

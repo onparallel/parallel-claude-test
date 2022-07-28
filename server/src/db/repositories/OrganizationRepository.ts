@@ -410,6 +410,10 @@ export class OrganizationRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
+  readonly loadBrandThemesByOrgId = this.buildLoadMultipleBy("organization_theme", "org_id", (q) =>
+    q.where("type", "BRAND").whereNull("deleted_at").orderBy("created_at", "desc")
+  );
+
   readonly loadPdfDocumentThemesByOrgId = this.buildLoadMultipleBy(
     "organization_theme",
     "org_id",
@@ -431,6 +435,7 @@ export class OrganizationRepository extends BaseRepository {
     orgId: number,
     name: string,
     type: OrganizationThemeType,
+    data: any,
     createdBy: string
   ) {
     const [theme] = await this.from("organization_theme").insert(
@@ -442,7 +447,7 @@ export class OrganizationRepository extends BaseRepository {
         created_by: createdBy,
         updated_at: this.now(),
         updated_by: createdBy,
-        data: defaultPdfDocumentTheme,
+        data,
         is_default: false,
       },
       "*"
