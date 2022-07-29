@@ -16,24 +16,15 @@ import {
   QueryContacts_OrderBy,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
-import {
-  useAssertQuery,
-  useAssertQueryOrPreviousData,
-} from "@parallel/utils/apollo/useAssertQuery";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
+import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useGoToContact } from "@parallel/utils/goToContact";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { useDeleteContacts } from "@parallel/utils/mutations/useDeleteContacts";
 import { withError } from "@parallel/utils/promises/withError";
-import {
-  integer,
-  parseQuery,
-  sorting,
-  string,
-  useQueryState,
-  values,
-} from "@parallel/utils/queryState";
+import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { UnwrapArray } from "@parallel/utils/types";
 import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
 import { MouseEvent, useMemo, useState } from "react";
@@ -59,18 +50,18 @@ function Contacts() {
   const {
     data: { me, realMe },
   } = useAssertQuery(Contacts_userDocument);
-  const {
-    data: { contacts },
-    loading,
-    refetch,
-  } = useAssertQueryOrPreviousData(Contacts_contactsDocument, {
+  const { data, loading, refetch } = useQueryOrPreviousData(Contacts_contactsDocument, {
     variables: {
       offset: state.items * (state.page - 1),
       limit: state.items,
       search: state.search,
       sortBy: [`${state.sort.field}_${state.sort.direction}` as QueryContacts_OrderBy],
     },
+    fetchPolicy: "cache-and-network",
   });
+
+  const contacts = data?.contacts;
+
   const createContact = useCreateContact();
 
   const [selected, setSelected] = useState<string[]>([]);
@@ -116,8 +107,10 @@ function Contacts() {
   const deleteContacts = useDeleteContacts();
   async function handleDeleteClick() {
     try {
-      await deleteContacts(contacts.items.filter((c) => selected.includes(c.id)));
-      await refetch();
+      if (contacts) {
+        await deleteContacts(contacts.items.filter((c) => selected.includes(c.id)));
+        await refetch();
+      }
     } catch {}
   }
 
@@ -157,7 +150,7 @@ function Contacts() {
           flex="0 1 auto"
           minHeight={0}
           columns={columns}
-          rows={contacts.items}
+          rows={contacts?.items ?? []}
           rowKeyProp={"id"}
           isSelectable
           isHighlightable
@@ -165,7 +158,7 @@ function Contacts() {
           onRowClick={handleRowClick}
           page={state.page}
           pageSize={state.items}
-          totalCount={contacts.totalCount}
+          totalCount={contacts?.totalCount ?? 0}
           sort={state.sort}
           onSelectionChange={setSelected}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
@@ -190,7 +183,7 @@ function Contacts() {
             />
           }
           body={
-            contacts.totalCount === 0 && !loading ? (
+            contacts && contacts.totalCount === 0 && !loading ? (
               state.search ? (
                 <Flex flex="1" alignItems="center" justifyContent="center" height="300px">
                   <Text color="gray.300" fontSize="lg">
@@ -339,19 +332,8 @@ Contacts.queries = [
   `,
 ];
 
-Contacts.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
-  const { page, items, search, sort } = parseQuery(query, QUERY_STATE);
-  await Promise.all([
-    fetchQuery(Contacts_contactsDocument, {
-      variables: {
-        offset: items * (page - 1),
-        limit: items,
-        search,
-        sortBy: [`${sort.field}_${sort.direction}` as QueryContacts_OrderBy],
-      },
-    }),
-    fetchQuery(Contacts_userDocument),
-  ]);
+Contacts.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
+  await fetchQuery(Contacts_userDocument);
 };
 
 export default compose(withDialogs, withApolloData)(Contacts);

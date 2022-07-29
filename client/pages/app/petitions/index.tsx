@@ -39,7 +39,6 @@ import {
   integer,
   list,
   object,
-  parseQuery,
   QueryItem,
   sorting,
   string,
@@ -48,7 +47,7 @@ import {
 } from "@parallel/utils/queryState";
 import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColumns";
 import { ValueProps } from "@parallel/utils/ValueProps";
-import { MouseEvent, PropsWithChildren, useCallback, useMemo, useState } from "react";
+import { MouseEvent, PropsWithChildren, useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 
@@ -96,11 +95,20 @@ function Petitions() {
       },
       sortBy: [`${sort.field}_${sort.direction}`],
     },
+    fetchPolicy: "cache-and-network",
   });
+
   const petitions = data?.petitions ?? {
     items: [],
     totalCount: 0,
   };
+
+  useEffect(() => {
+    console.count("DETAIL Component Rendered");
+    return () => {
+      console.log("UNMOUNTED");
+    };
+  }, []);
 
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -134,7 +142,7 @@ function Petitions() {
       await deletePetitions(selected);
     } catch {}
     refetch();
-  }, [intl.locale, petitions, selected]);
+  }, [intl.locale, selected]);
 
   const goToPetition = useGoToPetition();
 
@@ -544,28 +552,8 @@ function usePetitionListActions({
   ];
 }
 
-Petitions.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
+Petitions.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
   await fetchQuery(Petitions_userDocument);
-  const state = parseQuery(query, QUERY_STATE);
-  const sort =
-    state.sort ??
-    (state.type === "PETITION"
-      ? ({ field: "sentAt", direction: "DESC" } as const)
-      : ({ field: "createdAt", direction: "DESC" } as const));
-  await fetchQuery(Petitions_petitionsDocument, {
-    variables: {
-      offset: state.items * (state.page - 1),
-      limit: state.items,
-      search: state.search,
-      sortBy: [`${sort.field}_${sort.direction}`],
-      filters: {
-        type: state.type,
-        status: state.status,
-        tagIds: state.tags,
-        sharedWith: removeInvalidLines(state.sharedWith),
-      },
-    },
-  });
 };
 
 export default compose(withDialogs, withApolloData)(Petitions);

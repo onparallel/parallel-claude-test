@@ -942,6 +942,7 @@ export interface MutationcreatePetitionFieldCommentArgs {
   isInternal?: InputMaybe<Scalars["Boolean"]>;
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
+  subscribeNoPermissions?: InputMaybe<Scalars["Boolean"]>;
 }
 
 export interface MutationcreatePetitionFieldReplyArgs {
@@ -1528,6 +1529,7 @@ export interface MutationupdatePetitionFieldCommentArgs {
   petitionFieldCommentId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
+  subscribeNoPermissions?: InputMaybe<Scalars["Boolean"]>;
 }
 
 export interface MutationupdatePetitionFieldRepliesStatusArgs {
@@ -11811,9 +11813,17 @@ export type AdminOrganizationsMembers_OrganizationFragment = {
   hasSsoProvider: boolean;
 };
 
-export type AdminOrganizationsMembers_queryQueryVariables = Exact<{ [key: string]: never }>;
+export type AdminOrganizationsMembers_queryQueryVariables = Exact<{
+  id: Scalars["GID"];
+}>;
 
 export type AdminOrganizationsMembers_queryQuery = {
+  organization?: {
+    __typename?: "Organization";
+    id: string;
+    name: string;
+    hasSsoProvider: boolean;
+  } | null;
   me: {
     __typename?: "User";
     id: string;
@@ -11858,9 +11868,6 @@ export type AdminOrganizationsMembers_organizationQueryVariables = Exact<{
 export type AdminOrganizationsMembers_organizationQuery = {
   organization?: {
     __typename?: "Organization";
-    id: string;
-    name: string;
-    hasSsoProvider: boolean;
     users: {
       __typename?: "UserPagination";
       totalCount: number;
@@ -13260,12 +13267,7 @@ export type OrganizationUsers_resetTemporaryPasswordMutationVariables = Exact<{
 
 export type OrganizationUsers_resetTemporaryPasswordMutation = { resetTemporaryPassword: Result };
 
-export type OrganizationUsers_userQueryVariables = Exact<{
-  offset: Scalars["Int"];
-  limit: Scalars["Int"];
-  search?: InputMaybe<Scalars["String"]>;
-  sortBy?: InputMaybe<Array<OrganizationUsers_OrderBy> | OrganizationUsers_OrderBy>;
-}>;
+export type OrganizationUsers_userQueryVariables = Exact<{ [key: string]: never }>;
 
 export type OrganizationUsers_userQuery = {
   me: {
@@ -13284,10 +13286,39 @@ export type OrganizationUsers_userQuery = {
     organization: {
       __typename?: "Organization";
       id: string;
-      hasSsoProvider: boolean;
-      activeUserCount: number;
       name: string;
       iconUrl92?: string | null;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
+    };
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
+
+export type OrganizationUsers_orgUsersQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+  search?: InputMaybe<Scalars["String"]>;
+  sortBy?: InputMaybe<Array<OrganizationUsers_OrderBy> | OrganizationUsers_OrderBy>;
+}>;
+
+export type OrganizationUsers_orgUsersQuery = {
+  me: {
+    __typename?: "User";
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      hasSsoProvider: boolean;
+      activeUserCount: number;
       users: {
         __typename?: "UserPagination";
         totalCount: number;
@@ -13315,17 +13346,8 @@ export type OrganizationUsers_userQuery = {
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
         users: { __typename?: "OrganizationUsageUserLimit"; limit: number };
-        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
       };
     };
-  };
-  realMe: {
-    __typename?: "User";
-    id: string;
-    fullName?: string | null;
-    avatarUrl?: string | null;
-    initials?: string | null;
-    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -21572,25 +21594,6 @@ export type Thanks_petitionLogoQueryVariables = Exact<{
 
 export type Thanks_petitionLogoQuery = { publicOrgLogoUrl?: string | null };
 
-export type lolQueryVariables = Exact<{ [key: string]: never }>;
-
-export type lolQuery = {
-  me: {
-    __typename?: "User";
-    organization: {
-      __typename?: "Organization";
-      users: {
-        __typename?: "UserPagination";
-        items: Array<{ __typename?: "User"; id: string; fullName?: string | null; email: string }>;
-      };
-    };
-  };
-  userGroups: {
-    __typename?: "UserGroupPagination";
-    items: Array<{ __typename?: "UserGroup"; id: string; name: string; memberCount: number }>;
-  };
-};
-
 export type GetMyIdQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetMyIdQuery = { me: { __typename?: "User"; id: string } };
@@ -28413,10 +28416,14 @@ export const AdminOrganizationsFeatures_updateFeatureFlagsDocument = gql`
   AdminOrganizationsFeatures_updateFeatureFlagsMutationVariables
 >;
 export const AdminOrganizationsMembers_queryDocument = gql`
-  query AdminOrganizationsMembers_query {
+  query AdminOrganizationsMembers_query($id: GID!) {
     ...AdminOrganizationsLayout_Query
+    organization(id: $id) {
+      ...AdminOrganizationsMembers_Organization
+    }
   }
   ${AdminOrganizationsLayout_QueryFragmentDoc}
+  ${AdminOrganizationsMembers_OrganizationFragmentDoc}
 ` as unknown as DocumentNode<
   AdminOrganizationsMembers_queryQuery,
   AdminOrganizationsMembers_queryQueryVariables
@@ -28430,7 +28437,6 @@ export const AdminOrganizationsMembers_organizationDocument = gql`
     $sortBy: [OrganizationUsers_OrderBy!]
   ) {
     organization(id: $id) {
-      ...AdminOrganizationsMembers_Organization
       users(
         offset: $offset
         limit: $limit
@@ -28445,7 +28451,6 @@ export const AdminOrganizationsMembers_organizationDocument = gql`
       }
     }
   }
-  ${AdminOrganizationsMembers_OrganizationFragmentDoc}
   ${AdminOrganizationsMembers_OrganizationUserFragmentDoc}
 ` as unknown as DocumentNode<
   AdminOrganizationsMembers_organizationQuery,
@@ -28982,15 +28987,22 @@ export const OrganizationUsers_resetTemporaryPasswordDocument = gql`
   OrganizationUsers_resetTemporaryPasswordMutationVariables
 >;
 export const OrganizationUsers_userDocument = gql`
-  query OrganizationUsers_user(
+  query OrganizationUsers_user {
+    ...SettingsLayout_Query
+    me {
+      hasGhostLogin: hasFeatureFlag(featureFlag: GHOST_LOGIN)
+    }
+  }
+  ${SettingsLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<OrganizationUsers_userQuery, OrganizationUsers_userQueryVariables>;
+export const OrganizationUsers_orgUsersDocument = gql`
+  query OrganizationUsers_orgUsers(
     $offset: Int!
     $limit: Int!
     $search: String
     $sortBy: [OrganizationUsers_OrderBy!]
   ) {
-    ...SettingsLayout_Query
     me {
-      hasGhostLogin: hasFeatureFlag(featureFlag: GHOST_LOGIN)
       organization {
         id
         hasSsoProvider
@@ -29015,9 +29027,11 @@ export const OrganizationUsers_userDocument = gql`
       }
     }
   }
-  ${SettingsLayout_QueryFragmentDoc}
   ${OrganizationUsers_UserFragmentDoc}
-` as unknown as DocumentNode<OrganizationUsers_userQuery, OrganizationUsers_userQueryVariables>;
+` as unknown as DocumentNode<
+  OrganizationUsers_orgUsersQuery,
+  OrganizationUsers_orgUsersQueryVariables
+>;
 export const PetitionActivity_updatePetitionDocument = gql`
   mutation PetitionActivity_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
     updatePetition(petitionId: $petitionId, data: $data) {
@@ -30022,25 +30036,6 @@ export const Thanks_petitionLogoDocument = gql`
     publicOrgLogoUrl(id: $id)
   }
 ` as unknown as DocumentNode<Thanks_petitionLogoQuery, Thanks_petitionLogoQueryVariables>;
-export const lolDocument = gql`
-  query lol {
-    me {
-      organization {
-        users(limit: 100) {
-          items {
-            ...createMentionPlugin_UserOrUserGroup
-          }
-        }
-      }
-    }
-    userGroups(limit: 100) {
-      items {
-        ...createMentionPlugin_UserOrUserGroup
-      }
-    }
-  }
-  ${createMentionPlugin_UserOrUserGroupFragmentDoc}
-` as unknown as DocumentNode<lolQuery, lolQueryVariables>;
 export const GetMyIdDocument = gql`
   query GetMyId {
     me {

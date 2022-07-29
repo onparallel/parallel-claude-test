@@ -18,20 +18,11 @@ import {
   OrganizationRole,
   OrganizationUsers_OrderBy,
 } from "@parallel/graphql/__types";
-import {
-  useAssertQuery,
-  useAssertQueryOrPreviousData,
-} from "@parallel/utils/apollo/useAssertQuery";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
+import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
-import {
-  integer,
-  parseQuery,
-  sorting,
-  string,
-  useQueryState,
-  values,
-} from "@parallel/utils/queryState";
+import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
@@ -63,7 +54,7 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
   } = useAssertQuery(AdminOrganizationsMembers_queryDocument);
 
   const [state, setQueryState] = useQueryState(USERS_QUERY_STATE);
-  const { data, loading, refetch } = useAssertQueryOrPreviousData(
+  const { data, loading, refetch } = useQueryOrPreviousData(
     AdminOrganizationsMembers_organizationDocument,
     {
       variables: {
@@ -73,21 +64,25 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
         search: state.search,
         sortBy: [`${state.sort.field}_${state.sort.direction}` as OrganizationUsers_OrderBy],
       },
+      fetchPolicy: "cache-and-network",
     }
   );
 
   const [search, setSearch] = useState(state.search);
   const [selected, setSelected] = useState<string[]>([]);
 
-  const organization = data.organization!;
-  const users = organization.users.items;
+  const organization = data?.organization;
+  const users = data?.organization?.users.items;
 
   const intl = useIntl();
   const toast = useToast();
 
   const selectedUsers = useMemo(
-    () => selected.map((userId) => users.find((u) => u.id === userId)).filter(isDefined),
-    [selected.join(","), users]
+    () =>
+      loading
+        ? []
+        : selected.map((userId) => users!.find((u) => u.id === userId)).filter(isDefined),
+    [selected.join(","), users, loading]
   );
 
   const [createOrganizationUser] = useMutation(
@@ -200,7 +195,7 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
             />
           }
           body={
-            users.length === 0 && !loading ? (
+            users && users.length === 0 && !loading ? (
               state.search ? (
                 <Flex flex="1" alignItems="center" justifyContent="center">
                   <Text color="gray.300" fontSize="lg">
@@ -406,10 +401,14 @@ AdminOrganizationsMembers.fragments = {
 
 const _queries = [
   gql`
-    query AdminOrganizationsMembers_query {
+    query AdminOrganizationsMembers_query($id: GID!) {
       ...AdminOrganizationsLayout_Query
+      organization(id: $id) {
+        ...AdminOrganizationsMembers_Organization
+      }
     }
     ${AdminOrganizationsLayout.fragments.Query}
+    ${AdminOrganizationsMembers.fragments.Organization}
   `,
   gql`
     query AdminOrganizationsMembers_organization(
@@ -420,7 +419,6 @@ const _queries = [
       $sortBy: [OrganizationUsers_OrderBy!]
     ) {
       organization(id: $id) {
-        ...AdminOrganizationsMembers_Organization
         users(
           offset: $offset
           limit: $limit
@@ -436,7 +434,6 @@ const _queries = [
       }
     }
     ${AdminOrganizationsMembers.fragments.OrganizationUser}
-    ${AdminOrganizationsMembers.fragments.Organization}
   `,
 ];
 
@@ -469,19 +466,9 @@ AdminOrganizationsMembers.getInitialProps = async ({
   query,
   fetchQuery,
 }: WithApolloDataContext) => {
-  const { page, items, search, sort } = parseQuery(query, USERS_QUERY_STATE);
-  await Promise.all([
-    fetchQuery(AdminOrganizationsMembers_organizationDocument, {
-      variables: {
-        id: query!.organizationId as string,
-        offset: items * (page - 1),
-        limit: items,
-        search,
-        sortBy: [`${sort.field}_${sort.direction}` as OrganizationUsers_OrderBy],
-      },
-    }),
-    fetchQuery(AdminOrganizationsMembers_queryDocument),
-  ]);
+  await fetchQuery(AdminOrganizationsMembers_queryDocument, {
+    variables: { id: query.organizationId as string },
+  });
   return { organizationId: query.organizationId as string };
 };
 

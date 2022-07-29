@@ -37,6 +37,7 @@ import {
   OrganizationGroup_UserGroupMemberFragment,
 } from "@parallel/graphql/__types";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
+import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { withError } from "@parallel/utils/promises/withError";
@@ -76,15 +77,13 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     data: { me, realMe },
   } = useAssertQuery(OrganizationGroup_userDocument);
 
-  const {
-    data: { userGroup },
-    loading,
-    refetch,
-  } = useAssertQuery(OrganizationGroup_userGroupDocument, {
+  const { data, loading, refetch } = useQueryOrPreviousData(OrganizationGroup_userGroupDocument, {
     variables: {
       id: groupId,
     },
+    fetchPolicy: "cache-and-network",
   });
+  const userGroup = data?.userGroup;
 
   const canEdit = isAdmin(me.role);
 
@@ -566,10 +565,7 @@ OrganizationGroup.queries = [
 
 OrganizationGroup.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const groupId = query.groupId as string;
-  await Promise.all([
-    fetchQuery(OrganizationGroup_userGroupDocument, { variables: { id: groupId } }),
-    fetchQuery(OrganizationGroup_userDocument),
-  ]);
+  fetchQuery(OrganizationGroup_userDocument);
   return { groupId };
 };
 

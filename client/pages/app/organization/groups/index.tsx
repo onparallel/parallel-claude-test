@@ -1,7 +1,8 @@
 import { gql, useMutation } from "@apollo/client";
 import { Button, Flex, Heading, Text, useToast } from "@chakra-ui/react";
-import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
+import { CopyIcon, DeleteIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
+import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
   DialogProps,
   useDialog,
@@ -24,28 +25,18 @@ import {
   OrganizationGroups_userGroupsDocument,
   QueryUserGroups_OrderBy,
 } from "@parallel/graphql/__types";
-import {
-  useAssertQuery,
-  useAssertQueryOrPreviousData,
-} from "@parallel/utils/apollo/useAssertQuery";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
+import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import { withError } from "@parallel/utils/promises/withError";
-import {
-  integer,
-  parseQuery,
-  sorting,
-  string,
-  useQueryState,
-  values,
-} from "@parallel/utils/queryState";
+import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
+import { isAdmin } from "@parallel/utils/roles";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isAdmin } from "@parallel/utils/roles";
-import { CopyIcon, DeleteIcon } from "@parallel/chakra/icons";
 
 const SORTING = ["name", "members", "createdAt"] as const;
 
@@ -70,27 +61,28 @@ function OrganizationGroups() {
     data: { me, realMe },
   } = useAssertQuery(OrganizationGroups_userDocument);
 
-  const {
-    data: { userGroups },
-    loading,
-    refetch,
-  } = useAssertQueryOrPreviousData(OrganizationGroups_userGroupsDocument, {
+  const { data, loading, refetch } = useQueryOrPreviousData(OrganizationGroups_userGroupsDocument, {
     variables: {
       offset: state.items * (state.page - 1),
       limit: state.items,
       search: state.search,
       sortBy: [`${state.sort.field}_${state.sort.direction}` as QueryUserGroups_OrderBy],
     },
+    fetchPolicy: "cache-and-network",
   });
+
+  const userGroups = data?.userGroups;
 
   const canEdit = isAdmin(me.role);
 
   const selectedGroups = useMemo(
     () =>
-      selected
-        .map((groupId) => userGroups.items.find((g) => g.id === groupId)!)
-        .filter((u) => u !== undefined),
-    [selected.join(","), userGroups.items]
+      loading
+        ? []
+        : selected
+            .map((groupId) => userGroups!.items.find((g) => g.id === groupId)!)
+            .filter((u) => u !== undefined),
+    [selected.join(","), userGroups?.items, loading]
   );
 
   const [search, setSearch] = useState(state.search);
@@ -261,13 +253,13 @@ function OrganizationGroups() {
           isSelectable={canEdit}
           isHighlightable
           columns={columns}
-          rows={userGroups.items}
+          rows={userGroups?.items ?? []}
           onRowClick={handleRowClick}
           rowKeyProp="id"
           loading={loading}
           page={state.page}
           pageSize={state.items}
-          totalCount={userGroups.totalCount}
+          totalCount={userGroups?.totalCount ?? 0}
           sort={state.sort}
           onSelectionChange={setSelected}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
@@ -309,7 +301,7 @@ function OrganizationGroups() {
             />
           }
           body={
-            userGroups.totalCount === 0 && !loading ? (
+            userGroups && userGroups.totalCount === 0 && !loading ? (
               state.search ? (
                 <Flex flex="1" alignItems="center" justifyContent="center">
                   <Text color="gray.300" fontSize="lg">
@@ -528,19 +520,8 @@ OrganizationGroups.queries = [
   `,
 ];
 
-OrganizationGroups.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
-  const { page, items, search, sort } = parseQuery(query, QUERY_STATE);
-  await Promise.all([
-    fetchQuery(OrganizationGroups_userGroupsDocument, {
-      variables: {
-        offset: items * (page - 1),
-        limit: items,
-        search,
-        sortBy: [`${sort.field}_${sort.direction}` as QueryUserGroups_OrderBy],
-      },
-    }),
-    fetchQuery(OrganizationGroups_userDocument),
-  ]);
+OrganizationGroups.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
+  await fetchQuery(OrganizationGroups_userDocument);
 };
 
 export default compose(withDialogs, withApolloData)(OrganizationGroups);

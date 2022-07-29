@@ -454,7 +454,7 @@ export type Mutation = {
   createOrganization: SupportMethodResponse;
   /** Creates a new PDF_DOCUMENT theme on the user's organization */
   createOrganizationPdfDocumentTheme: Organization;
-  /** Creates a new user in the same organization as the context user if is not provided */
+  /** Creates a new user in the same organization as the context user if `orgId` is not provided */
   createOrganizationUser: User;
   /** Create parallel. */
   createPetition: PetitionBase;
@@ -904,10 +904,11 @@ export type MutationcreatePetitionFieldAttachmentUploadLinkArgs = {
 };
 
 export type MutationcreatePetitionFieldCommentArgs = {
-  content: Scalars["String"];
+  content: Scalars["JSON"];
   isInternal?: InputMaybe<Scalars["Boolean"]>;
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
+  subscribeNoPermissions?: InputMaybe<Scalars["Boolean"]>;
 };
 
 export type MutationcreatePetitionFieldReplyArgs = {
@@ -1151,7 +1152,7 @@ export type MutationpublicCreateFileUploadReplyArgs = {
 };
 
 export type MutationpublicCreatePetitionFieldCommentArgs = {
-  content: Scalars["String"];
+  content: Scalars["JSON"];
   keycode: Scalars["ID"];
   petitionFieldId: Scalars["GID"];
 };
@@ -1240,7 +1241,7 @@ export type MutationpublicStartAsyncFieldCompletionArgs = {
 };
 
 export type MutationpublicUpdatePetitionFieldCommentArgs = {
-  content: Scalars["String"];
+  content: Scalars["JSON"];
   keycode: Scalars["ID"];
   petitionFieldCommentId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
@@ -1490,10 +1491,11 @@ export type MutationupdatePetitionFieldArgs = {
 };
 
 export type MutationupdatePetitionFieldCommentArgs = {
-  content: Scalars["String"];
+  content: Scalars["JSON"];
   petitionFieldCommentId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
+  subscribeNoPermissions?: InputMaybe<Scalars["Boolean"]>;
 };
 
 export type MutationupdatePetitionFieldRepliesStatusArgs = {
@@ -2276,8 +2278,10 @@ export type PetitionFieldAttachmentUploadData = {
 export type PetitionFieldComment = {
   /** The author of the comment. */
   author: Maybe<UserOrPetitionAccess>;
-  /** The content of the comment. */
-  content: Scalars["String"];
+  /** The JSON content of the comment. */
+  content: Scalars["JSON"];
+  /** The HTML content of the comment. */
+  contentHtml: Scalars["String"];
   /** Time when the comment was created. */
   createdAt: Scalars["DateTime"];
   field: PetitionField;
@@ -2290,6 +2294,24 @@ export type PetitionFieldComment = {
   isInternal: Scalars["Boolean"];
   /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
+  /** The mentiones of the comments. */
+  mentions: Array<PetitionFieldCommentMention>;
+};
+
+export type PetitionFieldCommentMention =
+  | PetitionFieldCommentUserGroupMention
+  | PetitionFieldCommentUserMention;
+
+/** A user group mention on a petition field comment */
+export type PetitionFieldCommentUserGroupMention = {
+  mentionedId: Scalars["GID"];
+  userGroup: Maybe<UserGroup>;
+};
+
+/** A user mention on a petition field comment */
+export type PetitionFieldCommentUserMention = {
+  mentionedId: Scalars["GID"];
+  user: Maybe<User>;
 };
 
 /** The progress of the petition */
@@ -2734,6 +2756,7 @@ export type PublicContact = {
   fullName: Scalars["String"];
   /** The ID of the contact. */
   id: Scalars["GID"];
+  isMe: Scalars["Boolean"];
   /** The last name of the user. */
   lastName: Maybe<Scalars["String"]>;
 };
@@ -2860,8 +2883,10 @@ export type PublicPetitionField = {
 export type PublicPetitionFieldComment = {
   /** The author of the comment. */
   author: Maybe<PublicUserOrContact>;
-  /** The content of the comment. */
-  content: Scalars["String"];
+  /** The JSON content of the comment. */
+  content: Scalars["JSON"];
+  /** The HTML content of the comment. */
+  contentHtml: Scalars["String"];
   /** Time when the comment was created. */
   createdAt: Scalars["DateTime"];
   field: PublicPetitionField;
@@ -3633,6 +3658,7 @@ export type User = Timestamps & {
   id: Scalars["GID"];
   /** The initials of the user. */
   initials: Maybe<Scalars["String"]>;
+  isMe: Scalars["Boolean"];
   isSsoUser: Scalars["Boolean"];
   isSuperAdmin: Scalars["Boolean"];
   lastActiveAt: Maybe<Scalars["DateTime"]>;
@@ -3684,6 +3710,7 @@ export type UserGroup = Timestamps & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  imMember: Scalars["Boolean"];
   initials: Scalars["String"];
   memberCount: Scalars["Int"];
   members: Array<UserGroupMember>;

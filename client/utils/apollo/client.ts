@@ -119,6 +119,10 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
                 }
               },
             },
+            petitions: {
+              keyArgs: ["offset", "limit", "search", "filters", "sortBy"],
+              merge: false,
+            },
           },
         },
         PetitionBase: {

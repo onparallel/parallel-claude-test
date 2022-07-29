@@ -27,6 +27,7 @@ import {
   OrganizationUsers_createOrganizationUserDocument,
   OrganizationUsers_deactivateUserDocument,
   OrganizationUsers_OrderBy,
+  OrganizationUsers_orgUsersDocument,
   OrganizationUsers_resetTemporaryPasswordDocument,
   OrganizationUsers_updateOrganizationUserDocument,
   OrganizationUsers_userDocument,
@@ -35,14 +36,14 @@ import {
   UserStatus,
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
-import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/useAssertQuery";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
+import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { withError } from "@parallel/utils/promises/withError";
 import {
   boolean,
   integer,
-  parseQuery,
   sorting,
   string,
   useQueryState,
@@ -76,11 +77,12 @@ function OrganizationUsers() {
   const intl = useIntl();
   const toast = useToast();
   const [state, setQueryState] = useQueryState(QUERY_STATE);
+
   const {
     data: { me, realMe },
-    loading,
-    refetch,
-  } = useAssertQueryOrPreviousData(OrganizationUsers_userDocument, {
+  } = useAssertQuery(OrganizationUsers_userDocument);
+
+  const { data, loading, refetch } = useQueryOrPreviousData(OrganizationUsers_orgUsersDocument, {
     variables: {
       offset: state.items * (state.page - 1),
       limit: state.items,
@@ -93,18 +95,30 @@ function OrganizationUsers() {
 
   const [showDialog, setShowDialog] = useQueryStateSlice(state, setQueryState, "dialog");
 
-  const hasSsoProvider = me.organization.hasSsoProvider;
-  const userList = me.organization.users;
+  const hasSsoProvider = data?.me.organization.hasSsoProvider ?? false;
+  const userList = data?.me.organization.users;
 
   const [selected, setSelected] = useState<string[]>([]);
 
   const selectedUsers = useMemo(
     () =>
-      selected
-        .map((userId) => userList.items.find((u) => u.id === userId)!)
-        .filter((u) => u !== undefined),
-    [selected.join(","), userList.items]
+      loading
+        ? []
+        : selected
+            .map((userId) => userList!.items.find((u) => u.id === userId)!)
+            .filter((u) => u !== undefined),
+    [selected.join(","), userList, loading]
   );
+
+  const isUserLimitReached = loading
+    ? false
+    : data!.me.organization.activeUserCount >= data!.me.organization.usageLimits.users.limit;
+
+  const isActivateUserButtonDisabled = loading
+    ? false
+    : data!.me.organization.activeUserCount +
+        selectedUsers.filter((u) => u.status === "INACTIVE").length >
+      data!.me.organization.usageLimits.users.limit;
 
   const [search, setSearch] = useState(state.search);
 
@@ -388,13 +402,6 @@ function OrganizationUsers() {
     }
   };
 
-  const isUserLimitReached =
-    me.organization.activeUserCount >= me.organization.usageLimits.users.limit;
-
-  const isActivateUserButtonDisabled =
-    me.organization.activeUserCount + selectedUsers.filter((u) => u.status === "INACTIVE").length >
-    me.organization.usageLimits.users.limit;
-
   return (
     <SettingsLayout
       title={intl.formatMessage({
@@ -422,12 +429,12 @@ function OrganizationUsers() {
           isSelectable={userIsAdmin}
           isHighlightable
           columns={columns}
-          rows={userList.items}
+          rows={userList?.items ?? []}
           rowKeyProp="id"
           loading={loading}
           page={state.page}
           pageSize={state.items}
-          totalCount={userList.totalCount}
+          totalCount={userList?.totalCount ?? 0}
           sort={state.sort}
           onSelectionChange={setSelected}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
@@ -743,15 +750,22 @@ const _mutations = [
 
 OrganizationUsers.queries = [
   gql`
-    query OrganizationUsers_user(
+    query OrganizationUsers_user {
+      ...SettingsLayout_Query
+      me {
+        hasGhostLogin: hasFeatureFlag(featureFlag: GHOST_LOGIN)
+      }
+    }
+    ${SettingsLayout.fragments.Query}
+  `,
+  gql`
+    query OrganizationUsers_orgUsers(
       $offset: Int!
       $limit: Int!
       $search: String
       $sortBy: [OrganizationUsers_OrderBy!]
     ) {
-      ...SettingsLayout_Query
       me {
-        hasGhostLogin: hasFeatureFlag(featureFlag: GHOST_LOGIN)
         organization {
           id
           hasSsoProvider
@@ -776,21 +790,12 @@ OrganizationUsers.queries = [
         }
       }
     }
-    ${SettingsLayout.fragments.Query}
     ${OrganizationUsers.fragments.User}
   `,
 ];
 
-OrganizationUsers.getInitialProps = async ({ fetchQuery, ...context }: WithApolloDataContext) => {
-  const { page, items, search, sort } = parseQuery(context.query, QUERY_STATE);
-  await fetchQuery(OrganizationUsers_userDocument, {
-    variables: {
-      offset: items * (page - 1),
-      limit: items,
-      search,
-      sortBy: [`${sort.field}_${sort.direction}` as OrganizationUsers_OrderBy],
-    },
-  });
+OrganizationUsers.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
+  await fetchQuery(OrganizationUsers_userDocument);
 };
 
 export default compose(withDialogs, withApolloData)(OrganizationUsers);

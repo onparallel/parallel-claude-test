@@ -15,7 +15,7 @@ import { WithChakraProps } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableProps, useTableColors } from "@parallel/components/common/Table";
-import { ComponentType, Key, ReactNode, useCallback, useMemo, useState } from "react";
+import { ComponentType, Key, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, pick } from "remeda";
 
@@ -72,7 +72,23 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
 }: WithChakraProps<"section", TablePageProps<TRow, TContext, TImpl>>) {
   const colors = useTableColors();
   const intl = useIntl();
-  const pagination = usePagination({ current: page, pageSize, totalCount });
+  const _pagination = usePagination({ current: page, pageSize, totalCount });
+  const [pagination, setPagination] = useState(_pagination);
+
+  useEffect(() => {
+    if (!loading) {
+      setPagination(_pagination);
+    }
+  }, [loading, _pagination]);
+
+  useEffect(() => {
+    // if page > max_pages, change to last page
+    const totalPages = Math.ceil(totalCount / pageSize);
+    if (!loading && totalPages && totalCount <= (page - 1) * pageSize) {
+      onPageChange?.(totalCount > 0 ? totalPages : 0);
+    }
+  }, [page, pageSize, totalCount, loading]);
+
   const bottom = (
     <>
       <Box paddingLeft={1}>
@@ -217,7 +233,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         minWidth="0"
         position="relative"
         overflowX="auto"
-        minHeight="128px"
+        minHeight="240px"
       >
         {loading ? (
           <Flex
