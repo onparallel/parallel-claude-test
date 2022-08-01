@@ -18,7 +18,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import Select, { components, SelectComponentsConfig, SelectInstance } from "react-select";
 import AsyncSelect from "react-select/async";
 import { indexBy, zip } from "remeda";
-import { UserDropdownEmtpy } from "./UserDropdownEmtpy";
+import { UserDropdownEmpty } from "./UserDropdownEmpty";
 import { UserGroupMembersPopover } from "./UserGroupMembersPopover";
 import { UserSelectOption } from "./UserSelectOption";
 
@@ -314,7 +314,7 @@ const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
     selectProps: { inputValue: search, canCreateUsers, includeGroups },
   } = props;
   return (
-    <UserDropdownEmtpy
+    <UserDropdownEmpty
       search={search}
       canCreateUsers={canCreateUsers}
       includeGroups={includeGroups}

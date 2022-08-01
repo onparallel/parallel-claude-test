@@ -366,7 +366,7 @@ export const publicCreatePetitionFieldComment = mutationField("publicCreatePetit
   authorize: chain(
     authenticatePublicAccess("keycode"),
     and(fieldBelongsToAccess("petitionFieldId"), fieldsHaveCommentsEnabled("petitionFieldId")),
-    validPetitionFieldCommentContent("content", "petitionFieldId", false)
+    validPetitionFieldCommentContent("content", "petitionFieldId")
   ),
   args: {
     keycode: nonNull(idArg()),
@@ -424,7 +424,7 @@ export const publicUpdatePetitionFieldComment = mutationField("publicUpdatePetit
   authorize: chain(
     authenticatePublicAccess("keycode"),
     and(fieldBelongsToAccess("petitionFieldId"), commentsBelongsToAccess("petitionFieldCommentId")),
-    validPetitionFieldCommentContent("content", "petitionFieldId", false)
+    validPetitionFieldCommentContent("content", "petitionFieldId")
   ),
   args: {
     keycode: nonNull(idArg()),

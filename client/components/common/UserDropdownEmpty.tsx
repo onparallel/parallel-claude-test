@@ -1,24 +1,24 @@
 import { Button, Stack, Text } from "@chakra-ui/react";
 import { FormattedMessage } from "react-intl";
-import { EmptySearchTemplatesIcon } from "../petition-new/icons/EmtpySearchTemplatesIcon";
+import { EmptySearchIcon } from "./icons/EmptySearchIcon";
 import { Link, NakedLink } from "./Link";
 
-interface UserDropdownEmtpyProps {
+interface UserDropdownEmptyProps {
   search: string;
   canCreateUsers?: boolean;
   includeGroups?: boolean;
 }
 
-export function UserDropdownEmtpy({
+export function UserDropdownEmpty({
   search,
   canCreateUsers,
   includeGroups,
-}: UserDropdownEmtpyProps) {
+}: UserDropdownEmptyProps) {
   return (
     <Stack alignItems="center" textAlign="center" padding={4} spacing={4} fontSize="sm">
       {search ? (
         <>
-          <EmptySearchTemplatesIcon flex={0} width="120px" />
+          <EmptySearchIcon flex={0} width="120px" />
           <Text as="strong">
             <FormattedMessage
               id="component.user-dropdown-empty.no-options"

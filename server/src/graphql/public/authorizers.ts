@@ -219,7 +219,7 @@ export function validPetitionFieldCommentContent<
 >(
   argContent: TArgContent,
   argFieldId: TArgFieldId,
-  allowMentions: boolean
+  allowMentions?: boolean
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx, info) => {
     const content = args[argContent] as any;
@@ -245,7 +245,7 @@ export function validPetitionFieldCommentContent<
             properties: {
               type: { const: "placeholder" },
               mention: { type: "string" },
-              children: { type: "array", items: { $ref: "#/definitions/leaf" } },
+              children: { type: "array", items: { $ref: "#/definitions/text" } },
             },
             additionalProperties: false,
             required: ["type", "mention", "children"],

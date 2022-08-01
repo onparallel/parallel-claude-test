@@ -1,7 +1,7 @@
 import { Center, Stack, Text } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { FormattedMessage } from "react-intl";
-import { EmptySearchTemplatesIcon } from "./icons/EmtpySearchTemplatesIcon";
+import { EmptySearchIcon } from "../common/icons/EmptySearchIcon";
 
 interface NewPetitionEmptySearchProps {
   onClickPublicTemplates?: () => void;
@@ -13,7 +13,7 @@ export const NewPetitionEmptySearch = chakraForwardRef<"div", NewPetitionEmptySe
     return (
       <Center ref={ref} {...props}>
         <Stack justifyContent="center" alignItems="center" paddingX={4}>
-          <EmptySearchTemplatesIcon maxWidth="166px" height="77px" width="100%" />
+          <EmptySearchIcon maxWidth="166px" height="77px" width="100%" />
           <Text paddingTop={6}>
             <FormattedMessage
               id="component.new-petition-empty-search.no-results"

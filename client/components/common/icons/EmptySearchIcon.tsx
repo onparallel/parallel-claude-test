@@ -1,7 +1,7 @@
 import { createIcon } from "@chakra-ui/icon";
 
-export const EmptySearchTemplatesIcon = createIcon({
-  displayName: "EmptySearchTemplatesIcon",
+export const EmptySearchIcon = createIcon({
+  displayName: "EmptySearchIcon",
   viewBox: "0 0 166 77",
   path: (
     <g>

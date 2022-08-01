@@ -5,7 +5,7 @@ import {
   ComboboxProps,
   PlateCombobox,
 } from "@parallel/components/common/slate/PlateCombobox";
-import { UserDropdownEmtpy } from "@parallel/components/common/UserDropdownEmtpy";
+import { UserDropdownEmpty } from "@parallel/components/common/UserDropdownEmpty";
 import { UserSelectOption } from "@parallel/components/common/UserSelectOption";
 import { createMentionPlugin_UserOrUserGroupFragment } from "@parallel/graphql/__types";
 import {
@@ -119,7 +119,7 @@ const RenderMentionable: RenderFunction<ComboboxItemProps<Mentionable>> =
   };
 
 const RenderNoItems: RenderFunction<{ search: string }> = function RenderNoItems({ search }) {
-  return <UserDropdownEmtpy search={search} includeGroups={true} />;
+  return <UserDropdownEmpty search={search} includeGroups={true} />;
 };
 
 function MentionElement({

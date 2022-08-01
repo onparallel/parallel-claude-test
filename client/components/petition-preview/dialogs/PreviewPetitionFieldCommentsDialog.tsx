@@ -134,7 +134,7 @@ export function PreviewPetitionFieldCommentsDialog({
 
   const searchUsers = useSearchUsers();
   const myId = useGetMyId();
-  const handleSearcMentionables = useCallback(
+  const handleSearchMentionables = useCallback(
     async (search: string) => {
       return await searchUsers(search, { includeGroups: true, excludeUsers: [myId] });
     },
@@ -238,7 +238,7 @@ export function PreviewPetitionFieldCommentsDialog({
                     onEdit={(content) => handleEditCommentContent(comment.id, content)}
                     onDelete={() => handleDeleteClick(comment.id)}
                     onMarkAsUnread={() => handleMarkAsUnread(comment.id)}
-                    onSearchMentionables={handleSearcMentionables}
+                    onSearchMentionables={handleSearchMentionables}
                   />
                 ))}
               </Stack>
@@ -265,7 +265,7 @@ export function PreviewPetitionFieldCommentsDialog({
             id={field.id}
             isDisabled={isDisabled}
             isTemplate={isTemplate ?? false}
-            onSearchMentionables={handleSearcMentionables}
+            onSearchMentionables={handleSearchMentionables}
             hasCommentsEnabled={hasCommentsEnabled && !onlyReadPermission}
             onSubmit={handleSubmitClick}
           />

@@ -64,7 +64,7 @@ export function PetitionRepliesFieldComments({
 
   const searchUsers = useSearchUsers();
   const myId = useGetMyId();
-  const handleSearcMentionables = useCallback(
+  const handleSearchMentionables = useCallback(
     async (search: string) => {
       return await searchUsers(search, { includeGroups: true, excludeUsers: [myId] });
     },
@@ -150,7 +150,7 @@ export function PetitionRepliesFieldComments({
               <PetitionFieldComment
                 key={comment.id}
                 comment={comment}
-                onSearchMentionables={handleSearcMentionables}
+                onSearchMentionables={handleSearchMentionables}
                 onEdit={(content) => onUpdateComment(comment.id, content)}
                 onDelete={() => onDeleteComment(comment.id)}
                 onMarkAsUnread={() => onMarkAsUnread(comment.id)}
@@ -165,7 +165,7 @@ export function PetitionRepliesFieldComments({
           id={field.id}
           isDisabled={isDisabled}
           isTemplate={false}
-          onSearchMentionables={handleSearcMentionables}
+          onSearchMentionables={handleSearchMentionables}
           hasCommentsEnabled={hasCommentsEnabled && !onlyReadPermission}
           onSubmit={async (content, isNote) => {
             await onAddComment(content, isNote);

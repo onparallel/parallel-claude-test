@@ -7,7 +7,7 @@ import {
 import { genericRsComponent } from "@parallel/utils/react-select/hooks";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { EmptySearchTemplatesIcon } from "../petition-new/icons/EmtpySearchTemplatesIcon";
+import { EmptySearchIcon } from "./icons/EmptySearchIcon";
 import { UserSelect, UserSelectProps } from "./UserSelect";
 
 interface UserGroupSelectProps<IsMulti extends boolean>
@@ -43,7 +43,7 @@ const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
     <Stack alignItems="center" textAlign="center" padding={4} spacing={4}>
       {search ? (
         <>
-          <EmptySearchTemplatesIcon width="166px" height="77px" />
+          <EmptySearchIcon width="166px" height="77px" />
           <Text as="strong">
             <FormattedMessage
               id="component.user-group-select.no-options"
