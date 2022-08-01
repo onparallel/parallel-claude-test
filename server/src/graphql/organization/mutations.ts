@@ -342,7 +342,7 @@ export const updateFeatureFlags = mutationField("updateFeatureFlags", {
       list(
         nonNull(
           inputObjectType({
-            name: "InputFeatureFlag",
+            name: "InputFeatureFlagNameValue",
             description: "A feature flag name with his value",
             definition(t) {
               t.nonNull.field("name", { type: "FeatureFlag" });
@@ -356,14 +356,12 @@ export const updateFeatureFlags = mutationField("updateFeatureFlags", {
   },
   authorize: authenticateAnd(userIsSuperAdmin()),
   resolve: async (_, { featureFlags, orgId }, ctx) => {
-    try {
-      const needRemoveBranding = featureFlags.some((f) => f.name === "REMOVE_PARALLEL_BRANDING");
+    const needRemoveBranding = featureFlags.some((f) => f.name === "REMOVE_PARALLEL_BRANDING");
 
-      await ctx.featureFlags.addOrUpdateFeatureFlagOverride(orgId, featureFlags);
-      if (needRemoveBranding) {
-        await ctx.signature.updateBranding(orgId);
-      }
-    } catch {}
+    await ctx.featureFlags.addOrUpdateFeatureFlagOverride(orgId, featureFlags);
+    if (needRemoveBranding) {
+      await ctx.signature.updateBranding(orgId);
+    }
 
     return (await ctx.organizations.loadOrg(orgId))!;
   },

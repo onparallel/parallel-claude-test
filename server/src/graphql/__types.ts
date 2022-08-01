@@ -105,7 +105,7 @@ export interface NexusGenInputs {
     height?: number | null; // Int
     width?: number | null; // Int
   };
-  InputFeatureFlag: {
+  InputFeatureFlagNameValue: {
     // input type
     name: NexusGenEnums["FeatureFlag"]; // FeatureFlag!
     value: boolean; // Boolean!
@@ -396,7 +396,7 @@ export interface NexusGenObjects {
     db.PetitionPermission,
     "petition_id" | "user_id" | "type" | "is_subscribed"
   >;
-  FeatureFlagEntry: {
+  FeatureFlagNameValue: {
     // root type
     name: NexusGenEnums["FeatureFlag"]; // FeatureFlag!
     value: boolean; // Boolean!
@@ -870,7 +870,7 @@ export interface NexusGenFieldTypes {
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
     user: NexusGenRootTypes["User"]; // User!
   };
-  FeatureFlagEntry: {
+  FeatureFlagNameValue: {
     // field return type
     name: NexusGenEnums["FeatureFlag"]; // FeatureFlag!
     value: boolean; // Boolean!
@@ -1184,7 +1184,7 @@ export interface NexusGenFieldTypes {
     brandTheme: NexusGenScalars["JSONObject"] | null; // JSONObject
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customHost: string | null; // String
-    features: NexusGenRootTypes["FeatureFlagEntry"][]; // [FeatureFlagEntry!]!
+    features: NexusGenRootTypes["FeatureFlagNameValue"][]; // [FeatureFlagNameValue!]!
     hasSsoProvider: boolean; // Boolean!
     iconUrl: string | null; // String
     id: NexusGenScalars["GID"]; // GID!
@@ -2422,7 +2422,7 @@ export interface NexusGenFieldTypeNames {
     permissionType: "PetitionPermissionType";
     user: "User";
   };
-  FeatureFlagEntry: {
+  FeatureFlagNameValue: {
     // field return type name
     name: "FeatureFlag";
     value: "Boolean";
@@ -2736,7 +2736,7 @@ export interface NexusGenFieldTypeNames {
     brandTheme: "JSONObject";
     createdAt: "DateTime";
     customHost: "String";
-    features: "FeatureFlagEntry";
+    features: "FeatureFlagNameValue";
     hasSsoProvider: "Boolean";
     iconUrl: "String";
     id: "GID";
@@ -4524,7 +4524,7 @@ export interface NexusGenArgTypes {
     };
     updateFeatureFlags: {
       // args
-      featureFlags: NexusGenInputs["InputFeatureFlag"][]; // [InputFeatureFlag!]!
+      featureFlags: NexusGenInputs["InputFeatureFlagNameValue"][]; // [InputFeatureFlagNameValue!]!
       orgId: NexusGenScalars["GID"]; // GID!
     };
     updateFieldPositions: {

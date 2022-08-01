@@ -24,8 +24,8 @@ export const FeatureFlag = enumType({
   sourceType: "db.FeatureFlagName",
 });
 
-export const FeatureFlagEntry = objectType({
-  name: "FeatureFlagEntry",
+export const FeatureFlagNameValue = objectType({
+  name: "FeatureFlagNameValue",
   description: "A feature flag name with his value",
   definition(t) {
     t.nonNull.field("name", { type: "FeatureFlag" });

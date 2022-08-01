@@ -132,7 +132,7 @@ export class FeatureFlagRepository extends BaseRepository {
     )
   );
 
-  async loadOrganizationFeatureFlags(orgId: number, t?: Knex.Transaction) {
+  async getOrganizationFeatureFlags(orgId: number, t?: Knex.Transaction) {
     const rows = await this.raw<{ name: FeatureFlagName; value: boolean }>(
       /* sql */ `
       select

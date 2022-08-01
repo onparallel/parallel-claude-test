@@ -2,20 +2,20 @@ import { FeatureFlag } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 
-type FeatureFlagDescription = {
-  [feature in FeatureFlag]?: {
-    name?: string;
-    description?: string;
-    articleId?: number;
-  };
-};
+interface FeatureFlagInformation {
+  name: FeatureFlag;
+  title: string;
+  description: string;
+  articleId?: number;
+}
 
-export function useFeatureFlagDescriptions(): FeatureFlagDescription {
+export function useFeatureFlags() {
   const intl = useIntl();
-  return useMemo(
-    () => ({
-      AUTO_ANONYMIZE: {
-        name: intl.formatMessage({
+  return useMemo<FeatureFlagInformation[]>(
+    () => [
+      {
+        name: "AUTO_ANONYMIZE",
+        title: intl.formatMessage({
           id: "component.feature-flag-descriptions.auto-anonymize-name",
           defaultMessage: "Compliance feature",
         }),
@@ -25,8 +25,9 @@ export function useFeatureFlagDescriptions(): FeatureFlagDescription {
             "Allows setting up a period of time for the parallels to be automatically anonymized after x days of their closing.",
         }),
       },
-      CUSTOM_HOST_UI: {
-        name: intl.formatMessage({
+      {
+        name: "CUSTOM_HOST_UI",
+        title: intl.formatMessage({
           id: "component.feature-flag-descriptions.custom-host-ui-name",
           defaultMessage: "Subdomain feature (UI)",
         }),
@@ -36,8 +37,9 @@ export function useFeatureFlagDescriptions(): FeatureFlagDescription {
             "Remove the enterprise banners around the button to request a subdomain change.",
         }),
       },
-      DEVELOPER_ACCESS: {
-        name: intl.formatMessage({
+      {
+        name: "DEVELOPER_ACCESS",
+        title: intl.formatMessage({
           id: "component.feature-flag-descriptions.developer-access-name",
           defaultMessage: "Developer access",
         }),
@@ -46,8 +48,9 @@ export function useFeatureFlagDescriptions(): FeatureFlagDescription {
           defaultMessage: "Gives access to the developers view.",
         }),
       },
-      ES_TAX_DOCUMENTS_FIELD: {
-        name: intl.formatMessage({
+      {
+        name: "ES_TAX_DOCUMENTS_FIELD",
+        title: intl.formatMessage({
           id: "component.feature-flag-descriptions.es-tax-documents-field-name",
           defaultMessage: "Tax documents field (ESP)",
         }),
@@ -56,8 +59,9 @@ export function useFeatureFlagDescriptions(): FeatureFlagDescription {
           defaultMessage: "Gives access to the Bankflip field.",
         }),
       },
-      EXPORT_CUATRECASAS: {
-        name: intl.formatMessage({
+      {
+        name: "EXPORT_CUATRECASAS",
+        title: intl.formatMessage({
           id: "component.feature-flag-descriptions.export-cuatrecasas-name",
           defaultMessage: "Export Cuatrecasas",
         }),
@@ -66,8 +70,9 @@ export function useFeatureFlagDescriptions(): FeatureFlagDescription {
           defaultMessage: "Allows Cuatrecasas to export the contents to its LocalAPI",
         }),
       },
-      GHOST_LOGIN: {
-        name: intl.formatMessage({
+      {
+        name: "GHOST_LOGIN",
+        title: intl.formatMessage({
           id: "component.feature-flag-descriptions.ghost-login-name",
           defaultMessage: '"Ghost login" feature',
         }),
@@ -76,8 +81,9 @@ export function useFeatureFlagDescriptions(): FeatureFlagDescription {
           defaultMessage: "Allows the admins to login as users from their organization.",
         }),
       },
-      HIDE_RECIPIENT_VIEW_CONTENTS: {
-        name: intl.formatMessage({
+      {
+        name: "HIDE_RECIPIENT_VIEW_CONTENTS",
+        title: intl.formatMessage({
           id: "component.feature-flag-descriptions.hide-recipient-view-contents-name",
           defaultMessage: "Hide recipient view contents",
         }),
@@ -87,8 +93,9 @@ export function useFeatureFlagDescriptions(): FeatureFlagDescription {
             "Activate the setting to hide the table of contents in the recipient view.",
         }),
       },
-      ON_BEHALF_OF: {
-        name: intl.formatMessage({
+      {
+        name: "ON_BEHALF_OF",
+        title: intl.formatMessage({
           id: "component.feature-flag-descriptions.on-behalf-of-name",
           defaultMessage: '"Send as" feature',
         }),
@@ -98,8 +105,9 @@ export function useFeatureFlagDescriptions(): FeatureFlagDescription {
             "Add the option to send parallels on behalf of another user from their organization.",
         }),
       },
-      PETITION_ACCESS_RECIPIENT_URL_FIELD: {
-        name: intl.formatMessage({
+      {
+        name: "PETITION_ACCESS_RECIPIENT_URL_FIELD",
+        title: intl.formatMessage({
           id: "component.feature-flag-descriptions.petition-access-recipient-url-field-name",
           defaultMessage: "API access to the recipient's URL",
         }),
@@ -109,8 +117,9 @@ export function useFeatureFlagDescriptions(): FeatureFlagDescription {
             "Allows obtaining the url of the recipient view through the API. Only for Paymefy type applications that validate the user's identity.",
         }),
       },
-      PETITION_PDF_EXPORT: {
-        name: intl.formatMessage({
+      {
+        name: "PETITION_PDF_EXPORT",
+        title: intl.formatMessage({
           id: "component.feature-flag-descriptions.petition-pdf-export-name",
           defaultMessage: "PDF export",
         }),
@@ -119,8 +128,9 @@ export function useFeatureFlagDescriptions(): FeatureFlagDescription {
           defaultMessage: "Allows exporting the parallel to PDF.",
         }),
       },
-      PETITION_SIGNATURE: {
-        name: intl.formatMessage({
+      {
+        name: "PETITION_SIGNATURE",
+        title: intl.formatMessage({
           id: "component.feature-flag-descriptions.petition-signature-name",
           defaultMessage: "Signaturit Integration",
         }),
@@ -130,8 +140,9 @@ export function useFeatureFlagDescriptions(): FeatureFlagDescription {
             "Activates the Signaturit integration section so that the TOKEN API can be entered.",
         }),
       },
-      PUBLIC_PETITION_LINK_PREFILL_SECRET_UI: {
-        name: intl.formatMessage({
+      {
+        name: "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI",
+        title: intl.formatMessage({
           id: "component.feature-flag-descriptions.prefill-public-links-name",
           defaultMessage: "Pre-fill public links (UI)",
         }),
@@ -141,8 +152,9 @@ export function useFeatureFlagDescriptions(): FeatureFlagDescription {
         }),
         articleId: 6261913,
       },
-      REMOVE_PARALLEL_BRANDING: {
-        name: intl.formatMessage({
+      {
+        name: "REMOVE_PARALLEL_BRANDING",
+        title: intl.formatMessage({
           id: "component.feature-flag-descriptions.remove-parallel-branding-name",
           defaultMessage: "Remove Parallel branding",
         }),
@@ -152,8 +164,9 @@ export function useFeatureFlagDescriptions(): FeatureFlagDescription {
             'Eliminates all Parallel branding from recipient and mailing view (including "Why we use Parallel")',
         }),
       },
-      REMOVE_WHY_WE_USE_PARALLEL: {
-        name: intl.formatMessage({
+      {
+        name: "REMOVE_WHY_WE_USE_PARALLEL",
+        title: intl.formatMessage({
           id: "component.feature-flag-descriptions.remove-why-we-use-parallel-name",
           defaultMessage: 'Remove "Why do we use Parallel?"',
         }),
@@ -162,8 +175,9 @@ export function useFeatureFlagDescriptions(): FeatureFlagDescription {
           defaultMessage: 'Removes the "Why we use Parallel" block in mails to recipients',
         }),
       },
-      SKIP_FORWARD_SECURITY: {
-        name: intl.formatMessage({
+      {
+        name: "SKIP_FORWARD_SECURITY",
+        title: intl.formatMessage({
           id: "component.feature-flag-descriptions.skip-forward-security-name",
           defaultMessage: "Feature Disable forwarding protection",
         }),
@@ -173,7 +187,7 @@ export function useFeatureFlagDescriptions(): FeatureFlagDescription {
             "Enables the setting for the request to skip recipient verification (forward security).",
         }),
       },
-    }),
+    ],
     [intl.locale]
   );
 }

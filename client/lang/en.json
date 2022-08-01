@@ -4490,6 +4490,16 @@
     "context": "Enter the signer's information"
   },
   {
+    "term": "components.admin-organizations-tabs.features",
+    "definition": "Features",
+    "context": "Features"
+  },
+  {
+    "term": "components.admin-organizations-tabs.users",
+    "definition": "Users",
+    "context": "Users"
+  },
+  {
     "term": "components.confirm-discard-changes-dialog.body",
     "definition": "You have unsaved changes. Would you like to discard them?",
     "context": "You have unsaved changes. Would you like to discard them?"
@@ -5465,6 +5475,11 @@
     "context": "Help"
   },
   {
+    "term": "generic.help-center-article",
+    "definition": "Help center article",
+    "context": "Help center article"
+  },
+  {
     "term": "generic.help-question",
     "definition": "Help?",
     "context": "Help?"
@@ -5563,11 +5578,6 @@
     "term": "generic.no-deadline",
     "definition": "No deadline",
     "context": "No deadline"
-  },
-  {
-    "term": "generic.no-description",
-    "definition": "No description",
-    "context": "No description"
   },
   {
     "term": "generic.not-available",
@@ -6465,19 +6475,9 @@
     "context": "{amount} years"
   },
   {
-    "term": "page.oganizations.features",
-    "definition": "Features",
-    "context": "Features"
-  },
-  {
     "term": "page.oganizations.features-active",
     "definition": "Enabled features",
     "context": "Enabled features"
-  },
-  {
-    "term": "page.oganizations.users",
-    "definition": "Users",
-    "context": "Users"
   },
   {
     "term": "page.petition-replies.export-pdf",

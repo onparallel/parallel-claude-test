@@ -88,6 +88,11 @@ const config = {
     return [
       { source: "/invite", destination: "/signup", permanent: true },
       { source: "/app/settings/tokens", destination: "/app/settings/developers", permanent: true },
+      {
+        source: "/app/admin/organizations/:organizationId",
+        destination: "/app/admin/organizations/:organizationId/users",
+        permanent: false,
+      },
     ];
   },
   productionBrowserSourceMaps: true,

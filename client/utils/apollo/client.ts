@@ -200,6 +200,7 @@ export function createApolloClient(initialState: any, { req }: CreateApolloClien
             usageLimits: { merge: true },
             integrations: { merge: false },
             pdfDocumentThemes: { merge: false },
+            features: { merge: mergeArraysBy(["name"]) },
           },
         },
         User: {

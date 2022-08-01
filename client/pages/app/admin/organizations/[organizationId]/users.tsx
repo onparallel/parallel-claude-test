@@ -1,21 +1,38 @@
 import { gql, useMutation } from "@apollo/client";
 import { Badge, Flex, Text, Tooltip, useToast } from "@chakra-ui/react";
 import { ForbiddenIcon, LogInIcon } from "@parallel/chakra/icons";
+import { AdminOrganizationsLayout } from "@parallel/components/admin-organizations/AdminOrganizationsLayout";
 import { DateTime } from "@parallel/components/common/DateTime";
+import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
+import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
 import { useInviteUserDialog } from "@parallel/components/organization/dialogs/InviteUserDialog";
 import { OrganizationMembersListTableHeader } from "@parallel/components/organization/OrganizationMembersListTableHeader";
 import {
-  OrganizationMembers_OrganizationUserFragment,
+  AdminOrganizationsMembers_createOrganizationUserDocument,
+  AdminOrganizationsMembers_organizationDocument,
+  AdminOrganizationsMembers_OrganizationUserFragment,
+  AdminOrganizationsMembers_queryDocument,
   OrganizationRole,
-  OrganizationUsersTab_createOrganizationUserDocument,
-  OrganizationUsersTab_OrganizationFragment,
-  OrganizationUsersTab_OrganizationUserFragment,
+  OrganizationUsers_OrderBy,
 } from "@parallel/graphql/__types";
-import { USERS_QUERY_STATE } from "@parallel/pages/app/admin/organizations/[organizationId]";
+import {
+  useAssertQuery,
+  useAssertQueryOrPreviousData,
+} from "@parallel/utils/apollo/useAssertQuery";
+import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
-import { useQueryState } from "@parallel/utils/queryState";
+import {
+  integer,
+  parseQuery,
+  sorting,
+  string,
+  useQueryState,
+  values,
+} from "@parallel/utils/queryState";
+import { UnwrapPromise } from "@parallel/utils/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useLoginAs } from "@parallel/utils/useLoginAs";
@@ -24,36 +41,58 @@ import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
 
-type OrganizationUsersTabProps = {
-  myId: string;
-  organization: OrganizationUsersTab_OrganizationFragment;
-  users: OrganizationUsersTab_OrganizationUserFragment[];
-  totalCount: number;
-  isLoading: boolean;
-  refetch: () => void;
+const SORTING = ["fullName", "email", "createdAt", "lastActiveAt"] as const;
+
+export const USERS_QUERY_STATE = {
+  page: integer({ min: 1 }).orDefault(1),
+  search: string(),
+  items: values([10, 25, 50]).orDefault(10),
+  sort: sorting(SORTING).orDefault({
+    field: "createdAt",
+    direction: "ASC",
+  }),
 };
 
-export function OrganizationUsersTab({
-  myId,
-  organization,
-  users,
-  totalCount,
-  isLoading,
-  refetch,
-}: OrganizationUsersTabProps) {
-  const intl = useIntl();
-  const toast = useToast();
+type AdminOrganizationsMembersProps = UnwrapPromise<
+  ReturnType<typeof AdminOrganizationsMembers.getInitialProps>
+>;
+
+function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembersProps) {
+  const {
+    data: { me, realMe },
+  } = useAssertQuery(AdminOrganizationsMembers_queryDocument);
 
   const [state, setQueryState] = useQueryState(USERS_QUERY_STATE);
+  const { data, loading, refetch } = useAssertQueryOrPreviousData(
+    AdminOrganizationsMembers_organizationDocument,
+    {
+      variables: {
+        id: organizationId,
+        offset: state.items * (state.page - 1),
+        limit: state.items,
+        search: state.search,
+        sortBy: [`${state.sort.field}_${state.sort.direction}` as OrganizationUsers_OrderBy],
+      },
+    }
+  );
+
   const [search, setSearch] = useState(state.search);
   const [selected, setSelected] = useState<string[]>([]);
+
+  const organization = data.organization!;
+  const users = organization.users.items;
+
+  const intl = useIntl();
+  const toast = useToast();
 
   const selectedUsers = useMemo(
     () => selected.map((userId) => users.find((u) => u.id === userId)).filter(isDefined),
     [selected.join(","), users]
   );
 
-  const [createOrganizationUser] = useMutation(OrganizationUsersTab_createOrganizationUserDocument);
+  const [createOrganizationUser] = useMutation(
+    AdminOrganizationsMembers_createOrganizationUserDocument
+  );
   const showInviteUserDialog = useInviteUserDialog();
   async function handleInviteUser() {
     try {
@@ -118,79 +157,81 @@ export function OrganizationUsersTab({
   };
 
   return (
-    <Flex flexDirection="column" flex="1" minHeight={0} padding={4} paddingBottom={16}>
-      <TablePage
-        flex="0 1 auto"
-        minHeight={0}
-        isSelectable
-        isHighlightable
-        columns={columns}
-        rows={users ?? []}
-        rowKeyProp="id"
-        loading={isLoading}
-        page={state.page}
-        pageSize={state.items}
-        totalCount={totalCount ?? 0}
-        sort={state.sort}
-        onSelectionChange={setSelected}
-        onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
-        onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
-        onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
-        actions={[
-          {
-            key: "login-as",
-            onClick: handleLoginAs,
-            isDisabled:
-              selectedUsers.length !== 1 ||
-              selectedUsers[0].id === myId ||
-              selectedUsers[0].status === "INACTIVE",
-            leftIcon: <LogInIcon />,
-            children: (
-              <FormattedMessage id="organization-users.login-as" defaultMessage="Login as..." />
-            ),
-          },
-        ]}
-        header={
-          <OrganizationMembersListTableHeader
-            search={search}
-            onReload={() => refetch()}
-            onSearchChange={handleSearchChange}
-            onInviteClick={handleInviteUser}
-            hasSsoProvider={organization.hasSsoProvider}
-          />
-        }
-        body={
-          users.length === 0 && !isLoading ? (
-            state.search ? (
-              <Flex flex="1" alignItems="center" justifyContent="center">
-                <Text color="gray.300" fontSize="lg">
-                  <FormattedMessage
-                    id="view.group.no-results"
-                    defaultMessage="There's no users matching your search"
-                  />
-                </Text>
-              </Flex>
-            ) : (
-              <Flex flex="1" alignItems="center" justifyContent="center">
-                <Text fontSize="lg">
-                  <FormattedMessage
-                    id="view.group.no-users"
-                    defaultMessage="No users added to this team yet"
-                  />
-                </Text>
-              </Flex>
-            )
-          ) : null
-        }
-      />
-    </Flex>
+    <AdminOrganizationsLayout tabKey="users" me={me} realMe={realMe}>
+      <Flex flexDirection="column" flex="1" minHeight={0} padding={4} paddingBottom={16}>
+        <TablePage
+          flex="0 1 auto"
+          minHeight={0}
+          isSelectable
+          isHighlightable
+          columns={columns}
+          rows={users ?? []}
+          rowKeyProp="id"
+          loading={loading}
+          page={state.page}
+          pageSize={state.items}
+          totalCount={data.organization?.users.totalCount ?? 0}
+          sort={state.sort}
+          onSelectionChange={setSelected}
+          onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
+          onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
+          onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
+          actions={[
+            {
+              key: "login-as",
+              onClick: handleLoginAs,
+              isDisabled:
+                selectedUsers.length !== 1 ||
+                selectedUsers[0].id === me.id ||
+                selectedUsers[0].status === "INACTIVE",
+              leftIcon: <LogInIcon />,
+              children: (
+                <FormattedMessage id="organization-users.login-as" defaultMessage="Login as..." />
+              ),
+            },
+          ]}
+          header={
+            <OrganizationMembersListTableHeader
+              search={search}
+              onReload={() => refetch()}
+              onSearchChange={handleSearchChange}
+              onInviteClick={handleInviteUser}
+              hasSsoProvider={organization.hasSsoProvider}
+            />
+          }
+          body={
+            users.length === 0 && !loading ? (
+              state.search ? (
+                <Flex flex="1" alignItems="center" justifyContent="center">
+                  <Text color="gray.300" fontSize="lg">
+                    <FormattedMessage
+                      id="view.group.no-results"
+                      defaultMessage="There's no users matching your search"
+                    />
+                  </Text>
+                </Flex>
+              ) : (
+                <Flex flex="1" alignItems="center" justifyContent="center">
+                  <Text fontSize="lg">
+                    <FormattedMessage
+                      id="view.group.no-users"
+                      defaultMessage="No users added to this team yet"
+                    />
+                  </Text>
+                </Flex>
+              )
+            ) : null
+          }
+        />
+      </Flex>
+    </AdminOrganizationsLayout>
   );
 }
 
 function useOrganizationMembersTableColumns() {
   const intl = useIntl();
   const roles = useOrganizationRoles();
-  return useMemo<TableColumn<OrganizationMembers_OrganizationUserFragment>[]>(
+  return useMemo<TableColumn<AdminOrganizationsMembers_OrganizationUserFragment>[]>(
     () => [
       {
         key: "id",
@@ -342,34 +383,66 @@ function useOrganizationMembersTableColumns() {
   );
 }
 
-OrganizationUsersTab.fragments = {
-  get OrganizationUser() {
-    return gql`
-      fragment OrganizationUsersTab_OrganizationUser on User {
-        id
-        fullName
-        email
-        role
-        createdAt
-        lastActiveAt
-        status
-      }
-    `;
-  },
-  get Organization() {
-    return gql`
-      fragment OrganizationUsersTab_Organization on Organization {
-        id
-        name
-        hasSsoProvider
-      }
-    `;
-  },
+AdminOrganizationsMembers.fragments = {
+  OrganizationUser: gql`
+    fragment AdminOrganizationsMembers_OrganizationUser on User {
+      id
+      fullName
+      email
+      role
+      createdAt
+      lastActiveAt
+      status
+    }
+  `,
+  Organization: gql`
+    fragment AdminOrganizationsMembers_Organization on Organization {
+      id
+      name
+      hasSsoProvider
+    }
+  `,
 };
 
-OrganizationUsersTab.mutations = [
+const _queries = [
   gql`
-    mutation OrganizationUsersTab_createOrganizationUser(
+    query AdminOrganizationsMembers_query {
+      ...AdminOrganizationsLayout_Query
+    }
+    ${AdminOrganizationsLayout.fragments.Query}
+  `,
+  gql`
+    query AdminOrganizationsMembers_organization(
+      $id: GID!
+      $offset: Int!
+      $limit: Int!
+      $search: String
+      $sortBy: [OrganizationUsers_OrderBy!]
+    ) {
+      organization(id: $id) {
+        ...AdminOrganizationsMembers_Organization
+        users(
+          offset: $offset
+          limit: $limit
+          search: $search
+          sortBy: $sortBy
+          includeInactive: true
+        ) {
+          totalCount
+          items {
+            ...AdminOrganizationsMembers_OrganizationUser
+          }
+        }
+      }
+    }
+    ${AdminOrganizationsMembers.fragments.OrganizationUser}
+    ${AdminOrganizationsMembers.fragments.Organization}
+  `,
+];
+
+const _mutations = [
+  gql`
+    mutation AdminOrganizationsMembers_createOrganizationUser(
       $firstName: String!
       $lastName: String!
       $email: String!
@@ -385,9 +458,35 @@ OrganizationUsersTab.mutations = [
         locale: $locale
         orgId: $orgId
       ) {
-        ...OrganizationUsersTab_OrganizationUser
+        ...AdminOrganizationsMembers_OrganizationUser
       }
     }
-    ${OrganizationUsersTab.fragments.OrganizationUser}
+    ${AdminOrganizationsMembers.fragments.OrganizationUser}
   `,
 ];
+
+AdminOrganizationsMembers.getInitialProps = async ({
+  query,
+  fetchQuery,
+}: WithApolloDataContext) => {
+  const { page, items, search, sort } = parseQuery(query, USERS_QUERY_STATE);
+  await Promise.all([
+    fetchQuery(AdminOrganizationsMembers_organizationDocument, {
+      variables: {
+        id: query!.organizationId as string,
+        offset: items * (page - 1),
+        limit: items,
+        search,
+        sortBy: [`${sort.field}_${sort.direction}` as OrganizationUsers_OrderBy],
+      },
+    }),
+    fetchQuery(AdminOrganizationsMembers_queryDocument),
+  ]);
+  return { organizationId: query.organizationId as string };
+};
+
+export default compose(
+  withSuperAdminAccess,
+  withDialogs,
+  withApolloData
+)(AdminOrganizationsMembers);

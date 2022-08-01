@@ -236,8 +236,8 @@ export type FeatureFlag =
   | "SKIP_FORWARD_SECURITY";
 
 /** A feature flag name with his value */
-export interface FeatureFlagEntry {
-  __typename?: "FeatureFlagEntry";
+export interface FeatureFlagNameValue {
+  __typename?: "FeatureFlagNameValue";
   name: FeatureFlag;
   value: Scalars["Boolean"];
 }
@@ -331,7 +331,7 @@ export interface ImageOptionsResize {
 export type ImageOptionsResizeFit = "contain" | "cover" | "fill" | "inside" | "outside";
 
 /** A feature flag name with his value */
-export interface InputFeatureFlag {
+export interface InputFeatureFlagNameValue {
   name: FeatureFlag;
   value: Scalars["Boolean"];
 }
@@ -1429,7 +1429,7 @@ export interface MutationupdateFeatureFlagArgs {
 }
 
 export interface MutationupdateFeatureFlagsArgs {
-  featureFlags: Array<InputFeatureFlag>;
+  featureFlags: Array<InputFeatureFlagNameValue>;
   orgId: Scalars["GID"];
 }
 
@@ -1697,7 +1697,7 @@ export interface Organization extends Timestamps {
   /** Custom host used in petition links and public links. */
   customHost?: Maybe<Scalars["String"]>;
   /** A list of all feature flag and the value asigned to this org */
-  features: Array<FeatureFlagEntry>;
+  features: Array<FeatureFlagNameValue>;
   /** Whether the organization has an SSO provider configured. */
   hasSsoProvider: Scalars["Boolean"];
   /** URL of the organization logo */
@@ -3927,62 +3927,37 @@ export interface VerificationCodeRequest {
   token: Scalars["ID"];
 }
 
-export type OrganizationFeaturesTab_OrganizationFragment = {
-  __typename?: "Organization";
-  id: string;
-  features: Array<{ __typename?: "FeatureFlagEntry"; name: FeatureFlag; value: boolean }>;
-};
-
-export type OrganizationFeaturesTab_updateFeatureFlagsMutationVariables = Exact<{
-  orgId: Scalars["GID"];
-  featureFlags: Array<InputFeatureFlag> | InputFeatureFlag;
-}>;
-
-export type OrganizationFeaturesTab_updateFeatureFlagsMutation = {
-  updateFeatureFlags: {
-    __typename?: "Organization";
-    id: string;
-    features: Array<{ __typename?: "FeatureFlagEntry"; name: FeatureFlag; value: boolean }>;
-  };
-};
-
-export type OrganizationUsersTab_OrganizationUserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: string | null;
-  email: string;
-  role: OrganizationRole;
-  createdAt: string;
-  lastActiveAt?: string | null;
-  status: UserStatus;
-};
-
-export type OrganizationUsersTab_OrganizationFragment = {
-  __typename?: "Organization";
-  id: string;
-  name: string;
-  hasSsoProvider: boolean;
-};
-
-export type OrganizationUsersTab_createOrganizationUserMutationVariables = Exact<{
-  firstName: Scalars["String"];
-  lastName: Scalars["String"];
-  email: Scalars["String"];
-  role: OrganizationRole;
-  locale?: InputMaybe<Scalars["String"]>;
-  orgId?: InputMaybe<Scalars["GID"]>;
-}>;
-
-export type OrganizationUsersTab_createOrganizationUserMutation = {
-  createOrganizationUser: {
+export type AdminOrganizationsLayout_QueryFragment = {
+  me: {
     __typename?: "User";
     id: string;
     fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
     email: string;
-    role: OrganizationRole;
     createdAt: string;
-    lastActiveAt?: string | null;
-    status: UserStatus;
+    role: OrganizationRole;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organization: {
+      __typename?: "Organization";
+      name: string;
+      id: string;
+      iconUrl92?: string | null;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
+    };
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
   };
 };
 
@@ -11559,28 +11534,22 @@ export type Admin_userQuery = {
   };
 };
 
-export type OrganizationMembers_OrganizationUserFragment = {
-  __typename?: "User";
-  id: string;
-  fullName?: string | null;
-  email: string;
-  role: OrganizationRole;
-  createdAt: string;
-  lastActiveAt?: string | null;
-  status: UserStatus;
-};
-
-export type OrganizationMembers_OrganizationFragment = {
+export type AdminOrganizationsFeatures_OrganizationFragment = {
   __typename?: "Organization";
   id: string;
-  name: string;
-  hasSsoProvider: boolean;
-  features: Array<{ __typename?: "FeatureFlagEntry"; name: FeatureFlag; value: boolean }>;
+  features: Array<{ __typename?: "FeatureFlagNameValue"; name: FeatureFlag; value: boolean }>;
 };
 
-export type OrganizationMembers_userQueryVariables = Exact<{ [key: string]: never }>;
+export type AdminOrganizationsFeatures_queryQueryVariables = Exact<{
+  id: Scalars["GID"];
+}>;
 
-export type OrganizationMembers_userQuery = {
+export type AdminOrganizationsFeatures_queryQuery = {
+  organization?: {
+    __typename?: "Organization";
+    id: string;
+    features: Array<{ __typename?: "FeatureFlagNameValue"; name: FeatureFlag; value: boolean }>;
+  } | null;
   me: {
     __typename?: "User";
     id: string;
@@ -11595,8 +11564,8 @@ export type OrganizationMembers_userQuery = {
     initials?: string | null;
     organization: {
       __typename?: "Organization";
-      id: string;
       name: string;
+      id: string;
       iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
@@ -11614,7 +11583,74 @@ export type OrganizationMembers_userQuery = {
   };
 };
 
-export type OrganizationMembers_organizationQueryVariables = Exact<{
+export type AdminOrganizationsFeatures_updateFeatureFlagsMutationVariables = Exact<{
+  orgId: Scalars["GID"];
+  featureFlags: Array<InputFeatureFlagNameValue> | InputFeatureFlagNameValue;
+}>;
+
+export type AdminOrganizationsFeatures_updateFeatureFlagsMutation = {
+  updateFeatureFlags: {
+    __typename?: "Organization";
+    id: string;
+    features: Array<{ __typename?: "FeatureFlagNameValue"; name: FeatureFlag; value: boolean }>;
+  };
+};
+
+export type AdminOrganizationsMembers_OrganizationUserFragment = {
+  __typename?: "User";
+  id: string;
+  fullName?: string | null;
+  email: string;
+  role: OrganizationRole;
+  createdAt: string;
+  lastActiveAt?: string | null;
+  status: UserStatus;
+};
+
+export type AdminOrganizationsMembers_OrganizationFragment = {
+  __typename?: "Organization";
+  id: string;
+  name: string;
+  hasSsoProvider: boolean;
+};
+
+export type AdminOrganizationsMembers_queryQueryVariables = Exact<{ [key: string]: never }>;
+
+export type AdminOrganizationsMembers_queryQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    email: string;
+    createdAt: string;
+    role: OrganizationRole;
+    isSuperAdmin: boolean;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organization: {
+      __typename?: "Organization";
+      name: string;
+      id: string;
+      iconUrl92?: string | null;
+      usageLimits: {
+        __typename?: "OrganizationUsageLimit";
+        petitions: { __typename?: "OrganizationUsagePetitionLimit"; limit: number; used: number };
+      };
+    };
+  };
+  realMe: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+    initials?: string | null;
+    organizations: Array<{ __typename?: "Organization"; id: string }>;
+  };
+};
+
+export type AdminOrganizationsMembers_organizationQueryVariables = Exact<{
   id: Scalars["GID"];
   offset: Scalars["Int"];
   limit: Scalars["Int"];
@@ -11622,7 +11658,7 @@ export type OrganizationMembers_organizationQueryVariables = Exact<{
   sortBy?: InputMaybe<Array<OrganizationUsers_OrderBy> | OrganizationUsers_OrderBy>;
 }>;
 
-export type OrganizationMembers_organizationQuery = {
+export type AdminOrganizationsMembers_organizationQuery = {
   organization?: {
     __typename?: "Organization";
     id: string;
@@ -11642,8 +11678,29 @@ export type OrganizationMembers_organizationQuery = {
         status: UserStatus;
       }>;
     };
-    features: Array<{ __typename?: "FeatureFlagEntry"; name: FeatureFlag; value: boolean }>;
   } | null;
+};
+
+export type AdminOrganizationsMembers_createOrganizationUserMutationVariables = Exact<{
+  firstName: Scalars["String"];
+  lastName: Scalars["String"];
+  email: Scalars["String"];
+  role: OrganizationRole;
+  locale?: InputMaybe<Scalars["String"]>;
+  orgId?: InputMaybe<Scalars["GID"]>;
+}>;
+
+export type AdminOrganizationsMembers_createOrganizationUserMutation = {
+  createOrganizationUser: {
+    __typename?: "User";
+    id: string;
+    fullName?: string | null;
+    email: string;
+    role: OrganizationRole;
+    createdAt: string;
+    lastActiveAt?: string | null;
+    status: UserStatus;
+  };
 };
 
 export type AdminOrganizations_OrganizationFragment = {
@@ -21841,6 +21898,81 @@ export const UserAvatar_UserFragmentDoc = gql`
     initials
   }
 ` as unknown as DocumentNode<UserAvatar_UserFragment, unknown>;
+export const UserMenu_QueryFragmentDoc = gql`
+  fragment UserMenu_Query on Query {
+    me {
+      id
+      isSuperAdmin
+      role
+      email
+      ...UserAvatar_User
+    }
+    realMe {
+      id
+      ...UserAvatar_User
+    }
+  }
+  ${UserAvatar_UserFragmentDoc}
+` as unknown as DocumentNode<UserMenu_QueryFragment, unknown>;
+export const AppLayoutNavbar_QueryFragmentDoc = gql`
+  fragment AppLayoutNavbar_Query on Query {
+    ...UserMenu_Query
+    realMe {
+      id
+      organizations {
+        id
+      }
+    }
+    me {
+      id
+      role
+      organization {
+        id
+        name
+        iconUrl92: iconUrl(options: { resize: { width: 92 } })
+        usageLimits {
+          petitions {
+            limit
+            used
+          }
+        }
+      }
+    }
+  }
+  ${UserMenu_QueryFragmentDoc}
+` as unknown as DocumentNode<AppLayoutNavbar_QueryFragment, unknown>;
+export const AppLayout_QueryFragmentDoc = gql`
+  fragment AppLayout_Query on Query {
+    me {
+      id
+      fullName
+      firstName
+      lastName
+      email
+      createdAt
+      role
+    }
+    ...AppLayoutNavbar_Query
+  }
+  ${AppLayoutNavbar_QueryFragmentDoc}
+` as unknown as DocumentNode<AppLayout_QueryFragment, unknown>;
+export const SettingsLayout_QueryFragmentDoc = gql`
+  fragment SettingsLayout_Query on Query {
+    ...AppLayout_Query
+  }
+  ${AppLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<SettingsLayout_QueryFragment, unknown>;
+export const AdminOrganizationsLayout_QueryFragmentDoc = gql`
+  fragment AdminOrganizationsLayout_Query on Query {
+    ...SettingsLayout_Query
+    me {
+      organization {
+        name
+      }
+    }
+  }
+  ${SettingsLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<AdminOrganizationsLayout_QueryFragment, unknown>;
 export const AlreadyLoggedIn_UserFragmentDoc = gql`
   fragment AlreadyLoggedIn_User on User {
     email
@@ -22676,8 +22808,17 @@ export const CreateEventSubscriptionDialog_PetitionBaseFragmentDoc = gql`
     name
   }
 ` as unknown as DocumentNode<CreateEventSubscriptionDialog_PetitionBaseFragment, unknown>;
-export const OrganizationUsersTab_OrganizationUserFragmentDoc = gql`
-  fragment OrganizationUsersTab_OrganizationUser on User {
+export const AdminOrganizationsFeatures_OrganizationFragmentDoc = gql`
+  fragment AdminOrganizationsFeatures_Organization on Organization {
+    id
+    features {
+      name
+      value
+    }
+  }
+` as unknown as DocumentNode<AdminOrganizationsFeatures_OrganizationFragment, unknown>;
+export const AdminOrganizationsMembers_OrganizationUserFragmentDoc = gql`
+  fragment AdminOrganizationsMembers_OrganizationUser on User {
     id
     fullName
     email
@@ -22686,40 +22827,14 @@ export const OrganizationUsersTab_OrganizationUserFragmentDoc = gql`
     lastActiveAt
     status
   }
-` as unknown as DocumentNode<OrganizationUsersTab_OrganizationUserFragment, unknown>;
-export const OrganizationMembers_OrganizationUserFragmentDoc = gql`
-  fragment OrganizationMembers_OrganizationUser on User {
-    id
-    ...OrganizationUsersTab_OrganizationUser
-  }
-  ${OrganizationUsersTab_OrganizationUserFragmentDoc}
-` as unknown as DocumentNode<OrganizationMembers_OrganizationUserFragment, unknown>;
-export const OrganizationUsersTab_OrganizationFragmentDoc = gql`
-  fragment OrganizationUsersTab_Organization on Organization {
+` as unknown as DocumentNode<AdminOrganizationsMembers_OrganizationUserFragment, unknown>;
+export const AdminOrganizationsMembers_OrganizationFragmentDoc = gql`
+  fragment AdminOrganizationsMembers_Organization on Organization {
     id
     name
     hasSsoProvider
   }
-` as unknown as DocumentNode<OrganizationUsersTab_OrganizationFragment, unknown>;
-export const OrganizationFeaturesTab_OrganizationFragmentDoc = gql`
-  fragment OrganizationFeaturesTab_Organization on Organization {
-    id
-    features {
-      name
-      value
-    }
-  }
-` as unknown as DocumentNode<OrganizationFeaturesTab_OrganizationFragment, unknown>;
-export const OrganizationMembers_OrganizationFragmentDoc = gql`
-  fragment OrganizationMembers_Organization on Organization {
-    id
-    name
-    ...OrganizationUsersTab_Organization
-    ...OrganizationFeaturesTab_Organization
-  }
-  ${OrganizationUsersTab_OrganizationFragmentDoc}
-  ${OrganizationFeaturesTab_OrganizationFragmentDoc}
-` as unknown as DocumentNode<OrganizationMembers_OrganizationFragment, unknown>;
+` as unknown as DocumentNode<AdminOrganizationsMembers_OrganizationFragment, unknown>;
 export const AdminOrganizations_OrganizationFragmentDoc = gql`
   fragment AdminOrganizations_Organization on Organization {
     id
@@ -24059,64 +24174,6 @@ export const PetitionActivity_PetitionFragmentDoc = gql`
   ${validatePetitionFields_PetitionFieldFragmentDoc}
   ${FieldErrorDialog_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<PetitionActivity_PetitionFragment, unknown>;
-export const UserMenu_QueryFragmentDoc = gql`
-  fragment UserMenu_Query on Query {
-    me {
-      id
-      isSuperAdmin
-      role
-      email
-      ...UserAvatar_User
-    }
-    realMe {
-      id
-      ...UserAvatar_User
-    }
-  }
-  ${UserAvatar_UserFragmentDoc}
-` as unknown as DocumentNode<UserMenu_QueryFragment, unknown>;
-export const AppLayoutNavbar_QueryFragmentDoc = gql`
-  fragment AppLayoutNavbar_Query on Query {
-    ...UserMenu_Query
-    realMe {
-      id
-      organizations {
-        id
-      }
-    }
-    me {
-      id
-      role
-      organization {
-        id
-        name
-        iconUrl92: iconUrl(options: { resize: { width: 92 } })
-        usageLimits {
-          petitions {
-            limit
-            used
-          }
-        }
-      }
-    }
-  }
-  ${UserMenu_QueryFragmentDoc}
-` as unknown as DocumentNode<AppLayoutNavbar_QueryFragment, unknown>;
-export const AppLayout_QueryFragmentDoc = gql`
-  fragment AppLayout_Query on Query {
-    me {
-      id
-      fullName
-      firstName
-      lastName
-      email
-      createdAt
-      role
-    }
-    ...AppLayoutNavbar_Query
-  }
-  ${AppLayoutNavbar_QueryFragmentDoc}
-` as unknown as DocumentNode<AppLayout_QueryFragment, unknown>;
 export const PetitionHeader_QueryFragmentDoc = gql`
   fragment PetitionHeader_Query on Query {
     me {
@@ -25494,12 +25551,6 @@ export const Reports_PetitionTemplateFragmentDoc = gql`
     name
   }
 ` as unknown as DocumentNode<Reports_PetitionTemplateFragment, unknown>;
-export const SettingsLayout_QueryFragmentDoc = gql`
-  fragment SettingsLayout_Query on Query {
-    ...AppLayout_Query
-  }
-  ${AppLayout_QueryFragmentDoc}
-` as unknown as DocumentNode<SettingsLayout_QueryFragment, unknown>;
 export const useSettingsSections_UserFragmentDoc = gql`
   fragment useSettingsSections_User on User {
     hasDeveloperAccess: hasFeatureFlag(featureFlag: DEVELOPER_ACCESS)
@@ -26034,45 +26085,6 @@ export const useBackgroundTask_TaskFragmentDoc = gql`
     output
   }
 ` as unknown as DocumentNode<useBackgroundTask_TaskFragment, unknown>;
-export const OrganizationFeaturesTab_updateFeatureFlagsDocument = gql`
-  mutation OrganizationFeaturesTab_updateFeatureFlags(
-    $orgId: GID!
-    $featureFlags: [InputFeatureFlag!]!
-  ) {
-    updateFeatureFlags(orgId: $orgId, featureFlags: $featureFlags) {
-      ...OrganizationFeaturesTab_Organization
-    }
-  }
-  ${OrganizationFeaturesTab_OrganizationFragmentDoc}
-` as unknown as DocumentNode<
-  OrganizationFeaturesTab_updateFeatureFlagsMutation,
-  OrganizationFeaturesTab_updateFeatureFlagsMutationVariables
->;
-export const OrganizationUsersTab_createOrganizationUserDocument = gql`
-  mutation OrganizationUsersTab_createOrganizationUser(
-    $firstName: String!
-    $lastName: String!
-    $email: String!
-    $role: OrganizationRole!
-    $locale: String
-    $orgId: GID
-  ) {
-    createOrganizationUser(
-      email: $email
-      firstName: $firstName
-      lastName: $lastName
-      role: $role
-      locale: $locale
-      orgId: $orgId
-    ) {
-      ...OrganizationUsersTab_OrganizationUser
-    }
-  }
-  ${OrganizationUsersTab_OrganizationUserFragmentDoc}
-` as unknown as DocumentNode<
-  OrganizationUsersTab_createOrganizationUserMutation,
-  OrganizationUsersTab_createOrganizationUserMutationVariables
->;
 export const PetitionTagListCellContent_tagsDocument = gql`
   query PetitionTagListCellContent_tags($search: String) {
     tags(search: $search) {
@@ -27666,14 +27678,44 @@ export const Admin_userDocument = gql`
   }
   ${AppLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<Admin_userQuery, Admin_userQueryVariables>;
-export const OrganizationMembers_userDocument = gql`
-  query OrganizationMembers_user {
-    ...AppLayout_Query
+export const AdminOrganizationsFeatures_queryDocument = gql`
+  query AdminOrganizationsFeatures_query($id: GID!) {
+    ...AdminOrganizationsLayout_Query
+    organization(id: $id) {
+      ...AdminOrganizationsFeatures_Organization
+    }
   }
-  ${AppLayout_QueryFragmentDoc}
-` as unknown as DocumentNode<OrganizationMembers_userQuery, OrganizationMembers_userQueryVariables>;
-export const OrganizationMembers_organizationDocument = gql`
-  query OrganizationMembers_organization(
+  ${AdminOrganizationsLayout_QueryFragmentDoc}
+  ${AdminOrganizationsFeatures_OrganizationFragmentDoc}
+` as unknown as DocumentNode<
+  AdminOrganizationsFeatures_queryQuery,
+  AdminOrganizationsFeatures_queryQueryVariables
+>;
+export const AdminOrganizationsFeatures_updateFeatureFlagsDocument = gql`
+  mutation AdminOrganizationsFeatures_updateFeatureFlags(
+    $orgId: GID!
+    $featureFlags: [InputFeatureFlagNameValue!]!
+  ) {
+    updateFeatureFlags(orgId: $orgId, featureFlags: $featureFlags) {
+      ...AdminOrganizationsFeatures_Organization
+    }
+  }
+  ${AdminOrganizationsFeatures_OrganizationFragmentDoc}
+` as unknown as DocumentNode<
+  AdminOrganizationsFeatures_updateFeatureFlagsMutation,
+  AdminOrganizationsFeatures_updateFeatureFlagsMutationVariables
+>;
+export const AdminOrganizationsMembers_queryDocument = gql`
+  query AdminOrganizationsMembers_query {
+    ...AdminOrganizationsLayout_Query
+  }
+  ${AdminOrganizationsLayout_QueryFragmentDoc}
+` as unknown as DocumentNode<
+  AdminOrganizationsMembers_queryQuery,
+  AdminOrganizationsMembers_queryQueryVariables
+>;
+export const AdminOrganizationsMembers_organizationDocument = gql`
+  query AdminOrganizationsMembers_organization(
     $id: GID!
     $offset: Int!
     $limit: Int!
@@ -27681,7 +27723,7 @@ export const OrganizationMembers_organizationDocument = gql`
     $sortBy: [OrganizationUsers_OrderBy!]
   ) {
     organization(id: $id) {
-      ...OrganizationMembers_Organization
+      ...AdminOrganizationsMembers_Organization
       users(
         offset: $offset
         limit: $limit
@@ -27691,16 +27733,41 @@ export const OrganizationMembers_organizationDocument = gql`
       ) {
         totalCount
         items {
-          ...OrganizationMembers_OrganizationUser
+          ...AdminOrganizationsMembers_OrganizationUser
         }
       }
     }
   }
-  ${OrganizationMembers_OrganizationFragmentDoc}
-  ${OrganizationMembers_OrganizationUserFragmentDoc}
+  ${AdminOrganizationsMembers_OrganizationFragmentDoc}
+  ${AdminOrganizationsMembers_OrganizationUserFragmentDoc}
 ` as unknown as DocumentNode<
-  OrganizationMembers_organizationQuery,
-  OrganizationMembers_organizationQueryVariables
+  AdminOrganizationsMembers_organizationQuery,
+  AdminOrganizationsMembers_organizationQueryVariables
+>;
+export const AdminOrganizationsMembers_createOrganizationUserDocument = gql`
+  mutation AdminOrganizationsMembers_createOrganizationUser(
+    $firstName: String!
+    $lastName: String!
+    $email: String!
+    $role: OrganizationRole!
+    $locale: String
+    $orgId: GID
+  ) {
+    createOrganizationUser(
+      email: $email
+      firstName: $firstName
+      lastName: $lastName
+      role: $role
+      locale: $locale
+      orgId: $orgId
+    ) {
+      ...AdminOrganizationsMembers_OrganizationUser
+    }
+  }
+  ${AdminOrganizationsMembers_OrganizationUserFragmentDoc}
+` as unknown as DocumentNode<
+  AdminOrganizationsMembers_createOrganizationUserMutation,
+  AdminOrganizationsMembers_createOrganizationUserMutationVariables
 >;
 export const AdminOrganizations_organizationsDocument = gql`
   query AdminOrganizations_organizations(

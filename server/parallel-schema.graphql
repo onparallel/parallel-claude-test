@@ -270,7 +270,7 @@ enum FeatureFlag {
 """
 A feature flag name with his value
 """
-type FeatureFlagEntry {
+type FeatureFlagNameValue {
   name: FeatureFlag!
   value: Boolean!
 }
@@ -371,7 +371,7 @@ enum ImageOptionsResizeFit {
 """
 A feature flag name with his value
 """
-input InputFeatureFlag {
+input InputFeatureFlagNameValue {
   name: FeatureFlag!
   value: Boolean!
 }
@@ -1418,7 +1418,7 @@ type Mutation {
   """
   Activate or deactivate a list of organization feature flag
   """
-  updateFeatureFlags(featureFlags: [InputFeatureFlag!]!, orgId: GID!): Organization!
+  updateFeatureFlags(featureFlags: [InputFeatureFlagNameValue!]!, orgId: GID!): Organization!
 
   """
   Updates the positions of the petition fields
@@ -1830,7 +1830,7 @@ type Organization implements Timestamps {
   """
   A list of all feature flag and the value asigned to this org
   """
-  features: [FeatureFlagEntry!]!
+  features: [FeatureFlagNameValue!]!
 
   """
   Whether the organization has an SSO provider configured.

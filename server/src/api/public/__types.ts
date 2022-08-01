@@ -219,7 +219,7 @@ export type FeatureFlag =
   | "SKIP_FORWARD_SECURITY";
 
 /** A feature flag name with his value */
-export type FeatureFlagEntry = {
+export type FeatureFlagNameValue = {
   name: FeatureFlag;
   value: Scalars["Boolean"];
 };
@@ -306,7 +306,7 @@ export type ImageOptionsResize = {
 export type ImageOptionsResizeFit = "contain" | "cover" | "fill" | "inside" | "outside";
 
 /** A feature flag name with his value */
-export type InputFeatureFlag = {
+export type InputFeatureFlagNameValue = {
   name: FeatureFlag;
   value: Scalars["Boolean"];
 };
@@ -1395,7 +1395,7 @@ export type MutationupdateFeatureFlagArgs = {
 };
 
 export type MutationupdateFeatureFlagsArgs = {
-  featureFlags: Array<InputFeatureFlag>;
+  featureFlags: Array<InputFeatureFlagNameValue>;
   orgId: Scalars["GID"];
 };
 
@@ -1660,7 +1660,7 @@ export type Organization = Timestamps & {
   /** Custom host used in petition links and public links. */
   customHost: Maybe<Scalars["String"]>;
   /** A list of all feature flag and the value asigned to this org */
-  features: Array<FeatureFlagEntry>;
+  features: Array<FeatureFlagNameValue>;
   /** Whether the organization has an SSO provider configured. */
   hasSsoProvider: Scalars["Boolean"];
   /** URL of the organization logo */
