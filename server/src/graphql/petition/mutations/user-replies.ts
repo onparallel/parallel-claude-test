@@ -318,7 +318,7 @@ export const startAsyncFieldCompletion = mutationField("startAsyncFieldCompletio
 
     const token = await sign(payload, ctx.config.security.jwtSecret, { expiresIn: "1d" });
 
-    const baseWebhookUrl = await getBaseWebhookUrl(ctx.config.misc.parallelUrl);
+    const baseWebhookUrl = await getBaseWebhookUrl(ctx.config.misc.webhooksUrl);
 
     const userId = toGlobalId("User", ctx.user!.id);
     const res = await ctx.fetch.fetch(`https://api.bankflip.io/request`, {

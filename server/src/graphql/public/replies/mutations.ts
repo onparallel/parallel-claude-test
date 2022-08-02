@@ -288,7 +288,7 @@ export const publicStartAsyncFieldCompletion = mutationField("publicStartAsyncFi
       expiresIn: "1d",
     });
 
-    const baseWebhookUrl = await getBaseWebhookUrl(ctx.config.misc.parallelUrl);
+    const baseWebhookUrl = await getBaseWebhookUrl(ctx.config.misc.webhooksUrl);
 
     const res = await ctx.fetch.fetch(`https://api.bankflip.io/request`, {
       method: "POST",

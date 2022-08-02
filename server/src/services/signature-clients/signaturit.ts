@@ -104,7 +104,7 @@ export class SignaturitClient implements ISignatureClient<"SIGNATURIT"> {
       }
     }
 
-    const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.parallelUrl);
+    const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.webhooksUrl);
 
     return await this.sdk.createSignature(files, recipients, {
       body: opts.initialMessage,

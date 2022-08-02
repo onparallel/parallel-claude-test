@@ -120,6 +120,7 @@ export function buildConfig() {
       assetsUrl: process.env.ASSETS_URL!,
       imagesUrl: process.env.IMAGES_URL!,
       parallelUrl: process.env.PARALLEL_URL!,
+      webhooksUrl: process.env.WEBHOOKS_BASE_URL!,
       emailFrom: process.env.EMAIL_FROM!,
       clientServerToken: process.env.CLIENT_SERVER_TOKEN!,
     },
