@@ -248,6 +248,9 @@ async function fetchPetitionSignature(signatureId: string, ctx: ApiContext) {
 }
 
 async function appendEventLogs(ctx: ApiContext, data: SignaturItEventBody): Promise<void> {
+  // data.document.events contain the complete list of events since signature was started
+  // we just want to append the last event to the log
+  delete data.document.events;
   await ctx.petitions.appendPetitionSignatureEventLogs(`SIGNATURIT/${data.document.signature.id}`, [
     data,
   ]);
