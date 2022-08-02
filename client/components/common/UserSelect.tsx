@@ -251,6 +251,7 @@ function useGetUsersOrGroups() {
         const user = client.readFragment({
           fragment: UserSelect_UserFragmentDoc,
           id,
+          fragmentName: "UserSelect_User",
         });
         if (user?.__typename === "User") {
           return user;
