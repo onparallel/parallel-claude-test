@@ -574,30 +574,32 @@ export class PetitionRepository extends BaseRepository {
         .select("*");
 
       return ids.map((id) => {
-        const fieldsWithReplies = (fieldsByPetition[id] ?? []).map((field) => ({
-          ...field,
-          replies: fieldReplies
-            .filter((r) => r.petition_field_id === field.id)
-            .map((reply) => {
-              // for FILE_UPLOADs, we need to make sure the file was correctly uploaded before counting it as a submitted reply
-              const file =
-                isFileTypeField(reply.type) && isDefined(reply.content?.file_upload_id)
-                  ? uploadedFiles.find((f) => f.id === reply.content!.file_upload_id)
-                  : undefined;
+        const fieldsWithReplies = (fieldsByPetition[id] ?? [])
+          .map((field) => ({
+            ...field,
+            replies: fieldReplies
+              .filter((r) => r.petition_field_id === field.id)
+              .map((reply) => {
+                // for FILE_UPLOADs, we need to make sure the file was correctly uploaded before counting it as a submitted reply
+                const file =
+                  isFileTypeField(reply.type) && isDefined(reply.content?.file_upload_id)
+                    ? uploadedFiles.find((f) => f.id === reply.content!.file_upload_id)
+                    : undefined;
 
-              return {
-                content: reply.content
-                  ? {
-                      ...reply.content,
-                      uploadComplete: file?.upload_complete,
-                    }
-                  : null,
-                status: reply.status,
-                anonymized_at: reply.anonymized_at,
-              };
-            })
-            .filter((r) => r.content !== null),
-        }));
+                return {
+                  content: reply.content
+                    ? {
+                        ...reply.content,
+                        uploadComplete: file?.upload_complete,
+                      }
+                    : null,
+                  status: reply.status,
+                  anonymized_at: reply.anonymized_at,
+                };
+              })
+              .filter((r) => r.content !== null),
+          }))
+          .sort((a, b) => a.position! - b.position!);
 
         const visibleFields = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies))
           .filter(([field, isVisible]) => isVisible && !field.is_internal)

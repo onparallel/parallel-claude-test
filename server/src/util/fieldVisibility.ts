@@ -114,8 +114,8 @@ function evaluatePredicate(
         return !_reply.includes(_value);
       case "IS_ONE_OF":
         assert(typeof _reply === "string");
-        assert(typeof _value === "string");
-        return _reply.includes(_value);
+        assert(Array.isArray(_value));
+        return _value.includes(_reply);
       case "NOT_IS_ONE_OF":
         assert(typeof _reply === "string");
         assert(Array.isArray(_value));
