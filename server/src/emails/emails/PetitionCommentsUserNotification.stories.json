@@ -20,7 +20,37 @@
             "comments": [
               {
                 "id": 1,
-                "content": "De dónde saco esto tio?\nNo lo encuentro por ningún lado",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "text": "De dónde saco esto"
+                      },
+                      {
+                        "type": "mention",
+                        "mention": "User:1",
+                        "children": [
+                          {
+                            "text": "Santi Albo"
+                          }
+                        ]
+                      },
+                      {
+                        "text": "?"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "text": "No lo encuentro por ningún lado"
+                      }
+                    ]
+                  }
+                ],
+                "mentions": [{ "id": "User:1", "highlight": true }],
                 "author": {
                   "id": "Access:1",
                   "name": "Mariano Rodriguez"
@@ -28,7 +58,17 @@
               },
               {
                 "id": 2,
-                "content": "Ni caso, ya lo encontré 😅",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "text": "Ni caso, ya lo encontré 😅"
+                      }
+                    ]
+                  }
+                ],
+                "mentions": [],
                 "author": {
                   "id": "Access:1",
                   "name": "Mariano Rodriguez"
@@ -43,7 +83,17 @@
             "comments": [
               {
                 "id": 3,
-                "content": "Ya sale en el borrador",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "text": "Ya sale en el borrador"
+                      }
+                    ]
+                  }
+                ],
+                "mentions": [],
                 "author": {
                   "id": "User:2",
                   "name": "Derek Lou"
@@ -51,7 +101,17 @@
               },
               {
                 "id": 4,
-                "content": "Cualquier cosa me avisas",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "text": "Cualquier cosa me avisas"
+                      }
+                    ]
+                  }
+                ],
+                "mentions": [],
                 "author": {
                   "id": "User:2",
                   "name": "Derek Lou"
@@ -59,7 +119,17 @@
               },
               {
                 "id": 5,
-                "content": "Ostia que chulo este sistema de comentarios 😎",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "text": "Ostia que chulo este sistema de comentarios 😎"
+                      }
+                    ]
+                  }
+                ],
+                "mentions": [],
                 "author": {
                   "id": "User:3",
                   "name": "Angela Velasco"
@@ -67,7 +137,41 @@
               },
               {
                 "id": 6,
-                "content": "Ok!",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "text": "Que bueno"
+                      },
+                      {
+                        "type": "mention",
+                        "mention": "User:2",
+                        "children": [
+                          {
+                            "text": "Angela Velasco"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "mention",
+                        "mention": "User:3",
+                        "children": [
+                          {
+                            "text": "Derek Lou"
+                          }
+                        ]
+                      },
+                      {
+                        "text": "!"
+                      }
+                    ]
+                  }
+                ],
+                "mentions": [
+                  { "id": "User:2", "highlight": false },
+                  { "id": "User:3", "highlight": false }
+                ],
                 "author": {
                   "id": "Access:1",
                   "name": "Mariano Rodriguez"
@@ -75,7 +179,26 @@
               },
               {
                 "id": 7,
-                "content": "Ya está todo",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "text": "Ya está todo"
+                      },
+                      {
+                        "type": "mention",
+                        "mention": "UserGroup:1",
+                        "children": [
+                          {
+                            "text": "Devs"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "mentions": [{ "id": "UserGroup:1", "highlight": true }],
                 "author": {
                   "id": "Access:1",
                   "name": "Mariano Rodriguez"

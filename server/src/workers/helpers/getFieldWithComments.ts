@@ -3,6 +3,8 @@ import { pick, sortBy } from "remeda";
 import { WorkerContext } from "../../context";
 import { PetitionField, PetitionFieldComment } from "../../db/__types";
 import { fullName } from "../../util/fullName";
+import { toGlobalId } from "../../util/globalId";
+import { getMentions } from "../../util/slate";
 
 async function fetchCommentAuthor(c: PetitionFieldComment, context: WorkerContext) {
   if (c.user_id) {
@@ -30,17 +32,35 @@ async function fetchCommentAuthor(c: PetitionFieldComment, context: WorkerContex
 export async function buildFieldWithComments(
   field: PetitionField,
   commentsByField: Record<string, PetitionFieldComment[]>,
-  context: WorkerContext
+  context: WorkerContext,
+  userId?: number
 ) {
   return {
     ...pick(field, ["id", "title", "position"]),
     comments: await pMap(
       sortBy(commentsByField[field.id], (c) => c.created_at),
-      async (c) => ({
-        id: c.id,
-        content: c.content,
-        author: await fetchCommentAuthor(c, context),
-      })
+      async (c) => {
+        return {
+          id: c.id,
+          content: c.content_json,
+          mentions: await pMap(
+            getMentions(c.content_json),
+            async (m) => {
+              if (m.type === "User") {
+                return { id: toGlobalId("User", m.id), highlight: m.id === userId };
+              } else {
+                const groupMembers = await context.userGroups.loadUserGroupMembers(m.id);
+                return {
+                  id: toGlobalId("UserGroup", m.id),
+                  highlight: groupMembers.some((gm) => gm.user_id === userId),
+                };
+              }
+            },
+            { concurrency: 1 }
+          ),
+          author: await fetchCommentAuthor(c, context),
+        };
+      }
     ),
   };
 }

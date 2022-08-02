@@ -1,7 +1,7 @@
 import { createElement, Fragment, ReactNode } from "react";
 import { renderToString } from "react-dom/server";
-import { Contact, Petition, User, UserData } from "../db/__types";
-import { UserGroup } from "../pdf/__types";
+import { Contact, Petition, UserData } from "../db/__types";
+
 import { fullName } from "./fullName";
 import { fromGlobalId } from "./globalId";
 
@@ -9,7 +9,6 @@ interface SlateContext {
   petition?: Partial<Petition> | null;
   user?: Partial<UserData> | null;
   contact?: Partial<Contact> | null;
-  mentions?: (Partial<User> | Partial<UserGroup>)[];
 }
 
 export type SlateNode = {
@@ -60,6 +59,7 @@ function getPlaceholder(key?: string, ctx?: SlateContext) {
 
 interface RenderSlateToHtmlOptions {
   startingHeadingLevel: number;
+  replace?: (node: ReactNode) => ReactNode | null;
 }
 
 function renderSlate(
@@ -68,9 +68,10 @@ function renderSlate(
   ctx?: SlateContext
 ): ReactNode {
   if (Array.isArray(node)) {
-    return node.map((child, index) => (
-      <Fragment key={index}>{renderSlate(child, opts, ctx)}</Fragment>
-    ));
+    return node.map((child, index) => {
+      const render = renderSlate(child, opts, ctx);
+      return <Fragment key={index}>{opts.replace?.(render) ?? render}</Fragment>;
+    });
   }
   if (Array.isArray(node.children)) {
     switch (node.type) {

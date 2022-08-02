@@ -21,7 +21,16 @@
             "comments": [
               {
                 "id": 1,
-                "content": "De dónde saco esto tio?\n No lo encuentro por ningun lado",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "text": "De dónde saco esto tio?\n No lo encuentro por ningun lado"
+                      }
+                    ]
+                  }
+                ],
                 "author": {
                   "id": "Access:1",
                   "name": "Mariano Rodriguez"
@@ -29,7 +38,16 @@
               },
               {
                 "id": 2,
-                "content": "Ni caso, ya lo encontré",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "text": "Ni caso, ya lo encontré"
+                      }
+                    ]
+                  }
+                ],
                 "author": {
                   "id": "Access:1",
                   "name": "Mariano Rodriguez"
@@ -44,7 +62,16 @@
             "comments": [
               {
                 "id": 3,
-                "content": "Ya sale en el borrador",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "text": "Ya sale en el borrador"
+                      }
+                    ]
+                  }
+                ],
                 "author": {
                   "id": "User:1",
                   "name": "Derek Lou"

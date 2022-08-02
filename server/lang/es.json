@@ -566,13 +566,28 @@
   },
   {
     "term": "petition-comments-user-notification.intro-text",
+    "definition": "Tienes {mentionCount, plural, =1{# mención} other{# menciones}} y {commentCount, plural, =1{# comentario nuevo} other{# comentarios nuevos}} en { petitionName, select, null {tu parallel} other {{petitionName}}}:",
+    "context": "You have {mentionCount, plural, =1{# mention} other{# mentions}} and {commentCount, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your parallel} other{{petitionName}}}:"
+  },
+  {
+    "term": "petition-comments-user-notification.intro-text.comments",
     "definition": "Tienes {count, plural, =1{# comentario nuevo} other{# comentarios nuevos}} en { petitionName, select, null {tu parallel} other {{petitionName}}}:",
     "context": "You have {count, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your parallel} other{{petitionName}}}:"
+  },
+  {
+    "term": "petition-comments-user-notification.intro-text.mentions",
+    "definition": "Tienes {count, plural, =1{# mención} other{# menciones}} en { petitionName, select, null {tu parallel} other {{petitionName}}}:",
+    "context": "You have {count, plural, =1{# mention} other{# mentions}} on {petitionName, select, null{your parallel} other{{petitionName}}}:"
   },
   {
     "term": "petition-comments-user-notification.subject",
     "definition": "Tienes comentarios nuevos en { petitionName, select, null {tu parallel} other {{petitionName}}}",
     "context": "New comments on {petitionName, select, null{your parallel} other{{petitionName}}}"
+  },
+  {
+    "term": "petition-comments-user-notification.subject-mention",
+    "definition": "{author} {uniqueAuthorCount, plural, =1{te mencionó} other{y otros te mencionaron}} en {petitionName, select, null{tu parallel} other{{petitionName}}}",
+    "context": "{author} {uniqueAuthorCount, plural, =1{} other{and others}} mentioned you on {petitionName, select, null{your parallel} other{{petitionName}}}"
   },
   {
     "term": "petition-completed.access-button",

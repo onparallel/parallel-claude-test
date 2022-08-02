@@ -566,13 +566,28 @@
   },
   {
     "term": "petition-comments-user-notification.intro-text",
+    "definition": "You have {mentionCount, plural, =1{# mention} other{# mentions}} and {commentCount, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your parallel} other{{petitionName}}}:",
+    "context": "You have {mentionCount, plural, =1{# mention} other{# mentions}} and {commentCount, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your parallel} other{{petitionName}}}:"
+  },
+  {
+    "term": "petition-comments-user-notification.intro-text.comments",
     "definition": "You have {count, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your parallel} other{{petitionName}}}:",
     "context": "You have {count, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your parallel} other{{petitionName}}}:"
+  },
+  {
+    "term": "petition-comments-user-notification.intro-text.mentions",
+    "definition": "You have {count, plural, =1{# mention} other{# mentions}} on {petitionName, select, null{your parallel} other{{petitionName}}}:",
+    "context": "You have {count, plural, =1{# mention} other{# mentions}} on {petitionName, select, null{your parallel} other{{petitionName}}}:"
   },
   {
     "term": "petition-comments-user-notification.subject",
     "definition": "New comments on {petitionName, select, null{your parallel} other{{petitionName}}}",
     "context": "New comments on {petitionName, select, null{your parallel} other{{petitionName}}}"
+  },
+  {
+    "term": "petition-comments-user-notification.subject-mention",
+    "definition": "{author} {uniqueAuthorCount, plural, =1{} other{and others}} mentioned you on {petitionName, select, null{your parallel} other{{petitionName}}}",
+    "context": "{author} {uniqueAuthorCount, plural, =1{} other{and others}} mentioned you on {petitionName, select, null{your parallel} other{{petitionName}}}"
   },
   {
     "term": "petition-completed.access-button",

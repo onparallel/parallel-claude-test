@@ -1,11 +1,13 @@
-import { MjmlColumn, MjmlSection, MjmlText, MjmlWrapper } from "mjml-react";
+import { MjmlColumn, MjmlProps, MjmlSection, MjmlText, MjmlWrapper } from "mjml-react";
 import { FormattedMessage } from "react-intl";
+import { SlateNode, toHtml } from "../../util/slate";
 import { Maybe } from "../../util/types";
-import { BreakLines } from "../../util/BreakLines";
+import { UserMessageBox } from "./UserMessageBox";
 
 type FieldComment = {
   id: number;
-  content: string;
+  content: SlateNode[];
+  mentions: { id: string; highlight: boolean }[];
   author: {
     id: string;
     name: string;
@@ -71,7 +73,7 @@ export function PetitionFieldAndComments({ fields }: PetitionFieldAndCommentsPro
           {groupCommentsByAuthor(comments).map((commentGroup, i) => (
             <MjmlSection key={i} padding="8px 50px">
               <MjmlColumn>
-                {commentGroup.map(({ id, content, author }, commentNumber) => (
+                {commentGroup.map(({ id, content, mentions, author }, commentNumber) => (
                   <MjmlSection key={id} padding="1px 0">
                     <MjmlColumn backgroundColor="#F4F7F9" borderRadius="4px" padding="8px 16px">
                       {commentNumber === 0 && (
@@ -80,7 +82,25 @@ export function PetitionFieldAndComments({ fields }: PetitionFieldAndCommentsPro
                         </MjmlText>
                       )}
                       <MjmlText padding="0" lineHeight="24px">
-                        <BreakLines>{content}</BreakLines>
+                        <UserMessageBox
+                          dangerouslySetInnerHTML={toHtml(
+                            content,
+                            {},
+                            {
+                              replace: (node: any) => {
+                                if (node && node.type === "mention") {
+                                  const { children } = node.props;
+                                  const mention = mentions.find(
+                                    (m) => m.id === node.props["data-mention-id"]
+                                  );
+                                  if (mention) {
+                                    return <Mention mention={mention}>{children}</Mention>;
+                                  }
+                                }
+                              },
+                            }
+                          )}
+                        />
                       </MjmlText>
                     </MjmlColumn>
                   </MjmlSection>
@@ -91,5 +111,25 @@ export function PetitionFieldAndComments({ fields }: PetitionFieldAndCommentsPro
         </MjmlWrapper>
       ))}
     </>
+  );
+}
+
+interface MentionProps extends MjmlProps {
+  mention?: { id: string; highlight: boolean };
+}
+function Mention({ mention, children }: MentionProps) {
+  return (
+    <span
+      style={{
+        display: "inline-block",
+        borderRadius: "5px",
+        padding: "0 2px",
+        fontWeight: 500,
+        backgroundColor: mention?.highlight ? "#EBF8FF" : "inherit",
+        color: "#153E75",
+      }}
+    >
+      @{children}
+    </span>
   );
 }

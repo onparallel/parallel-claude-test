@@ -9,6 +9,8 @@ export type PetitionUserNotificationPayload<TType extends PetitionUserNotificati
   COMMENT_CREATED: {
     petition_field_id: number;
     petition_field_comment_id: number;
+    /** if true, notified user is mentioned on the comment */
+    is_mentioned: boolean;
   };
   MESSAGE_EMAIL_BOUNCED: {
     petition_access_id: number;

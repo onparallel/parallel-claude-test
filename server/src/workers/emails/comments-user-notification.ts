@@ -35,7 +35,7 @@ export async function commentsUserNotification(
   const commentsByField = groupBy(comments, (c) => c.petition_field_id);
   const fields = await pMap(
     sortBy(_fields, (f) => f.position!),
-    (f) => buildFieldWithComments(f, commentsByField, context)
+    (f) => buildFieldWithComments(f, commentsByField, context, payload.user_id)
   );
 
   const { html, text, subject, from } = await buildEmail(

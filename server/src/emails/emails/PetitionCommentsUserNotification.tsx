@@ -1,6 +1,8 @@
 import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
+import { uniqBy } from "remeda";
+import { sumBy } from "../../util/arrays";
 import { Email } from "../buildEmail";
 import { Button } from "../components/Button";
 import { GreetingUser } from "../components/Greeting";
@@ -25,15 +27,32 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
       defaultMessage: "Parallel",
     });
   },
-  subject({ petitionName }, intl: IntlShape) {
-    return intl.formatMessage(
-      {
-        id: "petition-comments-user-notification.subject",
-        defaultMessage:
-          "New comments on {petitionName, select, null{your parallel} other{{petitionName}}}",
-      },
-      { petitionName }
+  subject({ petitionName, fields }, intl: IntlShape) {
+    const commentsWithMentions = fields.flatMap((f) =>
+      f.comments.filter((c) => c.mentions.filter((m) => m.highlight).length > 0)
     );
+
+    return commentsWithMentions.length === 0
+      ? intl.formatMessage(
+          {
+            id: "petition-comments-user-notification.subject",
+            defaultMessage:
+              "New comments on {petitionName, select, null{your parallel} other{{petitionName}}}",
+          },
+          { petitionName }
+        )
+      : intl.formatMessage(
+          {
+            id: "petition-comments-user-notification.subject-mention",
+            defaultMessage:
+              "{author} {uniqueAuthorCount, plural, =1{} other{and others}} mentioned you on {petitionName, select, null{your parallel} other{{petitionName}}}",
+          },
+          {
+            author: commentsWithMentions[0].author.name,
+            uniqueAuthorCount: uniqBy(commentsWithMentions, (m) => m.author.id).length,
+            petitionName,
+          }
+        );
   },
   text(
     {
@@ -45,18 +64,47 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
     }: PetitionCommentsUserNotificationProps,
     intl: IntlShape
   ) {
-    const commentCount = fields.reduce((acc, f) => acc + f.comments.length, 0);
+    const commentsWithMentions = fields.flatMap((f) =>
+      f.comments.filter((c) => c.mentions.length > 0)
+    );
+    const mentionCount = commentsWithMentions.flatMap((c) =>
+      c.mentions.filter((m) => m.highlight)
+    ).length;
+
+    const commentCount = sumBy(fields, (f) => f.comments.length) - mentionCount;
+    const onlyComments = mentionCount === 0;
+    const onlyMentions = commentCount === 0;
 
     return outdent`
       ${greetingUser({ name: userName }, intl)}
-      ${intl.formatMessage(
-        {
-          id: "petition-comments-user-notification.intro-text",
-          defaultMessage:
-            "You have {count, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your parallel} other{{petitionName}}}:",
-        },
-        { count: commentCount, petitionName }
-      )}
+     ${
+       onlyComments
+         ? intl.formatMessage(
+             {
+               id: "petition-comments-user-notification.intro-text.comments",
+               defaultMessage:
+                 "You have {count, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your parallel} other{{petitionName}}}:",
+             },
+             { count: commentCount, petitionName }
+           )
+         : onlyMentions
+         ? intl.formatMessage(
+             {
+               id: "petition-comments-user-notification.intro-text.mentions",
+               defaultMessage:
+                 "You have {count, plural, =1{# mention} other{# mentions}} on {petitionName, select, null{your parallel} other{{petitionName}}}:",
+             },
+             { count: mentionCount, petitionName }
+           )
+         : intl.formatMessage(
+             {
+               id: "petition-comments-user-notification.intro-text",
+               defaultMessage:
+                 "You have {mentionCount, plural, =1{# mention} other{# mentions}} and {commentCount, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your parallel} other{{petitionName}}}:",
+             },
+             { commentCount, mentionCount, petitionName }
+           )
+     }
 
       ${intl.formatMessage({
         id: "petition-comments-user-notification.access-click-link",
@@ -79,7 +127,18 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
     theme,
   }: PetitionCommentsUserNotificationProps) {
     const { locale } = useIntl();
-    const commentCount = fields.reduce((acc, f) => acc + f.comments.length, 0);
+
+    const commentsWithMentions = fields.flatMap((f) =>
+      f.comments.filter((c) => c.mentions.length > 0)
+    );
+    const mentionCount = commentsWithMentions.flatMap((c) =>
+      c.mentions.filter((m) => m.highlight)
+    ).length;
+
+    const commentCount = sumBy(fields, (f) => f.comments.length) - mentionCount;
+    const onlyComments = mentionCount === 0;
+    const onlyMentions = commentCount === 0;
+
     return (
       <Layout
         assetsUrl={assetsUrl}
@@ -92,14 +151,25 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
           <MjmlColumn>
             <GreetingUser name={userName} />
             <MjmlText>
-              <FormattedMessage
-                id="petition-comments-user-notification.intro-text"
-                defaultMessage="You have {count, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your parallel} other{{petitionName}}}:"
-                values={{
-                  count: commentCount,
-                  petitionName: petitionName ? <b>{petitionName}</b> : null,
-                }}
-              />
+              {onlyComments ? (
+                <FormattedMessage
+                  id="petition-comments-user-notification.intro-text.comments"
+                  defaultMessage="You have {count, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your parallel} other{{petitionName}}}:"
+                  values={{ count: commentCount, petitionName }}
+                />
+              ) : onlyMentions ? (
+                <FormattedMessage
+                  id="petition-comments-user-notification.intro-text.mentions"
+                  defaultMessage="You have {count, plural, =1{# mention} other{# mentions}} on {petitionName, select, null{your parallel} other{{petitionName}}}:"
+                  values={{ count: mentionCount, petitionName }}
+                />
+              ) : (
+                <FormattedMessage
+                  id="petition-comments-user-notification.intro-text"
+                  defaultMessage="You have {mentionCount, plural, =1{# mention} other{# mentions}} and {commentCount, plural, =1{# new comment} other{# new comments}} on {petitionName, select, null{your parallel} other{{petitionName}}}:"
+                  values={{ commentCount, mentionCount, petitionName }}
+                />
+              )}
             </MjmlText>
           </MjmlColumn>
         </MjmlSection>

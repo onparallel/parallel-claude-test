@@ -1,4 +1,4 @@
-import { isDefined } from "remeda";
+import { isDefined, partition, uniq } from "remeda";
 import { WorkerContext } from "../../context";
 import {
   AccessActivatedFromPublicPetitionLinkEvent,
@@ -12,6 +12,7 @@ import {
   SignatureCompletedEvent,
   UserPermissionAddedEvent,
 } from "../../db/events";
+import { getMentions } from "../../util/slate";
 import { EventListener } from "../event-processor";
 
 async function createPetitionCompletedUserNotifications(
@@ -54,6 +55,15 @@ async function createCommentPublishedUserNotifications(
     return;
   }
 
+  const mentions = getMentions(comment.content_json);
+  const [userMentions, groupMentions] = partition(mentions, (m) => m.type === "User");
+  const groupMembers = await ctx.userGroups.loadUserGroupMembers(groupMentions.map((m) => m.id));
+
+  const mentionedUserIds = uniq([
+    ...userMentions.map((m) => m.id),
+    ...groupMembers.flatMap((members) => members.map((m) => m.user_id)),
+  ]);
+
   // Create contact and user notifications
   const [accesses, users] = await Promise.all([
     comment.is_internal ? [] : ctx.petitions.loadAccessesForPetition(event.petition_id),
@@ -79,6 +89,7 @@ async function createCommentPublishedUserNotifications(
         data: {
           petition_field_id: comment.petition_field_id,
           petition_field_comment_id: comment.id,
+          is_mentioned: mentionedUserIds.includes(userId),
         },
       }))
     ),
