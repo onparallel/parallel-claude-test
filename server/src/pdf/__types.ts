@@ -111,6 +111,7 @@ export type CommentCreatedUserNotification = PetitionUserNotification & {
   createdAt: Scalars["DateTime"];
   field: PetitionField;
   id: Scalars["GID"];
+  isMention: Scalars["Boolean"];
   isRead: Scalars["Boolean"];
   petition: PetitionBase;
 };
@@ -2316,7 +2317,7 @@ export type PetitionFieldComment = {
   isInternal: Scalars["Boolean"];
   /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
-  /** The mentiones of the comments. */
+  /** The mentions of the comments. */
   mentions: Array<PetitionFieldCommentMention>;
 };
 

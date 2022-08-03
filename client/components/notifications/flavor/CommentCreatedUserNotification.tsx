@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { Circle, Text } from "@chakra-ui/react";
-import { CommentIcon, NoteIcon } from "@parallel/chakra/icons";
+import { CommentIcon, MentionIcon, NoteIcon } from "@parallel/chakra/icons";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { UserOrContactReference } from "@parallel/components/petition-activity/UserOrContactReference";
 import { UserReference } from "@parallel/components/petition-activity/UserReference";
@@ -17,7 +17,11 @@ export interface CommentCreatedUserNotificationProps {
 export const CommentCreatedUserNotification = Object.assign(
   forwardRef<HTMLElement, CommentCreatedUserNotificationProps>(
     function CommentCreatedUserNotification({ isFirst, notification }, ref) {
-      const { author, isInternal: isNote } = notification.comment;
+      const {
+        comment: { author, isInternal: isNote },
+        isMention,
+      } = notification;
+
       const field = notification.field.title ? (
         <Text as="span">
           {'"'}
@@ -35,13 +39,25 @@ export const CommentCreatedUserNotification = Object.assign(
           isFirst={isFirst}
           notification={notification}
           icon={
-            <Circle size="36px" background="gray.200">
-              {isNote ? <NoteIcon fontSize="16px" /> : <CommentIcon fontSize="16px" />}
+            <Circle size="36px" background={isMention ? "blue.500" : "gray.200"}>
+              {isMention ? (
+                <MentionIcon color="white" />
+              ) : isNote ? (
+                <NoteIcon fontSize="16px" />
+              ) : (
+                <CommentIcon fontSize="16px" />
+              )}
             </Circle>
           }
           path={`/replies?comments=${notification.field.id}`}
         >
-          {isNote ? (
+          {isMention ? (
+            <FormattedMessage
+              id="component.notification-mention-comment.body"
+              defaultMessage="{name} has mentioned you in the field {field}."
+              values={{ name: <UserOrContactReference userOrAccess={author} />, field }}
+            />
+          ) : isNote ? (
             <FormattedMessage
               id="component.notification-internal-comment.body"
               defaultMessage="{name} has added a note in the field {field}."
@@ -74,6 +90,7 @@ export const CommentCreatedUserNotification = Object.assign(
               ...UserOrContactReference_UserOrPetitionAccess
             }
           }
+          isMention
         }
         ${PetitionUserNotification.fragments.PetitionUserNotification}
         ${UserOrContactReference.fragments.UserOrPetitionAccess}

@@ -122,6 +122,7 @@ export interface CommentCreatedUserNotification extends PetitionUserNotification
   createdAt: Scalars["DateTime"];
   field: PetitionField;
   id: Scalars["GID"];
+  isMention: Scalars["Boolean"];
   isRead: Scalars["Boolean"];
   petition: PetitionBase;
 }
@@ -2390,7 +2391,7 @@ export interface PetitionFieldComment {
   isInternal: Scalars["Boolean"];
   /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
-  /** The mentiones of the comments. */
+  /** The mentions of the comments. */
   mentions: Array<PetitionFieldCommentMention>;
 }
 
@@ -5005,6 +5006,7 @@ export type NotificationsDrawer_PetitionUserNotification_AccessActivatedFromPubl
 
 export type NotificationsDrawer_PetitionUserNotification_CommentCreatedUserNotification_Fragment = {
   __typename?: "CommentCreatedUserNotification";
+  isMention: boolean;
   id: string;
   createdAt: string;
   isRead: boolean;
@@ -5176,6 +5178,7 @@ export type NotificationsDrawer_notificationsQuery = {
           }
         | {
             __typename?: "CommentCreatedUserNotification";
+            isMention: boolean;
             id: string;
             createdAt: string;
             isRead: boolean;
@@ -5340,6 +5343,7 @@ export type NotificationsList_PetitionUserNotification_AccessActivatedFromPublic
 
 export type NotificationsList_PetitionUserNotification_CommentCreatedUserNotification_Fragment = {
   __typename?: "CommentCreatedUserNotification";
+  isMention: boolean;
   id: string;
   createdAt: string;
   isRead: boolean;
@@ -5493,6 +5497,7 @@ export type AccessActivatedFromLinkNotification_AccessActivatedFromPublicPetitio
 
 export type CommentCreatedUserNotification_CommentCreatedUserNotificationFragment = {
   __typename?: "CommentCreatedUserNotification";
+  isMention: boolean;
   id: string;
   createdAt: string;
   isRead: boolean;
@@ -23315,6 +23320,7 @@ export const CommentCreatedUserNotification_CommentCreatedUserNotificationFragme
         ...UserOrContactReference_UserOrPetitionAccess
       }
     }
+    isMention
   }
   ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
   ${UserOrContactReference_UserOrPetitionAccessFragmentDoc}

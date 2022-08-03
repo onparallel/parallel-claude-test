@@ -831,6 +831,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     field: NexusGenRootTypes["PetitionField"]; // PetitionField!
     id: NexusGenScalars["GID"]; // GID!
+    isMention: boolean; // Boolean!
     isRead: boolean; // Boolean!
     petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
   };
@@ -2410,6 +2411,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     field: "PetitionField";
     id: "GID";
+    isMention: "Boolean";
     isRead: "Boolean";
     petition: "PetitionBase";
   };

@@ -1920,6 +1920,11 @@
     "context": "{name} has added a note in the field {field}."
   },
   {
+    "term": "component.notification-mention-comment.body",
+    "definition": "{name} te ha mencionado en el campo {field}.",
+    "context": "{name} has mentioned you in the field {field}."
+  },
+  {
     "term": "component.notification-petition-completed.body",
     "definition": "{name} completó el parallel.",
     "context": "{name} completed the parallel."

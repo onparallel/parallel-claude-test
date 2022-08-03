@@ -104,6 +104,7 @@ type CommentCreatedUserNotification implements PetitionUserNotification {
   createdAt: DateTime!
   field: PetitionField!
   id: GID!
+  isMention: Boolean!
   isRead: Boolean!
   petition: PetitionBase!
 }
