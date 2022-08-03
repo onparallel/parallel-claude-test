@@ -70,6 +70,9 @@ export async function petitionMessage(
       ].includes(toGlobalId("Petition", petition.from_template_id))
     : false;
 
+  const brandTheme = (await context.organizations.loadBrandThemesByOrgId(organization!.id))[0]
+    ?.data;
+
   const { html, text, subject, from } = await buildEmail(
     PetitionMessage,
     {

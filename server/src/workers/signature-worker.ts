@@ -79,6 +79,8 @@ async function startSignatureProcess(
       throw new Error(`Expected theme of type PDF_DOCUMENT on Petition:${petition.id}`);
     }
 
+    const brandTheme = (await ctx.organizations.loadBrandThemesByOrgId(org!.id))[0];
+
     // send request to signature client
     const data = await signatureClient.startSignatureRequest(
       toGlobalId("Petition", petition.id),
@@ -306,6 +308,8 @@ async function updateOrganizationBranding(payload: { orgId: number }, ctx: Worke
   if (!organization) {
     return;
   }
+
+  const brandTheme = (await ctx.organizations.loadBrandThemesByOrgId(organization!.id))[0];
 
   await pMap(
     signatureIntegrations as SignatureOrgIntegration[],

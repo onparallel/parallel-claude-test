@@ -143,7 +143,7 @@ export const updateOrganizationBrandTheme = mutationField("updateOrganizationBra
       const updatedTheme = {
         data: {
           color: args.data.color ?? theme.color,
-          fontFamily: args.data.fontFamily ?? theme.fontFamily,
+          fontFamily: args.data.fontFamily !== undefined ? args.data.fontFamily : theme.fontFamily,
         },
       };
 
