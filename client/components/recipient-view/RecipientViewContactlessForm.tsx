@@ -215,6 +215,7 @@ export function RecipientViewContactlessForm({
         }
         const { result, remainingAttempts } = data.publicCheckVerificationCode;
         if (result === "SUCCESS") {
+          setState({ step: "VERIFIED" });
           router.replace(resolveUrl(`${router.pathname}/1`, router.query));
         } else {
           setState({

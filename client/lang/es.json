@@ -5750,7 +5750,7 @@
     "context": "Parallels"
   },
   {
-    "term": "generic.pending",
+    "term": "generic.parallel-status.pending",
     "definition": "Pendiente",
     "context": "Pending"
   },

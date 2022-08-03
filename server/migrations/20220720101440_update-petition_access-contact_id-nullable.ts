@@ -8,6 +8,7 @@ export async function up(knex: Knex): Promise<void> {
   await knex.raw(/* sql */ `
   alter table petition_access drop constraint petition_access__petition_id_contact_id;
   create unique index petition_access__petition_id_contact_id on petition_access (petition_id, contact_id) where status = 'ACTIVE';
+  create unique index petition_access__petition_id_contactless on petition_access (petition_id) where status = 'ACTIVE' and contact_id is null;
   `);
 }
 
@@ -51,6 +52,7 @@ export async function down(knex: Knex): Promise<void> {
 
   await knex.raw(/* sql */ `
   drop index petition_access__petition_id_contact_id;
+  drop index petition_access__petition_id_contactless;
   alter table petition_access add constraint petition_access__petition_id_contact_id unique (petition_id, contact_id);
 `);
 }

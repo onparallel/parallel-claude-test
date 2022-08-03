@@ -183,9 +183,7 @@ export const publicSendVerificationCode = mutationField("publicSendVerificationC
   },
   resolve: async (_, args, ctx) => {
     return await stallFor(async function () {
-      const access = await ctx.petitions.loadAccessByKeycode(args.keycode);
-
-      const isContactless = !isDefined(access!.contact_id);
+      const isContactless = !isDefined(ctx.access!.contact_id);
       const { firstName, lastName, email } = args;
 
       if (isContactless) {
@@ -196,7 +194,7 @@ export const publicSendVerificationCode = mutationField("publicSendVerificationC
           );
         }
 
-        const petition = await ctx.petitions.loadPetition(access!.petition_id);
+        const petition = await ctx.petitions.loadPetition(ctx.access!.petition_id);
         const contact = await ctx.contacts.loadContactByEmail({
           email,
           orgId: petition!.org_id,
@@ -266,28 +264,23 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
 
           if (petition) {
             const email = result.data.contact_email!.toLowerCase();
-            const contact = await ctx.contacts.loadContactByEmail({
-              email,
-              orgId: petition.org_id,
-            });
+
+            ctx.contact = (
+              await ctx.contacts.loadOrCreate(
+                {
+                  email,
+                  org_id: petition.org_id,
+                  first_name: result.data!.contact_first_name!,
+                  last_name: result.data!.contact_last_name || null,
+                },
+                `PetitionAccess:${access!.id}`
+              )
+            )[0];
 
             await ctx.petitions.withTransaction(async (t) => {
-              ctx.contact = contact
-                ? contact
-                : await ctx.contacts.createContact(
-                    {
-                      org_id: petition.org_id,
-                      email,
-                      first_name: result.data!.contact_first_name!,
-                      last_name: result.data!.contact_last_name || null,
-                    },
-                    `PetitionAccess:${access!.id}`,
-                    t
-                  );
-
               await ctx.petitions.addContactToPetitionAccess(
                 access!.id,
-                ctx.contact.id,
+                ctx.contact!.id,
                 `PetitionAccess:${access!.id}`,
                 t
               );
@@ -884,7 +877,7 @@ export const publicSendReminder = mutationField("publicSendReminder", {
     let owner: User;
 
     if (args.keycode) {
-      access = (await ctx.petitions.loadAccessByKeycode(args.keycode))!;
+      access = ctx.access!;
       const petition = (await ctx.petitions.loadPetition(access!.petition_id))!;
       const contact = await ctx.contacts.loadContactByEmail({
         email: args.contactEmail,

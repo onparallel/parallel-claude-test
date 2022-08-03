@@ -76,13 +76,6 @@ export function fetchPetitionAccess<
           `Petition for petition access with keycode ${keycode} not found`
         );
       }
-      // if (!contact) {
-      //   throw new PublicPetitionNotAvailableError(
-      //     `Contact for petition access with keycode ${keycode} not found`
-      //   );
-      // } else {
-      //   ctx.contact = contact;
-      // }
     }
     return true;
   };
