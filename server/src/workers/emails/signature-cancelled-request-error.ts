@@ -22,7 +22,7 @@ export async function signatureCancelledRequestError(
 
   const users = await context.petitions.loadUsersOnPetition(petition.id);
 
-  const config = petition.signature_config as PetitionSignatureConfig;
+  const config = signatureRequest.signature_config as PetitionSignatureConfig;
 
   const emails = [];
   for (const user of users) {

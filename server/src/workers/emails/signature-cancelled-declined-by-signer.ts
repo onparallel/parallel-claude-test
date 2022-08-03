@@ -22,7 +22,7 @@ export async function signatureCancelledDeclinedBySigner(
 
   const users = await context.petitions.loadUsersOnPetition(petition.id);
 
-  const config = petition.signature_config as PetitionSignatureConfig;
+  const config = signatureRequest.signature_config as PetitionSignatureConfig;
   const signatureIntegration = await context.integrations.loadIntegration(config.orgIntegrationId);
 
   const canceller = signatureRequest.cancel_data.canceller;
