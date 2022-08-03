@@ -295,13 +295,13 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
           }
         }
 
-        const { contactAuthentication, cookieValue } =
-          await ctx.contacts.createContactAuthentication(ctx.contact!.id);
-        await ctx.contacts.addContactAuthenticationLogAccessEntry(contactAuthentication.id, {
-          ip: getClientIp(ctx.req),
-          userAgent: ctx.req.headers["user-agent"] ?? null,
-        });
         if (result.success) {
+          const { contactAuthentication, cookieValue } =
+            await ctx.contacts.createContactAuthentication(ctx.contact!.id);
+          await ctx.contacts.addContactAuthenticationLogAccessEntry(contactAuthentication.id, {
+            ip: getClientIp(ctx.req),
+            userAgent: ctx.req.headers["user-agent"] ?? null,
+          });
           ctx.req.res?.cookie(
             `parallel_contact_auth_${toGlobalId("Contact", ctx.contact!.id)}`,
             cookieValue,

@@ -18,15 +18,17 @@ export async function down(knex: Knex): Promise<void> {
     .whereNull("contact_id")
     .select();
 
-  const duplicates = (await knex
-    .select("a.*")
-    .from("petition_access as a")
-    .leftJoin("petition_access as b", function () {
-      this.on("a.id", "<", "b.id")
-        .andOnNotNull("a.contact_id")
-        .andOn("a.contact_id ", "=", "b.contact_id");
-    })
-    .where("a.status", "INACTIVE")) as PetitionAccess[];
+  const duplicates = (await knex.raw(
+    `
+    select distinct pa1.*
+    from petition_access pa1
+    join pa2 on pa1.petition_id = pa2.petition_id and pa1.contact_id = pa2.contact_id and pa1.id != pa2.id
+  `
+  )) as PetitionAccess[];
+
+  // agrupamos por petition_id/contact_id
+  // de cada grupo elegimos una, la ELEGIDA que no borraremos (ACTIVE si hay, si no ultima INACTIVE)
+  // para cada grupo cogemos las referencias a los petition_access a borrar y las actualizamos a la ELEGIDA
 
   const petitionAccessIds = [...petitionAccessContactless, ...duplicates].map((pa) => pa.id);
 
