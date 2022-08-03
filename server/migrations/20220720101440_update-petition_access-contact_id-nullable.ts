@@ -36,6 +36,16 @@ export async function down(knex: Knex): Promise<void> {
       .whereIn("petition_access_id", petitionAccessIds)
       .delete();
 
+    await knex
+      .from("petition_field_reply")
+      .whereIn("petition_access_id", petitionAccessIds)
+      .delete();
+
+    await knex
+      .from("petition_field_comment")
+      .whereIn("petition_access_id", petitionAccessIds)
+      .delete();
+
     await knex.from("petition_message").whereIn("petition_access_id", petitionAccessIds).delete();
 
     await knex
@@ -51,8 +61,8 @@ export async function down(knex: Knex): Promise<void> {
   });
 
   await knex.raw(/* sql */ `
-  drop index petition_access__petition_id_contact_id;
   drop index petition_access__petition_id_contactless;
+  drop index petition_access__petition_id_contact_id;
   alter table petition_access add constraint petition_access__petition_id_contact_id unique (petition_id, contact_id);
 `);
 }
