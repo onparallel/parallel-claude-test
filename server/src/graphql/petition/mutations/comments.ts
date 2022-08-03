@@ -1,6 +1,10 @@
+import { ApolloError } from "apollo-server-core";
 import { booleanArg, mutationField, nonNull } from "nexus";
+import { difference, isDefined, partition } from "remeda";
+import { ApiContext } from "../../../context";
 import { PetitionFieldComment } from "../../../db/__types";
-import { toPlainText } from "../../../util/slate";
+import { fullName } from "../../../util/fullName";
+import { getMentions, toPlainText } from "../../../util/slate";
 import { and, authenticateAnd, ifArgEquals } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonArg } from "../../helpers/scalars";
@@ -14,6 +18,102 @@ import {
   userHasAccessToPetitions,
 } from "../authorizers";
 import { userIsCommentAuthor } from "./authorizers";
+
+async function manageMentionsSharing(
+  mentions: ReturnType<typeof getMentions>,
+  petitionId: number,
+  throwOnNoPermission: boolean,
+  sharePetition: boolean,
+  ctx: ApiContext
+) {
+  const [userMentions, userGroupMentions] = partition(mentions, (m) => m.type === "User");
+  const { users: userIdsWithPermission, userGroups: groupIdsWithPermission } =
+    await ctx.petitions.filterUsersWithPetitionPermission(
+      petitionId,
+      userMentions.map((m) => m.id),
+      userGroupMentions.map((m) => m.id)
+    );
+
+  const userIdsWithNoPermissions = difference(
+    userMentions.map((m) => m.id),
+    userIdsWithPermission
+  );
+
+  const userGroupIdsWithNoPermissions = difference(
+    userGroupMentions.map((m) => m.id),
+    groupIdsWithPermission
+  );
+
+  if (userIdsWithNoPermissions.length > 0 || userGroupIdsWithNoPermissions.length > 0) {
+    if (throwOnNoPermission) {
+      const users =
+        userIdsWithNoPermissions.length > 0
+          ? (await ctx.users.loadUserDataByUserId(userIdsWithNoPermissions)).filter(isDefined)
+          : [];
+      const groups =
+        userGroupIdsWithNoPermissions.length > 0
+          ? (await ctx.userGroups.loadUserGroup(userGroupIdsWithNoPermissions)).filter(isDefined)
+          : [];
+      throw new ApolloError(`Mentioned users with no permissions`, "NO_PERMISSIONS_MENTION_ERROR", {
+        names: [
+          ...users.map((u) => fullName(u.first_name, u.last_name)),
+          ...groups.map((g) => g.name),
+        ],
+      });
+    } else if (sharePetition) {
+      await ctx.petitions.withTransaction(async (t) => {
+        const { newPermissions } = await ctx.petitions.addPetitionPermissions(
+          [petitionId],
+          [
+            ...userIdsWithNoPermissions.map((userId) => ({
+              type: "User" as const,
+              id: userId,
+              isSubscribed: false,
+              permissionType: "READ" as const,
+            })),
+            ...userGroupIdsWithNoPermissions.map((groupId) => ({
+              type: "UserGroup" as const,
+              id: groupId,
+              isSubscribed: false,
+              permissionType: "READ" as const,
+            })),
+          ],
+          `User:${ctx.user!.id}`,
+          t
+        );
+
+        const [directlyAssigned, groupAssigned] = partition(
+          newPermissions.filter((p) => p.from_user_group_id === null),
+          (p) => p.user_group_id === null
+        );
+
+        await ctx.petitions.createEvent(
+          [
+            ...directlyAssigned.map((p) => ({
+              petition_id: p.petition_id,
+              type: "USER_PERMISSION_ADDED" as const,
+              data: {
+                user_id: ctx.user!.id,
+                permission_type: p.type,
+                permission_user_id: p.user_id!,
+              },
+            })),
+            ...groupAssigned.map((p) => ({
+              petition_id: p.petition_id,
+              type: "GROUP_PERMISSION_ADDED" as const,
+              data: {
+                user_id: ctx.user!.id,
+                permission_type: p.type,
+                user_group_id: p.user_group_id!,
+              },
+            })),
+          ],
+          t
+        );
+      });
+    }
+  }
+}
 
 export const createPetitionFieldComment = mutationField("createPetitionFieldComment", {
   description: "Create a petition field comment.",
@@ -43,13 +143,22 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
     petitionFieldId: nonNull(globalIdArg("PetitionField")),
     content: nonNull(jsonArg()),
     isInternal: booleanArg(),
-    subscribeNoPermissions: booleanArg(),
+    sharePetition: booleanArg({
+      description: "Automatically share the petition with mentioned users that have no permissions",
+    }),
+    throwOnNoPermission: booleanArg({
+      description: "Throw error if set to true and a user with no permissions is mentioned",
+    }),
   },
   resolve: async (_, args, ctx) => {
-    // TODO verificar que los mencionados tienen permisos a la peticion
-    // - si no tienen permisos el flag subcribeNoPermissions ha de ser true
-    // - si no tienen permisos, tira un error con los mencionados sin permisos
-    // para mostrar una confirmacion de subscripcion en el front.
+    await manageMentionsSharing(
+      getMentions(args.content),
+      args.petitionId,
+      args.throwOnNoPermission ?? true,
+      args.sharePetition ?? false,
+      ctx
+    );
+
     ctx.petitions.loadPetitionFieldCommentsForField.dataloader.clear({
       loadInternalComments: true,
       petitionFieldId: args.petitionFieldId,
@@ -130,13 +239,22 @@ export const updatePetitionFieldComment = mutationField("updatePetitionFieldComm
     petitionFieldId: nonNull(globalIdArg("PetitionField")),
     petitionFieldCommentId: nonNull(globalIdArg("PetitionFieldComment")),
     content: nonNull(jsonArg()),
-    subscribeNoPermissions: booleanArg(),
+    sharePetition: booleanArg({
+      description: "Automatically share the petition with mentioned users that have no permissions",
+    }),
+    throwOnNoPermission: booleanArg({
+      description: "Throw error if set to true and a user with no permissions is mentioned",
+    }),
   },
   resolve: async (_, args, ctx) => {
-    // TODO verificar que los mencionados tienen permisos a la peticion
-    // - si no tienen permisos el flag subcribeNoPermissions ha de ser true
-    // - si no tienen permisos, tira un error con los mencionados sin permisos
-    // para mostrar una confirmacion de subscripcion en el front.
+    await manageMentionsSharing(
+      getMentions(args.content),
+      args.petitionId,
+      args.throwOnNoPermission ?? true,
+      args.sharePetition ?? false,
+      ctx
+    );
+
     return await ctx.petitions.updatePetitionFieldCommentFromUser(
       args.petitionFieldCommentId,
       {

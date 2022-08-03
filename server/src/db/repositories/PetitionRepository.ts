@@ -201,6 +201,37 @@ export class PetitionRepository extends BaseRepository {
     return permissions.every((p) => p);
   }
 
+  async filterUsersWithPetitionPermission(
+    petitionId: number,
+    userIds: number[],
+    userGroupIds: number[]
+  ) {
+    const [userRows, userGroupRows] = await Promise.all([
+      userIds.length === 0
+        ? []
+        : await this.from("petition_permission")
+            .whereIn("user_id", userIds)
+            .where("petition_id", petitionId)
+            .whereNull("deleted_at")
+            .whereNull("user_group_id")
+            .select<{ user_id: number }[]>(this.knex.raw(`distinct(user_id)`)),
+      userGroupIds.length === 0
+        ? []
+        : await this.from("petition_permission")
+            .whereIn("user_group_id", userGroupIds)
+            .where("petition_id", petitionId)
+            .whereNull("deleted_at")
+            .whereNull("user_id")
+            .select<{ user_group_id: number }[]>(this.knex.raw(`distinct(user_group_id)`)),
+    ]);
+    return {
+      users: userRows.filter((r) => userIds.includes(r.user_id)).map((r) => r.user_id),
+      userGroups: userGroupRows
+        .filter((r) => userGroupIds.includes(r.user_group_id))
+        .map((r) => r.user_group_id),
+    };
+  }
+
   async userHasAccessToPetitionsRaw(
     userId: number,
     petitionIds: number[],

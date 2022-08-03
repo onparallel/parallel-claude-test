@@ -385,6 +385,26 @@
     "context": "The following contacts opted out from receiving reminders and any changes will not apply to them:"
   },
   {
+    "term": "component.confirm-comment-mention-and-share-dialog.body",
+    "definition": "{users} will not be able to see your note because they have no access to the parallel.",
+    "context": "{users} will not be able to see your note because they have no access to the parallel."
+  },
+  {
+    "term": "component.confirm-comment-mention-and-share-dialog.body-confirm",
+    "definition": "Do you want to share the parallel so they can see your message?",
+    "context": "Do you want to share the parallel so they can see your message?"
+  },
+  {
+    "term": "component.confirm-comment-mention-and-share-dialog.cancel",
+    "definition": "No, add without sharing",
+    "context": "No, add without sharing"
+  },
+  {
+    "term": "component.confirm-comment-mention-and-share-dialog.header",
+    "definition": "Users without access",
+    "context": "Users without access"
+  },
+  {
     "term": "component.confirm-compliance-period-dialog.body",
     "definition": "This parallel has been closed more than <b>{months, plural, =1{# month} other{# months}} ago</b>. If you confirm this changes, the parallel will be anonymized in the next 24 hours and all sensitive information will be deleted. You will not lose access to the parallel.",
     "context": "This parallel has been closed more than <b>{months, plural, =1{# month} other{# months}} ago</b>. If you confirm this changes, the parallel will be anonymized in the next 24 hours and all sensitive information will be deleted. You will not lose access to the parallel."

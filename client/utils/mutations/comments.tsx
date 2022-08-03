@@ -1,5 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
 import { VariablesOf } from "@graphql-typed-document-node/core";
+import { useConfirmCommentMentionAndShareDialog } from "@parallel/components/common/dialogs/ConfirmCommentMentionAndShareDialog";
 import { PetitionFieldComment } from "@parallel/components/common/PetitionFieldComment";
 import { removeMentionInputElements } from "@parallel/components/common/slate/CommentEditor";
 import {
@@ -8,20 +9,48 @@ import {
   usePetitionCommentsMutations_updatePetitionFieldCommentDocument,
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
+import { isApolloError } from "../apollo/isApolloError";
+import { withError } from "../promises/withError";
 
 export function useCreatePetitionFieldComment() {
   const [createPetitionFieldComment] = useMutation(
     usePetitionCommentsMutations_createPetitionFieldCommentDocument
   );
 
+  const showConfirmCommentMentionAndShareDialog = useConfirmCommentMentionAndShareDialog();
+
   return useCallback(
     async ({
       content,
       ...variables
-    }: VariablesOf<typeof usePetitionCommentsMutations_createPetitionFieldCommentDocument>) => {
-      await createPetitionFieldComment({
-        variables: { content: removeMentionInputElements(content), ...variables },
-      });
+    }: Omit<
+      VariablesOf<typeof usePetitionCommentsMutations_createPetitionFieldCommentDocument>,
+      "sharePetition" | "throwOnNoPermission"
+    >) => {
+      try {
+        await createPetitionFieldComment({
+          variables: { content: removeMentionInputElements(content), ...variables },
+        });
+      } catch (e: any) {
+        if (isApolloError(e, "NO_PERMISSIONS_MENTION_ERROR")) {
+          const names = e.graphQLErrors[0].extensions.names as string[];
+          const [error, sharePetition] = await withError(
+            showConfirmCommentMentionAndShareDialog({ names })
+          );
+          if (!error) {
+            try {
+              await createPetitionFieldComment({
+                variables: {
+                  content: removeMentionInputElements(content),
+                  sharePetition,
+                  throwOnNoPermission: false,
+                  ...variables,
+                },
+              });
+            } catch {}
+          }
+        }
+      }
     },
     [createPetitionFieldComment]
   );
@@ -31,14 +60,40 @@ export function useUpdatePetitionFieldComment() {
   const [updatePetitionFieldComment] = useMutation(
     usePetitionCommentsMutations_updatePetitionFieldCommentDocument
   );
+  const showConfirmCommentMentionAndShareDialog = useConfirmCommentMentionAndShareDialog();
+
   return useCallback(
     async ({
       content,
       ...variables
-    }: VariablesOf<typeof usePetitionCommentsMutations_updatePetitionFieldCommentDocument>) => {
-      await updatePetitionFieldComment({
-        variables: { content: removeMentionInputElements(content), ...variables },
-      });
+    }: Omit<
+      VariablesOf<typeof usePetitionCommentsMutations_updatePetitionFieldCommentDocument>,
+      "sharePetition" | "throwOnNoPermission"
+    >) => {
+      try {
+        await updatePetitionFieldComment({
+          variables: { content: removeMentionInputElements(content), ...variables },
+        });
+      } catch (e: any) {
+        if (isApolloError(e, "NO_PERMISSIONS_MENTION_ERROR")) {
+          const names = e.graphQLErrors[0].extensions.names as string[];
+          const [error, sharePetition] = await withError(
+            showConfirmCommentMentionAndShareDialog({ names })
+          );
+          if (!error) {
+            try {
+              await updatePetitionFieldComment({
+                variables: {
+                  content: removeMentionInputElements(content),
+                  sharePetition,
+                  throwOnNoPermission: false,
+                  ...variables,
+                },
+              });
+            } catch {}
+          }
+        }
+      }
     },
     [updatePetitionFieldComment]
   );
@@ -85,12 +140,16 @@ const _mutations = [
       $petitionFieldId: GID!
       $content: JSON!
       $isInternal: Boolean
+      $sharePetition: Boolean
+      $throwOnNoPermission: Boolean
     ) {
       createPetitionFieldComment(
         petitionId: $petitionId
         petitionFieldId: $petitionFieldId
         content: $content
         isInternal: $isInternal
+        sharePetition: $sharePetition
+        throwOnNoPermission: $throwOnNoPermission
       ) {
         ...usePetitionCommentsMutations_PetitionFieldComment
         field {
@@ -107,12 +166,16 @@ const _mutations = [
       $petitionFieldId: GID!
       $petitionFieldCommentId: GID!
       $content: JSON!
+      $sharePetition: Boolean
+      $throwOnNoPermission: Boolean
     ) {
       updatePetitionFieldComment(
         petitionId: $petitionId
         petitionFieldId: $petitionFieldId
         petitionFieldCommentId: $petitionFieldCommentId
         content: $content
+        sharePetition: $sharePetition
+        throwOnNoPermission: $throwOnNoPermission
       ) {
         ...usePetitionCommentsMutations_PetitionFieldComment
         field {

@@ -4116,7 +4116,8 @@ export interface NexusGenArgTypes {
       isInternal?: boolean | null; // Boolean
       petitionFieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
-      subscribeNoPermissions?: boolean | null; // Boolean
+      sharePetition?: boolean | null; // Boolean
+      throwOnNoPermission?: boolean | null; // Boolean
     };
     createPetitionFieldReply: {
       // args
@@ -4712,7 +4713,8 @@ export interface NexusGenArgTypes {
       petitionFieldCommentId: NexusGenScalars["GID"]; // GID!
       petitionFieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
-      subscribeNoPermissions?: boolean | null; // Boolean
+      sharePetition?: boolean | null; // Boolean
+      throwOnNoPermission?: boolean | null; // Boolean
     };
     updatePetitionFieldRepliesStatus: {
       // args

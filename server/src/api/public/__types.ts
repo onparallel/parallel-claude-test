@@ -923,7 +923,8 @@ export type MutationcreatePetitionFieldCommentArgs = {
   isInternal?: InputMaybe<Scalars["Boolean"]>;
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
-  subscribeNoPermissions?: InputMaybe<Scalars["Boolean"]>;
+  sharePetition?: InputMaybe<Scalars["Boolean"]>;
+  throwOnNoPermission?: InputMaybe<Scalars["Boolean"]>;
 };
 
 export type MutationcreatePetitionFieldReplyArgs = {
@@ -1512,7 +1513,8 @@ export type MutationupdatePetitionFieldCommentArgs = {
   petitionFieldCommentId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
-  subscribeNoPermissions?: InputMaybe<Scalars["Boolean"]>;
+  sharePetition?: InputMaybe<Scalars["Boolean"]>;
+  throwOnNoPermission?: InputMaybe<Scalars["Boolean"]>;
 };
 
 export type MutationupdatePetitionFieldRepliesStatusArgs = {

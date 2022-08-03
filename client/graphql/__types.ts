@@ -959,7 +959,8 @@ export interface MutationcreatePetitionFieldCommentArgs {
   isInternal?: InputMaybe<Scalars["Boolean"]>;
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
-  subscribeNoPermissions?: InputMaybe<Scalars["Boolean"]>;
+  sharePetition?: InputMaybe<Scalars["Boolean"]>;
+  throwOnNoPermission?: InputMaybe<Scalars["Boolean"]>;
 }
 
 export interface MutationcreatePetitionFieldReplyArgs {
@@ -1555,7 +1556,8 @@ export interface MutationupdatePetitionFieldCommentArgs {
   petitionFieldCommentId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
-  subscribeNoPermissions?: InputMaybe<Scalars["Boolean"]>;
+  sharePetition?: InputMaybe<Scalars["Boolean"]>;
+  throwOnNoPermission?: InputMaybe<Scalars["Boolean"]>;
 }
 
 export interface MutationupdatePetitionFieldRepliesStatusArgs {
@@ -22196,6 +22198,8 @@ export type usePetitionCommentsMutations_createPetitionFieldCommentMutationVaria
   petitionFieldId: Scalars["GID"];
   content: Scalars["JSON"];
   isInternal?: InputMaybe<Scalars["Boolean"]>;
+  sharePetition?: InputMaybe<Scalars["Boolean"]>;
+  throwOnNoPermission?: InputMaybe<Scalars["Boolean"]>;
 }>;
 
 export type usePetitionCommentsMutations_createPetitionFieldCommentMutation = {
@@ -22261,6 +22265,8 @@ export type usePetitionCommentsMutations_updatePetitionFieldCommentMutationVaria
   petitionFieldId: Scalars["GID"];
   petitionFieldCommentId: Scalars["GID"];
   content: Scalars["JSON"];
+  sharePetition?: InputMaybe<Scalars["Boolean"]>;
+  throwOnNoPermission?: InputMaybe<Scalars["Boolean"]>;
 }>;
 
 export type usePetitionCommentsMutations_updatePetitionFieldCommentMutation = {
@@ -30785,12 +30791,16 @@ export const usePetitionCommentsMutations_createPetitionFieldCommentDocument = g
     $petitionFieldId: GID!
     $content: JSON!
     $isInternal: Boolean
+    $sharePetition: Boolean
+    $throwOnNoPermission: Boolean
   ) {
     createPetitionFieldComment(
       petitionId: $petitionId
       petitionFieldId: $petitionFieldId
       content: $content
       isInternal: $isInternal
+      sharePetition: $sharePetition
+      throwOnNoPermission: $throwOnNoPermission
     ) {
       ...usePetitionCommentsMutations_PetitionFieldComment
       field {
@@ -30810,12 +30820,16 @@ export const usePetitionCommentsMutations_updatePetitionFieldCommentDocument = g
     $petitionFieldId: GID!
     $petitionFieldCommentId: GID!
     $content: JSON!
+    $sharePetition: Boolean
+    $throwOnNoPermission: Boolean
   ) {
     updatePetitionFieldComment(
       petitionId: $petitionId
       petitionFieldId: $petitionFieldId
       petitionFieldCommentId: $petitionFieldCommentId
       content: $content
+      sharePetition: $sharePetition
+      throwOnNoPermission: $throwOnNoPermission
     ) {
       ...usePetitionCommentsMutations_PetitionFieldComment
       field {

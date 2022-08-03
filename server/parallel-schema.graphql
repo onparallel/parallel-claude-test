@@ -755,7 +755,16 @@ type Mutation {
     isInternal: Boolean
     petitionFieldId: GID!
     petitionId: GID!
-    subscribeNoPermissions: Boolean
+
+    """
+    Automatically share the petition with mentioned users that have no permissions
+    """
+    sharePetition: Boolean
+
+    """
+    Throw error if set to true and a user with no permissions is mentioned
+    """
+    throwOnNoPermission: Boolean
   ): PetitionFieldComment!
 
   """
@@ -1607,7 +1616,16 @@ type Mutation {
     petitionFieldCommentId: GID!
     petitionFieldId: GID!
     petitionId: GID!
-    subscribeNoPermissions: Boolean
+
+    """
+    Automatically share the petition with mentioned users that have no permissions
+    """
+    sharePetition: Boolean
+
+    """
+    Throw error if set to true and a user with no permissions is mentioned
+    """
+    throwOnNoPermission: Boolean
   ): PetitionFieldComment!
 
   """

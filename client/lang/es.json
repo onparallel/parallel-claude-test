@@ -385,6 +385,26 @@
     "context": "The following contacts opted out from receiving reminders and any changes will not apply to them:"
   },
   {
+    "term": "component.confirm-comment-mention-and-share-dialog.body",
+    "definition": "{users} no {count, plural, =1{podrá} other{podrán}} ver tu nota porque no {count, plural, =1{tiene} other{tienen}} acceso al parallel.",
+    "context": "{users} will not be able to see your note because they have no access to the parallel."
+  },
+  {
+    "term": "component.confirm-comment-mention-and-share-dialog.body-confirm",
+    "definition": "¿Quieres {count, plural, =1{compartirle} other{compartirles}} el parallel para que {count, plural, =1{pueda} other{puedan}} ver tu mensaje?",
+    "context": "Do you want to share the parallel so they can see your message?"
+  },
+  {
+    "term": "component.confirm-comment-mention-and-share-dialog.cancel",
+    "definition": "No, añadir sin compartir",
+    "context": "No, add without sharing"
+  },
+  {
+    "term": "component.confirm-comment-mention-and-share-dialog.header",
+    "definition": "Usuarios sin acceso",
+    "context": "Users without access"
+  },
+  {
     "term": "component.confirm-compliance-period-dialog.body",
     "definition": "Este parallel ha sido cerrado <b>hace más de {months, plural, =1{# mes} other{# meses}}</b>. Si confirmas estos cambios,el parallel será anonimizado en las próximas 24 horas y toda la información sensible será eliminada. No perderás el acceso a este parallel.",
     "context": "This parallel has been closed more than <b>{months, plural, =1{# month} other{# months}} ago</b>. If you confirm this changes, the parallel will be anonymized in the next 24 hours and all sensitive information will be deleted. You will not lose access to the parallel."
