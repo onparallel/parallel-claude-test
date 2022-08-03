@@ -123,7 +123,7 @@ function Mention({ mention, children }: MentionProps) {
       style={{
         display: "inline-block",
         borderRadius: "5px",
-        padding: "0 2px",
+        padding: "0 4px",
         fontWeight: 500,
         backgroundColor: mention?.highlight ? "#EBF8FF" : "inherit",
         color: "#153E75",
