@@ -2670,11 +2670,11 @@ export class PetitionRepository extends BaseRepository {
       this.from("user")
         .where("org_id", orgId)
         .whereIn("id", userIds)
-        .select(this.raw(`count(distinct id)::int as count`)) as Promise<{ count: number }[]>,
+        .select(this.knex.raw(`count(distinct id)::int as count`)) as Promise<{ count: number }[]>,
       this.from("user_group")
         .where("org_id", orgId)
         .whereIn("id", userGroupIds)
-        .select(this.raw(`count(distinct id)::int as count`)) as Promise<{ count: number }[]>,
+        .select(this.knex.raw(`count(distinct id)::int as count`)) as Promise<{ count: number }[]>,
     ]);
     return userCount === new Set(userIds).size && userGroupCount === new Set(userGroupIds).size;
   }

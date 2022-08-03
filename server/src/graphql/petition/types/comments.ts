@@ -1,6 +1,6 @@
 import { objectType, unionType } from "nexus";
 import { isDefined } from "remeda";
-import { toHtml } from "../../../util/slate";
+import { getMentions, toHtml } from "../../../util/slate";
 
 export const UserOrPetitionAccess = unionType({
   name: "UserOrPetitionAccess",
@@ -111,19 +111,17 @@ export const PetitionFieldComment = objectType({
     });
     t.list.field("mentions", {
       type: "PetitionFieldCommentMention",
-      description: "The mentiones of the comments.",
+      description: "The mentions of the comments.",
       resolve: async (root, _, ctx) => {
-        return [];
-        // TODO coger mentions de la tabla de petition_field_comment_mentions
-        // return getMentions(root.content_json).map((m) => {
-        //   if (m.type === "User") {
-        //     return { __type: "User", user_id: m.id };
-        //   } else if (m.type === "UserGroup") {
-        //     return { __type: "UserGroup", user_group_id: m.id };
-        //   } else {
-        //     throw new Error("Unknown mention type");
-        //   }
-        // });
+        return getMentions(root.content_json).map((m) => {
+          if (m.type === "User") {
+            return { __type: "User", user_id: m.id };
+          } else if (m.type === "UserGroup") {
+            return { __type: "UserGroup", user_group_id: m.id };
+          } else {
+            throw new Error("Unknown mention type");
+          }
+        });
       },
     });
     t.datetime("createdAt", {

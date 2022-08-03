@@ -2146,8 +2146,8 @@
   },
   {
     "term": "component.petition-comments-and-notes-editor.note-placeholder",
-    "definition": "Escribe una nota",
-    "context": "Write a note"
+    "definition": "Presiona @ para mencionar a otros usuarios",
+    "context": "Type @ to mention other users"
   },
   {
     "term": "component.petition-comments-and-notes-editor.notes",

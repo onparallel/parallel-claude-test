@@ -118,8 +118,6 @@ const _CommentEditor = forwardRef<CommentEditorInstance, CommentEditorProps>(fun
   },
   ref
 ) {
-  // TODO remove this line to enable mentions
-  onSearchMentionables = undefined;
   const plugins = useMemo(
     () =>
       createPlugins<CommentEditorValue, CommentPEditor>(

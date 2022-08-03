@@ -114,7 +114,6 @@ export function PetitionCommentsAndNotesEditor({
               isDisabled={isDisabled}
               onKeyDown={handleKeyDown}
               onChange={setCommentDraft}
-              onSearchMentionables={onSearchMentionables}
             />
             <Button
               colorScheme="primary"
@@ -139,8 +138,7 @@ export function PetitionCommentsAndNotesEditor({
                   id={`note-editor-${id}`}
                   placeholder={intl.formatMessage({
                     id: "component.petition-comments-and-notes-editor.note-placeholder",
-                    // TODO: defaultMessage: "Type @ to mention other users",
-                    defaultMessage: "Write a note",
+                    defaultMessage: "Type @ to mention other users",
                   })}
                   value={noteDraft}
                   isDisabled={isDisabled}

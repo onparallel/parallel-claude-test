@@ -2915,7 +2915,7 @@ type PetitionFieldComment {
   isUnread: Boolean!
 
   """
-  The mentiones of the comments.
+  The mentions of the comments.
   """
   mentions: [PetitionFieldCommentMention!]!
 }
