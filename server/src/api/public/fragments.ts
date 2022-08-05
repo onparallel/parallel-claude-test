@@ -149,6 +149,20 @@ export const PetitionFragment = gql`
     tags @include(if: $includeTags) {
       ...Tag
     }
+    progress @include(if: $includeProgress) {
+      external {
+        approved
+        replied
+        optional
+        total
+      }
+      internal {
+        approved
+        replied
+        optional
+        total
+      }
+    }
   }
   ${PetitionAccessFragment}
   ${PetitionFieldWithRepliesFragment}

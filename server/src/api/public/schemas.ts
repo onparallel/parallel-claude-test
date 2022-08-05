@@ -493,6 +493,35 @@ const _Petition = {
         },
       },
     },
+    progress: {
+      type: "object",
+      description: outdent`
+        The progress on the parallel separated into internal and external fields.
+
+        Each category has values for:
+          - \`approved\`: Replied and approved fields.
+          - \`replied\`: Replied but not approved.
+          - \`optional\`: Non-replied fields that are optional.
+          - \`total\`: The total number of repliable fields in the category.
+        
+        Inside Parallel this progress is rendered as shown here:
+        ![progress explanation](https://static.onparallel.com/static/images/progressbar_states.png)
+      `,
+      example: {
+        external: {
+          approved: 0,
+          replied: 1,
+          optional: 0,
+          total: 1,
+        },
+        internal: {
+          approved: 0,
+          replied: 0,
+          optional: 0,
+          total: 0,
+        },
+      },
+    },
   },
 } as const;
 

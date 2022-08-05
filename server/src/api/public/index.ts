@@ -292,7 +292,7 @@ const petitionIncludeParam = {
     description: "Include optional fields in the response",
     array: true,
     required: false,
-    values: ["recipients", "fields", "tags", "replies"],
+    values: ["recipients", "fields", "tags", "replies", "progress"],
   }),
 };
 
@@ -463,6 +463,7 @@ api
           $includeTags: Boolean!
           $includeRecipientUrl: Boolean!
           $includeReplies: Boolean!
+          $includeProgress: Boolean!
         ) {
           petitions(
             offset: $offset
@@ -486,6 +487,7 @@ api
         includeRecipients: query.include?.includes("recipients") ?? false,
         includeTags: query.include?.includes("tags") ?? false,
         includeRecipientUrl: false,
+        includeProgress: query.include?.includes("progress") ?? false,
       });
       const { items, totalCount } = result.petitions;
       assertType<PetitionFragmentType[]>(items);
@@ -514,6 +516,7 @@ api
           $includeTags: Boolean!
           $includeRecipientUrl: Boolean!
           $includeReplies: Boolean!
+          $includeProgress: Boolean!
         ) {
           createPetition(name: $name, petitionId: $templateId) {
             ...Petition
@@ -528,6 +531,7 @@ api
         includeRecipients: query.include?.includes("recipients") ?? false,
         includeTags: query.include?.includes("tags") ?? false,
         includeRecipientUrl: false,
+        includeProgress: query.include?.includes("progress") ?? false,
       });
       assert("id" in result.createPetition);
       return Created(mapPetition(result.createPetition));
@@ -558,6 +562,7 @@ api
           $includeTags: Boolean!
           $includeRecipientUrl: Boolean!
           $includeReplies: Boolean!
+          $includeProgress: Boolean!
         ) {
           petition(id: $petitionId) {
             ...Petition
@@ -572,6 +577,7 @@ api
         includeRecipients: query.include?.includes("recipients") ?? false,
         includeTags: query.include?.includes("tags") ?? false,
         includeRecipientUrl: false,
+        includeProgress: query.include?.includes("progress") ?? false,
       });
       assert("id" in result.petition!);
       return Ok(mapPetition(result.petition!));
@@ -601,6 +607,7 @@ api
           $includeTags: Boolean!
           $includeRecipientUrl: Boolean!
           $includeReplies: Boolean!
+          $includeProgress: Boolean!
         ) {
           updatePetition(petitionId: $petitionId, data: $data) {
             ...Petition
@@ -616,6 +623,7 @@ api
         includeRecipients: query.include?.includes("recipients") ?? false,
         includeTags: query.include?.includes("tags") ?? false,
         includeRecipientUrl: false,
+        includeProgress: query.include?.includes("progress") ?? false,
       });
       assert("id" in result.updatePetition!);
       return Ok(mapPetition(result.updatePetition!));
@@ -961,7 +969,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
         description: "Include optional fields in the response",
         array: true,
         required: false,
-        values: ["recipients", "fields", "tags", "recipients.recipientUrl"],
+        values: ["recipients", "fields", "tags", "recipients.recipientUrl", "progress"],
       }),
     },
     responses: {
@@ -1062,6 +1070,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
           $includeTags: Boolean!
           $includeRecipientUrl: Boolean!
           $includeReplies: Boolean!
+          $includeProgress: Boolean!
         ) {
           sendPetition(
             petitionId: $petitionId
@@ -1109,6 +1118,7 @@ api.path("/petitions/:petitionId/send", { params: { petitionId } }).post(
         includeRecipients: query.include?.includes("recipients") ?? false,
         includeTags: query.include?.includes("tags") ?? false,
         includeRecipientUrl: query.include?.includes("recipients.recipientUrl") ?? false,
+        includeProgress: query.include?.includes("progress") ?? false,
       });
 
       assert(result.sendPetition[0].petition !== null);
@@ -1645,6 +1655,7 @@ api
         includeTags: false,
         includeRecipientUrl: false,
         includeReplies: false,
+        includeProgress: false,
       });
 
       return Ok(mapPetition(res.bulkCreatePetitionReplies));

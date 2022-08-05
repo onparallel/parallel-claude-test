@@ -160,6 +160,7 @@ gql`
     $includeRecipients: Boolean!
     $includeRecipientUrl: Boolean!
     $includeReplies: Boolean!
+    $includeProgress: Boolean!
   ) {
     bulkCreatePetitionReplies(petitionId: $petitionId, replies: $replies) {
       ...Petition

@@ -2392,6 +2392,11 @@ export interface PetitionFieldProgress {
   replied: Scalars["Int"];
   /** Total number of fields in the petition */
   total: Scalars["Int"];
+  /**
+   * Number of fields validated
+   * @deprecated Don't use this
+   */
+  validated: Scalars["Int"];
 }
 
 /** A reply to a petition field */
