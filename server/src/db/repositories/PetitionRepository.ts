@@ -414,7 +414,7 @@ export class PetitionRepository extends BaseRepository {
       builders.push((q) => q.where("locale", filters.locale));
     }
     if (filters?.status && type === "PETITION") {
-      builders.push((q) => q.whereIn("status", filters.status));
+      builders.push((q) => q.whereRaw("p.status in ?", [this.sqlIn(filters.status!)]));
     }
     if (filters?.tagIds) {
       builders.push((q) => {
