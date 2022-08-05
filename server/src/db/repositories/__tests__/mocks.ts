@@ -3,8 +3,11 @@ import { Knex } from "knex";
 import { isDefined, range } from "remeda";
 import { USER_COGNITO_ID } from "../../../../test/mocks";
 import { unMaybeArray } from "../../../util/arrays";
+import { fullName } from "../../../util/fullName";
+import { toGlobalId } from "../../../util/globalId";
 import { defaultPdfDocumentTheme } from "../../../util/PdfDocumentTheme";
 import { removeNotDefined } from "../../../util/remedaExtensions";
+import { safeJsonParse } from "../../../util/safeJsonParse";
 import { toPlainText } from "../../../util/slate";
 import { titleize } from "../../../util/strings";
 import { hash, random } from "../../../util/token";
@@ -719,6 +722,58 @@ export class Mocks {
           ...builder?.(i),
         }))
       )
+      .returning("*");
+  }
+
+  async mentionUserInComment(userId: number, commentId: number) {
+    const [user] = await this.knex<User>("user").where("id", userId).select("*");
+    const [userData] = await this.knex<UserData>("user_data")
+      .where("id", user.user_data_id)
+      .select("*");
+
+    const userName = fullName(userData.first_name, userData.last_name);
+    const [comment] = await this.knex<PetitionFieldComment>("petition_field_comment")
+      .where("id", commentId)
+      .select("*");
+
+    const newContent = (comment.content ?? "").concat("@" + userName);
+    const newContentJson = (safeJsonParse(comment.content_json) ?? []).concat({
+      type: "mention",
+      mention: toGlobalId("User", userId),
+      children: [{ text: userName }],
+    });
+
+    await this.knex<PetitionFieldComment>("petition_field_comment")
+      .update({
+        content: newContent,
+        content_json: this.knex.raw("?::jsonb", JSON.stringify(newContentJson)),
+      })
+      .where("id", commentId)
+      .returning("*");
+  }
+
+  async mentionUserGroupInComment(userGroupId: number, commentId: number) {
+    const [userGroup] = await this.knex<UserGroup>("user_group")
+      .where("id", userGroupId)
+      .select("*");
+
+    const [comment] = await this.knex<PetitionFieldComment>("petition_field_comment")
+      .where("id", commentId)
+      .select("*");
+
+    const newContent = (comment.content ?? "").concat("@" + userGroup.name);
+    const newContentJson = (safeJsonParse(comment.content_json) ?? []).concat({
+      type: "mention",
+      mention: toGlobalId("UserGroup", userGroupId),
+      children: [{ text: userGroup.name }],
+    });
+
+    await this.knex<PetitionFieldComment>("petition_field_comment")
+      .update({
+        content: newContent,
+        content_json: this.knex.raw("?::jsonb", JSON.stringify(newContentJson)),
+      })
+      .where("id", commentId)
       .returning("*");
   }
 

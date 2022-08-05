@@ -121,6 +121,7 @@ describe("Worker - User Notifications Listener", () => {
         data: {
           petition_field_id: field.id,
           petition_field_comment_id: comment.id,
+          is_mentioned: false,
         },
       }))
     );
@@ -156,6 +157,85 @@ describe("Worker - User Notifications Listener", () => {
         data: {
           petition_field_id: field.id,
           petition_field_comment_id: comment.id,
+          is_mentioned: false,
+        },
+      },
+    ]);
+  });
+
+  it("users should receive a notification when another user mentions them on a comment", async () => {
+    const [comment] = await mocks.createRandomCommentsFromUser(users[1].id, field.id, petition.id);
+    await mocks.mentionUserInComment(users[0].id, comment.id);
+    await userNotificationsListener(
+      {
+        id: 1,
+        created_at: new Date(),
+        type: "COMMENT_PUBLISHED",
+        petition_id: petition.id,
+        data: {
+          petition_field_comment_id: comment.id,
+          petition_field_id: field.id,
+        },
+      },
+      ctx
+    );
+
+    const notifications = await knex<PetitionUserNotification>("petition_user_notification")
+      .where({ petition_id: petition.id })
+      .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
+
+    expect(notifications).toEqual([
+      {
+        is_read: false,
+        processed_at: null,
+        petition_id: petition.id,
+        type: "COMMENT_CREATED",
+        user_id: users[0].id,
+        data: {
+          petition_field_id: field.id,
+          petition_field_comment_id: comment.id,
+          is_mentioned: true,
+        },
+      },
+    ]);
+  });
+
+  it("users should receive a notification when another user mentions a group they belong to in a comment", async () => {
+    const [comment] = await mocks.createRandomCommentsFromUser(users[1].id, field.id, petition.id);
+
+    const [group] = await mocks.createUserGroups(1, users[0].org_id);
+    await mocks.insertUserGroupMembers(group.id, [users[0].id]);
+    await mocks.mentionUserGroupInComment(group.id, comment.id);
+
+    await userNotificationsListener(
+      {
+        id: 1,
+        created_at: new Date(),
+        type: "COMMENT_PUBLISHED",
+        petition_id: petition.id,
+        data: {
+          petition_field_comment_id: comment.id,
+          petition_field_id: field.id,
+        },
+      },
+      ctx
+    );
+
+    const notifications = await knex<PetitionUserNotification>("petition_user_notification")
+      .where({ petition_id: petition.id })
+      .select("is_read", "processed_at", "data", "petition_id", "type", "user_id");
+
+    expect(notifications).toEqual([
+      {
+        is_read: false,
+        processed_at: null,
+        petition_id: petition.id,
+        type: "COMMENT_CREATED",
+        user_id: users[0].id,
+        data: {
+          petition_field_id: field.id,
+          petition_field_comment_id: comment.id,
+          is_mentioned: true,
         },
       },
     ]);

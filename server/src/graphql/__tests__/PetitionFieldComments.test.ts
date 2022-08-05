@@ -289,6 +289,286 @@ describe("GraphQL/Petition Fields Comments", () => {
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
+
+    it("mentions a user with access to the petition", async () => {
+      const [mentioned] = await mocks.createRandomUsers(organization.id, 1, undefined, () => ({
+        first_name: "Ross",
+        last_name: "Geller",
+      }));
+      await mocks.sharePetitions([petition.id], mentioned.id, "READ");
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $content: JSON!
+            $isInternal: Boolean
+          ) {
+            createPetitionFieldComment(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              content: $content
+              isInternal: $isInternal
+            ) {
+              mentions {
+                ... on PetitionFieldCommentUserMention {
+                  user {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", headingField.id),
+          content: [
+            {
+              type: "paragraph",
+              children: [
+                { text: "Hello" },
+                {
+                  type: "mention",
+                  mention: toGlobalId("User", mentioned.id),
+                  children: [{ text: "Ross Geller" }],
+                },
+                { text: "!" },
+              ],
+            },
+          ],
+          isInternal: true,
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data!.createPetitionFieldComment).toEqual({
+        mentions: [{ user: { id: toGlobalId("User", mentioned.id) } }],
+      });
+    });
+
+    it("sends error when trying to mention an user of another org", async () => {
+      const [privateOrg] = await mocks.createRandomOrganizations(1);
+      const [privateUser] = await mocks.createRandomUsers(privateOrg.id, 1, undefined, () => ({
+        first_name: "Chandler",
+        last_name: "Bing",
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $content: JSON!
+            $isInternal: Boolean
+          ) {
+            createPetitionFieldComment(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              content: $content
+              isInternal: $isInternal
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", headingField.id),
+          content: [
+            {
+              type: "paragraph",
+              children: [
+                { text: "Hello" },
+                {
+                  type: "mention",
+                  mention: toGlobalId("User", privateUser.id),
+                  children: [{ text: "Chandler Bing" }],
+                },
+                { text: "!" },
+              ],
+            },
+          ],
+          isInternal: true,
+        }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when mentioning a user with no access to the petition", async () => {
+      const [joey] = await mocks.createRandomUsers(organization.id, 1, undefined, () => ({
+        first_name: "Joey",
+        last_name: "Tribbiani",
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $content: JSON!
+            $isInternal: Boolean
+          ) {
+            createPetitionFieldComment(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              content: $content
+              isInternal: $isInternal
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", headingField.id),
+          content: [
+            {
+              type: "paragraph",
+              children: [
+                { text: "Hello" },
+                {
+                  type: "mention",
+                  mention: toGlobalId("User", joey.id),
+                  children: [{ text: "Joey Tribbiani" }],
+                },
+                { text: "!" },
+              ],
+            },
+          ],
+          isInternal: true,
+        }
+      );
+
+      expect(errors).toContainGraphQLError("NO_PERMISSIONS_MENTION_ERROR", {
+        names: ["Joey Tribbiani"],
+      });
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to add a mention on an external comment", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $content: JSON!
+            $isInternal: Boolean
+          ) {
+            createPetitionFieldComment(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              content: $content
+              isInternal: $isInternal
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", headingField.id),
+          content: [
+            {
+              type: "paragraph",
+              children: [
+                { text: "Hello" },
+                {
+                  type: "mention",
+                  mention: toGlobalId("User", otherUser.id),
+                  children: [{ text: "Joey Tribbiani" }],
+                },
+                { text: "!" },
+              ],
+            },
+          ],
+          isInternal: false,
+        }
+      );
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("automatically shares the petition when mentioning a user with no access and passing flags", async () => {
+      const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
+      const [field] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+        type: "TEXT",
+      }));
+      const [joey] = await mocks.createRandomUsers(organization.id, 1, undefined, () => ({
+        first_name: "Joey",
+        last_name: "Tribbiani",
+      }));
+
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $content: JSON!
+            $isInternal: Boolean
+            $throwOnNoPermission: Boolean
+            $sharePetition: Boolean
+          ) {
+            createPetitionFieldComment(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              content: $content
+              isInternal: $isInternal
+              throwOnNoPermission: $throwOnNoPermission
+              sharePetition: $sharePetition
+            ) {
+              mentions {
+                ... on PetitionFieldCommentUserMention {
+                  user {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", field.id),
+          content: [
+            {
+              type: "paragraph",
+              children: [
+                { text: "Hello" },
+                {
+                  type: "mention",
+                  mention: toGlobalId("User", joey.id),
+                  children: [{ text: "Joey Tribbiani" }],
+                },
+                { text: "!" },
+              ],
+            },
+          ],
+          isInternal: true,
+          throwOnNoPermission: false,
+          sharePetition: true,
+        }
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data!.createPetitionFieldComment).toEqual({
+        mentions: [{ user: { id: toGlobalId("User", joey.id) } }],
+      });
+
+      const permissions = await mocks.knex
+        .from("petition_permission")
+        .where("petition_id", petition.id)
+        .select("*");
+
+      expect(permissions).toMatchObject([
+        { user_id: user.id, type: "OWNER" },
+        { user_id: joey.id, type: "READ" },
+      ]);
+    });
   });
 
   describe("updatePetitionFieldComment", () => {
