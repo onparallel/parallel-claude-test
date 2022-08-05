@@ -1319,7 +1319,11 @@ export const sendPetition = mutationField("sendPetition", {
       throw new Error(`Owner of Petition:${args.petitionId} not found`);
     }
 
-    if (currentAccesses.some((access) => args.contactIdGroups.flat().includes(access.contact_id))) {
+    if (
+      currentAccesses
+        .filter((ca) => ca.status === "ACTIVE")
+        .some((access) => args.contactIdGroups.flat().includes(access.contact_id))
+    ) {
       throw new ApolloError(
         "This petition was already sent to some of the contacts",
         "PETITION_ALREADY_SENT_ERROR"

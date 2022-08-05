@@ -334,6 +334,10 @@ function usePetitionAccessesColumns(): TableColumn<
 
           const myEffectivePermission = petition.myEffectivePermission!.permissionType;
 
+          const contactHasActiveAccess = petition.accesses.some(
+            (access) => access.contact?.id === contact?.id && access.status === "ACTIVE"
+          );
+
           return contact ? (
             <Stack direction="row" spacing={2} justifyContent="flex-end">
               {status === "ACTIVE" ? (
@@ -381,7 +385,7 @@ function usePetitionAccessesColumns(): TableColumn<
                     isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
                   />
                 </>
-              ) : (
+              ) : contactHasActiveAccess ? null : (
                 <IconButtonWithTooltip
                   label={intl.formatMessage({
                     id: "petition-accesses.activate-access",

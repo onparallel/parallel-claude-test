@@ -49,7 +49,7 @@ export function useSendPetitionHandler(
 
     try {
       const currentRecipientIds = petition.accesses
-        .filter((a) => isDefined(a.contact))
+        .filter((a) => isDefined(a.contact) && a.status === "ACTIVE")
         .map((a) => a.contact!.id);
 
       await showTestSignatureDialog(
