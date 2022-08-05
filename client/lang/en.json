@@ -2490,7 +2490,7 @@
     "context": "{count} replied {count, plural, =1{field} other {fields}}{internalCount, plural,=0{} other { ({internalCount} internal)}}."
   },
   {
-    "term": "component.petition-progress-bar.validated-with-internal",
+    "term": "component.petition-progress-bar.approved-with-internal",
     "definition": "{count} reviewed {count, plural, =1{field} other {fields}}{internalCount, plural,=0{} other { ({internalCount} internal)}}.",
     "context": "{count} reviewed {count, plural, =1{field} other {fields}}{internalCount, plural,=0{} other { ({internalCount} internal)}}."
   },

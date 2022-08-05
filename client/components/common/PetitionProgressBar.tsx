@@ -13,7 +13,7 @@ interface PetitionProgressBarProps extends PetitionProgress, BoxProps {
 
 const STYLES = (() => {
   const styles = {
-    VALIDATED: { backgroundColor: "green.400" },
+    APPROVED: { backgroundColor: "green.400" },
     REPLIED: { backgroundColor: "yellow.400" },
     OPTIONAL: {
       backgroundColor: "yellow.400",
@@ -31,20 +31,20 @@ export function PetitionProgressBar({
   ...props
 }: PetitionProgressBarProps) {
   const sum = {
-    validated: external.validated + internal.validated,
+    approved: external.approved + internal.approved,
     replied: external.replied + internal.replied,
     optional: external.optional + internal.optional,
     total: external.total + internal.total,
   };
 
-  const { validated, replied, optional, total } = sum;
+  const { approved, replied, optional, total } = sum;
 
   return (
     <SmallPopover
       placement="left"
       width="auto"
       content={
-        status === "DRAFT" && !replied && !validated && !optional ? (
+        status === "DRAFT" && !replied && !approved && !optional ? (
           <Box textAlign="center" fontSize="sm">
             <Text fontStyle="italic">
               <FormattedMessage
@@ -63,7 +63,7 @@ export function PetitionProgressBar({
               />
             </Text>
           </Box>
-        ) : replied + validated === 0 ? (
+        ) : replied + approved === 0 ? (
           <Box textAlign="center" fontSize="sm">
             <QuestionIcon boxSize="24px" color="gray.300" />
             <Text marginTop={2}>
@@ -73,7 +73,7 @@ export function PetitionProgressBar({
               />
             </Text>
           </Box>
-        ) : total === validated ? (
+        ) : total === approved ? (
           <Box textAlign="center" fontSize="sm">
             <CheckIcon boxSize="24px" color="green.500" />
             <Text marginTop={2}>
@@ -85,7 +85,7 @@ export function PetitionProgressBar({
           </Box>
         ) : (
           <Stack as="ul" fontSize="sm" listStyleType="none" spacing={1}>
-            <ValidatedProgressText external={external} internal={internal} />
+            <ApprovedProgressText external={external} internal={internal} />
             <RepliedProgressText external={external} internal={internal} />
             <OptionalProgressText external={external} internal={internal} />
             <EmptyProgressText external={external} internal={internal} />
@@ -98,15 +98,15 @@ export function PetitionProgressBar({
           size="md"
           min={0}
           max={total!}
-          value={validated! + replied!}
+          value={approved! + replied!}
           {...STYLES["EMPTY"]}
         >
           <ProgressIndicator
             min={0}
             max={total!}
-            value={validated!}
+            value={approved!}
             backgroundColor="green.400"
-            {...STYLES["VALIDATED"]}
+            {...STYLES["APPROVED"]}
           />
           <ProgressIndicator min={0} max={total!} value={replied!} {...STYLES["REPLIED"]} />
           <ProgressIndicator min={0} max={total!} value={optional!} {...STYLES["OPTIONAL"]} />
@@ -120,8 +120,8 @@ function EmptyProgressText({ external, internal }: PetitionProgress) {
   const emptyFields =
     external.total +
     internal.total -
-    (external.validated +
-      internal.validated +
+    (external.approved +
+      internal.approved +
       external.replied +
       internal.replied +
       external.optional +
@@ -130,7 +130,7 @@ function EmptyProgressText({ external, internal }: PetitionProgress) {
   if (!emptyFields) return null;
 
   const internalEmptyFields =
-    internal.total - (internal.validated + internal.replied + internal.optional);
+    internal.total - (internal.approved + internal.replied + internal.optional);
 
   return (
     <ProgressText type="EMPTY">
@@ -146,17 +146,17 @@ function EmptyProgressText({ external, internal }: PetitionProgress) {
   );
 }
 
-function ValidatedProgressText({ external, internal }: PetitionProgress) {
-  if (!external.validated && !internal.validated) return null;
+function ApprovedProgressText({ external, internal }: PetitionProgress) {
+  if (!external.approved && !internal.approved) return null;
 
   return (
-    <ProgressText type="VALIDATED">
+    <ProgressText type="APPROVED">
       <FormattedMessage
-        id="component.petition-progress-bar.validated-with-internal"
+        id="component.petition-progress-bar.approved-with-internal"
         defaultMessage="{count} reviewed {count, plural, =1{field} other {fields}}{internalCount, plural,=0{} other { ({internalCount} internal)}}."
         values={{
-          count: external.validated + internal.validated,
-          internalCount: internal.validated,
+          count: external.approved + internal.approved,
+          internalCount: internal.approved,
         }}
       />
     </ProgressText>

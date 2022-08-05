@@ -31,13 +31,13 @@ PetitionStatusCellContent.fragments = {
       status
       progress {
         external {
-          validated
+          approved
           replied
           optional
           total
         }
         internal {
-          validated
+          approved
           replied
           optional
           total

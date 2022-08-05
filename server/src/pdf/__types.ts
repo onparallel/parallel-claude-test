@@ -2316,14 +2316,14 @@ export type PetitionFieldCommentUserMention = {
 
 /** The progress of the petition */
 export type PetitionFieldProgress = {
-  /** Number of optional fields not replied or validated */
+  /** Number of fields approved */
+  approved: Scalars["Int"];
+  /** Number of optional fields not replied or approved */
   optional: Scalars["Int"];
-  /** Number of fields with a reply and not validated */
+  /** Number of fields with a reply and not approved */
   replied: Scalars["Int"];
   /** Total number of fields in the petition */
   total: Scalars["Int"];
-  /** Number of fields validated */
-  validated: Scalars["Int"];
 };
 
 /** A reply to a petition field */

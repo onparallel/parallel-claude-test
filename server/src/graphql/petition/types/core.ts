@@ -42,12 +42,17 @@ export const PetitionFieldProgress = objectType({
   definition(t) {
     t.int("validated", {
       description: "Number of fields validated",
+      deprecation: "Don't use this",
+      resolve: (o) => o.approved,
+    });
+    t.int("approved", {
+      description: "Number of fields approved",
     });
     t.int("replied", {
-      description: "Number of fields with a reply and not validated",
+      description: "Number of fields with a reply and not approved",
     });
     t.int("optional", {
-      description: "Number of optional fields not replied or validated",
+      description: "Number of optional fields not replied or approved",
     });
     t.int("total", {
       description: "Total number of fields in the petition",

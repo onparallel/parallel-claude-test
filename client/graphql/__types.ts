@@ -2384,14 +2384,14 @@ export interface PetitionFieldCommentUserMention {
 /** The progress of the petition */
 export interface PetitionFieldProgress {
   __typename?: "PetitionFieldProgress";
-  /** Number of optional fields not replied or validated */
+  /** Number of fields approved */
+  approved: Scalars["Int"];
+  /** Number of optional fields not replied or approved */
   optional: Scalars["Int"];
-  /** Number of fields with a reply and not validated */
+  /** Number of fields with a reply and not approved */
   replied: Scalars["Int"];
   /** Total number of fields in the petition */
   total: Scalars["Int"];
-  /** Number of fields validated */
-  validated: Scalars["Int"];
 }
 
 /** A reply to a petition field */
@@ -4192,14 +4192,14 @@ export type PetitionStatusCellContent_PetitionFragment = {
     __typename?: "PetitionProgress";
     external: {
       __typename?: "PetitionFieldProgress";
-      validated: number;
+      approved: number;
       replied: number;
       optional: number;
       total: number;
     };
     internal: {
       __typename?: "PetitionFieldProgress";
-      validated: number;
+      approved: number;
       replied: number;
       optional: number;
       total: number;
@@ -12063,14 +12063,14 @@ export type Contact_ContactFragment = {
           __typename?: "PetitionProgress";
           external: {
             __typename?: "PetitionFieldProgress";
-            validated: number;
+            approved: number;
             replied: number;
             optional: number;
             total: number;
           };
           internal: {
             __typename?: "PetitionFieldProgress";
-            validated: number;
+            approved: number;
             replied: number;
             optional: number;
             total: number;
@@ -12134,14 +12134,14 @@ export type Contact_PetitionAccessFragment = {
       __typename?: "PetitionProgress";
       external: {
         __typename?: "PetitionFieldProgress";
-        validated: number;
+        approved: number;
         replied: number;
         optional: number;
         total: number;
       };
       internal: {
         __typename?: "PetitionFieldProgress";
-        validated: number;
+        approved: number;
         replied: number;
         optional: number;
         total: number;
@@ -12191,14 +12191,14 @@ export type Contact_PetitionFragment = {
     __typename?: "PetitionProgress";
     external: {
       __typename?: "PetitionFieldProgress";
-      validated: number;
+      approved: number;
       replied: number;
       optional: number;
       total: number;
     };
     internal: {
       __typename?: "PetitionFieldProgress";
-      validated: number;
+      approved: number;
       replied: number;
       optional: number;
       total: number;
@@ -12316,14 +12316,14 @@ export type Contact_contactQuery = {
             __typename?: "PetitionProgress";
             external: {
               __typename?: "PetitionFieldProgress";
-              validated: number;
+              approved: number;
               replied: number;
               optional: number;
               total: number;
             };
             internal: {
               __typename?: "PetitionFieldProgress";
-              validated: number;
+              approved: number;
               replied: number;
               optional: number;
               total: number;
@@ -19624,14 +19624,14 @@ export type Petitions_PetitionBasePaginationFragment = {
           __typename?: "PetitionProgress";
           external: {
             __typename?: "PetitionFieldProgress";
-            validated: number;
+            approved: number;
             replied: number;
             optional: number;
             total: number;
           };
           internal: {
             __typename?: "PetitionFieldProgress";
-            validated: number;
+            approved: number;
             replied: number;
             optional: number;
             total: number;
@@ -19768,14 +19768,14 @@ export type Petitions_PetitionBase_Petition_Fragment = {
     __typename?: "PetitionProgress";
     external: {
       __typename?: "PetitionFieldProgress";
-      validated: number;
+      approved: number;
       replied: number;
       optional: number;
       total: number;
     };
     internal: {
       __typename?: "PetitionFieldProgress";
-      validated: number;
+      approved: number;
       replied: number;
       optional: number;
       total: number;
@@ -19969,14 +19969,14 @@ export type Petitions_petitionsQuery = {
             __typename?: "PetitionProgress";
             external: {
               __typename?: "PetitionFieldProgress";
-              validated: number;
+              approved: number;
               replied: number;
               optional: number;
               total: number;
             };
             internal: {
               __typename?: "PetitionFieldProgress";
-              validated: number;
+              approved: number;
               replied: number;
               optional: number;
               total: number;
@@ -22382,14 +22382,14 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
     __typename?: "PetitionProgress";
     external: {
       __typename?: "PetitionFieldProgress";
-      validated: number;
+      approved: number;
       replied: number;
       optional: number;
       total: number;
     };
     internal: {
       __typename?: "PetitionFieldProgress";
-      validated: number;
+      approved: number;
       replied: number;
       optional: number;
       total: number;
@@ -23630,13 +23630,13 @@ export const PetitionStatusCellContent_PetitionFragmentDoc = gql`
     status
     progress {
       external {
-        validated
+        approved
         replied
         optional
         total
       }
       internal {
-        validated
+        approved
         replied
         optional
         total

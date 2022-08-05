@@ -542,13 +542,13 @@ export class PetitionRepository extends BaseRepository {
       number,
       {
         external: {
-          validated: number;
+          approved: number;
           replied: number;
           optional: number;
           total: number;
         };
         internal: {
-          validated: number;
+          approved: number;
           replied: number;
           optional: number;
           total: number;
@@ -622,12 +622,19 @@ export class PetitionRepository extends BaseRepository {
           .filter(([field, isVisible]) => isVisible && field.is_internal)
           .map(([field]) => field);
 
+        const validatedExternal = countBy(
+          visibleFields,
+          (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED")
+        );
+
+        const validatedInternal = countBy(
+          visibleInternalFields,
+          (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED")
+        );
+
         return {
           external: {
-            validated: countBy(
-              visibleFields,
-              (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED")
-            ),
+            approved: validatedExternal,
             replied: countBy(
               visibleFields,
               (f) =>
@@ -641,10 +648,8 @@ export class PetitionRepository extends BaseRepository {
             total: visibleFields.length,
           },
           internal: {
-            validated: countBy(
-              visibleInternalFields,
-              (f) => f.replies.length > 0 && f.replies.every((r) => r.status === "APPROVED")
-            ),
+            validated: validatedInternal,
+            approved: validatedInternal,
             replied: countBy(
               visibleInternalFields,
               (f) =>

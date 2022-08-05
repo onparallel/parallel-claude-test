@@ -524,10 +524,10 @@ export interface NexusGenObjects {
   PetitionFieldCommentUserMention: { __type: "User"; user_id: number };
   PetitionFieldProgress: {
     // root type
+    approved: number; // Int!
     optional: number; // Int!
     replied: number; // Int!
     total: number; // Int!
-    validated: number; // Int!
   };
   PetitionFieldReply: db.PetitionFieldReply;
   PetitionMessage: db.PetitionMessage;
@@ -1483,6 +1483,7 @@ export interface NexusGenFieldTypes {
   };
   PetitionFieldProgress: {
     // field return type
+    approved: number; // Int!
     optional: number; // Int!
     replied: number; // Int!
     total: number; // Int!
@@ -3050,6 +3051,7 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionFieldProgress: {
     // field return type name
+    approved: "Int";
     optional: "Int";
     replied: "Int";
     total: "Int";
