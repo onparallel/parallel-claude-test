@@ -1,8 +1,9 @@
-import { Box, Button, Stack } from "@chakra-ui/react";
+import { Box, Button, Stack, Text } from "@chakra-ui/react";
 import { RepeatIcon, UserPlusIcon } from "@parallel/chakra/icons";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
+import { Spacer } from "../common/Spacer";
 import { WhenOrgRole } from "../common/WhenOrgRole";
 
 export type OrganizationGroupListTableHeaderProps = {
@@ -35,12 +36,15 @@ export function OrganizationGroupListTableHeader({
         })}
       />
       <WhenOrgRole role="ADMIN">
+        <Spacer />
         <Button
           colorScheme="primary"
           leftIcon={<UserPlusIcon fontSize="18px" />}
           onClick={onAddMember}
         >
-          <FormattedMessage id="organization-groups.add-user" defaultMessage="Add user" />
+          <Text as="span" isTruncated>
+            <FormattedMessage id="organization-groups.add-user" defaultMessage="Add user" />
+          </Text>
         </Button>
       </WhenOrgRole>
     </Stack>
