@@ -8431,7 +8431,7 @@
   },
   {
     "term": "recipient-view.petition-completed-alert-2",
-    "definition": "{tone, select, INFORMAL{Puedes hacer cambios si quieres} other{Puede realizar cambios si así lo desea}}, pero no olvide hacer click de nuevo en el botón de <b>Finalizar</b>.",
+    "definition": "{tone, select, INFORMAL{Puedes hacer cambios si quieres} other{Puede realizar cambios si así lo desea}}, pero no {tone, select, INFORMAL{olvides} other{olvide}} hacer click de nuevo en el botón de <b>Finalizar</b>.",
     "context": "If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
   },
   {
