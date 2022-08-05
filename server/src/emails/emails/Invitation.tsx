@@ -146,8 +146,8 @@ const email: Email<InvitationProps> = {
               <FormattedMessage id="invitation.join-parallel" defaultMessage="Join Parallel" />
             </Button>
           </MjmlColumn>
-          <WhatsParallel />
         </MjmlSection>
+        <WhatsParallel />
       </Layout>
     );
   },
