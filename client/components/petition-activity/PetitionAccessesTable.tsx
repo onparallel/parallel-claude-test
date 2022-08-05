@@ -349,8 +349,6 @@ function usePetitionAccessesColumns(): TableColumn<
               (access) => access.contact?.id === contact?.id && access.status === "ACTIVE"
             );
 
-            if (contactHasActiveAccess) return null;
-
             return (
               <Stack direction="row" spacing={2} justifyContent="flex-end">
                 <IconButtonWithTooltip
@@ -362,7 +360,7 @@ function usePetitionAccessesColumns(): TableColumn<
                   placement="left"
                   icon={<UserCheckIcon fontSize="16px" />}
                   size="sm"
-                  isDisabled={petition.isAnonymized}
+                  isDisabled={petition.isAnonymized || contactHasActiveAccess}
                 />
               </Stack>
             );

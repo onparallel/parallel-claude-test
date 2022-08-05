@@ -33,7 +33,7 @@ export async function down(knex: Knex): Promise<void> {
     const petitionId = accesses[0].petition_id;
     const byContactId = pipe(
       accesses,
-      groupBy((pa) => pa.contact_id),
+      groupBy((pa) => pa.contact_id!),
       mapValues((pas) => sortBy(pas, [(pa) => new Date(pa.created_at), "desc"]))
     );
     for (const accesses of Object.values(byContactId)) {

@@ -18,7 +18,7 @@ export function TimelineAccessActivatedEvent({ event, userId }: TimelineAccessAc
     <TimelineItem
       icon={
         <TimelineIcon
-          icon={event.access.isContactless ? <PaperclipIcon /> : <UserPlusIcon />}
+          icon={event.access.isContactless ? PaperclipIcon : UserPlusIcon}
           color="white"
           backgroundColor="blue.500"
         />
