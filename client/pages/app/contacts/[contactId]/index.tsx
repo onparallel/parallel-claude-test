@@ -4,6 +4,7 @@ import {
   Button,
   Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Input,
   InputProps,
@@ -36,6 +37,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useDeleteContacts } from "@parallel/utils/mutations/useDeleteContacts";
 import { useHandleNavigation } from "@parallel/utils/navigation";
+import { isNotEmptyText } from "@parallel/utils/strings";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -44,8 +46,8 @@ import { FormattedMessage, useIntl } from "react-intl";
 type ContactProps = UnwrapPromise<ReturnType<typeof Contact.getInitialProps>>;
 
 type ContactDetailsFormData = {
-  firstName: string | null;
-  lastName: string | null;
+  firstName: string;
+  lastName: string;
 };
 
 function Contact({ contactId }: ContactProps) {
@@ -61,7 +63,12 @@ function Contact({ contactId }: ContactProps) {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [updateContact, { loading }] = useMutation(Contact_updateContactDocument);
-  const { register, handleSubmit, reset } = useForm<ContactDetailsFormData>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ContactDetailsFormData>({
     defaultValues: {
       firstName: contact!.firstName ?? "",
       lastName: contact!.lastName ?? "",
@@ -90,8 +97,8 @@ function Contact({ contactId }: ContactProps) {
         variables: {
           id: contact!.id,
           data: {
-            firstName: firstName || null,
-            lastName: lastName || null,
+            firstName: firstName.trim() || null,
+            lastName: lastName.trim() || null,
           },
         },
       });
@@ -138,16 +145,29 @@ function Contact({ contactId }: ContactProps) {
               </Flex>
             </CardHeader>
             <Stack padding={4}>
-              <FormControl id="contact-first-name">
+              <FormControl id="contact-first-name" isInvalid={!!errors.firstName}>
                 <FormLabel fontWeight="bold">
                   <FormattedMessage
                     id="generic.forms.first-name-label"
                     defaultMessage="First name"
                   />
                 </FormLabel>
-                <ToggleInput {...register("firstName")} isEditing={isEditing} isDisabled={loading}>
+                <ToggleInput
+                  {...register("firstName", {
+                    required: true,
+                    validate: { isNotEmptyText },
+                  })}
+                  isEditing={isEditing}
+                  isDisabled={loading}
+                >
                   {contact!.firstName}
                 </ToggleInput>
+                <FormErrorMessage>
+                  <FormattedMessage
+                    id="generic.forms.invalid-first-name-error"
+                    defaultMessage="Please, enter the first name"
+                  />
+                </FormErrorMessage>
               </FormControl>
               <FormControl id="contact-last-name">
                 <FormLabel fontWeight="bold">

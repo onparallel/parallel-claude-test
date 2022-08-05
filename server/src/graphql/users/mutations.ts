@@ -138,11 +138,14 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
       ctx.users.loadUserData(ctx.user!.user_data_id),
     ]);
     const email = args.email.trim().toLowerCase();
+    const firstName = args.firstName.trim();
+    const lastName = args.lastName.trim();
+
     const cognitoId = await ctx.aws.createCognitoUser(
       email,
       null,
-      args.firstName,
-      args.lastName,
+      firstName,
+      lastName,
       {
         locale: args.locale ?? "en",
         organizationName: organization!.name,
@@ -159,8 +162,8 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
         {
           cognito_id: cognitoId!,
           email,
-          first_name: args.firstName,
-          last_name: args.lastName,
+          first_name: firstName,
+          last_name: lastName,
           details: { source: "org-invitation", preferredLocale: args.locale ?? "en" },
         },
         `User:${ctx.user!.id}`
@@ -170,8 +173,8 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
         data: {
           invited_by: ctx.user!.id,
           email,
-          first_name: args.firstName,
-          last_name: args.lastName,
+          first_name: firstName,
+          last_name: lastName,
           role: args.role,
         },
       }),

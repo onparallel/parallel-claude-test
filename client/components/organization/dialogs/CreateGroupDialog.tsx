@@ -6,8 +6,9 @@ import {
   UserSelectInstance,
   UserSelectSelection,
 } from "@parallel/components/common/UserSelect";
-import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
+import { isNotEmptyText } from "@parallel/utils/strings";
+import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
@@ -33,6 +34,7 @@ export function CreateGroupDialog({ ...props }: DialogProps<{}, CreateGroupDialo
   const nameRef = useRef<HTMLInputElement>(null);
   const nameRegisterProps = useRegisterWithRef(nameRef, register, "name", {
     required: true,
+    validate: { isNotEmptyText },
   });
 
   const _handleSearchUsers = useSearchUsers();

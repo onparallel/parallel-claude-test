@@ -19,7 +19,9 @@ import { importFromExcel } from "../helpers/importDataFromExcel";
 import { parseContactList } from "../helpers/parseContactList";
 import { RESULT } from "../helpers/result";
 import { uploadArg } from "../helpers/scalars";
+import { validateAnd, validateIfDefined } from "../helpers/validateArgs";
 import { notEmptyObject } from "../helpers/validators/notEmptyObject";
+import { notEmptyString } from "../helpers/validators/notEmptyString";
 import { validateFile } from "../helpers/validators/validateFile";
 import { validEmail } from "../helpers/validators/validEmail";
 import { contextUserHasRole } from "../users/authorizers";
@@ -48,9 +50,9 @@ export const createContact = mutationField("createContact", {
       return await ctx.contacts.createContact(
         {
           org_id: ctx.user!.org_id,
-          email: email.toLowerCase(),
-          first_name: firstName,
-          last_name: lastName || null,
+          email: email.trim().toLowerCase(),
+          first_name: firstName.trim(),
+          last_name: lastName ? lastName.trim() : null,
         },
         `User:${ctx.user!.id}`
       );
@@ -80,15 +82,22 @@ export const updateContact = mutationField("updateContact", {
       }).asArg()
     ),
   },
-  validateArgs: notEmptyObject((arg) => arg.data, "data"),
+  validateArgs: validateAnd(
+    notEmptyObject((arg) => arg.data, "data"),
+    notEmptyString((arg) => arg.data.firstName, "firstName"),
+    validateIfDefined(
+      (arg) => arg.data.lastName,
+      notEmptyString((arg) => arg.data.lastName, "lastName")
+    )
+  ),
   resolve: async (_, args, ctx) => {
     const { firstName, lastName } = args.data;
     const data: Partial<CreateContact> = {};
     if (isDefined(firstName)) {
-      data.first_name = firstName;
+      data.first_name = firstName.trim();
     }
     if (lastName !== undefined) {
-      data.last_name = lastName;
+      data.last_name = lastName ? lastName.trim() : null;
     }
     return await ctx.contacts.updateContact(args.id, data, ctx.user!);
   },

@@ -24,6 +24,7 @@ import {
 } from "@parallel/graphql/__types";
 import { isApolloError } from "@parallel/utils/apollo/isApolloError";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
+import { isNotEmptyText } from "@parallel/utils/strings";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
@@ -184,7 +185,12 @@ function CreateOrUpdateUserDialog({
               <FormLabel>
                 <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
               </FormLabel>
-              <Input {...register("firstName", { required: true })} />
+              <Input
+                {...register("firstName", {
+                  required: true,
+                  validate: { isNotEmptyText },
+                })}
+              />
               <FormErrorMessage>
                 <FormattedMessage
                   id="generic.forms.invalid-first-name-error"
@@ -201,7 +207,12 @@ function CreateOrUpdateUserDialog({
               <FormLabel>
                 <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
               </FormLabel>
-              <Input {...register("lastName", { required: true })} />
+              <Input
+                {...register("lastName", {
+                  required: true,
+                  validate: { isNotEmptyText },
+                })}
+              />
               <FormErrorMessage>
                 <FormattedMessage
                   id="generic.forms.invalid-last-name-error"

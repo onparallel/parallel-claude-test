@@ -2,6 +2,7 @@ import { Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
+import { isNotEmptyText } from "@parallel/utils/strings";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -46,6 +47,7 @@ export function AskContactDetailsDialog({
   const firstNameRef = useRef<HTMLInputElement>(null);
   const firstNameRegisterProps = useRegisterWithRef(firstNameRef, register, "firstName", {
     required: true,
+    validate: { isNotEmptyText },
   });
   return (
     <ConfirmDialog
