@@ -22,6 +22,15 @@ export function Fonts() {
           font-display: swap;
           src: url('${process.env.NEXT_PUBLIC_ASSETS_URL}/static/fonts/ibm-plex-sans-v8-latin-regular.woff2') format('woff2');
         }
+
+        /* ibm-plex-sans-600 - latin */
+        @font-face {
+          font-family: 'IBM Plex Sans';
+          font-style: normal;
+          font-weight: 500;
+          font-display: swap;
+          src: url('${process.env.NEXT_PUBLIC_ASSETS_URL}/static/fonts/ibm-plex-sans-v8-latin-500.woff2') format('woff2');
+        }
         
         /* ibm-plex-sans-600 - latin */
         @font-face {

@@ -19,11 +19,8 @@ import { ComponentType, Key, ReactNode, useCallback, useEffect, useMemo, useStat
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined, pick } from "remeda";
 
-export type TablePageProps<TRow, TContext = unknown, TImpl extends TRow = TRow> = TableProps<
-  TRow,
-  TContext,
-  TImpl
-> & {
+export interface TablePageProps<TRow, TContext = unknown, TImpl extends TRow = TRow>
+  extends TableProps<TRow, TContext, TImpl> {
   loading: boolean;
   actions?: (ButtonProps & { key: Key })[];
   header?: ReactNode;
@@ -39,7 +36,7 @@ export type TablePageProps<TRow, TContext = unknown, TImpl extends TRow = TRow> 
   footerProps?: any;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (size: number) => void;
-};
+}
 
 export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   columns,

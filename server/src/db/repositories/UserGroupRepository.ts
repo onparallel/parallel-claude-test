@@ -29,7 +29,7 @@ export class UserGroupRepository extends BaseRepository {
             q.whereEscapedILike("name", `%${escapeLike(opts.search, "\\")}%`, "\\");
           }
           if (opts.sortBy) {
-            q.orderByRaw(opts.sortBy.map((s) => `"${s.column}" ${s.order}`).join(", "));
+            q.orderByRaw(opts.sortBy.map((s) => `"${s.field}" ${s.order}`).join(", "));
           }
         })
         .orderBy("id")

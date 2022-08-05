@@ -811,6 +811,7 @@ export interface Petition {
   anonymize_after_months: Maybe<number>; // int4
   anonymize_purpose: Maybe<string>; // text
   document_organization_theme_id: number; // int4
+  path: string; // text
 }
 
 export type CreatePetition = PartialProps<
@@ -852,6 +853,7 @@ export type CreatePetition = PartialProps<
   | "closed_at"
   | "anonymize_after_months"
   | "anonymize_purpose"
+  | "path"
 >;
 
 export interface PetitionAccess {

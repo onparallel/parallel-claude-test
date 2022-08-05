@@ -96,7 +96,7 @@ export const AppLayout = Object.assign(
 
     // Initialize userflow
     useEffect(() => {
-      if (!userflow.isIdentified()) {
+      if (!userflow.isIdentified() && process.env.NODE_ENV === "production") {
         userflow.init(process.env.NEXT_PUBLIC_USERFLOW_TOKEN);
         userflow.identify(me.id, {
           name: me.fullName,

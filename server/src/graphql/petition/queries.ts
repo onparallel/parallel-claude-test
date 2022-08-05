@@ -25,7 +25,7 @@ import { validatePublicPetitionLinkSlug } from "./validations";
 
 export const petitionsQuery = queryField((t) => {
   t.paginationField("petitions", {
-    type: "PetitionBase",
+    type: "PetitionBaseOrFolder",
     description: "The petitions of the user",
     authorize: authenticate(),
     extendArgs: {
@@ -35,6 +35,7 @@ export const petitionsQuery = queryField((t) => {
           t.nullable.list.nonNull.field("status", {
             type: "PetitionStatus",
           });
+          t.nullable.string("path");
           t.nullable.field("locale", {
             type: "PetitionLocale",
           });
@@ -73,7 +74,7 @@ export const petitionsQuery = queryField((t) => {
       }).asArg(),
     },
     searchable: true,
-    sortableBy: ["createdAt", "sentAt", "name", "lastUsedAt" as any],
+    sortableBy: ["createdAt", "sentAt", "name", "lastUsedAt"] as any,
     resolve: async (_, { offset, limit, search, sortBy, filters }, ctx) => {
       // move this to validator if it grows in complexity
       if (filters?.tagIds) {
@@ -96,19 +97,13 @@ export const petitionsQuery = queryField((t) => {
         throw new ApolloError("Invalid filter", "INVALID_FILTER");
       }
 
-      const columnMap = {
-        createdAt: "created_at",
-        sentAt: "sent_at",
-        name: "name",
-        lastUsedAt: "last_used_at",
-      } as const;
       return await ctx.petitions.loadPetitionsForUser(ctx.user!.id, {
         search,
         offset,
         filters,
         sortBy: sortBy?.map((value) => {
           const [field, order] = parseSortBy(value);
-          return { column: columnMap[field], order };
+          return { field: field, order };
         }),
         limit,
       });
@@ -176,7 +171,7 @@ export const templatesQuery = queryField((t) => {
           search,
           limit,
           offset,
-          sortBy: [{ column: "last_used_at", order: "desc" }],
+          sortBy: [{ field: "lastUsedAt", order: "desc" }],
           filters: {
             type: "TEMPLATE",
             locale,

@@ -164,6 +164,7 @@ export interface NexusGenInputs {
   PetitionFilter: {
     // input type
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
+    path?: string | null; // String
     sharedWith?: NexusGenInputs["PetitionSharedWithFilter"] | null; // PetitionSharedWithFilter
     status?: NexusGenEnums["PetitionStatus"][] | null; // [PetitionStatus!]
     tagIds?: NexusGenScalars["GID"][] | null; // [GID!]
@@ -494,9 +495,9 @@ export interface NexusGenObjects {
     attachment: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
     presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
   };
-  PetitionBasePagination: {
+  PetitionBaseOrFolderPagination: {
     // root type
-    items: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
+    items: NexusGenRootTypes["PetitionBaseOrFolder"][]; // [PetitionBaseOrFolder!]!
     totalCount: number; // Int!
   };
   PetitionClonedEvent: events.PetitionClonedEvent;
@@ -530,6 +531,13 @@ export interface NexusGenObjects {
     total: number; // Int!
   };
   PetitionFieldReply: db.PetitionFieldReply;
+  PetitionFolder: {
+    name: string;
+    petition_count: number;
+    is_folder: true;
+    path: string;
+    min_permission: db.PetitionPermissionType;
+  };
   PetitionMessage: db.PetitionMessage;
   PetitionMessageBouncedEvent: events.PetitionMessageBouncedEvent;
   PetitionProgress: {
@@ -723,6 +731,9 @@ export interface NexusGenInterfaces {
 }
 
 export interface NexusGenUnions {
+  PetitionBaseOrFolder:
+    | ({ is_folder: false } & NexusGenRootTypes["Petition"])
+    | NexusGenRootTypes["PetitionFolder"];
   PetitionFieldCommentMention:
     | { __type: "User"; user_id: number }
     | { __type: "UserGroup"; user_group_id: number };
@@ -1340,9 +1351,9 @@ export interface NexusGenFieldTypes {
     attachment: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
     presignedPostData: NexusGenRootTypes["AWSPresignedPostData"]; // AWSPresignedPostData!
   };
-  PetitionBasePagination: {
+  PetitionBaseOrFolderPagination: {
     // field return type
-    items: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
+    items: NexusGenRootTypes["PetitionBaseOrFolder"][]; // [PetitionBaseOrFolder!]!
     totalCount: number; // Int!
   };
   PetitionClonedEvent: {
@@ -1501,6 +1512,14 @@ export interface NexusGenFieldTypes {
     status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     updatedBy: NexusGenRootTypes["UserOrPetitionAccess"] | null; // UserOrPetitionAccess
+  };
+  PetitionFolder: {
+    // field return type
+    id: string; // ID!
+    minimumPermissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
+    name: string; // String!
+    path: string; // String!
+    petitionCount: number; // Int!
   };
   PetitionMessage: {
     // field return type
@@ -1843,7 +1862,7 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
     petitionEvents: NexusGenRootTypes["PetitionEvent"][]; // [PetitionEvent!]!
     petitionField: NexusGenRootTypes["PetitionField"]; // PetitionField!
-    petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
+    petitions: NexusGenRootTypes["PetitionBaseOrFolderPagination"]; // PetitionBaseOrFolderPagination!
     petitionsById: Array<NexusGenRootTypes["PetitionBase"] | null>; // [PetitionBase]!
     publicLicenseCode: NexusGenRootTypes["PublicLicenseCode"] | null; // PublicLicenseCode
     publicOrgLogoUrl: string | null; // String
@@ -2909,9 +2928,9 @@ export interface NexusGenFieldTypeNames {
     attachment: "PetitionAttachment";
     presignedPostData: "AWSPresignedPostData";
   };
-  PetitionBasePagination: {
+  PetitionBaseOrFolderPagination: {
     // field return type name
-    items: "PetitionBase";
+    items: "PetitionBaseOrFolder";
     totalCount: "Int";
   };
   PetitionClonedEvent: {
@@ -3070,6 +3089,14 @@ export interface NexusGenFieldTypeNames {
     status: "PetitionFieldReplyStatus";
     updatedAt: "DateTime";
     updatedBy: "UserOrPetitionAccess";
+  };
+  PetitionFolder: {
+    // field return type name
+    id: "ID";
+    minimumPermissionType: "PetitionPermissionType";
+    name: "String";
+    path: "String";
+    petitionCount: "Int";
   };
   PetitionMessage: {
     // field return type name
@@ -3412,7 +3439,7 @@ export interface NexusGenFieldTypeNames {
     petition: "PetitionBase";
     petitionEvents: "PetitionEvent";
     petitionField: "PetitionField";
-    petitions: "PetitionBasePagination";
+    petitions: "PetitionBaseOrFolderPagination";
     petitionsById: "PetitionBase";
     publicLicenseCode: "PublicLicenseCode";
     publicOrgLogoUrl: "String";
@@ -5021,6 +5048,7 @@ export interface NexusGenArgTypes {
 }
 
 export interface NexusGenAbstractTypeMembers {
+  PetitionBaseOrFolder: "Petition" | "PetitionFolder" | "PetitionTemplate";
   PetitionFieldCommentMention:
     | "PetitionFieldCommentUserGroupMention"
     | "PetitionFieldCommentUserMention";
@@ -5200,6 +5228,7 @@ export type NexusGenAbstractsUsingStrategyResolveType =
   | "CreatedAt"
   | "OrgIntegration"
   | "PetitionBase"
+  | "PetitionBaseOrFolder"
   | "PetitionEvent"
   | "PetitionFieldCommentMention"
   | "PetitionPermission"

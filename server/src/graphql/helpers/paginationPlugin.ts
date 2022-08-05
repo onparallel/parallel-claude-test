@@ -16,6 +16,10 @@ import { omit } from "remeda";
 import { KeysOfType } from "../../util/types";
 import { ArgValidationError } from "./errors";
 
+export function reverseSortDirection(direction: "asc" | "desc") {
+  return direction === "asc" ? "desc" : "asc";
+}
+
 export function parseSortBy<T extends string>(
   key: T
 ): T extends `${infer U}_${"ASC" | "DESC"}` ? [U, "asc" | "desc"] : never {

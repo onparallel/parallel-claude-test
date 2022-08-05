@@ -5,10 +5,11 @@ export function escapeLike(pattern: string, escape: string) {
 }
 
 export type SortBy<T> = {
-  column: T;
+  field: T;
   order: "asc" | "desc";
 };
 
+// TODO esto no va aqui
 export const isValueCompatible = (oldType: PetitionFieldType, newType: PetitionFieldType) => {
   return (
     ["TEXT", "SHORT_TEXT", "SELECT", "NUMBER", "DATE", "PHONE"].includes(oldType) &&

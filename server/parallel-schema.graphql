@@ -2563,11 +2563,13 @@ interface PetitionBase {
   updatedAt: DateTime!
 }
 
-type PetitionBasePagination {
+union PetitionBaseOrFolder = Petition | PetitionFolder | PetitionTemplate
+
+type PetitionBaseOrFolderPagination {
   """
   The requested slice of items.
   """
-  items: [PetitionBase!]!
+  items: [PetitionBaseOrFolder!]!
 
   """
   The total count of items in the list.
@@ -3056,10 +3058,38 @@ enum PetitionFieldType {
 
 input PetitionFilter {
   locale: PetitionLocale
+  path: String
   sharedWith: PetitionSharedWithFilter
   status: [PetitionStatus!]
   tagIds: [GID!]
   type: PetitionBaseType
+}
+
+type PetitionFolder {
+  """
+  The ID of the petition or template.
+  """
+  id: ID!
+
+  """
+  The lowest permission the user has in the petitions inside the folder.
+  """
+  minimumPermissionType: PetitionPermissionType!
+
+  """
+  The name of the folder.
+  """
+  name: String!
+
+  """
+  The full path of the folder.
+  """
+  path: String!
+
+  """
+  The name petitions in the folder.
+  """
+  petitionCount: Int!
 }
 
 """
@@ -4289,7 +4319,7 @@ type Query {
     Sorting to use on the collection
     """
     sortBy: [QueryPetitions_OrderBy!]
-  ): PetitionBasePagination!
+  ): PetitionBaseOrFolderPagination!
   petitionsById(ids: [GID!]!): [PetitionBase]!
   publicLicenseCode(code: String!, token: ID!): PublicLicenseCode
   publicOrgLogoUrl(id: GID!): String

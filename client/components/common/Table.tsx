@@ -29,6 +29,7 @@ import {
   ChevronUpIcon,
   FilterIcon,
 } from "@parallel/chakra/icons";
+import { getKey, KeyProp } from "@parallel/utils/keyProp";
 import { useSelectionState } from "@parallel/utils/useSelectionState";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import useMergedRef from "@react-hook/merged-ref";
@@ -62,7 +63,7 @@ export interface TableProps<TRow, TContext = unknown, TImpl extends TRow = TRow>
   columns: TableColumn<TRow, TContext>[];
   rows?: TImpl[];
   context?: TContext;
-  rowKeyProp: keyof TRow;
+  rowKeyProp: KeyProp<TImpl>;
   sort?: TableSorting<any>;
   filter?: Record<string, any>;
   isSelectable?: boolean;
@@ -341,7 +342,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
       </Box>
       <Box as="tbody">
         {(rows ?? []).map((row) => {
-          const key = row[rowKeyProp] as any;
+          const key = getKey(row, rowKeyProp);
           const isSelected = selection[key] ?? false;
           const isExpanded = key === expanded;
           return (

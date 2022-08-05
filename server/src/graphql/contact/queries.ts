@@ -30,18 +30,18 @@ export const contactQueries = queryField((t) => {
             case "firstName":
             case "fullName":
               return [
-                { column: "first_name", order },
-                { column: "last_name", order },
+                { field: "first_name", order },
+                { field: "last_name", order },
               ];
             case "lastName":
               return [
-                { column: "last_name", order },
-                { column: "first_name", order },
+                { field: "last_name", order },
+                { field: "first_name", order },
               ];
             case "email":
-              return [{ column: "email", order }];
+              return [{ field: "email", order }];
             case "createdAt":
-              return [{ column: "created_at", order }];
+              return [{ field: "created_at", order }];
             default:
               throw new Error(`Unhandled sorting field ${field} for Query.contacts`);
           }

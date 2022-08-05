@@ -112,21 +112,21 @@ export class OrganizationRepository extends BaseRepository {
               sortBy
                 .map((s) => {
                   // nullable columns
-                  if (["last_active_at"].includes(s.column)) {
+                  if (["last_active_at"].includes(s.field)) {
                     const nulls = s.order === "asc" ? "FIRST" : "LAST";
-                    return `"${s.column}" ${s.order} NULLS ${nulls}`;
-                  } else if (s.column === "full_name") {
+                    return `"${s.field}" ${s.order} NULLS ${nulls}`;
+                  } else if (s.field === "full_name") {
                     const nulls = s.order === "asc" ? "FIRST" : "LAST";
                     return `"user_data".first_name ${s.order} NULLS ${nulls}, "user_data".last_name ${s.order} NULLS ${nulls}`;
                   } else if (
-                    s.column === "first_name" ||
-                    s.column === "last_name" ||
-                    s.column === "email"
+                    s.field === "first_name" ||
+                    s.field === "last_name" ||
+                    s.field === "email"
                   ) {
                     const nulls = s.order === "asc" ? "FIRST" : "LAST";
-                    return `"user_data".${s.column} ${s.order} NULLS ${nulls}`;
+                    return `"user_data".${s.field} ${s.order} NULLS ${nulls}`;
                   } else {
-                    return `"${s.column}" ${s.order}`;
+                    return `"${s.field}" ${s.order}`;
                   }
                 })
                 .join(", ")

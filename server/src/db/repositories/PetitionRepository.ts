@@ -91,13 +91,14 @@ type PetitionSharedWithFilter = {
   }[];
 };
 
-type PetitionFilter = {
+interface PetitionFilter {
+  path?: string | null;
   status?: PetitionStatus[] | null;
   locale?: PetitionLocale | null;
   type?: PetitionType | null;
   tagIds?: number[] | null;
   sharedWith?: PetitionSharedWithFilter | null;
-};
+}
 
 type PetitionUserNotificationFilter =
   | "ALL"
@@ -369,7 +370,7 @@ export class PetitionRepository extends BaseRepository {
     userId: number,
     opts: {
       search?: string | null;
-      sortBy?: SortBy<keyof Petition | "last_used_at" | "sent_at">[];
+      sortBy?: SortBy<"name" | "lastUsedAt" | "sentAt" | "createdAt">[];
       filters?: PetitionFilter | null;
     } & PageOpts
   ) {
@@ -396,9 +397,16 @@ export class PetitionRepository extends BaseRepository {
             .whereRaw(
               /* sql */ ` 
             (
-              (p.name ilike :search escape '\\')
-              or (concat(c.first_name, ' ', c.last_name) ilike :search escape '\\' and c.deleted_at is null)
-              or (c.email ilike :search escape '\\' and c.deleted_at is null)
+              p.name ilike :search escape '\\'
+              or (p.path != '/' and exists (
+                select from unnest(regexp_split_to_array(trim(both '/' from p.path), '/')) part where part ilike :search escape '\\'
+              ))
+              or (
+                c.deleted_at is null and (
+                  concat(c.first_name, ' ', c.last_name) ilike :search escape '\\'
+                  or c.email ilike :search escape '\\'
+                )
+              )
             )
 
           `,
@@ -406,7 +414,14 @@ export class PetitionRepository extends BaseRepository {
             );
         } else {
           q.whereRaw(
-            /* sql */ `(p.name ilike :search escape '\\' or p.template_description ilike :search escape '\\')`,
+            /* sql */ `
+            (
+              p.name ilike :search escape '\\'
+              or (p.path != '/' and exists (
+                select from unnest(regexp_split_to_array(trim(both '/' from p.path), '/')) part where part ilike :search escape '\\'
+              ))
+              or p.template_description ilike :search escape '\\'
+            )`,
             { search: `%${escapeLike(search, "\\")}%` }
           );
         }
@@ -467,60 +482,174 @@ export class PetitionRepository extends BaseRepository {
       });
     }
 
-    const query = this.knex
-      .fromRaw("petition as p")
-      .groupBy("p.id")
-      .modify(function (q) {
-        builders.forEach((b) => b.call(this, q));
-      });
-
-    const [{ count }] = await this.knex
-      .with("p", query.clone().select("p.*"))
-      .from("p")
-      .select(this.count());
-    if (count === 0) {
-      return { totalCount: count, items: [] };
-    } else {
-      return {
-        totalCount: count,
-        items: await query
-          .clone()
-          .mmodify((q) => {
-            for (const { column, order } of opts.sortBy ?? []) {
-              if (column === "last_used_at") {
-                q.joinRaw(
-                  /* sql */ `
-                left join (
-                  select p.from_template_id as template_id, max(p.created_at) as t_last_used_at
-                  from petition as p where p.created_by = ? group by p.from_template_id
-                ) as t on t.template_id = p.id
-                `,
-                  [`User:${userId}`]
-                );
-                q.orderBy("last_used_at", order);
-              } else if (column === "sent_at") {
-                q.orderByRaw(`sent_at ${order}, status asc, created_at ${order}`);
-              } else {
-                q.orderBy(`p.${column}`, order);
+    const [[{ count: petitionCount }], [{ count: folderCount }]] = await Promise.all([
+      this.knex
+        .with(
+          "ps",
+          this.knex
+            .fromRaw("petition as p")
+            .modify(function (q) {
+              builders.forEach((b) => b.call(this, q));
+              if (filters?.path) {
+                q.where("p.path", filters.path);
               }
-            }
-          })
-          // default order by to ensure result consistency
-          // applies after any previously specified order by
-          .orderBy("p.id")
-          .offset(opts.offset ?? 0)
-          .limit(opts.limit ?? 0)
-          .select(
-            "p.*",
-            this.knex.raw("min(coalesce(pm.scheduled_at, pm.created_at)) as sent_at"),
-            ...(opts.sortBy?.some((s) => s.column === "last_used_at")
-              ? [
-                  this.knex.raw(
-                    "greatest(max(t.t_last_used_at), min(pp.created_at)) as last_used_at"
+            })
+            .groupBy("p.id")
+            .select(this.knex.raw(/* sql */ `distinct p.id`))
+        )
+        .from("ps")
+        .select(this.count()),
+      filters?.path
+        ? this.knex
+            .with(
+              "ps",
+              this.knex
+                .fromRaw("petition as p")
+                .modify(function (q) {
+                  builders.forEach((b) => b.call(this, q));
+                })
+                .whereRaw(/* sql */ `starts_with(p.path, ?) and p.path != ?`, [
+                  filters.path,
+                  filters.path,
+                ])
+                .groupBy("p.id")
+                .select(
+                  this.knex.raw(/* sql */ `distinct get_folder_after_prefix(p.path, ?)`, [
+                    filters.path,
+                  ])
+                )
+            )
+            .from("ps")
+            .select(this.count())
+        : [{ count: 0 }],
+    ]);
+
+    const totalCount = petitionCount + folderCount;
+
+    if (totalCount === 0) {
+      return { totalCount, items: [] };
+    } else {
+      const applyOrder: Knex.QueryCallback = (q) => {
+        for (const { field: column, order } of opts.sortBy ?? []) {
+          if (column === "lastUsedAt") {
+            q.orderByRaw(`is_folder ${order}, last_used_at ${order}`);
+          } else if (column === "sentAt") {
+            q.orderByRaw(`is_folder ${order}, sent_at ${order}, status asc, created_at ${order}`);
+          } else if (column === "createdAt") {
+            q.orderByRaw(`is_folder ${order}, created_at ${order}`);
+          } else if (column === "name") {
+            q.orderBy(`_name`, order);
+          }
+        }
+        // default ordering to avoid ambiguity
+        q.orderBy("id");
+      };
+
+      const petitionsQuery = this.knex
+        .fromRaw("petition as p")
+        .groupBy("p.id")
+        .modify(function (q) {
+          builders.forEach((b) => b.call(this, q));
+          if (filters?.path) {
+            q.where("p.path", filters.path);
+          }
+          if (opts.sortBy?.some((s) => s.field === "lastUsedAt")) {
+            q.joinRaw(
+              /* sql */ `
+              left join (
+                select p.from_template_id as template_id, max(p.created_at) as t_last_used_at
+                from petition as p where p.created_by = ? group by p.from_template_id
+              ) as t on t.template_id = p.id
+            `,
+              [`User:${userId}`]
+            );
+          }
+        })
+        .select(
+          "p.*",
+          this.knex.raw(/* sql */ `false as is_folder`),
+          this.knex.raw(/* sql */ `null::int as petition_count`),
+          this.knex.raw(/* sql */ `null::petition_permission_type as min_permission`),
+          this.knex.raw(/* sql */ `p.name as _name`),
+          this.knex.raw(/* sql */ `min(coalesce(pm.scheduled_at, pm.created_at)) as sent_at`),
+          opts.sortBy?.some((s) => s.field === "lastUsedAt")
+            ? this.knex.raw(
+                /* sql */ `greatest(max(t.t_last_used_at), min(pp.created_at)) as last_used_at`
+              )
+            : this.knex.raw(/* sql */ `null as last_used_at`)
+        );
+
+      const items: (Petition & {
+        is_folder: boolean;
+        petition_count: number | null;
+        min_permission: PetitionPermissionType | null;
+        _name: string;
+        sent_at: string | null;
+        last_used_at: string | null;
+      })[] =
+        folderCount === 0
+          ? await petitionsQuery
+              .clone()
+              .modify(applyOrder)
+              .offset(opts.offset ?? 0)
+              .limit(opts.limit ?? 0)
+          : await this.knex
+              .with(
+                "fs",
+                this.knex
+                  .fromRaw("petition as p")
+                  .whereRaw(/* sql */ `starts_with(p.path, ?) and p.path != ?`, [
+                    filters!.path!,
+                    filters!.path!,
+                  ])
+                  .modify(function (q) {
+                    builders.forEach((b) => b.call(this, q));
+                  })
+                  .select<{ count: number }[]>(
+                    this.knex.raw(/* sql */ `get_folder_after_prefix(p.path, ?) as _name`, [
+                      filters!.path!,
+                    ]),
+                    this.knex.raw(/* sql */ `count(distinct p.id)::int as petition_count`),
+                    this.knex.raw(/* sql */ `max(pp.type) as min_permission`)
+                  )
+                  .groupBy("_name")
+              )
+              .with("p", petitionsQuery)
+              .from("p")
+              .select("p.*")
+              .unionAll([
+                this.knex
+                  .from("fs")
+                  .joinRaw(/* sql */ `join petition paux on paux.id = 1`)
+                  .select(
+                    "paux.*",
+                    this.knex.raw(/* sql */ `true as is_folder`),
+                    "fs.petition_count",
+                    "fs.min_permission",
+                    "fs._name",
+                    this.knex.raw(/* sql */ `null as sent_at`),
+                    this.knex.raw(/* sql */ `null as last_used_at`)
                   ),
-                ]
-              : [])
-          ),
+              ])
+              .modify(applyOrder)
+              .offset(opts.offset ?? 0)
+              .limit(opts.limit ?? 0);
+      return {
+        totalCount: totalCount,
+        items: items.map((i) =>
+          i.is_folder
+            ? {
+                name: i._name,
+                petition_count: i.petition_count!,
+                min_permission: i.min_permission!,
+                is_folder: true as const,
+                path: `${filters!.path}${i._name}/`,
+              }
+            : {
+                is_folder: false as const,
+                ...omit(i, ["_name", "petition_count", "is_folder", "min_permission"]),
+              }
+        ),
       };
     }
   }

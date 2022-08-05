@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
-import { Flex, IconButton, Text } from "@chakra-ui/react";
-import { BellSettingsIcon } from "@parallel/chakra/icons";
+import { Flex, HStack, IconButton, Text } from "@chakra-ui/react";
+import { BellSettingsIcon, FolderIcon } from "@parallel/chakra/icons";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
 import { ContactReference } from "@parallel/components/common/ContactReference";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -21,6 +21,7 @@ import {
   usePetitionsTableColumns_PetitionBaseFragment,
   usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment,
   usePetitionsTableColumns_PetitionBase_Petition_Fragment,
+  usePetitionsTableColumns_PetitionFolderFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { MouseEvent, useMemo } from "react";
@@ -30,17 +31,14 @@ import { EnumerateList } from "./EnumerateList";
 import { useGoToContact } from "./goToContact";
 import { useGoToPetition } from "./goToPetition";
 
-type PetitionBaseTableColumn = TableColumn<usePetitionsTableColumns_PetitionBaseFragment, any>;
+type PetitionBase = usePetitionsTableColumns_PetitionBaseFragment;
+type Petition = usePetitionsTableColumns_PetitionBase_Petition_Fragment;
+type Template = usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment;
+type PetitionFolder = usePetitionsTableColumns_PetitionFolderFragment;
 
-type PetitionTableColumn = TableColumn<
-  usePetitionsTableColumns_PetitionBase_Petition_Fragment,
-  any
->;
-
-type PetitionTemplateTableColumn = TableColumn<
-  usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment,
-  any
->;
+type PetitionsTableColumns_PetitionBaseOrFolder = TableColumn<PetitionBase | PetitionFolder, any>;
+type PetitionsTableColumns_PetitionOrFolder = TableColumn<Petition | PetitionFolder, any>;
+type PetitionsTableColumns_PetitionTemplateOrFolder = TableColumn<Template | PetitionFolder, any>;
 
 export function usePetitionsTableColumns(type: PetitionBaseType) {
   const intl = useIntl();
@@ -50,36 +48,38 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
         {
           key: "name",
           isSortable: true,
-          header:
-            type === "PETITION"
-              ? intl.formatMessage({
-                  id: "generic.parallel-name",
-                  defaultMessage: "Parallel name",
-                })
-              : intl.formatMessage({
-                  id: "generic.template-name",
-                  defaultMessage: "Template name",
-                }),
+          header: intl.formatMessage({
+            id: "petitions.header.name",
+            defaultMessage: "Name",
+          }),
           cellProps: {
             maxWidth: 0,
             width: "30%",
             minWidth: "240px",
           },
-          CellContent: ({ row }) => (
-            <OverflownText textStyle={row.name ? undefined : "hint"}>
-              {row.name
-                ? row.name
-                : type === "PETITION"
-                ? intl.formatMessage({
+          CellContent: ({ row }) =>
+            row.__typename === "PetitionFolder" ? (
+              <HStack>
+                <FolderIcon />
+                <OverflownText>{row.folderName}</OverflownText>
+              </HStack>
+            ) : row.__typename === "Petition" ? (
+              <OverflownText textStyle={row.name ? undefined : "hint"}>
+                {row.name ||
+                  intl.formatMessage({
                     id: "generic.unnamed-parallel",
                     defaultMessage: "Unnamed parallel",
-                  })
-                : intl.formatMessage({
+                  })}
+              </OverflownText>
+            ) : row.__typename === "PetitionTemplate" ? (
+              <OverflownText textStyle={row.name ? undefined : "hint"}>
+                {row.name ||
+                  intl.formatMessage({
                     id: "generic.unnamed-template",
                     defaultMessage: "Unnamed template",
                   })}
-            </OverflownText>
-          ),
+              </OverflownText>
+            ) : null,
         },
         ...(type === "PETITION"
           ? ([
@@ -94,41 +94,45 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   whiteSpace: "nowrap",
                 },
                 CellContent: ({ row }) => {
-                  const recipients = row.accesses
-                    .filter((a) => a.status === "ACTIVE" && isDefined(a.contact))
-                    .map((a) => a.contact!);
-                  if (recipients.length === 0) {
+                  if (row.__typename === "Petition") {
+                    const recipients = row.accesses
+                      .filter((a) => a.status === "ACTIVE" && isDefined(a.contact))
+                      .map((a) => a.contact!);
+                    if (recipients.length === 0) {
+                      return null;
+                    }
+                    const goToContact = useGoToContact();
+
+                    return (
+                      <EnumerateList
+                        values={recipients}
+                        maxItems={1}
+                        renderItem={({ value }, index) => (
+                          <ContactReference
+                            key={index}
+                            contact={value}
+                            onClick={(e: MouseEvent) => e.stopPropagation()}
+                          />
+                        )}
+                        renderOther={({ children, remaining }) => (
+                          <ContactListPopover
+                            key="other"
+                            contacts={remaining}
+                            onContactClick={goToContact}
+                          >
+                            <Link
+                              href={`/app/petitions/${row.id}/activity`}
+                              onClick={(e: MouseEvent) => e.stopPropagation()}
+                            >
+                              {children}
+                            </Link>
+                          </ContactListPopover>
+                        )}
+                      />
+                    );
+                  } else {
                     return null;
                   }
-                  const goToContact = useGoToContact();
-
-                  return (
-                    <EnumerateList
-                      values={recipients}
-                      maxItems={1}
-                      renderItem={({ value }, index) => (
-                        <ContactReference
-                          key={index}
-                          contact={value}
-                          onClick={(e: MouseEvent) => e.stopPropagation()}
-                        />
-                      )}
-                      renderOther={({ children, remaining }) => (
-                        <ContactListPopover
-                          key="other"
-                          contacts={remaining}
-                          onContactClick={goToContact}
-                        >
-                          <Link
-                            href={`/app/petitions/${row.id}/activity`}
-                            onClick={(e: MouseEvent) => e.stopPropagation()}
-                          >
-                            {children}
-                          </Link>
-                        </ContactListPopover>
-                      )}
-                    />
-                  );
                 },
               },
               {
@@ -140,25 +144,36 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                 isFilterable: true,
                 Filter: PetitionListStatusFilter,
                 align: "center",
-                cellProps: (row) => ({
-                  minWidth: "180px",
-                  "data-section": "petition-progress",
-                  "data-petition-status": row.status,
-                }),
-                CellContent: ({ row }) => <PetitionStatusCellContent petition={row} />,
+                cellProps: (row) =>
+                  row.__typename === "Petition"
+                    ? {
+                        minWidth: "180px",
+                        "data-section": "petition-progress",
+                        "data-petition-status": row.status,
+                      }
+                    : {},
+                CellContent: ({ row }) =>
+                  row.__typename === "Petition" ? (
+                    <PetitionStatusCellContent petition={row} />
+                  ) : (
+                    <></>
+                  ),
               },
               {
                 key: "signature",
                 align: "center",
                 headerProps: { padding: 0 },
                 cellProps: { padding: 0, width: 8 },
-                CellContent: ({ row, context }) => (
-                  <Flex alignItems="center" paddingRight="2">
-                    <PetitionSignatureCellContent petition={row} />
-                  </Flex>
-                ),
+                CellContent: ({ row }) =>
+                  row.__typename === "Petition" ? (
+                    <Flex alignItems="center" paddingRight="2">
+                      <PetitionSignatureCellContent petition={row} />
+                    </Flex>
+                  ) : (
+                    <></>
+                  ),
               },
-            ] as PetitionTableColumn[])
+            ] as PetitionsTableColumns_PetitionOrFolder[])
           : ([
               {
                 key: "settings",
@@ -170,11 +185,14 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                 cellProps: {
                   minWidth: "205px",
                 },
-                CellContent: ({ row }) => {
-                  return <TemplateActiveSettingsIcons template={row} spacing={4} />;
-                },
+                CellContent: ({ row }) =>
+                  row.__typename === "PetitionTemplate" ? (
+                    <TemplateActiveSettingsIcons template={row} spacing={4} />
+                  ) : (
+                    <></>
+                  ),
               },
-            ] as PetitionTemplateTableColumn[])),
+            ] as PetitionsTableColumns_PetitionTemplateOrFolder[])),
         {
           key: "sharedWith",
           header: intl.formatMessage({
@@ -185,19 +203,26 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
           Filter: PetitionListSharedWithFilter,
           align: "left",
           cellProps: { minWidth: "132px" },
-          CellContent: ({ row: { permissions }, column }) => (
-            <Flex justifyContent={column.align}>
-              <UserAvatarList
-                usersOrGroups={permissions.map((p) =>
-                  p.__typename === "PetitionUserPermission"
-                    ? p.user
-                    : p.__typename === "PetitionUserGroupPermission"
-                    ? p.group
-                    : (null as never)
-                )}
-              />
-            </Flex>
-          ),
+          CellContent: ({ row, column }) => {
+            if (row.__typename === "Petition" || row.__typename === "PetitionTemplate") {
+              const { permissions } = row;
+              return (
+                <Flex justifyContent={column.align}>
+                  <UserAvatarList
+                    usersOrGroups={permissions.map((p) =>
+                      p.__typename === "PetitionUserPermission"
+                        ? p.user
+                        : p.__typename === "PetitionUserGroupPermission"
+                        ? p.group
+                        : (null as never)
+                    )}
+                  />
+                </Flex>
+              );
+            } else {
+              return null;
+            }
+          },
         },
         ...(type === "PETITION"
           ? ([
@@ -209,19 +234,25 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   defaultMessage: "Sent at",
                 }),
                 cellProps: { width: "1%", minWidth: "160px" },
-                CellContent: ({ row: { sentAt } }) =>
-                  sentAt ? (
-                    <DateTime
-                      value={sentAt}
-                      format={FORMATS.LLL}
-                      useRelativeTime
-                      whiteSpace="nowrap"
-                    />
-                  ) : (
-                    <Text as="span" textStyle="hint" whiteSpace="nowrap">
-                      <FormattedMessage id="generic.not-sent" defaultMessage="Not sent" />
-                    </Text>
-                  ),
+                CellContent: ({ row }) => {
+                  if (row.__typename === "Petition") {
+                    const { sentAt } = row;
+                    return sentAt ? (
+                      <DateTime
+                        value={sentAt}
+                        format={FORMATS.LLL}
+                        useRelativeTime
+                        whiteSpace="nowrap"
+                      />
+                    ) : (
+                      <Text as="span" textStyle="hint" whiteSpace="nowrap">
+                        <FormattedMessage id="generic.not-sent" defaultMessage="Not sent" />
+                      </Text>
+                    );
+                  } else {
+                    return null;
+                  }
+                },
               },
               {
                 key: "reminders",
@@ -232,73 +263,77 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                 }),
 
                 CellContent: ({ row }) => {
-                  const lastReminderDate = maxBy(
-                    row.accesses.map((a) => a.reminders[0]?.createdAt),
-                    (date) => new Date(date).valueOf()
-                  );
+                  if (row.__typename === "Petition") {
+                    const lastReminderDate = maxBy(
+                      row.accesses.map((a) => a.reminders[0]?.createdAt),
+                      (date) => new Date(date).valueOf()
+                    );
 
-                  const nextReminderAt = minBy(
-                    row.accesses.filter((a) => !!a.nextReminderAt),
-                    (a) => new Date(a.nextReminderAt!).valueOf()
-                  )?.nextReminderAt;
+                    const nextReminderAt = minBy(
+                      row.accesses.filter((a) => !!a.nextReminderAt),
+                      (a) => new Date(a.nextReminderAt!).valueOf()
+                    )?.nextReminderAt;
 
-                  const redirect = useGoToPetition();
+                    const redirect = useGoToPetition();
 
-                  return (
-                    <Flex
-                      alignItems="center"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        redirect(row.id, row.status === "DRAFT" ? "compose" : "activity");
-                      }}
-                      whiteSpace="nowrap"
-                    >
-                      {lastReminderDate ? (
-                        <DateTime
-                          value={lastReminderDate}
-                          format={FORMATS.MMMdd}
-                          whiteSpace="nowrap"
-                        />
-                      ) : (
-                        <Text as="span" textStyle="hint">
-                          <FormattedMessage
-                            id="petitions.header.reminders-disabled"
-                            defaultMessage="No reminders"
+                    return (
+                      <Flex
+                        alignItems="center"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          redirect(row.id, row.status === "DRAFT" ? "compose" : "activity");
+                        }}
+                        whiteSpace="nowrap"
+                      >
+                        {lastReminderDate ? (
+                          <DateTime
+                            value={lastReminderDate}
+                            format={FORMATS.MMMdd}
+                            whiteSpace="nowrap"
                           />
-                        </Text>
-                      )}
-                      {nextReminderAt ? (
-                        <SmallPopover
-                          content={
-                            <Text color="gray.800" fontSize="sm">
-                              <FormattedMessage
-                                id="petitions.header.reminders-next-reminder-at.popover"
-                                defaultMessage="Next reminder configured for {date}"
-                                values={{
-                                  date: <DateTime format={FORMATS.LLL} value={nextReminderAt} />,
-                                }}
-                              />
-                            </Text>
-                          }
-                          placement="bottom-end"
-                        >
-                          <IconButton
-                            marginLeft={1}
-                            variant="ghost"
-                            aria-label={intl.formatMessage({
-                              id: "petitions.header.reminders-next-reminder-at",
-                              defaultMessage: "Next reminder configured",
-                            })}
-                            size="xs"
-                            icon={<BellSettingsIcon fontSize="16px" color="gray.500" />}
-                          />
-                        </SmallPopover>
-                      ) : null}
-                    </Flex>
-                  );
+                        ) : (
+                          <Text as="span" textStyle="hint">
+                            <FormattedMessage
+                              id="petitions.header.reminders-disabled"
+                              defaultMessage="No reminders"
+                            />
+                          </Text>
+                        )}
+                        {nextReminderAt ? (
+                          <SmallPopover
+                            content={
+                              <Text color="gray.800" fontSize="sm">
+                                <FormattedMessage
+                                  id="petitions.header.reminders-next-reminder-at.popover"
+                                  defaultMessage="Next reminder configured for {date}"
+                                  values={{
+                                    date: <DateTime format={FORMATS.LLL} value={nextReminderAt} />,
+                                  }}
+                                />
+                              </Text>
+                            }
+                            placement="bottom-end"
+                          >
+                            <IconButton
+                              marginLeft={1}
+                              variant="ghost"
+                              aria-label={intl.formatMessage({
+                                id: "petitions.header.reminders-next-reminder-at",
+                                defaultMessage: "Next reminder configured",
+                              })}
+                              size="xs"
+                              icon={<BellSettingsIcon fontSize="16px" color="gray.500" />}
+                            />
+                          </SmallPopover>
+                        ) : null}
+                      </Flex>
+                    );
+                  } else {
+                    return null;
+                  }
                 },
               },
-            ] as PetitionTableColumn[])
+            ] as PetitionsTableColumns_PetitionOrFolder[])
           : ([
               {
                 key: "createdAt",
@@ -308,16 +343,23 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   defaultMessage: "Created at",
                 }),
                 cellProps: { width: "1%" },
-                CellContent: ({ row: { createdAt } }) => (
-                  <DateTime
-                    value={createdAt}
-                    format={FORMATS.LLL}
-                    useRelativeTime
-                    whiteSpace="nowrap"
-                  />
-                ),
+                CellContent: ({ row }) => {
+                  if (row.__typename === "PetitionTemplate") {
+                    const { createdAt } = row;
+                    return (
+                      <DateTime
+                        value={createdAt}
+                        format={FORMATS.LLL}
+                        useRelativeTime
+                        whiteSpace="nowrap"
+                      />
+                    );
+                  } else {
+                    return null;
+                  }
+                },
               },
-            ] as PetitionTemplateTableColumn[])),
+            ] as PetitionsTableColumns_PetitionTemplateOrFolder[])),
         {
           key: "tags",
           header: intl.formatMessage({
@@ -333,15 +375,25 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
           isFilterable: true,
           Filter: PetitionListTagFilter,
           CellContent: ({ row }) => {
-            return <PetitionTagListCellContent petition={row} />;
+            if (row.__typename === "Petition" || row.__typename === "PetitionTemplate") {
+              return <PetitionTagListCellContent petition={row} />;
+            } else {
+              return null;
+            }
           },
         },
-      ] as PetitionBaseTableColumn[],
+      ] as PetitionsTableColumns_PetitionBaseOrFolder[],
     [intl.locale, type]
   );
 }
 
 usePetitionsTableColumns.fragments = {
+  PetitionFolder: gql`
+    fragment usePetitionsTableColumns_PetitionFolder on PetitionFolder {
+      folderId: id
+      folderName: name
+    }
+  `,
   PetitionBase: gql`
     fragment usePetitionsTableColumns_PetitionBase on PetitionBase {
       id

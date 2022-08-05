@@ -2134,10 +2134,12 @@ export interface PetitionBase {
   updatedAt: Scalars["DateTime"];
 }
 
-export interface PetitionBasePagination {
-  __typename?: "PetitionBasePagination";
+export type PetitionBaseOrFolder = Petition | PetitionFolder | PetitionTemplate;
+
+export interface PetitionBaseOrFolderPagination {
+  __typename?: "PetitionBaseOrFolderPagination";
   /** The requested slice of items. */
-  items: Array<PetitionBase>;
+  items: Array<PetitionBaseOrFolder>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
 }
@@ -2460,10 +2462,25 @@ export type PetitionFieldType =
 
 export interface PetitionFilter {
   locale?: InputMaybe<PetitionLocale>;
+  path?: InputMaybe<Scalars["String"]>;
   sharedWith?: InputMaybe<PetitionSharedWithFilter>;
   status?: InputMaybe<Array<PetitionStatus>>;
   tagIds?: InputMaybe<Array<Scalars["GID"]>>;
   type?: InputMaybe<PetitionBaseType>;
+}
+
+export interface PetitionFolder {
+  __typename?: "PetitionFolder";
+  /** The ID of the petition or template. */
+  id: Scalars["ID"];
+  /** The lowest permission the user has in the petitions inside the folder. */
+  minimumPermissionType: PetitionPermissionType;
+  /** The name of the folder. */
+  name: Scalars["String"];
+  /** The full path of the folder. */
+  path: Scalars["String"];
+  /** The name petitions in the folder. */
+  petitionCount: Scalars["Int"];
 }
 
 /** The locale used for rendering the petition to the contact. */
@@ -3116,7 +3133,7 @@ export interface Query {
   /** A field of the petition. */
   petitionField: PetitionField;
   /** The petitions of the user */
-  petitions: PetitionBasePagination;
+  petitions: PetitionBaseOrFolderPagination;
   petitionsById: Array<Maybe<PetitionBase>>;
   publicLicenseCode?: Maybe<PublicLicenseCode>;
   publicOrgLogoUrl?: Maybe<Scalars["String"]>;
@@ -9587,12 +9604,6 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   hasCommentsEnabled: boolean;
 };
 
-export type PetitionListHeader_UserFragment = {
-  __typename?: "User";
-  id: string;
-  role: OrganizationRole;
-};
-
 export type PetitionListTagFilter_TagFragment = {
   __typename?: "Tag";
   id: string;
@@ -11919,9 +11930,10 @@ export type CreateEventSubscriptionDialog_petitionsQueryVariables = Exact<{
 
 export type CreateEventSubscriptionDialog_petitionsQuery = {
   petitions: {
-    __typename?: "PetitionBasePagination";
+    __typename?: "PetitionBaseOrFolderPagination";
     items: Array<
       | { __typename?: "Petition"; id: string; name?: string | null }
+      | { __typename?: "PetitionFolder" }
       | { __typename?: "PetitionTemplate"; id: string; name?: string | null }
     >;
   };
@@ -12699,7 +12711,7 @@ export type ChooseOrg_organizationsQuery = {
 export type ChooseOrg_petitionsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ChooseOrg_petitionsQuery = {
-  petitions: { __typename?: "PetitionBasePagination"; totalCount: number };
+  petitions: { __typename?: "PetitionBaseOrFolderPagination"; totalCount: number };
 };
 
 export type ChooseOrg_changeOrganizationMutationVariables = Exact<{
@@ -19875,155 +19887,7 @@ export type PetitionReplies_petitionQuery = {
 
 export type Petitions_UserFragment = { __typename?: "User"; role: OrganizationRole };
 
-export type Petitions_PetitionBasePaginationFragment = {
-  __typename?: "PetitionBasePagination";
-  totalCount: number;
-  items: Array<
-    | {
-        __typename?: "Petition";
-        sentAt?: string | null;
-        id: string;
-        name?: string | null;
-        createdAt: string;
-        status: PetitionStatus;
-        isRestricted: boolean;
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          permissionType: PetitionPermissionType;
-        } | null;
-        accesses: Array<{
-          __typename?: "PetitionAccess";
-          status: PetitionAccessStatus;
-          nextReminderAt?: string | null;
-          contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
-          reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
-        }>;
-        permissions: Array<
-          | {
-              __typename?: "PetitionUserGroupPermission";
-              permissionType: PetitionPermissionType;
-              group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-            }
-          | {
-              __typename?: "PetitionUserPermission";
-              permissionType: PetitionPermissionType;
-              user: {
-                __typename?: "User";
-                id: string;
-                fullName?: string | null;
-                avatarUrl?: string | null;
-                initials?: string | null;
-              };
-            }
-        >;
-        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-        progress: {
-          __typename?: "PetitionProgress";
-          external: {
-            __typename?: "PetitionFieldProgress";
-            approved: number;
-            replied: number;
-            optional: number;
-            total: number;
-          };
-          internal: {
-            __typename?: "PetitionFieldProgress";
-            approved: number;
-            replied: number;
-            optional: number;
-            total: number;
-          };
-        };
-        currentSignatureRequest?: {
-          __typename?: "PetitionSignatureRequest";
-          status: PetitionSignatureRequestStatus;
-          environment: SignatureOrgIntegrationEnvironment;
-        } | null;
-        signatureConfig?: {
-          __typename?: "SignatureConfig";
-          review: boolean;
-          integration?: {
-            __typename?: "SignatureOrgIntegration";
-            environment: SignatureOrgIntegrationEnvironment;
-          } | null;
-        } | null;
-      }
-    | {
-        __typename?: "PetitionTemplate";
-        isPublic: boolean;
-        descriptionExcerpt?: string | null;
-        id: string;
-        name?: string | null;
-        createdAt: string;
-        locale: PetitionLocale;
-        isRestricted: boolean;
-        anonymizeAfterMonths?: number | null;
-        myEffectivePermission?: {
-          __typename?: "EffectivePetitionUserPermission";
-          permissionType: PetitionPermissionType;
-        } | null;
-        permissions: Array<
-          | {
-              __typename?: "PetitionUserGroupPermission";
-              permissionType: PetitionPermissionType;
-              group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-            }
-          | {
-              __typename?: "PetitionUserPermission";
-              permissionType: PetitionPermissionType;
-              user: {
-                __typename?: "User";
-                id: string;
-                fullName?: string | null;
-                avatarUrl?: string | null;
-                initials?: string | null;
-              };
-            }
-        >;
-        publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
-        signatureConfig?: {
-          __typename?: "SignatureConfig";
-          review: boolean;
-          allowAdditionalSigners: boolean;
-          signers: Array<{
-            __typename?: "PetitionSigner";
-            contactId?: string | null;
-            fullName: string;
-            email: string;
-          } | null>;
-        } | null;
-        remindersConfig?: {
-          __typename?: "RemindersConfig";
-          offset: number;
-          time: string;
-          weekdaysOnly: boolean;
-        } | null;
-        defaultPermissions: Array<
-          | {
-              __typename?: "TemplateDefaultUserGroupPermission";
-              id: string;
-              permissionType: PetitionPermissionType;
-              group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-            }
-          | {
-              __typename?: "TemplateDefaultUserPermission";
-              id: string;
-              permissionType: PetitionPermissionType;
-              user: {
-                __typename?: "User";
-                id: string;
-                fullName?: string | null;
-                avatarUrl?: string | null;
-                initials?: string | null;
-              };
-            }
-        >;
-        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
-      }
-  >;
-};
-
-export type Petitions_PetitionBase_Petition_Fragment = {
+export type Petitions_PetitionBaseOrFolder_Petition_Fragment = {
   __typename?: "Petition";
   sentAt?: string | null;
   id: string;
@@ -20093,7 +19957,15 @@ export type Petitions_PetitionBase_Petition_Fragment = {
   } | null;
 };
 
-export type Petitions_PetitionBase_PetitionTemplate_Fragment = {
+export type Petitions_PetitionBaseOrFolder_PetitionFolder_Fragment = {
+  __typename?: "PetitionFolder";
+  path: string;
+  minimumPermissionType: PetitionPermissionType;
+  folderId: string;
+  folderName: string;
+};
+
+export type Petitions_PetitionBaseOrFolder_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   isPublic: boolean;
   descriptionExcerpt?: string | null;
@@ -20166,9 +20038,10 @@ export type Petitions_PetitionBase_PetitionTemplate_Fragment = {
   tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
 };
 
-export type Petitions_PetitionBaseFragment =
-  | Petitions_PetitionBase_Petition_Fragment
-  | Petitions_PetitionBase_PetitionTemplate_Fragment;
+export type Petitions_PetitionBaseOrFolderFragment =
+  | Petitions_PetitionBaseOrFolder_Petition_Fragment
+  | Petitions_PetitionBaseOrFolder_PetitionFolder_Fragment
+  | Petitions_PetitionBaseOrFolder_PetitionTemplate_Fragment;
 
 export type Petitions_userQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -20216,7 +20089,7 @@ export type Petitions_petitionsQueryVariables = Exact<{
 
 export type Petitions_petitionsQuery = {
   petitions: {
-    __typename?: "PetitionBasePagination";
+    __typename?: "PetitionBaseOrFolderPagination";
     totalCount: number;
     items: Array<
       | {
@@ -20292,6 +20165,13 @@ export type Petitions_petitionsQuery = {
               environment: SignatureOrgIntegrationEnvironment;
             } | null;
           } | null;
+        }
+      | {
+          __typename?: "PetitionFolder";
+          path: string;
+          minimumPermissionType: PetitionPermissionType;
+          folderId: string;
+          folderName: string;
         }
       | {
           __typename?: "PetitionTemplate";
@@ -20559,7 +20439,7 @@ export type NewPetition_userQuery = {
       };
     };
   };
-  hasTemplates: { __typename?: "PetitionBasePagination"; totalCount: number };
+  hasTemplates: { __typename?: "PetitionBaseOrFolderPagination"; totalCount: number };
   realMe: {
     __typename?: "User";
     id: string;
@@ -22620,6 +22500,12 @@ export type PetitionSignaturesCardPolling_petitionQuery = {
     | null;
 };
 
+export type usePetitionsTableColumns_PetitionFolderFragment = {
+  __typename?: "PetitionFolder";
+  folderId: string;
+  folderName: string;
+};
+
 export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   sentAt?: string | null;
@@ -23633,12 +23519,6 @@ export const ReferencedFieldDialog_PetitionFieldFragmentDoc = gql`
   }
   ${FieldErrorDialog_PetitionFieldFragmentDoc}
 ` as unknown as DocumentNode<ReferencedFieldDialog_PetitionFieldFragment, unknown>;
-export const PetitionListHeader_UserFragmentDoc = gql`
-  fragment PetitionListHeader_User on User {
-    id
-    role
-  }
-` as unknown as DocumentNode<PetitionListHeader_UserFragment, unknown>;
 export const PetitionListTagFilter_TagFragmentDoc = gql`
   fragment PetitionListTagFilter_Tag on Tag {
     id
@@ -26604,27 +26484,32 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
   ${PetitionSignatureCellContent_PetitionFragmentDoc}
   ${TemplateActiveSettingsIcons_PetitionTemplateFragmentDoc}
 ` as unknown as DocumentNode<usePetitionsTableColumns_PetitionBaseFragment, unknown>;
-export const Petitions_PetitionBaseFragmentDoc = gql`
-  fragment Petitions_PetitionBase on PetitionBase {
-    ...usePetitionsTableColumns_PetitionBase
+export const usePetitionsTableColumns_PetitionFolderFragmentDoc = gql`
+  fragment usePetitionsTableColumns_PetitionFolder on PetitionFolder {
+    folderId: id
+    folderName: name
+  }
+` as unknown as DocumentNode<usePetitionsTableColumns_PetitionFolderFragment, unknown>;
+export const Petitions_PetitionBaseOrFolderFragmentDoc = gql`
+  fragment Petitions_PetitionBaseOrFolder on PetitionBaseOrFolder {
+    ... on PetitionBase {
+      ...usePetitionsTableColumns_PetitionBase
+      myEffectivePermission {
+        permissionType
+      }
+    }
     ... on PetitionTemplate {
       isPublic
     }
-    myEffectivePermission {
-      permissionType
+    ... on PetitionFolder {
+      ...usePetitionsTableColumns_PetitionFolder
+      path
+      minimumPermissionType
     }
   }
   ${usePetitionsTableColumns_PetitionBaseFragmentDoc}
-` as unknown as DocumentNode<Petitions_PetitionBaseFragment, unknown>;
-export const Petitions_PetitionBasePaginationFragmentDoc = gql`
-  fragment Petitions_PetitionBasePagination on PetitionBasePagination {
-    items {
-      ...Petitions_PetitionBase
-    }
-    totalCount
-  }
-  ${Petitions_PetitionBaseFragmentDoc}
-` as unknown as DocumentNode<Petitions_PetitionBasePaginationFragment, unknown>;
+  ${usePetitionsTableColumns_PetitionFolderFragmentDoc}
+` as unknown as DocumentNode<Petitions_PetitionBaseOrFolderFragment, unknown>;
 export const TemplateCard_PetitionTemplateFragmentDoc = gql`
   fragment TemplateCard_PetitionTemplate on PetitionTemplate {
     id
@@ -29905,12 +29790,8 @@ export const PetitionReplies_petitionDocument = gql`
 export const Petitions_userDocument = gql`
   query Petitions_user {
     ...AppLayout_Query
-    me {
-      ...PetitionListHeader_User
-    }
   }
   ${AppLayout_QueryFragmentDoc}
-  ${PetitionListHeader_UserFragmentDoc}
 ` as unknown as DocumentNode<Petitions_userQuery, Petitions_userQueryVariables>;
 export const Petitions_petitionsDocument = gql`
   query Petitions_petitions(
@@ -29921,10 +29802,13 @@ export const Petitions_petitionsDocument = gql`
     $filters: PetitionFilter
   ) {
     petitions(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy, filters: $filters) {
-      ...Petitions_PetitionBasePagination
+      items {
+        ...Petitions_PetitionBaseOrFolder
+      }
+      totalCount
     }
   }
-  ${Petitions_PetitionBasePaginationFragmentDoc}
+  ${Petitions_PetitionBaseOrFolderFragmentDoc}
 ` as unknown as DocumentNode<Petitions_petitionsQuery, Petitions_petitionsQueryVariables>;
 export const Petitions_updatePetitionDocument = gql`
   mutation Petitions_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {

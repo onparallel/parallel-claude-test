@@ -2084,9 +2084,11 @@ export type PetitionBase = {
   updatedAt: Scalars["DateTime"];
 };
 
-export type PetitionBasePagination = {
+export type PetitionBaseOrFolder = Petition | PetitionFolder | PetitionTemplate;
+
+export type PetitionBaseOrFolderPagination = {
   /** The requested slice of items. */
-  items: Array<PetitionBase>;
+  items: Array<PetitionBaseOrFolder>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
 };
@@ -2391,10 +2393,22 @@ export type PetitionFieldType =
 
 export type PetitionFilter = {
   locale?: InputMaybe<PetitionLocale>;
+  path?: InputMaybe<Scalars["String"]>;
   sharedWith?: InputMaybe<PetitionSharedWithFilter>;
   status?: InputMaybe<Array<PetitionStatus>>;
   tagIds?: InputMaybe<Array<Scalars["GID"]>>;
   type?: InputMaybe<PetitionBaseType>;
+};
+
+export type PetitionFolder = {
+  /** The ID of the petition or template. */
+  id: Scalars["ID"];
+  /** The name of the folder. */
+  name: Scalars["String"];
+  /** The full path of the folder. */
+  path: Scalars["String"];
+  /** The name petitions in the folder. */
+  petitionCount: Scalars["Int"];
 };
 
 /** The locale used for rendering the petition to the contact. */
@@ -3019,7 +3033,7 @@ export type Query = {
   /** A field of the petition. */
   petitionField: PetitionField;
   /** The petitions of the user */
-  petitions: PetitionBasePagination;
+  petitions: PetitionBaseOrFolderPagination;
   petitionsById: Array<Maybe<PetitionBase>>;
   publicLicenseCode: Maybe<PublicLicenseCode>;
   publicOrgLogoUrl: Maybe<Scalars["String"]>;

@@ -1,11 +1,12 @@
 import { extension } from "mime-types";
-import { arg, enumType, inputObjectType, interfaceType, objectType } from "nexus";
+import { arg, enumType, inputObjectType, interfaceType, objectType, unionType } from "nexus";
 import { isDefined, minBy } from "remeda";
 import { fullName } from "../../../util/fullName";
 import { toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { safeJsonParse } from "../../../util/safeJsonParse";
 import { toHtml, toPlainText } from "../../../util/slate";
+import { encode } from "../../../util/token";
 
 export const PetitionLocale = enumType({
   name: "PetitionLocale",
@@ -72,6 +73,59 @@ export const PetitionProgress = objectType({
       description: "The progress of the petition include internal fields.",
     });
   },
+});
+
+export const PetitionFolder = objectType({
+  name: "PetitionFolder",
+  definition(t) {
+    t.id("id", {
+      description: "The ID of the petition or template.",
+      resolve: (o) => encode(Buffer.from(`PetitionFolder:${o.path}`, "utf8")),
+    });
+    t.string("name", {
+      description: "The name of the folder.",
+      resolve: (o) => o.name,
+    });
+    t.string("path", {
+      description: "The full path of the folder.",
+    });
+    t.int("petitionCount", {
+      description: "The name petitions in the folder.",
+      resolve: (o) => o.petition_count,
+    });
+    t.field("minimumPermissionType", {
+      type: "PetitionPermissionType",
+      description: "The lowest permission the user has in the petitions inside the folder.",
+      resolve: (o) => o.min_permission,
+    });
+  },
+  sourceType: /* sql */ `{
+    name: string;
+    petition_count: number;
+    is_folder: true;
+    path: string;
+    min_permission: db.PetitionPermissionType;
+  }`,
+});
+
+export const PetitionBaseOrFolder = unionType({
+  name: "PetitionBaseOrFolder",
+  definition(t) {
+    t.members("PetitionFolder", "Petition", "PetitionTemplate");
+  },
+  resolveType: (o) => {
+    if (o.is_folder) {
+      return "PetitionFolder";
+    } else if (o.is_template) {
+      return "PetitionTemplate";
+    } else {
+      return "Petition";
+    }
+  },
+  sourceType: /* ts */ `
+    | ({is_folder: false} & NexusGenRootTypes["Petition"])
+    | NexusGenRootTypes["PetitionFolder"]
+  `,
 });
 
 export const PetitionBase = interfaceType({

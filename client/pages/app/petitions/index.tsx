@@ -23,7 +23,7 @@ import {
   PetitionBaseType,
   PetitionSharedWithFilter,
   PetitionStatus,
-  Petitions_PetitionBaseFragment,
+  Petitions_PetitionBaseOrFolderFragment,
   Petitions_petitionsDocument,
   Petitions_updatePetitionDocument,
   Petitions_userDocument,
@@ -40,6 +40,7 @@ import {
   list,
   object,
   QueryItem,
+  QueryStateFrom,
   sorting,
   string,
   useQueryState,
@@ -55,6 +56,9 @@ import { pick } from "remeda";
 const SORTING = ["name", "createdAt", "sentAt"] as const;
 
 const QUERY_STATE = {
+  path: string()
+    .withValidation((value) => typeof value === "string" && /^\/([^\/]+\/)*$/.test(value))
+    .orDefault("/"),
   page: integer({ min: 1 }).orDefault(1),
   items: values([10, 25, 50]).orDefault(10),
   status: list<PetitionStatus>(["DRAFT", "PENDING", "COMPLETED", "CLOSED"]),
@@ -70,6 +74,12 @@ const QUERY_STATE = {
     unflatten: unflatShared,
   }),
 };
+
+export type PetitionsQueryState = QueryStateFrom<typeof QUERY_STATE>;
+
+function rowKeyProp(row: PetitionSelection) {
+  return row.__typename === "PetitionFolder" ? row.folderId : (row as any).id;
+}
 
 function Petitions() {
   const intl = useIntl();
@@ -91,6 +101,7 @@ function Petitions() {
         limit: state.items,
         search: state.search,
         filters: {
+          path: state.path,
           status: state.status,
           type: state.type,
           tagIds: state.tags,
@@ -107,7 +118,7 @@ function Petitions() {
 
   const { selectedIdsRef, selectedRowsRef, selectedIds, onChangeSelectedIds } = useSelection(
     petitions?.items,
-    "id"
+    rowKeyProp
   );
 
   function handleSearchChange(value: string | null) {
@@ -183,21 +194,26 @@ function Petitions() {
 
   const showPetitionSharingDialog = usePetitionSharingDialog();
 
-  const handlePetitionSharingClick = useCallback(
-    async function () {
-      try {
-        await showPetitionSharingDialog({
-          userId: me.id,
-          petitionIds: selectedIdsRef.current,
-          isTemplate: state.type === "TEMPLATE",
-        });
-      } catch {}
-    },
-    [state.type]
-  );
-
-  const handleRowClick = useCallback(
-    function (row: PetitionSelection, event: MouseEvent) {
+  const handlePetitionSharingClick = async function () {
+    try {
+      await showPetitionSharingDialog({
+        userId: me.id,
+        petitionIds: selectedIdsRef.current,
+        isTemplate: state.type === "TEMPLATE",
+      });
+    } catch {}
+  };
+  const handleRowClick = useCallback(function (row: PetitionSelection, event: MouseEvent) {
+    if (row.__typename === "PetitionFolder") {
+      setQueryState(
+        (current) => ({
+          ...current,
+          path: row.path,
+          page: 1,
+        }),
+        { type: "push", event }
+      );
+    } else if (row.__typename === "Petition" || row.__typename === "PetitionTemplate") {
       goToPetition(
         row.id,
         row.__typename === "Petition"
@@ -212,29 +228,34 @@ function Petitions() {
           : "compose",
         { event }
       );
-    },
-    [state.type]
-  );
+    }
+  }, []);
 
   const [updatePetition] = useMutation(Petitions_updatePetitionDocument);
   const showRenameDialog = useRenameDialog();
 
   const handleRenameClick = useCallback(async () => {
     try {
-      const petition = selectedRowsRef.current[0];
-      if (petition) {
-        const isPublic = petition.__typename === "PetitionTemplate" && petition.isPublic;
-        const { newName } = await showRenameDialog({
-          name: petition.name,
-          isTemplate: petition.__typename === "PetitionTemplate",
-          isDisabled: isPublic || petition.myEffectivePermission?.permissionType === "READ",
-        });
-        await updatePetition({
-          variables: {
-            petitionId: petition.id,
-            data: { name: newName },
-          },
-        });
+      const row = selectedRowsRef.current[0];
+      if (row.__typename === "PetitionFolder") {
+        // const folder = row;
+        // TODO rename folder
+      } else if (row.__typename === "Petition" || row.__typename === "PetitionTemplate") {
+        const petition = row;
+        if (petition) {
+          const isPublic = petition.__typename === "PetitionTemplate" && petition.isPublic;
+          const { newName } = await showRenameDialog({
+            name: petition.name,
+            isTemplate: petition.__typename === "PetitionTemplate",
+            isDisabled: isPublic || petition.myEffectivePermission?.permissionType === "READ",
+          });
+          await updatePetition({
+            variables: {
+              petitionId: petition.id,
+              data: { name: newName },
+            },
+          });
+        }
       }
     } catch {}
   }, []);
@@ -278,7 +299,7 @@ function Petitions() {
           columns={columns}
           rows={petitions?.items}
           context={context}
-          rowKeyProp={"id"}
+          rowKeyProp={rowKeyProp}
           isSelectable
           isHighlightable
           loading={loading}
@@ -298,7 +319,8 @@ function Petitions() {
           actions={actions}
           header={
             <PetitionListHeader
-              search={state.search}
+              shape={QUERY_STATE}
+              state={state}
               onSearchChange={handleSearchChange}
               onReload={() => refetch()}
             />
@@ -380,53 +402,42 @@ function RenderFooter({
   );
 }
 
-export type PetitionSelection = Petitions_PetitionBaseFragment;
+export type PetitionSelection = Petitions_PetitionBaseOrFolderFragment;
 
 Petitions.fragments = {
-  get User() {
-    return gql`
-      fragment Petitions_User on User {
-        role
-      }
-    `;
-  },
-  get PetitionBasePagination() {
-    return gql`
-      fragment Petitions_PetitionBasePagination on PetitionBasePagination {
-        items {
-          ...Petitions_PetitionBase
-        }
-        totalCount
-      }
-      ${this.PetitionBase}
-    `;
-  },
-  get PetitionBase() {
-    return gql`
-      fragment Petitions_PetitionBase on PetitionBase {
+  User: gql`
+    fragment Petitions_User on User {
+      role
+    }
+  `,
+  PetitionBaseOrFolder: gql`
+    fragment Petitions_PetitionBaseOrFolder on PetitionBaseOrFolder {
+      ... on PetitionBase {
         ...usePetitionsTableColumns_PetitionBase
-        ... on PetitionTemplate {
-          isPublic
-        }
         myEffectivePermission {
           permissionType
         }
       }
-      ${usePetitionsTableColumns.fragments.PetitionBase}
-    `;
-  },
+      ... on PetitionTemplate {
+        isPublic
+      }
+      ... on PetitionFolder {
+        ...usePetitionsTableColumns_PetitionFolder
+        path
+        minimumPermissionType
+      }
+    }
+    ${usePetitionsTableColumns.fragments.PetitionBase}
+    ${usePetitionsTableColumns.fragments.PetitionFolder}
+  `,
 };
 
 const _queries = [
   gql`
     query Petitions_user {
       ...AppLayout_Query
-      me {
-        ...PetitionListHeader_User
-      }
     }
     ${AppLayout.fragments.Query}
-    ${PetitionListHeader.fragments.User}
   `,
   gql`
     query Petitions_petitions(
@@ -443,10 +454,13 @@ const _queries = [
         sortBy: $sortBy
         filters: $filters
       ) {
-        ...Petitions_PetitionBasePagination
+        items {
+          ...Petitions_PetitionBaseOrFolder
+        }
+        totalCount
       }
     }
-    ${Petitions.fragments.PetitionBasePagination}
+    ${Petitions.fragments.PetitionBaseOrFolder}
   `,
 ];
 
