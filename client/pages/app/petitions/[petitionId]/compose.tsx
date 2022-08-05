@@ -561,7 +561,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 isReadOnly={isReadOnly}
               />
             ) : null}
-            {petition && petition.__typename === "Petition" && petition.status !== "DRAFT" ? (
+            {petition.__typename === "Petition" && petition.accesses.length > 0 ? (
               <Box color="gray.500" marginTop={12} paddingX={4} textAlign="center">
                 <Text>
                   <FormattedMessage
