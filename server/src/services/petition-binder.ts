@@ -134,7 +134,7 @@ export class PetitionBinder implements IPetitionBinder {
                     );
                   } else if (file.content_type === "application/pdf") {
                     return await this.writeTemporaryFile(
-                      this.aws.fileUploads.downloadFile(file.path)
+                      await this.aws.fileUploads.downloadFile(file.path)
                     );
                   } else {
                     throw new Error(`Cannot annex ${file.content_type} to pdf binder`);
@@ -228,7 +228,9 @@ export class PetitionBinder implements IPetitionBinder {
   }
 
   private async convertImage(fileS3Path: string, contentType: string) {
-    const tmpPath = await this.writeTemporaryFile(this.aws.fileUploads.downloadFile(fileS3Path));
+    const tmpPath = await this.writeTemporaryFile(
+      await this.aws.fileUploads.downloadFile(fileS3Path)
+    );
 
     const outputFormat = ["image/png", "image/gif"].includes(contentType) ? "png" : "jpeg";
     const output = resolve(this.temporaryDirectory, `${random(10)}.${outputFormat}`);

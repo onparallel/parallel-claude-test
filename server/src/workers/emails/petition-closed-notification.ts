@@ -88,9 +88,11 @@ export async function petitionClosedNotification(
       });
       const path = random(16);
 
-      const readable = new Readable();
-      readable.wrap(documentStream);
-      const res = await context.aws.temporaryFiles.uploadFile(path, "application/pdf", readable);
+      const res = await context.aws.temporaryFiles.uploadFile(
+        path,
+        "application/pdf",
+        documentStream as Readable
+      );
       const attachment = await context.files.createTemporaryFile(
         {
           path,

@@ -1,9 +1,18 @@
-import AWS from "aws-sdk";
-import { HeadObjectOutput, PresignedPost } from "aws-sdk/clients/s3";
+import {
+  DeleteObjectsCommand,
+  GetObjectCommand,
+  HeadObjectCommand,
+  HeadObjectOutput,
+  S3Client,
+} from "@aws-sdk/client-s3";
+import { Upload } from "@aws-sdk/lib-storage";
+import { createPresignedPost, PresignedPost } from "@aws-sdk/s3-presigned-post";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import contentDisposition from "content-disposition";
 import { injectable } from "inversify";
 import { chunk } from "remeda";
 import { Readable } from "stream";
+import { buffer } from "stream/consumers";
 import { unMaybeArray } from "../util/arrays";
 import { MaybeArray } from "../util/types";
 
@@ -22,7 +31,7 @@ export interface IStorage {
     filename: string,
     cdType: "attachment" | "inline"
   ): Promise<string>;
-  downloadFile(key: string): Readable;
+  downloadFile(key: string): Promise<Readable>;
   getFileMetadata(key: string): Promise<HeadObjectOutput>;
   deleteFile(key: MaybeArray<string>): Promise<void>;
   uploadFile(key: string, contentType: string, body: Buffer | Readable): Promise<HeadObjectOutput>;
@@ -30,86 +39,74 @@ export interface IStorage {
 const _4GB = 1024 * 1024 * 1024 * 4;
 @injectable()
 export class Storage implements IStorage {
-  constructor(private s3: AWS.S3, private bucketName: string) {}
+  constructor(private s3: S3Client, private bucketName: string) {}
 
   async getSignedUploadEndpoint(key: string, contentType: string, maxAllowedSize?: number) {
-    return await new Promise<PresignedPost>((resolve, reject) => {
-      this.s3.createPresignedPost(
-        {
-          Bucket: this.bucketName,
-          Fields: { key },
-          Expires: 60 * 30,
-          Conditions: [
-            ["eq", "$Content-Type", contentType],
-            ["content-length-range", 0, Math.min(maxAllowedSize ?? _4GB, _4GB)],
-          ],
-        },
-        (error, data) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(data);
-          }
-        }
-      );
+    return await createPresignedPost(this.s3, {
+      Bucket: this.bucketName,
+      Key: key,
+      Expires: 60 * 30,
+      Conditions: [
+        ["eq", "$Content-Type", contentType],
+        ["content-length-range", 0, Math.min(maxAllowedSize ?? _4GB, _4GB)],
+      ],
     });
   }
 
   async getSignedDownloadEndpoint(key: string, filename: string, cdType: "attachment" | "inline") {
-    return await this.s3.getSignedUrlPromise("getObject", {
-      Bucket: this.bucketName,
-      Key: key,
-      Expires: 60 * 30,
-      ResponseContentDisposition: contentDisposition(filename, {
-        type: cdType,
-      }),
-    });
-  }
-
-  downloadFile(key: string) {
-    return this.s3
-      .getObject({
+    return await getSignedUrl(
+      this.s3,
+      new GetObjectCommand({
         Bucket: this.bucketName,
         Key: key,
-      })
-      .createReadStream();
+        ResponseContentDisposition: contentDisposition(filename, { type: cdType }),
+      }),
+      { expiresIn: 60 * 30 }
+    );
+  }
+
+  async downloadFile(key: string) {
+    const response = await this.s3.send(
+      new GetObjectCommand({ Bucket: this.bucketName, Key: key })
+    );
+    return Readable.from(await buffer(response.Body! as Readable));
   }
 
   async getFileMetadata(key: string) {
-    return await this.s3
-      .headObject({
+    return await this.s3.send(
+      new HeadObjectCommand({
         Bucket: this.bucketName,
         Key: key,
       })
-      .promise();
+    );
   }
 
   async deleteFile(keys: MaybeArray<string>) {
     const objects = unMaybeArray(keys).map((key) => ({ Key: key }));
     if (objects.length > 0) {
       // there's a limit of 1000 items per API call
-      for (const objectsChunk of chunk(objects, 1000))
-        await this.s3
-          .deleteObjects({
+      for (const objectsChunk of chunk(objects, 1000)) {
+        await this.s3.send(
+          new DeleteObjectsCommand({
             Bucket: this.bucketName,
             Delete: { Objects: objectsChunk },
           })
-          .promise();
+        );
+      }
     }
   }
 
   async uploadFile(key: string, contentType: string, body: Buffer | Readable) {
-    await this.s3
-      .upload(
-        {
-          Bucket: this.bucketName,
-          Key: key,
-          ContentType: contentType,
-          Body: body,
-        },
-        {}
-      )
-      .promise();
+    await new Upload({
+      client: this.s3,
+      params: {
+        Bucket: this.bucketName,
+        Key: key,
+        ContentType: contentType,
+        Body: body,
+      },
+    }).done();
+
     return await this.getFileMetadata(key);
   }
 }

@@ -1,3 +1,4 @@
+import pMap from "p-map";
 import { unMaybeArray } from "../util/arrays";
 import { appSumoActivateAccount } from "./emails/appsumo-activate-account";
 import { commentsContactNotification } from "./emails/comments-contact-notification";
@@ -79,11 +80,15 @@ createQueueWorker("email-sender", async (payload: EmailSenderWorkerPayload, cont
           "X-SES-CONFIGURATION-SET":
             context.config.ses.configurationSet[email.track_opens ? "tracking" : "noTracking"],
         },
-        attachments: attachments.map((attachment) => ({
-          filename: attachment.filename,
-          contentType: attachment.content_type,
-          content: context.aws.temporaryFiles.downloadFile(attachment.path),
-        })),
+        attachments: await pMap(
+          attachments,
+          async (attachment) => ({
+            filename: attachment.filename,
+            contentType: attachment.content_type,
+            content: await context.aws.temporaryFiles.downloadFile(attachment.path),
+          }),
+          { concurrency: 1 }
+        ),
       });
       await context.emailLogs.updateWithResponse(email.id, {
         response: JSON.stringify(result),

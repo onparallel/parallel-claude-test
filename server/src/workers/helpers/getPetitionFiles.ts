@@ -94,7 +94,7 @@ export async function* getPetitionFiles(
           seen.add(filename);
           yield {
             filename,
-            stream: ctx.aws.fileUploads.downloadFile(file.path),
+            stream: await ctx.aws.fileUploads.downloadFile(file.path),
           } as ZipFileInput;
           await options.onProgress?.(++processedFiles / totalFiles);
         }
@@ -117,7 +117,7 @@ export async function* getPetitionFiles(
       if (signedPetition?.upload_complete) {
         yield {
           filename: signedPetition.filename,
-          stream: ctx.aws.fileUploads.downloadFile(signedPetition.path),
+          stream: await ctx.aws.fileUploads.downloadFile(signedPetition.path),
         };
         await options.onProgress?.(++processedFiles / totalFiles);
       }
@@ -129,7 +129,7 @@ export async function* getPetitionFiles(
       if (auditTrail?.upload_complete) {
         yield {
           filename: auditTrail.filename,
-          stream: ctx.aws.fileUploads.downloadFile(auditTrail.path),
+          stream: await ctx.aws.fileUploads.downloadFile(auditTrail.path),
         };
         await options.onProgress?.(++processedFiles / totalFiles);
       }

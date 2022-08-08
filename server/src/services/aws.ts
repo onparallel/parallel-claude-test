@@ -1,3 +1,4 @@
+import { S3Client } from "@aws-sdk/client-s3";
 import AWS, { AWSError, CognitoIdentityServiceProvider } from "aws-sdk";
 import { PromiseResult } from "aws-sdk/lib/request";
 import { createHash } from "crypto";
@@ -62,9 +63,8 @@ export const AWS_SERVICE = Symbol.for("AWS_SERVICE");
 @injectable()
 export class Aws implements IAws {
   @Memoize() private get s3() {
-    return new AWS.S3({
-      signatureVersion: "v4",
-      region: this.config.aws.region,
+    return new S3Client({
+      ...this.config.aws,
       useAccelerateEndpoint: true,
     });
   }
