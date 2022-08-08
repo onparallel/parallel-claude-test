@@ -2,7 +2,7 @@ import { Box, Text, Tooltip, useBreakpointValue } from "@chakra-ui/react";
 import { AlertCircleFilledIcon } from "@parallel/chakra/icons";
 import { cloneElement, ReactElement, ReactNode } from "react";
 import { useIntl } from "react-intl";
-import { Link } from "../common/Link";
+import { Link, NakedLink } from "../common/Link";
 import { SmallPopover } from "../common/SmallPopover";
 
 export interface AppLayoutNavbarLinkProps {
@@ -27,50 +27,52 @@ export function AppLayoutNavbarLink({
   const intl = useIntl();
   const isMobile = useBreakpointValue({ base: true, sm: false });
   return isAvailable ? (
-    <Link
-      href={href!}
-      data-link={`navbar-${section}`}
-      position="relative"
-      display="block"
-      userSelect="none"
-      aria-current={isActive ? "page" : undefined}
-      _focus={{
-        boxShadow: "none",
-        textDecoration: "underline",
-      }}
-      sx={{
-        color: "gray.600",
-        _hover: { color: "gray.700" },
-        _active: { color: "gray.800" },
-        _activeLink: {
-          color: "primary.600",
-          _hover: { color: "primary.700" },
-          _active: { color: "primary.800" },
-          _after: {
-            base: {
-              display: "block",
-              position: "absolute",
-              content: "''",
-              height: "4px",
-              width: "100%",
-              top: 0,
-              left: 0,
-              backgroundColor: "primary.600",
-            },
-            sm: {
-              width: "4px",
-              height: "100%",
-              left: 0,
-              top: 0,
+    <NakedLink href={href!}>
+      <Box
+        as="a"
+        data-link={`navbar-${section}`}
+        position="relative"
+        display="block"
+        userSelect="none"
+        aria-current={isActive ? "page" : undefined}
+        _focus={{
+          boxShadow: "none",
+          textDecoration: "underline",
+        }}
+        sx={{
+          color: "gray.600",
+          _hover: { color: "gray.700" },
+          _active: { color: "gray.800" },
+          _activeLink: {
+            color: "primary.600",
+            _hover: { color: "primary.700" },
+            _active: { color: "primary.800" },
+            _after: {
+              base: {
+                display: "block",
+                position: "absolute",
+                content: "''",
+                height: "4px",
+                width: "100%",
+                top: 0,
+                left: 0,
+                backgroundColor: "primary.600",
+              },
+              sm: {
+                width: "4px",
+                height: "100%",
+                left: 0,
+                top: 0,
+              },
             },
           },
-        },
-      }}
-    >
-      <AppLayoutNavbarLinkContent icon={icon} warningPopover={warningPopover}>
-        {children}
-      </AppLayoutNavbarLinkContent>
-    </Link>
+        }}
+      >
+        <AppLayoutNavbarLinkContent icon={icon} warningPopover={warningPopover}>
+          {children}
+        </AppLayoutNavbarLinkContent>
+      </Box>
+    </NakedLink>
   ) : (
     <Tooltip
       label={intl.formatMessage({

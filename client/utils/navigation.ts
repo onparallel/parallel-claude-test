@@ -4,12 +4,15 @@ import { useUpdatingRef } from "./useUpdatingRef";
 
 export function useHandleNavigation() {
   const router = useRouter();
-  const ref = useUpdatingRef(router.locale);
-  return useCallback(function (url: string, event?: MouseEvent) {
+  const localeRef = useUpdatingRef(
+    router.locale === router.defaultLocale ? undefined : router.locale
+  );
+  return useCallback(function (url: string, event?: MouseEvent | globalThis.MouseEvent) {
+    const path = (localeRef.current ? `/${localeRef.current}` : "") + url;
     if (event?.metaKey || event?.ctrlKey) {
-      window.open(`/${ref.current}${url}`, "_blank");
+      window.open(path, "_blank");
     } else {
-      router.push(`/${ref.current}${url}`);
+      void router.push(path);
     }
   }, []);
 }
