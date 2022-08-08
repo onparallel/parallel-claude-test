@@ -2,7 +2,7 @@ import { Box, Text, Tooltip, useBreakpointValue } from "@chakra-ui/react";
 import { AlertCircleFilledIcon } from "@parallel/chakra/icons";
 import { cloneElement, ReactElement, ReactNode } from "react";
 import { useIntl } from "react-intl";
-import { Link, NakedLink } from "../common/Link";
+import { NakedLink } from "../common/Link";
 import { SmallPopover } from "../common/SmallPopover";
 
 export interface AppLayoutNavbarLinkProps {

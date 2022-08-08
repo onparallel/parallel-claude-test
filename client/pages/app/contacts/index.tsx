@@ -28,7 +28,7 @@ import { integer, sorting, string, useQueryState, values } from "@parallel/utils
 import { UnwrapArray } from "@parallel/utils/types";
 import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
 import { useSelection } from "@parallel/utils/useSelectionState";
-import { MouseEvent, useMemo, useState } from "react";
+import { MouseEvent, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 const SORTING = ["firstName", "lastName", "fullName", "email", "createdAt"] as const;
@@ -65,7 +65,7 @@ function Contacts() {
 
   const createContact = useCreateContact();
 
-  const { selectedIds, selectedRows, onChangeSelectedIds } = useSelection(contacts?.items, "id");
+  const { selectedRows, onChangeSelectedIds } = useSelection(contacts?.items, "id");
 
   function handleSearchChange(value: string | null) {
     setQueryState((current) => ({
