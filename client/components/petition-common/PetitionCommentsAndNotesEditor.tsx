@@ -114,6 +114,7 @@ export function PetitionCommentsAndNotesEditor({
               isDisabled={isDisabled}
               onKeyDown={handleKeyDown}
               onChange={setCommentDraft}
+              onSearchMentionables={onSearchMentionables}
             />
             <Button
               colorScheme="primary"

@@ -1,12 +1,13 @@
 import { extension } from "mime-types";
 import { arg, core, enumType, inputObjectType, objectType, unionType } from "nexus";
+import pMap from "p-map";
 import { isDefined } from "remeda";
 import { PetitionAccess, PetitionMessage } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { safeJsonParse } from "../../util/safeJsonParse";
-import { toHtml } from "../../util/slate";
+import { getMentions, toHtml } from "../../util/slate";
 
 export const PublicPetitionAccess = objectType({
   name: "PublicPetitionAccess",
@@ -570,6 +571,40 @@ export const PublicPetitionFieldComment = objectType({
       description: "The HTML content of the comment.",
       resolve: async (root, _, ctx) => {
         return toHtml(root.content_json);
+      },
+    });
+    t.list.field("mentions", {
+      description: "The mentions of the comments.",
+      type: objectType({
+        name: "PublicPetitionFieldCommentMention",
+        definition(t) {
+          t.string("id", { description: "GlobalID of the User or UserGroup" });
+          t.nullable.string("name", { description: "Name of the mentioned user or group" });
+          t.string("type");
+        },
+      }),
+      resolve: async (root, _, ctx) => {
+        return await pMap(
+          getMentions(root.content_json),
+          async (m) => {
+            if (m.type === "User") {
+              const userData = await ctx.users.loadUserDataByUserId(m.id);
+              return {
+                id: toGlobalId(m.type, m.id),
+                name: userData ? fullName(userData.first_name, userData.last_name) : null,
+                type: m.type,
+              };
+            } else {
+              const group = await ctx.userGroups.loadUserGroup(m.id);
+              return {
+                id: toGlobalId(m.type, m.id),
+                name: group?.name ?? null,
+                type: m.type,
+              };
+            }
+          },
+          { concurrency: 1 }
+        );
       },
     });
     t.datetime("createdAt", {

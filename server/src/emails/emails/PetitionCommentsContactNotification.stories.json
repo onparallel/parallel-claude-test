@@ -68,10 +68,16 @@
                     "children": [
                       {
                         "text": "Ya sale en el borrador"
+                      },
+                      {
+                        "type": "mention",
+                        "mention": "User:1",
+                        "children": [{ "text": "Mariano Rodriguez" }]
                       }
                     ]
                   }
                 ],
+                "mentions": [{ "id": "User:1", "highlight": false }],
                 "author": {
                   "id": "User:1",
                   "name": "Derek Lou"

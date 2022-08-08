@@ -5,7 +5,7 @@ import { PublicPetitionFieldCommentContent_PetitionFieldCommentFragment } from "
 import { sanitizeHtml } from "@parallel/utils/sanitizeHtml";
 import parse, { Element, HTMLReactParserOptions } from "html-react-parser";
 import { useMemo } from "react";
-import { Mention } from "./Mention";
+import { PublicMention } from "./PublicMention";
 
 interface PublicPetitionFieldCommentContentProps {
   comment: PublicPetitionFieldCommentContent_PetitionFieldCommentFragment;
@@ -19,7 +19,10 @@ export const PublicPetitionFieldCommentContent = Object.assign(
     const options: HTMLReactParserOptions = {
       replace(domNode) {
         if (domNode instanceof Element && domNode.name === "mention") {
-          return <Box>{"mention"}</Box>;
+          const mention = comment.mentions.find(
+            (m) => m.id === domNode.attribs["data-mention-id"]
+          )!;
+          return <PublicMention mention={mention} />;
         }
       },
     };
@@ -44,8 +47,11 @@ export const PublicPetitionFieldCommentContent = Object.assign(
       PetitionFieldComment: gql`
         fragment PublicPetitionFieldCommentContent_PetitionFieldComment on PublicPetitionFieldComment {
           contentHtml
+          mentions {
+            ...PublicMention_PublicPetitionFieldCommentMention
+          }
         }
-        ${Mention.fragments.PetitionFieldCommentMention}
+        ${PublicMention.fragments.PublicPetitionFieldCommentMention}
       `,
     },
   }

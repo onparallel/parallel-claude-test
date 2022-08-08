@@ -131,12 +131,7 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
       )
     ),
     petitionIsNotAnonymized("petitionId"),
-    validPetitionFieldCommentContent(
-      "content",
-      "petitionFieldId",
-      // only internal comments can use mentions
-      (args) => args.isInternal
-    )
+    validPetitionFieldCommentContent("content", "petitionFieldId", true)
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -217,22 +212,18 @@ export const updatePetitionFieldComment = mutationField("updatePetitionFieldComm
   type: "PetitionFieldComment",
   authorize: authenticateAnd(
     async (root, args, ctx, info) => {
-      // if the comment is external:
-      // - user must have OWNER or WRITE permissions on the petition
-      // - comment can't contain mentions
+      // if the comment is external, user must have OWNER or WRITE permissions on the petition
       const comment = await ctx.petitions.loadPetitionFieldComment(args.petitionFieldCommentId);
-      return and(
-        userHasAccessToPetitions(
-          "petitionId",
-          comment?.is_internal || comment?.user_id === ctx.user!.id ? undefined : ["OWNER", "WRITE"]
-        ),
-        validPetitionFieldCommentContent("content", "petitionFieldId", () => comment?.is_internal)
+      return userHasAccessToPetitions(
+        "petitionId",
+        comment?.is_internal || comment?.user_id === ctx.user!.id ? undefined : ["OWNER", "WRITE"]
       )(root, args, ctx, info);
     },
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
     commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
     userIsCommentAuthor("petitionFieldCommentId"),
-    petitionIsNotAnonymized("petitionId")
+    petitionIsNotAnonymized("petitionId"),
+    validPetitionFieldCommentContent("content", "petitionFieldId", true)
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),

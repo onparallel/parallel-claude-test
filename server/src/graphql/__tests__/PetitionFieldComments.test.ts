@@ -449,50 +449,6 @@ describe("GraphQL/Petition Fields Comments", () => {
       expect(data).toBeNull();
     });
 
-    it("sends error when trying to add a mention on an external comment", async () => {
-      const { errors, data } = await testClient.execute(
-        gql`
-          mutation (
-            $petitionId: GID!
-            $petitionFieldId: GID!
-            $content: JSON!
-            $isInternal: Boolean
-          ) {
-            createPetitionFieldComment(
-              petitionId: $petitionId
-              petitionFieldId: $petitionFieldId
-              content: $content
-              isInternal: $isInternal
-            ) {
-              id
-            }
-          }
-        `,
-        {
-          petitionId: toGlobalId("Petition", petition.id),
-          petitionFieldId: toGlobalId("PetitionField", headingField.id),
-          content: [
-            {
-              type: "paragraph",
-              children: [
-                { text: "Hello" },
-                {
-                  type: "mention",
-                  mention: toGlobalId("User", otherUser.id),
-                  children: [{ text: "Joey Tribbiani" }],
-                },
-                { text: "!" },
-              ],
-            },
-          ],
-          isInternal: false,
-        }
-      );
-
-      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
-      expect(data).toBeNull();
-    });
-
     it("automatically shares the petition when mentioning a user with no access and passing flags", async () => {
       const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1);
       const [field] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({

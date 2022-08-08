@@ -170,7 +170,7 @@ export function PetitionFieldComment({
             id={`petition-field-comment-${comment.id}`}
             ref={editorRef}
             value={content}
-            onSearchMentionables={comment.isInternal ? onSearchMentionables : undefined}
+            onSearchMentionables={onSearchMentionables}
             onKeyDown={handleKeyDown}
             onChange={setContent}
           />

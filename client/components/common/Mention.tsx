@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
-import { Box, Tooltip } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { Tooltip } from "@chakra-ui/react";
 import { Mention_PetitionFieldCommentMentionFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { isDefined } from "remeda";
+import { MentionBadge } from "./MentionBadge";
 import { UserGroupMembersPopover } from "./UserGroupMembersPopover";
 
 export function Mention({ mention }: { mention: Mention_PetitionFieldCommentMentionFragment }) {
@@ -58,33 +58,6 @@ export function Mention({ mention }: { mention: Mention_PetitionFieldCommentMent
   }
   return null;
 }
-interface MentionBadgeProps {
-  mentionId: string;
-  isHighlighted?: boolean;
-  isFaded?: boolean;
-}
-
-const MentionBadge = chakraForwardRef<"span", MentionBadgeProps>(function MentionBadge(
-  { mentionId, isHighlighted, isFaded, ...props },
-  ref
-) {
-  return (
-    <Box
-      ref={ref as any}
-      as="span"
-      data-mention-id={mentionId}
-      display="inline-block"
-      borderRadius="sm"
-      paddingX={1}
-      lineHeight="short"
-      marginX="0.1em"
-      fontWeight={isHighlighted ? "semibold" : "normal"}
-      backgroundColor={isHighlighted ? "blue.100" : "gray.100"}
-      color={isHighlighted ? "blue.800" : isFaded ? "gray.400" : "gray.700"}
-      {...props}
-    />
-  );
-});
 
 Mention.fragments = {
   PetitionFieldCommentMention: gql`

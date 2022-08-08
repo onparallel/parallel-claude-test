@@ -4065,6 +4065,24 @@ type PublicPetitionFieldComment {
   Whether the comment has been read or not.
   """
   isUnread: Boolean!
+
+  """
+  The mentions of the comments.
+  """
+  mentions: [PublicPetitionFieldCommentMention!]!
+}
+
+type PublicPetitionFieldCommentMention {
+  """
+  GlobalID of the User or UserGroup
+  """
+  id: String!
+
+  """
+  Name of the mentioned user or group
+  """
+  name: String
+  type: String!
 }
 
 """

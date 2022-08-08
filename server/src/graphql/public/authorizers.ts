@@ -2,7 +2,6 @@ import Ajv from "ajv";
 import { ApolloError } from "apollo-server-core";
 import { parse as parseCookie } from "cookie";
 import { IncomingMessage } from "http";
-import { ArgsValue } from "nexus/dist/core";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { isDefined, partition } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
@@ -218,12 +217,11 @@ export function validPetitionFieldCommentContent<
 >(
   argContent: TArgContent,
   argFieldId: TArgFieldId,
-  allowMentions?: (args: ArgsValue<TypeName, FieldName>) => boolean | null | undefined
+  allowMentions?: boolean
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx, info) => {
     const content = args[argContent] as any;
     const fieldId = args[argFieldId] as unknown as number;
-    const canUseMentions = allowMentions?.(args) ?? false;
     const ajv = new Ajv();
     if (!content) {
       return false;
@@ -261,7 +259,7 @@ export function validPetitionFieldCommentContent<
           leaf: {
             type: "object",
             anyOf: [
-              ...(canUseMentions ? [{ $ref: "#/definitions/mention" }] : []),
+              ...(allowMentions ? [{ $ref: "#/definitions/mention" }] : []),
               { $ref: "#/definitions/text" },
             ],
           },
@@ -274,7 +272,7 @@ export function validPetitionFieldCommentContent<
     if (!valid) {
       throw new ArgValidationError(info, argContent, ajv.errorsText());
     }
-    if (canUseMentions) {
+    if (allowMentions) {
       const field = (await ctx.petitions.loadField(fieldId))!;
       const petition = (await ctx.petitions.loadPetition(field.petition_id))!;
       const mentions = getMentions(content);
