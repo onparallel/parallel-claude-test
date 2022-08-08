@@ -430,7 +430,7 @@ function OrganizationUsers() {
           onSelectionChange={onChangeSelectedIds}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
-          onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
+          onSortChange={(sort) => setQueryState((s) => ({ ...s, sort, page: 1 }))}
           onRowClick={userIsAdmin ? (user) => handleUpdateUser(user) : undefined}
           actions={[
             {

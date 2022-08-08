@@ -162,7 +162,7 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
           onSelectionChange={onChangeSelectedIds}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
-          onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
+          onSortChange={(sort) => setQueryState((s) => ({ ...s, sort, page: 1 }))}
           actions={[
             {
               key: "login-as",

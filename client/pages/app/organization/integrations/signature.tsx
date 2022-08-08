@@ -204,7 +204,7 @@ function IntegrationsSignature() {
           totalCount={me.organization.signatureIntegrations.totalCount}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
-          onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
+          onSortChange={(sort) => setQueryState((s) => ({ ...s, sort, page: 1 }))}
           header={
             <Stack direction="row" padding={2}>
               <IconButtonWithTooltip
