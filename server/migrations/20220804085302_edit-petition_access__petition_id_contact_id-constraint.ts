@@ -67,6 +67,32 @@ export async function down(knex: Knex): Promise<void> {
         data: knex.raw(`jsonb_set(data, '{petition_access_id}',?)`, [activeAccessOrLast.id]),
       });
 
+    await knex
+      .from("petition_event")
+      .whereIn(knex.raw("(data ->> 'new_petition_access_id')::int") as any, petitionAccessIds)
+      .update({
+        data: knex.raw(`jsonb_set(data, '{new_petition_access_id}',?)`, [activeAccessOrLast.id]),
+      });
+
+    await knex.from("petition_reminder").whereIn("petition_access_id", petitionAccessIds).update({
+      petition_access_id: activeAccessOrLast.id,
+    });
+
+    await knex
+      .from("petition_contact_notification")
+      .whereIn("petition_access_id", petitionAccessIds)
+      .update({
+        petition_access_id: activeAccessOrLast.id,
+      });
+
+    await knex
+      .from("task")
+      .whereNotNull("petition_access_id")
+      .whereIn("petition_access_id", petitionAccessIds)
+      .update({
+        petition_access_id: activeAccessOrLast.id,
+      });
+
     await knex.from("petition_access").whereIn("id", petitionAccessIds).delete();
   }
 
