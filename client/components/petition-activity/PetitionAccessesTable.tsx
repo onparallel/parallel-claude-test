@@ -160,7 +160,7 @@ export function PetitionAccessesTable({
           <Table
             columns={columns}
             context={context}
-            rows={petition.accesses ?? []}
+            rows={petition.accesses}
             rowKeyProp="id"
             isSelectable={showActions}
             onSelectionChange={setSelection}

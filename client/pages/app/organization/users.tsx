@@ -57,6 +57,7 @@ import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useLoginAs } from "@parallel/utils/useLoginAs";
 import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
+import { useSelection } from "@parallel/utils/useSelectionState";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -96,19 +97,9 @@ function OrganizationUsers() {
   const [showDialog, setShowDialog] = useQueryStateSlice(state, setQueryState, "dialog");
 
   const hasSsoProvider = data?.me.organization.hasSsoProvider ?? false;
-  const userList = data?.me.organization.users;
+  const users = data?.me.organization.users;
 
-  const [selected, setSelected] = useState<string[]>([]);
-
-  const selectedUsers = useMemo(
-    () =>
-      loading
-        ? []
-        : selected
-            .map((userId) => userList!.items.find((u) => u.id === userId)!)
-            .filter((u) => u !== undefined),
-    [selected.join(","), userList, loading]
-  );
+  const { selectedRows, selectedIds, onChangeSelectedIds } = useSelection(users?.items, "id");
 
   const isUserLimitReached = loading
     ? false
@@ -117,7 +108,7 @@ function OrganizationUsers() {
   const isActivateUserButtonDisabled = loading
     ? false
     : data!.me.organization.activeUserCount +
-        selectedUsers.filter((u) => u.status === "INACTIVE").length >
+        selectedRows.filter((u) => u.status === "INACTIVE").length >
       data!.me.organization.usageLimits.users.limit;
 
   const [search, setSearch] = useState(state.search);
@@ -221,19 +212,19 @@ function OrganizationUsers() {
     try {
       let transferToUser: Maybe<UserSelectSelection> = null;
       if (newStatus === "ACTIVE") {
-        await showConfirmActivateUserDialog({ count: selected.length });
+        await showConfirmActivateUserDialog({ count: selectedIds.length });
 
         await activateUser({
           variables: {
-            userIds: selected,
+            userIds: selectedIds,
           },
         });
       } else if (newStatus === "INACTIVE") {
-        transferToUser = await showConfirmDeactivateUserDialog({ selected });
+        transferToUser = await showConfirmDeactivateUserDialog({ userIds: selectedIds });
 
         await deactivateUser({
           variables: {
-            userIds: selected,
+            userIds: selectedIds,
             transferToUserId: transferToUser?.id,
           },
         });
@@ -259,9 +250,9 @@ function OrganizationUsers() {
   const genericErrorToast = useGenericErrorToast();
   async function handleResendInvitation() {
     try {
-      await showConfirmResendInvitationDialog({ fullName: selectedUsers[0].fullName ?? "" });
+      await showConfirmResendInvitationDialog({ fullName: selectedRows[0].fullName ?? "" });
       await resetTemporaryPassword({
-        variables: { email: selectedUsers[0].email, locale: intl.locale },
+        variables: { email: selectedRows[0].email, locale: intl.locale },
       });
 
       toast({
@@ -275,7 +266,7 @@ function OrganizationUsers() {
             defaultMessage:
               "We have sent an email to {email} with instructions to register in Parallel.",
           },
-          { email: selectedUsers[0].email }
+          { email: selectedRows[0].email }
         ),
         status: "success",
         duration: 5000,
@@ -293,7 +284,7 @@ function OrganizationUsers() {
               id: "organization.user-invitation-sent-error.toast-description",
               defaultMessage: "An invitation has been sent to {email} recently, try again later.",
             },
-            { email: selectedUsers[0].email }
+            { email: selectedRows[0].email }
           ),
           status: "error",
           duration: 5000,
@@ -311,7 +302,7 @@ function OrganizationUsers() {
               defaultMessage:
                 "It seems the user has already logged in. There is no need to resend the invitation.",
             },
-            { email: selectedUsers[0].email }
+            { email: selectedRows[0].email }
           ),
           status: "error",
           duration: 5000,
@@ -328,7 +319,7 @@ function OrganizationUsers() {
               id: "organization.user-invitation-inactive-error.toast-description",
               defaultMessage: "The selected user is inactive. Refresh your browser and try again.",
             },
-            { email: selectedUsers[0].email }
+            { email: selectedRows[0].email }
           ),
           status: "error",
           duration: 5000,
@@ -345,7 +336,7 @@ function OrganizationUsers() {
               id: "organization.user-invitation-sso-error.toast-description",
               defaultMessage: "We can't resend the invitation to SSO users.",
             },
-            { email: selectedUsers[0].email }
+            { email: selectedRows[0].email }
           ),
           status: "error",
           duration: 5000,
@@ -359,12 +350,12 @@ function OrganizationUsers() {
 
   const loginAs = useLoginAs();
   const handleLoginAs = async () => {
-    await loginAs(selected[0]);
+    await loginAs(selectedIds[0]);
   };
 
   const showErrorDialog = useErrorDialog();
   const handleUpdateSelectedUsersStatus = async (newStatus: UserStatus) => {
-    if (selectedUsers.some((u) => u.role === "OWNER")) {
+    if (selectedRows.some((u) => u.role === "OWNER")) {
       await withError(
         showErrorDialog({
           message: intl.formatMessage({
@@ -374,7 +365,7 @@ function OrganizationUsers() {
           }),
         })
       );
-    } else if (selectedUsers.some((u) => u.id === me.id)) {
+    } else if (selectedRows.some((u) => u.id === me.id)) {
       await withError(
         showErrorDialog({
           message: intl.formatMessage({
@@ -384,7 +375,7 @@ function OrganizationUsers() {
           }),
         })
       );
-    } else if (selectedUsers.some((u) => u.isSsoUser)) {
+    } else if (selectedRows.some((u) => u.isSsoUser)) {
       await withError(
         showErrorDialog({
           message: intl.formatMessage(
@@ -393,7 +384,7 @@ function OrganizationUsers() {
               defaultMessage:
                 "{count, plural, =1{The user you selected is} other{Some of the users you selected are}} managed by a SSO provider. Please, update its status directly on the provider.",
             },
-            { count: selectedUsers.length }
+            { count: selectedRows.length }
           ),
         })
       );
@@ -429,14 +420,14 @@ function OrganizationUsers() {
           isSelectable={userIsAdmin}
           isHighlightable
           columns={columns}
-          rows={userList?.items ?? []}
+          rows={users?.items}
           rowKeyProp="id"
           loading={loading}
           page={state.page}
           pageSize={state.items}
-          totalCount={userList?.totalCount ?? 0}
+          totalCount={users?.totalCount}
           sort={state.sort}
-          onSelectionChange={setSelected}
+          onSelectionChange={onChangeSelectedIds}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
@@ -446,26 +437,26 @@ function OrganizationUsers() {
               key: "activate",
               onClick: () => handleUpdateSelectedUsersStatus("ACTIVE"),
               isDisabled:
-                selectedUsers.every((u) => u.status === "ACTIVE") || isActivateUserButtonDisabled,
+                selectedRows.every((u) => u.status === "ACTIVE") || isActivateUserButtonDisabled,
               leftIcon: <UserCheckIcon />,
               children: (
                 <FormattedMessage
                   id="organization-users.activate"
                   defaultMessage="Activate {count, plural, =1{user} other {users}}"
-                  values={{ count: selectedUsers.length }}
+                  values={{ count: selectedRows.length }}
                 />
               ),
             },
             {
               key: "deactivate",
               onClick: () => handleUpdateSelectedUsersStatus("INACTIVE"),
-              isDisabled: selectedUsers.every((u) => u.status === "INACTIVE"),
+              isDisabled: selectedRows.every((u) => u.status === "INACTIVE"),
               leftIcon: <UserXIcon />,
               children: (
                 <FormattedMessage
                   id="organization-users.deactivate"
                   defaultMessage="Deactivate {count, plural, =1{user} other {users}}"
-                  values={{ count: selectedUsers.length }}
+                  values={{ count: selectedRows.length }}
                 />
               ),
             },
@@ -475,9 +466,9 @@ function OrganizationUsers() {
                     key: "login-as",
                     onClick: handleLoginAs,
                     isDisabled:
-                      selectedUsers.length !== 1 ||
-                      selectedUsers[0].id === me.id ||
-                      selectedUsers[0].status === "INACTIVE",
+                      selectedRows.length !== 1 ||
+                      selectedRows[0].id === me.id ||
+                      selectedRows[0].status === "INACTIVE",
                     leftIcon: <LogInIcon />,
                     children: (
                       <FormattedMessage
@@ -494,9 +485,9 @@ function OrganizationUsers() {
                     key: "reset-password",
                     onClick: handleResendInvitation,
                     isDisabled:
-                      selectedUsers.some(
+                      selectedRows.some(
                         (u) => u.lastActiveAt || u.status === "INACTIVE" || u.isSsoUser
-                      ) || selectedUsers.length !== 1,
+                      ) || selectedRows.length !== 1,
                     leftIcon: <ArrowUpRightIcon />,
                     children: (
                       <FormattedMessage

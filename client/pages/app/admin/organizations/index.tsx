@@ -18,21 +18,12 @@ import {
   OrganizationStatus,
   QueryOrganizations_OrderBy,
 } from "@parallel/graphql/__types";
-import {
-  useAssertQuery,
-  useAssertQueryOrPreviousData,
-} from "@parallel/utils/apollo/useAssertQuery";
+import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
+import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useHandleNavigation } from "@parallel/utils/navigation";
-import {
-  integer,
-  parseQuery,
-  sorting,
-  string,
-  useQueryState,
-  values,
-} from "@parallel/utils/queryState";
+import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { useAdminSections } from "@parallel/utils/useAdminSections";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, MouseEvent, useCallback, useMemo, useState } from "react";
@@ -59,19 +50,20 @@ function AdminOrganizations() {
   const {
     data: { me, realMe },
   } = useAssertQuery(AdminOrganizations_userDocument);
-  const {
-    data: { organizations },
-    loading,
-    refetch,
-  } = useAssertQueryOrPreviousData(AdminOrganizations_organizationsDocument, {
-    variables: {
-      offset: state.items * (state.page - 1),
-      limit: state.items,
-      search: state.search,
-      status: state.status,
-      sortBy: [`${state.sort.field}_${state.sort.direction}` as QueryOrganizations_OrderBy],
-    },
-  });
+  const { data, loading, refetch } = useQueryOrPreviousData(
+    AdminOrganizations_organizationsDocument,
+    {
+      variables: {
+        offset: state.items * (state.page - 1),
+        limit: state.items,
+        search: state.search,
+        status: state.status,
+        sortBy: [`${state.sort.field}_${state.sort.direction}` as QueryOrganizations_OrderBy],
+      },
+    }
+  );
+  const organizations = data?.organizations;
+
   const sections = useAdminSections();
 
   const columns = useOrganizationColumns();
@@ -124,14 +116,14 @@ function AdminOrganizations() {
           flex="0 1 auto"
           minHeight={0}
           columns={columns}
-          rows={organizations.items}
+          rows={organizations?.items}
           onRowClick={handleRowClick}
           rowKeyProp={"id"}
           isHighlightable
           loading={loading}
           page={state.page}
           pageSize={state.items}
-          totalCount={organizations.totalCount}
+          totalCount={organizations?.totalCount}
           sort={state.sort}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
@@ -314,19 +306,7 @@ AdminOrganizations.queries = [
 ];
 
 AdminOrganizations.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
-  const { page, items, search, status, sort } = parseQuery(query, QUERY_STATE);
-  await Promise.all([
-    fetchQuery(AdminOrganizations_organizationsDocument, {
-      variables: {
-        offset: items * (page - 1),
-        limit: items,
-        search,
-        sortBy: [`${sort.field}_${sort.direction}` as QueryOrganizations_OrderBy],
-        status,
-      },
-    }),
-    fetchQuery(AdminOrganizations_userDocument),
-  ]);
+  await fetchQuery(AdminOrganizations_userDocument);
 };
 
 export default compose(withSuperAdminAccess, withDialogs, withApolloData)(AdminOrganizations);

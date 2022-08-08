@@ -28,7 +28,7 @@ export type TablePageProps<TRow, TContext = unknown, TImpl extends TRow = TRow> 
   actions?: (ButtonProps & { key: Key })[];
   header?: ReactNode;
   body?: ReactNode;
-  totalCount: number;
+  totalCount?: number;
   page: number;
   pageSize: number;
   /**
@@ -72,23 +72,17 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
 }: WithChakraProps<"section", TablePageProps<TRow, TContext, TImpl>>) {
   const colors = useTableColors();
   const intl = useIntl();
-  const _pagination = usePagination({ current: page, pageSize, totalCount });
-  const [pagination, setPagination] = useState(_pagination);
-
-  useEffect(() => {
-    if (!loading) {
-      setPagination(_pagination);
-    }
-  }, [loading, _pagination]);
 
   useEffect(() => {
     // if page > max_pages, change to last page
-    const totalPages = Math.ceil(totalCount / pageSize);
-    if (!loading && totalPages && totalCount <= (page - 1) * pageSize) {
-      onPageChange?.(totalCount > 0 ? totalPages : 0);
+    const _totalCount = totalCount ?? 0;
+    const totalPages = Math.ceil(_totalCount / pageSize);
+    if (!loading && totalPages && _totalCount <= (page - 1) * pageSize) {
+      onPageChange?.(_totalCount > 0 ? totalPages : 0);
     }
   }, [page, pageSize, totalCount, loading]);
 
+  const pagination = usePagination({ current: page, pageSize, totalCount: totalCount ?? 0 });
   const bottom = (
     <>
       <Box paddingLeft={1}>
@@ -235,7 +229,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         overflowX="auto"
         minHeight="240px"
       >
-        {loading ? (
+        {!isDefined(rows) && loading ? (
           <Flex
             position="absolute"
             inset={0}

@@ -27,6 +27,7 @@ import { withError } from "@parallel/utils/promises/withError";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { UnwrapArray } from "@parallel/utils/types";
 import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
+import { useSelection } from "@parallel/utils/useSelectionState";
 import { MouseEvent, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -64,7 +65,7 @@ function Contacts() {
 
   const createContact = useCreateContact();
 
-  const [selected, setSelected] = useState<string[]>([]);
+  const { selectedIds, selectedRows, onChangeSelectedIds } = useSelection(contacts?.items, "id");
 
   function handleSearchChange(value: string | null) {
     setQueryState((current) => ({
@@ -108,7 +109,7 @@ function Contacts() {
   async function handleDeleteClick() {
     try {
       if (contacts) {
-        await deleteContacts(contacts.items.filter((c) => selected.includes(c.id)));
+        await deleteContacts(selectedRows);
         await refetch();
       }
     } catch {}
@@ -150,7 +151,7 @@ function Contacts() {
           flex="0 1 auto"
           minHeight={0}
           columns={columns}
-          rows={contacts?.items ?? []}
+          rows={contacts?.items}
           rowKeyProp={"id"}
           isSelectable
           isHighlightable
@@ -160,7 +161,7 @@ function Contacts() {
           pageSize={state.items}
           totalCount={contacts?.totalCount ?? 0}
           sort={state.sort}
-          onSelectionChange={setSelected}
+          onSelectionChange={onChangeSelectedIds}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}

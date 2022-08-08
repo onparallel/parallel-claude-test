@@ -46,8 +46,9 @@ import {
   values,
 } from "@parallel/utils/queryState";
 import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColumns";
+import { useSelection } from "@parallel/utils/useSelectionState";
 import { ValueProps } from "@parallel/utils/ValueProps";
-import { MouseEvent, PropsWithChildren, useCallback, useEffect, useMemo, useState } from "react";
+import { MouseEvent, PropsWithChildren, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 
@@ -82,35 +83,32 @@ function Petitions() {
   const {
     data: { me, realMe },
   } = useAssertQuery(Petitions_userDocument);
-  const { data, loading, refetch } = useQueryOrPreviousData(Petitions_petitionsDocument, {
-    variables: {
-      offset: state.items * (state.page - 1),
-      limit: state.items,
-      search: state.search,
-      filters: {
-        status: state.status,
-        type: state.type,
-        tagIds: state.tags,
-        sharedWith: removeInvalidLines(state.sharedWith),
+  const { data, loading, refetch } = useQueryOrPreviousData(
+    Petitions_petitionsDocument,
+    {
+      variables: {
+        offset: state.items * (state.page - 1),
+        limit: state.items,
+        search: state.search,
+        filters: {
+          status: state.status,
+          type: state.type,
+          tagIds: state.tags,
+          sharedWith: removeInvalidLines(state.sharedWith),
+        },
+        sortBy: [`${sort.field}_${sort.direction}`],
       },
-      sortBy: [`${sort.field}_${sort.direction}`],
+      fetchPolicy: "cache-and-network",
     },
-    fetchPolicy: "cache-and-network",
-  });
+    (prev, curr) => prev?.variables?.filters?.type === curr?.variables?.filters?.type
+  );
 
-  const petitions = data?.petitions ?? {
-    items: [],
-    totalCount: 0,
-  };
+  const petitions = data?.petitions;
 
-  useEffect(() => {
-    console.count("DETAIL Component Rendered");
-    return () => {
-      console.log("UNMOUNTED");
-    };
-  }, []);
-
-  const [selected, setSelected] = useState<string[]>([]);
+  const { selectedIdsRef, selectedRowsRef, selectedIds, onChangeSelectedIds } = useSelection(
+    petitions?.items,
+    "id"
+  );
 
   function handleSearchChange(value: string | null) {
     setQueryState((current) => ({
@@ -139,93 +137,91 @@ function Petitions() {
   const deletePetitions = useDeletePetitions();
   const handleDeleteClick = useCallback(async () => {
     try {
-      await deletePetitions(selected);
+      await deletePetitions(selectedIdsRef.current);
     } catch {}
     refetch();
-  }, [intl.locale, selected]);
+  }, []);
 
   const goToPetition = useGoToPetition();
 
   const createPetition = useCreatePetition();
 
-  const handleCloneAsTemplate = useCallback(
-    async function () {
-      try {
-        const templateId = await createPetition({
-          petitionId: selected[0],
-          type: "TEMPLATE",
-        });
-        goToPetition(templateId, "compose", { query: { new: "true" } });
-      } catch {}
-    },
-    [petitions, selected]
-  );
+  const handleCloneAsTemplate = useCallback(async function () {
+    try {
+      const templateId = await createPetition({
+        petitionId: selectedIdsRef.current[0],
+        type: "TEMPLATE",
+      });
+      goToPetition(templateId, "compose", { query: { new: "true" } });
+    } catch {}
+  }, []);
 
-  const handleUseTemplateClick = useCallback(
-    async function () {
-      try {
-        const petitionId = await createPetition({
-          petitionId: selected[0],
-        });
-        goToPetition(petitionId, "preview", {
-          query: { new: "true", fromTemplate: "true" },
-        });
-      } catch {}
-    },
-    [petitions, selected]
-  );
+  const handleUseTemplateClick = useCallback(async function () {
+    try {
+      const petitionId = await createPetition({
+        petitionId: selectedIdsRef.current[0],
+      });
+      goToPetition(petitionId, "preview", {
+        query: { new: "true", fromTemplate: "true" },
+      });
+    } catch {}
+  }, []);
 
   const clonePetitions = useClonePetitions();
-  const handleCloneClick = useCallback(
-    async function () {
-      try {
-        const petitionIds = await clonePetitions({
-          petitionIds: selected,
-        });
-        if (petitionIds.length === 1) {
-          goToPetition(petitionIds[0], "compose", { query: { new: "true" } });
-        } else {
-          refetch();
-        }
-      } catch {}
-    },
-    [petitions, selected]
-  );
+  const handleCloneClick = useCallback(async function () {
+    try {
+      const petitionIds = await clonePetitions({
+        petitionIds: selectedIdsRef.current,
+      });
+      if (petitionIds.length === 1) {
+        goToPetition(petitionIds[0], "compose", { query: { new: "true" } });
+      } else {
+        refetch();
+      }
+    } catch {}
+  }, []);
 
   const showPetitionSharingDialog = usePetitionSharingDialog();
 
-  const handlePetitionSharingClick = async function () {
-    try {
-      await showPetitionSharingDialog({
-        userId: me.id,
-        petitionIds: selected,
-        isTemplate: petitions.items[0].__typename === "PetitionTemplate",
-      });
-    } catch {}
-  };
-  const handleRowClick = useCallback(function (row: PetitionSelection, event: MouseEvent) {
-    goToPetition(
-      row.id,
-      row.__typename === "Petition"
-        ? (
-            {
-              DRAFT: "preview",
-              PENDING: "replies",
-              COMPLETED: "replies",
-              CLOSED: "replies",
-            } as const
-          )[row.status]
-        : "compose",
-      { event }
-    );
-  }, []);
+  const handlePetitionSharingClick = useCallback(
+    async function () {
+      try {
+        await showPetitionSharingDialog({
+          userId: me.id,
+          petitionIds: selectedIdsRef.current,
+          isTemplate: state.type === "TEMPLATE",
+        });
+      } catch {}
+    },
+    [state.type]
+  );
+
+  const handleRowClick = useCallback(
+    function (row: PetitionSelection, event: MouseEvent) {
+      goToPetition(
+        row.id,
+        row.__typename === "Petition"
+          ? (
+              {
+                DRAFT: "preview",
+                PENDING: "replies",
+                COMPLETED: "replies",
+                CLOSED: "replies",
+              } as const
+            )[row.status]
+          : "compose",
+        { event }
+      );
+    },
+    [state.type]
+  );
 
   const [updatePetition] = useMutation(Petitions_updatePetitionDocument);
   const showRenameDialog = useRenameDialog();
 
   const handleRenameClick = useCallback(async () => {
     try {
-      const petition = petitions.items.find((p) => p.id === selected[0]);
+      const petition = selectedRowsRef.current[0];
       if (petition) {
         const isPublic = petition.__typename === "PetitionTemplate" && petition.isPublic;
         const { newName } = await showRenameDialog({
@@ -241,22 +237,16 @@ function Petitions() {
         });
       }
     } catch {}
-  }, [petitions, selected]);
+  }, []);
 
-  const columns = usePetitionsTableColumns(
-    petitions.items.length > 0
-      ? petitions.items[0].__typename === "Petition"
-        ? "PETITION"
-        : "TEMPLATE"
-      : state.type
-  );
+  const columns = usePetitionsTableColumns(state.type);
 
   const context = useMemo(() => ({ user: me! }), [me]);
 
   const actions = usePetitionListActions({
     user: me,
     type: state.type,
-    selectedCount: selected.length,
+    selectedCount: selectedIds.length,
     onRenameClick: handleRenameClick,
     onDeleteClick: handleDeleteClick,
     onCloneAsTemplateClick: handleCloneAsTemplate,
@@ -286,7 +276,7 @@ function Petitions() {
           flex="0 1 auto"
           minHeight={0}
           columns={columns}
-          rows={petitions.items}
+          rows={petitions?.items}
           context={context}
           rowKeyProp={"id"}
           isSelectable
@@ -295,13 +285,13 @@ function Petitions() {
           onRowClick={handleRowClick}
           page={state.page}
           pageSize={state.items}
-          totalCount={petitions.totalCount}
+          totalCount={petitions?.totalCount}
           sort={sort}
           filter={pick(state, ["sharedWith", "status", "tags"])}
           onFilterChange={(key, value) => {
             setQueryState((current) => ({ ...current, [key]: value, page: 1 }));
           }}
-          onSelectionChange={setSelected}
+          onSelectionChange={onChangeSelectedIds}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
@@ -314,7 +304,7 @@ function Petitions() {
             />
           }
           body={
-            petitions.totalCount === 0 && !loading ? (
+            data?.petitions.totalCount === 0 && !loading ? (
               state.search || state.sharedWith || state.tags || state.status ? (
                 <Flex flex="1" alignItems="center" justifyContent="center">
                   <Text color="gray.300" fontSize="lg">

@@ -46,6 +46,7 @@ import { isAdmin } from "@parallel/utils/roles";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
+import { useSelection } from "@parallel/utils/useSelectionState";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -114,15 +115,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     return [members.slice((page - 1) * items, page * items), members];
   }, [userGroup, state]);
 
-  const [selected, setSelected] = useState<string[]>([]);
-
-  const selectedMembers = useMemo(
-    () =>
-      selected
-        .map((memberId) => userList.find((m) => m.id === memberId)!)
-        .filter((u) => u !== undefined),
-    [selected.join(","), userList]
-  );
+  const { selectedRows, onChangeSelectedIds } = useSelection(userList, "id");
 
   const [search, setSearch] = useState(state.search);
   const [name, setName] = useState(userGroup?.name ?? "");
@@ -222,9 +215,9 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
   const handleRemoveMember = async () => {
     try {
       await showConfirmRemoveMemberDialog({
-        selected: selectedMembers,
+        selected: selectedRows,
       });
-      const userIds = selectedMembers.map((m) => m.user.id);
+      const userIds = selectedRows.map((m) => m.user.id);
       await removeUsersFromGroup({
         variables: { userGroupId: groupId, userIds },
       });
@@ -292,7 +285,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
           pageSize={state.items}
           totalCount={searchedList?.length ?? 0}
           sort={state.sort}
-          onSelectionChange={setSelected}
+          onSelectionChange={onChangeSelectedIds}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}

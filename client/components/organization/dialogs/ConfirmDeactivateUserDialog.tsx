@@ -12,9 +12,9 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 
 function ConfirmDeactivateUserDialog({
-  selected,
+  userIds,
   ...props
-}: DialogProps<{ selected: string[] }, UserSelectSelection>) {
+}: DialogProps<{ userIds: string[] }, UserSelectSelection>) {
   const {
     control,
     handleSubmit,
@@ -35,7 +35,7 @@ function ConfirmDeactivateUserDialog({
   const handleSearchUsers = useCallback(
     async (search: string, excludeUsers: string[]) => {
       return await _handleSearchUsers(search, {
-        excludeUsers: [...excludeUsers, ...selected],
+        excludeUsers: [...excludeUsers, ...userIds],
       });
     },
     [_handleSearchUsers]
@@ -55,7 +55,7 @@ function ConfirmDeactivateUserDialog({
         <FormattedMessage
           id="organization-users.deactivate"
           defaultMessage="Deactivate {count, plural, =1{user} other {users}}"
-          values={{ count: selected.length }}
+          values={{ count: userIds.length }}
         />
       }
       body={
@@ -64,7 +64,7 @@ function ConfirmDeactivateUserDialog({
             <FormattedMessage
               id="organization.confirm-deactivate-user-dialog.body"
               defaultMessage="Are you sure you want to <b>deactivate</b> the selected {count, plural, =1{user} other {users}}?"
-              values={{ count: selected.length }}
+              values={{ count: userIds.length }}
             />
             <br />
             <FormattedMessage
@@ -77,7 +77,7 @@ function ConfirmDeactivateUserDialog({
               id="organization.confirm-deactivate-user-dialog.transfer-to-user"
               defaultMessage="To continue, you must select a user from your organization to transfer all the parallels of the {count, plural, =1{user} other {users}} to deactivate."
               values={{
-                count: selected.length,
+                count: userIds.length,
               }}
             />
           </Text>
@@ -112,7 +112,7 @@ function ConfirmDeactivateUserDialog({
             id="petition.confirm-deactivate-users.confirm"
             defaultMessage="Deactivate {count, plural, =1{user} other {users}}"
             values={{
-              count: selected.length,
+              count: userIds.length,
             }}
           />
         </Button>

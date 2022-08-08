@@ -35,6 +35,7 @@ import { integer, sorting, string, useQueryState, values } from "@parallel/utils
 import { isAdmin } from "@parallel/utils/roles";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
+import { useSelection } from "@parallel/utils/useSelectionState";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -55,7 +56,6 @@ function OrganizationGroups() {
   const toast = useToast();
 
   const [state, setQueryState] = useQueryState(QUERY_STATE);
-  const [selected, setSelected] = useState<string[]>([]);
 
   const {
     data: { me, realMe },
@@ -73,17 +73,9 @@ function OrganizationGroups() {
 
   const userGroups = data?.userGroups;
 
-  const canEdit = isAdmin(me.role);
+  const { selectedIds, selectedRows, onChangeSelectedIds } = useSelection(userGroups?.items, "id");
 
-  const selectedGroups = useMemo(
-    () =>
-      loading
-        ? []
-        : selected
-            .map((groupId) => userGroups!.items.find((g) => g.id === groupId)!)
-            .filter((u) => u !== undefined),
-    [selected.join(","), userGroups?.items, loading]
-  );
+  const canEdit = isAdmin(me.role);
 
   const [search, setSearch] = useState(state.search);
 
@@ -126,7 +118,7 @@ function OrganizationGroups() {
     async function () {
       await cloneUserGroup({
         variables: {
-          ids: selected,
+          ids: selectedIds,
           locale: intl.locale,
         },
       });
@@ -137,7 +129,7 @@ function OrganizationGroups() {
             id: "view.groups.clone-success-title",
             defaultMessage: "{count, plural, =1{Team} other{Teams}} cloned successfully.",
           },
-          { count: selected.length }
+          { count: selectedIds.length }
         ),
         description: intl.formatMessage(
           {
@@ -146,8 +138,8 @@ function OrganizationGroups() {
               "{count, plural, =1 {Team <b>{name}</b>} other{<b>#</b> teams}} successfully cloned.",
           },
           {
-            count: selected.length,
-            name: selectedGroups[0].name,
+            count: selectedIds.length,
+            name: selectedRows[0].name,
           }
         ),
         status: "success",
@@ -155,18 +147,18 @@ function OrganizationGroups() {
         isClosable: true,
       });
     },
-    [userGroups, selected]
+    [userGroups, selectedIds]
   );
 
   const [deleteUserGroup] = useMutation(OrganizationGroups_deleteUserGroupDocument);
   const handleDeleteClick = useCallback(async () => {
     const [error] = await withError(
-      confirmDelete({ name: selectedGroups[0].name, groupIds: selected })
+      confirmDelete({ name: selectedRows[0].name, groupIds: selectedIds })
     );
     if (!error) {
       await deleteUserGroup({
         variables: {
-          ids: selected,
+          ids: selectedIds,
         },
       });
       refetch();
@@ -176,7 +168,7 @@ function OrganizationGroups() {
             id: "view.groups.delete-success-title",
             defaultMessage: "{count, plural, =1{Team} other{Teams}} deleted successfully.",
           },
-          { count: selected.length }
+          { count: selectedIds.length }
         ),
         description: intl.formatMessage(
           {
@@ -185,8 +177,8 @@ function OrganizationGroups() {
               "{count, plural, =1 {Team <b>{name}</b>} other{<b>#</b> teams}} successfully deleted.",
           },
           {
-            count: selected.length,
-            name: selectedGroups[0].name,
+            count: selectedIds.length,
+            name: selectedRows[0].name,
           }
         ),
         status: "success",
@@ -194,7 +186,7 @@ function OrganizationGroups() {
         isClosable: true,
       });
     }
-  }, [userGroups, selected]);
+  }, [userGroups, selectedIds]);
 
   const [createUserGroup] = useMutation(OrganizationGroups_createUserGroupDocument);
   const showCreateGroupDialog = useCreateGroupDialog();
@@ -253,15 +245,15 @@ function OrganizationGroups() {
           isSelectable={canEdit}
           isHighlightable
           columns={columns}
-          rows={userGroups?.items ?? []}
+          rows={userGroups?.items}
           onRowClick={handleRowClick}
           rowKeyProp="id"
           loading={loading}
           page={state.page}
           pageSize={state.items}
-          totalCount={userGroups?.totalCount ?? 0}
+          totalCount={userGroups?.totalCount}
           sort={state.sort}
-          onSelectionChange={setSelected}
+          onSelectionChange={onChangeSelectedIds}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
@@ -274,7 +266,7 @@ function OrganizationGroups() {
                 <FormattedMessage
                   id="organization-groups.clone-group"
                   defaultMessage="Clone {count, plural, =1{team} other {teams}}"
-                  values={{ count: selectedGroups.length }}
+                  values={{ count: selectedRows.length }}
                 />
               ),
             },
@@ -287,7 +279,7 @@ function OrganizationGroups() {
                 <FormattedMessage
                   id="organization-groups.delete-group"
                   defaultMessage="Delete {count, plural, =1{team} other {teams}}"
-                  values={{ count: selectedGroups.length }}
+                  values={{ count: selectedRows.length }}
                 />
               ),
             },

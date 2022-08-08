@@ -60,7 +60,7 @@ function toggleSortingDirection(direction: TableSortingDirection): TableSortingD
 export interface TableProps<TRow, TContext = unknown, TImpl extends TRow = TRow>
   extends HTMLChakraProps<"table"> {
   columns: TableColumn<TRow, TContext>[];
-  rows: TImpl[];
+  rows?: TImpl[];
   context?: TContext;
   rowKeyProp: keyof TRow;
   sort?: TableSorting<any>;
@@ -134,7 +134,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   ...props
 }: TableProps<TRow, TContext, TImpl>) {
   const { selection, allSelected, anySelected, toggle, toggleAll } = useSelectionState(
-    rows,
+    rows ?? [],
     rowKeyProp
   );
   const colors = useTableColors();
@@ -340,7 +340,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         </Box>
       </Box>
       <Box as="tbody">
-        {rows.map((row) => {
+        {(rows ?? []).map((row) => {
           const key = row[rowKeyProp] as any;
           const isSelected = selection[key] ?? false;
           const isExpanded = key === expanded;

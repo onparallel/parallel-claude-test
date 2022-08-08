@@ -28,9 +28,9 @@ import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useLoginAs } from "@parallel/utils/useLoginAs";
 import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
+import { useSelection } from "@parallel/utils/useSelectionState";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
 
 const SORTING = ["fullName", "email", "createdAt", "lastActiveAt"] as const;
 
@@ -50,8 +50,9 @@ type AdminOrganizationsMembersProps = UnwrapPromise<
 
 function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembersProps) {
   const {
-    data: { me, realMe },
+    data: { me, realMe, ...rest },
   } = useAssertQuery(AdminOrganizationsMembers_queryDocument);
+  const organization = rest.organization!;
 
   const [state, setQueryState] = useQueryState(USERS_QUERY_STATE);
   const { data, loading, refetch } = useQueryOrPreviousData(
@@ -69,21 +70,12 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
   );
 
   const [search, setSearch] = useState(state.search);
-  const [selected, setSelected] = useState<string[]>([]);
 
-  const organization = data?.organization;
-  const users = data?.organization?.users.items;
+  const users = data?.organization?.users;
+  const { selectedRows, onChangeSelectedIds } = useSelection(users?.items, "id");
 
   const intl = useIntl();
   const toast = useToast();
-
-  const selectedUsers = useMemo(
-    () =>
-      loading
-        ? []
-        : selected.map((userId) => users!.find((u) => u.id === userId)).filter(isDefined),
-    [selected.join(","), users, loading]
-  );
 
   const [createOrganizationUser] = useMutation(
     AdminOrganizationsMembers_createOrganizationUserDocument
@@ -148,7 +140,7 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
 
   const loginAs = useLoginAs();
   const handleLoginAs = async () => {
-    await loginAs(selected[0]);
+    await loginAs(selectedRows[0].id);
   };
 
   return (
@@ -160,14 +152,14 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
           isSelectable
           isHighlightable
           columns={columns}
-          rows={users ?? []}
+          rows={users?.items}
           rowKeyProp="id"
           loading={loading}
           page={state.page}
           pageSize={state.items}
-          totalCount={data.organization?.users.totalCount ?? 0}
+          totalCount={users?.totalCount}
           sort={state.sort}
-          onSelectionChange={setSelected}
+          onSelectionChange={onChangeSelectedIds}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
@@ -176,9 +168,9 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
               key: "login-as",
               onClick: handleLoginAs,
               isDisabled:
-                selectedUsers.length !== 1 ||
-                selectedUsers[0].id === me.id ||
-                selectedUsers[0].status === "INACTIVE",
+                selectedRows.length !== 1 ||
+                selectedRows[0].id === me.id ||
+                selectedRows[0].status === "INACTIVE",
               leftIcon: <LogInIcon />,
               children: (
                 <FormattedMessage id="organization-users.login-as" defaultMessage="Login as..." />
@@ -195,7 +187,7 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
             />
           }
           body={
-            users && users.length === 0 && !loading ? (
+            users?.items.length === 0 && !loading ? (
               state.search ? (
                 <Flex flex="1" alignItems="center" justifyContent="center">
                   <Text color="gray.300" fontSize="lg">

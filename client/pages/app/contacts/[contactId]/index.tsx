@@ -209,7 +209,7 @@ function Contact({ contactId }: ContactProps) {
               <Table
                 columns={columns}
                 context={context}
-                rows={contact!.accesses.items ?? []}
+                rows={contact!.accesses.items}
                 rowKeyProp="id"
                 onRowClick={handleRowClick}
                 marginBottom={2}

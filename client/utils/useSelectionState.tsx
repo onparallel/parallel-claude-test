@@ -1,6 +1,8 @@
 import { MouseEvent, useMemo, useState } from "react";
+import { isDefined } from "remeda";
 import { debounce } from "./debounce";
 import { useEffectSkipFirst } from "./useEffectSkipFirst";
+import { useUpdatingRef } from "./useUpdatingRef";
 
 export type Selection = Record<string, boolean>;
 
@@ -13,11 +15,7 @@ interface SelectionState {
  * This hook encapsulates the logic for handling the selection of rows on a
  * table.
  */
-export function useSelectionState<T>(
-  rows: T[],
-  rowKeyProp: keyof T,
-  onChange?: (selection: Selection) => void
-) {
+export function useSelectionState<T>(rows: T[], rowKeyProp: keyof T) {
   const [{ selection }, setState] = useState<SelectionState>({
     selection: Object.fromEntries(
       rows.map((r) => {
@@ -39,7 +37,7 @@ export function useSelectionState<T>(
         })
       ),
     });
-  }, [rows, rowKeyProp]);
+  }, [rows.map((r) => r[rowKeyProp]).join(",")]);
 
   return {
     selection,
@@ -106,5 +104,23 @@ export function useSelectionState<T>(
         },
       };
     }, [rows, rowKeyProp]),
+  };
+}
+
+export function useSelection<T>(rows: T[] | undefined, rowKeyProp: keyof T) {
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const selectedRows = useMemo(
+    () =>
+      selectedIds
+        .map((id) => rows?.find((r) => (r[rowKeyProp] as unknown as string) === id))
+        .filter(isDefined),
+    [selectedIds, (rows ?? []).map((r) => r[rowKeyProp]).join(",")]
+  );
+  return {
+    selectedIds,
+    selectedRows,
+    selectedIdsRef: useUpdatingRef(selectedIds),
+    selectedRowsRef: useUpdatingRef(selectedRows),
+    onChangeSelectedIds: setSelectedIds,
   };
 }
