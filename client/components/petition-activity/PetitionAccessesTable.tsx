@@ -385,7 +385,7 @@ function usePetitionAccessesColumns(): TableColumn<
                     isDisabled={petition.isAnonymized || myEffectivePermission === "READ"}
                   />
                 </>
-              ) : contactHasActiveAccess ? null : (
+              ) : (
                 <IconButtonWithTooltip
                   label={intl.formatMessage({
                     id: "petition-accesses.activate-access",
@@ -395,7 +395,7 @@ function usePetitionAccessesColumns(): TableColumn<
                   placement="left"
                   icon={<UserCheckIcon fontSize="16px" />}
                   size="sm"
-                  isDisabled={petition.isAnonymized}
+                  isDisabled={petition.isAnonymized || contactHasActiveAccess}
                 />
               )}
             </Stack>

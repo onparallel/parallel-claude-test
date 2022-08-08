@@ -4,8 +4,10 @@ import { PetitionAccess } from "../src/db/__types";
 
 export async function up(knex: Knex): Promise<void> {
   await knex.raw(/* sql */ `
-    alter table petition_access drop constraint petition_access__petition_id_contact_id;
-    create unique index petition_access__petition_id_contact_id on petition_access (petition_id, contact_id) where status = 'ACTIVE';
+    alter table petition_access rename constraint petition_access__petition_id_contact_id to petition_access__petition_id_contact_id_old;
+    create index petition_access__petition_id_contact_id on petition_access (petition_id, contact_id);
+    create unique index petition_access__petition_id_contact_id_active on petition_access (petition_id, contact_id) where status = 'ACTIVE';
+    alter table petition_access drop constraint petition_access__petition_id_contact_id_old;
     `);
 }
 
@@ -14,13 +16,11 @@ export async function down(knex: Knex): Promise<void> {
   // de cada grupo elegimos una, la ELEGIDA que no borraremos (ACTIVE si hay, si no ultima INACTIVE)
   // para cada grupo cogemos las referencias a los petition_access a borrar y las actualizamos a la ELEGIDA
 
-  const { rows: duplicates }: { rows: PetitionAccess[] } = await knex.raw(
-    `
+  const { rows: duplicates }: { rows: PetitionAccess[] } = await knex.raw(/* sql */ `
     select distinct pa1.*
     from petition_access pa1
     join petition_access pa2 on pa1.petition_id = pa2.petition_id and pa1.contact_id = pa2.contact_id and pa1.id != pa2.id
-  `
-  );
+  `);
 
   const grouped = groupBy(duplicates, (pa) => pa.contact_id);
   const groupedAndSorted = mapValues(grouped, (val) =>
@@ -97,7 +97,9 @@ export async function down(knex: Knex): Promise<void> {
   }
 
   await knex.raw(/* sql */ `
-    drop index petition_access__petition_id_contact_id;
+    alter index petition_access__petition_id_contact_id rename to petition_access__petition_id_contact_id_old;
     alter table petition_access add constraint petition_access__petition_id_contact_id unique (petition_id, contact_id);
+    drop index petition_access__petition_id_contact_id_active;
+    drop index petition_access__petition_id_contact_id_old;
     `);
 }
