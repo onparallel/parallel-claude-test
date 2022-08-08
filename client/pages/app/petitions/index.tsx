@@ -291,7 +291,7 @@ function Petitions() {
           sort={sort}
           filter={pick(state, ["sharedWith", "status", "tags"])}
           onFilterChange={(key, value) => {
-            setQueryState((current) => ({ ...current, [key]: value }));
+            setQueryState((current) => ({ ...current, [key]: value, page: 1 }));
           }}
           onSelectionChange={setSelected}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
