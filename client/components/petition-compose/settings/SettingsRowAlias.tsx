@@ -22,6 +22,7 @@ export function SettingsRowAlias({
 }: SettingsRowAliasProps) {
   return (
     <SettingsRow
+      data-section="field-reference"
       isDisabled={isReadOnly}
       label={<FormattedMessage id="field-settings.alias-label" defaultMessage="References" />}
       description={

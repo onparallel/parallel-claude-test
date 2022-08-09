@@ -827,6 +827,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
       <Stack ref={ref} direction="row" padding={1} {...props}>
         {canChangeVisibility || field.isFixed ? (
           <IconButtonWithTooltip
+            data-action="add-field-condition"
             icon={<ConditionIcon />}
             isDisabled={
               (field.type === "HEADING" && (field.isFixed || field.options.hasPageBreak)) ||
@@ -906,6 +907,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFiel
           isDisabled={isReadOnly}
         />
         <IconButtonWithTooltip
+          data-action="show-field-settings"
           className="field-settings-button"
           icon={<SettingsIcon />}
           size="sm"

@@ -52,7 +52,12 @@ export function ContactListHeader({
         })}
       />
       <Spacer />
-      <Button display={{ base: "none", md: "block" }} variant="outline" onClick={onImportClick}>
+      <Button
+        data-action="import-contacts"
+        display={{ base: "none", md: "block" }}
+        variant="outline"
+        onClick={onImportClick}
+      >
         <FormattedMessage
           id="component.contact-list-header.import-contacts-button"
           defaultMessage="Import contacts"

@@ -228,6 +228,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
         cellProps: {
           width: "30%",
           minWidth: "240px",
+          "data-section": "contact-table-name",
         },
         CellContent: ({ row }) => (
           <>

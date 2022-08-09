@@ -97,7 +97,7 @@ export function PetitionAccessesTable({
   const optedOut = selected.filter((selected) => selected.remindersOptOut);
 
   return (
-    <Card {...props}>
+    <Card {...props} data-section="petition-accesses-table">
       <GenericCardHeader
         omitDivider
         rightAction={

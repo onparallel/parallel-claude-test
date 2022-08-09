@@ -162,7 +162,11 @@ export function Reports() {
         </HStack>
         <Stack direction={{ base: "column", md: "row" }} spacing={0} gridGap={2}>
           <Stack direction={{ base: "column", md: "row" }} spacing={0} gridGap={2} flex="1">
-            <HStack flex="1" maxWidth={{ base: "100%", md: "500px" }}>
+            <HStack
+              data-section="reports-select-template"
+              flex="1"
+              maxWidth={{ base: "100%", md: "500px" }}
+            >
               <Text>
                 <FormattedMessage id="generic.template" defaultMessage="Template" />:
               </Text>

@@ -213,7 +213,7 @@ export const PetitionHeader = Object.assign(
       >
         <Flex height={16} alignItems="center" paddingX={4}>
           <Flex alignItems="center">
-            <Center boxSize={6}>
+            <Center boxSize={6} data-section="petition-status-icon">
               <PetitionStatusIcon status={petition.status} />
             </Center>
             <LocaleBadge locale={petition.locale} marginLeft={2} />
