@@ -5,10 +5,16 @@ import { PetitionAccess } from "../src/db/__types";
 export async function up(knex: Knex): Promise<void> {
   await knex.raw(/* sql */ `
     alter table petition_access rename constraint petition_access__petition_id_contact_id to petition_access__petition_id_contact_id_old;
+  `);
+  await knex.raw(/* sql */ `
     create index petition_access__petition_id_contact_id on petition_access (petition_id, contact_id);
+  `);
+  await knex.raw(/* sql */ `
     create unique index petition_access__petition_id_contact_id_active on petition_access (petition_id, contact_id) where status = 'ACTIVE';
+  `);
+  await knex.raw(/* sql */ `
     alter table petition_access drop constraint petition_access__petition_id_contact_id_old;
-    `);
+  `);
 }
 
 export async function down(knex: Knex): Promise<void> {
