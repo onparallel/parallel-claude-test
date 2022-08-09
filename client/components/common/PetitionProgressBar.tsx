@@ -1,14 +1,15 @@
-import { Box, BoxProps, HStack, Square, Stack, Text } from "@chakra-ui/react";
+import { gql } from "@apollo/client";
+import { Box, HStack, Square, Stack, Text } from "@chakra-ui/react";
 import { CheckIcon, QuestionIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { PetitionProgress, PetitionStatus } from "@parallel/graphql/__types";
+import { PetitionProgressBar_PetitionFragment } from "@parallel/graphql/__types";
 import { generateCssStripe } from "@parallel/utils/css";
 import { FormattedMessage } from "react-intl";
 import { ProgressIndicator, ProgressTrack } from "./Progress";
 import { SmallPopover } from "./SmallPopover";
 
-interface PetitionProgressBarProps extends PetitionProgress, BoxProps {
-  status: PetitionStatus;
+interface PetitionProgressBarProps {
+  petition: PetitionProgressBar_PetitionFragment;
 }
 
 const STYLES = (() => {
@@ -24,99 +25,135 @@ const STYLES = (() => {
   return styles as Record<keyof typeof styles, any>;
 })();
 
-export function PetitionProgressBar({
-  status,
-  external,
-  internal,
-  ...props
-}: PetitionProgressBarProps) {
-  const sum = {
-    approved: external.approved + internal.approved,
-    replied: external.replied + internal.replied,
-    optional: external.optional + internal.optional,
-    total: external.total + internal.total,
-  };
+export const PetitionProgressBar = Object.assign(
+  chakraForwardRef<"div", PetitionProgressBarProps>(function PetitionProgressBar(
+    { petition: { progress, status }, ...props },
+    ref
+  ) {
+    const { external, internal } = progress;
+    const sum = {
+      approved: external.approved + internal.approved,
+      replied: external.replied + internal.replied,
+      optional: external.optional + internal.optional,
+      total: external.total + internal.total,
+    };
 
-  const { approved, replied, optional, total } = sum;
+    const { approved, replied, optional, total } = sum;
 
-  return (
-    <SmallPopover
-      placement="left"
-      width="auto"
-      content={
-        status === "DRAFT" && !replied && !approved && !optional ? (
-          <Box textAlign="center" fontSize="sm">
-            <Text fontStyle="italic">
-              <FormattedMessage
-                id="component.petition-progress-bar.not-replies"
-                defaultMessage="No replies have been added yet"
-              />
-            </Text>
-          </Box>
-        ) : total === 0 ? (
-          <Box textAlign="center" fontSize="sm">
-            <QuestionIcon boxSize="24px" color="gray.300" />
-            <Text fontStyle="italic" marginTop={2}>
-              <FormattedMessage
-                id="component.petition-progress-bar.no-fields"
-                defaultMessage="This parallel has no fields."
-              />
-            </Text>
-          </Box>
-        ) : replied + approved === 0 ? (
-          <Box textAlign="center" fontSize="sm">
-            <QuestionIcon boxSize="24px" color="gray.300" />
-            <Text marginTop={2}>
-              <FormattedMessage
-                id="component.petition-progress-bar.all-pending"
-                defaultMessage="The recipient has not replied to any of the fields."
-              />
-            </Text>
-          </Box>
-        ) : total === approved ? (
-          <Box textAlign="center" fontSize="sm">
-            <CheckIcon boxSize="24px" color="green.500" />
-            <Text marginTop={2}>
-              <FormattedMessage
-                id="component.petition-progress-bar.completed"
-                defaultMessage="This parallel is completed."
-              />
-            </Text>
-          </Box>
-        ) : (
-          <Stack as="ul" fontSize="sm" listStyleType="none" spacing={1}>
-            <ApprovedProgressText external={external} internal={internal} />
-            <RepliedProgressText external={external} internal={internal} />
-            <OptionalProgressText external={external} internal={internal} />
-            <EmptyProgressText external={external} internal={internal} />
-          </Stack>
-        )
-      }
-    >
-      <Box {...props}>
-        <ProgressTrack
-          size="md"
-          min={0}
-          max={total!}
-          value={approved! + replied!}
-          {...STYLES["EMPTY"]}
-        >
-          <ProgressIndicator
+    return (
+      <SmallPopover
+        placement="left"
+        width="auto"
+        content={
+          status === "DRAFT" && !replied && !approved && !optional ? (
+            <Box textAlign="center" fontSize="sm">
+              <Text fontStyle="italic">
+                <FormattedMessage
+                  id="component.petition-progress-bar.not-replies"
+                  defaultMessage="No replies have been added yet"
+                />
+              </Text>
+            </Box>
+          ) : total === 0 ? (
+            <Box textAlign="center" fontSize="sm">
+              <QuestionIcon boxSize="24px" color="gray.300" />
+              <Text fontStyle="italic" marginTop={2}>
+                <FormattedMessage
+                  id="component.petition-progress-bar.no-fields"
+                  defaultMessage="This parallel has no fields."
+                />
+              </Text>
+            </Box>
+          ) : replied + approved === 0 ? (
+            <Box textAlign="center" fontSize="sm">
+              <QuestionIcon boxSize="24px" color="gray.300" />
+              <Text marginTop={2}>
+                <FormattedMessage
+                  id="component.petition-progress-bar.all-pending"
+                  defaultMessage="The recipient has not replied to any of the fields."
+                />
+              </Text>
+            </Box>
+          ) : total === approved ? (
+            <Box textAlign="center" fontSize="sm">
+              <CheckIcon boxSize="24px" color="green.500" />
+              <Text marginTop={2}>
+                <FormattedMessage
+                  id="component.petition-progress-bar.completed"
+                  defaultMessage="This parallel is completed."
+                />
+              </Text>
+            </Box>
+          ) : (
+            <Stack as="ul" fontSize="sm" listStyleType="none" spacing={1}>
+              <ApprovedProgressText progress={progress} />
+              <RepliedProgressText progress={progress} />
+              <OptionalProgressText progress={progress} />
+              <EmptyProgressText progress={progress} />
+            </Stack>
+          )
+        }
+      >
+        <Box ref={ref} {...props}>
+          <ProgressTrack
+            size="md"
             min={0}
             max={total!}
-            value={approved!}
-            backgroundColor="green.400"
-            {...STYLES["APPROVED"]}
-          />
-          <ProgressIndicator min={0} max={total!} value={replied!} {...STYLES["REPLIED"]} />
-          <ProgressIndicator min={0} max={total!} value={optional!} {...STYLES["OPTIONAL"]} />
-        </ProgressTrack>
-      </Box>
-    </SmallPopover>
-  );
-}
+            value={approved! + replied!}
+            {...STYLES["EMPTY"]}
+          >
+            <ProgressIndicator
+              min={0}
+              max={total!}
+              value={approved!}
+              backgroundColor="green.400"
+              {...STYLES["APPROVED"]}
+            />
+            <ProgressIndicator min={0} max={total!} value={replied!} {...STYLES["REPLIED"]} />
+            <ProgressIndicator min={0} max={total!} value={optional!} {...STYLES["OPTIONAL"]} />
+          </ProgressTrack>
+        </Box>
+      </SmallPopover>
+    );
+  }),
+  {
+    fragments: {
+      get PetitionFieldProgress() {
+        return gql`
+          fragment PetitionProgressBar_PetitionFieldProgress on PetitionFieldProgress {
+            approved
+            replied
+            optional
+            total
+          }
+        `;
+      },
+      get Petition() {
+        return gql`
+          fragment PetitionProgressBar_Petition on Petition {
+            status
+            progress {
+              external {
+                ...PetitionProgressBar_PetitionFieldProgress
+              }
+              internal {
+                ...PetitionProgressBar_PetitionFieldProgress
+              }
+            }
+          }
+          ${this.PetitionFieldProgress}
+        `;
+      },
+    },
+  }
+);
 
-function EmptyProgressText({ external, internal }: PetitionProgress) {
+function EmptyProgressText({
+  progress,
+}: {
+  progress: PetitionProgressBar_PetitionFragment["progress"];
+}) {
+  const { external, internal } = progress;
   const emptyFields =
     external.total +
     internal.total -
@@ -146,7 +183,12 @@ function EmptyProgressText({ external, internal }: PetitionProgress) {
   );
 }
 
-function ApprovedProgressText({ external, internal }: PetitionProgress) {
+function ApprovedProgressText({
+  progress,
+}: {
+  progress: PetitionProgressBar_PetitionFragment["progress"];
+}) {
+  const { external, internal } = progress;
   if (!external.approved && !internal.approved) return null;
 
   return (
@@ -163,7 +205,12 @@ function ApprovedProgressText({ external, internal }: PetitionProgress) {
   );
 }
 
-function RepliedProgressText({ external, internal }: PetitionProgress) {
+function RepliedProgressText({
+  progress,
+}: {
+  progress: PetitionProgressBar_PetitionFragment["progress"];
+}) {
+  const { external, internal } = progress;
   if (!external.replied && !internal.replied) return null;
 
   return (
@@ -180,7 +227,12 @@ function RepliedProgressText({ external, internal }: PetitionProgress) {
   );
 }
 
-function OptionalProgressText({ external, internal }: PetitionProgress) {
+function OptionalProgressText({
+  progress,
+}: {
+  progress: PetitionProgressBar_PetitionFragment["progress"];
+}) {
+  const { external, internal } = progress;
   if (!external.optional && !internal.optional) return null;
 
   return (

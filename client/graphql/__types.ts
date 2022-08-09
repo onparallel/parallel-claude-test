@@ -4172,6 +4172,36 @@ export type PetitionFieldSelect_PetitionFieldFragment = {
   options: { [key: string]: any };
 };
 
+export type PetitionProgressBar_PetitionFieldProgressFragment = {
+  __typename?: "PetitionFieldProgress";
+  approved: number;
+  replied: number;
+  optional: number;
+  total: number;
+};
+
+export type PetitionProgressBar_PetitionFragment = {
+  __typename?: "Petition";
+  status: PetitionStatus;
+  progress: {
+    __typename?: "PetitionProgress";
+    external: {
+      __typename?: "PetitionFieldProgress";
+      approved: number;
+      replied: number;
+      optional: number;
+      total: number;
+    };
+    internal: {
+      __typename?: "PetitionFieldProgress";
+      approved: number;
+      replied: number;
+      optional: number;
+      total: number;
+    };
+  };
+};
+
 export type PetitionSignatureCellContent_PetitionFragment = {
   __typename?: "Petition";
   status: PetitionStatus;
@@ -19625,6 +19655,7 @@ export type Petitions_PetitionBasePaginationFragment = {
               };
             }
         >;
+        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         progress: {
           __typename?: "PetitionProgress";
           external: {
@@ -19642,7 +19673,6 @@ export type Petitions_PetitionBasePaginationFragment = {
             total: number;
           };
         };
-        tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
         currentSignatureRequest?: {
           __typename?: "PetitionSignatureRequest";
           status: PetitionSignatureRequestStatus;
@@ -19769,6 +19799,7 @@ export type Petitions_PetitionBase_Petition_Fragment = {
         };
       }
   >;
+  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   progress: {
     __typename?: "PetitionProgress";
     external: {
@@ -19786,7 +19817,6 @@ export type Petitions_PetitionBase_Petition_Fragment = {
       total: number;
     };
   };
-  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
     status: PetitionSignatureRequestStatus;
@@ -19970,6 +20000,7 @@ export type Petitions_petitionsQuery = {
                 };
               }
           >;
+          tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
           progress: {
             __typename?: "PetitionProgress";
             external: {
@@ -19987,7 +20018,6 @@ export type Petitions_petitionsQuery = {
               total: number;
             };
           };
-          tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
           currentSignatureRequest?: {
             __typename?: "PetitionSignatureRequest";
             status: PetitionSignatureRequestStatus;
@@ -22383,6 +22413,7 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
         };
       }
   >;
+  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   progress: {
     __typename?: "PetitionProgress";
     external: {
@@ -22400,7 +22431,6 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
       total: number;
     };
   };
-  tags: Array<{ __typename?: "Tag"; id: string; name: string; color: string }>;
   currentSignatureRequest?: {
     __typename?: "PetitionSignatureRequest";
     status: PetitionSignatureRequestStatus;
@@ -23630,24 +23660,34 @@ export const useDeleteContacts_ContactFragmentDoc = gql`
   }
   ${useConfirmDeleteContactsDialog_ContactFragmentDoc}
 ` as unknown as DocumentNode<useDeleteContacts_ContactFragment, unknown>;
-export const PetitionStatusCellContent_PetitionFragmentDoc = gql`
-  fragment PetitionStatusCellContent_Petition on Petition {
+export const PetitionProgressBar_PetitionFieldProgressFragmentDoc = gql`
+  fragment PetitionProgressBar_PetitionFieldProgress on PetitionFieldProgress {
+    approved
+    replied
+    optional
+    total
+  }
+` as unknown as DocumentNode<PetitionProgressBar_PetitionFieldProgressFragment, unknown>;
+export const PetitionProgressBar_PetitionFragmentDoc = gql`
+  fragment PetitionProgressBar_Petition on Petition {
     status
     progress {
       external {
-        approved
-        replied
-        optional
-        total
+        ...PetitionProgressBar_PetitionFieldProgress
       }
       internal {
-        approved
-        replied
-        optional
-        total
+        ...PetitionProgressBar_PetitionFieldProgress
       }
     }
   }
+  ${PetitionProgressBar_PetitionFieldProgressFragmentDoc}
+` as unknown as DocumentNode<PetitionProgressBar_PetitionFragment, unknown>;
+export const PetitionStatusCellContent_PetitionFragmentDoc = gql`
+  fragment PetitionStatusCellContent_Petition on Petition {
+    ...PetitionProgressBar_Petition
+    status
+  }
+  ${PetitionProgressBar_PetitionFragmentDoc}
 ` as unknown as DocumentNode<PetitionStatusCellContent_PetitionFragment, unknown>;
 export const getPetitionSignatureStatus_PetitionFragmentDoc = gql`
   fragment getPetitionSignatureStatus_Petition on Petition {
