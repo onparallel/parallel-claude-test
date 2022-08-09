@@ -21,14 +21,14 @@ import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined, noop } from "remeda";
+import { isDefined } from "remeda";
 
 export function useSendPetitionHandler(
   user: useSendPetitionHandler_UserFragment,
   petition: useSendPetitionHandler_PetitionFragment | null,
   onUpdatePetition: (data: UpdatePetitionInput) => Promise<any>,
   validator: () => Promise<boolean>,
-  onRefetch: () => void = noop,
+  onRefetch?: () => void,
   options: { redirect: boolean } = { redirect: true }
 ) {
   const intl = useIntl();
@@ -70,7 +70,7 @@ export function useSendPetitionHandler(
         user,
         petition,
         onUpdatePetition,
-        canAddRecipientGroups: currentRecipientIds.length === 0, // can only do a bulk send if the petition has no accesses yet
+        canAddRecipientGroups: petition.accesses.length === 0, // can only do a bulk send if the petition has no accesses yet
         onSearchContacts: async (search: string, exclude: string[]) =>
           await handleSearchContacts(search, [...exclude, ...currentRecipientIds]),
       });
@@ -187,7 +187,7 @@ export function useSendPetitionHandler(
       if (options.redirect) {
         router.push("/app/petitions");
       }
-      onRefetch();
+      onRefetch?.();
     } catch (e) {
       if (isApolloError(e, "PETITION_SEND_CREDITS_ERROR")) {
         await withError(showPetitionLimitReachedErrorDialog());
