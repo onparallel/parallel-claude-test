@@ -51,7 +51,9 @@ type AdminOrganizationsMembersProps = UnwrapPromise<
 function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembersProps) {
   const {
     data: { me, realMe, ...rest },
-  } = useAssertQuery(AdminOrganizationsMembers_queryDocument);
+  } = useAssertQuery(AdminOrganizationsMembers_queryDocument, {
+    variables: { id: organizationId },
+  });
   const organization = rest.organization!;
 
   const [state, setQueryState] = useQueryState(USERS_QUERY_STATE);
@@ -411,6 +413,7 @@ const _queries = [
       $sortBy: [OrganizationUsers_OrderBy!]
     ) {
       organization(id: $id) {
+        id
         users(
           offset: $offset
           limit: $limit

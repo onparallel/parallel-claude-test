@@ -11903,6 +11903,7 @@ export type AdminOrganizationsMembers_organizationQueryVariables = Exact<{
 export type AdminOrganizationsMembers_organizationQuery = {
   organization?: {
     __typename?: "Organization";
+    id: string;
     users: {
       __typename?: "UserPagination";
       totalCount: number;
@@ -28482,6 +28483,7 @@ export const AdminOrganizationsMembers_organizationDocument = gql`
     $sortBy: [OrganizationUsers_OrderBy!]
   ) {
     organization(id: $id) {
+      id
       users(
         offset: $offset
         limit: $limit
