@@ -7,20 +7,6 @@ export async function up(knex: Knex): Promise<void> {
     commit;
   `);
 
-  // await knex.raw(
-  //   /* sql */ `
-  //   insert into "organization_theme" (org_id, name, type, is_default, data)
-  //   select
-  //     id,
-  //     'Default',
-  //     'BRAND',
-  //     true,
-  //     coalesce(brand_theme, ?::jsonb)
-  //   from "organization" order by id
-  // `,
-  //   [JSON.stringify(defaultBrandTheme)]
-  // );
-
   await knex.raw(
     /* sql */ `
     insert into "organization_theme" (org_id, name, type, is_default, data)
