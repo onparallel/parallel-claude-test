@@ -105,7 +105,7 @@ export function ClosePetitionDialog({
           <Text>
             <FormattedMessage
               id="component.close-petition-dialog.heading"
-              defaultMessage="Finish parallel"
+              defaultMessage="Close parallel"
             />
           </Text>
         </Stack>

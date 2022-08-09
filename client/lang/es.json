@@ -341,8 +341,8 @@
   },
   {
     "term": "component.close-petition-dialog.heading",
-    "definition": "Finalizar parallel",
-    "context": "Finish parallel"
+    "definition": "Cerrar parallel",
+    "context": "Close parallel"
   },
   {
     "term": "component.close-petition-dialog.notify-recipient.message-placeholder",
@@ -6991,8 +6991,8 @@
   },
   {
     "term": "petition-replies.finalize-petition.button",
-    "definition": "Finalizar parallel",
-    "context": "Finish parallel"
+    "definition": "Cerrar parallel",
+    "context": "Close parallel"
   },
   {
     "term": "petition-replies.note-popover",

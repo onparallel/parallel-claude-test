@@ -494,7 +494,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               >
                 <FormattedMessage
                   id="petition-replies.finalize-petition.button"
-                  defaultMessage="Finish parallel"
+                  defaultMessage="Close parallel"
                 />
               </Button>
             )}
