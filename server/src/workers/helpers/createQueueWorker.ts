@@ -1,6 +1,6 @@
+import { SQSClient } from "@aws-sdk/client-sqs";
 import "reflect-metadata";
-import AWS from "aws-sdk";
-import { Consumer } from "sqs-consumer";
+import { Consumer } from "sqs-consumer-v3";
 import yargs from "yargs";
 import { CONFIG, Config } from "../../config";
 import { createContainer } from "../../container";
@@ -57,11 +57,7 @@ export function createQueueWorker<P, Q extends keyof Config["queueWorkers"]>(
       () => {
         const logger = container.get<ILogger>(LOGGER);
         const config = container.get<Config>(CONFIG);
-        AWS.config.update({
-          ...config.aws,
-          signatureVersion: "v4",
-          logger: { log: logger.debug.bind(logger) },
-        });
+
         const consumer = Consumer.create({
           queueUrl: config.queueWorkers[name].endpoint,
           batchSize: 10,
@@ -77,7 +73,10 @@ export function createQueueWorker<P, Q extends keyof Config["queueWorkers"]>(
               duration,
             });
           },
-          sqs: new AWS.SQS(),
+          sqs: new SQSClient({
+            ...config.aws,
+            endpoint: config.queueWorkers[name].endpoint,
+          }),
         });
         consumer.on("error", (error) => {
           logger.error(error.stack);

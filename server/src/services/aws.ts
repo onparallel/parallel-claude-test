@@ -1,4 +1,5 @@
 import { S3Client } from "@aws-sdk/client-s3";
+import { SendMessageBatchCommand, SendMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
 import AWS, { AWSError, CognitoIdentityServiceProvider } from "aws-sdk";
 import { PromiseResult } from "aws-sdk/lib/request";
 import { createHash } from "crypto";
@@ -69,8 +70,11 @@ export class Aws implements IAws {
     });
   }
 
-  @Memoize() private get sqs() {
-    return new AWS.SQS();
+  @Memoize((queue) => queue) private sqs(queue: keyof Config["queueWorkers"]) {
+    return new SQSClient({
+      ...this.config.aws,
+      endpoint: this.config.queueWorkers[queue].endpoint,
+    });
   }
 
   @Memoize() private get cognitoIdP() {
@@ -135,8 +139,8 @@ export class Aws implements IAws {
     const queueUrl = this.config.queueWorkers[queue].endpoint;
     if (Array.isArray(messages)) {
       for (const batch of chunk(messages, 10)) {
-        await this.sqs
-          .sendMessageBatch({
+        await this.sqs(queue).send(
+          new SendMessageBatchCommand({
             QueueUrl: queueUrl,
             Entries: batch.map(({ id, body, groupId }) => ({
               Id: this.hash(id),
@@ -144,16 +148,16 @@ export class Aws implements IAws {
               MessageGroupId: this.hash(groupId),
             })),
           })
-          .promise();
+        );
       }
     } else {
-      await this.sqs
-        .sendMessage({
+      await this.sqs(queue).send(
+        new SendMessageCommand({
           QueueUrl: queueUrl,
           MessageBody: JSON.stringify(messages.body),
           MessageGroupId: messages.groupId,
         })
-        .promise();
+      );
     }
   }
 
