@@ -2,6 +2,7 @@ import { extension } from "mime-types";
 import { arg, core, enumType, inputObjectType, objectType, unionType } from "nexus";
 import { isDefined } from "remeda";
 import { PetitionAccess, PetitionMessage } from "../../db/__types";
+import { defaultBrandTheme } from "../../util/BrandTheme";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
@@ -436,10 +437,10 @@ export const PublicOrganization = objectType({
       description: "The preferred tone of organization.",
       resolve: (o) => o.preferred_tone,
     });
-    t.nullable.jsonObject("brandTheme", {
+    t.nonNull.jsonObject("brandTheme", {
       resolve: async (o, _, ctx) => {
-        const theme = (await ctx.organizations.loadBrandThemesByOrgId(o.id))[0];
-        return theme?.data ?? null;
+        const theme = await ctx.organizations.loadOrgBrandTheme(o.id);
+        return theme?.data ?? defaultBrandTheme;
       },
     });
   },

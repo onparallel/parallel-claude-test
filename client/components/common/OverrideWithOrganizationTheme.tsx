@@ -4,9 +4,14 @@ import Color from "color";
 import { gql } from "@apollo/client";
 
 export interface OrganizationBrandTheme {
-  fontFamily?: string;
-  color?: string;
+  fontFamily: string | null;
+  color: string;
 }
+
+export const defaultOrganizationBrandTheme: OrganizationBrandTheme = {
+  fontFamily: null,
+  color: "#6059f7",
+};
 
 export function OverrideWithOrganizationTheme({
   children,
@@ -15,22 +20,21 @@ export function OverrideWithOrganizationTheme({
 }: {
   children: ReactNode;
   cssVarsRoot?: string;
-  brandTheme?: OrganizationBrandTheme | null;
+  brandTheme: OrganizationBrandTheme;
 }) {
   const theme = useTheme();
   const customTheme = extendTheme({
     ...theme,
     fonts: {
       ...theme.fonts,
-      body: brand?.fontFamily ?? theme.fonts.body,
-      heading: brand?.fontFamily ?? theme.fonts.heading,
+      body: brand.fontFamily || theme.fonts.body,
+      heading: brand.fontFamily || theme.fonts.heading,
     },
     colors: {
       ...theme.colors,
-      primary:
-        brand?.color && /^#[a-f\d]{6}$/i.test(brand?.color)
-          ? generateOrganizationPallete(brand.color)
-          : theme.colors.primary,
+      primary: /^#[a-f\d]{6}$/i.test(brand.color)
+        ? generateOrganizationPallete(brand.color)
+        : theme.colors.primary,
     },
   });
 

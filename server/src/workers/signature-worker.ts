@@ -79,7 +79,7 @@ async function startSignatureProcess(
       throw new Error(`Expected theme of type PDF_DOCUMENT on Petition:${petition.id}`);
     }
 
-    const brandTheme = (await ctx.organizations.loadBrandThemesByOrgId(org!.id))[0];
+    const brandTheme = await ctx.organizations.loadOrgBrandTheme(org!.id);
 
     // send request to signature client
     const data = await signatureClient.startSignatureRequest(
@@ -309,7 +309,7 @@ async function updateOrganizationBranding(payload: { orgId: number }, ctx: Worke
     return;
   }
 
-  const brandTheme = (await ctx.organizations.loadBrandThemesByOrgId(organization!.id))[0];
+  const brandTheme = await ctx.organizations.loadOrgBrandTheme(organization!.id);
 
   await pMap(
     signatureIntegrations as SignatureOrgIntegration[],

@@ -9,6 +9,7 @@ import {
   objectType,
 } from "nexus";
 import { equals, isDefined, omit, pick } from "remeda";
+import { defaultBrandTheme } from "../../util/BrandTheme";
 import { defaultPdfDocumentTheme, PdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { or, userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -339,10 +340,10 @@ export const Organization = objectType({
         return o.pdf_document_theme ?? defaultPdfDocumentTheme;
       },
     });
-    t.nullable.jsonObject("brandTheme", {
+    t.nonNull.jsonObject("brandTheme", {
       resolve: async (o, _, ctx) => {
-        const theme = (await ctx.organizations.loadBrandThemesByOrgId(o.id))[0];
-        return theme?.data ?? null;
+        const theme = await ctx.organizations.loadOrgBrandTheme(o.id);
+        return theme?.data ?? defaultBrandTheme;
       },
     });
     t.nonNull.boolean("isPdfDocumentThemeFontsDirty", {

@@ -1,4 +1,5 @@
 import { Knex } from "knex";
+import { defaultBrandTheme } from "../src/util/BrandTheme";
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.raw(/* sql */ `
@@ -6,29 +7,44 @@ export async function up(knex: Knex): Promise<void> {
     commit;
   `);
 
+  // await knex.raw(
+  //   /* sql */ `
+  //   insert into "organization_theme" (org_id, name, type, is_default, data)
+  //   select
+  //     id,
+  //     'Default',
+  //     'BRAND',
+  //     true,
+  //     coalesce(brand_theme, ?::jsonb)
+  //   from "organization" order by id
+  // `,
+  //   [JSON.stringify(defaultBrandTheme)]
+  // );
+
   await knex.raw(
     /* sql */ `
     insert into "organization_theme" (org_id, name, type, is_default, data)
     select
-      id,
-      'Default',
-      'BRAND',
-      true,
-      coalesce(brand_theme, ?::jsonb)
+    id,
+    'Default',
+    'BRAND',
+    true,
+    jsonb_build_object(
+      'color', coalesce(brand_theme->>'color', ?),
+      'fontFamily', coalesce(brand_theme->>'fontFamily', ?)
+    )
     from "organization" order by id
-  `,
-    [JSON.stringify({})]
+    `,
+    [defaultBrandTheme.color, defaultBrandTheme.fontFamily]
   );
 }
 
 export async function down(knex: Knex): Promise<void> {
   await knex.raw(/* sql */ `
-        with subquery as 
-        (select org_id, data from organization_theme where type = 'BRAND' and deleted_at is null)
-        update organization
-        set brand_theme = subquery.data
-        from subquery
-        where id = subquery.org_id
+       update organization o
+        set brand_theme = ot.data
+        from organization_theme ot
+        where o.id = ot.org_id and ot.type = 'BRAND' and ot.deleted_at is null
     `);
 
   await knex.raw(/* sql */ `

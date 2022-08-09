@@ -1720,7 +1720,7 @@ export interface Organization extends Timestamps {
   /** The total number of active users */
   activeUserCount: Scalars["Int"];
   anonymizePetitionsAfterMonths?: Maybe<Scalars["Int"]>;
-  brandTheme?: Maybe<Scalars["JSONObject"]>;
+  brandTheme: Scalars["JSONObject"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom host used in petition links and public links. */
@@ -2907,7 +2907,7 @@ export interface PublicLicenseCode {
 /** A public view of an organization */
 export interface PublicOrganization {
   __typename?: "PublicOrganization";
-  brandTheme?: Maybe<Scalars["JSONObject"]>;
+  brandTheme: Scalars["JSONObject"];
   /** If this organization has the REMOVE_PARALLEL_BRANDING feature flag enabled */
   hasRemoveParallelBranding: Scalars["Boolean"];
   /** The ID of the organization. */
@@ -4136,13 +4136,13 @@ export type Mention_PetitionFieldCommentMentionFragment =
 export type OverrideWithOrganizationTheme_OrganizationFragment = {
   __typename?: "Organization";
   id: string;
-  brandTheme?: { [key: string]: any } | null;
+  brandTheme: { [key: string]: any };
 };
 
 export type OverrideWithOrganizationTheme_PublicOrganizationFragment = {
   __typename?: "PublicOrganization";
   id: string;
-  brandTheme?: { [key: string]: any } | null;
+  brandTheme: { [key: string]: any };
 };
 
 export type PetitionFieldComment_PetitionFieldCommentFragment = {
@@ -5827,7 +5827,7 @@ export type BrandingGeneral_UserFragment = {
     id: string;
     name: string;
     preferredTone: Tone;
-    brandTheme?: { [key: string]: any } | null;
+    brandTheme: { [key: string]: any };
     logoUrl?: string | null;
   };
 };
@@ -5856,7 +5856,7 @@ export type BrandingGeneral_updateOrganizationBrandThemeMutation = {
   updateOrganizationBrandTheme: {
     __typename?: "Organization";
     id: string;
-    brandTheme?: { [key: string]: any } | null;
+    brandTheme: { [key: string]: any };
   };
 };
 
@@ -5869,7 +5869,7 @@ export type BrandingGeneralPreview_UserFragment = {
     preferredTone: Tone;
     logoUrl?: string | null;
     id: string;
-    brandTheme?: { [key: string]: any } | null;
+    brandTheme: { [key: string]: any };
   };
 };
 
@@ -13093,7 +13093,7 @@ export type OrganizationBranding_userQuery = {
       id: string;
       name: string;
       preferredTone: Tone;
-      brandTheme?: { [key: string]: any } | null;
+      brandTheme: { [key: string]: any };
       logoUrl?: string | null;
       iconUrl92?: string | null;
       usageLimits: {
@@ -18342,7 +18342,7 @@ export type PetitionPreview_QueryFragment = {
       __typename?: "Organization";
       name: string;
       id: string;
-      brandTheme?: { [key: string]: any } | null;
+      brandTheme: { [key: string]: any };
       iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
@@ -19248,7 +19248,7 @@ export type PetitionPreview_userQuery = {
       __typename?: "Organization";
       name: string;
       id: string;
-      brandTheme?: { [key: string]: any } | null;
+      brandTheme: { [key: string]: any };
       iconUrl92?: string | null;
       usageLimits: {
         __typename?: "OrganizationUsageLimit";
@@ -21741,7 +21741,7 @@ export type RecipientView_PublicPetitionAccessFragment = {
       name: string;
       logoUrl?: string | null;
       id: string;
-      brandTheme?: { [key: string]: any } | null;
+      brandTheme: { [key: string]: any };
     };
   } | null;
   contact?: {
@@ -22079,7 +22079,7 @@ export type RecipientView_accessQuery = {
         name: string;
         logoUrl?: string | null;
         id: string;
-        brandTheme?: { [key: string]: any } | null;
+        brandTheme: { [key: string]: any };
       };
     } | null;
     contact?: {

@@ -126,7 +126,7 @@ export const updateOrganizationBrandTheme = mutationField("updateOrganizationBra
         name: "OrganizationBrandThemeInput",
         definition(t) {
           t.nullable.string("fontFamily");
-          t.nullable.string("color");
+          t.string("color");
         },
       }).asArg()
     ),
@@ -136,31 +136,20 @@ export const updateOrganizationBrandTheme = mutationField("updateOrganizationBra
     validateHexColor((args) => args.data.color, "data.color")
   ),
   resolve: async (_, args, ctx) => {
-    const orgTheme = (await ctx.organizations.loadBrandThemesByOrgId(ctx.user!.org_id))[0];
-    const theme = orgTheme?.data;
+    const orgTheme = (await ctx.organizations.loadOrgBrandTheme(ctx.user!.org_id))!;
+    const theme = orgTheme.data;
 
-    if (isDefined(orgTheme)) {
-      const updatedTheme = {
+    await ctx.organizations.updateOrganizationTheme(
+      orgTheme.id,
+      {
         data: {
           color: args.data.color ?? theme.color,
           fontFamily: args.data.fontFamily !== undefined ? args.data.fontFamily : theme.fontFamily,
         },
-      };
+      },
+      `User:${ctx.user!.id}`
+    );
 
-      await ctx.organizations.updateOrganizationTheme(
-        orgTheme.id,
-        updatedTheme,
-        `User:${ctx.user!.id}`
-      );
-    } else {
-      await ctx.organizations.createOrganizationTheme(
-        ctx.user!.org_id,
-        "Default",
-        "BRAND",
-        args.data,
-        `User:${ctx.user!.id}`
-      );
-    }
     if (
       (isDefined(args.data.color) && theme?.color !== args.data.color) ||
       (args.data.fontFamily !== undefined && theme?.fontFamily !== args.data.fontFamily)

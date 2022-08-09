@@ -1200,7 +1200,7 @@ export interface NexusGenFieldTypes {
     _id: number; // Int!
     activeUserCount: number; // Int!
     anonymizePetitionsAfterMonths: number | null; // Int
-    brandTheme: NexusGenScalars["JSONObject"] | null; // JSONObject
+    brandTheme: NexusGenScalars["JSONObject"]; // JSONObject!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customHost: string | null; // String
     features: NexusGenRootTypes["FeatureFlagNameValue"][]; // [FeatureFlagNameValue!]!
@@ -1723,7 +1723,7 @@ export interface NexusGenFieldTypes {
   };
   PublicOrganization: {
     // field return type
-    brandTheme: NexusGenScalars["JSONObject"] | null; // JSONObject
+    brandTheme: NexusGenScalars["JSONObject"]; // JSONObject!
     hasRemoveParallelBranding: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     logoUrl: string | null; // String

@@ -18,7 +18,6 @@ import {
   Stack,
   Switch,
   Text,
-  useTheme,
 } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
 import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
@@ -57,14 +56,13 @@ interface BrandingGeneralProps {
 interface BrandingGeneralData {
   tone: Tone;
   color: string;
-  fontFamily?: string;
+  fontFamily: string | null;
   logo: Maybe<File> | string;
 }
 
 const MAX_FILE_SIZE = 1024 * 1024;
 
 export function BrandingGeneral({ user }: BrandingGeneralProps) {
-  const parallelTheme = useTheme();
   const intl = useIntl();
   const dropzoneRef = useRef<DropzoneRef>(null);
   const {
@@ -79,8 +77,8 @@ export function BrandingGeneral({ user }: BrandingGeneralProps) {
     mode: "onChange",
     defaultValues: {
       tone: user.organization.preferredTone,
-      color: user.organization.brandTheme?.color ?? parallelTheme.colors.primary[500],
-      fontFamily: user.organization.brandTheme?.fontFamily ?? "DEFAULT",
+      color: user.organization.brandTheme.color,
+      fontFamily: user.organization.brandTheme.fontFamily ?? "DEFAULT",
       logo: user.organization.logoUrl,
     },
   });

@@ -5,6 +5,7 @@ import { indexBy } from "remeda";
 import { Config, CONFIG } from "../../config";
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { unMaybeArray } from "../../util/arrays";
+import { defaultBrandTheme } from "../../util/BrandTheme";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { defaultPdfDocumentTheme } from "../../util/PdfDocumentTheme";
 import { Maybe, MaybeArray } from "../../util/types";
@@ -410,8 +411,8 @@ export class OrganizationRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
-  readonly loadBrandThemesByOrgId = this.buildLoadMultipleBy("organization_theme", "org_id", (q) =>
-    q.where("type", "BRAND").whereNull("deleted_at").orderBy("created_at", "desc")
+  readonly loadOrgBrandTheme = this.buildLoadBy("organization_theme", "org_id", (q) =>
+    q.where("type", "BRAND").whereNull("deleted_at")
   );
 
   readonly loadPdfDocumentThemesByOrgId = this.buildLoadMultipleBy(
@@ -421,14 +422,24 @@ export class OrganizationRepository extends BaseRepository {
   );
 
   async createDefaultOrganizationThemes(orgId: number, createdBy?: string, t?: Knex.Transaction) {
-    await this.from("organization_theme", t).insert({
-      org_id: orgId,
-      type: "PDF_DOCUMENT",
-      name: "Default",
-      is_default: true,
-      data: JSON.stringify(defaultPdfDocumentTheme),
-      created_by: createdBy,
-    });
+    await this.from("organization_theme", t).insert([
+      {
+        org_id: orgId,
+        type: "PDF_DOCUMENT",
+        name: "Default",
+        is_default: true,
+        data: this.json(defaultPdfDocumentTheme),
+        created_by: createdBy,
+      },
+      {
+        org_id: orgId,
+        type: "BRAND",
+        name: "Default",
+        is_default: true,
+        data: this.json(defaultBrandTheme),
+        created_by: createdBy,
+      },
+    ]);
   }
 
   async createOrganizationTheme(

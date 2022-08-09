@@ -1845,7 +1845,7 @@ type Organization implements Timestamps {
   """
   activeUserCount: Int!
   anonymizePetitionsAfterMonths: Int
-  brandTheme: JSONObject
+  brandTheme: JSONObject!
 
   """
   Time when the resource was created.
@@ -3821,7 +3821,7 @@ type PublicLicenseCode {
 A public view of an organization
 """
 type PublicOrganization {
-  brandTheme: JSONObject
+  brandTheme: JSONObject!
 
   """
   If this organization has the REMOVE_PARALLEL_BRANDING feature flag enabled

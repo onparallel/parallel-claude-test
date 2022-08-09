@@ -1683,7 +1683,7 @@ export type Organization = Timestamps & {
   /** The total number of active users */
   activeUserCount: Scalars["Int"];
   anonymizePetitionsAfterMonths: Maybe<Scalars["Int"]>;
-  brandTheme: Maybe<Scalars["JSONObject"]>;
+  brandTheme: Scalars["JSONObject"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Custom host used in petition links and public links. */
@@ -2821,7 +2821,7 @@ export type PublicLicenseCode = {
 
 /** A public view of an organization */
 export type PublicOrganization = {
-  brandTheme: Maybe<Scalars["JSONObject"]>;
+  brandTheme: Scalars["JSONObject"];
   /** If this organization has the REMOVE_PARALLEL_BRANDING feature flag enabled */
   hasRemoveParallelBranding: Scalars["Boolean"];
   /** The ID of the organization. */
