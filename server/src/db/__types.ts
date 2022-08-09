@@ -22,7 +22,8 @@ export type FeatureFlagName =
   | "CUSTOM_HOST_UI"
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
   | "PETITION_ACCESS_RECIPIENT_URL_FIELD"
-  | "AUTO_ANONYMIZE";
+  | "AUTO_ANONYMIZE"
+  | "TEMPLATE_REPLIES_RECIPIENT_URL";
 
 export const FeatureFlagNameValues = [
   "PETITION_SIGNATURE",
@@ -40,6 +41,7 @@ export const FeatureFlagNameValues = [
   "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI",
   "PETITION_ACCESS_RECIPIENT_URL_FIELD",
   "AUTO_ANONYMIZE",
+  "TEMPLATE_REPLIES_RECIPIENT_URL",
 ] as FeatureFlagName[];
 
 export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";

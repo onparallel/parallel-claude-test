@@ -175,6 +175,11 @@
     "context": "See answers in ND"
   },
   {
+    "term": "export-template-report-column-header.recipient-url",
+    "definition": "Recipient URL",
+    "context": "Recipient URL"
+  },
+  {
     "term": "export-template-report.column-header.petition-name",
     "definition": "Parallel name",
     "context": "Parallel name"

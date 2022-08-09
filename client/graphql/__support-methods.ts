@@ -1103,6 +1103,12 @@ export const schemaTypes: IntrospectionType[] = [
         isDeprecated: false,
         deprecationReason: null,
       },
+      {
+        name: "TEMPLATE_REPLIES_RECIPIENT_URL",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
     ],
     possibleTypes: null,
   },

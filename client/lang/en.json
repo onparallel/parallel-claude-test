@@ -1335,6 +1335,16 @@
     "context": "Feature Disable forwarding protection"
   },
   {
+    "term": "component.feature-flag-descriptions.template-replies-recipient-url-description",
+    "definition": "Adds a column on the template replies Excel report with recipient URL",
+    "context": "Adds a column on the template replies Excel report with recipient URL"
+  },
+  {
+    "term": "component.feature-flag-descriptions.template-replies-recipient-url-name",
+    "definition": "Template Replies Excel Recipient URL",
+    "context": "Template Replies Excel Recipient URL"
+  },
+  {
     "term": "component.field-comment.message-not-available",
     "definition": "Message not available",
     "context": "Message not available"
@@ -2460,6 +2470,11 @@
     "context": "The recipient has not replied to any of the fields."
   },
   {
+    "term": "component.petition-progress-bar.approved-with-internal",
+    "definition": "{count} reviewed {count, plural, =1{field} other {fields}}{internalCount, plural,=0{} other { ({internalCount} internal)}}.",
+    "context": "{count} reviewed {count, plural, =1{field} other {fields}}{internalCount, plural,=0{} other { ({internalCount} internal)}}."
+  },
+  {
     "term": "component.petition-progress-bar.completed",
     "definition": "This parallel is completed.",
     "context": "This parallel is completed."
@@ -2488,11 +2503,6 @@
     "term": "component.petition-progress-bar.replied-with-internal",
     "definition": "{count} replied {count, plural, =1{field} other {fields}}{internalCount, plural,=0{} other { ({internalCount} internal)}}.",
     "context": "{count} replied {count, plural, =1{field} other {fields}}{internalCount, plural,=0{} other { ({internalCount} internal)}}."
-  },
-  {
-    "term": "component.petition-progress-bar.approved-with-internal",
-    "definition": "{count} reviewed {count, plural, =1{field} other {fields}}{internalCount, plural,=0{} other { ({internalCount} internal)}}.",
-    "context": "{count} reviewed {count, plural, =1{field} other {fields}}{internalCount, plural,=0{} other { ({internalCount} internal)}}."
   },
   {
     "term": "component.petition-reminder-settings.next-reminder",

@@ -187,6 +187,17 @@ export function useFeatureFlags() {
             "Enables the setting for the request to skip recipient verification (forward security).",
         }),
       },
+      {
+        name: "TEMPLATE_REPLIES_RECIPIENT_URL",
+        title: intl.formatMessage({
+          id: "component.feature-flag-descriptions.template-replies-recipient-url-name",
+          defaultMessage: "Template Replies Excel Recipient URL",
+        }),
+        description: intl.formatMessage({
+          id: "component.feature-flag-descriptions.template-replies-recipient-url-description",
+          defaultMessage: "Adds a column on the template replies Excel report with recipient URL",
+        }),
+      },
     ],
     [intl.locale]
   );

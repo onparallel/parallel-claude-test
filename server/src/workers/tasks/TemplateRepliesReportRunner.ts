@@ -28,11 +28,13 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
 
     const intl = await this.ctx.i18n.getIntl(template!.locale);
 
-    const [petitionsAccesses, petitionsMessages, petitionsFields] = await Promise.all([
-      this.ctx.readonlyPetitions.loadAccessesForPetition(petitions.map((p) => p.id)),
-      this.ctx.readonlyPetitions.loadMessagesByPetitionId(petitions.map((p) => p.id)),
-      this.ctx.readonlyPetitions.loadFieldsForPetition(petitions.map((p) => p.id)),
-    ]);
+    const [includeRecipientUrl, petitionsAccesses, petitionsMessages, petitionsFields] =
+      await Promise.all([
+        this.ctx.featureFlags.orgHasFeatureFlag(template!.org_id, "TEMPLATE_REPLIES_RECIPIENT_URL"),
+        this.ctx.readonlyPetitions.loadAccessesForPetition(petitions.map((p) => p.id)),
+        this.ctx.readonlyPetitions.loadMessagesByPetitionId(petitions.map((p) => p.id)),
+        this.ctx.readonlyPetitions.loadFieldsForPetition(petitions.map((p) => p.id)),
+      ]);
 
     const petitionsAccessesContacts = await Promise.all(
       petitionsAccesses.map((accesses) =>
@@ -99,6 +101,21 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
             )
           : null,
       };
+
+      if (includeRecipientUrl) {
+        const accesses = petitionsAccesses[petitionIndex];
+        const recipientUrls = contacts.map((c) => {
+          const keycode = accesses.find((a) => a.contact_id === c.id)!.keycode;
+          return `${this.ctx.config.misc.parallelUrl}/${template!.locale}/petition/${keycode}`;
+        });
+
+        row[
+          intl.formatMessage({
+            id: "export-template-report-column-header.recipient-url",
+            defaultMessage: "Recipient URL",
+          })
+        ] = recipientUrls.join(" ") || "";
+      }
 
       const fieldIndexes = getFieldIndexes(petitionFields);
       zip(petitionFields, fieldIndexes).forEach(([field, fieldIndex], i) => {

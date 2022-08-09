@@ -216,7 +216,8 @@ export type FeatureFlag =
   | "PUBLIC_PETITION_LINK_PREFILL_SECRET_UI"
   | "REMOVE_PARALLEL_BRANDING"
   | "REMOVE_WHY_WE_USE_PARALLEL"
-  | "SKIP_FORWARD_SECURITY";
+  | "SKIP_FORWARD_SECURITY"
+  | "TEMPLATE_REPLIES_RECIPIENT_URL";
 
 /** A feature flag name with his value */
 export type FeatureFlagNameValue = {

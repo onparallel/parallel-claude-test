@@ -1335,6 +1335,16 @@
     "context": "Feature Disable forwarding protection"
   },
   {
+    "term": "component.feature-flag-descriptions.template-replies-recipient-url-description",
+    "definition": "Añade una columna en el Excel de respuestas de la plantilla con la URL de destinatario",
+    "context": "Adds a column on the template replies Excel report with recipient URL"
+  },
+  {
+    "term": "component.feature-flag-descriptions.template-replies-recipient-url-name",
+    "definition": "URL de destinatario en Excel de respuestas",
+    "context": "Template Replies Excel Recipient URL"
+  },
+  {
     "term": "component.field-comment.message-not-available",
     "definition": "Mensaje no disponible",
     "context": "Message not available"
@@ -2460,6 +2470,11 @@
     "context": "The recipient has not replied to any of the fields."
   },
   {
+    "term": "component.petition-progress-bar.approved-with-internal",
+    "definition": "{count} {count, plural, =1{campo aprobado} other {campos aprobados}}{internalCount, plural,=0{}  =1{ ({internalCount} interno)} other { ({internalCount} internos)}}.",
+    "context": "{count} reviewed {count, plural, =1{field} other {fields}}{internalCount, plural,=0{} other { ({internalCount} internal)}}."
+  },
+  {
     "term": "component.petition-progress-bar.completed",
     "definition": "Este parallel se ha completado.",
     "context": "This parallel is completed."
@@ -2488,11 +2503,6 @@
     "term": "component.petition-progress-bar.replied-with-internal",
     "definition": "{count} {count, plural, =1{campo rellenado} other {campos rellenados}}{internalCount, plural,=0{}  =1{ ({internalCount} interno)} other { ({internalCount} internos)}}.",
     "context": "{count} replied {count, plural, =1{field} other {fields}}{internalCount, plural,=0{} other { ({internalCount} internal)}}."
-  },
-  {
-    "term": "component.petition-progress-bar.approved-with-internal",
-    "definition": "{count} {count, plural, =1{campo aprobado} other {campos aprobados}}{internalCount, plural,=0{}  =1{ ({internalCount} interno)} other { ({internalCount} internos)}}.",
-    "context": "{count} reviewed {count, plural, =1{field} other {fields}}{internalCount, plural,=0{} other { ({internalCount} internal)}}."
   },
   {
     "term": "component.petition-reminder-settings.next-reminder",
