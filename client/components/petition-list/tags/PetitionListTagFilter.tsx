@@ -130,7 +130,7 @@ export function PetitionListTagFilter({
   );
   useEffect(() => {
     wrapperRef.current?.querySelectorAll("input").forEach((input) => {
-      input.setAttribute("tabindex", "-1");
+      input.setAttribute("tabIndex", "-1");
     });
   }, []);
   const id = useId(undefined, "tag-filter");

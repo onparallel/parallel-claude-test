@@ -31,7 +31,7 @@ export const HelpPopover = chakraForwardRef<"svg", HelpPopoverProps>(function (
           outline: "none",
           borderRadius: "full",
         }}
-        tabindex="0"
+        tabIndex="0"
         {...(props as any)}
       />
     </SmallPopover>
