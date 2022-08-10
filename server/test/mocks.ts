@@ -113,7 +113,7 @@ export class MockAwsService implements IAws {
   async resendVerificationCode() {}
   enqueueMessages() {}
   async enqueueEvents() {}
-  async createCognitoUser() {
+  async getOrCreateCognitoUser() {
     return "";
   }
   public get fileUploads() {

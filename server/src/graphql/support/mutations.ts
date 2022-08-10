@@ -1,4 +1,3 @@
-import { Knex } from "knex";
 import { arg, booleanArg, idArg, intArg, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { isDefined, uniq } from "remeda";
 import { ApiContext } from "../../context";
@@ -31,12 +30,11 @@ async function supportCreateUser(
     role: UserOrganizationRole;
     locale: string;
   },
-  ctx: ApiContext,
-  t?: Knex.Transaction
+  ctx: ApiContext
 ) {
   const email = args.email.trim().toLowerCase();
   const userData = (await ctx.users.loadUserData(ctx.user!.user_data_id))!;
-  const cognitoId = await ctx.aws.createCognitoUser(
+  const cognitoId = await ctx.aws.getOrCreateCognitoUser(
     email,
     args.password,
     args.firstName,
@@ -53,14 +51,13 @@ async function supportCreateUser(
       organization_role: args.role,
     },
     {
-      cognito_id: cognitoId!,
-      email,
+      cognito_id: cognitoId,
+      email: args.email.trim().toLowerCase(),
       first_name: args.firstName,
       last_name: args.lastName,
       details: { source: "parallel", preferredLocale: args.locale ?? "en" },
     },
-    `User:${ctx.user!.id}`,
-    t
+    `User:${ctx.user!.id}`
   );
 }
 
@@ -153,35 +150,31 @@ export const createOrganization = mutationField("createOrganization", {
   ),
   resolve: async (_, args, ctx) => {
     try {
-      return await ctx.petitions.withTransaction(async (t) => {
-        const org = await ctx.organizations.createOrganization(
-          {
-            name: args.name.trim(),
-            status: args.status,
-          },
-          `User:${ctx.user!.id}`,
-          t
-        );
-        await supportCreateUser(
-          {
-            orgId: org.id,
-            orgName: org.name,
-            email: args.email,
-            firstName: args.firstName,
-            lastName: args.lastName,
-            password: args.password,
-            role: "OWNER",
-            locale: args.locale ?? "es",
-          },
-          ctx,
-          t
-        );
-        await ctx.tiers.updateOrganizationTier(org, "FREE", `User:${ctx.user!.id}`, t);
-        return {
-          result: RESULT.SUCCESS,
-          message: `Organization:${org.id} created successfully with owner ${args.email}.`,
-        };
-      });
+      const org = await ctx.organizations.createOrganization(
+        {
+          name: args.name.trim(),
+          status: args.status,
+        },
+        `User:${ctx.user!.id}`
+      );
+      await supportCreateUser(
+        {
+          orgId: org.id,
+          orgName: org.name,
+          email: args.email,
+          firstName: args.firstName,
+          lastName: args.lastName,
+          password: args.password,
+          role: "OWNER",
+          locale: args.locale ?? "es",
+        },
+        ctx
+      );
+      await ctx.tiers.updateOrganizationTier(org, "FREE", `User:${ctx.user!.id}`);
+      return {
+        result: RESULT.SUCCESS,
+        message: `Organization:${org.id} created successfully with owner ${args.email}.`,
+      };
     } catch (e: any) {
       return { result: RESULT.FAILURE, message: e.message };
     }

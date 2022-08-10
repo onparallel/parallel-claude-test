@@ -25,7 +25,7 @@ export interface IAws {
     t?: Knex.Transaction
   ): void;
   enqueueEvents(events: MaybeArray<PetitionEvent | SystemEvent>, t?: Knex.Transaction): void;
-  createCognitoUser(
+  getOrCreateCognitoUser(
     email: string,
     password: string | null,
     firstName: string,
@@ -36,7 +36,7 @@ export interface IAws {
       locale: string;
     },
     sendEmail?: boolean
-  ): Promise<string | undefined>;
+  ): Promise<string>;
   resetUserPassword(
     email: string,
     clientMetadata: {
@@ -180,9 +180,9 @@ export class Aws implements IAws {
   }
 
   /**
-   * Creates a user in Cognito and returns the cognito Id
+   * Creates a user in Cognito (or gets it if already exists) and returns the cognito Id
    */
-  async createCognitoUser(
+  async getOrCreateCognitoUser(
     email: string,
     password: string | null,
     firstName: string,
@@ -194,22 +194,31 @@ export class Aws implements IAws {
     },
     sendEmail?: boolean
   ) {
-    const res = await this.cognitoIdP
-      .adminCreateUser({
-        UserPoolId: this.config.cognito.defaultPoolId,
-        Username: email,
-        TemporaryPassword: password ?? undefined,
-        MessageAction: sendEmail ? undefined : "SUPPRESS",
-        UserAttributes: [
-          { Name: "email", Value: email },
-          { Name: "email_verified", Value: "True" },
-          { Name: "given_name", Value: firstName },
-          { Name: "family_name", Value: lastName },
-        ],
-        ClientMetadata: clientMetadata,
-      })
-      .promise();
-    return res.User!.Username;
+    try {
+      const user = await this.getUser(email);
+      return user.Username!;
+    } catch (error: any) {
+      if (error.code === "UserNotFoundException") {
+        const res = await this.cognitoIdP
+          .adminCreateUser({
+            UserPoolId: this.config.cognito.defaultPoolId,
+            Username: email,
+            TemporaryPassword: password ?? undefined,
+            MessageAction: sendEmail ? undefined : "SUPPRESS",
+            UserAttributes: [
+              { Name: "email", Value: email },
+              { Name: "email_verified", Value: "True" },
+              { Name: "given_name", Value: firstName },
+              { Name: "family_name", Value: lastName },
+            ],
+            ClientMetadata: clientMetadata,
+          })
+          .promise();
+        return res.User!.Username!;
+      } else {
+        throw error;
+      }
+    }
   }
 
   /** resends the email with temporary password to an already existing user */

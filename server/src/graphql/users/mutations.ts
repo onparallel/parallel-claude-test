@@ -141,7 +141,7 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
     const firstName = args.firstName.trim();
     const lastName = args.lastName.trim();
 
-    const cognitoId = await ctx.aws.createCognitoUser(
+    const cognitoId = await ctx.aws.getOrCreateCognitoUser(
       email,
       null,
       firstName,
