@@ -26,6 +26,7 @@ import { integer, sorting, string, useQueryState, values } from "@parallel/utils
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { useGenericErrorToast } from "@parallel/utils/useGenericErrorToast";
 import { useLoginAs } from "@parallel/utils/useLoginAs";
 import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
 import { useSelection } from "@parallel/utils/useSelectionState";
@@ -78,7 +79,7 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
 
   const intl = useIntl();
   const toast = useToast();
-
+  const genericError = useGenericErrorToast();
   const [createOrganizationUser] = useMutation(
     AdminOrganizationsMembers_createOrganizationUserDocument
   );
@@ -116,7 +117,11 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
           }
         ),
       });
-    } catch {}
+    } catch (e: any) {
+      if (e.message !== "CANCEL") {
+        genericError();
+      }
+    }
   }
 
   const columns = useOrganizationMembersTableColumns();

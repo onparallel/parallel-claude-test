@@ -136,6 +136,7 @@ function OrganizationUsers() {
     [debouncedOnSearchChange]
   );
 
+  const genericError = useGenericErrorToast();
   const [createOrganizationUser] = useMutation(OrganizationUsers_createOrganizationUserDocument);
   const showCreateOrUpdateUserDialog = useCreateOrUpdateUserDialog();
   const handleCreateUser = async () => {
@@ -169,7 +170,11 @@ function OrganizationUsers() {
         duration: 5000,
         isClosable: true,
       });
-    } catch {}
+    } catch (e: any) {
+      if (e.message !== "CANCEL") {
+        genericError();
+      }
+    }
   };
 
   useEffect(() => {
