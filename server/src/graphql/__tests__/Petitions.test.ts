@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { faker } from "@faker-js/faker";
-import knex, { Knex } from "knex";
+import { Knex } from "knex";
 import { sortBy } from "remeda";
 import { PetitionEvent } from "../../db/events";
 import { KNEX } from "../../db/knex";
@@ -217,7 +217,9 @@ describe("GraphQL/Petitions", () => {
             petitions(filters: $filters, limit: 10) {
               totalCount
               items {
-                id
+                ... on PetitionBase {
+                  id
+                }
               }
             }
           }
@@ -245,7 +247,9 @@ describe("GraphQL/Petitions", () => {
             petitions(filters: $filters, limit: 10) {
               totalCount
               items {
-                id
+                ... on PetitionBase {
+                  id
+                }
               }
             }
           }
@@ -271,7 +275,9 @@ describe("GraphQL/Petitions", () => {
             petitions(filters: $filters, limit: 10) {
               totalCount
               items {
-                id
+                ... on PetitionBase {
+                  id
+                }
               }
             }
           }
@@ -294,7 +300,9 @@ describe("GraphQL/Petitions", () => {
             petitions(filters: $filters, limit: 100, offset: 0) {
               totalCount
               items {
-                id
+                ... on PetitionBase {
+                  id
+                }
               }
             }
           }
@@ -321,7 +329,9 @@ describe("GraphQL/Petitions", () => {
             petitions(filters: $filters, limit: 10) {
               totalCount
               items {
-                id
+                ... on PetitionBase {
+                  id
+                }
               }
             }
           }
@@ -344,7 +354,9 @@ describe("GraphQL/Petitions", () => {
             petitions(limit: $limit, filters: { type: $type }) {
               totalCount
               items {
-                id
+                ... on PetitionBase {
+                  id
+                }
               }
             }
           }
@@ -383,7 +395,9 @@ describe("GraphQL/Petitions", () => {
               filters: { type: TEMPLATE }
             ) {
               items {
-                id
+                ... on PetitionBase {
+                  id
+                }
               }
             }
           }
@@ -398,18 +412,16 @@ describe("GraphQL/Petitions", () => {
       const templateId = items[index].id;
 
       // use this random template to create a petition
-      await testClient.mutate({
-        mutation: gql`
+      await testClient.execute(
+        gql`
           mutation ($petitionId: GID) {
             createPetition(type: PETITION, petitionId: $petitionId, locale: en) {
               id
             }
           }
         `,
-        variables: {
-          petitionId: templateId,
-        },
-      });
+        { petitionId: templateId }
+      );
 
       // templateId should be in first position for petitions query
       const { errors, data } = await testClient.query({
@@ -421,7 +433,9 @@ describe("GraphQL/Petitions", () => {
               filters: { type: TEMPLATE }
             ) {
               items {
-                id
+                ... on PetitionBase {
+                  id
+                }
               }
             }
           }
@@ -499,17 +513,19 @@ describe("GraphQL/Petitions", () => {
 
     it("orders public templates by use count", async () => {
       await mocks.knex.from("petition").update("from_template_id", null);
-      const { data } = await testClient.query({
-        query: gql`
+      const { data } = await testClient.execute(
+        gql`
           query {
             templates(limit: 100, isPublic: true) {
               items {
-                id
+                ... on PetitionBase {
+                  id
+                }
               }
             }
           }
-        `,
-      });
+        `
+      );
 
       expect(data).not.toBeNull();
       const { items } = data!.templates;
@@ -519,18 +535,16 @@ describe("GraphQL/Petitions", () => {
       const templateId = items[index].id;
 
       // use this random template to create a petition
-      await testClient.mutate({
-        mutation: gql`
+      await testClient.execute(
+        gql`
           mutation ($petitionId: GID) {
             createPetition(type: PETITION, petitionId: $petitionId, locale: en) {
               id
             }
           }
         `,
-        variables: {
-          petitionId: templateId,
-        },
-      });
+        { petitionId: templateId }
+      );
 
       // templateId should be in first position for templates query
       const { errors, data: data2 } = await testClient.query({
@@ -538,7 +552,9 @@ describe("GraphQL/Petitions", () => {
           query {
             templates(limit: 100, isPublic: true) {
               items {
-                id
+                ... on PetitionBase {
+                  id
+                }
               }
             }
           }

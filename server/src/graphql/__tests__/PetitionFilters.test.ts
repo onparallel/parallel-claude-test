@@ -60,7 +60,9 @@ describe("Petition Filters", () => {
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
-              id
+              ... on PetitionBase {
+                id
+              }
             }
           }
         }
@@ -96,7 +98,9 @@ describe("Petition Filters", () => {
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
-              id
+              ... on PetitionBase {
+                id
+              }
             }
           }
         }
@@ -127,7 +131,9 @@ describe("Petition Filters", () => {
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
-              id
+              ... on PetitionBase {
+                id
+              }
             }
           }
         }
@@ -162,7 +168,9 @@ describe("Petition Filters", () => {
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
-              id
+              ... on PetitionBase {
+                id
+              }
             }
           }
         }
@@ -196,7 +204,9 @@ describe("Petition Filters", () => {
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
-              id
+              ... on PetitionBase {
+                id
+              }
             }
           }
         }
@@ -230,7 +240,9 @@ describe("Petition Filters", () => {
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
-              id
+              ... on PetitionBase {
+                id
+              }
             }
           }
         }
@@ -268,7 +280,9 @@ describe("Petition Filters", () => {
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
-              id
+              ... on PetitionBase {
+                id
+              }
             }
           }
         }
@@ -299,7 +313,9 @@ describe("Petition Filters", () => {
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
-              id
+              ... on PetitionBase {
+                id
+              }
             }
           }
         }
@@ -334,7 +350,9 @@ describe("Petition Filters", () => {
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
-              id
+              ... on PetitionBase {
+                id
+              }
             }
           }
         }
@@ -372,7 +390,9 @@ describe("Petition Filters", () => {
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
-              id
+              ... on PetitionBase {
+                id
+              }
             }
           }
         }
@@ -407,7 +427,9 @@ describe("Petition Filters", () => {
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
-              id
+              ... on PetitionBase {
+                id
+              }
             }
           }
         }
@@ -445,7 +467,9 @@ describe("Petition Filters", () => {
         query ($filters: PetitionFilter) {
           petitions(limit: 10, filters: $filters) {
             items {
-              id
+              ... on PetitionBase {
+                id
+              }
             }
           }
         }
