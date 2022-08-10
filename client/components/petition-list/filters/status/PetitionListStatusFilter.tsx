@@ -135,7 +135,7 @@ export function PetitionListStatusFilter({
   }, []);
   useEffect(() => {
     wrapperRef.current?.querySelectorAll("input").forEach((input) => {
-      input.setAttribute("tabIndex", "-1");
+      input.setAttribute("tabindex", "-1");
     });
   }, []);
 
