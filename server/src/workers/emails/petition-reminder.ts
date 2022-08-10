@@ -66,7 +66,9 @@ export async function petitionReminder(
     const repliableFields = zip(
       fieldsWithReplies,
       evaluateFieldVisibility(fieldsWithReplies)
-    ).filter(([field, isVisible]) => isVisible && field.type !== "HEADING");
+    ).filter(
+      ([field, isVisible]) => isVisible && field.type !== "HEADING" && field.is_internal === false
+    );
 
     const missingFieldCount = countBy(repliableFields, ([field]) => field.replies.length === 0);
     const { emailFrom, ...layoutProps } = await getLayoutProps(granter.org_id, context);
