@@ -214,7 +214,7 @@ export class OrganizationRepository extends BaseRepository {
             q.where("status", status);
           }
           if (sortBy) {
-            q.orderBy(sortBy);
+            q.orderBy(sortBy.map(({ field, order }) => ({ column: field, order })));
           }
         })
         .orderBy("id")

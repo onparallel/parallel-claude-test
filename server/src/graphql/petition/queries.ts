@@ -146,17 +146,22 @@ export const publicTemplateCategoriesQuery = queryField((t) => {
 
 export const templatesQuery = queryField((t) => {
   t.paginationField("templates", {
-    type: "PetitionTemplate",
+    type: "PetitionBaseOrFolder",
     description: "The available templates",
     authorize: authenticate(),
     extendArgs: {
+      path: stringArg(),
       locale: arg({ type: "PetitionLocale" }),
       isPublic: nonNull(booleanArg()),
       isOwner: booleanArg(),
       category: stringArg(),
     },
     searchable: true,
-    resolve: async (_, { limit, offset, locale, search, isPublic, isOwner, category }, ctx) => {
+    resolve: async (
+      _,
+      { limit, offset, path, locale, search, isPublic, isOwner, category },
+      ctx
+    ) => {
       if (isPublic) {
         return await ctx.petitions.loadPublicTemplates({
           search,
@@ -173,6 +178,7 @@ export const templatesQuery = queryField((t) => {
           offset,
           sortBy: [{ field: "lastUsedAt", order: "desc" }],
           filters: {
+            path,
             type: "TEMPLATE",
             locale,
             sharedWith:

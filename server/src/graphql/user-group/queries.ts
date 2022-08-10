@@ -22,7 +22,7 @@ export const userGroupsQuery = queryField((t) => {
         search,
         sortBy: sortBy?.map((value) => {
           const [field, order] = parseSortBy(value);
-          return { column: columnMap[field], order };
+          return { field: columnMap[field], order };
         }),
       });
     },

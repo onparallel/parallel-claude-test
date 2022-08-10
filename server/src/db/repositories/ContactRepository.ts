@@ -169,7 +169,7 @@ export class ContactRepository extends BaseRepository {
             q.whereNotIn("id", excludeIds);
           }
           if (opts.sortBy?.length) {
-            q.orderBy(opts.sortBy);
+            q.orderBy(opts.sortBy.map(({ field, order }) => ({ column: field, order })));
           }
         })
         .orderBy("id")

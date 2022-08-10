@@ -211,7 +211,7 @@ export const Organization = objectType({
           includeInactive,
           sortBy: sortBy?.map((value) => {
             const [field, order] = parseSortBy(value);
-            return { column: columnMap[field], order };
+            return { field: columnMap[field], order };
           }),
         });
       },

@@ -5,7 +5,6 @@ import {
   BreadcrumbLink,
   Button,
   ButtonGroup,
-  Flex,
   HStack,
   RadioProps,
   Stack,
@@ -39,9 +38,10 @@ export function PetitionListHeader({
   const [search, setSearch] = useState(state.search ?? "");
   const debouncedOnSearchChange = useDebouncedCallback(
     (search) =>
-      onStateChange(({ searchIn, current }) => ({
+      onStateChange(({ searchIn, ...current }) => ({
         ...current,
         search,
+        searchIn: search ? searchIn : "EVERYWHERE",
         page: 1,
       })),
     300,

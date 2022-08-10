@@ -123,7 +123,7 @@ export const PetitionBaseOrFolder = unionType({
     }
   },
   sourceType: /* ts */ `
-    | ({is_folder: false} & NexusGenRootTypes["Petition"])
+    | ({is_folder?: false} & NexusGenRootTypes["Petition"])
     | NexusGenRootTypes["PetitionFolder"]
   `,
 });

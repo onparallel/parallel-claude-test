@@ -3619,18 +3619,6 @@ type PetitionTemplate implements PetitionBase {
   updatedAt: DateTime!
 }
 
-type PetitionTemplatePagination {
-  """
-  The requested slice of items.
-  """
-  items: [PetitionTemplate!]!
-
-  """
-  The total count of items in the list.
-  """
-  totalCount: Int!
-}
-
 """
 The permission for a petition and user group
 """
@@ -4389,12 +4377,13 @@ type Query {
     Number of elements to skip from the list.
     """
     offset: Int
+    path: String
 
     """
     Optional text to search in the collection.
     """
     search: String
-  ): PetitionTemplatePagination!
+  ): PetitionBaseOrFolderPagination!
   userGroup(id: GID!): UserGroup
 
   """

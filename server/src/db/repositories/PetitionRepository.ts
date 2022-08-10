@@ -644,10 +644,7 @@ export class PetitionRepository extends BaseRepository {
                 is_folder: true as const,
                 path: `${filters!.path}${i._name}/`,
               }
-            : {
-                is_folder: false as const,
-                ...omit(i, ["_name", "petition_count", "is_folder", "min_permission"]),
-              }
+            : omit(i, ["_name", "petition_count", "is_folder", "min_permission"])
         ),
       };
     }

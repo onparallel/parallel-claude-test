@@ -570,11 +570,6 @@ export interface NexusGenObjects {
     email: string;
   };
   PetitionTemplate: db.Petition;
-  PetitionTemplatePagination: {
-    // root type
-    items: NexusGenRootTypes["PetitionTemplate"][]; // [PetitionTemplate!]!
-    totalCount: number; // Int!
-  };
   PetitionUserGroupPermission: db.PetitionPermission;
   PetitionUserPermission: db.PetitionPermission;
   PublicAccessVerification: {
@@ -732,7 +727,7 @@ export interface NexusGenInterfaces {
 
 export interface NexusGenUnions {
   PetitionBaseOrFolder:
-    | ({ is_folder: false } & NexusGenRootTypes["Petition"])
+    | ({ is_folder?: false } & NexusGenRootTypes["Petition"])
     | NexusGenRootTypes["PetitionFolder"];
   PetitionFieldCommentMention:
     | { __type: "User"; user_id: number }
@@ -1666,11 +1661,6 @@ export interface NexusGenFieldTypes {
     tone: NexusGenEnums["Tone"]; // Tone!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
-  PetitionTemplatePagination: {
-    // field return type
-    items: NexusGenRootTypes["PetitionTemplate"][]; // [PetitionTemplate!]!
-    totalCount: number; // Int!
-  };
   PetitionUserGroupPermission: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -1876,7 +1866,7 @@ export interface NexusGenFieldTypes {
     subscriptions: NexusGenRootTypes["PetitionEventSubscription"][]; // [PetitionEventSubscription!]!
     tags: NexusGenRootTypes["TagPagination"]; // TagPagination!
     task: NexusGenRootTypes["Task"]; // Task!
-    templates: NexusGenRootTypes["PetitionTemplatePagination"]; // PetitionTemplatePagination!
+    templates: NexusGenRootTypes["PetitionBaseOrFolderPagination"]; // PetitionBaseOrFolderPagination!
     userGroup: NexusGenRootTypes["UserGroup"] | null; // UserGroup
     userGroups: NexusGenRootTypes["UserGroupPagination"]; // UserGroupPagination!
   };
@@ -3243,11 +3233,6 @@ export interface NexusGenFieldTypeNames {
     tone: "Tone";
     updatedAt: "DateTime";
   };
-  PetitionTemplatePagination: {
-    // field return type name
-    items: "PetitionTemplate";
-    totalCount: "Int";
-  };
   PetitionUserGroupPermission: {
     // field return type name
     createdAt: "DateTime";
@@ -3453,7 +3438,7 @@ export interface NexusGenFieldTypeNames {
     subscriptions: "PetitionEventSubscription";
     tags: "TagPagination";
     task: "Task";
-    templates: "PetitionTemplatePagination";
+    templates: "PetitionBaseOrFolderPagination";
     userGroup: "UserGroup";
     userGroups: "UserGroupPagination";
   };
@@ -5015,6 +5000,7 @@ export interface NexusGenArgTypes {
       limit?: number | null; // Int
       locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
       offset?: number | null; // Int
+      path?: string | null; // String
       search?: string | null; // String
     };
     userGroup: {

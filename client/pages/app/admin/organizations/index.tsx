@@ -126,7 +126,9 @@ function AdminOrganizations() {
           totalCount={organizations?.totalCount}
           sort={state.sort}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
-          onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
+          onPageSizeChange={(items) =>
+            setQueryState((s) => ({ ...s, items: items as any, page: 1 }))
+          }
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort, page: 1 }))}
           header={
             <Stack direction="row" padding={2}>

@@ -20,6 +20,7 @@ import {
   CreateEventSubscriptionDialog_petitionsDocument,
   PetitionEventType,
 } from "@parallel/graphql/__types";
+import { assertTypenameArray } from "@parallel/utils/apollo/typename";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { genericRsComponent, useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { Maybe, MaybePromise } from "@parallel/utils/types";
@@ -83,6 +84,7 @@ export function CreateEventSubscriptionDialog(
         sortBy: "lastUsedAt_DESC",
       },
     });
+    assertTypenameArray(result.data.petitions.items, "PetitionTemplate");
     return result.data.petitions.items;
   }, []);
 
