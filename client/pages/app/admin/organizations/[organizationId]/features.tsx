@@ -78,7 +78,7 @@ function AdminOrganizationsFeatures({ organizationId }: AdminOrganizationsFeatur
   const featureFlags = useFeatureFlags();
 
   return (
-    <AdminOrganizationsLayout tabKey="features" me={me} realMe={realMe}>
+    <AdminOrganizationsLayout tabKey="features" me={me} organization={organization} realMe={realMe}>
       <Box padding={4}>
         <Card maxWidth="container.sm" as="form" onSubmit={handleSubmit(handleSubmitFeatureFlags)}>
           <CardHeader>
@@ -156,7 +156,9 @@ AdminOrganizationsFeatures.fragments = {
           name
           value
         }
+        ...AdminOrganizationsLayout_Organization
       }
+      ${AdminOrganizationsLayout.fragments.Organization}
     `;
   },
 };

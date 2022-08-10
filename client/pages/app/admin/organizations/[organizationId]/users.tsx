@@ -146,7 +146,7 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
   };
 
   return (
-    <AdminOrganizationsLayout tabKey="users" me={me} realMe={realMe}>
+    <AdminOrganizationsLayout tabKey="users" me={me} organization={organization} realMe={realMe}>
       <Flex flexDirection="column" flex="1" minHeight={0} padding={4} paddingBottom={16}>
         <TablePage
           flex="0 1 auto"
@@ -389,7 +389,9 @@ AdminOrganizationsMembers.fragments = {
       id
       name
       hasSsoProvider
+      ...AdminOrganizationsLayout_Organization
     }
+    ${AdminOrganizationsLayout.fragments.Organization}
   `,
 };
 

@@ -1,7 +1,10 @@
 import { gql } from "@apollo/client";
 import { Heading, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { AdminOrganizationsLayout_QueryFragment } from "@parallel/graphql/__types";
+import {
+  AdminOrganizationsLayout_QueryFragment,
+  AdminOrganizationsLayout_OrganizationFragment,
+} from "@parallel/graphql/__types";
 import { useAdminSections } from "@parallel/utils/useAdminSections";
 import { useRouter } from "next/router";
 import { ReactNode, useEffect, useMemo, useRef } from "react";
@@ -12,6 +15,7 @@ type AdminOrganizationsSection = "users" | "features";
 
 interface AdminOrganizationsLayoutProps extends AdminOrganizationsLayout_QueryFragment {
   tabKey: AdminOrganizationsSection;
+  organization: AdminOrganizationsLayout_OrganizationFragment;
   children: ReactNode;
 }
 
@@ -20,10 +24,10 @@ export function AdminOrganizationsLayout({
   me,
   realMe,
   children,
+  organization,
 }: AdminOrganizationsLayoutProps) {
   const router = useRouter();
   const adminSections = useAdminSections();
-  const organization = me.organization;
   const tabs = useAdminOrganizationsTabs();
   const currentTab = tabs.find((t) => t.key === tabKey)!;
   const currentTabRef = useRef<HTMLAnchorElement>(null);
@@ -110,15 +114,27 @@ function useAdminOrganizationsTabs() {
 }
 
 AdminOrganizationsLayout.fragments = {
-  Query: gql`
-    fragment AdminOrganizationsLayout_Query on Query {
-      ...SettingsLayout_Query
-      me {
-        organization {
-          name
+  get Organization() {
+    return gql`
+      fragment AdminOrganizationsLayout_Organization on Organization {
+        id
+        name
+      }
+    `;
+  },
+  get Query() {
+    return gql`
+      fragment AdminOrganizationsLayout_Query on Query {
+        ...SettingsLayout_Query
+        me {
+          organization {
+            name
+            ...AdminOrganizationsLayout_Organization
+          }
         }
       }
-    }
-    ${SettingsLayout.fragments.Query}
-  `,
+      ${SettingsLayout.fragments.Query}
+      ${AdminOrganizationsLayout.fragments.Organization}
+    `;
+  },
 };

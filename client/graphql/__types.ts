@@ -3960,6 +3960,12 @@ export interface VerificationCodeRequest {
   token: Scalars["ID"];
 }
 
+export type AdminOrganizationsLayout_OrganizationFragment = {
+  __typename?: "Organization";
+  id: string;
+  name: string;
+};
+
 export type AdminOrganizationsLayout_QueryFragment = {
   me: {
     __typename?: "User";
@@ -11771,6 +11777,7 @@ export type Admin_userQuery = {
 export type AdminOrganizationsFeatures_OrganizationFragment = {
   __typename?: "Organization";
   id: string;
+  name: string;
   features: Array<{ __typename?: "FeatureFlagNameValue"; name: FeatureFlag; value: boolean }>;
 };
 
@@ -11782,6 +11789,7 @@ export type AdminOrganizationsFeatures_queryQuery = {
   organization?: {
     __typename?: "Organization";
     id: string;
+    name: string;
     features: Array<{ __typename?: "FeatureFlagNameValue"; name: FeatureFlag; value: boolean }>;
   } | null;
   me: {
@@ -11826,6 +11834,7 @@ export type AdminOrganizationsFeatures_updateFeatureFlagsMutation = {
   updateFeatureFlags: {
     __typename?: "Organization";
     id: string;
+    name: string;
     features: Array<{ __typename?: "FeatureFlagNameValue"; name: FeatureFlag; value: boolean }>;
   };
 };
@@ -22717,16 +22726,24 @@ export const SettingsLayout_QueryFragmentDoc = gql`
   }
   ${AppLayout_QueryFragmentDoc}
 ` as unknown as DocumentNode<SettingsLayout_QueryFragment, unknown>;
+export const AdminOrganizationsLayout_OrganizationFragmentDoc = gql`
+  fragment AdminOrganizationsLayout_Organization on Organization {
+    id
+    name
+  }
+` as unknown as DocumentNode<AdminOrganizationsLayout_OrganizationFragment, unknown>;
 export const AdminOrganizationsLayout_QueryFragmentDoc = gql`
   fragment AdminOrganizationsLayout_Query on Query {
     ...SettingsLayout_Query
     me {
       organization {
         name
+        ...AdminOrganizationsLayout_Organization
       }
     }
   }
   ${SettingsLayout_QueryFragmentDoc}
+  ${AdminOrganizationsLayout_OrganizationFragmentDoc}
 ` as unknown as DocumentNode<AdminOrganizationsLayout_QueryFragment, unknown>;
 export const AlreadyLoggedIn_UserFragmentDoc = gql`
   fragment AlreadyLoggedIn_User on User {
@@ -23600,7 +23617,9 @@ export const AdminOrganizationsFeatures_OrganizationFragmentDoc = gql`
       name
       value
     }
+    ...AdminOrganizationsLayout_Organization
   }
+  ${AdminOrganizationsLayout_OrganizationFragmentDoc}
 ` as unknown as DocumentNode<AdminOrganizationsFeatures_OrganizationFragment, unknown>;
 export const AdminOrganizationsMembers_OrganizationUserFragmentDoc = gql`
   fragment AdminOrganizationsMembers_OrganizationUser on User {
@@ -23618,7 +23637,9 @@ export const AdminOrganizationsMembers_OrganizationFragmentDoc = gql`
     id
     name
     hasSsoProvider
+    ...AdminOrganizationsLayout_Organization
   }
+  ${AdminOrganizationsLayout_OrganizationFragmentDoc}
 ` as unknown as DocumentNode<AdminOrganizationsMembers_OrganizationFragment, unknown>;
 export const AdminOrganizations_OrganizationFragmentDoc = gql`
   fragment AdminOrganizations_Organization on Organization {
