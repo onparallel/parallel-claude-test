@@ -396,20 +396,19 @@ export class PetitionRepository extends BaseRepository {
             )
             .whereRaw(
               /* sql */ ` 
-            (
-              p.name ilike :search escape '\\'
-              or (p.path != '/' and exists (
-                select from unnest(regexp_split_to_array(trim(both '/' from p.path), '/')) part where part ilike :search escape '\\'
-              ))
-              or (
-                c.deleted_at is null and (
-                  concat(c.first_name, ' ', c.last_name) ilike :search escape '\\'
-                  or c.email ilike :search escape '\\'
+              (
+                p.name ilike :search escape '\\'
+                or (p.path != '/' and exists (
+                  select from unnest(regexp_split_to_array(trim(both '/' from p.path), '/')) part where part ilike :search escape '\\'
+                ))
+                or (
+                  c.deleted_at is null and (
+                    concat(c.first_name, ' ', c.last_name) ilike :search escape '\\'
+                    or c.email ilike :search escape '\\'
+                  )
                 )
               )
-            )
-
-          `,
+            `,
               { search: `%${escapeLike(search, "\\")}%` }
             );
         } else {

@@ -2,7 +2,7 @@ import { TableSorting, TableSortingDirection } from "@parallel/components/common
 import type Router from "next/router";
 import { NextRouter, useRouter } from "next/router";
 import { MouseEvent, useCallback, useMemo } from "react";
-import { equals, pick } from "remeda";
+import { equals, isDefined, pick } from "remeda";
 import { fromBase64, toBase64 } from "./base64";
 import { useHandleNavigation } from "./navigation";
 import { pathParams, resolveUrl } from "./next";
@@ -53,6 +53,24 @@ export class QueryItem<T> {
       return `${value}`;
     }
   }
+
+  list() {
+    return new QueryItem<NonNullable<T>[] | null>(
+      (value) => {
+        if (value) {
+          const parsed = (value as string).split(",").map((v) => this.parseValue(v));
+          return parsed.includes(null) ? null : (parsed as NonNullable<T>[]);
+        } else {
+          return null;
+        }
+      },
+      (value) =>
+        value
+          .filter(isDefined)
+          .map((v) => this.serialize(v))
+          .join(",")
+    );
+  }
 }
 
 export function integer({ max, min }: { max?: number; min?: number } = {}) {
@@ -78,29 +96,11 @@ export function boolean() {
   });
 }
 
-export function values<T>(values: T[]): QueryItem<T | null>;
-export function values<T extends string>(values: T[]): QueryItem<T | null>;
-export function values(values: any[]): QueryItem<any> {
+export function values<T extends string | number>(values: readonly T[]): QueryItem<T | null> {
   return new QueryItem<any>((value) => {
     // eslint-disable-next-line eqeqeq
-    return values.find((v) => v == value) ?? null;
+    return values.find((v) => v == (value as string)) ?? null;
   });
-}
-
-export function list<T>(values: T[]): QueryItem<T[] | null>;
-export function list<T extends string>(values: T[]): QueryItem<T[] | null>;
-export function list(values: any[]): QueryItem<any> {
-  return new QueryItem<any>(
-    (value) => {
-      if (value) {
-        const parsed = (value as string).split(",").map((v) => (values.includes(v) ? v : null));
-        return parsed.includes(null) ? null : parsed;
-      } else {
-        return null;
-      }
-    },
-    (values) => values.join(",")
-  );
 }
 
 export function sorting<T extends string>(fields: readonly T[]) {
@@ -146,6 +146,7 @@ export function object<T>({
     }
   );
 }
+
 export interface ParseQueryOptions {
   prefix?: string;
 }
@@ -174,7 +175,7 @@ export type QueryStateFrom<T extends Record<string, QueryItem<any>>> = T extends
   : never;
 
 type NextQueryState<T> = T | ((prevState: T) => T);
-type SetQueryState<T> = (state: NextQueryState<T>, options?: SetQueryStateOptions) => void;
+export type SetQueryState<T> = (state: NextQueryState<T>, options?: SetQueryStateOptions) => void;
 
 export interface SetQueryStateOptions {
   type?: "replace" | "push";

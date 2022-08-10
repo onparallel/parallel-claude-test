@@ -37,7 +37,6 @@ import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import {
   integer,
-  list,
   object,
   QueryItem,
   QueryStateFrom,
@@ -61,9 +60,10 @@ const QUERY_STATE = {
     .orDefault("/"),
   page: integer({ min: 1 }).orDefault(1),
   items: values([10, 25, 50]).orDefault(10),
-  status: list<PetitionStatus>(["DRAFT", "PENDING", "COMPLETED", "CLOSED"]),
+  status: values<PetitionStatus>(["DRAFT", "PENDING", "COMPLETED", "CLOSED"]).list(),
   type: values<PetitionBaseType>(["PETITION", "TEMPLATE"]).orDefault("PETITION"),
   search: string(),
+  searchIn: values(["EVERYWHERE", "CURRENT_FOLDER"] as const).orDefault("EVERYWHERE"),
   tags: new QueryItem<string[] | null>(
     (value) => (typeof value === "string" ? (value === "NO_TAGS" ? [] : value.split(",")) : null),
     (value) => (value.length === 0 ? "NO_TAGS" : value.join(","))
@@ -101,7 +101,7 @@ function Petitions() {
         limit: state.items,
         search: state.search,
         filters: {
-          path: state.path,
+          path: state.search && state.searchIn === "EVERYWHERE" ? null : state.path,
           status: state.status,
           type: state.type,
           tagIds: state.tags,
@@ -120,14 +120,6 @@ function Petitions() {
     petitions?.items,
     rowKeyProp
   );
-
-  function handleSearchChange(value: string | null) {
-    setQueryState((current) => ({
-      ...current,
-      search: value,
-      page: 1,
-    }));
-  }
 
   function handleTypeChange(type: PetitionBaseType) {
     setQueryState((current) => ({
@@ -314,14 +306,16 @@ function Petitions() {
           }}
           onSelectionChange={onChangeSelectedIds}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
-          onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
+          onPageSizeChange={(items) =>
+            setQueryState((s) => ({ ...s, items: items as any, page: 1 }))
+          }
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort, page: 1 }))}
           actions={actions}
           header={
             <PetitionListHeader
               shape={QUERY_STATE}
               state={state}
-              onSearchChange={handleSearchChange}
+              onStateChange={setQueryState}
               onReload={() => refetch()}
             />
           }

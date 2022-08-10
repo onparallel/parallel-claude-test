@@ -53,31 +53,29 @@ function CategoryRadio(props: RadioProps) {
   const { getInputProps, getCheckboxProps } = useRadio(props);
 
   const input = getInputProps();
-  const checkbox = getCheckboxProps();
-
-  const buttonProps = props.isChecked
-    ? {
-        colorScheme: "blue",
-        backgroundColor: "blue.600",
-        fontWeight: "bold",
-      }
-    : {
-        variant: "outline",
-        backgroundColor: "white",
-        fontWeight: "normal",
-      };
 
   return (
     <Button
       rounded="full"
       size="sm"
+      variant="outline"
+      fontWeight="normal"
       as="label"
       htmlFor={input.id}
       cursor="pointer"
-      {...buttonProps}
-      {...checkbox}
+      _checked={{
+        backgroundColor: "blue.500",
+        borderColor: "blue.500",
+        color: "white",
+        fontWeight: "bold",
+        _hover: {
+          backgroundColor: "blue.600",
+          borderColor: "blue.600",
+        },
+      }}
+      {...getCheckboxProps()}
     >
-      <input {...input} />
+      <input {...getInputProps()} />
       {props.children}
     </Button>
   );

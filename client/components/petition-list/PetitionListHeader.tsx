@@ -1,10 +1,23 @@
-import { Box, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Flex, HStack } from "@chakra-ui/react";
+import {
+  Box,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  Button,
+  ButtonGroup,
+  Flex,
+  HStack,
+  RadioProps,
+  Stack,
+  useRadio,
+  useRadioGroup,
+} from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
 import type { PetitionsQueryState } from "@parallel/pages/app/petitions";
-import { QueryStateOf, useBuildStateUrl } from "@parallel/utils/queryState";
+import { QueryStateOf, SetQueryState, useBuildStateUrl } from "@parallel/utils/queryState";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useMemo, useState } from "react";
-import { useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NakedLink } from "../common/Link";
 import { SearchInput } from "../common/SearchInput";
@@ -12,19 +25,28 @@ import { SearchInput } from "../common/SearchInput";
 export interface PetitionListHeaderProps {
   shape: QueryStateOf<PetitionsQueryState>;
   state: PetitionsQueryState;
-  onSearchChange: (value: string | null) => void;
+  onStateChange: SetQueryState<Partial<PetitionsQueryState>>;
   onReload: () => void;
 }
 
 export function PetitionListHeader({
   shape,
   state,
-  onSearchChange,
+  onStateChange,
   onReload,
 }: PetitionListHeaderProps) {
   const intl = useIntl();
   const [search, setSearch] = useState(state.search ?? "");
-  const debouncedOnSearchChange = useDebouncedCallback(onSearchChange, 300, [onSearchChange]);
+  const debouncedOnSearchChange = useDebouncedCallback(
+    (search) =>
+      onStateChange(({ searchIn, current }) => ({
+        ...current,
+        search,
+        page: 1,
+      })),
+    300,
+    [onStateChange]
+  );
   const handleSearchChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value;
@@ -38,7 +60,10 @@ export function PetitionListHeader({
   const breadcrumbs = useMemo(() => {
     const breadcrumbs = [
       {
-        text: intl.formatMessage({ id: "generic.path-root", defaultMessage: "All" }),
+        text:
+          state.type === "PETITION"
+            ? intl.formatMessage({ id: "generic.root-petitions", defaultMessage: "Parallels" })
+            : intl.formatMessage({ id: "generic.root-templates", defaultMessage: "Templates" }),
         url: buildUrl((current) => ({ ...current, page: 1, path: "/" })),
         isCurrent: state.path === "/",
       },
@@ -61,9 +86,20 @@ export function PetitionListHeader({
     return breadcrumbs;
   }, [state.path]);
 
+  const { getRootProps, getRadioProps } = useRadioGroup({
+    name: "categories",
+    value: state.searchIn,
+    onChange: (value: string) =>
+      onStateChange((current) => ({
+        ...current,
+        searchIn: value as PetitionsQueryState["searchIn"],
+        page: 1,
+      })),
+  });
+
   return (
-    <Flex direction="column">
-      <HStack padding={2}>
+    <Stack padding={2}>
+      <HStack>
         <Box flex="0 1 400px">
           <SearchInput value={search ?? ""} onChange={handleSearchChange} />
         </Box>
@@ -78,9 +114,34 @@ export function PetitionListHeader({
           })}
         />
       </HStack>
-      {state.path !== "/" ? (
-        <Box paddingY={1} paddingX={2}>
-          <Breadcrumb>
+      {state.search ? (
+        <HStack>
+          <Box id="search-in-label">
+            <FormattedMessage
+              id="component.petition-list-header.search-in"
+              defaultMessage="Search in:"
+            />
+          </Box>
+          <ButtonGroup
+            size="sm"
+            isAttached
+            variant="outline"
+            aria-labelledby="#search-in-label"
+            {...getRootProps()}
+          >
+            <SearchInButton {...getRadioProps({ value: "EVERYWHERE" })}>
+              <FormattedMessage id="generic.everywhere" defaultMessage="Everywhere" />
+            </SearchInButton>
+            <SearchInButton {...getRadioProps({ value: "CURRENT_FOLDER" })}>
+              {'"'}
+              {breadcrumbs.at(-1)!.text}
+              {'"'}
+            </SearchInButton>
+          </ButtonGroup>
+        </HStack>
+      ) : state.path !== "/" ? (
+        <Box>
+          <Breadcrumb height={8} display="flex" alignItems="center">
             {breadcrumbs.map(({ text, url, isCurrent }, i) => (
               <BreadcrumbItem key={i}>
                 <NakedLink href={url}>
@@ -98,6 +159,34 @@ export function PetitionListHeader({
           </Breadcrumb>
         </Box>
       ) : null}
-    </Flex>
+    </Stack>
+  );
+}
+
+function SearchInButton(props: RadioProps) {
+  const { getInputProps, getCheckboxProps } = useRadio(props);
+
+  const input = getInputProps();
+
+  return (
+    <Button
+      fontWeight="normal"
+      as="label"
+      htmlFor={input.id}
+      cursor="pointer"
+      _checked={{
+        backgroundColor: "blue.500",
+        borderColor: "blue.500",
+        color: "white",
+        _hover: {
+          backgroundColor: "blue.600",
+          borderColor: "blue.600",
+        },
+      }}
+      {...getCheckboxProps()}
+    >
+      <input {...getInputProps()} />
+      {props.children}
+    </Button>
   );
 }
