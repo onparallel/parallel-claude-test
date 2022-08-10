@@ -6,7 +6,7 @@ export async function up(knex: Knex): Promise<void> {
   });
   await knex.raw(/* sql */ `
     alter table "petition" add constraint "petition__path" check (
-      char_length("path") < 1000 and ("path" = '/' or "path" like '/%/')
+      char_length("path") < 1000 and "path" ~ '^/([^/]+/)*$'
     )`);
   await knex.raw(/* sql */ `
     create or replace function get_folder_after_prefix(path text, prefix text)
