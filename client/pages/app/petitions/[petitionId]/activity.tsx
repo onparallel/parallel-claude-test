@@ -45,7 +45,7 @@ import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
 import { useIntl } from "react-intl";
-import { omit } from "remeda";
+import { isDefined, omit } from "remeda";
 
 type PetitionActivityProps = UnwrapPromise<ReturnType<typeof PetitionActivity.getInitialProps>>;
 
@@ -230,20 +230,24 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const configureRemindersDialog = useConfigureRemindersDialog();
   const handleConfigureReminders = useCallback(
     async (accesses: PetitionAccessTable_PetitionAccessFragment[]) => {
-      let start = false;
       try {
         const accessIds = accesses
           .filter((access) => !access.remindersOptOut)
           .map((access) => access.id);
 
         const firstAccess = petition.accesses.find((a) => a.id === accessIds[0])!;
-        const remindersConfig = await configureRemindersDialog({
-          accesses,
-          remindersActive: firstAccess.remindersActive,
-          defaultRemindersConfig: firstAccess.remindersConfig || null,
-        });
+        const [error, remindersConfig] = await withError(
+          configureRemindersDialog({
+            accesses,
+            remindersActive: firstAccess.remindersActive,
+            defaultRemindersConfig: firstAccess.remindersConfig || null,
+          })
+        );
+        if (error) {
+          return;
+        }
 
-        start = !!remindersConfig;
+        const start = isDefined(remindersConfig);
         await switchReminders({
           variables: {
             start,
