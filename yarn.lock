@@ -815,10 +815,10 @@
   dependencies:
     tslib "^2.3.1"
 
-"@aws-sdk/lib-storage@^3.142.0":
-  version "3.142.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/lib-storage/-/lib-storage-3.142.0.tgz#51d9d67b573d4c035655baf710ac24f9c407d5be"
-  integrity sha512-087XHNRzfVG8iSigLg/Kyssw2R7mmFLnHSnFKWSO4JZgJbyUPNf1fu6Dnl0v2vGgU0V5Rn0spRv4ybBh/DoPYA==
+"@aws-sdk/lib-storage@^3.145.0":
+  version "3.145.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/lib-storage/-/lib-storage-3.145.0.tgz#30c54ca8e1c3d7338882cd6e8c8cc2a4c76cf1c2"
+  integrity sha512-CTDM6ZK4Dtyaw6dL0QIct1Wfr9s2L+ymt+08TwbABOpq6zH2C2m3TaMX+6JF13PopzMluOsdsvEHvi4RNWqkWw==
   dependencies:
     "@aws-sdk/smithy-client" "3.142.0"
     buffer "5.6.0"

@@ -1,5 +1,5 @@
 import archiver from "archiver";
-import { Readable } from "stream";
+import { PassThrough, pipeline, Readable } from "stream";
 
 export type ZipFileInput = { filename: string; stream: Readable };
 
@@ -16,5 +16,7 @@ export function createZipFile(files: AsyncGenerator<ZipFileInput>) {
     }
   }
   files.next().then(processFile);
-  return zip;
+  // workaround until this is fixed https://github.com/aws/aws-sdk-js-v3/issues/2522
+  const passThrough = new PassThrough();
+  return pipeline(zip, passThrough, () => {}) as Readable;
 }
