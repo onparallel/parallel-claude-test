@@ -321,9 +321,8 @@ export const PetitionSignaturesCard = Object.assign(
     );
 
     return (
-      <Card ref={ref} {...props}>
+      <Card ref={ref} data-section="signature-card" {...props}>
         <GenericCardHeader
-          data-section="signature-card-header"
           rightAction={
             !petition.signatureConfig ||
             current?.status === "COMPLETED" ||
