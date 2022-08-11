@@ -2,7 +2,6 @@ import { ApolloError } from "apollo-server-core";
 import { booleanArg, mutationField, nonNull } from "nexus";
 import { difference, partition } from "remeda";
 import { ApiContext } from "../../../context";
-import { PetitionFieldComment } from "../../../db/__types";
 import { toGlobalId } from "../../../util/globalId";
 import { getMentions, toPlainText } from "../../../util/slate";
 import { and, authenticateAnd, ifArgEquals } from "../../helpers/authorize";
@@ -15,9 +14,9 @@ import {
   fieldsBelongsToPetition,
   fieldsHaveCommentsEnabled,
   petitionIsNotAnonymized,
+  userHasAccessToPetitionFieldComment,
   userHasAccessToPetitions,
 } from "../authorizers";
-import { userIsCommentAuthor } from "./authorizers";
 
 async function manageMentionsSharing(
   mentions: ReturnType<typeof getMentions>,
@@ -168,20 +167,10 @@ export const deletePetitionFieldComment = mutationField("deletePetitionFieldComm
   description: "Delete a petition field comment.",
   type: "PetitionField",
   authorize: authenticateAnd(
-    async (root, args, ctx, info) => {
-      // if the comment is external, user must have OWNER or WRITE permissions on the petition
-      const comment = (await ctx.petitions.loadPetitionFieldComment(
-        args.petitionFieldCommentId
-      )) as PetitionFieldComment;
-      return await userHasAccessToPetitions(
-        "petitionId",
-        comment?.is_internal || comment?.user_id === ctx.user!.id ? undefined : ["OWNER", "WRITE"]
-      )(root, args, ctx, info);
-    },
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
     commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
-    petitionIsNotAnonymized("petitionId"),
-    userIsCommentAuthor("petitionFieldCommentId")
+    userHasAccessToPetitionFieldComment("petitionFieldCommentId"),
+    petitionIsNotAnonymized("petitionId")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -203,17 +192,9 @@ export const updatePetitionFieldComment = mutationField("updatePetitionFieldComm
   description: "Update a petition field comment.",
   type: "PetitionFieldComment",
   authorize: authenticateAnd(
-    async (root, args, ctx, info) => {
-      // if the comment is external, user must have OWNER or WRITE permissions on the petition
-      const comment = await ctx.petitions.loadPetitionFieldComment(args.petitionFieldCommentId);
-      return userHasAccessToPetitions(
-        "petitionId",
-        comment?.is_internal || comment?.user_id === ctx.user!.id ? undefined : ["OWNER", "WRITE"]
-      )(root, args, ctx, info);
-    },
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
     commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
-    userIsCommentAuthor("petitionFieldCommentId"),
+    userHasAccessToPetitionFieldComment("petitionFieldCommentId"),
     petitionIsNotAnonymized("petitionId"),
     validPetitionFieldCommentContent("content", "petitionFieldId", true)
   ),

@@ -6,7 +6,7 @@ import { authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import {
-  userHasAccessToPetitionFieldComments,
+  userHasAccessToPetitionFieldComment,
   userHasAccessToPetitions,
 } from "../petition/authorizers";
 import { userHasAccessToNotifications } from "./authorizers";
@@ -30,7 +30,7 @@ export const updatePetitionUserNotificationReadStatus = mutationField(
       ifArgDefined("petitionIds", userHasAccessToPetitions("petitionIds" as never)),
       ifArgDefined(
         "petitionFieldCommentIds",
-        userHasAccessToPetitionFieldComments("petitionFieldCommentIds" as never)
+        userHasAccessToPetitionFieldComment("petitionFieldCommentIds" as never)
       )
     ),
     args: {

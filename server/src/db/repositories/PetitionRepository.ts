@@ -263,17 +263,6 @@ export class PetitionRepository extends BaseRepository {
     return rows.length === 1;
   }
 
-  async userHasAccessToPetitionFieldComments(userId: number, petitionFieldCommentIds: number[]) {
-    const comments = await this.loadPetitionFieldComment(petitionFieldCommentIds);
-    return (
-      comments.every((c) => !!c) &&
-      (await this.userHasAccessToPetitions(
-        userId,
-        comments.map((c) => c!.petition_id)
-      ))
-    );
-  }
-
   async fieldsBelongToPetition(petitionId: number, fieldIds: number[]) {
     const [{ count }] = await this.from("petition_field")
       .where({
