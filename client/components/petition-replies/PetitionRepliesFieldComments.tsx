@@ -1,7 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import { Box, Center, Flex, Spinner, Stack, Text } from "@chakra-ui/react";
 import { CommentIcon, NoteIcon } from "@parallel/chakra/icons";
-import { Card, CardHeader } from "@parallel/components/common/Card";
+import { Card, CloseableCardHeader } from "@parallel/components/common/Card";
 import {
   PetitionRepliesFieldComments_PetitionFieldFragment,
   PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument,
@@ -73,13 +73,13 @@ export function PetitionRepliesFieldComments({
 
   return (
     <Card>
-      <CardHeader isCloseable onClose={onClose}>
+      <CloseableCardHeader onClose={onClose}>
         {field.title || (
           <Text fontWeight="normal" textStyle="hint">
             <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
           </Text>
         )}
-      </CardHeader>
+      </CloseableCardHeader>
       <Box
         maxHeight={{
           base: `calc(100vh - 364px)`,

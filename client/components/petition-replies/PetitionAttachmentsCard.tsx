@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { Box, Center, HStack, Text } from "@chakra-ui/react";
+import { Box, Center, Text } from "@chakra-ui/react";
 import { PaperclipIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
@@ -9,7 +9,7 @@ import {
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { FormattedMessage } from "react-intl";
-import { Card, GenericCardHeader } from "../common/Card";
+import { Card, CardHeader } from "../common/Card";
 import { FileAttachmentButton } from "../common/FileAttachmentButton";
 
 export interface PetitionAttachmentsCardProps {
@@ -68,17 +68,12 @@ export const PetitionAttachmentsCard = Object.assign(
     }
     return (
       <Card ref={ref} {...props}>
-        <GenericCardHeader>
-          <HStack as="span" spacing={2}>
-            <PaperclipIcon fontSize="20px" />
-            <Text as="span">
-              <FormattedMessage
-                id="component.petition-attachments-card.header"
-                defaultMessage="Attachments"
-              />
-            </Text>
-          </HStack>
-        </GenericCardHeader>
+        <CardHeader leftIcon={<PaperclipIcon fontSize="20px" />}>
+          <FormattedMessage
+            id="component.petition-attachments-card.header"
+            defaultMessage="Attachments"
+          />
+        </CardHeader>
         {petition.attachments.length > 0 ? (
           <Box padding={2}>
             {petition.attachments.map((attachment) => (

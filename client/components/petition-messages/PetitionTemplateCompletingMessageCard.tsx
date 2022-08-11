@@ -3,7 +3,6 @@ import {
   AlertDescription,
   AlertIcon,
   Box,
-  Flex,
   FormControl,
   FormLabel,
   Image,
@@ -30,7 +29,6 @@ import { CloseableAlert } from "../common/CloseableAlert";
 import { HelpPopover } from "../common/HelpPopover";
 import { PaddedCollapse } from "../common/PaddedCollapse";
 import { RichTextEditor } from "../common/slate/RichTextEditor";
-import { Spacer } from "../common/Spacer";
 
 interface PetitionTemplateCompletingMessageCardProps {
   petition: PetitionTemplateCompletingMessageCard_PetitionTemplateFragment;
@@ -106,25 +104,26 @@ export const PetitionTemplateCompletingMessageCard = Object.assign(
 
       return (
         <Card {...props}>
-          <CardHeader leftIcon={<AppWindowIcon marginRight={2} role="presentation" />}>
-            <Flex alignItems="center">
-              <FormattedMessage
-                id="component.petition-template-completing-message.card-header"
-                defaultMessage="Thank you message"
-              />
-              <HelpPopover>
-                <FormattedMessage
-                  id="component.petition-template-completing-message.popover"
-                  defaultMessage="Your message will be displayed in a pop-up upon completion."
-                />
-                <Image
-                  marginTop={2}
-                  src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/templates/thankyou_message_${intl.locale}.gif`}
-                />
-              </HelpPopover>
-              <Spacer />
+          <CardHeader
+            leftIcon={<AppWindowIcon marginRight={2} role="presentation" />}
+            rightAction={
               <Switch isChecked={isEnabled} onChange={handleSwitchChange} isDisabled={isReadOnly} />
-            </Flex>
+            }
+          >
+            <FormattedMessage
+              id="component.petition-template-completing-message.card-header"
+              defaultMessage="Thank you message"
+            />
+            <HelpPopover>
+              <FormattedMessage
+                id="component.petition-template-completing-message.popover"
+                defaultMessage="Your message will be displayed in a pop-up upon completion."
+              />
+              <Image
+                marginTop={2}
+                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/templates/thankyou_message_${intl.locale}.gif`}
+              />
+            </HelpPopover>
           </CardHeader>
           <Box padding={4}>
             <Text marginBottom={2}>

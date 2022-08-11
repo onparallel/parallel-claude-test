@@ -129,10 +129,10 @@ function Contact({ contactId }: ContactProps) {
             onSubmit={isEditing ? handleContactSaveSubmit : undefined}
             id="contact-details"
           >
-            <CardHeader as="h2" size="md">
-              <Flex alignItems="center">
-                {`${contact!.fullName ?? ""} <${contact!.email}>`}
-                <Spacer />
+            <CardHeader
+              headingLevel="h2"
+              headingSize="md"
+              rightAction={
                 <IconButtonWithTooltip
                   icon={<DeleteIcon />}
                   variant="outline"
@@ -142,7 +142,9 @@ function Contact({ contactId }: ContactProps) {
                   })}
                   onClick={handleDeleteClick}
                 />
-              </Flex>
+              }
+            >
+              {`${contact!.fullName ?? ""} <${contact!.email}>`}
             </CardHeader>
             <Stack padding={4}>
               <FormControl id="contact-first-name" isInvalid={!!errors.firstName}>
@@ -218,7 +220,7 @@ function Contact({ contactId }: ContactProps) {
             </Flex>
           </Card>
           <Card marginTop={4} id="contact-petitions">
-            <CardHeader omitDivider>
+            <CardHeader omitDivider={contact!.accesses.items.length > 0}>
               <FormattedMessage
                 id="contact.parallels-header"
                 defaultMessage="Parallels sent{name, select, null {} other { to {name}}}"

@@ -32,10 +32,9 @@ import {
 import { FORMATS } from "@parallel/utils/dates";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
-import { Card, GenericCardHeader } from "../common/Card";
+import { Card, CardHeader } from "../common/Card";
 import { ContactReference } from "../common/ContactReference";
 import { DateTime } from "../common/DateTime";
-import { Divider } from "../common/Divider";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NormalLink } from "../common/Link";
 import { Table, TableColumn } from "../common/Table";
@@ -98,8 +97,8 @@ export function PetitionAccessesTable({
 
   return (
     <Card {...props} data-section="petition-accesses-table">
-      <GenericCardHeader
-        omitDivider
+      <CardHeader
+        omitDivider={petition.accesses.length > 0}
         rightAction={
           <Stack direction="row">
             {showActions ? (
@@ -154,7 +153,7 @@ export function PetitionAccessesTable({
         }
       >
         <FormattedMessage id="petition-access.header" defaultMessage="Recipients" />
-      </GenericCardHeader>
+      </CardHeader>
       <Box overflowX="auto">
         {petition.accesses.length ? (
           <Table
@@ -167,32 +166,29 @@ export function PetitionAccessesTable({
             marginBottom={2}
           />
         ) : (
-          <>
-            <Divider />
-            <Center minHeight="60px" textAlign="center" padding={4} color="gray.400">
-              <Stack spacing={1}>
+          <Center minHeight="60px" textAlign="center" padding={4} color="gray.400">
+            <Stack spacing={1}>
+              <Text>
+                <FormattedMessage
+                  id="petition-access.havent-sent-parallel"
+                  defaultMessage="You haven't sent this parallel yet."
+                />
+              </Text>
+              {!petition.isAnonymized && myEffectivePermission !== "READ" ? (
                 <Text>
                   <FormattedMessage
-                    id="petition-access.havent-sent-parallel"
-                    defaultMessage="You haven't sent this parallel yet."
+                    id="petition-access.click-here-to-send"
+                    defaultMessage="Click <a>here</a> to send it."
+                    values={{
+                      a: (chunks: any) => (
+                        <NormalLink onClick={onPetitionSend}>{chunks}</NormalLink>
+                      ),
+                    }}
                   />
                 </Text>
-                {!petition.isAnonymized && myEffectivePermission !== "READ" ? (
-                  <Text>
-                    <FormattedMessage
-                      id="petition-access.click-here-to-send"
-                      defaultMessage="Click <a>here</a> to send it."
-                      values={{
-                        a: (chunks: any) => (
-                          <NormalLink onClick={onPetitionSend}>{chunks}</NormalLink>
-                        ),
-                      }}
-                    />
-                  </Text>
-                ) : null}
-              </Stack>
-            </Center>
-          </>
+              ) : null}
+            </Stack>
+          </Center>
         )}
       </Box>
     </Card>

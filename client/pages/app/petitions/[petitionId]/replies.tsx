@@ -11,7 +11,7 @@ import {
   ThumbUpIcon,
 } from "@parallel/chakra/icons";
 import { ButtonWithMoreOptions } from "@parallel/components/common/ButtonWithMoreOptions";
-import { Card, GenericCardHeader } from "@parallel/components/common/Card";
+import { Card, CardHeader } from "@parallel/components/common/Card";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import {
   DialogProps,
@@ -579,14 +579,12 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               />
             ) : (
               <Card display="flex" flexDirection="column" maxHeight={`calc(100vh - 14.5rem)`}>
-                <GenericCardHeader
+                <CardHeader
+                  leftIcon={<ListIcon fontSize="18px" role="presentation" />}
                   rightAction={<PetitionRepliesFilterButton value={filter} onChange={setFilter} />}
                 >
-                  <Text as="span" display="flex" alignItems="center">
-                    <ListIcon fontSize="18px" marginRight={2} role="presentation" />
-                    <FormattedMessage id="petition.contents" defaultMessage="Contents" />
-                  </Text>
-                </GenericCardHeader>
+                  <FormattedMessage id="petition.contents" defaultMessage="Contents" />
+                </CardHeader>
                 <Box overflow="auto">
                   <PetitionContents
                     fields={petition.fields}
@@ -639,14 +637,14 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             </LiquidScopeProvider>
           </Stack>
 
-          {petition.attachments.length > 0 && (
+          {petition.attachments.length > 0 ? (
             <PetitionAttachmentsCard
               id="attachments"
               petition={petition}
               layerStyle="highlightable"
               marginTop={8}
             />
-          )}
+          ) : null}
 
           <PetitionSignaturesCard
             ref={signaturesRef as any}

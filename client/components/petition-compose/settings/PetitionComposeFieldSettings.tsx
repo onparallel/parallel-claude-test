@@ -9,7 +9,7 @@ import {
   Switch,
   Text,
 } from "@chakra-ui/react";
-import { Card, CardHeader } from "@parallel/components/common/Card";
+import { Card, CloseableCardHeader } from "@parallel/components/common/Card";
 import { CloseableAlert } from "@parallel/components/common/CloseableAlert";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import {
@@ -238,9 +238,9 @@ export function PetitionComposeFieldSettings({
 
   return (
     <Card>
-      <CardHeader isCloseable onClose={onClose}>
+      <CloseableCardHeader onClose={onClose}>
         <FormattedMessage id="petition.field-settings" defaultMessage="Field settings" />
-      </CardHeader>
+      </CloseableCardHeader>
       <Stack spacing={4} padding={4} direction="column">
         <Box>
           <PetitionFieldTypeSelect

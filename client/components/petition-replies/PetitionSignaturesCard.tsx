@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { Center, Grid, HStack, Text, useToast } from "@chakra-ui/react";
+import { Box, Center, Grid, Text, useToast } from "@chakra-ui/react";
 import { SignatureIcon, SignaturePlusIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
@@ -22,7 +22,7 @@ import { usePetitionLimitReachedErrorDialog } from "@parallel/utils/usePetitionL
 import { usePetitionSignaturesCardPolling } from "@parallel/utils/usePetitionSignaturesCardPolling";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Card, GenericCardHeader } from "../common/Card";
+import { Card, CardHeader } from "../common/Card";
 import { useErrorDialog } from "../common/dialogs/ErrorDialog";
 import { HelpPopover } from "../common/HelpPopover";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -322,7 +322,8 @@ export const PetitionSignaturesCard = Object.assign(
 
     return (
       <Card ref={ref} data-section="signature-card" {...props}>
-        <GenericCardHeader
+        <CardHeader
+          leftIcon={<SignatureIcon fontSize="20px" />}
           rightAction={
             !petition.signatureConfig ||
             current?.status === "COMPLETED" ||
@@ -343,22 +344,19 @@ export const PetitionSignaturesCard = Object.assign(
             ) : null
           }
         >
-          <HStack as="span" spacing={2}>
-            <SignatureIcon fontSize="20px" role="presentation" />
-            <Text as="span">
-              <FormattedMessage id="generic.e-signature" defaultMessage="eSignature" />
-            </Text>
-            <HelpPopover popoverWidth="2xs">
-              <FormattedMessage
-                id="component.petition-signatures-card.signature-description"
-                defaultMessage="Generates a document and iniciates an eSignature process, through one of our integrated providers."
-              />
-            </HelpPopover>
-            {signatureEnvironment === "DEMO" ? (
+          <FormattedMessage id="generic.e-signature" defaultMessage="eSignature" />
+          <HelpPopover popoverWidth="2xs">
+            <FormattedMessage
+              id="component.petition-signatures-card.signature-description"
+              defaultMessage="Generates a document and iniciates an eSignature process, through one of our integrated providers."
+            />
+          </HelpPopover>
+          {signatureEnvironment === "DEMO" ? (
+            <Box display="inline-block" marginLeft={2}>
               <TestModeSignatureBadge hasPetitionSignature={user.hasPetitionSignature} />
-            ) : null}
-          </HStack>
-        </GenericCardHeader>
+            </Box>
+          ) : null}
+        </CardHeader>
         {current || older.length > 0 || petition.signatureConfig ? (
           <Grid templateColumns="auto 1fr auto" alignItems="center">
             {petition.signatureConfig && !current ? (

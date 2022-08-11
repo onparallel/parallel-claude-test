@@ -1,4 +1,4 @@
-import { Box, CloseButton, Heading, HeadingProps, Stack } from "@chakra-ui/react";
+import { Box, CloseButton, Heading, HeadingProps, HStack } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { ReactNode } from "react";
 import { useIntl } from "react-intl";
@@ -45,66 +45,70 @@ export const Card = chakraForwardRef<"section", CardProps>(function Card(
   );
 });
 
-export interface CardHeaderProps extends Omit<GenericCardHeaderProps, "rightAction"> {
+export interface CloseableCardHeaderProps extends Omit<CardHeaderProps, "rightAction"> {
   isCloseable?: boolean;
   onClose?: () => void;
 }
 
-export function CardHeader({ isCloseable, onClose, ...props }: CardHeaderProps) {
-  const intl = useIntl();
-  return (
-    <GenericCardHeader
-      {...props}
-      rightAction={
-        isCloseable ? (
-          <CloseButton
-            size="sm"
-            aria-label={intl.formatMessage({
-              id: "generic.close",
-              defaultMessage: "Close",
-            })}
-            onClick={onClose}
-          />
-        ) : null
-      }
-    />
-  );
-}
+export const CloseableCardHeader = chakraForwardRef<"header", CloseableCardHeaderProps>(
+  function CloseableCardHeader({ isCloseable = true, onClose, ...props }, ref) {
+    const intl = useIntl();
+    return (
+      <CardHeader
+        ref={ref}
+        {...props}
+        rightAction={
+          isCloseable ? (
+            <CloseButton
+              size="sm"
+              aria-label={intl.formatMessage({
+                id: "generic.close",
+                defaultMessage: "Close",
+              })}
+              onClick={onClose}
+            />
+          ) : null
+        }
+      />
+    );
+  }
+);
 
-export interface GenericCardHeaderProps {
-  children: ReactNode;
-  as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
-  size?: HeadingProps["size"];
+export interface CardHeaderProps {
+  headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+  headingSize?: HeadingProps["size"];
   rightAction?: ReactNode;
   omitDivider?: boolean;
   leftIcon?: ReactNode;
 }
 
-export function GenericCardHeader({
-  as = "h3",
-  size: size = "sm",
-  children,
-  rightAction,
-  omitDivider,
-  leftIcon,
-}: GenericCardHeaderProps) {
+export const CardHeader = chakraForwardRef<"header", CardHeaderProps>(function CardHeader(
+  { headingLevel, headingSize, rightAction, omitDivider, leftIcon, children, ...props },
+  ref
+) {
   return (
     <>
-      <Stack
-        direction="row"
+      <HStack
+        ref={ref as any}
         as="header"
         paddingX={4}
-        paddingY={3}
         minHeight="52px"
         alignItems="center"
+        {...props}
       >
         {leftIcon}
-        <Heading flex="1" as={as} size={size} overflowWrap="anywhere">
+        <Heading
+          flex="1"
+          as={headingLevel ?? "h3"}
+          size={headingSize ?? "sm"}
+          overflowWrap="anywhere"
+          paddingY={3}
+        >
           {children}
         </Heading>
         {rightAction}
-      </Stack>
+      </HStack>
       {omitDivider ? null : <Divider />}
     </>
   );
-}
+});
