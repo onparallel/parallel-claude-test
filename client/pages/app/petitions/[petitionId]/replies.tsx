@@ -254,12 +254,17 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   }
 
   const updatePetitionFieldComment = useUpdatePetitionFieldComment();
-  async function handleUpdateComment(petitionFieldCommentId: string, content: string) {
+  async function handleUpdateComment(
+    petitionFieldCommentId: string,
+    content: string,
+    isNote: boolean
+  ) {
     await updatePetitionFieldComment({
       petitionId,
       petitionFieldId: activeFieldId!,
       petitionFieldCommentId,
       content,
+      isNote,
     });
   }
 

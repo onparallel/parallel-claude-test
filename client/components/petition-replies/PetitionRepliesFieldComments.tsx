@@ -21,7 +21,7 @@ export interface PetitionRepliesFieldCommentsProps {
   field: PetitionRepliesFieldComments_PetitionFieldFragment;
   onAddComment: (content: any, isNote: boolean) => Promise<void>;
   onDeleteComment: (petitionFieldCommentId: string) => void;
-  onUpdateComment: (petitionFieldCommentId: string, content: any) => void;
+  onUpdateComment: (petitionFieldCommentId: string, content: any, isNote: boolean) => void;
   onMarkAsUnread: (petitionFieldCommentId: string) => void;
   onClose: () => void;
   isDisabled: boolean;
@@ -151,7 +151,7 @@ export function PetitionRepliesFieldComments({
                 key={comment.id}
                 comment={comment}
                 onSearchMentionables={handleSearchMentionables}
-                onEdit={(content) => onUpdateComment(comment.id, content)}
+                onEdit={(content) => onUpdateComment(comment.id, content, comment.isInternal)}
                 onDelete={() => onDeleteComment(comment.id)}
                 onMarkAsUnread={() => onMarkAsUnread(comment.id)}
               />

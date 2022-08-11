@@ -738,9 +738,14 @@ export class Mocks {
 
     const newContent = (comment.content ?? "").concat("@" + userName);
     const newContentJson = (safeJsonParse(comment.content_json) ?? []).concat({
-      type: "mention",
-      mention: toGlobalId("User", userId),
-      children: [{ text: userName }],
+      type: "paragraph",
+      children: [
+        {
+          type: "mention",
+          mention: toGlobalId("User", userId),
+          children: [{ text: userName }],
+        },
+      ],
     });
 
     await this.knex<PetitionFieldComment>("petition_field_comment")
@@ -763,9 +768,14 @@ export class Mocks {
 
     const newContent = (comment.content ?? "").concat("@" + userGroup.name);
     const newContentJson = (safeJsonParse(comment.content_json) ?? []).concat({
-      type: "mention",
-      mention: toGlobalId("UserGroup", userGroupId),
-      children: [{ text: userGroup.name }],
+      type: "paragraph",
+      children: [
+        {
+          type: "mention",
+          mention: toGlobalId("UserGroup", userGroupId),
+          children: [{ text: userGroup.name }],
+        },
+      ],
     });
 
     await this.knex<PetitionFieldComment>("petition_field_comment")

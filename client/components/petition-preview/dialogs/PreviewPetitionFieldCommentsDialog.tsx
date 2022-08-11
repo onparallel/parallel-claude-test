@@ -108,7 +108,7 @@ export function PreviewPetitionFieldCommentsDialog({
   }
 
   const updatePetitionFieldComment = useUpdatePetitionFieldComment();
-  async function handleEditCommentContent(commentId: string, content: any) {
+  async function handleEditCommentContent(commentId: string, content: any, isNote: boolean) {
     if (isTemplate) return;
     try {
       await updatePetitionFieldComment({
@@ -116,6 +116,7 @@ export function PreviewPetitionFieldCommentsDialog({
         petitionFieldId: field.id,
         petitionFieldCommentId: commentId,
         content,
+        isNote,
       });
     } catch {}
   }
@@ -235,7 +236,9 @@ export function PreviewPetitionFieldCommentsDialog({
                   <PetitionFieldComment
                     key={comment.id}
                     comment={comment}
-                    onEdit={(content) => handleEditCommentContent(comment.id, content)}
+                    onEdit={(content) =>
+                      handleEditCommentContent(comment.id, content, comment.isInternal)
+                    }
                     onDelete={() => handleDeleteClick(comment.id)}
                     onMarkAsUnread={() => handleMarkAsUnread(comment.id)}
                     onSearchMentionables={handleSearchMentionables}

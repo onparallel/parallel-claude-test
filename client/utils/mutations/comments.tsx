@@ -1,11 +1,15 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { VariablesOf } from "@graphql-typed-document-node/core";
 import { useConfirmCommentMentionAndShareDialog } from "@parallel/components/common/dialogs/ConfirmCommentMentionAndShareDialog";
 import { PetitionFieldComment } from "@parallel/components/common/PetitionFieldComment";
 import { removeMentionInputElements } from "@parallel/components/common/slate/CommentEditor";
+import { UserGroupReference } from "@parallel/components/petition-activity/UserGroupReference";
+import { UserReference } from "@parallel/components/petition-activity/UserReference";
 import {
+  Maybe,
   usePetitionCommentsMutations_createPetitionFieldCommentDocument,
   usePetitionCommentsMutations_deletePetitionFieldCommentDocument,
+  usePetitionCommentsMutations_getUsersOrGroupsDocument,
   usePetitionCommentsMutations_updatePetitionFieldCommentDocument,
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
@@ -18,6 +22,10 @@ export function useCreatePetitionFieldComment() {
   );
 
   const showConfirmCommentMentionAndShareDialog = useConfirmCommentMentionAndShareDialog();
+  const { refetch: fetchUsersOrGroups } = useQuery(
+    usePetitionCommentsMutations_getUsersOrGroupsDocument,
+    { skip: true }
+  );
 
   return useCallback(
     async ({
@@ -33,9 +41,13 @@ export function useCreatePetitionFieldComment() {
         });
       } catch (e: any) {
         if (isApolloError(e, "NO_PERMISSIONS_MENTION_ERROR")) {
-          const names = e.graphQLErrors[0].extensions.names as string[];
+          const ids = e.graphQLErrors[0].extensions.ids as string[];
+          const { data } = await fetchUsersOrGroups({ ids });
           const [error, sharePetition] = await withError(
-            showConfirmCommentMentionAndShareDialog({ names })
+            showConfirmCommentMentionAndShareDialog({
+              usersAndGroups: data.getUsersOrGroups,
+              isNote: variables.isInternal,
+            })
           );
           if (!error) {
             try {
@@ -61,24 +73,33 @@ export function useUpdatePetitionFieldComment() {
     usePetitionCommentsMutations_updatePetitionFieldCommentDocument
   );
   const showConfirmCommentMentionAndShareDialog = useConfirmCommentMentionAndShareDialog();
+  const { refetch: fetchUsersOrGroups } = useQuery(
+    usePetitionCommentsMutations_getUsersOrGroupsDocument,
+    { skip: true }
+  );
 
   return useCallback(
     async ({
       content,
+      isNote,
       ...variables
     }: Omit<
       VariablesOf<typeof usePetitionCommentsMutations_updatePetitionFieldCommentDocument>,
       "sharePetition" | "throwOnNoPermission"
-    >) => {
+    > & { isNote?: Maybe<boolean> }) => {
       try {
         await updatePetitionFieldComment({
           variables: { content: removeMentionInputElements(content), ...variables },
         });
       } catch (e: any) {
         if (isApolloError(e, "NO_PERMISSIONS_MENTION_ERROR")) {
-          const names = e.graphQLErrors[0].extensions.names as string[];
+          const ids = e.graphQLErrors[0].extensions.ids as string[];
+          const { data } = await fetchUsersOrGroups({ ids });
           const [error, sharePetition] = await withError(
-            showConfirmCommentMentionAndShareDialog({ names })
+            showConfirmCommentMentionAndShareDialog({
+              usersAndGroups: data.getUsersOrGroups,
+              isNote,
+            })
           );
           if (!error) {
             try {
@@ -112,6 +133,24 @@ export function useDeletePetitionFieldComment() {
     [deletePetitionFieldComment]
   );
 }
+
+const _queries = {
+  Users: gql`
+    query usePetitionCommentsMutations_getUsersOrGroups($ids: [ID!]!) {
+      getUsersOrGroups(ids: $ids) {
+        __typename
+        ... on User {
+          ...UserReference_User
+        }
+        ... on UserGroup {
+          ...UserGroupReference_UserGroup
+        }
+      }
+    }
+    ${UserReference.fragments.User}
+    ${UserGroupReference.fragments.UserGroup}
+  `,
+};
 
 const _fragments = {
   PetitionField: gql`

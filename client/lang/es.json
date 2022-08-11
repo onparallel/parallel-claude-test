@@ -386,8 +386,8 @@
   },
   {
     "term": "component.confirm-comment-mention-and-share-dialog.body",
-    "definition": "{users} no {count, plural, =1{podrá} other{podrán}} ver tu nota porque no {count, plural, =1{tiene} other{tienen}} acceso al parallel.",
-    "context": "{users} will not be able to see your note because they have no access to the parallel."
+    "definition": "Los siguientes {entries} no podrán ver tu {isNote, select, true{nota} other{comentario}} porque no tienen acceso al parallel:",
+    "context": "The following {entries} won't be able to see your {isNote, select, true{note} other{comment}} because the parallel is not shared with them:"
   },
   {
     "term": "component.confirm-comment-mention-and-share-dialog.body-confirm",
@@ -396,8 +396,13 @@
   },
   {
     "term": "component.confirm-comment-mention-and-share-dialog.cancel",
-    "definition": "No, añadir sin compartir",
-    "context": "No, add without sharing"
+    "definition": "No, continuar sin compartir",
+    "context": "No, continue without sharing"
+  },
+  {
+    "term": "component.confirm-comment-mention-and-share-dialog.confirm",
+    "definition": "Si, compartir parallel",
+    "context": "Yes, share parallel"
   },
   {
     "term": "component.confirm-comment-mention-and-share-dialog.header",
@@ -5828,6 +5833,11 @@
     "term": "generic.go-to-page",
     "definition": "Ir a la página {page}",
     "context": "Go to page {page}"
+  },
+  {
+    "term": "generic.groups",
+    "definition": "Equipos",
+    "context": "Teams"
   },
   {
     "term": "generic.help",

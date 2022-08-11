@@ -1,9 +1,9 @@
 import { ApolloError } from "apollo-server-core";
 import { booleanArg, mutationField, nonNull } from "nexus";
-import { difference, isDefined, partition } from "remeda";
+import { difference, partition } from "remeda";
 import { ApiContext } from "../../../context";
 import { PetitionFieldComment } from "../../../db/__types";
-import { fullName } from "../../../util/fullName";
+import { toGlobalId } from "../../../util/globalId";
 import { getMentions, toPlainText } from "../../../util/slate";
 import { and, authenticateAnd, ifArgEquals } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
@@ -46,18 +46,10 @@ async function manageMentionsSharing(
 
   if (userIdsWithNoPermissions.length > 0 || userGroupIdsWithNoPermissions.length > 0) {
     if (throwOnNoPermission) {
-      const users =
-        userIdsWithNoPermissions.length > 0
-          ? (await ctx.users.loadUserDataByUserId(userIdsWithNoPermissions)).filter(isDefined)
-          : [];
-      const groups =
-        userGroupIdsWithNoPermissions.length > 0
-          ? (await ctx.userGroups.loadUserGroup(userGroupIdsWithNoPermissions)).filter(isDefined)
-          : [];
       throw new ApolloError(`Mentioned users with no permissions`, "NO_PERMISSIONS_MENTION_ERROR", {
-        names: [
-          ...users.map((u) => fullName(u.first_name, u.last_name)),
-          ...groups.map((g) => g.name),
+        ids: [
+          ...userIdsWithNoPermissions.map((id) => toGlobalId("User", id)),
+          ...userGroupIdsWithNoPermissions.map((id) => toGlobalId("UserGroup", id)),
         ],
       });
     } else if (sharePetition) {

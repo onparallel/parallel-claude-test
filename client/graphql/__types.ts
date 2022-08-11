@@ -22136,6 +22136,17 @@ export type isUsageLimitsReached_OrganizationFragment = {
   };
 };
 
+export type usePetitionCommentsMutations_getUsersOrGroupsQueryVariables = Exact<{
+  ids: Array<Scalars["ID"]> | Scalars["ID"];
+}>;
+
+export type usePetitionCommentsMutations_getUsersOrGroupsQuery = {
+  getUsersOrGroups: Array<
+    | { __typename: "User"; id: string; fullName?: string | null; status: UserStatus }
+    | { __typename: "UserGroup"; name: string }
+  >;
+};
+
 export type usePetitionCommentsMutations_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -30785,6 +30796,24 @@ export const GetMyIdDocument = gql`
     }
   }
 ` as unknown as DocumentNode<GetMyIdQuery, GetMyIdQueryVariables>;
+export const usePetitionCommentsMutations_getUsersOrGroupsDocument = gql`
+  query usePetitionCommentsMutations_getUsersOrGroups($ids: [ID!]!) {
+    getUsersOrGroups(ids: $ids) {
+      __typename
+      ... on User {
+        ...UserReference_User
+      }
+      ... on UserGroup {
+        ...UserGroupReference_UserGroup
+      }
+    }
+  }
+  ${UserReference_UserFragmentDoc}
+  ${UserGroupReference_UserGroupFragmentDoc}
+` as unknown as DocumentNode<
+  usePetitionCommentsMutations_getUsersOrGroupsQuery,
+  usePetitionCommentsMutations_getUsersOrGroupsQueryVariables
+>;
 export const usePetitionCommentsMutations_createPetitionFieldCommentDocument = gql`
   mutation usePetitionCommentsMutations_createPetitionFieldComment(
     $petitionId: GID!

@@ -444,7 +444,7 @@ describe("GraphQL/Petition Fields Comments", () => {
       );
 
       expect(errors).toContainGraphQLError("NO_PERMISSIONS_MENTION_ERROR", {
-        names: ["Joey Tribbiani"],
+        ids: [toGlobalId("User", joey.id)],
       });
       expect(data).toBeNull();
     });
