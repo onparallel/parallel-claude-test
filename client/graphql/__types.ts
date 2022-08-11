@@ -2471,7 +2471,7 @@ export interface PetitionFilter {
 
 export interface PetitionFolder {
   __typename?: "PetitionFolder";
-  /** The ID of the petition or template. */
+  /** The ID of the petition folder. */
   id: Scalars["ID"];
   /** The lowest permission the user has in the petitions inside the folder. */
   minimumPermissionType: PetitionPermissionType;
@@ -2781,14 +2781,6 @@ export interface PetitionTemplate extends PetitionBase {
 /** A petition template */
 export interface PetitionTemplateimageUrlArgs {
   options?: InputMaybe<ImageOptions>;
-}
-
-export interface PetitionTemplatePagination {
-  __typename?: "PetitionTemplatePagination";
-  /** The requested slice of items. */
-  items: Array<PetitionTemplate>;
-  /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
 }
 
 /** The permission for a petition and user group */
@@ -3152,7 +3144,7 @@ export interface Query {
   tags: TagPagination;
   task: Task;
   /** The available templates */
-  templates: PetitionTemplatePagination;
+  templates: PetitionBaseOrFolderPagination;
   userGroup?: Maybe<UserGroup>;
   /** Paginated list of user groups in the organization */
   userGroups: UserGroupPagination;
@@ -3310,6 +3302,7 @@ export interface QuerytemplatesArgs {
   limit?: InputMaybe<Scalars["Int"]>;
   locale?: InputMaybe<PetitionLocale>;
   offset?: InputMaybe<Scalars["Int"]>;
+  path?: InputMaybe<Scalars["String"]>;
   search?: InputMaybe<Scalars["String"]>;
 }
 
@@ -20340,75 +20333,79 @@ export type NewPetition_templatesQueryVariables = Exact<{
 
 export type NewPetition_templatesQuery = {
   templates: {
-    __typename?: "PetitionTemplatePagination";
+    __typename?: "PetitionBaseOrFolderPagination";
     totalCount: number;
-    items: Array<{
-      __typename?: "PetitionTemplate";
-      id: string;
-      name?: string | null;
-      descriptionExcerpt?: string | null;
-      backgroundColor?: string | null;
-      categories?: Array<string> | null;
-      imageUrl?: string | null;
-      locale: PetitionLocale;
-      isRestricted: boolean;
-      isPublic: boolean;
-      anonymizeAfterMonths?: number | null;
-      permissions: Array<
-        | {
-            __typename?: "PetitionUserGroupPermission";
-            group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-          }
-        | {
-            __typename?: "PetitionUserPermission";
-            user: {
-              __typename?: "User";
-              id: string;
-              fullName?: string | null;
-              avatarUrl?: string | null;
-              initials?: string | null;
-            };
-          }
-      >;
-      publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
-      signatureConfig?: {
-        __typename?: "SignatureConfig";
-        review: boolean;
-        allowAdditionalSigners: boolean;
-        signers: Array<{
-          __typename?: "PetitionSigner";
-          contactId?: string | null;
-          fullName: string;
-          email: string;
-        } | null>;
-      } | null;
-      remindersConfig?: {
-        __typename?: "RemindersConfig";
-        offset: number;
-        time: string;
-        weekdaysOnly: boolean;
-      } | null;
-      defaultPermissions: Array<
-        | {
-            __typename?: "TemplateDefaultUserGroupPermission";
-            id: string;
-            permissionType: PetitionPermissionType;
-            group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
-          }
-        | {
-            __typename?: "TemplateDefaultUserPermission";
-            id: string;
-            permissionType: PetitionPermissionType;
-            user: {
-              __typename?: "User";
-              id: string;
-              fullName?: string | null;
-              avatarUrl?: string | null;
-              initials?: string | null;
-            };
-          }
-      >;
-    }>;
+    items: Array<
+      | { __typename?: "Petition" }
+      | { __typename?: "PetitionFolder" }
+      | {
+          __typename?: "PetitionTemplate";
+          id: string;
+          name?: string | null;
+          descriptionExcerpt?: string | null;
+          backgroundColor?: string | null;
+          categories?: Array<string> | null;
+          imageUrl?: string | null;
+          locale: PetitionLocale;
+          isRestricted: boolean;
+          isPublic: boolean;
+          anonymizeAfterMonths?: number | null;
+          permissions: Array<
+            | {
+                __typename?: "PetitionUserGroupPermission";
+                group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+              }
+            | {
+                __typename?: "PetitionUserPermission";
+                user: {
+                  __typename?: "User";
+                  id: string;
+                  fullName?: string | null;
+                  avatarUrl?: string | null;
+                  initials?: string | null;
+                };
+              }
+          >;
+          publicLink?: { __typename?: "PublicPetitionLink"; id: string; isActive: boolean } | null;
+          signatureConfig?: {
+            __typename?: "SignatureConfig";
+            review: boolean;
+            allowAdditionalSigners: boolean;
+            signers: Array<{
+              __typename?: "PetitionSigner";
+              contactId?: string | null;
+              fullName: string;
+              email: string;
+            } | null>;
+          } | null;
+          remindersConfig?: {
+            __typename?: "RemindersConfig";
+            offset: number;
+            time: string;
+            weekdaysOnly: boolean;
+          } | null;
+          defaultPermissions: Array<
+            | {
+                __typename?: "TemplateDefaultUserGroupPermission";
+                id: string;
+                permissionType: PetitionPermissionType;
+                group: { __typename?: "UserGroup"; id: string; name: string; initials: string };
+              }
+            | {
+                __typename?: "TemplateDefaultUserPermission";
+                id: string;
+                permissionType: PetitionPermissionType;
+                user: {
+                  __typename?: "User";
+                  id: string;
+                  fullName?: string | null;
+                  avatarUrl?: string | null;
+                  initials?: string | null;
+                };
+              }
+          >;
+        }
+    >;
   };
 };
 
@@ -20562,9 +20559,13 @@ export type Reports_templatesQueryVariables = Exact<{
 
 export type Reports_templatesQuery = {
   templates: {
-    __typename?: "PetitionTemplatePagination";
+    __typename?: "PetitionBaseOrFolderPagination";
     totalCount: number;
-    items: Array<{ __typename?: "PetitionTemplate"; id: string; name?: string | null }>;
+    items: Array<
+      | { __typename?: "Petition" }
+      | { __typename?: "PetitionFolder" }
+      | { __typename?: "PetitionTemplate"; id: string; name?: string | null }
+    >;
   };
 };
 

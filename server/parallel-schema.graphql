@@ -3067,7 +3067,7 @@ input PetitionFilter {
 
 type PetitionFolder {
   """
-  The ID of the petition or template.
+  The ID of the petition folder.
   """
   id: ID!
 

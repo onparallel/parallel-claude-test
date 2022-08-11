@@ -79,7 +79,7 @@ export const PetitionFolder = objectType({
   name: "PetitionFolder",
   definition(t) {
     t.id("id", {
-      description: "The ID of the petition or template.",
+      description: "The ID of the petition folder.",
       resolve: (o) => encode(Buffer.from(`PetitionFolder:${o.path}`, "utf8")),
     });
     t.string("name", {
