@@ -819,7 +819,8 @@ export const publicCreateAndSendPetitionFromPublicLink = mutationField(
         await ctx.petitions.createPermissionsFromTemplateDefaultPermissions(
           petition.id,
           link.template_id,
-          `PublicPetitionLink:${link.id}`,
+          "PublicPetitionLink",
+          link.id,
           t
         );
 

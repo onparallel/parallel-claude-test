@@ -1,8 +1,5 @@
 import { ApolloError } from "apollo-server-core";
 import { booleanArg, mutationField, nonNull } from "nexus";
-import { difference, partition } from "remeda";
-import { ApiContext } from "../../../context";
-import { toGlobalId } from "../../../util/globalId";
 import { getMentions, toPlainText } from "../../../util/slate";
 import { and, authenticateAnd, ifArgEquals } from "../../helpers/authorize";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
@@ -17,94 +14,6 @@ import {
   userHasAccessToPetitionFieldComment,
   userHasAccessToPetitions,
 } from "../authorizers";
-
-async function manageMentionsSharing(
-  mentions: ReturnType<typeof getMentions>,
-  petitionId: number,
-  throwOnNoPermission: boolean,
-  sharePetition: boolean,
-  ctx: ApiContext
-) {
-  const [userMentions, userGroupMentions] = partition(mentions, (m) => m.type === "User");
-  const { users: userIdsWithPermission, userGroups: groupIdsWithPermission } =
-    await ctx.petitions.filterUsersWithPetitionPermission(
-      petitionId,
-      userMentions.map((m) => m.id),
-      userGroupMentions.map((m) => m.id)
-    );
-
-  const userIdsWithNoPermissions = difference(
-    userMentions.map((m) => m.id),
-    userIdsWithPermission
-  );
-
-  const userGroupIdsWithNoPermissions = difference(
-    userGroupMentions.map((m) => m.id),
-    groupIdsWithPermission
-  );
-
-  if (userIdsWithNoPermissions.length > 0 || userGroupIdsWithNoPermissions.length > 0) {
-    if (throwOnNoPermission) {
-      throw new ApolloError(`Mentioned users with no permissions`, "NO_PERMISSIONS_MENTION_ERROR", {
-        ids: [
-          ...userIdsWithNoPermissions.map((id) => toGlobalId("User", id)),
-          ...userGroupIdsWithNoPermissions.map((id) => toGlobalId("UserGroup", id)),
-        ],
-      });
-    } else if (sharePetition) {
-      await ctx.petitions.withTransaction(async (t) => {
-        const { newPermissions } = await ctx.petitions.addPetitionPermissions(
-          [petitionId],
-          [
-            ...userIdsWithNoPermissions.map((userId) => ({
-              type: "User" as const,
-              id: userId,
-              isSubscribed: false,
-              permissionType: "READ" as const,
-            })),
-            ...userGroupIdsWithNoPermissions.map((groupId) => ({
-              type: "UserGroup" as const,
-              id: groupId,
-              isSubscribed: false,
-              permissionType: "READ" as const,
-            })),
-          ],
-          `User:${ctx.user!.id}`,
-          t
-        );
-
-        const [directlyAssigned, groupAssigned] = partition(
-          newPermissions.filter((p) => p.from_user_group_id === null),
-          (p) => p.user_group_id === null
-        );
-
-        await ctx.petitions.createEvent(
-          [
-            ...directlyAssigned.map((p) => ({
-              petition_id: p.petition_id,
-              type: "USER_PERMISSION_ADDED" as const,
-              data: {
-                user_id: ctx.user!.id,
-                permission_type: p.type,
-                permission_user_id: p.user_id!,
-              },
-            })),
-            ...groupAssigned.map((p) => ({
-              petition_id: p.petition_id,
-              type: "GROUP_PERMISSION_ADDED" as const,
-              data: {
-                user_id: ctx.user!.id,
-                permission_type: p.type,
-                user_group_id: p.user_group_id!,
-              },
-            })),
-          ],
-          t
-        );
-      });
-    }
-  }
-}
 
 export const createPetitionFieldComment = mutationField("createPetitionFieldComment", {
   description: "Create a petition field comment.",
@@ -137,29 +46,41 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
     }),
   },
   resolve: async (_, args, ctx) => {
-    await manageMentionsSharing(
-      getMentions(args.content),
-      args.petitionId,
-      args.throwOnNoPermission ?? true,
-      args.sharePetition ?? false,
-      ctx
-    );
+    try {
+      await ctx.petitions.checkUserMentions(
+        getMentions(args.content),
+        args.petitionId,
+        args.throwOnNoPermission ?? true,
+        args.sharePetition ?? false,
+        ctx.user!.id
+      );
 
-    ctx.petitions.loadPetitionFieldCommentsForField.dataloader.clear({
-      loadInternalComments: true,
-      petitionFieldId: args.petitionFieldId,
-      petitionId: args.petitionId,
-    });
-    return await ctx.petitions.createPetitionFieldCommentFromUser(
-      {
-        petitionId: args.petitionId,
+      ctx.petitions.loadPetitionFieldCommentsForField.dataloader.clear({
+        loadInternalComments: true,
         petitionFieldId: args.petitionFieldId,
-        contentJson: args.content,
-        content: toPlainText(args.content),
-        isInternal: args.isInternal ?? false,
-      },
-      ctx.user!
-    );
+        petitionId: args.petitionId,
+      });
+      return await ctx.petitions.createPetitionFieldCommentFromUser(
+        {
+          petitionId: args.petitionId,
+          petitionFieldId: args.petitionFieldId,
+          contentJson: args.content,
+          content: toPlainText(args.content),
+          isInternal: args.isInternal ?? false,
+        },
+        ctx.user!
+      );
+    } catch (e: any) {
+      if (e.code === "NO_PERMISSIONS_MENTION_ERROR") {
+        throw new ApolloError(
+          `Mentioned users with no permissions`,
+          "NO_PERMISSIONS_MENTION_ERROR",
+          { ids: e.ids }
+        );
+      } else {
+        throw e;
+      }
+    }
   },
 });
 
@@ -211,21 +132,33 @@ export const updatePetitionFieldComment = mutationField("updatePetitionFieldComm
     }),
   },
   resolve: async (_, args, ctx) => {
-    await manageMentionsSharing(
-      getMentions(args.content),
-      args.petitionId,
-      args.throwOnNoPermission ?? true,
-      args.sharePetition ?? false,
-      ctx
-    );
+    try {
+      await ctx.petitions.checkUserMentions(
+        getMentions(args.content),
+        args.petitionId,
+        args.throwOnNoPermission ?? true,
+        args.sharePetition ?? false,
+        ctx.user!.id
+      );
 
-    return await ctx.petitions.updatePetitionFieldCommentFromUser(
-      args.petitionFieldCommentId,
-      {
-        content: toPlainText(args.content),
-        contentJson: args.content,
-      },
-      ctx.user!
-    );
+      return await ctx.petitions.updatePetitionFieldCommentFromUser(
+        args.petitionFieldCommentId,
+        {
+          content: toPlainText(args.content),
+          contentJson: args.content,
+        },
+        ctx.user!
+      );
+    } catch (e: any) {
+      if (e.code === "NO_PERMISSIONS_MENTION_ERROR") {
+        throw new ApolloError(
+          `Mentioned users with no permissions`,
+          "NO_PERMISSIONS_MENTION_ERROR",
+          { ids: e.ids }
+        );
+      } else {
+        throw e;
+      }
+    }
   },
 });

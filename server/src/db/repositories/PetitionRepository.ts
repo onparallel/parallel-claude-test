@@ -6,6 +6,7 @@ import pMap from "p-map";
 import {
   chunk,
   countBy,
+  difference,
   groupBy,
   indexBy,
   isDefined,
@@ -20,12 +21,13 @@ import { average, findLast, partition, unMaybeArray } from "../../util/arrays";
 import { completedFieldReplies } from "../../util/completedFieldReplies";
 import { evaluateFieldVisibility, PetitionFieldVisibility } from "../../util/fieldVisibility";
 import { fromDataLoader } from "../../util/fromDataLoader";
-import { fromGlobalId } from "../../util/globalId";
+import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
 import { keyBuilder } from "../../util/keyBuilder";
 import { pFlatMap } from "../../util/promises/pFlatMap";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import { calculateNextReminder, PetitionAccessReminderConfig } from "../../util/reminderUtils";
+import { getMentions } from "../../util/slate";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
 import {
@@ -199,37 +201,6 @@ export class PetitionRepository extends BaseRepository {
       permissionTypes
     );
     return permissions.every((p) => p);
-  }
-
-  async filterUsersWithPetitionPermission(
-    petitionId: number,
-    userIds: number[],
-    userGroupIds: number[]
-  ) {
-    const [userRows, userGroupRows] = await Promise.all([
-      userIds.length === 0
-        ? []
-        : await this.from("petition_permission")
-            .whereIn("user_id", userIds)
-            .where("petition_id", petitionId)
-            .whereNull("deleted_at")
-            .whereNull("user_group_id")
-            .select<{ user_id: number }[]>(this.knex.raw(`distinct(user_id)`)),
-      userGroupIds.length === 0
-        ? []
-        : await this.from("petition_permission")
-            .whereIn("user_group_id", userGroupIds)
-            .where("petition_id", petitionId)
-            .whereNull("deleted_at")
-            .whereNull("user_id")
-            .select<{ user_group_id: number }[]>(this.knex.raw(`distinct(user_group_id)`)),
-    ]);
-    return {
-      users: userRows.filter((r) => userIds.includes(r.user_id)).map((r) => r.user_id),
-      userGroups: userGroupRows
-        .filter((r) => userGroupIds.includes(r.user_group_id))
-        .map((r) => r.user_group_id),
-    };
   }
 
   async userHasAccessToPetitionsRaw(
@@ -3430,21 +3401,21 @@ export class PetitionRepository extends BaseRepository {
       permissionType: PetitionPermissionType;
       isSubscribed: boolean;
     }[],
-    createdBy: string,
+    creator: "User" | "PublicPetitionLink",
+    creatorId: number,
+    createEvents?: boolean,
     t?: Knex.Transaction
   ) {
+    const createdBy = `${creator}:${creatorId}`;
     const [newUsers, newUserGroups] = partition(data, (d) => d.type === "User");
     return await this.withTransaction(async (t) => {
       const permissionType =
         newUsers.length > 0 ? newUsers[0].permissionType : newUserGroups[0].permissionType;
-      const [
-        directlyAssignedNewUserPermissions,
-        userGroupNewPermissions,
-        groupAssignedNewUserPermissions,
-      ] = await Promise.all([
-        newUsers.length > 0
-          ? this.raw<PetitionPermission>(
-              /* sql */ `
+      const [newUserPermissions, newGroupPermissions, groupAssignedNewUserPermissions] =
+        await Promise.all([
+          newUsers.length > 0
+            ? this.raw<PetitionPermission>(
+                /* sql */ `
                ? on conflict (petition_id, user_id)
                where deleted_at is null and from_user_group_id is null and user_group_id is null 
                   do update set
@@ -3455,31 +3426,31 @@ export class PetitionRepository extends BaseRepository {
                   deleted_at = null where petition_permission.type > ?
                 returning *;
               `,
-              [
-                // directly-assigned user permissions
-                this.from("petition_permission").insert(
-                  petitionIds.flatMap((petitionId) =>
-                    newUsers.map((user) => ({
-                      petition_id: petitionId,
-                      user_id: user.id,
-                      is_subscribed: user.isSubscribed,
-                      type: user.permissionType,
-                      created_by: createdBy,
-                      updated_by: createdBy,
-                    }))
-                  )
-                ),
-                permissionType,
-                createdBy,
-                this.now(),
-                permissionType,
-              ],
-              t
-            )
-          : [],
-        newUserGroups.length > 0
-          ? this.raw<PetitionPermission>(
-              /* sql */ `
+                [
+                  // directly-assigned user permissions
+                  this.from("petition_permission").insert(
+                    petitionIds.flatMap((petitionId) =>
+                      newUsers.map((user) => ({
+                        petition_id: petitionId,
+                        user_id: user.id,
+                        is_subscribed: user.isSubscribed,
+                        type: user.permissionType,
+                        created_by: createdBy,
+                        updated_by: createdBy,
+                      }))
+                    )
+                  ),
+                  permissionType,
+                  createdBy,
+                  this.now(),
+                  permissionType,
+                ],
+                t
+              )
+            : [],
+          newUserGroups.length > 0
+            ? this.raw<PetitionPermission>(
+                /* sql */ `
                 ? on conflict (petition_id, user_group_id)
                 where deleted_at is null and user_group_id is not null
                   do update set
@@ -3490,32 +3461,32 @@ export class PetitionRepository extends BaseRepository {
                   deleted_at = null  where petition_permission.type > ?
                 returning *;
               `,
-              [
-                // group permissions
-                this.from("petition_permission").insert(
-                  petitionIds.flatMap((petitionId) =>
-                    newUserGroups.map((userGroup) => ({
-                      petition_id: petitionId,
-                      user_group_id: userGroup.id,
-                      is_subscribed: userGroup.isSubscribed,
-                      type: userGroup.permissionType,
-                      created_by: createdBy,
-                      updated_by: createdBy,
-                    }))
-                  )
-                ),
-                permissionType,
-                createdBy,
-                this.now(),
-                permissionType,
-              ],
-              t
-            )
-          : [],
-        // user permissions through a user group
-        newUserGroups.length > 0
-          ? this.raw<PetitionPermission>(
-              /* sql */ `
+                [
+                  // group permissions
+                  this.from("petition_permission").insert(
+                    petitionIds.flatMap((petitionId) =>
+                      newUserGroups.map((userGroup) => ({
+                        petition_id: petitionId,
+                        user_group_id: userGroup.id,
+                        is_subscribed: userGroup.isSubscribed,
+                        type: userGroup.permissionType,
+                        created_by: createdBy,
+                        updated_by: createdBy,
+                      }))
+                    )
+                  ),
+                  permissionType,
+                  createdBy,
+                  this.now(),
+                  permissionType,
+                ],
+                t
+              )
+            : [],
+          // user permissions through a user group
+          newUserGroups.length > 0
+            ? this.raw<PetitionPermission>(
+                /* sql */ `
               with gm as (
                 select ugm.user_id, ugm.user_group_id, ugm_info.is_subscribed, ugm_info.permission_type
                 from user_group_member ugm
@@ -3532,29 +3503,55 @@ export class PetitionRepository extends BaseRepository {
               from gm cross join p
               on conflict do nothing returning *;
             `,
-              [
-                this.sqlValues(
-                  newUserGroups.map((ug) => [ug.id, ug.isSubscribed, ug.permissionType]),
-                  ["int", "bool", "petition_permission_type"]
-                ),
-                this.sqlIn(
-                  newUserGroups.map((ug) => ug.id),
-                  "int"
-                ),
-                this.sqlValues(
-                  petitionIds.map((id) => [id]),
-                  ["int"]
-                ),
-                createdBy,
-                createdBy,
-              ],
-              t
-            )
-          : [],
-      ]);
+                [
+                  this.sqlValues(
+                    newUserGroups.map((ug) => [ug.id, ug.isSubscribed, ug.permissionType]),
+                    ["int", "bool", "petition_permission_type"]
+                  ),
+                  this.sqlIn(
+                    newUserGroups.map((ug) => ug.id),
+                    "int"
+                  ),
+                  this.sqlValues(
+                    petitionIds.map((id) => [id]),
+                    ["int"]
+                  ),
+                  createdBy,
+                  createdBy,
+                ],
+                t
+              )
+            : [],
+        ]);
 
       for (const petitionId of petitionIds) {
         this.loadUserPermissionsByPetitionId.dataloader.clear(petitionId);
+      }
+
+      if (createEvents && creator === "User") {
+        await this.createEvent(
+          [
+            ...newUserPermissions.map((p) => ({
+              petition_id: p.petition_id,
+              type: "USER_PERMISSION_ADDED" as const,
+              data: {
+                user_id: creatorId,
+                permission_type: p.type,
+                permission_user_id: p.user_id!,
+              },
+            })),
+            ...newGroupPermissions.map((p) => ({
+              petition_id: p.petition_id,
+              type: "GROUP_PERMISSION_ADDED" as const,
+              data: {
+                user_id: creatorId,
+                permission_type: p.type,
+                user_group_id: p.user_group_id!,
+              },
+            })),
+          ],
+          t
+        );
       }
 
       const petitions = await this.from("petition", t)
@@ -3565,8 +3562,8 @@ export class PetitionRepository extends BaseRepository {
       return {
         petitions,
         newPermissions: [
-          ...directlyAssignedNewUserPermissions,
-          ...userGroupNewPermissions,
+          ...newUserPermissions,
+          ...newGroupPermissions,
           ...groupAssignedNewUserPermissions,
         ],
       };
@@ -4031,7 +4028,8 @@ export class PetitionRepository extends BaseRepository {
   async createPermissionsFromTemplateDefaultPermissions(
     petitionId: number,
     templateId: number,
-    createdBy: string,
+    creator: "User" | "PublicPetitionLink",
+    creatorId: number,
     t?: Knex.Transaction
   ) {
     const defaultPermissions = await this.loadTemplateDefaultPermissions(templateId);
@@ -4044,7 +4042,9 @@ export class PetitionRepository extends BaseRepository {
           permissionType: p.type,
           isSubscribed: p.is_subscribed,
         })),
-        createdBy,
+        creator,
+        creatorId,
+        false,
         t
       );
     }
@@ -5129,5 +5129,60 @@ export class PetitionRepository extends BaseRepository {
     `,
       [user.id, isTemplate, user.org_id, this.sqlArray(paths)]
     );
+  }
+
+  async checkUserMentions(
+    mentions: ReturnType<typeof getMentions>,
+    petitionId: number,
+    throwOnNoPermission: boolean,
+    sharePetition: boolean,
+    userId: number
+  ) {
+    const [userMentions, userGroupMentions] = partition(mentions, (m) => m.type === "User");
+    const permissions = await this.loadUserAndUserGroupPermissionsByPetitionId(petitionId);
+    const [userPermissions, groupPermissions] = partition(permissions, (p) => isDefined(p.user_id));
+
+    const userIdsWithNoPermissions = difference(
+      userMentions.map((m) => m.id),
+      userPermissions.map((p) => p.user_id!)
+    );
+
+    const userGroupIdsWithNoPermissions = difference(
+      userGroupMentions.map((m) => m.id),
+      groupPermissions.map((p) => p.user_group_id!)
+    );
+
+    if (userIdsWithNoPermissions.length > 0 || userGroupIdsWithNoPermissions.length > 0) {
+      if (throwOnNoPermission) {
+        throw {
+          code: "NO_PERMISSIONS_MENTION_ERROR",
+          ids: [
+            ...userIdsWithNoPermissions.map((id) => toGlobalId("User", id)),
+            ...userGroupIdsWithNoPermissions.map((id) => toGlobalId("UserGroup", id)),
+          ],
+        };
+      } else if (sharePetition) {
+        await this.addPetitionPermissions(
+          [petitionId],
+          [
+            ...userIdsWithNoPermissions.map((userId) => ({
+              type: "User" as const,
+              id: userId,
+              isSubscribed: false,
+              permissionType: "READ" as const,
+            })),
+            ...userGroupIdsWithNoPermissions.map((groupId) => ({
+              type: "UserGroup" as const,
+              id: groupId,
+              isSubscribed: false,
+              permissionType: "READ" as const,
+            })),
+          ],
+          "User",
+          userId,
+          true
+        );
+      }
+    }
   }
 }

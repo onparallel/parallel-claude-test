@@ -171,7 +171,8 @@ export const createPetition = mutationField("createPetition", {
               permissionType: "WRITE",
             },
           ],
-          `User:${ctx.user!.id}`
+          "User",
+          ctx.user!.id
         );
       }
 
@@ -179,7 +180,8 @@ export const createPetition = mutationField("createPetition", {
         await ctx.petitions.createPermissionsFromTemplateDefaultPermissions(
           petition.id,
           original.id,
-          `User:${ctx.user!.id}`
+          "User",
+          ctx.user!.id
         );
       }
 

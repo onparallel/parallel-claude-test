@@ -2,7 +2,6 @@ import { ApolloError } from "apollo-server-core";
 import { arg, booleanArg, list, mutationField, nonNull, nullable, stringArg } from "nexus";
 import pMap from "p-map";
 import { groupBy, isDefined, uniq, zip } from "remeda";
-import { partition } from "../../../util/arrays";
 import { and, authenticate, authenticateAnd, chain, ifArgDefined } from "../../helpers/authorize";
 import { ArgValidationError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
@@ -76,58 +75,27 @@ export const addPetitionPermission = mutationField("addPetitionPermission", {
     const currentPermissions = (
       await ctx.petitions.loadEffectivePermissions(args.petitionIds)
     ).flat();
-    const { petitions, newPermissions } = await ctx.petitions.withTransaction(async (t) => {
-      const { petitions, newPermissions } = await ctx.petitions.addPetitionPermissions(
-        args.petitionIds,
-        [
-          ...(args.userIds ?? []).map((userId) => ({
-            type: "User" as const,
-            id: userId,
-            isSubscribed: args.subscribe ?? true,
-            permissionType: args.permissionType,
-          })),
-          ...(args.userGroupIds ?? []).map((userGroupId) => ({
-            type: "UserGroup" as const,
-            id: userGroupId,
-            isSubscribed: args.subscribe ?? true,
-            permissionType: args.permissionType,
-          })),
-        ],
-        `User:${ctx.user!.id}`,
-        t
-      );
 
-      const [directlyAssigned, groupAssigned] = partition(
-        newPermissions.filter((p) => p.from_user_group_id === null),
-        (p) => p.user_group_id === null
-      );
-
-      await ctx.petitions.createEvent(
-        [
-          ...directlyAssigned.map((p) => ({
-            petition_id: p.petition_id,
-            type: "USER_PERMISSION_ADDED" as const,
-            data: {
-              user_id: ctx.user!.id,
-              permission_type: p.type,
-              permission_user_id: p.user_id!,
-            },
-          })),
-          ...groupAssigned.map((p) => ({
-            petition_id: p.petition_id,
-            type: "GROUP_PERMISSION_ADDED" as const,
-            data: {
-              user_id: ctx.user!.id,
-              permission_type: p.type,
-              user_group_id: p.user_group_id!,
-            },
-          })),
-        ],
-        t
-      );
-
-      return { petitions, newPermissions };
-    });
+    const { petitions, newPermissions } = await ctx.petitions.addPetitionPermissions(
+      args.petitionIds,
+      [
+        ...(args.userIds ?? []).map((userId) => ({
+          type: "User" as const,
+          id: userId,
+          isSubscribed: args.subscribe ?? true,
+          permissionType: args.permissionType,
+        })),
+        ...(args.userGroupIds ?? []).map((userGroupId) => ({
+          type: "UserGroup" as const,
+          id: userGroupId,
+          isSubscribed: args.subscribe ?? true,
+          permissionType: args.permissionType,
+        })),
+      ],
+      "User",
+      ctx.user!.id,
+      true
+    );
 
     if (args.notify) {
       /** we have to notify only those users who didn't have any permission before */
