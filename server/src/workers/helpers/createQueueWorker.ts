@@ -1,11 +1,12 @@
 import { SQSClient } from "@aws-sdk/client-sqs";
 import "reflect-metadata";
-import { Consumer } from "sqs-consumer-v3";
+import { Consumer } from "@rxfork/sqs-consumer";
 import yargs from "yargs";
 import { CONFIG, Config } from "../../config";
 import { createContainer } from "../../container";
 import { WorkerContext } from "../../context";
 import { ILogger, LOGGER } from "../../services/logger";
+import { awsLogger } from "../../util/awsLogger";
 import { loadEnv } from "../../util/loadEnv";
 import { stopwatch } from "../../util/stopwatch";
 
@@ -76,6 +77,7 @@ export function createQueueWorker<P, Q extends keyof Config["queueWorkers"]>(
           sqs: new SQSClient({
             ...config.aws,
             endpoint: config.queueWorkers[name].endpoint,
+            logger: awsLogger(logger),
           }),
         });
         consumer.on("error", (error) => {

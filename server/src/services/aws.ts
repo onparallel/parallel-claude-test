@@ -10,6 +10,7 @@ import { Memoize } from "typescript-memoize";
 import { Config, CONFIG } from "../config";
 import { PetitionEvent, SystemEvent } from "../db/events";
 import { unMaybeArray } from "../util/arrays";
+import { awsLogger } from "../util/awsLogger";
 import { MaybeArray } from "../util/types";
 import { ILogger, LOGGER } from "./logger";
 import { IStorage, Storage, STORAGE_FACTORY } from "./storage";
@@ -67,6 +68,7 @@ export class Aws implements IAws {
     return new S3Client({
       ...this.config.aws,
       useAccelerateEndpoint: true,
+      logger: awsLogger(this.logger),
     });
   }
 
@@ -74,6 +76,7 @@ export class Aws implements IAws {
     return new SQSClient({
       ...this.config.aws,
       endpoint: this.config.queueWorkers[queue].endpoint,
+      logger: awsLogger(this.logger),
     });
   }
 
