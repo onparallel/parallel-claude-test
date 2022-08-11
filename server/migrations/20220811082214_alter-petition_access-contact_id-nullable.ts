@@ -16,12 +16,29 @@ export async function down(knex: Knex): Promise<void> {
   const petitionAccessIds = accesess.map((pa) => pa.id);
 
   if (petitionAccessIds.length) {
-    await knex
+    const events = await knex
       .from("petition_event")
       .whereIn("petition_id", uniq(accesess.map((a) => a.petition_id)))
       .whereIn("type", ["ACCESS_ACTIVATED", "ACCESS_DEACTIVATED"])
       .whereIn(knex.raw("(data ->> 'petition_access_id')::int") as any, petitionAccessIds)
-      .delete();
+      .select("*");
+
+    if (events.length > 0) {
+      await knex
+        .from("user_petition_event_log")
+        .whereIn(
+          "petition_event_id",
+          events.map((e) => e.id)
+        )
+        .delete();
+      await knex
+        .from("petition_event")
+        .whereIn(
+          "id",
+          events.map((e) => e.id)
+        )
+        .delete();
+    }
 
     await knex.from("petition_access").whereIn("id", petitionAccessIds).delete();
   }
