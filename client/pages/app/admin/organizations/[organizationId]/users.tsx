@@ -22,6 +22,7 @@ import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
+import { withError } from "@parallel/utils/promises/withError";
 import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useClipboardWithToast } from "@parallel/utils/useClipboardWithToast";
@@ -86,7 +87,10 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
   const showInviteUserDialog = useInviteUserDialog();
   async function handleInviteUser() {
     try {
-      const user = await showInviteUserDialog({});
+      const [error, user] = await withError(showInviteUserDialog({}));
+      if (error || !user) {
+        return;
+      }
 
       await createOrganizationUser({
         variables: {
@@ -118,9 +122,7 @@ function AdminOrganizationsMembers({ organizationId }: AdminOrganizationsMembers
         ),
       });
     } catch (e: any) {
-      if (e.message !== "CANCEL") {
-        genericError();
-      }
+      genericError();
     }
   }
 

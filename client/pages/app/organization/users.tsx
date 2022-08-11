@@ -141,8 +141,11 @@ function OrganizationUsers() {
   const showCreateOrUpdateUserDialog = useCreateOrUpdateUserDialog();
   const handleCreateUser = async () => {
     try {
-      const { userGroups, ...user } = await showCreateOrUpdateUserDialog({});
-
+      const [error, data] = await withError(showCreateOrUpdateUserDialog({}));
+      if (error || !data) {
+        return;
+      }
+      const { userGroups, ...user } = data;
       await createOrganizationUser({
         variables: {
           ...user,
@@ -171,9 +174,7 @@ function OrganizationUsers() {
         isClosable: true,
       });
     } catch (e: any) {
-      if (e.message !== "CANCEL") {
-        genericError();
-      }
+      genericError();
     }
   };
 

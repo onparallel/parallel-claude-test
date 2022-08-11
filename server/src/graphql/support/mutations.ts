@@ -1,7 +1,5 @@
 import { arg, booleanArg, idArg, intArg, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { isDefined, uniq } from "remeda";
-import { ApiContext } from "../../context";
-import { UserOrganizationRole } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { hash, random } from "../../util/token";
@@ -18,48 +16,6 @@ import { validLocale } from "../helpers/validators/validLocale";
 import { validateHexColor } from "../tag/validators";
 import { supportMethodAccess } from "./authorizers";
 import { validatePublicTemplateCategories } from "./validators";
-
-async function supportCreateUser(
-  args: {
-    orgId: number;
-    orgName: string;
-    email: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-    role: UserOrganizationRole;
-    locale: string;
-  },
-  ctx: ApiContext
-) {
-  const email = args.email.trim().toLowerCase();
-  const userData = (await ctx.users.loadUserData(ctx.user!.user_data_id))!;
-  const cognitoId = await ctx.aws.getOrCreateCognitoUser(
-    email,
-    args.password,
-    args.firstName,
-    args.lastName,
-    {
-      locale: args.locale ?? "en",
-      organizationName: args.orgName,
-      organizationUser: fullName(userData.first_name, userData.last_name),
-    }
-  );
-  return await ctx.users.createUser(
-    {
-      org_id: args.orgId,
-      organization_role: args.role,
-    },
-    {
-      cognito_id: cognitoId,
-      email: args.email.trim().toLowerCase(),
-      first_name: args.firstName,
-      last_name: args.lastName,
-      details: { source: "parallel", preferredLocale: args.locale ?? "en" },
-    },
-    `User:${ctx.user!.id}`
-  );
-}
 
 export const assignPetitionToUser = mutationField("assignPetitionToUser", {
   description: "Clones the petition and assigns the given user as owner and creator.",
@@ -157,19 +113,36 @@ export const createOrganization = mutationField("createOrganization", {
         },
         `User:${ctx.user!.id}`
       );
-      await supportCreateUser(
+
+      const email = args.email.trim().toLowerCase();
+      const userData = (await ctx.users.loadUserData(ctx.user!.user_data_id))!;
+      const cognitoId = await ctx.aws.getOrCreateCognitoUser(
+        email,
+        args.password,
+        args.firstName,
+        args.lastName,
         {
-          orgId: org.id,
-          orgName: org.name,
-          email: args.email,
-          firstName: args.firstName,
-          lastName: args.lastName,
-          password: args.password,
-          role: "OWNER",
-          locale: args.locale ?? "es",
-        },
-        ctx
+          locale: args.locale ?? "en",
+          organizationName: org.name,
+          organizationUser: fullName(userData.first_name, userData.last_name),
+        }
       );
+
+      await ctx.users.createUser(
+        {
+          org_id: org.id,
+          organization_role: "OWNER",
+        },
+        {
+          cognito_id: cognitoId,
+          email,
+          first_name: args.firstName,
+          last_name: args.lastName,
+          details: { source: "parallel", preferredLocale: args.locale ?? "en" },
+        },
+        `User:${ctx.user!.id}`
+      );
+
       await ctx.tiers.updateOrganizationTier(org, "FREE", `User:${ctx.user!.id}`);
       return {
         result: RESULT.SUCCESS,
@@ -205,18 +178,33 @@ export const createUser = mutationField("createUser", {
       if (!org) {
         throw new Error(`Organization with id ${args.organizationId} does not exist.`);
       }
-      const user = await supportCreateUser(
+
+      const email = args.email.trim().toLowerCase();
+      const userData = (await ctx.users.loadUserData(ctx.user!.user_data_id))!;
+      const cognitoId = await ctx.aws.getOrCreateCognitoUser(
+        email,
+        args.password,
+        args.firstName,
+        args.lastName,
         {
-          orgId: org.id,
-          orgName: org.name,
-          email: args.email,
-          firstName: args.firstName,
-          lastName: args.lastName,
-          password: args.password,
-          role: args.role,
           locale: args.locale ?? "en",
+          organizationName: org.name,
+          organizationUser: fullName(userData.first_name, userData.last_name),
+        }
+      );
+      const user = await ctx.users.createUser(
+        {
+          org_id: org.id,
+          organization_role: args.role,
         },
-        ctx
+        {
+          cognito_id: cognitoId,
+          email,
+          first_name: args.firstName,
+          last_name: args.lastName,
+          details: { source: "parallel", preferredLocale: args.locale ?? "en" },
+        },
+        `User:${ctx.user!.id}`
       );
       return {
         result: RESULT.SUCCESS,
