@@ -19,21 +19,10 @@ const RUNNERS: Record<TaskName, new (ctx: WorkerContext, task: Task<any>) => Tas
 };
 
 createQueueWorker("task-worker", async ({ taskId }: { taskId: number }, ctx) => {
-  try {
-    const task = await ctx.tasks.pickupTask(taskId, `TaskWorker:${taskId}`);
-    if (!isDefined(task)) {
-      return;
-    }
-    const Runner = RUNNERS[task.name as TaskName];
-    const output = await new Runner(ctx, task).run();
-
-    await ctx.tasks.taskCompleted(taskId, output, `TaskWorker:${taskId}`);
-  } catch (error: any) {
-    ctx.logger.error(error.message, { stack: error.stack });
-    await ctx.tasks.taskFailed(
-      taskId,
-      { message: error.message, stack: error.stack },
-      `TaskWorker:${taskId}`
-    );
+  const task = await ctx.tasks.pickupTask(taskId, `TaskWorker:${taskId}`);
+  if (!isDefined(task)) {
+    return;
   }
+  const Runner = RUNNERS[task.name as TaskName];
+  await new Runner(ctx, task).runTask();
 });
