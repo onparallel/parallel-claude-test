@@ -162,7 +162,7 @@ export function PetitionAccessesTable({
             context={context}
             rows={petition.accesses}
             rowKeyProp="id"
-            isSelectable={showActions}
+            isSelectable
             onSelectionChange={setSelection}
             marginBottom={2}
           />
