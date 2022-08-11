@@ -76,7 +76,7 @@ export function createQueueWorker<P, Q extends keyof Config["queueWorkers"]>(
           },
           sqs: new SQSClient({
             ...config.aws,
-            endpoint: config.queueWorkers[name].endpoint,
+            endpoint: process.env.NODE_ENV === "development" ? "http://localhost:9324" : undefined,
             logger: awsLogger(logger),
           }),
         });

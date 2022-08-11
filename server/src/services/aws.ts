@@ -72,10 +72,10 @@ export class Aws implements IAws {
     });
   }
 
-  @Memoize((queue) => queue) private sqs(queue: keyof Config["queueWorkers"]) {
+  @Memoize() private get sqs() {
     return new SQSClient({
       ...this.config.aws,
-      endpoint: this.config.queueWorkers[queue].endpoint,
+      endpoint: process.env.NODE_ENV === "development" ? "http://localhost:9324" : undefined,
       logger: awsLogger(this.logger),
     });
   }
@@ -142,7 +142,7 @@ export class Aws implements IAws {
     const queueUrl = this.config.queueWorkers[queue].endpoint;
     if (Array.isArray(messages)) {
       for (const batch of chunk(messages, 10)) {
-        await this.sqs(queue).send(
+        await this.sqs.send(
           new SendMessageBatchCommand({
             QueueUrl: queueUrl,
             Entries: batch.map(({ id, body, groupId }) => ({
@@ -154,7 +154,7 @@ export class Aws implements IAws {
         );
       }
     } else {
-      await this.sqs(queue).send(
+      await this.sqs.send(
         new SendMessageCommand({
           QueueUrl: queueUrl,
           MessageBody: JSON.stringify(messages.body),
