@@ -600,12 +600,6 @@ export interface NexusGenObjects {
   PublicPetitionAccess: db.PetitionAccess;
   PublicPetitionField: db.PetitionField;
   PublicPetitionFieldComment: db.PetitionFieldComment;
-  PublicPetitionFieldCommentMention: {
-    // root type
-    id: string; // String!
-    name?: string | null; // String
-    type: string; // String!
-  };
   PublicPetitionFieldReply: db.PetitionFieldReply;
   PublicPetitionLink: db.PublicPetitionLink;
   PublicPetitionMessage: db.PetitionMessage;
@@ -1794,13 +1788,6 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isAnonymized: boolean; // Boolean!
     isUnread: boolean; // Boolean!
-    mentions: NexusGenRootTypes["PublicPetitionFieldCommentMention"][]; // [PublicPetitionFieldCommentMention!]!
-  };
-  PublicPetitionFieldCommentMention: {
-    // field return type
-    id: string; // String!
-    name: string | null; // String
-    type: string; // String!
   };
   PublicPetitionFieldReply: {
     // field return type
@@ -3381,13 +3368,6 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isAnonymized: "Boolean";
     isUnread: "Boolean";
-    mentions: "PublicPetitionFieldCommentMention";
-  };
-  PublicPetitionFieldCommentMention: {
-    // field return type name
-    id: "String";
-    name: "String";
-    type: "String";
   };
   PublicPetitionFieldReply: {
     // field return type name
