@@ -1660,7 +1660,7 @@ export const sendPetitionClosedNotification = mutationField("sendPetitionClosedN
 
     const accesses = await ctx.petitions.loadAccessesForPetition(args.petitionId);
 
-    const activeAccesses = accesses.filter((a) => a.status === "ACTIVE");
+    const activeAccesses = accesses.filter((a) => a.status === "ACTIVE" && isDefined(a.contact_id));
 
     await Promise.all([
       ctx.emails.sendPetitionClosedEmail(

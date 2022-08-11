@@ -46,6 +46,7 @@ export async function petitionClosedNotification(
       ? await context.contacts.loadContact(access!.contact_id)
       : null;
     if (!contact) {
+      context.logger.error(`Expected Contact to be defined on PetitionAccess:${access!.id}`);
       continue;
     }
 

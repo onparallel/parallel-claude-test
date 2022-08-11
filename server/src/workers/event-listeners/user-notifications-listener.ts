@@ -61,7 +61,12 @@ async function createCommentPublishedUserNotifications(
   ]);
 
   const accessIds = accesses
-    .filter((a) => a.status === "ACTIVE" && a.id !== comment.petition_access_id)
+    .filter(
+      (a) =>
+        a.status === "ACTIVE" && // active access
+        a.id !== comment.petition_access_id && // don't notify comment author
+        isDefined(a.contact_id) // filter contactless
+    )
     .map((a) => a.id);
   const userIds = users.filter((u) => u.id !== comment.user_id).map((u) => u.id);
 

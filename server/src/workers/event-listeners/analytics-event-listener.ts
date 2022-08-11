@@ -131,8 +131,12 @@ async function trackPetitionClosedEvent(event: PetitionClosedEvent, ctx: WorkerC
 }
 
 async function trackAccessActivatedEvent(event: AccessActivatedEvent, ctx: WorkerContext) {
-  const petition = await ctx.petitions.loadPetition(event.petition_id);
-  if (!petition) return;
+  const [petition, access] = await Promise.all([
+    ctx.petitions.loadPetition(event.petition_id),
+    ctx.petitions.loadAccess(event.data.petition_access_id),
+  ]);
+
+  if (!petition || !access || !access.contact_id) return; // skip tracking of contactless accesses
 
   const [user, contact] = await Promise.all([
     loadPetitionOwner(event.petition_id, ctx),
