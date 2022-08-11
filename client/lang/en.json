@@ -660,11 +660,6 @@
     "context": "Import contacts"
   },
   {
-    "term": "component.contact-reference.empty",
-    "definition": "Empty",
-    "context": "Empty"
-  },
-  {
     "term": "component.contact-select.bounced-email-tooltip",
     "definition": "Previously bounced email",
     "context": "Previously bounced email"
@@ -1843,6 +1838,61 @@
     "term": "component.password-restrict-petition.title",
     "definition": "Password protection",
     "context": "Password protection"
+  },
+  {
+    "term": "component.petition-accesses-table.activate-access",
+    "definition": "Reactivate access",
+    "context": "Reactivate access"
+  },
+  {
+    "term": "component.petition-accesses-table.contact-header",
+    "definition": "Contact",
+    "context": "Contact"
+  },
+  {
+    "term": "component.petition-accesses-table.contactless-access-contact",
+    "definition": "No contact",
+    "context": "No contact"
+  },
+  {
+    "term": "component.petition-accesses-table.deactivate-access",
+    "definition": "Remove access",
+    "context": "Remove access"
+  },
+  {
+    "term": "component.petition-accesses-table.next-reminder-header",
+    "definition": "Next reminder",
+    "context": "Next reminder"
+  },
+  {
+    "term": "component.petition-accesses-table.no-reminders-sent",
+    "definition": "No reminders sent",
+    "context": "No reminders sent"
+  },
+  {
+    "term": "component.petition-accesses-table.reminder-settings",
+    "definition": "Reminder settings",
+    "context": "Reminder settings"
+  },
+  {
+    "term": "component.petition-accesses-table.reminders-opt-out-popover",
+    "definition": "Opted out from receiving reminders",
+    "context": "Opted out from receiving reminders"
+  },
+  {
+    "term": "component.petition-accesses-table.reminders-sent-header",
+    "definition": "Reminders sent",
+    "context": "Reminders sent"
+  },
+  {
+    "term": "component.petition-accesses-table.send-reminder",
+    "definition": "Send reminder",
+    "context": "Send reminder"
+  },
+  {
+    "term": "component.petition-accesses-table.status-header",
+    "definition": "Status",
+    "context": "Status"
   },
   {
     "term": "component.petition-attachments-card.header",
@@ -5745,14 +5795,14 @@
     "context": "Draft"
   },
   {
-    "term": "generic.parallel-type-plural",
-    "definition": "Parallels",
-    "context": "Parallels"
-  },
-  {
     "term": "generic.parallel-status.pending",
     "definition": "Pending",
     "context": "Pending"
+  },
+  {
+    "term": "generic.parallel-type-plural",
+    "definition": "Parallels",
+    "context": "Parallels"
   },
   {
     "term": "generic.plans.enterprise",
@@ -6943,56 +6993,6 @@
     "term": "petition-access.status-pending",
     "definition": "Pending",
     "context": "Pending"
-  },
-  {
-    "term": "petition-accesses.activate-access",
-    "definition": "Reactivate access",
-    "context": "Reactivate access"
-  },
-  {
-    "term": "petition-accesses.contact-header",
-    "definition": "Contact",
-    "context": "Contact"
-  },
-  {
-    "term": "petition-accesses.deactivate-access",
-    "definition": "Remove access",
-    "context": "Remove access"
-  },
-  {
-    "term": "petition-accesses.next-reminder-header",
-    "definition": "Next reminder",
-    "context": "Next reminder"
-  },
-  {
-    "term": "petition-accesses.no-reminders-sent",
-    "definition": "No reminders sent",
-    "context": "No reminders sent"
-  },
-  {
-    "term": "petition-accesses.reminder-settings",
-    "definition": "Reminder settings",
-    "context": "Reminder settings"
-  },
-  {
-    "term": "petition-accesses.reminders-opt-out-popover",
-    "definition": "Opted out from receiving reminders",
-    "context": "Opted out from receiving reminders"
-  },
-  {
-    "term": "petition-accesses.reminders-sent-header",
-    "definition": "Reminders sent",
-    "context": "Reminders sent"
-  },
-  {
-    "term": "petition-accesses.send-reminder",
-    "definition": "Send reminder",
-    "context": "Send reminder"
-  },
-  {
-    "term": "petition-accesses.status-header",
-    "definition": "Status",
-    "context": "Status"
   },
   {
     "term": "petition-compose.settings",
@@ -8978,6 +8978,11 @@
     "term": "timeline.comment-published.message-not-available",
     "definition": "Message not available",
     "context": "Message not available"
+  },
+  {
+    "term": "timeline.contactless-access-deactivated-manual-description",
+    "definition": "{userIsYou, select, true {You} other {{user}}} deactivated a link access {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} deactivated a link access {timeAgo}"
   },
   {
     "term": "timeline.edit-group-permission-description",

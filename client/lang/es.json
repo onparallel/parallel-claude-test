@@ -660,11 +660,6 @@
     "context": "Import contacts"
   },
   {
-    "term": "component.contact-reference.empty",
-    "definition": "Vacío",
-    "context": "Empty"
-  },
-  {
     "term": "component.contact-select.bounced-email-tooltip",
     "definition": "Correo rebotado previamente",
     "context": "Previously bounced email"
@@ -1843,6 +1838,61 @@
     "term": "component.password-restrict-petition.title",
     "definition": "Protección con contraseña",
     "context": "Password protection"
+  },
+  {
+    "term": "component.petition-accesses-table.activate-access",
+    "definition": "Reactivar acceso",
+    "context": "Reactivate access"
+  },
+  {
+    "term": "component.petition-accesses-table.contact-header",
+    "definition": "Contacto",
+    "context": "Contact"
+  },
+  {
+    "term": "component.petition-accesses-table.contactless-access-contact",
+    "definition": "Sin contacto",
+    "context": "No contact"
+  },
+  {
+    "term": "component.petition-accesses-table.deactivate-access",
+    "definition": "Quitar acceso",
+    "context": "Remove access"
+  },
+  {
+    "term": "component.petition-accesses-table.next-reminder-header",
+    "definition": "Siguiente recordatorio",
+    "context": "Next reminder"
+  },
+  {
+    "term": "component.petition-accesses-table.no-reminders-sent",
+    "definition": "No se han enviado recordatorios",
+    "context": "No reminders sent"
+  },
+  {
+    "term": "component.petition-accesses-table.reminder-settings",
+    "definition": "Configurar recordatorios",
+    "context": "Reminder settings"
+  },
+  {
+    "term": "component.petition-accesses-table.reminders-opt-out-popover",
+    "definition": "El contacto desea no recibir recordatorios",
+    "context": "Opted out from receiving reminders"
+  },
+  {
+    "term": "component.petition-accesses-table.reminders-sent-header",
+    "definition": "Recordatorios enviados",
+    "context": "Reminders sent"
+  },
+  {
+    "term": "component.petition-accesses-table.send-reminder",
+    "definition": "Enviar recordatorio",
+    "context": "Send reminder"
+  },
+  {
+    "term": "component.petition-accesses-table.status-header",
+    "definition": "Estado",
+    "context": "Status"
   },
   {
     "term": "component.petition-attachments-card.header",
@@ -5745,14 +5795,14 @@
     "context": "Draft"
   },
   {
-    "term": "generic.parallel-type-plural",
-    "definition": "Parallels",
-    "context": "Parallels"
-  },
-  {
     "term": "generic.parallel-status.pending",
     "definition": "Pendiente",
     "context": "Pending"
+  },
+  {
+    "term": "generic.parallel-type-plural",
+    "definition": "Parallels",
+    "context": "Parallels"
   },
   {
     "term": "generic.plans.enterprise",
@@ -6943,56 +6993,6 @@
     "term": "petition-access.status-pending",
     "definition": "Pendiente",
     "context": "Pending"
-  },
-  {
-    "term": "petition-accesses.activate-access",
-    "definition": "Reactivar acceso",
-    "context": "Reactivate access"
-  },
-  {
-    "term": "petition-accesses.contact-header",
-    "definition": "Contacto",
-    "context": "Contact"
-  },
-  {
-    "term": "petition-accesses.deactivate-access",
-    "definition": "Quitar acceso",
-    "context": "Remove access"
-  },
-  {
-    "term": "petition-accesses.next-reminder-header",
-    "definition": "Siguiente recordatorio",
-    "context": "Next reminder"
-  },
-  {
-    "term": "petition-accesses.no-reminders-sent",
-    "definition": "No se han enviado recordatorios",
-    "context": "No reminders sent"
-  },
-  {
-    "term": "petition-accesses.reminder-settings",
-    "definition": "Configurar recordatorios",
-    "context": "Reminder settings"
-  },
-  {
-    "term": "petition-accesses.reminders-opt-out-popover",
-    "definition": "El contacto desea no recibir recordatorios",
-    "context": "Opted out from receiving reminders"
-  },
-  {
-    "term": "petition-accesses.reminders-sent-header",
-    "definition": "Recordatorios enviados",
-    "context": "Reminders sent"
-  },
-  {
-    "term": "petition-accesses.send-reminder",
-    "definition": "Enviar recordatorio",
-    "context": "Send reminder"
-  },
-  {
-    "term": "petition-accesses.status-header",
-    "definition": "Estado",
-    "context": "Status"
   },
   {
     "term": "petition-compose.settings",
@@ -8978,6 +8978,11 @@
     "term": "timeline.comment-published.message-not-available",
     "definition": "Mensaje no disponible",
     "context": "Message not available"
+  },
+  {
+    "term": "timeline.contactless-access-deactivated-manual-description",
+    "definition": "{userIsYou, select, true {Desactivaste} other {{user} desactivó}} un acceso por enlace {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} deactivated a link access {timeAgo}"
   },
   {
     "term": "timeline.edit-group-permission-description",

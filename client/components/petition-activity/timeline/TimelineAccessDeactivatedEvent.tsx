@@ -20,23 +20,32 @@ export function TimelineAccessDeactivatedEvent({
   return (
     <TimelineItem icon={<TimelineIcon icon={UserXIcon} color="white" backgroundColor="red.500" />}>
       {event.reason === "DEACTIVATED_BY_USER" ? (
-        <FormattedMessage
-          id="timeline.access-deactivated-manual-description"
-          defaultMessage="{userIsYou, select, true {You} other {{user}}} removed access to {contact} {timeAgo}"
-          values={{
-            userIsYou: userId === event.user?.id,
-            user: <UserReference user={event.user} />,
-            contact: (
-              <ContactReference
-                contact={event.access.contact}
-                isEmpty={event.access.isContactless}
-              />
-            ),
-            timeAgo: (
-              <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
-            ),
-          }}
-        />
+        event.access.isContactless ? (
+          <FormattedMessage
+            id="timeline.contactless-access-deactivated-manual-description"
+            defaultMessage="{userIsYou, select, true {You} other {{user}}} deactivated a link access {timeAgo}"
+            values={{
+              userIsYou: userId === event.user?.id,
+              user: <UserReference user={event.user} />,
+              timeAgo: (
+                <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+              ),
+            }}
+          />
+        ) : (
+          <FormattedMessage
+            id="timeline.access-deactivated-manual-description"
+            defaultMessage="{userIsYou, select, true {You} other {{user}}} removed access to {contact} {timeAgo}"
+            values={{
+              userIsYou: userId === event.user?.id,
+              user: <UserReference user={event.user} />,
+              contact: <ContactReference contact={event.access.contact} />,
+              timeAgo: (
+                <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
+              ),
+            }}
+          />
+        )
       ) : event.reason === "EMAIL_BOUNCED" ? (
         <FormattedMessage
           id="timeline.access-deactivated-auto-description"

@@ -120,7 +120,7 @@ export function PetitionAccessesTable({
                       icon={<BellIcon display="block" boxSize={4} />}
                     >
                       <FormattedMessage
-                        id="petition-accesses.send-reminder"
+                        id="component.petition-accesses-table.send-reminder"
                         defaultMessage="Send reminder"
                       />
                     </MenuItem>
@@ -134,7 +134,7 @@ export function PetitionAccessesTable({
                       icon={<SettingsIcon display="block" boxSize={4} />}
                     >
                       <FormattedMessage
-                        id="petition-accesses.reminder-settings"
+                        id="component.petition-accesses-table.reminder-settings"
                         defaultMessage="Reminder settings"
                       />
                     </MenuItem>
@@ -215,22 +215,31 @@ function usePetitionAccessesColumns(): TableColumn<
       {
         key: "contact",
         header: intl.formatMessage({
-          id: "petition-accesses.contact-header",
+          id: "component.petition-accesses-table.contact-header",
           defaultMessage: "Contact",
         }),
         CellContent: ({ row: { contact, remindersOptOut, isContactless } }) => (
           <HStack>
-            <ContactReference contact={contact} isEmpty={isContactless} />
+            {isContactless ? (
+              <Text as="span" textStyle="hint">
+                <FormattedMessage
+                  id="component.petition-accesses-table.contactless-access-contact"
+                  defaultMessage="No contact"
+                />
+              </Text>
+            ) : (
+              <ContactReference contact={contact} />
+            )}
             {remindersOptOut ? (
               <Tooltip
                 label={intl.formatMessage({
-                  id: "petition-accesses.reminders-opt-out-popover",
+                  id: "component.petition-accesses-table.reminders-opt-out-popover",
                   defaultMessage: "Opted out from receiving reminders",
                 })}
               >
                 <BellOffIcon
                   aria-label={intl.formatMessage({
-                    id: "petition-accesses.reminders-opt-out-popover",
+                    id: "component.petition-accesses-table.reminders-opt-out-popover",
                     defaultMessage: "Opted out from receiving reminders",
                   })}
                   marginLeft={1}
@@ -246,7 +255,7 @@ function usePetitionAccessesColumns(): TableColumn<
       {
         key: "status",
         header: intl.formatMessage({
-          id: "petition-accesses.status-header",
+          id: "component.petition-accesses-table.status-header",
           defaultMessage: "Status",
         }),
         CellContent: ({ row: { status, isContactless } }) => {
@@ -272,7 +281,7 @@ function usePetitionAccessesColumns(): TableColumn<
       {
         key: "next-reminder",
         header: intl.formatMessage({
-          id: "petition-accesses.next-reminder-header",
+          id: "component.petition-accesses-table.next-reminder-header",
           defaultMessage: "Next reminder",
         }),
         CellContent: ({ row: { nextReminderAt, remindersLeft, remindersActive } }) => {
@@ -295,7 +304,7 @@ function usePetitionAccessesColumns(): TableColumn<
       {
         key: "reminders-sent",
         header: intl.formatMessage({
-          id: "petition-accesses.reminders-sent-header",
+          id: "component.petition-accesses-table.reminders-sent-header",
           defaultMessage: "Reminders sent",
         }),
         CellContent: ({ row: { reminderCount } }) => {
@@ -304,7 +313,7 @@ function usePetitionAccessesColumns(): TableColumn<
           ) : (
             <Text textStyle="hint" whiteSpace="nowrap">
               <FormattedMessage
-                id="petition-accesses.no-reminders-sent"
+                id="component.petition-accesses-table.no-reminders-sent"
                 defaultMessage="No reminders sent"
               />
             </Text>
@@ -353,7 +362,7 @@ function usePetitionAccessesColumns(): TableColumn<
               <Stack direction="row" spacing={2} justifyContent="flex-end">
                 <IconButtonWithTooltip
                   label={intl.formatMessage({
-                    id: "petition-accesses.activate-access",
+                    id: "component.petition-accesses-table.activate-access",
                     defaultMessage: "Reactivate access",
                   })}
                   onClick={() => onReactivateAccess(id)}
@@ -389,7 +398,7 @@ function usePetitionAccessesColumns(): TableColumn<
                       myEffectivePermission === "READ"
                     }
                     label={intl.formatMessage({
-                      id: "petition-accesses.send-reminder",
+                      id: "component.petition-accesses-table.send-reminder",
                       defaultMessage: "Send reminder",
                     })}
                     onClick={() => onSendReminders([row])}
@@ -405,7 +414,7 @@ function usePetitionAccessesColumns(): TableColumn<
                       myEffectivePermission === "READ"
                     }
                     label={intl.formatMessage({
-                      id: "petition-accesses.reminder-settings",
+                      id: "component.petition-accesses-table.reminder-settings",
                       defaultMessage: "Reminder settings",
                     })}
                     onClick={() => onConfigureReminders([row])}
@@ -417,7 +426,7 @@ function usePetitionAccessesColumns(): TableColumn<
               )}
               <IconButtonWithTooltip
                 label={intl.formatMessage({
-                  id: "petition-accesses.deactivate-access",
+                  id: "component.petition-accesses-table.deactivate-access",
                   defaultMessage: "Remove access",
                 })}
                 onClick={() => onDeactivateAccess(id)}
