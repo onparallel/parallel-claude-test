@@ -61,21 +61,21 @@ async function main() {
         var _a;
         const ipAddress = instance.PrivateIpAddress;
         const instanceName = (_a = instance.Tags) === null || _a === void 0 ? void 0 : _a.find((t) => t.Key === "Name").Value;
-        console.log((0, chalk_1.default) `Stopping workers on ${instance.InstanceId} ${instanceName}`);
+        console.log(chalk_1.default.yellow `Stopping workers on ${instance.InstanceId} ${instanceName}`);
         (0, child_process_1.execSync)(`ssh \
       -o "UserKnownHostsFile=/dev/null" \
       -o StrictHostKeyChecking=no \
       ${ipAddress} ${OPS_DIR}/workers.sh stop`);
-        console.log((0, chalk_1.default) `Workers stopped on ${instance.InstanceId} ${instanceName}`);
+        console.log(chalk_1.default.green.bold `Workers stopped on ${instance.InstanceId} ${instanceName}`);
     }));
-    console.log("Registering new instances on LB");
+    console.log(chalk_1.default.yellow `Registering new instances on LB`);
     await elb
         .registerInstancesWithLoadBalancer({
         LoadBalancerName: `parallel-${env}`,
         Instances: newInstances,
     })
         .promise();
-    console.log("Create invalidation for static files");
+    console.log(chalk_1.default.yellow `Creating invalidation for static files`);
     const distributionId = await cloudfront
         .listDistributions()
         .promise()
@@ -87,14 +87,16 @@ async function main() {
         InvalidationBatch: { CallerReference: buildId, Paths: { Quantity: 1, Items: ["/static/*"] } },
     })
         .promise();
+    console.log(chalk_1.default.green.bold `Invalidation created`);
     await (0, wait_1.waitFor)(async () => {
         return await elb
             .describeInstanceHealth({ LoadBalancerName: `parallel-${env}`, Instances: newInstances })
             .promise()
             .then((r) => r.InstanceStates.every((i) => i.State === "InService"));
-    }, `Waiting for new targets to become healthy`, 3000);
+    }, chalk_1.default.yellow.italic `...Waiting for new instances to become healthy`, 3000);
+    console.log(chalk_1.default.green.bold `New instances are healthy`);
     if (oldInstances.length) {
-        console.log("Deregistering new instances on LB");
+        console.log(chalk_1.default.yellow `Deregistering old instances on LB`);
         await elb
             .deregisterInstancesFromLoadBalancer({
             LoadBalancerName: `parallel-${env}`,
@@ -106,7 +108,8 @@ async function main() {
                 .describeInstanceHealth({ LoadBalancerName: `parallel-${env}`, Instances: oldInstances })
                 .promise()
                 .then((r) => r.InstanceStates.every((i) => i.State === "OutOfService"));
-        }, `Waiting for new targets to become out of service`, 3000);
+        }, chalk_1.default.yellow.italic `...Waiting for old instances to become out of service`, 3000);
+        console.log(chalk_1.default.green.bold `Old instances deregistered`);
     }
     const newInstancesFull = await ec2
         .describeInstances({
@@ -118,12 +121,12 @@ async function main() {
         var _a;
         const ipAddress = instance.PrivateIpAddress;
         const instanceName = (_a = instance.Tags) === null || _a === void 0 ? void 0 : _a.find((t) => t.Key === "Name").Value;
-        console.log((0, chalk_1.default) `Starting workers on ${instance.InstanceId} ${instanceName}`);
+        console.log(chalk_1.default.yellow `Starting workers on ${instance.InstanceId} ${instanceName}`);
         (0, child_process_1.execSync)(`ssh \
       -o "UserKnownHostsFile=/dev/null" \
       -o StrictHostKeyChecking=no \
       ${ipAddress} ${OPS_DIR}/workers.sh start`);
-        console.log((0, chalk_1.default) `Workers started on ${instance.InstanceId} ${instanceName}`);
+        console.log(chalk_1.default.green.bold `Workers started on ${instance.InstanceId} ${instanceName}`);
     }));
 }
 (0, run_1.run)(main);
