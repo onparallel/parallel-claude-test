@@ -619,7 +619,9 @@ export class PetitionRepository extends BaseRepository {
               .unionAll([
                 this.knex
                   .from("fs")
-                  .joinRaw(/* sql */ `join petition paux on paux.id = 1`)
+                  // join with any petition so both parts of the union have the same columns.
+                  // The value from those columns will be discarded afterwards
+                  .joinRaw(/* sql */ `join (select * from petition limit 1) paux on 1 = 1`)
                   .select(
                     "paux.*",
                     this.knex.raw(/* sql */ `true as is_folder`),
