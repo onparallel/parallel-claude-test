@@ -23,7 +23,7 @@ export function Fonts() {
           src: url('${process.env.NEXT_PUBLIC_ASSETS_URL}/static/fonts/ibm-plex-sans-v8-latin-regular.woff2') format('woff2');
         }
 
-        /* ibm-plex-sans-600 - latin */
+        /* ibm-plex-sans-500 - latin */
         @font-face {
           font-family: 'IBM Plex Sans';
           font-style: normal;
