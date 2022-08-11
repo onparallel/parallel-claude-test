@@ -1,5 +1,9 @@
 import { gql, useQuery } from "@apollo/client";
 import {
+  Box,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
   Button,
   Container,
   Flex,
@@ -14,11 +18,13 @@ import {
 } from "@chakra-ui/react";
 import { AddIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
+import { NakedLink } from "@parallel/components/common/Link";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { TemplateDetailsModal } from "@parallel/components/petition-common/dialogs/TemplateDetailsModal";
 import { useNewTemplateDialog } from "@parallel/components/petition-new/dialogs/NewTemplateDialog";
+import { FolderCard } from "@parallel/components/petition-new/FolderCard";
 import { GridInfiniteScrollList } from "@parallel/components/petition-new/GridInfiniteScrollList";
 import { NewPetitionCategoryFilter } from "@parallel/components/petition-new/NewPetitionCategoryFilter";
 import { NewPetitionCategoryMenuFilter } from "@parallel/components/petition-new/NewPetitionCategoryMenuFilter";
@@ -45,14 +51,24 @@ import { compose } from "@parallel/utils/compose";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
-import { boolean, parseQuery, string, useQueryState, values } from "@parallel/utils/queryState";
+import {
+  boolean,
+  parseQuery,
+  string,
+  useBuildStateUrl,
+  useQueryState,
+  values,
+} from "@parallel/utils/queryState";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 
 const QUERY_STATE = {
+  path: string()
+    .withValidation((value) => typeof value === "string" && /^\/([^\/]+\/)*$/.test(value))
+    .orDefault("/"),
   search: string(),
   lang: values<PetitionLocale | "ALL">(["en", "es", "ALL"]),
   public: boolean().orDefault(false),
@@ -102,6 +118,7 @@ function NewPetition() {
       locale: locale,
       isOwner: state.owner,
       category: state.category,
+      path: state.path,
     },
   });
   const hasMore = templates.length < totalCount;
@@ -196,6 +213,43 @@ function NewPetition() {
     fontWeight: "semibold",
     borderBottom: "2px solid",
     borderColor: "blue.600",
+  };
+
+  const buildUrl = useBuildStateUrl(QUERY_STATE);
+  const breadcrumbs = useMemo(() => {
+    const breadcrumbs = [
+      {
+        text: intl.formatMessage({ id: "generic.root-templates", defaultMessage: "Templates" }),
+        url: buildUrl((current) => ({ ...current, path: "/" })),
+        isCurrent: state.path === "/",
+      },
+    ];
+    if (state.path !== "/") {
+      breadcrumbs.push(
+        ...state.path
+          .slice(1, -1)
+          .split("/")
+          .map((part, i, parts) => {
+            const path = "/" + parts.slice(0, i + 1).join("/") + "/";
+            return {
+              text: part,
+              url: buildUrl((current) => ({ ...current, path })),
+              isCurrent: path === state.path,
+            };
+          })
+      );
+    }
+    return breadcrumbs;
+  }, [state.path]);
+
+  const handleFolderClick = (path: string) => {
+    setQueryState(
+      (current) => ({
+        ...current,
+        path,
+      }),
+      { type: "push" }
+    );
   };
 
   return (
@@ -316,6 +370,26 @@ function NewPetition() {
                   />
                 </Stack>
               </Stack>
+              {state.path !== "/" ? (
+                <Box paddingX={6}>
+                  <Breadcrumb height={8} display="flex" alignItems="center">
+                    {breadcrumbs.map(({ text, url, isCurrent }, i) => (
+                      <BreadcrumbItem key={i}>
+                        <NakedLink href={url}>
+                          <BreadcrumbLink
+                            isCurrentPage={isCurrent}
+                            color="primary.600"
+                            fontWeight="medium"
+                            _activeLink={{ color: "inherit", fontWeight: "inherit" }}
+                          >
+                            {text}
+                          </BreadcrumbLink>
+                        </NakedLink>
+                      </BreadcrumbItem>
+                    ))}
+                  </Breadcrumb>
+                </Box>
+              ) : null}
               {templates.length > 0 ? (
                 <GridInfiniteScrollList
                   items={templates}
@@ -323,15 +397,25 @@ function NewPetition() {
                   hasMore={hasMore}
                 >
                   {(template, i) => {
-                    return (
-                      <TemplateCard
-                        data-template-id={template.id}
-                        data-template-first={i === 0 ? "" : undefined}
-                        key={template.id}
-                        template={template}
-                        onPress={() => handleTemplateClick(template.id)}
-                      />
-                    );
+                    if (template.__typename === "PetitionFolder") {
+                      return (
+                        <FolderCard
+                          key={template.folderId}
+                          folder={template}
+                          onPress={() => handleFolderClick(template.path)}
+                        />
+                      );
+                    } else if (template.__typename === "PetitionTemplate") {
+                      return (
+                        <TemplateCard
+                          data-template-id={template.id}
+                          data-template-first={i === 0 ? "" : undefined}
+                          key={template.id}
+                          template={template}
+                          onPress={() => handleTemplateClick(template.id)}
+                        />
+                      );
+                    }
                   }}
                 </GridInfiniteScrollList>
               ) : hasTemplates ? (
@@ -399,15 +483,25 @@ function NewPetition() {
                   hasMore={hasMore}
                 >
                   {(template, i) => {
-                    return (
-                      <PublicTemplateCard
-                        data-template-id={template.id}
-                        data-template-first={i === 0 ? "" : undefined}
-                        key={template.id}
-                        template={template}
-                        onPress={() => handleTemplateClick(template.id)}
-                      />
-                    );
+                    if (template.__typename === "PetitionFolder") {
+                      return (
+                        <FolderCard
+                          key={template.folderId}
+                          folder={template}
+                          onPress={() => handleFolderClick(template.folderId)}
+                        />
+                      );
+                    } else if (template.__typename === "PetitionTemplate") {
+                      return (
+                        <PublicTemplateCard
+                          data-template-id={template.id}
+                          data-template-first={i === 0 ? "" : undefined}
+                          key={template.id}
+                          template={template}
+                          onPress={() => handleTemplateClick(template.id)}
+                        />
+                      );
+                    }
                   }}
                 </GridInfiniteScrollList>
               ) : (
@@ -435,11 +529,17 @@ function NewPetition() {
 }
 
 NewPetition.fragments = {
-  PetitionTemplate: gql`
-    fragment NewPetition_PetitionTemplate on PetitionTemplate {
-      ...TemplateCard_PetitionTemplate
-      ...PublicTemplateCard_PetitionTemplate
+  PetitionBaseOrFolder: gql`
+    fragment NewPetition_PetitionBaseOrFolder on PetitionBaseOrFolder {
+      ... on PetitionTemplate {
+        ...TemplateCard_PetitionTemplate
+        ...PublicTemplateCard_PetitionTemplate
+      }
+      ... on PetitionFolder {
+        ...FolderCard_PetitionFolder
+      }
     }
+    ${FolderCard.fragments.PetitionFolder}
     ${TemplateCard.fragments.PetitionTemplate}
     ${PublicTemplateCard.fragments.PetitionTemplate}
   `,
@@ -455,6 +555,7 @@ NewPetition.queries = [
       $isPublic: Boolean!
       $isOwner: Boolean
       $category: String
+      $path: String
     ) {
       templates(
         offset: $offset
@@ -464,14 +565,15 @@ NewPetition.queries = [
         isOwner: $isOwner
         locale: $locale
         category: $category
+        path: $path
       ) {
         items {
-          ...NewPetition_PetitionTemplate
+          ...NewPetition_PetitionBaseOrFolder
         }
         totalCount
       }
     }
-    ${NewPetition.fragments.PetitionTemplate}
+    ${NewPetition.fragments.PetitionBaseOrFolder}
   `,
   gql`
     query NewPetition_user {
@@ -521,6 +623,7 @@ NewPetition.getInitialProps = async ({
         locale: locale,
         isOwner: state.owner,
         category: state.category,
+        path: state.path,
       },
     }),
     fetchQuery(NewPetition_userDocument),

@@ -1560,6 +1560,11 @@
     "context": "Zip file"
   },
   {
+    "term": "component.folder-card.number-of-templates",
+    "definition": "{count, plural, =1 {# plantilla} other {# plantillas}}",
+    "context": "{count, plural, =1 {# template} other {# templates}}"
+  },
+  {
     "term": "component.generate-new-token-dialog.api-key-label",
     "definition": "Token API",
     "context": "API token"
@@ -1698,6 +1703,16 @@
     "term": "component.message-events-indicator.opened-explanation",
     "definition": "El correo electrónico fue abierto el {date}",
     "context": "The email was opened on {date}"
+  },
+  {
+    "term": "component.move-folder-dialog.header",
+    "definition": "Mover a...",
+    "context": "Move to..."
+  },
+  {
+    "term": "component.move-folder-dialog.move",
+    "definition": "Mover",
+    "context": "Move"
   },
   {
     "term": "component.multiple-emails-pasted-dialog.header",
@@ -2598,6 +2613,11 @@
     "term": "component.petition-link-dialog.body-2",
     "definition": "Este enlace es individual y <b>solo podrá usarse una vez</b>. Si quieres añadir más destinatarios puedes hacerlo desde la pestaña de {activityLink}.",
     "context": "This link is individual and <b>can only be used once</b>. If you want to add more recipients you can do it from the {activityLink} tab."
+  },
+  {
+    "term": "component.petition-list-header.search-in",
+    "definition": "Busca en:",
+    "context": "Search in:"
   },
   {
     "term": "component.petition-list-shared-with-filter.add-filter",
@@ -4100,6 +4120,11 @@
     "context": "Rename parallel"
   },
   {
+    "term": "component.rename-dialog.header-petition-folder",
+    "definition": "Renombrar carpeta",
+    "context": "Rename folder"
+  },
+  {
     "term": "component.rename-dialog.header-template",
     "definition": "Renombrar plantilla",
     "context": "Rename template"
@@ -5460,6 +5485,11 @@
     "context": "Enter a value"
   },
   {
+    "term": "generic.everywhere",
+    "definition": "Todo",
+    "context": "Everywhere"
+  },
+  {
     "term": "generic.example",
     "definition": "Ejemplo: {example}",
     "context": "Example: {example}"
@@ -5483,6 +5513,11 @@
     "term": "generic.file-size",
     "definition": "Tamaño de archivo",
     "context": "File size"
+  },
+  {
+    "term": "generic.folder-name",
+    "definition": "Nombre de la carpeta",
+    "context": "Folder name"
   },
   {
     "term": "generic.for-example",
@@ -5888,6 +5923,16 @@
     "term": "generic.required-field-error",
     "definition": "El campo es requerido",
     "context": "The field is required"
+  },
+  {
+    "term": "generic.root-petitions",
+    "definition": "Parallels",
+    "context": "Parallels"
+  },
+  {
+    "term": "generic.root-templates",
+    "definition": "Plantillas",
+    "context": "Templates"
   },
   {
     "term": "generic.save",
@@ -7688,6 +7733,11 @@
     "term": "petition.status.error",
     "definition": "Error",
     "context": "Error"
+  },
+  {
+    "term": "petitions.header.name",
+    "definition": "Nombre",
+    "context": "Name"
   },
   {
     "term": "petitions.header.recipient",

@@ -2401,8 +2401,10 @@ export type PetitionFilter = {
 };
 
 export type PetitionFolder = {
-  /** The ID of the petition or template. */
+  /** The ID of the petition folder. */
   id: Scalars["ID"];
+  /** The lowest permission the user has in the petitions inside the folder. */
+  minimumPermissionType: PetitionPermissionType;
   /** The name of the folder. */
   name: Scalars["String"];
   /** The full path of the folder. */
@@ -2698,13 +2700,6 @@ export type PetitionTemplate = PetitionBase & {
 /** A petition template */
 export type PetitionTemplateimageUrlArgs = {
   options?: InputMaybe<ImageOptions>;
-};
-
-export type PetitionTemplatePagination = {
-  /** The requested slice of items. */
-  items: Array<PetitionTemplate>;
-  /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
 };
 
 /** The permission for a petition and user group */
@@ -3052,7 +3047,7 @@ export type Query = {
   tags: TagPagination;
   task: Task;
   /** The available templates */
-  templates: PetitionTemplatePagination;
+  templates: PetitionBaseOrFolderPagination;
   userGroup: Maybe<UserGroup>;
   /** Paginated list of user groups in the organization */
   userGroups: UserGroupPagination;
@@ -3210,6 +3205,7 @@ export type QuerytemplatesArgs = {
   limit?: InputMaybe<Scalars["Int"]>;
   locale?: InputMaybe<PetitionLocale>;
   offset?: InputMaybe<Scalars["Int"]>;
+  path?: InputMaybe<Scalars["String"]>;
   search?: InputMaybe<Scalars["String"]>;
 };
 

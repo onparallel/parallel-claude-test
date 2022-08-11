@@ -675,6 +675,23 @@ export const FolderIcon = createIcon({
   ),
 });
 
+export const FolderOpenIcon = createIcon({
+  displayName: "FolderOpenIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      stroke="currentColor"
+      fill="none"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m22 19c0 .5304-.2107 1.0391-.5858 1.4142s-.8838.5858-1.4142.5858h-16c-.53043 0-1.03914-.2107-1.41421-.5858-.37508-.3751-.58579-.8838-.58579-1.4142v-14c0-.53043.21071-1.03914.58579-1.41421.37507-.37508.88378-.58579 1.41421-.58579h5l2 3h9c.5304 0 1.0391.21071 1.4142.58579.3751.37507.5858.88378.5858 1.41421z" />
+      <path d="m2.25 10.5h14.25c.5304 0 1.0391.2107 1.4142.5858s.6858.9142.8358 1.4142l2.25 7" />
+    </g>
+  ),
+});
+
 export const ForbiddenIcon = createIcon({
   displayName: "ForbiddenIcon",
   viewBox: "0 0 24 24",

@@ -8,7 +8,7 @@ import { FormattedMessage } from "react-intl";
 
 interface RenameDialogProps {
   name: string | null | undefined;
-  isTemplate: boolean;
+  typeName: "Petition" | "PetitionTemplate" | undefined;
   isDisabled: boolean;
 }
 
@@ -18,7 +18,7 @@ interface RenameDialogData {
 
 function RenameDialog({
   name,
-  isTemplate,
+  typeName,
   isDisabled,
   ...props
 }: DialogProps<RenameDialogProps, RenameDialogData>) {
@@ -47,15 +47,20 @@ function RenameDialog({
       }
       {...props}
       header={
-        isTemplate ? (
+        typeName === "PetitionTemplate" ? (
           <FormattedMessage
             id="component.rename-dialog.header-template"
             defaultMessage="Rename template"
           />
-        ) : (
+        ) : typeName === "Petition" ? (
           <FormattedMessage
             id="component.rename-dialog.header-petition"
             defaultMessage="Rename parallel"
+          />
+        ) : (
+          <FormattedMessage
+            id="component.rename-dialog.header-petition-folder"
+            defaultMessage="Rename folder"
           />
         )
       }
@@ -63,10 +68,12 @@ function RenameDialog({
         <Stack>
           <FormControl id="newName" isInvalid={!!errors.newName} isDisabled={isDisabled}>
             <FormLabel>
-              {isTemplate ? (
+              {typeName === "PetitionTemplate" ? (
                 <FormattedMessage id="generic.template-name" defaultMessage="Template name" />
-              ) : (
+              ) : typeName === "Petition" ? (
                 <FormattedMessage id="generic.parallel-name" defaultMessage="Parallel name" />
+              ) : (
+                <FormattedMessage id="generic.folder-name" defaultMessage="Folder name" />
               )}
             </FormLabel>
             <Input {...nameProps} />

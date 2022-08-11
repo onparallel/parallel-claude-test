@@ -232,13 +232,19 @@ function Petitions() {
       if (row.__typename === "PetitionFolder") {
         // const folder = row;
         // TODO rename folder
+        const { newName } = await showRenameDialog({
+          name: row.folderName,
+          typeName: undefined,
+          isDisabled: false,
+        });
+        console.log("New folder name: ", newName);
       } else if (row.__typename === "Petition" || row.__typename === "PetitionTemplate") {
         const petition = row;
         if (petition) {
           const isPublic = petition.__typename === "PetitionTemplate" && petition.isPublic;
           const { newName } = await showRenameDialog({
             name: petition.name,
-            isTemplate: petition.__typename === "PetitionTemplate",
+            typeName: petition.__typename,
             isDisabled: isPublic || petition.myEffectivePermission?.permissionType === "READ",
           });
           await updatePetition({

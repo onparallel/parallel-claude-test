@@ -9657,6 +9657,15 @@ export type PetitionTemplateRequestMessageCard_PetitionTemplateFragment = {
   } | null;
 };
 
+export type FolderCard_PetitionFolderFragment = {
+  __typename?: "PetitionFolder";
+  path: string;
+  petitionCount: number;
+  minimumPermissionType: PetitionPermissionType;
+  folderId: string;
+  folderName: string;
+};
+
 export type PublicTemplateCard_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
@@ -20253,7 +20262,18 @@ export type Petitions_updatePetitionMutation = {
     | { __typename?: "PetitionTemplate"; id: string; name?: string | null };
 };
 
-export type NewPetition_PetitionTemplateFragment = {
+export type NewPetition_PetitionBaseOrFolder_Petition_Fragment = { __typename?: "Petition" };
+
+export type NewPetition_PetitionBaseOrFolder_PetitionFolder_Fragment = {
+  __typename?: "PetitionFolder";
+  path: string;
+  petitionCount: number;
+  minimumPermissionType: PetitionPermissionType;
+  folderId: string;
+  folderName: string;
+};
+
+export type NewPetition_PetitionBaseOrFolder_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   id: string;
   name?: string | null;
@@ -20321,6 +20341,11 @@ export type NewPetition_PetitionTemplateFragment = {
   >;
 };
 
+export type NewPetition_PetitionBaseOrFolderFragment =
+  | NewPetition_PetitionBaseOrFolder_Petition_Fragment
+  | NewPetition_PetitionBaseOrFolder_PetitionFolder_Fragment
+  | NewPetition_PetitionBaseOrFolder_PetitionTemplate_Fragment;
+
 export type NewPetition_templatesQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
@@ -20329,6 +20354,7 @@ export type NewPetition_templatesQueryVariables = Exact<{
   isPublic: Scalars["Boolean"];
   isOwner?: InputMaybe<Scalars["Boolean"]>;
   category?: InputMaybe<Scalars["String"]>;
+  path?: InputMaybe<Scalars["String"]>;
 }>;
 
 export type NewPetition_templatesQuery = {
@@ -20337,7 +20363,14 @@ export type NewPetition_templatesQuery = {
     totalCount: number;
     items: Array<
       | { __typename?: "Petition" }
-      | { __typename?: "PetitionFolder" }
+      | {
+          __typename?: "PetitionFolder";
+          path: string;
+          petitionCount: number;
+          minimumPermissionType: PetitionPermissionType;
+          folderId: string;
+          folderName: string;
+        }
       | {
           __typename?: "PetitionTemplate";
           id: string;
@@ -26545,14 +26578,29 @@ export const PublicTemplateCard_PetitionTemplateFragmentDoc = gql`
   }
   ${TemplateActiveSettingsIcons_PetitionTemplateFragmentDoc}
 ` as unknown as DocumentNode<PublicTemplateCard_PetitionTemplateFragment, unknown>;
-export const NewPetition_PetitionTemplateFragmentDoc = gql`
-  fragment NewPetition_PetitionTemplate on PetitionTemplate {
-    ...TemplateCard_PetitionTemplate
-    ...PublicTemplateCard_PetitionTemplate
+export const FolderCard_PetitionFolderFragmentDoc = gql`
+  fragment FolderCard_PetitionFolder on PetitionFolder {
+    folderId: id
+    folderName: name
+    path
+    petitionCount
+    minimumPermissionType
+  }
+` as unknown as DocumentNode<FolderCard_PetitionFolderFragment, unknown>;
+export const NewPetition_PetitionBaseOrFolderFragmentDoc = gql`
+  fragment NewPetition_PetitionBaseOrFolder on PetitionBaseOrFolder {
+    ... on PetitionTemplate {
+      ...TemplateCard_PetitionTemplate
+      ...PublicTemplateCard_PetitionTemplate
+    }
+    ... on PetitionFolder {
+      ...FolderCard_PetitionFolder
+    }
   }
   ${TemplateCard_PetitionTemplateFragmentDoc}
   ${PublicTemplateCard_PetitionTemplateFragmentDoc}
-` as unknown as DocumentNode<NewPetition_PetitionTemplateFragment, unknown>;
+  ${FolderCard_PetitionFolderFragmentDoc}
+` as unknown as DocumentNode<NewPetition_PetitionBaseOrFolderFragment, unknown>;
 export const Reports_PetitionTemplateFragmentDoc = gql`
   fragment Reports_PetitionTemplate on PetitionTemplate {
     id
@@ -29831,6 +29879,7 @@ export const NewPetition_templatesDocument = gql`
     $isPublic: Boolean!
     $isOwner: Boolean
     $category: String
+    $path: String
   ) {
     templates(
       offset: $offset
@@ -29840,14 +29889,15 @@ export const NewPetition_templatesDocument = gql`
       isOwner: $isOwner
       locale: $locale
       category: $category
+      path: $path
     ) {
       items {
-        ...NewPetition_PetitionTemplate
+        ...NewPetition_PetitionBaseOrFolder
       }
       totalCount
     }
   }
-  ${NewPetition_PetitionTemplateFragmentDoc}
+  ${NewPetition_PetitionBaseOrFolderFragmentDoc}
 ` as unknown as DocumentNode<NewPetition_templatesQuery, NewPetition_templatesQueryVariables>;
 export const NewPetition_userDocument = gql`
   query NewPetition_user {
