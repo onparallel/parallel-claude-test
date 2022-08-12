@@ -65,12 +65,8 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
       t.nullable.string("cookieName");
       t.nullable.string("cookieValue");
       t.nullable.string("email");
-      t.nullable.string("orgLogoUrl");
-      t.nullable.string("orgName");
       t.nullable.string("ownerName");
-      t.nullable.field("tone", {
-        type: "Tone",
-      });
+      t.nullable.field("organization", { type: "PublicOrganization" });
       t.nullable.jsonObject("brandTheme");
     },
   }),
@@ -97,9 +93,8 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
       ip: args.ip ?? null,
       userAgent: args.userAgent ?? null,
     };
-    const contactId = ctx.contact?.id;
 
-    if (!isDefined(contactId)) {
+    if (!isDefined(ctx.access!.contact_id)) {
       const owner = (await ctx.petitions.loadPetitionOwner(petition.id))!;
       const data = (await ctx.users.loadUserData(owner.user_data_id))!;
 
@@ -107,9 +102,10 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
         isAllowed: false,
         isContactlessAccess: true,
         ownerName: fullName(data.first_name, data.last_name),
+        organization: await ctx.organizations.loadOrg(petition.org_id),
       };
     }
-
+    const contactId = ctx.access!.contact_id;
     if (await ctx.contacts.hasContactAuthentication(contactId)) {
       const cookieValue = getContactAuthCookieValue(ctx.req, contactId);
       const authenticationId = cookieValue
@@ -126,22 +122,10 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
         await ctx.contacts.addContactAuthenticationLogAccessEntry(authenticationId, logEntry);
         return { isAllowed: true };
       } else {
-        const [org, logoPath] = await Promise.all([
-          ctx.organizations.loadOrg(ctx.contact!.org_id),
-          ctx.organizations.loadOrgLogoPath(ctx.contact!.org_id),
-        ]);
-        const logoUrl = isDefined(logoPath)
-          ? await ctx.images.getImageUrl(logoPath, {
-              resize: { width: 400, height: 120, fit: "inside" },
-            })
-          : null;
         return {
           isAllowed: false,
           email: anonymizeEmail(ctx.contact!.email),
-          orgName: org!.name,
-          orgLogoUrl: logoUrl,
-          tone: org!.preferred_tone,
-          brandTheme: org!.brand_theme,
+          organization: await ctx.organizations.loadOrg(ctx.contact!.org_id),
         };
       }
     } else {

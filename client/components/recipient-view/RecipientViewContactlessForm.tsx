@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   Center,
-  Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -18,11 +17,11 @@ import {
 } from "@chakra-ui/react";
 import { CheckIcon, QuestionOutlineIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
-import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { RecipientViewPinForm } from "@parallel/components/recipient-view/RecipientViewPinForm";
 import {
   RecipientViewContactlessForm_publicCheckVerificationCodeDocument,
+  RecipientViewContactlessForm_PublicOrganizationFragment,
   RecipientViewContactlessForm_publicSendReminderDocument,
   RecipientViewContactlessForm_publicSendVerificationCodeDocument,
 } from "@parallel/graphql/__types";
@@ -59,15 +58,15 @@ type RecipientViewContactlessState =
   | { step: "EMAIL_EXISTS" }
   | { step: "VERIFIED" };
 
+interface RecipientViewContactlessFormProps {
+  ownerName: string;
+  organization: RecipientViewContactlessForm_PublicOrganizationFragment;
+}
+
 export function RecipientViewContactlessForm({
   ownerName,
-  orgLogoUrl,
-  orgName,
-}: {
-  ownerName: string;
-  orgLogoUrl: string;
-  orgName: string;
-}) {
+  organization,
+}: RecipientViewContactlessFormProps) {
   const tone = useTone();
   const codeExpiredToast = useCodeExpiredToast();
   const showGenericErrorToast = useGenericErrorToast();
@@ -103,7 +102,7 @@ export function RecipientViewContactlessForm({
 
   useEffect(() => {
     firstNameRef.current?.focus();
-  }, [firstNameRef]);
+  }, []);
 
   useEffect(() => {
     if (state.step === "FORM" && email) {
@@ -248,19 +247,19 @@ export function RecipientViewContactlessForm({
     <Card
       padding={{ base: 4, sm: 8 }}
       paddingTop={{ base: 8, sm: 10 }}
-      paddingBottom={{ base: 14, sm: 16 }}
+      paddingBottom={{ base: 12, sm: 12 }}
       position="relative"
     >
       <Stack spacing={8}>
         <Box>
-          {orgLogoUrl ? (
+          {organization.logoUrl340 ? (
             <Box
               role="img"
-              aria-label={orgName}
+              aria-label={organization.name}
               width="170px"
               margin="auto"
               height="60px"
-              backgroundImage={`url("${orgLogoUrl}")`}
+              backgroundImage={`url("${organization.logoUrl340}")`}
               backgroundSize="contain"
               backgroundPosition="center"
               backgroundRepeat="no-repeat"
@@ -473,31 +472,43 @@ export function RecipientViewContactlessForm({
           </>
         )}
       </Stack>
-      <Flex justifyContent="flex-end" position="absolute" right={0} bottom={0}>
-        <NakedLink href="/?ref=parallel_public_link">
-          <Box
-            as="a"
-            target="_blank"
-            backgroundColor="gray.200"
-            borderTopLeftRadius="xl"
-            paddingX={4}
-            paddingY={1.5}
-            fontSize="sm"
-            whiteSpace="nowrap"
-          >
-            <FormattedMessage
-              id="recipient-view.created-with"
-              defaultMessage="Created with {parallel}"
-              values={{ parallel: <Text as="b">Parallel</Text> }}
-            />
-          </Box>
-        </NakedLink>
-      </Flex>
+      {false ? null : (
+        <Box
+          position="absolute"
+          right={0}
+          bottom={0}
+          as="a"
+          href="/?ref=parallel_public_link"
+          target="_blank"
+          backgroundColor="gray.200"
+          borderTopLeftRadius="xl"
+          paddingX={4}
+          paddingY={1.5}
+          fontSize="sm"
+          whiteSpace="nowrap"
+        >
+          <FormattedMessage
+            id="recipient-view.created-with"
+            defaultMessage="Created with {parallel}"
+            values={{ parallel: <Text as="b">Parallel</Text> }}
+          />
+        </Box>
+      )}
     </Card>
   );
 }
 
-RecipientViewContactlessForm.mutations = [
+RecipientViewContactlessForm.fragments = {
+  PublicOrganization: gql`
+    fragment RecipientViewContactlessForm_PublicOrganization on PublicOrganization {
+      name
+      logoUrl340: logoUrl(options: { resize: { width: 340, height: 120, fit: inside } })
+      hasRemoveParallelBranding
+    }
+  `,
+};
+
+const _mutations = [
   gql`
     mutation RecipientViewContactlessForm_publicSendVerificationCode(
       $keycode: ID!

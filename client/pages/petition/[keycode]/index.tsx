@@ -1,15 +1,15 @@
 import { gql } from "@apollo/client";
 import { Box, Container } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
-import {
-  OrganizationBrandTheme,
-  OverrideWithOrganizationTheme,
-} from "@parallel/components/common/OverrideWithOrganizationTheme";
+import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
 import { withApolloData } from "@parallel/components/common/withApolloData";
 import { RecipientViewContactlessForm } from "@parallel/components/recipient-view/RecipientViewContactlessForm";
 import { RecipientViewNewDevice } from "@parallel/components/recipient-view/RecipientViewNewDevice";
-import { RecipientViewVerify_verifyPublicAccessDocument, Tone } from "@parallel/graphql/__types";
+import {
+  RecipientViewVerify_verifyPublicAccessDocument,
+  RecipientViewVerify_verifyPublicAccessMutation,
+} from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { compose } from "@parallel/utils/compose";
 import { serialize as serializeCookie } from "cookie";
@@ -17,30 +17,17 @@ import { GetServerSidePropsContext, GetServerSidePropsResult } from "next";
 import Head from "next/head";
 import { getClientIp } from "request-ip";
 
-interface RecipientViewVerifyProps {
-  email: string;
-  orgName: string;
-  orgLogoUrl: string;
-  tone: Tone;
-  brandTheme?: OrganizationBrandTheme | null;
-  ownerName: string;
-  isContactlessAccess?: boolean;
-}
-
 function RecipientViewVerify({
   email,
-  orgName,
-  orgLogoUrl,
-  tone,
-  brandTheme,
   ownerName,
   isContactlessAccess,
-}: RecipientViewVerifyProps) {
+  organization,
+}: RecipientViewVerify_verifyPublicAccessMutation["verifyPublicAccess"]) {
   return (
-    <ToneProvider value={tone}>
-      <OverrideWithOrganizationTheme cssVarsRoot="body" brandTheme={brandTheme}>
+    <ToneProvider value={organization!.tone}>
+      <OverrideWithOrganizationTheme cssVarsRoot="body" brandTheme={organization!.brandTheme}>
         <Head>
-          <title>Parallel</title>
+          <title>{organization!.name}</title>
         </Head>
         <Box backgroundColor="primary.50" minHeight="100vh">
           <Container
@@ -49,15 +36,12 @@ function RecipientViewVerify({
             justifyContent="center"
             minHeight="100vh"
             maxW="container.sm"
+            paddingY={4}
           >
             {isContactlessAccess ? (
-              <RecipientViewContactlessForm
-                ownerName={ownerName}
-                orgName={orgName}
-                orgLogoUrl={orgLogoUrl}
-              />
+              <RecipientViewContactlessForm ownerName={ownerName!} organization={organization!} />
             ) : (
-              <RecipientViewNewDevice email={email} orgName={orgName} orgLogoUrl={orgLogoUrl} />
+              <RecipientViewNewDevice email={email!} organization={organization!} />
             )}
           </Container>
         </Box>
@@ -71,7 +55,9 @@ export async function getServerSideProps({
   locale,
   req,
   res,
-}: GetServerSidePropsContext): Promise<GetServerSidePropsResult<RecipientViewVerifyProps>> {
+}: GetServerSidePropsContext): Promise<
+  GetServerSidePropsResult<RecipientViewVerify_verifyPublicAccessMutation["verifyPublicAccess"]>
+> {
   const client = createApolloClient({}, { req });
   const { data } = await client.mutate({
     mutation: RecipientViewVerify_verifyPublicAccessDocument,
@@ -108,7 +94,7 @@ export async function getServerSideProps({
       },
     };
   }
-  return { props: data.verifyPublicAccess as any };
+  return { props: data.verifyPublicAccess };
 }
 
 RecipientViewVerify.mutations = [
@@ -126,12 +112,16 @@ RecipientViewVerify.mutations = [
         cookieName
         cookieValue
         email
-        orgName
-        orgLogoUrl
-        tone
-        brandTheme
+        organization {
+          ...RecipientViewContactlessForm_PublicOrganization
+          ...RecipientViewNewDevice_PublicOrganization
+          tone
+          brandTheme
+        }
       }
     }
+    ${RecipientViewContactlessForm.fragments.PublicOrganization}
+    ${RecipientViewNewDevice.fragments.PublicOrganization}
   `,
 ];
 

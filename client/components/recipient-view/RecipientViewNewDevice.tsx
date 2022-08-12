@@ -6,6 +6,7 @@ import { Logo } from "@parallel/components/common/Logo";
 import { RecipientViewPinForm } from "@parallel/components/recipient-view/RecipientViewPinForm";
 import {
   RecipientViewNewDevice_publicCheckVerificationCodeDocument,
+  RecipientViewNewDevice_PublicOrganizationFragment,
   RecipientViewNewDevice_publicSendVerificationCodeDocument,
 } from "@parallel/graphql/__types";
 import { resolveUrl } from "@parallel/utils/next";
@@ -28,15 +29,12 @@ type RecipientViewNewDeviceState =
     }
   | { step: "VERIFIED" };
 
-export function RecipientViewNewDevice({
-  orgLogoUrl,
-  orgName,
-  email,
-}: {
-  orgLogoUrl: string;
-  orgName: string;
+interface RecipientViewNewDeviceProps {
   email: string;
-}) {
+  organization: RecipientViewNewDevice_PublicOrganizationFragment;
+}
+
+export function RecipientViewNewDevice({ organization, email }: RecipientViewNewDeviceProps) {
   const codeExpiredToast = useCodeExpiredToast();
   const router = useRouter();
   const { query } = router;
@@ -112,14 +110,14 @@ export function RecipientViewNewDevice({
     <Card padding={{ base: 4, sm: 8 }} paddingTop={8} paddingBottom={{ base: 12, sm: 14 }}>
       <Stack spacing={8}>
         <Box>
-          {orgLogoUrl ? (
+          {organization.logoUrl340 ? (
             <Box
               role="img"
-              aria-label={orgName}
+              aria-label={organization.name}
               width="170px"
               margin="auto"
               height="60px"
-              backgroundImage={`url("${orgLogoUrl}")`}
+              backgroundImage={`url("${organization.logoUrl340}")`}
               backgroundSize="contain"
               backgroundPosition="center"
               backgroundRepeat="no-repeat"
@@ -190,7 +188,16 @@ export function RecipientViewNewDevice({
   );
 }
 
-RecipientViewNewDevice.mutations = [
+RecipientViewNewDevice.fragments = {
+  PublicOrganization: gql`
+    fragment RecipientViewNewDevice_PublicOrganization on PublicOrganization {
+      name
+      logoUrl340: logoUrl(options: { resize: { width: 340, height: 120, fit: inside } })
+    }
+  `,
+};
+
+const _mutations = [
   gql`
     mutation RecipientViewNewDevice_publicSendVerificationCode($keycode: ID!) {
       publicSendVerificationCode(keycode: $keycode) {

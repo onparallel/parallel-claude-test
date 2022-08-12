@@ -2843,10 +2843,8 @@ export interface PublicAccessVerification {
   email?: Maybe<Scalars["String"]>;
   isAllowed: Scalars["Boolean"];
   isContactlessAccess?: Maybe<Scalars["Boolean"]>;
-  orgLogoUrl?: Maybe<Scalars["String"]>;
-  orgName?: Maybe<Scalars["String"]>;
+  organization?: Maybe<PublicOrganization>;
   ownerName?: Maybe<Scalars["String"]>;
-  tone?: Maybe<Tone>;
 }
 
 /** A public view of a contact */
@@ -11000,6 +10998,13 @@ export type LandingTemplateCard_LandingTemplateFragment = {
   organizationName: string;
 };
 
+export type RecipientViewContactlessForm_PublicOrganizationFragment = {
+  __typename?: "PublicOrganization";
+  name: string;
+  hasRemoveParallelBranding: boolean;
+  logoUrl340?: string | null;
+};
+
 export type RecipientViewContactlessForm_publicSendVerificationCodeMutationVariables = Exact<{
   keycode: Scalars["ID"];
   firstName?: InputMaybe<Scalars["String"]>;
@@ -11231,6 +11236,12 @@ export type RecipientViewHeader_publicDelegateAccessToContactMutation = {
       }>;
     } | null;
   };
+};
+
+export type RecipientViewNewDevice_PublicOrganizationFragment = {
+  __typename?: "PublicOrganization";
+  name: string;
+  logoUrl340?: string | null;
 };
 
 export type RecipientViewNewDevice_publicSendVerificationCodeMutationVariables = Exact<{
@@ -21531,10 +21542,14 @@ export type RecipientViewVerify_verifyPublicAccessMutation = {
     cookieName?: string | null;
     cookieValue?: string | null;
     email?: string | null;
-    orgName?: string | null;
-    orgLogoUrl?: string | null;
-    tone?: Tone | null;
-    brandTheme?: { [key: string]: any } | null;
+    organization?: {
+      __typename?: "PublicOrganization";
+      tone: Tone;
+      brandTheme?: { [key: string]: any } | null;
+      name: string;
+      hasRemoveParallelBranding: boolean;
+      logoUrl340?: string | null;
+    } | null;
   };
 };
 
@@ -23341,14 +23356,6 @@ export const CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragmentDoc = gq
     isDefault
   }
 ` as unknown as DocumentNode<CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment, unknown>;
-export const ConfirmReactivateAccessDialog_PetitionAccessFragmentDoc = gql`
-  fragment ConfirmReactivateAccessDialog_PetitionAccess on PetitionAccess {
-    contact {
-      ...ContactReference_Contact
-    }
-  }
-  ${ContactReference_ContactFragmentDoc}
-` as unknown as DocumentNode<ConfirmReactivateAccessDialog_PetitionAccessFragment, unknown>;
 export const CreateReferenceDialog_PetitionFieldFragmentDoc = gql`
   fragment CreateReferenceDialog_PetitionField on PetitionField {
     id
@@ -23745,6 +23752,19 @@ export const LandingTemplateCard_LandingTemplateFragmentDoc = gql`
     organizationName
   }
 ` as unknown as DocumentNode<LandingTemplateCard_LandingTemplateFragment, unknown>;
+export const RecipientViewContactlessForm_PublicOrganizationFragmentDoc = gql`
+  fragment RecipientViewContactlessForm_PublicOrganization on PublicOrganization {
+    name
+    logoUrl340: logoUrl(options: { resize: { width: 340, height: 120, fit: inside } })
+    hasRemoveParallelBranding
+  }
+` as unknown as DocumentNode<RecipientViewContactlessForm_PublicOrganizationFragment, unknown>;
+export const RecipientViewNewDevice_PublicOrganizationFragmentDoc = gql`
+  fragment RecipientViewNewDevice_PublicOrganization on PublicOrganization {
+    name
+    logoUrl340: logoUrl(options: { resize: { width: 340, height: 120, fit: inside } })
+  }
+` as unknown as DocumentNode<RecipientViewNewDevice_PublicOrganizationFragment, unknown>;
 export const PublicPetitionFieldCommentContent_PetitionFieldCommentFragmentDoc = gql`
   fragment PublicPetitionFieldCommentContent_PetitionFieldComment on PublicPetitionFieldComment {
     contentHtml
@@ -24139,6 +24159,14 @@ export const ConfirmDeactivateAccessDialog_PetitionAccessFragmentDoc = gql`
   }
   ${ContactReference_ContactFragmentDoc}
 ` as unknown as DocumentNode<ConfirmDeactivateAccessDialog_PetitionAccessFragment, unknown>;
+export const ConfirmReactivateAccessDialog_PetitionAccessFragmentDoc = gql`
+  fragment ConfirmReactivateAccessDialog_PetitionAccess on PetitionAccess {
+    contact {
+      ...ContactReference_Contact
+    }
+  }
+  ${ContactReference_ContactFragmentDoc}
+` as unknown as DocumentNode<ConfirmReactivateAccessDialog_PetitionAccessFragment, unknown>;
 export const HeaderNameEditable_PetitionBaseFragmentDoc = gql`
   fragment HeaderNameEditable_PetitionBase on PetitionBase {
     name
@@ -25225,6 +25253,7 @@ export const PetitionActivity_PetitionFragmentDoc = gql`
       id
       status
       ...ConfirmDeactivateAccessDialog_PetitionAccess
+      ...ConfirmReactivateAccessDialog_PetitionAccess
     }
     ...PetitionLayout_PetitionBase
     ...PetitionAccessTable_Petition
@@ -25238,6 +25267,7 @@ export const PetitionActivity_PetitionFragmentDoc = gql`
     }
   }
   ${ConfirmDeactivateAccessDialog_PetitionAccessFragmentDoc}
+  ${ConfirmReactivateAccessDialog_PetitionAccessFragmentDoc}
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionAccessTable_PetitionFragmentDoc}
   ${PetitionActivityTimeline_PetitionFragmentDoc}
@@ -30186,12 +30216,14 @@ export const RecipientViewVerify_verifyPublicAccessDocument = gql`
       cookieName
       cookieValue
       email
-      orgName
-      orgLogoUrl
-      tone
-      brandTheme
+      organization {
+        ...RecipientViewContactlessForm_PublicOrganization
+        tone
+        brandTheme
+      }
     }
   }
+  ${RecipientViewContactlessForm_PublicOrganizationFragmentDoc}
 ` as unknown as DocumentNode<
   RecipientViewVerify_verifyPublicAccessMutation,
   RecipientViewVerify_verifyPublicAccessMutationVariables

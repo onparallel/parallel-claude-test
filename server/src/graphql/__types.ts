@@ -577,10 +577,8 @@ export interface NexusGenObjects {
     email?: string | null; // String
     isAllowed: boolean; // Boolean!
     isContactlessAccess?: boolean | null; // Boolean
-    orgLogoUrl?: string | null; // String
-    orgName?: string | null; // String
+    organization?: NexusGenRootTypes["PublicOrganization"] | null; // PublicOrganization
     ownerName?: string | null; // String
-    tone?: NexusGenEnums["Tone"] | null; // Tone
   };
   PublicContact: db.Contact;
   PublicCreateFileUploadReply: {
@@ -1681,10 +1679,8 @@ export interface NexusGenFieldTypes {
     email: string | null; // String
     isAllowed: boolean; // Boolean!
     isContactlessAccess: boolean | null; // Boolean
-    orgLogoUrl: string | null; // String
-    orgName: string | null; // String
+    organization: NexusGenRootTypes["PublicOrganization"] | null; // PublicOrganization
     ownerName: string | null; // String
-    tone: NexusGenEnums["Tone"] | null; // Tone
   };
   PublicContact: {
     // field return type
@@ -3253,10 +3249,8 @@ export interface NexusGenFieldTypeNames {
     email: "String";
     isAllowed: "Boolean";
     isContactlessAccess: "Boolean";
-    orgLogoUrl: "String";
-    orgName: "String";
+    organization: "PublicOrganization";
     ownerName: "String";
-    tone: "Tone";
   };
   PublicContact: {
     // field return type name
