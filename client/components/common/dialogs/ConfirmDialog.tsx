@@ -64,7 +64,7 @@ export function ConfirmDialog<TResult = void>({
         <ModalFooter as={Stack} direction="row">
           {alternative}
           {cancel ?? (
-            <Button ref={cancelRef} onClick={() => props.onReject()}>
+            <Button ref={cancelRef} onClick={() => props.onReject("CANCEL")}>
               <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
             </Button>
           )}

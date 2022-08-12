@@ -7,23 +7,24 @@ import { Link } from "@parallel/components/common/Link";
 import { FormattedMessage } from "react-intl";
 import { noop } from "remeda";
 
-export type ContactlessLinkDialogProps = {
+export interface ContactlessLinkDialogProps {
   link: string;
   petitionId: string;
-};
+}
 
 export function ContactlessLinkDialog({
   link,
   petitionId,
   ...props
-}: DialogProps<ContactlessLinkDialogProps, { forceClose?: boolean }>) {
+}: DialogProps<ContactlessLinkDialogProps>) {
   return (
     <ConfirmDialog
       size="md"
+      closeOnNavigation
       hasCloseButton
       header={
         <HStack>
-          <CircleCheckFilledIcon color="green.500" />
+          <CircleCheckFilledIcon color="green.500" role="presentation" />
           <Text>
             <FormattedMessage id="generic.copy-link" defaultMessage="Copy link" />
           </Text>
@@ -54,16 +55,8 @@ export function ContactlessLinkDialog({
               defaultMessage="This link is individual and <b>can only be used once</b>. If you want to add more recipients you can do it from the {activityLink} tab."
               values={{
                 activityLink: (
-                  <Link
-                    href={`/app/petitions/${petitionId}/activity`}
-                    onClick={() => props.onResolve({ forceClose: true })}
-                  >
-                    <Text as="span" fontWeight="bold">
-                      <FormattedMessage
-                        id="petition.header.activity-tab"
-                        defaultMessage="Activity"
-                      />
-                    </Text>
+                  <Link fontWeight="bold" href={`/app/petitions/${petitionId}/activity`}>
+                    <FormattedMessage id="petition.header.activity-tab" defaultMessage="Activity" />
                   </Link>
                 ),
               }}

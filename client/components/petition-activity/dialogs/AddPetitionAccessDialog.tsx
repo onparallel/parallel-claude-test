@@ -253,13 +253,10 @@ export function AddPetitionAccessDialog({
         }
       }
 
-      const data = await showContactlessLinkDialog({
+      await showContactlessLinkDialog({
         link,
         petitionId: petition.id,
       });
-      if (data.forceClose) {
-        props.onReject();
-      }
     } catch {}
   }, [accesses]);
 
@@ -270,6 +267,7 @@ export function AddPetitionAccessDialog({
       id="send-petition-dialog"
       closeOnEsc={false}
       closeOnOverlayClick={false}
+      closeOnNavigation
       initialFocusRef={recipientsRef}
       hasCloseButton
       size="2xl"
