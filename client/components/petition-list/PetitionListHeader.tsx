@@ -6,20 +6,30 @@ import {
   Button,
   ButtonGroup,
   HStack,
+  MenuItem,
+  MenuList,
   RadioProps,
   Stack,
   useRadio,
   useRadioGroup,
 } from "@chakra-ui/react";
-import { RepeatIcon } from "@parallel/chakra/icons";
+import { AddIcon, RepeatIcon } from "@parallel/chakra/icons";
 import type { PetitionsQueryState } from "@parallel/pages/app/petitions";
+import { useGoToPetition } from "@parallel/utils/goToPetition";
+import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
+import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
+import { useHandleNavigation } from "@parallel/utils/navigation";
 import { QueryStateOf, SetQueryState, useBuildStateUrl } from "@parallel/utils/queryState";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NakedLink } from "../common/Link";
+import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
 import { SearchInput } from "../common/SearchInput";
+import { Spacer } from "../common/Spacer";
+import { useCreateFolderDialog } from "../petition-common/dialogs/CreateFolderDialog";
+import { useNewTemplateDialog } from "../petition-new/dialogs/NewTemplateDialog";
 
 export interface PetitionListHeaderProps {
   shape: QueryStateOf<PetitionsQueryState>;
@@ -97,6 +107,57 @@ export function PetitionListHeader({
       })),
   });
 
+  const showCreateFolderDialog = useCreateFolderDialog();
+  const handleCreateFolder = async () => {
+    try {
+      const data = await showCreateFolderDialog({ isTemplate: state.type === "TEMPLATE" });
+      console.log("name: ", data.name);
+      console.log("petition / template ID's: ", data.ids);
+    } catch {}
+  };
+
+  const createPetition = useCreatePetition();
+  const goToPetition = useGoToPetition();
+  const clonePetitions = useClonePetitions();
+  const showNewTemplateDialog = useNewTemplateDialog();
+
+  const handleCreateTemplate = useCallback(async () => {
+    try {
+      const id = await createPetition({ type: "TEMPLATE" });
+      goToPetition(id, "compose", { query: { new: "true" } });
+    } catch {}
+  }, [goToPetition, createPetition]);
+
+  const navigate = useHandleNavigation();
+  const handleCreateNewParallelOrTemplate = async () => {
+    try {
+      if (state.type === "PETITION") {
+        navigate(`/app/petitions/new`);
+      } else {
+        const templateId = await showNewTemplateDialog({});
+        if (!templateId) {
+          handleCreateTemplate();
+        } else {
+          const petitionIds = await clonePetitions({
+            petitionIds: [templateId],
+            keepTitle: true,
+          });
+          goToPetition(petitionIds[0], "compose", { query: { new: "true" } });
+        }
+      }
+    } catch {}
+  };
+
+  const newParallelOrTemplateLiteral =
+    state.type === "PETITION" ? (
+      <FormattedMessage id="generic.new-petition" defaultMessage="New parallel" />
+    ) : (
+      <FormattedMessage
+        id="component.petition-list-header.new-template"
+        defaultMessage="New template"
+      />
+    );
+
   return (
     <Stack padding={2}>
       <HStack>
@@ -112,6 +173,39 @@ export function PetitionListHeader({
             id: "generic.reload-data",
             defaultMessage: "Reload",
           })}
+        />
+        <Spacer />
+        <Button display={{ base: "none", lg: "block" }} onClick={handleCreateFolder}>
+          <FormattedMessage
+            id="component.petition-list-header.create-folder"
+            defaultMessage="Create folder"
+          />
+        </Button>
+        <Button
+          display={{ base: "none", lg: "block" }}
+          colorScheme="primary"
+          onClick={handleCreateNewParallelOrTemplate}
+        >
+          {newParallelOrTemplateLiteral}
+        </Button>
+
+        <MoreOptionsMenuButton
+          display={{ base: "block", lg: "none" }}
+          colorScheme="primary"
+          icon={<AddIcon />}
+          options={
+            <MenuList minWidth="fit-content">
+              <MenuItem onClick={handleCreateFolder}>
+                <FormattedMessage
+                  id="component.petition-list-header.create-folder"
+                  defaultMessage="Create folder"
+                />
+              </MenuItem>
+              <MenuItem onClick={handleCreateNewParallelOrTemplate}>
+                {newParallelOrTemplateLiteral}
+              </MenuItem>
+            </MenuList>
+          }
         />
       </HStack>
       {state.search ? (

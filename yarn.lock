@@ -19185,6 +19185,11 @@ rc@^1.2.8:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+react-accessible-treeview@^2.1.4:
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/react-accessible-treeview/-/react-accessible-treeview-2.1.4.tgz#7bec971bfcf41c24184b86c0f6d476c6c1e6ba74"
+  integrity sha512-JIcb6zD6Cw/yHPrY3UnHEY5lfus8YdCQnPZ9G4kVK0xOxj5ENIMsKefoF2I6xpDK+oOA0KhQhcPhllv/KDBAKQ==
+
 react-async-script@^1.1.1:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/react-async-script/-/react-async-script-1.2.0.tgz#ab9412a26f0b83f5e2e00de1d2befc9400834b21"

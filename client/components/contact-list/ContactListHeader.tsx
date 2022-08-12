@@ -1,4 +1,4 @@
-import { Box, Button, MenuItem, MenuList, Stack } from "@chakra-ui/react";
+import { Box, Button, MenuItem, MenuList, Stack, Text } from "@chakra-ui/react";
 import { RepeatIcon, UploadIcon, UserPlusIcon } from "@parallel/chakra/icons";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
@@ -54,14 +54,16 @@ export function ContactListHeader({
       <Spacer />
       <Button
         data-action="import-contacts"
-        display={{ base: "none", md: "block" }}
+        display={{ base: "none", md: "flex" }}
         variant="outline"
         onClick={onImportClick}
       >
-        <FormattedMessage
-          id="component.contact-list-header.import-contacts-button"
-          defaultMessage="Import contacts"
-        />
+        <Text as="span" isTruncated>
+          <FormattedMessage
+            id="component.contact-list-header.import-contacts-button"
+            defaultMessage="Import contacts"
+          />
+        </Text>
       </Button>
       <ResponsiveButtonIcon
         display={{ base: "none", md: "block" }}
@@ -79,7 +81,7 @@ export function ContactListHeader({
         display={{ base: "block", md: "none" }}
         variant="outline"
         options={
-          <MenuList width="min-content">
+          <MenuList minWidth="fit-content">
             <MenuItem onClick={onImportClick} icon={<UploadIcon display="block" boxSize={4} />}>
               <FormattedMessage
                 id="component.contact-list-header.import-contacts-button"

@@ -855,6 +855,11 @@
     "context": "Event subscription"
   },
   {
+    "term": "component.create-folder-dialog.create-folder",
+    "definition": "Crear carpeta",
+    "context": "Create folder"
+  },
+  {
     "term": "component.create-group-dialog.confirm-button",
     "definition": "Crear equipo",
     "context": "Create team"
@@ -1705,6 +1710,16 @@
     "context": "The email was opened on {date}"
   },
   {
+    "term": "component.move-folder-dialog.create-folder",
+    "definition": "Crear carpeta",
+    "context": "Create folder"
+  },
+  {
+    "term": "component.move-folder-dialog.currently-in",
+    "definition": "Actualmente en <b>{folder}</b>",
+    "context": "Currently in <b>{folder}</b>"
+  },
+  {
     "term": "component.move-folder-dialog.header",
     "definition": "Mover a...",
     "context": "Move to..."
@@ -1713,6 +1728,11 @@
     "term": "component.move-folder-dialog.move",
     "definition": "Mover",
     "context": "Move"
+  },
+  {
+    "term": "component.move-folder-dialog.will-move-from",
+    "definition": "Se moverá de <b>{source}</b> a <b>{destination}</b>",
+    "context": "Will move from <b>{source}</b> to <b>{destination}</b>"
   },
   {
     "term": "component.multiple-emails-pasted-dialog.header",
@@ -2613,6 +2633,16 @@
     "term": "component.petition-link-dialog.body-2",
     "definition": "Este enlace es individual y <b>solo podrá usarse una vez</b>. Si quieres añadir más destinatarios puedes hacerlo desde la pestaña de {activityLink}.",
     "context": "This link is individual and <b>can only be used once</b>. If you want to add more recipients you can do it from the {activityLink} tab."
+  },
+  {
+    "term": "component.petition-list-header.create-folder",
+    "definition": "Crear carpeta",
+    "context": "Create folder"
+  },
+  {
+    "term": "component.petition-list-header.new-template",
+    "definition": "Nueva plantilla",
+    "context": "New template"
   },
   {
     "term": "component.petition-list-header.search-in",
@@ -5560,6 +5590,11 @@
     "context": "First name"
   },
   {
+    "term": "generic.forms.folder-name-label",
+    "definition": "Nombre de la carpeta",
+    "context": "Folder name"
+  },
+  {
     "term": "generic.forms.invalid-email-error",
     "definition": "Por favor, introduzca un correo electrónico válido",
     "context": "Please, enter a valid email"
@@ -5568,6 +5603,11 @@
     "term": "generic.forms.invalid-first-name-error",
     "definition": "Por favor, introduzca el nombre",
     "context": "Please, enter the first name"
+  },
+  {
+    "term": "generic.forms.invalid-folder-name-error",
+    "definition": "Por favor, indtroduzca el nombre de la carpeta",
+    "context": "Please, enter the folder name"
   },
   {
     "term": "generic.forms.invalid-group-name-error",
@@ -5788,6 +5828,11 @@
     "term": "generic.never-used",
     "definition": "No se ha usado",
     "context": "Never used"
+  },
+  {
+    "term": "generic.new-petition",
+    "definition": "Nuevo parallel",
+    "context": "New parallel"
   },
   {
     "term": "generic.next-page",
@@ -6218,11 +6263,6 @@
     "term": "new-petition.search-placeholder",
     "definition": "¿Qué estás buscando?",
     "context": "What are you looking for?"
-  },
-  {
-    "term": "new-petition.title",
-    "definition": "Nuevo parallel",
-    "context": "New parallel"
   },
   {
     "term": "organization-groups.add-user",
@@ -6738,6 +6778,11 @@
     "term": "page.petitions-list.actions-clone",
     "definition": "Duplicar",
     "context": "Duplicate"
+  },
+  {
+    "term": "page.petitions-list.actions-move-to",
+    "definition": "Mover a...",
+    "context": "Move to..."
   },
   {
     "term": "page.petitions-list.actions-rename",

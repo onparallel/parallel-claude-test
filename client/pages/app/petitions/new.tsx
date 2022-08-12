@@ -257,7 +257,7 @@ function NewPetition() {
       ref={mainRef}
       id="main-container"
       title={intl.formatMessage({
-        id: "new-petition.title",
+        id: "generic.new-petition",
         defaultMessage: "New parallel",
       })}
       me={me}

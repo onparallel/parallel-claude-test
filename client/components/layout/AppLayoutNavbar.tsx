@@ -180,7 +180,7 @@ export const AppLayoutNavbar = Object.assign(
                 size="lg"
                 isRound
                 label={intl.formatMessage({
-                  id: "new-petition.title",
+                  id: "generic.new-petition",
                   defaultMessage: "New parallel",
                 })}
                 placement={isMobile ? "top" : "right"}

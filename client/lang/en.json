@@ -855,6 +855,11 @@
     "context": "Event subscription"
   },
   {
+    "term": "component.create-folder-dialog.create-folder",
+    "definition": "Create folder",
+    "context": "Create folder"
+  },
+  {
     "term": "component.create-group-dialog.confirm-button",
     "definition": "Create team",
     "context": "Create team"
@@ -1705,6 +1710,16 @@
     "context": "The email was opened on {date}"
   },
   {
+    "term": "component.move-folder-dialog.create-folder",
+    "definition": "Create folder",
+    "context": "Create folder"
+  },
+  {
+    "term": "component.move-folder-dialog.currently-in",
+    "definition": "Currently in <b>{folder}</b>",
+    "context": "Currently in <b>{folder}</b>"
+  },
+  {
     "term": "component.move-folder-dialog.header",
     "definition": "Move to...",
     "context": "Move to..."
@@ -1713,6 +1728,11 @@
     "term": "component.move-folder-dialog.move",
     "definition": "Move",
     "context": "Move"
+  },
+  {
+    "term": "component.move-folder-dialog.will-move-from",
+    "definition": "Will move from <b>{source}</b> to <b>{destination}</b>",
+    "context": "Will move from <b>{source}</b> to <b>{destination}</b>"
   },
   {
     "term": "component.multiple-emails-pasted-dialog.header",
@@ -2613,6 +2633,16 @@
     "term": "component.petition-link-dialog.body-2",
     "definition": "This link is individual and <b>can only be used once</b>. If you want to add more recipients you can do it from the {activityLink} tab.",
     "context": "This link is individual and <b>can only be used once</b>. If you want to add more recipients you can do it from the {activityLink} tab."
+  },
+  {
+    "term": "component.petition-list-header.create-folder",
+    "definition": "Create folder",
+    "context": "Create folder"
+  },
+  {
+    "term": "component.petition-list-header.new-template",
+    "definition": "New template",
+    "context": "New template"
   },
   {
     "term": "component.petition-list-header.search-in",
@@ -5560,6 +5590,11 @@
     "context": "First name"
   },
   {
+    "term": "generic.forms.folder-name-label",
+    "definition": "Folder name",
+    "context": "Folder name"
+  },
+  {
     "term": "generic.forms.invalid-email-error",
     "definition": "Please, enter a valid email",
     "context": "Please, enter a valid email"
@@ -5568,6 +5603,11 @@
     "term": "generic.forms.invalid-first-name-error",
     "definition": "Please, enter the first name",
     "context": "Please, enter the first name"
+  },
+  {
+    "term": "generic.forms.invalid-folder-name-error",
+    "definition": "Please, enter the folder name",
+    "context": "Please, enter the folder name"
   },
   {
     "term": "generic.forms.invalid-group-name-error",
@@ -5788,6 +5828,11 @@
     "term": "generic.never-used",
     "definition": "Never used",
     "context": "Never used"
+  },
+  {
+    "term": "generic.new-petition",
+    "definition": "New parallel",
+    "context": "New parallel"
   },
   {
     "term": "generic.next-page",
@@ -6218,11 +6263,6 @@
     "term": "new-petition.search-placeholder",
     "definition": "What are you looking for?",
     "context": "What are you looking for?"
-  },
-  {
-    "term": "new-petition.title",
-    "definition": "New parallel",
-    "context": "New parallel"
   },
   {
     "term": "organization-groups.add-user",
@@ -6738,6 +6778,11 @@
     "term": "page.petitions-list.actions-clone",
     "definition": "Duplicate",
     "context": "Duplicate"
+  },
+  {
+    "term": "page.petitions-list.actions-move-to",
+    "definition": "Move to...",
+    "context": "Move to..."
   },
   {
     "term": "page.petitions-list.actions-rename",

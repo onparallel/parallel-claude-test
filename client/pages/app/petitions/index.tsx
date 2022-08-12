@@ -4,6 +4,7 @@ import {
   CopyIcon,
   DeleteIcon,
   EditSimpleIcon,
+  FolderIcon,
   PaperPlaneIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
@@ -11,6 +12,7 @@ import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider"
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
+import { useMoveToFolderDialog } from "@parallel/components/petition-common/dialogs/MoveFolderDialog";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { useRenameDialog } from "@parallel/components/petition-common/dialogs/RenameDialog";
 import {
@@ -258,6 +260,16 @@ function Petitions() {
     } catch {}
   }, []);
 
+  const showMoveFolderDialog = useMoveToFolderDialog();
+  const handleMoveToClick = useCallback(async () => {
+    try {
+      await showMoveFolderDialog({
+        currentPath: state.path,
+        petitionOrPetitionFolderIds: selectedIdsRef.current,
+      });
+    } catch {}
+  }, []);
+
   const columns = usePetitionsTableColumns(state.type);
 
   const context = useMemo(() => ({ user: me! }), [me]);
@@ -272,6 +284,7 @@ function Petitions() {
     onUseTemplateClick: handleUseTemplateClick,
     onCloneClick: handleCloneClick,
     onShareClick: handlePetitionSharingClick,
+    onMoveToClick: handleMoveToClick,
   });
 
   return (
@@ -485,6 +498,7 @@ function usePetitionListActions({
   onCloneAsTemplateClick,
   onUseTemplateClick,
   onDeleteClick,
+  onMoveToClick,
 }: {
   user: any;
   type: PetitionBaseType;
@@ -495,6 +509,7 @@ function usePetitionListActions({
   onCloneAsTemplateClick: () => void;
   onUseTemplateClick: () => void;
   onDeleteClick: () => void;
+  onMoveToClick: () => void;
 }) {
   return [
     {
@@ -521,6 +536,17 @@ function usePetitionListActions({
             leftIcon: <CopyIcon />,
             children: (
               <FormattedMessage id="page.petitions-list.actions-clone" defaultMessage="Duplicate" />
+            ),
+          },
+          {
+            key: "move-to",
+            onClick: onMoveToClick,
+            leftIcon: <FolderIcon />,
+            children: (
+              <FormattedMessage
+                id="page.petitions-list.actions-move-to"
+                defaultMessage="Move to..."
+              />
             ),
           },
         ]),
