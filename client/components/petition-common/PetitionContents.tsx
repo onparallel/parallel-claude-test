@@ -13,13 +13,13 @@ import {
 import { EyeOffIcon, NewPropertyIcon } from "@parallel/chakra/icons";
 import {
   PetitionContents_PetitionFieldFragment,
-  PetitionSignatureRequestStatus,
   SignatureOrgIntegrationEnvironment,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { filterPetitionFields, PetitionFieldFilter } from "@parallel/utils/filterPetitionFields";
+import { PetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
 import { isFileTypeField } from "@parallel/utils/isFileTypeField";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { ComponentType, createElement, memo, MouseEvent, ReactNode } from "react";
@@ -28,15 +28,13 @@ import { Divider } from "../common/Divider";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { InternalFieldBadge } from "../common/InternalFieldBadge";
 import { PetitionSignatureStatusIcon } from "../common/PetitionSignatureStatusIcon";
+import { AliasOptionsMenu } from "./AliasOptionsMenu";
 import { CopyAliasIconButton } from "./CopyAliasIconButton";
 import { useCreateReferenceDialog } from "./dialogs/CreateReferenceDialog";
-import { AliasOptionsMenu as AliasOptionsMenu } from "./AliasOptionsMenu";
 
 interface PetitionContentsFieldIndicatorsProps<T extends PetitionContents_PetitionFieldFragment> {
   field: T;
 }
-
-type PetitionContentsSignatureStatus = "START" | PetitionSignatureRequestStatus;
 
 export interface PetitionContentsProps<T extends PetitionContents_PetitionFieldFragment> {
   fields: T[];
@@ -47,7 +45,7 @@ export interface PetitionContentsProps<T extends PetitionContents_PetitionFieldF
   onFieldEdit?: (fieldId: string, data: UpdatePetitionFieldInput) => void;
   filter?: PetitionFieldFilter;
   fieldIndicators?: ComponentType<PetitionContentsFieldIndicatorsProps<T>>;
-  signatureStatus?: PetitionContentsSignatureStatus | null;
+  signatureStatus?: PetitionSignatureStatus;
   signatureEnvironment?: SignatureOrgIntegrationEnvironment | null;
   onSignatureStatusClick?: () => void;
   isReadOnly?: boolean;
@@ -121,7 +119,7 @@ function SignatureStatusInfo({
   environment,
   ...props
 }: BoxProps & {
-  status: PetitionContentsSignatureStatus;
+  status: PetitionSignatureStatus;
   environment?: SignatureOrgIntegrationEnvironment | null;
 }) {
   return (

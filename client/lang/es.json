@@ -7255,24 +7255,34 @@
     "context": "{count, plural, =1 {Parallel} other {Parallels}} shared"
   },
   {
-    "term": "petition-signature-status-label.e-signature-cancelled",
-    "definition": "Firma digital cancelada",
+    "term": "petition-signature-status-label.cancelled",
+    "definition": "Firma cancelada",
     "context": "eSignature cancelled"
   },
   {
-    "term": "petition-signature-status-label.e-signature-completed",
-    "definition": "Firma digital completada",
+    "term": "petition-signature-status-label.completed",
+    "definition": "Firma completada",
     "context": "eSignature completed"
   },
   {
-    "term": "petition-signature-status-label.e-signature-processing",
-    "definition": "Firma digital pendiente",
-    "context": "eSignature pending"
+    "term": "petition-signature-status-label.no-signature",
+    "definition": "Sin firma",
+    "context": "Without eSignature"
   },
   {
-    "term": "petition-signature-status-label.e-signature-start",
+    "term": "petition-signature-status-label.not-started",
+    "definition": "Firma sin iniciar",
+    "context": "eSignature not started"
+  },
+  {
+    "term": "petition-signature-status-label.pending-start",
     "definition": "Pendiente de inicio",
     "context": "Pending start"
+  },
+  {
+    "term": "petition-signature-status-label.processing",
+    "definition": "Esperando firma",
+    "context": "Waiting for signature"
   },
   {
     "term": "petition.add-access.header",

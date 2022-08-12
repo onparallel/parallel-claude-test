@@ -12,7 +12,7 @@ export function PetitionSignatureCellContent({ petition }: PetitionSignatureCell
   const environment = getPetitionSignatureEnvironment(petition);
 
   // do not show signature status on drafts
-  if (petition.status === "DRAFT" || !status) return null;
+  if (petition.status === "DRAFT") return null;
 
   return <PetitionSignatureStatusIcon status={status} environment={environment} />;
 }

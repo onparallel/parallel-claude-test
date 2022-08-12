@@ -7255,24 +7255,34 @@
     "context": "{count, plural, =1 {Parallel} other {Parallels}} shared"
   },
   {
-    "term": "petition-signature-status-label.e-signature-cancelled",
+    "term": "petition-signature-status-label.cancelled",
     "definition": "eSignature cancelled",
     "context": "eSignature cancelled"
   },
   {
-    "term": "petition-signature-status-label.e-signature-completed",
+    "term": "petition-signature-status-label.completed",
     "definition": "eSignature completed",
     "context": "eSignature completed"
   },
   {
-    "term": "petition-signature-status-label.e-signature-processing",
-    "definition": "eSignature pending",
-    "context": "eSignature pending"
+    "term": "petition-signature-status-label.no-signature",
+    "definition": "Without eSignature",
+    "context": "Without eSignature"
   },
   {
-    "term": "petition-signature-status-label.e-signature-start",
+    "term": "petition-signature-status-label.not-started",
+    "definition": "eSignature not started",
+    "context": "eSignature not started"
+  },
+  {
+    "term": "petition-signature-status-label.pending-start",
     "definition": "Pending start",
     "context": "Pending start"
+  },
+  {
+    "term": "petition-signature-status-label.processing",
+    "definition": "Waiting for signature",
+    "context": "Waiting for signature"
   },
   {
     "term": "petition.add-access.header",

@@ -1,14 +1,19 @@
-import { Circle, Flex, Tooltip, PlacementWithLogical } from "@chakra-ui/react";
-import { AlertCircleIcon, SignatureIcon, TimeIcon } from "@parallel/chakra/icons";
+import { Flex, PlacementWithLogical, Tooltip } from "@chakra-ui/react";
 import {
-  PetitionSignatureRequestStatus,
-  SignatureOrgIntegrationEnvironment,
-} from "@parallel/graphql/__types";
+  SignatureCancelledIcon,
+  SignatureCompletedIcon,
+  SignatureNotStartedIcon,
+  SignaturePendingIcon,
+  SignatureProcessingIcon,
+} from "@parallel/chakra/icons";
+import { SignatureOrgIntegrationEnvironment } from "@parallel/graphql/__types";
+import { PetitionSignatureStatus } from "@parallel/utils/getPetitionSignatureStatus";
 import { usePetitionSignatureStatusLabels } from "@parallel/utils/usePetitionSignatureStatusLabels";
+import { useMemo } from "react";
 import { useIntl } from "react-intl";
 
 interface PetitionSignatureStatusIconProps {
-  status: PetitionSignatureRequestStatus | "START" | null;
+  status: PetitionSignatureStatus;
   environment?: SignatureOrgIntegrationEnvironment | null;
   tooltipPlacement?: PlacementWithLogical;
 }
@@ -24,27 +29,41 @@ export function PetitionSignatureStatusIcon({
   const envLabel =
     environment === "DEMO"
       ? ` - ${intl.formatMessage({
-          id: "generic.signature-demo-environment-long",
-          defaultMessage: "Test environment",
-        })}`
+          id: "generic.signature-demo-environment",
+          defaultMessage: "Test",
+        })}`.toUpperCase()
       : "";
 
-  const label = status ? labels[status] + envLabel : "";
+  const label = status !== "NO_SIGNATURE" ? labels[status] + envLabel : "";
+
+  const iconProps = useMemo(
+    () => ({
+      fontSize: "25px",
+      color:
+        status === "COMPLETED"
+          ? environment === "PRODUCTION"
+            ? "gray.800"
+            : "yellow.600"
+          : environment === "PRODUCTION"
+          ? "gray.300"
+          : "#DBBC8E",
+    }),
+    [environment, status]
+  );
 
   return (
     <Tooltip label={label} placement={tooltipPlacement}>
       <Flex alignItems="center" gridGap={0} position="relative" paddingX={1}>
-        {status === "START" ? (
-          <Circle size={2} backgroundColor="primary.500" marginRight="2px" />
-        ) : null}
-        <SignatureIcon
-          color={environment === "DEMO" ? "yellow.700" : "gray.700"}
-          opacity={status === "COMPLETED" ? 1 : 0.4}
-        />
-        {status && ["ENQUEUED", "PROCESSING", "PROCESSED"].includes(status) ? (
-          <TimeIcon color="yellow.600" fontSize="13px" position="absolute" top={-2} right={0} />
+        {status === "NOT_STARTED" ? (
+          <SignatureNotStartedIcon {...iconProps} />
+        ) : status === "PENDING_START" ? (
+          <SignaturePendingIcon {...iconProps} />
+        ) : status === "PROCESSING" ? (
+          <SignatureProcessingIcon {...iconProps} />
         ) : status === "CANCELLED" ? (
-          <AlertCircleIcon color="red.500" fontSize="14px" position="absolute" top={-2} right={0} />
+          <SignatureCancelledIcon {...iconProps} />
+        ) : status === "COMPLETED" ? (
+          <SignatureCompletedIcon {...iconProps} />
         ) : null}
       </Flex>
     </Tooltip>
