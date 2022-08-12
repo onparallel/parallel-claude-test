@@ -277,9 +277,7 @@ export function RecipientViewContactlessForm({
                   <FormattedMessage
                     id="component.recipient-view-contactless-form.heading"
                     defaultMessage="Enter your data to access"
-                    values={{
-                      tone,
-                    }}
+                    values={{ tone }}
                   />
                   <IconButton
                     marginLeft={2}
@@ -303,7 +301,7 @@ export function RecipientViewContactlessForm({
               <Text>
                 <FormattedMessage
                   id="component.recipient-view-contactless-form.has-shared-with-you"
-                  defaultMessage="{ownerName} has shared with you an access to Parallel."
+                  defaultMessage="{ownerName} has shared with you this link."
                   values={{
                     ownerName,
                     tone,

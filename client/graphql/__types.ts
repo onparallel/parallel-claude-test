@@ -21624,7 +21624,7 @@ export type PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutation
 };
 
 export type PublicPetitionLink_publicSendReminderMutationVariables = Exact<{
-  slug?: InputMaybe<Scalars["ID"]>;
+  slug: Scalars["ID"];
   contactEmail: Scalars["String"];
 }>;
 
@@ -30218,12 +30218,14 @@ export const RecipientViewVerify_verifyPublicAccessDocument = gql`
       email
       organization {
         ...RecipientViewContactlessForm_PublicOrganization
+        ...RecipientViewNewDevice_PublicOrganization
         tone
         brandTheme
       }
     }
   }
   ${RecipientViewContactlessForm_PublicOrganizationFragmentDoc}
+  ${RecipientViewNewDevice_PublicOrganizationFragmentDoc}
 ` as unknown as DocumentNode<
   RecipientViewVerify_verifyPublicAccessMutation,
   RecipientViewVerify_verifyPublicAccessMutationVariables
@@ -30276,7 +30278,7 @@ export const PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkDocumen
   PublicPetitionLink_publicCreateAndSendPetitionFromPublicLinkMutationVariables
 >;
 export const PublicPetitionLink_publicSendReminderDocument = gql`
-  mutation PublicPetitionLink_publicSendReminder($slug: ID, $contactEmail: String!) {
+  mutation PublicPetitionLink_publicSendReminder($slug: ID!, $contactEmail: String!) {
     publicSendReminder(slug: $slug, contactEmail: $contactEmail)
   }
 ` as unknown as DocumentNode<

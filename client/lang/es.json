@@ -3546,8 +3546,8 @@
   },
   {
     "term": "component.recipient-view-contactless-form.has-shared-with-you",
-    "definition": "{ownerName} {tone, select, INFORMAL {te} other {le}} ha compartido un acceso a Parallel.",
-    "context": "{ownerName} has shared with you an access to Parallel."
+    "definition": "{ownerName} {tone, select, INFORMAL {te} other {le}} ha compartido este enlace.",
+    "context": "{ownerName} has shared with you this link."
   },
   {
     "term": "component.recipient-view-contactless-form.heading",
@@ -4806,8 +4806,8 @@
   },
   {
     "term": "components.recipient-view-contactless-help-dialog.body-1",
-    "definition": "{tone, select, INFORMAL{Si te han compartido este enlace, significa que van a solicitarte información. Una vez identificado, te <b>enviaremos un correo</b> para que puedas acceder y completarla.} other{Si ha recibido este enlace, quiere decir que alguien le solicita una información. Tras identificarse, <b>recibirá un correo</b> que le permitirá acceder y completarla.}}",
-    "context": "If you have received this link, it means that someone is requesting information from you. After identifying yourself, you will <b>receive an email</b> to access and complete it."
+    "definition": "{tone, select, INFORMAL{Si te han compartido este enlace, significa que van a solicitarte información. Una vez identificado, <b>podrás acceder y completarla</b>.} other{Si ha recibido este enlace, quiere decir que alguien le solicita una información. Tras identificarse, <b>podrá acceder y completarla</b>.}}",
+    "context": "If you have received this link, it means that someone is requesting information from you. After identifying yourself, <b>you will be able to access an complete it</b>."
   },
   {
     "term": "components.recipient-view-contactless-help-dialog.body-2",

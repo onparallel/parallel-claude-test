@@ -3546,8 +3546,8 @@
   },
   {
     "term": "component.recipient-view-contactless-form.has-shared-with-you",
-    "definition": "{ownerName} has shared with you an access to Parallel.",
-    "context": "{ownerName} has shared with you an access to Parallel."
+    "definition": "{ownerName} has shared with you this link.",
+    "context": "{ownerName} has shared with you this link."
   },
   {
     "term": "component.recipient-view-contactless-form.heading",
@@ -4806,8 +4806,8 @@
   },
   {
     "term": "components.recipient-view-contactless-help-dialog.body-1",
-    "definition": "If you have received this link, it means that someone is requesting information from you. After identifying yourself, you will <b>receive an email</b> to access and complete it.",
-    "context": "If you have received this link, it means that someone is requesting information from you. After identifying yourself, you will <b>receive an email</b> to access and complete it."
+    "definition": "If you have received this link, it means that someone is requesting information from you. After identifying yourself, <b>you will be able to access an complete it</b>.",
+    "context": "If you have received this link, it means that someone is requesting information from you. After identifying yourself, <b>you will be able to access an complete it</b>."
   },
   {
     "term": "components.recipient-view-contactless-help-dialog.body-2",

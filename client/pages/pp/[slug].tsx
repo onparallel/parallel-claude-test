@@ -325,7 +325,7 @@ PublicPetitionLink.mutations = [
     }
   `,
   gql`
-    mutation PublicPetitionLink_publicSendReminder($slug: ID, $contactEmail: String!) {
+    mutation PublicPetitionLink_publicSendReminder($slug: ID!, $contactEmail: String!) {
       publicSendReminder(slug: $slug, contactEmail: $contactEmail)
     }
   `,

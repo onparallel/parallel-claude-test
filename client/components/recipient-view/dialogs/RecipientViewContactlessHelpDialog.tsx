@@ -32,7 +32,7 @@ function RecipientViewContactlessHelpDialog({ tone, ...props }: DialogProps<{ to
           <Text>
             <FormattedMessage
               id="components.recipient-view-contactless-help-dialog.body-1"
-              defaultMessage="If you have received this link, it means that someone is requesting information from you. After identifying yourself, you will <b>receive an email</b> to access and complete it."
+              defaultMessage="If you have received this link, it means that someone is requesting information from you. After identifying yourself, <b>you will be able to access an complete it</b>."
               values={{ tone }}
             />
           </Text>
