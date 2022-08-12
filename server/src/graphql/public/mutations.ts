@@ -275,6 +275,15 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
                 `PetitionAccess:${access!.id}`,
                 t
               );
+
+              if (petition.credits_used === 0) {
+                await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
+                  petition.org_id,
+                  "PETITION_SEND",
+                  1,
+                  t
+                );
+              }
             });
           }
         }
