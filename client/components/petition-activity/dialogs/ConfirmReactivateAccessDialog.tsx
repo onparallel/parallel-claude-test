@@ -1,38 +1,42 @@
+import { gql } from "@apollo/client";
 import { Button } from "@chakra-ui/react";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { ConfirmReactivateAccessDialog_PetitionAccessFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
+import { isDefined } from "remeda";
 
 export function ConfirmReactivateAccessDialog({
-  nameOrEmail,
+  access,
   ...props
-}: DialogProps<{ nameOrEmail: string }>) {
+}: DialogProps<{ access: ConfirmReactivateAccessDialog_PetitionAccessFragment }>) {
   return (
     <ConfirmDialog
       header={
         <FormattedMessage
-          id="petition.confirm-activate-access-message.header"
+          id="component.confirm-reactivate-access-dialog.header"
           defaultMessage="Reactivate contact access"
         />
       }
       body={
-        nameOrEmail.length > 0 ? (
+        isDefined(access.contact) ? (
           <FormattedMessage
-            id="petition.confirm-activate-access-message.body"
-            defaultMessage="Are you sure you want to <b>reactivate access</b> to {nameOrEmail}?"
-            values={{ nameOrEmail }}
+            id="component.confirm-reactivate-access-dialog.body"
+            defaultMessage="Are you sure you want to <b>reactivate access</b> to {contact}?"
+            values={{ contact: <ContactReference contact={access.contact} /> }}
           />
         ) : (
           <FormattedMessage
-            id="petition.confirm-activate-access-message.body-empty-access"
-            defaultMessage="Are you sure you want to <b>reactivate the empty access</b>?"
+            id="component.confirm-reactivate-access-dialog.body-contactless-access"
+            defaultMessage="Are you sure you want to reactivate the link access?"
           />
         )
       }
       confirm={
         <Button colorScheme="red" onClick={() => props.onResolve()}>
           <FormattedMessage
-            id="petition.confirm-activate-access-message.confirm"
+            id="component.confirm-reactivate-access-dialog.confirm"
             defaultMessage="Yes, activate access"
           />
         </Button>
@@ -41,6 +45,17 @@ export function ConfirmReactivateAccessDialog({
     />
   );
 }
+
+ConfirmReactivateAccessDialog.fragments = {
+  PetitionAccess: gql`
+    fragment ConfirmReactivateAccessDialog_PetitionAccess on PetitionAccess {
+      contact {
+        ...ContactReference_Contact
+      }
+    }
+    ${ContactReference.fragments.Contact}
+  `,
+};
 
 export function useConfirmReactivateAccessDialog() {
   return useDialog(ConfirmReactivateAccessDialog);

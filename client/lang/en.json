@@ -390,6 +390,26 @@
     "context": "Ongoing eSignature"
   },
   {
+    "term": "component.confirm-deactivate-access-dialog.body",
+    "definition": "Are you sure you want to <b>remove access</b> to {contact}?",
+    "context": "Are you sure you want to <b>remove access</b> to {contact}?"
+  },
+  {
+    "term": "component.confirm-deactivate-access-dialog.body-contactless-access",
+    "definition": "Are you sure you want to deactivate the link access?",
+    "context": "Are you sure you want to deactivate the link access?"
+  },
+  {
+    "term": "component.confirm-deactivate-access-dialog.confirm",
+    "definition": "Yes, remove access",
+    "context": "Yes, remove access"
+  },
+  {
+    "term": "component.confirm-deactivate-access-dialog.header",
+    "definition": "Remove contact access",
+    "context": "Remove contact access"
+  },
+  {
     "term": "component.confirm-deactivate-event-subscription-dialog.body",
     "definition": "Are you sure you want to deactivate the selected event subscription?",
     "context": "Are you sure you want to deactivate the selected event subscription?"
@@ -513,6 +533,26 @@
     "term": "component.confirm-petition-signers-dialog.start-signature-button",
     "definition": "Start signature",
     "context": "Start signature"
+  },
+  {
+    "term": "component.confirm-reactivate-access-dialog.body",
+    "definition": "Are you sure you want to <b>reactivate access</b> to {contact}?",
+    "context": "Are you sure you want to <b>reactivate access</b> to {contact}?"
+  },
+  {
+    "term": "component.confirm-reactivate-access-dialog.body-contactless-access",
+    "definition": "Are you sure you want to reactivate the link access?",
+    "context": "Are you sure you want to reactivate the link access?"
+  },
+  {
+    "term": "component.confirm-reactivate-access-dialog.confirm",
+    "definition": "Yes, activate access",
+    "context": "Yes, activate access"
+  },
+  {
+    "term": "component.confirm-reactivate-access-dialog.header",
+    "definition": "Reactivate contact access",
+    "context": "Reactivate contact access"
   },
   {
     "term": "component.confirm-remove-member-dialog.body",
@@ -7265,26 +7305,6 @@
     "context": "This parallel has already been sent."
   },
   {
-    "term": "petition.confirm-activate-access-message.body",
-    "definition": "Are you sure you want to <b>reactivate access</b> to {nameOrEmail}?",
-    "context": "Are you sure you want to <b>reactivate access</b> to {nameOrEmail}?"
-  },
-  {
-    "term": "petition.confirm-activate-access-message.body-empty-access",
-    "definition": "Are you sure you want to <b>reactivate the empty access</b>?",
-    "context": "Are you sure you want to <b>reactivate the empty access</b>?"
-  },
-  {
-    "term": "petition.confirm-activate-access-message.confirm",
-    "definition": "Yes, activate access",
-    "context": "Yes, activate access"
-  },
-  {
-    "term": "petition.confirm-activate-access-message.header",
-    "definition": "Reactivate contact access",
-    "context": "Reactivate contact access"
-  },
-  {
     "term": "petition.confirm-cancel-scheduled-message.body",
     "definition": "Are you sure you want to cancel this message?",
     "context": "Are you sure you want to cancel this message?"
@@ -7333,26 +7353,6 @@
     "term": "petition.confirm-change-short-text-format.header",
     "definition": "Change format type",
     "context": "Change format type"
-  },
-  {
-    "term": "petition.confirm-deactivate-access-message.body",
-    "definition": "Are you sure you want to <b>remove access</b> to {nameOrEmail}?",
-    "context": "Are you sure you want to <b>remove access</b> to {nameOrEmail}?"
-  },
-  {
-    "term": "petition.confirm-deactivate-access-message.body-empty-access",
-    "definition": "Are you sure you want to <b>remove the empty access</b>?",
-    "context": "Are you sure you want to <b>remove the empty access</b>?"
-  },
-  {
-    "term": "petition.confirm-deactivate-access-message.confirm",
-    "definition": "Yes, remove access",
-    "context": "Yes, remove access"
-  },
-  {
-    "term": "petition.confirm-deactivate-access-message.header",
-    "definition": "Remove contact access",
-    "context": "Remove contact access"
   },
   {
     "term": "petition.confirm-deactivate-users.confirm",
@@ -8980,6 +8980,11 @@
     "context": "Message not available"
   },
   {
+    "term": "timeline.contactless-access-activated-description",
+    "definition": "{userIsYou, select, true {You} other {{user}}} created a link access {timeAgo}",
+    "context": "{userIsYou, select, true {You} other {{user}}} created a link access {timeAgo}"
+  },
+  {
     "term": "timeline.contactless-access-deactivated-manual-description",
     "definition": "{userIsYou, select, true {You} other {{user}}} deactivated a link access {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{user}}} deactivated a link access {timeAgo}"
@@ -9088,11 +9093,6 @@
     "term": "timeline.petition-completed-description",
     "definition": "{userIsYou, select, true {You} other {{name}}} completed the parallel {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{name}}} completed the parallel {timeAgo}"
-  },
-  {
-    "term": "timeline.contactless-access-activated-description",
-    "definition": "{userIsYou, select, true {You} other {{user}}} created a link access {timeAgo}",
-    "context": "{userIsYou, select, true {You} other {{user}}} created a link access {timeAgo}"
   },
   {
     "term": "timeline.petition-correct-notified-description",

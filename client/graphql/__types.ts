@@ -7325,6 +7325,16 @@ export type AddPetitionAccessDialog_createPetitionAccessMutation = {
   };
 };
 
+export type ConfirmDeactivateAccessDialog_PetitionAccessFragment = {
+  __typename?: "PetitionAccess";
+  contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+};
+
+export type ConfirmReactivateAccessDialog_PetitionAccessFragment = {
+  __typename?: "PetitionAccess";
+  contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
+};
+
 export type SentPetitionMessageDialog_PetitionMessageFragment = {
   __typename?: "PetitionMessage";
   emailBody?: string | null;
@@ -23331,6 +23341,14 @@ export const CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragmentDoc = gq
     isDefault
   }
 ` as unknown as DocumentNode<CreateOrUpdateDocumentThemeDialog_OrganizationThemeFragment, unknown>;
+export const ConfirmReactivateAccessDialog_PetitionAccessFragmentDoc = gql`
+  fragment ConfirmReactivateAccessDialog_PetitionAccess on PetitionAccess {
+    contact {
+      ...ContactReference_Contact
+    }
+  }
+  ${ContactReference_ContactFragmentDoc}
+` as unknown as DocumentNode<ConfirmReactivateAccessDialog_PetitionAccessFragment, unknown>;
 export const CreateReferenceDialog_PetitionFieldFragmentDoc = gql`
   fragment CreateReferenceDialog_PetitionField on PetitionField {
     id
@@ -24113,6 +24131,14 @@ export const OrganizationUsers_UserFragmentDoc = gql`
   }
   ${useCreateOrUpdateUserDialog_UserFragmentDoc}
 ` as unknown as DocumentNode<OrganizationUsers_UserFragment, unknown>;
+export const ConfirmDeactivateAccessDialog_PetitionAccessFragmentDoc = gql`
+  fragment ConfirmDeactivateAccessDialog_PetitionAccess on PetitionAccess {
+    contact {
+      ...ContactReference_Contact
+    }
+  }
+  ${ContactReference_ContactFragmentDoc}
+` as unknown as DocumentNode<ConfirmDeactivateAccessDialog_PetitionAccessFragment, unknown>;
 export const HeaderNameEditable_PetitionBaseFragmentDoc = gql`
   fragment HeaderNameEditable_PetitionBase on PetitionBase {
     name
@@ -25198,6 +25224,7 @@ export const PetitionActivity_PetitionFragmentDoc = gql`
     accesses {
       id
       status
+      ...ConfirmDeactivateAccessDialog_PetitionAccess
     }
     ...PetitionLayout_PetitionBase
     ...PetitionAccessTable_Petition
@@ -25210,6 +25237,7 @@ export const PetitionActivity_PetitionFragmentDoc = gql`
       ...FieldErrorDialog_PetitionField
     }
   }
+  ${ConfirmDeactivateAccessDialog_PetitionAccessFragmentDoc}
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionAccessTable_PetitionFragmentDoc}
   ${PetitionActivityTimeline_PetitionFragmentDoc}

@@ -12,8 +12,14 @@ import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { AddPetitionAccessDialog } from "@parallel/components/petition-activity/dialogs/AddPetitionAccessDialog";
 import { useConfigureRemindersDialog } from "@parallel/components/petition-activity/dialogs/ConfigureRemindersDialog";
 import { useConfirmCancelScheduledMessageDialog } from "@parallel/components/petition-activity/dialogs/ConfirmCancelScheduledMessageDialog";
-import { useConfirmDeactivateAccessDialog } from "@parallel/components/petition-activity/dialogs/ConfirmDeactivateAccessDialog";
-import { useConfirmReactivateAccessDialog } from "@parallel/components/petition-activity/dialogs/ConfirmReactivateAccessDialog";
+import {
+  ConfirmDeactivateAccessDialog,
+  useConfirmDeactivateAccessDialog,
+} from "@parallel/components/petition-activity/dialogs/ConfirmDeactivateAccessDialog";
+import {
+  ConfirmReactivateAccessDialog,
+  useConfirmReactivateAccessDialog,
+} from "@parallel/components/petition-activity/dialogs/ConfirmReactivateAccessDialog";
 import { useConfirmSendReminderDialog } from "@parallel/components/petition-activity/dialogs/ConfirmSendReminderDialog";
 import { PetitionAccessesTable } from "@parallel/components/petition-activity/PetitionAccessesTable";
 import { PetitionActivityTimeline } from "@parallel/components/petition-activity/PetitionActivityTimeline";
@@ -190,11 +196,9 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const [reactivateAccess] = useMutation(PetitionActivity_reactivateAccessesDocument);
   const handleReactivateAccess = useCallback(
     async (accessId: string) => {
-      const { contact } = petition.accesses.find((a) => a.id === accessId)!;
+      const access = petition.accesses.find((a) => a.id === accessId)!;
       try {
-        await confirmReactivateAccess({
-          nameOrEmail: contact?.fullName ?? contact?.email ?? "",
-        });
+        await confirmReactivateAccess({ access });
       } catch {
         return;
       }
@@ -210,11 +214,9 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const [deactivateAccess] = useMutation(PetitionActivity_deactivateAccessesDocument);
   const handleDeactivateAccess = useCallback(
     async (accessId) => {
-      const { contact } = petition.accesses.find((a) => a.id === accessId)!;
+      const access = petition.accesses.find((a) => a.id === accessId)!;
       try {
-        await confirmDeactivateAccess({
-          nameOrEmail: contact?.fullName ?? contact?.email ?? "",
-        });
+        await confirmDeactivateAccess({ access });
       } catch {
         return;
       }
@@ -365,6 +367,8 @@ PetitionActivity.fragments = {
       accesses {
         id
         status
+        ...ConfirmDeactivateAccessDialog_PetitionAccess
+        ...ConfirmReactivateAccessDialog_PetitionAccess
       }
       ...PetitionLayout_PetitionBase
       ...PetitionAccessTable_Petition
@@ -385,6 +389,8 @@ PetitionActivity.fragments = {
     ${useSendPetitionHandler.fragments.Petition}
     ${validatePetitionFields.fragments.PetitionField}
     ${FieldErrorDialog.fragments.PetitionField}
+    ${ConfirmDeactivateAccessDialog.fragments.PetitionAccess}
+    ${ConfirmReactivateAccessDialog.fragments.PetitionAccess}
   `,
   Query: gql`
     fragment PetitionActivity_Query on Query {

@@ -1,38 +1,43 @@
+import { gql } from "@apollo/client";
 import { Button } from "@chakra-ui/react";
+import { ContactReference } from "@parallel/components/common/ContactReference";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { ConfirmDeactivateAccessDialog_PetitionAccessFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
+import { isDefined } from "remeda";
 
 export function ConfirmDeactivateAccessDialog({
-  nameOrEmail,
+  access,
   ...props
-}: DialogProps<{ nameOrEmail: string }>) {
+}: DialogProps<{ access: ConfirmDeactivateAccessDialog_PetitionAccessFragment }>) {
   return (
     <ConfirmDialog
+      closeOnNavigation
       header={
         <FormattedMessage
-          id="petition.confirm-deactivate-access-message.header"
+          id="component.confirm-deactivate-access-dialog.header"
           defaultMessage="Remove contact access"
         />
       }
       body={
-        nameOrEmail.length > 0 ? (
+        isDefined(access.contact) ? (
           <FormattedMessage
-            id="petition.confirm-deactivate-access-message.body"
-            defaultMessage="Are you sure you want to <b>remove access</b> to {nameOrEmail}?"
-            values={{ nameOrEmail }}
+            id="component.confirm-deactivate-access-dialog.body"
+            defaultMessage="Are you sure you want to <b>remove access</b> to {contact}?"
+            values={{ contact: <ContactReference contact={access.contact} /> }}
           />
         ) : (
           <FormattedMessage
-            id="petition.confirm-deactivate-access-message.body-empty-access"
-            defaultMessage="Are you sure you want to <b>remove the empty access</b>?"
+            id="component.confirm-deactivate-access-dialog.body-contactless-access"
+            defaultMessage="Are you sure you want to deactivate the link access?"
           />
         )
       }
       confirm={
         <Button colorScheme="red" onClick={() => props.onResolve()}>
           <FormattedMessage
-            id="petition.confirm-deactivate-access-message.confirm"
+            id="component.confirm-deactivate-access-dialog.confirm"
             defaultMessage="Yes, remove access"
           />
         </Button>
@@ -41,6 +46,17 @@ export function ConfirmDeactivateAccessDialog({
     />
   );
 }
+
+ConfirmDeactivateAccessDialog.fragments = {
+  PetitionAccess: gql`
+    fragment ConfirmDeactivateAccessDialog_PetitionAccess on PetitionAccess {
+      contact {
+        ...ContactReference_Contact
+      }
+    }
+    ${ContactReference.fragments.Contact}
+  `,
+};
 
 export function useConfirmDeactivateAccessDialog() {
   return useDialog(ConfirmDeactivateAccessDialog);
