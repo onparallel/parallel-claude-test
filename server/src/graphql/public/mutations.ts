@@ -249,19 +249,19 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
           if (petition) {
             const email = result.data.contact_email!.toLowerCase();
 
-            ctx.contact = (
-              await ctx.contacts.loadOrCreate(
-                {
-                  email,
-                  org_id: petition.org_id,
-                  first_name: result.data!.contact_first_name!,
-                  last_name: result.data!.contact_last_name || null,
-                },
-                `PetitionAccess:${access!.id}`
-              )
-            )[0];
-
             await ctx.petitions.withTransaction(async (t) => {
+              ctx.contact = (
+                await ctx.contacts.loadOrCreate(
+                  {
+                    email,
+                    org_id: petition.org_id,
+                    first_name: result.data!.contact_first_name!,
+                    last_name: result.data!.contact_last_name || null,
+                  },
+                  `PetitionAccess:${access!.id}`,
+                  t
+                )
+              )[0];
               await ctx.petitions.addContactToPetitionAccess(
                 access!.id,
                 ctx.contact!.id,
@@ -277,6 +277,13 @@ export const publicCheckVerificationCode = mutationField("publicCheckVerificatio
               );
 
               if (petition.credits_used === 0) {
+                const limit = await ctx.organizations.getOrganizationCurrentUsageLimit(
+                  petition.org_id,
+                  "PETITION_SEND"
+                );
+                if (!limit || limit.used + 1 > limit.limit) {
+                  throw new Error("PETITION_SEND_CREDITS_ERROR");
+                }
                 await ctx.organizations.updateOrganizationCurrentUsageLimitCredits(
                   petition.org_id,
                   "PETITION_SEND",
