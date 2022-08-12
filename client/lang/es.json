@@ -65,6 +65,11 @@
     "context": "Add users to the team"
   },
   {
+    "term": "component.add-new-signer-dialog.header",
+    "definition": "{tone, select, INFORMAL{Introduce} other{Introduzca}} los datos del firmante",
+    "context": "Enter the signer's information"
+  },
+  {
     "term": "component.add-petition-access-dialog.add-signers",
     "definition": "Añadir firmantes",
     "context": "Add signers"
@@ -158,6 +163,16 @@
     "term": "component.add-signature-api-key-dialog.title",
     "definition": "Introduce tu API Key",
     "context": "Enter your API Key"
+  },
+  {
+    "term": "component.admin-organizations-tabs.features",
+    "definition": "Funcionalidades",
+    "context": "Features"
+  },
+  {
+    "term": "component.admin-organizations-tabs.users",
+    "definition": "Usuarios",
+    "context": "Users"
   },
   {
     "term": "component.app-layout-navbar.contacts-link",
@@ -500,6 +515,26 @@
     "context": "Ongoing eSignature"
   },
   {
+    "term": "component.confirm-discard-changes-dialog.body",
+    "definition": "Tienes cambios sin guardar. ¿Quieres descartarlos?",
+    "context": "You have unsaved changes. Would you like to discard them?"
+  },
+  {
+    "term": "component.confirm-discard-changes-dialog.cancel",
+    "definition": "Mantener",
+    "context": "Stay"
+  },
+  {
+    "term": "component.confirm-discard-changes-dialog.confirm",
+    "definition": "Descartar y continuar",
+    "context": "Discard and continue"
+  },
+  {
+    "term": "component.confirm-discard-changes-dialog.header",
+    "definition": "Cambios sin guardar",
+    "context": "Unsaved changes"
+  },
+  {
     "term": "component.confirm-petition-signers-dialog.confirmation-text",
     "definition": "Al iniciar firma enviaremos el documento a firmar a los siguientes contactos:",
     "context": "When you start the signature, we will send the document to be signed to the following contacts:"
@@ -833,6 +868,51 @@
     "term": "component.create-group-dialog.title",
     "definition": "Nuevo equipo",
     "context": "New team"
+  },
+  {
+    "term": "component.create-or-update-document-theme-dialog.create-theme-button",
+    "definition": "Crear tema",
+    "context": "Create theme"
+  },
+  {
+    "term": "component.create-or-update-document-theme-dialog.delete-theme-button",
+    "definition": "Eliminar tema",
+    "context": "Delete theme"
+  },
+  {
+    "term": "component.create-or-update-document-theme-dialog.edit-theme",
+    "definition": "Editar tema",
+    "context": "Edit theme"
+  },
+  {
+    "term": "component.create-or-update-document-theme-dialog.name-error",
+    "definition": "Por favor, ingresa un nombre para el tema",
+    "context": "Please, enter a name for the theme"
+  },
+  {
+    "term": "component.create-or-update-document-theme-dialog.new-theme",
+    "definition": "Nuevo tema",
+    "context": "New theme"
+  },
+  {
+    "term": "component.create-or-update-document-theme-dialog.set-default-help",
+    "definition": "Al crear nuevas plantillas, se utilizará este tema por defecto. Las plantillas existentes no se verán afectadas.",
+    "context": "When creating new templates, this theme will be used as default. Existing templates are not affected."
+  },
+  {
+    "term": "component.create-or-update-document-theme-dialog.set-default-label",
+    "definition": "Establecer como tema por defecto",
+    "context": "Set as default theme"
+  },
+  {
+    "term": "component.create-or-update-user-dialog.included-in",
+    "definition": "Incluido en (opcional)",
+    "context": "Included in (optional)"
+  },
+  {
+    "term": "component.create-or-update-user-dialog.update-user",
+    "definition": "Actualizar usuario",
+    "context": "Update user"
   },
   {
     "term": "component.create-reference-dialog.body",
@@ -1620,6 +1700,31 @@
     "context": "The email was opened on {date}"
   },
   {
+    "term": "component.multiple-emails-pasted-dialog.header",
+    "definition": "Múltiples correos electrónicos",
+    "context": "Multiple emails"
+  },
+  {
+    "term": "component.multiple-emails-pasted-dialog.message-1",
+    "definition": "Has pegado desde el portapapeles múltiples correos electrónicos.",
+    "context": "You have pasted multiple emails from the clipboard."
+  },
+  {
+    "term": "component.multiple-emails-pasted-dialog.message-2",
+    "definition": "¿Quieres añadirlos en <b>grupos separados</b> (recibirán parallels diferentes) o <b>agruparlos en un único parallel</b>?",
+    "context": "Do you want to add them to <b>separate groups</b> (they will fill different parallels) or <b>group them in the same parallel</b>?"
+  },
+  {
+    "term": "component.multiple-emails-pasted-dialog.same-group",
+    "definition": "Todos en un único parallel",
+    "context": "All in the same parallel"
+  },
+  {
+    "term": "component.multiple-emails-pasted-dialog.separate-groups",
+    "definition": "Crear grupos separados",
+    "context": "Add to separate groups"
+  },
+  {
     "term": "component.netdocuments-iconbutton.open-file",
     "definition": "Acceder al archivo en NetDocuments",
     "context": "Access file in NetDocuments"
@@ -1858,6 +1963,21 @@
     "term": "component.organization-memebers-list-table-headr.sso-provider",
     "definition": "Proveedor SSO",
     "context": "SSO provider"
+  },
+  {
+    "term": "component.overwrite-documentation-dialog.body",
+    "definition": "{tone, select, INFORMAL{Ya se ha completado una subida. Si continúas, volverás al proceso inicial y se sobrescribirá la documentación actual. ¿Estás seguro de querer empezar de nuevo?} other{El proceso de subida ha sido completado al menos una vez. Si continúa, volverá al proceso inicial y se sobrescribirá la documentación actual. ¿Está seguro de querer empezar de nuevo?}}",
+    "context": "An upload has already been completed. If you continue, you will return to the initial process and the current documentation will be overwritten. Are you sure you want to start over?"
+  },
+  {
+    "term": "component.overwrite-documentation-dialog.confirm-button",
+    "definition": "Sí, empezar de nuevo",
+    "context": "Yes, start again"
+  },
+  {
+    "term": "component.overwrite-documentation-dialog.header",
+    "definition": "Sobrescribir documentación",
+    "context": "Overwrite documentation"
   },
   {
     "term": "component.password-input.hide",
@@ -2980,6 +3100,41 @@
     "context": "Status"
   },
   {
+    "term": "component.petition-tag-list-cell-content.add-tags",
+    "definition": "Añadir etiquetas",
+    "context": "Add tags"
+  },
+  {
+    "term": "component.petition-tag-list-cell-content.edit-tags",
+    "definition": "Editar etiquetas",
+    "context": "Edit tags"
+  },
+  {
+    "term": "component.petition-tag-list-cell-content.no-options-1",
+    "definition": "Tu organización aún no ha creado etiquetas.",
+    "context": "Your organization doesn't have any tags yet."
+  },
+  {
+    "term": "component.petition-tag-list-cell-content.no-options-2",
+    "definition": "Escribe para crear la primera.",
+    "context": "Write something to create the first one."
+  },
+  {
+    "term": "component.petition-tag-list-cell-content.no-options-3",
+    "definition": "Escribe para crear una etiqueta",
+    "context": "Type to create a new tag"
+  },
+  {
+    "term": "component.petition-tag-list-cell-content.tags-create",
+    "definition": "Crear {tag}",
+    "context": "Create {tag}"
+  },
+  {
+    "term": "component.petition-tag-list-cell-content.tags-x-more",
+    "definition": "y <b>{extra} más</b>",
+    "context": "and <b>{extra} more</b>"
+  },
+  {
     "term": "component.petition-template-closing-message.card-explainer",
     "definition": "Este mensaje se utilizará al seleccionar la opción <b>notificar al destinatario</b> para notificar de la revisión y el cierre del parallel.",
     "context": "This message will be used when selecting the option <b>notify recipients</b> to notify that it has been reviewed and closed."
@@ -3558,6 +3713,26 @@
     "term": "component.recipient-view-contactless-form.resend-access",
     "definition": "Reenviar acceso",
     "context": "Resend access"
+  },
+  {
+    "term": "component.recipient-view-contactless-help-dialog.body-1",
+    "definition": "{tone, select, INFORMAL{Si te han compartido este enlace, significa que van a solicitarte información. Una vez identificado, <b>podrás acceder y completarla</b>.} other{Si ha recibido este enlace, quiere decir que alguien le solicita una información. Tras identificarse, <b>podrá acceder y completarla</b>.}}",
+    "context": "If you have received this link, it means that someone is requesting information from you. After identifying yourself, <b>you will be able to access an complete it</b>."
+  },
+  {
+    "term": "component.recipient-view-contactless-help-dialog.body-2",
+    "definition": "Este enlace es personal y único, por lo que no puede compartirse. {tone, select, INFORMAL{Una vez dentro, podrás invitar a los colaboradores que necesites.} other{Una vez dentro, podrá invitar a los colaboradores que necesite.}}",
+    "context": "This link is personal and unique, so it cannot be shared. Once inside, you will be able to invite the collaborators you need."
+  },
+  {
+    "term": "component.recipient-view-contactless-help-dialog.faq",
+    "definition": "Ver más preguntas frecuentes",
+    "context": "See more frequently asked questions"
+  },
+  {
+    "term": "component.recipient-view-contactless-help-dialog.header",
+    "definition": "¿Por qué pedimos estos datos?",
+    "context": "Why do we ask for this data?"
   },
   {
     "term": "component.recipient-view-content-card.comment-count",
@@ -4375,6 +4550,21 @@
     "context": "{count} selected"
   },
   {
+    "term": "component.table.change-sorting",
+    "definition": "Cambiar ordenación para \"{column}\"",
+    "context": "Change sorting for \"{column}\""
+  },
+  {
+    "term": "component.table.filter",
+    "definition": "Filtrar \"{column}\"",
+    "context": "Filter \"{column}\""
+  },
+  {
+    "term": "component.table.filter-button",
+    "definition": "Filtrar",
+    "context": "Filter"
+  },
+  {
     "term": "component.table.filter-header",
     "definition": "Filtro",
     "context": "Filter"
@@ -4400,9 +4590,44 @@
     "context": "Previous"
   },
   {
+    "term": "component.table.sort-button",
+    "definition": "Ordenar",
+    "context": "Sort"
+  },
+  {
+    "term": "component.table.sort-by",
+    "definition": "Ordenar por \"{column}\"",
+    "context": "Sort by \"{column}\""
+  },
+  {
     "term": "component.table.total-results",
     "definition": "Mostrando {start}-{end} de {total, plural, =1 {# resultado} other {# resultados}}",
     "context": "Showing {start}-{end} of {total, plural, =1 {# result} other {# results}}"
+  },
+  {
+    "term": "component.tag-edit-dialog.color-label",
+    "definition": "Color",
+    "context": "Color"
+  },
+  {
+    "term": "component.tag-edit-dialog.existing-tag",
+    "definition": "Ya existe una etiqueta con este nombre",
+    "context": "A tag with the same name already exists"
+  },
+  {
+    "term": "component.tag-edit-dialog.header",
+    "definition": "Editar etiquetas",
+    "context": "Edit tags"
+  },
+  {
+    "term": "component.tag-edit-dialog.name-label",
+    "definition": "Editar texto",
+    "context": "Edit text"
+  },
+  {
+    "term": "component.tag-edit-dialog.tag-label",
+    "definition": "Etiqueta",
+    "context": "Tag"
   },
   {
     "term": "component.tag-select.placeholder",
@@ -4585,6 +4810,16 @@
     "context": "Search for existing users and teams"
   },
   {
+    "term": "component.user-group-members-popover.members-of",
+    "definition": "Miembros de {name}:",
+    "context": "Members of {name}:"
+  },
+  {
+    "term": "component.user-group-members-popover.no-members",
+    "definition": "Este equipo no tiene miembros todavía",
+    "context": "This team has no members yet"
+  },
+  {
     "term": "component.user-group-select.no-options",
     "definition": "No se han encontrado equipos",
     "context": "No teams have been found"
@@ -4648,241 +4883,6 @@
     "term": "component.user-select.user-group-icon-alt",
     "definition": "Equipo",
     "context": "Team"
-  },
-  {
-    "term": "components.add-new-signer-dialog.header",
-    "definition": "{tone, select, INFORMAL{Introduce} other{Introduzca}} los datos del firmante",
-    "context": "Enter the signer's information"
-  },
-  {
-    "term": "components.admin-organizations-tabs.features",
-    "definition": "Funcionalidades",
-    "context": "Features"
-  },
-  {
-    "term": "components.admin-organizations-tabs.users",
-    "definition": "Usuarios",
-    "context": "Users"
-  },
-  {
-    "term": "components.confirm-discard-changes-dialog.body",
-    "definition": "Tienes cambios sin guardar. ¿Quieres descartarlos?",
-    "context": "You have unsaved changes. Would you like to discard them?"
-  },
-  {
-    "term": "components.confirm-discard-changes-dialog.cancel",
-    "definition": "Mantener",
-    "context": "Stay"
-  },
-  {
-    "term": "components.confirm-discard-changes-dialog.confirm",
-    "definition": "Descartar y continuar",
-    "context": "Discard and continue"
-  },
-  {
-    "term": "components.confirm-discard-changes-dialog.header",
-    "definition": "Cambios sin guardar",
-    "context": "Unsaved changes"
-  },
-  {
-    "term": "components.create-or-update-document-theme-dialog.create-theme-button",
-    "definition": "Crear tema",
-    "context": "Create theme"
-  },
-  {
-    "term": "components.create-or-update-document-theme-dialog.delete-theme-button",
-    "definition": "Eliminar tema",
-    "context": "Delete theme"
-  },
-  {
-    "term": "components.create-or-update-document-theme-dialog.edit-theme",
-    "definition": "Editar tema",
-    "context": "Edit theme"
-  },
-  {
-    "term": "components.create-or-update-document-theme-dialog.name-error",
-    "definition": "Por favor, ingresa un nombre para el tema",
-    "context": "Please, enter a name for the theme"
-  },
-  {
-    "term": "components.create-or-update-document-theme-dialog.new-theme",
-    "definition": "Nuevo tema",
-    "context": "New theme"
-  },
-  {
-    "term": "components.create-or-update-document-theme-dialog.set-default-help",
-    "definition": "Al crear nuevas plantillas, se utilizará este tema por defecto. Las plantillas existentes no se verán afectadas.",
-    "context": "When creating new templates, this theme will be used as default. Existing templates are not affected."
-  },
-  {
-    "term": "components.create-or-update-document-theme-dialog.set-default-label",
-    "definition": "Establecer como tema por defecto",
-    "context": "Set as default theme"
-  },
-  {
-    "term": "components.create-or-update-user-dialog.included-in",
-    "definition": "Incluido en (opcional)",
-    "context": "Included in (optional)"
-  },
-  {
-    "term": "components.create-or-update-user-dialog.update-user",
-    "definition": "Actualizar usuario",
-    "context": "Update user"
-  },
-  {
-    "term": "components.multiple-emails-pasted-dialog.header",
-    "definition": "Múltiples correos electrónicos",
-    "context": "Multiple emails"
-  },
-  {
-    "term": "components.multiple-emails-pasted-dialog.message-1",
-    "definition": "Has pegado desde el portapapeles múltiples correos electrónicos.",
-    "context": "You have pasted multiple emails from the clipboard."
-  },
-  {
-    "term": "components.multiple-emails-pasted-dialog.message-2",
-    "definition": "¿Quieres añadirlos en <b>grupos separados</b> (recibirán parallels diferentes) o <b>agruparlos en un único parallel</b>?",
-    "context": "Do you want to add them to <b>separate groups</b> (they will fill different parallels) or <b>group them in the same parallel</b>?"
-  },
-  {
-    "term": "components.multiple-emails-pasted-dialog.same-group",
-    "definition": "Todos en un único parallel",
-    "context": "All in the same parallel"
-  },
-  {
-    "term": "components.multiple-emails-pasted-dialog.separate-groups",
-    "definition": "Crear grupos separados",
-    "context": "Add to separate groups"
-  },
-  {
-    "term": "components.overwrite-documentation-dialog.body",
-    "definition": "{tone, select, INFORMAL{Ya se ha completado una subida. Si continúas, volverás al proceso inicial y se sobrescribirá la documentación actual. ¿Estás seguro de querer empezar de nuevo?} other{El proceso de subida ha sido completado al menos una vez. Si continúa, volverá al proceso inicial y se sobrescribirá la documentación actual. ¿Está seguro de querer empezar de nuevo?}}",
-    "context": "An upload has already been completed. If you continue, you will return to the initial process and the current documentation will be overwritten. Are you sure you want to start over?"
-  },
-  {
-    "term": "components.overwrite-documentation-dialog.confirm-button",
-    "definition": "Sí, empezar de nuevo",
-    "context": "Yes, start again"
-  },
-  {
-    "term": "components.overwrite-documentation-dialog.header",
-    "definition": "Sobrescribir documentación",
-    "context": "Overwrite documentation"
-  },
-  {
-    "term": "components.petition-tag-list-cell-content.add-tags",
-    "definition": "Añadir etiquetas",
-    "context": "Add tags"
-  },
-  {
-    "term": "components.petition-tag-list-cell-content.edit-tags",
-    "definition": "Editar etiquetas",
-    "context": "Edit tags"
-  },
-  {
-    "term": "components.petition-tag-list-cell-content.no-options-1",
-    "definition": "Tu organización aún no ha creado etiquetas.",
-    "context": "Your organization doesn't have any tags yet."
-  },
-  {
-    "term": "components.petition-tag-list-cell-content.no-options-2",
-    "definition": "Escribe para crear la primera.",
-    "context": "Write something to create the first one."
-  },
-  {
-    "term": "components.petition-tag-list-cell-content.no-options-3",
-    "definition": "Escribe para crear una etiqueta",
-    "context": "Type to create a new tag"
-  },
-  {
-    "term": "components.petition-tag-list-cell-content.tags-create",
-    "definition": "Crear {tag}",
-    "context": "Create {tag}"
-  },
-  {
-    "term": "components.petition-tag-list-cell-content.tags-x-more",
-    "definition": "y <b>{extra} más</b>",
-    "context": "and <b>{extra} more</b>"
-  },
-  {
-    "term": "components.recipient-view-contactless-help-dialog.body-1",
-    "definition": "{tone, select, INFORMAL{Si te han compartido este enlace, significa que van a solicitarte información. Una vez identificado, <b>podrás acceder y completarla</b>.} other{Si ha recibido este enlace, quiere decir que alguien le solicita una información. Tras identificarse, <b>podrá acceder y completarla</b>.}}",
-    "context": "If you have received this link, it means that someone is requesting information from you. After identifying yourself, <b>you will be able to access an complete it</b>."
-  },
-  {
-    "term": "components.recipient-view-contactless-help-dialog.body-2",
-    "definition": "Este enlace es personal y único, por lo que no puede compartirse. {tone, select, INFORMAL{Una vez dentro, podrás invitar a los colaboradores que necesites.} other{Una vez dentro, podrá invitar a los colaboradores que necesite.}}",
-    "context": "This link is personal and unique, so it cannot be shared. Once inside, you will be able to invite the collaborators you need."
-  },
-  {
-    "term": "components.recipient-view-contactless-help-dialog.faq",
-    "definition": "Ver más preguntas frecuentes",
-    "context": "See more frequently asked questions"
-  },
-  {
-    "term": "components.recipient-view-contactless-help-dialog.header",
-    "definition": "¿Por qué pedimos estos datos?",
-    "context": "Why do we ask for this data?"
-  },
-  {
-    "term": "components.table.change-sorting",
-    "definition": "Cambiar ordenación para \"{column}\"",
-    "context": "Change sorting for \"{column}\""
-  },
-  {
-    "term": "components.table.filter",
-    "definition": "Filtrar \"{column}\"",
-    "context": "Filter \"{column}\""
-  },
-  {
-    "term": "components.table.filter-button",
-    "definition": "Filtrar",
-    "context": "Filter"
-  },
-  {
-    "term": "components.table.sort-button",
-    "definition": "Ordenar",
-    "context": "Sort"
-  },
-  {
-    "term": "components.table.sort-by",
-    "definition": "Ordenar por \"{column}\"",
-    "context": "Sort by \"{column}\""
-  },
-  {
-    "term": "components.tag-edit-dialog.color-label",
-    "definition": "Color",
-    "context": "Color"
-  },
-  {
-    "term": "components.tag-edit-dialog.existing-tag",
-    "definition": "Ya existe una etiqueta con este nombre",
-    "context": "A tag with the same name already exists"
-  },
-  {
-    "term": "components.tag-edit-dialog.header",
-    "definition": "Editar etiquetas",
-    "context": "Edit tags"
-  },
-  {
-    "term": "components.tag-edit-dialog.name-label",
-    "definition": "Editar texto",
-    "context": "Edit text"
-  },
-  {
-    "term": "components.tag-edit-dialog.tag-label",
-    "definition": "Etiqueta",
-    "context": "Tag"
-  },
-  {
-    "term": "components.user-group-members-popover.members-of",
-    "definition": "Miembros de {name}:",
-    "context": "Members of {name}:"
-  },
-  {
-    "term": "components.user-group-members-popover.no-members",
-    "definition": "Este equipo no tiene miembros todavía",
-    "context": "This team has no members yet"
   },
   {
     "term": "contact.edit-details-button",

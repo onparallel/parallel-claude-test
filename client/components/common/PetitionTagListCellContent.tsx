@@ -125,7 +125,7 @@ export function PetitionTagListCellContent({
             size="sm"
             value={petition.tags}
             placeholder={intl.formatMessage({
-              id: "components.petition-tag-list-cell-content.add-tags",
+              id: "component.petition-tag-list-cell-content.add-tags",
               defaultMessage: "Add tags",
             })}
             defaultOptions
@@ -164,7 +164,7 @@ export function PetitionTagListCellContent({
               </Circle>
               <Text as="div" whiteSpace="nowrap" fontSize="sm" color="gray.400">
                 <FormattedMessage
-                  id="components.petition-tag-list-cell-content.add-tags"
+                  id="component.petition-tag-list-cell-content.add-tags"
                   defaultMessage="Add tags"
                 />
               </Text>
@@ -183,7 +183,7 @@ export function PetitionTagListCellContent({
           {extra.length ? (
             <ListItem whiteSpace="nowrap" fontSize="sm" lineHeight="24px">
               <FormattedMessage
-                id="components.petition-tag-list-cell-content.tags-x-more"
+                id="component.petition-tag-list-cell-content.tags-x-more"
                 defaultMessage="and <b>{extra} more</b>"
                 values={{
                   extra: extra.length,
@@ -422,13 +422,13 @@ const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
         <>
           <Text>
             <FormattedMessage
-              id="components.petition-tag-list-cell-content.no-options-1"
+              id="component.petition-tag-list-cell-content.no-options-1"
               defaultMessage="Your organization doesn't have any tags yet."
             />
           </Text>
           <Text>
             <FormattedMessage
-              id="components.petition-tag-list-cell-content.no-options-2"
+              id="component.petition-tag-list-cell-content.no-options-2"
               defaultMessage="Write something to create the first one."
             />
           </Text>
@@ -436,7 +436,7 @@ const NoOptionsMessage = rsComponent("NoOptionsMessage", function (props) {
       ) : (
         <Text as="div">
           <FormattedMessage
-            id="components.petition-tag-list-cell-content.no-options-3"
+            id="component.petition-tag-list-cell-content.no-options-3"
             defaultMessage="Type to create a new tag"
           />
         </Text>
@@ -466,7 +466,7 @@ const Option = rsComponent("Option", function (props) {
     <components.Option {...props}>
       <Flex alignItems="baseline">
         <FormattedMessage
-          id="components.petition-tag-list-cell-content.tags-create"
+          id="component.petition-tag-list-cell-content.tags-create"
           defaultMessage="Create {tag}"
           values={{
             tag: (
@@ -509,7 +509,7 @@ const MenuList = rsComponent("MenuList", function (props) {
             onClick={() => onEditTags()}
           >
             <FormattedMessage
-              id="components.petition-tag-list-cell-content.edit-tags"
+              id="component.petition-tag-list-cell-content.edit-tags"
               defaultMessage="Edit tags"
             />
           </Button>

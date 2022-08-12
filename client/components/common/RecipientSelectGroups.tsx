@@ -367,7 +367,7 @@ function MultipleEmailsPastedDialog(props: DialogProps<{}, MultipleEmailsPastedA
       content={{ as: "form", onSubmit: () => props.onResolve(action) }}
       header={
         <FormattedMessage
-          id="components.multiple-emails-pasted-dialog.header"
+          id="component.multiple-emails-pasted-dialog.header"
           defaultMessage="Multiple emails"
         />
       }
@@ -376,13 +376,13 @@ function MultipleEmailsPastedDialog(props: DialogProps<{}, MultipleEmailsPastedA
           <Stack>
             <Text>
               <FormattedMessage
-                id="components.multiple-emails-pasted-dialog.message-1"
+                id="component.multiple-emails-pasted-dialog.message-1"
                 defaultMessage="You have pasted multiple emails from the clipboard."
               />
             </Text>
             <Text>
               <FormattedMessage
-                id="components.multiple-emails-pasted-dialog.message-2"
+                id="component.multiple-emails-pasted-dialog.message-2"
                 defaultMessage="Do you want to add them to <b>separate groups</b> (they will fill different parallels) or <b>group them in the same parallel</b>?"
               />
             </Text>
@@ -395,13 +395,13 @@ function MultipleEmailsPastedDialog(props: DialogProps<{}, MultipleEmailsPastedA
           >
             <Radio value="SEPARATE_GROUPS" ref={initialFocusRef as any}>
               <FormattedMessage
-                id="components.multiple-emails-pasted-dialog.separate-groups"
+                id="component.multiple-emails-pasted-dialog.separate-groups"
                 defaultMessage="Add to separate groups"
               />
             </Radio>
             <Radio value="SAME_GROUP">
               <FormattedMessage
-                id="components.multiple-emails-pasted-dialog.same-group"
+                id="component.multiple-emails-pasted-dialog.same-group"
                 defaultMessage="All in the same parallel"
               />
             </Radio>

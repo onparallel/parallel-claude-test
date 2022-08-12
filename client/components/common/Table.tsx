@@ -595,7 +595,7 @@ export function DefaultHeader({
             ref={filterButtonRef}
             icon={<FilterIcon />}
             label={intl.formatMessage({
-              id: "components.table.filter-button",
+              id: "component.table.filter-button",
               defaultMessage: "Filter",
             })}
             size="xs"
@@ -603,7 +603,7 @@ export function DefaultHeader({
             colorScheme={isFilterOpen ? "gray" : filter ? "primary" : "gray"}
             aria-label={intl.formatMessage(
               {
-                id: "components.table.filter",
+                id: "component.table.filter",
                 defaultMessage: 'Filter "{column}"',
               },
               { column: column.header }
@@ -628,7 +628,7 @@ export function DefaultHeader({
               )
             }
             label={intl.formatMessage({
-              id: "components.table.sort-button",
+              id: "component.table.sort-button",
               defaultMessage: "Sort",
             })}
             size="xs"
@@ -637,14 +637,14 @@ export function DefaultHeader({
               sort?.field === column.key
                 ? intl.formatMessage(
                     {
-                      id: "components.table.change-sorting",
+                      id: "component.table.change-sorting",
                       defaultMessage: 'Change sorting for "{column}"',
                     },
                     { column: column.header }
                   )
                 : intl.formatMessage(
                     {
-                      id: "components.table.sort-by",
+                      id: "component.table.sort-by",
                       defaultMessage: 'Sort by "{column}"',
                     },
                     { column: column.header }

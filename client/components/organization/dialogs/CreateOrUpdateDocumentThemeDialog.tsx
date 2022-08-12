@@ -61,12 +61,12 @@ export function CreateOrUpdateDocumentThemeDialog({
       header={
         isUpdate ? (
           <FormattedMessage
-            id="components.create-or-update-document-theme-dialog.edit-theme"
+            id="component.create-or-update-document-theme-dialog.edit-theme"
             defaultMessage="Edit theme"
           />
         ) : (
           <FormattedMessage
-            id="components.create-or-update-document-theme-dialog.new-theme"
+            id="component.create-or-update-document-theme-dialog.new-theme"
             defaultMessage="New theme"
           />
         )
@@ -80,7 +80,7 @@ export function CreateOrUpdateDocumentThemeDialog({
             <Input {...nameRegisterProps} maxLength={50} />
             <FormErrorMessage>
               <FormattedMessage
-                id="components.create-or-update-document-theme-dialog.name-error"
+                id="component.create-or-update-document-theme-dialog.name-error"
                 defaultMessage="Please, enter a name for the theme"
               />
             </FormErrorMessage>
@@ -88,13 +88,13 @@ export function CreateOrUpdateDocumentThemeDialog({
           <FormControl as={HStack}>
             <Checkbox {...register("isDefault")}>
               <FormattedMessage
-                id="components.create-or-update-document-theme-dialog.set-default-label"
+                id="component.create-or-update-document-theme-dialog.set-default-label"
                 defaultMessage="Set as default theme"
               />
             </Checkbox>
             <HelpPopover>
               <FormattedMessage
-                id="components.create-or-update-document-theme-dialog.set-default-help"
+                id="component.create-or-update-document-theme-dialog.set-default-help"
                 defaultMessage="When creating new templates, this theme will be used as default. Existing templates are not affected."
               />
             </HelpPopover>
@@ -105,7 +105,7 @@ export function CreateOrUpdateDocumentThemeDialog({
         isDefined(theme) && !theme.isDefault ? (
           <Button colorScheme="red" onClick={() => props.onReject("DELETE_THEME")}>
             <FormattedMessage
-              id="components.create-or-update-document-theme-dialog.delete-theme-button"
+              id="component.create-or-update-document-theme-dialog.delete-theme-button"
               defaultMessage="Delete theme"
             />
           </Button>
@@ -117,7 +117,7 @@ export function CreateOrUpdateDocumentThemeDialog({
             <FormattedMessage id="generic.save" defaultMessage="Save" />
           ) : (
             <FormattedMessage
-              id="components.create-or-update-document-theme-dialog.create-theme-button"
+              id="component.create-or-update-document-theme-dialog.create-theme-button"
               defaultMessage="Create theme"
             />
           )}

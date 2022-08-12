@@ -46,7 +46,7 @@ function AddNewSignerDialog({ tone, ...props }: DialogProps<{ tone: Tone }, NewS
       }}
       header={
         <FormattedMessage
-          id="components.add-new-signer-dialog.header"
+          id="component.add-new-signer-dialog.header"
           defaultMessage="Enter the signer's information"
           values={{ tone }}
         />

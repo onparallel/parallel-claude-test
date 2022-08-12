@@ -14,13 +14,13 @@ function OverwriteDocumentationDialog({ tone, ...props }: DialogProps<{ tone: To
       initialFocusRef={focusRef}
       header={
         <FormattedMessage
-          id="components.overwrite-documentation-dialog.header"
+          id="component.overwrite-documentation-dialog.header"
           defaultMessage="Overwrite documentation"
         />
       }
       body={
         <FormattedMessage
-          id="components.overwrite-documentation-dialog.body"
+          id="component.overwrite-documentation-dialog.body"
           defaultMessage="An upload has already been completed. If you continue, you will return to the initial process and the current documentation will be overwritten. Are you sure you want to start over?"
           values={{ tone }}
         />
@@ -28,7 +28,7 @@ function OverwriteDocumentationDialog({ tone, ...props }: DialogProps<{ tone: To
       confirm={
         <Button ref={focusRef} colorScheme="primary" onClick={() => props.onResolve()}>
           <FormattedMessage
-            id="components.overwrite-documentation-dialog.confirm-button"
+            id="component.overwrite-documentation-dialog.confirm-button"
             defaultMessage="Yes, start again"
           />
         </Button>

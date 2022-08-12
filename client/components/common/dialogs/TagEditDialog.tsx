@@ -75,7 +75,7 @@ export function TagEditDialog({ ...props }: DialogProps) {
         <Stack direction="row" alignItems="center">
           <EditIcon position="relative" />
           <Text as="div" flex="1">
-            <FormattedMessage id="components.tag-edit-dialog.header" defaultMessage="Edit tags" />
+            <FormattedMessage id="component.tag-edit-dialog.header" defaultMessage="Edit tags" />
           </Text>
         </Stack>
       }
@@ -83,7 +83,7 @@ export function TagEditDialog({ ...props }: DialogProps) {
         <Box>
           <FormControl isDisabled={isDisabled}>
             <FormLabel>
-              <FormattedMessage id="components.tag-edit-dialog.tag-label" defaultMessage="Tag" />
+              <FormattedMessage id="component.tag-edit-dialog.tag-label" defaultMessage="Tag" />
             </FormLabel>
             <TagSelect
               value={tag}
@@ -95,7 +95,7 @@ export function TagEditDialog({ ...props }: DialogProps) {
             <FormControl as={NoElement} isDisabled={isDisabled} isInvalid={!!error}>
               <FormLabel marginBottom="0">
                 <FormattedMessage
-                  id="components.tag-edit-dialog.name-label"
+                  id="component.tag-edit-dialog.name-label"
                   defaultMessage="Edit text"
                 />
               </FormLabel>
@@ -111,7 +111,7 @@ export function TagEditDialog({ ...props }: DialogProps) {
               {error === "TAG_ALREADY_EXISTS" ? (
                 <FormErrorMessage gridColumn="2" marginTop={0}>
                   <FormattedMessage
-                    id="components.tag-edit-dialog.existing-tag"
+                    id="component.tag-edit-dialog.existing-tag"
                     defaultMessage="A tag with the same name already exists"
                   />
                 </FormErrorMessage>
@@ -120,7 +120,7 @@ export function TagEditDialog({ ...props }: DialogProps) {
             <FormControl as={NoElement} isDisabled={isDisabled}>
               <FormLabel marginBottom="0">
                 <FormattedMessage
-                  id="components.tag-edit-dialog.color-label"
+                  id="component.tag-edit-dialog.color-label"
                   defaultMessage="Color"
                 />
               </FormLabel>

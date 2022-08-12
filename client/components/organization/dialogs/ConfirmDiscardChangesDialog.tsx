@@ -13,7 +13,7 @@ export function ConfirmDiscardChangesDialog({ ...props }: DialogProps) {
     <ConfirmDialog
       header={
         <FormattedMessage
-          id="components.confirm-discard-changes-dialog.header"
+          id="component.confirm-discard-changes-dialog.header"
           defaultMessage="Unsaved changes"
         />
       }
@@ -21,7 +21,7 @@ export function ConfirmDiscardChangesDialog({ ...props }: DialogProps) {
         <Stack>
           <Text>
             <FormattedMessage
-              id="components.confirm-discard-changes-dialog.body"
+              id="component.confirm-discard-changes-dialog.body"
               defaultMessage="You have unsaved changes. Would you like to discard them?"
             />
           </Text>
@@ -31,7 +31,7 @@ export function ConfirmDiscardChangesDialog({ ...props }: DialogProps) {
       cancel={
         <Button ref={cancelRef} onClick={() => props.onReject()}>
           <FormattedMessage
-            id="components.confirm-discard-changes-dialog.cancel"
+            id="component.confirm-discard-changes-dialog.cancel"
             defaultMessage="Stay"
           />
         </Button>
@@ -39,7 +39,7 @@ export function ConfirmDiscardChangesDialog({ ...props }: DialogProps) {
       confirm={
         <Button colorScheme="primary" onClick={() => props.onResolve()}>
           <FormattedMessage
-            id="components.confirm-discard-changes-dialog.confirm"
+            id="component.confirm-discard-changes-dialog.confirm"
             defaultMessage="Discard and continue"
           />
         </Button>

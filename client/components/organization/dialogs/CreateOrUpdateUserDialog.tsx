@@ -125,7 +125,7 @@ function CreateOrUpdateUserDialog({
       header={
         isUpdate ? (
           <FormattedMessage
-            id="components.create-or-update-user-dialog.update-user"
+            id="component.create-or-update-user-dialog.update-user"
             defaultMessage="Update user"
           />
         ) : (
@@ -246,7 +246,7 @@ function CreateOrUpdateUserDialog({
             <FormLabel>
               {isUpdate ? (
                 <FormattedMessage
-                  id="components.create-or-update-user-dialog.included-in"
+                  id="component.create-or-update-user-dialog.included-in"
                   defaultMessage="Included in (optional)"
                 />
               ) : (
@@ -289,7 +289,7 @@ function CreateOrUpdateUserDialog({
         >
           {isUpdate ? (
             <FormattedMessage
-              id="components.create-or-update-user-dialog.update-user"
+              id="component.create-or-update-user-dialog.update-user"
               defaultMessage="Update user"
             />
           ) : (

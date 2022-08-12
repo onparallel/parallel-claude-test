@@ -47,7 +47,7 @@ export function UserGroupMembersPopover({ userGroupId, children }: UserGroupMemb
           {isDefined(group) ? (
             <PopoverHeader borderBottom="none" fontWeight="normal" paddingBottom={0} fontSize="sm">
               <FormattedMessage
-                id="components.user-group-members-popover.members-of"
+                id="component.user-group-members-popover.members-of"
                 defaultMessage="Members of {name}:"
                 values={{
                   name: <Text as="strong">{group.name}</Text>,
@@ -72,7 +72,7 @@ export function UserGroupMembersPopover({ userGroupId, children }: UserGroupMemb
                 <Center height="60px" paddingX={3}>
                   <Text textStyle="hint" fontSize="sm">
                     <FormattedMessage
-                      id="components.user-group-members-popover.no-members"
+                      id="component.user-group-members-popover.no-members"
                       defaultMessage="This team has no members yet"
                     />
                   </Text>

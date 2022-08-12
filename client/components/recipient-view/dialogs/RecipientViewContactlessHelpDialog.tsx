@@ -21,7 +21,7 @@ function RecipientViewContactlessHelpDialog({ tone, ...props }: DialogProps<{ to
           <QuestionOutlineIcon />
           <Heading fontSize="xl">
             <FormattedMessage
-              id="components.recipient-view-contactless-help-dialog.header"
+              id="component.recipient-view-contactless-help-dialog.header"
               defaultMessage="Why do we ask for this data?"
             />
           </Heading>
@@ -31,14 +31,14 @@ function RecipientViewContactlessHelpDialog({ tone, ...props }: DialogProps<{ to
         <Stack>
           <Text>
             <FormattedMessage
-              id="components.recipient-view-contactless-help-dialog.body-1"
+              id="component.recipient-view-contactless-help-dialog.body-1"
               defaultMessage="If you have received this link, it means that someone is requesting information from you. After identifying yourself, <b>you will be able to access an complete it</b>."
               values={{ tone }}
             />
           </Text>
           <Text>
             <FormattedMessage
-              id="components.recipient-view-contactless-help-dialog.body-2"
+              id="component.recipient-view-contactless-help-dialog.body-2"
               defaultMessage="This link is personal and unique, so it cannot be shared. Once inside, you will be able to invite the collaborators you need."
               values={{ tone }}
             />
@@ -56,7 +56,7 @@ function RecipientViewContactlessHelpDialog({ tone, ...props }: DialogProps<{ to
             rel="noopener"
           >
             <FormattedMessage
-              id="components.recipient-view-contactless-help-dialog.faq"
+              id="component.recipient-view-contactless-help-dialog.faq"
               defaultMessage="See more frequently asked questions"
             />
           </Button>

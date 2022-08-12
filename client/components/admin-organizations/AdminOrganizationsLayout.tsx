@@ -97,14 +97,14 @@ function useAdminOrganizationsTabs() {
       {
         key: "users" as const,
         title: intl.formatMessage({
-          id: "components.admin-organizations-tabs.users",
+          id: "component.admin-organizations-tabs.users",
           defaultMessage: "Users",
         }),
       },
       {
         key: "features" as const,
         title: intl.formatMessage({
-          id: "components.admin-organizations-tabs.features",
+          id: "component.admin-organizations-tabs.features",
           defaultMessage: "Features",
         }),
       },
