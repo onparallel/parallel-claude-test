@@ -1,5 +1,6 @@
 import {
   Button,
+  Flex,
   ModalBody,
   ModalCloseButton,
   ModalContent,
@@ -61,8 +62,16 @@ export function ConfirmDialog<TResult = void>({
         ) : null}
         <ModalHeader>{header}</ModalHeader>
         <ModalBody>{body}</ModalBody>
-        <ModalFooter as={Stack} direction="row">
-          {alternative}
+        <ModalFooter
+          as={Stack}
+          direction={{ base: "column", sm: "row" }}
+          alignItems={{ base: "stretch" }}
+        >
+          {alternative ? (
+            <Flex flex="1" direction="column" alignItems={{ base: "stretch", sm: "flex-start" }}>
+              {alternative}
+            </Flex>
+          ) : null}
           {cancel ?? (
             <Button ref={cancelRef} onClick={() => props.onReject("CANCEL")}>
               <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />

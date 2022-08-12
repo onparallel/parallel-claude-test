@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import {
   Button,
   Checkbox,
-  Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -104,14 +103,12 @@ export function CreateOrUpdateDocumentThemeDialog({
       }
       alternative={
         isDefined(theme) && !theme.isDefault ? (
-          <Flex flex="1">
-            <Button colorScheme="red" onClick={() => props.onReject("DELETE_THEME")}>
-              <FormattedMessage
-                id="components.create-or-update-document-theme-dialog.delete-theme-button"
-                defaultMessage="Delete theme"
-              />
-            </Button>
-          </Flex>
+          <Button colorScheme="red" onClick={() => props.onReject("DELETE_THEME")}>
+            <FormattedMessage
+              id="components.create-or-update-document-theme-dialog.delete-theme-button"
+              defaultMessage="Delete theme"
+            />
+          </Button>
         ) : null
       }
       confirm={

@@ -221,7 +221,7 @@ function usePetitionAccessesColumns(): TableColumn<
         CellContent: ({ row: { contact, remindersOptOut, isContactless } }) => (
           <HStack>
             {isContactless ? (
-              <Text as="span" textStyle="hint">
+              <Text as="span" textStyle="hint" whiteSpace="nowrap">
                 <FormattedMessage
                   id="component.petition-accesses-table.contactless-access-contact"
                   defaultMessage="No contact"

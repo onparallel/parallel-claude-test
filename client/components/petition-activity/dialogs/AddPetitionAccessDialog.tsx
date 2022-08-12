@@ -451,40 +451,28 @@ export function AddPetitionAccessDialog({
           />
         </>
       }
-      confirm={
-        <Flex
-          justifyContent="space-between"
-          width="full"
-          wrap={{ base: "wrap", sm: "nowrap" }}
-          gridGap={2}
+      alternative={
+        <Button
+          variant="outline"
+          leftIcon={<LinkIcon />}
+          onClick={handleShareByLinkClick}
+          isDisabled={recipientGroups.some((g) => g.length > 0)}
         >
-          <Button
-            variant="outline"
-            leftIcon={<LinkIcon />}
-            width={{ base: "full", sm: "fit-content" }}
-            onClick={handleShareByLinkClick}
-            isDisabled={recipientGroups.some((g) => g.length > 0)}
-          >
-            <Text isTruncated>
-              <FormattedMessage id="generic.share-by-link" defaultMessage="Share by link" />
-            </Text>
-          </Button>
-          <HStack spacing={0} gridGap={2} width={{ base: "full", sm: "fit-content" }}>
-            <Button onClick={() => props.onReject()} flex="1">
-              <Text isTruncated>
-                <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
-              </Text>
-            </Button>
-            <SendButton
-              flex="1"
-              data-action="send-petition"
-              onSendClick={() => handleSendClick(false)}
-              onScheduleClick={() => handleSendClick(true)}
-            />
-          </HStack>
-        </Flex>
+          <FormattedMessage id="generic.share-by-link" defaultMessage="Share by link" />
+        </Button>
       }
-      cancel={<></>}
+      confirm={
+        <SendButton
+          data-action="send-petition"
+          onSendClick={() => handleSendClick(false)}
+          onScheduleClick={() => handleSendClick(true)}
+        />
+      }
+      cancel={
+        <Button onClick={() => props.onReject()}>
+          <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
+        </Button>
+      }
       {...props}
     />
   );
