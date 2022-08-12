@@ -360,7 +360,29 @@ export const bulkCreatePetitionReplies = mutationField("bulkCreatePetitionReplie
   },
   authorize: authenticateAnd(userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"])),
   resolve: async (_, args, ctx) => {
+    const petition = (await ctx.petitions.loadPetition(args.petitionId))!;
+    if (petition.credits_used === 0) {
+      const petitionSendUsageLimit = await ctx.organizations.getOrganizationCurrentUsageLimit(
+        ctx.user!.org_id,
+        "PETITION_SEND"
+      );
+
+      if (
+        !petitionSendUsageLimit ||
+        petitionSendUsageLimit.used + 1 > petitionSendUsageLimit.limit
+      ) {
+        throw new ApolloError(
+          `Not enough credits to submit a reply`,
+          "PETITION_SEND_CREDITS_ERROR",
+          {
+            needed: 1,
+            used: petitionSendUsageLimit?.used || 0,
+            limit: petitionSendUsageLimit?.limit || 0,
+          }
+        );
+      }
+    }
     await prefillPetition(args.petitionId, args.replies, ctx.user!, ctx);
-    return (await ctx.petitions.loadPetition(args.petitionId))!;
+    return petition;
   },
 });

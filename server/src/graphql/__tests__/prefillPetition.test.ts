@@ -37,6 +37,8 @@ describe("prefillPetition", () => {
     ({ organization, user } = await mocks.createSessionUserAndOrganization());
 
     [petition] = await mocks.createRandomPetitions(organization.id, user.id);
+
+    await mocks.createOrganizationUsageLimit(organization.id, "PETITION_SEND", 1000);
   });
 
   afterAll(async () => {
@@ -323,5 +325,25 @@ describe("prefillPetition", () => {
       { type: "SELECT", content: { value: "C" }, petition_field_id: fieldId(fields, "SELECT") },
       { type: "NUMBER", content: { value: 10 }, petition_field_id: fieldId(fields, "NUMBER") },
     ]);
+  });
+
+  it("fails if org doesnt have petition_send credits", async () => {
+    await mocks.knex
+      .from("organization_usage_limit")
+      .where({ org_id: organization.id, limit_name: "PETITION_SEND" })
+      .update({ used: 0, limit: 0 });
+
+    const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+      status: "PENDING",
+      is_template: false,
+    }));
+    await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+      type: "TEXT",
+      alias: "TEXT",
+    }));
+
+    await expect(
+      prefillPetition(petition.id, { TEXT: "first text reply" }, user, ctx)
+    ).rejects.toThrow("PETITION_SEND_CREDITS_ERROR");
   });
 });

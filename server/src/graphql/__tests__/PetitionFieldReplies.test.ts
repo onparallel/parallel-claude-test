@@ -50,6 +50,8 @@ describe("GraphQL/Petition Field Replies", () => {
       [contact.id],
       user.id
     );
+
+    await mocks.createOrganizationUsageLimit(organization.id, "PETITION_SEND", 1000);
   });
 
   afterAll(async () => {
@@ -79,6 +81,48 @@ describe("GraphQL/Petition Field Replies", () => {
         [readPetitionField] = await mocks.createRandomPetitionFields(readPetition.id, 1, () => ({
           type: "TEXT",
         }));
+      });
+
+      it("doesn't consume a petition_send credit if petition already consumed", async () => {
+        const [petition] = await mocks.createRandomPetitions(organization.id, user.id, 1, () => ({
+          is_template: false,
+          status: "PENDING",
+          credits_used: 1,
+        }));
+
+        const [field] = await mocks.createRandomPetitionFields(petition.id, 1, () => ({
+          type: "TEXT",
+        }));
+
+        const [before] = await mocks.knex
+          .from("organization_usage_limit")
+          .where({ org_id: organization.id, limit_name: "PETITION_SEND" })
+          .select("*");
+
+        const { errors, data } = await testClient.execute(
+          gql`
+            mutation ($petitionId: GID!, $fieldId: GID!, $reply: JSON!) {
+              createPetitionFieldReply(petitionId: $petitionId, fieldId: $fieldId, reply: $reply) {
+                id
+              }
+            }
+          `,
+          {
+            petitionId: toGlobalId("Petition", petition.id),
+            fieldId: toGlobalId("PetitionField", field.id),
+            reply: "my reply",
+          }
+        );
+
+        expect(errors).toBeUndefined();
+        expect(data).toBeDefined();
+
+        const [after] = await mocks.knex
+          .from("organization_usage_limit")
+          .where({ org_id: organization.id, limit_name: "PETITION_SEND" })
+          .select("*");
+
+        expect(before.used).toEqual(after.used);
       });
 
       it("should send error when trying to submit a reply with READ access", async () => {
