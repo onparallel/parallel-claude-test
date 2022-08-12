@@ -232,7 +232,7 @@ export function BrandingDocumentTheme({ user }: BrandingDocumentThemeProps) {
         {!hasAdminRole ? <OnlyAdminsAlert /> : null}
         <FormProvider {...form}>
           <DocumentThemeEditor
-            key={selectedTheme.id}
+            themeId={selectedTheme.id}
             canRestoreFonts={canRestoreFonts}
             onRestoreFonts={handleRestoreFonts}
             isDisabled={!hasAdminRole}
@@ -252,6 +252,7 @@ BrandingDocumentTheme.fragments = {
   get User() {
     return gql`
       fragment BrandingDocumentTheme_User on User {
+        id
         role
         organization {
           ...DocumentThemePreview_Organization

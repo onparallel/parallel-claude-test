@@ -5656,6 +5656,7 @@ export type SignatureCompletedUserNotification_SignatureCompletedUserNotificatio
 
 export type BrandingDocumentTheme_UserFragment = {
   __typename?: "User";
+  id: string;
   role: OrganizationRole;
   organization: {
     __typename?: "Organization";
@@ -23088,6 +23089,7 @@ export const BrandingDocumentTheme_OrganizationThemeFragmentDoc = gql`
 ` as unknown as DocumentNode<BrandingDocumentTheme_OrganizationThemeFragment, unknown>;
 export const BrandingDocumentTheme_UserFragmentDoc = gql`
   fragment BrandingDocumentTheme_User on User {
+    id
     role
     organization {
       ...DocumentThemePreview_Organization
@@ -28660,6 +28662,7 @@ export const OrganizationBranding_userDocument = gql`
   query OrganizationBranding_user {
     ...SettingsLayout_Query
     me {
+      id
       ...BrandingGeneral_User
       ...BrandingDocumentTheme_User
     }

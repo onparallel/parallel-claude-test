@@ -99,6 +99,7 @@ OrganizationBranding.queries = [
     query OrganizationBranding_user {
       ...SettingsLayout_Query
       me {
+        id
         ...BrandingGeneral_User
         ...BrandingDocumentTheme_User
       }

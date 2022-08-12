@@ -29,6 +29,7 @@ interface DocumentThemeEditorProps {
   canRestoreFonts: boolean;
   onRestoreFonts: () => Promise<void>;
   isDisabled?: boolean;
+  themeId: string;
 }
 
 const FONT_SIZES_PT = [
@@ -60,6 +61,7 @@ export function DocumentThemeEditor({
   canRestoreFonts: canResetFonts,
   onRestoreFonts: onResetFonts,
   isDisabled,
+  themeId,
 }: DocumentThemeEditorProps) {
   const intl = useIntl();
 
@@ -306,7 +308,7 @@ export function DocumentThemeEditor({
                   name={`legalText.${key as "es" | "en"}`}
                   render={({ field: { onChange, value, onBlur } }) => (
                     <RichTextEditor
-                      id={`legal-text-editor-${key}`}
+                      id={`legal-text-editor-${key}-${themeId}`}
                       value={value}
                       onChange={onChange}
                       onBlur={onBlur}
