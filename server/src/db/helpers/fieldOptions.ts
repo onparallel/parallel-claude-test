@@ -103,7 +103,7 @@ const SCHEMAS = {
   },
   SELECT: {
     type: "object",
-    required: ["values", "placeholder"],
+    required: ["values"],
     additionalProperties: false,
     properties: {
       values: {
