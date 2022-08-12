@@ -9090,7 +9090,7 @@
     "context": "{userIsYou, select, true {You} other {{name}}} completed the parallel {timeAgo}"
   },
   {
-    "term": "timeline.petition-contactless-link-created-description",
+    "term": "timeline.contactless-access-activated-description",
     "definition": "{userIsYou, select, true {Creaste} other {{user} creó}} un acceso por enlace {timeAgo}",
     "context": "{userIsYou, select, true {You} other {{user}}} created a link access {timeAgo}"
   },

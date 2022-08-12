@@ -26,7 +26,7 @@ export function TimelineAccessActivatedEvent({ event, userId }: TimelineAccessAc
     >
       {event.access.isContactless ? (
         <FormattedMessage
-          id="timeline.petition-contactless-link-created-description"
+          id="timeline.contactless-access-activated-description"
           defaultMessage="{userIsYou, select, true {You} other {{user}}} created a link access {timeAgo}"
           values={{
             userIsYou: userId === event.user?.id,
