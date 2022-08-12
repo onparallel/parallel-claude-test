@@ -609,37 +609,8 @@ describe("GraphQL/Petition Fields Comments", () => {
       expect(dataInternal.data).toBeNull();
     });
 
-    it("should allow to update an internal and external comment with READ access are owner of that comment", async () => {
-      const dataExternal = await testClient.execute(
-        gql`
-          mutation (
-            $petitionId: GID!
-            $petitionFieldId: GID!
-            $petitionFieldCommentId: GID!
-            $content: JSON!
-          ) {
-            updatePetitionFieldComment(
-              petitionId: $petitionId
-              petitionFieldId: $petitionFieldId
-              petitionFieldCommentId: $petitionFieldCommentId
-              content: $content
-            ) {
-              id
-            }
-          }
-        `,
-        {
-          petitionId: toGlobalId("Petition", readPetition.id),
-          petitionFieldId: toGlobalId("PetitionField", readField.id),
-          petitionFieldCommentId: toGlobalId("PetitionFieldComment", comment.id),
-          content: mocks.createRandomCommentContent(),
-        }
-      );
-
-      expect(dataExternal.errors).toBeUndefined();
-      expect(dataExternal.data?.updatePetitionFieldComment).toBeDefined();
-
-      const dataInternal = await testClient.execute(
+    it("should allow to update an internal comment with READ access and owner of that comment", async () => {
+      const { errors, data } = await testClient.execute(
         gql`
           mutation (
             $petitionId: GID!
@@ -665,8 +636,39 @@ describe("GraphQL/Petition Fields Comments", () => {
         }
       );
 
-      expect(dataInternal.errors).toBeUndefined();
-      expect(dataInternal.data?.updatePetitionFieldComment).toBeDefined();
+      expect(errors).toBeUndefined();
+      expect(data?.updatePetitionFieldComment).toBeDefined();
+    });
+
+    it("should NOT allow to update an external comment with READ access and owner of that comment", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation (
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $petitionFieldCommentId: GID!
+            $content: JSON!
+          ) {
+            updatePetitionFieldComment(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              petitionFieldCommentId: $petitionFieldCommentId
+              content: $content
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", readPetition.id),
+          petitionFieldId: toGlobalId("PetitionField", readField.id),
+          petitionFieldCommentId: toGlobalId("PetitionFieldComment", comment.id),
+          content: mocks.createRandomCommentContent(),
+        }
+      );
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
   });
 
@@ -738,28 +740,7 @@ describe("GraphQL/Petition Fields Comments", () => {
     });
 
     it("should allow to delete an internal comment with READ access", async () => {
-      const dataExternal = await testClient.execute(
-        gql`
-          mutation ($petitionId: GID!, $petitionFieldId: GID!, $petitionFieldCommentId: GID!) {
-            deletePetitionFieldComment(
-              petitionId: $petitionId
-              petitionFieldId: $petitionFieldId
-              petitionFieldCommentId: $petitionFieldCommentId
-            ) {
-              id
-            }
-          }
-        `,
-        {
-          petitionId: toGlobalId("Petition", readPetition.id),
-          petitionFieldId: toGlobalId("PetitionField", readField.id),
-          petitionFieldCommentId: toGlobalId("PetitionFieldComment", comment.id),
-        }
-      );
-      expect(dataExternal.errors).toBeUndefined();
-      expect(dataExternal.data?.deletePetitionFieldComment).toBeDefined();
-
-      const dataInternal = await testClient.execute(
+      const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionId: GID!, $petitionFieldId: GID!, $petitionFieldCommentId: GID!) {
             deletePetitionFieldComment(
@@ -777,8 +758,31 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", internalComment.id),
         }
       );
-      expect(dataInternal.errors).toBeUndefined();
-      expect(dataInternal.data?.deletePetitionFieldComment).toBeDefined();
+      expect(errors).toBeUndefined();
+      expect(data?.deletePetitionFieldComment).toBeDefined();
+    });
+
+    it("should NOT allow to delete an external comment with READ access", async () => {
+      const { errors, data } = await testClient.execute(
+        gql`
+          mutation ($petitionId: GID!, $petitionFieldId: GID!, $petitionFieldCommentId: GID!) {
+            deletePetitionFieldComment(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              petitionFieldCommentId: $petitionFieldCommentId
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: toGlobalId("Petition", readPetition.id),
+          petitionFieldId: toGlobalId("PetitionField", readField.id),
+          petitionFieldCommentId: toGlobalId("PetitionFieldComment", comment.id),
+        }
+      );
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
   });
 });
