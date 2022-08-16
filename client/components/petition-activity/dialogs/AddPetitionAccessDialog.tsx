@@ -248,7 +248,7 @@ export function AddPetitionAccessDialog({
         });
 
         if (isDefined(newAccess.data)) {
-          link = newAccess.data.createPetitionAccess.recipientUrl;
+          link = newAccess.data.createPetitionAccess.recipientUrl!;
           setAccesses(newAccess.data.createPetitionAccess.petition!.accesses);
         }
       }

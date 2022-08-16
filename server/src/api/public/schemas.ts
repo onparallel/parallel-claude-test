@@ -230,7 +230,7 @@ const _PetitionAccess = {
     },
     recipientUrl: {
       description: "URL of the recipient portal for this parallel access",
-      type: "string",
+      type: ["string", "null"],
     },
   },
 } as const;

@@ -1307,7 +1307,7 @@ export interface NexusGenFieldTypes {
     isContactless: boolean; // Boolean!
     nextReminderAt: NexusGenScalars["DateTime"] | null; // DateTime
     petition: NexusGenRootTypes["Petition"] | null; // Petition
-    recipientUrl: string; // String!
+    recipientUrl: string | null; // String
     reminderCount: number; // Int!
     reminders: NexusGenRootTypes["PetitionReminder"][]; // [PetitionReminder!]!
     remindersActive: boolean; // Boolean!

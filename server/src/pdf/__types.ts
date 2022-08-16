@@ -1977,7 +1977,7 @@ export type PetitionAccess = Timestamps & {
   nextReminderAt: Maybe<Scalars["DateTime"]>;
   /** The petition for this message access. */
   petition: Maybe<Petition>;
-  recipientUrl: Scalars["String"];
+  recipientUrl: Maybe<Scalars["String"]>;
   /** Number of reminders sent. */
   reminderCount: Scalars["Int"];
   reminders: Array<PetitionReminder>;
@@ -2761,10 +2761,8 @@ export type PublicAccessVerification = {
   email: Maybe<Scalars["String"]>;
   isAllowed: Scalars["Boolean"];
   isContactlessAccess: Maybe<Scalars["Boolean"]>;
-  orgLogoUrl: Maybe<Scalars["String"]>;
-  orgName: Maybe<Scalars["String"]>;
+  organization: Maybe<PublicOrganization>;
   ownerName: Maybe<Scalars["String"]>;
-  tone: Maybe<Tone>;
 };
 
 /** A public view of a contact */

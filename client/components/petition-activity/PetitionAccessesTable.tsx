@@ -377,7 +377,7 @@ function usePetitionAccessesColumns(): TableColumn<
 
           return (
             <Stack direction="row" spacing={2} justifyContent="flex-end">
-              {isContactless ? (
+              {isContactless && isDefined(recipientUrl) ? (
                 <CopyToClipboardButton
                   copyLabel={intl.formatMessage({
                     id: "generic.copy-link",

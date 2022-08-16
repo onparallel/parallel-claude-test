@@ -723,27 +723,23 @@ export const PetitionAccess = objectType({
       type: "PetitionReminder",
       resolve: async (root, _, ctx) => ctx.petitions.loadRemindersByAccessId(root.id),
     });
-    t.nonNull.string("recipientUrl", {
-      authorize: async (root, _, ctx) => {
-        const hasFeatureFlag = ctx.user?.id
-          ? await ctx.featureFlags.userHasFeatureFlag(
-              ctx.user.id,
-              "PETITION_ACCESS_RECIPIENT_URL_FIELD"
-            )
-          : false;
-
-        if (!hasFeatureFlag && root.contact_id !== null) {
-          return false;
-        }
-        return true;
-      },
+    t.nullable.string("recipientUrl", {
       resolve: async (root, _, ctx) => {
-        const { locale } = (await ctx.petitions.loadPetition(root.petition_id))!;
-        return `${ctx.config.misc.parallelUrl}/${locale}/petition/${root.keycode}`;
+        const hasFeatureFlag = await ctx.featureFlags.userHasFeatureFlag(
+          ctx.user!.id,
+          "PETITION_ACCESS_RECIPIENT_URL_FIELD"
+        );
+
+        if (hasFeatureFlag || root.contact_id === null) {
+          const { locale } = (await ctx.petitions.loadPetition(root.petition_id))!;
+          return `${ctx.config.misc.parallelUrl}/${locale}/petition/${root.keycode}`;
+        }
+
+        return null;
       },
     });
     t.boolean("isContactless", {
-      description: "It will be true if dont have contact assigned",
+      description: "It will be true if doesn't have contact assigned",
       resolve: (root) => {
         return root.contact_id === null;
       },

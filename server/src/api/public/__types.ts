@@ -1977,7 +1977,7 @@ export type PetitionAccess = Timestamps & {
   nextReminderAt: Maybe<Scalars["DateTime"]>;
   /** The petition for this message access. */
   petition: Maybe<Petition>;
-  recipientUrl: Scalars["String"];
+  recipientUrl: Maybe<Scalars["String"]>;
   /** Number of reminders sent. */
   reminderCount: Scalars["Int"];
   reminders: Array<PetitionReminder>;
@@ -2761,10 +2761,8 @@ export type PublicAccessVerification = {
   email: Maybe<Scalars["String"]>;
   isAllowed: Scalars["Boolean"];
   isContactlessAccess: Maybe<Scalars["Boolean"]>;
-  orgLogoUrl: Maybe<Scalars["String"]>;
-  orgName: Maybe<Scalars["String"]>;
+  organization: Maybe<PublicOrganization>;
   ownerName: Maybe<Scalars["String"]>;
-  tone: Maybe<Tone>;
 };
 
 /** A public view of a contact */
@@ -3946,7 +3944,7 @@ export type PetitionFragment = {
   fromTemplateId: string | null;
   customProperties: { [key: string]: any };
   recipients: Array<{
-    recipientUrl: string;
+    recipientUrl: string | null;
     id: string;
     status: PetitionAccessStatus;
     reminderCount: number;
@@ -4132,7 +4130,7 @@ export type GetPetitions_petitionsQuery = {
           fromTemplateId: string | null;
           customProperties: { [key: string]: any };
           recipients: Array<{
-            recipientUrl: string;
+            recipientUrl: string | null;
             id: string;
             status: PetitionAccessStatus;
             reminderCount: number;
@@ -4218,7 +4216,7 @@ export type CreatePetition_petitionMutation = {
         fromTemplateId: string | null;
         customProperties: { [key: string]: any };
         recipients: Array<{
-          recipientUrl: string;
+          recipientUrl: string | null;
           id: string;
           status: PetitionAccessStatus;
           reminderCount: number;
@@ -4301,7 +4299,7 @@ export type GetPetition_petitionQuery = {
         fromTemplateId: string | null;
         customProperties: { [key: string]: any };
         recipients: Array<{
-          recipientUrl: string;
+          recipientUrl: string | null;
           id: string;
           status: PetitionAccessStatus;
           reminderCount: number;
@@ -4386,7 +4384,7 @@ export type UpdatePetition_updatePetitionMutation = {
         fromTemplateId: string | null;
         customProperties: { [key: string]: any };
         recipients: Array<{
-          recipientUrl: string;
+          recipientUrl: string | null;
           id: string;
           status: PetitionAccessStatus;
           reminderCount: number;
@@ -4547,7 +4545,7 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
       fromTemplateId: string | null;
       customProperties: { [key: string]: any };
       recipients: Array<{
-        recipientUrl: string;
+        recipientUrl: string | null;
         id: string;
         status: PetitionAccessStatus;
         reminderCount: number;
@@ -5642,7 +5640,7 @@ export type SubmitReplies_bulkCreatePetitionRepliesMutation = {
     fromTemplateId: string | null;
     customProperties: { [key: string]: any };
     recipients: Array<{
-      recipientUrl: string;
+      recipientUrl: string | null;
       id: string;
       status: PetitionAccessStatus;
       reminderCount: number;

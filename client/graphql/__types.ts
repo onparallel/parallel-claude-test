@@ -2023,7 +2023,7 @@ export interface PetitionAccess extends Timestamps {
   nextReminderAt?: Maybe<Scalars["DateTime"]>;
   /** The petition for this message access. */
   petition?: Maybe<Petition>;
-  recipientUrl: Scalars["String"];
+  recipientUrl?: Maybe<Scalars["String"]>;
   /** Number of reminders sent. */
   reminderCount: Scalars["Int"];
   reminders: Array<PetitionReminder>;
@@ -5888,7 +5888,7 @@ export type PetitionAccessTable_PetitionFragment = {
     remindersActive: boolean;
     remindersOptOut: boolean;
     isContactless: boolean;
-    recipientUrl: string;
+    recipientUrl?: string | null;
     createdAt: string;
     contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
     remindersConfig?: {
@@ -5923,7 +5923,7 @@ export type PetitionAccessTable_PetitionAccessFragment = {
   remindersActive: boolean;
   remindersOptOut: boolean;
   isContactless: boolean;
-  recipientUrl: string;
+  recipientUrl?: string | null;
   createdAt: string;
   contact?: { __typename?: "Contact"; id: string; fullName: string; email: string } | null;
   remindersConfig?: {
@@ -7225,7 +7225,7 @@ export type AddPetitionAccessDialog_PetitionFragment = {
   accesses: Array<{
     __typename?: "PetitionAccess";
     isContactless: boolean;
-    recipientUrl: string;
+    recipientUrl?: string | null;
     id: string;
     status: PetitionAccessStatus;
     contact?: {
@@ -7246,7 +7246,7 @@ export type AddPetitionAccessDialog_createPetitionAccessMutation = {
   createPetitionAccess: {
     __typename?: "PetitionAccess";
     id: string;
-    recipientUrl: string;
+    recipientUrl?: string | null;
     petition?: {
       __typename?: "Petition";
       id: string;
@@ -7308,7 +7308,7 @@ export type AddPetitionAccessDialog_createPetitionAccessMutation = {
       accesses: Array<{
         __typename?: "PetitionAccess";
         isContactless: boolean;
-        recipientUrl: string;
+        recipientUrl?: string | null;
         id: string;
         status: PetitionAccessStatus;
         contact?: {
@@ -8794,7 +8794,7 @@ export type useSendPetitionHandler_PetitionFragment = {
   accesses: Array<{
     __typename?: "PetitionAccess";
     isContactless: boolean;
-    recipientUrl: string;
+    recipientUrl?: string | null;
     id: string;
     status: PetitionAccessStatus;
     contact?: {
@@ -8907,7 +8907,7 @@ export type useSendPetitionHandler_addPetitionPermissionMutation = {
         accesses: Array<{
           __typename?: "PetitionAccess";
           isContactless: boolean;
-          recipientUrl: string;
+          recipientUrl?: string | null;
           id: string;
           status: PetitionAccessStatus;
           contact?: {
@@ -13618,7 +13618,7 @@ export type PetitionActivity_PetitionFragment = {
     id: string;
     status: PetitionAccessStatus;
     isContactless: boolean;
-    recipientUrl: string;
+    recipientUrl?: string | null;
     nextReminderAt?: string | null;
     remindersLeft: number;
     reminderCount: number;
@@ -14430,7 +14430,7 @@ export type PetitionActivity_updatePetitionMutation = {
           id: string;
           status: PetitionAccessStatus;
           isContactless: boolean;
-          recipientUrl: string;
+          recipientUrl?: string | null;
           nextReminderAt?: string | null;
           remindersLeft: number;
           reminderCount: number;
@@ -15306,7 +15306,7 @@ export type PetitionActivity_petitionQuery = {
           id: string;
           status: PetitionAccessStatus;
           isContactless: boolean;
-          recipientUrl: string;
+          recipientUrl?: string | null;
           nextReminderAt?: string | null;
           remindersLeft: number;
           reminderCount: number;
@@ -16167,7 +16167,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
     id: string;
     status: PetitionAccessStatus;
     isContactless: boolean;
-    recipientUrl: string;
+    recipientUrl?: string | null;
     contact?: {
       __typename?: "Contact";
       id: string;
@@ -16604,7 +16604,7 @@ export type PetitionCompose_updatePetitionMutation = {
         accesses: Array<{
           __typename?: "PetitionAccess";
           isContactless: boolean;
-          recipientUrl: string;
+          recipientUrl?: string | null;
           status: PetitionAccessStatus;
           id: string;
           contact?: {
@@ -17125,7 +17125,7 @@ export type PetitionCompose_petitionQuery = {
           id: string;
           status: PetitionAccessStatus;
           isContactless: boolean;
-          recipientUrl: string;
+          recipientUrl?: string | null;
           contact?: {
             __typename?: "Contact";
             id: string;
@@ -17607,7 +17607,7 @@ export type PetitionPreview_PetitionBase_Petition_Fragment = {
     id: string;
     status: PetitionAccessStatus;
     isContactless: boolean;
-    recipientUrl: string;
+    recipientUrl?: string | null;
     contact?: {
       __typename?: "Contact";
       id: string;
@@ -17974,7 +17974,7 @@ export type PetitionPreview_updatePetitionMutation = {
           id: string;
           status: PetitionAccessStatus;
           isContactless: boolean;
-          recipientUrl: string;
+          recipientUrl?: string | null;
           contact?: {
             __typename?: "Contact";
             id: string;
@@ -18305,7 +18305,7 @@ export type PetitionPreview_completePetitionMutation = {
       id: string;
       status: PetitionAccessStatus;
       isContactless: boolean;
-      recipientUrl: string;
+      recipientUrl?: string | null;
       contact?: {
         __typename?: "Contact";
         id: string;
@@ -18500,7 +18500,7 @@ export type PetitionPreview_petitionQuery = {
           id: string;
           status: PetitionAccessStatus;
           isContactless: boolean;
-          recipientUrl: string;
+          recipientUrl?: string | null;
           contact?: {
             __typename?: "Contact";
             id: string;

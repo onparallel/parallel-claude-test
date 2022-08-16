@@ -2354,7 +2354,7 @@ type PetitionAccess implements Timestamps {
   id: GID!
 
   """
-  It will be true if dont have contact assigned
+  It will be true if doesn't have contact assigned
   """
   isContactless: Boolean!
 
@@ -2367,7 +2367,7 @@ type PetitionAccess implements Timestamps {
   The petition for this message access.
   """
   petition: Petition
-  recipientUrl: String!
+  recipientUrl: String
 
   """
   Number of reminders sent.
