@@ -4283,6 +4283,11 @@ type Query {
   petitionField(petitionFieldId: GID!, petitionId: GID!): PetitionField!
 
   """
+  Lists every path of the user's petitions as a string array
+  """
+  petitionFoldersTree(templates: Boolean): [String!]!
+
+  """
   The petitions of the user
   """
   petitions(
