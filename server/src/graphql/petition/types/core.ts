@@ -6,7 +6,6 @@ import { toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { safeJsonParse } from "../../../util/safeJsonParse";
 import { toHtml, toPlainText } from "../../../util/slate";
-import { encode } from "../../../util/token";
 
 export const PetitionLocale = enumType({
   name: "PetitionLocale",
@@ -80,7 +79,7 @@ export const PetitionFolder = objectType({
   definition(t) {
     t.id("id", {
       description: "The ID of the petition folder.",
-      resolve: (o) => encode(Buffer.from(`PetitionFolder:${o.path}`, "utf8")),
+      resolve: (o) => toGlobalId<string>("PetitionFolder", o.path),
     });
     t.string("name", {
       description: "The name of the folder.",

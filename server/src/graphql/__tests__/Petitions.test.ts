@@ -623,10 +623,12 @@ describe("GraphQL/Petitions", () => {
           query {
             templates(limit: 100, isPublic: true) {
               items {
-                owner {
-                  organization {
-                    users {
-                      totalCount
+                ... on PetitionBase {
+                  owner {
+                    organization {
+                      users {
+                        totalCount
+                      }
                     }
                   }
                 }

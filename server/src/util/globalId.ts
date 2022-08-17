@@ -1,14 +1,15 @@
 import { decode, encode } from "./token";
 import { Maybe } from "./types";
 
-export function toGlobalId(type: string, id: number) {
+export function toGlobalId<T extends number | string = number>(type: string, id: T) {
   return encode(Buffer.from(`${type}:${id}`, "utf8"));
 }
 
-export function fromGlobalId<T extends string = string>(
+export function fromGlobalId<T extends string = string, IsStringId extends boolean = false>(
   globalId: string,
-  type?: T
-): { id: number; type: T } {
+  type?: T,
+  isString?: IsStringId
+): { id: IsStringId extends true ? string : number; type: T } {
   let decoded: string;
   try {
     decoded = decode(globalId).toString("utf8");
@@ -19,26 +20,32 @@ export function fromGlobalId<T extends string = string>(
   if (type && _type !== type) {
     throw new Error(`${globalId} is not a ${type}`);
   }
-  if (!id || !id.match(/^[1-9]\d*$/)) {
+  if (!id || (!isString && !id.match(/^[1-9]\d*$/))) {
     throw new Error(`Invalid id ${globalId}`);
   }
   return {
     type: _type as T,
-    id: parseInt(id, 10),
+    id: isString ? (id as any) : parseInt(id, 10),
   };
 }
 
-export function fromGlobalIds<T extends string>(
+export function fromGlobalIds<T extends string, IsStringId extends boolean = false>(
   globalIds: string[],
-  type: string
-): { type: T; ids: number[] };
-export function fromGlobalIds<T extends string>(
+  type: T,
+  isString?: IsStringId
+): { type: T; ids: IsStringId extends true ? string[] : number[] };
+export function fromGlobalIds<T extends string, IsStringId extends boolean = false>(
   globalIds: Maybe<string>[],
-  type: string
-): { type: T; ids: Maybe<number>[] };
-export function fromGlobalIds(globalIds: Maybe<string>[], type: string) {
+  type: T,
+  isString?: IsStringId
+): { type: T; ids: IsStringId extends true ? Maybe<string>[] : Maybe<number>[] };
+export function fromGlobalIds<T extends string, IsStringId extends boolean = false>(
+  globalIds: Maybe<string>[],
+  type: T,
+  isString?: IsStringId
+) {
   return {
-    type,
-    ids: globalIds.map((id) => (id ? fromGlobalId(id, type).id : null)),
+    type: type as T,
+    ids: globalIds.map((id) => (id ? fromGlobalId(id, type, isString).id : null)),
   };
 }
