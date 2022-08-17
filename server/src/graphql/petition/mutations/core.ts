@@ -1,4 +1,4 @@
-import { ApolloError } from "apollo-server-core";
+import { ApolloError, ForbiddenError } from "apollo-server-core";
 import {
   arg,
   booleanArg,
@@ -13,7 +13,7 @@ import {
 } from "nexus";
 import { outdent } from "outdent";
 import pMap from "p-map";
-import { isDefined, omit, zip } from "remeda";
+import { isDefined, omit, partition, uniq, uniqBy, zip } from "remeda";
 import { defaultFieldOptions } from "../../../db/helpers/fieldOptions";
 import { isValueCompatible } from "../../../db/helpers/utils";
 import {
@@ -24,7 +24,7 @@ import {
   PetitionPermission,
 } from "../../../db/__types";
 import { unMaybeArray } from "../../../util/arrays";
-import { fromGlobalId, toGlobalId } from "../../../util/globalId";
+import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { getRequiredPetitionSendCredits } from "../../../util/organizationUsageLimits";
 import { withError } from "../../../util/promises/withError";
@@ -55,7 +55,11 @@ import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { notEmptyObject } from "../../helpers/validators/notEmptyObject";
 import { notEmptyString } from "../../helpers/validators/notEmptyString";
 import { validateFile } from "../../helpers/validators/validateFile";
-import { REFERENCE_REGEX, validateRegex } from "../../helpers/validators/validateRegex";
+import {
+  PETITION_FOLDER_REGEX,
+  REFERENCE_REGEX,
+  validateRegex,
+} from "../../helpers/validators/validateRegex";
 import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
 import { validFieldVisibilityJson } from "../../helpers/validators/validFieldVisibility";
 import { validIsDefined } from "../../helpers/validators/validIsDefined";
@@ -89,6 +93,7 @@ import {
   repliesBelongsToPetition,
   templateDoesNotHavePublicPetitionLink,
   userHasAccessToPetitions,
+  userHasAccessToPetitionsAndFolders,
   userHasFeatureFlag,
 } from "../authorizers";
 import { validatePublicPetitionLinkSlug } from "../validations";
@@ -2037,5 +2042,84 @@ export const completePetition = mutationField("completePetition", {
         throw error;
       }
     }
+  },
+});
+
+export const movePetitions = mutationField("movePetitions", {
+  description: "Moves a group of petitions or folders to another folder",
+  type: "Success",
+  authorize: authenticateAnd(userHasAccessToPetitionsAndFolders("src", ["WRITE", "OWNER"])),
+  args: {
+    src: nonNull(list(nonNull(stringArg()))),
+    dst: nonNull(stringArg()),
+    type: "PetitionBaseType",
+  },
+  validateArgs: validateAnd(
+    (_, args, ctx, info) => {
+      // validate src input
+      // src must be a list of Petition GID's or folder paths
+      try {
+        for (const value of args.src) {
+          if (!value.match(PETITION_FOLDER_REGEX)) {
+            if (fromGlobalId(value, "Petition").type !== "Petition") {
+              throw new Error();
+            }
+          }
+        }
+      } catch {
+        throw new ArgValidationError(info, "src", "source is invalid");
+      }
+    },
+    validateRegex((args) => args.dst, "dst", PETITION_FOLDER_REGEX)
+  ),
+  resolve: async (_, args, ctx) => {
+    const [paths, petitionGIDs] = partition(args.src, (p) => !!p.match(PETITION_FOLDER_REGEX));
+    const [petitionsOnFolder, petitions] = await Promise.all([
+      paths.length > 0
+        ? ctx.petitions
+            .getUserPetitionsOnFolder(ctx.user!.id, paths)
+            .then((ps) => ps.filter((p) => p.is_template === (args.type === "TEMPLATE")))
+        : ([] as Petition[]),
+      petitionGIDs.length > 0
+        ? ctx.petitions
+            .loadPetition(fromGlobalIds(petitionGIDs, "Petition").ids)
+            .then((ps) => ps.filter((p) => p!.is_template === (args.type === "TEMPLATE")))
+        : ([] as Petition[]),
+    ]);
+
+    // trying to move a folder and a petition inside that folder at once
+    if (petitionsOnFolder.some((pf) => petitions.map((p) => p!.id).includes(pf.id))) {
+      throw new ForbiddenError("INVALID_PATH_ERROR");
+    }
+    // trying to move a folder and another folder inside the first at once
+    if (uniqBy(petitionsOnFolder, (p) => p.id).length !== petitionsOnFolder.length) {
+      throw new ForbiddenError("INVALID_PATH_ERROR");
+    }
+
+    const groupedBySrc: Record<string, Petition[]> = {};
+    for (const src of uniq(args.src)) {
+      groupedBySrc[src] = petitionsOnFolder.filter((p) => p.path.startsWith(src));
+    }
+
+    await Promise.all([
+      pMap(Object.entries(groupedBySrc), async ([path, petitions]) => {
+        await pMap(petitions, async (p) => {
+          const discardedPath = path.replace(/^(.*\/).+$/, "$1");
+          await ctx.petitions.updatePetition(
+            p.id,
+            { path: args.dst + p!.path.substring(discardedPath.length) },
+            `User:${ctx.user!.id}`
+          );
+        });
+      }),
+
+      ctx.petitions.updatePetition(
+        petitions.map((p) => p!.id),
+        { path: args.dst },
+        `User:${ctx.user!.id}`
+      ),
+    ]);
+
+    return SUCCESS;
   },
 });

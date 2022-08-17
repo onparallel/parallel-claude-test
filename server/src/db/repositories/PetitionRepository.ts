@@ -188,6 +188,44 @@ export class PetitionRepository extends BaseRepository {
     })
   );
 
+  async getUserPetitionsOnFolder(userId: number, paths: string[]) {
+    return await this.raw<Petition>(
+      /* sql */ `
+      select p.*
+        from petition_permission pp join petition p on p.id = pp.petition_id
+        where pp.user_id = ?
+          and p.path like any (?)
+          and p.deleted_at is null 
+          and pp.deleted_at is null
+          and pp.user_group_id is null
+        group by p.id;
+    `,
+      [userId, this.sqlArray(paths.map((path) => `${path}%`))]
+    );
+  }
+
+  async userHasAccessToFolders(
+    userId: number,
+    paths: string[],
+    permissionTypes?: PetitionPermissionType[]
+  ) {
+    if (paths.length === 0) {
+      return true;
+    }
+    // list the petitions of the user inside passed paths with any permission
+    const petitions = await this.getUserPetitionsOnFolder(userId, paths);
+    if (petitions.length === 0) {
+      return false;
+    }
+
+    // check minimal permissions on those petitions
+    return await this.userHasAccessToPetitions(
+      userId,
+      petitions.map((p) => p.id),
+      permissionTypes
+    );
+  }
+
   async userHasAccessToPetitions(
     userId: number,
     petitionIds: number[],

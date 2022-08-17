@@ -1,6 +1,6 @@
 import { ApolloError } from "apollo-server-express";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { countBy, isDefined, uniq } from "remeda";
+import { countBy, isDefined, partition, uniq } from "remeda";
 import {
   FeatureFlagName,
   IntegrationType,
@@ -12,9 +12,10 @@ import {
   PetitionStatus,
 } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
-import { toGlobalId } from "../../util/globalId";
+import { fromGlobalIds, toGlobalId } from "../../util/globalId";
 import { MaybeArray } from "../../util/types";
 import { Arg, ArgAuthorizer } from "../helpers/authorize";
+import { PETITION_FOLDER_REGEX } from "../helpers/validators/validateRegex";
 
 function createPetitionAuthorizer<TRest extends any[] = []>(
   predicate: (petition: Petition, ...rest: TRest) => boolean
@@ -534,3 +535,34 @@ export function signatureRequestIsNotAnonymized<
 export const petitionHasStatus = createPetitionAuthorizer(
   (petition, status: PetitionStatus) => petition.status === status
 );
+
+export function userHasAccessToPetitionsAndFolders<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, string[]>
+>(
+  argName: TArg,
+  permissionTypes?: PetitionPermissionType[]
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const srcPaths = unMaybeArray(args[argName] as unknown as string[]);
+      if (srcPaths.length === 0) {
+        return true;
+      }
+
+      const [folders, petitionGIDS] = partition(srcPaths, (p) => !!p.match(PETITION_FOLDER_REGEX));
+      const [hasPetitionAccess, hasFolderAccess] = await Promise.all([
+        ctx.petitions.userHasAccessToPetitions(
+          ctx.user!.id,
+          fromGlobalIds(petitionGIDS, "Petition").ids,
+          permissionTypes
+        ),
+        ctx.petitions.userHasAccessToFolders(ctx.user!.id, folders, permissionTypes),
+      ]);
+
+      return hasPetitionAccess && hasFolderAccess;
+    } catch {}
+    return false;
+  };
+}

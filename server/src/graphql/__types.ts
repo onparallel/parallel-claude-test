@@ -1083,6 +1083,7 @@ export interface NexusGenFieldTypes {
     loginAs: NexusGenEnums["Result"]; // Result!
     markSignatureIntegrationAsDefault: NexusGenRootTypes["OrgIntegration"]; // OrgIntegration!
     modifyPetitionCustomProperty: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
+    movePetitions: NexusGenEnums["Success"]; // Success!
     petitionAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     petitionAttachmentUploadComplete: NexusGenRootTypes["PetitionAttachment"]; // PetitionAttachment!
     petitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
@@ -2656,6 +2657,7 @@ export interface NexusGenFieldTypeNames {
     loginAs: "Result";
     markSignatureIntegrationAsDefault: "OrgIntegration";
     modifyPetitionCustomProperty: "PetitionBase";
+    movePetitions: "Success";
     petitionAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     petitionAttachmentUploadComplete: "PetitionAttachment";
     petitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
@@ -4277,6 +4279,12 @@ export interface NexusGenArgTypes {
       key: string; // String!
       petitionId: NexusGenScalars["GID"]; // GID!
       value?: string | null; // String
+    };
+    movePetitions: {
+      // args
+      dst: string; // String!
+      src: string[]; // [String!]!
+      type?: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
     };
     petitionAttachmentDownloadLink: {
       // args
