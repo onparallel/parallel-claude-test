@@ -578,6 +578,8 @@ export interface Mutation {
   markSignatureIntegrationAsDefault: OrgIntegration;
   /** Adds, edits or deletes a custom property on the petition */
   modifyPetitionCustomProperty: PetitionBase;
+  /** Moves a group of petitions or folders to another folder */
+  movePetitions: Success;
   /** Generates a download link for a petition attachment */
   petitionAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the petition attachment was correctly uploaded to S3 */
@@ -1131,6 +1133,12 @@ export interface MutationmodifyPetitionCustomPropertyArgs {
   key: Scalars["String"];
   petitionId: Scalars["GID"];
   value?: InputMaybe<Scalars["String"]>;
+}
+
+export interface MutationmovePetitionsArgs {
+  dst: Scalars["String"];
+  src: Array<Scalars["String"]>;
+  type?: InputMaybe<PetitionBaseType>;
 }
 
 export interface MutationpetitionAttachmentDownloadLinkArgs {
@@ -2717,6 +2725,7 @@ export interface PetitionTemplate extends PetitionBase {
   createdAt: Scalars["DateTime"];
   /** Custom user properties */
   customProperties: Scalars["JSONObject"];
+  defaultPath: Scalars["String"];
   defaultPermissions: Array<TemplateDefaultPermission>;
   /** Description of the template. */
   description?: Maybe<Scalars["JSON"]>;
@@ -3124,6 +3133,8 @@ export interface Query {
   petitionEvents: Array<PetitionEvent>;
   /** A field of the petition. */
   petitionField: PetitionField;
+  /** Lists every path of the user's petitions as a string array */
+  petitionFoldersTree: Array<Scalars["String"]>;
   /** The petitions of the user */
   petitions: PetitionBaseOrFolderPagination;
   petitionsById: Array<Maybe<PetitionBase>>;
@@ -3234,6 +3245,10 @@ export interface QuerypetitionEventsArgs {
 export interface QuerypetitionFieldArgs {
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
+}
+
+export interface QuerypetitionFoldersTreeArgs {
+  templates?: InputMaybe<Scalars["Boolean"]>;
 }
 
 export interface QuerypetitionsArgs {
@@ -3756,6 +3771,7 @@ export interface UpdatePetitionInput {
   completingMessageBody?: InputMaybe<Scalars["JSON"]>;
   completingMessageSubject?: InputMaybe<Scalars["String"]>;
   deadline?: InputMaybe<Scalars["DateTime"]>;
+  defaultPath?: InputMaybe<Scalars["String"]>;
   description?: InputMaybe<Scalars["JSON"]>;
   emailBody?: InputMaybe<Scalars["JSON"]>;
   emailSubject?: InputMaybe<Scalars["String"]>;
@@ -9269,6 +9285,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
 export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   __typename: "PetitionTemplate";
   isPublic: boolean;
+  defaultPath: string;
   id: string;
   locale: PetitionLocale;
   skipForwardSecurity: boolean;
@@ -16323,6 +16340,7 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   isRestricted: boolean;
   isAnonymized: boolean;
   name?: string | null;
+  defaultPath: string;
   locale: PetitionLocale;
   skipForwardSecurity: boolean;
   isRecipientViewContentsHidden: boolean;
@@ -16655,6 +16673,7 @@ export type PetitionCompose_updatePetitionMutation = {
         id: string;
         name?: string | null;
         isPublic: boolean;
+        defaultPath: string;
         locale: PetitionLocale;
         skipForwardSecurity: boolean;
         isRecipientViewContentsHidden: boolean;
@@ -17284,6 +17303,7 @@ export type PetitionCompose_petitionQuery = {
         isRestricted: boolean;
         isAnonymized: boolean;
         name?: string | null;
+        defaultPath: string;
         locale: PetitionLocale;
         skipForwardSecurity: boolean;
         isRecipientViewContentsHidden: boolean;
@@ -25475,6 +25495,7 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
       defaultPermissions {
         ...TemplateDefaultPermissionsDialog_TemplateDefaultPermission
       }
+      defaultPath
     }
     isAnonymized
   }

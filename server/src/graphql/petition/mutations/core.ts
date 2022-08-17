@@ -614,6 +614,7 @@ export const updatePetition = mutationField("updatePetition", {
         args.data.isRecipientViewContentsHidden,
         args.data.anonymizeAfterMonths,
         args.data.anonymizePurpose,
+        args.data.defaultPath,
       ],
       petitionsAreEditable("petitionId")
     ),
@@ -636,6 +637,7 @@ export const updatePetition = mutationField("updatePetition", {
         args.data.skipForwardSecurity,
         args.data.anonymizeAfterMonths,
         args.data.anonymizePurpose,
+        args.data.defaultPath,
       ],
       petitionIsNotAnonymized("petitionId")
     ),
@@ -669,6 +671,7 @@ export const updatePetition = mutationField("updatePetition", {
           t.nullable.json("completingMessageBody");
           t.nullable.string("anonymizePurpose");
           t.nullable.int("anonymizeAfterMonths");
+          t.nullable.string("defaultPath");
         },
       }).asArg()
     ),
@@ -685,7 +688,8 @@ export const updatePetition = mutationField("updatePetition", {
     validRichTextContent((args) => args.data.completingMessageBody, "data.completingMessageBody"),
     validRemindersConfig((args) => args.data.remindersConfig, "data.remindersConfig"),
     validSignatureConfig((args) => args.data.signatureConfig, "data.signatureConfig"),
-    inRange((args) => args.data.anonymizeAfterMonths, "data.anonymizeAfterMonths", 1)
+    inRange((args) => args.data.anonymizeAfterMonths, "data.anonymizeAfterMonths", 1),
+    validateRegex((args) => args.data.defaultPath, "data.defaultPath", PETITION_FOLDER_REGEX)
   ),
   resolve: async (_, args, ctx) => {
     const {
@@ -705,6 +709,7 @@ export const updatePetition = mutationField("updatePetition", {
       completingMessageBody,
       anonymizeAfterMonths,
       anonymizePurpose,
+      defaultPath,
     } = args.data;
     const data: Partial<CreatePetition> = {};
     if (name !== undefined) {
@@ -755,8 +760,13 @@ export const updatePetition = mutationField("updatePetition", {
     if (anonymizeAfterMonths !== undefined) {
       data.anonymize_after_months = anonymizeAfterMonths;
     }
+
     if (anonymizePurpose !== undefined) {
       data.anonymize_purpose = anonymizePurpose;
+    }
+
+    if (defaultPath !== undefined) {
+      data.default_path = defaultPath ?? "/";
     }
 
     const [petition] = await ctx.petitions.updatePetition(

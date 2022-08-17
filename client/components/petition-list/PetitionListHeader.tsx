@@ -1,8 +1,5 @@
 import {
   Box,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
   Button,
   ButtonGroup,
   HStack,
@@ -21,11 +18,12 @@ import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useHandleNavigation } from "@parallel/utils/navigation";
 import { QueryStateOf, SetQueryState, useBuildStateUrl } from "@parallel/utils/queryState";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { ChangeEvent, useCallback, useMemo, useState } from "react";
+import { ChangeEvent, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { NakedLink } from "../common/Link";
 import { MoreOptionsMenuButton } from "../common/MoreOptionsMenuButton";
+import { PathBreadcrumbs } from "../common/PathBreadcrumbs";
+import { PathName } from "../common/PathName";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
 import { useCreateFolderDialog } from "../petition-common/dialogs/CreateFolderDialog";
@@ -67,34 +65,6 @@ export function PetitionListHeader({
   );
 
   const buildUrl = useBuildStateUrl(shape);
-  const breadcrumbs = useMemo(() => {
-    const breadcrumbs = [
-      {
-        text:
-          state.type === "PETITION"
-            ? intl.formatMessage({ id: "generic.root-petitions", defaultMessage: "Parallels" })
-            : intl.formatMessage({ id: "generic.root-templates", defaultMessage: "Templates" }),
-        url: buildUrl((current) => ({ ...current, page: 1, path: "/" })),
-        isCurrent: state.path === "/",
-      },
-    ];
-    if (state.path !== "/") {
-      breadcrumbs.push(
-        ...state.path
-          .slice(1, -1)
-          .split("/")
-          .map((part, i, parts) => {
-            const path = "/" + parts.slice(0, i + 1).join("/") + "/";
-            return {
-              text: part,
-              url: buildUrl((current) => ({ ...current, page: 1, path })),
-              isCurrent: path === state.path,
-            };
-          })
-      );
-    }
-    return breadcrumbs;
-  }, [state.path]);
 
   const { getRootProps, getRadioProps } = useRadioGroup({
     name: "categories",
@@ -228,30 +198,17 @@ export function PetitionListHeader({
             </SearchInButton>
             <SearchInButton {...getRadioProps({ value: "CURRENT_FOLDER" })}>
               {'"'}
-              {breadcrumbs.at(-1)!.text}
+              <PathName path={state.path} type={state.type} disableTooltip />
               {'"'}
             </SearchInButton>
           </ButtonGroup>
         </HStack>
       ) : state.path !== "/" ? (
-        <Box>
-          <Breadcrumb height={8} display="flex" alignItems="center">
-            {breadcrumbs.map(({ text, url, isCurrent }, i) => (
-              <BreadcrumbItem key={i}>
-                <NakedLink href={url}>
-                  <BreadcrumbLink
-                    isCurrentPage={isCurrent}
-                    color="primary.600"
-                    fontWeight="medium"
-                    _activeLink={{ color: "inherit", fontWeight: "inherit" }}
-                  >
-                    {text}
-                  </BreadcrumbLink>
-                </NakedLink>
-              </BreadcrumbItem>
-            ))}
-          </Breadcrumb>
-        </Box>
+        <PathBreadcrumbs
+          path={state.path}
+          type={state.type}
+          pathUrl={(path) => buildUrl((current) => ({ ...current, path, page: 1 }))}
+        />
       ) : null}
     </Stack>
   );

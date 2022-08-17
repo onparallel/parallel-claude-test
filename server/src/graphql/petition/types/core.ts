@@ -448,6 +448,9 @@ export const PetitionTemplate = objectType({
         return null;
       },
     });
+    t.string("defaultPath", {
+      resolve: (o) => o.default_path,
+    });
   },
   sourceType: "db.Petition",
 });

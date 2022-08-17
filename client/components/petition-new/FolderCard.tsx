@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { HStack, Stack, Text } from "@chakra-ui/react";
+import { Flex, HStack, Stack, Text, VisuallyHidden } from "@chakra-ui/react";
 import { FolderIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
@@ -29,8 +29,13 @@ export const FolderCard = Object.assign(
         {...buttonProps}
         {...props}
       >
-        <HStack alignItems="center">
-          <FolderIcon fontSize="lg" />
+        <HStack as="header" alignItems="center">
+          <Flex>
+            <VisuallyHidden>
+              <FormattedMessage id="generic.folder" defaultMessage="Folder" />
+            </VisuallyHidden>
+            <FolderIcon fontSize="lg" role="presentation" />
+          </Flex>
           <Text as="h2" fontSize="lg" noOfLines={2} fontWeight="bold">
             {folder.folderName}
           </Text>

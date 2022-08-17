@@ -1,0 +1,311 @@
+diff --git a/node_modules/react-accessible-treeview/dist/TreeView/index.d.ts b/node_modules/react-accessible-treeview/dist/TreeView/index.d.ts
+new file mode 100644
+index 0000000..4a0f648
+--- /dev/null
++++ b/node_modules/react-accessible-treeview/dist/TreeView/index.d.ts
+@@ -0,0 +1,232 @@
++import React from "react";
++import { EventCallback } from "./utils";
++export interface INode {
++    /** A non-negative integer that uniquely identifies the node */
++    id: number;
++    /** Used to match on key press */
++    name: string;
++    /** An array with the ids of the children nodes */
++    children: number[];
++    /** The parent of the node; null for the root node */
++    parent: number | null;
++}
++export declare type INodeRef = HTMLLIElement | HTMLDivElement;
++export declare type INodeRefs = null | React.RefObject<{
++    [key: number]: INodeRef;
++}>;
++export declare type TreeViewAction = {
++    type: "COLLAPSE";
++    id: number;
++    lastInteractedWith?: number | null;
++} | {
++    type: "COLLAPSE_MANY";
++    ids: number[];
++    lastInteractedWith?: number | null;
++} | {
++    type: "EXPAND";
++    id: number;
++    lastInteractedWith?: number | null;
++} | {
++    type: "EXPAND_MANY";
++    ids: number[];
++    lastInteractedWith?: number | null;
++} | {
++    type: "HALF_SELECT";
++    id: number;
++    lastInteractedWith?: number | null;
++} | {
++    type: "SELECT";
++    id: number;
++    multiSelect?: boolean;
++    keepFocus?: boolean;
++    NotUserAction?: boolean;
++    lastInteractedWith?: number | null;
++} | {
++    type: "DESELECT";
++    id: number;
++    multiSelect?: boolean;
++    keepFocus?: boolean;
++    NotUserAction?: boolean;
++    lastInteractedWith?: number | null;
++} | {
++    type: "TOGGLE";
++    id: number;
++    lastInteractedWith?: number | null;
++} | {
++    type: "TOGGLE_SELECT";
++    id: number;
++    multiSelect?: boolean;
++    NotUserAction?: boolean;
++    lastInteractedWith?: number | null;
++} | {
++    type: "SELECT_MANY";
++    ids: number[];
++    select?: boolean;
++    multiSelect?: boolean;
++    lastInteractedWith?: number | null;
++} | {
++    type: "EXCLUSIVE_SELECT_MANY";
++} | {
++    type: "EXCLUSIVE_CHANGE_SELECT_MANY";
++    ids: number[];
++    select?: boolean;
++    multiSelect?: boolean;
++    lastInteractedWith?: number | null;
++} | {
++    type: "FOCUS";
++    id: number;
++    lastInteractedWith?: number | null;
++} | {
++    type: "BLUR";
++} | {
++    type: "DISABLE";
++    id: number;
++} | {
++    type: "ENABLE";
++    id: number;
++};
++export interface ITreeViewState {
++    /** Set of the ids of the expanded nodes */
++    expandedIds: Set<number>;
++    /** Set of the ids of the selected nodes */
++    disabledIds: Set<number>;
++    /** Set of the ids of the selected nodes */
++    halfSelectedIds: Set<number>;
++    /** Set of the ids of the selected nodes */
++    selectedIds: Set<number>;
++    /** Id of the node with tabindex = 0 */
++    tabbableId: number;
++    /** Whether the tree has focus */
++    isFocused: boolean;
++    /** Last selection made directly by the user */
++    lastUserSelect: number;
++    /** Last node interacted with */
++    lastInteractedWith?: number | null;
++    lastAction?: TreeViewAction["type"];
++}
++declare const clickActions: {
++    readonly select: "SELECT";
++    readonly focus: "FOCUS";
++    readonly exclusiveSelect: "EXCLUSIVE_SELECT";
++};
++export declare const CLICK_ACTIONS: readonly ("SELECT" | "FOCUS" | "EXCLUSIVE_SELECT")[];
++declare type ValueOf<T> = T[keyof T];
++export declare type ClickActions = ValueOf<typeof clickActions>;
++declare type ActionableNode = {
++    "aria-selected": boolean | undefined;
++} | {
++    "aria-checked": boolean | undefined | "mixed";
++};
++export declare type LeafProps = ActionableNode & {
++    role: string;
++    tabIndex: number;
++    onClick: EventCallback;
++    ref: <T extends INodeRef>(x: T | null) => void;
++    className: string;
++    "aria-setsize": number;
++    "aria-posinset": number;
++    "aria-level": number;
++    "aria-selected": boolean;
++    disabled: boolean;
++    "aria-disabled": boolean;
++};
++export interface IBranchProps {
++    onClick: EventCallback;
++    className: string;
++}
++export interface INodeRendererProps {
++    /** The object that represents the rendered node */
++    element: INode;
++    /** A function which gives back the props to pass to the node */
++    getNodeProps: (args?: {
++        onClick?: EventCallback;
++    }) => IBranchProps | LeafProps;
++    /** Whether the rendered node is a branch node */
++    isBranch: boolean;
++    /** Whether the rendered node is selected */
++    isSelected: boolean;
++    /** If the node is a branch node, whether it is half-selected, else undefined */
++    isHalfSelected: boolean;
++    /** If the node is a branch node, whether it is expanded, else undefined */
++    isExpanded: boolean;
++    /** Whether the rendered node is disabled */
++    isDisabled: boolean;
++    /** A positive integer that corresponds to the aria-level attribute */
++    level: number;
++    /** A positive integer that corresponds to the aria-setsize attribute */
++    setsize: number;
++    /** A positive integer that corresponds to the aria-posinset attribute */
++    posinset: number;
++    /** Function to assign to the onClick event handler of the element(s) that will toggle the selected state */
++    handleSelect: EventCallback;
++    /** Function to assign to the onClick event handler of the element(s) that will toggle the expanded state */
++    handleExpand: EventCallback;
++    /** Function to dispatch actions */
++    dispatch: React.Dispatch<TreeViewAction>;
++    /** state of the treeview */
++    treeState: ITreeViewState;
++}
++export interface ITreeViewOnSelectProps {
++    element: INode;
++    isBranch: boolean;
++    isExpanded: boolean;
++    isSelected: boolean;
++    isHalfSelected: boolean;
++    isDisabled: boolean;
++    treeState: ITreeViewState;
++}
++export interface ITreeViewOnExpandProps {
++    element: INode;
++    isExpanded: boolean;
++    isSelected: boolean;
++    isHalfSelected: boolean;
++    isDisabled: boolean;
++    treeState: ITreeViewState;
++}
++declare const nodeActions: {
++    readonly check: "check";
++    readonly select: "select";
++};
++export declare const NODE_ACTIONS: readonly ("select" | "check")[];
++export declare type NodeAction = ValueOf<typeof nodeActions>;
++export interface ITreeViewProps {
++    /** Tree data*/
++    data: INode[];
++    /** Function called when a node changes its selected state */
++    onSelect?: (props: ITreeViewOnSelectProps) => void;
++    /** Function called when a node changes its expanded state */
++    onExpand?: (props: ITreeViewOnExpandProps) => void;
++    /** className to add to the outermost ul */
++    className?: string;
++    /** Render prop for the node */
++    nodeRenderer: (props: INodeRendererProps) => React.ReactNode;
++    /** Indicates what action will be performed on a node which informs the correct aria-* properties to use on the node (aria-checked if using checkboxes, aria-selected if not). */
++    nodeAction?: NodeAction;
++    /** Array with the ids of the default expanded nodes */
++    defaultExpandedIds?: number[];
++    /** Array with the ids of the default selected nodes */
++    defaultSelectedIds?: number[];
++    /** Array with the ids of the default disabled nodes */
++    defaultDisabledIds?: number[];
++    /** If true, collapsing a node will also collapse its descendants */
++    propagateCollapse?: boolean;
++    /** If true, selecting a node will also select its descendants */
++    propagateSelect?: boolean;
++    /** If true, selecting a node will update the state of its parent (e.g. a parent node in a checkbox will be automatically selected if all of its children are selected) */
++    propagateSelectUpwards?: boolean;
++    /** Allows multiple nodes to be selected */
++    multiSelect?: boolean;
++    /** Selecting a node with a keyboard (using Space or Enter) will also toggle its expanded state */
++    expandOnKeyboardSelect?: boolean;
++    /** Wether the selected state is togglable */
++    togglableSelect?: boolean;
++    /** action to perform on click */
++    clickAction?: ClickActions;
++    /** Custom onBlur event that is triggered when focusing out of the component as a whole (moving focus between the nodes won't trigger it) */
++    onBlur?: (event: {
++        treeState: ITreeViewState;
++        dispatch: React.Dispatch<TreeViewAction>;
++    }) => void;
++}
++declare const TreeView: React.ForwardRefExoticComponent<ITreeViewProps & React.RefAttributes<HTMLUListElement>>;
++export default TreeView;
+diff --git a/node_modules/react-accessible-treeview/dist/TreeView/utils.d.ts b/node_modules/react-accessible-treeview/dist/TreeView/utils.d.ts
+new file mode 100644
+index 0000000..611619e
+--- /dev/null
++++ b/node_modules/react-accessible-treeview/dist/TreeView/utils.d.ts
+@@ -0,0 +1,45 @@
++/// <reference types="react" />
++import { INode, INodeRef } from ".";
++export declare type EventCallback = <T, E>(event: React.MouseEvent<T, E> | React.KeyboardEvent<T>) => void;
++export declare const composeHandlers: (...handlers: EventCallback[]) => EventCallback;
++export declare const difference: (a: Set<number>, b: Set<number>) => Set<number>;
++export declare const symmetricDifference: (a: Set<number>, b: Set<number>) => Set<number>;
++export declare const usePrevious: (x: Set<number>) => Set<number> | undefined;
++export declare const isBranchNode: (data: INode[], i: number) => boolean;
++export declare const focusRef: (ref: INodeRef) => void;
++export declare const getParent: (data: INode[], id: number) => number | null;
++export declare const getDescendants: (data: INode[], id: number, disabledIds: Set<number>) => number[];
++export declare const getSibling: (data: INode[], id: number, diff: number) => number | null;
++export declare const getLastAccessible: (data: INode[], id: number, expandedIds: Set<number>) => number;
++export declare const getPreviousAccessible: (data: INode[], id: number, expandedIds: Set<number>) => number | null;
++export declare const getNextAccessible: (data: INode[], id: number, expandedIds: Set<number>) => number | null;
++export declare const propagateSelectChange: (data: INode[], ids: Set<number>, selectedIds: Set<number>, halfSelectedIds: Set<number>, disabledIds: Set<number>) => {
++    every: Set<number>;
++    some: Set<number>;
++    none: Set<number>;
++};
++export declare const getAccessibleRange: ({ data, expandedIds, from, to, }: {
++    data: INode[];
++    expandedIds: Set<number>;
++    from: number;
++    to: number;
++}) => number[];
++interface ITreeNode {
++    name: string;
++    children?: ITreeNode[];
++}
++export declare const flattenTree: (tree: ITreeNode) => INode[];
++export declare const getAriaSelected: ({ isSelected, isDisabled, multiSelect, }: {
++    isSelected: boolean;
++    isDisabled: boolean;
++    multiSelect: boolean;
++}) => boolean | undefined;
++export declare const getAriaChecked: ({ isSelected, isDisabled, isHalfSelected, multiSelect, }: {
++    isSelected: boolean;
++    isDisabled: boolean;
++    isHalfSelected: boolean;
++    multiSelect: boolean;
++}) => boolean | undefined | "mixed";
++export declare const propagatedIds: (data: INode[], ids: number[], disabledIds: Set<number>) => number[];
++export declare const onComponentBlur: (event: React.FocusEvent, treeNode: HTMLUListElement | null, callback: () => void) => void;
++export {};
+diff --git a/node_modules/react-accessible-treeview/dist/index.d.ts b/node_modules/react-accessible-treeview/dist/index.d.ts
+new file mode 100644
+index 0000000..0647b57
+--- /dev/null
++++ b/node_modules/react-accessible-treeview/dist/index.d.ts
+@@ -0,0 +1,4 @@
++import TreeView, { ClickActions, CLICK_ACTIONS, IBranchProps, LeafProps, INode, INodeRendererProps, ITreeViewOnExpandProps, ITreeViewOnSelectProps, ITreeViewProps, ITreeViewState, TreeViewAction } from "./TreeView";
++import { EventCallback, flattenTree } from "./TreeView/utils";
++export { flattenTree, ITreeViewProps, INode, ITreeViewOnSelectProps, CLICK_ACTIONS, ITreeViewOnExpandProps, EventCallback, TreeViewAction, INodeRendererProps, ClickActions, IBranchProps, LeafProps, ITreeViewState, };
++export default TreeView;
+diff --git a/node_modules/react-accessible-treeview/package.json b/node_modules/react-accessible-treeview/package.json
+index a13b0a1..030de1d 100644
+--- a/node_modules/react-accessible-treeview/package.json
++++ b/node_modules/react-accessible-treeview/package.json
+@@ -3,6 +3,7 @@
+   "description": "A react component that implements the treeview pattern as described by the WAI-ARIA Authoring Practices.",
+   "version": "2.1.4",
+   "author": "lissitz (https://github.com/lissitz)",
++  "types": "dist/index.d.ts",
+   "main": "dist/react-accessible-treeview.cjs.js",
+   "module": "dist/react-accessible-treeview.esm.js",
+   "peerDependencies": {

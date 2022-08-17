@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Flex, HStack, IconButton, Text } from "@chakra-ui/react";
+import { Flex, HStack, IconButton, Text, VisuallyHidden } from "@chakra-ui/react";
 import { BellSettingsIcon, FolderIcon } from "@parallel/chakra/icons";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
 import { ContactReference } from "@parallel/components/common/ContactReference";
@@ -60,7 +60,12 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
           CellContent: ({ row }) =>
             row.__typename === "PetitionFolder" ? (
               <HStack>
-                <FolderIcon />
+                <Flex>
+                  <VisuallyHidden>
+                    <FormattedMessage id="generic.folder" defaultMessage="Folder" />
+                  </VisuallyHidden>
+                  <FolderIcon role="presentation" />
+                </Flex>
                 <OverflownText>{row.folderName}</OverflownText>
               </HStack>
             ) : row.__typename === "Petition" ? (

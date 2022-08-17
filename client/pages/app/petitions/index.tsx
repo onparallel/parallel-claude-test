@@ -12,7 +12,7 @@ import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider"
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { useMoveToFolderDialog } from "@parallel/components/petition-common/dialogs/MoveFolderDialog";
+import { useMoveToFolderDialog } from "@parallel/components/petition-common/dialogs/MoveToFolderDialog";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/dialogs/PetitionSharingDialog";
 import { useRenameDialog } from "@parallel/components/petition-common/dialogs/RenameDialog";
 import {
@@ -30,6 +30,7 @@ import {
   Petitions_updatePetitionDocument,
   Petitions_userDocument,
 } from "@parallel/graphql/__types";
+import { isTypename } from "@parallel/utils/apollo/typename";
 import { useAssertQuery } from "@parallel/utils/apollo/useAssertQuery";
 import { useQueryOrPreviousData } from "@parallel/utils/apollo/useQueryOrPreviousData";
 import { compose } from "@parallel/utils/compose";
@@ -49,6 +50,7 @@ import {
 } from "@parallel/utils/queryState";
 import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColumns";
 import { useSelection } from "@parallel/utils/useSelectionState";
+import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { MouseEvent, PropsWithChildren, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -87,6 +89,7 @@ function Petitions() {
   const intl = useIntl();
 
   const [state, setQueryState] = useQueryState(QUERY_STATE);
+  const stateRef = useUpdatingRef(state);
   const sort =
     state.sort ??
     (state.type === "PETITION"
@@ -232,11 +235,9 @@ function Petitions() {
     try {
       const row = selectedRowsRef.current[0];
       if (row.__typename === "PetitionFolder") {
-        // const folder = row;
-        // TODO rename folder
-        const { newName } = await showRenameDialog({
+        const newName = await showRenameDialog({
           name: row.folderName,
-          typeName: undefined,
+          type: row.__typename,
           isDisabled: false,
         });
         console.log("New folder name: ", newName);
@@ -244,9 +245,9 @@ function Petitions() {
         const petition = row;
         if (petition) {
           const isPublic = petition.__typename === "PetitionTemplate" && petition.isPublic;
-          const { newName } = await showRenameDialog({
+          const newName = await showRenameDialog({
             name: petition.name,
-            typeName: petition.__typename,
+            type: petition.__typename,
             isDisabled: isPublic || petition.myEffectivePermission?.permissionType === "READ",
           });
           await updatePetition({
@@ -264,8 +265,11 @@ function Petitions() {
   const handleMoveToClick = useCallback(async () => {
     try {
       await showMoveFolderDialog({
-        currentPath: state.path,
-        petitionOrPetitionFolderIds: selectedIdsRef.current,
+        type: stateRef.current.type,
+        currentPath: stateRef.current.path,
+        disabledPaths: selectedRowsRef.current
+          .filter(isTypename("PetitionFolder"))
+          .map((r) => r.path),
       });
     } catch {}
   }, []);

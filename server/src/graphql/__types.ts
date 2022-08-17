@@ -235,6 +235,7 @@ export interface NexusGenInputs {
     completingMessageBody?: NexusGenScalars["JSON"] | null; // JSON
     completingMessageSubject?: string | null; // String
     deadline?: NexusGenScalars["DateTime"] | null; // DateTime
+    defaultPath?: string | null; // String
     description?: NexusGenScalars["JSON"] | null; // JSON
     emailBody?: NexusGenScalars["JSON"] | null; // JSON
     emailSubject?: string | null; // String
@@ -1629,6 +1630,7 @@ export interface NexusGenFieldTypes {
     completingMessageSubject: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     customProperties: NexusGenScalars["JSONObject"]; // JSONObject!
+    defaultPath: string; // String!
     defaultPermissions: NexusGenRootTypes["TemplateDefaultPermission"][]; // [TemplateDefaultPermission!]!
     description: NexusGenScalars["JSON"] | null; // JSON
     descriptionExcerpt: string | null; // String
@@ -3203,6 +3205,7 @@ export interface NexusGenFieldTypeNames {
     completingMessageSubject: "String";
     createdAt: "DateTime";
     customProperties: "JSONObject";
+    defaultPath: "String";
     defaultPermissions: "TemplateDefaultPermission";
     description: "JSON";
     descriptionExcerpt: "String";

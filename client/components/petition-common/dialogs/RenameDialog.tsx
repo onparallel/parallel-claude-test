@@ -1,37 +1,39 @@
 import { Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
+import { PetitionBaseOrFolder } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
+import { isDefined } from "remeda";
 
 interface RenameDialogProps {
   name: string | null | undefined;
-  typeName: "Petition" | "PetitionTemplate" | undefined;
+  type: PetitionBaseOrFolder["__typename"];
   isDisabled: boolean;
-}
-
-interface RenameDialogData {
-  newName: string;
 }
 
 function RenameDialog({
   name,
-  typeName,
+  type,
   isDisabled,
   ...props
-}: DialogProps<RenameDialogProps, RenameDialogData>) {
+}: DialogProps<RenameDialogProps, string>) {
   const {
     handleSubmit,
     register,
     formState: { isDirty, errors },
-  } = useForm<RenameDialogData>({
-    defaultValues: { newName: name ?? "" },
+  } = useForm<{ name: string }>({
+    defaultValues: { name: name ?? "" },
   });
 
   const nameRef = useRef<HTMLInputElement>(null);
-  const nameProps = useRegisterWithRef(nameRef, register, "newName", { maxLength: 255 });
+  const nameProps = useRegisterWithRef(nameRef, register, "name", {
+    maxLength: 255,
+    required: true,
+    validate: type === "PetitionFolder" ? { noSlash: (value) => !value.includes("/") } : undefined,
+  });
 
   return (
     <ConfirmDialog
@@ -42,17 +44,17 @@ function RenameDialog({
       content={
         {
           as: "form",
-          onSubmit: handleSubmit(({ newName }) => props.onResolve({ newName })),
+          onSubmit: handleSubmit(({ name }) => props.onResolve(name)),
         } as any
       }
       {...props}
       header={
-        typeName === "PetitionTemplate" ? (
+        type === "PetitionTemplate" ? (
           <FormattedMessage
             id="component.rename-dialog.header-template"
             defaultMessage="Rename template"
           />
-        ) : typeName === "Petition" ? (
+        ) : type === "Petition" ? (
           <FormattedMessage
             id="component.rename-dialog.header-petition"
             defaultMessage="Rename parallel"
@@ -66,24 +68,38 @@ function RenameDialog({
       }
       body={
         <Stack>
-          <FormControl id="newName" isInvalid={!!errors.newName} isDisabled={isDisabled}>
+          <FormControl isInvalid={!!errors.name} isDisabled={isDisabled}>
             <FormLabel>
-              {typeName === "PetitionTemplate" ? (
+              {type === "PetitionTemplate" ? (
                 <FormattedMessage id="generic.template-name" defaultMessage="Template name" />
-              ) : typeName === "Petition" ? (
+              ) : type === "Petition" ? (
                 <FormattedMessage id="generic.parallel-name" defaultMessage="Parallel name" />
               ) : (
                 <FormattedMessage id="generic.folder-name" defaultMessage="Folder name" />
               )}
             </FormLabel>
             <Input {...nameProps} />
-            <FormErrorMessage>
-              <FormattedMessage
-                id="component.rename-dialog.change-name-error"
-                defaultMessage="Name cannot exceed {max} characters"
-                values={{ max: 255 }}
-              />
-            </FormErrorMessage>
+            {isDefined(errors.name) ? (
+              <FormErrorMessage>
+                {errors.name.type === "maxLength" ? (
+                  <FormattedMessage
+                    id="component.rename-dialog.max-length-error"
+                    defaultMessage="Name cannot exceed {max} characters"
+                    values={{ max: 255 }}
+                  />
+                ) : errors.name.type === "noSlash" ? (
+                  <FormattedMessage
+                    id="component.rename-dialog.no-slash-error"
+                    defaultMessage="Name can't contain the slash character /"
+                  />
+                ) : errors.name.type === "required" ? (
+                  <FormattedMessage
+                    id="component.rename-dialog.required-error"
+                    defaultMessage="Please enter a name"
+                  />
+                ) : null}
+              </FormErrorMessage>
+            ) : null}
           </FormControl>
         </Stack>
       }

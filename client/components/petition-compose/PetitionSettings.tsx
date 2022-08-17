@@ -23,6 +23,7 @@ import {
   DocumentIcon,
   EmailIcon,
   FieldDateIcon,
+  FolderIcon,
   LinkIcon,
   ListIcon,
   LockClosedIcon,
@@ -62,11 +63,13 @@ import { DialogProps, useDialog } from "../common/dialogs/DialogProvider";
 import { Divider } from "../common/Divider";
 import { HelpPopover } from "../common/HelpPopover";
 import { NormalLink } from "../common/Link";
+import { PathName } from "../common/PathName";
 import { useConfigureRemindersDialog } from "../petition-activity/dialogs/ConfigureRemindersDialog";
 import {
   PublicLinkSettingsDialog,
   usePublicLinkSettingsDialog,
 } from "../petition-common/dialogs/PublicLinkSettingsDialog";
+import { useSelectFolderDialog } from "../petition-common/dialogs/SelectFolderDialog";
 import {
   SignatureConfigDialog,
   useSignatureConfigDialog,
@@ -460,6 +463,18 @@ function _PetitionSettings({
     );
   }
 
+  const showSelectFolderDialog = useSelectFolderDialog();
+  async function handleChangeDefaultPath() {
+    try {
+      assertTypename(petition, "PetitionTemplate");
+      const path = await showSelectFolderDialog({
+        currentPath: petition.defaultPath,
+        type: "PETITION",
+      });
+      await onUpdatePetition({ defaultPath: path });
+    } catch {}
+  }
+
   return (
     <Stack padding={4} spacing={2}>
       {petition.__typename === "PetitionTemplate" ? (
@@ -804,6 +819,26 @@ function _PetitionSettings({
           </AlertDescription>
         </Alert>
       ) : null}
+      {petition.__typename === "PetitionTemplate" ? (
+        <SettingsRow
+          controlId="default-path"
+          isDisabled={petition.isRestricted || isPublicTemplate || myEffectivePermission === "READ"}
+          icon={<FolderIcon />}
+          label={
+            <>
+              <FormattedMessage
+                id="component.petition-settings.default-path"
+                defaultMessage="Folder for created parallels:"
+              />{" "}
+              <PathName as="strong" type="PETITION" path={petition.defaultPath} />
+            </>
+          }
+        >
+          <Button size="sm" id="default-path" onClick={handleChangeDefaultPath}>
+            Change
+          </Button>
+        </SettingsRow>
+      ) : null}
     </Stack>
   );
 }
@@ -887,6 +922,7 @@ const fragments = {
         defaultPermissions {
           ...TemplateDefaultPermissionsDialog_TemplateDefaultPermission
         }
+        defaultPath
       }
       isAnonymized
     }

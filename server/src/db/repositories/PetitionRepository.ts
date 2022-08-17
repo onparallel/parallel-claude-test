@@ -405,6 +405,7 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async loadPetitionsForUser(
+    orgId: number,
     userId: number,
     opts: {
       search?: string | null;
@@ -422,6 +423,7 @@ export class PetitionRepository extends BaseRepository {
             [userId]
           )
           .joinRaw(/* sql */ `left join petition_message pm on p.id = pm.petition_id`)
+          .where("p.org_id", orgId)
           .whereNull("p.deleted_at")
           .where("p.is_template", type === "TEMPLATE"),
     ];
@@ -568,10 +570,13 @@ export class PetitionRepository extends BaseRepository {
     } else {
       const applyOrder: Knex.QueryCallback = (q) => {
         for (const { field: column, order } of opts.sortBy ?? []) {
+          const reverse = order === "asc" ? "desc" : "asc";
           if (column === "lastUsedAt") {
             q.orderByRaw(`is_folder ${order}, last_used_at ${order}`);
           } else if (column === "sentAt") {
-            q.orderByRaw(`is_folder ${order}, sent_at ${order}, status asc, created_at ${order}`);
+            q.orderByRaw(
+              `is_folder ${order}, sent_at ${order}, status asc, created_at ${order}, _name ${reverse}`
+            );
           } else if (column === "createdAt") {
             q.orderByRaw(`is_folder ${order}, created_at ${order}`);
           } else if (column === "name") {

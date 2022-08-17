@@ -1710,29 +1710,24 @@
     "context": "The email was opened on {date}"
   },
   {
-    "term": "component.move-folder-dialog.create-folder",
-    "definition": "Create folder",
-    "context": "Create folder"
+    "term": "component.move-to-folder-dialog.currently-in",
+    "definition": "Currently in {folder}",
+    "context": "Currently in {folder}"
   },
   {
-    "term": "component.move-folder-dialog.currently-in",
-    "definition": "Currently in <b>{folder}</b>",
-    "context": "Currently in <b>{folder}</b>"
-  },
-  {
-    "term": "component.move-folder-dialog.header",
+    "term": "component.move-to-folder-dialog.header",
     "definition": "Move to...",
     "context": "Move to..."
   },
   {
-    "term": "component.move-folder-dialog.move",
+    "term": "component.move-to-folder-dialog.move",
     "definition": "Move",
     "context": "Move"
   },
   {
-    "term": "component.move-folder-dialog.will-move-from",
-    "definition": "Will move from <b>{source}</b> to <b>{destination}</b>",
-    "context": "Will move from <b>{source}</b> to <b>{destination}</b>"
+    "term": "component.move-to-folder-dialog.will-move-from",
+    "definition": "Will move from {source} to {destination}",
+    "context": "Will move from {source} to {destination}"
   },
   {
     "term": "component.multiple-emails-pasted-dialog.header",
@@ -1768,6 +1763,16 @@
     "term": "component.netdocuments-link.open-file",
     "definition": "Open file in NetDocuments",
     "context": "Open file in NetDocuments"
+  },
+  {
+    "term": "component.new-folder-dialog.folder-name-label",
+    "definition": "Folder name",
+    "context": "Folder name"
+  },
+  {
+    "term": "component.new-folder-dialog.header",
+    "definition": "New folder",
+    "context": "New folder"
   },
   {
     "term": "component.new-petition-empty-search.no-results",
@@ -2893,6 +2898,11 @@
     "term": "component.petition-settings.deadline-description",
     "definition": "This date is used to inform the recipients of the deadline for which you need to have the information.",
     "context": "This date is used to inform the recipients of the deadline for which you need to have the information."
+  },
+  {
+    "term": "component.petition-settings.default-path",
+    "definition": "Folder for created parallels:",
+    "context": "Folder for created parallels:"
   },
   {
     "term": "component.petition-settings.document-theme-label",
@@ -4140,7 +4150,7 @@
     "context": "Change name"
   },
   {
-    "term": "component.rename-dialog.change-name-error",
+    "term": "component.rename-dialog.max-length-error",
     "definition": "Name cannot exceed {max} characters",
     "context": "Name cannot exceed {max} characters"
   },
@@ -4318,6 +4328,21 @@
     "term": "component.search-input.placeholder",
     "definition": "Search...",
     "context": "Search..."
+  },
+  {
+    "term": "component.select-folder-dialog.currently-in",
+    "definition": "Currently selected folder: {folder}",
+    "context": "Currently selected folder: {folder}"
+  },
+  {
+    "term": "component.select-folder-dialog.header",
+    "definition": "Select folder",
+    "context": "Select folder"
+  },
+  {
+    "term": "component.select-folder-dialog.move",
+    "definition": "Move",
+    "context": "Move"
   },
   {
     "term": "component.send-button.schedule",
@@ -5395,6 +5420,11 @@
     "context": "Copy link"
   },
   {
+    "term": "generic.create-folder",
+    "definition": "Create folder",
+    "context": "Create folder"
+  },
+  {
     "term": "generic.create-petition",
     "definition": "Create parallel",
     "context": "Create parallel"
@@ -5543,6 +5573,16 @@
     "term": "generic.file-size",
     "definition": "File size",
     "context": "File size"
+  },
+  {
+    "term": "generic.folder",
+    "definition": "Folder",
+    "context": "Folder"
+  },
+  {
+    "term": "generic.folder-directory",
+    "definition": "Folder directory",
+    "context": "Folder directory"
   },
   {
     "term": "generic.folder-name",

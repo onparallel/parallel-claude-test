@@ -3494,6 +3494,7 @@ type PetitionTemplate implements PetitionBase {
   Custom user properties
   """
   customProperties: JSONObject!
+  defaultPath: String!
   defaultPermissions: [TemplateDefaultPermission!]!
 
   """
@@ -5017,6 +5018,7 @@ input UpdatePetitionInput {
   completingMessageBody: JSON
   completingMessageSubject: String
   deadline: DateTime
+  defaultPath: String
   description: JSON
   emailBody: JSON
   emailSubject: String

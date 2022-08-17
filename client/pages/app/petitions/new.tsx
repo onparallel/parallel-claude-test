@@ -19,6 +19,7 @@ import {
 import { AddIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { NakedLink } from "@parallel/components/common/Link";
+import { PathBreadcrumbs } from "@parallel/components/common/PathBreadcrumbs";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
@@ -216,31 +217,6 @@ function NewPetition() {
   };
 
   const buildUrl = useBuildStateUrl(QUERY_STATE);
-  const breadcrumbs = useMemo(() => {
-    const breadcrumbs = [
-      {
-        text: intl.formatMessage({ id: "generic.root-templates", defaultMessage: "Templates" }),
-        url: buildUrl((current) => ({ ...current, path: "/" })),
-        isCurrent: state.path === "/",
-      },
-    ];
-    if (state.path !== "/") {
-      breadcrumbs.push(
-        ...state.path
-          .slice(1, -1)
-          .split("/")
-          .map((part, i, parts) => {
-            const path = "/" + parts.slice(0, i + 1).join("/") + "/";
-            return {
-              text: part,
-              url: buildUrl((current) => ({ ...current, path })),
-              isCurrent: path === state.path,
-            };
-          })
-      );
-    }
-    return breadcrumbs;
-  }, [state.path]);
 
   const handleFolderClick = (path: string) => {
     setQueryState(
@@ -371,24 +347,12 @@ function NewPetition() {
                 </Stack>
               </Stack>
               {state.path !== "/" ? (
-                <Box paddingX={6}>
-                  <Breadcrumb height={8} display="flex" alignItems="center">
-                    {breadcrumbs.map(({ text, url, isCurrent }, i) => (
-                      <BreadcrumbItem key={i}>
-                        <NakedLink href={url}>
-                          <BreadcrumbLink
-                            isCurrentPage={isCurrent}
-                            color="primary.600"
-                            fontWeight="medium"
-                            _activeLink={{ color: "inherit", fontWeight: "inherit" }}
-                          >
-                            {text}
-                          </BreadcrumbLink>
-                        </NakedLink>
-                      </BreadcrumbItem>
-                    ))}
-                  </Breadcrumb>
-                </Box>
+                <PathBreadcrumbs
+                  path={state.path}
+                  type="TEMPLATE"
+                  paddingX={6}
+                  pathUrl={(path) => buildUrl((current) => ({ ...current, path }))}
+                />
               ) : null}
               {templates.length > 0 ? (
                 <GridInfiniteScrollList

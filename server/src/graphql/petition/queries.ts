@@ -97,7 +97,7 @@ export const petitionsQuery = queryField((t) => {
         throw new ApolloError("Invalid filter", "INVALID_FILTER");
       }
 
-      return await ctx.petitions.loadPetitionsForUser(ctx.user!.id, {
+      return await ctx.petitions.loadPetitionsForUser(ctx.user!.org_id, ctx.user!.id, {
         search,
         offset,
         filters,
@@ -172,7 +172,7 @@ export const templatesQuery = queryField((t) => {
         });
       } else {
         const userId = ctx.user!.id;
-        return await ctx.petitions.loadPetitionsForUser(userId, {
+        return await ctx.petitions.loadPetitionsForUser(ctx.user!.org_id, userId, {
           search,
           limit,
           offset,
