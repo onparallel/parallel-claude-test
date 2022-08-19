@@ -979,7 +979,7 @@ type Mutation {
   """
   Moves a group of petitions or folders to another folder
   """
-  movePetitions(dst: String!, src: [String!]!, type: PetitionBaseType): Success!
+  movePetitions(dst: String!, src: [String!]!, type: PetitionBaseType!): Success!
 
   """
   Generates a download link for a petition attachment

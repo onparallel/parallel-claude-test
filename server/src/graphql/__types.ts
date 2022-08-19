@@ -4287,7 +4287,7 @@ export interface NexusGenArgTypes {
       // args
       dst: string; // String!
       src: string[]; // [String!]!
-      type?: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
+      type: NexusGenEnums["PetitionBaseType"]; // PetitionBaseType!
     };
     petitionAttachmentDownloadLink: {
       // args

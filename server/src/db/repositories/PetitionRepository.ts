@@ -1360,6 +1360,19 @@ export class PetitionRepository extends BaseRepository {
       );
   }
 
+  async updatePetitionPaths(petitionIds: number[], from: string, to: string, updatedBy: string) {
+    await this.raw(
+      /* SQL */ `
+      update petition p
+      set "path" = concat(?::text, substring("path", length(?) + 1)),
+      updated_at = NOW(),
+      updated_by = ?
+      where p.id in ?
+    `,
+      [to, from, updatedBy, this.sqlIn(petitionIds)]
+    );
+  }
+
   async closePetition(petitionId: number, updatedBy: string, t?: Knex.Transaction) {
     return await this.from("petition", t).where("id", petitionId).update(
       {

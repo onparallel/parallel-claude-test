@@ -2062,7 +2062,7 @@ export const movePetitions = mutationField("movePetitions", {
   args: {
     src: nonNull(list(nonNull(stringArg()))),
     dst: nonNull(stringArg()),
-    type: "PetitionBaseType",
+    type: nonNull("PetitionBaseType"),
   },
   validateArgs: validateAnd(
     (_, args, ctx, info) => {
@@ -2084,7 +2084,7 @@ export const movePetitions = mutationField("movePetitions", {
   ),
   resolve: async (_, args, ctx) => {
     const [paths, petitionGIDs] = partition(args.src, (p) => !!p.match(PETITION_FOLDER_REGEX));
-    const [petitionsOnFolder, petitions] = await Promise.all([
+    const [petitionsOnFolder, singlePetitions] = await Promise.all([
       paths.length > 0
         ? ctx.petitions
             .getUserPetitionsOnFolder(ctx.user!.id, paths)
@@ -2098,7 +2098,7 @@ export const movePetitions = mutationField("movePetitions", {
     ]);
 
     // trying to move a folder and a petition inside that folder at once
-    if (petitionsOnFolder.some((pf) => petitions.map((p) => p!.id).includes(pf.id))) {
+    if (petitionsOnFolder.some((pf) => singlePetitions.map((p) => p!.id).includes(pf.id))) {
       throw new ForbiddenError("INVALID_PATH_ERROR");
     }
     // trying to move a folder and another folder inside the first at once
@@ -2106,29 +2106,24 @@ export const movePetitions = mutationField("movePetitions", {
       throw new ForbiddenError("INVALID_PATH_ERROR");
     }
 
-    const groupedBySrc: Record<string, Petition[]> = {};
-    for (const src of uniq(args.src)) {
-      groupedBySrc[src] = petitionsOnFolder.filter((p) => p.path.startsWith(src));
+    const groupedByTargetSrc: Record<string, number[]> = {};
+    for (const src of uniq(paths)) {
+      groupedByTargetSrc[src] = petitionsOnFolder
+        .filter((p) => p.path.startsWith(src))
+        .map((p) => p.id);
+    }
+    for (const singlePetition of singlePetitions) {
+      if (!groupedByTargetSrc[singlePetition!.path]) {
+        groupedByTargetSrc[singlePetition!.path] = [];
+      }
+      groupedByTargetSrc[singlePetition!.path].push(singlePetition!.id);
     }
 
-    await Promise.all([
-      pMap(Object.entries(groupedBySrc), async ([path, petitions]) => {
-        await pMap(petitions, async (p) => {
-          const discardedPath = path.replace(/^(.*\/).+$/, "$1");
-          await ctx.petitions.updatePetition(
-            p.id,
-            { path: args.dst + p!.path.substring(discardedPath.length) },
-            `User:${ctx.user!.id}`
-          );
-        });
-      }),
-
-      ctx.petitions.updatePetition(
-        petitions.map((p) => p!.id),
-        { path: args.dst },
-        `User:${ctx.user!.id}`
-      ),
-    ]);
+    await Promise.all(
+      Object.entries(groupedByTargetSrc).map(([from, ids]) =>
+        ctx.petitions.updatePetitionPaths(ids, from, args.dst, `User:${ctx.user!.id}`)
+      )
+    );
 
     return SUCCESS;
   },
