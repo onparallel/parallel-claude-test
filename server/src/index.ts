@@ -30,8 +30,8 @@ app.use("/api", json(), cors(), cookieParser(), api(container));
 app.use("/graphql", graphqlUploadExpress());
 const server = new ApolloServer({
   debug: true,
-  // https://github.com/graphql-nexus/nexus/issues/1019
-  schema: schema as any,
+  cache: "bounded",
+  schema: schema,
   plugins: [
     process.env.NODE_ENV === "production"
       ? ApolloServerPluginLandingPageDisabled()

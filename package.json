@@ -32,7 +32,7 @@
     "patch-package": "^6.4.7"
   },
   "resolutions": {
-    "@apollo/client": "^3.6.8",
+    "@apollo/client": "^3.6.9",
     "@graphql-typed-document-node/core": "^3.1.1",
     "core-js": "^3.21.1",
     "@types/react": "^17.0.38"
