@@ -29,9 +29,9 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
 
     const intl = await this.ctx.i18n.getIntl(template!.locale);
 
-    const [includeRecipientUrl, petitionsAccesses, petitionsMessages, petitionsFields] =
+    const [includePreviewUrl, petitionsAccesses, petitionsMessages, petitionsFields] =
       await Promise.all([
-        this.ctx.featureFlags.orgHasFeatureFlag(template!.org_id, "TEMPLATE_REPLIES_RECIPIENT_URL"),
+        this.ctx.featureFlags.orgHasFeatureFlag(template!.org_id, "TEMPLATE_REPLIES_PREVIEW_URL"),
         this.ctx.readonlyPetitions.loadAccessesForPetition(petitions.map((p) => p.id)),
         this.ctx.readonlyPetitions.loadMessagesByPetitionId(petitions.map((p) => p.id)),
         this.ctx.readonlyPetitions.loadFieldsForPetition(petitions.map((p) => p.id)),
@@ -78,8 +78,16 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
         string,
         { position: number; content: Maybe<string | Date>; title: Maybe<string> }
       > = {
-        "parallel-name": {
+        "parallel-id": {
           position: 0,
+          title: intl.formatMessage({
+            id: "export-template-report.column-header.petition-id",
+            defaultMessage: "Parallel ID",
+          }),
+          content: toGlobalId("Petition", petition.id),
+        },
+        "parallel-name": {
+          position: 1,
           title: intl.formatMessage({
             id: "export-template-report.column-header.petition-name",
             defaultMessage: "Parallel name",
@@ -87,7 +95,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
           content: petition.name || "",
         },
         "recipient-names": {
-          position: 1,
+          position: 2,
           title: intl.formatMessage({
             id: "export-template-report.column-header.recipient-names",
             defaultMessage: "Recipient names",
@@ -95,7 +103,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
           content: contactNames.join(", ") || "",
         },
         "recipient-emails": {
-          position: 2,
+          position: 3,
           title: intl.formatMessage({
             id: "export-template-report.column-header.recipient-emails",
             defaultMessage: "Recipient emails",
@@ -103,7 +111,7 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
           content: contactEmails.join(", ") || "",
         },
         "send-date": {
-          position: 3,
+          position: 4,
           title: intl.formatMessage({
             id: "export-template-report.column-header.send-date",
             defaultMessage: "Send date",
@@ -122,20 +130,17 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
         },
       };
 
-      if (includeRecipientUrl) {
-        const accesses = petitionsAccesses[petitionIndex];
-        const recipientUrls = contacts.map((c) => {
-          const keycode = accesses.find((a) => a.contact_id === c.id)!.keycode;
-          return `${this.ctx.config.misc.parallelUrl}/${template!.locale}/petition/${keycode}`;
-        });
-
-        row["recipient-url"] = {
-          position: 4,
+      if (includePreviewUrl) {
+        row["preview-url"] = {
+          position: 5,
           title: intl.formatMessage({
-            id: "export-template-report-column-header.recipient-url",
-            defaultMessage: "Recipient URL",
+            id: "export-template-report-column-header.preview-url",
+            defaultMessage: "Preview URL",
           }),
-          content: recipientUrls.join(" ") || "",
+          content: `${this.ctx.config.misc.parallelUrl}/${intl.locale}/app/petitions/${toGlobalId(
+            "Petition",
+            petition.id
+          )}/preview`,
         };
       }
       const fixedColsLength = Object.keys(row).length;

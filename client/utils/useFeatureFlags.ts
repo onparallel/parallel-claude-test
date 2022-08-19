@@ -188,14 +188,15 @@ export function useFeatureFlags() {
         }),
       },
       {
-        name: "TEMPLATE_REPLIES_RECIPIENT_URL",
+        name: "TEMPLATE_REPLIES_PREVIEW_URL",
         title: intl.formatMessage({
-          id: "component.feature-flag-descriptions.template-replies-recipient-url-name",
-          defaultMessage: "Template Replies Excel Recipient URL",
+          id: "component.feature-flag-descriptions.template-replies-preview-url-name",
+          defaultMessage: "Template Replies Excel Preview URL",
         }),
         description: intl.formatMessage({
-          id: "component.feature-flag-descriptions.template-replies-recipient-url-description",
-          defaultMessage: "Adds a column on the template replies Excel report with recipient URL",
+          id: "component.feature-flag-descriptions.template-replies-preview-url-description",
+          defaultMessage:
+            "Adds a column on the template replies Excel report with petition preview URL",
         }),
       },
     ],

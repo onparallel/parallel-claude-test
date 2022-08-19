@@ -234,6 +234,7 @@ export type FeatureFlag =
   | "REMOVE_PARALLEL_BRANDING"
   | "REMOVE_WHY_WE_USE_PARALLEL"
   | "SKIP_FORWARD_SECURITY"
+  | "TEMPLATE_REPLIES_PREVIEW_URL"
   | "TEMPLATE_REPLIES_RECIPIENT_URL";
 
 /** A feature flag name with his value */
@@ -2017,7 +2018,7 @@ export interface PetitionAccess extends Timestamps {
   granter?: Maybe<User>;
   /** The ID of the petition access. */
   id: Scalars["GID"];
-  /** It will be true if dont have contact assigned */
+  /** It will be true if doesn't have contact assigned */
   isContactless: Scalars["Boolean"];
   /** When the next reminder will be sent. */
   nextReminderAt?: Maybe<Scalars["DateTime"]>;

@@ -1455,14 +1455,14 @@
     "context": "Feature Disable forwarding protection"
   },
   {
-    "term": "component.feature-flag-descriptions.template-replies-recipient-url-description",
-    "definition": "Adds a column on the template replies Excel report with recipient URL",
-    "context": "Adds a column on the template replies Excel report with recipient URL"
+    "term": "component.feature-flag-descriptions.template-replies-preview-url-description",
+    "definition": "Adds a column on the template replies Excel report with petition preview URL",
+    "context": "Adds a column on the template replies Excel report with petition preview URL"
   },
   {
-    "term": "component.feature-flag-descriptions.template-replies-recipient-url-name",
-    "definition": "Template Replies Excel Recipient URL",
-    "context": "Template Replies Excel Recipient URL"
+    "term": "component.feature-flag-descriptions.template-replies-preview-url-name",
+    "definition": "Template Replies Excel Preview URL",
+    "context": "Template Replies Excel Preview URL"
   },
   {
     "term": "component.field-comment.message-not-available",

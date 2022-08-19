@@ -175,9 +175,14 @@
     "context": "See answers in ND"
   },
   {
-    "term": "export-template-report-column-header.recipient-url",
-    "definition": "URL de destinatario",
-    "context": "Recipient URL"
+    "term": "export-template-report-column-header.preview-url",
+    "definition": "URL del parallel",
+    "context": "Preview URL"
+  },
+  {
+    "term": "export-template-report.column-header.petition-id",
+    "definition": "ID del parallel",
+    "context": "Parallel ID"
   },
   {
     "term": "export-template-report.column-header.petition-name",
