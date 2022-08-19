@@ -3,6 +3,7 @@ import {
   arg,
   booleanArg,
   enumType,
+  idArg,
   inputObjectType,
   intArg,
   list,
@@ -24,7 +25,7 @@ import {
   PetitionPermission,
 } from "../../../db/__types";
 import { unMaybeArray } from "../../../util/arrays";
-import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
+import { fromGlobalId, toGlobalId } from "../../../util/globalId";
 import { isFileTypeField } from "../../../util/isFileTypeField";
 import { getRequiredPetitionSendCredits } from "../../../util/organizationUsageLimits";
 import { withError } from "../../../util/promises/withError";
@@ -2060,22 +2061,21 @@ export const movePetitions = mutationField("movePetitions", {
   type: "Success",
   authorize: authenticateAnd(userHasAccessToPetitionsAndFolders("src", ["WRITE", "OWNER"])),
   args: {
-    src: nonNull(list(nonNull(stringArg()))),
+    src: nonNull(list(nonNull(idArg()))),
     dst: nonNull(stringArg()),
     type: nonNull("PetitionBaseType"),
   },
   validateArgs: validateAnd(
     (_, args, ctx, info) => {
-      // validate src input
-      // src must be a list of Petition GID's or folder paths
       try {
-        for (const value of args.src) {
-          if (!value.match(PETITION_FOLDER_REGEX)) {
-            if (fromGlobalId(value, "Petition").type !== "Petition") {
-              throw new Error();
-            }
+        // src must be a list of Petition or PetitionFolder GID's
+        args.src.map((id) => {
+          try {
+            fromGlobalId(id, "Petition");
+          } catch {
+            fromGlobalId(id, "PetitionFolder", true);
           }
-        }
+        });
       } catch {
         throw new ArgValidationError(info, "src", "source is invalid");
       }
@@ -2083,16 +2083,29 @@ export const movePetitions = mutationField("movePetitions", {
     validateRegex((args) => args.dst, "dst", PETITION_FOLDER_REGEX)
   ),
   resolve: async (_, args, ctx) => {
-    const [paths, petitionGIDs] = partition(args.src, (p) => !!p.match(PETITION_FOLDER_REGEX));
+    const decodedIds = args.src.map((id) => {
+      try {
+        return fromGlobalId(id, "Petition");
+      } catch {
+        return fromGlobalId(id, "PetitionFolder", true);
+      }
+    });
+    const [folders, petitions] = partition(
+      decodedIds,
+      (decoded) => decoded.type === "PetitionFolder"
+    );
+    const paths = folders.map((f) => f.id as string);
+    const petitionIds = petitions.map((p) => p.id as number);
+
     const [petitionsOnFolder, singlePetitions] = await Promise.all([
-      paths.length > 0
+      folders.length > 0
         ? ctx.petitions
             .getUserPetitionsOnFolder(ctx.user!.id, paths)
             .then((ps) => ps.filter((p) => p.is_template === (args.type === "TEMPLATE")))
         : ([] as Petition[]),
-      petitionGIDs.length > 0
+      petitions.length > 0
         ? ctx.petitions
-            .loadPetition(fromGlobalIds(petitionGIDs, "Petition").ids)
+            .loadPetition(petitionIds)
             .then((ps) => ps.filter((p) => p!.is_template === (args.type === "TEMPLATE")))
         : ([] as Petition[]),
     ]);

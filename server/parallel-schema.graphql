@@ -242,13 +242,6 @@ type EffectivePetitionUserPermission {
   user: User!
 }
 
-enum EntityType {
-  Contact
-  Organization
-  Petition
-  User
-}
-
 enum FeatureFlag {
   AUTO_ANONYMIZE
   CUSTOM_HOST_UI
@@ -979,7 +972,7 @@ type Mutation {
   """
   Moves a group of petitions or folders to another folder
   """
-  movePetitions(dst: String!, src: [String!]!, type: PetitionBaseType!): Success!
+  movePetitions(dst: String!, src: [ID!]!, type: PetitionBaseType!): Success!
 
   """
   Generates a download link for a petition attachment
@@ -4221,8 +4214,12 @@ type Query {
     """
     ID to encode
     """
-    id: Int!
-    type: EntityType!
+    id: String!
+
+    """
+    ID type
+    """
+    type: String!
   ): SupportMethodResponse!
   isValidPublicPetitionLinkSlug(slug: String!): Boolean!
   landingTemplateBySlug(slug: String!): LandingTemplate

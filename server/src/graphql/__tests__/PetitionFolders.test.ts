@@ -114,7 +114,7 @@ describe("Petition Folders", () => {
 
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($src: [String!]!, $dst: String!, $type: PetitionBaseType!) {
+          mutation ($src: [ID!]!, $dst: String!, $type: PetitionBaseType!) {
             movePetitions(src: $src, dst: $dst, type: $type)
           }
         `,
@@ -143,7 +143,7 @@ describe("Petition Folders", () => {
 
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($src: [String!]!, $dst: String!, $type: PetitionBaseType!) {
+          mutation ($src: [ID!]!, $dst: String!, $type: PetitionBaseType!) {
             movePetitions(src: $src, dst: $dst, type: $type)
           }
         `,
@@ -209,12 +209,12 @@ describe("Petition Folders", () => {
 
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($src: [String!]!, $dst: String!, $type: PetitionBaseType!) {
+          mutation ($src: [ID!]!, $dst: String!, $type: PetitionBaseType!) {
             movePetitions(src: $src, dst: $dst, type: $type)
           }
         `,
         {
-          src: ["/spanish/clients/"],
+          src: [toGlobalId("PetitionFolder", "/spanish/clients/")],
           dst: "/english/clients/",
           type: "PETITION",
         }
@@ -285,12 +285,12 @@ describe("Petition Folders", () => {
 
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($src: [String!]!, $dst: String!, $type: PetitionBaseType!) {
+          mutation ($src: [ID!]!, $dst: String!, $type: PetitionBaseType!) {
             movePetitions(src: $src, dst: $dst, type: $type)
           }
         `,
         {
-          src: ["/spanish/clients/"],
+          src: [toGlobalId("PetitionFolder", "/spanish/clients/")],
           dst: "/spanish/clients/closed/clients/",
           type: "PETITION",
         }
@@ -368,13 +368,13 @@ describe("Petition Folders", () => {
 
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($src: [String!]!, $dst: String!, $type: PetitionBaseType!) {
+          mutation ($src: [ID!]!, $dst: String!, $type: PetitionBaseType!) {
             movePetitions(src: $src, dst: $dst, type: $type)
           }
         `,
         {
           src: [
-            "/spanish/clients/",
+            toGlobalId("PetitionFolder", "/spanish/clients/"),
             toGlobalId("Petition", petitions.find((p) => p.name === "kyc-4")!.id),
           ],
           dst: "/closed/kyc/clients/",
@@ -423,12 +423,12 @@ describe("Petition Folders", () => {
 
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($src: [String!]!, $dst: String!, $type: PetitionBaseType!) {
+          mutation ($src: [ID!]!, $dst: String!, $type: PetitionBaseType!) {
             movePetitions(src: $src, dst: $dst, type: $type)
           }
         `,
         {
-          src: ["/shared-folder/"],
+          src: [toGlobalId("PetitionFolder", "/shared-folder/")],
           dst: "/mine/shared-folder/",
           type: "PETITION",
         }
@@ -462,12 +462,12 @@ describe("Petition Folders", () => {
 
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($src: [String!]!, $dst: String!, $type: PetitionBaseType!) {
+          mutation ($src: [ID!]!, $dst: String!, $type: PetitionBaseType!) {
             movePetitions(src: $src, dst: $dst, type: $type)
           }
         `,
         {
-          src: ["/"],
+          src: [toGlobalId("PetitionFolder", "/")],
           dst: "/templates/",
           type: "TEMPLATE",
         }
@@ -508,7 +508,7 @@ describe("Petition Folders", () => {
 
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($src: [String!]!, $dst: String!, $type: PetitionBaseType!) {
+          mutation ($src: [ID!]!, $dst: String!, $type: PetitionBaseType!) {
             movePetitions(src: $src, dst: $dst, type: $type)
           }
         `,
@@ -534,12 +534,12 @@ describe("Petition Folders", () => {
 
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($src: [String!]!, $dst: String!, $type: PetitionBaseType!) {
+          mutation ($src: [ID!]!, $dst: String!, $type: PetitionBaseType!) {
             movePetitions(src: $src, dst: $dst, type: $type)
           }
         `,
         {
-          src: ["/"],
+          src: [toGlobalId("PetitionFolder", "/")],
           dst: "/new-folder/",
           type: "PETITION",
         }
@@ -554,7 +554,7 @@ describe("Petition Folders", () => {
 
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($src: [String!]!, $dst: String!, $type: PetitionBaseType!) {
+          mutation ($src: [ID!]!, $dst: String!, $type: PetitionBaseType!) {
             movePetitions(src: $src, dst: $dst, type: $type)
           }
         `,
@@ -577,12 +577,12 @@ describe("Petition Folders", () => {
 
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($src: [String!]!, $dst: String!, $type: PetitionBaseType!) {
+          mutation ($src: [ID!]!, $dst: String!, $type: PetitionBaseType!) {
             movePetitions(src: $src, dst: $dst, type: $type)
           }
         `,
         {
-          src: ["/private/"],
+          src: [toGlobalId("PetitionFolder", "/private/")],
           dst: "/public/",
           type: "PETITION",
         }
@@ -598,7 +598,7 @@ describe("Petition Folders", () => {
 
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($src: [String!]!, $dst: String!, $type: PetitionBaseType!) {
+          mutation ($src: [ID!]!, $dst: String!, $type: PetitionBaseType!) {
             movePetitions(src: $src, dst: $dst, type: $type)
           }
         `,
@@ -616,7 +616,7 @@ describe("Petition Folders", () => {
     it("sends error if src is not a petition nor folder", async () => {
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($src: [String!]!, $dst: String!, $type: PetitionBaseType!) {
+          mutation ($src: [ID!]!, $dst: String!, $type: PetitionBaseType!) {
             movePetitions(src: $src, dst: $dst, type: $type)
           }
         `,
@@ -637,12 +637,12 @@ describe("Petition Folders", () => {
       }));
       const { errors, data } = await testClient.execute(
         gql`
-          mutation ($src: [String!]!, $dst: String!, $type: PetitionBaseType!) {
+          mutation ($src: [ID!]!, $dst: String!, $type: PetitionBaseType!) {
             movePetitions(src: $src, dst: $dst, type: $type)
           }
         `,
         {
-          src: [toGlobalId("Petition", petition.id), "/a/b/"],
+          src: [toGlobalId("Petition", petition.id), toGlobalId("PetitionFolder", "/a/b/")],
           dst: "/",
           type: "PETITION",
         }

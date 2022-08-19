@@ -1,4 +1,4 @@
-import { arg, enumType, idArg, intArg, nonNull, queryField } from "nexus";
+import { idArg, nonNull, queryField, stringArg } from "nexus";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { RESULT } from "../helpers/result";
 import { supportMethodAccess } from "./authorizers";
@@ -24,22 +24,15 @@ export const globalIdEncode = queryField("globalIdEncode", {
   description: "Encodes the given ID into a Global ID.",
   type: "SupportMethodResponse",
   args: {
-    id: nonNull(intArg({ description: "ID to encode" })),
-    type: nonNull(
-      arg({
-        type: enumType({
-          name: "EntityType",
-          members: ["Petition", "User", "Contact", "Organization"],
-        }),
-      })
-    ),
+    id: nonNull(stringArg({ description: "ID to encode" })),
+    type: nonNull(stringArg({ description: "ID type" })),
   },
   authorize: supportMethodAccess(),
   resolve: (_, args) => {
     try {
       return {
         result: RESULT.SUCCESS,
-        message: toGlobalId(args.type, args.id),
+        message: toGlobalId<string | number>(args.type, args.id),
       };
     } catch (e: any) {
       return { result: RESULT.FAILURE, message: e.toString() };

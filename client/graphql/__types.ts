@@ -216,8 +216,6 @@ export interface EffectivePetitionUserPermission {
   user: User;
 }
 
-export type EntityType = "Contact" | "Organization" | "Petition" | "User";
-
 export type FeatureFlag =
   | "AUTO_ANONYMIZE"
   | "CUSTOM_HOST_UI"
@@ -1137,8 +1135,8 @@ export interface MutationmodifyPetitionCustomPropertyArgs {
 
 export interface MutationmovePetitionsArgs {
   dst: Scalars["String"];
-  src: Array<Scalars["String"]>;
-  type?: InputMaybe<PetitionBaseType>;
+  src: Array<Scalars["ID"]>;
+  type: PetitionBaseType;
 }
 
 export interface MutationpetitionAttachmentDownloadLinkArgs {
@@ -3198,8 +3196,8 @@ export interface QueryglobalIdDecodeArgs {
 }
 
 export interface QueryglobalIdEncodeArgs {
-  id: Scalars["Int"];
-  type: EntityType;
+  id: Scalars["String"];
+  type: Scalars["String"];
 }
 
 export interface QueryisValidPublicPetitionLinkSlugArgs {

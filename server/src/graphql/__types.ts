@@ -268,7 +268,6 @@ export interface NexusGenInputs {
 export interface NexusGenEnums {
   BulkSendSigningMode: "COPY_SIGNATURE_SETTINGS" | "DISABLE_SIGNATURE" | "LET_RECIPIENT_CHOOSE";
   ChangePasswordResult: "INCORRECT_PASSWORD" | "INVALID_NEW_PASSWORD" | "SUCCESS";
-  EntityType: "Contact" | "Organization" | "Petition" | "User";
   FeatureFlag: db.FeatureFlagName;
   FilterSharedWithLogicalOperator: "AND" | "OR";
   FilterSharedWithOperator: "IS_OWNER" | "NOT_IS_OWNER" | "NOT_SHARED_WITH" | "SHARED_WITH";
@@ -4286,7 +4285,7 @@ export interface NexusGenArgTypes {
     movePetitions: {
       // args
       dst: string; // String!
-      src: string[]; // [String!]!
+      src: string[]; // [ID!]!
       type: NexusGenEnums["PetitionBaseType"]; // PetitionBaseType!
     };
     petitionAttachmentDownloadLink: {
@@ -4898,8 +4897,8 @@ export interface NexusGenArgTypes {
     };
     globalIdEncode: {
       // args
-      id: number; // Int!
-      type: NexusGenEnums["EntityType"]; // EntityType!
+      id: string; // String!
+      type: string; // String!
     };
     isValidPublicPetitionLinkSlug: {
       // args

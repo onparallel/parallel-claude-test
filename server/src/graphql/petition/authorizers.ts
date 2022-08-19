@@ -12,10 +12,9 @@ import {
   PetitionStatus,
 } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
-import { fromGlobalIds, toGlobalId } from "../../util/globalId";
+import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { MaybeArray } from "../../util/types";
 import { Arg, ArgAuthorizer } from "../helpers/authorize";
-import { PETITION_FOLDER_REGEX } from "../helpers/validators/validateRegex";
 
 function createPetitionAuthorizer<TRest extends any[] = []>(
   predicate: (petition: Petition, ...rest: TRest) => boolean
@@ -546,19 +545,34 @@ export function userHasAccessToPetitionsAndFolders<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const srcPaths = unMaybeArray(args[argName] as unknown as string[]);
-      if (srcPaths.length === 0) {
+      const ids = unMaybeArray(args[argName] as unknown as string[]);
+      if (ids.length === 0) {
         return true;
       }
 
-      const [folders, petitionGIDS] = partition(srcPaths, (p) => !!p.match(PETITION_FOLDER_REGEX));
+      const decodedIds = ids.map((id) => {
+        try {
+          return fromGlobalId(id, "Petition");
+        } catch {
+          return fromGlobalId(id, "PetitionFolder", true);
+        }
+      });
+
+      const [folders, petitions] = partition(
+        decodedIds,
+        (decoded) => decoded.type === "PetitionFolder"
+      );
       const [hasPetitionAccess, hasFolderAccess] = await Promise.all([
         ctx.petitions.userHasAccessToPetitions(
           ctx.user!.id,
-          fromGlobalIds(petitionGIDS, "Petition").ids,
+          petitions.map((p) => p.id as number),
           permissionTypes
         ),
-        ctx.petitions.userHasAccessToFolders(ctx.user!.id, folders, permissionTypes),
+        ctx.petitions.userHasAccessToFolders(
+          ctx.user!.id,
+          folders.map((f) => f.id as string),
+          permissionTypes
+        ),
       ]);
 
       return hasPetitionAccess && hasFolderAccess;

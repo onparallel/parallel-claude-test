@@ -1,7 +1,7 @@
 import { decode, encode } from "./token";
 import { Maybe } from "./types";
 
-export function toGlobalId<T extends number | string = number>(type: string, id: T) {
+export function toGlobalId<TId extends number | string = number>(type: string, id: TId) {
   return encode(Buffer.from(`${type}:${id}`, "utf8"));
 }
 
