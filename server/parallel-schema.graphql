@@ -4291,7 +4291,7 @@ type Query {
   """
   Lists every path of the user's petitions as a string array
   """
-  petitionFoldersTree(templates: Boolean): [String!]!
+  petitionFolders(type: PetitionBaseType!): [String!]!
 
   """
   The petitions of the user

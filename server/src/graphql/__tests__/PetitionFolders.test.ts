@@ -22,7 +22,7 @@ describe("Petition Folders", () => {
     await testClient.stop();
   });
 
-  describe("petitionFoldersTree", () => {
+  describe("petitionFolders", () => {
     beforeEach(async () => {
       await mocks.knex.from("petition").update({ deleted_at: new Date() });
       const paths = [
@@ -40,15 +40,19 @@ describe("Petition Folders", () => {
         path: paths[i % paths.length],
       }));
     });
+
     it("queries a list of the user's petition folders", async () => {
-      const { errors, data } = await testClient.execute(gql`
-        query {
-          petitionFoldersTree
-        }
-      `);
+      const { errors, data } = await testClient.execute(
+        gql`
+          query ($type: PetitionBaseType!) {
+            petitionFolders(type: $type)
+          }
+        `,
+        { type: "PETITION" }
+      );
 
       expect(errors).toBeUndefined();
-      expect(data!.petitionFoldersTree).toEqual([
+      expect(data!.petitionFolders).toEqual([
         "/A/",
         "/A/AA/",
         "/B/",
@@ -67,15 +71,15 @@ describe("Petition Folders", () => {
       }));
       const { errors, data } = await testClient.execute(
         gql`
-          query ($templates: Boolean) {
-            petitionFoldersTree(templates: $templates)
+          query ($type: PetitionBaseType!) {
+            petitionFolders(type: $type)
           }
         `,
-        { templates: true }
+        { type: "TEMPLATE" }
       );
 
       expect(errors).toBeUndefined();
-      expect(data!.petitionFoldersTree).toEqual(["/templates-folder/"]);
+      expect(data!.petitionFolders).toEqual(["/templates-folder/"]);
     });
 
     it("ignores paths on petitions of other organization users", async () => {
@@ -85,14 +89,17 @@ describe("Petition Folders", () => {
       }));
       const { apiKey } = await mocks.createUserAuthToken("api-token", otherUser.id);
 
-      const { errors, data } = await testClient.withApiKey(apiKey).execute(gql`
-        query {
-          petitionFoldersTree
-        }
-      `);
+      const { errors, data } = await testClient.withApiKey(apiKey).execute(
+        gql`
+          query ($type: PetitionBaseType!) {
+            petitionFolders(type: $type)
+          }
+        `,
+        { type: "PETITION" }
+      );
 
       expect(errors).toBeUndefined();
-      expect(data!.petitionFoldersTree).toEqual(["/PRIVATE/PATH/"]);
+      expect(data!.petitionFolders).toEqual(["/PRIVATE/PATH/"]);
     });
   });
 

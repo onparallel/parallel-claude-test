@@ -5035,13 +5035,12 @@ export class PetitionRepository extends BaseRepository {
     return fields[0]?.title ?? null;
   }
 
-  async getUserPetitionFoldersTree(userId: number, orgId: number, isTemplate: boolean) {
+  async getUserPetitionFoldersList(userId: number, orgId: number, isTemplate: boolean) {
     const paths = await this.raw<{ path: string }>(
       /* sql */ `
-      select "path" from petition p
+      select distinct("path") from petition p
       join petition_permission pp on p.id = pp.petition_id and pp.user_id = ? and pp.deleted_at is null
       where p.deleted_at is null and p.is_template = ? and p.org_id = ?
-      group by "path"
       order by "path" asc;
     `,
       [userId, isTemplate, orgId]

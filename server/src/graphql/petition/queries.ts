@@ -256,18 +256,18 @@ export const petitionFieldQuery = queryField("petitionField", {
   resolve: async (_, args, ctx) => (await ctx.petitions.loadField(args.petitionFieldId))!,
 });
 
-export const petitionFoldersTree = queryField("petitionFoldersTree", {
+export const petitionFolders = queryField("petitionFolders", {
   description: "Lists every path of the user's petitions as a string array",
   type: list("String"),
   authorize: authenticate(),
   args: {
-    templates: nullable(booleanArg()),
+    type: nonNull("PetitionBaseType"),
   },
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.getUserPetitionFoldersTree(
+    return await ctx.petitions.getUserPetitionFoldersList(
       ctx.user!.id,
       ctx.user!.org_id,
-      args.templates ?? false
+      args.type === "TEMPLATE"
     );
   },
 });
