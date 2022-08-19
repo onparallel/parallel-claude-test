@@ -1,11 +1,12 @@
 import Excel from "exceljs";
-import { isDefined, minBy, uniq, zip } from "remeda";
+import { isDefined, minBy, zip } from "remeda";
 import { Readable } from "stream";
 import { PetitionFieldReply } from "../../db/__types";
 import { getFieldIndices as getFieldIndexes } from "../../util/fieldIndices";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { isFileTypeField } from "../../util/isFileTypeField";
+import { Maybe } from "../../util/types";
 import { TaskRunner } from "../helpers/TaskRunner";
 
 export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_REPORT"> {
@@ -73,33 +74,52 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
           })
         : [];
 
-      const row: Record<string, any> = {
-        [intl.formatMessage({
-          id: "export-template-report.column-header.petition-name",
-          defaultMessage: "Parallel name",
-        })]: petition.name || "",
-        [intl.formatMessage({
-          id: "export-template-report.column-header.recipient-names",
-          defaultMessage: "Recipient names",
-        })]: contactNames.join(", ") || "",
-        [intl.formatMessage({
-          id: "export-template-report.column-header.recipient-emails",
-          defaultMessage: "Recipient emails",
-        })]: contactEmails.join(", ") || "",
-        [intl.formatMessage({
-          id: "export-template-report.column-header.send-date",
-          defaultMessage: "Send date",
-        })]: firstSendDate
-          ? new Date(
-              Date.UTC(
-                parseInt(year.value),
-                parseInt(month.value) - 1, // months go from 0 (Jan) to 11 (Dec)
-                parseInt(day.value),
-                parseInt(hour.value),
-                parseInt(minute.value)
+      const row: Record<
+        string,
+        { position: number; content: Maybe<string | Date>; title: Maybe<string> }
+      > = {
+        "parallel-name": {
+          position: 0,
+          title: intl.formatMessage({
+            id: "export-template-report.column-header.petition-name",
+            defaultMessage: "Parallel name",
+          }),
+          content: petition.name || "",
+        },
+        "recipient-names": {
+          position: 1,
+          title: intl.formatMessage({
+            id: "export-template-report.column-header.recipient-names",
+            defaultMessage: "Recipient names",
+          }),
+          content: contactNames.join(", ") || "",
+        },
+        "recipient-emails": {
+          position: 2,
+          title: intl.formatMessage({
+            id: "export-template-report.column-header.recipient-emails",
+            defaultMessage: "Recipient emails",
+          }),
+          content: contactEmails.join(", ") || "",
+        },
+        "send-date": {
+          position: 3,
+          title: intl.formatMessage({
+            id: "export-template-report.column-header.send-date",
+            defaultMessage: "Send date",
+          }),
+          content: firstSendDate
+            ? new Date(
+                Date.UTC(
+                  parseInt(year.value),
+                  parseInt(month.value) - 1, // months go from 0 (Jan) to 11 (Dec)
+                  parseInt(day.value),
+                  parseInt(hour.value),
+                  parseInt(minute.value)
+                )
               )
-            )
-          : null,
+            : null,
+        },
       };
 
       if (includeRecipientUrl) {
@@ -109,29 +129,36 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
           return `${this.ctx.config.misc.parallelUrl}/${template!.locale}/petition/${keycode}`;
         });
 
-        row[
-          intl.formatMessage({
+        row["recipient-url"] = {
+          position: 4,
+          title: intl.formatMessage({
             id: "export-template-report-column-header.recipient-url",
             defaultMessage: "Recipient URL",
-          })
-        ] = recipientUrls.join(" ") || "";
+          }),
+          content: recipientUrls.join(" ") || "",
+        };
       }
+      const fixedColsLength = Object.keys(row).length;
 
       const fieldIndexes = getFieldIndexes(petitionFields);
       zip(petitionFields, fieldIndexes).forEach(([field, fieldIndex], i) => {
         if (field.type !== "HEADING") {
           const replies = petitionFieldsReplies[i];
-          row[`${fieldIndex}:${field.title}`] = !isFileTypeField(field.type)
-            ? replies.map(this.replyContent).join("; ")
-            : replies.length > 0
-            ? intl.formatMessage(
-                {
-                  id: "export-template-report.file-cell-content",
-                  defaultMessage: "{count, plural, =1{1 file} other {# files}}",
-                },
-                { count: replies.length }
-              )
-            : "";
+          row[`${field.from_petition_field_id ?? field.id}`] = {
+            position: (fieldIndex as number) - 1 + fixedColsLength,
+            title: field.title,
+            content: !isFileTypeField(field.type)
+              ? replies.map(this.replyContent).join("; ")
+              : replies.length > 0
+              ? intl.formatMessage(
+                  {
+                    id: "export-template-report.file-cell-content",
+                    defaultMessage: "{count, plural, =1{1 file} other {# files}}",
+                  },
+                  { count: replies.length }
+                )
+              : "",
+          };
         }
       });
 
@@ -169,26 +196,44 @@ export class TemplateRepliesReportRunner extends TaskRunner<"TEMPLATE_REPLIES_RE
     }
   }
 
-  private async exportToExcel(rows: Record<string, string>[]) {
+  private async exportToExcel(
+    rows: Record<
+      string,
+      { position: number; content: Maybe<string | Date>; title: Maybe<string> }
+    >[]
+  ) {
     const wb = new Excel.Workbook();
 
     const page = wb.addWorksheet();
-    const headers = uniq(rows.flatMap(Object.keys));
-    // first 4 headers are common for every row and we don't want to include those when sorting
-    const sortedHeaders = headers.slice(0, 4).concat(
-      headers.slice(4).sort((a, b) => {
-        const aPosition = parseInt(a.split(":")[0]);
-        const bPosition = parseInt(b.split(":")[0]);
-        return aPosition - bPosition;
-      })
-    );
+    const headers: { key: string; data: { position: number; title: Maybe<string> } }[] = [];
+    rows.forEach((row) => {
+      Object.entries(row).forEach(([key, data]) => {
+        const pushedKey = headers.find((h) => h.key === key);
+        if (!pushedKey) {
+          headers.push({ key, data });
+          // if the same field is found on another position, keep only the first one to avoid duplicating columns
+        } else if (pushedKey.data.position > data.position) {
+          pushedKey.data = data;
+        }
+      });
+    });
 
-    page.columns = sortedHeaders.map((key) => ({
-      key, // keep position on key so fields with same title in different positions are treated as different columns
-      header: key.split(":").slice(1).join(":") || key,
+    headers.sort((a, b) => a.data.position - b.data.position);
+
+    page.columns = headers.map((h) => ({
+      key: h.key,
+      header: h.data.title ?? "",
     }));
 
-    page.addRows(rows);
+    page.addRows(
+      rows.map((row) => {
+        const obj: any = {};
+        Object.entries(row).forEach(([key, data]) => {
+          obj[key] = data.content;
+        });
+        return obj;
+      })
+    );
 
     const stream = new Readable();
     stream.push(await wb.xlsx.writeBuffer());
