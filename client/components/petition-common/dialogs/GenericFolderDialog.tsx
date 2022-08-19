@@ -1,24 +1,23 @@
-import { Box, Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
+import { gql, useQuery } from "@apollo/client";
+import { Box, Button, Center, FormControl, FormLabel, Input, Spinner } from "@chakra-ui/react";
 import { FolderIcon, FolderOpenIcon } from "@parallel/chakra/icons";
 import {
   ConfirmDialog,
   ConfirmDialogProps,
 } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import { PetitionBaseType } from "@parallel/graphql/__types";
+import { GenericFolderDialog_foldersDocument, PetitionBaseType } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import { ComponentType, createElement, useEffect, useRef, useState } from "react";
+import { ComponentType, createElement, useEffect, useMemo, useRef, useState } from "react";
 import TreeView, { INode } from "react-accessible-treeview";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { pick } from "remeda";
+import { isDefined, pick } from "remeda";
 import { PathName } from "../../common/PathName";
 
 interface PathNode extends INode {
   path: string;
 }
-
-const paths = ["/ABC/", "/ABC/XYZ/", "/DEF/"];
 
 type GenericFolderDialogComponentProps = DialogProps<
   {
@@ -50,33 +49,51 @@ export function GenericFolderDialog({
   ...props
 }: DialogProps<GenericFolderDialogProps, string>) {
   const intl = useIntl();
-  const [selectedPath, setSelectedPath] = useState(currentPath);
-  const [data, setData] = useState(() => {
-    const data: PathNode[] = [
-      { id: 0, name: "", parent: null, children: [1], path: "" },
-      { id: 1, name: "", parent: 0, children: [], path: "/" },
-    ];
-    const pathToId: Record<string, number> = { "/": 1 };
-    let counter = 2;
-    const filteredPaths = paths.filter(
-      (p) => !(disabledPaths ?? []).some((dp) => p.startsWith(dp) && p.length > dp.length)
-    );
-    for (const path of filteredPaths) {
-      const parts = path.replace(/^\//, "").replace(/\/$/, "").split("/");
-      const parentPath = parts.length > 1 ? `/${parts.slice(0, -1).join("/")}/` : "/";
-      const parent = data[pathToId[parentPath]];
-      const id = counter++;
-      pathToId[path] = id;
-      parent.children.push(id);
-      data.push({ id, name: "", parent: parent.id, children: [], path });
-    }
-    return data;
+  const { data } = useQuery(GenericFolderDialog_foldersDocument, {
+    variables: { type },
+    fetchPolicy: "network-only",
   });
-  const currentPathNode = data.find((n) => n.path === currentPath)!;
-  const expandedIds = data.filter((n) => currentPath.startsWith(n.path)).map((n) => n.id);
-  const disabledIds = data
-    .filter((n) => (disabledPaths ?? []).some((dp) => n.path === dp))
-    .map((n) => n.id);
+  const [selectedPath, setSelectedPath] = useState(currentPath);
+  const [treeViewData, setTreeViewData] = useState<PathNode[] | null>(null);
+  useEffect(() => {
+    if (isDefined(data)) {
+      const nodes: PathNode[] = [
+        { id: 0, name: "", parent: null, children: [1], path: "" },
+        { id: 1, name: "", parent: 0, children: [], path: "/" },
+      ];
+      const pathToId: Record<string, number> = { "/": 1 };
+      let counter = 2;
+      const filteredPaths = data.petitionFolders.filter(
+        (p) => !(disabledPaths ?? []).some((dp) => p.startsWith(dp) && p.length > dp.length)
+      );
+      for (const path of filteredPaths) {
+        const parts = path.replace(/^\//, "").replace(/\/$/, "").split("/");
+        const parentPath = parts.length > 1 ? `/${parts.slice(0, -1).join("/")}/` : "/";
+        const parent = nodes[pathToId[parentPath]];
+        const id = counter++;
+        pathToId[path] = id;
+        parent.children.push(id);
+        nodes.push({ id, name: "", parent: parent.id, children: [], path });
+      }
+      setTreeViewData(nodes);
+    }
+  }, [isDefined(data)]);
+
+  const treeViewProps = useMemo(() => {
+    if (isDefined(treeViewData)) {
+      return {
+        defaultSelectedIds: [treeViewData.find((n) => n.path === currentPath)!.id],
+        defaultExpandedIds: treeViewData
+          .filter((n) => currentPath.startsWith(n.path))
+          .map((n) => n.id),
+        defaultDisabledIds: treeViewData
+          .filter((n) => (disabledPaths ?? []).some((dp) => n.path === dp))
+          .map((n) => n.id),
+      };
+    } else {
+      return null;
+    }
+  }, [treeViewData]);
 
   useEffect(() => {
     void clickPathItem(currentPath).then();
@@ -118,12 +135,14 @@ export function GenericFolderDialog({
       const isExpanded = node?.parentElement?.getAttribute("aria-expanded") === "true";
       const name = await showNewFolderNameDialog({});
       const path = selectedPath + name + "/";
-      const id = data.length;
-      const parent = data.find((n) => n.path === selectedPath)!;
-      setData([
-        ...data.map((n) => (n.id === parent.id ? { ...n, children: [...n.children, id] } : n)),
+      const id = treeViewData!.length;
+      const parent = treeViewData!.find((n) => n.path === selectedPath)!;
+      setTreeViewData([
+        ...treeViewData!.map((n) =>
+          n.id === parent.id ? { ...n, children: [...n.children, id] } : n
+        ),
         {
-          id: data.length,
+          id: treeViewData!.length,
           name: "",
           parent: parent.id,
           path: path,
@@ -179,55 +198,67 @@ export function GenericFolderDialog({
             },
           }}
         >
-          {createElement(body, componentProps)}
-          <TreeView
-            data={data}
-            aria-label={intl.formatMessage({
-              id: "generic.folder-directory",
-              defaultMessage: "Folder directory",
-            })}
-            clickAction="EXCLUSIVE_SELECT"
-            defaultSelectedIds={[currentPathNode.id]}
-            defaultExpandedIds={expandedIds}
-            defaultDisabledIds={disabledIds}
-            onSelect={({ element, isSelected }) =>
-              isSelected && setSelectedPath((element as any).path)
-            }
-            expandOnKeyboardSelect
-            nodeRenderer={({
-              element,
-              isExpanded,
-              handleExpand,
-              handleSelect,
-              isDisabled,
-              getNodeProps,
-              level,
-            }) => {
-              const { path } = element as any;
-              const { onClick: _, ...nodeProps } = getNodeProps() as any;
-              return (
-                <Button
-                  as="div"
-                  data-folder-path={path}
-                  variant="ghost"
-                  colorScheme="gray"
-                  width="full"
-                  size="sm"
-                  isDisabled={isDisabled}
-                  _focus={{ _disabled: { boxShadow: "outline" } }}
-                  leftIcon={isExpanded ? <FolderOpenIcon /> : <FolderIcon />}
-                  justifyContent="flex-start"
-                  paddingInlineStart={`${0.75 + (level - 1) * 1}rem`}
-                  onClick={handleSelect}
-                  onDoubleClick={handleExpand}
-                  tabIndex={0}
-                  {...nodeProps}
-                >
-                  <PathName type={type} path={path} disableTooltip />
-                </Button>
-              );
-            }}
-          />
+          {isDefined(treeViewData) ? (
+            <>
+              {createElement(body, componentProps)}
+              <TreeView
+                data={treeViewData!}
+                aria-label={intl.formatMessage({
+                  id: "generic.folder-directory",
+                  defaultMessage: "Folder directory",
+                })}
+                clickAction="EXCLUSIVE_SELECT"
+                {...treeViewProps!}
+                onSelect={({ element, isSelected }) =>
+                  isSelected && setSelectedPath((element as any).path)
+                }
+                expandOnKeyboardSelect
+                nodeRenderer={({
+                  element,
+                  isExpanded,
+                  handleExpand,
+                  handleSelect,
+                  isDisabled,
+                  getNodeProps,
+                  level,
+                }) => {
+                  const { path } = element as any;
+                  const { onClick: _, ...nodeProps } = getNodeProps() as any;
+                  return (
+                    <Button
+                      as="div"
+                      data-folder-path={path}
+                      variant="ghost"
+                      colorScheme="gray"
+                      width="full"
+                      size="sm"
+                      isDisabled={isDisabled}
+                      _focus={{ _disabled: { boxShadow: "outline" } }}
+                      leftIcon={isExpanded ? <FolderOpenIcon /> : <FolderIcon />}
+                      justifyContent="flex-start"
+                      paddingInlineStart={`${0.75 + (level - 1) * 1}rem`}
+                      onClick={handleSelect}
+                      onDoubleClick={handleExpand}
+                      tabIndex={0}
+                      {...nodeProps}
+                    >
+                      <PathName type={type} path={path} disableTooltip />
+                    </Button>
+                  );
+                }}
+              />
+            </>
+          ) : (
+            <Center minHeight={64}>
+              <Spinner
+                thickness="4px"
+                speed="0.65s"
+                emptyColor="gray.200"
+                color="primary.500"
+                size="xl"
+              />
+            </Center>
+          )}
         </Box>
       }
       alternative={
@@ -239,6 +270,14 @@ export function GenericFolderDialog({
     />
   );
 }
+
+const _queries = [
+  gql`
+    query GenericFolderDialog_folders($type: PetitionBaseType!) {
+      petitionFolders(type: $type)
+    }
+  `,
+];
 
 function NewFolderNameDialog(props: DialogProps<{}, string>) {
   const intl = useIntl();

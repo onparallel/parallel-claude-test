@@ -3134,7 +3134,7 @@ export interface Query {
   /** A field of the petition. */
   petitionField: PetitionField;
   /** Lists every path of the user's petitions as a string array */
-  petitionFoldersTree: Array<Scalars["String"]>;
+  petitionFolders: Array<Scalars["String"]>;
   /** The petitions of the user */
   petitions: PetitionBaseOrFolderPagination;
   petitionsById: Array<Maybe<PetitionBase>>;
@@ -3247,8 +3247,8 @@ export interface QuerypetitionFieldArgs {
   petitionId: Scalars["GID"];
 }
 
-export interface QuerypetitionFoldersTreeArgs {
-  templates?: InputMaybe<Scalars["Boolean"]>;
+export interface QuerypetitionFoldersArgs {
+  type: PetitionBaseType;
 }
 
 export interface QuerypetitionsArgs {
@@ -7927,6 +7927,12 @@ export type CreateReferenceDialog_PetitionFieldFragment = {
   alias?: string | null;
   options: { [key: string]: any };
 };
+
+export type GenericFolderDialog_foldersQueryVariables = Exact<{
+  type: PetitionBaseType;
+}>;
+
+export type GenericFolderDialog_foldersQuery = { petitionFolders: Array<string> };
 
 export type PetitionSharingModal_Petition_Petition_Fragment = {
   __typename?: "Petition";
@@ -27534,6 +27540,14 @@ export const AddPetitionAccessDialog_createPetitionAccessDocument = gql`
 ` as unknown as DocumentNode<
   AddPetitionAccessDialog_createPetitionAccessMutation,
   AddPetitionAccessDialog_createPetitionAccessMutationVariables
+>;
+export const GenericFolderDialog_foldersDocument = gql`
+  query GenericFolderDialog_folders($type: PetitionBaseType!) {
+    petitionFolders(type: $type)
+  }
+` as unknown as DocumentNode<
+  GenericFolderDialog_foldersQuery,
+  GenericFolderDialog_foldersQueryVariables
 >;
 export const PetitionSharingModal_addPetitionPermissionDocument = gql`
   mutation PetitionSharingModal_addPetitionPermission(
