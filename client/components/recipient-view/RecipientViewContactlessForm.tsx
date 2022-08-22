@@ -421,6 +421,7 @@ export function RecipientViewContactlessForm({
                   id="recipient-view.verify-2"
                   defaultMessage="To ensure the privacy of your data, we need to verify your identity with a code you will receive on your email {email}."
                   values={{
+                    tone,
                     email: (
                       <Text as="span" fontWeight="bold">
                         {email}
