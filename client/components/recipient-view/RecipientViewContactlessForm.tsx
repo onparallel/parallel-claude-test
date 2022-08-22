@@ -9,6 +9,7 @@ import {
   Heading,
   HStack,
   IconButton,
+  Image,
   Input,
   ScaleFade,
   Stack,
@@ -245,24 +246,19 @@ export function RecipientViewContactlessForm({
 
   return (
     <Card
-      padding={{ base: 4, sm: 8 }}
-      paddingTop={{ base: 8, sm: 10 }}
-      paddingBottom={{ base: 12, sm: 12 }}
+      padding={{ base: 6, sm: 8 }}
+      paddingBottom={organization.hasRemoveParallelBranding ? undefined : { base: 12, sm: 12 }}
       position="relative"
     >
       <Stack spacing={8}>
         <Box>
           {organization.logoUrl340 ? (
-            <Box
-              role="img"
-              aria-label={organization.name}
+            <Image
+              alt={organization.name}
+              src={organization.logoUrl340}
+              objectFit="contain"
               width="170px"
-              margin="auto"
               height="60px"
-              backgroundImage={`url("${organization.logoUrl340}")`}
-              backgroundSize="contain"
-              backgroundPosition="center"
-              backgroundRepeat="no-repeat"
             />
           ) : (
             <Logo width="170px" />
@@ -470,7 +466,7 @@ export function RecipientViewContactlessForm({
           </>
         )}
       </Stack>
-      {false ? null : (
+      {organization.hasRemoveParallelBranding ? null : (
         <Box
           position="absolute"
           right={0}

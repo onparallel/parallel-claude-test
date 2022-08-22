@@ -8671,7 +8671,7 @@
   },
   {
     "term": "recipient-view.verify-2",
-    "definition": "Para asegurar la privacidad de sus datos, necesitamos que verifique su identidad mediante el código que le llegará a su correo electrónico {email}.",
+    "definition": "Para asegurar la privacidad de {tone, select, INFORMAL{tus} other{sus}} datos, necesitamos que {tone, select, INFORMAL{verifiques tu} other{verifique su}} identidad mediante el código que {tone, select, INFORMAL{te llegará a tu} other{le llegará a su}} correo electrónico {email}.",
     "context": "To ensure the privacy of your data, we need to verify your identity with a code you will receive on your email {email}."
   },
   {

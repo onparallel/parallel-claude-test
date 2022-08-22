@@ -11242,6 +11242,7 @@ export type RecipientViewHeader_publicDelegateAccessToContactMutation = {
 export type RecipientViewNewDevice_PublicOrganizationFragment = {
   __typename?: "PublicOrganization";
   name: string;
+  hasRemoveParallelBranding: boolean;
   logoUrl340?: string | null;
 };
 
@@ -23764,6 +23765,7 @@ export const RecipientViewNewDevice_PublicOrganizationFragmentDoc = gql`
   fragment RecipientViewNewDevice_PublicOrganization on PublicOrganization {
     name
     logoUrl340: logoUrl(options: { resize: { width: 340, height: 120, fit: inside } })
+    hasRemoveParallelBranding
   }
 ` as unknown as DocumentNode<RecipientViewNewDevice_PublicOrganizationFragment, unknown>;
 export const PublicPetitionFieldCommentContent_PetitionFieldCommentFragmentDoc = gql`

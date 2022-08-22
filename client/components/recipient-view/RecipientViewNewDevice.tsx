@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { Box, Button, Center, Heading, ScaleFade, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Center, Heading, Image, ScaleFade, Stack, Text } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
@@ -107,20 +107,20 @@ export function RecipientViewNewDevice({ organization, email }: RecipientViewNew
   }
 
   return (
-    <Card padding={{ base: 4, sm: 8 }} paddingTop={8} paddingBottom={{ base: 12, sm: 14 }}>
+    <Card
+      padding={{ base: 6, sm: 8 }}
+      paddingBottom={organization.hasRemoveParallelBranding ? undefined : { base: 12, sm: 12 }}
+      position="relative"
+    >
       <Stack spacing={8}>
         <Box>
           {organization.logoUrl340 ? (
-            <Box
-              role="img"
-              aria-label={organization.name}
+            <Image
+              alt={organization.name}
+              src={organization.logoUrl340}
+              objectFit="contain"
               width="170px"
-              margin="auto"
               height="60px"
-              backgroundImage={`url("${organization.logoUrl340}")`}
-              backgroundSize="contain"
-              backgroundPosition="center"
-              backgroundRepeat="no-repeat"
             />
           ) : (
             <Logo width="170px" />
@@ -145,6 +145,7 @@ export function RecipientViewNewDevice({ organization, email }: RecipientViewNew
               id="recipient-view.verify-2"
               defaultMessage="To ensure the privacy of your data, we need to verify your identity with a code you will receive on your email {email}."
               values={{
+                tone,
                 email: (
                   <Text as="span" fontWeight="bold">
                     {email && email.replace(/\*/g, "\u25CF")}
@@ -184,6 +185,28 @@ export function RecipientViewNewDevice({ organization, email }: RecipientViewNew
           </Center>
         ) : null}
       </Stack>
+      {organization.hasRemoveParallelBranding ? null : (
+        <Box
+          position="absolute"
+          right={0}
+          bottom={0}
+          as="a"
+          href="/?ref=parallel_public_link"
+          target="_blank"
+          backgroundColor="gray.200"
+          borderTopLeftRadius="xl"
+          paddingX={4}
+          paddingY={1.5}
+          fontSize="sm"
+          whiteSpace="nowrap"
+        >
+          <FormattedMessage
+            id="recipient-view.created-with"
+            defaultMessage="Created with {parallel}"
+            values={{ parallel: <Text as="b">Parallel</Text> }}
+          />
+        </Box>
+      )}
     </Card>
   );
 }
@@ -193,6 +216,7 @@ RecipientViewNewDevice.fragments = {
     fragment RecipientViewNewDevice_PublicOrganization on PublicOrganization {
       name
       logoUrl340: logoUrl(options: { resize: { width: 340, height: 120, fit: inside } })
+      hasRemoveParallelBranding
     }
   `,
 };

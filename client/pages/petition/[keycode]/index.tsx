@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Container } from "@chakra-ui/react";
+import { Container, Flex } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/dialogs/DialogProvider";
 import { OverrideWithOrganizationTheme } from "@parallel/components/common/OverrideWithOrganizationTheme";
 import { ToneProvider } from "@parallel/components/common/ToneProvider";
@@ -29,22 +29,15 @@ function RecipientViewVerify({
         <Head>
           <title>{organization!.name}</title>
         </Head>
-        <Box backgroundColor="primary.50" minHeight="100vh">
-          <Container
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-            minHeight="100vh"
-            maxW="container.sm"
-            paddingY={4}
-          >
+        <Flex backgroundColor="primary.50" minHeight="100vh" alignItems="center">
+          <Container paddingY={4} maxWidth="32rem">
             {isContactlessAccess ? (
               <RecipientViewContactlessForm ownerName={ownerName!} organization={organization!} />
             ) : (
               <RecipientViewNewDevice email={email!} organization={organization!} />
             )}
           </Container>
-        </Box>
+        </Flex>
       </OverrideWithOrganizationTheme>
     </ToneProvider>
   );
