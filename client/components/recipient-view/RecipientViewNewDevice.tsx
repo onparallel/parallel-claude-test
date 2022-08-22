@@ -131,6 +131,7 @@ export function RecipientViewNewDevice({ organization, email }: RecipientViewNew
             <FormattedMessage
               id="recipient-view.verify-title"
               defaultMessage="Enter verification code"
+              values={{ tone }}
             />
           </Heading>
           <Text>

@@ -8681,7 +8681,7 @@
   },
   {
     "term": "recipient-view.verify-title",
-    "definition": "Introduce el código de verificación",
+    "definition": "{tone, select, INFORMAL{Introduce} other{Introduzca}} el código de verificación",
     "context": "Enter verification code"
   },
   {
