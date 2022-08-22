@@ -452,7 +452,7 @@ export type Mutation = {
   createFileUploadReply: FileUploadReplyResponse;
   /** Notifies the backend that the upload is complete. */
   createFileUploadReplyComplete: PetitionFieldReply;
-  /** Creates a new organization. */
+  /** Creates a new organization. Sends email to owner ONLY if it's not registered in any other organization. */
   createOrganization: SupportMethodResponse;
   /** Creates a new PDF_DOCUMENT theme on the user's organization */
   createOrganizationPdfDocumentTheme: Organization;
@@ -489,8 +489,6 @@ export type Mutation = {
   createTemplateRepliesReportTask: Task;
   /** Creates a task for generating a JSON report of the template usage */
   createTemplateStatsReportTask: Task;
-  /** Creates a new user in the specified organization. */
-  createUser: SupportMethodResponse;
   /** Creates a group in the user's organization */
   createUserGroup: UserGroup;
   /** Deactivates the specified active petition accesses. */
@@ -965,16 +963,6 @@ export type MutationcreateTemplateRepliesReportTaskArgs = {
 
 export type MutationcreateTemplateStatsReportTaskArgs = {
   templateId: Scalars["GID"];
-};
-
-export type MutationcreateUserArgs = {
-  email: Scalars["String"];
-  firstName: Scalars["String"];
-  lastName: Scalars["String"];
-  locale: PetitionLocale;
-  organizationId: Scalars["Int"];
-  password: Scalars["String"];
-  role: OrganizationRole;
 };
 
 export type MutationcreateUserGroupArgs = {

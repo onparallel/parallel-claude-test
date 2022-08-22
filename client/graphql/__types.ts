@@ -486,7 +486,7 @@ export interface Mutation {
   createFileUploadReply: FileUploadReplyResponse;
   /** Notifies the backend that the upload is complete. */
   createFileUploadReplyComplete: PetitionFieldReply;
-  /** Creates a new organization. */
+  /** Creates a new organization. Sends email to owner ONLY if it's not registered in any other organization. */
   createOrganization: SupportMethodResponse;
   /** Creates a new PDF_DOCUMENT theme on the user's organization */
   createOrganizationPdfDocumentTheme: Organization;
@@ -523,8 +523,6 @@ export interface Mutation {
   createTemplateRepliesReportTask: Task;
   /** Creates a task for generating a JSON report of the template usage */
   createTemplateStatsReportTask: Task;
-  /** Creates a new user in the specified organization. */
-  createUser: SupportMethodResponse;
   /** Creates a group in the user's organization */
   createUserGroup: UserGroup;
   /** Deactivates the specified active petition accesses. */
@@ -999,16 +997,6 @@ export interface MutationcreateTemplateRepliesReportTaskArgs {
 
 export interface MutationcreateTemplateStatsReportTaskArgs {
   templateId: Scalars["GID"];
-}
-
-export interface MutationcreateUserArgs {
-  email: Scalars["String"];
-  firstName: Scalars["String"];
-  lastName: Scalars["String"];
-  locale: PetitionLocale;
-  organizationId: Scalars["Int"];
-  password: Scalars["String"];
-  role: OrganizationRole;
 }
 
 export interface MutationcreateUserGroupArgs {
@@ -5854,12 +5842,6 @@ export type CreateUserDialog_emailIsAvailableQueryVariables = Exact<{
 }>;
 
 export type CreateUserDialog_emailIsAvailableQuery = { emailIsAvailable: boolean };
-
-export type InviteUserDialog_emailIsAvailableQueryVariables = Exact<{
-  email: Scalars["String"];
-}>;
-
-export type InviteUserDialog_emailIsAvailableQuery = { emailIsAvailable: boolean };
 
 export type EmailEventsIndicator_PetitionMessageFragment = {
   __typename?: "PetitionMessage";
@@ -27543,14 +27525,6 @@ export const CreateUserDialog_emailIsAvailableDocument = gql`
 ` as unknown as DocumentNode<
   CreateUserDialog_emailIsAvailableQuery,
   CreateUserDialog_emailIsAvailableQueryVariables
->;
-export const InviteUserDialog_emailIsAvailableDocument = gql`
-  query InviteUserDialog_emailIsAvailable($email: String!) {
-    emailIsAvailable(email: $email)
-  }
-` as unknown as DocumentNode<
-  InviteUserDialog_emailIsAvailableQuery,
-  InviteUserDialog_emailIsAvailableQueryVariables
 >;
 export const AddPetitionAccessDialog_createPetitionAccessDocument = gql`
   mutation AddPetitionAccessDialog_createPetitionAccess($petitionId: GID!) {

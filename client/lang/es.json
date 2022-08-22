@@ -6500,6 +6500,16 @@
     "context": "Usage"
   },
   {
+    "term": "organization.user-already-registered.toast-description",
+    "definition": "El email ya se encuentra registrado en la organización.",
+    "context": "The provided email is already registered on the organization."
+  },
+  {
+    "term": "organization.user-already-registered.toast-title",
+    "definition": "Usuario ya registrado",
+    "context": "User already registered"
+  },
+  {
     "term": "organization.user-created-success.toast-description",
     "definition": "Hemos enviado un email a {email} con instrucciones para registrarse en Parallel.",
     "context": "We have sent an email to {email} with instructions to register in Parallel."

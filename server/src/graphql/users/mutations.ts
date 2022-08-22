@@ -44,6 +44,7 @@ import {
   contextUserIsNotSso,
   userIsNotContextUser,
   userIsNotOrgOwner,
+  emailIsNotRegisteredInTargetOrg,
   userIsNotSSO,
 } from "./authorizers";
 
@@ -108,7 +109,8 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
     orgDoesNotHaveSsoProvider(),
     orgCanCreateNewUser(),
     ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never)),
-    ifArgDefined("orgId", userIsSuperAdmin(), contextUserHasRole("ADMIN"))
+    ifArgDefined("orgId", userIsSuperAdmin(), contextUserHasRole("ADMIN")),
+    emailIsNotRegisteredInTargetOrg("email", "orgId" as never)
   ),
   args: {
     email: nonNull(stringArg()),
@@ -122,7 +124,6 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
   validateArgs: validateAnd(
     validLocale((args) => args.locale, "locale"),
     validEmail((args) => args.email, "email"),
-    emailIsAvailable((args) => args.email),
     (_, { role }, ctx, info) => {
       if (role === "OWNER") {
         throw new ArgValidationError(info, "role", "Can't create a new user with OWNER role.");

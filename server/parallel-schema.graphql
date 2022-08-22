@@ -653,7 +653,7 @@ type Mutation {
   createFileUploadReplyComplete(petitionId: GID!, replyId: GID!): PetitionFieldReply!
 
   """
-  Creates a new organization.
+  Creates a new organization. Sends email to owner ONLY if it's not registered in any other organization.
   """
   createOrganization(
     """
@@ -812,42 +812,6 @@ type Mutation {
   Creates a task for generating a JSON report of the template usage
   """
   createTemplateStatsReportTask(templateId: GID!): Task!
-
-  """
-  Creates a new user in the specified organization.
-  """
-  createUser(
-    """
-    Email of the user
-    """
-    email: String!
-
-    """
-    First name of the user
-    """
-    firstName: String!
-
-    """
-    Last name of the user
-    """
-    lastName: String!
-    locale: PetitionLocale!
-
-    """
-    ID of the organization
-    """
-    organizationId: Int!
-
-    """
-    Temporary password of the user
-    """
-    password: String!
-
-    """
-    Role of the user
-    """
-    role: OrganizationRole!
-  ): SupportMethodResponse!
 
   """
   Creates a group in the user's organization

@@ -1,4 +1,3 @@
-import { gql, useApolloClient } from "@apollo/client";
 import {
   Button,
   FormControl,
@@ -12,13 +11,8 @@ import {
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/dialogs/ConfirmDialog";
 import { DialogProps, useDialog } from "@parallel/components/common/dialogs/DialogProvider";
-import {
-  InviteUserDialog_emailIsAvailableDocument,
-  OrganizationRole,
-} from "@parallel/graphql/__types";
-import { isApolloError } from "@parallel/utils/apollo/isApolloError";
+import { OrganizationRole } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useOrganizationRoles } from "@parallel/utils/useOrganizationRoles";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
@@ -51,40 +45,10 @@ export function InviteUserDialog({ ...props }: DialogProps<{}, InviteUserDialogD
     },
   });
 
-  const apollo = useApolloClient();
-  const debouncedEmailIsAvailable = useDebouncedAsync(
-    async (email: string) => {
-      const { data } = await apollo.query({
-        query: InviteUserDialog_emailIsAvailableDocument,
-        variables: { email },
-        fetchPolicy: "no-cache",
-      });
-      return data.emailIsAvailable;
-    },
-    300,
-    []
-  );
-
-  const emailIsAvailable = async (value: string) => {
-    try {
-      return await debouncedEmailIsAvailable(value);
-    } catch (e: any) {
-      // "DEBOUNCED" error means the search was cancelled because user kept typing
-      if (e === "DEBOUNCED") {
-        return "DEBOUNCED";
-      } else if (isApolloError(e)) {
-        return e.graphQLErrors[0]?.extensions?.code as string;
-      } else {
-        throw e;
-      }
-    }
-  };
-
   const emailRef = useRef<HTMLInputElement>(null);
   const emailRegisterProps = useRegisterWithRef(emailRef, register, "email", {
     required: true,
     pattern: EMAIL_REGEX,
-    validate: { emailIsAvailable },
   });
 
   const locales = useSupportedLocales();
@@ -120,21 +84,12 @@ export function InviteUserDialog({ ...props }: DialogProps<{}, InviteUserDialogD
                 defaultMessage: "name@example.com",
               })}
             />
-            {errors.email?.message !== "DEBOUNCED" ? (
-              <FormErrorMessage>
-                {errors.email?.message === "EMAIL_ALREADY_REGISTERED_ERROR" ? (
-                  <FormattedMessage
-                    id="generic.forms.email-already-registered-error"
-                    defaultMessage="This email is already registered"
-                  />
-                ) : (
-                  <FormattedMessage
-                    id="generic.forms.invalid-email-error"
-                    defaultMessage="Please, enter a valid email"
-                  />
-                )}
-              </FormErrorMessage>
-            ) : null}
+            <FormErrorMessage>
+              <FormattedMessage
+                id="generic.forms.invalid-email-error"
+                defaultMessage="Please, enter a valid email"
+              />
+            </FormErrorMessage>
           </FormControl>
           <FormControl id="first-name" isInvalid={!!errors.firstName}>
             <FormLabel>
@@ -198,14 +153,6 @@ export function InviteUserDialog({ ...props }: DialogProps<{}, InviteUserDialogD
     />
   );
 }
-
-InviteUserDialog.queries = [
-  gql`
-    query InviteUserDialog_emailIsAvailable($email: String!) {
-      emailIsAvailable(email: $email)
-    }
-  `,
-];
 
 export function useInviteUserDialog() {
   return useDialog(InviteUserDialog);

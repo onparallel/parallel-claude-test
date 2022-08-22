@@ -1050,7 +1050,6 @@ export interface NexusGenFieldTypes {
     createTag: NexusGenRootTypes["Tag"]; // Tag!
     createTemplateRepliesReportTask: NexusGenRootTypes["Task"]; // Task!
     createTemplateStatsReportTask: NexusGenRootTypes["Task"]; // Task!
-    createUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     deactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     deactivateUser: NexusGenRootTypes["User"][]; // [User!]!
@@ -2620,7 +2619,6 @@ export interface NexusGenFieldTypeNames {
     createTag: "Tag";
     createTemplateRepliesReportTask: "Task";
     createTemplateStatsReportTask: "Task";
-    createUser: "SupportMethodResponse";
     createUserGroup: "UserGroup";
     deactivateAccesses: "PetitionAccess";
     deactivateUser: "User";
@@ -4131,16 +4129,6 @@ export interface NexusGenArgTypes {
     createTemplateStatsReportTask: {
       // args
       templateId: NexusGenScalars["GID"]; // GID!
-    };
-    createUser: {
-      // args
-      email: string; // String!
-      firstName: string; // String!
-      lastName: string; // String!
-      locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
-      organizationId: number; // Int!
-      password: string; // String!
-      role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
     };
     createUserGroup: {
       // args

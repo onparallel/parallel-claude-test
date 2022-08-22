@@ -174,7 +174,22 @@ function OrganizationUsers() {
         isClosable: true,
       });
     } catch (e: any) {
-      genericError();
+      if (isApolloError(e, "USER_ALREADY_IN_ORG_ERROR")) {
+        toast({
+          status: "info",
+          title: intl.formatMessage({
+            id: "organization.user-already-registered.toast-title",
+            defaultMessage: "User already registered",
+          }),
+          description: intl.formatMessage({
+            id: "organization.user-already-registered.toast-description",
+            defaultMessage: "The provided email is already registered on the organization.",
+          }),
+          isClosable: true,
+        });
+      } else {
+        genericError();
+      }
     }
   };
 

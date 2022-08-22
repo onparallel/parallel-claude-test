@@ -1,7 +1,8 @@
+import { ApolloError } from "apollo-server-core";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
 import { UserOrganizationRole } from "../../db/__types";
 import { unMaybeArray } from "../../util/arrays";
-import { MaybeArray } from "../../util/types";
+import { Maybe, MaybeArray } from "../../util/types";
 import { userHasRole } from "../../util/userHasRole";
 import { Arg } from "../helpers/authorize";
 
@@ -69,4 +70,25 @@ export function userIsNotContextUser<
   TArg extends Arg<TypeName, FieldName, number>
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => ctx.user!.id !== (args[argName] as unknown as number);
+}
+
+export function emailIsNotRegisteredInTargetOrg<
+  TypeName extends string,
+  FieldName extends string,
+  TEmail extends Arg<TypeName, FieldName, string>,
+  TOrgId extends Arg<TypeName, FieldName, Maybe<number>>
+>(emailArg: TEmail, orgIdArg: TOrgId): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const email = args[emailArg] as unknown as string;
+    const targetOrgId = args[orgIdArg] ?? ctx.user!.org_id;
+    const users = await ctx.users.loadUsersByEmail(email);
+    if (users.some((user) => user.org_id === targetOrgId)) {
+      throw new ApolloError(
+        "The provided email is already registered on the organization",
+        "USER_ALREADY_IN_ORG_ERROR"
+      );
+    }
+
+    return true;
+  };
 }

@@ -1,4 +1,4 @@
-import { arg, booleanArg, idArg, intArg, mutationField, nonNull, nullable, stringArg } from "nexus";
+import { booleanArg, idArg, intArg, mutationField, nonNull, nullable, stringArg } from "nexus";
 import { isDefined, uniq } from "remeda";
 import { fullName } from "../../util/fullName";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
@@ -8,7 +8,6 @@ import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
 import { uploadArg } from "../helpers/scalars";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
-import { emailIsAvailable } from "../helpers/validators/emailIsAvailable";
 import { validateFile } from "../helpers/validators/validateFile";
 import { validateRegex } from "../helpers/validators/validateRegex";
 import { validEmail } from "../helpers/validators/validEmail";
@@ -82,7 +81,8 @@ export const deletePetition = mutationField("deletePetition", {
 });
 
 export const createOrganization = mutationField("createOrganization", {
-  description: "Creates a new organization.",
+  description:
+    "Creates a new organization. Sends email to owner ONLY if it's not registered in any other organization.",
   type: "SupportMethodResponse",
   args: {
     name: nonNull(stringArg({ description: "Name of the organization" })),
@@ -97,7 +97,6 @@ export const createOrganization = mutationField("createOrganization", {
   validateArgs: validateAnd(
     validLocale((args) => args.locale, "locale"),
     validEmail((args) => args.email, "email"),
-    emailIsAvailable((args) => args.email),
     (_, { status }, ctx, info) => {
       if (status === "ROOT") {
         throw new ArgValidationError(info, "status", "Can't create an org with ROOT status");
@@ -147,68 +146,6 @@ export const createOrganization = mutationField("createOrganization", {
       return {
         result: RESULT.SUCCESS,
         message: `Organization:${org.id} created successfully with owner ${args.email}.`,
-      };
-    } catch (e: any) {
-      return { result: RESULT.FAILURE, message: e.message };
-    }
-  },
-});
-
-export const createUser = mutationField("createUser", {
-  description: "Creates a new user in the specified organization.",
-  type: "SupportMethodResponse",
-  args: {
-    email: nonNull(stringArg({ description: "Email of the user" })),
-    password: nonNull(stringArg({ description: "Temporary password of the user" })),
-    firstName: nonNull(stringArg({ description: "First name of the user" })),
-    lastName: nonNull(stringArg({ description: "Last name of the user" })),
-    role: nonNull(arg({ type: "OrganizationRole", description: "Role of the user" })),
-    organizationId: nonNull(intArg({ description: "ID of the organization" })),
-    locale: nonNull("PetitionLocale"),
-  },
-  validateArgs: validateAnd(
-    validLocale((args) => args.locale, "locale"),
-    validEmail((args) => args.email, "email"),
-    emailIsAvailable((args) => args.email)
-  ),
-  authorize: supportMethodAccess(),
-  resolve: async (_, args, ctx) => {
-    try {
-      const org = await ctx.organizations.loadOrg(args.organizationId);
-      if (!org) {
-        throw new Error(`Organization with id ${args.organizationId} does not exist.`);
-      }
-
-      const email = args.email.trim().toLowerCase();
-      const userData = (await ctx.users.loadUserData(ctx.user!.user_data_id))!;
-      const cognitoId = await ctx.aws.getOrCreateCognitoUser(
-        email,
-        args.password,
-        args.firstName,
-        args.lastName,
-        {
-          locale: args.locale ?? "en",
-          organizationName: org.name,
-          organizationUser: fullName(userData.first_name, userData.last_name),
-        }
-      );
-      const user = await ctx.users.createUser(
-        {
-          org_id: org.id,
-          organization_role: args.role,
-        },
-        {
-          cognito_id: cognitoId,
-          email,
-          first_name: args.firstName,
-          last_name: args.lastName,
-          details: { source: "parallel", preferredLocale: args.locale ?? "en" },
-        },
-        `User:${ctx.user!.id}`
-      );
-      return {
-        result: RESULT.SUCCESS,
-        message: `User:${user.id} with email ${args.email} created in org ${org.name}`,
       };
     } catch (e: any) {
       return { result: RESULT.FAILURE, message: e.message };

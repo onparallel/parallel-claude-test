@@ -996,7 +996,7 @@ describe("GraphQL/Users", () => {
       expect(data).toBeNull();
     });
 
-    it("should not create a user if the email is already registered", async () => {
+    it("should not create a user if the email is already registered on that organization", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation (
@@ -1024,7 +1024,7 @@ describe("GraphQL/Users", () => {
         },
       });
 
-      expect(errors).toContainGraphQLError("EMAIL_ALREADY_REGISTERED_ERROR");
+      expect(errors).toContainGraphQLError("USER_ALREADY_IN_ORG_ERROR");
       expect(data).toBeNull();
     });
 

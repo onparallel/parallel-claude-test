@@ -47,7 +47,8 @@ export const supportMethods: {
   {
     field: {
       name: "createOrganization",
-      description: "Creates a new organization.",
+      description:
+        "Creates a new organization. Sends email to owner ONLY if it's not registered in any other organization.",
       args: [
         {
           name: "email",
@@ -128,106 +129,6 @@ export const supportMethods: {
             kind: "NON_NULL",
             name: null,
             ofType: { kind: "ENUM", name: "OrganizationStatus", ofType: null },
-          },
-          defaultValue: null,
-          isDeprecated: false,
-          deprecationReason: null,
-        },
-      ],
-      type: {
-        kind: "NON_NULL",
-        name: null,
-        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
-      },
-      isDeprecated: false,
-      deprecationReason: null,
-    },
-    queryType: "mutation",
-  },
-  {
-    field: {
-      name: "createUser",
-      description: "Creates a new user in the specified organization.",
-      args: [
-        {
-          name: "email",
-          description: "Email of the user",
-          type: {
-            kind: "NON_NULL",
-            name: null,
-            ofType: { kind: "SCALAR", name: "String", ofType: null },
-          },
-          defaultValue: null,
-          isDeprecated: false,
-          deprecationReason: null,
-        },
-        {
-          name: "firstName",
-          description: "First name of the user",
-          type: {
-            kind: "NON_NULL",
-            name: null,
-            ofType: { kind: "SCALAR", name: "String", ofType: null },
-          },
-          defaultValue: null,
-          isDeprecated: false,
-          deprecationReason: null,
-        },
-        {
-          name: "lastName",
-          description: "Last name of the user",
-          type: {
-            kind: "NON_NULL",
-            name: null,
-            ofType: { kind: "SCALAR", name: "String", ofType: null },
-          },
-          defaultValue: null,
-          isDeprecated: false,
-          deprecationReason: null,
-        },
-        {
-          name: "locale",
-          description: null,
-          type: {
-            kind: "NON_NULL",
-            name: null,
-            ofType: { kind: "ENUM", name: "PetitionLocale", ofType: null },
-          },
-          defaultValue: null,
-          isDeprecated: false,
-          deprecationReason: null,
-        },
-        {
-          name: "organizationId",
-          description: "ID of the organization",
-          type: {
-            kind: "NON_NULL",
-            name: null,
-            ofType: { kind: "SCALAR", name: "Int", ofType: null },
-          },
-          defaultValue: null,
-          isDeprecated: false,
-          deprecationReason: null,
-        },
-        {
-          name: "password",
-          description: "Temporary password of the user",
-          type: {
-            kind: "NON_NULL",
-            name: null,
-            ofType: { kind: "SCALAR", name: "String", ofType: null },
-          },
-          defaultValue: null,
-          isDeprecated: false,
-          deprecationReason: null,
-        },
-        {
-          name: "role",
-          description: "Role of the user",
-          type: {
-            kind: "NON_NULL",
-            name: null,
-            ofType: { kind: "ENUM", name: "OrganizationRole", ofType: null },
           },
           defaultValue: null,
           isDeprecated: false,
@@ -994,22 +895,6 @@ export const schemaTypes: IntrospectionType[] = [
         deprecationReason: null,
       },
       { name: "ROOT", description: "Root client", isDeprecated: false, deprecationReason: null },
-    ],
-    possibleTypes: null,
-  },
-  {
-    kind: "ENUM",
-    name: "OrganizationRole",
-    description: "The roles of a user within an organization.",
-    specifiedByURL: null,
-    fields: null,
-    inputFields: null,
-    interfaces: null,
-    enumValues: [
-      { name: "ADMIN", description: null, isDeprecated: false, deprecationReason: null },
-      { name: "COLLABORATOR", description: null, isDeprecated: false, deprecationReason: null },
-      { name: "NORMAL", description: null, isDeprecated: false, deprecationReason: null },
-      { name: "OWNER", description: null, isDeprecated: false, deprecationReason: null },
     ],
     possibleTypes: null,
   },
