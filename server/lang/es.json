@@ -76,7 +76,7 @@
   },
   {
     "term": "component.greeting-new-user",
-    "definition": "{name, select, null {Hola! 👋} other {Hola {name}! 👋}}",
+    "definition": "{name, select, null {¡Hola! 👋} other {¡Hola {name}! 👋}}",
     "context": "{name, select, null {Hi! 👋} other {Hi {name}! 👋}}"
   },
   {
@@ -396,7 +396,7 @@
   },
   {
     "term": "invitation.waiting-to-collaborate",
-    "definition": "{organizationUser} te está esperando para colaborar contigo! 😁",
+    "definition": "¡{organizationUser} te está esperando para colaborar contigo! 😁",
     "context": "{organizationUser} is waiting for you to collaborate together! 😁"
   },
   {
