@@ -234,6 +234,17 @@ export class PetitionRepository extends BaseRepository {
     return rows.length === 1;
   }
 
+  async userHasAccessToPetitionFieldComments(userId: number, petitionFieldCommentIds: number[]) {
+    const comments = await this.loadPetitionFieldComment(petitionFieldCommentIds);
+    return (
+      comments.every((c) => !!c) &&
+      (await this.userHasAccessToPetitions(
+        userId,
+        comments.map((c) => c!.petition_id)
+      ))
+    );
+  }
+
   async fieldsBelongToPetition(petitionId: number, fieldIds: number[]) {
     const [{ count }] = await this.from("petition_field")
       .where({
@@ -5138,6 +5149,9 @@ export class PetitionRepository extends BaseRepository {
     sharePetition: boolean,
     userId: number
   ) {
+    if (mentions.length === 0) {
+      return;
+    }
     const [userMentions, userGroupMentions] = partition(mentions, (m) => m.type === "User");
     const permissions = await this.loadUserAndUserGroupPermissionsByPetitionId(petitionId);
     const [userPermissions, groupPermissions] = partition(permissions, (p) => isDefined(p.user_id));

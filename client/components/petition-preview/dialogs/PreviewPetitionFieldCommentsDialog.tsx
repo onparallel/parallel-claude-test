@@ -21,8 +21,8 @@ import { Link } from "@parallel/components/common/Link";
 import { PetitionFieldComment } from "@parallel/components/common/PetitionFieldComment";
 import { PetitionCommentsAndNotesEditor } from "@parallel/components/petition-common/PetitionCommentsAndNotesEditor";
 import {
+  PreviewPetitionFieldCommentsDialog_PetitionFieldFragment,
   PreviewPetitionFieldCommentsDialog_petitionFieldQueryDocument,
-  PreviewPetitionField_PetitionFieldFragment,
   Tone,
 } from "@parallel/graphql/__types";
 import { useGetMyId } from "@parallel/utils/apollo/getMyId";
@@ -40,7 +40,7 @@ import { Divider } from "../../common/Divider";
 
 interface PreviewPetitionFieldCommentsDialogProps {
   petitionId: string;
-  field: PreviewPetitionField_PetitionFieldFragment;
+  field: PreviewPetitionFieldCommentsDialog_PetitionFieldFragment;
   isTemplate?: boolean;
   tone: Tone;
   isDisabled: boolean;

@@ -1,7 +1,7 @@
 import { ApolloError } from "apollo-server-express";
 import { core } from "nexus";
 import { FieldAuthorizeResolver } from "nexus/dist/plugins/fieldAuthorizePlugin";
-import { countBy, isDefined, partition, uniq } from "remeda";
+import { countBy, isDefined, uniq } from "remeda";
 import {
   FeatureFlagName,
   IntegrationType,
@@ -595,31 +595,31 @@ export function userHasAccessToPetitionFieldComment<
   TypeName extends string,
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
->(commentIdArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const commentIds = unMaybeArray(args[commentIdArg] as unknown as MaybeArray<number>);
-      const comments = await ctx.petitions.loadPetitionFieldComment(commentIds);
-      if (comments.some((c) => !c || c.user_id !== ctx.user!.id)) {
-        return false;
+      const commentIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+      if (commentIds.length === 0) {
+        return true;
       }
-
-      const [internal, external] = partition(comments, (c) => c!.is_internal);
-      const results = await Promise.all([
-        ctx.petitions.userHasAccessToPetitions(
-          ctx.user!.id,
-          internal.map((c) => c!.petition_id)
-        ),
-        // if the comment is external, user must have OWNER or WRITE permissions on the petition
-        ctx.petitions.userHasAccessToPetitions(
-          ctx.user!.id,
-          external.map((c) => c!.petition_id),
-          ["OWNER", "WRITE"]
-        ),
-      ]);
-
-      return results.every((r) => r);
+      return await ctx.petitions.userHasAccessToPetitionFieldComments(ctx.user!.id, commentIds);
     } catch {}
     return false;
+  };
+}
+
+export function userIsOwnerOfPetitionFieldComment<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(commentIdArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const commentIds = unMaybeArray(args[commentIdArg] as unknown as MaybeArray<number>);
+    const comments = await ctx.petitions.loadPetitionFieldComment(commentIds);
+    if (comments.some((c) => !c || c.user_id !== ctx.user!.id)) {
+      return false;
+    }
+
+    return true;
   };
 }

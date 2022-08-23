@@ -11,7 +11,7 @@ import {
   fieldsBelongsToPetition,
   fieldsHaveCommentsEnabled,
   petitionIsNotAnonymized,
-  userHasAccessToPetitionFieldComment,
+  userIsOwnerOfPetitionFieldComment,
   userHasAccessToPetitions,
 } from "../authorizers";
 
@@ -19,8 +19,6 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
   description: "Create a petition field comment.",
   type: "PetitionFieldComment",
   authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
-    fieldsBelongsToPetition("petitionId", "petitionFieldId"),
     ifArgEquals(
       "isInternal",
       false,
@@ -28,8 +26,10 @@ export const createPetitionFieldComment = mutationField("createPetitionFieldComm
         userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"]),
         fieldsHaveCommentsEnabled("petitionFieldId"),
         fieldsAreNotInternal("petitionFieldId")
-      )
+      ),
+      userHasAccessToPetitions("petitionId")
     ),
+    fieldsBelongsToPetition("petitionId", "petitionFieldId"),
     petitionIsNotAnonymized("petitionId"),
     validPetitionFieldCommentContent("content", "petitionFieldId", true)
   ),
@@ -88,9 +88,10 @@ export const deletePetitionFieldComment = mutationField("deletePetitionFieldComm
   description: "Delete a petition field comment.",
   type: "PetitionField",
   authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
     commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
-    userHasAccessToPetitionFieldComment("petitionFieldCommentId"),
+    userIsOwnerOfPetitionFieldComment("petitionFieldCommentId"),
     petitionIsNotAnonymized("petitionId")
   ),
   args: {
@@ -113,9 +114,10 @@ export const updatePetitionFieldComment = mutationField("updatePetitionFieldComm
   description: "Update a petition field comment.",
   type: "PetitionFieldComment",
   authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "petitionFieldId"),
     commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
-    userHasAccessToPetitionFieldComment("petitionFieldCommentId"),
+    userIsOwnerOfPetitionFieldComment("petitionFieldCommentId"),
     petitionIsNotAnonymized("petitionId"),
     validPetitionFieldCommentContent("content", "petitionFieldId", true)
   ),

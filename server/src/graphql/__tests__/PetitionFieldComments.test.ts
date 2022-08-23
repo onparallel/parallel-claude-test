@@ -640,7 +640,8 @@ describe("GraphQL/Petition Fields Comments", () => {
       expect(data?.updatePetitionFieldComment).toBeDefined();
     });
 
-    it("should NOT allow to update an external comment with READ access and owner of that comment", async () => {
+    it("should allow to update an external comment with READ access and owner of that comment", async () => {
+      const content = mocks.createRandomCommentContent();
       const { errors, data } = await testClient.execute(
         gql`
           mutation (
@@ -656,6 +657,7 @@ describe("GraphQL/Petition Fields Comments", () => {
               content: $content
             ) {
               id
+              content
             }
           }
         `,
@@ -663,12 +665,15 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionId: toGlobalId("Petition", readPetition.id),
           petitionFieldId: toGlobalId("PetitionField", readField.id),
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", comment.id),
-          content: mocks.createRandomCommentContent(),
+          content,
         }
       );
 
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
+      expect(errors).toBeUndefined();
+      expect(data!.updatePetitionFieldComment).toEqual({
+        id: toGlobalId("PetitionFieldComment", comment.id),
+        content,
+      });
     });
   });
 
@@ -762,7 +767,7 @@ describe("GraphQL/Petition Fields Comments", () => {
       expect(data?.deletePetitionFieldComment).toBeDefined();
     });
 
-    it("should NOT allow to delete an external comment with READ access", async () => {
+    it("should allow to delete an external comment with READ access", async () => {
       const { errors, data } = await testClient.execute(
         gql`
           mutation ($petitionId: GID!, $petitionFieldId: GID!, $petitionFieldCommentId: GID!) {
@@ -781,8 +786,10 @@ describe("GraphQL/Petition Fields Comments", () => {
           petitionFieldCommentId: toGlobalId("PetitionFieldComment", comment.id),
         }
       );
-      expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
+      expect(errors).toBeUndefined();
+      expect(data!.deletePetitionFieldComment).toEqual({
+        id: toGlobalId("PetitionField", readField.id),
+      });
     });
   });
 });
